@@ -88,6 +88,35 @@
   color: #f0ce7e;
 }
 
+.pillCharge {
+  background: #2e2412;
+  border-color: #e8b23a;
+  color: #f0ce7e;
+}
+
+.nudgeStrip {
+  position: absolute;
+  top: 26.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+  padding: 6px 8px;
+  background: rgba(24, 34, 56, 0.92);
+  border: 1px solid #2a3853;
+  border-radius: 10px;
+}
+
+.rerollRow {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+.enemyChipTargeted {
+  border-color: #7c5cff;
+}
+
 .enemyRow {
   position: absolute;
   top: 10.5%;
@@ -129,6 +158,12 @@
   background: #12263b;
   border-color: #4a90e2;
   color: #9cc4f2;
+}
+
+.intentUtility {
+  background: #221a33;
+  border-color: #b08cff;
+  color: #d9cbff;
 }
 
 .bottomBar {

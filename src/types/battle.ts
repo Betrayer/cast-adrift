@@ -1,4 +1,5 @@
-import type { DieTier, Intent, School } from "@/types/content";
+import type { DieTier, Intent, School, SubsystemAura } from "@/types/content";
+import type { Statuses } from "@/game/battle/statuses";
 
 export type SlotId =
   | "weaponA"
@@ -25,7 +26,16 @@ export interface RolledDie {
 export interface SlotState {
   cap: DieTier;
   mk: 1 | 2 | 3;
+  jamOn?: number;
   dieUid?: string;
+}
+
+export interface SubsystemState {
+  id: string;
+  key: string;
+  hp: number;
+  hpMax: number;
+  aura: SubsystemAura;
 }
 
 export interface EnemyState {
@@ -35,16 +45,35 @@ export interface EnemyState {
   hpMax: number;
   shield: number;
   intentIndex: number;
+  nextIntent: Intent;
+  statuses: Statuses;
+  subsystems: SubsystemState[];
 }
 
 export type BattlePhase =
   | "idle"
   | "placement"
   | "resolving"
-  | "enemy"
   | "ended";
 
 export type BattleOutcome = "victory" | "defeat";
+
+export type EngineTier = "brace" | "dodge" | "dodgePlus";
+
+export interface NextTurnMods {
+  weapons?: number;
+  spinal?: number;
+}
+
+export interface BlockedSlot {
+  slot: SlotId;
+  untilTurn: number;
+}
+
+export interface LockedDie {
+  uid: string;
+  untilTurn: number;
+}
 
 export interface BattleSnapshot {
   turn: number;
@@ -56,19 +85,64 @@ export interface BattleSnapshot {
   slots: Partial<Record<SlotId, SlotState>>;
   enemies: EnemyState[];
   targetId: string | null;
+  engineState: EngineTier | null;
+  nextTurnMods: NextTurnMods;
+  nextRollBonus: number;
+  pendingDeepScan: boolean;
+  blockedSlots: BlockedSlot[];
+  lockedDice: LockedDie[];
   outcome?: BattleOutcome;
+}
+
+export type BeatKind =
+  | "damage"
+  | "spinalJam"
+  | "shield"
+  | "engine"
+  | "sensor"
+  | "charge";
+
+export interface SensorResult {
+  mark: boolean;
+  jam: boolean;
+  deepScan: boolean;
 }
 
 export interface Beat {
   slot: SlotId;
-  kind: "damage" | "shield" | "charge";
+  kind: BeatKind;
   amount: number;
   targetId?: string;
+  engineTier?: EngineTier;
+  sensor?: SensorResult;
+  overflowHull?: number;
+  after: BattleSnapshot;
 }
+
+export type EnemyBeatKind =
+  | "attack"
+  | "shield"
+  | "shieldAll"
+  | "charge"
+  | "jamSlot"
+  | "lockDie"
+  | "summon"
+  | "burnTick";
 
 export interface EnemyBeat {
   enemyId: string;
-  intent: Intent;
+  kind: EnemyBeatKind;
+  amount: number;
   hullDamage: number;
   shieldDamage: number;
+  slot?: SlotId;
+  dieUid?: string;
+  after: BattleSnapshot;
+}
+
+export interface ResolutionBundle {
+  beats: Beat[];
+  enemyBeats: EnemyBeat[];
+  final: BattleSnapshot;
+  finalPhase: Extract<BattlePhase, "placement" | "ended">;
 }

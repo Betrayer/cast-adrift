@@ -22,11 +22,36 @@ export interface DieItemDef {
   pts: number;
 }
 
-export type Intent = { t: "attack"; n: number } | { t: "shield"; n: number };
+export type Intent =
+  | { t: "attack"; n: number }
+  | { t: "shield"; n: number }
+  | { t: "shieldAll"; n: number }
+  | { t: "multi"; n: number; k: number }
+  | { t: "charge" }
+  | { t: "jamSlot" }
+  | { t: "lockDie" }
+  | { t: "summon"; id: string };
+
+export type PatternStep = Intent | { pick: readonly (readonly [Intent, number])[] };
+
+export type SubsystemAura = "atk+2" | "shieldAllies3" | "lockEachTurn";
+
+export interface SubsystemDef {
+  id: string;
+  name: LocKey;
+  hp: number;
+  aura: SubsystemAura;
+}
+
+export type OnDeathEffect = { t: "blockSlot"; slot: "weaponA" };
 
 export interface EnemyDef {
   id: string;
   name: LocKey;
   hp: number;
-  pattern: Intent[];
+  pattern: PatternStep[];
+  env?: boolean;
+  elite?: boolean;
+  onDeath?: OnDeathEffect;
+  subsystems?: SubsystemDef[];
 }
