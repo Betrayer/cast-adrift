@@ -1,7 +1,6 @@
-import type { ScreenId } from '@/types';
+import type { ScreenId } from "@/types";
 
 export const screenPhase: Partial<Record<ScreenId, number>> = {
-  battle: 2,
   runSetup: 5,
   map: 5,
   shop: 5,

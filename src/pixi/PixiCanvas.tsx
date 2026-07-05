@@ -35,7 +35,7 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
       })
       .then(() => {
         if (disposed) {
-          app.destroy(true, { children: true });
+          app.destroy({ removeView: true, releaseGlobalResources: false }, { children: true });
           return;
         }
         initialized = true;
@@ -53,7 +53,7 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
       document.removeEventListener('visibilitychange', onVisibility);
       if (initialized) {
         cleanup?.();
-        app.destroy(true, { children: true });
+        app.destroy({ removeView: true, releaseGlobalResources: false }, { children: true });
       }
     };
   }, [mount]);

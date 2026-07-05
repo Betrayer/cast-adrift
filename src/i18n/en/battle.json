@@ -1,0 +1,22 @@
+{
+  "turn": "Turn {{n}}",
+  "hull": "Hull {{hp}}/{{max}}",
+  "shield": "Shield {{n}}",
+  "scrap": "Scrap {{n}}",
+  "endTurn": "End turn",
+  "burnHint": "Dice left outside slots burn at end of turn",
+  "victory": "Victory",
+  "defeat": "Defeat",
+  "toMenu": "To menu",
+  "hp": "HP {{hp}}/{{max}}",
+  "intent": {
+    "attack": "Attack {{n}}",
+    "shield": "Shield +{{n}}"
+  },
+  "slot": {
+    "weaponA": "Weapon A",
+    "shields": "Shields",
+    "reactor": "Reactor",
+    "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
+  }
+}
