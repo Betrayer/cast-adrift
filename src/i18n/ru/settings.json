@@ -1,0 +1,14 @@
+{
+  "title": "Настройки",
+  "language": "Язык",
+  "sfxVolume": "Громкость эффектов",
+  "musicVolume": "Громкость музыки",
+  "reducedMotion": "Меньше анимации",
+  "auto": "Авто",
+  "on": "Вкл.",
+  "off": "Выкл.",
+  "echoVerbosity": "Разговорчивость Эхо",
+  "echoNormal": "Обычная",
+  "echoLess": "Меньше",
+  "screenShake": "Тряска экрана"
+}

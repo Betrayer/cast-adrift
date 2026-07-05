@@ -1,0 +1,14 @@
+{
+  "title": "Settings",
+  "language": "Language",
+  "sfxVolume": "SFX volume",
+  "musicVolume": "Music volume",
+  "reducedMotion": "Reduced motion",
+  "auto": "Auto",
+  "on": "On",
+  "off": "Off",
+  "echoVerbosity": "Echo chatter",
+  "echoNormal": "Normal",
+  "echoLess": "Less",
+  "screenShake": "Screen shake"
+}
