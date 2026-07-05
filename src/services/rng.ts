@@ -6,7 +6,14 @@ export interface RngStream {
   shuffle: <T>(arr: readonly T[]) => T[];
 }
 
-export type StreamLabel = 'map' | 'dice' | 'loot' | 'events' | 'shop' | 'fate';
+export type StreamLabel =
+  | 'map'
+  | 'dice'
+  | 'loot'
+  | 'events'
+  | 'shop'
+  | 'fate'
+  | 'vfx';
 
 export type RngStreams = Record<StreamLabel, RngStream>;
 
@@ -17,6 +24,7 @@ const STREAM_LABELS: readonly StreamLabel[] = [
   'events',
   'shop',
   'fate',
+  'vfx',
 ];
 
 export const fnv1a = (str: string): number => {

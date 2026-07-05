@@ -4,12 +4,14 @@ import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
 import { canPlaceDie } from "@/game/battle/setup";
 import type { StatusKey } from "@/game/battle/statuses";
+import { playSfx } from "@/services/audio";
 import {
   dieTexture,
   PIXI_FONT_FAMILY,
   releaseDieTextures,
 } from "@/pixi/textures";
 import { easeOutQuad, linear, Tweens } from "@/pixi/tween";
+import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
 import {
   resolveReducedMotion,
   useSettingsStore,
@@ -208,6 +210,8 @@ export class BattleScene {
   private reserveBox: Graphics | null = null;
   private reserveGlow: Graphics | null = null;
   private reserveTitle: Text | null = null;
+  private tumbleFx: Tumble | null = null;
+  private readonly tumblingUids = new Set<string>();
   private beatTimeouts: number[] = [];
   private beatRun: { cancelled: boolean } | null = null;
   private pendingPress: PendingPress | null = null;
@@ -238,7 +242,10 @@ export class BattleScene {
     app.stage.on("pointerupoutside", this.onPointerUp);
 
     this.buildNumberPool();
-    this.rebuild(useBattleStore.getState());
+    const initial = useBattleStore.getState();
+    this.rebuild(initial);
+    this.maybeTumble(initial);
+    if (initial.phase === "placement") playSfx("roll");
     this.unsubscribe = useBattleStore.subscribe(this.onStoreChange);
     this.app.renderer.on("resize", this.onResize);
     this.app.ticker.add(this.tick);
@@ -249,6 +256,8 @@ export class BattleScene {
 
   destroy(): void {
     this.stopBeats();
+    this.tumbleFx?.destroy();
+    this.tumbleFx = null;
     if (useBattleStore.getState().phase === "resolving") {
       useBattleStore.getState().finishResolution();
     }
@@ -799,6 +808,10 @@ export class BattleScene {
         sprite.alpha = 1;
         sprite.visible = true;
       } else if (die.state === "tray" || die.state === "locked") {
+        if (this.tumblingUids.has(die.uid)) {
+          sprite.visible = false;
+          continue;
+        }
         const anchor = this.trayAnchor(die.uid, state);
         sprite.texture = this.dieTextureFor(die, this.layout.dieSize);
         sprite.position.set(anchor.x, anchor.y);
@@ -868,6 +881,10 @@ export class BattleScene {
     ) {
       this.cancelDrag(state);
       this.rebuild(state);
+      if (state.turn !== prev.turn) {
+        this.maybeTumble(state);
+        if (state.phase === "placement") playSfx("roll");
+      }
     } else {
       if (
         state.dice !== prev.dice ||
@@ -892,6 +909,9 @@ export class BattleScene {
     ) {
       this.startResolution(state);
     }
+    if (state.outcome !== prev.outcome && state.outcome !== undefined) {
+      playSfx(state.outcome === "victory" ? "win" : "lose");
+    }
   };
 
   private readonly onResize = (): void => {
@@ -912,6 +932,54 @@ export class BattleScene {
       this.reserveGlow.alpha = alpha;
     }
   };
+
+  private tumbleBox(): { x: number; y: number; w: number; h: number } {
+    const trayY = this.layout.tray[0]?.y ?? this.app.screen.height * 0.345;
+    return {
+      x: 12,
+      y: trayY - 130,
+      w: this.app.screen.width - 24,
+      h: 150,
+    };
+  }
+
+  private maybeTumble(state: BattleState): void {
+    if (state.phase !== "placement") return;
+    if (resolveReducedMotion(useSettingsStore.getState().reducedMotion)) return;
+    const vfx = useBattleStore.getState().streams?.vfx;
+    if (vfx === undefined) return;
+    const trayDice = state.dice.filter(
+      (d) => d.state === "tray" && !isDieLockedNow(state, d.uid),
+    );
+    if (trayDice.length === 0) return;
+    if (this.tumbleFx === null) {
+      this.tumbleFx = new Tumble(this.app, this.trayLayer, this.tweens, vfx);
+    } else {
+      this.tumbleFx.cancel();
+    }
+    this.tumblingUids.clear();
+    const dice: TumbleDie[] = trayDice.map((d) => {
+      this.tumblingUids.add(d.uid);
+      return {
+        uid: d.uid,
+        texture: this.dieTextureFor(d, this.layout.dieSize),
+        grid: this.trayAnchor(d.uid, state),
+      };
+    });
+    this.syncBoard(state);
+    this.tumbleFx.run(dice, this.tumbleBox(), this.layout.dieSize, () => {
+      this.tumblingUids.clear();
+      this.syncBoard(useBattleStore.getState());
+    });
+  }
+
+  private cancelTumble(): void {
+    this.tumbleFx?.cancel();
+    if (this.tumblingUids.size > 0) {
+      this.tumblingUids.clear();
+      this.syncBoard(useBattleStore.getState());
+    }
+  }
 
   private cancelDrag(state: BattleState): void {
     this.pendingPress = null;
@@ -944,6 +1012,7 @@ export class BattleScene {
     const press = this.pendingPress;
     if (press === null) return;
     this.pendingPress = null;
+    this.cancelTumble();
     const state = useBattleStore.getState();
     if (state.phase !== "placement" || state.rerollMode) return;
     const die = state.dice.find((d) => d.uid === press.uid);
@@ -977,6 +1046,7 @@ export class BattleScene {
       blockedSlots: fresh.blockedSlots,
       lockedDice: fresh.lockedDice,
       turn: fresh.turn,
+      resonance: fresh.resonance,
     };
     const validSlots = activeSlotIds(fresh).filter((slotId) =>
       canPlaceDie(snapshotLike, press.uid, slotId),
@@ -1088,6 +1158,7 @@ export class BattleScene {
       return;
     }
     this.animating.add(uid);
+    playSfx("place");
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
     const cancelScale = this.tweens.to(
@@ -1342,6 +1413,7 @@ export class BattleScene {
   private startResolution(state: BattleState): void {
     const bundle = state.resolution;
     if (bundle === null) return;
+    this.cancelTumble();
     this.stopBeats();
     const reduced = resolveReducedMotion(
       useSettingsStore.getState().reducedMotion,
@@ -1398,6 +1470,7 @@ export class BattleScene {
     if (beat.kind === "damage" && beat.targetId !== undefined) {
       const anchor = this.enemyAnchor(beat.targetId);
       if (anchor !== undefined) {
+        playSfx("hit");
         this.fireProjectile(slotAnchor, anchor);
         const parentId = beat.targetId.split(":")[0] ?? beat.targetId;
         this.flashEnemy(parentId);
@@ -1419,6 +1492,7 @@ export class BattleScene {
       return;
     }
     if (beat.kind === "shield") {
+      playSfx("shield");
       this.shieldShimmer();
       this.spawnNumber(
         slotAnchor.x,

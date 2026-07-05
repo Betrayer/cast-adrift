@@ -1,5 +1,7 @@
 import { create } from "zustand";
 import { type ShipId } from "@/data/ships";
+import { canCopy, canFlip, adjacentCopyValue, flippedValue } from "@/game/battle/actives";
+import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import {
   advanceTurn,
   BASE_REROLL_SIZE,
@@ -27,6 +29,7 @@ import type {
   EngineTier,
   LockedDie,
   NextTurnMods,
+  ResonanceCensus,
   ResolutionBundle,
   RolledDie,
   SlotId,
@@ -45,13 +48,18 @@ export interface BattleValues {
   hull: number;
   hullMax: number;
   shield: number;
+  shieldPersist: number;
   charge: number;
+  scrap: number;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
   rerollsLeft: number;
   rerollSize: number;
+  rerollBase: number;
   rerollMode: boolean;
   rerollSelection: string[];
+  reserveCap: number;
+  freeNudges: number;
   selectedDieUid: string | null;
   enemies: EnemyState[];
   targetId: string | null;
@@ -61,6 +69,8 @@ export interface BattleValues {
   pendingDeepScan: boolean;
   blockedSlots: BlockedSlot[];
   lockedDice: LockedDie[];
+  resonance: ResonanceCensus;
+  survivedLethal: boolean;
   outcome?: BattleOutcome;
   resolution: ResolutionBundle | null;
   beats: Beat[];
@@ -86,6 +96,8 @@ export interface BattleState extends BattleValues {
   spendNudge: (uid: string, dir: -1 | 1) => void;
   spendBonusReroll: () => void;
   spendSurge: () => void;
+  flipDie: (uid: string) => void;
+  copyDie: (uid: string) => void;
   toggleRerollMode: () => void;
   toggleRerollDie: (uid: string) => void;
   confirmReroll: () => void;
@@ -102,13 +114,18 @@ export const createInitialBattleValues = (): BattleValues => ({
   hull: 0,
   hullMax: 0,
   shield: 0,
+  shieldPersist: 0,
   charge: 0,
+  scrap: 0,
   dice: [],
   slots: {},
   rerollsLeft: 0,
   rerollSize: BASE_REROLL_SIZE,
+  rerollBase: BASE_REROLL_SIZE,
   rerollMode: false,
   rerollSelection: [],
+  reserveCap: 1,
+  freeNudges: 0,
   selectedDieUid: null,
   enemies: [],
   targetId: null,
@@ -118,6 +135,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   pendingDeepScan: false,
   blockedSlots: [],
   lockedDice: [],
+  resonance: computeCensus([]),
+  survivedLethal: false,
   outcome: undefined,
   resolution: null,
   beats: [],
@@ -133,7 +152,9 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   hull: s.hull,
   hullMax: s.hullMax,
   shield: s.shield,
+  shieldPersist: s.shieldPersist,
   charge: s.charge,
+  scrap: s.scrap,
   dice: s.dice,
   slots: s.slots,
   enemies: s.enemies,
@@ -144,6 +165,8 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   pendingDeepScan: s.pendingDeepScan,
   blockedSlots: s.blockedSlots,
   lockedDice: s.lockedDice,
+  resonance: s.resonance,
+  survivedLethal: s.survivedLethal,
   outcome: s.outcome,
 });
 
@@ -152,7 +175,9 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   hull: snap.hull,
   hullMax: snap.hullMax,
   shield: snap.shield,
+  shieldPersist: snap.shieldPersist,
   charge: snap.charge,
+  scrap: snap.scrap,
   dice: snap.dice,
   slots: snap.slots,
   enemies: snap.enemies,
@@ -163,6 +188,8 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pendingDeepScan: snap.pendingDeepScan,
   blockedSlots: snap.blockedSlots,
   lockedDice: snap.lockedDice,
+  resonance: snap.resonance,
+  survivedLethal: snap.survivedLethal,
   outcome: snap.outcome,
 });
 
@@ -182,25 +209,43 @@ const applyDebugRoll = (
     };
   });
 
+export const grantsFromCensus = (
+  census: ResonanceCensus,
+): { rerollBase: number; reserveCap: number; freeNudges: number } => ({
+  rerollBase:
+    BASE_REROLL_SIZE +
+    (resonanceAtLeast(census, "grey", 2) ? 1 : 0) +
+    (resonanceAtLeast(census, "yellow", 6) ? 1 : 0),
+  reserveCap: resonanceAtLeast(census, "grey", 6) ? 2 : 1,
+  freeNudges: resonanceAtLeast(census, "prismatic", 2) ? 1 : 0,
+});
+
 export const useBattleStore = create<BattleState>()((set, get) => ({
   ...createInitialBattleValues(),
 
   startBattle: (encounter, deckDefIds, streams) => {
     const shipId = encounter.shipId ?? "wanderer";
     const enemyStream = createEnemyStream(streams);
+    const mkLevels = useRunStore.getState().mkLevels;
     const snapshot = buildBattleSnapshot(
       shipId,
       deckDefIds,
       encounter.enemyIds,
       streams,
       enemyStream,
+      mkLevels,
     );
+    const grants = grantsFromCensus(snapshot.resonance);
     set({
       ...createInitialBattleValues(),
       ...fromSnapshot(snapshot),
       phase: "placement",
       shipId,
       rerollsLeft: 1,
+      rerollSize: grants.rerollBase,
+      rerollBase: grants.rerollBase,
+      reserveCap: grants.reserveCap,
+      freeNudges: grants.freeNudges,
       streams,
       enemyStream,
     });
@@ -243,10 +288,13 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (s.phase !== "placement" || s.rerollMode) return s;
       const die = s.dice.find((d) => d.uid === uid);
       if (die?.state !== "tray") return s;
-      if (s.dice.some((d) => d.state === "reserved")) return s;
+      if (s.dice.filter((d) => d.state === "reserved").length >= s.reserveCap)
+        return s;
       return {
         dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, state: "reserved" as const, slot: undefined } : d,
+          d.uid === uid
+            ? { ...d, state: "reserved" as const, slot: undefined }
+            : d,
         ),
         selectedDieUid: null,
       };
@@ -293,14 +341,17 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
 
   spendNudge: (uid, dir) => {
     set((s) => {
-      if (s.phase !== "placement" || s.charge < NUDGE_COST) return s;
+      if (s.phase !== "placement") return s;
       const die = s.dice.find((d) => d.uid === uid);
       if (die === undefined) return s;
       if (die.state !== "tray" && die.state !== "placed") return s;
       const value = Math.min(die.tier, Math.max(1, die.value + dir));
       if (value === die.value) return s;
+      const useFree = s.freeNudges > 0;
+      if (!useFree && s.charge < NUDGE_COST) return s;
       return {
-        charge: s.charge - NUDGE_COST,
+        charge: useFree ? s.charge : s.charge - NUDGE_COST,
+        freeNudges: useFree ? s.freeNudges - 1 : s.freeNudges,
         dice: s.dice.map((d) => (d.uid === uid ? { ...d, value } : d)),
       };
     });
@@ -326,6 +377,36 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set((s) => {
       if (s.phase !== "placement" || s.charge < SURGE_COST) return s;
       return { charge: s.charge - SURGE_COST, nextRollBonus: 1 };
+    });
+  },
+
+  flipDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canFlip(die)) return s;
+      if (die.state !== "tray" && die.state !== "placed") return s;
+      const value = flippedValue(die);
+      return {
+        dice: s.dice.map((d) =>
+          d.uid === uid ? { ...d, value, activeUsed: true } : d,
+        ),
+      };
+    });
+  },
+
+  copyDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die?.state !== "tray" || !canCopy(die, s.resonance)) return s;
+      const value = adjacentCopyValue(s.dice, uid);
+      if (value === undefined) return s;
+      return {
+        dice: s.dice.map((d) =>
+          d.uid === uid ? { ...d, value, activeUsed: true } : d,
+        ),
+      };
     });
   },
 
@@ -364,12 +445,14 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         return { rerollMode: false, rerollSelection: [] };
       }
       const streams = s.streams;
+      const blueFloor = resonanceAtLeast(s.resonance, "blue", 2);
       return {
-        dice: s.dice.map((d) =>
-          s.rerollSelection.includes(d.uid) && d.state === "tray"
-            ? { ...d, value: streams.dice.int(1, d.tier) }
-            : d,
-        ),
+        dice: s.dice.map((d) => {
+          if (!s.rerollSelection.includes(d.uid) || d.state !== "tray") return d;
+          let value = streams.dice.int(1, d.tier) + (d.growth ?? 0);
+          if (blueFloor && d.school === "blue") value = Math.max(value, 2);
+          return { ...d, value };
+        }),
         rerollsLeft: s.rerollsLeft - 1,
         rerollMode: false,
         rerollSelection: [],
@@ -453,7 +536,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       phase: finalPhase,
       resolution: null,
       rerollsLeft: finalPhase === "placement" ? 1 : 0,
-      rerollSize: BASE_REROLL_SIZE,
+      rerollSize: s.rerollBase,
     });
   },
 

@@ -175,3 +175,66 @@
   flex-direction: column;
   gap: 6px;
 }
+
+.resonanceRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  pointer-events: none;
+}
+
+.resChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 10px;
+  padding: 2px 8px;
+  font-size: 11px;
+  line-height: 16px;
+  white-space: nowrap;
+  background: rgba(16, 24, 42, 0.92);
+  border: 1px solid;
+  animation: chip-pop 260ms ease-out;
+}
+
+.resChipActive {
+  box-shadow: 0 0 0 1px currentColor inset;
+}
+
+.resPips {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.resPip {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  border: 1px solid currentColor;
+  opacity: 0.4;
+}
+
+.resPipOn {
+  background: currentColor;
+  opacity: 1;
+}
+
+@keyframes chip-pop {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.activeBtnRow {
+  display: flex;
+  gap: 8px;
+}

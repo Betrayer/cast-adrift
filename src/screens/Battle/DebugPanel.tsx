@@ -12,6 +12,7 @@ import {
 } from '@mantine/core';
 import { useState } from 'react';
 import { STARTER_DECK } from '@/data/decks';
+import { DIE_BY_ID } from '@/data/dice';
 import {
   ENCOUNTER_GROUPS,
   ENEMY_BY_ID,
@@ -22,7 +23,20 @@ import { mountTextureGrid } from '@/pixi/battle/textureGrid';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { createStreams } from '@/services/rng';
 import { useBattleStore } from '@/stores/battleStore';
+import { useLootStore } from '@/stores/lootStore';
+import { useRunStore } from '@/stores/runStore';
+import type { SlotId } from '@/types/battle';
 import type { Intent, PatternStep } from '@/types/content';
+
+const MK_SLOTS: readonly SlotId[] = [
+  'weaponA',
+  'weaponB',
+  'shields',
+  'engines',
+  'sensors',
+  'reactor',
+  'spinal',
+];
 
 const flattenStep = (step: PatternStep): Intent[] =>
   'pick' in step ? step.pick.map(([intent]) => intent) : [step];
@@ -62,6 +76,7 @@ export const DebugPanel = () => {
   const [encounter, setEncounter] = useState('raider');
   const [shipId, setShipId] = useState<ShipId>('wanderer');
   const [seedValue, setSeedValue] = useState<number | string>('');
+  const [deckText, setDeckText] = useState(STARTER_DECK.join(','));
 
   const restart = (): void => {
     const enemyIds = encounter
@@ -69,11 +84,15 @@ export const DebugPanel = () => {
       .map((id) => id.trim())
       .filter(Boolean);
     if (enemyIds.length === 0) return;
+    const deck = deckText
+      .split(',')
+      .map((id) => id.trim())
+      .filter((id) => DIE_BY_ID.has(id));
     const seed = Number(seedValue);
     useBattleStore.getState().reset();
     useBattleStore.getState().startBattle(
       { enemyIds, shipId },
-      STARTER_DECK,
+      deck.length > 0 ? deck : STARTER_DECK,
       createStreams(
         Number.isFinite(seed) && seedValue !== '' ? seed : Date.now() >>> 0,
       ),
@@ -126,6 +145,10 @@ export const DebugPanel = () => {
       }),
     }));
   };
+
+  const mkLevels = useRunStore((s) => s.mkLevels);
+  const bumpMk = useRunStore((s) => s.bumpMk);
+  const resetMk = useRunStore((s) => s.resetMk);
 
   const firstEnemy = useBattleStore((s) => s.enemies[0]);
   const pattern = ENEMY_BY_ID.get(firstEnemy?.defId ?? '')?.pattern ?? [];
@@ -186,6 +209,15 @@ export const DebugPanel = () => {
           value={seedValue}
           onChange={setSeedValue}
         />
+        <TextInput
+          size="xs"
+          label="deck (die ids, csv)"
+          placeholder="ember,slug,coreshard"
+          value={deckText}
+          onChange={(e) => {
+            setDeckText(e.currentTarget.value);
+          }}
+        />
         <Button size="compact-xs" onClick={restart}>
           restart battle
         </Button>
@@ -218,6 +250,54 @@ export const DebugPanel = () => {
           onChange={forceIntent}
           comboboxProps={{ zIndex: 1000, withinPortal: true }}
         />
+        <Text size="xs" fw={700}>
+          shipyard (bump Mk, then restart)
+        </Text>
+        <Box
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}
+        >
+          {MK_SLOTS.map((slot) => (
+            <Button
+              key={slot}
+              size="compact-xs"
+              variant="default"
+              onClick={() => {
+                bumpMk(slot);
+              }}
+            >
+              {`${slot} Mk${String(mkLevels[slot] ?? 1)}`}
+            </Button>
+          ))}
+        </Box>
+        <Button size="compact-xs" variant="default" onClick={resetMk}>
+          reset Mk
+        </Button>
+        <Text size="xs" fw={700}>
+          loot ceremony
+        </Text>
+        <Box
+          style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 4 }}
+        >
+          {(
+            [
+              ['ember', 'common'],
+              ['bulwark', 'uncommon'],
+              ['vulture', 'rare'],
+              ['coreshard', 'legend'],
+            ] as const
+          ).map(([id, label]) => (
+            <Button
+              key={id}
+              size="compact-xs"
+              variant="default"
+              onClick={() => {
+                useLootStore.getState().drop(id);
+              }}
+            >
+              {label}
+            </Button>
+          ))}
+        </Box>
         <Button
           size="compact-xs"
           variant="default"

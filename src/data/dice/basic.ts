@@ -51,7 +51,3 @@ export const BASIC_DICE: readonly DieItemDef[] = [
     pts: DIE_PTS[6],
   },
 ];
-
-export const DIE_BY_ID: ReadonlyMap<string, DieItemDef> = new Map(
-  BASIC_DICE.map((def) => [def.id, def]),
-);
