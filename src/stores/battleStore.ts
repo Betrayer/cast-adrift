@@ -1,6 +1,11 @@
 import { create } from "zustand";
 import { type ShipId } from "@/data/ships";
-import { canCopy, canFlip, adjacentCopyValue, flippedValue } from "@/game/battle/actives";
+import {
+  canCopy,
+  canFlip,
+  adjacentCopyValue,
+  flippedValue,
+} from "@/game/battle/actives";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import {
   advanceTurn,
@@ -448,7 +453,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const blueFloor = resonanceAtLeast(s.resonance, "blue", 2);
       return {
         dice: s.dice.map((d) => {
-          if (!s.rerollSelection.includes(d.uid) || d.state !== "tray") return d;
+          if (!s.rerollSelection.includes(d.uid) || d.state !== "tray")
+            return d;
           let value = streams.dice.int(1, d.tier) + (d.growth ?? 0);
           if (blueFloor && d.school === "blue") value = Math.max(value, 2);
           return { ...d, value };

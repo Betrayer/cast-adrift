@@ -6,14 +6,8 @@ import {
   place,
 } from "@/game/battle/battleHarness";
 import { canCopy } from "@/game/battle/actives";
-import {
-  computeCensus,
-  resonanceAtLeast,
-} from "@/game/battle/resonance";
-import {
-  resolveEnemyPhase,
-  resolvePlayerPhase,
-} from "@/game/battle/resolver";
+import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
+import { resolveEnemyPhase, resolvePlayerPhase } from "@/game/battle/resolver";
 import { applyRollFloors } from "@/game/battle/rollFloors";
 import { BattleCtx } from "@/game/effects/context";
 import { buildSources, emit } from "@/game/effects/pipeline";
@@ -22,7 +16,9 @@ import { grantsFromCensus } from "@/stores/battleStore";
 import type { RolledDie } from "@/types/battle";
 
 const filler = (defId: string, n: number): RolledDie[] =>
-  Array.from({ length: n }, (_, i) => harnessDie(`${defId}-${String(i)}`, defId));
+  Array.from({ length: n }, (_, i) =>
+    harnessDie(`${defId}-${String(i)}`, defId),
+  );
 
 const weaponBeats = (dice: RolledDie[], placeUid: string, slot: "weaponA") => {
   const snap = harnessSnap(dice);
@@ -158,7 +154,10 @@ describe("green resonance", () => {
 
 describe("yellow resonance", () => {
   it("yellow-2: a max-face roll grants +4 scrap", () => {
-    const dice = [harnessDie("y", "yellow-d6", 6), harnessDie("f", "yellow-d6", 2)];
+    const dice = [
+      harnessDie("y", "yellow-d6", 6),
+      harnessDie("f", "yellow-d6", 2),
+    ];
     const snap = harnessSnap(dice);
     place(snap, "y", "sensors");
     expect(resolvePlayerPhase(snap).next.scrap).toBe(4);
@@ -171,19 +170,20 @@ describe("yellow resonance", () => {
   });
 
   it("yellow-6: grants +1 reroll die", () => {
-    expect(grantsFromCensus(computeCensus(filler("yellow-d6", 6))).rerollBase).toBe(
-      3,
-    );
+    expect(
+      grantsFromCensus(computeCensus(filler("yellow-d6", 6))).rerollBase,
+    ).toBe(3);
   });
 });
 
 describe("black resonance", () => {
   it("black-2: a black die may exceed a slot cap at −1 hull", () => {
-    const dice = [harnessDie("o", "obsidian", 8), harnessDie("f", "black-d6", 3)];
+    const dice = [
+      harnessDie("o", "obsidian", 8),
+      harnessDie("f", "black-d6", 3),
+    ];
     const snap = harnessSnap(dice);
-    expect(
-      resonanceAtLeast(snap.resonance, "black", 2),
-    ).toBe(true);
+    expect(resonanceAtLeast(snap.resonance, "black", 2)).toBe(true);
     place(snap, "o", "engines");
     const { next } = resolvePlayerPhase(snap);
     expect(next.hull).toBe(29);
@@ -216,7 +216,9 @@ describe("black resonance", () => {
 
 describe("grey and prismatic resonance", () => {
   it("grey-2: reroll capacity rises to 3", () => {
-    expect(grantsFromCensus(computeCensus(filler("grey-d4", 3))).rerollBase).toBe(3);
+    expect(
+      grantsFromCensus(computeCensus(filler("grey-d4", 3))).rerollBase,
+    ).toBe(3);
   });
 
   it("grey-4: grey dice may copy an adjacent value", () => {
@@ -226,7 +228,9 @@ describe("grey and prismatic resonance", () => {
   });
 
   it("grey-6: reserve capacity +1", () => {
-    expect(grantsFromCensus(computeCensus(filler("grey-d4", 6))).reserveCap).toBe(2);
+    expect(
+      grantsFromCensus(computeCensus(filler("grey-d4", 6))).reserveCap,
+    ).toBe(2);
   });
 
   it("prismatic-2: +1 free nudge per battle", () => {

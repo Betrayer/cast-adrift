@@ -80,17 +80,15 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
       </Text>
       <div className={styles.stage}>
         <div
-          className={`${styles.card ?? ''} ${revealed ? styles.cardRevealed ?? '' : ''} ${
-            reduced ? styles.cardInstant ?? '' : ''
-          }`}
+          className={`${styles.card ?? ''} ${revealed ? styles.cardRevealed ?? '' : ''} ${reduced ? styles.cardInstant ?? '' : ''
+            }`}
         >
           <div className={`${styles.face ?? ''} ${styles.back ?? ''}`}>
             <div className={styles.backMark} />
           </div>
           <div
-            className={`${styles.face ?? ''} ${styles.front ?? ''} ${
-              revealed ? styles.frontGlow ?? '' : ''
-            }`}
+            className={`${styles.face ?? ''} ${styles.front ?? ''} ${revealed ? styles.frontGlow ?? '' : ''
+              }`}
             style={{ borderColor: frameColor, color: frameColor }}
           >
             <Text className={styles.dieName} c={tokens.text}>

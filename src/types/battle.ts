@@ -60,11 +60,7 @@ export interface ResonanceCensus {
   counts: Record<School, number>;
 }
 
-export type BattlePhase =
-  | "idle"
-  | "placement"
-  | "resolving"
-  | "ended";
+export type BattlePhase = "idle" | "placement" | "resolving" | "ended";
 
 export type BattleOutcome = "victory" | "defeat";
 

@@ -18,7 +18,10 @@ const SLOT_HOOKS: ReadonlySet<Hook> = new Set([
   "place",
 ]);
 
-const dieSource = (uid: string, effects: readonly EffectDef[]): EffectSource => ({
+const dieSource = (
+  uid: string,
+  effects: readonly EffectDef[],
+): EffectSource => ({
   key: `die:${uid}`,
   dieUid: uid,
   run: (hook, ctx, subject) => {

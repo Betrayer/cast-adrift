@@ -1,5 +1,11 @@
 import { BattleCtx, dieFaceMax, dieFaceMin } from "@/game/effects/context";
-import type { Action, Cond, EffectDef, Hook, SlotMatch } from "@/game/effects/types";
+import type {
+  Action,
+  Cond,
+  EffectDef,
+  Hook,
+  SlotMatch,
+} from "@/game/effects/types";
 import type { RolledDie, SlotId } from "@/types/battle";
 
 const WEAPON_SLOTS: ReadonlySet<SlotId> = new Set([

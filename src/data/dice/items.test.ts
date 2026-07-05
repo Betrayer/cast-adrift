@@ -52,7 +52,9 @@ describe("cinder", () => {
     const die = harnessDie("c", "cinder", 3);
     const snap = harnessSnap([die]);
     place(snap, "c", "weaponA");
-    expect(resolvePlayerPhase(snap).next.enemies[0]?.statuses.burn).toBeUndefined();
+    expect(
+      resolvePlayerPhase(snap).next.enemies[0]?.statuses.burn,
+    ).toBeUndefined();
   });
 });
 
@@ -89,7 +91,9 @@ describe("sprout", () => {
     for (let i = 0; i < 3; i += 1) {
       const snap = harnessSnap([die]);
       place(snap, "s", "sensors");
-      const next = resolvePlayerPhase(snap).next.dice.find((d) => d.uid === "s");
+      const next = resolvePlayerPhase(snap).next.dice.find(
+        (d) => d.uid === "s",
+      );
       if (next === undefined) throw new Error("lost die");
       die = { ...next, value: 6 + (next.growth ?? 0) };
     }

@@ -1,5 +1,9 @@
 import { DIE_BY_ID } from "@/data/dice";
-import { aliveEnemies, applyWeaponDamage, resolveWeaponTarget } from "@/game/battle/damage";
+import {
+  aliveEnemies,
+  applyWeaponDamage,
+  resolveWeaponTarget,
+} from "@/game/battle/damage";
 import { resonanceAtLeast } from "@/game/battle/resonance";
 import { applyStatus, type StatusKey } from "@/game/battle/statuses";
 import type { EffectTarget } from "@/game/effects/types";
@@ -88,7 +92,10 @@ export class BattleCtx {
   }
 
   heal(n: number): void {
-    this.snapshot.hull = Math.min(this.snapshot.hullMax, this.snapshot.hull + n);
+    this.snapshot.hull = Math.min(
+      this.snapshot.hullMax,
+      this.snapshot.hull + n,
+    );
   }
 
   charge(n: number): void {

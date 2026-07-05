@@ -1,8 +1,4 @@
-import {
-  AFFINITY,
-  affinitySchoolForSlot,
-  slotInAffinity,
-} from "@/data/slots";
+import { AFFINITY, affinitySchoolForSlot, slotInAffinity } from "@/data/slots";
 import type { BattleCtx, ResolveScope } from "@/game/effects/context";
 import type { EffectSource } from "@/game/effects/pipeline";
 import type { RolledDie } from "@/types/battle";

@@ -172,9 +172,8 @@ const EnemyChips = () => {
         return (
           <div
             key={enemy.id}
-            className={`${styles.enemyChip ?? ''} ${
-              targeted ? styles.enemyChipTargeted ?? '' : ''
-            }`}
+            className={`${styles.enemyChip ?? ''} ${targeted ? styles.enemyChipTargeted ?? '' : ''
+              }`}
             style={{ opacity: enemy.hp > 0 ? 1 : 0.45 }}
           >
             <Text size="sm" fw={600} c={tokens.text}>
@@ -220,9 +219,8 @@ const ResonanceChips = () => {
         return (
           <span
             key={school}
-            className={`${styles.resChip ?? ''} ${
-              active.length > 0 ? styles.resChipActive ?? '' : ''
-            }`}
+            className={`${styles.resChip ?? ''} ${active.length > 0 ? styles.resChipActive ?? '' : ''
+              }`}
             style={{ borderColor: colors.stroke, color: colors.text }}
           >
             {label}
@@ -230,9 +228,8 @@ const ResonanceChips = () => {
               {RESONANCE_THRESHOLDS.map((th) => (
                 <span
                   key={th}
-                  className={`${styles.resPip ?? ''} ${
-                    active.includes(th) ? styles.resPipOn ?? '' : ''
-                  }`}
+                  className={`${styles.resPip ?? ''} ${active.includes(th) ? styles.resPipOn ?? '' : ''
+                    }`}
                 />
               ))}
             </span>

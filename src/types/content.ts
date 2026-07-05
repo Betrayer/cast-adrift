@@ -46,7 +46,9 @@ export type Intent =
   | { t: "lockDie" }
   | { t: "summon"; id: string };
 
-export type PatternStep = Intent | { pick: readonly (readonly [Intent, number])[] };
+export type PatternStep =
+  | Intent
+  | { pick: readonly (readonly [Intent, number])[] };
 
 export type SubsystemAura = "atk+2" | "shieldAllies3" | "lockEachTurn";
 
