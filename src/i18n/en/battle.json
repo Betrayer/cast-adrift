@@ -3,20 +3,48 @@
   "hull": "Hull {{hp}}/{{max}}",
   "shield": "Shield {{n}}",
   "scrap": "Scrap {{n}}",
+  "charge": "Charge {{n}}/{{max}}",
   "endTurn": "End turn",
   "burnHint": "Dice left outside slots burn at end of turn",
   "victory": "Victory",
   "defeat": "Defeat",
   "toMenu": "To menu",
   "hp": "HP {{hp}}/{{max}}",
+  "reserve": "Reserve",
+  "reroll": "Reroll ({{n}})",
+  "rerollConfirm": "Reroll {{k}}/{{size}}",
+  "rerollCancel": "Cancel",
+  "rerollHint": "Tap up to {{size}} dice to reroll",
+  "buyReroll": "+1 reroll die (5⚡)",
+  "surge": "Surge (10⚡)",
+  "nudgeMinus": "−1 (3⚡)",
+  "nudgePlus": "+1 (3⚡)",
+  "jam": "JAM",
+  "status": {
+    "burn": "B",
+    "mark": "M",
+    "jam": "J",
+    "charge": "C"
+  },
   "intent": {
     "attack": "Attack {{n}}",
-    "shield": "Shield +{{n}}"
+    "shield": "Shield +{{n}}",
+    "shieldAll": "Shields allies +{{n}}",
+    "multi": "Attack {{n}}×{{k}}",
+    "charge": "Charging up",
+    "jamSlot": "Jams a slot",
+    "lockDie": "Locks a die",
+    "summon": "Summons"
   },
   "slot": {
     "weaponA": "Weapon A",
+    "weaponB": "Weapon B",
+    "spinal": "Spinal Mount",
     "shields": "Shields",
+    "engines": "Engines",
+    "sensors": "Sensors",
     "reactor": "Reactor",
+    "repairBay": "Repair Bay",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
   }
 }

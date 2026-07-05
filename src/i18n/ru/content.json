@@ -8,6 +8,19 @@
     "black-d6": "Чёрный d6"
   },
   "enemies": {
-    "raider": "Рейдер"
+    "scavDrone": "Дрон-мародёр",
+    "raider": "Рейдер",
+    "shieldWarden": "Страж щитов",
+    "mine": "Мина",
+    "jammerCorvette": "Корвет-глушитель",
+    "leechSkiff": "Скиф-пиявка",
+    "choirZealot": "Фанатик Хора",
+    "riftWasp": "Оса Разлома",
+    "raiderAlpha": "Рейдер-альфа",
+    "raiderAlpha-turret": "Турель"
+  },
+  "ships": {
+    "wanderer": "Скиталец",
+    "ram-proto": "Прототип тарана"
   }
 }

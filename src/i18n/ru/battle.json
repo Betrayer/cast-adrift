@@ -3,20 +3,48 @@
   "hull": "Корпус {{hp}}/{{max}}",
   "shield": "Щит {{n}}",
   "scrap": "Лом {{n}}",
+  "charge": "Заряд {{n}}/{{max}}",
   "endTurn": "Завершить ход",
   "burnHint": "Кубы вне слотов сгорают в конце хода",
   "victory": "Победа",
   "defeat": "Поражение",
   "toMenu": "В меню",
   "hp": "HP {{hp}}/{{max}}",
+  "reserve": "Резерв",
+  "reroll": "Переброс ({{n}})",
+  "rerollConfirm": "Перебросить {{k}}/{{size}}",
+  "rerollCancel": "Отмена",
+  "rerollHint": "Выбери до {{size}} кубов для переброса",
+  "buyReroll": "+1 куб переброса (5⚡)",
+  "surge": "Всплеск (10⚡)",
+  "nudgeMinus": "−1 (3⚡)",
+  "nudgePlus": "+1 (3⚡)",
+  "jam": "КЛИН",
+  "status": {
+    "burn": "B",
+    "mark": "M",
+    "jam": "J",
+    "charge": "C"
+  },
   "intent": {
     "attack": "Атака {{n}}",
-    "shield": "Щит +{{n}}"
+    "shield": "Щит +{{n}}",
+    "shieldAll": "Щит союзникам +{{n}}",
+    "multi": "Атака {{n}}×{{k}}",
+    "charge": "Накапливает заряд",
+    "jamSlot": "Глушит слот",
+    "lockDie": "Блокирует куб",
+    "summon": "Призывает"
   },
   "slot": {
     "weaponA": "Орудие А",
+    "weaponB": "Орудие Б",
+    "spinal": "Осевое орудие",
     "shields": "Щиты",
+    "engines": "Двигатели",
+    "sensors": "Сенсоры",
     "reactor": "Реактор",
+    "repairBay": "Ремонтный отсек",
     "cap": "кап ≤ d{{cap}} · Mk{{mk}}"
   }
 }

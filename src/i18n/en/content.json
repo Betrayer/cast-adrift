@@ -8,6 +8,19 @@
     "black-d6": "Black d6"
   },
   "enemies": {
-    "raider": "Raider"
+    "scavDrone": "Scav Drone",
+    "raider": "Raider",
+    "shieldWarden": "Shield Warden",
+    "mine": "Mine",
+    "jammerCorvette": "Jammer Corvette",
+    "leechSkiff": "Leech Skiff",
+    "choirZealot": "Choir Zealot",
+    "riftWasp": "Rift Wasp",
+    "raiderAlpha": "Raider Alpha",
+    "raiderAlpha-turret": "Turret"
+  },
+  "ships": {
+    "wanderer": "Wanderer",
+    "ram-proto": "Ram Prototype"
   }
 }
