@@ -17,6 +17,7 @@ interface MenuEntry {
 }
 
 const ENTRIES: readonly MenuEntry[] = [
+  { key: 'testBattle', screen: 'battle' },
   { key: 'newRun', screen: 'runSetup', phase: 5 },
   { key: 'hangar', screen: 'hangar', phase: 7 },
   { key: 'starChart', screen: 'chart', phase: 7 },

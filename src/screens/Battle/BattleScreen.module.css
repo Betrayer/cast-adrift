@@ -1,0 +1,142 @@
+.hud {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.clickable {
+  pointer-events: auto;
+}
+
+.statusCard {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 12px;
+  background: #182238;
+  border: 1px solid #2a3853;
+  border-radius: 10px;
+}
+
+.statusLeft {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.statusRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.hullTrack {
+  height: 9px;
+  border-radius: 5px;
+  background: #0d1424;
+  border: 0.5px solid #2a3853;
+  overflow: hidden;
+}
+
+.hullFill {
+  height: 100%;
+  border-radius: 5px;
+  background: #e4574e;
+  transition: width 200ms ease;
+}
+
+.hullFlash {
+  animation: hull-flash 350ms ease-out;
+}
+
+@keyframes hull-flash {
+  0% {
+    filter: brightness(2.4);
+  }
+  100% {
+    filter: brightness(1);
+  }
+}
+
+.pill {
+  border-radius: 10px;
+  padding: 1px 10px;
+  font-size: 12px;
+  line-height: 18px;
+  border: 0.75px solid;
+  white-space: nowrap;
+}
+
+.pillShield {
+  background: #12263b;
+  border-color: #4a90e2;
+  color: #9cc4f2;
+}
+
+.pillScrap {
+  background: #2e2412;
+  border-color: #e8b23a;
+  color: #f0ce7e;
+}
+
+.enemyRow {
+  position: absolute;
+  top: 10.5%;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+}
+
+.enemyChip {
+  background: rgba(24, 34, 56, 0.92);
+  border: 1px solid #2a3853;
+  border-radius: 12px;
+  padding: 8px 12px;
+  min-width: 140px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intentPill {
+  align-self: flex-start;
+  margin-top: 4px;
+  border-radius: 8px;
+  padding: 2px 10px;
+  font-size: 12px;
+  border: 0.75px solid;
+  white-space: nowrap;
+}
+
+.intentAttack {
+  background: #2e1517;
+  border-color: #e4574e;
+  color: #f0a09a;
+}
+
+.intentShield {
+  background: #12263b;
+  border-color: #4a90e2;
+  color: #9cc4f2;
+}
+
+.bottomBar {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}

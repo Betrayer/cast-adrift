@@ -1,0 +1,13 @@
+{
+  "dice": {
+    "red-d6": "Red d6",
+    "blue-d6": "Blue d6",
+    "grey-d4": "Grey d4",
+    "green-d4": "Green d4",
+    "yellow-d6": "Yellow d6",
+    "black-d6": "Black d6"
+  },
+  "enemies": {
+    "raider": "Raider"
+  }
+}
