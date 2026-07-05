@@ -1,4 +1,13 @@
+import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { ENEMY_BY_ID } from "@/data/enemies/sector1";
+import {
+  aliveEnemies,
+  applyWeaponDamage,
+  handleDeath,
+  resolveWeaponTarget,
+} from "@/game/battle/damage";
+import { resonanceAtLeast } from "@/game/battle/resonance";
+import { applyRollFloors } from "@/game/battle/rollFloors";
 import {
   drawIntent,
   isDieLocked,
@@ -6,11 +15,14 @@ import {
   MAX_ENEMIES,
   spawnEnemy,
 } from "@/game/battle/setup";
+import { applyStatus, consumeStatus, tickBurn } from "@/game/battle/statuses";
 import {
-  applyStatus,
-  consumeStatus,
-  tickBurn,
-} from "@/game/battle/statuses";
+  BattleCtx,
+  buildSources,
+  dieFaceMax,
+  emit,
+  type EffectSource,
+} from "@/game/effects";
 import type { RngStream, RngStreams } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -18,7 +30,9 @@ import type {
   EnemyBeat,
   EnemyState,
   EngineTier,
+  RolledDie,
   SlotId,
+  SlotState,
   SubsystemState,
 } from "@/types/battle";
 
@@ -38,6 +52,7 @@ export const NUDGE_COST = 3;
 export const BONUS_REROLL_COST = 5;
 export const SURGE_COST = 10;
 export const BASE_REROLL_SIZE = 2;
+export const OVER_CAP_HULL_COST = 1;
 
 const clone = (snapshot: BattleSnapshot): BattleSnapshot =>
   structuredClone(snapshot);
@@ -48,124 +63,106 @@ export const engineTier = (value: number): EngineTier => {
   return "dodgePlus";
 };
 
-const aliveEnemies = (snapshot: BattleSnapshot): EnemyState[] =>
-  snapshot.enemies.filter((e) => e.hp > 0);
-
 const hasAliveAura = (
   enemy: EnemyState,
   aura: SubsystemState["aura"],
 ): boolean => enemy.subsystems.some((s) => s.hp > 0 && s.aura === aura);
 
-const handleDeath = (next: BattleSnapshot, enemy: EnemyState): void => {
-  const def = ENEMY_BY_ID.get(enemy.defId);
-  if (def?.onDeath?.t === "blockSlot") {
-    next.blockedSlots.push({
-      slot: def.onDeath.slot,
-      untilTurn: next.turn + 1,
-    });
+const guardLethal = (next: BattleSnapshot): void => {
+  if (
+    next.hull <= 0 &&
+    !next.survivedLethal &&
+    resonanceAtLeast(next.resonance, "black", 6)
+  ) {
+    next.hull = 1;
+    next.survivedLethal = true;
   }
 };
 
-const retargetAfterKill = (
-  next: BattleSnapshot,
-  parent: EnemyState,
-  killedSubsystem: boolean,
-): void => {
-  if (killedSubsystem && parent.hp > 0) {
-    next.targetId = parent.id;
+const greenDiceCount = (next: BattleSnapshot): number =>
+  next.dice.filter((d) => d.school === "green").length;
+
+const finalizeOutcome = (next: BattleSnapshot): void => {
+  guardLethal(next);
+  if (next.hull <= 0) {
+    next.outcome = "defeat";
     return;
   }
-  next.targetId = aliveEnemies(next)[0]?.id ?? null;
+  if (aliveEnemies(next).length === 0) {
+    if (resonanceAtLeast(next.resonance, "green", 4)) {
+      next.hull = Math.min(next.hullMax, next.hull + greenDiceCount(next));
+    }
+    next.outcome = "victory";
+  }
 };
 
-interface WeaponTarget {
-  enemy: EnemyState;
-  subsystem?: SubsystemState;
+interface SlotContext {
+  ctx: BattleCtx;
+  sources: EffectSource[];
+  mods: BattleSnapshot["nextTurnMods"];
+  beats: Beat[];
 }
 
-const resolveWeaponTarget = (
+const applySlotEffect = (
   next: BattleSnapshot,
-): WeaponTarget | undefined => {
-  if (next.targetId !== null) {
-    for (const enemy of aliveEnemies(next)) {
-      const subsystem = enemy.subsystems.find(
-        (s) => s.id === next.targetId && s.hp > 0,
-      );
-      if (subsystem !== undefined) return { enemy, subsystem };
-    }
-    const enemy = next.enemies.find(
-      (e) => e.id === next.targetId && e.hp > 0,
+  slotId: SlotId,
+  die: RolledDie,
+  value: number,
+  thresholdBonus: number,
+  chargeMult: number,
+  crit: boolean,
+  mods: BattleSnapshot["nextTurnMods"],
+  beats: Beat[],
+): void => {
+  if (slotId === "sensors") {
+    const target =
+      next.enemies.find((e) => e.id === next.targetId && e.hp > 0) ??
+      aliveEnemies(next)[0];
+    if (target === undefined) return;
+    applyStatus(target.statuses, "mark");
+    const jam = value >= 4;
+    if (jam) applyStatus(target.statuses, "jam");
+    const deepScan = value >= 7;
+    if (deepScan) next.pendingDeepScan = true;
+    beats.push({
+      slot: slotId,
+      kind: "sensor",
+      amount: value,
+      targetId: target.id,
+      sensor: { mark: true, jam, deepScan },
+      after: clone(next),
+    });
+  } else if (slotId === "weaponA" || slotId === "weaponB") {
+    const target = resolveWeaponTarget(next);
+    if (target === undefined) return;
+    const targetId = (target.subsystem ?? target.enemy).id;
+    const dealt = applyWeaponDamage(
+      next,
+      target,
+      value + (mods.weapons ?? 0),
+      crit,
     );
-    if (enemy !== undefined) return { enemy };
-  }
-  const fallback = aliveEnemies(next)[0];
-  if (fallback === undefined) return undefined;
-  next.targetId = fallback.id;
-  return { enemy: fallback };
-};
-
-const applyWeaponDamage = (
-  next: BattleSnapshot,
-  target: WeaponTarget,
-  baseDamage: number,
-): number => {
-  let damage = baseDamage;
-  if (target.subsystem !== undefined) {
-    target.subsystem.hp = Math.max(0, target.subsystem.hp - damage);
-    if (target.subsystem.hp === 0) retargetAfterKill(next, target.enemy, true);
-    return damage;
-  }
-  if (consumeStatus(target.enemy.statuses, "mark")) damage += 2;
-  const absorbed = Math.min(target.enemy.shield, damage);
-  target.enemy.shield -= absorbed;
-  target.enemy.hp = Math.max(0, target.enemy.hp - (damage - absorbed));
-  if (target.enemy.hp === 0) {
-    for (const sub of target.enemy.subsystems) sub.hp = 0;
-    handleDeath(next, target.enemy);
-    retargetAfterKill(next, target.enemy, false);
-  }
-  return damage;
-};
-
-export const resolvePlayerPhase = (
-  snapshot: BattleSnapshot,
-): { next: BattleSnapshot; beats: Beat[] } => {
-  const next = clone(snapshot);
-  const beats: Beat[] = [];
-  const mods = next.nextTurnMods;
-  next.nextTurnMods = {};
-  for (const slotId of RESOLUTION_ORDER) {
-    const slot = next.slots[slotId];
-    if (slot?.dieUid === undefined) continue;
-    const die = next.dice.find((d) => d.uid === slot.dieUid);
-    if (die === undefined) continue;
-
-    if (slotId === "sensors") {
-      const target =
-        next.enemies.find((e) => e.id === next.targetId && e.hp > 0) ??
-        aliveEnemies(next)[0];
-      if (target === undefined) continue;
-      applyStatus(target.statuses, "mark");
-      const jam = die.value >= 4;
-      if (jam) applyStatus(target.statuses, "jam");
-      const deepScan = die.value >= 7;
-      if (deepScan) next.pendingDeepScan = true;
-      beats.push({
-        slot: slotId,
-        kind: "sensor",
-        amount: die.value,
-        targetId: target.id,
-        sensor: { mark: true, jam, deepScan },
-        after: clone(next),
-      });
-    } else if (slotId === "weaponA" || slotId === "weaponB") {
+    beats.push({
+      slot: slotId,
+      kind: "damage",
+      amount: dealt,
+      targetId,
+      after: clone(next),
+    });
+  } else if (slotId === "spinal") {
+    const slot = next.slots.spinal;
+    if (value <= (slot?.jamOn ?? 4)) {
+      next.nextTurnMods.spinal = (mods.spinal ?? 0) + 2;
+      beats.push({ slot: slotId, kind: "spinalJam", amount: 0, after: clone(next) });
+    } else {
       const target = resolveWeaponTarget(next);
-      if (target === undefined) continue;
+      if (target === undefined) return;
       const targetId = (target.subsystem ?? target.enemy).id;
       const dealt = applyWeaponDamage(
         next,
         target,
-        die.value + (mods.weapons ?? 0),
+        value + (mods.spinal ?? 0),
+        crit,
       );
       beats.push({
         slot: slotId,
@@ -174,72 +171,149 @@ export const resolvePlayerPhase = (
         targetId,
         after: clone(next),
       });
-    } else if (slotId === "spinal") {
-      if (die.value <= (slot.jamOn ?? 4)) {
-        next.nextTurnMods.spinal = (mods.spinal ?? 0) + 2;
-        beats.push({
-          slot: slotId,
-          kind: "spinalJam",
-          amount: 0,
-          after: clone(next),
-        });
-      } else {
-        const target = resolveWeaponTarget(next);
-        if (target === undefined) continue;
-        const targetId = (target.subsystem ?? target.enemy).id;
-        const dealt = applyWeaponDamage(
-          next,
-          target,
-          die.value + (mods.spinal ?? 0),
-        );
-        beats.push({
-          slot: slotId,
-          kind: "damage",
-          amount: dealt,
-          targetId,
-          after: clone(next),
-        });
-      }
-    } else if (slotId === "shields") {
-      next.shield += die.value;
-      beats.push({
-        slot: slotId,
-        kind: "shield",
-        amount: die.value,
-        after: clone(next),
-      });
-    } else if (slotId === "engines") {
-      const tier = engineTier(die.value);
-      next.engineState = tier;
-      if (tier === "dodgePlus") {
-        next.nextTurnMods.weapons = (next.nextTurnMods.weapons ?? 0) + 2;
-      }
-      beats.push({
-        slot: slotId,
-        kind: "engine",
-        amount: die.value,
-        engineTier: tier,
-        after: clone(next),
-      });
-    } else if (slotId === "reactor") {
-      next.charge += die.value;
-      let overflow = 0;
-      if (next.charge > CHARGE_CAP) {
-        next.charge = CHARGE_CAP;
-        overflow = OVERFLOW_HULL_COST;
-        next.hull = Math.max(0, next.hull - OVERFLOW_HULL_COST);
-      }
-      beats.push({
-        slot: slotId,
-        kind: "charge",
-        amount: die.value,
-        overflowHull: overflow > 0 ? overflow : undefined,
-        after: clone(next),
-      });
     }
+  } else if (slotId === "shields") {
+    next.shield += value;
+    if (
+      (die.school === "blue" || die.school === "prismatic") &&
+      resonanceAtLeast(next.resonance, "blue", 4)
+    ) {
+      next.shieldPersist = Math.min(next.hullMax, next.shieldPersist + value);
+    }
+    beats.push({ slot: slotId, kind: "shield", amount: value, after: clone(next) });
+  } else if (slotId === "engines") {
+    const tier = engineTier(value + thresholdBonus);
+    next.engineState = tier;
+    if (tier === "dodgePlus") {
+      next.nextTurnMods.weapons = (next.nextTurnMods.weapons ?? 0) + 2;
+    }
+    beats.push({
+      slot: slotId,
+      kind: "engine",
+      amount: value,
+      engineTier: tier,
+      after: clone(next),
+    });
+  } else if (slotId === "reactor") {
+    const stored = Math.floor(value * chargeMult);
+    next.charge += stored;
+    let overflow = 0;
+    if (next.charge > CHARGE_CAP) {
+      next.charge = CHARGE_CAP;
+      overflow = OVERFLOW_HULL_COST;
+      next.hull = Math.max(0, next.hull - OVERFLOW_HULL_COST);
+    }
+    beats.push({
+      slot: slotId,
+      kind: "charge",
+      amount: stored,
+      overflowHull: overflow > 0 ? overflow : undefined,
+      after: clone(next),
+    });
   }
-  if (next.hull <= 0) next.outcome = "defeat";
-  else if (aliveEnemies(next).length === 0) next.outcome = "victory";
+};
+
+const resolveSlot = (
+  next: BattleSnapshot,
+  slotId: SlotId,
+  slot: SlotState,
+  die: RolledDie,
+  sc: SlotContext,
+): void => {
+  const { ctx, sources, mods, beats } = sc;
+  const scope = {
+    slotId,
+    slot,
+    die,
+    value: die.value,
+    chargeMult: 1,
+    thresholdBonus: 0,
+    crit: false,
+    repeat: false,
+  };
+  ctx.scope = scope;
+
+  const primed = ctx.consumePrime(die.school);
+  if (primed !== undefined) {
+    if (primed.max) scope.value = dieFaceMax(die);
+    scope.value += primed.n;
+  }
+
+  emit(sources, "beforeResolveSlot", ctx);
+
+  if (die.tier > slot.cap && resonanceAtLeast(next.resonance, "black", 2)) {
+    next.hull = Math.max(0, next.hull - OVER_CAP_HULL_COST);
+  }
+
+  const isWeapon =
+    slotId === "weaponA" || slotId === "weaponB" || slotId === "spinal";
+  const crit =
+    isWeapon &&
+    resonanceAtLeast(next.resonance, "yellow", 4) &&
+    die.value >= dieFaceMax(die);
+
+  applySlotEffect(
+    next,
+    slotId,
+    die,
+    scope.value,
+    scope.thresholdBonus,
+    scope.chargeMult,
+    crit,
+    mods,
+    beats,
+  );
+
+  emit(sources, "afterResolveSlot", ctx);
+
+  const def = DIE_BY_ID.get(die.defId);
+  const fieldCap = def?.growth?.cap ?? 0;
+  const greenCap =
+    die.school === "green" && resonanceAtLeast(next.resonance, "green", 6)
+      ? 3
+      : 0;
+  const growthCap = Math.max(fieldCap, greenCap);
+  if (growthCap > 0 && die.value >= dieFaceMax(die)) {
+    const per = def?.growth?.perMax ?? 1;
+    die.growth = Math.min(growthCap, (die.growth ?? 0) + per);
+  }
+
+  if (scope.repeat) {
+    applySlotEffect(
+      next,
+      slotId,
+      die,
+      scope.value,
+      scope.thresholdBonus,
+      scope.chargeMult,
+      crit,
+      mods,
+      beats,
+    );
+  }
+
+  ctx.scope = null;
+};
+
+export const resolvePlayerPhase = (
+  snapshot: BattleSnapshot,
+): { next: BattleSnapshot; beats: Beat[] } => {
+  const next = clone(snapshot);
+  const beats: Beat[] = [];
+  const ctx = new BattleCtx(next);
+  const sources = buildSources(next);
+  const mods = next.nextTurnMods;
+  next.nextTurnMods = {};
+
+  for (const slotId of RESOLUTION_ORDER) {
+    const slot = next.slots[slotId];
+    if (slot?.dieUid === undefined) continue;
+    const die = next.dice.find((d) => d.uid === slot.dieUid);
+    if (die === undefined) continue;
+    resolveSlot(next, slotId, slot, die, { ctx, sources, mods, beats });
+  }
+
+  finalizeOutcome(next);
   return { next, beats };
 };
 
@@ -454,9 +528,8 @@ export const resolveEnemyPhase = (
     });
   }
 
-  next.shield = 0;
-  if (next.hull <= 0) next.outcome = "defeat";
-  else if (aliveEnemies(next).length === 0) next.outcome = "victory";
+  next.shield = Math.min(next.shield, next.shieldPersist);
+  finalizeOutcome(next);
   return { next, beats };
 };
 
@@ -466,21 +539,21 @@ export const advanceTurn = (
 ): BattleSnapshot => {
   const next = clone(snapshot);
   next.turn += 1;
-  next.blockedSlots = next.blockedSlots.filter(
-    (b) => b.untilTurn >= next.turn,
-  );
+  next.blockedSlots = next.blockedSlots.filter((b) => b.untilTurn >= next.turn);
   next.lockedDice = next.lockedDice.filter((l) => l.untilTurn >= next.turn);
   next.dice = next.dice.map((die) => {
     if (isDieLocked(next, die.uid)) {
-      return { ...die, state: "locked" as const, slot: undefined };
+      return { ...die, state: "locked" as const, slot: undefined, lastValue: undefined };
     }
     if (die.state === "reserved") {
-      return { ...die, state: "tray" as const, slot: undefined };
+      return { ...die, state: "tray" as const, slot: undefined, lastValue: undefined };
     }
-    const rolled = streams.dice.int(1, die.tier);
+    const base = rollBaseValue(die.defId, die.tier, streams.dice);
+    const rolled = Math.min(die.tier, Math.max(1, base + next.nextRollBonus));
     return {
       ...die,
-      value: Math.min(die.tier, Math.max(1, rolled + next.nextRollBonus)),
+      value: rolled + (die.growth ?? 0),
+      lastValue: die.value,
       state: "tray" as const,
       slot: undefined,
     };
@@ -490,5 +563,19 @@ export const advanceTurn = (
   }
   next.engineState = null;
   next.nextRollBonus = 0;
+
+  const rolledDice = next.dice.filter(
+    (d) => d.state === "tray" && d.lastValue !== undefined,
+  );
+  applyRollFloors(rolledDice, next.resonance);
+
+  const ctx = new BattleCtx(next);
+  const sources = buildSources(next);
+  for (const die of rolledDice) {
+    ctx.subjectDie = die;
+    emit(sources, "rolled", ctx);
+  }
+  ctx.subjectDie = null;
+
   return next;
 };

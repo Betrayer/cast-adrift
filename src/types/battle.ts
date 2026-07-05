@@ -21,6 +21,10 @@ export interface RolledDie {
   value: number;
   state: DieState;
   slot?: SlotId;
+  growth?: number;
+  lastValue?: number;
+  overCap?: boolean;
+  activeUsed?: boolean;
 }
 
 export interface SlotState {
@@ -50,11 +54,13 @@ export interface EnemyState {
   subsystems: SubsystemState[];
 }
 
-export type BattlePhase =
-  | "idle"
-  | "placement"
-  | "resolving"
-  | "ended";
+export type ResonanceThreshold = 2 | 4 | 6;
+
+export interface ResonanceCensus {
+  counts: Record<School, number>;
+}
+
+export type BattlePhase = "idle" | "placement" | "resolving" | "ended";
 
 export type BattleOutcome = "victory" | "defeat";
 
@@ -80,7 +86,9 @@ export interface BattleSnapshot {
   hull: number;
   hullMax: number;
   shield: number;
+  shieldPersist: number;
   charge: number;
+  scrap: number;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
   enemies: EnemyState[];
@@ -91,6 +99,8 @@ export interface BattleSnapshot {
   pendingDeepScan: boolean;
   blockedSlots: BlockedSlot[];
   lockedDice: LockedDie[];
+  resonance: ResonanceCensus;
+  survivedLethal: boolean;
   outcome?: BattleOutcome;
 }
 

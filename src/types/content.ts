@@ -1,3 +1,5 @@
+import type { EffectDef } from "@/game/effects/types";
+
 export type LocKey = string;
 
 export type School =
@@ -13,6 +15,13 @@ export type DieTier = 4 | 6 | 8 | 10 | 12 | 20 | 100;
 
 export type Rarity = "common" | "uncommon" | "rare" | "legendary";
 
+export interface DieGrowth {
+  perMax: number;
+  cap: number;
+}
+
+export type DieActive = "flip" | "copy";
+
 export interface DieItemDef {
   id: string;
   name: LocKey;
@@ -20,6 +29,11 @@ export interface DieItemDef {
   school: School;
   rarity: Rarity;
   pts: number;
+  desc?: LocKey;
+  effects?: readonly EffectDef[];
+  faces?: readonly number[];
+  growth?: DieGrowth;
+  active?: DieActive;
 }
 
 export type Intent =
@@ -32,7 +46,9 @@ export type Intent =
   | { t: "lockDie" }
   | { t: "summon"; id: string };
 
-export type PatternStep = Intent | { pick: readonly (readonly [Intent, number])[] };
+export type PatternStep =
+  | Intent
+  | { pick: readonly (readonly [Intent, number])[] };
 
 export type SubsystemAura = "atk+2" | "shieldAllies3" | "lockEachTurn";
 

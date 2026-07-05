@@ -1,4 +1,5 @@
 import {
+  hapticFeedback,
   init,
   isTMA,
   miniApp,
@@ -6,6 +7,16 @@ import {
   viewport,
 } from "@tma.js/sdk";
 import { tokens } from "@/app/theme";
+
+export type HapticStyle = "light" | "medium" | "heavy";
+
+export const haptic = (style: HapticStyle): void => {
+  try {
+    hapticFeedback.impactOccurred.ifAvailable(style);
+  } catch {
+    // no-op on web / when unavailable
+  }
+};
 
 export interface TmaSession {
   isTelegram: boolean;

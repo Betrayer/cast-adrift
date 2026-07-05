@@ -6,17 +6,25 @@ export interface RngStream {
   shuffle: <T>(arr: readonly T[]) => T[];
 }
 
-export type StreamLabel = 'map' | 'dice' | 'loot' | 'events' | 'shop' | 'fate';
+export type StreamLabel =
+  | "map"
+  | "dice"
+  | "loot"
+  | "events"
+  | "shop"
+  | "fate"
+  | "vfx";
 
 export type RngStreams = Record<StreamLabel, RngStream>;
 
 const STREAM_LABELS: readonly StreamLabel[] = [
-  'map',
-  'dice',
-  'loot',
-  'events',
-  'shop',
-  'fate',
+  "map",
+  "dice",
+  "loot",
+  "events",
+  "shop",
+  "fate",
+  "vfx",
 ];
 
 export const fnv1a = (str: string): number => {
@@ -50,14 +58,14 @@ export const createStream = (seed: number): RngStream => {
     min + Math.floor(next() * (max - min + 1));
 
   const pick = <T>(arr: readonly T[]): T => {
-    if (arr.length === 0) throw new Error('rng.pick: empty array');
+    if (arr.length === 0) throw new Error("rng.pick: empty array");
     return arr[int(0, arr.length - 1)] as T;
   };
 
   const weighted = <T>(entries: readonly (readonly [T, number])[]): T => {
     const total = entries.reduce((sum, [, weight]) => sum + weight, 0);
     if (entries.length === 0 || total <= 0) {
-      throw new Error('rng.weighted: no entries with positive weight');
+      throw new Error("rng.weighted: no entries with positive weight");
     }
     let roll = next() * total;
     for (const [value, weight] of entries) {

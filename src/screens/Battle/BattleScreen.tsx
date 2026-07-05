@@ -1,11 +1,22 @@
 import { Box, Button, Group, Overlay, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { LootReveal } from '@/screens/Battle/LootReveal';
+import { useLootStore } from '@/stores/lootStore';
 import type { TFunction } from 'i18next';
 import type { Application } from 'pixi.js';
 import { tokens } from '@/app/theme';
 import { STARTER_DECK } from '@/data/decks';
 import { ENEMY_BY_ID } from '@/data/enemies/sector1';
+import { DIE_BY_ID } from '@/data/dice';
+import { schools } from '@/data/schools';
+import { canCopy, canFlip } from '@/game/battle/actives';
+import {
+  activeThresholds,
+  nextThreshold,
+  RESONANCE_THRESHOLDS,
+  SCHOOL_ORDER,
+} from '@/game/battle/resonance';
 import {
   BONUS_REROLL_COST,
   CHARGE_CAP,
@@ -14,6 +25,7 @@ import {
 } from '@/game/battle/resolver';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
+import { initAudio } from '@/services/audio';
 import { createStreams } from '@/services/rng';
 import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
@@ -66,6 +78,7 @@ const StatusCard = () => {
   const hullMax = useBattleStore((s) => s.hullMax);
   const shield = useBattleStore((s) => s.shield);
   const charge = useBattleStore((s) => s.charge);
+  const scrap = useBattleStore((s) => s.scrap);
   const turn = useBattleStore((s) => s.turn);
   const phase = useBattleStore((s) => s.phase);
   const rerollMode = useBattleStore((s) => s.rerollMode);
@@ -110,6 +123,11 @@ const StatusCard = () => {
         <span className={`${styles.pill ?? ''} ${styles.pillShield ?? ''}`}>
           {t('battle:shield', { n: shield })}
         </span>
+        {scrap > 0 ? (
+          <span className={`${styles.pill ?? ''} ${styles.pillScrap ?? ''}`}>
+            {t('battle:scrap', { n: scrap })}
+          </span>
+        ) : null}
         <span className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}>
           {t('battle:charge', { n: charge, max: CHARGE_CAP })}
         </span>
@@ -154,9 +172,8 @@ const EnemyChips = () => {
         return (
           <div
             key={enemy.id}
-            className={`${styles.enemyChip ?? ''} ${
-              targeted ? styles.enemyChipTargeted ?? '' : ''
-            }`}
+            className={`${styles.enemyChip ?? ''} ${targeted ? styles.enemyChipTargeted ?? '' : ''
+              }`}
             style={{ opacity: enemy.hp > 0 ? 1 : 0.45 }}
           >
             <Text size="sm" fw={600} c={tokens.text}>
@@ -182,20 +199,74 @@ const EnemyChips = () => {
   );
 };
 
-const NudgeStrip = () => {
+const ResonanceChips = () => {
   const { t } = useTranslation(['battle']);
+  const resonance = useBattleStore((s) => s.resonance);
+  const present = SCHOOL_ORDER.filter((school) => resonance.counts[school] > 0);
+  if (present.length === 0) return null;
+  return (
+    <div className={styles.resonanceRow}>
+      {present.map((school) => {
+        const count = resonance.counts[school];
+        const next = nextThreshold(count);
+        const active = activeThresholds(resonance, school);
+        const colors = schools[school];
+        const schoolLabel = t(`battle:school.${school}`);
+        const label =
+          next === null
+            ? t('battle:resChipFull', { school: schoolLabel, count })
+            : t('battle:resChip', { school: schoolLabel, count, next });
+        return (
+          <span
+            key={school}
+            className={`${styles.resChip ?? ''} ${active.length > 0 ? styles.resChipActive ?? '' : ''
+              }`}
+            style={{ borderColor: colors.stroke, color: colors.text }}
+          >
+            {label}
+            <span className={styles.resPips}>
+              {RESONANCE_THRESHOLDS.map((th) => (
+                <span
+                  key={th}
+                  className={`${styles.resPip ?? ''} ${active.includes(th) ? styles.resPipOn ?? '' : ''
+                    }`}
+                />
+              ))}
+            </span>
+          </span>
+        );
+      })}
+    </div>
+  );
+};
+
+const NudgeStrip = () => {
+  const { t } = useTranslation(['battle', 'content']);
   const phase = useBattleStore((s) => s.phase);
   const charge = useBattleStore((s) => s.charge);
+  const freeNudges = useBattleStore((s) => s.freeNudges);
+  const resonance = useBattleStore((s) => s.resonance);
   const selectedDieUid = useBattleStore((s) => s.selectedDieUid);
   const spendNudge = useBattleStore((s) => s.spendNudge);
+  const flipDie = useBattleStore((s) => s.flipDie);
+  const copyDie = useBattleStore((s) => s.copyDie);
   const die = useBattleStore((s) =>
     s.dice.find((d) => d.uid === s.selectedDieUid),
   );
   if (phase !== 'placement' || selectedDieUid === null || die === undefined)
     return null;
-  const affordable = charge >= NUDGE_COST;
+  const def = DIE_BY_ID.get(die.defId);
+  const free = freeNudges > 0;
+  const affordable = free || charge >= NUDGE_COST;
+  const showFlip = canFlip(die);
+  const showCopy = die.state === 'tray' && canCopy(die, resonance);
   return (
     <div className={styles.nudgeStrip}>
+      {def !== undefined ? (
+        <Text size="xs" fw={600} c={tokens.text} style={{ alignSelf: 'center' }}>
+          {`${t(def.name)} · d${String(def.tier)}`}
+        </Text>
+      ) : null}
       <Button
         className={styles.clickable}
         size="compact-sm"
@@ -205,7 +276,7 @@ const NudgeStrip = () => {
           spendNudge(selectedDieUid, -1);
         }}
       >
-        {t('battle:nudgeMinus')}
+        {t(free ? 'battle:nudgeFree' : 'battle:nudgeMinus')}
       </Button>
       <Button
         className={styles.clickable}
@@ -216,8 +287,32 @@ const NudgeStrip = () => {
           spendNudge(selectedDieUid, 1);
         }}
       >
-        {t('battle:nudgePlus')}
+        {t(free ? 'battle:nudgeFreePlus' : 'battle:nudgePlus')}
       </Button>
+      {showFlip ? (
+        <Button
+          className={styles.clickable}
+          size="compact-sm"
+          variant="default"
+          onClick={() => {
+            flipDie(selectedDieUid);
+          }}
+        >
+          {t('battle:flip')}
+        </Button>
+      ) : null}
+      {showCopy ? (
+        <Button
+          className={styles.clickable}
+          size="compact-sm"
+          variant="default"
+          onClick={() => {
+            copyDie(selectedDieUid);
+          }}
+        >
+          {t('battle:copy')}
+        </Button>
+      ) : null}
     </div>
   );
 };
@@ -234,6 +329,7 @@ const BottomBar = () => {
   const endTurn = useBattleStore((s) => s.endTurn);
   return (
     <div className={styles.bottomBar}>
+      <ResonanceChips />
       {rerollMode ? (
         <Text size="xs" c={tokens.dim} ta="center">
           {t('battle:rerollHint', { size: rerollSize })}
@@ -295,8 +391,10 @@ const EndOverlay = () => {
   const { t } = useTranslation(['battle']);
   const outcome = useBattleStore((s) => s.outcome);
   const reset = useBattleStore((s) => s.reset);
+  const lootPending = useLootStore((s) => s.pending);
+  const clearLoot = useLootStore((s) => s.clear);
   const go = useAppStore((s) => s.go);
-  if (outcome === undefined) return null;
+  if (outcome === undefined || lootPending !== null) return null;
   return (
     <Overlay backgroundOpacity={0.82} color={tokens.bg} blur={2} zIndex={5}>
       <Stack align="center" justify="center" h="100%" gap="lg">
@@ -306,6 +404,7 @@ const EndOverlay = () => {
         <Button
           size="md"
           onClick={() => {
+            clearLoot();
             reset();
             go('menu');
           }}
@@ -320,10 +419,22 @@ const EndOverlay = () => {
 export const BattleScreen = () => {
   const { t } = useTranslation(['battle']);
   const phase = useBattleStore((s) => s.phase);
+  const outcome = useBattleStore((s) => s.outcome);
+  const dropLoot = useLootStore((s) => s.drop);
+  const droppedRef = useRef(false);
 
   useEffect(() => {
+    initAudio();
     startTestBattleIfIdle();
   }, []);
+
+  useEffect(() => {
+    if (outcome === 'victory' && !droppedRef.current) {
+      droppedRef.current = true;
+      dropLoot('vulture');
+    }
+    if (outcome === undefined) droppedRef.current = false;
+  }, [outcome, dropLoot]);
 
   const mountScene = useMemo(
     () => (app: Application) =>
@@ -350,6 +461,7 @@ export const BattleScreen = () => {
         <NudgeStrip />
         <BottomBar />
       </div>
+      <LootReveal />
       {phase === 'ended' ? <EndOverlay /> : null}
       {debugEnabled ? <DebugPanel /> : null}
     </Box>

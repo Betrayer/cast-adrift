@@ -13,6 +13,7 @@ import {
   drawIntent,
   spawnEnemy,
 } from "@/game/battle/setup";
+import { computeCensus } from "@/game/battle/resonance";
 import { createStream, createStreams } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -49,9 +50,9 @@ const die = (
   tier: DieTier = 6,
 ): RolledDie => ({
   uid,
-  defId: "red-d6",
+  defId: "grey-d4",
   tier,
-  school: "red",
+  school: "grey",
   value,
   state: slot === undefined ? "tray" : "placed",
   slot,
@@ -62,7 +63,9 @@ const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
   hull: 30,
   hullMax: 30,
   shield: 0,
+  shieldPersist: 0,
   charge: 0,
+  scrap: 0,
   dice: [],
   slots: {
     weaponA: { cap: 8, mk: 1 },
@@ -80,6 +83,8 @@ const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
   pendingDeepScan: false,
   blockedSlots: [],
   lockedDice: [],
+  resonance: computeCensus([]),
+  survivedLethal: false,
   ...over,
 });
 

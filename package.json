@@ -13,7 +13,8 @@
     "typecheck": "tsc --noEmit",
     "sim": "tsx scripts/sim.mts",
     "sim:smoke": "tsx scripts/sim.mts --enemy raider --runs 100 --seed 7",
-    "lint:content": "tsx scripts/contentLint.mts"
+    "lint:content": "tsx scripts/contentLint.mts",
+    "gensfx": "tsx scripts/genSfx.mts"
   },
   "dependencies": {
     "@mantine/core": "^9.4.1",

@@ -1,9 +1,9 @@
-import { DIE_BY_ID } from "@/data/dice/basic";
-import {
-  ENEMY_BY_ID,
-  expandEncounterIds,
-} from "@/data/enemies/sector1";
+import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
+import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies/sector1";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
+import { slotCapForMk, type MkLevel } from "@/data/slots";
+import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
+import { applyRollFloors } from "@/game/battle/rollFloors";
 import { createStream, type RngStream, type RngStreams } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -16,11 +16,14 @@ import type { EnemyDef, Intent } from "@/types/content";
 
 export const MAX_ENEMIES = 3;
 
+export type MkLevels = Partial<Record<SlotId, MkLevel>>;
+
 export const createEnemyStream = (streams: RngStreams): RngStream =>
   createStream(Math.floor(streams.dice.next() * 4294967296) >>> 0);
 
 export const buildShipSlots = (
   shipId: ShipId,
+  mkLevels: MkLevels = {},
 ): Partial<Record<SlotId, SlotState>> => {
   const ship = SHIP_BY_ID.get(shipId);
   if (ship === undefined)
@@ -30,7 +33,8 @@ export const buildShipSlots = (
     SlotId,
     Omit<SlotState, "dieUid">,
   ][]) {
-    slots[slotId] = { ...def };
+    const mk = mkLevels[slotId] ?? def.mk;
+    slots[slotId] = { ...def, mk, cap: slotCapForMk(slotId, mk) };
   }
   return slots;
 };
@@ -55,7 +59,7 @@ export const rollDeck = (
       defId,
       tier: def.tier,
       school: def.school,
-      value: streams.dice.int(1, def.tier),
+      value: rollBaseValue(defId, def.tier, streams.dice),
       state: "tray",
     };
   });
@@ -105,7 +109,9 @@ export const buildEnemies = (
 ): EnemyState[] =>
   expandEncounterIds(enemyIds)
     .slice(0, MAX_ENEMIES)
-    .map((defId, index) => spawnEnemy(defId, `enemy-${String(index)}`, enemyStream));
+    .map((defId, index) =>
+      spawnEnemy(defId, `enemy-${String(index)}`, enemyStream),
+    );
 
 export const buildBattleSnapshot = (
   shipId: ShipId,
@@ -113,16 +119,20 @@ export const buildBattleSnapshot = (
   enemyIds: readonly string[],
   streams: RngStreams,
   enemyStream: RngStream,
+  mkLevels: MkLevels = {},
 ): BattleSnapshot => {
   const enemies = buildEnemies(enemyIds, enemyStream);
-  return {
+  const dice = rollDeck(deckDefIds, streams);
+  const snapshot: BattleSnapshot = {
     turn: 1,
     hull: shipHullMax(shipId),
     hullMax: shipHullMax(shipId),
     shield: 0,
+    shieldPersist: 0,
     charge: 0,
-    dice: rollDeck(deckDefIds, streams),
-    slots: buildShipSlots(shipId),
+    scrap: 0,
+    dice,
+    slots: buildShipSlots(shipId, mkLevels),
     enemies,
     targetId: enemies[0]?.id ?? null,
     engineState: null,
@@ -131,7 +141,11 @@ export const buildBattleSnapshot = (
     pendingDeepScan: false,
     blockedSlots: [],
     lockedDice: [],
+    resonance: computeCensus(dice),
+    survivedLethal: false,
   };
+  applyRollFloors(dice, snapshot.resonance);
+  return snapshot;
 };
 
 export const isSlotBlocked = (
@@ -150,10 +164,22 @@ export const isDieLocked = (
     (l) => l.uid === uid && l.untilTurn >= snapshot.turn,
   );
 
+export const dieFitsSlot = (
+  snapshot: Pick<BattleSnapshot, "resonance">,
+  die: Pick<RolledDie, "tier" | "school">,
+  slot: Pick<SlotState, "cap">,
+): boolean => {
+  if (die.tier <= slot.cap) return true;
+  return (
+    (die.school === "black" || die.school === "prismatic") &&
+    resonanceAtLeast(snapshot.resonance, "black", 2)
+  );
+};
+
 export const canPlaceDie = (
   snapshot: Pick<
     BattleSnapshot,
-    "dice" | "slots" | "blockedSlots" | "lockedDice" | "turn"
+    "dice" | "slots" | "blockedSlots" | "lockedDice" | "turn" | "resonance"
   >,
   uid: string,
   slotId: SlotId,
@@ -165,7 +191,7 @@ export const canPlaceDie = (
     slot !== undefined &&
     die.state === "tray" &&
     slot.dieUid === undefined &&
-    die.tier <= slot.cap &&
+    dieFitsSlot(snapshot, die, slot) &&
     !isSlotBlocked(snapshot, slotId) &&
     !isDieLocked(snapshot, uid)
   );
