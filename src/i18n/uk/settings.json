@@ -1,0 +1,14 @@
+{
+  "title": "Налаштування",
+  "language": "Мова",
+  "sfxVolume": "Гучність ефектів",
+  "musicVolume": "Гучність музики",
+  "reducedMotion": "Менше анімації",
+  "auto": "Авто",
+  "on": "Увімк.",
+  "off": "Вимк.",
+  "echoVerbosity": "Балакучість Ехо",
+  "echoNormal": "Звичайна",
+  "echoLess": "Менше",
+  "screenShake": "Тряска екрана"
+}

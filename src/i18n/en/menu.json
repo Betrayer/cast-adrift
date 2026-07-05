@@ -1,0 +1,10 @@
+{
+  "tagline": "A salvage run through a dead sector",
+  "newRun": "New Run",
+  "hangar": "Hangar",
+  "starChart": "Star Chart",
+  "codex": "Codex",
+  "modes": "Modes",
+  "settings": "Settings",
+  "stub": "This screen arrives in Phase {{phase}}."
+}
