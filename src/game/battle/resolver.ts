@@ -7,7 +7,7 @@ import {
   resolveWeaponTarget,
 } from "@/game/battle/damage";
 import { resonanceAtLeast } from "@/game/battle/resonance";
-import { applyRollFloors } from "@/game/battle/rollFloors";
+import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import {
   drawIntent,
   isDieLocked,
@@ -23,6 +23,8 @@ import {
   emit,
   type EffectSource,
 } from "@/game/effects";
+import { computePerkMods, hasTrait } from "@/game/run/perkMods";
+import type { PerkMods } from "@/data/perks/types";
 import type { RngStream, RngStreams } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -53,6 +55,10 @@ export const BONUS_REROLL_COST = 5;
 export const SURGE_COST = 10;
 export const BASE_REROLL_SIZE = 2;
 export const OVER_CAP_HULL_COST = 1;
+export const REFLECT_DODGE_DAMAGE = 3;
+export const SACRIFICE_DAMAGE = 4;
+export const BLOOD_REACTOR_HULL = 2;
+export const BLOOD_REACTOR_CHARGE = 3;
 
 const clone = (snapshot: BattleSnapshot): BattleSnapshot =>
   structuredClone(snapshot);
@@ -101,6 +107,8 @@ interface SlotContext {
   sources: EffectSource[];
   mods: BattleSnapshot["nextTurnMods"];
   beats: Beat[];
+  perkMods: PerkMods;
+  ricochet: boolean;
 }
 
 const applySlotEffect = (
@@ -113,6 +121,8 @@ const applySlotEffect = (
   crit: boolean,
   mods: BattleSnapshot["nextTurnMods"],
   beats: Beat[],
+  perkMods: PerkMods,
+  ricochet: boolean,
 ): void => {
   if (slotId === "sensors") {
     const target =
@@ -136,11 +146,17 @@ const applySlotEffect = (
     const target = resolveWeaponTarget(next);
     if (target === undefined) return;
     const targetId = (target.subsystem ?? target.enemy).id;
+    const markBonus = 2 + perkMods.markBonusDelta;
+    const preHp =
+      target.subsystem === undefined
+        ? target.enemy.hp + target.enemy.shield
+        : 0;
     const dealt = applyWeaponDamage(
       next,
       target,
       value + (mods.weapons ?? 0),
       crit,
+      markBonus,
     );
     beats.push({
       slot: slotId,
@@ -149,6 +165,35 @@ const applySlotEffect = (
       targetId,
       after: clone(next),
     });
+    if (
+      ricochet &&
+      slotId === "weaponA" &&
+      target.subsystem === undefined &&
+      target.enemy.hp === 0
+    ) {
+      const overkill = dealt - preHp;
+      if (overkill > 0) {
+        const nextEnemy = aliveEnemies(next).find(
+          (e) => e.id !== target.enemy.id,
+        );
+        if (nextEnemy !== undefined) {
+          const ricochetDealt = applyWeaponDamage(
+            next,
+            { enemy: nextEnemy },
+            overkill,
+            false,
+            markBonus,
+          );
+          beats.push({
+            slot: slotId,
+            kind: "damage",
+            amount: ricochetDealt,
+            targetId: nextEnemy.id,
+            after: clone(next),
+          });
+        }
+      }
+    }
   } else if (slotId === "spinal") {
     const slot = next.slots.spinal;
     if (value <= (slot?.jamOn ?? 4)) {
@@ -163,6 +208,7 @@ const applySlotEffect = (
         target,
         value + (mods.spinal ?? 0),
         crit,
+        2 + perkMods.markBonusDelta,
       );
       beats.push({
         slot: slotId,
@@ -182,7 +228,9 @@ const applySlotEffect = (
     }
     beats.push({ slot: slotId, kind: "shield", amount: value, after: clone(next) });
   } else if (slotId === "engines") {
-    const tier = engineTier(value + thresholdBonus);
+    const tier = engineTier(
+      value + thresholdBonus + perkMods.enginesThresholdDelta,
+    );
     next.engineState = tier;
     if (tier === "dodgePlus") {
       next.nextTurnMods.weapons = (next.nextTurnMods.weapons ?? 0) + 2;
@@ -198,8 +246,8 @@ const applySlotEffect = (
     const stored = Math.floor(value * chargeMult);
     next.charge += stored;
     let overflow = 0;
-    if (next.charge > CHARGE_CAP) {
-      next.charge = CHARGE_CAP;
+    if (next.charge > next.chargeCap) {
+      next.charge = next.chargeCap;
       overflow = OVERFLOW_HULL_COST;
       next.hull = Math.max(0, next.hull - OVERFLOW_HULL_COST);
     }
@@ -262,6 +310,8 @@ const resolveSlot = (
     crit,
     mods,
     beats,
+    sc.perkMods,
+    sc.ricochet,
   );
 
   emit(sources, "afterResolveSlot", ctx);
@@ -272,7 +322,8 @@ const resolveSlot = (
     die.school === "green" && resonanceAtLeast(next.resonance, "green", 6)
       ? 3
       : 0;
-  const growthCap = Math.max(fieldCap, greenCap);
+  const effectiveField = fieldCap > 0 ? fieldCap + sc.perkMods.growthCapDelta : 0;
+  const growthCap = Math.max(effectiveField, greenCap);
   if (growthCap > 0 && die.value >= dieFaceMax(die)) {
     const per = def?.growth?.perMax ?? 1;
     die.growth = Math.min(growthCap, (die.growth ?? 0) + per);
@@ -289,6 +340,8 @@ const resolveSlot = (
       crit,
       mods,
       beats,
+      sc.perkMods,
+      sc.ricochet,
     );
   }
 
@@ -302,15 +355,32 @@ export const resolvePlayerPhase = (
   const beats: Beat[] = [];
   const ctx = new BattleCtx(next);
   const sources = buildSources(next);
+  const perkMods = computePerkMods(next.perks);
+  const ricochet = hasTrait(next.perks, "ricochet");
   const mods = next.nextTurnMods;
   next.nextTurnMods = {};
+  if (next.sacrificePool > 0) {
+    mods.weapons = (mods.weapons ?? 0) + next.sacrificePool;
+    next.sacrificePool = 0;
+  }
 
   for (const slotId of RESOLUTION_ORDER) {
     const slot = next.slots[slotId];
     if (slot?.dieUid === undefined) continue;
     const die = next.dice.find((d) => d.uid === slot.dieUid);
     if (die === undefined) continue;
-    resolveSlot(next, slotId, slot, die, { ctx, sources, mods, beats });
+    resolveSlot(next, slotId, slot, die, {
+      ctx,
+      sources,
+      mods,
+      beats,
+      perkMods,
+      ricochet,
+    });
+  }
+
+  if (hasTrait(next.perks, "compost")) {
+    next.scrap += next.dice.filter((d) => d.state === "tray").length;
   }
 
   finalizeOutcome(next);
@@ -329,8 +399,14 @@ const applyAttack = (
   context: AttackContext,
 ): { dealt: number; hullDamage: number; shieldDamage: number } => {
   const aura = hasAliveAura(enemy, "atk+2") ? 2 : 0;
+  const tide = Math.max(0, next.tide);
+  const perkMods = computePerkMods(next.perks);
+  const reflectDodge = hasTrait(next.perks, "reflectDodge");
+  const dodgeCharge = hasTrait(next.perks, "dodgeCharge");
   const chargeMult = consumeStatus(enemy.statuses, "charge") ? 2 : 1;
-  const jamPenalty = consumeStatus(enemy.statuses, "jam") ? 2 : 0;
+  const jamPenalty = consumeStatus(enemy.statuses, "jam")
+    ? 2 + perkMods.jamPowerDelta
+    : 0;
   const brace = next.engineState === "brace" ? 1 : 0;
   const dodges =
     next.engineState === "dodge" || next.engineState === "dodgePlus";
@@ -340,10 +416,14 @@ const applyAttack = (
   for (let i = 0; i < hits; i += 1) {
     let damage = Math.max(
       0,
-      (perHit + aura) * chargeMult - (i === 0 ? jamPenalty : 0),
+      (perHit + aura + tide) * chargeMult - (i === 0 ? jamPenalty : 0),
     );
     if (dodges && !context.dodgeSpent) {
       context.dodgeSpent = true;
+      if (reflectDodge) enemy.hp = Math.max(0, enemy.hp - REFLECT_DODGE_DAMAGE);
+      if (dodgeCharge) {
+        next.charge = Math.min(next.chargeCap, next.charge + 1);
+      }
       continue;
     }
     damage = Math.max(0, damage - brace);
@@ -490,6 +570,7 @@ export const resolveEnemyPhase = (
           intent.id,
           `enemy-${String(next.enemies.length)}`,
           enemyStream,
+          next.tide,
         );
         next.enemies.push(spawned);
         beats.push({
@@ -563,11 +644,14 @@ export const advanceTurn = (
   }
   next.engineState = null;
   next.nextRollBonus = 0;
+  next.sacrificePool = 0;
+  next.bloodReactorUsed = false;
 
   const rolledDice = next.dice.filter(
     (d) => d.state === "tray" && d.lastValue !== undefined,
   );
-  applyRollFloors(rolledDice, next.resonance);
+  applyRollFloors(rolledDice, next.resonance, hasTrait(next.perks, "stabilizer"));
+  if (hasTrait(next.perks, "spareLowest")) applySpareLowest(rolledDice);
 
   const ctx = new BattleCtx(next);
   const sources = buildSources(next);

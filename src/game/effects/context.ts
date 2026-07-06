@@ -6,6 +6,7 @@ import {
 } from "@/game/battle/damage";
 import { resonanceAtLeast } from "@/game/battle/resonance";
 import { applyStatus, type StatusKey } from "@/game/battle/statuses";
+import { hasTrait } from "@/game/run/perkMods";
 import type { EffectTarget } from "@/game/effects/types";
 import type {
   BattleSnapshot,
@@ -133,7 +134,16 @@ export class BattleCtx {
     if (target !== "target") return;
     const enemy = this.currentTargetEnemy();
     if (enemy === undefined) return;
-    applyStatus(enemy.statuses, s, n);
+    let amount = n;
+    if (
+      s === "burn" &&
+      !this.snapshot.burnDoubleUsed &&
+      hasTrait(this.snapshot.perks, "burnDouble")
+    ) {
+      amount = n * 2;
+      this.snapshot.burnDoubleUsed = true;
+    }
+    applyStatus(enemy.statuses, s, amount);
   }
 
   primeSchool(school: School, n = 0, max = false): void {

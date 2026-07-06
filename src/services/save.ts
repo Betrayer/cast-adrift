@@ -25,6 +25,7 @@ interface SavePayload {
 export interface SaveService {
   saveRunSnapshot: (snapshot: RunSnapshot) => void;
   loadRunSnapshot: () => RunSnapshot | null;
+  localSavedAt: () => number | null;
   hasRun: () => boolean;
   clearRun: () => void;
   pushCloudSnapshot: () => Promise<void>;
@@ -127,6 +128,14 @@ export const createSaveService = (
     return null;
   };
 
+  const localSavedAt = (): number | null => {
+    for (const key of [activeKey(), inactiveKey()]) {
+      const payload = readPayload(key);
+      if (payload !== null) return payload.savedAt;
+    }
+    return null;
+  };
+
   const hasRun = (): boolean => loadRunSnapshot() !== null;
 
   const clearRun = (): void => {
@@ -143,6 +152,7 @@ export const createSaveService = (
   return {
     saveRunSnapshot,
     loadRunSnapshot,
+    localSavedAt,
     hasRun,
     clearRun,
     pushCloudSnapshot,
@@ -156,6 +166,7 @@ const defaultStorage: KeyValueStorage =
 export const {
   saveRunSnapshot,
   loadRunSnapshot,
+  localSavedAt,
   hasRun,
   clearRun,
   pushCloudSnapshot,

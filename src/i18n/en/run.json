@@ -1,0 +1,85 @@
+{
+  "glyph": {
+    "start": "⌂",
+    "battle": "B",
+    "elite": "E",
+    "miniboss": "MB",
+    "shop": "$",
+    "shipyard": "Y",
+    "event": "?",
+    "anomaly": "A",
+    "beacon": "M",
+    "boss": "Boss"
+  },
+  "map": {
+    "title": "Sector {{n}} · {{name}}",
+    "sector1": "The Rim",
+    "depth": "depth {{cur}} of {{max}} · autosave",
+    "tide": "Interference tide {{n}}",
+    "fog": "Interference",
+    "fogSub": "Sensors Mk2+ reveal further",
+    "jump": "Jump to selected node",
+    "jumpHint": "Select a reachable node",
+    "you": "You",
+    "boss": "Boss",
+    "abandon": "Abandon run"
+  },
+  "event": {
+    "title": "Signal",
+    "phase6": "Full events, anomalies and beacons arrive in Phase 6.",
+    "continue": "Continue"
+  },
+  "rewards": {
+    "scrap": "+{{n}} scrap",
+    "dieTitle": "Salvaged die",
+    "keep": "Keep in deck",
+    "sell": "Sell (+{{n}})",
+    "deckFull": "Deck full (9)",
+    "healed": "Repaired +{{n}}"
+  },
+  "perk": {
+    "title": "Choose an upgrade",
+    "pick": "Take",
+    "skip": "Skip (+{{n}} scrap)",
+    "sub": "1 of 3"
+  },
+  "shop": {
+    "title": "Market · Mara",
+    "buy": "Buy ({{n}})",
+    "sell": "Sell",
+    "reroll": "Restock ({{n}})",
+    "leave": "Leave",
+    "scrap": "Scrap: {{n}}",
+    "deck": "Deck {{n}}/9",
+    "sellTitle": "Sell a die",
+    "empty": "Sold out",
+    "owned": "In deck"
+  },
+  "shipyard": {
+    "title": "Shipyard",
+    "mk": "Mk{{mk}} — {{cost}}",
+    "mkMax": "Mk3 · maxed",
+    "systems": "Systems",
+    "fusion": "Fuse ({{cost}})",
+    "fusionTitle": "Fusion",
+    "fusionHint": "Two identical dice → +1 tier",
+    "fusionPick": "Pick a die to fuse",
+    "repair": "Repair",
+    "repairHint": "2 scrap per hull",
+    "leave": "Leave",
+    "scrap": "Scrap: {{n}}",
+    "hull": "Hull {{cur}}/{{max}}"
+  },
+  "summary": {
+    "victory": "Sector cleared",
+    "defeat": "Run over",
+    "nodes": "Nodes cleared: {{n}}",
+    "kills": "Kills: {{n}}",
+    "earned": "Scrap earned: {{n}}",
+    "spent": "Scrap spent: {{n}}",
+    "perks": "Upgrades:",
+    "perksNone": "none",
+    "meta": "Shards & XP — Phase 7",
+    "toMenu": "To menu"
+  }
+}

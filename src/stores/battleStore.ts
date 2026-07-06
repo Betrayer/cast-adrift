@@ -10,18 +10,30 @@ import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import {
   advanceTurn,
   BASE_REROLL_SIZE,
+  BLOOD_REACTOR_CHARGE,
+  BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
   NUDGE_COST,
   resolveEnemyPhase,
   resolvePlayerPhase,
+  SACRIFICE_DAMAGE,
   SURGE_COST,
 } from "@/game/battle/resolver";
 import {
   buildBattleSnapshot,
   canPlaceDie,
   createEnemyStream,
+  DEFAULT_CHARGE_CAP,
 } from "@/game/battle/setup";
-import type { RngStream, RngStreams } from "@/services/rng";
+import {
+  createStreamFromState,
+  restoreStreams,
+  serializeStreams,
+  type RngStream,
+  type RngStreams,
+  type StreamStates,
+} from "@/services/rng";
+import { computePerkMods, hasTrait } from "@/game/run/perkMods";
 import { useRunStore } from "@/stores/runStore";
 import type {
   BattleOutcome,
@@ -44,6 +56,11 @@ import type {
 export interface BattleEncounter {
   enemyIds: string[];
   shipId?: ShipId;
+  tide?: number;
+  perks?: readonly string[];
+  hull?: number;
+  hullMax?: number;
+  chargeCap?: number;
 }
 
 export interface BattleValues {
@@ -56,6 +73,12 @@ export interface BattleValues {
   shieldPersist: number;
   charge: number;
   scrap: number;
+  tide: number;
+  perks: string[];
+  chargeCap: number;
+  sacrificePool: number;
+  bloodReactorUsed: boolean;
+  burnDoubleUsed: boolean;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
   rerollsLeft: number;
@@ -101,6 +124,8 @@ export interface BattleState extends BattleValues {
   spendNudge: (uid: string, dir: -1 | 1) => void;
   spendBonusReroll: () => void;
   spendSurge: () => void;
+  bloodReactor: () => void;
+  sacrificeDie: (uid: string) => void;
   flipDie: (uid: string) => void;
   copyDie: (uid: string) => void;
   toggleRerollMode: () => void;
@@ -122,6 +147,12 @@ export const createInitialBattleValues = (): BattleValues => ({
   shieldPersist: 0,
   charge: 0,
   scrap: 0,
+  tide: 0,
+  perks: [],
+  chargeCap: DEFAULT_CHARGE_CAP,
+  sacrificePool: 0,
+  bloodReactorUsed: false,
+  burnDoubleUsed: false,
   dice: [],
   slots: {},
   rerollsLeft: 0,
@@ -160,6 +191,12 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   shieldPersist: s.shieldPersist,
   charge: s.charge,
   scrap: s.scrap,
+  tide: s.tide,
+  perks: s.perks,
+  chargeCap: s.chargeCap,
+  sacrificePool: s.sacrificePool,
+  bloodReactorUsed: s.bloodReactorUsed,
+  burnDoubleUsed: s.burnDoubleUsed,
   dice: s.dice,
   slots: s.slots,
   enemies: s.enemies,
@@ -183,6 +220,12 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   shieldPersist: snap.shieldPersist,
   charge: snap.charge,
   scrap: snap.scrap,
+  tide: snap.tide,
+  perks: snap.perks,
+  chargeCap: snap.chargeCap,
+  sacrificePool: snap.sacrificePool,
+  bloodReactorUsed: snap.bloodReactorUsed,
+  burnDoubleUsed: snap.burnDoubleUsed,
   dice: snap.dice,
   slots: snap.slots,
   enemies: snap.enemies,
@@ -239,17 +282,28 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       streams,
       enemyStream,
       mkLevels,
+      {
+        tide: encounter.tide,
+        perks: encounter.perks,
+        hull: encounter.hull,
+        hullMax: encounter.hullMax,
+        chargeCap: encounter.chargeCap,
+      },
     );
     const grants = grantsFromCensus(snapshot.resonance);
+    const perks = encounter.perks ?? [];
+    const mods = computePerkMods(perks);
+    const rerollBase = grants.rerollBase + mods.rerollSizeDelta;
     set({
       ...createInitialBattleValues(),
       ...fromSnapshot(snapshot),
       phase: "placement",
       shipId,
+      scrap: mods.battleStartScrap,
       rerollsLeft: 1,
-      rerollSize: grants.rerollBase,
-      rerollBase: grants.rerollBase,
-      reserveCap: grants.reserveCap,
+      rerollSize: rerollBase,
+      rerollBase,
+      reserveCap: grants.reserveCap + mods.reserveDelta,
       freeNudges: grants.freeNudges,
       streams,
       enemyStream,
@@ -293,8 +347,12 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (s.phase !== "placement" || s.rerollMode) return s;
       const die = s.dice.find((d) => d.uid === uid);
       if (die?.state !== "tray") return s;
-      if (s.dice.filter((d) => d.state === "reserved").length >= s.reserveCap)
-        return s;
+      const reserved = s.dice.filter((d) => d.state === "reserved").length;
+      const blueExtra =
+        die.school === "blue" || die.school === "prismatic"
+          ? computePerkMods(s.perks).blueReserveDelta
+          : 0;
+      if (reserved >= s.reserveCap + blueExtra) return s;
       return {
         dice: s.dice.map((d) =>
           d.uid === uid
@@ -353,9 +411,13 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const value = Math.min(die.tier, Math.max(1, die.value + dir));
       if (value === die.value) return s;
       const useFree = s.freeNudges > 0;
-      if (!useFree && s.charge < NUDGE_COST) return s;
+      const cost = Math.max(
+        0,
+        NUDGE_COST + computePerkMods(s.perks).nudgeCostDelta,
+      );
+      if (!useFree && s.charge < cost) return s;
       return {
-        charge: useFree ? s.charge : s.charge - NUDGE_COST,
+        charge: useFree ? s.charge : s.charge - cost,
         freeNudges: useFree ? s.freeNudges - 1 : s.freeNudges,
         dice: s.dice.map((d) => (d.uid === uid ? { ...d, value } : d)),
       };
@@ -382,6 +444,37 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set((s) => {
       if (s.phase !== "placement" || s.charge < SURGE_COST) return s;
       return { charge: s.charge - SURGE_COST, nextRollBonus: 1 };
+    });
+  },
+
+  bloodReactor: () => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      if (!hasTrait(s.perks, "bloodReactor")) return s;
+      if (s.bloodReactorUsed || s.hull <= BLOOD_REACTOR_HULL) return s;
+      return {
+        hull: s.hull - BLOOD_REACTOR_HULL,
+        charge: Math.min(s.chargeCap, s.charge + BLOOD_REACTOR_CHARGE),
+        bloodReactorUsed: true,
+      };
+    });
+  },
+
+  sacrificeDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      if (!hasTrait(s.perks, "sacrifice")) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die?.state !== "tray") return s;
+      return {
+        dice: s.dice.map((d) =>
+          d.uid === uid
+            ? { ...d, state: "burned" as const, slot: undefined }
+            : d,
+        ),
+        sacrificePool: s.sacrificePool + SACRIFICE_DAMAGE,
+        selectedDieUid: null,
+      };
     });
   },
 
@@ -550,6 +643,85 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set(createInitialBattleValues());
   },
 }));
+
+export type BattleSaveValues = Omit<
+  BattleValues,
+  "streams" | "enemyStream" | "debugNextRoll"
+>;
+
+export interface BattleSaveState {
+  values: BattleSaveValues;
+  streamStates: StreamStates;
+  enemyStreamState: number;
+}
+
+const pickBattleValues = (s: BattleState): BattleSaveValues => ({
+  phase: s.phase,
+  shipId: s.shipId,
+  turn: s.turn,
+  hull: s.hull,
+  hullMax: s.hullMax,
+  shield: s.shield,
+  shieldPersist: s.shieldPersist,
+  charge: s.charge,
+  scrap: s.scrap,
+  tide: s.tide,
+  perks: s.perks,
+  chargeCap: s.chargeCap,
+  sacrificePool: s.sacrificePool,
+  bloodReactorUsed: s.bloodReactorUsed,
+  burnDoubleUsed: s.burnDoubleUsed,
+  dice: s.dice,
+  slots: s.slots,
+  rerollsLeft: s.rerollsLeft,
+  rerollSize: s.rerollSize,
+  rerollBase: s.rerollBase,
+  rerollMode: s.rerollMode,
+  rerollSelection: s.rerollSelection,
+  reserveCap: s.reserveCap,
+  freeNudges: s.freeNudges,
+  selectedDieUid: s.selectedDieUid,
+  enemies: s.enemies,
+  targetId: s.targetId,
+  engineState: s.engineState,
+  nextTurnMods: s.nextTurnMods,
+  nextRollBonus: s.nextRollBonus,
+  pendingDeepScan: s.pendingDeepScan,
+  blockedSlots: s.blockedSlots,
+  lockedDice: s.lockedDice,
+  resonance: s.resonance,
+  survivedLethal: s.survivedLethal,
+  outcome: s.outcome,
+  resolution: s.resolution,
+  beats: s.beats,
+  enemyBeats: s.enemyBeats,
+  beatSeq: s.beatSeq,
+});
+
+export const serializeBattle = (): BattleSaveState | null => {
+  const s = useBattleStore.getState();
+  if (s.phase === "idle" || s.streams === null || s.enemyStream === null) {
+    return null;
+  }
+  return {
+    values: pickBattleValues(s),
+    streamStates: serializeStreams(s.streams),
+    enemyStreamState: s.enemyStream.state(),
+  };
+};
+
+export const hydrateBattle = (save: BattleSaveState): void => {
+  useBattleStore.setState({
+    ...createInitialBattleValues(),
+    ...save.values,
+    streams: restoreStreams(save.streamStates),
+    enemyStream: createStreamFromState(save.enemyStreamState),
+    debugNextRoll: null,
+  });
+  if (save.values.phase === "resolving") {
+    useBattleStore.getState().finishResolution();
+  }
+};
 
 declare global {
   interface Window {

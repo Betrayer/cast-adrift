@@ -4,6 +4,7 @@ export interface RngStream {
   pick: <T>(arr: readonly T[]) => T;
   weighted: <T>(entries: readonly (readonly [T, number])[]) => T;
   shuffle: <T>(arr: readonly T[]) => T[];
+  state: () => number;
 }
 
 export type StreamLabel =
@@ -51,8 +52,15 @@ export const deriveSeed = (root: number, label: string): number => {
   return Math.floor(step() * 4294967296) >>> 0;
 };
 
-export const createStream = (seed: number): RngStream => {
-  const next = mulberry32(seed);
+export const createStreamFromState = (initialState: number): RngStream => {
+  let state = initialState >>> 0;
+
+  const next = (): number => {
+    state = (state + 0x6d2b79f5) | 0;
+    let t = Math.imul(state ^ (state >>> 15), 1 | state);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 
   const int = (min: number, max: number): number =>
     min + Math.floor(next() * (max - min + 1));
@@ -86,13 +94,32 @@ export const createStream = (seed: number): RngStream => {
     return copy;
   };
 
-  return { next, int, pick, weighted, shuffle };
+  return { next, int, pick, weighted, shuffle, state: () => state >>> 0 };
 };
+
+export const createStream = (seed: number): RngStream =>
+  createStreamFromState(seed >>> 0);
 
 export const createStreams = (rootSeed: number): RngStreams => {
   const streams = {} as RngStreams;
   for (const label of STREAM_LABELS) {
     streams[label] = createStream(deriveSeed(rootSeed, label));
+  }
+  return streams;
+};
+
+export type StreamStates = Record<StreamLabel, number>;
+
+export const serializeStreams = (streams: RngStreams): StreamStates => {
+  const states = {} as StreamStates;
+  for (const label of STREAM_LABELS) states[label] = streams[label].state();
+  return states;
+};
+
+export const restoreStreams = (states: StreamStates): RngStreams => {
+  const streams = {} as RngStreams;
+  for (const label of STREAM_LABELS) {
+    streams[label] = createStreamFromState(states[label] >>> 0);
   }
   return streams;
 };

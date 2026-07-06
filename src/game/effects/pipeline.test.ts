@@ -148,11 +148,12 @@ describe("emit ordering and die scoping", () => {
     expect(snap.enemies[0]?.statuses.burn).toBe(1);
   });
 
-  it("registers affinity and resonance sources ahead of die sources", () => {
+  it("registers affinity, resonance and perk sources ahead of die sources", () => {
     const snap = harnessSnap([harnessDie("a", "cinder", 4)]);
     const sources = buildSources(snap);
     expect(sources[0]?.key).toBe("affinity");
     expect(sources[1]?.key).toBe("resonance");
-    expect(sources[2]?.key).toBe("die:a");
+    expect(sources[2]?.key).toBe("perks");
+    expect(sources[3]?.key).toBe("die:a");
   });
 });

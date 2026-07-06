@@ -52,6 +52,13 @@ const condMatches = (
       );
     case "resonanceAtLeast":
       return ctx.resAtLeast(cond.school, cond.n);
+    case "turnLte":
+      return ctx.snapshot.turn <= cond.n;
+    case "hullPctLt":
+      return (
+        ctx.snapshot.hullMax > 0 &&
+        ctx.snapshot.hull * 100 < cond.n * ctx.snapshot.hullMax
+      );
     case "flag":
       return ctx.flags.has(cond.key);
   }

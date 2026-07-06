@@ -3,7 +3,9 @@ import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies/sector1";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
-import { applyRollFloors } from "@/game/battle/rollFloors";
+import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
+import { scaleHpForTide } from "@/game/run/encounter";
+import { hasTrait } from "@/game/run/perkMods";
 import { createStream, type RngStream, type RngStreams } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -15,6 +17,15 @@ import type {
 import type { EnemyDef, Intent } from "@/types/content";
 
 export const MAX_ENEMIES = 3;
+export const DEFAULT_CHARGE_CAP = 10;
+
+export interface BattleInit {
+  tide?: number;
+  perks?: readonly string[];
+  hull?: number;
+  hullMax?: number;
+  chargeCap?: number;
+}
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
 
@@ -80,15 +91,17 @@ export const spawnEnemy = (
   defId: string,
   id: string,
   enemyStream: RngStream,
+  tide = 0,
 ): EnemyState => {
   const def = ENEMY_BY_ID.get(defId);
   if (def === undefined)
     throw new Error(`spawnEnemy: unknown enemy "${defId}"`);
+  const hp = scaleHpForTide(def.hp, tide);
   return {
     id,
     defId,
-    hp: def.hp,
-    hpMax: def.hp,
+    hp,
+    hpMax: hp,
     shield: 0,
     intentIndex: 0,
     nextIntent: drawIntent(def, 0, enemyStream),
@@ -96,8 +109,8 @@ export const spawnEnemy = (
     subsystems: (def.subsystems ?? []).map((sub) => ({
       id: `${id}:${sub.id}`,
       key: sub.id,
-      hp: sub.hp,
-      hpMax: sub.hp,
+      hp: scaleHpForTide(sub.hp, tide),
+      hpMax: scaleHpForTide(sub.hp, tide),
       aura: sub.aura,
     })),
   };
@@ -106,11 +119,12 @@ export const spawnEnemy = (
 export const buildEnemies = (
   enemyIds: readonly string[],
   enemyStream: RngStream,
+  tide = 0,
 ): EnemyState[] =>
   expandEncounterIds(enemyIds)
     .slice(0, MAX_ENEMIES)
     .map((defId, index) =>
-      spawnEnemy(defId, `enemy-${String(index)}`, enemyStream),
+      spawnEnemy(defId, `enemy-${String(index)}`, enemyStream, tide),
     );
 
 export const buildBattleSnapshot = (
@@ -120,17 +134,22 @@ export const buildBattleSnapshot = (
   streams: RngStreams,
   enemyStream: RngStream,
   mkLevels: MkLevels = {},
+  init: BattleInit = {},
 ): BattleSnapshot => {
-  const enemies = buildEnemies(enemyIds, enemyStream);
+  const tide = init.tide ?? 0;
+  const enemies = buildEnemies(enemyIds, enemyStream, tide);
   const dice = rollDeck(deckDefIds, streams);
+  const hullMax = init.hullMax ?? shipHullMax(shipId);
   const snapshot: BattleSnapshot = {
     turn: 1,
-    hull: shipHullMax(shipId),
-    hullMax: shipHullMax(shipId),
+    hull: Math.max(1, Math.min(hullMax, init.hull ?? hullMax)),
+    hullMax,
     shield: 0,
     shieldPersist: 0,
     charge: 0,
     scrap: 0,
+    tide,
+    perks: [...(init.perks ?? [])],
     dice,
     slots: buildShipSlots(shipId, mkLevels),
     enemies,
@@ -139,12 +158,18 @@ export const buildBattleSnapshot = (
     nextTurnMods: {},
     nextRollBonus: 0,
     pendingDeepScan: false,
+    chargeCap: init.chargeCap ?? DEFAULT_CHARGE_CAP,
+    sacrificePool: 0,
+    bloodReactorUsed: false,
+    burnDoubleUsed: false,
     blockedSlots: [],
     lockedDice: [],
     resonance: computeCensus(dice),
     survivedLethal: false,
   };
-  applyRollFloors(dice, snapshot.resonance);
+  const perks = init.perks ?? [];
+  applyRollFloors(dice, snapshot.resonance, hasTrait(perks, "stabilizer"));
+  if (hasTrait(perks, "spareLowest")) applySpareLowest(dice);
   return snapshot;
 };
 

@@ -67,7 +67,9 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
   const lowest = [...alive].sort(
     (a, b) => a.hp + a.shield - (b.hp + b.shield),
   )[0];
-  const targetId = lowest?.id ?? snapshot.targetId;
+  const auraSubsystems = alive
+    .flatMap((e) => e.subsystems.filter((s) => s.hp > 0))
+    .sort((a, b) => a.hp - b.hp);
 
   const available = (): RolledDie[] =>
     trayDice(snapshot).filter((d) => !usedDice.has(d.uid));
@@ -101,7 +103,17 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
     .sort((a, b) => b.value - a.value)
     .slice(0, weaponSlotsOpen.length);
   const killSum = killCandidates.reduce((sum, d) => sum + d.value, 0);
-  if (killSum >= totalEnemyHp && totalEnemyHp > 0) {
+  const lethal = killSum >= totalEnemyHp && totalEnemyHp > 0;
+
+  // Front-load the aura subsystem (turret) so the atk+2 aura drops early — unless we
+  // can lethal-clear the core this turn, in which case just kill the enemy.
+  const targetSub = auraSubsystems[0];
+  const targetId =
+    !lethal && targetSub !== undefined
+      ? targetSub.id
+      : (lowest?.id ?? snapshot.targetId);
+
+  if (lethal) {
     placeWeapons(killCandidates);
   }
 

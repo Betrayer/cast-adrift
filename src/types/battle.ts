@@ -89,6 +89,8 @@ export interface BattleSnapshot {
   shieldPersist: number;
   charge: number;
   scrap: number;
+  tide: number;
+  perks: string[];
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
   enemies: EnemyState[];
@@ -97,6 +99,10 @@ export interface BattleSnapshot {
   nextTurnMods: NextTurnMods;
   nextRollBonus: number;
   pendingDeepScan: boolean;
+  chargeCap: number;
+  sacrificePool: number;
+  bloodReactorUsed: boolean;
+  burnDoubleUsed: boolean;
   blockedSlots: BlockedSlot[];
   lockedDice: LockedDie[];
   resonance: ResonanceCensus;

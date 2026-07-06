@@ -44,6 +44,8 @@ export type Cond =
   | { c: "isMinFace" }
   | { c: "equalsLast" }
   | { c: "resonanceAtLeast"; school: School; n: 2 | 4 | 6 }
+  | { c: "turnLte"; n: number }
+  | { c: "hullPctLt"; n: number }
   | { c: "flag"; key: string };
 
 export type EffectTarget = "target" | "self";
