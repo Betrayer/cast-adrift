@@ -92,6 +92,13 @@ describe("decidePlacements", () => {
     expect(decision.targetId).toBe("enemy-1");
   });
 
+  it("front-loads an aura subsystem before the core when not lethal", () => {
+    const snapshot = makeSnapshot(["raiderAlpha"]);
+    setValues(snapshot, [2, 2, 1, 1, 1]);
+    const decision = decidePlacements(snapshot);
+    expect(decision.targetId).toBe("enemy-0:turret");
+  });
+
   it("never places into blocked slots or with locked dice", () => {
     const snapshot = makeSnapshot();
     snapshot.blockedSlots = [{ slot: "weaponA", untilTurn: snapshot.turn }];

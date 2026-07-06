@@ -1,0 +1,3 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`map generator > produces a stable snapshot for seed 42 1`] = `"r0l1:start,r1l0:battle,r1l1:event,r1l2:battle,r2l1:battle,r2l2:shop,r2l3:battle,r3l1:battle,r3l2:anomaly,r3l3:battle,r4l0:battle,r4l1:battle,r4l3:event,r5l0:battle,r5l2:battle,r5l3:battle,r6l1:event,r6l2:battle,r6l3:battle,r7l0:battle,r7l2:battle,r7l3:shipyard,r8l0:miniboss,r8l2:miniboss,r9l1:elite,r9l2:anomaly,r9l3:shop,r10l0:beacon,r10l1:shipyard,r10l2:battle,r10l3:battle,r11l0:event,r11l1:battle,r11l3:battle,r12l0:battle,r12l2:battle,r12l3:battle,r13l0:battle,r13l2:battle,r13l3:battle,r14l1:battle,r14l2:elite,r14l3:event,r15l1:boss"`;

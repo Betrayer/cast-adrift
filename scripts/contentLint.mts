@@ -4,6 +4,8 @@ import {
   ENCOUNTER_GROUPS,
   SECTOR1_ENEMIES,
 } from "../src/data/enemies/sector1";
+import { ALL_PERKS } from "../src/data/perks";
+import { PHASE5_PERKS } from "../src/data/perks/phase5";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
 import { SHIPS } from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
@@ -121,6 +123,30 @@ for (const ship of SHIPS) {
   checkLocKey(`ships.${ship.id}`, ship.name);
 }
 
+checkUniqueIds(
+  "perks",
+  ALL_PERKS.map((p) => p.id),
+);
+
+if (PHASE5_PERKS.length !== 30) {
+  errors.push(
+    `perks: expected exactly 30 Phase-5 perks, found ${String(PHASE5_PERKS.length)}`,
+  );
+}
+
+for (const perk of ALL_PERKS) {
+  checkLocKey(`perks.${perk.id}`, perk.name);
+  checkLocKey(`perks.${perk.id}`, perk.desc);
+  checkEffects(`perks.${perk.id}`, perk.effects);
+  if (
+    perk.effects === undefined &&
+    perk.mods === undefined &&
+    perk.traits === undefined
+  ) {
+    errors.push(`perks: "${perk.id}" has no effects, mods, or traits`);
+  }
+}
+
 for (const [group, members] of Object.entries(ENCOUNTER_GROUPS)) {
   if (enemyIds.has(group))
     errors.push(`encounters: group "${group}" shadows an enemy id`);
@@ -138,5 +164,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(SECTOR1_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships`,
+  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(SECTOR1_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(ALL_PERKS.length)} perks`,
 );

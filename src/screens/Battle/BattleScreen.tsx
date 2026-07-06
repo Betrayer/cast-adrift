@@ -23,12 +23,15 @@ import {
   NUDGE_COST,
   SURGE_COST,
 } from '@/game/battle/resolver';
+import { resolveRunBattle } from '@/game/run/flow';
+import { hasTrait } from '@/game/run/perkMods';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { initAudio } from '@/services/audio';
 import { createStreams } from '@/services/rng';
 import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
+import { useRunStore } from '@/stores/runStore';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
 import type { Intent } from '@/types/content';
 import styles from './BattleScreen.module.css';
@@ -317,6 +320,48 @@ const NudgeStrip = () => {
   );
 };
 
+const ActivePerks = () => {
+  const { t } = useTranslation(['battle']);
+  const perks = useBattleStore((s) => s.perks);
+  const phase = useBattleStore((s) => s.phase);
+  const hull = useBattleStore((s) => s.hull);
+  const bloodUsed = useBattleStore((s) => s.bloodReactorUsed);
+  const selected = useBattleStore((s) => s.selectedDieUid);
+  const bloodReactor = useBattleStore((s) => s.bloodReactor);
+  const sacrificeDie = useBattleStore((s) => s.sacrificeDie);
+  const hasBlood = hasTrait(perks, 'bloodReactor');
+  const hasSac = hasTrait(perks, 'sacrifice');
+  if (phase !== 'placement' || (!hasBlood && !hasSac)) return null;
+  return (
+    <div className={styles.nudgeStrip}>
+      {hasBlood ? (
+        <Button
+          className={styles.clickable}
+          size="compact-sm"
+          variant="default"
+          disabled={bloodUsed || hull <= 2}
+          onClick={bloodReactor}
+        >
+          {t('battle:bloodReactor')}
+        </Button>
+      ) : null}
+      {hasSac ? (
+        <Button
+          className={styles.clickable}
+          size="compact-sm"
+          variant="default"
+          disabled={selected === null}
+          onClick={() => {
+            if (selected !== null) sacrificeDie(selected);
+          }}
+        >
+          {t('battle:sacrifice')}
+        </Button>
+      ) : null}
+    </div>
+  );
+};
+
 const BottomBar = () => {
   const { t } = useTranslation(['battle']);
   const phase = useBattleStore((s) => s.phase);
@@ -420,21 +465,32 @@ export const BattleScreen = () => {
   const { t } = useTranslation(['battle']);
   const phase = useBattleStore((s) => s.phase);
   const outcome = useBattleStore((s) => s.outcome);
+  const runActive = useRunStore((s) => s.active);
   const dropLoot = useLootStore((s) => s.drop);
   const droppedRef = useRef(false);
+  const resolvedRef = useRef(false);
 
   useEffect(() => {
     initAudio();
-    startTestBattleIfIdle();
+    if (!useRunStore.getState().active) startTestBattleIfIdle();
   }, []);
 
   useEffect(() => {
+    if (runActive) return;
     if (outcome === 'victory' && !droppedRef.current) {
       droppedRef.current = true;
       dropLoot('vulture');
     }
     if (outcome === undefined) droppedRef.current = false;
-  }, [outcome, dropLoot]);
+  }, [outcome, dropLoot, runActive]);
+
+  useEffect(() => {
+    if (!runActive) return;
+    if (phase === 'ended' && !resolvedRef.current) {
+      resolvedRef.current = true;
+      resolveRunBattle();
+    }
+  }, [phase, runActive]);
 
   const mountScene = useMemo(
     () => (app: Application) =>
@@ -458,11 +514,12 @@ export const BattleScreen = () => {
       <div className={styles.hud}>
         <StatusCard />
         <EnemyChips />
+        <ActivePerks />
         <NudgeStrip />
         <BottomBar />
       </div>
       <LootReveal />
-      {phase === 'ended' ? <EndOverlay /> : null}
+      {phase === 'ended' && !runActive ? <EndOverlay /> : null}
       {debugEnabled ? <DebugPanel /> : null}
     </Box>
   );

@@ -60,6 +60,7 @@ export const applyWeaponDamage = (
   target: WeaponTarget,
   baseDamage: number,
   crit = false,
+  markBonus = 2,
 ): number => {
   let damage = baseDamage;
   if (target.subsystem !== undefined) {
@@ -68,7 +69,7 @@ export const applyWeaponDamage = (
     if (target.subsystem.hp === 0) retargetAfterKill(next, target.enemy, true);
     return damage;
   }
-  if (consumeStatus(target.enemy.statuses, "mark")) damage += 2;
+  if (consumeStatus(target.enemy.statuses, "mark")) damage += markBonus;
   if (crit) damage = Math.floor(damage * 1.5);
   const absorbed = Math.min(target.enemy.shield, damage);
   target.enemy.shield -= absorbed;

@@ -1,11 +1,15 @@
 {
   "tagline": "A salvage run through a dead sector",
   "testBattle": "Test Battle",
-  "newRun": "New Run",
+  "newRun": "Campaign (slice)",
   "hangar": "Hangar",
   "starChart": "Star Chart",
   "codex": "Codex",
   "modes": "Modes",
   "settings": "Settings",
+  "resume": "Continue: Sector {{sector}} · depth {{depth}}",
+  "cloudFound": "A fresher run was found in the cloud — continue it?",
+  "cloudYes": "Cloud run",
+  "cloudNo": "Local",
   "stub": "This screen arrives in Phase {{phase}}."
 }

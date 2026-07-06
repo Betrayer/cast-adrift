@@ -2,11 +2,14 @@ import '@mantine/core/styles.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
+import { setupAutosave } from '@/game/run/autosave';
+import { bootCloud } from '@/game/run/cloud';
 import { initI18n } from '@/i18n';
 import { initTma } from '@/services/tma';
 import { useAppStore } from '@/stores/appStore';
 
 void initI18n();
+setupAutosave();
 
 const bootPlatform = async (): Promise<void> => {
   try {
@@ -21,6 +24,7 @@ const bootPlatform = async (): Promise<void> => {
   } catch (error) {
     console.error('boot: firebase boot failed', error);
   }
+  await bootCloud();
 };
 
 void bootPlatform();

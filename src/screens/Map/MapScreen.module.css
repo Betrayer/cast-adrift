@@ -1,0 +1,124 @@
+.root {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  background: #0b0f1a;
+}
+
+.header {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 12px 16px;
+  border-bottom: 1px solid #2a3853;
+  background: #10182a;
+}
+
+.headTitle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tideChip {
+  padding: 4px 10px;
+  border-radius: 12px;
+  border: 1px solid #e4574e;
+  background: #2e1517;
+  color: #f0a09a;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.tidePulse {
+  animation: tideRipple 700ms ease-out;
+}
+
+@keyframes tideRipple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(228, 87, 78, 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 14px rgba(228, 87, 78, 0);
+  }
+}
+
+.scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.stage {
+  display: block;
+  width: 100%;
+  max-width: 440px;
+  height: auto;
+  margin: 0 auto;
+}
+
+.footer {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  border-top: 1px solid #2a3853;
+  background: #10182a;
+}
+
+.node {
+  cursor: default;
+}
+
+.nodeSelectable {
+  cursor: pointer;
+}
+
+.nodeStagger {
+  animation: nodeIn 260ms ease-out both;
+}
+
+@keyframes nodeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.pulse {
+  animation: nodePulse 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes nodePulse {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.fog {
+  transition: opacity 300ms ease-out;
+}
+
+.marker {
+  transition: transform 400ms ease-in-out;
+}
+
+.markerInstant {
+  transition: none;
+}

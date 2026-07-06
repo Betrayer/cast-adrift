@@ -11,6 +11,7 @@ export type ScreenId =
   | 'event'
   | 'shop'
   | 'shipyard'
+  | 'rewards'
   | 'summary';
 
 export type Locale = 'en' | 'uk' | 'ru';
