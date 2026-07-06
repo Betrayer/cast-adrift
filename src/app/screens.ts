@@ -7,6 +7,7 @@ export const screenPhase: Partial<Record<ScreenId, number>> = {
   shipyard: 5,
   summary: 5,
   event: 6,
+  puzzle: 6,
   codex: 6,
   hangar: 7,
   chart: 7,

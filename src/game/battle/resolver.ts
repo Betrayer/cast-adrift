@@ -399,7 +399,7 @@ const applyAttack = (
   context: AttackContext,
 ): { dealt: number; hullDamage: number; shieldDamage: number } => {
   const aura = hasAliveAura(enemy, "atk+2") ? 2 : 0;
-  const tide = Math.max(0, next.tide);
+  const tide = Math.max(0, next.tide) + Math.max(0, next.interference);
   const perkMods = computePerkMods(next.perks);
   const reflectDodge = hasTrait(next.perks, "reflectDodge");
   const dodgeCharge = hasTrait(next.perks, "dodgeCharge");

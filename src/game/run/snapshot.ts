@@ -9,6 +9,7 @@ import {
   type RunState,
   type RunValues,
 } from "@/stores/runStore";
+import { emitBark, resetBarkMemory } from "@/game/narrative";
 import { useAppStore } from "@/stores/appStore";
 import type { ScreenId } from "@/types";
 
@@ -40,6 +41,28 @@ const pickRunValues = (s: RunState): RunValues => ({
   jumpsSinceTide: s.jumpsSinceTide,
   flags: { ...s.flags },
   axis: s.axis,
+  seenEvents: [...s.seenEvents],
+  solvedPuzzles: [...s.solvedPuzzles],
+  anomalyStreak: s.anomalyStreak,
+  interferenceStacks: s.interferenceStacks,
+  killedTypes: [...s.killedTypes],
+  battleMods: s.battleMods.map((m) => ({ ...m })),
+  battleEndHealRun: s.battleEndHealRun,
+  rerollSizeRun: s.rerollSizeRun,
+  bonusReveal: s.bonusReveal,
+  shipyardDiscount: s.shipyardDiscount,
+  pendingBattle:
+    s.pendingBattle === null
+      ? null
+      : {
+          enemyIds: [...s.pendingBattle.enemyIds],
+          originNodeId: s.pendingBattle.originNodeId,
+          scrap: s.pendingBattle.scrap,
+          lootDie: s.pendingBattle.lootDie,
+          lootRarity: s.pendingBattle.lootRarity,
+          setFlags: s.pendingBattle.setFlags.map((f) => [...f] as [string, typeof f[1]]),
+          clearFlags: [...s.pendingBattle.clearFlags],
+        },
   pendingDeepScan: s.pendingDeepScan,
   pendingRewards:
     s.pendingRewards === null
@@ -85,6 +108,8 @@ export const restoreRunSnapshot = (data: unknown): boolean => {
     .hydrate({ ...createInitialRunValues(), ...data.run });
   if (data.battle !== null) hydrateBattle(data.battle);
   useAppStore.getState().go(data.screen);
+  resetBarkMemory();
+  if (data.run.active) emitBark("resume");
   return true;
 };
 

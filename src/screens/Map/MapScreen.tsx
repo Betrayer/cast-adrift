@@ -80,8 +80,10 @@ const MapView = ({ map, position }: MapViewProps) => {
   const { t } = useTranslation(["run", "common"]);
   const visited = useRunStore((s) => s.visited);
   const tide = useRunStore((s) => s.tide);
+  const interference = useRunStore((s) => s.interferenceStacks);
   const sector = useRunStore((s) => s.sector);
   const pendingDeepScan = useRunStore((s) => s.pendingDeepScan);
+  const bonusReveal = useRunStore((s) => s.bonusReveal);
   const sensorsMk = useRunStore((s) => s.mkLevels.sensors ?? 1);
   const reduced = resolveReducedMotion(
     useSettingsStore((s) => s.reducedMotion),
@@ -101,7 +103,8 @@ const MapView = ({ map, position }: MapViewProps) => {
   const prevTide = useRef(tide);
   const [tidePulse, setTidePulse] = useState(false);
 
-  const visibleRows = 2 + (sensorsMk - 1) + (pendingDeepScan ? 1 : 0);
+  const visibleRows =
+    2 + (sensorsMk - 1) + (pendingDeepScan ? 1 : 0) + bonusReveal;
   const visibleLimit = positionRow + visibleRows;
 
   const isVisible = (node: MapNode): boolean =>
@@ -178,11 +181,18 @@ const MapView = ({ map, position }: MapViewProps) => {
             {t("run:map.depth", { cur: positionRow, max: ROW_COUNT })}
           </Text>
         </div>
-        <span
-          className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
-        >
-          {t("run:map.tide", { n: tide })}
-        </span>
+        <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
+          <span
+            className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
+          >
+            {t("run:map.tide", { n: tide })}
+          </span>
+          {interference > 0 ? (
+            <span className={styles.tideChip ?? ""}>
+              {t("run:map.interference", { n: interference })}
+            </span>
+          ) : null}
+        </div>
       </div>
 
       <div className={styles.scroll} ref={scrollRef}>
@@ -265,6 +275,18 @@ const MapView = ({ map, position }: MapViewProps) => {
                     fill="#CDBAFF"
                   >
                     {t("run:map.you")}
+                  </text>
+                ) : null}
+                {current && interference > 0 ? (
+                  <text
+                    x={nodeX(node)}
+                    y={rowY(node.row) - nodeRadius(node) - 6}
+                    textAnchor="middle"
+                    fontSize={12}
+                    fontWeight={700}
+                    fill="#F0A09A"
+                  >
+                    {`≈${String(interference)}`}
                   </text>
                 ) : null}
               </g>

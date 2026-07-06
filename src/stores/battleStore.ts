@@ -57,10 +57,13 @@ export interface BattleEncounter {
   enemyIds: string[];
   shipId?: ShipId;
   tide?: number;
+  interference?: number;
   perks?: readonly string[];
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
+  startCharge?: number;
+  rerollSizeBonus?: number;
 }
 
 export interface BattleValues {
@@ -74,6 +77,7 @@ export interface BattleValues {
   charge: number;
   scrap: number;
   tide: number;
+  interference: number;
   perks: string[];
   chargeCap: number;
   sacrificePool: number;
@@ -104,6 +108,8 @@ export interface BattleValues {
   beats: Beat[];
   enemyBeats: EnemyBeat[];
   beatSeq: number;
+  blackUsed: number;
+  blueUsed: number;
   streams: RngStreams | null;
   enemyStream: RngStream | null;
   debugNextRoll: number[] | null;
@@ -148,6 +154,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   charge: 0,
   scrap: 0,
   tide: 0,
+  interference: 0,
   perks: [],
   chargeCap: DEFAULT_CHARGE_CAP,
   sacrificePool: 0,
@@ -178,6 +185,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   beats: [],
   enemyBeats: [],
   beatSeq: 0,
+  blackUsed: 0,
+  blueUsed: 0,
   streams: null,
   enemyStream: null,
   debugNextRoll: null,
@@ -192,6 +201,7 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   charge: s.charge,
   scrap: s.scrap,
   tide: s.tide,
+  interference: s.interference,
   perks: s.perks,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
@@ -221,6 +231,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   charge: snap.charge,
   scrap: snap.scrap,
   tide: snap.tide,
+  interference: snap.interference,
   perks: snap.perks,
   chargeCap: snap.chargeCap,
   sacrificePool: snap.sacrificePool,
@@ -284,6 +295,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       mkLevels,
       {
         tide: encounter.tide,
+        interference: encounter.interference,
         perks: encounter.perks,
         hull: encounter.hull,
         hullMax: encounter.hullMax,
@@ -293,13 +305,15 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const grants = grantsFromCensus(snapshot.resonance);
     const perks = encounter.perks ?? [];
     const mods = computePerkMods(perks);
-    const rerollBase = grants.rerollBase + mods.rerollSizeDelta;
+    const rerollBase =
+      grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
     set({
       ...createInitialBattleValues(),
       ...fromSnapshot(snapshot),
       phase: "placement",
       shipId,
       scrap: mods.battleStartScrap,
+      charge: Math.min(snapshot.chargeCap, Math.max(0, encounter.startCharge ?? 0)),
       rerollsLeft: 1,
       rerollSize: rerollBase,
       rerollBase,
@@ -563,6 +577,11 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const s = get();
     if (s.phase !== "placement" || s.streams === null || s.enemyStream === null)
       return;
+    const placed = s.dice.filter((d) => d.state === "placed");
+    const blackUsed =
+      s.blackUsed + placed.filter((d) => d.school === "black").length;
+    const blueUsed =
+      s.blueUsed + placed.filter((d) => d.school === "blue").length;
     const player = resolvePlayerPhase(toSnapshot(s));
     let bundle: ResolutionBundle;
     if (player.next.outcome !== undefined) {
@@ -608,6 +627,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       beats: bundle.beats,
       enemyBeats: bundle.enemyBeats,
       beatSeq: s.beatSeq + 1,
+      blackUsed,
+      blueUsed,
       rerollMode: false,
       rerollSelection: [],
       selectedDieUid: null,
@@ -666,6 +687,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   charge: s.charge,
   scrap: s.scrap,
   tide: s.tide,
+  interference: s.interference,
   perks: s.perks,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
@@ -696,6 +718,8 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   beats: s.beats,
   enemyBeats: s.enemyBeats,
   beatSeq: s.beatSeq,
+  blackUsed: s.blackUsed,
+  blueUsed: s.blueUsed,
 });
 
 export const serializeBattle = (): BattleSaveState | null => {

@@ -9,6 +9,7 @@ export type ScreenId =
   | 'map'
   | 'battle'
   | 'event'
+  | 'puzzle'
   | 'shop'
   | 'shipyard'
   | 'rewards'
