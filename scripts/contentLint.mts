@@ -14,7 +14,13 @@ import { RESONANCE_BONUSES } from "../src/data/resonance";
 import { SHIPS } from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
 import { HOOKS } from "../src/game/effects/types";
-import { isAchievable, isTrivial } from "../src/game/puzzles/evaluate";
+import {
+  difficultyReport,
+  isAchievable,
+  isTrivial,
+  solutionCount,
+  totalPlacements,
+} from "../src/game/puzzles/evaluate";
 import enContent from "../src/i18n/en/content.json" with { type: "json" };
 import ukContent from "../src/i18n/uk/content.json" with { type: "json" };
 import ruContent from "../src/i18n/ru/content.json" with { type: "json" };
@@ -282,7 +288,33 @@ for (const puzzle of PUZZLES) {
     errors.push(`puzzles: "${puzzle.id}" cannot reach its goal even on a ceiling roll`);
   if (isTrivial(puzzle))
     errors.push(`puzzles: "${puzzle.id}" is a free win on a floor roll`);
+  if (puzzle.goal.g === "deduction") {
+    if (puzzle.fixedRoll === undefined)
+      errors.push(`puzzles: "${puzzle.id}" is a deduction puzzle without a fixedRoll`);
+    const count = solutionCount(puzzle);
+    if (count < 1 || count > 3)
+      errors.push(
+        `puzzles: "${puzzle.id}" deduction solution count ${String(count)} is not in [1,3]`,
+      );
+    if (count >= totalPlacements(puzzle))
+      errors.push(`puzzles: "${puzzle.id}" deduction is solved by every placement`);
+  }
+  if (puzzle.goal.g === "exact") {
+    const r = difficultyReport(puzzle);
+    if (!r.exactReachable)
+      errors.push(`puzzles: "${puzzle.id}" exact value is not landable on any roll`);
+    if (r.target <= r.floor || r.target > r.ceil)
+      errors.push(
+        `puzzles: "${puzzle.id}" exact value ${String(r.target)} is not inside (floor ${String(r.floor)}, ceil ${String(r.ceil)}]`,
+      );
+  }
 }
+
+const PUZZLE_COUNT = 12;
+if (PUZZLES.length !== PUZZLE_COUNT)
+  errors.push(
+    `puzzles: expected exactly ${String(PUZZLE_COUNT)} puzzles, found ${String(PUZZLES.length)}`,
+  );
 
 for (const bark of BARKS) {
   if (bark.lines.length === 0)

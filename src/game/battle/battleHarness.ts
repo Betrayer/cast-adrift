@@ -61,6 +61,7 @@ export const harnessSnap = (
   charge: 0,
   scrap: 0,
   tide: 0,
+  interference: 0,
   perks: [],
   dice,
   slots: defaultSlots(),

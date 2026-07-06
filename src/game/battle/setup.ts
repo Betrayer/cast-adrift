@@ -21,6 +21,7 @@ export const DEFAULT_CHARGE_CAP = 10;
 
 export interface BattleInit {
   tide?: number;
+  interference?: number;
   perks?: readonly string[];
   hull?: number;
   hullMax?: number;
@@ -149,6 +150,7 @@ export const buildBattleSnapshot = (
     charge: 0,
     scrap: 0,
     tide,
+    interference: Math.max(0, init.interference ?? 0),
     perks: [...(init.perks ?? [])],
     dice,
     slots: buildShipSlots(shipId, mkLevels),

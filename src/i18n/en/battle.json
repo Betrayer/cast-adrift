@@ -4,6 +4,7 @@
   "shield": "Shield {{n}}",
   "scrap": "Scrap {{n}}",
   "charge": "Charge {{n}}/{{max}}",
+  "interference": "Interference ×{{n}}",
   "endTurn": "End turn",
   "burnHint": "Dice left outside slots burn at end of turn",
   "victory": "Victory",

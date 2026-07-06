@@ -90,6 +90,7 @@ export interface BattleSnapshot {
   charge: number;
   scrap: number;
   tide: number;
+  interference: number;
   perks: string[];
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;

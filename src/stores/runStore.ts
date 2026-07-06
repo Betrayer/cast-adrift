@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { MkLevel } from "@/data/slots";
+import { interferenceStacksForStreak } from "@/game/run/interference";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
 import type { SlotId } from "@/types/battle";
@@ -72,6 +73,8 @@ export interface RunValues {
   axis: number;
   seenEvents: string[];
   solvedPuzzles: string[];
+  anomalyStreak: number;
+  interferenceStacks: number;
   killedTypes: string[];
   battleMods: RunBattleMod[];
   battleEndHealRun: number;
@@ -100,6 +103,8 @@ export interface RunState extends RunValues {
   addAxis: (n: number) => void;
   markEventSeen: (id: string) => void;
   markPuzzleSolved: (id: string) => void;
+  recordAnomalySolved: () => void;
+  recordAnomalyUnsolved: () => void;
   markKilledType: (defId: string) => boolean;
   addBattleMod: (mod: RunBattleMod) => void;
   consumeBattleMods: () => ConsumedBattleMods;
@@ -140,6 +145,8 @@ export const createInitialRunValues = (): RunValues => ({
   axis: 0,
   seenEvents: [],
   solvedPuzzles: [],
+  anomalyStreak: 0,
+  interferenceStacks: 0,
   killedTypes: [],
   battleMods: [],
   battleEndHealRun: 0,
@@ -237,6 +244,20 @@ export const useRunStore = create<RunState>()((set, get) => ({
         ? s
         : { solvedPuzzles: [...s.solvedPuzzles, id] },
     );
+  },
+
+  recordAnomalySolved: () => {
+    set({ anomalyStreak: 0, interferenceStacks: 0 });
+  },
+
+  recordAnomalyUnsolved: () => {
+    set((s) => {
+      const streak = s.anomalyStreak + 1;
+      return {
+        anomalyStreak: streak,
+        interferenceStacks: interferenceStacksForStreak(streak),
+      };
+    });
   },
 
   markKilledType: (defId) => {

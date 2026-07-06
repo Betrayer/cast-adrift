@@ -40,12 +40,17 @@ const eventOptions = ALL_EVENTS.map((e) => ({
   label: `${e.requires?.flags !== undefined ? "⇄ " : ""}${e.id}`,
 }));
 
-const puzzleOptions = PUZZLES.map((p) => ({ value: p.id, label: p.id }));
+const puzzleOptions = PUZZLES.map((p) => ({
+  value: p.id,
+  label: `${p.id} · ${p.goal.g}`,
+}));
 
 export const DevPanel = () => {
   const active = useRunStore((s) => s.active);
   const screen = useAppStore((s) => s.screen);
   const flags = useRunStore((s) => s.flags);
+  const anomalyStreak = useRunStore((s) => s.anomalyStreak);
+  const interferenceStacks = useRunStore((s) => s.interferenceStacks);
   const [eventId, setEventId] = useState<string | null>(
     eventOptions[0]?.value ?? null,
   );
@@ -123,6 +128,30 @@ export const DevPanel = () => {
           >
             open puzzle
           </Button>
+
+          <Text size="xs" fw={700} c={tokens.text} mt={4}>
+            interference (streak {anomalyStreak} · ×{interferenceStacks})
+          </Text>
+          <Group gap={3}>
+            <Button
+              size="compact-xs"
+              variant="default"
+              onClick={() => {
+                useRunStore.getState().recordAnomalyUnsolved();
+              }}
+            >
+              leave unsolved +1
+            </Button>
+            <Button
+              size="compact-xs"
+              variant="default"
+              onClick={() => {
+                useRunStore.getState().recordAnomalySolved();
+              }}
+            >
+              solve · clear
+            </Button>
+          </Group>
 
           <Text size="xs" fw={700} c={tokens.text} mt={4}>
             flags

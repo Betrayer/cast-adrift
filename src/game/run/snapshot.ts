@@ -43,6 +43,8 @@ const pickRunValues = (s: RunState): RunValues => ({
   axis: s.axis,
   seenEvents: [...s.seenEvents],
   solvedPuzzles: [...s.solvedPuzzles],
+  anomalyStreak: s.anomalyStreak,
+  interferenceStacks: s.interferenceStacks,
   killedTypes: [...s.killedTypes],
   battleMods: s.battleMods.map((m) => ({ ...m })),
   battleEndHealRun: s.battleEndHealRun,

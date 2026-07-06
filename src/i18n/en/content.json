@@ -457,18 +457,18 @@
     }
   },
   "puzzle": {
-    "redline": { "title": "Redline", "goal": "Deal 18+ damage — red dice belong in the weapons." },
-    "sensorLance": { "title": "Sensor Lance", "goal": "Deal 17+ damage — mark first, then fire." },
-    "spinalDrive": { "title": "Spinal Drive", "goal": "Deal 16+ damage — keep the spinal above a jam." },
-    "reactorBank": { "title": "Reactor Bank", "goal": "Bank 12+ charge — black cores overcharge the reactor." },
-    "coldEngine": { "title": "Cold Engine", "goal": "Bank 12+ charge — a prismatic core drinks deepest." },
-    "aegis": { "title": "Aegis", "goal": "Raise 10+ shield — blue belongs in the shields." },
-    "wall": { "title": "The Wall", "goal": "Survive the barrage — shields and brace together." },
-    "slipstream": { "title": "Slipstream", "goal": "Survive the strike — dodge it clean." },
-    "mixedFire": { "title": "Full Broadside", "goal": "Deal 30+ damage — every mount, marked." },
-    "obsidianGamble": { "title": "Obsidian Gamble", "goal": "Deal 16+ damage — obsidian rolls only 1 or 8." },
-    "burnLance": { "title": "Burn Lance", "goal": "Deal 16+ damage — stack your reds." },
-    "bracewall": { "title": "Bracewall", "goal": "Survive three hits — shield and dodge." }
+    "oreVein": { "title": "Ore Vein", "goal": "Deal exactly 14 — the vein shears if you over-cut. Leave a die out." },
+    "coolant": { "title": "Coolant Line", "goal": "Bank exactly 10 charge — the core drinks in steps of one and a half." },
+    "cleanFit": { "title": "Clean Fit", "goal": "Bank 6+ charge with every die placed and nothing spilled past the cap." },
+    "redRoute": { "title": "Red Route", "goal": "Deal 18+ damage — a red die in Weapon A, affinity firing." },
+    "ignite": { "title": "Ignite", "goal": "Deal 12+ damage and land Burn — a cinder must hit its max face." },
+    "pipeline": { "title": "Pipeline", "goal": "Mark, then land 8+ into the marked target, and don't overflow the reactor." },
+    "overload": { "title": "Overload", "goal": "Jam the spinal on purpose, then carry 14+ damage on the mounts." },
+    "slowBurn": { "title": "Slow Burn", "goal": "Two turns: set Burn, reserve a hitter, and stack 26+ total damage." },
+    "capacitor": { "title": "Capacitor", "goal": "Bank 16+ charge across three turns — one core can't hold it all." },
+    "lockbox": { "title": "Lockbox", "goal": "Fixed reading — one routing lands damage, shield, and charge at once." },
+    "parity": { "title": "Parity Lock", "goal": "Fixed reading — Weapons must read odd, Shields even. Mind the faces." },
+    "bulwarkStand": { "title": "Bulwark Stand", "goal": "Survive the barrage and still hold 6+ shield — layer the defence." }
   },
   "bark": {
     "resume": {

@@ -57,6 +57,7 @@ export interface BattleEncounter {
   enemyIds: string[];
   shipId?: ShipId;
   tide?: number;
+  interference?: number;
   perks?: readonly string[];
   hull?: number;
   hullMax?: number;
@@ -76,6 +77,7 @@ export interface BattleValues {
   charge: number;
   scrap: number;
   tide: number;
+  interference: number;
   perks: string[];
   chargeCap: number;
   sacrificePool: number;
@@ -152,6 +154,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   charge: 0,
   scrap: 0,
   tide: 0,
+  interference: 0,
   perks: [],
   chargeCap: DEFAULT_CHARGE_CAP,
   sacrificePool: 0,
@@ -198,6 +201,7 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   charge: s.charge,
   scrap: s.scrap,
   tide: s.tide,
+  interference: s.interference,
   perks: s.perks,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
@@ -227,6 +231,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   charge: snap.charge,
   scrap: snap.scrap,
   tide: snap.tide,
+  interference: snap.interference,
   perks: snap.perks,
   chargeCap: snap.chargeCap,
   sacrificePool: snap.sacrificePool,
@@ -290,6 +295,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       mkLevels,
       {
         tide: encounter.tide,
+        interference: encounter.interference,
         perks: encounter.perks,
         hull: encounter.hull,
         hullMax: encounter.hullMax,
@@ -681,6 +687,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   charge: s.charge,
   scrap: s.scrap,
   tide: s.tide,
+  interference: s.interference,
   perks: s.perks,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,

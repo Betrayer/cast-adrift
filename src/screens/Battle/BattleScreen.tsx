@@ -83,6 +83,7 @@ const StatusCard = () => {
   const shield = useBattleStore((s) => s.shield);
   const charge = useBattleStore((s) => s.charge);
   const scrap = useBattleStore((s) => s.scrap);
+  const interference = useBattleStore((s) => s.interference);
   const turn = useBattleStore((s) => s.turn);
   const phase = useBattleStore((s) => s.phase);
   const rerollMode = useBattleStore((s) => s.rerollMode);
@@ -127,6 +128,18 @@ const StatusCard = () => {
         <span className={`${styles.pill ?? ''} ${styles.pillShield ?? ''}`}>
           {t('battle:shield', { n: shield })}
         </span>
+        {interference > 0 ? (
+          <span
+            className={styles.pill}
+            style={{
+              borderColor: tokens.danger,
+              color: tokens.danger,
+              background: 'rgba(240,120,110,0.12)',
+            }}
+          >
+            {t('battle:interference', { n: interference })}
+          </span>
+        ) : null}
         {scrap > 0 ? (
           <span className={`${styles.pill ?? ''} ${styles.pillScrap ?? ''}`}>
             {t('battle:scrap', { n: scrap })}

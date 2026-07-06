@@ -77,6 +77,7 @@ export const DebugPanel = () => {
   const [shipId, setShipId] = useState<ShipId>('wanderer');
   const [seedValue, setSeedValue] = useState<number | string>('');
   const [deckText, setDeckText] = useState(STARTER_DECK.join(','));
+  const [interference, setInterference] = useState<number | string>(0);
 
   const restart = (): void => {
     const enemyIds = encounter
@@ -89,9 +90,14 @@ export const DebugPanel = () => {
       .map((id) => id.trim())
       .filter((id) => DIE_BY_ID.has(id));
     const seed = Number(seedValue);
+    const interf = Number(interference);
     useBattleStore.getState().reset();
     useBattleStore.getState().startBattle(
-      { enemyIds, shipId },
+      {
+        enemyIds,
+        shipId,
+        interference: Number.isFinite(interf) ? Math.max(0, interf) : 0,
+      },
       deck.length > 0 ? deck : STARTER_DECK,
       createStreams(
         Number.isFinite(seed) && seedValue !== '' ? seed : Date.now() >>> 0,
@@ -208,6 +214,13 @@ export const DebugPanel = () => {
           label="seed (blank = random)"
           value={seedValue}
           onChange={setSeedValue}
+        />
+        <NumberInput
+          size="xs"
+          label="interference stacks"
+          value={interference}
+          onChange={setInterference}
+          min={0}
         />
         <TextInput
           size="xs"

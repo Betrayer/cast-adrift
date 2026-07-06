@@ -82,6 +82,7 @@ const startBattleNode = (node: MapNode): void => {
     {
       enemyIds,
       tide: s.tide,
+      interference: s.interferenceStacks,
       perks: s.perks,
       hull: s.hull,
       hullMax: s.hullMax,
@@ -117,6 +118,7 @@ export const startEventBattle = (follow: ForcedBattle): void => {
     {
       enemyIds,
       tide: s.tide,
+      interference: s.interferenceStacks,
       perks: s.perks,
       hull: s.hull,
       hullMax: s.hullMax,
