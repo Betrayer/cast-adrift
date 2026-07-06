@@ -54,6 +54,9 @@ export const rollDrop = (rng: RngStream, weights: RarityWeights): string => {
   return rng.pick(poolForRarity(rarity));
 };
 
+export const dieForRarity = (rng: RngStream, rarity: Rarity): string =>
+  rng.pick(poolForRarity(rarity));
+
 export const computeNodeReward = (
   type: NodeType,
   rng: RngStream,

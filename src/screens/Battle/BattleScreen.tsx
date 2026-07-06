@@ -23,7 +23,8 @@ import {
   NUDGE_COST,
   SURGE_COST,
 } from '@/game/battle/resolver';
-import { resolveRunBattle } from '@/game/run/flow';
+import { resolveActiveBattle } from '@/game/run/flow';
+import { emitBark } from '@/game/narrative';
 import { hasTrait } from '@/game/run/perkMods';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
@@ -466,9 +467,22 @@ export const BattleScreen = () => {
   const phase = useBattleStore((s) => s.phase);
   const outcome = useBattleStore((s) => s.outcome);
   const runActive = useRunStore((s) => s.active);
+  const hull = useBattleStore((s) => s.hull);
+  const hullMax = useBattleStore((s) => s.hullMax);
   const dropLoot = useLootStore((s) => s.drop);
   const droppedRef = useRef(false);
   const resolvedRef = useRef(false);
+  const lowHullRef = useRef(false);
+
+  useEffect(() => {
+    if (!runActive || hullMax <= 0) {
+      lowHullRef.current = false;
+      return;
+    }
+    const low = hull > 0 && hull / hullMax < 0.3;
+    if (low && !lowHullRef.current) emitBark('lowHull');
+    lowHullRef.current = low;
+  }, [hull, hullMax, runActive]);
 
   useEffect(() => {
     initAudio();
@@ -488,7 +502,7 @@ export const BattleScreen = () => {
     if (!runActive) return;
     if (phase === 'ended' && !resolvedRef.current) {
       resolvedRef.current = true;
-      resolveRunBattle();
+      resolveActiveBattle();
     }
   }, [phase, runActive]);
 

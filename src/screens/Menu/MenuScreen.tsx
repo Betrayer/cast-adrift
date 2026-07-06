@@ -25,7 +25,7 @@ const ENTRIES: readonly MenuEntry[] = [
   { key: 'newRun', screen: 'map', action: 'startRun' },
   { key: 'hangar', screen: 'hangar', phase: 7 },
   { key: 'starChart', screen: 'chart', phase: 7 },
-  { key: 'codex', screen: 'codex', phase: 6 },
+  { key: 'codex', screen: 'codex' },
   { key: 'modes', screen: 'modes', phase: 9 },
   { key: 'settings', screen: 'settings' },
 ];

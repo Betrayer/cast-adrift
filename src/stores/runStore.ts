@@ -3,6 +3,8 @@ import type { MkLevel } from "@/data/slots";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
 import type { SlotId } from "@/types/battle";
+import type { Rarity } from "@/types/content";
+import type { FlagValue } from "@/types/events";
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
 
@@ -12,6 +14,29 @@ export interface DieInstance {
   uid: string;
   defId: string;
   growthBonus?: number;
+}
+
+export type BattleModKind = "startCharge" | "enemyPlus";
+
+export interface RunBattleMod {
+  kind: BattleModKind;
+  value: number;
+  battlesLeft: number;
+}
+
+export interface ConsumedBattleMods {
+  startCharge: number;
+  enemyPlus: number;
+}
+
+export interface PendingBattle {
+  enemyIds: string[];
+  originNodeId: NodeId;
+  scrap: number;
+  lootDie: string | null;
+  lootRarity: Rarity | null;
+  setFlags: [string, FlagValue][];
+  clearFlags: string[];
 }
 
 export interface RunStats {
@@ -43,8 +68,17 @@ export interface RunValues {
   mkLevels: MkLevels;
   tide: number;
   jumpsSinceTide: number;
-  flags: Record<string, boolean>;
+  flags: Record<string, FlagValue>;
   axis: number;
+  seenEvents: string[];
+  solvedPuzzles: string[];
+  killedTypes: string[];
+  battleMods: RunBattleMod[];
+  battleEndHealRun: number;
+  rerollSizeRun: number;
+  bonusReveal: number;
+  shipyardDiscount: number;
+  pendingBattle: PendingBattle | null;
   pendingDeepScan: boolean;
   pendingRewards: PendingRewards | null;
   shop: ShopState | null;
@@ -61,8 +95,19 @@ export interface RunState extends RunValues {
   healHull: (n: number) => void;
   setHull: (n: number) => void;
   addPerk: (perkId: string) => void;
-  setFlag: (key: string, value?: boolean) => void;
+  setFlag: (key: string, value?: FlagValue) => void;
+  clearFlag: (key: string) => void;
   addAxis: (n: number) => void;
+  markEventSeen: (id: string) => void;
+  markPuzzleSolved: (id: string) => void;
+  markKilledType: (defId: string) => boolean;
+  addBattleMod: (mod: RunBattleMod) => void;
+  consumeBattleMods: () => ConsumedBattleMods;
+  addBattleEndHeal: (n: number) => void;
+  addRerollSizeRun: (n: number) => void;
+  addBonusReveal: (n: number) => void;
+  addShipyardDiscount: (n: number) => void;
+  setPendingBattle: (pending: PendingBattle | null) => void;
   bumpStats: (delta: Partial<RunStats>) => void;
   clearPendingDeepScan: () => void;
   setPendingDeepScan: (value: boolean) => void;
@@ -93,6 +138,15 @@ export const createInitialRunValues = (): RunValues => ({
   jumpsSinceTide: 0,
   flags: {},
   axis: 0,
+  seenEvents: [],
+  solvedPuzzles: [],
+  killedTypes: [],
+  battleMods: [],
+  battleEndHealRun: 0,
+  rerollSizeRun: 0,
+  bonusReveal: 0,
+  shipyardDiscount: 0,
+  pendingBattle: null,
   pendingDeepScan: false,
   pendingRewards: null,
   shop: null,
@@ -156,8 +210,79 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set((s) => ({ flags: { ...s.flags, [key]: value } }));
   },
 
+  clearFlag: (key) => {
+    set((s) => {
+      if (s.flags[key] === undefined) return s;
+      const flags: Record<string, FlagValue> = {};
+      for (const [k, v] of Object.entries(s.flags)) {
+        if (k !== key) flags[k] = v;
+      }
+      return { flags };
+    });
+  },
+
   addAxis: (n) => {
     set((s) => ({ axis: Math.max(-10, Math.min(10, s.axis + n)) }));
+  },
+
+  markEventSeen: (id) => {
+    set((s) =>
+      s.seenEvents.includes(id) ? s : { seenEvents: [...s.seenEvents, id] },
+    );
+  },
+
+  markPuzzleSolved: (id) => {
+    set((s) =>
+      s.solvedPuzzles.includes(id)
+        ? s
+        : { solvedPuzzles: [...s.solvedPuzzles, id] },
+    );
+  },
+
+  markKilledType: (defId) => {
+    if (get().killedTypes.includes(defId)) return false;
+    set((s) => ({ killedTypes: [...s.killedTypes, defId] }));
+    return true;
+  },
+
+  addBattleMod: (mod) => {
+    set((s) => ({ battleMods: [...s.battleMods, mod] }));
+  },
+
+  consumeBattleMods: () => {
+    const result: ConsumedBattleMods = { startCharge: 0, enemyPlus: 0 };
+    set((s) => {
+      const next: RunBattleMod[] = [];
+      for (const mod of s.battleMods) {
+        if (mod.battlesLeft <= 0) continue;
+        if (mod.kind === "startCharge") result.startCharge += mod.value;
+        else result.enemyPlus += mod.value;
+        const left = mod.battlesLeft - 1;
+        if (left > 0) next.push({ ...mod, battlesLeft: left });
+      }
+      return { battleMods: next };
+    });
+    return result;
+  },
+
+  addBattleEndHeal: (n) => {
+    set((s) => ({ battleEndHealRun: s.battleEndHealRun + n }));
+  },
+
+  addRerollSizeRun: (n) => {
+    set((s) => ({ rerollSizeRun: s.rerollSizeRun + n }));
+  },
+
+  addBonusReveal: (n) => {
+    set((s) => ({ bonusReveal: Math.max(0, s.bonusReveal + n) }));
+  },
+
+  addShipyardDiscount: (n) => {
+    set((s) => ({ shipyardDiscount: Math.max(0, s.shipyardDiscount + n) }));
+  },
+
+  setPendingBattle: (pending) => {
+    set({ pendingBattle: pending });
   },
 
   bumpStats: (delta) => {

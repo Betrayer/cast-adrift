@@ -18,9 +18,14 @@ import {
   sellValue,
   SHOP_REROLL_COST,
 } from "@/game/economy/prices";
-import { generateShopStock } from "@/game/economy/shop";
+import {
+  flagShopConsequence,
+  flagShopDiscount,
+  generateShopStock,
+} from "@/game/economy/shop";
 import { autosaveRun, completeNode } from "@/game/run/flow";
 import { computePerkMods } from "@/game/run/perkMods";
+import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 
 export const ShopScreen = () => {
@@ -29,25 +34,31 @@ export const ShopScreen = () => {
   const deck = useRunStore((s) => s.deck);
   const seed = useRunStore((s) => s.seed);
   const perks = useRunStore((s) => s.perks);
+  const flags = useRunStore((s) => s.flags);
   const position = useRunStore((s) => s.position);
   const shop = useRunStore((s) => s.shop);
   const setShop = useRunStore((s) => s.setShop);
 
-  const discount = computePerkMods(perks).shopDiscountPct;
+  const discount = computePerkMods(perks).shopDiscountPct + flagShopDiscount(flags);
   const nodeId = position ?? "";
 
   useEffect(() => {
     if (nodeId === "") return;
-    const current = useRunStore.getState().shop;
-    if (current === null || current.nodeId !== nodeId) {
-      useRunStore.getState().setShop({
-        nodeId,
-        rerolls: 0,
-        items: generateShopStock(seed, nodeId, 0, discount),
-      });
-      autosaveRun();
-    }
-  }, [nodeId, seed, discount]);
+    const state = useRunStore.getState();
+    const current = state.shop;
+    if (current !== null && current.nodeId === nodeId) return;
+    const pct =
+      computePerkMods(state.perks).shopDiscountPct +
+      flagShopDiscount(state.flags);
+    state.setShop({
+      nodeId,
+      rerolls: 0,
+      items: generateShopStock(seed, nodeId, 0, pct),
+    });
+    const conseq = flagShopConsequence(state.flags);
+    if (conseq !== null) useNarrativeStore.getState().pushConsequence(conseq);
+    autosaveRun();
+  }, [nodeId, seed]);
 
   const buy = (index: number): void => {
     const state = useRunStore.getState();
@@ -92,6 +103,12 @@ export const ShopScreen = () => {
   };
 
   const leave = (): void => {
+    const state = useRunStore.getState();
+    const courier = state.flags.courierDiscount;
+    if (typeof courier === "number") {
+      if (courier - 1 <= 0) state.clearFlag("courierDiscount");
+      else state.setFlag("courierDiscount", courier - 1);
+    }
     setShop(null);
     completeNode({ outcome: "cleared" });
   };

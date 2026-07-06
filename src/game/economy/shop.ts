@@ -5,6 +5,7 @@ import {
 } from "@/game/economy/prices";
 import { rollDrop, type RarityWeights } from "@/game/economy/rewards";
 import { createStream, deriveSeed } from "@/services/rng";
+import type { FlagValue } from "@/types/events";
 
 export interface ShopItem {
   defId: string;
@@ -25,6 +26,30 @@ export const SHOP_WEIGHTS: RarityWeights = {
   uncommon: 38,
   rare: 14,
   legendary: 3,
+};
+
+// Callback consumer (DESIGN §3): Mara remembers what you did at the Rim, and a
+// freed courier's route pays off. Positive = cheaper stock.
+export const flagShopDiscount = (
+  flags: Record<string, FlagValue>,
+): number => {
+  let pct = 0;
+  if (flags.maraFriend !== undefined) pct += 15;
+  if (flags.maraGrudge !== undefined) pct -= 20;
+  const courier = flags.courierDiscount;
+  if (typeof courier === "number" && courier > 0) pct += 20;
+  return pct;
+};
+
+export const flagShopConsequence = (
+  flags: Record<string, FlagValue>,
+): string | null => {
+  if (flags.maraFriend !== undefined) return "content:consequence.maraFriend";
+  if (flags.maraGrudge !== undefined) return "content:consequence.maraGrudge";
+  const courier = flags.courierDiscount;
+  if (typeof courier === "number" && courier > 0)
+    return "content:consequence.courierFreed";
+  return null;
 };
 
 export const generateShopStock = (

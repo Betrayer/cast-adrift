@@ -27,7 +27,11 @@ export const ShipyardScreen = () => {
   const hullMax = useRunStore((s) => s.hullMax);
   const mkLevels = useRunStore((s) => s.mkLevels);
   const deck = useRunStore((s) => s.deck);
+  const shipyardDiscount = useRunStore((s) => s.shipyardDiscount);
   const [repair, setRepair] = useState(0);
+
+  const discountedMk = (target: Exclude<MkLevel, 1>): number =>
+    Math.max(1, mkUpgradeCost(target) - shipyardDiscount);
 
   const ship = SHIP_BY_ID.get("wanderer");
   const slotIds = useMemo(
@@ -52,10 +56,11 @@ export const ShipyardScreen = () => {
     const current = state.mkLevels[slotId] ?? 1;
     if (current >= 3) return;
     const target = (current + 1) as Exclude<MkLevel, 1>;
-    const cost = mkUpgradeCost(target);
+    const cost = Math.max(1, mkUpgradeCost(target) - state.shipyardDiscount);
     if (state.scrap < cost) return;
     if (!state.spendScrap(cost)) return;
     state.bumpMk(slotId);
+    if (state.shipyardDiscount > 0) useRunStore.setState({ shipyardDiscount: 0 });
     autosaveRun();
   };
 
@@ -104,7 +109,7 @@ export const ShipyardScreen = () => {
             const mk = mkLevels[slotId] ?? 1;
             const maxed = mk >= 3;
             const target = maxed ? 3 : ((mk + 1) as Exclude<MkLevel, 1>);
-            const cost = maxed ? 0 : mkUpgradeCost(target);
+            const cost = maxed ? 0 : discountedMk(target);
             return (
               <Paper key={slotId} bg={tokens.surface1} p="xs" radius="md" withBorder>
                 <Group justify="space-between" wrap="nowrap">

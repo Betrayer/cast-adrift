@@ -71,6 +71,17 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     pattern: [{ t: "multi", n: 3, k: 4 }],
   },
   {
+    id: "bountyHuntress",
+    name: "content:enemies.bountyHuntress",
+    hp: 34,
+    elite: true,
+    pattern: [
+      { t: "multi", n: 5, k: 3 },
+      { t: "lockDie" },
+      { t: "multi", n: 6, k: 2 },
+    ],
+  },
+  {
     id: "raiderAlpha",
     name: "content:enemies.raiderAlpha",
     hp: 30,

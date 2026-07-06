@@ -1,5 +1,6 @@
 import type { RngStream } from "@/services/rng";
 import type { NodeType } from "@/game/map/types";
+import type { FlagValue } from "@/types/events";
 
 // Singles: uniform over the sector-1 roster. raider is a solo bruiser (Phase-3 notes:
 // ~83% solo) and is NOT a pair member — brutal in pairs (raider+scavDrone ≈ 14%).
@@ -27,14 +28,31 @@ const CURATED_PAIRS: readonly (readonly [string, string])[] = [
 
 const LIGHT_POOL: readonly string[] = ["scavDrone", "riftWasp", "choirZealot"];
 
+const flagSet = (
+  flags: Record<string, FlagValue>,
+  key: string,
+): boolean => flags[key] !== undefined;
+
+// Consequence hook (DESIGN §3): once the player carries the cursed-cargo bounty
+// mark, the Bounty Huntress stalks the next elite until engaged.
+export const shouldInjectBounty = (
+  type: NodeType,
+  flags: Record<string, FlagValue>,
+): boolean =>
+  type === "elite" &&
+  flagSet(flags, "hunterMark") &&
+  !flagSet(flags, "hunterEngaged");
+
 export const buildEncounterIds = (
   type: NodeType,
   rng: RngStream,
+  flags: Record<string, FlagValue> = {},
 ): string[] => {
   if (type === "boss" || type === "miniboss") {
     return ["raiderAlpha"];
   }
   if (type === "elite") {
+    if (shouldInjectBounty(type, flags)) return ["bountyHuntress"];
     const ids = ["raiderAlpha"];
     if (rng.next() < 0.4) ids.push(rng.pick(LIGHT_POOL));
     return ids;

@@ -82,6 +82,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const tide = useRunStore((s) => s.tide);
   const sector = useRunStore((s) => s.sector);
   const pendingDeepScan = useRunStore((s) => s.pendingDeepScan);
+  const bonusReveal = useRunStore((s) => s.bonusReveal);
   const sensorsMk = useRunStore((s) => s.mkLevels.sensors ?? 1);
   const reduced = resolveReducedMotion(
     useSettingsStore((s) => s.reducedMotion),
@@ -101,7 +102,8 @@ const MapView = ({ map, position }: MapViewProps) => {
   const prevTide = useRef(tide);
   const [tidePulse, setTidePulse] = useState(false);
 
-  const visibleRows = 2 + (sensorsMk - 1) + (pendingDeepScan ? 1 : 0);
+  const visibleRows =
+    2 + (sensorsMk - 1) + (pendingDeepScan ? 1 : 0) + bonusReveal;
   const visibleLimit = positionRow + visibleRows;
 
   const isVisible = (node: MapNode): boolean =>
