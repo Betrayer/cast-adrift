@@ -1,23 +1,110 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { CHART_NODE_BY_ID } from '@/data/chart';
+import { STARTER_DECK } from '@/data/decks';
+import type { ShipId } from '@/data/ships';
+import { levelFromTotalXp } from '@/game/xp';
+
+export interface CollectionEntry {
+  defId: string;
+  count: number;
+}
+
+export interface MetaStats {
+  runs: number;
+  wins: number;
+  shardsEarned: number;
+}
 
 export interface MetaValues {
+  shards: number;
+  xp: number;
+  level: number;
+  chartPicks: string[];
+  collection: CollectionEntry[];
+  ships: ShipId[];
+  selectedShip: ShipId;
+  hangar: { deck: string[] };
+  themes: string[];
   codex: string[];
   codexRead: string[];
+  contracts: Record<string, number>;
+  ascension: { campaign: number };
+  flagsArchive: string[];
+  stats: MetaStats;
+}
+
+export interface RunAward {
+  fromLevel: number;
+  toLevel: number;
 }
 
 export interface MetaState extends MetaValues {
   unlockCodex: (id: string) => boolean;
   markCodexRead: (id: string) => void;
   markAllCodexRead: () => void;
+  awardRun: (xpGain: number, shardGain: number, win: boolean) => RunAward;
+  addShards: (n: number) => void;
+  spendShards: (n: number) => boolean;
+  allocatePick: (id: string) => void;
+  deallocatePick: (id: string) => void;
+  addToCollection: (defId: string, n?: number) => void;
+  buyDie: (defId: string, price: number) => boolean;
+  setDeck: (deck: readonly string[]) => void;
+  selectShip: (id: ShipId) => void;
+  buyShip: (id: ShipId, price: number) => boolean;
+  unlockTheme: (id: string) => void;
+  archiveRunFlags: (flags: readonly string[]) => void;
 }
 
-export const META_VERSION = 2;
+export const META_VERSION = 3;
+
+const STARTER_SPARE = 'yellow-d6';
+
+const buildStarterCollection = (): CollectionEntry[] => {
+  const counts = new Map<string, number>();
+  for (const id of [...STARTER_DECK, STARTER_SPARE]) {
+    counts.set(id, (counts.get(id) ?? 0) + 1);
+  }
+  return [...counts].map(([defId, count]) => ({ defId, count }));
+};
 
 const createInitialMetaValues = (): MetaValues => ({
+  shards: 0,
+  xp: 0,
+  level: 1,
+  chartPicks: [],
+  collection: buildStarterCollection(),
+  ships: ['wanderer'],
+  selectedShip: 'wanderer',
+  hangar: { deck: [...STARTER_DECK] },
+  themes: ['deepSpace'],
   codex: [],
   codexRead: [],
+  contracts: {},
+  ascension: { campaign: 0 },
+  flagsArchive: [],
+  stats: { runs: 0, wins: 0, shardsEarned: 0 },
 });
+
+const coerceCollection = (value: unknown): CollectionEntry[] => {
+  if (!Array.isArray(value)) return buildStarterCollection();
+  const out: CollectionEntry[] = [];
+  for (const entry of value) {
+    if (
+      typeof entry === 'object' &&
+      entry !== null &&
+      typeof (entry as CollectionEntry).defId === 'string' &&
+      typeof (entry as CollectionEntry).count === 'number'
+    ) {
+      out.push({
+        defId: (entry as CollectionEntry).defId,
+        count: (entry as CollectionEntry).count,
+      });
+    }
+  }
+  return out.length > 0 ? out : buildStarterCollection();
+};
 
 export const migrateMeta = (
   persisted: unknown,
@@ -29,10 +116,56 @@ export const migrateMeta = (
     );
   }
   const prev = (persisted ?? {}) as Partial<MetaValues>;
+  const base = createInitialMetaValues();
   return {
-    ...createInitialMetaValues(),
-    codex: Array.isArray(prev.codex) ? prev.codex : [],
-    codexRead: Array.isArray(prev.codexRead) ? prev.codexRead : [],
+    ...base,
+    shards: typeof prev.shards === 'number' ? prev.shards : base.shards,
+    xp: typeof prev.xp === 'number' ? prev.xp : base.xp,
+    level:
+      typeof prev.xp === 'number'
+        ? levelFromTotalXp(prev.xp)
+        : typeof prev.level === 'number'
+          ? prev.level
+          : base.level,
+    chartPicks: Array.isArray(prev.chartPicks)
+      ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
+      : base.chartPicks,
+    collection: coerceCollection(prev.collection),
+    ships: Array.isArray(prev.ships) ? (prev.ships as ShipId[]) : base.ships,
+    selectedShip:
+      typeof prev.selectedShip === 'string'
+        ? (prev.selectedShip as ShipId)
+        : base.selectedShip,
+    hangar:
+      typeof prev.hangar === 'object' &&
+      prev.hangar !== null &&
+      Array.isArray((prev.hangar as { deck?: unknown }).deck)
+        ? { deck: [...(prev.hangar as { deck: string[] }).deck] }
+        : base.hangar,
+    themes: Array.isArray(prev.themes) ? prev.themes : base.themes,
+    codex: Array.isArray(prev.codex) ? prev.codex : base.codex,
+    codexRead: Array.isArray(prev.codexRead) ? prev.codexRead : base.codexRead,
+    contracts:
+      typeof prev.contracts === 'object' && prev.contracts !== null
+        ? (prev.contracts as Record<string, number>)
+        : base.contracts,
+    ascension:
+      typeof prev.ascension === 'object' &&
+      prev.ascension !== null &&
+      typeof (prev.ascension as { campaign?: unknown }).campaign === 'number'
+        ? { campaign: (prev.ascension as { campaign: number }).campaign }
+        : base.ascension,
+    flagsArchive: Array.isArray(prev.flagsArchive)
+      ? prev.flagsArchive
+      : base.flagsArchive,
+    stats:
+      typeof prev.stats === 'object' && prev.stats !== null
+        ? {
+            runs: (prev.stats as MetaStats).runs ?? 0,
+            wins: (prev.stats as MetaStats).wins ?? 0,
+            shardsEarned: (prev.stats as MetaStats).shardsEarned ?? 0,
+          }
+        : base.stats,
   };
 };
 
@@ -56,15 +189,132 @@ export const useMetaStore = create<MetaState>()(
       markAllCodexRead: () => {
         set((s) => ({ codexRead: [...new Set([...s.codexRead, ...s.codex])] }));
       },
+
+      awardRun: (xpGain, shardGain, win) => {
+        const fromLevel = get().level;
+        const gainXp = Math.max(0, Math.round(xpGain));
+        const gainShards = Math.max(0, Math.round(shardGain));
+        set((s) => {
+          const xp = s.xp + gainXp;
+          return {
+            xp,
+            level: levelFromTotalXp(xp),
+            shards: s.shards + gainShards,
+            stats: {
+              runs: s.stats.runs + 1,
+              wins: s.stats.wins + (win ? 1 : 0),
+              shardsEarned: s.stats.shardsEarned + gainShards,
+            },
+          };
+        });
+        return { fromLevel, toLevel: get().level };
+      },
+
+      addShards: (n) => {
+        if (n <= 0) return;
+        set((s) => ({ shards: s.shards + n }));
+      },
+
+      spendShards: (n) => {
+        const s = get();
+        if (n < 0 || s.shards < n) return false;
+        set({ shards: s.shards - n });
+        return true;
+      },
+
+      allocatePick: (id) => {
+        set((s) =>
+          s.chartPicks.includes(id)
+            ? s
+            : { chartPicks: [...s.chartPicks, id] },
+        );
+      },
+
+      deallocatePick: (id) => {
+        set((s) => ({ chartPicks: s.chartPicks.filter((p) => p !== id) }));
+      },
+
+      addToCollection: (defId, n = 1) => {
+        if (n <= 0) return;
+        set((s) => {
+          const existing = s.collection.find((e) => e.defId === defId);
+          if (existing !== undefined) {
+            return {
+              collection: s.collection.map((e) =>
+                e.defId === defId ? { ...e, count: e.count + n } : e,
+              ),
+            };
+          }
+          return { collection: [...s.collection, { defId, count: n }] };
+        });
+      },
+
+      buyDie: (defId, price) => {
+        if (!get().spendShards(price)) return false;
+        get().addToCollection(defId, 1);
+        return true;
+      },
+
+      setDeck: (deck) => {
+        set({ hangar: { deck: [...deck] } });
+      },
+
+      selectShip: (id) => {
+        if (!get().ships.includes(id)) return;
+        set({ selectedShip: id });
+      },
+
+      buyShip: (id, price) => {
+        if (get().ships.includes(id)) {
+          set({ selectedShip: id });
+          return true;
+        }
+        if (!get().spendShards(price)) return false;
+        set((s) => ({ ships: [...s.ships, id], selectedShip: id }));
+        return true;
+      },
+
+      unlockTheme: (id) => {
+        set((s) => (s.themes.includes(id) ? s : { themes: [...s.themes, id] }));
+      },
+
+      archiveRunFlags: (flags) => {
+        set((s) => ({
+          flagsArchive: [...new Set([...s.flagsArchive, ...flags])],
+        }));
+      },
     }),
     {
       name: 'ca.meta',
       version: META_VERSION,
       migrate: migrateMeta,
       partialize: (s): MetaValues => ({
+        shards: s.shards,
+        xp: s.xp,
+        level: s.level,
+        chartPicks: s.chartPicks,
+        collection: s.collection,
+        ships: s.ships,
+        selectedShip: s.selectedShip,
+        hangar: s.hangar,
+        themes: s.themes,
         codex: s.codex,
         codexRead: s.codexRead,
+        contracts: s.contracts,
+        ascension: s.ascension,
+        flagsArchive: s.flagsArchive,
+        stats: s.stats,
       }),
     },
   ),
 );
+
+declare global {
+  interface Window {
+    __meta?: typeof useMetaStore;
+  }
+}
+
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  window.__meta = useMetaStore;
+}

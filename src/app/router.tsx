@@ -1,7 +1,10 @@
 import { StubScreen } from '@/components/StubScreen';
 import { BattleScreen } from '@/screens/Battle/BattleScreen';
+import { ChartScreen } from '@/screens/Chart/ChartScreen';
 import { CodexScreen } from '@/screens/Codex/CodexScreen';
+import { CollectionScreen } from '@/screens/Collection/CollectionScreen';
 import { EventScreen } from '@/screens/Event/EventScreen';
+import { HangarScreen } from '@/screens/Hangar/HangarScreen';
 import { MapScreen } from '@/screens/Map/MapScreen';
 import { MenuScreen } from '@/screens/Menu/MenuScreen';
 import { PuzzleScreen } from '@/screens/Puzzle/PuzzleScreen';
@@ -25,5 +28,8 @@ export const Router = () => {
   if (screen === 'rewards') return <RewardsScreen />;
   if (screen === 'summary') return <SummaryScreen />;
   if (screen === 'codex') return <CodexScreen />;
+  if (screen === 'chart') return <ChartScreen />;
+  if (screen === 'hangar') return <HangarScreen />;
+  if (screen === 'collection') return <CollectionScreen />;
   return <StubScreen screen={screen} />;
 };

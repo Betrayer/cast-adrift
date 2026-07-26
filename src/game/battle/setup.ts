@@ -1,11 +1,12 @@
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies/sector1";
-import { SHIP_BY_ID, type ShipId } from "@/data/ships";
+import { SHIP_BY_ID, shipHasPassive, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import { scaleHpForTide } from "@/game/run/encounter";
 import { hasTrait } from "@/game/run/perkMods";
+import { runHasTrait } from "@/game/run/runMods";
 import { createStream, type RngStream, type RngStreams } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -19,10 +20,41 @@ import type { EnemyDef, Intent } from "@/types/content";
 export const MAX_ENEMIES = 3;
 export const DEFAULT_CHARGE_CAP = 10;
 
+const WEAPON_SLOTS: ReadonlySet<SlotId> = new Set([
+  "weaponA",
+  "weaponB",
+  "spinal",
+]);
+
+const dieFaceRange = (defId: string, tier: number): [number, number] => {
+  const faces = DIE_BY_ID.get(defId)?.faces;
+  if (faces !== undefined && faces.length > 0) {
+    return [Math.min(...faces), Math.max(...faces)];
+  }
+  return [1, tier];
+};
+
+export const applyObsidianPact = (
+  dice: RolledDie[],
+  perks: readonly string[],
+  chartPicks: readonly string[],
+): void => {
+  if (!runHasTrait(perks, chartPicks, "obsidianPact")) return;
+  for (const die of dice) {
+    if (die.school !== "black" && die.school !== "prismatic") continue;
+    if (die.state !== "tray") continue;
+    const [min, max] = dieFaceRange(die.defId, die.tier);
+    const growth = die.growth ?? 0;
+    const mid = (min + max) / 2;
+    die.value = (die.value - growth >= mid ? max : min) + growth;
+  }
+};
+
 export interface BattleInit {
   tide?: number;
   interference?: number;
   perks?: readonly string[];
+  chartPicks?: readonly string[];
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
@@ -152,6 +184,8 @@ export const buildBattleSnapshot = (
     tide,
     interference: Math.max(0, init.interference ?? 0),
     perks: [...(init.perks ?? [])],
+    chartPicks: [...(init.chartPicks ?? [])],
+    shipId,
     dice,
     slots: buildShipSlots(shipId, mkLevels),
     enemies,
@@ -172,6 +206,7 @@ export const buildBattleSnapshot = (
   const perks = init.perks ?? [];
   applyRollFloors(dice, snapshot.resonance, hasTrait(perks, "stabilizer"));
   if (hasTrait(perks, "spareLowest")) applySpareLowest(dice);
+  applyObsidianPact(dice, perks, init.chartPicks ?? []);
   return snapshot;
 };
 
@@ -192,21 +227,35 @@ export const isDieLocked = (
   );
 
 export const dieFitsSlot = (
-  snapshot: Pick<BattleSnapshot, "resonance">,
+  snapshot: Pick<BattleSnapshot, "resonance" | "shipId">,
   die: Pick<RolledDie, "tier" | "school">,
   slot: Pick<SlotState, "cap">,
+  slotId: SlotId,
 ): boolean => {
   if (die.tier <= slot.cap) return true;
-  return (
+  if (
     (die.school === "black" || die.school === "prismatic") &&
     resonanceAtLeast(snapshot.resonance, "black", 2)
+  ) {
+    return true;
+  }
+  return (
+    snapshot.shipId !== undefined &&
+    shipHasPassive(snapshot.shipId, "overload") &&
+    WEAPON_SLOTS.has(slotId)
   );
 };
 
 export const canPlaceDie = (
   snapshot: Pick<
     BattleSnapshot,
-    "dice" | "slots" | "blockedSlots" | "lockedDice" | "turn" | "resonance"
+    | "dice"
+    | "slots"
+    | "blockedSlots"
+    | "lockedDice"
+    | "turn"
+    | "resonance"
+    | "shipId"
   >,
   uid: string,
   slotId: SlotId,
@@ -218,7 +267,7 @@ export const canPlaceDie = (
     slot !== undefined &&
     die.state === "tray" &&
     slot.dieUid === undefined &&
-    dieFitsSlot(snapshot, die, slot) &&
+    dieFitsSlot(snapshot, die, slot, slotId) &&
     !isSlotBlocked(snapshot, slotId) &&
     !isDieLocked(snapshot, uid)
   );

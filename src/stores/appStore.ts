@@ -20,3 +20,13 @@ export const useAppStore = create<AppState>()((set) => ({
   setTgUserId: (tgUserId) => set({ tgUserId }),
   setCloudResume: (cloudResume) => set({ cloudResume }),
 }));
+
+declare global {
+  interface Window {
+    __app?: typeof useAppStore;
+  }
+}
+
+if (import.meta.env.DEV && typeof window !== "undefined") {
+  window.__app = useAppStore;
+}

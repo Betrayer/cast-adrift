@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { ShipId } from "@/data/ships";
 import type { MkLevel } from "@/data/slots";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import type { ShopState } from "@/game/economy/shop";
@@ -42,6 +43,9 @@ export interface PendingBattle {
 
 export interface RunStats {
   nodesCleared: number;
+  elites: number;
+  minibosses: number;
+  bosses: number;
   kills: number;
   scrapEarned: number;
   scrapSpent: number;
@@ -64,8 +68,10 @@ export interface RunValues {
   hull: number;
   hullMax: number;
   scrap: number;
+  shipId: ShipId;
   deck: DieInstance[];
   perks: string[];
+  chartPicks: string[];
   mkLevels: MkLevels;
   tide: number;
   jumpsSinceTide: number;
@@ -136,8 +142,10 @@ export const createInitialRunValues = (): RunValues => ({
   hull: 0,
   hullMax: 0,
   scrap: 0,
+  shipId: "wanderer",
   deck: [],
   perks: [],
+  chartPicks: [],
   mkLevels: {},
   tide: 0,
   jumpsSinceTide: 0,
@@ -158,7 +166,15 @@ export const createInitialRunValues = (): RunValues => ({
   pendingRewards: null,
   shop: null,
   deckSeq: 0,
-  stats: { nodesCleared: 0, kills: 0, scrapEarned: 0, scrapSpent: 0 },
+  stats: {
+    nodesCleared: 0,
+    elites: 0,
+    minibosses: 0,
+    bosses: 0,
+    kills: 0,
+    scrapEarned: 0,
+    scrapSpent: 0,
+  },
 });
 
 export const useRunStore = create<RunState>()((set, get) => ({
@@ -310,6 +326,9 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set((s) => ({
       stats: {
         nodesCleared: s.stats.nodesCleared + (delta.nodesCleared ?? 0),
+        elites: s.stats.elites + (delta.elites ?? 0),
+        minibosses: s.stats.minibosses + (delta.minibosses ?? 0),
+        bosses: s.stats.bosses + (delta.bosses ?? 0),
         kills: s.stats.kills + (delta.kills ?? 0),
         scrapEarned: s.stats.scrapEarned + (delta.scrapEarned ?? 0),
         scrapSpent: s.stats.scrapSpent + (delta.scrapSpent ?? 0),

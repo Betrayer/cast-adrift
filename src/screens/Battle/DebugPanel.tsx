@@ -206,7 +206,7 @@ export const DebugPanel = () => {
           data={SHIPS.map((s) => s.id)}
           value={shipId}
           onChange={(v) => {
-            if (v === 'wanderer' || v === 'ram-proto') setShipId(v);
+            if (SHIPS.some((s) => s.id === v)) setShipId(v as ShipId);
           }}
         />
         <NumberInput

@@ -89,6 +89,8 @@
   },
   "ships": {
     "wanderer": "Wanderer",
+    "ram": "Ram",
+    "ark": "Ark",
     "ram-proto": "Ram Prototype"
   },
   "perks": {
@@ -471,6 +473,11 @@
     "bulwarkStand": { "title": "Bulwark Stand", "goal": "Survive the barrage and still hold 6+ shield — layer the defence." }
   },
   "bark": {
+    "levelUp": {
+      "1": "A new rank. The record notices you now, captain.",
+      "2": "Level up. The Star Chart just widened — go spend it.",
+      "3": "You grew. So did the map of what we could become."
+    },
     "resume": {
       "1": "Welcome back, captain. I recalculated the odds. Still against us.",
       "2": "You're back. The dark didn't miss you. I did, a little."

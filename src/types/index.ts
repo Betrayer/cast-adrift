@@ -3,6 +3,7 @@ export type ScreenId =
   | 'settings'
   | 'hangar'
   | 'chart'
+  | 'collection'
   | 'codex'
   | 'modes'
   | 'runSetup'

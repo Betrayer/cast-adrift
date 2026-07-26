@@ -1,5 +1,6 @@
 import { DIE_BY_ID } from "@/data/dice";
 import { buildAffinitySource } from "@/game/effects/affinity";
+import { buildChartSource } from "@/game/effects/chartSource";
 import type { BattleCtx } from "@/game/effects/context";
 import { applyDefs } from "@/game/effects/evaluate";
 import { buildPerkSource } from "@/game/effects/perkSource";
@@ -35,6 +36,7 @@ export const buildSources = (snapshot: BattleSnapshot): EffectSource[] => {
     buildAffinitySource(),
     buildResonanceSource(snapshot.resonance),
     buildPerkSource(snapshot.perks),
+    buildChartSource(snapshot.chartPicks ?? []),
   ];
   for (const die of snapshot.dice) {
     const effects = DIE_BY_ID.get(die.defId)?.effects;

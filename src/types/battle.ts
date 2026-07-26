@@ -1,4 +1,5 @@
 import type { DieTier, Intent, School, SubsystemAura } from "@/types/content";
+import type { ShipId } from "@/data/ships";
 import type { Statuses } from "@/game/battle/statuses";
 
 export type SlotId =
@@ -6,6 +7,7 @@ export type SlotId =
   | "weaponB"
   | "spinal"
   | "shields"
+  | "shieldsB"
   | "engines"
   | "sensors"
   | "reactor"
@@ -92,6 +94,8 @@ export interface BattleSnapshot {
   tide: number;
   interference: number;
   perks: string[];
+  chartPicks?: string[];
+  shipId?: ShipId;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
   enemies: EnemyState[];
@@ -117,7 +121,8 @@ export type BeatKind =
   | "shield"
   | "engine"
   | "sensor"
-  | "charge";
+  | "charge"
+  | "repair";
 
 export interface SensorResult {
   mark: boolean;

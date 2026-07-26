@@ -1,29 +1,103 @@
-import { Button, Divider, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import {
+  Button,
+  Divider,
+  Group,
+  Paper,
+  Progress,
+  Stack,
+  Text,
+  Title,
+} from "@mantine/core";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { PERK_BY_ID } from "@/data/perks";
+import { progressWithinLevel } from "@/game/xp";
 import { abandonRun } from "@/game/run/flow";
+import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
+import {
+  resolveReducedMotion,
+  useSettingsStore,
+} from "@/stores/settingsStore";
+import { useSummaryStore } from "@/stores/summaryStore";
+import { LevelUpCeremony } from "./LevelUpCeremony";
+
+const useCountUp = (target: number, reduced: boolean): number => {
+  const [value, setValue] = useState(reduced ? target : 0);
+  useEffect(() => {
+    if (reduced) return;
+    let frame = 0;
+    let start = 0;
+    const duration = 650;
+    const tick = (ts: number): void => {
+      if (start === 0) start = ts;
+      const p = Math.min(1, (ts - start) / duration);
+      setValue(Math.round(target * p));
+      if (p < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(frame);
+    };
+  }, [target, reduced]);
+  return value;
+};
 
 export const SummaryScreen = () => {
-  const { t } = useTranslation(["run"]);
+  const { t } = useTranslation(["run", "meta"]);
   const stats = useRunStore((s) => s.stats);
   const perks = useRunStore((s) => s.perks);
-  const position = useRunStore((s) => s.position);
-  const map = useRunStore((s) => s.map);
-  const node = map?.nodes.find((n) => n.id === position);
-  const victory = node?.type === "boss";
+  const result = useSummaryStore((s) => s.result);
+  const level = useMetaStore((s) => s.level);
+  const xp = useMetaStore((s) => s.xp);
+  const reduced = resolveReducedMotion(
+    useSettingsStore((s) => s.reducedMotion),
+  );
 
+  const win = result?.win ?? false;
+  const xpShown = useCountUp(result?.xpGain ?? 0, reduced);
+  const shardsShown = useCountUp(result?.shardGain ?? 0, reduced);
+  const leveled =
+    result !== null && result.toLevel > result.fromLevel;
+  const [ceremonyDone, setCeremonyDone] = useState(!leveled);
+  const [barsDone, setBarsDone] = useState(reduced);
+
+  useEffect(() => {
+    if (reduced) return;
+    const id = setTimeout(() => {
+      setBarsDone(true);
+    }, 750);
+    return () => {
+      clearTimeout(id);
+    };
+  }, [reduced]);
+
+  const progress = progressWithinLevel(xp);
   const perkNames = perks
     .map((id) => PERK_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
+
+  if (leveled && barsDone && !ceremonyDone && result !== null) {
+    return (
+      <LevelUpCeremony
+        fromLevel={result.fromLevel}
+        toLevel={result.toLevel}
+        milestones={result.milestones}
+        reduced={reduced}
+        onContinue={() => {
+          setCeremonyDone(true);
+        }}
+      />
+    );
+  }
 
   return (
     <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={420} w="100%">
         <Stack gap="sm">
-          <Title order={2} c={victory ? tokens.text : tokens.danger} ta="center">
-            {t(victory ? "run:summary.victory" : "run:summary.defeat")}
+          <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">
+            {t(win ? "run:summary.victory" : "run:summary.defeat")}
           </Title>
           <Divider color={tokens.line} />
           <Text c={tokens.dim}>
@@ -33,9 +107,31 @@ export const SummaryScreen = () => {
           <Text c={tokens.dim}>
             {t("run:summary.earned", { n: stats.scrapEarned })}
           </Text>
-          <Text c={tokens.dim}>
-            {t("run:summary.spent", { n: stats.scrapSpent })}
+          <Divider color={tokens.line} />
+          <Group justify="space-between">
+            <Text c={tokens.amber} fw={600}>
+              {t("meta:summary.shards")}
+            </Text>
+            <Text c={tokens.amber} fw={700}>
+              +{shardsShown} ◈
+            </Text>
+          </Group>
+          <Group justify="space-between">
+            <Text c={tokens.accent} fw={600}>
+              {t("meta:summary.xp")}
+            </Text>
+            <Text c={tokens.accent} fw={700}>
+              +{xpShown}
+            </Text>
+          </Group>
+          <Text size="xs" c={tokens.faint}>
+            {t("meta:summary.level", { level })}
           </Text>
+          <Progress
+            value={progress.pct * 100}
+            color="accent"
+            aria-label="xp"
+          />
           <Divider color={tokens.line} />
           <Text c={tokens.faint} size="sm">
             {t("run:summary.perks")}{" "}
@@ -43,20 +139,15 @@ export const SummaryScreen = () => {
               ? t("run:summary.perksNone")
               : perkNames.map((name) => t(name)).join(" · ")}
           </Text>
-          <Group
-            justify="space-between"
-            px="sm"
-            py="xs"
-            style={{
-              border: `1px dashed ${tokens.line}`,
-              borderRadius: 8,
+          <Button
+            size="md"
+            fullWidth
+            mt="sm"
+            onClick={() => {
+              useSummaryStore.getState().clear();
+              abandonRun();
             }}
           >
-            <Text c={tokens.faint} size="sm">
-              {t("run:summary.meta")}
-            </Text>
-          </Group>
-          <Button size="md" fullWidth mt="sm" onClick={abandonRun}>
             {t("run:summary.toMenu")}
           </Button>
         </Stack>

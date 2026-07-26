@@ -1,4 +1,5 @@
 import { BARKS } from "../src/data/barks";
+import { CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
 import { ALL_DICE } from "../src/data/dice";
@@ -150,6 +151,46 @@ for (const enemy of SECTOR1_ENEMIES) {
 
 for (const ship of SHIPS) {
   checkLocKey(`ships.${ship.id}`, ship.name);
+}
+
+checkUniqueIds(
+  "chart",
+  CHART_NODES.map((n) => n.id),
+);
+
+const CHART_NODE_TOTAL = 120;
+const CHART_NOTABLES = 14;
+const CHART_KEYSTONES = 4;
+if (CHART_NODES.length !== CHART_NODE_TOTAL)
+  errors.push(
+    `chart: expected ${String(CHART_NODE_TOTAL)} nodes, found ${String(CHART_NODES.length)}`,
+  );
+const notableCount = CHART_NODES.filter((n) => n.kind === "notable").length;
+if (notableCount !== CHART_NOTABLES)
+  errors.push(
+    `chart: expected ${String(CHART_NOTABLES)} notables, found ${String(notableCount)}`,
+  );
+const keystoneCount = CHART_NODES.filter((n) => n.kind === "keystone").length;
+if (keystoneCount !== CHART_KEYSTONES)
+  errors.push(
+    `chart: expected ${String(CHART_KEYSTONES)} keystones, found ${String(keystoneCount)}`,
+  );
+for (const node of CHART_NODES) {
+  checkLocKey(`chart.${node.id}`, node.name);
+  checkLocKey(`chart.${node.id}`, node.desc);
+  checkEffects(`chart.${node.id}`, node.effects);
+  for (const link of node.links) {
+    if (!CHART_NODE_BY_ID.has(link))
+      errors.push(`chart: "${node.id}" links to unknown node "${link}"`);
+  }
+  if (
+    node.effects === undefined &&
+    node.mods === undefined &&
+    node.traits === undefined &&
+    node.hubBudget !== true
+  ) {
+    errors.push(`chart: "${node.id}" is a no-op (no effects, mods, traits, or budget)`);
+  }
 }
 
 checkUniqueIds(
@@ -354,5 +395,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(SECTOR1_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks`,
+  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(SECTOR1_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks`,
 );

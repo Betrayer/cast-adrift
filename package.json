@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "sim": "tsx scripts/sim.mts",
     "sim:smoke": "tsx scripts/sim.mts --enemy raider --runs 100 --seed 7",
+    "sim:chart": "tsx scripts/chartSim.mts",
     "lint:content": "tsx scripts/contentLint.mts",
     "gensfx": "tsx scripts/genSfx.mts"
   },
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.62.0",
     "@types/howler": "^2.2.13",
     "@types/matter-js": "^0.20.2",
     "@types/node": "^22.20.0",

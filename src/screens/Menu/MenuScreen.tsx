@@ -1,9 +1,21 @@
-import { Box, Button, Group, Paper, Stack, Text, Title } from '@mantine/core';
+import {
+  Box,
+  Button,
+  Group,
+  Paper,
+  RingProgress,
+  Stack,
+  Text,
+  Title,
+  UnstyledButton,
+} from '@mantine/core';
 import { useReducedMotion } from '@mantine/hooks';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import type { Application } from 'pixi.js';
 import { tokens } from '@/app/theme';
+import { progressWithinLevel } from '@/game/xp';
+import { useMetaStore } from '@/stores/metaStore';
 import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
 import { startRun } from '@/game/run/flow';
 import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
@@ -23,16 +35,20 @@ interface MenuEntry {
 const ENTRIES: readonly MenuEntry[] = [
   { key: 'testBattle', screen: 'battle' },
   { key: 'newRun', screen: 'map', action: 'startRun' },
-  { key: 'hangar', screen: 'hangar', phase: 7 },
-  { key: 'starChart', screen: 'chart', phase: 7 },
+  { key: 'hangar', screen: 'hangar' },
+  { key: 'starChart', screen: 'chart' },
+  { key: 'collection', screen: 'collection' },
   { key: 'codex', screen: 'codex' },
   { key: 'modes', screen: 'modes', phase: 9 },
   { key: 'settings', screen: 'settings' },
 ];
 
 export const MenuScreen = () => {
-  const { t } = useTranslation(['common', 'menu']);
+  const { t } = useTranslation(['common', 'menu', 'meta']);
   const go = useAppStore((s) => s.go);
+  const level = useMetaStore((s) => s.level);
+  const xp = useMetaStore((s) => s.xp);
+  const progress = progressWithinLevel(xp);
   const cloudResume = useAppStore((s) => s.cloudResume);
   const [localResume] = useState(readLocalResume);
   const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
@@ -61,6 +77,28 @@ export const MenuScreen = () => {
   return (
     <Box pos="relative" mih="100dvh" bg={tokens.bg} style={{ overflow: 'hidden' }}>
       <PixiCanvas mount={mountBg} />
+      <UnstyledButton
+        pos="absolute"
+        top={12}
+        right={12}
+        onClick={() => {
+          go('chart');
+        }}
+        style={{ zIndex: 2, pointerEvents: 'auto' }}
+        aria-label={t('meta:menu.level', { level })}
+      >
+        <RingProgress
+          size={56}
+          thickness={4}
+          roundCaps
+          sections={[{ value: progress.pct * 100, color: 'accent' }]}
+          label={
+            <Text ta="center" size="xs" c={tokens.text} fw={700}>
+              {level}
+            </Text>
+          }
+        />
+      </UnstyledButton>
       <Stack
         pos="relative"
         align="center"

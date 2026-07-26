@@ -21,7 +21,10 @@ export type PerkTrait =
   | "spareLowest"
   | "compost"
   | "reflectDodge"
-  | "dodgeCharge";
+  | "dodgeCharge"
+  | "singleCast"
+  | "coldLogic"
+  | "obsidianPact";
 
 export interface PerkMods {
   rerollSizeDelta: number;

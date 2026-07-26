@@ -1,5 +1,6 @@
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { ENEMY_BY_ID } from "@/data/enemies/sector1";
+import { SHIP_BY_ID, shipHasPassive } from "@/data/ships";
 import {
   aliveEnemies,
   applyWeaponDamage,
@@ -9,6 +10,7 @@ import {
 import { resonanceAtLeast } from "@/game/battle/resonance";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import {
+  applyObsidianPact,
   drawIntent,
   isDieLocked,
   isSlotBlocked,
@@ -23,7 +25,8 @@ import {
   emit,
   type EffectSource,
 } from "@/game/effects";
-import { computePerkMods, hasTrait } from "@/game/run/perkMods";
+import { hasTrait } from "@/game/run/perkMods";
+import { computeRunMods, runHasTrait } from "@/game/run/runMods";
 import type { PerkMods } from "@/data/perks/types";
 import type { RngStream, RngStreams } from "@/services/rng";
 import type {
@@ -44,9 +47,13 @@ export const RESOLUTION_ORDER: readonly SlotId[] = [
   "weaponB",
   "spinal",
   "shields",
+  "shieldsB",
   "engines",
   "reactor",
+  "repairBay",
 ];
+
+export const OVERLOAD_HULL_COST = 2;
 
 export const CHARGE_CAP = 10;
 export const OVERFLOW_HULL_COST = 2;
@@ -218,7 +225,7 @@ const applySlotEffect = (
         after: clone(next),
       });
     }
-  } else if (slotId === "shields") {
+  } else if (slotId === "shields" || slotId === "shieldsB") {
     next.shield += value;
     if (
       (die.school === "blue" || die.school === "prismatic") &&
@@ -227,6 +234,10 @@ const applySlotEffect = (
       next.shieldPersist = Math.min(next.hullMax, next.shieldPersist + value);
     }
     beats.push({ slot: slotId, kind: "shield", amount: value, after: clone(next) });
+  } else if (slotId === "repairBay") {
+    const heal = Math.ceil(value / 2);
+    next.hull = Math.min(next.hullMax, next.hull + heal);
+    beats.push({ slot: slotId, kind: "repair", amount: heal, after: clone(next) });
   } else if (slotId === "engines") {
     const tier = engineTier(
       value + thresholdBonus + perkMods.enginesThresholdDelta,
@@ -289,14 +300,24 @@ const resolveSlot = (
 
   emit(sources, "beforeResolveSlot", ctx);
 
-  if (die.tier > slot.cap && resonanceAtLeast(next.resonance, "black", 2)) {
-    next.hull = Math.max(0, next.hull - OVER_CAP_HULL_COST);
-  }
-
   const isWeapon =
     slotId === "weaponA" || slotId === "weaponB" || slotId === "spinal";
+
+  if (die.tier > slot.cap) {
+    const overload =
+      isWeapon &&
+      next.shipId !== undefined &&
+      shipHasPassive(next.shipId, "overload");
+    if (overload) {
+      next.hull = Math.max(0, next.hull - OVERLOAD_HULL_COST);
+    } else if (resonanceAtLeast(next.resonance, "black", 2)) {
+      next.hull = Math.max(0, next.hull - OVER_CAP_HULL_COST);
+    }
+  }
+
   const crit =
     isWeapon &&
+    !runHasTrait(next.perks, next.chartPicks ?? [], "coldLogic") &&
     resonanceAtLeast(next.resonance, "yellow", 4) &&
     die.value >= dieFaceMax(die);
 
@@ -355,7 +376,7 @@ export const resolvePlayerPhase = (
   const beats: Beat[] = [];
   const ctx = new BattleCtx(next);
   const sources = buildSources(next);
-  const perkMods = computePerkMods(next.perks);
+  const perkMods = computeRunMods(next.perks, next.chartPicks ?? []);
   const ricochet = hasTrait(next.perks, "ricochet");
   const mods = next.nextTurnMods;
   next.nextTurnMods = {};
@@ -400,7 +421,7 @@ const applyAttack = (
 ): { dealt: number; hullDamage: number; shieldDamage: number } => {
   const aura = hasAliveAura(enemy, "atk+2") ? 2 : 0;
   const tide = Math.max(0, next.tide) + Math.max(0, next.interference);
-  const perkMods = computePerkMods(next.perks);
+  const perkMods = computeRunMods(next.perks, next.chartPicks ?? []);
   const reflectDodge = hasTrait(next.perks, "reflectDodge");
   const dodgeCharge = hasTrait(next.perks, "dodgeCharge");
   const chargeMult = consumeStatus(enemy.statuses, "charge") ? 2 : 1;
@@ -609,7 +630,16 @@ export const resolveEnemyPhase = (
     });
   }
 
-  next.shield = Math.min(next.shield, next.shieldPersist);
+  const passive =
+    next.shipId !== undefined ? SHIP_BY_ID.get(next.shipId)?.passive : undefined;
+  const bulwarkFloor =
+    passive?.kind === "bulwark" && next.shield > 0
+      ? Math.floor(next.shield * (passive.keepPct / 100))
+      : 0;
+  next.shield = Math.min(
+    next.shield,
+    Math.max(next.shieldPersist, bulwarkFloor),
+  );
   finalizeOutcome(next);
   return { next, beats };
 };
@@ -652,6 +682,7 @@ export const advanceTurn = (
   );
   applyRollFloors(rolledDice, next.resonance, hasTrait(next.perks, "stabilizer"));
   if (hasTrait(next.perks, "spareLowest")) applySpareLowest(rolledDice);
+  applyObsidianPact(rolledDice, next.perks, next.chartPicks ?? []);
 
   const ctx = new BattleCtx(next);
   const sources = buildSources(next);

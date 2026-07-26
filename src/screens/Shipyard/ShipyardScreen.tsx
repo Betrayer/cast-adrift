@@ -27,13 +27,14 @@ export const ShipyardScreen = () => {
   const hullMax = useRunStore((s) => s.hullMax);
   const mkLevels = useRunStore((s) => s.mkLevels);
   const deck = useRunStore((s) => s.deck);
+  const shipId = useRunStore((s) => s.shipId);
   const shipyardDiscount = useRunStore((s) => s.shipyardDiscount);
   const [repair, setRepair] = useState(0);
 
   const discountedMk = (target: Exclude<MkLevel, 1>): number =>
     Math.max(1, mkUpgradeCost(target) - shipyardDiscount);
 
-  const ship = SHIP_BY_ID.get("wanderer");
+  const ship = SHIP_BY_ID.get(shipId);
   const slotIds = useMemo(
     () => (ship ? (Object.keys(ship.slots) as SlotId[]) : []),
     [ship],

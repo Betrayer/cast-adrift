@@ -37,12 +37,13 @@ export interface BattleSceneLabels {
 const SLOT_GRID: Partial<Record<SlotId, { row: number; col: number }>> = {
   weaponA: { row: 0, col: 0 },
   weaponB: { row: 0, col: 1 },
-  spinal: { row: 0, col: 0 },
+  shieldsB: { row: 0, col: 1 },
   shields: { row: 1, col: 0 },
   engines: { row: 1, col: 1 },
   sensors: { row: 2, col: 0 },
-  reactor: { row: 2, col: 1 },
+  spinal: { row: 2, col: 0 },
   repairBay: { row: 2, col: 0 },
+  reactor: { row: 2, col: 1 },
 };
 
 const MINI_DIE_SIZE = 40;

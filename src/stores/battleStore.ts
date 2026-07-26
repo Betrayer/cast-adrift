@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { type ShipId } from "@/data/ships";
+import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import {
   canCopy,
   canFlip,
@@ -33,7 +33,8 @@ import {
   type RngStreams,
   type StreamStates,
 } from "@/services/rng";
-import { computePerkMods, hasTrait } from "@/game/run/perkMods";
+import { hasTrait } from "@/game/run/perkMods";
+import { computeRunMods, runHasTrait } from "@/game/run/runMods";
 import { useRunStore } from "@/stores/runStore";
 import type {
   BattleOutcome,
@@ -59,6 +60,7 @@ export interface BattleEncounter {
   tide?: number;
   interference?: number;
   perks?: readonly string[];
+  chartPicks?: readonly string[];
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
@@ -79,6 +81,7 @@ export interface BattleValues {
   tide: number;
   interference: number;
   perks: string[];
+  chartPicks: string[];
   chargeCap: number;
   sacrificePool: number;
   bloodReactorUsed: boolean;
@@ -156,6 +159,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   tide: 0,
   interference: 0,
   perks: [],
+  chartPicks: [],
   chargeCap: DEFAULT_CHARGE_CAP,
   sacrificePool: 0,
   bloodReactorUsed: false,
@@ -203,6 +207,8 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   tide: s.tide,
   interference: s.interference,
   perks: s.perks,
+  chartPicks: s.chartPicks,
+  shipId: s.shipId,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
   bloodReactorUsed: s.bloodReactorUsed,
@@ -233,6 +239,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   tide: snap.tide,
   interference: snap.interference,
   perks: snap.perks,
+  chartPicks: snap.chartPicks ?? [],
   chargeCap: snap.chargeCap,
   sacrificePool: snap.sacrificePool,
   bloodReactorUsed: snap.bloodReactorUsed,
@@ -297,6 +304,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         tide: encounter.tide,
         interference: encounter.interference,
         perks: encounter.perks,
+        chartPicks: encounter.chartPicks,
         hull: encounter.hull,
         hullMax: encounter.hullMax,
         chargeCap: encounter.chargeCap,
@@ -304,17 +312,22 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     );
     const grants = grantsFromCensus(snapshot.resonance);
     const perks = encounter.perks ?? [];
-    const mods = computePerkMods(perks);
+    const chartPicks = encounter.chartPicks ?? [];
+    const mods = computeRunMods(perks, chartPicks);
     const rerollBase =
       grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
+    const passive = SHIP_BY_ID.get(shipId)?.passive;
+    const scrapperScrap = passive?.kind === "scrapper" ? passive.scrap : 0;
+    const singleCast = runHasTrait(perks, chartPicks, "singleCast");
     set({
       ...createInitialBattleValues(),
       ...fromSnapshot(snapshot),
       phase: "placement",
       shipId,
-      scrap: mods.battleStartScrap,
+      chartPicks: [...chartPicks],
+      scrap: mods.battleStartScrap + scrapperScrap,
       charge: Math.min(snapshot.chargeCap, Math.max(0, encounter.startCharge ?? 0)),
-      rerollsLeft: 1,
+      rerollsLeft: singleCast ? 0 : 1,
       rerollSize: rerollBase,
       rerollBase,
       reserveCap: grants.reserveCap + mods.reserveDelta,
@@ -364,7 +377,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const reserved = s.dice.filter((d) => d.state === "reserved").length;
       const blueExtra =
         die.school === "blue" || die.school === "prismatic"
-          ? computePerkMods(s.perks).blueReserveDelta
+          ? computeRunMods(s.perks, s.chartPicks).blueReserveDelta
           : 0;
       if (reserved >= s.reserveCap + blueExtra) return s;
       return {
@@ -427,7 +440,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const useFree = s.freeNudges > 0;
       const cost = Math.max(
         0,
-        NUDGE_COST + computePerkMods(s.perks).nudgeCostDelta,
+        NUDGE_COST + computeRunMods(s.perks, s.chartPicks).nudgeCostDelta,
       );
       if (!useFree && s.charge < cost) return s;
       return {
@@ -650,12 +663,15 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     if (final.pendingDeepScan) {
       useRunStore.setState({ pendingDeepScan: true });
     }
+    const canReroll =
+      finalPhase === "placement" &&
+      !runHasTrait(s.perks, s.chartPicks, "singleCast");
     set({
       ...fromSnapshot(final),
       pendingDeepScan: false,
       phase: finalPhase,
       resolution: null,
-      rerollsLeft: finalPhase === "placement" ? 1 : 0,
+      rerollsLeft: canReroll ? 1 : 0,
       rerollSize: s.rerollBase,
     });
   },
@@ -689,6 +705,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   tide: s.tide,
   interference: s.interference,
   perks: s.perks,
+  chartPicks: s.chartPicks,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
   bloodReactorUsed: s.bloodReactorUsed,

@@ -18,8 +18,12 @@ import { pushRunCloud } from "@/game/run/cloud";
 import { buildEncounterIds } from "@/game/run/encounter";
 import { battleEndAxisDelta, countDeckSchool } from "@/game/run/axis";
 import { emitBark, resetBarkMemory } from "@/game/narrative";
-import { computePerkMods, perkChargeCap } from "@/game/run/perkMods";
+import { computePerkMods } from "@/game/run/perkMods";
+import { computeRunMods, runChargeCap } from "@/game/run/runMods";
 import { rollPerkChoices, SKIP_SCRAP } from "@/game/run/perkDraft";
+import { runShards, runXp } from "@/game/xp";
+import { MILESTONES } from "@/data/milestones";
+import { useSummaryStore } from "@/stores/summaryStore";
 import { captureRunSnapshot } from "@/game/run/snapshot";
 import {
   createStream,
@@ -29,6 +33,7 @@ import {
 import { clearRun, saveRunSnapshot } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
 import { useBattleStore } from "@/stores/battleStore";
+import { useMetaStore } from "@/stores/metaStore";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
 import type { RunValues } from "@/stores/runStore";
 import type { RunSnapshot } from "@/types";
@@ -45,6 +50,36 @@ export interface NodeResult {
   kills?: number;
   deepScan?: boolean;
 }
+
+export const endRun = (win: boolean): void => {
+  const run = useRunStore.getState();
+  const meta = useMetaStore.getState();
+  const counts = {
+    nodes: run.stats.nodesCleared,
+    elites: run.stats.elites,
+    minibosses: run.stats.minibosses,
+    bosses: run.stats.bosses,
+    contractStars: 0,
+  };
+  const xpGain = runXp(counts, meta.ascension.campaign);
+  const shardGain = runShards(counts);
+  const award = meta.awardRun(xpGain, shardGain, win);
+  meta.archiveRunFlags(Object.keys(run.flags));
+  const milestones = MILESTONES.filter(
+    (m) => m.level > award.fromLevel && m.level <= award.toLevel,
+  ).map((m) => m.label);
+  useSummaryStore.getState().setResult({
+    xpGain,
+    shardGain,
+    fromLevel: award.fromLevel,
+    toLevel: award.toLevel,
+    win,
+    milestones,
+  });
+  useRunStore.setState({ active: false });
+  useAppStore.getState().go("summary");
+  autosaveRun();
+};
 
 export const autosaveRun = (): void => {
   try {
@@ -81,12 +116,14 @@ const startBattleNode = (node: MapNode): void => {
   useBattleStore.getState().startBattle(
     {
       enemyIds,
+      shipId: s.shipId,
       tide: s.tide,
       interference: s.interferenceStacks,
       perks: s.perks,
+      chartPicks: s.chartPicks,
       hull: s.hull,
       hullMax: s.hullMax,
-      chargeCap: perkChargeCap(s.perks),
+      chargeCap: runChargeCap(s.perks, s.chartPicks),
       startCharge: mods.startCharge,
       rerollSizeBonus: s.rerollSizeRun,
     },
@@ -117,12 +154,14 @@ export const startEventBattle = (follow: ForcedBattle): void => {
   useBattleStore.getState().startBattle(
     {
       enemyIds,
+      shipId: s.shipId,
       tide: s.tide,
       interference: s.interferenceStacks,
       perks: s.perks,
+      chartPicks: s.chartPicks,
       hull: s.hull,
       hullMax: s.hullMax,
-      chargeCap: perkChargeCap(s.perks),
+      chargeCap: runChargeCap(s.perks, s.chartPicks),
       startCharge: mods.startCharge,
       rerollSizeBonus: s.rerollSizeRun,
     },
@@ -165,7 +204,13 @@ export const startRun = (seed = Date.now() >>> 0): void => {
   const rootSeed = seed >>> 0;
   const streams = createStreams(rootSeed);
   const map = generateSectorMap(streams.map, 1);
-  const hullMax = shipHullMax("wanderer");
+  const meta = useMetaStore.getState();
+  const shipId = meta.selectedShip;
+  const chartPicks = [...meta.chartPicks];
+  const deckIds =
+    meta.hangar.deck.length >= 3 ? meta.hangar.deck : STARTER_DECK;
+  const chartHullDelta = computeRunMods([], chartPicks).hullMaxDelta;
+  const hullMax = Math.max(1, shipHullMax(shipId) + chartHullDelta);
   const values: RunValues = {
     ...createInitialRunValues(),
     active: true,
@@ -179,11 +224,13 @@ export const startRun = (seed = Date.now() >>> 0): void => {
     hull: hullMax,
     hullMax,
     scrap: STARTING_SCRAP,
-    deck: STARTER_DECK.map((defId, index) => ({
+    shipId,
+    chartPicks,
+    deck: deckIds.map((defId, index) => ({
       uid: `d${String(index)}`,
       defId,
     })),
-    deckSeq: STARTER_DECK.length,
+    deckSeq: deckIds.length,
   };
   useRunStore.getState().hydrate(values);
   useBattleStore.getState().reset();
@@ -234,7 +281,15 @@ const finalizeNode = (
   if (result.scrap !== undefined && result.scrap > 0) run.addScrap(result.scrap);
   if (result.setHull !== undefined) run.setHull(result.setHull);
   if (result.deepScan === true) run.setPendingDeepScan(true);
-  run.bumpStats({ nodesCleared: 1, kills: result.kills ?? 0 });
+  const typeDelta =
+    node.type === "elite"
+      ? { elites: 1 }
+      : node.type === "miniboss"
+        ? { minibosses: 1 }
+        : node.type === "boss"
+          ? { bosses: 1 }
+          : {};
+  run.bumpStats({ nodesCleared: 1, kills: result.kills ?? 0, ...typeDelta });
   if (!run.visited.includes(node.id)) {
     useRunStore.setState({ visited: [...run.visited, node.id] });
   }
@@ -253,14 +308,15 @@ const finalizeNode = (
 
   if (hasRewards) {
     useAppStore.getState().go("rewards");
+    autosaveRun();
+    pushRunCloud();
   } else if (node.type === "boss") {
-    useRunStore.setState({ active: false });
-    useAppStore.getState().go("summary");
+    endRun(true);
   } else {
     useAppStore.getState().go("map");
+    autosaveRun();
+    pushRunCloud();
   }
-  autosaveRun();
-  pushRunCloud();
 };
 
 export const completeNode = (result: NodeResult): void => {
@@ -270,9 +326,7 @@ export const completeNode = (result: NodeResult): void => {
   if (node === undefined) return;
 
   if (result.outcome === "defeat") {
-    useRunStore.setState({ active: false });
-    useAppStore.getState().go("summary");
-    autosaveRun();
+    endRun(false);
     return;
   }
   finalizeNode(node, result, null);
@@ -286,13 +340,12 @@ export const finishRewards = (): void => {
       ? undefined
       : nodeById(run.map).get(run.position);
   if (node?.type === "boss") {
-    useRunStore.setState({ active: false });
-    useAppStore.getState().go("summary");
+    endRun(true);
   } else {
     useAppStore.getState().go("map");
+    autosaveRun();
+    pushRunCloud();
   }
-  autosaveRun();
-  pushRunCloud();
 };
 
 export const resolveRunBattle = (): void => {
@@ -304,10 +357,8 @@ export const resolveRunBattle = (): void => {
   if (node === undefined) return;
 
   if (b.outcome === "defeat") {
-    useRunStore.setState({ active: false });
     useBattleStore.getState().reset();
-    useAppStore.getState().go("summary");
-    autosaveRun();
+    endRun(false);
     return;
   }
 
@@ -326,7 +377,7 @@ export const resolveRunBattle = (): void => {
   announceVictory(enemyDefIds, battleHull);
 
   const lootStream = createStream(deriveSeed(run.seed, `loot:${node.id}`));
-  const mods = computePerkMods(run.perks);
+  const mods = computeRunMods(run.perks, run.chartPicks);
   const reward = computeNodeReward(node.type, lootStream);
   const rewardScrap = Math.round(reward.scrap * (1 + mods.scrapMultPct / 100));
   const perkChoices = isDraftNode(node.type)
@@ -359,10 +410,8 @@ export const resolveEventBattle = (): void => {
   }
 
   if (b.outcome === "defeat") {
-    useRunStore.setState({ active: false });
     useBattleStore.getState().reset();
-    useAppStore.getState().go("summary");
-    autosaveRun();
+    endRun(false);
     return;
   }
 
@@ -380,7 +429,7 @@ export const resolveEventBattle = (): void => {
   if (axisDelta !== 0) run.addAxis(axisDelta);
   announceVictory(enemyDefIds, battleHull);
 
-  const mods = computePerkMods(run.perks);
+  const mods = computeRunMods(run.perks, run.chartPicks);
   if (pending.lootDie !== null || pending.lootRarity !== null) {
     const lootStream = createStream(
       deriveSeed(run.seed, `evloot:${pending.originNodeId}`),
