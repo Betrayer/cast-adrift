@@ -1,7 +1,7 @@
 {
   "tagline": "A salvage run through a dead sector",
   "testBattle": "Test Battle",
-  "newRun": "Campaign (slice)",
+  "newRun": "Campaign",
   "hangar": "Hangar",
   "starChart": "Star Chart",
   "collection": "Collection",
@@ -12,5 +12,18 @@
   "cloudFound": "A fresher run was found in the cloud — continue it?",
   "cloudYes": "Cloud run",
   "cloudNo": "Local",
-  "stub": "This screen arrives in Phase {{phase}}."
+  "stub": "This screen arrives in Phase {{phase}}.",
+  "resumeCard": "Continue: Sector {{sector}} · depth {{depth}} · {{when}}",
+  "resumeContinue": "Continue",
+  "resumeAbandon": "Leave it",
+  "resumeWhen": {
+    "now": "just now",
+    "minutes": "{{n}} min ago",
+    "hours": "{{n}} h ago",
+    "days": "{{n}} d ago"
+  },
+  "abandonTitle": "Abandon this run?",
+  "abandonBody": "Both local saves and the cloud copy are erased. There is no going back.",
+  "abandonNo": "Keep it",
+  "abandonYes": "Abandon"
 }

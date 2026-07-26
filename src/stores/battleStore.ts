@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { ENEMY_BY_ID } from "@/data/enemies";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import {
   canCopy,
@@ -66,6 +67,11 @@ export interface BattleEncounter {
   chargeCap?: number;
   startCharge?: number;
   rerollSizeBonus?: number;
+  ascension?: number;
+  enemyHpBonusPct?: number;
+  gateHpBonusPct?: number;
+  eliteShield?: number;
+  scriptedSlots?: readonly (readonly SlotId[])[];
 }
 
 export interface BattleValues {
@@ -103,9 +109,19 @@ export interface BattleValues {
   nextRollBonus: number;
   pendingDeepScan: boolean;
   blockedSlots: BlockedSlot[];
+  shrunkSlots: BlockedSlot[];
   lockedDice: LockedDie[];
   resonance: ResonanceCensus;
   survivedLethal: boolean;
+  lastPlayerDamage: number;
+  stolenScrap: number;
+  pendingTwist: number;
+  pendingSwap: number;
+  pendingStorm: number;
+  ascension: number;
+  introPending: boolean;
+  introEnemyId: string | null;
+  scriptedSlots: SlotId[][] | null;
   outcome?: BattleOutcome;
   resolution: ResolutionBundle | null;
   beats: Beat[];
@@ -119,6 +135,7 @@ export interface BattleValues {
 }
 
 export interface BattleState extends BattleValues {
+  dismissIntro: () => void;
   startBattle: (
     encounter: BattleEncounter,
     deckDefIds: readonly string[],
@@ -181,9 +198,19 @@ export const createInitialBattleValues = (): BattleValues => ({
   nextRollBonus: 0,
   pendingDeepScan: false,
   blockedSlots: [],
+  shrunkSlots: [],
   lockedDice: [],
   resonance: computeCensus([]),
   survivedLethal: false,
+  lastPlayerDamage: 0,
+  stolenScrap: 0,
+  pendingTwist: 0,
+  pendingSwap: 0,
+  pendingStorm: 0,
+  ascension: 0,
+  introPending: false,
+  introEnemyId: null,
+  scriptedSlots: null,
   outcome: undefined,
   resolution: null,
   beats: [],
@@ -222,9 +249,16 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   nextRollBonus: s.nextRollBonus,
   pendingDeepScan: s.pendingDeepScan,
   blockedSlots: s.blockedSlots,
+  shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
   resonance: s.resonance,
   survivedLethal: s.survivedLethal,
+  lastPlayerDamage: s.lastPlayerDamage,
+  stolenScrap: s.stolenScrap,
+  pendingTwist: s.pendingTwist,
+  pendingSwap: s.pendingSwap,
+  pendingStorm: s.pendingStorm,
+  ascension: s.ascension,
   outcome: s.outcome,
 });
 
@@ -253,9 +287,16 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   nextRollBonus: snap.nextRollBonus,
   pendingDeepScan: snap.pendingDeepScan,
   blockedSlots: snap.blockedSlots,
+  shrunkSlots: snap.shrunkSlots,
   lockedDice: snap.lockedDice,
   resonance: snap.resonance,
   survivedLethal: snap.survivedLethal,
+  lastPlayerDamage: snap.lastPlayerDamage,
+  stolenScrap: snap.stolenScrap,
+  pendingTwist: snap.pendingTwist,
+  pendingSwap: snap.pendingSwap,
+  pendingStorm: snap.pendingStorm,
+  ascension: snap.ascension,
   outcome: snap.outcome,
 });
 
@@ -274,6 +315,24 @@ const applyDebugRoll = (
       value: Math.min(Math.max(1, Math.round(forced)), die.tier),
     };
   });
+
+// Prologue overrides (Phase-8 Task 4): a per-turn allow-list of slots, applied at
+// the store boundary so the resolver stays a single engine.
+export const allowedSlotsForTurn = (
+  scriptedSlots: readonly (readonly SlotId[])[] | null,
+  turn: number,
+): readonly SlotId[] | null => {
+  if (scriptedSlots === null) return null;
+  return scriptedSlots[turn - 1] ?? null;
+};
+
+const slotAllowedThisTurn = (
+  s: Pick<BattleValues, "scriptedSlots" | "turn">,
+  slotId: SlotId,
+): boolean => {
+  const allowed = allowedSlotsForTurn(s.scriptedSlots, s.turn);
+  return allowed === null || allowed.includes(slotId);
+};
 
 export const grantsFromCensus = (
   census: ResonanceCensus,
@@ -308,6 +367,10 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         hull: encounter.hull,
         hullMax: encounter.hullMax,
         chargeCap: encounter.chargeCap,
+        ascension: encounter.ascension,
+        enemyHpBonusPct: encounter.enemyHpBonusPct,
+        gateHpBonusPct: encounter.gateHpBonusPct,
+        eliteShield: encounter.eliteShield,
       },
     );
     const grants = grantsFromCensus(snapshot.resonance);
@@ -319,10 +382,20 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const passive = SHIP_BY_ID.get(shipId)?.passive;
     const scrapperScrap = passive?.kind === "scrapper" ? passive.scrap : 0;
     const singleCast = runHasTrait(perks, chartPicks, "singleCast");
+    const introEnemy = snapshot.enemies.find((e) => {
+      const def = ENEMY_BY_ID.get(e.defId);
+      return def?.boss === true || def?.miniboss === true;
+    });
     set({
       ...createInitialBattleValues(),
       ...fromSnapshot(snapshot),
       phase: "placement",
+      introPending: introEnemy !== undefined,
+      introEnemyId: introEnemy?.defId ?? null,
+      scriptedSlots:
+        encounter.scriptedSlots === undefined
+          ? null
+          : encounter.scriptedSlots.map((row) => [...row]),
       shipId,
       chartPicks: [...chartPicks],
       scrap: mods.battleStartScrap + scrapperScrap,
@@ -337,9 +410,14 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     });
   },
 
+  dismissIntro: () => {
+    set({ introPending: false });
+  },
+
   placeDie: (uid, slotId) => {
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
+      if (!slotAllowedThisTurn(s, slotId)) return s;
       if (!canPlaceDie(toSnapshot(s), uid, slotId)) return s;
       const slot = s.slots[slotId];
       if (slot === undefined) return s;
@@ -727,9 +805,19 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   nextRollBonus: s.nextRollBonus,
   pendingDeepScan: s.pendingDeepScan,
   blockedSlots: s.blockedSlots,
+  shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
   resonance: s.resonance,
   survivedLethal: s.survivedLethal,
+  lastPlayerDamage: s.lastPlayerDamage,
+  stolenScrap: s.stolenScrap,
+  pendingTwist: s.pendingTwist,
+  pendingSwap: s.pendingSwap,
+  pendingStorm: s.pendingStorm,
+  ascension: s.ascension,
+  introPending: s.introPending,
+  introEnemyId: s.introEnemyId,
+  scriptedSlots: s.scriptedSlots,
   outcome: s.outcome,
   resolution: s.resolution,
   beats: s.beats,

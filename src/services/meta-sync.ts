@@ -47,6 +47,8 @@ const metaValues = (): MetaValues => {
     contracts: s.contracts,
     ascension: s.ascension,
     flagsArchive: s.flagsArchive,
+    bossFirstKills: s.bossFirstKills,
+    endings: s.endings,
     stats: s.stats,
   };
 };

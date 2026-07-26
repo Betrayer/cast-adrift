@@ -1,0 +1,86 @@
+.kicker {
+  font-size: 12px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.plate {
+  animation: plateIn 420ms cubic-bezier(0.2, 0.9, 0.3, 1.1) both;
+}
+
+@keyframes plateIn {
+  from {
+    opacity: 0;
+    transform: translateX(-26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+}
+
+.pip {
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid #6b3a3f;
+  background: rgba(240, 160, 154, 0.1);
+  color: #f0a09a;
+  font-size: 12px;
+  font-weight: 600;
+  animation: pipIn 320ms ease-out both;
+}
+
+@keyframes pipIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.bossFall {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 6;
+  background: radial-gradient(
+    circle at 50% 42%,
+    rgba(255, 240, 220, 0.55),
+    rgba(11, 15, 26, 0) 62%
+  );
+  animation: bossBurst 320ms ease-out both;
+}
+
+@keyframes bossBurst {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  35% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.2);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .plate,
+  .pip,
+  .bossFall {
+    animation: none;
+  }
+}

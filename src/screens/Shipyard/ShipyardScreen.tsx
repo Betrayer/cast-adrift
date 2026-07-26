@@ -29,6 +29,7 @@ export const ShipyardScreen = () => {
   const deck = useRunStore((s) => s.deck);
   const shipId = useRunStore((s) => s.shipId);
   const shipyardDiscount = useRunStore((s) => s.shipyardDiscount);
+  const vouchers = useRunStore((s) => s.vouchers);
   const [repair, setRepair] = useState(0);
 
   const discountedMk = (target: Exclude<MkLevel, 1>): number =>
@@ -62,6 +63,15 @@ export const ShipyardScreen = () => {
     if (!state.spendScrap(cost)) return;
     state.bumpMk(slotId);
     if (state.shipyardDiscount > 0) useRunStore.setState({ shipyardDiscount: 0 });
+    autosaveRun();
+  };
+
+  // The mini-boss Mk-voucher: one free tier at any shipyard, no scrap spent.
+  const redeemVoucher = (slotId: SlotId): void => {
+    const state = useRunStore.getState();
+    if ((state.mkLevels[slotId] ?? 1) >= 3) return;
+    if (!state.spendVoucher()) return;
+    state.bumpMk(slotId);
     autosaveRun();
   };
 
@@ -103,6 +113,12 @@ export const ShipyardScreen = () => {
         </Group>
       </Group>
 
+      {vouchers > 0 ? (
+        <Text size="xs" c={tokens.accent}>
+          {t("run:shipyard.voucher", { n: vouchers })}
+        </Text>
+      ) : null}
+
       <Divider color={tokens.line} label={t("run:shipyard.systems")} />
       <ScrollArea.Autosize mah={260}>
         <Stack gap={6}>
@@ -125,17 +141,31 @@ export const ShipyardScreen = () => {
                       })}
                     </Text>
                   </Stack>
-                  <Button
-                    size="compact-sm"
-                    disabled={maxed || scrap < cost}
-                    onClick={() => {
-                      buyMk(slotId);
-                    }}
-                  >
-                    {maxed
-                      ? t("run:shipyard.mkMax")
-                      : t("run:shipyard.mk", { mk: target, cost })}
-                  </Button>
+                  <Group gap={6} wrap="nowrap">
+                    {vouchers > 0 && !maxed ? (
+                      <Button
+                        size="compact-sm"
+                        variant="light"
+                        color="accent"
+                        onClick={() => {
+                          redeemVoucher(slotId);
+                        }}
+                      >
+                        {t("run:shipyard.voucherUse")}
+                      </Button>
+                    ) : null}
+                    <Button
+                      size="compact-sm"
+                      disabled={maxed || scrap < cost}
+                      onClick={() => {
+                        buyMk(slotId);
+                      }}
+                    >
+                      {maxed
+                        ? t("run:shipyard.mkMax")
+                        : t("run:shipyard.mk", { mk: target, cost })}
+                    </Button>
+                  </Group>
                 </Group>
               </Paper>
             );

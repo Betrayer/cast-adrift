@@ -29,6 +29,12 @@ export const pushCloud = async (
   return true;
 };
 
+export const deleteCloud = async (uid: string): Promise<void> => {
+  const { db } = await import("@/services/firebase");
+  const { doc, deleteDoc } = await import("firebase/firestore");
+  await deleteDoc(doc(db(), "users", uid, "run", "current"));
+};
+
 export const pullCloud = async (uid: string): Promise<CloudRun | null> => {
   const { db } = await import("@/services/firebase");
   const { doc, getDoc } = await import("firebase/firestore");

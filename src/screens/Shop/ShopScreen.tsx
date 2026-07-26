@@ -9,6 +9,7 @@ import {
 } from "@mantine/core";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { ascensionMods } from "@/data/ascension";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { schools } from "@/data/schools";
@@ -39,7 +40,11 @@ export const ShopScreen = () => {
   const shop = useRunStore((s) => s.shop);
   const setShop = useRunStore((s) => s.setShop);
 
-  const discount = computePerkMods(perks).shopDiscountPct + flagShopDiscount(flags);
+  const ascension = useRunStore((s) => s.ascension);
+  const discount =
+    computePerkMods(perks).shopDiscountPct +
+    flagShopDiscount(flags) -
+    ascensionMods(ascension).shopPricePct;
   const nodeId = position ?? "";
 
   useEffect(() => {
@@ -49,7 +54,8 @@ export const ShopScreen = () => {
     if (current !== null && current.nodeId === nodeId) return;
     const pct =
       computePerkMods(state.perks).shopDiscountPct +
-      flagShopDiscount(state.flags);
+      flagShopDiscount(state.flags) -
+      ascensionMods(state.ascension).shopPricePct;
     state.setShop({
       nodeId,
       rerolls: 0,

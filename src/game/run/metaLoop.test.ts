@@ -8,7 +8,7 @@ import {
 } from "@/game/chart/engine";
 import { hangarBudget } from "@/data/milestones";
 import { validateDeck } from "@/game/meta/deck";
-import { runShards, runXp } from "@/game/xp";
+import { campaignShards, runXp } from "@/game/xp";
 import { endRun, startRun } from "@/game/run/flow";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
@@ -29,7 +29,8 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
       hangar: { deck: ["red-d6", "red-d6", "blue-d6", "grey-d4", "green-d4"] },
       themes: ["deepSpace"], codex: [], codexRead: [], contracts: {},
       ascension: { campaign: 0 }, flagsArchive: [],
-      stats: { runs: 0, wins: 0, shardsEarned: 0 },
+      bossFirstKills: [], endings: [],
+      stats: { runs: 0, wins: 0, shardsEarned: 0, prologueDone: false, campaignClears: 0 },
     });
 
     // [1] Run-end award (boss-win path)
@@ -44,9 +45,9 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
     const meta1 = useMetaStore.getState();
     expect(result).not.toBeNull();
     expect(result?.xpGain).toBe(runXp(counts));
-    expect(result?.shardGain).toBe(runShards(counts));
+    expect(result?.shardGain).toBe(campaignShards(5));
     expect(meta1.xp).toBe(runXp(counts));
-    expect(meta1.shards).toBe(runShards(counts));
+    expect(meta1.shards).toBe(campaignShards(5));
     expect(result?.fromLevel).toBe(1);
     expect(result?.toLevel).toBeGreaterThan(1);
     expect(result?.milestones.length).toBeGreaterThan(0);

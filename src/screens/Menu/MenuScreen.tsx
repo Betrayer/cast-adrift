@@ -17,10 +17,10 @@ import { tokens } from '@/app/theme';
 import { progressWithinLevel } from '@/game/xp';
 import { useMetaStore } from '@/stores/metaStore';
 import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
-import { startRun } from '@/game/run/flow';
 import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
 import { mountMenuBg } from '@/pixi/menuBg';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
+import { ResumeCard } from '@/screens/Menu/ResumeCard';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
@@ -29,12 +29,12 @@ interface MenuEntry {
   key: string;
   screen: ScreenId;
   phase?: number;
-  action?: 'startRun';
+  action?: 'startCampaign';
 }
 
 const ENTRIES: readonly MenuEntry[] = [
   { key: 'testBattle', screen: 'battle' },
-  { key: 'newRun', screen: 'map', action: 'startRun' },
+  { key: 'newRun', screen: 'runSetup', action: 'startCampaign' },
   { key: 'hangar', screen: 'hangar' },
   { key: 'starChart', screen: 'chart' },
   { key: 'collection', screen: 'collection' },
@@ -50,6 +50,7 @@ export const MenuScreen = () => {
   const xp = useMetaStore((s) => s.xp);
   const progress = progressWithinLevel(xp);
   const cloudResume = useAppStore((s) => s.cloudResume);
+  const prologueDone = useMetaStore((s) => s.stats.prologueDone);
   const [localResume] = useState(readLocalResume);
   const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
   const osReducedMotion = useReducedMotion(false);
@@ -65,13 +66,13 @@ export const MenuScreen = () => {
 
   const onSelect = useCallback(
     (entry: MenuEntry) => () => {
-      if (entry.action === 'startRun') {
-        startRun();
+      if (entry.action === 'startCampaign') {
+        go(prologueDone ? 'runSetup' : 'prologue');
         return;
       }
       go(entry.screen);
     },
-    [go],
+    [go, prologueDone],
   );
 
   return (
@@ -146,18 +147,7 @@ export const MenuScreen = () => {
               </Stack>
             </Paper>
           ) : localResume !== null ? (
-            <Button
-              size="md"
-              color="accent"
-              onClick={() => {
-                resumeLocalRun();
-              }}
-            >
-              {t('menu:resume', {
-                sector: localResume.sector,
-                depth: localResume.depth,
-              })}
-            </Button>
+            <ResumeCard resume={localResume} />
           ) : null}
           {ENTRIES.map((entry) => (
             <Button

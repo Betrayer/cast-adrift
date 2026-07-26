@@ -94,6 +94,7 @@ const dummyEnemy = (incoming: Intent | undefined, burn: number): EnemyState => (
   nextIntent: incoming ?? { t: "attack", n: 0 },
   statuses: burn > 0 ? { burn } : {},
   subsystems: [],
+  phase: 0,
 });
 
 const buildSnapshot = (
@@ -155,9 +156,16 @@ const buildSnapshot = (
     bloodReactorUsed: false,
     burnDoubleUsed: false,
     blockedSlots: [],
+    shrunkSlots: [],
     lockedDice: [],
     resonance: computeCensus(dice),
     survivedLethal: false,
+    lastPlayerDamage: 0,
+    stolenScrap: 0,
+    pendingTwist: 0,
+    pendingSwap: 0,
+    pendingStorm: 0,
+    ascension: 0,
   };
 };
 

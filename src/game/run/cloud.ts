@@ -1,4 +1,4 @@
-import { pullCloud, pushCloud } from "@/services/cloud";
+import { deleteCloud, pullCloud, pushCloud } from "@/services/cloud";
 import { localSavedAt } from "@/services/save";
 import {
   captureRunSnapshot,
@@ -60,6 +60,25 @@ export const restoreCloudRun = (): boolean => {
   pendingCloud = null;
   useAppStore.getState().setCloudResume(false);
   return ok;
+};
+
+// Abandon clears both local slots (via flow) and the cloud doc, so the run does
+// not come back on the next device.
+export const dropCloudRun = async (): Promise<void> => {
+  if (cloudTimer !== null) {
+    clearTimeout(cloudTimer);
+    cloudTimer = null;
+  }
+  pendingCloud = null;
+  useAppStore.getState().setCloudResume(false);
+  try {
+    const { ensureAnonAuth } = await import("@/services/firebase");
+    const uid = await ensureAnonAuth();
+    if (uid === null) return;
+    await deleteCloud(uid);
+  } catch (error) {
+    console.warn("cloud: delete failed", error);
+  }
 };
 
 export const dismissCloudRun = (): void => {

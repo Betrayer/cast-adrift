@@ -26,9 +26,9 @@ export const incomingEstimate = (snapshot: BattleSnapshot): number => {
     if (enemy.hp <= 0) continue;
     const intent = enemy.nextIntent;
     if (intent.t !== "attack" && intent.t !== "multi") continue;
-    const aura = enemy.subsystems.some((s) => s.hp > 0 && s.aura === "atk+2")
-      ? 2
-      : 0;
+    const aura =
+      (enemy.subsystems.some((s) => s.hp > 0 && s.aura === "atk+2") ? 2 : 0) +
+      (enemy.subsystems.some((s) => s.hp > 0 && s.aura === "atk+3") ? 3 : 0);
     const mult = enemy.statuses.charge !== undefined ? 2 : 1;
     const hits = intent.t === "multi" ? intent.k : 1;
     total += (intent.n + aura) * mult * hits;

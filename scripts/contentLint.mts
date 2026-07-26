@@ -5,8 +5,8 @@ import { STARTER_DECK } from "../src/data/decks";
 import { ALL_DICE } from "../src/data/dice";
 import {
   ENCOUNTER_GROUPS,
-  SECTOR1_ENEMIES,
-} from "../src/data/enemies/sector1";
+  ALL_ENEMIES,
+} from "../src/data/enemies";
 import { ALL_EVENTS } from "../src/data/events";
 import { ALL_PERKS } from "../src/data/perks";
 import { PHASE5_PERKS } from "../src/data/perks/phase5";
@@ -81,7 +81,7 @@ checkUniqueIds(
 );
 checkUniqueIds(
   "enemies",
-  SECTOR1_ENEMIES.map((e) => e.id),
+  ALL_ENEMIES.map((e) => e.id),
 );
 checkUniqueIds(
   "ships",
@@ -113,12 +113,12 @@ for (const bonus of RESONANCE_BONUSES) {
   checkEffects(`resonance.${bonus.school}-${String(bonus.threshold)}`, bonus.effects);
 }
 
-const enemyIds = new Set(SECTOR1_ENEMIES.map((e) => e.id));
+const enemyIds = new Set(ALL_ENEMIES.map((e) => e.id));
 
 const flattenStep = (step: PatternStep): Intent[] =>
   "pick" in step ? step.pick.map(([intent]) => intent) : [step];
 
-for (const enemy of SECTOR1_ENEMIES) {
+for (const enemy of ALL_ENEMIES) {
   if (enemy.pattern.length === 0)
     errors.push(`enemies: "${enemy.id}" has an empty pattern`);
   if (enemy.hp <= 0) errors.push(`enemies: "${enemy.id}" hp must be positive`);
@@ -395,5 +395,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(SECTOR1_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks`,
+  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(ALL_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks`,
 );

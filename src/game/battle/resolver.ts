@@ -1,5 +1,5 @@
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
-import { ENEMY_BY_ID } from "@/data/enemies/sector1";
+import { ENEMY_BY_ID } from "@/data/enemies";
 import { SHIP_BY_ID, shipHasPassive } from "@/data/ships";
 import {
   aliveEnemies,
@@ -12,9 +12,13 @@ import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import {
   applyObsidianPact,
   drawIntent,
+  effectiveCap,
+  everyTurnFor,
   isDieLocked,
   isSlotBlocked,
+  isSlotShrunk,
   MAX_ENEMIES,
+  phaseIndexForHp,
   spawnEnemy,
 } from "@/game/battle/setup";
 import { applyStatus, consumeStatus, tickBurn } from "@/game/battle/statuses";
@@ -33,6 +37,7 @@ import type {
   BattleSnapshot,
   Beat,
   EnemyBeat,
+  EnemyBeatKind,
   EnemyState,
   EngineTier,
   RolledDie,
@@ -40,6 +45,7 @@ import type {
   SlotState,
   SubsystemState,
 } from "@/types/battle";
+import type { EnemyDef, Intent } from "@/types/content";
 
 export const RESOLUTION_ORDER: readonly SlotId[] = [
   "sensors",
@@ -60,6 +66,7 @@ export const OVERFLOW_HULL_COST = 2;
 export const NUDGE_COST = 3;
 export const BONUS_REROLL_COST = 5;
 export const SURGE_COST = 10;
+export const MIRROR_CAP = 12;
 export const BASE_REROLL_SIZE = 2;
 export const OVER_CAP_HULL_COST = 1;
 export const REFLECT_DODGE_DAMAGE = 3;
@@ -80,6 +87,11 @@ const hasAliveAura = (
   enemy: EnemyState,
   aura: SubsystemState["aura"],
 ): boolean => enemy.subsystems.some((s) => s.hp > 0 && s.aura === aura);
+
+const countAliveAura = (
+  enemy: EnemyState,
+  aura: SubsystemState["aura"],
+): number => enemy.subsystems.filter((s) => s.hp > 0 && s.aura === aura).length;
 
 const guardLethal = (next: BattleSnapshot): void => {
   if (
@@ -303,7 +315,7 @@ const resolveSlot = (
   const isWeapon =
     slotId === "weaponA" || slotId === "weaponB" || slotId === "spinal";
 
-  if (die.tier > slot.cap) {
+  if (die.tier > effectiveCap(next, slotId, slot)) {
     const overload =
       isWeapon &&
       next.shipId !== undefined &&
@@ -404,6 +416,10 @@ export const resolvePlayerPhase = (
     next.scrap += next.dice.filter((d) => d.state === "tray").length;
   }
 
+  next.lastPlayerDamage = beats
+    .filter((b) => b.kind === "damage")
+    .reduce((sum, b) => sum + b.amount, 0);
+
   finalizeOutcome(next);
   return { next, beats };
 };
@@ -419,7 +435,9 @@ const applyAttack = (
   hits: number,
   context: AttackContext,
 ): { dealt: number; hullDamage: number; shieldDamage: number } => {
-  const aura = hasAliveAura(enemy, "atk+2") ? 2 : 0;
+  const aura =
+    (hasAliveAura(enemy, "atk+2") ? 2 : 0) +
+    (hasAliveAura(enemy, "atk+3") ? 3 : 0);
   const tide = Math.max(0, next.tide) + Math.max(0, next.interference);
   const perkMods = computeRunMods(next.perks, next.chartPicks ?? []);
   const reflectDodge = hasTrait(next.perks, "reflectDodge");
@@ -472,52 +490,69 @@ const lockRandomTrayDie = (
   return die.uid;
 };
 
-export const resolveEnemyPhase = (
-  snapshot: BattleSnapshot,
+export const stealScrap = (next: BattleSnapshot, n: number): number => {
+  const fromBattle = Math.min(next.scrap, n);
+  next.scrap -= fromBattle;
+  next.stolenScrap += n - fromBattle;
+  return n;
+};
+
+const shrinkRandomSlot = (
+  next: BattleSnapshot,
   enemyStream: RngStream,
-): { next: BattleSnapshot; beats: EnemyBeat[] } => {
-  const next = clone(snapshot);
-  const beats: EnemyBeat[] = [];
-  const context: AttackContext = { dodgeSpent: false };
+): SlotId | undefined => {
+  const candidates = (Object.keys(next.slots) as SlotId[]).filter(
+    (slotId) => !isSlotShrunk(next, slotId),
+  );
+  if (candidates.length === 0) return undefined;
+  const slot = enemyStream.pick(candidates);
+  next.shrunkSlots.push({ slot, untilTurn: next.turn + 1 });
+  return slot;
+};
 
-  for (const enemy of aliveEnemies(next)) {
-    if (hasAliveAura(enemy, "shieldAllies3")) {
-      for (const ally of aliveEnemies(next)) ally.shield += 3;
-      beats.push({
-        enemyId: enemy.id,
-        kind: "shieldAll",
-        amount: 3,
-        hullDamage: 0,
-        shieldDamage: 0,
-        after: clone(next),
-      });
-    }
-    if (hasAliveAura(enemy, "lockEachTurn")) {
-      const uid = lockRandomTrayDie(next, enemyStream);
-      if (uid !== undefined) {
-        beats.push({
-          enemyId: enemy.id,
-          kind: "lockDie",
-          amount: 0,
-          hullDamage: 0,
-          shieldDamage: 0,
-          dieUid: uid,
-          after: clone(next),
-        });
-      }
-    }
-  }
+interface EnemyPhaseCtx {
+  next: BattleSnapshot;
+  beats: EnemyBeat[];
+  enemyStream: RngStream;
+  attack: AttackContext;
+}
 
-  for (const enemy of next.enemies) {
-    if (enemy.hp <= 0) continue;
-    const def = ENEMY_BY_ID.get(enemy.defId);
-    if (def === undefined) continue;
-    const intent = enemy.nextIntent;
+const pushBeat = (
+  ctx: EnemyPhaseCtx,
+  enemyId: string,
+  kind: EnemyBeatKind,
+  amount = 0,
+  extra: Partial<EnemyBeat> = {},
+): void => {
+  ctx.beats.push({
+    enemyId,
+    kind,
+    amount,
+    hullDamage: 0,
+    shieldDamage: 0,
+    ...extra,
+    after: clone(ctx.next),
+  });
+};
 
-    if (intent.t === "attack" || intent.t === "multi") {
+const stealsOnHit = (enemy: EnemyState, def: EnemyDef): number => {
+  if (hasAliveAura(enemy, "stealOnHit6")) return 6;
+  return def.stealOnHit ?? 0;
+};
+
+const resolveIntent = (
+  ctx: EnemyPhaseCtx,
+  enemy: EnemyState,
+  def: EnemyDef,
+  intent: Intent,
+): void => {
+  const { next, enemyStream } = ctx;
+  switch (intent.t) {
+    case "attack":
+    case "multi": {
       const hits = intent.t === "multi" ? intent.k : 1;
-      const result = applyAttack(next, enemy, intent.n, hits, context);
-      beats.push({
+      const result = applyAttack(next, enemy, intent.n, hits, ctx.attack);
+      ctx.beats.push({
         enemyId: enemy.id,
         kind: "attack",
         amount: result.dealt,
@@ -525,88 +560,211 @@ export const resolveEnemyPhase = (
         shieldDamage: result.shieldDamage,
         after: clone(next),
       });
-    } else if (intent.t === "shield") {
+      const steal = stealsOnHit(enemy, def);
+      if (steal > 0 && result.dealt > 0) {
+        stealScrap(next, steal);
+        pushBeat(ctx, enemy.id, "steal", steal);
+      }
+      if (intent.t === "attack" && (intent.self ?? 0) > 0) {
+        enemy.hp = Math.max(0, enemy.hp - (intent.self ?? 0));
+        if (enemy.hp === 0) {
+          for (const sub of enemy.subsystems) sub.hp = 0;
+          handleDeath(next, enemy);
+          if (enemy.id === next.targetId) {
+            next.targetId = aliveEnemies(next)[0]?.id ?? null;
+          }
+        }
+      }
+      return;
+    }
+    case "shield":
       enemy.shield += intent.n;
-      beats.push({
-        enemyId: enemy.id,
-        kind: "shield",
-        amount: intent.n,
-        hullDamage: 0,
-        shieldDamage: 0,
-        after: clone(next),
-      });
-    } else if (intent.t === "shieldAll") {
+      pushBeat(ctx, enemy.id, "shield", intent.n);
+      return;
+    case "shieldAll":
       for (const ally of aliveEnemies(next)) ally.shield += intent.n;
-      beats.push({
-        enemyId: enemy.id,
-        kind: "shieldAll",
-        amount: intent.n,
-        hullDamage: 0,
-        shieldDamage: 0,
-        after: clone(next),
-      });
-    } else if (intent.t === "charge") {
+      pushBeat(ctx, enemy.id, "shieldAll", intent.n);
+      return;
+    case "healAllies":
+      for (const ally of aliveEnemies(next)) {
+        ally.hp = Math.min(ally.hpMax, ally.hp + intent.n);
+      }
+      pushBeat(ctx, enemy.id, "heal", intent.n);
+      return;
+    case "charge":
       applyStatus(enemy.statuses, "charge");
-      beats.push({
+      pushBeat(ctx, enemy.id, "charge");
+      return;
+    case "mirrorHalf": {
+      const mirrored = Math.min(
+        MIRROR_CAP,
+        Math.ceil(Math.max(0, next.lastPlayerDamage) / 2),
+      );
+      const result = applyAttack(next, enemy, mirrored, 1, ctx.attack);
+      ctx.beats.push({
         enemyId: enemy.id,
-        kind: "charge",
-        amount: 0,
-        hullDamage: 0,
-        shieldDamage: 0,
+        kind: "attack",
+        amount: result.dealt,
+        hullDamage: result.hullDamage,
+        shieldDamage: result.shieldDamage,
         after: clone(next),
       });
-    } else if (intent.t === "jamSlot") {
+      return;
+    }
+    case "stealScrap":
+      stealScrap(next, intent.n);
+      pushBeat(ctx, enemy.id, "steal", intent.n);
+      return;
+    case "jamSlot": {
       const candidates = (Object.keys(next.slots) as SlotId[]).filter(
         (slotId) => !isSlotBlocked(next, slotId),
       );
-      if (candidates.length > 0) {
-        const slot = enemyStream.pick(candidates);
-        next.blockedSlots.push({ slot, untilTurn: next.turn + 1 });
-        beats.push({
-          enemyId: enemy.id,
-          kind: "jamSlot",
-          amount: 0,
-          hullDamage: 0,
-          shieldDamage: 0,
-          slot,
-          after: clone(next),
-        });
-      }
-    } else if (intent.t === "lockDie") {
+      if (candidates.length === 0) return;
+      const slot = enemyStream.pick(candidates);
+      next.blockedSlots.push({ slot, untilTurn: next.turn + 1 });
+      pushBeat(ctx, enemy.id, "jamSlot", 0, { slot });
+      return;
+    }
+    case "capShrink": {
+      const slot = shrinkRandomSlot(next, enemyStream);
+      if (slot === undefined) return;
+      pushBeat(ctx, enemy.id, "capShrink", 0, { slot });
+      return;
+    }
+    case "lockDie": {
       const uid = lockRandomTrayDie(next, enemyStream);
-      if (uid !== undefined) {
-        beats.push({
-          enemyId: enemy.id,
-          kind: "lockDie",
-          amount: 0,
-          hullDamage: 0,
-          shieldDamage: 0,
-          dieUid: uid,
-          after: clone(next),
-        });
-      }
-    } else {
-      if (aliveEnemies(next).length < MAX_ENEMIES) {
-        const spawned = spawnEnemy(
-          intent.id,
+      if (uid === undefined) return;
+      pushBeat(ctx, enemy.id, "lockDie", 0, { dieUid: uid });
+      return;
+    }
+    case "twistDie":
+      next.pendingTwist += 1;
+      pushBeat(ctx, enemy.id, "twist");
+      return;
+    case "swapValues":
+      next.pendingSwap += 1;
+      pushBeat(ctx, enemy.id, "swap");
+      return;
+    case "storm":
+      next.pendingStorm += 1;
+      pushBeat(ctx, enemy.id, "storm");
+      return;
+    case "summon": {
+      if (aliveEnemies(next).length >= MAX_ENEMIES) return;
+      const spawned = spawnEnemy(
+        intent.id,
+        `enemy-${String(next.enemies.length)}`,
+        enemyStream,
+        { tide: next.tide, ascension: next.ascension },
+      );
+      next.enemies.push(spawned);
+      pushBeat(ctx, enemy.id, "summon");
+      return;
+    }
+  }
+};
+
+const syncPhases = (ctx: EnemyPhaseCtx): void => {
+  for (const enemy of aliveEnemies(ctx.next)) {
+    const def = ENEMY_BY_ID.get(enemy.defId);
+    if (def?.phases === undefined || def.phases.length === 0) continue;
+    const target = phaseIndexForHp(
+      def,
+      enemy.hp,
+      enemy.hpMax,
+      ctx.next.ascension,
+    );
+    if (target === enemy.phase) continue;
+    enemy.phase = target;
+    enemy.intentIndex = 0;
+    enemy.nextIntent = drawIntent(def, 0, ctx.enemyStream, target);
+    pushBeat(ctx, enemy.id, "phase", target);
+    for (const intent of def.phases[target]?.onEnter ?? []) {
+      resolveIntent(ctx, enemy, def, intent);
+    }
+  }
+};
+
+const resolveAuras = (ctx: EnemyPhaseCtx): void => {
+  const { next, enemyStream } = ctx;
+  for (const enemy of aliveEnemies(next)) {
+    if (hasAliveAura(enemy, "shieldAllies3")) {
+      for (const ally of aliveEnemies(next)) ally.shield += 3;
+      pushBeat(ctx, enemy.id, "shieldAll", 3);
+    }
+    if (hasAliveAura(enemy, "shieldSelf6")) {
+      enemy.shield += 6;
+      pushBeat(ctx, enemy.id, "shield", 6);
+    }
+    // The hymn swells every third turn rather than every turn: a permanent
+    // ally-wide charge doubles every incoming hit and is not survivable.
+    if (hasAliveAura(enemy, "chargeAllies") && next.turn % 3 === 0) {
+      for (const ally of aliveEnemies(next)) applyStatus(ally.statuses, "charge");
+      pushBeat(ctx, enemy.id, "charge");
+    }
+    // Each eye twists: killing one halves the pressure, which is the whole
+    // reason to shoot the Maw's subsystems.
+    const twists = countAliveAura(enemy, "twistEachTurn");
+    if (twists > 0) {
+      next.pendingTwist += twists;
+      pushBeat(ctx, enemy.id, "twist", twists);
+    }
+    const locksNow =
+      hasAliveAura(enemy, "lockEachTurn") ||
+      (hasAliveAura(enemy, "lockEvery3") && next.turn % 3 === 0);
+    if (locksNow) {
+      const uid = lockRandomTrayDie(next, enemyStream);
+      if (uid !== undefined) pushBeat(ctx, enemy.id, "lockDie", 0, { dieUid: uid });
+    }
+    if (
+      hasAliveAura(enemy, "summonEvery4") &&
+      next.turn % 4 === 0 &&
+      aliveEnemies(next).length < MAX_ENEMIES
+    ) {
+      next.enemies.push(
+        spawnEnemy(
+          "choirAcolyte",
           `enemy-${String(next.enemies.length)}`,
           enemyStream,
-          next.tide,
-        );
-        next.enemies.push(spawned);
-        beats.push({
-          enemyId: enemy.id,
-          kind: "summon",
-          amount: 0,
-          hullDamage: 0,
-          shieldDamage: 0,
-          after: clone(next),
-        });
-      }
+          { tide: next.tide, ascension: next.ascension },
+        ),
+      );
+      pushBeat(ctx, enemy.id, "summon");
     }
+  }
+};
 
-    enemy.intentIndex = (enemy.intentIndex + 1) % def.pattern.length;
-    enemy.nextIntent = drawIntent(def, enemy.intentIndex, enemyStream);
+export const resolveEnemyPhase = (
+  snapshot: BattleSnapshot,
+  enemyStream: RngStream,
+): { next: BattleSnapshot; beats: EnemyBeat[] } => {
+  const next = clone(snapshot);
+  const beats: EnemyBeat[] = [];
+  const ctx: EnemyPhaseCtx = {
+    next,
+    beats,
+    enemyStream,
+    attack: { dodgeSpent: false },
+  };
+
+  syncPhases(ctx);
+  resolveAuras(ctx);
+
+  for (const enemy of next.enemies) {
+    if (enemy.hp <= 0) continue;
+    const def = ENEMY_BY_ID.get(enemy.defId);
+    if (def === undefined) continue;
+
+    for (const extra of everyTurnFor(def, enemy.phase)) {
+      resolveIntent(ctx, enemy, def, extra);
+    }
+    if (enemy.hp <= 0) continue;
+
+    resolveIntent(ctx, enemy, def, enemy.nextIntent);
+
+    const pattern = def.phases?.[enemy.phase]?.pattern ?? def.pattern;
+    enemy.intentIndex = (enemy.intentIndex + 1) % pattern.length;
+    enemy.nextIntent = drawIntent(def, enemy.intentIndex, enemyStream, enemy.phase);
   }
 
   for (const enemy of aliveEnemies(next)) {
@@ -644,6 +802,41 @@ export const resolveEnemyPhase = (
   return { next, beats };
 };
 
+const clampToTier = (die: RolledDie, value: number): number =>
+  Math.min(die.tier, Math.max(1, value));
+
+// Phase-8 amendment 2: enemy dice-manipulation lands on the fresh roll, before
+// the resonance floors and Obsidian Pact re-assert their invariants.
+export const applyPendingTwists = (
+  next: BattleSnapshot,
+  dice: RolledDie[],
+  rng: RngStream,
+): void => {
+  for (let i = 0; i < next.pendingTwist && dice.length > 0; i += 1) {
+    const die = rng.pick(dice);
+    const reroll = rng.int(1, die.tier) + (die.growth ?? 0);
+    die.value = clampToTier(die, Math.min(die.value, reroll));
+  }
+  for (let i = 0; i < next.pendingSwap && dice.length > 1; i += 1) {
+    const sorted = [...dice].sort((a, b) => a.value - b.value);
+    const low = sorted[0];
+    const high = sorted[sorted.length - 1];
+    if (low === undefined || high === undefined || low.uid === high.uid) break;
+    const lowValue = low.value;
+    low.value = clampToTier(low, high.value);
+    high.value = clampToTier(high, lowValue);
+  }
+  for (let i = 0; i < next.pendingStorm; i += 1) {
+    for (let k = 0; k < 2 && dice.length > 0; k += 1) {
+      const die = rng.pick(dice);
+      die.value = clampToTier(die, die.value + rng.pick([-1, 1]));
+    }
+  }
+  next.pendingTwist = 0;
+  next.pendingSwap = 0;
+  next.pendingStorm = 0;
+};
+
 export const advanceTurn = (
   snapshot: BattleSnapshot,
   streams: RngStreams,
@@ -651,6 +844,7 @@ export const advanceTurn = (
   const next = clone(snapshot);
   next.turn += 1;
   next.blockedSlots = next.blockedSlots.filter((b) => b.untilTurn >= next.turn);
+  next.shrunkSlots = next.shrunkSlots.filter((b) => b.untilTurn >= next.turn);
   next.lockedDice = next.lockedDice.filter((l) => l.untilTurn >= next.turn);
   next.dice = next.dice.map((die) => {
     if (isDieLocked(next, die.uid)) {
@@ -680,6 +874,7 @@ export const advanceTurn = (
   const rolledDice = next.dice.filter(
     (d) => d.state === "tray" && d.lastValue !== undefined,
   );
+  applyPendingTwists(next, rolledDice, streams.dice);
   applyRollFloors(rolledDice, next.resonance, hasTrait(next.perks, "stabilizer"));
   if (hasTrait(next.perks, "spareLowest")) applySpareLowest(rolledDice);
   applyObsidianPact(rolledDice, next.perks, next.chartPicks ?? []);

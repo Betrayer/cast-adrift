@@ -14,6 +14,8 @@ export interface MetaStats {
   runs: number;
   wins: number;
   shardsEarned: number;
+  prologueDone: boolean;
+  campaignClears: number;
 }
 
 export interface MetaValues {
@@ -31,6 +33,8 @@ export interface MetaValues {
   contracts: Record<string, number>;
   ascension: { campaign: number };
   flagsArchive: string[];
+  bossFirstKills: string[];
+  endings: string[];
   stats: MetaStats;
 }
 
@@ -55,9 +59,13 @@ export interface MetaState extends MetaValues {
   buyShip: (id: ShipId, price: number) => boolean;
   unlockTheme: (id: string) => void;
   archiveRunFlags: (flags: readonly string[]) => void;
+  recordBossFirstKill: (bossId: string) => boolean;
+  recordEnding: (endingId: string) => void;
+  markPrologueDone: () => void;
+  recordCampaignClear: (ascension: number) => void;
 }
 
-export const META_VERSION = 3;
+export const META_VERSION = 4;
 
 const STARTER_SPARE = 'yellow-d6';
 
@@ -84,7 +92,15 @@ const createInitialMetaValues = (): MetaValues => ({
   contracts: {},
   ascension: { campaign: 0 },
   flagsArchive: [],
-  stats: { runs: 0, wins: 0, shardsEarned: 0 },
+  bossFirstKills: [],
+  endings: [],
+  stats: {
+    runs: 0,
+    wins: 0,
+    shardsEarned: 0,
+    prologueDone: false,
+    campaignClears: 0,
+  },
 });
 
 const coerceCollection = (value: unknown): CollectionEntry[] => {
@@ -158,12 +174,18 @@ export const migrateMeta = (
     flagsArchive: Array.isArray(prev.flagsArchive)
       ? prev.flagsArchive
       : base.flagsArchive,
+    bossFirstKills: Array.isArray(prev.bossFirstKills)
+      ? prev.bossFirstKills
+      : base.bossFirstKills,
+    endings: Array.isArray(prev.endings) ? prev.endings : base.endings,
     stats:
       typeof prev.stats === 'object' && prev.stats !== null
         ? {
             runs: (prev.stats as MetaStats).runs ?? 0,
             wins: (prev.stats as MetaStats).wins ?? 0,
             shardsEarned: (prev.stats as MetaStats).shardsEarned ?? 0,
+            prologueDone: (prev.stats as MetaStats).prologueDone ?? false,
+            campaignClears: (prev.stats as MetaStats).campaignClears ?? 0,
           }
         : base.stats,
   };
@@ -201,6 +223,7 @@ export const useMetaStore = create<MetaState>()(
             level: levelFromTotalXp(xp),
             shards: s.shards + gainShards,
             stats: {
+              ...s.stats,
               runs: s.stats.runs + 1,
               wins: s.stats.wins + (win ? 1 : 0),
               shardsEarned: s.stats.shardsEarned + gainShards,
@@ -283,6 +306,33 @@ export const useMetaStore = create<MetaState>()(
           flagsArchive: [...new Set([...s.flagsArchive, ...flags])],
         }));
       },
+
+      recordBossFirstKill: (bossId) => {
+        if (get().bossFirstKills.includes(bossId)) return false;
+        set((s) => ({ bossFirstKills: [...s.bossFirstKills, bossId] }));
+        return true;
+      },
+
+      recordEnding: (endingId) => {
+        set((s) =>
+          s.endings.includes(endingId)
+            ? s
+            : { endings: [...s.endings, endingId] },
+        );
+      },
+
+      markPrologueDone: () => {
+        set((s) => ({ stats: { ...s.stats, prologueDone: true } }));
+      },
+
+      recordCampaignClear: (ascension) => {
+        set((s) => ({
+          ascension: {
+            campaign: Math.max(s.ascension.campaign, ascension + 1),
+          },
+          stats: { ...s.stats, campaignClears: s.stats.campaignClears + 1 },
+        }));
+      },
     }),
     {
       name: 'ca.meta',
@@ -303,6 +353,8 @@ export const useMetaStore = create<MetaState>()(
         contracts: s.contracts,
         ascension: s.ascension,
         flagsArchive: s.flagsArchive,
+        bossFirstKills: s.bossFirstKills,
+        endings: s.endings,
         stats: s.stats,
       }),
     },
