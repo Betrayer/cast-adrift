@@ -1,0 +1,36 @@
+.beat {
+  animation: beatIn 420ms ease-out both;
+}
+
+.tallyLine {
+  animation: slideIn 340ms ease-out both;
+}
+
+@keyframes beatIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .beat,
+  .tallyLine {
+    animation: none;
+  }
+}

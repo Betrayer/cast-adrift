@@ -1045,6 +1045,7 @@ export class BattleScene {
       dice: fresh.dice,
       slots: fresh.slots,
       blockedSlots: fresh.blockedSlots,
+      shrunkSlots: fresh.shrunkSlots,
       lockedDice: fresh.lockedDice,
       turn: fresh.turn,
       resonance: fresh.resonance,

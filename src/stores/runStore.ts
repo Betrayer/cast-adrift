@@ -10,7 +10,7 @@ import type { FlagValue } from "@/types/events";
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
 
-export type RunMode = "slice";
+export type RunMode = "campaign";
 
 export interface DieInstance {
   uid: string;
@@ -54,6 +54,9 @@ export interface RunStats {
 export interface PendingRewards {
   dieDrop: string | null;
   perkChoices: string[];
+  dieChoices?: string[];
+  voucher?: boolean;
+  packageScrap?: number;
 }
 
 export interface RunValues {
@@ -93,6 +96,13 @@ export interface RunValues {
   shop: ShopState | null;
   deckSeq: number;
   stats: RunStats;
+  ascension: number;
+  vouchers: number;
+  usedMinibosses: string[];
+  bossesKilled: string[];
+  memoriesUnlocked: number;
+  endingId: string | null;
+  startedAt: number;
 }
 
 export interface RunState extends RunValues {
@@ -127,13 +137,19 @@ export interface RunState extends RunValues {
   bumpMk: (slotId: SlotId) => void;
   setMk: (slotId: SlotId, mk: MkLevel) => void;
   resetMk: () => void;
+  addVoucher: (n?: number) => void;
+  spendVoucher: () => boolean;
+  markMinibossUsed: (defId: string) => void;
+  markBossKilled: (defId: string) => boolean;
+  unlockNextMemory: () => number;
+  setEnding: (id: string | null) => void;
   reset: () => void;
 }
 
 export const createInitialRunValues = (): RunValues => ({
   active: false,
   seed: 0,
-  mode: "slice",
+  mode: "campaign",
   sector: 1,
   depthRow: 0,
   position: null,
@@ -175,6 +191,13 @@ export const createInitialRunValues = (): RunValues => ({
     scrapEarned: 0,
     scrapSpent: 0,
   },
+  ascension: 0,
+  vouchers: 0,
+  usedMinibosses: [],
+  bossesKilled: [],
+  memoriesUnlocked: 0,
+  endingId: null,
+  startedAt: 0,
 });
 
 export const useRunStore = create<RunState>()((set, get) => ({
@@ -366,6 +389,40 @@ export const useRunStore = create<RunState>()((set, get) => ({
 
   resetMk: () => {
     set({ mkLevels: {} });
+  },
+
+  addVoucher: (n = 1) => {
+    set((s) => ({ vouchers: s.vouchers + n }));
+  },
+
+  spendVoucher: () => {
+    if (get().vouchers <= 0) return false;
+    set((s) => ({ vouchers: s.vouchers - 1 }));
+    return true;
+  },
+
+  markMinibossUsed: (defId) => {
+    set((s) =>
+      s.usedMinibosses.includes(defId)
+        ? s
+        : { usedMinibosses: [...s.usedMinibosses, defId] },
+    );
+  },
+
+  markBossKilled: (defId) => {
+    if (get().bossesKilled.includes(defId)) return false;
+    set((s) => ({ bossesKilled: [...s.bossesKilled, defId] }));
+    return true;
+  },
+
+  unlockNextMemory: () => {
+    const next = get().memoriesUnlocked + 1;
+    set({ memoriesUnlocked: next });
+    return next;
+  },
+
+  setEnding: (id) => {
+    set({ endingId: id });
   },
 
   reset: () => {

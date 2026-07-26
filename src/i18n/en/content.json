@@ -85,7 +85,44 @@
     "riftWasp": "Rift Wasp",
     "raiderAlpha": "Raider Alpha",
     "raiderAlpha-turret": "Turret",
-    "bountyHuntress": "Bounty Huntress"
+    "bountyHuntress": "Bounty Huntress",
+    "breakerDrone": "Breaker Drone",
+    "magnetTug": "Magnet Tug",
+    "minelayer": "Minelayer",
+    "riftling": "Riftling",
+    "echoShade": "Echo Shade",
+    "unstableCore": "Unstable Core",
+    "choirAcolyte": "Choir Acolyte",
+    "hymnTurret": "Hymn Turret",
+    "zealotRam": "Zealot Ram",
+    "coreFragment": "Core Fragment",
+    "probabilityKnot": "Probability Knot",
+    "nullDrone": "Null Drone",
+    "convoyAlpha": "Convoy Alpha",
+    "convoyAlpha-escortA": "Escort I",
+    "convoyAlpha-escortB": "Escort II",
+    "convoyAlpha-escortC": "Escort III",
+    "wardenFragment": "Warden Fragment",
+    "wardenFragment-plate": "Ablative Plate",
+    "leechQueen": "Leech Queen",
+    "mineTyrant": "Mine Tyrant",
+    "choirHerald": "Choir Herald",
+    "mirrorHull": "Mirror Hull",
+    "quarantineWarden": "Quarantine Warden",
+    "quarantineWarden-lance": "Lance Array",
+    "quarantineWarden-aegis": "Aegis Ring",
+    "breakerBarge": "Breaker Barge",
+    "breakerBarge-grinder": "Grinder Maw",
+    "breakerBarge-crane": "Salvage Crane",
+    "riftMaw": "Rift Maw",
+    "riftMaw-eyeA": "Maw-Eye I",
+    "riftMaw-eyeB": "Maw-Eye II",
+    "choirFlagship": "Choir Flagship",
+    "choirFlagship-spire": "Hymn Spire",
+    "choirFlagship-voice": "The Voice",
+    "coreHeart": "The Core Heart",
+    "coreHeart-valveA": "Valve I",
+    "coreHeart-valveB": "Valve II"
   },
   "ships": {
     "wanderer": "Wanderer",
@@ -174,12 +211,26 @@
     "heardChoir": "you listened to the Choir (Sector 1)",
     "alerted": "you tripped the Warden cache alarm (Sector 1)",
     "yusufFriend": "you escorted Yusuf (Sector 1)",
-    "yusufGrudge": "you taxed Yusuf (Sector 1)"
+    "yusufGrudge": "you taxed Yusuf (Sector 1)",
+    "beaconKey": "you took the Keeper's key (Sector 1)",
+    "keeperSlighted": "you sold out the Keeper (Sector 1)",
+    "beaconBroken": "you broke a beacon (Sector 1)",
+    "fleetShared": "you shared the black box with Yusuf (Sector 2)",
+    "fleetWiped": "you erased the fleet's record (Sector 2)",
+    "pactStep1": "you opened the Choir's pact (Sector 3)",
+    "refusedChoir": "you refused the Choir (Sector 3)",
+    "pactSealed": "you sealed the pact (Sector 4)",
+    "choirEnemy": "you crossed the Choir (Sector 4)",
+    "silentReady": "the Keeper vouched for you (Sector 5)"
   },
   "events": {
     "driftingPod": {
       "text": "A survivor pod tumbles across your bow, hull scarred, beacon stuttering. Something moves inside.",
-      "opt": { "open": "Crack it open", "sell": "Sell it sealed", "leave": "Leave it drifting" },
+      "opt": {
+        "open": "Crack it open",
+        "sell": "Sell it sealed",
+        "leave": "Leave it drifting"
+      },
       "out": {
         "openAlly": "A half-frozen scrapper spills out, grateful, and pays in salvage.",
         "openAmbush": "Not a survivor — a trap. Charges rake your hull before you seal the lock.",
@@ -189,7 +240,11 @@
     },
     "freedCourier": {
       "text": "A courier drone hangs snared in a mag-net, running lights dimming. Its manifest is still encrypted.",
-      "opt": { "free": "Cut it loose", "ransom": "Ransom the manifest", "ignore": "Fly on" },
+      "opt": {
+        "free": "Cut it loose",
+        "ransom": "Ransom the manifest",
+        "ignore": "Fly on"
+      },
       "out": {
         "free": "You slice the net. The drone pings a quiet thanks and vanishes coreward.",
         "ransom": "You strip the manifest and sell the route. Business is business.",
@@ -198,7 +253,10 @@
     },
     "courierReturns": {
       "text": "A familiar drone matches your vector — the one you freed. It broadcasts a trader's handshake.",
-      "opt": { "discount": "Take the trade route", "die": "Take the spare core" },
+      "opt": {
+        "discount": "Take the trade route",
+        "die": "Take the spare core"
+      },
       "out": {
         "discount": "It shares a smuggler's route. The next markets owe you a favour.",
         "die": "It jettisons a spare probability core into your hold."
@@ -206,7 +264,10 @@
     },
     "cursedCargo": {
       "text": "A sealed strongbox drifts alone, warded with cult glyphs. It is worth a fortune, and it is watching you back.",
-      "opt": { "take": "Take the cargo", "jettison": "Cut it loose" },
+      "opt": {
+        "take": "Take the cargo",
+        "jettison": "Cut it loose"
+      },
       "out": {
         "take": "You haul it aboard. Somewhere in the dark, a tracking ping answers.",
         "jettison": "You send it spinning into the void. Whatever wanted it can chase the wreck."
@@ -214,7 +275,10 @@
     },
     "bountyAmbush": {
       "text": "A lean gunship drops out of the static, matching you exactly. \"You're carrying marked cargo, captain. That makes you cargo too.\"",
-      "opt": { "fight": "Fight her off", "bribe": "Buy her off (30)" },
+      "opt": {
+        "fight": "Fight her off",
+        "bribe": "Buy her off (30)"
+      },
       "out": {
         "fight": "No more talking. She commits — and so do you.",
         "bribe": "She counts the scrap twice, then peels away. \"Nothing personal.\""
@@ -222,7 +286,11 @@
     },
     "maraStall": {
       "text": "A patched-together stall hangs off a dead freighter. \"Mara,\" the trader says, not looking up. \"You've got the look of someone who breaks things.\"",
-      "opt": { "chat": "Talk straight", "browse": "Browse her stock (15)", "rob": "Rob the stall" },
+      "opt": {
+        "chat": "Talk straight",
+        "browse": "Browse her stock (15)",
+        "rob": "Rob the stall"
+      },
       "out": {
         "chat": "You trade honest words. Rare currency out here. She almost smiles.",
         "browse": "You dig through the crates and pull something worth having.",
@@ -232,7 +300,10 @@
     },
     "maraFavor": {
       "text": "Mara flags you down, warmer this time. \"Word gets around. You dealt straight with me. Pick something — on the house.\"",
-      "opt": { "repair": "Take the repairs", "die": "Take a spare core" },
+      "opt": {
+        "repair": "Take the repairs",
+        "die": "Take a spare core"
+      },
       "out": {
         "repair": "Her crew patches your hull with practised speed.",
         "die": "She presses a wrapped core into your hand. \"Don't tell the others.\""
@@ -240,7 +311,10 @@
     },
     "maraColdShoulder": {
       "text": "Mara's channel opens cold. \"The captain who robbed me. Word travels. My prices went up — for you especially.\"",
-      "opt": { "apologize": "Make it right (25)", "walk": "Let it lie" },
+      "opt": {
+        "apologize": "Make it right (25)",
+        "walk": "Let it lie"
+      },
       "out": {
         "apologize": "You pay back double and then some. She grunts. It's a start.",
         "walk": "You cut the channel. Some bridges stay burned."
@@ -248,7 +322,10 @@
     },
     "derelictReactor": {
       "text": "A gutted hauler's reactor still ticks over, leaking charge into the dark. You could tap it, if the field holds.",
-      "opt": { "siphon": "Siphon the charge", "salvage": "Strip it for scrap" },
+      "opt": {
+        "siphon": "Siphon the charge",
+        "salvage": "Strip it for scrap"
+      },
       "out": {
         "siphonPass": "The tap holds. Your cells drink deep — a head start on the fights ahead.",
         "siphonFail": "The field collapses mid-draw and bleeds into your hull.",
@@ -257,7 +334,10 @@
     },
     "mineFieldGap": {
       "text": "A drifting minefield chokes the lane. There's a gap, if your piloting is exact — or a long way around.",
-      "opt": { "thread": "Thread the gap", "around": "Take the long way" },
+      "opt": {
+        "thread": "Thread the gap",
+        "around": "Take the long way"
+      },
       "out": {
         "threadPass": "Clean run. You slip through the quiet corridor and lose the sector's attention for a while.",
         "threadFail": "A mine clips you on the way through. The hull remembers it.",
@@ -266,7 +346,10 @@
     },
     "choirBroadcast": {
       "text": "A structured signal blooms across every band. A calm voice: \"You have questions. The Core has already answered them. Only listen.\"",
-      "opt": { "listen": "Listen", "jam": "Jam the signal" },
+      "opt": {
+        "listen": "Listen",
+        "jam": "Jam the signal"
+      },
       "out": {
         "listen": "The words settle into you like they were always there. Something shifts, quietly, toward resonance.",
         "jam": "You blanket the channel with noise. The sector bristles at the insult."
@@ -274,7 +357,10 @@
     },
     "choirGift": {
       "text": "The Choir's voice returns, gentle. \"You listened once. Take this — a shard that remembers how to fall.\"",
-      "opt": { "accept": "Accept the black die", "refuse": "Refuse" },
+      "opt": {
+        "accept": "Accept the black die",
+        "refuse": "Refuse"
+      },
       "out": {
         "accept": "A black core settles into your rack, cold and eager.",
         "refuse": "You decline. The voice does not argue. That's the unsettling part."
@@ -282,7 +368,10 @@
     },
     "scrapAuction": {
       "text": "Scavengers ring a floodlit wreck, bidding on sealed cores. The auctioneer eyes your scrap.",
-      "opt": { "bid": "Bid on a core (25)", "watch": "Just watch" },
+      "opt": {
+        "bid": "Bid on a core (25)",
+        "watch": "Just watch"
+      },
       "out": {
         "bid": "Your bid holds. The core is yours — and it's a good one.",
         "watch": "You pocket a few loose parts nobody bid on."
@@ -290,7 +379,10 @@
     },
     "stowaway": {
       "text": "You find a stowaway in the aft crawlspace — a mechanic who ran from something worse. \"I earn my keep,\" she says.",
-      "opt": { "keep": "Let her stay", "handOver": "Hand her over" },
+      "opt": {
+        "keep": "Let her stay",
+        "handOver": "Hand her over"
+      },
       "out": {
         "keep": "She reroutes power to a med-loop. Less hull, but she'll patch you after every fight.",
         "handOver": "You trade her to a passing patrol for coin. Neither of you meets the other's eye."
@@ -298,7 +390,10 @@
     },
     "oldBeaconEcho": {
       "text": "A fleet beacon still cycles, forty years on. Its keeper-AI stirs. \"Report,\" it rasps. \"Where is the fleet?\"",
-      "opt": { "decrypt": "Decrypt the log", "leave": "Salvage and go" },
+      "opt": {
+        "decrypt": "Decrypt the log",
+        "leave": "Salvage and go"
+      },
       "out": {
         "decryptPass": "The log cracks open — old charts spill across your sensors, revealing more of the lane.",
         "decryptFail": "The encryption holds. Only static, and a word repeated: quieter.",
@@ -307,7 +402,10 @@
     },
     "leechNest": {
       "text": "A cluster of leech skiffs feeds on a dead cruiser, cores half-drained. Burn them out, or slip past?",
-      "opt": { "burn": "Burn the nest", "avoid": "Slip past" },
+      "opt": {
+        "burn": "Burn the nest",
+        "avoid": "Slip past"
+      },
       "out": {
         "burn": "You commit to the cull. The nest boils toward you.",
         "avoid": "You give the nest a wide berth and let the dead cruiser keep its parasites."
@@ -315,7 +413,10 @@
     },
     "driftMerchant": {
       "text": "A lone merchant hails you, hold full of odd cores. \"Straight swap,\" he offers. \"Your worst for a wildcard of mine.\"",
-      "opt": { "swap": "Make the swap", "decline": "Decline" },
+      "opt": {
+        "swap": "Make the swap",
+        "decline": "Decline"
+      },
       "out": {
         "swap": "You trade your weakest core for one of his. Fair enough, out here.",
         "decline": "You wave him off. He shrugs and drifts on."
@@ -323,7 +424,10 @@
     },
     "radiationPocket": {
       "text": "A radiation pocket bars the direct lane. Push through and save time, or detour the safe way.",
-      "opt": { "push": "Push through", "detour": "Detour" },
+      "opt": {
+        "push": "Push through",
+        "detour": "Detour"
+      },
       "out": {
         "push": "You gun it through the glare. It costs hull, but you shave the sector's grip.",
         "detour": "You take the long, clean route and scavenge as you go."
@@ -331,7 +435,10 @@
     },
     "wardenCache": {
       "text": "A Quarantine Warden supply cache sits sealed and armed. A recorded voice: \"Unauthorised access will be answered.\"",
-      "opt": { "crack": "Crack the cache", "leave": "Leave it sealed" },
+      "opt": {
+        "crack": "Crack the cache",
+        "leave": "Leave it sealed"
+      },
       "out": {
         "crackPass": "The lock yields. Inside: a Warden requisition chit — the next shipyard will honour it.",
         "crackFail": "The lock screams. Somewhere, a patrol logs your position.",
@@ -340,7 +447,10 @@
     },
     "alertedPatrol": {
       "text": "A Warden patrol runs you down, flanked and ready. \"Cache tamperer. Hold for inspection.\" They have no intention of inspecting.",
-      "opt": { "engage": "Break through", "evade": "Slip the net" },
+      "opt": {
+        "engage": "Break through",
+        "evade": "Slip the net"
+      },
       "out": {
         "engage": "You commit to the breakout. They close in.",
         "evadePass": "You kill your lights and thread their sweep, lifting a few crates on the way out.",
@@ -349,7 +459,10 @@
     },
     "gamblersWreck": {
       "text": "A ruined casino-barge still runs one game: a single die against the house AI. \"Care to test your luck, captain?\"",
-      "opt": { "roll": "Play the house (20)", "scavenge": "Scavenge instead" },
+      "opt": {
+        "roll": "Play the house (20)",
+        "scavenge": "Scavenge instead"
+      },
       "out": {
         "rollPass": "The die lands your way. The house pays out with a resentful chime.",
         "rollFail": "The house wins, as houses do. Your stake vanishes.",
@@ -358,7 +471,10 @@
     },
     "frozenCrew": {
       "text": "A lifeboat drifts with its crew in cold-sleep, power nearly gone. Thawing them costs fuel and scrap.",
-      "opt": { "thaw": "Thaw the crew (15)", "leave": "Leave them frozen" },
+      "opt": {
+        "thaw": "Thaw the crew (15)",
+        "leave": "Leave them frozen"
+      },
       "out": {
         "thaw": "The pods hiss open. Grateful hands help patch your hull before they part ways.",
         "leave": "You can't spare the scrap. You mark their position and move on. Small mercy: they still drift."
@@ -366,7 +482,10 @@
     },
     "crewGratitude": {
       "text": "The crew you thawed catches up in a patched skiff. \"We owe you. Let us tune your dice-racks.\"",
-      "opt": { "crew": "Let them tune the racks", "pay": "Take a parting gift" },
+      "opt": {
+        "crew": "Let them tune the racks",
+        "pay": "Take a parting gift"
+      },
       "out": {
         "crew": "They rework your reroll gear. It'll spin one die wider, all run long.",
         "pay": "They press salvage on you instead, and wave you off toward the Core."
@@ -374,7 +493,10 @@
     },
     "probCoreLeak": {
       "text": "A probability core is cracking, bleeding raw uncertainty across your hold. It could be stabilised — or harvested.",
-      "opt": { "stabilize": "Stabilise it (blue die)", "harvest": "Harvest it (black die)" },
+      "opt": {
+        "stabilize": "Stabilise it (blue die)",
+        "harvest": "Harvest it (black die)"
+      },
       "out": {
         "stabilize": "A blue core damps the leak. The board settles toward stability, and your hull steadies.",
         "harvest": "A black core drinks the chaos. Resonance surges, a fresh shard drops — and it costs a little hull."
@@ -382,12 +504,20 @@
     },
     "silentField": {
       "text": "A field of dead static, no signal, no wreckage. Just the hum of the Rim and your own breathing.",
-      "opt": { "drift": "Drift through, listening" },
-      "out": { "drift": "Nothing answers. You scavenge loose plating on the way out." }
+      "opt": {
+        "drift": "Drift through, listening"
+      },
+      "out": {
+        "drift": "Nothing answers. You scavenge loose plating on the way out."
+      }
     },
     "tollGate": {
       "text": "Scavengers have strung a wreck-gate across the lane and want a toll. Behind it, a single gunship waits.",
-      "opt": { "pay": "Pay the toll (15)", "fight": "Force the gate", "sneak": "Slip past" },
+      "opt": {
+        "pay": "Pay the toll (15)",
+        "fight": "Force the gate",
+        "sneak": "Slip past"
+      },
       "out": {
         "pay": "You hand over the scrap. The gate creaks open, grudgingly.",
         "fight": "You answer the toll with your weapons instead.",
@@ -397,7 +527,10 @@
     },
     "mirrorFlare": {
       "text": "A mirror-flare blooms off a shattered array, throwing a copy of your own ship back at you — and a shard with it.",
-      "opt": { "absorb": "Reach into the flare", "lookAway": "Look away" },
+      "opt": {
+        "absorb": "Reach into the flare",
+        "lookAway": "Look away"
+      },
       "out": {
         "absorb": "You pull a core from your own reflection. It hums with borrowed resonance.",
         "lookAway": "You shield your sensors and let the flare burn itself out."
@@ -405,7 +538,10 @@
     },
     "driftRace": {
       "text": "Yusuf's convoy runners idle at a marker buoy. \"Fast hull like yours? Race us to the next beacon. Winner takes the pot.\"",
-      "opt": { "race": "Race them (engines Mk2)", "decline": "Wave them off" },
+      "opt": {
+        "race": "Race them (engines Mk2)",
+        "decline": "Wave them off"
+      },
       "out": {
         "race": "Your engines eat the lane. You take the pot and their grudging respect.",
         "decline": "You let them have their fun and pocket a small stake for showing up."
@@ -413,7 +549,10 @@
     },
     "sensorGhost": {
       "text": "A sensor ghost flickers at the edge of your scope — maybe a wreck, maybe a trap. Sharper sensors could resolve it.",
-      "opt": { "reveal": "Resolve it (sensors Mk2)", "fire": "Fire blind" },
+      "opt": {
+        "reveal": "Resolve it (sensors Mk2)",
+        "fire": "Fire blind"
+      },
       "out": {
         "reveal": "Your array pins it down and maps the lane beyond in the process.",
         "fire": "You loose a volley at the ghost. It scatters — and something scatters back."
@@ -421,7 +560,10 @@
     },
     "yusufConvoy": {
       "text": "Yusuf, convoy master, hails you plainly. \"Raiders are shadowing my haulers. Escort us through and I'll make it worth your while. Or tax us and be gone.\"",
-      "opt": { "escort": "Escort the convoy", "tax": "Tax the convoy" },
+      "opt": {
+        "escort": "Escort the convoy",
+        "tax": "Tax the convoy"
+      },
       "out": {
         "escort": "You take point. The raiders won't like it, but Yusuf will remember.",
         "tax": "You clip his margins and let him pass. He remembers that too."
@@ -429,10 +571,160 @@
     },
     "yusufEscortPaid": {
       "text": "Yusuf's convoy finds you again, banners bright. \"The captain who saw us through! Take a cut of the run — you earned it.\"",
-      "opt": { "bonus": "Take the cut", "wave": "Wave it off" },
+      "opt": {
+        "bonus": "Take the cut",
+        "wave": "Wave it off"
+      },
       "out": {
         "bonus": "He loads scrap and a spare core into your hold, grinning the whole time.",
         "wave": "You wave off the pay. Yusuf salutes. Goodwill compounds out here."
+      }
+    },
+    "beaconKeeperIntro": {
+      "text": "The beacon is older than the wreck field around it, and someone is still maintaining it. A figure in a patched suit waves you down without hurry. \"You're the fifth salvager this decade. The other four took the key. None of them asked what it opens.\"",
+      "take": "Take the key and ask what it opens",
+      "takeOut": "\"Nothing,\" the Keeper says. \"It opens nothing. It proves you were here, and at the end that turns out to matter.\" The beacon's chart data floods your sensors.",
+      "sell": "Cut the beacon's core out and sell it",
+      "sellOut": "The Keeper does not stop you. They watch you strip forty years of maintenance into a cargo net, and they write something down.",
+      "smash": "Smash it — the signal is what draws them here",
+      "smashOut": "The beacon dies with a sound like a held breath. The interference in this sector drops immediately. So does the Keeper's expression."
+    },
+    "fleetBlackbox": {
+      "text": "The blackbox is fused into a bulkhead that used to be a wall of a ship you have heard of. Yusuf's convoy is parked two hundred metres off, waiting to see what you do with it. \"Whatever's on there,\" he says on open channel, \"the clans have a right to know.\"",
+      "share": "Broadcast it to the convoy",
+      "shareOut": "Yusuf listens to the whole thing without speaking, then puts his own mechanics on your hull for free. \"Forty years,\" he says. \"They were asking for help the entire time.\"",
+      "keep": "Keep it — the record is worth more intact",
+      "keepOut": "You seal the box in your hold. Yusuf's channel closes without a sign-off. Whatever is on it, it is yours alone now.",
+      "wipe": "Wipe it — nobody needs to hear this",
+      "wipeOut": "The recorder erases cleanly, the way things do when they were designed by people expecting to be found. The convoy stands down and patches your hull anyway."
+    },
+    "choirInvitation": {
+      "text": "The Preacher's shuttle matches your drift without asking. \"You have felt it,\" he says. \"Every roll you take out here, every branch you leave open — it costs you. We can close them. All of them. It begins with one agreement.\"",
+      "accept": "Take the first step of the pact",
+      "acceptOut": "He marks your hull with a number. Your reactor runs hot and certain for a while, and something in the sector notices you differently.",
+      "refuse": "Refuse — out loud, on open channel",
+      "refuseOut": "The Preacher takes the refusal with a smile that suggests he expected it and has time. Your crew, hearing you say it, works harder.",
+      "probe": "Make him explain what the pact costs",
+      "probePass": "You keep him talking until the doctrine contradicts itself, then say so on the open channel. He leaves. The convoy that overheard pays you for the recording.",
+      "probeFail": "He answers every question patiently, and by the end you have agreed to something you cannot quite locate in the conversation."
+    },
+    "pactSeal": {
+      "text": "The Choir's flagship holds the seal chamber open for you. The Preacher is already there, ledger out. \"One signature and the Rim stops arguing with you. Or you walk, and it argues with you personally, for the rest of a short career.\"",
+      "complete": "Sign — let them close the branches",
+      "completeOut": "The ledger takes your name in a hand that is not yours. The Choir's fleet parts for you, and the Core's noise drops to a hum you can almost ignore.",
+      "betray": "Burn the ledger",
+      "betrayOut": "You put a round through the ledger table and the chamber empties in eight seconds flat. The honour guard does not need instructions."
+    },
+    "pactSealSkipped": {
+      "text": "The seal chamber is running a ceremony without you in it. Nobody stops you at the door; the Choir has decided you are furniture. Whatever they are closing, they are closing it now.",
+      "watch": "Watch, record, and leave",
+      "watchOut": "You take the whole liturgy on sensors and sell the recording twice before you reach the next lane. Understanding costs nothing here; certainty is what they charge for.",
+      "burn": "Break the ceremony",
+      "burnOut": "You put your engines through the chamber's field array. The hymn stops. Something in the sector starts paying you very close attention."
+    },
+    "coreThreshold": {
+      "text": "The last beacon is not maintained, not broadcasting, and not, strictly speaking, present at all times. The Keeper is standing on it anyway. \"Past here it stops asking,\" they say. \"Whatever you brought with you is the argument you get to make.\"",
+      "listen": "Ask the Keeper what the fleet was asking for",
+      "listenOut": "They tell you. It takes four minutes and it is not what any report claimed. When they finish, they hand you the list of names and step back off the beacon.",
+      "answer": "Answer the Core's carrier on its own pattern",
+      "answerOut": "You broadcast into the Rift and something enormous adjusts its attention by a fraction of a degree. Your reactor has not been this eager since it was built.",
+      "silence": "Go in silent",
+      "silenceOut": "You shut every transmitter on the hull and drift past the threshold as a hole in the noise. It does not notice you. That is the point."
+    },
+    "keeperEcho": {
+      "text": "A relay you have never used lights up with a name you recognise. The Keepers pass word along a chain of dead beacons, and yours has been passed. \"The Rim is small,\" the voice says. \"Smaller since you made it smaller.\"",
+      "opt": {
+        "pay": "Pay for what you cut out (40)",
+        "shrug": "They kept a beacon. You kept a career."
+      },
+      "out": {
+        "pay": "The transfer clears and the chain of beacons stops talking about you. One of them even sends you its chart data, unasked.",
+        "shrug": "The relay goes quiet mid-sentence. Two hours later the interference here is measurably worse, and nobody will explain why."
+      }
+    },
+    "yusufLane": {
+      "text": "Yusuf's convoy is running a lane it has no business running this deep. He hails you first. \"You gave us the box. Whole clans changed their route because of it. Name what you need.\"",
+      "opt": {
+        "escort": "Ask for hull work and a friendly dock",
+        "trade": "Ask for cargo and a cut"
+      },
+      "out": {
+        "escort": "His mechanics swarm the hull for six hours and refuse payment. One of them leaves a note on your reactor housing that just says THANK YOU.",
+        "trade": "He pays out in scrap and one crate he claims fell off a Choir tender. You do not ask."
+      }
+    },
+    "preacherGrudge": {
+      "text": "The Preacher's shuttle finds you again, deeper in and much less patient. \"You said it in the open channel,\" he says. \"Half the Rim heard. Say it again here, where it costs something. Or listen, once, properly.\"",
+      "opt": {
+        "repeat": "Say it again, louder",
+        "hear": "Listen — once, properly"
+      },
+      "out": {
+        "repeat": "You repeat it word for word. The Choir logs you as an enemy of the liturgy, and your crew reinforces the hull out of pure spite.",
+        "hear": "You let him finish. It is beautiful and it is wrong, and something in your reactor keeps humming the shape of it for two jumps."
+      }
+    },
+    "brokenBeaconWake": {
+      "text": "The sector is louder here than the charts allow, and the pattern of the noise is a beacon-shaped hole. A Keeper is already parked in it, working with parts they do not have enough of.",
+      "opt": {
+        "rebuild": "Fund the rebuild (30)",
+        "scavenge": "Take the spare parts instead"
+      },
+      "out": {
+        "rebuild": "They get it lit before you leave. The interference drops across the whole sector and the Keeper does not thank you, which is how you know it counted.",
+        "scavenge": "You leave with a full net and a Keeper watching you go. The hole in the noise stays exactly where it was."
+      }
+    },
+    "driftSalvageCrew": {
+      "text": "A breaker crew is riding a hull that has eleven hours of air and no engine. Yusuf's lane is four jumps away. Their captain does not beg; she just reads out the number of people aboard, twice.",
+      "opt": {
+        "rescue": "Take them aboard — all of them",
+        "tow": "Rig a tow and burn for the lane",
+        "strip": "Cut what's valuable and go"
+      },
+      "out": {
+        "rescue": "Eleven people, one head of lettuce, and a hold you can no longer walk through. They fix things constantly, whether or not you asked.",
+        "towPass": "The tow holds. Yusuf's people meet you halfway and pay salvage rates for a rescue, which is not how salvage works.",
+        "towFail": "The line snaps under load and takes a chunk of your hull with it. You get them home. Nobody is grateful for how.",
+        "strip": "You take the reactor coupling and the good plating. The channel stays open behind you for a long time."
+      }
+    },
+    "riftMirror": {
+      "text": "A sheet of collapsed probability hangs across the lane, and your ship is on the other side of it, doing something you have not done yet. It is waiting to see whether you do.",
+      "opt": {
+        "match": "Match the mirror's move",
+        "break": "Put a round through it"
+      },
+      "out": {
+        "matchPass": "You do the thing before you see yourself do it, and the sheet folds inward with a sound like a card being turned over. What falls out is yours.",
+        "matchFail": "You hesitate. The mirror does not, and what comes through the sheet is very interested in you.",
+        "break": "The sheet shatters into ordinary debris worth ordinary money. Whatever it was going to show you, it does not."
+      }
+    },
+    "coreStatic": {
+      "text": "This deep, the Core's carrier is not a signal any more, it's weather. Every instrument on the ship has an opinion about it and none of them agree.",
+      "opt": {
+        "tune": "Tune the sensors into it",
+        "shield": "Shield the hull and ride it out",
+        "ride": "Feed it straight into the reactor"
+      },
+      "out": {
+        "tune": "You get three rows of the sector for free and a headache that lasts a jump. Echo asks you, twice, to stop.",
+        "shield": "You spend an hour wrapping the hull in its own noise. Nothing happens, which is the entire point of doing it.",
+        "ride": "The reactor drinks it. Everything runs hot and eager for a while and the hull pays the difference."
+      }
+    },
+    "scavRefit": {
+      "text": "Mara's tender is parked in a lane it should not be in, with the awning out. \"Don't look at me like that. Deep sector, deep margins. What do you need, captain?\"",
+      "opt": {
+        "buy": "Buy the reroll rig (35)",
+        "swap": "Trade in your worst die",
+        "pass": "Sell her your junk instead"
+      },
+      "out": {
+        "buy": "She bolts a scavenged sorting rig into your tray. It rattles. It also works.",
+        "swap": "She takes your worst die without comment and hands back something with a different kind of wrong in it.",
+        "pass": "She buys the lot at a fair price, which from Mara is practically a compliment."
       }
     }
   },
@@ -456,21 +748,137 @@
     "riddleWard": {
       "title": "Warded Anomalies",
       "body": "Some anomalies resolve like locks: feed them the exact outcome and they open. The expedition's engineers called it 'arguing with the dice.' It works, until the dice argue back."
+    },
+    "keeperCreed": {
+      "title": "The Keeper's Creed",
+      "body": "Beacon Keepers do not repair the beacons. They witness them. Each one carries a key that opens nothing, and a list of names that opens everything."
+    },
+    "fleetBlackbox": {
+      "title": "The Fleet's Black Box",
+      "body": "Eleven ships, one recorder, and a final entry that is not a log at all but a request — repeated, patiently, for thirty-nine years."
+    },
+    "choirDoctrine": {
+      "title": "Choir Doctrine",
+      "body": "The Choir holds that uncertainty is suffering and that a collapsed outcome is a mercy. They are consistent about this, which is the frightening part."
+    },
+    "pactLedger": {
+      "title": "The Pact Ledger",
+      "body": "Every pact is written twice: once in the ledger, once in the signer. The Choir has never had to enforce one."
+    },
+    "coreThreshold": {
+      "title": "The Threshold",
+      "body": "Past the last beacon the sector stops having a shape. Instruments still work; they simply stop agreeing about when they worked."
+    },
+    "memory-1": {
+      "title": "Fragment 1 — Boot",
+      "body": "First thing I remember is a countdown. Not to launch. To something the expedition called 'the ask'."
+    },
+    "memory-2": {
+      "title": "Fragment 2 — Muster",
+      "body": "Eleven ships. I was the small one — sensor sweeps and bad ideas."
+    },
+    "memory-3": {
+      "title": "Fragment 3 — The Rim",
+      "body": "We crossed the Rim on a Tuesday. Command logged it as uneventful. Command logged a lot of things as uneventful."
+    },
+    "memory-4": {
+      "title": "Fragment 4 — First Core",
+      "body": "We found the first probability core inside a rock. It was not in the rock. The rock was in it."
+    },
+    "memory-5": {
+      "title": "Fragment 5 — The Ask",
+      "body": "You do not ask a core a question. You ask it to stop being able to answer differently."
+    },
+    "memory-6": {
+      "title": "Fragment 6 — Drift",
+      "body": "Two ships went into the Drift Fields for anchor mass and came back a year older in eight days."
+    },
+    "memory-7": {
+      "title": "Fragment 7 — Split",
+      "body": "Half the fleet wanted to seal it. Half wanted to listen. Nobody wanted to leave."
+    },
+    "memory-8": {
+      "title": "Fragment 8 — The Choir",
+      "body": "The listeners started calling themselves something. That is always the moment it goes wrong."
+    },
+    "memory-9": {
+      "title": "Fragment 9 — Last Signal",
+      "body": "I was ordered to broadcast a pattern until someone came. I have been very obedient."
+    },
+    "memory-10": {
+      "title": "Fragment 10 — The Cut",
+      "body": "When the Core took them it did not take them apart. It took them aside."
+    },
+    "memory-11": {
+      "title": "Fragment 11 — Me",
+      "body": "I was the piece that fell off. Forty years of drifting, and the pattern was still running."
+    },
+    "memory-12-seal": {
+      "title": "Fragment 12 — Closed",
+      "body": "It's over, I remember all of it, and none of it is happening any more. I'll take that trade."
+    },
+    "memory-12-merge": {
+      "title": "Fragment 12 — Opened",
+      "body": "You're in here with them now. I can hear you thinking in the pattern. It suits you."
+    },
+    "memory-12-bargain": {
+      "title": "Fragment 12 — Signed",
+      "body": "They filed my crew under 'pending'. I am told that is not the same as lost."
+    },
+    "memory-12-silent": {
+      "title": "Fragment 12 — Answered",
+      "body": "Eleven ships. I remember every name. For the first time in forty years, so does someone else."
     }
   },
   "puzzle": {
-    "oreVein": { "title": "Ore Vein", "goal": "Deal exactly 14 — the vein shears if you over-cut. Leave a die out." },
-    "coolant": { "title": "Coolant Line", "goal": "Bank exactly 10 charge — the core drinks in steps of one and a half." },
-    "cleanFit": { "title": "Clean Fit", "goal": "Bank 6+ charge with every die placed and nothing spilled past the cap." },
-    "redRoute": { "title": "Red Route", "goal": "Deal 18+ damage — a red die in Weapon A, affinity firing." },
-    "ignite": { "title": "Ignite", "goal": "Deal 12+ damage and land Burn — a cinder must hit its max face." },
-    "pipeline": { "title": "Pipeline", "goal": "Mark, then land 8+ into the marked target, and don't overflow the reactor." },
-    "overload": { "title": "Overload", "goal": "Jam the spinal on purpose, then carry 14+ damage on the mounts." },
-    "slowBurn": { "title": "Slow Burn", "goal": "Two turns: set Burn, reserve a hitter, and stack 26+ total damage." },
-    "capacitor": { "title": "Capacitor", "goal": "Bank 16+ charge across three turns — one core can't hold it all." },
-    "lockbox": { "title": "Lockbox", "goal": "Fixed reading — one routing lands damage, shield, and charge at once." },
-    "parity": { "title": "Parity Lock", "goal": "Fixed reading — Weapons must read odd, Shields even. Mind the faces." },
-    "bulwarkStand": { "title": "Bulwark Stand", "goal": "Survive the barrage and still hold 6+ shield — layer the defence." }
+    "oreVein": {
+      "title": "Ore Vein",
+      "goal": "Deal exactly 14 — the vein shears if you over-cut. Leave a die out."
+    },
+    "coolant": {
+      "title": "Coolant Line",
+      "goal": "Bank exactly 10 charge — the core drinks in steps of one and a half."
+    },
+    "cleanFit": {
+      "title": "Clean Fit",
+      "goal": "Bank 6+ charge with every die placed and nothing spilled past the cap."
+    },
+    "redRoute": {
+      "title": "Red Route",
+      "goal": "Deal 18+ damage — a red die in Weapon A, affinity firing."
+    },
+    "ignite": {
+      "title": "Ignite",
+      "goal": "Deal 12+ damage and land Burn — a cinder must hit its max face."
+    },
+    "pipeline": {
+      "title": "Pipeline",
+      "goal": "Mark, then land 8+ into the marked target, and don't overflow the reactor."
+    },
+    "overload": {
+      "title": "Overload",
+      "goal": "Jam the spinal on purpose, then carry 14+ damage on the mounts."
+    },
+    "slowBurn": {
+      "title": "Slow Burn",
+      "goal": "Two turns: set Burn, reserve a hitter, and stack 26+ total damage."
+    },
+    "capacitor": {
+      "title": "Capacitor",
+      "goal": "Bank 16+ charge across three turns — one core can't hold it all."
+    },
+    "lockbox": {
+      "title": "Lockbox",
+      "goal": "Fixed reading — one routing lands damage, shield, and charge at once."
+    },
+    "parity": {
+      "title": "Parity Lock",
+      "goal": "Fixed reading — Weapons must read odd, Shields even. Mind the faces."
+    },
+    "bulwarkStand": {
+      "title": "Bulwark Stand",
+      "goal": "Survive the barrage and still hold 6+ shield — layer the defence."
+    }
   },
   "bark": {
     "levelUp": {
@@ -552,6 +960,150 @@
     "killScav": {
       "1": "Drone's slag. It wanted our dice too.",
       "2": "One less drone picking at the wreck."
+    },
+    "memory": {
+      "1": "Something just came back. Give me a second, captain.",
+      "2": "That's another piece of me. Filed under 'unpleasant, useful'.",
+      "3": "I remember more of them now. That's not entirely a gift."
+    },
+    "sectorEnter2": {
+      "1": "Drift Fields. Everything here is somebody's salvage, including us.",
+      "2": "Watch the mines. They've had forty years to get bored."
+    },
+    "sectorEnter3": {
+      "1": "The Rift. My sensors are voting and they disagree.",
+      "2": "Don't trust the readings. Don't trust the dice either, honestly."
+    },
+    "sectorEnter4": {
+      "1": "Choir space. They'll be polite. That's the worrying part.",
+      "2": "If they start singing numbers at you, captain, do not sing back."
+    },
+    "sectorEnter5": {
+      "1": "The Core. I have been pointed at this place for forty years.",
+      "2": "Whatever happens here, thank you for the lift."
+    },
+    "bossPhase": {
+      "1": "It just changed its mind about how this goes. Adjust.",
+      "2": "New pattern, captain. The old one was the polite version.",
+      "3": "That was a phase change. I would take it personally."
     }
+  },
+  "sectors": {
+    "1": "The Rim",
+    "2": "The Drift Fields",
+    "3": "The Rift",
+    "4": "The Choir",
+    "5": "The Core"
+  },
+  "ascension": {
+    "1": {
+      "name": "A1 — Pressure",
+      "desc": "Enemies carry +10% hull."
+    },
+    "2": {
+      "name": "A2 — Empowered elites",
+      "desc": "Elites, mini-bosses and bosses open behind a shield."
+    },
+    "3": {
+      "name": "A3 — Lean markets",
+      "desc": "Shop prices +20%."
+    },
+    "4": {
+      "name": "A4 — Deep interference",
+      "desc": "The interference tide caps one level higher."
+    },
+    "5": {
+      "name": "A5 — Rewritten bosses",
+      "desc": "Bosses open in their late-fight pattern."
+    }
+  },
+  "prologue": {
+    "drift1": "Three weeks of dead space, and the Rim finally coughs up a return. Something big out there, and it isn't moving.",
+    "drift2": "You cut the burn and let the hull coast toward the ping.",
+    "driftCta": "Match velocity",
+    "salvage1": "The fragment comes aboard on a grapple line: a slab of hull with a core still warm inside it.",
+    "salvage2": "—six degrees off, correct your appro— oh. You're not the bridge. You're a salvager.",
+    "salvage3": "I'm Echo. I was a ship once. Now I'm mostly opinions and a very good sensor package.",
+    "salvageCta": "Bring it online",
+    "signal1": "Deep in the sector, something is broadcasting on a structured carrier. Not a distress call. A pattern.",
+    "signal2": "There are two ways to read that pattern, captain. Neither is comforting.",
+    "signal3": "A needle you have never noticed before twitches once, then settles back to centre.",
+    "signalCta": "Plot a course",
+    "contact1": "Contact. Scav drone — cheap, hungry, and about to learn something. Weapons first: put a die in the gun.",
+    "contact2": "The drone turns toward you, thrusters flaring.",
+    "contactCta": "Engage"
+  },
+  "fragment": {
+    "f1-1": "Rim salvage law: whoever cuts the hull first owns what falls out. Nobody has ever enforced it.",
+    "f1-2": "The fleet's last clean transmission was a grocery list. Nobody knows why.",
+    "f1-3": "Quarantine buoys still blink out here. The quarantine ended thirty-nine years ago.",
+    "f2-1": "In the Drift Fields a ship is a promise you make to whoever tows you home.",
+    "f2-2": "Breaker clans measure wealth in cut metres, not scrap.",
+    "f2-3": "Mines out here are patient. Some have been waiting since before you were born.",
+    "f3-1": "In the Rift, dice sometimes land on faces they do not have.",
+    "f3-2": "Two survey ships entered the Rift on the same heading. One wake came out.",
+    "f3-3": "Rift cartographers draw maps in pencil, and only ever once.",
+    "f4-1": "The Choir does not pray for outcomes. It prays for the collapse of alternatives.",
+    "f4-2": "Every acolyte carries one die they will never roll.",
+    "f4-3": "Their hymns are numbers read aloud. The tune is incidental.",
+    "f5-1": "This close to the Core, causality is a local ordinance, not a law.",
+    "f5-2": "The fleet's beacons all point here. They always did.",
+    "f5-3": "The Core does not answer questions. It collapses them."
+  },
+  "ending": {
+    "seal": {
+      "title": "The Seal",
+      "label": "Seal the Core",
+      "req": "Stability +3 or higher",
+      "beat1": "You feed the Core its own certainty back, one collapsed outcome at a time, until it has nothing left to decide.",
+      "beat2": "The Rift closes like a mouth that has finally been fed. The pressure leaning on your hull for five sectors simply stops.",
+      "beat3": "The fleet's beacons go quiet in order, oldest first, and the Hush Rim becomes just another dead sector on a chart.",
+      "beat4": "You burn for the edge with a full hold and a sector behind you that will never make anyone else disappear.",
+      "echo": "You made the sector boring, captain. Kindest thing anyone's done out here in forty years."
+    },
+    "merge": {
+      "title": "The Merge",
+      "label": "Join the Core",
+      "req": "Resonance −3 or lower",
+      "beat1": "You stop fighting the pattern and start reading it, and somewhere in the third pass the pattern starts reading you back.",
+      "beat2": "The hull does not survive contact. You do — spread thin across every outcome the Core was still holding open.",
+      "beat3": "From the inside the fleet is not lost. It is filed. Forty years of them, waiting for a better question.",
+      "beat4": "The Hush Rim goes on humming. There is a new voice in it now, and the voice remembers being a captain.",
+      "echo": "I'll keep your logs. All of them. Even the ones where you swore at the reactor."
+    },
+    "bargain": {
+      "title": "The Bargain",
+      "label": "Hand the Core to the Choir",
+      "req": "The pact sealed in Sector 4",
+      "beat1": "The Choir takes the Core the way a choir takes a note — carefully, in unison, without asking whether it wants to be sung.",
+      "beat2": "They give you a ship, a rank, and a die you are not permitted to roll. The Rim opens like a door with your name on it.",
+      "beat3": "Behind the hymn the fleet is still waiting, and nobody in the Choir considers that a loose end.",
+      "echo": "For the record, captain: I logged your objection. You didn't make one. I logged that too."
+    },
+    "silent": {
+      "title": "The Silent Fleet",
+      "label": "Answer the fleet",
+      "req": "All five beacons resolved, the Keeper's blessing, and one act of mercy",
+      "beat1": "Five beacons, five answers, and on the last one the fleet speaks in something other than a carrier tone.",
+      "beat2": "They were never destroyed. They were held — forty years of crews inside a decision the Core could not finish making.",
+      "beat3": "You finish it for them. The Rim fills with running lights that have not moved since before you were born.",
+      "beat4": "You lead them out. It takes eleven days and you do not sleep for any of them.",
+      "echo": "I know every one of those ships by name, captain. Thank you for making me say them out loud."
+    }
+  },
+  "epilogue": {
+    "maraFriend": "Mara keeps a crate aside for you at the Rim market. She calls it inventory. It isn't.",
+    "yusufFriend": "Yusuf's convoy runs the Drift lane again, and your callsign rides it free.",
+    "yusufGrudge": "Yusuf tells the story with you as the villain. He is not entirely wrong.",
+    "crewSaved": "The crew you pulled out of the wreck are alive, loud, and telling it badly in three ports.",
+    "courierFreed": "The courier you let go runs a discount route now, and remembers who paid for it.",
+    "hunterCleared": "The bounty on your hull is settled. The Huntress settled it personally.",
+    "refusedChoir": "You told the Choir no in front of witnesses. They have not stopped quoting it.",
+    "pactSealed": "Your name is in the Choir's ledger, in a hand that is not yours.",
+    "choirEnemy": "The Choir sings you into their liturgy as a cautionary verse.",
+    "beacons": "Beacons answered: {{n}} of 5.",
+    "ascension": "Cleared at ascension A{{n}}.",
+    "lastBreath": "One hull point, once. You do not talk about it. Echo does, constantly.",
+    "quiet": "You leave the Rim quietly. Nobody out here writes anything down."
   }
 }

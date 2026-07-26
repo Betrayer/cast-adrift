@@ -14,7 +14,11 @@ export type ScreenId =
   | 'shop'
   | 'shipyard'
   | 'rewards'
-  | 'summary';
+  | 'summary'
+  | 'prologue'
+  | 'interstitial'
+  | 'finale'
+  | 'ending';
 
 export type Locale = 'en' | 'uk' | 'ru';
 

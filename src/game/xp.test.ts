@@ -3,7 +3,7 @@ import {
   levelFromTotalXp,
   MAX_LEVEL,
   progressWithinLevel,
-  runShards,
+  campaignShards,
   runXp,
   totalXpForLevel,
   xpToNext,
@@ -83,15 +83,11 @@ describe("run rewards", () => {
     expect(runXp(counts, 5)).toBe(30);
   });
 
-  it("shards = nodes x1 + elites x4", () => {
-    expect(
-      runShards({
-        nodes: 12,
-        elites: 3,
-        minibosses: 1,
-        bosses: 1,
-        contractStars: 0,
-      }),
-    ).toBe(24);
+  it("campaign shards follow the DESIGN 12.3 sector table", () => {
+    expect(campaignShards(0)).toBe(0);
+    expect(campaignShards(1)).toBe(40);
+    expect(campaignShards(3)).toBe(170);
+    expect(campaignShards(5)).toBe(410);
+    expect(campaignShards(9)).toBe(410);
   });
 });

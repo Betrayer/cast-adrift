@@ -13,7 +13,6 @@
   },
   "map": {
     "title": "Sector {{n}} · {{name}}",
-    "sector1": "The Rim",
     "depth": "depth {{cur}} of {{max}} · autosave",
     "tide": "Interference tide {{n}}",
     "interference": "Interference ×{{n}}",
@@ -23,7 +22,9 @@
     "jumpHint": "Select a reachable node",
     "you": "You",
     "boss": "Boss",
-    "abandon": "Abandon run"
+    "abandon": "Abandon run",
+    "previewMiniboss": "Mini-boss: {{name}}",
+    "previewBoss": "Boss: {{name}}"
   },
   "event": {
     "title": "Signal",
@@ -113,14 +114,21 @@
     },
     "clause": "Hold {{n}}+ {{metric}}",
     "surviveLabel": "Survive the incoming hit",
-    "parity": { "even": "even", "odd": "odd" },
+    "parity": {
+      "even": "even",
+      "odd": "odd"
+    },
     "affix": {
       "burn": "Burn",
       "growth": "Growth",
       "exceedCap": "Over-cap",
       "affinity": "Affinity"
     },
-    "metric": { "damage": "damage", "charge": "charge", "shield": "shield" }
+    "metric": {
+      "damage": "damage",
+      "charge": "charge",
+      "shield": "shield"
+    }
   },
   "codex": {
     "title": "Codex",
@@ -172,7 +180,9 @@
     "repairHint": "2 scrap per hull",
     "leave": "Leave",
     "scrap": "Scrap: {{n}}",
-    "hull": "Hull {{cur}}/{{max}}"
+    "hull": "Hull {{cur}}/{{max}}",
+    "voucher": "Mk-voucher ×{{n}} — one free tier",
+    "voucherUse": "Free"
   },
   "summary": {
     "victory": "Sector cleared",
@@ -183,7 +193,49 @@
     "spent": "Scrap spent: {{n}}",
     "perks": "Upgrades:",
     "perksNone": "none",
-    "meta": "Shards & XP — Phase 7",
+    "meta": "Shards & XP",
     "toMenu": "To menu"
+  },
+  "prologue": {
+    "title": "Prologue",
+    "echo": "ECHO: {{line}}",
+    "step": "{{cur}} / {{max}}",
+    "leave": "Back to menu"
+  },
+  "interstitial": {
+    "sector": "Sector {{n}}",
+    "enter": "Enter the sector"
+  },
+  "finale": {
+    "title": "The Core Heart is open",
+    "intro": "Everything you decided out here is now a door. Only the ones you earned will open.",
+    "thin": "Echo: \"You left it thin, captain. Two doors, both of them shrugging.\"",
+    "axis": "Resonance ↔ Stability axis: {{n}}"
+  },
+  "ending": {
+    "next": "Continue",
+    "step": "{{cur}} / {{max}}",
+    "tally": "What you left behind",
+    "continue": "Close the log"
+  },
+  "setup": {
+    "title": "Launch",
+    "mode": "Campaign — five sectors, one ending.",
+    "ship": "Ship",
+    "deck": "Deck: {{n}} dice",
+    "ascension": "Ascension",
+    "ascensionLocked": "Clear the campaign once to unlock ascension.",
+    "aLevel": "A{{n}}",
+    "tideCap": "Interference tide caps at {{n}}",
+    "launch": "Launch",
+    "back": "Back"
+  },
+  "package": {
+    "title": "Gate package",
+    "scrap": "+{{n}} scrap",
+    "voucher": "Mk-voucher ×{{n}} — one free upgrade at any shipyard",
+    "take": "Take",
+    "sell": "Sell (+{{n}})",
+    "hint": "Pick one. The perk draft follows."
   }
 }

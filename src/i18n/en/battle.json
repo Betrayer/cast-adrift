@@ -55,7 +55,14 @@
     "charge": "Charging up",
     "jamSlot": "Jams a slot",
     "lockDie": "Locks a die",
-    "summon": "Summons"
+    "summon": "Summons",
+    "healAllies": "Heals allies +{{n}}",
+    "mirrorHalf": "Mirrors your last turn",
+    "stealScrap": "Steals {{n}} scrap",
+    "capShrink": "Shrinks a slot cap",
+    "twistDie": "Twists one of your dice",
+    "swapValues": "Swaps your high and low",
+    "storm": "Probability storm"
   },
   "slot": {
     "weaponA": "Weapon A",
@@ -68,5 +75,13 @@
     "reactor": "Reactor",
     "repairBay": "Repair Bay",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
-  }
+  },
+  "intro": {
+    "miniboss": "Mini-boss",
+    "boss": "Boss",
+    "subsystems": "Subsystems",
+    "begin": "Begin",
+    "hull": "Hull {{n}}"
+  },
+  "scriptHint": "Prologue: only {{slots}} may be used this turn."
 }

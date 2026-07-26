@@ -6,7 +6,7 @@ import {
   ENEMY_BY_ID,
   expandEncounterIds,
   isEncounterGroup,
-} from "../src/data/enemies/sector1";
+} from "../src/data/enemies";
 import {
   DECK_CAP,
   mkUpgradeCost,
@@ -15,6 +15,7 @@ import {
 } from "../src/game/economy/prices";
 import { computeNodeReward, isDraftNode } from "../src/game/economy/rewards";
 import { generateShopStock } from "../src/game/economy/shop";
+import { SECTORS } from "../src/data/sectors";
 import {
   BOSS_NODE_ID,
   generateSectorMap,
@@ -40,6 +41,7 @@ import {
   buildBattleSnapshot,
   canPlaceDie,
   createEnemyStream,
+  gateHpBonusPct,
   MAX_ENEMIES,
 } from "../src/game/battle/setup";
 import { buildEncounterIds } from "../src/game/run/encounter";
@@ -61,6 +63,7 @@ interface BattleInit {
   tide?: number;
   mkLevels?: MkLevels;
   perks?: readonly string[];
+  gateHpBonusPct?: number;
 }
 
 interface BattleResult {
@@ -113,6 +116,7 @@ const simulateBattle = (
       hull: init.hull,
       hullMax: init.hullMax,
       chargeCap: perkChargeCap(init.perks ?? []),
+      gateHpBonusPct: init.gateHpBonusPct,
     },
   );
   let dealt = 0;
@@ -727,6 +731,127 @@ const battleModeMain = (
   );
 };
 
+// ── Boss / gate mode ─────────────────────────────────────────────────────────
+
+interface GateProfile {
+  sector: number;
+  deck: readonly string[];
+  mkLevels: MkLevels;
+  hull: number;
+  tide: number;
+}
+
+// A "mid deck" for each act: what a player who bought sensibly and upgraded on
+// cadence actually brings to the gate. Used only for balance measurement.
+const GATE_PROFILES: readonly GateProfile[] = [
+  {
+    sector: 1,
+    deck: ["red-d6", "red-d6", "ember", "blue-d6", "grey-d4", "green-d4"],
+    mkLevels: {},
+    hull: 26,
+    tide: 2,
+  },
+  {
+    sector: 2,
+    deck: ["red-d6", "red-d6", "ember", "slug", "blue-d6", "bulwark", "grey-d4"],
+    mkLevels: { weaponA: 2 },
+    hull: 27,
+    tide: 2,
+  },
+  {
+    sector: 3,
+    deck: [
+      "red-d6", "red-d6", "ember", "slug", "cinder",
+      "blue-d6", "bulwark", "grey-d4",
+    ],
+    mkLevels: { weaponA: 2, shields: 2 },
+    hull: 28,
+    tide: 3,
+  },
+  {
+    sector: 4,
+    deck: [
+      "red-d6", "red-d6", "ember", "slug", "cinder", "fused-emberforge",
+      "blue-d6", "bulwark", "black-d6",
+    ],
+    mkLevels: { weaponA: 3, shields: 2, reactor: 2 },
+    hull: 29,
+    tide: 3,
+  },
+  {
+    sector: 5,
+    deck: [
+      "red-d6", "red-d6", "ember", "slug", "cinder", "fused-emberforge",
+      "blue-d6", "bulwark", "black-d6",
+    ],
+    mkLevels: { weaponA: 3, weaponB: 2, shields: 3, reactor: 2 },
+    hull: 30,
+    tide: 3,
+  },
+];
+
+const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const kind = getArg("gate", "boss");
+  const rows: string[] = [
+    "sector,target,runs,seed,winrate,timeouts,avgTurns,avgHullLeftWins",
+  ];
+  for (const profile of GATE_PROFILES) {
+    const def = SECTORS.find((s) => s.id === profile.sector);
+    if (def === undefined) continue;
+    const targets =
+      kind === "miniboss" ? [...def.minibossPool] : [def.bossId];
+    for (const target of targets) {
+      const results: BattleResult[] = [];
+      for (let i = 0; i < runs; i += 1) {
+        results.push(
+          simulateBattle(
+            [target],
+            profile.deck,
+            deriveSeed(seed, `${target}:run-${String(i)}`),
+            {
+              hull: profile.hull,
+              hullMax: profile.hull,
+              tide: profile.tide,
+              mkLevels: profile.mkLevels,
+              gateHpBonusPct: gateHpBonusPct(profile.sector),
+            },
+          ),
+        );
+      }
+      const wins = results.filter((r) => r.win);
+      const winrate = wins.length / results.length;
+      const timeouts = results.filter((r) => r.timeout).length;
+      const avgTurns =
+        results.reduce((sum, r) => sum + r.turns, 0) / results.length;
+      const avgHull =
+        wins.length > 0
+          ? wins.reduce((sum, r) => sum + r.hullLeft, 0) / wins.length
+          : 0;
+      rows.push(
+        [
+          String(profile.sector),
+          target,
+          String(results.length),
+          String(seed),
+          winrate.toFixed(3),
+          String(timeouts),
+          avgTurns.toFixed(2),
+          avgHull.toFixed(2),
+        ].join(","),
+      );
+      console.log(
+        `sim gate: S${String(profile.sector)} ${target} — winrate ${(winrate * 100).toFixed(1)}% · avgTurns ${avgTurns.toFixed(1)} · avgHullLeft(wins) ${avgHull.toFixed(1)} · timeouts ${String(timeouts)}`,
+      );
+    }
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `gate-${kind}-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+};
+
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
@@ -738,6 +863,10 @@ const main = (): void => {
   }
   if (mode === "run") {
     runModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "gate") {
+    gateModeMain(runs, seed, startedAt);
     return;
   }
   battleModeMain(runs, seed, startedAt);

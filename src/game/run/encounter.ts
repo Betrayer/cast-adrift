@@ -1,37 +1,12 @@
+import { sectorDef } from "@/data/sectors";
 import type { RngStream } from "@/services/rng";
 import type { NodeType } from "@/game/map/types";
 import type { FlagValue } from "@/types/events";
 
-// Singles: uniform over the sector-1 roster. raider is a solo bruiser (Phase-3 notes:
-// ~83% solo) and is NOT a pair member — brutal in pairs (raider+scavDrone ≈ 14%).
-const SINGLE_POOL: readonly (readonly [string, number])[] = [
-  ["scavDrone", 2],
-  ["raider", 2],
-  ["shieldWarden", 2],
-  ["jammerCorvette", 2],
-  ["leechSkiff", 2],
-  ["choirZealot", 2],
-  ["riftWasp", 2],
-];
-
-// Curated pairs (Phase-3 notes open risk #5: curate, don't sample the roster uniformly).
-// Excludes raider and the near-impossible shieldWarden+riftWasp (0.3%). These land in the
-// 45-65% pair band against the greedy bot.
-const CURATED_PAIRS: readonly (readonly [string, string])[] = [
-  ["choirZealot", "riftWasp"],
-  ["jammerCorvette", "leechSkiff"],
-  ["shieldWarden", "scavDrone"],
-  ["scavDrone", "scavDrone"],
-  ["leechSkiff", "riftWasp"],
-  ["choirZealot", "scavDrone"],
-];
-
 const LIGHT_POOL: readonly string[] = ["scavDrone", "riftWasp", "choirZealot"];
 
-const flagSet = (
-  flags: Record<string, FlagValue>,
-  key: string,
-): boolean => flags[key] !== undefined;
+const flagSet = (flags: Record<string, FlagValue>, key: string): boolean =>
+  flags[key] !== undefined;
 
 // Consequence hook (DESIGN §3): once the player carries the cursed-cargo bounty
 // mark, the Bounty Huntress stalks the next elite until engaged.
@@ -43,28 +18,50 @@ export const shouldInjectBounty = (
   flagSet(flags, "hunterMark") &&
   !flagSet(flags, "hunterEngaged");
 
+export interface EncounterContext {
+  sector?: number;
+  flags?: Record<string, FlagValue>;
+  usedMinibosses?: readonly string[];
+}
+
+export const pickMiniboss = (
+  sector: number,
+  rng: RngStream,
+  used: readonly string[] = [],
+): string => {
+  const pool = sectorDef(sector).minibossPool;
+  const fresh = pool.filter((id) => !used.includes(id));
+  return rng.pick(fresh.length > 0 ? fresh : pool);
+};
+
 export const buildEncounterIds = (
   type: NodeType,
   rng: RngStream,
-  flags: Record<string, FlagValue> = {},
+  ctx: EncounterContext = {},
 ): string[] => {
-  if (type === "boss" || type === "miniboss") {
-    return ["raiderAlpha"];
+  const sector = ctx.sector ?? 1;
+  const flags = ctx.flags ?? {};
+  const def = sectorDef(sector);
+
+  if (type === "boss") return [def.bossId];
+  if (type === "miniboss") {
+    return [pickMiniboss(sector, rng, ctx.usedMinibosses ?? [])];
   }
   if (type === "elite") {
     if (shouldInjectBounty(type, flags)) return ["bountyHuntress"];
-    const ids = ["raiderAlpha"];
+    const ids = [rng.pick(def.elitePool)];
     if (rng.next() < 0.4) ids.push(rng.pick(LIGHT_POOL));
     return ids;
   }
-  // Sector 1 is tutorialized (DESIGN §2): singles-dominant, one enemy at a time, with
-  // the occasional curated pair as a step-up. Enemy stats stay at the Phase-3 baseline.
+  // Sector 1 is tutorialized (DESIGN §2): singles-dominant, one enemy at a time,
+  // with the occasional curated pair as a step-up. Later sectors pair harder.
+  const pairWeight = sector === 1 ? 1 : 2;
   const count = rng.weighted([
     [1, 4],
-    [2, 1],
+    [2, pairWeight],
   ]);
-  if (count === 1) return [rng.weighted(SINGLE_POOL)];
-  return [...rng.pick(CURATED_PAIRS)];
+  if (count === 1) return [rng.weighted(def.enemyPool)];
+  return [...rng.pick(def.pairPool)];
 };
 
 export const scaleHpForTide = (baseHp: number, tide: number): number =>

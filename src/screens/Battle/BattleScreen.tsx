@@ -7,7 +7,7 @@ import type { TFunction } from 'i18next';
 import type { Application } from 'pixi.js';
 import { tokens } from '@/app/theme';
 import { STARTER_DECK } from '@/data/decks';
-import { ENEMY_BY_ID } from '@/data/enemies/sector1';
+import { ENEMY_BY_ID } from '@/data/enemies';
 import { DIE_BY_ID } from '@/data/dice';
 import { schools } from '@/data/schools';
 import { canCopy, canFlip } from '@/game/battle/actives';
@@ -29,13 +29,19 @@ import { hasTrait } from '@/game/run/perkMods';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { initAudio } from '@/services/audio';
+import { haptic } from '@/services/tma';
 import { createStreams } from '@/services/rng';
+import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
 import { useAppStore } from '@/stores/appStore';
-import { useBattleStore } from '@/stores/battleStore';
+import { allowedSlotsForTurn, useBattleStore } from '@/stores/battleStore';
 import { useRunStore } from '@/stores/runStore';
+import { BossIntro } from '@/screens/Battle/BossIntro';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
+import bossStyles from './BossIntro.module.css';
 import type { Intent } from '@/types/content';
 import styles from './BattleScreen.module.css';
+
+const BOSS_HIT_STOP_MS = 300;
 
 const startTestBattleIfIdle = (): void => {
   const store = useBattleStore.getState();
@@ -65,6 +71,20 @@ const intentLabel = (t: TFunction<['battle', 'content']>, intent: Intent): strin
       return t('battle:intent.lockDie');
     case 'summon':
       return t('battle:intent.summon');
+    case 'healAllies':
+      return t('battle:intent.healAllies', { n: intent.n });
+    case 'mirrorHalf':
+      return t('battle:intent.mirrorHalf');
+    case 'stealScrap':
+      return t('battle:intent.stealScrap', { n: intent.n });
+    case 'capShrink':
+      return t('battle:intent.capShrink');
+    case 'twistDie':
+      return t('battle:intent.twistDie');
+    case 'swapValues':
+      return t('battle:intent.swapValues');
+    case 'storm':
+      return t('battle:intent.storm');
   }
 };
 
@@ -376,6 +396,21 @@ const ActivePerks = () => {
   );
 };
 
+const ScriptHint = () => {
+  const { t } = useTranslation(['battle']);
+  const scriptedSlots = useBattleStore((s) => s.scriptedSlots);
+  const turn = useBattleStore((s) => s.turn);
+  const allowed = allowedSlotsForTurn(scriptedSlots, turn);
+  if (allowed === null || allowed.length === 0) return null;
+  return (
+    <Text size="xs" c={tokens.amber} ta="center">
+      {t('battle:scriptHint', {
+        slots: allowed.map((slot) => t(`battle:slot.${slot}`)).join(' · '),
+      })}
+    </Text>
+  );
+};
+
 const BottomBar = () => {
   const { t } = useTranslation(['battle']);
   const phase = useBattleStore((s) => s.phase);
@@ -389,6 +424,7 @@ const BottomBar = () => {
   return (
     <div className={styles.bottomBar}>
       <ResonanceChips />
+      <ScriptHint />
       {rerollMode ? (
         <Text size="xs" c={tokens.dim} ta="center">
           {t('battle:rerollHint', { size: rerollSize })}
@@ -483,6 +519,15 @@ export const BattleScreen = () => {
   const hull = useBattleStore((s) => s.hull);
   const hullMax = useBattleStore((s) => s.hullMax);
   const dropLoot = useLootStore((s) => s.drop);
+  const introEnemyId = useBattleStore((s) => s.introEnemyId);
+  const enemyBeats = useBattleStore((s) => s.enemyBeats);
+  const beatSeq = useBattleStore((s) => s.beatSeq);
+  const bossFight = introEnemyId !== null;
+  const reduced = resolveReducedMotion(
+    useSettingsStore((s) => s.reducedMotion),
+  );
+  const bossFall =
+    bossFight && phase === 'ended' && outcome === 'victory' && !reduced;
   const droppedRef = useRef(false);
   const resolvedRef = useRef(false);
   const lowHullRef = useRef(false);
@@ -502,6 +547,12 @@ export const BattleScreen = () => {
     if (!useRunStore.getState().active) startTestBattleIfIdle();
   }, []);
 
+  // Echo calls the turn when a boss rewrites itself mid-fight.
+  useEffect(() => {
+    if (!bossFight || beatSeq === 0) return;
+    if (enemyBeats.some((b) => b.kind === 'phase')) emitBark('bossPhase');
+  }, [beatSeq, enemyBeats, bossFight]);
+
   useEffect(() => {
     if (runActive) return;
     if (outcome === 'victory' && !droppedRef.current) {
@@ -513,11 +564,18 @@ export const BattleScreen = () => {
 
   useEffect(() => {
     if (!runActive) return;
-    if (phase === 'ended' && !resolvedRef.current) {
-      resolvedRef.current = true;
+    if (phase !== 'ended' || resolvedRef.current) return;
+    resolvedRef.current = true;
+    if (!bossFall) {
       resolveActiveBattle();
+      return;
     }
-  }, [phase, runActive]);
+    haptic('heavy');
+    const id = window.setTimeout(resolveActiveBattle, BOSS_HIT_STOP_MS);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [phase, runActive, bossFall]);
 
   const mountScene = useMemo(
     () => (app: Application) =>
@@ -546,6 +604,8 @@ export const BattleScreen = () => {
         <BottomBar />
       </div>
       <LootReveal />
+      {bossFall ? <div className={bossStyles.bossFall} /> : null}
+      <BossIntro />
       {phase === 'ended' && !runActive ? <EndOverlay /> : null}
       {debugEnabled ? <DebugPanel /> : null}
     </Box>

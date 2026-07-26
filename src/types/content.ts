@@ -37,20 +37,37 @@ export interface DieItemDef {
 }
 
 export type Intent =
-  | { t: "attack"; n: number }
+  | { t: "attack"; n: number; self?: number }
   | { t: "shield"; n: number }
   | { t: "shieldAll"; n: number }
   | { t: "multi"; n: number; k: number }
   | { t: "charge" }
   | { t: "jamSlot" }
   | { t: "lockDie" }
-  | { t: "summon"; id: string };
+  | { t: "summon"; id: string }
+  | { t: "healAllies"; n: number }
+  | { t: "mirrorHalf" }
+  | { t: "stealScrap"; n: number }
+  | { t: "capShrink" }
+  | { t: "twistDie" }
+  | { t: "swapValues" }
+  | { t: "storm" };
 
 export type PatternStep =
   | Intent
   | { pick: readonly (readonly [Intent, number])[] };
 
-export type SubsystemAura = "atk+2" | "shieldAllies3" | "lockEachTurn";
+export type SubsystemAura =
+  | "atk+2"
+  | "atk+3"
+  | "shieldAllies3"
+  | "shieldSelf6"
+  | "lockEachTurn"
+  | "lockEvery3"
+  | "twistEachTurn"
+  | "chargeAllies"
+  | "summonEvery4"
+  | "stealOnHit6";
 
 export interface SubsystemDef {
   id: string;
@@ -59,7 +76,16 @@ export interface SubsystemDef {
   aura: SubsystemAura;
 }
 
-export type OnDeathEffect = { t: "blockSlot"; slot: "weaponA" };
+export type OnDeathEffect =
+  | { t: "blockSlot"; slot: "weaponA" }
+  | { t: "explode"; n: number };
+
+export interface PhaseScript {
+  untilHpPct: number;
+  pattern: PatternStep[];
+  onEnter?: readonly Intent[];
+  everyTurn?: readonly Intent[];
+}
 
 export interface EnemyDef {
   id: string;
@@ -68,6 +94,19 @@ export interface EnemyDef {
   pattern: PatternStep[];
   env?: boolean;
   elite?: boolean;
+  miniboss?: boolean;
+  boss?: boolean;
+  shell?: boolean;
+  guarded?: boolean;
+  stealOnHit?: number;
+  markVulnerable?: boolean;
   onDeath?: OnDeathEffect;
   subsystems?: SubsystemDef[];
+  phases?: readonly PhaseScript[];
+}
+
+export interface BossDef extends EnemyDef {
+  boss: true;
+  subsystems: SubsystemDef[];
+  phases: PhaseScript[];
 }

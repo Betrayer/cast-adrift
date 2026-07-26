@@ -18,7 +18,7 @@ const resetMeta = (): void => {
     contracts: {},
     ascension: { campaign: 0 },
     flagsArchive: [],
-    stats: { runs: 0, wins: 0, shardsEarned: 0 },
+    stats: { runs: 0, wins: 0, shardsEarned: 0, prologueDone: false, campaignClears: 0 },
   });
 };
 

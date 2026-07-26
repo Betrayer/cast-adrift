@@ -13,8 +13,8 @@ describe("interference tide", () => {
   });
 
   it("spawns enemies with tide-scaled hp", () => {
-    const base = spawnEnemy("raider", "e", createStream(1), 0).hp;
-    const scaled = spawnEnemy("raider", "e", createStream(1), 3).hp;
+    const base = spawnEnemy("raider", "e", createStream(1), { tide: 0 }).hp;
+    const scaled = spawnEnemy("raider", "e", createStream(1), { tide: 3 }).hp;
     expect(base).toBe(32);
     expect(scaled).toBe(42);
     expect(scaled).toBeGreaterThan(base);

@@ -58,5 +58,19 @@ export const runXp = (counts: RunCounts, ascension = 0): number => {
   return Math.round(raw * ascensionMult(ascension));
 };
 
-export const runShards = (counts: RunCounts): number =>
-  counts.nodes * 1 + counts.elites * 4;
+// DESIGN §12.3 campaign table. Replaces the Phase-5 per-node slice formula:
+// shards now come from sector clears, not from node grinding.
+export const SECTOR_CLEAR_SHARDS: readonly number[] = [40, 55, 75, 100, 140];
+export const BOSS_FIRST_KILL_SHARDS: readonly number[] = [25, 35, 50, 70, 100];
+
+export const sectorClearShards = (sector: number): number =>
+  SECTOR_CLEAR_SHARDS[Math.max(0, Math.min(4, sector - 1))] ?? 0;
+
+export const bossFirstKillShards = (sector: number): number =>
+  BOSS_FIRST_KILL_SHARDS[Math.max(0, Math.min(4, sector - 1))] ?? 0;
+
+export const campaignShards = (sectorsCleared: number): number =>
+  SECTOR_CLEAR_SHARDS.slice(0, Math.max(0, sectorsCleared)).reduce(
+    (sum, n) => sum + n,
+    0,
+  );

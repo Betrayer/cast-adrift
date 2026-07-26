@@ -16,8 +16,8 @@ import { DIE_BY_ID } from '@/data/dice';
 import {
   ENCOUNTER_GROUPS,
   ENEMY_BY_ID,
-  SECTOR1_ENEMIES,
-} from '@/data/enemies/sector1';
+  ALL_ENEMIES,
+} from '@/data/enemies';
 import { SHIPS, type ShipId } from '@/data/ships';
 import { mountTextureGrid } from '@/pixi/battle/textureGrid';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
@@ -59,11 +59,25 @@ const intentSummary = (intent: Intent): string => {
       return 'lockDie';
     case 'summon':
       return `summon ${intent.id}`;
+    case 'healAllies':
+      return `heal ${String(intent.n)}`;
+    case 'mirrorHalf':
+      return 'mirror';
+    case 'stealScrap':
+      return `steal ${String(intent.n)}`;
+    case 'capShrink':
+      return 'capShrink';
+    case 'twistDie':
+      return 'twist';
+    case 'swapValues':
+      return 'swap';
+    case 'storm':
+      return 'storm';
   }
 };
 
 const encounterOptions = [
-  ...SECTOR1_ENEMIES.filter((e) => e.id !== 'mine').map((e) => e.id),
+  ...ALL_ENEMIES.filter((e) => e.id !== 'mine').map((e) => e.id),
   ...Object.keys(ENCOUNTER_GROUPS),
   'raider,scavDrone',
   'jammerCorvette,leechSkiff',

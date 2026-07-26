@@ -83,6 +83,13 @@ const pickRunValues = (s: RunState): RunValues => ({
         },
   deckSeq: s.deckSeq,
   stats: { ...s.stats },
+  ascension: s.ascension,
+  vouchers: s.vouchers,
+  usedMinibosses: [...s.usedMinibosses],
+  bossesKilled: [...s.bossesKilled],
+  memoriesUnlocked: s.memoriesUnlocked,
+  endingId: s.endingId,
+  startedAt: s.startedAt,
 });
 
 export const captureRunSnapshot = (): RunSnapshotV1 => ({
@@ -107,7 +114,7 @@ export const restoreRunSnapshot = (data: unknown): boolean => {
   if (!isRunSnapshot(data)) return false;
   useRunStore
     .getState()
-    .hydrate({ ...createInitialRunValues(), ...data.run });
+    .hydrate({ ...createInitialRunValues(), ...data.run, mode: "campaign" });
   if (data.battle !== null) hydrateBattle(data.battle);
   useAppStore.getState().go(data.screen);
   resetBarkMemory();

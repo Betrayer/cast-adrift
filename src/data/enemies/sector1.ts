@@ -112,21 +112,3 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
   },
 ];
 
-export const ENEMY_BY_ID: ReadonlyMap<string, EnemyDef> = new Map(
-  SECTOR1_ENEMIES.map((def) => [def.id, def]),
-);
-
-export const ENCOUNTER_GROUPS: Readonly<Record<string, readonly string[]>> = {
-  mineCluster: ["mine", "mine", "mine"],
-};
-
-export const isEncounterGroup = (id: string): boolean =>
-  Object.hasOwn(ENCOUNTER_GROUPS, id);
-
-export const expandEncounterIds = (
-  enemyIds: readonly string[],
-): string[] =>
-  enemyIds.flatMap((id) => {
-    const group = isEncounterGroup(id) ? ENCOUNTER_GROUPS[id] : undefined;
-    return group === undefined ? [id] : [...group];
-  });

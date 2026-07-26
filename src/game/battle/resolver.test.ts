@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ENEMY_BY_ID } from "@/data/enemies/sector1";
+import { ENEMY_BY_ID } from "@/data/enemies";
 import {
   advanceTurn,
   CHARGE_CAP,
@@ -40,6 +40,7 @@ const mkEnemy = (over: Partial<EnemyState> = {}): EnemyState => ({
   nextIntent: { t: "attack", n: 5 },
   statuses: {},
   subsystems: [],
+  phase: 0,
   ...over,
 });
 
@@ -89,9 +90,16 @@ const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
   bloodReactorUsed: false,
   burnDoubleUsed: false,
   blockedSlots: [],
+  shrunkSlots: [],
   lockedDice: [],
   resonance: computeCensus([]),
   survivedLethal: false,
+  lastPlayerDamage: 0,
+  stolenScrap: 0,
+  pendingTwist: 0,
+  pendingSwap: 0,
+  pendingStorm: 0,
+  ascension: 0,
   ...over,
 });
 

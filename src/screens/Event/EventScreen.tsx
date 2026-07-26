@@ -33,6 +33,7 @@ import { useRunStore } from "@/stores/runStore";
 import type { School } from "@/types/content";
 import type {
   EventDef,
+  EventKind,
   EventOption,
   ForcedBattle,
   OptionRequirement,
@@ -57,7 +58,11 @@ const buildStreams = (seed: number, key: string): EventStreams => ({
   loot: createStream(deriveSeed(seed, `evloot:${key}`)),
 });
 
-const resolveEventForNode = (nodeId: string, forcedId?: string): Resolved => {
+const resolveEventForNode = (
+  nodeId: string,
+  kind: EventKind,
+  forcedId?: string,
+): Resolved => {
   const s = useRunStore.getState();
   if (forcedId !== undefined) {
     return {
@@ -73,7 +78,7 @@ const resolveEventForNode = (nodeId: string, forcedId?: string): Resolved => {
     flags: s.flags,
     seenEvents: s.seenEvents,
   };
-  const event = pickEvent(ALL_EVENTS, ctx, "event", pickStream);
+  const event = pickEvent(ALL_EVENTS, ctx, kind, pickStream);
   return { nodeId, event, streams: buildStreams(s.seed, nodeId) };
 };
 
@@ -336,7 +341,10 @@ const EventRunner = ({
                     <Button
                       fullWidth
                       variant="default"
+                      h="auto"
+                      py={8}
                       disabled={!met}
+                      styles={{ label: { whiteSpace: "normal", lineHeight: 1.3 } }}
                       onClick={() => {
                         pickOption(option);
                       }}
@@ -426,9 +434,17 @@ export const EventScreen = () => {
   const map = useRunStore((s) => s.map);
   const forcedId = useAppStore((s) => s.params?.eventId);
   const forced = forcedId !== undefined;
+  const nodeKind: EventKind =
+    map === null || position === null
+      ? "event"
+      : nodeById(map).get(position)?.type === "beacon"
+        ? "beacon"
+        : "event";
   const [resolved] = useState<Resolved | null>(() => {
-    if (forcedId !== undefined) return resolveEventForNode("", forcedId);
-    return position === null ? null : resolveEventForNode(position);
+    if (forcedId !== undefined) return resolveEventForNode("", "event", forcedId);
+    return position === null
+      ? null
+      : resolveEventForNode(position, nodeKind);
   });
 
   const event = resolved?.event ?? null;

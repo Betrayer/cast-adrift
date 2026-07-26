@@ -54,6 +54,7 @@ export interface EnemyState {
   nextIntent: Intent;
   statuses: Statuses;
   subsystems: SubsystemState[];
+  phase: number;
 }
 
 export type ResonanceThreshold = 2 | 4 | 6;
@@ -109,9 +110,16 @@ export interface BattleSnapshot {
   bloodReactorUsed: boolean;
   burnDoubleUsed: boolean;
   blockedSlots: BlockedSlot[];
+  shrunkSlots: BlockedSlot[];
   lockedDice: LockedDie[];
   resonance: ResonanceCensus;
   survivedLethal: boolean;
+  lastPlayerDamage: number;
+  stolenScrap: number;
+  pendingTwist: number;
+  pendingSwap: number;
+  pendingStorm: number;
+  ascension: number;
   outcome?: BattleOutcome;
 }
 
@@ -149,7 +157,15 @@ export type EnemyBeatKind =
   | "jamSlot"
   | "lockDie"
   | "summon"
-  | "burnTick";
+  | "burnTick"
+  | "heal"
+  | "steal"
+  | "capShrink"
+  | "twist"
+  | "swap"
+  | "storm"
+  | "explode"
+  | "phase";
 
 export interface EnemyBeat {
   enemyId: string;

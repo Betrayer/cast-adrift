@@ -2,6 +2,10 @@ import { Box, Button, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
+import { ENEMY_BY_ID } from "@/data/enemies";
+import { sectorDef } from "@/data/sectors";
+import { pickMiniboss } from "@/game/run/encounter";
+import { createStream, deriveSeed } from "@/services/rng";
 import { abandonRun, jumpTo } from "@/game/run/flow";
 import {
   areConnected,
@@ -82,6 +86,8 @@ const MapView = ({ map, position }: MapViewProps) => {
   const tide = useRunStore((s) => s.tide);
   const interference = useRunStore((s) => s.interferenceStacks);
   const sector = useRunStore((s) => s.sector);
+  const seed = useRunStore((s) => s.seed);
+  const usedMinibosses = useRunStore((s) => s.usedMinibosses);
   const pendingDeepScan = useRunStore((s) => s.pendingDeepScan);
   const bonusReveal = useRunStore((s) => s.bonusReveal);
   const sensorsMk = useRunStore((s) => s.mkLevels.sensors ?? 1);
@@ -167,14 +173,32 @@ const MapView = ({ map, position }: MapViewProps) => {
   const canJump =
     !jumping && selectedNode !== undefined && selectedNode !== null && isLegal(selectedNode);
 
+  // Intent preview: the gate row announces which of the six mini-bosses waits.
+  const previewLabel = ((): string | null => {
+    if (selectedNode === undefined || selectedNode === null) return null;
+    if (selectedNode.type === "boss") {
+      const boss = ENEMY_BY_ID.get(sectorDef(sector).bossId);
+      return boss === undefined
+        ? null
+        : t("run:map.previewBoss", { name: t(boss.name) });
+    }
+    if (selectedNode.type !== "miniboss") return null;
+    const stream = createStream(deriveSeed(seed, `enc:${selectedNode.id}`));
+    const id = pickMiniboss(sector, stream, usedMinibosses);
+    const def = ENEMY_BY_ID.get(id);
+    return def === undefined
+      ? null
+      : t("run:map.previewMiniboss", { name: t(def.name) });
+  })();
+
   return (
     <div className={styles.root}>
       <div className={styles.header}>
         <div className={styles.headTitle}>
-          <Text fw={600} c={tokens.text}>
+          <Text fw={600} c={sectorDef(sector).accent}>
             {t("run:map.title", {
               n: sector,
-              name: t("run:map.sector1"),
+              name: t(sectorDef(sector).name),
             })}
           </Text>
           <Text size="xs" c={tokens.faint}>
@@ -220,7 +244,6 @@ const MapView = ({ map, position }: MapViewProps) => {
           })}
 
           {visibleNodes.map((node, index) => {
-            if (node.type === "boss") return null;
             const current = node.id === position;
             const chosen = node.id === selected;
             const legal = isLegal(node);
@@ -251,7 +274,13 @@ const MapView = ({ map, position }: MapViewProps) => {
                   cx={nodeX(node)}
                   cy={rowY(node.row)}
                   r={nodeRadius(node)}
-                  fill={current ? "#221A38" : "#182238"}
+                  fill={
+                    node.type === "boss"
+                      ? "#2E1517"
+                      : current
+                        ? "#221A38"
+                        : "#182238"
+                  }
                   stroke={ring.stroke}
                   strokeWidth={ring.width}
                 />
@@ -335,27 +364,6 @@ const MapView = ({ map, position }: MapViewProps) => {
             </g>
           ) : null}
 
-          <g>
-            <circle
-              cx={CENTER_X}
-              cy={rowY(BOSS_ROW)}
-              r={22}
-              fill="#2E1517"
-              stroke={tokens.danger}
-              strokeWidth={2}
-            />
-            <text
-              x={CENTER_X}
-              y={rowY(BOSS_ROW) + 4}
-              textAnchor="middle"
-              fontSize={12}
-              fontWeight={600}
-              fill="#F0A09A"
-            >
-              {t("run:map.boss")}
-            </text>
-          </g>
-
           {jumping ? (
             <g
               className={styles.marker}
@@ -368,6 +376,11 @@ const MapView = ({ map, position }: MapViewProps) => {
       </div>
 
       <div className={styles.footer}>
+        {previewLabel === null ? null : (
+          <Text size="xs" c="#F0A09A" ta="center" fw={600}>
+            {previewLabel}
+          </Text>
+        )}
         <Button size="md" fullWidth disabled={!canJump} onClick={onJump}>
           {t("run:map.jump")}
         </Button>

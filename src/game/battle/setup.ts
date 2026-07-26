@@ -1,5 +1,5 @@
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
-import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies/sector1";
+import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies";
 import { SHIP_BY_ID, shipHasPassive, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
@@ -15,7 +15,19 @@ import type {
   SlotId,
   SlotState,
 } from "@/types/battle";
-import type { EnemyDef, Intent } from "@/types/content";
+import type {
+  DieTier,
+  EnemyDef,
+  Intent,
+  PatternStep,
+} from "@/types/content";
+
+export const TIER_LADDER: readonly DieTier[] = [4, 6, 8, 10, 12, 20, 100];
+
+export const shrinkTier = (tier: DieTier): DieTier => {
+  const index = TIER_LADDER.indexOf(tier);
+  return index <= 0 ? tier : (TIER_LADDER[index - 1] ?? tier);
+};
 
 export const MAX_ENEMIES = 3;
 export const DEFAULT_CHARGE_CAP = 10;
@@ -58,6 +70,10 @@ export interface BattleInit {
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
+  ascension?: number;
+  enemyHpBonusPct?: number;
+  gateHpBonusPct?: number;
+  eliteShield?: number;
 }
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
@@ -108,56 +124,112 @@ export const rollDeck = (
     };
   });
 
+export const phaseFloor = (ascension: number): number =>
+  ascension >= 5 ? 1 : 0;
+
+export const phaseIndexForHp = (
+  def: EnemyDef,
+  hp: number,
+  hpMax: number,
+  ascension = 0,
+): number => {
+  const phases = def.phases;
+  if (phases === undefined || phases.length === 0) return 0;
+  const floor = Math.min(phaseFloor(ascension), phases.length - 1);
+  const pct = hpMax > 0 ? (hp / hpMax) * 100 : 0;
+  for (let i = floor; i < phases.length; i += 1) {
+    const phase = phases[i];
+    if (phase !== undefined && pct > phase.untilHpPct) return i;
+  }
+  return phases.length - 1;
+};
+
+export const patternFor = (def: EnemyDef, phase: number): PatternStep[] => {
+  const script = def.phases?.[phase];
+  return script?.pattern ?? def.pattern;
+};
+
+export const everyTurnFor = (def: EnemyDef, phase: number): readonly Intent[] =>
+  def.phases?.[phase]?.everyTurn ?? [];
+
 export const drawIntent = (
   def: EnemyDef,
   intentIndex: number,
   enemyStream: RngStream,
+  phase = 0,
 ): Intent => {
-  const step = def.pattern[intentIndex % def.pattern.length];
+  const pattern = patternFor(def, phase);
+  const step = pattern[intentIndex % pattern.length];
   if (step === undefined)
     throw new Error(`drawIntent: "${def.id}" empty pattern`);
   if ("pick" in step) return enemyStream.weighted(step.pick);
   return step;
 };
 
+export interface SpawnInit {
+  tide?: number;
+  hpBonusPct?: number;
+  gateHpBonusPct?: number;
+  eliteShield?: number;
+  ascension?: number;
+}
+
+const isTough = (def: EnemyDef): boolean =>
+  def.elite === true || def.miniboss === true || def.boss === true;
+
+// The six mini-bosses rotate across sectors with very different decks facing
+// them, so they ride the same ×(1 + 0.15×(sector−1)) curve the enemy pools were
+// baked with. Bosses are authored per act and need no runtime scaling.
+export const GATE_CURVE_PCT_PER_SECTOR = 15;
+
+export const gateHpBonusPct = (sector: number): number =>
+  Math.max(0, sector - 1) * GATE_CURVE_PCT_PER_SECTOR;
+
 export const spawnEnemy = (
   defId: string,
   id: string,
   enemyStream: RngStream,
-  tide = 0,
+  init: SpawnInit = {},
 ): EnemyState => {
   const def = ENEMY_BY_ID.get(defId);
   if (def === undefined)
     throw new Error(`spawnEnemy: unknown enemy "${defId}"`);
-  const hp = scaleHpForTide(def.hp, tide);
+  const tide = init.tide ?? 0;
+  const gate = def.miniboss === true ? (init.gateHpBonusPct ?? 0) : 0;
+  const bonus = 1 + Math.max(0, (init.hpBonusPct ?? 0) + gate) / 100;
+  const scale = (base: number): number =>
+    Math.max(1, Math.round(scaleHpForTide(base, tide) * bonus));
+  const hp = scale(def.hp);
+  const phase = phaseIndexForHp(def, hp, hp, init.ascension ?? 0);
   return {
     id,
     defId,
     hp,
     hpMax: hp,
-    shield: 0,
+    shield: isTough(def) ? (init.eliteShield ?? 0) : 0,
     intentIndex: 0,
-    nextIntent: drawIntent(def, 0, enemyStream),
+    nextIntent: drawIntent(def, 0, enemyStream, phase),
     statuses: {},
     subsystems: (def.subsystems ?? []).map((sub) => ({
       id: `${id}:${sub.id}`,
       key: sub.id,
-      hp: scaleHpForTide(sub.hp, tide),
-      hpMax: scaleHpForTide(sub.hp, tide),
+      hp: scale(sub.hp),
+      hpMax: scale(sub.hp),
       aura: sub.aura,
     })),
+    phase,
   };
 };
 
 export const buildEnemies = (
   enemyIds: readonly string[],
   enemyStream: RngStream,
-  tide = 0,
+  init: SpawnInit = {},
 ): EnemyState[] =>
   expandEncounterIds(enemyIds)
     .slice(0, MAX_ENEMIES)
     .map((defId, index) =>
-      spawnEnemy(defId, `enemy-${String(index)}`, enemyStream, tide),
+      spawnEnemy(defId, `enemy-${String(index)}`, enemyStream, init),
     );
 
 export const buildBattleSnapshot = (
@@ -170,7 +242,14 @@ export const buildBattleSnapshot = (
   init: BattleInit = {},
 ): BattleSnapshot => {
   const tide = init.tide ?? 0;
-  const enemies = buildEnemies(enemyIds, enemyStream, tide);
+  const ascension = init.ascension ?? 0;
+  const enemies = buildEnemies(enemyIds, enemyStream, {
+    tide,
+    hpBonusPct: init.enemyHpBonusPct ?? 0,
+    gateHpBonusPct: init.gateHpBonusPct ?? 0,
+    eliteShield: init.eliteShield ?? 0,
+    ascension,
+  });
   const dice = rollDeck(deckDefIds, streams);
   const hullMax = init.hullMax ?? shipHullMax(shipId);
   const snapshot: BattleSnapshot = {
@@ -199,9 +278,16 @@ export const buildBattleSnapshot = (
     bloodReactorUsed: false,
     burnDoubleUsed: false,
     blockedSlots: [],
+    shrunkSlots: [],
     lockedDice: [],
     resonance: computeCensus(dice),
     survivedLethal: false,
+    lastPlayerDamage: 0,
+    stolenScrap: 0,
+    pendingTwist: 0,
+    pendingSwap: 0,
+    pendingStorm: 0,
+    ascension,
   };
   const perks = init.perks ?? [];
   applyRollFloors(dice, snapshot.resonance, hasTrait(perks, "stabilizer"));
@@ -218,6 +304,20 @@ export const isSlotBlocked = (
     (b) => b.slot === slotId && b.untilTurn >= snapshot.turn,
   );
 
+export const isSlotShrunk = (
+  snapshot: Pick<BattleSnapshot, "shrunkSlots" | "turn">,
+  slotId: SlotId,
+): boolean =>
+  (snapshot.shrunkSlots ?? []).some(
+    (b) => b.slot === slotId && b.untilTurn >= snapshot.turn,
+  );
+
+export const effectiveCap = (
+  snapshot: Pick<BattleSnapshot, "shrunkSlots" | "turn">,
+  slotId: SlotId,
+  slot: Pick<SlotState, "cap">,
+): DieTier => (isSlotShrunk(snapshot, slotId) ? shrinkTier(slot.cap) : slot.cap);
+
 export const isDieLocked = (
   snapshot: Pick<BattleSnapshot, "lockedDice" | "turn">,
   uid: string,
@@ -227,12 +327,15 @@ export const isDieLocked = (
   );
 
 export const dieFitsSlot = (
-  snapshot: Pick<BattleSnapshot, "resonance" | "shipId">,
+  snapshot: Pick<
+    BattleSnapshot,
+    "resonance" | "shipId" | "shrunkSlots" | "turn"
+  >,
   die: Pick<RolledDie, "tier" | "school">,
   slot: Pick<SlotState, "cap">,
   slotId: SlotId,
 ): boolean => {
-  if (die.tier <= slot.cap) return true;
+  if (die.tier <= effectiveCap(snapshot, slotId, slot)) return true;
   if (
     (die.school === "black" || die.school === "prismatic") &&
     resonanceAtLeast(snapshot.resonance, "black", 2)
@@ -252,6 +355,7 @@ export const canPlaceDie = (
     | "dice"
     | "slots"
     | "blockedSlots"
+    | "shrunkSlots"
     | "lockedDice"
     | "turn"
     | "resonance"
