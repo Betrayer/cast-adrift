@@ -22,12 +22,19 @@ import {
   START_NODE_ID,
 } from "../src/game/map/generator";
 import {
+  BOSS_ROW,
   nodeById,
   outgoingEdges,
   type MapGraph,
   type MapNode,
   type NodeType,
 } from "../src/game/map/types";
+import {
+  DRIFT_LOOP_HP_PCT,
+  DRIFT_TIDE_CAP,
+  SCORE_PER_DEPTH,
+  SCORE_PER_KILL,
+} from "../src/game/run/modes";
 import {
   decidePlacements,
   decideReroll,
@@ -64,6 +71,7 @@ interface BattleInit {
   mkLevels?: MkLevels;
   perks?: readonly string[];
   gateHpBonusPct?: number;
+  enemyHpBonusPct?: number;
 }
 
 interface BattleResult {
@@ -117,6 +125,7 @@ const simulateBattle = (
       hullMax: init.hullMax,
       chargeCap: perkChargeCap(init.perks ?? []),
       gateHpBonusPct: init.gateHpBonusPct,
+      enemyHpBonusPct: init.enemyHpBonusPct,
     },
   );
   let dealt = 0;
@@ -524,6 +533,247 @@ const runSector = (seed: number): SectorResult => {
   return finish(position === BOSS_NODE_ID, -1);
 };
 
+// ── Drift mode ────────────────────────────────────────────────────────────────
+
+interface DriftResult {
+  depth: number;
+  sectors: number;
+  kills: number;
+  scrapEarned: number;
+  score: number;
+  deathSector: number;
+}
+
+const driftSector = (
+  state: RunState,
+  seed: number,
+  sectorIndex: number,
+): { cleared: boolean; rows: number } => {
+  const streams = createStreams(deriveSeed(seed, `map:${String(sectorIndex)}`));
+  const sector = Math.min(SECTORS.length, sectorIndex);
+  const map: MapGraph = generateSectorMap(streams.map, sector, {
+    bossAsGate: true,
+  });
+  const byId = nodeById(map);
+  const loopHpPct = DRIFT_LOOP_HP_PCT * Math.max(0, sectorIndex - SECTORS.length);
+
+  let position = START_NODE_ID;
+  let posRow = 0;
+
+  for (let guard = 0; guard < 64; guard += 1) {
+    const next = greedyNext(map, byId, position, posRow);
+    if (next === undefined) return { cleared: false, rows: posRow };
+    position = next.id;
+    posRow = next.row;
+    state.jumpsSinceTide += 1;
+    if (state.jumpsSinceTide >= 4) {
+      state.tide = Math.min(DRIFT_TIDE_CAP, state.tide + 1);
+      state.jumpsSinceTide = 0;
+    }
+
+    const type = next.type;
+    if (FIGHT_TYPES.has(type)) {
+      const encStream = createStream(
+        deriveSeed(seed, `enc:${String(sectorIndex)}:${next.id}`),
+      );
+      const enemyIds = buildEncounterIds(type, encStream, { sector });
+      const res = simulateBattle(
+        enemyIds,
+        state.deck,
+        deriveSeed(seed, `node:${String(sectorIndex)}:${next.id}`),
+        {
+          hull: state.hull,
+          hullMax: state.hullMax,
+          tide: state.tide,
+          mkLevels: state.mkLevels,
+          perks: state.perks,
+          gateHpBonusPct: gateHpBonusPct(sector),
+          enemyHpBonusPct: loopHpPct,
+        },
+      );
+      state.hull = res.hullLeft;
+      state.kills += res.kills;
+      if (!res.win) return { cleared: false, rows: posRow };
+      state.nodes += 1;
+      const loot = createStream(
+        deriveSeed(seed, `loot:${String(sectorIndex)}:${next.id}`),
+      );
+      const reward = computeNodeReward(type, loot);
+      const mods = computePerkMods(state.perks);
+      gain(
+        state,
+        Math.round(
+          reward.scrap *
+            (SECTORS.find((s) => s.id === sector)?.scrapMult ?? 1) *
+            (1 + mods.scrapMultPct / 100),
+        ),
+      );
+      state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
+      if (reward.dieDrop !== null) {
+        if (state.deck.length < DECK_CAP) state.deck.push(reward.dieDrop);
+        else gain(state, sellValue(ptsForDie(reward.dieDrop)));
+      }
+      if (isDraftNode(type)) {
+        const choices = rollPerkChoices(loot, state.perks);
+        const pick = choices[0];
+        if (pick !== undefined) {
+          state.perks.push(pick);
+          const picked = computePerkMods([pick]);
+          if (picked.hullMaxDelta > 0) {
+            state.hullMax += picked.hullMaxDelta;
+            state.hull = Math.min(
+              state.hullMax,
+              state.hull + picked.hullMaxDelta,
+            );
+          }
+        }
+      }
+      if (posRow >= BOSS_ROW) return { cleared: true, rows: posRow };
+    } else if (type === "shop") {
+      greedyShop(state, deriveSeed(seed, `shop:${String(sectorIndex)}`), next);
+      state.nodes += 1;
+    } else if (type === "shipyard") {
+      const forecast =
+        fightsUntilRest(map, byId, next.id, next.row) * EXPECTED_DMG_PER_FIGHT;
+      greedyShipyard(state, forecast > state.hull * 0.6);
+      state.nodes += 1;
+    } else {
+      state.nodes += 1;
+    }
+  }
+  return { cleared: false, rows: posRow };
+};
+
+// The starter deck dies in sector 1 (same as `--mode run`), so the loop scaling is
+// never reached. `--deck mid` enters drift with what a mid-collection profile
+// actually brings, which is the only way to measure the +8%/loop ramp.
+const DRIFT_MID_DECK: readonly string[] = [
+  "red-d6",
+  "red-d6",
+  "ember",
+  "slug",
+  "cinder",
+  "fused-emberforge",
+  "blue-d6",
+  "bulwark",
+  "black-d6",
+];
+
+const DRIFT_MID_MK: MkLevels = {
+  weaponA: 3,
+  weaponB: 2,
+  shields: 3,
+  reactor: 2,
+};
+
+const runDrift = (seed: number, mid: boolean): DriftResult => {
+  const state: RunState = {
+    hull: 30,
+    hullMax: 30,
+    scrap: 0,
+    scrapEarned: 0,
+    scrapSpent: 0,
+    deck: mid ? [...DRIFT_MID_DECK] : [...STARTER_DECK],
+    mkLevels: mid ? { ...DRIFT_MID_MK } : {},
+    perks: [],
+    tide: 0,
+    jumpsSinceTide: 0,
+    kills: 0,
+    nodes: 0,
+  };
+
+  let sectorIndex = 1;
+  let depth = 0;
+  for (; sectorIndex <= 40; sectorIndex += 1) {
+    const { cleared, rows } = driftSector(state, seed, sectorIndex);
+    depth = (sectorIndex - 1) * BOSS_ROW + rows;
+    if (!cleared) break;
+    // Drift keeps the tide between sectors only through its cap; the map resets.
+    state.tide = Math.max(0, state.tide - 1);
+    state.jumpsSinceTide = 0;
+  }
+
+  return {
+    depth,
+    sectors: Math.max(1, Math.min(sectorIndex, 40)),
+    kills: state.kills,
+    scrapEarned: state.scrapEarned,
+    score: depth * SCORE_PER_DEPTH + state.kills * SCORE_PER_KILL + state.scrapEarned,
+    deathSector: Math.min(sectorIndex, 40),
+  };
+};
+
+const driftModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const deckName = getArg("deck", "starter");
+  if (deckName !== "starter" && deckName !== "mid") {
+    console.error(`sim: drift --deck must be "starter" or "mid"`);
+    process.exit(1);
+  }
+  const mid = deckName === "mid";
+  const results: DriftResult[] = [];
+  for (let i = 0; i < runs; i += 1) {
+    results.push(runDrift(deriveSeed(seed, `drift-${String(i)}`), mid));
+  }
+  const scores = results.map((r) => r.score).sort((a, b) => a - b);
+  const depths = results.map((r) => r.depth).sort((a, b) => a - b);
+  const avg = (f: (r: DriftResult) => number): number =>
+    results.reduce((s, r) => s + f(r), 0) / Math.max(1, results.length);
+
+  console.log(
+    `sim drift (${deckName}): avgDepth ${avg((r) => r.depth).toFixed(1)} · avgScore ${avg((r) => r.score).toFixed(0)} · avgKills ${avg((r) => r.kills).toFixed(1)} · avgScrap ${avg((r) => r.scrapEarned).toFixed(0)} · avgSectors ${avg((r) => r.sectors).toFixed(2)}`,
+  );
+  console.log(
+    `  score deciles: ${DECILES.map((q) => `P${String(Math.round(q * 100))}=${String(decile(scores, q))}`).join(" ")}`,
+  );
+  console.log(
+    `  depth deciles: ${DECILES.map((q) => `P${String(Math.round(q * 100))}=${String(decile(depths, q))}`).join(" ")}`,
+  );
+
+  const sectorHist = new Map<number, number>();
+  for (const r of results) {
+    sectorHist.set(r.deathSector, (sectorHist.get(r.deathSector) ?? 0) + 1);
+  }
+  console.log(
+    `  death sector histogram: ${[...sectorHist.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([s, n]) => `s${String(s)}:${String(n)}`)
+      .join(" ")}`,
+  );
+
+  const rows = [
+    "runs,seed,deck,avgDepth,avgScore,avgKills,avgScrapEarned,avgSectors," +
+      DECILES.map((q) => `scoreP${String(Math.round(q * 100))}`).join(",") +
+      "," +
+      DECILES.map((q) => `depthP${String(Math.round(q * 100))}`).join(","),
+    [
+      String(results.length),
+      String(seed),
+      deckName,
+      avg((r) => r.depth).toFixed(2),
+      avg((r) => r.score).toFixed(1),
+      avg((r) => r.kills).toFixed(2),
+      avg((r) => r.scrapEarned).toFixed(1),
+      avg((r) => r.sectors).toFixed(2),
+      ...DECILES.map((q) => String(decile(scores, q))),
+      ...DECILES.map((q) => String(decile(depths, q))),
+    ].join(","),
+    "",
+    "death_sector,count",
+    ...[...sectorHist.entries()]
+      .sort((a, b) => a[0] - b[0])
+      .map(([s, n]) => `${String(s)},${String(n)}`),
+  ];
+
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `drift-${deckName}-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(
+    `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms (${String(runs)} drift runs, seed ${String(seed)})`,
+  );
+};
+
 const runModeMain = (runs: number, seed: number, startedAt: number): void => {
   const results: SectorResult[] = [];
   for (let i = 0; i < runs; i += 1) {
@@ -863,6 +1113,10 @@ const main = (): void => {
   }
   if (mode === "run") {
     runModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "drift") {
+    driftModeMain(runs, seed, startedAt);
     return;
   }
   if (mode === "gate") {

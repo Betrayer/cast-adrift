@@ -17,12 +17,13 @@ const bootPlatform = async (): Promise<void> => {
   try {
     const session = await initTma();
     useAppStore.getState().setTgUserId(session.tgUserId);
+    useAppStore.getState().setTgName(session.tgName);
   } catch (error) {
     console.error('boot: tma init failed', error);
   }
   try {
     const { ensureAnonAuth } = await import('@/services/firebase');
-    await ensureAnonAuth();
+    useAppStore.getState().setUid(await ensureAnonAuth());
   } catch (error) {
     console.error('boot: firebase boot failed', error);
   }

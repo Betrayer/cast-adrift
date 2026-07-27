@@ -10,8 +10,8 @@ import { hangarBudget } from "@/data/milestones";
 import { validateDeck } from "@/game/meta/deck";
 import { campaignShards, runXp } from "@/game/xp";
 import { endRun, startRun } from "@/game/run/flow";
-import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import { createInitialMetaStats, useMetaStore } from "@/stores/metaStore";
+import { createInitialRunStats, useRunStore } from "@/stores/runStore";
 import { useSummaryStore } from "@/stores/summaryStore";
 
 describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
@@ -30,14 +30,23 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
       themes: ["deepSpace"], codex: [], codexRead: [], contracts: {},
       ascension: { campaign: 0 }, flagsArchive: [],
       bossFirstKills: [], endings: [],
-      stats: { runs: 0, wins: 0, shardsEarned: 0, prologueDone: false, campaignClears: 0 },
+      stats: createInitialMetaStats(),
     });
 
     // [1] Run-end award (boss-win path)
     const counts = { nodes: 60, elites: 12, minibosses: 5, bosses: 5, contractStars: 0 };
     useRunStore.setState({
       active: true,
-      stats: { nodesCleared: 60, elites: 12, minibosses: 5, bosses: 5, kills: 40, scrapEarned: 300, scrapSpent: 120 },
+      stats: {
+        ...createInitialRunStats(),
+        nodesCleared: 60,
+        elites: 12,
+        minibosses: 5,
+        bosses: 5,
+        kills: 40,
+        scrapEarned: 300,
+        scrapSpent: 120,
+      },
       flags: { metCartographer: true },
     });
     endRun(true);

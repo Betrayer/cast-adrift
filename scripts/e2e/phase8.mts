@@ -64,6 +64,12 @@ const main = async (): Promise<void> => {
         shardsEarned: 0,
         prologueDone: false,
         campaignClears: 0,
+        kills: 0,
+        scrapEarned: 0,
+        deepestDrift: 0,
+        driftRuns: 0,
+        dailyRuns: 0,
+        contractRuns: 0,
       },
     });
     window.__app?.getState().go("menu");

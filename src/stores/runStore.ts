@@ -10,7 +10,7 @@ import type { FlagValue } from "@/types/events";
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
 
-export type RunMode = "campaign";
+export type RunMode = "campaign" | "drift" | "daily" | "contract";
 
 export interface DieInstance {
   uid: string;
@@ -49,7 +49,57 @@ export interface RunStats {
   kills: number;
   scrapEarned: number;
   scrapSpent: number;
+  depth: number;
+  jumps: number;
+  battlesWon: number;
+  shieldAbsorbed: number;
+  spinalMaxHit: number;
+  rerollsUsed: number;
+  repairBayHealed: number;
+  fullHullBattleEnds: number;
+  minBattleTurns: number;
+  burnKillElites: number;
+  shipyardVisits: number;
+  maxBlackPlacedWin: number;
+  hullPctMin: number;
+  actionHash: number;
+  actionCount: number;
 }
+
+// Everything a finished battle contributes to the goal counters, captured before
+// the battle store resets.
+export interface BattleTally {
+  won: boolean;
+  turns: number;
+  shieldAbsorbed: number;
+  spinalMaxHit: number;
+  rerollsUsed: number;
+  repairBayHealed: number;
+  endedFullHull: boolean;
+  blackPlaced: number;
+  burnKilledElite: boolean;
+}
+
+const ADDITIVE_STAT_KEYS = [
+  "nodesCleared",
+  "elites",
+  "minibosses",
+  "bosses",
+  "kills",
+  "scrapEarned",
+  "scrapSpent",
+  "jumps",
+  "battlesWon",
+  "shieldAbsorbed",
+  "rerollsUsed",
+  "repairBayHealed",
+  "fullHullBattleEnds",
+  "burnKillElites",
+  "shipyardVisits",
+] as const;
+
+export const NO_BATTLE_TURNS = 0;
+export const FULL_HULL_PCT = 100;
 
 export interface PendingRewards {
   dieDrop: string | null;
@@ -63,7 +113,11 @@ export interface RunValues {
   active: boolean;
   seed: number;
   mode: RunMode;
+  mutators: string[];
+  contractId: string | null;
+  dailyDate: string | null;
   sector: number;
+  sectorIndex: number;
   depthRow: number;
   position: NodeId | null;
   map: MapGraph | null;
@@ -130,6 +184,9 @@ export interface RunState extends RunValues {
   addShipyardDiscount: (n: number) => void;
   setPendingBattle: (pending: PendingBattle | null) => void;
   bumpStats: (delta: Partial<RunStats>) => void;
+  noteDepth: (depth: number) => void;
+  noteHullPct: (pct: number) => void;
+  noteBattleTally: (tally: BattleTally) => void;
   clearPendingDeepScan: () => void;
   setPendingDeepScan: (value: boolean) => void;
   setPendingRewards: (rewards: PendingRewards | null) => void;
@@ -146,11 +203,40 @@ export interface RunState extends RunValues {
   reset: () => void;
 }
 
+export const createInitialRunStats = (): RunStats => ({
+  nodesCleared: 0,
+  elites: 0,
+  minibosses: 0,
+  bosses: 0,
+  kills: 0,
+  scrapEarned: 0,
+  scrapSpent: 0,
+  depth: 0,
+  jumps: 0,
+  battlesWon: 0,
+  shieldAbsorbed: 0,
+  spinalMaxHit: 0,
+  rerollsUsed: 0,
+  repairBayHealed: 0,
+  fullHullBattleEnds: 0,
+  minBattleTurns: NO_BATTLE_TURNS,
+  burnKillElites: 0,
+  shipyardVisits: 0,
+  maxBlackPlacedWin: 0,
+  hullPctMin: FULL_HULL_PCT,
+  actionHash: 0,
+  actionCount: 0,
+});
+
 export const createInitialRunValues = (): RunValues => ({
   active: false,
   seed: 0,
   mode: "campaign",
+  mutators: [],
+  contractId: null,
+  dailyDate: null,
   sector: 1,
+  sectorIndex: 1,
   depthRow: 0,
   position: null,
   map: null,
@@ -182,15 +268,7 @@ export const createInitialRunValues = (): RunValues => ({
   pendingRewards: null,
   shop: null,
   deckSeq: 0,
-  stats: {
-    nodesCleared: 0,
-    elites: 0,
-    minibosses: 0,
-    bosses: 0,
-    kills: 0,
-    scrapEarned: 0,
-    scrapSpent: 0,
-  },
+  stats: createInitialRunStats(),
   ascension: 0,
   vouchers: 0,
   usedMinibosses: [],
@@ -346,17 +424,59 @@ export const useRunStore = create<RunState>()((set, get) => ({
   },
 
   bumpStats: (delta) => {
-    set((s) => ({
-      stats: {
-        nodesCleared: s.stats.nodesCleared + (delta.nodesCleared ?? 0),
-        elites: s.stats.elites + (delta.elites ?? 0),
-        minibosses: s.stats.minibosses + (delta.minibosses ?? 0),
-        bosses: s.stats.bosses + (delta.bosses ?? 0),
-        kills: s.stats.kills + (delta.kills ?? 0),
-        scrapEarned: s.stats.scrapEarned + (delta.scrapEarned ?? 0),
-        scrapSpent: s.stats.scrapSpent + (delta.scrapSpent ?? 0),
-      },
-    }));
+    set((s) => {
+      const stats = { ...s.stats };
+      for (const key of ADDITIVE_STAT_KEYS) stats[key] += delta[key] ?? 0;
+      return { stats };
+    });
+  },
+
+  noteDepth: (depth) => {
+    set((s) =>
+      depth <= s.stats.depth
+        ? s
+        : { stats: { ...s.stats, depth: Math.round(depth) } },
+    );
+  },
+
+  noteHullPct: (pct) => {
+    const clamped = Math.max(0, Math.min(FULL_HULL_PCT, Math.round(pct)));
+    set((s) =>
+      clamped >= s.stats.hullPctMin
+        ? s
+        : { stats: { ...s.stats, hullPctMin: clamped } },
+    );
+  },
+
+  noteBattleTally: (tally) => {
+    set((s) => {
+      const prev = s.stats;
+      const turns = Math.max(1, tally.turns);
+      return {
+        stats: {
+          ...prev,
+          battlesWon: prev.battlesWon + (tally.won ? 1 : 0),
+          shieldAbsorbed: prev.shieldAbsorbed + tally.shieldAbsorbed,
+          rerollsUsed: prev.rerollsUsed + tally.rerollsUsed,
+          repairBayHealed: prev.repairBayHealed + tally.repairBayHealed,
+          fullHullBattleEnds:
+            prev.fullHullBattleEnds +
+            (tally.won && tally.endedFullHull ? 1 : 0),
+          burnKillElites:
+            prev.burnKillElites + (tally.burnKilledElite ? 1 : 0),
+          spinalMaxHit: Math.max(prev.spinalMaxHit, tally.spinalMaxHit),
+          maxBlackPlacedWin: tally.won
+            ? Math.max(prev.maxBlackPlacedWin, tally.blackPlaced)
+            : prev.maxBlackPlacedWin,
+          minBattleTurns:
+            tally.won && turns > 0
+              ? prev.minBattleTurns === NO_BATTLE_TURNS
+                ? turns
+                : Math.min(prev.minBattleTurns, turns)
+              : prev.minBattleTurns,
+        },
+      };
+    });
   },
 
   clearPendingDeepScan: () => {
