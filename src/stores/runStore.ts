@@ -1,7 +1,9 @@
 import { create } from "zustand";
+import { moduleSlots } from "@/data/modules";
 import type { ShipId } from "@/data/ships";
 import type { MkLevel } from "@/data/slots";
 import { interferenceStacksForStreak } from "@/game/run/interference";
+import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
 import type { SlotId } from "@/types/battle";
@@ -61,6 +63,7 @@ export interface RunStats {
   burnKillElites: number;
   shipyardVisits: number;
   maxBlackPlacedWin: number;
+  dicePlaced: number;
   hullPctMin: number;
   actionHash: number;
   actionCount: number;
@@ -77,6 +80,7 @@ export interface BattleTally {
   repairBayHealed: number;
   endedFullHull: boolean;
   blackPlaced: number;
+  dicePlaced: number;
   burnKilledElite: boolean;
 }
 
@@ -96,6 +100,7 @@ const ADDITIVE_STAT_KEYS = [
   "fullHullBattleEnds",
   "burnKillElites",
   "shipyardVisits",
+  "dicePlaced",
 ] as const;
 
 export const NO_BATTLE_TURNS = 0;
@@ -105,6 +110,7 @@ export interface PendingRewards {
   dieDrop: string | null;
   perkChoices: string[];
   dieChoices?: string[];
+  moduleChoices?: string[];
   voucher?: boolean;
   packageScrap?: number;
 }
@@ -128,6 +134,7 @@ export interface RunValues {
   shipId: ShipId;
   deck: DieInstance[];
   perks: string[];
+  modules: string[];
   chartPicks: string[];
   mkLevels: MkLevels;
   tide: number;
@@ -168,6 +175,8 @@ export interface RunState extends RunValues {
   healHull: (n: number) => void;
   setHull: (n: number) => void;
   addPerk: (perkId: string) => void;
+  addModule: (moduleId: string) => boolean;
+  removeModule: (moduleId: string) => void;
   setFlag: (key: string, value?: FlagValue) => void;
   clearFlag: (key: string) => void;
   addAxis: (n: number) => void;
@@ -223,6 +232,7 @@ export const createInitialRunStats = (): RunStats => ({
   burnKillElites: 0,
   shipyardVisits: 0,
   maxBlackPlacedWin: 0,
+  dicePlaced: 0,
   hullPctMin: FULL_HULL_PCT,
   actionHash: 0,
   actionCount: 0,
@@ -247,6 +257,7 @@ export const createInitialRunValues = (): RunValues => ({
   shipId: "wanderer",
   deck: [],
   perks: [],
+  modules: [],
   chartPicks: [],
   mkLevels: {},
   tide: 0,
@@ -328,6 +339,22 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set((s) =>
       s.perks.includes(perkId) ? s : { perks: [...s.perks, perkId] },
     );
+  },
+
+  addModule: (moduleId) => {
+    const s = get();
+    if (s.modules.includes(moduleId)) return false;
+    if (
+      s.modules.length >=
+      moduleSlots(computeRunMods(s.perks, s.chartPicks).moduleSlotDelta)
+    )
+      return false;
+    set({ modules: [...s.modules, moduleId] });
+    return true;
+  },
+
+  removeModule: (moduleId) => {
+    set((s) => ({ modules: s.modules.filter((m) => m !== moduleId) }));
   },
 
   setFlag: (key, value = true) => {
@@ -464,6 +491,7 @@ export const useRunStore = create<RunState>()((set, get) => ({
             (tally.won && tally.endedFullHull ? 1 : 0),
           burnKillElites:
             prev.burnKillElites + (tally.burnKilledElite ? 1 : 0),
+          dicePlaced: prev.dicePlaced + tally.dicePlaced,
           spinalMaxHit: Math.max(prev.spinalMaxHit, tally.spinalMaxHit),
           maxBlackPlacedWin: tally.won
             ? Math.max(prev.maxBlackPlacedWin, tally.blackPlaced)

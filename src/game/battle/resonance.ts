@@ -36,11 +36,14 @@ const zeroCounts = (): Record<School, number> => ({
   prismatic: 0,
 });
 
+// «Prism Cascade» makes every prismatic die count twice toward the set it joins.
 export const computeCensus = (
   dice: readonly Pick<RolledDie, "school">[],
+  prismaticMult = 1,
 ): ResonanceCensus => {
   const counts = zeroCounts();
   for (const die of dice) counts[die.school] += 1;
+  counts.prismatic *= prismaticMult;
 
   const prismatic = counts.prismatic;
   if (prismatic > 0) {

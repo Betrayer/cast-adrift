@@ -3,11 +3,13 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { computeMutatorMods } from "@/data/mutators";
 import { sectorDef } from "@/data/sectors";
 import { pickMiniboss } from "@/game/run/encounter";
 import { createStream, deriveSeed } from "@/services/rng";
 import { abandonRun, jumpTo } from "@/game/run/flow";
+import { computeRunMods } from "@/game/run/runMods";
 import {
   areConnected,
   BOSS_ROW,
@@ -85,6 +87,18 @@ const MapView = ({ map, position }: MapViewProps) => {
   const { t } = useTranslation(["run", "common"]);
   const visited = useRunStore((s) => s.visited);
   const tide = useRunStore((s) => s.tide);
+  const runModules = useRunStore((s) => s.modules);
+  const chartPicks = useRunStore((s) => s.chartPicks);
+  const perks = useRunStore((s) => s.perks);
+  const moduleCap = moduleSlots(
+    computeRunMods(perks, chartPicks).moduleSlotDelta,
+  );
+  const moduleNames = runModules
+    .map((id) => {
+      const def = MODULE_BY_ID.get(id);
+      return def === undefined ? id : t(def.name);
+    })
+    .join(" · ");
   const interference = useRunStore((s) => s.interferenceStacks);
   const sector = useRunStore((s) => s.sector);
   const seed = useRunStore((s) => s.seed);
@@ -222,6 +236,14 @@ const MapView = ({ map, position }: MapViewProps) => {
           {interference > 0 ? (
             <span className={styles.tideChip ?? ""}>
               {t("run:map.interference", { n: interference })}
+            </span>
+          ) : null}
+          {runModules.length > 0 ? (
+            <span className={styles.tideChip ?? ""} title={moduleNames}>
+              {t("run:map.modules", {
+                used: runModules.length,
+                max: moduleCap,
+              })}
             </span>
           ) : null}
         </div>

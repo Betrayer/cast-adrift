@@ -34,7 +34,42 @@
     "fused-windfall": "Windfall",
     "fused-railslug": "Railslug",
     "fused-rampart": "Rampart",
-    "fused-bloom": "Bloom"
+    "fused-bloom": "Bloom",
+    "flare": "Flare",
+    "magma": "Magma",
+    "thermite": "Thermite",
+    "lancehead": "Lancehead",
+    "hoarfrost": "Hoarfrost",
+    "aegis": "Aegis",
+    "deepblue": "Deepblue",
+    "glacierspike": "Glacierspike",
+    "tendon": "Tendon",
+    "bramble": "Bramble",
+    "heartwood": "Heartwood",
+    "worldseed": "Worldseed",
+    "token": "Token",
+    "glint": "Glint",
+    "bonanza": "Bonanza",
+    "jackpot": "Jackpot",
+    "midas": "Midas",
+    "cinderblack": "Cinderblack",
+    "pitch": "Pitch",
+    "tar": "Tar",
+    "nadir": "Nadir",
+    "eclipse": "Eclipse",
+    "abyss": "Abyss",
+    "voidmaw": "Voidmaw",
+    "shim": "Shim",
+    "spool": "Spool",
+    "mimic": "Mimic",
+    "pivot": "Pivot",
+    "beaconChip": "Beacon Chip",
+    "lodestar": "Lodestar",
+    "prismChip": "Prism Chip",
+    "prismCore": "Prism Core",
+    "spectra": "Spectra",
+    "aurora": "Aurora",
+    "fate-d100": "Fate"
   },
   "diceDesc": {
     "ember": "A plain red d6.",
@@ -51,7 +86,42 @@
     "obsidian": "Rolls only 1 or 8.",
     "copycat": "Once per battle, copy an adjacent die's value.",
     "ballast": "A plain grey d4.",
-    "coreshard": "Prismatic wildcard for sets and affinities."
+    "coreshard": "Prismatic wildcard for sets and affinities.",
+    "flare": "+1 damage in weapons on 3 or more.",
+    "magma": "Max face in weapons applies Burn 3.",
+    "thermite": "+2 in weapons while hull is under half.",
+    "lancehead": "+3 in the Spinal Mount.",
+    "hoarfrost": "+1 shield whenever it fills a shield slot.",
+    "aegis": "+2 in shields.",
+    "deepblue": "Min face grants 4 shield.",
+    "glacierspike": "+3 in shields.",
+    "tendon": "+2 when it repeats last turn's value.",
+    "bramble": "Grows +1 on a max face, up to +2.",
+    "heartwood": "+2 in engines.",
+    "worldseed": "Grows +1 on a max face, up to +4.",
+    "token": "Max face pays 3 scrap.",
+    "glint": "Min face pays 2 scrap.",
+    "bonanza": "Max face pays 6 scrap.",
+    "jackpot": "Max face pays 10 scrap and 1 charge.",
+    "midas": "Pays 2 scrap wherever it resolves.",
+    "cinderblack": "Min face stores 1 charge.",
+    "pitch": "+1 in the reactor.",
+    "tar": "+2 while hull is under 40%.",
+    "nadir": "Min face primes the next black die with +3.",
+    "eclipse": "+3 in the reactor.",
+    "abyss": "Its faces are only 1 or 12.",
+    "voidmaw": "+2 in the reactor.",
+    "shim": "+1 on the first turn of a battle.",
+    "spool": "A rolled 1 becomes a 2.",
+    "mimic": "Once per battle, copy a neighbour's value.",
+    "pivot": "Once per battle, flip to the opposite face.",
+    "beaconChip": "+2 in sensors.",
+    "lodestar": "+1 in every slot.",
+    "prismChip": "Counts toward your largest set.",
+    "prismCore": "+1 in every slot, and counts toward your largest set.",
+    "spectra": "Max face pays 1 charge and 1 scrap.",
+    "aurora": "+2 in every slot.",
+    "fate-d100": "Never slotted. Once per battle, roll it and take what the sector gives."
   },
   "resonance": {
     "red-2": "Red dice in Weapons deal +1.",
@@ -122,7 +192,37 @@
     "choirFlagship-voice": "The Voice",
     "coreHeart": "The Core Heart",
     "coreHeart-valveA": "Valve I",
-    "coreHeart-valveB": "Valve II"
+    "coreHeart-valveB": "Valve II",
+    "hookTug": "Hook Tug",
+    "slagHauler": "Slag Hauler",
+    "chaffSwarm": "Chaff Swarm",
+    "foldWorm": "Fold Worm",
+    "nullEcho": "Null Echo",
+    "riftAnchor": "Rift Anchor",
+    "hymnCantor": "Hymn Cantor",
+    "pyreDeacon": "Pyre Deacon",
+    "reliquary": "Reliquary",
+    "causalityLoop": "Causality Loop",
+    "voidWarden": "Void Warden",
+    "quietEngine": "Quiet Engine",
+    "breachDrone": "Breach Drone",
+    "sparkMote": "Spark Mote",
+    "hullGnat": "Hull Gnat",
+    "clanBreaker": "Clan Breaker",
+    "clanBreaker-claw": "Grapple Claw",
+    "riftTyrant": "Rift Tyrant",
+    "riftTyrant-eye": "Folding Eye",
+    "choirCantor": "Choir Cantor",
+    "choirCantor-hymn": "Hymn Array",
+    "coreSentinel": "Core Sentinel",
+    "coreSentinel-lattice": "Causal Lattice",
+    "leechPrince": "Leech Prince",
+    "leechPrince-siphon": "Siphon Arm",
+    "mineBaron": "Mine Baron",
+    "mineBaron-rack": "Mine Rack",
+    "subsystem": {
+      "overclock": "Overclock Module"
+    }
   },
   "ships": {
     "wanderer": "Wanderer",
@@ -160,7 +260,127 @@
     "condenser": "Condenser",
     "targeter": "Targeter",
     "plating": "Plating",
-    "tug": "Tug"
+    "tug": "Tug",
+    "kindling": "Kindling",
+    "hammerhead": "Hammerhead",
+    "scorchmark": "Scorchmark",
+    "openingVolley": "Opening Volley",
+    "pyreFloor": "Pyre Floor",
+    "redForge": "Red Forge",
+    "searing": "Searing",
+    "cinderTithe": "Cinder Tithe",
+    "thermalVent": "Thermal Vent",
+    "overburn": "Overburn",
+    "emberField": "Ember Field",
+    "hotline": "Hotline",
+    "secondBarrel": "Second Barrel",
+    "detonator": "Detonator",
+    "magmaCore": "Magma Core",
+    "infernoDoctrine": "Inferno Doctrine",
+    "hoarplate": "Hoarplate",
+    "stormWall": "Storm Wall",
+    "coldStart": "Cold Start",
+    "blueFloor": "Blue Floor",
+    "meltwater": "Meltwater",
+    "frostBrake": "Frost Brake",
+    "bulkhead": "Bulkhead",
+    "chillBank": "Chill Bank",
+    "aegisField": "Aegis Field",
+    "deepFreeze": "Deep Freeze",
+    "interdict": "Interdict",
+    "hardVacuum": "Hard Vacuum",
+    "secondSkin": "Second Skin",
+    "glacierPact": "Glacier Pact",
+    "mirrorLattice": "Mirror Lattice",
+    "permafrost": "Permafrost",
+    "rootHold": "Root Hold",
+    "secondGrowth": "Second Growth",
+    "mulch": "Mulch",
+    "pollen": "Pollen",
+    "longRoots": "Long Roots",
+    "greenwake": "Greenwake",
+    "steadyHand": "Steady Hand",
+    "sapline": "Sapline",
+    "thicket": "Thicket",
+    "bloomCycle": "Bloom Cycle",
+    "photosynth": "Photosynth",
+    "evergreen": "Evergreen",
+    "tideRoots": "Tide Roots",
+    "worldTree": "World Tree",
+    "overgrowthPact": "Overgrowth Pact",
+    "standingWave": "Standing Wave",
+    "pocketChange": "Pocket Change",
+    "finderFee": "Finder's Fee",
+    "streetPrice": "Street Price",
+    "luckyStreak": "Lucky Streak",
+    "scrapline": "Scrapline",
+    "smallMercies": "Small Mercies",
+    "goldTooth": "Gold Tooth",
+    "tallyMark": "Tally Mark",
+    "bountyBoard": "Bounty Board",
+    "marketRun": "Market Run",
+    "goldRush": "Gold Rush",
+    "houseEdge": "House Edge",
+    "ledgerTrick": "Ledger Trick",
+    "mintCondition": "Mint Condition",
+    "silentPartner": "Silent Partner",
+    "veinTap": "Vein Tap",
+    "darkCurrent": "Dark Current",
+    "lowTide": "Low Tide",
+    "brinkmanship": "Brinkmanship",
+    "blackTithe": "Black Tithe",
+    "coldFusion": "Cold Fusion",
+    "longOdds": "Long Odds",
+    "hardBargain": "Hard Bargain",
+    "nightShift": "Night Shift",
+    "eventHorizon": "Event Horizon",
+    "bloodPrice": "Blood Price",
+    "heatShroud": "Heat Shroud",
+    "scrapheap": "Scrapheap",
+    "deadReckoning": "Dead Reckoning",
+    "obsidianCreed": "Obsidian Creed",
+    "lastBreath": "Last Breath",
+    "singularity": "Singularity",
+    "widerGrip": "Wider Grip",
+    "shimStock": "Shim Stock",
+    "deckHand": "Deck Hand",
+    "toolRoll": "Tool Roll",
+    "counterweight": "Counterweight",
+    "checklist": "Checklist",
+    "greyMarket": "Grey Market",
+    "spareParts": "Spare Parts",
+    "dampers": "Dampers",
+    "routineCheck": "Routine Check",
+    "switchboard": "Switchboard",
+    "gimbalMount": "Gimbal Mount",
+    "logistics": "Logistics",
+    "quickHands": "Quick Hands",
+    "balanceBeam": "Balance Beam",
+    "holdBack": "Hold Back",
+    "payloadShuffle": "Payload Shuffle",
+    "shortHaul": "Short Haul",
+    "dryDock": "Dry Dock",
+    "masterKey": "Master Key",
+    "greyProtocol": "Grey Protocol",
+    "armorPlate": "Armour Plate",
+    "coolantLoop": "Coolant Loop",
+    "finePitch": "Fine Pitch",
+    "boresight": "Boresight",
+    "bilgePump": "Bilge Pump",
+    "dockRates": "Dock Rates",
+    "crewDrill": "Crew Drill",
+    "scrapHopper": "Scrap Hopper",
+    "spotterCall": "Spotter's Call",
+    "hullWeld": "Hull Weld",
+    "reinforcedBay": "Reinforced Bay",
+    "surgeTank": "Surge Tank",
+    "hardenedHull": "Hardened Hull",
+    "kineticDampers": "Kinetic Dampers",
+    "targetingSuite": "Targeting Suite",
+    "pressureValve": "Pressure Valve",
+    "resonanceTuner": "Resonance Tuner",
+    "shockLance": "Shock Lance",
+    "piercingRounds": "Piercing Rounds"
   },
   "perksDesc": {
     "hot-charge": "A max-face weapon roll deals +2 damage.",
@@ -186,13 +406,133 @@
     "grip": "Reroll size +1.",
     "reservist": "Reserve capacity +1.",
     "calibration": "Nudge costs 2 charge instead of 3.",
-    "spare": "Turn start: the lowest die gets +1.",
+    "spare": "The lowest die of each roll comes up one higher; reroll one more die.",
     "afterburner": "Engine thresholds are 1 lower.",
     "jammer-plus": "Jam reduces enemy attack by 3.",
     "condenser": "Reactor charge cap rises to 12.",
     "targeter": "Mark grants +3 damage instead of +2.",
     "plating": "Max hull +5, heal 5 now.",
-    "tug": "A dodge also grants +1 charge."
+    "tug": "A dodge also grants +1 charge.",
+    "kindling": "+1 in weapons on 5 or more.",
+    "hammerhead": "+2 in Weapons A.",
+    "scorchmark": "Max face in weapons adds Burn 1.",
+    "openingVolley": "+2 in weapons on the first two turns.",
+    "pyreFloor": "+2 in weapons on a min face.",
+    "redForge": "+1 for red dice in weapons.",
+    "searing": "+2 in weapons on 8 or more.",
+    "cinderTithe": "Max face in weapons pays 3 scrap.",
+    "thermalVent": "+3 in weapons on a max face, and 1 charge.",
+    "overburn": "+2 in weapons while hull is under half.",
+    "emberField": "Max face on a red die adds Burn 2.",
+    "hotline": "+3 in the Spinal Mount.",
+    "secondBarrel": "+3 in Weapons B.",
+    "detonator": "A max face in weapons resolves the slot twice.",
+    "magmaCore": "+3 in weapons once you hold four red dice.",
+    "infernoDoctrine": "Every weapon hit adds Burn 1.",
+    "hoarplate": "+1 in shields.",
+    "stormWall": "Max face in shields grants 3 more shield.",
+    "coldStart": "+2 in shields on the first two turns.",
+    "blueFloor": "Blue dice never roll under 3.",
+    "meltwater": "Min face in shields grants 3 more shield.",
+    "frostBrake": "+2 for blue dice in engines.",
+    "bulkhead": "Hull +3.",
+    "chillBank": "Max face on a blue die stores 1 charge.",
+    "aegisField": "+2 shield from every shield die.",
+    "deepFreeze": "+3 in shields on 8 or more.",
+    "interdict": "Your jam cuts 2 more from enemy attacks.",
+    "hardVacuum": "+3 in shields while hull is under half.",
+    "secondSkin": "Hull +4; heal 1 after every battle.",
+    "glacierPact": "+4 in shields once you hold four blue dice.",
+    "mirrorLattice": "Dodges reflect damage; engine thresholds one step easier.",
+    "permafrost": "A max face in shields resolves the slot twice.",
+    "rootHold": "+1 in engines.",
+    "secondGrowth": "+2 when a die repeats last turn's value.",
+    "mulch": "Heal 1 after battle; +5% scrap.",
+    "pollen": "Max face on a green die heals 1 hull.",
+    "longRoots": "Growing dice climb one step higher.",
+    "greenwake": "5 or more in engines grants 2 shield.",
+    "steadyHand": "Engine thresholds one step easier.",
+    "sapline": "Repeating last turn's value heals 2 hull.",
+    "thicket": "Hull +3; heal 2 after every battle.",
+    "bloomCycle": "+3 when a green die repeats last turn's value.",
+    "photosynth": "Every green die stores 1 charge.",
+    "evergreen": "Growing dice climb two steps higher.",
+    "tideRoots": "Interference tide hits one level softer.",
+    "worldTree": "Heal 2 per resolved slot once you hold four green dice.",
+    "overgrowthPact": "Growth +2 and engine thresholds two steps easier; hull −4.",
+    "standingWave": "+4 in engines.",
+    "pocketChange": "+2 scrap at battle start.",
+    "finderFee": "+2 scrap per kill.",
+    "streetPrice": "Shop prices −8%.",
+    "luckyStreak": "Any max face pays 3 scrap.",
+    "scrapline": "+12% scrap from every source.",
+    "smallMercies": "Any min face pays 2 scrap.",
+    "goldTooth": "Every yellow die pays 1 scrap.",
+    "tallyMark": "+10% XP from the run.",
+    "bountyBoard": "+4 scrap per kill.",
+    "marketRun": "Shops −10%; the first reroll in each shop is free.",
+    "goldRush": "Max face on a yellow die pays 8 scrap.",
+    "houseEdge": "+3 on a max face from a yellow die.",
+    "ledgerTrick": "+20% scrap; hull −2.",
+    "mintCondition": "Max faces pay 12 scrap and 1 charge once you hold four yellow dice.",
+    "silentPartner": "+30% scrap; shops −10%.",
+    "veinTap": "+6 scrap per kill and +6 at battle start.",
+    "darkCurrent": "+1 in the reactor.",
+    "lowTide": "Any min face stores 2 charge.",
+    "brinkmanship": "+1 to every die while hull is under 40%.",
+    "blackTithe": "Every black die pays 2 scrap.",
+    "coldFusion": "Charge cap +2.",
+    "longOdds": "+3 on a min face from a black die.",
+    "hardBargain": "+15% scrap; you heal 1 less after battles.",
+    "nightShift": "Max face in the reactor stores 2 more charge.",
+    "eventHorizon": "+3 for black dice in the reactor.",
+    "bloodPrice": "+4 in weapons while hull is under 25%.",
+    "heatShroud": "The first reactor overflow each battle costs no hull.",
+    "scrapheap": "Every unplaced die stores 1 charge.",
+    "deadReckoning": "Charge cap +3; hull −3.",
+    "obsidianCreed": "Black dice roll only min or max; charge cap +2.",
+    "lastBreath": "Once per run, survive a lethal hit at 1 hull.",
+    "singularity": "The reactor stores 3 more charge.",
+    "widerGrip": "Reroll one more die at a time.",
+    "shimStock": "Nudges cost 1 less charge.",
+    "deckHand": "Reserve +1 die.",
+    "toolRoll": "One extra reroll every turn.",
+    "counterweight": "A rolled 1 becomes a 2.",
+    "checklist": "+1 to every die on the first turn.",
+    "greyMarket": "Shops −6%; +6% scrap.",
+    "spareParts": "+4 scrap at battle start.",
+    "dampers": "Hull +2; charge cap +1.",
+    "routineCheck": "Heal 1 after every battle.",
+    "switchboard": "+2 in sensors.",
+    "gimbalMount": "Marks are worth +2 more damage.",
+    "logistics": "First two rerolls in every shop are free; shops −5%.",
+    "quickHands": "Reroll two more dice at a time.",
+    "balanceBeam": "Your lowest roll each turn is nudged up.",
+    "holdBack": "Nudges cost 1 less charge; charge cap +2.",
+    "payloadShuffle": "Reserve +1 die, and one extra blue die.",
+    "shortHaul": "+15% XP from the run.",
+    "dryDock": "The Repair Bay heals 3 more hull.",
+    "masterKey": "Two extra rerolls every turn, and one more die per reroll.",
+    "greyProtocol": "+2 to every die once you hold four grey dice.",
+    "armorPlate": "Hull +4.",
+    "coolantLoop": "Charge cap +1.",
+    "finePitch": "Engine thresholds one step easier.",
+    "boresight": "Marks are worth +1 more damage.",
+    "bilgePump": "Heal 1 after every battle.",
+    "dockRates": "Shop prices −7%.",
+    "crewDrill": "+12% XP from the run.",
+    "scrapHopper": "+3 scrap at battle start.",
+    "spotterCall": "5 or more in sensors stores 1 charge.",
+    "hullWeld": "The Repair Bay heals 1 more hull.",
+    "reinforcedBay": "One more module slot.",
+    "surgeTank": "Charge cap +3.",
+    "hardenedHull": "Hull +7; engine thresholds one step harder.",
+    "kineticDampers": "A dodge stores 1 charge.",
+    "targetingSuite": "Marks +2 damage; jam cuts 1 more.",
+    "pressureValve": "The first reactor overflow each battle costs no hull.",
+    "resonanceTuner": "+2 charge at battle start per completed four-set.",
+    "shockLance": "+5 in the Spinal Mount.",
+    "piercingRounds": "The first hit each battle ignores shields; marks +1."
   },
   "speaker": {
     "mara": "Mara, scrap-trader",
@@ -221,7 +561,22 @@
     "refusedChoir": "you refused the Choir (Sector 3)",
     "pactSealed": "you sealed the pact (Sector 4)",
     "choirEnemy": "you crossed the Choir (Sector 4)",
-    "silentReady": "the Keeper vouched for you (Sector 5)"
+    "silentReady": "the Keeper vouched for you (Sector 5)",
+    "choirCurious": "Consequence: you listened to the Choir.",
+    "clanPaid": "Consequence: you paid the clan toll.",
+    "clanSlighted": "Consequence: you ran the clan toll.",
+    "defectorSaved": "Consequence: you sheltered the defector.",
+    "hereticsArmed": "Consequence: you armed the heretics.",
+    "hunterAllied": "Consequence: the Huntress owes you.",
+    "hunterBeaten": "Consequence: you beat the Huntress.",
+    "hunterEngaged": "Consequence: the Huntress has your trail.",
+    "hymnJammed": "Consequence: you jammed the hymn.",
+    "hymnJoined": "Consequence: you sang with the Choir.",
+    "keeperTrust": "Consequence: the Keeper trusts you.",
+    "mirrorSpoke": "Consequence: you spoke to the mirror.",
+    "pactOpened": "Consequence: the pact lies open.",
+    "pactSigned": "Consequence: you signed the pact.",
+    "relayFixed": "Consequence: you repaired the relay."
   },
   "events": {
     "driftingPod": {
@@ -370,11 +725,17 @@
       "text": "Scavengers ring a floodlit wreck, bidding on sealed cores. The auctioneer eyes your scrap.",
       "opt": {
         "bid": "Bid on a core (25)",
-        "watch": "Just watch"
+        "watch": "Just watch",
+        "bidHigh": "Bid high",
+        "bidLow": "Bid low",
+        "heckle": "Heckle the bidding"
       },
       "out": {
         "bid": "Your bid holds. The core is yours — and it's a good one.",
-        "watch": "You pocket a few loose parts nobody bid on."
+        "watch": "You pocket a few loose parts nobody bid on.",
+        "bidHigh": "Mara knocks it down to you and files your name under 'pays'.",
+        "bidLow": "You take the second lot. Nobody else wanted it, which may be the point.",
+        "heckle": "You talk the price down for somebody else and pocket their thanks. Mara does not thank you."
       }
     },
     "stowaway": {
@@ -562,11 +923,15 @@
       "text": "Yusuf, convoy master, hails you plainly. \"Raiders are shadowing my haulers. Escort us through and I'll make it worth your while. Or tax us and be gone.\"",
       "opt": {
         "escort": "Escort the convoy",
-        "tax": "Tax the convoy"
+        "tax": "Tax the convoy",
+        "escortHim": "Ride escort",
+        "takeCargo": "Take the cargo instead"
       },
       "out": {
         "escort": "You take point. The raiders won't like it, but Yusuf will remember.",
-        "tax": "You clip his margins and let him pass. He remembers that too."
+        "tax": "You clip his margins and let him pass. He remembers that too.",
+        "escortHim": "You take point. Yusuf's yard opens its books to you at the far end.",
+        "takeCargo": "You cut the tether and run. Yusuf says nothing on the open channel. That's worse."
       }
     },
     "yusufEscortPaid": {
@@ -726,6 +1091,628 @@
         "swap": "She takes your worst die without comment and hands back something with a different kind of wrong in it.",
         "pass": "She buys the lot at a fair price, which from Mara is practically a compliment."
       }
+    },
+    "clanToll": {
+      "text": "A clan skiff cuts across the lane and holds station. «Toll's thirty. The lane's ours this cycle.»",
+      "opt": {
+        "pay": "Pay the toll",
+        "run": "Run the lane"
+      },
+      "out": {
+        "pay": "They wave you through and mark your hull as paid. The lane opens two rows deeper.",
+        "runPass": "You thread past before they close. Somebody's cargo comes loose in the wake.",
+        "runFail": "They clip your flank on the way out. The clan remembers faces."
+      }
+    },
+    "magnetGraveyard": {
+      "text": "A tug boneyard, hulls locked together by their own magnets. Forty years of nobody letting go.",
+      "opt": {
+        "strip": "Strip the hulls",
+        "salvageCore": "Cut out a core",
+        "leave": "Leave them locked"
+      },
+      "out": {
+        "strip": "Good haul. The clamps take a bite out of your plating on the way out.",
+        "salvageCore": "One core still holds a charge. It comes free clean.",
+        "leave": "You cut power and drift past. The field quiets behind you."
+      }
+    },
+    "yusufDebt": {
+      "text": "Yusuf's voice, flat and tired: «You owe my lane a hull. Sixty, or we settle the other way.»",
+      "opt": {
+        "settle": "Settle in scrap",
+        "refuse": "Refuse him"
+      },
+      "out": {
+        "settle": "He counts it twice and puts the ledger away. «Then we're square, captain.»",
+        "refuse": "The lane closes behind you and two of his tugs come about."
+      }
+    },
+    "minefieldLane": {
+      "text": "An inherited minefield, laid by nobody currently alive. There's a thread through it, if you trust the plot.",
+      "opt": {
+        "threadIt": "Thread the field",
+        "detonate": "Detonate a corridor"
+      },
+      "out": {
+        "threadPass": "Clean run. From the far side you can see three rows of lane.",
+        "threadFail": "A drifter clips the belly. The hull rings for a long time.",
+        "detonate": "You blow a corridor open. The noise brings company."
+      }
+    },
+    "crewReunion": {
+      "text": "The crew you pulled off the wreck flag you down. They've been waiting on this lane for a while.",
+      "opt": {
+        "hire": "Take them aboard",
+        "sendOff": "Pay them off"
+      },
+      "out": {
+        "hire": "Four extra hands. The tray gets tidier and the hull gets patched.",
+        "sendOff": "They leave with their share and a lane's worth of goodwill."
+      }
+    },
+    "hunterTrail": {
+      "text": "A narrow-band hail, unencrypted. The Huntress reads your registry back to you, digit by digit.",
+      "opt": {
+        "buyOff": "Buy her off",
+        "ambushHer": "Turn and meet her"
+      },
+      "out": {
+        "buyOff": "She takes the scrap and closes the channel. The trail goes quiet, for now.",
+        "ambushHer": "You cut the reply short and come about. She sounds almost pleased."
+      }
+    },
+    "driftChapel": {
+      "text": "A chapel welded into a hauler's hold. The Preacher keeps the door open and the arithmetic running.",
+      "opt": {
+        "listen": "Sit and listen",
+        "refuse": "Walk out"
+      },
+      "out": {
+        "listen": "The numbers make an unpleasant kind of sense. You leave carrying current.",
+        "refuse": "You leave mid-verse. The hull feels solider for the refusal."
+      }
+    },
+    "tetheredHulk": {
+      "text": "A liner hulk on a single tether, swinging slow. Somebody moored it deliberately.",
+      "opt": {
+        "boardIt": "Board it",
+        "cutFree": "Cut the tether"
+      },
+      "out": {
+        "boardIt": "The interior is intact and airless. You come back with something worth the bruises.",
+        "cutFree": "You take the mooring gear and let the hulk drift. Good cable is good cable."
+      }
+    },
+    "beaconRelay": {
+      "text": "A relay mast, half its array sheared off. It still tries to speak on the hour.",
+      "opt": {
+        "repairIt": "Repair the array",
+        "stripIt": "Strip the array"
+      },
+      "out": {
+        "repairIt": "It comes back up mid-sentence. The Keeper's network notes who fixed it.",
+        "stripIt": "Good parts. The mast goes dark behind you and stays dark."
+      }
+    },
+    "fuelBloom": {
+      "text": "A slow bloom of unspent drive fuel, hanging in the lane like weather.",
+      "opt": {
+        "siphon": "Siphon it",
+        "burnIt": "Burn it off"
+      },
+      "out": {
+        "siphon": "The reactor drinks it happily. Several battles' worth of head start.",
+        "burnIt": "The bloom goes up and takes the interference with it. And some paint."
+      }
+    },
+    "foldedHour": {
+      "text": "The clock on the bridge runs twice and then stops apologising. The Rift is folding an hour around you.",
+      "opt": {
+        "waitOut": "Wait it out",
+        "pushThrough": "Push through"
+      },
+      "out": {
+        "waitOut": "You sit inside the fold and let the crew sleep. Something outside gets closer while you do.",
+        "pushPass": "You come out the far side with four rows of clean plot and a headache.",
+        "pushFail": "You come out sideways. Something structural did not come out at all."
+      }
+    },
+    "mirrorSelf": {
+      "text": "A hull identical to yours holds station off the bow. Its running lights answer half a second before you signal.",
+      "opt": {
+        "speak": "Speak to it",
+        "shoot": "Fire on it"
+      },
+      "out": {
+        "speak": "It answers in your own voice, and it is kinder than you are. You leave carrying something it gave you.",
+        "shoot": "It breaks apart without resistance. Your own hull takes the damage anyway."
+      }
+    },
+    "clanEscort": {
+      "text": "A clan wing forms up on your flank, unasked. «You paid. This is what paid buys.»",
+      "opt": {
+        "acceptEscort": "Accept the escort",
+        "takeMap": "Ask for their charts"
+      },
+      "out": {
+        "acceptEscort": "They fly cover for three jumps and hand you a full reactor at the parting.",
+        "takeMap": "They dump four rows of lane plot and a bag of scrap. «Cheaper than flying with you.»"
+      }
+    },
+    "clanReprisal": {
+      "text": "Three clan hulls, no hail. They've been waiting on this row since the lane.",
+      "opt": {
+        "standGround": "Stand your ground",
+        "payLate": "Pay late, with interest"
+      },
+      "out": {
+        "standGround": "You hold the line. The Rim respects that, which is not the same as surviving it.",
+        "payLate": "They take the scrap and the insult together. The lane reopens."
+      }
+    },
+    "riftHarvest": {
+      "text": "A vein of Rift shards, growing out of nothing, cut clean by something that isn't there.",
+      "opt": {
+        "cutShards": "Cut a shard",
+        "mapVein": "Map the vein"
+      },
+      "out": {
+        "cutShards": "It comes away as a prismatic chip. The recoil takes a bite out of the hull.",
+        "mapVein": "You sell the survey ahead and read two rows of lane off the same data."
+      }
+    },
+    "relayEcho": {
+      "text": "The relay you fixed is talking. Not repeating — talking.",
+      "opt": {
+        "answerIt": "Answer it",
+        "sellIt": "Sell the channel"
+      },
+      "out": {
+        "answerIt": "The Keeper's network opens a channel to you. Something in the sector eases.",
+        "sellIt": "Somebody pays well for a Keeper frequency. The Keeper finds out. He always finds out."
+      }
+    },
+    "choirProbe": {
+      "text": "The Preacher, on your private band: «You listened once. Listening twice is a choice.»",
+      "opt": {
+        "kneel": "Hear the whole verse",
+        "walkAway": "Cut the channel"
+      },
+      "out": {
+        "kneel": "The pact opens. So does a case of cores you were not offered before.",
+        "walkAway": "You close the band mid-verse. The refusal is on record now."
+      }
+    },
+    "hunterRespect": {
+      "text": "The Huntress hails you openly this time. «You cost me a wing. Say what you want.»",
+      "opt": {
+        "hireHer": "Hire her",
+        "warnHer": "Warn her off the Core"
+      },
+      "out": {
+        "hireHer": "She flies your flank for the rest of the sector and never once explains her ledger.",
+        "warnHer": "She listens. Then she gives you something from her own hold and cuts the channel."
+      }
+    },
+    "anomalyLedger": {
+      "text": "A ward tablet, floating in clean vacuum. Somebody wrote the arithmetic out longhand and left it here.",
+      "opt": {
+        "solveIt": "Solve the ward",
+        "burnLedger": "Burn the tablet"
+      },
+      "out": {
+        "solvePass": "The arithmetic closes. Whatever the ward was holding shut hands you a core.",
+        "solveFail": "You get the sign wrong. The ward opens the wrong way, and the sector notices.",
+        "burnLedger": "You unmake the question. The Rift quiets, and something out here approves."
+      }
+    },
+    "twinWreck": {
+      "text": "Two identical wrecks, same registry, same damage. The Rift is fond of this joke.",
+      "opt": {
+        "leftHull": "Board the left one",
+        "rightHull": "Board the right one"
+      },
+      "out": {
+        "leftHull": "Intact hold, one good core still in its cradle.",
+        "leftEmpty": "Stripped to the frame — by you, apparently, in some other reading of this hour.",
+        "rightHull": "A full pay chest, untouched. Nobody claimed it because nobody found it twice.",
+        "rightTrap": "The hold is bait. Something was waiting to be boarded."
+      }
+    },
+    "warpedShipyard": {
+      "text": "A yard that finished building itself after the crew left. The tools still run.",
+      "opt": {
+        "refit": "Pay for a refit",
+        "swapPart": "Let it swap a part"
+      },
+      "out": {
+        "refit": "The frame comes back heavier than it went in. You choose not to ask.",
+        "swapPart": "It takes your worst core and hands back something else. Fair, by its own arithmetic."
+      }
+    },
+    "quietStar": {
+      "text": "A star with no output and a real gravity well. The instruments hate it; the crew likes the quiet.",
+      "opt": {
+        "chartIt": "Chart it",
+        "restThere": "Rest in its shadow"
+      },
+      "out": {
+        "chartIt": "With sensors this good you plot four rows off the well alone.",
+        "restThere": "Real sleep, first in days. The sector uses the time too."
+      }
+    },
+    "hymnGate": {
+      "text": "A gate of hulls, all tuned to one chord. They will open for a voice, or for silence.",
+      "opt": {
+        "singAlong": "Sing the verse",
+        "jamIt": "Jam the chord"
+      },
+      "out": {
+        "singAlong": "Your reactor picks up the chord and keeps it. The gate opens gladly.",
+        "jamIt": "You put a wall of noise across their band. The gate opens because it has to."
+      }
+    },
+    "pactSealing": {
+      "text": "The Preacher lays the pact out twice: one copy for you, one for the Core.",
+      "opt": {
+        "signIt": "Sign it",
+        "tearIt": "Tear it up"
+      },
+      "out": {
+        "signIt": "The ink is a probability. Something in the hull agrees to be less certain from now on.",
+        "tearIt": "You tear both copies. The Choir stops calling you a guest."
+      }
+    },
+    "heretics": {
+      "text": "A handful of hulls with the hymn scraped off their plating. They heard you refused too.",
+      "opt": {
+        "armThem": "Arm them",
+        "reportThem": "Report them"
+      },
+      "out": {
+        "armThem": "You hand over cores and cutting gear. They fly out singing nothing at all.",
+        "reportThem": "The Choir pays for the coordinates. You do not stay to watch."
+      }
+    },
+    "keeperVault": {
+      "text": "The Keeper opens a hatch he has kept welded for thirty years. «You've earned the choice, not the contents.»",
+      "opt": {
+        "openVault": "Open the vault",
+        "leaveSealed": "Leave it sealed"
+      },
+      "out": {
+        "openVault": "Fleet-issue, sealed since the silence. It answers to your hand immediately.",
+        "leaveSealed": "You weld it shut yourself. The Keeper says nothing, and gives you the plating."
+      }
+    },
+    "mirrorReturn": {
+      "text": "The mirror hull is back, and this time it is waiting where you were going.",
+      "opt": {
+        "listenAgain": "Listen again",
+        "sealIt": "Seal the fold"
+      },
+      "out": {
+        "listenAgain": "It tells you the route. All of it. You do not ask how it knows.",
+        "sealIt": "You close the fold with everything you have. The hull pays for it."
+      }
+    },
+    "huntressFavor": {
+      "text": "«One favour,» the Huntress says. «Spend it here or carry it. Your ledger.»",
+      "opt": {
+        "callFavor": "Call it in now",
+        "saveFavor": "Keep it for later"
+      },
+      "out": {
+        "callFavor": "She drops a crate on your dorsal clamp and is gone before you thank her.",
+        "saveFavor": "She routes you a private supply channel instead. It keeps paying."
+      }
+    },
+    "reliquaryRun": {
+      "text": "A reliquary hull, escorted by one cantor. Whatever's inside has not been opened in decades.",
+      "opt": {
+        "raidIt": "Take the reliquary",
+        "trade": "Trade for it"
+      },
+      "out": {
+        "raidIt": "You commit. The cantor stops singing and starts firing.",
+        "trade": "They accept a yellow core as tribute and swap you something stranger."
+      }
+    },
+    "choirTithe": {
+      "text": "A tithe station. The Choir accepts scrap, hull, or nothing — and prices all three honestly.",
+      "opt": {
+        "tithe": "Tithe in scrap",
+        "bleed": "Tithe in hull",
+        "declineTithe": "Decline"
+      },
+      "out": {
+        "tithe": "They reinforce your frame with something that was a hymn an hour ago.",
+        "bleed": "They cut a plate off you and hand back a core. The trade is exact.",
+        "declineTithe": "You pass the plate along. The station's tone changes for the rest of the sector."
+      }
+    },
+    "organShip": {
+      "text": "A ship built around an organ, still tuned, still playing to nobody.",
+      "opt": {
+        "tuneOrgan": "Tune it",
+        "silenceOrgan": "Silence it"
+      },
+      "out": {
+        "tunePass": "You find the chord. Something in your dice tray learns it too.",
+        "tuneFail": "You find the wrong chord. The hull finds out first.",
+        "silenceOrgan": "You cut the bellows. The sector gets quieter and slightly cheaper."
+      }
+    },
+    "acolyteDefector": {
+      "text": "An acolyte in a stolen skiff, running on fumes and a number instead of a name.",
+      "opt": {
+        "shelter": "Shelter her",
+        "handOver": "Hand her over"
+      },
+      "out": {
+        "shelter": "She earns her passage inside an hour, and reads Choir routing like a map.",
+        "handOver": "The Choir pays promptly. Nobody on your bridge speaks for a while."
+      }
+    },
+    "voiceInTheHull": {
+      "text": "Something is using your own intercom. It is polite, and it knows your rank.",
+      "opt": {
+        "answerVoice": "Answer it",
+        "purgeVoice": "Purge the system"
+      },
+      "out": {
+        "answerVoice": "It gives you a great deal of current and asks for nothing yet.",
+        "purgeVoice": "You burn the intercom out at the root. It hurts. It works."
+      }
+    },
+    "hymnArchive": {
+      "text": "An archive hull, wall to wall with hymn plates. The oldest one is a ship manifest.",
+      "opt": {
+        "copyIt": "Copy the archive",
+        "burnArchive": "Burn the archive"
+      },
+      "out": {
+        "copyIt": "You take a full record. Echo reads it for the rest of the sector.",
+        "burnArchive": "Forty years of arithmetic, gone in nine minutes. The Choir will hear about it."
+      }
+    },
+    "causalityTide": {
+      "text": "A tide of loose causality, running the wrong way down the lane.",
+      "opt": {
+        "rideTide": "Ride it",
+        "anchorHere": "Anchor and wait"
+      },
+      "out": {
+        "rideTide": "You arrive five rows further along than you should. The hull disagrees about how.",
+        "anchorHere": "You hold position until it passes. The crew gets an hour that counts."
+      }
+    },
+    "coreBargain": {
+      "text": "The pact you signed comes due. The Core would like to make it permanent.",
+      "opt": {
+        "acceptBargain": "Accept",
+        "renege": "Break the pact"
+      },
+      "out": {
+        "acceptBargain": "Something in the deck becomes certain in the wrong direction. It is extremely powerful.",
+        "renege": "You tear it out at the root. The hull nearly goes with it."
+      }
+    },
+    "hereticFleet": {
+      "text": "The heretics you armed have made a fleet of it, and they are asking who leads.",
+      "opt": {
+        "leadThem": "Lead them",
+        "sendThemHome": "Send them home"
+      },
+      "out": {
+        "leadThem": "Nine hulls fall in behind you, singing nothing, very loudly.",
+        "sendThemHome": "They leave you their stores and their gratitude. Both are heavy."
+      }
+    },
+    "silentSignal": {
+      "text": "The Keeper's channel opens one last time. «If you're going to call the fleet, call it from here.»",
+      "opt": {
+        "broadcast": "Broadcast",
+        "keepSilent": "Stay silent"
+      },
+      "out": {
+        "broadcast": "Forty years of silence, and something answers on the old frequency.",
+        "keepSilent": "You keep the fleet out of it. The Keeper gives you what he was saving for them."
+      }
+    },
+    "defectorReturns": {
+      "text": "The acolyte you sheltered is waiting at the last waypoint, with a route and a request.",
+      "opt": {
+        "takeHerAboard": "Take her aboard",
+        "sendHerBack": "Send her back"
+      },
+      "out": {
+        "takeHerAboard": "She runs your tray like she was born to it. Nothing in the Choir surprises her.",
+        "sendHerBack": "She leaves you everything she carried. It is more than you expected."
+      }
+    },
+    "brokenLighthouse": {
+      "text": "A lighthouse nobody built, dark for the first time in forty years.",
+      "opt": {
+        "relight": "Relight it",
+        "harvestLens": "Take the lens"
+      },
+      "out": {
+        "relight": "It catches. From here you can see the whole approach to the Core.",
+        "harvestLens": "The lens is a prismatic core the size of a fist. The dark stays dark."
+      }
+    },
+    "unwrittenTurn": {
+      "text": "A stretch of lane where nothing has happened yet. It is waiting for a first draft.",
+      "opt": {
+        "writeIt": "Write it",
+        "leaveBlank": "Leave it blank"
+      },
+      "out": {
+        "writePass": "You commit an outcome and it holds. Something extraordinary is left in the hold.",
+        "writeFail": "You commit an outcome and it does not hold. Neither does the hull.",
+        "leaveBlank": "You pass through without deciding anything. The ship feels solider for it."
+      }
+    },
+    "coreChoirWreck": {
+      "text": "A Choir flagship, intact and stopped. Every name is still on the hull.",
+      "opt": {
+        "salvageIt": "Salvage it",
+        "readNames": "Read the names"
+      },
+      "out": {
+        "salvageIt": "The hold is full. So is the escort you didn't see on approach.",
+        "readNames": "You read all of them aloud. It takes an hour, and it is worth the hour."
+      }
+    },
+    "lastMarket": {
+      "text": "Mara has set up on a dead hull at the edge of the Core. «Last stock in the sector, captain.»",
+      "opt": {
+        "buyOut": "Buy her out",
+        "sellShip": "Sell her your plating",
+        "walkPast": "Walk past"
+      },
+      "out": {
+        "buyOut": "She hands over the good crate without haggling, which is how you know it's the end.",
+        "sellShip": "She pays honestly for the armour. You will feel this later.",
+        "walkPast": "«Suit yourself.» She still slips you a repair kit on the way out."
+      }
+    },
+    "maraLedger": {
+      "text": "Mara opens her ledger to your page. «Credit or a tip. I'm not doing both.»",
+      "opt": {
+        "takeCredit": "Take the credit",
+        "takeTip": "Take the tip"
+      },
+      "out": {
+        "takeCredit": "Scrap up front, debt on the page. She underlines your name twice.",
+        "takeTip": "Three rows of route and a core she wasn't supposed to have."
+      }
+    },
+    "maraCollector": {
+      "text": "Not Mara — her collector. He has the page with your name and no interest in conversation.",
+      "opt": {
+        "settleDebt": "Settle up",
+        "outrun": "Outrun him"
+      },
+      "out": {
+        "settleDebt": "He tears the page out and hands it to you. «She says you're welcome back.»",
+        "outrun": "You lose him in the lane. He was never the expensive part."
+      }
+    },
+    "hymnResidue": {
+      "text": "The chord you sang is still in the reactor housing. It has not stopped.",
+      "opt": {
+        "keepHumming": "Let it run",
+        "scourIt": "Scour it out"
+      },
+      "out": {
+        "keepHumming": "It feeds the reactor and asks nothing. That is the concerning part.",
+        "scourIt": "You cut it out plate by plate. The silence afterwards is yours again."
+      }
+    },
+    "jammedChoir": {
+      "text": "The choir you jammed is still off-key, and one of their cantors is stranded in the lane.",
+      "opt": {
+        "pressAdvantage": "Press the advantage",
+        "slipAway": "Slip past"
+      },
+      "out": {
+        "pressAdvantage": "You take the wreck apart while it is still finding the note.",
+        "slipAway": "You use their confusion as cover. Two rows of lane, no shots fired."
+      }
+    },
+    "clanFerry": {
+      "text": "A clan ferry, running the deep lanes on schedule. Your hull is marked as paid.",
+      "opt": {
+        "rideAlong": "Ride along",
+        "buyLane": "Buy the lane rights"
+      },
+      "out": {
+        "rideAlong": "Four rows in convoy, and their medic looks at your hull for free.",
+        "buyLane": "They sign the lane over and throw in a yard discount to close it."
+      }
+    },
+    "darkRelay": {
+      "text": "A Keeper relay, running on the emergency band. It has been calling your registry for two sectors.",
+      "opt": {
+        "confess": "Answer honestly",
+        "jamHim": "Jam the band"
+      },
+      "out": {
+        "confess": "You tell him what you took. He is quiet for a long time, and then forgives it.",
+        "jamHim": "You cut him off and sell the relay's position. It pays well and sits badly."
+      }
+    },
+    "emptySuit": {
+      "text": "A suit drifting alone, arms folded, tether cut from the inside.",
+      "opt": {
+        "readLog": "Read the log",
+        "stripSuit": "Strip the suit"
+      },
+      "out": {
+        "readLog": "Coordinates, a name, and a route somebody wanted found.",
+        "stripSuit": "Good seals, good scrap. You leave the name plate where it is."
+      }
+    },
+    "coldEngine": {
+      "text": "A drive assembly, cold for decades, still bolted into half a hull.",
+      "opt": {
+        "warmIt": "Warm it up",
+        "gutIt": "Gut it"
+      },
+      "out": {
+        "warmIt": "It turns over. You take the working parts and leave it running.",
+        "gutIt": "One good core in the housing. The frame fights you for it."
+      }
+    },
+    "probabilityRain": {
+      "text": "Loose probability, falling through the lane like rain. Some of it lands.",
+      "opt": {
+        "standInIt": "Stand in it",
+        "shelter": "Shelter"
+      },
+      "out": {
+        "standGood": "Something condenses in the tray. It is beautiful and it works.",
+        "standBad": "Something condenses in the hull. It is neither.",
+        "shelter": "You wait it out under a wreck and come out with a charged reactor."
+      }
+    },
+    "salvageCourt": {
+      "text": "Two crews, one wreck, and a very old argument about who arrived first.",
+      "opt": {
+        "arbitrate": "Arbitrate",
+        "takeBoth": "Take the wreck"
+      },
+      "out": {
+        "arbitrate": "You split it down the middle. Both sides pay you the arbiter's cut.",
+        "takeBoth": "You take the lot and leave two crews with a shared grievance."
+      }
+    },
+    "convoyRun": {
+      "text": "Yusuf's convoy is short an escort and long on cargo. «One lane. You keep station, I keep the books open.»",
+      "opt": {
+        "escortHim": "Ride escort",
+        "takeCargo": "Take the cargo instead"
+      },
+      "out": {
+        "escortHim": "You take point. Yusuf's yard opens its books to you at the far end.",
+        "takeCargo": "You cut the tether and run. Yusuf says nothing on the open channel. That's worse."
+      }
+    },
+    "driftAuction": {
+      "text": "Mara's auction, run off a barge ramp. Two lots, one crowd, no receipts.",
+      "opt": {
+        "bidHigh": "Bid high",
+        "bidLow": "Bid low",
+        "heckle": "Heckle the bidding"
+      },
+      "out": {
+        "bidHigh": "Mara knocks it down to you and files your name under 'pays'.",
+        "bidLow": "You take the second lot. Nobody else wanted it, which may be the point.",
+        "heckle": "You talk the price down for somebody else and pocket their thanks. Mara does not thank you."
+      }
     }
   },
   "codex": {
@@ -878,60 +1865,182 @@
     "bulwarkStand": {
       "title": "Bulwark Stand",
       "goal": "Survive the barrage and still hold 6+ shield — layer the defence."
+    },
+    "tally": {
+      "title": "The Tally",
+      "goal": "Deal exactly 9 damage."
+    },
+    "battery": {
+      "title": "The Battery",
+      "goal": "Store exactly 9 charge."
+    },
+    "seawall": {
+      "title": "The Seawall",
+      "goal": "Raise exactly 7 shield."
+    },
+    "mirrorMath": {
+      "title": "The Mirror",
+      "goal": "Deal 15 or more using at most two slots."
+    },
+    "engraverBench": {
+      "title": "The Bench",
+      "goal": "Raise 9 shield with at least two slots filled."
+    },
+    "blackVault": {
+      "title": "The Vault",
+      "goal": "Store 8 charge using a school's own system."
+    },
+    "spinalDrill": {
+      "title": "Spinal Drill",
+      "goal": "Mark, jam the Spinal, then deal 9."
+    },
+    "coolChain": {
+      "title": "Cool Chain",
+      "goal": "5 shield, 5 charge, and no overflow."
+    },
+    "emberStack": {
+      "title": "Ember Stack",
+      "goal": "Deal 24 across two turns."
+    },
+    "shieldWall": {
+      "title": "Shield Wall",
+      "goal": "End the second turn on 11 shield."
+    },
+    "fateBench": {
+      "title": "Fixed Odds",
+      "goal": "One roll, one placement: 7 damage, 5 shield, 7 charge."
+    },
+    "sortingYard": {
+      "title": "Sorting Yard",
+      "goal": "Deal 8 or more with an even total in Weapons A."
+    },
+    "choirStand": {
+      "title": "The Choir Stand",
+      "goal": "Survive the charged volley on 8 shield or more."
     }
   },
   "bark": {
     "levelUp": {
       "1": "A new rank. The record notices you now, captain.",
       "2": "Level up. The Star Chart just widened — go spend it.",
-      "3": "You grew. So did the map of what we could become."
+      "3": "You grew. So did the map of what we could become.",
+      "4": "Captain's rating up. Somebody's keeping score after all.",
+      "5": "Promotion. No ceremony out here, sorry.",
+      "6": "Another rank. Another point on the chart."
     },
     "resume": {
       "1": "Welcome back, captain. I recalculated the odds. Still against us.",
-      "2": "You're back. The dark didn't miss you. I did, a little."
+      "2": "You're back. The dark didn't miss you. I did, a little.",
+      "3": "Systems warm. You were gone longer than the log admits, captain.",
+      "4": "Welcome back. I kept the lights on and the numbers honest.",
+      "5": "Still here. Still counting. Ready when you are.",
+      "6": "I ran the diagnostics twice. Boredom is a state, apparently.",
+      "7": "Course held. Nothing found us while you were away.",
+      "8": "Good. I was starting to compose an obituary.",
+      "9": "Everything where you left it. Sadly, including the damage.",
+      "10": "Back at the board, captain. The sector didn't move."
     },
     "sectorEnter1": {
       "1": "The Hush Rim. The name is honest.",
-      "2": "Forty years of silence, and we brought the noise."
+      "2": "Forty years of silence, and we brought the noise.",
+      "3": "The Rim. Where the fleet stopped answering."
     },
     "lowHull": {
       "1": "The hull is complaining. So am I, just quieter.",
       "2": "We're taking this personally now. The hull, I mean.",
-      "3": "'Structural integrity' is a generous term for what we have."
+      "3": "'Structural integrity' is a generous term for what we have.",
+      "4": "Hull's thin, captain. Thinner than my patience.",
+      "5": "I can hear the frame. That's not a sound it should make.",
+      "6": "One more like that and we're a fragment for somebody else.",
+      "7": "Structural margin: rhetorical.",
+      "8": "Please. Shields. Any shields.",
+      "9": "We're past careful and into lucky, captain.",
+      "10": "I'm not panicking. I'm reporting at volume."
     },
     "battleWin": {
       "1": "Clean. Collect what glitters.",
       "2": "They're scrap now. Fitting.",
-      "3": "Logged as a win. Barely counts, but logged."
+      "3": "Logged as a win. Barely counts, but logged.",
+      "4": "Clean. I'll note it as intentional.",
+      "5": "Field's clear. So is my conscience, mostly.",
+      "6": "That went better than the arithmetic suggested.",
+      "7": "Enemy resolved. Scrap incoming.",
+      "8": "Good rolls. Good placement. Mostly good placement.",
+      "9": "Logged as a win. I'm generous with definitions.",
+      "10": "Nobody's shooting. Enjoy the novelty.",
+      "11": "You made that look deliberate, captain.",
+      "12": "Salvage rights are ours by the only law out here."
     },
     "nearDeathWin": {
       "1": "Filing that under: do not repeat.",
-      "2": "We lived. I'll pretend that was the plan."
+      "2": "We lived. I'll pretend that was the plan.",
+      "3": "We are alive on a technicality. I'll take it.",
+      "4": "That was not a plan. That was a coincidence with good timing.",
+      "5": "Hull integrity: theoretical. Morale: also theoretical.",
+      "6": "Please don't do that again. Please do it again if it works."
     },
     "tideUp": {
       "1": "Interference is rising. The sector noticed us.",
-      "2": "The static is climbing. It knows we're here."
+      "2": "The static is climbing. It knows we're here.",
+      "3": "Interference is climbing. Everything hits harder from here.",
+      "4": "The sector just tightened its grip, captain.",
+      "5": "Tide up. The numbers stop being friendly now.",
+      "6": "Noise floor rising. So is everything else."
     },
     "rareLoot": {
       "1": "Careful with that one. It… thinks.",
-      "2": "That core is humming. Cores shouldn't hum."
+      "2": "That core is humming. Cores shouldn't hum.",
+      "3": "That's a good one. Don't sell it out of habit.",
+      "4": "Rare core. Somebody died for that, statistically.",
+      "5": "Oh, that's lovely. Put it in the deck, captain.",
+      "6": "Fleet-grade. Forty years and it still holds a face.",
+      "7": "I'd call that a find. I rarely call anything a find.",
+      "8": "Rare. Genuinely rare, not merchant-rare.",
+      "9": "That one changes a build. Choose deliberately.",
+      "10": "Worth the hull we spent. Nearly.",
+      "11": "Handle it gently. It's older than the wreck it was in.",
+      "12": "New core. New habits, if you're willing."
     },
     "eventNeg": {
       "1": "Could have gone worse. Theoretically.",
       "2": "I'd say I told you so. But I didn't. This time.",
-      "3": "We'll call that tuition."
+      "3": "We'll call that tuition.",
+      "4": "That cost us. I'm noting who chose it.",
+      "5": "Consequences arrive on schedule out here.",
+      "6": "Well. That's a decision we live with now.",
+      "7": "Filed under 'lessons'. Expensive category.",
+      "8": "I'd argue, but the ledger already has.",
+      "9": "Not fatal. Just permanent.",
+      "10": "The sector took its cut, captain."
     },
     "eventPos": {
       "1": "That went better than the math promised.",
-      "2": "Take the win, captain. They're rare out here."
+      "2": "Take the win, captain. They're rare out here.",
+      "3": "That went our way. Rare. Enjoy it.",
+      "4": "Good call. I'll pretend I suggested it.",
+      "5": "Profit and no holes. A fine afternoon.",
+      "6": "I like this outcome. I like very few outcomes.",
+      "7": "Somebody out here still keeps their word.",
+      "8": "Clean trade. Nobody bled.",
+      "9": "That's the sort of choice that gets remembered kindly.",
+      "10": "Noted, logged, and quietly approved of."
     },
     "idleMap": {
       "1": "The map won't decide for us, captain.",
-      "2": "Whenever you're ready. The dark can wait."
+      "2": "Whenever you're ready. The dark can wait.",
+      "3": "Take your time. The sector is patient and so am I.",
+      "4": "Every route from here is a different kind of expensive.",
+      "5": "Fog's thick ahead. Sensors would help with that.",
+      "6": "I've charted worse. Not recently, but I have."
     },
     "setComplete": {
       "1": "Resonance caught. Don't ask how it works.",
-      "2": "The cores are singing together. That's usually a warning."
+      "2": "The cores are singing together. That's usually a warning.",
+      "3": "Set locked. The deck just started agreeing with itself.",
+      "4": "Resonance holding. You'll feel that next roll.",
+      "5": "Four of a school. The cores like company.",
+      "6": "That's a proper build now, captain.",
+      "7": "The whole tray hums. That's the good hum."
     },
     "killJammer": {
       "1": "The jammer's quiet. I can finally hear myself think.",
@@ -964,28 +2073,108 @@
     "memory": {
       "1": "Something just came back. Give me a second, captain.",
       "2": "That's another piece of me. Filed under 'unpleasant, useful'.",
-      "3": "I remember more of them now. That's not entirely a gift."
+      "3": "I remember more of them now. That's not entirely a gift.",
+      "4": "Another piece of me came back. I'm not sure I wanted this one."
     },
     "sectorEnter2": {
       "1": "Drift Fields. Everything here is somebody's salvage, including us.",
-      "2": "Watch the mines. They've had forty years to get bored."
+      "2": "Watch the mines. They've had forty years to get bored.",
+      "3": "Drift Fields. Mind the lanes and mind the clans."
     },
     "sectorEnter3": {
       "1": "The Rift. My sensors are voting and they disagree.",
-      "2": "Don't trust the readings. Don't trust the dice either, honestly."
+      "2": "Don't trust the readings. Don't trust the dice either, honestly.",
+      "3": "The Rift. Trust the resolver, not the instruments."
     },
     "sectorEnter4": {
       "1": "Choir space. They'll be polite. That's the worrying part.",
-      "2": "If they start singing numbers at you, captain, do not sing back."
+      "2": "If they start singing numbers at you, captain, do not sing back.",
+      "3": "The Choir. They'll be polite. That's the unsettling part."
     },
     "sectorEnter5": {
       "1": "The Core. I have been pointed at this place for forty years.",
-      "2": "Whatever happens here, thank you for the lift."
+      "2": "Whatever happens here, thank you for the lift.",
+      "3": "The Core. Everything from here is a first draft."
     },
     "bossPhase": {
       "1": "It just changed its mind about how this goes. Adjust.",
       "2": "New pattern, captain. The old one was the polite version.",
-      "3": "That was a phase change. I would take it personally."
+      "3": "That was a phase change. I would take it personally.",
+      "4": "It changed pattern. Read it again before you place.",
+      "5": "New phase. Everything you learned is half wrong now.",
+      "6": "It's not hurt. It's committed.",
+      "7": "Second movement, captain. Louder.",
+      "8": "Watch the intent. It just rewrote itself.",
+      "9": "That was the polite version.",
+      "10": "It has more to say. Unfortunately."
+    },
+    "minibossIntro": {
+      "1": "Gate fight. This one was built to be remembered.",
+      "2": "That's not a patrol. That's a statement.",
+      "3": "Subsystems visible. Shoot the idea, not the hull.",
+      "4": "We don't get past this one by being fast.",
+      "5": "It's been waiting at this row for a while, captain.",
+      "6": "Whatever it does first, it will do again. Learn it."
+    },
+    "kill-raider": {
+      "1": "Clan colours. There will be more of those."
+    },
+    "kill-scavDrone": {
+      "1": "Somebody's loader. It didn't choose this."
+    },
+    "kill-shieldWarden": {
+      "1": "Fleet escort doctrine. Forty years too late."
+    },
+    "kill-jammerCorvette": {
+      "1": "Slot's free again. I hated that."
+    },
+    "kill-leechSkiff": {
+      "1": "The dice move again. Thank you."
+    },
+    "kill-choirZealot": {
+      "1": "It sang until it didn't. Log the channel."
+    },
+    "kill-riftWasp": {
+      "1": "Loud to the end. Check the weapon mount."
+    },
+    "kill-breakerDrone": {
+      "1": "Salvage tooling with opinions. Not any more."
+    },
+    "kill-magnetTug": {
+      "1": "It only wanted to hold us. It was very good at it."
+    },
+    "kill-minelayer": {
+      "1": "Field's still out there. The layer isn't."
+    },
+    "kill-hookTug": {
+      "1": "No invoice this time."
+    },
+    "kill-riftling": {
+      "1": "The Rift will draw another. It always does."
+    },
+    "kill-echoShade": {
+      "1": "It stopped repeating us. Small mercy."
+    },
+    "kill-foldWorm": {
+      "1": "The numbers feel solid again."
+    },
+    "kill-choirAcolyte": {
+      "1": "That one volunteered, captain."
+    },
+    "kill-hymnTurret": {
+      "1": "Off-key at last."
+    },
+    "kill-hymnCantor": {
+      "1": "The tempo's gone. The rest will scatter."
+    },
+    "kill-coreFragment": {
+      "1": "A piece of the Core, and it bled like a ship."
+    },
+    "kill-probabilityKnot": {
+      "1": "Untied. Two futures, both over."
+    },
+    "kill-causalityLoop": {
+      "1": "It stopped swapping. I'd almost gotten used to it."
     }
   },
   "mutators": {
@@ -1078,6 +2267,22 @@
     "choirShadow": {
       "name": "Choir's Shadow",
       "desc": "The Choir under a resonant storm. Lean into the black and pay for it."
+    },
+    "keeper": {
+      "name": "Keeper",
+      "desc": "Answer every beacon in a single run."
+    },
+    "bareArmor": {
+      "name": "No Armour",
+      "desc": "The shield slots are welded shut."
+    },
+    "collector": {
+      "name": "Collector",
+      "desc": "Nine dice, five schools, one hold."
+    },
+    "quietRun": {
+      "name": "Quiet Run",
+      "desc": "Cross the Rift placing as few dice as you can."
     }
   },
   "sectors": {
@@ -1107,6 +2312,26 @@
     "5": {
       "name": "A5 — Rewritten bosses",
       "desc": "Bosses open in their late-fight pattern."
+    },
+    "6": {
+      "name": "Overclocked",
+      "desc": "Every elite carries an extra subsystem."
+    },
+    "7": {
+      "name": "Seller's Market",
+      "desc": "Shop prices rise another 25%."
+    },
+    "8": {
+      "name": "Extra Verse",
+      "desc": "Every boss phase gains an extra beat."
+    },
+    "9": {
+      "name": "High Tide",
+      "desc": "Interference tide climbs to 4."
+    },
+    "10": {
+      "name": "The Keeper's Trial",
+      "desc": "Hull −15%. Clear it and the Rim remembers your name."
     }
   },
   "prologue": {
@@ -1140,7 +2365,72 @@
     "f4-3": "Their hymns are numbers read aloud. The tune is incidental.",
     "f5-1": "This close to the Core, causality is a local ordinance, not a law.",
     "f5-2": "The fleet's beacons all point here. They always did.",
-    "f5-3": "The Core does not answer questions. It collapses them."
+    "f5-3": "The Core does not answer questions. It collapses them.",
+    "f1-4": "The Rim's wrecks all face the same way. Nobody has explained why.",
+    "f1-5": "Fleet manifests list eleven ships. Salvage crews have found twelve hulls.",
+    "f1-6": "A probability core weighs nothing until you ask it a question.",
+    "f1-7": "The first prospectors traded in oxygen. Scrap came later.",
+    "f1-8": "Quarantine buoys still transmit. The authority that set them does not.",
+    "f1-9": "Nothing decays out here. It just stops being maintained.",
+    "f1-10": "The Rim has no weather and three words for wind.",
+    "f1-11": "Salvage law says the first hull to arrive owns the wreck. Nobody arrives first.",
+    "f1-12": "Every ship in the Rim carries a spare beacon and no plan to use it.",
+    "f1-13": "Dice were cargo before they were currency.",
+    "f1-14": "The expedition's last clear transmission was a shipping figure.",
+    "f1-15": "Old hands paint their hulls matte. Reflections attract attention out here.",
+    "f1-16": "The Rim is the only sector where the maps are older than the stars on them.",
+    "f2-4": "The clans divide the Fields by drift lane, not by distance.",
+    "f2-5": "A tug that can hold you is worth two that can shoot you.",
+    "f2-6": "Minefields here are inherited. Nobody remembers who laid the oldest.",
+    "f2-7": "Clan debts pass to whoever buys the ship, hull and ledger together.",
+    "f2-8": "The Fields have a market day. It moves.",
+    "f2-9": "Scrap is priced by mass everywhere else and by story here.",
+    "f2-10": "Convoy masters trade routes for names, never for scrap.",
+    "f2-11": "The barge crews sing to keep the count. It is not a hymn.",
+    "f2-12": "A clan will forgive theft twice and rudeness never.",
+    "f2-13": "Every wreck in the Fields has been stripped at least three times.",
+    "f2-14": "Yusuf's lane is the only one with a published toll.",
+    "f2-15": "Drift graves are marked with a single welded plate. No names.",
+    "f2-16": "The Fields drift a quarter of a light-second a year. The maps do not.",
+    "f3-4": "In the Rift, the shortest route is not always the same length twice.",
+    "f3-5": "Rift instruments report confidently and disagree with each other.",
+    "f3-6": "Some crews hear their own voices on Rift channels. Most stop listening.",
+    "f3-7": "Cut a Rift shard wrong and it stops having been a shard.",
+    "f3-8": "The Rift has no centre that anyone has visited twice.",
+    "f3-9": "Anomaly wards are arithmetic, not superstition. Mostly.",
+    "f3-10": "Time in the Rift is honest. It just is not shared.",
+    "f3-11": "The Rift returns things. Rarely the same things.",
+    "f3-12": "Old charts of the Rift are worth more than new ones. They lie consistently.",
+    "f3-13": "A mirror in the Rift shows what you would have done.",
+    "f3-14": "The fleet's science officers called this sector 'the working'.",
+    "f3-15": "Rift storms have a rhythm. Nobody has counted long enough to prove it.",
+    "f3-16": "Twin wrecks in the Rift are usually one wreck, twice.",
+    "f4-4": "The Choir does not recruit. It waits for the arithmetic to convince you.",
+    "f4-5": "Their hymns are ledgers. The melody is the carry.",
+    "f4-6": "A Choir ship has no captain, only a first voice.",
+    "f4-7": "The Preacher was a fleet statistician. The rank still shows.",
+    "f4-8": "Choir pacts are written twice: once for you, once for the Core.",
+    "f4-9": "Heresy in the Choir means preferring one outcome over another.",
+    "f4-10": "Their reliquaries hold dice that no longer roll.",
+    "f4-11": "The Choir counts the dead as rounding error, and means it kindly.",
+    "f4-12": "Every Choir hull is tuned to the same chord. That is the fleet formation.",
+    "f4-13": "Acolytes are given a number, not a name. Some earn the name back.",
+    "f4-14": "The Choir's oldest hymn is a list of the expedition's ships.",
+    "f4-15": "They believe the Core is not answering. They believe it is asking.",
+    "f4-16": "A silenced Choir organ takes three days to forget its tuning.",
+    "f5-4": "Near the Core, causality is a local convention.",
+    "f5-5": "The Core does not broadcast. It replies.",
+    "f5-6": "Ships that reach the Core report arriving before they left.",
+    "f5-7": "The last fleet transmission came from here, dated four years early.",
+    "f5-8": "The Core's light has no source and casts real shadows.",
+    "f5-9": "Instruments near the Core agree. That is the frightening part.",
+    "f5-10": "Every wreck at the Core is intact. They simply stopped.",
+    "f5-11": "The Core has been described as patient by everyone who returned.",
+    "f5-12": "There is a lighthouse here. Nobody built it.",
+    "f5-13": "The Core collapses uncertainty. It does not promise you like the result.",
+    "f5-14": "Fleet doctrine said: observe, do not answer. Somebody answered.",
+    "f5-15": "Forty years of silence, and the signal was never once repeated.",
+    "f5-16": "The Core keeps a copy of everything that has ever decided near it."
   },
   "ending": {
     "seal": {
@@ -1197,5 +2487,480 @@
     "ascension": "Cleared at ascension A{{n}}.",
     "lastBreath": "One hull point, once. You do not talk about it. Echo does, constantly.",
     "quiet": "You leave the Rim quietly. Nobody out here writes anything down."
+  },
+  "modules": {
+    "magnetScoop": {
+      "name": "Magnet Scoop",
+      "desc": "+2 scrap at the start of every battle."
+    },
+    "grapple": {
+      "name": "Grapnel Hook",
+      "desc": "+3 scrap for every enemy you kill."
+    },
+    "lotteryBlock": {
+      "name": "Lottery Block",
+      "desc": "The first reroll in every shop is free."
+    },
+    "trainingModule": {
+      "name": "Training Module",
+      "desc": "+20% XP from the run."
+    },
+    "assayRig": {
+      "name": "Assay Rig",
+      "desc": "Any max face pays 2 scrap."
+    },
+    "brokerLink": {
+      "name": "Broker Link",
+      "desc": "Shop prices −12%."
+    },
+    "slagPress": {
+      "name": "Slag Press",
+      "desc": "Any min face pays 3 scrap."
+    },
+    "tithePlate": {
+      "name": "Tithe Plate",
+      "desc": "+25% scrap from every source."
+    },
+    "salvageArm": {
+      "name": "Salvage Arm",
+      "desc": "Every unplaced die pays 1 scrap."
+    },
+    "auditCore": {
+      "name": "Audit Core",
+      "desc": "+6 scrap at battle start; shops −5%."
+    },
+    "mirrorPlate": {
+      "name": "Mirror Plating",
+      "desc": "A dodged hit reflects damage back."
+    },
+    "ballastModule": {
+      "name": "Ballast",
+      "desc": "Hull +4."
+    },
+    "escapePod": {
+      "name": "Escape Pod",
+      "desc": "Once per run, survive a lethal hit at 1 hull."
+    },
+    "heatsink": {
+      "name": "Heatsink",
+      "desc": "The first reactor overflow each battle costs no hull."
+    },
+    "fieldStabilizer": {
+      "name": "Field Stabiliser",
+      "desc": "Interference tide hits one level softer."
+    },
+    "ablativeWeave": {
+      "name": "Ablative Weave",
+      "desc": "+2 shield from every shield die."
+    },
+    "bulkheadRing": {
+      "name": "Bulkhead Ring",
+      "desc": "Hull +8; engine thresholds one step harder."
+    },
+    "dampingCoil": {
+      "name": "Damping Coil",
+      "desc": "Heal 3 hull after every battle."
+    },
+    "hardpointClamp": {
+      "name": "Hardpoint Clamp",
+      "desc": "Engine thresholds one step easier."
+    },
+    "voidLiner": {
+      "name": "Void Liner",
+      "desc": "+3 shield from shield dice while hull is under 40%."
+    },
+    "siegeMount": {
+      "name": "Siege Mount",
+      "desc": "+2 damage on a max face in weapons."
+    },
+    "piercer": {
+      "name": "Piercer",
+      "desc": "The first hit each battle ignores shields."
+    },
+    "emberInjector": {
+      "name": "Ember Injector",
+      "desc": "Max face in weapons applies Burn 2."
+    },
+    "railCradle": {
+      "name": "Rail Cradle",
+      "desc": "+3 in the Spinal Mount."
+    },
+    "targetingMesh": {
+      "name": "Targeting Mesh",
+      "desc": "Marks are worth +2 more damage."
+    },
+    "overpressure": {
+      "name": "Overpressure",
+      "desc": "+3 in weapons on the first turn."
+    },
+    "ricochetHousing": {
+      "name": "Ricochet Housing",
+      "desc": "Overkill from Weapons A carries to the next enemy."
+    },
+    "splinterHead": {
+      "name": "Splinter Head",
+      "desc": "+3 in weapons on a min face."
+    },
+    "lanceCapacitor": {
+      "name": "Lance Capacitor",
+      "desc": "+2 in weapons on 7 or more."
+    },
+    "executioner": {
+      "name": "Executioner",
+      "desc": "+3 in weapons while hull is under 30%."
+    },
+    "solenoid": {
+      "name": "Solenoid",
+      "desc": "One extra reroll every turn."
+    },
+    "gyroStabilizer": {
+      "name": "Gyro Stabiliser",
+      "desc": "Reserve +1 die."
+    },
+    "recycler": {
+      "name": "Recycler",
+      "desc": "Every unplaced die stores 1 charge."
+    },
+    "resonator": {
+      "name": "Resonator",
+      "desc": "+2 charge at battle start per completed four-set."
+    },
+    "nudgeGovernor": {
+      "name": "Nudge Governor",
+      "desc": "Nudges cost 1 less charge."
+    },
+    "wideGrip": {
+      "name": "Wide Grip",
+      "desc": "Reroll one more die at a time."
+    },
+    "capacitorBank": {
+      "name": "Capacitor Bank",
+      "desc": "Charge cap +3."
+    },
+    "primerCoil": {
+      "name": "Primer Coil",
+      "desc": "+2 in the reactor."
+    },
+    "blueBallast": {
+      "name": "Blue Ballast",
+      "desc": "Reserve one extra blue die."
+    },
+    "growthTrellis": {
+      "name": "Growth Trellis",
+      "desc": "Growing dice climb one step higher."
+    },
+    "echoBuffer": {
+      "name": "Echo Buffer",
+      "desc": "+2 charge when a die repeats last turn's value."
+    },
+    "seedVault": {
+      "name": "Seed Vault",
+      "desc": "+2 from green dice in engines."
+    },
+    "jamBreaker": {
+      "name": "Jam Breaker",
+      "desc": "Your jam cuts 2 more from enemy attacks."
+    },
+    "entropySink": {
+      "name": "Entropy Sink",
+      "desc": "Any min face stores 2 charge."
+    },
+    "paradoxLoop": {
+      "name": "Paradox Loop",
+      "desc": "A max face in weapons resolves the slot twice."
+    },
+    "blackLedger": {
+      "name": "Black Ledger",
+      "desc": "+3 from black dice in weapons."
+    },
+    "prismLens": {
+      "name": "Prism Lens",
+      "desc": "+1 to every die on the first turn."
+    },
+    "hushAntenna": {
+      "name": "Hush Antenna",
+      "desc": "+2 in sensors."
+    },
+    "coldLogicCore": {
+      "name": "Cold Logic Core",
+      "desc": "Nudges are free; crits stop happening."
+    },
+    "gamblersChip": {
+      "name": "Gambler's Chip",
+      "desc": "Any max face pays 1 charge and 1 scrap."
+    }
+  },
+  "engravings": {
+    "sting": {
+      "name": "Sting",
+      "desc": "+1 damage on a max face in weapons."
+    },
+    "frost": {
+      "name": "Frost",
+      "desc": "A min face grants 1 shield."
+    },
+    "vein": {
+      "name": "Vein",
+      "desc": "A max face pays 1 scrap."
+    },
+    "echo": {
+      "name": "Echo",
+      "desc": "Repeating last turn's value stores 1 charge."
+    },
+    "anchor": {
+      "name": "Anchor",
+      "desc": "This die can never be locked."
+    },
+    "wedge": {
+      "name": "Wedge",
+      "desc": "This die ignores jammed slots."
+    },
+    "flame": {
+      "name": "Flame",
+      "desc": "A max face in weapons adds Burn 1."
+    },
+    "edge": {
+      "name": "Edge",
+      "desc": "Rerolling this die alone costs nothing."
+    },
+    "shade": {
+      "name": "Shade",
+      "desc": "+1 when it resolves in the reactor."
+    },
+    "spring": {
+      "name": "Spring",
+      "desc": "One free nudge on this die each battle."
+    },
+    "lead": {
+      "name": "Lead",
+      "desc": "+2 in the Spinal Mount."
+    },
+    "spark": {
+      "name": "Spark",
+      "desc": "Rolling a 1 stores 2 charge."
+    },
+    "keel": {
+      "name": "Keel",
+      "desc": "+1 in engines."
+    },
+    "lens": {
+      "name": "Lens",
+      "desc": "+1 in sensors."
+    },
+    "bastion": {
+      "name": "Bastion",
+      "desc": "+1 in shields."
+    },
+    "hunger": {
+      "name": "Hunger",
+      "desc": "A max face deals 1 extra damage to the target."
+    },
+    "ash": {
+      "name": "Ash",
+      "desc": "A min face pays 2 scrap."
+    },
+    "surf": {
+      "name": "Surf",
+      "desc": "+1 on the first turn."
+    },
+    "lastLight": {
+      "name": "Last Light",
+      "desc": "+2 while hull is under 30%."
+    },
+    "weight": {
+      "name": "Weight",
+      "desc": "Any value under 3 counts as 3."
+    },
+    "crown": {
+      "name": "Crown",
+      "desc": "A max face stores 1 charge."
+    },
+    "thorn": {
+      "name": "Thorn",
+      "desc": "5 or more in weapons adds Burn 1."
+    },
+    "glass": {
+      "name": "Glass",
+      "desc": "+2 in weapons; a max face costs 1 hull."
+    },
+    "rime": {
+      "name": "Rime",
+      "desc": "+2 shield whenever it fills a shield slot."
+    },
+    "loam": {
+      "name": "Loam",
+      "desc": "+2 in engines."
+    },
+    "cinder": {
+      "name": "Cinder",
+      "desc": "A max face adds Burn 2."
+    },
+    "mint": {
+      "name": "Mint",
+      "desc": "A max face pays 3 scrap."
+    },
+    "wick": {
+      "name": "Wick",
+      "desc": "A min face stores 1 charge."
+    },
+    "pin": {
+      "name": "Pin",
+      "desc": "+2 in sensors."
+    },
+    "drum": {
+      "name": "Drum",
+      "desc": "+2 charge whenever it fills the reactor."
+    },
+    "scale": {
+      "name": "Scale",
+      "desc": "A max face in shields heals 1 hull."
+    },
+    "beaconRune": {
+      "name": "Beacon",
+      "desc": "+1 on the first two turns."
+    },
+    "rust": {
+      "name": "Rust",
+      "desc": "+2 in weapons on 8 or more."
+    },
+    "salt": {
+      "name": "Salt",
+      "desc": "A max face grants 1 shield."
+    },
+    "glimmer": {
+      "name": "Glimmer",
+      "desc": "Rolling 2 or less stores 1 charge."
+    },
+    "sinew": {
+      "name": "Sinew",
+      "desc": "4 or more in engines grants 1 shield."
+    },
+    "cipher": {
+      "name": "Cipher",
+      "desc": "Repeating last turn's value pays 4 scrap."
+    },
+    "brand": {
+      "name": "Brand",
+      "desc": "+2 for red dice in weapons."
+    },
+    "tidepool": {
+      "name": "Tidepool",
+      "desc": "A min face in shields grants 3 shield."
+    },
+    "voidmark": {
+      "name": "Voidmark",
+      "desc": "A min face in the reactor stores 3 charge."
+    }
+  },
+  "fate": {
+    "severance": "Severance — the line to your own luck goes dead.",
+    "misfire": "Misfire — something in the hull answers wrong.",
+    "interference": "Interference — the sector eats your margins.",
+    "trade": "Trade — the Rim takes hull and gives back current.",
+    "wash": "Wash — nothing gained, nothing lost. Almost.",
+    "ripple": "Ripple — the field folds neatly around you.",
+    "tailwind": "Tailwind — the sector leans your way for once.",
+    "cache": "Cache — a dead crew's savings, unclaimed.",
+    "volley": "Volley — the numbers decide to be a weapon.",
+    "mercy": "Mercy — the Rim mends what it broke.",
+    "miracle": "Miracle — for one turn the sector is on your side."
+  },
+  "dossier": {
+    "scavDrone": "Somebody's cargo loader, taught two commands and let loose.",
+    "raider": "Clan colours painted over clan colours. Nobody remembers the first ones.",
+    "shieldWarden": "Fleet escort doctrine, still running forty years after the fleet.",
+    "mine": "Cheap, patient, and entirely without opinions.",
+    "jammerCorvette": "Built to blind customs cutters. It never learned a second job.",
+    "leechSkiff": "It does not want your hull. It wants your dice to sit still.",
+    "choirZealot": "Sings on an open channel so you know the odds are being prayed at.",
+    "riftWasp": "Dies loudly and leaves a slot ringing.",
+    "bountyHuntress": "She keeps a ledger. You are a line in it, not a grudge.",
+    "raiderAlpha": "The one whose turret still tracks. That is the whole promotion.",
+    "breakerDrone": "Salvage tooling with the safeties filed off.",
+    "magnetTug": "It cannot shoot. It does not need to; it can hold.",
+    "minelayer": "Lays its field, then waits to be the least interesting thing here.",
+    "riftling": "A shape the Rift keeps redrawing because it likes the first draft.",
+    "echoShade": "Whatever you just did, it heard the loud half.",
+    "unstableCore": "A reactor that never finished deciding whether to stop.",
+    "choirAcolyte": "Volunteered. That is the frightening part.",
+    "hymnTurret": "A gun tuned to a chord. It fires on the downbeat.",
+    "zealotRam": "No shields, no plan past the first thirty seconds.",
+    "coreFragment": "A piece of the Core that still thinks it is the whole.",
+    "probabilityKnot": "Two futures tied together and pulled tight.",
+    "nullDrone": "It removes options rather than hull. Efficient, in its way.",
+    "hookTug": "It bills for the tow whether or not you asked.",
+    "slagHauler": "Slow, armoured, full of somebody else's ship.",
+    "chaffSwarm": "Individually harmless. That is the joke, and it lands.",
+    "foldWorm": "It eats the certainty out of a number and leaves the digit.",
+    "nullEcho": "Half of your last turn, played back with worse intentions.",
+    "riftAnchor": "It holds a piece of space still so the rest can wobble.",
+    "hymnCantor": "Sets the tempo. Kill the tempo first.",
+    "pyreDeacon": "Heals its choir and calls it mercy. It is, from one side.",
+    "reliquary": "A hull built around a relic nobody has opened in decades.",
+    "causalityLoop": "It swaps two of your numbers and lets you do the rest.",
+    "voidWarden": "Older than the Choir. Possibly older than the fleet.",
+    "quietEngine": "It does not attack. It makes the room uncertain.",
+    "breachDrone": "One job, done once, loudly.",
+    "sparkMote": "Static with an ambition problem.",
+    "hullGnat": "Too small to matter, in numbers large enough to matter.",
+    "clanBreaker": "The clan's collector. It bills in hull and takes the change.",
+    "riftTyrant": "It grew an eye so the Rift could watch back.",
+    "choirCantor": "It leads the hymn, and the hymn is a weapon.",
+    "coreSentinel": "The Core keeps one of these where the causality is thin.",
+    "leechPrince": "Every skiff in the field learned its trade from this one.",
+    "mineBaron": "It seeds the field, then charges for safe passage through it.",
+    "convoyAlpha": "Three escorts and a hull that will not die until they do.",
+    "wardenFragment": "A piece of the Warden that never got the stand-down order.",
+    "leechQueen": "She takes the dice first and the ship at leisure.",
+    "mineTyrant": "It thinks of the whole field as one weapon. It is right.",
+    "choirHerald": "Sent ahead to be survived, so the Flagship is understood.",
+    "mirrorHull": "It answers with your own last turn, halved and honest.",
+    "quarantineWarden": "Still enforcing a quarantine on a sector with nothing to protect.",
+    "breakerBarge": "It eats salvage. Your scrap counts as salvage.",
+    "riftMaw": "Not a ship. A place that decided to have a direction.",
+    "choirFlagship": "The hymn, given a hull and a firing solution.",
+    "coreHeart": "The thing the fleet came to study. It has been studying back."
+  },
+  "keeper": {
+    "mara1": "Mara: «Everything here works. Define 'works' first, though.»",
+    "mara2": "Mara: «No refunds, no receipts, no hard feelings.»",
+    "mara3": "Mara: «You look like a captain who counts. I like that. Slightly.»",
+    "mara4": "Mara: «Prices are firm. The stock is not.»",
+    "mara5": "Mara: «I sold that one twice. The first buyer never came back for it.»",
+    "mara6": "Mara: «Buy the ugly one. The ugly ones survive.»",
+    "mara7": "Mara: «If it rolls, it sells. If it argues, it's yours.»",
+    "mara8": "Mara: «Don't touch the shelf. That shelf is inventory.»",
+    "mara9": "Mara: «Half the Rim owes me. You're the half that pays.»",
+    "mara10": "Mara: «Sell me the ones you're afraid of. I'm not.»",
+    "mara11": "Mara: «I've stopped asking where the cargo came from. Saves time.»",
+    "mara12": "Mara: «That's fleet stock. Which means it works and nobody wants it.»",
+    "mara13": "Mara: «You want cheap or you want to come back? Pick one.»",
+    "mara14": "Mara: «I don't haggle. I reconsider, occasionally.»",
+    "mara15": "Mara: «Business is steady. Everyone out here needs something twice.»",
+    "mara16": "Mara: «Take it. If it kills you, I'll buy it back from the wreck.»",
+    "yusuf1": "Yusuf: «Bring it in. We'll see what's still yours.»",
+    "yusuf2": "Yusuf: «Nothing's beyond repair. Some things are beyond payment.»",
+    "yusuf3": "Yusuf: «You fly like someone who's read the manual once.»",
+    "yusuf4": "Yusuf: «I can fix the hull. The habits are on you.»",
+    "yusuf5": "Yusuf: «My father welded this bay. It's outlived his lane.»",
+    "yusuf6": "Yusuf: «Upgrade the thing you actually use. Radical advice, I know.»",
+    "yusuf7": "Yusuf: «Fusion's clean work. Two of a kind, one better.»",
+    "yusuf8": "Yusuf: «Voucher's good here. It's good anywhere I say it is.»",
+    "yusuf9": "Yusuf: «You want speed or you want to arrive?»",
+    "yusuf10": "Yusuf: «Every convoy I've lost, I lost to a system I skipped.»",
+    "yusuf11": "Yusuf: «I don't ask about the scorch marks. I just weld over them.»",
+    "yusuf12": "Yusuf: «Rest here as long as you like. The Rim isn't going anywhere.»",
+    "yusuf13": "Yusuf: «Cheap repairs cost twice. You'll learn that once.»",
+    "yusuf14": "Yusuf: «Go on then. Don't make me see this hull again.»",
+    "keeper1": "The Keeper: «You're the third ship this cycle. The other two didn't stop.»",
+    "keeper2": "The Keeper: «I keep the lights. Somebody has to say where the edges are.»",
+    "keeper3": "The Keeper: «The fleet passed here singing. That's in the log.»",
+    "keeper4": "The Keeper: «Beacons don't guide. They witness.»",
+    "keeper5": "The Keeper: «I've stopped counting years. I count relights.»",
+    "keeper6": "The Keeper: «Answer the beacons and the sector answers back. Eventually.»",
+    "keeper7": "The Keeper: «Take the reading. Don't take the lamp.»",
+    "keeper8": "The Keeper: «Everything the Rim swallows, a beacon saw first.»",
+    "keeper9": "The Keeper: «I was crew once. The ship is still out there, technically.»",
+    "keeper10": "The Keeper: «If you get to the Core, tell it somebody kept the lights on.»"
   }
 }

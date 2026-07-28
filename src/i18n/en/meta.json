@@ -50,7 +50,29 @@
     "keyOvergrowth": "Overgrowth",
     "keyColdLogic": "Cold Logic",
     "keyObsidian": "Obsidian Pact",
-    "keySingleCast": "Single Cast"
+    "keySingleCast": "Single Cast",
+    "redSpotter": "Spotter",
+    "redFirestorm": "Firestorm",
+    "redSpine": "Spine",
+    "blueBarrier": "Barrier",
+    "blueJammer": "Jammer",
+    "blueTideBreak": "Tidebreak",
+    "greenCanopy": "Canopy",
+    "greenPerennial": "Perennial",
+    "yellowTally": "Tally",
+    "yellowBounty": "Bounty",
+    "blackVent": "Vent",
+    "blackWell": "Well",
+    "greyToolkit": "Toolkit",
+    "greyLedger": "Ledger",
+    "prismLattice": "Lattice",
+    "prismFacet": "Facet",
+    "prismWell": "Prism Well",
+    "hubEngineering": "Engineering Bay",
+    "keyStormChaser": "Storm Chaser",
+    "keyIronDoctrine": "Iron Doctrine",
+    "keyFatesFavorite": "Fate's Favourite",
+    "keyPrismCascade": "Prism Cascade"
   },
   "chartFx": {
     "hubBudget": "+1 hangar budget",
@@ -81,7 +103,19 @@
       "redSalvo": "Weapons +3 on turn 1",
       "blueGlacier": "+2 shield per Shields resolve",
       "blackEdge": "All dice +2 while hull is critical",
-      "allDice1": "All dice +1"
+      "allDice1": "All dice +1",
+      "weaponsBurn": "Max face in weapons adds Burn 1",
+      "enginesBonus": "+1 in engines",
+      "reactorBonus": "+1 in the reactor",
+      "greenHeal": "Max face on a green die heals 1",
+      "repeatCharge": "A repeated value stores 1 charge",
+      "maxFaceScrap": "Any max face pays 2 scrap",
+      "minFaceCharge": "Any min face stores 1 charge",
+      "firstTurnAll": "+1 to every die on the first turn",
+      "redFirestorm": "Max face in weapons adds Burn 3",
+      "redSpine": "+4 in the Spinal Mount",
+      "greenCanopy": "+3 in engines",
+      "blackWell": "The reactor stores 2 more charge"
     },
     "trait": {
       "obsidianPact": "Black dice roll only their min or max",
@@ -195,7 +229,10 @@
     "beaconResolved": "Resolve the beacon",
     "anomaliesSolvedAtLeast": "Solve {{n}} anomaly",
     "blackPlacedInWinAtLeast": "Win a battle with {{n}}+ black dice placed",
-    "axisAtMost": "Finish with the axis at {{n}} or below"
+    "axisAtMost": "Finish with the axis at {{n}} or below",
+    "allBeaconsResolved": "Resolve every beacon",
+    "deckSchoolsAtLeast": "Finish with {{n}} schools in the deck",
+    "dicePlacedAtMost": "Place at most {{n}} dice all run"
   },
   "drift": {
     "title": "Drift over",
@@ -245,5 +282,19 @@
     "place": "#{{rank}}",
     "endings": "Endings",
     "locked": "Sealed"
+  },
+  "engraving": {
+    "title": "Engraving Station",
+    "hint": "Pick a die, then a rune. Removing one destroys it — no refund.",
+    "locked": "Unlocks at captain level {{level}}.",
+    "pickDie": "Die",
+    "sockets": "Sockets {{used}}/{{max}}",
+    "empty": "No engravings fitted.",
+    "remove": "remove",
+    "fitted": "fitted",
+    "fit": "{{price}} ◈"
+  },
+  "badge": {
+    "keeper": "Keeper"
   }
 }

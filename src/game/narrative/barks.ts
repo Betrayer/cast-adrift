@@ -6,7 +6,8 @@ import { useRunStore } from "@/stores/runStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import type { Outcome } from "@/types/events";
 
-const RING = 12;
+// Phase 10 widens the anti-repeat window to twenty lines (plan Task 8).
+const RING = 20;
 const GLOBAL_MS = 20000;
 
 let recent: string[] = [];

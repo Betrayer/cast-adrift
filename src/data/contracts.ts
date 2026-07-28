@@ -13,6 +13,7 @@ export interface ContractSetup {
   chartDisabled?: boolean;
   perksDisabled?: boolean;
   sensorsDisabled?: boolean;
+  shieldsDisabled?: boolean;
   shopPricePct?: number;
   forcedTraits?: readonly PerkTrait[];
 }
@@ -43,6 +44,15 @@ const BLUE_DECK: readonly string[] = [
   "bulwark",
   "gyro",
   "fused-frostwall",
+];
+
+const MIXED_DECK: readonly string[] = [
+  "red-d6",
+  "blue-d6",
+  "green-d4",
+  "yellow-d6",
+  "black-d6",
+  "grey-d4",
 ];
 
 export const CONTRACTS: readonly ContractDef[] = [
@@ -150,6 +160,50 @@ export const CONTRACTS: readonly ContractDef[] = [
       { g: "win" },
       { g: "blackPlacedInWinAtLeast", n: 3 },
       { g: "axisAtMost", n: -2 },
+    ],
+  },
+  {
+    id: "keeper",
+    name: "content:contracts.keeper.name",
+    desc: "content:contracts.keeper.desc",
+    setup: { sector: 1 },
+    goals: [
+      { g: "win" },
+      { g: "allBeaconsResolved" },
+      { g: "anomaliesSolvedAtLeast", n: 2 },
+    ],
+  },
+  {
+    id: "bareArmor",
+    name: "content:contracts.bareArmor.name",
+    desc: "content:contracts.bareArmor.desc",
+    setup: { shieldsDisabled: true },
+    goals: [
+      { g: "win" },
+      { g: "hullNeverBelowPct", n: 25 },
+      { g: "elitesAtLeast", n: 2 },
+    ],
+  },
+  {
+    id: "collector",
+    name: "content:contracts.collector.name",
+    desc: "content:contracts.collector.desc",
+    setup: { deckPreset: MIXED_DECK },
+    goals: [
+      { g: "win" },
+      { g: "deckSchoolsAtLeast", n: 5 },
+      { g: "depthWithDeckAtLeast", depth: 15, deck: 9 },
+    ],
+  },
+  {
+    id: "quietRun",
+    name: "content:contracts.quietRun.name",
+    desc: "content:contracts.quietRun.desc",
+    setup: { sector: 3 },
+    goals: [
+      { g: "win" },
+      { g: "dicePlacedAtMost", n: 20 },
+      { g: "jumpsAtMost", n: 14 },
     ],
   },
 ];

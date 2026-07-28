@@ -18,6 +18,7 @@ import {
   isSlotBlocked,
   isSlotShrunk,
   MAX_ENEMIES,
+  patternFor,
   phaseIndexForHp,
   spawnEnemy,
 } from "@/game/battle/setup";
@@ -29,8 +30,8 @@ import {
   emit,
   type EffectSource,
 } from "@/game/effects";
-import { hasTrait } from "@/game/run/perkMods";
-import { computeRunMods, runHasTrait } from "@/game/run/runMods";
+import { dieHasGrant } from "@/data/engravings";
+import { sourceMods, sourceTrait } from "@/game/run/runMods";
 import { computeMutatorMods, type MutatorMods } from "@/data/mutators";
 import type { PerkMods } from "@/data/perks/types";
 import type { RngStream, RngStreams } from "@/services/rng";
@@ -106,7 +107,8 @@ const guardLethal = (next: BattleSnapshot): void => {
   if (
     next.hull <= 0 &&
     !next.survivedLethal &&
-    resonanceAtLeast(next.resonance, "black", 6)
+    (resonanceAtLeast(next.resonance, "black", 6) ||
+      sourceTrait(next, "escapePod"))
   ) {
     next.hull = 1;
     next.survivedLethal = true;
@@ -128,6 +130,14 @@ const finalizeOutcome = (next: BattleSnapshot): void => {
     }
     next.outcome = "victory";
   }
+};
+
+// «Пробойник» fires once per battle, on the first weapon hit that lands.
+const consumePierce = (next: BattleSnapshot): boolean => {
+  if (next.pierceUsed === true) return false;
+  if (!sourceTrait(next, "firstHitPierce")) return false;
+  next.pierceUsed = true;
+  return true;
 };
 
 interface SlotContext {
@@ -180,12 +190,14 @@ const applySlotEffect = (
       target.subsystem === undefined
         ? target.enemy.hp + target.enemy.shield
         : 0;
+    const pierce = consumePierce(next);
     const dealt = applyWeaponDamage(
       next,
       target,
       scaleDamage(value + (mods.weapons ?? 0), damageMultPct),
       crit,
       markBonus,
+      pierce,
     );
     beats.push({
       slot: slotId,
@@ -281,8 +293,14 @@ const applySlotEffect = (
     let overflow = 0;
     if (next.charge > next.chargeCap) {
       next.charge = next.chargeCap;
-      overflow = OVERFLOW_HULL_COST;
-      next.hull = Math.max(0, next.hull - OVERFLOW_HULL_COST);
+      // «Теплоотвод» eats the first overflow of the battle; the charge is still
+      // capped, only the hull bill is waived.
+      if (next.overflowShieldUsed !== true && sourceTrait(next, "overflowShield")) {
+        next.overflowShieldUsed = true;
+      } else {
+        overflow = OVERFLOW_HULL_COST;
+        next.hull = Math.max(0, next.hull - OVERFLOW_HULL_COST);
+      }
     }
     beats.push({
       slot: slotId,
@@ -339,7 +357,7 @@ const resolveSlot = (
 
   const crit =
     isWeapon &&
-    !runHasTrait(next.perks, next.chartPicks ?? [], "coldLogic") &&
+    !sourceTrait(next, "coldLogic") &&
     resonanceAtLeast(next.resonance, "yellow", 4) &&
     die.value >= dieFaceMax(die);
 
@@ -398,8 +416,9 @@ export const resolvePlayerPhase = (
   const beats: Beat[] = [];
   const ctx = new BattleCtx(next);
   const sources = buildSources(next);
-  const perkMods = computeRunMods(next.perks, next.chartPicks ?? []);
-  const ricochet = hasTrait(next.perks, "ricochet");
+  const perkMods = sourceMods(next);
+  const ricochet = sourceTrait(next, "ricochet");
+  const killsBefore = aliveEnemies(next).length;
   const mods = next.nextTurnMods;
   next.nextTurnMods = {};
   if (next.sacrificePool > 0) {
@@ -422,8 +441,15 @@ export const resolvePlayerPhase = (
     });
   }
 
-  if (hasTrait(next.perks, "compost")) {
-    next.scrap += next.dice.filter((d) => d.state === "tray").length;
+  const unplaced = next.dice.filter((d) => d.state === "tray").length;
+  if (sourceTrait(next, "compost")) next.scrap += unplaced;
+  // «Утилизатор» pays in charge what «Компост» pays in scrap.
+  if (sourceTrait(next, "recycler")) {
+    next.charge = Math.min(next.chargeCap, next.charge + unplaced);
+  }
+  if (perkMods.scrapPerKill > 0) {
+    const killed = killsBefore - aliveEnemies(next).length;
+    if (killed > 0) next.scrap += killed * perkMods.scrapPerKill;
   }
 
   next.lastPlayerDamage = beats
@@ -448,11 +474,18 @@ const applyAttack = (
   const aura =
     (hasAliveAura(enemy, "atk+2") ? 2 : 0) +
     (hasAliveAura(enemy, "atk+3") ? 3 : 0);
-  const tide = Math.max(0, next.tide) + Math.max(0, next.interference);
-  const perkMods = computeRunMods(next.perks, next.chartPicks ?? []);
+  const perkMods = sourceMods(next);
+  // «Полевой стабилизатор» dulls the tide's combat bite without touching the
+  // tide counter itself.
+  const tide = Math.max(
+    0,
+    Math.max(0, next.tide) +
+      Math.max(0, next.interference) +
+      perkMods.tideEffectDelta,
+  );
   const damageMultPct = battleMutators(next).damageMultPct;
-  const reflectDodge = hasTrait(next.perks, "reflectDodge");
-  const dodgeCharge = hasTrait(next.perks, "dodgeCharge");
+  const reflectDodge = sourceTrait(next, "reflectDodge");
+  const dodgeCharge = sourceTrait(next, "dodgeCharge");
   const chargeMult = consumeStatus(enemy.statuses, "charge") ? 2 : 1;
   const jamPenalty = consumeStatus(enemy.statuses, "jam")
     ? 2 + perkMods.jamPowerDelta
@@ -495,8 +528,12 @@ const lockRandomTrayDie = (
   next: BattleSnapshot,
   enemyStream: RngStream,
 ): string | undefined => {
+  // «Якорь» keeps its die out of every lock pool.
   const candidates = next.dice.filter(
-    (d) => d.state === "tray" && !isDieLocked(next, d.uid),
+    (d) =>
+      d.state === "tray" &&
+      !isDieLocked(next, d.uid) &&
+      !dieHasGrant(next.engravings, d.defId, "lockImmune"),
   );
   if (candidates.length === 0) return undefined;
   const die = enemyStream.pick(candidates);
@@ -691,7 +728,13 @@ const syncPhases = (ctx: EnemyPhaseCtx): void => {
     if (target === enemy.phase) continue;
     enemy.phase = target;
     enemy.intentIndex = 0;
-    enemy.nextIntent = drawIntent(def, 0, ctx.enemyStream, target);
+    enemy.nextIntent = drawIntent(
+      def,
+      0,
+      ctx.enemyStream,
+      target,
+      ctx.next.ascension,
+    );
     pushBeat(ctx, enemy.id, "phase", target);
     for (const intent of def.phases[target]?.onEnter ?? []) {
       resolveIntent(ctx, enemy, def, intent);
@@ -783,9 +826,15 @@ export const resolveEnemyPhase = (
 
     resolveIntent(ctx, enemy, def, enemy.nextIntent);
 
-    const pattern = def.phases?.[enemy.phase]?.pattern ?? def.pattern;
+    const pattern = patternFor(def, enemy.phase, next.ascension);
     enemy.intentIndex = (enemy.intentIndex + 1) % pattern.length;
-    enemy.nextIntent = drawIntent(def, enemy.intentIndex, enemyStream, enemy.phase);
+    enemy.nextIntent = drawIntent(
+      def,
+      enemy.intentIndex,
+      enemyStream,
+      enemy.phase,
+      next.ascension,
+    );
   }
 
   for (const enemy of aliveEnemies(next)) {
@@ -896,9 +945,9 @@ export const advanceTurn = (
     (d) => d.state === "tray" && d.lastValue !== undefined,
   );
   applyPendingTwists(next, rolledDice, streams.dice);
-  applyRollFloors(rolledDice, next.resonance, hasTrait(next.perks, "stabilizer"));
-  if (hasTrait(next.perks, "spareLowest")) applySpareLowest(rolledDice);
-  applyObsidianPact(rolledDice, next.perks, next.chartPicks ?? []);
+  applyRollFloors(rolledDice, next.resonance, sourceTrait(next, "stabilizer"));
+  if (sourceTrait(next, "spareLowest")) applySpareLowest(rolledDice);
+  applyObsidianPact(rolledDice, next.perks, next.chartPicks ?? [], next.modules ?? []);
 
   const ctx = new BattleCtx(next);
   const sources = buildSources(next);

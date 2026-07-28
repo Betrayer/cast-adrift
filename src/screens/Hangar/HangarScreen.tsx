@@ -20,7 +20,7 @@ import { PLAYABLE_SHIPS } from "@/data/ships";
 import { diePoints, metaDiePrice } from "@/data/metaShop";
 import { hubBudgetBonus } from "@/game/chart/engine";
 import { validateDeck } from "@/game/meta/deck";
-import { hangarBudget } from "@/data/milestones";
+import { ENGRAVING_STATION_LEVEL, hangarBudget } from "@/data/milestones";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import type { DieItemDef, Rarity, School } from "@/types/content";
@@ -325,14 +325,23 @@ export const HangarScreen = () => {
           </Stack>
         </ScrollArea>
         <Divider my="xs" color={tokens.line} />
-        <Button
-          size="xs"
-          fullWidth
-          variant="subtle"
-          onClick={() => { go("collection"); }}
-        >
-          {t("meta:collection.title")}
-        </Button>
+        <Group gap="xs" grow>
+          <Button
+            size="xs"
+            variant="subtle"
+            onClick={() => { go("collection"); }}
+          >
+            {t("meta:collection.title")}
+          </Button>
+          <Button
+            size="xs"
+            variant="subtle"
+            disabled={level < ENGRAVING_STATION_LEVEL}
+            onClick={() => { go("engraving"); }}
+          >
+            {t("meta:engraving.title")}
+          </Button>
+        </Group>
       </Paper>
     </Stack>
   );

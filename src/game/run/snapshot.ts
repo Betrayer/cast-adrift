@@ -42,6 +42,7 @@ const pickRunValues = (s: RunState): RunValues => ({
   shipId: s.shipId,
   deck: s.deck.map((d) => ({ ...d })),
   perks: [...s.perks],
+  modules: [...s.modules],
   chartPicks: [...s.chartPicks],
   mkLevels: { ...s.mkLevels },
   tide: s.tide,
@@ -77,6 +78,18 @@ const pickRunValues = (s: RunState): RunValues => ({
       : {
           dieDrop: s.pendingRewards.dieDrop,
           perkChoices: [...s.pendingRewards.perkChoices],
+          ...(s.pendingRewards.dieChoices !== undefined
+            ? { dieChoices: [...s.pendingRewards.dieChoices] }
+            : {}),
+          ...(s.pendingRewards.moduleChoices !== undefined
+            ? { moduleChoices: [...s.pendingRewards.moduleChoices] }
+            : {}),
+          ...(s.pendingRewards.voucher !== undefined
+            ? { voucher: s.pendingRewards.voucher }
+            : {}),
+          ...(s.pendingRewards.packageScrap !== undefined
+            ? { packageScrap: s.pendingRewards.packageScrap }
+            : {}),
         },
   shop:
     s.shop === null
@@ -85,6 +98,7 @@ const pickRunValues = (s: RunState): RunValues => ({
           nodeId: s.shop.nodeId,
           rerolls: s.shop.rerolls,
           items: s.shop.items.map((item) => ({ ...item })),
+          modules: s.shop.modules.map((item) => ({ ...item })),
         },
   deckSeq: s.deckSeq,
   stats: { ...s.stats },

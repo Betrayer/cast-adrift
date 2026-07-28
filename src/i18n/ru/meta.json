@@ -50,7 +50,29 @@
     "keyOvergrowth": "Разрастание",
     "keyColdLogic": "Холодный расчёт",
     "keyObsidian": "Обсидиановый пакт",
-    "keySingleCast": "Единый бросок"
+    "keySingleCast": "Единый бросок",
+    "redSpotter": "Наводчик",
+    "redFirestorm": "Огненный шторм",
+    "redSpine": "Хребет",
+    "blueBarrier": "Барьер",
+    "blueJammer": "Глушитель",
+    "blueTideBreak": "Волнорез",
+    "greenCanopy": "Крона",
+    "greenPerennial": "Многолетник",
+    "yellowTally": "Подсчёт",
+    "yellowBounty": "Награда",
+    "blackVent": "Клапан",
+    "blackWell": "Колодец",
+    "greyToolkit": "Набор инструментов",
+    "greyLedger": "Учётная книга",
+    "prismLattice": "Решётка",
+    "prismFacet": "Грань",
+    "prismWell": "Призматический колодец",
+    "hubEngineering": "Инженерный отсек",
+    "keyStormChaser": "Ловец штормов",
+    "keyIronDoctrine": "Железная доктрина",
+    "keyFatesFavorite": "Любимец Фатума",
+    "keyPrismCascade": "Призматический каскад"
   },
   "chartFx": {
     "hubBudget": "+1 к бюджету ангара",
@@ -81,7 +103,19 @@
       "redSalvo": "Оружие +3 в 1-й ход",
       "blueGlacier": "+2 щит за каждый Щит",
       "blackEdge": "Все кубы +2 при критическом корпусе",
-      "allDice1": "Все кубы +1"
+      "allDice1": "Все кубы +1",
+      "weaponsBurn": "Максимальная грань в оружии добавляет Ожог 1",
+      "enginesBonus": "+1 в двигателях",
+      "reactorBonus": "+1 в реакторе",
+      "greenHeal": "Максимальная грань зелёного кубика лечит 1",
+      "repeatCharge": "Повторённое значение даёт 1 заряд",
+      "maxFaceScrap": "Любая максимальная грань платит 2 лома",
+      "minFaceCharge": "Любая минимальная грань даёт 1 заряд",
+      "firstTurnAll": "+1 к каждому кубику на первом ходу",
+      "redFirestorm": "Максимальная грань в оружии добавляет Ожог 3",
+      "redSpine": "+4 в Спинальной установке",
+      "greenCanopy": "+3 в двигателях",
+      "blackWell": "Реактор копит ещё 2 заряда"
     },
     "trait": {
       "obsidianPact": "Чёрные кубы выпадают только на мин или макс",
@@ -195,7 +229,10 @@
     "beaconResolved": "Разрешить маяк",
     "anomaliesSolvedAtLeast": "Решить {{n}} аномалию",
     "blackPlacedInWinAtLeast": "Победить в бою, выставив {{n}}+ чёрных кубов",
-    "axisAtMost": "Закончить с осью {{n}} или ниже"
+    "axisAtMost": "Закончить с осью {{n}} или ниже",
+    "allBeaconsResolved": "Ответить на все маяки",
+    "deckSchoolsAtLeast": "Завершить с {{n}} школами в колоде",
+    "dicePlacedAtMost": "Поставить не более {{n}} кубиков за забег"
   },
   "drift": {
     "title": "Дрейф окончен",
@@ -245,5 +282,19 @@
     "place": "#{{rank}}",
     "endings": "Финалы",
     "locked": "Запечатан"
+  },
+  "engraving": {
+    "title": "Станция гравировки",
+    "hint": "Выбери кубик, затем руну. Снятие уничтожает гравировку — без возврата.",
+    "locked": "Откроется на уровне капитана {{level}}.",
+    "pickDie": "Кубик",
+    "sockets": "Гнёзда {{used}}/{{max}}",
+    "empty": "Гравировок нет.",
+    "remove": "снять",
+    "fitted": "установлено",
+    "fit": "{{price}} ◈"
+  },
+  "badge": {
+    "keeper": "Смотритель"
   }
 }

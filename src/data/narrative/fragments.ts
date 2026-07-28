@@ -6,9 +6,10 @@ export interface FragmentDef {
   text: LocKey;
 }
 
-// Jump fragments: one-line world facts shown on the sector interstitial. The pool
-// grows toward the DESIGN §2.1 target of 80 in Phase 10; these are the seams the
-// campaign needs now — three per sector, unseen-first.
+// Jump fragments: one-line world facts shown on the sector interstitial,
+// weighted unseen-first. DESIGN §2.1 target: 80, sixteen per sector.
+export const FRAGMENTS_PER_SECTOR = 16;
+
 const fragment = (sector: number, index: number): FragmentDef => ({
   id: `f${String(sector)}-${String(index)}`,
   sector,
@@ -16,7 +17,10 @@ const fragment = (sector: number, index: number): FragmentDef => ({
 });
 
 export const FRAGMENTS: readonly FragmentDef[] = [1, 2, 3, 4, 5].flatMap(
-  (sector) => [1, 2, 3].map((index) => fragment(sector, index)),
+  (sector) =>
+    Array.from({ length: FRAGMENTS_PER_SECTOR }, (_, i) =>
+      fragment(sector, i + 1),
+    ),
 );
 
 export const fragmentsForSector = (sector: number): FragmentDef[] =>

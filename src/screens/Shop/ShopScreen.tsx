@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Divider,
   Group,
@@ -12,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { ascensionMods } from "@/data/ascension";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
+import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { schools } from "@/data/schools";
 import {
   DECK_CAP,
@@ -22,10 +24,13 @@ import {
 import {
   flagShopConsequence,
   flagShopDiscount,
+  generateShopModules,
   generateShopStock,
 } from "@/game/economy/shop";
+import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { autosaveRun, completeNode } from "@/game/run/flow";
-import { computePerkMods } from "@/game/run/perkMods";
+import { computeRunMods } from "@/game/run/runMods";
+import { createStream, deriveSeed } from "@/services/rng";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 
@@ -35,17 +40,21 @@ export const ShopScreen = () => {
   const deck = useRunStore((s) => s.deck);
   const seed = useRunStore((s) => s.seed);
   const perks = useRunStore((s) => s.perks);
+  const chartPicks = useRunStore((s) => s.chartPicks);
+  const runModules = useRunStore((s) => s.modules);
   const flags = useRunStore((s) => s.flags);
   const position = useRunStore((s) => s.position);
   const shop = useRunStore((s) => s.shop);
   const setShop = useRunStore((s) => s.setShop);
 
   const ascension = useRunStore((s) => s.ascension);
+  const mods = computeRunMods(perks, chartPicks, runModules);
   const discount =
-    computePerkMods(perks).shopDiscountPct +
+    mods.shopDiscountPct +
     flagShopDiscount(flags) -
     ascensionMods(ascension).shopPricePct;
   const nodeId = position ?? "";
+  const slots = moduleSlots(computeRunMods(perks, chartPicks).moduleSlotDelta);
 
   useEffect(() => {
     if (nodeId === "") return;
@@ -53,13 +62,15 @@ export const ShopScreen = () => {
     const current = state.shop;
     if (current !== null && current.nodeId === nodeId) return;
     const pct =
-      computePerkMods(state.perks).shopDiscountPct +
+      computeRunMods(state.perks, state.chartPicks, state.modules)
+        .shopDiscountPct +
       flagShopDiscount(state.flags) -
       ascensionMods(state.ascension).shopPricePct;
     state.setShop({
       nodeId,
       rerolls: 0,
       items: generateShopStock(seed, nodeId, 0, pct),
+      modules: generateShopModules(seed, nodeId, 0, pct),
     });
     const conseq = flagShopConsequence(state.flags);
     if (conseq !== null) useNarrativeStore.getState().pushConsequence(conseq);
@@ -84,16 +95,44 @@ export const ShopScreen = () => {
     autosaveRun();
   };
 
+  const buyModule = (index: number): void => {
+    const state = useRunStore.getState();
+    const current = state.shop;
+    if (current === null) return;
+    const item = current.modules[index];
+    if (item === undefined || item.sold) return;
+    if (state.scrap < item.price) return;
+    if (!state.spendScrap(item.price)) return;
+    if (!state.addModule(item.moduleId)) {
+      state.addScrap(item.price);
+      return;
+    }
+    setShop({
+      ...current,
+      modules: current.modules.map((it, i) =>
+        i === index ? { ...it, sold: true } : it,
+      ),
+    });
+    autosaveRun();
+  };
+
+  // «Лотерейный блок» pays for the first reroll of every shop it visits.
+  const rerollCost = (rerolls: number): number =>
+    rerolls < mods.freeShopRerolls ? 0 : SHOP_REROLL_COST;
+
   const reroll = (): void => {
     const state = useRunStore.getState();
     const current = state.shop;
-    if (current === null || state.scrap < SHOP_REROLL_COST) return;
-    if (!state.spendScrap(SHOP_REROLL_COST)) return;
+    if (current === null) return;
+    const cost = rerollCost(current.rerolls);
+    if (state.scrap < cost) return;
+    if (cost > 0 && !state.spendScrap(cost)) return;
     const rerolls = current.rerolls + 1;
     setShop({
       nodeId: current.nodeId,
       rerolls,
       items: generateShopStock(seed, current.nodeId, rerolls, discount),
+      modules: generateShopModules(seed, current.nodeId, rerolls, discount),
     });
     autosaveRun();
   };
@@ -119,7 +158,14 @@ export const ShopScreen = () => {
     completeNode({ outcome: "cleared" });
   };
 
+  // The counter greeting is drawn from the node's own seed, so a reloaded save
+  // hears the same line (DESIGN §2.1, 40 keeper lines).
+  const greeting = createStream(deriveSeed(seed, `keeper:${nodeId}`)).pick(
+    keeperLinesFor("shop"),
+  );
   const items = shop?.items ?? [];
+  const moduleItems = shop?.modules ?? [];
+  const nextRerollCost = rerollCost(shop?.rerolls ?? 0);
 
   return (
     <Stack mih="100dvh" p="md" gap="sm" bg={tokens.bg}>
@@ -136,6 +182,10 @@ export const ShopScreen = () => {
           </Text>
         </Group>
       </Group>
+
+      <Text size="xs" c={tokens.dim} fs="italic">
+        {t(greeting.text)}
+      </Text>
 
       <Group gap="sm" grow>
         {items.map((item, index) => {
@@ -190,12 +240,70 @@ export const ShopScreen = () => {
         })}
       </Group>
 
+      <Divider
+        color={tokens.line}
+        label={t("run:shop.modulesTitle", {
+          used: runModules.length,
+          max: slots,
+        })}
+      />
+      <Group gap="sm" grow>
+        {moduleItems.map((item, index) => {
+          const def = MODULE_BY_ID.get(item.moduleId);
+          if (def === undefined) return null;
+          const owned = runModules.includes(item.moduleId);
+          const full = runModules.length >= slots;
+          const affordable = !item.sold && !owned && !full && scrap >= item.price;
+          return (
+            <Paper
+              key={item.moduleId}
+              bg={tokens.surface1}
+              p="sm"
+              radius="md"
+              withBorder
+              style={{ opacity: item.sold ? 0.4 : 1 }}
+            >
+              <Stack gap={4}>
+                <Group gap={6} justify="space-between">
+                  <Text fw={600} c={tokens.text}>
+                    {t(def.name)}
+                  </Text>
+                  <Badge size="xs" variant="light">
+                    {def.rarity}
+                  </Badge>
+                </Group>
+                <Text size="xs" c={tokens.dim}>
+                  {t(def.desc)}
+                </Text>
+                <Button
+                  size="compact-sm"
+                  mt={4}
+                  fullWidth
+                  disabled={!affordable}
+                  onClick={() => {
+                    buyModule(index);
+                  }}
+                >
+                  {item.sold
+                    ? t("run:shop.empty")
+                    : full
+                      ? t("run:shop.modulesFull")
+                      : t("run:shop.buy", { n: item.price })}
+                </Button>
+              </Stack>
+            </Paper>
+          );
+        })}
+      </Group>
+
       <Button
         variant="default"
-        disabled={scrap < SHOP_REROLL_COST}
+        disabled={scrap < nextRerollCost}
         onClick={reroll}
       >
-        {t("run:shop.reroll", { n: SHOP_REROLL_COST })}
+        {nextRerollCost === 0
+          ? t("run:shop.rerollFree")
+          : t("run:shop.reroll", { n: nextRerollCost })}
       </Button>
 
       <Divider color={tokens.line} label={t("run:shop.sellTitle")} />

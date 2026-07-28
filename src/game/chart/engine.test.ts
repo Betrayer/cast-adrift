@@ -14,10 +14,10 @@ import {
 } from "@/game/chart/engine";
 
 describe("chart data", () => {
-  it("has exactly 120 nodes, 14 notables, 4 keystones", () => {
-    expect(CHART_NODES.length).toBe(120);
-    expect(CHART_NODES.filter((n) => n.kind === "notable").length).toBe(14);
-    expect(CHART_NODES.filter((n) => n.kind === "keystone").length).toBe(4);
+  it("has exactly 220 nodes, 32 notables, 8 keystones", () => {
+    expect(CHART_NODES.length).toBe(220);
+    expect(CHART_NODES.filter((n) => n.kind === "notable").length).toBe(32);
+    expect(CHART_NODES.filter((n) => n.kind === "keystone").length).toBe(8);
   });
 
   it("has no no-op node", () => {
@@ -26,7 +26,9 @@ describe("chart data", () => {
         n.effects === undefined &&
         n.mods === undefined &&
         n.traits === undefined &&
-        n.hubBudget !== true,
+        n.hubBudget !== true &&
+        n.budgetDelta === undefined &&
+        n.slotTierDelta === undefined,
     );
     expect(noop).toEqual([]);
   });
@@ -40,7 +42,7 @@ describe("chart data", () => {
   });
 
   it("has at least one entry node per gate + hub inner ring", () => {
-    expect(CHART_NODES.filter((n) => n.entry === true).length).toBe(15);
+    expect(CHART_NODES.filter((n) => n.entry === true).length).toBe(19);
   });
 });
 

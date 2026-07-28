@@ -24,14 +24,14 @@ describe("chart mods aggregation", () => {
 
 describe("chart traits", () => {
   it("detects keystone traits from picks", () => {
-    expect(chartHasTrait(["black-key"], "obsidianPact")).toBe(true);
-    expect(chartHasTrait(["grey-key"], "singleCast")).toBe(true);
-    expect(chartHasTrait(["yellow-key"], "coldLogic")).toBe(true);
+    expect(chartHasTrait(["black-key1"], "obsidianPact")).toBe(true);
+    expect(chartHasTrait(["grey-key1"], "singleCast")).toBe(true);
+    expect(chartHasTrait(["yellow-key1"], "coldLogic")).toBe(true);
     expect(chartHasTrait([], "obsidianPact")).toBe(false);
   });
 
   it("runHasTrait unions perk and chart traits", () => {
-    expect(runHasTrait([], ["grey-key"], "singleCast")).toBe(true);
+    expect(runHasTrait([], ["grey-key1"], "singleCast")).toBe(true);
     expect(runHasTrait([], [], "singleCast")).toBe(false);
   });
 });

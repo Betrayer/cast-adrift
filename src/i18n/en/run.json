@@ -24,7 +24,8 @@
     "boss": "Boss",
     "abandon": "Abandon run",
     "previewMiniboss": "Mini-boss: {{name}}",
-    "previewBoss": "Boss: {{name}}"
+    "previewBoss": "Boss: {{name}}",
+    "modules": "Modules {{used}}/{{max}}"
   },
   "event": {
     "title": "Signal",
@@ -165,7 +166,10 @@
     "deck": "Deck {{n}}/9",
     "sellTitle": "Sell a die",
     "empty": "Sold out",
-    "owned": "In deck"
+    "owned": "In deck",
+    "modulesTitle": "Modules {{used}}/{{max}}",
+    "modulesFull": "Bay full",
+    "rerollFree": "Reroll stock (free)"
   },
   "shipyard": {
     "title": "Shipyard",
@@ -236,6 +240,8 @@
     "voucher": "Mk-voucher ×{{n}} — one free upgrade at any shipyard",
     "take": "Take",
     "sell": "Sell (+{{n}})",
-    "hint": "Pick one. The perk draft follows."
+    "hint": "Pick one. The perk draft follows.",
+    "module": "module",
+    "install": "Install"
   }
 }

@@ -1,6 +1,13 @@
-import { BARKS } from "../src/data/barks";
-import { CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
+import { ASCENSIONS, MAX_ASCENSION } from "../src/data/ascension";
+import { BARKS, BARK_QUOTA } from "../src/data/barks";
+import { ENGRAVINGS } from "../src/data/engravings";
+import { FATE_TABLE } from "../src/data/fate";
+import { ALL_MODULES } from "../src/data/modules";
+import { FRAGMENTS } from "../src/data/narrative/fragments";
+import { KEEPER_LINES } from "../src/data/narrative/keeperLines";
+import { CHART_ADJACENCY, CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
+import { MODULE_BY_ID } from "../src/data/modules";
 import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
@@ -8,10 +15,10 @@ import { ALL_DICE } from "../src/data/dice";
 import {
   ENCOUNTER_GROUPS,
   ALL_ENEMIES,
+  isEncounterGroup,
 } from "../src/data/enemies";
 import { ALL_EVENTS } from "../src/data/events";
 import { ALL_PERKS } from "../src/data/perks";
-import { PHASE5_PERKS } from "../src/data/perks/phase5";
 import { PUZZLES } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
 import { SHIPS } from "../src/data/ships";
@@ -53,6 +60,18 @@ import type { Intent, PatternStep } from "../src/types/content";
 type ContentNode = string | { [key: string]: ContentNode };
 
 const errors: string[] = [];
+const ENGRAVING_IDS = new Set(ENGRAVINGS.map((e) => e.id));
+
+// Flags the run sets outside the event pipeline (battle entry, prologue).
+const RUNTIME_FLAGS: readonly string[] = [
+  "hunterEngaged",
+  "prologueRun",
+  "beacon1",
+  "beacon2",
+  "beacon3",
+  "beacon4",
+  "beacon5",
+];
 const hooks = new Set<string>(HOOKS);
 const content = enContent as unknown as ContentNode;
 
@@ -183,9 +202,9 @@ checkUniqueIds(
   CHART_NODES.map((n) => n.id),
 );
 
-const CHART_NODE_TOTAL = 120;
-const CHART_NOTABLES = 14;
-const CHART_KEYSTONES = 4;
+const CHART_NODE_TOTAL = 220;
+const CHART_NOTABLES = 32;
+const CHART_KEYSTONES = 8;
 if (CHART_NODES.length !== CHART_NODE_TOTAL)
   errors.push(
     `chart: expected ${String(CHART_NODE_TOTAL)} nodes, found ${String(CHART_NODES.length)}`,
@@ -212,10 +231,33 @@ for (const node of CHART_NODES) {
     node.effects === undefined &&
     node.mods === undefined &&
     node.traits === undefined &&
-    node.hubBudget !== true
+    node.hubBudget !== true &&
+    node.budgetDelta === undefined &&
+    node.slotTierDelta === undefined
   ) {
     errors.push(`chart: "${node.id}" is a no-op (no effects, mods, traits, or budget)`);
   }
+}
+
+// Orphans and reachability: every node must reach an entry node through the
+// undirected link graph, or no amount of points can ever buy it.
+const chartReached = new Set<string>();
+const chartQueue: string[] = CHART_NODES.filter((n) => n.entry === true).map(
+  (n) => n.id,
+);
+for (const id of chartQueue) chartReached.add(id);
+while (chartQueue.length > 0) {
+  const cur = chartQueue.shift();
+  if (cur === undefined) break;
+  for (const next of CHART_ADJACENCY.get(cur) ?? []) {
+    if (chartReached.has(next)) continue;
+    chartReached.add(next);
+    chartQueue.push(next);
+  }
+}
+for (const node of CHART_NODES) {
+  if (!chartReached.has(node.id))
+    errors.push(`chart: "${node.id}" is unreachable from any entry node`);
 }
 
 checkUniqueIds(
@@ -223,10 +265,28 @@ checkUniqueIds(
   ALL_PERKS.map((p) => p.id),
 );
 
-if (PHASE5_PERKS.length !== 30) {
+const PERK_TOTAL = 150;
+if (ALL_PERKS.length !== PERK_TOTAL) {
   errors.push(
-    `perks: expected exactly 30 Phase-5 perks, found ${String(PHASE5_PERKS.length)}`,
+    `perks: expected exactly ${String(PERK_TOTAL)}, found ${String(ALL_PERKS.length)}`,
   );
+}
+
+// DESIGN §9.4 rarity spread {c 50%, u 35%, r 15%}, ±4 points of slack.
+const RARITY_TARGET_PCT: Record<string, number> = {
+  common: 50,
+  uncommon: 35,
+  rare: 15,
+};
+for (const [rarity, target] of Object.entries(RARITY_TARGET_PCT)) {
+  const pct =
+    (ALL_PERKS.filter((p) => p.rarity === rarity).length / ALL_PERKS.length) *
+    100;
+  if (Math.abs(pct - target) > 4) {
+    errors.push(
+      `perks: ${rarity} share ${pct.toFixed(1)}% is outside ${String(target)}%±4`,
+    );
+  }
 }
 
 for (const perk of ALL_PERKS) {
@@ -239,6 +299,19 @@ for (const perk of ALL_PERKS) {
     perk.traits === undefined
   ) {
     errors.push(`perks: "${perk.id}" has no effects, mods, or traits`);
+  }
+  // Every rare must point at something buildable (plan Task 4).
+  if (perk.rarity === "rare") {
+    const syn = perk.synergy;
+    if (syn === undefined) {
+      errors.push(`perks: rare "${perk.id}" has no synergy tag`);
+    } else if (syn.kind === "module" && !MODULE_BY_ID.has(syn.id)) {
+      errors.push(`perks: "${perk.id}" synergy references unknown module "${syn.id}"`);
+    } else if (syn.kind === "engraving" && !ENGRAVING_IDS.has(syn.id)) {
+      errors.push(
+        `perks: "${perk.id}" synergy references unknown engraving "${syn.id}"`,
+      );
+    }
   }
 }
 
@@ -298,7 +371,7 @@ const checkOutcome = (owner: string, outcome: Outcome): void => {
   }
   if (outcome.follow !== undefined) {
     for (const id of outcome.follow.enemyIds) {
-      if (!enemyIds.has(id))
+      if (!enemyIds.has(id) && !isEncounterGroup(id))
         errors.push(`events: ${owner} follow references unknown enemy "${id}"`);
     }
     const followDie = outcome.follow.loot?.die;
@@ -325,14 +398,45 @@ for (const event of ALL_EVENTS) {
   }
 }
 
-if (ALL_EVENTS.length < 30)
+const EVENT_TOTAL = 100;
+const CALLBACK_TARGET = 30;
+if (ALL_EVENTS.length < EVENT_TOTAL)
   errors.push(
-    `events: expected at least 30 events, found ${String(ALL_EVENTS.length)}`,
+    `events: expected at least ${String(EVENT_TOTAL)} events, found ${String(ALL_EVENTS.length)}`,
   );
-if (callbackCount < 8)
+if (callbackCount < CALLBACK_TARGET)
   errors.push(
-    `events: expected at least 8 callback events, found ${String(callbackCount)}`,
+    `events: expected at least ${String(CALLBACK_TARGET)} callback events, found ${String(callbackCount)}`,
   );
+
+// Unreachable events: a callback whose required flags no outcome anywhere can
+// set is dead content, not a hidden secret.
+const settableFlags = new Set<string>();
+for (const event of ALL_EVENTS) {
+  for (const option of event.options) {
+    for (const outcome of [
+      ...(option.outcomes ?? []),
+      ...(option.onPass ?? []),
+      ...(option.onFail ?? []),
+    ]) {
+      for (const eff of outcome.effects) {
+        if (eff.k === "flag") settableFlags.add(eff.key);
+      }
+      for (const [key] of outcome.follow?.setFlags ?? []) settableFlags.add(key);
+    }
+  }
+}
+for (const key of RUNTIME_FLAGS) settableFlags.add(key);
+for (const event of ALL_EVENTS) {
+  for (const key of event.requires?.flags?.all ?? []) {
+    if (!settableFlags.has(key))
+      errors.push(`events: "${event.id}" requires flag "${key}" that nothing sets`);
+  }
+  for (const key of event.requires?.flags?.any ?? []) {
+    if (!settableFlags.has(key))
+      errors.push(`events: "${event.id}" requires flag "${key}" that nothing sets`);
+  }
+}
 
 for (const entry of CODEX) {
   checkLocKey(`codex.${entry.id}`, entry.title);
@@ -376,22 +480,143 @@ for (const puzzle of PUZZLES) {
   }
 }
 
-const PUZZLE_COUNT = 12;
+const PUZZLE_COUNT = 25;
 if (PUZZLES.length !== PUZZLE_COUNT)
   errors.push(
     `puzzles: expected exactly ${String(PUZZLE_COUNT)} puzzles, found ${String(PUZZLES.length)}`,
   );
 
+const BARK_LINE_TOTAL = 150;
+let barkLines = 0;
+const barkByQuota = new Map<string, number>();
 for (const bark of BARKS) {
   if (bark.lines.length === 0)
     errors.push(`barks: "${bark.id}" has no lines`);
   for (const line of bark.lines) checkLocKey(`bark.${bark.id}`, line);
+  barkLines += bark.lines.length;
+  const quotaKey = bark.trigger.startsWith("firstKill:")
+    ? "firstKill"
+    : bark.trigger.startsWith("sectorEnter:")
+      ? "sectorEnter"
+      : bark.trigger;
+  barkByQuota.set(
+    quotaKey,
+    (barkByQuota.get(quotaKey) ?? 0) + bark.lines.length,
+  );
 }
+if (barkLines !== BARK_LINE_TOTAL)
+  errors.push(
+    `barks: expected ${String(BARK_LINE_TOTAL)} lines, found ${String(barkLines)}`,
+  );
+for (const [trigger, quota] of Object.entries(BARK_QUOTA)) {
+  const have = barkByQuota.get(trigger) ?? 0;
+  if (have !== quota)
+    errors.push(
+      `barks: trigger "${trigger}" has ${String(have)} lines, quota ${String(quota)}`,
+    );
+}
+
+// ── Phase 10: modules, engravings, fate, fragments, keeper lines ────────────
+
+const MODULE_TOTAL = 50;
+const ENGRAVING_TOTAL = 40;
+const FRAGMENT_TOTAL = 80;
+const KEEPER_TOTAL = 40;
+const DICE_TOTAL = 70;
+const DOSSIER_TOTAL = 54;
+
+checkUniqueIds("modules", ALL_MODULES.map((m) => m.id));
+checkUniqueIds("engravings", ENGRAVINGS.map((e) => e.id));
+checkUniqueIds("keeperLines", KEEPER_LINES.map((k) => k.id));
+checkUniqueIds("fragments", FRAGMENTS.map((f) => f.id));
+
+if (ALL_MODULES.length !== MODULE_TOTAL)
+  errors.push(
+    `modules: expected ${String(MODULE_TOTAL)}, found ${String(ALL_MODULES.length)}`,
+  );
+if (ENGRAVINGS.length !== ENGRAVING_TOTAL)
+  errors.push(
+    `engravings: expected ${String(ENGRAVING_TOTAL)}, found ${String(ENGRAVINGS.length)}`,
+  );
+if (FRAGMENTS.length !== FRAGMENT_TOTAL)
+  errors.push(
+    `fragments: expected ${String(FRAGMENT_TOTAL)}, found ${String(FRAGMENTS.length)}`,
+  );
+if (KEEPER_LINES.length !== KEEPER_TOTAL)
+  errors.push(
+    `keeperLines: expected ${String(KEEPER_TOTAL)}, found ${String(KEEPER_LINES.length)}`,
+  );
+if (ALL_DICE.length !== DICE_TOTAL)
+  errors.push(
+    `dice: expected ${String(DICE_TOTAL)}, found ${String(ALL_DICE.length)}`,
+  );
+
+for (const def of ALL_MODULES) {
+  checkLocKey(`modules.${def.id}`, def.name);
+  checkLocKey(`modules.${def.id}`, def.desc);
+  checkEffects(`modules.${def.id}`, def.effects);
+  if (
+    def.effects === undefined &&
+    def.mods === undefined &&
+    def.traits === undefined
+  ) {
+    errors.push(`modules: "${def.id}" is a no-op`);
+  }
+  if (def.price < 40 || def.price > 90) {
+    errors.push(
+      `modules: "${def.id}" price ${String(def.price)} is outside the §9.3 band 40-90`,
+    );
+  }
+}
+
+for (const def of ENGRAVINGS) {
+  checkLocKey(`engravings.${def.id}`, def.name);
+  checkLocKey(`engravings.${def.id}`, def.desc);
+  checkEffects(`engravings.${def.id}`, def.effects);
+  if (def.effects === undefined && def.grant === undefined) {
+    errors.push(`engravings: "${def.id}" is a no-op`);
+  }
+}
+
+for (const def of FATE_TABLE) {
+  checkLocKey(`fate.${def.id}`, def.text);
+  if (def.do.length === 0) errors.push(`fate: "${def.id}" has no actions`);
+}
+const fateCovered = new Set<number>();
+for (const band of FATE_TABLE) {
+  for (let n = band.min; n <= band.max; n += 1) {
+    if (fateCovered.has(n)) errors.push(`fate: roll ${String(n)} is covered twice`);
+    fateCovered.add(n);
+  }
+}
+for (let n = 1; n <= 100; n += 1) {
+  if (!fateCovered.has(n)) errors.push(`fate: roll ${String(n)} has no outcome`);
+}
+
+for (const f of FRAGMENTS) checkLocKey(`fragment.${f.id}`, f.text);
+for (const k of KEEPER_LINES) checkLocKey(`keeper.${k.id}`, k.text);
+
+if (ASCENSIONS.length !== MAX_ASCENSION)
+  errors.push(
+    `ascension: expected ${String(MAX_ASCENSION)} levels, found ${String(ASCENSIONS.length)}`,
+  );
+for (const def of ASCENSIONS) {
+  checkLocKey(`ascension.${String(def.level)}`, def.name);
+  checkLocKey(`ascension.${String(def.level)}`, def.desc);
+  if (Object.keys(def.mods).length === 0)
+    errors.push(`ascension: A${String(def.level)} is a no-op`);
+}
+
+const dossierCount = CODEX.filter((e) => e.group === "dossier").length;
+if (dossierCount !== DOSSIER_TOTAL)
+  errors.push(
+    `codex: expected ${String(DOSSIER_TOTAL)} dossiers, found ${String(dossierCount)}`,
+  );
 
 // ── Phase 9: mutators, contracts, goals ─────────────────────────────────────
 
 const MUTATOR_COUNT = 12;
-const CONTRACT_COUNT = 10;
+const CONTRACT_COUNT = 14;
 const MUTATOR_MOD_KEYS = new Set(Object.keys(ZERO_MUTATOR_MODS));
 
 checkUniqueIds(
@@ -521,6 +746,10 @@ if (errors.length > 0) {
   for (const error of errors) console.error(`lint:content: ${error}`);
   process.exit(1);
 }
+
+console.log(
+  `lint:content: totals — dice ${String(ALL_DICE.length)}/70 · perks ${String(ALL_PERKS.length)}/150 · modules ${String(ALL_MODULES.length)}/50 · engravings ${String(ENGRAVINGS.length)}/40 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/25 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/54 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/54 · keeper ${String(KEEPER_LINES.length)}/40`,
+);
 
 console.log(
   `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(ALL_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks, ${String(MUTATORS.length)} mutators, ${String(CONTRACTS.length)} contracts`,

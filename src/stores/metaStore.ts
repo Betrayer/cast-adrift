@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CHART_NODE_BY_ID } from '@/data/chart';
 import { STARTER_DECK } from '@/data/decks';
+import { socketsForDie } from '@/data/engravings';
 import type { ShipId } from '@/data/ships';
 import { levelFromTotalXp } from '@/game/xp';
 
@@ -50,6 +51,8 @@ export interface MetaValues {
   selectedShip: ShipId;
   hangar: { deck: string[] };
   themes: string[];
+  engravings: Record<string, string[]>;
+  badges: string[];
   codex: string[];
   codexRead: string[];
   contracts: Record<string, number>;
@@ -82,6 +85,9 @@ export interface MetaState extends MetaValues {
   selectShip: (id: ShipId) => void;
   buyShip: (id: ShipId, price: number) => boolean;
   unlockTheme: (id: string) => void;
+  engrave: (defId: string, engravingId: string, price: number) => boolean;
+  removeEngraving: (defId: string, engravingId: string) => void;
+  awardBadge: (id: string) => boolean;
   archiveRunFlags: (flags: readonly string[]) => void;
   recordBossFirstKill: (bossId: string) => boolean;
   recordEnding: (endingId: string) => void;
@@ -94,7 +100,9 @@ export interface MetaState extends MetaValues {
   bumpLifetime: (delta: Partial<MetaStats>) => void;
 }
 
-export const META_VERSION = 5;
+export const META_VERSION = 6;
+
+export const SMOTRITEL_BADGE = 'keeper';
 
 const STARTER_SPARE = 'yellow-d6';
 
@@ -142,6 +150,8 @@ const createInitialMetaValues = (): MetaValues => ({
   selectedShip: 'wanderer',
   hangar: { deck: [...STARTER_DECK] },
   themes: ['deepSpace'],
+  engravings: {},
+  badges: [],
   codex: [],
   codexRead: [],
   contracts: {},
@@ -190,6 +200,19 @@ const coerceDailyPlayed = (value: unknown): Record<string, DailyRecord> => {
       score: typeof rec.score === 'number' ? rec.score : 0,
       rank: typeof rec.rank === 'number' ? rec.rank : null,
     };
+  }
+  return out;
+};
+
+// v5 → v6: engravings and badges are new; anything that is not a clean
+// defId → string[] map is dropped rather than half-restored.
+const coerceEngravings = (value: unknown): Record<string, string[]> => {
+  if (typeof value !== 'object' || value === null) return {};
+  const out: Record<string, string[]> = {};
+  for (const [defId, raw] of Object.entries(value as Record<string, unknown>)) {
+    if (!Array.isArray(raw)) continue;
+    const ids = raw.filter((id): id is string => typeof id === 'string');
+    if (ids.length > 0) out[defId] = ids;
   }
   return out;
 };
@@ -249,6 +272,8 @@ export const migrateMeta = (
         ? { deck: [...(prev.hangar as { deck: string[] }).deck] }
         : base.hangar,
     themes: Array.isArray(prev.themes) ? prev.themes : base.themes,
+    engravings: coerceEngravings(prev.engravings),
+    badges: Array.isArray(prev.badges) ? prev.badges : base.badges,
     codex: Array.isArray(prev.codex) ? prev.codex : base.codex,
     codexRead: Array.isArray(prev.codexRead) ? prev.codexRead : base.codexRead,
     contracts:
@@ -387,6 +412,42 @@ export const useMetaStore = create<MetaState>()(
         set((s) => (s.themes.includes(id) ? s : { themes: [...s.themes, id] }));
       },
 
+      // Engravings are keyed by die definition (Phase-10 amendment 3): the
+      // collection has no per-copy identity to hang one on.
+      engrave: (defId, engravingId, price) => {
+        const current = get().engravings[defId] ?? [];
+        if (current.includes(engravingId)) return false;
+        if (current.length >= socketsForDie(defId)) return false;
+        if (!get().spendShards(price)) return false;
+        set((s) => ({
+          engravings: {
+            ...s.engravings,
+            [defId]: [...(s.engravings[defId] ?? []), engravingId],
+          },
+        }));
+        return true;
+      },
+
+      removeEngraving: (defId, engravingId) => {
+        set((s) => {
+          const kept = (s.engravings[defId] ?? []).filter(
+            (id) => id !== engravingId,
+          );
+          const engravings: Record<string, string[]> = {};
+          for (const [key, ids] of Object.entries(s.engravings)) {
+            if (key !== defId) engravings[key] = ids;
+          }
+          if (kept.length > 0) engravings[defId] = kept;
+          return { engravings };
+        });
+      },
+
+      awardBadge: (id) => {
+        if (get().badges.includes(id)) return false;
+        set((s) => ({ badges: [...s.badges, id] }));
+        return true;
+      },
+
       archiveRunFlags: (flags) => {
         set((s) => ({
           flagsArchive: [...new Set([...s.flagsArchive, ...flags])],
@@ -508,6 +569,8 @@ export const useMetaStore = create<MetaState>()(
         selectedShip: s.selectedShip,
         hangar: s.hangar,
         themes: s.themes,
+        engravings: s.engravings,
+        badges: s.badges,
         codex: s.codex,
         codexRead: s.codexRead,
         contracts: s.contracts,

@@ -1,11 +1,12 @@
+import { A6_ELITE_SUBSYSTEM, ascensionMods } from "@/data/ascension";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
+import { dieHasGrant, type EngravingMap } from "@/data/engravings";
 import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies";
 import { SHIP_BY_ID, shipHasPassive, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import { scaleHpForTide } from "@/game/run/encounter";
-import { hasTrait } from "@/game/run/perkMods";
 import { runHasTrait } from "@/game/run/runMods";
 import { createStream, type RngStream, type RngStreams } from "@/services/rng";
 import type {
@@ -51,8 +52,9 @@ export const applyObsidianPact = (
   dice: RolledDie[],
   perks: readonly string[],
   chartPicks: readonly string[],
+  modules: readonly string[] = [],
 ): void => {
-  if (!runHasTrait(perks, chartPicks, "obsidianPact")) return;
+  if (!runHasTrait(perks, chartPicks, "obsidianPact", modules)) return;
   for (const die of dice) {
     if (die.school !== "black" && die.school !== "prismatic") continue;
     if (die.state !== "tray") continue;
@@ -74,6 +76,8 @@ export interface BattleInit {
   perks?: readonly string[];
   chartPicks?: readonly string[];
   mutators?: readonly string[];
+  modules?: readonly string[];
+  engravings?: EngravingMap;
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
@@ -172,9 +176,35 @@ export const phaseIndexForHp = (
   return phases.length - 1;
 };
 
-export const patternFor = (def: EnemyDef, phase: number): PatternStep[] => {
+// A8 inserts one extra beat into every boss phase: the phase's heaviest attack
+// runs a second time, so the pattern reads familiar but hits harder.
+const heaviestAttack = (pattern: readonly PatternStep[]): PatternStep | undefined => {
+  let best: PatternStep | undefined;
+  let bestN = -1;
+  for (const step of pattern) {
+    if ("pick" in step) continue;
+    const n =
+      step.t === "attack" ? step.n : step.t === "multi" ? step.n * step.k : -1;
+    if (n > bestN) {
+      bestN = n;
+      best = step;
+    }
+  }
+  return best;
+};
+
+export const patternFor = (
+  def: EnemyDef,
+  phase: number,
+  ascension = 0,
+): PatternStep[] => {
   const script = def.phases?.[phase];
-  return script?.pattern ?? def.pattern;
+  const base = script?.pattern ?? def.pattern;
+  if (def.boss !== true || !ascensionMods(ascension).bossPatternInsert) {
+    return [...base];
+  }
+  const extra = heaviestAttack(base);
+  return extra === undefined ? [...base] : [...base, extra];
 };
 
 export const everyTurnFor = (def: EnemyDef, phase: number): readonly Intent[] =>
@@ -185,8 +215,9 @@ export const drawIntent = (
   intentIndex: number,
   enemyStream: RngStream,
   phase = 0,
+  ascension = 0,
 ): Intent => {
-  const pattern = patternFor(def, phase);
+  const pattern = patternFor(def, phase, ascension);
   const step = pattern[intentIndex % pattern.length];
   if (step === undefined)
     throw new Error(`drawIntent: "${def.id}" empty pattern`);
@@ -228,7 +259,15 @@ export const spawnEnemy = (
   const scale = (base: number): number =>
     Math.max(1, Math.round(scaleHpForTide(base, tide) * bonus));
   const hp = scale(def.hp);
-  const phase = phaseIndexForHp(def, hp, hp, init.ascension ?? 0);
+  const ascension = init.ascension ?? 0;
+  const phase = phaseIndexForHp(def, hp, hp, ascension);
+  // A6 bolts an overclock module onto every elite (DESIGN §13).
+  const subs = [
+    ...(def.subsystems ?? []),
+    ...(def.elite === true && ascensionMods(ascension).eliteSubsystem
+      ? [A6_ELITE_SUBSYSTEM]
+      : []),
+  ];
   return {
     id,
     defId,
@@ -236,9 +275,9 @@ export const spawnEnemy = (
     hpMax: hp,
     shield: isTough(def) ? (init.eliteShield ?? 0) : 0,
     intentIndex: 0,
-    nextIntent: drawIntent(def, 0, enemyStream, phase),
+    nextIntent: drawIntent(def, 0, enemyStream, phase, ascension),
     statuses: {},
-    subsystems: (def.subsystems ?? []).map((sub) => ({
+    subsystems: subs.map((sub) => ({
       id: `${id}:${sub.id}`,
       key: sub.id,
       hp: scale(sub.hp),
@@ -280,7 +319,17 @@ export const buildBattleSnapshot = (
   });
   const dice = rollDeck(deckDefIds, streams);
   const hullMax = init.hullMax ?? shipHullMax(shipId);
-  const resonance = computeCensus(dice);
+  const resonance = computeCensus(
+    dice,
+    runHasTrait(
+      init.perks ?? [],
+      init.chartPicks ?? [],
+      "prismDouble",
+      init.modules ?? [],
+    )
+      ? 2
+      : 1,
+  );
   if (init.resonanceBoost !== undefined) {
     resonance.counts[init.resonanceBoost.school] += init.resonanceBoost.n;
   }
@@ -297,6 +346,8 @@ export const buildBattleSnapshot = (
     perks: [...(init.perks ?? [])],
     chartPicks: [...(init.chartPicks ?? [])],
     mutators: [...(init.mutators ?? [])],
+    modules: [...(init.modules ?? [])],
+    engravings: init.engravings ?? {},
     shipId,
     dice,
     slots: applySlotOverrides(
@@ -327,9 +378,16 @@ export const buildBattleSnapshot = (
     ascension,
   };
   const perks = init.perks ?? [];
-  applyRollFloors(dice, snapshot.resonance, hasTrait(perks, "stabilizer"));
-  if (hasTrait(perks, "spareLowest")) applySpareLowest(dice);
-  applyObsidianPact(dice, perks, init.chartPicks ?? []);
+  const modules = init.modules ?? [];
+  applyRollFloors(
+    dice,
+    snapshot.resonance,
+    runHasTrait(perks, init.chartPicks ?? [], "stabilizer", modules),
+  );
+  if (runHasTrait(perks, init.chartPicks ?? [], "spareLowest", modules)) {
+    applySpareLowest(dice);
+  }
+  applyObsidianPact(dice, perks, init.chartPicks ?? [], modules);
   return snapshot;
 };
 
@@ -397,19 +455,23 @@ export const canPlaceDie = (
     | "turn"
     | "resonance"
     | "shipId"
+    | "engravings"
   >,
   uid: string,
   slotId: SlotId,
 ): boolean => {
   const die = snapshot.dice.find((d) => d.uid === uid);
   const slot = snapshot.slots[slotId];
+  if (die === undefined || slot === undefined) return false;
+  // «клин» ignores the placement ban a Jammer put on the slot.
+  const blocked =
+    isSlotBlocked(snapshot, slotId) &&
+    !dieHasGrant(snapshot.engravings, die.defId, "blockImmune");
   return (
-    die !== undefined &&
-    slot !== undefined &&
     die.state === "tray" &&
     slot.dieUid === undefined &&
     dieFitsSlot(snapshot, die, slot, slotId) &&
-    !isSlotBlocked(snapshot, slotId) &&
+    !blocked &&
     !isDieLocked(snapshot, uid)
   );
 };

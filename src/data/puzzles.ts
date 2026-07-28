@@ -1,3 +1,4 @@
+import { PHASE10_PUZZLES } from "@/data/puzzlesPhase10";
 import type { MkLevel } from "@/data/slots";
 import type { SlotId } from "@/types/battle";
 import type { Intent, LocKey, School } from "@/types/content";
@@ -74,7 +75,7 @@ const reward = (): PuzzleReward => ({ scrap: 20, codex: "riddleWard" });
 // 1 survivePlus. Every entry is proven solvable-and-not-free by the validator
 // in evaluate.test.ts + lint:content. Numbers are tuned against the real
 // resolver (affinity, red-2 resonance, reactor x1.5, over-cap gating).
-export const PUZZLES: readonly PuzzleDef[] = [
+const PHASE5_PUZZLES: readonly PuzzleDef[] = [
   // --- exact (2) ---
   {
     id: "oreVein",
@@ -266,6 +267,11 @@ export const PUZZLES: readonly PuzzleDef[] = [
     goal: { g: "survivePlus", clause: { metric: "shield", min: 6 } },
     reward: reward(),
   },
+];
+
+export const PUZZLES: readonly PuzzleDef[] = [
+  ...PHASE5_PUZZLES,
+  ...PHASE10_PUZZLES,
 ];
 
 export const PUZZLE_BY_ID: ReadonlyMap<string, PuzzleDef> = new Map(

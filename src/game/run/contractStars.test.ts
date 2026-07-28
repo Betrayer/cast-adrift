@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { CONTRACTS, type ContractDef } from "@/data/contracts";
+import { BEACON_FLAGS } from "@/data/events/beacons";
 import {
   goalStarsMask,
   type GoalContext,
@@ -19,6 +20,7 @@ const scriptRun = (goals: readonly GoalSpec[]): GoalContext => {
     hullMax: 30,
     scrap: 0,
     deckSize: 5,
+    deckSchools: 3,
     axis: 0,
     solvedPuzzles: [],
     flags: {},
@@ -85,6 +87,18 @@ const scriptRun = (goals: readonly GoalSpec[]): GoalContext => {
       case "axisAtMost":
         ctx.axis = spec.n;
         break;
+      case "allBeaconsResolved":
+        ctx.flags = { ...ctx.flags, ...Object.fromEntries(
+          BEACON_FLAGS.map((key) => [key, true as const]),
+        ) };
+        break;
+      case "deckSchoolsAtLeast":
+        ctx.deckSchools = spec.n;
+        ctx.deckSize = Math.max(ctx.deckSize, spec.n);
+        break;
+      case "dicePlacedAtMost":
+        stats.dicePlaced = spec.n;
+        break;
     }
   }
   return ctx;
@@ -110,9 +124,11 @@ describe("contract stars are reachable", () => {
           shipyardVisits: 3,
           rerollsUsed: 9,
           scrapSpent: 300,
+          dicePlaced: 999,
         },
         hull: 1,
         hullMax: 30,
+        deckSchools: 1,
         scrap: 0,
         deckSize: 1,
         axis: 5,

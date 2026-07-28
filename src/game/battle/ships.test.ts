@@ -144,7 +144,7 @@ describe("Single Cast (grey keystone)", () => {
     useRunStore.getState().reset();
     const snap = snapFor("wanderer", ["red-d6", "blue-d6", "green-d4"]);
     useBattleStore.setState({
-      chartPicks: ["grey-key"],
+      chartPicks: ["grey-key1"],
       perks: [],
       rerollBase: 2,
       phase: "resolving",

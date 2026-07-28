@@ -6,6 +6,9 @@ export interface AscensionMods {
   shopPricePct: number;
   tideCapDelta: number;
   bossPhaseShift: boolean;
+  eliteSubsystem: boolean;
+  bossPatternInsert: boolean;
+  hullPct: number;
 }
 
 export interface AscensionDef {
@@ -15,9 +18,9 @@ export interface AscensionDef {
   mods: Partial<AscensionMods>;
 }
 
-export const MAX_ASCENSION = 5;
+export const MAX_ASCENSION = 10;
 
-// A1–A5 exactly per DESIGN §13. Each level stacks on top of the ones below it.
+// A1–A10 per DESIGN §13. Each level stacks on top of the ones below it.
 export const ASCENSIONS: readonly AscensionDef[] = [
   {
     level: 1,
@@ -49,6 +52,36 @@ export const ASCENSIONS: readonly AscensionDef[] = [
     desc: "content:ascension.5.desc",
     mods: { bossPhaseShift: true },
   },
+  {
+    level: 6,
+    name: "content:ascension.6.name",
+    desc: "content:ascension.6.desc",
+    mods: { eliteSubsystem: true },
+  },
+  {
+    level: 7,
+    name: "content:ascension.7.name",
+    desc: "content:ascension.7.desc",
+    mods: { shopPricePct: 25 },
+  },
+  {
+    level: 8,
+    name: "content:ascension.8.name",
+    desc: "content:ascension.8.desc",
+    mods: { bossPatternInsert: true },
+  },
+  {
+    level: 9,
+    name: "content:ascension.9.name",
+    desc: "content:ascension.9.desc",
+    mods: { tideCapDelta: 1 },
+  },
+  {
+    level: 10,
+    name: "content:ascension.10.name",
+    desc: "content:ascension.10.desc",
+    mods: { hullPct: -15 },
+  },
 ];
 
 export const ZERO_ASCENSION_MODS: AscensionMods = {
@@ -57,6 +90,9 @@ export const ZERO_ASCENSION_MODS: AscensionMods = {
   shopPricePct: 0,
   tideCapDelta: 0,
   bossPhaseShift: false,
+  eliteSubsystem: false,
+  bossPatternInsert: false,
+  hullPct: 0,
 };
 
 export const ascensionMods = (level: number): AscensionMods => {
@@ -67,10 +103,23 @@ export const ascensionMods = (level: number): AscensionMods => {
     out.eliteShield += def.mods.eliteShield ?? 0;
     out.shopPricePct += def.mods.shopPricePct ?? 0;
     out.tideCapDelta += def.mods.tideCapDelta ?? 0;
+    out.hullPct += def.mods.hullPct ?? 0;
     out.bossPhaseShift = out.bossPhaseShift || def.mods.bossPhaseShift === true;
+    out.eliteSubsystem = out.eliteSubsystem || def.mods.eliteSubsystem === true;
+    out.bossPatternInsert =
+      out.bossPatternInsert || def.mods.bossPatternInsert === true;
   }
   return out;
 };
 
 export const maxSelectableAscension = (cleared: number): number =>
   Math.max(0, Math.min(MAX_ASCENSION, cleared));
+
+// A6 bolts one extra subsystem onto every elite; A8 inserts an extra pattern
+// step into boss phases. Both are data shapes the resolver already understands.
+export const A6_ELITE_SUBSYSTEM = {
+  id: "overclock",
+  name: "content:enemies.subsystem.overclock",
+  hp: 12,
+  aura: "atk+2",
+} as const;

@@ -5,6 +5,7 @@ import { CodexScreen } from '@/screens/Codex/CodexScreen';
 import { CollectionScreen } from '@/screens/Collection/CollectionScreen';
 import { ContractsScreen } from '@/screens/Contracts/ContractsScreen';
 import { EndingScreen } from '@/screens/Ending/EndingScreen';
+import { EngravingScreen } from '@/screens/Engraving/EngravingScreen';
 import { LeaderboardScreen } from '@/screens/Leaderboard/LeaderboardScreen';
 import { ModesScreen } from '@/screens/Modes/ModesScreen';
 import { ProfileScreen } from '@/screens/Profile/ProfileScreen';
@@ -46,6 +47,7 @@ export const Router = () => {
   if (screen === 'chart') return <ChartScreen />;
   if (screen === 'hangar') return <HangarScreen />;
   if (screen === 'collection') return <CollectionScreen />;
+  if (screen === 'engraving') return <EngravingScreen />;
   if (screen === 'runSetup') return <RunSetupScreen />;
   if (screen === 'prologue') return <PrologueScreen />;
   if (screen === 'interstitial') return <InterstitialScreen />;

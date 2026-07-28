@@ -1,3 +1,4 @@
+import { ALL_ENEMIES } from "@/data/enemies";
 import type { LocKey } from "@/types/content";
 
 export type CodexGroup = "world" | "dossier" | "memory";
@@ -37,7 +38,20 @@ const MEMORY_ENTRIES: readonly CodexEntry[] = [
   memory("memory-12-silent"),
 ];
 
+// One dossier per roster entry (DESIGN §2.1, 54 of them): the title is the
+// enemy's own name and the body is its hand-written flavour line. The stat block
+// is rendered from the EnemyDef at read time, so no numbers live in the string.
+export const dossierId = (enemyId: string): string => `dossier-${enemyId}`;
+
+const DOSSIER_ENTRIES: readonly CodexEntry[] = ALL_ENEMIES.map((enemy) => ({
+  id: dossierId(enemy.id),
+  group: "dossier" as const,
+  title: enemy.name,
+  body: `content:dossier.${enemy.id}`,
+}));
+
 export const CODEX: readonly CodexEntry[] = [
+  ...DOSSIER_ENTRIES,
   world("silentField"),
   world("oldBeacon"),
   world("choirSignal"),

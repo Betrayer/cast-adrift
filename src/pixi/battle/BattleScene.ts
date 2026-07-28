@@ -1,6 +1,7 @@
 import { Circle, Container, Graphics, Rectangle, Sprite, Text } from "pixi.js";
 import type { Application, FederatedPointerEvent, Ticker } from "pixi.js";
 import { tokens } from "@/app/theme";
+import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
 import { canPlaceDie } from "@/game/battle/setup";
 import type { StatusKey } from "@/game/battle/statuses";
@@ -719,6 +720,9 @@ export class BattleScene {
       tier: die.tier,
       value: die.value,
       size,
+      engraved:
+        engravingsForDie(useBattleStore.getState().engravings, die.defId)
+          .length > 0,
     });
   }
 
