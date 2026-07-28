@@ -1,4 +1,5 @@
-import { DIE_ITEMS } from "@/data/dice";
+import { LOOT_DICE } from "@/data/dice";
+import { MODULE_POOL } from "@/data/modules";
 import type { NodeType } from "@/game/map/types";
 import type { RngStream } from "@/services/rng";
 import type { Rarity } from "@/types/content";
@@ -26,10 +27,10 @@ const RARITY_ORDER: readonly Rarity[] = [
 ];
 
 export const LOOT_POOL: Record<Rarity, readonly string[]> = {
-  common: DIE_ITEMS.filter((d) => d.rarity === "common").map((d) => d.id),
-  uncommon: DIE_ITEMS.filter((d) => d.rarity === "uncommon").map((d) => d.id),
-  rare: DIE_ITEMS.filter((d) => d.rarity === "rare").map((d) => d.id),
-  legendary: DIE_ITEMS.filter((d) => d.rarity === "legendary").map((d) => d.id),
+  common: LOOT_DICE.filter((d) => d.rarity === "common").map((d) => d.id),
+  uncommon: LOOT_DICE.filter((d) => d.rarity === "uncommon").map((d) => d.id),
+  rare: LOOT_DICE.filter((d) => d.rarity === "rare").map((d) => d.id),
+  legendary: LOOT_DICE.filter((d) => d.rarity === "legendary").map((d) => d.id),
 };
 
 const poolForRarity = (rarity: Rarity): readonly string[] => {
@@ -133,6 +134,33 @@ export const computeNodeReward = (
     default:
       return { scrap: 0, dieDrop: null };
   }
+};
+
+const MODULE_LADDER: readonly Rarity[] = ["common", "uncommon", "rare"];
+
+// Module offers never repeat what the ship already carries; the floor lifts the
+// draw for mini-boss packages.
+export const rollModule = (
+  rng: RngStream,
+  owned: readonly string[],
+  floor: Rarity = "common",
+): string => {
+  const start = Math.max(0, MODULE_LADDER.indexOf(floor));
+  const tiers = MODULE_LADDER.slice(start);
+  const weights: [Rarity, number][] = tiers.map((r, i) => [
+    r,
+    [55, 33, 12][i + start] ?? 10,
+  ]);
+  const rarity = rng.weighted(weights);
+  const available = (r: Rarity): string[] =>
+    MODULE_POOL[r].filter((id) => !owned.includes(id));
+  const pool = available(rarity);
+  if (pool.length > 0) return rng.pick(pool);
+  for (const r of MODULE_LADDER) {
+    const fallback = available(r);
+    if (fallback.length > 0) return rng.pick(fallback);
+  }
+  return rng.pick(MODULE_POOL.common);
 };
 
 export const isDraftNode = (type: NodeType): boolean =>

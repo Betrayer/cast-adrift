@@ -4,6 +4,7 @@ export type ScreenId =
   | 'hangar'
   | 'chart'
   | 'collection'
+  | 'engraving'
   | 'codex'
   | 'modes'
   | 'profile'

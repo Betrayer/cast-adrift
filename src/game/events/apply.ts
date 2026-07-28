@@ -1,4 +1,4 @@
-import { DIE_ITEMS } from "@/data/dice";
+import { LOOT_DICE } from "@/data/dice";
 import { dieForRarity } from "@/game/economy/rewards";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import type { RngStream } from "@/services/rng";
@@ -45,8 +45,8 @@ const applySwapLowest = (stream: RngStream): void => {
   if (run.deck.length === 0) return;
   const withPts = run.deck.map((d) => ({ uid: d.uid, pts: ptsForDie(d.defId) }));
   const lowest = withPts.reduce((a, b) => (b.pts < a.pts ? b : a));
-  const samePts = DIE_ITEMS.filter((d) => d.pts === lowest.pts);
-  const pool = samePts.length > 0 ? samePts : DIE_ITEMS;
+  const samePts = LOOT_DICE.filter((d) => d.pts === lowest.pts);
+  const pool = samePts.length > 0 ? samePts : LOOT_DICE;
   const replacement = stream.pick(pool).id;
   run.removeDie(lowest.uid);
   run.addDie(replacement);

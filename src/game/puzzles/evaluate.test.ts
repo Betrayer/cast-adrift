@@ -21,20 +21,20 @@ const byId = (id: string): PuzzleDef => {
 };
 
 describe("puzzle set shape", () => {
-  it("has exactly 12 puzzles", () => {
-    expect(PUZZLES).toHaveLength(12);
+  it("has exactly 25 puzzles", () => {
+    expect(PUZZLES).toHaveLength(25);
   });
 
   it("matches the authored archetype spread", () => {
     const spread: Record<string, number> = {};
     for (const p of PUZZLES) spread[p.goal.g] = (spread[p.goal.g] ?? 0) + 1;
     expect(spread).toEqual({
-      exact: 2,
-      constraint: 3,
-      order: 2,
-      multiTurn: 2,
-      deduction: 2,
-      survivePlus: 1,
+      exact: 5,
+      constraint: 6,
+      order: 4,
+      multiTurn: 4,
+      deduction: 4,
+      survivePlus: 2,
     });
   });
 

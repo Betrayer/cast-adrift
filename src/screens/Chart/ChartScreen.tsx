@@ -2,7 +2,7 @@ import { ActionIcon, Badge, Box, Button, Group, Paper, Stack, Text } from "@mant
 import { useCallback, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
-import { CHART_NODES, CHART_NODE_BY_ID } from "@/data/chart";
+import { CHART_BOUNDS, CHART_NODES, CHART_NODE_BY_ID } from "@/data/chart";
 import type { ChartNodeDef, Constellation } from "@/data/chart";
 import { schools } from "@/data/schools";
 import {
@@ -17,7 +17,7 @@ import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import styles from "./ChartScreen.module.css";
 
-const CANVAS = 1000;
+
 const MIN_SCALE = 0.5;
 const MAX_SCALE = 2;
 
@@ -65,7 +65,7 @@ export const ChartScreen = () => {
   const deallocatePick = useMetaStore((s) => s.deallocatePick);
   const spendShards = useMetaStore((s) => s.spendShards);
 
-  const [view, setView] = useState<View>({ scale: 0.62, tx: 0, ty: 0 });
+  const [view, setView] = useState<View>({ scale: 1, tx: 0, ty: 0 });
   const [selected, setSelected] = useState<string | null>(null);
   const [respec, setRespec] = useState(false);
 
@@ -123,7 +123,7 @@ export const ChartScreen = () => {
   const zoom = (factor: number): void =>
     setView((v) => ({ ...v, scale: clampScale(v.scale * factor) }));
 
-  const resetView = (): void => setView({ scale: 0.62, tx: 0, ty: 0 });
+  const resetView = (): void => setView({ scale: 1, tx: 0, ty: 0 });
 
   const onNodeTap = (id: string): void => {
     if (dragged.current) return;
@@ -155,7 +155,7 @@ export const ChartScreen = () => {
       >
         <svg
           className={styles.svg}
-          viewBox={`0 0 ${String(CANVAS)} ${String(CANVAS)}`}
+          viewBox={`${String(CHART_BOUNDS.x)} ${String(CHART_BOUNDS.y)} ${String(CHART_BOUNDS.w)} ${String(CHART_BOUNDS.h)}`}
           preserveAspectRatio="xMidYMid meet"
         >
           <g transform={`translate(${String(view.tx)} ${String(view.ty)}) scale(${String(view.scale)})`}>

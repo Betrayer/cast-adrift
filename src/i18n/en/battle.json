@@ -83,5 +83,7 @@
     "begin": "Begin",
     "hull": "Hull {{n}}"
   },
-  "scriptHint": "Prologue: only {{slots}} may be used this turn."
+  "scriptHint": "Prologue: only {{slots}} may be used this turn.",
+  "fate": "Roll Fate",
+  "fateResult": "Fate {{roll}} — {{text}}"
 }

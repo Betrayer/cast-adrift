@@ -21,6 +21,7 @@ export const PHASE5_PERKS: readonly PerkDef[] = [
     desc: "content:perksDesc.ricochet",
     rarity: "rare",
     pool: "red",
+    synergy: { kind: "slot", slot: "weapons" },
     traits: ["ricochet"],
   },
   {
@@ -165,6 +166,7 @@ export const PHASE5_PERKS: readonly PerkDef[] = [
     desc: "content:perksDesc.blood-reactor",
     rarity: "rare",
     pool: "black",
+    synergy: { kind: "slot", slot: "reactor" },
     traits: ["bloodReactor"],
   },
   {
@@ -187,6 +189,7 @@ export const PHASE5_PERKS: readonly PerkDef[] = [
     desc: "content:perksDesc.sacrifice",
     rarity: "rare",
     pool: "black",
+    synergy: { kind: "school", school: "black" },
     traits: ["sacrifice"],
   },
   {
@@ -228,12 +231,15 @@ export const PHASE5_PERKS: readonly PerkDef[] = [
     mods: { nudgeCostDelta: -1 },
   },
   {
+    // Reworked in Phase 10: sparing the lowest die was worth less than a reroll
+    // slot, so it now carries one.
     id: "spare",
     name: "content:perks.spare",
     desc: "content:perksDesc.spare",
     rarity: "uncommon",
     pool: "grey",
     traits: ["spareLowest"],
+    mods: { rerollSizeDelta: 1 },
   },
   {
     id: "afterburner",

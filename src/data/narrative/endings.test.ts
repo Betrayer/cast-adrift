@@ -138,9 +138,11 @@ describe("epilogue tally", () => {
   });
 });
 
-describe("ascension A1–A5", () => {
-  it("defines exactly five levels", () => {
-    expect(ASCENSIONS.map((a) => a.level)).toEqual([1, 2, 3, 4, 5]);
+describe("ascension A1–A10", () => {
+  it("defines exactly ten levels", () => {
+    expect(ASCENSIONS.map((a) => a.level)).toEqual([
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+    ]);
   });
 
   it("stacks every lower level's modifier", () => {
@@ -150,6 +152,9 @@ describe("ascension A1–A5", () => {
       shopPricePct: 0,
       tideCapDelta: 0,
       bossPhaseShift: false,
+      eliteSubsystem: false,
+      bossPatternInsert: false,
+      hullPct: 0,
     });
     expect(ascensionMods(5)).toEqual({
       enemyHpPct: 10,
@@ -157,13 +162,26 @@ describe("ascension A1–A5", () => {
       shopPricePct: 20,
       tideCapDelta: 1,
       bossPhaseShift: true,
+      eliteSubsystem: false,
+      bossPatternInsert: false,
+      hullPct: 0,
     });
     expect(ascensionMods(2).shopPricePct).toBe(0);
+    expect(ascensionMods(10)).toEqual({
+      enemyHpPct: 10,
+      eliteShield: 6,
+      shopPricePct: 45,
+      tideCapDelta: 2,
+      bossPhaseShift: true,
+      eliteSubsystem: true,
+      bossPatternInsert: true,
+      hullPct: -15,
+    });
   });
 
-  it("unlocks one level per clear, capped at A5", () => {
+  it("unlocks one level per clear, capped at A10", () => {
     expect(maxSelectableAscension(0)).toBe(0);
     expect(maxSelectableAscension(1)).toBe(1);
-    expect(maxSelectableAscension(99)).toBe(5);
+    expect(maxSelectableAscension(99)).toBe(10);
   });
 });

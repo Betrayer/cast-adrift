@@ -381,6 +381,8 @@ export const BEACON_FLAGS: readonly string[] = [
   "beacon5",
 ];
 
+export const BEACON_TOTAL = BEACON_FLAGS.length;
+
 export const beaconsResolved = (
   flags: Record<string, unknown>,
 ): number => BEACON_FLAGS.filter((key) => flags[key] !== undefined).length;

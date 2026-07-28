@@ -97,6 +97,8 @@ export interface BattleSnapshot {
   perks: string[];
   chartPicks?: string[];
   mutators?: string[];
+  modules?: string[];
+  engravings?: Readonly<Record<string, readonly string[]>>;
   shipId?: ShipId;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
@@ -121,6 +123,8 @@ export interface BattleSnapshot {
   pendingSwap: number;
   pendingStorm: number;
   ascension: number;
+  overflowShieldUsed?: boolean;
+  pierceUsed?: boolean;
   outcome?: BattleOutcome;
 }
 

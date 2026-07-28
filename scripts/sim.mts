@@ -53,7 +53,14 @@ import {
 } from "../src/game/battle/setup";
 import { buildEncounterIds } from "../src/game/run/encounter";
 import { rollPerkChoices } from "../src/game/run/perkDraft";
-import { computePerkMods, perkChargeCap } from "../src/game/run/perkMods";
+import { computePerkMods } from "../src/game/run/perkMods";
+import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
+import { ascensionMods } from "../src/data/ascension";
+import { moduleSlots } from "../src/data/modules";
+import { ALL_PERKS } from "../src/data/perks";
+import { rollModule } from "../src/game/economy/rewards";
+import { generateShopModules } from "../src/game/economy/shop";
+import { shipHullMax } from "../src/game/battle/setup";
 import type { MkLevels } from "../src/stores/runStore";
 import {
   createStream,
@@ -70,8 +77,11 @@ interface BattleInit {
   tide?: number;
   mkLevels?: MkLevels;
   perks?: readonly string[];
+  modules?: readonly string[];
   gateHpBonusPct?: number;
   enemyHpBonusPct?: number;
+  eliteShield?: number;
+  ascension?: number;
 }
 
 interface BattleResult {
@@ -103,6 +113,45 @@ const applyPlacement = (
   slot.dieUid = uid;
 };
 
+const NUDGE = 3;
+const SURGE = 10;
+
+const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
+  const die = snapshot.dice.find((d) => d.uid === uid);
+  if (die === undefined) return false;
+  const mult = die.school === "black" || die.school === "prismatic" ? 1.5 : 1;
+  return snapshot.charge + Math.floor(die.value * mult) > snapshot.chargeCap;
+};
+
+// Charge is a resource the greedy bot used to ignore entirely, which made every
+// reactor-leaning build unmeasurable. A competent player spends it: surge when
+// the bank is full, otherwise nudge the placed weapon dice up.
+const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
+  const cost = Math.max(
+    1,
+    NUDGE + computeRunMods(init.perks ?? [], [], init.modules ?? []).nudgeCostDelta,
+  );
+  if (snapshot.charge >= SURGE && snapshot.nextRollBonus === 0) {
+    snapshot.charge -= SURGE;
+    snapshot.nextRollBonus = 1;
+  }
+  const placed = snapshot.dice.filter(
+    (d) => d.state === "placed" && d.slot !== undefined,
+  );
+  const weapons = placed.filter(
+    (d) => d.slot === "weaponA" || d.slot === "weaponB" || d.slot === "spinal",
+  );
+  const targets = weapons.length > 0 ? weapons : placed;
+  let guard = 0;
+  while (snapshot.charge >= cost && targets.length > 0 && guard < 12) {
+    const die = targets.reduce((best, d) => (d.value > best.value ? d : best));
+    if (die.value >= die.tier) break;
+    die.value += 1;
+    snapshot.charge -= cost;
+    guard += 1;
+  }
+};
+
 const simulateBattle = (
   enemyIds: readonly string[],
   deck: readonly string[],
@@ -121,11 +170,14 @@ const simulateBattle = (
     {
       tide: init.tide,
       perks: init.perks,
+      modules: init.modules,
       hull: init.hull,
       hullMax: init.hullMax,
-      chargeCap: perkChargeCap(init.perks ?? []),
+      chargeCap: runChargeCap(init.perks ?? [], [], init.modules ?? []),
       gateHpBonusPct: init.gateHpBonusPct,
       enemyHpBonusPct: init.enemyHpBonusPct,
+      eliteShield: init.eliteShield,
+      ascension: init.ascension,
     },
   );
   let dealt = 0;
@@ -143,6 +195,11 @@ const simulateBattle = (
     const decision = decidePlacements(snapshot);
     if (decision.targetId !== null) snapshot.targetId = decision.targetId;
     for (const placement of decision.placements) {
+      // A competent player does not pour a die into a reactor that is about to
+      // overflow: the −2 hull is strictly worse than burning the die.
+      if (placement.slot === "reactor" && overflows(snapshot, placement.uid)) {
+        continue;
+      }
       if (canPlaceDie(snapshot, placement.uid, placement.slot)) {
         applyPlacement(snapshot, placement.uid, placement.slot);
       }
@@ -151,6 +208,7 @@ const simulateBattle = (
       const die = snapshot.dice.find((d) => d.uid === decision.reserveUid);
       if (die?.state === "tray") die.state = "reserved";
     }
+    spendCharge(snapshot, init);
 
     const player = resolvePlayerPhase(snapshot);
     dealt += player.beats
@@ -222,6 +280,7 @@ interface RunState {
   deck: string[];
   mkLevels: MkLevels;
   perks: string[];
+  modules: string[];
   tide: number;
   jumpsSinceTide: number;
   kills: number;
@@ -274,7 +333,15 @@ const deckTargetSchool = (deck: readonly string[]): string => {
 };
 
 const greedyShop = (state: RunState, seed: number, node: MapNode): void => {
-  const discount = computePerkMods(state.perks).shopDiscountPct;
+  const discount = computeRunMods(state.perks, [], state.modules).shopDiscountPct;
+  // The bot buys any module it can afford while the bay has room: modules are a
+  // strict upgrade at these prices, so a greedy rule is the honest baseline.
+  for (const item of generateShopModules(seed, node.id, 0, discount)) {
+    if (state.modules.length >= moduleSlots(0)) break;
+    if (state.scrap >= item.price && spend(state, item.price)) {
+      state.modules.push(item.moduleId);
+    }
+  }
   const items = generateShopStock(seed, node.id, 0, discount);
   const target = deckTargetSchool(state.deck);
   const rank = (defId: string): number => {
@@ -429,6 +496,7 @@ const runSector = (seed: number): SectorResult => {
     deck: [...STARTER_DECK],
     mkLevels: {},
     perks: [],
+    modules: [],
     tide: 0,
     jumpsSinceTide: 0,
     kills: 0,
@@ -495,7 +563,7 @@ const runSector = (seed: number): SectorResult => {
       state.nodes += 1;
       const loot = createStream(deriveSeed(seed, `loot:${next.id}`));
       const reward = computeNodeReward(type, loot);
-      const mods = computePerkMods(state.perks);
+      const mods = computeRunMods(state.perks, [], state.modules);
       gain(state, Math.round(reward.scrap * (1 + mods.scrapMultPct / 100)));
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
       if (reward.dieDrop !== null) {
@@ -676,6 +744,7 @@ const runDrift = (seed: number, mid: boolean): DriftResult => {
     deck: mid ? [...DRIFT_MID_DECK] : [...STARTER_DECK],
     mkLevels: mid ? { ...DRIFT_MID_MK } : {},
     perks: [],
+    modules: [],
     tide: 0,
     jumpsSinceTide: 0,
     kills: 0,
@@ -1102,10 +1171,390 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
 };
 
+// ── Sweep mode (Phase-10 Task 10) ────────────────────────────────────────────
+
+interface Archetype {
+  name: string;
+  deck: readonly string[];
+  mkLevels: MkLevels;
+  // The two modules a player running this build buys first. A mid-collection
+  // profile always reaches a shop before the gate, so starting empty would
+  // measure a ship nobody actually flies.
+  modules: readonly string[];
+}
+
+// Three mid-collection builds a real profile can actually assemble, one per
+// axis the balance bands care about: burst, sustain, and risk.
+const ARCHETYPES: readonly Archetype[] = [
+  {
+    name: "red-burn",
+    deck: [
+      "red-d6", "red-d6", "ember", "cinder", "slug",
+      "fused-emberforge", "magma", "flare", "blue-d6",
+    ],
+    mkLevels: { weaponA: 3, weaponB: 2, shields: 2, reactor: 2 },
+    modules: ["siegeMount", "emberInjector"],
+  },
+  {
+    // A four-set is the build; the rest is the weapons core every deck needs.
+    name: "blue-wall",
+    deck: [
+      "blue-d6", "frostplate", "bulwark", "aegis",
+      "red-d6", "red-d6", "ember", "slug", "fused-emberforge",
+    ],
+    mkLevels: { weaponA: 3, shields: 3, engines: 2, reactor: 2 },
+    modules: ["ablativeWeave", "dampingCoil"],
+  },
+  {
+    // Black's measurable identity is the exceed-cap gamble (DESIGN §7), not the
+    // reactor: the bot converts charge at 3:1, so reactor value under-reads.
+    name: "black-edge",
+    deck: [
+      "black-d6", "ashen", "pitch", "eclipse", "voidmaw",
+      "red-d6", "ember", "slug", "fused-emberforge",
+    ],
+    mkLevels: { weaponA: 3, weaponB: 2, shields: 2, reactor: 3 },
+    modules: ["blackLedger", "heatsink"],
+  },
+];
+
+interface SweepOptions {
+  sector: number;
+  ascension: number;
+  archetype: Archetype;
+  forcedPerk?: string;
+}
+
+const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
+  const streams = createStreams(seed);
+  const map: MapGraph = generateSectorMap(streams.map, opts.sector);
+  const byId = nodeById(map);
+  const aMods = ascensionMods(opts.ascension);
+  const hullMax = Math.max(
+    1,
+    Math.round(shipHullMax("wanderer") * (1 + aMods.hullPct / 100)),
+  );
+  const state: RunState = {
+    hull: hullMax,
+    hullMax,
+    scrap: 0,
+    scrapEarned: 0,
+    scrapSpent: 0,
+    deck: [...opts.archetype.deck],
+    mkLevels: { ...opts.archetype.mkLevels },
+    perks: opts.forcedPerk !== undefined ? [opts.forcedPerk] : [],
+    modules: [...opts.archetype.modules],
+    tide: 0,
+    jumpsSinceTide: 0,
+    kills: 0,
+    nodes: 0,
+  };
+
+  let position = START_NODE_ID;
+  let posRow = 0;
+  const hullEntering: number[] = [];
+  const tideCap = 3 + aMods.tideCapDelta;
+
+  const finish = (win: boolean, deathRow: number): SectorResult => ({
+    win,
+    deathRow,
+    nodes: state.nodes,
+    kills: state.kills,
+    scrapEarned: state.scrapEarned,
+    scrapSpent: state.scrapSpent,
+    scrapUnspent: state.scrap,
+    hullMin: hullEntering.length > 0 ? Math.min(...hullEntering) : state.hull,
+    hullMedian: median(hullEntering.length > 0 ? hullEntering : [state.hull]),
+    resonanceSet: maxRealSchoolCount(state.deck) >= 4,
+    mkReached: maxMk(state.mkLevels),
+  });
+
+  while (position !== BOSS_NODE_ID) {
+    const next = greedyNext(map, byId, position, posRow);
+    if (next === undefined) break;
+    position = next.id;
+    posRow = next.row;
+    state.jumpsSinceTide += 1;
+    if (state.jumpsSinceTide >= 4) {
+      state.tide = Math.min(tideCap, state.tide + 1);
+      state.jumpsSinceTide = 0;
+    }
+
+    const type = next.type;
+    if (FIGHT_TYPES.has(type)) {
+      hullEntering.push(state.hull);
+      const encStream = createStream(deriveSeed(seed, `enc:${next.id}`));
+      const enemyIds = buildEncounterIds(type, encStream, {
+        sector: opts.sector,
+      });
+      const res = simulateBattle(
+        enemyIds,
+        state.deck,
+        deriveSeed(seed, `node:${next.id}`),
+        {
+          hull: state.hull,
+          hullMax: state.hullMax,
+          tide: state.tide,
+          mkLevels: state.mkLevels,
+          perks: state.perks,
+          modules: state.modules,
+          gateHpBonusPct: gateHpBonusPct(opts.sector),
+          enemyHpBonusPct: aMods.enemyHpPct,
+          eliteShield: aMods.eliteShield,
+          ascension: opts.ascension,
+        },
+      );
+      state.hull = res.hullLeft;
+      state.kills += res.kills;
+      if (!res.win) return finish(false, next.row);
+      state.nodes += 1;
+      const loot = createStream(deriveSeed(seed, `loot:${next.id}`));
+      const reward = computeNodeReward(type, loot);
+      const mods = computeRunMods(state.perks, [], state.modules);
+      const sectorMult =
+        SECTORS.find((sd) => sd.id === opts.sector)?.scrapMult ?? 1;
+      gain(
+        state,
+        Math.round(reward.scrap * sectorMult * (1 + mods.scrapMultPct / 100)),
+      );
+      state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
+      if (reward.dieDrop !== null && state.deck.length < DECK_CAP) {
+        state.deck.push(reward.dieDrop);
+      }
+      if (type === "elite" || type === "miniboss") {
+        const moduleId = rollModule(loot, state.modules, "common");
+        if (state.modules.length < moduleSlots(0)) state.modules.push(moduleId);
+      }
+      if (isDraftNode(type) && opts.forcedPerk === undefined) {
+        const pick = rollPerkChoices(loot, state.perks)[0];
+        if (pick !== undefined) {
+          state.perks.push(pick);
+          const picked = computePerkMods([pick]);
+          if (picked.hullMaxDelta > 0) {
+            state.hullMax += picked.hullMaxDelta;
+            state.hull = Math.min(state.hullMax, state.hull + picked.hullMaxDelta);
+          }
+        }
+      }
+      if (type === "boss") return finish(true, -1);
+    } else if (type === "shop") {
+      greedyShop(state, seed, next);
+      state.nodes += 1;
+    } else if (type === "shipyard") {
+      const forecast =
+        fightsUntilRest(map, byId, next.id, next.row) * EXPECTED_DMG_PER_FIGHT;
+      greedyShipyard(state, forecast > state.hull * 0.6);
+      state.nodes += 1;
+    } else {
+      state.nodes += 1;
+    }
+  }
+  return finish(position === BOSS_NODE_ID, -1);
+};
+
+const SWEEP_ASCENSIONS: readonly number[] = [0, 3, 6];
+
+const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const rows: string[] = [
+    "sector,ascension,deck,runs,winrate,avgNodes,avgKills,avgScrapEarned,avgScrapSpent,avgHullMedian,avgMk",
+  ];
+  console.log(
+    `sim sweep: 5 sectors x ${String(SWEEP_ASCENSIONS.length)} ascensions x ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
+  );
+  for (const sector of [1, 2, 3, 4, 5]) {
+    for (const ascension of SWEEP_ASCENSIONS) {
+      for (const archetype of ARCHETYPES) {
+        const results: SectorResult[] = [];
+        for (let i = 0; i < runs; i += 1) {
+          results.push(
+            runSweepSector(
+              deriveSeed(
+                seed,
+                `sweep:${String(sector)}:${String(ascension)}:${archetype.name}:${String(i)}`,
+              ),
+              { sector, ascension, archetype },
+            ),
+          );
+        }
+        const n = Math.max(1, results.length);
+        const avg = (f: (r: SectorResult) => number): number =>
+          results.reduce((sum, r) => sum + f(r), 0) / n;
+        const winrate = results.filter((r) => r.win).length / n;
+        rows.push(
+          [
+            String(sector),
+            `A${String(ascension)}`,
+            archetype.name,
+            String(results.length),
+            winrate.toFixed(3),
+            avg((r) => r.nodes).toFixed(2),
+            avg((r) => r.kills).toFixed(2),
+            avg((r) => r.scrapEarned).toFixed(1),
+            avg((r) => r.scrapSpent).toFixed(1),
+            avg((r) => r.hullMedian).toFixed(1),
+            avg((r) => r.mkReached).toFixed(2),
+          ].join(","),
+        );
+        console.log(
+          `  S${String(sector)} A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(winrate * 100).toFixed(1)}% · scrap +${avg((r) => r.scrapEarned).toFixed(0)}/-${avg((r) => r.scrapSpent).toFixed(0)} · hull ${avg((r) => r.hullMedian).toFixed(1)}`,
+        );
+      }
+    }
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `sweep-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+};
+
+// Dead-perk report: every perk is force-picked for a fixed run budget and its
+// winrate compared with the no-perk baseline on the same seeds.
+const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const archetype = ARCHETYPES[0];
+  if (archetype === undefined) return;
+  const sector = Number(getArg("sector", "2"));
+  const baseline = (forcedPerk?: string): number => {
+    let wins = 0;
+    for (let i = 0; i < runs; i += 1) {
+      const res = runSweepSector(
+        deriveSeed(seed, `perk:${String(sector)}:${String(i)}`),
+        { sector, ascension: 0, archetype, forcedPerk },
+      );
+      if (res.win) wins += 1;
+    }
+    return wins / Math.max(1, runs);
+  };
+
+  const base = baseline();
+  const rows: string[] = ["perk,pool,rarity,winrate,baseline,delta_pct"];
+  const deltas: { id: string; delta: number }[] = [];
+  for (const perk of ALL_PERKS) {
+    const wr = baseline(perk.id);
+    const delta = (wr - base) * 100;
+    deltas.push({ id: perk.id, delta });
+    rows.push(
+      [
+        perk.id,
+        perk.pool,
+        perk.rarity,
+        wr.toFixed(3),
+        base.toFixed(3),
+        delta.toFixed(1),
+      ].join(","),
+    );
+  }
+  deltas.sort((a, b) => a.delta - b.delta);
+  const dead = deltas.filter((d) => d.delta < -3);
+  console.log(
+    `sim perks: baseline ${(base * 100).toFixed(1)}% over ${String(runs)} runs on S${String(sector)}`,
+  );
+  console.log(
+    `  worst five: ${deltas.slice(0, 5).map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
+  );
+  console.log(
+    `  best five: ${deltas.slice(-5).reverse().map((d) => `${d.id} +${d.delta.toFixed(1)}%`).join(" · ")}`,
+  );
+  console.log(
+    dead.length === 0
+      ? "  no perk below the -3% dead-weight line"
+      : `  BELOW -3%: ${dead.map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
+  );
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `perks-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+};
+
+// Economy pass (Phase-10 Task 10). DESIGN §9.3 prices every node type; the
+// assertion here is the derived one: scrap earned per cleared node must sit
+// inside the battle-floor..elite-ceiling band once the sector multiplier is
+// applied, and a healthy run must convert a real share of it into upgrades.
+const ECONOMY_PER_NODE_MIN = 12;
+const ECONOMY_PER_NODE_MAX = 60;
+// A sector must fund at least one Mk3 (130) and never so much that prices stop
+// mattering — six Mk3s is the ceiling the §9.3 spend list implies.
+const ECONOMY_SECTOR_MIN = 130;
+const ECONOMY_SECTOR_MAX = 130 * 6;
+
+const economyModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const rows: string[] = [
+    "sector,deck,runs,medianEarnedPerNode,medianEarned,medianSpent,spendShare,verdict",
+  ];
+  let failures = 0;
+  for (const sector of [1, 3, 5]) {
+    const mult = SECTORS.find((sd) => sd.id === sector)?.scrapMult ?? 1;
+    for (const archetype of ARCHETYPES) {
+      const perNode: number[] = [];
+      const earned: number[] = [];
+      const spent: number[] = [];
+      for (let i = 0; i < runs; i += 1) {
+        const r = runSweepSector(
+          deriveSeed(seed, `eco:${String(sector)}:${archetype.name}:${String(i)}`),
+          { sector, ascension: 0, archetype },
+        );
+        earned.push(r.scrapEarned);
+        spent.push(r.scrapSpent);
+        if (r.nodes > 0) perNode.push(r.scrapEarned / r.nodes);
+      }
+      const mEarnedPerNode = median(perNode);
+      const mEarned = median(earned);
+      const mSpent = median(spent);
+      const share = mEarned > 0 ? mSpent / mEarned : 0;
+      const lo = ECONOMY_PER_NODE_MIN * mult;
+      const hi = ECONOMY_PER_NODE_MAX * mult;
+      const ok =
+        mEarnedPerNode >= lo &&
+        mEarnedPerNode <= hi &&
+        mEarned >= ECONOMY_SECTOR_MIN &&
+        mEarned <= ECONOMY_SECTOR_MAX;
+      if (!ok) failures += 1;
+      rows.push(
+        [
+          String(sector),
+          archetype.name,
+          String(runs),
+          mEarnedPerNode.toFixed(2),
+          mEarned.toFixed(1),
+          mSpent.toFixed(1),
+          share.toFixed(3),
+          ok ? "ok" : "OUT_OF_BAND",
+        ].join(","),
+      );
+      console.log(
+        `sim economy: S${String(sector)} ${archetype.name.padEnd(10)} ${mEarnedPerNode.toFixed(1)}/node (band ${lo.toFixed(0)}-${hi.toFixed(0)}) · earned ${mEarned.toFixed(0)} · spent ${mSpent.toFixed(0)} (${(share * 100).toFixed(0)}%) — ${ok ? "ok" : "OUT OF BAND"}`,
+      );
+    }
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `economy-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (failures > 0) {
+    console.error(`sim economy: ${String(failures)} row(s) outside the §9.3 envelope`);
+    process.exit(1);
+  }
+};
+
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
-  const runs = Number(getArg("runs", mode === "run" ? "300" : "1000"));
+  const defaultRuns =
+    mode === "run"
+      ? "300"
+      : mode === "sweep"
+        ? "500"
+        : mode === "perks"
+          ? "60"
+          : mode === "economy"
+            ? "200"
+            : "1000";
+  const runs = Number(getArg("runs", defaultRuns));
   const seed = Number(getArg("seed", "7"));
   if (!Number.isFinite(runs) || runs <= 0) {
     console.error(`sim: invalid --runs "${getArg("runs", "1000")}"`);
@@ -1121,6 +1570,18 @@ const main = (): void => {
   }
   if (mode === "gate") {
     gateModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "sweep") {
+    sweepModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "perks") {
+    perkModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "economy") {
+    economyModeMain(runs, seed, startedAt);
     return;
   }
   battleModeMain(runs, seed, startedAt);

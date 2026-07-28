@@ -87,6 +87,7 @@ export const applyWeaponDamage = (
   baseDamage: number,
   crit = false,
   markBonus = 2,
+  pierce = false,
 ): number => {
   let damage = baseDamage;
   if (target.subsystem !== undefined) {
@@ -100,7 +101,8 @@ export const applyWeaponDamage = (
   const bonus = def?.markVulnerable === true ? markBonus * 2 : markBonus;
   if (consumeStatus(target.enemy.statuses, "mark")) damage += bonus;
   if (crit) damage = Math.floor(damage * 1.5);
-  const absorbed = Math.min(target.enemy.shield, damage);
+  // «Пробойник» spends its one charge to put the whole hit past the shield.
+  const absorbed = pierce ? 0 : Math.min(target.enemy.shield, damage);
   target.enemy.shield -= absorbed;
   target.enemy.hp = Math.max(0, target.enemy.hp - (damage - absorbed));
   if (target.enemy.hp === 0) {

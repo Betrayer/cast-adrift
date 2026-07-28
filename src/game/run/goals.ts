@@ -1,4 +1,4 @@
-import { beaconsResolved } from "@/data/events/beacons";
+import { BEACON_TOTAL, beaconsResolved } from "@/data/events/beacons";
 import { NO_BATTLE_TURNS, type RunStats } from "@/stores/runStore";
 import type { FlagValue } from "@/types/events";
 
@@ -23,7 +23,10 @@ export type GoalSpec =
   | { g: "beaconResolved" }
   | { g: "anomaliesSolvedAtLeast"; n: number }
   | { g: "blackPlacedInWinAtLeast"; n: number }
-  | { g: "axisAtMost"; n: number };
+  | { g: "axisAtMost"; n: number }
+  | { g: "allBeaconsResolved" }
+  | { g: "deckSchoolsAtLeast"; n: number }
+  | { g: "dicePlacedAtMost"; n: number };
 
 export type GoalKind = GoalSpec["g"];
 
@@ -34,6 +37,7 @@ export interface GoalContext {
   hullMax: number;
   scrap: number;
   deckSize: number;
+  deckSchools: number;
   axis: number;
   solvedPuzzles: readonly string[];
   flags: Record<string, FlagValue>;
@@ -91,6 +95,12 @@ export const evaluateGoal = (spec: GoalSpec, ctx: GoalContext): boolean => {
       return ctx.stats.maxBlackPlacedWin >= spec.n;
     case "axisAtMost":
       return ctx.axis <= spec.n;
+    case "allBeaconsResolved":
+      return beaconsResolved(ctx.flags) >= BEACON_TOTAL;
+    case "deckSchoolsAtLeast":
+      return ctx.deckSchools >= spec.n;
+    case "dicePlacedAtMost":
+      return ctx.stats.dicePlaced <= spec.n;
   }
 };
 
@@ -102,6 +112,9 @@ const WIN_ONLY: ReadonlySet<GoalKind> = new Set<GoalKind>([
   "scrapAtLeast",
   "axisAtMost",
   "depthWithDeckAtLeast",
+  "allBeaconsResolved",
+  "deckSchoolsAtLeast",
+  "dicePlacedAtMost",
 ]);
 
 export const goalMet = (spec: GoalSpec, ctx: GoalContext): boolean => {

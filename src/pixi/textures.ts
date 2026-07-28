@@ -12,6 +12,7 @@ export interface DieTextureOptions {
   tier: DieTier;
   value: number;
   size: number;
+  engraved?: boolean;
 }
 
 const caches = new WeakMap<Renderer, Map<string, Texture>>();
@@ -21,6 +22,7 @@ export const dieTexture = (
   options: DieTextureOptions,
 ): Texture => {
   const { school, tier, value } = options;
+  const engraved = options.engraved === true;
   const size = Math.round(options.size);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   let cache = caches.get(app.renderer);
@@ -28,7 +30,7 @@ export const dieTexture = (
     cache = new Map();
     caches.set(app.renderer, cache);
   }
-  const key = `${school}:${String(tier)}:${String(value)}:${String(size)}:${String(dpr)}`;
+  const key = `${school}:${String(tier)}:${String(value)}:${String(size)}:${String(dpr)}:${engraved ? "e" : "-"}`;
   const cached = cache.get(key);
   if (cached !== undefined) return cached;
 
@@ -60,6 +62,21 @@ export const dieTexture = (
   tag.anchor.set(0.5, 1);
   tag.position.set(size / 2, size * 0.94);
   root.addChild(box, num, tag);
+
+  // Engraved dice wear a corner rune: a notched chevron in the school stroke.
+  if (engraved) {
+    const r = size * 0.17;
+    const inset = size * 0.13;
+    const rune = new Graphics()
+      .moveTo(size - inset - r, inset)
+      .lineTo(size - inset, inset)
+      .lineTo(size - inset, inset + r)
+      .stroke({ color: colors.stroke, width: Math.max(1.5, size * 0.05) })
+      .moveTo(size - inset - r * 0.55, inset + r * 0.55)
+      .lineTo(size - inset - r * 0.05, inset + r * 0.05)
+      .stroke({ color: colors.text, width: Math.max(1, size * 0.04) });
+    root.addChild(rune);
+  }
 
   const texture = app.renderer.generateTexture({
     target: root,

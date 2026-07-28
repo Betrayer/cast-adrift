@@ -1,5 +1,5 @@
-import type { EffectDef } from "@/game/effects/types";
-import type { LocKey, Rarity } from "@/types/content";
+import type { EffectDef, SlotMatch } from "@/game/effects/types";
+import type { LocKey, Rarity, School } from "@/types/content";
 
 export type PerkPool =
   | "red"
@@ -24,7 +24,13 @@ export type PerkTrait =
   | "dodgeCharge"
   | "singleCast"
   | "coldLogic"
-  | "obsidianPact";
+  | "obsidianPact"
+  | "overflowShield"
+  | "firstHitPierce"
+  | "escapePod"
+  | "recycler"
+  | "fateTwice"
+  | "prismDouble";
 
 export interface PerkMods {
   rerollSizeDelta: number;
@@ -35,13 +41,29 @@ export interface PerkMods {
   scrapMultPct: number;
   chargeCapDelta: number;
   hullMaxDelta: number;
+  hullMaxPct: number;
   enginesThresholdDelta: number;
   markBonusDelta: number;
   jamPowerDelta: number;
   growthCapDelta: number;
   battleStartScrap: number;
   battleEndHeal: number;
+  extraRerolls: number;
+  scrapPerKill: number;
+  setCompleteCharge: number;
+  freeShopRerolls: number;
+  xpMultPct: number;
+  tideEffectDelta: number;
+  moduleSlotDelta: number;
 }
+
+// Every rare perk must point at something the player can build toward
+// (DESIGN §9.4); `lint:content` refuses a rare without one.
+export type PerkSynergy =
+  | { kind: "school"; school: School }
+  | { kind: "module"; id: string }
+  | { kind: "engraving"; id: string }
+  | { kind: "slot"; slot: SlotMatch };
 
 export interface PerkDef {
   id: string;
@@ -52,6 +74,7 @@ export interface PerkDef {
   effects?: readonly EffectDef[];
   mods?: Partial<PerkMods>;
   traits?: readonly PerkTrait[];
+  synergy?: PerkSynergy;
 }
 
 export const ZERO_PERK_MODS: PerkMods = {
@@ -63,10 +86,18 @@ export const ZERO_PERK_MODS: PerkMods = {
   scrapMultPct: 0,
   chargeCapDelta: 0,
   hullMaxDelta: 0,
+  hullMaxPct: 0,
   enginesThresholdDelta: 0,
   markBonusDelta: 0,
   jamPowerDelta: 0,
   growthCapDelta: 0,
   battleStartScrap: 0,
   battleEndHeal: 0,
+  extraRerolls: 0,
+  scrapPerKill: 0,
+  setCompleteCharge: 0,
+  freeShopRerolls: 0,
+  xpMultPct: 0,
+  tideEffectDelta: 0,
+  moduleSlotDelta: 0,
 };

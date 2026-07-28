@@ -9,6 +9,7 @@ import { tokens } from '@/app/theme';
 import { STARTER_DECK } from '@/data/decks';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { DIE_BY_ID } from '@/data/dice';
+import { FATE_DIE_ID, FATE_TABLE } from '@/data/fate';
 import { schools } from '@/data/schools';
 import { canCopy, canFlip } from '@/game/battle/actives';
 import {
@@ -26,6 +27,7 @@ import {
 import { resolveActiveBattle } from '@/game/run/flow';
 import { emitBark } from '@/game/narrative';
 import { hasTrait } from '@/game/run/perkMods';
+import { runHasTrait } from '@/game/run/runMods';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { initAudio } from '@/services/audio';
@@ -396,6 +398,56 @@ const ActivePerks = () => {
   );
 };
 
+// DESIGN §7 ceremony moment: the Fate die never enters a slot — it is one
+// button, once per battle, and the table's verdict is read out loud.
+const FateStrip = () => {
+  const { t } = useTranslation(['battle', 'content']);
+  const phase = useBattleStore((s) => s.phase);
+  const dice = useBattleStore((s) => s.dice);
+  const fateUses = useBattleStore((s) => s.fateUses);
+  const perks = useBattleStore((s) => s.perks);
+  const chartPicks = useBattleStore((s) => s.chartPicks);
+  const modules = useBattleStore((s) => s.modules);
+  const fateRoll = useBattleStore((s) => s.fateRoll);
+  const fateOutcomeId = useBattleStore((s) => s.fateOutcomeId);
+  const rollFate = useBattleStore((s) => s.rollFate);
+  const clearFateResult = useBattleStore((s) => s.clearFateResult);
+  const hasFate = dice.some((d) => d.defId === FATE_DIE_ID);
+  const maxUses = runHasTrait(perks, chartPicks, 'fateTwice', modules) ? 2 : 1;
+  const fateUsed = fateUses >= maxUses;
+  if (!hasFate || phase !== 'placement') return null;
+  const outcome =
+    fateOutcomeId === null
+      ? undefined
+      : FATE_TABLE.find((o) => o.id === fateOutcomeId);
+  return (
+    <div className={styles.nudgeStrip}>
+      <Button
+        className={styles.clickable}
+        size="compact-sm"
+        variant={fateUsed ? 'default' : 'filled'}
+        disabled={fateUsed}
+        onClick={rollFate}
+      >
+        {t('battle:fate')}
+      </Button>
+      {fateRoll !== null && outcome !== undefined ? (
+        <Text
+          size="xs"
+          c={tokens.amber}
+          className={styles.clickable}
+          onClick={clearFateResult}
+        >
+          {t('battle:fateResult', {
+            roll: fateRoll,
+            text: t(outcome.text),
+          })}
+        </Text>
+      ) : null}
+    </div>
+  );
+};
+
 const ScriptHint = () => {
   const { t } = useTranslation(['battle']);
   const scriptedSlots = useBattleStore((s) => s.scriptedSlots);
@@ -600,6 +652,7 @@ export const BattleScreen = () => {
         <StatusCard />
         <EnemyChips />
         <ActivePerks />
+        <FateStrip />
         <NudgeStrip />
         <BottomBar />
       </div>

@@ -50,7 +50,29 @@
     "keyOvergrowth": "Розростання",
     "keyColdLogic": "Холодний розрахунок",
     "keyObsidian": "Обсидіановий пакт",
-    "keySingleCast": "Єдиний кидок"
+    "keySingleCast": "Єдиний кидок",
+    "redSpotter": "Навідник",
+    "redFirestorm": "Вогняний шторм",
+    "redSpine": "Хребет",
+    "blueBarrier": "Бар'єр",
+    "blueJammer": "Глушник",
+    "blueTideBreak": "Хвилеріз",
+    "greenCanopy": "Крона",
+    "greenPerennial": "Багаторічник",
+    "yellowTally": "Підрахунок",
+    "yellowBounty": "Нагорода",
+    "blackVent": "Клапан",
+    "blackWell": "Колодязь",
+    "greyToolkit": "Набір інструментів",
+    "greyLedger": "Книга обліку",
+    "prismLattice": "Ґратка",
+    "prismFacet": "Грань",
+    "prismWell": "Призматичний колодязь",
+    "hubEngineering": "Інженерний відсік",
+    "keyStormChaser": "Ловець штормів",
+    "keyIronDoctrine": "Залізна доктрина",
+    "keyFatesFavorite": "Улюбленець Фатуму",
+    "keyPrismCascade": "Призматичний каскад"
   },
   "chartFx": {
     "hubBudget": "+1 до бюджету ангара",
@@ -81,7 +103,19 @@
       "redSalvo": "Зброя +3 у 1-й хід",
       "blueGlacier": "+2 щит за кожен Щит",
       "blackEdge": "Усі куби +2 при критичному корпусі",
-      "allDice1": "Усі куби +1"
+      "allDice1": "Усі куби +1",
+      "weaponsBurn": "Максимальна грань у зброї додає Опік 1",
+      "enginesBonus": "+1 у двигунах",
+      "reactorBonus": "+1 у реакторі",
+      "greenHeal": "Максимальна грань зеленого кубика лікує 1",
+      "repeatCharge": "Повторене значення дає 1 заряд",
+      "maxFaceScrap": "Будь-яка максимальна грань платить 2 брухту",
+      "minFaceCharge": "Будь-яка мінімальна грань дає 1 заряд",
+      "firstTurnAll": "+1 до кожного кубика на першому ході",
+      "redFirestorm": "Максимальна грань у зброї додає Опік 3",
+      "redSpine": "+4 у Спінальній установці",
+      "greenCanopy": "+3 у двигунах",
+      "blackWell": "Реактор накопичує ще 2 заряду"
     },
     "trait": {
       "obsidianPact": "Чорні куби випадають лише на мін чи макс",
@@ -195,7 +229,10 @@
     "beaconResolved": "Розв'язати маяк",
     "anomaliesSolvedAtLeast": "Розв'язати {{n}} аномалію",
     "blackPlacedInWinAtLeast": "Перемогти в бою, виставивши {{n}}+ чорних кубів",
-    "axisAtMost": "Завершити з віссю {{n}} або нижче"
+    "axisAtMost": "Завершити з віссю {{n}} або нижче",
+    "allBeaconsResolved": "Відповісти на всі маяки",
+    "deckSchoolsAtLeast": "Завершити з {{n}} школами в колоді",
+    "dicePlacedAtMost": "Поставити не більше {{n}} кубиків за забіг"
   },
   "drift": {
     "title": "Дрейф завершено",
@@ -245,5 +282,19 @@
     "place": "#{{rank}}",
     "endings": "Фінали",
     "locked": "Запечатано"
+  },
+  "engraving": {
+    "title": "Станція гравіювання",
+    "hint": "Обери кубик, тоді руну. Зняття знищує гравіювання — без повернення.",
+    "locked": "Відкриється на рівні капітана {{level}}.",
+    "pickDie": "Кубик",
+    "sockets": "Гнізда {{used}}/{{max}}",
+    "empty": "Гравіювань немає.",
+    "remove": "зняти",
+    "fitted": "встановлено",
+    "fit": "{{price}} ◈"
+  },
+  "badge": {
+    "keeper": "Смотритель"
   }
 }

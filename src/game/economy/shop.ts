@@ -1,3 +1,4 @@
+import { MODULE_BY_ID, MODULE_POOL } from "@/data/modules";
 import {
   applyDiscount,
   diePrice,
@@ -5,6 +6,7 @@ import {
 } from "@/game/economy/prices";
 import { rollDrop, type RarityWeights } from "@/game/economy/rewards";
 import { createStream, deriveSeed } from "@/services/rng";
+import type { Rarity } from "@/types/content";
 import type { FlagValue } from "@/types/events";
 
 export interface ShopItem {
@@ -13,13 +15,25 @@ export interface ShopItem {
   sold: boolean;
 }
 
+export interface ShopModuleItem {
+  moduleId: string;
+  price: number;
+  sold: boolean;
+}
+
 export interface ShopState {
   nodeId: string;
   rerolls: number;
   items: ShopItem[];
+  modules: ShopModuleItem[];
 }
 
 export const SHOP_SIZE = 3;
+export const SHOP_MODULE_WEIGHTS: readonly (readonly [Rarity, number])[] = [
+  ["common", 52],
+  ["uncommon", 36],
+  ["rare", 12],
+];
 
 export const SHOP_WEIGHTS: RarityWeights = {
   common: 45,
@@ -67,6 +81,38 @@ export const generateShopStock = (
     const jitter = rng.int(0, 8) - 4;
     const price = applyDiscount(diePrice(ptsForDie(defId), jitter), discountPct);
     items.push({ defId, price, sold: false });
+  }
+  return items;
+};
+
+// Every shop carries one or two modules (DESIGN §9.4) on its own stream, so
+// adding modules never shifts the dice a saved run already rolled.
+export const generateShopModules = (
+  seed: number,
+  nodeId: string,
+  rerolls: number,
+  discountPct: number,
+): ShopModuleItem[] => {
+  const rng = createStream(
+    deriveSeed(seed, `shopmod:${nodeId}:${String(rerolls)}`),
+  );
+  const count = rng.int(1, 2);
+  const items: ShopModuleItem[] = [];
+  const taken = new Set<string>();
+  for (let i = 0; i < count; i += 1) {
+    const rarity = rng.weighted(SHOP_MODULE_WEIGHTS);
+    const pool = MODULE_POOL[rarity].filter((id) => !taken.has(id));
+    const fallback = MODULE_POOL.common.filter((id) => !taken.has(id));
+    const source = pool.length > 0 ? pool : fallback;
+    if (source.length === 0) break;
+    const moduleId = rng.pick(source);
+    taken.add(moduleId);
+    const base = MODULE_BY_ID.get(moduleId)?.price ?? 60;
+    items.push({
+      moduleId,
+      price: applyDiscount(base + rng.int(0, 8) - 4, discountPct),
+      sold: false,
+    });
   }
   return items;
 };

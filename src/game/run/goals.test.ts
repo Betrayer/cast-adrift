@@ -16,6 +16,7 @@ const ctx = (patch: Partial<GoalContext> = {}): GoalContext => ({
   hull: 30,
   hullMax: 30,
   scrap: 0,
+  deckSchools: 3,
   deckSize: 5,
   axis: 0,
   solvedPuzzles: [],
@@ -145,8 +146,8 @@ describe("star masks", () => {
 });
 
 describe("contract catalogue", () => {
-  it("ships ten contracts, each with three distinct goals", () => {
-    expect(CONTRACTS).toHaveLength(10);
+  it("ships fourteen contracts, each with three distinct goals", () => {
+    expect(CONTRACTS).toHaveLength(14);
     for (const def of CONTRACTS) {
       expect(def.goals).toHaveLength(CONTRACT_STAR_COUNT);
       expect(new Set(def.goals.map((g) => g.g)).size).toBe(CONTRACT_STAR_COUNT);

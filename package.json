@@ -16,7 +16,11 @@
     "sim:chart": "tsx scripts/chartSim.mts",
     "lint:content": "tsx scripts/contentLint.mts",
     "test:rules": "tsx scripts/rulesTest.mts",
-    "gensfx": "tsx scripts/genSfx.mts"
+    "gensfx": "tsx scripts/genSfx.mts",
+    "sim:sweep": "tsx scripts/sim.mts --mode sweep --runs 500 --seed 11",
+    "sim:perks": "tsx scripts/sim.mts --mode perks --runs 200 --sector 2 --seed 5",
+    "sim:economy": "tsx scripts/sim.mts --mode economy --runs 200 --seed 11",
+    "lint:keys": "tsx scripts/missingKeys.mts"
   },
   "dependencies": {
     "@mantine/core": "^9.4.1",

@@ -1,10 +1,6 @@
-import {
-  CHART_NODE_BY_ID,
-  chartNeighbors,
-  HUB_BUDGET_NODE_ID,
-  isEntryNode,
-} from "@/data/chart";
+import { CHART_NODE_BY_ID, chartNeighbors, isEntryNode } from "@/data/chart";
 import { MAX_LEVEL } from "@/game/xp";
+import type { SlotId } from "@/types/battle";
 
 export const RESPEC_SHARD_COST = 20;
 
@@ -65,5 +61,26 @@ export const canDeallocate = (
   return allConnectedToEntry(picks.filter((p) => p !== id));
 };
 
+// «Инженерный отсек» adds a hangar slot, «Prism Cascade» takes two away; both
+// are the same signed delta so the budget stays one number.
 export const hubBudgetBonus = (picks: readonly string[]): number =>
-  picks.includes(HUB_BUDGET_NODE_ID) ? 1 : 0;
+  picks.reduce(
+    (sum, id) => sum + (CHART_NODE_BY_ID.get(id)?.budgetDelta ?? 0),
+    0,
+  );
+
+// «Iron Doctrine» is the only chart node that shrinks a slot cap; the run merges
+// this with the mutator deltas before the battle is built.
+export const chartSlotTierDelta = (
+  picks: readonly string[],
+): Partial<Record<SlotId, number>> => {
+  const out: Partial<Record<SlotId, number>> = {};
+  for (const id of picks) {
+    const deltas = CHART_NODE_BY_ID.get(id)?.slotTierDelta;
+    if (deltas === undefined) continue;
+    for (const [slot, delta] of Object.entries(deltas) as [SlotId, number][]) {
+      out[slot] = (out[slot] ?? 0) + delta;
+    }
+  }
+  return out;
+};

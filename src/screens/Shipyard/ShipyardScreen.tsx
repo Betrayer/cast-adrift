@@ -15,8 +15,10 @@ import { DIE_BY_ID } from "@/data/dice";
 import { fusionTarget } from "@/data/dice/fusion";
 import { SHIP_BY_ID } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
+import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { FUSION_COST, mkUpgradeCost } from "@/game/economy/prices";
 import { autosaveRun, completeNode } from "@/game/run/flow";
+import { createStream, deriveSeed } from "@/services/rng";
 import { useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
 
@@ -30,7 +32,13 @@ export const ShipyardScreen = () => {
   const shipId = useRunStore((s) => s.shipId);
   const shipyardDiscount = useRunStore((s) => s.shipyardDiscount);
   const vouchers = useRunStore((s) => s.vouchers);
+  const seed = useRunStore((s) => s.seed);
+  const position = useRunStore((s) => s.position);
   const [repair, setRepair] = useState(0);
+
+  const greeting = createStream(
+    deriveSeed(seed, `keeper:${position ?? "yard"}`),
+  ).pick(keeperLinesFor("shipyard"));
 
   const discountedMk = (target: Exclude<MkLevel, 1>): number =>
     Math.max(1, mkUpgradeCost(target) - shipyardDiscount);
@@ -112,6 +120,10 @@ export const ShipyardScreen = () => {
           </Text>
         </Group>
       </Group>
+
+      <Text size="xs" c={tokens.dim} fs="italic">
+        {t(greeting.text)}
+      </Text>
 
       {vouchers > 0 ? (
         <Text size="xs" c={tokens.accent}>

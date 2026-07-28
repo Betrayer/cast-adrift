@@ -6,7 +6,7 @@ import {
 } from "@/game/battle/damage";
 import { resonanceAtLeast } from "@/game/battle/resonance";
 import { applyStatus, type StatusKey } from "@/game/battle/statuses";
-import { hasTrait } from "@/game/run/perkMods";
+import { sourceTrait } from "@/game/run/runMods";
 import type { EffectTarget } from "@/game/effects/types";
 import type {
   BattleSnapshot,
@@ -138,7 +138,7 @@ export class BattleCtx {
     if (
       s === "burn" &&
       !this.snapshot.burnDoubleUsed &&
-      hasTrait(this.snapshot.perks, "burnDouble")
+      sourceTrait(this.snapshot, "burnDouble")
     ) {
       amount = n * 2;
       this.snapshot.burnDoubleUsed = true;

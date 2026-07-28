@@ -23,12 +23,14 @@ export const MILESTONES: readonly Milestone[] = [
   { level: 20, kind: "contractRow", label: "meta:milestone.contractRow", live: false },
   { level: 25, kind: "budget", label: "meta:milestone.budget", live: true },
   { level: 25, kind: "shipArk", label: "meta:milestone.shipArk", live: true },
-  { level: 30, kind: "engraving", label: "meta:milestone.engraving", live: false },
+  { level: 30, kind: "engraving", label: "meta:milestone.engraving", live: true },
   { level: 35, kind: "budget", label: "meta:milestone.budget", live: true },
   { level: 40, kind: "dailyPreview", label: "meta:milestone.dailyPreview", live: false },
   { level: 45, kind: "budget", label: "meta:milestone.budget", live: true },
   { level: 50, kind: "respecPrestige", label: "meta:milestone.respecPrestige", live: false },
 ];
+
+export const ENGRAVING_STATION_LEVEL = 30;
 
 export const BASE_HANGAR_BUDGET = 10;
 export const MAX_HANGAR_BUDGET = 16;

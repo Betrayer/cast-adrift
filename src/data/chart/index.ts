@@ -8,6 +8,28 @@ export const CHART_NODE_BY_ID: ReadonlyMap<string, ChartNodeDef> = new Map(
   CHART_NODES.map((n) => [n.id, n]),
 );
 
+// The 220-node layout runs past the old fixed 0..1000 canvas, so the screen
+// takes its viewBox from the data rather than from a constant.
+const CHART_PAD = 40;
+
+export const CHART_BOUNDS = ((): {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+} => {
+  const xs = CHART_NODES.map((n) => n.pos.x);
+  const ys = CHART_NODES.map((n) => n.pos.y);
+  const minX = Math.min(...xs) - CHART_PAD;
+  const minY = Math.min(...ys) - CHART_PAD;
+  return {
+    x: minX,
+    y: minY,
+    w: Math.max(...xs) + CHART_PAD - minX,
+    h: Math.max(...ys) + CHART_PAD - minY,
+  };
+})();
+
 const buildAdjacency = (): Map<string, string[]> => {
   const adj = new Map<string, string[]>();
   const add = (a: string, b: string): void => {
