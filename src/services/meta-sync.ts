@@ -42,6 +42,7 @@ const metaValues = (): MetaValues => {
     selectedShip: s.selectedShip,
     hangar: s.hangar,
     themes: s.themes,
+    tutorialSeen: s.tutorialSeen,
     engravings: s.engravings,
     badges: s.badges,
     codex: s.codex,

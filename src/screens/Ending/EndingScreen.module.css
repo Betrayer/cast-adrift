@@ -28,9 +28,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .beat,
-  .tallyLine {
-    animation: none;
-  }
+:root[data-ca-motion='reduced'] .beat, :root[data-ca-motion='reduced'] .tallyLine {
+  animation: none;
 }

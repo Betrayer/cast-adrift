@@ -6,7 +6,7 @@
   gap: 20px;
   min-height: 100dvh;
   padding: 24px;
-  background: #0b0f1a;
+  background: var(--ca-bg);
 }
 
 .title {
@@ -23,8 +23,8 @@
   width: 168px;
   padding: 22px 16px;
   border-radius: 14px;
-  border: 2px solid #2a3853;
-  background: #10182a;
+  border: 2px solid var(--ca-line);
+  background: var(--ca-surface1);
 }
 
 .reveal {
@@ -80,8 +80,8 @@
   width: 178px;
   padding: 16px;
   border-radius: 12px;
-  border: 1px solid #2a3853;
-  background: #10182a;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
   animation: perkFlip 360ms ease-out both;
 }
 
@@ -94,4 +94,9 @@
     opacity: 1;
     transform: rotateY(0) translateY(0);
   }
+}
+
+:root[data-ca-motion='reduced'] .reveal,
+:root[data-ca-motion='reduced'] .perkCard {
+  animation: none;
 }

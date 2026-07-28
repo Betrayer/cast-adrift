@@ -25,9 +25,10 @@ import { ShipyardScreen } from '@/screens/Shipyard/ShipyardScreen';
 import { ShopScreen } from '@/screens/Shop/ShopScreen';
 import { SummaryScreen } from '@/screens/Summary/SummaryScreen';
 import { useAppStore } from '@/stores/appStore';
+import type { ScreenId } from '@/types';
+import styles from './Router.module.css';
 
-export const Router = () => {
-  const screen = useAppStore((s) => s.screen);
+const screenFor = (screen: ScreenId) => {
   if (screen === 'menu') return <MenuScreen />;
   if (screen === 'settings') return <SettingsScreen />;
   if (screen === 'battle') return <BattleScreen />;
@@ -54,4 +55,15 @@ export const Router = () => {
   if (screen === 'finale') return <FinaleScreen />;
   if (screen === 'ending') return <EndingScreen />;
   return <StubScreen screen={screen} />;
+};
+
+// Screens crossfade on entry (DESIGN §10 transitions). The wrapper is keyed by
+// screen id so React remounts it and the animation replays every navigation.
+export const Router = () => {
+  const screen = useAppStore((s) => s.screen);
+  return (
+    <div key={screen} className={styles.screen}>
+      {screenFor(screen)}
+    </div>
+  );
 };

@@ -2,12 +2,21 @@ import '@mantine/core/styles.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
+import { applyFontScale, applyMotion, applyTheme } from '@/app/theme';
 import { setupAutosave } from '@/game/run/autosave';
 import { bootCloud } from '@/game/run/cloud';
 import { initI18n } from '@/i18n';
 import { bootMetaSync, setupMetaSync } from '@/services/meta-sync';
 import { initTma } from '@/services/tma';
 import { useAppStore } from '@/stores/appStore';
+import {
+  resolveReducedMotion,
+  useSettingsStore,
+} from '@/stores/settingsStore';
+
+applyTheme(useSettingsStore.getState().theme);
+applyFontScale(useSettingsStore.getState().fontScale);
+applyMotion(resolveReducedMotion(useSettingsStore.getState().reducedMotion));
 
 void initI18n();
 setupAutosave();

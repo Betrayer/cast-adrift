@@ -29,6 +29,10 @@ export type Locale = 'en' | 'uk' | 'ru';
 
 export type ReducedMotionSetting = 'auto' | 'on' | 'off';
 
+export type FontScale = 's' | 'm' | 'l';
+
+export type BattleSpeed = 'normal' | 'fast';
+
 export type EchoVerbosity = 'normal' | 'less' | 'off';
 
 export type RunSnapshot = Record<string, unknown>;

@@ -1,21 +1,16 @@
 import { Button, Text } from '@mantine/core';
 import { useEffect, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import { rarityColor } from '@/app/rarity';
 import { tokens } from '@/app/theme';
 import { DIE_BY_ID } from '@/data/dice';
+import { LOOT_SFX } from '@/data/audio';
 import { schools } from '@/data/schools';
+import { duckMusic, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
 import { useLootStore } from '@/stores/lootStore';
-import type { Rarity } from '@/types/content';
 import styles from './LootReveal.module.css';
-
-const RARITY_FRAME: Record<Rarity, string> = {
-  common: tokens.line,
-  uncommon: '#4A90E2',
-  rare: '#B08CFF',
-  legendary: '#E8B23A',
-};
 
 const BURST_DOTS = 8;
 const BURST_RADIUS = 92;
@@ -42,6 +37,11 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
 
   useEffect(() => {
     haptic('medium');
+    const def = DIE_BY_ID.get(dieId);
+    if (def !== undefined) {
+      playSfx(LOOT_SFX[def.rarity]);
+      duckMusic(def.rarity === 'legendary' ? 2000 : 1200);
+    }
     if (reduced) return;
     const id = window.setTimeout(() => {
       setRevealed(true);
@@ -49,13 +49,13 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
     return () => {
       window.clearTimeout(id);
     };
-  }, [reduced]);
+  }, [reduced, dieId]);
 
   const def = DIE_BY_ID.get(dieId);
   if (def === undefined) return null;
 
   const colors = schools[def.school];
-  const frameColor = RARITY_FRAME[def.rarity];
+  const frameColor = rarityColor(def.rarity);
 
   const onOverlayClick = (): void => {
     if (!revealed) {
@@ -78,6 +78,9 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
       <Text className={styles.title} c={tokens.dim}>
         {t('battle:lootNew')}
       </Text>
+      {revealed && !reduced && def.rarity === 'legendary' ? (
+        <div className={styles.beam} style={{ color: frameColor }} />
+      ) : null}
       <div className={styles.stage}>
         <div
           className={`${styles.card ?? ''} ${revealed ? styles.cardRevealed ?? '' : ''} ${reduced ? styles.cardInstant ?? '' : ''

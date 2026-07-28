@@ -14,6 +14,7 @@ import {
 } from "@/game/chart/engine";
 import { chartNodeLines, chartNodeTitle } from "@/game/chart/describe";
 import { useAppStore } from "@/stores/appStore";
+import { playSfx } from "@/services/audio";
 import { useMetaStore } from "@/stores/metaStore";
 import styles from "./ChartScreen.module.css";
 
@@ -131,7 +132,9 @@ export const ChartScreen = () => {
   };
 
   const allocate = (id: string): void => {
-    if (canAllocate(id, level, picks)) allocatePick(id);
+    if (!canAllocate(id, level, picks)) return;
+    playSfx("chartAllocate");
+    allocatePick(id);
   };
 
   const refund = (id: string): void => {

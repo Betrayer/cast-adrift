@@ -10,5 +10,25 @@
   "echoVerbosity": "Разговорчивость Эхо",
   "echoNormal": "Обычная",
   "echoLess": "Меньше",
-  "screenShake": "Тряска экрана"
+  "screenShake": "Тряска экрана",
+  "fontScale": "Размер текста",
+  "fontS": "S",
+  "fontM": "M",
+  "fontL": "L",
+  "battleSpeed": "Скорость боя",
+  "speedNormal": "Обычная",
+  "speedFast": "Быстрая",
+  "tutorialReset": "Показать обучение снова",
+  "theme": {
+    "label": "Тема",
+    "deepSpace": "Глубокий космос",
+    "terminal": "Терминал",
+    "blueprint": "Чертёж",
+    "aurora": "Аврора",
+    "use": "Выбрать",
+    "active": "Активна",
+    "owned": "Открыта",
+    "unlock": "Открыть",
+    "price": "{{n}} осколков"
+  }
 }

@@ -51,6 +51,7 @@ export interface MetaValues {
   selectedShip: ShipId;
   hangar: { deck: string[] };
   themes: string[];
+  tutorialSeen: string[];
   engravings: Record<string, string[]>;
   badges: string[];
   codex: string[];
@@ -85,6 +86,8 @@ export interface MetaState extends MetaValues {
   selectShip: (id: ShipId) => void;
   buyShip: (id: ShipId, price: number) => boolean;
   unlockTheme: (id: string) => void;
+  markTutorialSeen: (id: string) => void;
+  resetTutorial: () => void;
   engrave: (defId: string, engravingId: string, price: number) => boolean;
   removeEngraving: (defId: string, engravingId: string) => void;
   awardBadge: (id: string) => boolean;
@@ -100,7 +103,7 @@ export interface MetaState extends MetaValues {
   bumpLifetime: (delta: Partial<MetaStats>) => void;
 }
 
-export const META_VERSION = 6;
+export const META_VERSION = 7;
 
 export const SMOTRITEL_BADGE = 'keeper';
 
@@ -150,6 +153,7 @@ const createInitialMetaValues = (): MetaValues => ({
   selectedShip: 'wanderer',
   hangar: { deck: [...STARTER_DECK] },
   themes: ['deepSpace'],
+  tutorialSeen: [],
   engravings: {},
   badges: [],
   codex: [],
@@ -272,6 +276,9 @@ export const migrateMeta = (
         ? { deck: [...(prev.hangar as { deck: string[] }).deck] }
         : base.hangar,
     themes: Array.isArray(prev.themes) ? prev.themes : base.themes,
+    tutorialSeen: Array.isArray(prev.tutorialSeen)
+      ? prev.tutorialSeen.filter((id): id is string => typeof id === 'string')
+      : base.tutorialSeen,
     engravings: coerceEngravings(prev.engravings),
     badges: Array.isArray(prev.badges) ? prev.badges : base.badges,
     codex: Array.isArray(prev.codex) ? prev.codex : base.codex,
@@ -410,6 +417,18 @@ export const useMetaStore = create<MetaState>()(
 
       unlockTheme: (id) => {
         set((s) => (s.themes.includes(id) ? s : { themes: [...s.themes, id] }));
+      },
+
+      markTutorialSeen: (id) => {
+        set((s) =>
+          s.tutorialSeen.includes(id)
+            ? s
+            : { tutorialSeen: [...s.tutorialSeen, id] },
+        );
+      },
+
+      resetTutorial: () => {
+        set({ tutorialSeen: [] });
       },
 
       // Engravings are keyed by die definition (Phase-10 amendment 3): the
@@ -569,6 +588,7 @@ export const useMetaStore = create<MetaState>()(
         selectedShip: s.selectedShip,
         hangar: s.hangar,
         themes: s.themes,
+        tutorialSeen: s.tutorialSeen,
         engravings: s.engravings,
         badges: s.badges,
         codex: s.codex,

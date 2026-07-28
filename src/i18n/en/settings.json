@@ -10,5 +10,25 @@
   "echoVerbosity": "Echo chatter",
   "echoNormal": "Normal",
   "echoLess": "Less",
-  "screenShake": "Screen shake"
+  "screenShake": "Screen shake",
+  "fontScale": "Text size",
+  "fontS": "S",
+  "fontM": "M",
+  "fontL": "L",
+  "battleSpeed": "Battle speed",
+  "speedNormal": "Normal",
+  "speedFast": "Fast",
+  "tutorialReset": "Show tutorial again",
+  "theme": {
+    "label": "Theme",
+    "deepSpace": "Deep Space",
+    "terminal": "Terminal",
+    "blueprint": "Blueprint",
+    "aurora": "Aurora",
+    "use": "Use",
+    "active": "Active",
+    "owned": "Unlocked",
+    "unlock": "Unlock",
+    "price": "{{n}} shards"
+  }
 }

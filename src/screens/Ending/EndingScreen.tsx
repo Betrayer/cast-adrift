@@ -7,7 +7,7 @@ import {
   Text,
   Title,
 } from '@mantine/core';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tokens } from '@/app/theme';
 import { beaconsResolved } from '@/data/events/beacons';
@@ -16,6 +16,7 @@ import { buildEpilogue } from '@/data/narrative/epilogue';
 import { finalMemoryCodexId } from '@/data/narrative/memories';
 import { CODEX_BY_ID } from '@/data/codex';
 import { finishEnding } from '@/game/run/flow';
+import { duckMusic, playSfx } from '@/services/audio';
 import { useRunStore } from '@/stores/runStore';
 import styles from './EndingScreen.module.css';
 
@@ -26,6 +27,11 @@ export const EndingScreen = () => {
   const axis = useRunStore((s) => s.axis);
   const ascension = useRunStore((s) => s.ascension);
   const [beatIndex, setBeatIndex] = useState(0);
+
+  useEffect(() => {
+    playSfx('endingSting');
+    duckMusic(2600);
+  }, []);
 
   const ending = endingId === null ? undefined : ENDING_BY_ID.get(endingId);
 

@@ -8,7 +8,7 @@
   justify-content: center;
   gap: 18px;
   padding: 24px;
-  background: rgba(8, 11, 20, 0.92);
+  background: var(--ca-bg-a86);
   animation: fadeIn 240ms ease-out;
 }
 
@@ -73,12 +73,12 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .overlay,
-  .ring,
-  .level,
-  .chip,
-  .card {
-    animation: none;
-  }
+.rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+:root[data-ca-motion='reduced'] .overlay, :root[data-ca-motion='reduced'] .ring, :root[data-ca-motion='reduced'] .level, :root[data-ca-motion='reduced'] .chip, :root[data-ca-motion='reduced'] .card {
+  animation: none;
 }

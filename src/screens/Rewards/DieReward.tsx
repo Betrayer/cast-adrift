@@ -1,5 +1,6 @@
 import { Button, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { rarityColor } from "@/app/rarity";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { schools } from "@/data/schools";
@@ -7,15 +8,7 @@ import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import { resolveDieReward } from "@/game/run/flow";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useRunStore } from "@/stores/runStore";
-import type { Rarity } from "@/types/content";
 import styles from "./Rewards.module.css";
-
-const RARITY_FRAME: Record<Rarity, string> = {
-  common: tokens.line,
-  uncommon: "#4A90E2",
-  rare: "#B08CFF",
-  legendary: "#E8B23A",
-};
 
 export const DieReward = ({ dieId }: { dieId: string }) => {
   const { t } = useTranslation(["run", "battle", "content"]);
@@ -36,7 +29,7 @@ export const DieReward = ({ dieId }: { dieId: string }) => {
       </Text>
       <div
         className={`${styles.card ?? ""} ${reduced ? "" : styles.reveal ?? ""}`}
-        style={{ borderColor: RARITY_FRAME[def.rarity] }}
+        style={{ borderColor: rarityColor(def.rarity) }}
       >
         <Text className={styles.dieName} c={tokens.text}>
           {t(def.name)}

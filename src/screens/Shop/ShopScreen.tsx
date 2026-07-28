@@ -15,6 +15,7 @@ import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { schools } from "@/data/schools";
+import { playSfx } from "@/services/audio";
 import {
   DECK_CAP,
   ptsForDie,
@@ -85,6 +86,7 @@ export const ShopScreen = () => {
     if (item === undefined || item.sold) return;
     if (state.deck.length >= DECK_CAP || state.scrap < item.price) return;
     if (!state.spendScrap(item.price)) return;
+    playSfx("buy");
     state.addDie(item.defId);
     setShop({
       ...current,
@@ -107,6 +109,7 @@ export const ShopScreen = () => {
       state.addScrap(item.price);
       return;
     }
+    playSfx("buy");
     setShop({
       ...current,
       modules: current.modules.map((it, i) =>

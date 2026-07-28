@@ -19,8 +19,8 @@
   align-items: flex-start;
   gap: 12px;
   padding: 10px 12px;
-  background: #182238;
-  border: 1px solid #2a3853;
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-line);
   border-radius: 10px;
 }
 
@@ -42,15 +42,15 @@
 .hullTrack {
   height: 9px;
   border-radius: 5px;
-  background: #0d1424;
-  border: 0.5px solid #2a3853;
+  background: var(--ca-hull-track);
+  border: 0.5px solid var(--ca-line);
   overflow: hidden;
 }
 
 .hullFill {
   height: 100%;
   border-radius: 5px;
-  background: #e4574e;
+  background: var(--ca-danger);
   transition: width 200ms ease;
 }
 
@@ -77,21 +77,21 @@
 }
 
 .pillShield {
-  background: #12263b;
-  border-color: #4a90e2;
-  color: #9cc4f2;
+  background: var(--ca-school-blue-fill);
+  border-color: var(--ca-school-blue-stroke);
+  color: var(--ca-school-blue-text);
 }
 
 .pillScrap {
-  background: #2e2412;
-  border-color: #e8b23a;
-  color: #f0ce7e;
+  background: var(--ca-school-yellow-fill);
+  border-color: var(--ca-amber);
+  color: var(--ca-school-yellow-text);
 }
 
 .pillCharge {
-  background: #2e2412;
-  border-color: #e8b23a;
-  color: #f0ce7e;
+  background: var(--ca-school-yellow-fill);
+  border-color: var(--ca-amber);
+  color: var(--ca-school-yellow-text);
 }
 
 .nudgeStrip {
@@ -102,8 +102,8 @@
   display: flex;
   gap: 8px;
   padding: 6px 8px;
-  background: rgba(24, 34, 56, 0.92);
-  border: 1px solid #2a3853;
+  background: var(--ca-surface2-a92);
+  border: 1px solid var(--ca-line);
   border-radius: 10px;
 }
 
@@ -114,7 +114,7 @@
 }
 
 .enemyChipTargeted {
-  border-color: #7c5cff;
+  border-color: var(--ca-accent);
 }
 
 .enemyRow {
@@ -128,8 +128,8 @@
 }
 
 .enemyChip {
-  background: rgba(24, 34, 56, 0.92);
-  border: 1px solid #2a3853;
+  background: var(--ca-surface2-a92);
+  border: 1px solid var(--ca-line);
   border-radius: 12px;
   padding: 8px 12px;
   min-width: 140px;
@@ -148,22 +148,37 @@
   white-space: nowrap;
 }
 
+.intentPulse {
+  animation: intent-pulse 420ms ease-out;
+}
+
+@keyframes intent-pulse {
+  0% {
+    transform: scale(0.86);
+    filter: brightness(1.9);
+  }
+  100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+}
+
 .intentAttack {
-  background: #2e1517;
-  border-color: #e4574e;
-  color: #f0a09a;
+  background: var(--ca-school-red-fill);
+  border-color: var(--ca-danger);
+  color: var(--ca-school-red-text);
 }
 
 .intentShield {
-  background: #12263b;
-  border-color: #4a90e2;
-  color: #9cc4f2;
+  background: var(--ca-school-blue-fill);
+  border-color: var(--ca-school-blue-stroke);
+  color: var(--ca-school-blue-text);
 }
 
 .intentUtility {
-  background: #221a33;
-  border-color: #b08cff;
-  color: #d9cbff;
+  background: var(--ca-school-black-fill);
+  border-color: var(--ca-school-black-stroke);
+  color: var(--ca-school-black-text);
 }
 
 .bottomBar {
@@ -193,7 +208,7 @@
   font-size: 11px;
   line-height: 16px;
   white-space: nowrap;
-  background: rgba(16, 24, 42, 0.92);
+  background: var(--ca-surface1-a92);
   border: 1px solid;
   animation: chip-pop 260ms ease-out;
 }
@@ -237,4 +252,14 @@
 .activeBtnRow {
   display: flex;
   gap: 8px;
+}
+
+:root[data-ca-motion='reduced'] .hullFill {
+  transition: none;
+}
+
+:root[data-ca-motion='reduced'] .hullFlash,
+:root[data-ca-motion='reduced'] .intentPulse,
+:root[data-ca-motion='reduced'] .resChip {
+  animation: none;
 }

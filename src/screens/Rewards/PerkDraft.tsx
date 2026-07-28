@@ -1,18 +1,12 @@
 import { Button, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { rarityColor } from "@/app/rarity";
 import { tokens } from "@/app/theme";
 import { PERK_BY_ID } from "@/data/perks";
-import type { PerkRarity } from "@/data/perks/types";
 import { SKIP_SCRAP } from "@/game/run/perkDraft";
 import { resolvePerkChoice } from "@/game/run/flow";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import styles from "./Rewards.module.css";
-
-const RARITY_COLOR: Record<PerkRarity, string> = {
-  common: tokens.line,
-  uncommon: "#4A90E2",
-  rare: "#B08CFF",
-};
 
 export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
   const { t } = useTranslation(["run", "content"]);
@@ -34,7 +28,7 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
               key={id}
               className={styles.perkCard}
               style={{
-                borderColor: RARITY_COLOR[perk.rarity],
+                borderColor: rarityColor(perk.rarity),
                 animationDelay: reduced ? undefined : `${String(index * 90)}ms`,
                 animation: reduced ? "none" : undefined,
               }}

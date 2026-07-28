@@ -139,7 +139,11 @@
     "empty": "Nothing logged yet.",
     "locked": "Not yet uncovered",
     "back": "Back",
-    "unread": "new"
+    "unread": "new",
+    "glyphLegend": {
+      "title": "School glyphs",
+      "body": "Every die carries a corner shape so schools stay apart without colour: Red — triangle · Blue — square · Green — leaf · Yellow — ring · Black — spike · Grey — dot · Prismatic — star."
+    }
   },
   "consequenceToast": "Consequence: {{text}}",
   "rewards": {
@@ -243,5 +247,29 @@
     "hint": "Pick one. The perk draft follows.",
     "module": "module",
     "install": "Install"
+  },
+  "tutorial": {
+    "next": "Next",
+    "skipAll": "Skip all",
+    "place": {
+      "title": "Drag a die into a system",
+      "body": "Roll, then drag dice from the tray onto Weapons, Shields, Engines, Sensors or the Reactor. A die never fits a slot whose cap is below its face."
+    },
+    "endTurn": {
+      "title": "Resolve the turn",
+      "body": "When the board reads the way you want it, end the turn. Systems fire top to bottom, then the enemy answers."
+    },
+    "reroll": {
+      "title": "Rerolls are free once",
+      "body": "Pick any dice still in the tray and reroll them. Rerolls do not carry over between turns — an unused one is wasted."
+    },
+    "nudge": {
+      "title": "Charge buys precision",
+      "body": "Select a die and spend charge to nudge its face up or down by one. Charge also pays for extra rerolls and surges."
+    },
+    "jump": {
+      "title": "Choose the next node",
+      "body": "Tap a lit node, then Jump. Fog hides the rows ahead; Sensors and deep scans push the horizon further."
+    }
   }
 }

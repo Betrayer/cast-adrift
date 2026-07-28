@@ -30,7 +30,7 @@ import { hasTrait } from '@/game/run/perkMods';
 import { runHasTrait } from '@/game/run/runMods';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
-import { initAudio } from '@/services/audio';
+import { initAudio, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { createStreams } from '@/services/rng';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
@@ -38,6 +38,7 @@ import { useAppStore } from '@/stores/appStore';
 import { allowedSlotsForTurn, useBattleStore } from '@/stores/battleStore';
 import { useRunStore } from '@/stores/runStore';
 import { BossIntro } from '@/screens/Battle/BossIntro';
+import { FateInvocation } from '@/screens/Battle/FateInvocation';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
 import bossStyles from './BossIntro.module.css';
 import type { Intent } from '@/types/content';
@@ -167,7 +168,10 @@ const StatusCard = () => {
             {t('battle:scrap', { n: scrap })}
           </span>
         ) : null}
-        <span className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}>
+        <span
+          className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}
+          data-coach="charge"
+        >
           {t('battle:charge', { n: charge, max: CHARGE_CAP })}
         </span>
         <Group gap={4} justify="flex-end">
@@ -176,7 +180,10 @@ const StatusCard = () => {
             size="compact-xs"
             variant="default"
             disabled={!spendable || rerollsLeft <= 0 || charge < BONUS_REROLL_COST}
-            onClick={spendBonusReroll}
+            onClick={() => {
+              playSfx('reroll');
+              spendBonusReroll();
+            }}
           >
             {t('battle:buyReroll')}
           </Button>
@@ -185,7 +192,10 @@ const StatusCard = () => {
             size="compact-xs"
             variant="default"
             disabled={!spendable || charge < SURGE_COST}
-            onClick={spendSurge}
+            onClick={() => {
+              playSfx('surge');
+              spendSurge();
+            }}
           >
             {t('battle:surge')}
           </Button>
@@ -226,7 +236,8 @@ const EnemyChips = () => {
             </Text>
             {enemy.hp > 0 ? (
               <span
-                className={`${styles.intentPill ?? ''} ${intentPillClass(intent)}`}
+                key={intentLabel(t, intent)}
+                className={`${styles.intentPill ?? ''} ${intentPillClass(intent)} ${styles.intentPulse ?? ''}`}
               >
                 {intentLabel(t, intent)}
               </span>
@@ -312,6 +323,7 @@ const NudgeStrip = () => {
         variant="default"
         disabled={!affordable || die.value <= 1}
         onClick={() => {
+          playSfx('nudge');
           spendNudge(selectedDieUid, -1);
         }}
       >
@@ -323,6 +335,7 @@ const NudgeStrip = () => {
         variant="default"
         disabled={!affordable || die.value >= die.tier}
         onClick={() => {
+          playSfx('nudge');
           spendNudge(selectedDieUid, 1);
         }}
       >
@@ -501,7 +514,10 @@ const BottomBar = () => {
               className={styles.clickable}
               size="sm"
               disabled={rerollSelection.length === 0}
-              onClick={confirmReroll}
+              onClick={() => {
+                playSfx('reroll');
+                confirmReroll();
+              }}
             >
               {t('battle:rerollConfirm', {
                 k: rerollSelection.length,
@@ -516,6 +532,7 @@ const BottomBar = () => {
             variant="default"
             disabled={phase !== 'placement' || rerollsLeft <= 0}
             onClick={toggleRerollMode}
+            data-coach="reroll"
           >
             {t('battle:reroll', { n: rerollsLeft })}
           </Button>
@@ -527,6 +544,7 @@ const BottomBar = () => {
         fullWidth
         disabled={phase !== 'placement' || rerollMode}
         onClick={endTurn}
+        data-coach="endTurn"
       >
         {t('battle:endTurn')}
       </Button>
@@ -657,6 +675,7 @@ export const BattleScreen = () => {
         <BottomBar />
       </div>
       <LootReveal />
+      <FateInvocation />
       {bossFall ? <div className={bossStyles.bossFall} /> : null}
       <BossIntro />
       {phase === 'ended' && !runActive ? <EndOverlay /> : null}

@@ -5,7 +5,7 @@
   touch-action: none;
   cursor: grab;
   background:
-    radial-gradient(circle at 50% 45%, #131c30 0%, #0b0f1a 70%);
+    radial-gradient(circle at 50% 45%, var(--ca-surface2) 0%, var(--ca-bg) 70%);
 }
 
 .viewport:active {
@@ -38,9 +38,7 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .pulse {
-    animation: none;
+:root[data-ca-motion='reduced'] .pulse {
+  animation: none;
     opacity: 0.9;
-  }
 }

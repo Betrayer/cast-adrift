@@ -1,0 +1,79 @@
+.root {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  pointer-events: none;
+}
+
+.dim {
+  position: fixed;
+  background: var(--ca-shadow);
+  opacity: 0.72;
+  pointer-events: auto;
+}
+
+.cutout {
+  position: fixed;
+  border-radius: 12px;
+  border: 2px solid var(--ca-accent);
+  box-shadow: 0 0 0 2px var(--ca-bg);
+  pointer-events: none;
+  animation: cutoutPulse 1.6s ease-in-out infinite;
+}
+
+.card {
+  position: fixed;
+  max-width: 300px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  animation: cardIn 220ms ease-out both;
+}
+
+.title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ca-text);
+}
+
+.body {
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ca-dim);
+}
+
+.actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+@keyframes cutoutPulse {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:root[data-ca-motion='reduced'] .cutout, :root[data-ca-motion='reduced'] .card {
+  animation: none;
+}

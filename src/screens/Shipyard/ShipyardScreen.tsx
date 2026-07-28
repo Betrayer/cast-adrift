@@ -8,7 +8,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
@@ -18,9 +18,11 @@ import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { FUSION_COST, mkUpgradeCost } from "@/game/economy/prices";
 import { autosaveRun, completeNode } from "@/game/run/flow";
+import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
+import styles from "./ShipyardScreen.module.css";
 
 export const ShipyardScreen = () => {
   const { t } = useTranslation(["run", "battle", "content"]);
@@ -35,6 +37,10 @@ export const ShipyardScreen = () => {
   const seed = useRunStore((s) => s.seed);
   const position = useRunStore((s) => s.position);
   const [repair, setRepair] = useState(0);
+  const [swept, setSwept] = useState<{ slotId: SlotId; key: number } | null>(
+    null,
+  );
+  const sweepKey = useRef(0);
 
   const greeting = createStream(
     deriveSeed(seed, `keeper:${position ?? "yard"}`),
@@ -61,6 +67,12 @@ export const ShipyardScreen = () => {
 
   const maxRepair = Math.min(hullMax - hull, Math.floor(scrap / 2));
 
+  const markUpgraded = (slotId: SlotId): void => {
+    playSfx("buy");
+    setSwept({ slotId, key: sweepKey.current + 1 });
+    sweepKey.current += 1;
+  };
+
   const buyMk = (slotId: SlotId): void => {
     const state = useRunStore.getState();
     const current = state.mkLevels[slotId] ?? 1;
@@ -71,6 +83,7 @@ export const ShipyardScreen = () => {
     if (!state.spendScrap(cost)) return;
     state.bumpMk(slotId);
     if (state.shipyardDiscount > 0) useRunStore.setState({ shipyardDiscount: 0 });
+    markUpgraded(slotId);
     autosaveRun();
   };
 
@@ -80,6 +93,7 @@ export const ShipyardScreen = () => {
     if ((state.mkLevels[slotId] ?? 1) >= 3) return;
     if (!state.spendVoucher()) return;
     state.bumpMk(slotId);
+    markUpgraded(slotId);
     autosaveRun();
   };
 
@@ -140,7 +154,17 @@ export const ShipyardScreen = () => {
             const target = maxed ? 3 : ((mk + 1) as Exclude<MkLevel, 1>);
             const cost = maxed ? 0 : discountedMk(target);
             return (
-              <Paper key={slotId} bg={tokens.surface1} p="xs" radius="md" withBorder>
+              <Paper
+                key={slotId}
+                bg={tokens.surface1}
+                p="xs"
+                radius="md"
+                withBorder
+                className={styles.slot}
+              >
+                {swept?.slotId === slotId ? (
+                  <span key={swept.key} className={styles.sweep} />
+                ) : null}
                 <Group justify="space-between" wrap="nowrap">
                   <Stack gap={0}>
                     <Text size="sm" c={tokens.text}>

@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
-  background: rgba(6, 9, 16, 0.86);
+  background: var(--ca-bg-a86);
   cursor: pointer;
   animation: fade-in 240ms ease-out;
 }
@@ -56,20 +56,20 @@
 
 .back {
   transform: rotateY(0deg);
-  background: #10182a;
-  border-color: #2a3853;
+  background: var(--ca-surface1);
+  border-color: var(--ca-line);
 }
 
 .backMark {
   width: 46px;
   height: 46px;
   border-radius: 12px;
-  border: 2px dashed #5c6a85;
+  border: 2px dashed var(--ca-faint);
 }
 
 .front {
   transform: rotateY(180deg);
-  background: #10182a;
+  background: var(--ca-surface1);
 }
 
 .frontGlow {
@@ -129,4 +129,46 @@
   to {
     opacity: 1;
   }
+}
+
+.beam {
+  position: absolute;
+  left: 50%;
+  top: -30vh;
+  width: 96px;
+  height: 160vh;
+  margin-left: -48px;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    transparent,
+    currentColor 35%,
+    currentColor 65%,
+    transparent
+  );
+  opacity: 0;
+  animation: beam 900ms ease-out both;
+}
+
+@keyframes beam {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.15);
+  }
+  30% {
+    opacity: 0.5;
+    transform: scaleX(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0.6);
+  }
+}
+
+:root[data-ca-motion='reduced'] .overlay, :root[data-ca-motion='reduced'] .card, :root[data-ca-motion='reduced'] .dot, :root[data-ca-motion='reduced'] .beam {
+  animation: none;
+}
+
+:root[data-ca-motion='reduced'] .card {
+  transition: none;
 }

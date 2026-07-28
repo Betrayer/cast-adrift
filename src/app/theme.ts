@@ -1,76 +1,141 @@
 import { createTheme, type MantineColorsTuple } from '@mantine/core';
+import { mixHex, rgba } from '@/app/color';
+import {
+  applySchoolPalette,
+  SCHOOL_IDS,
+  tintedSchools,
+} from '@/data/schools';
+import {
+  DEFAULT_THEME_ID,
+  THEME_BY_ID,
+  type ThemeDef,
+  type ThemeId,
+  type ThemeTokens,
+} from '@/data/themes';
+import type { FontScale } from '@/types';
 
-export const tokens = {
-  bg: '#0B0F1A',
-  surface1: '#10182A',
-  surface2: '#182238',
-  line: '#2A3853',
-  text: '#E8EDF7',
-  dim: '#93A0B8',
-  faint: '#5C6A85',
-  accent: '#7C5CFF',
-  danger: '#E4574E',
-  amber: '#E8B23A',
-} as const;
+export type { ThemeTokens } from '@/data/themes';
 
-const accent: MantineColorsTuple = [
-  '#F1EDFF',
-  '#DED4FF',
-  '#C4B3FF',
-  '#A98FFF',
-  '#9273FF',
-  '#7C5CFF',
-  '#6C4CE8',
-  '#5A3DC7',
-  '#4930A3',
-  '#392480',
-];
+export const tokens: ThemeTokens = { ...THEME_BY_ID[DEFAULT_THEME_ID].palette };
 
-const danger: MantineColorsTuple = [
-  '#FCEDEC',
-  '#F6D0CD',
-  '#EFAFAA',
-  '#E98E87',
-  '#E67268',
-  '#E4574E',
-  '#C74A42',
-  '#A63D37',
-  '#84302B',
-  '#632420',
-];
+const TOKEN_KEYS = Object.keys(tokens) as (keyof ThemeTokens)[];
 
-const amber: MantineColorsTuple = [
-  '#FBF3E0',
-  '#F6E3B8',
-  '#F0D28D',
-  '#ECC463',
-  '#EABB49',
-  '#E8B23A',
-  '#CB9B31',
-  '#A98128',
-  '#86661F',
-  '#644C17',
-];
+const ramp = (base: string): MantineColorsTuple => {
+  const shades: string[] = [];
+  for (let i = 0; i < 5; i += 1) {
+    shades.push(mixHex(base, '#FFFFFF', ((5 - i) / 5) * 0.88));
+  }
+  shades.push(base);
+  for (let i = 6; i < 10; i += 1) {
+    shades.push(mixHex(base, '#000000', ((i - 5) / 4) * 0.5));
+  }
+  return shades as unknown as MantineColorsTuple;
+};
 
-const dark: MantineColorsTuple = [
-  '#E8EDF7',
-  '#93A0B8',
-  '#5C6A85',
-  '#3D4C6B',
-  '#2A3853',
-  '#182238',
-  '#10182A',
-  '#0B0F1A',
-  '#080C14',
-  '#05080E',
-];
+const darkRamp = (palette: ThemeTokens): MantineColorsTuple =>
+  [
+    palette.text,
+    palette.dim,
+    palette.faint,
+    mixHex(palette.faint, palette.line, 0.5),
+    palette.line,
+    palette.surface2,
+    palette.surface1,
+    palette.bg,
+    mixHex(palette.bg, '#000000', 0.35),
+    mixHex(palette.bg, '#000000', 0.6),
+  ] as unknown as MantineColorsTuple;
 
-export const theme = createTheme({
-  fontFamily:
-    '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
-  primaryColor: 'accent',
-  primaryShade: 5,
-  defaultRadius: 'md',
-  colors: { accent, danger, amber, dark },
-  other: { tokens },
-});
+export const mantineThemeFor = (def: ThemeDef) =>
+  createTheme({
+    fontFamily: def.dieStyle.glyphFont,
+    primaryColor: 'accent',
+    primaryShade: 5,
+    defaultRadius: 'md',
+    colors: {
+      accent: ramp(def.palette.accent),
+      danger: ramp(def.palette.danger),
+      amber: ramp(def.palette.amber),
+      dark: darkRamp(def.palette),
+    },
+    other: { tokens: def.palette, themeId: def.id },
+  });
+
+type ThemeListener = (def: ThemeDef) => void;
+
+const listeners = new Set<ThemeListener>();
+
+export const onThemeChange = (listener: ThemeListener): (() => void) => {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+};
+
+let active: ThemeDef = THEME_BY_ID[DEFAULT_THEME_ID];
+
+export const currentTheme = (): ThemeDef => active;
+
+const writeCssVariables = (def: ThemeDef): void => {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement.style;
+  for (const key of TOKEN_KEYS) root.setProperty(`--ca-${key}`, tokens[key]);
+  root.setProperty('--ca-shadow', rgba(mixHex(def.palette.bg, '#000000', 0.6), 0.72));
+  root.setProperty('--ca-veil', mixHex(def.palette.bg, '#000000', 0.35));
+  root.setProperty('--ca-hull-track', mixHex(def.palette.bg, '#000000', 0.3));
+  root.setProperty('--ca-surface1-a92', rgba(def.palette.surface1, 0.92));
+  root.setProperty('--ca-surface2-a92', rgba(def.palette.surface2, 0.92));
+  root.setProperty('--ca-bg-a86', rgba(mixHex(def.palette.bg, '#000000', 0.4), 0.86));
+  root.setProperty('--ca-danger-a12', rgba(def.palette.danger, 0.12));
+  root.setProperty('--ca-danger-a55', rgba(def.palette.danger, 0.55));
+  root.setProperty('--ca-danger-a0', rgba(def.palette.danger, 0));
+  const palette = tintedSchools(def.schoolTint);
+  for (const id of SCHOOL_IDS) {
+    const colors = palette[id];
+    root.setProperty(`--ca-school-${id}-fill`, colors.fill);
+    root.setProperty(`--ca-school-${id}-stroke`, colors.stroke);
+    root.setProperty(`--ca-school-${id}-text`, colors.text);
+  }
+  document.body.style.background = def.palette.bg;
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if (meta !== null) meta.setAttribute('content', def.palette.bg);
+  document.documentElement.dataset.caTheme = def.id;
+};
+
+export const applyTheme = (id: ThemeId): ThemeDef => {
+  const def = THEME_BY_ID[id] ?? THEME_BY_ID[DEFAULT_THEME_ID];
+  if (active.id === def.id && tokens.bg === def.palette.bg) {
+    // Still write the DOM side: a boot call has to seed the variables even
+    // when the id already matches the module default.
+    writeCssVariables(def);
+    return def;
+  }
+  active = def;
+  for (const key of TOKEN_KEYS) tokens[key] = def.palette[key];
+  applySchoolPalette(tintedSchools(def.schoolTint));
+  writeCssVariables(def);
+  for (const listener of [...listeners]) listener(def);
+  return def;
+};
+
+// The setting is tri-state (auto/on/off), so the DOM is told the *resolved*
+// answer instead of letting a bare `prefers-reduced-motion` media query
+// override a player who deliberately turned motion back on.
+export const applyMotion = (reduced: boolean): void => {
+  if (typeof document === 'undefined') return;
+  document.documentElement.dataset.caMotion = reduced ? 'reduced' : 'full';
+};
+
+export const FONT_SCALE_VALUE: Record<FontScale, number> = {
+  s: 0.875,
+  m: 1,
+  l: 1.125,
+};
+
+export const applyFontScale = (scale: FontScale): void => {
+  if (typeof document === 'undefined') return;
+  document.documentElement.style.setProperty(
+    '--mantine-scale',
+    String(FONT_SCALE_VALUE[scale]),
+  );
+};
