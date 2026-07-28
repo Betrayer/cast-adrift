@@ -27,7 +27,14 @@ interface Skeleton {
   bossId: NodeId;
 }
 
-const buildSkeleton = (rng: RngStream): Skeleton => {
+export interface MapGenOptions {
+  // Drift never ends: the row-15 node becomes a second mini-boss gate, and
+  // clearing it hands the run to the next sector instead of the finale.
+  bossAsGate?: boolean;
+  noShops?: boolean;
+}
+
+const buildSkeleton = (rng: RngStream, options: MapGenOptions): Skeleton => {
   const nodes = new Map<NodeId, MapNode>();
   const edgeKeys = new Set<string>();
   const edges: [NodeId, NodeId][] = [];
@@ -77,7 +84,7 @@ const buildSkeleton = (rng: RngStream): Skeleton => {
       let type: NodeType;
       if (row === BOSS_ROW) {
         lane = BOSS_LANE;
-        type = "boss";
+        type = options.bossAsGate === true ? "miniboss" : "boss";
       } else if (row === GATE_ROW) {
         lane = nearestGateLane(walker.lane);
         type = "miniboss";
@@ -106,7 +113,7 @@ interface TypeSlot {
   maxRow: number;
 }
 
-const buildQuota = (rng: RngStream): TypeSlot[] => {
+const buildQuota = (rng: RngStream, options: MapGenOptions): TypeSlot[] => {
   const eliteCount = rng.int(2, 3);
   const eventCount = rng.int(4, 5);
   const slots: TypeSlot[] = [];
@@ -119,7 +126,9 @@ const buildQuota = (rng: RngStream): TypeSlot[] => {
   push("shipyard", 1, 8, 13);
   push("elite", eliteCount, 3, 14);
   push("anomaly", 2, 1, 14);
-  push("shop", 2, 1, 14);
+  // «Глушь» keeps the shipyards — a run with no repairs at all is unwinnable —
+  // and takes the two markets instead.
+  if (options.noShops !== true) push("shop", 2, 1, 14);
   push("event", eventCount, 1, 14);
   return slots;
 };
@@ -143,13 +152,14 @@ const buildAdjacency = (
 const tryAssignTypes = (
   skeleton: Skeleton,
   rng: RngStream,
+  options: MapGenOptions,
 ): Map<NodeId, NodeType> | null => {
   const assigned = new Map<NodeId, NodeType>();
   const adj = buildAdjacency(skeleton.edges);
   const candidates = [...skeleton.nodes.values()].filter(
     (node) => node.type === "battle",
   );
-  const slots = buildQuota(rng);
+  const slots = buildQuota(rng, options);
 
   const conflicts = (node: MapNode, type: NodeType): boolean => {
     const neighbors = adj.get(node.id);
@@ -178,13 +188,17 @@ const tryAssignTypes = (
   return assigned;
 };
 
-export const generateSectorMap = (rng: RngStream, sector = 1): MapGraph => {
+export const generateSectorMap = (
+  rng: RngStream,
+  sector = 1,
+  options: MapGenOptions = {},
+): MapGraph => {
   void sector;
-  const skeleton = buildSkeleton(rng);
+  const skeleton = buildSkeleton(rng, options);
 
   let assignment: Map<NodeId, NodeType> | null = null;
   for (let attempt = 0; attempt < MAX_TYPE_ATTEMPTS; attempt += 1) {
-    assignment = tryAssignTypes(skeleton, rng);
+    assignment = tryAssignTypes(skeleton, rng, options);
     if (assignment !== null) break;
   }
 

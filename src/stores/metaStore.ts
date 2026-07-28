@@ -16,6 +16,28 @@ export interface MetaStats {
   shardsEarned: number;
   prologueDone: boolean;
   campaignClears: number;
+  kills: number;
+  scrapEarned: number;
+  deepestDrift: number;
+  driftRuns: number;
+  dailyRuns: number;
+  contractRuns: number;
+}
+
+export type DailyPlayState = "started" | "done";
+
+export interface DailyRecord {
+  state: DailyPlayState;
+  score: number;
+  rank: number | null;
+}
+
+export interface BestScores {
+  drift: number;
+  driftWeek: string | null;
+  driftWeekly: number;
+  dailyRank: number | null;
+  dailyDate: string | null;
 }
 
 export interface MetaValues {
@@ -31,6 +53,8 @@ export interface MetaValues {
   codex: string[];
   codexRead: string[];
   contracts: Record<string, number>;
+  dailyPlayed: Record<string, DailyRecord>;
+  best: BestScores;
   ascension: { campaign: number };
   flagsArchive: string[];
   bossFirstKills: string[];
@@ -63,9 +87,14 @@ export interface MetaState extends MetaValues {
   recordEnding: (endingId: string) => void;
   markPrologueDone: () => void;
   recordCampaignClear: (ascension: number) => void;
+  recordContractStars: (id: string, mask: number) => number;
+  markDailyStarted: (date: string) => void;
+  recordDaily: (date: string, score: number, rank: number | null) => void;
+  recordDriftScore: (score: number, week: string) => boolean;
+  bumpLifetime: (delta: Partial<MetaStats>) => void;
 }
 
-export const META_VERSION = 4;
+export const META_VERSION = 5;
 
 const STARTER_SPARE = 'yellow-d6';
 
@@ -76,6 +105,32 @@ const buildStarterCollection = (): CollectionEntry[] => {
   }
   return [...counts].map(([defId, count]) => ({ defId, count }));
 };
+
+export const createInitialMetaStats = (): MetaStats => ({
+  runs: 0,
+  wins: 0,
+  shardsEarned: 0,
+  prologueDone: false,
+  campaignClears: 0,
+  kills: 0,
+  scrapEarned: 0,
+  deepestDrift: 0,
+  driftRuns: 0,
+  dailyRuns: 0,
+  contractRuns: 0,
+});
+
+const LIFETIME_KEYS = [
+  "runs",
+  "wins",
+  "shardsEarned",
+  "campaignClears",
+  "kills",
+  "scrapEarned",
+  "driftRuns",
+  "dailyRuns",
+  "contractRuns",
+] as const;
 
 const createInitialMetaValues = (): MetaValues => ({
   shards: 0,
@@ -90,17 +145,19 @@ const createInitialMetaValues = (): MetaValues => ({
   codex: [],
   codexRead: [],
   contracts: {},
+  dailyPlayed: {},
+  best: {
+    drift: 0,
+    driftWeek: null,
+    driftWeekly: 0,
+    dailyRank: null,
+    dailyDate: null,
+  },
   ascension: { campaign: 0 },
   flagsArchive: [],
   bossFirstKills: [],
   endings: [],
-  stats: {
-    runs: 0,
-    wins: 0,
-    shardsEarned: 0,
-    prologueDone: false,
-    campaignClears: 0,
-  },
+  stats: createInitialMetaStats(),
 });
 
 const coerceCollection = (value: unknown): CollectionEntry[] => {
@@ -120,6 +177,39 @@ const coerceCollection = (value: unknown): CollectionEntry[] => {
     }
   }
   return out.length > 0 ? out : buildStarterCollection();
+};
+
+const coerceDailyPlayed = (value: unknown): Record<string, DailyRecord> => {
+  if (typeof value !== 'object' || value === null) return {};
+  const out: Record<string, DailyRecord> = {};
+  for (const [date, raw] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof raw !== 'object' || raw === null) continue;
+    const rec = raw as Partial<DailyRecord>;
+    out[date] = {
+      state: rec.state === 'done' ? 'done' : 'started',
+      score: typeof rec.score === 'number' ? rec.score : 0,
+      rank: typeof rec.rank === 'number' ? rec.rank : null,
+    };
+  }
+  return out;
+};
+
+const coerceBest = (value: unknown, base: BestScores): BestScores => {
+  if (typeof value !== 'object' || value === null) return base;
+  const prev = value as Partial<BestScores>;
+  return {
+    drift: typeof prev.drift === 'number' ? prev.drift : base.drift,
+    driftWeek:
+      typeof prev.driftWeek === 'string' ? prev.driftWeek : base.driftWeek,
+    driftWeekly:
+      typeof prev.driftWeekly === 'number'
+        ? prev.driftWeekly
+        : base.driftWeekly,
+    dailyRank:
+      typeof prev.dailyRank === 'number' ? prev.dailyRank : base.dailyRank,
+    dailyDate:
+      typeof prev.dailyDate === 'string' ? prev.dailyDate : base.dailyDate,
+  };
 };
 
 export const migrateMeta = (
@@ -165,6 +255,8 @@ export const migrateMeta = (
       typeof prev.contracts === 'object' && prev.contracts !== null
         ? (prev.contracts as Record<string, number>)
         : base.contracts,
+    dailyPlayed: coerceDailyPlayed(prev.dailyPlayed),
+    best: coerceBest(prev.best, base.best),
     ascension:
       typeof prev.ascension === 'object' &&
       prev.ascension !== null &&
@@ -180,13 +272,7 @@ export const migrateMeta = (
     endings: Array.isArray(prev.endings) ? prev.endings : base.endings,
     stats:
       typeof prev.stats === 'object' && prev.stats !== null
-        ? {
-            runs: (prev.stats as MetaStats).runs ?? 0,
-            wins: (prev.stats as MetaStats).wins ?? 0,
-            shardsEarned: (prev.stats as MetaStats).shardsEarned ?? 0,
-            prologueDone: (prev.stats as MetaStats).prologueDone ?? false,
-            campaignClears: (prev.stats as MetaStats).campaignClears ?? 0,
-          }
+        ? { ...base.stats, ...(prev.stats as Partial<MetaStats>) }
         : base.stats,
   };
 };
@@ -333,6 +419,80 @@ export const useMetaStore = create<MetaState>()(
           stats: { ...s.stats, campaignClears: s.stats.campaignClears + 1 },
         }));
       },
+
+      // Stars are a 3-bit mask and only ever accumulate, so a replay of a
+      // contract already three-starred grants no XP.
+      recordContractStars: (id, mask) => {
+        const previous = get().contracts[id] ?? 0;
+        const gained = mask & ~previous;
+        if (gained === 0) return 0;
+        set((s) => ({
+          contracts: { ...s.contracts, [id]: previous | mask },
+        }));
+        let count = 0;
+        for (let bit = 0; bit < 3; bit += 1) {
+          if ((gained & (1 << bit)) !== 0) count += 1;
+        }
+        return count;
+      },
+
+      markDailyStarted: (date) => {
+        set((s) =>
+          s.dailyPlayed[date] !== undefined
+            ? s
+            : {
+                dailyPlayed: {
+                  ...s.dailyPlayed,
+                  [date]: { state: 'started', score: 0, rank: null },
+                },
+              },
+        );
+      },
+
+      recordDaily: (date, score, rank) => {
+        set((s) => ({
+          dailyPlayed: {
+            ...s.dailyPlayed,
+            [date]: { state: 'done', score, rank },
+          },
+          best:
+            rank !== null &&
+            (s.best.dailyRank === null || rank < s.best.dailyRank)
+              ? { ...s.best, dailyRank: rank, dailyDate: date }
+              : s.best,
+        }));
+      },
+
+      recordDriftScore: (score, week) => {
+        const best = get().best;
+        const beatsAllTime = score > best.drift;
+        set((s) => ({
+          best: {
+            ...s.best,
+            drift: Math.max(s.best.drift, score),
+            driftWeek: week,
+            driftWeekly:
+              s.best.driftWeek === week
+                ? Math.max(s.best.driftWeekly, score)
+                : score,
+          },
+        }));
+        return beatsAllTime;
+      },
+
+      bumpLifetime: (delta) => {
+        set((s) => {
+          const stats = { ...s.stats };
+          for (const key of LIFETIME_KEYS) stats[key] += delta[key] ?? 0;
+          if (delta.deepestDrift !== undefined) {
+            stats.deepestDrift = Math.max(
+              stats.deepestDrift,
+              delta.deepestDrift,
+            );
+          }
+          return { stats };
+        });
+      },
     }),
     {
       name: 'ca.meta',
@@ -351,6 +511,8 @@ export const useMetaStore = create<MetaState>()(
         codex: s.codex,
         codexRead: s.codexRead,
         contracts: s.contracts,
+        dailyPlayed: s.dailyPlayed,
+        best: s.best,
         ascension: s.ascension,
         flagsArchive: s.flagsArchive,
         bossFirstKills: s.bossFirstKills,

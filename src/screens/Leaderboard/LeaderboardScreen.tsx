@@ -1,0 +1,204 @@
+import {
+  Button,
+  Group,
+  Loader,
+  Paper,
+  ScrollArea,
+  SegmentedControl,
+  Stack,
+  Text,
+} from "@mantine/core";
+import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { tokens } from "@/app/theme";
+import { boardUid } from "@/game/run/boards";
+import { isoWeekKey, utcDateKey } from "@/game/run/modes";
+import {
+  aroundMe,
+  dailyBoardId,
+  driftWeeklyBoardId,
+  DRIFT_ALLTIME_BOARD,
+  entryHidden,
+  rankEntries,
+  top,
+  type RankedEntry,
+} from "@/services/leaderboards";
+import { useAppStore } from "@/stores/appStore";
+
+type Tab = "daily" | "drift" | "week";
+
+const boardIdFor = (tab: Tab, now: number): string => {
+  if (tab === "daily") return dailyBoardId(utcDateKey(now));
+  if (tab === "week") return driftWeeklyBoardId(isoWeekKey(now));
+  return DRIFT_ALLTIME_BOARD;
+};
+
+type View = "top" | "around";
+
+// The fetched board carries the request it answered, so switching tabs shows the
+// loader instead of the previous tab's rows — and no setState happens in the
+// effect body itself.
+interface LoadedBoard {
+  key: string;
+  rows: RankedEntry[];
+  myRank: number | null;
+}
+
+// `?debug=1` greys flagged rows instead of hiding them, so a forged submission is
+// visible while testing but invisible in play (plan Task 5.3).
+const debugBoards = (): boolean => {
+  if (typeof window === "undefined") return false;
+  return new URLSearchParams(window.location.search).get("debug") === "1";
+};
+
+export const LeaderboardScreen = () => {
+  const { t } = useTranslation(["meta", "common"]);
+  const go = useAppStore((s) => s.go);
+  const params = useAppStore((s) => s.params);
+  const [tab, setTab] = useState<Tab>(
+    params?.tab === "daily" ? "daily" : params?.tab === "week" ? "week" : "drift",
+  );
+  const [view, setView] = useState<View>("top");
+  const [showFlagged] = useState(debugBoards);
+  const [now] = useState(() => Date.now());
+  const [loaded, setLoaded] = useState<LoadedBoard | null>(null);
+
+  const board = boardIdFor(tab, now);
+  const requestKey = `${board}:${view}`;
+
+  useEffect(() => {
+    let cancelled = false;
+    const fetchBoard = async (): Promise<void> => {
+      const uid = await boardUid();
+      const rows =
+        view === "around" && uid !== null
+          ? (await aroundMe(board, uid)).rows.filter(
+              (e) => showFlagged || e.isMe || !entryHidden(e, board),
+            )
+          : rankEntries(
+              (await top(board)).filter(
+                (e) => showFlagged || !entryHidden(e, board),
+              ),
+              uid,
+            );
+      if (cancelled) return;
+      setLoaded({
+        key: `${board}:${view}`,
+        rows,
+        myRank: rows.find((e) => e.isMe)?.rank ?? null,
+      });
+    };
+    void fetchBoard();
+    return () => {
+      cancelled = true;
+    };
+  }, [board, view, showFlagged]);
+
+  const ready = loaded !== null && loaded.key === requestKey;
+  const rows = ready ? loaded.rows : null;
+  const myRank = ready ? loaded.myRank : null;
+
+  return (
+    <Stack align="center" mih="100dvh" p="md" bg={tokens.bg} gap="sm">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+        <Stack gap="xs">
+          <Group justify="space-between">
+            <Text fw={700} c={tokens.text}>
+              {t("meta:board.title")}
+            </Text>
+            <Button
+              size="xs"
+              variant="default"
+              onClick={() => {
+                go("modes");
+              }}
+            >
+              {t("common:back")}
+            </Button>
+          </Group>
+          <SegmentedControl
+            fullWidth
+            size="xs"
+            value={tab}
+            onChange={(value) => {
+              setTab(value as Tab);
+            }}
+            data={[
+              { value: "daily", label: t("meta:board.tabDaily") },
+              { value: "drift", label: t("meta:board.tabDrift") },
+              { value: "week", label: t("meta:board.tabWeek") },
+            ]}
+          />
+          <SegmentedControl
+            fullWidth
+            size="xs"
+            value={view}
+            onChange={(value) => {
+              setView(value as View);
+            }}
+            data={[
+              { value: "top", label: t("meta:board.viewTop") },
+              { value: "around", label: t("meta:board.viewAround") },
+            ]}
+          />
+          <Text size="xs" c={tokens.faint}>
+            {myRank === null
+              ? t("meta:board.noRank")
+              : t("meta:board.myRank", { rank: myRank })}
+          </Text>
+        </Stack>
+      </Paper>
+
+      <ScrollArea h="calc(100dvh - 230px)" w="100%" maw={460}>
+        {rows === null ? (
+          <Group justify="center" py="xl">
+            <Loader size="sm" color="accent" />
+          </Group>
+        ) : rows.length === 0 ? (
+          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+            <Text size="sm" c={tokens.dim}>
+              {t("meta:board.empty")}
+            </Text>
+          </Paper>
+        ) : (
+          <Stack gap={4} pb="md">
+            {rows.map((entry) => {
+              const flagged = showFlagged && entryHidden(entry, board);
+              return (
+                <Paper
+                  key={entry.uid}
+                  bg={entry.isMe ? tokens.surface2 : tokens.surface1}
+                  p="xs"
+                  radius="sm"
+                  withBorder
+                  style={flagged ? { opacity: 0.4 } : undefined}
+                >
+                  <Group justify="space-between" wrap="nowrap" gap="xs">
+                    <Text size="sm" c={tokens.faint} w={32}>
+                      {entry.rank}
+                    </Text>
+                    <Text
+                      size="sm"
+                      c={entry.isMe ? tokens.accent : tokens.text}
+                      fw={entry.isMe ? 700 : 400}
+                      style={{ flex: 1, overflow: "hidden" }}
+                      truncate
+                    >
+                      {entry.name}
+                    </Text>
+                    <Text size="xs" c={tokens.faint}>
+                      {t("meta:board.depth", { n: entry.depth })}
+                    </Text>
+                    <Text size="sm" c={tokens.amber} fw={700}>
+                      {entry.score}
+                    </Text>
+                  </Group>
+                </Paper>
+              );
+            })}
+          </Stack>
+        )}
+      </ScrollArea>
+    </Stack>
+  );
+};

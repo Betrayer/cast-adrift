@@ -25,7 +25,10 @@ import {
   canPlaceDie,
   createEnemyStream,
   DEFAULT_CHARGE_CAP,
+  type ResonanceBoost,
 } from "@/game/battle/setup";
+import { computeMutatorMods } from "@/data/mutators";
+import type { PerkTrait } from "@/data/perks/types";
 import {
   createStreamFromState,
   restoreStreams,
@@ -36,7 +39,8 @@ import {
 } from "@/services/rng";
 import { hasTrait } from "@/game/run/perkMods";
 import { computeRunMods, runHasTrait } from "@/game/run/runMods";
-import { useRunStore } from "@/stores/runStore";
+import { recordAction } from "@/game/run/actionLog";
+import { useRunStore, type BattleTally } from "@/stores/runStore";
 import type {
   BattleOutcome,
   BattlePhase,
@@ -62,6 +66,7 @@ export interface BattleEncounter {
   interference?: number;
   perks?: readonly string[];
   chartPicks?: readonly string[];
+  mutators?: readonly string[];
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
@@ -71,6 +76,10 @@ export interface BattleEncounter {
   enemyHpBonusPct?: number;
   gateHpBonusPct?: number;
   eliteShield?: number;
+  resonanceBoost?: ResonanceBoost;
+  slotTierDelta?: Partial<Record<SlotId, number>>;
+  disabledSlots?: readonly SlotId[];
+  forcedTraits?: readonly PerkTrait[];
   scriptedSlots?: readonly (readonly SlotId[])[];
 }
 
@@ -88,6 +97,8 @@ export interface BattleValues {
   interference: number;
   perks: string[];
   chartPicks: string[];
+  mutators: string[];
+  forcedTraits: PerkTrait[];
   chargeCap: number;
   sacrificePool: number;
   bloodReactorUsed: boolean;
@@ -129,6 +140,11 @@ export interface BattleValues {
   beatSeq: number;
   blackUsed: number;
   blueUsed: number;
+  shieldAbsorbed: number;
+  spinalMaxHit: number;
+  rerollsUsed: number;
+  repairBayHealed: number;
+  burnKilledElite: boolean;
   streams: RngStreams | null;
   enemyStream: RngStream | null;
   debugNextRoll: number[] | null;
@@ -177,6 +193,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   interference: 0,
   perks: [],
   chartPicks: [],
+  mutators: [],
+  forcedTraits: [],
   chargeCap: DEFAULT_CHARGE_CAP,
   sacrificePool: 0,
   bloodReactorUsed: false,
@@ -218,6 +236,11 @@ export const createInitialBattleValues = (): BattleValues => ({
   beatSeq: 0,
   blackUsed: 0,
   blueUsed: 0,
+  shieldAbsorbed: 0,
+  spinalMaxHit: 0,
+  rerollsUsed: 0,
+  repairBayHealed: 0,
+  burnKilledElite: false,
   streams: null,
   enemyStream: null,
   debugNextRoll: null,
@@ -235,6 +258,7 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   interference: s.interference,
   perks: s.perks,
   chartPicks: s.chartPicks,
+  mutators: s.mutators,
   shipId: s.shipId,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
@@ -274,6 +298,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   interference: snap.interference,
   perks: snap.perks,
   chartPicks: snap.chartPicks ?? [],
+  mutators: snap.mutators ?? [],
   chargeCap: snap.chargeCap,
   sacrificePool: snap.sacrificePool,
   bloodReactorUsed: snap.bloodReactorUsed,
@@ -334,6 +359,55 @@ const slotAllowedThisTurn = (
   return allowed === null || allowed.includes(slotId);
 };
 
+interface TurnTally {
+  shieldAbsorbed: number;
+  repairBayHealed: number;
+  spinalMaxHit: number;
+  burnKilledElite: boolean;
+}
+
+// Contract goals count things no other system tracks (shields absorbed, the
+// biggest Spinal hit, a burn tick that finished an elite). The beats already
+// carry every number, so the counters read them instead of touching the resolver.
+export const tallyBundle = (bundle: ResolutionBundle): TurnTally => {
+  let shieldAbsorbed = 0;
+  let repairBayHealed = 0;
+  let spinalMaxHit = 0;
+  let burnKilledElite = false;
+
+  for (const beat of bundle.beats) {
+    if (beat.slot === "spinal" && beat.kind === "damage") {
+      spinalMaxHit = Math.max(spinalMaxHit, beat.amount);
+    }
+    if (beat.slot === "repairBay" && beat.kind === "repair") {
+      repairBayHealed += beat.amount;
+    }
+  }
+  for (const beat of bundle.enemyBeats) {
+    shieldAbsorbed += beat.shieldDamage;
+    if (beat.kind !== "burnTick") continue;
+    const enemy = beat.after.enemies.find((e) => e.id === beat.enemyId);
+    if (enemy === undefined || enemy.hp > 0) continue;
+    const def = ENEMY_BY_ID.get(enemy.defId);
+    if (def?.elite === true || def?.miniboss === true || def?.boss === true) {
+      burnKilledElite = true;
+    }
+  }
+  return { shieldAbsorbed, repairBayHealed, spinalMaxHit, burnKilledElite };
+};
+
+export const battleTally = (s: BattleValues): BattleTally => ({
+  won: s.outcome === "victory",
+  turns: s.turn,
+  shieldAbsorbed: s.shieldAbsorbed,
+  spinalMaxHit: s.spinalMaxHit,
+  rerollsUsed: s.rerollsUsed,
+  repairBayHealed: s.repairBayHealed,
+  endedFullHull: s.hull >= s.hullMax,
+  blackPlaced: s.blackUsed,
+  burnKilledElite: s.burnKilledElite,
+});
+
 export const grantsFromCensus = (
   census: ResonanceCensus,
 ): { rerollBase: number; reserveCap: number; freeNudges: number } => ({
@@ -364,6 +438,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         interference: encounter.interference,
         perks: encounter.perks,
         chartPicks: encounter.chartPicks,
+        mutators: encounter.mutators,
         hull: encounter.hull,
         hullMax: encounter.hullMax,
         chargeCap: encounter.chargeCap,
@@ -371,17 +446,23 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         enemyHpBonusPct: encounter.enemyHpBonusPct,
         gateHpBonusPct: encounter.gateHpBonusPct,
         eliteShield: encounter.eliteShield,
+        resonanceBoost: encounter.resonanceBoost,
+        slotTierDelta: encounter.slotTierDelta,
+        disabledSlots: encounter.disabledSlots,
       },
     );
     const grants = grantsFromCensus(snapshot.resonance);
     const perks = encounter.perks ?? [];
     const chartPicks = encounter.chartPicks ?? [];
+    const forcedTraits = encounter.forcedTraits ?? [];
     const mods = computeRunMods(perks, chartPicks);
     const rerollBase =
       grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
     const passive = SHIP_BY_ID.get(shipId)?.passive;
     const scrapperScrap = passive?.kind === "scrapper" ? passive.scrap : 0;
-    const singleCast = runHasTrait(perks, chartPicks, "singleCast");
+    const singleCast =
+      runHasTrait(perks, chartPicks, "singleCast") ||
+      forcedTraits.includes("singleCast");
     const introEnemy = snapshot.enemies.find((e) => {
       const def = ENEMY_BY_ID.get(e.defId);
       return def?.boss === true || def?.miniboss === true;
@@ -398,6 +479,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
           : encounter.scriptedSlots.map((row) => [...row]),
       shipId,
       chartPicks: [...chartPicks],
+      mutators: [...(encounter.mutators ?? [])],
+      forcedTraits: [...forcedTraits],
       scrap: mods.battleStartScrap + scrapperScrap,
       charge: Math.min(snapshot.chargeCap, Math.max(0, encounter.startCharge ?? 0)),
       rerollsLeft: singleCast ? 0 : 1,
@@ -421,6 +504,10 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (!canPlaceDie(toSnapshot(s), uid, slotId)) return s;
       const slot = s.slots[slotId];
       if (slot === undefined) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die !== undefined) {
+        recordAction(`place:${die.defId}:${String(die.value)}:${slotId}`);
+      }
       return {
         dice: s.dice.map((d) =>
           d.uid === uid ? { ...d, state: "placed" as const, slot: slotId } : d,
@@ -518,7 +605,9 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const useFree = s.freeNudges > 0;
       const cost = Math.max(
         0,
-        NUDGE_COST + computeRunMods(s.perks, s.chartPicks).nudgeCostDelta,
+        NUDGE_COST +
+          computeRunMods(s.perks, s.chartPicks).nudgeCostDelta +
+          computeMutatorMods(s.mutators).nudgeCostDelta,
       );
       if (!useFree && s.charge < cost) return s;
       return {
@@ -658,6 +747,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
           return { ...d, value };
         }),
         rerollsLeft: s.rerollsLeft - 1,
+        rerollsUsed: s.rerollsUsed + 1,
         rerollMode: false,
         rerollSelection: [],
       };
@@ -712,6 +802,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         };
       }
     }
+    const tally = tallyBundle(bundle);
     set({
       phase: "resolving",
       resolution: bundle,
@@ -720,6 +811,10 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       beatSeq: s.beatSeq + 1,
       blackUsed,
       blueUsed,
+      shieldAbsorbed: s.shieldAbsorbed + tally.shieldAbsorbed,
+      repairBayHealed: s.repairBayHealed + tally.repairBayHealed,
+      spinalMaxHit: Math.max(s.spinalMaxHit, tally.spinalMaxHit),
+      burnKilledElite: s.burnKilledElite || tally.burnKilledElite,
       rerollMode: false,
       rerollSelection: [],
       selectedDieUid: null,
@@ -743,7 +838,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     }
     const canReroll =
       finalPhase === "placement" &&
-      !runHasTrait(s.perks, s.chartPicks, "singleCast");
+      !runHasTrait(s.perks, s.chartPicks, "singleCast") &&
+      !s.forcedTraits.includes("singleCast");
     set({
       ...fromSnapshot(final),
       pendingDeepScan: false,
@@ -784,6 +880,8 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   interference: s.interference,
   perks: s.perks,
   chartPicks: s.chartPicks,
+  mutators: s.mutators,
+  forcedTraits: s.forcedTraits,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
   bloodReactorUsed: s.bloodReactorUsed,
@@ -825,6 +923,11 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   beatSeq: s.beatSeq,
   blackUsed: s.blackUsed,
   blueUsed: s.blueUsed,
+  shieldAbsorbed: s.shieldAbsorbed,
+  spinalMaxHit: s.spinalMaxHit,
+  rerollsUsed: s.rerollsUsed,
+  repairBayHealed: s.repairBayHealed,
+  burnKilledElite: s.burnKilledElite,
 });
 
 export const serializeBattle = (): BattleSaveState | null => {

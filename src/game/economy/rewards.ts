@@ -44,22 +44,71 @@ const poolForRarity = (rarity: Rarity): readonly string[] => {
   return LOOT_POOL.common;
 };
 
-export const rollDrop = (rng: RngStream, weights: RarityWeights): string => {
+const RARITY_LADDER: readonly Rarity[] = [
+  "common",
+  "uncommon",
+  "rare",
+  "legendary",
+];
+
+// «Жирный лут» shifts the whole weight table one rung up the ladder; the mass
+// that runs off the top piles into legendary rather than vanishing.
+export const shiftWeights = (
+  weights: RarityWeights,
+  step: number,
+): RarityWeights => {
+  if (step <= 0) return weights;
+  const out: RarityWeights = {
+    common: 0,
+    uncommon: 0,
+    rare: 0,
+    legendary: 0,
+  };
+  for (let i = 0; i < RARITY_LADDER.length; i += 1) {
+    const from = RARITY_LADDER[i];
+    if (from === undefined) continue;
+    const target =
+      RARITY_LADDER[Math.min(RARITY_LADDER.length - 1, i + step)] ?? "legendary";
+    out[target] += weights[from];
+  }
+  return out;
+};
+
+export const bumpRarity = (rarity: Rarity, step: number): Rarity => {
+  const index = RARITY_LADDER.indexOf(rarity);
+  if (index < 0) return rarity;
+  return (
+    RARITY_LADDER[
+      Math.min(RARITY_LADDER.length - 1, index + Math.max(0, step))
+    ] ?? rarity
+  );
+};
+
+export const rollDrop = (
+  rng: RngStream,
+  weights: RarityWeights,
+  rarityStep = 0,
+): string => {
+  const table = shiftWeights(weights, rarityStep);
   const rarity = rng.weighted([
-    ["common", weights.common],
-    ["uncommon", weights.uncommon],
-    ["rare", weights.rare],
-    ["legendary", weights.legendary],
+    ["common", table.common],
+    ["uncommon", table.uncommon],
+    ["rare", table.rare],
+    ["legendary", table.legendary],
   ] as const);
   return rng.pick(poolForRarity(rarity));
 };
 
-export const dieForRarity = (rng: RngStream, rarity: Rarity): string =>
-  rng.pick(poolForRarity(rarity));
+export const dieForRarity = (
+  rng: RngStream,
+  rarity: Rarity,
+  rarityStep = 0,
+): string => rng.pick(poolForRarity(bumpRarity(rarity, rarityStep)));
 
 export const computeNodeReward = (
   type: NodeType,
   rng: RngStream,
+  rarityStep = 0,
 ): NodeReward => {
   switch (type) {
     case "battle":
@@ -67,17 +116,20 @@ export const computeNodeReward = (
         scrap: rng.int(12, 20),
         dieDrop:
           rng.next() < BATTLE_DROP_CHANCE
-            ? rollDrop(rng, DROP_WEIGHTS.battle)
+            ? rollDrop(rng, DROP_WEIGHTS.battle, rarityStep)
             : null,
       };
     case "elite":
     case "miniboss":
       return {
         scrap: rng.int(45, 60),
-        dieDrop: rollDrop(rng, DROP_WEIGHTS.elite),
+        dieDrop: rollDrop(rng, DROP_WEIGHTS.elite, rarityStep),
       };
     case "boss":
-      return { scrap: 80, dieDrop: rollDrop(rng, DROP_WEIGHTS.boss) };
+      return {
+        scrap: 80,
+        dieDrop: rollDrop(rng, DROP_WEIGHTS.boss, rarityStep),
+      };
     default:
       return { scrap: 0, dieDrop: null };
   }

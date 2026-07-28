@@ -45,6 +45,8 @@ const metaValues = (): MetaValues => {
     codex: s.codex,
     codexRead: s.codexRead,
     contracts: s.contracts,
+    dailyPlayed: s.dailyPlayed,
+    best: s.best,
     ascension: s.ascension,
     flagsArchive: s.flagsArchive,
     bossFirstKills: s.bossFirstKills,

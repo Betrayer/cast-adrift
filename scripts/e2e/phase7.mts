@@ -87,6 +87,10 @@ const main = async (): Promise<void> => {
       toLevel: 8,
       win: true,
       milestones: ["meta:milestone.budget"],
+      mode: "campaign",
+      score: null,
+      contractId: null,
+      contractStars: 0,
     });
     window.__app?.getState().go("summary");
   });

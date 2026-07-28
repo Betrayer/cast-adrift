@@ -988,6 +988,98 @@
       "3": "That was a phase change. I would take it personally."
     }
   },
+  "mutators": {
+    "brittleShields": {
+      "name": "Brittle Shields",
+      "desc": "Your shield sags by half before the enemy acts."
+    },
+    "fatLoot": {
+      "name": "Fat Loot",
+      "desc": "Drops come a rarity higher; enemies carry 15% more hull."
+    },
+    "fog": {
+      "name": "Fog",
+      "desc": "Sensors reach one row less."
+    },
+    "overheat": {
+      "name": "Overheat",
+      "desc": "The reactor caps two charge lower."
+    },
+    "richVein": {
+      "name": "Rich Vein",
+      "desc": "Scrap pays half again as much."
+    },
+    "wilds": {
+      "name": "The Wilds",
+      "desc": "No markets out here. Shipyards only."
+    },
+    "resonantStorm": {
+      "name": "Resonant Storm",
+      "desc": "One school counts two higher for resonance each battle."
+    },
+    "heavyDice": {
+      "name": "Heavy Dice",
+      "desc": "Nudging a die costs 5 charge."
+    },
+    "glassFleet": {
+      "name": "Glass Fleet",
+      "desc": "All damage ×1.5 — theirs and yours."
+    },
+    "risingTide": {
+      "name": "Rising Tide",
+      "desc": "The interference tide climbs every third jump."
+    },
+    "radioSilence": {
+      "name": "Radio Silence",
+      "desc": "Sensors lose a tier and Echo says nothing."
+    },
+    "doubles": {
+      "name": "Doubles",
+      "desc": "One extra copy of the lead enemy; every enemy has 30% less hull."
+    }
+  },
+  "contracts": {
+    "bareHull": {
+      "name": "Bare Hull",
+      "desc": "The Wanderer as it left the yard — no perks, no chart, nothing but the roll."
+    },
+    "redHeat": {
+      "name": "Red Heat",
+      "desc": "A deck of nothing but red. Burn a path and do not linger."
+    },
+    "iceWall": {
+      "name": "Ice Wall",
+      "desc": "All blue. Outlast the sector instead of out-shooting it."
+    },
+    "tightVoyage": {
+      "name": "Tight Voyage",
+      "desc": "Every price is half again as high. Spend like it hurts."
+    },
+    "batteringRam": {
+      "name": "Battering Ram",
+      "desc": "The Ram and its Spinal Mount. Hit first, hit once, hit hard."
+    },
+    "ark": {
+      "name": "Ark",
+      "desc": "The Ark's repair bay is the whole plan. Keep the hull whole."
+    },
+    "singleCast": {
+      "name": "Single Cast",
+      "desc": "No rerolls, no chart. One roll, one plan, the Rim."
+    },
+    "storm": {
+      "name": "Storm",
+      "desc": "The tide is already rising when you launch."
+    },
+    "blindJump": {
+      "name": "Blind Jump",
+      "desc": "Fog ahead and no sensors to cut it. Jump anyway."
+    },
+    "choirShadow": {
+      "name": "Choir's Shadow",
+      "desc": "The Choir under a resonant storm. Lean into the black and pay for it."
+    }
+  },
   "sectors": {
     "1": "The Rim",
     "2": "The Drift Fields",

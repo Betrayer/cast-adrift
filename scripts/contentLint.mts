@@ -1,5 +1,7 @@
 import { BARKS } from "../src/data/barks";
 import { CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
+import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
+import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
 import { ALL_DICE } from "../src/data/dice";
@@ -28,7 +30,23 @@ import ruContent from "../src/i18n/ru/content.json" with { type: "json" };
 import enRun from "../src/i18n/en/run.json" with { type: "json" };
 import ukRun from "../src/i18n/uk/run.json" with { type: "json" };
 import ruRun from "../src/i18n/ru/run.json" with { type: "json" };
+import enCommon from "../src/i18n/en/common.json" with { type: "json" };
+import ukCommon from "../src/i18n/uk/common.json" with { type: "json" };
+import ruCommon from "../src/i18n/ru/common.json" with { type: "json" };
+import enMenu from "../src/i18n/en/menu.json" with { type: "json" };
+import ukMenu from "../src/i18n/uk/menu.json" with { type: "json" };
+import ruMenu from "../src/i18n/ru/menu.json" with { type: "json" };
+import enSettings from "../src/i18n/en/settings.json" with { type: "json" };
+import ukSettings from "../src/i18n/uk/settings.json" with { type: "json" };
+import ruSettings from "../src/i18n/ru/settings.json" with { type: "json" };
+import enBattle from "../src/i18n/en/battle.json" with { type: "json" };
+import ukBattle from "../src/i18n/uk/battle.json" with { type: "json" };
+import ruBattle from "../src/i18n/ru/battle.json" with { type: "json" };
+import enMeta from "../src/i18n/en/meta.json" with { type: "json" };
+import ukMeta from "../src/i18n/uk/meta.json" with { type: "json" };
+import ruMeta from "../src/i18n/ru/meta.json" with { type: "json" };
 import type { EffectDef } from "../src/game/effects/types";
+import type { GoalSpec } from "../src/game/run/goals";
 import type { EventOption, Outcome } from "../src/types/events";
 import type { Intent, PatternStep } from "../src/types/content";
 
@@ -46,10 +64,8 @@ const checkUniqueIds = (kind: string, ids: readonly string[]): void => {
   }
 };
 
-const resolveContentKey = (key: string): boolean => {
-  const [ns, path] = key.split(":");
-  if (ns !== "content" || path === undefined) return true;
-  let node: ContentNode | undefined = content;
+const resolveIn = (root: ContentNode, path: string): boolean => {
+  let node: ContentNode | undefined = root;
   for (const seg of path.split(".")) {
     if (typeof node !== "object" || node === null) return false;
     node = node[seg];
@@ -57,6 +73,15 @@ const resolveContentKey = (key: string): boolean => {
   }
   return typeof node === "string";
 };
+
+const resolveContentKey = (key: string): boolean => {
+  const [ns, path] = key.split(":");
+  if (ns !== "content" || path === undefined) return true;
+  return resolveIn(content, path);
+};
+
+const resolveMetaKey = (path: string): boolean =>
+  resolveIn(enMeta as unknown as ContentNode, path);
 
 const checkLocKey = (owner: string, key: string | undefined): void => {
   if (key === undefined) return;
@@ -363,6 +388,99 @@ for (const bark of BARKS) {
   for (const line of bark.lines) checkLocKey(`bark.${bark.id}`, line);
 }
 
+// ── Phase 9: mutators, contracts, goals ─────────────────────────────────────
+
+const MUTATOR_COUNT = 12;
+const CONTRACT_COUNT = 10;
+const MUTATOR_MOD_KEYS = new Set(Object.keys(ZERO_MUTATOR_MODS));
+
+checkUniqueIds(
+  "mutators",
+  MUTATORS.map((m) => m.id),
+);
+if (MUTATORS.length !== MUTATOR_COUNT) {
+  errors.push(
+    `mutators: expected exactly ${String(MUTATOR_COUNT)}, found ${String(MUTATORS.length)}`,
+  );
+}
+for (const def of MUTATORS) {
+  checkLocKey(`mutators.${def.id}`, def.name);
+  checkLocKey(`mutators.${def.id}`, def.desc);
+  checkEffects(`mutators.${def.id}`, def.effects);
+  const keys = Object.keys(def.mods);
+  if (keys.length === 0 && def.effects === undefined) {
+    errors.push(`mutators: "${def.id}" is a no-op (no mods, no effects)`);
+  }
+  for (const key of keys) {
+    if (!MUTATOR_MOD_KEYS.has(key)) {
+      errors.push(`mutators: "${def.id}" sets unknown mod "${key}"`);
+    }
+  }
+}
+
+const goalKey = (spec: GoalSpec): string =>
+  "n" in spec
+    ? `${spec.g}:${String(spec.n)}`
+    : spec.g === "depthWithDeckAtLeast"
+      ? `${spec.g}:${String(spec.depth)}:${String(spec.deck)}`
+      : spec.g;
+
+checkUniqueIds(
+  "contracts",
+  CONTRACTS.map((c) => c.id),
+);
+if (CONTRACTS.length !== CONTRACT_COUNT) {
+  errors.push(
+    `contracts: expected exactly ${String(CONTRACT_COUNT)}, found ${String(CONTRACTS.length)}`,
+  );
+}
+const shipIds = new Set(SHIPS.map((s) => s.id));
+for (const def of CONTRACTS) {
+  checkLocKey(`contracts.${def.id}`, def.name);
+  checkLocKey(`contracts.${def.id}`, def.desc);
+  if (def.goals.length !== CONTRACT_STAR_COUNT) {
+    errors.push(
+      `contracts: "${def.id}" has ${String(def.goals.length)} goals, expected ${String(CONTRACT_STAR_COUNT)}`,
+    );
+  }
+  const seenGoals = new Set<string>();
+  for (const spec of def.goals) {
+    const key = goalKey(spec);
+    if (seenGoals.has(key)) {
+      errors.push(`contracts: "${def.id}" repeats goal "${key}"`);
+    }
+    seenGoals.add(key);
+    if (!resolveMetaKey(`goal.${spec.g}`)) {
+      errors.push(`contracts: "${def.id}" goal "${spec.g}" has no meta label`);
+    }
+  }
+  const setup = def.setup;
+  if (setup.ship !== undefined && !shipIds.has(setup.ship)) {
+    errors.push(`contracts: "${def.id}" uses unknown ship "${setup.ship}"`);
+  }
+  for (const id of setup.mutators ?? []) {
+    if (!MUTATOR_BY_ID.has(id)) {
+      errors.push(`contracts: "${def.id}" uses unknown mutator "${id}"`);
+    }
+  }
+  for (const defId of setup.deckPreset ?? []) {
+    if (!dieIdSet.has(defId)) {
+      errors.push(`contracts: "${def.id}" preset uses unknown die "${defId}"`);
+    }
+  }
+  if (
+    setup.deckPreset !== undefined &&
+    (setup.deckPreset.length < 3 || setup.deckPreset.length > 9)
+  ) {
+    errors.push(
+      `contracts: "${def.id}" preset has ${String(setup.deckPreset.length)} dice, must be 3-9`,
+    );
+  }
+  if (setup.sector !== undefined && (setup.sector < 1 || setup.sector > 5)) {
+    errors.push(`contracts: "${def.id}" sector ${String(setup.sector)} is out of range`);
+  }
+}
+
 const flattenKeys = (node: unknown, prefix = ""): string[] => {
   if (typeof node !== "object" || node === null) return [prefix];
   return Object.entries(node as Record<string, unknown>).flatMap(([key, value]) =>
@@ -384,10 +502,20 @@ const checkParity = (
   }
 };
 
-checkParity("content", enContent, ukContent, "uk");
-checkParity("content", enContent, ruContent, "ru");
-checkParity("run", enRun, ukRun, "uk");
-checkParity("run", enRun, ruRun, "ru");
+const NAMESPACES: readonly [string, unknown, unknown, unknown][] = [
+  ["common", enCommon, ukCommon, ruCommon],
+  ["menu", enMenu, ukMenu, ruMenu],
+  ["settings", enSettings, ukSettings, ruSettings],
+  ["battle", enBattle, ukBattle, ruBattle],
+  ["content", enContent, ukContent, ruContent],
+  ["run", enRun, ukRun, ruRun],
+  ["meta", enMeta, ukMeta, ruMeta],
+];
+
+for (const [ns, en, uk, ru] of NAMESPACES) {
+  checkParity(ns, en, uk, "uk");
+  checkParity(ns, en, ru, "ru");
+}
 
 if (errors.length > 0) {
   for (const error of errors) console.error(`lint:content: ${error}`);
@@ -395,5 +523,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(ALL_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks`,
+  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(ALL_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks, ${String(MUTATORS.length)} mutators, ${String(CONTRACTS.length)} contracts`,
 );

@@ -12,7 +12,7 @@ import {
 import { bossFirstKillShards, campaignShards } from "@/game/xp";
 import { createStream } from "@/services/rng";
 import { useAppStore } from "@/stores/appStore";
-import { useMetaStore } from "@/stores/metaStore";
+import { createInitialMetaStats, useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 
 const resetMeta = (): void => {
@@ -26,13 +26,7 @@ const resetMeta = (): void => {
     bossFirstKills: [],
     endings: [],
     ascension: { campaign: 0 },
-    stats: {
-      runs: 0,
-      wins: 0,
-      shardsEarned: 0,
-      prologueDone: false,
-      campaignClears: 0,
-    },
+    stats: createInitialMetaStats(),
   });
 };
 

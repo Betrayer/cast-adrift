@@ -1,6 +1,8 @@
 import { BARKS, type BarkDef } from "@/data/barks";
+import { computeMutatorMods } from "@/data/mutators";
 import { createStream, type RngStream } from "@/services/rng";
 import { useNarrativeStore } from "@/stores/narrativeStore";
+import { useRunStore } from "@/stores/runStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import type { Outcome } from "@/types/events";
 
@@ -39,6 +41,8 @@ const eligible = (
 export const emitBark = (trigger: string): void => {
   const verbosity = useSettingsStore.getState().echoVerbosity;
   if (verbosity === "off") return;
+  // «Радиомолчание» cuts Echo off for the whole run.
+  if (computeMutatorMods(useRunStore.getState().mutators).barksOff) return;
   const now = clock();
   if (now - lastBarkAt < GLOBAL_MS) return;
 

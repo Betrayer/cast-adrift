@@ -96,6 +96,7 @@ export interface BattleSnapshot {
   interference: number;
   perks: string[];
   chartPicks?: string[];
+  mutators?: string[];
   shipId?: ShipId;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;

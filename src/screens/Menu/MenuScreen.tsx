@@ -39,7 +39,7 @@ const ENTRIES: readonly MenuEntry[] = [
   { key: 'starChart', screen: 'chart' },
   { key: 'collection', screen: 'collection' },
   { key: 'codex', screen: 'codex' },
-  { key: 'modes', screen: 'modes', phase: 9 },
+  { key: 'modes', screen: 'modes' },
   { key: 'settings', screen: 'settings' },
 ];
 

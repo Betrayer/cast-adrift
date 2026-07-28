@@ -20,6 +20,7 @@ import type {
   EnemyDef,
   Intent,
   PatternStep,
+  School,
 } from "@/types/content";
 
 export const TIER_LADDER: readonly DieTier[] = [4, 6, 8, 10, 12, 20, 100];
@@ -62,11 +63,17 @@ export const applyObsidianPact = (
   }
 };
 
+export interface ResonanceBoost {
+  school: School;
+  n: number;
+}
+
 export interface BattleInit {
   tide?: number;
   interference?: number;
   perks?: readonly string[];
   chartPicks?: readonly string[];
+  mutators?: readonly string[];
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
@@ -74,6 +81,9 @@ export interface BattleInit {
   enemyHpBonusPct?: number;
   gateHpBonusPct?: number;
   eliteShield?: number;
+  resonanceBoost?: ResonanceBoost;
+  slotTierDelta?: Partial<Record<SlotId, number>>;
+  disabledSlots?: readonly SlotId[];
 }
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
@@ -97,6 +107,24 @@ export const buildShipSlots = (
     slots[slotId] = { ...def, mk, cap: slotCapForMk(slotId, mk) };
   }
   return slots;
+};
+
+// Mutators and contract setups shrink or remove whole systems (Радиомолчание
+// drops sensors a tier, «Слепой прыжок» removes the slot outright).
+export const applySlotOverrides = (
+  slots: Partial<Record<SlotId, SlotState>>,
+  tierDelta: Partial<Record<SlotId, number>> = {},
+  disabled: readonly SlotId[] = [],
+): Partial<Record<SlotId, SlotState>> => {
+  const out: Partial<Record<SlotId, SlotState>> = {};
+  for (const [key, slot] of Object.entries(slots) as [SlotId, SlotState][]) {
+    if (disabled.includes(key)) continue;
+    let cap = slot.cap;
+    const steps = tierDelta[key] ?? 0;
+    for (let i = 0; i < -steps; i += 1) cap = shrinkTier(cap);
+    out[key] = { ...slot, cap };
+  }
+  return out;
 };
 
 export const shipHullMax = (shipId: ShipId): number => {
@@ -252,6 +280,10 @@ export const buildBattleSnapshot = (
   });
   const dice = rollDeck(deckDefIds, streams);
   const hullMax = init.hullMax ?? shipHullMax(shipId);
+  const resonance = computeCensus(dice);
+  if (init.resonanceBoost !== undefined) {
+    resonance.counts[init.resonanceBoost.school] += init.resonanceBoost.n;
+  }
   const snapshot: BattleSnapshot = {
     turn: 1,
     hull: Math.max(1, Math.min(hullMax, init.hull ?? hullMax)),
@@ -264,9 +296,14 @@ export const buildBattleSnapshot = (
     interference: Math.max(0, init.interference ?? 0),
     perks: [...(init.perks ?? [])],
     chartPicks: [...(init.chartPicks ?? [])],
+    mutators: [...(init.mutators ?? [])],
     shipId,
     dice,
-    slots: buildShipSlots(shipId, mkLevels),
+    slots: applySlotOverrides(
+      buildShipSlots(shipId, mkLevels),
+      init.slotTierDelta,
+      init.disabledSlots,
+    ),
     enemies,
     targetId: enemies[0]?.id ?? null,
     engineState: null,
@@ -280,7 +317,7 @@ export const buildBattleSnapshot = (
     blockedSlots: [],
     shrunkSlots: [],
     lockedDice: [],
-    resonance: computeCensus(dice),
+    resonance,
     survivedLethal: false,
     lastPlayerDamage: 0,
     stolenScrap: 0,

@@ -31,6 +31,7 @@ import {
 } from "@/game/effects";
 import { hasTrait } from "@/game/run/perkMods";
 import { computeRunMods, runHasTrait } from "@/game/run/runMods";
+import { computeMutatorMods, type MutatorMods } from "@/data/mutators";
 import type { PerkMods } from "@/data/perks/types";
 import type { RngStream, RngStreams } from "@/services/rng";
 import type {
@@ -76,6 +77,14 @@ export const BLOOD_REACTOR_CHARGE = 3;
 
 const clone = (snapshot: BattleSnapshot): BattleSnapshot =>
   structuredClone(snapshot);
+
+const battleMutators = (snapshot: BattleSnapshot): MutatorMods =>
+  computeMutatorMods(snapshot.mutators ?? []);
+
+// «Стеклянный флот» cuts both ways: the same multiplier scales player weapon
+// hits and every incoming enemy hit.
+export const scaleDamage = (damage: number, multPct: number): number =>
+  multPct === 0 ? damage : Math.round(damage * (1 + multPct / 100));
 
 export const engineTier = (value: number): EngineTier => {
   if (value <= 3) return "brace";
@@ -143,6 +152,7 @@ const applySlotEffect = (
   perkMods: PerkMods,
   ricochet: boolean,
 ): void => {
+  const damageMultPct = battleMutators(next).damageMultPct;
   if (slotId === "sensors") {
     const target =
       next.enemies.find((e) => e.id === next.targetId && e.hp > 0) ??
@@ -173,7 +183,7 @@ const applySlotEffect = (
     const dealt = applyWeaponDamage(
       next,
       target,
-      value + (mods.weapons ?? 0),
+      scaleDamage(value + (mods.weapons ?? 0), damageMultPct),
       crit,
       markBonus,
     );
@@ -225,7 +235,7 @@ const applySlotEffect = (
       const dealt = applyWeaponDamage(
         next,
         target,
-        value + (mods.spinal ?? 0),
+        scaleDamage(value + (mods.spinal ?? 0), damageMultPct),
         crit,
         2 + perkMods.markBonusDelta,
       );
@@ -440,6 +450,7 @@ const applyAttack = (
     (hasAliveAura(enemy, "atk+3") ? 3 : 0);
   const tide = Math.max(0, next.tide) + Math.max(0, next.interference);
   const perkMods = computeRunMods(next.perks, next.chartPicks ?? []);
+  const damageMultPct = battleMutators(next).damageMultPct;
   const reflectDodge = hasTrait(next.perks, "reflectDodge");
   const dodgeCharge = hasTrait(next.perks, "dodgeCharge");
   const chargeMult = consumeStatus(enemy.statuses, "charge") ? 2 : 1;
@@ -455,7 +466,10 @@ const applyAttack = (
   for (let i = 0; i < hits; i += 1) {
     let damage = Math.max(
       0,
-      (perHit + aura + tide) * chargeMult - (i === 0 ? jamPenalty : 0),
+      scaleDamage(
+        (perHit + aura + tide) * chargeMult - (i === 0 ? jamPenalty : 0),
+        damageMultPct,
+      ),
     );
     if (dodges && !context.dodgeSpent) {
       context.dodgeSpent = true;
@@ -746,6 +760,13 @@ export const resolveEnemyPhase = (
     enemyStream,
     attack: { dodgeSpent: false },
   };
+
+  // «Хрупкие щиты»: the shield sags on the turn boundary, before the enemy acts,
+  // so raising it still matters — it just protects less than it reads.
+  const decayPct = battleMutators(next).shieldDecayPct;
+  if (decayPct > 0 && next.shield > 0) {
+    next.shield = Math.floor((next.shield * (100 - decayPct)) / 100);
+  }
 
   syncPhases(ctx);
   resolveAuras(ctx);

@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { migrateMeta, useMetaStore } from "@/stores/metaStore";
+import {
+  createInitialMetaStats,
+  migrateMeta,
+  useMetaStore,
+} from "@/stores/metaStore";
 import { totalXpForLevel } from "@/game/xp";
 
 const resetMeta = (): void => {
@@ -18,7 +22,7 @@ const resetMeta = (): void => {
     contracts: {},
     ascension: { campaign: 0 },
     flagsArchive: [],
-    stats: { runs: 0, wins: 0, shardsEarned: 0, prologueDone: false, campaignClears: 0 },
+    stats: createInitialMetaStats(),
   });
 };
 

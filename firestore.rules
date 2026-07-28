@@ -1,9 +1,11 @@
 rules_version = '2';
 
 // Cast Adrift — Firestore security rules.
-// Phase 7 DRAFT: locks per-user documents to their owner and validates the
-// meta/progress doc shape. Full validation (range/monotonicity/anti-cheat,
-// leaderboard plausibility) lands in Phase 9 per docs/DESIGN.md §15.
+// Phase 9: per-user documents stay locked to their owner; leaderboard entries are
+// client-written but shape- and range-validated, one doc per uid, no deletes.
+// Anti-cheat is deterrence, not prevention (docs/DESIGN.md §15): there is no
+// server function in v1, so implausible entries are shadow-flagged and hidden by
+// every reader instead of being rejected outright.
 
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -39,12 +41,57 @@ service cloud.firestore {
       }
     }
 
-    // Leaderboards / dailies: read-only to clients here; writes go through a
-    // trusted server function in Phase 9. Deny direct client writes for now.
-    match /leaderboards/{mode}/entries/{uid} {
+    // Boards are public to any signed-in client; a client may only ever write the
+    // single document whose id equals its own uid.
+    match /leaderboards/{board}/entries/{uid} {
+
+      function shapeOk(d) {
+        return d.score is int
+          && d.score >= 0
+          && d.score <= 500000
+          && d.level is int
+          && d.level >= 1
+          && d.level <= 50
+          && d.depth is int
+          && d.depth >= 0
+          && d.depth <= 5000
+          && d.kills is int
+          && d.kills >= 0
+          && d.kills <= 20000
+          && d.scrap is int
+          && d.scrap >= 0
+          && d.scrap <= 400000
+          && d.name is string
+          && d.name.size() > 0
+          && d.name.size() <= 24
+          && d.ship is string
+          && d.ship.size() > 0
+          && d.ship.size() <= 32
+          && d.updatedAt is int
+          // A ±5 min window around the server clock: the field stays an int so
+          // the client can sort and tie-break on it, but it cannot be backdated.
+          && d.updatedAt <= request.time.toMillis() + 60000
+          && d.updatedAt >= request.time.toMillis() - 300000;
+      }
+
+      function optionalsOk(d) {
+        return (!('hash' in d) || d.hash is int)
+          && (!('flagged' in d) || d.flagged == true)
+          && (!('state' in d) || d.state in ['started', 'done']);
+      }
+
+      allow read: if request.auth != null;
+      allow create, update: if isOwner(uid)
+        && shapeOk(request.resource.data)
+        && optionalsOk(request.resource.data);
+      allow delete: if false;
+    }
+
+    match /leaderboards/{board} {
       allow read: if request.auth != null;
       allow write: if false;
     }
+
     match /dailies/{day} {
       allow read: if request.auth != null;
       allow write: if false;
