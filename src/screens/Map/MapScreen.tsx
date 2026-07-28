@@ -1,12 +1,15 @@
 import { Box, Button, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { mixHex } from "@/app/color";
 import { tokens } from "@/app/theme";
+import { schools } from "@/data/schools";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { computeMutatorMods } from "@/data/mutators";
 import { sectorDef } from "@/data/sectors";
 import { pickMiniboss } from "@/game/run/encounter";
+import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
 import { abandonRun, jumpTo } from "@/game/run/flow";
 import { computeRunMods } from "@/game/run/runMods";
@@ -67,14 +70,35 @@ const glyphColor = (node: MapNode): string => {
   switch (node.type) {
     case "elite":
     case "miniboss":
-      return "#F0A09A";
+      return schools.red.text;
     case "beacon":
-      return "#CDBAFF";
+      return schools.black.text;
     case "shipyard":
     case "shop":
-      return "#F0CE7E";
+      return schools.yellow.text;
     default:
       return tokens.dim;
+  }
+};
+
+// Each node type carries a stamp behind its glyph: a procedural silhouette
+// that reads at a glance and survives a monochrome theme.
+const nodeStamp = (node: MapNode, cx: number, cy: number): string | null => {
+  const r = nodeRadius(node) * 0.72;
+  switch (node.type) {
+    case "battle":
+    case "elite":
+      return `M ${String(cx - r)} ${String(cy + r)} L ${String(cx)} ${String(cy - r)} L ${String(cx + r)} ${String(cy + r)} Z`;
+    case "miniboss":
+    case "boss":
+      return `M ${String(cx)} ${String(cy - r)} L ${String(cx + r)} ${String(cy)} L ${String(cx)} ${String(cy + r)} L ${String(cx - r)} ${String(cy)} Z`;
+    case "shop":
+    case "shipyard":
+      return `M ${String(cx - r)} ${String(cy - r * 0.6)} H ${String(cx + r)} V ${String(cy + r * 0.8)} H ${String(cx - r)} Z`;
+    case "beacon":
+      return `M ${String(cx)} ${String(cy - r)} L ${String(cx + r * 0.4)} ${String(cy)} L ${String(cx)} ${String(cy + r)} L ${String(cx - r * 0.4)} ${String(cy)} Z`;
+    default:
+      return null;
   }
 };
 
@@ -123,6 +147,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   }));
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const prevTide = useRef(tide);
+  const prevLimit = useRef(0);
   const [tidePulse, setTidePulse] = useState(false);
 
   const visibleRows = Math.max(
@@ -158,6 +183,11 @@ const MapView = ({ map, position }: MapViewProps) => {
   }, []);
 
   useEffect(() => {
+    if (visibleLimit > prevLimit.current) playSfx("fogReveal");
+    prevLimit.current = visibleLimit;
+  }, [visibleLimit]);
+
+  useEffect(() => {
     if (tide > prevTide.current && !reduced) {
       setTidePulse(true);
       const id = window.setTimeout(() => {
@@ -175,6 +205,7 @@ const MapView = ({ map, position }: MapViewProps) => {
     if (selected === null || jumping) return;
     const target = byId.get(selected);
     if (target === undefined || !isLegal(target)) return;
+    playSfx("jump");
     if (reduced) {
       jumpTo(selected);
       return;
@@ -267,7 +298,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 y1={rowY(na.row)}
                 x2={nodeX(nb)}
                 y2={rowY(nb.row)}
-                stroke="#33405C"
+                stroke={mixHex(tokens.line, tokens.faint, 0.35)}
                 strokeWidth={1.2}
               />
             );
@@ -279,6 +310,7 @@ const MapView = ({ map, position }: MapViewProps) => {
             const legal = isLegal(node);
             const ring = ringFor(node, current, chosen);
             const done = visited.includes(node.id) && !current;
+            const stamp = nodeStamp(node, nodeX(node), rowY(node.row));
             return (
               <g
                 key={node.id}
@@ -306,21 +338,24 @@ const MapView = ({ map, position }: MapViewProps) => {
                   r={nodeRadius(node)}
                   fill={
                     node.type === "boss"
-                      ? "#2E1517"
+                      ? schools.red.fill
                       : current
-                        ? "#221A38"
-                        : "#182238"
+                        ? schools.black.fill
+                        : tokens.surface2
                   }
                   stroke={ring.stroke}
                   strokeWidth={ring.width}
                 />
+                {stamp === null ? null : (
+                  <path d={stamp} fill={glyphColor(node)} opacity={0.16} />
+                )}
                 <text
                   x={nodeX(node)}
                   y={rowY(node.row) + 4}
                   textAnchor="middle"
                   fontSize={13}
                   fontWeight={600}
-                  fill={current ? "#CDBAFF" : glyphColor(node)}
+                  fill={current ? schools.black.text : glyphColor(node)}
                 >
                   {t(NODE_GLYPH[node.type])}
                 </text>
@@ -331,7 +366,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                     textAnchor="middle"
                     fontSize={11}
                     fontWeight={600}
-                    fill="#CDBAFF"
+                    fill={schools.black.text}
                   >
                     {t("run:map.you")}
                   </text>
@@ -343,7 +378,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                     textAnchor="middle"
                     fontSize={12}
                     fontWeight={700}
-                    fill="#F0A09A"
+                    fill={schools.red.text}
                   >
                     {`≈${String(interference)}`}
                   </text>
@@ -360,7 +395,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 width={VIEW_W - 16}
                 height={fogBottom}
                 rx={8}
-                fill="#0B0F1A"
+                fill={tokens.bg}
                 opacity={0.72}
               />
               <rect
@@ -370,7 +405,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 height={fogBottom}
                 rx={8}
                 fill="none"
-                stroke="#33405C"
+                stroke={mixHex(tokens.line, tokens.faint, 0.35)}
                 strokeDasharray="6 5"
               />
               <text
@@ -407,11 +442,17 @@ const MapView = ({ map, position }: MapViewProps) => {
 
       <div className={styles.footer}>
         {previewLabel === null ? null : (
-          <Text size="xs" c="#F0A09A" ta="center" fw={600}>
+          <Text size="xs" c={schools.red.text} ta="center" fw={600}>
             {previewLabel}
           </Text>
         )}
-        <Button size="md" fullWidth disabled={!canJump} onClick={onJump}>
+        <Button
+          size="md"
+          fullWidth
+          disabled={!canJump}
+          onClick={onJump}
+          data-coach="jump"
+        >
           {t("run:map.jump")}
         </Button>
         {selected === null ? (

@@ -1,5 +1,8 @@
 import { Container, Graphics } from 'pixi.js';
 import type { Application, Ticker } from 'pixi.js';
+import { hslToHex } from '@/app/color';
+import { currentTheme, onThemeChange } from '@/app/theme';
+import type { BgStyle } from '@/data/themes';
 import { createStream, deriveSeed } from '@/services/rng';
 
 interface Star {
@@ -13,28 +16,48 @@ const BANDS = [
   { count: 20, radius: 2.2, alpha: 0.85, speed: 0.6 },
 ] as const;
 
-const STAR_COLOR = 0xe8edf7;
+const SCANLINE_STEP = 3;
+const SCANLINE_ALPHA = 0.03;
+const GRID_STEP = 34;
+
+const starColor = (style: BgStyle): string =>
+  hslToHex({ h: style.hue, s: 0.18, l: 0.94 });
+
+const paintOverlay = (
+  app: Application,
+  style: BgStyle,
+  accent: string,
+): Graphics | null => {
+  if (style.scanlines !== true && style.grid !== true) return null;
+  const g = new Graphics();
+  const w = app.screen.width;
+  const h = app.screen.height;
+  if (style.grid === true) {
+    for (let x = GRID_STEP; x < w; x += GRID_STEP) {
+      g.moveTo(x, 0).lineTo(x, h);
+    }
+    for (let y = GRID_STEP; y < h; y += GRID_STEP) {
+      g.moveTo(0, y).lineTo(w, y);
+    }
+    g.stroke({ color: accent, alpha: 0.08, width: 1 });
+  }
+  if (style.scanlines === true) {
+    for (let y = 0; y < h; y += SCANLINE_STEP) {
+      g.rect(0, y, w, 1);
+    }
+    g.fill({ color: '#000000', alpha: SCANLINE_ALPHA });
+  }
+  g.eventMode = 'none';
+  return g;
+};
 
 export const mountMenuBg = (
   app: Application,
   opts: { reducedMotion: boolean },
 ): (() => void) => {
-  const rng = createStream(deriveSeed(0, 'menuBg'));
-  const root = new Container();
-  app.stage.addChild(root);
-
-  const stars: Star[] = [];
-  for (const band of BANDS) {
-    for (let i = 0; i < band.count; i += 1) {
-      const dot = new Graphics()
-        .circle(0, 0, band.radius)
-        .fill({ color: STAR_COLOR, alpha: band.alpha });
-      dot.x = rng.next() * app.screen.width;
-      dot.y = rng.next() * app.screen.height;
-      root.addChild(dot);
-      stars.push({ dot, speed: band.speed });
-    }
-  }
+  let root: Container | null = null;
+  let stars: Star[] = [];
+  let ticking = false;
 
   const tick = (ticker: Ticker) => {
     const w = app.screen.width;
@@ -47,10 +70,54 @@ export const mountMenuBg = (
     }
   };
 
-  if (!opts.reducedMotion) app.ticker.add(tick);
+  const build = (): void => {
+    const theme = currentTheme();
+    const style = theme.bgStyle;
+    const rng = createStream(deriveSeed(0, 'menuBg'));
+    const container = new Container();
+    app.stage.addChild(container);
+    const color = starColor(style);
+    const built: Star[] = [];
+    for (const band of BANDS) {
+      const count = Math.round(band.count * style.starDensity);
+      for (let i = 0; i < count; i += 1) {
+        const dot = new Graphics()
+          .circle(0, 0, band.radius)
+          .fill({ color, alpha: band.alpha });
+        dot.x = rng.next() * app.screen.width;
+        dot.y = rng.next() * app.screen.height;
+        container.addChild(dot);
+        built.push({ dot, speed: band.speed });
+      }
+    }
+    const overlay = paintOverlay(app, style, theme.palette.accent);
+    if (overlay !== null) container.addChild(overlay);
+    root = container;
+    stars = built;
+    if (!opts.reducedMotion && !ticking) {
+      app.ticker.add(tick);
+      ticking = true;
+    }
+  };
+
+  const teardown = (): void => {
+    root?.destroy({ children: true });
+    root = null;
+    stars = [];
+  };
+
+  build();
+  const unsubscribe = onThemeChange(() => {
+    teardown();
+    build();
+  });
 
   return () => {
-    if (!opts.reducedMotion) app.ticker.remove(tick);
-    root.destroy({ children: true });
+    unsubscribe();
+    if (ticking) {
+      app.ticker.remove(tick);
+      ticking = false;
+    }
+    teardown();
   };
 };

@@ -1,11 +1,13 @@
 import { Button, Stack, Text, Title } from '@mantine/core';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tokens } from '@/app/theme';
 import { fragmentsForSector } from '@/data/narrative/fragments';
 import { sectorDef } from '@/data/sectors';
+import { playSfx } from '@/services/audio';
 import { createStream, deriveSeed } from '@/services/rng';
 import { useAppStore } from '@/stores/appStore';
+import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
 import { useRunStore } from '@/stores/runStore';
 import styles from './InterstitialScreen.module.css';
 
@@ -15,6 +17,22 @@ export const InterstitialScreen = () => {
   const seed = useRunStore((s) => s.seed);
   const go = useAppStore((s) => s.go);
   const def = sectorDef(sector);
+  const reduced = resolveReducedMotion(
+    useSettingsStore((s) => s.reducedMotion),
+  );
+
+  useEffect(() => {
+    playSfx('jump');
+  }, []);
+
+  const streaks = useMemo(
+    () =>
+      Array.from({ length: 18 }, (_, i) => ({
+        angle: (i / 18) * 360 + (i % 3) * 7,
+        delay: (i % 6) * 40,
+      })),
+    [],
+  );
 
   const fragment = useMemo(() => {
     const pool = fragmentsForSector(sector);
@@ -31,6 +49,21 @@ export const InterstitialScreen = () => {
       gap="lg"
       style={{ background: def.wash }}
     >
+      {reduced ? null : (
+        <div className={styles.warp}>
+          {streaks.map((streak) => (
+            <span
+              key={streak.angle}
+              className={styles.streak}
+              style={{
+                background: def.accent,
+                transform: `rotate(${String(streak.angle)}deg)`,
+                animationDelay: `${String(streak.delay)}ms`,
+              }}
+            />
+          ))}
+        </div>
+      )}
       <div
         className={styles.wash}
         style={{ background: `radial-gradient(circle at 50% 40%, ${def.accent}33, transparent 62%)` }}

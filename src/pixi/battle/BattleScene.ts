@@ -1,16 +1,22 @@
 import { Circle, Container, Graphics, Rectangle, Sprite, Text } from "pixi.js";
 import type { Application, FederatedPointerEvent, Ticker } from "pixi.js";
-import { tokens } from "@/app/theme";
+import { mixHex } from "@/app/color";
+import { currentTheme, onThemeChange, tokens } from "@/app/theme";
+import { DIE_BY_ID } from "@/data/dice";
 import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
+import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
 import { canPlaceDie } from "@/game/battle/setup";
 import type { StatusKey } from "@/game/battle/statuses";
-import { playSfx } from "@/services/audio";
+import { duckMusic, playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import {
+  clearDieTextureCache,
   dieTexture,
   PIXI_FONT_FAMILY,
   releaseDieTextures,
 } from "@/pixi/textures";
+import { clearPool, reportPool } from "@/pixi/perf";
 import { easeOutQuad, linear, Tweens } from "@/pixi/tween";
 import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
 import {
@@ -26,6 +32,7 @@ import type {
   RolledDie,
   SlotId,
 } from "@/types/battle";
+import type { School } from "@/types/content";
 
 export interface BattleSceneLabels {
   slotTitle: (slot: SlotId) => string;
@@ -48,21 +55,39 @@ const SLOT_GRID: Partial<Record<SlotId, { row: number; col: number }>> = {
 };
 
 const MINI_DIE_SIZE = 40;
-const BEAT_GAP_MS = 180;
+const BEAT_GAP_NORMAL_MS = 180;
+const BEAT_GAP_FAST_MS = 90;
 const GLOW_HZ = 1.2;
 const DAMAGE_POOL_SIZE = 12;
+const PARTICLE_POOL_SIZE = 24;
 const DRAG_THRESHOLD = 6;
 const REROLL_LIFT = 4;
 const CHARGE_PIP_COUNT = 10;
+const SHAKE_AMPLITUDE = 6;
+const SHAKE_MS = 180;
+const BIG_HIT_DAMAGE = 10;
+const HIT_STOP_MS = 70;
 
-const EMPTY_SLOT_FILL = "#131B2D";
-const EMPTY_SLOT_STROKE = "#3D4C6E";
-const ENEMY_FILL = "#182238";
-const STATUS_TINTS: Record<StatusKey, string> = {
-  burn: "#E8963A",
-  mark: "#E8B23A",
-  jam: "#4A90E2",
-  charge: "#B08CFF",
+const beatGapMs = (): number =>
+  useSettingsStore.getState().battleSpeed === "fast"
+    ? BEAT_GAP_FAST_MS
+    : BEAT_GAP_NORMAL_MS;
+
+const emptySlotFill = (): string => mixHex(tokens.surface1, tokens.bg, 0.45);
+const emptySlotStroke = (): string => mixHex(tokens.line, tokens.faint, 0.5);
+const enemyFill = (): string => tokens.surface2;
+
+const statusTint = (key: StatusKey): string => {
+  switch (key) {
+    case "burn":
+      return mixHex(tokens.amber, tokens.danger, 0.45);
+    case "mark":
+      return tokens.amber;
+    case "jam":
+      return schools.blue.stroke;
+    case "charge":
+      return schools.black.stroke;
+  }
 };
 
 interface Rect {
@@ -176,6 +201,35 @@ const dashedRoundRectStroke = (
   g.moveTo(x, y + r).arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
 };
 
+// Slot boards get their depth from drawing, not from bitmaps: a soft inner
+// rim plus short etched ticks along the cap edge.
+const paintSlotBoard = (
+  g: Graphics,
+  rect: Rect,
+  style: { innerShadow: number; etching: boolean },
+): void => {
+  if (style.innerShadow > 0) {
+    g.roundRect(rect.x + 1.5, rect.y + 1.5, rect.w - 3, rect.h - 3, 11).stroke({
+      color: "#000000",
+      alpha: style.innerShadow,
+      width: 3,
+    });
+    g.roundRect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h * 0.5, 10).fill({
+      color: "#FFFFFF",
+      alpha: style.innerShadow * 0.06,
+    });
+  }
+  if (!style.etching) return;
+  const ticks = 6;
+  const span = rect.w * 0.34;
+  const start = rect.x + rect.w - span - 10;
+  for (let i = 0; i < ticks; i += 1) {
+    const x = start + (span / (ticks - 1)) * i;
+    g.moveTo(x, rect.y + rect.h - 7).lineTo(x, rect.y + rect.h - 3);
+  }
+  g.stroke({ color: tokens.line, alpha: 0.85, width: 1 });
+};
+
 const activeSlotIds = (state: BattleState): SlotId[] =>
   Object.keys(state.slots) as SlotId[];
 
@@ -219,7 +273,13 @@ export class BattleScene {
   private pendingPress: PendingPress | null = null;
   private drag: DragState | null = null;
   private glowTime = 0;
+  private shakeMs = 0;
+  private readonly particlePool: Graphics[] = [];
+  private readonly particleCancels = new Set<() => void>();
+  private sceneGlow: Graphics | null = null;
+  private readonly mirrorIntents = new Set<string>();
   private readonly unsubscribe: () => void;
+  private readonly unsubscribeTheme: () => void;
 
   constructor(app: Application, labels: BattleSceneLabels) {
     this.app = app;
@@ -244,11 +304,13 @@ export class BattleScene {
     app.stage.on("pointerupoutside", this.onPointerUp);
 
     this.buildNumberPool();
+    this.buildParticlePool();
     const initial = useBattleStore.getState();
     this.rebuild(initial);
     this.maybeTumble(initial);
-    if (initial.phase === "placement") playSfx("roll");
+    if (initial.phase === "placement") playSfx("rollTumble");
     this.unsubscribe = useBattleStore.subscribe(this.onStoreChange);
+    this.unsubscribeTheme = onThemeChange(this.onThemeSwitch);
     this.app.renderer.on("resize", this.onResize);
     this.app.ticker.add(this.tick);
     if (useBattleStore.getState().phase === "resolving") {
@@ -264,6 +326,8 @@ export class BattleScene {
       useBattleStore.getState().finishResolution();
     }
     this.unsubscribe();
+    this.unsubscribeTheme();
+    this.app.stage.position.set(0, 0);
     this.app.renderer.off("resize", this.onResize);
     this.app.ticker.remove(this.tick);
     this.app.stage.off("pointerdown", this.onStagePointerDown);
@@ -283,6 +347,7 @@ export class BattleScene {
     ]) {
       layer.destroy({ children: true });
     }
+    clearPool("battleFx");
     releaseDieTextures(this.app);
   }
 
@@ -372,6 +437,221 @@ export class BattleScene {
     }
   }
 
+  private buildParticlePool(): void {
+    for (let i = 0; i < PARTICLE_POOL_SIZE; i += 1) {
+      const dot = new Graphics();
+      dot.visible = false;
+      this.fxLayer.addChild(dot);
+      this.particlePool.push(dot);
+    }
+  }
+
+  private reduced(): boolean {
+    return resolveReducedMotion(useSettingsStore.getState().reducedMotion);
+  }
+
+  private readonly onThemeSwitch = (): void => {
+    const state = useBattleStore.getState();
+    this.cancelTumble();
+    this.cancelDrag(state);
+    for (const cancel of this.dieCancels.values()) cancel();
+    this.dieCancels.clear();
+    this.animating.clear();
+    for (const cancel of this.particleCancels) cancel();
+    this.particleCancels.clear();
+    for (const dot of this.particlePool) {
+      dot.clear();
+      dot.visible = false;
+    }
+    clearDieTextureCache(this.app);
+    this.rebuild(useBattleStore.getState());
+  };
+
+  private takeParticle(): Graphics | undefined {
+    const free = this.particlePool.find((dot) => !dot.visible);
+    if (free === undefined) return undefined;
+    free.clear();
+    free.alpha = 1;
+    free.scale.set(1);
+    free.visible = true;
+    return free;
+  }
+
+  private trackParticle(cancel: () => void): void {
+    this.particleCancels.add(cancel);
+  }
+
+  // 12 school-tinted shards fly out of the board centre and the whole scene
+  // takes a short glow — the "a set just completed" moment (DESIGN §10).
+  private resonanceBurst(school: School): void {
+    const colors = schools[school];
+    playSfx("setComplete");
+    if (this.reduced()) {
+      this.sceneGlowPulse(colors.stroke, 0.18, 220);
+      return;
+    }
+    const rect = this.layout.slots.reactor ?? this.layout.reserve;
+    const cx = rect.x + rect.w / 2;
+    const cy = rect.y + rect.h / 2;
+    for (let i = 0; i < 12; i += 1) {
+      const dot = this.takeParticle();
+      if (dot === undefined) break;
+      const angle = (i / 12) * Math.PI * 2;
+      dot.circle(0, 0, 3.5).fill(colors.stroke);
+      dot.position.set(cx, cy);
+      const cancelMove = this.tweens.to(
+        dot,
+        {
+          x: cx + Math.cos(angle) * 78,
+          y: cy + Math.sin(angle) * 78,
+        },
+        520,
+        easeOutQuad,
+      );
+      const cancelFade = this.tweens.to(dot, { alpha: 0 }, 520, linear, () => {
+        dot.visible = false;
+      });
+      this.trackParticle(cancelMove);
+      this.trackParticle(cancelFade);
+    }
+    this.sceneGlowPulse(colors.stroke, 0.22, 420);
+  }
+
+  private sceneGlowPulse(color: string, alpha: number, ms: number): void {
+    if (this.sceneGlow === null) {
+      this.sceneGlow = new Graphics();
+      this.sceneGlow.eventMode = "none";
+      this.fxLayer.addChild(this.sceneGlow);
+    }
+    const glow = this.sceneGlow;
+    glow.clear();
+    glow
+      .rect(0, 0, this.app.screen.width, this.app.screen.height)
+      .fill({ color, alpha: 1 });
+    glow.alpha = alpha;
+    this.tweens.to(glow, { alpha: 0 }, ms, easeOutQuad);
+  }
+
+  // Boss intro: one expanding ring from the enemy line, no particles.
+  private bossShockwave(): void {
+    playSfx("bossIntro");
+    duckMusic(1500);
+    const anchor = this.layout.enemies[0] ?? this.layout.playerHit;
+    if (this.reduced()) {
+      this.sceneGlowPulse(tokens.danger, 0.2, 240);
+      return;
+    }
+    const ring = new Graphics();
+    ring.circle(0, 0, 28).stroke({ color: tokens.danger, width: 3 });
+    ring.position.set(anchor.x, anchor.y);
+    ring.eventMode = "none";
+    this.fxLayer.addChild(ring);
+    this.tweens.to(ring.scale, { x: 7, y: 7 }, 620, easeOutQuad);
+    this.tweens.to(ring, { alpha: 0 }, 620, linear, () => {
+      ring.destroy();
+    });
+    this.shake();
+  }
+
+  // Mirror Hull announces its reflection turn with a diagonal sheen.
+  private mirrorShimmer(enemyId: string): void {
+    const view = this.enemyViews.get(enemyId);
+    if (view === undefined || this.reduced()) return;
+    const size = this.layout.enemySize;
+    const sheen = new Graphics();
+    sheen
+      .moveTo(-size * 0.1, -size / 2)
+      .lineTo(size * 0.16, -size / 2)
+      .lineTo(-size * 0.02, size / 2)
+      .lineTo(-size * 0.28, size / 2)
+      .closePath()
+      .fill({ color: "#FFFFFF", alpha: 0.5 });
+    sheen.eventMode = "none";
+    sheen.x = -size * 0.7;
+    view.root.addChild(sheen);
+    this.tweens.to(sheen, { x: size * 0.9 }, 560, easeOutQuad);
+    this.tweens.to(sheen, { alpha: 0 }, 560, linear, () => {
+      sheen.destroy();
+    });
+  }
+
+  // Core Heart's third phase is the loudest beat in the game: a double ring
+  // out of the boss plus the one screen shake it is allowed.
+  private corePulse(enemyId: string): void {
+    const view = this.enemyViews.get(enemyId);
+    const anchor =
+      view === undefined
+        ? this.layout.enemies[0] ?? this.layout.playerHit
+        : { x: view.root.x, y: view.root.y };
+    playSfx("bossPhase");
+    if (this.reduced()) {
+      this.sceneGlowPulse(tokens.danger, 0.24, 260);
+      return;
+    }
+    for (let i = 0; i < 2; i += 1) {
+      const ring = new Graphics();
+      ring.circle(0, 0, 20).stroke({ color: tokens.danger, width: 4 - i });
+      ring.position.set(anchor.x, anchor.y);
+      ring.eventMode = "none";
+      this.fxLayer.addChild(ring);
+      this.tweens.to(ring.scale, { x: 5 + i, y: 5 + i }, 520 + i * 160, easeOutQuad);
+      this.tweens.to(ring, { alpha: 0 }, 520 + i * 160, linear, () => {
+        ring.destroy();
+      });
+    }
+    this.shake();
+  }
+
+  // A kill pays out visibly: shards of the hull scatter and the scrap it was
+  // worth flies toward the counter in the HUD's top-right corner.
+  private killBurst(enemyId: string, scrap: number): void {
+    const view = this.enemyViews.get(enemyId);
+    if (view === undefined) return;
+    const at = { x: view.root.x, y: view.root.y };
+    if (this.reduced()) {
+      if (scrap > 0) this.spawnNumber(at.x, at.y, `+${String(scrap)}`, tokens.amber);
+      return;
+    }
+    for (let i = 0; i < 8; i += 1) {
+      const dot = this.takeParticle();
+      if (dot === undefined) break;
+      const angle = (i / 8) * Math.PI * 2 + 0.4;
+      dot.rect(-2.5, -2.5, 5, 5).fill(tokens.danger);
+      dot.position.set(at.x, at.y);
+      this.trackParticle(
+        this.tweens.to(
+          dot,
+          { x: at.x + Math.cos(angle) * 54, y: at.y + Math.sin(angle) * 54 },
+          420,
+          easeOutQuad,
+        ),
+      );
+      this.trackParticle(
+        this.tweens.to(dot, { alpha: 0 }, 420, linear, () => {
+          dot.visible = false;
+        }),
+      );
+    }
+    if (scrap <= 0) return;
+    const coin = this.takeParticle();
+    if (coin === undefined) return;
+    coin.circle(0, 0, 4).fill(tokens.amber);
+    coin.position.set(at.x, at.y);
+    const counter = { x: this.app.screen.width - 44, y: 46 };
+    this.trackParticle(
+      this.tweens.to(coin, { x: counter.x, y: counter.y }, 520, easeOutQuad, () => {
+        coin.visible = false;
+      }),
+    );
+  }
+
+  // Shake is bomb-tier only and always opt-out-able (DESIGN §10 + a11y).
+  private shake(): void {
+    if (this.reduced()) return;
+    if (!useSettingsStore.getState().screenShake) return;
+    this.shakeMs = SHAKE_MS;
+  }
+
   private rebuild(state: BattleState): void {
     this.layout = this.computeLayout();
     this.buildSlots(state);
@@ -445,15 +725,24 @@ export class BattleScene {
     view.blocked = blocked;
     const g = view.box;
     g.clear();
+    const style = currentTheme().slotStyle;
     if (occupied) {
       g.roundRect(rect.x, rect.y, rect.w, rect.h, 12)
         .fill(tokens.surface2)
         .stroke({ color: tokens.line, width: 1 });
     } else {
-      g.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill(EMPTY_SLOT_FILL);
-      dashedRoundRectStroke(g, rect, 12);
-      g.stroke({ color: EMPTY_SLOT_STROKE, width: 1 });
+      g.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill(emptySlotFill());
+      if (style.dashed) {
+        dashedRoundRectStroke(g, rect, 12);
+        g.stroke({ color: emptySlotStroke(), width: 1 });
+      } else {
+        g.roundRect(rect.x, rect.y, rect.w, rect.h, 12).stroke({
+          color: emptySlotStroke(),
+          width: 1,
+        });
+      }
     }
+    paintSlotBoard(g, rect, style);
     if (blocked) {
       g.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill({
         color: tokens.danger,
@@ -497,10 +786,18 @@ export class BattleScene {
     this.reserveGlow?.destroy();
     this.reserveTitle?.destroy();
     const rect = this.layout.reserve;
+    const style = currentTheme().slotStyle;
     const box = new Graphics();
-    box.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill(EMPTY_SLOT_FILL);
-    dashedRoundRectStroke(box, rect, 12);
-    box.stroke({ color: EMPTY_SLOT_STROKE, width: 1 });
+    box.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill(emptySlotFill());
+    if (style.dashed) {
+      dashedRoundRectStroke(box, rect, 12);
+      box.stroke({ color: emptySlotStroke(), width: 1 });
+    } else {
+      box
+        .roundRect(rect.x, rect.y, rect.w, rect.h, 12)
+        .stroke({ color: emptySlotStroke(), width: 1 });
+    }
+    paintSlotBoard(box, rect, style);
     const glow = new Graphics();
     glow
       .roundRect(rect.x - 1.5, rect.y - 1.5, rect.w + 3, rect.h + 3, 13)
@@ -531,7 +828,7 @@ export class BattleScene {
       root.position.set(anchor.x, anchor.y);
       const body = new Graphics()
         .roundRect(-size / 2, -size / 2, size, size, 12)
-        .fill(ENEMY_FILL)
+        .fill(enemyFill())
         .stroke({ color: tokens.line, width: 1.5 })
         .moveTo(0, size * 0.28)
         .lineTo(-size * 0.26, -size * 0.18)
@@ -575,7 +872,7 @@ export class BattleScene {
             fontFamily: PIXI_FONT_FAMILY,
             fontSize: 12,
             fontWeight: "700",
-            fill: STATUS_TINTS[key],
+            fill: statusTint(key),
           },
         });
         text.anchor.set(0.5, 0);
@@ -594,7 +891,7 @@ export class BattleScene {
         chip.position.set(size / 2 + 22, -size / 4 + subIndex * 32);
         const circle = new Graphics()
           .circle(0, 0, 14)
-          .fill(ENEMY_FILL)
+          .fill(enemyFill())
           .stroke({ color: tokens.amber, width: 1.5 });
         circle.eventMode = "none";
         const subId = sub.id;
@@ -720,6 +1017,9 @@ export class BattleScene {
       tier: die.tier,
       value: die.value,
       size,
+      defId: die.defId,
+      growth: die.growth ?? 0,
+      hasActive: DIE_BY_ID.get(die.defId)?.active !== undefined,
       engraved:
         engravingsForDie(useBattleStore.getState().engravings, die.defId)
           .length > 0,
@@ -773,7 +1073,7 @@ export class BattleScene {
     const by = y - size / 2 + badge / 2 + 3;
     const shackleR = badge * 0.2;
     const shackleY = by - badge * 0.08;
-    overlay.circle(bx, by, badge * 0.5).fill(EMPTY_SLOT_FILL);
+    overlay.circle(bx, by, badge * 0.5).fill(emptySlotFill());
     overlay
       .moveTo(bx - shackleR, shackleY)
       .arc(bx, shackleY, shackleR, Math.PI, 0)
@@ -888,7 +1188,7 @@ export class BattleScene {
       this.rebuild(state);
       if (state.turn !== prev.turn) {
         this.maybeTumble(state);
-        if (state.phase === "placement") playSfx("roll");
+        if (state.phase === "placement") playSfx("rollTumble");
       }
     } else {
       if (
@@ -914,10 +1214,60 @@ export class BattleScene {
     ) {
       this.startResolution(state);
     }
+    if (state.resonance !== prev.resonance) {
+      this.checkResonanceMilestones(state, prev);
+    }
+    if (state.enemies !== prev.enemies) {
+      this.checkKills(state, prev);
+    }
+    if (prev.introPending && !state.introPending) this.bossShockwave();
+    if (state.enemies !== prev.enemies) this.checkMirrorIntents(state);
+    if (state.charge > prev.charge) playSfx("charge");
     if (state.outcome !== prev.outcome && state.outcome !== undefined) {
       playSfx(state.outcome === "victory" ? "win" : "lose");
+      duckMusic(1800);
+      if (state.outcome === "defeat") this.shake();
     }
   };
+
+  private checkResonanceMilestones(
+    state: BattleState,
+    prev: BattleState,
+  ): void {
+    for (const school of SCHOOL_ORDER) {
+      const before = prev.resonance.counts[school];
+      const after = state.resonance.counts[school];
+      if (after <= before) continue;
+      const crossed = RESONANCE_THRESHOLDS.some(
+        (th) => before < th && after >= th,
+      );
+      if (crossed) {
+        this.resonanceBurst(school);
+        return;
+      }
+    }
+  }
+
+  private checkKills(state: BattleState, prev: BattleState): void {
+    for (const enemy of state.enemies) {
+      if (enemy.hp > 0) continue;
+      const before = prev.enemies.find((e) => e.id === enemy.id);
+      if (before === undefined || before.hp <= 0) continue;
+      this.killBurst(enemy.id, Math.max(0, state.scrap - prev.scrap));
+    }
+  }
+
+  private checkMirrorIntents(state: BattleState): void {
+    for (const enemy of state.enemies) {
+      const mirroring = enemy.hp > 0 && enemy.nextIntent.t === "mirrorHalf";
+      if (mirroring && !this.mirrorIntents.has(enemy.id)) {
+        this.mirrorIntents.add(enemy.id);
+        this.mirrorShimmer(enemy.id);
+      } else if (!mirroring) {
+        this.mirrorIntents.delete(enemy.id);
+      }
+    }
+  }
 
   private readonly onResize = (): void => {
     this.cancelDrag(useBattleStore.getState());
@@ -925,6 +1275,23 @@ export class BattleScene {
   };
 
   private readonly tick = (ticker: Ticker): void => {
+    reportPool(
+      "battleFx",
+      this.numberPool.filter((p) => p.text.visible).length +
+        this.particlePool.filter((p) => p.visible).length,
+      this.numberPool.length + this.particlePool.length,
+    );
+    if (this.shakeMs > 0) {
+      this.shakeMs = Math.max(0, this.shakeMs - ticker.deltaMS);
+      const decay = this.shakeMs / SHAKE_MS;
+      const amp = SHAKE_AMPLITUDE * decay;
+      const phase = (SHAKE_MS - this.shakeMs) / 22;
+      this.app.stage.position.set(
+        Math.sin(phase) * amp,
+        Math.cos(phase * 1.4) * amp * 0.6,
+      );
+      if (this.shakeMs === 0) this.app.stage.position.set(0, 0);
+    }
     if (this.drag === null) return;
     this.glowTime += ticker.deltaMS;
     const alpha =
@@ -1165,6 +1532,7 @@ export class BattleScene {
     }
     this.animating.add(uid);
     playSfx("place");
+    haptic("light");
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
     const cancelScale = this.tweens.to(
@@ -1251,6 +1619,7 @@ export class BattleScene {
       goBack();
       return;
     }
+    playSfx("invalid");
     const offsets = [4, -4, 4, -4, 0];
     const baseX = sprite.x;
     const step = (i: number): void => {
@@ -1428,6 +1797,7 @@ export class BattleScene {
       useBattleStore.getState().finishResolution();
       return;
     }
+    haptic("medium");
     const run = { cancelled: false };
     this.beatRun = run;
     void this.runBeats(bundle, run);
@@ -1451,13 +1821,15 @@ export class BattleScene {
       if (run.cancelled) return;
       this.playBeat(beat);
       useBattleStore.getState().applyBeatSnapshot(beat.after);
-      await this.sleep(BEAT_GAP_MS, run);
+      // DESIGN §10 hit-stop: a heavy hit holds the frame before the next beat.
+      const heavy = beat.kind === "damage" && beat.amount >= BIG_HIT_DAMAGE;
+      await this.sleep(beatGapMs() + (heavy ? HIT_STOP_MS : 0), run);
     }
     for (const beat of bundle.enemyBeats) {
       if (run.cancelled) return;
       this.playEnemyBeat(beat);
       useBattleStore.getState().applyBeatSnapshot(beat.after);
-      await this.sleep(BEAT_GAP_MS, run);
+      await this.sleep(beatGapMs(), run);
     }
     if (run.cancelled) return;
     this.beatRun = null;
@@ -1476,7 +1848,8 @@ export class BattleScene {
     if (beat.kind === "damage" && beat.targetId !== undefined) {
       const anchor = this.enemyAnchor(beat.targetId);
       if (anchor !== undefined) {
-        playSfx("hit");
+        playSfx(beat.slot === "spinal" ? "spinalFire" : "weapons");
+        if (beat.slot === "spinal" && beat.amount >= 15) this.shake();
         this.fireProjectile(slotAnchor, anchor);
         const parentId = beat.targetId.split(":")[0] ?? beat.targetId;
         this.flashEnemy(parentId);
@@ -1490,15 +1863,17 @@ export class BattleScene {
       return;
     }
     if (beat.kind === "spinalJam") {
+      playSfx("spinalJam");
       this.spawnNumber(slotAnchor.x, slotAnchor.y - 20, this.labels.jamLabel, tokens.danger);
       return;
     }
     if (beat.kind === "sensor" && beat.targetId !== undefined) {
+      playSfx("sensors");
       this.scanSweep(beat.targetId);
       return;
     }
     if (beat.kind === "shield") {
-      playSfx("shield");
+      playSfx("shields");
       this.shieldShimmer();
       this.spawnNumber(
         slotAnchor.x,
@@ -1509,9 +1884,11 @@ export class BattleScene {
       return;
     }
     if (beat.kind === "engine") {
+      playSfx("engines");
       this.thrusterPuff();
       return;
     }
+    playSfx(beat.kind === "repair" ? "repair" : "reactor");
     this.spawnNumber(
       slotAnchor.x,
       slotAnchor.y - 24,
@@ -1539,6 +1916,9 @@ export class BattleScene {
       this.fireProjectile(origin, this.layout.playerHit);
       const { playerHit } = this.layout;
       if (beat.hullDamage > 0) {
+        playSfx("hullHit");
+        const state = useBattleStore.getState();
+        if (beat.hullDamage >= state.hull) this.shake();
         this.spawnNumber(
           playerHit.x,
           playerHit.y,
@@ -1546,6 +1926,11 @@ export class BattleScene {
           schools.red.text,
         );
       } else if (beat.shieldDamage > 0) {
+        playSfx(
+          beat.after.shield <= 0 && beat.shieldDamage > 0
+            ? "shieldBreak"
+            : "shieldHit",
+        );
         this.spawnNumber(
           playerHit.x,
           playerHit.y,
@@ -1553,6 +1938,7 @@ export class BattleScene {
           schools.blue.text,
         );
       } else {
+        playSfx("dodge");
         this.spawnNumber(playerHit.x, playerHit.y, "0", tokens.dim);
       }
       return;
@@ -1576,6 +1962,7 @@ export class BattleScene {
     }
     if (beat.kind === "jamSlot" && beat.slot !== undefined) {
       const center = this.slotCenter(beat.slot);
+      playSfx("invalid");
       this.fireProjectile(origin, center);
       this.spawnNumber(center.x, center.y - 16, this.labels.jamLabel, tokens.danger);
       return;
@@ -1583,20 +1970,29 @@ export class BattleScene {
     if (beat.kind === "lockDie" && beat.dieUid !== undefined) {
       const state = useBattleStore.getState();
       const anchor = this.trayAnchor(beat.dieUid, state);
+      playSfx("invalid");
       this.fireProjectile(origin, anchor);
       return;
     }
     if (beat.kind === "burnTick") {
+      playSfx("burnTick");
       this.flashEnemy(beat.enemyId);
       this.spawnNumber(
         origin.x,
         origin.y - this.layout.enemySize / 2,
         `-${String(beat.amount)}`,
-        STATUS_TINTS.burn,
+        statusTint("burn"),
       );
       return;
     }
+    if (beat.kind === "phase") {
+      const after = beat.after.enemies.find((e) => e.id === beat.enemyId);
+      if ((after?.phase ?? 1) >= 3) this.corePulse(beat.enemyId);
+      else this.sceneGlowPulse(tokens.danger, 0.16, 260);
+      return;
+    }
     if (beat.kind === "summon") {
+      playSfx("summon");
       this.flashEnemy(beat.enemyId);
     }
   }

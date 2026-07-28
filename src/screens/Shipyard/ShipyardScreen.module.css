@@ -1,0 +1,34 @@
+.slot {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Mk upgrade: a hologram band sweeps the row once, then the row is just a row
+   again — no lingering state to clean up. */
+.sweep {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 30%,
+    var(--ca-accent) 50%,
+    transparent 70%
+  );
+  opacity: 0.4;
+  animation: mkSweep 620ms ease-out both;
+}
+
+@keyframes mkSweep {
+  from {
+    transform: translateX(-110%);
+  }
+  to {
+    transform: translateX(110%);
+  }
+}
+
+:root[data-ca-motion='reduced'] .sweep {
+  animation: none;
+  opacity: 0;
+}

@@ -1,0 +1,59 @@
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  background: var(--ca-bg-a86);
+  animation: dim 600ms ease-out forwards;
+}
+
+.orbit {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 0;
+  height: 0;
+  animation: spin 600ms linear;
+}
+
+.glyph {
+  position: absolute;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ca-amber);
+  transform: translate(-50%, -50%);
+}
+
+.still {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  background: var(--ca-bg-a86);
+  opacity: 0.5;
+}
+
+@keyframes dim {
+  0% {
+    opacity: 0;
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(340deg);
+  }
+}
+
+:root[data-ca-motion='reduced'] .overlay, :root[data-ca-motion='reduced'] .orbit {
+  animation: none;
+}

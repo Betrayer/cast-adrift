@@ -10,5 +10,25 @@
   "echoVerbosity": "Балакучість Ехо",
   "echoNormal": "Звичайна",
   "echoLess": "Менше",
-  "screenShake": "Тряска екрана"
+  "screenShake": "Тряска екрана",
+  "fontScale": "Розмір тексту",
+  "fontS": "S",
+  "fontM": "M",
+  "fontL": "L",
+  "battleSpeed": "Швидкість бою",
+  "speedNormal": "Звичайна",
+  "speedFast": "Швидка",
+  "tutorialReset": "Показати навчання знову",
+  "theme": {
+    "label": "Тема",
+    "deepSpace": "Глибокий космос",
+    "terminal": "Термінал",
+    "blueprint": "Кресленик",
+    "aurora": "Аврора",
+    "use": "Обрати",
+    "active": "Активна",
+    "owned": "Відкрита",
+    "unlock": "Відкрити",
+    "price": "{{n}} уламків"
+  }
 }

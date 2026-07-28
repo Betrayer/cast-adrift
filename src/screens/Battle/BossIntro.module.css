@@ -30,9 +30,9 @@
 .pip {
   padding: 4px 12px;
   border-radius: 12px;
-  border: 1px solid #6b3a3f;
-  background: rgba(240, 160, 154, 0.1);
-  color: #f0a09a;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-danger-a12);
+  color: var(--ca-school-red-text);
   font-size: 12px;
   font-weight: 600;
   animation: pipIn 320ms ease-out both;
@@ -77,10 +77,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .plate,
-  .pip,
-  .bossFall {
-    animation: none;
-  }
+:root[data-ca-motion='reduced'] .plate, :root[data-ca-motion='reduced'] .pip, :root[data-ca-motion='reduced'] .bossFall {
+  animation: none;
 }

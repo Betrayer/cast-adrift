@@ -13,8 +13,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .line {
-    animation: none;
-  }
+:root[data-ca-motion='reduced'] .line {
+  animation: none;
 }

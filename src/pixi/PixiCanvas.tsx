@@ -1,6 +1,8 @@
 import { Application } from 'pixi.js';
 import { useEffect, useRef } from 'react';
-import { tokens } from '@/app/theme';
+import { hexToNumber } from '@/app/color';
+import { onThemeChange, tokens } from '@/app/theme';
+import { registerPerfApp } from '@/pixi/perf';
 
 export type PixiMount = (app: Application) => (() => void) | undefined;
 
@@ -15,6 +17,8 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
     let disposed = false;
     let initialized = false;
     let cleanup: (() => void) | undefined;
+    let unsubscribeTheme: (() => void) | undefined;
+    let unregisterPerf: (() => void) | undefined;
 
     const onVisibility = () => {
       if (!initialized) return;
@@ -40,6 +44,10 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
         }
         initialized = true;
         container.appendChild(app.canvas);
+        unregisterPerf = registerPerfApp(app);
+        unsubscribeTheme = onThemeChange((def) => {
+          app.renderer.background.color = hexToNumber(def.palette.bg);
+        });
         cleanup = mount(app);
         document.addEventListener('visibilitychange', onVisibility);
         onVisibility();
@@ -51,6 +59,8 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
     return () => {
       disposed = true;
       document.removeEventListener('visibilitychange', onVisibility);
+      unsubscribeTheme?.();
+      unregisterPerf?.();
       if (initialized) {
         cleanup?.();
         app.destroy({ removeView: true, releaseGlobalResources: false }, { children: true });

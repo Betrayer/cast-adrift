@@ -7,10 +7,10 @@ import {
 
 describe('settings migrations', () => {
   it('current version is wired', () => {
-    expect(SETTINGS_VERSION).toBe(1);
+    expect(SETTINGS_VERSION).toBe(2);
   });
 
-  it('migrate passes persisted state through', () => {
+  it('v1 blobs keep their values and gain the v2 defaults', () => {
     const persisted = {
       locale: 'uk',
       sfxVol: 0.5,
@@ -19,7 +19,23 @@ describe('settings migrations', () => {
       echoVerbosity: 'normal',
       screenShake: false,
     };
-    expect(migrateSettings(persisted, 0)).toEqual(persisted);
+    expect(migrateSettings(persisted, 1)).toEqual({
+      ...persisted,
+      theme: 'deepSpace',
+      fontScale: 'm',
+      battleSpeed: 'normal',
+    });
+  });
+
+  it('an unknown theme id falls back to the free default', () => {
+    expect(migrateSettings({ theme: 'chartreuse' }, 1).theme).toBe('deepSpace');
+    expect(migrateSettings({ theme: 'terminal' }, 1).theme).toBe('terminal');
+  });
+
+  it('junk font scale and battle speed are replaced, not carried', () => {
+    const values = migrateSettings({ fontScale: 'xl', battleSpeed: 'warp' }, 1);
+    expect(values.fontScale).toBe('m');
+    expect(values.battleSpeed).toBe('normal');
   });
 });
 

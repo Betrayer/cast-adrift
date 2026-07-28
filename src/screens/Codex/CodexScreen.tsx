@@ -19,6 +19,8 @@ import {
   type CodexEntry,
   type CodexGroup,
 } from "@/data/codex";
+import { schoolGlyphPath } from "@/data/glyphs";
+import { SCHOOL_IDS, schools } from "@/data/schools";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 
@@ -76,6 +78,42 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
   );
 };
 
+const GlyphLegend = () => {
+  const { t } = useTranslation(["run", "battle"]);
+  return (
+    <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder>
+      <Text size="sm" fw={600} c={tokens.text}>
+        {t("run:codex.glyphLegend.title")}
+      </Text>
+      <Group gap="sm" mt="xs" wrap="wrap">
+        {SCHOOL_IDS.map((school) => {
+          const glyph = schoolGlyphPath(school, 11, 11, 8);
+          return (
+            <Group key={school} gap={6} wrap="nowrap">
+              <svg width={22} height={22} role="presentation">
+                <path
+                  d={glyph.d}
+                  fill={glyph.mode === "fill" ? schools[school].stroke : "none"}
+                  stroke={
+                    glyph.mode === "stroke" ? schools[school].stroke : "none"
+                  }
+                  strokeWidth={glyph.width}
+                />
+              </svg>
+              <Text size="xs" c={tokens.dim}>
+                {t(`battle:school.${school}`)}
+              </Text>
+            </Group>
+          );
+        })}
+      </Group>
+      <Text size="xs" c={tokens.faint} mt="xs">
+        {t("run:codex.glyphLegend.body")}
+      </Text>
+    </Paper>
+  );
+};
+
 export const CodexScreen = () => {
   const { t } = useTranslation(["run", "content"]);
   const go = useAppStore((s) => s.go);
@@ -92,6 +130,7 @@ export const CodexScreen = () => {
       </Group>
       <ScrollArea.Autosize mah="82dvh">
         <Stack gap="md">
+          <GlyphLegend />
           {CODEX_GROUP_ORDER.map((group) => {
             const entries = codexByGroup(group);
             return (

@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
+import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
 import { DIE_BY_ID } from "@/data/dice";
 import {
   ENGRAVINGS,
@@ -19,6 +20,7 @@ import {
 } from "@/data/engravings";
 import { ENGRAVING_STATION_LEVEL } from "@/data/milestones";
 import { schools } from "@/data/schools";
+import { playSfx } from "@/services/audio";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 
@@ -33,6 +35,7 @@ export const EngravingScreen = () => {
   const removeEngraving = useMetaStore((s) => s.removeEngraving);
 
   const [selected, setSelected] = useState<string | null>(null);
+  const [burst, setBurst] = useState<SparkleBurst | null>(null);
   const unlocked = level >= ENGRAVING_STATION_LEVEL;
   const owned = collection.filter((e) => e.count > 0);
   const activeDie = selected ?? owned[0]?.defId ?? null;
@@ -170,9 +173,18 @@ export const EngravingScreen = () => {
                       <Button
                         size="compact-xs"
                         disabled={!affordable}
-                        onClick={() => {
-                          if (activeDie !== null)
-                            engrave(activeDie, def.id, def.price);
+                        onClick={(event) => {
+                          if (activeDie === null) return;
+                          if (!engrave(activeDie, def.id, def.price)) return;
+                          playSfx("setComplete");
+                          const rect =
+                            event.currentTarget.getBoundingClientRect();
+                          setBurst({
+                            key: Date.now(),
+                            x: rect.left + rect.width / 2,
+                            y: rect.top + rect.height / 2,
+                            color: tokens.amber,
+                          });
                         }}
                       >
                         {already
@@ -187,6 +199,7 @@ export const EngravingScreen = () => {
           </Paper>
         </>
       ) : null}
+      <Sparkle burst={burst} />
     </Stack>
   );
 };

@@ -2,7 +2,9 @@ import { Badge, Button, Paper, RingProgress, Text, Title } from "@mantine/core";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
+import { ParticleRain } from "@/components/ParticleRain";
 import { emitBark } from "@/game/narrative";
+import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import styles from "./LevelUpCeremony.module.css";
 
@@ -26,6 +28,8 @@ export const LevelUpCeremony = ({
 
   useEffect(() => {
     emitBark("levelUp");
+    playSfx("levelUp");
+    duckMusic(2200);
     haptic("heavy");
   }, []);
 
@@ -33,6 +37,12 @@ export const LevelUpCeremony = ({
 
   return (
     <div className={`${styles.overlay ?? ""}`}>
+      {reduced ? null : (
+        <ParticleRain
+          color={tokens.amber}
+          className={styles.rain}
+        />
+      )}
       <div className={cls("ring")}>
         <RingProgress
           size={140}

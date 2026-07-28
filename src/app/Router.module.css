@@ -1,0 +1,18 @@
+/* Opacity only, deliberately: a transform on this wrapper would become the
+   containing block for every `position: fixed` overlay inside a screen. */
+.screen {
+  animation: screenIn 180ms ease-out both;
+}
+
+@keyframes screenIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:root[data-ca-motion='reduced'] .screen {
+  animation: none;
+}
