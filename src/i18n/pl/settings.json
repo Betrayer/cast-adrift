@@ -1,0 +1,40 @@
+{
+  "title": "Ustawienia",
+  "language": "Język",
+  "sfxVolume": "Poziom głośności efektów dźwiękowych",
+  "musicVolume": "Głośność muzyki",
+  "reducedMotion": "Ograniczony ruch",
+  "auto": "Auto",
+  "on": "W dniu",
+  "off": "Wyłączone",
+  "echoVerbosity": "Echo paplanina",
+  "echoNormal": "Normalny",
+  "echoLess": "Mniej",
+  "screenShake": "Drganie ekranu",
+  "fontScale": "Rozmiar tekstu",
+  "fontS": "S",
+  "fontM": "M",
+  "fontL": "L",
+  "battleSpeed": "Tempo bitwy",
+  "speedNormal": "Normalny",
+  "speedFast": "Szybko",
+  "tutorialReset": "Pokaż samouczek ponownie",
+  "theme": {
+    "label": "Temat",
+    "deepSpace": "Głęboki kosmos",
+    "terminal": "Terminal",
+    "blueprint": "Projekt",
+    "aurora": "Aurora",
+    "use": "Zastosowanie",
+    "active": "Aktywne",
+    "owned": "Odblokowane",
+    "unlock": "Odblokuj",
+    "price": "{{n}} odłamki"
+  },
+  "diagnostics": {
+    "version": "Zbuduj wersję „{{version}}”",
+    "show": "Diagnostyka ({{n}})",
+    "hide": "Ukryj informacje diagnostyczne",
+    "clean": "W tej sesji nie wystąpiły żadne błędy."
+  }
+}

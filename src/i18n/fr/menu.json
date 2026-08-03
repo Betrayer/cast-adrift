@@ -1,0 +1,29 @@
+{
+  "tagline": "Une opération de récupération dans un secteur inactif",
+  "testBattle": "Combat d'essai",
+  "newRun": "Campagne",
+  "hangar": "Hangar",
+  "starChart": "Carte stellaire",
+  "collection": "Collection",
+  "codex": "Codex",
+  "modes": "Modes",
+  "settings": "Paramètres",
+  "resume": "Continuer : Secteur {{sector}} · analyse approfondie {{depth}}",
+  "cloudFound": "Une nouvelle série a été détectée dans le nuage — faut-il la poursuivre ?",
+  "cloudYes": "Course dans le cloud",
+  "cloudNo": "Local",
+  "stub": "Cet écran apparaît dans la phase «{{phase}} ».",
+  "resumeCard": "Lire la suite : Secteur {{sector}} · en détail {{depth}} · {{when}}",
+  "resumeContinue": "Continuer",
+  "resumeAbandon": "Laisse tomber",
+  "resumeWhen": {
+    "now": "il y a un instant",
+    "minutes": "{{n}} il y a quelques minutes",
+    "hours": "{{n}} il y a h",
+    "days": "{{n}} il y a d"
+  },
+  "abandonTitle": "Faut-il abandonner cette course ?",
+  "abandonBody": "Les sauvegardes locales et la copie sur le cloud sont toutes deux effacées. Il n'y a pas de retour en arrière possible.",
+  "abandonNo": "Garde-le",
+  "abandonYes": "Abandonner"
+}

@@ -1,0 +1,29 @@
+{
+  "tagline": "Przejazd ratunkowy przez martwy sektor",
+  "testBattle": "Bitwa testowa",
+  "newRun": "Kampania",
+  "hangar": "Hangar",
+  "starChart": "Mapa gwiazd",
+  "collection": "Kolekcja",
+  "codex": "Kodeks",
+  "modes": "Tryby",
+  "settings": "Ustawienia",
+  "resume": "Kontynuuj: Sektor {{sector}} · głębokość {{depth}}",
+  "cloudFound": "W chmurze znaleziono nowszą wersję — czy kontynuować?",
+  "cloudYes": "Bieg w chmurze",
+  "cloudNo": "Lokalne",
+  "stub": "Ten ekran pojawia się w fazie „{{phase}}”.",
+  "resumeCard": "Czytaj dalej: Sektor {{sector}} · szczegółowe informacje {{depth}} · {{when}}",
+  "resumeContinue": "Kontynuuj",
+  "resumeAbandon": "Zostaw to",
+  "resumeWhen": {
+    "now": "właśnie przed chwilą",
+    "minutes": "{{n}} min temu",
+    "hours": "{{n}} h temu",
+    "days": "{{n}} d temu"
+  },
+  "abandonTitle": "Zrezygnować z tego przejazdu?",
+  "abandonBody": "Zarówno pliki zapisane lokalnie, jak i kopia w chmurze zostaną usunięte. Nie ma już odwrotu.",
+  "abandonNo": "Zachowaj to",
+  "abandonYes": "Porzucić"
+}

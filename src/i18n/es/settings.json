@@ -1,0 +1,40 @@
+{
+  "title": "Configuración",
+  "language": "Idioma",
+  "sfxVolume": "Volumen de efectos especiales",
+  "musicVolume": "Volumen de la música",
+  "reducedMotion": "Movimiento reducido",
+  "auto": "Auto",
+  "on": "El",
+  "off": "Apagado",
+  "echoVerbosity": "Echo cháchara",
+  "echoNormal": "Normal",
+  "echoLess": "Menos",
+  "screenShake": "Temblor de la pantalla",
+  "fontScale": "Tamaño del texto",
+  "fontS": "S",
+  "fontM": "M",
+  "fontL": "L",
+  "battleSpeed": "Velocidad de combate",
+  "speedNormal": "Normal",
+  "speedFast": "Rápido",
+  "tutorialReset": "Volver a mostrar el tutorial",
+  "theme": {
+    "label": "Tema",
+    "deepSpace": "Espacio profundo",
+    "terminal": "Terminal",
+    "blueprint": "Plan de acción",
+    "aurora": "Aurora",
+    "use": "Uso",
+    "active": "Activo",
+    "owned": "Desbloqueado",
+    "unlock": "Desbloquear",
+    "price": "{{n}} fragmentos"
+  },
+  "diagnostics": {
+    "version": "Compilar {{version}}",
+    "show": "Diagnósticos ({{n}})",
+    "hide": "Ocultar diagnósticos",
+    "clean": "No se han producido errores en esta sesión."
+  }
+}

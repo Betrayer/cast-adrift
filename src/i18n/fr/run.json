@@ -1,0 +1,275 @@
+{
+  "glyph": {
+    "start": "⌂",
+    "battle": "B",
+    "elite": "E",
+    "miniboss": "MB",
+    "shop": "$",
+    "shipyard": "Y",
+    "event": "?",
+    "anomaly": "A",
+    "beacon": "M",
+    "boss": "Patron"
+  },
+  "map": {
+    "title": "{{n}} du secteur · {{name}}",
+    "depth": "{{cur}}s détaillées sur {{max}} · enregistrement automatique",
+    "tide": "{{n}} des marées d'interférence",
+    "interference": "Interférence × {{n}}",
+    "fog": "Interférence",
+    "fogSub": "Les capteurs Mk2+ en dévoilent davantage",
+    "jump": "Aller au nœud sélectionné",
+    "jumpHint": "Sélectionnez un nœud accessible",
+    "you": "Toi",
+    "boss": "Patron",
+    "abandon": "Abandonner la course",
+    "previewMiniboss": "Mini-boss : {{name}}",
+    "previewBoss": "Boss : {{name}}",
+    "modules": "Modules {{used}} / {{max}}"
+  },
+  "event": {
+    "title": "Signal",
+    "continue": "Continuer",
+    "toBattle": "S'engager",
+    "quiet": "Le secteur retient son souffle. Tout est immobile.",
+    "speaker": "— {{name}}",
+    "reqScrap": "recherche des chutes d'{{n}}",
+    "reqHull": "nécessite une coque de type «{{n}}»",
+    "reqSchool": "Il faut des dés « {{n}} » et « {{school}} ».",
+    "reqDieTier": "nécessite une d{{tier}}",
+    "reqDieSchool": "nécessite une matrice «{{school}}»",
+    "reqMk": "besoins {{slot}} Mk {{mk}}",
+    "reqFlag": "verrouillé",
+    "checkTitle": "Lancer de dés",
+    "checkSum": "Somme de {{n}}s ou plus",
+    "checkHighest": "Un dé affichant « {{n}} » ou plus",
+    "odds": "probabilité {{n}} %",
+    "checkHint": "vérifier · {{n}} %",
+    "pass": "Succès — {{total}}",
+    "fail": "Échec — {{total}}",
+    "roll": "Rouleau",
+    "back": "Retour"
+  },
+  "anomaly": {
+    "title": "Anomalie",
+    "goal": "Objectif",
+    "resolve": "Résolution",
+    "retry": "Nouveau rouleau",
+    "solved": "Résolu",
+    "failed": "Pas encore — relancer le dé ou relancer une nouvelle fois",
+    "reward": "+ Déchet de{{n}}",
+    "leave": "Partir",
+    "tray": "Lancer de dés",
+    "slots": "Systèmes",
+    "rerolls": "Relances : {{n}}",
+    "reroll": "Reroll ({{n}})",
+    "retryLeft": "Nouveau rouleau (à {{n}}, à gauche)",
+    "giveUp": "Plus de rouleaux neufs",
+    "toMap": "Retour à la carte",
+    "outOfRollsTitle": "Anomalie non résolue",
+    "outOfRolls": "Il ne reste plus de nouveaux rouleaux. Départ de Stokes Résonance Interférence.",
+    "rerollHint": "Choisissez jusqu’à {{n}} dés à relancer",
+    "rerollCancel": "Annuler",
+    "rerollConfirm": "Rejouer «{{k}} »",
+    "m_damage": "{{n}}s sur les dégâts / {{target}}",
+    "m_charge": "{{n}} / {{target}}",
+    "m_shield": "{{n}} de Shield / {{target}}",
+    "mHull": "Coque après le succès : {{n}}",
+    "exactEq": "Cible = {{n}}",
+    "exactNow": "maintenant {{n}}",
+    "exactHit": "exact",
+    "exactOver": "sur {{n}}",
+    "exactUnder": "par {{n}}",
+    "turn": "Turn {{cur}} / {{max}}",
+    "carry": "Adopté :",
+    "carryCharge": "{{n}} de la charge",
+    "carryBurn": "{{n}} de combustion",
+    "carryReserved": "réservé d {{n}}",
+    "carryNone": "rien pour l'instant",
+    "reserve": "Réserve",
+    "reserved": "Réservé",
+    "unreserve": "Sans réserve",
+    "nextTurn": "Fin de virage",
+    "reset": "Réinitialiser le placement",
+    "fixed": "Lecture fixe — réfléchis-y",
+    "cumDamage": "Dégâts totaux {{n}} / {{target}}",
+    "cumCharge": "{{n}} des frais prélevés / {{target}}",
+    "cumShield": "{{n}} de Shield / {{target}}",
+    "interferenceWarn": "Repartez, et l'interférence « Résonance » commence.",
+    "rule": {
+      "noWaste": "Aucun liquide ne s'est écoulé au-delà du bouchon",
+      "schoolInSlot": "{{school}} mourir dans « {{slot}} »",
+      "everyDiePlaced": "Chaque dé posé",
+      "slotParity": "{{slot}} on peut lire {{parity}}",
+      "minSlotsUsed": "Utiliser au moins des systèmes «{{n}} »",
+      "maxSlotsUsed": "Utilisation au maximum sur des systèmes «{{n}} »",
+      "affixUsed": "{{affix}} déclenché"
+    },
+    "step": {
+      "mark": "Des capteurs repèrent la cible",
+      "damage": "{{n}}au sol + dégâts",
+      "shield": "Lancer « {{n}}» + bouclier",
+      "charge": "{{n}}bancaire + frais",
+      "noOverflow": "Le réacteur ne déborde pas",
+      "spinalJam": "Bloquages vertébraux volontaires"
+    },
+    "clause": "{{n}}et {{metric}}",
+    "surviveLabel": "Survivre à l'impact imminent",
+    "parity": {
+      "even": "même",
+      "odd": "impair"
+    },
+    "affix": {
+      "burn": "Brûler",
+      "growth": "Croissance",
+      "exceedCap": "Surcharge",
+      "affinity": "Affinité"
+    },
+    "metric": {
+      "damage": "dégâts",
+      "charge": "frais",
+      "shield": "bouclier"
+    }
+  },
+  "codex": {
+    "title": "Codex",
+    "world": "Monde",
+    "dossiers": "Dossiers",
+    "memory": "Echo Mémoire",
+    "empty": "Rien n'a encore été enregistré.",
+    "locked": "Pas encore découvert",
+    "back": "Retour",
+    "unread": "nouveau",
+    "glyphLegend": {
+      "title": "Symboles scolaires",
+      "body": "Chaque dé présente une forme différente dans un coin, ce qui permet de distinguer les écoles sans avoir recours à la couleur : Rouge — triangle · Bleu — carré · Vert — feuille · Jaune — anneau · Noir — pointe · Gris — point · Prismatique — étoile."
+    }
+  },
+  "consequenceToast": "Conséquence : {{text}}",
+  "rewards": {
+    "scrap": "+ Déchet de{{n}}",
+    "dieTitle": "Matrice récupérée",
+    "keep": "Garder dans le paquet",
+    "sell": "Vendre (+ {{n}})",
+    "deckFull": "Jeu complet (9)",
+    "healed": "Réparé + {{n}}"
+  },
+  "perk": {
+    "title": "Choisissez une mise à niveau",
+    "pick": "Prendre",
+    "skip": "Passer (+ {{n}}s de chutes)",
+    "sub": "1 sur 3"
+  },
+  "shop": {
+    "title": "Marché · Mara",
+    "buy": "Acheter ({{n}})",
+    "sell": "Vendre",
+    "reroll": "Réapprovisionnement ({{n}})",
+    "leave": "Partir",
+    "scrap": "Ferraille: {{n}}",
+    "deck": "{{n}}s sur le pont /9",
+    "sellTitle": "Vendre un dé",
+    "empty": "Épuisé",
+    "owned": "Sur le pont",
+    "modulesTitle": "Modules {{used}} / {{max}}",
+    "modulesFull": "Baie pleine",
+    "rerollFree": "Réapprovisionnement (gratuit)"
+  },
+  "shipyard": {
+    "title": "Chantier naval",
+    "mk": "Mk {{mk}} — {{cost}}",
+    "mkMax": "Mk3 · à fond",
+    "systems": "Systèmes",
+    "fusion": "Fuse ({{cost}})",
+    "fusionTitle": "Fusion",
+    "fusionHint": "Deux dés identiques → +1 niveau",
+    "fusionPick": "Choisissez un dé à fusionner",
+    "repair": "Réparation",
+    "repairHint": "2 pièces de ferraille par coque",
+    "leave": "Partir",
+    "scrap": "Ferraille: {{n}}",
+    "hull": "Coque {{cur}}/{{max}}",
+    "voucher": "Code promo Mk × {{n}} — un niveau gratuit",
+    "voucherUse": "Gratuit"
+  },
+  "summary": {
+    "victory": "Secteur dégagé",
+    "defeat": "Écrasé",
+    "nodes": "Nœuds effacés : {{n}}",
+    "kills": "Kills : {{n}}",
+    "earned": "Ferraille Source : {{n}}",
+    "spent": "Ferraille source : {{n}}",
+    "perks": "Mises à jour :",
+    "perksNone": "aucun",
+    "meta": "Éclats & XP",
+    "toMenu": "Retour au menu"
+  },
+  "prologue": {
+    "title": "Prologue",
+    "echo": "ECHO : {{line}}",
+    "step": "{{cur}} / {{max}}",
+    "leave": "Retour au menu"
+  },
+  "interstitial": {
+    "sector": "{{n}} du secteur",
+    "enter": "Entrer dans le secteur"
+  },
+  "finale": {
+    "title": "Le « Core Heart » est ouvert",
+    "intro": "Toutes les décisions que tu as prises ici sont désormais autant de portes. Seules celles que tu as méritées s'ouvriront.",
+    "thin": "Echo : « Vous n'avez pas été très convaincant, capitaine. Deux portes, et les deux ont haussé les épaules. »",
+    "axis": "Résonance ↔ Axe de stabilité : {{n}}"
+  },
+  "ending": {
+    "next": "Continuer",
+    "step": "{{cur}} / {{max}}",
+    "tally": "Ce que tu as laissé derrière toi",
+    "continue": "Fermer le journal"
+  },
+  "setup": {
+    "title": "Lancement",
+    "mode": "Campagne — cinq secteurs, une seule issue.",
+    "ship": "Navire",
+    "deck": "Jeu de cartes : dés « {{n}} »",
+    "ascension": "Ascension",
+    "ascensionLocked": "Terminez la campagne une fois pour débloquer l'ascension.",
+    "aLevel": "Un «{{n}} »",
+    "tideCap": "Niveaux maximaux des marées d'interférence à l'{{n}}",
+    "launch": "Lancement",
+    "back": "Retour"
+  },
+  "package": {
+    "title": "Boîtier de porte",
+    "scrap": "+ Déchet de{{n}}",
+    "voucher": "Bon Mk × {{n}} — une mise à niveau gratuite dans n'importe quel chantier naval",
+    "take": "Prendre",
+    "sell": "Vendre (+ {{n}})",
+    "hint": "Faites votre choix. Le tirage au sort des avantages va suivre.",
+    "module": "module",
+    "install": "Installer"
+  },
+  "tutorial": {
+    "next": "Suivant",
+    "skipAll": "Tout ignorer",
+    "place": {
+      "title": "Faites glisser un dé dans un système",
+      "body": "Lancez les dés, puis faites-les glisser depuis le plateau vers les cases « Armes », « Boucliers », « Moteurs », « Capteurs » ou « Réacteur ». Un dé ne peut jamais être placé dans une case dont le niveau maximal est inférieur à sa face."
+    },
+    "endTurn": {
+      "title": "Résoudre le virage",
+      "body": "Lorsque le plateau correspond à ce que vous souhaitez, terminez votre tour. Les systèmes tirent de haut en bas, puis l'ennemi riposte."
+    },
+    "reroll": {
+      "title": "On a droit à un relance gratuit une seule fois",
+      "body": "Choisissez n'importe quel dé encore présent dans le plateau et relancez-le. Les relances ne se reportent pas d'un tour à l'autre : une relance non utilisée est perdue."
+    },
+    "nudge": {
+      "title": "La puissance d'attaque est synonyme de précision",
+      "body": "Choisissez un dé et dépensez des points de charge pour faire varier sa face de +1 ou -1. Les points de charge permettent également d'effectuer des relances supplémentaires et d'activer des « surges »."
+    },
+    "jump": {
+      "title": "Choisissez le nœud suivant",
+      "body": "Appuyez sur un nœud allumé, puis sur « Sauter ». Le brouillard masque les rangées qui se trouvent devant ; les capteurs et les analyses approfondies repoussent l'horizon plus loin."
+    }
+  }
+}

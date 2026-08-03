@@ -1,0 +1,275 @@
+{
+  "glyph": {
+    "start": "⌂",
+    "battle": "B",
+    "elite": "E",
+    "miniboss": "MB",
+    "shop": "$",
+    "shipyard": "Y",
+    "event": "?",
+    "anomaly": "A",
+    "beacon": "M",
+    "boss": "Szef"
+  },
+  "map": {
+    "title": "Sektor {{n}} · {{name}}",
+    "depth": "głębokość {{cur}} z {{max}} · automatyczne zapisywanie",
+    "tide": "Fala interferencyjna {{n}}",
+    "interference": "Interference × {{n}}",
+    "fog": "Zakłócenia",
+    "fogSub": "Czujniki Mk2+ ujawniają jeszcze więcej",
+    "jump": "Przejdź do wybranego węzła",
+    "jumpHint": "Wybierz dostępny węzeł",
+    "you": "Ty",
+    "boss": "Szef",
+    "abandon": "Przerwij przebieg",
+    "previewMiniboss": "Mini-boss: {{name}}",
+    "previewBoss": "Szef: {{name}}",
+    "modules": "Moduły {{used}} / {{max}}"
+  },
+  "event": {
+    "title": "Sygnał",
+    "continue": "Kontynuuj",
+    "toBattle": "Zaangażuj się",
+    "quiet": "Cała branża wstrzymuje oddech. Nic się nie porusza.",
+    "speaker": "— {{name}}",
+    "reqScrap": "potrzebuje złomu typu „{{n}}”",
+    "reqHull": "potrzebny jest kadłub typu „{{n}}”",
+    "reqSchool": "potrzebne są kostki z gry „{{n}}” i „{{school}}”",
+    "reqDieTier": "potrzebuje d {{tier}}",
+    "reqDieSchool": "potrzebna jest matryca typu „{{school}}”",
+    "reqMk": "wymagania: {{slot}} Mk{{mk}}",
+    "reqFlag": "zablokowane",
+    "checkTitle": "Rzut kostką",
+    "checkSum": "Suma {{n}} lub więcej",
+    "checkHighest": "Kość, na której widnieje napis „{{n}}” lub więcej",
+    "odds": "szansa {{n}} %",
+    "checkHint": "sprawdź · {{n}} %",
+    "pass": "Sukces — {{total}}",
+    "fail": "Niepowodzenie — {{total}}",
+    "roll": "Rolka",
+    "back": "Powrót"
+  },
+  "anomaly": {
+    "title": "Anomalia",
+    "goal": "Cel",
+    "resolve": "Rozwiązanie",
+    "retry": "Nowa rolka",
+    "solved": "Rozwiązane",
+    "failed": "Jeszcze nie — spróbuj ponownie lub rzuć kostką od nowa",
+    "reward": "+ fragment z{{n}}",
+    "leave": "Wyjść",
+    "tray": "Rzucone kości",
+    "slots": "Systemy",
+    "rerolls": "powtórki: {{n}}",
+    "reroll": "Reroll ({{n}})",
+    "retryLeft": "Nowa rolka (po lewej: {{n}})",
+    "giveUp": "Brak nowych rolek",
+    "toMap": "Powrót do mapy",
+    "outOfRollsTitle": "Anomalia nierozwiązana",
+    "outOfRolls": "Nie ma już nowych rzutów. Opuszcza boisko – faul Rezonans.",
+    "rerollHint": "Wybierz maksymalnie{{n}}-kości, aby rzucić ponownie",
+    "rerollCancel": "Anuluj",
+    "rerollConfirm": "Ponowne losowanie {{k}}",
+    "m_damage": "Oszkody {{n}} / {{target}}",
+    "m_charge": "Kontakt: {{n}} / {{target}}",
+    "m_shield": "Shield {{n}} / {{target}}",
+    "mHull": "Kadłub po uderzeniu: {{n}}",
+    "exactEq": "Adres docelowy = {{n}}",
+    "exactNow": "teraz {{n}}",
+    "exactHit": "dokładny",
+    "exactOver": "na stronie {{n}}",
+    "exactUnder": "autor: {{n}}",
+    "turn": "Zajrzyj na stronę {{cur}} / {{max}}",
+    "carry": "Przyjęto:",
+    "carryCharge": "opłata {{n}}",
+    "carryBurn": "spal {{n}}",
+    "carryReserved": "zastrzeżone d {{n}}",
+    "carryNone": "na razie nic",
+    "reserve": "Rezerwa",
+    "reserved": "Zarezerwowane",
+    "unreserve": "Znieść rezerwację",
+    "nextTurn": "Koniec zakrętu",
+    "reset": "Zresetuj rozmieszczenie",
+    "fixed": "Stała wartość odczytu — wyjaśnij to",
+    "cumDamage": "Łączne szkody {{n}} / {{target}}",
+    "cumCharge": "Zgromadzone opłaty {{n}} / {{target}}",
+    "cumShield": "Shield {{n}} / {{target}}",
+    "interferenceWarn": "Wyruszamy ponownie i rozpoczyna się zakłócenie typu „Rezonans”.",
+    "rule": {
+      "noWaste": "Żadna ciecz nie wyciekła poza korek",
+      "schoolInSlot": "{{school}} die w pliku {{slot}}",
+      "everyDiePlaced": "Każda umieszczona kostka",
+      "slotParity": "{{slot}} brzmi: {{parity}}",
+      "minSlotsUsed": "Należy korzystać co najmniej z systemów typu „{{n}}”",
+      "maxSlotsUsed": "Użyj co najwyżej systemów typu „{{n}}”",
+      "affixUsed": "{{affix}} uruchomiony"
+    },
+    "step": {
+      "mark": "Czujniki wskazują cel",
+      "damage": "{{n}}+ obrażenia",
+      "shield": "Podnieś tarczę „{{n}}”+",
+      "charge": "Bank {{n}} + opłata",
+      "noOverflow": "Reaktor nie przelewa się",
+      "spinalJam": "Celowe blokady kręgosłupa"
+    },
+    "clause": "Zadzwoń pod numer {{n}}lub {{metric}}",
+    "surviveLabel": "Przetrwaj nadchodzące uderzenie",
+    "parity": {
+      "even": "nawet",
+      "odd": "nieparzysty"
+    },
+    "affix": {
+      "burn": "Spalić",
+      "growth": "Wzrost",
+      "exceedCap": "Przekroczenie limitu",
+      "affinity": "Affinity"
+    },
+    "metric": {
+      "damage": "uszkodzenie",
+      "charge": "opłata",
+      "shield": "tarcza"
+    }
+  },
+  "codex": {
+    "title": "Kodeks",
+    "world": "Świat",
+    "dossiers": "Dokumentacje",
+    "memory": "Echo Pamięć",
+    "empty": "Nie zarejestrowano jeszcze żadnych wpisów.",
+    "locked": "Jeszcze nie odkryte",
+    "back": "Powrót",
+    "unread": "nowy",
+    "glyphLegend": {
+      "title": "Symbole szkolne",
+      "body": "Każda kostka ma inny kształt rogu, dzięki czemu szkoły mogą się od siebie odróżniać bez użycia kolorów: czerwony — trójkąt · niebieski — kwadrat · zielony — liść · żółty — pierścień · czarny — kolczasty · szary — kropka · pryzmatyczny — gwiazda."
+    }
+  },
+  "consequenceToast": "Wynik: {{text}}",
+  "rewards": {
+    "scrap": "+ fragment z{{n}}",
+    "dieTitle": "Odzyskana matryca",
+    "keep": "Zostawić na pokładzie",
+    "sell": "Sprzedaj (+{{n}})",
+    "deckFull": "Pełna talia (9)",
+    "healed": "Naprawiono + {{n}}"
+  },
+  "perk": {
+    "title": "Wybierz opcję rozszerzenia",
+    "pick": "Weź",
+    "skip": "Pomiń (+odpad z {{n}})",
+    "sub": "1 z 3"
+  },
+  "shop": {
+    "title": "Rynek · Mara",
+    "buy": "Kup ({{n}})",
+    "sell": "Sprzedaj",
+    "reroll": "Uzupełnienie zapasów ({{n}})",
+    "leave": "Wyjść",
+    "scrap": "Złom: {{n}}",
+    "deck": "Pokład {{n}} /9",
+    "sellTitle": "Sprzedaj kostkę do gry",
+    "empty": "Wyprzedane",
+    "owned": "Na pokładzie",
+    "modulesTitle": "Moduły {{used}} / {{max}}",
+    "modulesFull": "Zatoka pełna",
+    "rerollFree": "Ponowne losowanie zasobów (bezpłatne)"
+  },
+  "shipyard": {
+    "title": "Stocznia",
+    "mk": "Mk {{mk}} — {{cost}}",
+    "mkMax": "Mk3 · na maksa",
+    "systems": "Systemy",
+    "fusion": "Fuse ({{cost}})",
+    "fusionTitle": "Fusion",
+    "fusionHint": "Dwie identyczne kostki → +1 poziom",
+    "fusionPick": "Wybierz kostkę do połączenia",
+    "repair": "Naprawa",
+    "repairHint": "2 sztuki złomu na kadłub",
+    "leave": "Wyjść",
+    "scrap": "Złom: {{n}}",
+    "hull": "Kadłub {{cur}}/{{max}}",
+    "voucher": "Kupon Mk ×{{n}} — jeden bezpłatny poziom",
+    "voucherUse": "Bezpłatny"
+  },
+  "summary": {
+    "victory": "Sektor oczyszczony",
+    "defeat": "Potrącony",
+    "nodes": "Wyczyściło się węzły: {{n}}",
+    "kills": "Zabójstwa: {{n}}",
+    "earned": "Złom źródło: {{n}}",
+    "spent": "Złom źródło: {{n}}",
+    "perks": "Ulepszenia:",
+    "perksNone": "brak",
+    "meta": "Odłamki & XP",
+    "toMenu": "Do menu"
+  },
+  "prologue": {
+    "title": "Prolog",
+    "echo": "ECHO: {{line}}",
+    "step": "{{cur}} / {{max}}",
+    "leave": "Powrót do menu"
+  },
+  "interstitial": {
+    "sector": "Sektor{{n}}",
+    "enter": "Wejdź do branży"
+  },
+  "finale": {
+    "title": "Serce Rdzenia jest otwarte",
+    "intro": "Wszystko, o czym tu zdecydowałeś, stało się teraz drzwiami. Otworzą się tylko te, na które zasłużyłeś.",
+    "thin": "Echo: „Nie do końca to doprecyzowałeś, kapitanie. Dwoje ludzi, oboje wzruszają ramionami”.",
+    "axis": "Rezonans ↔ Oś stabilności: {{n}}"
+  },
+  "ending": {
+    "next": "Kontynuuj",
+    "step": "{{cur}} / {{max}}",
+    "tally": "To, co po sobie zostawiłeś",
+    "continue": "Zamknij dziennik"
+  },
+  "setup": {
+    "title": "Uruchomienie",
+    "mode": "Kampania — pięć sektorów, jedno zakończenie.",
+    "ship": "Statek",
+    "deck": "Talia: Kości „{{n}}”",
+    "ascension": "Wniebowstąpienie",
+    "ascensionLocked": "Ukończ kampanię raz, aby odblokować ascendencję.",
+    "aLevel": "A {{n}}",
+    "tideCap": "Szczyty pływów interferencyjnych na stronie {{n}}",
+    "launch": "Uruchomienie",
+    "back": "Powrót"
+  },
+  "package": {
+    "title": "Opakowanie typu Gate",
+    "scrap": "+ fragment z{{n}}",
+    "voucher": "Kupon Mk ×{{n}} — jedno bezpłatne ulepszenie w dowolnej stoczni",
+    "take": "Weź",
+    "sell": "Sprzedaj (+{{n}})",
+    "hint": "Wybierz jedną opcję. Zaraz rozpocznie się wybór bonusów.",
+    "module": "moduł",
+    "install": "Zainstaluj"
+  },
+  "tutorial": {
+    "next": "Dalej",
+    "skipAll": "Pomiń wszystko",
+    "place": {
+      "title": "Przeciągnij kostkę do systemu",
+      "body": "Rzuć kostką, a następnie przeciągnij ją z tacki na pola „Broń”, „Tarcze”, „Silniki”, „Czujniki” lub „Reaktor”. Kostka nigdy nie zmieści się w polu, którego limit jest niższy od jej wartości."
+    },
+    "endTurn": {
+      "title": "Rozstrzygnij ruch",
+      "body": "Gdy układ na planszy będzie taki, jak chcesz, zakończ turę. Systemy strzelają od góry do dołu, a następnie odpowiada przeciwnik."
+    },
+    "reroll": {
+      "title": "Dodatkowe próby są dostępne raz za darmo",
+      "body": "Wybierz dowolną kostkę, która nadal znajduje się w tacki, i rzuć nią ponownie. Powtórne rzuty nie przechodzą na kolejną turę — niewykorzystany rzut przepada."
+    },
+    "nudge": {
+      "title": "Za opłatą zyskujesz precyzję",
+      "body": "Wybierz kostkę i wykorzystaj punkty mocy, aby zmienić wynik na jednej ściance o jeden w górę lub w dół. Punkty mocy pozwalają również na dodatkowe rzuty oraz wzmocnienia."
+    },
+    "jump": {
+      "title": "Wybierz następny węzeł",
+      "body": "Dotknij podświetlonego węzła, a następnie wybierz opcję „Skok”. Mgła zasłania kolejne rzędy; czujniki i szczegółowe skanowanie poszerzają horyzont."
+    }
+  }
+}

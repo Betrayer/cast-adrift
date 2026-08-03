@@ -93,6 +93,23 @@ const unflatten = (flat: Map<string, string>): Tree => {
 // re-translated on the way back.
 const PLACEHOLDER = /(\{\{[^}]+\}\}|<\/?\d+>)/g;
 
+// tag_handling: xml makes DeepL parse every string as an XML document, so a
+// bare & or < in the English source is an invalid token and rejects the whole
+// batch. Everything outside a placeholder is escaped on the way out and
+// unescaped on the way back — otherwise DeepL answers with the entity intact
+// and "Shards &amp; XP" lands in the UI.
+const escapeXml = (value: string): string =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+const unescapeXml = (value: string): string =>
+  value
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&#39;/g, "'")
+    .replace(/&amp;/g, "&");
+
 const glossary = (
   JSON.parse(readFileSync(GLOSSARY_PATH, "utf8")) as { terms: GlossaryRow[] }
 ).terms;
@@ -111,7 +128,10 @@ const protect = (source: string, locale: MachineLocale): Protection => {
     slots.push(value);
     return `<ph>${String(slots.length - 1)}</ph>`;
   };
-  let text = source.replace(PLACEHOLDER, (match) => hold(match));
+  let text = source
+    .split(PLACEHOLDER)
+    .map((part, index) => (index % 2 === 1 ? hold(part) : escapeXml(part)))
+    .join("");
   for (const row of glossary) {
     const pattern = new RegExp(`\\b${escapeRegExp(row.en)}\\b`, "g");
     text = text.replace(pattern, () => hold(row[locale]));
@@ -120,46 +140,127 @@ const protect = (source: string, locale: MachineLocale): Protection => {
 };
 
 const restore = (translated: string, slots: string[]): string =>
-  translated.replace(/<ph>\s*(\d+)\s*<\/ph>/g, (_, index: string) => {
-    const slot = slots[Number(index)];
-    return slot ?? "";
-  });
+  unescapeXml(translated).replace(
+    /<ph>\s*(\d+)\s*<\/ph>/g,
+    (_, index: string) => {
+      const slot = slots[Number(index)];
+      return slot ?? "";
+    },
+  );
 
 const placeholdersOf = (value: string): string[] =>
   (value.match(PLACEHOLDER) ?? []).sort();
 
-const endpoint = (key: string): string =>
-  key.endsWith(":fx")
-    ? "https://api-free.deepl.com/v2/translate"
-    : "https://api.deepl.com/v2/translate";
+const host = (key: string): string =>
+  key.endsWith(":fx") ? "https://api-free.deepl.com" : "https://api.deepl.com";
 
+const RETRY_STATUS = new Set([408, 429, 500, 502, 503, 504]);
+const FATAL_STATUS = new Set([401, 403, 456]);
+const ATTEMPTS = 5;
+
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+type BatchResult =
+  | { ok: true; texts: string[] }
+  | { ok: false; status: number; body: string };
+
+const postBatch = async (
+  key: string,
+  texts: string[],
+  locale: MachineLocale,
+): Promise<BatchResult> => {
+  let last: BatchResult = { ok: false, status: 0, body: "no attempt made" };
+  for (let attempt = 0; attempt < ATTEMPTS; attempt += 1) {
+    try {
+      const response = await fetch(`${host(key)}/v2/translate`, {
+        method: "POST",
+        headers: {
+          Authorization: `DeepL-Auth-Key ${key}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({
+          text: texts,
+          source_lang: "EN",
+          target_lang: locale.toUpperCase(),
+          tag_handling: "xml",
+          ignore_tags: ["ph"],
+          preserve_formatting: true,
+        }),
+      });
+      if (response.ok) {
+        const body = (await response.json()) as {
+          translations: { text: string }[];
+        };
+        return { ok: true, texts: body.translations.map((entry) => entry.text) };
+      }
+      last = {
+        ok: false,
+        status: response.status,
+        body: await response.text(),
+      };
+      if (FATAL_STATUS.has(response.status)) return last;
+      if (!RETRY_STATUS.has(response.status)) return last;
+    } catch (error) {
+      last = {
+        ok: false,
+        status: 0,
+        body: error instanceof Error ? error.message : String(error),
+      };
+    }
+    if (attempt < ATTEMPTS - 1) {
+      const wait = 2 ** attempt * 1000;
+      console.log(
+        `  retry in ${String(wait)}ms (deepl ${String(last.status)})`,
+      );
+      await sleep(wait);
+    }
+  }
+  return last;
+};
+
+// A rejected batch used to abort the whole run and lose every translation that
+// had not been flushed yet. One bad string now costs only itself: the batch is
+// halved until the offender is alone, and it comes back as null so the caller
+// can keep the English source and report the key.
 const translateBatch = async (
   key: string,
   texts: string[],
   locale: MachineLocale,
-): Promise<string[]> => {
-  const response = await fetch(endpoint(key), {
-    method: "POST",
-    headers: {
-      Authorization: `DeepL-Auth-Key ${key}`,
-      "content-type": "application/json",
-    },
-    body: JSON.stringify({
-      text: texts,
-      source_lang: "EN",
-      target_lang: locale.toUpperCase(),
-      tag_handling: "xml",
-      ignore_tags: ["ph"],
-      preserve_formatting: true,
-    }),
+): Promise<(string | null)[]> => {
+  if (texts.length === 0) return [];
+  const result = await postBatch(key, texts, locale);
+  if (result.ok) return result.texts;
+  if (FATAL_STATUS.has(result.status)) {
+    throw new Error(`deepl ${String(result.status)}: ${result.body}`);
+  }
+  if (texts.length === 1) {
+    console.warn(`  deepl ${String(result.status)} on one string: ${result.body}`);
+    return [null];
+  }
+  const mid = Math.ceil(texts.length / 2);
+  const head = await translateBatch(key, texts.slice(0, mid), locale);
+  const tail = await translateBatch(key, texts.slice(mid), locale);
+  return [...head, ...tail];
+};
+
+const reportUsage = async (key: string): Promise<void> => {
+  const response = await fetch(`${host(key)}/v2/usage`, {
+    headers: { Authorization: `DeepL-Auth-Key ${key}` },
   });
   if (!response.ok) {
-    throw new Error(
-      `deepl ${String(response.status)}: ${await response.text()}`,
+    console.error(
+      `translate: DeepL rejected the key (${String(response.status)}) — ${await response.text()}`,
     );
+    process.exit(1);
   }
-  const body = (await response.json()) as { translations: { text: string }[] };
-  return body.translations.map((entry) => entry.text);
+  const usage = (await response.json()) as {
+    character_count: number;
+    character_limit: number;
+  };
+  console.log(
+    `translate: quota ${String(usage.character_count)}/${String(usage.character_limit)} characters used`,
+  );
 };
 
 const cache: Record<string, string> = existsSync(CACHE_PATH)
@@ -203,6 +304,11 @@ const verify = (locale: MachineLocale): void => {
           `${locale}/${namespace}: placeholder drift at "${key}" (${before} -> ${after})`,
         );
       }
+      if (/&(amp|lt|gt|quot|apos|#\d+);/.test(translated)) {
+        problems.push(
+          `${locale}/${namespace}: xml entity left at "${key}" ("${translated}")`,
+        );
+      }
     }
   }
 };
@@ -226,6 +332,16 @@ const generate = async (key: string, locale: MachineLocale): Promise<void> => {
       pending.push({ key: path, protection: protect(value, locale) });
     }
 
+    if (pending.length > 0) {
+      const chars = pending.reduce(
+        (sum, entry) => sum + entry.protection.text.length,
+        0,
+      );
+      console.log(
+        `  ${locale}/${namespace}: ${String(pending.length)} new strings, ${String(chars)} characters`,
+      );
+    }
+
     for (let i = 0; i < pending.length; i += BATCH) {
       const slice = pending.slice(i, i + BATCH);
       const translated = await translateBatch(
@@ -235,8 +351,9 @@ const generate = async (key: string, locale: MachineLocale): Promise<void> => {
       );
       slice.forEach((entry, index) => {
         const original = flat.get(entry.key) ?? "";
-        const raw = translated[index] ?? entry.protection.text;
-        const candidate = restore(raw, entry.protection.slots);
+        const raw = translated[index];
+        const candidate =
+          raw == null ? "" : restore(raw, entry.protection.slots);
         // DeepL occasionally answers with an empty string or drops an ignored
         // tag. An empty label in the UI is worse than an untranslated one, so
         // the English source stands in and the key is reported rather than
@@ -288,6 +405,7 @@ const main = async (): Promise<void> => {
     );
     process.exit(1);
   }
+  await reportUsage(key);
   for (const locale of targets) await generate(key, locale);
   for (const locale of targets) verify(locale);
   if (fallbacks.length > 0) {
