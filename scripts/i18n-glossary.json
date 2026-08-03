@@ -1,0 +1,110 @@
+{
+  "_comment": "Terms the machine translator is not allowed to improvise on. Each row pins one en source term to a fixed rendering per language; proper nouns keep their English form on purpose so the Codex, the barks and the leaderboard all name the same thing. Matching is whole-word and case-sensitive, applied before the request and restored after it.",
+  "terms": [
+    {
+      "en": "Cast Adrift",
+      "de": "Cast Adrift",
+      "es": "Cast Adrift",
+      "fr": "Cast Adrift",
+      "pl": "Cast Adrift"
+    },
+    {
+      "en": "Echo",
+      "de": "Echo",
+      "es": "Echo",
+      "fr": "Echo",
+      "pl": "Echo"
+    },
+    {
+      "en": "Silent Edge",
+      "de": "Silent Edge",
+      "es": "Silent Edge",
+      "fr": "Silent Edge",
+      "pl": "Silent Edge"
+    },
+    {
+      "en": "Resonance",
+      "de": "Resonanz",
+      "es": "Resonancia",
+      "fr": "Résonance",
+      "pl": "Rezonans"
+    },
+    {
+      "en": "Scrap",
+      "de": "Schrott",
+      "es": "Chatarra",
+      "fr": "Ferraille",
+      "pl": "Złom"
+    },
+    {
+      "en": "Shards",
+      "de": "Splitter",
+      "es": "Fragmentos",
+      "fr": "Éclats",
+      "pl": "Odłamki"
+    },
+    {
+      "en": "Captain Level",
+      "de": "Kapitänsstufe",
+      "es": "Nivel de capitán",
+      "fr": "Niveau de capitaine",
+      "pl": "Poziom kapitana"
+    },
+    {
+      "en": "Star Chart",
+      "de": "Sternenkarte",
+      "es": "Carta estelar",
+      "fr": "Carte stellaire",
+      "pl": "Mapa gwiazd"
+    },
+    {
+      "en": "Drift",
+      "de": "Drift",
+      "es": "Deriva",
+      "fr": "Dérive",
+      "pl": "Dryf"
+    },
+    {
+      "en": "Beacon",
+      "de": "Bake",
+      "es": "Baliza",
+      "fr": "Balise",
+      "pl": "Latarnia"
+    },
+    {
+      "en": "Fate Die",
+      "de": "Schicksalswürfel",
+      "es": "Dado del Destino",
+      "fr": "Dé du Destin",
+      "pl": "Kość Losu"
+    },
+    {
+      "en": "Tide",
+      "de": "Flut",
+      "es": "Marea",
+      "fr": "Marée",
+      "pl": "Przypływ"
+    },
+    {
+      "en": "Codex",
+      "de": "Kodex",
+      "es": "Códice",
+      "fr": "Codex",
+      "pl": "Kodeks"
+    },
+    {
+      "en": "Engraving",
+      "de": "Gravur",
+      "es": "Grabado",
+      "fr": "Gravure",
+      "pl": "Grawerunek"
+    },
+    {
+      "en": "Hull",
+      "de": "Hülle",
+      "es": "Casco",
+      "fr": "Coque",
+      "pl": "Kadłub"
+    }
+  ]
+}

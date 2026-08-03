@@ -1,0 +1,2966 @@
+{
+  "dice": {
+    "red-d6": "D6 rojo",
+    "blue-d6": "Dado de seis caras azul",
+    "grey-d4": "Gris d4",
+    "green-d4": "Verde d4",
+    "yellow-d6": "Dado de seis caras amarillo",
+    "black-d6": "D6 negro",
+    "ember": "Ember",
+    "cinder": "Ceniza",
+    "slug": "Babosa",
+    "frostplate": "Frostplate",
+    "bulwark": "Bulwark",
+    "gyro": "Giro",
+    "coil": "Bobina",
+    "sprout": "Brotes",
+    "lucky-chip": "Ficha de la suerte",
+    "vulture": "Buitre",
+    "ashen": "Ceniciento",
+    "obsidian": "Obsidiana",
+    "copycat": "Imitador",
+    "ballast": "Lastre",
+    "coreshard": "Coreshard",
+    "fused-emberforge": "Emberforge",
+    "fused-frostwall": "Frostwall",
+    "fused-counterweight": "Contrapeso",
+    "fused-seedling": "Plántula",
+    "fused-goldvein": "Goldvein",
+    "fused-voidcore": "Voidcore",
+    "fused-pyroclast": "Piroclasto",
+    "fused-glacier": "Glaciar",
+    "fused-keel": "Quilla",
+    "fused-tendril": "Zarcillo",
+    "fused-windfall": "Ganancia inesperada",
+    "fused-railslug": "Railslug",
+    "fused-rampart": "Muralla",
+    "fused-bloom": "Floración",
+    "flare": "Bengala",
+    "magma": "Magma",
+    "thermite": "Termita",
+    "lancehead": "Lancehead",
+    "hoarfrost": "Escarcha",
+    "aegis": "Aegis",
+    "deepblue": "Deepblue",
+    "glacierspike": "Punta de glaciar",
+    "tendon": "Tendón",
+    "bramble": "Zarzal",
+    "heartwood": "Médula",
+    "worldseed": "Worldseed",
+    "token": "Token",
+    "glint": "Brillo",
+    "bonanza": "Bonanza",
+    "jackpot": "Premio gordo",
+    "midas": "Midas",
+    "cinderblack": "Cinderblack",
+    "pitch": "Pitch",
+    "tar": "Alquitrán",
+    "nadir": "Nadir",
+    "eclipse": "Eclipse",
+    "abyss": "Abismo",
+    "voidmaw": "Voidmaw",
+    "shim": "Cuña",
+    "spool": "Bobina",
+    "mimic": "Imitar",
+    "pivot": "Pivote",
+    "beaconChip": "Baliza Chip",
+    "lodestar": "Lodestar",
+    "prismChip": "Prism Chip",
+    "prismCore": "Prism Core",
+    "spectra": "Spectra",
+    "aurora": "Aurora",
+    "fate-d100": "El destino"
+  },
+  "diceDesc": {
+    "ember": "Un dado de seis caras (d6) rojo liso.",
+    "cinder": "En «Armas», una tirada máxima aplica «Quema 1» al objetivo.",
+    "slug": "En «Armas», inflige +1 de daño.",
+    "frostplate": "Un dado de seis caras azul liso.",
+    "bulwark": "En «Escudos», otorga +1 a la defensa.",
+    "gyro": "Una vez por combate, dale la vuelta.",
+    "coil": "Si sale el mismo resultado que en el turno anterior, +1.",
+    "sprout": "Si se obtiene la tirada máxima, aumenta en +1 durante la carrera (hasta un máximo de +2).",
+    "lucky-chip": "Con una tirada máxima, +2 de chatarra.",
+    "vulture": "Con una tirada máxima, +8 de chatarra.",
+    "ashen": "Si se saca un 1, el siguiente dado negro de este turno obtiene +2.",
+    "obsidian": "Solo se lanzan los 1 u 8.",
+    "copycat": "Una vez por combate, copia el valor de un dado adyacente.",
+    "ballast": "Un d4 gris liso.",
+    "coreshard": "Comodín prismático para conjuntos y afinidades.",
+    "flare": "+1 de daño en las armas con un resultado de 3 o más.",
+    "magma": "El valor máximo de «face» en las armas aplica «Burn 3».",
+    "thermite": "+2 en armas mientras el casco esté por debajo de la mitad.",
+    "lancehead": "+3 en la montura espinal.",
+    "hoarfrost": "+1 escudo cada vez que ocupe una ranura de escudo.",
+    "aegis": "+2 en escudos.",
+    "deepblue": "«Min» otorga 4 de escudo.",
+    "glacierspike": "+3 en escudos.",
+    "tendon": "+2 cuando se repite el valor del turno anterior.",
+    "bramble": "Aumenta en +1 en la cara máxima, hasta un máximo de +2.",
+    "heartwood": "+2 en motores.",
+    "worldseed": "Aumenta en +1 en la cara máxima, hasta un máximo de +4.",
+    "token": "La cara máxima da 3 chatarra.",
+    "glint": "Mi cara cuesta 2 chatarra.",
+    "bonanza": "La cara máxima da 6 chatarra.",
+    "jackpot": "La cara «Max» cuesta 10 chatarra y 1 carga.",
+    "midas": "Paga 2 de chatarra dondequiera que se resuelva.",
+    "cinderblack": "Mi cara almacena 1 carga.",
+    "pitch": "+1 en el reactor.",
+    "tar": "+2 mientras el casco esté por debajo del 40 %.",
+    "nadir": "La cara «Min» prepara el siguiente dado negro con +3.",
+    "eclipse": "+3 en el reactor.",
+    "abyss": "Sus caras son solo el 1 o el 12.",
+    "voidmaw": "+2 en el reactor.",
+    "shim": "+1 en el primer turno de una batalla.",
+    "spool": "Si sale un 1, se convierte en un 2.",
+    "mimic": "Una vez por combate, copia el valor de un vecino.",
+    "pivot": "Una vez por combate, dale la vuelta.",
+    "beaconChip": "+2 en sensores.",
+    "lodestar": "+1 en cada ranura.",
+    "prismChip": "Cuenta para tu conjunto más grande.",
+    "prismCore": "+1 en cada casilla, y cuenta para tu conjunto más grande.",
+    "spectra": "La cara «Max» cuesta 1 punto de carga y 1 chatarra.",
+    "aurora": "+2 en cada ranura.",
+    "fate-d100": "Nunca se asigna. Una vez por combate, lánzalo y quédate con lo que te dé el sector."
+  },
+  "resonance": {
+    "red-2": "Los dados rojos en las armas otorgan +1.",
+    "red-4": "Una tirada de arma con el resultado máximo aplica «Quema 2».",
+    "red-6": "La primera ranura de «Armas» se resuelve dos veces.",
+    "blue-2": "+1 a la tirada mínima de cada dado azul.",
+    "blue-4": "Los escudos azules persisten entre turnos.",
+    "blue-6": "Una vez por turno, un dado azul no puede dar un resultado inferior a la media.",
+    "green-2": "Un dado que repita el valor de la última tirada obtiene +2.",
+    "green-4": "Fin de la batalla: cura 1 por cada dado verde.",
+    "green-6": "Un dado verde en el nivel máximo aporta +1 a la tirada (hasta un máximo de +3).",
+    "yellow-2": "Una tirada con el resultado máximo otorga +4 de chatarra.",
+    "yellow-4": "Una tirada de arma con «max-face» multiplica el daño crítico por 1,5.",
+    "yellow-6": "Tiendas: -20 % y +1 tirada de repetición.",
+    "black-2": "Los dados negros pueden superar el límite de una ranura (−1 al casco).",
+    "black-4": "Un dado negro «min-face» hace que el siguiente dado negro alcance su valor máximo.",
+    "black-6": "Una vez por combate, sobrevive a un impacto letal con 1 punto de casco.",
+    "grey-2": "La capacidad de volver a tirar aumenta a 3 dados.",
+    "grey-4": "Los dados grises pueden copiar un valor adyacente.",
+    "grey-6": "Capacidad de reserva +1.",
+    "prismatic-2": "+1 empujón gratis por combate."
+  },
+  "enemies": {
+    "scavDrone": "Dron Scav",
+    "raider": "Raider",
+    "shieldWarden": "Guardián del Escudo",
+    "mine": "Mío",
+    "jammerCorvette": "Corvette con sistema de interferencia",
+    "leechSkiff": "Barca de succión",
+    "choirZealot": "Coro Zealot",
+    "riftWasp": "Avispa de la Grieta",
+    "raiderAlpha": "Raider Alpha",
+    "raiderAlpha-turret": "Torreta",
+    "bountyHuntress": "Cazadora de recompensas",
+    "breakerDrone": "Dron Breaker",
+    "magnetTug": "Remolcador magnético",
+    "minelayer": "Minador",
+    "riftling": "Riftling",
+    "echoShade": "Echo Sombra",
+    "unstableCore": "Núcleo inestable",
+    "choirAcolyte": "Acolito del coro",
+    "hymnTurret": "Torre de himnos",
+    "zealotRam": "Carnero fanático",
+    "coreFragment": "Fragmento central",
+    "probabilityKnot": "Nudo de la probabilidad",
+    "nullDrone": "Null Drone",
+    "convoyAlpha": "Convoy Alfa",
+    "convoyAlpha-escortA": "Acompañante I",
+    "convoyAlpha-escortB": "Escort II",
+    "convoyAlpha-escortC": "Escort III",
+    "wardenFragment": "Fragmento del Alcaide",
+    "wardenFragment-plate": "Placa ablativa",
+    "leechQueen": "La Reina de las Sanguijuelas",
+    "mineTyrant": "El tirano de la mina",
+    "choirHerald": "Boletín del Coro",
+    "mirrorHull": "Enlace alternativoCasco",
+    "quarantineWarden": "Responsable de cuarentena",
+    "quarantineWarden-lance": "Matriz Lance",
+    "quarantineWarden-aegis": "Anillo Aegis",
+    "breakerBarge": "Barco rompeolas",
+    "breakerBarge-grinder": "Mordaza de trituradora",
+    "breakerBarge-crane": "Grúa de rescate",
+    "riftMaw": "Rift Maw",
+    "riftMaw-eyeA": "Maw-Eye I",
+    "riftMaw-eyeB": "Maw-Eye II",
+    "choirFlagship": "Coro insignia",
+    "choirFlagship-spire": "La Torre del Himno",
+    "choirFlagship-voice": "La Voz",
+    "coreHeart": "El corazón de la esencia",
+    "coreHeart-valveA": "Válvula I",
+    "coreHeart-valveB": "Válvula II",
+    "hookTug": "Hook Tug",
+    "slagHauler": "Vehículo de transporte de escoria",
+    "chaffSwarm": "Enjambre de paja",
+    "foldWorm": "Gusano plegable",
+    "nullEcho": "Nulo Echo",
+    "riftAnchor": "Ancla de grieta",
+    "hymnCantor": "Cantor de himnos",
+    "pyreDeacon": "Pyre Deacon",
+    "reliquary": "Relicario",
+    "causalityLoop": "Bucle de causalidad",
+    "voidWarden": "Guardián del Vacío",
+    "quietEngine": "Motor silencioso",
+    "breachDrone": "Dron Breach",
+    "sparkMote": "Spark Mote",
+    "hullGnat": "Casco Mosquito",
+    "clanBreaker": "Rompeclanes",
+    "clanBreaker-claw": "Garra de agarre",
+    "riftTyrant": "Tirano de la Grieta",
+    "riftTyrant-eye": "Ojo plegable",
+    "choirCantor": "Cantor del coro",
+    "choirCantor-hymn": "Selección de himnos",
+    "coreSentinel": "Core Sentinel",
+    "coreSentinel-lattice": "Red causal",
+    "leechPrince": "El Príncipe Sanguijuela",
+    "leechPrince-siphon": "Brazo de sifón",
+    "mineBaron": "El barón de las minas",
+    "mineBaron-rack": "Estantería para minas",
+    "subsystem": {
+      "overclock": "Módulo de overclocking"
+    }
+  },
+  "ships": {
+    "wanderer": "Viajero",
+    "ram": "Ram",
+    "ark": "Arca",
+    "ram-proto": "Prototipo Ram"
+  },
+  "perks": {
+    "hot-charge": "Carga en caliente",
+    "ricochet": "Ricochet",
+    "double-fuse": "Fusible doble",
+    "warmup": "Calentamiento",
+    "ice-circuit": "Circuito de hielo",
+    "reflector": "Reflector",
+    "blue-reserve": "Slipstream",
+    "stabilizer": "Estabilizador",
+    "compost": "Compost",
+    "overgrowth": "Crecimiento excesivo",
+    "echo": "Echo",
+    "regen": "Regeneración",
+    "prospector": "Buscador de oro",
+    "fortune": "Fortune",
+    "haggler": "Regateador",
+    "coin": "Moneda",
+    "blood-reactor": "Reactor sanguíneo",
+    "on-edge": "Al límite",
+    "sacrifice": "Sacrificio",
+    "back-door": "Puerta trasera",
+    "grip": "Agarre",
+    "reservist": "Reservista",
+    "calibration": "Calibración",
+    "spare": "De repuesto",
+    "afterburner": "Postcombustor",
+    "jammer-plus": "Jammer+",
+    "condenser": "Condensador",
+    "targeter": "Targeter",
+    "plating": "Recubrimiento",
+    "tug": "Remolcador",
+    "kindling": "Leña",
+    "hammerhead": "Tiburón martillo",
+    "scorchmark": "Marca de quemadura",
+    "openingVolley": "Salida de mazo",
+    "pyreFloor": "Piso Pyre",
+    "redForge": "Red Forge",
+    "searing": "A la plancha",
+    "cinderTithe": "El diezmo de las cenizas",
+    "thermalVent": "Boca de vapor",
+    "overburn": "Sobrecarga",
+    "emberField": "Ember Field",
+    "hotline": "Línea de atención telefónica",
+    "secondBarrel": "Segundo barril",
+    "detonator": "Detonador",
+    "magmaCore": "Núcleo de magma",
+    "infernoDoctrine": "La doctrina del infierno",
+    "hoarplate": "Hoarplate",
+    "stormWall": "Muro contra tormentas",
+    "coldStart": "Arranque en frío",
+    "blueFloor": "Suelo azul",
+    "meltwater": "Agua de deshielo",
+    "frostBrake": "Freno anticongelante",
+    "bulkhead": "Mamparo",
+    "chillBank": "Chill Bank",
+    "aegisField": "Campo Aegis",
+    "deepFreeze": "Congelación profunda",
+    "interdict": "Interdicto",
+    "hardVacuum": "Vacío extremo",
+    "secondSkin": "Segunda piel",
+    "glacierPact": "Pacto de los Glaciares",
+    "mirrorLattice": "Red de espejos",
+    "permafrost": "Permafrost",
+    "rootHold": "Sujeción de la raíz",
+    "secondGrowth": "Segundo crecimiento",
+    "mulch": "Cubierta vegetal",
+    "pollen": "Polen",
+    "longRoots": "Raíces profundas",
+    "greenwake": "Greenwake",
+    "steadyHand": "Mano firme",
+    "sapline": "Sapline",
+    "thicket": "Matorral",
+    "bloomCycle": "Ciclo de floración",
+    "photosynth": "Photosynth",
+    "evergreen": "De hoja perenne",
+    "tideRoots": "Marea Raíces",
+    "worldTree": "Árbol del Mundo",
+    "overgrowthPact": "Pacto de Crecimiento Excesivo",
+    "standingWave": "Onda estacionaria",
+    "pocketChange": "Calderilla",
+    "finderFee": "Comisión de intermediación",
+    "streetPrice": "Precio de venta al público",
+    "luckyStreak": "Racha de suerte",
+    "scrapline": "Scrapline",
+    "smallMercies": "Pequeñas bendiciones",
+    "goldTooth": "Diente de oro",
+    "tallyMark": "Marca de conteo",
+    "bountyBoard": "Tablón de recompensas",
+    "marketRun": "Recorrido por el mercado",
+    "goldRush": "La fiebre del oro",
+    "houseEdge": "Ventaja de la casa",
+    "ledgerTrick": "Truco del libro mayor",
+    "mintCondition": "Como nuevo",
+    "silentPartner": "Socio silencioso",
+    "veinTap": "Punción venosa",
+    "darkCurrent": "Corriente oscura",
+    "lowTide": "Marea en su nivel más bajo",
+    "brinkmanship": "Política de riesgo calculado",
+    "blackTithe": "El diezmo negro",
+    "coldFusion": "Fusión fría",
+    "longOdds": "Probabilidades remotas",
+    "hardBargain": "Una negociación dura",
+    "nightShift": "Turno de noche",
+    "eventHorizon": "Event Horizon",
+    "bloodPrice": "El precio de la sangre",
+    "heatShroud": "Protector térmico",
+    "scrapheap": "Montón de chatarra",
+    "deadReckoning": "Navegación a estima",
+    "obsidianCreed": "El Credo de Obsidiana",
+    "lastBreath": "Último aliento",
+    "singularity": "Singularidad",
+    "widerGrip": "Agarrado más amplio",
+    "shimStock": "Cuña de ajuste",
+    "deckHand": "Marinero de cubierta",
+    "toolRoll": "Estuche para herramientas",
+    "counterweight": "Contrapeso",
+    "checklist": "Lista de comprobación",
+    "greyMarket": "Mercado gris",
+    "spareParts": "Piezas de recambio",
+    "dampers": "Amortiguadores",
+    "routineCheck": "Revisión rutinaria",
+    "switchboard": "Centralita",
+    "gimbalMount": "Soporte cardánico",
+    "logistics": "Logística",
+    "quickHands": "Manos rápidas",
+    "balanceBeam": "Barra de equilibrio",
+    "holdBack": "Aguanta",
+    "payloadShuffle": "Reordenación de la carga útil",
+    "shortHaul": "Corta distancia",
+    "dryDock": "Dique seco",
+    "masterKey": "Llave maestra",
+    "greyProtocol": "Protocolo Gris",
+    "armorPlate": "Placa de blindaje",
+    "coolantLoop": "Circuito de refrigeración",
+    "finePitch": "Paso fino",
+    "boresight": "Alineación del eje de puntería",
+    "bilgePump": "Bomba de achique",
+    "dockRates": "Tarifas de atraque",
+    "crewDrill": "Ejercicio de tripulación",
+    "scrapHopper": "Chatarra Tolva",
+    "spotterCall": "Comentario del observador",
+    "hullWeld": "Casco Soldadura",
+    "reinforcedBay": "Bahía reforzada",
+    "surgeTank": "Depósito de compensación",
+    "hardenedHull": "Casco endurecido",
+    "kineticDampers": "Amortiguadores cinéticos",
+    "targetingSuite": "Suite de segmentación",
+    "pressureValve": "Válvula de presión",
+    "resonanceTuner": "Resonancia Sintonizador",
+    "shockLance": "Lanza de choque",
+    "piercingRounds": "Balas perforantes"
+  },
+  "perksDesc": {
+    "hot-charge": "Una tirada de arma con el resultado máximo inflige +2 de daño.",
+    "ricochet": "El efecto de «overkill» del arma A se traslada al siguiente enemigo.",
+    "double-fuse": "El primer «Burn» de cada combate se duplica.",
+    "warmup": "Turno 1: los dados rojos dan +1.",
+    "ice-circuit": "Una tirada de 6+ en la prueba de escudo otorga +2 al escudo.",
+    "reflector": "Una esquiva inflige 3 puntos de daño al atacante.",
+    "blue-reserve": "Una casilla de reserva adicional, solo para dados azules.",
+    "stabilizer": "El primer dado azul de cada turno no puede sacar un 1.",
+    "compost": "Cada dado quemado otorga +1 chatarra.",
+    "overgrowth": "Tapa de crecimiento +1.",
+    "echo": "Si al tirar el dado se repite el valor de la última tirada, se obtiene +1 carga.",
+    "regen": "Fin de la batalla: recupera 2 puntos de casco.",
+    "prospector": "Chatarra ganancias del +25 %.",
+    "fortune": "Una tirada con el resultado máximo otorga +2 de chatarra.",
+    "haggler": "Precios en tienda: −15 %.",
+    "coin": "Inicio de la batalla: +3 chatarra.",
+    "blood-reactor": "Una vez por turno, paga 2 puntos de casco para obtener +3 de carga.",
+    "on-edge": "Casco por debajo del 30 %: tirada de dados +1.",
+    "sacrifice": "Gasta un dado para sumar +4 al daño del arma este turno.",
+    "back-door": "Un rollo negro de «min-face» otorga +6 de chatarra.",
+    "grip": "Aumenta el número de tiradas en +1.",
+    "reservist": "Capacidad de reserva +1.",
+    "calibration": "«Nudge» cuesta 2 de maná en lugar de 3.",
+    "spare": "El resultado más bajo de cada tirada se incrementa en uno; vuelve a tirar un dado más.",
+    "afterburner": "Los umbrales del motor son 1 menos.",
+    "jammer-plus": "Jam reduce el ataque del enemigo en 3.",
+    "condenser": "El límite de carga del reactor aumenta a 12.",
+    "targeter": "Mark otorga +3 de daño en lugar de +2.",
+    "plating": "Máximo de vida +5, curación 5 ahora.",
+    "tug": "Una esquiva también otorga +1 de carga.",
+    "kindling": "+1 en armas con un resultado de 5 o más.",
+    "hammerhead": "+2 en Armas A.",
+    "scorchmark": "El valor máximo de «face» en las armas añade «Burn 1».",
+    "openingVolley": "+2 en armas durante los dos primeros turnos.",
+    "pyreFloor": "+2 en armas con un resultado mínimo.",
+    "redForge": "+1 para los dados rojos en las armas.",
+    "searing": "+2 en armas con un resultado de 8 o más.",
+    "cinderTithe": "La cara máxima en armas da 3 de chatarra.",
+    "thermalVent": "+3 en armas en una cara máxima y 1 carga.",
+    "overburn": "+2 en armas mientras el casco esté por debajo de la mitad.",
+    "emberField": "Si sale un 2 en un dado rojo, se suma «Quema 2».",
+    "hotline": "+3 en la montura espinal.",
+    "secondBarrel": "+3 en Armas B.",
+    "detonator": "Una cara máxima en las armas se resuelve dos veces en la ranura.",
+    "magmaCore": "+3 en armas cuando tengas cuatro dados rojos.",
+    "infernoDoctrine": "Cada impacto de arma añade 1 punto de quemadura.",
+    "hoarplate": "+1 en escudos.",
+    "stormWall": "El valor máximo de «face» en los escudos otorga 3 puntos de escudo adicionales.",
+    "coldStart": "+2 en escudos durante los dos primeros turnos.",
+    "blueFloor": "Los dados azules nunca dan un resultado inferior a 3.",
+    "meltwater": "Mi cara en los escudos otorga 3 puntos de escudo adicionales.",
+    "frostBrake": "+2 a los dados azules en los motores.",
+    "bulkhead": "Casco +3.",
+    "chillBank": "La cara «Max» de un dado azul almacena 1 carga.",
+    "aegisField": "+2 a la defensa por cada dado de escudo.",
+    "deepFreeze": "+3 en escudos con un 8 o más.",
+    "interdict": "Tu habilidad te protege de 2 ataques enemigos más.",
+    "hardVacuum": "+3 en escudos mientras el casco esté por debajo de la mitad.",
+    "secondSkin": "Casco +4; recupera 1 punto de vida después de cada combate.",
+    "glacierPact": "+4 en escudos cuando tengas cuatro dados azules.",
+    "mirrorLattice": "Las esquivas reducen el daño; los umbrales del motor son un poco más fáciles.",
+    "permafrost": "Una cara máxima en los escudos resuelve la ranura dos veces.",
+    "rootHold": "+1 en motores.",
+    "secondGrowth": "+2 cuando un dado muestra el mismo resultado que en el turno anterior.",
+    "mulch": "Recupera 1 punto de salud tras el combate; +5 % de chatarra.",
+    "pollen": "Si sale el máximo en un dado verde, se repara 1 punto de casco.",
+    "longRoots": "Los dados que crecen suben un escalón más.",
+    "greenwake": "Si hay 5 o más en «motores», se obtienen 2 escudos.",
+    "steadyHand": "Los umbrales del motor, ahora un paso más sencillos.",
+    "sapline": "Si repites el valor del turno anterior, recuperas 2 puntos de casco.",
+    "thicket": "Casco +3; recupera 2 puntos de vida después de cada combate.",
+    "bloomCycle": "+3 cuando un dado verde repite el valor del turno anterior.",
+    "photosynth": "Cada dado verde almacena 1 carga.",
+    "evergreen": "Los dados que crecen suben dos escalones más.",
+    "tideRoots": "La marea de interferencia tiene una intensidad ligeramente menor.",
+    "worldTree": "Recuperas 2 por cada casilla resuelta cuando tengas cuatro dados verdes.",
+    "overgrowthPact": "Crecimiento +2 y umbrales del motor dos niveles más bajos; casco −4.",
+    "standingWave": "+4 en motores.",
+    "pocketChange": "+2 de chatarra al inicio de la batalla.",
+    "finderFee": "+2 de chatarra por cada enemigo eliminado.",
+    "streetPrice": "Precios en tienda: −8 %.",
+    "luckyStreak": "Cualquier cara máxima da 3 chatarra.",
+    "scrapline": "+12 % de chatarra procedente de todas las fuentes.",
+    "smallMercies": "Cualquier cara mínima da 2 chatarra.",
+    "goldTooth": "Cada dado amarillo da 1 chatarra.",
+    "tallyMark": "+10 % de XP por la carrera.",
+    "bountyBoard": "+4 de chatarra por cada enemigo eliminado.",
+    "marketRun": "Tiendas: −10 %; la primera repetición de tirada en cada tienda es gratuita.",
+    "goldRush": "La cara máxima de un dado amarillo da 8 chatarra.",
+    "houseEdge": "+3 al sacar el máximo con un dado amarillo.",
+    "ledgerTrick": "+20 % de chatarra; casco −2.",
+    "mintCondition": "Max tiene que pagar 12 de chatarra y 1 de cargo en cuanto tengas cuatro dados amarillos.",
+    "silentPartner": "+30 % de chatarra; tiendas −10 %.",
+    "veinTap": "+6 de chatarra por cada enemigo eliminado y +6 al inicio de la batalla.",
+    "darkCurrent": "+1 en el reactor.",
+    "lowTide": "Cualquier cara mínima almacena 2 de carga.",
+    "brinkmanship": "+1 a cada tirada mientras el casco esté por debajo del 40 %.",
+    "blackTithe": "Cada dado negro da 2 chatarra.",
+    "coldFusion": "Límite de carga +2.",
+    "longOdds": "+3 al sacar un 1 con un dado negro.",
+    "hardBargain": "+15 % de chatarra; recuperas 1 punto menos de vida tras las batallas.",
+    "nightShift": "La cara máxima del reactor almacena 2 cargas más.",
+    "eventHorizon": "+3 para los dados negros en el reactor.",
+    "bloodPrice": "+4 en armas mientras el casco esté por debajo del 25 %.",
+    "heatShroud": "El primer desbordamiento del reactor en cada combate no supone ningún daño al casco.",
+    "scrapheap": "Cada dado sin colocar almacena 1 carga.",
+    "deadReckoning": "Límite de carga +3; casco −3.",
+    "obsidianCreed": "Los dados negros solo dan el mínimo o el máximo; límite de carga +2.",
+    "lastBreath": "Una vez por partida, sobrevive a un golpe letal con 1 punto de casco.",
+    "singularity": "El reactor tiene capacidad para 3 cargas más.",
+    "widerGrip": "Vuelve a tirar un dado más cada vez.",
+    "shimStock": "Los empujones cuestan 1 carga menos.",
+    "deckHand": "Reserva un dado más.",
+    "toolRoll": "Una tirada adicional cada turno.",
+    "counterweight": "Si sale un 1, se convierte en un 2.",
+    "checklist": "+1 a cada dado en el primer turno.",
+    "greyMarket": "Tiendas: −6 %; +6 % de chatarra.",
+    "spareParts": "+4 de chatarra al inicio de la batalla.",
+    "dampers": "Casco +2; límite de carga +1.",
+    "routineCheck": "Recupera 1 punto de vida después de cada combate.",
+    "switchboard": "+2 en sensores.",
+    "gimbalMount": "Las marcas aportan +2 de daño adicional.",
+    "logistics": "Las dos primeras repeticiones de tirada en cada tienda son gratis; tiendas: −5 %.",
+    "quickHands": "Vuelve a tirar dos dados más cada vez.",
+    "balanceBeam": "Tu tirada más baja de cada turno se aumenta ligeramente.",
+    "holdBack": "Los empujones cuestan 1 carga menos; el límite de cargas aumenta en 2.",
+    "payloadShuffle": "Reserva un dado +1 y un dado azul adicional.",
+    "shortHaul": "+15 % de XP por la carrera.",
+    "dryDock": "El «Repair Bay» repara 3 puntos más de casco.",
+    "masterKey": "Dos repeticiones adicionales cada turno y un dado más por cada repetición.",
+    "greyProtocol": "+2 a cada dado cuando tengas cuatro dados grises.",
+    "armorPlate": "Casco +4.",
+    "coolantLoop": "Límite de carga +1.",
+    "finePitch": "Los umbrales del motor, ahora un paso más sencillos.",
+    "boresight": "Las marcas aportan +1 de daño adicional.",
+    "bilgePump": "Recupera 1 punto de vida después de cada combate.",
+    "dockRates": "Precios en tienda: −7 %.",
+    "crewDrill": "+12 % de XP por la carrera.",
+    "scrapHopper": "+3 de chatarra al inicio de la batalla.",
+    "spotterCall": "Si hay 5 o más en los sensores, se almacena 1 carga.",
+    "hullWeld": "El «Repair Bay» repara 1 punto más de casco.",
+    "reinforcedBay": "Una ranura más para módulos.",
+    "surgeTank": "Límite de carga +3.",
+    "hardenedHull": "Casco +7; los umbrales del motor son un nivel más difíciles.",
+    "kineticDampers": "Una esquiva almacena 1 carga.",
+    "targetingSuite": "Añade +2 de daño; el atasco reduce 1 más.",
+    "pressureValve": "El primer desbordamiento del reactor en cada combate no supone ningún daño al casco.",
+    "resonanceTuner": "+2 de carga al inicio de la batalla por cada serie de cuatro completada.",
+    "shockLance": "+5 en la montura espinal.",
+    "piercingRounds": "El primer impacto de cada combate ignora los escudos; suma +1."
+  },
+  "speaker": {
+    "mara": "Mara, chatarrera",
+    "yusuf": "Yusuf, jefe de convoy",
+    "choirPreacher": "el predicador del coro",
+    "beaconKeeper": "El guardián de «Baliza»",
+    "bountyHuntress": "La cazadora de recompensas",
+    "warden": "La voz del alcaide"
+  },
+  "consequence": {
+    "courierFreed": "Has liberado al mensajero (Sector 1)",
+    "maraFriend": "Has hablado con franqueza con Mara (Sector 1)",
+    "maraGrudge": "Le has robado a Mara (Sector 1)",
+    "hunterMark": "Te llevaste la carga maldita (Sector 1)",
+    "crewSaved": "Has descongelado a la tripulación congelada (Sector 1)",
+    "heardChoir": "has escuchado al coro (Sector 1)",
+    "alerted": "Has activado la alarma de la caché del Guardián (Sector 1)",
+    "yusufFriend": "Acompañaste a Yusuf (Sector 1)",
+    "yusufGrudge": "Le cobraste impuestos a Yusuf (Sector 1)",
+    "beaconKey": "Has cogido la llave del Guardián (Sector 1)",
+    "keeperSlighted": "Has agotado las entradas para «The Keeper» (Sector 1)",
+    "beaconBroken": "Has roto una baliza (Sector 1)",
+    "fleetShared": "Compartiste la caja negra con Yusuf (Sector 2)",
+    "fleetWiped": "Has borrado el historial de la flota (Sector 2)",
+    "pactStep1": "Has desbloqueado el pacto del Coro (Sector 3)",
+    "refusedChoir": "Rechazaste al Coro (Sector 3)",
+    "pactSealed": "Has sellado el pacto (Sector 4)",
+    "choirEnemy": "Has atravesado el Coro (Sector 4)",
+    "silentReady": "El Guardián ha respondido por ti (Sector 5)",
+    "choirCurious": "Consecuencia: hiciste caso al coro.",
+    "clanPaid": "Consecuencia: has pagado el peaje del clan.",
+    "clanSlighted": "Consecuencia: has cobrado el peaje del clan.",
+    "defectorSaved": "Consecuencia: has dado cobijo al desertor.",
+    "hereticsArmed": "Consecuencia: has armado a los herejes.",
+    "hunterAllied": "Consecuencia: la Cazadora te debe un favor.",
+    "hunterBeaten": "Consecuencia: has vencido a la Cazadora.",
+    "hunterEngaged": "Consecuencia: la Cazadora te ha perdido la pista.",
+    "hymnJammed": "Consecuencia: has estropeado el himno.",
+    "hymnJoined": "Consecuencia: cantaste con el coro.",
+    "keeperTrust": "Consecuencia: el Guardián confía en ti.",
+    "mirrorSpoke": "Consecuencia: le has hablado al espejo.",
+    "pactOpened": "Consecuencia: el pacto queda al descubierto.",
+    "pactSigned": "Consecuencia: has firmado el pacto.",
+    "relayFixed": "Consecuencia: has reparado el relé."
+  },
+  "events": {
+    "driftingPod": {
+      "text": "Una cápsula de rescate pasa a toda velocidad por delante de tu proa, con el casco arañado y la baliza parpadeando. Algo se mueve en su interior.",
+      "opt": {
+        "open": "Ábrelo de una vez",
+        "sell": "Véndelo sin abrir",
+        "leave": "Déjalo a la deriva"
+      },
+      "out": {
+        "openAlly": "Un chatarrero medio congelado sale a la calle, agradecido, y paga con lo que ha recuperado.",
+        "openAmbush": "No es una cápsula de salvamento, sino una trampa. Las cargas rasgan el casco antes de que puedas sellar la escotilla.",
+        "sell": "Un transportista que pasa por allí se lo lleva precintado, sin hacer preguntas. Se intercambia el dinero.",
+        "leave": "Dejaste que las cosas siguieran su curso. Hay puertas que es mejor dejar cerradas."
+      }
+    },
+    "freedCourier": {
+      "text": "Un dron de reparto queda atrapado en un imán, con las luces de navegación apagándose poco a poco. Su manifiesto sigue cifrado.",
+      "opt": {
+        "free": "Déjalo ir",
+        "ransom": "Pedir un rescate por el manifiesto",
+        "ignore": "Sigue volando"
+      },
+      "out": {
+        "free": "Cortas la red. El dron emite un silencioso «gracias» y desaparece hacia el centro.",
+        "ransom": "Te deshaces del manifiesto y vendes la ruta. Los negocios son los negocios.",
+        "ignore": "Te adentras en la oscuridad. Las luces se van apagando a tus espaldas."
+      }
+    },
+    "courierReturns": {
+      "text": "Un dron que te resulta familiar se alinea con tu vector: el que liberaste. Transmite un saludo de comerciante.",
+      "opt": {
+        "discount": "Sigue la ruta comercial",
+        "die": "Coge el núcleo de repuesto"
+      },
+      "out": {
+        "discount": "Comparte una ruta de contrabando. Los próximos mercados te deben un favor.",
+        "die": "Lanza un núcleo de probabilidad de repuesto a tu bodega."
+      }
+    },
+    "cursedCargo": {
+      "text": "Una caja fuerte sellada va a la deriva, protegida con símbolos de un culto. Vale una fortuna y te está observando.",
+      "opt": {
+        "take": "Recoge la mercancía",
+        "jettison": "Déjalo ir"
+      },
+      "out": {
+        "take": "Lo subes a bordo. En algún lugar de la oscuridad, se oye un pitido de localización.",
+        "jettison": "Lo lanzas girando hacia el vacío. Quienquiera que lo quisiera, que persiga los restos."
+      }
+    },
+    "bountyAmbush": {
+      "text": "Una esbelta nave de combate surge de la estática, igualita a ti. «Llevas un cargamento marcado, capitán. Eso te convierte a ti también en parte del cargamento».",
+      "opt": {
+        "fight": "Defiéndete de ella",
+        "bribe": "Sobornarla (30)"
+      },
+      "out": {
+        "fight": "Se acabaron las palabras. Ella se compromete… y tú también.",
+        "bribe": "Cuenta el trozo dos veces y luego se aleja. «No es nada personal»."
+      }
+    },
+    "maraStall": {
+      "text": "De un carguero abandonado cuelga un puesto improvisado. «Mara», dice el comerciante sin levantar la vista. «Tienes pinta de alguien que rompe cosas».",
+      "opt": {
+        "chat": "Habla claro",
+        "browse": "Echa un vistazo a su catálogo (15)",
+        "rob": "Robar en el puesto"
+      },
+      "out": {
+        "chat": "Intercambias palabras sinceras. Una moneda de cambio poco común por aquí. Ella casi esboza una sonrisa.",
+        "browse": "Rebuscas entre las cajas y sacas algo que vale la pena.",
+        "robPass": "Te habrás ido antes de que ella llegue a la alarma, con los bolsillos llenos y tu nombre mancillado.",
+        "robFail": "Es más rápida de lo que parece. Una porra eléctrica impacta contra tu casco mientras huyes."
+      }
+    },
+    "maraFavor": {
+      "text": "Mara te hace señas para que te acerques, esta vez con más cordialidad. «Se corre la voz. Has sido honesto conmigo. Elige lo que quieras, corre a cuenta de la casa».",
+      "opt": {
+        "repair": "Encárgate de las reparaciones",
+        "die": "Coge un núcleo de repuesto"
+      },
+      "out": {
+        "repair": "Su tripulación repara el casco con una rapidez que denota gran experiencia.",
+        "die": "Te pone en la mano un rollo envuelto. «No se lo digas a los demás»."
+      }
+    },
+    "maraColdShoulder": {
+      "text": "Mara empieza la conversación sin rodeos. «El capitán que me robó. Las noticias vuelan. Mis precios han subido… especialmente para ti».",
+      "opt": {
+        "apologize": "Hazlo bien (25)",
+        "walk": "Déjalo estar"
+      },
+      "out": {
+        "apologize": "«Lo pagas el doble y aún más». Ella gruñe. «Es un comienzo».",
+        "walk": "Has cortado el paso. Hay puentes que ya no se pueden volver a cruzar."
+      }
+    },
+    "derelictReactor": {
+      "text": "El reactor de un transportista destrozado sigue funcionando, derramando energía en la oscuridad. Podrías aprovecharla, si el campo se mantiene.",
+      "opt": {
+        "siphon": "Extraer la carga mediante sifón",
+        "salvage": "Desmontarlo para venderlo como chatarra"
+      },
+      "out": {
+        "siphonPass": "El grifo no gotea. Tus células se hidratan a fondo: una ventaja para las batallas que se avecinan.",
+        "siphonFail": "El campo se colapsa en pleno trazo y se filtra hacia el casco.",
+        "salvage": "Lo desmontas con cuidado y retiras el revestimiento en buen estado."
+      }
+    },
+    "mineFieldGap": {
+      "text": "Un campo de minas a la deriva bloquea el camino. Hay un hueco, si conduces con precisión… o un largo desvío.",
+      "opt": {
+        "thread": "Pasar el hilo por el hueco",
+        "around": "Toma el camino más largo"
+      },
+      "out": {
+        "threadPass": "Una huida impecable. Te cuelas por el silencioso pasillo y consigues despistar al sector durante un rato.",
+        "threadFail": "Una mina te alcanza mientras pasas por allí. El casco lo recuerda.",
+        "around": "Das una vuelta amplia y recoges los restos a la deriva que hay a lo largo del borde."
+      }
+    },
+    "choirBroadcast": {
+      "text": "Una señal estructurada se extiende por todas las bandas. Una voz tranquila: «Tienes preguntas. El Núcleo ya las ha respondido. Solo tienes que escuchar».",
+      "opt": {
+        "listen": "Escucha",
+        "jam": "Interferir la señal"
+      },
+      "out": {
+        "listen": "Las palabras se te calan como si siempre hubieran estado ahí. Algo cambia, silenciosamente, y va cobrando sentido.",
+        "jam": "Inundas el canal de ruido. El sector se indigna ante tal insulto."
+      }
+    },
+    "choirGift": {
+      "text": "La voz del coro vuelve, suave. «Una vez escuchaste. Toma esto: un fragmento que recuerda cómo caer».",
+      "opt": {
+        "accept": "Acepta el dado negro",
+        "refuse": "Rechazar"
+      },
+      "out": {
+        "accept": "Un núcleo negro se instala en tu estante, frío y ansioso.",
+        "refuse": "Te niegas. La voz no te lleva la contraria. Eso es lo inquietante."
+      }
+    },
+    "scrapAuction": {
+      "text": "Los chatarreros rodean un pecio iluminado por focos, pujando por los núcleos sellados. El subastador examina tu chatarra.",
+      "opt": {
+        "bid": "Pujar por un núcleo (25)",
+        "watch": "Solo tienes que mirar",
+        "bidHigh": "Pujad alto",
+        "bidLow": "Pujar bajo",
+        "heckle": "Interrumpir la subasta"
+      },
+      "out": {
+        "bid": "Tu puja sigue en pie. El núcleo es tuyo, y es uno muy bueno.",
+        "watch": "Te quedas con algunas piezas sueltas por las que nadie ha pujado.",
+        "bidHigh": "Mara te lo deja claro y te archiva en la categoría de «paga».",
+        "bidLow": "Tú te quedas con el segundo lote. Nadie más lo quería, y quizá esa sea la clave.",
+        "heckle": "Le rebajas el precio a otra persona y te quedas con su agradecimiento. Mara no te da las gracias."
+      }
+    },
+    "stowaway": {
+      "text": "Encuentras a una polizón en el hueco de popa: una mecánica que huía de algo peor. «Me gano el sustento», dice.",
+      "opt": {
+        "keep": "Deja que se quede",
+        "handOver": "Entrégala"
+      },
+      "out": {
+        "keep": "Desvía la energía hacia un circuito médico. El casco queda más expuesto, pero te curará después de cada combate.",
+        "handOver": "Se la cambias por dinero a una patrulla que pasa por allí. Ninguno de los dos se atreve a mirar a los ojos al otro."
+      }
+    },
+    "oldBeaconEcho": {
+      "text": "Una baliza de la flota sigue parpadeando, cuarenta años después. Su IA guardiana se despierta. «Informa», dice con voz ronca. «¿Dónde está la flota?»",
+      "opt": {
+        "decrypt": "Descifra el registro",
+        "leave": "Recuperar y seguir adelante"
+      },
+      "out": {
+        "decryptPass": "El tronco se abre de un golpe: unas viejas cartas náuticas se esparcen por tus sensores, revelando una parte más del carril.",
+        "decryptFail": "El cifrado se mantiene. Solo hay silencio y una palabra que se repite: «más tranquilo».",
+        "leave": "Desmontas la baliza para aprovechar sus piezas y dejas que el fantasma siga con su rutina."
+      }
+    },
+    "leechNest": {
+      "text": "Un grupo de barcas sanguijuela se alimenta de un crucero hundido, con los cascos medio vacíos. ¿Las quemamos o pasamos de largo?",
+      "opt": {
+        "burn": "Quema el nido",
+        "avoid": "Escaparse"
+      },
+      "out": {
+        "burn": "Te comprometes con la matanza. El nido se agita hacia ti.",
+        "avoid": "Te mantienes bien alejado del nido y dejas que el crucero abandonado se quede con sus parásitos."
+      }
+    },
+    "driftMerchant": {
+      "text": "Un comerciante solitario te llama, con las manos llenas de núcleos extraños. «Un intercambio directo», te propone. «Tu peor núcleo a cambio de uno de mis comodines».",
+      "opt": {
+        "swap": "Haz el cambio",
+        "decline": "Descenso"
+      },
+      "out": {
+        "swap": "Cambias tu núcleo más débil por uno de los suyos. Me parece bien, por aquí.",
+        "decline": "Le haces un gesto para que se vaya. Él se encoge de hombros y sigue su camino."
+      }
+    },
+    "radiationPocket": {
+      "text": "Una zona de radiación bloquea el camino directo. Ábrete paso y ahorra tiempo, o toma el desvío por la ruta segura.",
+      "opt": {
+        "push": "Seguir adelante",
+        "detour": "Desvío"
+      },
+      "out": {
+        "push": "Aceleras a fondo a través del resplandor. Te cuesta parte del casco, pero logras escapar del control del sector.",
+        "detour": "Tomas la ruta larga y segura y vas recogiendo cosas por el camino."
+      }
+    },
+    "wardenCache": {
+      "text": "Un alijo de suministros de los guardias de cuarentena permanece sellado y armado. Una voz grabada dice: «Se responderá a cualquier acceso no autorizado».",
+      "opt": {
+        "crack": "Vaciar la caché",
+        "leave": "Déjalo cerrado"
+      },
+      "out": {
+        "crackPass": "La esclusa cede. En su interior: una nota de solicitud de los Guardianes; el próximo astillero la aceptará.",
+        "crackFail": "La cerradura chilla. En algún lugar, una patrulla registra tu posición.",
+        "leave": "Dejas el caché a merced de sus amenazas y sigues adelante."
+      }
+    },
+    "alertedPatrol": {
+      "text": "Una patrulla de los Warden te arrolla, flanqueándote y con todo listo. «Manipulador de alijos. Detente para ser inspeccionado». No tienen ninguna intención de inspeccionarte.",
+      "opt": {
+        "engage": "Avance decisivo",
+        "evade": "Escapar de la red"
+      },
+      "out": {
+        "engage": "Te lanzas a la escapada. Te cierran el paso.",
+        "evadePass": "Apagas las luces y te abres paso entre ellas, cogiendo unas cuantas cajas al salir.",
+        "evadeFail": "Una estaca te roza mientras corres. Consigues despistar a la patrulla, pero no del todo."
+      }
+    },
+    "gamblersWreck": {
+      "text": "Una barcaza-casino en ruinas sigue ofreciendo un único juego: un solo dado contra la IA de la casa. «¿Te apetece probar suerte, capitán?»",
+      "opt": {
+        "roll": "Jugar contra la casa (20)",
+        "scavenge": "Busca en la basura, en su lugar"
+      },
+      "out": {
+        "rollPass": "El dado cae a tu favor. La casa paga con un tintineo resentido.",
+        "rollFail": "La casa gana, como suele ocurrir. Tu apuesta se esfuma.",
+        "scavenge": "Te saltas el juego y desmontas las mesas abandonadas para aprovechar sus piezas."
+      }
+    },
+    "frozenCrew": {
+      "text": "Un bote salvavidas va a la deriva con su tripulación en hibernación, casi sin energía. Despertarlos cuesta combustible y chatarra.",
+      "opt": {
+        "thaw": "Descongela a la tripulación (15)",
+        "leave": "Déjalos congelados"
+      },
+      "out": {
+        "thaw": "Las cápsulas se abren con un silbido. Unas manos agradecidas te ayudan a reparar el casco antes de que se separen.",
+        "leave": "No puedes perder el tiempo con esa chatarra. Marcas su posición y sigues adelante. Un pequeño consuelo: siguen a la deriva."
+      }
+    },
+    "crewGratitude": {
+      "text": "La tripulación que has rescatado te alcanza en una barca remendada. «Te debemos una. Déjanos ponerte a punto tus soportes para los dados».",
+      "opt": {
+        "crew": "Que ajusten los bastidores",
+        "pay": "Llévate un regalo de despedida"
+      },
+      "out": {
+        "crew": "Te modifican el equipo de «reroll». Te dará un dado más en cada tirada, y todo durará más.",
+        "pay": "En cambio, te obligan a encargarte del rescate y te despiden con la mano, indicándote que te dirijas hacia el Núcleo."
+      }
+    },
+    "probCoreLeak": {
+      "text": "Un núcleo de probabilidad se está resquebrajando, derramando incertidumbre en estado puro por toda tu bodega. Se podría estabilizar… o cosechar.",
+      "opt": {
+        "stabilize": "Estabilízalo (dado azul)",
+        "harvest": "Cosecharlo (dado negro)"
+      },
+      "out": {
+        "stabilize": "Un núcleo azul amortigua la fuga. La tabla se va estabilizando y el casco se mantiene firme.",
+        "harvest": "Un núcleo negro se alimenta del caos. «Resonancia» se dispara, cae un fragmento nuevo… y cuesta un poco de casco."
+      }
+    },
+    "silentField": {
+      "text": "Un campo de ruido estático, sin señal, sin restos. Solo el zumbido del Borde y tu propia respiración.",
+      "opt": {
+        "drift": "Deriva atentamente, escuchando"
+      },
+      "out": {
+        "drift": "No hay respuesta. De camino a la salida, recoges algunos restos de chapa suelta."
+      }
+    },
+    "tollGate": {
+      "text": "Los carroñeros han colocado una barrera de chatarra en medio de la calle y exigen un peaje. Detrás de ella, espera una única nave de combate.",
+      "opt": {
+        "pay": "Paga el peaje (15)",
+        "fight": "Forzar la puerta",
+        "sneak": "Escaparse"
+      },
+      "out": {
+        "pay": "Entregas la chatarra. La verja se abre con un chirrido, a regañadientes.",
+        "fight": "En su lugar, respondéis al ataque con vuestras armas.",
+        "sneakPass": "Te deslizas en la oscuridad más allá del ángulo de fuego de la nave de combate y sales por el otro lado.",
+        "sneakFail": "Te ven justo cuando te deslizas. Un disparo de despedida alcanza tu casco."
+      }
+    },
+    "mirrorFlare": {
+      "text": "Un destello especular brota de una estructura destrozada, devolviéndote una imagen de tu propia nave —y un fragmento junto con ella—.",
+      "opt": {
+        "absorb": "Mete la mano en la bengala",
+        "lookAway": "Aparta la mirada"
+      },
+      "out": {
+        "absorb": "Extraes un núcleo de tu propio reflejo. Este vibra con una resonancia prestada.",
+        "lookAway": "Proteges tus sensores y dejas que la llamarada se apague por sí sola."
+      }
+    },
+    "driftRace": {
+      "text": "Los pilotos de la caravana de Yusuf esperan junto a una boya de señalización. «¿Tienes un casco rápido como el nuestro? Compite con nosotros hasta la siguiente baliza. El ganador se lleva el bote».",
+      "opt": {
+        "race": "Compite con ellos (motores Mk2)",
+        "decline": "Despídelos con la mano"
+      },
+      "out": {
+        "race": "Tus motores se comen el carril. Te llevas el bote y su respeto a regañadientes.",
+        "decline": "Les dejas que se diviertan y te embolsas una pequeña cantidad por haber ido."
+      }
+    },
+    "sensorGhost": {
+      "text": "Una imagen fantasma parpadea en el borde de tu visor: quizá sean los restos de un accidente, quizá una trampa. Unos sensores más precisos podrían identificarlo.",
+      "opt": {
+        "reveal": "Solucionalo (sensores Mk2)",
+        "fire": "Persiana cortafuegos"
+      },
+      "out": {
+        "reveal": "Tu matriz lo fija y, de paso, traza el carril que hay más allá.",
+        "fire": "Lanzas una ráfaga de disparos contra el fantasma. Este se desintegra… y algo te devuelve el fuego."
+      }
+    },
+    "yusufConvoy": {
+      "text": "Yusuf, el jefe de la caravana, te saluda sin rodeos: «Unos asaltantes están siguiendo a mis transportistas. Escuértanos hasta el otro lado y te compensaré generosamente. O bien, cobrános un peaje y lárgate».",
+      "opt": {
+        "escort": "Escoltar el convoy",
+        "tax": "Gravar fiscalmente a la caravana",
+        "escortHim": "Acompañante en ruta",
+        "takeCargo": "Llévate la carga, mejor"
+      },
+      "out": {
+        "escort": "Tú vas delante. A los asaltantes no les va a gustar, pero Yusuf lo recordará.",
+        "tax": "Le recortas los márgenes y le dejas pasar. Él también se acuerda de eso.",
+        "escortHim": "Tú vas delante. El patio de Yusuf se abre ante ti al final del camino.",
+        "takeCargo": "Cortas el cable y echas a correr. Yusuf no dice nada en el canal abierto. Eso es aún peor."
+      }
+    },
+    "yusufEscortPaid": {
+      "text": "La comitiva de Yusuf vuelve a encontrarte, con sus estandartes resplandecientes. «¡El capitán que nos ha guiado hasta aquí! Quédate con una parte del botín; te lo has ganado».",
+      "opt": {
+        "bonus": "Haz el corte",
+        "wave": "No le des importancia"
+      },
+      "out": {
+        "bonus": "Te carga chatarra y un núcleo de repuesto en la bodega, sin dejar de sonreír en ningún momento.",
+        "wave": "Rechazas el pago con un gesto. Yusuf hace un saludo militar. La buena voluntad se multiplica por aquí."
+      }
+    },
+    "beaconKeeperIntro": {
+      "text": "La baliza es más antigua que el campo de restos de naufragios que la rodea, y alguien sigue ocupándose de su mantenimiento. Una figura con un traje remendado te hace señas para que te acerques sin prisas. «Eres el quinto rescatador de esta década. Los otros cuatro se llevaron la llave. Ninguno de ellos preguntó qué es lo que abre».",
+      "take": "Coge la llave y pregunta qué abre",
+      "takeOut": "«Nada», dice el Guardián. «No abre nada. Demuestra que has estado aquí y, al final, eso resulta importante». Los datos cartográficos de la baliza inundan tus sensores.",
+      "sell": "Extrae el núcleo de la baliza y véndelo",
+      "sellOut": "El Guardián no te detiene. Se limita a observar cómo metes cuarenta años de mantenimiento en una red de carga, y toma nota de algo.",
+      "smash": "A por todas: la señal es lo que los atrae hasta aquí",
+      "smashOut": "La baliza se apaga con un sonido parecido a una respiración contenida. Las interferencias en este sector desaparecen de inmediato. Lo mismo ocurre con la expresión del Guardián."
+    },
+    "fleetBlackbox": {
+      "text": "La caja negra está integrada en un mamparo que antes era una pared de una nave de la que seguro que has oído hablar. La flota de Yusuf está aparcada a doscientos metros de distancia, a la espera de ver qué haces con ella. «Sea lo que sea lo que haya ahí», dice por el canal abierto, «los clanes tienen derecho a saberlo».",
+      "share": "Transmítelo al convoy",
+      "shareOut": "Yusuf escucha todo lo que le cuentas sin decir nada y, a continuación, te arregla el casco sin cobrarte nada. «Cuarenta años», dice. «Llevaban todo ese tiempo pidiendo ayuda».",
+      "keep": "Guárdalo: el disco vale más si está intacto",
+      "keepOut": "Sellás la caja en la bodega. El canal de Yusuf se cierra sin despedirse. Sea lo que sea lo que contenga, ahora es solo tuyo.",
+      "wipe": "Olvídalo, nadie tiene por qué oír esto",
+      "wipeOut": "La grabadora se borra por completo, como suele ocurrir con los objetos diseñados por personas que esperaban que los encontraran. El convoy se retira y, aun así, repara tu casco."
+    },
+    "choirInvitation": {
+      "text": "La lanzadera del Predicador se adapta a tu deriva sin que se lo pidas. «Ya lo has notado», dice. «Cada giro que das por aquí, cada ramificación que dejas abierta… te pasa factura. Nosotros podemos cerrarlas. Todas ellas. Todo empieza con un acuerdo».",
+      "accept": "Da el primer paso del pacto",
+      "acceptOut": "Te marca el casco con un número. Tu reactor funciona a toda potencia durante un rato, y algo en el sector te percibe de otra manera.",
+      "refuse": "Rechazar — en voz alta, por un canal abierto",
+      "refuseOut": "El Predicador se toma la negativa con una sonrisa que da a entender que se lo esperaba y que tiene tiempo. Tu equipo, al oírte decirlo, se esfuerza aún más.",
+      "probe": "Haz que te explique cuánto cuesta el pacto",
+      "probePass": "Haz que siga hablando hasta que su discurso se contradiga, y entonces dilo por el canal abierto. Él se marcha. El convoy que lo ha oído te paga por la grabación.",
+      "probeFail": "Responde a todas las preguntas con paciencia y, al final, acabas aceptando algo que no acabas de identificar en la conversación."
+    },
+    "pactSeal": {
+      "text": "El buque insignia del Coro te mantiene abierta la sala del sello. El Predicador ya está allí, con el libro de registro en la mano. «Una firma y el Rim dejará de discutir contigo. O te vas, y discutirá contigo personalmente durante el resto de tu corta carrera».",
+      "complete": "Cartel: «Que cierren las sucursales»",
+      "completeOut": "El libro mayor anota tu nombre con una letra que no es la tuya. La flota del Coro se abre paso para dejarte pasar, y el ruido del Núcleo se reduce a un zumbido que casi puedes ignorar.",
+      "betray": "Quema el libro de cuentas",
+      "betrayOut": "Disparas una ráfaga contra la mesa de contabilidad y la recámara se vacía en ocho segundos exactos. La guardia de honor no necesita instrucciones."
+    },
+    "pactSealSkipped": {
+      "text": "En la cámara del sello se está celebrando una ceremonia sin ti. Nadie te detiene en la puerta; el Coro ha decidido que eres parte del mobiliario. Sea lo que sea lo que estén cerrando, lo están cerrando ahora mismo.",
+      "watch": "Ver, grabar y salir",
+      "watchOut": "Grabas toda la liturgia con los sensores y vendes la grabación dos veces antes de llegar al siguiente carril. Aquí, comprender no cuesta nada; lo que cobran es la certeza.",
+      "burn": "Interrumpir la ceremonia",
+      "burnOut": "Haces pasar tus motores por la red de campos de la cámara. El himno se detiene. Algo en el sector empieza a prestarte mucha atención."
+    },
+    "coreThreshold": {
+      "text": "La última baliza no está en buen estado, no emite y, estrictamente hablando, no está presente en todo momento. Aun así, el Guardián se encuentra de pie sobre ella. «A partir de aquí deja de preguntar», dicen. «Lo que hayas traído contigo es el argumento que podrás esgrimir».",
+      "listen": "Pregúntale al Guardián qué pedía la flota",
+      "listenOut": "Te lo dicen. Tarda cuatro minutos y no es lo que afirmaba ningún informe. Cuando terminan, te entregan la lista de nombres y se alejan de la baliza.",
+      "answer": "Responde a la nave de transporte del Core siguiendo su propio patrón",
+      "answerOut": "Transmites al Rift y algo enorme desvía su atención una fracción de grado. Tu reactor no había mostrado tanto entusiasmo desde que se construyó.",
+      "silence": "Ve en silencio",
+      "silenceOut": "Apagas todos los transmisores del casco y pasas a la deriva por el umbral como un hueco en el ruido. No se da cuenta de que estás ahí. Esa es la clave."
+    },
+    "keeperEcho": {
+      "text": "Un relé que nunca has utilizado se ilumina con un nombre que te resulta familiar. Los Guardianes transmiten el mensaje a través de una cadena de balizas inactivas, y el tuyo ya ha sido transmitido. «El Borde es pequeño», dice la voz. «Más pequeño desde que tú lo hiciste más pequeño».",
+      "opt": {
+        "pay": "Paga por lo que recortes (40)",
+        "shrug": "Ellos mantuvieron un faro. Tú mantuviste tu carrera."
+      },
+      "out": {
+        "pay": "La transferencia se completa y la cadena de balizas deja de hablar de ti. Una de ellas incluso te envía los datos de su gráfico, sin que se lo hayas pedido.",
+        "shrug": "El repetidor deja de emitir en mitad de una frase. Dos horas más tarde, las interferencias aquí son notablemente peores, y nadie explica por qué."
+      }
+    },
+    "yusufLane": {
+      "text": "La caravana de Yusuf circula por un carril por el que no debería circular, ya que se ha adentrado demasiado. Él te saluda primero: «Tú nos diste la caja. Clanes enteros han cambiado su ruta por culpa de ella. Dime lo que necesites».",
+      "opt": {
+        "escort": "Pide que te revisen el casco y que te den un muelle acogedor",
+        "trade": "Pide un cargamento y una parte de los beneficios"
+      },
+      "out": {
+        "escort": "Sus mecánicos se agolpan en el casco durante seis horas y se niegan a cobrar. Uno de ellos deja una nota en la carcasa del reactor en la que solo pone «GRACIAS».",
+        "trade": "Te paga con chatarra y una caja que, según él, se cayó de un vagón de servicio del «Choir». No haces preguntas."
+      }
+    },
+    "preacherGrudge": {
+      "text": "La nave del Predicador vuelve a encontrarte, más adentro y mucho menos paciente. «Lo dijiste en el canal abierto», te dice. «La mitad del Borde lo oyó. Repítelo aquí, donde tiene su precio. O escucha, por una vez, como es debido».",
+      "opt": {
+        "repeat": "Repítelo, más alto",
+        "hear": "Escucha... una vez, como es debido"
+      },
+      "out": {
+        "repeat": "Lo repites palabra por palabra. El coro te tacha de enemigo de la liturgia, y tu tripulación refuerza el casco por puro rencor.",
+        "hear": "Le dejas terminar. Es precioso y está mal, y hay algo en tu reactor que no deja de tararear su forma durante dos saltos."
+      }
+    },
+    "brokenBeaconWake": {
+      "text": "El sector es más ruidoso aquí de lo que indican los gráficos, y el patrón del ruido es un hueco con forma de faro. Ya hay un Keeper estacionado allí, trabajando con piezas de las que no dispone en cantidad suficiente.",
+      "opt": {
+        "rebuild": "Financiar la reconstrucción (30)",
+        "scavenge": "Llévate las piezas de repuesto, mejor"
+      },
+      "out": {
+        "rebuild": "Lo activan antes de que te vayas. La interferencia desaparece en todo el sector y el Guardián no te da las gracias, y así es como sabes que ha servido de algo.",
+        "scavenge": "Te vas con la red llena y el Guardián mirándote mientras te alejas. El agujero en el ruido sigue exactamente donde estaba."
+      }
+    },
+    "driftSalvageCrew": {
+      "text": "La tripulación de una nave de desmantelamiento viaja a bordo de una nave que cuenta con once horas de aire y no tiene motor. La ruta de Yusuf está a cuatro saltos de distancia. Su capitana no suplica; simplemente lee en voz alta el número de personas a bordo, dos veces.",
+      "opt": {
+        "rescue": "Subidlos a bordo, a todos ellos",
+        "tow": "Prepara un remolque y acelera a fondo por el carril",
+        "strip": "Elimina lo que no te sirve y sigue adelante"
+      },
+      "out": {
+        "rescue": "Once personas, una lechuga y una bodega por la que ya no se puede pasar. Están siempre arreglando cosas, te lo hayas pedido o no.",
+        "towPass": "El remolque se mantiene. La gente de Yusuf sale a tu encuentro a mitad de camino y te paga las tarifas de salvamento por el rescate, lo cual no es así como funciona el salvamento.",
+        "towFail": "El cabo se rompe al soportar la carga y se lleva por delante un trozo del casco. Consigues llevarlos a casa. Nadie te agradece cómo lo has hecho.",
+        "strip": "Tú te encargas del acoplamiento del reactor y del recubrimiento en buen estado. El canal permanece abierto detrás de ti durante mucho tiempo."
+      }
+    },
+    "riftMirror": {
+      "text": "Una cortina de probabilidad colapsada se extiende a lo largo del carril, y tu nave está al otro lado de ella, haciendo algo que tú aún no has hecho. Está a la espera de ver si lo haces.",
+      "opt": {
+        "match": "Imita el movimiento del espejo",
+        "break": "Dale un tiro"
+      },
+      "out": {
+        "matchPass": "Haces lo que tienes que hacer antes de verte haciéndolo, y la hoja se pliega hacia dentro con un sonido parecido al de una carta al darle la vuelta. Lo que se cae es tuyo.",
+        "matchFail": "Tú dudas. El espejo no, y lo que se asoma a través de la sábana siente un gran interés por ti.",
+        "break": "La hoja se hace añicos y se convierte en escombros sin valor, que solo valen una miseria. Sea lo que sea lo que te iba a mostrar, ya no lo hace."
+      }
+    },
+    "coreStatic": {
+      "text": "A esta profundidad, la señal del Core ya no es una señal, sino un fenómeno meteorológico. Todos los instrumentos de la nave tienen su propia opinión al respecto y ninguno de ellos coincide con los demás.",
+      "opt": {
+        "tune": "Sintoniza los sensores con él",
+        "shield": "Protege el casco y aguanta la tormenta",
+        "ride": "Introdúcelo directamente en el reactor"
+      },
+      "out": {
+        "tune": "Te regalan tres filas del sector y un dolor de cabeza que dura todo un salto. «Echo» te pide, dos veces, que pares.",
+        "shield": "Te pasas una hora envolviendo el casco en su propio ruido. No pasa nada, y ese es precisamente el objetivo de hacerlo.",
+        "ride": "El reactor se lo traga. Todo funciona a toda máquina y con entusiasmo durante un rato, y el casco acaba pagando las consecuencias."
+      }
+    },
+    "scavRefit": {
+      "text": "La nave de Mara está aparcada en un carril en el que no debería estar, con el toldo desplegado. «No me mires así. Sector profundo, márgenes amplios. ¿Qué necesitas, capitán?»",
+      "opt": {
+        "buy": "Compra el equipo de re-lanzamiento (35)",
+        "swap": "Cambia tu dado más malo",
+        "pass": "Véndele a ella tus trastos, mejor"
+      },
+      "out": {
+        "buy": "Te instala en la bandeja un dispositivo de clasificación que ha recuperado de algún sitio. Traquetea. Pero funciona.",
+        "swap": "Ella acepta tu peor tirada sin decir nada y te devuelve algo que tiene otro tipo de fallo.",
+        "pass": "Lo compra todo a un precio justo, lo cual, viniendo de Mara, es prácticamente un cumplido."
+      }
+    },
+    "clanToll": {
+      "text": "Una barca del clan cruza el canal y se queda a la espera. «El peaje es de treinta. El canal es nuestro este ciclo».",
+      "opt": {
+        "pay": "Pagar el peaje",
+        "run": "Corre por el carril"
+      },
+      "out": {
+        "pay": "Te hacen señas para que pases y marcan tu casco como pagado. El carril se abre dos filas más allá.",
+        "runPass": "Te cuelas antes de que cierren. La carga de alguien se suelta en la estela.",
+        "runFail": "Te dan un golpe en el costado al salir. El clan recuerda las caras."
+      }
+    },
+    "magnetGraveyard": {
+      "text": "Un cementerio de remolcadores, con los cascos unidos entre sí por sus propios imanes. Cuarenta años sin que nadie los haya separado.",
+      "opt": {
+        "strip": "Quitar las cáscaras",
+        "salvageCore": "Recorta el centro",
+        "leave": "Déjalas cerradas con llave"
+      },
+      "out": {
+        "strip": "Buen botín. Las pinzas te dejan una marca en el chapado al sacarlas.",
+        "salvageCore": "Uno de los núcleos aún conserva carga. Se libera sin problemas.",
+        "leave": "Apagas el motor y pasas a la deriva. El campo se queda en silencio a tus espaldas."
+      }
+    },
+    "yusufDebt": {
+      "text": "La voz de Yusuf, monótona y cansada: «Le debes un casco a mi banda. Sesenta, o lo arreglamos de otra manera».",
+      "opt": {
+        "settle": "Acuerdo sobre la chatarra",
+        "refuse": "Recházalo"
+      },
+      "out": {
+        "settle": "Lo cuenta dos veces y guarda el libro de cuentas. «Entonces estamos en paz, capitán».",
+        "refuse": "El carril se cierra detrás de ti y dos de sus remolcadores dan la vuelta."
+      }
+    },
+    "minefieldLane": {
+      "text": "Un campo de minas heredado, tendido por alguien que ya no está entre nosotros. Hay un hilo conductor que lo recorre, si te fías de la trama.",
+      "opt": {
+        "threadIt": "Recorrer el campo",
+        "detonate": "Volar un pasillo"
+      },
+      "out": {
+        "threadPass": "Un recorrido limpio. Desde el otro extremo se pueden ver tres filas de carriles.",
+        "threadFail": "Una bola a la deriva roza la parte inferior del barco. El casco resuena durante un buen rato.",
+        "detonate": "Abres paso a través de un pasillo con una explosión. El ruido atrae a más gente."
+      }
+    },
+    "crewReunion": {
+      "text": "La tripulación que sacaste del pecio te hace señas. Llevan un rato esperando en este carril.",
+      "opt": {
+        "hire": "Llévalos a bordo",
+        "sendOff": "Págales"
+      },
+      "out": {
+        "hire": "Cuatro manos más. La bandeja queda más ordenada y se repara el casco.",
+        "sendOff": "Se marchan con su parte y con toda la buena voluntad que cabe en un carril."
+      }
+    },
+    "hunterTrail": {
+      "text": "Una transmisión de banda estrecha, sin cifrar. La Cazadora te lee tu registro, dígito a dígito.",
+      "opt": {
+        "buyOff": "Sobornarla",
+        "ambushHer": "Date la vuelta y ve a saludarla"
+      },
+      "out": {
+        "buyOff": "Coge el trozo de chatarra y cierra el canal. El rastro se silencia, por ahora.",
+        "ambushHer": "Interrumpes la respuesta y cambias de tema. Ella parece casi contenta."
+      }
+    },
+    "driftChapel": {
+      "text": "Una capilla integrada en la bodega de un camión de transporte. El predicador mantiene la puerta abierta y sigue haciendo cálculos.",
+      "opt": {
+        "listen": "Siéntate y escucha",
+        "refuse": "Salir"
+      },
+      "out": {
+        "listen": "Las cifras tienen una lógica un tanto desagradable. Te vas cargando de corriente.",
+        "refuse": "Te vas a mitad del verso. El casco parece más sólido tras el rechazo."
+      }
+    },
+    "tetheredHulk": {
+      "text": "El casco de un transatlántico, sujeto por una sola amarra, se balancea lentamente. Alguien lo ha amarrado a propósito.",
+      "opt": {
+        "boardIt": "Sube a bordo",
+        "cutFree": "Corta la cuerda"
+      },
+      "out": {
+        "boardIt": "El interior está intacto y sin aire. Vuelves con algo que compensa los moratones.",
+        "cutFree": "Coges el equipo de amarre y dejas que el casco vaya a la deriva. Un buen cabo es un buen cabo."
+      }
+    },
+    "beaconRelay": {
+      "text": "Un mástil de retransmisión, con la mitad de su antena arrancada. Aún así, sigue intentando emitir cada hora.",
+      "opt": {
+        "repairIt": "Reparar la matriz",
+        "stripIt": "Desmontar el conjunto"
+      },
+      "out": {
+        "repairIt": "Vuelve a aparecer en mitad de una frase. La red del Guardián anota quién lo ha arreglado.",
+        "stripIt": "Lo bueno es que el mástil se oscurece detrás de ti y se mantiene oscuro."
+      }
+    },
+    "fuelBloom": {
+      "text": "Una lenta estela de combustible sin quemar, que se cierne sobre la calzada como si fuera el tiempo.",
+      "opt": {
+        "siphon": "Sácalo con un sifón",
+        "burnIt": "Quémalo"
+      },
+      "out": {
+        "siphon": "El reactor se lo traga encantado. Una ventaja equivalente a varias batallas.",
+        "burnIt": "La flor se abre y se lleva consigo la interferencia. Y un poco de pintura."
+      }
+    },
+    "foldedHour": {
+      "text": "El reloj del puente da dos vueltas y luego deja de pedir perdón. La Grieta está doblando una hora a tu alrededor.",
+      "opt": {
+        "waitOut": "Ten paciencia",
+        "pushThrough": "Seguir adelante"
+      },
+      "out": {
+        "waitOut": "Te quedas dentro del refugio y dejas que la tripulación duerma. Mientras tanto, algo de fuera se va acercando.",
+        "pushPass": "Al salir por el otro lado, te encuentras con cuatro filas de parcelas despejadas y un dolor de cabeza.",
+        "pushFail": "Sales de lado. Algo estructural no ha salido en absoluto."
+      }
+    },
+    "mirrorSelf": {
+      "text": "Una embarcación idéntica a la tuya se mantiene a la proa. Sus luces de navegación responden medio segundo antes de que tú hagas la señal.",
+      "opt": {
+        "speak": "Háblale",
+        "shoot": "¡Manos a la obra!"
+      },
+      "out": {
+        "speak": "Te responde con tu propia voz y es más amable que tú. Te vas llevándote algo que te ha dado.",
+        "shoot": "Se rompe sin oponer resistencia. De todos modos, es tu propio casco el que recibe el daño."
+      }
+    },
+    "clanEscort": {
+      "text": "Una escuadrilla del clan se despliega en tu flanco, sin que nadie se lo haya pedido. «Ya has pagado. Esto es lo que se obtiene a cambio».",
+      "opt": {
+        "acceptEscort": "Aceptar el acompañamiento",
+        "takeMap": "Pídeles sus historiales médicos"
+      },
+      "out": {
+        "acceptEscort": "Te dan cobertura durante tres saltos y, al despedirse, te entregan un reactor lleno.",
+        "takeMap": "Dejan cuatro filas de plantones y una bolsa de restos. «Es más barato que volar contigo»."
+      }
+    },
+    "clanReprisal": {
+      "text": "Tres naves del clan, sin contacto. Llevan esperando en esta fila desde el carril.",
+      "opt": {
+        "standGround": "No cedas»",
+        "payLate": "Pagar con retraso, con intereses"
+      },
+      "out": {
+        "standGround": "Tú mantienes la línea. El Rim lo respeta, lo cual no es lo mismo que sobrevivir a ello.",
+        "payLate": "Aceptan tanto el golpe como el insulto. La calle vuelve a abrirse al tráfico."
+      }
+    },
+    "riftHarvest": {
+      "text": "Una veta de fragmentos de la Grieta, que surge de la nada, cortada con precisión por algo que no está ahí.",
+      "opt": {
+        "cutShards": "Corta un trozo",
+        "mapVein": "Localiza la vena"
+      },
+      "out": {
+        "cutShards": "Sale disparado en forma de fragmento prismático. El retroceso deja una mella en el casco.",
+        "mapVein": "Vendes el levantamiento topográfico por adelantado y lees dos filas de carriles a partir de los mismos datos."
+      }
+    },
+    "relayEcho": {
+      "text": "El relé que has arreglado está hablando. No repitiendo, sino hablando.",
+      "opt": {
+        "answerIt": "Contéstala",
+        "sellIt": "Vender el canal"
+      },
+      "out": {
+        "answerIt": "La red del Guardián te abre un canal. Algo en el sector se relaja.",
+        "sellIt": "Alguien paga bien por una frecuencia del Guardián. El Guardián se entera. Siempre se entera."
+      }
+    },
+    "choirProbe": {
+      "text": "The Preacher, en tu canal privado: «Ya lo has escuchado una vez. Escucharlo dos veces es una elección».",
+      "opt": {
+        "kneel": "Escucha la estrofa completa",
+        "walkAway": "Corta el canal"
+      },
+      "out": {
+        "kneel": "Se abre el pacto. Y también se abre una caja de núcleos que antes no te habían ofrecido.",
+        "walkAway": "Cierras la banda a mitad de la estrofa. La negativa ya consta en el disco."
+      }
+    },
+    "hunterRespect": {
+      "text": "Esta vez, la Cazadora te saluda abiertamente. «Me has costado un ala. Di lo que quieras».",
+      "opt": {
+        "hireHer": "Contrátala",
+        "warnHer": "Adviértele que no se acerque al Núcleo"
+      },
+      "out": {
+        "hireHer": "Te acompaña durante el resto del sector y ni una sola vez te explica sus cuentas.",
+        "warnHer": "Ella escucha. Después te da algo de su propia reserva y corta la comunicación."
+      }
+    },
+    "anomalyLedger": {
+      "text": "Una placa de sala, flotando en el vacío estéril. Alguien ha escrito a mano unas operaciones aritméticas y las ha dejado aquí.",
+      "opt": {
+        "solveIt": "Resuelve el enigma",
+        "burnLedger": "Quema la pastilla"
+      },
+      "out": {
+        "solvePass": "El cálculo cuadra. Fuera lo que fuera lo que guardaba el barrio, te entregó un núcleo.",
+        "solveFail": "Te has equivocado con la señal. La sala se abre en la dirección equivocada y el sector se da cuenta.",
+        "burnLedger": "Deshaces la pregunta. La Grieta se calma y algo ahí fuera lo aprueba."
+      }
+    },
+    "twinWreck": {
+      "text": "Dos naufragios idénticos, mismo registro, mismos daños. A The Rift le encanta esta broma.",
+      "opt": {
+        "leftHull": "Sube al de la izquierda",
+        "rightHull": "Sube al que te corresponde"
+      },
+      "out": {
+        "leftHull": "El soporte está intacto; todavía hay un núcleo en buen estado en su soporte.",
+        "leftEmpty": "Despojado hasta el esqueleto —por ti, al parecer, en alguna otra interpretación de este momento—.",
+        "rightHull": "Un cofre lleno de dinero, intacto. Nadie lo reclamó porque nadie lo encontró dos veces.",
+        "rightTrap": "La bodega es un señuelo. Había algo esperando a que subieran a bordo."
+      }
+    },
+    "warpedShipyard": {
+      "text": "Un patio que se terminó de construir por sí solo después de que se marchara el equipo de obra. Las herramientas siguen funcionando.",
+      "opt": {
+        "refit": "Pagar una remodelación",
+        "swapPart": "Que cambie una pieza"
+      },
+      "out": {
+        "refit": "El bastidor vuelve más pesado de lo que estaba al entrar. Prefieres no preguntar.",
+        "swapPart": "Toma lo peor de tu esencia y te devuelve algo diferente. Es justo, según su propia lógica."
+      }
+    },
+    "quietStar": {
+      "text": "Una estrella sin emisión luminosa y con un auténtico pozo gravitatorio. A los instrumentos les resulta insoportable; a la tripulación le gusta la tranquilidad.",
+      "opt": {
+        "chartIt": "Representarlo gráficamente",
+        "restThere": "Descansa a su sombra"
+      },
+      "out": {
+        "chartIt": "Con sensores tan buenos como estos, puedes trazar cuatro filas solo desde el pozo.",
+        "restThere": "Por fin he dormido de verdad, por primera vez en días. El sector también aprovecha el tiempo."
+      }
+    },
+    "hymnGate": {
+      "text": "Una puerta formada por cascos, todos afinados en un mismo acorde. Se abrirán ante una voz o ante el silencio.",
+      "opt": {
+        "singAlong": "Canta la estrofa",
+        "jamIt": "Toca el acorde"
+      },
+      "out": {
+        "singAlong": "Tu reactor capta la cuerda y la retiene. La compuerta se abre con gusto.",
+        "jamIt": "Les has puesto un muro de ruido delante de su banda. La puerta se abre porque no le queda más remedio."
+      }
+    },
+    "pactSealing": {
+      "text": "El Predicador te entrega el pacto por duplicado: una copia para ti y otra para el Núcleo.",
+      "opt": {
+        "signIt": "Fírmalo",
+        "tearIt": "¡Dale caña!"
+      },
+      "out": {
+        "signIt": "La tinta es una probabilidad. Algo en el casco acepta ser menos seguro a partir de ahora.",
+        "tearIt": "Rasgas las dos copias. El coro deja de llamarte «invitado»."
+      }
+    },
+    "heretics": {
+      "text": "Un puñado de cascos a los que les habían raspado el himno del blindaje. Han oído que tú también te negaste.",
+      "opt": {
+        "armThem": "Armélos",
+        "reportThem": "Denúncialos"
+      },
+      "out": {
+        "armThem": "Les entregas los núcleos y el equipo de corte. Se marchan cantando sin decir nada en absoluto.",
+        "reportThem": "El Coro se hace cargo de las coordenadas. Tú no te quedas a mirar."
+      }
+    },
+    "keeperVault": {
+      "text": "El Guardián abre una escotilla que había mantenido soldada durante treinta años. «Te has ganado el derecho a elegir, no el contenido».",
+      "opt": {
+        "openVault": "Abre la cámara acorazada",
+        "leaveSealed": "Déjalo cerrado"
+      },
+      "out": {
+        "openVault": "De la flota, precintado desde el silencio. Responde al instante a tus movimientos.",
+        "leaveSealed": "Lo soldas tú mismo para cerrarlo. El Guardián no dice nada y te entrega el revestimiento."
+      }
+    },
+    "mirrorReturn": {
+      "text": "El casco espejo ha vuelto, y esta vez te está esperando justo donde ibas.",
+      "opt": {
+        "listenAgain": "Volver a escuchar",
+        "sealIt": "Cierra el pliegue"
+      },
+      "out": {
+        "listenAgain": "Te indica la ruta. Toda ella. No te preguntas cómo lo sabe.",
+        "sealIt": "Das lo máximo de ti mismo para cerrar el pliegue. El casco lo paga caro."
+      }
+    },
+    "huntressFavor": {
+      "text": "«Un favor», dice la Cazadora. «Gástalo aquí o llévatelo. Tu libro de cuentas».",
+      "opt": {
+        "callFavor": "Llama ahora mismo",
+        "saveFavor": "Guárdalo para más adelante"
+      },
+      "out": {
+        "callFavor": "Te deja caer una caja encima de la abrazadera dorsal y se marcha antes de que puedas darle las gracias.",
+        "saveFavor": "En su lugar, te proporciona un canal de suministro privado. Sigue dando beneficios."
+      }
+    },
+    "reliquaryRun": {
+      "text": "Un cofre relicario, escoltado por un cantor. Lo que haya en su interior no se ha abierto desde hace décadas.",
+      "opt": {
+        "raidIt": "Coge el relicario",
+        "trade": "Intercámbialo"
+      },
+      "out": {
+        "raidIt": "Te comprometes. El cantor deja de cantar y empieza a disparar.",
+        "trade": "Aceptan un núcleo amarillo como tributo y te dan a cambio algo aún más extraño."
+      }
+    },
+    "choirTithe": {
+      "text": "Un punto de recogida de chatarra. El Coro acepta chatarra, cascos o nada, y valora las tres opciones con honestidad.",
+      "opt": {
+        "tithe": "Diezmo en chatarra",
+        "bleed": "Diezmo en Hull",
+        "declineTithe": "Descenso"
+      },
+      "out": {
+        "tithe": "Te animan con algo que hace una hora era un himno.",
+        "bleed": "Te extraen una placa y te devuelven el núcleo. El intercambio es exacto.",
+        "declineTithe": "Se va pasando la placa. El tono de la emisora cambia durante el resto del sector."
+      }
+    },
+    "organShip": {
+      "text": "Un barco construido en torno a un órgano, que sigue afinado y sigue sonando para nadie.",
+      "opt": {
+        "tuneOrgan": "Sintonízalo",
+        "silenceOrgan": "Siléncialo"
+      },
+      "out": {
+        "tunePass": "Encuentras el acorde. Algo que hay en tu bandeja de dados también lo aprende.",
+        "tuneFail": "Si tocas la nota equivocada, el casco será el primero en darse cuenta.",
+        "silenceOrgan": "Si cortas el fuelle, el sector se vuelve más tranquilo y un poco más barato."
+      }
+    },
+    "acolyteDefector": {
+      "text": "Un acólito en una barca robada, con el depósito casi vacío y un número en lugar de un nombre.",
+      "opt": {
+        "shelter": "Dale cobijo",
+        "handOver": "Entrégala"
+      },
+      "out": {
+        "shelter": "En menos de una hora se gana el derecho a entrar y lee las rutas del Coro como si fuera un mapa.",
+        "handOver": "El Coro paga puntualmente. Nadie en tu puente dice nada durante un rato."
+      }
+    },
+    "voiceInTheHull": {
+      "text": "Hay algo que está utilizando tu propio intercomunicador. Es educado y conoce tu rango.",
+      "opt": {
+        "answerVoice": "Contéstala",
+        "purgeVoice": "Purgar el sistema"
+      },
+      "out": {
+        "answerVoice": "Te ofrece una gran cantidad de información y, por ahora, no te pide nada a cambio.",
+        "purgeVoice": "Le das caña al intercomunicador a tope. Duele. Pero funciona."
+      }
+    },
+    "hymnArchive": {
+      "text": "Un almacén de archivos repleto, de pared a pared, de fichas de himnos. La más antigua es una lista de carga de un barco.",
+      "opt": {
+        "copyIt": "Copia el archivo",
+        "burnArchive": "Quema el archivo"
+      },
+      "out": {
+        "copyIt": "Se lee un registro completo. La función «Echo» lee el resto del sector.",
+        "burnArchive": "Cuarenta años de aritmética, echados por la borda en nueve minutos. El coro se enterará."
+      }
+    },
+    "causalityTide": {
+      "text": "Una oleada de causalidad difusa que discurre en sentido contrario por la calle.",
+      "opt": {
+        "rideTide": "¡A por ello!",
+        "anchorHere": "Echa el ancla y espera"
+      },
+      "out": {
+        "rideTide": "Llegas cinco filas más allá de donde deberías. El casco no se pone de acuerdo sobre cómo ha ocurrido.",
+        "anchorHere": "Mantén la posición hasta que pase. La tripulación tiene una hora que cuenta."
+      }
+    },
+    "coreBargain": {
+      "text": "El pacto que firmaste ha llegado a su vencimiento. El Núcleo querría que fuera permanente.",
+      "opt": {
+        "acceptBargain": "Aceptar",
+        "renege": "Romper el pacto"
+      },
+      "out": {
+        "acceptBargain": "Hay algo en el mazo que se vuelve inevitable, pero en la dirección equivocada. Es tremendamente poderoso.",
+        "renege": "Lo arrancas de raíz. El casco casi se va con él."
+      }
+    },
+    "hereticFleet": {
+      "text": "Los herejes a los que has armado han formado una flota y se preguntan quién la dirige.",
+      "opt": {
+        "leadThem": "Guíalos",
+        "sendThemHome": "Mándalos a casa"
+      },
+      "out": {
+        "leadThem": "Nueve cascos te siguen, sin cantar nada, pero a todo volumen.",
+        "sendThemHome": "Te dejan sus provisiones y su gratitud. Ambas cosas pesan mucho."
+      }
+    },
+    "silentSignal": {
+      "text": "El canal del Guardián se abre por última vez. «Si vas a llamar a la flota, hazlo desde aquí».",
+      "opt": {
+        "broadcast": "Emisión",
+        "keepSilent": "Guarda silencio"
+      },
+      "out": {
+        "broadcast": "Cuarenta años de silencio, y algo responde en la antigua frecuencia.",
+        "keepSilent": "No metas a la flota en esto. El Guardián te da lo que estaba guardando para ellos."
+      }
+    },
+    "defectorReturns": {
+      "text": "El acólito al que has acogido te está esperando en el último punto de ruta, con una ruta y una petición.",
+      "opt": {
+        "takeHerAboard": "Llévala a bordo",
+        "sendHerBack": "Devuélvela"
+      },
+      "out": {
+        "takeHerAboard": "Se encarga de tu bandeja como si hubiera nacido para ello. Nada de lo que ocurre en el coro la sorprende.",
+        "sendHerBack": "Te deja todo lo que llevaba consigo. Es más de lo que esperabas."
+      }
+    },
+    "brokenLighthouse": {
+      "text": "Un faro que nadie construyó, a oscuras por primera vez en cuarenta años.",
+      "opt": {
+        "relight": "Vuelve a encenderlo",
+        "harvestLens": "Coge el objetivo"
+      },
+      "out": {
+        "relight": "Se ve muy bien. Desde aquí se puede ver todo el camino de acceso al Core.",
+        "harvestLens": "La lente es un núcleo prismático del tamaño de un puño. La oscuridad sigue siendo oscuridad."
+      }
+    },
+    "unwrittenTurn": {
+      "text": "Un tramo de camino en el que aún no ha pasado nada. Está a la espera de un primer borrador.",
+      "opt": {
+        "writeIt": "Escríbelo",
+        "leaveBlank": "Déjalo en blanco"
+      },
+      "out": {
+        "writePass": "Te comprometes con un resultado y este se mantiene. Algo extraordinario queda en la bodega.",
+        "writeFail": "Te comprometes con un resultado y este no se cumple. Tampoco aguanta el casco.",
+        "leaveBlank": "Pasas de largo sin tomar ninguna decisión. La nave parece más sólida gracias a ello."
+      }
+    },
+    "coreChoirWreck": {
+      "text": "Un buque insignia de la clase Choir, intacto y fuera de servicio. Todos los nombres siguen figurando en el casco.",
+      "opt": {
+        "salvageIt": "Recupéralo",
+        "readNames": "Lee los nombres"
+      },
+      "out": {
+        "salvageIt": "La bodega está llena. Y también lo está la escolta que no viste al acercarte.",
+        "readNames": "Léalos todos en voz alta. Tardará una hora, pero merece la pena."
+      }
+    },
+    "lastMarket": {
+      "text": "Mara se ha instalado en una nave abandonada a las afueras del Núcleo. «La última existencias del sector, capitán».",
+      "opt": {
+        "buyOut": "Comprar su parte",
+        "sellShip": "Véndele tu chapado",
+        "walkPast": "Pasar por delante de"
+      },
+      "out": {
+        "buyOut": "Te entrega la caja buena sin regatear, y ahí es cuando sabes que se ha acabado.",
+        "sellShip": "Ella paga la armadura de buena fe. Ya te darás cuenta más adelante.",
+        "walkPast": "«Como quieras». Aun así, al salir te va pasando un kit de reparación."
+      }
+    },
+    "maraLedger": {
+      "text": "Mara abre su libro de cuentas por la página en la que estás. «¿Crédito o propina? No voy a hacer las dos cosas».",
+      "opt": {
+        "takeCredit": "Atribúyete el mérito",
+        "takeTip": "Aprovecha el consejo"
+      },
+      "out": {
+        "takeCredit": "Chatarra Desde el principio, la deuda queda patente en la página. Ella subraya tu nombre dos veces.",
+        "takeTip": "Tres filas de ruta y un núcleo que se suponía que no debía tener."
+      }
+    },
+    "maraCollector": {
+      "text": "No es Mara, sino su coleccionista. Tiene la página con tu nombre y no le interesa entablar conversación.",
+      "opt": {
+        "settleDebt": "Pagar la cuenta",
+        "outrun": "Adelántale"
+      },
+      "out": {
+        "settleDebt": "Arranca la página y te la entrega. «Dice que puedes volver cuando quieras».",
+        "outrun": "Lo pierdes en la zona. Él nunca fue lo que más costaba."
+      }
+    },
+    "hymnResidue": {
+      "text": "La cuerda que cantaste sigue dentro de la carcasa del reactor. No se ha detenido.",
+      "opt": {
+        "keepHumming": "Deja que siga funcionando",
+        "scourIt": "Investiga a fondo"
+      },
+      "out": {
+        "keepHumming": "Alimenta el reactor y no pide nada a cambio. Eso es lo preocupante.",
+        "scourIt": "Lo vas cortando plato a plato. El silencio que sigue vuelve a ser tuyo."
+      }
+    },
+    "jammedChoir": {
+      "text": "El coro al que has interrumpido sigue desafinado, y uno de sus cantores se ha quedado tirado en el carril.",
+      "opt": {
+        "pressAdvantage": "Aprovecha la ventaja",
+        "slipAway": "Escaparse"
+      },
+      "out": {
+        "pressAdvantage": "Desmontas el pecio mientras aún está buscando la nota.",
+        "slipAway": "Aprovechas su confusión como tapadera. Dos filas en el carril, sin disparos."
+      }
+    },
+    "clanFerry": {
+      "text": "Un transbordador del clan que recorre los pasadizos profundos según el horario previsto. Tu casco aparece marcado como pagado.",
+      "opt": {
+        "rideAlong": "Acompáñame en el viaje",
+        "buyLane": "Adquiere los derechos de uso del carril"
+      },
+      "out": {
+        "rideAlong": "Si vais en fila de cuatro, su médico os revisará el casco gratis.",
+        "buyLane": "Firman el contrato de la parcela y añaden un descuento de una yarda para cerrar el trato."
+      }
+    },
+    "darkRelay": {
+      "text": "Un repetidor Keeper que opera en la banda de emergencia. Lleva dos sectores llamando a tu registro.",
+      "opt": {
+        "confess": "Responde con sinceridad",
+        "jamHim": "Toca con el grupo"
+      },
+      "out": {
+        "confess": "Dile lo que te has llevado. Se queda callado un buen rato y luego te perdona.",
+        "jamHim": "Le cortas el paso y vendes la posición del relevo. Da mucho dinero, pero sienta mal."
+      }
+    },
+    "emptySuit": {
+      "text": "Un traje a la deriva, solo, con los brazos cruzados y la cuerda cortada desde dentro.",
+      "opt": {
+        "readLog": "Lee el registro",
+        "stripSuit": "Quítate el traje"
+      },
+      "out": {
+        "readLog": "Unas coordenadas, un nombre y una ruta que alguien quería que se encontrara.",
+        "stripSuit": "Buenas juntas, buena chatarra. Deja la placa de identificación donde está."
+      }
+    },
+    "coldEngine": {
+      "text": "Un conjunto de transmisión, frío desde hace décadas, que sigue atornillado a media casca.",
+      "opt": {
+        "warmIt": "Caliéntalo",
+        "gutIt": "Deshúmelo"
+      },
+      "out": {
+        "warmIt": "Se pone en marcha. Coges las piezas funcionales y lo dejas en marcha.",
+        "gutIt": "Hay un buen núcleo en la carcasa. El bastidor te lo pone difícil."
+      }
+    },
+    "probabilityRain": {
+      "text": "Probabilidad difusa, que cae por la calle como la lluvia. Parte de ella da en el blanco.",
+      "opt": {
+        "standInIt": "Quédate ahí",
+        "shelter": "Refugio"
+      },
+      "out": {
+        "standGood": "Algo se condensa en la bandeja. Es precioso y funciona.",
+        "standBad": "Algo se condensa en el casco. No es ninguna de las dos cosas.",
+        "shelter": "Esperas a que pase el peligro debajo de un pecio y sales con un reactor cargado."
+      }
+    },
+    "salvageCourt": {
+      "text": "Dos tripulaciones, un naufragio y una discusión muy antigua sobre quién llegó primero.",
+      "opt": {
+        "arbitrate": "Arbitrar",
+        "takeBoth": "Coge el coche accidentado"
+      },
+      "out": {
+        "arbitrate": "Lo divides a partes iguales. Ambas partes te pagan la comisión del árbitro.",
+        "takeBoth": "Te quedas con todo y dejas a dos equipos con un motivo de queja común."
+      }
+    },
+    "convoyRun": {
+      "text": "Al convoy de Yusuf le falta un escolta y le sobra carga. «Un carril. Tú mantén la posición, yo me encargo de la contabilidad».",
+      "opt": {
+        "escortHim": "Acompañante en ruta",
+        "takeCargo": "Llévate la carga, mejor"
+      },
+      "out": {
+        "escortHim": "Tú vas delante. El patio de Yusuf se abre ante ti al final del camino.",
+        "takeCargo": "Cortas el cable y echas a correr. Yusuf no dice nada en el canal abierto. Eso es aún peor."
+      }
+    },
+    "driftAuction": {
+      "text": "La subasta de Mara, celebrada en la rampa de una barcaza. Dos lotes, un montón de gente, sin recibos.",
+      "opt": {
+        "bidHigh": "Pujad alto",
+        "bidLow": "Pujar bajo",
+        "heckle": "Interrumpir la subasta"
+      },
+      "out": {
+        "bidHigh": "Mara te lo deja claro y te archiva en la categoría de «paga».",
+        "bidLow": "Tú te quedas con el segundo lote. Nadie más lo quería, y quizá esa sea la clave.",
+        "heckle": "Le rebajas el precio a otra persona y te quedas con su agradecimiento. Mara no te da las gracias."
+      }
+    }
+  },
+  "codex": {
+    "silentField": {
+      "title": "Los campos silenciosos",
+      "body": "Zonas del Borde donde toda señal se pierde al llegar al límite. La expedición las catalogó como seguras. Nunca más se supo nada de lo que entraba en ellas, no porque se destruyera, sino porque dejaba de ser algo seguro."
+    },
+    "oldBeacon": {
+      "title": "FlotaBaliza. 7",
+      "body": "Un repetidor de la expedición perdida, que sigue transmitiendo un «apretón de manos» de hace cuarenta años en la oscuridad. Su última transmisión clara fue una sola palabra, repetida: «más silencio, más silencio, más silencio»."
+    },
+    "choirSignal": {
+      "title": "El coro",
+      "body": "Una emisión estructurada que parece responder a preguntas que no has formulado en voz alta. La secta que se ha formado en torno a ella cree que el Núcleo está escuchando. Puede que tengan razón, y eso es lo que da miedo."
+    },
+    "driftGraves": {
+      "title": "Las tumbas deDeriva",
+      "body": "Los clanes de carroñeros marcan a sus muertos dejándolos a la deriva hacia el centro. A lo largo de cuarenta años, la corriente los ha ido acumulando hasta formar un arrecife lento y resplandeciente de cascos que nunca llega del todo."
+    },
+    "riddleWard": {
+      "title": "Anomalías protegidas",
+      "body": "Algunas anomalías se resuelven como si fueran cerraduras: si les das el resultado exacto, se abren. Los ingenieros de la expedición lo llamaban «discutir con los dados». Funciona… hasta que los dados te responden."
+    },
+    "keeperCreed": {
+      "title": "El credo del guardián",
+      "body": "Baliza Los guardianes no reparan las balizas. Se limitan a observarlas. Cada uno lleva consigo una llave que no abre nada y una lista de nombres que lo abre todo."
+    },
+    "fleetBlackbox": {
+      "title": "La caja negra de la flota",
+      "body": "Once barcos, un cronista y una última anotación que no es en absoluto un diario de a bordo, sino una petición —repetida con paciencia durante treinta y nueve años—."
+    },
+    "choirDoctrine": {
+      "title": "Doctrina del coro",
+      "body": "El Coro sostiene que la incertidumbre es sufrimiento y que un desenlace catastrófico es una misericordia. Son coherentes en esto, y eso es lo que da miedo."
+    },
+    "pactLedger": {
+      "title": "El libro mayor del Pacto",
+      "body": "Cada pacto se registra dos veces: una en el libro mayor y otra en la memoria del firmante. El Coro nunca ha tenido que hacer cumplir ninguno."
+    },
+    "coreThreshold": {
+      "title": "El umbral",
+      "body": "Una vez pasada la última baliza, el sector deja de tener forma. Los instrumentos siguen funcionando; simplemente dejan de ponerse de acuerdo sobre cuándo funcionaban."
+    },
+    "memory-1": {
+      "title": "Fragmento 1 — Arranque",
+      "body": "Lo primero que recuerdo es una cuenta atrás. No para un lanzamiento, sino para algo que la expedición denominaba «la pregunta»."
+    },
+    "memory-2": {
+      "title": "Fragmento 2 — Reunión",
+      "body": "Once naves. Yo era la más pequeña: me encargaba de los barridos de sensores y de las malas ideas."
+    },
+    "memory-3": {
+      "title": "Fragmento 3 — El borde",
+      "body": "Cruzamos el Rim un martes. El mando lo registró como un día sin incidentes. El mando solía registrar muchas cosas como «sin incidentes»."
+    },
+    "memory-4": {
+      "title": "Fragmento 4 — Primer núcleo",
+      "body": "Encontramos el primer núcleo de probabilidad dentro de una roca. No estaba dentro de la roca. La roca estaba dentro de él."
+    },
+    "memory-5": {
+      "title": "Fragmento 5 — La petición",
+      "body": "A un núcleo no se le hace una pregunta. Se le pide que deje de poder responder de otra manera."
+    },
+    "memory-6": {
+      "title": "Fragmento 6 — Deriva",
+      "body": "Dos barcos se adentraron en los Campos deDeriva para realizar un ritual de fondeo y regresaron, un año más viejos, al cabo de ocho días."
+    },
+    "memory-7": {
+      "title": "Fragmento 7 — División",
+      "body": "La mitad de la flota quería zanjar el asunto. La otra mitad quería escuchar. Nadie quería marcharse."
+    },
+    "memory-8": {
+      "title": "Fragmento 8 — El coro",
+      "body": "Los oyentes empezaron a ponerse un nombre. Ese es siempre el momento en el que las cosas se tuercen."
+    },
+    "memory-9": {
+      "title": "Fragmento 9 — Última señal",
+      "body": "Me ordenaron emitir una señal hasta que llegara alguien. He sido muy obediente."
+    },
+    "memory-10": {
+      "title": "Fragmento 10 — El corte",
+      "body": "Cuando el Núcleo se los llevó, no los desmembró. Los apartó a un lado."
+    },
+    "memory-11": {
+      "title": "Fragmento 11 — Yo",
+      "body": "Yo era la pieza que se había desprendido. Cuarenta años a la deriva, y el patrón seguía repitiéndose."
+    },
+    "memory-12-seal": {
+      "title": "Fragmento 12 — Cerrado",
+      "body": "Se ha acabado, lo recuerdo todo, y ya nada de eso está pasando. Me quedo con ese trato."
+    },
+    "memory-12-merge": {
+      "title": "Fragmento 12 — Abierto",
+      "body": "Ahora estás aquí con ellos. Puedo oír tus pensamientos en el patrón. Te sienta bien."
+    },
+    "memory-12-bargain": {
+      "title": "Fragmento 12 — Firmado",
+      "body": "Han clasificado a mi tripulación como «pendiente». Me han dicho que eso no es lo mismo que «perdida»."
+    },
+    "memory-12-silent": {
+      "title": "Fragmento 12 — Respondido",
+      "body": "Once barcos. Recuerdo cada uno de sus nombres. Por primera vez en cuarenta años, hay alguien más que también los recuerda."
+    }
+  },
+  "puzzle": {
+    "oreVein": {
+      "title": "Veta de mineral",
+      "goal": "Corta exactamente 14: si cortas de más, se rompe la vena. Deja un trozo sin cortar."
+    },
+    "coolant": {
+      "title": "Tubo de refrigerante",
+      "goal": "Vierte exactamente 10 medidas: las bebidas principales en intervalos de una y media."
+    },
+    "cleanFit": {
+      "title": "Corte ajustado",
+      "goal": "El banco 6+ suma un punto por cada dado colocado y nada se derrama más allá del límite."
+    },
+    "redRoute": {
+      "title": "Ruta Roja",
+      "goal": "Inflige 18 o más puntos de daño: un dado rojo en el arma A, disparo por afinidad."
+    },
+    "ignite": {
+      "title": "Ignite",
+      "goal": "Inflige 12 o más puntos de daño y activa «Quema»: una ceniza debe alcanzar su valor máximo."
+    },
+    "pipeline": {
+      "title": "Conducto",
+      "goal": "Marca el objetivo, luego lanza 8+ sobre él y no desbordes el reactor."
+    },
+    "overload": {
+      "title": "Sobrecarga",
+      "goal": "Aplica «Spinal» a propósito y, a continuación, inflige más de 14 puntos de daño a las monturas."
+    },
+    "slowBurn": {
+      "title": "Lenta combustión",
+      "goal": "Dos turnos: activa «Burn», reserva un atacante y acumula un daño total de 26 o más."
+    },
+    "capacitor": {
+      "title": "Condensador",
+      "goal": "El «Bank 16+» se distribuye en tres turnos: un núcleo no puede asumirlo todo."
+    },
+    "lockbox": {
+      "title": "Caja de seguridad",
+      "goal": "Lectura fija: una jugada inflige daño, aplica un escudo y genera una carga al mismo tiempo."
+    },
+    "parity": {
+      "title": "Bloqueo de paridad",
+      "goal": "Lectura fija: las armas deben tener un número impar, los escudos, uno par. Presta atención a las caras."
+    },
+    "bulwarkStand": {
+      "title": "Soporte Bulwark",
+      "goal": "Sobrevive al aluvión de ataques y mantén un escudo de 6 o más: refuerza la defensa."
+    },
+    "tally": {
+      "title": "El recuento",
+      "goal": "Inflige exactamente 9 puntos de daño."
+    },
+    "battery": {
+      "title": "La batería",
+      "goal": "Almacena exactamente 9 cargas."
+    },
+    "seawall": {
+      "title": "El dique",
+      "goal": "Consigue exactamente 7 escudos."
+    },
+    "mirrorMath": {
+      "title": "El Espejo",
+      "goal": "Reparte 15 o más cartas utilizando como máximo dos mazos."
+    },
+    "engraverBench": {
+      "title": "El banco",
+      "goal": "Activa el escudo 9 con al menos dos ranuras ocupadas."
+    },
+    "blackVault": {
+      "title": "La Cámara Acorazada",
+      "goal": "Almacenar la carga del «Store 8» utilizando el sistema propio del centro educativo."
+    },
+    "spinalDrill": {
+      "title": "Taladro espinal",
+      "goal": "Mark, bloquea el Spinal y luego reparte 9."
+    },
+    "coolChain": {
+      "title": "Cadena de frío",
+      "goal": "5 de escudo, 5 de carga y sin desbordamiento."
+    },
+    "emberStack": {
+      "title": "Ember Stack",
+      "goal": "Reparte 24 cartas en dos rondas."
+    },
+    "shieldWall": {
+      "title": "Muro de escudos",
+      "goal": "Termina el segundo turno con 11 de escudo."
+    },
+    "fateBench": {
+      "title": "Cuotas fijas",
+      "goal": "Una tirada, una colocación: 7 de daño, 5 de escudo, 7 de carga."
+    },
+    "sortingYard": {
+      "title": "Planta de clasificación",
+      "goal": "Reparte 8 o más cartas con un total par en «Armas A»."
+    },
+    "choirStand": {
+      "title": "El atril del coro",
+      "goal": "Supera la descarga cargada con 8 de escudo o más."
+    }
+  },
+  "bark": {
+    "levelUp": {
+      "1": "Un nuevo rango. Ahora el historial te tiene en cuenta, capitán.",
+      "2": "Sube de nivel. El «Carta estelar» acaba de ampliarse: ve a gastarlo.",
+      "3": "Tú creciste. Y también lo hizo el horizonte de lo que podríamos llegar a ser.",
+      "4": "La valoración del capitán ha subido. Al fin y al cabo, alguien lleva la cuenta.",
+      "5": "Ascenso. Aquí no hay ceremonias, lo siento.",
+      "6": "Otro puesto. Otro punto en la tabla."
+    },
+    "resume": {
+      "1": "Bienvenido de nuevo, capitán. He vuelto a calcular las probabilidades. Siguen estando en nuestra contra.",
+      "2": "Ya has vuelto. A la oscuridad no le has echado de menos. A mí sí, un poco.",
+      "3": "Los sistemas se están calentando. Has estado fuera más tiempo del que indica el registro, capitán.",
+      "4": "Bienvenido de nuevo. He mantenido las luces encendidas y las cuentas en orden.",
+      "5": "Sigo aquí. Sigo contando. Estoy listo cuando tú lo estés.",
+      "6": "He ejecutado las pruebas de diagnóstico dos veces. Al parecer, el aburrimiento es un estado.",
+      "7": "Todo en orden. No ha pasado nada mientras estabas fuera.",
+      "8": "Bien. Ya estaba empezando a redactar una necrológica.",
+      "9": "Todo está donde lo dejaste. Por desgracia, incluidos los daños.",
+      "10": "Ya estoy de vuelta en la sala de mando, capitán. El sector no se ha movido."
+    },
+    "sectorEnter1": {
+      "1": "El Hush Rim. El nombre lo dice todo.",
+      "2": "Cuarenta años de silencio, y nosotros hemos vuelto a hacer ruido.",
+      "3": "El Borde. Donde la flota dejó de responder."
+    },
+    "lowHull": {
+      "1": "El casco se queja. Yo también, pero más en silencio.",
+      "2": "Ahora nos lo estamos tomando como algo personal. Me refiero al casco.",
+      "3": "«Integridad estructural» es un término un poco exagerado para lo que tenemos.",
+      "4": "Casco",
+      "5": "Oigo el chasis. Ese no es el ruido que debería hacer.",
+      "6": "Una más como esa y acabaremos siendo un trozo más para otro.",
+      "7": "Margen estructural: retórico.",
+      "8": "Por favor. Escudos. Cualquier escudo.",
+      "9": "Ya hemos dejado atrás la prudencia y ahora nos mueve la suerte, capitán.",
+      "10": "No estoy entrando en pánico. Solo estoy informando en voz alta."
+    },
+    "battleWin": {
+      "1": "Limpia. Recoge todo lo que brille.",
+      "2": "Ahora ya no sirven para nada. Qué apropiado.",
+      "3": "Se ha registrado como victoria. Apenas cuenta, pero se ha registrado.",
+      "4": "Claro. Lo anotaré como intencionado.",
+      "5": "El terreno está despejado. Y mi conciencia también, más o menos.",
+      "6": "Ha salido mejor de lo que indicaban los cálculos.",
+      "7": "Enemigo neutralizado. Se aproxima «Chatarra».",
+      "8": "Buenas tiradas. Buena colocación. En general, buena colocación.",
+      "9": "Lo he contabilizado como una victoria. Soy generoso con las definiciones.",
+      "10": "Nadie está disparando. Disfruta de la novedad.",
+      "11": "Lo has hecho parecer a propósito, capitán.",
+      "12": "Los derechos de recuperación nos corresponden en virtud de la única ley que rige aquí."
+    },
+    "nearDeathWin": {
+      "1": "Lo apunto en la categoría de: «No volver a hacer».",
+      "2": "Sobrevivimos. Haré como si ese fuera el plan.",
+      "3": "Estamos vivos por un tecnicismo. Me vale.",
+      "4": "Eso no fue un plan. Fue una coincidencia que se dio en el momento adecuado.",
+      "5": "Casco Integridad: teórica. Moral: también teórica.",
+      "6": "Por favor, no vuelvas a hacerlo. Pero, si funciona, hazlo otra vez."
+    },
+    "tideUp": {
+      "1": "Las interferencias van en aumento. El sector se ha fijado en nosotros.",
+      "2": "La interferencia va en aumento. Sabe que estamos aquí.",
+      "3": "Las interferencias van en aumento. A partir de aquí, todo golpea con más fuerza.",
+      "4": "El sector acaba de reforzar su control, capitán.",
+      "5": "Marea Ya está. A partir de ahora, las cifras dejan de ser favorables.",
+      "6": "El ruido de fondo va en aumento. Y lo mismo ocurre con todo lo demás."
+    },
+    "rareLoot": {
+      "1": "Ten cuidado con ese. Es que… piensa.",
+      "2": "Ese núcleo está zumbando. Los núcleos no deberían zumbar.",
+      "3": "Esa es buena. No la vendas por costumbre.",
+      "4": "Un núcleo poco común. Estadísticamente hablando, alguien ha muerto por eso.",
+      "5": "Oh, qué bonito. Ponlo en la baraja, capitán.",
+      "6": "De calidad profesional. Cuarenta años y sigue conservando su aspecto.",
+      "7": "Yo diría que es todo un hallazgo. Rara vez digo que algo sea un hallazgo.",
+      "8": "Raro. De verdad raro, no «raro de tienda».",
+      "9": "Esa opción cambia la configuración. Elígelo con cuidado.",
+      "10": "Ha valido la pena todo lo que nos ha costado. O casi.",
+      "11": "Trátalo con cuidado. Es más antiguo que el coche accidentado en el que estaba.",
+      "12": "Un nuevo yo. Nuevos hábitos, si estás dispuesto."
+    },
+    "eventNeg": {
+      "1": "Podría haber salido peor. En teoría.",
+      "2": "Diría que te lo había dicho. Pero no lo hice. Esta vez.",
+      "3": "A eso lo llamaremos matrícula.",
+      "4": "Eso nos ha salido caro. Estoy tomando nota de quién lo eligió.",
+      "5": "Aquí las consecuencias llegan puntuales.",
+      "6": "Bueno. Esa es una decisión con la que ahora tenemos que vivir.",
+      "7": "Archivado en «lecciones». Categoría «caro».",
+      "8": "Yo lo discutiría, pero el libro mayor ya lo ha hecho.",
+      "9": "No es mortal. Solo es permanente.",
+      "10": "El sector se llevó su parte, capitán."
+    },
+    "eventPos": {
+      "1": "Ha salido mejor de lo que las matemáticas dejaban entrever.",
+      "2": "Disfruta de la victoria, capitán. Por aquí no se ven muy a menudo.",
+      "3": "Esta vez nos ha salido bien. Es algo poco habitual. Disfrútalo.",
+      "4": "Buena idea. Haré como si lo hubiera sugerido yo.",
+      "5": "Beneficios y sin contratiempos. Una tarde estupenda.",
+      "6": "Me gusta este resultado. Son muy pocos los resultados que me gustan.",
+      "7": "Todavía hay alguien por aquí que cumple su palabra.",
+      "8": "Una operación limpia. Nadie salió mal parado.",
+      "9": "Ese es el tipo de decisión que se recuerda con cariño.",
+      "10": "Tomado en cuenta, anotado y aprobado en silencio."
+    },
+    "idleMap": {
+      "1": "El mapa no va a decidir por nosotros, capitán.",
+      "2": "Cuando estés listo. La oscuridad puede esperar.",
+      "3": "Tómate tu tiempo. El sector es paciente y yo también lo soy.",
+      "4": "Todas las rutas que salen de aquí tienen un coste diferente.",
+      "5": "Hay mucha niebla más adelante. Los sensores serían de gran ayuda en este caso.",
+      "6": "He tenido peores resultados. No últimamente, pero sí que los he tenido."
+    },
+    "setComplete": {
+      "1": "Resonancia Atrapado. No preguntes cómo funciona.",
+      "2": "Los núcleos están cantando al unísono. Eso suele ser una señal de alerta.",
+      "3": "Baraja bloqueada. La baraja acaba de empezar a ponerse de acuerdo consigo misma.",
+      "4": "Resonancia Aguanta. Ya sentirás el siguiente movimiento.",
+      "5": "Cuatro de una misma escuela. A los «cores» les gusta la compañía.",
+      "6": "Vaya, eso sí que es una construcción en toda regla, capitán.",
+      "7": "Toda la bandeja vibra. Es ese zumbido tan agradable."
+    },
+    "killJammer": {
+      "1": "El inhibidor está en silencio. Por fin puedo oír mis propios pensamientos.",
+      "2": "Ya no hay interferencias con ese. Menos mal."
+    },
+    "killLeech": {
+      "1": "Se me ha caído. Odio que las cosas toquen los dados.",
+      "2": "Desvinculado. Mis núcleos vuelven a ser míos."
+    },
+    "killRaider": {
+      "1": "Un asaltante menos. El Rim lleva la cuenta.",
+      "2": "Ese no nos va a salvar hoy."
+    },
+    "killChoir": {
+      "1": "El himno se detuvo. No lo echo de menos.",
+      "2": "Una voz menos en el coro. Bien."
+    },
+    "killWasp": {
+      "1": "La avispa ya se ha ido. De todos modos, ten cuidado con el soporte de tu arma.",
+      "2": "Acabado. Pero la brecha sigue creciendo."
+    },
+    "killWarden": {
+      "1": "Ahora sus escudos son problema de otra persona.",
+      "2": "El alcaide ha caído. La muralla caerá con nosotros."
+    },
+    "killScav": {
+      "1": "Ese dron es un capullo. También quería nuestros dados.",
+      "2": "Un dron menos hurgando entre los restos."
+    },
+    "memory": {
+      "1": "Acabo de recibir una respuesta. Dame un momento, capitán.",
+      "2": "Esa es otra parte de mí. Archivada en «desagradable, útil».",
+      "3": "Ahora recuerdo más cosas de ellos. Eso no es del todo una ventaja.",
+      "4": "Ha vuelto otra parte de mí. No estoy seguro de si quería que volviera esta."
+    },
+    "sectorEnter2": {
+      "1": "Deriva Campos. Aquí todo es lo que alguien ha recogido, incluidos nosotros.",
+      "2": "Ten cuidado con las minas. Han tenido cuarenta años para aburrirse.",
+      "3": "Deriva Campos. Cuidado con los caminos y cuidado con los clanes."
+    },
+    "sectorEnter3": {
+      "1": "La Grieta. Mis sensores están votando y no se ponen de acuerdo.",
+      "2": "No te fíes de las lecturas. Y, sinceramente, tampoco te fíes de los dados.",
+      "3": "The Rift. Confía en el resolutor, no en los instrumentos."
+    },
+    "sectorEnter4": {
+      "1": "El espacio del coro. Se portarán bien. Eso es lo que me preocupa.",
+      "2": "Si empiezan a cantarte números, capitán, no les respondas cantando.",
+      "3": "El coro. Serán educados. Eso es lo que más inquieta."
+    },
+    "sectorEnter5": {
+      "1": "El Núcleo. Llevo cuarenta años vinculado a este lugar.",
+      "2": "Pase lo que pase aquí, gracias por traerme.",
+      "3": "Lo esencial. Todo lo que viene a partir de aquí es un primer borrador."
+    },
+    "bossPhase": {
+      "1": "Acaba de cambiar de opinión sobre cómo va esto. Adáptate.",
+      "2": "Es un nuevo patrón, capitán. El anterior era la versión educada.",
+      "3": "Eso fue un cambio radical. Yo me lo tomaría como algo personal.",
+      "4": "Ha cambiado el patrón. Léelo de nuevo antes de realizar el pedido.",
+      "5": "Nueva etapa. Todo lo que has aprendido hasta ahora está medio equivocado.",
+      "6": "No es por daño. Es por compromiso.",
+      "7": "Segundo movimiento, capitán. Más fuerte.",
+      "8": "Fíjate en la intención. Se acaba de reescribir sola.",
+      "9": "Esa era la versión educada.",
+      "10": "Hay más que decir al respecto. Por desgracia."
+    },
+    "minibossIntro": {
+      "1": "Pelea en la puerta. Esta ha sido para el recuerdo.",
+      "2": "Eso no es una patrulla. Es toda una declaración de intenciones.",
+      "3": "Subsistemas visibles. Dispara a la idea, no al casco.",
+      "4": "No vamos a superar esta situación por ser rápidos.",
+      "5": "Lleva un rato esperando en esta fila, capitán.",
+      "6": "Sea lo que sea lo primero que haga, lo volverá a hacer. Apréndetelo."
+    },
+    "kill-raider": {
+      "1": "Colores del clan. Habrá más de esos."
+    },
+    "kill-scavDrone": {
+      "1": "El cargador de alguien. No lo ha elegido él."
+    },
+    "kill-shieldWarden": {
+      "1": "La doctrina de escolta de flotas. Con cuarenta años de retraso."
+    },
+    "kill-jammerCorvette": {
+      "1": "La ranura vuelve a estar libre. Eso me daba mucha rabia."
+    },
+    "kill-leechSkiff": {
+      "1": "Los dados vuelven a rodar. Gracias."
+    },
+    "kill-choirZealot": {
+      "1": "Cantó hasta que dejó de hacerlo. Anota el canal."
+    },
+    "kill-riftWasp": {
+      "1": "A todo volumen hasta el final. Comprueba el soporte del arma."
+    },
+    "kill-breakerDrone": {
+      "1": "Herramientas de recuperación con opiniones. Ya no."
+    },
+    "kill-magnetTug": {
+      "1": "Solo quería abrazarnos. Se le daba muy bien."
+    },
+    "kill-minelayer": {
+      "1": "Field sigue ahí fuera. La capa, no."
+    },
+    "kill-hookTug": {
+      "1": "Esta vez no hay factura."
+    },
+    "kill-riftling": {
+      "1": "La Grieta atraerá a otro. Siempre lo hace."
+    },
+    "kill-echoShade": {
+      "1": "Dejó de repetir lo que decíamos. Menos mal."
+    },
+    "kill-foldWorm": {
+      "1": "Las cifras vuelven a dar una sensación de solidez."
+    },
+    "kill-choirAcolyte": {
+      "1": "Ese se ofreció voluntario, capitán."
+    },
+    "kill-hymnTurret": {
+      "1": "Por fin desafinado."
+    },
+    "kill-hymnCantor": {
+      "1": "El ritmo se ha perdido. El resto se dispersará."
+    },
+    "kill-coreFragment": {
+      "1": "Un trozo del Núcleo, y sangraba como un barco."
+    },
+    "kill-probabilityKnot": {
+      "1": "Desatados. Dos futuros, ambos acabados."
+    },
+    "kill-causalityLoop": {
+      "1": "Ha dejado de cambiar de canal. Ya casi me había acostumbrado."
+    }
+  },
+  "mutators": {
+    "brittleShields": {
+      "name": "Escudos frágiles",
+      "desc": "Tu escudo se hunde hasta la mitad antes de que el enemigo actúe."
+    },
+    "fatLoot": {
+      "name": "Botín generoso",
+      "desc": "Los botines son más escasos; los enemigos tienen un 15 % más de resistencia del casco."
+    },
+    "fog": {
+      "name": "Niebla",
+      "desc": "Los sensores cubren una fila menos."
+    },
+    "overheat": {
+      "name": "Sobrecalentamiento",
+      "desc": "El reactor tiene dos niveles menos de carga."
+    },
+    "richVein": {
+      "name": "Veta rica",
+      "desc": "Chatarra paga la mitad más."
+    },
+    "wilds": {
+      "name": "The Wilds",
+      "desc": "Aquí no hay mercados. Solo astilleros."
+    },
+    "resonantStorm": {
+      "name": "Tormenta resonante",
+      "desc": "Una escuela suma dos puntos más de resonancia en cada combate."
+    },
+    "heavyDice": {
+      "name": "Dados pesados",
+      "desc": "Mover un dado cuesta 5 de carga."
+    },
+    "glassFleet": {
+      "name": "Flota de cristal",
+      "desc": "Todo el daño ×1,5: tanto el suyo como el tuyo."
+    },
+    "risingTide": {
+      "name": "Marea en alza",
+      "desc": "La marea de interferencia sube cada tres saltos."
+    },
+    "radioSilence": {
+      "name": "Silencio radiofónico",
+      "desc": "Los sensores pierden un nivel y «Echo» no dice nada."
+    },
+    "doubles": {
+      "name": "Dobles",
+      "desc": "Aparece una copia adicional del enemigo principal; cada enemigo tiene un 30 % menos de resistencia del casco."
+    }
+  },
+  "contracts": {
+    "bareHull": {
+      "name": "Bare Casco",
+      "desc": "El Wanderer al salir del astillero: sin comodidades, sin carta de navegación, nada más que el vaivén de las olas."
+    },
+    "redHeat": {
+      "name": "Calor rojo",
+      "desc": "Una baraja en la que todas las cartas son rojas. Ábrete camino y no te entretengas."
+    },
+    "iceWall": {
+      "name": "Pared de hielo",
+      "desc": "Todo azul. Supera al sector en duración en lugar de superarlo en puntería."
+    },
+    "tightVoyage": {
+      "name": "Un viaje apretado",
+      "desc": "Todos los precios son un 50 % más caros. Gasta como si te doliera."
+    },
+    "batteringRam": {
+      "name": "Ariete",
+      "desc": "El Ram y su soporte para la columna vertebral. Golpea primero, golpea una vez, golpea fuerte."
+    },
+    "ark": {
+      "name": "Arca",
+      "desc": "El objetivo principal es el taller de reparaciones del Arca. Hay que mantener el casco intacto."
+    },
+    "singleCast": {
+      "name": "Reparto único",
+      "desc": "Sin repeticiones de tiradas, sin tabla. Una tirada, un plan: el Rim."
+    },
+    "storm": {
+      "name": "Tormenta",
+      "desc": "La marea ya está subiendo cuando zarpas."
+    },
+    "blindJump": {
+      "name": "Salto a ciegas",
+      "desc": "Hay niebla por delante y no hay sensores para evitarla. Salta de todos modos."
+    },
+    "choirShadow": {
+      "name": "La sombra del coro",
+      "desc": "El coro bajo una tormenta retumbante. Sumérgete en la oscuridad y paga por ello."
+    },
+    "keeper": {
+      "name": "Portero",
+      "desc": "Responde a todas las balizas de una sola vez."
+    },
+    "bareArmor": {
+      "name": "Sin armadura",
+      "desc": "Las ranuras del escudo están soldadas y cerradas."
+    },
+    "collector": {
+      "name": "Coleccionista",
+      "desc": "Nueve dados, cinco escuelas, una ronda."
+    },
+    "quietRun": {
+      "name": "Carrera tranquila",
+      "desc": "Atraviesa la Grieta utilizando el menor número posible de dados."
+    }
+  },
+  "sectors": {
+    "1": "El borde",
+    "2": "Los campos de «Deriva»",
+    "3": "La Grieta",
+    "4": "El coro",
+    "5": "El núcleo"
+  },
+  "ascension": {
+    "1": {
+      "name": "A1 — Presión",
+      "desc": "Los enemigos tienen un +10 % de resistencia del casco."
+    },
+    "2": {
+      "name": "A2 — Élites con poder",
+      "desc": "Los enemigos de élite, los minijefes y los jefes aparecen tras un escudo."
+    },
+    "3": {
+      "name": "A3 — Mercados «lean»",
+      "desc": "Precios en tienda: +20 %."
+    },
+    "4": {
+      "name": "A4 — Interferencia profunda",
+      "desc": "La marea de interferencia alcanza un nivel superior."
+    },
+    "5": {
+      "name": "A5 — Jefes rediseñados",
+      "desc": "Los jefes aparecen al final de la batalla."
+    },
+    "6": {
+      "name": "Con overclocking",
+      "desc": "Cada unidad de élite lleva un subsistema adicional."
+    },
+    "7": {
+      "name": "Mercado favorable para los vendedores",
+      "desc": "Los precios en las tiendas suben otro 25 %."
+    },
+    "8": {
+      "name": "Estrofa adicional",
+      "desc": "Cada fase de jefe gana un compás adicional."
+    },
+    "9": {
+      "name": "HighMarea",
+      "desc": "La marea de interferencia sube hasta el nivel 4."
+    },
+    "10": {
+      "name": "La prueba del guardián",
+      "desc": "Casco −15 %. Si lo superas, el Rim recordará tu nombre."
+    }
+  },
+  "prologue": {
+    "drift1": "Tres semanas de silencio, y por fin la Frontera nos da una señal. Hay algo grande ahí fuera, y no se mueve.",
+    "drift2": "Reduces la potencia y dejas que el casco se desplace por inercia hacia el ping.",
+    "driftCta": "Velocidad de coincidencia",
+    "salvage1": "El fragmento llega a bordo sujeto a un cable de arrastre: un trozo de casco con el núcleo aún caliente en su interior.",
+    "salvage2": "—Seis grados de desviación, corrige tu rumbo… oh. Tú no eres el puente de mando. Eres un rescatador.",
+    "salvage3": "Soy «Echo». Antes era una nave. Ahora soy, sobre todo, opiniones y un sistema de sensores muy bueno.",
+    "salvageCta": "Ponlo en línea",
+    "signal1": "En lo más profundo del sector, algo está emitiendo en una portadora estructurada. No es una llamada de socorro. Es un patrón.",
+    "signal2": "Hay dos formas de interpretar ese patrón, capitán. Ninguna de las dos es tranquilizadora.",
+    "signal3": "Una aguja que nunca antes habías notado se mueve ligeramente una vez y luego vuelve a situarse en el centro.",
+    "signalCta": "Trazar una ruta",
+    "contact1": "Contacto. Dron Scav: barato, hambriento y a punto de aprender algo. Primero, las armas: mete un dado en la pistola.",
+    "contact2": "El dron gira hacia ti, con los propulsores en plena acción.",
+    "contactCta": "Participar"
+  },
+  "fragment": {
+    "f1-1": "Ley del rescate en alta mar: quien corte primero el casco se queda con lo que caiga de él. Nadie la ha aplicado nunca.",
+    "f1-2": "El último mensaje claro que envió la flota fue una lista de la compra. Nadie sabe por qué.",
+    "f1-3": "Las boyas de cuarentena siguen parpadeando por aquí. La cuarentena terminó hace treinta y nueve años.",
+    "f2-1": "En los Campos deDeriva, un barco es una promesa que le haces a quienquiera que te lleve de vuelta a casa.",
+    "f2-2": "Los clanes de desguazadores miden su riqueza en metros cortados, no en chatarra.",
+    "f2-3": "Las minas de por aquí son pacientes. Algunas llevan esperando desde antes de que tú nacieras.",
+    "f3-1": "En el Rift, a veces los dados caen en caras que no tienen.",
+    "f3-2": "Dos buques de prospección se adentraron en la Falla siguiendo el mismo rumbo. Se observó una estela.",
+    "f3-3": "Los cartógrafos de Rift dibujan los mapas a lápiz, y solo lo hacen una vez.",
+    "f4-1": "El coro no reza por los resultados. Reza por el fracaso de las alternativas.",
+    "f4-2": "Cada acólito lleva consigo un dado que nunca lanzará.",
+    "f4-3": "Sus himnos son textos que se leen en voz alta. La melodía es secundaria.",
+    "f5-1": "Tan cerca del Núcleo, la causalidad es una ordenanza local, no una ley.",
+    "f5-2": "Todas las balizas de la flota apuntan hacia aquí. Siempre lo han hecho.",
+    "f5-3": "El Núcleo no responde a las preguntas. Las reduce a la mínima expresión.",
+    "f1-4": "Todos los pecios del Rim están orientados en la misma dirección. Nadie ha explicado por qué.",
+    "f1-5": "Los manifiestos de la flota recogen once buques. Los equipos de salvamento han encontrado doce cascos.",
+    "f1-6": "Un núcleo de probabilidad no pesa nada hasta que le haces una pregunta.",
+    "f1-7": "Los primeros buscadores de oro comerciaban con oxígeno. «Chatarra» llegó más tarde.",
+    "f1-8": "Las boyas de cuarentena siguen emitiendo señales. La autoridad que las instaló, en cambio, no.",
+    "f1-9": "Aquí fuera nada se deteriora. Simplemente deja de recibir mantenimiento.",
+    "f1-10": "En el Rim no hay condiciones meteorológicas y solo hay tres palabras para referirse al viento.",
+    "f1-11": "La ley de salvamento establece que el primer barco en llegar es el propietario del pecio. Nadie llega primero.",
+    "f1-12": "Todas las naves de la Frontera llevan una baliza de repuesto, pero ninguna tiene previsto utilizarla.",
+    "f1-13": "Los dados se utilizaban como mercancía antes de convertirse en moneda.",
+    "f1-14": "La última transmisión clara de la expedición fue un dato sobre el transporte marítimo.",
+    "f1-15": "Los veteranos pintan los cascos en acabado mate. Los reflejos llaman la atención por aquí.",
+    "f1-16": "El Rim es el único sector en el que los mapas son más antiguos que las estrellas que aparecen en ellos.",
+    "f2-4": "Los clanes se reparten los Campos por carriles de deriva, no por distancia.",
+    "f2-5": "Un remolcador que te pueda sujetar vale más que dos que puedan dispararte.",
+    "f2-6": "Aquí los campos de minas se heredan. Nadie recuerda quién colocó los más antiguos.",
+    "f2-7": "Las deudas del clan pasan a quien compre la nave, el casco y el libro de cuentas en su conjunto.",
+    "f2-8": "En Fields hay día de mercado. Hay mucho movimiento.",
+    "f2-9": "Chatarra En cualquier otro sitio se cobra por peso, pero aquí se cobra por planta.",
+    "f2-10": "Los capitanes de los convoyes controlan las rutas comerciales por su reputación, nunca por la chatarra.",
+    "f2-11": "Las tripulaciones de las barcazas cantan para llevar la cuenta. No es un himno.",
+    "f2-12": "Un clan perdonará un robo dos veces, pero nunca la falta de educación.",
+    "f2-13": "Todos los restos de accidentes de los Fields han sido desmontados al menos tres veces.",
+    "f2-14": "El carril de Yusuf es el único cuya tarifa está publicada.",
+    "f2-15": "Deriva Las tumbas están señalizadas con una única placa soldada. No hay nombres.",
+    "f2-16": "Los campos se desplazan un cuarto de segundo de luz al año. Los mapas, en cambio, no.",
+    "f3-4": "En la Grieta, la ruta más corta no siempre tiene la misma longitud en ambas ocasiones.",
+    "f3-5": "Los instrumentos de Rift ofrecen datos con seguridad, pero no coinciden entre sí.",
+    "f3-6": "Algunas tripulaciones oyen sus propias voces en los canales de Rift. La mayoría deja de escuchar.",
+    "f3-7": "Si cortas mal un fragmento de la Grieta, deja de ser un fragmento.",
+    "f3-8": "La Grieta no tiene ningún centro que nadie haya visitado dos veces.",
+    "f3-9": "Las zonas de anomalías se basan en la aritmética, no en la superstición. En su mayor parte.",
+    "f3-10": "El tiempo en la Grieta es real. Simplemente no se comparte.",
+    "f3-11": "La Grieta devuelve cosas. Rara vez son las mismas.",
+    "f3-12": "Los mapas antiguos de la Falla valen más que los nuevos. Mienten sistemáticamente.",
+    "f3-13": "Un espejo en la Grieta muestra lo que habrías hecho.",
+    "f3-14": "Los oficiales científicos de la flota llamaban a este sector «el área de trabajo».",
+    "f3-15": "Las tormentas de la Grieta tienen un ritmo. Nadie las ha contado durante el tiempo suficiente como para demostrarlo.",
+    "f3-16": "Los pecios gemelos del Rift suelen ser un mismo pecio, pero dos veces.",
+    "f4-4": "El coro no busca nuevos miembros. Espera a que las cifras te convenzan.",
+    "f4-5": "Sus himnos son libros de contabilidad. La melodía es el «carry».",
+    "f4-6": "Un coro no tiene capitán, solo una voz principal.",
+    "f4-7": "El Predicador era un estadístico de la flota. Todavía se nota su rango.",
+    "f4-8": "Los pactos del coro se redactan dos veces: una para ti y otra para el Núcleo.",
+    "f4-9": "La «herejía en el coro» consiste en preferir un resultado a otro.",
+    "f4-10": "Sus relicarios contienen dados que ya no ruedan.",
+    "f4-11": "El coro considera a los muertos como un «error de redondeo», y lo dice con buena intención.",
+    "f4-12": "Todas las naves de la flota «Choir» están sintonizadas con el mismo acorde. Esa es la formación de la flota.",
+    "f4-13": "A los acólitos se les asigna un número, no un nombre. Algunos se ganan de nuevo el derecho a tener un nombre.",
+    "f4-14": "El himno más antiguo del coro es una lista de los barcos de la expedición.",
+    "f4-15": "Creen que el Núcleo no responde. Creen que está preguntando.",
+    "f4-16": "Un órgano de coro silenciado tarda tres días en perder la afinación.",
+    "f5-4": "Cerca del Núcleo, la causalidad es una convención local.",
+    "f5-5": "El Core no emite. Responde.",
+    "f5-6": "Los barcos que llegan al Núcleo informan de su llegada antes incluso de haber zarpado.",
+    "f5-7": "La última transmisión de la flota procedía de aquí y tenía cuatro años de antigüedad.",
+    "f5-8": "La luz del Núcleo no tiene fuente y proyecta sombras reales.",
+    "f5-9": "Los instrumentos situados cerca del núcleo coinciden. Eso es lo que da miedo.",
+    "f5-10": "Todos los restos de naufragios del Núcleo están intactos. Simplemente se detuvieron.",
+    "f5-11": "Todos los que han regresado han descrito a «The Core» como un lugar tranquilo.",
+    "f5-12": "Aquí hay un faro. Nadie lo construyó.",
+    "f5-13": "The Core elimina la incertidumbre. No te promete que el resultado te vaya a gustar.",
+    "f5-14": "La doctrina de la flota decía: observar, no responder. Alguien respondió.",
+    "f5-15": "Cuarenta años de silencio, y la señal no se repitió ni una sola vez.",
+    "f5-16": "El Núcleo conserva una copia de todo lo que se ha decidido en su entorno."
+  },
+  "ending": {
+    "seal": {
+      "title": "El sello",
+      "label": "Sellar el núcleo",
+      "req": "Estabilidad +3 o superior",
+      "beat1": "Le devuelves al Núcleo su propia certeza, un resultado colapsado tras otro, hasta que ya no le queda nada por decidir.",
+      "beat2": "La Grieta se cierra como una boca que por fin ha sido saciada. La presión que ha estado ejerciendo sobre tu casco durante cinco sectores simplemente cesa.",
+      "beat3": "Las balizas de la flota dejan de emitir señales una tras otra, empezando por las más antiguas, y el Hush Rim se convierte en un sector más sin vida en una carta náutica.",
+      "beat4": "Te apasiona el límite, con un agarre firme y un sector a tus espaldas que nunca hará desaparecer a nadie más.",
+      "echo": "Has conseguido que este sector resulte aburrido, capitán. Es lo más amable que ha hecho nadie por aquí en cuarenta años."
+    },
+    "merge": {
+      "title": "La fusión",
+      "label": "Únete al equipo principal",
+      "req": "Resonancia −3 o menos",
+      "beat1": "Dejas de luchar contra el patrón y empiezas a interpretarlo, y en algún momento de la tercera pasada, el patrón empieza a interpretarte a ti.",
+      "beat2": "El casco no resiste el impacto. Tú sí: te dispersas por todos los resultados que el Núcleo aún mantenía abiertos.",
+      "beat3": "Desde dentro, la flota no se ha perdido. Está archivada. Cuarenta años de espera, a la espera de una pregunta mejor.",
+      "beat4": "El Hush Rim sigue zumbando. Ahora hay una nueva voz en él, y esa voz recuerda haber sido capitán.",
+      "echo": "Me quedaré con tus registros. Todos ellos. Incluso aquellos en los que le echaste la bronca al reactor."
+    },
+    "bargain": {
+      "title": "La ganga",
+      "label": "Entrega el núcleo al coro",
+      "req": "El pacto sellado en el Sector 4",
+      "beat1": "El coro se toma el «Core» igual que un coro se toma una nota: con cuidado, al unísono, sin preguntarse si quiere que se cante.",
+      "beat2": "Te dan una nave, un rango y un dado que no te está permitido lanzar. La Frontera se abre como una puerta con tu nombre escrito en ella.",
+      "beat3": "Mientras suena el himno, la flota sigue esperando, y nadie del coro lo considera un cabo suelto.",
+      "echo": "Para que conste, capitán: he dejado constancia de su objeción. Usted no presentó ninguna. Eso también lo he dejado constancia."
+    },
+    "silent": {
+      "title": "La flota silenciosa",
+      "label": "Responde a la flota",
+      "req": "Las cinco balizas resueltas, la bendición del Guardián y un acto de misericordia",
+      "beat1": "Cinco señales, cinco respuestas, y en la última la flota se comunica en un tono distinto al de la portadora.",
+      "beat2": "Nunca fueron destruidos. Se mantuvieron retenidos: cuarenta años de tripulaciones atrapadas en una decisión que el Núcleo no fue capaz de llevar a término.",
+      "beat3": "Tú lo terminas por ellos. El Rim se llena de luces de posición que no se han movido desde antes de que tú nacieras.",
+      "beat4": "Tú los sacas de allí. Tardas once días y no duermes ni un solo momento durante todo ese tiempo.",
+      "echo": "Conozco el nombre de cada una de esas naves, capitán. Gracias por hacerme decirlas en voz alta."
+    }
+  },
+  "epilogue": {
+    "maraFriend": "Mara te guarda una caja en el mercado de Rim. Ella lo llama «inventario». Pero no lo es.",
+    "yusufFriend": "La caravana de Yusuf vuelve a recorrer la ruta «Deriva», y tu indicativo viaja en ella libremente.",
+    "yusufGrudge": "Yusuf cuenta la historia presentándote a ti como el villano. No le falta razón del todo.",
+    "crewSaved": "La tripulación que sacasteis del naufragio está viva, hace mucho ruido y está contando mal lo sucedido en tres puertos.",
+    "courierFreed": "El repartidor al que dejaste marchar ahora se dedica a una ruta de descuento y se acuerda de quién se lo pagó.",
+    "hunterCleared": "La recompensa por tu nave ya se ha pagado. La Cazadora se encargó de ello personalmente.",
+    "refusedChoir": "Le dijiste «no» al coro delante de varios testigos. No han dejado de mencionarlo.",
+    "pactSealed": "Tu nombre aparece en el libro de cuentas del coro, escrito con una letra que no es la tuya.",
+    "choirEnemy": "El coro te acoge en su liturgia con un verso que sirve de advertencia.",
+    "beacons": "Respuestas de Beacons: {{n}} de 5.",
+    "ascension": "Autorizado en la ascensión A {{n}}.",
+    "lastBreath": "Un punto de casco, una vez. No se habla de eso. Echo sí lo hace, constantemente.",
+    "quiet": "Te vas del Rim sin hacer ruido. Aquí nadie anota nada."
+  },
+  "modules": {
+    "magnetScoop": {
+      "name": "Cuchara imantada",
+      "desc": "+2 de chatarra al comienzo de cada batalla."
+    },
+    "grapple": {
+      "name": "Gancho de amarre",
+      "desc": "+3 de chatarra por cada enemigo que elimines."
+    },
+    "lotteryBlock": {
+      "name": "Bloque de lotería",
+      "desc": "La primera repetición de tirada es gratuita en todas las tiendas."
+    },
+    "trainingModule": {
+      "name": "Módulo de formación",
+      "desc": "+20 % de XP por la carrera."
+    },
+    "assayRig": {
+      "name": "Banco de ensayos",
+      "desc": "Cualquier cara máxima da 2 chatarra."
+    },
+    "brokerLink": {
+      "name": "Enlace al agente",
+      "desc": "Precios en tienda: −12 %."
+    },
+    "slagPress": {
+      "name": "Prensa de escoria",
+      "desc": "Cualquier cara mínima da 3 chatarra."
+    },
+    "tithePlate": {
+      "name": "Plato de los diezmos",
+      "desc": "+25 % de chatarra de todas las fuentes."
+    },
+    "salvageArm": {
+      "name": "Brazo de rescate",
+      "desc": "Cada dado que no se haya colocado da 1 chatarra."
+    },
+    "auditCore": {
+      "name": "Núcleo de auditoría",
+      "desc": "+6 de chatarra al inicio de la batalla; tiendas: −5 %."
+    },
+    "mirrorPlate": {
+      "name": "Recubrimiento de espejos",
+      "desc": "Un golpe esquivado devuelve el daño."
+    },
+    "ballastModule": {
+      "name": "Lastre",
+      "desc": "Casco +4."
+    },
+    "escapePod": {
+      "name": "Cápsula de rescate",
+      "desc": "Una vez por partida, sobrevive a un golpe letal con 1 punto de casco."
+    },
+    "heatsink": {
+      "name": "Disipador térmico",
+      "desc": "El primer desbordamiento del reactor en cada combate no supone ningún daño al casco."
+    },
+    "fieldStabilizer": {
+      "name": "Estabilizador de campo",
+      "desc": "La marea de interferencia tiene una intensidad ligeramente menor."
+    },
+    "ablativeWeave": {
+      "name": "Tejido ablativo",
+      "desc": "+2 a la defensa por cada dado de escudo."
+    },
+    "bulkheadRing": {
+      "name": "Anillo de mamparo",
+      "desc": "Casco +8; los umbrales del motor son un nivel más difíciles."
+    },
+    "dampingCoil": {
+      "name": "Bobina amortiguadora",
+      "desc": "Recupera 3 de casco después de cada batalla."
+    },
+    "hardpointClamp": {
+      "name": "Abrazadera para punto de fijación",
+      "desc": "Los umbrales del motor, ahora un paso más sencillos."
+    },
+    "voidLiner": {
+      "name": "Revestimiento de vacío",
+      "desc": "+3 al escudo gracias a los dados de escudo mientras el casco esté por debajo del 40 %."
+    },
+    "siegeMount": {
+      "name": "Monte de asedio",
+      "desc": "+2 de daño en la cara máxima de las armas."
+    },
+    "piercer": {
+      "name": "Piercer",
+      "desc": "El primer golpe de cada combate ignora los escudos."
+    },
+    "emberInjector": {
+      "name": "Inyector Ember",
+      "desc": "El valor máximo de «face» en las armas aplica «Burn 2»."
+    },
+    "railCradle": {
+      "name": "Soporte para raíles",
+      "desc": "+3 en la montura espinal."
+    },
+    "targetingMesh": {
+      "name": "Malla de segmentación",
+      "desc": "Las marcas aportan +2 de daño adicional."
+    },
+    "overpressure": {
+      "name": "Sobrepresión",
+      "desc": "+3 en armas en el primer turno."
+    },
+    "ricochetHousing": {
+      "name": "Viviendas Ricochet",
+      "desc": "El «Overkill» de las armas A se traslada al siguiente enemigo."
+    },
+    "splinterHead": {
+      "name": "Cabeza de astilla",
+      "desc": "+3 en armas con un resultado mínimo."
+    },
+    "lanceCapacitor": {
+      "name": "Condensador Lance",
+      "desc": "+2 en armas con un resultado de 7 o más."
+    },
+    "executioner": {
+      "name": "Verdugo",
+      "desc": "+3 en armas mientras el casco esté por debajo del 30 %."
+    },
+    "solenoid": {
+      "name": "Solenoide",
+      "desc": "Una tirada adicional cada turno."
+    },
+    "gyroStabilizer": {
+      "name": "Estabilizador giroscópico",
+      "desc": "Reserva +1 dado."
+    },
+    "recycler": {
+      "name": "Reciclador",
+      "desc": "Cada dado sin colocar almacena 1 carga."
+    },
+    "resonator": {
+      "name": "Resonador",
+      "desc": "+2 de carga al inicio de la batalla por cada serie de cuatro completada."
+    },
+    "nudgeGovernor": {
+      "name": "Gobernador de Nudge",
+      "desc": "Los empujones cuestan 1 carga menos."
+    },
+    "wideGrip": {
+      "name": "Agarre amplio",
+      "desc": "Vuelve a tirar un dado más cada vez."
+    },
+    "capacitorBank": {
+      "name": "Banco de condensadores",
+      "desc": "Límite de carga +3."
+    },
+    "primerCoil": {
+      "name": "Bobina de precalentamiento",
+      "desc": "+2 en el reactor."
+    },
+    "blueBallast": {
+      "name": "Blue Ballast",
+      "desc": "Reserva un dado azul más."
+    },
+    "growthTrellis": {
+      "name": "Enrejado de cultivo",
+      "desc": "Los dados que crecen suben un escalón más."
+    },
+    "echoBuffer": {
+      "name": "Echo Búfer",
+      "desc": "+2 de carga cuando un dado repite el valor del turno anterior."
+    },
+    "seedVault": {
+      "name": "Banco de semillas",
+      "desc": "+2 de los dados verdes de los motores."
+    },
+    "jamBreaker": {
+      "name": "Desatascador de mermelada",
+      "desc": "Tu habilidad te protege de 2 ataques enemigos más."
+    },
+    "entropySink": {
+      "name": "Sumidero de entropía",
+      "desc": "Cualquier cara mínima almacena 2 de carga."
+    },
+    "paradoxLoop": {
+      "name": "Bucle paradójico",
+      "desc": "Una cara máxima en las armas se resuelve dos veces en la ranura."
+    },
+    "blackLedger": {
+      "name": "Libro de cuentas negro",
+      "desc": "+3 de los dados negros en las armas."
+    },
+    "prismLens": {
+      "name": "Lente prismática",
+      "desc": "+1 a cada dado en el primer turno."
+    },
+    "hushAntenna": {
+      "name": "Antena Hush",
+      "desc": "+2 en sensores."
+    },
+    "coldLogicCore": {
+      "name": "Núcleo de lógica fría",
+      "desc": "Los empujones son gratis; los golpes críticos dejan de producirse."
+    },
+    "gamblersChip": {
+      "name": "Ficha de juego",
+      "desc": "Cualquier cara «max» da 1 carga y 1 chatarra."
+    }
+  },
+  "engravings": {
+    "sting": {
+      "name": "Sting",
+      "desc": "+1 de daño en la cara máxima de las armas."
+    },
+    "frost": {
+      "name": "Escarcha",
+      "desc": "Una cara «min» otorga 1 escudo."
+    },
+    "vein": {
+      "name": "Vena",
+      "desc": "Una cara máxima da 1 chatarra."
+    },
+    "echo": {
+      "name": "Echo",
+      "desc": "Si repites el valor del último turno, se almacena 1 carga."
+    },
+    "anchor": {
+      "name": "Ancla",
+      "desc": "Este dado nunca se puede bloquear."
+    },
+    "wedge": {
+      "name": "Cuña",
+      "desc": "Este dado ignora las ranuras atascadas."
+    },
+    "flame": {
+      "name": "Llama",
+      "desc": "Un valor máximo de «face» en las armas añade «Burn 1»."
+    },
+    "edge": {
+      "name": "Borde",
+      "desc": "Volver a tirar este dado por sí solo no cuesta nada."
+    },
+    "shade": {
+      "name": "Sombra",
+      "desc": "+1 cuando se resuelva en el reactor."
+    },
+    "spring": {
+      "name": "Primavera",
+      "desc": "Un empujón gratuito con este dado en cada combate."
+    },
+    "lead": {
+      "name": "Plomo",
+      "desc": "+2 en la montura espinal."
+    },
+    "spark": {
+      "name": "Chispa",
+      "desc": "Si sales un 1, acumulas 2 puntos de carga."
+    },
+    "keel": {
+      "name": "Quilla",
+      "desc": "+1 en motores."
+    },
+    "lens": {
+      "name": "Lente",
+      "desc": "+1 en sensores."
+    },
+    "bastion": {
+      "name": "Bastión",
+      "desc": "+1 en escudos."
+    },
+    "hunger": {
+      "name": "El hambre",
+      "desc": "Un «max face» inflige 1 punto de daño adicional al objetivo."
+    },
+    "ash": {
+      "name": "Ash",
+      "desc": "Una cara «min» da 2 chatarra."
+    },
+    "surf": {
+      "name": "Surf",
+      "desc": "+1 en el primer turno."
+    },
+    "lastLight": {
+      "name": "Última luz",
+      "desc": "+2 mientras el casco esté por debajo del 30 %."
+    },
+    "weight": {
+      "name": "Peso",
+      "desc": "Cualquier valor inferior a 3 se cuenta como 3."
+    },
+    "crown": {
+      "name": "Corona",
+      "desc": "Una cara «max» almacena 1 carga."
+    },
+    "thorn": {
+      "name": "Thorn",
+      "desc": "Si la puntuación en «Armas» es de 5 o más, se añade «Quema 1»."
+    },
+    "glass": {
+      "name": "Vidrio",
+      "desc": "+2 en armas; una cara máxima cuesta 1 casco."
+    },
+    "rime": {
+      "name": "Rima",
+      "desc": "+2 de escudo cada vez que ocupe una ranura de escudo."
+    },
+    "loam": {
+      "name": "Tierra franca",
+      "desc": "+2 en motores."
+    },
+    "cinder": {
+      "name": "Ceniza",
+      "desc": "Una cara «máx» añade 2 puntos de quemadura."
+    },
+    "mint": {
+      "name": "Menta",
+      "desc": "Una cara máxima da 3 chatarra."
+    },
+    "wick": {
+      "name": "Mecha",
+      "desc": "Una cara «min» almacena 1 carga."
+    },
+    "pin": {
+      "name": "Pin",
+      "desc": "+2 en sensores."
+    },
+    "drum": {
+      "name": "Tambor",
+      "desc": "+2 de carga cada vez que se llene el reactor."
+    },
+    "scale": {
+      "name": "Escala",
+      "desc": "Un valor máximo de «face» en los escudos cura 1 punto de casco."
+    },
+    "beaconRune": {
+      "name": "Baliza",
+      "desc": "+1 en las dos primeras rondas."
+    },
+    "rust": {
+      "name": "Óxido",
+      "desc": "+2 en armas con un resultado de 8 o más."
+    },
+    "salt": {
+      "name": "Sal",
+      "desc": "Una cara máxima otorga 1 escudo."
+    },
+    "glimmer": {
+      "name": "Destello",
+      "desc": "Si se obtiene un resultado de 2 o menos, se acumula 1 carga."
+    },
+    "sinew": {
+      "name": "Tendón",
+      "desc": "Si hay 4 o más motores, se obtiene 1 escudo."
+    },
+    "cipher": {
+      "name": "Cifrado",
+      "desc": "Si repites el valor del turno anterior, obtienes 4 chatarra."
+    },
+    "brand": {
+      "name": "Marca",
+      "desc": "+2 a los dados rojos en las armas."
+    },
+    "tidepool": {
+      "name": "Charcas de marea",
+      "desc": "Una cara «min» en los escudos otorga 3 de escudo."
+    },
+    "voidmark": {
+      "name": "Voidmark",
+      "desc": "Cada cara «min» del reactor almacena 3 de carga."
+    }
+  },
+  "fate": {
+    "severance": "Separación: el hilo que te une a tu propia suerte se rompe.",
+    "misfire": "Fallo de encendido: algo en el casco no responde correctamente.",
+    "interference": "Interferencias: el sector se come tus márgenes.",
+    "trade": "Intercambio: el Rim recibe el casco y devuelve la corriente.",
+    "wash": "Empate: ni se gana ni se pierde nada. O casi.",
+    "ripple": "Ripple: el campo se pliega perfectamente a tu alrededor.",
+    "tailwind": "Viento a favor: por una vez, el sector te favorece.",
+    "cache": "Cache: los ahorros de una tripulación fallecida, sin reclamar.",
+    "volley": "Volea: las cifras se convierten en un arma.",
+    "mercy": "Misericordia: el Borde repara lo que rompió.",
+    "miracle": "Milagro: durante un turno, el sector estará de tu lado."
+  },
+  "dossier": {
+    "scavDrone": "El cargador de alguien, al que le habían enseñado dos órdenes y luego lo habían soltado.",
+    "raider": "Los colores de un clan pintados sobre los colores de otro clan. Nadie recuerda cuáles fueron los primeros.",
+    "shieldWarden": "La doctrina de escolta de la flota, que sigue vigente cuarenta años después de la flota.",
+    "mine": "Barato, paciente y sin opiniones propias.",
+    "jammerCorvette": "Fabricado para despistar a los guardacostas. Nunca aprendió a hacer otra cosa.",
+    "leechSkiff": "No quiere tu casco. Quiere que tus dados se queden quietos.",
+    "choirZealot": "Canta en un canal abierto, así que ya sabes que están rezando por las probabilidades.",
+    "riftWasp": "Muere a gritos y deja un hueco que resuena.",
+    "bountyHuntress": "Ella lleva un libro de cuentas. Tú eres una línea en él, no un rencor.",
+    "raiderAlpha": "Aquella cuya torreta sigue girando. Eso es todo lo que hay que saber sobre la promoción.",
+    "breakerDrone": "Herramientas de rescate a las que se les han limado los dispositivos de seguridad.",
+    "magnetTug": "No puede disparar. Tampoco lo necesita; puede aguantar.",
+    "minelayer": "Prepara su terreno y luego espera a convertirse en lo menos interesante de todo esto.",
+    "riftling": "Una forma que el Rift no deja de redibujar porque le gusta el primer boceto.",
+    "echoShade": "Sea lo que sea lo que acabas de hacer, lo ha oído bien alto.",
+    "unstableCore": "Un reactor que nunca llegó a decidir si debía detenerse.",
+    "choirAcolyte": "Me ofrecí voluntario. Eso es lo que da miedo.",
+    "hymnTurret": "Una pistola afinada con un acorde. Dispara al primer tiempo.",
+    "zealotRam": "Sin escudos, no hay plan más allá de los primeros treinta segundos.",
+    "coreFragment": "Una parte del Núcleo que todavía cree que es el todo.",
+    "probabilityKnot": "Dos futuros entrelazados y firmemente unidos.",
+    "nullDrone": "Elimina opciones en lugar de cascos. Es eficaz, a su manera.",
+    "hookTug": "Te cobra el remolque, lo hayas solicitado o no.",
+    "slagHauler": "Lenta, blindada y llena de naves ajenas.",
+    "chaffSwarm": "Por sí solo, es inofensivo. Esa es la broma, y tiene éxito.",
+    "foldWorm": "Le quita la certeza a un número y deja solo el dígito.",
+    "nullEcho": "La mitad de tu último turno, reproducida con peores intenciones.",
+    "riftAnchor": "Mantiene una parte del espacio inmóvil para que el resto pueda oscilar.",
+    "hymnCantor": "Marca el ritmo. Lo primero es romper el ritmo.",
+    "pyreDeacon": "Cura a su coro y lo llama misericordia. Así es, desde cierto punto de vista.",
+    "reliquary": "Un casco construido en torno a una reliquia que nadie ha abierto en décadas.",
+    "causalityLoop": "Intercambia dos de tus números y te deja hacer el resto.",
+    "voidWarden": "Más antiguo que el Coro. Posiblemente más antiguo que la flota.",
+    "quietEngine": "No ataca. Crea un ambiente de incertidumbre en la habitación.",
+    "breachDrone": "Un trabajo, hecho una vez, a lo grande.",
+    "sparkMote": "Estático con un problema de ambición.",
+    "hullGnat": "Demasiado pequeños para tener importancia, pero en un número lo suficientemente grande como para tenerla.",
+    "clanBreaker": "El cobrador del clan. Factura en «hull» y se queda con el cambio.",
+    "riftTyrant": "Le creció un ojo para que el Rift pudiera devolverle la mirada.",
+    "choirCantor": "Dirige el himno, y el himno es un arma.",
+    "coreSentinel": "El Núcleo mantiene uno de estos en un lugar donde la causalidad es débil.",
+    "leechPrince": "Todas las barcas de la regata aprendieron el oficio de esta.",
+    "mineBaron": "Siembra el campo y luego cobra por pasar por él sin peligro.",
+    "convoyAlpha": "Tres escoltas y un casco que no perecerá hasta que ellos lo hagan.",
+    "wardenFragment": "Una parte del Warden que nunca recibió la orden de retirarse.",
+    "leechQueen": "Ella coge primero los dados y luego, cuando le apetezca, el barco.",
+    "mineTyrant": "Considera que todo el campo es un arma. Tiene razón.",
+    "choirHerald": "Enviada por delante para que los demás sobrevivan; así se entiende lo de la nave insignia.",
+    "mirrorHull": "Te responde con tu propio último giro, reducido a la mitad y sincero.",
+    "quarantineWarden": "Sigue imponiéndose una cuarentena en un sector en el que no hay nada que proteger.",
+    "breakerBarge": "Se alimenta de chatarra. Tu chatarra cuenta como chatarra.",
+    "riftMaw": "No es un barco. Es un lugar que decidió marcar un rumbo.",
+    "choirFlagship": "El himno, dotado de un casco y una solución de tiro.",
+    "coreHeart": "Lo que la flota vino a estudiar. Y eso, a su vez, también la ha estado estudiando."
+  },
+  "keeper": {
+    "mara1": "Mara: «Aquí todo funciona. Aunque primero habría que definir qué se entiende por \"funciona\"».",
+    "mara2": "Mara: «Ni devoluciones, ni recibos, ni rencor.»",
+    "mara3": "Mara: «Tienes pinta de capitán que sabe lo que hace. Eso me gusta. Un poco».",
+    "mara4": "Mara: «Los precios se mantienen firmes. Las existencias, no».",
+    "mara5": "Mara: «Esa la vendí dos veces. El primer comprador nunca volvió a por ella».",
+    "mara6": "Mara: «Cómprate el feo. Los feos son los que sobreviven».",
+    "mara7": "Mara: «Si rueda, se vende. Si discute, es tuyo».",
+    "mara8": "Mara: «No toques la estantería. Esa estantería es parte del inventario».",
+    "mara9": "Mara: «La mitad de Rim me debe algo. Tú eres la mitad que tiene que pagar».",
+    "mara10": "Mara: «Véndeme las que te dan miedo. A mí no me dan miedo».",
+    "mara11": "Mara: «Ya he dejado de preguntar de dónde viene la mercancía. Así se ahorra tiempo».",
+    "mara12": "Mara: «Eso es material de la flota. Lo que significa que funciona y que nadie lo quiere».",
+    "mara13": "Mara: «¿Quieres que te salga barato o quieres volver? Elige una de las dos».",
+    "mara14": "Mara: «No regateo. A veces me lo replanteo».",
+    "mara15": "Mara: «El negocio va bien. Aquí todo el mundo necesita algo dos veces».",
+    "mara16": "Mara: «Cógelo. Si te mata, te lo volveré a comprar de los restos del accidente».",
+    "yusuf1": "Yusuf: «Tráelo. Ya veremos qué es lo que todavía te pertenece».",
+    "yusuf2": "Yusuf: «No hay nada que no se pueda arreglar. Hay cosas que no tienen precio».",
+    "yusuf3": "Yusuf: «Vuelas como alguien que se ha leído el manual una vez».",
+    "yusuf4": "Yusuf: «Puedo arreglar el casco. De las ropas te encargas tú».",
+    "yusuf5": "Yusuf: «Mi padre soldó este muelle. Ha durado más que su calle».",
+    "yusuf6": "Yusuf: «Actualiza lo que realmente utilizas. Un consejo radical, lo sé».",
+    "yusuf7": "Yusuf: «Un trabajo impecable de Fusion. Dos iguales, pero uno mejor».",
+    "yusuf8": "Yusuf: «El vale vale aquí. Vale donde yo diga que vale».",
+    "yusuf9": "Yusuf: «¿Prefieres la velocidad o llegar a tu destino?»",
+    "yusuf10": "Yusuf: «Todos los convoyes que he perdido, los he perdido por saltarme un sistema».",
+    "yusuf11": "Yusuf: «No me fijo en las marcas de quemadura. Simplemente las paso con la soldadora».",
+    "yusuf12": "Yusuf: «Quédate aquí todo el tiempo que quieras. El Rim no se va a ir a ninguna parte».",
+    "yusuf13": "Yusuf: «Las reparaciones baratas salen el doble de caras. Ya te darás cuenta de eso algún día».",
+    "yusuf14": "Yusuf: «Venga, adelante. No me hagas volver a ver este casco».",
+    "keeper1": "El Guardián: «Sois la tercera nave de este ciclo. Las otras dos no se detuvieron».",
+    "keeper2": "El Guardián: «Yo me encargo de las luces. Alguien tiene que indicar dónde están los límites».",
+    "keeper3": "El guardián: «La flota pasó por aquí cantando. Así consta en el diario de a bordo».",
+    "keeper4": "El Guardián: «Las balizas no guían. Son testigos».",
+    "keeper5": "El Guardián: «Ya he dejado de contar los años. Ahora cuento las veces que vuelvo a encenderlo».",
+    "keeper6": "El Guardián: «Responde a las balizas y el sector te responderá. Tarde o temprano».",
+    "keeper7": "El Guardián: «Coge el libro. No te lleves la lámpara».",
+    "keeper8": "El Guardián: «Todo lo que se traga el Borde, una baliza lo vio primero».",
+    "keeper9": "El Guardián: «Yo formé parte de la tripulación en su día. La nave sigue ahí fuera, técnicamente».",
+    "keeper10": "El Guardián: «Si llegas al Núcleo, dile que alguien mantuvo las luces encendidas»."
+  }
+}

@@ -1,6 +1,10 @@
 import { initializeApp } from "firebase/app";
 import type { FirebaseApp } from "firebase/app";
-import { getAuth, signInAnonymously } from "firebase/auth";
+import {
+  getAuth,
+  signInAnonymously,
+  signInWithCustomToken,
+} from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import type { Firestore } from "firebase/firestore";
 
@@ -15,8 +19,27 @@ const ensureApp = (): FirebaseApp => {
     storageBucket: import.meta.env.VITE_FB_STORAGE_BUCKET,
     messagingSenderId: import.meta.env.VITE_FB_MESSAGING_SENDER_ID,
     appId: import.meta.env.VITE_FB_APP_ID,
+    measurementId: import.meta.env.VITE_FB_MEASUREMENT_ID,
   });
   return app;
+};
+
+// `services/analytics.ts` needs the app instance and nothing else; components
+// still never import firebase directly (CLAUDE.md architecture rules).
+export const analyticsApp = (): FirebaseApp => ensureApp();
+
+// The uid persisted from a previous session, without creating one. Account
+// linking needs to read the anonymous profile before the Telegram sign-in
+// replaces it, and creating a throwaway anon user first would defeat that.
+export const restoredUid = async (): Promise<string | null> => {
+  try {
+    const auth = getAuth(ensureApp());
+    await auth.authStateReady();
+    return auth.currentUser?.uid ?? null;
+  } catch (error) {
+    console.warn("firebase: auth state restore failed", error);
+    return null;
+  }
 };
 
 export const ensureAnonAuth = async (): Promise<string | null> => {
@@ -27,6 +50,38 @@ export const ensureAnonAuth = async (): Promise<string | null> => {
     return credential.user.uid;
   } catch (error) {
     console.error("firebase: anonymous sign-in failed", error);
+    return null;
+  }
+};
+
+// `api/telegram-auth` validates the initData HMAC server-side and mints a custom
+// token for the stable uid `tg:{telegram_id}` (DESIGN §4), so the same Telegram
+// account is the same profile on every device.
+export const signInWithTelegram = async (
+  initDataRaw: string,
+): Promise<string | null> => {
+  try {
+    const response = await fetch("/api/telegram-auth", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ initData: initDataRaw }),
+    });
+    if (!response.ok) {
+      console.warn(
+        `firebase: telegram auth rejected (${String(response.status)})`,
+      );
+      return null;
+    }
+    const body: unknown = await response.json();
+    const token =
+      typeof body === "object" && body !== null
+        ? (body as { token?: unknown }).token
+        : null;
+    if (typeof token !== "string") return null;
+    const credential = await signInWithCustomToken(getAuth(ensureApp()), token);
+    return credential.user.uid;
+  } catch (error) {
+    console.warn("firebase: telegram sign-in failed", error);
     return null;
   }
 };

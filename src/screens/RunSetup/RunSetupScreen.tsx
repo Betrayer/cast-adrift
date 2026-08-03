@@ -32,7 +32,7 @@ export const RunSetupScreen = () => {
   const mods = ascensionMods(ascension);
 
   return (
-    <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={460} w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>

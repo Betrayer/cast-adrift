@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   gap: 20px;
-  min-height: 100dvh;
+  min-height: var(--ca-vh);
   padding: 24px;
   background: var(--ca-bg);
 }

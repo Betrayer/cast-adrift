@@ -1,3 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
+import process from "node:process";
 import { ASCENSIONS, MAX_ASCENSION } from "../src/data/ascension";
 import { BARKS, BARK_QUOTA } from "../src/data/barks";
 import { ENGRAVINGS } from "../src/data/engravings";
@@ -706,6 +709,16 @@ for (const def of CONTRACTS) {
   }
 }
 
+const flatValues = (node: unknown, prefix = ""): Record<string, string> => {
+  if (typeof node === "string") return { [prefix]: node };
+  if (typeof node !== "object" || node === null) return {};
+  const out: Record<string, string> = {};
+  for (const [key, value] of Object.entries(node as Record<string, unknown>)) {
+    Object.assign(out, flatValues(value, prefix === "" ? key : `${prefix}.${key}`));
+  }
+  return out;
+};
+
 const flattenKeys = (node: unknown, prefix = ""): string[] => {
   if (typeof node !== "object" || node === null) return [prefix];
   return Object.entries(node as Record<string, unknown>).flatMap(([key, value]) =>
@@ -740,6 +753,36 @@ const NAMESPACES: readonly [string, unknown, unknown, unknown][] = [
 for (const [ns, en, uk, ru] of NAMESPACES) {
   checkParity(ns, en, uk, "uk");
   checkParity(ns, en, ru, "ru");
+}
+
+// Machine locales (Phase 12) are generated artefacts and may be absent from a
+// given checkout. Present means complete: a half-generated language would fall
+// back to English mid-sentence, which reads as a bug rather than as a locale.
+const MACHINE_LOCALES = ["de", "es", "fr", "pl"] as const;
+const I18N_DIR = join(process.cwd(), "src", "i18n");
+
+for (const locale of MACHINE_LOCALES) {
+  const dir = join(I18N_DIR, locale);
+  if (!existsSync(dir)) continue;
+  for (const [ns, en] of NAMESPACES) {
+    const path = join(dir, `${ns}.json`);
+    if (!existsSync(path)) {
+      errors.push(`i18n: ${locale}/${ns} is missing (locale is half-generated)`);
+      continue;
+    }
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(readFileSync(path, "utf8"));
+    } catch {
+      errors.push(`i18n: ${locale}/${ns} is not valid JSON`);
+      continue;
+    }
+    checkParity(ns, en, parsed, locale);
+    for (const [key, value] of Object.entries(flatValues(parsed))) {
+      if (value.trim() === "")
+        errors.push(`i18n: ${locale}/${ns} has an empty string at "${key}"`);
+    }
+  }
 }
 
 if (errors.length > 0) {

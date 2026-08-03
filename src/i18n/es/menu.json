@@ -1,0 +1,29 @@
+{
+  "tagline": "Una operación de rescate en un sector inactivo",
+  "testBattle": "Combate de prueba",
+  "newRun": "Campaña",
+  "hangar": "Hangar",
+  "starChart": "Carta estelar",
+  "collection": "Colección",
+  "codex": "Códice",
+  "modes": "Modos",
+  "settings": "Configuración",
+  "resume": "Continuar: Sector {{sector}} · profundidad {{depth}}",
+  "cloudFound": "Se ha encontrado una ejecución más reciente en la nube. ¿Quieres continuar con ella?",
+  "cloudYes": "Carrera en la nube",
+  "cloudNo": "Local",
+  "stub": "Esta pantalla aparece en la fase «{{phase}}».",
+  "resumeCard": "Continuar: Sector {{sector}} · profundidad {{depth}} · {{when}}",
+  "resumeContinue": "Continuar",
+  "resumeAbandon": "Déjalo estar",
+  "resumeWhen": {
+    "now": "hace un momento",
+    "minutes": "{{n}} hace un minuto",
+    "hours": "{{n}} h hace",
+    "days": "{{n}} hace d días"
+  },
+  "abandonTitle": "¿Abandonamos esta carrera?",
+  "abandonBody": "Se borrarán tanto las partidas guardadas localmente como la copia en la nube. No hay vuelta atrás.",
+  "abandonNo": "Guárdalo",
+  "abandonYes": "Abandonar"
+}

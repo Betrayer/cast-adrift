@@ -1,0 +1,40 @@
+{
+  "title": "Einstellungen",
+  "language": "Sprache",
+  "sfxVolume": "SFX-Lautstärke",
+  "musicVolume": "Musiklautstärke",
+  "reducedMotion": "Eingeschränkte Bewegungsfähigkeit",
+  "auto": "Auto",
+  "on": "Am",
+  "off": "Aus",
+  "echoVerbosity": "Echo Geplauder",
+  "echoNormal": "Normal",
+  "echoLess": "Weniger",
+  "screenShake": "Bildschirmverwacklung",
+  "fontScale": "Schriftgröße",
+  "fontS": "S",
+  "fontM": "M",
+  "fontL": "L",
+  "battleSpeed": "Kampfgeschwindigkeit",
+  "speedNormal": "Normal",
+  "speedFast": "Schnell",
+  "tutorialReset": "Anleitung erneut anzeigen",
+  "theme": {
+    "label": "Thema",
+    "deepSpace": "Tiefer Weltraum",
+    "terminal": "Terminal",
+    "blueprint": "Entwurf",
+    "aurora": "Aurora",
+    "use": "Verwendung",
+    "active": "Aktiv",
+    "owned": "Freigeschaltet",
+    "unlock": "Entsperren",
+    "price": "{{n}} Splitter"
+  },
+  "diagnostics": {
+    "version": "Build-{{version}}",
+    "show": "Diagnostik ({{n}})",
+    "hide": "Diagnose ausblenden",
+    "clean": "In dieser Sitzung sind keine Fehler aufgetreten."
+  }
+}

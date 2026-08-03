@@ -99,7 +99,7 @@ export const LeaderboardScreen = () => {
   const myRank = ready ? loaded.myRank : null;
 
   return (
-    <Stack align="center" mih="100dvh" p="md" bg={tokens.bg} gap="sm">
+    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
         <Stack gap="xs">
           <Group justify="space-between">
@@ -149,7 +149,7 @@ export const LeaderboardScreen = () => {
         </Stack>
       </Paper>
 
-      <ScrollArea h="calc(100dvh - 230px)" w="100%" maw={460}>
+      <ScrollArea h="calc(var(--ca-vh) - 230px)" w="100%" maw={460}>
         {rows === null ? (
           <Group justify="center" py="xl">
             <Loader size="sm" color="accent" />

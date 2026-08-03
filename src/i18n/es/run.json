@@ -1,0 +1,275 @@
+{
+  "glyph": {
+    "start": "⌂",
+    "battle": "B",
+    "elite": "E",
+    "miniboss": "MB",
+    "shop": "$",
+    "shipyard": "Y",
+    "event": "?",
+    "anomaly": "A",
+    "beacon": "M",
+    "boss": "Jefe"
+  },
+  "map": {
+    "title": "Sector {{n}} · {{name}}",
+    "depth": "profundidad {{cur}} de {{max}} · guardado automático",
+    "tide": "Marea de interferencia {{n}}",
+    "interference": "Interferencia × {{n}}",
+    "fog": "Interferencia",
+    "fogSub": "Los sensores Mk2+ revelan más detalles",
+    "jump": "Ir al nodo seleccionado",
+    "jumpHint": "Selecciona un nodo accesible",
+    "you": "Tú",
+    "boss": "Jefe",
+    "abandon": "Abandonar la carrera",
+    "previewMiniboss": "Minijefazo: {{name}}",
+    "previewBoss": "Jefe: {{name}}",
+    "modules": "Módulos {{used}} / {{max}}"
+  },
+  "event": {
+    "title": "Señal",
+    "continue": "Continuar",
+    "toBattle": "Participar",
+    "quiet": "El sector contiene la respiración. No se mueve ni un alma.",
+    "speaker": "— {{name}}",
+    "reqScrap": "Se busca chatarra de «{{n}}»",
+    "reqHull": "necesita un casco «{{n}}»",
+    "reqSchool": "necesita {{n}} {{school}} dice",
+    "reqDieTier": "Necesita un d {{tier}}",
+    "reqDieSchool": "necesita un troquel «{{school}}»",
+    "reqMk": "Se necesita un «{{slot}}» Mk{{mk}}",
+    "reqFlag": "bloqueado",
+    "checkTitle": "Tirada de dados",
+    "checkSum": "Suma «{{n}}» o más",
+    "checkHighest": "Un dado que marque «{{n}}» o más",
+    "odds": "probabilidad{{n}} %",
+    "checkHint": "comprueba · {{n}} %",
+    "pass": "Éxito — {{total}}",
+    "fail": "Error — {{total}}",
+    "roll": "Lanzamiento",
+    "back": "Atrás"
+  },
+  "anomaly": {
+    "title": "Anomalía",
+    "goal": "Objetivo",
+    "resolve": "Resolución",
+    "retry": "Nuevo rollo",
+    "solved": "Resuelto",
+    "failed": "Todavía no: vuelve a tirar o tira de nuevo",
+    "reward": "+ Recorte de{{n}}",
+    "leave": "Salir",
+    "tray": "Dados lanzados",
+    "slots": "Sistemas",
+    "rerolls": "repeticiones: {{n}}",
+    "reroll": "Reroll ({{n}})",
+    "retryLeft": "Nuevo rollo (a la izquierda de {{n}})",
+    "giveUp": "No quedan rollos nuevos",
+    "toMap": "Volver al mapa",
+    "outOfRollsTitle": "Anomalía sin resolver",
+    "outOfRolls": "No quedan nuevos rollos. Salida de Stokes Resonancia Interferencia.",
+    "rerollHint": "Elige hasta un{{n}}es dados para volver a tirar",
+    "rerollCancel": "Cancelar",
+    "rerollConfirm": "Volver a jugar «{{k}}»",
+    "m_damage": "Daños {{n}} / {{target}}",
+    "m_charge": "Contacto: {{n}} / {{target}}",
+    "m_shield": "Shield {{n}} / {{target}}",
+    "mHull": "Casco Tras el éxito: {{n}}",
+    "exactEq": "Enlace de destino = {{n}}",
+    "exactNow": "ahora {{n}}",
+    "exactHit": "exacto",
+    "exactOver": "publicado en {{n}}",
+    "exactUnder": "por {{n}}",
+    "turn": "Visita {{cur}} / {{max}}",
+    "carry": "Aprobado:",
+    "carryCharge": "cobrar {{n}}",
+    "carryBurn": "quemar {{n}}",
+    "carryReserved": "reservado d {{n}}",
+    "carryNone": "Todavía nada",
+    "reserve": "Reserva",
+    "reserved": "Reservado",
+    "unreserve": "Desreservar",
+    "nextTurn": "Fin de turno",
+    "reset": "Restablecer la ubicación",
+    "fixed": "Lectura fija: razona el motivo",
+    "cumDamage": "Daños totales: {{n}} / {{target}}",
+    "cumCharge": "Cargo acumulado {{n}} / {{target}}",
+    "cumShield": "Shield {{n}} / {{target}}",
+    "interferenceWarn": "Vuelve a salir y comienza la interferencia de «Resonancia».",
+    "rule": {
+      "noWaste": "No se derramó ningún líquido más allá del tapón",
+      "schoolInSlot": "{{school}} morir en {{slot}}",
+      "everyDiePlaced": "Cada dado colocado",
+      "slotParity": "{{slot}} dice: «{{parity}}»",
+      "minSlotsUsed": "Utiliza, como mínimo, sistemas «{{n}}»",
+      "maxSlotsUsed": "Utilizar como máximo sistemas «{{n}}»",
+      "affixUsed": "{{affix}} activado"
+    },
+    "step": {
+      "mark": "Los sensores marcan el objetivo",
+      "damage": "{{n}}+ daño de tierra",
+      "shield": "Crear un escudo «{{n}}»+",
+      "charge": "{{n}}bancario + comisión",
+      "noOverflow": "El reactor no se desborda",
+      "spinalJam": "Bloqueos espinales a propósito"
+    },
+    "clause": "Llám{{n}}o {{metric}}",
+    "surviveLabel": "Sobrevive al impacto que se avecina",
+    "parity": {
+      "even": "incluso",
+      "odd": "impar"
+    },
+    "affix": {
+      "burn": "Quemar",
+      "growth": "Crecimiento",
+      "exceedCap": "Exceso de capacidad",
+      "affinity": "Afinidad"
+    },
+    "metric": {
+      "damage": "daños",
+      "charge": "cargo",
+      "shield": "escudo"
+    }
+  },
+  "codex": {
+    "title": "Códice",
+    "world": "Mundo",
+    "dossiers": "Expedientes",
+    "memory": "Echo Memoria",
+    "empty": "Aún no hay nada registrado.",
+    "locked": "Aún no se ha descubierto",
+    "back": "Atrás",
+    "unread": "nuevo",
+    "glyphLegend": {
+      "title": "Glifos escolares",
+      "body": "Cada dado tiene una forma en una de sus esquinas, lo que permite diferenciar a las escuelas sin necesidad de colores: Rojo — triángulo · Azul — cuadrado · Verde — hoja · Amarillo — anillo · Negro — púa · Gris — punto · Prismático — estrella."
+    }
+  },
+  "consequenceToast": "Consecuencia: {{text}}",
+  "rewards": {
+    "scrap": "+ Recorte de{{n}}",
+    "dieTitle": "Matriz recuperada",
+    "keep": "Dejar en la baraja",
+    "sell": "Vender (+{{n}})",
+    "deckFull": "Baraja completa (9)",
+    "healed": "Reparado + {{n}}"
+  },
+  "perk": {
+    "title": "Elige una mejora",
+    "pick": "Toma",
+    "skip": "Saltar (+recortes de{{n}})",
+    "sub": "1 de 3"
+  },
+  "shop": {
+    "title": "Mercado · Mara",
+    "buy": "Comprar ({{n}})",
+    "sell": "Vender",
+    "reroll": "Reposición ({{n}})",
+    "leave": "Salir",
+    "scrap": "Chatarra: {{n}}",
+    "deck": "Cubierta {{n}} /9",
+    "sellTitle": "Vender un dado",
+    "empty": "Agotado",
+    "owned": "En cubierta",
+    "modulesTitle": "Módulos {{used}} / {{max}}",
+    "modulesFull": "Bahía llena",
+    "rerollFree": "Reaprovisionar existencias (gratis)"
+  },
+  "shipyard": {
+    "title": "Astillero",
+    "mk": "Mk {{mk}} — {{cost}}",
+    "mkMax": "Mk3 · al máximo",
+    "systems": "Sistemas",
+    "fusion": "Fuse ({{cost}})",
+    "fusionTitle": "Fusión",
+    "fusionHint": "Dos dados idénticos → +1 nivel",
+    "fusionPick": "Elige un dado para fusionar",
+    "repair": "Reparación",
+    "repairHint": "2 piezas de chatarra por casco",
+    "leave": "Salir",
+    "scrap": "Chatarra: {{n}}",
+    "hull": "Casco {{cur}}/{{max}}",
+    "voucher": "Cupón Mk × {{n}}: un nivel gratuito",
+    "voucherUse": "Gratis"
+  },
+  "summary": {
+    "victory": "Sector despejado",
+    "defeat": "Atropellado",
+    "nodes": "Nodos eliminados: {{n}}",
+    "kills": "Asesinatos: {{n}}",
+    "earned": "Chatarra Fuente: {{n}}",
+    "spent": "Chatarra gasto: {{n}}",
+    "perks": "Actualizaciones:",
+    "perksNone": "ninguno",
+    "meta": "Fragmentos & XP",
+    "toMenu": "Ir al menú"
+  },
+  "prologue": {
+    "title": "Prólogo",
+    "echo": "ECHO: {{line}}",
+    "step": "{{cur}} / {{max}}",
+    "leave": "Volver al menú"
+  },
+  "interstitial": {
+    "sector": "Sector{{n}}",
+    "enter": "Entrar en el sector"
+  },
+  "finale": {
+    "title": "El «Core Heart» está abierto",
+    "intro": "Todo lo que has decidido aquí fuera es ahora una puerta. Solo se abrirán aquellas que te hayas ganado.",
+    "thin": "Echoe: «Lo has dejado un poco flojo, capitán. Dos puertas, y en ambas se han encogido de hombros».",
+    "axis": "Resonancia ↔ Eje de estabilidad: {{n}}"
+  },
+  "ending": {
+    "next": "Continuar",
+    "step": "{{cur}} / {{max}}",
+    "tally": "Lo que dejaste atrás",
+    "continue": "Cerrar el registro"
+  },
+  "setup": {
+    "title": "Inicio",
+    "mode": "Campaña: cinco sectores, un final.",
+    "ship": "Barco",
+    "deck": "Baraja: Dados «{{n}}»",
+    "ascension": "Ascensión",
+    "ascensionLocked": "Supera la campaña una vez para desbloquear la ascensión.",
+    "aLevel": "Un e{{n}}",
+    "tideCap": "Máximos de las mareas de interferencia en {{n}}",
+    "launch": "Inicio",
+    "back": "Atrás"
+  },
+  "package": {
+    "title": "Paquete «Gate»",
+    "scrap": "+ Recorte de{{n}}",
+    "voucher": "Cupón Mk × {{n}}: una mejora gratuita en cualquier astillero",
+    "take": "Toma",
+    "sell": "Vender (+{{n}})",
+    "hint": "Elige una. A continuación viene el draft de ventajas.",
+    "module": "módulo",
+    "install": "Instalar"
+  },
+  "tutorial": {
+    "next": "Siguiente",
+    "skipAll": "Saltar todo",
+    "place": {
+      "title": "Arrastra un dado a un sistema",
+      "body": "Tira los dados y, a continuación, arrástralos desde la bandeja hasta las casillas de «Armas», «Escudos», «Motores», «Sensores» o «Reactor». Un dado nunca encaja en una casilla cuyo límite esté por debajo de su cara."
+    },
+    "endTurn": {
+      "title": "Resolver el turno",
+      "body": "Cuando el tablero se vea tal y como quieres, da por terminado el turno. Los sistemas disparan de arriba abajo y, a continuación, el enemigo responde."
+    },
+    "reroll": {
+      "title": "Las repeticiones son gratuitas una vez",
+      "body": "Elige cualquier dado que quede en la bandeja y vuelve a lanzarlos. Las repeticiones de tirada no se acumulan entre turnos: si no se utiliza una, se pierde."
+    },
+    "nudge": {
+      "title": "La inversión garantiza la precisión",
+      "body": "Elige un dado y gasta un punto de carga para aumentar o reducir su resultado en uno. Los puntos de carga también sirven para pagar repeticiones de tiradas y aumentos de poder."
+    },
+    "jump": {
+      "title": "Elige el siguiente nodo",
+      "body": "Toca un nodo iluminado y, a continuación, pulsa «Saltar». La niebla oculta las filas que hay más adelante; los sensores y los escáneres profundos amplían el horizonte."
+    }
+  }
+}

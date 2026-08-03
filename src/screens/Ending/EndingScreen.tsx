@@ -17,6 +17,7 @@ import { finalMemoryCodexId } from '@/data/narrative/memories';
 import { CODEX_BY_ID } from '@/data/codex';
 import { finishEnding } from '@/game/run/flow';
 import { duckMusic, playSfx } from '@/services/audio';
+import { haptic } from '@/services/tma';
 import { useRunStore } from '@/stores/runStore';
 import styles from './EndingScreen.module.css';
 
@@ -31,6 +32,7 @@ export const EndingScreen = () => {
   useEffect(() => {
     playSfx('endingSting');
     duckMusic(2600);
+    haptic('ending');
   }, []);
 
   const ending = endingId === null ? undefined : ENDING_BY_ID.get(endingId);
@@ -49,7 +51,7 @@ export const EndingScreen = () => {
 
   if (ending === undefined) {
     return (
-      <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+      <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
         <Button onClick={finishEnding}>{t('run:ending.continue')}</Button>
       </Stack>
     );
@@ -59,7 +61,7 @@ export const EndingScreen = () => {
   const showTally = beatIndex >= ending.beats.length;
 
   return (
-    <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={480} w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>

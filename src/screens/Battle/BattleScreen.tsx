@@ -640,7 +640,7 @@ export const BattleScreen = () => {
       resolveActiveBattle();
       return;
     }
-    haptic('heavy');
+    haptic('bossIntro');
     const id = window.setTimeout(resolveActiveBattle, BOSS_HIT_STOP_MS);
     return () => {
       window.clearTimeout(id);
@@ -664,7 +664,7 @@ export const BattleScreen = () => {
     new URLSearchParams(window.location.search).get('debug') === '1';
 
   return (
-    <Box pos="relative" mih="100dvh" bg={tokens.bg} style={{ overflow: 'hidden' }}>
+    <Box pos="relative" mih="var(--ca-vh)" bg={tokens.bg} style={{ overflow: 'hidden' }}>
       <PixiCanvas mount={mountScene} />
       <div className={styles.hud}>
         <StatusCard />

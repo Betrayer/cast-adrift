@@ -11,7 +11,7 @@ export const StubScreen = ({ screen }: { screen: ScreenId }) => {
   const phase = screenPhase[screen];
 
   return (
-    <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder>
         <Stack align="center" gap="md">
           <Code fz="lg">{screen}</Code>

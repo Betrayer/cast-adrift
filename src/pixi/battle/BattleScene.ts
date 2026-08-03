@@ -1532,7 +1532,7 @@ export class BattleScene {
     }
     this.animating.add(uid);
     playSfx("place");
-    haptic("light");
+    haptic("place");
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
     const cancelScale = this.tweens.to(
@@ -1797,7 +1797,6 @@ export class BattleScene {
       useBattleStore.getState().finishResolution();
       return;
     }
-    haptic("medium");
     const run = { cancelled: false };
     this.beatRun = run;
     void this.runBeats(bundle, run);
@@ -1820,6 +1819,7 @@ export class BattleScene {
     for (const beat of bundle.beats) {
       if (run.cancelled) return;
       this.playBeat(beat);
+      haptic("resolveTick");
       useBattleStore.getState().applyBeatSnapshot(beat.after);
       // DESIGN §10 hit-stop: a heavy hit holds the frame before the next beat.
       const heavy = beat.kind === "damage" && beat.amount >= BIG_HIT_DAMAGE;
@@ -1828,6 +1828,7 @@ export class BattleScene {
     for (const beat of bundle.enemyBeats) {
       if (run.cancelled) return;
       this.playEnemyBeat(beat);
+      if (beat.hullDamage > 0) haptic("hitTaken");
       useBattleStore.getState().applyBeatSnapshot(beat.after);
       await this.sleep(beatGapMs(), run);
     }

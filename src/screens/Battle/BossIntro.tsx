@@ -15,7 +15,7 @@ export const BossIntro = () => {
   const dismissIntro = useBattleStore((s) => s.dismissIntro);
 
   useEffect(() => {
-    if (introPending) haptic('heavy');
+    if (introPending) haptic('bossIntro');
   }, [introPending]);
 
   if (!introPending || introEnemyId === null) return null;

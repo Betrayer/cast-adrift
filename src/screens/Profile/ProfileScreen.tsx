@@ -47,7 +47,7 @@ export const ProfileScreen = () => {
   );
 
   return (
-    <Stack align="center" mih="100dvh" p="md" bg={tokens.bg} gap="sm">
+    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
         <Group justify="space-between">
           <Text fw={700} c={tokens.text}>
@@ -65,7 +65,7 @@ export const ProfileScreen = () => {
         </Group>
       </Paper>
 
-      <ScrollArea h="calc(100dvh - 110px)" w="100%" maw={460}>
+      <ScrollArea h="calc(var(--ca-vh) - 110px)" w="100%" maw={460}>
         <Stack gap="sm" pb="md">
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Group>

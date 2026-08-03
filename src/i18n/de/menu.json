@@ -1,0 +1,29 @@
+{
+  "tagline": "Ein Rettungslauf durch einen toten Sektor",
+  "testBattle": "Testkampf",
+  "newRun": "Kampagne",
+  "hangar": "Hangar",
+  "starChart": "Sternenkarte",
+  "collection": "Sammlung",
+  "codex": "Kodex",
+  "modes": "Modi",
+  "settings": "Einstellungen",
+  "resume": "Weiter: Sektor {{sector}} · Tiefe {{depth}}",
+  "cloudFound": "In der Cloud wurde ein neuerer Durchlauf gefunden – soll dieser fortgesetzt werden?",
+  "cloudYes": "Cloud-Lauf",
+  "cloudNo": "Lokal",
+  "stub": "Dieser Bildschirm erscheint in Phase „{{phase}}“.",
+  "resumeCard": "Weiter: Sektor {{sector}} · Tiefe {{depth}} · {{when}}",
+  "resumeContinue": "Weiter",
+  "resumeAbandon": "Lass es so",
+  "resumeWhen": {
+    "now": "gerade eben",
+    "minutes": "{{n}} vor min",
+    "hours": "{{n}} vor h",
+    "days": "{{n}} vor d"
+  },
+  "abandonTitle": "Diesen Lauf abbrechen?",
+  "abandonBody": "Sowohl die lokalen Speicherstände als auch die Cloud-Kopie werden gelöscht. Es gibt kein Zurück mehr.",
+  "abandonNo": "Behalte es",
+  "abandonYes": "Aufgeben"
+}

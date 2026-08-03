@@ -557,7 +557,7 @@ const PuzzleRunner = ({
   const showLeaveWarning = !forced && interferenceImminent(anomalyStreak) && !solved;
 
   return (
-    <Stack mih="100dvh" p="md" gap="sm" bg={tokens.bg}>
+    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
       <Group justify="space-between">
         <Title order={3} c={tokens.text}>
           {t("run:anomaly.title")}
@@ -831,7 +831,7 @@ export const PuzzleScreen = () => {
   });
 
   if (puzzle === null || (!forced && position === null)) {
-    return <Box bg={tokens.bg} mih="100dvh" />;
+    return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
   }
   return <PuzzleRunner puzzle={puzzle} nodeId={nodeId} forced={forced} />;
 };

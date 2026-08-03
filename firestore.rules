@@ -96,5 +96,32 @@ service cloud.firestore {
       allow read: if request.auth != null;
       allow write: if false;
     }
+
+    // Phase 12 crash reports. Append-only from the client, never readable by it:
+    // a player must not be able to enumerate other players' stack traces, and a
+    // crash loop must not be able to rewrite or delete what it already wrote.
+    // The client-side limiter (5/session, 1/10 s, deduped) is the first line;
+    // these bounds are the one the client cannot talk its way past.
+    match /errors/{day}/items/{item} {
+      allow read, update, delete: if false;
+      allow create: if request.auth != null
+        && request.resource.data.keys().hasOnly(
+          ['at', 'message', 'stack', 'screen', 'version'])
+        && request.resource.data.at is int
+        && request.resource.data.at <= request.time.toMillis() + 60000
+        && request.resource.data.message is string
+        && request.resource.data.message.size() > 0
+        && request.resource.data.message.size() <= 300
+        && request.resource.data.stack is string
+        && request.resource.data.stack.size() <= 1000
+        && request.resource.data.screen is string
+        && request.resource.data.screen.size() <= 32
+        && request.resource.data.version is string
+        && request.resource.data.version.size() <= 32;
+    }
+
+    match /errors/{day} {
+      allow read, write: if false;
+    }
   }
 }

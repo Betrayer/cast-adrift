@@ -1,0 +1,275 @@
+{
+  "glyph": {
+    "start": "⌂",
+    "battle": "B",
+    "elite": "E",
+    "miniboss": "MB",
+    "shop": "$",
+    "shipyard": "Y",
+    "event": "?",
+    "anomaly": "A",
+    "beacon": "M",
+    "boss": "Chef"
+  },
+  "map": {
+    "title": "Branche {{n}} · {{name}}",
+    "depth": "Tiefensuche {{cur}} von {{max}} · automatische Speicherung",
+    "tide": "Interferenzgezeiten {{n}}",
+    "interference": "Interferenz × {{n}}",
+    "fog": "Störung",
+    "fogSub": "Sensoren Mk2+ bieten noch mehr",
+    "jump": "Zum ausgewählten Knoten springen",
+    "jumpHint": "Wählen Sie einen erreichbaren Knoten aus",
+    "you": "Du",
+    "boss": "Chef",
+    "abandon": "Lauf abbrechen",
+    "previewMiniboss": "Mini-Boss: {{name}}",
+    "previewBoss": "Chef: {{name}}",
+    "modules": "Module {{used}} / {{max}}"
+  },
+  "event": {
+    "title": "Signal",
+    "continue": "Weiter",
+    "toBattle": "Mitmachen",
+    "quiet": "Die Branche hält den Atem an. Nichts regt sich.",
+    "speaker": "— {{name}}",
+    "reqScrap": "{{n}}-Schrott gesucht",
+    "reqHull": "benötigt einen „{{n}}“-Rumpf",
+    "reqSchool": "benötigt „{{n}}“ und „{{school}}“",
+    "reqDieTier": "benötigt ein D-{{tier}}",
+    "reqDieSchool": "benötigt eine „{{school}}“-Stanze",
+    "reqMk": "benötigt „{{slot}}“ Mk{{mk}}",
+    "reqFlag": "gesperrt",
+    "checkTitle": "Würfelwurf",
+    "checkSum": "Summe „{{n}}“ oder mehr",
+    "checkHighest": "Ein Würfel, der „{{n}}“ oder mehr anzeigt",
+    "odds": "Wahrscheinlichkeit {{n}} %",
+    "checkHint": "Überprüfen · {{n}} %",
+    "pass": "Erfolg — {{total}}",
+    "fail": "Fehlgeschlagen — {{total}}",
+    "roll": "Rolle",
+    "back": "Zurück"
+  },
+  "anomaly": {
+    "title": "Anomalie",
+    "goal": "Ziel",
+    "resolve": "Entschlossenheit",
+    "retry": "Neue Rolle",
+    "solved": "Gelöst",
+    "failed": "Noch nicht – noch einmal würfeln oder neu würfeln",
+    "reward": "+ „{{n}}“-Ausschnitt",
+    "leave": "Gehen",
+    "tray": "Gewürfelte Würfel",
+    "slots": "Systeme",
+    "rerolls": "Wiederholungswürfe: {{n}}",
+    "reroll": "Reroll ({{n}})",
+    "retryLeft": "Neue Rolle (links: {{n}})",
+    "giveUp": "Keine neuen Rollen mehr",
+    "toMap": "Zurück zur Karte",
+    "outOfRollsTitle": "Anomalie weiterhin ungeklärt",
+    "outOfRolls": "Es sind keine neuen Rollen mehr vorhanden. Verlassen von „StokesResonanz-Interferenz“.",
+    "rerollHint": "Nimm bis zu {{n}} Würfel, um erneut zu würfeln",
+    "rerollCancel": "Abbrechen",
+    "rerollConfirm": "{{k}} erneut würfeln",
+    "m_damage": "Schadens{{n}} / {{target}}",
+    "m_charge": "Ansprech{{n}} / {{target}}",
+    "m_shield": "Shield {{n}} / {{target}}",
+    "mHull": "Hülle Nach dem Treffer: {{n}}",
+    "exactEq": "Ziel = {{n}}",
+    "exactNow": "Jetzt unter {{n}}",
+    "exactHit": "genau",
+    "exactOver": "bei „{{n}}“",
+    "exactUnder": "von {{n}}",
+    "turn": "{{cur}} / {{max}}",
+    "carry": "Angenommen:",
+    "carryCharge": "charge {{n}}",
+    "carryBurn": "{{n}} verbrennen",
+    "carryReserved": "reserviert d {{n}}",
+    "carryNone": "noch nichts",
+    "reserve": "Reserve",
+    "reserved": "Reserviert",
+    "unreserve": "Reservierung aufheben",
+    "nextTurn": "Ende der Runde",
+    "reset": "Platzierung zurücksetzen",
+    "fixed": "Leseaufgabe – Überlege dir die Lösung",
+    "cumDamage": "Gesamtschaden {{n}} / {{target}}",
+    "cumCharge": "Gespeicherte Ladung {{n}} / {{target}}",
+    "cumShield": "Shield {{n}} / {{target}}",
+    "interferenceWarn": "Erneut verlassen, und die Störung durch „Resonanz“ beginnt.",
+    "rule": {
+      "noWaste": "Es ist keine Ladung über die Obergrenze hinausgelaufen",
+      "schoolInSlot": "{{school}} die in {{slot}}",
+      "everyDiePlaced": "Jeder platzierte Würfel",
+      "slotParity": "{{slot}} lautet: „{{parity}}“",
+      "minSlotsUsed": "Verwenden Sie mindestens „{{n}}“-Systeme",
+      "maxSlotsUsed": "Verwendung auf höchstens {{n}} Systemen",
+      "affixUsed": "{{affix}} ausgelöst"
+    },
+    "step": {
+      "mark": "Sensoren markieren das Ziel",
+      "damage": "Land{{n}} + Schaden",
+      "shield": "{{n}}-Schild errichten",
+      "charge": "Bank{{n}} + Gebühr",
+      "noOverflow": "Der Reaktor läuft nicht über",
+      "spinalJam": "Absichtliche Blockaden der Wirbelsäule"
+    },
+    "clause": "Hold {{n}}+ {{metric}}",
+    "surviveLabel": "Den bevorstehenden Treffer überstehen",
+    "parity": {
+      "even": "sogar",
+      "odd": "ungerade"
+    },
+    "affix": {
+      "burn": "Verbrennen",
+      "growth": "Wachstum",
+      "exceedCap": "Überkapazität",
+      "affinity": "Affinität"
+    },
+    "metric": {
+      "damage": "Schaden",
+      "charge": "Gebühr",
+      "shield": "Schild"
+    }
+  },
+  "codex": {
+    "title": "Kodex",
+    "world": "Welt",
+    "dossiers": "Dossiers",
+    "memory": "Echo Speicher",
+    "empty": "Es wurde noch nichts protokolliert.",
+    "locked": "Noch nicht aufgedeckt",
+    "back": "Zurück",
+    "unread": "neu",
+    "glyphLegend": {
+      "title": "Schulzeichen",
+      "body": "Jeder Würfel hat eine bestimmte Eckenform, sodass die Schulen auch ohne Farbunterscheidung voneinander getrennt bleiben: Rot – Dreieck · Blau – Quadrat · Grün – Blatt · Gelb – Ring · Schwarz – Stachel · Grau – Punkt · Prismatisch – Stern."
+    }
+  },
+  "consequenceToast": "Folge: {{text}}",
+  "rewards": {
+    "scrap": "+ „{{n}}“-Ausschnitt",
+    "dieTitle": "Wiederverwertete Matrize",
+    "keep": "Im Deck behalten",
+    "sell": "Verkaufen (+{{n}})",
+    "deckFull": "Deck voll (9)",
+    "healed": "Repariert + {{n}}"
+  },
+  "perk": {
+    "title": "Wählen Sie ein Upgrade aus",
+    "pick": "Nimm",
+    "skip": "Überspringen (+ {{n}}-Ausschnitt)",
+    "sub": "1 von 3"
+  },
+  "shop": {
+    "title": "Markt · Mara",
+    "buy": "Kaufen ({{n}})",
+    "sell": "Verkaufen",
+    "reroll": "Restock ({{n}})",
+    "leave": "Gehen",
+    "scrap": "Schrott: {{n}}",
+    "deck": "Deck-{{n}}/9",
+    "sellTitle": "Einen Würfel verkaufen",
+    "empty": "Ausverkauft",
+    "owned": "Im Deck",
+    "modulesTitle": "Module {{used}} / {{max}}",
+    "modulesFull": "Bucht voll",
+    "rerollFree": "Reroll-Bestand (kostenlos)"
+  },
+  "shipyard": {
+    "title": "Werft",
+    "mk": "Mk {{mk}} — {{cost}}",
+    "mkMax": "Mk3 · voll ausgebaut",
+    "systems": "Systeme",
+    "fusion": "Fuse ({{cost}})",
+    "fusionTitle": "Fusion",
+    "fusionHint": "Zwei identische Würfel → +1 Stufe",
+    "fusionPick": "Wähle einen Würfel zum Verschmelzen aus",
+    "repair": "Reparatur",
+    "repairHint": "2 Schrott pro Rumpf",
+    "leave": "Gehen",
+    "scrap": "Schrott: {{n}}",
+    "hull": "Hülle {{cur}}/{{max}}",
+    "voucher": "Mk-Gutschein ×{{n}} – eine kostenlose Stufe",
+    "voucherUse": "Kostenlos"
+  },
+  "summary": {
+    "victory": "Sektor geräumt",
+    "defeat": "Überfahren",
+    "nodes": "Gereinigte Knoten: {{n}}",
+    "kills": "Kills: {{n}}",
+    "earned": "Schrott Quelle: {{n}}",
+    "spent": "Schrott Quelle: {{n}}",
+    "perks": "Upgrades:",
+    "perksNone": "keine",
+    "meta": "Splitter & XP",
+    "toMenu": "Zum Menü"
+  },
+  "prologue": {
+    "title": "Prolog",
+    "echo": "ECHO: {{line}}",
+    "step": "{{cur}} / {{max}}",
+    "leave": "Zurück zum Menü"
+  },
+  "interstitial": {
+    "sector": "Branchen{{n}}",
+    "enter": "In die Branche einsteigen"
+  },
+  "finale": {
+    "title": "Das Kernherz ist offen",
+    "intro": "Alles, wofür du dich hier draußen entschieden hast, ist nun eine Tür. Nur die, die du dir verdient hast, werden sich öffnen.",
+    "thin": "Echo: „Das war ein bisschen dürftig, Captain. Zwei Türen, beide zuckten nur mit den Schultern.“",
+    "axis": "Resonanz ↔ Stabilitätsachse: {{n}}"
+  },
+  "ending": {
+    "next": "Weiter",
+    "step": "{{cur}} / {{max}}",
+    "tally": "Was du zurückgelassen hast",
+    "continue": "Protokoll schließen"
+  },
+  "setup": {
+    "title": "Start",
+    "mode": "Kampagne – fünf Abschnitte, ein Ende.",
+    "ship": "Schiff",
+    "deck": "Kartensatz: „{{n}}“-Würfel",
+    "ascension": "Himmelfahrt",
+    "ascensionLocked": "Schließe die Kampagne einmal ab, um den Aufstieg freizuschalten.",
+    "aLevel": "Ein „{{n}}“",
+    "tideCap": "Interferenzgezeiten am {{n}}",
+    "launch": "Start",
+    "back": "Zurück"
+  },
+  "package": {
+    "title": "Gate-Gehäuse",
+    "scrap": "+ „{{n}}“-Ausschnitt",
+    "voucher": "Mk-Gutschein × {{n}} – ein kostenloses Upgrade in einer beliebigen Werft",
+    "take": "Nimm",
+    "sell": "Verkaufen (+{{n}})",
+    "hint": "Wähle eine aus. Anschließend folgt die Auswahl der Vorteile.",
+    "module": "Modul",
+    "install": "Installieren"
+  },
+  "tutorial": {
+    "next": "Weiter",
+    "skipAll": "Alle überspringen",
+    "place": {
+      "title": "Ziehe einen Würfel in ein System",
+      "body": "Würfle und ziehe dann die Würfel aus dem Fach auf die Felder „Waffen“, „Schilde“, „Triebwerke“, „Sensoren“ oder „Reaktor“. Ein Würfel passt niemals in ein Feld, dessen Oberkante unterhalb seiner Augenzahl liegt."
+    },
+    "endTurn": {
+      "title": "Die Kurve meistern",
+      "body": "Wenn das Spielfeld so aussieht, wie du es dir vorstellst, beende den Zug. Die Systeme feuern von oben nach unten, dann antwortet der Gegner."
+    },
+    "reroll": {
+      "title": "Einmal kann man kostenlos neu würfeln",
+      "body": "Wähle beliebige Würfel aus, die sich noch in der Schale befinden, und würfle sie erneut. Wiederholwürfe werden nicht von einer Runde in die nächste übertragen – ein nicht genutzter Wiederholwurf verfällt."
+    },
+    "nudge": {
+      "title": "Investition sorgt für Präzision",
+      "body": "Wähle einen Würfel aus und gib eine Ladung aus, um seine Augenzahl um eins nach oben oder unten zu verschieben. Mit Ladungen kannst du auch zusätzliche Würfe und „Surges“ bezahlen."
+    },
+    "jump": {
+      "title": "Wählen Sie den nächsten Knoten aus",
+      "body": "Tippe auf einen beleuchteten Knoten und wähle dann „Springen“. Nebel verdeckt die vor dir liegenden Reihen; Sensoren und Tiefenscans verschieben den Horizont weiter nach vorne."
+    }
+  }
+}

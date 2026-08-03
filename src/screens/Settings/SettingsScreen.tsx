@@ -2,17 +2,24 @@ import {
   Button,
   Group,
   Paper,
+  ScrollArea,
   SegmentedControl,
+  Select,
   Slider,
   Stack,
   Switch,
   Text,
   Title,
 } from '@mantine/core';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tokens } from '@/app/theme';
 import { THEMES, type ThemeId } from '@/data/themes';
+import { AVAILABLE_LOCALES } from '@/i18n';
+import { trackEvent } from '@/services/analytics';
 import { playSfx } from '@/services/audio';
+import { recentErrors } from '@/services/errors';
+import { APP_VERSION } from '@/services/version';
 import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -24,11 +31,21 @@ import type {
   ReducedMotionSetting,
 } from '@/types';
 
-const LOCALE_OPTIONS: { value: Locale; label: string }[] = [
-  { value: 'en', label: 'English' },
-  { value: 'uk', label: 'Українська' },
-  { value: 'ru', label: 'Русский' },
-];
+// Endonyms, not flags: a language is not a country (DESIGN §4 i18n row).
+const LOCALE_LABELS: Record<Locale, string> = {
+  en: 'English',
+  uk: 'Українська',
+  ru: 'Русский',
+  de: 'Deutsch',
+  es: 'Español',
+  fr: 'Français',
+  pl: 'Polski',
+};
+
+const LOCALE_OPTIONS = AVAILABLE_LOCALES.map((value) => ({
+  value,
+  label: LOCALE_LABELS[value],
+}));
 
 const ThemePicker = () => {
   const { t } = useTranslation(['settings']);
@@ -102,6 +119,7 @@ const ThemePicker = () => {
                   disabled={!affordable}
                   onClick={() => {
                     if (!spendShards(def.price)) return;
+                    trackEvent({ name: 'meta_purchase', params: { kind: 'theme' } });
                     unlockTheme(def.id);
                     setTheme(def.id);
                     playSfx('buy');
@@ -118,6 +136,60 @@ const ThemePicker = () => {
   );
 };
 
+// Self-serve bug reports: the player can read the exact build and the errors
+// this session actually raised instead of describing a blank screen. The list is
+// the in-memory ring from `services/errors.ts`, never a Firestore read.
+const Diagnostics = () => {
+  const { t } = useTranslation(['settings']);
+  const [open, setOpen] = useState(false);
+  const reports = recentErrors();
+
+  return (
+    <Stack gap="xs">
+      <Group justify="space-between">
+        <Text size="xs" c={tokens.faint}>
+          {t('settings:diagnostics.version', { version: APP_VERSION })}
+        </Text>
+        <Button
+          size="compact-xs"
+          variant="default"
+          onClick={() => {
+            setOpen((value) => !value);
+          }}
+        >
+          {t(open ? 'settings:diagnostics.hide' : 'settings:diagnostics.show', {
+            n: reports.length,
+          })}
+        </Button>
+      </Group>
+      {open ? (
+        <Paper p="xs" radius="md" withBorder bg={tokens.surface1}>
+          {reports.length === 0 ? (
+            <Text size="xs" c={tokens.dim}>
+              {t('settings:diagnostics.clean')}
+            </Text>
+          ) : (
+            <ScrollArea.Autosize mah={200}>
+              <Stack gap={4}>
+                {reports.map((report) => (
+                  <Text
+                    key={`${String(report.at)}-${report.message}`}
+                    size="xs"
+                    c={tokens.dim}
+                    style={{ fontFamily: 'monospace', wordBreak: 'break-word' }}
+                  >
+                    {`${report.screen} · ${report.message}`}
+                  </Text>
+                ))}
+              </Stack>
+            </ScrollArea.Autosize>
+          )}
+        </Paper>
+      ) : null}
+    </Stack>
+  );
+};
+
 export const SettingsScreen = () => {
   const { t } = useTranslation(['common', 'settings']);
   const go = useAppStore((s) => s.go);
@@ -125,7 +197,7 @@ export const SettingsScreen = () => {
   const resetTutorial = useMetaStore((s) => s.resetTutorial);
 
   return (
-    <Stack maw={440} mx="auto" mih="100dvh" gap="lg" p="lg" bg={tokens.bg}>
+    <Stack maw={440} mx="auto" mih="var(--ca-vh)" gap="lg" p="lg" bg={tokens.bg}>
       <Title order={2} c={tokens.text}>
         {t('settings:title')}
       </Title>
@@ -134,13 +206,14 @@ export const SettingsScreen = () => {
         <Text size="sm" c={tokens.dim}>
           {t('settings:language')}
         </Text>
-        <SegmentedControl
-          fullWidth
+        <Select
+          allowDeselect={false}
           value={settings.locale}
           onChange={(value) => {
-            settings.setLocale(value as Locale);
+            if (value !== null) settings.setLocale(value as Locale);
           }}
           data={LOCALE_OPTIONS}
+          comboboxProps={{ withinPortal: true }}
         />
       </Stack>
 
@@ -259,6 +332,8 @@ export const SettingsScreen = () => {
       <Button variant="default" onClick={resetTutorial}>
         {t('settings:tutorialReset')}
       </Button>
+
+      <Diagnostics />
 
       <Button
         variant="default"

@@ -119,7 +119,7 @@ export const CodexScreen = () => {
   const go = useAppStore((s) => s.go);
 
   return (
-    <Stack mih="100dvh" p="md" gap="sm" bg={tokens.bg}>
+    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
       <Group justify="space-between">
         <Title order={3} c={tokens.text}>
           {t("run:codex.title")}

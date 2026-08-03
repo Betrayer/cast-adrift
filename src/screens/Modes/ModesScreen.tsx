@@ -7,7 +7,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { CONTRACTS } from "@/data/contracts";
@@ -36,6 +36,8 @@ const countdownLabel = (ms: number): { h: number; m: number } => ({
 export const ModesScreen = () => {
   const { t } = useTranslation(["meta", "common", "content", "run"]);
   const go = useAppStore((s) => s.go);
+  const focus = useAppStore((s) => s.params?.focus);
+  const focusRef = useRef<HTMLDivElement>(null);
   const prologueDone = useMetaStore((s) => s.stats.prologueDone);
   const best = useMetaStore((s) => s.best);
   const contracts = useMetaStore((s) => s.contracts);
@@ -51,6 +53,13 @@ export const ModesScreen = () => {
     (sum, def) => sum + countStars(contracts[def.id] ?? 0),
     0,
   );
+
+  // A `?startapp=daily` deep link lands on this screen, so the card it asked for
+  // has to announce itself rather than sit third in a scroll.
+  useEffect(() => {
+    if (focus === undefined) return;
+    focusRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+  }, [focus]);
 
   const guarded = useCallback((action: () => void) => {
     if (hasActiveRun()) {
@@ -69,7 +78,7 @@ export const ModesScreen = () => {
   };
 
   return (
-    <Stack align="center" mih="100dvh" p="md" bg={tokens.bg} gap="sm">
+    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
         <Group justify="space-between">
           <Text fw={700} c={tokens.text}>
@@ -119,7 +128,16 @@ export const ModesScreen = () => {
         </Stack>
       </Paper>
 
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+      <Paper
+        ref={focus === "drift" ? focusRef : undefined}
+        bg={tokens.surface1}
+        p="md"
+        radius="md"
+        withBorder
+        maw={460}
+        w="100%"
+        style={focus === "drift" ? { borderColor: tokens.accent } : undefined}
+      >
         <Stack gap="xs">
           <Group justify="space-between">
             <Text fw={600} c={tokens.text}>
@@ -155,7 +173,16 @@ export const ModesScreen = () => {
         </Stack>
       </Paper>
 
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+      <Paper
+        ref={focus === "daily" ? focusRef : undefined}
+        bg={tokens.surface1}
+        p="md"
+        radius="md"
+        withBorder
+        maw={460}
+        w="100%"
+        style={focus === "daily" ? { borderColor: tokens.accent } : undefined}
+      >
         <Stack gap="xs">
           <Group justify="space-between">
             <Text fw={600} c={tokens.text}>

@@ -6,6 +6,7 @@ import {
   Text,
 } from "pixi.js";
 import type { Application, Renderer, Texture } from "pixi.js";
+import { registerTextureUsage } from "@/pixi/perf";
 import { mixHex } from "@/app/color";
 import { currentTheme, tokens } from "@/app/theme";
 import { schoolGlyphPath } from "@/data/glyphs";
@@ -46,6 +47,8 @@ const caches = new WeakMap<Renderer, Map<string, CacheEntry>>();
 const stats: TextureStats = { built: 0, evicted: 0, live: 0, bytes: 0 };
 
 export const textureStats = (): TextureStats => ({ ...stats });
+
+registerTextureUsage(() => ({ live: stats.live, bytes: stats.bytes }));
 
 // School identity has to survive Terminal's monochrome palette and every kind
 // of colour blindness, so each school also carries a shape (DESIGN a11y pass).

@@ -1,0 +1,484 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>Cast Adrift — a dice-built salvage run through a dead sector</title>
+    <meta
+      name="description"
+      content="Roll your whole dice deck, drag dice into ship systems, and fight your way out of a dead sector. Free in the browser and on Telegram."
+    />
+    <meta name="theme-color" content="#0B0F1A" />
+    <link rel="canonical" href="https://cast-adrift.vercel.app/" />
+    <link rel="icon" type="image/svg+xml" href="/brand/mark.svg" />
+    <link rel="apple-touch-icon" href="/brand/mark.svg" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Cast Adrift" />
+    <meta property="og:title" content="Cast Adrift" />
+    <meta
+      property="og:description"
+      content="Build a hand out of dice. Break through a dead sector."
+    />
+    <meta property="og:url" content="https://cast-adrift.vercel.app/" />
+    <meta property="og:image" content="https://cast-adrift.vercel.app/brand/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Cast Adrift" />
+    <meta
+      name="twitter:description"
+      content="Build a hand out of dice. Break through a dead sector."
+    />
+    <meta name="twitter:image" content="https://cast-adrift.vercel.app/brand/og.png" />
+
+    <style>
+      :root {
+        --bg: #0b0f1a;
+        --surface1: #10182a;
+        --surface2: #182238;
+        --line: #2a3853;
+        --text: #e8edf7;
+        --dim: #9aa8c0;
+        --faint: #6c7c99;
+        --accent: #7c5cff;
+        --amber: #e8b23a;
+        --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html {
+        color-scheme: dark;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .wrap {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 20px 0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+
+      .brand img {
+        width: 34px;
+        height: 34px;
+        display: block;
+      }
+
+      .langs {
+        display: flex;
+        gap: 4px;
+      }
+
+      .langs button {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--surface1);
+        color: var(--dim);
+        font: inherit;
+        font-size: 13px;
+        padding: 5px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .langs button[aria-pressed='true'] {
+        color: var(--text);
+        border-color: var(--accent);
+      }
+
+      .hero {
+        position: relative;
+        padding: 48px 0 40px;
+        text-align: center;
+        overflow: hidden;
+      }
+
+      .hero::before {
+        content: '';
+        position: absolute;
+        inset: -40% 10% auto 10%;
+        height: 420px;
+        background: radial-gradient(
+          closest-side,
+          rgba(124, 92, 255, 0.28),
+          rgba(124, 92, 255, 0)
+        );
+        pointer-events: none;
+      }
+
+      h1 {
+        position: relative;
+        margin: 0 0 10px;
+        font-size: clamp(38px, 8vw, 68px);
+        line-height: 1.05;
+        letter-spacing: -1.2px;
+      }
+
+      .hook {
+        position: relative;
+        margin: 0 auto 26px;
+        max-width: 640px;
+        font-size: clamp(17px, 3.4vw, 22px);
+        color: var(--dim);
+      }
+
+      .cta {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        justify-content: center;
+      }
+
+      .btn {
+        display: inline-block;
+        padding: 13px 24px;
+        border-radius: 12px;
+        font-weight: 650;
+        font-size: 16px;
+        text-decoration: none;
+        border: 1px solid transparent;
+      }
+
+      .btn-primary {
+        background: var(--accent);
+        color: #0b0f1a;
+      }
+
+      .btn-secondary {
+        background: var(--surface1);
+        border-color: var(--line);
+        color: var(--text);
+      }
+
+      .shots {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        padding: 8px 0 44px;
+      }
+
+      .shots figure {
+        margin: 0;
+      }
+
+      .shots img {
+        width: 100%;
+        height: auto;
+        display: block;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--surface1);
+      }
+
+      .shots figcaption {
+        margin-top: 8px;
+        font-size: 13px;
+        color: var(--faint);
+        text-align: center;
+      }
+
+      .features {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        padding-bottom: 48px;
+      }
+
+      .card {
+        background: var(--surface1);
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 18px;
+      }
+
+      .card h2 {
+        margin: 0 0 6px;
+        font-size: 17px;
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--dim);
+        font-size: 15px;
+      }
+
+      .facts {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        justify-content: center;
+        padding-bottom: 44px;
+        color: var(--faint);
+        font-size: 14px;
+      }
+
+      .facts b {
+        color: var(--amber);
+        font-weight: 650;
+      }
+
+      footer {
+        border-top: 1px solid var(--line);
+        padding: 22px 0 40px;
+        color: var(--faint);
+        font-size: 13px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px 18px;
+        justify-content: space-between;
+      }
+
+      footer a {
+        color: var(--dim);
+      }
+
+      @media (max-width: 720px) {
+        .shots,
+        .features {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div class="brand">
+          <img src="/brand/mark.svg" width="34" height="34" alt="" />
+          <span>Cast Adrift</span>
+        </div>
+        <nav class="langs" aria-label="Language">
+          <button type="button" data-lang="en" aria-pressed="true">EN</button>
+          <button type="button" data-lang="uk" aria-pressed="false">UK</button>
+          <button type="button" data-lang="ru" aria-pressed="false">RU</button>
+        </nav>
+      </header>
+
+      <section class="hero">
+        <h1>Cast Adrift</h1>
+        <p class="hook" data-t="hook">
+          Build a hand out of dice. Break through a dead sector.
+        </p>
+        <div class="cta">
+          <a class="btn btn-primary" id="play-web" href="/play" data-t="playWeb">
+            Play in the browser
+          </a>
+          <a
+            class="btn btn-secondary"
+            id="play-tg"
+            href="https://t.me/castadrift_bot/castadrift"
+            rel="noopener"
+            data-t="playTg"
+          >
+            Open in Telegram
+          </a>
+        </div>
+      </section>
+
+      <section class="shots">
+        <figure>
+          <img
+            src="/shots/menu.png"
+            width="390"
+            height="780"
+            alt="The Cast Adrift main menu with the captain level ring"
+            loading="lazy"
+          />
+          <figcaption data-t="shotMenu">The bridge</figcaption>
+        </figure>
+        <figure>
+          <img
+            src="/shots/battle.png"
+            width="390"
+            height="780"
+            alt="A battle: dice in the tray, ship system slots above"
+            loading="lazy"
+          />
+          <figcaption data-t="shotBattle">A resolution turn</figcaption>
+        </figure>
+        <figure>
+          <img
+            src="/shots/map.png"
+            width="390"
+            height="780"
+            alt="The sector map with branching nodes and fog"
+            loading="lazy"
+          />
+          <figcaption data-t="shotMap">The sector map</figcaption>
+        </figure>
+      </section>
+
+      <section class="features">
+        <article class="card">
+          <h2 data-t="f1t">Builds made of dice</h2>
+          <p data-t="f1b">
+            Seventy dice across seven schools, resonance sets, engravings and
+            modules. Your deck is your build.
+          </p>
+        </article>
+        <article class="card">
+          <h2 data-t="f2t">Choices that come back</h2>
+          <p data-t="f2b">
+            A hundred events with real consequences, thirty of them calling back
+            to something you did sectors ago.
+          </p>
+        </article>
+        <article class="card">
+          <h2 data-t="f3t">A 2.5-hour campaign</h2>
+          <p data-t="f3b">
+            Five sectors, five bosses, four endings — plus Drift, a daily seed
+            and fourteen contracts.
+          </p>
+        </article>
+      </section>
+
+      <p class="facts">
+        <span><b>70</b> <span data-t="factDice">dice</span></span>
+        <span><b>150</b> <span data-t="factPerks">perks</span></span>
+        <span><b>100</b> <span data-t="factEvents">events</span></span>
+        <span><b>220</b> <span data-t="factChart">star chart nodes</span></span>
+        <span><b>4</b> <span data-t="factEndings">endings</span></span>
+      </p>
+
+      <footer>
+        <span data-t="credits">Made by Bohdan Illiakov · MIT licensed</span>
+        <span>
+          <a href="/play" data-t="playWeb">Play in the browser</a>
+          ·
+          <a href="/privacy.html" data-t="privacy">Privacy</a>
+        </span>
+      </footer>
+    </div>
+
+    <script>
+      // No framework on purpose: the landing has to score in the nineties on a
+      // cold 4G load, so every byte here is inline and the whole page is one
+      // request plus three lazy screenshots.
+      var TG_APP_URL = 'https://t.me/castadrift_bot/castadrift';
+      var STRINGS = {
+        en: {},
+        uk: {
+          hook: 'Збери руку з кубів. Прорвись крізь мертвий сектор.',
+          playWeb: 'Грати у браузері',
+          playTg: 'Відкрити в Telegram',
+          shotMenu: 'Місток',
+          shotBattle: 'Хід розрахунку',
+          shotMap: 'Карта сектора',
+          f1t: 'Білди з кубів',
+          f1b: 'Сімдесят кубів семи шкіл, резонансні сети, гравіювання та модулі. Твоя колода — це твій білд.',
+          f2t: 'Наслідки повертаються',
+          f2b: 'Сто подій зі справжніми наслідками, тридцять із них згадують те, що ти зробив сектори тому.',
+          f3t: 'Кампанія на 2,5 години',
+          f3b: "П'ять секторів, п'ять босів, чотири фінали — плюс Дрейф, щоденний сід і чотирнадцять контрактів.",
+          factDice: 'кубів',
+          factPerks: 'перків',
+          factEvents: 'подій',
+          factChart: 'вузлів зоряної карти',
+          factEndings: 'фінали',
+          credits: 'Зроблено Богданом Ілляковим · ліцензія MIT',
+          privacy: 'Приватність',
+        },
+        ru: {
+          hook: 'Собери руку из кубов. Прорвись через мёртвый сектор.',
+          playWeb: 'Играть в браузере',
+          playTg: 'Открыть в Telegram',
+          shotMenu: 'Мостик',
+          shotBattle: 'Ход расчёта',
+          shotMap: 'Карта сектора',
+          f1t: 'Билды из кубов',
+          f1b: 'Семьдесят кубов семи школ, резонансные сеты, гравировки и модули. Твоя колода — это твой билд.',
+          f2t: 'Последствия возвращаются',
+          f2b: 'Сто событий с настоящими последствиями, тридцать из них ссылаются на то, что ты сделал секторы назад.',
+          f3t: 'Кампания на 2,5 часа',
+          f3b: 'Пять секторов, пять боссов, четыре финала — плюс Дрейф, ежедневный сид и четырнадцать контрактов.',
+          factDice: 'кубов',
+          factPerks: 'перков',
+          factEvents: 'событий',
+          factChart: 'узлов звёздной карты',
+          factEndings: 'финала',
+          credits: 'Сделано Богданом Илляковым · лицензия MIT',
+          privacy: 'Приватность',
+        },
+      };
+
+      var defaults = {};
+      document.querySelectorAll('[data-t]').forEach(function (node) {
+        defaults[node.dataset.t] = node.textContent.trim();
+      });
+      STRINGS.en = defaults;
+
+      function apply(lang) {
+        var dict = STRINGS[lang] || STRINGS.en;
+        document.querySelectorAll('[data-t]').forEach(function (node) {
+          var value = dict[node.dataset.t];
+          if (value) node.textContent = value;
+        });
+        document.documentElement.lang = lang;
+        document.querySelectorAll('.langs button').forEach(function (button) {
+          button.setAttribute(
+            'aria-pressed',
+            String(button.dataset.lang === lang),
+          );
+        });
+        try {
+          localStorage.setItem('ca.landing.lang', lang);
+        } catch (error) {
+          /* private mode */
+        }
+      }
+
+      document.querySelectorAll('.langs button').forEach(function (button) {
+        button.addEventListener('click', function () {
+          apply(button.dataset.lang);
+        });
+      });
+
+      document.getElementById('play-tg').href = TG_APP_URL;
+
+      var stored = null;
+      try {
+        stored = localStorage.getItem('ca.landing.lang');
+      } catch (error) {
+        /* private mode */
+      }
+      var guess = (navigator.language || 'en').slice(0, 2);
+      apply(stored || (STRINGS[guess] ? guess : 'en'));
+    </script>
+  </body>
+</html>

@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Cast Adrift — Privacy &amp; License</title>
+    <meta name="description" content="What Cast Adrift stores, why, and how to erase it." />
+    <meta name="theme-color" content="#0B0F1A" />
+    <link rel="icon" type="image/svg+xml" href="/brand/mark.svg" />
+    <style>
+      :root {
+        --bg: #0b0f1a;
+        --surface1: #10182a;
+        --line: #2a3853;
+        --text: #e8edf7;
+        --dim: #9aa8c0;
+        --accent: #7c5cff;
+      }
+      html {
+        color-scheme: dark;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.6;
+      }
+      main {
+        max-width: 720px;
+        margin: 0 auto;
+        padding: 40px 20px 64px;
+      }
+      h1 {
+        font-size: 32px;
+        margin: 0 0 6px;
+      }
+      h2 {
+        font-size: 19px;
+        margin: 32px 0 6px;
+      }
+      p,
+      li {
+        color: var(--dim);
+      }
+      a {
+        color: var(--accent);
+      }
+      code {
+        background: var(--surface1);
+        border: 1px solid var(--line);
+        border-radius: 5px;
+        padding: 1px 5px;
+        font-size: 13px;
+      }
+      .back {
+        display: inline-block;
+        margin-bottom: 22px;
+        color: var(--dim);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <a class="back" href="/">← Cast Adrift</a>
+      <h1>Privacy &amp; License</h1>
+      <p>Last updated: 30 July 2026.</p>
+
+      <h2>What is stored</h2>
+      <ul>
+        <li>
+          <strong>On your device</strong> — settings, meta progress and the
+          current run, in <code>localStorage</code>. Clearing site data erases
+          all of it.
+        </li>
+        <li>
+          <strong>In the cloud</strong> (Firebase Firestore) — the same meta
+          progress and one run snapshot, so a run continues on a second device;
+          leaderboard entries you submit; nothing else.
+        </li>
+        <li>
+          <strong>Identity</strong> — an anonymous Firebase account on the web.
+          Inside Telegram, your numeric Telegram id becomes the account id
+          (<code>tg:&lt;id&gt;</code>) and your first name is used as the
+          leaderboard display name. No email, no phone number, no contacts.
+        </li>
+        <li>
+          <strong>Diagnostics</strong> — anonymous gameplay counters (a run
+          started, a node cleared, a death) and, if the game crashes, the error
+          message with the screen it happened on and the build version. Rate
+          limited to a handful per session.
+        </li>
+      </ul>
+
+      <h2>What is never stored</h2>
+      <p>
+        No advertising identifiers, no cross-site tracking, no third-party
+        analytics beyond Firebase, and nothing is sold or shared. There is no
+        payment of any kind in this version.
+      </p>
+
+      <h2>Erasing your data</h2>
+      <p>
+        Clear the site data in your browser to remove the local copy. To remove
+        the cloud copy and any leaderboard entry, write to
+        <a href="mailto:bohdan@ranktracker.com">bohdan@ranktracker.com</a> from
+        the Telegram account in question, or send <code>/delete</code> to the
+        bot; the documents are deleted within seven days.
+      </p>
+
+      <h2>Licence</h2>
+      <p>
+        The game code is MIT licensed. Audio is used under the licences listed in
+        the in-game credits. Cast Adrift is a solo project by Bohdan Illiakov and
+        is not affiliated with Telegram.
+      </p>
+    </main>
+  </body>
+</html>
