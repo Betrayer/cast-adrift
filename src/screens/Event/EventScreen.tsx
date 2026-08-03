@@ -317,7 +317,7 @@ const EventRunner = ({
         }));
 
   return (
-    <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={460} w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>
@@ -406,7 +406,7 @@ const EventRunner = ({
 const EventFallback = () => {
   const { t } = useTranslation(["run"]);
   return (
-    <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={420}>
         <Stack align="center" gap="md">
           <Title order={3} c={tokens.text}>
@@ -458,10 +458,10 @@ export const EventScreen = () => {
   }, [event, forced]);
 
   if (position === null || map === null) {
-    return <Box bg={tokens.bg} mih="100dvh" />;
+    return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
   }
   if (!forced && nodeById(map).get(position) === undefined) {
-    return <Box bg={tokens.bg} mih="100dvh" />;
+    return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
   }
   if (resolved === null || event === null) {
     return <EventFallback />;

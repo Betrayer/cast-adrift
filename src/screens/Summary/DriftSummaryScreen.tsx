@@ -36,7 +36,7 @@ export const DriftSummaryScreen = () => {
   const daily = result?.mode === "daily";
 
   return (
-    <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={420} w="100%">
         <Stack gap="sm">
           <Title order={2} c={tokens.text} ta="center">

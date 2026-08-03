@@ -10,20 +10,23 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import { useReducedMotion } from '@mantine/hooks';
-import { useCallback, useMemo, useState } from 'react';
+import { lazy, Suspense, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import type { Application } from 'pixi.js';
 import { tokens } from '@/app/theme';
 import { progressWithinLevel } from '@/game/xp';
 import { useMetaStore } from '@/stores/metaStore';
 import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
 import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
-import { mountMenuBg } from '@/pixi/menuBg';
-import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { ResumeCard } from '@/screens/Menu/ResumeCard';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
+
+const MenuBackground = lazy(() =>
+  import('@/screens/Menu/MenuBackground').then((m) => ({
+    default: m.MenuBackground,
+  })),
+);
 
 interface MenuEntry {
   key: string;
@@ -59,11 +62,6 @@ export const MenuScreen = () => {
       ? osReducedMotion
       : reducedMotionSetting === 'on';
 
-  const mountBg = useMemo(
-    () => (app: Application) => mountMenuBg(app, { reducedMotion }),
-    [reducedMotion],
-  );
-
   const onSelect = useCallback(
     (entry: MenuEntry) => () => {
       if (entry.action === 'startCampaign') {
@@ -76,8 +74,10 @@ export const MenuScreen = () => {
   );
 
   return (
-    <Box pos="relative" mih="100dvh" bg={tokens.bg} style={{ overflow: 'hidden' }}>
-      <PixiCanvas mount={mountBg} />
+    <Box pos="relative" mih="var(--ca-vh)" bg={tokens.bg} style={{ overflow: 'hidden' }}>
+      <Suspense fallback={null}>
+        <MenuBackground reducedMotion={reducedMotion} />
+      </Suspense>
       <UnstyledButton
         pos="absolute"
         top={12}
@@ -104,7 +104,7 @@ export const MenuScreen = () => {
         pos="relative"
         align="center"
         justify="center"
-        mih="100dvh"
+        mih="var(--ca-vh)"
         gap="xl"
         p="lg"
         style={{ zIndex: 1, pointerEvents: 'none' }}

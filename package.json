@@ -1,11 +1,13 @@
 {
   "name": "cast-adrift",
   "private": true,
-  "version": "0.1.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && tsx scripts/buildSite.mts",
+    "size:check": "tsx scripts/sizeCheck.mts",
+    "i18n:translate": "tsx scripts/translate.mts",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",

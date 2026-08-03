@@ -58,6 +58,7 @@ import {
 import { MILESTONES } from "@/data/milestones";
 import { useSummaryStore } from "@/stores/summaryStore";
 import { captureRunSnapshot } from "@/game/run/snapshot";
+import { trackEvent } from "@/services/analytics";
 import { createStream, createStreams, deriveSeed } from "@/services/rng";
 import { clearRun, saveRunSnapshot } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
@@ -141,6 +142,12 @@ const settleContract = (win: boolean): { stars: number; newStars: number } => {
   if (def === undefined) return { stars: 0, newStars: 0 };
   const mask = goalStarsMask(def.goals, goalContextFor(win));
   const gained = useMetaStore.getState().recordContractStars(def.id, mask);
+  if (gained > 0) {
+    trackEvent({
+      name: "contract_star",
+      params: { contract: def.id, stars: countStars(mask) },
+    });
+  }
   return { stars: countStars(mask), newStars: gained };
 };
 
@@ -192,6 +199,16 @@ export const endRun = (win: boolean): void => {
     contractId: run.contractId,
     contractStars: contract?.stars ?? 0,
   });
+  if (!win) {
+    trackEvent({
+      name: "death",
+      params: {
+        sector: run.sector,
+        depth: depthFor(run.sectorIndex, run.depthRow),
+        cause: run.hull <= 0 ? "hull" : "abandon",
+      },
+    });
+  }
   useRunStore.setState({ active: false });
   if (isScoredMode(run.mode)) void finishScoredRun();
   useAppStore.getState().go(isScoredMode(run.mode) ? "driftSummary" : "summary");
@@ -483,6 +500,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   resetBarkMemory();
   useAppStore.getState().go("map");
   emitBark(`sectorEnter:${String(values.sector)}`);
+  trackEvent({ name: "run_start", params: { mode, ship: shipId } });
   autosaveRun();
 };
 
@@ -622,6 +640,14 @@ const finalizeNode = (
           ? { bosses: 1 }
           : {};
   run.bumpStats({ nodesCleared: 1, kills: result.kills ?? 0, ...typeDelta });
+  trackEvent({
+    name: "node_complete",
+    params: {
+      type: node.type,
+      sector: run.sector,
+      depth: depthFor(run.sectorIndex, run.depthRow),
+    },
+  });
   if (!run.visited.includes(node.id)) {
     useRunStore.setState({ visited: [...run.visited, node.id] });
   }
@@ -729,12 +755,20 @@ export const resolveRunBattle = (): void => {
   if (node === undefined) return;
 
   if (b.outcome === "defeat") {
+    trackEvent({
+      name: "battle_result",
+      params: { win: false, turns: b.turn, sector: run.sector },
+    });
     run.noteBattleTally(takeBattleTally());
     useBattleStore.getState().reset();
     endRun(false);
     return;
   }
 
+  trackEvent({
+    name: "battle_result",
+    params: { win: true, turns: b.turn, sector: run.sector },
+  });
   const kills = b.enemies.length;
   const battleScrap = b.scrap;
   const stolen = b.stolenScrap;
@@ -818,12 +852,20 @@ export const resolveEventBattle = (): void => {
   }
 
   if (b.outcome === "defeat") {
+    trackEvent({
+      name: "battle_result",
+      params: { win: false, turns: b.turn, sector: run.sector },
+    });
     run.noteBattleTally(takeBattleTally());
     useBattleStore.getState().reset();
     endRun(false);
     return;
   }
 
+  trackEvent({
+    name: "battle_result",
+    params: { win: true, turns: b.turn, sector: run.sector },
+  });
   const kills = b.enemies.length;
   const battleScrap = b.scrap;
   const stolen = b.stolenScrap;
@@ -989,6 +1031,10 @@ export const chooseEnding = (endingId: string): void => {
   useMetaStore.getState().unlockCodex(finalMemoryCodexId(endingId));
   useMetaStore.getState().recordEnding(endingId);
   useRunStore.setState({ memoriesUnlocked: 12 });
+  trackEvent({
+    name: "ending",
+    params: { id: endingId, ascension: run.ascension },
+  });
   useAppStore.getState().go("ending");
   autosaveRun();
 };

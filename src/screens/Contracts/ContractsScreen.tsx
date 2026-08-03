@@ -45,7 +45,7 @@ export const ContractsScreen = () => {
   }, []);
 
   return (
-    <Stack align="center" mih="100dvh" p="md" bg={tokens.bg} gap="sm">
+    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
         <Group justify="space-between">
           <Text fw={700} c={tokens.text}>
@@ -63,7 +63,7 @@ export const ContractsScreen = () => {
         </Group>
       </Paper>
 
-      <ScrollArea h="calc(100dvh - 120px)" w="100%" maw={460}>
+      <ScrollArea h="calc(var(--ca-vh) - 120px)" w="100%" maw={460}>
         <Stack gap="sm" pb="md">
           {CONTRACTS.map((def) => {
             const mask = contracts[def.id] ?? 0;

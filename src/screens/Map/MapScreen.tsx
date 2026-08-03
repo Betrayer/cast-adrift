@@ -2,6 +2,7 @@ import { Box, Button, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { mixHex } from "@/app/color";
+import { prefetchBattle } from "@/app/prefetch";
 import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
 import { ENEMY_BY_ID } from "@/data/enemies";
@@ -482,6 +483,15 @@ export const MapScreen = () => {
     if (map === null || position === null) go("menu");
   }, [map, position, go]);
 
-  if (map === null || position === null) return <Box bg={tokens.bg} mih="100dvh" />;
+  // Reading the map is the one unhurried moment in a run, so the battle chunk
+  // (Pixi + Matter) downloads here instead of at the node the player picks.
+  useEffect(() => {
+    const idle = window.requestIdleCallback?.bind(window) ?? window.setTimeout;
+    idle(() => {
+      prefetchBattle();
+    });
+  }, []);
+
+  if (map === null || position === null) return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
   return <MapView map={map} position={position} />;
 };

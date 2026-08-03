@@ -30,7 +30,7 @@ export const LevelUpCeremony = ({
     emitBark("levelUp");
     playSfx("levelUp");
     duckMusic(2200);
-    haptic("heavy");
+    haptic("levelUp");
   }, []);
 
   const cls = (name: string): string => (reduced ? "" : (styles[name] ?? ""));

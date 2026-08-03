@@ -171,7 +171,7 @@ export const ShopScreen = () => {
   const nextRerollCost = rerollCost(shop?.rerolls ?? 0);
 
   return (
-    <Stack mih="100dvh" p="md" gap="sm" bg={tokens.bg}>
+    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
       <Group justify="space-between">
         <Text fw={600} c={tokens.text}>
           {t("run:shop.title")}

@@ -22,7 +22,7 @@ export const FateInvocation = () => {
     const grew = fateUses > prevUses.current;
     prevUses.current = fateUses;
     if (!grew) return;
-    haptic('medium');
+    haptic('reveal');
     setVisible(true);
     const id = window.setTimeout(
       () => {

@@ -13,6 +13,7 @@ import {
 } from "@mantine/core";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { trackEvent } from "@/services/analytics";
 import { tokens } from "@/app/theme";
 import { ALL_DICE, DIE_BY_ID } from "@/data/dice";
 import { schools } from "@/data/schools";
@@ -114,7 +115,7 @@ export const HangarScreen = () => {
   const shopIds = filtered(ALL_DICE.map((d) => d.id));
 
   return (
-    <Stack align="center" mih="100dvh" p="md" bg={tokens.bg} gap="sm">
+    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
         <Group justify="space-between" mb="xs">
           <Text fw={700} c={tokens.text}>
@@ -166,7 +167,10 @@ export const HangarScreen = () => {
                     <Button
                       size="compact-xs"
                       disabled={shards < ship.price}
-                      onClick={() => { buyShip(ship.id, ship.price); }}
+                      onClick={() => {
+                        buyShip(ship.id, ship.price);
+                        trackEvent({ name: "meta_purchase", params: { kind: "ship" } });
+                      }}
                     >
                       {t("meta:hangar.shipBuy", { price: ship.price })}
                     </Button>

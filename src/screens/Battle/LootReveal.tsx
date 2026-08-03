@@ -36,7 +36,7 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
   const [revealed, setRevealed] = useState(reduced);
 
   useEffect(() => {
-    haptic('medium');
+    haptic('reveal');
     const def = DIE_BY_ID.get(dieId);
     if (def !== undefined) {
       playSfx(LOOT_SFX[def.rarity]);

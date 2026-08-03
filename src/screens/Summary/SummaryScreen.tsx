@@ -93,7 +93,7 @@ export const SummaryScreen = () => {
   }
 
   return (
-    <Stack align="center" justify="center" mih="100dvh" p="md" bg={tokens.bg}>
+    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={420} w="100%">
         <Stack gap="sm">
           <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">

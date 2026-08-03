@@ -30,5 +30,11 @@
     "owned": "Unlocked",
     "unlock": "Unlock",
     "price": "{{n}} shards"
+  },
+  "diagnostics": {
+    "version": "Build {{version}}",
+    "show": "Diagnostics ({{n}})",
+    "hide": "Hide diagnostics",
+    "clean": "No errors this session."
   }
 }

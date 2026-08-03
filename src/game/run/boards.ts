@@ -1,6 +1,7 @@
 import i18n from "i18next";
 import { isoWeekKey, runScore } from "@/game/run/modes";
 import { plausibility } from "@/game/run/plausibility";
+import { trackEvent } from "@/services/analytics";
 import {
   aroundMe,
   dailyBoardId,
@@ -101,6 +102,10 @@ export const finishScoredRun = async (): Promise<void> => {
       .getState()
       .recordDaily(captured.dailyDate, captured.score, null);
     summary.setPersonalBest(captured.score, false);
+    trackEvent({
+      name: "daily_played",
+      params: { date: captured.dailyDate, score: captured.score },
+    });
   }
 
   summary.setSubmit("pending");

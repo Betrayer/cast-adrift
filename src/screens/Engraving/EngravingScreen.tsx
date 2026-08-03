@@ -44,7 +44,7 @@ export const EngravingScreen = () => {
   const free = sockets - fitted.length;
 
   return (
-    <Stack align="center" mih="100dvh" p="md" bg={tokens.bg} gap="sm">
+    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
         <Group justify="space-between">
           <Text fw={700} c={tokens.text}>

@@ -20,7 +20,7 @@ export const RewardsScreen = () => {
     if (done) finishRewards();
   }, [done]);
 
-  if (pending === null) return <Box bg={tokens.bg} mih="100dvh" />;
+  if (pending === null) return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
   if (
     (pending.dieChoices ?? []).length > 0 ||
     (pending.moduleChoices ?? []).length > 0
@@ -35,5 +35,5 @@ export const RewardsScreen = () => {
   if (pending.dieDrop !== null) return <DieReward dieId={pending.dieDrop} />;
   if (pending.perkChoices.length > 0)
     return <PerkDraft choices={pending.perkChoices} />;
-  return <Box bg={tokens.bg} mih="100dvh" />;
+  return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
 };

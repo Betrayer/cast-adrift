@@ -44,7 +44,7 @@ export const InterstitialScreen = () => {
     <Stack
       align="center"
       justify="center"
-      mih="100dvh"
+      mih="var(--ca-vh)"
       p="lg"
       gap="lg"
       style={{ background: def.wash }}

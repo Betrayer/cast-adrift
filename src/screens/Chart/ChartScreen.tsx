@@ -14,6 +14,7 @@ import {
 } from "@/game/chart/engine";
 import { chartNodeLines, chartNodeTitle } from "@/game/chart/describe";
 import { useAppStore } from "@/stores/appStore";
+import { trackEvent } from "@/services/analytics";
 import { playSfx } from "@/services/audio";
 import { useMetaStore } from "@/stores/metaStore";
 import styles from "./ChartScreen.module.css";
@@ -140,6 +141,7 @@ export const ChartScreen = () => {
   const refund = (id: string): void => {
     if (!canDeallocate(id, picks)) return;
     if (!spendShards(RESPEC_SHARD_COST)) return;
+    trackEvent({ name: "meta_purchase", params: { kind: "respec" } });
     deallocatePick(id);
   };
 
@@ -147,7 +149,7 @@ export const ChartScreen = () => {
     kind === "keystone" ? 13 : kind === "notable" ? 10 : kind === "gate" ? 8 : 6;
 
   return (
-    <Box pos="relative" mih="100dvh" bg={tokens.bg} style={{ overflow: "hidden" }}>
+    <Box pos="relative" mih="var(--ca-vh)" bg={tokens.bg} style={{ overflow: "hidden" }}>
       <div
         className={styles.viewport}
         onPointerDown={onPointerDown}

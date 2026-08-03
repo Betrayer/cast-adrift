@@ -12,3 +12,4 @@ coverage
 docs
 CLAUDE.md
 sim-out
+scripts/.translate-cache.json
