@@ -82,16 +82,16 @@ export const BLACK_PERKS: readonly PerkDef[] = [
     mods: { chargeCapDelta: 3, hullMaxDelta: -3 },
   }),
   perk("obsidianCreed", "black", "rare", {
-    synergy: { kind: "school", school: "black" },
+    synergy: ["black"],
     traits: ["obsidianPact"],
     mods: { chargeCapDelta: 2 },
   }),
   perk("lastBreath", "black", "rare", {
-    synergy: { kind: "module", id: "escapePod" },
+    synergy: ["survival"],
     traits: ["escapePod"],
   }),
   perk("singularity", "black", "rare", {
-    synergy: { kind: "slot", slot: "reactor" },
+    synergy: ["reactor", "charge"],
     effects: [
       {
         on: "afterResolveSlot",

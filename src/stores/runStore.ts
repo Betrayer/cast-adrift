@@ -140,6 +140,7 @@ export interface RunValues {
   tide: number;
   jumpsSinceTide: number;
   flags: Record<string, FlagValue>;
+  counters: Record<string, number>;
   axis: number;
   seenEvents: string[];
   solvedPuzzles: string[];
@@ -179,6 +180,7 @@ export interface RunState extends RunValues {
   removeModule: (moduleId: string) => void;
   setFlag: (key: string, value?: FlagValue) => void;
   clearFlag: (key: string) => void;
+  bumpCounter: (key: string, delta: number) => void;
   addAxis: (n: number) => void;
   markEventSeen: (id: string) => void;
   markPuzzleSolved: (id: string) => void;
@@ -263,6 +265,7 @@ export const createInitialRunValues = (): RunValues => ({
   tide: 0,
   jumpsSinceTide: 0,
   flags: {},
+  counters: {},
   axis: 0,
   seenEvents: [],
   solvedPuzzles: [],
@@ -370,6 +373,12 @@ export const useRunStore = create<RunState>()((set, get) => ({
       }
       return { flags };
     });
+  },
+
+  bumpCounter: (key, delta) => {
+    set((s) => ({
+      counters: { ...s.counters, [key]: (s.counters[key] ?? 0) + delta },
+    }));
   },
 
   addAxis: (n) => {

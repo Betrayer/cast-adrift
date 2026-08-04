@@ -100,6 +100,7 @@ const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
   pendingSwap: 0,
   pendingStorm: 0,
   ascension: 0,
+  exceedCap: [],
   ...over,
 });
 

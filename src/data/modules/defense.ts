@@ -8,6 +8,7 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "uncommon",
     price: 60,
     tag: "defense",
+    tags: ["dodge", "engines"],
     traits: ["reflectDodge"],
   },
   {
@@ -26,6 +27,7 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "rare",
     price: 90,
     tag: "defense",
+    tags: ["survival"],
     traits: ["escapePod"],
   },
   {
@@ -35,6 +37,7 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 45,
     tag: "defense",
+    tags: ["reactor", "charge"],
     traits: ["overflowShield"],
   },
   {

@@ -23,7 +23,7 @@ import {
   resolveReducedMotion,
   useSettingsStore,
 } from "@/stores/settingsStore";
-import { useBattleStore } from "@/stores/battleStore";
+import { battleSnapshot, useBattleStore } from "@/stores/battleStore";
 import type { BattleState } from "@/stores/battleStore";
 import type {
   Beat,
@@ -1412,17 +1412,9 @@ export class BattleScene {
     sprite.visible = true;
 
     const fresh = useBattleStore.getState();
-    const snapshotLike = {
-      dice: fresh.dice,
-      slots: fresh.slots,
-      blockedSlots: fresh.blockedSlots,
-      shrunkSlots: fresh.shrunkSlots,
-      lockedDice: fresh.lockedDice,
-      turn: fresh.turn,
-      resonance: fresh.resonance,
-    };
+    const snapshot = battleSnapshot(fresh);
     const validSlots = activeSlotIds(fresh).filter((slotId) =>
-      canPlaceDie(snapshotLike, press.uid, slotId),
+      canPlaceDie(snapshot, press.uid, slotId),
     );
     const reserveValid = !fresh.dice.some((d) => d.state === "reserved");
 

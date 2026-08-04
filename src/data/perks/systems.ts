@@ -20,6 +20,7 @@ export const SYSTEM_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("hullWeld", "systems", "common", {
+    tags: ["repairBay"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -42,7 +43,7 @@ export const SYSTEM_PERKS: readonly PerkDef[] = [
   perk("pressureValve", "systems", "uncommon", { traits: ["overflowShield"] }),
   perk("resonanceTuner", "systems", "uncommon", { mods: { setCompleteCharge: 2 } }),
   perk("shockLance", "systems", "rare", {
-    synergy: { kind: "slot", slot: "spinal" },
+    synergy: ["spinal"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -52,7 +53,7 @@ export const SYSTEM_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("piercingRounds", "systems", "rare", {
-    synergy: { kind: "module", id: "piercer" },
+    synergy: ["pierce"],
     traits: ["firstHitPierce"],
     mods: { markBonusDelta: 1 },
   }),

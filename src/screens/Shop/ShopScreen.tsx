@@ -23,16 +23,15 @@ import {
   SHOP_REROLL_COST,
 } from "@/game/economy/prices";
 import {
-  flagShopConsequence,
   flagShopDiscount,
   generateShopModules,
   generateShopStock,
 } from "@/game/economy/shop";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { autosaveRun, completeNode } from "@/game/run/flow";
+import { enterShop } from "@/game/run/shopEntry";
 import { computeRunMods } from "@/game/run/runMods";
 import { createStream, deriveSeed } from "@/services/rng";
-import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 
 export const ShopScreen = () => {
@@ -58,24 +57,7 @@ export const ShopScreen = () => {
   const slots = moduleSlots(computeRunMods(perks, chartPicks).moduleSlotDelta);
 
   useEffect(() => {
-    if (nodeId === "") return;
-    const state = useRunStore.getState();
-    const current = state.shop;
-    if (current !== null && current.nodeId === nodeId) return;
-    const pct =
-      computeRunMods(state.perks, state.chartPicks, state.modules)
-        .shopDiscountPct +
-      flagShopDiscount(state.flags) -
-      ascensionMods(state.ascension).shopPricePct;
-    state.setShop({
-      nodeId,
-      rerolls: 0,
-      items: generateShopStock(seed, nodeId, 0, pct),
-      modules: generateShopModules(seed, nodeId, 0, pct),
-    });
-    const conseq = flagShopConsequence(state.flags);
-    if (conseq !== null) useNarrativeStore.getState().pushConsequence(conseq);
-    autosaveRun();
+    if (enterShop(nodeId)) autosaveRun();
   }, [nodeId, seed]);
 
   const buy = (index: number): void => {

@@ -14,7 +14,7 @@ import { restoreActionLog } from "@/game/run/actionLog";
 import { useAppStore } from "@/stores/appStore";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 1;
+export const RUN_SNAPSHOT_V = 2;
 
 export interface RunSnapshotV1 {
   v: number;
@@ -48,6 +48,7 @@ const pickRunValues = (s: RunState): RunValues => ({
   tide: s.tide,
   jumpsSinceTide: s.jumpsSinceTide,
   flags: { ...s.flags },
+  counters: { ...s.counters },
   axis: s.axis,
   seenEvents: [...s.seenEvents],
   solvedPuzzles: [...s.solvedPuzzles],

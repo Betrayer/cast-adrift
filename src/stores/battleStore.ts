@@ -40,7 +40,12 @@ import {
   type StreamStates,
 } from "@/services/rng";
 import { computeRunMods, runHasTrait } from "@/game/run/runMods";
-import { applyDefs, BattleCtx } from "@/game/effects";
+import { applyActions, BattleCtx, buildSources, emit } from "@/game/effects";
+import type {
+  ExceedCapGrant,
+  GrantKey,
+  ScheduledEffect,
+} from "@/game/effects/types";
 import { recordAction } from "@/game/run/actionLog";
 import { useRunStore, type BattleTally } from "@/stores/runStore";
 import type { School } from "@/types/content";
@@ -72,6 +77,8 @@ export interface BattleEncounter {
   mutators?: readonly string[];
   modules?: readonly string[];
   engravings?: EngravingMap;
+  flags?: readonly string[];
+  runCounters?: Readonly<Record<string, number>>;
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
@@ -105,6 +112,12 @@ export interface BattleValues {
   mutators: string[];
   modules: string[];
   engravings: EngravingMap;
+  flags: string[];
+  counters: Record<string, number>;
+  runCounters: Record<string, number>;
+  exceedCap: ExceedCapGrant[];
+  scheduled: ScheduledEffect[];
+  grants: Partial<Record<GrantKey, number>>;
   forcedTraits: PerkTrait[];
   chargeCap: number;
   sacrificePool: number;
@@ -212,6 +225,12 @@ export const createInitialBattleValues = (): BattleValues => ({
   mutators: [],
   modules: [],
   engravings: {},
+  flags: [],
+  counters: {},
+  runCounters: {},
+  exceedCap: [],
+  scheduled: [],
+  grants: {},
   forcedTraits: [],
   chargeCap: DEFAULT_CHARGE_CAP,
   sacrificePool: 0,
@@ -271,7 +290,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   debugNextRoll: null,
 });
 
-const toSnapshot = (s: BattleState): BattleSnapshot => ({
+export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   turn: s.turn,
   hull: s.hull,
   hullMax: s.hullMax,
@@ -286,6 +305,12 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   mutators: s.mutators,
   modules: s.modules,
   engravings: s.engravings,
+  flags: s.flags,
+  counters: s.counters,
+  runCounters: s.runCounters,
+  exceedCap: s.exceedCap,
+  scheduled: s.scheduled,
+  grants: s.grants,
   shipId: s.shipId,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
@@ -330,6 +355,12 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   mutators: snap.mutators ?? [],
   modules: snap.modules ?? [],
   engravings: snap.engravings ?? {},
+  flags: snap.flags ?? [],
+  counters: snap.counters ?? {},
+  runCounters: snap.runCounters ?? {},
+  exceedCap: snap.exceedCap ?? [],
+  scheduled: snap.scheduled ?? [],
+  grants: snap.grants ?? {},
   chargeCap: snap.chargeCap,
   sacrificePool: snap.sacrificePool,
   bloodReactorUsed: snap.bloodReactorUsed,
@@ -357,6 +388,11 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pierceUsed: snap.pierceUsed ?? false,
   outcome: snap.outcome,
 });
+
+const syncSnapshotFlags = (snapshot: BattleSnapshot, ctx: BattleCtx): void => {
+  if (ctx.flags.size === (snapshot.flags?.length ?? 0)) return;
+  snapshot.flags = [...ctx.flags];
+};
 
 const applyDebugRoll = (
   dice: RolledDie[],
@@ -451,15 +487,12 @@ const SET_SCHOOLS: readonly School[] = [
   "grey",
 ];
 
-export const grantsFromCensus = (
-  census: ResonanceCensus,
+export const grantsOf = (
+  snapshot: Pick<BattleSnapshot, "grants">,
 ): { rerollBase: number; reserveCap: number; freeNudges: number } => ({
-  rerollBase:
-    BASE_REROLL_SIZE +
-    (resonanceAtLeast(census, "grey", 2) ? 1 : 0) +
-    (resonanceAtLeast(census, "yellow", 6) ? 1 : 0),
-  reserveCap: resonanceAtLeast(census, "grey", 6) ? 2 : 1,
-  freeNudges: resonanceAtLeast(census, "prismatic", 2) ? 1 : 0,
+  rerollBase: BASE_REROLL_SIZE + (snapshot.grants?.rerollSize ?? 0),
+  reserveCap: 1 + (snapshot.grants?.reserve ?? 0),
+  freeNudges: snapshot.grants?.nudge ?? 0,
 });
 
 export const useBattleStore = create<BattleState>()((set, get) => ({
@@ -484,6 +517,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         mutators: encounter.mutators,
         modules: encounter.modules,
         engravings: encounter.engravings,
+        flags: encounter.flags,
+        runCounters: encounter.runCounters,
         hull: encounter.hull,
         hullMax: encounter.hullMax,
         chargeCap: encounter.chargeCap,
@@ -496,14 +531,11 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         disabledSlots: encounter.disabledSlots,
       },
     );
-    const grants = grantsFromCensus(snapshot.resonance);
     const perks = encounter.perks ?? [];
     const chartPicks = encounter.chartPicks ?? [];
     const modules = encounter.modules ?? [];
     const forcedTraits = encounter.forcedTraits ?? [];
     const mods = computeRunMods(perks, chartPicks, modules);
-    const rerollBase =
-      grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
     const passive = SHIP_BY_ID.get(shipId)?.passive;
     const scrapperScrap = passive?.kind === "scrapper" ? passive.scrap : 0;
     const singleCast =
@@ -519,6 +551,20 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const def = ENEMY_BY_ID.get(e.defId);
       return def?.boss === true || def?.miniboss === true;
     });
+    snapshot.scrap = Math.max(
+      0,
+      snapshot.scrap + mods.battleStartScrap + scrapperScrap,
+    );
+    snapshot.charge = Math.max(
+      0,
+      Math.min(
+        snapshot.chargeCap,
+        snapshot.charge + (encounter.startCharge ?? 0) + setCharge,
+      ),
+    );
+    const grants = grantsOf(snapshot);
+    const rerollBase =
+      grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
     set({
       ...createInitialBattleValues(),
       ...fromSnapshot(snapshot),
@@ -535,12 +581,11 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       modules: [...modules],
       engravings: encounter.engravings ?? {},
       forcedTraits: [...forcedTraits],
-      scrap: mods.battleStartScrap + scrapperScrap,
-      charge: Math.min(
-        snapshot.chargeCap,
-        Math.max(0, (encounter.startCharge ?? 0) + setCharge),
-      ),
-      rerollsLeft: singleCast ? 0 : 1 + Math.max(0, mods.extraRerolls),
+      rerollsLeft: singleCast
+        ? 0
+        : 1 +
+          Math.max(0, mods.extraRerolls) +
+          (snapshot.grants?.rerollUses ?? 0),
       rerollSize: rerollBase,
       rerollBase,
       reserveCap: grants.reserveCap + mods.reserveDelta,
@@ -558,20 +603,28 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
       if (!slotAllowedThisTurn(s, slotId)) return s;
-      if (!canPlaceDie(toSnapshot(s), uid, slotId)) return s;
+      if (!canPlaceDie(battleSnapshot(s), uid, slotId)) return s;
       const slot = s.slots[slotId];
       if (slot === undefined) return s;
       const die = s.dice.find((d) => d.uid === uid);
       if (die !== undefined) {
         recordAction(`place:${die.defId}:${String(die.value)}:${slotId}`);
       }
-      return {
-        dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, state: "placed" as const, slot: slotId } : d,
-        ),
-        slots: { ...s.slots, [slotId]: { ...slot, dieUid: uid } },
-        selectedDieUid: null,
+      const snapshot = battleSnapshot(s);
+      snapshot.dice = s.dice.map((d) =>
+        d.uid === uid ? { ...d, state: "placed" as const, slot: slotId } : d,
+      );
+      snapshot.slots = { ...s.slots, [slotId]: { ...slot, dieUid: uid } };
+      snapshot.enemies = structuredClone(s.enemies);
+      const placed = snapshot.dice.find((d) => d.uid === uid);
+      const ctx = new BattleCtx(snapshot, snapshot.flags);
+      ctx.payload = {
+        slot: slotId,
+        ...(placed === undefined ? {} : { die: placed }),
       };
+      emit(buildSources(snapshot), "place", ctx);
+      syncSnapshotFlags(snapshot, ctx);
+      return { ...fromSnapshot(snapshot), selectedDieUid: null };
     });
   },
 
@@ -780,14 +833,12 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     if (!s.dice.some((d) => d.defId === FATE_DIE_ID)) return;
     const roll = s.streams.fate.int(1, 100);
     const outcome: FateOutcome = fateOutcomeFor(roll);
-    const snapshot = toSnapshot(s);
-    const ctx = new BattleCtx(snapshot);
-    applyDefs(
-      [{ on: "battleStart", do: [...outcome.do] }],
-      "battleStart",
-      ctx,
-      null,
-    );
+    const snapshot = battleSnapshot(s);
+    snapshot.enemies = structuredClone(s.enemies);
+    snapshot.blockedSlots = [...s.blockedSlots];
+    const ctx = new BattleCtx(snapshot, snapshot.flags);
+    applyActions(outcome.do, ctx);
+    syncSnapshotFlags(snapshot, ctx);
     snapshot.charge = Math.max(0, Math.min(snapshot.chargeCap, snapshot.charge));
     snapshot.scrap = Math.max(0, snapshot.scrap);
     set({
@@ -871,7 +922,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       s.blackUsed + placed.filter((d) => d.school === "black").length;
     const blueUsed =
       s.blueUsed + placed.filter((d) => d.school === "blue").length;
-    const player = resolvePlayerPhase(toSnapshot(s));
+    const player = resolvePlayerPhase(battleSnapshot(s));
     let bundle: ResolutionBundle;
     if (player.next.outcome !== undefined) {
       bundle = {
@@ -945,6 +996,14 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     if (final.pendingDeepScan) {
       useRunStore.setState({ pendingDeepScan: true });
     }
+    const run = useRunStore.getState();
+    for (const key of final.flags ?? []) {
+      if (run.flags[key] === undefined) run.setFlag(key);
+    }
+    for (const [key, value] of Object.entries(final.runCounters ?? {})) {
+      const delta = value - (run.counters[key] ?? 0);
+      if (delta !== 0) run.bumpCounter(key, delta);
+    }
     const canReroll =
       finalPhase === "placement" &&
       !runHasTrait(s.perks, s.chartPicks, "singleCast", s.modules) &&
@@ -958,7 +1017,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       pendingDeepScan: false,
       phase: finalPhase,
       resolution: null,
-      rerollsLeft: canReroll ? 1 + extra : 0,
+      rerollsLeft: canReroll ? 1 + extra + (final.grants?.rerollUses ?? 0) : 0,
       rerollSize: s.rerollBase,
     });
   },
@@ -996,6 +1055,12 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   mutators: s.mutators,
   modules: s.modules,
   engravings: s.engravings,
+  flags: s.flags,
+  counters: s.counters,
+  runCounters: s.runCounters,
+  exceedCap: s.exceedCap,
+  scheduled: s.scheduled,
+  grants: s.grants,
   forcedTraits: s.forcedTraits,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,

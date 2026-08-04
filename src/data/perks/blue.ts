@@ -98,7 +98,7 @@ export const BLUE_PERKS: readonly PerkDef[] = [
     mods: { hullMaxDelta: 4, battleEndHeal: 1 },
   }),
   perk("glacierPact", "blue", "rare", {
-    synergy: { kind: "school", school: "blue" },
+    synergy: ["blue"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -111,12 +111,12 @@ export const BLUE_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("mirrorLattice", "blue", "rare", {
-    synergy: { kind: "module", id: "mirrorPlate" },
+    synergy: ["dodge"],
     traits: ["reflectDodge"],
     mods: { enginesThresholdDelta: 1 },
   }),
   perk("permafrost", "blue", "rare", {
-    synergy: { kind: "slot", slot: "shields" },
+    synergy: ["shields"],
     effects: [
       {
         on: "beforeResolveSlot",

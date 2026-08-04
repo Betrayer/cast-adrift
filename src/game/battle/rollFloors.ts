@@ -1,4 +1,4 @@
-import { resonanceAtLeast } from "@/game/battle/resonance";
+import { resonanceGrantActive } from "@/data/resonance";
 import type { ResonanceCensus, RolledDie } from "@/types/battle";
 
 export const applyRollFloors = (
@@ -6,8 +6,8 @@ export const applyRollFloors = (
   census: ResonanceCensus,
   stabilizer = false,
 ): void => {
-  const blueFloor = resonanceAtLeast(census, "blue", 2);
-  const blueAvg = resonanceAtLeast(census, "blue", 6);
+  const blueFloor = resonanceGrantActive(census.counts, "blueRollFloor");
+  const blueAvg = resonanceGrantActive(census.counts, "blueAverageFloor");
   if (!blueFloor && !blueAvg && !stabilizer) return;
   let avgUsed = false;
   let stabilizerUsed = false;

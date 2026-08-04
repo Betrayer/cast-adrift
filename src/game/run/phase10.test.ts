@@ -9,7 +9,9 @@ import {
 } from "@/data/engravings";
 import { fateOutcomeFor, FATE_TABLE } from "@/data/fate";
 import { ALL_MODULES, moduleSlots, MODULE_BY_ID } from "@/data/modules";
+import { moduleTags } from "@/data/modules/types";
 import { ALL_PERKS } from "@/data/perks";
+import type { ContentTag } from "@/data/tags";
 import { patternFor, spawnEnemy } from "@/game/battle/setup";
 import { rollModule } from "@/game/economy/rewards";
 import { generateShopModules } from "@/game/economy/shop";
@@ -155,14 +157,25 @@ describe("ascension A6–A10", () => {
 });
 
 describe("perk synergy tags", () => {
-  it("gives every rare a synergy that resolves", () => {
-    const engravingIds = new Set(ENGRAVINGS.map((e) => e.id));
+  it("gives every rare a synergy tag some content carries", () => {
+    const carried = new Set<ContentTag>();
+    for (const die of ALL_DICE) {
+      carried.add(die.school);
+      for (const tag of die.tags ?? []) carried.add(tag);
+    }
+    for (const def of ALL_MODULES) {
+      for (const tag of moduleTags(def)) carried.add(tag);
+    }
+    for (const def of ENGRAVINGS) {
+      for (const tag of def.tags ?? []) carried.add(tag);
+    }
+    for (const def of ALL_PERKS) {
+      for (const tag of def.tags ?? []) carried.add(tag);
+    }
     for (const perk of ALL_PERKS.filter((p) => p.rarity === "rare")) {
       const syn = perk.synergy;
       expect(syn).toBeDefined();
-      if (syn === undefined) continue;
-      if (syn.kind === "module") expect(MODULE_BY_ID.has(syn.id)).toBe(true);
-      if (syn.kind === "engraving") expect(engravingIds.has(syn.id)).toBe(true);
+      for (const tag of syn ?? []) expect(carried.has(tag)).toBe(true);
     }
   });
 });

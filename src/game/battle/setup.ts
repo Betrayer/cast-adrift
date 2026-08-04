@@ -4,7 +4,10 @@ import { dieHasGrant, type EngravingMap } from "@/data/engravings";
 import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies";
 import { SHIP_BY_ID, shipHasPassive, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
-import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
+import { computeCensus } from "@/game/battle/resonance";
+import { BattleCtx, buildSources, emit } from "@/game/effects";
+import { slotMatches } from "@/game/effects/evaluate";
+import type { ExceedCapGrant } from "@/game/effects/types";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import { scaleHpForTide } from "@/game/run/encounter";
 import { runHasTrait } from "@/game/run/runMods";
@@ -78,6 +81,8 @@ export interface BattleInit {
   mutators?: readonly string[];
   modules?: readonly string[];
   engravings?: EngravingMap;
+  flags?: readonly string[];
+  runCounters?: Readonly<Record<string, number>>;
   hull?: number;
   hullMax?: number;
   chargeCap?: number;
@@ -348,6 +353,10 @@ export const buildBattleSnapshot = (
     mutators: [...(init.mutators ?? [])],
     modules: [...(init.modules ?? [])],
     engravings: init.engravings ?? {},
+    flags: [...(init.flags ?? [])],
+    counters: {},
+    runCounters: { ...(init.runCounters ?? {}) },
+    exceedCap: [],
     shipId,
     dice,
     slots: applySlotOverrides(
@@ -388,6 +397,9 @@ export const buildBattleSnapshot = (
     applySpareLowest(dice);
   }
   applyObsidianPact(dice, perks, init.chartPicks ?? [], modules);
+  const ctx = new BattleCtx(snapshot, snapshot.flags);
+  emit(buildSources(snapshot), "battleStart", ctx);
+  snapshot.flags = [...ctx.flags];
   return snapshot;
 };
 
@@ -421,22 +433,30 @@ export const isDieLocked = (
     (l) => l.uid === uid && l.untilTurn >= snapshot.turn,
   );
 
+export const exceedCapGrantFor = (
+  snapshot: Pick<BattleSnapshot, "exceedCap">,
+  die: Pick<RolledDie, "school">,
+  slotId: SlotId,
+): ExceedCapGrant | undefined =>
+  (snapshot.exceedCap ?? []).find(
+    (grant) =>
+      (grant.school === undefined ||
+        die.school === grant.school ||
+        die.school === "prismatic") &&
+      (grant.slot === undefined || slotMatches(slotId, grant.slot)),
+  );
+
 export const dieFitsSlot = (
   snapshot: Pick<
     BattleSnapshot,
-    "resonance" | "shipId" | "shrunkSlots" | "turn"
+    "resonance" | "shipId" | "shrunkSlots" | "turn" | "exceedCap"
   >,
   die: Pick<RolledDie, "tier" | "school">,
   slot: Pick<SlotState, "cap">,
   slotId: SlotId,
 ): boolean => {
   if (die.tier <= effectiveCap(snapshot, slotId, slot)) return true;
-  if (
-    (die.school === "black" || die.school === "prismatic") &&
-    resonanceAtLeast(snapshot.resonance, "black", 2)
-  ) {
-    return true;
-  }
+  if (exceedCapGrantFor(snapshot, die, slotId) !== undefined) return true;
   return (
     snapshot.shipId !== undefined &&
     shipHasPassive(snapshot.shipId, "overload") &&
@@ -456,6 +476,7 @@ export const canPlaceDie = (
     | "resonance"
     | "shipId"
     | "engravings"
+    | "exceedCap"
   >,
   uid: string,
   slotId: SlotId,

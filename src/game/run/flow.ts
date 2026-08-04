@@ -34,6 +34,7 @@ import { computePerkMods } from "@/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
 import { rollPerkChoices, SKIP_SCRAP } from "@/game/run/perkDraft";
 import { recordAction, resetActionLog, syncActionStats } from "@/game/run/actionLog";
+import { emitRunHook } from "@/game/run/runEffects";
 import { finishScoredRun } from "@/game/run/boards";
 import { countStars, goalStarsMask, type GoalContext } from "@/game/run/goals";
 import {
@@ -43,7 +44,6 @@ import {
   depthFor,
   driftLoop,
   driftLoopHpPct,
-  DRIFT_TIDE_CAP,
   isScoredMode,
   isSectorExitRow,
   scoreBreakdown,
@@ -71,8 +71,11 @@ import type { SlotId } from "@/types/battle";
 import type { School } from "@/types/content";
 import type { FlagValue, ForcedBattle } from "@/types/events";
 
+import { BASE_TIDE_CAP, tideCapFor } from "@/game/run/tide";
+
+export { BASE_TIDE_CAP, tideCapFor };
+
 export const JUMPS_PER_TIDE = 4;
-export const BASE_TIDE_CAP = 3;
 export const STARTING_SCRAP = 0;
 export const MINIBOSS_PACKAGE_SCRAP: readonly [number, number] = [30, 40];
 
@@ -97,14 +100,6 @@ export interface NodeResult {
   kills?: number;
   deepScan?: boolean;
 }
-
-export const tideCapFor = (
-  ascension: number,
-  mode: RunMode = "campaign",
-): number =>
-  mode === "drift"
-    ? DRIFT_TIDE_CAP
-    : BASE_TIDE_CAP + ascensionMods(ascension).tideCapDelta;
 
 export const jumpsPerTideFor = (mutators: readonly string[]): number =>
   Math.max(1, JUMPS_PER_TIDE + computeMutatorMods(mutators).jumpsPerTideDelta);
@@ -307,6 +302,8 @@ const runBattleInit = (nodeKey: string) => {
     mutators: s.mutators,
     modules: s.modules,
     engravings: useMetaStore.getState().engravings,
+    flags: Object.keys(s.flags),
+    runCounters: s.counters,
     hull: s.hull,
     hullMax: s.hullMax,
     chargeCap: Math.max(
@@ -391,6 +388,14 @@ export const startEventBattle = (follow: ForcedBattle): void => {
 
 const routeToNode = (node: MapNode): void => {
   const go = useAppStore.getState().go;
+  emitRunHook("nodeEnter", {
+    node: {
+      nodeId: node.id,
+      nodeType: node.type,
+      sector: useRunStore.getState().sector,
+      row: node.row,
+    },
+  });
   switch (node.type) {
     case "battle":
     case "elite":

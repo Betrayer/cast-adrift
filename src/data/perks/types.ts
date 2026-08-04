@@ -1,5 +1,6 @@
-import type { EffectDef, SlotMatch } from "@/game/effects/types";
-import type { LocKey, Rarity, School } from "@/types/content";
+import type { ContentTag } from "@/data/tags";
+import type { EffectDef } from "@/game/effects/types";
+import type { LocKey, Rarity } from "@/types/content";
 
 export type PerkPool =
   | "red"
@@ -57,13 +58,7 @@ export interface PerkMods {
   moduleSlotDelta: number;
 }
 
-// Every rare perk must point at something the player can build toward
-// (DESIGN §9.4); `lint:content` refuses a rare without one.
-export type PerkSynergy =
-  | { kind: "school"; school: School }
-  | { kind: "module"; id: string }
-  | { kind: "engraving"; id: string }
-  | { kind: "slot"; slot: SlotMatch };
+export type PerkSynergy = readonly ContentTag[];
 
 export interface PerkDef {
   id: string;
@@ -75,6 +70,7 @@ export interface PerkDef {
   mods?: Partial<PerkMods>;
   traits?: readonly PerkTrait[];
   synergy?: PerkSynergy;
+  tags?: readonly ContentTag[];
 }
 
 export const ZERO_PERK_MODS: PerkMods = {

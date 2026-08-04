@@ -1,3 +1,4 @@
+import type { ContentTag } from "@/data/tags";
 import type { EffectDef } from "@/game/effects/types";
 
 export type LocKey = string;
@@ -34,6 +35,7 @@ export interface DieItemDef {
   faces?: readonly number[];
   growth?: DieGrowth;
   active?: DieActive;
+  tags?: readonly ContentTag[];
 }
 
 export type Intent =

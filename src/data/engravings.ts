@@ -1,4 +1,5 @@
 import { DIE_BY_ID } from "@/data/dice";
+import type { ContentTag } from "@/data/tags";
 import type { EffectDef } from "@/game/effects/types";
 import type { LocKey, Rarity } from "@/types/content";
 
@@ -17,12 +18,13 @@ export interface EngravingDef {
   price: number;
   effects?: readonly EffectDef[];
   grant?: EngravingGrant;
+  tags?: readonly ContentTag[];
 }
 
 const eng = (
   id: string,
   price: number,
-  body: Pick<EngravingDef, "effects" | "grant">,
+  body: Pick<EngravingDef, "effects" | "grant" | "tags">,
 ): EngravingDef => ({
   id,
   name: `content:engravings.${id}.name`,
@@ -33,6 +35,7 @@ const eng = (
 
 export const ENGRAVINGS: readonly EngravingDef[] = [
   eng("sting", 60, {
+    tags: ["weapons"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -42,6 +45,7 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("frost", 60, {
+    tags: ["shields"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -51,6 +55,7 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("vein", 60, {
+    tags: ["scrap"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -60,13 +65,15 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("echo", 90, {
+    tags: ["charge"],
     effects: [
       { on: "rolled", if: [{ c: "equalsLast" }], do: [{ a: "charge", n: 1 }] },
     ],
   }),
-  eng("anchor", 120, { grant: "lockImmune" }),
-  eng("wedge", 120, { grant: "blockImmune" }),
+  eng("anchor", 120, { grant: "lockImmune", tags: ["survival"] }),
+  eng("wedge", 120, { grant: "blockImmune", tags: ["control"] }),
   eng("flame", 90, {
+    tags: ["burn", "weapons"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -75,8 +82,9 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
       },
     ],
   }),
-  eng("edge", 120, { grant: "freeReroll" }),
+  eng("edge", 120, { grant: "freeReroll", tags: ["reroll"] }),
   eng("shade", 60, {
+    tags: ["reactor"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -85,8 +93,9 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
       },
     ],
   }),
-  eng("spring", 120, { grant: "freeNudge" }),
+  eng("spring", 120, { grant: "freeNudge", tags: ["reroll"] }),
   eng("lead", 90, {
+    tags: ["spinal"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -96,11 +105,13 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("spark", 90, {
+    tags: ["charge"],
     effects: [
       { on: "rolled", if: [{ c: "valueLt", n: 2 }], do: [{ a: "charge", n: 2 }] },
     ],
   }),
   eng("keel", 60, {
+    tags: ["engines"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -110,6 +121,7 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("lens", 60, {
+    tags: ["sensors"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -214,6 +226,7 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("loam", 90, {
+    tags: ["growth"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -223,6 +236,7 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("cinder", 120, {
+    tags: ["burn"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -232,6 +246,7 @@ export const ENGRAVINGS: readonly EngravingDef[] = [
     ],
   }),
   eng("mint", 90, {
+    tags: ["scrap"],
     effects: [
       {
         on: "afterResolveSlot",

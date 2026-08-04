@@ -52,7 +52,7 @@ export const YELLOW_PERKS: readonly PerkDef[] = [
     mods: { scrapMultPct: 20, hullMaxDelta: -2 },
   }),
   perk("mintCondition", "yellow", "rare", {
-    synergy: { kind: "school", school: "yellow" },
+    synergy: ["yellow"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -68,11 +68,11 @@ export const YELLOW_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("silentPartner", "yellow", "rare", {
-    synergy: { kind: "module", id: "tithePlate" },
+    synergy: ["scrap"],
     mods: { scrapMultPct: 30, shopDiscountPct: 10 },
   }),
   perk("veinTap", "yellow", "rare", {
-    synergy: { kind: "engraving", id: "mint" },
+    synergy: ["scrap"],
     mods: { scrapPerKill: 6, battleStartScrap: 6 },
   }),
 ];

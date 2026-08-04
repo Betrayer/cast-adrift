@@ -1,6 +1,8 @@
 import { LOOT_DICE } from "@/data/dice";
+import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
+import { emitRunHook } from "@/game/run/runEffects";
 import type { RngStream } from "@/services/rng";
 import { useMetaStore } from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
@@ -110,6 +112,7 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
 export const applyOutcome = (
   outcome: Outcome,
   stream: RngStream,
+  info?: EventOutcomeInfo,
 ): ApplyResult => {
   for (const effect of outcome.effects) applyEffect(effect, stream);
   if (outcome.codex !== undefined) {
@@ -118,5 +121,6 @@ export const applyOutcome = (
   if (outcome.consequence !== undefined) {
     useNarrativeStore.getState().pushConsequence(outcome.consequence);
   }
+  emitRunHook("eventOutcome", info === undefined ? {} : { event: info });
   return { follow: outcome.follow ?? null };
 };

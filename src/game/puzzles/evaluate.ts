@@ -155,6 +155,7 @@ const buildSnapshot = (
     sacrificePool: 0,
     bloodReactorUsed: false,
     burnDoubleUsed: false,
+    exceedCap: [],
     blockedSlots: [],
     shrunkSlots: [],
     lockedDice: [],

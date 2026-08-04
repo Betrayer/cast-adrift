@@ -276,24 +276,33 @@ const EventRunner = ({
     flags,
   };
 
-  const commit = (chosen: Outcome | null): void => {
+  const commit = (chosen: Outcome | null, optionIndex = -1): void => {
     if (chosen === null) {
       completeNode({ outcome: "cleared" });
       return;
     }
-    const result = applyOutcome(chosen, streams.loot);
+    const result = applyOutcome(chosen, streams.loot, {
+      eventId: event.id,
+      optionIndex,
+    });
     emitEventOutcome(chosen);
     setOutcome(chosen);
     setFollow(result.follow);
     setCheckOption(null);
   };
 
+  const optionIndexOf = (option: EventOption): number =>
+    event.options.findIndex((o) => o.id === option.id);
+
   const pickOption = (option: EventOption): void => {
     if (option.check !== undefined) {
       setCheckOption(option);
       return;
     }
-    commit(selectOutcome(option.outcomes ?? [], streams.outcome));
+    commit(
+      selectOutcome(option.outcomes ?? [], streams.outcome),
+      optionIndexOf(option),
+    );
   };
 
   const onContinue = (): void => {
@@ -393,7 +402,9 @@ const EventRunner = ({
           option={checkOption}
           faces={checkFaces}
           streams={streams}
-          onResolved={commit}
+          onResolved={(chosen) => {
+            commit(chosen, optionIndexOf(checkOption));
+          }}
           onCancel={() => {
             setCheckOption(null);
           }}

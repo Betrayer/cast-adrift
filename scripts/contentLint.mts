@@ -10,7 +10,6 @@ import { FRAGMENTS } from "../src/data/narrative/fragments";
 import { KEEPER_LINES } from "../src/data/narrative/keeperLines";
 import { CHART_ADJACENCY, CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
-import { MODULE_BY_ID } from "../src/data/modules";
 import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
@@ -26,7 +25,17 @@ import { PUZZLES } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
 import { SHIPS } from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
-import { HOOKS } from "../src/game/effects/types";
+import {
+  ACTION_NAMES,
+  COND_NAMES,
+  HOOKS,
+  RUN_ACTIONS as RUN_ACTION_NAMES,
+  RUN_HOOKS,
+  SUBJECT_CONDS as SUBJECT_COND_NAMES,
+  SUBJECT_HOOKS,
+} from "../src/game/effects/types";
+import { CONTENT_TAGS, isContentTag } from "../src/data/tags";
+import { moduleTags } from "../src/data/modules/types";
 import {
   difficultyReport,
   isAchievable,
@@ -55,7 +64,7 @@ import ruBattle from "../src/i18n/ru/battle.json" with { type: "json" };
 import enMeta from "../src/i18n/en/meta.json" with { type: "json" };
 import ukMeta from "../src/i18n/uk/meta.json" with { type: "json" };
 import ruMeta from "../src/i18n/ru/meta.json" with { type: "json" };
-import type { EffectDef } from "../src/game/effects/types";
+import type { Action, Cond, EffectDef } from "../src/game/effects/types";
 import type { GoalSpec } from "../src/game/run/goals";
 import type { EventOption, Outcome } from "../src/types/events";
 import type { Intent, PatternStep } from "../src/types/content";
@@ -63,7 +72,6 @@ import type { Intent, PatternStep } from "../src/types/content";
 type ContentNode = string | { [key: string]: ContentNode };
 
 const errors: string[] = [];
-const ENGRAVING_IDS = new Set(ENGRAVINGS.map((e) => e.id));
 
 // Flags the run sets outside the event pipeline (battle entry, prologue).
 const RUNTIME_FLAGS: readonly string[] = [
@@ -76,6 +84,58 @@ const RUNTIME_FLAGS: readonly string[] = [
   "beacon5",
 ];
 const hooks = new Set<string>(HOOKS);
+const actionNames = new Set<string>(ACTION_NAMES);
+const SUBJECT_HOOK_SET = new Set<string>(SUBJECT_HOOKS);
+const RUN_HOOK_SET = new Set<string>(RUN_HOOKS);
+const SUBJECT_CONDS = new Set<string>(SUBJECT_COND_NAMES);
+const RUN_ACTIONS = new Set<string>(RUN_ACTION_NAMES);
+const SLOT_ACTIONS = new Set<string>(["crit", "repeatSlot", "grow"]);
+const SLOT_HOOK_SET = new Set<string>(["beforeResolveSlot", "afterResolveSlot"]);
+
+const needsSubjectDie = (action: Action): boolean => {
+  if (action.a === "grow") return true;
+  if (
+    action.a !== "modDieValue" &&
+    action.a !== "setDieValue" &&
+    action.a !== "rerollDie"
+  ) {
+    return false;
+  }
+  return action.sel === undefined || action.sel.s === "subject";
+};
+
+const PENDING_VOCABULARY: Readonly<Record<string, string>> = {
+  rollStart: "R6",
+  place: "R5",
+  turnEnd: "R5",
+  enemyTurnEnd: "R6",
+  nodeEnter: "R3",
+  eventOutcome: "R7",
+  shopEnter: "R8",
+  any: "R5",
+  not: "R5",
+  firstOfTurn: "R5",
+  chargeAtLeast: "R5",
+  shieldAtLeast: "R5",
+  tideAtLeast: "R3",
+  counterAtLeast: "R5",
+  enemyHpPctLt: "R6",
+  enemyShielded: "R6",
+  enemyHasStatus: "R6",
+  enemyCountAtLeast: "R6",
+  targetIsBossOrMini: "R6",
+  hasTag: "R5",
+  countTag: "R5",
+  flag: "R7",
+  rerollDie: "R5",
+  counter: "R5",
+  schedule: "R5",
+  addTempDie: "R5",
+  removeTempDie: "R5",
+  setFlag: "R7",
+  overcap: "R5",
+};
+
 const content = enContent as unknown as ContentNode;
 
 const checkUniqueIds = (kind: string, ids: readonly string[]): void => {
@@ -113,13 +173,87 @@ const checkLocKey = (owner: string, key: string | undefined): void => {
   }
 };
 
-const checkEffects = (owner: string, effects: readonly EffectDef[] | undefined): void => {
+const referencedTags = new Set<string>();
+const carriedTags = new Set<string>();
+const hookUse = new Map<string, number>();
+const condUse = new Map<string, number>();
+const actionUse = new Map<string, number>();
+
+const bump = (map: Map<string, number>, key: string): void => {
+  map.set(key, (map.get(key) ?? 0) + 1);
+};
+
+const walkConds = (conds: readonly Cond[] | undefined): void => {
+  for (const cond of conds ?? []) {
+    bump(condUse, cond.c);
+    if (cond.c === "hasTag" || cond.c === "countTag") referencedTags.add(cond.tag);
+    else if (cond.c === "any") walkConds(cond.of);
+    else if (cond.c === "not") walkConds([cond.of]);
+  }
+};
+
+const walkActions = (actions: readonly Action[]): void => {
+  for (const action of actions) {
+    bump(actionUse, action.a);
+    if (!actionNames.has(action.a)) {
+      errors.push(`effects: unknown action "${action.a}"`);
+    }
+    if (action.a === "schedule") walkActions(action.do);
+    if ("perTag" in action && action.perTag !== undefined) {
+      referencedTags.add(action.perTag);
+    }
+  }
+};
+
+const condNeedsSubject = (cond: Cond): boolean => {
+  if (cond.c === "any") return cond.of.some(condNeedsSubject);
+  if (cond.c === "not") return condNeedsSubject(cond.of);
+  return SUBJECT_CONDS.has(cond.c);
+};
+
+type EffectOwnerKind = "die" | "loadout";
+
+const checkEffects = (
+  owner: string,
+  effects: readonly EffectDef[] | undefined,
+  ownerKind: EffectOwnerKind = "loadout",
+): void => {
   if (effects === undefined) return;
   for (const def of effects) {
     if (!hooks.has(def.on)) {
       errors.push(`${owner}: unknown hook "${def.on}"`);
     }
+    bump(hookUse, def.on);
+    walkConds(def.if);
+    walkActions(def.do);
+    const hasSubject = ownerKind === "die" || SUBJECT_HOOK_SET.has(def.on);
+    if (!hasSubject && (def.if ?? []).some(condNeedsSubject)) {
+      errors.push(
+        `${owner}: "${def.on}" carries a die condition but has no subject die`,
+      );
+    }
+    if (!hasSubject && def.do.some(needsSubjectDie)) {
+      errors.push(
+        `${owner}: "${def.on}" carries a die action but has no subject die`,
+      );
+    }
+    for (const action of def.do) {
+      if (SLOT_ACTIONS.has(action.a) && !SLOT_HOOK_SET.has(def.on)) {
+        errors.push(
+          `${owner}: action "${action.a}" only takes effect while a slot resolves, not on "${def.on}"`,
+        );
+      }
+      if (RUN_HOOK_SET.has(def.on) && !RUN_ACTIONS.has(action.a)) {
+        errors.push(
+          `${owner}: action "${action.a}" cannot fire on run hook "${def.on}"`,
+        );
+      }
+    }
   }
+};
+
+const checkTag = (owner: string, tag: string): void => {
+  if (!isContentTag(tag)) errors.push(`${owner}: unknown tag "${tag}"`);
 };
 
 checkUniqueIds(
@@ -149,9 +283,14 @@ for (const die of ALL_DICE) {
   }
   checkLocKey(`dice.${die.id}`, die.name);
   checkLocKey(`dice.${die.id}`, die.desc);
-  checkEffects(`dice.${die.id}`, die.effects);
+  checkEffects(`dice.${die.id}`, die.effects, "die");
   if (die.faces !== undefined && die.faces.length === 0) {
     errors.push(`dice: "${die.id}" has empty faces`);
+  }
+  carriedTags.add(die.school);
+  for (const tag of die.tags ?? []) {
+    checkTag(`dice.${die.id}`, tag);
+    carriedTags.add(tag);
   }
 }
 
@@ -306,15 +445,15 @@ for (const perk of ALL_PERKS) {
   // Every rare must point at something buildable (plan Task 4).
   if (perk.rarity === "rare") {
     const syn = perk.synergy;
-    if (syn === undefined) {
+    if (syn === undefined || syn.length === 0) {
       errors.push(`perks: rare "${perk.id}" has no synergy tag`);
-    } else if (syn.kind === "module" && !MODULE_BY_ID.has(syn.id)) {
-      errors.push(`perks: "${perk.id}" synergy references unknown module "${syn.id}"`);
-    } else if (syn.kind === "engraving" && !ENGRAVING_IDS.has(syn.id)) {
-      errors.push(
-        `perks: "${perk.id}" synergy references unknown engraving "${syn.id}"`,
-      );
+    } else {
+      for (const tag of syn) referencedTags.add(tag);
     }
+  }
+  for (const tag of perk.tags ?? []) {
+    checkTag(`perks.${perk.id}`, tag);
+    carriedTags.add(tag);
   }
 }
 
@@ -570,20 +709,29 @@ for (const def of ALL_MODULES) {
       `modules: "${def.id}" price ${String(def.price)} is outside the §9.3 band 40-90`,
     );
   }
+  for (const tag of moduleTags(def)) {
+    checkTag(`modules.${def.id}`, tag);
+    carriedTags.add(tag);
+  }
 }
 
 for (const def of ENGRAVINGS) {
   checkLocKey(`engravings.${def.id}`, def.name);
   checkLocKey(`engravings.${def.id}`, def.desc);
-  checkEffects(`engravings.${def.id}`, def.effects);
+  checkEffects(`engravings.${def.id}`, def.effects, "die");
   if (def.effects === undefined && def.grant === undefined) {
     errors.push(`engravings: "${def.id}" is a no-op`);
+  }
+  for (const tag of def.tags ?? []) {
+    checkTag(`engravings.${def.id}`, tag);
+    carriedTags.add(tag);
   }
 }
 
 for (const def of FATE_TABLE) {
   checkLocKey(`fate.${def.id}`, def.text);
   if (def.do.length === 0) errors.push(`fate: "${def.id}" has no actions`);
+  walkActions(def.do);
 }
 const fateCovered = new Set<number>();
 for (const band of FATE_TABLE) {
@@ -785,10 +933,52 @@ for (const locale of MACHINE_LOCALES) {
   }
 }
 
+const vocabularyRow = (
+  kind: string,
+  members: readonly string[],
+  use: Map<string, number>,
+): string => {
+  const unused = members.filter((m) => (use.get(m) ?? 0) === 0);
+  for (const member of unused) {
+    if (PENDING_VOCABULARY[member] === undefined) {
+      errors.push(
+        `vocabulary: ${kind} "${member}" is declared but no content uses it`,
+      );
+    }
+  }
+  const used = members.length - unused.length;
+  const pending = unused
+    .map((m) => `${m}→${PENDING_VOCABULARY[m] ?? "?"}`)
+    .join(" ");
+  return `  ${kind.padEnd(7)} ${String(used)}/${String(members.length)} used${
+    pending === "" ? "" : ` · pending ${pending}`
+  }`;
+};
+
+for (const tag of referencedTags) {
+  checkTag("tags", tag);
+  if (!carriedTags.has(tag)) {
+    errors.push(`tags: "${tag}" is referenced but carried by no content`);
+  }
+}
+
+const tagUse = new Map<string, number>();
+for (const tag of carriedTags) bump(tagUse, tag);
+
+const vocabularyReport = [
+  vocabularyRow("hooks", HOOKS, hookUse),
+  vocabularyRow("conds", COND_NAMES, condUse),
+  vocabularyRow("actions", ACTION_NAMES, actionUse),
+  vocabularyRow("tags", CONTENT_TAGS, tagUse),
+];
+
 if (errors.length > 0) {
   for (const error of errors) console.error(`lint:content: ${error}`);
   process.exit(1);
 }
+
+console.log("lint:content: effect vocabulary");
+for (const row of vocabularyReport) console.log(row);
 
 console.log(
   `lint:content: totals — dice ${String(ALL_DICE.length)}/70 · perks ${String(ALL_PERKS.length)}/150 · modules ${String(ALL_MODULES.length)}/50 · engravings ${String(ENGRAVINGS.length)}/40 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/25 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/54 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/54 · keeper ${String(KEEPER_LINES.length)}/40`,

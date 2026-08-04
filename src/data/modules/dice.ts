@@ -8,6 +8,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "uncommon",
     price: 65,
     tag: "dice",
+    tags: ["reroll"],
     mods: { extraRerolls: 1 },
   },
   {
@@ -53,6 +54,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 50,
     tag: "dice",
+    tags: ["reroll"],
     mods: { rerollSizeDelta: 1 },
   },
   {
@@ -62,6 +64,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "uncommon",
     price: 60,
     tag: "dice",
+    tags: ["charge", "reactor"],
     mods: { chargeCapDelta: 3 },
   },
   {
@@ -71,6 +74,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 50,
     tag: "dice",
+    tags: ["reactor"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -86,6 +90,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 45,
     tag: "dice",
+    tags: ["blue"],
     mods: { blueReserveDelta: 1 },
   },
   {
@@ -95,6 +100,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 45,
     tag: "dice",
+    tags: ["growth"],
     mods: { growthCapDelta: 1 },
   },
   {
@@ -104,6 +110,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "uncommon",
     price: 60,
     tag: "dice",
+    tags: ["charge"],
     effects: [
       {
         on: "rolled",
@@ -119,6 +126,7 @@ export const DICE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 50,
     tag: "dice",
+    tags: ["engines", "growth"],
     effects: [
       {
         on: "beforeResolveSlot",

@@ -21,7 +21,7 @@ export const PHASE5_PERKS: readonly PerkDef[] = [
     desc: "content:perksDesc.ricochet",
     rarity: "rare",
     pool: "red",
-    synergy: { kind: "slot", slot: "weapons" },
+    synergy: ["weapons"],
     traits: ["ricochet"],
   },
   {
@@ -166,7 +166,7 @@ export const PHASE5_PERKS: readonly PerkDef[] = [
     desc: "content:perksDesc.blood-reactor",
     rarity: "rare",
     pool: "black",
-    synergy: { kind: "slot", slot: "reactor" },
+    synergy: ["reactor", "charge"],
     traits: ["bloodReactor"],
   },
   {
@@ -189,7 +189,7 @@ export const PHASE5_PERKS: readonly PerkDef[] = [
     desc: "content:perksDesc.sacrifice",
     rarity: "rare",
     pool: "black",
-    synergy: { kind: "school", school: "black" },
+    synergy: ["black"],
     traits: ["sacrifice"],
   },
   {

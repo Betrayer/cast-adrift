@@ -23,6 +23,7 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "uncommon",
     price: 70,
     tag: "offense",
+    tags: ["pierce"],
     traits: ["firstHitPierce"],
   },
   {
@@ -32,6 +33,7 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 50,
     tag: "offense",
+    tags: ["burn"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -47,6 +49,7 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "uncommon",
     price: 60,
     tag: "offense",
+    tags: ["spinal"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -62,6 +65,7 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "common",
     price: 50,
     tag: "offense",
+    tags: ["sensors"],
     mods: { markBonusDelta: 2 },
   },
   {
@@ -125,6 +129,7 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
     rarity: "rare",
     price: 80,
     tag: "offense",
+    tags: ["crit"],
     effects: [
       {
         on: "beforeResolveSlot",

@@ -127,7 +127,7 @@ export const RED_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("detonator", "red", "rare", {
-    synergy: { kind: "slot", slot: "weapons" },
+    synergy: ["weapons"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -137,7 +137,7 @@ export const RED_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("magmaCore", "red", "rare", {
-    synergy: { kind: "school", school: "red" },
+    synergy: ["red"],
     effects: [
       {
         on: "beforeResolveSlot",
@@ -150,7 +150,7 @@ export const RED_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("infernoDoctrine", "red", "rare", {
-    synergy: { kind: "engraving", id: "flame" },
+    synergy: ["burn"],
     effects: [
       {
         on: "afterResolveSlot",

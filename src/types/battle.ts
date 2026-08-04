@@ -1,6 +1,11 @@
 import type { DieTier, Intent, School, SubsystemAura } from "@/types/content";
 import type { ShipId } from "@/data/ships";
 import type { Statuses } from "@/game/battle/statuses";
+import type {
+  ExceedCapGrant,
+  GrantKey,
+  ScheduledEffect,
+} from "@/game/effects/types";
 
 export type SlotId =
   | "weaponA"
@@ -27,6 +32,8 @@ export interface RolledDie {
   lastValue?: number;
   overCap?: boolean;
   activeUsed?: boolean;
+  temp?: boolean;
+  expiresTurn?: number;
 }
 
 export interface SlotState {
@@ -99,6 +106,12 @@ export interface BattleSnapshot {
   mutators?: string[];
   modules?: string[];
   engravings?: Readonly<Record<string, readonly string[]>>;
+  flags?: string[];
+  counters?: Record<string, number>;
+  runCounters?: Record<string, number>;
+  exceedCap: ExceedCapGrant[];
+  scheduled?: ScheduledEffect[];
+  grants?: Partial<Record<GrantKey, number>>;
   shipId?: ShipId;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;

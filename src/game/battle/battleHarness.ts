@@ -1,5 +1,6 @@
 import { DIE_BY_ID } from "@/data/dice";
 import { computeCensus } from "@/game/battle/resonance";
+import { BattleCtx, buildSources, emit } from "@/game/effects";
 import type {
   BattleSnapshot,
   DieState,
@@ -87,8 +88,18 @@ export const harnessSnap = (
   pendingSwap: 0,
   pendingStorm: 0,
   ascension: 0,
+  exceedCap: [],
   ...over,
 });
+
+export const startedSnap = (
+  dice: RolledDie[],
+  over: Partial<BattleSnapshot> = {},
+): BattleSnapshot => {
+  const snap = harnessSnap(dice, over);
+  emit(buildSources(snap), "battleStart", new BattleCtx(snap, snap.flags));
+  return snap;
+};
 
 export const place = (
   snap: BattleSnapshot,

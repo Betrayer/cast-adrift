@@ -70,7 +70,7 @@ export const GREEN_PERKS: readonly PerkDef[] = [
   perk("evergreen", "green", "uncommon", { mods: { growthCapDelta: 2 } }),
   perk("tideRoots", "green", "uncommon", { mods: { tideEffectDelta: -1 } }),
   perk("worldTree", "green", "rare", {
-    synergy: { kind: "school", school: "green" },
+    synergy: ["green"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -80,11 +80,11 @@ export const GREEN_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("overgrowthPact", "green", "rare", {
-    synergy: { kind: "engraving", id: "loam" },
+    synergy: ["growth"],
     mods: { growthCapDelta: 2, enginesThresholdDelta: 2, hullMaxDelta: -4 },
   }),
   perk("standingWave", "green", "rare", {
-    synergy: { kind: "slot", slot: "engines" },
+    synergy: ["engines"],
     effects: [
       {
         on: "beforeResolveSlot",

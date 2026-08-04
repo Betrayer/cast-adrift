@@ -49,7 +49,7 @@ export const GREY_PERKS: readonly PerkDef[] = [
   }),
   perk("shortHaul", "grey", "uncommon", { mods: { xpMultPct: 15 } }),
   perk("dryDock", "grey", "rare", {
-    synergy: { kind: "slot", slot: "repairBay" },
+    synergy: ["repairBay"],
     effects: [
       {
         on: "afterResolveSlot",
@@ -59,11 +59,11 @@ export const GREY_PERKS: readonly PerkDef[] = [
     ],
   }),
   perk("masterKey", "grey", "rare", {
-    synergy: { kind: "engraving", id: "edge" },
+    synergy: ["reroll"],
     mods: { extraRerolls: 2, rerollSizeDelta: 1 },
   }),
   perk("greyProtocol", "grey", "rare", {
-    synergy: { kind: "school", school: "grey" },
+    synergy: ["grey"],
     effects: [
       {
         on: "beforeResolveSlot",

@@ -1,5 +1,5 @@
 import { DIE_BY_ID } from "@/data/dice";
-import { resonanceAtLeast } from "@/game/battle/resonance";
+import { resonanceGrantActive } from "@/data/resonance";
 import type { ResonanceCensus, RolledDie } from "@/types/battle";
 
 export const canFlip = (die: RolledDie): boolean =>
@@ -11,7 +11,10 @@ export const canCopy = (
 ): boolean => {
   if (die.activeUsed === true) return false;
   if (DIE_BY_ID.get(die.defId)?.active === "copy") return true;
-  return die.school === "grey" && resonanceAtLeast(resonance, "grey", 4);
+  return (
+    die.school === "grey" &&
+    resonanceGrantActive(resonance.counts, "copyAdjacent")
+  );
 };
 
 export const flippedValue = (die: RolledDie): number => die.tier + 1 - die.value;
