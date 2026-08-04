@@ -11,6 +11,7 @@
   "defeat": "Porażka",
   "toMenu": "Do menu",
   "hp": "HP {{hp}} / {{max}}",
+  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Rezerwa",
   "reroll": "Reroll ({{n}})",
   "rerollConfirm": "Ponowne losowanie {{k}} / {{size}}",

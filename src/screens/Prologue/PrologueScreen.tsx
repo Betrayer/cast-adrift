@@ -1,6 +1,7 @@
 import { Button, Paper, Stack, Text, Title } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { PROLOGUE_BEATS } from '@/data/narrative/prologue';
 import { startPrologueBattle } from '@/game/run/flow';
@@ -26,8 +27,8 @@ export const PrologueScreen = () => {
   if (beat === undefined) return null;
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={460} w="100%">
+    <Screen centered>
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
           <Title order={4} c={tokens.dim}>
             {t('run:prologue.title')}
@@ -68,6 +69,6 @@ export const PrologueScreen = () => {
           </Button>
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

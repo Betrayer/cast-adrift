@@ -72,7 +72,8 @@
     "keyStormChaser": "Cazador de tormentas",
     "keyIronDoctrine": "La doctrina de hierro",
     "keyFatesFavorite": "El favorito del destino",
-    "keyPrismCascade": "Cascada Prism"
+    "keyPrismCascade": "Cascada Prism",
+    "selectHint": "Toca un nodo para ver qué hace."
   },
   "chartFx": {
     "hubBudget": "+1 presupuesto para hangares",

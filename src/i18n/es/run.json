@@ -25,7 +25,19 @@
     "abandon": "Abandonar la carrera",
     "previewMiniboss": "Minijefazo: {{name}}",
     "previewBoss": "Jefe: {{name}}",
-    "modules": "Módulos {{used}} / {{max}}"
+    "modules": "Módulos {{used}} / {{max}}",
+    "legend": "Leyenda",
+    "node": {
+      "battle": "Combate",
+      "elite": "Élite",
+      "miniboss": "Minijefe",
+      "shop": "Tienda",
+      "shipyard": "Astillero",
+      "event": "Evento",
+      "anomaly": "Anomalía",
+      "beacon": "Baliza",
+      "boss": "Jefe"
+    }
   },
   "event": {
     "title": "Señal",

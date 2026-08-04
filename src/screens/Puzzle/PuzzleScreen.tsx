@@ -1,7 +1,8 @@
-import { Box, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import {
@@ -557,15 +558,20 @@ const PuzzleRunner = ({
   const showLeaveWarning = !forced && interferenceImminent(anomalyStreak) && !solved;
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
-      <Group justify="space-between">
-        <Title order={3} c={tokens.text}>
-          {t("run:anomaly.title")}
-        </Title>
-        <Button size="compact-sm" variant="subtle" color="gray" onClick={done}>
-          {t("run:anomaly.leave")}
-        </Button>
-      </Group>
+    <Screen
+      width="wide"
+      header={
+        <Group justify="space-between">
+          <Title order={3} c={tokens.text}>
+            {t("run:anomaly.title")}
+          </Title>
+          <Button size="compact-sm" variant="subtle" color="gray" onClick={done}>
+            {t("run:anomaly.leave")}
+          </Button>
+        </Group>
+      }
+    >
+      <Stack gap="sm">
 
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between">
@@ -816,7 +822,8 @@ const PuzzleRunner = ({
           )}
         </Stack>
       )}
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };
 
@@ -830,8 +837,6 @@ export const PuzzleScreen = () => {
     return position === null ? null : pickPuzzle(position);
   });
 
-  if (puzzle === null || (!forced && position === null)) {
-    return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
-  }
+  if (puzzle === null || (!forced && position === null)) return <Screen />;
   return <PuzzleRunner puzzle={puzzle} nodeId={nodeId} forced={forced} />;
 };

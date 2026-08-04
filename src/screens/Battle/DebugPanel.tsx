@@ -188,7 +188,7 @@ export const DebugPanel = () => {
       p="xs"
       radius="md"
       withBorder
-      style={{ zIndex: 400 }}
+      style={{ zIndex: 'var(--z-dev)' }}
     >
       <Stack gap="xs">
         <Text size="xs" fw={700}>
@@ -203,7 +203,7 @@ export const DebugPanel = () => {
             if (v !== null) setEncounter(v);
           }}
           searchable
-          comboboxProps={{ zIndex: 1000, withinPortal: true }}
+          comboboxProps={{ zIndex: 'var(--z-dropdown)', withinPortal: true }}
         />
         <TextInput
           size="xs"
@@ -275,7 +275,7 @@ export const DebugPanel = () => {
           label="force intent"
           data={intentOptions}
           onChange={forceIntent}
-          comboboxProps={{ zIndex: 1000, withinPortal: true }}
+          comboboxProps={{ zIndex: 'var(--z-dropdown)', withinPortal: true }}
         />
         <Text size="xs" fw={700}>
           shipyard (bump Mk, then restart)

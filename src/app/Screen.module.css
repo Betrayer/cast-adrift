@@ -1,0 +1,98 @@
+.screen {
+  --screen-pad: 16px;
+  --screen-safe-bottom: var(--ca-safe-bottom);
+  position: relative;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: var(--ca-vh);
+  min-height: var(--ca-vh);
+  background: var(--ca-bg);
+  overflow: hidden;
+}
+
+.background {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+}
+
+.narrow {
+  max-width: 460px;
+}
+
+.wide {
+  max-width: 720px;
+}
+
+.full {
+  max-width: none;
+}
+
+.passThrough {
+  pointer-events: none;
+}
+
+.header,
+.footer {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.body {
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+.scroll {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.clip {
+  overflow-y: hidden;
+}
+
+.inner {
+  width: 100%;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
+.clip > .inner {
+  flex: 1 0 auto;
+  min-height: 0;
+}
+
+.centered .inner {
+  margin-block: auto;
+}
+
+.padded > .header,
+.padded > .footer {
+  padding: 12px var(--screen-pad);
+}
+
+.padded .inner {
+  padding: 12px var(--screen-pad);
+}
+
+@media (min-width: 900px) {
+  .screen {
+    --screen-pad: 24px;
+  }
+}

@@ -11,6 +11,7 @@
   "defeat": "Поразка",
   "toMenu": "У меню",
   "hp": "HP {{hp}}/{{max}}",
+  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Резерв",
   "reroll": "Перекид ({{n}})",
   "rerollConfirm": "Перекинути {{k}}/{{size}}",

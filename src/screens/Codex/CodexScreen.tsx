@@ -5,13 +5,13 @@ import {
   Divider,
   Group,
   Paper,
-  ScrollArea,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import {
   CODEX_GROUP_ORDER,
@@ -119,17 +119,20 @@ export const CodexScreen = () => {
   const go = useAppStore((s) => s.go);
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
-      <Group justify="space-between">
-        <Title order={3} c={tokens.text}>
-          {t("run:codex.title")}
-        </Title>
-        <Button size="compact-sm" variant="default" onClick={() => { go("menu"); }}>
-          {t("run:codex.back")}
-        </Button>
-      </Group>
-      <ScrollArea.Autosize mah="82dvh">
-        <Stack gap="md">
+    <Screen
+      width="wide"
+      header={
+        <Group justify="space-between">
+          <Title order={3} c={tokens.text}>
+            {t("run:codex.title")}
+          </Title>
+          <Button size="compact-sm" variant="default" onClick={() => { go("menu"); }}>
+            {t("run:codex.back")}
+          </Button>
+        </Group>
+      }
+    >
+      <Stack gap="md">
           <GlyphLegend />
           {CODEX_GROUP_ORDER.map((group) => {
             const entries = codexByGroup(group);
@@ -150,8 +153,7 @@ export const CodexScreen = () => {
               </Box>
             );
           })}
-        </Stack>
-      </ScrollArea.Autosize>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

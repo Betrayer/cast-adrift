@@ -1,5 +1,6 @@
 import { Circle, Container, Graphics, Rectangle, Sprite, Text } from "pixi.js";
 import type { Application, FederatedPointerEvent, Ticker } from "pixi.js";
+import { bodyRect, subscribeBodyRect } from "@/app/bands";
 import { mixHex } from "@/app/color";
 import { currentTheme, onThemeChange, tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
@@ -17,6 +18,8 @@ import {
   releaseDieTextures,
 } from "@/pixi/textures";
 import { clearPool, reportPool } from "@/pixi/perf";
+import { publishTrayAnchor } from "@/pixi/battle/anchors";
+import { computeBattleLayout, type BattleLayout, type Rect } from "@/pixi/battle/layout";
 import { easeOutQuad, linear, Tweens } from "@/pixi/tween";
 import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
 import {
@@ -41,18 +44,6 @@ export interface BattleSceneLabels {
   statusGlyph: (key: StatusKey) => string;
   jamLabel: string;
 }
-
-const SLOT_GRID: Partial<Record<SlotId, { row: number; col: number }>> = {
-  weaponA: { row: 0, col: 0 },
-  weaponB: { row: 0, col: 1 },
-  shieldsB: { row: 0, col: 1 },
-  shields: { row: 1, col: 0 },
-  engines: { row: 1, col: 1 },
-  sensors: { row: 2, col: 0 },
-  spinal: { row: 2, col: 0 },
-  repairBay: { row: 2, col: 0 },
-  reactor: { row: 2, col: 1 },
-};
 
 const MINI_DIE_SIZE = 40;
 const BEAT_GAP_NORMAL_MS = 180;
@@ -89,23 +80,6 @@ const statusTint = (key: StatusKey): string => {
       return schools.black.stroke;
   }
 };
-
-interface Rect {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
-
-interface Layout {
-  dieSize: number;
-  tray: { x: number; y: number }[];
-  slots: Partial<Record<SlotId, Rect>>;
-  reserve: Rect;
-  enemies: { x: number; y: number }[];
-  enemySize: number;
-  playerHit: { x: number; y: number };
-}
 
 interface SlotView {
   box: Graphics;
@@ -254,7 +228,7 @@ export class BattleScene {
   private readonly dragLayer = new Container();
   private readonly fxLayer = new Container();
 
-  private layout: Layout;
+  private layout: BattleLayout;
   private readonly slotViews = new Map<SlotId, SlotView>();
   private readonly enemyViews = new Map<string, EnemyView>();
   private readonly dieSprites = new Map<string, Sprite>();
@@ -280,6 +254,7 @@ export class BattleScene {
   private readonly mirrorIntents = new Set<string>();
   private readonly unsubscribe: () => void;
   private readonly unsubscribeTheme: () => void;
+  private readonly unsubscribeBands: () => void;
 
   constructor(app: Application, labels: BattleSceneLabels) {
     this.app = app;
@@ -311,6 +286,7 @@ export class BattleScene {
     if (initial.phase === "placement") playSfx("rollTumble");
     this.unsubscribe = useBattleStore.subscribe(this.onStoreChange);
     this.unsubscribeTheme = onThemeChange(this.onThemeSwitch);
+    this.unsubscribeBands = subscribeBodyRect(this.onResize);
     this.app.renderer.on("resize", this.onResize);
     this.app.ticker.add(this.tick);
     if (useBattleStore.getState().phase === "resolving") {
@@ -327,6 +303,7 @@ export class BattleScene {
     }
     this.unsubscribe();
     this.unsubscribeTheme();
+    this.unsubscribeBands();
     this.app.stage.position.set(0, 0);
     this.app.renderer.off("resize", this.onResize);
     this.app.ticker.remove(this.tick);
@@ -347,6 +324,7 @@ export class BattleScene {
     ]) {
       layer.destroy({ children: true });
     }
+    publishTrayAnchor(null);
     clearPool("battleFx");
     releaseDieTextures(this.app);
   }
@@ -358,65 +336,36 @@ export class BattleScene {
     this.beatTimeouts = [];
   }
 
-  private computeLayout(): Layout {
-    const w = this.app.screen.width;
-    const h = this.app.screen.height;
-    const margin = 16;
-    const gap = 12;
+  private boardRegion(): Rect {
+    const full: Rect = {
+      x: 0,
+      y: 0,
+      w: this.app.screen.width,
+      h: this.app.screen.height,
+    };
+    const published = bodyRect();
+    if (published.w <= 0 || published.h <= 0) return full;
+    const canvas = this.app.canvas.getBoundingClientRect();
+    if (canvas.width <= 0 || canvas.height <= 0) return full;
+    const x = Math.max(0, Math.min(published.x - canvas.left, full.w));
+    const y = Math.max(0, Math.min(published.y - canvas.top, full.h));
+    const w = Math.max(120, Math.min(published.w, full.w - x));
+    const h = Math.max(160, Math.min(published.h, full.h - y));
+    return { x, y, w, h };
+  }
+
+  private computeLayout(): BattleLayout {
     const state = useBattleStore.getState();
-    const diceCount = Math.max(state.dice.length, 1);
-    const dieSize = Math.max(
-      36,
-      Math.min(56, (w - 2 * margin - (diceCount - 1) * gap) / diceCount),
-    );
-
-    const trayY = h * 0.345;
-    const trayWidth = diceCount * dieSize + (diceCount - 1) * gap;
-    const trayStart = (w - trayWidth) / 2 + dieSize / 2;
-    const tray = Array.from({ length: diceCount }, (_, i) => ({
-      x: trayStart + i * (dieSize + gap),
-      y: trayY,
-    }));
-
-    const gridTop = h * 0.435;
-    const gridBottom = h * 0.745;
-    const cellW = (w - 2 * margin - gap) / 2;
-    const cellH = (gridBottom - gridTop - 2 * gap) / 3;
-    const slots: Partial<Record<SlotId, Rect>> = {};
-    for (const slotId of activeSlotIds(state)) {
-      const pos = SLOT_GRID[slotId];
-      if (pos === undefined) continue;
-      slots[slotId] = {
-        x: margin + pos.col * (cellW + gap),
-        y: gridTop + pos.row * (cellH + gap),
-        w: cellW,
-        h: cellH,
-      };
-    }
-
-    const reserve: Rect = {
-      x: margin,
-      y: gridBottom + 10,
-      w: cellW,
-      h: Math.max(46, cellH * 0.8),
-    };
-
-    const enemySize = 56;
-    const enemyCount = Math.max(state.enemies.length, 1);
-    const enemies = Array.from({ length: enemyCount }, (_, i) => ({
-      x: (w * (i + 1)) / (enemyCount + 1),
-      y: h * 0.25,
-    }));
-
-    return {
-      dieSize,
-      tray,
-      slots,
-      reserve,
-      enemies,
-      enemySize,
-      playerHit: { x: w / 2, y: h * 0.82 },
-    };
+    return computeBattleLayout({
+      board: this.boardRegion(),
+      diceCount: state.dice.length,
+      enemyCount: state.enemies.length,
+      maxSubsystems: state.enemies.reduce(
+        (most, enemy) => Math.max(most, enemy.subsystems.length),
+        0,
+      ),
+      slotIds: activeSlotIds(state),
+    });
   }
 
   private buildNumberPool(): void {
@@ -652,8 +601,20 @@ export class BattleScene {
     this.shakeMs = SHAKE_MS;
   }
 
+  private publishTrayAnchor(): void {
+    const canvas = this.app.canvas.getBoundingClientRect();
+    const band = this.layout.trayBand;
+    publishTrayAnchor({
+      x: canvas.left + band.x,
+      y: canvas.top + band.y,
+      w: band.w,
+      h: band.h,
+    });
+  }
+
   private rebuild(state: BattleState): void {
     this.layout = this.computeLayout();
+    this.publishTrayAnchor();
     this.buildSlots(state);
     this.buildReserve();
     this.buildEnemies(state);
@@ -687,7 +648,6 @@ export class BattleScene {
         text: this.labels.slotTitle(slotId),
         style: { fontFamily: PIXI_FONT_FAMILY, fontSize: 13, fill: tokens.dim },
       });
-      title.position.set(rect.x + 12, rect.y + 10);
       const cap = new Text({
         text: slot === undefined ? "" : this.labels.capLabel(slot.cap, slot.mk),
         style: {
@@ -696,7 +656,7 @@ export class BattleScene {
           fill: tokens.faint,
         },
       });
-      cap.position.set(rect.x + 12, rect.y + 30);
+      this.placeSlotLabels(title, cap, rect);
       const pips = new Graphics();
       this.slotsLayer.addChild(box, glow, title, cap, pips);
       const view: SlotView = {
@@ -711,6 +671,20 @@ export class BattleScene {
       this.slotViews.set(slotId, view);
       this.drawSlotBox(slotId, false, isSlotBlockedNow(state, slotId));
     }
+  }
+
+  private placeSlotLabels(title: Text, cap: Text, rect: Rect): void {
+    if (this.layout.compactCells) {
+      title.anchor.set(0, 0.5);
+      cap.anchor.set(1, 0.5);
+      title.position.set(rect.x + 12, rect.y + rect.h * 0.42);
+      cap.position.set(rect.x + rect.w - 12, rect.y + rect.h * 0.42);
+      return;
+    }
+    title.anchor.set(0, 0);
+    cap.anchor.set(0, 0);
+    title.position.set(rect.x + 12, rect.y + 10);
+    cap.position.set(rect.x + 12, rect.y + 30);
   }
 
   private drawSlotBox(
@@ -765,18 +739,31 @@ export class BattleScene {
     if (view === undefined || rect === undefined) return;
     const g = view.pips;
     g.clear();
-    const usable = rect.w - 24;
+    if (this.layout.compactCells) {
+      const track = rect.w - 24;
+      const filled = (track * Math.min(state.charge, CHARGE_PIP_COUNT)) /
+        CHARGE_PIP_COUNT;
+      g.roundRect(rect.x + 12, rect.y + rect.h - 7, track, 3, 2).fill({
+        color: tokens.faint,
+        alpha: 0.4,
+      });
+      if (filled > 0) {
+        g.roundRect(rect.x + 12, rect.y + rect.h - 7, filled, 3, 2).fill(
+          tokens.amber,
+        );
+      }
+      return;
+    }
+    const usable = rect.w - this.layout.slotDieSize - 34;
     const step = usable / CHARGE_PIP_COUNT;
+    const radius = Math.max(1.5, Math.min(4, step * 0.3));
     const y = rect.y + rect.h - 12;
     for (let i = 0; i < CHARGE_PIP_COUNT; i += 1) {
       const x = rect.x + 12 + step * i + step / 2;
       if (i < state.charge) {
-        g.circle(x, y, Math.min(4, step * 0.3)).fill(tokens.amber);
+        g.circle(x, y, radius).fill(tokens.amber);
       } else {
-        g.circle(x, y, Math.min(4, step * 0.3)).stroke({
-          color: tokens.faint,
-          width: 1,
-        });
+        g.circle(x, y, radius).stroke({ color: tokens.faint, width: 1 });
       }
     }
   }
@@ -807,7 +794,8 @@ export class BattleScene {
       text: this.labels.reserveTitle,
       style: { fontFamily: PIXI_FONT_FAMILY, fontSize: 13, fill: tokens.dim },
     });
-    title.position.set(rect.x + 12, rect.y + 10);
+    title.anchor.set(0, 0.5);
+    title.position.set(rect.x + 12, rect.y + rect.h / 2);
     this.slotsLayer.addChild(box, glow, title);
     this.reserveBox = box;
     this.reserveGlow = glow;
@@ -836,7 +824,6 @@ export class BattleScene {
         .lineTo(size * 0.26, -size * 0.18)
         .closePath()
         .fill(tokens.danger);
-      body.eventMode = "none";
       const flash = new Graphics()
         .roundRect(-size / 2, -size / 2, size, size, 12)
         .fill("#FFFFFF");
@@ -850,15 +837,12 @@ export class BattleScene {
       root.addChild(body, targetRing, flash);
 
       const enemyId = enemy.id;
-      root.eventMode = "static";
-      root.cursor = "pointer";
-      root.hitArea = new Rectangle(
-        -size * 0.85,
-        -size * 0.85,
-        size * 1.7,
-        size * 1.7,
-      );
-      root.on("pointertap", () => {
+      const hit = this.layout.enemyHit;
+      root.eventMode = "passive";
+      body.eventMode = "static";
+      body.cursor = "pointer";
+      body.hitArea = new Rectangle(hit.x, hit.y, hit.w, hit.h);
+      body.on("pointertap", () => {
         if (useBattleStore.getState().phase === "placement") {
           useBattleStore.getState().setTarget(enemyId);
         }
@@ -886,25 +870,26 @@ export class BattleScene {
         string,
         { chip: Container; ring: Graphics; hp: Text }
       >();
+      const chips = this.layout.subsystems;
       enemy.subsystems.forEach((sub, subIndex) => {
         const chip = new Container();
-        chip.position.set(size / 2 + 22, -size / 4 + subIndex * 32);
+        chip.position.set(chips.x, chips.y0 + subIndex * chips.pitch);
         const circle = new Graphics()
-          .circle(0, 0, 14)
+          .circle(0, 0, chips.radius * 0.78)
           .fill(enemyFill())
           .stroke({ color: tokens.amber, width: 1.5 });
         circle.eventMode = "none";
         const subId = sub.id;
         chip.eventMode = "static";
         chip.cursor = "pointer";
-        chip.hitArea = new Circle(0, 0, 20);
+        chip.hitArea = new Circle(0, 0, chips.radius);
         chip.on("pointertap", () => {
           if (useBattleStore.getState().phase === "placement") {
             useBattleStore.getState().setTarget(subId);
           }
         });
         const ring = new Graphics()
-          .circle(0, 0, 18)
+          .circle(0, 0, chips.radius)
           .stroke({ color: tokens.accent, width: 2 });
         ring.visible = false;
         ring.eventMode = "none";
@@ -941,8 +926,9 @@ export class BattleScene {
       if (view === undefined) continue;
       const alive = enemy.hp > 0;
       view.root.alpha = alive ? 1 : 0.25;
-      view.root.eventMode = alive ? "static" : "none";
-      view.root.cursor = alive ? "pointer" : "default";
+      view.root.eventMode = alive ? "passive" : "none";
+      view.body.eventMode = alive ? "static" : "none";
+      view.body.cursor = alive ? "pointer" : "default";
       view.targetRing.visible = alive && state.targetId === enemy.id;
 
       const size = this.layout.enemySize;
@@ -982,7 +968,7 @@ export class BattleScene {
     const rect = this.layout.slots[slotId];
     if (rect === undefined) return undefined;
     return {
-      x: rect.x + rect.w - MINI_DIE_SIZE / 2 - 12,
+      x: rect.x + rect.w - this.layout.slotDieSize / 2 - 10,
       y: rect.y + rect.h / 2,
     };
   }
@@ -990,9 +976,13 @@ export class BattleScene {
   private reserveAnchor(): { x: number; y: number } {
     const rect = this.layout.reserve;
     return {
-      x: rect.x + rect.w - MINI_DIE_SIZE / 2 - 12,
+      x: rect.x + rect.w - this.layout.slotDieSize / 2 - 10,
       y: rect.y + rect.h / 2,
     };
+  }
+
+  private slotDieScale(): number {
+    return this.layout.slotDieSize / MINI_DIE_SIZE;
   }
 
   private trayAnchor(
@@ -1098,18 +1088,23 @@ export class BattleScene {
         if (anchor === undefined) continue;
         sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
         sprite.position.set(anchor.x, anchor.y);
-        sprite.scale.set(1);
+        sprite.scale.set(this.slotDieScale());
         sprite.alpha = 1;
         sprite.visible = true;
         if (state.selectedDieUid === die.uid) {
-          this.syncSelectionRing(die.uid, anchor.x, anchor.y, MINI_DIE_SIZE);
+          this.syncSelectionRing(
+            die.uid,
+            anchor.x,
+            anchor.y,
+            this.layout.slotDieSize,
+          );
           visibleRings.add(die.uid);
         }
       } else if (die.state === "reserved") {
         const anchor = this.reserveAnchor();
         sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
         sprite.position.set(anchor.x, anchor.y);
-        sprite.scale.set(1);
+        sprite.scale.set(this.slotDieScale());
         sprite.alpha = 1;
         sprite.visible = true;
       } else if (die.state === "tray" || die.state === "locked") {
@@ -1305,14 +1300,8 @@ export class BattleScene {
     }
   };
 
-  private tumbleBox(): { x: number; y: number; w: number; h: number } {
-    const trayY = this.layout.tray[0]?.y ?? this.app.screen.height * 0.345;
-    return {
-      x: 12,
-      y: trayY - 130,
-      w: this.app.screen.width - 24,
-      h: 150,
-    };
+  private tumbleBox(): Rect {
+    return this.layout.tumble;
   }
 
   private maybeTumble(state: BattleState): void {
@@ -1529,7 +1518,7 @@ export class BattleScene {
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
     const cancelScale = this.tweens.to(
       sprite.scale,
-      { x: 1, y: 1 },
+      { x: this.slotDieScale(), y: this.slotDieScale() },
       120,
       easeOutQuad,
     );
@@ -1563,7 +1552,7 @@ export class BattleScene {
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
     const cancelScale = this.tweens.to(
       sprite.scale,
-      { x: 1, y: 1 },
+      { x: this.slotDieScale(), y: this.slotDieScale() },
       120,
       easeOutQuad,
     );

@@ -1,5 +1,9 @@
 {
   "appName": "Cast Adrift",
   "back": "Zurück",
-  "phaseHint": "Phase {{phase}}"
+  "phaseHint": "Phase {{phase}}",
+  "rotate": {
+    "title": "Gerät drehen",
+    "body": "Cast Adrift wird hochkant gespielt. Drehe zurück ins Hochformat, um den Lauf fortzusetzen."
+  }
 }

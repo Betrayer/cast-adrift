@@ -72,7 +72,8 @@
     "keyStormChaser": "Ловець штормів",
     "keyIronDoctrine": "Залізна доктрина",
     "keyFatesFavorite": "Улюбленець Фатуму",
-    "keyPrismCascade": "Призматичний каскад"
+    "keyPrismCascade": "Призматичний каскад",
+    "selectHint": "Торкнись вузла, щоб побачити, що він дає."
   },
   "chartFx": {
     "hubBudget": "+1 до бюджету ангара",

@@ -1,3 +1,7 @@
+.frame {
+  overflow: hidden;
+}
+
 .wash {
   position: absolute;
   inset: 0;

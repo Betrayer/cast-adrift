@@ -1,6 +1,7 @@
-import { Box, Button, Text } from "@mantine/core";
+import { Button, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { mixHex } from "@/app/color";
 import { prefetchBattle } from "@/app/prefetch";
 import { tokens } from "@/app/theme";
@@ -36,7 +37,6 @@ const ROW_GAP = 62;
 const TOP_PAD = 42;
 const BOT_PAD = 42;
 const MAP_H = TOP_PAD + BOSS_ROW * ROW_GAP + BOT_PAD;
-const MAX_STAGE_W = 440;
 
 const rowY = (row: number): number => TOP_PAD + (BOSS_ROW - row) * ROW_GAP;
 const nodeX = (node: MapNode): number =>
@@ -67,8 +67,8 @@ const ringFor = (
   }
 };
 
-const glyphColor = (node: MapNode): string => {
-  switch (node.type) {
+const glyphColorFor = (type: MapNode["type"]): string => {
+  switch (type) {
     case "elite":
     case "miniboss":
       return schools.red.text;
@@ -81,6 +81,20 @@ const glyphColor = (node: MapNode): string => {
       return tokens.dim;
   }
 };
+
+const glyphColor = (node: MapNode): string => glyphColorFor(node.type);
+
+const LEGEND_TYPES: readonly MapNode["type"][] = [
+  "battle",
+  "elite",
+  "miniboss",
+  "event",
+  "anomaly",
+  "shop",
+  "shipyard",
+  "beacon",
+  "boss",
+];
 
 // Each node type carries a stamp behind its glyph: a procedural silhouette
 // that reads at a glance and survives a monochrome theme.
@@ -147,6 +161,7 @@ const MapView = ({ map, position }: MapViewProps) => {
     y: rowY(positionRow),
   }));
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const stageRef = useRef<SVGSVGElement | null>(null);
   const prevTide = useRef(tide);
   const prevLimit = useRef(0);
   const [tidePulse, setTidePulse] = useState(false);
@@ -173,8 +188,9 @@ const MapView = ({ map, position }: MapViewProps) => {
 
   useEffect(() => {
     const el = scrollRef.current;
-    if (el === null) return;
-    const scale = Math.min(el.clientWidth, MAX_STAGE_W) / VIEW_W;
+    const stage = stageRef.current;
+    if (el === null || stage === null) return;
+    const scale = stage.getBoundingClientRect().width / VIEW_W;
     const targetY = rowY(positionRow) * scale;
     el.scrollTo({
       top: Math.max(0, targetY - el.clientHeight * 0.55),
@@ -245,44 +261,86 @@ const MapView = ({ map, position }: MapViewProps) => {
       : t("run:map.previewMiniboss", { name: t(def.name) });
   })();
 
-  return (
-    <div className={styles.root}>
-      <div className={styles.header}>
-        <div className={styles.headTitle}>
-          <Text fw={600} c={sectorDef(sector).accent}>
-            {t("run:map.title", {
-              n: sector,
-              name: t(sectorDef(sector).name),
-            })}
-          </Text>
-          <Text size="xs" c={tokens.faint}>
-            {t("run:map.depth", { cur: positionRow, max: ROW_COUNT })}
-          </Text>
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
-          <span
-            className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
-          >
-            {t("run:map.tide", { n: tide })}
-          </span>
-          {interference > 0 ? (
-            <span className={styles.tideChip ?? ""}>
-              {t("run:map.interference", { n: interference })}
-            </span>
-          ) : null}
-          {runModules.length > 0 ? (
-            <span className={styles.tideChip ?? ""} title={moduleNames}>
-              {t("run:map.modules", {
-                used: runModules.length,
-                max: moduleCap,
-              })}
-            </span>
-          ) : null}
-        </div>
+  const header = (
+    <div className={styles.header}>
+      <div className={styles.headTitle}>
+        <Text fw={600} c={sectorDef(sector).accent}>
+          {t("run:map.title", {
+            n: sector,
+            name: t(sectorDef(sector).name),
+          })}
+        </Text>
+        <Text size="xs" c={tokens.faint}>
+          {t("run:map.depth", { cur: positionRow, max: ROW_COUNT })}
+        </Text>
       </div>
+      <div className={styles.headChips}>
+        <span
+          className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
+        >
+          {t("run:map.tide", { n: tide })}
+        </span>
+        {interference > 0 ? (
+          <span className={styles.tideChip ?? ""}>
+            {t("run:map.interference", { n: interference })}
+          </span>
+        ) : null}
+        {runModules.length > 0 ? (
+          <span className={styles.tideChip ?? ""} title={moduleNames}>
+            {t("run:map.modules", {
+              used: runModules.length,
+              max: moduleCap,
+            })}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
 
-      <div className={styles.scroll} ref={scrollRef}>
+  const footer = (
+    <div className={styles.footer}>
+      {previewLabel === null ? null : (
+        <Text size="xs" c={schools.red.text} ta="center" fw={600}>
+          {previewLabel}
+        </Text>
+      )}
+      <Button
+        size="md"
+        fullWidth
+        disabled={!canJump}
+        onClick={onJump}
+        data-coach="jump"
+      >
+        {t("run:map.jump")}
+      </Button>
+      {selected === null ? (
+        <Text size="xs" c={tokens.faint} ta="center">
+          {t("run:map.jumpHint")}
+        </Text>
+      ) : null}
+      <Button
+        size="compact-xs"
+        variant="subtle"
+        color="gray"
+        onClick={abandonRun}
+      >
+        {t("run:map.abandon")}
+      </Button>
+    </div>
+  );
+
+  return (
+    <Screen
+      width="full"
+      pad={false}
+      header={header}
+      footer={footer}
+      bodyRef={scrollRef}
+      innerClassName={styles.body}
+    >
+      <div>
         <svg
+          ref={stageRef}
           className={styles.stage}
           viewBox={`0 0 ${String(VIEW_W)} ${String(MAP_H)}`}
           role="img"
@@ -441,36 +499,39 @@ const MapView = ({ map, position }: MapViewProps) => {
         </svg>
       </div>
 
-      <div className={styles.footer}>
-        {previewLabel === null ? null : (
-          <Text size="xs" c={schools.red.text} ta="center" fw={600}>
-            {previewLabel}
-          </Text>
-        )}
-        <Button
-          size="md"
-          fullWidth
-          disabled={!canJump}
-          onClick={onJump}
-          data-coach="jump"
-        >
-          {t("run:map.jump")}
-        </Button>
-        {selected === null ? (
-          <Text size="xs" c={tokens.faint} ta="center">
-            {t("run:map.jumpHint")}
+      <aside className={styles.sidePanel}>
+        <Text fw={600} c={tokens.text}>
+          {t("run:map.title", { n: sector, name: t(sectorDef(sector).name) })}
+        </Text>
+        <Text size="xs" c={tokens.dim}>
+          {t("run:map.depth", { cur: positionRow, max: ROW_COUNT })}
+        </Text>
+        <Text size="xs" c={tokens.dim}>
+          {t("run:map.tide", { n: tide })}
+        </Text>
+        {runModules.length > 0 ? (
+          <Text size="xs" c={tokens.dim}>
+            {moduleNames}
           </Text>
         ) : null}
-        <Button
-          size="compact-xs"
-          variant="subtle"
-          color="gray"
-          onClick={abandonRun}
-        >
-          {t("run:map.abandon")}
-        </Button>
-      </div>
-    </div>
+        <Text size="xs" c={tokens.faint}>
+          {t("run:map.legend")}
+        </Text>
+        {LEGEND_TYPES.map((type) => (
+          <div key={type} className={styles.legendRow}>
+            <span
+              className={styles.legendGlyph}
+              style={{ color: glyphColorFor(type) }}
+            >
+              {t(NODE_GLYPH[type])}
+            </span>
+            <Text size="xs" c={tokens.dim}>
+              {t(`run:map.node.${type}`)}
+            </Text>
+          </div>
+        ))}
+      </aside>
+    </Screen>
   );
 };
 
@@ -492,6 +553,6 @@ export const MapScreen = () => {
     });
   }, []);
 
-  if (map === null || position === null) return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
+  if (map === null || position === null) return <Screen />;
   return <MapView map={map} position={position} />;
 };

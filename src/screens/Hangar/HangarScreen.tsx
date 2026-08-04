@@ -5,7 +5,6 @@ import {
   Group,
   Paper,
   Progress,
-  ScrollArea,
   SegmentedControl,
   Select,
   Stack,
@@ -14,6 +13,7 @@ import {
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { trackEvent } from "@/services/analytics";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { ALL_DICE, DIE_BY_ID } from "@/data/dice";
 import { schools } from "@/data/schools";
@@ -115,8 +115,9 @@ export const HangarScreen = () => {
   const shopIds = filtered(ALL_DICE.map((d) => d.id));
 
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+    <Screen>
+      <Stack gap="sm">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between" mb="xs">
           <Text fw={700} c={tokens.text}>
             {t("meta:hangar.title")}
@@ -197,7 +198,7 @@ export const HangarScreen = () => {
         />
       </Paper>
 
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between">
           <Text size="sm" c={validation.over ? tokens.danger : tokens.dim}>
             {t("meta:hangar.budget", { used: validation.pts, max: budget })}
@@ -255,11 +256,11 @@ export const HangarScreen = () => {
         </Button>
       </Paper>
 
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
-        <Group gap="xs" mb="xs">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <Group gap="xs" mb="xs" grow wrap="wrap">
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={schoolFilter}
             onChange={(v) => { setSchoolFilter((v as School | "all") ?? "all"); }}
             data={SCHOOLS.map((s) => ({
@@ -269,7 +270,7 @@ export const HangarScreen = () => {
           />
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={rarityFilter}
             onChange={(v) => { setRarityFilter((v as Rarity | "all") ?? "all"); }}
             data={RARITIES.map((r) => ({
@@ -278,7 +279,6 @@ export const HangarScreen = () => {
             }))}
           />
         </Group>
-        <ScrollArea h={280}>
           <Stack gap={6}>
             {(tab === "build" ? collectionIds : shopIds).map((id) => {
               const def = DIE_BY_ID.get(id);
@@ -327,7 +327,6 @@ export const HangarScreen = () => {
               );
             })}
           </Stack>
-        </ScrollArea>
         <Divider my="xs" color={tokens.line} />
         <Group gap="xs" grow>
           <Button
@@ -347,6 +346,7 @@ export const HangarScreen = () => {
           </Button>
         </Group>
       </Paper>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

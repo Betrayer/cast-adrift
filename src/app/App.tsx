@@ -11,8 +11,9 @@ import { CoachMarks } from '@/components/CoachMarks';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
 import { MusicDirector } from '@/components/MusicDirector';
-import { NarrativeToasts } from '@/components/NarrativeToasts';
 import { PerfOverlay } from '@/components/PerfOverlay';
+import { RotateGate } from '@/components/RotateGate';
+import { ToastHost } from '@/components/ToastHost';
 import {
   resolveReducedMotion,
   useSettingsStore,
@@ -48,8 +49,9 @@ export const App = () => {
     <MantineProvider theme={mantine} forceColorScheme="dark">
       <Router />
       <MusicDirector />
-      <NarrativeToasts />
+      <ToastHost />
       <CoachMarks />
+      <RotateGate />
       <DevOverlay />
       <PerfOverlay />
       <DevPanel />

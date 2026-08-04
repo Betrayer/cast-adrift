@@ -3,13 +3,13 @@ import {
   Divider,
   Group,
   Paper,
-  ScrollArea,
   Slider,
   Stack,
   Text,
 } from "@mantine/core";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { fusionTarget } from "@/data/dice/fusion";
@@ -120,7 +120,21 @@ export const ShipyardScreen = () => {
   };
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
+    <Screen
+      width="wide"
+      footer={
+        <Button
+          size="md"
+          fullWidth
+          onClick={() => {
+            completeNode({ outcome: "cleared" });
+          }}
+        >
+          {t("run:shipyard.leave")}
+        </Button>
+      }
+    >
+      <Stack gap="sm">
       <Group justify="space-between">
         <Text fw={600} c={tokens.text}>
           {t("run:shipyard.title")}
@@ -146,7 +160,6 @@ export const ShipyardScreen = () => {
       ) : null}
 
       <Divider color={tokens.line} label={t("run:shipyard.systems")} />
-      <ScrollArea.Autosize mah={260}>
         <Stack gap={6}>
           {slotIds.map((slotId) => {
             const mk = mkLevels[slotId] ?? 1;
@@ -207,7 +220,6 @@ export const ShipyardScreen = () => {
             );
           })}
         </Stack>
-      </ScrollArea.Autosize>
 
       <Divider color={tokens.line} label={t("run:shipyard.fusionTitle")} />
       {fusable.length === 0 ? (
@@ -257,16 +269,7 @@ export const ShipyardScreen = () => {
       >
         {`${t("run:shipyard.repair")} +${String(repair)} (${String(repair * 2)})`}
       </Button>
-
-      <Button
-        size="md"
-        mt="auto"
-        onClick={() => {
-          completeNode({ outcome: "cleared" });
-        }}
-      >
-        {t("run:shipyard.leave")}
-      </Button>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { PERK_BY_ID } from "@/data/perks";
 import { progressWithinLevel } from "@/game/xp";
@@ -78,8 +79,8 @@ export const SummaryScreen = () => {
     .map((id) => PERK_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
 
-  if (leveled && barsDone && !ceremonyDone && result !== null) {
-    return (
+  const ceremony =
+    leveled && barsDone && !ceremonyDone && result !== null ? (
       <LevelUpCeremony
         fromLevel={result.fromLevel}
         toLevel={result.toLevel}
@@ -89,12 +90,11 @@ export const SummaryScreen = () => {
           setCeremonyDone(true);
         }}
       />
-    );
-  }
+    ) : null;
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={420} w="100%">
+    <Screen centered overlay={ceremony}>
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="sm">
           <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">
             {t(win ? "run:summary.victory" : "run:summary.defeat")}
@@ -152,6 +152,6 @@ export const SummaryScreen = () => {
           </Button>
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

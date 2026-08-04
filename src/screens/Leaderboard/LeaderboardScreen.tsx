@@ -3,7 +3,6 @@ import {
   Group,
   Loader,
   Paper,
-  ScrollArea,
   SegmentedControl,
   Stack,
   Text,
@@ -23,6 +22,7 @@ import {
   top,
   type RankedEntry,
 } from "@/services/leaderboards";
+import { Screen } from "@/app/Screen";
 import { useAppStore } from "@/stores/appStore";
 
 type Tab = "daily" | "drift" | "week";
@@ -99,9 +99,10 @@ export const LeaderboardScreen = () => {
   const myRank = ready ? loaded.myRank : null;
 
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
-        <Stack gap="xs">
+    <Screen
+      header={
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <Stack gap="xs">
           <Group justify="space-between">
             <Text fw={700} c={tokens.text}>
               {t("meta:board.title")}
@@ -141,15 +142,16 @@ export const LeaderboardScreen = () => {
               { value: "around", label: t("meta:board.viewAround") },
             ]}
           />
-          <Text size="xs" c={tokens.faint}>
-            {myRank === null
-              ? t("meta:board.noRank")
-              : t("meta:board.myRank", { rank: myRank })}
-          </Text>
-        </Stack>
-      </Paper>
-
-      <ScrollArea h="calc(var(--ca-vh) - 230px)" w="100%" maw={460}>
+            <Text size="xs" c={tokens.faint}>
+              {myRank === null
+                ? t("meta:board.noRank")
+                : t("meta:board.myRank", { rank: myRank })}
+            </Text>
+          </Stack>
+        </Paper>
+      }
+    >
+      <>
         {rows === null ? (
           <Group justify="center" py="xl">
             <Loader size="sm" color="accent" />
@@ -198,7 +200,7 @@ export const LeaderboardScreen = () => {
             })}
           </Stack>
         )}
-      </ScrollArea>
-    </Stack>
+      </>
+    </Screen>
   );
 };

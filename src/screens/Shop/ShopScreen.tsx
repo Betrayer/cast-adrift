@@ -4,13 +4,14 @@ import {
   Divider,
   Group,
   Paper,
-  ScrollArea,
+  SimpleGrid,
   Stack,
   Text,
 } from "@mantine/core";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ascensionMods } from "@/data/ascension";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
@@ -153,7 +154,15 @@ export const ShopScreen = () => {
   const nextRerollCost = rerollCost(shop?.rerolls ?? 0);
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
+    <Screen
+      width="wide"
+      footer={
+        <Button size="md" fullWidth onClick={leave}>
+          {t("run:shop.leave")}
+        </Button>
+      }
+    >
+      <Stack gap="sm">
       <Group justify="space-between">
         <Text fw={600} c={tokens.text}>
           {t("run:shop.title")}
@@ -172,7 +181,7 @@ export const ShopScreen = () => {
         {t(greeting.text)}
       </Text>
 
-      <Group gap="sm" grow>
+      <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="sm" maw={720}>
         {items.map((item, index) => {
           const def = DIE_BY_ID.get(item.defId);
           if (def === undefined) return null;
@@ -223,7 +232,7 @@ export const ShopScreen = () => {
             </Paper>
           );
         })}
-      </Group>
+      </SimpleGrid>
 
       <Divider
         color={tokens.line}
@@ -232,7 +241,7 @@ export const ShopScreen = () => {
           max: slots,
         })}
       />
-      <Group gap="sm" grow>
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" maw={720}>
         {moduleItems.map((item, index) => {
           const def = MODULE_BY_ID.get(item.moduleId);
           if (def === undefined) return null;
@@ -279,7 +288,7 @@ export const ShopScreen = () => {
             </Paper>
           );
         })}
-      </Group>
+      </SimpleGrid>
 
       <Button
         variant="default"
@@ -292,8 +301,7 @@ export const ShopScreen = () => {
       </Button>
 
       <Divider color={tokens.line} label={t("run:shop.sellTitle")} />
-      <ScrollArea.Autosize mah={200}>
-        <Group gap="xs">
+        <Group gap="xs" wrap="wrap">
           {deck.map((die) => {
             const def = DIE_BY_ID.get(die.defId);
             if (def === undefined) return null;
@@ -313,11 +321,7 @@ export const ShopScreen = () => {
             );
           })}
         </Group>
-      </ScrollArea.Autosize>
-
-      <Button size="md" mt="auto" onClick={leave}>
-        {t("run:shop.leave")}
-      </Button>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

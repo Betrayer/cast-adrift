@@ -72,7 +72,8 @@
     "keyStormChaser": "Łowca burz",
     "keyIronDoctrine": "Żelazna doktryna",
     "keyFatesFavorite": "Ulubieniec losu",
-    "keyPrismCascade": "Kaskada pryzmatów"
+    "keyPrismCascade": "Kaskada pryzmatów",
+    "selectHint": "Dotknij węzła, aby zobaczyć, co robi."
   },
   "chartFx": {
     "hubBudget": "+1 budżet na hangar",

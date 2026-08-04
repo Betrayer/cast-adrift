@@ -1,14 +1,7 @@
-import {
-  Badge,
-  Button,
-  Group,
-  Paper,
-  ScrollArea,
-  Stack,
-  Text,
-} from "@mantine/core";
+import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { useCallback, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
 import { MUTATOR_BY_ID } from "@/data/mutators";
@@ -45,26 +38,27 @@ export const ContractsScreen = () => {
   }, []);
 
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
-        <Group justify="space-between">
-          <Text fw={700} c={tokens.text}>
-            {t("meta:contracts.title")}
-          </Text>
-          <Button
-            size="xs"
-            variant="default"
-            onClick={() => {
-              go("modes");
-            }}
-          >
-            {t("common:back")}
-          </Button>
-        </Group>
-      </Paper>
-
-      <ScrollArea h="calc(var(--ca-vh) - 120px)" w="100%" maw={460}>
-        <Stack gap="sm" pb="md">
+    <Screen
+      header={
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <Group justify="space-between">
+            <Text fw={700} c={tokens.text}>
+              {t("meta:contracts.title")}
+            </Text>
+            <Button
+              size="xs"
+              variant="default"
+              onClick={() => {
+                go("modes");
+              }}
+            >
+              {t("common:back")}
+            </Button>
+          </Group>
+        </Paper>
+      }
+    >
+      <Stack gap="sm">
           {CONTRACTS.map((def) => {
             const mask = contracts[def.id] ?? 0;
             return (
@@ -133,8 +127,7 @@ export const ContractsScreen = () => {
               </Paper>
             );
           })}
-        </Stack>
-      </ScrollArea>
+      </Stack>
 
       <ActiveRunGuard
         opened={pending !== null}
@@ -147,6 +140,6 @@ export const ContractsScreen = () => {
           if (id !== null) startContractRun(id);
         }}
       />
-    </Stack>
+    </Screen>
   );
 };

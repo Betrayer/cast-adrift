@@ -25,7 +25,7 @@ export const BossIntro = () => {
   const subsystems = state?.subsystems ?? [];
 
   return (
-    <Overlay backgroundOpacity={0.88} color={tokens.bg} blur={3} zIndex={7}>
+    <Overlay backgroundOpacity={0.88} color={tokens.bg} blur={3} zIndex="var(--z-modal)">
       <Stack align="center" justify="center" h="100%" gap="lg" p="lg">
         <Text className={styles.kicker} c={tokens.danger}>
           {t(def.boss === true ? 'battle:intro.boss' : 'battle:intro.miniboss')}

@@ -25,7 +25,19 @@
     "abandon": "Abandonner la course",
     "previewMiniboss": "Mini-boss : {{name}}",
     "previewBoss": "Boss : {{name}}",
-    "modules": "Modules {{used}} / {{max}}"
+    "modules": "Modules {{used}} / {{max}}",
+    "legend": "Légende",
+    "node": {
+      "battle": "Combat",
+      "elite": "Élite",
+      "miniboss": "Mini-boss",
+      "shop": "Boutique",
+      "shipyard": "Chantier",
+      "event": "Événement",
+      "anomaly": "Anomalie",
+      "beacon": "Balise",
+      "boss": "Boss"
+    }
   },
   "event": {
     "title": "Signal",

@@ -1,6 +1,7 @@
-import { Box, Button, Group, Overlay, Stack, Text, Title } from '@mantine/core';
+import { Button, Group, Overlay, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { LootReveal } from '@/screens/Battle/LootReveal';
 import { useLootStore } from '@/stores/lootStore';
 import type { TFunction } from 'i18next';
@@ -131,7 +132,7 @@ const StatusCard = () => {
   const spendable = phase === 'placement' && !rerollMode;
 
   return (
-    <div className={styles.statusCard}>
+    <div className={styles.statusCard} data-band="status">
       <div className={styles.statusLeft}>
         <Text size="sm" c={tokens.text}>
           {t('battle:hull', { hp: hull, max: hullMax })}
@@ -152,14 +153,7 @@ const StatusCard = () => {
           {t('battle:shield', { n: shield })}
         </span>
         {interference > 0 ? (
-          <span
-            className={styles.pill}
-            style={{
-              borderColor: tokens.danger,
-              color: tokens.danger,
-              background: 'rgba(240,120,110,0.12)',
-            }}
-          >
+          <span className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}>
             {t('battle:interference', { n: interference })}
           </span>
         ) : null}
@@ -205,12 +199,16 @@ const StatusCard = () => {
   );
 };
 
+const COMPACT_ENEMY_COUNT = 3;
+
 const EnemyChips = () => {
   const { t } = useTranslation(['battle', 'content']);
   const enemies = useBattleStore((s) => s.enemies);
   const targetId = useBattleStore((s) => s.targetId);
+  const setTarget = useBattleStore((s) => s.setTarget);
+  const compact = enemies.length >= COMPACT_ENEMY_COUNT;
   return (
-    <div className={styles.enemyRow}>
+    <div className={styles.enemyRow} data-band="enemies">
       {enemies.map((enemy) => {
         const def = ENEMY_BY_ID.get(enemy.defId);
         if (def === undefined) return null;
@@ -221,15 +219,31 @@ const EnemyChips = () => {
         return (
           <div
             key={enemy.id}
-            className={`${styles.enemyChip ?? ''} ${targeted ? styles.enemyChipTargeted ?? '' : ''
-              }`}
+            role="button"
+            tabIndex={0}
+            className={`${styles.enemyChip ?? ''} ${compact ? styles.enemyChipCompact ?? '' : ''} ${targeted ? styles.enemyChipTargeted ?? '' : ''}`}
             style={{ opacity: enemy.hp > 0 ? 1 : 0.45 }}
+            onClick={() => {
+              if (enemy.hp > 0) setTarget(enemy.id);
+            }}
+            onKeyDown={(event) => {
+              if (event.key !== 'Enter' && event.key !== ' ') return;
+              if (enemy.hp > 0) setTarget(enemy.id);
+            }}
           >
-            <Text size="sm" fw={600} c={tokens.text}>
+            <Text
+              size={compact ? 'xs' : 'sm'}
+              fw={600}
+              c={tokens.text}
+              className={styles.enemyName}
+            >
               {t(def.name)}
             </Text>
             <Text size="xs" c={tokens.dim}>
-              {t('battle:hp', { hp: enemy.hp, max: enemy.hpMax })}
+              {t(compact ? 'battle:hpShort' : 'battle:hp', {
+                hp: enemy.hp,
+                max: enemy.hpMax,
+              })}
               {enemy.shield > 0
                 ? ` · ${t('battle:shield', { n: enemy.shield })}`
                 : ''}
@@ -290,9 +304,8 @@ const ResonanceChips = () => {
   );
 };
 
-const NudgeStrip = () => {
+const DieControls = () => {
   const { t } = useTranslation(['battle', 'content']);
-  const phase = useBattleStore((s) => s.phase);
   const charge = useBattleStore((s) => s.charge);
   const freeNudges = useBattleStore((s) => s.freeNudges);
   const resonance = useBattleStore((s) => s.resonance);
@@ -303,17 +316,14 @@ const NudgeStrip = () => {
   const die = useBattleStore((s) =>
     s.dice.find((d) => d.uid === s.selectedDieUid),
   );
-  if (phase !== 'placement' || selectedDieUid === null || die === undefined)
-    return null;
+  if (selectedDieUid === null || die === undefined) return null;
   const def = DIE_BY_ID.get(die.defId);
   const free = freeNudges > 0;
   const affordable = free || charge >= NUDGE_COST;
-  const showFlip = canFlip(die);
-  const showCopy = die.state === 'tray' && canCopy(die, resonance);
   return (
-    <div className={styles.nudgeStrip}>
+    <>
       {def !== undefined ? (
-        <Text size="xs" fw={600} c={tokens.text} style={{ alignSelf: 'center' }}>
+        <Text size="xs" fw={600} c={tokens.text} className={styles.railLabel}>
           {`${t(def.name)} · d${String(def.tier)}`}
         </Text>
       ) : null}
@@ -341,7 +351,7 @@ const NudgeStrip = () => {
       >
         {t(free ? 'battle:nudgeFreePlus' : 'battle:nudgePlus')}
       </Button>
-      {showFlip ? (
+      {canFlip(die) ? (
         <Button
           className={styles.clickable}
           size="compact-sm"
@@ -353,7 +363,7 @@ const NudgeStrip = () => {
           {t('battle:flip')}
         </Button>
       ) : null}
-      {showCopy ? (
+      {die.state === 'tray' && canCopy(die, resonance) ? (
         <Button
           className={styles.clickable}
           size="compact-sm"
@@ -365,14 +375,13 @@ const NudgeStrip = () => {
           {t('battle:copy')}
         </Button>
       ) : null}
-    </div>
+    </>
   );
 };
 
-const ActivePerks = () => {
+const PerkControls = () => {
   const { t } = useTranslation(['battle']);
   const perks = useBattleStore((s) => s.perks);
-  const phase = useBattleStore((s) => s.phase);
   const hull = useBattleStore((s) => s.hull);
   const bloodUsed = useBattleStore((s) => s.bloodReactorUsed);
   const selected = useBattleStore((s) => s.selectedDieUid);
@@ -380,9 +389,9 @@ const ActivePerks = () => {
   const sacrificeDie = useBattleStore((s) => s.sacrificeDie);
   const hasBlood = hasTrait(perks, 'bloodReactor');
   const hasSac = hasTrait(perks, 'sacrifice');
-  if (phase !== 'placement' || (!hasBlood && !hasSac)) return null;
+  if (!hasBlood && !hasSac) return null;
   return (
-    <div className={styles.nudgeStrip}>
+    <>
       {hasBlood ? (
         <Button
           className={styles.clickable}
@@ -407,15 +416,14 @@ const ActivePerks = () => {
           {t('battle:sacrifice')}
         </Button>
       ) : null}
-    </div>
+    </>
   );
 };
 
 // DESIGN §7 ceremony moment: the Fate die never enters a slot — it is one
 // button, once per battle, and the table's verdict is read out loud.
-const FateStrip = () => {
+const FateControls = () => {
   const { t } = useTranslation(['battle', 'content']);
-  const phase = useBattleStore((s) => s.phase);
   const dice = useBattleStore((s) => s.dice);
   const fateUses = useBattleStore((s) => s.fateUses);
   const perks = useBattleStore((s) => s.perks);
@@ -428,13 +436,13 @@ const FateStrip = () => {
   const hasFate = dice.some((d) => d.defId === FATE_DIE_ID);
   const maxUses = runHasTrait(perks, chartPicks, 'fateTwice', modules) ? 2 : 1;
   const fateUsed = fateUses >= maxUses;
-  if (!hasFate || phase !== 'placement') return null;
+  if (!hasFate) return null;
   const outcome =
     fateOutcomeId === null
       ? undefined
       : FATE_TABLE.find((o) => o.id === fateOutcomeId);
   return (
-    <div className={styles.nudgeStrip}>
+    <>
       <Button
         className={styles.clickable}
         size="compact-sm"
@@ -448,15 +456,33 @@ const FateStrip = () => {
         <Text
           size="xs"
           c={tokens.amber}
-          className={styles.clickable}
+          className={`${styles.clickable ?? ''} ${styles.railLabel ?? ''}`}
           onClick={clearFateResult}
         >
-          {t('battle:fateResult', {
-            roll: fateRoll,
-            text: t(outcome.text),
-          })}
+          {t('battle:fateResult', { roll: fateRoll, text: t(outcome.text) })}
         </Text>
       ) : null}
+    </>
+  );
+};
+
+// One band owns every mid-battle action. The three strips this replaced all
+// carried the same absolute position and stacked on top of each other.
+const ActionRail = () => {
+  const phase = useBattleStore((s) => s.phase);
+  const perks = useBattleStore((s) => s.perks);
+  const dice = useBattleStore((s) => s.dice);
+  const selectedDieUid = useBattleStore((s) => s.selectedDieUid);
+  const hasPerkControls =
+    hasTrait(perks, 'bloodReactor') || hasTrait(perks, 'sacrifice');
+  const hasFate = dice.some((d) => d.defId === FATE_DIE_ID);
+  if (phase !== 'placement') return null;
+  if (selectedDieUid === null && !hasPerkControls && !hasFate) return null;
+  return (
+    <div className={styles.actionRail} data-band="rail" data-action-rail>
+      <DieControls />
+      <PerkControls />
+      <FateControls />
     </div>
   );
 };
@@ -487,15 +513,15 @@ const BottomBar = () => {
   const confirmReroll = useBattleStore((s) => s.confirmReroll);
   const endTurn = useBattleStore((s) => s.endTurn);
   return (
-    <div className={styles.bottomBar}>
+    <div className={styles.bottomBar} data-band="bottom">
       <ResonanceChips />
       <ScriptHint />
       {rerollMode ? (
-        <Text size="xs" c={tokens.dim} ta="center">
+        <Text size="xs" c={tokens.dim} ta="center" className={styles.hint}>
           {t('battle:rerollHint', { size: rerollSize })}
         </Text>
       ) : (
-        <Text size="xs" c={tokens.faint} ta="center">
+        <Text size="xs" c={tokens.faint} ta="center" className={styles.hint}>
           {t('battle:burnHint')}
         </Text>
       )}
@@ -561,7 +587,7 @@ const EndOverlay = () => {
   const go = useAppStore((s) => s.go);
   if (outcome === undefined || lootPending !== null) return null;
   return (
-    <Overlay backgroundOpacity={0.82} color={tokens.bg} blur={2} zIndex={5}>
+    <Overlay backgroundOpacity={0.82} color={tokens.bg} blur={2} zIndex="var(--z-modal)">
       <Stack align="center" justify="center" h="100%" gap="lg">
         <Title order={1} c={outcome === 'victory' ? tokens.text : tokens.danger}>
           {t(outcome === 'victory' ? 'battle:victory' : 'battle:defeat')}
@@ -664,22 +690,35 @@ export const BattleScreen = () => {
     new URLSearchParams(window.location.search).get('debug') === '1';
 
   return (
-    <Box pos="relative" mih="var(--ca-vh)" bg={tokens.bg} style={{ overflow: 'hidden' }}>
-      <PixiCanvas mount={mountScene} />
-      <div className={styles.hud}>
-        <StatusCard />
-        <EnemyChips />
-        <ActivePerks />
-        <FateStrip />
-        <NudgeStrip />
-        <BottomBar />
-      </div>
-      <LootReveal />
-      <FateInvocation />
-      {bossFall ? <div className={bossStyles.bossFall} /> : null}
-      <BossIntro />
-      {phase === 'ended' && !runActive ? <EndOverlay /> : null}
-      {debugEnabled ? <DebugPanel /> : null}
-    </Box>
+    <Screen
+      width="full"
+      pad={false}
+      scroll={false}
+      passThrough
+      bodyClassName={styles.board}
+      background={<PixiCanvas mount={mountScene} />}
+      header={
+        <div className={styles.topBands}>
+          <StatusCard />
+          <EnemyChips />
+          <ActionRail />
+        </div>
+      }
+      footer={
+        <div className={styles.centreColumn}>
+          <BottomBar />
+        </div>
+      }
+      overlay={
+        <>
+          <LootReveal />
+          <FateInvocation />
+          {bossFall ? <div className={bossStyles.bossFall} /> : null}
+          <BossIntro />
+          {phase === 'ended' && !runActive ? <EndOverlay /> : null}
+          {debugEnabled ? <DebugPanel /> : null}
+        </>
+      }
+    />
   );
 };

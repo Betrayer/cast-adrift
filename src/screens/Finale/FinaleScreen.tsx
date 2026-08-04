@@ -1,6 +1,7 @@
 import { Button, Paper, Stack, Text, Title } from '@mantine/core';
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { beaconsResolved } from '@/data/events/beacons';
 import { finaleOptions } from '@/data/narrative/endings';
@@ -23,8 +24,8 @@ export const FinaleScreen = () => {
   );
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={480} w="100%">
+    <Screen centered>
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>
             {t('run:finale.title')}
@@ -58,6 +59,6 @@ export const FinaleScreen = () => {
           </Text>
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

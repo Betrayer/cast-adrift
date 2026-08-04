@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Group,
   Paper,
@@ -12,6 +11,7 @@ import {
 import { useReducedMotion } from '@mantine/hooks';
 import { lazy, Suspense, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { progressWithinLevel } from '@/game/xp';
 import { useMetaStore } from '@/stores/metaStore';
@@ -21,6 +21,7 @@ import { ResumeCard } from '@/screens/Menu/ResumeCard';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
+import styles from './MenuScreen.module.css';
 
 const MenuBackground = lazy(() =>
   import('@/screens/Menu/MenuBackground').then((m) => ({
@@ -74,50 +75,46 @@ export const MenuScreen = () => {
   );
 
   return (
-    <Box pos="relative" mih="var(--ca-vh)" bg={tokens.bg} style={{ overflow: 'hidden' }}>
-      <Suspense fallback={null}>
-        <MenuBackground reducedMotion={reducedMotion} />
-      </Suspense>
-      <UnstyledButton
-        pos="absolute"
-        top={12}
-        right={12}
-        onClick={() => {
-          go('chart');
-        }}
-        style={{ zIndex: 2, pointerEvents: 'auto' }}
-        aria-label={t('meta:menu.level', { level })}
-      >
-        <RingProgress
-          size={56}
-          thickness={4}
-          roundCaps
-          sections={[{ value: progress.pct * 100, color: 'accent' }]}
-          label={
-            <Text ta="center" size="xs" c={tokens.text} fw={700}>
-              {level}
-            </Text>
-          }
-        />
-      </UnstyledButton>
-      <Stack
-        pos="relative"
-        align="center"
-        justify="center"
-        mih="var(--ca-vh)"
-        gap="xl"
-        p="lg"
-        style={{ zIndex: 1, pointerEvents: 'none' }}
-      >
-        <Stack align="center" gap="xs">
+    <Screen
+      width="full"
+      centered
+      background={
+        <Suspense fallback={null}>
+          <MenuBackground reducedMotion={reducedMotion} />
+        </Suspense>
+      }
+      overlay={
+        <UnstyledButton
+          className={styles.levelBadge}
+          onClick={() => {
+            go('chart');
+          }}
+          aria-label={t('meta:menu.level', { level })}
+        >
+          <RingProgress
+            size={56}
+            thickness={4}
+            roundCaps
+            sections={[{ value: progress.pct * 100, color: 'accent' }]}
+            label={
+              <Text ta="center" size="xs" c={tokens.text} fw={700}>
+                {level}
+              </Text>
+            }
+          />
+        </UnstyledButton>
+      }
+    >
+      <div className={styles.hero}>
+        <div className={styles.title}>
           <Title order={1} c={tokens.text}>
             {t('common:appName')}
           </Title>
           <Text c={tokens.dim} size="sm">
             {t('menu:tagline')}
           </Text>
-        </Stack>
-        <Stack gap="sm" w={280} style={{ pointerEvents: 'auto' }}>
+        </div>
+        <div className={styles.actions}>
           {cloudResume ? (
             <Paper bg={tokens.surface1} p="sm" radius="md" withBorder>
               <Stack gap="xs">
@@ -167,8 +164,8 @@ export const MenuScreen = () => {
               {t(`menu:${entry.key}`)}
             </Button>
           ))}
-        </Stack>
-      </Stack>
-    </Box>
+        </div>
+      </div>
+    </Screen>
   );
 };

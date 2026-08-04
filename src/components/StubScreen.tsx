@@ -1,6 +1,7 @@
 import { Button, Code, Paper, Stack, Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { screenPhase } from '@/app/screens';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { useAppStore } from '@/stores/appStore';
 import type { ScreenId } from '@/types';
@@ -11,7 +12,7 @@ export const StubScreen = ({ screen }: { screen: ScreenId }) => {
   const phase = screenPhase[screen];
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
+    <Screen centered>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder>
         <Stack align="center" gap="md">
           <Code fz="lg">{screen}</Code>
@@ -28,6 +29,6 @@ export const StubScreen = ({ screen }: { screen: ScreenId }) => {
           </Button>
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

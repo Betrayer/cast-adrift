@@ -25,7 +25,19 @@
     "abandon": "Покинути забіг",
     "previewMiniboss": "Міні-бос: {{name}}",
     "previewBoss": "Бос: {{name}}",
-    "modules": "Модулі {{used}}/{{max}}"
+    "modules": "Модулі {{used}}/{{max}}",
+    "legend": "Легенда",
+    "node": {
+      "battle": "Бій",
+      "elite": "Еліта",
+      "miniboss": "Міні-бос",
+      "shop": "Крамниця",
+      "shipyard": "Верф",
+      "event": "Подія",
+      "anomaly": "Аномалія",
+      "beacon": "Маяк",
+      "boss": "Бос"
+    }
   },
   "event": {
     "title": "Сигнал",

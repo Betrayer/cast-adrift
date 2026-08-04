@@ -1,5 +1,9 @@
 {
   "appName": "Cast Adrift",
   "back": "Atrás",
-  "phaseHint": "Fase {{phase}}"
+  "phaseHint": "Fase {{phase}}",
+  "rotate": {
+    "title": "Gira el dispositivo",
+    "body": "Cast Adrift se juega en vertical. Vuelve al modo retrato para continuar la partida."
+  }
 }

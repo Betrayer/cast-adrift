@@ -2,13 +2,13 @@ import {
   Button,
   Divider,
   Paper,
-  ScrollArea,
   Stack,
   Text,
   Title,
 } from '@mantine/core';
 import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { beaconsResolved } from '@/data/events/beacons';
 import { ENDING_BY_ID } from '@/data/narrative/endings';
@@ -51,9 +51,9 @@ export const EndingScreen = () => {
 
   if (ending === undefined) {
     return (
-      <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
+      <Screen centered>
         <Button onClick={finishEnding}>{t('run:ending.continue')}</Button>
-      </Stack>
+      </Screen>
     );
   }
 
@@ -61,8 +61,8 @@ export const EndingScreen = () => {
   const showTally = beatIndex >= ending.beats.length;
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={480} w="100%">
+    <Screen centered width="wide">
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>
             {t(ending.title)}
@@ -73,7 +73,6 @@ export const EndingScreen = () => {
                 {t(ending.echoLine)}
               </Text>
               <Divider color={tokens.line} label={t('run:ending.tally')} />
-              <ScrollArea.Autosize mah={280}>
                 <Stack gap={6}>
                   {tally.map((line, index) => (
                     <Text
@@ -87,7 +86,6 @@ export const EndingScreen = () => {
                     </Text>
                   ))}
                 </Stack>
-              </ScrollArea.Autosize>
               {finalMemory === undefined ? null : (
                 <>
                   <Divider color={tokens.line} label={t('run:codex.memory')} />
@@ -128,6 +126,6 @@ export const EndingScreen = () => {
           )}
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

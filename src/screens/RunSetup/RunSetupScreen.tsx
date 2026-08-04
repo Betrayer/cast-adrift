@@ -9,6 +9,7 @@ import {
 } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import {
   ASCENSIONS,
@@ -32,8 +33,8 @@ export const RunSetupScreen = () => {
   const mods = ascensionMods(ascension);
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={460} w="100%">
+    <Screen centered>
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>
             {t('run:setup.title')}
@@ -103,6 +104,6 @@ export const RunSetupScreen = () => {
           </Button>
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

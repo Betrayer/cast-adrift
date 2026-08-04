@@ -1,0 +1,88 @@
+.host {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-toast);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+  padding-top: calc(var(--ca-band-top, var(--ca-safe-top)) + 8px);
+  padding-bottom: calc(var(--ca-band-bottom, var(--ca-safe-bottom)) + 8px);
+  padding-left: calc(var(--ca-safe-left) + 12px);
+  padding-right: calc(var(--ca-safe-right) + 12px);
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+}
+
+.toast {
+  pointer-events: auto;
+  cursor: pointer;
+  width: 100%;
+  animation: toastIn 200ms ease-out both;
+}
+
+.consequence {
+  max-width: 420px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-accent);
+  box-shadow: 0 8px 24px var(--ca-shadow);
+  color: var(--ca-text);
+  font-size: 13px;
+}
+
+.bark {
+  max-width: 460px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--ca-bg-a86);
+  border-left: 3px solid var(--ca-accent);
+  color: var(--ca-dim);
+  font-size: 13px;
+}
+
+.barkMark {
+  color: var(--ca-accent);
+  font-weight: 700;
+}
+
+.queueDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ca-faint);
+}
+
+.queue {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  justify-content: center;
+}
+
+@keyframes toastIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+:root[data-ca-motion='reduced'] .toast {
+  animation: none;
+}

@@ -1,5 +1,9 @@
 {
   "appName": "Cast Adrift",
   "back": "Назад",
-  "phaseHint": "Фаза {{phase}}"
+  "phaseHint": "Фаза {{phase}}",
+  "rotate": {
+    "title": "Поверни пристрій",
+    "body": "Cast Adrift грається вертикально. Поверни портретну орієнтацію, щоб продовжити забіг."
+  }
 }

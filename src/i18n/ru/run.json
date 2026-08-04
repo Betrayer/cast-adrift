@@ -25,7 +25,19 @@
     "abandon": "Бросить забег",
     "previewMiniboss": "Мини-босс: {{name}}",
     "previewBoss": "Босс: {{name}}",
-    "modules": "Модули {{used}}/{{max}}"
+    "modules": "Модули {{used}}/{{max}}",
+    "legend": "Легенда",
+    "node": {
+      "battle": "Бой",
+      "elite": "Элита",
+      "miniboss": "Мини-босс",
+      "shop": "Лавка",
+      "shipyard": "Верфь",
+      "event": "Событие",
+      "anomaly": "Аномалия",
+      "beacon": "Маяк",
+      "boss": "Босс"
+    }
   },
   "event": {
     "title": "Сигнал",

@@ -3,14 +3,13 @@ import {
   Button,
   Group,
   Paper,
-  ScrollArea,
   Select,
   SimpleGrid,
-  Stack,
   Text,
 } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { schools } from "@/data/schools";
@@ -48,8 +47,9 @@ export const CollectionScreen = () => {
   });
 
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+    <Screen
+      header={
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between" mb="xs">
           <Text fw={700} c={tokens.text}>
             {t("meta:collection.title")}
@@ -61,10 +61,10 @@ export const CollectionScreen = () => {
         <Text size="xs" c={tokens.faint} mb="xs">
           {t("meta:collection.count", { n: owned.reduce((a, e) => a + e.count, 0) })}
         </Text>
-        <Group gap="xs">
+        <Group gap="xs" grow wrap="wrap">
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={schoolFilter}
             onChange={(v) => { setSchoolFilter((v as School | "all") ?? "all"); }}
             data={SCHOOLS.map((s) => ({
@@ -77,7 +77,7 @@ export const CollectionScreen = () => {
           />
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={String(tierFilter)}
             onChange={(v) => { setTierFilter(Number(v ?? 0)); }}
             data={TIERS.map((tier) => ({
@@ -86,11 +86,11 @@ export const CollectionScreen = () => {
             }))}
           />
         </Group>
-      </Paper>
-
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
-        <ScrollArea h={420}>
-          <SimpleGrid cols={2} spacing="xs">
+        </Paper>
+      }
+    >
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
             {filtered.map((entry) => {
               const def = DIE_BY_ID.get(entry.defId);
               if (def === undefined) return null;
@@ -117,8 +117,7 @@ export const CollectionScreen = () => {
               );
             })}
           </SimpleGrid>
-        </ScrollArea>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

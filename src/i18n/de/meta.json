@@ -72,7 +72,8 @@
     "keyStormChaser": "Sturmjäger",
     "keyIronDoctrine": "Eiserne Doktrin",
     "keyFatesFavorite": "Der Liebling des Schicksals",
-    "keyPrismCascade": "Prisma-Kaskade"
+    "keyPrismCascade": "Prisma-Kaskade",
+    "selectHint": "Tippe auf einen Knoten, um zu sehen, was er bewirkt."
   },
   "chartFx": {
     "hubBudget": "+1 Hangar-Budget",

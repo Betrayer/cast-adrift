@@ -24,7 +24,7 @@ export const DevOverlay = () => {
         left: 8,
         bottom: 8,
         width: 210,
-        zIndex: 500,
+        zIndex: 'var(--z-dev)',
         padding: 8,
         borderRadius: 8,
         background: "rgba(8,12,20,0.92)",

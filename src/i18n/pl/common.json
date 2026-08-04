@@ -1,5 +1,9 @@
 {
   "appName": "Cast Adrift",
   "back": "Powrót",
-  "phaseHint": "Faza {{phase}}"
+  "phaseHint": "Faza {{phase}}",
+  "rotate": {
+    "title": "Obróć urządzenie",
+    "body": "Cast Adrift gra się pionowo. Wróć do orientacji pionowej, aby kontynuować przebieg."
+  }
 }

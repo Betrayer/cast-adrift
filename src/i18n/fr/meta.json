@@ -72,7 +72,8 @@
     "keyStormChaser": "Chasseur de tempêtes",
     "keyIronDoctrine": "La doctrine de fer",
     "keyFatesFavorite": "Le chouchou du destin",
-    "keyPrismCascade": "Cascade de prismes"
+    "keyPrismCascade": "Cascade de prismes",
+    "selectHint": "Touche un nœud pour voir ce qu’il fait."
   },
   "chartFx": {
     "hubBudget": "+1 budget pour le hangar",

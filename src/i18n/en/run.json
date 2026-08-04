@@ -25,7 +25,19 @@
     "abandon": "Abandon run",
     "previewMiniboss": "Mini-boss: {{name}}",
     "previewBoss": "Boss: {{name}}",
-    "modules": "Modules {{used}}/{{max}}"
+    "modules": "Modules {{used}}/{{max}}",
+    "legend": "Legend",
+    "node": {
+      "battle": "Battle",
+      "elite": "Elite",
+      "miniboss": "Mini-boss",
+      "shop": "Shop",
+      "shipyard": "Shipyard",
+      "event": "Event",
+      "anomaly": "Anomaly",
+      "beacon": "Beacon",
+      "boss": "Boss"
+    }
   },
   "event": {
     "title": "Signal",

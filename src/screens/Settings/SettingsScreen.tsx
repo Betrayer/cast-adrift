@@ -2,7 +2,6 @@ import {
   Button,
   Group,
   Paper,
-  ScrollArea,
   SegmentedControl,
   Select,
   Slider,
@@ -13,6 +12,7 @@ import {
 } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { THEMES, type ThemeId } from '@/data/themes';
 import { AVAILABLE_LOCALES } from '@/i18n';
@@ -169,7 +169,6 @@ const Diagnostics = () => {
               {t('settings:diagnostics.clean')}
             </Text>
           ) : (
-            <ScrollArea.Autosize mah={200}>
               <Stack gap={4}>
                 {reports.map((report) => (
                   <Text
@@ -182,7 +181,6 @@ const Diagnostics = () => {
                   </Text>
                 ))}
               </Stack>
-            </ScrollArea.Autosize>
           )}
         </Paper>
       ) : null}
@@ -197,7 +195,8 @@ export const SettingsScreen = () => {
   const resetTutorial = useMetaStore((s) => s.resetTutorial);
 
   return (
-    <Stack maw={440} mx="auto" mih="var(--ca-vh)" gap="lg" p="lg" bg={tokens.bg}>
+    <Screen>
+      <Stack gap="lg">
       <Title order={2} c={tokens.text}>
         {t('settings:title')}
       </Title>
@@ -343,6 +342,7 @@ export const SettingsScreen = () => {
       >
         {t('common:back')}
       </Button>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

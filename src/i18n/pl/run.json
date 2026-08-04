@@ -25,7 +25,19 @@
     "abandon": "Przerwij przebieg",
     "previewMiniboss": "Mini-boss: {{name}}",
     "previewBoss": "Szef: {{name}}",
-    "modules": "Moduły {{used}} / {{max}}"
+    "modules": "Moduły {{used}} / {{max}}",
+    "legend": "Legenda",
+    "node": {
+      "battle": "Walka",
+      "elite": "Elita",
+      "miniboss": "Miniboss",
+      "shop": "Sklep",
+      "shipyard": "Stocznia",
+      "event": "Zdarzenie",
+      "anomaly": "Anomalia",
+      "beacon": "Latarnia",
+      "boss": "Boss"
+    }
   },
   "event": {
     "title": "Sygnał",

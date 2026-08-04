@@ -1,6 +1,7 @@
 import { Button, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { fragmentsForSector } from '@/data/narrative/fragments';
 import { sectorDef } from '@/data/sectors';
@@ -41,14 +42,8 @@ export const InterstitialScreen = () => {
   }, [sector, seed]);
 
   return (
-    <Stack
-      align="center"
-      justify="center"
-      mih="var(--ca-vh)"
-      p="lg"
-      gap="lg"
-      style={{ background: def.wash }}
-    >
+    <Screen centered width="wide" className={styles.frame}>
+      <Stack align="center" justify="center" gap="lg" p="lg" style={{ background: def.wash }}>
       {reduced ? null : (
         <div className={styles.warp}>
           {streaks.map((streak) => (
@@ -97,6 +92,7 @@ export const InterstitialScreen = () => {
       >
         {t('run:interstitial.enter')}
       </Button>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

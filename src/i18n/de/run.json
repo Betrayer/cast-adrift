@@ -25,7 +25,19 @@
     "abandon": "Lauf abbrechen",
     "previewMiniboss": "Mini-Boss: {{name}}",
     "previewBoss": "Chef: {{name}}",
-    "modules": "Module {{used}} / {{max}}"
+    "modules": "Module {{used}} / {{max}}",
+    "legend": "Legende",
+    "node": {
+      "battle": "Kampf",
+      "elite": "Elite",
+      "miniboss": "Mini-Boss",
+      "shop": "Laden",
+      "shipyard": "Werft",
+      "event": "Ereignis",
+      "anomaly": "Anomalie",
+      "beacon": "Bake",
+      "boss": "Boss"
+    }
   },
   "event": {
     "title": "Signal",

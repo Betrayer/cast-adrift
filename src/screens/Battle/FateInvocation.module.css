@@ -1,7 +1,7 @@
 .overlay {
   position: absolute;
   inset: 0;
-  z-index: 15;
+  z-index: var(--z-overlay);
   pointer-events: none;
   background: var(--ca-bg-a86);
   animation: dim 600ms ease-out forwards;
@@ -27,7 +27,7 @@
 .still {
   position: absolute;
   inset: 0;
-  z-index: 15;
+  z-index: var(--z-overlay);
   pointer-events: none;
   background: var(--ca-bg-a86);
   opacity: 0.5;

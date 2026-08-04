@@ -72,7 +72,8 @@
     "keyStormChaser": "Storm Chaser",
     "keyIronDoctrine": "Iron Doctrine",
     "keyFatesFavorite": "Fate's Favourite",
-    "keyPrismCascade": "Prism Cascade"
+    "keyPrismCascade": "Prism Cascade",
+    "selectHint": "Tap a node to see what it does."
   },
   "chartFx": {
     "hubBudget": "+1 hangar budget",

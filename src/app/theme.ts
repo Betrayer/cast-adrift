@@ -1,4 +1,5 @@
 import { createTheme, type MantineColorsTuple } from '@mantine/core';
+import { BREAKPOINTS, BREAKPOINT_ORDER } from '@/app/breakpoints';
 import { mixHex, rgba } from '@/app/color';
 import {
   applySchoolPalette,
@@ -46,12 +47,17 @@ const darkRamp = (palette: ThemeTokens): MantineColorsTuple =>
     mixHex(palette.bg, '#000000', 0.6),
   ] as unknown as MantineColorsTuple;
 
+const mantineBreakpoints = Object.fromEntries(
+  BREAKPOINT_ORDER.map((name) => [name, `${String(BREAKPOINTS[name])}px`]),
+) as Record<(typeof BREAKPOINT_ORDER)[number], string>;
+
 export const mantineThemeFor = (def: ThemeDef) =>
   createTheme({
     fontFamily: def.dieStyle.glyphFont,
     primaryColor: 'accent',
     primaryShade: 5,
     defaultRadius: 'md',
+    breakpoints: mantineBreakpoints,
     colors: {
       accent: ramp(def.palette.accent),
       danger: ramp(def.palette.danger),

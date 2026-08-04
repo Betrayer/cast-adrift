@@ -1,7 +1,8 @@
-import { Box, Button, Group, Modal, Paper, Stack, Text, Title } from "@mantine/core";
+import { Button, Group, Modal, Paper, Stack, Text, Title } from "@mantine/core";
 import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { ALL_EVENTS, EVENT_BY_ID } from "@/data/events";
@@ -326,8 +327,8 @@ const EventRunner = ({
         }));
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={460} w="100%">
+    <Screen centered>
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>
             {t("run:event.title")}
@@ -410,15 +411,15 @@ const EventRunner = ({
           }}
         />
       ) : null}
-    </Stack>
+    </Screen>
   );
 };
 
 const EventFallback = () => {
   const { t } = useTranslation(["run"]);
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={420}>
+    <Screen centered>
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack align="center" gap="md">
           <Title order={3} c={tokens.text}>
             {t("run:event.title")}
@@ -436,7 +437,7 @@ const EventFallback = () => {
           </Button>
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };
 
@@ -468,12 +469,8 @@ export const EventScreen = () => {
     }
   }, [event, forced]);
 
-  if (position === null || map === null) {
-    return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
-  }
-  if (!forced && nodeById(map).get(position) === undefined) {
-    return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
-  }
+  if (position === null || map === null) return <Screen />;
+  if (!forced && nodeById(map).get(position) === undefined) return <Screen />;
   if (resolved === null || event === null) {
     return <EventFallback />;
   }

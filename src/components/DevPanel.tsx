@@ -83,9 +83,9 @@ export const DevPanel = () => {
       radius="md"
       withBorder
       bg="rgba(8,12,20,0.94)"
-      style={{ zIndex: 600 }}
+      style={{ zIndex: 'var(--z-dev)' }}
     >
-      <ScrollArea.Autosize mah="82dvh">
+      <ScrollArea.Autosize mah="60vh">
         <Stack gap={6}>
           <Text size="xs" fw={700} c={tokens.text}>
             dev · campaign
@@ -98,7 +98,7 @@ export const DevPanel = () => {
             value={eventId}
             onChange={setEventId}
             searchable
-            comboboxProps={{ zIndex: 1000, withinPortal: true }}
+            comboboxProps={{ zIndex: 'var(--z-dropdown)', withinPortal: true }}
           />
           <Button
             size="compact-xs"
@@ -117,7 +117,7 @@ export const DevPanel = () => {
             value={puzzleId}
             onChange={setPuzzleId}
             searchable
-            comboboxProps={{ zIndex: 1000, withinPortal: true }}
+            comboboxProps={{ zIndex: 'var(--z-dropdown)', withinPortal: true }}
           />
           <Button
             size="compact-xs"
