@@ -1819,104 +1819,244 @@
   },
   "puzzle": {
     "oreVein": {
-      "title": "Erzader",
-      "goal": "Genau 14 abschneiden – die Ader reißt, wenn man zu viel abschneidet. Eine Matrize weglassen."
+      "title": "Ore Vein",
+      "goal": "Deal exactly {{n}} — the vein shears if you over-cut. Leave a die out."
     },
     "coolant": {
-      "title": "Kühlmittelleitung",
-      "goal": "Genau 10 Mal einfüllen – die Hauptgetränke in Schritten von jeweils eineinhalb."
+      "title": "Coolant Line",
+      "goal": "Bank exactly {{n}} charge — the core drinks in steps of one and a half."
     },
     "cleanFit": {
       "title": "Clean Fit",
-      "goal": "Bei Bank 6+ wird bei jedem platzierten Würfel eine Gebühr erhoben, und es darf nichts über die Obergrenze hinausfließen."
+      "goal": "Bank {{n}}+ charge with every die placed and nothing spilled past the cap."
     },
     "redRoute": {
-      "title": "Rote Route",
-      "goal": "Füge 18+ Schaden zu – ein roter Würfel bei Waffe A, Affinitätsschuss."
+      "title": "Red Route",
+      "goal": "Deal {{n}}+ damage — a red die in Weapon A, affinity firing."
     },
     "ignite": {
       "title": "Ignite",
-      "goal": "Füge 12+ Schaden zu und löse „Burn“ aus – eine Asche muss ihre maximale Seite zeigen."
+      "goal": "Deal {{n}}+ damage and land Burn — a cinder must hit its max face."
     },
     "pipeline": {
       "title": "Pipeline",
-      "goal": "Markiere das Ziel, schieße dann 8+ Treffer auf das markierte Ziel und lass den Reaktor nicht überlaufen."
+      "goal": "Mark, then land {{n}}+ into the marked target, and do not overflow the reactor."
     },
     "overload": {
-      "title": "Überlastung",
-      "goal": "Setze „Spinal“ absichtlich ein und füge den Reittieren dann 14+ Schaden zu."
+      "title": "Overload",
+      "goal": "Jam the spinal on purpose, then carry {{n}}+ damage on the mounts."
     },
     "slowBurn": {
-      "title": "Langsam brennend",
-      "goal": "Zwei Züge: „Burn“ einsetzen, einen Angreifer reservieren und insgesamt 26+ Schaden erzielen."
+      "title": "Slow Burn",
+      "goal": "Two turns: set Burn, reserve a hitter, and stack {{n}}+ total damage."
     },
     "capacitor": {
-      "title": "Kondensator",
-      "goal": "Bank 16+ lädt über drei Runden hinweg auf – ein Kern reicht dafür nicht aus."
+      "title": "Capacitor",
+      "goal": "Bank {{n}}+ charge across three turns — one core cannot hold it all at once."
     },
     "lockbox": {
-      "title": "Schließfach",
-      "goal": "Feste Auslegung – ein Manöver verursacht gleichzeitig Schaden, setzt einen Schild ein und führt eine Attacke aus."
+      "title": "Lockbox",
+      "goal": "Fixed reading — one routing lands damage, shield and {{n}}+ charge at once."
     },
     "parity": {
-      "title": "Paritätssperre",
-      "goal": "Festgelegte Lesereihenfolge – Bei Waffen muss man die ungeraden Zahlen vorlesen, bei Schilden die geraden. Achte auf die Seitenzahlen."
+      "title": "Parity Lock",
+      "goal": "Fixed reading — {{n}}+ damage, Weapons odd, Shields even. Mind the faces."
     },
     "bulwarkStand": {
-      "title": "Bulwark-Ständer",
-      "goal": "Überstehe den Beschuss und behalte dabei noch 6+ Schildpunkte – baue deine Verteidigung mehrschichtig auf."
+      "title": "Bulwark Stand",
+      "goal": "Survive the barrage and still hold {{n}}+ shield — layer the defence."
     },
     "tally": {
-      "title": "Die Bilanz",
-      "goal": "Füge genau 9 Schaden zu."
+      "title": "The Tally",
+      "goal": "Deal exactly {{n}} damage."
     },
     "battery": {
-      "title": "Die Batterie",
-      "goal": "Speichere genau 9 Ladungen."
+      "title": "The Battery",
+      "goal": "Store exactly {{n}} charge."
     },
     "seawall": {
-      "title": "Die Küstenbefestigung",
-      "goal": "Errichte genau 7 Schilde."
+      "title": "The Seawall",
+      "goal": "Raise exactly {{n}} shield."
     },
     "mirrorMath": {
-      "title": "Der Spiegel",
-      "goal": "Teile 15 oder mehr Karten aus, wobei du höchstens zwei Plätze nutzen darfst."
+      "title": "The Mirror",
+      "goal": "Deal {{n}} or more using at most two slots."
     },
     "engraverBench": {
-      "title": "Die Bank",
-      "goal": "Errichte einen Schild der Stufe 9, bei dem mindestens zwei Slots belegt sind."
+      "title": "The Bench",
+      "goal": "Raise {{n}} shield with at least two slots filled."
     },
     "blackVault": {
-      "title": "Der Tresor",
-      "goal": "Die Kosten für Store 8 werden über das schuleigene System abgerechnet."
+      "title": "The Vault",
+      "goal": "Store {{n}} charge using a school's own system."
     },
     "spinalDrill": {
-      "title": "Wirbelsäulenbohrer",
-      "goal": "Mark, blockiere den Spinal und gib dann 9 aus."
+      "title": "Spinal Drill",
+      "goal": "Mark, jam the Spinal, then deal {{n}}."
     },
     "coolChain": {
-      "title": "Kühlkette",
-      "goal": "5 Schutz, 5 Ladung und kein Überlauf."
+      "title": "Cool Chain",
+      "goal": "Shields first, then {{n}} charge, and no overflow."
     },
     "emberStack": {
       "title": "Ember Stack",
-      "goal": "Teile die Karten in zwei Runden auf."
+      "goal": "Deal {{n}} across two turns."
     },
     "shieldWall": {
-      "title": "Schildwand",
-      "goal": "Beende den zweiten Zug mit 11 Schildpunkten."
+      "title": "Shield Wall",
+      "goal": "End the second turn on {{n}} shield."
     },
     "fateBench": {
-      "title": "Feste Quoten",
-      "goal": "Ein Würfelwurf, eine Platzierung: 7 Schaden, 5 Schild, 7 Angriffspunkte."
+      "title": "Fixed Odds",
+      "goal": "One roll, one placement: damage, shield, and {{n}} charge."
     },
     "sortingYard": {
-      "title": "Sortierbahnhof",
-      "goal": "Lege 8 oder mehr Karten mit einer geraden Gesamtsumme in „Waffen A“ ab."
+      "title": "Sorting Yard",
+      "goal": "Deal {{n}} or more with an even total in Weapon A."
     },
     "choirStand": {
-      "title": "Der Chorstand",
-      "goal": "Überstehe die geladene Salve mit mindestens 8 Schildpunkten."
+      "title": "The Choir Stand",
+      "goal": "Survive the charged volley on {{n}} shield or more."
+    },
+    "emberCut": {
+      "title": "Ember Cut",
+      "goal": "Land within two of {{n}} damage — the seam gives at either edge."
+    },
+    "driftSpark": {
+      "title": "Drift Spark",
+      "goal": "Bank {{n}} charge, give or take two. The coil is forgiving; the core is not."
+    },
+    "plateFit": {
+      "title": "Plate Fit",
+      "goal": "Raise exactly {{n}} shield. The plate seats or it does not."
+    },
+    "hairline": {
+      "title": "Hairline",
+      "goal": "One mount, exactly {{n}} damage. Everything else stays in the tray."
+    },
+    "tithe": {
+      "title": "The Tithe",
+      "goal": "Exactly {{n}} charge, and the reactor takes its cut first."
+    },
+    "deadWeight": {
+      "title": "Dead Weight",
+      "goal": "Deal {{n}}+ with every die placed — the ballast has to go somewhere."
+    },
+    "blueLane": {
+      "title": "Blue Lane",
+      "goal": "Raise {{n}}+ shield with a blue die in the Shields — the lane is keyed."
+    },
+    "spread": {
+      "title": "The Spread",
+      "goal": "Deal {{n}}+ across three systems. Nothing concentrated survives the scan."
+    },
+    "greenhouse": {
+      "title": "Greenhouse",
+      "goal": "Deal {{n}}+ and make something grow — a green die must land on its top face."
+    },
+    "overcut": {
+      "title": "Overcut",
+      "goal": "Bank {{n}}+ charge and force a die past a cap it does not fit."
+    },
+    "tightPack": {
+      "title": "Tight Pack",
+      "goal": "Bank {{n}}+ charge across two systems with nothing spilled past a cap."
+    },
+    "oddPlate": {
+      "title": "Odd Plate",
+      "goal": "Raise {{n}}+ shield reading odd, with the engines reading even."
+    },
+    "redOnly": {
+      "title": "Red Only",
+      "goal": "Deal {{n}}+ with a red die in Weapon A, and Burn has to land."
+    },
+    "perfectSeal": {
+      "title": "Perfect Seal",
+      "goal": "One reading only: {{n}}+ damage, every die placed, Weapons odd, Shields and the core even."
+    },
+    "firstLight": {
+      "title": "First Light",
+      "goal": "Mark first, then put {{n}}+ into what the sensors found."
+    },
+    "coldStart": {
+      "title": "Cold Start",
+      "goal": "Shields up first, then {{n}}+ charge into a cold core."
+    },
+    "braceGate": {
+      "title": "Brace Gate",
+      "goal": "Mark, brace for {{n}}+ shield, and leave the reactor unflooded."
+    },
+    "siegeLine": {
+      "title": "Siege Line",
+      "goal": "Jam the spinal on purpose, carry {{n}}+ on the mounts, and hold the core."
+    },
+    "markedBurn": {
+      "title": "Marked Burn",
+      "goal": "Mark, jam the spinal, and still land {{n}}+ on the mount."
+    },
+    "dryDock": {
+      "title": "Dry Dock",
+      "goal": "Shields, then {{n}}+ charge, and not one point over the cap."
+    },
+    "theWholeChain": {
+      "title": "The Whole Chain",
+      "goal": "Mark, bank without flooding, and finish on {{n}}+ — one pass, no rerolls."
+    },
+    "ironBank": {
+      "title": "Iron Bank",
+      "goal": "Three turns, one core: bank {{n}}+ without ever spilling."
+    },
+    "twinFuse": {
+      "title": "Twin Fuse",
+      "goal": "The first die sits out turn one. Still reach {{n}}+ across the two."
+    },
+    "longWall": {
+      "title": "Long Wall",
+      "goal": "Only the last turn counts. End on {{n}}+ shield — hold a die back for it."
+    },
+    "slowFuse": {
+      "title": "Slow Fuse",
+      "goal": "The first die sits out turn one. Burn and mounts must still total {{n}}+."
+    },
+    "reactorRun": {
+      "title": "Reactor Run",
+      "goal": "The first die sits out turn one, and there are no rerolls. Bank {{n}}+."
+    },
+    "theLongCount": {
+      "title": "The Long Count",
+      "goal": "Three turns, no rerolls, the first die held back — and {{n}}+ banked at the end."
+    },
+    "ledger": {
+      "title": "The Ledger",
+      "goal": "Fixed reading — every die booked, Shields reading even, {{n}}+ damage on the line."
+    },
+    "crossWire": {
+      "title": "Cross-Wire",
+      "goal": "Fixed reading — damage, shield and {{n}}+ charge out of one routing."
+    },
+    "mirrorRead": {
+      "title": "Mirror Read",
+      "goal": "Fixed reading — {{n}}+ damage with Burn landed. Only one way round."
+    },
+    "theSeal": {
+      "title": "The Seal",
+      "goal": "Fixed reading — {{n}}+ damage, Shields reading even, nothing spilled past a cap."
+    },
+    "hullCheck": {
+      "title": "Hull Check",
+      "goal": "Take the volley and still stand on {{n}}+ shield."
+    },
+    "lastLight": {
+      "title": "Last Light",
+      "goal": "Survive the volley with {{n}}+ charge still in the core."
+    },
+    "stormFront": {
+      "title": "Storm Front",
+      "goal": "Survive the volley and answer it with {{n}}+ damage in the same turn."
+    },
+    "theVigil": {
+      "title": "The Vigil",
+      "goal": "One reading, no board changes: take the heaviest volley in the sector and still hold {{n}}+ charge."
     }
   },
   "bark": {

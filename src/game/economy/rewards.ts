@@ -106,30 +106,37 @@ export const dieForRarity = (
   rarityStep = 0,
 ): string => rng.pick(poolForRarity(bumpRarity(rarity, rarityStep)));
 
+export const POCKET_SCRAP_MULT = 1.5;
+export const POCKET_RARITY_STEP = 1;
+
 export const computeNodeReward = (
   type: NodeType,
   rng: RngStream,
   rarityStep = 0,
+  pocket = false,
 ): NodeReward => {
+  const step = rarityStep + (pocket ? POCKET_RARITY_STEP : 0);
+  const scrap = (n: number): number =>
+    pocket ? Math.round(n * POCKET_SCRAP_MULT) : n;
   switch (type) {
     case "battle":
       return {
-        scrap: rng.int(12, 20),
+        scrap: scrap(rng.int(12, 20)),
         dieDrop:
           rng.next() < BATTLE_DROP_CHANCE
-            ? rollDrop(rng, DROP_WEIGHTS.battle, rarityStep)
+            ? rollDrop(rng, DROP_WEIGHTS.battle, step)
             : null,
       };
     case "elite":
     case "miniboss":
       return {
-        scrap: rng.int(45, 60),
-        dieDrop: rollDrop(rng, DROP_WEIGHTS.elite, rarityStep),
+        scrap: scrap(rng.int(45, 60)),
+        dieDrop: rollDrop(rng, DROP_WEIGHTS.elite, step),
       };
     case "boss":
       return {
         scrap: 80,
-        dieDrop: rollDrop(rng, DROP_WEIGHTS.boss, rarityStep),
+        dieDrop: rollDrop(rng, DROP_WEIGHTS.boss, step),
       };
     default:
       return { scrap: 0, dieDrop: null };

@@ -37,6 +37,13 @@
       "anomaly": "Anomalía",
       "beacon": "Baliza",
       "boss": "Jefe"
+    },
+    "previewNode": "{{type}} · riesgo: {{risk}}",
+    "previewPocket": "Desvío: mejor botín, combate más duro",
+    "risk": {
+      "low": "bajo",
+      "raised": "elevado",
+      "high": "alto"
     }
   },
   "event": {
@@ -66,20 +73,14 @@
     "title": "Anomalía",
     "goal": "Objetivo",
     "resolve": "Resolución",
-    "retry": "Nuevo rollo",
     "solved": "Resuelto",
     "failed": "Todavía no: vuelve a tirar o tira de nuevo",
-    "reward": "+ Recorte de{{n}}",
     "leave": "Salir",
     "tray": "Dados lanzados",
     "slots": "Sistemas",
     "rerolls": "repeticiones: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Nuevo rollo (a la izquierda de {{n}})",
-    "giveUp": "No quedan rollos nuevos",
     "toMap": "Volver al mapa",
-    "outOfRollsTitle": "Anomalía sin resolver",
-    "outOfRolls": "No quedan nuevos rollos. Salida de Stokes Resonancia Interferencia.",
     "rerollHint": "Elige hasta un{{n}}es dados para volver a tirar",
     "rerollCancel": "Cancelar",
     "rerollConfirm": "Volver a jugar «{{k}}»",
@@ -99,7 +100,6 @@
     "carryReserved": "reservado d {{n}}",
     "carryNone": "Todavía nada",
     "reserve": "Reserva",
-    "reserved": "Reservado",
     "unreserve": "Desreservar",
     "nextTurn": "Fin de turno",
     "reset": "Restablecer la ubicación",
@@ -141,7 +141,37 @@
       "damage": "daños",
       "charge": "cargo",
       "shield": "escudo"
-    }
+    },
+    "tierName": {
+      "1": "faint reading",
+      "2": "steady reading",
+      "3": "deep reading",
+      "4": "severe reading",
+      "5": "singular reading"
+    },
+    "entryEnter": "Take the reading",
+    "entryLeaveNote": "Walking away counts as unsolved and feeds Resonance Interference.",
+    "rewardPreview": "Reward",
+    "rewardScrap": "{{n}} scrap",
+    "rewardCodex": "a codex entry",
+    "rewardChoice": "your pick: the die «{{name}}» or an engraving voucher",
+    "rewardDie": "the die «{{name}}»",
+    "rewardOnce": "drops nowhere else",
+    "stakes": "Stakes",
+    "stakeFree": "{{n}} attempts, both free",
+    "stakePaid": "{{n}} free, then {{costs}} scrap",
+    "stakeDeduction": "fixed reading · {{n}} submissions",
+    "interferenceNow": "Resonance Interference ×{{n}} is running — any solve clears it.",
+    "interferenceNone": "No interference on the hull.",
+    "attemptChip": "attempt {{cur}}/{{max}}",
+    "submissionsLeft": "answers left: {{n}}",
+    "newAttempt": "New board ({{n}} left)",
+    "newAttemptCost": "New board — {{n}} scrap",
+    "outOfAttemptsTitle": "The reading closes",
+    "outOfAttempts": "No attempts left. Leaving stokes Resonance Interference.",
+    "locked": "{{n}} die is held out of turn 1",
+    "takeDie": "Take «{{name}}»",
+    "takeVoucher": "Take the voucher"
   },
   "codex": {
     "title": "Códice",
@@ -214,7 +244,8 @@
     "perks": "Actualizaciones:",
     "perksNone": "ninguno",
     "meta": "Fragmentos & XP",
-    "toMenu": "Ir al menú"
+    "toMenu": "Ir al menú",
+    "faced": "Enfrentados: {{names}}"
   },
   "prologue": {
     "title": "Prólogo",
@@ -283,5 +314,15 @@
       "title": "Elige el siguiente nodo",
       "body": "Toca un nodo iluminado y, a continuación, pulsa «Saltar». La niebla oculta las filas que hay más adelante; los sensores y los escáneres profundos amplían el horizonte."
     }
+  },
+  "motif": {
+    "title": "Rasgos del sector",
+    "cache": "Alijo: chatarra al llegar",
+    "mine": "Campo de minas: cruzar cuesta casco",
+    "blessed": "Carril bendecido: el Coro te favorece",
+    "cursed": "Carril maldito: la interferencia sube",
+    "unstable": "Fila inestable: su contenido se volvió a tirar",
+    "pocket": "Bolsa de desvío: más riesgo, más recompensa",
+    "riftSplit": "Fisura: las ramas solo se juntan en la puerta"
   }
 }

@@ -56,6 +56,7 @@ export interface MetaValues {
   badges: string[];
   codex: string[];
   codexRead: string[];
+  seenPuzzles: string[];
   contracts: Record<string, number>;
   dailyPlayed: Record<string, DailyRecord>;
   best: BestScores;
@@ -74,6 +75,7 @@ export interface RunAward {
 export interface MetaState extends MetaValues {
   unlockCodex: (id: string) => boolean;
   markCodexRead: (id: string) => void;
+  markPuzzleSeen: (id: string) => void;
   markAllCodexRead: () => void;
   awardRun: (xpGain: number, shardGain: number, win: boolean) => RunAward;
   addShards: (n: number) => void;
@@ -103,7 +105,9 @@ export interface MetaState extends MetaValues {
   bumpLifetime: (delta: Partial<MetaStats>) => void;
 }
 
-export const META_VERSION = 7;
+export const META_VERSION = 8;
+
+export const SEEN_PUZZLE_MEMORY = 40;
 
 export const SMOTRITEL_BADGE = 'keeper';
 
@@ -158,6 +162,7 @@ const createInitialMetaValues = (): MetaValues => ({
   badges: [],
   codex: [],
   codexRead: [],
+  seenPuzzles: [],
   contracts: {},
   dailyPlayed: {},
   best: {
@@ -283,6 +288,9 @@ export const migrateMeta = (
     badges: Array.isArray(prev.badges) ? prev.badges : base.badges,
     codex: Array.isArray(prev.codex) ? prev.codex : base.codex,
     codexRead: Array.isArray(prev.codexRead) ? prev.codexRead : base.codexRead,
+    seenPuzzles: Array.isArray(prev.seenPuzzles)
+      ? prev.seenPuzzles.slice(-SEEN_PUZZLE_MEMORY)
+      : base.seenPuzzles,
     contracts:
       typeof prev.contracts === 'object' && prev.contracts !== null
         ? (prev.contracts as Record<string, number>)
@@ -323,6 +331,19 @@ export const useMetaStore = create<MetaState>()(
       markCodexRead: (id) => {
         set((s) =>
           s.codexRead.includes(id) ? s : { codexRead: [...s.codexRead, id] },
+        );
+      },
+
+      markPuzzleSeen: (id) => {
+        set((s) =>
+          s.seenPuzzles[s.seenPuzzles.length - 1] === id
+            ? s
+            : {
+                seenPuzzles: [
+                  ...s.seenPuzzles.filter((seen) => seen !== id),
+                  id,
+                ].slice(-SEEN_PUZZLE_MEMORY),
+              },
         );
       },
 
@@ -593,6 +614,7 @@ export const useMetaStore = create<MetaState>()(
         badges: s.badges,
         codex: s.codex,
         codexRead: s.codexRead,
+        seenPuzzles: s.seenPuzzles,
         contracts: s.contracts,
         dailyPlayed: s.dailyPlayed,
         best: s.best,

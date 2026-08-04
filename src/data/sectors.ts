@@ -1,4 +1,6 @@
+import type { NodeType } from "@/game/map/types";
 import type { LocKey } from "@/types/content";
+import type { EventEffect } from "@/types/events";
 
 export type SectorId = 1 | 2 | 3 | 4 | 5;
 
@@ -11,6 +13,42 @@ export interface NodeQuotas {
   beacons: number;
 }
 
+export interface SectorScaling {
+  hpPct: number;
+  pocketPct: number;
+}
+
+export type SectorMotif =
+  | { m: "cache"; count: number; gain: readonly EventEffect[] }
+  | { m: "mineEdges"; count: number; toll: readonly EventEffect[] }
+  | { m: "riftSplit"; from: number; to: number }
+  | {
+      m: "procession";
+      blessed: readonly EventEffect[];
+      cursed: readonly EventEffect[];
+    }
+  | { m: "collapse"; rows: number; chance: number };
+
+export type MotifKind = SectorMotif["m"];
+
+export interface EncounterMix {
+  bespokeWeight: number;
+  threatCap: number;
+  sizeWeights: readonly number[];
+}
+
+export interface SectorShape {
+  bossRow: number;
+  gateRow: number;
+  lanes: 3 | 4;
+  branchiness: number;
+  quotas: NodeQuotas;
+  motifs: readonly SectorMotif[];
+  pockets: readonly [number, number];
+  pocketTable: readonly (readonly [NodeType, number])[];
+  anomalyTiers: readonly [number, number];
+}
+
 export interface SectorDef {
   id: SectorId;
   name: LocKey;
@@ -20,20 +58,132 @@ export interface SectorDef {
   pairPool: readonly (readonly [string, string])[];
   elitePool: readonly string[];
   minibossPool: readonly string[];
-  bossId: string;
+  bossPool: readonly string[];
   tideCap: number;
-  nodeQuotas: NodeQuotas;
+  encounter: EncounterMix;
+  shape: SectorShape;
+  scaling: SectorScaling;
   scrapMult: number;
   beaconId: string;
 }
 
-const QUOTAS: NodeQuotas = {
-  elites: [2, 3],
-  events: [4, 5],
-  shops: 2,
-  shipyards: 2,
-  anomalies: 2,
-  beacons: 1,
+const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
+  1: {
+    bossRow: 15,
+    gateRow: 8,
+    lanes: 3,
+    branchiness: 0.35,
+    quotas: {
+      elites: [2, 2],
+      events: [5, 6],
+      shops: 2,
+      shipyards: 2,
+      anomalies: 2,
+      beacons: 1,
+    },
+    motifs: [{ m: "cache", count: 2, gain: [{ k: "scrap", n: 10 }] }],
+    pockets: [1, 1],
+    pocketTable: [
+      ["event", 3],
+      ["anomaly", 2],
+      ["shop", 1],
+    ],
+    anomalyTiers: [1, 2],
+  },
+  2: {
+    bossRow: 15,
+    gateRow: 8,
+    lanes: 4,
+    branchiness: 0.7,
+    quotas: {
+      elites: [2, 3],
+      events: [4, 5],
+      shops: 3,
+      shipyards: 2,
+      anomalies: 2,
+      beacons: 1,
+    },
+    motifs: [{ m: "mineEdges", count: 4, toll: [{ k: "hull", n: -2 }] }],
+    pockets: [2, 2],
+    pocketTable: [
+      ["shop", 3],
+      ["event", 2],
+      ["anomaly", 2],
+    ],
+    anomalyTiers: [1, 3],
+  },
+  3: {
+    bossRow: 14,
+    gateRow: 7,
+    lanes: 4,
+    branchiness: 0.55,
+    quotas: {
+      elites: [2, 3],
+      events: [4, 4],
+      shops: 2,
+      shipyards: 2,
+      anomalies: 2,
+      beacons: 1,
+    },
+    motifs: [{ m: "riftSplit", from: 3, to: 6 }],
+    pockets: [1, 1],
+    pocketTable: [
+      ["anomaly", 3],
+      ["event", 2],
+      ["shipyard", 1],
+    ],
+    anomalyTiers: [2, 4],
+  },
+  4: {
+    bossRow: 15,
+    gateRow: 9,
+    lanes: 4,
+    branchiness: 0.6,
+    quotas: {
+      elites: [2, 3],
+      events: [5, 6],
+      shops: 2,
+      shipyards: 3,
+      anomalies: 2,
+      beacons: 1,
+    },
+    motifs: [
+      {
+        m: "procession",
+        blessed: [{ k: "nodeMod", mod: "shipyardDiscount", n: 12 }],
+        cursed: [{ k: "tide", n: 1 }],
+      },
+    ],
+    pockets: [2, 2],
+    pocketTable: [
+      ["event", 3],
+      ["anomaly", 2],
+      ["shipyard", 2],
+    ],
+    anomalyTiers: [2, 4],
+  },
+  5: {
+    bossRow: 14,
+    gateRow: 7,
+    lanes: 3,
+    branchiness: 0.45,
+    quotas: {
+      elites: [3, 4],
+      events: [3, 4],
+      shops: 2,
+      shipyards: 2,
+      anomalies: 2,
+      beacons: 1,
+    },
+    motifs: [{ m: "collapse", rows: 2, chance: 0.5 }],
+    pockets: [1, 1],
+    pocketTable: [
+      ["anomaly", 3],
+      ["event", 2],
+      ["shop", 2],
+    ],
+    anomalyTiers: [3, 5],
+  },
 };
 
 export const SECTORS: readonly SectorDef[] = [
@@ -63,9 +213,15 @@ export const SECTORS: readonly SectorDef[] = [
     ],
     elitePool: ["raiderAlpha", "bountyHuntress"],
     minibossPool: ["convoyAlpha", "wardenFragment", "mirrorHull"],
-    bossId: "quarantineWarden",
+    bossPool: ["quarantineWarden"],
     tideCap: 3,
-    nodeQuotas: QUOTAS,
+    encounter: {
+      bespokeWeight: 14,
+      threatCap: 26,
+      sizeWeights: [4, 1],
+    },
+    shape: SHAPES[1],
+    scaling: { hpPct: 0, pocketPct: 20 },
     scrapMult: 1,
     beaconId: "beaconKeeperIntro",
   },
@@ -94,9 +250,15 @@ export const SECTORS: readonly SectorDef[] = [
     ],
     elitePool: ["raiderAlpha", "clanBreaker", "mineBaron"],
     minibossPool: ["mineTyrant", "leechQueen", "convoyAlpha"],
-    bossId: "breakerBarge",
+    bossPool: ["breakerBarge"],
     tideCap: 3,
-    nodeQuotas: QUOTAS,
+    encounter: {
+      bespokeWeight: 12,
+      threatCap: 30,
+      sizeWeights: [4, 2, 0.4],
+    },
+    shape: SHAPES[2],
+    scaling: { hpPct: 6, pocketPct: 25 },
     scrapMult: 1.1,
     beaconId: "fleetBlackbox",
   },
@@ -125,9 +287,15 @@ export const SECTORS: readonly SectorDef[] = [
     ],
     elitePool: ["riftTyrant", "bountyHuntress", "leechPrince"],
     minibossPool: ["mirrorHull", "leechQueen", "wardenFragment"],
-    bossId: "riftMaw",
+    bossPool: ["riftMaw"],
     tideCap: 3,
-    nodeQuotas: QUOTAS,
+    encounter: {
+      bespokeWeight: 12,
+      threatCap: 34,
+      sizeWeights: [4, 2, 0.4],
+    },
+    shape: SHAPES[3],
+    scaling: { hpPct: 20, pocketPct: 25 },
     scrapMult: 1.2,
     beaconId: "choirInvitation",
   },
@@ -156,9 +324,15 @@ export const SECTORS: readonly SectorDef[] = [
     ],
     elitePool: ["choirCantor", "bountyHuntress", "leechPrince"],
     minibossPool: ["choirHerald", "convoyAlpha", "mineTyrant"],
-    bossId: "choirFlagship",
+    bossPool: ["choirFlagship"],
     tideCap: 3,
-    nodeQuotas: QUOTAS,
+    encounter: {
+      bespokeWeight: 12,
+      threatCap: 38,
+      sizeWeights: [4, 2, 0.4],
+    },
+    shape: SHAPES[4],
+    scaling: { hpPct: 32, pocketPct: 30 },
     scrapMult: 1.3,
     beaconId: "pactSeal",
   },
@@ -187,9 +361,15 @@ export const SECTORS: readonly SectorDef[] = [
     ],
     elitePool: ["coreSentinel", "riftTyrant", "choirCantor"],
     minibossPool: ["mirrorHull", "choirHerald", "leechQueen"],
-    bossId: "coreHeart",
+    bossPool: ["coreHeart"],
     tideCap: 3,
-    nodeQuotas: QUOTAS,
+    encounter: {
+      bespokeWeight: 12,
+      threatCap: 42,
+      sizeWeights: [4, 2, 0.4],
+    },
+    shape: SHAPES[5],
+    scaling: { hpPct: 56, pocketPct: 30 },
     scrapMult: 1.4,
     beaconId: "coreThreshold",
   },

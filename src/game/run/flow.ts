@@ -10,7 +10,7 @@ import { beaconsResolved } from "@/data/events/beacons";
 import { finalMemoryCodexId, memoryAt } from "@/data/narrative/memories";
 import { PROLOGUE_ENEMY, PROLOGUE_SCRIPT } from "@/data/narrative/prologue";
 import { SECTOR_COUNT, sectorDef } from "@/data/sectors";
-import { gateHpBonusPct, shipHullMax } from "@/game/battle/setup";
+import { shipHullMax } from "@/game/battle/setup";
 import { chartSlotTierDelta } from "@/game/chart/engine";
 import {
   computeNodeReward,
@@ -27,7 +27,12 @@ import {
 } from "@/game/map/types";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import { pushRunCloud } from "@/game/run/cloud";
-import { buildEncounterIds } from "@/game/run/encounter";
+import {
+  buildEncounterIds,
+  pickBoss,
+  sectorHpPct,
+} from "@/game/run/encounter";
+import { applyEdgeMotifs, applyNodeMotifs } from "@/game/run/motifs";
 import { battleEndAxisDelta, countDeckSchool } from "@/game/run/axis";
 import { emitBark, resetBarkMemory } from "@/game/narrative";
 import { computePerkMods } from "@/game/run/perkMods";
@@ -89,6 +94,16 @@ const STORM_SCHOOLS: readonly School[] = [
   "black",
   "grey",
 ];
+
+const runRotation = (run: RunValues): string[] => {
+  const faced = [
+    ...run.usedMinibosses,
+    ...(run.stats.bosses > 0 ? [pickBoss(run.sector, run.seed)] : []),
+  ];
+  return faced
+    .map((id) => ENEMY_BY_ID.get(id)?.name)
+    .filter((name): name is string => name !== undefined);
+};
 
 const contractPerksDisabled = (): boolean =>
   setupForRun(useRunStore.getState()).perksDisabled === true;
@@ -193,6 +208,7 @@ export const endRun = (win: boolean): void => {
     score: isScoredMode(run.mode) ? scoreBreakdown(run.stats) : null,
     contractId: run.contractId,
     contractStars: contract?.stars ?? 0,
+    rotation: runRotation(run),
   });
   if (!win) {
     trackEvent({
@@ -249,25 +265,25 @@ export const unlockNextMemory = (): void => {
   emitBark("memory");
 };
 
-const encounterInit = () => {
+const encounterInit = (pocket: boolean) => {
   const s = useRunStore.getState();
   const mods = ascensionMods(s.ascension);
   const mut = computeMutatorMods(s.mutators);
   return {
     ascension: s.ascension,
+    sectorHpPct: sectorHpPct({ sector: s.sector, pocket }),
     enemyHpBonusPct:
       mods.enemyHpPct +
       mut.enemyHpPct +
       mut.copyHpPct +
       driftLoopHpPct(driftLoop(s.sectorIndex)),
-    gateHpBonusPct: gateHpBonusPct(s.sector),
     eliteShield: mods.eliteShield,
   };
 };
 
 // Mutators and contract setups are constant for the run, so every battle in the
 // run enters through the same shaped encounter.
-const runBattleInit = (nodeKey: string) => {
+const runBattleInit = (nodeKey: string, pocket = false) => {
   const s = useRunStore.getState();
   const setup = setupForRun(s);
   const mut = computeMutatorMods(s.mutators);
@@ -315,7 +331,7 @@ const runBattleInit = (nodeKey: string) => {
     slotTierDelta,
     disabledSlots,
     resonanceBoost,
-    ...encounterInit(),
+    ...encounterInit(pocket),
   };
 };
 
@@ -336,6 +352,7 @@ const startBattleNode = (node: MapNode): void => {
     sector: s.sector,
     flags: s.flags,
     usedMinibosses: s.usedMinibosses,
+    seed: s.seed,
   });
   if (enemyIds.includes("bountyHuntress")) s.setFlag("hunterEngaged");
   if (node.type === "miniboss" && enemyIds[0] !== undefined) {
@@ -347,7 +364,7 @@ const startBattleNode = (node: MapNode): void => {
     {
       enemyIds: withEnemyCopies(enemyIds),
       startCharge: mods.startCharge,
-      ...runBattleInit(node.id),
+      ...runBattleInit(node.id, node.pocket === true),
     },
     s.deck.map((d) => d.defId),
     streams,
@@ -377,7 +394,10 @@ export const startEventBattle = (follow: ForcedBattle): void => {
     {
       enemyIds: withEnemyCopies(enemyIds),
       startCharge: mods.startCharge,
-      ...runBattleInit(`ev:${s.position}`),
+      ...runBattleInit(
+        `ev:${s.position}`,
+        nodeById(s.map).get(s.position)?.pocket === true,
+      ),
     },
     s.deck.map((d) => d.defId),
     streams,
@@ -388,12 +408,14 @@ export const startEventBattle = (follow: ForcedBattle): void => {
 
 const routeToNode = (node: MapNode): void => {
   const go = useAppStore.getState().go;
+  applyNodeMotifs(node, useRunStore.getState().sector);
   emitRunHook("nodeEnter", {
     node: {
       nodeId: node.id,
       nodeType: node.type,
       sector: useRunStore.getState().sector,
       row: node.row,
+      pocket: node.pocket === true,
     },
   });
   switch (node.type) {
@@ -582,6 +604,7 @@ export const jumpTo = (toNodeId: NodeId): boolean => {
   }
 
   recordAction(`jump:${toNodeId}`);
+  applyEdgeMotifs(s.map, s.position, toNodeId, s.sector);
   useRunStore.setState({
     position: toNodeId,
     depthRow: node.row,
@@ -601,7 +624,7 @@ export const jumpTo = (toNodeId: NodeId): boolean => {
 const afterBossVictory = (): void => {
   const run = useRunStore.getState();
   const meta = useMetaStore.getState();
-  const bossId = sectorDef(run.sector).bossId;
+  const bossId = pickBoss(run.sector, run.seed);
   if (meta.recordBossFirstKill(bossId)) {
     meta.addShards(bossFirstKillShards(run.sector));
   }
@@ -621,10 +644,12 @@ const afterBossVictory = (): void => {
 
 // Campaign ends a sector on its boss; drift replaces that boss with a gate, so
 // the exit is the row rather than the node type.
-const isSectorExit = (node: MapNode): boolean =>
-  useRunStore.getState().mode === "drift"
-    ? isSectorExitRow(node.row)
+const isSectorExit = (node: MapNode): boolean => {
+  const run = useRunStore.getState();
+  return run.mode === "drift"
+    ? isSectorExitRow(run.sectorIndex, node.row)
     : node.type === "boss";
+};
 
 const finalizeNode = (
   node: MapNode,
@@ -797,7 +822,12 @@ export const resolveRunBattle = (): void => {
   const mods = computeRunMods(run.perks, run.chartPicks, run.modules);
   const mut = computeMutatorMods(run.mutators);
   const sectorScrapMult = sectorDef(run.sector).scrapMult;
-  const reward = computeNodeReward(node.type, lootStream, mut.lootRarityStep);
+  const reward = computeNodeReward(
+    node.type,
+    lootStream,
+    mut.lootRarityStep,
+    node.pocket === true,
+  );
   const rewardScrap = Math.round(
     reward.scrap *
       sectorScrapMult *
@@ -1055,7 +1085,7 @@ export const sectorShardPreview = (): number =>
   sectorClearShards(useRunStore.getState().sector);
 
 export const currentBossName = (sector: number): string =>
-  ENEMY_BY_ID.get(sectorDef(sector).bossId)?.name ?? "";
+  ENEMY_BY_ID.get(pickBoss(sector, useRunStore.getState().seed))?.name ?? "";
 
 export const abandonRun = (): void => {
   useRunStore.getState().reset();

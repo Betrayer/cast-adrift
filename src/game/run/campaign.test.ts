@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { MINIBOSSES } from "@/data/enemies";
 import { MEMORIES } from "@/data/narrative/memories";
-import { SECTORS, sectorDef } from "@/data/sectors";
-import { pickMiniboss } from "@/game/run/encounter";
+import { SECTORS } from "@/data/sectors";
+import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import {
   advanceSector,
   startRun,
@@ -141,8 +141,8 @@ describe("campaign shard table", () => {
   it("pays a first-kill bonus once per boss per profile", () => {
     resetMeta();
     const meta = useMetaStore.getState();
-    expect(meta.recordBossFirstKill(sectorDef(1).bossId)).toBe(true);
-    expect(useMetaStore.getState().recordBossFirstKill(sectorDef(1).bossId)).toBe(
+    expect(meta.recordBossFirstKill(pickBoss(1, 7))).toBe(true);
+    expect(useMetaStore.getState().recordBossFirstKill(pickBoss(1, 7))).toBe(
       false,
     );
     expect(bossFirstKillShards(1)).toBe(25);

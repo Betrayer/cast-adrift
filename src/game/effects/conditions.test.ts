@@ -11,6 +11,7 @@ import { RunCtx } from "@/game/effects/runCtx";
 import { applyDefs } from "@/game/effects/evaluate";
 import { injectEffectSource } from "@/game/effects/pipeline";
 import { computeCensus } from "@/game/battle/resonance";
+import type { NodeType } from "@/game/map/types";
 import type { Cond, EffectDef } from "@/game/effects/types";
 import type { BattleSnapshot, RolledDie } from "@/types/battle";
 
@@ -278,6 +279,54 @@ describe("run scope", () => {
     expect(
       runFires([{ c: "resonanceAtLeast", school: "red", n: 2 }], runCtx()),
     ).toBe(true);
+  });
+
+  it("answers nodeIs from the node the run is entering", () => {
+    const withNode = (
+      node: { nodeType: NodeType; pocket: boolean } | undefined,
+    ): RunCtx => {
+      const ctx = runCtx();
+      ctx.payload =
+        node === undefined
+          ? {}
+          : {
+              node: {
+                nodeId: "r4l1",
+                nodeType: node.nodeType,
+                sector: 1,
+                row: 4,
+                pocket: node.pocket,
+              },
+            };
+      return ctx;
+    };
+    expect(
+      runFires(
+        [{ c: "nodeIs", is: "shop" }],
+        withNode({ nodeType: "shop", pocket: false }),
+      ),
+    ).toBe(true);
+    expect(
+      runFires(
+        [{ c: "nodeIs", is: "shop" }],
+        withNode({ nodeType: "event", pocket: false }),
+      ),
+    ).toBe(false);
+    expect(
+      runFires(
+        [{ c: "nodeIs", is: "pocket" }],
+        withNode({ nodeType: "battle", pocket: true }),
+      ),
+    ).toBe(true);
+    expect(
+      runFires(
+        [{ c: "nodeIs", is: "pocket" }],
+        withNode({ nodeType: "battle", pocket: false }),
+      ),
+    ).toBe(false);
+    expect(runFires([{ c: "nodeIs", is: "battle" }], withNode(undefined))).toBe(
+      false,
+    );
   });
 
   it("battle-only conditions stay false out of battle", () => {

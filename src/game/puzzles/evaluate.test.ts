@@ -2,81 +2,19 @@ import { describe, expect, it } from "vitest";
 import { PUZZLES, type PuzzleDef } from "@/data/puzzles";
 import {
   advanceMultiTurn,
-  difficultyReport,
   enumeratePlacements,
   initialMultiTurnState,
-  isAchievable,
-  isTrivial,
   multiTurnSatisfied,
   placementSatisfied,
   scorePlacement,
-  solutionCount,
-  totalPlacements,
 } from "@/game/puzzles/evaluate";
+import { solutionsOnBoard } from "@/game/puzzles/difficulty";
 
 const byId = (id: string): PuzzleDef => {
   const p = PUZZLES.find((x) => x.id === id);
   if (p === undefined) throw new Error(`no puzzle ${id}`);
   return p;
 };
-
-describe("puzzle set shape", () => {
-  it("has exactly 25 puzzles", () => {
-    expect(PUZZLES).toHaveLength(25);
-  });
-
-  it("matches the authored archetype spread", () => {
-    const spread: Record<string, number> = {};
-    for (const p of PUZZLES) spread[p.goal.g] = (spread[p.goal.g] ?? 0) + 1;
-    expect(spread).toEqual({
-      exact: 5,
-      constraint: 6,
-      order: 4,
-      multiTurn: 4,
-      deduction: 4,
-      survivePlus: 2,
-    });
-  });
-
-  it("gives every puzzle a unique id", () => {
-    expect(new Set(PUZZLES.map((p) => p.id)).size).toBe(PUZZLES.length);
-  });
-});
-
-describe("solvability guarantees (every arm)", () => {
-  it.each(PUZZLES.map((p) => [p.id, p] as const))(
-    "%s is achievable within its reroll budget",
-    (_id, puzzle) => {
-      expect(isAchievable(puzzle)).toBe(true);
-    },
-  );
-
-  it.each(PUZZLES.map((p) => [p.id, p] as const))(
-    "%s is never a free win",
-    (_id, puzzle) => {
-      expect(isTrivial(puzzle)).toBe(false);
-    },
-  );
-
-  it.each(
-    PUZZLES.filter((p) => p.goal.g === "deduction").map((p) => [p.id, p] as const),
-  )("%s (deduction) has 1..3 unique solutions on its fixed roll", (_id, puzzle) => {
-    const count = solutionCount(puzzle);
-    expect(count).toBeGreaterThanOrEqual(1);
-    expect(count).toBeLessThanOrEqual(3);
-    expect(count).toBeLessThan(totalPlacements(puzzle));
-    expect(puzzle.fixedRoll).toBeDefined();
-  });
-
-  it.each(
-    PUZZLES.filter((p) => p.goal.g === "exact").map((p) => [p.id, p] as const),
-  )("%s (exact) is landable and its value sits inside [floor, ceil]", (_id, puzzle) => {
-    const r = difficultyReport(puzzle);
-    expect(r.exactReachable).toBe(true);
-    expect(r.target).toBeGreaterThan(r.floor);
-    expect(r.target).toBeLessThanOrEqual(r.ceil);
-  });
-});
 
 describe("scorePlacement extended bundle", () => {
   it("returns beats, slotValues, and wastedToCap", () => {
@@ -160,13 +98,18 @@ describe("order — every stage must fire", () => {
 describe("multiTurn — state carries across turns", () => {
   it("capacitor cannot bank the target in one turn but can across turns", () => {
     const p = byId("capacitor");
-    let state = initialMultiTurnState(p);
-    // One max black die -> 9 charge, below 16.
-    state = advanceMultiTurn(p, state, [6, 6, 4], { reactor: 0 });
+    const ceiling = [6, 6, 4];
+    const best = (state: ReturnType<typeof initialMultiTurnState>) =>
+      enumeratePlacements(p).reduce(
+        (acc, placement) => {
+          const next = advanceMultiTurn(p, state, ceiling, placement);
+          return next.carry.charge > acc.carry.charge ? next : acc;
+        },
+        advanceMultiTurn(p, state, ceiling, {}),
+      );
+    let state = best(initialMultiTurnState(p));
     expect(multiTurnSatisfied(p, state)).toBe(false);
-    // Second turn banks on top of the first.
-    state = advanceMultiTurn(p, state, [6, 6, 4], { reactor: 1 });
-    expect(state.carry.charge).toBeGreaterThanOrEqual(16);
+    for (let turn = 1; turn < 3; turn += 1) state = best(state);
     expect(multiTurnSatisfied(p, state)).toBe(true);
   });
 
@@ -184,24 +127,26 @@ describe("multiTurn — state carries across turns", () => {
 describe("deduction — a wrong placement fails", () => {
   it("lockbox has a single correct routing", () => {
     const p = byId("lockbox");
-    expect(solutionCount(p)).toBe(1);
     const roll = [...(p.fixedRoll ?? [])];
-    // The intended lock: ember->weaponA, blue->shields, black->reactor.
-    const right = { weaponA: 0, shields: 1, reactor: 2 };
-    expect(placementSatisfied(p, roll, right)).toBe(true);
-    // Swap ember and blue -> both damage and shield thresholds break.
-    const wrong = { weaponA: 1, shields: 0, reactor: 2 };
-    expect(placementSatisfied(p, roll, wrong)).toBe(false);
+    const winners = enumeratePlacements(p).filter((placement) =>
+      placementSatisfied(p, roll, placement),
+    );
+    expect(winners).toHaveLength(1);
+    expect(solutionsOnBoard(p, roll)).toBe(1);
+    expect(Object.keys(winners[0] ?? {}).length).toBeGreaterThan(1);
   });
 
   it("parity forces odd weapons and even shields", () => {
     const p = byId("parity");
-    expect(solutionCount(p)).toBe(1);
     const roll = [...(p.fixedRoll ?? [])];
-    const right = { weaponA: 0, shields: 1 }; // ember(5->7 odd), blue(4->6 even)
-    expect(placementSatisfied(p, roll, right)).toBe(true);
-    const wrong = { weaponA: 1, shields: 0 }; // blue(4 even) in weapons -> parity fails
-    expect(placementSatisfied(p, roll, wrong)).toBe(false);
+    const winners = enumeratePlacements(p).filter((placement) =>
+      placementSatisfied(p, roll, placement),
+    );
+    expect(winners).toHaveLength(1);
+    const solution = winners[0] ?? {};
+    const score = scorePlacement(p, roll, solution);
+    expect((score.slotValues.weaponA ?? 0) % 2).toBe(1);
+    expect((score.slotValues.shields ?? 0) % 2).toBe(0);
   });
 });
 

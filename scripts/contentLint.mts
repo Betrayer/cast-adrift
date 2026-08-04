@@ -13,7 +13,9 @@ import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
 import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
-import { ALL_DICE } from "../src/data/dice";
+import { ALL_DICE, DIE_BY_ID } from "../src/data/dice";
+import { resolveFaces } from "../src/game/puzzles/evaluate";
+import { createStream } from "../src/services/rng";
 import {
   ENCOUNTER_GROUPS,
   ALL_ENEMIES,
@@ -36,13 +38,9 @@ import {
 } from "../src/game/effects/types";
 import { CONTENT_TAGS, isContentTag } from "../src/data/tags";
 import { moduleTags } from "../src/data/modules/types";
-import {
-  difficultyReport,
-  isAchievable,
-  isTrivial,
-  solutionCount,
-  totalPlacements,
-} from "../src/game/puzzles/evaluate";
+import { calibrationIssues } from "../src/game/puzzles/difficulty";
+import { PUZZLE_CODEX, rewardFor } from "../src/game/puzzles/stakes";
+import { puzzleTable } from "./puzzleTable";
 import enContent from "../src/i18n/en/content.json" with { type: "json" };
 import ukContent from "../src/i18n/uk/content.json" with { type: "json" };
 import ruContent from "../src/i18n/ru/content.json" with { type: "json" };
@@ -109,7 +107,6 @@ const PENDING_VOCABULARY: Readonly<Record<string, string>> = {
   place: "R5",
   turnEnd: "R5",
   enemyTurnEnd: "R6",
-  nodeEnter: "R3",
   eventOutcome: "R7",
   shopEnter: "R8",
   any: "R5",
@@ -117,7 +114,6 @@ const PENDING_VOCABULARY: Readonly<Record<string, string>> = {
   firstOfTurn: "R5",
   chargeAtLeast: "R5",
   shieldAtLeast: "R5",
-  tideAtLeast: "R3",
   counterAtLeast: "R5",
   enemyHpPctLt: "R6",
   enemyShielded: "R6",
@@ -592,41 +588,110 @@ for (const puzzle of PUZZLES) {
     if (!dieIdSet.has(defId))
       errors.push(`puzzles: "${puzzle.id}" uses unknown die "${defId}"`);
   }
-  if (puzzle.reward.die !== undefined && !dieIdSet.has(puzzle.reward.die))
-    errors.push(`puzzles: "${puzzle.id}" rewards unknown die "${puzzle.reward.die}"`);
-  if (puzzle.reward.codex !== undefined && !CODEX_BY_ID.has(puzzle.reward.codex))
-    errors.push(`puzzles: "${puzzle.id}" rewards unknown codex "${puzzle.reward.codex}"`);
-  if (!isAchievable(puzzle))
-    errors.push(`puzzles: "${puzzle.id}" cannot reach its goal even on a ceiling roll`);
-  if (isTrivial(puzzle))
-    errors.push(`puzzles: "${puzzle.id}" is a free win on a floor roll`);
+  if (puzzle.tier === 5 && puzzle.uniqueDie === undefined)
+    errors.push(`puzzles: "${puzzle.id}" is T5 and owes a unique die reward`);
+  if (puzzle.tier !== 5 && puzzle.uniqueDie !== undefined)
+    errors.push(
+      `puzzles: "${puzzle.id}" is T${String(puzzle.tier)} and cannot carry a unique die`,
+    );
+  if (puzzle.uniqueDie !== undefined && !dieIdSet.has(puzzle.uniqueDie))
+    errors.push(
+      `puzzles: "${puzzle.id}" rewards unknown die "${puzzle.uniqueDie}"`,
+    );
+  if (puzzle.locks !== undefined && puzzle.goal.g !== "multiTurn")
+    errors.push(
+      `puzzles: "${puzzle.id}" locks dice but has no turn 2 to release them on`,
+    );
+  if (puzzle.locks !== undefined && puzzle.locks >= puzzle.deck.length)
+    errors.push(`puzzles: "${puzzle.id}" locks its whole deck out of turn 1`);
   if (puzzle.goal.g === "deduction") {
     if (puzzle.fixedRoll === undefined)
       errors.push(`puzzles: "${puzzle.id}" is a deduction puzzle without a fixedRoll`);
-    const count = solutionCount(puzzle);
-    if (count < 1 || count > 3)
-      errors.push(
-        `puzzles: "${puzzle.id}" deduction solution count ${String(count)} is not in [1,3]`,
-      );
-    if (count >= totalPlacements(puzzle))
-      errors.push(`puzzles: "${puzzle.id}" deduction is solved by every placement`);
+    if (puzzle.rerolls !== 0)
+      errors.push(`puzzles: "${puzzle.id}" is a deduction puzzle with rerolls`);
   }
-  if (puzzle.goal.g === "exact") {
-    const r = difficultyReport(puzzle);
-    if (!r.exactReachable)
-      errors.push(`puzzles: "${puzzle.id}" exact value is not landable on any roll`);
-    if (r.target <= r.floor || r.target > r.ceil)
+  if (puzzle.fixedRoll !== undefined) {
+    if (puzzle.fixedRoll.length !== puzzle.deck.length)
       errors.push(
-        `puzzles: "${puzzle.id}" exact value ${String(r.target)} is not inside (floor ${String(r.floor)}, ceil ${String(r.ceil)}]`,
+        `puzzles: "${puzzle.id}" fixedRoll has ${String(puzzle.fixedRoll.length)} faces for ${String(puzzle.deck.length)} dice`,
       );
+    puzzle.fixedRoll.forEach((face, index) => {
+      const defId = puzzle.deck[index];
+      if (defId === undefined) return;
+      const faces = resolveFaces(defId, DIE_BY_ID.get(defId)?.tier ?? 6);
+      if (!faces.includes(face))
+        errors.push(
+          `puzzles: "${puzzle.id}" fixedRoll reads ${String(face)} on "${defId}", which cannot show it`,
+        );
+    });
+  }
+  try {
+    for (const issue of calibrationIssues(puzzle)) {
+      errors.push(`puzzles: "${issue.id}" ${issue.problem}`);
+    }
+  } catch (error) {
+    errors.push(
+      `puzzles: "${puzzle.id}" ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 
-const PUZZLE_COUNT = 25;
+if (!CODEX_BY_ID.has(PUZZLE_CODEX))
+  errors.push(`puzzles: the tier reward table names unknown codex "${PUZZLE_CODEX}"`);
+for (const puzzle of PUZZLES) {
+  const reward = rewardFor(puzzle, createStream(1));
+  if (reward.die !== undefined && !dieIdSet.has(reward.die))
+    errors.push(`puzzles: "${puzzle.id}" rewards unknown die "${reward.die}"`);
+  if (reward.choice !== undefined && !dieIdSet.has(reward.choice.die))
+    errors.push(
+      `puzzles: "${puzzle.id}" offers unknown die "${reward.choice.die}"`,
+    );
+}
+
+const PUZZLE_COUNT = 60;
 if (PUZZLES.length !== PUZZLE_COUNT)
   errors.push(
     `puzzles: expected exactly ${String(PUZZLE_COUNT)} puzzles, found ${String(PUZZLES.length)}`,
   );
+
+const PUZZLE_MATRIX: Readonly<Record<string, readonly number[]>> = {
+  exact: [2, 3, 3, 2, 0],
+  constraint: [3, 4, 5, 2, 1],
+  order: [1, 3, 4, 2, 1],
+  multiTurn: [0, 2, 4, 3, 1],
+  deduction: [1, 2, 2, 2, 1],
+  survivePlus: [1, 1, 2, 1, 1],
+};
+
+const puzzleCells = new Map<string, number>();
+for (const puzzle of PUZZLES) {
+  const key = `${puzzle.goal.g}:${String(puzzle.tier)}`;
+  puzzleCells.set(key, (puzzleCells.get(key) ?? 0) + 1);
+}
+for (const [arch, row] of Object.entries(PUZZLE_MATRIX)) {
+  row.forEach((want, index) => {
+    const tier = index + 1;
+    const got = puzzleCells.get(`${arch}:${String(tier)}`) ?? 0;
+    if (got !== want)
+      errors.push(
+        `puzzles: the ${arch} × T${String(tier)} cell holds ${String(got)} puzzles, not ${String(want)}`,
+      );
+  });
+}
+for (const arch of new Set(PUZZLES.map((p) => p.goal.g))) {
+  if (PUZZLE_MATRIX[arch] === undefined)
+    errors.push(`puzzles: archetype "${arch}" is authored but absent from the matrix`);
+}
+
+const PUZZLE_BELL: readonly number[] = [8, 15, 20, 12, 5];
+PUZZLE_BELL.forEach((want, index) => {
+  const tier = index + 1;
+  const got = PUZZLES.filter((p) => p.tier === tier).length;
+  if (got !== want)
+    errors.push(
+      `puzzles: the bell wants ${String(want)} at T${String(tier)}, found ${String(got)}`,
+    );
+});
 
 const BARK_LINE_TOTAL = 150;
 let barkLines = 0;
@@ -980,8 +1045,11 @@ if (errors.length > 0) {
 console.log("lint:content: effect vocabulary");
 for (const row of vocabularyReport) console.log(row);
 
+console.log("lint:content: puzzle calibration");
+for (const row of puzzleTable(PUZZLES)) console.log(`  ${row}`);
+
 console.log(
-  `lint:content: totals — dice ${String(ALL_DICE.length)}/70 · perks ${String(ALL_PERKS.length)}/150 · modules ${String(ALL_MODULES.length)}/50 · engravings ${String(ENGRAVINGS.length)}/40 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/25 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/54 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/54 · keeper ${String(KEEPER_LINES.length)}/40`,
+  `lint:content: totals — dice ${String(ALL_DICE.length)}/70 · perks ${String(ALL_PERKS.length)}/150 · modules ${String(ALL_MODULES.length)}/50 · engravings ${String(ENGRAVINGS.length)}/40 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/54 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/54 · keeper ${String(KEEPER_LINES.length)}/40`,
 );
 
 console.log(

@@ -37,6 +37,13 @@
       "anomaly": "Anomalia",
       "beacon": "Latarnia",
       "boss": "Boss"
+    },
+    "previewNode": "{{type}} · ryzyko: {{risk}}",
+    "previewPocket": "Objazd: lepszy łup, trudniejsza walka",
+    "risk": {
+      "low": "niskie",
+      "raised": "podwyższone",
+      "high": "wysokie"
     }
   },
   "event": {
@@ -66,20 +73,14 @@
     "title": "Anomalia",
     "goal": "Cel",
     "resolve": "Rozwiązanie",
-    "retry": "Nowa rolka",
     "solved": "Rozwiązane",
     "failed": "Jeszcze nie — spróbuj ponownie lub rzuć kostką od nowa",
-    "reward": "+ fragment z{{n}}",
     "leave": "Wyjść",
     "tray": "Rzucone kości",
     "slots": "Systemy",
     "rerolls": "powtórki: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Nowa rolka (po lewej: {{n}})",
-    "giveUp": "Brak nowych rolek",
     "toMap": "Powrót do mapy",
-    "outOfRollsTitle": "Anomalia nierozwiązana",
-    "outOfRolls": "Nie ma już nowych rzutów. Opuszcza boisko – faul Rezonans.",
     "rerollHint": "Wybierz maksymalnie{{n}}-kości, aby rzucić ponownie",
     "rerollCancel": "Anuluj",
     "rerollConfirm": "Ponowne losowanie {{k}}",
@@ -99,7 +100,6 @@
     "carryReserved": "zastrzeżone d {{n}}",
     "carryNone": "na razie nic",
     "reserve": "Rezerwa",
-    "reserved": "Zarezerwowane",
     "unreserve": "Znieść rezerwację",
     "nextTurn": "Koniec zakrętu",
     "reset": "Zresetuj rozmieszczenie",
@@ -141,7 +141,37 @@
       "damage": "uszkodzenie",
       "charge": "opłata",
       "shield": "tarcza"
-    }
+    },
+    "tierName": {
+      "1": "faint reading",
+      "2": "steady reading",
+      "3": "deep reading",
+      "4": "severe reading",
+      "5": "singular reading"
+    },
+    "entryEnter": "Take the reading",
+    "entryLeaveNote": "Walking away counts as unsolved and feeds Resonance Interference.",
+    "rewardPreview": "Reward",
+    "rewardScrap": "{{n}} scrap",
+    "rewardCodex": "a codex entry",
+    "rewardChoice": "your pick: the die «{{name}}» or an engraving voucher",
+    "rewardDie": "the die «{{name}}»",
+    "rewardOnce": "drops nowhere else",
+    "stakes": "Stakes",
+    "stakeFree": "{{n}} attempts, both free",
+    "stakePaid": "{{n}} free, then {{costs}} scrap",
+    "stakeDeduction": "fixed reading · {{n}} submissions",
+    "interferenceNow": "Resonance Interference ×{{n}} is running — any solve clears it.",
+    "interferenceNone": "No interference on the hull.",
+    "attemptChip": "attempt {{cur}}/{{max}}",
+    "submissionsLeft": "answers left: {{n}}",
+    "newAttempt": "New board ({{n}} left)",
+    "newAttemptCost": "New board — {{n}} scrap",
+    "outOfAttemptsTitle": "The reading closes",
+    "outOfAttempts": "No attempts left. Leaving stokes Resonance Interference.",
+    "locked": "{{n}} die is held out of turn 1",
+    "takeDie": "Take «{{name}}»",
+    "takeVoucher": "Take the voucher"
   },
   "codex": {
     "title": "Kodeks",
@@ -214,7 +244,8 @@
     "perks": "Ulepszenia:",
     "perksNone": "brak",
     "meta": "Odłamki & XP",
-    "toMenu": "Do menu"
+    "toMenu": "Do menu",
+    "faced": "Napotkani: {{names}}"
   },
   "prologue": {
     "title": "Prolog",
@@ -283,5 +314,15 @@
       "title": "Wybierz następny węzeł",
       "body": "Dotknij podświetlonego węzła, a następnie wybierz opcję „Skok”. Mgła zasłania kolejne rzędy; czujniki i szczegółowe skanowanie poszerzają horyzont."
     }
+  },
+  "motif": {
+    "title": "Cechy sektora",
+    "cache": "Skrytka: złom po wejściu",
+    "mine": "Pole minowe: przejście kosztuje kadłub",
+    "blessed": "Błogosławiony pas: Chór ci sprzyja",
+    "cursed": "Przeklęty pas: zakłócenia rosną",
+    "unstable": "Niestabilny rząd: jego zawartość przetasowano",
+    "pocket": "Kieszeń objazdu: wyższe ryzyko, wyższa nagroda",
+    "riftSplit": "Rozłam: gałęzie łączą się dopiero przy bramie"
   }
 }

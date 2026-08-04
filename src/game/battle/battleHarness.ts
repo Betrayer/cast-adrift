@@ -89,6 +89,8 @@ export const harnessSnap = (
   pendingStorm: 0,
   ascension: 0,
   exceedCap: [],
+  sectorHpPct: 0,
+  enemyHpPct: 0,
   ...over,
 });
 

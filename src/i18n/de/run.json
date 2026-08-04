@@ -37,6 +37,13 @@
       "anomaly": "Anomalie",
       "beacon": "Bake",
       "boss": "Boss"
+    },
+    "previewNode": "{{type}} · Risiko: {{risk}}",
+    "previewPocket": "Umweg: bessere Beute, härterer Kampf",
+    "risk": {
+      "low": "niedrig",
+      "raised": "erhöht",
+      "high": "hoch"
     }
   },
   "event": {
@@ -66,20 +73,14 @@
     "title": "Anomalie",
     "goal": "Ziel",
     "resolve": "Entschlossenheit",
-    "retry": "Neue Rolle",
     "solved": "Gelöst",
     "failed": "Noch nicht – noch einmal würfeln oder neu würfeln",
-    "reward": "+ „{{n}}“-Ausschnitt",
     "leave": "Gehen",
     "tray": "Gewürfelte Würfel",
     "slots": "Systeme",
     "rerolls": "Wiederholungswürfe: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Neue Rolle (links: {{n}})",
-    "giveUp": "Keine neuen Rollen mehr",
     "toMap": "Zurück zur Karte",
-    "outOfRollsTitle": "Anomalie weiterhin ungeklärt",
-    "outOfRolls": "Es sind keine neuen Rollen mehr vorhanden. Verlassen von „StokesResonanz-Interferenz“.",
     "rerollHint": "Nimm bis zu {{n}} Würfel, um erneut zu würfeln",
     "rerollCancel": "Abbrechen",
     "rerollConfirm": "{{k}} erneut würfeln",
@@ -99,7 +100,6 @@
     "carryReserved": "reserviert d {{n}}",
     "carryNone": "noch nichts",
     "reserve": "Reserve",
-    "reserved": "Reserviert",
     "unreserve": "Reservierung aufheben",
     "nextTurn": "Ende der Runde",
     "reset": "Platzierung zurücksetzen",
@@ -141,7 +141,37 @@
       "damage": "Schaden",
       "charge": "Gebühr",
       "shield": "Schild"
-    }
+    },
+    "tierName": {
+      "1": "faint reading",
+      "2": "steady reading",
+      "3": "deep reading",
+      "4": "severe reading",
+      "5": "singular reading"
+    },
+    "entryEnter": "Take the reading",
+    "entryLeaveNote": "Walking away counts as unsolved and feeds Resonance Interference.",
+    "rewardPreview": "Reward",
+    "rewardScrap": "{{n}} scrap",
+    "rewardCodex": "a codex entry",
+    "rewardChoice": "your pick: the die «{{name}}» or an engraving voucher",
+    "rewardDie": "the die «{{name}}»",
+    "rewardOnce": "drops nowhere else",
+    "stakes": "Stakes",
+    "stakeFree": "{{n}} attempts, both free",
+    "stakePaid": "{{n}} free, then {{costs}} scrap",
+    "stakeDeduction": "fixed reading · {{n}} submissions",
+    "interferenceNow": "Resonance Interference ×{{n}} is running — any solve clears it.",
+    "interferenceNone": "No interference on the hull.",
+    "attemptChip": "attempt {{cur}}/{{max}}",
+    "submissionsLeft": "answers left: {{n}}",
+    "newAttempt": "New board ({{n}} left)",
+    "newAttemptCost": "New board — {{n}} scrap",
+    "outOfAttemptsTitle": "The reading closes",
+    "outOfAttempts": "No attempts left. Leaving stokes Resonance Interference.",
+    "locked": "{{n}} die is held out of turn 1",
+    "takeDie": "Take «{{name}}»",
+    "takeVoucher": "Take the voucher"
   },
   "codex": {
     "title": "Kodex",
@@ -214,7 +244,8 @@
     "perks": "Upgrades:",
     "perksNone": "keine",
     "meta": "Splitter & XP",
-    "toMenu": "Zum Menü"
+    "toMenu": "Zum Menü",
+    "faced": "Begegnet: {{names}}"
   },
   "prologue": {
     "title": "Prolog",
@@ -283,5 +314,15 @@
       "title": "Wählen Sie den nächsten Knoten aus",
       "body": "Tippe auf einen beleuchteten Knoten und wähle dann „Springen“. Nebel verdeckt die vor dir liegenden Reihen; Sensoren und Tiefenscans verschieben den Horizont weiter nach vorne."
     }
+  },
+  "motif": {
+    "title": "Sektormerkmale",
+    "cache": "Depot: Bergegut beim Ankommen",
+    "mine": "Minenfeld: Überqueren kostet Hülle",
+    "blessed": "Gesegnete Bahn: der Chor ist dir gewogen",
+    "cursed": "Verfluchte Bahn: die Interferenz steigt",
+    "unstable": "Instabile Reihe: ihr Inhalt wurde neu gewürfelt",
+    "pocket": "Umwegtasche: höheres Risiko, höherer Lohn",
+    "riftSplit": "Riftspaltung: die Zweige treffen sich erst am Tor"
   }
 }

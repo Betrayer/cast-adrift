@@ -109,12 +109,19 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
   }
 };
 
+export const applyEventEffects = (
+  effects: readonly EventEffect[],
+  stream: RngStream,
+): void => {
+  for (const effect of effects) applyEffect(effect, stream);
+};
+
 export const applyOutcome = (
   outcome: Outcome,
   stream: RngStream,
   info?: EventOutcomeInfo,
 ): ApplyResult => {
-  for (const effect of outcome.effects) applyEffect(effect, stream);
+  applyEventEffects(outcome.effects, stream);
   if (outcome.codex !== undefined) {
     useMetaStore.getState().unlockCodex(outcome.codex);
   }

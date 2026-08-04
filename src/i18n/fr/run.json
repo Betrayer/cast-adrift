@@ -37,6 +37,13 @@
       "anomaly": "Anomalie",
       "beacon": "Balise",
       "boss": "Boss"
+    },
+    "previewNode": "{{type}} · risque : {{risk}}",
+    "previewPocket": "Détour : meilleur butin, combat plus dur",
+    "risk": {
+      "low": "faible",
+      "raised": "accru",
+      "high": "élevé"
     }
   },
   "event": {
@@ -66,20 +73,14 @@
     "title": "Anomalie",
     "goal": "Objectif",
     "resolve": "Résolution",
-    "retry": "Nouveau rouleau",
     "solved": "Résolu",
     "failed": "Pas encore — relancer le dé ou relancer une nouvelle fois",
-    "reward": "+ Déchet de{{n}}",
     "leave": "Partir",
     "tray": "Lancer de dés",
     "slots": "Systèmes",
     "rerolls": "Relances : {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Nouveau rouleau (à {{n}}, à gauche)",
-    "giveUp": "Plus de rouleaux neufs",
     "toMap": "Retour à la carte",
-    "outOfRollsTitle": "Anomalie non résolue",
-    "outOfRolls": "Il ne reste plus de nouveaux rouleaux. Départ de Stokes Résonance Interférence.",
     "rerollHint": "Choisissez jusqu’à {{n}} dés à relancer",
     "rerollCancel": "Annuler",
     "rerollConfirm": "Rejouer «{{k}} »",
@@ -99,7 +100,6 @@
     "carryReserved": "réservé d {{n}}",
     "carryNone": "rien pour l'instant",
     "reserve": "Réserve",
-    "reserved": "Réservé",
     "unreserve": "Sans réserve",
     "nextTurn": "Fin de virage",
     "reset": "Réinitialiser le placement",
@@ -141,7 +141,37 @@
       "damage": "dégâts",
       "charge": "frais",
       "shield": "bouclier"
-    }
+    },
+    "tierName": {
+      "1": "faint reading",
+      "2": "steady reading",
+      "3": "deep reading",
+      "4": "severe reading",
+      "5": "singular reading"
+    },
+    "entryEnter": "Take the reading",
+    "entryLeaveNote": "Walking away counts as unsolved and feeds Resonance Interference.",
+    "rewardPreview": "Reward",
+    "rewardScrap": "{{n}} scrap",
+    "rewardCodex": "a codex entry",
+    "rewardChoice": "your pick: the die «{{name}}» or an engraving voucher",
+    "rewardDie": "the die «{{name}}»",
+    "rewardOnce": "drops nowhere else",
+    "stakes": "Stakes",
+    "stakeFree": "{{n}} attempts, both free",
+    "stakePaid": "{{n}} free, then {{costs}} scrap",
+    "stakeDeduction": "fixed reading · {{n}} submissions",
+    "interferenceNow": "Resonance Interference ×{{n}} is running — any solve clears it.",
+    "interferenceNone": "No interference on the hull.",
+    "attemptChip": "attempt {{cur}}/{{max}}",
+    "submissionsLeft": "answers left: {{n}}",
+    "newAttempt": "New board ({{n}} left)",
+    "newAttemptCost": "New board — {{n}} scrap",
+    "outOfAttemptsTitle": "The reading closes",
+    "outOfAttempts": "No attempts left. Leaving stokes Resonance Interference.",
+    "locked": "{{n}} die is held out of turn 1",
+    "takeDie": "Take «{{name}}»",
+    "takeVoucher": "Take the voucher"
   },
   "codex": {
     "title": "Codex",
@@ -214,7 +244,8 @@
     "perks": "Mises à jour :",
     "perksNone": "aucun",
     "meta": "Éclats & XP",
-    "toMenu": "Retour au menu"
+    "toMenu": "Retour au menu",
+    "faced": "Rencontrés : {{names}}"
   },
   "prologue": {
     "title": "Prologue",
@@ -283,5 +314,15 @@
       "title": "Choisissez le nœud suivant",
       "body": "Appuyez sur un nœud allumé, puis sur « Sauter ». Le brouillard masque les rangées qui se trouvent devant ; les capteurs et les analyses approfondies repoussent l'horizon plus loin."
     }
+  },
+  "motif": {
+    "title": "Traits du secteur",
+    "cache": "Cache : ferraille à l’arrivée",
+    "mine": "Champ de mines : traverser coûte de la coque",
+    "blessed": "Voie bénie : le Chœur vous favorise",
+    "cursed": "Voie maudite : l’interférence monte",
+    "unstable": "Rangée instable : son contenu a été relancé",
+    "pocket": "Poche de détour : plus de risque, plus de gain",
+    "riftSplit": "Faille : les branches ne se rejoignent qu’à la porte"
   }
 }

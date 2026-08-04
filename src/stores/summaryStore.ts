@@ -15,6 +15,7 @@ export interface RunResult {
   score: ScoreBreakdown | null;
   contractId: string | null;
   contractStars: number;
+  rotation: readonly string[];
 }
 
 export interface SummaryState {

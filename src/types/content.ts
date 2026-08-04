@@ -89,10 +89,26 @@ export interface PhaseScript {
   everyTurn?: readonly Intent[];
 }
 
+export type EnemyRole =
+  | "bruiser"
+  | "support"
+  | "harrier"
+  | "anchor"
+  | "swarm";
+
+export const ENEMY_ROLES: readonly EnemyRole[] = [
+  "bruiser",
+  "support",
+  "harrier",
+  "anchor",
+  "swarm",
+];
+
 export interface EnemyDef {
   id: string;
   name: LocKey;
   hp: number;
+  role?: EnemyRole;
   pattern: PatternStep[];
   env?: boolean;
   elite?: boolean;

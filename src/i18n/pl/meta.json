@@ -116,7 +116,10 @@
       "redFirestorm": "Maksymalna wartość parametru „Face” w broni zwiększa efekt „Burn” o 3",
       "redSpine": "+4 przy mocowaniu kręgosłupowym",
       "greenCanopy": "+3 w kategorii silników",
-      "blackWell": "W reaktorze pozostały jeszcze 2 ładunki"
+      "blackWell": "W reaktorze pozostały jeszcze 2 ładunki",
+      "shopArrival": "+6 złomu po dotarciu na targ",
+      "tideWard": "Naprawia 1 kadłuba na skok przy przypływie 2+",
+      "detourScout": "+12 złomu po wejściu w objazd"
     },
     "trait": {
       "obsidianPact": "Czarne kości wypadają tylko z minimalną lub maksymalną wartością",

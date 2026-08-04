@@ -115,6 +115,11 @@ export interface PendingRewards {
   packageScrap?: number;
 }
 
+export interface PuzzleRunState {
+  puzzleId: string;
+  attempts: number;
+}
+
 export interface RunValues {
   active: boolean;
   seed: number;
@@ -144,6 +149,7 @@ export interface RunValues {
   axis: number;
   seenEvents: string[];
   solvedPuzzles: string[];
+  puzzleRuns: Record<NodeId, PuzzleRunState>;
   anomalyStreak: number;
   interferenceStacks: number;
   killedTypes: string[];
@@ -184,6 +190,8 @@ export interface RunState extends RunValues {
   addAxis: (n: number) => void;
   markEventSeen: (id: string) => void;
   markPuzzleSolved: (id: string) => void;
+  beginPuzzle: (nodeId: NodeId, puzzleId: string) => PuzzleRunState;
+  spendPuzzleAttempt: (nodeId: NodeId) => number;
   recordAnomalySolved: () => void;
   recordAnomalyUnsolved: () => void;
   markKilledType: (defId: string) => boolean;
@@ -240,6 +248,8 @@ export const createInitialRunStats = (): RunStats => ({
   actionCount: 0,
 });
 
+export const MAX_SHIPYARD_DISCOUNT = 60;
+
 export const createInitialRunValues = (): RunValues => ({
   active: false,
   seed: 0,
@@ -269,6 +279,7 @@ export const createInitialRunValues = (): RunValues => ({
   axis: 0,
   seenEvents: [],
   solvedPuzzles: [],
+  puzzleRuns: {},
   anomalyStreak: 0,
   interferenceStacks: 0,
   killedTypes: [],
@@ -399,6 +410,22 @@ export const useRunStore = create<RunState>()((set, get) => ({
     );
   },
 
+  beginPuzzle: (nodeId, puzzleId) => {
+    const existing = get().puzzleRuns[nodeId];
+    if (existing !== undefined && existing.puzzleId === puzzleId) return existing;
+    const fresh: PuzzleRunState = { puzzleId, attempts: 0 };
+    set((s) => ({ puzzleRuns: { ...s.puzzleRuns, [nodeId]: fresh } }));
+    return fresh;
+  },
+
+  spendPuzzleAttempt: (nodeId) => {
+    const current = get().puzzleRuns[nodeId];
+    if (current === undefined) return 0;
+    const next = { ...current, attempts: current.attempts + 1 };
+    set((s) => ({ puzzleRuns: { ...s.puzzleRuns, [nodeId]: next } }));
+    return next.attempts;
+  },
+
   recordAnomalySolved: () => {
     set({ anomalyStreak: 0, interferenceStacks: 0 });
   },
@@ -452,7 +479,12 @@ export const useRunStore = create<RunState>()((set, get) => ({
   },
 
   addShipyardDiscount: (n) => {
-    set((s) => ({ shipyardDiscount: Math.max(0, s.shipyardDiscount + n) }));
+    set((s) => ({
+      shipyardDiscount: Math.max(
+        0,
+        Math.min(MAX_SHIPYARD_DISCOUNT, s.shipyardDiscount + n),
+      ),
+    }));
   },
 
   setPendingBattle: (pending) => {

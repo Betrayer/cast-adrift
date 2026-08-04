@@ -5,6 +5,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "scavDrone",
     name: "content:enemies.scavDrone",
     hp: 10,
+    role: "swarm",
     pattern: [
       { t: "multi", n: 3, k: 3 },
       { t: "attack", n: 4 },
@@ -14,6 +15,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "raider",
     name: "content:enemies.raider",
     hp: 32,
+    role: "bruiser",
     pattern: [
       { t: "multi", n: 5, k: 4 },
       { t: "multi", n: 5, k: 3 },
@@ -24,15 +26,22 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "shieldWarden",
     name: "content:enemies.shieldWarden",
     hp: 26,
+    role: "anchor",
     pattern: [
       { t: "shieldAll", n: 6 },
-      { t: "multi", n: 4, k: 4 },
+      {
+        pick: [
+          [{ t: "multi", n: 4, k: 4 }, 3],
+          [{ t: "attack", n: 9 }, 2],
+        ],
+      },
     ],
   },
   {
     id: "mine",
     name: "content:enemies.mine",
     hp: 2,
+    role: "swarm",
     env: true,
     pattern: [{ t: "attack", n: 1 }],
   },
@@ -40,6 +49,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "jammerCorvette",
     name: "content:enemies.jammerCorvette",
     hp: 24,
+    role: "harrier",
     pattern: [
       { t: "jamSlot" },
       { t: "multi", n: 4, k: 4 },
@@ -49,6 +59,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "leechSkiff",
     name: "content:enemies.leechSkiff",
     hp: 22,
+    role: "harrier",
     pattern: [
       { t: "lockDie" },
       { t: "multi", n: 4, k: 3 },
@@ -58,6 +69,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "choirZealot",
     name: "content:enemies.choirZealot",
     hp: 22,
+    role: "support",
     pattern: [
       { t: "charge" },
       { t: "multi", n: 3, k: 3 },
@@ -67,6 +79,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "riftWasp",
     name: "content:enemies.riftWasp",
     hp: 18,
+    role: "harrier",
     onDeath: { t: "blockSlot", slot: "weaponA" },
     pattern: [{ t: "multi", n: 3, k: 4 }],
   },
@@ -74,6 +87,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "bountyHuntress",
     name: "content:enemies.bountyHuntress",
     hp: 34,
+    role: "harrier",
     elite: true,
     pattern: [
       { t: "multi", n: 5, k: 3 },
@@ -85,6 +99,7 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
     id: "raiderAlpha",
     name: "content:enemies.raiderAlpha",
     hp: 30,
+    role: "bruiser",
     elite: true,
     subsystems: [
       {

@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { ALL_COACH_MARK_IDS, nextCoachMark } from "@/game/tutorial";
+import { DEFAULT_SHAPE } from "@/game/map/types";
 import { useBattleStore } from "@/stores/battleStore";
 import { useRunStore } from "@/stores/runStore";
 import type { RolledDie } from "@/types/battle";
@@ -86,7 +87,9 @@ describe("coach mark gating", () => {
   it("keeps battle marks off the map screen and vice versa", () => {
     placement({});
     expect(nextCoachMark("map", [])).toBeNull();
-    useRunStore.setState({ map: { nodes: [], edges: [] } });
+    useRunStore.setState({
+      map: { nodes: [], edges: [], shape: DEFAULT_SHAPE, edgeMarks: {} },
+    });
     expect(nextCoachMark("map", [])?.id).toBe("jump");
     expect(nextCoachMark("battle", [])?.id).toBe("place");
   });

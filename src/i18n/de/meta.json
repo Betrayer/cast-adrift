@@ -116,7 +116,10 @@
       "redFirestorm": "Maximaler Wert für „Waffen“ erhöht „Verbrennung“ um 3",
       "redSpine": "+4 bei der Wirbelsäulenmontage",
       "greenCanopy": "+3 bei den Motoren",
-      "blackWell": "Der Reaktor speichert noch 2 Ladungen"
+      "blackWell": "Der Reaktor speichert noch 2 Ladungen",
+      "shopArrival": "+6 Schrott beim Erreichen eines Marktes",
+      "tideWard": "Repariert 1 Hülle pro Sprung ab Flut 2",
+      "detourScout": "+12 Schrott beim Betreten eines Umwegs"
     },
     "trait": {
       "obsidianPact": "Schwarze Würfel zeigen nur ihren Mindest- oder Höchstwert an.",

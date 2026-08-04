@@ -107,6 +107,13 @@ export const SummaryScreen = () => {
           <Text c={tokens.dim}>
             {t("run:summary.earned", { n: stats.scrapEarned })}
           </Text>
+          {(result?.rotation ?? []).length === 0 ? null : (
+            <Text c={tokens.dim}>
+              {t("run:summary.faced", {
+                names: (result?.rotation ?? []).map((n) => t(n)).join(" · "),
+              })}
+            </Text>
+          )}
           <Divider color={tokens.line} />
           <Group justify="space-between">
             <Text c={tokens.amber} fw={600}>

@@ -152,7 +152,7 @@ const main = async (): Promise<void> => {
       visited: [prev.id],
       map: hasEdge
         ? map
-        : { nodes: map.nodes, edges: [...map.edges, [prev.id, boss.id]] },
+        : { ...map, edges: [...map.edges, [prev.id, boss.id]] },
       bonusReveal: 14,
     });
     window.__app?.getState().go("menu");

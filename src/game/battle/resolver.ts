@@ -22,6 +22,7 @@ import {
   patternFor,
   phaseIndexForHp,
   spawnEnemy,
+  type SpawnInit,
 } from "@/game/battle/setup";
 import { applyStatus, consumeStatus, tickBurn } from "@/game/battle/statuses";
 import {
@@ -50,6 +51,13 @@ import type {
   SubsystemState,
 } from "@/types/battle";
 import type { EnemyDef, Intent } from "@/types/content";
+
+const enemySpawnInit = (next: BattleSnapshot): SpawnInit => ({
+  tide: next.tide,
+  sectorHpPct: next.sectorHpPct,
+  hpBonusPct: next.enemyHpPct,
+  ascension: next.ascension,
+});
 
 export const RESOLUTION_ORDER: readonly SlotId[] = [
   "sensors",
@@ -741,7 +749,7 @@ const resolveIntent = (
         intent.id,
         `enemy-${String(next.enemies.length)}`,
         enemyStream,
-        { tide: next.tide, ascension: next.ascension },
+        enemySpawnInit(next),
       );
       next.enemies.push(spawned);
       pushBeat(ctx, enemy.id, "summon");
@@ -818,7 +826,7 @@ const resolveAuras = (ctx: EnemyPhaseCtx): void => {
           "choirAcolyte",
           `enemy-${String(next.enemies.length)}`,
           enemyStream,
-          { tide: next.tide, ascension: next.ascension },
+          enemySpawnInit(next),
         ),
       );
       pushBeat(ctx, enemy.id, "summon");

@@ -37,6 +37,13 @@
       "anomaly": "Anomaly",
       "beacon": "Beacon",
       "boss": "Boss"
+    },
+    "previewNode": "{{type}} · risk: {{risk}}",
+    "previewPocket": "Detour: better loot, tougher fight",
+    "risk": {
+      "low": "low",
+      "raised": "raised",
+      "high": "high"
     }
   },
   "event": {
@@ -66,20 +73,14 @@
     "title": "Anomaly",
     "goal": "Goal",
     "resolve": "Resolve",
-    "retry": "New roll",
     "solved": "Solved",
     "failed": "Not yet — reroll or roll anew",
-    "reward": "+{{n}} scrap",
     "leave": "Leave",
     "tray": "Rolled dice",
     "slots": "Systems",
     "rerolls": "rerolls: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "New roll ({{n}} left)",
-    "giveUp": "Out of new rolls",
     "toMap": "Back to the map",
-    "outOfRollsTitle": "Anomaly unresolved",
-    "outOfRolls": "No new rolls left. Leaving stokes Resonance Interference.",
     "rerollHint": "Pick up to {{n}} dice to reroll",
     "rerollCancel": "Cancel",
     "rerollConfirm": "Reroll {{k}}",
@@ -99,7 +100,6 @@
     "carryReserved": "reserved d{{n}}",
     "carryNone": "nothing yet",
     "reserve": "Reserve",
-    "reserved": "Reserved",
     "unreserve": "Unreserve",
     "nextTurn": "End turn",
     "reset": "Reset placement",
@@ -141,7 +141,37 @@
       "damage": "damage",
       "charge": "charge",
       "shield": "shield"
-    }
+    },
+    "tierName": {
+      "1": "faint reading",
+      "2": "steady reading",
+      "3": "deep reading",
+      "4": "severe reading",
+      "5": "singular reading"
+    },
+    "entryEnter": "Take the reading",
+    "entryLeaveNote": "Walking away counts as unsolved and feeds Resonance Interference.",
+    "rewardPreview": "Reward",
+    "rewardScrap": "{{n}} scrap",
+    "rewardCodex": "a codex entry",
+    "rewardChoice": "your pick: the die «{{name}}» or an engraving voucher",
+    "rewardDie": "the die «{{name}}»",
+    "rewardOnce": "drops nowhere else",
+    "stakes": "Stakes",
+    "stakeFree": "{{n}} attempts, both free",
+    "stakePaid": "{{n}} free, then {{costs}} scrap",
+    "stakeDeduction": "fixed reading · {{n}} submissions",
+    "interferenceNow": "Resonance Interference ×{{n}} is running — any solve clears it.",
+    "interferenceNone": "No interference on the hull.",
+    "attemptChip": "attempt {{cur}}/{{max}}",
+    "submissionsLeft": "answers left: {{n}}",
+    "newAttempt": "New board ({{n}} left)",
+    "newAttemptCost": "New board — {{n}} scrap",
+    "outOfAttemptsTitle": "The reading closes",
+    "outOfAttempts": "No attempts left. Leaving stokes Resonance Interference.",
+    "locked": "{{n}} die is held out of turn 1",
+    "takeDie": "Take «{{name}}»",
+    "takeVoucher": "Take the voucher"
   },
   "codex": {
     "title": "Codex",
@@ -214,7 +244,8 @@
     "perks": "Upgrades:",
     "perksNone": "none",
     "meta": "Shards & XP",
-    "toMenu": "To menu"
+    "toMenu": "To menu",
+    "faced": "Faced: {{names}}"
   },
   "prologue": {
     "title": "Prologue",
@@ -283,5 +314,15 @@
       "title": "Choose the next node",
       "body": "Tap a lit node, then Jump. Fog hides the rows ahead; Sensors and deep scans push the horizon further."
     }
+  },
+  "motif": {
+    "title": "Sector traits",
+    "cache": "Cache: salvage on arrival",
+    "mine": "Mine run: crossing costs hull",
+    "blessed": "Blessed lane: the Choir favours you",
+    "cursed": "Cursed lane: interference rises",
+    "unstable": "Unstable row: its contents were re-rolled",
+    "pocket": "Detour pocket: raised risk, raised reward",
+    "riftSplit": "Rift split: the branches only meet at the gate"
   }
 }

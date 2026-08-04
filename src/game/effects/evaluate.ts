@@ -108,6 +108,11 @@ const condMatches = (
       return (ctx.tagCount?.(cond.tag) ?? 0) >= cond.n;
     case "battleOutcome":
       return ctx.payload.battleEnd?.outcome === cond.is;
+    case "nodeIs": {
+      const node = ctx.payload.node;
+      if (node === undefined) return false;
+      return cond.is === "pocket" ? node.pocket : node.nodeType === cond.is;
+    }
   }
 };
 

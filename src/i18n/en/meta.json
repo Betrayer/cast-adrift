@@ -116,7 +116,10 @@
       "redFirestorm": "Max face in weapons adds Burn 3",
       "redSpine": "+4 in the Spinal Mount",
       "greenCanopy": "+3 in engines",
-      "blackWell": "The reactor stores 2 more charge"
+      "blackWell": "The reactor stores 2 more charge",
+      "shopArrival": "+6 scrap on arriving at a market",
+      "tideWard": "Repair 1 hull on every jump while tide is 2+",
+      "detourScout": "+12 scrap on entering a detour"
     },
     "trait": {
       "obsidianPact": "Black dice roll only their min or max",

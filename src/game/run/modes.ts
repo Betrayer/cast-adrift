@@ -5,8 +5,7 @@ import {
   type MutatorId,
   type MutatorMods,
 } from "@/data/mutators";
-import { SECTOR_COUNT } from "@/data/sectors";
-import { BOSS_ROW } from "@/game/map/types";
+import { SECTOR_COUNT, sectorDef } from "@/data/sectors";
 import { createStream, deriveSeed, fnv1a } from "@/services/rng";
 import type { RunMode, RunStats, RunValues } from "@/stores/runStore";
 
@@ -43,10 +42,17 @@ export const dailyMutators = (date: string): MutatorId[] => {
   return pickDailyMutators((max) => stream.int(0, max - 1));
 };
 
-// Depth is rows advanced from the run origin: a sector's boss row is 15, and a
-// drift run keeps counting across sectors.
-export const depthFor = (sectorIndex: number, depthRow: number): number =>
-  Math.max(0, (Math.max(1, sectorIndex) - 1) * BOSS_ROW + Math.max(0, depthRow));
+// Depth is rows advanced from the run origin. Sectors have different depths
+// (DESIGN §9.1), so the sectors already passed are summed rather than
+// multiplied, and a drift run keeps counting across sectors.
+export const sectorDepth = (sectorIndex: number): number =>
+  sectorDef(contentSector(sectorIndex)).shape.bossRow;
+
+export const depthFor = (sectorIndex: number, depthRow: number): number => {
+  let passed = 0;
+  for (let i = 1; i < Math.max(1, sectorIndex); i += 1) passed += sectorDepth(i);
+  return passed + Math.max(0, depthRow);
+};
 
 export const driftLoop = (sectorIndex: number): number =>
   Math.max(0, sectorIndex - SECTOR_COUNT);
@@ -103,6 +109,7 @@ export const runMutatorMods = (
   run: Pick<RunValues, "mutators">,
 ): MutatorMods => computeMutatorMods(run.mutators);
 
-// A drift sector's row-15 node is a gate, not a boss, and clearing it hands the
+// A drift sector's last row is a gate, not a boss, and clearing it hands the
 // run straight to the next map.
-export const isSectorExitRow = (row: number): boolean => row === BOSS_ROW;
+export const isSectorExitRow = (sectorIndex: number, row: number): boolean =>
+  row === sectorDepth(sectorIndex);

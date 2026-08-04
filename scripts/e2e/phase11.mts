@@ -181,6 +181,7 @@ const main = async (): Promise<void> => {
       score: null,
       contractId: null,
       contractStars: 0,
+      rotation: [],
     });
     window.__app?.getState().go("summary");
   });

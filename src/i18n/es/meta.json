@@ -116,7 +116,10 @@
       "redFirestorm": "El valor máximo de «face» en las armas añade «Burn 3»",
       "redSpine": "+4 en la montura espinal",
       "greenCanopy": "+3 en motores",
-      "blackWell": "El reactor tiene capacidad para 2 cargas más."
+      "blackWell": "El reactor tiene capacidad para 2 cargas más.",
+      "shopArrival": "+6 chatarra al llegar a un mercado",
+      "tideWard": "Repara 1 de casco por salto con marea 2+",
+      "detourScout": "+12 chatarra al entrar en un desvío"
     },
     "trait": {
       "obsidianPact": "Los dados negros solo dan el mínimo o el máximo.",

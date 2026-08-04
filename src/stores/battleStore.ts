@@ -85,8 +85,8 @@ export interface BattleEncounter {
   startCharge?: number;
   rerollSizeBonus?: number;
   ascension?: number;
+  sectorHpPct?: number;
   enemyHpBonusPct?: number;
-  gateHpBonusPct?: number;
   eliteShield?: number;
   resonanceBoost?: ResonanceBoost;
   slotTierDelta?: Partial<Record<SlotId, number>>;
@@ -106,6 +106,8 @@ export interface BattleValues {
   charge: number;
   scrap: number;
   tide: number;
+  sectorHpPct: number;
+  enemyHpPct: number;
   interference: number;
   perks: string[];
   chartPicks: string[];
@@ -229,6 +231,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   counters: {},
   runCounters: {},
   exceedCap: [],
+  sectorHpPct: 0,
+  enemyHpPct: 0,
   scheduled: [],
   grants: {},
   forcedTraits: [],
@@ -335,6 +339,8 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   pendingSwap: s.pendingSwap,
   pendingStorm: s.pendingStorm,
   ascension: s.ascension,
+  sectorHpPct: s.sectorHpPct,
+  enemyHpPct: s.enemyHpPct,
   overflowShieldUsed: s.overflowShieldUsed,
   pierceUsed: s.pierceUsed,
   outcome: s.outcome,
@@ -384,6 +390,8 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pendingSwap: snap.pendingSwap,
   pendingStorm: snap.pendingStorm,
   ascension: snap.ascension,
+  sectorHpPct: snap.sectorHpPct,
+  enemyHpPct: snap.enemyHpPct,
   overflowShieldUsed: snap.overflowShieldUsed ?? false,
   pierceUsed: snap.pierceUsed ?? false,
   outcome: snap.outcome,
@@ -523,8 +531,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         hullMax: encounter.hullMax,
         chargeCap: encounter.chargeCap,
         ascension: encounter.ascension,
+        sectorHpPct: encounter.sectorHpPct,
         enemyHpBonusPct: encounter.enemyHpBonusPct,
-        gateHpBonusPct: encounter.gateHpBonusPct,
         eliteShield: encounter.eliteShield,
         resonanceBoost: encounter.resonanceBoost,
         slotTierDelta: encounter.slotTierDelta,
@@ -1093,6 +1101,8 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   pendingSwap: s.pendingSwap,
   pendingStorm: s.pendingStorm,
   ascension: s.ascension,
+  sectorHpPct: s.sectorHpPct,
+  enemyHpPct: s.enemyHpPct,
   overflowShieldUsed: s.overflowShieldUsed,
   pierceUsed: s.pierceUsed,
   fateUses: s.fateUses,

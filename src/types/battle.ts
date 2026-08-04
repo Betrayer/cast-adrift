@@ -136,6 +136,8 @@ export interface BattleSnapshot {
   pendingSwap: number;
   pendingStorm: number;
   ascension: number;
+  sectorHpPct: number;
+  enemyHpPct: number;
   overflowShieldUsed?: boolean;
   pierceUsed?: boolean;
   outcome?: BattleOutcome;

@@ -17,7 +17,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "hookTug",
     name: "content:enemies.hookTug",
-    hp: 20,
+    hp: 17,
+    role: "harrier",
     stealOnHit: 4,
     pattern: [
       { t: "attack", n: 5 },
@@ -27,7 +28,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "slagHauler",
     name: "content:enemies.slagHauler",
-    hp: 30,
+    hp: 26,
+    role: "anchor",
     pattern: [
       { t: "shield", n: 8 },
       { t: "attack", n: 7 },
@@ -36,7 +38,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "chaffSwarm",
     name: "content:enemies.chaffSwarm",
-    hp: 12,
+    hp: 10,
+    role: "swarm",
     pattern: [{ t: "multi", n: 2, k: 4 }],
   },
 
@@ -44,7 +47,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "foldWorm",
     name: "content:enemies.foldWorm",
-    hp: 24,
+    hp: 18,
+    role: "harrier",
     pattern: [
       { t: "twistDie" },
       { t: "multi", n: 4, k: 3 },
@@ -53,7 +57,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "nullEcho",
     name: "content:enemies.nullEcho",
-    hp: 21,
+    hp: 16,
+    role: "harrier",
     pattern: [
       { t: "mirrorHalf" },
       { t: "attack", n: 4 },
@@ -63,7 +68,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "riftAnchor",
     name: "content:enemies.riftAnchor",
-    hp: 28,
+    hp: 21,
+    role: "anchor",
     pattern: [
       { t: "capShrink" },
       { t: "attack", n: 6 },
@@ -75,7 +81,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "hymnCantor",
     name: "content:enemies.hymnCantor",
-    hp: 31,
+    hp: 21,
+    role: "support",
     pattern: [
       { t: "charge" },
       { t: "attack", n: 8 },
@@ -84,7 +91,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "pyreDeacon",
     name: "content:enemies.pyreDeacon",
-    hp: 33,
+    hp: 23,
+    role: "support",
     pattern: [
       { t: "healAllies", n: 5 },
       { t: "multi", n: 5, k: 3 },
@@ -93,7 +101,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "reliquary",
     name: "content:enemies.reliquary",
-    hp: 36,
+    hp: 25,
+    role: "anchor",
     guarded: true,
     pattern: [
       { t: "shieldAll", n: 6 },
@@ -105,7 +114,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "causalityLoop",
     name: "content:enemies.causalityLoop",
-    hp: 38,
+    hp: 24,
+    role: "harrier",
     pattern: [
       { t: "swapValues" },
       { t: "multi", n: 6, k: 3 },
@@ -114,7 +124,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "voidWarden",
     name: "content:enemies.voidWarden",
-    hp: 40,
+    hp: 25,
+    role: "bruiser",
     pattern: [
       { t: "lockDie" },
       { t: "attack", n: 10 },
@@ -124,7 +135,8 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "quietEngine",
     name: "content:enemies.quietEngine",
-    hp: 35,
+    hp: 22,
+    role: "harrier",
     pattern: [
       { t: "storm" },
       { t: "multi", n: 6, k: 3 },
@@ -135,14 +147,16 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "breachDrone",
     name: "content:enemies.breachDrone",
-    hp: 16,
+    hp: 12,
+    role: "swarm",
     onDeath: { t: "explode", n: 4 },
     pattern: [{ t: "attack", n: 5 }],
   },
   {
     id: "sparkMote",
     name: "content:enemies.sparkMote",
-    hp: 8,
+    hp: 5,
+    role: "swarm",
     env: true,
     pattern: [{ t: "attack", n: 2 }],
   },
@@ -150,6 +164,7 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
     id: "hullGnat",
     name: "content:enemies.hullGnat",
     hp: 14,
+    role: "swarm",
     pattern: [
       { t: "multi", n: 2, k: 3 },
       { t: "attack", n: 4 },
@@ -160,14 +175,15 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "clanBreaker",
     name: "content:enemies.clanBreaker",
-    hp: 38,
+    hp: 33,
+    role: "bruiser",
     elite: true,
     stealOnHit: 6,
     subsystems: [
       {
         id: "claw",
         name: "content:enemies.clanBreaker-claw",
-        hp: 12,
+        hp: 10,
         aura: "stealOnHit6",
       },
     ],
@@ -180,13 +196,14 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "riftTyrant",
     name: "content:enemies.riftTyrant",
-    hp: 40,
+    hp: 31,
+    role: "harrier",
     elite: true,
     subsystems: [
       {
         id: "eye",
         name: "content:enemies.riftTyrant-eye",
-        hp: 13,
+        hp: 10,
         aura: "twistEachTurn",
       },
     ],
@@ -199,13 +216,14 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "choirCantor",
     name: "content:enemies.choirCantor",
-    hp: 42,
+    hp: 29,
+    role: "support",
     elite: true,
     subsystems: [
       {
         id: "hymn",
         name: "content:enemies.choirCantor-hymn",
-        hp: 14,
+        hp: 9,
         aura: "chargeAllies",
       },
     ],
@@ -218,13 +236,14 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "coreSentinel",
     name: "content:enemies.coreSentinel",
-    hp: 45,
+    hp: 28,
+    role: "anchor",
     elite: true,
     subsystems: [
       {
         id: "lattice",
         name: "content:enemies.coreSentinel-lattice",
-        hp: 15,
+        hp: 9,
         aura: "shieldSelf6",
       },
     ],
@@ -237,13 +256,14 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "leechPrince",
     name: "content:enemies.leechPrince",
-    hp: 36,
+    hp: 28,
+    role: "harrier",
     elite: true,
     subsystems: [
       {
         id: "siphon",
         name: "content:enemies.leechPrince-siphon",
-        hp: 12,
+        hp: 9,
         aura: "lockEachTurn",
       },
     ],
@@ -256,14 +276,15 @@ export const PHASE10_ENEMIES: readonly EnemyDef[] = [
   {
     id: "mineBaron",
     name: "content:enemies.mineBaron",
-    hp: 39,
+    hp: 34,
+    role: "support",
     elite: true,
     onDeath: { t: "explode", n: 8 },
     subsystems: [
       {
         id: "rack",
         name: "content:enemies.mineBaron-rack",
-        hp: 12,
+        hp: 10,
         aura: "summonEvery4",
       },
     ],

@@ -14,7 +14,7 @@ import { restoreActionLog } from "@/game/run/actionLog";
 import { useAppStore } from "@/stores/appStore";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 2;
+export const RUN_SNAPSHOT_V = 4;
 
 export interface RunSnapshotV1 {
   v: number;
@@ -52,6 +52,9 @@ const pickRunValues = (s: RunState): RunValues => ({
   axis: s.axis,
   seenEvents: [...s.seenEvents],
   solvedPuzzles: [...s.solvedPuzzles],
+  puzzleRuns: Object.fromEntries(
+    Object.entries(s.puzzleRuns).map(([nodeId, state]) => [nodeId, { ...state }]),
+  ),
   anomalyStreak: s.anomalyStreak,
   interferenceStacks: s.interferenceStacks,
   killedTypes: [...s.killedTypes],

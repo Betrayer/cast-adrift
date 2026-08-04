@@ -1,3 +1,4 @@
+import { ENEMY_BY_ID } from "@/data/enemies";
 import { canPlaceDie, isSlotBlocked } from "@/game/battle/setup";
 import type { BattleSnapshot, RolledDie, SlotId } from "@/types/battle";
 
@@ -108,10 +109,13 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
   // Front-load the aura subsystem (turret) so the atk+2 aura drops early — unless we
   // can lethal-clear the core this turn, in which case just kill the enemy.
   const targetSub = auraSubsystems[0];
-  const targetId =
-    !lethal && targetSub !== undefined
-      ? targetSub.id
-      : (lowest?.id ?? snapshot.targetId);
+  const healer =
+    alive.length > 1
+      ? alive.find((e) => ENEMY_BY_ID.get(e.defId)?.role === "support")
+      : undefined;
+  const targetId = lethal
+    ? (lowest?.id ?? snapshot.targetId)
+    : (targetSub?.id ?? healer?.id ?? lowest?.id ?? snapshot.targetId);
 
   if (lethal) {
     placeWeapons(killCandidates);

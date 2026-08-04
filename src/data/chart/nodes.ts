@@ -107,6 +107,21 @@ const minFaceCharge: EffectDef = {
   if: [{ c: "isMinFace" }],
   do: [{ a: "charge", n: 1 }],
 };
+const shopArrival: EffectDef = {
+  on: "nodeEnter",
+  if: [{ c: "nodeIs", is: "shop" }],
+  do: [{ a: "scrap", n: 6 }],
+};
+const tideWard: EffectDef = {
+  on: "nodeEnter",
+  if: [{ c: "tideAtLeast", n: 2 }],
+  do: [{ a: "heal", n: 1 }],
+};
+const detourScout: EffectDef = {
+  on: "nodeEnter",
+  if: [{ c: "nodeIs", is: "pocket" }],
+  do: [{ a: "scrap", n: 12 }],
+};
 const firstTurnAll: EffectDef = {
   on: "beforeResolveSlot",
   if: [{ c: "turnLte", n: 1 }],
@@ -139,7 +154,7 @@ const SMALL_POOLS: Record<School, readonly Content[]> = {
     eff([shieldsHigh], "meta:chartFx.fx.shieldsHigh"),
     mod({ jamPowerDelta: 1 }),
     eff([shieldsFlat], "meta:chartFx.fx.shieldsFlat"),
-    mod({ hullMaxDelta: 2 }),
+    eff([tideWard], "meta:chartFx.fx.tideWard"),
     mod({ blueReserveDelta: 1 }),
     eff([sensorsBonus], "meta:chartFx.fx.sensorsBonus"),
   ],
@@ -154,7 +169,7 @@ const SMALL_POOLS: Record<School, readonly Content[]> = {
   yellow: [
     mod({ scrapMultPct: 5 }),
     mod({ battleStartScrap: 2 }),
-    mod({ shopDiscountPct: 3 }),
+    eff([shopArrival], "meta:chartFx.fx.shopArrival"),
     eff([maxFaceScrap], "meta:chartFx.fx.maxFaceScrap"),
     mod({ scrapPerKill: 2 }),
     mod({ xpMultPct: 4 }),
@@ -165,7 +180,7 @@ const SMALL_POOLS: Record<School, readonly Content[]> = {
     mod({ chargeCapDelta: 1 }),
     eff([reactorBonus], "meta:chartFx.fx.reactorBonus"),
     eff([minFaceCharge], "meta:chartFx.fx.minFaceCharge"),
-    mod({ hullMaxDelta: 1, chargeCapDelta: 1 }),
+    eff([detourScout], "meta:chartFx.fx.detourScout"),
   ],
   grey: [
     mod({ rerollSizeDelta: 1 }),

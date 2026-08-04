@@ -1,7 +1,8 @@
 import type { EnemyDef } from "@/types/content";
 
-// The six gate fights (DESIGN §6.4). Row 8 of every sector routes through one of
-// these; a campaign never repeats one. Each carries a single signature idea.
+// The six gate fights (DESIGN §6.4). Every sector routes its gate row through one
+// of these, drawn from the sector's pool; a campaign never repeats one while the
+// pool still has a fresh member. Each carries a single signature idea.
 export const MINIBOSSES: readonly EnemyDef[] = [
   {
     id: "convoyAlpha",

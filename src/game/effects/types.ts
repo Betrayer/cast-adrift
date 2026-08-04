@@ -64,11 +64,14 @@ export interface BattleEndInfo {
   overkill: number;
 }
 
+export type NodeKind = NodeType | "pocket";
+
 export interface NodeEnterInfo {
   nodeId: string;
   nodeType: NodeType;
   sector: number;
   row: number;
+  pocket: boolean;
 }
 
 export interface EventOutcomeInfo {
@@ -121,7 +124,8 @@ export type Cond =
   | { c: "targetIsBossOrMini" }
   | { c: "hasTag"; tag: ContentTag }
   | { c: "countTag"; tag: ContentTag; n: number }
-  | { c: "battleOutcome"; is: BattleOutcome };
+  | { c: "battleOutcome"; is: BattleOutcome }
+  | { c: "nodeIs"; is: NodeKind };
 
 export type EffectTarget = "target" | "self";
 
@@ -219,6 +223,7 @@ const COND_NAME_SET: Record<Cond["c"], true> = {
   hasTag: true,
   countTag: true,
   battleOutcome: true,
+  nodeIs: true,
 };
 
 export const ACTION_NAMES = Object.keys(ACTION_NAME_SET) as Action["a"][];

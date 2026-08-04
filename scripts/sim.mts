@@ -15,14 +15,14 @@ import {
 } from "../src/game/economy/prices";
 import { computeNodeReward, isDraftNode } from "../src/game/economy/rewards";
 import { generateShopStock } from "../src/game/economy/shop";
-import { SECTORS } from "../src/data/sectors";
+import { SECTORS, sectorDef } from "../src/data/sectors";
 import {
-  BOSS_NODE_ID,
+  bossNodeIdFor,
   generateSectorMap,
   START_NODE_ID,
 } from "../src/game/map/generator";
 import {
-  BOSS_ROW,
+  edgeMarkFor,
   nodeById,
   outgoingEdges,
   type MapGraph,
@@ -30,10 +30,12 @@ import {
   type NodeType,
 } from "../src/game/map/types";
 import {
+  depthFor,
   DRIFT_LOOP_HP_PCT,
   DRIFT_TIDE_CAP,
   SCORE_PER_DEPTH,
   SCORE_PER_KILL,
+  sectorDepth,
 } from "../src/game/run/modes";
 import {
   decidePlacements,
@@ -48,10 +50,12 @@ import {
   buildBattleSnapshot,
   canPlaceDie,
   createEnemyStream,
-  gateHpBonusPct,
   MAX_ENEMIES,
 } from "../src/game/battle/setup";
-import { buildEncounterIds } from "../src/game/run/encounter";
+import {
+  buildEncounterIds,
+  sectorHpPct,
+} from "../src/game/run/encounter";
 import { rollPerkChoices } from "../src/game/run/perkDraft";
 import { computePerkMods } from "../src/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
@@ -68,6 +72,7 @@ import {
   deriveSeed,
 } from "../src/services/rng";
 import type { BattleSnapshot, SlotId } from "../src/types/battle";
+import type { EventEffect } from "../src/types/events";
 
 const TURN_CAP = 30;
 
@@ -78,7 +83,7 @@ interface BattleInit {
   mkLevels?: MkLevels;
   perks?: readonly string[];
   modules?: readonly string[];
-  gateHpBonusPct?: number;
+  sectorHpPct?: number;
   enemyHpBonusPct?: number;
   eliteShield?: number;
   ascension?: number;
@@ -174,7 +179,7 @@ const simulateBattle = (
       hull: init.hull,
       hullMax: init.hullMax,
       chargeCap: runChargeCap(init.perks ?? [], [], init.modules ?? []),
-      gateHpBonusPct: init.gateHpBonusPct,
+      sectorHpPct: init.sectorHpPct,
       enemyHpBonusPct: init.enemyHpBonusPct,
       eliteShield: init.eliteShield,
       ascension: init.ascension,
@@ -285,6 +290,7 @@ interface RunState {
   jumpsSinceTide: number;
   kills: number;
   nodes: number;
+  pockets: number;
 }
 
 const spend = (state: RunState, cost: number): boolean => {
@@ -411,16 +417,112 @@ const FIGHT_TYPES: ReadonlySet<NodeType> = new Set([
 ]);
 const EXPECTED_DMG_PER_FIGHT = 7;
 
+// Detours are worth their raised risk only with hull to spare, and a marked
+// mine edge is worth half a node of priority to walk around.
+const POCKET_HULL_PCT = 60;
+const MINE_PENALTY = 0.5;
+const CURSED_PENALTY = 0.75;
+const BLESSED_BONUS = 0.25;
+
+const pocketPayoff = (
+  map: MapGraph,
+  byId: ReadonlyMap<string, MapNode>,
+  node: MapNode,
+): NodeType => {
+  const rewardId = outgoingEdges(map, node.id)[0];
+  const reward = rewardId === undefined ? undefined : byId.get(rewardId);
+  return reward?.type ?? node.type;
+};
+
+const stepCost = (
+  map: MapGraph,
+  byId: ReadonlyMap<string, MapNode>,
+  from: string,
+  node: MapNode,
+): number => {
+  const base =
+    node.pocket === true
+      ? priorityOf(pocketPayoff(map, byId, node))
+      : priorityOf(node.type);
+  const blessing =
+    node.blessing === "cursed"
+      ? CURSED_PENALTY
+      : node.blessing === "blessed"
+        ? -BLESSED_BONUS
+        : 0;
+  return (
+    base +
+    blessing +
+    (edgeMarkFor(map, from, node.id) === "mine" ? MINE_PENALTY : 0)
+  );
+};
+
 const greedyNext = (
   map: MapGraph,
   byId: ReadonlyMap<string, MapNode>,
   position: string,
   posRow: number,
+  hullPct = 100,
 ): MapNode | undefined =>
   outgoingEdges(map, position)
     .map((id) => byId.get(id))
     .filter((n): n is MapNode => n !== undefined && n.row > posRow)
-    .sort((a, b) => priorityOf(a.type) - priorityOf(b.type))[0];
+    .filter((n) => n.pocket !== true || hullPct >= POCKET_HULL_PCT)
+    .sort(
+      (a, b) =>
+        stepCost(map, byId, position, a) - stepCost(map, byId, position, b),
+    )[0];
+
+const motifsOf = (sector: number) => sectorDef(sector).shape.motifs;
+
+const applyEffectsToState = (
+  state: RunState,
+  effects: readonly EventEffect[],
+  tideCap: number,
+): void => {
+  for (const effect of effects) {
+    if (effect.k === "scrap") gain(state, effect.n);
+    else if (effect.k === "hull") {
+      state.hull = Math.max(1, Math.min(state.hullMax, state.hull + effect.n));
+    } else if (effect.k === "tide") {
+      state.tide = Math.max(0, Math.min(tideCap, state.tide + effect.n));
+    }
+  }
+};
+
+const applyNodeMotifsSim = (
+  state: RunState,
+  sector: number,
+  node: MapNode,
+  tideCap: number,
+): void => {
+  for (const motif of motifsOf(sector)) {
+    if (motif.m === "cache" && node.cache === true) {
+      applyEffectsToState(state, motif.gain, tideCap);
+    }
+    if (motif.m === "procession" && node.blessing !== undefined) {
+      applyEffectsToState(
+        state,
+        node.blessing === "blessed" ? motif.blessed : motif.cursed,
+        tideCap,
+      );
+    }
+  }
+};
+
+const applyEdgeMotifsSim = (
+  state: RunState,
+  sector: number,
+  map: MapGraph,
+  from: string,
+  to: string,
+  tideCap: number,
+): void => {
+  if (edgeMarkFor(map, from, to) !== "mine") return;
+  for (const motif of motifsOf(sector)) {
+    if (motif.m === "mineEdges") applyEffectsToState(state, motif.toll, tideCap);
+  }
+};
 
 // Forecast the number of fights on the greedy path from here to the next shipyard/boss.
 const fightsUntilRest = (
@@ -455,6 +557,7 @@ interface SectorResult {
   hullMedian: number;
   resonanceSet: boolean;
   mkReached: number;
+  pockets: number;
 }
 
 const median = (values: readonly number[]): number => {
@@ -486,6 +589,7 @@ const maxMk = (mkLevels: MkLevels): number =>
 const runSector = (seed: number): SectorResult => {
   const streams = createStreams(seed);
   const map: MapGraph = generateSectorMap(streams.map, 1);
+  const bossId = bossNodeIdFor(1);
   const byId = nodeById(map);
   const state: RunState = {
     hull: 30,
@@ -501,6 +605,7 @@ const runSector = (seed: number): SectorResult => {
     jumpsSinceTide: 0,
     kills: 0,
     nodes: 0,
+    pockets: 0,
   };
 
   let position = START_NODE_ID;
@@ -519,14 +624,19 @@ const runSector = (seed: number): SectorResult => {
     hullMedian: median(hullEntering.length > 0 ? hullEntering : [state.hull]),
     resonanceSet: maxRealSchoolCount(state.deck) >= 4,
     mkReached: maxMk(state.mkLevels),
+    pockets: state.pockets,
   });
 
-  while (position !== BOSS_NODE_ID) {
-    const next = greedyNext(map, byId, position, posRow);
+  while (position !== bossId) {
+    const hullPct = (state.hull / Math.max(1, state.hullMax)) * 100;
+    const next = greedyNext(map, byId, position, posRow, hullPct);
     if (next === undefined) break;
 
+    applyEdgeMotifsSim(state, 1, map, position, next.id, 3);
     position = next.id;
     posRow = next.row;
+    if (next.pocket === true) state.pockets += 1;
+    applyNodeMotifsSim(state, 1, next, 3);
     state.jumpsSinceTide += 1;
     if (state.jumpsSinceTide >= 4) {
       state.tide = Math.min(3, state.tide + 1);
@@ -542,7 +652,7 @@ const runSector = (seed: number): SectorResult => {
     ) {
       hullEntering.push(state.hull);
       const encStream = createStream(deriveSeed(seed, `enc:${next.id}`));
-      const enemyIds = buildEncounterIds(type, encStream);
+      const enemyIds = buildEncounterIds(type, encStream, { seed });
       const res = simulateBattle(
         enemyIds,
         state.deck,
@@ -553,6 +663,7 @@ const runSector = (seed: number): SectorResult => {
           tide: state.tide,
           mkLevels: state.mkLevels,
           perks: state.perks,
+          sectorHpPct: sectorHpPct({ sector: 1, pocket: next.pocket === true }),
         },
       );
       state.hull = res.hullLeft;
@@ -562,7 +673,7 @@ const runSector = (seed: number): SectorResult => {
       }
       state.nodes += 1;
       const loot = createStream(deriveSeed(seed, `loot:${next.id}`));
-      const reward = computeNodeReward(type, loot);
+      const reward = computeNodeReward(type, loot, 0, next.pocket === true);
       const mods = computeRunMods(state.perks, [], state.modules);
       gain(state, Math.round(reward.scrap * (1 + mods.scrapMultPct / 100)));
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
@@ -598,7 +709,7 @@ const runSector = (seed: number): SectorResult => {
     }
   }
 
-  return finish(position === BOSS_NODE_ID, -1);
+  return finish(position === bossId, -1);
 };
 
 // ── Drift mode ────────────────────────────────────────────────────────────────
@@ -629,10 +740,14 @@ const driftSector = (
   let posRow = 0;
 
   for (let guard = 0; guard < 64; guard += 1) {
-    const next = greedyNext(map, byId, position, posRow);
+    const hullPct = (state.hull / Math.max(1, state.hullMax)) * 100;
+    const next = greedyNext(map, byId, position, posRow, hullPct);
     if (next === undefined) return { cleared: false, rows: posRow };
+    applyEdgeMotifsSim(state, sector, map, position, next.id, DRIFT_TIDE_CAP);
     position = next.id;
     posRow = next.row;
+    if (next.pocket === true) state.pockets += 1;
+    applyNodeMotifsSim(state, sector, next, DRIFT_TIDE_CAP);
     state.jumpsSinceTide += 1;
     if (state.jumpsSinceTide >= 4) {
       state.tide = Math.min(DRIFT_TIDE_CAP, state.tide + 1);
@@ -644,7 +759,7 @@ const driftSector = (
       const encStream = createStream(
         deriveSeed(seed, `enc:${String(sectorIndex)}:${next.id}`),
       );
-      const enemyIds = buildEncounterIds(type, encStream, { sector });
+      const enemyIds = buildEncounterIds(type, encStream, { sector, seed });
       const res = simulateBattle(
         enemyIds,
         state.deck,
@@ -655,7 +770,7 @@ const driftSector = (
           tide: state.tide,
           mkLevels: state.mkLevels,
           perks: state.perks,
-          gateHpBonusPct: gateHpBonusPct(sector),
+          sectorHpPct: sectorHpPct({ sector, pocket: next.pocket === true }),
           enemyHpBonusPct: loopHpPct,
         },
       );
@@ -666,7 +781,7 @@ const driftSector = (
       const loot = createStream(
         deriveSeed(seed, `loot:${String(sectorIndex)}:${next.id}`),
       );
-      const reward = computeNodeReward(type, loot);
+      const reward = computeNodeReward(type, loot, 0, next.pocket === true);
       const mods = computePerkMods(state.perks);
       gain(
         state,
@@ -696,7 +811,7 @@ const driftSector = (
           }
         }
       }
-      if (posRow >= BOSS_ROW) return { cleared: true, rows: posRow };
+      if (posRow >= sectorDepth(sectorIndex)) return { cleared: true, rows: posRow };
     } else if (type === "shop") {
       greedyShop(state, deriveSeed(seed, `shop:${String(sectorIndex)}`), next);
       state.nodes += 1;
@@ -749,13 +864,14 @@ const runDrift = (seed: number, mid: boolean): DriftResult => {
     jumpsSinceTide: 0,
     kills: 0,
     nodes: 0,
+    pockets: 0,
   };
 
   let sectorIndex = 1;
   let depth = 0;
   for (; sectorIndex <= 40; sectorIndex += 1) {
     const { cleared, rows } = driftSector(state, seed, sectorIndex);
-    depth = (sectorIndex - 1) * BOSS_ROW + rows;
+    depth = depthFor(sectorIndex, rows);
     if (!cleared) break;
     // Drift keeps the tide between sectors only through its cap; the map resets.
     state.tide = Math.max(0, state.tide - 1);
@@ -1118,7 +1234,7 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
     const def = SECTORS.find((s) => s.id === profile.sector);
     if (def === undefined) continue;
     const targets =
-      kind === "miniboss" ? [...def.minibossPool] : [def.bossId];
+      kind === "miniboss" ? [...def.minibossPool] : [...def.bossPool];
     for (const target of targets) {
       const results: BattleResult[] = [];
       for (let i = 0; i < runs; i += 1) {
@@ -1132,7 +1248,7 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
               hullMax: profile.hull,
               tide: profile.tide,
               mkLevels: profile.mkLevels,
-              gateHpBonusPct: gateHpBonusPct(profile.sector),
+              sectorHpPct: sectorHpPct({ sector: profile.sector }),
             },
           ),
         );
@@ -1228,6 +1344,7 @@ interface SweepOptions {
 const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
   const streams = createStreams(seed);
   const map: MapGraph = generateSectorMap(streams.map, opts.sector);
+  const bossId = bossNodeIdFor(opts.sector);
   const byId = nodeById(map);
   const aMods = ascensionMods(opts.ascension);
   const hullMax = Math.max(
@@ -1248,6 +1365,7 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
     jumpsSinceTide: 0,
     kills: 0,
     nodes: 0,
+    pockets: 0,
   };
 
   let position = START_NODE_ID;
@@ -1267,13 +1385,18 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
     hullMedian: median(hullEntering.length > 0 ? hullEntering : [state.hull]),
     resonanceSet: maxRealSchoolCount(state.deck) >= 4,
     mkReached: maxMk(state.mkLevels),
+    pockets: state.pockets,
   });
 
-  while (position !== BOSS_NODE_ID) {
-    const next = greedyNext(map, byId, position, posRow);
+  while (position !== bossId) {
+    const hullPct = (state.hull / Math.max(1, state.hullMax)) * 100;
+    const next = greedyNext(map, byId, position, posRow, hullPct);
     if (next === undefined) break;
+    applyEdgeMotifsSim(state, opts.sector, map, position, next.id, tideCap);
     position = next.id;
     posRow = next.row;
+    if (next.pocket === true) state.pockets += 1;
+    applyNodeMotifsSim(state, opts.sector, next, tideCap);
     state.jumpsSinceTide += 1;
     if (state.jumpsSinceTide >= 4) {
       state.tide = Math.min(tideCap, state.tide + 1);
@@ -1286,6 +1409,7 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
       const encStream = createStream(deriveSeed(seed, `enc:${next.id}`));
       const enemyIds = buildEncounterIds(type, encStream, {
         sector: opts.sector,
+        seed,
       });
       const res = simulateBattle(
         enemyIds,
@@ -1298,7 +1422,10 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
           mkLevels: state.mkLevels,
           perks: state.perks,
           modules: state.modules,
-          gateHpBonusPct: gateHpBonusPct(opts.sector),
+          sectorHpPct: sectorHpPct({
+            sector: opts.sector,
+            pocket: next.pocket === true,
+          }),
           enemyHpBonusPct: aMods.enemyHpPct,
           eliteShield: aMods.eliteShield,
           ascension: opts.ascension,
@@ -1309,7 +1436,7 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
       if (!res.win) return finish(false, next.row);
       state.nodes += 1;
       const loot = createStream(deriveSeed(seed, `loot:${next.id}`));
-      const reward = computeNodeReward(type, loot);
+      const reward = computeNodeReward(type, loot, 0, next.pocket === true);
       const mods = computeRunMods(state.perks, [], state.modules);
       const sectorMult =
         SECTORS.find((sd) => sd.id === opts.sector)?.scrapMult ?? 1;
@@ -1349,14 +1476,14 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
       state.nodes += 1;
     }
   }
-  return finish(position === BOSS_NODE_ID, -1);
+  return finish(position === bossId, -1);
 };
 
 const SWEEP_ASCENSIONS: readonly number[] = [0, 3, 6];
 
 const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
   const rows: string[] = [
-    "sector,ascension,deck,runs,winrate,avgNodes,avgKills,avgScrapEarned,avgScrapSpent,avgHullMedian,avgMk",
+    "sector,ascension,deck,runs,winrate,avgNodes,avgKills,avgScrapEarned,avgScrapSpent,avgHullMedian,avgMk,avgPockets",
   ];
   console.log(
     `sim sweep: 5 sectors x ${String(SWEEP_ASCENSIONS.length)} ascensions x ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
@@ -1393,10 +1520,11 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
             avg((r) => r.scrapSpent).toFixed(1),
             avg((r) => r.hullMedian).toFixed(1),
             avg((r) => r.mkReached).toFixed(2),
+            avg((r) => r.pockets).toFixed(2),
           ].join(","),
         );
         console.log(
-          `  S${String(sector)} A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(winrate * 100).toFixed(1)}% · scrap +${avg((r) => r.scrapEarned).toFixed(0)}/-${avg((r) => r.scrapSpent).toFixed(0)} · hull ${avg((r) => r.hullMedian).toFixed(1)}`,
+          `  S${String(sector)} A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(winrate * 100).toFixed(1)}% · scrap +${avg((r) => r.scrapEarned).toFixed(0)}/-${avg((r) => r.scrapSpent).toFixed(0)} · hull ${avg((r) => r.hullMedian).toFixed(1)} · pockets ${avg((r) => r.pockets).toFixed(2)}`,
         );
       }
     }

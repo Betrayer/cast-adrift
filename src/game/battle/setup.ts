@@ -9,7 +9,7 @@ import { BattleCtx, buildSources, emit } from "@/game/effects";
 import { slotMatches } from "@/game/effects/evaluate";
 import type { ExceedCapGrant } from "@/game/effects/types";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
-import { scaleHpForTide } from "@/game/run/encounter";
+import { scaleEnemyHp } from "@/game/run/encounter";
 import { runHasTrait } from "@/game/run/runMods";
 import { createStream, type RngStream, type RngStreams } from "@/services/rng";
 import type {
@@ -87,8 +87,8 @@ export interface BattleInit {
   hullMax?: number;
   chargeCap?: number;
   ascension?: number;
+  sectorHpPct?: number;
   enemyHpBonusPct?: number;
-  gateHpBonusPct?: number;
   eliteShield?: number;
   resonanceBoost?: ResonanceBoost;
   slotTierDelta?: Partial<Record<SlotId, number>>;
@@ -232,22 +232,14 @@ export const drawIntent = (
 
 export interface SpawnInit {
   tide?: number;
+  sectorHpPct?: number;
   hpBonusPct?: number;
-  gateHpBonusPct?: number;
   eliteShield?: number;
   ascension?: number;
 }
 
 const isTough = (def: EnemyDef): boolean =>
   def.elite === true || def.miniboss === true || def.boss === true;
-
-// The six mini-bosses rotate across sectors with very different decks facing
-// them, so they ride the same ×(1 + 0.15×(sector−1)) curve the enemy pools were
-// baked with. Bosses are authored per act and need no runtime scaling.
-export const GATE_CURVE_PCT_PER_SECTOR = 15;
-
-export const gateHpBonusPct = (sector: number): number =>
-  Math.max(0, sector - 1) * GATE_CURVE_PCT_PER_SECTOR;
 
 export const spawnEnemy = (
   defId: string,
@@ -258,11 +250,12 @@ export const spawnEnemy = (
   const def = ENEMY_BY_ID.get(defId);
   if (def === undefined)
     throw new Error(`spawnEnemy: unknown enemy "${defId}"`);
-  const tide = init.tide ?? 0;
-  const gate = def.miniboss === true ? (init.gateHpBonusPct ?? 0) : 0;
-  const bonus = 1 + Math.max(0, (init.hpBonusPct ?? 0) + gate) / 100;
   const scale = (base: number): number =>
-    Math.max(1, Math.round(scaleHpForTide(base, tide) * bonus));
+    scaleEnemyHp(base, {
+      tide: init.tide,
+      sectorHpPct: init.sectorHpPct,
+      hpBonusPct: init.hpBonusPct,
+    });
   const hp = scale(def.hp);
   const ascension = init.ascension ?? 0;
   const phase = phaseIndexForHp(def, hp, hp, ascension);
@@ -317,8 +310,8 @@ export const buildBattleSnapshot = (
   const ascension = init.ascension ?? 0;
   const enemies = buildEnemies(enemyIds, enemyStream, {
     tide,
+    sectorHpPct: init.sectorHpPct ?? 0,
     hpBonusPct: init.enemyHpBonusPct ?? 0,
-    gateHpBonusPct: init.gateHpBonusPct ?? 0,
     eliteShield: init.eliteShield ?? 0,
     ascension,
   });
@@ -385,6 +378,8 @@ export const buildBattleSnapshot = (
     pendingSwap: 0,
     pendingStorm: 0,
     ascension,
+    sectorHpPct: init.sectorHpPct ?? 0,
+    enemyHpPct: init.enemyHpBonusPct ?? 0,
   };
   const perks = init.perks ?? [];
   const modules = init.modules ?? [];

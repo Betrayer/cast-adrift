@@ -116,7 +116,10 @@
       "redFirestorm": "La valeur maximale de « face » dans les armes ajoute « Brûlure 3 »",
       "redSpine": "+4 en montage dorsal",
       "greenCanopy": "+3 dans la catégorie « Moteurs »",
-      "blackWell": "Le réacteur peut encore contenir deux charges supplémentaires."
+      "blackWell": "Le réacteur peut encore contenir deux charges supplémentaires.",
+      "shopArrival": "+6 ferraille en arrivant à un marché",
+      "tideWard": "Répare 1 coque par saut dès marée 2",
+      "detourScout": "+12 ferraille en entrant dans un détour"
     },
     "trait": {
       "obsidianPact": "Les dés noirs n'affichent que leur valeur minimale ou maximale.",

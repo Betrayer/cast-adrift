@@ -1,8 +1,8 @@
 import type { BossDef } from "@/types/content";
 
-// Act bosses (DESIGN §2). HP figures are the A0 baseline; ascension scaling is a
-// run modifier, never baked here. Phases are ordered high hp% → low; the first
-// phase whose `untilHpPct` the boss is still above owns the pattern.
+// Act bosses (DESIGN §2). HP is the sector-1 baseline (DESIGN §9.5); the sector
+// curve, tide and ascension all scale at spawn. Phases are ordered high hp% →
+// low; the first phase whose `untilHpPct` the boss is still above owns the pattern.
 export const BOSSES: readonly BossDef[] = [
   {
     id: "quarantineWarden",
@@ -39,12 +39,12 @@ export const BOSSES: readonly BossDef[] = [
   {
     id: "breakerBarge",
     name: "content:enemies.breakerBarge",
-    hp: 84,
+    hp: 73,
     boss: true,
     stealOnHit: 6,
     subsystems: [
-      { id: "grinder", name: "content:enemies.breakerBarge-grinder", hp: 16, aura: "stealOnHit6" },
-      { id: "crane", name: "content:enemies.breakerBarge-crane", hp: 16, aura: "lockEvery3" },
+      { id: "grinder", name: "content:enemies.breakerBarge-grinder", hp: 14, aura: "stealOnHit6" },
+      { id: "crane", name: "content:enemies.breakerBarge-crane", hp: 14, aura: "lockEvery3" },
     ],
     phases: [
       {
@@ -74,11 +74,11 @@ export const BOSSES: readonly BossDef[] = [
   {
     id: "riftMaw",
     name: "content:enemies.riftMaw",
-    hp: 88,
+    hp: 68,
     boss: true,
     subsystems: [
-      { id: "eyeA", name: "content:enemies.riftMaw-eyeA", hp: 16, aura: "twistEachTurn" },
-      { id: "eyeB", name: "content:enemies.riftMaw-eyeB", hp: 16, aura: "twistEachTurn" },
+      { id: "eyeA", name: "content:enemies.riftMaw-eyeA", hp: 12, aura: "twistEachTurn" },
+      { id: "eyeB", name: "content:enemies.riftMaw-eyeB", hp: 12, aura: "twistEachTurn" },
     ],
     phases: [
       {
@@ -106,11 +106,11 @@ export const BOSSES: readonly BossDef[] = [
   {
     id: "choirFlagship",
     name: "content:enemies.choirFlagship",
-    hp: 112,
+    hp: 77,
     boss: true,
     subsystems: [
-      { id: "spire", name: "content:enemies.choirFlagship-spire", hp: 20, aura: "chargeAllies" },
-      { id: "voice", name: "content:enemies.choirFlagship-voice", hp: 20, aura: "summonEvery4" },
+      { id: "spire", name: "content:enemies.choirFlagship-spire", hp: 14, aura: "chargeAllies" },
+      { id: "voice", name: "content:enemies.choirFlagship-voice", hp: 14, aura: "summonEvery4" },
     ],
     phases: [
       {
@@ -140,12 +140,12 @@ export const BOSSES: readonly BossDef[] = [
   {
     id: "coreHeart",
     name: "content:enemies.coreHeart",
-    hp: 132,
+    hp: 82,
     boss: true,
     shell: true,
     subsystems: [
-      { id: "valveA", name: "content:enemies.coreHeart-valveA", hp: 20, aura: "shieldSelf6" },
-      { id: "valveB", name: "content:enemies.coreHeart-valveB", hp: 20, aura: "twistEachTurn" },
+      { id: "valveA", name: "content:enemies.coreHeart-valveA", hp: 12, aura: "shieldSelf6" },
+      { id: "valveB", name: "content:enemies.coreHeart-valveB", hp: 12, aura: "twistEachTurn" },
     ],
     phases: [
       {

@@ -10,40 +10,28 @@ import { ENEMY_BY_ID } from "@/data/enemies";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { computeMutatorMods } from "@/data/mutators";
 import { sectorDef } from "@/data/sectors";
-import { pickMiniboss } from "@/game/run/encounter";
+import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
 import { abandonRun, jumpTo } from "@/game/run/flow";
 import { computeRunMods } from "@/game/run/runMods";
 import {
   areConnected,
-  BOSS_ROW,
+  edgeMarkFor,
   NODE_GLYPH,
-  ROW_COUNT,
   nodeById,
   type MapGraph,
   type MapNode,
   type NodeId,
 } from "@/game/map/types";
+import { nodeRisk } from "@/game/map/risk";
+import { tierForNode } from "@/game/puzzles/selection";
+import { TierBadge } from "@/components/TierBadge";
+import { mapGeometry, ROW_GAP } from "./mapGeometry";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useAppStore } from "@/stores/appStore";
 import { useRunStore } from "@/stores/runStore";
 import styles from "./MapScreen.module.css";
-
-const LANE_X = [64, 144, 224, 304] as const;
-const CENTER_X = 184;
-const VIEW_W = 368;
-const ROW_GAP = 62;
-const TOP_PAD = 42;
-const BOT_PAD = 42;
-const MAP_H = TOP_PAD + BOSS_ROW * ROW_GAP + BOT_PAD;
-
-const rowY = (row: number): number => TOP_PAD + (BOSS_ROW - row) * ROW_GAP;
-const nodeX = (node: MapNode): number =>
-  node.type === "start" || node.type === "boss"
-    ? CENTER_X
-    : (LANE_X[node.lane] ?? CENTER_X);
-const nodeRadius = (node: MapNode): number => (node.type === "boss" ? 22 : 16);
 
 const ringFor = (
   node: MapNode,
@@ -98,8 +86,13 @@ const LEGEND_TYPES: readonly MapNode["type"][] = [
 
 // Each node type carries a stamp behind its glyph: a procedural silhouette
 // that reads at a glance and survives a monochrome theme.
-const nodeStamp = (node: MapNode, cx: number, cy: number): string | null => {
-  const r = nodeRadius(node) * 0.72;
+const nodeStamp = (
+  node: MapNode,
+  cx: number,
+  cy: number,
+  radius: number,
+): string | null => {
+  const r = radius * 0.72;
   switch (node.type) {
     case "battle":
     case "elite":
@@ -116,6 +109,75 @@ const nodeStamp = (node: MapNode, cx: number, cy: number): string | null => {
       return null;
   }
 };
+
+const MOTIF_BADGE = {
+  pocket: "✦",
+  cache: "◈",
+  unstable: "⚡",
+  blessed: "○",
+  cursed: "●",
+} as const;
+
+const motifBadge = (node: MapNode): string | null => {
+  if (node.pocket === true) return MOTIF_BADGE.pocket;
+  if (node.cache === true) return MOTIF_BADGE.cache;
+  if (node.unstable === true) return MOTIF_BADGE.unstable;
+  if (node.blessing !== undefined) return MOTIF_BADGE[node.blessing];
+  return null;
+};
+
+const motifColor = (node: MapNode): string => {
+  if (node.pocket === true) return tokens.amber;
+  if (node.cache === true) return schools.yellow.text;
+  if (node.unstable === true) return schools.red.text;
+  return node.blessing === "cursed" ? schools.red.text : schools.blue.text;
+};
+
+interface MotifLegendEntry {
+  key: string;
+  badge: string;
+  color: string;
+  present: (map: MapGraph) => boolean;
+}
+
+const MOTIF_LEGEND: readonly MotifLegendEntry[] = [
+  {
+    key: "pocket",
+    badge: MOTIF_BADGE.pocket,
+    color: tokens.amber,
+    present: (map) => map.nodes.some((n) => n.pocket === true),
+  },
+  {
+    key: "cache",
+    badge: MOTIF_BADGE.cache,
+    color: schools.yellow.text,
+    present: (map) => map.nodes.some((n) => n.cache === true),
+  },
+  {
+    key: "unstable",
+    badge: MOTIF_BADGE.unstable,
+    color: schools.red.text,
+    present: (map) => map.nodes.some((n) => n.unstable === true),
+  },
+  {
+    key: "blessed",
+    badge: MOTIF_BADGE.blessed,
+    color: schools.blue.text,
+    present: (map) => map.nodes.some((n) => n.blessing === "blessed"),
+  },
+  {
+    key: "cursed",
+    badge: MOTIF_BADGE.cursed,
+    color: schools.red.text,
+    present: (map) => map.nodes.some((n) => n.blessing === "cursed"),
+  },
+  {
+    key: "mine",
+    badge: "─",
+    color: schools.red.text,
+    present: (map) => Object.keys(map.edgeMarks).length > 0,
+  },
+];
 
 interface MapViewProps {
   map: MapGraph;
@@ -150,6 +212,7 @@ const MapView = ({ map, position }: MapViewProps) => {
     useSettingsStore((s) => s.reducedMotion),
   );
 
+  const geo = useMemo(() => mapGeometry(map.shape), [map.shape]);
   const byId = useMemo(() => nodeById(map), [map]);
   const posNode = byId.get(position);
   const positionRow = posNode?.row ?? 0;
@@ -157,8 +220,8 @@ const MapView = ({ map, position }: MapViewProps) => {
   const [selected, setSelected] = useState<NodeId | null>(null);
   const [jumping, setJumping] = useState(false);
   const [marker, setMarker] = useState(() => ({
-    x: posNode ? nodeX(posNode) : CENTER_X,
-    y: rowY(positionRow),
+    x: posNode ? geo.nodeX(posNode) : geo.centerX,
+    y: geo.rowY(positionRow),
   }));
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<SVGSVGElement | null>(null);
@@ -190,8 +253,8 @@ const MapView = ({ map, position }: MapViewProps) => {
     const el = scrollRef.current;
     const stage = stageRef.current;
     if (el === null || stage === null) return;
-    const scale = stage.getBoundingClientRect().width / VIEW_W;
-    const targetY = rowY(positionRow) * scale;
+    const scale = stage.getBoundingClientRect().width / geo.viewW;
+    const targetY = geo.rowY(positionRow) * scale;
     el.scrollTo({
       top: Math.max(0, targetY - el.clientHeight * 0.55),
       behavior: reduced ? "auto" : "smooth",
@@ -228,7 +291,7 @@ const MapView = ({ map, position }: MapViewProps) => {
       return;
     }
     setJumping(true);
-    setMarker({ x: nodeX(target), y: rowY(target.row) });
+    setMarker({ x: geo.nodeX(target), y: geo.rowY(target.row) });
     window.setTimeout(() => {
       jumpTo(selected);
     }, 430);
@@ -237,17 +300,23 @@ const MapView = ({ map, position }: MapViewProps) => {
   const visibleNodes = map.nodes.filter(isVisible);
   const visibleIds = new Set(visibleNodes.map((n) => n.id));
   const fogBottom =
-    visibleLimit >= BOSS_ROW ? 0 : rowY(visibleLimit) - ROW_GAP / 2;
+    visibleLimit >= map.shape.bossRow
+      ? 0
+      : geo.rowY(visibleLimit) - ROW_GAP / 2;
+
+  const motifLegend = MOTIF_LEGEND.filter((entry) =>
+    entry.present(map),
+  );
 
   const selectedNode = selected === null ? null : byId.get(selected);
   const canJump =
     !jumping && selectedNode !== undefined && selectedNode !== null && isLegal(selectedNode);
 
-  // Intent preview: the gate row announces which of the six mini-bosses waits.
-  const previewLabel = ((): string | null => {
+  // Intent preview: what waits, how dangerous it is, and what a detour pays.
+  const previewName = ((): string | null => {
     if (selectedNode === undefined || selectedNode === null) return null;
     if (selectedNode.type === "boss") {
-      const boss = ENEMY_BY_ID.get(sectorDef(sector).bossId);
+      const boss = ENEMY_BY_ID.get(pickBoss(sector, seed));
       return boss === undefined
         ? null
         : t("run:map.previewBoss", { name: t(boss.name) });
@@ -261,6 +330,31 @@ const MapView = ({ map, position }: MapViewProps) => {
       : t("run:map.previewMiniboss", { name: t(def.name) });
   })();
 
+  const anomalyTier =
+    selectedNode === undefined || selectedNode === null
+      ? null
+      : tierForNode(seed, selectedNode);
+
+  const previewLines =
+    selectedNode === undefined || selectedNode === null
+      ? []
+      : [
+          t("run:map.previewNode", {
+            type: t(`run:map.node.${selectedNode.type}`),
+            risk: t(`run:map.risk.${nodeRisk(selectedNode)}`),
+          }),
+          ...(previewName === null ? [] : [previewName]),
+          ...(selectedNode.pocket === true ? [t("run:map.previewPocket")] : []),
+          ...(selectedNode.cache === true ? [t("run:motif.cache")] : []),
+          ...(selectedNode.unstable === true ? [t("run:motif.unstable")] : []),
+          ...(selectedNode.blessing === undefined
+            ? []
+            : [t(`run:motif.${selectedNode.blessing}`)]),
+          ...(edgeMarkFor(map, position, selectedNode.id) === "mine"
+            ? [t("run:motif.mine")]
+            : []),
+        ];
+
   const header = (
     <div className={styles.header}>
       <div className={styles.headTitle}>
@@ -271,7 +365,7 @@ const MapView = ({ map, position }: MapViewProps) => {
           })}
         </Text>
         <Text size="xs" c={tokens.faint}>
-          {t("run:map.depth", { cur: positionRow, max: ROW_COUNT })}
+          {t("run:map.depth", { cur: positionRow, max: map.shape.bossRow })}
         </Text>
       </div>
       <div className={styles.headChips}>
@@ -299,11 +393,25 @@ const MapView = ({ map, position }: MapViewProps) => {
 
   const footer = (
     <div className={styles.footer}>
-      {previewLabel === null ? null : (
-        <Text size="xs" c={schools.red.text} ta="center" fw={600}>
-          {previewLabel}
-        </Text>
+      {anomalyTier === null ? null : (
+        <div className={styles.previewBadge}>
+          <TierBadge
+            tier={anomalyTier}
+            label={t(`run:anomaly.tierName.${String(anomalyTier)}`)}
+          />
+        </div>
       )}
+      {previewLines.map((line, index) => (
+        <Text
+          key={line}
+          size="xs"
+          c={index === 0 ? tokens.dim : schools.red.text}
+          ta="center"
+          fw={index === 0 ? 400 : 600}
+        >
+          {line}
+        </Text>
+      ))}
       <Button
         size="md"
         fullWidth
@@ -342,7 +450,7 @@ const MapView = ({ map, position }: MapViewProps) => {
         <svg
           ref={stageRef}
           className={styles.stage}
-          viewBox={`0 0 ${String(VIEW_W)} ${String(MAP_H)}`}
+          viewBox={`0 0 ${String(geo.viewW)} ${String(geo.viewH)}`}
           role="img"
         >
           {map.edges.map(([a, b]) => {
@@ -350,15 +458,23 @@ const MapView = ({ map, position }: MapViewProps) => {
             const na = byId.get(a);
             const nb = byId.get(b);
             if (na === undefined || nb === undefined) return null;
+            const mark = edgeMarkFor(map, a, b);
             return (
               <line
                 key={`${a}-${b}`}
-                x1={nodeX(na)}
-                y1={rowY(na.row)}
-                x2={nodeX(nb)}
-                y2={rowY(nb.row)}
-                stroke={mixHex(tokens.line, tokens.faint, 0.35)}
-                strokeWidth={1.2}
+                x1={geo.nodeX(na)}
+                y1={geo.rowY(na.row)}
+                x2={geo.nodeX(nb)}
+                y2={geo.rowY(nb.row)}
+                stroke={
+                  mark === undefined
+                    ? mixHex(tokens.line, tokens.faint, 0.35)
+                    : mark === "mine"
+                      ? schools.red.text
+                      : tokens.amber
+                }
+                strokeWidth={mark === undefined ? 1.2 : 1.8}
+                strokeDasharray={mark === undefined ? undefined : "5 4"}
               />
             );
           })}
@@ -369,10 +485,16 @@ const MapView = ({ map, position }: MapViewProps) => {
             const legal = isLegal(node);
             const ring = ringFor(node, current, chosen);
             const done = visited.includes(node.id) && !current;
-            const stamp = nodeStamp(node, nodeX(node), rowY(node.row));
+            const stamp = nodeStamp(
+              node,
+              geo.nodeX(node),
+              geo.rowY(node.row),
+              geo.radius(node),
+            );
             return (
               <g
                 key={node.id}
+                data-node={node.id}
                 className={`${legal ? styles.nodeSelectable ?? "" : styles.node ?? ""} ${
                   reduced ? "" : styles.nodeStagger ?? ""
                 }`}
@@ -383,18 +505,18 @@ const MapView = ({ map, position }: MapViewProps) => {
                 {legal && !chosen && !reduced ? (
                   <circle
                     className={styles.pulse}
-                    cx={nodeX(node)}
-                    cy={rowY(node.row)}
-                    r={nodeRadius(node) + 4}
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node) + 4}
                     fill="none"
                     stroke={tokens.accent}
                     strokeWidth={1}
                   />
                 ) : null}
                 <circle
-                  cx={nodeX(node)}
-                  cy={rowY(node.row)}
-                  r={nodeRadius(node)}
+                  cx={geo.nodeX(node)}
+                  cy={geo.rowY(node.row)}
+                  r={geo.radius(node)}
                   fill={
                     node.type === "boss"
                       ? schools.red.fill
@@ -409,8 +531,8 @@ const MapView = ({ map, position }: MapViewProps) => {
                   <path d={stamp} fill={glyphColor(node)} opacity={0.16} />
                 )}
                 <text
-                  x={nodeX(node)}
-                  y={rowY(node.row) + 4}
+                  x={geo.nodeX(node)}
+                  y={geo.rowY(node.row) + 4}
                   textAnchor="middle"
                   fontSize={13}
                   fontWeight={600}
@@ -418,10 +540,22 @@ const MapView = ({ map, position }: MapViewProps) => {
                 >
                   {t(NODE_GLYPH[node.type])}
                 </text>
+                {motifBadge(node) === null ? null : (
+                  <text
+                    x={geo.nodeX(node) + geo.radius(node) - 1}
+                    y={geo.rowY(node.row) - geo.radius(node) + 6}
+                    textAnchor="middle"
+                    fontSize={11}
+                    fontWeight={700}
+                    fill={motifColor(node)}
+                  >
+                    {motifBadge(node)}
+                  </text>
+                )}
                 {current ? (
                   <text
-                    x={nodeX(node)}
-                    y={rowY(node.row) + nodeRadius(node) + 15}
+                    x={geo.nodeX(node)}
+                    y={geo.rowY(node.row) + geo.radius(node) + 15}
                     textAnchor="middle"
                     fontSize={11}
                     fontWeight={600}
@@ -432,8 +566,8 @@ const MapView = ({ map, position }: MapViewProps) => {
                 ) : null}
                 {current && interference > 0 ? (
                   <text
-                    x={nodeX(node)}
-                    y={rowY(node.row) - nodeRadius(node) - 6}
+                    x={geo.nodeX(node)}
+                    y={geo.rowY(node.row) - geo.radius(node) - 6}
                     textAnchor="middle"
                     fontSize={12}
                     fontWeight={700}
@@ -451,7 +585,7 @@ const MapView = ({ map, position }: MapViewProps) => {
               <rect
                 x={8}
                 y={0}
-                width={VIEW_W - 16}
+                width={geo.viewW - 16}
                 height={fogBottom}
                 rx={8}
                 fill={tokens.bg}
@@ -460,7 +594,7 @@ const MapView = ({ map, position }: MapViewProps) => {
               <rect
                 x={8}
                 y={0}
-                width={VIEW_W - 16}
+                width={geo.viewW - 16}
                 height={fogBottom}
                 rx={8}
                 fill="none"
@@ -468,7 +602,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 strokeDasharray="6 5"
               />
               <text
-                x={VIEW_W / 2}
+                x={geo.viewW / 2}
                 y={Math.min(fogBottom - 26, 54)}
                 textAnchor="middle"
                 fontSize={13}
@@ -477,7 +611,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 {t("run:map.fog")}
               </text>
               <text
-                x={VIEW_W / 2}
+                x={geo.viewW / 2}
                 y={Math.min(fogBottom - 10, 72)}
                 textAnchor="middle"
                 fontSize={11}
@@ -504,7 +638,7 @@ const MapView = ({ map, position }: MapViewProps) => {
           {t("run:map.title", { n: sector, name: t(sectorDef(sector).name) })}
         </Text>
         <Text size="xs" c={tokens.dim}>
-          {t("run:map.depth", { cur: positionRow, max: ROW_COUNT })}
+          {t("run:map.depth", { cur: positionRow, max: map.shape.bossRow })}
         </Text>
         <Text size="xs" c={tokens.dim}>
           {t("run:map.tide", { n: tide })}
@@ -530,6 +664,26 @@ const MapView = ({ map, position }: MapViewProps) => {
             </Text>
           </div>
         ))}
+        {motifLegend.length === 0 ? null : (
+          <>
+            <Text size="xs" c={tokens.faint}>
+              {t("run:motif.title")}
+            </Text>
+            {motifLegend.map((entry) => (
+              <div key={entry.key} className={styles.legendRow}>
+                <span
+                  className={styles.legendGlyph}
+                  style={{ color: entry.color }}
+                >
+                  {entry.badge}
+                </span>
+                <Text size="xs" c={tokens.dim}>
+                  {t(`run:motif.${entry.key}`)}
+                </Text>
+              </div>
+            ))}
+          </>
+        )}
       </aside>
     </Screen>
   );

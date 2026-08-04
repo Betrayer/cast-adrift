@@ -39,8 +39,6 @@ export interface CarryState {
 
 const PUZZLE_HULL_DEFAULT = 30;
 const DEFAULT_PUZZLE_CHARGE_CAP = 20;
-const SAMPLE_SEED = 0x5a17;
-const SAMPLE_ROLLS = 120;
 
 export const emptyCarry = (deckLen: number): CarryState => ({
   charge: 0,
@@ -48,8 +46,12 @@ export const emptyCarry = (deckLen: number): CarryState => ({
   growth: Array<number>(deckLen).fill(0),
 });
 
-export const dieMetas = (puzzle: PuzzleDef): DieMeta[] =>
-  puzzle.deck.map((defId) => {
+const metaCache = new WeakMap<PuzzleDef, DieMeta[]>();
+
+export const dieMetas = (puzzle: PuzzleDef): DieMeta[] => {
+  const cached = metaCache.get(puzzle);
+  if (cached !== undefined) return cached;
+  const metas = puzzle.deck.map((defId) => {
     const def = DIE_BY_ID.get(defId);
     return {
       defId,
@@ -57,6 +59,18 @@ export const dieMetas = (puzzle: PuzzleDef): DieMeta[] =>
       school: def?.school ?? "grey",
     };
   });
+  metaCache.set(puzzle, metas);
+  return metas;
+};
+
+export const lockedCountForTurn = (puzzle: PuzzleDef, turnIndex: number): number =>
+  turnIndex === 0 ? Math.min(puzzle.locks ?? 0, puzzle.deck.length) : 0;
+
+export const dieIsLocked = (
+  puzzle: PuzzleDef,
+  dieIndex: number,
+  turnIndex: number,
+): boolean => dieIndex < lockedCountForTurn(puzzle, turnIndex);
 
 export const resolveFaces = (defId: string, tier: DieTier): number[] => {
   const faces = DIE_BY_ID.get(defId)?.faces;
@@ -156,6 +170,8 @@ const buildSnapshot = (
     bloodReactorUsed: false,
     burnDoubleUsed: false,
     exceedCap: [],
+    sectorHpPct: 0,
+    enemyHpPct: 0,
     blockedSlots: [],
     shrunkSlots: [],
     lockedDice: [],
@@ -402,12 +418,45 @@ export const primaryMetric = (goal: PuzzleGoal): PuzzleMetric | "hull" => {
   }
 };
 
+export const goalTarget = (goal: PuzzleGoal): number => {
+  switch (goal.g) {
+    case "damage":
+    case "charge":
+    case "shield":
+      return goal.min;
+    case "survive":
+      return 0;
+    case "survivePlus":
+      return goal.clause.min;
+    case "exact":
+      return goal.value;
+    case "constraint":
+      return goal.base.min;
+    case "order":
+      return Math.max(0, ...goal.steps.map((s) => ("min" in s ? s.min : 0)));
+    case "multiTurn":
+      return goal.final.min;
+    case "deduction":
+      return goalTarget(goal.inner);
+  }
+};
+
 export const scoreMetric = (
   metric: PuzzleMetric | "hull",
   score: TrialScore,
 ): number => (metric === "hull" ? score.hullAfter : metricValue(metric, score));
 
-export const enumeratePlacements = (puzzle: PuzzleDef): Placement[] => {
+const placementCache = new WeakMap<PuzzleDef, Map<number, Placement[]>>();
+
+export const enumeratePlacements = (
+  puzzle: PuzzleDef,
+  lockedCount = 0,
+): Placement[] => {
+  const perPuzzle = placementCache.get(puzzle) ?? new Map<number, Placement[]>();
+  placementCache.set(puzzle, perPuzzle);
+  const hit = perPuzzle.get(lockedCount);
+  if (hit !== undefined) return hit;
+
   const metas = dieMetas(puzzle);
   const census = computeCensus(metas);
   const blocked = new Set(puzzle.blocked ?? []);
@@ -424,6 +473,7 @@ export const enumeratePlacements = (puzzle: PuzzleDef): Placement[] => {
       return;
     }
     recurse(index + 1, used, acc);
+    if (index < lockedCount) return;
     const die = metas[index];
     if (die === undefined) return;
     for (const slot of available) {
@@ -434,6 +484,8 @@ export const enumeratePlacements = (puzzle: PuzzleDef): Placement[] => {
   };
 
   recurse(0, new Set(), {});
+  results.sort((a, b) => Object.keys(b).length - Object.keys(a).length);
+  perPuzzle.set(lockedCount, results);
   return results;
 };
 
@@ -441,104 +493,25 @@ export const legalAssign = (
   puzzle: PuzzleDef,
   dieIndex: number,
   slot: SlotId,
+  turnIndex = 0,
 ): boolean => {
   if ((puzzle.blocked ?? []).includes(slot)) return false;
+  if (dieIsLocked(puzzle, dieIndex, turnIndex)) return false;
   const metas = dieMetas(puzzle);
   const die = metas[dieIndex];
   if (die === undefined) return false;
   return canAssign(die, capFor(puzzle, slot), computeCensus(metas));
 };
 
-const facesAt = (
-  puzzle: PuzzleDef,
-  pick: (lo: number, hi: number) => number,
-): number[] =>
-  puzzle.deck.map((defId) => {
-    const def = DIE_BY_ID.get(defId);
-    const [lo, hi] = faceRange(defId, def?.tier ?? 6);
-    return pick(lo, hi);
-  });
-
-const floorFaces = (puzzle: PuzzleDef): number[] =>
-  facesAt(puzzle, (lo) => lo);
-const ceilFaces = (puzzle: PuzzleDef): number[] => facesAt(puzzle, (_, hi) => hi);
-const midFaces = (puzzle: PuzzleDef): number[] =>
-  facesAt(puzzle, (lo, hi) => Math.round((lo + hi) / 2));
-
-const sampleRolls = (puzzle: PuzzleDef, count: number): number[][] => {
-  const stream = createStream(SAMPLE_SEED);
-  const facePools = puzzle.deck.map((defId) => {
-    const def = DIE_BY_ID.get(defId);
-    return resolveFaces(defId, def?.tier ?? 6);
-  });
-  const rolls: number[][] = [];
-  for (let i = 0; i < count; i += 1) {
-    rolls.push(facePools.map((faces) => stream.pick(faces)));
-  }
-  return rolls;
-};
-
-const representativeRolls = (puzzle: PuzzleDef): number[][] => {
-  if (puzzle.fixedRoll !== undefined) return [[...puzzle.fixedRoll]];
-  return [
-    floorFaces(puzzle),
-    midFaces(puzzle),
-    ceilFaces(puzzle),
-    ...sampleRolls(puzzle, SAMPLE_ROLLS),
-  ];
-};
-
-const ROLL_ENUM_CAP = 50000;
-
-// The full roll space when it is small enough to enumerate — used to turn the
-// exact-arm reachability check from an empirical sample into an actual proof.
-const enumerateRolls = (puzzle: PuzzleDef): number[][] | null => {
-  const pools = puzzle.deck.map((defId) =>
-    resolveFaces(defId, DIE_BY_ID.get(defId)?.tier ?? 6),
-  );
-  const total = pools.reduce((n, faces) => n * faces.length, 1);
-  if (total > ROLL_ENUM_CAP) return null;
-  let rolls: number[][] = [[]];
-  for (const faces of pools) {
-    const next: number[][] = [];
-    for (const roll of rolls) {
-      for (const face of faces) next.push([...roll, face]);
-    }
-    rolls = next;
-  }
-  return rolls;
-};
-
-const bestMetricAt = (
-  puzzle: PuzzleDef,
-  values: readonly number[],
-  metric: PuzzleMetric | "hull" = primaryMetric(puzzle.goal),
-): number => {
-  let best = -Infinity;
-  for (const p of enumeratePlacements(puzzle)) {
-    best = Math.max(best, scoreMetric(metric, scorePlacement(puzzle, values, p)));
-  }
-  return best;
-};
-
-const satisfiedByAnyPlacement = (
-  puzzle: PuzzleDef,
-  goal: SingleTurnGoal,
-  values: readonly number[],
-): boolean =>
-  enumeratePlacements(puzzle).some((p) =>
-    singleTurnSatisfied(puzzle, goal, values, p),
-  );
-
 // ---- multiTurn simulator ----
 
-interface TurnOutcome {
+export interface TurnOutcome {
   turnDamage: number;
   endShield: number;
   carryOut: CarryState;
 }
 
-const applyTurn = (
+export const applyTurn = (
   puzzle: PuzzleDef,
   values: readonly number[],
   placement: Placement,
@@ -554,42 +527,6 @@ const applyTurn = (
     endShield: score.shield,
     carryOut: { charge: score.charge, burn: burnOut, growth: score.growthOut },
   };
-};
-
-const bestCumulative = (
-  puzzle: PuzzleDef,
-  valuesPerTurn: number[][],
-  metric: PuzzleMetric,
-): number => {
-  const turns = valuesPerTurn.length;
-  const placements = enumeratePlacements(puzzle);
-
-  const rec = (
-    t: number,
-    carry: CarryState,
-    cumDamage: number,
-  ): number => {
-    const values = valuesPerTurn[t];
-    if (values === undefined) {
-      return metric === "damage"
-        ? cumDamage
-        : metric === "charge"
-          ? carry.charge
-          : 0;
-    }
-    let best = -Infinity;
-    for (const p of placements) {
-      const out = applyTurn(puzzle, values, p, carry);
-      const isLast = t === turns - 1;
-      let val: number;
-      if (metric === "shield" && isLast) val = out.endShield;
-      else val = rec(t + 1, out.carryOut, cumDamage + out.turnDamage);
-      best = Math.max(best, val);
-    }
-    return best;
-  };
-
-  return rec(0, emptyCarry(puzzle.deck.length), 0);
 };
 
 export interface MultiTurnState {
@@ -637,183 +574,3 @@ export const multiTurnSatisfied = (
 ): boolean =>
   puzzle.goal.g === "multiTurn" &&
   multiTurnMetric(puzzle, state) >= puzzle.goal.final.min;
-
-// ---- validator ----
-
-export const solutionCount = (puzzle: PuzzleDef): number => {
-  const goal = puzzle.goal;
-  if (goal.g === "multiTurn") {
-    // Count placements of the ceiling first turn that keep a winning line open.
-    return bestCumulative(
-      puzzle,
-      Array.from({ length: goal.turns }, () => ceilFaces(puzzle)),
-      goal.final.metric,
-    ) >= goal.final.min
-      ? 1
-      : 0;
-  }
-  const target = goal.g === "deduction" ? goal.inner : goal;
-  const rolls =
-    puzzle.fixedRoll !== undefined
-      ? [[...puzzle.fixedRoll]]
-      : representativeRolls(puzzle);
-  let count = 0;
-  for (const values of rolls) {
-    for (const p of enumeratePlacements(puzzle)) {
-      if (singleTurnSatisfied(puzzle, target, values, p)) count += 1;
-    }
-  }
-  return count;
-};
-
-export const totalPlacements = (puzzle: PuzzleDef): number =>
-  enumeratePlacements(puzzle).length;
-
-export const exactReachable = (puzzle: PuzzleDef): boolean => {
-  const goal = innerGoal(puzzle.goal);
-  if (goal?.g !== "exact") return true;
-  // Prove it: enumerate the whole roll space when small, else fall back to
-  // the representative sample.
-  const rolls = enumerateRolls(puzzle) ?? representativeRolls(puzzle);
-  const placements = enumeratePlacements(puzzle);
-  return rolls.some((values) =>
-    placements.some((p) => singleTurnSatisfied(puzzle, goal, values, p)),
-  );
-};
-
-// The trial can be won: some (roll, placement) within budget meets the goal.
-export const isAchievable = (puzzle: PuzzleDef): boolean => {
-  const goal = puzzle.goal;
-  if (goal.g === "multiTurn") {
-    return (
-      bestCumulative(
-        puzzle,
-        Array.from({ length: goal.turns }, () => ceilFaces(puzzle)),
-        goal.final.metric,
-      ) >= goal.final.min
-    );
-  }
-  if (goal.g === "deduction") {
-    return solutionCount(puzzle) >= 1;
-  }
-  if (goal.g === "exact") {
-    const ceil = bestMetricAt(puzzle, ceilFaces(puzzle), goal.metric);
-    return exactReachable(puzzle) && goal.value <= ceil;
-  }
-  // Monotone arms: a ceiling roll (plus samples for safety) can satisfy.
-  return representativeRolls(puzzle).some((values) =>
-    satisfiedByAnyPlacement(puzzle, goal, values),
-  );
-};
-
-const exactReachableAt = (
-  puzzle: PuzzleDef,
-  values: readonly number[],
-  goal: Extract<SingleTurnGoal, { g: "exact" }>,
-): boolean =>
-  enumeratePlacements(puzzle).some((p) =>
-    singleTurnSatisfied(puzzle, goal, values, p),
-  );
-
-// The trial is never a free win: the floor roll (or a wrong placement, for
-// deduction) fails to meet the goal.
-export const isTrivial = (puzzle: PuzzleDef): boolean => {
-  const goal = puzzle.goal;
-  if (goal.g === "multiTurn") {
-    return (
-      bestCumulative(
-        puzzle,
-        Array.from({ length: goal.turns }, () => floorFaces(puzzle)),
-        goal.final.metric,
-      ) >= goal.final.min
-    );
-  }
-  if (goal.g === "deduction") {
-    return solutionCount(puzzle) >= totalPlacements(puzzle);
-  }
-  if (goal.g === "exact") {
-    // Free if even the floor roll can already land the exact value.
-    return floorFaces(puzzle).length > 0 && exactReachableAt(puzzle, floorFaces(puzzle), goal);
-  }
-  return satisfiedByAnyPlacement(puzzle, goal, floorFaces(puzzle));
-};
-
-export interface DifficultyReport {
-  arch: PuzzleGoal["g"];
-  floor: number;
-  mid: number;
-  ceil: number;
-  target: number;
-  solutions: number;
-  exactReachable: boolean;
-}
-
-const goalTarget = (goal: PuzzleGoal): number => {
-  switch (goal.g) {
-    case "damage":
-    case "charge":
-    case "shield":
-      return goal.min;
-    case "survive":
-    case "survivePlus":
-      return 1;
-    case "exact":
-      return goal.value;
-    case "constraint":
-      return goal.base.min;
-    case "order":
-      return Math.max(
-        0,
-        ...goal.steps.map((s) => ("min" in s ? s.min : 0)),
-      );
-    case "multiTurn":
-      return goal.final.min;
-    case "deduction":
-      return goalTarget(goal.inner);
-  }
-};
-
-export const difficultyReport = (puzzle: PuzzleDef): DifficultyReport => {
-  const goal = puzzle.goal;
-  const metric = primaryMetric(goal);
-  if (goal.g === "multiTurn") {
-    return {
-      arch: goal.g,
-      floor: bestCumulative(
-        puzzle,
-        Array.from({ length: goal.turns }, () => floorFaces(puzzle)),
-        goal.final.metric,
-      ),
-      mid: bestCumulative(
-        puzzle,
-        Array.from({ length: goal.turns }, () => midFaces(puzzle)),
-        goal.final.metric,
-      ),
-      ceil: bestCumulative(
-        puzzle,
-        Array.from({ length: goal.turns }, () => ceilFaces(puzzle)),
-        goal.final.metric,
-      ),
-      target: goal.final.min,
-      solutions: solutionCount(puzzle),
-      exactReachable: true,
-    };
-  }
-  const rollFor = (pick: "floor" | "mid" | "ceil"): number[] =>
-    puzzle.fixedRoll !== undefined
-      ? [...puzzle.fixedRoll]
-      : pick === "floor"
-        ? floorFaces(puzzle)
-        : pick === "mid"
-          ? midFaces(puzzle)
-          : ceilFaces(puzzle);
-  return {
-    arch: goal.g,
-    floor: bestMetricAt(puzzle, rollFor("floor"), metric),
-    mid: bestMetricAt(puzzle, rollFor("mid"), metric),
-    ceil: bestMetricAt(puzzle, rollFor("ceil"), metric),
-    target: goalTarget(goal),
-    solutions: solutionCount(puzzle),
-    exactReachable: exactReachable(puzzle),
-  };
-};
