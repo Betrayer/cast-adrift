@@ -1,12 +1,19 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
-import { adjacentCopyValue, flippedValue } from "@/game/battle/actives";
+import { ALL_DICE, BASIC_DICE, DIE_BY_ID, rollBaseValue } from "@/data/dice";
+import {
+  adjacentCopyValue,
+  flippedValue,
+  SPLIT_DIE_COUNT,
+  SPLIT_DIE_DEF,
+} from "@/game/battle/actives";
+import { advanceTurn } from "@/game/battle/resolver";
 import { harnessDie, harnessSnap, place } from "@/game/battle/battleHarness";
 import { resolvePlayerPhase } from "@/game/battle/resolver";
 import { BattleCtx } from "@/game/effects/context";
 import { buildSources, emit } from "@/game/effects/pipeline";
 import { createStream, createStreams } from "@/services/rng";
 import {
+  battleSnapshot,
   createInitialBattleValues,
   useBattleStore,
 } from "@/stores/battleStore";
@@ -21,15 +28,33 @@ const weaponDamage = (defId: string, value: number): number => {
   );
 };
 
-describe("plain dice", () => {
-  it("carry no effects, faces, growth or active fields", () => {
-    for (const id of ["ember", "frostplate", "ballast"]) {
-      const def = DIE_BY_ID.get(id);
-      expect(def?.effects).toBeUndefined();
-      expect(def?.faces).toBeUndefined();
-      expect(def?.growth).toBeUndefined();
-      expect(def?.active).toBeUndefined();
+describe("the starter dice", () => {
+  it("stay mechanically bare so every other die reads against them", () => {
+    for (const def of BASIC_DICE) {
+      expect(def.effects).toBeUndefined();
+      expect(def.faces).toBeUndefined();
+      expect(def.growth).toBeUndefined();
+      expect(def.active).toBeUndefined();
+      expect(def.tags ?? []).not.toHaveLength(0);
     }
+  });
+
+  it("are the only dice without an identity", () => {
+    const basics = new Set(BASIC_DICE.map((d) => d.id));
+    const bare = ALL_DICE.filter(
+      (d) =>
+        !basics.has(d.id) &&
+        d.tier !== 100 &&
+        d.effects === undefined &&
+        d.faces === undefined &&
+        d.growth === undefined &&
+        d.active === undefined,
+    );
+    expect(bare.map((d) => d.id)).toEqual([]);
+  });
+
+  it("gives every die a description key", () => {
+    for (const def of ALL_DICE) expect(def.desc).toBeDefined();
   });
 
   it("coreshard is a prismatic legendary d10", () => {
@@ -178,5 +203,92 @@ describe("gyro (flip) and copycat (copy) actives", () => {
     useBattleStore.getState().copyDie(uid);
     expect(useBattleStore.getState().dice[0]?.value).toBe(5);
     expect(useBattleStore.getState().dice[0]?.activeUsed).toBe(true);
+  });
+});
+
+describe("swap, bank and split actives", () => {
+  beforeEach(() => {
+    useBattleStore.setState(useBattleStore.getInitialState(), true);
+    useBattleStore.setState(createInitialBattleValues());
+    useRunStore.setState({ mkLevels: {} });
+  });
+
+  const start = (deck: readonly string[]): void => {
+    useBattleStore
+      .getState()
+      .startBattle({ enemyIds: ["raider"] }, [...deck], createStreams(1));
+  };
+
+  const setValues = (values: readonly number[]): void => {
+    useBattleStore.setState((s) => ({
+      dice: s.dice.map((d, i) => ({ ...d, value: values[i] ?? d.value })),
+    }));
+  };
+
+  it("swap exchanges values with the die picked next", () => {
+    start(["mimic", "ember"]);
+    setValues([2, 7]);
+    const [a, b] = useBattleStore.getState().dice;
+    if (a === undefined || b === undefined) throw new Error("no dice");
+    useBattleStore.getState().beginSwap(a.uid);
+    expect(useBattleStore.getState().swapSourceUid).toBe(a.uid);
+    useBattleStore.getState().selectDie(b.uid);
+    const after = useBattleStore.getState();
+    expect(after.dice[0]?.value).toBe(7);
+    expect(after.dice[1]?.value).toBe(2);
+    expect(after.dice[0]?.activeUsed).toBe(true);
+    expect(after.swapSourceUid).toBeNull();
+  });
+
+  it("swap is spent after one use", () => {
+    start(["mimic", "ember"]);
+    setValues([2, 7]);
+    const [a, b] = useBattleStore.getState().dice;
+    if (a === undefined || b === undefined) throw new Error("no dice");
+    useBattleStore.getState().beginSwap(a.uid);
+    useBattleStore.getState().selectDie(b.uid);
+    useBattleStore.getState().beginSwap(a.uid);
+    expect(useBattleStore.getState().swapSourceUid).toBeNull();
+  });
+
+  it("bank holds the face into the next turn and then re-arms", () => {
+    start(["ballast", "ember"]);
+    setValues([4, 3]);
+    const uid = useBattleStore.getState().dice[0]?.uid ?? "";
+    useBattleStore.getState().bankDie(uid);
+    expect(useBattleStore.getState().dice[0]?.bankedValue).toBe(4);
+    expect(useBattleStore.getState().dice[0]?.activeUsed).toBe(true);
+
+    const snap = battleSnapshot(useBattleStore.getState());
+    const next = advanceTurn(snap, createStreams(9));
+    const rolled = next.dice.find((d) => d.uid === uid);
+    expect(rolled?.value).toBe(4);
+    expect(rolled?.bankedValue).toBeUndefined();
+    expect(rolled?.activeUsed).toBe(false);
+  });
+
+  it("split burns the die into two temporary grey d4s", () => {
+    start(["thermite", "ember"]);
+    const before = useBattleStore.getState().dice.length;
+    const uid = useBattleStore.getState().dice[0]?.uid ?? "";
+    useBattleStore.getState().splitDie(uid);
+    const after = useBattleStore.getState();
+    expect(after.dice).toHaveLength(before + SPLIT_DIE_COUNT);
+    expect(after.dice.find((d) => d.uid === uid)?.state).toBe("burned");
+    const spawned = after.dice.filter((d) => d.temp === true);
+    expect(spawned).toHaveLength(SPLIT_DIE_COUNT);
+    for (const die of spawned) {
+      expect(die.defId).toBe(SPLIT_DIE_DEF);
+      expect(die.value).toBeGreaterThanOrEqual(1);
+      expect(die.value).toBeLessThanOrEqual(4);
+    }
+  });
+
+  it("covers every active kind across the pool", () => {
+    const kinds = new Set(
+      ALL_DICE.map((d) => d.active).filter((a) => a !== undefined),
+    );
+    expect([...kinds].sort()).toEqual(["bank", "copy", "flip", "split", "swap"]);
+    expect(ALL_DICE.filter((d) => d.active !== undefined).length).toBeGreaterThanOrEqual(12);
   });
 });

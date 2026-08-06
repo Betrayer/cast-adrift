@@ -37,7 +37,12 @@ import { battleEndAxisDelta, countDeckSchool } from "@/game/run/axis";
 import { emitBark, resetBarkMemory } from "@/game/narrative";
 import { computePerkMods } from "@/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
-import { rollPerkChoices, SKIP_SCRAP } from "@/game/run/perkDraft";
+import {
+  DRAFT_REROLL_COST,
+  rollPerkChoices,
+  skipScrapFor,
+  type DraftContext,
+} from "@/game/run/perkDraft";
 import { recordAction, resetActionLog, syncActionStats } from "@/game/run/actionLog";
 import { emitRunHook } from "@/game/run/runEffects";
 import { finishScoredRun } from "@/game/run/boards";
@@ -70,7 +75,13 @@ import { useAppStore } from "@/stores/appStore";
 import { battleTally, useBattleStore } from "@/stores/battleStore";
 import { SMOTRITEL_BADGE, useMetaStore } from "@/stores/metaStore";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
-import type { BattleTally, RunMode, RunValues } from "@/stores/runStore";
+import type {
+  BattleTally,
+  RunMode,
+  RunState,
+  RunValues,
+} from "@/stores/runStore";
+import { PERK_BY_ID } from "@/data/perks";
 import type { RunSnapshot } from "@/types";
 import type { SlotId } from "@/types/battle";
 import type { School } from "@/types/content";
@@ -751,20 +762,45 @@ export const finishRewards = (): void => {
   }
 };
 
+export const draftContext = (
+  run: RunState,
+  floor?: DraftContext["floor"],
+): DraftContext => ({
+  owned: run.perks,
+  banished: run.banishedPerks,
+  sector: run.sector,
+  deckDefIds: run.deck.map((d) => d.defId),
+  modules: run.modules,
+  shipId: run.shipId,
+  draftsSinceRare: run.draftsSinceRare,
+  ...(floor === undefined ? {} : { floor }),
+});
+
+const noteDraftOffer = (choices: readonly string[]): void => {
+  if (choices.length === 0) return;
+  useRunStore
+    .getState()
+    .noteDraftOffer(
+      choices.some((id) => PERK_BY_ID.get(id)?.rarity === "rare"),
+    );
+};
+
 // DESIGN §6.4: choice of a rare die OR a module, plus a Mk voucher, scrap and a
 // perk draft. Phase 8 substituted a second rare die because modules did not
 // exist yet; Phase 10 restores the real fork.
 const minibossPackage = (
   lootStream: ReturnType<typeof createStream>,
-  perks: readonly string[],
-  modules: readonly string[],
+  run: RunState,
   rarityStep: number,
+  nodeId: NodeId,
 ): NonNullable<RunValues["pendingRewards"]> => ({
   dieDrop: null,
-  perkChoices: rollPerkChoices(lootStream, perks, "uncommon"),
+  perkChoices: rollPerkChoices(lootStream, draftContext(run, "uncommon")),
   dieChoices: [dieForRarity(lootStream, "rare", rarityStep)],
-  moduleChoices: [rollModule(lootStream, modules, "uncommon")],
+  moduleChoices: [rollModule(lootStream, run.modules, "uncommon")],
   voucher: true,
+  draftNodeId: nodeId,
+  draftFloor: "uncommon",
   packageScrap: lootStream.int(
     MINIBOSS_PACKAGE_SCRAP[0],
     MINIBOSS_PACKAGE_SCRAP[1],
@@ -836,23 +872,21 @@ export const resolveRunBattle = (): void => {
 
   const pending: NonNullable<RunValues["pendingRewards"]> =
     node.type === "miniboss"
-      ? minibossPackage(
-          lootStream,
-          run.perks,
-          run.modules,
-          mut.lootRarityStep,
-        )
+      ? minibossPackage(lootStream, run, mut.lootRarityStep, node.id)
       : {
           dieDrop: reward.dieDrop,
           perkChoices:
             isDraftNode(node.type) && !contractPerksDisabled()
-              ? rollPerkChoices(lootStream, run.perks)
+              ? rollPerkChoices(lootStream, draftContext(run))
               : [],
+          draftNodeId: node.id,
           // Elites hand out a module alongside their die (DESIGN §9.4).
           ...(node.type === "elite"
             ? { moduleChoices: [rollModule(lootStream, run.modules, "common")] }
             : {}),
         };
+
+  noteDraftOffer(pending.perkChoices);
 
   const packageScrap = pending.packageScrap ?? 0;
 
@@ -1022,12 +1056,44 @@ export const resolvePerkChoice = (perkId: string | null): void => {
   const pending = run.pendingRewards;
   if (pending === null) return;
   if (perkId === null) {
-    run.addScrap(SKIP_SCRAP);
+    run.addScrap(skipScrapFor(run.sector));
   } else {
     applyPerkPick(perkId);
   }
   useRunStore.getState().setPendingRewards({ ...pending, perkChoices: [] });
   autosaveRun();
+};
+
+const redrawDraft = (label: string): void => {
+  const run = useRunStore.getState();
+  const pending = run.pendingRewards;
+  if (pending === null) return;
+  const nodeId = pending.draftNodeId ?? run.position ?? "draft";
+  const stream = createStream(deriveSeed(run.seed, `${label}:${nodeId}`));
+  const choices = rollPerkChoices(
+    stream,
+    draftContext(run, pending.draftFloor),
+  );
+  useRunStore.getState().setPendingRewards({ ...pending, perkChoices: choices });
+  noteDraftOffer(choices);
+  autosaveRun();
+};
+
+export const banishPerkChoice = (perkId: string): void => {
+  const run = useRunStore.getState();
+  if (run.pendingRewards === null) return;
+  if (!run.banishPerk(perkId)) return;
+  redrawDraft(`banish:${perkId}`);
+};
+
+export const rerollPerkDraft = (): void => {
+  const run = useRunStore.getState();
+  if (run.pendingRewards === null) return;
+  if (run.draftRerollUsed) return;
+  if (run.scrap < DRAFT_REROLL_COST) return;
+  if (!run.spendScrap(DRAFT_REROLL_COST)) return;
+  if (!useRunStore.getState().useDraftReroll()) return;
+  redrawDraft("draftReroll");
 };
 
 // The prologue opens a real campaign run and then routes its scripted fight
@@ -1115,7 +1181,27 @@ export interface FlowDevHooks {
   endRun: typeof endRun;
   jumpTo: typeof jumpTo;
   abandonRun: typeof abandonRun;
+  offerPerkDraft: (seed: number) => string[];
+  resolvePerkChoice: typeof resolvePerkChoice;
+  banishPerkChoice: typeof banishPerkChoice;
+  rerollPerkDraft: typeof rerollPerkDraft;
+  autosaveRun: typeof autosaveRun;
 }
+
+// Deals a real draft at the run's current node so the driver exercises
+// `rollPerkChoices` and the pending-rewards plumbing rather than faking cards.
+const offerPerkDraft = (seed: number): string[] => {
+  const run = useRunStore.getState();
+  const choices = rollPerkChoices(createStream(seed), draftContext(run));
+  run.setPendingRewards({
+    dieDrop: null,
+    perkChoices: choices,
+    draftNodeId: run.position ?? START_NODE_ID,
+  });
+  noteDraftOffer(choices);
+  useAppStore.getState().go("rewards");
+  return choices;
+};
 
 declare global {
   interface Window {
@@ -1135,5 +1221,10 @@ if (import.meta.env.DEV && typeof window !== "undefined") {
     endRun,
     jumpTo,
     abandonRun,
+    offerPerkDraft,
+    resolvePerkChoice,
+    banishPerkChoice,
+    rerollPerkDraft,
+    autosaveRun,
   };
 }

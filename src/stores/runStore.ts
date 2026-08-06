@@ -113,6 +113,8 @@ export interface PendingRewards {
   moduleChoices?: string[];
   voucher?: boolean;
   packageScrap?: number;
+  draftNodeId?: NodeId;
+  draftFloor?: "common" | "uncommon" | "rare";
 }
 
 export interface PuzzleRunState {
@@ -140,6 +142,10 @@ export interface RunValues {
   deck: DieInstance[];
   perks: string[];
   modules: string[];
+  banishedPerks: string[];
+  draftsSinceRare: number;
+  draftRerollUsed: boolean;
+  banishUsed: boolean;
   chartPicks: string[];
   mkLevels: MkLevels;
   tide: number;
@@ -182,6 +188,9 @@ export interface RunState extends RunValues {
   healHull: (n: number) => void;
   setHull: (n: number) => void;
   addPerk: (perkId: string) => void;
+  noteDraftOffer: (hadRare: boolean) => void;
+  banishPerk: (perkId: string) => boolean;
+  useDraftReroll: () => boolean;
   addModule: (moduleId: string) => boolean;
   removeModule: (moduleId: string) => void;
   setFlag: (key: string, value?: FlagValue) => void;
@@ -270,6 +279,10 @@ export const createInitialRunValues = (): RunValues => ({
   deck: [],
   perks: [],
   modules: [],
+  banishedPerks: [],
+  draftsSinceRare: 0,
+  draftRerollUsed: false,
+  banishUsed: false,
   chartPicks: [],
   mkLevels: {},
   tide: 0,
@@ -353,6 +366,23 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set((s) =>
       s.perks.includes(perkId) ? s : { perks: [...s.perks, perkId] },
     );
+  },
+
+  noteDraftOffer: (hadRare) => {
+    set((s) => ({ draftsSinceRare: hadRare ? 0 : s.draftsSinceRare + 1 }));
+  },
+
+  banishPerk: (perkId) => {
+    const s = get();
+    if (s.banishUsed || s.banishedPerks.includes(perkId)) return false;
+    set({ banishUsed: true, banishedPerks: [...s.banishedPerks, perkId] });
+    return true;
+  },
+
+  useDraftReroll: () => {
+    if (get().draftRerollUsed) return false;
+    set({ draftRerollUsed: true });
+    return true;
   },
 
   addModule: (moduleId) => {

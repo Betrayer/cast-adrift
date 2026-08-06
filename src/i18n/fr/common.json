@@ -3,7 +3,7 @@
   "back": "Retour",
   "phaseHint": "Phase{{phase}}",
   "rotate": {
-    "title": "Tourne ton appareil",
-    "body": "Cast Adrift se joue à la verticale. Reviens en mode portrait pour continuer la partie."
+    "title": "Retournez votre appareil",
+    "body": "Cast Adrift Se joue en mode vertical. Remettez l'appareil en mode portrait pour poursuivre la partie."
   }
 }

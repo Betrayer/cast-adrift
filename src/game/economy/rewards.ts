@@ -143,7 +143,12 @@ export const computeNodeReward = (
   }
 };
 
-const MODULE_LADDER: readonly Rarity[] = ["common", "uncommon", "rare"];
+const MODULE_LADDER: readonly Rarity[] = [
+  "common",
+  "uncommon",
+  "rare",
+  "legendary",
+];
 
 // Module offers never repeat what the ship already carries; the floor lifts the
 // draw for mini-boss packages.
@@ -156,7 +161,7 @@ export const rollModule = (
   const tiers = MODULE_LADDER.slice(start);
   const weights: [Rarity, number][] = tiers.map((r, i) => [
     r,
-    [55, 33, 12][i + start] ?? 10,
+    [55, 33, 10, 2][i + start] ?? 2,
   ]);
   const rarity = rng.weighted(weights);
   const available = (r: Rarity): string[] =>

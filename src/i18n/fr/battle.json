@@ -86,5 +86,9 @@
   },
   "scriptHint": "Prologue : seule la compétence « {{slots}} » peut être utilisée lors de ce tour.",
   "fate": "Lancer de dés du destin",
-  "fateResult": "Fate {{roll}} — {{text}}"
+  "fateResult": "Fate {{roll}} — {{text}}",
+  "swap": "Échange",
+  "swapPick": "Choisis un dé…",
+  "bank": "Face de la banque",
+  "split": "Split"
 }

@@ -1,5 +1,5 @@
 import { Button, Group, Overlay, Stack, Text, Title } from '@mantine/core';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { LootReveal } from '@/screens/Battle/LootReveal';
@@ -12,7 +12,13 @@ import { ENEMY_BY_ID } from '@/data/enemies';
 import { DIE_BY_ID } from '@/data/dice';
 import { FATE_DIE_ID, FATE_TABLE } from '@/data/fate';
 import { schools } from '@/data/schools';
-import { canCopy, canFlip } from '@/game/battle/actives';
+import {
+  canBank,
+  canCopy,
+  canFlip,
+  canSplit,
+  canSwap,
+} from '@/game/battle/actives';
 import {
   activeThresholds,
   nextThreshold,
@@ -41,6 +47,7 @@ import { useRunStore } from '@/stores/runStore';
 import { BossIntro } from '@/screens/Battle/BossIntro';
 import { FateInvocation } from '@/screens/Battle/FateInvocation';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
+import { BuildSheet } from '@/screens/Build/BuildSheet';
 import bossStyles from './BossIntro.module.css';
 import type { Intent } from '@/types/content';
 import styles from './BattleScreen.module.css';
@@ -100,8 +107,8 @@ const intentPillClass = (intent: Intent): string => {
   return styles.intentUtility ?? '';
 };
 
-const StatusCard = () => {
-  const { t } = useTranslation(['battle']);
+const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
+  const { t } = useTranslation(['battle', 'run']);
   const hull = useBattleStore((s) => s.hull);
   const hullMax = useBattleStore((s) => s.hullMax);
   const shield = useBattleStore((s) => s.shield);
@@ -192,6 +199,16 @@ const StatusCard = () => {
             }}
           >
             {t('battle:surge')}
+          </Button>
+          <Button
+            className={styles.clickable}
+            size="compact-xs"
+            variant="subtle"
+            color="gray"
+            data-open-build
+            onClick={onOpenBuild}
+          >
+            {t('run:build.open')}
           </Button>
         </Group>
       </div>
@@ -313,6 +330,11 @@ const DieControls = () => {
   const spendNudge = useBattleStore((s) => s.spendNudge);
   const flipDie = useBattleStore((s) => s.flipDie);
   const copyDie = useBattleStore((s) => s.copyDie);
+  const beginSwap = useBattleStore((s) => s.beginSwap);
+  const cancelSwap = useBattleStore((s) => s.cancelSwap);
+  const bankDie = useBattleStore((s) => s.bankDie);
+  const splitDie = useBattleStore((s) => s.splitDie);
+  const swapSourceUid = useBattleStore((s) => s.swapSourceUid);
   const die = useBattleStore((s) =>
     s.dice.find((d) => d.uid === s.selectedDieUid),
   );
@@ -373,6 +395,43 @@ const DieControls = () => {
           }}
         >
           {t('battle:copy')}
+        </Button>
+      ) : null}
+      {canSwap(die) ? (
+        <Button
+          className={styles.clickable}
+          size="compact-sm"
+          variant={swapSourceUid === die.uid ? 'filled' : 'default'}
+          onClick={() => {
+            if (swapSourceUid === die.uid) cancelSwap();
+            else beginSwap(selectedDieUid);
+          }}
+        >
+          {t(swapSourceUid === die.uid ? 'battle:swapPick' : 'battle:swap')}
+        </Button>
+      ) : null}
+      {canBank(die) ? (
+        <Button
+          className={styles.clickable}
+          size="compact-sm"
+          variant="default"
+          onClick={() => {
+            bankDie(selectedDieUid);
+          }}
+        >
+          {t('battle:bank')}
+        </Button>
+      ) : null}
+      {canSplit(die) ? (
+        <Button
+          className={styles.clickable}
+          size="compact-sm"
+          variant="default"
+          onClick={() => {
+            splitDie(selectedDieUid);
+          }}
+        >
+          {t('battle:split')}
         </Button>
       ) : null}
     </>
@@ -627,6 +686,7 @@ export const BattleScreen = () => {
   const droppedRef = useRef(false);
   const resolvedRef = useRef(false);
   const lowHullRef = useRef(false);
+  const [buildOpen, setBuildOpen] = useState(false);
 
   useEffect(() => {
     if (!runActive || hullMax <= 0) {
@@ -699,7 +759,11 @@ export const BattleScreen = () => {
       background={<PixiCanvas mount={mountScene} />}
       header={
         <div className={styles.topBands}>
-          <StatusCard />
+          <StatusCard
+            onOpenBuild={() => {
+              setBuildOpen(true);
+            }}
+          />
           <EnemyChips />
           <ActionRail />
         </div>
@@ -711,6 +775,13 @@ export const BattleScreen = () => {
       }
       overlay={
         <>
+          {buildOpen ? (
+            <BuildSheet
+              onClose={() => {
+                setBuildOpen(false);
+              }}
+            />
+          ) : null}
           <LootReveal />
           <FateInvocation />
           {bossFall ? <div className={bossStyles.bossFall} /> : null}

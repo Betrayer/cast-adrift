@@ -73,7 +73,7 @@
     "keyIronDoctrine": "La doctrina de hierro",
     "keyFatesFavorite": "El favorito del destino",
     "keyPrismCascade": "Cascada Prism",
-    "selectHint": "Toca un nodo para ver qué hace."
+    "selectHint": "Pulsa en un nodo para ver para qué sirve."
   },
   "chartFx": {
     "hubBudget": "+1 presupuesto para hangares",
@@ -117,9 +117,9 @@
       "redSpine": "+4 en la montura espinal",
       "greenCanopy": "+3 en motores",
       "blackWell": "El reactor tiene capacidad para 2 cargas más.",
-      "shopArrival": "+6 chatarra al llegar a un mercado",
-      "tideWard": "Repara 1 de casco por salto con marea 2+",
-      "detourScout": "+12 chatarra al entrar en un desvío"
+      "shopArrival": "+6 de chatarra al llegar a un mercado",
+      "tideWard": "Repara 1 punto de casco en cada salto mientras la marea sea 2+",
+      "detourScout": "+12 de chatarra al entrar en un desvío"
     },
     "trait": {
       "obsidianPact": "Los dados negros solo dan el mínimo o el máximo.",
@@ -296,7 +296,8 @@
     "empty": "No lleva grabados.",
     "remove": "eliminar",
     "fitted": "ajustado",
-    "fit": "{{price}} ◈"
+    "fit": "{{price}} ◈",
+    "pair": "Combina con «{{name}}»"
   },
   "badge": {
     "keeper": "Portero"

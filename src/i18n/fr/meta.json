@@ -73,7 +73,7 @@
     "keyIronDoctrine": "La doctrine de fer",
     "keyFatesFavorite": "Le chouchou du destin",
     "keyPrismCascade": "Cascade de prismes",
-    "selectHint": "Touche un nœud pour voir ce qu’il fait."
+    "selectHint": "Appuyez sur un nœud pour découvrir son fonctionnement."
   },
   "chartFx": {
     "hubBudget": "+1 budget pour le hangar",
@@ -117,9 +117,9 @@
       "redSpine": "+4 en montage dorsal",
       "greenCanopy": "+3 dans la catégorie « Moteurs »",
       "blackWell": "Le réacteur peut encore contenir deux charges supplémentaires.",
-      "shopArrival": "+6 ferraille en arrivant à un marché",
-      "tideWard": "Répare 1 coque par saut dès marée 2",
-      "detourScout": "+12 ferraille en entrant dans un détour"
+      "shopArrival": "+6 de ferraille à l'arrivée sur un marché",
+      "tideWard": "Répare 1 point de coque à chaque saut tant que la marée est de 2 ou plus",
+      "detourScout": "+12 points de casse en empruntant un détour"
     },
     "trait": {
       "obsidianPact": "Les dés noirs n'affichent que leur valeur minimale ou maximale.",
@@ -296,7 +296,8 @@
     "empty": "Aucune gravure n'a été apposée.",
     "remove": "supprimer",
     "fitted": "ajusté",
-    "fit": "{{price}} ◈"
+    "fit": "{{price}} ◈",
+    "pair": "À associer avec « {{name}} »"
   },
   "badge": {
     "keeper": "Gardien"

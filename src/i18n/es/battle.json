@@ -86,5 +86,9 @@
   },
   "scriptHint": "Prólogo: en este turno solo se puede utilizar «{{slots}}».",
   "fate": "Tirada de destino",
-  "fateResult": "Fate {{roll}} — {{text}}"
+  "fateResult": "Fate {{roll}} — {{text}}",
+  "swap": "Intercambio",
+  "swapPick": "Elige un dado…",
+  "bank": "Cara del banco",
+  "split": "Split"
 }

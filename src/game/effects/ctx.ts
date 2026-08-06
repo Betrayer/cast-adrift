@@ -23,6 +23,7 @@ export interface EffectCtx {
   readonly logs: string[];
   log: (message: string) => void;
   currentSlot?: () => SlotId | undefined;
+  slotMk?: (slot: SlotId) => number;
   subject?: () => RolledDie | null;
   findDie?: (uid: string) => RolledDie | undefined;
   turn?: () => number;

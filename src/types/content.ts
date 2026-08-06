@@ -21,7 +21,7 @@ export interface DieGrowth {
   cap: number;
 }
 
-export type DieActive = "flip" | "copy";
+export type DieActive = "flip" | "copy" | "swap" | "bank" | "split";
 
 export interface DieItemDef {
   id: string;

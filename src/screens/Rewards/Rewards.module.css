@@ -71,6 +71,14 @@
   max-width: 620px;
 }
 
+.draftActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+}
+
 .perkCard {
   display: flex;
   flex-direction: column;

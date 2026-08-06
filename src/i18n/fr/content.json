@@ -69,59 +69,119 @@
     "prismCore": "Prism Core",
     "spectra": "Spectra",
     "aurora": "Aurora",
-    "fate-d100": "Le destin"
+    "fate-d100": "Le destin",
+    "slag": "Scories",
+    "fissure": "Fissure",
+    "anthracite": "Anthracite",
+    "stillwater": "Stillwater",
+    "floodgate": "Vanne de déversement",
+    "undertow": "Contre-courant",
+    "taproot": "Racine pivotante",
+    "seedpod": "Gousse",
+    "evergreen": "Evergreen",
+    "plumbline": "Fil à plomb",
+    "chaff": "Paille",
+    "glimmer": "Lueur",
+    "facet": "Facette",
+    "gamut": "Gamut",
+    "salvo": "Salvo",
+    "crucible": "Creuset",
+    "bombard": "Bombard",
+    "smallChange": "Petite monnaie",
+    "wager": "Pari",
+    "hedge": "Haie"
   },
   "diceDesc": {
-    "ember": "Un dé à six faces rouge uni.",
+    "ember": "Dans la catégorie « Armes », elle confère un bonus de +2 lorsque votre configuration comprend au moins 4 objets rouges.",
     "cinder": "Dans la section « Armes », un jet maximal inflige 1 point de brûlure à la cible.",
     "slug": "Dans la catégorie « Armes », inflige +1 point de dégâts.",
-    "frostplate": "Un dé à six faces bleu uni.",
+    "frostplate": "Dans la catégorie « Boucliers », cela ajoute 2 points de bouclier supplémentaires dès lors que vous portez au moins 4 objets « Mur de boucliers ».",
     "bulwark": "Dans « Shields », confère +1 bouclier.",
-    "gyro": "Une fois par combat, retournez la carte pour en voir l'autre face.",
-    "coil": "Si le résultat est identique à celui du tour précédent, +1.",
-    "sprout": "En cas de jet maximal, le personnage gagne +1 pour la course (jusqu'à +2).",
-    "lucky-chip": "En cas de jet maximal, +2 ferraille.",
-    "vulture": "En cas de jet maximal, +8 en ferraille.",
+    "gyro": "Ses faces sont 2, 3, 3, 4, 4 et 5 ; une fois par combat, retournez-le pour afficher la face opposée.",
+    "coil": "Les faces sont 2·2·3·3. +1 si la valeur du tour précédent se répète, et +2 supplémentaires tant que vous possédez au moins 3 [essaim].",
+    "sprout": "Il gagne +1 sur une face maximale (jusqu'à +2), et sa résolution dans la phase « Moteurs » lui fait gagner encore +1, jusqu'à +4.",
+    "lucky-chip": "La face « Max » rapporte 2 ferrailles.",
+    "vulture": "La carte « Max » rapporte 8 points de ferraille et ajoute 1 au compteur de gains ; à partir du deuxième gain, elle inflige un coup critique lorsqu’elle est placée dans un emplacement d’arme.",
     "ashen": "Si le résultat du dé est inférieur ou égal à 1, le prochain dé noir de ce tour bénéficie d'un bonus de +2.",
-    "obsidian": "On ne lance que le 1 ou le 8.",
-    "copycat": "Une fois par combat, copiez la valeur d'un dé adjacent.",
-    "ballast": "Un d4 gris uni.",
-    "coreshard": "Caractère générique prismatique pour les ensembles et les affinités.",
-    "flare": "+1 point de dégâts pour les armes lorsque le résultat est 3 ou plus.",
-    "magma": "La valeur maximale de « face » pour les armes applique l'effet « Brûlure 3 ».",
-    "thermite": "+2 en attaque tant que la santé de la coque est inférieure à la moitié.",
-    "lancehead": "+3 au niveau de la fixation vertébrale.",
+    "obsidian": "On lance uniquement un 1 ou un 8 ; si le résultat est 1, il compte pour 8 — pour 2 points de coque.",
+    "copycat": "Les faces sont uniquement 1, 2, 2, 3, 3, 4 ; une fois par combat, copiez la valeur la plus élevée de ses deux voisines.",
+    "ballast": "Une fois par combat, mettez ce dé de côté : au tour suivant, le personnage commence avec la valeur enregistrée au lieu de lancer le dé.",
+    "coreshard": "Les dés prismatiques peuvent dépasser la limite d'un emplacement pour 1 coque. Une face maximale confère un bonus de +2 à chaque école.",
+    "flare": "Ses faces sont 1, 2, 4 et 4 — jamais un 3 — et, dans la catégorie « Armes », il inflige +1 de dégâts sur un résultat de 3 ou plus.",
+    "magma": "Dans la catégorie « Armes », une valeur maximale de « Face » inflige 3 points de brûlure.",
+    "thermite": "+2 en « Armes » lorsque la coque est à moins de la moitié de sa santé ; une fois par combat, elle se divise en deux d4 gris temporaires.",
+    "lancehead": "+3 à la compétence « Montage sur le dos », et un 15 naturel ou plus entraîne un coup critique.",
     "hoarfrost": "+1 bouclier chaque fois qu'il occupe un emplacement de bouclier.",
-    "aegis": "+2 en boucliers.",
+    "aegis": "Dans « Shields », cela compte pour +2, et le mur tient bon : au tour suivant, vous gagnez 3 boucliers gratuitement.",
     "deepblue": "« Min » confère 4 points de bouclier.",
-    "glacierspike": "+3 en boucliers.",
-    "tendon": "+2 lorsque la valeur est identique à celle du tour précédent.",
-    "bramble": "Augmente de +1 sur une face maximale, jusqu'à +2.",
-    "heartwood": "+2 dans la catégorie « moteurs ».",
-    "worldseed": "Augmente de +1 sur une face maximale, jusqu'à +4.",
-    "token": "La face « Max » rapporte 3 ferrailles.",
-    "glint": "Mon visage rapporte 2 ferrailles.",
-    "bonanza": "La face « Max » rapporte 6 ferrailles.",
-    "jackpot": "La face « Max » rapporte 10 ferraille et 1 charge.",
-    "midas": "Paye 2 points de ferraille là où la carte se résout.",
-    "cinderblack": "Mon visage peut stocker 1 charge.",
+    "glacierspike": "Ses faces vont de 8 à 20, ce qui fait que le « Spinal Mount » ne peut jamais le bloquer ; quel que soit l'endroit où il se résout, il confère 3 points de bouclier, et depuis le « Spinal Mount », il bloque également la cible.",
+    "tendon": "+2 si le résultat est identique à celui du tour précédent, et le dé vert suivant est modifié de +1.",
+    "bramble": "Il gagne +2 sur la face maximale (jusqu'à +2), et sa résolution dans la phase « Armes » lui fait gagner encore +2, jusqu'à +4.",
+    "heartwood": "+2 en Moteurs. Une fois par combat, vous pouvez faire pivoter sa face pour le tour suivant.",
+    "worldseed": "Augmente de +1 sur une face maximale, jusqu'à +4, et une face maximale se résout deux fois dans son emplacement.",
+    "token": "La face « Max » rapporte 3 ferrailles et ajoute 1 au compteur de gains du combat.",
+    "glint": "Un 1 ou un 6 rapporte 2 ferrailles et ajoute 1 au compteur de gains de la bataille.",
+    "bonanza": "Ses faces sont deux 2, un 4, un 6 et deux 8 ; un 8 ajoute 1 au compteur de gains, et à partir du troisième gain, il rapporte 4 ferraille et 1 charge, quel que soit l'endroit où il se résout.",
+    "jackpot": "Une mise maximale rapporte 6 « scrap » et 1 « charge », et ajoute 1 au compteur de gains ; à partir du quatrième gain obtenu avec une mise maximale, le gain est majoré de 12 « scrap ».",
+    "midas": "Chaque tour se termine par l'obtention d'un déchet pour chaque objet [déchet] que vous possédez ; sa valeur maximale ajoute 2 au compteur de gains, et à partir du troisième gain, il s'applique avec un bonus de +3.",
+    "cinderblack": "On lance uniquement un 1 ou un 4 ; un 1 permet de stocker 1 charge.",
     "pitch": "+1 dans le réacteur.",
-    "tar": "+2 tant que la santé est inférieure à 40 %.",
+    "tar": "+1 tant que la santé est inférieure à 50 %, et +3 supplémentaires tant qu'elle est inférieure à 25 %.",
     "nadir": "Le « Min » donne un bonus de +3 au prochain dé noir.",
-    "eclipse": "+3 dans le réacteur.",
-    "abyss": "Ses faces ne sont que 1 ou 12.",
+    "eclipse": "N'importe quel dé s'adapte au réacteur par-dessus le bouchon — pour 1 point de coque ; une fois par combat, il change de face pour le tour suivant.",
+    "abyss": "Ses faces ne sont que le 1 ou le 12 ; une fois qu'il a donné un 1, chaque 12 qu'il donne compte pour 18.",
     "voidmaw": "+2 dans le réacteur.",
-    "shim": "+1 au premier tour d'un combat.",
-    "spool": "Un 1 obtenu au dé devient un 2.",
-    "mimic": "Une fois par combat, copiez la valeur d'un voisin.",
-    "pivot": "Une fois par combat, retournez la carte pour afficher l'autre face.",
-    "beaconChip": "+2 au niveau des capteurs.",
-    "lodestar": "+1 dans chaque emplacement.",
-    "prismChip": "Cela compte pour votre plus grande série.",
-    "prismCore": "+1 dans chaque emplacement, et cela compte pour votre plus grande série.",
-    "spectra": "La face « Max » coûte 1 charge et 1 débris.",
-    "aurora": "+2 dans chaque emplacement.",
-    "fate-d100": "Jamais attribué. Une fois par combat, lancez le dé et prenez ce que le secteur vous offre."
+    "shim": "Les faces sont uniquement 2, 2, 3, 3 ; +1 au premier tour d'un combat.",
+    "spool": "Si le résultat est 1 ou 2, on relance le dé une fois.",
+    "mimic": "Une fois par combat, échangez vos valeurs avec celles de n'importe quel autre dé ; si vous disposez de trois objets marqués « dés », chaque combat commence par un déplacement gratuit.",
+    "pivot": "Les faces sont uniquement 1, 2, 3, 6, 7, 8 — il n'y a pas de face intermédiaire ; une fois par combat, retournez la face pour afficher la face opposée.",
+    "beaconChip": "+2 en « Capteurs », et chaque combat commence avec un « coup de pouce » gratuit.",
+    "lodestar": "+1 dans chaque emplacement ; chaque combat commence avec un « nudge » gratuit et un relancer supplémentaire ; une fois par combat, mettez sa face de côté pour le tour suivant.",
+    "prismChip": "Ses faces sont 2, 3, 3 et 4 ; une face maximale rapporte 2 ferrailles pour chaque objet prismatique que vous transportez.",
+    "prismCore": "Il réfracte vers l'avant : dans la catégorie « Capteurs », il donne un bonus de rouge ; dans « Armes », de bleu ; dans « Boucliers », de vert ; dans « Moteurs », de noir ; et dans « Réacteur », de jaune — le prochain dé de cette école pour ce tour bénéficie d'un bonus de +2.",
+    "spectra": "« Max face » coûte 2 points de charge et 4 points de ferraille ; une fois par combat, il met sa face en réserve et commence son tour suivant sur celle-ci.",
+    "aurora": "+2 dans chaque emplacement tant que le pont contient au moins 3 dés prismatiques ; un jet de 10 ou plus rapporte 2 points de dégâts, 2 points de bouclier, 1 point de charge, 3 points de ferraille et 1 point de coque.",
+    "fate-d100": "Jamais attribué. Une fois par combat, lancez le dé et prenez ce que le secteur vous offre.",
+    "red-d6": "Cartes 1 à 6, sans carte passive — la carte rouge basique et polyvalente qui sert de référence pour évaluer le reste du jeu.",
+    "blue-d6": "Faces 1 à 6 et pas de capacité passive — bleu uni, mais cela compte tout de même pour la résonance bleue.",
+    "grey-d4": "Faces 1 à 4 et pas de capacité passive — une carte de remplissage grise bon marché, et une carte de plus pour les decks qui misent sur les petits dés.",
+    "green-d4": "Faces 1 à 4 et pas de mode passif — un produit d'appoint vert bon marché qui alimente les seuils du moteur et des capteurs.",
+    "yellow-d6": "Cartes 1 à 6, sans effet passif — jaune uni ; la chance doit venir de ce que vous construisez autour.",
+    "black-d6": "Faces 1 à 6 et pas de passif — noir uni, et il ne prend aucun risque de lui-même.",
+    "slag": "Ses faces sont 1, 1, 1 et 4, mais dans le réacteur, il compte toujours pour 4.",
+    "fissure": "Ne donne que les résultats 1, 2, 3, 8, 9 ou 10 ; une fois par combat, il se divise en deux dés gris temporaires de type d4.",
+    "anthracite": "Il ne donne que les résultats suivants : 1, 1, 2, 11, 12 ou 12 ; une fois par combat, il échange ses valeurs avec celles d'un autre dé.",
+    "stillwater": "Ses faces ne sont que 3, 3, 4, 4, 5 et 5 ; dans « Sensors », il bloque la cible même sur un 3.",
+    "floodgate": "Ses faces vont de 3 à 8, jamais moins ; une fois par combat, il choisit sa face, et au tour suivant, il commence à partir de là au lieu de lancer le dé.",
+    "undertow": "Le résultat n'est jamais inférieur à 5 ; une fois par combat, échangez sa valeur avec celle d'un autre dé.",
+    "fused-emberforge": "Deux dés fusionnés en un seul : ses faces sont 2, 2, 4, 4, 6, 6, 8, 8 et ne comportent jamais de nombre impair.",
+    "fused-frostwall": "Deux plaques soudées à plat : leurs faces sont respectivement 3, 3, 4, 4, 5, 5, 6, 6.",
+    "fused-counterweight": "Une fois par combat, échangez vos valeurs avec n'importe quel autre dé.",
+    "fused-seedling": "Au début de chaque combat, il émet un tir : un d4 vert temporaire pendant 2 tours.",
+    "fused-goldvein": "Le filon traverse deux fois la dernière face — 1, 2, 3, 4, 5, 6, 8, 8 — et un jet maximal rapporte 4 ferrailles.",
+    "fused-voidcore": "Une fois par combat, détruisez-le : il s'éteint et laisse deux d4 gris temporaires.",
+    "fused-pyroclast": "Un « max face » dans la catégorie « Armes » permet de lancer une deuxième pierre infligeant 3 points de dégâts au-delà de la limite de l'emplacement.",
+    "fused-glacier": "À partir du tour 3, +3 aux boucliers.",
+    "fused-keel": "Une fois par combat, réservez cette face : au tour suivant, le dé commence sur cette face au lieu d'être lancé.",
+    "fused-tendril": "+2 lorsqu'il reproduit la valeur du tour précédent ou obtient son résultat minimum.",
+    "fused-windfall": "La face maximale rapporte 3 scrap, la face minimale rapporte 1.",
+    "fused-railslug": "+1 en armes et +2 au montage dorsal.",
+    "fused-rampart": "+1 en boucliers ; même si vous en possédez déjà 8, cela en ajoute 2 de plus.",
+    "fused-bloom": "Augmente de +1 sur un résultat maximal, jusqu'à +3, et tout jet de 9 ou plus répare 1 point de coque.",
+    "taproot": "Il inflige des dégâts à chaque fois qu’il se déclenche : +1 à partir de la troisième case du combat, +2 à partir de la cinquième.",
+    "seedpod": "Un « max face » génère un d4 vert temporaire pendant deux tours. Une fois par combat, vous pouvez le diviser en deux d4 gris.",
+    "evergreen": "Les faces sont uniquement paires : 2, 4, 6, 8, 10, 12. Le bonus augmente de +2 à la face maximale, jusqu'à +4.",
+    "plumbline": "Les lancers de dés ne donnent que les résultats suivants : 2, 2, 4, 4, 6, 6.",
+    "chaff": "Les faces sont uniquement 1, 1, 2, 3, 5, 8 ; une fois par combat, brûlez-la depuis le plateau pour obtenir deux d4 gris temporaires.",
+    "glimmer": "Ses faces ne sont que 1, 1, 4 et 4 ; tant que le jeu contient au moins deux dés prismatiques, un 1 obtenu est relancé une fois.",
+    "facet": "Ses faces sont 4, 4, 5, 5, 6 et 6 ; une fois par combat, il échange ses valeurs avec celles de n'importe quel autre dé.",
+    "gamut": "Les faces sont 2·4·6·8·10·10. +2 tant que vous possédez 2 [spike] ou plus ; une face maximale vous permet de stocker 1 charge par dé prismatique de votre paquet.",
+    "salvo": "Dans la catégorie « Armes », elle inflige 1 point de dégâts supplémentaire pour chaque objet « Essaim » présent dans votre configuration, y compris celui-ci.",
+    "crucible": "Une fois par combat, notez le résultat sur la face du dé : au tour suivant, le personnage commence avec ce chiffre au lieu de relancer le dé.",
+    "bombard": "Ses faces sont 1, 2, 3, 4, 12 et 12 ; un 12 dans la catégorie « Armes » inflige 5 points de dégâts supplémentaires.",
+    "smallChange": "Il comporte deux 2, deux 3 et deux 4 ; une fois par combat, il se divise en deux dés gris à 4 faces pour le reste du combat.",
+    "wager": "Il affiche trois « 1 » et trois « 6 » ; une fois par combat, il échange ses valeurs avec celles d'un autre dé, et un « 1 » placé dans un emplacement d'arme devient un « 6 » pour 2 points de coque.",
+    "hedge": "Ne lance que les dés 1, 3, 5 ou 7 ; une fois par combat, il choisit une face et commence le tour suivant sur celle-ci."
   },
   "resonance": {
     "red-2": "Les dés rouges dans la catégorie « Armes » confèrent un bonus de +1.",
@@ -251,13 +311,9 @@
     "on-edge": "Au bord du précipice",
     "sacrifice": "Sacrifice",
     "back-door": "Porte dérobée",
-    "grip": "Prise",
-    "reservist": "Réserviste",
-    "calibration": "Étalonnage",
     "spare": "De rechange",
     "afterburner": "Postcombustion",
     "jammer-plus": "Jammer+",
-    "condenser": "Condenseur",
     "targeter": "Targeter",
     "plating": "Placage",
     "tug": "Remorqueur",
@@ -295,11 +351,9 @@
     "permafrost": "Permafrost",
     "rootHold": "Maintien des racines",
     "secondGrowth": "Deuxième croissance",
-    "mulch": "Paillis",
     "pollen": "Pollen",
     "longRoots": "De longues racines",
     "greenwake": "Greenwake",
-    "steadyHand": "Main sûre",
     "sapline": "Sapline",
     "thicket": "Fourré",
     "bloomCycle": "Cycle de floraison",
@@ -362,177 +416,243 @@
     "dryDock": "Cale sèche",
     "masterKey": "Clé passe-partout",
     "greyProtocol": "Protocole Grey",
-    "armorPlate": "Plaque de blindage",
-    "coolantLoop": "Circuit de refroidissement",
-    "finePitch": "Pas fin",
-    "boresight": "Alignement de visée",
-    "bilgePump": "Pompe de cale",
-    "dockRates": "Tarifs d'amarrage",
     "crewDrill": "Exercice d'équipage",
-    "scrapHopper": "Ferraille Trémie",
     "spotterCall": "Annonce de l'observateur",
     "hullWeld": "Coque Soudure",
     "reinforcedBay": "Baie renforcée",
-    "surgeTank": "Réservoir tampon",
     "hardenedHull": "Coque renforcé",
-    "kineticDampers": "Amortisseurs cinétiques",
     "targetingSuite": "Suite de ciblage",
-    "pressureValve": "Soupape de pression",
-    "resonanceTuner": "Résonance Tuner",
     "shockLance": "Lance de choc",
-    "piercingRounds": "Billes de piercing"
+    "piercingRounds": "Billes de piercing",
+    "snakeEyes": "Snake Eyes",
+    "looseBallast": "Gravier en vrac",
+    "downPayment": "Acompte",
+    "hazardPay": "Prime de risque",
+    "overdraft": "Découvert bancaire",
+    "debtCollector": "Agent de recouvrement",
+    "snowline": "Ligne de neige",
+    "rimeGuard": "Rime Guard",
+    "whiteNoise": "Bruit blanc",
+    "iceSheet": "Calotte glaciaire",
+    "bracingVanes": "Ailettes de renfort",
+    "nullField": "Champ nul",
+    "takeRoot": "Prendre racine",
+    "seedBank": "Banque de graines",
+    "understory": "Sous-bois",
+    "mycelium": "Mycélium",
+    "rhizome": "Rhizome",
+    "taproot": "Racine pivotante",
+    "perennial": "Vivace",
+    "annualRings": "Cernes annuels",
+    "dryRun": "Simulation",
+    "teardown": "Démontage",
+    "tallySheet": "Feuille de comptage",
+    "cargoHold": "Salle de chargement",
+    "pointBlank": "À bout portant",
+    "ignition": "Allumage",
+    "keelStrike": "Coup de quille",
+    "runningHot": "En pleine forme",
+    "ashfall": "Pluie de cendres",
+    "stokehold": "Stokehold",
+    "autoAlign": "Alignement automatique",
+    "coreTap": "Carottage",
+    "damageControl": "Limitation des dégâts",
+    "spallLiner": "Revêtement anti-écaillage",
+    "scavengedArmour": "Armure récupérée",
+    "crashPriority": "Priorité en cas d'accident",
+    "spareHands": "Mains de rechange",
+    "overrideKeys": "Clés de remplacement",
+    "markLedger": "Mark Ledger",
+    "refitCrew": "Équipe de remise en état",
+    "flightLog": "Journal de bord",
+    "fullRefit": "Rénovation complète",
+    "sureThing": "C'est sûr",
+    "chipStack": "Pile de jetons",
+    "warChest": "Caisse de guerre",
+    "marginCall": "Appel de marge",
+    "loadedDice": "Dés truqués"
   },
   "perksDesc": {
-    "hot-charge": "Un jet d'arme « max-face » inflige +2 points de dégâts.",
-    "ricochet": "L'effet « overkill » de l'arme A se propage à l'ennemi suivant.",
+    "hot-charge": "Tant que vous disposez de 5 points de charge, chaque coup porté avec une arme inflige 2 points de dégâts supplémentaires.",
+    "ricochet": "Les armes de type A infligent un « overkill » à l'ennemi suivant, et une attaque maximale contre celui-ci inflige +4 points de dégâts.",
     "double-fuse": "Le « Burn » initial de chaque combat est doublé.",
-    "warmup": "Tour 1 : les dés rouges rapportent +1.",
+    "warmup": "À partir du tour 3, chaque coup porté inflige 3 points de dégâts supplémentaires.",
     "ice-circuit": "Un jet de bouclier de 6+ confère un bonus de +2 au bouclier.",
-    "reflector": "Une esquive inflige 3 points de dégâts à l'attaquant.",
-    "blue-reserve": "Un emplacement de réserve supplémentaire, réservé aux dés bleus uniquement.",
+    "reflector": "Si vous terminez un tour avec 10 points de bouclier ou plus, le champ riposte en infligeant 4 points de dégâts.",
+    "blue-reserve": "Deux emplacements de réserve supplémentaires réservés aux dés bleus uniquement, mais vous relancez un dé de moins à chaque fois.",
     "stabilizer": "Le premier dé bleu de chaque tour ne peut pas afficher le chiffre 1.",
-    "compost": "Chaque dé brûlé rapporte +1 déchet.",
-    "overgrowth": "Capuchon de matrice de croissance +1.",
+    "compost": "Chaque dé restant dans le plateau à la fin du tour rapporte 1 déchet.",
+    "overgrowth": "Les dés qui grandissent montent d'un cran.",
     "echo": "Si le dé affiche la même valeur que lors du tour précédent, cela confère +1 charge.",
     "regen": "Fin du combat : régénère 2 points de coque.",
-    "prospector": "Ferraille hausse de 25 %.",
-    "fortune": "Un jet de dé « max-face » rapporte +2 en ferraille.",
-    "haggler": "Prix en magasin : -15 %.",
-    "coin": "Début du combat : +3 ferraille.",
-    "blood-reactor": "Une fois par tour, payez 2 points de coque pour obtenir +3 en charge.",
+    "prospector": "Chaque combat commence avec 2 débris pour chaque dé jaune de votre deck.",
+    "fortune": "Tant que vous possédez au moins trois dés jaunes, chaque combat commence avec un relancer supplémentaire.",
+    "haggler": "Boutiques : -18 %, mais la mission rapporte 10 % d'XP en moins.",
+    "coin": "+3 points de ferraille au début du combat, et chaque dé dont le résultat correspond à la face la plus haute ou la plus basse rapporte 1 point supplémentaire.",
+    "blood-reactor": "Une fois par tour, payez 2 points de coque pour obtenir +3 points de charge ; si vous possédez quatre objets de charge, chaque dé de réacteur stocke 2 points supplémentaires.",
     "on-edge": "Coque inférieur à 30 % : +1 au lancer de dés.",
-    "sacrifice": "Utilisez un dé pour accumuler +4 points de dégâts d'arme pendant ce tour.",
+    "sacrifice": "Lancez un dé pour accumuler +4 points de dégâts d'arme ce tour-ci ; lorsque la coque est inférieure à un tiers, chaque emplacement d'arme inflige des dégâts critiques multipliés par 1,5.",
     "back-door": "Un rouleau noir « min-face » rapporte +6 ferraille.",
-    "grip": "Augmenter la taille du relancer de +1.",
-    "reservist": "Capacité de réserve +1.",
-    "calibration": "Le sort « Nudge » coûte 2 points de charge au lieu de 3.",
-    "spare": "Le résultat le plus bas de chaque lancer est augmenté d'un point ; relancez un dé supplémentaire.",
-    "afterburner": "Les seuils du moteur sont inférieurs d'un point.",
-    "jammer-plus": "Jam réduit l'attaque de l'ennemi de 3.",
-    "condenser": "La limite de charge du réacteur passe à 12.",
-    "targeter": "Mark confère +3 points de dégâts au lieu de +2.",
-    "plating": "Carène maximale +5, soins : 5 désormais.",
+    "spare": "Le dé ayant obtenu le résultat le plus bas à chaque lancer gagne un point ; relancez un dé à la fois.",
+    "afterburner": "Les seuils des moteurs sont un peu plus faciles ; coque −2.",
+    "jammer-plus": "Jam réduit l'attaque ennemie de 2 points supplémentaires, mais les points marqués valent 1 point de moins.",
+    "targeter": "Les marques infligent +1 point de dégâts supplémentaire, mais les enrayages en réduisent de 1 de moins.",
+    "plating": "Coque +5, et chaque combat remporté répare 2 points de coque.",
     "tug": "Une esquive confère également +1 charge.",
     "kindling": "+1 en armes à partir d'un résultat de 5 ou plus.",
     "hammerhead": "+2 en Armes A.",
     "scorchmark": "La valeur maximale de « face » dans les armes ajoute « Brûlure 1 ».",
     "openingVolley": "+2 en armes lors des deux premiers tours.",
-    "pyreFloor": "+2 en armes dès le premier jet.",
-    "redForge": "+1 pour les dés rouges dans les armes.",
-    "searing": "+2 en armes si le résultat est de 8 ou plus.",
+    "pyreFloor": "Lorsqu'un dé rouge tombe sur sa face la plus petite, on le relance immédiatement.",
+    "redForge": "Un dé d'arme rouge dont la face affichée est la plus élevée gagne +1 à ses faces, dans la limite de +2.",
+    "searing": "Un jet d'arme de 8 ou plus ajoute « Brûlure 2 ».",
     "cinderTithe": "La valeur maximale d'une carte « Arme » rapporte 3 points de ferraille.",
     "thermalVent": "+3 en armes sur une face maximale, et 1 charge.",
-    "overburn": "+2 en attaque tant que la santé de la coque est inférieure à la moitié.",
+    "overburn": "Les dés d'arme bénéficient d'un bonus de +2, et chaque tour se termine par la perte de 2 points de coque.",
     "emberField": "Si le dé rouge affiche « Max », cela ajoute 2 points de brûlure.",
-    "hotline": "+3 au niveau de la fixation vertébrale.",
-    "secondBarrel": "+3 en « Armes B ».",
-    "detonator": "Une valeur maximale pour les armes permet de résoudre l'emplacement deux fois.",
-    "magmaCore": "+3 en armes dès que vous avez quatre dés rouges.",
-    "infernoDoctrine": "Chaque coup porté inflige 1 point de brûlure.",
+    "hotline": "N'importe quel dé s'adapte au support vertébral une fois passé son capuchon, pour 2 points de coque.",
+    "secondBarrel": "+3 en « Armes B », et +2 supplémentaires grâce au Mk II.",
+    "detonator": "Un « max face » dans les armes déclenche deux fois l'effet de l'emplacement, et avec cinq objets d'arme, tout jet de 8 ou plus le déclenche également.",
+    "magmaCore": "+3 en armes au niveau de résonance rouge 4, et au niveau rouge 6, chaque coup d'arme confère +3 au dé rouge suivant.",
+    "infernoDoctrine": "Chaque coup porté avec une arme inflige 1 point de brûlure, et 3 points de brûlure dès que vous disposez de trois sources de brûlure.",
     "hoarplate": "+1 en boucliers.",
     "stormWall": "Le bonus maximal de points de bouclier confère 3 points de bouclier supplémentaires.",
-    "coldStart": "+2 en défense lors des deux premiers tours.",
+    "coldStart": "Chacun des deux premiers tours se termine par un gain de 3 points de bouclier supplémentaires.",
     "blueFloor": "Les dés bleus ne donnent jamais un résultat inférieur à 3.",
     "meltwater": "« Min face in shields » confère 3 points de bouclier supplémentaires.",
     "frostBrake": "+2 pour les dés bleus dans les moteurs.",
     "bulkhead": "Coque +3.",
     "chillBank": "La face « Max » d'un dé bleu stocke 1 charge.",
-    "aegisField": "+2 en défense pour chaque dé de défense.",
-    "deepFreeze": "+3 en boucliers sur un 8 ou plus.",
-    "interdict": "Votre bonus vous protège contre 2 attaques ennemies supplémentaires.",
+    "aegisField": "Le premier emplacement à résoudre à chaque tour augmente également le bouclier de 3.",
+    "deepFreeze": "Un jet de bouclier à 8+ donne +3 et ajoute 2 boucliers supplémentaires.",
+    "interdict": "Un dé « capteurs » dont le résultat est inférieur à 4 est porté à 4, ce qui provoque systématiquement un blocage, et ce blocage te fait perdre 1 point supplémentaire.",
     "hardVacuum": "+3 en boucliers tant que la santé de la coque est inférieure à la moitié.",
-    "secondSkin": "Coque +4 ; regagne 1 point de vie après chaque combat.",
+    "secondSkin": "Coque +4 et 2 points de coque réparés après chaque combat, mais les gains de récupération sont réduits de 10 %.",
     "glacierPact": "+4 en boucliers dès que vous avez quatre dés bleus en main.",
-    "mirrorLattice": "Les esquives réduisent les dégâts ; les seuils du moteur sont un peu plus faciles à atteindre.",
+    "mirrorLattice": "Les esquives réduisent les dégâts, les seuils des moteurs sont abaissés d'un niveau, et avec trois objets d'esquive, les moteurs affichent +3.",
     "permafrost": "Un « max face » dans les boucliers se résout deux fois par emplacement.",
-    "rootHold": "+1 pour les moteurs.",
+    "rootHold": "À partir du troisième tour, chaque dé attribué aux moteurs compte pour deux dés supplémentaires.",
     "secondGrowth": "+2 lorsque le dé affiche le même résultat que lors du tour précédent.",
-    "mulch": "Récupère 1 point de vie après le combat ; +5 % de ferraille.",
     "pollen": "La face « Max » d'un dé vert permet de restaurer 1 point de coque.",
-    "longRoots": "Les dés qui grandissent montent d'un cran.",
+    "longRoots": "Un dé qui s'arrête sur sa face de valeur maximale gagne définitivement +1, dans la limite de +2.",
     "greenwake": "5 ou plus dans les moteurs confèrent 2 points de bouclier.",
-    "steadyHand": "Des seuils de moteur encore plus simples.",
     "sapline": "En reproduisant la valeur du tour précédent, on récupère 2 points de coque.",
-    "thicket": "Coque +3 ; regagne 2 points de vie après chaque combat.",
+    "thicket": "Coque +8, mais la valeur de récupération est réduite de 15 %.",
     "bloomCycle": "+3 lorsqu'un dé vert affiche la même valeur que lors du tour précédent.",
-    "photosynth": "Chaque dé vert contient 1 charge.",
-    "evergreen": "Les dés qui grandissent montent de deux cases.",
+    "photosynth": "Chaque dé vert qui se résout stocke 1 charge.",
+    "evergreen": "Tant que vous possédez trois objets de croissance, un dé dont la valeur correspond à celle du tour précédent gagne définitivement +1, jusqu'à +3.",
     "tideRoots": "La marée d'interférence est légèrement moins forte.",
-    "worldTree": "Vous regagnez 2 points de vie par emplacement résolu dès que vous possédez quatre dés verts.",
-    "overgrowthPact": "Croissance +2 et seuils des moteurs réduits de deux niveaux ; coque −4.",
-    "standingWave": "+4 dans la catégorie « moteurs ».",
-    "pocketChange": "+2 débris au début du combat.",
+    "worldTree": "Dès que quatre dés verts sont alignés, à la fin de chaque tour, vous récupérez 1 point de coque par objet vert que vous transportez.",
+    "overgrowthPact": "Croissance +2 et coque −4 ; tant que vous portez quatre objets de croissance, chaque dé compte pour 2 de plus.",
+    "standingWave": "Les seuils des moteurs sont désormais un peu plus faciles à atteindre ; si un moteur affiche une valeur de 6 ou plus, il conserve 4 points de bouclier et 2 points de charge pour le tour suivant.",
+    "pocketChange": "Lorsque vous entrez dans un nœud, vous gagnez 1 déchet pour chaque objet [déchet] présent dans votre équipement.",
     "finderFee": "+2 ferraille par victime.",
-    "streetPrice": "Prix en magasin : -8 %.",
+    "streetPrice": "Magasins : −8 %, mais la ferraille affiche une hausse de −5 % : vous achetez et vendez au même prix du marché.",
     "luckyStreak": "Toute face « max » rapporte 3 scrap.",
     "scrapline": "+12 % de ferraille provenant de toutes les sources.",
     "smallMercies": "Tout visage « min » rapporte 2 scrap.",
-    "goldTooth": "Chaque dé jaune rapporte 1 déchet.",
-    "tallyMark": "+10 % d'XP grâce à cette course.",
-    "bountyBoard": "+4 de ferraille par victime.",
+    "goldTooth": "Chaque dé jaune que vous résolvez rapporte 1 déchet.",
+    "tallyMark": "Chaque victoire vous rapporte un point ; à partir de la sixième, chaque nœud que vous franchissez vous rapporte 3 morceaux de ferraille.",
+    "bountyBoard": "Chaque victoire rapporte une prime de 12 ferrailles.",
     "marketRun": "Boutiques : -10 % ; le premier relancer dans chaque boutique est gratuit.",
     "goldRush": "Le maximum obtenu sur un dé jaune rapporte 8 ferrailles.",
-    "houseEdge": "+3 sur le maximum d'un dé jaune.",
-    "ledgerTrick": "+20 % de ferraille ; coque −2.",
-    "mintCondition": "Max doit payer 12 points de ferraille et 1 point de charge dès que tu as quatre dés jaunes en main.",
-    "silentPartner": "+30 % de rebuts ; magasins : −10 %.",
-    "veinTap": "+6 de ferraille par victime et +6 au début du combat.",
-    "darkCurrent": "+1 dans le réacteur.",
-    "lowTide": "Tout visage « min » stocke 2 charges.",
-    "brinkmanship": "+1 à chaque dé tant que la coque est en dessous de 40 %.",
-    "blackTithe": "Chaque dé noir rapporte 2 ferrailles.",
-    "coldFusion": "Limite de charge +2.",
+    "houseEdge": "Un dé dont le résultat est égal ou supérieur à 7 lors d'un jet d'arme inflige un coup critique (dégâts multipliés par 1,5).",
+    "ledgerTrick": "+20 % de déchets, mais le plafond de charge diminue de 2.",
+    "mintCondition": "Dès que vous possédez quatre dés jaunes, chaque face maximale rapporte 10 ferraille et 2 points de charge.",
+    "silentPartner": "Boutiques : -12 %, avec un relancer gratuit par boutique, et chaque victoire rapporte 4 débris par objet [débris] que vous possédez.",
+    "veinTap": "+40 % de déchets, mais chaque relance nécessite un dé de moins.",
+    "darkCurrent": "Un jet de dé inférieur à 5 dans le réacteur est considéré comme un jet supérieur de 2.",
+    "lowTide": "Chaque dé qui affiche sa face « min » rapporte 1 charge, qu’il soit posé ou non.",
+    "brinkmanship": "+1 à chaque dé résolu dès lors que vous possédez trois objets « risque ».",
+    "blackTithe": "Chaque nœud que vous franchissez rapporte 5 scrap pour 1 point de coque, et cesse de générer des gains dès que la coque passe sous la barre des 25 %.",
+    "coldFusion": "Limite de charge +4 ; le noyau consomme 15 % de vos déchets.",
     "longOdds": "+3 si un dé noir affiche au minimum un 1.",
-    "hardBargain": "+15 % de débris ; vous récupérez 1 point de vie de moins après les combats.",
+    "hardBargain": "+15 % de ferraille ; coque −1.",
     "nightShift": "La capacité maximale du réacteur permet de stocker 2 charges supplémentaires.",
     "eventHorizon": "+3 pour les dés noirs dans le réacteur.",
-    "bloodPrice": "+4 en puissance de tir lorsque la santé de la coque est inférieure à 25 %.",
-    "heatShroud": "Le premier débordement du réacteur à chaque combat n'entraîne aucune perte de coque.",
-    "scrapheap": "Chaque dé non placé stocke 1 charge.",
+    "bloodPrice": "À la fin de chaque tour, tant que la santé est égale ou supérieure à 30 %, dépensez 1 point de santé pour infliger 4 points de dégâts.",
+    "heatShroud": "Le premier débordement du réacteur à chaque combat n'entraîne aucune perte de coque, et un dé de réacteur augmente vos boucliers de 4 tant que vous disposez d'au moins 8 points de charge.",
+    "scrapheap": "Chaque dé non placé stocke 1 charge, et chaque victoire rapporte 5 ferrailles.",
     "deadReckoning": "Limite de charge +3 ; coque −3.",
-    "obsidianCreed": "Les dés noirs ne donnent que le minimum ou le maximum ; le plafond de charge est augmenté de +2.",
-    "lastBreath": "Une fois par session, survivez à un coup mortel lorsque votre coque est à 1 point.",
-    "singularity": "Le réacteur peut encore stocker 3 charges supplémentaires.",
+    "obsidianCreed": "Les dés noirs ne donnent que la valeur minimale ou maximale ; le plafond de charge est augmenté de 2 ; chaque combat commence avec 1 point de charge par objet de risque que vous possédez.",
+    "lastBreath": "Une fois par session, résistez à un coup mortel lorsque votre coque est à 1 point ; une bataille engagée alors que votre coque est à 3 points commence avec 8 points de bouclier.",
+    "singularity": "Chaque dé du réacteur stocke 3 points de charge supplémentaires et coûte 1 point de coque.",
     "widerGrip": "Relancez un dé à la fois.",
     "shimStock": "Les « nudges » coûtent 1 point de charge en moins.",
     "deckHand": "Réservez +1 dé.",
-    "toolRoll": "Un relancer supplémentaire à chaque tour.",
+    "toolRoll": "Un relancer supplémentaire à chaque tour ; résistance maximale : −2.",
     "counterweight": "Un 1 obtenu au dé devient un 2.",
-    "checklist": "+1 à chaque dé au premier tour.",
+    "checklist": "Le premier emplacement à résoudre à chaque tour rapporte 1 charge.",
     "greyMarket": "Magasins : −6 % ; +6 % de rebuts.",
-    "spareParts": "+4 de ferraille au début du combat.",
+    "spareParts": "Un pion gris d4 temporaire est placé sur le plateau pendant les deux premiers tours de chaque combat.",
     "dampers": "Coque +2 ; limite de charge +1.",
-    "routineCheck": "Récupère 1 point de vie après chaque combat.",
-    "switchboard": "+2 au niveau des capteurs.",
-    "gimbalMount": "Les marques infligent +2 points de dégâts supplémentaires.",
-    "logistics": "Les deux premiers relances sont gratuites dans chaque boutique ; boutiques : −5 %.",
-    "quickHands": "Relancez deux dés supplémentaires à la fois.",
-    "balanceBeam": "À chaque tour, votre résultat le plus bas est légèrement revu à la hausse.",
-    "holdBack": "Les « nudges » coûtent 1 point de charge en moins ; le plafond de charge est augmenté de 2.",
-    "payloadShuffle": "Mettez de côté +1 dé, ainsi qu'un dé bleu supplémentaire.",
-    "shortHaul": "+15 % d'XP grâce à cette course.",
-    "dryDock": "L'atelier de réparation restaure 3 points de coque supplémentaires.",
-    "masterKey": "Deux relances supplémentaires à chaque tour, et un dé supplémentaire par relance.",
-    "greyProtocol": "+2 à chaque dé dès que vous avez quatre dés gris en main.",
-    "armorPlate": "Coque +4.",
-    "coolantLoop": "Limite de charge +1.",
-    "finePitch": "Des seuils de moteur encore plus simples.",
-    "boresight": "Les marques infligent +1 point de dégâts supplémentaire.",
-    "bilgePump": "Récupère 1 point de vie après chaque combat.",
-    "dockRates": "Prix en magasin : -7 %.",
+    "routineCheck": "Chaque nœud que vous franchissez est consigné dans le journal ; à partir de la dixième entrée, chaque combat commence avec un relancer supplémentaire.",
+    "switchboard": "Les marques infligent +1 point de dégâts supplémentaire, et lorsque l'effet « Capteurs » se résout, votre dé ayant obtenu le résultat le plus bas est relancé.",
+    "gimbalMount": "Un dé dont le résultat correspond à « Moteurs » ou « Capteurs » compte pour au moins 4.",
+    "logistics": "Boutiques : -12 %, les deux premiers relances sont gratuites, mais les revenus issus de la ferraille sont réduits de 8 %.",
+    "quickHands": "Relancez deux dés supplémentaires à la fois, mais vous ne pouvez plus garder de dé en réserve.",
+    "balanceBeam": "Chaque dé dont la face supérieure apparaît vous coûte 1 point, ce qui permet d'augmenter de 2 la valeur de votre dé le moins élevé.",
+    "holdBack": "Les « nudges » coûtent 1 point de charge en moins, et si vous disposez de trois objets marqués « dés », vous réservez un dé supplémentaire.",
+    "payloadShuffle": "Réserve : +2 dés, +1 supplémentaire pour un dé bleu, mais le plafond de charge diminue de 2.",
+    "shortHaul": "+20 % d'XP pour cette mission ; coque max −3.",
+    "dryDock": "La « Repair Bay » restaure 2 points de coque supplémentaires pour chaque objet que vous transportez et portant la balise « repair bay », y compris celui-ci.",
+    "masterKey": "Un relancer supplémentaire à chaque tour et un dé supplémentaire par relancer ; avec trois objets marqués « relancer », un de plus de chaque.",
+    "greyProtocol": "Avec quatre dés gris, chaque combat commence avec trois déplacements gratuits et un emplacement de réserve supplémentaire.",
     "crewDrill": "+12 % d'XP grâce à cette course.",
-    "scrapHopper": "+3 débris au début du combat.",
     "spotterCall": "À partir de 5 capteurs, 1 charge est enregistrée.",
     "hullWeld": "L'atelier de réparation restaure 1 point de coque supplémentaire.",
-    "reinforcedBay": "Un emplacement supplémentaire pour un module.",
-    "surgeTank": "Limite de charge +3.",
-    "hardenedHull": "Coque +7 ; les seuils du moteur sont un cran plus difficiles.",
-    "kineticDampers": "Une esquive permet de stocker 1 charge.",
-    "targetingSuite": "Marque +2 points de dégâts ; un enrayage en enlève 1 de plus.",
-    "pressureValve": "Le premier débordement de réacteur par combat n'entraîne aucune perte de coque.",
-    "resonanceTuner": "+2 points de charge au début du combat par série de quatre terminée.",
-    "shockLance": "+5 au niveau de la fixation vertébrale.",
-    "piercingRounds": "Le premier coup de chaque combat ignore les boucliers ; marque +1."
+    "reinforcedBay": "Un emplacement de module supplémentaire ; coque −3.",
+    "hardenedHull": "Coque +6 ; regagne 1 point de vie après chaque combat.",
+    "targetingSuite": "Inflige +2 points de dégâts, et l'activation des capteurs permet d'accumuler 1 charge pour chaque objet de précision que vous portez.",
+    "shockLance": "+5 au « Spinal Mount », et tout dé dont le résultat est inférieur à 5 est relancé dès qu’il atterrit à cet endroit.",
+    "piercingRounds": "Le premier coup porté à chaque combat ignore les boucliers, confère un bonus de +1, et une arme de type « Face » inflige 2 points de dégâts supplémentaires pour chaque objet « Perçage » que vous portez.",
+    "snakeEyes": "Même lorsqu'un dé d'arme affiche sa face minimale, il inflige tout de même 3 points de dégâts.",
+    "looseBallast": "Un relancer supplémentaire à chaque tour ; coque −3.",
+    "downPayment": "Le premier emplacement à être résolu à chaque tour gagne +3 et coûte 1 point de coque, sauf si la coque est inférieure à 20 %.",
+    "hazardPay": "Participer à un combat avec moins de la moitié de la coque rapporte 10 points de ferraille.",
+    "overdraft": "Les emplacements d'armes acceptent des dés dépassant leur limite maximale moyennant un coût de 2 points de coque chacun, et un dé d'arme de valeur 9 ou plus coûte 2 points de charge.",
+    "debtCollector": "Chaque minute passée à mener ce combat correspond à une inscription dans le registre ; à partir de la quatrième minute, chaque tour se termine par 1 point de dégâts par objet à risque que vous possédez.",
+    "snowline": "Chaque combat commence avec 1 bouclier par dé bleu présent dans votre paquet.",
+    "rimeGuard": "Un dé d'une autre école placé dans une fente ne donne jamais un résultat inférieur à 2.",
+    "whiteNoise": "Si vous terminez un tour avec une charge de 4 ou plus, la prochaine attaque de l'ennemi est bloquée.",
+    "iceSheet": "Tant qu'un objet « Shieldwall » se trouve à bord, chaque tour se termine avec 4 points de bouclier supplémentaires.",
+    "bracingVanes": "Un dé de moteur qui n'est pas sur sa face maximale donne un bonus de +3.",
+    "nullField": "À la fin de chaque tour, on dispose de 2 points de bouclier par objet « Mur de boucliers » ; avec quatre de ces objets, la prochaine attaque de l'ennemi est bloquée.",
+    "takeRoot": "Tout résultat inférieur à 3 est porté à 3 dès que vous l'attribuez à un emplacement.",
+    "seedBank": "Début du combat : pendant les trois tours suivants, vous gagnez 1 bouclier par objet de croissance que vous portez.",
+    "understory": "Fin du tour : s'il reste au moins 4 points de bouclier, soigne 1 point de coque.",
+    "mycelium": "Une fois que six emplacements ont réglé ce combat, chaque tour se termine par la restauration de 2 points de coque et l'augmentation de 3 points de bouclier.",
+    "rhizome": "Seuils du moteur : deux niveaux plus faciles ; coque : −2.",
+    "taproot": "Compte chaque nœud que vous franchissez ; à partir du huitième, chaque combat commence avec 6 points de bouclier et 3 points de coque restaurés.",
+    "perennial": "Dans les moteurs, un dé dont le résultat correspond à celui du tour précédent compte pour quatre de plus.",
+    "annualRings": "Compte chaque dé dont la valeur correspond à celle du tour précédent ; à partir du troisième, chaque dé compte pour 3 de plus jusqu'à la fin du combat.",
+    "dryRun": "Si un dé affiche une valeur inférieure à 4 identique à celle du lancer précédent, on le relance.",
+    "teardown": "À la fin de chaque tour, les dés temporaires sont retirés, ce qui vous rapporte 1 ferraille par objet que vous transportez et portant la mention « dés ».",
+    "tallySheet": "Chaque dé dont la face la plus basse est visible compte pour un point, et tous les trois points, on touche 3 points de charge à la fin du tour.",
+    "cargoHold": "Mettez trois dés supplémentaires de côté, mais relancez-en un de moins à chaque fois.",
+    "pointBlank": "Une attaque maximale avec une arme inflige +3 points de dégâts et coûte 1 point de coque.",
+    "ignition": "Le combat commence par un « Burn 2 » lancé sur l'ennemi.",
+    "keelStrike": "Une attaque « max face » dans le mode « Spinal Mount » inflige des dégâts critiques multipliés par 1,5.",
+    "runningHot": "À partir du quatrième dé d'arme de la bataille, les dés d'arme bénéficient d'un bonus de +3.",
+    "ashfall": "Une face « max » dans les armes inflige 2 points de dégâts supplémentaires pour chaque source de brûlure que vous possédez.",
+    "stokehold": "Avec trois sources de brûlure, chaque tour se termine par l'ajout d'une brûlure 2.",
+    "autoAlign": "Si un dé affiche un résultat inférieur à 3 sur les capteurs, on le relance immédiatement.",
+    "coreTap": "Une fois que le réacteur est en version Mk2, sa résolution permet de stocker 2 charges supplémentaires.",
+    "damageControl": "En dessous de la moitié des points de vie, la fin de chaque tour permet de regagner 3 points de bouclier.",
+    "spallLiner": "Chaque combat commence avec 2 points de bouclier pour chaque objet de survie que vous portez.",
+    "scavengedArmour": "Coque +6 ; −10 % de rebuts.",
+    "crashPriority": "Entrer dans un combat alors que la coque est à plus de la moitié de sa capacité fait perdre 2 points de coque pour 5 points de charge.",
+    "spareHands": "Si vous avez trois objets « Précision » sur vous, chaque combat commence par un « nudge » gratuit.",
+    "overrideKeys": "Si vous entrez dans un combat avec plus de 60 % de coque, tout équipement occupant un emplacement d'arme dépasse sa limite de 2 points de coque.",
+    "markLedger": "Chaque point est inscrit dans le registre, et à partir du troisième, chaque emplacement d'arme inflige un coup critique.",
+    "refitCrew": "Lorsque l'on arrive à un nœud où le niveau de réparation de la coque est inférieur à la moitié de 3.",
+    "flightLog": "+25 % d'XP pour cette mission ; −15 % de ferraille.",
+    "fullRefit": "+2 à chaque jet de dé dès lors que vous portez quatre objets de précision.",
+    "sureThing": "Un dé dont la face la plus basse indique 1 ou 2 devient un 3 pour 2 points.",
+    "chipStack": "Tant que vous disposez d'au moins 5 points de charge, un dé dont la face maximale est obtenue avec les armes inflige un coup critique (dégâts multipliés par 1,5).",
+    "warChest": "Si vous possédez ne serait-ce qu’un seul objet [de récupération], chaque combat commence avec 3 points de charge.",
+    "marginCall": "Un dé dont le résultat est inférieur à 4 lors d'un achat d'armes confère un bonus de +5 à sa valeur pour 3 ferrailles.",
+    "loadedDice": "On peut lancer le dé du destin deux fois par combat, et un « nudge » coûte 2 points de charge en moins."
   },
   "speaker": {
     "mara": "Mara, ferrailleuse",
@@ -727,14 +847,14 @@
         "bid": "Enchérir sur un noyau (25)",
         "watch": "Regarde donc",
         "bidHigh": "Enchérissez haut",
-        "bidLow": "Enchérissez à bas prix",
+        "bidLow": "Enchérissez à un prix bas",
         "heckle": "Chahuter les enchères"
       },
       "out": {
         "bid": "Votre enchère est retenue. Le noyau est à vous — et c'est un bon choix.",
         "watch": "Tu empoches quelques pièces détachées pour lesquelles personne n'a enchéri.",
         "bidHigh": "Mara te le refile et classe ton nom dans la rubrique « paie ».",
-        "bidLow": "C'est toi qui prends le deuxième lot. Personne d'autre n'en voulait, et c'est peut-être justement ça le problème.",
+        "bidLow": "C'est toi qui prends le deuxième lot. Personne d'autre n'en voulait, et c'est peut-être justement ça le but.",
         "heckle": "Tu négocies le prix pour quelqu'un d'autre et tu en retires des remerciements. Mara, elle, ne te remercie pas."
       }
     },
@@ -1819,244 +1939,244 @@
   },
   "puzzle": {
     "oreVein": {
-      "title": "Ore Vein",
-      "goal": "Deal exactly {{n}} — the vein shears if you over-cut. Leave a die out."
+      "title": "Filon de minerai",
+      "goal": "Respectez scrupuleusement les dimensions indiquées {{n}} — sinon, vous risquez de sectionner les veines si vous coupez trop. Laissez une matrice de côté."
     },
     "coolant": {
-      "title": "Coolant Line",
-      "goal": "Bank exactly {{n}} charge — the core drinks in steps of one and a half."
+      "title": "Conduite de liquide de refroidissement",
+      "goal": "Enregistrez exactement la charge «{{n}}» — les boissons principales par paliers d'un et demi."
     },
     "cleanFit": {
-      "title": "Clean Fit",
-      "goal": "Bank {{n}}+ charge with every die placed and nothing spilled past the cap."
+      "title": "Coupe ajustée",
+      "goal": "{{n}}bancaire + frais à chaque dé posé, sans aucun dépassement du plafond."
     },
     "redRoute": {
-      "title": "Red Route",
-      "goal": "Deal {{n}}+ damage — a red die in Weapon A, affinity firing."
+      "title": "Circuit rouge",
+      "goal": "Inflige {{n}}+ de dégâts — un dé rouge avec l'arme A, tir d'affinité."
     },
     "ignite": {
       "title": "Ignite",
-      "goal": "Deal {{n}}+ damage and land Burn — a cinder must hit its max face."
+      "goal": "Inflige {{n}}+ points de dégâts et déclenche l’effet « Brûlure » : une cendre doit atteindre sa face maximale."
     },
     "pipeline": {
       "title": "Pipeline",
-      "goal": "Mark, then land {{n}}+ into the marked target, and do not overflow the reactor."
+      "goal": "Marquez la cible, puis lancez {{n}}+ sur la cible marquée, en veillant à ne pas faire déborder le réacteur."
     },
     "overload": {
-      "title": "Overload",
-      "goal": "Jam the spinal on purpose, then carry {{n}}+ damage on the mounts."
+      "title": "Surcharge",
+      "goal": "Utilisez « Spinal » exprès, puis infligez {{n}}+ de dégâts sur les montures."
     },
     "slowBurn": {
-      "title": "Slow Burn",
-      "goal": "Two turns: set Burn, reserve a hitter, and stack {{n}}+ total damage."
+      "title": "Une combustion lente",
+      "goal": "Deux tours : activez « Burn », réservez un attaquant et empilez «{{n}}» + les dégâts totaux."
     },
     "capacitor": {
-      "title": "Capacitor",
-      "goal": "Bank {{n}}+ charge across three turns — one core cannot hold it all at once."
+      "title": "Condensateur",
+      "goal": "{{n}}bancaire + charge répartie sur trois tours — un seul noyau ne peut pas tout gérer en même temps."
     },
     "lockbox": {
-      "title": "Lockbox",
-      "goal": "Fixed reading — one routing lands damage, shield and {{n}}+ charge at once."
+      "title": "Coffre-fort",
+      "goal": "Lecture fixe — un enchaînement inflige des dégâts, active un bouclier et une «{{n}}» + une charge en une seule fois."
     },
     "parity": {
-      "title": "Parity Lock",
-      "goal": "Fixed reading — {{n}}+ damage, Weapons odd, Shields even. Mind the faces."
+      "title": "Verrouillage de parité",
+      "goal": "Lecture fixe — {{n}}+ dégâts, armes impaires, boucliers pairs. Attention aux visages."
     },
     "bulwarkStand": {
-      "title": "Bulwark Stand",
-      "goal": "Survive the barrage and still hold {{n}}+ shield — layer the defence."
+      "title": "Support Bulwark",
+      "goal": "Survivez à la rafale et conservez votre bouclier {{n}}+ — renforcez vos défenses."
     },
     "tally": {
-      "title": "The Tally",
-      "goal": "Deal exactly {{n}} damage."
+      "title": "Le décompte",
+      "goal": "Inflige exactement {{n}} de dégâts."
     },
     "battery": {
-      "title": "The Battery",
-      "goal": "Store exactly {{n}} charge."
+      "title": "La batterie",
+      "goal": "Conserver exactement l{{n}}e de charge."
     },
     "seawall": {
-      "title": "The Seawall",
-      "goal": "Raise exactly {{n}} shield."
+      "title": "La digue",
+      "goal": "Génère un bouclier d'{{n}}."
     },
     "mirrorMath": {
-      "title": "The Mirror",
-      "goal": "Deal {{n}} or more using at most two slots."
+      "title": "Le Miroir",
+      "goal": "Distribuez {{n}}s ou plus en utilisant au maximum deux emplacements."
     },
     "engraverBench": {
-      "title": "The Bench",
-      "goal": "Raise {{n}} shield with at least two slots filled."
+      "title": "Le banc",
+      "goal": "Activez un bouclier «{{n}}» dont au moins deux emplacements sont occupés."
     },
     "blackVault": {
-      "title": "The Vault",
-      "goal": "Store {{n}} charge using a school's own system."
+      "title": "Le Coffre-fort",
+      "goal": "Enregistrer les frais liés à l'{{n}}, via le système propre à l'établissement."
     },
     "spinalDrill": {
-      "title": "Spinal Drill",
-      "goal": "Mark, jam the Spinal, then deal {{n}}."
+      "title": "Foret rachidien",
+      "goal": "Mark, bloque le « Spinal », puis lance «{{n}} »."
     },
     "coolChain": {
-      "title": "Cool Chain",
-      "goal": "Shields first, then {{n}} charge, and no overflow."
+      "title": "Chaîne du froid",
+      "goal": "Les boucliers d'abord, puis la charge «{{n}} », et pas de débordement."
     },
     "emberStack": {
       "title": "Ember Stack",
-      "goal": "Deal {{n}} across two turns."
+      "goal": "Distribuez les cartes «{{n}}» en deux tours."
     },
     "shieldWall": {
-      "title": "Shield Wall",
-      "goal": "End the second turn on {{n}} shield."
+      "title": "Mur de boucliers",
+      "goal": "Terminez le deuxième tour sur un bouclier «{{n}}»."
     },
     "fateBench": {
-      "title": "Fixed Odds",
-      "goal": "One roll, one placement: damage, shield, and {{n}} charge."
+      "title": "Cotes fixes",
+      "goal": "Un jet, un placement : dégâts, bouclier et charge d’{{n}}."
     },
     "sortingYard": {
-      "title": "Sorting Yard",
-      "goal": "Deal {{n}} or more with an even total in Weapon A."
+      "title": "Parc de tri",
+      "goal": "Infligez-{{n}}s ou plus avec un total pair d'Arme A."
     },
     "choirStand": {
-      "title": "The Choir Stand",
-      "goal": "Survive the charged volley on {{n}} shield or more."
+      "title": "Le pupitre de chorale",
+      "goal": "Résistez à la salve chargée en utilisant un bouclier «{{n}}» ou plus."
     },
     "emberCut": {
-      "title": "Ember Cut",
-      "goal": "Land within two of {{n}} damage — the seam gives at either edge."
+      "title": "Coupe Ember",
+      "goal": "Atterrir à moins de deux cases d’{{n}}r des dégâts — la couture cède à l’un ou l’autre des bords."
     },
     "driftSpark": {
-      "title": "Drift Spark",
-      "goal": "Bank {{n}} charge, give or take two. The coil is forgiving; the core is not."
+      "title": "Dérive Spark",
+      "goal": "{{n}}, à deux près. La bobine est indulgente ; le noyau, lui, ne l'est pas."
     },
     "plateFit": {
-      "title": "Plate Fit",
-      "goal": "Raise exactly {{n}} shield. The plate seats or it does not."
+      "title": "Ajustement de la plaque",
+      "goal": "Créez un bouclier d'{{n}}. Soit la plaque s'adapte, soit elle ne s'adapte pas."
     },
     "hairline": {
-      "title": "Hairline",
-      "goal": "One mount, exactly {{n}} damage. Everything else stays in the tray."
+      "title": "Ligne des cheveux",
+      "goal": "Une seule monture, exactement{{n}}s de dégâts. Tout le reste reste dans le bac."
     },
     "tithe": {
-      "title": "The Tithe",
-      "goal": "Exactly {{n}} charge, and the reactor takes its cut first."
+      "title": "La dîme",
+      "goal": "Exactement {{n}}, et le réacteur prélève sa part en premier."
     },
     "deadWeight": {
-      "title": "Dead Weight",
-      "goal": "Deal {{n}}+ with every die placed — the ballast has to go somewhere."
+      "title": "Poids mort",
+      "goal": "Distribuez {{n}}ou plus à chaque fois qu'un dé est placé — il faut bien mettre le lest quelque part."
     },
     "blueLane": {
       "title": "Blue Lane",
-      "goal": "Raise {{n}}+ shield with a blue die in the Shields — the lane is keyed."
+      "goal": "Déployez un bouclier «{{n}}» + avec un dé bleu dans la section « Boucliers » — la voie est verrouillée."
     },
     "spread": {
-      "title": "The Spread",
-      "goal": "Deal {{n}}+ across three systems. Nothing concentrated survives the scan."
+      "title": "L'écart",
+      "goal": "{{n}}+ répartis sur trois systèmes. Aucun élément concentré ne survit au balayage."
     },
     "greenhouse": {
-      "title": "Greenhouse",
-      "goal": "Deal {{n}}+ and make something grow — a green die must land on its top face."
+      "title": "Serre",
+      "goal": "Distribuez les cartes {{n}}et faites pousser quelque chose : un dé vert doit s’arrêter sur sa face supérieure."
     },
     "overcut": {
-      "title": "Overcut",
-      "goal": "Bank {{n}}+ charge and force a die past a cap it does not fit."
+      "title": "Surcoupe",
+      "goal": "{{n}}de la banque + forcer un matrice à passer à travers un capuchon dans lequel il ne rentre pas."
     },
     "tightPack": {
-      "title": "Tight Pack",
-      "goal": "Bank {{n}}+ charge across two systems with nothing spilled past a cap."
+      "title": "Groupe serré",
+      "goal": "{{n}}bancaire + frais répartis sur deux systèmes, sans aucun dépassement du plafond fixé."
     },
     "oddPlate": {
-      "title": "Odd Plate",
-      "goal": "Raise {{n}}+ shield reading odd, with the engines reading even."
+      "title": "Plaque impaire",
+      "goal": "Le bouclier de l'{{n}}+ affiche une valeur impaire, tandis que les moteurs affichent une valeur paire."
     },
     "redOnly": {
-      "title": "Red Only",
-      "goal": "Deal {{n}}+ with a red die in Weapon A, and Burn has to land."
+      "title": "Uniquement en rouge",
+      "goal": "Distribuez {{n}} ou plus avec un dé rouge dans l’arme A, et « Brûler » doit se déclencher."
     },
     "perfectSeal": {
-      "title": "Perfect Seal",
-      "goal": "One reading only: {{n}}+ damage, every die placed, Weapons odd, Shields and the core even."
+      "title": "Étanchéité parfaite",
+      "goal": "Une seule lecture : {{n}}+ dégâts, chaque dé placé, les armes sur les cases impaires, les boucliers et le noyau sur les cases paires."
     },
     "firstLight": {
-      "title": "First Light",
-      "goal": "Mark first, then put {{n}}+ into what the sensors found."
+      "title": "Première lumière",
+      "goal": "Commencez par marquer, puis ajoutez « {{n}}+ » aux résultats détectés par les capteurs."
     },
     "coldStart": {
-      "title": "Cold Start",
-      "goal": "Shields up first, then {{n}}+ charge into a cold core."
+      "title": "Démarrage à froid",
+      "goal": "Activer d'abord les boucliers, puis lancer «{{n}}» et charger vers un noyau froid."
     },
     "braceGate": {
-      "title": "Brace Gate",
-      "goal": "Mark, brace for {{n}}+ shield, and leave the reactor unflooded."
+      "title": "Affaire « Brace Gate »",
+      "goal": "Mark, prépare-toi à utiliser « {{n}}» + « shield », et veille à ce que le réacteur ne soit pas inondé."
     },
     "siegeLine": {
-      "title": "Siege Line",
-      "goal": "Jam the spinal on purpose, carry {{n}}+ on the mounts, and hold the core."
+      "title": "Ligne de siège",
+      "goal": "Bloquez volontairement la colonne vertébrale, maintenez une force de plus d'{{n}} sur les points d'ancrage et maintenez le centre de gravité."
     },
     "markedBurn": {
-      "title": "Marked Burn",
-      "goal": "Mark, jam the spinal, and still land {{n}}+ on the mount."
+      "title": "Brûlure marquée",
+      "goal": "Mark, bloque la colonne vertébrale, et réussis quand même un « {{n}}+ » en position de montée."
     },
     "dryDock": {
-      "title": "Dry Dock",
-      "goal": "Shields, then {{n}}+ charge, and not one point over the cap."
+      "title": "Cale sèche",
+      "goal": "Des « Shields », puis une charge d'{{n}}, sans dépasser d'un seul point le plafond."
     },
     "theWholeChain": {
-      "title": "The Whole Chain",
-      "goal": "Mark, bank without flooding, and finish on {{n}}+ — one pass, no rerolls."
+      "title": "Toute la chaîne",
+      "goal": "Marquez un point, effectuez un virage sans sortir de la piste, puis terminez sur {{n}}+ — un seul passage, pas de relance."
     },
     "ironBank": {
       "title": "Iron Bank",
-      "goal": "Three turns, one core: bank {{n}}+ without ever spilling."
+      "goal": "Trois virages, un seul noyau : enchaînez les « bank {{n}}» sans jamais perdre l'équilibre."
     },
     "twinFuse": {
-      "title": "Twin Fuse",
-      "goal": "The first die sits out turn one. Still reach {{n}}+ across the two."
+      "title": "Double fusible",
+      "goal": "Le premier dé ne participe pas au premier tour. On atteint tout de même {{n}}+ avec les deux."
     },
     "longWall": {
       "title": "Long Wall",
-      "goal": "Only the last turn counts. End on {{n}}+ shield — hold a die back for it."
+      "goal": "Seul le dernier tour compte. Terminez sur « {{n}}» + bouclier — gardez un dé en réserve pour cela."
     },
     "slowFuse": {
-      "title": "Slow Fuse",
-      "goal": "The first die sits out turn one. Burn and mounts must still total {{n}}+."
+      "title": "Mèche lente",
+      "goal": "Le premier dé ne participe pas au premier tour. Le total des dégâts et des montures doit tout de même être d’{{n}} ou plus."
     },
     "reactorRun": {
-      "title": "Reactor Run",
-      "goal": "The first die sits out turn one, and there are no rerolls. Bank {{n}}+."
+      "title": "Fonctionnement du réacteur",
+      "goal": "Le premier dé ne participe pas au premier tour, et il n'y a pas de relances. Banque {{n}}+."
     },
     "theLongCount": {
-      "title": "The Long Count",
-      "goal": "Three turns, no rerolls, the first die held back — and {{n}}+ banked at the end."
+      "title": "Le Compte long",
+      "goal": "Trois tours, pas de relances, le premier dé mis de côté… et « {{n}} » + a été marqué en fin de partie."
     },
     "ledger": {
-      "title": "The Ledger",
-      "goal": "Fixed reading — every die booked, Shields reading even, {{n}}+ damage on the line."
+      "title": "Le Ledger",
+      "goal": "Lecture fixe — tous les dés lancés, lecture « Shields » paire, {{n}}+ dégâts sur la ligne."
     },
     "crossWire": {
       "title": "Cross-Wire",
-      "goal": "Fixed reading — damage, shield and {{n}}+ charge out of one routing."
+      "goal": "Lecture fixe — dégâts, bouclier et «{{n}}» + charge à la suite d’une mise en déroute."
     },
     "mirrorRead": {
-      "title": "Mirror Read",
-      "goal": "Fixed reading — {{n}}+ damage with Burn landed. Only one way round."
+      "title": "Lecture en miroir",
+      "goal": "Correction : « {{n}}» + dégâts infligés par « Burn ». Il n'y a qu'une seule façon de procéder."
     },
     "theSeal": {
-      "title": "The Seal",
-      "goal": "Fixed reading — {{n}}+ damage, Shields reading even, nothing spilled past a cap."
+      "title": "Le sceau",
+      "goal": "Valeur fixe — {{n}}+ dégâts, valeurs des boucliers équilibrées, rien ne dépasse le plafond."
     },
     "hullCheck": {
-      "title": "Hull Check",
-      "goal": "Take the volley and still stand on {{n}}+ shield."
+      "title": "Coque Vérifier",
+      "goal": "Encaisser la volée tout en restant sur un bouclier « {{n}}+ »."
     },
     "lastLight": {
-      "title": "Last Light",
-      "goal": "Survive the volley with {{n}}+ charge still in the core."
+      "title": "Dernière lueur",
+      "goal": "Survivre à la salve tout en conservant la charge « {{n}} » dans le noyau."
     },
     "stormFront": {
-      "title": "Storm Front",
-      "goal": "Survive the volley and answer it with {{n}}+ damage in the same turn."
+      "title": "Front orageux",
+      "goal": "Résistez à cette salve et ripostez en infligeant au moins {{n}} de dégâts au cours du même tour."
     },
     "theVigil": {
-      "title": "The Vigil",
-      "goal": "One reading, no board changes: take the heaviest volley in the sector and still hold {{n}}+ charge."
+      "title": "La veillée",
+      "goal": "Une seule lecture, aucun changement sur le plateau : encaisser la salve la plus puissante du secteur tout en conservant une charge d'{{n}}+."
     }
   },
   "bark": {
@@ -2631,209 +2751,249 @@
   "modules": {
     "magnetScoop": {
       "name": "Cuillère magnétique",
-      "desc": "+2 ferraille au début de chaque combat."
+      "desc": "Chaque nœud que vous franchissez vous rapporte 2 morceaux de ferraille, et chaque combat remporté vous en rapporte 3 supplémentaires."
     },
     "grapple": {
       "name": "Crochet d'ancrage",
-      "desc": "+3 de ferraille pour chaque ennemi que vous éliminez."
+      "desc": "+3 de ferraille pour chaque ennemi que vous éliminez, et 8 de ferraille supplémentaires si vous remportez la bataille avant la fin du tour 3."
     },
     "lotteryBlock": {
       "name": "Bloc de loterie",
-      "desc": "Dans chaque boutique, le premier relancer est gratuit."
+      "desc": "Le premier relancer dans chaque boutique est gratuit, et chaque troisième nœud dans lequel vous entrez rapporte 12 débris."
     },
     "trainingModule": {
       "name": "Module de formation",
-      "desc": "+20 % d'XP grâce à cette course."
+      "desc": "+20 % d'XP, et après 4 nœuds, l'équipage aguerri ajoute 1 relance à chaque combat."
     },
     "assayRig": {
       "name": "Banc d'essai",
-      "desc": "Toute face « max » rapporte 2 scrap."
+      "desc": "Une face maximale obtenue avec l'arme A rapporte 5 ferrailles."
     },
     "brokerLink": {
       "name": "Lien vers le courtier",
-      "desc": "Prix en magasin : -12 %."
+      "desc": "Prix en boutique : −16 %, mais le réseau d'antennes consomme 3 points de coque au maximum."
     },
     "slagPress": {
       "name": "Presse à scories",
-      "desc": "Tout visage « min » rapporte 3 scrap."
+      "desc": "Un dé placé dans l'arme B, face inférieure vers le haut, est augmenté jusqu'à 4 et rapporte 3 ferrailles."
     },
     "tithePlate": {
       "name": "Assiette de la dîme",
-      "desc": "+25 % de ferraille provenant de toutes les sources."
+      "desc": "+25 % de ferraille provenant de toutes les sources, et 2 unités de ferraille au début du combat pour chaque objet [ferraille] que vous possédez."
     },
     "salvageArm": {
       "name": "Bras de récupération",
-      "desc": "Chaque dé non placé rapporte 1 déchet."
+      "desc": "Chaque bataille remportée vous rapporte une épave ; à partir de la cinquième épave, chaque nœud dans lequel vous entrez vous rapporte 4 morceaux de ferraille."
     },
     "auditCore": {
       "name": "Noyau d'audit",
-      "desc": "+6 de ferraille au début du combat ; boutiques : −5 %."
+      "desc": "+4 ferraille au début de chaque combat, et 8 de plus une fois que le réacteur est passé à la version Mk2."
     },
     "mirrorPlate": {
       "name": "Métallisation miroir",
-      "desc": "Un coup esquivé renvoie les dégâts à son adversaire."
+      "desc": "Chaque dé de « défense avec bouclier » résolu inflige 6 points de dégâts à l'adversaire à la fin du tour."
     },
     "ballastModule": {
-      "name": "Lest",
-      "desc": "Coque +4."
+      "name": "Réservoirs de ballast",
+      "desc": "Coque +5 et des seuils de moteur un cran plus élevés ; chaque nœud que vous franchissez répare 1 point de coque."
     },
     "escapePod": {
       "name": "Capsule de sauvetage",
-      "desc": "Une fois par session, survivez à un coup mortel lorsque votre coque est à 1 point."
+      "desc": "Une fois par session, vous survivez à un coup mortel alors que votre coque est à 1 point, et toute bataille à laquelle vous participez avec une coque inférieure à 40 % commence avec 8 points de bouclier et un emplacement de réserve supplémentaire."
     },
     "heatsink": {
       "name": "Dissipateur thermique",
-      "desc": "Le premier débordement du réacteur à chaque combat n'entraîne aucune perte de coque."
+      "desc": "N'importe quel dé s'adapte au réacteur par son sommet pour 1 point de coque, et une face maximale placée dans les évents du réacteur permet de régénérer 3 points de bouclier."
     },
     "fieldStabilizer": {
       "name": "Stabilisateur de champ",
-      "desc": "La marée d'interférence est légèrement moins forte."
+      "desc": "Une marée d'interférence vous fait perdre un niveau de résistance, et un combat qui commence à la marée 3 ou plus vous offre un coup de pouce gratuit et 4 boucliers."
     },
     "ablativeWeave": {
       "name": "Tissage ablatif",
-      "desc": "+2 en défense pour chaque dé de défense."
+      "desc": "Les deux premiers dés obtenus en « Boucliers » lors de chaque combat ajoutent 5 boucliers chacun, à mesure que le tissu se consume."
     },
     "bulkheadRing": {
       "name": "Anneau de cloison",
-      "desc": "Coque +8 ; les seuils du moteur sont un cran plus élevés."
+      "desc": "Coque +8 et des seuils de moteur plus élevés d'un cran ; avec des boucliers de niveau Mk 2, chaque combat commence avec 6 points de bouclier, et au niveau Mk 3, la réserve contient un dé supplémentaire."
     },
     "dampingCoil": {
       "name": "Bobine d'amortissement",
-      "desc": "Récupère 3 points de coque après chaque combat."
+      "desc": "La bobine se déroule sur les trois spires suivantes, chacune d'entre elles se terminant par 3 blindages supplémentaires."
     },
     "hardpointClamp": {
       "name": "Pince de fixation Hardpoint",
-      "desc": "Des seuils de moteur encore plus simples."
+      "desc": "Les seuils du moteur sont un peu plus faciles à atteindre, et dès que le support moteur atteint le niveau Mk 2, chaque dé lancé compte pour +3."
     },
     "voidLiner": {
       "name": "Void Liner",
-      "desc": "+3 au bouclier grâce aux dés de bouclier tant que la coque est en dessous de 40 %."
+      "desc": "+4 à chaque dé dans « Boucliers II », et tant que la coque est en dessous de 40 %, ajoutez également 4 à chaque dé dans « Boucliers »."
     },
     "siegeMount": {
       "name": "Mont de siège",
-      "desc": "+2 points de dégâts sur une arme de niveau maximal."
+      "desc": "+4 en « Armes A » à partir du deuxième tour."
     },
     "piercer": {
       "name": "Pierceur",
-      "desc": "Le premier coup de chaque combat ignore les boucliers."
+      "desc": "Le premier coup porté à chaque combat ignore les boucliers, et la technique « Spinal Mount » inflige 2 points de dégâts supplémentaires pour chaque objet « Pierce » que vous portez."
     },
     "emberInjector": {
       "name": "Injecteur Ember",
-      "desc": "La valeur maximale de « face » pour les armes correspond à « Burn 2 »."
+      "desc": "Chaque dé dont le résultat est déterminé dans la section « Armes B » inflige 2 points de brûlure."
     },
     "railCradle": {
       "name": "Support de rail",
-      "desc": "+3 au niveau de la fixation vertébrale."
+      "desc": "Le support spinal gagne +1, puis +5 au total une fois qu'il est remplacé par la version Mk II."
     },
     "targetingMesh": {
       "name": "Maillage de ciblage",
-      "desc": "Les marques infligent +2 points de dégâts supplémentaires."
+      "desc": "Les points rapportent +1, et la résolution des capteurs ajoute +2 au dé en attente dans la catégorie « Armes A »."
     },
     "overpressure": {
       "name": "Surpression",
-      "desc": "+3 en armes dès le premier tour."
+      "desc": "La première case résolue à chaque tour bénéficie d'un bonus de +4 s'il s'agit d'une arme ; vous relancez un dé de moins."
     },
     "ricochetHousing": {
       "name": "Logements Ricochet",
-      "desc": "L'« Overkill » des armes A se propage à l'ennemi suivant."
+      "desc": "L'effet « Overkill » se propage à l'ennemi suivant, et une attaque de niveau maximal de l'arme B inflige 5 points de dégâts par ricochet à la fin du tour suivant."
     },
     "splinterHead": {
       "name": "Tête d'écharde",
-      "desc": "+3 en armes sur une face minimale."
+      "desc": "Si le résultat du jet d'une arme est inférieur à 4, celle-ci inflige 1 point de dégâts supplémentaire pour chaque objet « Essaim » que vous portez."
     },
     "lanceCapacitor": {
       "name": "Condensateur Lance",
-      "desc": "+2 en armes si le résultat est égal ou supérieur à 7."
+      "desc": "Chaque dé d'arme dont le résultat est de 6 ou plus et qui dispose d'une réserve de charge utilise 6 points de cette réserve pour obtenir un bonus de +5."
     },
     "executioner": {
       "name": "Bourreau",
-      "desc": "+3 en puissance de tir lorsque la santé de la coque est inférieure à 30 %."
+      "desc": "Dès que l'arme A atteint le niveau Mk II, elle inflige des coups critiques ; au niveau Mk III, chaque tir de cette arme ajoute 4 points de dégâts."
     },
     "solenoid": {
       "name": "Solénoïde",
-      "desc": "Un relancer supplémentaire à chaque tour."
+      "desc": "Un relancer supplémentaire à chaque tour, et un dé dont le résultat est inférieur à 4 pour l'arme B est relancé une fois."
     },
     "gyroStabilizer": {
       "name": "Stabilisateur gyroscopique",
-      "desc": "Réservez +1 dé."
+      "desc": "Réservez +1 dé, puis +1 dé supplémentaire dès que les moteurs sont de type Mk2."
     },
     "recycler": {
       "name": "Recycleur",
-      "desc": "Chaque dé non placé stocke 1 charge."
+      "desc": "À la fin de chaque tour, il fait fondre tous les dés temporaires, lance un nouveau d4 gris dans le bac et rapporte 2 déchets."
     },
     "resonator": {
       "name": "Résonateur",
-      "desc": "+2 points de charge au début du combat pour chaque série de quatre terminée."
+      "desc": "+2 de charge au début du combat pour chaque série de quatre terminée, 2 charges supplémentaires à chacun des trois tours suivants, et +2 à chaque dé tant que vous disposez d'au moins 8 charges."
     },
     "nudgeGovernor": {
       "name": "Régulateur de poussée",
-      "desc": "Les « nudges » coûtent 1 point de charge en moins."
+      "desc": "Les « nudges » coûtent 1 point de charge en moins, mais le plafond de charge diminue de 1."
     },
     "wideGrip": {
       "name": "Prise large",
-      "desc": "Relancez un dé à la fois."
+      "desc": "Relancez un dé à la fois ; avec trois éléments marqués « relance », chaque combat ajoute un dé supplémentaire par relance et une relance supplémentaire."
     },
     "capacitorBank": {
       "name": "Banc de condensateurs",
-      "desc": "Limite de charge +3."
+      "desc": "Limite de charge +3 ; si un combat se termine avec au moins 3 points de charge, 3 d'entre eux sont conservés, et la réserve restitue ces 3 points au début du combat suivant."
     },
     "primerCoil": {
       "name": "Bobine d'amorçage",
-      "desc": "+2 dans le réacteur."
-    },
-    "blueBallast": {
-      "name": "Blue Ballast",
-      "desc": "Mettez de côté un dé bleu supplémentaire."
+      "desc": "Un dé dont la face la plus haute est « Sensors » active le prochain dé rouge du tour, lui conférant un bonus de +3."
     },
     "growthTrellis": {
       "name": "Treillis de croissance",
-      "desc": "Les dés qui grandissent montent d'un cran."
+      "desc": "Les dés qui augmentent de valeur montent d'un cran, et un dé dont la face la plus élevée est prise en compte dans « Engines » augmente d'un point supplémentaire, jusqu'à 3."
     },
     "echoBuffer": {
       "name": "Echo Mémoire tampon",
-      "desc": "+2 points de charge lorsqu'un dé affiche le même résultat que lors du tour précédent."
+      "desc": "Un dé dont la valeur correspond à celle du tour précédent stocke 2 unités de charge, et un dé résolu dans le réacteur confère 3 unités de charge supplémentaires au tour suivant."
     },
     "seedVault": {
       "name": "Banque de semences",
-      "desc": "+2 grâce aux dés verts dans les moteurs."
+      "desc": "Un d4 vert temporaire et un d4 gris sont placés sur le plateau pendant les trois premiers tours de chaque combat."
     },
     "jamBreaker": {
       "name": "Désembouteilleur",
-      "desc": "Votre bonus vous protège contre 2 attaques ennemies supplémentaires."
+      "desc": "Votre « jam » vous protège contre deux attaques ennemies supplémentaires, et avec des capteurs de niveau Mk2 ou supérieur, chaque combat commence avec un emplacement de réserve supplémentaire."
     },
     "entropySink": {
       "name": "Puits d'entropie",
-      "desc": "Tout visage « min » stocke 2 charges."
+      "desc": "Limite de charge +2, et si le réacteur est de niveau Mk2 ou supérieur, chaque face minimale stocke 3 charges."
     },
     "paradoxLoop": {
       "name": "Boucle paradoxale",
-      "desc": "Une valeur maximale pour les armes permet de résoudre l'emplacement deux fois."
+      "desc": "L'arme A est résolue deux fois sur une face « max » ; l'arme B est résolue deux fois sur une face « min »."
     },
     "blackLedger": {
       "name": "Le Grand Livre noir",
-      "desc": "+3 grâce aux dés noirs dans les armes."
+      "desc": "Chaque nœud verse 3 scrap à crédit ; au sixième nœud, le registre encaisse 4 hull et ouvre une nouvelle page."
     },
     "prismLens": {
       "name": "Lentille prismatique",
-      "desc": "+1 à chaque dé au premier tour."
+      "desc": "Chaque dé dont la face la plus petite est apparue est relancé."
     },
     "hushAntenna": {
       "name": "Antenne Hush",
-      "desc": "+2 au niveau des capteurs."
+      "desc": "Si vous terminez un tour sans avoir accumulé de charge, l'antenne restitue discrètement 3 points de charge."
     },
     "coldLogicCore": {
       "name": "Noyau « Cold Logic »",
-      "desc": "Les « nudges » sont gratuits ; les coups critiques ne se produisent plus."
+      "desc": "Les « nudges » coûtent 2 points de charge en moins et chaque combat commence avec 2 « nudges » gratuits ; les coups critiques ne se déclenchent jamais."
     },
     "gamblersChip": {
       "name": "Jeton de jeu",
-      "desc": "Toute face « max » rapporte 1 charge et 1 débris."
+      "desc": "Une face « max » rapporte 2 ferrailles pour chaque objet [risque] que vous possédez et permet de relancer un autre dé au hasard."
+    },
+    "bufferCells": {
+      "name": "Cellules tampons",
+      "desc": "Coque −3, mais chaque combat commence avec 6 points de bouclier."
+    },
+    "citadelCore": {
+      "name": "Noyau de la Citadelle",
+      "desc": "Tout dé peut être monté sur un support de bouclier au-dessus de son capuchon sans endommager la coque ; chaque combat commence avec 2 points de bouclier par objet « Mur de boucliers » que vous transportez, et tant que vous possédez 12 points de bouclier ou plus, chaque dé résolu sur un support de bouclier répare 3 points de coque."
+    },
+    "ratchetFeed": {
+      "name": "Alimentation à cliquet",
+      "desc": "Un dé lancé dans l'arme A à un résultat inférieur à 3 passe à 3."
+    },
+    "bondedVault": {
+      "name": "Chambre forte sous douane",
+      "desc": "+2 au plafond de charges, et 1 charge au début du combat pour chaque objet [ferraille] que vous possédez."
+    },
+    "foundryCore": {
+      "name": "Noyau de fonderie",
+      "desc": "+30 % sur la ferraille et les prix en boutique −12 % ; chaque combat commence avec un d6 jaune « frappé » qui dure 3 tours, et avec un deuxième si vous possédez au moins 5 objets [ferraille]."
+    },
+    "gunCamera": {
+      "name": "Caméra de canon",
+      "desc": "Le système enregistre chaque nœud que vous franchissez : les armes gagnent +2 après 6 nœuds et +4 après 14."
+    },
+    "autoloader": {
+      "name": "Tableau d'autochargeurs",
+      "desc": "À chaque combat, un dé6 rouge supplémentaire vient s'ajouter à votre plateau, et chaque troisième emplacement d'arme résolu vous en rapporte un autre pour le tour suivant."
+    },
+    "prophecyMount": {
+      "name": "Le Mont de la Prophétie",
+      "desc": "Une face maximale sur l'arme A fait passer le prochain dé gris de ce tour à sa face la plus élevée."
+    },
+    "phantomBay": {
+      "name": "Phantom Bay",
+      "desc": "À la fin de chaque tour, un d4 gris fantôme apparaît dans le plateau et reste là pendant un tour."
+    },
+    "delayLine": {
+      "name": "Ligne à retard",
+      "desc": "Un effet « max » de l'arme B se déclenche en retard : 3 points de dégâts par objet [spike] que vous possédez sont infligés à la fin du tour suivant."
+    },
+    "nonEuclidRack": {
+      "name": "Rack non euclidien",
+      "desc": "Chaque emplacement accepte un dé de n'importe quel niveau, à raison d'un point de coque à chaque fois qu'il est résolu ; limite de charge : −3."
     }
   },
   "engravings": {
     "sting": {
       "name": "Sting",
-      "desc": "+1 point de dégâts sur une arme de niveau maximal."
+      "desc": "+1 pour un bonus maximal aux attaques avec des armes."
     },
     "frost": {
       "name": "Gel",
@@ -2845,7 +3005,7 @@
     },
     "echo": {
       "name": "Echo",
-      "desc": "En reproduisant la valeur du tour précédent, on stocke 1 charge."
+      "desc": "En reprenant la valeur du tour précédent, on stocke 1 charge et on ajoute +1."
     },
     "anchor": {
       "name": "Ancre",
@@ -2857,7 +3017,7 @@
     },
     "flame": {
       "name": "Flamme",
-      "desc": "Une valeur maximale de « face » dans les armes confère 1 point de brûlure."
+      "desc": "Le premier dé d'arme de chaque tour ajoute 2 points de brûlure."
     },
     "edge": {
       "name": "Edge",
@@ -2877,7 +3037,7 @@
     },
     "spark": {
       "name": "Spark",
-      "desc": "Si l'on obtient un 1 au dé, on accumule 2 points de charge."
+      "desc": "Un résultat de 1 au dé correspond à une charge de 2 et le dé est réglé sur 2."
     },
     "keel": {
       "name": "Quille",
@@ -2889,7 +3049,7 @@
     },
     "bastion": {
       "name": "Bastion",
-      "desc": "+1 en boucliers."
+      "desc": "Si vous avez 6 boucliers ou plus, vous gagnez 2 boucliers."
     },
     "hunger": {
       "name": "La faim",
@@ -2897,11 +3057,11 @@
     },
     "ash": {
       "name": "Cendre",
-      "desc": "Un visage « min » rapporte 2 ferrailles."
+      "desc": "Une face « min » rapporte 2 ferrailles et ajoute « Brûlure 1 »."
     },
     "surf": {
       "name": "Surf",
-      "desc": "+1 au premier tour."
+      "desc": "Au premier tour, les moteurs : +3 et 2 de bouclier."
     },
     "lastLight": {
       "name": "Dernière lueur",
@@ -2909,7 +3069,7 @@
     },
     "weight": {
       "name": "Poids",
-      "desc": "Toute valeur inférieure à 3 est considérée comme égale à 3."
+      "desc": "Une fois placée, toute valeur inférieure à 3 passe à 3, au prix d'un point de coque."
     },
     "crown": {
       "name": "Couronne",
@@ -2925,11 +3085,11 @@
     },
     "rime": {
       "name": "Rime",
-      "desc": "+2 de bouclier chaque fois qu'il occupe un emplacement de bouclier."
+      "desc": "+2 de bouclier chaque fois qu'il occupe un emplacement de bouclier ; si vous possédez 8 boucliers ou plus, vous en gagnez 1 supplémentaire à la fin de votre tour."
     },
     "loam": {
       "name": "Terreau",
-      "desc": "+2 dans la catégorie « moteurs »."
+      "desc": "À chaque fois qu'il alimente les moteurs, il gagne +1, jusqu'à +3."
     },
     "cinder": {
       "name": "Cendrillon",
@@ -2937,7 +3097,7 @@
     },
     "mint": {
       "name": "Menthe",
-      "desc": "Une face « max » rapporte 3 scrap."
+      "desc": "Un « max face » rapporte 3 scrap ; une bataille remportée rapporte 5 de plus."
     },
     "wick": {
       "name": "Mèche",
@@ -2945,51 +3105,91 @@
     },
     "pin": {
       "name": "Épingler",
-      "desc": "+2 au niveau des capteurs."
+      "desc": "Dans les capteurs, toute valeur inférieure à 5 est considérée comme égale à 5 ; une face « max » stocke alors 2 charges."
     },
     "drum": {
       "name": "Tambour",
-      "desc": "+2 de charge à chaque fois qu'il remplit le réacteur."
+      "desc": "Remplir le réacteur permet d'accumuler 2 charges et de frapper sur le tambour ; à partir du troisième coup, 2 charges supplémentaires sont accordées à la fin du tour."
     },
     "scale": {
       "name": "Échelle",
-      "desc": "Un bouclier à valeur maximale restaure 1 point de coque."
+      "desc": "Un « max face » dans les boucliers restaure 1 point de coque et confère 2 points de bouclier."
     },
     "beaconRune": {
       "name": "Balise",
-      "desc": "+1 pour les deux premiers tours."
+      "desc": "En utilisant des capteurs, vous obtenez un bonus de +3 à votre prochain dé rouge."
     },
     "rust": {
       "name": "Rouille",
-      "desc": "+2 en armes si le résultat est égal ou supérieur à 8."
+      "desc": "Un nombre d'armes égal ou supérieur à 8 peut dépasser la limite d'emplacements autorisée pour une coque."
     },
     "salt": {
       "name": "Sel",
-      "desc": "Un « max face » confère 1 bouclier."
+      "desc": "Une attaque « max face » confère 2 points de bouclier et inflige 1 point de corrosion à la coque."
     },
     "glimmer": {
       "name": "Lueur",
-      "desc": "Si le résultat du jet est inférieur ou égal à 2, on accumule 1 charge."
+      "desc": "En le plaçant sous 3 magasins, il consomme 1 charge et rapporte 1 ferraille."
     },
     "sinew": {
       "name": "Tendon",
-      "desc": "4 moteurs ou plus confèrent 1 bouclier."
+      "desc": "4 moteurs ou plus confèrent 1 bouclier et 1 charge."
     },
     "cipher": {
       "name": "Chiffrement",
-      "desc": "Si vous reproduisez la valeur du tour précédent, vous gagnez 4 ferrailles."
+      "desc": "Si vous reproduisez la valeur du tour précédent, vous gagnez 4 ferraille et stockez 1 charge."
     },
     "brand": {
       "name": "Marque",
-      "desc": "+2 aux dés rouges pour les armes."
+      "desc": "+3 en armes pour un dé rouge, +1 pour tout autre dé."
     },
     "tidepool": {
       "name": "Marisage",
-      "desc": "Un visage « min » sur les boucliers confère 3 points de bouclier."
+      "desc": "Un minimum de faces « bouclier » confère 3 points de bouclier ; tant que la « marée d'interférence » est égale ou supérieure à 2, 2 points de bouclier supplémentaires sont accordés à la fin du tour."
     },
     "voidmark": {
       "name": "Voidmark",
-      "desc": "Une face « min » dans le réacteur stocke 3 points de charge."
+      "desc": "Une face « min » dans le réacteur stocke 3 unités de charge ; tant que vous détenez 8 unités de charge ou plus, elle gagne également +2 à cet endroit."
+    },
+    "pyre": {
+      "name": "Pyre",
+      "desc": "Au niveau des armes, cela ajoute « Brûlure 1 » et confère un bonus de +2 tant que vous possédez au moins 2 objets [Brûlure]."
+    },
+    "swarmMark": {
+      "name": "Marque « Swarm »",
+      "desc": "En matière d'armes : +2 tant que vous possédez au moins 3 objets [Essaim], et une attaque maximale inflige 1 point de dégâts supplémentaire par objet [Essaim] que vous possédez."
+    },
+    "seventhFace": {
+      "name": "Septième visage",
+      "desc": "Le dé dispose désormais d'un septième résultat sur sa face la plus élevée : la première face « max » de chaque tour se résout une deuxième fois."
+    },
+    "mirrorFace": {
+      "name": "Visage en miroir",
+      "desc": "Le dé gagne un septième résultat sur sa face la plus élevée : lors d'un jet maximal, votre dé le plus faible gagne +3 et vous accumulez 1 charge."
+    },
+    "sleeve": {
+      "name": "Manchon",
+      "desc": "Si vous possédez au moins 2 objets [Reroll], chaque combat commence avec un reroll supplémentaire."
+    },
+    "tuningFork": {
+      "name": "Diapason",
+      "desc": "+2 tant que vous disposez d'au moins 5 charges ; lorsque vous le posez, il stocke 1 charge si vous possédez au moins 2 objets [Charge]."
+    },
+    "tickMark": {
+      "name": "Coche",
+      "desc": "Une fois placé dans le réacteur, il programme 3 charges et 2 boucliers pour le prochain tour."
+    },
+    "ledgerMark": {
+      "name": "Marque de registre",
+      "desc": "Dans la catégorie « Capteurs », elle rapporte 2 ferraille et confère un bonus de +3 tant que vous possédez au moins 2 objets [Ferraille]."
+    },
+    "glacis": {
+      "name": "Glacis",
+      "desc": "+3 en boucliers tant que vous possédez au moins 2 objets [Mur de boucliers] ; tant que vous détenez au moins 6 boucliers, vous récupérez 1 point de coque à la fin du tour."
+    },
+    "lifeline": {
+      "name": "Ligne de secours",
+      "desc": "Dans l'atelier de réparation, il restaure 2 points de coque et confère 2 points de bouclier."
     }
   },
   "fate": {

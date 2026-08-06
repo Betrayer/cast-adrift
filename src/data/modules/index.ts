@@ -22,11 +22,14 @@ export const MODULE_BY_ID: ReadonlyMap<string, ModuleDef> = new Map(
   ALL_MODULES.map((def) => [def.id, def]),
 );
 
+const idsOfRarity = (rarity: Rarity): readonly string[] =>
+  ALL_MODULES.filter((m) => m.rarity === rarity).map((m) => m.id);
+
 export const MODULE_POOL: Record<Rarity, readonly string[]> = {
-  common: ALL_MODULES.filter((m) => m.rarity === "common").map((m) => m.id),
-  uncommon: ALL_MODULES.filter((m) => m.rarity === "uncommon").map((m) => m.id),
-  rare: ALL_MODULES.filter((m) => m.rarity === "rare").map((m) => m.id),
-  legendary: [],
+  common: idsOfRarity("common"),
+  uncommon: idsOfRarity("uncommon"),
+  rare: idsOfRarity("rare"),
+  legendary: idsOfRarity("legendary"),
 };
 
 export const moduleDef = (id: string): ModuleDef | undefined =>

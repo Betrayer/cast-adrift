@@ -8,7 +8,12 @@ import {
   socketsForDie,
 } from "@/data/engravings";
 import { fateOutcomeFor, FATE_TABLE } from "@/data/fate";
-import { ALL_MODULES, moduleSlots, MODULE_BY_ID } from "@/data/modules";
+import {
+  ALL_MODULES,
+  moduleSlots,
+  MODULE_BY_ID,
+  MODULE_POOL,
+} from "@/data/modules";
 import { moduleTags } from "@/data/modules/types";
 import { ALL_PERKS } from "@/data/perks";
 import type { ContentTag } from "@/data/tags";
@@ -21,9 +26,13 @@ import { ENEMY_BY_ID } from "@/data/enemies";
 
 describe("modules", () => {
   it("aggregates mods across installed modules", () => {
+    const hull = MODULE_BY_ID.get("ballastModule")?.mods?.hullMaxDelta ?? 0;
+    const charge = MODULE_BY_ID.get("capacitorBank")?.mods?.chargeCapDelta ?? 0;
+    expect(hull).toBeGreaterThan(0);
+    expect(charge).toBeGreaterThan(0);
     const mods = computeModuleMods(["ballastModule", "capacitorBank"]);
-    expect(mods.hullMaxDelta).toBe(4);
-    expect(mods.chargeCapDelta).toBe(3);
+    expect(mods.hullMaxDelta).toBe(hull);
+    expect(mods.chargeCapDelta).toBe(charge);
   });
 
   it("reads traits off installed modules", () => {
@@ -37,11 +46,21 @@ describe("modules", () => {
     expect(moduleSlots(9)).toBe(3);
   });
 
-  it("prices every module inside the DESIGN §9.3 band", () => {
+  it("prices every module inside its DESIGN §9.3 band", () => {
     for (const def of ALL_MODULES) {
-      expect(def.price).toBeGreaterThanOrEqual(40);
-      expect(def.price).toBeLessThanOrEqual(90);
+      const [low, high] = def.rarity === "legendary" ? [95, 140] : [40, 90];
+      expect(def.price).toBeGreaterThanOrEqual(low);
+      expect(def.price).toBeLessThanOrEqual(high);
     }
+  });
+
+  it("stocks a legendary pool the drop table can actually reach", () => {
+    const legendaries = ALL_MODULES.filter((m) => m.rarity === "legendary");
+    expect(legendaries.length).toBeGreaterThanOrEqual(4);
+    expect([...MODULE_POOL.legendary].sort()).toEqual(
+      legendaries.map((m) => m.id).sort(),
+    );
+    expect(new Set(legendaries.map((m) => m.tag)).size).toBe(legendaries.length);
   });
 
   it("never offers a module the ship already carries", () => {

@@ -3,9 +3,22 @@ import { join } from "node:path";
 import process from "node:process";
 import { ASCENSIONS, MAX_ASCENSION } from "../src/data/ascension";
 import { BARKS, BARK_QUOTA } from "../src/data/barks";
-import { ENGRAVINGS } from "../src/data/engravings";
+import {
+  ENGRAVINGS,
+  ENGRAVING_BY_ID,
+  ENGRAVING_PAIRS,
+} from "../src/data/engravings";
 import { FATE_TABLE } from "../src/data/fate";
-import { ALL_MODULES } from "../src/data/modules";
+import { ALL_MODULES, MODULE_POOL } from "../src/data/modules";
+import {
+  isConditional,
+  isSingleScalar,
+  normalizedBody,
+  referencedTagsOf,
+  tagConditionedEffects,
+  usesModuleVocabulary,
+  type ShapedContent,
+} from "../src/data/contentShape";
 import { FRAGMENTS } from "../src/data/narrative/fragments";
 import { KEEPER_LINES } from "../src/data/narrative/keeperLines";
 import { CHART_ADJACENCY, CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
@@ -13,7 +26,7 @@ import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
 import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
-import { ALL_DICE, DIE_BY_ID } from "../src/data/dice";
+import { ALL_DICE, BASIC_DICE, DIE_BY_ID } from "../src/data/dice";
 import { resolveFaces } from "../src/game/puzzles/evaluate";
 import { createStream } from "../src/services/rng";
 import {
@@ -36,7 +49,7 @@ import {
   SUBJECT_CONDS as SUBJECT_COND_NAMES,
   SUBJECT_HOOKS,
 } from "../src/game/effects/types";
-import { CONTENT_TAGS, isContentTag } from "../src/data/tags";
+import { CONTENT_TAGS, SCHOOL_TAGS, isContentTag } from "../src/data/tags";
 import { moduleTags } from "../src/data/modules/types";
 import { calibrationIssues } from "../src/game/puzzles/difficulty";
 import { PUZZLE_CODEX, rewardFor } from "../src/game/puzzles/stakes";
@@ -104,32 +117,16 @@ const needsSubjectDie = (action: Action): boolean => {
 
 const PENDING_VOCABULARY: Readonly<Record<string, string>> = {
   rollStart: "R6",
-  place: "R5",
-  turnEnd: "R5",
   enemyTurnEnd: "R6",
   eventOutcome: "R7",
   shopEnter: "R8",
-  any: "R5",
-  not: "R5",
-  firstOfTurn: "R5",
-  chargeAtLeast: "R5",
-  shieldAtLeast: "R5",
-  counterAtLeast: "R5",
   enemyHpPctLt: "R6",
   enemyShielded: "R6",
   enemyHasStatus: "R6",
   enemyCountAtLeast: "R6",
   targetIsBossOrMini: "R6",
-  hasTag: "R5",
-  countTag: "R5",
   flag: "R7",
-  rerollDie: "R5",
-  counter: "R5",
-  schedule: "R5",
-  addTempDie: "R5",
-  removeTempDie: "R5",
   setFlag: "R7",
-  overcap: "R5",
 };
 
 const content = enContent as unknown as ContentNode;
@@ -403,7 +400,7 @@ checkUniqueIds(
   ALL_PERKS.map((p) => p.id),
 );
 
-const PERK_TOTAL = 150;
+const PERK_TOTAL = 180;
 if (ALL_PERKS.length !== PERK_TOTAL) {
   errors.push(
     `perks: expected exactly ${String(PERK_TOTAL)}, found ${String(ALL_PERKS.length)}`,
@@ -725,11 +722,11 @@ for (const [trigger, quota] of Object.entries(BARK_QUOTA)) {
 
 // ── Phase 10: modules, engravings, fate, fragments, keeper lines ────────────
 
-const MODULE_TOTAL = 50;
-const ENGRAVING_TOTAL = 40;
+const MODULE_TOTAL = 60;
+const ENGRAVING_TOTAL = 50;
 const FRAGMENT_TOTAL = 80;
 const KEEPER_TOTAL = 40;
-const DICE_TOTAL = 70;
+const DICE_TOTAL = 90;
 const DOSSIER_TOTAL = 54;
 
 checkUniqueIds("modules", ALL_MODULES.map((m) => m.id));
@@ -769,7 +766,7 @@ for (const def of ALL_MODULES) {
   ) {
     errors.push(`modules: "${def.id}" is a no-op`);
   }
-  if (def.price < 40 || def.price > 90) {
+  if (def.rarity !== "legendary" && (def.price < 40 || def.price > 90)) {
     errors.push(
       `modules: "${def.id}" price ${String(def.price)} is outside the §9.3 band 40-90`,
     );
@@ -998,6 +995,231 @@ for (const locale of MACHINE_LOCALES) {
   }
 }
 
+// ── R5: depth gates ─────────────────────────────────────────────────────────
+
+const DEEP_PERK_PCT = 60;
+const TAG_REFERENCE_TARGET = 25;
+const RARE_TAG_CONSUMER_TARGET = 10;
+const MODULE_VOCABULARY_TARGET = 15;
+const LEGENDARY_MODULE_TARGET = 4;
+const ENGRAVING_SCALAR_PCT = 25;
+const STAT_STICK_CAP = 5;
+const ACTIVE_DIE_TARGET = 12;
+const LEGENDARY_PRICE = [95, 140] as const;
+
+const SCHOOL_TAG_SET = new Set<string>(SCHOOL_TAGS);
+const BASIC_DIE_IDS = new Set(BASIC_DICE.map((d) => d.id));
+
+const bodyOwners = new Map<string, string[]>();
+const noteBody = (kind: string, id: string, def: ShapedContent): void => {
+  const key = normalizedBody(def);
+  const list = bodyOwners.get(key);
+  if (list === undefined) bodyOwners.set(key, [`${kind}:${id}`]);
+  else list.push(`${kind}:${id}`);
+};
+
+for (const perk of ALL_PERKS) noteBody("perk", perk.id, perk);
+for (const def of ALL_MODULES) noteBody("module", def.id, def);
+
+for (const [, owners] of bodyOwners) {
+  if (owners.length > 1) {
+    errors.push(`dedupe: ${owners.join(" == ")} share one normalized body`);
+  }
+}
+
+const deepPerks = ALL_PERKS.filter(isConditional).length;
+const deepPct = (deepPerks / Math.max(1, ALL_PERKS.length)) * 100;
+if (deepPct < DEEP_PERK_PCT) {
+  errors.push(
+    `perks: ${deepPct.toFixed(1)}% are conditional or synergistic, target ${String(DEEP_PERK_PCT)}%`,
+  );
+}
+
+for (const perk of ALL_PERKS) {
+  if ((perk.tags ?? []).length === 0) {
+    errors.push(`perks: "${perk.id}" carries no tag`);
+  }
+  for (const tag of perk.tags ?? []) {
+    if (SCHOOL_TAG_SET.has(tag)) {
+      errors.push(
+        `perks: "${perk.id}" carries school tag "${tag}" — only dice carry school tags`,
+      );
+    }
+  }
+}
+
+for (const def of ALL_MODULES) {
+  for (const tag of def.tags ?? []) {
+    if (SCHOOL_TAG_SET.has(tag)) {
+      errors.push(
+        `modules: "${def.id}" carries school tag "${tag}" — only dice carry school tags`,
+      );
+    }
+  }
+}
+
+for (const def of ENGRAVINGS) {
+  if ((def.tags ?? []).length === 0) {
+    errors.push(`engravings: "${def.id}" carries no tag`);
+  }
+  for (const tag of def.tags ?? []) {
+    if (SCHOOL_TAG_SET.has(tag)) {
+      errors.push(
+        `engravings: "${def.id}" carries school tag "${tag}" — only dice carry school tags`,
+      );
+    }
+  }
+}
+
+for (const die of ALL_DICE) {
+  if (die.desc === undefined) errors.push(`dice: "${die.id}" has no diceDesc`);
+  for (const tag of die.tags ?? []) {
+    if (tag === die.school) {
+      errors.push(`dice: "${die.id}" repeats its own school in tags`);
+    }
+  }
+}
+
+const tagReferenceCount =
+  ALL_PERKS.filter((d) => tagConditionedEffects(d) > 0).length +
+  ALL_MODULES.filter((d) => tagConditionedEffects(d) > 0).length +
+  ALL_DICE.filter((d) => tagConditionedEffects(d) > 0).length +
+  ENGRAVINGS.filter((d) => tagConditionedEffects(d) > 0).length;
+if (tagReferenceCount < TAG_REFERENCE_TARGET) {
+  errors.push(
+    `tags: ${String(tagReferenceCount)} records carry a tag-conditioned effect, target ${String(TAG_REFERENCE_TARGET)}`,
+  );
+}
+
+const rareTagConsumers = ALL_PERKS.filter(
+  (perk) =>
+    perk.rarity === "rare" &&
+    referencedTagsOf(perk).some((tag) => (perk.synergy ?? []).includes(tag)),
+).length;
+if (rareTagConsumers < RARE_TAG_CONSUMER_TARGET) {
+  errors.push(
+    `tags: ${String(rareTagConsumers)} rares mechanically consume their own synergy tag, target ${String(RARE_TAG_CONSUMER_TARGET)}`,
+  );
+}
+
+const moduleVocabulary = ALL_MODULES.filter(usesModuleVocabulary);
+if (moduleVocabulary.length < MODULE_VOCABULARY_TARGET) {
+  errors.push(
+    `modules: ${String(moduleVocabulary.length)} use module-only vocabulary, target ${String(MODULE_VOCABULARY_TARGET)}`,
+  );
+}
+
+const legendaryModules = ALL_MODULES.filter((m) => m.rarity === "legendary");
+if (legendaryModules.length < LEGENDARY_MODULE_TARGET) {
+  errors.push(
+    `modules: legendary pool holds ${String(legendaryModules.length)}, target ${String(LEGENDARY_MODULE_TARGET)}`,
+  );
+}
+if (MODULE_POOL.legendary.length !== legendaryModules.length) {
+  errors.push(
+    `modules: MODULE_POOL.legendary holds ${String(MODULE_POOL.legendary.length)} of ${String(legendaryModules.length)} legendaries`,
+  );
+}
+for (const def of legendaryModules) {
+  if (def.price < LEGENDARY_PRICE[0] || def.price > LEGENDARY_PRICE[1]) {
+    errors.push(
+      `modules: legendary "${def.id}" price ${String(def.price)} is outside ${String(LEGENDARY_PRICE[0])}-${String(LEGENDARY_PRICE[1])}`,
+    );
+  }
+}
+
+const scalarEngravings = ENGRAVINGS.filter(isSingleScalar).length;
+const scalarPct = (scalarEngravings / Math.max(1, ENGRAVINGS.length)) * 100;
+if (scalarPct > ENGRAVING_SCALAR_PCT) {
+  errors.push(
+    `engravings: ${scalarPct.toFixed(1)}% are a single scalar shape, cap ${String(ENGRAVING_SCALAR_PCT)}%`,
+  );
+}
+
+for (const [a, b] of ENGRAVING_PAIRS) {
+  if (!ENGRAVING_BY_ID.has(a) || !ENGRAVING_BY_ID.has(b)) {
+    errors.push(`engravings: pair "${a}"+"${b}" names an unknown engraving`);
+  }
+}
+const ENGRAVING_PAIR_TARGET = 4;
+if (ENGRAVING_PAIRS.length < ENGRAVING_PAIR_TARGET) {
+  errors.push(
+    `engravings: ${String(ENGRAVING_PAIRS.length)} two-socket pairs designed, target ${String(ENGRAVING_PAIR_TARGET)}`,
+  );
+}
+
+const statSticks = ALL_DICE.filter(
+  (die) =>
+    !BASIC_DIE_IDS.has(die.id) &&
+    die.effects === undefined &&
+    die.faces === undefined &&
+    die.growth === undefined &&
+    die.active === undefined &&
+    die.tier !== 100,
+);
+if (statSticks.length > STAT_STICK_CAP) {
+  errors.push(
+    `dice: ${String(statSticks.length)} stat-sticks (${statSticks.map((d) => d.id).join(" ")}), cap ${String(STAT_STICK_CAP)}`,
+  );
+}
+for (const die of statSticks) {
+  if (die.rarity !== "common") {
+    errors.push(
+      `dice: stat-stick "${die.id}" is ${die.rarity}; a die without an identity may only be common`,
+    );
+  }
+}
+
+const activeDice = ALL_DICE.filter((d) => d.active !== undefined);
+if (activeDice.length < ACTIVE_DIE_TARGET) {
+  errors.push(
+    `dice: ${String(activeDice.length)} carry an active, target ${String(ACTIVE_DIE_TARGET)}`,
+  );
+}
+
+// Counting a school with `countTag` is counting the deck, which is what
+// resonance already does. A school-tag condition may therefore not pay what a
+// tier of that school already pays — that is a resonance threshold re-spelled
+// with a different number. Mechanic tags are a different axis and are free to
+// reach a similar payload.
+const resonancePayloadsBySchool = new Map<string, Set<string>>();
+for (const bonus of RESONANCE_BONUSES) {
+  const set = resonancePayloadsBySchool.get(bonus.school) ?? new Set<string>();
+  for (const eff of bonus.effects ?? []) {
+    set.add(`${eff.on}|${JSON.stringify(eff.do)}`);
+  }
+  if (bonus.grant !== undefined) set.add(`grant:${bonus.grant}`);
+  resonancePayloadsBySchool.set(bonus.school, set);
+}
+
+const schoolTagsIn = (cond: Cond): string[] => {
+  if (cond.c === "any") return cond.of.flatMap(schoolTagsIn);
+  if (cond.c === "not") return schoolTagsIn(cond.of);
+  if (cond.c !== "hasTag" && cond.c !== "countTag") return [];
+  return SCHOOL_TAG_SET.has(cond.tag) ? [cond.tag] : [];
+};
+
+const checkTagVsResonance = (
+  owner: string,
+  effects: readonly EffectDef[] | undefined,
+): void => {
+  for (const eff of effects ?? []) {
+    const schools = (eff.if ?? []).flatMap(schoolTagsIn);
+    if (schools.length === 0) continue;
+    const payload = `${eff.on}|${JSON.stringify(eff.do)}`;
+    for (const school of schools) {
+      if (resonancePayloadsBySchool.get(school)?.has(payload) === true) {
+        errors.push(
+          `tags: ${owner} gates the ${school} resonance payload behind a countTag on ${school}`,
+        );
+      }
+    }
+  }
+};
+for (const perk of ALL_PERKS) checkTagVsResonance(`perks.${perk.id}`, perk.effects);
+for (const def of ALL_MODULES) checkTagVsResonance(`modules.${def.id}`, def.effects);
+for (const die of ALL_DICE) checkTagVsResonance(`dice.${die.id}`, die.effects);
+
 const vocabularyRow = (
   kind: string,
   members: readonly string[],
@@ -1045,11 +1267,25 @@ if (errors.length > 0) {
 console.log("lint:content: effect vocabulary");
 for (const row of vocabularyReport) console.log(row);
 
+console.log("lint:content: depth");
+console.log(
+  `  perks   ${String(deepPerks)}/${String(ALL_PERKS.length)} conditional (${deepPct.toFixed(1)}%) · ${String(rareTagConsumers)} rares consume their synergy tag`,
+);
+console.log(
+  `  tags    ${String(tagReferenceCount)} records carry a tag-conditioned effect · ${String(CONTENT_TAGS.length)} tags in the registry`,
+);
+console.log(
+  `  modules ${String(moduleVocabulary.length)}/${String(ALL_MODULES.length)} on module-only vocabulary · ${String(legendaryModules.length)} legendary`,
+);
+console.log(
+  `  dice    ${String(activeDice.length)} actives · ${String(statSticks.length)} stat-sticks · ${String(scalarEngravings)}/${String(ENGRAVINGS.length)} engravings single-scalar (${scalarPct.toFixed(1)}%)`,
+);
+
 console.log("lint:content: puzzle calibration");
 for (const row of puzzleTable(PUZZLES)) console.log(`  ${row}`);
 
 console.log(
-  `lint:content: totals — dice ${String(ALL_DICE.length)}/70 · perks ${String(ALL_PERKS.length)}/150 · modules ${String(ALL_MODULES.length)}/50 · engravings ${String(ENGRAVINGS.length)}/40 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/54 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/54 · keeper ${String(KEEPER_LINES.length)}/40`,
+  `lint:content: totals — dice ${String(ALL_DICE.length)}/90 · perks ${String(ALL_PERKS.length)}/180 · modules ${String(ALL_MODULES.length)}/60 · engravings ${String(ENGRAVINGS.length)}/50 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/54 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/54 · keeper ${String(KEEPER_LINES.length)}/40`,
 );
 
 console.log(

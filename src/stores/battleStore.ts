@@ -2,11 +2,18 @@ import { create } from "zustand";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import {
+  adjacentCopyValue,
+  canBank,
   canCopy,
   canFlip,
-  adjacentCopyValue,
+  canSplit,
+  canSwap,
   flippedValue,
+  isSwapTarget,
+  SPLIT_DIE_COUNT,
+  SPLIT_DIE_DEF,
 } from "@/game/battle/actives";
+import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import {
   advanceTurn,
@@ -135,6 +142,7 @@ export interface BattleValues {
   reserveCap: number;
   freeNudges: number;
   selectedDieUid: string | null;
+  swapSourceUid: string | null;
   enemies: EnemyState[];
   targetId: string | null;
   engineState: EngineTier | null;
@@ -199,6 +207,10 @@ export interface BattleState extends BattleValues {
   sacrificeDie: (uid: string) => void;
   flipDie: (uid: string) => void;
   copyDie: (uid: string) => void;
+  beginSwap: (uid: string) => void;
+  cancelSwap: () => void;
+  bankDie: (uid: string) => void;
+  splitDie: (uid: string) => void;
   rollFate: () => void;
   clearFateResult: () => void;
   toggleRerollMode: () => void;
@@ -266,6 +278,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   pendingTwist: 0,
   pendingSwap: 0,
   pendingStorm: 0,
+  swapSourceUid: null,
   ascension: 0,
   overflowShieldUsed: false,
   pierceUsed: false,
@@ -690,11 +703,89 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
   selectDie: (uid) => {
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
-      if (uid === null) return { selectedDieUid: null };
+      if (uid === null) return { selectedDieUid: null, swapSourceUid: null };
       const die = s.dice.find((d) => d.uid === uid);
       if (die === undefined) return s;
       if (die.state !== "tray" && die.state !== "placed") return s;
-      return { selectedDieUid: uid };
+      const source =
+        s.swapSourceUid === null
+          ? undefined
+          : s.dice.find((d) => d.uid === s.swapSourceUid);
+      if (source === undefined || !isSwapTarget(source, die)) {
+        return { selectedDieUid: uid };
+      }
+      return {
+        selectedDieUid: uid,
+        swapSourceUid: null,
+        dice: s.dice.map((d) =>
+          d.uid === source.uid
+            ? { ...d, value: die.value, activeUsed: true }
+            : d.uid === die.uid
+              ? { ...d, value: source.value }
+              : d,
+        ),
+      };
+    });
+  },
+
+  beginSwap: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canSwap(die)) return s;
+      return { swapSourceUid: uid };
+    });
+  },
+
+  cancelSwap: () => {
+    set({ swapSourceUid: null });
+  },
+
+  bankDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canBank(die)) return s;
+      return {
+        dice: s.dice.map((d) =>
+          d.uid === uid ? { ...d, bankedValue: d.value, activeUsed: true } : d,
+        ),
+      };
+    });
+  },
+
+  splitDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      if (s.streams === null) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canSplit(die)) return s;
+      const spawned: RolledDie[] = [];
+      for (let i = 0; i < SPLIT_DIE_COUNT; i += 1) {
+        const def = DIE_BY_ID.get(SPLIT_DIE_DEF);
+        if (def === undefined) break;
+        spawned.push({
+          uid: `${uid}-split${String(i)}`,
+          defId: SPLIT_DIE_DEF,
+          tier: def.tier,
+          school: def.school,
+          value: rollBaseValue(SPLIT_DIE_DEF, def.tier, s.streams.dice),
+          state: "tray",
+          temp: true,
+        });
+      }
+      if (spawned.length === 0) return s;
+      return {
+        selectedDieUid: null,
+        dice: [
+          ...s.dice.map((d) =>
+            d.uid === uid
+              ? { ...d, state: "burned" as const, slot: undefined, activeUsed: true }
+              : d,
+          ),
+          ...spawned,
+        ],
+      };
     });
   },
 
@@ -1100,6 +1191,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   pendingTwist: s.pendingTwist,
   pendingSwap: s.pendingSwap,
   pendingStorm: s.pendingStorm,
+  swapSourceUid: s.swapSourceUid,
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
   enemyHpPct: s.enemyHpPct,

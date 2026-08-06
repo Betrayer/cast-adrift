@@ -87,7 +87,7 @@ describe("blue resonance", () => {
   });
 
   it("blue-4: blue shields persist through the enemy turn reset", () => {
-    const snap = harnessSnap(filler("frostplate", 4), {
+    const snap = harnessSnap(filler("blue-d6", 4), {
       enemies: [harnessEnemy({ nextIntent: { t: "charge" } })],
     });
     const first = snap.dice[0];
@@ -174,7 +174,7 @@ describe("green resonance", () => {
       return snap.dice.find((d) => d.uid === "s")?.growth ?? 0;
     };
     expect(grow([], 5)).toBe(3);
-    expect(grow(["evergreen"], 5)).toBe(4);
+    expect(grow(["overgrowthPact"], 5)).toBe(4);
   });
 });
 

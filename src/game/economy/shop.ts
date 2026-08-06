@@ -30,9 +30,10 @@ export interface ShopState {
 
 export const SHOP_SIZE = 3;
 export const SHOP_MODULE_WEIGHTS: readonly (readonly [Rarity, number])[] = [
-  ["common", 52],
-  ["uncommon", 36],
+  ["common", 50],
+  ["uncommon", 35],
   ["rare", 12],
+  ["legendary", 3],
 ];
 
 export const SHOP_WEIGHTS: RarityWeights = {

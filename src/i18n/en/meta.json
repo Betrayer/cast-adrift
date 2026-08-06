@@ -296,7 +296,8 @@
     "empty": "No engravings fitted.",
     "remove": "remove",
     "fitted": "fitted",
-    "fit": "{{price}} ◈"
+    "fit": "{{price}} ◈",
+    "pair": "Pairs with {{name}}"
   },
   "badge": {
     "keeper": "Keeper"

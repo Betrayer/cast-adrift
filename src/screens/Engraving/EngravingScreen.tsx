@@ -12,10 +12,12 @@ import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
+import { TagChips } from "@/components/TagChips";
 import { DIE_BY_ID } from "@/data/dice";
 import {
   ENGRAVINGS,
   ENGRAVING_BY_ID,
+  ENGRAVING_PAIRS,
   socketsForDie,
 } from "@/data/engravings";
 import { ENGRAVING_STATION_LEVEL } from "@/data/milestones";
@@ -23,6 +25,14 @@ import { schools } from "@/data/schools";
 import { playSfx } from "@/services/audio";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
+
+const pairPartner = (id: string): string | undefined => {
+  for (const [a, b] of ENGRAVING_PAIRS) {
+    if (a === id) return b;
+    if (b === id) return a;
+  }
+  return undefined;
+};
 
 export const EngravingScreen = () => {
   const { t } = useTranslation(["meta", "common", "content"]);
@@ -148,13 +158,24 @@ export const EngravingScreen = () => {
                         borderRadius: 8,
                       }}
                     >
-                      <Stack gap={0} style={{ flex: 1 }}>
+                      <Stack gap={2} style={{ flex: 1 }}>
                         <Text size="sm" c={tokens.text}>
                           {t(def.name)}
                         </Text>
                         <Text size="xs" c={tokens.faint}>
                           {t(def.desc)}
                         </Text>
+                        <TagChips tags={def.tags ?? []} />
+                        {pairPartner(def.id) === undefined ? null : (
+                          <Text size="xs" c={tokens.amber}>
+                            {t("meta:engraving.pair", {
+                              name: t(
+                                ENGRAVING_BY_ID.get(pairPartner(def.id) ?? "")
+                                  ?.name ?? "",
+                              ),
+                            })}
+                          </Text>
+                        )}
                       </Stack>
                       <Button
                         size="compact-xs"

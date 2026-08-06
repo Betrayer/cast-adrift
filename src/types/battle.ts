@@ -34,6 +34,7 @@ export interface RolledDie {
   activeUsed?: boolean;
   temp?: boolean;
   expiresTurn?: number;
+  bankedValue?: number;
 }
 
 export interface SlotState {

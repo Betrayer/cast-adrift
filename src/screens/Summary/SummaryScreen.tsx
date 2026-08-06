@@ -22,6 +22,7 @@ import {
   useSettingsStore,
 } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
+import { BuildSheet } from "@/screens/Build/BuildSheet";
 import { LevelUpCeremony } from "./LevelUpCeremony";
 
 const useCountUp = (target: number, reduced: boolean): number => {
@@ -79,6 +80,8 @@ export const SummaryScreen = () => {
     .map((id) => PERK_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
 
+  const [buildOpen, setBuildOpen] = useState(false);
+
   const ceremony =
     leveled && barsDone && !ceremonyDone && result !== null ? (
       <LevelUpCeremony
@@ -93,7 +96,21 @@ export const SummaryScreen = () => {
     ) : null;
 
   return (
-    <Screen centered overlay={ceremony}>
+    <Screen
+      centered
+      overlay={
+        <>
+          {ceremony}
+          {buildOpen ? (
+            <BuildSheet
+              onClose={() => {
+                setBuildOpen(false);
+              }}
+            />
+          ) : null}
+        </>
+      }
+    >
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="sm">
           <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">
@@ -146,6 +163,16 @@ export const SummaryScreen = () => {
               ? t("run:summary.perksNone")
               : perkNames.map((name) => t(name)).join(" · ")}
           </Text>
+          <Button
+            size="compact-sm"
+            variant="default"
+            data-open-build
+            onClick={() => {
+              setBuildOpen(true);
+            }}
+          >
+            {t("run:build.open")}
+          </Button>
           <Button
             size="md"
             fullWidth

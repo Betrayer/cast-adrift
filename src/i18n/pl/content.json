@@ -69,59 +69,119 @@
     "prismCore": "Rdzeń Prism",
     "spectra": "Spectra",
     "aurora": "Aurora",
-    "fate-d100": "Los"
+    "fate-d100": "Los",
+    "slag": "Żużel",
+    "fissure": "Szczelina",
+    "anthracite": "Antracyt",
+    "stillwater": "Stillwater",
+    "floodgate": "Sluza",
+    "undertow": "Prąd podwodny",
+    "taproot": "Korzeń główny",
+    "seedpod": "Strąk nasienny",
+    "evergreen": "Evergreen",
+    "plumbline": "Linia pionowa",
+    "chaff": "Słoma",
+    "glimmer": "Błysk",
+    "facet": "Aspekt",
+    "gamut": "Gamut",
+    "salvo": "Salvo",
+    "crucible": "Tygiel",
+    "bombard": "Bombard",
+    "smallChange": "Drobne",
+    "wager": "Zakład",
+    "hedge": "Zagajnik"
   },
   "diceDesc": {
-    "ember": "Zwykła czerwona kostka sześciościenna.",
+    "ember": "W kategorii „Broń” zapewnia +2, o ile twoja konfiguracja zawiera co najmniej 4 czerwone przedmioty.",
     "cinder": "W sekcji „Broń” maksymalny wynik rzutu powoduje nałożenie efektu „Oparzenie 1” na cel.",
     "slug": "W trybie „Broń” zadaje +1 punkt obrażeń.",
-    "frostplate": "Zwykła niebieska kostka sześciościenna.",
+    "frostplate": "W przypadku umiejętności „Tarcze” dodaje ona 2 dodatkowe tarcze, gdy nosisz 4 lub więcej przedmiotów z serii „Tarcza”.",
     "bulwark": "W trybie „Tarcze” zapewnia +1 do tarczy.",
-    "gyro": "Raz na bitwę należy obrócić kartę na drugą stronę.",
-    "coil": "Jeśli wypadnie ta sama wartość co w poprzedniej turze, +1.",
-    "sprout": "W przypadku maksymalnego wyniku rzutu wzrasta o +1 na czas trwania rundy (maksymalnie do +2).",
-    "lucky-chip": "Przy maksymalnym wyniku rzutu – +2 złomu.",
-    "vulture": "Przy maksymalnym wyniku rzutu – +8 złomu.",
+    "gyro": "Jego strony to 2, 3, 3, 4, 4 i 5; raz na bitwę należy obrócić kostkę na drugą stronę.",
+    "coil": "Wyniki to 2·2·3·3. +1, gdy wynik jest taki sam jak w poprzedniej turze, oraz dodatkowe +2, jeśli posiadasz 3 lub więcej [rój].",
+    "sprout": "W przypadku maksymalnej wartości na kostce wzrasta o +1 (maksymalnie do +2), a rozliczenie tej wartości w silnikach powoduje jej dalszy wzrost, maksymalnie do +4.",
+    "lucky-chip": "Maksymalna wartość twarzy to 2 złomów.",
+    "vulture": "Karta „Max” zapewnia 8 złomu i zwiększa liczbę wypłat o 1; od drugiej wypłaty na tej karcie zadaje ona trafienie krytyczne w slocie na broń.",
     "ashen": "W przypadku rzutu „min” następna czarna kostka w tej turze otrzymuje +2.",
-    "obsidian": "Rzuca się tylko 1 lub 8.",
-    "copycat": "Raz na bitwę skopiuj wartość sąsiedniej kostki.",
-    "ballast": "Zwykła szara kostka d4.",
-    "coreshard": "Znak wieloznaczny typu pryzmatycznego dla zbiorów i powinowactw.",
-    "flare": "+1 do obrażeń zadawanych bronią przy wyniku 3 lub większym.",
-    "magma": "Maksymalna wartość parametru „face” dla broni powoduje zastosowanie efektu „Burn 3”.",
-    "thermite": "+2 do obrażeń zadawanych bronią, gdy poziom zdrowia kadłuba spadnie poniżej połowy.",
-    "lancehead": "+3 w przypadku mocowania kręgosłupowego.",
+    "obsidian": "Rzuca się tylko 1 lub 8; wynik 1 liczy się jako 8 — co odpowiada 2 punktom wytrzymałości kadłuba.",
+    "copycat": "Wartości twarzy to tylko 1, 2, 2, 3, 3, 4; raz na bitwę kopiuje wyższą z dwóch sąsiednich wartości.",
+    "ballast": "Raz na bitwę odłóż jej stronę na bok: w następnej turze rozpocznie grę od zapisanej wartości zamiast rzucać kostką.",
+    "coreshard": "Kości pryzmatyczne mogą przekroczyć limit dowolnego slotu dla 1 kadłuba. Maksymalna wartość na ściance zwiększa współczynnik każdej szkoły o +2.",
+    "flare": "Jej wyniki to 1, 2, 4 i 4 — nigdy 3 — a w kategorii „Broń” zadaje +1 przy wyniku 3 lub większym.",
+    "magma": "W kategorii „Broń” maksymalna wartość twarzy powoduje nałożenie efektu „Oparzenie 3”.",
+    "thermite": "+2 do ataku bronią, gdy poziom zdrowia kadłuba spadnie poniżej połowy; raz na bitwę dzieli się na dwie tymczasowe szare kostki d4.",
+    "lancehead": "+3 przy rzucie na „Spinal Mount”, a naturalna 15 lub więcej oznacza trafienie krytyczne.",
     "hoarfrost": "+1 do tarczy za każdym razem, gdy zajmuje miejsce na tarczę.",
-    "aegis": "+2 do tarcz.",
+    "aegis": "W systemie „Tarcze” liczy się to jako +2, a mur wytrzymuje: w następnej turze zyskujesz 3 punkty tarczy za darmo.",
     "deepblue": "Moja twarz zapewnia 4 punkty osłony.",
-    "glacierspike": "+3 do tarcz.",
-    "tendon": "+2, gdy wartość jest taka sama jak w poprzedniej turze.",
-    "bramble": "W przypadku maksymalnej wartości na kostce wynik wzrasta o +1, maksymalnie do +2.",
-    "heartwood": "+2 w kategorii silników.",
-    "worldseed": "W przypadku maksymalnej wartości na kostce wynik wzrasta o +1, maksymalnie do +4.",
-    "token": "Maksymalna wartość twarzy to 3 złomów.",
-    "glint": "Za moją twarz płaci się 2 złomów.",
-    "bonanza": "Maksymalna stawka za twarz wynosi 6 złomu.",
-    "jackpot": "Maksymalny koszt akcji wynosi 10 złomu i 1 punkt ładunku.",
-    "midas": "Wypłaca 2 punkty za złom w dowolnym miejscu, w którym zostanie rozpatrzona.",
-    "cinderblack": "Min face może pomieścić 1 ładunek.",
+    "glacierspike": "Ma od 8 do 20 twarzy, więc „Spinal Mount” nigdy nie może go zablokować; niezależnie od tego, gdzie zostanie rozpatrzony, zapewnia 3 punkty osłony, a po użyciu „Spinal Mount” dodatkowo blokuje cel.",
+    "tendon": "+2, jeśli wynik jest taki sam jak w poprzedniej turze, a także zwiększa wartość następnej zielonej kostki o +1.",
+    "bramble": "W przypadku maksymalnej wartości na kości wzrasta o +2 (maksymalnie do +2), a zastosowanie tej zdolności w sekcji „Broń” powoduje jej dalszy wzrost, maksymalnie do +4.",
+    "heartwood": "+2 do parametrów silników. Raz na bitwę możesz obrócić tę stronę na następną turę.",
+    "worldseed": "Zwiększa się o +1 przy maksymalnym wyniku, maksymalnie do +4, a przy maksymalnym wyniku efekt ten jest rozpatrywany dwukrotnie.",
+    "token": "Karta „Max face” zapewnia 3 złom i zwiększa liczbę wygranych w bitwie o 1.",
+    "glint": "Wynik 1 lub 6 daje 2 złom i zwiększa liczbę wygranych w bitwie o 1.",
+    "bonanza": "Na kartach widnieją dwie dwójki, czwórka, szóstka i dwie ósemki; ósemka zwiększa liczbę wypłat o 1, a od trzeciej wypłaty zapewnia 4 złom i 1 ładunek niezależnie od miejsca, w którym zostanie rozpatrzona.",
+    "jackpot": "Przy maksymalnym zakładzie na symbol „face” wypłacane jest 6 scrapów i 1 charge, a liczba wypłat zwiększa się o 1; od czwartej wypłaty przy maksymalnym zakładzie na symbol „face” wypłacane jest o 12 scrapów więcej.",
+    "midas": "Każda tura kończy się przyznaniem 1 złomu za każdy posiadany przedmiot typu [złom]; jego maksymalna wartość dodaje 2 do liczby wypłat, a od trzeciej wypłaty z tego przedmiotu wartość ta wynosi +3.",
+    "cinderblack": "Rzuca się tylko 1 lub 4; wynik 1 oznacza 1 ładunek.",
     "pitch": "+1 w reaktorze.",
-    "tar": "+2, gdy poziom wytrzymałości kadłuba wynosi poniżej 40%.",
+    "tar": "+1, gdy poziom wytrzymałości kadłuba wynosi poniżej 50%, oraz dodatkowe +3, gdy wynosi poniżej 25%.",
     "nadir": "Min przygotowuje kolejną czarną kostkę, dodając do niej +3.",
-    "eclipse": "+3 w reaktorze.",
-    "abyss": "Jego wartości to tylko 1 lub 12.",
+    "eclipse": "Każda kostka pasuje do reaktora i umieszcza się ją na nasadce — za 1 punkt wytrzymałości; raz na bitwę kostka ta obraca się o 90 stopni na następną turę.",
+    "abyss": "Jego wyniki to tylko 1 lub 12; po wyrzuceniu 1 każde kolejne 12 liczy się jako 18.",
     "voidmaw": "+2 w reaktorze.",
-    "shim": "+1 w pierwszej turze bitwy.",
-    "spool": "Wynik 1 w rzucie kostką zamienia się na 2.",
-    "mimic": "Raz na bitwę skopiuj wartość sąsiada.",
-    "pivot": "Raz na bitwę odwróć kartę na drugą stronę.",
-    "beaconChip": "+2 czujniki.",
-    "lodestar": "+1 w każdym slocie.",
-    "prismChip": "Liczy się do twojego największego zestawu.",
-    "prismCore": "+1 w każdym slocie i wlicza się do twojego największego zestawu.",
-    "spectra": "Maksymalna wartość twarzy to 1 punkt ładunku i 1 punkt złomu.",
-    "aurora": "+2 w każdym slocie.",
-    "fate-d100": "Nigdy nie jest przypisane. Raz na bitwę rzuć kostką i weź to, co daje dany sektor."
+    "shim": "Wartości twarzy to tylko 2, 2, 3, 3; +1 w pierwszej turze bitwy.",
+    "spool": "Wynik 1 lub 2 rzuca się ponownie tylko raz.",
+    "mimic": "Raz na walkę możesz zamienić wartości z dowolną inną kostką; mając trzy przedmioty oznaczone jako „kostki”, każda walka zaczyna się od darmowego przesunięcia.",
+    "pivot": "Wyróżnione są tylko strony 1, 2, 3, 6, 7, 8 — nie ma żadnych pośrednich wartości; raz na bitwę należy obrócić kostkę na drugą stronę.",
+    "beaconChip": "+2 do umiejętności „Czujniki”, a każda bitwa rozpoczyna się z jednym darmowym „szturchnięciem”.",
+    "lodestar": "+1 w każdym polu; każda bitwa rozpoczyna się od jednego darmowego przesunięcia i jednego dodatkowego rzutu; raz na bitwę odłóż jej wynik na bok na następną turę.",
+    "prismChip": "Jego wartości to 2, 3, 3 i 4; najwyższa wartość zapewnia 2 złom za każdy przenoszony przedmiot pryzmatyczny.",
+    "prismCore": "Zmienia kierunek działania: w sekcji „Czujniki” nadaje kolor czerwony, w sekcji „Broń” – niebieski, w sekcji „Tarcze” – zielony, w sekcji „Silniki” – czarny, a w sekcji „Reaktor” – żółty — następna kostka tej szkoły w tej turze otrzymuje +2.",
+    "spectra": "Karta „Max” kosztuje 2 punkty ładunku i 4 punkty złomu; raz na bitwę może zmienić swoją stronę i rozpocząć następną turę od tej strony.",
+    "aurora": "+2 w każdym slocie, o ile w talii znajdują się co najmniej 3 kostki pryzmatyczne; wynik rzutu równy 10 lub wyższy zapewnia 2 punkty obrażeń, 2 punkty osłony, 1 punkt ładunku, 3 punkty złomu i 1 punkt kadłuba.",
+    "fate-d100": "Nigdy nie jest przypisane. Raz na bitwę rzuć kostką i weź to, co daje dany sektor.",
+    "red-d6": "Karty od 1 do 6 bez efektów pasywnych — zwykła, czerwona karta robocza, do której porównywana jest reszta talii.",
+    "blue-d6": "Strony od 1 do 6, bez efektu pasywnego — zwykły niebieski, ale nadal liczy się do rezonansu niebieskiego.",
+    "grey-d4": "Strony od 1 do 4 i brak umiejętności pasywnej — tania, szara karta wypełniająca, a także dodatkowa karta do talii, w których liczy się liczba małych kości.",
+    "green-d4": "Strony od 1 do 4 i brak trybu pasywnego — tani, ekologiczny wypełniacz, który zasila silnik i czujniki.",
+    "yellow-d6": "Strony od 1 do 6 i brak efektu pasywnego — zwykły żółty; szczęście musi wynikać z tego, co zbudujesz wokół niego.",
+    "black-d6": "Strony od 1 do 6, bez akcji pasywnej — po prostu czarna, sama z siebie nie podejmuje żadnego ryzyka.",
+    "slag": "Jego wartości to 1, 1, 1 i 4, ale w reaktorze zawsze liczy się jako 4.",
+    "fissure": "Wyrzuca wyłącznie wyniki 1, 2, 3, 8, 9 lub 10; raz na bitwę dzieli się na dwie tymczasowe szare kostki d4.",
+    "anthracite": "Wyrzuca wyłącznie wyniki 1, 1, 2, 11, 12 lub 12; raz na bitwę zamienia się miejscami z inną kostką.",
+    "stillwater": "Jego wyniki to tylko 3, 3, 4, 4, 5 i 5; w trybie „Sensors” blokuje cel nawet przy wyniku 3.",
+    "floodgate": "Jego twarze to od 3 do 8, nigdy mniej; raz na bitwę zmienia swoją twarz, a w następnej turze zaczyna od tej twarzy zamiast rzucać kostką.",
+    "undertow": "Jego wynik nigdy nie wynosi mniej niż 5; raz na bitwę można zamienić jego wartość z dowolną inną kostką.",
+    "fused-emberforge": "Dwa elementy połączone w jeden: jego liczby to 2, 2, 4, 4, 6, 6, 8, 8 i nigdy nie są to liczby nieparzyste.",
+    "fused-frostwall": "Dwie blachy zespawane na płasko: ich wymiary wynoszą 3, 3, 4, 4, 5, 5, 6, 6.",
+    "fused-counterweight": "Raz na bitwę możesz zamienić wartości dowolnej kostki z dowolną inną.",
+    "fused-seedling": "Na początku każdej bitwy uruchamia strzał: tymczasowy zielony d4 na 2 tury.",
+    "fused-goldvein": "Żyła przebiega dwukrotnie przez ostatnią ścianę — 1, 2, 3, 4, 5, 6, 8, 8 — a maksymalny wynik rzutu zapewnia 4 złomów.",
+    "fused-voidcore": "Raz na bitwę można go rozbić: ulega on zużyciu i pozostawia dwie tymczasowe szare kostki d4.",
+    "fused-pyroclast": "Postacie o maksymalnej wartości cechy „Broń” rzucają drugim kamieniem, zadając 3 punkty obrażeń powyżej limitu slotu.",
+    "fused-glacier": "Od 3. tury +3 do osłon.",
+    "fused-keel": "Raz na bitwę możesz zapisać ten wynik: w następnej turze kostka zacznie leżeć na tym polu, zamiast być rzucana.",
+    "fused-tendril": "+2, gdy wynik jest taki sam jak w poprzedniej turze lub wynosi minimum.",
+    "fused-windfall": "Za najwyższą wartość na kartach wypłaca się 3 złom, a za najniższą – 1.",
+    "fused-railslug": "+1 do broni i +2 do mocowania kręgosłupowego.",
+    "fused-rampart": "+1 do tarcz – mimo że masz już 8 tarcz, dodaje to kolejne 2.",
+    "fused-bloom": "W przypadku maksymalnego wyniku wzrasta o +1, maksymalnie do +3, a każdy wynik 9 lub wyższy naprawia 1 punkt kadłuba.",
+    "taproot": "Za każdym razem, gdy wykonuje akcję, otrzymuje: +1 z trzeciego pola bitwy, +2 z piątego.",
+    "seedpod": "Kostka typu „max face” generuje tymczasową zieloną kostkę d4 na dwie tury. Raz na bitwę możesz podzielić ją na dwie szare kostki d4.",
+    "evergreen": "Wyniki są parzyste tylko w następujących wartościach: 2·4·6·8·10·12. Przy maksymalnym wyniku otrzymuje się +2, maksymalnie do +4.",
+    "plumbline": "Rolls ma do pokonania wyłącznie następujące liczby: 2, 2, 4, 4, 6, 6.",
+    "chaff": "Wartości to wyłącznie 1, 1, 2, 3, 5, 8; raz na bitwę można ją spalić z tacy, aby uzyskać dwie tymczasowe szare kostki d4.",
+    "glimmer": "Jego wartości to wyłącznie 1, 1, 4 i 4; dopóki w talii znajdują się co najmniej dwie kostki pryzmatyczne, wyrzucona „1” podlega jednemu ponownemu rzutowi.",
+    "facet": "Jego wyniki to 4, 4, 5, 5, 6 i 6; raz na bitwę może zamienić się miejscami z dowolną inną kostką.",
+    "gamut": "Wartości oczek to 2·4·6·8·10·10. +2, gdy posiadasz 2 lub więcej [kolców]; maksymalna wartość oczka zapewnia 1 ładunek na każdą pryzmatyczną kostkę w twojej talii.",
+    "salvo": "W kategorii „Broń” zadaje 1 dodatkowy punkt obrażeń za każdy przedmiot z serii „Swarm” w twoim zestawie, wliczając sam ten przedmiot.",
+    "crucible": "Raz na bitwę odnotuj wynik rzutu: w następnej turze postać zaczyna grę z tą liczbą zamiast rzucać kostką.",
+    "bombard": "Jego wartości to 1, 2, 3, 4, 12 i 12; wartość 12 w kategorii „Broń” zadaje 5 dodatkowych punktów obrażeń.",
+    "smallChange": "Na jego ściankach widnieją dwie dwójki, dwie trójki i dwie czwórki; raz na walkę rozdziela się na dwie szare kostki d4 na pozostałą część walki.",
+    "wager": "Na jego ściankach widnieją trzy jedynki i trzy szóstki; raz na bitwę zamienia się miejscami z inną kostką, a jedynka w polu broni zamienia się na szóstkę, co daje 2 punkty wytrzymałości kadłuba.",
+    "hedge": "Wyrzuca tylko 1, 3, 5 lub 7; raz na bitwę zmienia stronę i rozpoczyna następną turę od tej strony."
   },
   "resonance": {
     "red-2": "Czerwone kości w transakcji dotyczącej broni dają +1.",
@@ -251,13 +311,9 @@
     "on-edge": "Na krawędzi",
     "sacrifice": "Poświęcenie",
     "back-door": "Tylne drzwi",
-    "grip": "Uchwyt",
-    "reservist": "Rezerwista",
-    "calibration": "Kalibracja",
     "spare": "Zapasowy",
     "afterburner": "Dopalacz",
     "jammer-plus": "Jammer+",
-    "condenser": "Skraplacz",
     "targeter": "Targeter",
     "plating": "Galwanizacja",
     "tug": "Holownik",
@@ -295,11 +351,9 @@
     "permafrost": "Wieczna zmarzlina",
     "rootHold": "Utrzymanie korzeni",
     "secondGrowth": "Drugi rocznik",
-    "mulch": "Ściółka",
     "pollen": "Pyłek kwiatowy",
     "longRoots": "Długie korzenie",
     "greenwake": "Greenwake",
-    "steadyHand": "Pewna ręka",
     "sapline": "Sapline",
     "thicket": "Gęstwin",
     "bloomCycle": "Cykl kwitnienia",
@@ -362,177 +416,243 @@
     "dryDock": "Suchy dok",
     "masterKey": "Klucz główny",
     "greyProtocol": "Protokół Grey",
-    "armorPlate": "Płyta pancerna",
-    "coolantLoop": "Obieg chłodziwa",
-    "finePitch": "Mały rozstaw",
-    "boresight": "Linia celowania",
-    "bilgePump": "Pompa zęzowa",
-    "dockRates": "Stawki za postoj w doku",
     "crewDrill": "Ćwiczenia załogi",
-    "scrapHopper": "Złom Lej",
     "spotterCall": "Komunikat obserwatora",
     "hullWeld": "Kadłub Spawanie",
     "reinforcedBay": "Zmocniona zatoka",
-    "surgeTank": "Zbiornik wyrównawczy",
     "hardenedHull": "Kadłub w wersji wzmocnionej",
-    "kineticDampers": "Amortyzatory kinetyczne",
     "targetingSuite": "Pakiet narzędzi do targetowania",
-    "pressureValve": "Zawór ciśnieniowy",
-    "resonanceTuner": "Rezonans Tuner",
     "shockLance": "Lanca uderzeniowa",
-    "piercingRounds": "Kule do piercingu"
+    "piercingRounds": "Kule do piercingu",
+    "snakeEyes": "Snake Eyes",
+    "looseBallast": "Luźny balast",
+    "downPayment": "Zaliczka",
+    "hazardPay": "Dodatek za pracę w warunkach niebezpiecznych",
+    "overdraft": "Kredyt w rachunku bieżącym",
+    "debtCollector": "Windykator",
+    "snowline": "Linia śniegu",
+    "rimeGuard": "Rime Guard",
+    "whiteNoise": "Biały szum",
+    "iceSheet": "Pokrywa lodowa",
+    "bracingVanes": "Łopatki usztywniające",
+    "nullField": "Pole zerowe",
+    "takeRoot": "Zakorzenić się",
+    "seedBank": "Bank nasion",
+    "understory": "Podszyt",
+    "mycelium": "Grzybnia",
+    "rhizome": "Kłącze",
+    "taproot": "Korzeń główny",
+    "perennial": "Wieloletnia",
+    "annualRings": "Słoje roczne",
+    "dryRun": "Próba generalna",
+    "teardown": "Rozbiórka",
+    "tallySheet": "Arkusz podsumowujący",
+    "cargoHold": "Luk ładunkowy",
+    "pointBlank": "Z bliska",
+    "ignition": "Zapłon",
+    "keelStrike": "Uderzenie w kil",
+    "runningHot": "Na pełnych obrotach",
+    "ashfall": "Opady popiołu",
+    "stokehold": "Stokehold",
+    "autoAlign": "Automatyczne wyrównanie",
+    "coreTap": "Wiertło rdzeniowe",
+    "damageControl": "Ograniczanie szkód",
+    "spallLiner": "Wkładka przeciwodpryskowa",
+    "scavengedArmour": "Zdobywana zbroja",
+    "crashPriority": "Priorytet wypadków",
+    "spareHands": "Zapasowe ręce",
+    "overrideKeys": "Klawisze nadpisujące",
+    "markLedger": "Mark Ledger",
+    "refitCrew": "Załoga remontowa",
+    "flightLog": "Dziennik lotów",
+    "fullRefit": "Kompleksowy remont",
+    "sureThing": "To na pewno",
+    "chipStack": "Stos żetonów",
+    "warChest": "Fundusz wojenny",
+    "marginCall": "Wezwanie do uzupełnienia depozytu zabezpieczającego",
+    "loadedDice": "Sfałszowane kości"
   },
   "perksDesc": {
-    "hot-charge": "Rzut na broń z maksymalną wartością twarzy zadaje +2 pkt. obrażeń.",
-    "ricochet": "Nadmierna siła rażenia broni A przenosi się na kolejnego wroga.",
+    "hot-charge": "Dopóki masz 5 punktów naładowania, każde trafienie bronią zadaje 2 dodatkowe punkty obrażeń.",
+    "ricochet": "Broń typu A przenosi się na kolejnego wroga, a maksymalne trafienie w tym miejscu zadaje +4 pkt. obrażeń.",
     "double-fuse": "W każdej bitwie wartość „Burn” jest podwajana.",
-    "warmup": "Tura 1: czerwone kości dają +1.",
+    "warmup": "Począwszy od tury 3, każde trafienie bronią zadaje 3 dodatkowe punkty obrażeń.",
     "ice-circuit": "Rzut na tarczę wynoszący 6+ zapewnia +2 do tarczy.",
-    "reflector": "Unik zadaje atakującemu 3 punkty obrażeń.",
-    "blue-reserve": "Jedno dodatkowe miejsce w rezerwie, wyłącznie niebieskie kości.",
+    "reflector": "Jeśli zakończysz turę, mając co najmniej 10 punktów tarczy, pole zadaje 4 punkty obrażeń.",
+    "blue-reserve": "Dwa dodatkowe miejsca rezerwowe przeznaczone wyłącznie na niebieskie kości, ale za każdym razem rzuca się o jedną kość mniej.",
     "stabilizer": "Pierwsza niebieska kostka w każdej turze nie może wypaść 1.",
-    "compost": "Każda spalona kostka daje +1 złom.",
-    "overgrowth": "Wzrost – utrata życia +1.",
+    "compost": "Każda kostka pozostała w tacki na koniec tury daje 1 złom.",
+    "overgrowth": "Rosnące kostki przesuwają się o jeden stopień wyżej.",
     "echo": "Kostka, która wylosuje tę samą wartość co w poprzedniej turze, zapewnia +1 ładunek.",
     "regen": "Koniec bitwy: przywróć 2 punkty wytrzymałości kadłuba.",
-    "prospector": "Złom wzrost o 25%.",
-    "fortune": "Rzut „max-face” zapewnia +2 do złomu.",
-    "haggler": "Ceny w sklepie obniżone o 15%.",
-    "coin": "Początek bitwy: +3 złom.",
-    "blood-reactor": "Raz na turę zapłać 2 punkty wytrzymałości, aby uzyskać +3 do ładunku.",
+    "prospector": "Każda bitwa rozpoczyna się z 2 sztukami złomu za każdą żółtą kostkę w twojej talii.",
+    "fortune": "Jeśli masz przy sobie trzy lub więcej żółtych kości, każda bitwa rozpoczyna się z jedną dodatkową szansą na ponowne rzucenie.",
+    "haggler": "Sklepy −18%, ale za wykonanie zadania otrzymuje się o 10% mniej XP.",
+    "coin": "+3 punkty złomu na początku bitwy, a każda kostka, której wynik to najwyższa lub najniższa wartość, zapewnia 1 punkt więcej.",
+    "blood-reactor": "Raz na turę zapłać 2 punkty wytrzymałości, aby uzyskać +3 do ładunku; jeśli posiadasz cztery przedmioty zwiększające ładunek, każda kostka reaktora gromadzi o 2 więcej.",
     "on-edge": "Kadłub poniżej 30%: +1 do rzutu kostką.",
-    "sacrifice": "W tej turze spal kostkę, aby uzyskać +4 do obrażeń zadawanych bronią.",
+    "sacrifice": "W tej turze poświęć kostkę, aby uzyskać +4 do obrażeń zadawanych bronią; przy mniej niż jednej trzeciej wytrzymałości kadłuba każda broń zadaje obrażenia krytyczne pomnożone przez 1,5.",
     "back-door": "Czarna rolka typu „min-face” zapewnia +6 złomu.",
-    "grip": "Wielkość ponownego rzutu +1.",
-    "reservist": "Zapasowa moc +1.",
-    "calibration": "Zabieg „Nudge” kosztuje 2 punkty energii zamiast 3.",
-    "spare": "Najniższy wynik z każdego rzutu zwiększa się o jeden; należy rzucić jeszcze jedną kostką.",
-    "afterburner": "Progi silnika są o 1 niższe.",
-    "jammer-plus": "Jam zmniejsza siłę ataku przeciwnika o 3.",
-    "condenser": "Limit ładunku reaktora wzrasta do 12.",
-    "targeter": "Mark zapewnia +3 do obrażeń zamiast +2.",
-    "plating": "Maksymalna wytrzymałość kadłuba +5, teraz leczy 5.",
+    "spare": "Najniższy wynik z każdego rzutu zwiększa się o jeden; należy ponownie rzucać po jednej kostce na raz.",
+    "afterburner": "Progi silnika są o jeden stopień łatwiejsze; kadłub −2.",
+    "jammer-plus": "Jam zmniejsza siłę ataku wroga o kolejne 2 punkty, ale wartość znaków jest o 1 mniejsza.",
+    "targeter": "Oznaczenia zwiększają obrażenia o +1, ale zacięcie zmniejsza je o 1 mniej.",
+    "plating": "Kadłub +5, a każda wygrana bitwa naprawia 2 punkty kadłuba.",
     "tug": "Unik zapewnia również +1 ładunek.",
     "kindling": "+1 do broni przy wyniku 5 lub więcej.",
     "hammerhead": "+2 w kategorii „Broń A”.",
     "scorchmark": "Maksymalna wartość parametru „Face” w broni zwiększa wartość „Burn” o 1.",
     "openingVolley": "+2 do broni w pierwszych dwóch turach.",
-    "pyreFloor": "+2 do broni przy minimalnym wyniku rzutu.",
-    "redForge": "+1 za czerwone kości w broni.",
-    "searing": "+2 do broni przy wyniku 8 lub wyższym.",
+    "pyreFloor": "Czerwona kostka, która wypadła najniższą ścianką, jest natychmiast rzucana ponownie.",
+    "redForge": "Czerwona kostka broni, której wierzchnia ścianka wskazuje maksymalną wartość, zyskuje +1 do liczby ścianek, maksymalnie do +2.",
+    "searing": "Wynik rzutu na broń równy 8 lub więcej powoduje nałożenie efektu „Oparzenie 2”.",
     "cinderTithe": "Maksymalna wartość broni to 3 złom.",
     "thermalVent": "+3 do broni przy maksymalnej wartości na kości oraz 1 ładunek.",
-    "overburn": "+2 do obrażeń zadawanych bronią, gdy poziom zdrowia kadłuba spadnie poniżej połowy.",
+    "overburn": "Kości broni otrzymują +2, a na koniec każdej tury tracimy 2 punkty wytrzymałości kadłuba.",
     "emberField": "Wynik „Max” na czerwonej kostce powoduje dodanie 2 punktów obrażeń od ognia.",
-    "hotline": "+3 w przypadku mocowania kręgosłupowego.",
-    "secondBarrel": "+3 w kategorii „Broń B”.",
-    "detonator": "W przypadku broni z maksymalną liczbą twarzy slot ten rozpatrywany jest dwukrotnie.",
-    "magmaCore": "+3 do broni, gdy masz cztery czerwone kości.",
-    "infernoDoctrine": "Każde trafienie bronią powoduje nałożenie efektu „Oparzenie 1”.",
+    "hotline": "Każda kostka pasuje do mocowania kręgosłupowego po włożeniu jej za nasadkę, co kosztuje 2 punkty wytrzymałości kadłuba.",
+    "secondBarrel": "+3 w kategorii „Broń B” oraz dodatkowe +2 z Mk II.",
+    "detonator": "W przypadku broni maksymalna wartość twarzy powoduje dwukrotne rozstrzygnięcie slotu, a przy pięciu przedmiotach broniowym – każdy wynik 8 lub wyższy również.",
+    "magmaCore": "+3 do broni przy czerwonym rezonansie 4, a przy czerwonym rezonansie 6 każde trafienie bronią zapewnia +3 do następnej czerwonej kostki.",
+    "infernoDoctrine": "Każde trafienie bronią dodaje 1 punkt poparzenia, a gdy posiadasz trzy źródła poparzenia – 3 punkty poparzenia.",
     "hoarplate": "+1 do tarcz.",
     "stormWall": "Maksymalna wartość „Face in Shields” zapewnia 3 dodatkowe punkty tarczy.",
-    "coldStart": "+2 do tarcz w pierwszych dwóch turach.",
+    "coldStart": "Każda z dwóch pierwszych tur kończy się zdobyciem kolejnych 3 punktów tarczy.",
     "blueFloor": "Niebieskie kości nigdy nie wypadają poniżej 3.",
     "meltwater": "Moja twarz na tarczach zapewnia 3 dodatkowe punkty tarczy.",
     "frostBrake": "+2 do niebieskich kości w silnikach.",
     "bulkhead": "Kadłub +3.",
     "chillBank": "Symbol „Max” na niebieskiej kostce oznacza 1 ładunek.",
-    "aegisField": "+2 do tarczy za każdą kostkę tarczy.",
-    "deepFreeze": "+3 do tarcz przy wyniku 8 lub więcej.",
-    "interdict": "Twoja umiejętność „Jam” zmniejsza obrażenia z ataków wroga o 2.",
+    "aegisField": "Pierwsza pozycja rozpatrywana w każdej turze zwiększa również wartość tarczy o 3.",
+    "deepFreeze": "Wynik rzutu na tarcze przy 8+ oznacza +3 i dodaje 2 dodatkowe tarcze.",
+    "interdict": "Wynik rzutu na uszkodzenie czujnika poniżej 4 jest podnoszony do 4, więc czujnik zawsze się zacina, a zacięcie powoduje utratę 1 dodatkowego punktu.",
     "hardVacuum": "+3 do osłon, gdy poziom wytrzymałości kadłuba spadnie poniżej połowy.",
-    "secondSkin": "Kadłub +4; po każdej bitwie odzyskujesz 1 punkt zdrowia.",
+    "secondSkin": "Kadłub Po każdej bitwie kadłub odzyskuje +4 i 2 punkty wytrzymałości, ale zysk z odzysku jest o 10% niższy.",
     "glacierPact": "+4 do tarcz, gdy masz cztery niebieskie kości.",
-    "mirrorLattice": "Uniki zmniejszają otrzymywane obrażenia; progi silnika są o jeden stopień łatwiejsze do osiągnięcia.",
+    "mirrorLattice": "Uniki zmniejszają otrzymywane obrażenia, progi silników są o jeden stopień łatwiejsze do osiągnięcia, a przy trzech przedmiotach zwiększających uniki silniki dają +3.",
     "permafrost": "Karta „Max Face” w talii „Shields” jest rozpatrywana dwukrotnie w danym slocie.",
-    "rootHold": "+1 w kategorii silników.",
+    "rootHold": "Począwszy od trzeciego zakrętu, każda kostka w silnikach liczy się jako o dwa wyższa.",
     "secondGrowth": "+2, gdy wynik rzutu kostką jest taki sam jak w poprzedniej turze.",
-    "mulch": "Po walce odzyskuje 1 punkt zdrowia; +5% złomu.",
     "pollen": "Maksymalna wartość na zielonej kostce przywraca 1 punkt wytrzymałości kadłuba.",
-    "longRoots": "Rosnące kostki przesuwają się o jeden stopień wyżej.",
+    "longRoots": "Kość, która wyląduje stroną o najwyższej wartości, na stałe zyskuje +1, maksymalnie do +2.",
     "greenwake": "5 lub więcej w kategorii „silniki” zapewnia 2 punkty osłony.",
-    "steadyHand": "Ustawianie progów silnika stało się o krok łatwiejsze.",
     "sapline": "Powtórzenie wartości z poprzedniej tury przywraca 2 punkty wytrzymałości kadłuba.",
-    "thicket": "Kadłub +3; odzyskuje 2 punkty zdrowia po każdej bitwie.",
+    "thicket": "Kadłub +8, ale za złom płaci się o 15% mniej.",
     "bloomCycle": "+3, gdy zielona kostka wyleci z tym samym wynikiem co w poprzedniej turze.",
-    "photosynth": "Każda zielona kostka przechowuje 1 ładunek.",
-    "evergreen": "Rastące kostki przesuwają się o dwa stopnie wyżej.",
+    "photosynth": "Każda zielona kostka, której efekt został rozpatrzony, gromadzi 1 ładunek.",
+    "evergreen": "Jeśli masz przy sobie trzy przedmioty zwiększające wzrost, kostka, która powtarza wynik z poprzedniej tury, na stałe zyskuje +1, maksymalnie do +3.",
     "tideRoots": "Fala zakłóceń uderza o jeden poziom słabiej.",
-    "worldTree": "Gdy masz cztery zielone kości, odzyskujesz 2 punkty zdrowia za każde rozstrzygnięte miejsce.",
-    "overgrowthPact": "Wzrost +2, a progi silnika są o dwa stopnie łatwiejsze; kadłub −4.",
-    "standingWave": "+4 w kategorii silników.",
-    "pocketChange": "+2 złomu na początku bitwy.",
+    "worldTree": "Gdy cztery zielone kostki zrezonują, na koniec każdej tury odzyskujesz 1 punkt wytrzymałości za każdy zielony przedmiot, który masz przy sobie.",
+    "overgrowthPact": "Wzrost +2 i kadłub −4; dopóki masz przy sobie cztery przedmioty zwiększające wzrost, każda kostka liczy się jako o 2 wyższa.",
+    "standingWave": "Progi silników są o jeden stopień łatwiejsze; 6 lub więcej silników zapewnia 4 punkty osłony i 2 punkty ładunku na następną turę.",
+    "pocketChange": "Za wejście do węzła otrzymujesz 1 złom za każdy przedmiot typu [złom] znajdujący się w twoim ekwipunku.",
     "finderFee": "+2 złomu za każde zabicie.",
-    "streetPrice": "Ceny w sklepie obniżone o 8%.",
+    "streetPrice": "Sklepy −8%, ale zysk ze złomu −5%: kupujesz i sprzedajesz po tej samej cenie rynkowej.",
     "luckyStreak": "Każda maksymalna twarz daje 3 złomów.",
     "scrapline": "+12% złomu ze wszystkich źródeł.",
     "smallMercies": "Za każdą minimalną twarz wypłacane są 2 złomów.",
-    "goldTooth": "Każda żółta kostka daje 1 złom.",
-    "tallyMark": "+10% XP za przebiegnięcie trasy.",
-    "bountyBoard": "+4 złomu za każde zabicie.",
+    "goldTooth": "Każda żółta kostka, której efekt rozpatrujesz, daje 1 złom.",
+    "tallyMark": "Każde zwycięstwo oznacza kolejny znak na liście; od szóstego wzwyż za każdy weszły węzeł otrzymujesz 3 złom.",
+    "bountyBoard": "Za każde zwycięstwo przyznawana jest nagroda w wysokości 12 sztuk złomu.",
     "marketRun": "Sklepy −10%; pierwsze ponowne losowanie w każdym sklepie jest bezpłatne.",
     "goldRush": "Najwyższy wynik na żółtej kostce daje 8 złomu.",
-    "houseEdge": "+3 przy maksymalnym wyniku na żółtej kostce.",
-    "ledgerTrick": "+20% złomu; kadłub −2.",
-    "mintCondition": "Gdy masz cztery żółte kości, Max musi zapłacić 12 punktów za złom i 1 punkt za opłatę.",
-    "silentPartner": "+30% złomu; sklepy −10%.",
-    "veinTap": "+6 złomu za każde zabicie oraz +6 na początku bitwy.",
-    "darkCurrent": "+1 w reaktorze.",
-    "lowTide": "Każda minimalna powierzchnia twarzy przechowuje 2 jednostki ładunku.",
-    "brinkmanship": "+1 do każdego rzutu, gdy wytrzymałość kadłuba wynosi poniżej 40%.",
-    "blackTithe": "Każda czarna kostka daje 2 złom.",
-    "coldFusion": "Limit ładunku +2.",
+    "houseEdge": "Rzut kostką, którego wynik wynosi 7 lub więcej w przypadku broni, powoduje trafienie krytyczne (obrażenia ×1,5).",
+    "ledgerTrick": "+20% złomu, ale limit ładunku zmniejsza się o 2.",
+    "mintCondition": "Gdy masz przy sobie cztery żółte kości, każda maksymalna wartość na kości zapewnia 10 złomu i 2 ładunki.",
+    "silentPartner": "Sklepy: -12%, z jednym darmowym ponownym losowaniem dla każdego, a każde zwycięstwo zapewnia 4 złom za każdy posiadany przedmiot typu [złom].",
+    "veinTap": "+40% szansy na niepowodzenie, ale każda ponowna rzut wymaga użycia o jedną kostkę mniej.",
+    "darkCurrent": "Wynik rzutu poniżej 5 w reaktorze liczy się jako wynik o 2 wyższy.",
+    "lowTide": "Każda kostka, która wypadnie na swojej minimalnej wartości, przypisuje 1 ładunek, niezależnie od tego, czy została umieszczona, czy nie.",
+    "brinkmanship": "+1 do każdego rzutu, którego wynik został już ustalony, gdy posiadasz trzy przedmioty ryzyka.",
+    "blackTithe": "Każdy węzeł, do którego wejdziesz, pobiera opłatę w wysokości 5 złomu za 1 punkt wytrzymałości kadłuba i przestaje naliczać opłaty, gdy wytrzymałość kadłuba spadnie poniżej 25%.",
+    "coldFusion": "Limit ładunku +4; rdzeń zużywa 15% twoich złomów.",
     "longOdds": "+3 przy minimalnym wyniku na czarnej kostce.",
-    "hardBargain": "+15% złomu; po bitwach odzyskujesz o 1 punkt zdrowia mniej.",
+    "hardBargain": "+15% złomu; kadłub −1.",
     "nightShift": "Maksymalna pojemność reaktora pozwala na przechowywanie jeszcze 2 ładunków.",
     "eventHorizon": "+3 do czarnych kości w reaktorze.",
-    "bloodPrice": "+4 do broni, gdy poziom wytrzymałości kadłuba wynosi poniżej 25%.",
-    "heatShroud": "Pierwsze przepełnienie reaktora w każdej bitwie nie powoduje uszkodzenia kadłuba.",
-    "scrapheap": "Każda nieumieszczona kostka przechowuje 1 ładunek.",
+    "bloodPrice": "Pod koniec każdej tury, o ile poziom wytrzymałości kadłuba wynosi co najmniej 30%, zużyj 1 punkt wytrzymałości kadłuba, aby zadać 4 punkty obrażeń.",
+    "heatShroud": "Pierwsze przepełnienie reaktora w każdej bitwie nie powoduje utraty punktów wytrzymałości kadłuba, a rzut kostką reaktora zwiększa osłonę o 4, o ile masz 8 lub więcej punktów ładunku.",
+    "scrapheap": "Każda nieumieszczona kostka przechowuje 1 ładunek, a każde zwycięstwo daje 5 złomu.",
     "deadReckoning": "Limit ładunku +3; kadłub −3.",
-    "obsidianCreed": "Czarne kości dają wyłącznie minimalną lub maksymalną wartość; limit ładunku +2.",
-    "lastBreath": "Raz na sesję możesz przetrwać śmiertelne trafienie, gdy masz 1 punkt wytrzymałości.",
-    "singularity": "W reaktorze pozostały jeszcze 3 ładunki.",
+    "obsidianCreed": "Czarne kości dają wyłącznie wynik minimalny lub maksymalny; limit ładunków +2; każda bitwa rozpoczyna się z 1 ładunkiem na każdy posiadany przedmiot ryzyka.",
+    "lastBreath": "Raz na sesję możesz przetrwać śmiertelne trafienie przy 1 punkcie wytrzymałości kadłuba; bitwa rozpoczęta przy trzecim punkcie wytrzymałości kadłuba rozpoczyna się z 8 punktami osłony.",
+    "singularity": "Każda kostka w reaktorze pozwala zgromadzić o 3 jednostki ładunku więcej i kosztuje 1 punkt wytrzymałości kadłuba.",
     "widerGrip": "Rzuć ponownie po jednej kostce na raz.",
     "shimStock": "Pchnięcia kosztują o 1 punkt energii mniej.",
     "deckHand": "Zarezerwuj +1 kość.",
-    "toolRoll": "Jedno dodatkowe powtórzenie rzutu w każdej turze.",
+    "toolRoll": "Jedno dodatkowe powtórzenie rzutu w każdej turze; maksymalna wytrzymałość kadłuba −2.",
     "counterweight": "Wynik 1 w rzucie kostką zamienia się na 2.",
-    "checklist": "+1 do każdej kości w pierwszej turze.",
+    "checklist": "W każdej turze w pierwszej komórce gromadzi się 1 ładunek.",
     "greyMarket": "Sklepy −6%; +6% złom.",
-    "spareParts": "+4 złomu na początku bitwy.",
+    "spareParts": "Na pierwszych dwóch turach każdej bitwy na planszę wkracza tymczasowy szary pionek d4.",
     "dampers": "Kadłub +2; limit ładunku +1.",
-    "routineCheck": "Po każdej bitwie odzyskuje 1 punkt zdrowia.",
-    "switchboard": "+2 czujniki.",
-    "gimbalMount": "Znaki zwiększają zadawane obrażenia o +2.",
-    "logistics": "Pierwsze dwa ponowne rzuty w każdym sklepie są bezpłatne; sklepy −5%.",
-    "quickHands": "Rzuć ponownie po dwie kostki na raz.",
-    "balanceBeam": "Twoja najniższa wartość rzutu w każdej turze zostaje nieznacznie podwyższona.",
-    "holdBack": "Pchnięcia kosztują o 1 punkt energii mniej; limit energii wzrasta o 2.",
-    "payloadShuffle": "Zarezerwuj +1 kość oraz jedną dodatkową niebieską kość.",
-    "shortHaul": "+15% XP za przebiegnięcie trasy.",
-    "dryDock": "Stacja naprawcza przywraca 3 dodatkowe punkty wytrzymałości kadłuba.",
-    "masterKey": "Dwa dodatkowe powtórzenia rzutu w każdej turze oraz jedna dodatkowa kostka przy każdym powtórzeniu rzutu.",
-    "greyProtocol": "+2 do każdej kostki, gdy masz w ręku cztery szare kostki.",
-    "armorPlate": "Kadłub +4.",
-    "coolantLoop": "Limit ładunku +1.",
-    "finePitch": "Ustawianie progów silnika stało się o krok łatwiejsze.",
-    "boresight": "Znaki zwiększają zadawane obrażenia o +1.",
-    "bilgePump": "Po każdej bitwie odzyskuje 1 punkt zdrowia.",
-    "dockRates": "Ceny w sklepie obniżone o 7%.",
+    "routineCheck": "Każdy wprowadzony węzeł trafia do dziennika; począwszy od dziesiątego wpisu, każda bitwa rozpoczyna się z jedną dodatkową szansą na ponowne rzucenie kością.",
+    "switchboard": "Znaki zwiększają zadawane obrażenia o +1, a po rozpatrzeniu efektu „Czujniki” rzut najniższą kostką jest powtarzany.",
+    "gimbalMount": "Wynik rzutu, w którym pojawiają się symbole „Silniki” lub „Czujniki”, liczy się jako co najmniej 4.",
+    "logistics": "Sklepy: -12%, przy czym pierwsze dwa ponowne rzuty są bezpłatne, ale dochód ze złomu wynosi -8%.",
+    "quickHands": "Rzuć ponownie po dwie kostki na raz, ale nie możesz już trzymać kostki w rezerwie.",
+    "balanceBeam": "Każda kostka, która wyląduje górną ścianką do góry, traci 1 punkt, aby podnieść wynik najniższej kostki o 2.",
+    "holdBack": "„Nudges” kosztują o 1 punkt mniej, a mając trzy przedmioty oznaczone tagiem „kość”, rezerwujesz jeszcze jedną kość.",
+    "payloadShuffle": "Zarezerwuj +2 kości, +1 dodatkową za niebieską, ale limit szarży zmniejsza się o 2.",
+    "shortHaul": "+20% XP za rejs; maksymalna wytrzymałość kadłuba −3.",
+    "dryDock": "Stacja naprawcza przywraca 2 dodatkowe punkty wytrzymałości kadłuba za każdy przedmiot, który masz przy sobie i który ma oznaczenie „stacja naprawcza” – łącznie z tym przedmiotem.",
+    "masterKey": "Jedno dodatkowe powtórzenie rzutu w każdej turze i jedna dodatkowa kostka przy każdym powtórzeniu; przy trzech przedmiotach oznaczonych jako „powtórzenie rzutu” – po jednym dodatkowym z każdego rodzaju.",
+    "greyProtocol": "W przypadku czterech szarych kości każda bitwa rozpoczyna się od trzech darmowych przesunięć i jednego dodatkowego miejsca w rezerwie.",
     "crewDrill": "+12% XP za przebiegnięcie trasy.",
-    "scrapHopper": "+3 złomu na początku bitwy.",
     "spotterCall": "5 lub więcej czujników zapisuje 1 ładunek.",
     "hullWeld": "Stacja naprawcza przywraca 1 dodatkowy punkt wytrzymałości kadłuba.",
-    "reinforcedBay": "Jeszcze jedno gniazdo modułowe.",
-    "surgeTank": "Limit ładunku +3.",
-    "hardenedHull": "Kadłub +7; progi silnika są o jeden stopień trudniejsze.",
-    "kineticDampers": "Unik pozwala zgromadzić 1 ładunek.",
-    "targetingSuite": "Zadaje o 2 punkty więcej obrażeń; zacięcie zmniejsza je o 1 punkt więcej.",
-    "pressureValve": "Pierwsze przepełnienie reaktora w każdej bitwie nie powoduje uszkodzeń kadłuba.",
-    "resonanceTuner": "+2 do ładunku na początku bitwy za każdy komplet czterech zestawów.",
-    "shockLance": "+5 w pozycji „Spinal Mount”.",
-    "piercingRounds": "Pierwsze trafienie w każdej bitwie ignoruje tarcze; daje +1 do trafień."
+    "reinforcedBay": "Jeszcze jedno gniazdo modułowe; kadłub −3.",
+    "hardenedHull": "Kadłub +6; po każdej bitwie odzyskujesz 1 punkt zdrowia.",
+    "targetingSuite": "Zadaje o +2 więcej obrażeń, a podczas rozpoznawania czujniki gromadzą 1 ładunek za każdy przedmiot z serii „Precyzja”, który masz przy sobie.",
+    "shockLance": "+5 w sekcji „Spinal Mount”, a wynik rzutu, który wyląduje tam poniżej 5, jest powtarzany w momencie upadku.",
+    "piercingRounds": "Pierwsze trafienie w każdej walce ignoruje tarcze, zwiększa liczbę celów o 1, a broń o maksymalnej sile zadaje o 2 punkty obrażeń więcej za każdy przedmiot typu „Przebijający”, który masz przy sobie.",
+    "snakeEyes": "Kostka broni, która wypadła na najniższą wartość, nadal zadaje 3 punkty obrażeń.",
+    "looseBallast": "Jedno dodatkowe powtórzenie rzutu w każdej turze; wytrzymałość kadłuba −3.",
+    "downPayment": "Pierwsze pole, które zostanie rozpatrzone w każdej turze, otrzymuje +3 i kosztuje 1 punkt wytrzymałości, chyba że wytrzymałość wynosi mniej niż 20%.",
+    "hazardPay": "Wejście do bitwy przy poziomie wytrzymałości poniżej połowy kadłuba daje 10 złomu.",
+    "overdraft": "Miejsca na broń przyjmują kości przekraczające swój limit za cenę 2 punktów kadłuba za każdą, a kość broni o wartości 9 lub większej kosztuje 2 punkty ładunku.",
+    "debtCollector": "Każda minuta spędzona w tej walce to jeden wpis w rejestrze; od czwartej minuty każda tura kończy się 1 punktem obrażeń za każdy posiadany przedmiot ryzyka.",
+    "snowline": "Każda bitwa rozpoczyna się z 1 tarczą za każdą niebieską kostkę w twojej talii.",
+    "rimeGuard": "Kość z innej szkoły włożona do gniazda nigdy nie daje wyniku poniżej 2.",
+    "whiteNoise": "Jeśli zakończysz turę z wartością szarży wynoszącą 4 lub więcej, następny atak przeciwnika zostanie zablokowany.",
+    "iceSheet": "Dopóki na pokładzie znajduje się jakikolwiek przedmiot z serii „Shieldwall”, każda tura kończy się z dodatkowymi 4 punktami tarczy.",
+    "bracingVanes": "Kostka silnika, która nie pokazuje najwyższej wartości, daje +3.",
+    "nullField": "Każda tura kończy się przyznaniem 2 punktów tarczy za każdy przedmiot „Tarcza”, a przy czterech takich przedmiotach następny atak wroga zostaje zablokowany.",
+    "takeRoot": "Każda wartość rzutu poniżej 3 zostaje podwyższona do 3 w momencie przypisania jej do pola.",
+    "seedBank": "Początek bitwy: przez kolejne trzy tury zyskujesz 1 tarczę za każdy przedmiot zwiększający siłę, który masz przy sobie.",
+    "understory": "Koniec tury: jeśli pozostały jeszcze 4 lub więcej punktów osłony, przywróć 1 punkt wytrzymałości kadłuba.",
+    "mycelium": "Gdy sześć slotów rozstrzygnie tę bitwę, na koniec każdej tury kadłub zostanie wyleczony o 2 punkty, a osłona wzrośnie o 3 punkty.",
+    "rhizome": "Progi silnika o dwa stopnie niższe; kadłub −2.",
+    "taproot": "Zlicza każdy wchodzony węzeł; począwszy od ósmego, każda bitwa rozpoczyna się z 6 punktami zdrowia tarczy i 3 punktami zdrowia kadłuba.",
+    "perennial": "W silnikach wynik rzutu kostką, który jest taki sam jak w poprzedniej turze, liczy się jako wynik o cztery wyższy.",
+    "annualRings": "Zlicza każdą kostkę, której wynik pokrywa się z wynikiem z poprzedniej tury; począwszy od trzeciej, każda taka kostka liczy się jako o 3 wyższa do końca bitwy.",
+    "dryRun": "Jeśli wynik rzutu kostką poniżej 4 jest taki sam jak poprzedni, rzut się powtarza.",
+    "teardown": "Pod koniec każdej tury tymczasowe kości są usuwane, a za każdy przedmiot z oznaczeniem „kość”, który masz przy sobie, otrzymujesz 1 złom.",
+    "tallySheet": "Każda kostka, która wyląduje na najniższej ściance, oznacza jeden punkt, a co trzy punkty są zamieniane na 3 punkty ataku pod koniec tury.",
+    "cargoHold": "Odłóż jeszcze trzy kości, ale za każdym razem rzucaj o jedną mniej.",
+    "pointBlank": "Trafienie bronią typu „max face” zadaje +3 pkt. obrażeń i kosztuje 1 pkt. wytrzymałości kadłuba.",
+    "ignition": "Bitwa rozpoczyna się od nałożenia na wroga efektu „Burn 2”.",
+    "keelStrike": "Atak typu „Max Face” w trybie „Spinal Mount” zadaje obrażenia krytyczne pomnożone przez 1,5.",
+    "runningHot": "Począwszy od czwartej kości broni w tej bitwie, do wyników kości broni dodaje się +3.",
+    "ashfall": "Cechy „Max Face” w broni zadają 2 dodatkowe punkty obrażeń za każde źródło efektu „Burn”, które posiadasz.",
+    "stokehold": "Przy trzech źródłach obrażeń od ognia każda tura kończy się dodaniem 2 punktów obrażeń od ognia.",
+    "autoAlign": "Jeśli wynik rzutu kostką wynosi mniej niż 3, rzut powtarza się natychmiast.",
+    "coreTap": "Gdy Reaktor osiągnie poziom Mk2, jego aktywacja pozwala zgromadzić 2 dodatkowe ładunki.",
+    "damageControl": "Poniżej połowy kadłuba na końcu każdego zakrętu przywraca się 3 punkty osłony.",
+    "spallLiner": "Każda bitwa rozpoczyna się z 2 punktami pancerza za każdy przedmiot z kategorii „Przetrwanie”, który masz przy sobie.",
+    "scavengedArmour": "Kadłub +6; −10% złomu.",
+    "crashPriority": "Rozpoczęcie walki przy poziomie wytrzymałości kadłuba powyżej połowy powoduje utratę 2 punktów wytrzymałości kadłuba za 5 punktów energii.",
+    "spareHands": "Jeśli masz przy sobie trzy przedmioty typu „Precyzja”, każda bitwa zaczyna się od darmowego przesunięcia.",
+    "overrideKeys": "Jeśli przystąpisz do walki z poziomem wytrzymałości kadłuba powyżej 60%, każda kostka zajmująca gniazdo broni powyżej limitu kosztuje 2 punkty wytrzymałości kadłuba.",
+    "markLedger": "Każdy punkt trafienia jest zapisywany w rejestrze, a od trzeciego trafienia każda komórka broni zadaje trafienie krytyczne.",
+    "refitCrew": "Po dotarciu do węzła, w którym stan kadłuba jest niższy niż połowa poziomu naprawy 3.",
+    "flightLog": "+25% XP za przebieg; −15% złomu.",
+    "fullRefit": "+2 do każdego rzutu, gdy masz przy sobie cztery przedmioty z atrybutem „Precyzja”.",
+    "sureThing": "Kość ułożona tak, że jej najniższa ścianka wskazuje 1 lub 2, zamienia się w 3 za 2 żetony.",
+    "chipStack": "Jeśli masz 5 lub więcej punktów ładunku, rzut kostką o maksymalnej wartości w przypadku broni powoduje trafienie krytyczne (obrażenia ×1,5).",
+    "warChest": "Jeśli posiadasz choćby jeden przedmiot [z odzysku], każda bitwa rozpoczyna się z 3 ładunkami.",
+    "marginCall": "Kostka, której wynik w kategorii broni wynosi poniżej 4, zyskuje +5 do swojej wartości za 3 złom.",
+    "loadedDice": "W każdej bitwie można wykonać rzut na los dwa razy, a koszt użycia umiejętności „nudge” jest o 2 punkty ładunku niższy."
   },
   "speaker": {
     "mara": "Mara, handlarz złomem",
@@ -930,7 +1050,7 @@
       "out": {
         "escort": "Ty idziesz na czele. Napastnikom się to nie spodoba, ale Yusuf to zapamięta.",
         "tax": "Ograniczasz mu pole manewru i pozwalasz mu przejść. On też to pamięta.",
-        "escortHim": "Ty idziesz na czele. Na samym końcu znajduje się podwórko Yusufa, gdzie możesz zajrzeć do ksiąg.",
+        "escortHim": "Ty idziesz na czele. Na samym końcu znajduje się podwórze Yusufa, gdzie możesz zajrzeć do ksiąg.",
         "takeCargo": "Przecinasz linkę i uciekasz. Yusuf nic nie mówi na otwartym kanale. To jeszcze gorzej."
       }
     },
@@ -1819,244 +1939,244 @@
   },
   "puzzle": {
     "oreVein": {
-      "title": "Ore Vein",
-      "goal": "Deal exactly {{n}} — the vein shears if you over-cut. Leave a die out."
+      "title": "Żyła rudy",
+      "goal": "Postępuj dokładnie zgodnie z instrukcją na stronie {{n}} — w przypadku zbyt głębokiego cięcia żyła może ulec przecięciu. Pomiń jedną matrycę."
     },
     "coolant": {
-      "title": "Coolant Line",
-      "goal": "Bank exactly {{n}} charge — the core drinks in steps of one and a half."
+      "title": "Przewód chłodziwa",
+      "goal": "Wprowadź dokładnie opłatę „{{n}}” — podstawowe napoje w krokach co półtora."
     },
     "cleanFit": {
       "title": "Clean Fit",
-      "goal": "Bank {{n}}+ charge with every die placed and nothing spilled past the cap."
+      "goal": "Bank {{n}}+ naliczany jest opłata za każdy umieszczony kość, a nic nie wylewa się poza limit."
     },
     "redRoute": {
-      "title": "Red Route",
-      "goal": "Deal {{n}}+ damage — a red die in Weapon A, affinity firing."
+      "title": "Czerwona trasa",
+      "goal": "Zadaj {{n}}+ obrażeń — czerwona kostka w broni A, strzał z wykorzystaniem powinowactwa."
     },
     "ignite": {
       "title": "Ignite",
-      "goal": "Deal {{n}}+ damage and land Burn — a cinder must hit its max face."
+      "goal": "Zadaj {{n}}+ obrażeń i wywołaj efekt „Spalenie” — popiół musi osiągnąć swoją maksymalną wartość."
     },
     "pipeline": {
-      "title": "Pipeline",
-      "goal": "Mark, then land {{n}}+ into the marked target, and do not overflow the reactor."
+      "title": "Rurociąg",
+      "goal": "Zaznacz, a następnie skieruj strzałę {{n}}+ w zaznaczony cel i nie dopuść do przepełnienia reaktora."
     },
     "overload": {
-      "title": "Overload",
-      "goal": "Jam the spinal on purpose, then carry {{n}}+ damage on the mounts."
+      "title": "Przeciążenie",
+      "goal": "Celowo zablokuj kręgosłup, a następnie zadaj {{n}}+ obrażeń na wierzchowcach."
     },
     "slowBurn": {
-      "title": "Slow Burn",
-      "goal": "Two turns: set Burn, reserve a hitter, and stack {{n}}+ total damage."
+      "title": "Powolny rozwój akcji",
+      "goal": "Dwie tury: ustaw „Burn”, zarezerwuj postać atakującą i zgromadź łączne obrażeni{{n}}+."
     },
     "capacitor": {
-      "title": "Capacitor",
-      "goal": "Bank {{n}}+ charge across three turns — one core cannot hold it all at once."
+      "title": "Kondensator",
+      "goal": "Bank {{n}}+ ładuje się w trzech etapach — jeden rdzeń nie jest w stanie pomieścić tego wszystkiego naraz."
     },
     "lockbox": {
-      "title": "Lockbox",
-      "goal": "Fixed reading — one routing lands damage, shield and {{n}}+ charge at once."
+      "title": "Skrzynka depozytowa",
+      "goal": "Stały efekt — jedno użycie tej umiejętności zadaje obrażenia, zapewnia tarczę oraz „{{n}}” wraz z naładowaniem."
     },
     "parity": {
-      "title": "Parity Lock",
-      "goal": "Fixed reading — {{n}}+ damage, Weapons odd, Shields even. Mind the faces."
+      "title": "Blokada parzystości",
+      "goal": "Stałe wartości — {{n}}+ obrażenia, broń – liczby nieparzyste, tarcze – liczby parzyste. Uważajcie na twarze."
     },
     "bulwarkStand": {
-      "title": "Bulwark Stand",
-      "goal": "Survive the barrage and still hold {{n}}+ shield — layer the defence."
+      "title": "Stojak Bulwark",
+      "goal": "Przetrwaj ostrzał i nadal utrzymuj tarczę {{n}}+ — wzmocnij swoją obronę."
     },
     "tally": {
-      "title": "The Tally",
-      "goal": "Deal exactly {{n}} damage."
+      "title": "Podsumowanie",
+      "goal": "Zadaje dokładnie {{n}} obrażeń."
     },
     "battery": {
-      "title": "The Battery",
-      "goal": "Store exactly {{n}} charge."
+      "title": "Akumulator",
+      "goal": "Przechowuj dokładnie{{n}}."
     },
     "seawall": {
-      "title": "The Seawall",
-      "goal": "Raise exactly {{n}} shield."
+      "title": "Falochron",
+      "goal": "Stwórz tarczę o wymiarach dokładnie{{n}}."
     },
     "mirrorMath": {
-      "title": "The Mirror",
-      "goal": "Deal {{n}} or more using at most two slots."
+      "title": "„The Mirror”",
+      "goal": "Rozdaj {{n}} lub więcej, wykorzystując maksymalnie dwa miejsca."
     },
     "engraverBench": {
-      "title": "The Bench",
-      "goal": "Raise {{n}} shield with at least two slots filled."
+      "title": "Ławka",
+      "goal": "Wznieś tarczę „{{n}}”, mając zajęte co najmniej dwa sloty."
     },
     "blackVault": {
-      "title": "The Vault",
-      "goal": "Store {{n}} charge using a school's own system."
+      "title": "Skarbiec",
+      "goal": "Przechowuj opłaty za usługę „{{n}}” w systemie należącym do szkoły."
     },
     "spinalDrill": {
-      "title": "Spinal Drill",
-      "goal": "Mark, jam the Spinal, then deal {{n}}."
+      "title": "Wiertarka do kręgosłupa",
+      "goal": "Mark, zablokuj „Spinal”, a potem zagraj „{{n}}”."
     },
     "coolChain": {
-      "title": "Cool Chain",
-      "goal": "Shields first, then {{n}} charge, and no overflow."
+      "title": "Łańcuch chłodniczy",
+      "goal": "Najpierw tarcze, potem atak typu „{{n}}”, bez efektu „overflow”."
     },
     "emberStack": {
       "title": "Ember Stack",
-      "goal": "Deal {{n}} across two turns."
+      "goal": "Rozdaj karty „{{n}}” w dwóch rundach."
     },
     "shieldWall": {
-      "title": "Shield Wall",
-      "goal": "End the second turn on {{n}} shield."
+      "title": "Ściana tarczowa",
+      "goal": "Zakończ drugą turę na tarczy „{{n}}”."
     },
     "fateBench": {
-      "title": "Fixed Odds",
-      "goal": "One roll, one placement: damage, shield, and {{n}} charge."
+      "title": "Stałe kursy",
+      "goal": "Jeden rzut, jedno użycie: obrażenia, tarcza i ładunek „{{n}}”."
     },
     "sortingYard": {
-      "title": "Sorting Yard",
-      "goal": "Deal {{n}} or more with an even total in Weapon A."
+      "title": "Plac sortowania",
+      "goal": "Zagraj w „{{n}}” lub więcej, a suma punktów w kategorii „Weapon A” musi być parzysta."
     },
     "choirStand": {
-      "title": "The Choir Stand",
-      "goal": "Survive the charged volley on {{n}} shield or more."
+      "title": "Podest chóru",
+      "goal": "Przetrwaj salwę naładowanych pocisków, używając tarczy „{{n}}” lub większej."
     },
     "emberCut": {
-      "title": "Ember Cut",
-      "goal": "Land within two of {{n}} damage — the seam gives at either edge."
+      "title": "Cięcie Ember",
+      "goal": "Znajduje się w odległości dwóch od uszkodzenia typu „{{n}}” — szew pęka na jednej z krawędzi."
     },
     "driftSpark": {
-      "title": "Drift Spark",
-      "goal": "Bank {{n}} charge, give or take two. The coil is forgiving; the core is not."
+      "title": "Dryf Iskra",
+      "goal": "Bank „{{n}}” – plus minus dwa. Cewka jest wyrozumiała, rdzeń już nie."
     },
     "plateFit": {
-      "title": "Plate Fit",
-      "goal": "Raise exactly {{n}} shield. The plate seats or it does not."
+      "title": "Dopasowanie płyty",
+      "goal": "Zbuduj dokładnie tarczę typu „{{n}}”. Płytka albo się wpasuje, albo nie."
     },
     "hairline": {
-      "title": "Hairline",
-      "goal": "One mount, exactly {{n}} damage. Everything else stays in the tray."
+      "title": "Linia włosów",
+      "goal": "Jedna amuletka, dokładnie{{n}}ów obrażeń. Wszystko inne zostaje w szufladce."
     },
     "tithe": {
-      "title": "The Tithe",
-      "goal": "Exactly {{n}} charge, and the reactor takes its cut first."
+      "title": "Dziesięcina",
+      "goal": "Dokładnie tyle, ile wynosi opłata za usługę „{{n}}”, a reaktor pobiera swoją część jako pierwszy."
     },
     "deadWeight": {
-      "title": "Dead Weight",
-      "goal": "Deal {{n}}+ with every die placed — the ballast has to go somewhere."
+      "title": "Ciężar własny",
+      "goal": "Zastosowanie{{n}}+ przy każdym umieszczonym kostce — balast musi gdzieś trafić."
     },
     "blueLane": {
       "title": "Blue Lane",
-      "goal": "Raise {{n}}+ shield with a blue die in the Shields — the lane is keyed."
+      "goal": "Wytwórz tarczę typu „{{n}}” z niebieską kostką w sekcji „Tarcze” — linia jest zablokowana."
     },
     "spread": {
-      "title": "The Spread",
-      "goal": "Deal {{n}}+ across three systems. Nothing concentrated survives the scan."
+      "title": "Rozpiętość",
+      "goal": "Zastosuj opcję „{{n}}” na trzech systemach. Żadna skoncentrowana zawartość nie przetrwa skanowania."
     },
     "greenhouse": {
-      "title": "Greenhouse",
-      "goal": "Deal {{n}}+ and make something grow — a green die must land on its top face."
+      "title": "Szklarnia",
+      "goal": "Zrealizuj akcję „{{n}}+” i spraw, by coś wyrosło — zielona kostka musi wylądować na górnej ściance."
     },
     "overcut": {
-      "title": "Overcut",
-      "goal": "Bank {{n}}+ charge and force a die past a cap it does not fit."
+      "title": "Nadcięcie",
+      "goal": "Bank {{n}}+ obciąża i wciska kość przez nasadkę, do której nie pasuje."
     },
     "tightPack": {
-      "title": "Tight Pack",
-      "goal": "Bank {{n}}+ charge across two systems with nothing spilled past a cap."
+      "title": "Ciasna paczka",
+      "goal": "Bank {{n}}+ nalicza opłaty w obu systemach, przy czym żadna kwota nie przekracza ustalonego limitu."
     },
     "oddPlate": {
-      "title": "Odd Plate",
-      "goal": "Raise {{n}}+ shield reading odd, with the engines reading even."
+      "title": "Nieparzysta tablica rejestracyjna",
+      "goal": "Podnieść „{{n}}” + tarczę o wartości nieparzystej, przy wartościach silników o wartości parzystej."
     },
     "redOnly": {
-      "title": "Red Only",
-      "goal": "Deal {{n}}+ with a red die in Weapon A, and Burn has to land."
+      "title": "Tylko czerwone",
+      "goal": "Zastosuj efekt „{{n}}” + z czerwoną kostką w Broni A, a efekt „Burn” musi zadziałać."
     },
     "perfectSeal": {
-      "title": "Perfect Seal",
-      "goal": "One reading only: {{n}}+ damage, every die placed, Weapons odd, Shields and the core even."
+      "title": "Idealna szczelność",
+      "goal": "Tylko jedno odczytanie: {{n}}+ obrażenia, każda rzucona kostka – broń na nieparzystych, tarcze i rdzeń na parzystych."
     },
     "firstLight": {
-      "title": "First Light",
-      "goal": "Mark first, then put {{n}}+ into what the sensors found."
+      "title": "Pierwsze światło",
+      "goal": "Najpierw zaznacz, a potem wpisz „{{n}}” do wyników wykrytych przez czujniki."
     },
     "coldStart": {
-      "title": "Cold Start",
-      "goal": "Shields up first, then {{n}}+ charge into a cold core."
+      "title": "Rozruch na zimno",
+      "goal": "Najpierw podnieść tarcze, a potem wykonać atak „{{n}}” i rzucić się na zimne jądro."
     },
     "braceGate": {
-      "title": "Brace Gate",
-      "goal": "Mark, brace for {{n}}+ shield, and leave the reactor unflooded."
+      "title": "Afera Brace’a",
+      "goal": "Mark, przygotuj się na osłonę typu „{{n}}”, i nie zalewaj reaktora."
     },
     "siegeLine": {
-      "title": "Siege Line",
-      "goal": "Jam the spinal on purpose, carry {{n}}+ on the mounts, and hold the core."
+      "title": "Linia oblężnicza",
+      "goal": "Celowo zablokuj kręgosłup, załóż na uchwyty „{{n}}” i utrzymaj rdzeń."
     },
     "markedBurn": {
-      "title": "Marked Burn",
-      "goal": "Mark, jam the spinal, and still land {{n}}+ on the mount."
+      "title": "Wyraźne oparzenie",
+      "goal": "Mark, zablokuj kręgosłup, a mimo to wyląduj w pozycji „{{n}}” z przewagą."
     },
     "dryDock": {
-      "title": "Dry Dock",
-      "goal": "Shields, then {{n}}+ charge, and not one point over the cap."
+      "title": "Suchy dok",
+      "goal": "Tarcze, a potem {{n}}+ opłata – i ani o jeden punkt nie przekroczyliśmy limitu."
     },
     "theWholeChain": {
-      "title": "The Whole Chain",
-      "goal": "Mark, bank without flooding, and finish on {{n}}+ — one pass, no rerolls."
+      "title": "Cały łańcuch",
+      "goal": "Zaznacz, nie zalewaj, i zakończ na {{n}}+ — jedno przejście, bez powtórek."
     },
     "ironBank": {
-      "title": "Iron Bank",
-      "goal": "Three turns, one core: bank {{n}}+ without ever spilling."
+      "title": "Bank Żelaza",
+      "goal": "Trzy obroty, jeden rdzeń: wykonaj manewr „{{n}}” bez rozlania ani kropli."
     },
     "twinFuse": {
-      "title": "Twin Fuse",
-      "goal": "The first die sits out turn one. Still reach {{n}}+ across the two."
+      "title": "Podwójny bezpiecznik",
+      "goal": "Pierwsza kostka nie bierze udziału w pierwszej turze. Mimo to w sumie udaje się osiągnąć {{n}}+."
     },
     "longWall": {
-      "title": "Long Wall",
-      "goal": "Only the last turn counts. End on {{n}}+ shield — hold a die back for it."
+      "title": "Długa ściana",
+      "goal": "Liczy się tylko ostatnia tura. Zakończ grę z kartą „{{n}}” i tarczą — zachowaj na to jedną kostkę."
     },
     "slowFuse": {
-      "title": "Slow Fuse",
-      "goal": "The first die sits out turn one. Burn and mounts must still total {{n}}+."
+      "title": "Powolny zapalnik",
+      "goal": "Pierwsza kostka nie bierze udziału w pierwszej turze. Łączna wartość punktów „Burn” i „Mounts” musi nadal wynosić co najmniej „{{n}}”."
     },
     "reactorRun": {
-      "title": "Reactor Run",
-      "goal": "The first die sits out turn one, and there are no rerolls. Bank {{n}}+."
+      "title": "Praca reaktora",
+      "goal": "Pierwsza kostka nie bierze udziału w pierwszej turze i nie ma ponownych rzutów. Bank{{n}}+."
     },
     "theLongCount": {
-      "title": "The Long Count",
-      "goal": "Three turns, no rerolls, the first die held back — and {{n}}+ banked at the end."
+      "title": "Długi Licznik",
+      "goal": "Trzy tury, bez powtórek rzutów, pierwsza kostka odłożona na bok — a na koniec „{{n}}”+ w kieszeni."
     },
     "ledger": {
-      "title": "The Ledger",
-      "goal": "Fixed reading — every die booked, Shields reading even, {{n}}+ damage on the line."
+      "title": "Księga",
+      "goal": "Stały wynik rzutu — wszystkie kości zarezerwowane, wynik Shields równy, {{n}}+ obrażeń na linii."
     },
     "crossWire": {
       "title": "Cross-Wire",
-      "goal": "Fixed reading — damage, shield and {{n}}+ charge out of one routing."
+      "goal": "Stały efekt — obrażenia, tarcza oraz „{{n}}” + szarża po jednym wycofaniu się."
     },
     "mirrorRead": {
-      "title": "Mirror Read",
-      "goal": "Fixed reading — {{n}}+ damage with Burn landed. Only one way round."
+      "title": "Odczyt z lustrzanego odbicia",
+      "goal": "Poprawiono tekst — „{{n}}” + obrażenia przy trafieniu efektem „Burn”. Jest tylko jedna wersja."
     },
     "theSeal": {
-      "title": "The Seal",
-      "goal": "Fixed reading — {{n}}+ damage, Shields reading even, nothing spilled past a cap."
+      "title": "Pieczęć",
+      "goal": "Wartość stała — {{n}}+ obrażenia, wartości osłon są równe, nic nie przekroczyło limitu."
     },
     "hullCheck": {
-      "title": "Hull Check",
-      "goal": "Take the volley and still stand on {{n}}+ shield."
+      "title": "Kadłub Sprawdź",
+      "goal": "Odbij piłkę i pozostań na tarczy {{n}}+."
     },
     "lastLight": {
-      "title": "Last Light",
-      "goal": "Survive the volley with {{n}}+ charge still in the core."
+      "title": "Ostatnie światło",
+      "goal": "Przetrwaj salwę, mając w rdzeniu jeszcze ładunek typu „{{n}}”."
     },
     "stormFront": {
-      "title": "Storm Front",
-      "goal": "Survive the volley and answer it with {{n}}+ damage in the same turn."
+      "title": "Front burzowy",
+      "goal": "Przetrwaj atak i odpowiedz nim, zadając w tej samej turze obrażeni{{n}}+."
     },
     "theVigil": {
-      "title": "The Vigil",
-      "goal": "One reading, no board changes: take the heaviest volley in the sector and still hold {{n}}+ charge."
+      "title": "Czuwanie",
+      "goal": "Jeden odczyt, brak zmian na planszy: przyjmij najsilniejszy ostrzał w sektorze i nadal zachowaj ładunek typu „{{n}}”."
     }
   },
   "bark": {
@@ -2631,209 +2751,249 @@
   "modules": {
     "magnetScoop": {
       "name": "Łopatka magnetyczna",
-      "desc": "+2 złomu na początku każdej bitwy."
+      "desc": "Za każdy weszły węzeł otrzymujesz 2 złom, a za każdą wygraną bitwę – kolejne 3."
     },
     "grapple": {
       "name": "Haczyk kotwiczny",
-      "desc": "+3 złomu za każdego pokonanego wroga."
+      "desc": "+3 złom za każdego pokonanego wroga oraz dodatkowe 8 złomu za zwycięstwo w bitwie do końca tury 3."
     },
     "lotteryBlock": {
       "name": "Blok loterii",
-      "desc": "Pierwsze ponowne losowanie w każdym sklepie jest bezpłatne."
+      "desc": "Pierwsze ponowne losowanie w każdym sklepie jest bezpłatne, a za każdy trzeci węzeł, do którego wejdziesz, otrzymujesz 12 złomu."
     },
     "trainingModule": {
       "name": "Moduł szkoleniowy",
-      "desc": "+20% XP za przebiegnięcie trasy."
+      "desc": "+20% XP, a po zdobyciu 4 węzłów wyszkolona załoga zapewnia 1 dodatkową szansę na ponowny rzut w każdej bitwie."
     },
     "assayRig": {
       "name": "Układ badawczy",
-      "desc": "Każda maksymalna twarz daje 2 złomów."
+      "desc": "Za każdą maksymalną twarz rozpoznaną w Broni A przyznaje się 5 złomu."
     },
     "brokerLink": {
       "name": "Link do brokera",
-      "desc": "Ceny w sklepie obniżone o 12%."
+      "desc": "Ceny w sklepie spadły o 16%, ale układ antenowy pochłania maksymalnie 3 punkty wytrzymałości kadłuba."
     },
     "slagPress": {
       "name": "Prasa do żużlu",
-      "desc": "Za każdą minimalną twarz wypłacane są 3 złomów."
+      "desc": "Kość umieszczona w broni B najniższą stroną do góry jest przesuwana o maksymalnie 4 i zapewnia 3 złom."
     },
     "tithePlate": {
       "name": "Taca na dziesięcinę",
-      "desc": "+25% złomu ze wszystkich źródeł."
+      "desc": "+25% złomu ze wszystkich źródeł oraz 2 jednostki złomu na początku bitwy za każdy posiadany przedmiot typu [złom]."
     },
     "salvageArm": {
       "name": "Ramię ratownicze",
-      "desc": "Za każdą kostkę, która nie zajęła miejsca, otrzymuje się 1 złom."
+      "desc": "Każda wygrana bitwa powoduje pojawienie się wraku; począwszy od piątego wraku, za każdy węzeł, do którego wejdziesz, otrzymujesz 4 sztuki złomu."
     },
     "auditCore": {
       "name": "Podstawy audytu",
-      "desc": "+6 złomu na początku bitwy; sklepy −5%."
+      "desc": "+4 złomu na początku każdej bitwy oraz dodatkowe 8, gdy reaktor osiągnie poziom Mk2."
     },
     "mirrorPlate": {
       "name": "Powlekanie lustrzane",
-      "desc": "Uniknięte trafienie odbija obrażenia z powrotem."
+      "desc": "Każda kostka rozstrzygnięta w ramach ataku z tarczą zadaje 6 punktów obrażeń przeciwnikowi pod koniec tury."
     },
     "ballastModule": {
-      "name": "Balast",
-      "desc": "Kadłub +4."
+      "name": "Zbiorniki balastowe",
+      "desc": "Kadłub +5 oraz progi silnika są o jeden poziom trudniejsze; każdy węzeł, do którego wejdziesz, naprawia 1 punkt kadłuba."
     },
     "escapePod": {
       "name": "Kapsuła ratunkowa",
-      "desc": "Raz na sesję możesz przetrwać śmiertelne trafienie przy 1 punkcie wytrzymałości kadłuba."
+      "desc": "Raz na sesję przetrwasz śmiertelne trafienie przy 1 punkcie wytrzymałości kadłuba, a każda bitwa, do której wkraczasz z wytrzymałością kadłuba poniżej 40%, rozpoczyna się z 8 punktami osłony i jednym dodatkowym slotem rezerwowym."
     },
     "heatsink": {
       "name": "Radiator",
-      "desc": "Pierwsze przepełnienie reaktora w każdej bitwie nie powoduje uszkodzenia kadłuba."
+      "desc": "Każda kostka, umieszczona na reaktorze przez jego pokrywę, kosztuje 1 punkt wytrzymałości, a maksymalna wartość na ściance kostki umieszczonej w reaktorze zmniejsza osłonę o 3 punkty."
     },
     "fieldStabilizer": {
       "name": "Stabilizator pola",
-      "desc": "Fala zakłóceń uderza o jeden poziom słabiej."
+      "desc": "Fala interferencyjna uderza o jeden poziom słabiej, a walka rozpoczynająca się przy poziomie fali 3 lub wyższym zapewnia ci darmowe przesunięcie i 4 tarcze."
     },
     "ablativeWeave": {
       "name": "Splot ablacyjny",
-      "desc": "+2 do tarczy za każdą kostkę tarczy."
+      "desc": "Pierwsze dwie kostki, których wynik to „Tarcze” w każdej bitwie, dodają po 5 tarcz, w miarę jak osłona ulega zniszczeniu."
     },
     "bulkheadRing": {
       "name": "Pierścień przegrody",
-      "desc": "Kadłub +8; progi silnika są o jeden stopień trudniejsze."
+      "desc": "Kadłub +8 oraz progi silnika są o jeden stopień trudniejsze; przy osłonach na poziomie Mk 2 każda bitwa rozpoczyna się z 6 punktami osłony, a na poziomie Mk 3 rezerwa zawiera o jedną kostkę więcej."
     },
     "dampingCoil": {
       "name": "Cewka tłumiąca",
-      "desc": "Po każdej bitwie przywraca 3 punktów wytrzymałości kadłuba."
+      "desc": "Cewka rozwija się przez kolejne trzy zwoje, a każdy z nich kończy się kolejnymi trzema zwojami ekranującymi."
     },
     "hardpointClamp": {
       "name": "Zacisk mocujący",
-      "desc": "Ustawianie progów silnika stało się o krok łatwiejsze."
+      "desc": "Progi silnika są o jeden stopień łatwiejsze, a gdy mocowanie silnika osiągnie poziom Mk 2, każda kostka w rzucie liczy się jako +3."
     },
     "voidLiner": {
       "name": "Wkładka Void",
-      "desc": "+3 do osłony z kości osłony, gdy poziom wytrzymałości kadłuba wynosi poniżej 40%."
+      "desc": "+4 do każdej kostki w osłonach II, a gdy wytrzymałość kadłuba wynosi poniżej 40%, do osłon dodaje się również 4 kostki."
     },
     "siegeMount": {
       "name": "Góra Oblężnicza",
-      "desc": "+2 do obrażeń przy maksymalnym poziomie twarzy w kategorii broni."
+      "desc": "+4 do umiejętności „Broń A” od drugiej tury."
     },
     "piercer": {
       "name": "Piercer",
-      "desc": "Pierwsze trafienie w każdej bitwie ignoruje osłony."
+      "desc": "Pierwsze trafienie w każdej walce ignoruje tarcze, a umiejętność „Spinal Mount” zadaje 2 dodatkowe punkty obrażeń za każdy przedmiot z efektem „Przebicie”, który masz przy sobie."
     },
     "emberInjector": {
       "name": "Wtryskiwacz Ember",
-      "desc": "Maksymalna wartość parametru „face” dla broni powoduje zastosowanie efektu „Burn 2”."
+      "desc": "Każda kostka, której wynik jest rozpatrywany w sekcji „Broń B”, powoduje zadanie 2 punktów obrażeń od ognia."
     },
     "railCradle": {
       "name": "Podstawa szynowa",
-      "desc": "+3 w przypadku mocowania kręgosłupowego."
+      "desc": "Mocowanie kręgosłupowe zyskuje +1, a po modernizacji do wersji Mk II – łącznie +5."
     },
     "targetingMesh": {
       "name": "Siatka docelowa",
-      "desc": "Znaki zwiększają zadawane obrażenia o +2."
+      "desc": "Znaki dają +1, a rozegranie karty „Czujniki” dodaje +2 do wyniku rzutu kostką w puli „Broń A”."
     },
     "overpressure": {
       "name": "Nadciśnienie",
-      "desc": "+3 do broni w pierwszej turze."
+      "desc": "Pierwsze pole rozstrzygnięte w każdej turze otrzymuje +4, jeśli jest to broń; rzucasz o jedną kostkę mniej."
     },
     "ricochetHousing": {
       "name": "Ricochet Housing",
-      "desc": "Przesadna siła rażenia broni z kategorii A przenosi się na kolejnego wroga."
+      "desc": "Efekt „Overkill” przenosi się na kolejnego wroga, a pocisk o maksymalnej sile rażenia z sekcji „Weapons B” odbija się, zadając 5 punktów obrażeń pod koniec następnej tury."
     },
     "splinterHead": {
       "name": "Głowa odłamka",
-      "desc": "+3 do broni przy minimalnym wyniku rzutu."
+      "desc": "Wynik rzutu kostką broni poniżej 4 zadaje 1 dodatkowy punkt obrażeń za każdy przedmiot z serii „Swarm”, który masz przy sobie."
     },
     "lanceCapacitor": {
       "name": "Kondensator Lance’a",
-      "desc": "+2 do broni przy wyniku 7 lub wyższym."
+      "desc": "Każda kostka broni, której wynik wynosi 6 lub więcej zgromadzonych punktów szarży, zużywa 6 z nich, zapewniając +5."
     },
     "executioner": {
       "name": "Kat",
-      "desc": "+3 do broni, gdy poziom wytrzymałości kadłuba spadnie poniżej 30%."
+      "desc": "Gdy broń A osiąga poziom Mk II, każdy jej strzał zadaje obrażenia krytyczne; na poziomie Mk III każdy strzał z tej broni zwiększa obrażenia o 4."
     },
     "solenoid": {
       "name": "Elektromagnes",
-      "desc": "Jedno dodatkowe powtórzenie rzutu w każdej turze."
+      "desc": "Jedno dodatkowe rzucenie kostką w każdej turze, a kostka, której wynik w polu „Broń B” wynosi poniżej 4, jest ponownie rzucana raz."
     },
     "gyroStabilizer": {
       "name": "Stabilizator żyroskopowy",
-      "desc": "Zarezerwuj +1 kość."
+      "desc": "Zarezerwuj +1 kość, a następnie jeszcze +1, gdy silniki osiągną poziom Mk2."
     },
     "recycler": {
       "name": "Zakład recyklingu",
-      "desc": "Każda nieumieszczona kostka przechowuje 1 ładunek."
+      "desc": "Pod koniec każdej tury topi wszystkie tymczasowe kości, wrzuca do tacki nową szarą kość d4 i generuje 2 jednostki złomu."
     },
     "resonator": {
       "name": "Rezonator",
-      "desc": "+2 do ładunku na początku bitwy za każdy komplet czterech zestawów."
+      "desc": "+2 do ładunku na początku bitwy za każdy ukończony zestaw czterech elementów, 2 dodatkowe punkty ładunku w każdej z trzech kolejnych tur oraz +2 do każdej kości, gdy posiadasz 8 lub więcej punktów ładunku."
     },
     "nudgeGovernor": {
       "name": "Gubernator Nudge",
-      "desc": "Pchnięcia kosztują o 1 punkt energii mniej."
+      "desc": "„Nudges” kosztują o 1 punkt energii mniej, ale limit energii zmniejsza się o 1."
     },
     "wideGrip": {
       "name": "Szeroki uchwyt",
-      "desc": "Rzuć ponownie po jednej kostce na raz."
+      "desc": "Rzuć ponownie po jednej kostce na raz; jeśli masz trzy przedmioty oznaczone tagiem „reroll”, w każdej bitwie dodaje się jedną dodatkową kostkę na każdy ponowny rzut oraz jeden dodatkowy rzut."
     },
     "capacitorBank": {
       "name": "Zestaw kondensatorów",
-      "desc": "Limit ładunku +3."
+      "desc": "Limit szarży +3; jeśli bitwa zakończy się z co najmniej 3 punktami szarży, 3 z nich trafiają do puli, a pula zwraca te 3 punkty na początku następnej bitwy."
     },
     "primerCoil": {
       "name": "Cewka rozruchowa",
-      "desc": "+2 w reaktorze."
-    },
-    "blueBallast": {
-      "name": "Blue Ballast",
-      "desc": "Odłóż jedną dodatkową niebieską kostkę."
+      "desc": "Kostka, która w grze „Sensors” wylosowała najwyższą wartość, przygotowuje następną czerwoną kostkę w tej turze, zwiększając jej wartość o +3."
     },
     "growthTrellis": {
       "name": "Kratka do uprawy roślin",
-      "desc": "Rosnące kostki przesuwają się o jeden stopień wyżej."
+      "desc": "Rosnące kości wspinają się o jeden stopień wyżej, a kość, której wynik w fazie „Silniki” jest ustalany na podstawie najwyższej ścianki, rośnie o 1, maksymalnie do 3."
     },
     "echoBuffer": {
       "name": "Echo Bufor",
-      "desc": "+2 do ładunku, gdy wynik rzutu kostką jest taki sam jak w poprzedniej turze."
+      "desc": "Kość, która powtarza wynik z poprzedniej tury, gromadzi 2 jednostki ładunku, a kość rozstrzygnięta w reaktorze zapewnia 3 dodatkowe jednostki ładunku w następnej turze."
     },
     "seedVault": {
       "name": "Skarbiec nasion",
-      "desc": "+2 z zielonych kości w silnikach."
+      "desc": "W pierwszych trzech turach każdej bitwy na planszę wkraczają tymczasowy zielony pionek d4 i szary pionek d4."
     },
     "jamBreaker": {
       "name": "Rozbijacz dżemu",
-      "desc": "Twoja umiejętność „Jam” zmniejsza obrażenia z ataków wroga o 2."
+      "desc": "Twoja umiejętność „Jam” zmniejsza liczbę trafień z ataków wroga o 2, a przy czujnikach w wersji Mk2 lub wyższej każda bitwa rozpoczyna się z jednym dodatkowym miejscem w rezerwie."
     },
     "entropySink": {
       "name": "Pochłaniacz entropii",
-      "desc": "Każda minimalna powierzchnia twarzy przechowuje 2 jednostki ładunku."
+      "desc": "Limit ładunku +2, a przy reaktorze w wersji Mk2 lub nowszej każda strona miny przechowuje 3 jednostki ładunku."
     },
     "paradoxLoop": {
       "name": "Pętla paradoksalna",
-      "desc": "W przypadku broni z opcją „max face” slot ten jest rozpatrywany dwukrotnie."
+      "desc": "Broń A rozpatruje się dwukrotnie przy wyniku maksymalnym; broń B rozpatruje się dwukrotnie przy wyniku minimalnym."
     },
     "blackLedger": {
       "name": "Czarna księga",
-      "desc": "+3 z czarnych kości w broni."
+      "desc": "Każdy węzeł wpłaca 3 jednostki złomu na konto; na szóstym węźle rejestr gromadzi 4 jednostki kadłuba i otwiera nową stronę."
     },
     "prismLens": {
       "name": "Soczewka pryzmatyczna",
-      "desc": "+1 do każdej kości w pierwszej turze."
+      "desc": "Każda kostka, która wypadła najniższą stroną do góry, jest rzucana ponownie."
     },
     "hushAntenna": {
       "name": "Antena Hush",
-      "desc": "+2 czujniki."
+      "desc": "Jeśli na koniec tury nie masz zgromadzonych ładunków, antena po cichu zwraca 3 ładunki."
     },
     "coldLogicCore": {
       "name": "Rdzeń „Cold Logic”",
-      "desc": "Lekkie trafienia są darmowe; trafienia krytyczne przestają się zdarzać."
+      "desc": "Przesunięcia kosztują o 2 punkty mniej, a każda bitwa rozpoczyna się z 2 darmowymi przesunięciami; krytyczne trafienia nigdy nie mają miejsca."
     },
     "gamblersChip": {
       "name": "Żeton hazardzisty",
-      "desc": "Każda karta „max face” zapewnia 1 punkt ładunku i 1 punkt złomu."
+      "desc": "Karta „Max Face” zapewnia 2 złom za każdy posiadany przedmiot [ryzyka] oraz pozwala na ponowne rzucenie losowej innej kostki."
+    },
+    "bufferCells": {
+      "name": "Komórki buforowe",
+      "desc": "Kadłub −3, ale każda bitwa rozpoczyna się z 6 punktami tarczy."
+    },
+    "citadelCore": {
+      "name": "Rdzeń Cytadeli",
+      "desc": "Każda kostka pasuje do uchwytu tarczy zamontowanego na jej nasadce, nie powodując utraty punktów kadłuba; każda bitwa rozpoczyna się z 2 punktami tarczy na każdy przedmiot typu „Shieldwall”, który posiadasz, a dopóki posiadasz 12 lub więcej punktów tarczy, każda kostka rozstrzygnięta w uchwycie tarczy naprawia 3 punkty kadłuba."
+    },
+    "ratchetFeed": {
+      "name": "Posuw zapadkowy",
+      "desc": "Kość wrzucona do broni A poniżej poziomu 3 przesuwa się o 3 poziomy w górę."
+    },
+    "bondedVault": {
+      "name": "Sklepienie klejone",
+      "desc": "+2 do limitu ładunków oraz 1 ładunek na początku bitwy za każdy posiadany przedmiot typu [złom]."
+    },
+    "foundryCore": {
+      "name": "Rdzeń odlewniczy",
+      "desc": "+30% do cen złomu i w sklepie, −12%; każda bitwa rozpoczyna się z żółtą kostką d6, która działa przez 3 tury, a jeśli posiadasz 5 lub więcej przedmiotów [złomu], pojawia się druga taka kostka."
+    },
+    "gunCamera": {
+      "name": "Kamera zamontowana na broni",
+      "desc": "Rejestruje każdy węzeł, do którego wejdziesz: broń zyskuje +2 po 6 węzłach i +4 po 14."
+    },
+    "autoloader": {
+      "name": "Tablica modułów automatycznego ładowania",
+      "desc": "W każdej bitwie do twojej tacy trafia dodatkowa czerwona kostka d6, a co trzecie rozstrzygnięcie miejsca na broń zapewnia kolejną na następną turę."
+    },
+    "prophecyMount": {
+      "name": "Góra Proroctwa",
+      "desc": "Wybicie maksymalnej wartości na broni A powoduje, że następna szara kostka w tej turze przyjmuje najwyższą wartość."
+    },
+    "phantomBay": {
+      "name": "Zatoka Fantomowa",
+      "desc": "Pod koniec każdej tury na tacy pojawia się szara kostka d4-ki, która pozostaje tam przez jedną turę."
+    },
+    "delayLine": {
+      "name": "Linia opóźniająca",
+      "desc": "W broni B pojawia się efekt „max face” z opóźnieniem: pod koniec następnej tury otrzymujesz 3 punkty obrażeń za każdy posiadany przedmiot typu [spike]."
+    },
+    "nonEuclidRack": {
+      "name": "Stojak nieeuklidesowy",
+      "desc": "Każde miejsce przyjmuje kostkę dowolnego poziomu, przy czym za każdym razem, gdy następuje rozstrzygnięcie, zużywa się 1 punkt wytrzymałości; limit ładunku zmniejsza się o −3."
     }
   },
   "engravings": {
     "sting": {
       "name": "Sting",
-      "desc": "+1 do obrażeń przy maksymalnym poziomie broni."
+      "desc": "+1 za maksymalną wartość „face” w broni."
     },
     "frost": {
       "name": "Mróz",
@@ -2845,7 +3005,7 @@
     },
     "echo": {
       "name": "Echo",
-      "desc": "Powtórzenie wartości z ostatniej tury powoduje zapisanie 1 ładunku."
+      "desc": "Powtórzenie wartości z poprzedniej tury powoduje zapisanie 1 ładunku i dodanie +1."
     },
     "anchor": {
       "name": "Kotwica",
@@ -2857,7 +3017,7 @@
     },
     "flame": {
       "name": "Płomień",
-      "desc": "Maksymalna wartość parametru „face” w broni zapewnia efekt „Burn 1”."
+      "desc": "Pierwszy rzut kostką broni w każdej turze dodaje 2 punkty obrażeń od ognia."
     },
     "edge": {
       "name": "Krawędź",
@@ -2877,7 +3037,7 @@
     },
     "spark": {
       "name": "Iskra",
-      "desc": "Wyrzucenie 1 oznacza zgromadzenie 2 punktów energii."
+      "desc": "Wynik 1 oznacza 2 punkty energii, a wartość kości ustala się na 2."
     },
     "keel": {
       "name": "Kiel",
@@ -2889,7 +3049,7 @@
     },
     "bastion": {
       "name": "Bastion",
-      "desc": "+1 do tarcz."
+      "desc": "6 lub więcej w tarczach zapewnia 2 punkty tarczy."
     },
     "hunger": {
       "name": "Głód",
@@ -2897,11 +3057,11 @@
     },
     "ash": {
       "name": "Popiół",
-      "desc": "Za minową twarz płaci się 2 złomów."
+      "desc": "Karta „min” kosztuje 2 złom i dodaje 1 punkt obrażeń od ognia."
     },
     "surf": {
       "name": "Surfowanie",
-      "desc": "+1 w pierwszej turze."
+      "desc": "W pierwszej turze silniki: +3 i 2 punkty osłony."
     },
     "lastLight": {
       "name": "Ostatnie światło",
@@ -2909,7 +3069,7 @@
     },
     "weight": {
       "name": "Waga",
-      "desc": "Każda wartość mniejsza niż 3 jest traktowana jako 3."
+      "desc": "Po umieszczeniu każda wartość mniejsza niż 3 zostaje zmieniona na 3, co kosztuje 1 punkt wytrzymałości kadłuba."
     },
     "crown": {
       "name": "Korona",
@@ -2925,11 +3085,11 @@
     },
     "rime": {
       "name": "Rime",
-      "desc": "+2 do tarczy za każdym razem, gdy zajmuje miejsce na tarczę."
+      "desc": "+2 do tarczy za każdym razem, gdy zajmuje ona miejsce na tarczę; jeśli posiadasz 8 lub więcej punktów tarczy, otrzymujesz 1 dodatkowy punkt na koniec tury."
     },
     "loam": {
       "name": "Gleba gliniasta",
-      "desc": "+2 w kategorii silników."
+      "desc": "Za każdym razem, gdy napełnia silniki, jego wartość wzrasta o +1, maksymalnie do +3."
     },
     "cinder": {
       "name": "Popiół",
@@ -2937,7 +3097,7 @@
     },
     "mint": {
       "name": "Mięta",
-      "desc": "Maksymalna wartość twarzy to 3 złom."
+      "desc": "Za maksymalną liczbę oczek na kostce otrzymuje się 3 złom; za wygraną bitwę – dodatkowe 5."
     },
     "wick": {
       "name": "Knot",
@@ -2945,51 +3105,91 @@
     },
     "pin": {
       "name": "Przypnij",
-      "desc": "+2 czujniki."
+      "desc": "W czujnikach każda wartość poniżej 5 jest traktowana jako 5; maksymalna wartość w tym przypadku wynosi 2 ładunki."
     },
     "drum": {
       "name": "Bęben",
-      "desc": "+2 do ładunku za każdym razem, gdy reaktor zostanie napełniony."
+      "desc": "Napełnienie reaktora zapewnia 2 jednostki ładunku i uruchamia bęben; od trzeciego uderzenia – dodatkowe 2 jednostki ładunku na koniec tury."
     },
     "scale": {
       "name": "Skala",
-      "desc": "Maksymalna wartość „face” w tarczach przywraca 1 punkt wytrzymałości kadłuba."
+      "desc": "Maksymalny poziom osłon leczy 1 punkt kadłuba i zapewnia 2 punkty osłon."
     },
     "beaconRune": {
       "name": "Latarnia",
-      "desc": "+1 w pierwszych dwóch turach."
+      "desc": "Rozwiązanie zadania związanego z czujnikami zapewnia +3 do następnego rzutu czerwoną kostką."
     },
     "rust": {
       "name": "Rdza",
-      "desc": "+2 do broni przy wyniku 8 lub wyższym."
+      "desc": "8 lub więcej sztuk broni może przekroczyć limit miejsc dla 1 kadłuba."
     },
     "salt": {
       "name": "Sól",
-      "desc": "Maksymalna wartość twarzy zapewnia 1 punkt osłony."
+      "desc": "Maksymalny efekt „face” zapewnia 2 punkty osłony i powoduje korozję 1 punktu kadłuba."
     },
     "glimmer": {
       "name": "Błysk",
-      "desc": "Wynik 2 lub mniej oznacza, że gracz gromadzi 1 punkt energii."
+      "desc": "Umieszczenie go pod 3 sklepami zużywa 1 punkt energii i daje 1 złom."
     },
     "sinew": {
       "name": "Ścięgno",
-      "desc": "4 lub więcej w kategorii „silniki” zapewnia 1 tarczę."
+      "desc": "4 lub więcej w polu „silniki” zapewnia 1 tarczę i 1 ładunek."
     },
     "cipher": {
       "name": "Szyfr",
-      "desc": "Powtórzenie wartości z poprzedniej tury daje 4 złomów."
+      "desc": "Powtórzenie wartości z poprzedniej tury daje 4 złom i pozwala zgromadzić 1 ładunek."
     },
     "brand": {
       "name": "Marka",
-      "desc": "+2 do czerwonych kości w broni."
+      "desc": "+3 do broni za czerwoną kostkę, +1 za każdą inną."
     },
     "tidepool": {
       "name": "Basen pływowy",
-      "desc": "Jedna ikona „min” na tarczy zapewnia 3 punkty tarczy."
+      "desc": "Minimalna liczba oczek na tarczach zapewnia 3 punkty tarczy; gdy wskaźnik „Fala zakłóceń” wynosi 2 lub więcej, na koniec tury przyznaje się dodatkowe 2 punkty tarczy."
     },
     "voidmark": {
       "name": "Voidmark",
-      "desc": "Jedna min w reaktorze przechowuje 3 jednostki ładunku."
+      "desc": "Każda twarz „min” w reaktorze przechowuje 3 jednostki ładunku; dopóki posiadasz 8 lub więcej jednostek ładunku, zyskuje ona tam dodatkowo +2."
+    },
+    "pyre": {
+      "name": "Pogrzeb",
+      "desc": "W przypadku broni dodaje efekt „Burn 1” i zapewnia +2 do tej wartości, o ile posiadasz co najmniej 2 przedmioty z efektem [Burn]."
+    },
+    "swarmMark": {
+      "name": "Znak Roju",
+      "desc": "W przypadku broni: +2, gdy posiadasz 3 lub więcej przedmiotów z atrybutem [Rój], a maksymalna wartość obrażeń zadanych przez atak zadanego przez ciebie wynosi o 1 więcej za każdy posiadany przedmiot z atrybutem [Rój]."
+    },
+    "seventhFace": {
+      "name": "Siódma twarz",
+      "desc": "Kostka zyskuje siódmy wynik na swojej najwyższej ściance: pierwsza ścianka z maksymalnym wynikiem w każdej turze jest rozpatrywana po raz drugi."
+    },
+    "mirrorFace": {
+      "name": "Lustrzana twarz",
+      "desc": "Kość zyskuje siódmy wynik na swojej najwyższej ściance: przy maksymalnym wyniku rzutu twoja najniższa kość zyskuje +3, a ty gromadzisz 1 ładunek."
+    },
+    "sleeve": {
+      "name": "Rękaw",
+      "desc": "Jeśli posiadasz 2 lub więcej przedmiotów [Reroll], każda bitwa rozpoczyna się z jednym dodatkowym rzutem."
+    },
+    "tuningFork": {
+      "name": "Kamerton",
+      "desc": "+2, gdy masz 5 lub więcej ładunków; umieszczenie tego przedmiotu powoduje zgromadzenie 1 ładunku, jeśli posiadasz 2 lub więcej przedmiotów typu [Ładunek]."
+    },
+    "tickMark": {
+      "name": "Zaznaczenie",
+      "desc": "Po umieszczeniu w reaktorze ustala harmonogram 3 ładunków i 2 osłon na następną turę."
+    },
+    "ledgerMark": {
+      "name": "Znak księgi",
+      "desc": "W kategorii „Czujniki” zapewnia 2 punkty złomu i daje +3 do tej kategorii, o ile posiadasz co najmniej 2 przedmioty z serii [Złom]."
+    },
+    "glacis": {
+      "name": "Glacis",
+      "desc": "+3 do osłon, gdy posiadasz 2 lub więcej przedmiotów [Shieldwall]; jeśli masz przy sobie 6 lub więcej tarcz, na koniec tury odzyskujesz 1 punkt wytrzymałości kadłuba."
+    },
+    "lifeline": {
+      "name": "Linia ratunkowa",
+      "desc": "W stacji naprawczej przywraca 2 punkty wytrzymałości kadłuba i zapewnia 2 punkty osłony."
     }
   },
   "fate": {

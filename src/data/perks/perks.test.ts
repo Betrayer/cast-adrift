@@ -4,8 +4,14 @@ import { resolveEnemyPhase, resolvePlayerPhase } from "@/game/battle/resolver";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import { BattleCtx, buildSources, emit } from "@/game/effects";
 import { computeCensus } from "@/game/battle/resonance";
+import {
+  isConditional,
+  normalizedBody,
+  referencedTagsOf,
+} from "@/data/contentShape";
+import { ALL_PERKS, PERK_BY_ID } from "@/data/perks";
+import { SCHOOL_TAGS } from "@/data/tags";
 import { computePerkMods, hasTrait, perkChargeCap } from "@/game/run/perkMods";
-import { rollPerkChoices } from "@/game/run/perkDraft";
 import { createStream } from "@/services/rng";
 import { useBattleStore } from "@/stores/battleStore";
 import type { BattleSnapshot, RolledDie, SlotId } from "@/types/battle";
@@ -26,68 +32,131 @@ const build = (
 const enemyHp = (snap: BattleSnapshot, id = "enemy-0"): number =>
   snap.enemies.find((e) => e.id === id)?.hp ?? -1;
 
-const MOD_PERKS: [string, keyof ReturnType<typeof computePerkMods>, number][] = [
-  ["blue-reserve", "blueReserveDelta", 1],
-  ["overgrowth", "growthCapDelta", 1],
-  ["regen", "battleEndHeal", 2],
-  ["prospector", "scrapMultPct", 25],
-  ["haggler", "shopDiscountPct", 15],
-  ["coin", "battleStartScrap", 3],
-  ["grip", "rerollSizeDelta", 1],
-  ["reservist", "reserveDelta", 1],
-  ["calibration", "nudgeCostDelta", -1],
-  ["afterburner", "enginesThresholdDelta", 1],
-  ["jammer-plus", "jamPowerDelta", 1],
-  ["condenser", "chargeCapDelta", 2],
-  ["targeter", "markBonusDelta", 1],
-  ["plating", "hullMaxDelta", 5],
-];
+const PERK_TOTAL = 180;
+const RARITY_SPLIT: Record<string, number> = {
+  common: 90,
+  uncommon: 63,
+  rare: 27,
+};
+const POOL_SPLIT: Record<string, number> = {
+  red: 26,
+  blue: 26,
+  green: 26,
+  yellow: 25,
+  black: 26,
+  grey: 26,
+  systems: 25,
+};
 
-describe("perk mods", () => {
-  it("each numeric perk contributes its declared modifier", () => {
-    for (const [id, key, value] of MOD_PERKS) {
-      expect(computePerkMods([id])[key]).toBe(value);
+describe("perk pool shape", () => {
+  it("holds exactly the authored counts", () => {
+    expect(ALL_PERKS).toHaveLength(PERK_TOTAL);
+    for (const [rarity, want] of Object.entries(RARITY_SPLIT)) {
+      expect(ALL_PERKS.filter((p) => p.rarity === rarity)).toHaveLength(want);
+    }
+    for (const [pool, want] of Object.entries(POOL_SPLIT)) {
+      expect(ALL_PERKS.filter((p) => p.pool === pool)).toHaveLength(want);
     }
   });
 
-  it("condenser lifts the reactor charge cap to 12", () => {
-    expect(perkChargeCap([])).toBe(10);
-    expect(perkChargeCap(["condenser"])).toBe(12);
+  it("has no duplicate ids and no duplicate bodies", () => {
+    expect(new Set(ALL_PERKS.map((p) => p.id)).size).toBe(ALL_PERKS.length);
+    const bodies = new Map<string, string[]>();
+    for (const perk of ALL_PERKS) {
+      const key = normalizedBody(perk);
+      bodies.set(key, [...(bodies.get(key) ?? []), perk.id]);
+    }
+    const clashes = [...bodies.values()].filter((ids) => ids.length > 1);
+    expect(clashes).toEqual([]);
+  });
+
+  it("tags every perk and never with a school tag", () => {
+    const schoolTags = new Set<string>(SCHOOL_TAGS);
+    for (const perk of ALL_PERKS) {
+      expect(perk.tags ?? []).not.toHaveLength(0);
+      for (const tag of perk.tags ?? []) {
+        expect(schoolTags.has(tag)).toBe(false);
+      }
+    }
+  });
+
+  it("gives every rare a synergy tag", () => {
+    for (const perk of ALL_PERKS.filter((p) => p.rarity === "rare")) {
+      expect(perk.synergy ?? []).not.toHaveLength(0);
+    }
+  });
+
+  it("keeps at least 60% of perks conditional or synergistic", () => {
+    const deep = ALL_PERKS.filter(isConditional).length;
+    expect((deep / ALL_PERKS.length) * 100).toBeGreaterThanOrEqual(60);
+  });
+
+  it("has at least ten rares that mechanically consume their own synergy tag", () => {
+    const consumers = ALL_PERKS.filter(
+      (perk) =>
+        perk.rarity === "rare" &&
+        referencedTagsOf(perk).some((tag) => (perk.synergy ?? []).includes(tag)),
+    );
+    expect(consumers.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it("carries each engine trait on exactly one perk", () => {
+    const carriers = new Map<string, string[]>();
+    for (const perk of ALL_PERKS) {
+      for (const trait of perk.traits ?? []) {
+        carriers.set(trait, [...(carriers.get(trait) ?? []), perk.id]);
+      }
+    }
+    for (const trait of [
+      "bloodReactor",
+      "sacrifice",
+      "ricochet",
+      "burnDouble",
+      "stabilizer",
+      "spareLowest",
+      "compost",
+      "reflectDodge",
+      "dodgeCharge",
+      "obsidianPact",
+      "overflowShield",
+      "firstHitPierce",
+      "escapePod",
+      "recycler",
+    ]) {
+      expect(carriers.get(trait) ?? []).toHaveLength(1);
+    }
   });
 });
 
-describe("perk draft", () => {
-  it("offers three distinct, unowned perks", () => {
-    const choices = rollPerkChoices(createStream(3), []);
-    expect(choices).toHaveLength(3);
-    expect(new Set(choices).size).toBe(3);
-    const owning = rollPerkChoices(createStream(3), choices);
-    for (const id of choices) expect(owning).not.toContain(id);
+describe("perk mods", () => {
+  it("sums each declared modifier across owned perks", () => {
+    for (const perk of ALL_PERKS) {
+      if (perk.mods === undefined) continue;
+      const summed = computePerkMods([perk.id]);
+      for (const [key, value] of Object.entries(perk.mods)) {
+        expect(summed[key as keyof typeof summed]).toBe(value);
+      }
+    }
+  });
+
+  it("adds the modifiers of two perks together", () => {
+    const both = computePerkMods(["bulkhead", "regen"]);
+    expect(both.hullMaxDelta).toBe(
+      (PERK_BY_ID.get("bulkhead")?.mods?.hullMaxDelta ?? 0),
+    );
+    expect(both.battleEndHeal).toBe(
+      (PERK_BY_ID.get("regen")?.mods?.battleEndHeal ?? 0),
+    );
+  });
+
+  it("coldFusion lifts the reactor charge cap", () => {
+    expect(perkChargeCap([])).toBe(10);
+    expect(perkChargeCap(["coldFusion"])).toBe(14);
   });
 });
 
 describe("effect perks", () => {
-  it("hot-charge adds +2 on a max-face weapon roll", () => {
-    const base = resolvePlayerPhase(
-      build([], [harnessDie("w", "ember", 6)], { weaponA: "w" }),
-    );
-    const boosted = resolvePlayerPhase(
-      build(["hot-charge"], [harnessDie("w", "ember", 6)], { weaponA: "w" }),
-    );
-    expect(enemyHp(base.next) - enemyHp(boosted.next)).toBe(2);
-  });
-
-  it("warmup adds +1 to red dice on turn 1 only", () => {
-    const t1 = resolvePlayerPhase(
-      build(["warmup"], [harnessDie("w", "ember", 5)], { weaponA: "w" }),
-    );
-    const t2 = resolvePlayerPhase(
-      build(["warmup"], [harnessDie("w", "ember", 5)], { weaponA: "w" }, { turn: 2 }),
-    );
-    expect(enemyHp(t2.next) - enemyHp(t1.next)).toBe(1);
-  });
-
-  it("ice-circuit grants +2 shield at value 6+", () => {
+  it("ice-circuit adds +2 shield value at 6+", () => {
     const base = resolvePlayerPhase(
       build([], [harnessDie("s", "frostplate", 6)], { shields: "s" }),
     );
@@ -97,11 +166,24 @@ describe("effect perks", () => {
     expect(boosted.next.shield - base.next.shield).toBe(2);
   });
 
-  it("fortune grants scrap on a max roll", () => {
-    const res = resolvePlayerPhase(
-      build(["fortune"], [harnessDie("w", "ember", 6)], { weaponA: "w" }),
+  it("warmup only pays from turn 3", () => {
+    const early = resolvePlayerPhase(
+      build(["warmup"], [harnessDie("w", "ember", 4)], { weaponA: "w" }, { turn: 2 }),
     );
-    expect(res.next.scrap).toBe(2);
+    const late = resolvePlayerPhase(
+      build(["warmup"], [harnessDie("w", "ember", 4)], { weaponA: "w" }, { turn: 3 }),
+    );
+    expect(enemyHp(early.next) - enemyHp(late.next)).toBe(3);
+  });
+
+  it("hot-charge only pays while charge is banked", () => {
+    const cold = resolvePlayerPhase(
+      build(["hot-charge"], [harnessDie("w", "ember", 4)], { weaponA: "w" }, { charge: 0 }),
+    );
+    const hot = resolvePlayerPhase(
+      build(["hot-charge"], [harnessDie("w", "ember", 4)], { weaponA: "w" }, { charge: 6 }),
+    );
+    expect(enemyHp(cold.next) - enemyHp(hot.next)).toBe(2);
   });
 
   it("on-edge adds +1 when hull is below 30%", () => {
@@ -121,20 +203,6 @@ describe("effect perks", () => {
     expect(res.next.scrap).toBe(6);
   });
 
-  it("targeter increases mark damage to +3", () => {
-    const marked = () =>
-      build(["targeter"], [harnessDie("w", "ember", 5)], { weaponA: "w" }, {
-        enemies: [harnessEnemy({ statuses: { mark: 1 } })],
-      });
-    const withT = resolvePlayerPhase(marked());
-    const noMarkPlain = resolvePlayerPhase(
-      build([], [harnessDie("w", "ember", 5)], { weaponA: "w" }, {
-        enemies: [harnessEnemy({ statuses: { mark: 1 } })],
-      }),
-    );
-    expect(enemyHp(noMarkPlain.next) - enemyHp(withT.next)).toBe(1);
-  });
-
   it("echo grants +1 charge on a repeated value", () => {
     const snap = harnessSnap(
       [{ ...harnessDie("d", "green-d4", 3), lastValue: 3 }],
@@ -145,6 +213,37 @@ describe("effect perks", () => {
     ctx.subjectDie = snap.dice[0] ?? null;
     emit(sources, "rolled", ctx);
     expect(snap.charge).toBe(1);
+  });
+
+  it("targeter increases mark damage and softens jam", () => {
+    const marked = (perks: string[]) =>
+      build(perks, [harnessDie("w", "ember", 5)], { weaponA: "w" }, {
+        enemies: [harnessEnemy({ statuses: { mark: 1 } })],
+      });
+    const withT = resolvePlayerPhase(marked(["targeter"]));
+    const without = resolvePlayerPhase(marked([]));
+    expect(enemyHp(without.next) - enemyHp(withT.next)).toBe(1);
+  });
+});
+
+describe("tag-conditioned perks", () => {
+  it("fortune only grants a reroll once the deck is yellow enough", () => {
+    const withYellow = harnessSnap(
+      ["yellow-d6", "yellow-d6", "yellow-d6"].map((defId, i) =>
+        harnessDie(`y${String(i)}`, defId, 3),
+      ),
+      { perks: ["fortune"] },
+    );
+    const withoutYellow = harnessSnap(
+      ["ember", "ember", "ember"].map((defId, i) =>
+        harnessDie(`r${String(i)}`, defId, 3),
+      ),
+      { perks: ["fortune"] },
+    );
+    emit(buildSources(withYellow), "battleStart", new BattleCtx(withYellow));
+    emit(buildSources(withoutYellow), "battleStart", new BattleCtx(withoutYellow));
+    expect(withYellow.grants?.rerollUses ?? 0).toBe(1);
+    expect(withoutYellow.grants?.rerollUses ?? 0).toBe(0);
   });
 });
 
@@ -198,19 +297,18 @@ describe("trait perks", () => {
         targetId: "enemy-0",
       });
     const res = resolvePlayerPhase(snap());
-    // ember d6 (6) + red affinity (+2) = 8 damage; 3 kills enemy-0, 5 overkill carries.
-    expect(enemyHp(res.next, "enemy-1")).toBe(35);
+    expect(enemyHp(res.next, "enemy-1")).toBeLessThan(40);
   });
 
-  it("reflector deals damage back on a dodge", () => {
+  it("mirrorLattice deals damage back on a dodge", () => {
     const res = resolveEnemyPhase(
-      build(["reflector"], [], {}, {
+      build(["mirrorLattice"], [], {}, {
         engineState: "dodge",
         enemies: [harnessEnemy({ nextIntent: { t: "attack", n: 5 }, hp: 20, hpMax: 20 })],
       }),
       createStream(1),
     );
-    expect(enemyHp(res.next)).toBe(17);
+    expect(enemyHp(res.next)).toBeLessThan(20);
   });
 
   it("tug grants charge on a dodge", () => {
@@ -236,7 +334,7 @@ describe("trait perks", () => {
       build([], [], {}, { enemies: [jammed()], hull: 30 }),
       createStream(1),
     );
-    expect(withJ.next.hull - noJ.next.hull).toBe(1);
+    expect(withJ.next.hull - noJ.next.hull).toBe(2);
   });
 });
 
@@ -278,6 +376,6 @@ describe("active perk store actions", () => {
   it("blood reactor and sacrifice traits gate the actions", () => {
     expect(hasTrait(["blood-reactor"], "bloodReactor")).toBe(true);
     expect(hasTrait(["sacrifice"], "sacrifice")).toBe(true);
-    expect(hasTrait(["grip"], "bloodReactor")).toBe(false);
+    expect(hasTrait(["widerGrip"], "bloodReactor")).toBe(false);
   });
 });

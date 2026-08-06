@@ -29,14 +29,19 @@ describe("loadout census", () => {
   });
 
   it("counts engraving tags per engraved die", () => {
-    const census = loadoutCensus({
+    const bare = loadoutCensus({
+      deckDefIds: ["red-d6", "blue-d6"],
+      perks: [],
+      modules: [],
+    });
+    const engraved = loadoutCensus({
       deckDefIds: ["red-d6", "blue-d6"],
       perks: [],
       modules: [],
       engravings: { "red-d6": ["flame"], "blue-d6": ["frost"] },
     });
-    expect(census.burn).toBe(1);
-    expect(census.shields).toBe(1);
+    expect((engraved.burn ?? 0) - (bare.burn ?? 0)).toBe(1);
+    expect((engraved.shields ?? 0) - (bare.shields ?? 0)).toBe(1);
   });
 
   it("counts perk tags", () => {

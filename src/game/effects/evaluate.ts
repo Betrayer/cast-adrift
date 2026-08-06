@@ -46,6 +46,8 @@ const condMatches = (
       return cond.exact !== true && subject.school === "prismatic";
     case "slot":
       return slotMatches(ctx.currentSlot?.(), cond.is);
+    case "slotMk":
+      return (ctx.slotMk?.(cond.slot) ?? 0) >= cond.n;
     case "valueGte":
       return subject !== null && subject.value >= cond.n;
     case "valueLt":

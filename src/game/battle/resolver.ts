@@ -980,12 +980,15 @@ export const advanceTurn = (
     }
     const base = rollBaseValue(die.defId, die.tier, streams.dice);
     const rolled = Math.min(die.tier, Math.max(1, base + next.nextRollBonus));
+    const banked = die.bankedValue;
     return {
       ...die,
-      value: rolled + (die.growth ?? 0),
+      value: banked ?? rolled + (die.growth ?? 0),
       lastValue: die.value,
       state: "tray" as const,
       slot: undefined,
+      bankedValue: undefined,
+      activeUsed: banked === undefined ? die.activeUsed : false,
     };
   });
   for (const slot of Object.values(next.slots)) {

@@ -86,5 +86,9 @@
   },
   "scriptHint": "Prolog: w tej turze można użyć wyłącznie „{{slots}}”.",
   "fate": "Rzuć kostką losu",
-  "fateResult": "Fate {{roll}} — {{text}}"
+  "fateResult": "Fate {{roll}} — {{text}}",
+  "swap": "Zamień",
+  "swapPick": "Wybierz kostkę…",
+  "bank": "Fasada banku",
+  "split": "Split"
 }

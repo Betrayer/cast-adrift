@@ -69,59 +69,119 @@
     "prismCore": "Prism Core",
     "spectra": "Spektren",
     "aurora": "Aurora",
-    "fate-d100": "Schicksal"
+    "fate-d100": "Schicksal",
+    "slag": "Schlacke",
+    "fissure": "Spalte",
+    "anthracite": "Anthrazit",
+    "stillwater": "Stillwater",
+    "floodgate": "Schleuse",
+    "undertow": "Unterströmung",
+    "taproot": "Hauptwurzel",
+    "seedpod": "Samenkapsel",
+    "evergreen": "Evergreen",
+    "plumbline": "Lot",
+    "chaff": "Spreu",
+    "glimmer": "Schimmer",
+    "facet": "Facette",
+    "gamut": "Farbraum",
+    "salvo": "Salvo",
+    "crucible": "Schmelztiegel",
+    "bombard": "Bombard",
+    "smallChange": "Kleingeld",
+    "wager": "Einsatz",
+    "hedge": "Hecke"
   },
   "diceDesc": {
-    "ember": "Ein schlichter roter sechsseitiger Würfel.",
+    "ember": "Unter „Waffen“ gewährt es einen Bonus von +2, solange dein Build 4 oder mehr rote Gegenstände enthält.",
     "cinder": "Bei „Waffen“ wird bei einem Maximalwurf „Verbrennung 1“ auf das Ziel angewendet.",
     "slug": "Verursacht bei „Waffen“ +1 Schaden.",
-    "frostplate": "Ein schlichter blauer W6.",
+    "frostplate": "Bei „Schilde“ erhältst du 2 zusätzliche Schilde, sobald du 4 oder mehr „Schildwall“-Gegenstände bei dir trägst.",
     "bulwark": "In „Shields“ gewährt dies +1 Schild.",
-    "gyro": "Einmal pro Kampf die Karte auf die andere Seite wenden.",
-    "coil": "Wenn derselbe Wert wie in der letzten Runde gewürfelt wird, +1.",
-    "sprout": "Bei einem Maximalwurf steigt der Wert für diesen Durchgang um +1 (bis zu +2).",
-    "lucky-chip": "Bei einem Maximalwurf gibt es +2 Schrott.",
-    "vulture": "Bei einem Maximalwurf gibt es +8 Schrott.",
+    "gyro": "Die Seiten zeigen die Zahlen 2, 3, 3, 4, 4 und 5; einmal pro Kampf darfst du den Würfel auf die andere Seite drehen.",
+    "coil": "Die Würfelwerte sind 2·2·3·3. +1, wenn der Wert des letzten Zuges wiederholt wird, und weitere +2, solange du 3 oder mehr [Schwarm] besitzt.",
+    "sprout": "Wächst bei einer maximalen Augenzahl um +1 (bis zu +2), und durch die Auswertung in „Engines“ wächst der Wert erneut, bis zu +4.",
+    "lucky-chip": "Bei „Max Face“ erhält man 2 Schrott.",
+    "vulture": "„Max Face“ zahlt 8 Schrott und erhöht den Auszahlungszähler um 1; ab der zweiten Auszahlung verursacht es in einem Waffenslot einen kritischen Treffer.",
     "ashen": "Bei einem „Min“-Wurf erhält der nächste schwarze Würfel in diesem Zug einen Bonus von +2.",
-    "obsidian": "Es fallen nur die Zahlen 1 oder 8.",
-    "copycat": "Einmal pro Kampf kopiere den Wert eines benachbarten Würfels.",
-    "ballast": "Ein schlichter grauer d4.",
-    "coreshard": "Prismatischer Platzhalter für Mengen und Affinitäten.",
-    "flare": "+1 Schadenspunkt bei Waffen ab einer Augenzahl von 3.",
-    "magma": "Die maximale Wirkung von Waffen ist „Burn 3“.",
-    "thermite": "+2 auf Waffen, solange der Rumpf weniger als die Hälfte seiner Lebenspunkte hat.",
-    "lancehead": "+3 bei der Wirbelsäulenbefestigung.",
+    "obsidian": "Wurf nur 1 oder 8; bei einer 1 zählt der Wurf als 8 – für 2 Rumpfpunkte.",
+    "copycat": "Die Werte betragen nur 1, 2, 2, 3, 3, 4; einmal pro Kampf wird der höhere der beiden benachbarten Werte übernommen.",
+    "ballast": "Einmal pro Kampf legst du die gewürfelte Augenzahl beiseite: Im nächsten Zug beginnt die Figur mit dem gespeicherten Wert, anstatt erneut zu würfeln.",
+    "coreshard": "Prismatische Würfel können die Obergrenze eines Slots für 1 Rumpf überschreiten. Eine maximale Augenzahl erhöht die Werte jeder Schule um +2.",
+    "flare": "Die Augenzahlen sind 1, 2, 4 und 4 – niemals eine 3 – und im Bereich „Waffen“ verursacht er bei einer Augenzahl von 3 oder mehr +1 Schaden.",
+    "magma": "Bei „Waffen“ bewirkt ein „Max Face“ den Effekt „Burn 3“.",
+    "thermite": "+2 auf Waffen, solange die Rumpf-HP unter der Hälfte liegen; einmal pro Kampf teilt es sich in zwei temporäre graue d4 auf.",
+    "lancehead": "+3 beim „Spinal Mount“ und bei einer natürlichen 15 oder mehr gibt es dort einen kritischen Treffer.",
     "hoarfrost": "+1 Schild, sobald ein Schildplatz besetzt wird.",
-    "aegis": "+2 bei den Schilden.",
+    "aegis": "In „Shields“ zählt das als +2, und die Mauer hält stand: In der nächsten Runde erhältst du 3 Schilde gratis.",
     "deepblue": "„Min“ gewährt 4 Schildpunkte.",
-    "glacierspike": "+3 bei den Schilden.",
-    "tendon": "+2, wenn der Wert des letzten Zuges wiederholt wird.",
-    "bramble": "Erhöht sich bei einer maximalen Augenzahl um +1, bis zu +2.",
-    "heartwood": "+2 bei den Motoren.",
-    "worldseed": "Erhöht sich bei einer maximalen Augenzahl um +1, bis zu +4.",
-    "token": "Bei „Max Face“ erhält man 3 Schrott.",
-    "glint": "„Min“ kostet 2 Schrott.",
-    "bonanza": "Bei „Max Face“ gibt es 6 Schrott.",
-    "jackpot": "„Max Face“ kostet 10 Schrott und 1 Ladung.",
-    "midas": "Zahlt 2 Schrott, wo immer die Karte ausgewertet wird.",
-    "cinderblack": "„Min face“ speichert 1 Ladung.",
+    "glacierspike": "Da es 8 bis 20 Seiten hat, kann es durch den „Spinal Mount“ niemals blockiert werden; wo immer es ausgewertet wird, gewährt es 3 Schutzpunkte, und durch den „Spinal Mount“ blockiert es zudem das Ziel.",
+    "tendon": "+2, wenn der Wert des letzten Zuges wiederholt wird, und der nächste grüne Würfel wird um +1 erhöht.",
+    "bramble": "Erhöht den Wert bei einer maximalen Augenzahl um +2 (bis zu +2), und durch die Auswertung in „Waffen“ wird er erneut erhöht, bis zu +4.",
+    "heartwood": "+2 auf „Motoren“. Einmal pro Gefecht kannst du die Vorderseite für den nächsten Zug nach oben drehen.",
+    "worldseed": "Wächst bei einer Maximal-Augenzahl um +1, bis zu +4, und eine Maximal-Augenzahl wird zweimal ausgewertet.",
+    "token": "„Max Face“ bringt 3 Schrott ein und erhöht den Auszahlungszähler des Kampfes um 1.",
+    "glint": "Bei einer 1 oder einer 6 erhält man 2 Schrott und der Auszahlungszähler des Kampfes wird um 1 erhöht.",
+    "bonanza": "Auf den Karten sind zwei 2er, eine 4, eine 6 und zwei 8er abgebildet; eine 8 erhöht die Auszahlungsanzahl um 1, und ab der dritten Auszahlung werden 4 Schrott und 1 Ladung gezahlt, unabhängig davon, wo sie ausgewertet wird.",
+    "jackpot": "Bei „Max Face“ werden 6 Schrott und 1 Ladung ausgezahlt und der Auszahlungszähler um 1 erhöht; ab der vierten Auszahlung bei „Max Face“ werden 12 Schrott mehr ausgezahlt.",
+    "midas": "Jeder Spielzug endet mit 1 Schrottstück für jeden [Schrott]-Gegenstand, den du besitzt; sein Maximalwert erhöht die Auszahlungsanzahl um 2, und ab der dritten Auszahlung wird er mit +3 ausgewertet.",
+    "cinderblack": "Es wird nur mit 1 oder 4 gewürfelt; eine 1 speichert 1 Ladung.",
     "pitch": "+1 im Reaktor.",
-    "tar": "+2, solange die Rumpfstärke unter 40 % liegt.",
+    "tar": "+1, solange die Rumpfstärke unter 50 % liegt, und weitere +3, solange sie unter 25 % liegt.",
     "nadir": "Bei einem Wurf von 1 erhält der nächste schwarze Würfel einen Bonus von +3.",
-    "eclipse": "+3 im Reaktor.",
-    "abyss": "Die Zahlen auf den Würfeln sind entweder 1 oder 12.",
+    "eclipse": "Jeder Würfel passt über die Kappe des Reaktors – für 1 Rumpf; einmal pro Gefecht dreht er seine Seite für den nächsten Zug.",
+    "abyss": "Die Augenzahlen betragen entweder 1 oder 12; sobald eine 1 gewürfelt wurde, zählt jede weitere 12, die gewürfelt wird, als 18.",
     "voidmaw": "+2 im Reaktor.",
-    "shim": "+1 in der ersten Runde eines Kampfes.",
-    "spool": "Eine gewürfelte 1 wird zu einer 2.",
-    "mimic": "Einmal pro Kampf den Wert eines Nachbarn kopieren.",
-    "pivot": "Einmal pro Kampf die Karte auf die andere Seite wenden.",
-    "beaconChip": "+2 bei den Sensoren.",
-    "lodestar": "+1 in jedem Slot.",
-    "prismChip": "Zählt zu deiner größten Gruppe.",
-    "prismCore": "+1 in jedem Slot, und zählt zu deinem größten Satz.",
-    "spectra": "„Max face“ kostet 1 Ladung und 1 Schrott.",
-    "aurora": "+2 in jedem Slot.",
-    "fate-d100": "Wird nie fest zugewiesen. Einmal pro Kampf würfelst du und nimmst, was der Sektor dir gibt."
+    "shim": "Die Würfelwerte betragen nur 2, 2, 3, 3; +1 im ersten Zug eines Kampfes.",
+    "spool": "Bei einer Augenzahl von 1 oder 2 wird einmal neu gewürfelt.",
+    "mimic": "Einmal pro Kampf kannst du die Werte mit einem beliebigen anderen Würfel vertauschen; bei drei Gegenständen mit der Bezeichnung „Würfel“ beginnt jeder Kampf mit einem kostenlosen Nudge.",
+    "pivot": "Es gibt nur die Seiten 1, 2, 3, 6, 7 und 8 – keine Zwischenstufen; einmal pro Kampf darfst du den Würfel auf die gegenüberliegende Seite drehen.",
+    "beaconChip": "+2 bei „Sensoren“, und jeder Kampf beginnt mit einem kostenlosen Anstoß.",
+    "lodestar": "+1 in jedem Feld; jeder Kampf beginnt mit einem kostenlosen Nudge und einem zusätzlichen Reroll; einmal pro Kampf die gewürfelte Augenzahl für den nächsten Zug beiseite legen.",
+    "prismChip": "Die Augenzahlen lauten 2, 3, 3 und 4; bei einer maximalen Augenzahl erhältst du 2 Schrott pro prismatischem Gegenstand, den du bei dir trägst.",
+    "prismCore": "Es wird nach vorne gebrochen: Bei „Sensoren“ wird Rot, bei „Waffen“ Blau, bei „Schilden“ Grün, bei „Triebwerken“ Schwarz und beim „Reaktor“ Gelb ausgewählt – der nächste Würfel dieser Schule erhält in diesem Zug +2.",
+    "spectra": "„Max Face“ zahlt 2 Ladung und 4 Schrott; einmal pro Kampf speichert es seine Seite und beginnt den nächsten Zug auf dieser Seite.",
+    "aurora": "+2 in jedem Slot, solange das Deck 3 oder mehr prismatische Würfel enthält; bei einer Augenzahl von 10 oder höher werden 2 Schadenspunkte, 2 Schildpunkte, 1 Ladepunkt, 3 Schrottpunkte und 1 Rumpfpunkt ausgezahlt.",
+    "fate-d100": "Wird nie fest zugewiesen. Einmal pro Kampf würfelst du und nimmst, was der Sektor dir gibt.",
+    "red-d6": "Karten 1 bis 6 und keine Passivkarten – das schlichte, rote Arbeitstier, an dem der Rest des Decks gemessen wird.",
+    "blue-d6": "Seiten 1 bis 6 und keine passive Fähigkeit – einfach nur blau, zählt aber trotzdem zur blauen Resonanz.",
+    "grey-d4": "Seiten 1 bis 4 und keine Passivkarte – billiger grauer Lückenfüller und eine weitere Karte für Decks, bei denen kleine Würfel zählen.",
+    "green-d4": "Seiten 1 bis 4 und keine Passivform – billiger grüner Füllstoff, der die Schwellenwerte von Motor und Sensor anheizt.",
+    "yellow-d6": "Karten 1 bis 6 und keine Passivkarte – einfach nur gelb; das Glück muss sich aus dem ergeben, was man drumherum aufbaut.",
+    "black-d6": "Seiten 1 bis 6 und keine passive Funktion – schlicht schwarz, und es geht von sich aus kein Risiko ein.",
+    "slag": "Seine Augenzahlen sind 1, 1, 1 und 4, aber im Reaktor zählt er immer als 4.",
+    "fissure": "Es wird nur mit den Würfeln 1, 2, 3, 8, 9 oder 10 gewürfelt; einmal pro Kampf teilt er sich in zwei vorübergehende graue d4-Würfel auf.",
+    "anthracite": "Es werden nur die Werte 1, 1, 2, 11, 12 oder 12 gewürfelt; einmal pro Kampf tauscht er seine Werte mit einem anderen Würfel.",
+    "stillwater": "Seine Augenzahlen sind nur 3, 3, 4, 4, 5 und 5; bei „Sensors“ blockiert es das Ziel bereits bei einer 3.",
+    "floodgate": "Die Augenzahlen liegen zwischen 3 und 8, niemals darunter; einmal pro Kampf legt es eine Augenzahl fest, und im nächsten Zug beginnt es dort, anstatt zu würfeln.",
+    "undertow": "Der Wert liegt nie unter 5; einmal pro Kampf kannst du seinen Wert mit dem eines beliebigen anderen Würfels vertauschen.",
+    "fused-emberforge": "Zwei Würfel zu einem zusammengeworfen: Die Augenzahlen lauten 2, 2, 4, 4, 6, 6, 8, 8 und sind niemals ungerade.",
+    "fused-frostwall": "Zwei flach zusammengeschweißte Platten: Ihre Flächen sind 3, 3, 4, 4, 5, 5, 6, 6.",
+    "fused-counterweight": "Einmal pro Kampf kannst du die Werte mit einem beliebigen anderen Würfel tauschen.",
+    "fused-seedling": "Zu Beginn jedes Kampfes setzt es einen Schuss ab: einen vorübergehenden grünen d4 für 2 Runden.",
+    "fused-goldvein": "Die Ader verläuft zweimal über die letzte Seite – 1, 2, 3, 4, 5, 6, 8, 8 – und bei einem Maximalwurf gibt es 4 Schrott.",
+    "fused-voidcore": "Einmal pro Kampf zerfällt es: Es verbrennt und hinterlässt zwei vorübergehende graue d4.",
+    "fused-pyroclast": "Ein „Max“-Ergebnis bei „Waffen“ lässt einen zweiten Stein werfen, der 3 Schaden verursacht und die Slot-Obergrenze überschreitet.",
+    "fused-glacier": "Ab Runde 3 gibt es +3 auf die Schilde.",
+    "fused-keel": "Einmal pro Kampf kannst du diese Seite speichern: Im nächsten Zug zeigt der Würfel diese Seite an, anstatt gewürfelt zu werden.",
+    "fused-tendril": "+2, wenn der Wert des letzten Zuges wiederholt wird oder das Minimum gewürfelt wird.",
+    "fused-windfall": "Bei der höchsten Augenzahl erhält man 3 Schrott, bei der niedrigsten 1.",
+    "fused-railslug": "+1 bei den Waffen und +2 bei der Wirbelsäulenhalterung.",
+    "fused-rampart": "+1 bei den Schilden – und obwohl du bereits 8 Schilde hast, kommen noch 2 weitere hinzu.",
+    "fused-bloom": "Erhöht sich bei einer maximalen Augenzahl um +1, bis zu +3, und jeder Wurf von 9 oder mehr repariert 1 Rumpfpunkt.",
+    "taproot": "Erzielt bei jeder Auswertung Punkte: +1 aus dem dritten Slot des Kampfes, +2 aus dem fünften.",
+    "seedpod": "Ein „Max“-Symbol erzeugt für zwei Runden einen temporären grünen W4. Einmal pro Kampf kannst du ihn in zwei graue W4 aufteilen.",
+    "evergreen": "Die Augenzahlen sind nur gerade: 2·4·6·8·10·12. Bei der höchsten Augenzahl erhöht sich der Wert um +2, bis maximal +4.",
+    "plumbline": "Rolls hat sogar nur folgende Würfelergebnisse: 2, 2, 4, 4, 6, 6.",
+    "chaff": "Die Seiten sind nur 1, 1, 2, 3, 5, 8; einmal pro Kampf kannst du ihn aus dem Fach verbrennen, um zwei vorübergehende graue d4 zu erhalten.",
+    "glimmer": "Die Augenzahlen betragen ausschließlich 1, 1, 4 und 4; solange sich 2 oder mehr prismatische Würfel im Würfelbecher befinden, wird eine gewürfelte 1 einmal erneut gewürfelt.",
+    "facet": "Seine Augenzahlen lauten 4, 4, 5, 5, 6 und 6; einmal pro Kampf tauscht er seine Werte mit einem beliebigen anderen Würfel aus.",
+    "gamut": "Die Augenzahlen lauten 2·4·6·8·10·10. +2, solange du 2 oder mehr [Spike] besitzt; eine maximale Augenzahl bringt 1 Ladung pro prismatischem Würfel in deinem Deck ein.",
+    "salvo": "Unter „Waffen“ verursacht sie für jeden „Schwarm“-Gegenstand in deinem Build – einschließlich sich selbst – 1 zusätzlichen Schadenspunkt.",
+    "crucible": "Einmal pro Kampf kannst du die Augenzahl notieren: Im nächsten Zug beginnt die Figur mit dieser Zahl, anstatt zu würfeln.",
+    "bombard": "Die Augenzahlen sind 1, 2, 3, 4, 12 und 12; eine 12 bei „Waffen“ verursacht 5 zusätzlichen Schaden.",
+    "smallChange": "Er zeigt zwei 2er, zwei 3er und zwei 4er; einmal pro Kampf zerfällt er für den Rest des Kampfes in zwei graue d4er.",
+    "wager": "Die Augenzahlen sind drei 1en und drei 6en; einmal pro Kampf tauscht er seine Werte mit einem anderen Würfel aus, und eine 1 in einem Waffenplatz wird zu einer 6 für 2 Rumpfpunkte.",
+    "hedge": "Es würfelt nur 1, 3, 5 oder 7; einmal pro Kampf dreht es seine Vorderseite nach oben und beginnt den nächsten Zug auf dieser Seite."
   },
   "resonance": {
     "red-2": "Rote Würfel im Waffen-Deal geben +1.",
@@ -251,13 +311,9 @@
     "on-edge": "Am Rande",
     "sacrifice": "Opfer",
     "back-door": "Hintertür",
-    "grip": "Griff",
-    "reservist": "Reservist",
-    "calibration": "Kalibrierung",
     "spare": "Ersatz",
     "afterburner": "Nachbrenner",
     "jammer-plus": "Störsender+",
-    "condenser": "Kondensator",
     "targeter": "Targeter",
     "plating": "Galvanisieren",
     "tug": "Schlepper",
@@ -295,11 +351,9 @@
     "permafrost": "Permafrost",
     "rootHold": "Wurzelhalt",
     "secondGrowth": "Zweites Wachstum",
-    "mulch": "Mulch",
     "pollen": "Pollen",
     "longRoots": "Tiefe Wurzeln",
     "greenwake": "Greenwake",
-    "steadyHand": "Sichere Hand",
     "sapline": "Sapline",
     "thicket": "Dickicht",
     "bloomCycle": "Blütezyklus",
@@ -362,177 +416,243 @@
     "dryDock": "Trockendock",
     "masterKey": "Hauptschlüssel",
     "greyProtocol": "Graues Protokoll",
-    "armorPlate": "Panzerplatte",
-    "coolantLoop": "Kühlmittelkreislauf",
-    "finePitch": "Feiner Abstand",
-    "boresight": "Visierachse",
-    "bilgePump": "Bilgenpumpe",
-    "dockRates": "Liegeplatzgebühren",
     "crewDrill": "Mannschaftsübung",
-    "scrapHopper": "Schrott Trichter",
     "spotterCall": "Meldung des Beobachters",
     "hullWeld": "Hülle Schweißnaht",
     "reinforcedBay": "Verstärkte Bucht",
-    "surgeTank": "Ausgleichsbehälter",
     "hardenedHull": "Hülle in gehärteter Ausführung",
-    "kineticDampers": "Kinetische Dämpfer",
     "targetingSuite": "Targeting-Suite",
-    "pressureValve": "Druckventil",
-    "resonanceTuner": "Resonanz Tuner",
     "shockLance": "Schocklanze",
-    "piercingRounds": "Durchschussgeschosse"
+    "piercingRounds": "Durchschussgeschosse",
+    "snakeEyes": "Snake Eyes",
+    "looseBallast": "Lose Schotter",
+    "downPayment": "Anzahlung",
+    "hazardPay": "Gefahrenzulage",
+    "overdraft": "Überziehung",
+    "debtCollector": "Inkassounternehmen",
+    "snowline": "Schneegrenze",
+    "rimeGuard": "Rime Guard",
+    "whiteNoise": "Weißes Rauschen",
+    "iceSheet": "Eisschild",
+    "bracingVanes": "Verstrebungslamellen",
+    "nullField": "Nullfeld",
+    "takeRoot": "Wurzeln schlagen",
+    "seedBank": "Saatgutbank",
+    "understory": "Unterholz",
+    "mycelium": "Myzel",
+    "rhizome": "Rhizom",
+    "taproot": "Hauptwurzel",
+    "perennial": "Mehrjährig",
+    "annualRings": "Jahresringe",
+    "dryRun": "Probelauf",
+    "teardown": "Demontage",
+    "tallySheet": "Erfassungsbogen",
+    "cargoHold": "Laderraum",
+    "pointBlank": "Aus nächster Nähe",
+    "ignition": "Zündung",
+    "keelStrike": "Kielschlag",
+    "runningHot": "Auf Hochtouren",
+    "ashfall": "Aschenregen",
+    "stokehold": "Stokehold",
+    "autoAlign": "Automatische Ausrichtung",
+    "coreTap": "Kernbohrer",
+    "damageControl": "Schadensbegrenzung",
+    "spallLiner": "Splitterauskleidung",
+    "scavengedArmour": "Gefundene Rüstung",
+    "crashPriority": "Unfallpriorität",
+    "spareHands": "Ersatzhände",
+    "overrideKeys": "Überschreibungsschlüssel",
+    "markLedger": "Mark Ledger",
+    "refitCrew": "Umbau-Crew",
+    "flightLog": "Flugbuch",
+    "fullRefit": "Komplette Überholung",
+    "sureThing": "Klar doch",
+    "chipStack": "Chipstapel",
+    "warChest": "Kriegskasse",
+    "marginCall": "Margin Call",
+    "loadedDice": "Manipulierte Würfel"
   },
   "perksDesc": {
-    "hot-charge": "Ein „Max-Face“-Waffenwurf verursacht +2 Schaden.",
-    "ricochet": "Der Überkill von Waffe A wirkt sich auf den nächsten Gegner aus.",
+    "hot-charge": "Solange du 5 Ladungen hast, verursacht jeder Treffer mit einer Waffe 2 zusätzliche Schadenspunkte.",
+    "ricochet": "Waffen: Ein „Overkill“ wird auf den nächsten Gegner übertragen, und ein „Max Face“ verursacht dort +4 Schaden.",
     "double-fuse": "Der erste „Burn“ in jedem Kampf wird verdoppelt.",
-    "warmup": "Runde 1: Rote Würfel ergeben +1.",
+    "warmup": "Ab Runde 3 verursacht jeder Waffentreffer 3 zusätzliche Schadenspunkte.",
     "ice-circuit": "Ein Schildwurf von 6+ gewährt +2 auf den Schildwert.",
-    "reflector": "Ein Ausweichmanöver fügt dem Angreifer 3 Schadenspunkte zu.",
-    "blue-reserve": "Ein zusätzlicher Reserveplatz, nur blaue Würfel.",
+    "reflector": "Beende einen Zug mit 10 oder mehr Schildpunkten, und das Feld schlägt mit 4 Schadenspunkten zurück.",
+    "blue-reserve": "Zwei zusätzliche Reserveplätze, ausschließlich für blaue Würfel, allerdings würfelst du jeweils einen Würfel weniger neu.",
     "stabilizer": "Der erste blaue Würfel darf in jedem Zug keine 1 zeigen.",
-    "compost": "Jeder verbrannte Würfel bringt +1 Schrott.",
-    "overgrowth": "Wachstums-Die-Cap +1.",
+    "compost": "Jeder Würfel, der am Ende des Zuges noch in der Schale liegt, bringt 1 Reststück ein.",
+    "overgrowth": "Wachsende Würfel steigen eine Stufe höher.",
     "echo": "Wird der Wert des letzten Zuges gewürfelt, erhält man +1 Ladung.",
     "regen": "Kampfende: 2 Rumpfpunkte heilen.",
-    "prospector": "Schrott Gewinnsteigerung um 25 %.",
-    "fortune": "Ein Würfelwurf mit der höchsten Augenzahl bringt +2 Schrott.",
-    "haggler": "Preise im Geschäft −15 %.",
-    "coin": "Kampfbeginn: +3 Schrott.",
-    "blood-reactor": "Einmal pro Zug: Zahle 2 Rumpfpunkte für +3 Ladung.",
+    "prospector": "Jede Schlacht beginnt mit 2 Schrott für jeden gelben Würfel in deinem Deck.",
+    "fortune": "Solange du drei oder mehr gelbe Würfel bei dir hast, beginnt jeder Kampf mit einem zusätzlichen Wiederwurf.",
+    "haggler": "Läden −18 %, aber der Lauf bringt 10 % weniger XP ein.",
+    "coin": "+3 Schrott zu Beginn des Kampfes, und jeder Würfel, der mit seiner höchsten oder niedrigsten Augenzahl gewürfelt wird, bringt 1 zusätzlichen Schrott ein.",
+    "blood-reactor": "Einmal pro Runde: Zahle 2 Rumpfpunkte für +3 Ladung; wenn du vier Ladungsgegenstände besitzt, speichert jeder Reaktorwürfel 2 Ladung mehr.",
     "on-edge": "Hülle unter 30 %: Würfelwurf +1.",
-    "sacrifice": "Verbrauche in diesem Zug einen Würfel, um +4 Waffenschaden zu sammeln.",
+    "sacrifice": "Wirf in diesem Zug einen Würfel, um +4 Waffenschaden zu sammeln; bei weniger als einem Drittel der Rumpfpunkte verursacht jeder Waffenslot einen kritischen Treffer mit ×1,5.",
     "back-door": "Eine schwarze „Min-Face“-Rolle bringt +6 Schrott.",
-    "grip": "Wurfgröße +1.",
-    "reservist": "Reservekapazität +1.",
-    "calibration": "„Nudge“ kostet 2 Ladungen statt 3.",
-    "spare": "Der niedrigste Würfelwert jedes Wurfs wird um eins erhöht; würfle einen weiteren Würfel erneut.",
-    "afterburner": "Die Motorschwellenwerte sind um 1 niedriger.",
-    "jammer-plus": "„Jam“ verringert den Angriff des Gegners um 3.",
-    "condenser": "Die maximale Reaktorbeladung steigt auf 12.",
-    "targeter": "Mark gewährt +3 Schaden statt +2.",
-    "plating": "Max. Rüstung +5, Heilung jetzt 5.",
+    "spare": "Der niedrigste Würfelwert jedes Wurfs wird um eins erhöht; würfle jeweils einen weiteren Würfel neu.",
+    "afterburner": "Die Schwellenwerte für den Motor sind einen Schritt einfacher; Rumpf −2.",
+    "jammer-plus": "„Jam“ verringert den Angriff des Gegners um weitere 2, aber die Markierungen sind 1 Punkt weniger wert.",
+    "targeter": "Markierungen verursachen +1 Schaden mehr, aber eine Ladehemmung verringert den Schaden um 1 weniger.",
+    "plating": "Hülle +5, und jede gewonnene Schlacht repariert 2 Rumpfpunkte.",
     "tug": "Ein Ausweichmanöver gewährt zudem +1 Ladung.",
     "kindling": "+1 auf Waffen bei einer Augenzahl von 5 oder mehr.",
     "hammerhead": "+2 in „Waffen A“.",
     "scorchmark": "Max. Wert bei Waffen erhöht „Verbrennung“ um 1.",
     "openingVolley": "+2 bei den Waffen in den ersten beiden Zügen.",
-    "pyreFloor": "+2 auf die Waffen bei einer Mindestaugenzahl.",
-    "redForge": "+1 für rote Würfel bei Waffen.",
-    "searing": "+2 auf Waffen bei einer Augenzahl von 8 oder mehr.",
+    "pyreFloor": "Ein roter Würfel, der seine niedrigste Augenzahl zeigt, wird sofort erneut gewürfelt.",
+    "redForge": "Ein roter Waffenwürfel, der auf seiner Höchstseite liegt, erhält +1 auf seine Augenzahlen, bis zu +2.",
+    "searing": "Bei einem Waffenwurf von 8 oder mehr wird „Verbrennung 2“ hinzugefügt.",
     "cinderTithe": "Die maximale Wertstufe bei Waffen bringt 3 Schrott.",
     "thermalVent": "+3 auf Waffen bei maximaler Augenzahl und 1 Ladung.",
-    "overburn": "+2 auf Waffen, solange der Rumpf weniger als die Hälfte seiner Lebenspunkte hat.",
+    "overburn": "Waffenwürfel erhalten einen Bonus von +2, und am Ende jedes Zuges werden 2 Rumpfpunkte abgezogen.",
     "emberField": "Bei einer 2 auf einem roten Würfel wird „Burn 2“ hinzugefügt.",
-    "hotline": "+3 bei der Wirbelsäulenbefestigung.",
-    "secondBarrel": "+3 in „Waffen B“.",
-    "detonator": "Ein „Max“-Wert bei Waffen wird zweimal auf den Slot angewendet.",
-    "magmaCore": "+3 bei den Waffen, sobald du vier rote Würfel hast.",
-    "infernoDoctrine": "Jeder Treffer mit einer Waffe fügt „Verbrennung 1“ hinzu.",
+    "hotline": "Jeder Würfel passt über die Kappe hinaus in die Spinal-Halterung – für 2 Rumpfpunkte.",
+    "secondBarrel": "+3 in „Waffen B“ und weitere +2 durch Mk II.",
+    "detonator": "Ein „Max“-Ergebnis bei Waffen löst den Slot zweimal aus, ebenso wie bei fünf Waffen-Gegenständen jeder Würfelwurf von 8 oder mehr.",
+    "magmaCore": "+3 auf Waffen bei roter Resonanz 4, und bei roter Resonanz 6 verleiht jeder Waffentreffer dem nächsten roten Würfel +3.",
+    "infernoDoctrine": "Jeder Waffentreffer fügt „Burn 1“ hinzu, und „Burn 3“, sobald du drei „Burn“-Quellen besitzt.",
     "hoarplate": "+1 bei den Schilden.",
     "stormWall": "„Max Face in Shields“ gewährt 3 zusätzliche Schilde.",
-    "coldStart": "+2 auf die Schilde in den ersten beiden Runden.",
+    "coldStart": "Jede der ersten beiden Runden endet mit 3 zusätzlichen Schilden.",
     "blueFloor": "Blaue Würfel zeigen niemals eine Augenzahl unter 3.",
     "meltwater": "„Min face in shields“ gewährt 3 zusätzliche Schilde.",
     "frostBrake": "+2 für blaue Würfel in Motoren.",
     "bulkhead": "Hülle +3.",
     "chillBank": "Die Seite „Max“ auf einem blauen Würfel speichert 1 Ladung.",
-    "aegisField": "+2 Rüstung pro Rüstungswürfel.",
-    "deepFreeze": "+3 auf die Schilde bei einer Augenzahl von 8 oder mehr.",
-    "interdict": "Deine Jam verringert den Schaden durch gegnerische Angriffe um 2.",
+    "aegisField": "Der erste Slot, der in jeder Runde ausgewertet wird, erhöht zudem den Schildwert um 3.",
+    "deepFreeze": "Ein Schild, der bei 8+ stirbt, erhält einen Bonus von +3 und fügt 2 weitere Schilde hinzu.",
+    "interdict": "Ein Sensor-Wurf unter 4 wird auf 4 erhöht, sodass es immer zu einer Blockade kommt, und deine Blockade reduziert den Wert um 1.",
     "hardVacuum": "+3 auf die Schilde, solange der Rumpf weniger als die Hälfte seiner Lebenspunkte hat.",
-    "secondSkin": "Hülle +4; nach jedem Kampf 1 Lebenspunkt regenerieren.",
+    "secondSkin": "Hülle Nach jedem Gefecht werden +4 und 2 Rumpfschaden repariert, aber die Bergungsprämie ist um 10 % geringer.",
     "glacierPact": "+4 auf die Schilde, sobald du vier blaue Würfel hast.",
-    "mirrorLattice": "Ausweichmanöver wehren Schaden ab; die Motorschwellen sind eine Stufe niedriger.",
+    "mirrorLattice": "Ausweichmanöver wehren Schaden ab, die Motorschwellen sind eine Stufe niedriger, und mit drei Ausweich-Gegenständen erhalten Motoren einen Bonus von +3.",
     "permafrost": "Bei „Max Face“ in „Shields“ wird der Slot zweimal ausgewertet.",
-    "rootHold": "+1 bei den Motoren.",
+    "rootHold": "Ab Runde drei zählt jeder Würfel bei den Motoren als zwei Würfel höher.",
     "secondGrowth": "+2, wenn der Würfel denselben Wert wie im letzten Zug zeigt.",
-    "mulch": "1 Heilung nach dem Kampf; +5 % Schrott.",
     "pollen": "Bei einer „Max“-Seite auf einem grünen Würfel wird 1 Rumpfpunkt geheilt.",
-    "longRoots": "Wachsende Würfel steigen eine Stufe höher.",
+    "longRoots": "Ein Würfel, der auf seiner höchsten Augenzahl landet, erhält dauerhaft +1, bis zu einem Maximum von +2.",
     "greenwake": "Bei 5 oder mehr Motoren erhält man 2 Schutzschilde.",
-    "steadyHand": "Die Motor-Schwellenwerte – jetzt noch einfacher.",
     "sapline": "Wird der Wert des letzten Zuges wiederholt, werden 2 Rumpfpunkte geheilt.",
-    "thicket": "Hülle +3; nach jedem Kampf 2 Lebenspunkte regenerieren.",
+    "thicket": "Hülle +8, aber die Verwertungsprämie ist um 15 % geringer.",
     "bloomCycle": "+3, wenn ein grüner Würfel denselben Wert wie im letzten Zug zeigt.",
-    "photosynth": "Jeder grüne Würfel speichert 1 Ladung.",
-    "evergreen": "Wachsende Würfel steigen zwei Stufen höher.",
+    "photosynth": "Jeder grüne Würfel, der ausgewertet wird, speichert 1 Ladung.",
+    "evergreen": "Solange du drei Wachstumsgegenstände bei dir trägst, erhält ein Würfel, der den Wert des letzten Zuges wiederholt, dauerhaft +1, bis zu einem Maximum von +3.",
     "tideRoots": "Die Interferenzflut ist um eine Stufe schwächer.",
-    "worldTree": "Sobald du vier grüne Würfel hast, heilst du 2 pro ausgewertetem Slot.",
-    "overgrowthPact": "Wachstum +2 und Triebwerksschwellenwerte um zwei Stufen gesenkt; Rumpf −4.",
-    "standingWave": "+4 bei den Motoren.",
-    "pocketChange": "+2 Schrott zu Beginn des Kampfes.",
+    "worldTree": "Sobald vier grüne Würfel im Einklang stehen, heilt du am Ende jedes Zuges 1 Rumpfpunkt pro grünem Gegenstand, den du bei dir trägst.",
+    "overgrowthPact": "Wachstum +2 und Rumpf −4; solange du vier Wachstumsgegenstände bei dir trägst, zählt jeder Würfel als um 2 höher.",
+    "standingWave": "Die Schwellenwerte für Motoren sind nun einen Schritt einfacher; bei 6 oder mehr Motoren werden 4 Schilde und 2 Ladungen in den nächsten Zug übertragen.",
+    "pocketChange": "Beim Betreten eines Knotens erhältst du 1 Schrott für jeden [Schrott]-Gegenstand in deiner Ausrüstung.",
     "finderFee": "+2 Schrott pro Kill.",
-    "streetPrice": "Preise im Geschäft −8 %.",
+    "streetPrice": "Geschäfte −8 %, Schrott jedoch +5 %: Man kauft und verkauft zum gleichen Straßenpreis.",
     "luckyStreak": "Jede „Max Face“-Kombination bringt 3 Scrap ein.",
     "scrapline": "+12 % Schrott aus allen Quellen.",
     "smallMercies": "Jedes „Min“-Symbol bringt 2 Schrott.",
-    "goldTooth": "Jeder gelbe Würfel bringt 1 Schrottstück ein.",
-    "tallyMark": "+10 % EP für diesen Lauf.",
-    "bountyBoard": "+4 Schrott pro Kill.",
+    "goldTooth": "Für jeden gelben Würfel, den du auswertest, erhältst du 1 Schrott.",
+    "tallyMark": "Mit jedem Sieg wird ein Strich gesetzt; ab dem sechsten bringt jeder Knoten, den du betrittst, 3 Schrott ein.",
+    "bountyBoard": "Für jeden Sieg gibt es eine Prämie von 12 Schrott.",
     "marketRun": "Geschäfte −10 %; der erste Neuzufallswurf in jedem Geschäft ist kostenlos.",
     "goldRush": "Ein „Max“-Symbol auf einem gelben Würfel bringt 8 Schrott.",
-    "houseEdge": "+3 bei einer maximalen Augenzahl eines gelben Würfels.",
-    "ledgerTrick": "+20 % Schrott; Rumpf −2.",
-    "mintCondition": "Sobald du vier gelbe Würfel hast, muss Max 12 Schrott und 1 Gebühr zahlen.",
-    "silentPartner": "+30 % Schrott; Geschäfte −10 %.",
-    "veinTap": "+6 Schrott pro Kill und +6 zu Beginn des Gefechts.",
-    "darkCurrent": "+1 im Reaktor.",
-    "lowTide": "Jedes Min-Face speichert 2 Ladungen.",
-    "brinkmanship": "+1 auf jeden Würfelwurf, solange der Rumpf unter 40 % liegt.",
-    "blackTithe": "Jeder schwarze Würfel bringt 2 Schrott ein.",
-    "coldFusion": "Ladegrenze +2.",
+    "houseEdge": "Ein Würfel, der in Waffengebieten eine 7 oder mehr ergibt, erzielt einen kritischen Treffer (×1,5 Schaden).",
+    "ledgerTrick": "+20 % Schrott, aber die Ladungsgrenze sinkt um 2.",
+    "mintCondition": "Sobald du vier gelbe Würfel hast, bringt jede maximale Augenzahl 10 Schrott und 2 Ladung ein.",
+    "silentPartner": "Shops −12 % mit jeweils einem kostenlosen Neuloss, und jeder Sieg bringt 4 Schrott pro [Schrott]-Gegenstand, den du besitzt.",
+    "veinTap": "+40 % Schrott, aber bei jedem erneuten Würfeln wird ein Würfel weniger gewürfelt.",
+    "darkCurrent": "Ein Würfelwurf unter 5 im Reaktor zählt als 2 höher.",
+    "lowTide": "Jeder Würfel, der seine Mindestzahl würfelt, bringt 1 Ladung ein, unabhängig davon, ob er platziert wurde oder nicht.",
+    "brinkmanship": "+1 auf jeden ausgewerteten Würfel, sobald du drei Risiko-Objekte besitzt.",
+    "blackTithe": "Jeder Knoten, den du betrittst, kostet 5 Schrott für 1 Rumpf, und die Abrechnung wird eingestellt, sobald der Rumpf unter 25 % liegt.",
+    "coldFusion": "Ladungslimit +4; der Kern verbraucht 15 % deines Schrotts.",
     "longOdds": "+3 bei einer Mindestaugenzahl eines schwarzen Würfels.",
-    "hardBargain": "+15 % Schrott; nach Kämpfen heilst du 1 weniger.",
+    "hardBargain": "+15 % Schrott; Rumpf −1.",
     "nightShift": "Max kann im Reaktor noch 2 weitere Ladungen speichern.",
     "eventHorizon": "+3 für schwarze Würfel im Reaktor.",
-    "bloodPrice": "+4 auf die Waffen, solange der Rumpf weniger als 25 % Lebenspunkte hat.",
-    "heatShroud": "Der erste Reaktorüberlauf pro Gefecht kostet keinen Rumpfschaden.",
-    "scrapheap": "Jeder noch nicht platzierte Würfel speichert 1 Ladung.",
+    "bloodPrice": "Am Ende jedes Zuges, solange die Rumpfpunkte bei 30 % oder mehr liegen, gib 1 Rumpfpunkt aus, um 4 Schadenspunkte zu verursachen.",
+    "heatShroud": "Der erste Reaktorüberlauf pro Gefecht kostet keinen Rumpfschaden, und ein Reaktorwürfel erhöht den Schild um 4, solange du 8 oder mehr Ladung hast.",
+    "scrapheap": "Jeder nicht platzierte Würfel speichert 1 Ladung, und jeder Sieg bringt 5 Schrott ein.",
     "deadReckoning": "Angriffsgrenze +3; Rumpf −3.",
-    "obsidianCreed": "Schwarze Würfel zeigen nur den Mindest- oder Höchstwert; Angriffslimit +2.",
-    "lastBreath": "Einmal pro Spielrunde überlebst du einen tödlichen Treffer bei 1 Rumpfpunkt.",
-    "singularity": "Der Reaktor kann noch 3 weitere Ladungen speichern.",
+    "obsidianCreed": "Schwarze Würfel zeigen nur „Min“ oder „Max“; Ladungslimit +2; jeder Kampf beginnt mit 1 Ladung pro Risiko-Gegenstand, den du besitzt.",
+    "lastBreath": "Einmal pro Spielrunde überlebst du einen tödlichen Treffer bei 1 Rumpfpunkt; ein Kampf, in den du mit weniger als 3 Rumpfpunkten eingehst, beginnt mit 8 Schildpunkten.",
+    "singularity": "Jeder Würfel im Reaktor speichert 3 zusätzliche Ladung und kostet 1 Rumpfpunkt.",
     "widerGrip": "Wirf jeweils einen weiteren Würfel erneut.",
     "shimStock": "Anstöße kosten 1 Ladepunkt weniger.",
     "deckHand": "Reserve +1 Würfel.",
-    "toolRoll": "Ein zusätzlicher Wiederholwurf pro Runde.",
+    "toolRoll": "Ein zusätzlicher Wiederholwurf pro Runde; Rumpfwert −2.",
     "counterweight": "Eine gewürfelte 1 wird zu einer 2.",
-    "checklist": "+1 auf jeden Würfel im ersten Zug.",
+    "checklist": "Der erste Slot, der in jeder Runde ausgewertet wird, bringt 1 Ladung ein.",
     "greyMarket": "Geschäfte −6 %; +6 % Schrott.",
-    "spareParts": "+4 Schrott zu Beginn des Kampfes.",
+    "spareParts": "In den ersten beiden Zügen jeder Schlacht wird ein temporärer grauer d4 auf das Spielfeld gelegt.",
     "dampers": "Hülle +2; Ladungslimit +1.",
-    "routineCheck": "Nach jedem Kampf 1 Heilpunkt.",
-    "switchboard": "+2 bei den Sensoren.",
-    "gimbalMount": "Marken verursachen +2 zusätzlichen Schaden.",
-    "logistics": "Die ersten beiden Wiederholungswürfe sind in jedem Geschäft kostenlos; in Geschäften −5 %.",
-    "quickHands": "Wirf jeweils zwei weitere Würfel neu.",
-    "balanceBeam": "Dein niedrigster Würfelwurf in jeder Runde wird etwas nach oben korrigiert.",
-    "holdBack": "Anstöße kosten 1 Ladepunkt weniger; Ladegrenze +2.",
-    "payloadShuffle": "Lege einen zusätzlichen Würfel (+1) und einen weiteren blauen Würfel beiseite.",
-    "shortHaul": "+15 % EP für diesen Lauf.",
-    "dryDock": "Die Reparaturstation stellt 3 weitere Rumpfpunkte wieder her.",
-    "masterKey": "Zwei zusätzliche Wiederholwürfe pro Runde und ein weiterer Würfel pro Wiederholwurf.",
-    "greyProtocol": "+2 auf jeden Würfel, sobald du vier graue Würfel hast.",
-    "armorPlate": "Hülle +4.",
-    "coolantLoop": "Ladegrenze +1.",
-    "finePitch": "Die Motor-Schwellenwerte – jetzt noch einfacher.",
-    "boresight": "Marken verursachen +1 Schaden mehr.",
-    "bilgePump": "Nach jedem Kampf 1 Heilpunkt.",
-    "dockRates": "Preise im Geschäft −7 %.",
+    "routineCheck": "Jeder Knoten, den du eingibst, wird im Protokoll erfasst; ab dem zehnten Eintrag beginnt jeder Kampf mit einem zusätzlichen Wiederholungswurf.",
+    "switchboard": "Markierungen verursachen +1 zusätzlichen Schaden, und wenn „Sensoren“ ausgewertet wird, wird dein Würfel mit der niedrigsten Augenzahl erneut gewürfelt.",
+    "gimbalMount": "Ein Würfel, der auf „Motoren“ oder „Sensoren“ landet, zählt als mindestens 4.",
+    "logistics": "Geschäfte −12 %, wobei die ersten beiden Wiederholungswürfe kostenlos sind, aber die Schrott-Einnahmen betragen −8 %.",
+    "quickHands": "Wirf jeweils zwei weitere Würfel neu, aber du kannst keinen Würfel mehr in Reserve halten.",
+    "balanceBeam": "Jeder Würfel, der seine oberste Seite zeigt, gibt 1 ab, um deinen niedrigsten Würfel um 2 zu erhöhen.",
+    "holdBack": "„Nudges“ kosten 1 Ladung weniger, und mit drei Gegenständen, die mit „Würfel“ gekennzeichnet sind, reservierst du einen weiteren Würfel.",
+    "payloadShuffle": "Reserve: +2 Würfel, +1 weiterer für einen blauen Würfel, aber die Ladungsgrenze sinkt um 2.",
+    "shortHaul": "+20 % EP aus dem Lauf; Rumpf-Maximalwert −3.",
+    "dryDock": "Die Reparaturbucht heilt 2 weitere Rumpfpunkte für jeden Gegenstand, den du bei dir trägst und der mit „Reparaturbucht“ gekennzeichnet ist – einschließlich dieses Gegenstands.",
+    "masterKey": "Ein zusätzlicher Wiederholwurf pro Runde und ein weiterer Würfel pro Wiederholwurf; bei drei Gegenständen mit dem Tag „Wiederholwurf“ jeweils noch einer zusätzlich.",
+    "greyProtocol": "Mit vier grauen Würfeln beginnt jede Schlacht mit drei kostenlosen Verschiebungen und einem zusätzlichen Reserveplatz.",
     "crewDrill": "+12 % EP durch den Lauf.",
-    "scrapHopper": "+3 Schrott zu Beginn des Kampfes.",
     "spotterCall": "Bei 5 oder mehr Sensoren wird 1 Ladung gespeichert.",
     "hullWeld": "Die Reparaturbucht heilt 1 Rumpfpunkt mehr.",
-    "reinforcedBay": "Noch ein Modulsteckplatz.",
-    "surgeTank": "Ladegrenze +3.",
-    "hardenedHull": "Hülle +7; die Motor-Schwellenwerte sind eine Stufe schwieriger.",
-    "kineticDampers": "Ein Ausweichmanöver speichert 1 Ladung.",
-    "targetingSuite": "Verursacht +2 Schaden; eine Ladehemmung verringert den Schaden um 1.",
-    "pressureValve": "Der erste Reaktorüberlauf pro Gefecht kostet keinen Rumpfschaden.",
-    "resonanceTuner": "+2 Ladung zu Beginn des Kampfes pro abgeschlossenem Vierer-Set.",
-    "shockLance": "+5 bei der Wirbelsäulenbefestigung.",
-    "piercingRounds": "Der erste Treffer in jedem Kampf ignoriert Schilde; +1 auf die Trefferwertung."
+    "reinforcedBay": "Noch ein Modulsteckplatz; Rumpf −3.",
+    "hardenedHull": "Hülle +6; nach jedem Kampf 1 Lebenspunkt regenerieren.",
+    "targetingSuite": "Verursacht +2 Schadenspunkte, und beim Auslösen der Sensoren wird für jeden Präzisionsgegenstand, den du bei dir trägst, 1 Ladung gespeichert.",
+    "shockLance": "+5 beim „Spinal Mount“, und ein Würfel, der dort mit einer Augenzahl unter 5 landet, wird beim Einfallen erneut gewürfelt.",
+    "piercingRounds": "Der erste Treffer in jedem Kampf ignoriert Schilde, erhöht die Trefferwertung um +1, und eine Waffe mit maximaler Angriffskraft verursacht für jeden bei dir getragenen Durchschlag-Gegenstand 2 zusätzliche Schadenspunkte.",
+    "snakeEyes": "Ein Waffenwürfel, der auf seiner Mindestseite liegt, verursacht dennoch 3 Schadenspunkte.",
+    "looseBallast": "Ein zusätzlicher Wiederholwurf pro Runde; Rumpf −3.",
+    "downPayment": "Der erste Slot, der in jeder Runde ausgewertet wird, erhält +3 und kostet 1 Rumpfpunkt, es sei denn, der Rumpfstand liegt unter 20 %.",
+    "hazardPay": "Wenn man mit weniger als der Hälfte des Rumpfes in einen Kampf eintritt, erhält man 10 Schrott.",
+    "overdraft": "Waffenslots akzeptieren Würfel, die über ihre Obergrenze hinausgehen, für jeweils 2 Rumpfpunkte, und ein Waffenwürfel mit einer Augenzahl von 9 oder mehr kostet 2 Ladepunkte.",
+    "debtCollector": "Jede Minute, in der du diesen Kampf bestreitest, wird im Protokoll vermerkt; ab der vierten Minute endet jeder Zug mit 1 Schadenspunkt pro Risikoobjekt, das du besitzt.",
+    "snowline": "Jede Schlacht beginnt mit 1 Schild pro blauem Würfel in deinem Deck.",
+    "rimeGuard": "Ein Würfel einer anderen Schule, der in einen Schlitz gelegt wird, ergibt niemals einen Wert unter 2.",
+    "whiteNoise": "Beende einen Zug mit einer Angriffsstärke von 4 oder mehr, und der nächste Angriff des Gegners wird blockiert.",
+    "iceSheet": "Solange sich ein „Shieldwall“-Gegenstand an Bord befindet, endet jeder Zug mit 4 zusätzlichen Schildpunkten.",
+    "bracingVanes": "Ein Motorwürfel, der nicht auf seiner Höchstseite liegt, ergibt einen Bonus von +3.",
+    "nullField": "Jede Runde endet mit 2 Schildpunkten pro „Schildwall“-Gegenstand, und bei vier davon wird der nächste Angriff des Gegners abgewehrt.",
+    "takeRoot": "Jeder Würfelwert unter 3 wird auf 3 erhöht, sobald du ihn einem Slot zuordnest.",
+    "seedBank": "Kampfbeginn: In den nächsten drei Runden erhöht sich dein Schildwert um 1 pro Wachstumsgegenstand, den du bei dir trägst.",
+    "understory": "Ende des Zuges: Wenn noch 4 oder mehr Schildpunkte vorhanden sind, heile 1 Rumpfpunkt.",
+    "mycelium": "Sobald sechs Slots diesen Kampf entschieden haben, werden am Ende jedes Zuges 2 Rumpfpunkte geheilt und der Schild um 3 erhöht.",
+    "rhizome": "Motor-Schwellenwerte zwei Stufen niedriger; Rumpf −2.",
+    "taproot": "Zählt jeden Knoten, den du betrittst; ab dem achten beginnt jeder Kampf mit 6 Schild- und 3 Rumpf-Heilpunkten.",
+    "perennial": "Ein Würfel in Motoren, der den Wert des letzten Zuges wiederholt, zählt als vier höher.",
+    "annualRings": "Zählt jeden Würfel, dessen Wert dem des letzten Zuges entspricht; ab dem dritten Würfel zählt jeder weitere Würfel für den Rest des Kampfes als um 3 höher.",
+    "dryRun": "Ein Würfel, der einen Wert unter 4 wiederholt, wird erneut gewürfelt.",
+    "teardown": "Temporäre Würfel werden am Ende jedes Zuges entfernt, wobei du 1 Schrott pro Gegenstand erhältst, den du bei dir trägst und der mit „Würfel“ gekennzeichnet ist.",
+    "tallySheet": "Jeder Würfel, der auf seiner niedrigsten Augenzahl landet, zählt als ein Strich, und je drei Striche werden am Ende des Zuges gegen 3 Ladungen eingetauscht.",
+    "cargoHold": "Lege drei weitere Würfel beiseite, aber würfle jedes Mal einen weniger erneut.",
+    "pointBlank": "Ein „Max“-Treffer bei Waffen verursacht +3 Schaden und kostet 1 Rumpfpunkt.",
+    "ignition": "Der Kampf beginnt mit einem „Burn 2“ gegen den Gegner.",
+    "keelStrike": "Ein „Max Face“ im „Spinal Mount“ verursacht kritische Treffer mit dem Faktor ×1,5.",
+    "runningHot": "Ab dem vierten Waffenwürfel der Schlacht erhalten die Waffenwürfel einen Bonus von +3.",
+    "ashfall": "Ein „Max“-Effekt bei Waffen verursacht 2 zusätzliche Schadenspunkte für jede „Burn“-Quelle, die du besitzt.",
+    "stokehold": "Bei drei Brandherden endet jeder Zug damit, dass „Brand 2“ hinzugefügt wird.",
+    "autoAlign": "Ein Würfel, der bei den Sensoren unterhalb von 3 landet, wird sofort erneut gewürfelt.",
+    "coreTap": "Sobald der Reaktor die Version Mk2 erreicht hat, werden beim Auflösen 2 zusätzliche Ladungen gespeichert.",
+    "damageControl": "Sobald die Rüstung unter die Hälfte sinkt, werden am Ende jeder Runde 3 Schildpunkte wiederhergestellt.",
+    "spallLiner": "Jede Schlacht beginnt mit 2 Schildpunkten pro Überlebensgegenstand, den du bei dir trägst.",
+    "scavengedArmour": "Hülle +6; −10 % Schrott.",
+    "crashPriority": "Wenn man mit mehr als der Hälfte der Rumpfressource in einen Kampf eintritt, werden 2 Rumpfressource für 5 Ladung verbraucht.",
+    "spareHands": "Wenn du drei Präzisionsgegenstände bei dir trägst, beginnt jeder Kampf mit einem kostenlosen Nudge.",
+    "overrideKeys": "Wenn du mit mehr als 60 % Rumpfstärke in einen Kampf eintrittst, passt jede Waffe, die die Obergrenze ihres Waffenslots um 2 Rumpfstärke überschreitet, in diesen Slot.",
+    "markLedger": "Jede Markierung wird im Hauptbuch vermerkt, und ab der dritten Markierung erzielt jeder Waffenslot einen kritischen Treffer.",
+    "refitCrew": "Bei Erreichen eines Knotens, an dem die Rumpfreparatur unter der Hälfte von 3 liegt.",
+    "flightLog": "+25 % EP aus dem Lauf; −15 % Schrott.",
+    "fullRefit": "+2 auf jeden Würfel, sobald du vier Präzisionsgegenstände bei dir trägst.",
+    "sureThing": "Ein Würfel, der mit der Zahl 1 oder 2 auf seiner Unterseite liegt, wird zu einer 3 für 2 Schrott.",
+    "chipStack": "Solange du 5 oder mehr Ladungen hast, erzielt ein Würfel mit dem höchsten Augenzahl bei Waffen einen kritischen Treffer (×1,5 Schaden).",
+    "warChest": "Wenn du auch nur einen [Schrott]-Gegenstand besitzt, beginnst du jeden Kampf mit 3 Ladungen.",
+    "marginCall": "Ein Würfel, der bei der Waffenauswahl einen Wert unter 4 ergibt, erhält für 3 Schrott +5 auf seinen Wert.",
+    "loadedDice": "Pro Kampf kann zweimal gewürfelt werden, und ein „Nudge“ kostet 2 Ladepunkte weniger."
   },
   "speaker": {
     "mara": "Mara, Schrotthändlerin",
@@ -1819,244 +1939,244 @@
   },
   "puzzle": {
     "oreVein": {
-      "title": "Ore Vein",
-      "goal": "Deal exactly {{n}} — the vein shears if you over-cut. Leave a die out."
+      "title": "Erzader",
+      "goal": "Genau so vorgehen: {{n}} – die Ader reißt, wenn man zu tief schneidet. Eine Matrize weglassen."
     },
     "coolant": {
-      "title": "Coolant Line",
-      "goal": "Bank exactly {{n}} charge — the core drinks in steps of one and a half."
+      "title": "Kühlmittelleitung",
+      "goal": "Genau {{n}} Gebühr einziehen – die Hauptgetränke in Schritten von jeweils eineinhalb."
     },
     "cleanFit": {
       "title": "Clean Fit",
-      "goal": "Bank {{n}}+ charge with every die placed and nothing spilled past the cap."
+      "goal": "Bank {{n}}+ Gebühr für jeden platzierten Würfel, wobei nichts über die Obergrenze hinausgeht."
     },
     "redRoute": {
-      "title": "Red Route",
-      "goal": "Deal {{n}}+ damage — a red die in Weapon A, affinity firing."
+      "title": "Rote Route",
+      "goal": "Füge {{n}}Schaden zu — ein roter Würfel bei Waffe A, Affinitätsschuss."
     },
     "ignite": {
       "title": "Ignite",
-      "goal": "Deal {{n}}+ damage and land Burn — a cinder must hit its max face."
+      "goal": "Füge dem Ziel {{n}}Schaden zu und löse „Burn“ aus – eine Asche muss ihre maximale Wertseite zeigen."
     },
     "pipeline": {
       "title": "Pipeline",
-      "goal": "Mark, then land {{n}}+ into the marked target, and do not overflow the reactor."
+      "goal": "Markiere das Ziel, lande dann „{{n}}“ darauf und achte darauf, dass der Reaktor nicht überläuft."
     },
     "overload": {
-      "title": "Overload",
-      "goal": "Jam the spinal on purpose, then carry {{n}}+ damage on the mounts."
+      "title": "Überlastung",
+      "goal": "Setze „Spinal“ absichtlich ein und erhalte dann {{n}}+ Schaden auf den Reittieren."
     },
     "slowBurn": {
-      "title": "Slow Burn",
-      "goal": "Two turns: set Burn, reserve a hitter, and stack {{n}}+ total damage."
+      "title": "Langsam brennend",
+      "goal": "Zwei Züge: „Burn“ aktivieren, einen Angreifer reservieren und „{{n}}“ + Gesamtschaden stapeln."
     },
     "capacitor": {
-      "title": "Capacitor",
-      "goal": "Bank {{n}}+ charge across three turns — one core cannot hold it all at once."
+      "title": "Kondensator",
+      "goal": "Lade „{{n}}“ über drei Runden hinweg auf – ein Kern kann nicht alles auf einmal speichern."
     },
     "lockbox": {
-      "title": "Lockbox",
-      "goal": "Fixed reading — one routing lands damage, shield and {{n}}+ charge at once."
+      "title": "Schließfach",
+      "goal": "Feste Auslegung – Ein Routing verursacht Schaden, setzt einen Schild und „{{n}}“ sowie eine Ladung gleichzeitig ein."
     },
     "parity": {
-      "title": "Parity Lock",
-      "goal": "Fixed reading — {{n}}+ damage, Weapons odd, Shields even. Mind the faces."
+      "title": "Paritätssperre",
+      "goal": "Feste Werte – {{n}}+ Schaden, Waffen ungerade, Schilde gerade. Achtet auf die Gesichter."
     },
     "bulwarkStand": {
-      "title": "Bulwark Stand",
-      "goal": "Survive the barrage and still hold {{n}}+ shield — layer the defence."
+      "title": "Bulwark-Ständer",
+      "goal": "Überstehe den Beschuss und behalte dennoch {{n}}+ Schild bei – baue deine Verteidigung schichtweise auf."
     },
     "tally": {
-      "title": "The Tally",
-      "goal": "Deal exactly {{n}} damage."
+      "title": "Die Bilanz",
+      "goal": "Füge genau {{n}} Schaden zu."
     },
     "battery": {
-      "title": "The Battery",
-      "goal": "Store exactly {{n}} charge."
+      "title": "Die Batterie",
+      "goal": "Lagern Sie genau „{{n}}“ auf."
     },
     "seawall": {
-      "title": "The Seawall",
-      "goal": "Raise exactly {{n}} shield."
+      "title": "Die Küstenbefestigung",
+      "goal": "Errichte genau ein „{{n}}“-Schild."
     },
     "mirrorMath": {
-      "title": "The Mirror",
-      "goal": "Deal {{n}} or more using at most two slots."
+      "title": "Der Spiegel",
+      "goal": "Verteilen Sie {{n}}en oder mehr auf höchstens zwei Spielplätze."
     },
     "engraverBench": {
-      "title": "The Bench",
-      "goal": "Raise {{n}} shield with at least two slots filled."
+      "title": "Die Bank",
+      "goal": "Errichte einen „{{n}}“-Schild, bei dem mindestens zwei Slots belegt sind."
     },
     "blackVault": {
-      "title": "The Vault",
-      "goal": "Store {{n}} charge using a school's own system."
+      "title": "Der Tresor",
+      "goal": "Die Abrechnung von „Store-{{n}}“ erfolgt über das schuleigene System."
     },
     "spinalDrill": {
-      "title": "Spinal Drill",
-      "goal": "Mark, jam the Spinal, then deal {{n}}."
+      "title": "Wirbelsäulenbohrer",
+      "goal": "Mark, blockiere den Spinal und spiele dann „{{n}}“ aus."
     },
     "coolChain": {
-      "title": "Cool Chain",
-      "goal": "Shields first, then {{n}} charge, and no overflow."
+      "title": "Kühlkette",
+      "goal": "Zuerst die Schilde, dann „{{n}}“ aktivieren und keinen Überlauf zulassen."
     },
     "emberStack": {
       "title": "Ember Stack",
-      "goal": "Deal {{n}} across two turns."
+      "goal": "{{n}}n über zwei Runden austeilen."
     },
     "shieldWall": {
-      "title": "Shield Wall",
-      "goal": "End the second turn on {{n}} shield."
+      "title": "Schildwand",
+      "goal": "Beende den zweiten Zug auf dem „{{n}}“-Schild."
     },
     "fateBench": {
-      "title": "Fixed Odds",
-      "goal": "One roll, one placement: damage, shield, and {{n}} charge."
+      "title": "Feste Quoten",
+      "goal": "Ein Würfelwurf, eine Platzierung: Schaden, Schild und eine „{{n}}“-Ladung."
     },
     "sortingYard": {
-      "title": "Sorting Yard",
-      "goal": "Deal {{n}} or more with an even total in Weapon A."
+      "title": "Sortierbahnhof",
+      "goal": "Füge der „{{n}}“ oder mehr Schaden zu, wobei die Gesamtzahl bei Waffe A gerade sein muss."
     },
     "choirStand": {
-      "title": "The Choir Stand",
-      "goal": "Survive the charged volley on {{n}} shield or more."
+      "title": "Der Chorstand",
+      "goal": "Überstehe die aufgeladene Salve mit einem „{{n}}“-Schild oder mehr."
     },
     "emberCut": {
       "title": "Ember Cut",
-      "goal": "Land within two of {{n}} damage — the seam gives at either edge."
+      "goal": "Landet man innerhalb von zwei Feldern von „{{n}}“ – die Naht gibt an beiden Rändern nach."
     },
     "driftSpark": {
-      "title": "Drift Spark",
-      "goal": "Bank {{n}} charge, give or take two. The coil is forgiving; the core is not."
+      "title": "Drift Funke",
+      "goal": "Bank{{n}}, plus/minus zwei. Die Spule ist nachsichtig, der Kern hingegen nicht."
     },
     "plateFit": {
-      "title": "Plate Fit",
-      "goal": "Raise exactly {{n}} shield. The plate seats or it does not."
+      "title": "Passform der Platte",
+      "goal": "Erhebe genau {{n}} Schild. Entweder passt die Platte hinein oder nicht."
     },
     "hairline": {
-      "title": "Hairline",
-      "goal": "One mount, exactly {{n}} damage. Everything else stays in the tray."
+      "title": "Haarlinie",
+      "goal": "Ein Mount, genau {{n}} Schaden. Alles andere bleibt in der Ablage."
     },
     "tithe": {
-      "title": "The Tithe",
-      "goal": "Exactly {{n}} charge, and the reactor takes its cut first."
+      "title": "Der Zehnte",
+      "goal": "Genau {{n}} Gebühr, und der Betreiber des Reaktors erhält seinen Anteil als Erstes."
     },
     "deadWeight": {
-      "title": "Dead Weight",
-      "goal": "Deal {{n}}+ with every die placed — the ballast has to go somewhere."
+      "title": "Leergewicht",
+      "goal": "{{n}}+ bei jedem platzierten Würfel – der Ballast muss ja irgendwo hin."
     },
     "blueLane": {
       "title": "Blue Lane",
-      "goal": "Raise {{n}}+ shield with a blue die in the Shields — the lane is keyed."
+      "goal": "Errichte einen „{{n}}“-Schild mit einem blauen Würfel in den „Shields“ – die Spur ist markiert."
     },
     "spread": {
-      "title": "The Spread",
-      "goal": "Deal {{n}}+ across three systems. Nothing concentrated survives the scan."
+      "title": "Der Spread",
+      "goal": "{{n}}und mehr auf drei Systemen. Nichts, was nicht verteilt ist, übersteht den Scan."
     },
     "greenhouse": {
-      "title": "Greenhouse",
-      "goal": "Deal {{n}}+ and make something grow — a green die must land on its top face."
+      "title": "Gewächshaus",
+      "goal": "{{n}}+ austeilen und etwas wachsen lassen – dabei muss ein grüner Würfel mit der Oberseite nach oben zeigen."
     },
     "overcut": {
-      "title": "Overcut",
-      "goal": "Bank {{n}}+ charge and force a die past a cap it does not fit."
+      "title": "Überfräsung",
+      "goal": "Bank{{n}} + Druck ausüben und einen Stempel über eine Kappe schieben, in die er nicht passt."
     },
     "tightPack": {
-      "title": "Tight Pack",
-      "goal": "Bank {{n}}+ charge across two systems with nothing spilled past a cap."
+      "title": "Enges Gedränge",
+      "goal": "Bank-{{n}} + Gebühren über zwei Systeme hinweg, wobei nichts über eine Obergrenze hinausgeht."
     },
     "oddPlate": {
-      "title": "Odd Plate",
-      "goal": "Raise {{n}}+ shield reading odd, with the engines reading even."
+      "title": "Ungerade Kennzeichen",
+      "goal": "{{n}}erhöhen + Schildanzeige ungerade, Triebwerksanzeige gerade."
     },
     "redOnly": {
-      "title": "Red Only",
-      "goal": "Deal {{n}}+ with a red die in Weapon A, and Burn has to land."
+      "title": "Nur rot",
+      "goal": "{{n}}+ mit einem roten Würfel in Waffe A austeilen, und „Burn“ muss treffen."
     },
     "perfectSeal": {
-      "title": "Perfect Seal",
-      "goal": "One reading only: {{n}}+ damage, every die placed, Weapons odd, Shields and the core even."
+      "title": "Perfekte Abdichtung",
+      "goal": "Nur eine Auslegung: {{n}}+ Schaden, jeder gewürfelte Würfel, Waffen auf ungeraden Feldern, Schilde und der Kern auf geraden Feldern."
     },
     "firstLight": {
-      "title": "First Light",
-      "goal": "Mark first, then put {{n}}+ into what the sensors found."
+      "title": "Erstes Licht",
+      "goal": "Markieren Sie zuerst die Stellen und fügen Sie dann „{{n}}“ zu den von den Sensoren erfassten Werten hinzu."
     },
     "coldStart": {
-      "title": "Cold Start",
-      "goal": "Shields up first, then {{n}}+ charge into a cold core."
+      "title": "Kaltstart",
+      "goal": "Zuerst die Schilde aktivieren, dann „{{n}}“ und in einen kalten Kern stürmen."
     },
     "braceGate": {
-      "title": "Brace Gate",
-      "goal": "Mark, brace for {{n}}+ shield, and leave the reactor unflooded."
+      "title": "Brace-Gate",
+      "goal": "Mark, mach dich bereit für „{{n}}“ und „Shield“ und lass den Reaktor nicht überfluten."
     },
     "siegeLine": {
-      "title": "Siege Line",
-      "goal": "Jam the spinal on purpose, carry {{n}}+ on the mounts, and hold the core."
+      "title": "Belagerungslinie",
+      "goal": "Blockiere die Wirbelsäule absichtlich, trage „{{n}}+“ auf den Halterungen und halte den Kern fest."
     },
     "markedBurn": {
-      "title": "Marked Burn",
-      "goal": "Mark, jam the spinal, and still land {{n}}+ on the mount."
+      "title": "Ausgeprägte Verbrennung",
+      "goal": "Mark, blockiere die Wirbelsäule und lande trotzdem {{n}}+ in der Mount-Position."
     },
     "dryDock": {
-      "title": "Dry Dock",
-      "goal": "Shields, then {{n}}+ charge, and not one point over the cap."
+      "title": "Trockendock",
+      "goal": "Shields, dann „{{n}}“ plus Gebühr, und kein einziger Punkt über der Obergrenze."
     },
     "theWholeChain": {
-      "title": "The Whole Chain",
-      "goal": "Mark, bank without flooding, and finish on {{n}}+ — one pass, no rerolls."
+      "title": "Die gesamte Kette",
+      "goal": "Markiere, fahre ohne Überschwemmung weiter und beende die Runde auf {{n}}+ — ein Durchgang, keine Wiederholungswürfe."
     },
     "ironBank": {
-      "title": "Iron Bank",
-      "goal": "Three turns, one core: bank {{n}}+ without ever spilling."
+      "title": "Eisenbank",
+      "goal": "Drei Drehungen, ein Kern: Bank{{n}}+ – ohne jemals etwas zu verschütten."
     },
     "twinFuse": {
-      "title": "Twin Fuse",
-      "goal": "The first die sits out turn one. Still reach {{n}}+ across the two."
+      "title": "Doppelsicherung",
+      "goal": "Der erste Würfel setzt in Runde eins aus. Man erreicht dennoch {{n}}+ über beide Würfel hinweg."
     },
     "longWall": {
-      "title": "Long Wall",
-      "goal": "Only the last turn counts. End on {{n}}+ shield — hold a die back for it."
+      "title": "Langwand",
+      "goal": "Nur der letzte Zug zählt. Beende den Zug mit „{{n}} + Schild“ – hebe dir dafür einen Würfel auf."
     },
     "slowFuse": {
-      "title": "Slow Fuse",
-      "goal": "The first die sits out turn one. Burn and mounts must still total {{n}}+."
+      "title": "Langsame Zündschnur",
+      "goal": "Der erste Würfel setzt in Runde eins aus. Die Summe aus „Burn“ und „Mounts“ muss dennoch mindestens „{{n}}“ betragen."
     },
     "reactorRun": {
-      "title": "Reactor Run",
-      "goal": "The first die sits out turn one, and there are no rerolls. Bank {{n}}+."
+      "title": "Reaktorlauf",
+      "goal": "Der erste Würfel wird in Runde eins nicht gewürfelt, und es gibt keine Wiederholungswürfe. Bank{{n}}+."
     },
     "theLongCount": {
-      "title": "The Long Count",
-      "goal": "Three turns, no rerolls, the first die held back — and {{n}}+ banked at the end."
+      "title": "Die Lange Zählung",
+      "goal": "Drei Runden, keine Wiederholwürfe, der erste Würfel wurde zurückbehalten – und „{{n}}“+ landete am Ende auf der Gewinnerseite."
     },
     "ledger": {
-      "title": "The Ledger",
-      "goal": "Fixed reading — every die booked, Shields reading even, {{n}}+ damage on the line."
+      "title": "Das Hauptbuch",
+      "goal": "Feste Würfelergebnisse – jeder Würfel gezählt, Shields-Wert gerade, „{{n}}“ + Schaden auf der Linie."
     },
     "crossWire": {
       "title": "Cross-Wire",
-      "goal": "Fixed reading — damage, shield and {{n}}+ charge out of one routing."
+      "goal": "Feste Werte – Schaden, Schild und „{{n}}“ + Angriff nach einem Rückzug."
     },
     "mirrorRead": {
-      "title": "Mirror Read",
-      "goal": "Fixed reading — {{n}}+ damage with Burn landed. Only one way round."
+      "title": "Spiegelbild lesen",
+      "goal": "Korrekter Wert — {{n}}+ Schaden bei Treffer mit „Burn“. Es gibt nur eine mögliche Variante."
     },
     "theSeal": {
-      "title": "The Seal",
-      "goal": "Fixed reading — {{n}}+ damage, Shields reading even, nothing spilled past a cap."
+      "title": "Das Siegel",
+      "goal": "Fester Messwert — {{n}}+ Schaden, Schilde zeigen einen gleichmäßigen Messwert an, nichts hat die Obergrenze überschritten."
     },
     "hullCheck": {
-      "title": "Hull Check",
-      "goal": "Take the volley and still stand on {{n}}+ shield."
+      "title": "Hülle Überprüfen",
+      "goal": "Nimm den Schlag hin und bleibe trotzdem auf {{n}}+ Schild stehen."
     },
     "lastLight": {
-      "title": "Last Light",
-      "goal": "Survive the volley with {{n}}+ charge still in the core."
+      "title": "Letztes Licht",
+      "goal": "Überstehe den Angriff mit „{{n}}“ und der Ladung, die noch im Kern vorhanden ist."
     },
     "stormFront": {
-      "title": "Storm Front",
-      "goal": "Survive the volley and answer it with {{n}}+ damage in the same turn."
+      "title": "Sturmfront",
+      "goal": "Überstehe den Angriff und erwidere ihn im selben Zug mit einem Schaden von {{n}}+."
     },
     "theVigil": {
-      "title": "The Vigil",
-      "goal": "One reading, no board changes: take the heaviest volley in the sector and still hold {{n}}+ charge."
+      "title": "Die Nachtwache",
+      "goal": "Ein Messwert, keine Änderungen am Spielbrett: Man muss den stärksten Beschuss im Sektor einstecken und behält dennoch die „{{n}}“-Ladung bei."
     }
   },
   "bark": {
@@ -2631,209 +2751,249 @@
   "modules": {
     "magnetScoop": {
       "name": "Magnetlöffel",
-      "desc": "+2 Schrott zu Beginn jedes Kampfes."
+      "desc": "Für jeden Knoten, den du betrittst, erhältst du 2 Schrott, und für jeden gewonnenen Kampf bekommst du 3 weitere."
     },
     "grapple": {
       "name": "Enterhaken",
-      "desc": "+3 Schrott für jeden getöteten Gegner."
+      "desc": "+3 Schrott für jeden getöteten Gegner und 8 Schrott zusätzlich für einen bis zum Ende von Runde 3 gewonnenen Kampf."
     },
     "lotteryBlock": {
       "name": "Lotterie-Block",
-      "desc": "Der erste Neuzufall ist in jedem Shop kostenlos."
+      "desc": "Der erste Neuzufallsgenerator in jedem Laden ist kostenlos, und für jeden dritten Knoten, den du betrittst, erhältst du 12 Schrott."
     },
     "trainingModule": {
       "name": "Schulungsmodul",
-      "desc": "+20 % EP für diesen Lauf."
+      "desc": "+20 % EP, und ab dem 4. Knotenpunkt gewährt die gut eingespielte Besatzung in jedem Gefecht einen zusätzlichen Wiederholungswurf."
     },
     "assayRig": {
       "name": "Prüfstand",
-      "desc": "Jede „Max Face“-Kombination bringt 2 Scrap ein."
+      "desc": "Ein in Waffe A erzielter Maximalwert wird mit 5 Schrott bewertet."
     },
     "brokerLink": {
       "name": "Broker-Link",
-      "desc": "Preise im Geschäft −12 %."
+      "desc": "Shop-Preise −16 %, aber die Antennenanlage beansprucht maximal 3 Rumpfpunkte."
     },
     "slagPress": {
       "name": "Schlackepresse",
-      "desc": "Jedes „Min“-Gesicht bringt 3 Schrott ein."
+      "desc": "Ein Würfel, der mit seiner niedrigsten Seite nach oben in Waffe B gelegt wird, wird auf 4 hochgedrückt und bringt 3 Schrott ein."
     },
     "tithePlate": {
       "name": "Opferkorb",
-      "desc": "+25 % Schrott aus allen Quellen."
+      "desc": "+25 % Schrott aus allen Quellen sowie 2 Schrott zu Beginn des Kampfes für jeden [Schrott]-Gegenstand, den du besitzt."
     },
     "salvageArm": {
       "name": "Bergungsarm",
-      "desc": "Jeder nicht platzierte Würfel bringt 1 Schrott ein."
+      "desc": "Für jeden gewonnenen Kampf wird ein Wrack verbucht; ab dem fünften Wrack erhältst du für jeden Knoten, den du betrittst, 4 Schrott."
     },
     "auditCore": {
       "name": "Audit-Kern",
-      "desc": "+6 Schrott zu Beginn des Kampfes; Geschäfte −5 %."
+      "desc": "+4 Schrott zu Beginn jedes Kampfes und weitere 8, sobald der Reaktor auf Mk2 aufgerüstet ist."
     },
     "mirrorPlate": {
       "name": "Spiegelbeschichtung",
-      "desc": "Ein ausgewichener Treffer reflektiert den Schaden zurück."
+      "desc": "Jeder bei einer Schild-Montage ausgewertete Würfel verursacht am Ende des Zuges 6 Schadenspunkte."
     },
     "ballastModule": {
-      "name": "Ballast",
-      "desc": "Hülle +4."
+      "name": "Ballasttanks",
+      "desc": "Hülle +5 und die Motor-Schwellenwerte sind um eine Stufe höher; jeder Knoten, den du betrittst, repariert 1 Rumpf."
     },
     "escapePod": {
       "name": "Rettungskapsel",
-      "desc": "Einmal pro Spielrunde überlebst du einen tödlichen Treffer bei 1 Rumpfpunkt."
+      "desc": "Einmal pro Spielrunde überlebst du einen tödlichen Treffer bei 1 Rumpfpunkt, und jeder Kampf, in den du mit weniger als 40 % Rumpfpunkt eintrittst, beginnt mit 8 Schildpunkten und einem zusätzlichen Reserveplatz."
     },
     "heatsink": {
       "name": "Kühlkörper",
-      "desc": "Der erste Reaktorüberlauf pro Gefecht kostet keinen Rumpfschaden."
+      "desc": "Jeder Würfel passt für 1 Rumpf auf die Kappe des Reaktors, und eine maximale Augenzahl im Reaktor entzieht 3 Schildpunkte."
     },
     "fieldStabilizer": {
       "name": "Feldstabilisator",
-      "desc": "Die Interferenzflut ist um eine Stufe schwächer."
+      "desc": "Bei einer Interferenz-Flut ist die Stufe um eine Stufe schwächer, und ein Kampf, der bei Flutstufe 3 oder höher beginnt, bringt dir einen kostenlosen Schub und 4 Schilde ein."
     },
     "ablativeWeave": {
       "name": "Ablatives Gewebe",
-      "desc": "+2 Rüstung pro Rüstungswürfel."
+      "desc": "Die ersten beiden Würfel, die in jeder Schlacht als „Schilde“ gewertet werden, fügen jeweils 5 Schilde hinzu, während das Gewebe verbrennt."
     },
     "bulkheadRing": {
       "name": "Schott-Ring",
-      "desc": "Hülle +8; die Motor-Schwellenwerte sind eine Stufe schwieriger."
+      "desc": "Hülle +8 und die Motor-Schwellenwerte sind eine Stufe schwieriger; bei Schildern der Stufe Mk 2 beginnt jeder Kampf mit 6 Schildpunkten, und bei Mk 3 enthält die Reserve einen zusätzlichen Würfel."
     },
     "dampingCoil": {
       "name": "Dämpfungsspule",
-      "desc": "Heilt nach jedem Kampf 3 Rumpfpunkte."
+      "desc": "Die Spule wird über die nächsten drei Windungen abgewickelt, wobei jede dieser Windungen mit 3 weiteren Abschirmungen endet."
     },
     "hardpointClamp": {
       "name": "Befestigungsklemme",
-      "desc": "Die Motor-Schwellenwerte – jetzt noch einfacher."
+      "desc": "Die Motor-Schwellenwerte sind nun einen Schritt einfacher, und sobald die Motorhalterung Mk 2 erreicht, zählt jeder Würfel darin +3."
     },
     "voidLiner": {
       "name": "Void-Liner",
-      "desc": "+3 Schild durch Schildwürfel, solange der Rumpf unter 40 % liegt."
+      "desc": "+4 auf jeden Würfel in „Schilde II“, und solange der Rumpf unter 40 % liegt, werden den Würfeln in „Schilde“ zusätzlich 4 Schilde hinzugefügt."
     },
     "siegeMount": {
       "name": "Belagerungsberg",
-      "desc": "+2 Schaden bei „Max Face“ bei Waffen."
+      "desc": "Ab dem zweiten Zug +4 in „Waffen A“."
     },
     "piercer": {
       "name": "Piercer",
-      "desc": "Der erste Treffer in jedem Kampf ignoriert Schilde."
+      "desc": "Der erste Treffer in jedem Kampf ignoriert Schilde, und „Spinal Mount“ verursacht für jeden „Pierce“-Gegenstand, den du bei dir trägst, 2 zusätzliche Schadenspunkte."
     },
     "emberInjector": {
       "name": "Ember-Injektor",
-      "desc": "Der maximale Schaden von Waffen beträgt „Burn 2“."
+      "desc": "Jeder Würfel, der in „Waffen B“ ausgewertet wird, verursacht 2 Brandschaden."
     },
     "railCradle": {
       "name": "Schienenhalterung",
-      "desc": "+3 bei der Wirbelsäulenbefestigung."
+      "desc": "Die „Spinal Mount“ erhält +1 und insgesamt +5, sobald sie auf Mk II umgerüstet wird."
     },
     "targetingMesh": {
       "name": "Zielnetz",
-      "desc": "Marken verursachen +2 zusätzlichen Schaden."
+      "desc": "Marken sind +1 wert, und das Auswerten von Sensoren erhöht den Würfelwert in „Waffen A“ um +2."
     },
     "overpressure": {
       "name": "Überdruck",
-      "desc": "+3 bei den Waffen in der ersten Runde."
+      "desc": "Der erste in jeder Runde aufgelöste Slot erhält +4, wenn es sich um eine Waffe handelt; du würfelst einen Würfel weniger erneut."
     },
     "ricochetHousing": {
       "name": "Ricochet-Gehäuse",
-      "desc": "Der Überkill von Waffe A wirkt sich auf den nächsten Gegner aus."
+      "desc": "Der Überkill wirkt sich auf den nächsten Gegner aus, und ein „Max Face“ in „Weapons B“ verursacht am Ende des nächsten Zuges 5 Schaden durch einen Abpraller."
     },
     "splinterHead": {
       "name": "Splitterkopf",
-      "desc": "+3 bei Waffen bei einer Mindestaugenzahl."
+      "desc": "Ein Waffenwurf unter 4 verursacht für jeden „Swarm“-Gegenstand, den du bei dir trägst, 1 zusätzlichen Schadenspunkt."
     },
     "lanceCapacitor": {
       "name": "Lance-Kondensator",
-      "desc": "+2 auf Waffen bei einer Augenzahl von 7 oder mehr."
+      "desc": "Jeder Waffenwürfel, der mit 6 oder mehr gesammelten Ladepunkten ausgewertet wird, verbraucht 6 davon für +5."
     },
     "executioner": {
       "name": "Henker",
-      "desc": "+3 auf die Waffen, solange der Rumpf weniger als 30 % Lebenspunkte hat."
+      "desc": "Sobald Waffe A die Stufe Mk II erreicht hat, verursacht sie bei einem Volltreffer einen kritischen Treffer; ab Stufe Mk III fügt jeder Schuss dieser Waffe 4 Schadenspunkte hinzu."
     },
     "solenoid": {
       "name": "Magnetventil",
-      "desc": "Ein zusätzlicher Wiederholwurf pro Runde."
+      "desc": "Ein zusätzlicher Wiederwurf pro Runde, und ein Würfel, der bei Waffe B unter 4 landet, wird einmal neu gewürfelt."
     },
     "gyroStabilizer": {
       "name": "Gyro-Stabilisator",
-      "desc": "Reserve +1 Würfel."
+      "desc": "Reserviere +1 Würfel und noch einmal +1, sobald die Motoren auf Mk2 aufgerüstet sind."
     },
     "recycler": {
       "name": "Recycler",
-      "desc": "Jeder noch nicht platzierte Würfel speichert 1 Ladung."
+      "desc": "Am Ende jedes Zuges schmilzt es alle temporären Würfel ein, gießt einen neuen grauen d4 in die Schale und liefert 2 Schrott."
     },
     "resonator": {
       "name": "Resonator",
-      "desc": "+2 Ladung zu Beginn des Kampfes pro abgeschlossenem Vierer-Set."
+      "desc": "+2 Ladung zu Beginn des Kampfes pro abgeschlossenem Vierer-Set, 2 weitere Ladungen in jedem der nächsten drei Züge und +2 auf jeden Würfel, solange du 8 oder mehr Ladungen hast."
     },
     "nudgeGovernor": {
       "name": "Nudge-Gouverneur",
-      "desc": "Anstöße kosten 1 Ladepunkt weniger."
+      "desc": "„Nudges“ kosten 1 Ladepunkt weniger, aber die Ladegrenze sinkt um 1."
     },
     "wideGrip": {
       "name": "Breiter Griff",
-      "desc": "Wirf jeweils einen weiteren Würfel erneut."
+      "desc": "Würfle jeweils einen weiteren Würfel neu; bei drei mit „Reroll“ gekennzeichneten Gegenständen gibt es in jedem Kampf pro Neuwurf einen zusätzlichen Würfel und einen zusätzlichen Neuwurf."
     },
     "capacitorBank": {
       "name": "Kondensatorbank",
-      "desc": "Ladegrenze +3."
+      "desc": "Angriffslimit +3; endet ein Kampf mit 3 oder mehr Angriffspunkten, werden 3 davon auf die Angriffsbank übertragen, und die Bank zahlt diese 3 zu Beginn des nächsten Kampfes zurück."
     },
     "primerCoil": {
       "name": "Primer-Spule",
-      "desc": "+2 im Reaktor."
-    },
-    "blueBallast": {
-      "name": "Blauer Ballast",
-      "desc": "Lege einen zusätzlichen blauen Würfel beiseite."
+      "desc": "Ein Würfel, der in „Sensors“ auf seiner höchsten Seite landet, bereitet den nächsten roten Würfel des Zuges für +3 vor."
     },
     "growthTrellis": {
       "name": "Wachstumsspalier",
-      "desc": "Wachsende Würfel steigen eine Stufe höher."
+      "desc": "Wachsende Würfel steigen um eine Stufe höher, und ein Würfel, der in „Engines“ mit seiner höchsten Augenzahl ausgewertet wird, wächst um 1 weiter, bis zu einem Wert von 3."
     },
     "echoBuffer": {
       "name": "Echo Puffer",
-      "desc": "+2 Angriffspunkte, wenn ein Würfel denselben Wert wie im letzten Zug zeigt."
+      "desc": "Ein Würfel, der den Wert des letzten Zuges wiederholt, speichert 2 Ladung, und ein im Reaktor ausgewerteter Würfel liefert im nächsten Zug 3 weitere Ladung."
     },
     "seedVault": {
       "name": "Saatgutbank",
-      "desc": "+2 durch grüne Würfel in den Motoren."
+      "desc": "In den ersten drei Zügen jeder Schlacht kommen ein temporärer grüner d4 und ein grauer d4 auf das Spielfeld."
     },
     "jamBreaker": {
       "name": "Marmeladenbrecher",
-      "desc": "Deine Jam verringert den Schaden durch gegnerische Angriffe um 2."
+      "desc": "Dein Jam-Modul verringert die durch feindliche Angriffe verursachten Schäden um 2, und mit Sensoren der Stufe Mk2 oder höher beginnt jeder Kampf mit einem zusätzlichen Reserveplatz."
     },
     "entropySink": {
       "name": "Entropie-Senke",
-      "desc": "Jedes Min-Face speichert 2 Ladungen."
+      "desc": "Ladungsobergrenze +2, und bei einem Reaktor der Stufe Mk2 oder höher speichert jede Min-Fläche 3 Ladungen."
     },
     "paradoxLoop": {
       "name": "Paradoxe Schleife",
-      "desc": "Ein „Max“-Wert bei Waffen wird zweimal auf den Slot angewendet."
+      "desc": "Waffe A wird zweimal bei Erreichen der Höchstzahl ausgewertet; Waffe B wird zweimal bei Erreichen der Mindestzahl ausgewertet."
     },
     "blackLedger": {
       "name": "Schwarzes Hauptbuch",
-      "desc": "+3 durch schwarze Würfel bei Waffen."
+      "desc": "Jeder Knoten zahlt 3 Schrott auf Kredit; beim sechsten Knoten sammelt das Hauptbuch 4 Rumpf und schlägt eine neue Seite auf."
     },
     "prismLens": {
       "name": "Prismenlinse",
-      "desc": "+1 auf jeden Würfel im ersten Zug."
+      "desc": "Jeder Würfel, der seine niedrigste Augenzahl zeigt, wird erneut gewürfelt."
     },
     "hushAntenna": {
       "name": "Hush-Antenne",
-      "desc": "+2 bei den Sensoren."
+      "desc": "Beendet man einen Zug ohne gespeicherte Ladung, gibt die Antenne stillschweigend 3 Ladung zurück."
     },
     "coldLogicCore": {
       "name": "Cold Logic Core",
-      "desc": "Anstöße sind kostenlos; kritische Treffer treten nicht mehr auf."
+      "desc": "Nudges kosten 2 Ladepunkte weniger, und jeder Kampf beginnt mit 2 kostenlosen Nudges; kritische Treffer werden nie ausgelöst."
     },
     "gamblersChip": {
       "name": "Spielchip",
-      "desc": "Jede „Max“-Seite bringt 1 Ladung und 1 Schrott ein."
+      "desc": "Bei einer „Max“-Seite erhältst du 2 Schrott für jeden [Risiko]-Gegenstand, den du besitzt, und würfelst einen beliebigen anderen Würfel erneut."
+    },
+    "bufferCells": {
+      "name": "Pufferzellen",
+      "desc": "Hülle −3, aber jeder Kampf beginnt mit 6 Schildpunkten."
+    },
+    "citadelCore": {
+      "name": "Citadel Core",
+      "desc": "Jeder Würfel passt in eine Schildhalterung über seiner Kappe, ohne dass Rumpfschaden entsteht. Jeder Kampf beginnt mit 2 Schilden pro „Schildwall“-Gegenstand, den du bei dir trägst, und solange du 12 oder mehr Schilde besitzt, repariert jeder Würfel, der in einer Schildhalterung ausgewertet wird, 3 Rumpfschaden."
+    },
+    "ratchetFeed": {
+      "name": "Ratschenvorschub",
+      "desc": "Ein Würfel, der in Waffe A unterhalb von 3 eingeworfen wird, springt auf 3 hoch."
+    },
+    "bondedVault": {
+      "name": "Zollverschlossener Tresorraum",
+      "desc": "+2 Ladungslimit und 1 Ladung zu Beginn des Kampfes für jeden [Schrott]-Gegenstand, den du besitzt."
+    },
+    "foundryCore": {
+      "name": "Gießereikern",
+      "desc": "+30 % Schrott- und Ladenpreise −12 %; jeder Kampf beginnt mit einem geprägten gelben W6, der 3 Runden lang gültig ist, sowie mit einem zweiten, wenn du 5 oder mehr [Schrott]-Gegenstände besitzt."
+    },
+    "gunCamera": {
+      "name": "Waffenkamera",
+      "desc": "Es zeichnet jeden Knoten auf, den du betrittst: Waffen erhalten nach 6 Knoten +2 und nach 14 Knoten +4."
+    },
+    "autoloader": {
+      "name": "Autoloader-Array",
+      "desc": "In jeder Schlacht kommt ein zusätzlicher roter W6 auf dein Tablett, und bei jedem dritten abgearbeiteten Waffenplatz wird ein weiterer für den nächsten Zug hinzugefügt."
+    },
+    "prophecyMount": {
+      "name": "Berg der Prophezeiung",
+      "desc": "Eine „Max“-Zahl auf Waffe A sorgt dafür, dass der nächste graue Würfel dieses Zuges die höchste Augenzahl anzeigt."
+    },
+    "phantomBay": {
+      "name": "Phantom Bay",
+      "desc": "Am Ende jedes Zuges erscheint ein grauer Phantom-d4 in der Ablage und bleibt dort einen Zug lang."
+    },
+    "delayLine": {
+      "name": "Verzögerungsleitung",
+      "desc": "Ein „Max Face“ in Waffe B kommt verspätet: Am Ende des nächsten Zuges erleidest du 3 Schadenspunkte pro [Spike]-Gegenstand, den du besitzt."
+    },
+    "nonEuclidRack": {
+      "name": "Nicht-euklidisches Gestell",
+      "desc": "Jeder Slot nimmt bei jeder Auswertung einen Würfel beliebiger Stufe mit jeweils 1 Rumpf auf; Ladungslimit −3."
     }
   },
   "engravings": {
     "sting": {
       "name": "Sting",
-      "desc": "+1 Schaden bei „Max Face“ bei Waffen."
+      "desc": "+1 für die maximale Angriffsstärke bei Waffen."
     },
     "frost": {
       "name": "Frost",
@@ -2845,7 +3005,7 @@
     },
     "echo": {
       "name": "Echo",
-      "desc": "Durch Wiederholen des Wertes aus dem letzten Zug wird 1 Ladung gespeichert."
+      "desc": "Wenn man den Wert des letzten Zuges wiederholt, wird 1 Ladung gespeichert und +1 hinzugefügt."
     },
     "anchor": {
       "name": "Anker",
@@ -2857,7 +3017,7 @@
     },
     "flame": {
       "name": "Flamme",
-      "desc": "Ein Max-Wert bei Waffen fügt „Verbrennung 1“ hinzu."
+      "desc": "Der erste Waffenwürfel in jedem Zug fügt „Verbrennung 2“ hinzu."
     },
     "edge": {
       "name": "Kante",
@@ -2877,7 +3037,7 @@
     },
     "spark": {
       "name": "Funke",
-      "desc": "Bei einer 1 werden 2 Ladungen gespeichert."
+      "desc": "Bei einer 1 werden 2 Ladungen gespeichert, und der Würfel wird auf 2 gesetzt."
     },
     "keel": {
       "name": "Kiel",
@@ -2889,7 +3049,7 @@
     },
     "bastion": {
       "name": "Bastion",
-      "desc": "+1 bei den Schilden."
+      "desc": "Bei 6 oder mehr Schilden erhält man 2 Schilde."
     },
     "hunger": {
       "name": "Hunger",
@@ -2897,11 +3057,11 @@
     },
     "ash": {
       "name": "Asche",
-      "desc": "Ein „Min“-Gesicht bringt 2 Schrott."
+      "desc": "Ein Min-Gesicht kostet 2 Schrott und fügt „Verbrennen 1“ hinzu."
     },
     "surf": {
       "name": "Surfen",
-      "desc": "+1 in der ersten Runde."
+      "desc": "Beim ersten Start der Triebwerke: +3 und 2 Schild."
     },
     "lastLight": {
       "name": "Letztes Licht",
@@ -2909,7 +3069,7 @@
     },
     "weight": {
       "name": "Gewicht",
-      "desc": "Jeder Wert unter 3 zählt als 3."
+      "desc": "Wird diese Karte ausgelegt, wird jeder Wert unter 3 auf 3 gesetzt, wobei 1 Rumpfpunkt verloren geht."
     },
     "crown": {
       "name": "Krone",
@@ -2925,11 +3085,11 @@
     },
     "rime": {
       "name": "Reim",
-      "desc": "+2 Schild, sobald es einen Schild-Slot belegt."
+      "desc": "+2 Schild, sobald es einen Schildplatz belegt; solange du 8 oder mehr Schilde besitzt, erhältst du am Ende des Zuges 1 weiteren Schild."
     },
     "loam": {
       "name": "Lehm",
-      "desc": "+2 bei den Motoren."
+      "desc": "Jedes Mal, wenn es Motoren befüllt, steigt sein Wert um +1, bis zu einem Höchstwert von +3."
     },
     "cinder": {
       "name": "Asche",
@@ -2937,7 +3097,7 @@
     },
     "mint": {
       "name": "Minze",
-      "desc": "Ein „Max Face“ bringt 3 Schrott."
+      "desc": "Ein „Max“-Ergebnis bringt 3 Schrott; ein gewonnener Kampf bringt 5 zusätzlich."
     },
     "wick": {
       "name": "Docht",
@@ -2945,51 +3105,91 @@
     },
     "pin": {
       "name": "Anheften",
-      "desc": "+2 bei den Sensoren."
+      "desc": "Bei Sensoren wird jeder Wert unter 5 als 5 gewertet; eine „Max“-Fläche speichert dort 2 Ladungen."
     },
     "drum": {
       "name": "Trommel",
-      "desc": "+2 Ladung, sobald der Reaktor aufgefüllt ist."
+      "desc": "Durch das Befüllen des Reaktors werden 2 Ladungen gespeichert und die Trommel geschlagen; ab dem dritten Schlag gibt es am Ende des Zuges 2 weitere Ladungen."
     },
     "scale": {
       "name": "Maßstab",
-      "desc": "Ein „Max Face“ in Schilden heilt 1 Rumpf."
+      "desc": "Ein „Max Face“ in den Schilden heilt 1 Rumpfpunkt und gewährt 2 Schildpunkte."
     },
     "beaconRune": {
       "name": "Bake",
-      "desc": "+1 für die ersten beiden Züge."
+      "desc": "Wenn du bei Sensoren erfolgreich bist, erhältst du für deinen nächsten roten Würfel einen Bonus von +3."
     },
     "rust": {
       "name": "Rost",
-      "desc": "+2 auf Waffen bei einer Augenzahl von 8 oder mehr."
+      "desc": "8 oder mehr Waffen können die Slot-Obergrenze für 1 Rumpf überschreiten."
     },
     "salt": {
       "name": "Salz",
-      "desc": "Ein „Max Face“ gewährt 1 Schild."
+      "desc": "Ein „Max Face“ gewährt 2 Schildpunkte und verursacht 1 Punkt Rumpfschaden."
     },
     "glimmer": {
       "name": "Schimmer",
-      "desc": "Bei einem Würfelergebnis von 2 oder weniger wird 1 Ladung gespeichert."
+      "desc": "Wenn man es unter 3 Läden legt, erhält man 1 Ladung und zahlt 1 Schrott."
     },
     "sinew": {
       "name": "Sehne",
-      "desc": "Bei 4 oder mehr Motoren erhält man 1 Schild."
+      "desc": "Bei 4 oder mehr Motoren erhält man 1 Schild und 1 Ladung."
     },
     "cipher": {
       "name": "Chiffre",
-      "desc": "Wenn man den Wert des letzten Zuges wiederholt, erhält man 4 Schrott."
+      "desc": "Wird der Wert des letzten Zuges wiederholt, erhält man 4 Schrott und speichert 1 Ladung."
     },
     "brand": {
       "name": "Marke",
-      "desc": "+2 für rote Würfel bei Waffen."
+      "desc": "+3 bei Waffen für einen roten Würfel, +1 für alle anderen."
     },
     "tidepool": {
       "name": "Gezeitentümpel",
-      "desc": "Ein „min“-Symbol auf Schilden gewährt 3 Schildpunkte."
+      "desc": "Ein „Min“-Symbol auf den Schilden gewährt 3 Schildpunkte; solange die Interferenzwelle 2 oder höher ist, erhält man am Ende des Zuges 2 weitere Schildpunkte."
     },
     "voidmark": {
       "name": "Voidmark",
-      "desc": "Ein „min“-Symbol im Reaktor speichert 3 Ladungseinheiten."
+      "desc": "Ein „Min“-Symbol im Reaktor speichert 3 Ladung; solange du 8 oder mehr Ladung hast, erhält es dort zusätzlich +2."
+    },
+    "pyre": {
+      "name": "Scheiterhaufen",
+      "desc": "Bei Waffen fügt es „Burn 1“ hinzu und erhält dort einen Bonus von +2, solange du 2 oder mehr [Burn]-Gegenstände besitzt."
+    },
+    "swarmMark": {
+      "name": "Schwarmzeichen",
+      "desc": "Bei Waffen: +2, solange du 3 oder mehr [Schwarm]-Gegenstände besitzt, und ein maximaler Angriffswert verursacht 1 zusätzlichen Schadenspunkt pro [Schwarm]-Gegenstand, den du besitzt."
+    },
+    "seventhFace": {
+      "name": "Das siebte Gesicht",
+      "desc": "Der Würfel erhält auf seiner höchsten Augenzahl ein siebtes Ergebnis: Die erste Augenzahl mit dem höchsten Wert in jeder Runde wird ein zweites Mal ausgewertet."
+    },
+    "mirrorFace": {
+      "name": "Spiegelgesicht",
+      "desc": "Der Würfel erhält auf seiner höchsten Augenzahl ein siebtes Ergebnis: Bei einem Maximalwurf erhält dein Würfel mit der niedrigsten Augenzahl +3 und du sammelst 1 Ladung."
+    },
+    "sleeve": {
+      "name": "Hülle",
+      "desc": "Wenn du 2 oder mehr [Reroll]-Gegenstände besitzt, beginnt jeder Kampf mit einem zusätzlichen Reroll."
+    },
+    "tuningFork": {
+      "name": "Stimmgabel",
+      "desc": "+2, solange du 5 oder mehr Ladungen hast; beim Ablegen wird 1 Ladung gespeichert, wenn du 2 oder mehr [Ladung]-Gegenstände besitzt."
+    },
+    "tickMark": {
+      "name": "Häkchen",
+      "desc": "Wird es in den Reaktor eingesetzt, plant es für den nächsten Zug 3 Ladungen und 2 Abschirmungen ein."
+    },
+    "ledgerMark": {
+      "name": "Ledger-Markierung",
+      "desc": "Im Bereich „Sensoren“ zahlt es 2 Schrott und erhält dort +3, solange du 2 oder mehr [Schrott]-Gegenstände besitzt."
+    },
+    "glacis": {
+      "name": "Glacis",
+      "desc": "+3 auf die Schilde, solange du 2 oder mehr [Schildwall]-Gegenstände besitzt; solange du 6 oder mehr Schilde hältst, heilst du am Ende des Zuges 1 Rumpf."
+    },
+    "lifeline": {
+      "name": "Lebensader",
+      "desc": "In der Reparaturbucht werden 2 Rumpfpunkte wiederhergestellt und 2 Schildpunkte gewährt."
     }
   },
   "fate": {

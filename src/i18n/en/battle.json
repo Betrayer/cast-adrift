@@ -86,5 +86,9 @@
   },
   "scriptHint": "Prologue: only {{slots}} may be used this turn.",
   "fate": "Roll Fate",
-  "fateResult": "Fate {{roll}} — {{text}}"
+  "fateResult": "Fate {{roll}} — {{text}}",
+  "swap": "Swap",
+  "swapPick": "Pick a die…",
+  "bank": "Bank face",
+  "split": "Split"
 }

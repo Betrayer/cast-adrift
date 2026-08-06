@@ -69,59 +69,119 @@
     "prismCore": "Prism Core",
     "spectra": "Spectra",
     "aurora": "Aurora",
-    "fate-d100": "El destino"
+    "fate-d100": "El destino",
+    "slag": "Escoria",
+    "fissure": "Fisura",
+    "anthracite": "Antracita",
+    "stillwater": "Stillwater",
+    "floodgate": "Compuerta",
+    "undertow": "Resaca",
+    "taproot": "Raíz principal",
+    "seedpod": "Cápsula de semillas",
+    "evergreen": "De hoja perenne",
+    "plumbline": "Plomada",
+    "chaff": "Paja",
+    "glimmer": "Destello",
+    "facet": "Faceta",
+    "gamut": "Gama cromática",
+    "salvo": "Salvo",
+    "crucible": "Crisol",
+    "bombard": "Bombard",
+    "smallChange": "Cambio de poca monta",
+    "wager": "Apuesta",
+    "hedge": "Cobertura"
   },
   "diceDesc": {
-    "ember": "Un dado de seis caras (d6) rojo liso.",
+    "ember": "En «Armas», otorga +2 siempre que tu configuración incluya 4 o más objetos rojos.",
     "cinder": "En «Armas», una tirada máxima aplica «Quema 1» al objetivo.",
     "slug": "En «Armas», inflige +1 de daño.",
-    "frostplate": "Un dado de seis caras azul liso.",
+    "frostplate": "En «Escudos», se añaden 2 puntos de escudo adicionales cuando llevas 4 o más objetos de «Muro de escudos».",
     "bulwark": "En «Escudos», otorga +1 a la defensa.",
-    "gyro": "Una vez por combate, dale la vuelta.",
-    "coil": "Si sale el mismo resultado que en el turno anterior, +1.",
-    "sprout": "Si se obtiene la tirada máxima, aumenta en +1 durante la carrera (hasta un máximo de +2).",
-    "lucky-chip": "Con una tirada máxima, +2 de chatarra.",
-    "vulture": "Con una tirada máxima, +8 de chatarra.",
+    "gyro": "Sus caras son 2, 3, 3, 4, 4 y 5; una vez por combate, dale la vuelta para mostrar la cara opuesta.",
+    "coil": "Las caras son 2·2·3·3. +1 cuando se repite el valor del turno anterior, y +2 más mientras tengas 3 o más [enjambre].",
+    "sprout": "Aumenta en +1 en la cara máxima (hasta +2), y al resolverlo en «Engines» vuelve a aumentar, hasta +4.",
+    "lucky-chip": "La cara máxima da 2 chatarra.",
+    "vulture": "La cara «Max» da 8 de chatarra y suma 1 al recuento de pagos; a partir del segundo pago, se considera un golpe crítico en una ranura de arma.",
     "ashen": "Si se saca un 1, el siguiente dado negro de este turno obtiene +2.",
-    "obsidian": "Solo se lanzan los 1 u 8.",
-    "copycat": "Una vez por combate, copia el valor de un dado adyacente.",
-    "ballast": "Un d4 gris liso.",
-    "coreshard": "Comodín prismático para conjuntos y afinidades.",
-    "flare": "+1 de daño en las armas con un resultado de 3 o más.",
-    "magma": "El valor máximo de «face» en las armas aplica «Burn 3».",
-    "thermite": "+2 en armas mientras el casco esté por debajo de la mitad.",
-    "lancehead": "+3 en la montura espinal.",
+    "obsidian": "Solo se tiran los dados 1 u 8; si sale un 1, cuenta como un 8 — para 2 de casco.",
+    "copycat": "Los valores de «Faces» son únicamente 1, 2, 2, 3, 3, 4; una vez por combate, copia el mayor de sus dos valores vecinos.",
+    "ballast": "Una vez por combate, aparta su cara: en el siguiente turno, comenzará con el valor guardado en lugar de tirar el dado.",
+    "coreshard": "Los dados prismáticos pueden superar cualquier límite de ranura correspondiente a 1 casco. Una cara máxima otorga un bonificador de +2 a cada escuela.",
+    "flare": "Sus caras son 1, 2, 4 y 4 —nunca un 3— y, en la categoría «Armas», inflige +1 al obtener un 3 o más.",
+    "magma": "En «Armas», un valor máximo de cara aplica «Quema 3».",
+    "thermite": "+2 en Armas mientras el casco esté por debajo de la mitad; una vez por combate, se divide en dos d4 grises temporales.",
+    "lancehead": "+3 en la técnica «Spinal Mount», y si se obtiene un 15 natural o más, se produce un golpe crítico.",
     "hoarfrost": "+1 escudo cada vez que ocupe una ranura de escudo.",
-    "aegis": "+2 en escudos.",
+    "aegis": "En «Escudos» cuenta como +2, y el muro aguanta: en el siguiente turno obtienes 3 escudos gratis.",
     "deepblue": "«Min» otorga 4 de escudo.",
-    "glacierspike": "+3 en escudos.",
-    "tendon": "+2 cuando se repite el valor del turno anterior.",
-    "bramble": "Aumenta en +1 en la cara máxima, hasta un máximo de +2.",
-    "heartwood": "+2 en motores.",
-    "worldseed": "Aumenta en +1 en la cara máxima, hasta un máximo de +4.",
-    "token": "La cara máxima da 3 chatarra.",
-    "glint": "Mi cara cuesta 2 chatarra.",
-    "bonanza": "La cara máxima da 6 chatarra.",
-    "jackpot": "La cara «Max» cuesta 10 chatarra y 1 carga.",
-    "midas": "Paga 2 de chatarra dondequiera que se resuelva.",
-    "cinderblack": "Mi cara almacena 1 carga.",
+    "glacierspike": "Tiene entre 8 y 20 caras, por lo que el «Spinal Mount» nunca puede bloquearlo; dondequiera que se resuelva, otorga 3 de escudo, y desde el «Spinal Mount» también bloquea al objetivo.",
+    "tendon": "+2 cuando repite el valor del turno anterior, y aumenta en +1 el valor del siguiente dado verde.",
+    "bramble": "Aumenta en +2 en la cara máxima (hasta un máximo de +2), y al resolverlo en «Armas» vuelve a aumentar, hasta un máximo de +4.",
+    "heartwood": "+2 en Motores. Una vez por batalla, puedes inclinarla hacia ese lado durante el siguiente turno.",
+    "worldseed": "Aumenta en +1 en una cara máxima, hasta un máximo de +4, y una cara máxima se resuelve dos veces en su casilla.",
+    "token": "La cara «Max» da 3 chatarra y suma 1 al recuento de ganancias de la batalla.",
+    "glint": "Si sale un 1 o un 6, se ganan 2 chatarra y se suma 1 al recuento de premios de la batalla.",
+    "bonanza": "Sus caras son dos 2, un 4, un 6 y dos 8; un 8 suma 1 al recuento de pagos y, a partir del tercer pago, otorga 4 chatarra y 1 carga dondequiera que se resuelva.",
+    "jackpot": "La apuesta máxima por cara da derecho a 6 chatarra y 1 recarga, y suma 1 al recuento de pagos; a partir del cuarto pago con la apuesta máxima, se obtienen 12 chatarra más.",
+    "midas": "Cada turno termina con 1 chatarra por cada objeto [chatarra] que tengas; su valor máximo suma 2 al recuento de pagos, y a partir del tercer pago se resuelve con un +3.",
+    "cinderblack": "Solo se puede tirar un 1 o un 4; un 1 almacena 1 carga.",
     "pitch": "+1 en el reactor.",
-    "tar": "+2 mientras el casco esté por debajo del 40 %.",
+    "tar": "+1 mientras el casco esté por debajo del 50 %, y +3 más mientras esté por debajo del 25 %.",
     "nadir": "La cara «Min» prepara el siguiente dado negro con +3.",
-    "eclipse": "+3 en el reactor.",
-    "abyss": "Sus caras son solo el 1 o el 12.",
+    "eclipse": "Cualquier dado encaja en el reactor por encima de la tapa —por 1 punto de casco—; una vez por batalla, gira su cara para el siguiente turno.",
+    "abyss": "Sus caras son solo el 1 o el 12; una vez que ha dado un 1, cada 12 que dé cuenta como 18.",
     "voidmaw": "+2 en el reactor.",
-    "shim": "+1 en el primer turno de una batalla.",
-    "spool": "Si sale un 1, se convierte en un 2.",
-    "mimic": "Una vez por combate, copia el valor de un vecino.",
-    "pivot": "Una vez por combate, dale la vuelta.",
-    "beaconChip": "+2 en sensores.",
-    "lodestar": "+1 en cada ranura.",
-    "prismChip": "Cuenta para tu conjunto más grande.",
-    "prismCore": "+1 en cada casilla, y cuenta para tu conjunto más grande.",
-    "spectra": "La cara «Max» cuesta 1 punto de carga y 1 chatarra.",
-    "aurora": "+2 en cada ranura.",
-    "fate-d100": "Nunca se asigna. Una vez por combate, lánzalo y quédate con lo que te dé el sector."
+    "shim": "Las caras son solo 2, 2, 3, 3; +1 en el primer turno de una batalla.",
+    "spool": "Si se obtiene un 1 o un 2, se vuelve a tirar una vez.",
+    "mimic": "Una vez por combate, intercambia los valores con cualquier otro dado; si tienes tres objetos etiquetados como «dados», cada combate comienza con un «nudge» gratuito.",
+    "pivot": "Las caras son solo 1, 2, 3, 6, 7 y 8; no hay opciones intermedias; una vez por combate, dale la vuelta para mostrar la cara opuesta.",
+    "beaconChip": "+2 en «Sensores», y cada combate empieza con un empujón gratis.",
+    "lodestar": "+1 en cada casilla; cada batalla comienza con un «nudge» gratis y una repetición de tirada extra; una vez por batalla, aparta su cara para el siguiente turno.",
+    "prismChip": "Sus valores son 2, 3, 3 y 4; un valor máximo te da 2 chatarra por cada objeto prismático que lleves.",
+    "prismCore": "Se refracta hacia delante: en «Sensores» se vuelve rojo, en «Armas» azul, en «Escudos» verde, en «Motores» negro y en «Reactor» amarillo; el siguiente dado de esa escuela en este turno obtiene +2.",
+    "spectra": "La cara «Max» cuesta 2 de carga y 4 de chatarra; una vez por combate, la guarda y comienza el siguiente turno en ella.",
+    "aurora": "+2 en cada ranura mientras la baraja contenga 3 o más dados prismáticos; una tirada de 10 o más otorga 2 de daño, 2 de escudo, 1 de carga, 3 de chatarra y 1 de casco.",
+    "fate-d100": "Nunca se asigna. Una vez por combate, lánzalo y quédate con lo que te dé el sector.",
+    "red-d6": "Las cartas del 1 al 6 y sin pasiva: el sencillo y fiable as de la baraja con el que se compara el resto del mazo.",
+    "blue-d6": "Caras del 1 al 6 y sin pasiva: azul liso, pero sigue contando para la resonancia azul.",
+    "grey-d4": "Caras del 1 al 4 y sin pasiva: un relleno gris barato y una carta más para los mazos en los que cuentan los dados pequeños.",
+    "green-d4": "Caras 1 a 4 y sin modo pasivo: un relleno verde barato que alimenta los umbrales del motor y los sensores.",
+    "yellow-d6": "Caras del 1 al 6 y sin efecto pasivo: simplemente amarilla; la suerte tiene que venir de lo que construyas a su alrededor.",
+    "black-d6": "Caras del 1 al 6 y sin pasiva: negro liso, y no asume ningún riesgo por sí mismo.",
+    "slag": "Sus caras son 1, 1, 1 y 4, pero en el reactor siempre cuenta como 4.",
+    "fissure": "Solo se lanzan los dados 1, 2, 3, 8, 9 o 10; una vez por combate, se divide en dos dados d4 grises temporales.",
+    "anthracite": "Solo saca 1, 1, 2, 11, 12 o 12; una vez por combate, intercambia sus valores con los de otro dado.",
+    "stillwater": "Sus resultados son únicamente 3, 3, 4, 4, 5 y 5; en «Sensors», bloquea el objetivo incluso con un 3.",
+    "floodgate": "Sus caras van del 3 al 8, nunca menos; una vez por combate, elige una cara, y en el siguiente turno empieza por ahí en lugar de tirar el dado.",
+    "undertow": "Nunca da un resultado inferior a 5; una vez por combate, intercambia su valor con el de cualquier otro dado.",
+    "fused-emberforge": "Dos dados fundidos en uno: sus caras son 2, 2, 4, 4, 6, 6, 8, 8 y nunca son impares.",
+    "fused-frostwall": "Dos placas soldadas a plano: sus caras son 3, 3, 4, 4, 5, 5, 6, 6.",
+    "fused-counterweight": "Una vez por combate, intercambia los valores con cualquier otro dado.",
+    "fused-seedling": "Al comienzo de cada batalla, lanza un disparo: un d4 verde temporal que dura 2 turnos.",
+    "fused-goldvein": "La veta aparece dos veces en la última cara —1, 2, 3, 4, 5, 6, 8, 8— y la tirada máxima da 4 chatarra.",
+    "fused-voidcore": "Una vez por combate, desmóntalo: se agota y deja dos d4 grises temporales.",
+    "fused-pyroclast": "Una cara máxima en «Armas» lanza una segunda piedra que inflige 3 puntos de daño por encima del límite de la ranura.",
+    "fused-glacier": "A partir del turno 3, +3 en escudos.",
+    "fused-keel": "Una vez por combate, reserva esta cara: en el siguiente turno, el dado empezará en ella en lugar de tener que lanzarlo.",
+    "fused-tendril": "+2 cuando repite el valor del turno anterior o saca su mínimo.",
+    "fused-windfall": "La cara máxima da 3 chatarra y la mínima, 1.",
+    "fused-railslug": "+1 en armas y +2 en el «Spinal Mount».",
+    "fused-rampart": "+1 en escudos; y, aunque ya tengas 8 escudos, te añade 2 más.",
+    "fused-bloom": "Aumenta en +1 en la cara máxima, hasta un máximo de +3, y cualquier tirada de 9 o más repara 1 punto de casco.",
+    "taproot": "Obtiene puntos cada vez que se resuelve: +1 de la tercera casilla de la batalla, +2 de la quinta.",
+    "seedpod": "Una cara «max» genera un dado verde de 4 caras temporal durante dos turnos. Una vez por combate, puedes dividirlo en dos dados grises de 4 caras.",
+    "evergreen": "Las caras son solo pares: 2·4·6·8·10·12. Aumenta en +2 con la cara máxima, hasta un máximo de +4.",
+    "plumbline": "Los únicos resultados posibles al lanzar los dados son: 2, 2, 4, 4, 6, 6.",
+    "chaff": "Las caras son solo 1, 1, 2, 3, 5 y 8; una vez por combate, quémala de la bandeja para obtener dos d4 grises temporales.",
+    "glimmer": "Sus caras son únicamente 1, 1, 4 y 4; mientras haya 2 o más dados prismáticos en el mazo, si sale un 1, se vuelve a lanzar una vez.",
+    "facet": "Sus caras son 4, 4, 5, 5, 6 y 6; una vez por combate, intercambia sus valores con los de cualquier otro dado.",
+    "gamut": "Los valores son 2·4·6·8·10·10. +2 mientras tengas 2 o más [puntas]; un valor máximo acumula 1 carga por cada dado prismático de tu mazo.",
+    "salvo": "En «Armas», inflige 1 punto de daño adicional por cada objeto de «Enjambre» que tengas en tu configuración, incluido el propio.",
+    "crucible": "Una vez por combate, anota su cara: en el siguiente turno, empezará con ese número en lugar de tirar el dado.",
+    "bombard": "Sus caras son 1, 2, 3, 4, 12 y 12; un 12 en «Armas» inflige 5 puntos de daño adicionales.",
+    "smallChange": "Sus caras son dos 2, dos 3 y dos 4; una vez por combate, se divide en dos dados grises de 4 caras para el resto del combate.",
+    "wager": "Muestra tres «1» y tres «6»; una vez por combate intercambia su valor con el de otro dado, y un «1» en una ranura de arma se convierte en un «6» por 2 de casco.",
+    "hedge": "Solo saca 1, 3, 5 o 7; una vez por combate, cambia de cara y comienza el siguiente turno con esa cara."
   },
   "resonance": {
     "red-2": "Los dados rojos en las armas otorgan +1.",
@@ -251,13 +311,9 @@
     "on-edge": "Al límite",
     "sacrifice": "Sacrificio",
     "back-door": "Puerta trasera",
-    "grip": "Agarre",
-    "reservist": "Reservista",
-    "calibration": "Calibración",
     "spare": "De repuesto",
     "afterburner": "Postcombustor",
     "jammer-plus": "Jammer+",
-    "condenser": "Condensador",
     "targeter": "Targeter",
     "plating": "Recubrimiento",
     "tug": "Remolcador",
@@ -295,11 +351,9 @@
     "permafrost": "Permafrost",
     "rootHold": "Sujeción de la raíz",
     "secondGrowth": "Segundo crecimiento",
-    "mulch": "Cubierta vegetal",
     "pollen": "Polen",
     "longRoots": "Raíces profundas",
     "greenwake": "Greenwake",
-    "steadyHand": "Mano firme",
     "sapline": "Sapline",
     "thicket": "Matorral",
     "bloomCycle": "Ciclo de floración",
@@ -362,177 +416,243 @@
     "dryDock": "Dique seco",
     "masterKey": "Llave maestra",
     "greyProtocol": "Protocolo Gris",
-    "armorPlate": "Placa de blindaje",
-    "coolantLoop": "Circuito de refrigeración",
-    "finePitch": "Paso fino",
-    "boresight": "Alineación del eje de puntería",
-    "bilgePump": "Bomba de achique",
-    "dockRates": "Tarifas de atraque",
     "crewDrill": "Ejercicio de tripulación",
-    "scrapHopper": "Chatarra Tolva",
     "spotterCall": "Comentario del observador",
     "hullWeld": "Casco Soldadura",
     "reinforcedBay": "Bahía reforzada",
-    "surgeTank": "Depósito de compensación",
     "hardenedHull": "Casco endurecido",
-    "kineticDampers": "Amortiguadores cinéticos",
     "targetingSuite": "Suite de segmentación",
-    "pressureValve": "Válvula de presión",
-    "resonanceTuner": "Resonancia Sintonizador",
     "shockLance": "Lanza de choque",
-    "piercingRounds": "Balas perforantes"
+    "piercingRounds": "Balas perforantes",
+    "snakeEyes": "Ojos de serpiente",
+    "looseBallast": "Balasto suelto",
+    "downPayment": "Pago inicial",
+    "hazardPay": "Complemento por riesgo laboral",
+    "overdraft": "Descubierto",
+    "debtCollector": "Agente de cobro",
+    "snowline": "Línea de nieve",
+    "rimeGuard": "Rime Guard",
+    "whiteNoise": "Ruido blanco",
+    "iceSheet": "Capa de hielo",
+    "bracingVanes": "Aletas de refuerzo",
+    "nullField": "Campo nulo",
+    "takeRoot": "Echar raíces",
+    "seedBank": "Banco de semillas",
+    "understory": "Sotobosque",
+    "mycelium": "Micelio",
+    "rhizome": "Rizoma",
+    "taproot": "Raíz principal",
+    "perennial": "Planta perenne",
+    "annualRings": "Anillos anuales",
+    "dryRun": "Prueba de simulación",
+    "teardown": "Desmontaje",
+    "tallySheet": "Hoja de recuento",
+    "cargoHold": "Carga",
+    "pointBlank": "A quemarropa",
+    "ignition": "Encendido",
+    "keelStrike": "Golpe en la quilla",
+    "runningHot": "A toda marcha",
+    "ashfall": "Lluvia de cenizas",
+    "stokehold": "Stokehold",
+    "autoAlign": "Alineación automática",
+    "coreTap": "Broca hueca",
+    "damageControl": "Control de daños",
+    "spallLiner": "Revestimiento antidesprendimiento",
+    "scavengedArmour": "Armadura recuperada",
+    "crashPriority": "Prioridad en caso de colisión",
+    "spareHands": "Manos de repuesto",
+    "overrideKeys": "Teclas de anulación",
+    "markLedger": "Mark Ledger",
+    "refitCrew": "Equipo de reacondicionamiento",
+    "flightLog": "Registro de vuelo",
+    "fullRefit": "Reacondicionamiento completo",
+    "sureThing": "Seguro que sí",
+    "chipStack": "Pila de fichas",
+    "warChest": "Fondo de campaña",
+    "marginCall": "Llamada de margen",
+    "loadedDice": "Dados trucados"
   },
   "perksDesc": {
-    "hot-charge": "Una tirada de arma con el resultado máximo inflige +2 de daño.",
-    "ricochet": "El efecto de «overkill» del arma A se traslada al siguiente enemigo.",
+    "hot-charge": "Mientras tengas 5 de carga, cada impacto de arma inflige 2 de daño adicional.",
+    "ricochet": "Las armas de tipo A causan un daño excesivo al siguiente enemigo, y un golpe máximo allí inflige +4 de daño.",
     "double-fuse": "El primer «Burn» de cada combate se duplica.",
-    "warmup": "Turno 1: los dados rojos dan +1.",
+    "warmup": "A partir del turno 3, cada impacto de arma inflige 3 puntos de daño adicionales.",
     "ice-circuit": "Una tirada de 6+ en la prueba de escudo otorga +2 al escudo.",
-    "reflector": "Una esquiva inflige 3 puntos de daño al atacante.",
-    "blue-reserve": "Una casilla de reserva adicional, solo para dados azules.",
+    "reflector": "Si terminas un turno con 10 o más de escudo, el campo te devuelve 4 de daño.",
+    "blue-reserve": "Dos casillas de reserva adicionales solo para los dados azules, pero se vuelve a tirar un dado menos cada vez.",
     "stabilizer": "El primer dado azul de cada turno no puede sacar un 1.",
-    "compost": "Cada dado quemado otorga +1 chatarra.",
-    "overgrowth": "Tapa de crecimiento +1.",
+    "compost": "Cada dado que quede en la bandeja al final del turno te da 1 resto.",
+    "overgrowth": "Los dados que crecen suben un escalón más.",
     "echo": "Si al tirar el dado se repite el valor de la última tirada, se obtiene +1 carga.",
     "regen": "Fin de la batalla: recupera 2 puntos de casco.",
-    "prospector": "Chatarra ganancias del +25 %.",
-    "fortune": "Una tirada con el resultado máximo otorga +2 de chatarra.",
-    "haggler": "Precios en tienda: −15 %.",
-    "coin": "Inicio de la batalla: +3 chatarra.",
-    "blood-reactor": "Una vez por turno, paga 2 puntos de casco para obtener +3 de carga.",
+    "prospector": "Cada batalla comienza con 2 chatarra por cada dado amarillo que tengas en tu mazo.",
+    "fortune": "Mientras tengas tres o más dados amarillos, cada batalla comienza con una tirada adicional.",
+    "haggler": "Tiendas: −18 %, pero la misión otorga un 10 % menos de XP.",
+    "coin": "+3 de chatarra al inicio de la batalla, y cada dado que se resuelva con la cara más alta o más baja da 1 más.",
+    "blood-reactor": "Una vez por turno, paga 2 de casco para obtener +3 de carga; si tienes cuatro objetos de carga, cada dado de reactor almacena 2 más.",
     "on-edge": "Casco por debajo del 30 %: tirada de dados +1.",
-    "sacrifice": "Gasta un dado para sumar +4 al daño del arma este turno.",
+    "sacrifice": "Gasta un dado para sumar +4 al daño de las armas este turno; si el casco está por debajo de un tercio, todos los disparos críticos de las armas se multiplican por 1,5.",
     "back-door": "Un rollo negro de «min-face» otorga +6 de chatarra.",
-    "grip": "Aumenta el número de tiradas en +1.",
-    "reservist": "Capacidad de reserva +1.",
-    "calibration": "«Nudge» cuesta 2 de maná en lugar de 3.",
-    "spare": "El resultado más bajo de cada tirada se incrementa en uno; vuelve a tirar un dado más.",
-    "afterburner": "Los umbrales del motor son 1 menos.",
-    "jammer-plus": "Jam reduce el ataque del enemigo en 3.",
-    "condenser": "El límite de carga del reactor aumenta a 12.",
-    "targeter": "Mark otorga +3 de daño en lugar de +2.",
-    "plating": "Máximo de vida +5, curación 5 ahora.",
+    "spare": "El resultado más bajo de cada tirada se incrementa en uno; vuelve a tirar un dado más cada vez.",
+    "afterburner": "Los umbrales del motor son un paso más sencillos; casco −2.",
+    "jammer-plus": "Jam reduce el ataque del enemigo en 2 puntos más, pero las marcas valen 1 punto menos.",
+    "targeter": "Las marcas aportan +1 de daño adicional, pero el atasco reduce 1 menos.",
+    "plating": "Casco +5, y cada batalla ganada repara 2 puntos de casco.",
     "tug": "Una esquiva también otorga +1 de carga.",
     "kindling": "+1 en armas con un resultado de 5 o más.",
     "hammerhead": "+2 en Armas A.",
     "scorchmark": "El valor máximo de «face» en las armas añade «Burn 1».",
     "openingVolley": "+2 en armas durante los dos primeros turnos.",
-    "pyreFloor": "+2 en armas con un resultado mínimo.",
-    "redForge": "+1 para los dados rojos en las armas.",
-    "searing": "+2 en armas con un resultado de 8 o más.",
+    "pyreFloor": "Si un dado rojo sale con su cara de menor valor, se vuelve a lanzar inmediatamente.",
+    "redForge": "Un dado de arma rojo que muestre su cara máxima obtiene +1 a sus caras, hasta un máximo de +2.",
+    "searing": "Una tirada de arma de 8 o más añade «Quema 2».",
     "cinderTithe": "La cara máxima en armas da 3 de chatarra.",
     "thermalVent": "+3 en armas en una cara máxima y 1 carga.",
-    "overburn": "+2 en armas mientras el casco esté por debajo de la mitad.",
+    "overburn": "Los dados de las armas obtienen un +2, y cada turno termina con la pérdida de 2 puntos de casco.",
     "emberField": "Si sale un 2 en un dado rojo, se suma «Quema 2».",
-    "hotline": "+3 en la montura espinal.",
-    "secondBarrel": "+3 en Armas B.",
-    "detonator": "Una cara máxima en las armas se resuelve dos veces en la ranura.",
-    "magmaCore": "+3 en armas cuando tengas cuatro dados rojos.",
-    "infernoDoctrine": "Cada impacto de arma añade 1 punto de quemadura.",
+    "hotline": "Cualquier dado cabe en el soporte espinal más allá de su tapa, con un coste de 2 puntos de casco.",
+    "secondBarrel": "+3 en «Armas B» y +2 más gracias al Mk II.",
+    "detonator": "Una cara máxima en las armas resuelve la casilla dos veces, y con cinco objetos de arma, cualquier tirada de 8 o más también lo hace.",
+    "magmaCore": "+3 en armas con resonancia roja 4, y con resonancia roja 6, cada impacto de arma otorga +3 al siguiente dado rojo.",
+    "infernoDoctrine": "Cada impacto de arma añade 1 punto de quemadura, y 3 puntos de quemadura cuando tienes tres fuentes de quemadura.",
     "hoarplate": "+1 en escudos.",
     "stormWall": "El valor máximo de «face» en los escudos otorga 3 puntos de escudo adicionales.",
-    "coldStart": "+2 en escudos durante los dos primeros turnos.",
+    "coldStart": "Cada uno de los dos primeros turnos termina con 3 escudos más.",
     "blueFloor": "Los dados azules nunca dan un resultado inferior a 3.",
     "meltwater": "Mi cara en los escudos otorga 3 puntos de escudo adicionales.",
     "frostBrake": "+2 a los dados azules en los motores.",
     "bulkhead": "Casco +3.",
     "chillBank": "La cara «Max» de un dado azul almacena 1 carga.",
-    "aegisField": "+2 a la defensa por cada dado de escudo.",
-    "deepFreeze": "+3 en escudos con un 8 o más.",
-    "interdict": "Tu habilidad te protege de 2 ataques enemigos más.",
+    "aegisField": "La primera casilla que se resuelve en cada turno también aumenta el escudo en 3.",
+    "deepFreeze": "Una tirada de escudos con resultado de 8+ se lee como +3 y añade 2 escudos más.",
+    "interdict": "Si la tirada de un sensor es inferior a 4, se eleva a 4, por lo que siempre se atasca, y tu atasco reduce 1 más.",
     "hardVacuum": "+3 en escudos mientras el casco esté por debajo de la mitad.",
-    "secondSkin": "Casco +4; recupera 1 punto de vida después de cada combate.",
+    "secondSkin": "Casco Se reparan +4 y 2 puntos de casco tras cada batalla, pero el rescate se paga un 10 % menos.",
     "glacierPact": "+4 en escudos cuando tengas cuatro dados azules.",
-    "mirrorLattice": "Las esquivas reducen el daño; los umbrales del motor son un poco más fáciles.",
+    "mirrorLattice": "Las esquivas reflejan el daño, los umbrales de los motores son un nivel más fáciles y, con tres objetos de esquiva, los motores se leen como +3.",
     "permafrost": "Una cara máxima en los escudos resuelve la ranura dos veces.",
-    "rootHold": "+1 en motores.",
+    "rootHold": "A partir del tercer turno, cada dado de los motores cuenta como dos más.",
     "secondGrowth": "+2 cuando un dado muestra el mismo resultado que en el turno anterior.",
-    "mulch": "Recupera 1 punto de salud tras el combate; +5 % de chatarra.",
     "pollen": "Si sale el máximo en un dado verde, se repara 1 punto de casco.",
-    "longRoots": "Los dados que crecen suben un escalón más.",
+    "longRoots": "Un dado que salga en su cara de mayor valor obtiene de forma permanente un +1, hasta un máximo de +2.",
     "greenwake": "Si hay 5 o más en «motores», se obtienen 2 escudos.",
-    "steadyHand": "Los umbrales del motor, ahora un paso más sencillos.",
     "sapline": "Si repites el valor del turno anterior, recuperas 2 puntos de casco.",
-    "thicket": "Casco +3; recupera 2 puntos de vida después de cada combate.",
+    "thicket": "Casco +8, pero la recuperación da un 15 % menos.",
     "bloomCycle": "+3 cuando un dado verde repite el valor del turno anterior.",
-    "photosynth": "Cada dado verde almacena 1 carga.",
-    "evergreen": "Los dados que crecen suben dos escalones más.",
+    "photosynth": "Cada dado verde que se resuelva acumula 1 carga.",
+    "evergreen": "Mientras lleves tres objetos de crecimiento, un dado que repita el valor del turno anterior obtendrá de forma permanente un +1, hasta un máximo de +3.",
     "tideRoots": "La marea de interferencia tiene una intensidad ligeramente menor.",
-    "worldTree": "Recuperas 2 por cada casilla resuelta cuando tengas cuatro dados verdes.",
-    "overgrowthPact": "Crecimiento +2 y umbrales del motor dos niveles más bajos; casco −4.",
-    "standingWave": "+4 en motores.",
-    "pocketChange": "+2 de chatarra al inicio de la batalla.",
+    "worldTree": "Cuando los cuatro dados verdes entren en resonancia, al final de cada turno se recuperará 1 punto de casco por cada objeto verde que lleves contigo.",
+    "overgrowthPact": "Crecimiento +2 y casco −4; mientras lleves cuatro objetos de crecimiento, cada dado cuenta como si tuviera un valor 2 puntos mayor.",
+    "standingWave": "Los umbrales de los motores son ahora un poco más fáciles; si un motor tiene 6 o más, pasa 4 de escudo y 2 de carga al siguiente turno.",
+    "pocketChange": "Al entrar en un nodo, se obtiene 1 chatarra por cada objeto [chatarra] que tengas en tu equipamiento.",
     "finderFee": "+2 de chatarra por cada enemigo eliminado.",
-    "streetPrice": "Precios en tienda: −8 %.",
+    "streetPrice": "Las tiendas bajan un −8 %, pero la chatarra sube un −5 %: se compra y se vende al mismo precio de mercado.",
     "luckyStreak": "Cualquier cara máxima da 3 chatarra.",
     "scrapline": "+12 % de chatarra procedente de todas las fuentes.",
     "smallMercies": "Cualquier cara mínima da 2 chatarra.",
-    "goldTooth": "Cada dado amarillo da 1 chatarra.",
-    "tallyMark": "+10 % de XP por la carrera.",
-    "bountyBoard": "+4 de chatarra por cada enemigo eliminado.",
+    "goldTooth": "Cada dado amarillo que resuelvas te da 1 chatarra.",
+    "tallyMark": "Cada victoria supone una marca en el recuento; a partir de la sexta, cada nodo al que entres te da 3 chatarra.",
+    "bountyBoard": "Cada victoria reporta una recompensa de 12 chatarra.",
     "marketRun": "Tiendas: −10 %; la primera repetición de tirada en cada tienda es gratuita.",
     "goldRush": "La cara máxima de un dado amarillo da 8 chatarra.",
-    "houseEdge": "+3 al sacar el máximo con un dado amarillo.",
-    "ledgerTrick": "+20 % de chatarra; casco −2.",
-    "mintCondition": "Max tiene que pagar 12 de chatarra y 1 de cargo en cuanto tengas cuatro dados amarillos.",
-    "silentPartner": "+30 % de chatarra; tiendas −10 %.",
-    "veinTap": "+6 de chatarra por cada enemigo eliminado y +6 al inicio de la batalla.",
-    "darkCurrent": "+1 en el reactor.",
-    "lowTide": "Cualquier cara mínima almacena 2 de carga.",
-    "brinkmanship": "+1 a cada tirada mientras el casco esté por debajo del 40 %.",
-    "blackTithe": "Cada dado negro da 2 chatarra.",
-    "coldFusion": "Límite de carga +2.",
+    "houseEdge": "Si un dado da un resultado de 7 o más en las tiradas de armas, se consigue un golpe crítico (daño ×1,5).",
+    "ledgerTrick": "+20 % de chatarra, pero el límite de carga se reduce en 2.",
+    "mintCondition": "Cuando tengas cuatro dados amarillos, cada cara máxima te da 10 chatarra y 2 de carga.",
+    "silentPartner": "Tiendas: -12 %, con una repetición gratuita para cada una, y cada victoria te da 4 chatarra por cada objeto [chatarra] que tengas.",
+    "veinTap": "+40 % de fallidos, pero cada nueva tirada requiere un dado menos.",
+    "darkCurrent": "Si se saca un 5 o menos en el reactor, se cuenta como 2 más.",
+    "lowTide": "Cada dado que saque su cara mínima acumula 1 carga, esté colocado o no.",
+    "brinkmanship": "+1 a cada tirada resuelta una vez que tengas tres objetos de riesgo.",
+    "blackTithe": "Cada nodo al que entres te da 5 de chatarra por cada 1 de casco, y deja de dar chatarra cuando el casco está por debajo del 25 %.",
+    "coldFusion": "Límite de carga +4; el núcleo consume el 15 % de tu chatarra.",
     "longOdds": "+3 al sacar un 1 con un dado negro.",
-    "hardBargain": "+15 % de chatarra; recuperas 1 punto menos de vida tras las batallas.",
+    "hardBargain": "+15 % de chatarra; casco −1.",
     "nightShift": "La cara máxima del reactor almacena 2 cargas más.",
     "eventHorizon": "+3 para los dados negros en el reactor.",
-    "bloodPrice": "+4 en armas mientras el casco esté por debajo del 25 %.",
-    "heatShroud": "El primer desbordamiento del reactor en cada combate no supone ningún daño al casco.",
-    "scrapheap": "Cada dado sin colocar almacena 1 carga.",
+    "bloodPrice": "Al final de cada turno, siempre que el casco sea del 30 % o más, gasta 1 punto de casco para infligir 4 puntos de daño.",
+    "heatShroud": "El primer desbordamiento del reactor en cada combate no cuesta nada al casco, y cada dado del reactor aumenta el escudo en 4 mientras tengas 8 o más de carga.",
+    "scrapheap": "Cada dado sin colocar almacena 1 carga, y cada victoria da 5 chatarra.",
     "deadReckoning": "Límite de carga +3; casco −3.",
-    "obsidianCreed": "Los dados negros solo dan el mínimo o el máximo; límite de carga +2.",
-    "lastBreath": "Una vez por partida, sobrevive a un golpe letal con 1 punto de casco.",
-    "singularity": "El reactor tiene capacidad para 3 cargas más.",
+    "obsidianCreed": "Los dados negros solo dan el mínimo o el máximo; límite de carga +2; cada batalla comienza con 1 carga por cada objeto de riesgo que tengas.",
+    "lastBreath": "Una vez por partida, sobrevive a un impacto letal con 1 punto de casco; una batalla en la que se entre con menos de un tercio de casco comienza con 8 puntos de escudo.",
+    "singularity": "Cada dado del reactor almacena 3 unidades de carga más y cuesta 1 punto de casco.",
     "widerGrip": "Vuelve a tirar un dado más cada vez.",
     "shimStock": "Los empujones cuestan 1 carga menos.",
-    "deckHand": "Reserva un dado más.",
-    "toolRoll": "Una tirada adicional cada turno.",
+    "deckHand": "Reserva +1 dado.",
+    "toolRoll": "Una tirada de repetición adicional cada turno; casco máximo −2.",
     "counterweight": "Si sale un 1, se convierte en un 2.",
-    "checklist": "+1 a cada dado en el primer turno.",
+    "checklist": "La primera casilla que se resuelva en cada turno acumula 1 carga.",
     "greyMarket": "Tiendas: −6 %; +6 % de chatarra.",
-    "spareParts": "+4 de chatarra al inicio de la batalla.",
+    "spareParts": "Durante los dos primeros turnos de cada batalla, se añade a la bandeja una ficha gris d4 temporal.",
     "dampers": "Casco +2; límite de carga +1.",
-    "routineCheck": "Recupera 1 punto de vida después de cada combate.",
-    "switchboard": "+2 en sensores.",
-    "gimbalMount": "Las marcas aportan +2 de daño adicional.",
-    "logistics": "Las dos primeras repeticiones de tirada en cada tienda son gratis; tiendas: −5 %.",
-    "quickHands": "Vuelve a tirar dos dados más cada vez.",
-    "balanceBeam": "Tu tirada más baja de cada turno se aumenta ligeramente.",
-    "holdBack": "Los empujones cuestan 1 carga menos; el límite de cargas aumenta en 2.",
-    "payloadShuffle": "Reserva un dado +1 y un dado azul adicional.",
-    "shortHaul": "+15 % de XP por la carrera.",
-    "dryDock": "El «Repair Bay» repara 3 puntos más de casco.",
-    "masterKey": "Dos repeticiones adicionales cada turno y un dado más por cada repetición.",
-    "greyProtocol": "+2 a cada dado cuando tengas cuatro dados grises.",
-    "armorPlate": "Casco +4.",
-    "coolantLoop": "Límite de carga +1.",
-    "finePitch": "Los umbrales del motor, ahora un paso más sencillos.",
-    "boresight": "Las marcas aportan +1 de daño adicional.",
-    "bilgePump": "Recupera 1 punto de vida después de cada combate.",
-    "dockRates": "Precios en tienda: −7 %.",
+    "routineCheck": "Cada nodo al que accedas se registra en el historial; a partir de la décima entrada, cada batalla comienza con una tirada adicional.",
+    "switchboard": "Las marcas aportan +1 de daño adicional y, cuando se resuelve «Sensores», se vuelve a tirar el dado con el resultado más bajo.",
+    "gimbalMount": "Una tirada que dé como resultado «Motores» o «Sensores» cuenta como un mínimo de 4.",
+    "logistics": "Tiendas: −12 %, con las dos primeras repeticiones gratis, pero los ingresos por chatarra se reducen en un −8 %.",
+    "quickHands": "Vuelve a tirar dos dados más cada vez, pero ya no puedes guardar ningún dado en reserva.",
+    "balanceBeam": "Cada dado que muestre su cara superior te da 1 punto para subir en 2 puntos tu dado con la puntuación más baja.",
+    "holdBack": "Los empujones cuestan 1 carga menos y, si tienes tres objetos etiquetados como «dados», te quedas con un dado más.",
+    "payloadShuffle": "Reserva +2 dados; +1 más si es azul, pero el límite de carga se reduce en 2.",
+    "shortHaul": "+20 % de XP por la carrera; casco máximo −3.",
+    "dryDock": "La «Repair Bay» restaura 2 puntos más de casco por cada objeto que lleves etiquetado como «repair bay», incluido este mismo.",
+    "masterKey": "Una repetición adicional cada turno y un dado más por cada repetición; con tres objetos etiquetados como «repetición», uno más de cada uno de nuevo.",
+    "greyProtocol": "Con cuatro dados grises, cada batalla comienza con tres movimientos libres y una casilla de reserva adicional.",
     "crewDrill": "+12 % de XP por la carrera.",
-    "scrapHopper": "+3 de chatarra al inicio de la batalla.",
     "spotterCall": "Si hay 5 o más en los sensores, se almacena 1 carga.",
     "hullWeld": "El «Repair Bay» repara 1 punto más de casco.",
-    "reinforcedBay": "Una ranura más para módulos.",
-    "surgeTank": "Límite de carga +3.",
-    "hardenedHull": "Casco +7; los umbrales del motor son un nivel más difíciles.",
-    "kineticDampers": "Una esquiva almacena 1 carga.",
-    "targetingSuite": "Añade +2 de daño; el atasco reduce 1 más.",
-    "pressureValve": "El primer desbordamiento del reactor en cada combate no supone ningún daño al casco.",
-    "resonanceTuner": "+2 de carga al inicio de la batalla por cada serie de cuatro completada.",
-    "shockLance": "+5 en la montura espinal.",
-    "piercingRounds": "El primer impacto de cada combate ignora los escudos; suma +1."
+    "reinforcedBay": "Una ranura más para módulos; casco −3.",
+    "hardenedHull": "Casco +6; recupera 1 punto de vida después de cada combate.",
+    "targetingSuite": "Aporta +2 al daño, y al activar los sensores se almacena 1 carga por cada objeto de «Precisión» que lleves contigo.",
+    "shockLance": "+5 en la tirada de «Spinal Mount», y si un dado que caiga ahí muestra un resultado inferior a 5, se vuelve a tirar en cuanto caiga.",
+    "piercingRounds": "El primer golpe de cada combate ignora los escudos, otorga +1 a la marca y las armas con un valor máximo de daño infligen 2 puntos de daño adicionales por cada objeto de «Perforación» que lleves.",
+    "snakeEyes": "Un dado de arma que salga en su cara mínima sigue infligiendo 3 puntos de daño.",
+    "looseBallast": "Una tirada adicional cada turno; casco −3.",
+    "downPayment": "La primera ranura que se resuelva en cada turno obtiene +3 y cuesta 1 punto de casco, a menos que el casco sea inferior al 20 %.",
+    "hazardPay": "Si entras en una batalla con menos de la mitad del casco, recibes 10 de chatarra.",
+    "overdraft": "Las ranuras de armas admiten dados por encima de su límite máximo a cambio de 2 puntos de casco cada uno, y un dado de arma de 9 o más cuesta 2 de carga.",
+    "debtCollector": "Cada minuto que pases en esta batalla supone una anotación en el libro de cuentas; a partir del cuarto minuto, cada turno termina con 1 punto de daño por cada objeto de riesgo que tengas.",
+    "snowline": "Cada batalla comienza con 1 escudo por cada dado azul que haya en tu mazo.",
+    "rimeGuard": "Un dado de otra escuela que se coloque en una ranura nunca dará un resultado inferior a 2.",
+    "whiteNoise": "Si terminas un turno con una carga de 4 o más, el siguiente ataque del enemigo queda bloqueado.",
+    "iceSheet": "Mientras haya algún objeto de «Muro de escudos» a bordo, cada turno termina con 4 escudos más.",
+    "bracingVanes": "Un dado de motor que no muestre su cara de máximo valor otorga un +3.",
+    "nullField": "Cada turno termina con 2 escudos por cada objeto «Muro de escudos», y con cuatro de ellos se bloquea el siguiente ataque del enemigo.",
+    "takeRoot": "Cualquier resultado inferior a 3 se eleva a 3 en el momento en que lo asignes a una casilla.",
+    "seedBank": "Inicio de la batalla: durante los tres siguientes turnos, aumentarás tu escudo en 1 por cada objeto de crecimiento que lleves.",
+    "understory": "Fin del turno: si quedan 4 o más puntos de escudo, recupera 1 punto de casco.",
+    "mycelium": "Una vez que las seis casillas hayan resuelto esta batalla, cada turno termina curando 2 de casco y aumentando 3 de escudo.",
+    "rhizome": "Los umbrales del motor son dos niveles más fáciles; el casco, −2.",
+    "taproot": "Cuenta cada nodo por el que pasas; a partir del octavo, cada batalla comienza con 6 puntos de escudo y 3 de casco recuperados.",
+    "perennial": "En los motores, un dado que repita el valor de la última tirada cuenta como cuatro más.",
+    "annualRings": "Cuenta cada dado que repita el valor del turno anterior; a partir del tercero, cada dado cuenta como 3 más durante el resto de la batalla.",
+    "dryRun": "Si un dado repite su valor anterior y este es inferior a 4, se vuelve a lanzar.",
+    "teardown": "Los dados temporales se retiran al final de cada turno, y se te abona 1 chatarra por cada objeto que lleves etiquetado como «dado».",
+    "tallySheet": "Cada dado que se resuelva con su cara de menor valor suma un punto, y cada tres puntos se canjean por 3 de carga al final del turno.",
+    "cargoHold": "Reserva tres dados más, pero vuelve a tirar uno menos cada vez.",
+    "pointBlank": "Un impacto de máxima cara en las armas inflige +3 de daño y cuesta 1 punto de casco.",
+    "ignition": "La batalla comienza con un «Burn 2» sobre el enemigo.",
+    "keelStrike": "Un «Max Face» en el «Spinal Mount» inflige un daño crítico multiplicado por 1,5.",
+    "runningHot": "A partir del cuarto dado de arma de la batalla, los dados de arma obtienen un +3.",
+    "ashfall": "Una cara máxima en las armas inflige 2 puntos de daño adicionales por cada fuente de quemadura que tengas.",
+    "stokehold": "Con tres fuentes de quemadura, cada turno termina sumando «Quemadura 2».",
+    "autoAlign": "Si un dado da un resultado inferior a 3 en los sensores, se vuelve a lanzar inmediatamente.",
+    "coreTap": "Una vez que el Reactor alcanza el nivel Mk2, al resolverlo se almacenan 2 cargas más.",
+    "damageControl": "Por debajo de la mitad de los puntos de vida, al final de cada turno se recuperan 3 puntos de escudo.",
+    "spallLiner": "Cada combate comienza con 2 de escudo por cada objeto de supervivencia que lleves.",
+    "scavengedArmour": "Casco +6; −10 % de chatarra.",
+    "crashPriority": "Entrar en combate con más de la mitad del casco consumirá 2 de casco por cada 5 de carga.",
+    "spareHands": "Lleva tres objetos de «Precisión» y cada combate comenzará con un empujón gratuito.",
+    "overrideKeys": "Si entras en combate con más del 60 % de casco, cualquier arma que ocupe una ranura por encima de su límite costará 2 de casco.",
+    "markLedger": "Cada marca se anota en el libro mayor y, a partir de la tercera, todas las ranuras de armas producen golpes críticos.",
+    "refitCrew": "Al llegar a un nodo con menos de la mitad de las reparaciones del casco 3.",
+    "flightLog": "+25 % de XP por la partida; −15 % de chatarra.",
+    "fullRefit": "+2 a cada tirada cuando lleves cuatro objetos de «Precisión».",
+    "sureThing": "Un dado que se coloque con la cara 1 o la 2 hacia abajo se convierte en un 3 a cambio de 2 fichas.",
+    "chipStack": "Mientras tengas 5 o más puntos de carga, un dado con el valor máximo en las armas provoca un golpe crítico (×1,5 de daño).",
+    "warChest": "Si tienes aunque sea un solo objeto [de desecho], cada combate comienza con 3 cargas.",
+    "marginCall": "Si un dado da un resultado inferior a 4 en la compra de armas, se le suma +5 a su valor a cambio de 3 chatarra.",
+    "loadedDice": "La tirada de «Destino» se puede realizar dos veces por combate, y un «empujón» cuesta 2 cargas menos."
   },
   "speaker": {
     "mara": "Mara, chatarrera",
@@ -1819,244 +1939,244 @@
   },
   "puzzle": {
     "oreVein": {
-      "title": "Ore Vein",
-      "goal": "Deal exactly {{n}} — the vein shears if you over-cut. Leave a die out."
+      "title": "Veta de mineral",
+      "goal": "Hazlo exactamente {{n}}: si cortas demasiado, se rompen las venas. Deja un trozo sin cortar."
     },
     "coolant": {
-      "title": "Coolant Line",
-      "goal": "Bank exactly {{n}} charge — the core drinks in steps of one and a half."
+      "title": "Tubo de refrigerante",
+      "goal": "Introduce exactamente {{n}} cargo: las bebidas principales en incrementos de uno y medio."
     },
     "cleanFit": {
-      "title": "Clean Fit",
-      "goal": "Bank {{n}}+ charge with every die placed and nothing spilled past the cap."
+      "title": "Corte ajustado",
+      "goal": "{{n}}+ cargo por cada dado colocado y sin que se derrame nada más allá del límite."
     },
     "redRoute": {
-      "title": "Red Route",
-      "goal": "Deal {{n}}+ damage — a red die in Weapon A, affinity firing."
+      "title": "Ruta Roja",
+      "goal": "Inflige {{n}}+ de daño: un dado rojo en el arma A, disparo por afinidad."
     },
     "ignite": {
       "title": "Ignite",
-      "goal": "Deal {{n}}+ damage and land Burn — a cinder must hit its max face."
+      "goal": "Inflige {{n}}+ de daño y aplica «Quema»: una ceniza debe alcanzar su valor máximo."
     },
     "pipeline": {
-      "title": "Pipeline",
-      "goal": "Mark, then land {{n}}+ into the marked target, and do not overflow the reactor."
+      "title": "Conducto",
+      "goal": "Marca el objetivo, luego lanza {{n}}+ contra él y no dejes que el reactor se desborde."
     },
     "overload": {
-      "title": "Overload",
-      "goal": "Jam the spinal on purpose, then carry {{n}}+ damage on the mounts."
+      "title": "Sobrecarga",
+      "goal": "Aplica «Spinal» a propósito y, a continuación, inflige un daño de «{{n}}» a las monturas."
     },
     "slowBurn": {
-      "title": "Slow Burn",
-      "goal": "Two turns: set Burn, reserve a hitter, and stack {{n}}+ total damage."
+      "title": "Lenta combustión",
+      "goal": "Dos turnos: activa «Burn», reserva un atacante y acumula un total de daño de «{{n}}»."
     },
     "capacitor": {
-      "title": "Capacitor",
-      "goal": "Bank {{n}}+ charge across three turns — one core cannot hold it all at once."
+      "title": "Condensador",
+      "goal": "{{n}}de «Bank» + se acumula a lo largo de tres turnos; un núcleo no puede almacenarlo todo a la vez."
     },
     "lockbox": {
-      "title": "Lockbox",
-      "goal": "Fixed reading — one routing lands damage, shield and {{n}}+ charge at once."
+      "title": "Caja de seguridad",
+      "goal": "Lectura fija: una ruta inflige daño, aplica un escudo y una carga de «{{n}}» a la vez."
     },
     "parity": {
-      "title": "Parity Lock",
-      "goal": "Fixed reading — {{n}}+ damage, Weapons odd, Shields even. Mind the faces."
+      "title": "Bloqueo de paridad",
+      "goal": "Lectura fija: {{n}}+ daño; armas impares, escudos pares. Cuidado con las caras."
     },
     "bulwarkStand": {
-      "title": "Bulwark Stand",
-      "goal": "Survive the barrage and still hold {{n}}+ shield — layer the defence."
+      "title": "Soporte Bulwark",
+      "goal": "Sobrevive al aluvión de ataques y mantén el escudo de {{n}}+: refuerza la defensa."
     },
     "tally": {
-      "title": "The Tally",
-      "goal": "Deal exactly {{n}} damage."
+      "title": "El recuento",
+      "goal": "Inflige exactamente {{n}} de daño."
     },
     "battery": {
-      "title": "The Battery",
-      "goal": "Store exactly {{n}} charge."
+      "title": "La batería",
+      "goal": "Almacena exactamente una recarg{{n}}."
     },
     "seawall": {
-      "title": "The Seawall",
-      "goal": "Raise exactly {{n}} shield."
+      "title": "El dique",
+      "goal": "Crea exactamente un escudo «{{n}}»."
     },
     "mirrorMath": {
-      "title": "The Mirror",
-      "goal": "Deal {{n}} or more using at most two slots."
+      "title": "El Espejo",
+      "goal": "Reparte {{n}} o más cartas utilizando como máximo dos ranuras."
     },
     "engraverBench": {
-      "title": "The Bench",
-      "goal": "Raise {{n}} shield with at least two slots filled."
+      "title": "El banco",
+      "goal": "Activa un escudo «{{n}}» con al menos dos ranuras ocupadas."
     },
     "blackVault": {
-      "title": "The Vault",
-      "goal": "Store {{n}} charge using a school's own system."
+      "title": "La Cámara Acorazada",
+      "goal": "Registrar los gastos de «{{n}}» utilizando el sistema propio del centro educativo."
     },
     "spinalDrill": {
-      "title": "Spinal Drill",
-      "goal": "Mark, jam the Spinal, then deal {{n}}."
+      "title": "Taladro espinal",
+      "goal": "Mark, bloquea el «Spinal» y luego juega «{{n}}»."
     },
     "coolChain": {
-      "title": "Cool Chain",
-      "goal": "Shields first, then {{n}} charge, and no overflow."
+      "title": "Cadena de frío",
+      "goal": "Primero los escudos, luego una carga de «{{n}}», y sin desbordamiento."
     },
     "emberStack": {
       "title": "Ember Stack",
-      "goal": "Deal {{n}} across two turns."
+      "goal": "Reparte «{{n}}» en dos rondas."
     },
     "shieldWall": {
-      "title": "Shield Wall",
-      "goal": "End the second turn on {{n}} shield."
+      "title": "Muro de escudos",
+      "goal": "Termina el segundo turno con un escudo «{{n}}»."
     },
     "fateBench": {
-      "title": "Fixed Odds",
-      "goal": "One roll, one placement: damage, shield, and {{n}} charge."
+      "title": "Cuotas fijas",
+      "goal": "Una tirada, una aplicación: daño, escudo y una carg{{n}}."
     },
     "sortingYard": {
-      "title": "Sorting Yard",
-      "goal": "Deal {{n}} or more with an even total in Weapon A."
+      "title": "Planta de clasificación",
+      "goal": "Reparte {{n}}o o más con un total par en la Arma A."
     },
     "choirStand": {
-      "title": "The Choir Stand",
-      "goal": "Survive the charged volley on {{n}} shield or more."
+      "title": "El atril del coro",
+      "goal": "Resiste la descarga de un escudo «{{n}}» o superior."
     },
     "emberCut": {
-      "title": "Ember Cut",
-      "goal": "Land within two of {{n}} damage — the seam gives at either edge."
+      "title": "Corte Ember",
+      "goal": "Si el daño de «{{n}}» se aproxima a dos puntos, la costura se rompe por cualquiera de los dos extremos."
     },
     "driftSpark": {
-      "title": "Drift Spark",
-      "goal": "Bank {{n}} charge, give or take two. The coil is forgiving; the core is not."
+      "title": "Deriva Chispa",
+      "goal": "El «{{n}}» del banco, más o menos dos. La bobina es tolerante; el núcleo, no."
     },
     "plateFit": {
-      "title": "Plate Fit",
-      "goal": "Raise exactly {{n}} shield. The plate seats or it does not."
+      "title": "Ajuste de la placa",
+      "goal": "Levanta exactamente un escudo «{{n}}». O encaja en la base o no."
     },
     "hairline": {
-      "title": "Hairline",
-      "goal": "One mount, exactly {{n}} damage. Everything else stays in the tray."
+      "title": "Línea del cabello",
+      "goal": "Una montura, exactamente{{n}}s de daño. Todo lo demás se queda en la bandeja."
     },
     "tithe": {
-      "title": "The Tithe",
-      "goal": "Exactly {{n}} charge, and the reactor takes its cut first."
+      "title": "El diezmo",
+      "goal": "Exactamente una recarg{{n}}, y el reactor se lleva su parte primero."
     },
     "deadWeight": {
-      "title": "Dead Weight",
-      "goal": "Deal {{n}}+ with every die placed — the ballast has to go somewhere."
+      "title": "Peso muerto",
+      "goal": "{{n}}o más por cada dado colocado: el lastre tiene que ir a algún sitio."
     },
     "blueLane": {
       "title": "Blue Lane",
-      "goal": "Raise {{n}}+ shield with a blue die in the Shields — the lane is keyed."
+      "goal": "Levanta un escudo «{{n}}» con un dado azul en la sección «Escudos»: la línea está marcada."
     },
     "spread": {
-      "title": "The Spread",
-      "goal": "Deal {{n}}+ across three systems. Nothing concentrated survives the scan."
+      "title": "El margen",
+      "goal": "{{n}}+ en tres sistemas. Nada que esté concentrado sobrevive al escaneo."
     },
     "greenhouse": {
-      "title": "Greenhouse",
-      "goal": "Deal {{n}}+ and make something grow — a green die must land on its top face."
+      "title": "Invernadero",
+      "goal": "Reparte las cartas {{n}}+ y haz que algo crezca: debe salir un dado verde en su cara superior."
     },
     "overcut": {
-      "title": "Overcut",
-      "goal": "Bank {{n}}+ charge and force a die past a cap it does not fit."
+      "title": "Sobrecorte",
+      "goal": "{{n}} del banco +: forzar un troquel a pasar por un tapón en el que no cabe."
     },
     "tightPack": {
-      "title": "Tight Pack",
-      "goal": "Bank {{n}}+ charge across two systems with nothing spilled past a cap."
+      "title": "Grupo compacto",
+      "goal": "El «{{n}}» del banco se aplica en dos sistemas sin que se supere el límite máximo."
     },
     "oddPlate": {
-      "title": "Odd Plate",
-      "goal": "Raise {{n}}+ shield reading odd, with the engines reading even."
+      "title": "Matrícula impar",
+      "goal": "Activa el escudo «{{n}}» con un valor impar, mientras que los motores deben tener un valor par."
     },
     "redOnly": {
-      "title": "Red Only",
-      "goal": "Deal {{n}}+ with a red die in Weapon A, and Burn has to land."
+      "title": "Solo rojo",
+      "goal": "Reparte {{n}} o más con un dado rojo en el Arma A, y «Burn» tiene que salir."
     },
     "perfectSeal": {
-      "title": "Perfect Seal",
-      "goal": "One reading only: {{n}}+ damage, every die placed, Weapons odd, Shields and the core even."
+      "title": "Sellado perfecto",
+      "goal": "Solo una tirada: {{n}}+ daño; cada dado colocado: armas en los números impares, escudos y el núcleo en los pares."
     },
     "firstLight": {
-      "title": "First Light",
-      "goal": "Mark first, then put {{n}}+ into what the sensors found."
+      "title": "Primera luz",
+      "goal": "Marca primero y, a continuación, introduce «{{n}}» en los resultados de los sensores."
     },
     "coldStart": {
-      "title": "Cold Start",
-      "goal": "Shields up first, then {{n}}+ charge into a cold core."
+      "title": "Arranque en frío",
+      "goal": "Primero activa los escudos y, a continuación, l{{n}}y carga contra un núcleo frío."
     },
     "braceGate": {
-      "title": "Brace Gate",
-      "goal": "Mark, brace for {{n}}+ shield, and leave the reactor unflooded."
+      "title": "Escándalo de las ortesis",
+      "goal": "Mark, prepárate para un escudo «{{n}}», y no inunde el reactor."
     },
     "siegeLine": {
-      "title": "Siege Line",
-      "goal": "Jam the spinal on purpose, carry {{n}}+ on the mounts, and hold the core."
+      "title": "Línea de asedio",
+      "goal": "Bloquea la columna vertebral a propósito, lleva un{{n}} o más en los soportes y mantén el núcleo."
     },
     "markedBurn": {
-      "title": "Marked Burn",
-      "goal": "Mark, jam the spinal, and still land {{n}}+ on the mount."
+      "title": "Quemadura grave",
+      "goal": "Mark, bloquea la columna vertebral y, aun así, consigue un «{{n}}» en la posición de montada."
     },
     "dryDock": {
-      "title": "Dry Dock",
-      "goal": "Shields, then {{n}}+ charge, and not one point over the cap."
+      "title": "Dique seco",
+      "goal": "Shields, y luego un contrato de tipo «{{n}}»+, sin sobrepasar ni un punto el límite salarial."
     },
     "theWholeChain": {
-      "title": "The Whole Chain",
-      "goal": "Mark, bank without flooding, and finish on {{n}}+ — one pass, no rerolls."
+      "title": "Toda la cadena",
+      "goal": "Marca, realiza la maniobra sin salirse de la pista y termina en {{n}}+ — una sola pasada, sin repeticiones."
     },
     "ironBank": {
-      "title": "Iron Bank",
-      "goal": "Three turns, one core: bank {{n}}+ without ever spilling."
+      "title": "Banco del Hierro",
+      "goal": "Tres giros, un núcleo: haz un «{{n}}» sin derramar nada."
     },
     "twinFuse": {
-      "title": "Twin Fuse",
-      "goal": "The first die sits out turn one. Still reach {{n}}+ across the two."
+      "title": "Fusible doble",
+      "goal": "El primer dado se queda fuera en el primer turno. Aun así, se alcanza un total de {{n}}+ entre los dos."
     },
     "longWall": {
-      "title": "Long Wall",
-      "goal": "Only the last turn counts. End on {{n}}+ shield — hold a die back for it."
+      "title": "Muro largo",
+      "goal": "Solo cuenta el último turno. Termina con «{{n}}» + escudo: guarda un dado para ello."
     },
     "slowFuse": {
-      "title": "Slow Fuse",
-      "goal": "The first die sits out turn one. Burn and mounts must still total {{n}}+."
+      "title": "Mecha lenta",
+      "goal": "El primer dado no se utiliza en el primer turno. El daño por fuego y las monturas deben sumar, en total, un{{n}} o más."
     },
     "reactorRun": {
-      "title": "Reactor Run",
-      "goal": "The first die sits out turn one, and there are no rerolls. Bank {{n}}+."
+      "title": "Funcionamiento del reactor",
+      "goal": "El primer dado no se utiliza en el primer turno y no hay repeticiones de tirada. Apuesta{{n}} o más."
     },
     "theLongCount": {
-      "title": "The Long Count",
-      "goal": "Three turns, no rerolls, the first die held back — and {{n}}+ banked at the end."
+      "title": "La Cuenta Larga",
+      "goal": "Tres turnos, sin repeticiones de tiradas, el primer dado sin lanzar… y un «{{n}}» que se guardó para el final."
     },
     "ledger": {
-      "title": "The Ledger",
-      "goal": "Fixed reading — every die booked, Shields reading even, {{n}}+ damage on the line."
+      "title": "El Ledger",
+      "goal": "Lectura fija: se reservan todos los dados, lectura par de escudos, {{n}}+ de daño en la línea."
     },
     "crossWire": {
-      "title": "Cross-Wire",
-      "goal": "Fixed reading — damage, shield and {{n}}+ charge out of one routing."
+      "title": "Cable cruzado",
+      "goal": "Lectura fija: daño, escudo y {{n}}+ carga tras una huida."
     },
     "mirrorRead": {
-      "title": "Mirror Read",
-      "goal": "Fixed reading — {{n}}+ damage with Burn landed. Only one way round."
+      "title": "Lectura en espejo",
+      "goal": "Se ha corregido el texto: «{{n}}» + daño al aplicar «Burn». Solo hay una forma de hacerlo."
     },
     "theSeal": {
-      "title": "The Seal",
-      "goal": "Fixed reading — {{n}}+ damage, Shields reading even, nothing spilled past a cap."
+      "title": "El sello",
+      "goal": "Lectura fija: {{n}}+ de daño; lectura de escudos en par; nada ha superado el límite."
     },
     "hullCheck": {
-      "title": "Hull Check",
-      "goal": "Take the volley and still stand on {{n}}+ shield."
+      "title": "Casco Comprobar",
+      "goal": "Recibe el golpe y sigue de pie sobre un escudo {{n}}+."
     },
     "lastLight": {
-      "title": "Last Light",
-      "goal": "Survive the volley with {{n}}+ charge still in the core."
+      "title": "Última luz",
+      "goal": "Sobrevive a la descarga con una carga de «{{n}}» aún en el núcleo."
     },
     "stormFront": {
-      "title": "Storm Front",
-      "goal": "Survive the volley and answer it with {{n}}+ damage in the same turn."
+      "title": "Frente de tormenta",
+      "goal": "Supera el ataque y responde con un daño de {{n}}+ en el mismo turno."
     },
     "theVigil": {
-      "title": "The Vigil",
-      "goal": "One reading, no board changes: take the heaviest volley in the sector and still hold {{n}}+ charge."
+      "title": "La vigilia",
+      "goal": "Una lectura, sin cambios en el tablero: recibe la descarga más potente del sector y aún así mantienes una carga de «{{n}}+»."
     }
   },
   "bark": {
@@ -2631,209 +2751,249 @@
   "modules": {
     "magnetScoop": {
       "name": "Cuchara imantada",
-      "desc": "+2 de chatarra al comienzo de cada batalla."
+      "desc": "Por cada nodo en el que entres recibirás 2 chatarra, y por cada batalla que ganes recibirás 3 más."
     },
     "grapple": {
       "name": "Gancho de amarre",
-      "desc": "+3 de chatarra por cada enemigo que elimines."
+      "desc": "+3 de chatarra por cada enemigo que elimines, y 8 de chatarra más si ganas la batalla antes de que termine el turno 3."
     },
     "lotteryBlock": {
       "name": "Bloque de lotería",
-      "desc": "La primera repetición de tirada es gratuita en todas las tiendas."
+      "desc": "La primera repetición en cada tienda es gratuita, y cada tres nodos a los que entres te dan 12 chatarra."
     },
     "trainingModule": {
       "name": "Módulo de formación",
-      "desc": "+20 % de XP por la carrera."
+      "desc": "+20 % de XP, y tras 4 nodos, la tripulación entrenada añade una repetición de tirada a cada batalla."
     },
     "assayRig": {
       "name": "Banco de ensayos",
-      "desc": "Cualquier cara máxima da 2 chatarra."
+      "desc": "Se evalúa una cara máxima obtenida en el arma A por 5 chatarra."
     },
     "brokerLink": {
       "name": "Enlace al agente",
-      "desc": "Precios en tienda: −12 %."
+      "desc": "Los precios en la tienda han bajado un 16 %, pero el conjunto de antenas consume un máximo de 3 de resistencia del casco."
     },
     "slagPress": {
       "name": "Prensa de escoria",
-      "desc": "Cualquier cara mínima da 3 chatarra."
+      "desc": "Si se coloca un dado en el arma B con su cara de menor valor, se sube hasta 4 y se obtienen 3 chatarra."
     },
     "tithePlate": {
       "name": "Plato de los diezmos",
-      "desc": "+25 % de chatarra de todas las fuentes."
+      "desc": "+25 % de chatarra de todas las fuentes, y 2 unidades de chatarra al inicio de la batalla por cada objeto [chatarra] que tengas."
     },
     "salvageArm": {
       "name": "Brazo de rescate",
-      "desc": "Cada dado que no se haya colocado da 1 chatarra."
+      "desc": "Cada batalla ganada suma un pecio; a partir del quinto pecio, cada nodo al que entres te da 4 chatarra."
     },
     "auditCore": {
       "name": "Núcleo de auditoría",
-      "desc": "+6 de chatarra al inicio de la batalla; tiendas: −5 %."
+      "desc": "+4 de chatarra al inicio de cada batalla, y 8 más una vez que el reactor alcance el nivel Mk2."
     },
     "mirrorPlate": {
       "name": "Recubrimiento de espejos",
-      "desc": "Un golpe esquivado devuelve el daño."
+      "desc": "Cada dado de «die» resuelto en una posición de escudo devuelve 6 de daño al final del turno."
     },
     "ballastModule": {
-      "name": "Lastre",
-      "desc": "Casco +4."
+      "name": "Tanques de lastre",
+      "desc": "Casco +5 y los umbrales del motor son un nivel más difíciles; cada nodo al que entres repara 1 punto de casco."
     },
     "escapePod": {
       "name": "Cápsula de rescate",
-      "desc": "Una vez por partida, sobrevive a un golpe letal con 1 punto de casco."
+      "desc": "Una vez por partida, sobrevives a un impacto letal con 1 punto de casco, y cualquier batalla en la que entres con menos del 40 % de casco comienza con 8 de escudo y una ranura de reserva adicional."
     },
     "heatsink": {
       "name": "Disipador térmico",
-      "desc": "El primer desbordamiento del reactor en cada combate no supone ningún daño al casco."
+      "desc": "Cualquier dado encaja en el reactor por la tapa y le resta 1 punto de casco, y cada cara máxima que salga en las rejillas de ventilación del reactor resta 3 puntos de escudo."
     },
     "fieldStabilizer": {
       "name": "Estabilizador de campo",
-      "desc": "La marea de interferencia tiene una intensidad ligeramente menor."
+      "desc": "La marea de interferencia tiene un nivel de dificultad inferior, y una batalla que comience con una marea de nivel 3 o superior te otorga un empujón gratis y 4 escudos."
     },
     "ablativeWeave": {
       "name": "Tejido ablativo",
-      "desc": "+2 a la defensa por cada dado de escudo."
+      "desc": "Los dos primeros dados que den como resultado «Escudos» en cada batalla suman 5 escudos cada uno a medida que el tejido se va consumiendo."
     },
     "bulkheadRing": {
       "name": "Anillo de mamparo",
-      "desc": "Casco +8; los umbrales del motor son un nivel más difíciles."
+      "desc": "Casco +8 y los umbrales del motor son un nivel más difíciles; con los escudos en Mk 2, cada batalla comienza con 6 de escudo, y en Mk 3 la reserva cuenta con un dado más."
     },
     "dampingCoil": {
       "name": "Bobina amortiguadora",
-      "desc": "Recupera 3 de casco después de cada batalla."
+      "desc": "La bobina se desenrolla a lo largo de las tres vueltas siguientes, terminando cada una de ellas con 3 blindajes más."
     },
     "hardpointClamp": {
       "name": "Abrazadera para punto de fijación",
-      "desc": "Los umbrales del motor, ahora un paso más sencillos."
+      "desc": "Los umbrales del motor son un poco más fáciles, y una vez que el soporte del motor alcanza el nivel Mk 2, cada dado que se lance cuenta como +3."
     },
     "voidLiner": {
       "name": "Revestimiento de vacío",
-      "desc": "+3 al escudo gracias a los dados de escudo mientras el casco esté por debajo del 40 %."
+      "desc": "+4 a cada dado en «Escudos II», y mientras el casco esté por debajo del 40 %, los dados de «Escudos» también suman 4 a los escudos."
     },
     "siegeMount": {
       "name": "Monte de asedio",
-      "desc": "+2 de daño en la cara máxima de las armas."
+      "desc": "+4 en Armas A a partir del segundo turno."
     },
     "piercer": {
       "name": "Piercer",
-      "desc": "El primer golpe de cada combate ignora los escudos."
+      "desc": "El primer golpe de cada combate ignora los escudos, y la habilidad «Spinal Mount» inflige 2 puntos de daño adicionales por cada objeto de «Perforación» que lleves equipado."
     },
     "emberInjector": {
       "name": "Inyector Ember",
-      "desc": "El valor máximo de «face» en las armas aplica «Burn 2»."
+      "desc": "Cada tirada que se resuelva en «Armas B» aplica 2 puntos de quemadura."
     },
     "railCradle": {
       "name": "Soporte para raíles",
-      "desc": "+3 en la montura espinal."
+      "desc": "El «Spinal Mount» gana +1, y +5 en total una vez que se actualiza a la versión Mk II."
     },
     "targetingMesh": {
       "name": "Malla de segmentación",
-      "desc": "Las marcas aportan +2 de daño adicional."
+      "desc": "Las marcas valen +1, y al resolver la prueba de Sensores se suma +2 al dado que está a la espera en Armas A."
     },
     "overpressure": {
       "name": "Sobrepresión",
-      "desc": "+3 en armas en el primer turno."
+      "desc": "La primera casilla resuelta en cada turno recibe un +4 si se trata de un arma; se vuelve a tirar un dado menos."
     },
     "ricochetHousing": {
       "name": "Viviendas Ricochet",
-      "desc": "El «Overkill» de las armas A se traslada al siguiente enemigo."
+      "desc": "El «Overkill» se traslada al siguiente enemigo, y un «Max Face» de la sección «Armas B» rebota e inflige 5 puntos de daño al final del siguiente turno."
     },
     "splinterHead": {
       "name": "Cabeza de astilla",
-      "desc": "+3 en armas con un resultado mínimo."
+      "desc": "Si el resultado de un dado de arma es inferior a 4, se inflige 1 punto de daño adicional por cada objeto de «Enjambre» que lleves contigo."
     },
     "lanceCapacitor": {
       "name": "Condensador Lance",
-      "desc": "+2 en armas con un resultado de 7 o más."
+      "desc": "Cada dado de arma que se resuelva con 6 o más puntos de carga acumulados gasta 6 de ellos a cambio de +5."
     },
     "executioner": {
       "name": "Verdugo",
-      "desc": "+3 en armas mientras el casco esté por debajo del 30 %."
+      "desc": "Cuando el arma A alcanza el nivel Mk II, sus ataques críticos alcanzan el máximo; a partir del nivel Mk III, cada disparo que realice añade 4 puntos de daño."
     },
     "solenoid": {
       "name": "Solenoide",
-      "desc": "Una tirada adicional cada turno."
+      "desc": "Una tirada adicional cada turno, y si un dado de la Arma B sale por debajo de 4, se vuelve a lanzar una vez."
     },
     "gyroStabilizer": {
       "name": "Estabilizador giroscópico",
-      "desc": "Reserva +1 dado."
+      "desc": "Reserva +1 dado, y +1 más cuando los motores sean Mk2."
     },
     "recycler": {
       "name": "Reciclador",
-      "desc": "Cada dado sin colocar almacena 1 carga."
+      "desc": "Al final de cada turno, funde todos los dados temporales, lanza un nuevo d4 gris a la bandeja y genera 2 restos."
     },
     "resonator": {
       "name": "Resonador",
-      "desc": "+2 de carga al inicio de la batalla por cada serie de cuatro completada."
+      "desc": "+2 de carga al inicio de la batalla por cada serie de cuatro completada, 2 de carga más en cada uno de los tres turnos siguientes y +2 a cada dado mientras tengas 8 o más de carga."
     },
     "nudgeGovernor": {
       "name": "Gobernador de Nudge",
-      "desc": "Los empujones cuestan 1 carga menos."
+      "desc": "Los empujones cuestan 1 carga menos, pero el límite de cargas se reduce en 1."
     },
     "wideGrip": {
       "name": "Agarre amplio",
-      "desc": "Vuelve a tirar un dado más cada vez."
+      "desc": "Vuelve a tirar un dado más cada vez; con tres elementos marcados como «reroll», cada batalla añade un dado más por cada repetición de tirada y una repetición de tirada adicional."
     },
     "capacitorBank": {
       "name": "Banco de condensadores",
-      "desc": "Límite de carga +3."
+      "desc": "Límite de carga +3; si una batalla termina con 3 o más puntos de carga, se acumulan 3 de ellos, y el banco devuelve esos 3 al inicio de la siguiente batalla."
     },
     "primerCoil": {
       "name": "Bobina de precalentamiento",
-      "desc": "+2 en el reactor."
-    },
-    "blueBallast": {
-      "name": "Blue Ballast",
-      "desc": "Reserva un dado azul más."
+      "desc": "Un dado que salga por la cara más alta en «Sensors» prepara el siguiente dado rojo del turno para que sume +3."
     },
     "growthTrellis": {
       "name": "Enrejado de cultivo",
-      "desc": "Los dados que crecen suben un escalón más."
+      "desc": "Los dados en crecimiento suben un nivel más, y un dado que se resuelve por su cara más alta en «Engines» crece 1 más, hasta un máximo de 3."
     },
     "echoBuffer": {
       "name": "Echo Búfer",
-      "desc": "+2 de carga cuando un dado repite el valor del turno anterior."
+      "desc": "Un dado que repite el valor del turno anterior acumula 2 de carga, y un dado resuelto en el reactor aporta 3 de carga más en el siguiente turno."
     },
     "seedVault": {
       "name": "Banco de semillas",
-      "desc": "+2 de los dados verdes de los motores."
+      "desc": "Durante los tres primeros turnos de cada batalla, se añaden a la bandeja un d4 verde temporal y un d4 gris."
     },
     "jamBreaker": {
       "name": "Desatascador de mermelada",
-      "desc": "Tu habilidad te protege de 2 ataques enemigos más."
+      "desc": "Tu equipo te protege de 2 ataques enemigos más, y con los sensores de nivel Mk2 o superior, cada batalla comienza con una ranura de reserva adicional."
     },
     "entropySink": {
       "name": "Sumidero de entropía",
-      "desc": "Cualquier cara mínima almacena 2 de carga."
+      "desc": "Límite de carga +2, y con el reactor en Mk2 o superior, cualquier cara mínima almacena 3 de carga."
     },
     "paradoxLoop": {
       "name": "Bucle paradójico",
-      "desc": "Una cara máxima en las armas se resuelve dos veces en la ranura."
+      "desc": "El arma A se resuelve dos veces con la cara máxima; el arma B se resuelve dos veces con la cara mínima."
     },
     "blackLedger": {
       "name": "Libro de cuentas negro",
-      "desc": "+3 de los dados negros en las armas."
+      "desc": "Cada nodo paga 3 de chatarra a crédito; en el sexto nodo, el libro mayor recauda 4 de casco y abre una nueva página."
     },
     "prismLens": {
       "name": "Lente prismática",
-      "desc": "+1 a cada dado en el primer turno."
+      "desc": "Cada dado que muestre su cara de menor valor se vuelve a lanzar."
     },
     "hushAntenna": {
       "name": "Antena Hush",
-      "desc": "+2 en sensores."
+      "desc": "Si terminas un turno sin haber acumulado carga alguna, la antena devuelve discretamente 3 de carga."
     },
     "coldLogicCore": {
       "name": "Núcleo de lógica fría",
-      "desc": "Los empujones son gratis; los golpes críticos dejan de producirse."
+      "desc": "Los empujones cuestan 2 de carga menos y cada combate comienza con 2 empujones gratis; los golpes críticos nunca se activan."
     },
     "gamblersChip": {
       "name": "Ficha de juego",
-      "desc": "Cualquier cara «max» da 1 carga y 1 chatarra."
+      "desc": "Una cara máxima te da 2 chatarra por cada objeto [de riesgo] que tengas y te permite volver a tirar otro dado al azar."
+    },
+    "bufferCells": {
+      "name": "Células tampón",
+      "desc": "Casco −3, pero cada combate comienza con 6 de escudo."
+    },
+    "citadelCore": {
+      "name": "Núcleo de la Ciudadela",
+      "desc": "Cualquier dado cabe en un soporte de escudo sobre su tapa sin que se pierda casco; cada batalla comienza con 2 escudos por cada objeto «Muro de escudos» que lleves, y mientras tengas 12 o más escudos, cada dado resuelto en un soporte de escudo repara 3 de casco."
+    },
+    "ratchetFeed": {
+      "name": "Avance por trinquete",
+      "desc": "Si se lanza un dado en el arma A por debajo de 3, el valor sube hasta 3."
+    },
+    "bondedVault": {
+      "name": "Cámara acorazada",
+      "desc": "+2 al límite de cargas, y 1 carga al inicio de la batalla por cada objeto [chatarra] que tengas."
+    },
+    "foundryCore": {
+      "name": "Núcleo de fundición",
+      "desc": "+30 % en chatarra y precios en la tienda, −12 %; cada batalla comienza con un dado d6 amarillo recién acuñado que dura 3 turnos, y con un segundo si tienes 5 o más objetos de [chatarra]."
+    },
+    "gunCamera": {
+      "name": "Cámara de cañón",
+      "desc": "Registra cada nodo por el que pasas: las armas obtienen +2 tras 6 nodos y +4 tras 14."
+    },
+    "autoloader": {
+      "name": "Matriz de autocargadores",
+      "desc": "En cada batalla se añade un dado rojo de seis caras (d6) extra a tu bandeja, y cada tres casillas de arma resueltas se suma otro más para el siguiente turno."
+    },
+    "prophecyMount": {
+      "name": "Monte de la Profecía",
+      "desc": "Si se obtiene la cara máxima en el arma A, el siguiente dado gris de ese turno se establece en su cara más alta."
+    },
+    "phantomBay": {
+      "name": "Bahía Fantasma",
+      "desc": "Al final de cada turno, un d4 gris fantasma aparece en la bandeja y permanece allí durante un turno."
+    },
+    "delayLine": {
+      "name": "Línea de retardo",
+      "desc": "Si se activa un efecto «max face» en el arma B con retraso: al final del siguiente turno, recibirás 3 puntos de daño por cada objeto [spike] que tengas."
+    },
+    "nonEuclidRack": {
+      "name": "Estantería no euclidiana",
+      "desc": "Cada ranura admite un dado de cualquier nivel, con un valor de casco de 1 cada vez que se resuelve; límite de carga: −3."
     }
   },
   "engravings": {
     "sting": {
       "name": "Sting",
-      "desc": "+1 de daño en la cara máxima de las armas."
+      "desc": "+1 a la tirada máxima en las armas."
     },
     "frost": {
       "name": "Escarcha",
@@ -2845,7 +3005,7 @@
     },
     "echo": {
       "name": "Echo",
-      "desc": "Si repites el valor del último turno, se almacena 1 carga."
+      "desc": "Si repites el valor del turno anterior, se almacena 1 carga y se suma +1."
     },
     "anchor": {
       "name": "Ancla",
@@ -2857,7 +3017,7 @@
     },
     "flame": {
       "name": "Llama",
-      "desc": "Un valor máximo de «face» en las armas añade «Burn 1»."
+      "desc": "El primer dado de arma de cada turno añade 2 de quemadura."
     },
     "edge": {
       "name": "Borde",
@@ -2877,7 +3037,7 @@
     },
     "spark": {
       "name": "Chispa",
-      "desc": "Si sales un 1, acumulas 2 puntos de carga."
+      "desc": "Si se obtiene un 1 al tirar el dado, se acumula 1 punto de carga y el dado se fija en 2."
     },
     "keel": {
       "name": "Quilla",
@@ -2889,7 +3049,7 @@
     },
     "bastion": {
       "name": "Bastión",
-      "desc": "+1 en escudos."
+      "desc": "Si tienes 6 o más escudos, obtienes 2 escudos."
     },
     "hunger": {
       "name": "El hambre",
@@ -2897,11 +3057,11 @@
     },
     "ash": {
       "name": "Ash",
-      "desc": "Una cara «min» da 2 chatarra."
+      "desc": "Una cara «min» cuesta 2 chatarra y añade «Quemar 1»."
     },
     "surf": {
       "name": "Surf",
-      "desc": "+1 en el primer turno."
+      "desc": "Al encender los motores por primera vez: +3 y 2 de escudo."
     },
     "lastLight": {
       "name": "Última luz",
@@ -2909,7 +3069,7 @@
     },
     "weight": {
       "name": "Peso",
-      "desc": "Cualquier valor inferior a 3 se cuenta como 3."
+      "desc": "Cuando se coloca, cualquier valor inferior a 3 pasa a ser 3 a costa de 1 punto de casco."
     },
     "crown": {
       "name": "Corona",
@@ -2925,11 +3085,11 @@
     },
     "rime": {
       "name": "Rima",
-      "desc": "+2 de escudo cada vez que ocupe una ranura de escudo."
+      "desc": "+2 de escudo cada vez que ocupe una ranura de escudo; si tienes 8 o más de escudo, 1 más al final del turno."
     },
     "loam": {
       "name": "Tierra franca",
-      "desc": "+2 en motores."
+      "desc": "Cada vez que llena los motores, aumenta en +1, hasta un máximo de +3."
     },
     "cinder": {
       "name": "Ceniza",
@@ -2937,7 +3097,7 @@
     },
     "mint": {
       "name": "Menta",
-      "desc": "Una cara máxima da 3 chatarra."
+      "desc": "Una cara máxima da 3 chatarra; una batalla ganada da 5 más."
     },
     "wick": {
       "name": "Mecha",
@@ -2945,51 +3105,91 @@
     },
     "pin": {
       "name": "Pin",
-      "desc": "+2 en sensores."
+      "desc": "En los sensores, cualquier valor inferior a 5 se considera 5; una cara máxima almacena 2 de carga."
     },
     "drum": {
       "name": "Tambor",
-      "desc": "+2 de carga cada vez que se llene el reactor."
+      "desc": "Al llenar el reactor, se acumulan 2 de carga y se toca el tambor; a partir del tercer golpe, se obtienen 2 de carga más al final del turno."
     },
     "scale": {
       "name": "Escala",
-      "desc": "Un valor máximo de «face» en los escudos cura 1 punto de casco."
+      "desc": "Un valor máximo de «face» en los escudos cura 1 punto de casco y otorga 2 de escudo."
     },
     "beaconRune": {
       "name": "Baliza",
-      "desc": "+1 en las dos primeras rondas."
+      "desc": "Si resuelves con sensores, tu próximo dado rojo obtendrá un +3."
     },
     "rust": {
       "name": "Óxido",
-      "desc": "+2 en armas con un resultado de 8 o más."
+      "desc": "Si el número de armas es igual o superior a 8, se puede superar el límite de ranuras de un casco."
     },
     "salt": {
       "name": "Sal",
-      "desc": "Una cara máxima otorga 1 escudo."
+      "desc": "Una cara máxima otorga 2 de escudo y corroe 1 de casco."
     },
     "glimmer": {
       "name": "Destello",
-      "desc": "Si se obtiene un resultado de 2 o menos, se acumula 1 carga."
+      "desc": "Si lo colocas debajo de 3 tiendas, acumula 1 carga y te da 1 chatarra."
     },
     "sinew": {
       "name": "Tendón",
-      "desc": "Si hay 4 o más motores, se obtiene 1 escudo."
+      "desc": "Si hay 4 o más en «motores», se obtiene 1 escudo y 1 carga."
     },
     "cipher": {
       "name": "Cifrado",
-      "desc": "Si repites el valor del turno anterior, obtienes 4 chatarra."
+      "desc": "Si repites el valor del turno anterior, obtienes 4 chatarra y acumulas 1 carga."
     },
     "brand": {
       "name": "Marca",
-      "desc": "+2 a los dados rojos en las armas."
+      "desc": "+3 en armas por un dado rojo, +1 por cualquier otro."
     },
     "tidepool": {
       "name": "Charcas de marea",
-      "desc": "Una cara «min» en los escudos otorga 3 de escudo."
+      "desc": "Una cara «min» en los escudos otorga 3 de escudo; mientras la marea de interferencia sea 2 o superior, se otorgan 2 de escudo más al final del turno."
     },
     "voidmark": {
       "name": "Voidmark",
-      "desc": "Cada cara «min» del reactor almacena 3 de carga."
+      "desc": "Una cara «min» en el reactor almacena 3 de carga; mientras mantengas 8 o más de carga, también gana +2 allí."
+    },
+    "pyre": {
+      "name": "Pira",
+      "desc": "En cuanto a las armas, añade «Quema 1» y obtiene un bonificador de +2 en ese aspecto mientras tengas 2 o más objetos con la propiedad [Quema]."
+    },
+    "swarmMark": {
+      "name": "Marca del enjambre",
+      "desc": "En armas: +2 mientras tengas 3 o más objetos [Enjambre], y el daño máximo de cada cara inflige 1 punto de daño adicional por cada objeto [Enjambre] que tengas."
+    },
+    "seventhFace": {
+      "name": "Séptima cara",
+      "desc": "El dado adquiere un séptimo resultado en su cara de mayor valor: la primera cara máxima de cada turno se resuelve por segunda vez."
+    },
+    "mirrorFace": {
+      "name": "Cara de espejo",
+      "desc": "El dado obtiene un séptimo resultado en su cara de mayor valor: si obtienes la tirada máxima, tu dado de menor valor gana +3 y acumulas 1 carga."
+    },
+    "sleeve": {
+      "name": "Manga",
+      "desc": "Si tienes 2 o más objetos [Reroll], cada batalla comienza con una oportunidad extra de volver a tirar los dados."
+    },
+    "tuningFork": {
+      "name": "Diapason",
+      "desc": "+2 mientras tengas 5 o más cargas; al colocarlo, se almacena 1 carga si tienes 2 o más objetos [Carga]."
+    },
+    "tickMark": {
+      "name": "Marca de verificación",
+      "desc": "Una vez colocado en el reactor, programa 3 de carga y 2 de protección para el siguiente turno."
+    },
+    "ledgerMark": {
+      "name": "Marca de contabilidad",
+      "desc": "En «Sensores», cuesta 2 de chatarra y otorga +3 en esa categoría mientras tengas 2 o más objetos [Chatarra]."
+    },
+    "glacis": {
+      "name": "Glacis",
+      "desc": "+3 a la defensa mientras tengas 2 o más objetos [Muro de escudos]; si tienes 6 o más escudos, recupera 1 punto de casco al final del turno."
+    },
+    "lifeline": {
+      "name": "Línea de vida",
+      "desc": "En el taller de reparaciones, restaura 2 puntos de casco y otorga 2 puntos de escudo."
     }
   },
   "fate": {

@@ -14,7 +14,7 @@ import { restoreActionLog } from "@/game/run/actionLog";
 import { useAppStore } from "@/stores/appStore";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 4;
+export const RUN_SNAPSHOT_V = 5;
 
 export interface RunSnapshotV1 {
   v: number;
@@ -43,6 +43,10 @@ const pickRunValues = (s: RunState): RunValues => ({
   deck: s.deck.map((d) => ({ ...d })),
   perks: [...s.perks],
   modules: [...s.modules],
+  banishedPerks: [...s.banishedPerks],
+  draftsSinceRare: s.draftsSinceRare,
+  draftRerollUsed: s.draftRerollUsed,
+  banishUsed: s.banishUsed,
   chartPicks: [...s.chartPicks],
   mkLevels: { ...s.mkLevels },
   tide: s.tide,
@@ -93,6 +97,12 @@ const pickRunValues = (s: RunState): RunValues => ({
             : {}),
           ...(s.pendingRewards.packageScrap !== undefined
             ? { packageScrap: s.pendingRewards.packageScrap }
+            : {}),
+          ...(s.pendingRewards.draftNodeId !== undefined
+            ? { draftNodeId: s.pendingRewards.draftNodeId }
+            : {}),
+          ...(s.pendingRewards.draftFloor !== undefined
+            ? { draftFloor: s.pendingRewards.draftFloor }
             : {}),
         },
   shop:

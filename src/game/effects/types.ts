@@ -103,6 +103,7 @@ export type Cond =
   | { c: "not"; of: Cond }
   | { c: "school"; is: School; exact?: boolean }
   | { c: "slot"; is: SlotMatch }
+  | { c: "slotMk"; slot: SlotId; n: 1 | 2 | 3 }
   | { c: "valueGte"; n: number }
   | { c: "valueLt"; n: number }
   | { c: "isMaxFace" }
@@ -201,6 +202,7 @@ const COND_NAME_SET: Record<Cond["c"], true> = {
   not: true,
   school: true,
   slot: true,
+  slotMk: true,
   valueGte: true,
   valueLt: true,
   isMaxFace: true,

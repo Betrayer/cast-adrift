@@ -56,12 +56,15 @@ import {
   buildEncounterIds,
   sectorHpPct,
 } from "../src/game/run/encounter";
-import { rollPerkChoices } from "../src/game/run/perkDraft";
+import {
+  rollPerkChoices,
+  type DraftContext,
+} from "../src/game/run/perkDraft";
 import { computePerkMods } from "../src/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
 import { ascensionMods } from "../src/data/ascension";
 import { moduleSlots } from "../src/data/modules";
-import { ALL_PERKS } from "../src/data/perks";
+import { ALL_PERKS, PERK_BY_ID } from "../src/data/perks";
 import { rollModule } from "../src/game/economy/rewards";
 import { generateShopModules } from "../src/game/economy/shop";
 import { shipHullMax } from "../src/game/battle/setup";
@@ -291,7 +294,30 @@ interface RunState {
   kills: number;
   nodes: number;
   pockets: number;
+  draftsSinceRare: number;
 }
+
+const simDraftContext = (
+  state: RunState,
+  sector: number,
+): DraftContext => ({
+  owned: state.perks,
+  banished: [],
+  sector,
+  deckDefIds: state.deck,
+  modules: state.modules,
+  shipId: "wanderer",
+  draftsSinceRare: state.draftsSinceRare,
+});
+
+const noteSimDraft = (state: RunState, choices: readonly string[]): void => {
+  if (choices.length === 0) return;
+  state.draftsSinceRare = choices.some(
+    (id) => PERK_BY_ID.get(id)?.rarity === "rare",
+  )
+    ? 0
+    : state.draftsSinceRare + 1;
+};
 
 const spend = (state: RunState, cost: number): boolean => {
   if (cost < 0 || state.scrap < cost) return false;
@@ -606,6 +632,7 @@ const runSector = (seed: number): SectorResult => {
     kills: 0,
     nodes: 0,
     pockets: 0,
+    draftsSinceRare: 0,
   };
 
   let position = START_NODE_ID;
@@ -682,7 +709,8 @@ const runSector = (seed: number): SectorResult => {
         else gain(state, sellValue(ptsForDie(reward.dieDrop)));
       }
       if (isDraftNode(type)) {
-        const choices = rollPerkChoices(loot, state.perks);
+        const choices = rollPerkChoices(loot, simDraftContext(state, 1));
+        noteSimDraft(state, choices);
         const pick = choices[0];
         if (pick !== undefined) {
           state.perks.push(pick);
@@ -797,7 +825,8 @@ const driftSector = (
         else gain(state, sellValue(ptsForDie(reward.dieDrop)));
       }
       if (isDraftNode(type)) {
-        const choices = rollPerkChoices(loot, state.perks);
+        const choices = rollPerkChoices(loot, simDraftContext(state, sector));
+        noteSimDraft(state, choices);
         const pick = choices[0];
         if (pick !== undefined) {
           state.perks.push(pick);
@@ -865,6 +894,7 @@ const runDrift = (seed: number, mid: boolean): DriftResult => {
     kills: 0,
     nodes: 0,
     pockets: 0,
+    draftsSinceRare: 0,
   };
 
   let sectorIndex = 1;
@@ -1366,6 +1396,7 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
     kills: 0,
     nodes: 0,
     pockets: 0,
+    draftsSinceRare: 0,
   };
 
   let position = START_NODE_ID;
@@ -1453,7 +1484,12 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
         if (state.modules.length < moduleSlots(0)) state.modules.push(moduleId);
       }
       if (isDraftNode(type) && opts.forcedPerk === undefined) {
-        const pick = rollPerkChoices(loot, state.perks)[0];
+        const draftChoices = rollPerkChoices(
+          loot,
+          simDraftContext(state, opts.sector),
+        );
+        noteSimDraft(state, draftChoices);
+        const pick = draftChoices[0];
         if (pick !== undefined) {
           state.perks.push(pick);
           const picked = computePerkMods([pick]);

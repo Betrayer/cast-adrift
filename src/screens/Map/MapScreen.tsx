@@ -27,6 +27,7 @@ import {
 import { nodeRisk } from "@/game/map/risk";
 import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
+import { BuildSheet } from "@/screens/Build/BuildSheet";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useAppStore } from "@/stores/appStore";
@@ -218,6 +219,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const positionRow = posNode?.row ?? 0;
 
   const [selected, setSelected] = useState<NodeId | null>(null);
+  const [buildOpen, setBuildOpen] = useState(false);
   const [jumping, setJumping] = useState(false);
   const [marker, setMarker] = useState(() => ({
     x: posNode ? geo.nodeX(posNode) : geo.centerX,
@@ -369,6 +371,16 @@ const MapView = ({ map, position }: MapViewProps) => {
         </Text>
       </div>
       <div className={styles.headChips}>
+        <Button
+          size="compact-xs"
+          variant="default"
+          data-open-build
+          onClick={() => {
+            setBuildOpen(true);
+          }}
+        >
+          {t("run:build.open")}
+        </Button>
         <span
           className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
         >
@@ -445,6 +457,15 @@ const MapView = ({ map, position }: MapViewProps) => {
       footer={footer}
       bodyRef={scrollRef}
       innerClassName={styles.body}
+      overlay={
+        buildOpen ? (
+          <BuildSheet
+            onClose={() => {
+              setBuildOpen(false);
+            }}
+          />
+        ) : null
+      }
     >
       <div>
         <svg

@@ -99,6 +99,10 @@ export class BattleCtx implements EffectCtx {
     return this.scope?.slotId ?? this.payload.slot;
   }
 
+  slotMk(slot: SlotId): number {
+    return this.snapshot.slots[slot]?.mk ?? 0;
+  }
+
   subject(): RolledDie | null {
     return this.scope?.die ?? this.subjectDie ?? this.payload.die ?? null;
   }
