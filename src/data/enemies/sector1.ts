@@ -1,34 +1,53 @@
+import { enemy } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
+// Sector 1 is the teaching floor: every anti-mechanic the run will lean on later
+// shows up here once, cheap and alone. It is also the only pool allowed to carry
+// pure two-step loops (R6 DoD), because a metronome is what a tutorial needs.
 export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
-  {
+  enemy({
     id: "scavDrone",
-    name: "content:enemies.scavDrone",
     hp: 10,
     role: "swarm",
+    claims: [{ k: "intent", t: "multi" }],
     pattern: [
       { t: "multi", n: 3, k: 3 },
       { t: "attack", n: 4 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "raider",
-    name: "content:enemies.raider",
     hp: 32,
     role: "bruiser",
+    claims: [
+      { k: "intent", t: "multi" },
+      { k: "trait", is: "conditional" },
+    ],
     pattern: [
       { t: "multi", n: 5, k: 4 },
+      {
+        when: { c: "selfHpPctLt", n: 40 },
+        then: { t: "multi", n: 5, k: 4 },
+        else: { t: "shield", n: 6 },
+      },
       { t: "multi", n: 5, k: 3 },
-      { t: "shield", n: 6 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "shieldWarden",
-    name: "content:enemies.shieldWarden",
     hp: 26,
     role: "anchor",
+    claims: [
+      { k: "intent", t: "siphonShield" },
+      { k: "trait", is: "conditional" },
+      { k: "trait", is: "pick" },
+    ],
     pattern: [
-      { t: "shieldAll", n: 6 },
+      {
+        when: { c: "playerShielded" },
+        then: { t: "siphonShield", n: 5 },
+        else: { t: "shieldAll", n: 6 },
+      },
       {
         pick: [
           [{ t: "multi", n: 4, k: 4 }, 3],
@@ -36,94 +55,89 @@ export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "mine",
-    name: "content:enemies.mine",
-    hp: 2,
-    role: "swarm",
-    env: true,
-    pattern: [{ t: "attack", n: 1 }],
-  },
-  {
+  }),
+  enemy({
     id: "jammerCorvette",
-    name: "content:enemies.jammerCorvette",
     hp: 24,
     role: "harrier",
+    claims: [
+      { k: "intent", t: "jamSlot" },
+      { k: "trait", is: "conditional" },
+    ],
     pattern: [
-      { t: "jamSlot" },
+      {
+        when: { c: "turnGte", n: 4 },
+        then: { t: "jamSlot", k: 2 },
+        else: { t: "jamSlot" },
+      },
       { t: "multi", n: 4, k: 4 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "leechSkiff",
-    name: "content:enemies.leechSkiff",
     hp: 22,
     role: "harrier",
+    claims: [{ k: "intent", t: "lockDie" }],
     pattern: [
-      { t: "lockDie" },
+      { t: "lockDie", target: "highest" },
       { t: "multi", n: 4, k: 3 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "choirZealot",
-    name: "content:enemies.choirZealot",
     hp: 22,
     role: "support",
+    claims: [{ k: "intent", t: "charge" }],
     pattern: [
       { t: "charge" },
       { t: "multi", n: 3, k: 3 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "riftWasp",
-    name: "content:enemies.riftWasp",
     hp: 18,
     role: "harrier",
+    claims: [
+      { k: "onDeath", t: "blockSlot" },
+      { k: "intent", t: "multi" },
+    ],
     onDeath: { t: "blockSlot", slot: "weaponA" },
     pattern: [{ t: "multi", n: 3, k: 4 }],
-  },
-  {
-    id: "bountyHuntress",
-    name: "content:enemies.bountyHuntress",
-    hp: 34,
+  }),
+  enemy({
+    id: "anchorHulk",
+    hp: 28,
+    role: "anchor",
+    claims: [{ k: "intent", t: "shieldGate" }],
+    pattern: [
+      { t: "shieldGate", n: 5 },
+      { t: "attack", n: 7 },
+      { t: "multi", n: 4, k: 2 },
+    ],
+  }),
+  enemy({
+    id: "tetherDrone",
+    hp: 16,
     role: "harrier",
-    elite: true,
+    claims: [{ k: "intent", t: "curseDie" }],
     pattern: [
-      { t: "multi", n: 5, k: 3 },
-      { t: "lockDie" },
-      { t: "multi", n: 6, k: 2 },
+      { t: "curseDie", n: 2 },
+      { t: "multi", n: 3, k: 3 },
     ],
-  },
-  {
-    id: "raiderAlpha",
-    name: "content:enemies.raiderAlpha",
-    hp: 30,
-    role: "bruiser",
-    elite: true,
-    subsystems: [
-      {
-        id: "turret",
-        name: "content:enemies.raiderAlpha-turret",
-        hp: 10,
-        aura: "atk+2",
-      },
+  }),
+  enemy({
+    id: "salvageWarden",
+    hp: 24,
+    role: "support",
+    claims: [
+      { k: "onDeath", t: "healAllies" },
+      { k: "intent", t: "healAllies" },
     ],
+    onDeath: { t: "healAllies", n: 5 },
     pattern: [
-      { t: "multi", n: 4, k: 4 },
-      {
-        pick: [
-          [{ t: "multi", n: 4, k: 3 }, 2],
-          [{ t: "shield", n: 6 }, 1],
-        ],
-      },
-      {
-        pick: [
-          [{ t: "multi", n: 4, k: 4 }, 1],
-          [{ t: "multi", n: 3, k: 4 }, 1],
-        ],
-      },
+      { t: "shieldAll", n: 5 },
+      { t: "healAllies", n: 4 },
+      { t: "attack", n: 6 },
     ],
-  },
+  }),
 ];
-

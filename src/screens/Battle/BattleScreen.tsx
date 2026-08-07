@@ -49,6 +49,7 @@ import { FateInvocation } from '@/screens/Battle/FateInvocation';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
 import { BuildSheet } from '@/screens/Build/BuildSheet';
 import bossStyles from './BossIntro.module.css';
+import type { EnemyState } from '@/types/battle';
 import type { Intent } from '@/types/content';
 import styles from './BattleScreen.module.css';
 
@@ -96,14 +97,43 @@ const intentLabel = (t: TFunction<['battle', 'content']>, intent: Intent): strin
       return t('battle:intent.swapValues');
     case 'storm':
       return t('battle:intent.storm');
+    case 'curseDie':
+      return t('battle:intent.curseDie', { n: intent.n });
+    case 'shieldGate':
+      return t('battle:intent.shieldGate', { n: intent.n });
+    case 'mirrorSchool':
+      return t('battle:intent.mirrorSchool');
+    case 'drainCharge':
+      return t('battle:intent.drainCharge', { n: intent.n });
+    case 'siphonShield':
+      return t('battle:intent.siphonShield', { n: intent.n });
+    case 'bargain':
+      return t('battle:intent.bargain', { n: intent.n, heal: intent.heal });
+    case 'enrage':
+      return t('battle:intent.enrage', { n: intent.n });
+    case 'hijack':
+      return t('battle:intent.hijack');
   }
 };
 
+const ATTACK_INTENTS: ReadonlySet<Intent['t']> = new Set([
+  'attack',
+  'multi',
+  'mirrorHalf',
+  'mirrorSchool',
+  'enrage',
+]);
+
+const SHIELD_INTENTS: ReadonlySet<Intent['t']> = new Set([
+  'shield',
+  'shieldAll',
+  'shieldGate',
+  'siphonShield',
+]);
+
 const intentPillClass = (intent: Intent): string => {
-  if (intent.t === 'attack' || intent.t === 'multi')
-    return styles.intentAttack ?? '';
-  if (intent.t === 'shield' || intent.t === 'shieldAll')
-    return styles.intentShield ?? '';
+  if (ATTACK_INTENTS.has(intent.t)) return styles.intentAttack ?? '';
+  if (SHIELD_INTENTS.has(intent.t)) return styles.intentShield ?? '';
   return styles.intentUtility ?? '';
 };
 
@@ -218,6 +248,49 @@ const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
 
 const COMPACT_ENEMY_COUNT = 3;
 
+// The three enemy states the player has to read before placing a die: a warded
+// school, a damage gate and a stacked rage. All three are set by R6 signatures
+// and none of them are legible from the intent pill alone.
+const EnemyTraitChips = ({ enemy }: { enemy: EnemyState }) => {
+  const { t } = useTranslation(['battle']);
+  const chips: { key: string; label: string; color: string }[] = [];
+  if (enemy.ward !== undefined) {
+    chips.push({
+      key: 'ward',
+      label: t('battle:enemyWard', { school: t(`battle:school.${enemy.ward}`) }),
+      color: schools[enemy.ward].text,
+    });
+  }
+  if ((enemy.gate ?? 0) > 0) {
+    chips.push({
+      key: 'gate',
+      label: t('battle:enemyGate', { n: enemy.gate }),
+      color: schools.blue.text,
+    });
+  }
+  if ((enemy.rage ?? 0) > 0) {
+    chips.push({
+      key: 'rage',
+      label: t('battle:enemyRage', { n: enemy.rage }),
+      color: schools.red.text,
+    });
+  }
+  if (chips.length === 0) return null;
+  return (
+    <div className={styles.enemyTraitRow} data-enemy-traits={enemy.id}>
+      {chips.map((chip) => (
+        <span
+          key={chip.key}
+          className={styles.enemyTraitChip}
+          style={{ color: chip.color, borderColor: chip.color }}
+        >
+          {chip.label}
+        </span>
+      ))}
+    </div>
+  );
+};
+
 const EnemyChips = () => {
   const { t } = useTranslation(['battle', 'content']);
   const enemies = useBattleStore((s) => s.enemies);
@@ -265,6 +338,7 @@ const EnemyChips = () => {
                 ? ` · ${t('battle:shield', { n: enemy.shield })}`
                 : ''}
             </Text>
+            {enemy.hp > 0 ? <EnemyTraitChips enemy={enemy} /> : null}
             {enemy.hp > 0 ? (
               <span
                 key={intentLabel(t, intent)}
@@ -741,6 +815,7 @@ export const BattleScreen = () => {
         reserveTitle: t('battle:reserve'),
         statusGlyph: (key) => t(`battle:status.${key}`),
         jamLabel: t('battle:jam'),
+        beatGlyph: (kind) => t(`battle:beat.${kind}`),
       }),
     [t],
   );

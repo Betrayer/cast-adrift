@@ -110,6 +110,14 @@ const NO_INTEGER_PREIMAGE: readonly string[] = [
   "coreHeart",
 ];
 
+// Defs whose HP was deliberately re-authored after the R3 rebase. The rebase
+// evidence below is about the ladder, not about balance being frozen: a def that
+// has since been retuned no longer has a legacy pre-image to match, and saying so
+// here is what keeps the rest of the table honest.
+const RETUNED_SINCE_REBASE: Readonly<Record<string, string>> = {
+  leechQueen: "R6 raised the gate-fight floor: 44 → 50",
+};
+
 const LEGACY_CURVE_PCT: Readonly<Record<number, number>> = {
   1: 0,
   2: 15,
@@ -140,14 +148,23 @@ const legacyHp = (id: string, tide: number, ascension: number) =>
 describe("enemy scaling", () => {
   it("rebases every def losslessly against the ladder its old number was baked on", () => {
     for (const [id, legacy] of Object.entries(LEGACY_EFFECTIVE_HP)) {
+      if (RETUNED_SINCE_REBASE[id] !== undefined) continue;
       const hp = legacyHp(id, 0, 0);
       const slack = NO_INTEGER_PREIMAGE.includes(id) ? 1 : 0;
       expect(Math.abs(hp - legacy), `${id} rebase`).toBeLessThanOrEqual(slack);
     }
   });
 
+  it("names every def that was retuned away from its rebase number", () => {
+    for (const [id, why] of Object.entries(RETUNED_SINCE_REBASE)) {
+      expect(LEGACY_EFFECTIVE_HP[id], `${id} was never rebased`).toBeGreaterThan(0);
+      expect(legacyHp(id, 0, 0), `${id}: ${why}`).not.toBe(LEGACY_EFFECTIVE_HP[id]);
+    }
+  });
+
   it("never drifts more than 2 HP from the pre-rebase curve at any tide or ascension", () => {
     for (const [id, legacy] of Object.entries(LEGACY_EFFECTIVE_HP)) {
+      if (RETUNED_SINCE_REBASE[id] !== undefined) continue;
       for (const tide of [0, 1, 2, 3, 4, 5]) {
         for (const ascension of [0, 15, 30]) {
           const before = Math.max(
@@ -176,9 +193,23 @@ describe("enemy scaling", () => {
     }
   });
 
-  it("covers every enemy def in the legacy table", () => {
-    for (const def of ALL_ENEMIES) {
-      expect(LEGACY_EFFECTIVE_HP[def.id], `${def.id} missing`).toBeGreaterThan(0);
+  // The table is R3's rebase evidence: it holds the defs whose HP number was
+  // baked on the old per-sector ladder. R6's roster was authored directly on the
+  // rebased curve and has no legacy pre-image, so the invariant is that no
+  // rebased def has silently left the roster — not that every def is in here.
+  it("keeps every rebased def in the roster", () => {
+    const ids = new Set(ALL_ENEMIES.map((def) => def.id));
+    for (const id of Object.keys(LEGACY_EFFECTIVE_HP)) {
+      expect(ids.has(id), `${id} left the roster`).toBe(true);
+    }
+  });
+
+  it("authors post-rebase defs without a legacy number", () => {
+    const rebased = new Set(Object.keys(LEGACY_EFFECTIVE_HP));
+    const fresh = ALL_ENEMIES.filter((def) => !rebased.has(def.id));
+    expect(fresh.length).toBeGreaterThan(0);
+    for (const def of fresh) {
+      expect(LEGACY_HOME_SECTOR[def.id], `${def.id} legacy home`).toBeUndefined();
     }
   });
 

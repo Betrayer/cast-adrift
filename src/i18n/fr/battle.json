@@ -63,7 +63,15 @@
     "capShrink": "Réduit la taille d'un capuchon d'emplacement",
     "twistDie": "Fait tourner l'un de vos dés",
     "swapValues": "Inverse vos valeurs maximales et minimales",
-    "storm": "Tempête de probabilités"
+    "storm": "Tempête de probabilités",
+    "curseDie": "« Curses a die » − {{n}}",
+    "shieldGate": "Affiche une fenêtre contextuelle «{{n}} »",
+    "mirrorSchool": "Reflète votre recensement",
+    "drainCharge": "Frais de «{{n}} » des canalisations",
+    "siphonShield": "Bouclier «{{n}} » de Siphons",
+    "bargain": "{{n}} de factures : votre ferraille ou votre coque",
+    "enrage": "Enrages + {{n}}",
+    "hijack": "Il s'empare de ton meilleur dé"
   },
   "slot": {
     "weaponA": "Arme A",
@@ -90,5 +98,18 @@
   "swap": "Échange",
   "swapPick": "Choisis un dé…",
   "bank": "Face de la banque",
-  "split": "Split"
+  "split": "Split",
+  "beat": {
+    "curse": "MALÉDICTION",
+    "gate": "GATE",
+    "drain": "VIDANGE",
+    "siphon": "SIPHON",
+    "bargain": "OFFRE",
+    "enrage": "RAGE",
+    "hijack": "DÉTOURNEMENT",
+    "ward": "WARD"
+  },
+  "enemyWard": "Circonscription : {{school}}",
+  "enemyGate": "{{n}} de l'entrée",
+  "enemyRage": "Rage + {{n}}"
 }

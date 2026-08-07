@@ -62,6 +62,7 @@ import type {
   BattleSnapshot,
   Beat,
   BlockedSlot,
+  CursedDie,
   EnemyBeat,
   EnemyState,
   EngineTier,
@@ -88,6 +89,7 @@ export interface BattleEncounter {
   runCounters?: Readonly<Record<string, number>>;
   hull?: number;
   hullMax?: number;
+  runScrap?: number;
   chargeCap?: number;
   startCharge?: number;
   rerollSizeBonus?: number;
@@ -112,6 +114,7 @@ export interface BattleValues {
   shieldPersist: number;
   charge: number;
   scrap: number;
+  runScrap: number;
   tide: number;
   sectorHpPct: number;
   enemyHpPct: number;
@@ -152,6 +155,8 @@ export interface BattleValues {
   blockedSlots: BlockedSlot[];
   shrunkSlots: BlockedSlot[];
   lockedDice: LockedDie[];
+  cursedDice: CursedDie[];
+  pendingHijack: number;
   resonance: ResonanceCensus;
   survivedLethal: boolean;
   lastPlayerDamage: number;
@@ -232,6 +237,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   shieldPersist: 0,
   charge: 0,
   scrap: 0,
+  runScrap: 0,
   tide: 0,
   interference: 0,
   perks: [],
@@ -271,6 +277,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   blockedSlots: [],
   shrunkSlots: [],
   lockedDice: [],
+  cursedDice: [],
+  pendingHijack: 0,
   resonance: computeCensus([]),
   survivedLethal: false,
   lastPlayerDamage: 0,
@@ -315,6 +323,7 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   shieldPersist: s.shieldPersist,
   charge: s.charge,
   scrap: s.scrap,
+  runScrap: s.runScrap,
   tide: s.tide,
   interference: s.interference,
   perks: s.perks,
@@ -344,6 +353,8 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
+  cursedDice: s.cursedDice,
+  pendingHijack: s.pendingHijack,
   resonance: s.resonance,
   survivedLethal: s.survivedLethal,
   lastPlayerDamage: s.lastPlayerDamage,
@@ -367,6 +378,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   shieldPersist: snap.shieldPersist,
   charge: snap.charge,
   scrap: snap.scrap,
+  runScrap: snap.runScrap,
   tide: snap.tide,
   interference: snap.interference,
   perks: snap.perks,
@@ -395,6 +407,8 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   blockedSlots: snap.blockedSlots,
   shrunkSlots: snap.shrunkSlots,
   lockedDice: snap.lockedDice,
+  cursedDice: snap.cursedDice ?? [],
+  pendingHijack: snap.pendingHijack ?? 0,
   resonance: snap.resonance,
   survivedLethal: snap.survivedLethal,
   lastPlayerDamage: snap.lastPlayerDamage,
@@ -542,6 +556,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         runCounters: encounter.runCounters,
         hull: encounter.hull,
         hullMax: encounter.hullMax,
+        runScrap: encounter.runScrap,
         chargeCap: encounter.chargeCap,
         ascension: encounter.ascension,
         sectorHpPct: encounter.sectorHpPct,
@@ -653,6 +668,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set((s) => {
       if (s.phase !== "placement") return s;
       const die = s.dice.find((d) => d.uid === uid);
+      // A hijacked die is welded into the slot the Trawler picked.
+      if (die?.pinned === true) return s;
       if (die?.state !== "placed" || die.slot === undefined) return s;
       const slot = s.slots[die.slot];
       if (slot === undefined) return s;
@@ -996,6 +1013,11 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
           die !== undefined && dieHasGrant(s.engravings, die.defId, "freeReroll")
         );
       });
+      // «Кассир» bills the reroll itself: whatever the tray gains, it gains a
+      // charge, so the answer to it is planning rather than spending.
+      const taxed = s.enemies.some(
+        (e) => e.hp > 0 && ENEMY_BY_ID.get(e.defId)?.feedsOnReroll === true,
+      );
       return {
         dice: s.dice.map((d) => {
           if (!s.rerollSelection.includes(d.uid) || d.state !== "tray")
@@ -1004,6 +1026,13 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
           if (blueFloor && d.school === "blue") value = Math.max(value, 2);
           return { ...d, value };
         }),
+        enemies: taxed
+          ? s.enemies.map((e) =>
+              e.hp > 0 && ENEMY_BY_ID.get(e.defId)?.feedsOnReroll === true
+                ? { ...e, statuses: { ...e.statuses, charge: 1 } }
+                : e,
+            )
+          : s.enemies,
         rerollsLeft: free ? s.rerollsLeft : s.rerollsLeft - 1,
         rerollsUsed: s.rerollsUsed + 1,
         rerollMode: false,
@@ -1147,6 +1176,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   shieldPersist: s.shieldPersist,
   charge: s.charge,
   scrap: s.scrap,
+  runScrap: s.runScrap,
   tide: s.tide,
   interference: s.interference,
   perks: s.perks,
@@ -1184,6 +1214,8 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
+  cursedDice: s.cursedDice,
+  pendingHijack: s.pendingHijack,
   resonance: s.resonance,
   survivedLethal: s.survivedLethal,
   lastPlayerDamage: s.lastPlayerDamage,

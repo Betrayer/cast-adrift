@@ -63,7 +63,15 @@
     "capShrink": "Reduce el tamaño de la tapa de una ranura",
     "twistDie": "Gira uno de tus dados",
     "swapValues": "Intercambia tus valores máximo y mínimo",
-    "storm": "Tormenta de probabilidades"
+    "storm": "Tormenta de probabilidades",
+    "curseDie": "Maldiciones y dados −{{n}}",
+    "shieldGate": "Abre una puerta {{n}}",
+    "mirrorSchool": "Refleja tu censo",
+    "drainCharge": "Agota la recarg{{n}}",
+    "siphonShield": "Sifones: escudo «{{n}}»",
+    "bargain": "{{n}} de los Bills: o te vas, o te quedas",
+    "enrage": "Enrages + {{n}}",
+    "hijack": "Te quita tu mejor dado"
   },
   "slot": {
     "weaponA": "Arma A",
@@ -90,5 +98,18 @@
   "swap": "Intercambio",
   "swapPick": "Elige un dado…",
   "bank": "Cara del banco",
-  "split": "Split"
+  "split": "Split",
+  "beat": {
+    "curse": "MALDICIÓN",
+    "gate": "GATE",
+    "drain": "DESAGÜE",
+    "siphon": "SIFÓN",
+    "bargain": "OFERTA",
+    "enrage": "RAGE",
+    "hijack": "SECUESTRO",
+    "ward": "WARD"
+  },
+  "enemyWard": "Distrito: {{school}}",
+  "enemyGate": "Puerta {{n}}",
+  "enemyRage": "Rage y{{n}}"
 }

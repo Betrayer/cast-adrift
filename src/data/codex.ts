@@ -8,6 +8,7 @@ export interface CodexEntry {
   group: CodexGroup;
   title: LocKey;
   body: LocKey;
+  signature?: LocKey;
 }
 
 export const CODEX_GROUP_ORDER: readonly CodexGroup[] = [
@@ -38,15 +39,17 @@ const MEMORY_ENTRIES: readonly CodexEntry[] = [
   memory("memory-12-silent"),
 ];
 
-// One dossier per roster entry (DESIGN §2.1, 54 of them): the title is the
-// enemy's own name and the body is its hand-written flavour line. The stat block
-// is rendered from the EnemyDef at read time, so no numbers live in the string.
+// One dossier per roster entry (DESIGN §6.4): the title is the enemy's own name,
+// the signature is its mechanically true line — lint cross-checks it against the
+// def's claims — and the body is the hand-written flavour. The stat block is
+// rendered from the EnemyDef at read time, so no numbers live in the strings.
 export const dossierId = (enemyId: string): string => `dossier-${enemyId}`;
 
 const DOSSIER_ENTRIES: readonly CodexEntry[] = ALL_ENEMIES.map((enemy) => ({
   id: dossierId(enemy.id),
   group: "dossier" as const,
   title: enemy.name,
+  signature: enemy.signature,
   body: `content:dossier.${enemy.id}`,
 }));
 

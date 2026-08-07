@@ -63,7 +63,15 @@
     "capShrink": "Verringert die Obergrenze eines Slots",
     "twistDie": "Dreht einen deiner Würfel",
     "swapValues": "Tauscht Hoch und Tief aus",
-    "storm": "Wahrscheinlichkeitssturm"
+    "storm": "Wahrscheinlichkeitssturm",
+    "curseDie": "Flüche und Würfel –{{n}}",
+    "shieldGate": "Löst ein Gate-{{n}} aus",
+    "mirrorSchool": "Spiegelt Ihre Volkszählung wider",
+    "drainCharge": "{{n}}-Gebühr",
+    "siphonShield": "Siphons „{{n}}“-Abschirmung",
+    "bargain": "{{n}} von Bills: Entsorgung oder Schiffsrumpf",
+    "enrage": "Enrages + {{n}}",
+    "hijack": "Entführt deinen besten Würfel"
   },
   "slot": {
     "weaponA": "Waffe A",
@@ -90,5 +98,18 @@
   "swap": "Tauschen",
   "swapPick": "Wähle einen Würfel aus…",
   "bank": "Bankfront",
-  "split": "Split"
+  "split": "Split",
+  "beat": {
+    "curse": "FLUCH",
+    "gate": "GATE",
+    "drain": "ABLAUF",
+    "siphon": "SIPHON",
+    "bargain": "ANGEBOT",
+    "enrage": "RAGE",
+    "hijack": "HIJACK",
+    "ward": "WARD"
+  },
+  "enemyWard": "Wahlbezirk: {{school}}",
+  "enemyGate": "Gate{{n}}",
+  "enemyRage": "Rage und{{n}}"
 }

@@ -62,6 +62,7 @@ export const harnessSnap = (
   shieldPersist: 0,
   charge: 0,
   scrap: 0,
+  runScrap: 0,
   tide: 0,
   interference: 0,
   perks: [],

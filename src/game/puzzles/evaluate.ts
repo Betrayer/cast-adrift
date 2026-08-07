@@ -154,6 +154,7 @@ const buildSnapshot = (
     shieldPersist: 0,
     charge: carry.charge,
     scrap: 0,
+  runScrap: 0,
     tide: 0,
     interference: 0,
     perks: [],

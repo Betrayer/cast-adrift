@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { STARTER_DECK } from "../src/data/decks";
 import { DIE_BY_ID } from "../src/data/dice";
 import {
+  ALL_ENEMIES,
   ENEMY_BY_ID,
   expandEncounterIds,
   isEncounterGroup,
@@ -82,6 +83,7 @@ const TURN_CAP = 30;
 interface BattleInit {
   hull?: number;
   hullMax?: number;
+  runScrap?: number;
   tide?: number;
   mkLevels?: MkLevels;
   perks?: readonly string[];
@@ -181,6 +183,7 @@ const simulateBattle = (
       modules: init.modules,
       hull: init.hull,
       hullMax: init.hullMax,
+      runScrap: init.runScrap,
       chargeCap: runChargeCap(init.perks ?? [], [], init.modules ?? []),
       sectorHpPct: init.sectorHpPct,
       enemyHpBonusPct: init.enemyHpBonusPct,
@@ -199,6 +202,13 @@ const simulateBattle = (
           ? { ...d, value: streams.dice.int(1, d.tier) }
           : d,
       );
+      // Bot fidelity for «Кассир» (R6): the store bills every confirmed reroll,
+      // so the sim has to bill it too or the elite reads as free.
+      for (const live of snapshot.enemies) {
+        if (live.hp <= 0) continue;
+        if (ENEMY_BY_ID.get(live.defId)?.feedsOnReroll !== true) continue;
+        live.statuses = { ...live.statuses, charge: 1 };
+      }
     }
     const decision = decidePlacements(snapshot);
     if (decision.targetId !== null) snapshot.targetId = decision.targetId;
@@ -1204,6 +1214,10 @@ interface GateProfile {
   mkLevels: MkLevels;
   hull: number;
   tide: number;
+  // What the same player is carrying when they arrive. R6 made this matter: a
+  // `bargain` bills the run purse, so a harness with no purse measures the
+  // broke-player worst case rather than the ordinary arrival.
+  scrap: number;
 }
 
 // A "mid deck" for each act: what a player who bought sensibly and upgraded on
@@ -1215,6 +1229,7 @@ const GATE_PROFILES: readonly GateProfile[] = [
     mkLevels: {},
     hull: 26,
     tide: 2,
+    scrap: 45,
   },
   {
     sector: 2,
@@ -1222,6 +1237,7 @@ const GATE_PROFILES: readonly GateProfile[] = [
     mkLevels: { weaponA: 2 },
     hull: 27,
     tide: 2,
+    scrap: 45,
   },
   {
     sector: 3,
@@ -1232,6 +1248,7 @@ const GATE_PROFILES: readonly GateProfile[] = [
     mkLevels: { weaponA: 2, shields: 2 },
     hull: 28,
     tide: 3,
+    scrap: 45,
   },
   {
     sector: 4,
@@ -1242,6 +1259,7 @@ const GATE_PROFILES: readonly GateProfile[] = [
     mkLevels: { weaponA: 3, shields: 2, reactor: 2 },
     hull: 29,
     tide: 3,
+    scrap: 45,
   },
   {
     sector: 5,
@@ -1252,6 +1270,7 @@ const GATE_PROFILES: readonly GateProfile[] = [
     mkLevels: { weaponA: 3, weaponB: 2, shields: 3, reactor: 2 },
     hull: 30,
     tide: 3,
+    scrap: 45,
   },
 ];
 
@@ -1276,6 +1295,7 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
             {
               hull: profile.hull,
               hullMax: profile.hull,
+              runScrap: profile.scrap,
               tide: profile.tide,
               mkLevels: profile.mkLevels,
               sectorHpPct: sectorHpPct({ sector: profile.sector }),
@@ -1705,6 +1725,175 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   }
 };
 
+// ── Roster mode (R6 Task 5) ─────────────────────────────────────────────────
+
+// The home sector a def is actually met in, so the 1v1 harness measures it
+// against the deck and the HP curve it is designed against rather than against
+// sector 1 for everybody.
+const homeSectorOf = (id: string): number => {
+  for (const def of SECTORS) {
+    const pooled =
+      def.enemyPool.some(([enemyId]) => enemyId === id) ||
+      def.elitePool.includes(id) ||
+      def.minibossPool.includes(id) ||
+      def.bossPool.includes(id) ||
+      def.pairPool.some((pair) => pair.includes(id));
+    if (pooled) return def.id;
+  }
+  return 1;
+};
+
+interface RosterRow {
+  id: string;
+  tier: string;
+  sector: number;
+  archetype: string;
+  wins: number;
+  runs: number;
+  turns: number;
+  hullLeft: number;
+}
+
+const rosterTierOf = (id: string): string => {
+  const def = ENEMY_BY_ID.get(id);
+  if (def?.boss === true) return "boss";
+  if (def?.miniboss === true) return "miniboss";
+  if (def?.elite === true) return "elite";
+  return "base";
+};
+
+// A 1v1 at full hull with a tuned deck is not the fight the player has. Each
+// tier is measured at the state it is actually met in: an ordinary battle early
+// in a sector, an elite after two, a gate fight at the row it gates, a boss at
+// the end of the sector with the tide up.
+interface RosterEntry {
+  hullPct: number;
+  tide: number;
+  scrap: number;
+}
+
+const ROSTER_ENTRY: Readonly<Record<string, RosterEntry>> = {
+  base: { hullPct: 100, tide: 0, scrap: 20 },
+  elite: { hullPct: 75, tide: 1, scrap: 30 },
+  miniboss: { hullPct: 65, tide: 2, scrap: 45 },
+  boss: { hullPct: 55, tide: 3, scrap: 60 },
+};
+
+// Solvability bands. The floor is the real gate the plan asks for — nothing may
+// be unwinnable at an on-curve deck — and the ceiling catches a fight that has
+// stopped being one.
+const ROSTER_BANDS: Readonly<Record<string, readonly [number, number]>> = {
+  base: [0.8, 1],
+  elite: [0.55, 1],
+  miniboss: [0.45, 0.99],
+  boss: [0.3, 0.98],
+};
+
+const rosterModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const rows: string[] = [
+    "id,tier,sector,archetype,runs,wins,winrate,avgTurns,avgHullLeft",
+  ];
+  const results: RosterRow[] = [];
+  let failures = 0;
+
+  for (const def of ALL_ENEMIES) {
+    if (def.env === true) continue;
+    const sector = homeSectorOf(def.id);
+    const tier = rosterTierOf(def.id);
+    const entry = ROSTER_ENTRY[tier] ?? { hullPct: 100, tide: 0, scrap: 20 };
+    const hullMax = shipHullMax("wanderer");
+    const perTier: RosterRow[] = [];
+    for (const archetype of ARCHETYPES) {
+      let wins = 0;
+      let turns = 0;
+      let hullLeft = 0;
+      for (let i = 0; i < runs; i += 1) {
+        const result = simulateBattle(
+          [def.id],
+          archetype.deck,
+          deriveSeed(seed, `roster:${def.id}:${archetype.name}:${String(i)}`),
+          {
+            mkLevels: archetype.mkLevels,
+            modules: [...archetype.modules],
+            sectorHpPct: sectorHpPct({ sector }),
+            hull: Math.round((hullMax * entry.hullPct) / 100),
+            hullMax,
+            runScrap: entry.scrap,
+            tide: entry.tide,
+          },
+        );
+        if (result.win) wins += 1;
+        turns += result.turns;
+        hullLeft += result.hullLeft;
+      }
+      const row: RosterRow = {
+        id: def.id,
+        tier,
+        sector,
+        archetype: archetype.name,
+        wins,
+        runs,
+        turns: turns / runs,
+        hullLeft: hullLeft / runs,
+      };
+      perTier.push(row);
+      results.push(row);
+      rows.push(
+        [
+          def.id,
+          tier,
+          String(sector),
+          archetype.name,
+          String(runs),
+          String(wins),
+          (wins / runs).toFixed(3),
+          (turns / runs).toFixed(2),
+          (hullLeft / runs).toFixed(1),
+        ].join(","),
+      );
+    }
+    const total = perTier.reduce((sum, r) => sum + r.wins, 0);
+    const totalRuns = perTier.reduce((sum, r) => sum + r.runs, 0);
+    const rate = total / Math.max(1, totalRuns);
+    const band = ROSTER_BANDS[tier] ?? [0, 1];
+    // The harness flies one mid-collection deck at every sector, so sector-1
+    // content reads at the ceiling by construction. The floor still applies.
+    const ceiling = sector === 1 ? 1 : band[1];
+    const ok = rate >= band[0] && rate <= ceiling;
+    if (!ok) failures += 1;
+    console.log(
+      `sim roster: ${def.id.padEnd(18)} ${tier.padEnd(8)} S${String(sector)} ${(rate * 100).toFixed(1)}% (band ${(band[0] * 100).toFixed(0)}-${(band[1] * 100).toFixed(0)}) — ${ok ? "ok" : "OUT OF BAND"}`,
+    );
+  }
+
+  console.log("\nsim roster: boss-pair fairness (±5pp inside a sector)");
+  let unfair = 0;
+  for (const def of SECTORS) {
+    const rates = def.bossPool.map((id) => {
+      const rowsFor = results.filter((r) => r.id === id);
+      const wins = rowsFor.reduce((sum, r) => sum + r.wins, 0);
+      const total = rowsFor.reduce((sum, r) => sum + r.runs, 0);
+      return { id, rate: total === 0 ? 0 : wins / total };
+    });
+    const spread =
+      Math.max(...rates.map((r) => r.rate)) - Math.min(...rates.map((r) => r.rate));
+    const ok = spread <= 0.05;
+    if (!ok) unfair += 1;
+    console.log(
+      `  S${String(def.id)} ${rates.map((r) => `${r.id} ${(r.rate * 100).toFixed(1)}%`).join(" vs ")} — spread ${(spread * 100).toFixed(1)}pp ${ok ? "ok" : "UNFAIR"}`,
+    );
+  }
+
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `roster-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(
+    `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(failures)} out of band, ${String(unfair)} unfair pair(s)`,
+  );
+};
+
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
@@ -1717,7 +1906,9 @@ const main = (): void => {
           ? "60"
           : mode === "economy"
             ? "200"
-            : "1000";
+            : mode === "roster"
+              ? "40"
+              : "1000";
   const runs = Number(getArg("runs", defaultRuns));
   const seed = Number(getArg("seed", "7"));
   if (!Number.isFinite(runs) || runs <= 0) {
@@ -1746,6 +1937,10 @@ const main = (): void => {
   }
   if (mode === "economy") {
     economyModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "roster") {
+    rosterModeMain(runs, seed, startedAt);
     return;
   }
   battleModeMain(runs, seed, startedAt);

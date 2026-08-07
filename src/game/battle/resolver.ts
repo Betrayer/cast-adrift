@@ -11,6 +11,8 @@ import { resonanceGrantActive } from "@/data/resonance";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import {
   applyObsidianPact,
+  curseOn,
+  dieFitsSlot,
   drawIntent,
   effectiveCap,
   everyTurnFor,
@@ -21,7 +23,9 @@ import {
   MAX_ENEMIES,
   patternFor,
   phaseIndexForHp,
+  rotateWard,
   spawnEnemy,
+  stepContextFor,
   type SpawnInit,
 } from "@/game/battle/setup";
 import { applyStatus, consumeStatus, tickBurn } from "@/game/battle/statuses";
@@ -180,7 +184,14 @@ const applySlotEffect = (
     if (target === undefined) return;
     applyStatus(target.statuses, "mark");
     const jam = value >= 4;
-    if (jam) applyStatus(target.statuses, "jam");
+    if (jam) {
+      applyStatus(target.statuses, "jam");
+      const targetDef = ENEMY_BY_ID.get(target.defId);
+      // «Глушитель» holds the slots shut with the same signal a jam breaks.
+      if (targetDef?.jamReleasesBlocks === true) next.blockedSlots = [];
+      // «Кантор-исполин» loses the hymn it has been stacking.
+      if (targetDef?.jamClearsRage === true) target.rage = 0;
+    }
     const deepScan = value >= 7;
     if (deepScan) next.pendingDeepScan = true;
     beats.push({
@@ -208,6 +219,7 @@ const applySlotEffect = (
       crit,
       markBonus,
       pierce,
+      die.school,
     );
     if (target.subsystem === undefined) {
       noteOverkill(sc, target.enemy, preHp, dealt);
@@ -267,6 +279,8 @@ const applySlotEffect = (
         scaleDamage(value + (mods.spinal ?? 0), damageMultPct),
         crit,
         2 + perkMods.markBonusDelta,
+        false,
+        die.school,
       );
       if (target.subsystem === undefined) {
         noteOverkill(sc, target.enemy, preHp, dealt);
@@ -516,7 +530,8 @@ const applyAttack = (
 ): { dealt: number; hullDamage: number; shieldDamage: number } => {
   const aura =
     (hasAliveAura(enemy, "atk+2") ? 2 : 0) +
-    (hasAliveAura(enemy, "atk+3") ? 3 : 0);
+    (hasAliveAura(enemy, "atk+3") ? 3 : 0) +
+    (enemy.rage ?? 0);
   const perkMods = sourceMods(next);
   // «Полевой стабилизатор» dulls the tide's combat bite without touching the
   // tide counter itself.
@@ -570,6 +585,7 @@ const applyAttack = (
 const lockRandomTrayDie = (
   next: BattleSnapshot,
   enemyStream: RngStream,
+  pick?: "highest",
 ): string | undefined => {
   // «Якорь» keeps its die out of every lock pool.
   const candidates = next.dice.filter(
@@ -579,15 +595,46 @@ const lockRandomTrayDie = (
       !dieHasGrant(next.engravings, d.defId, "lockImmune"),
   );
   if (candidates.length === 0) return undefined;
-  const die = enemyStream.pick(candidates);
+  const die =
+    pick === "highest"
+      ? candidates.reduce((best, d) => (d.value > best.value ? d : best))
+      : enemyStream.pick(candidates);
   next.lockedDice.push({ uid: die.uid, untilTurn: next.turn + 1 });
   return die.uid;
 };
 
+const curseTrayDie = (
+  next: BattleSnapshot,
+  enemyStream: RngStream,
+  n: number,
+): string | undefined => {
+  const candidates = next.dice.filter((d) => d.state === "tray");
+  if (candidates.length === 0) return undefined;
+  const die = enemyStream.pick(candidates);
+  next.cursedDice = [
+    ...(next.cursedDice ?? []),
+    { uid: die.uid, n, untilTurn: next.turn + 2 },
+  ];
+  return die.uid;
+};
+
+// A census mirror is aimed at the deck, not at the hull. At ×2 every archetype
+// deck sat on the cap and the mechanic had no gradient; at ×1 a mono build takes
+// eight and a spread build takes three, which is the read the signature promises.
+export const MIRROR_SCHOOL_MULT = 1;
+export const MIRROR_SCHOOL_CAP = 10;
+
+const largestSchoolCount = (next: BattleSnapshot): number =>
+  Math.max(0, ...Object.values(next.resonance.counts));
+
 export const stealScrap = (next: BattleSnapshot, n: number): number => {
   const fromBattle = Math.min(next.scrap, n);
   next.scrap -= fromBattle;
-  next.stolenScrap += n - fromBattle;
+  const fromRun = n - fromBattle;
+  next.stolenScrap += fromRun;
+  // The run purse is settled after the battle; mirroring the drain here keeps a
+  // second read inside the same fight honest.
+  next.runScrap = Math.max(0, next.runScrap - fromRun);
   return n;
 };
 
@@ -710,13 +757,15 @@ const resolveIntent = (
       pushBeat(ctx, enemy.id, "steal", intent.n);
       return;
     case "jamSlot": {
-      const candidates = (Object.keys(next.slots) as SlotId[]).filter(
-        (slotId) => !isSlotBlocked(next, slotId),
-      );
-      if (candidates.length === 0) return;
-      const slot = enemyStream.pick(candidates);
-      next.blockedSlots.push({ slot, untilTurn: next.turn + 1 });
-      pushBeat(ctx, enemy.id, "jamSlot", 0, { slot });
+      for (let i = 0; i < (intent.k ?? 1); i += 1) {
+        const candidates = (Object.keys(next.slots) as SlotId[]).filter(
+          (slotId) => !isSlotBlocked(next, slotId),
+        );
+        if (candidates.length === 0) return;
+        const slot = enemyStream.pick(candidates);
+        next.blockedSlots.push({ slot, untilTurn: next.turn + 1 });
+        pushBeat(ctx, enemy.id, "jamSlot", 0, { slot });
+      }
       return;
     }
     case "capShrink": {
@@ -726,11 +775,80 @@ const resolveIntent = (
       return;
     }
     case "lockDie": {
-      const uid = lockRandomTrayDie(next, enemyStream);
+      const uid = lockRandomTrayDie(next, enemyStream, intent.target);
       if (uid === undefined) return;
       pushBeat(ctx, enemy.id, "lockDie", 0, { dieUid: uid });
       return;
     }
+    case "curseDie": {
+      const uid = curseTrayDie(next, enemyStream, intent.n);
+      if (uid === undefined) return;
+      pushBeat(ctx, enemy.id, "curse", intent.n, { dieUid: uid });
+      return;
+    }
+    case "shieldGate":
+      enemy.gate = intent.n;
+      pushBeat(ctx, enemy.id, "gate", intent.n);
+      return;
+    case "mirrorSchool": {
+      const mirrored = Math.min(
+        MIRROR_SCHOOL_CAP,
+        largestSchoolCount(next) * MIRROR_SCHOOL_MULT,
+      );
+      const result = applyAttack(next, enemy, mirrored, 1, ctx.attack);
+      ctx.beats.push({
+        enemyId: enemy.id,
+        kind: "attack",
+        amount: result.dealt,
+        hullDamage: result.hullDamage,
+        shieldDamage: result.shieldDamage,
+        after: clone(next),
+      });
+      return;
+    }
+    case "drainCharge": {
+      const hoarded = next.charge >= intent.n;
+      next.charge = Math.max(0, next.charge - intent.n);
+      if (hoarded) applyStatus(enemy.statuses, "charge");
+      pushBeat(ctx, enemy.id, "drain", intent.n);
+      return;
+    }
+    case "siphonShield": {
+      const taken = Math.min(next.shield, intent.n);
+      next.shield -= taken;
+      enemy.shield += taken;
+      pushBeat(ctx, enemy.id, "siphon", taken);
+      return;
+    }
+    case "bargain": {
+      // The purse it bills is the run's, not the battle's: the answer to a
+      // bargain is what the player spent at the last shop.
+      if (next.scrap + next.runScrap >= intent.n) {
+        stealScrap(next, intent.n);
+        enemy.hp = Math.min(enemy.hpMax, enemy.hp + intent.heal);
+        pushBeat(ctx, enemy.id, "bargain", intent.heal);
+        return;
+      }
+      // The bill is the damage: refusing costs exactly what paying would have.
+      const result = applyAttack(next, enemy, intent.n, 1, ctx.attack);
+      ctx.beats.push({
+        enemyId: enemy.id,
+        kind: "attack",
+        amount: result.dealt,
+        hullDamage: result.hullDamage,
+        shieldDamage: result.shieldDamage,
+        after: clone(next),
+      });
+      return;
+    }
+    case "enrage":
+      enemy.rage = (enemy.rage ?? 0) + intent.n;
+      pushBeat(ctx, enemy.id, "enrage", enemy.rage);
+      return;
+    case "hijack":
+      next.pendingHijack = (next.pendingHijack ?? 0) + 1;
+      pushBeat(ctx, enemy.id, "hijack");
+      return;
     case "twistDie":
       next.pendingTwist += 1;
       pushBeat(ctx, enemy.id, "twist");
@@ -777,6 +895,7 @@ const syncPhases = (ctx: EnemyPhaseCtx): void => {
       ctx.enemyStream,
       target,
       ctx.next.ascension,
+      stepContextFor(ctx.next, enemy),
     );
     pushBeat(ctx, enemy.id, "phase", target);
     for (const intent of def.phases[target]?.onEnter ?? []) {
@@ -877,7 +996,12 @@ export const resolveEnemyPhase = (
       enemyStream,
       enemy.phase,
       next.ascension,
+      stepContextFor(next, enemy),
     );
+    if (def.ward === true) {
+      enemy.ward = rotateWard(enemy.ward, enemyStream);
+      pushBeat(ctx, enemy.id, "ward");
+    }
   }
 
   for (const enemy of aliveEnemies(next)) {
@@ -956,6 +1080,31 @@ export const applyPendingTwists = (
   next.pendingStorm = 0;
 };
 
+// «Тральщик» takes the best face out of the player's hands: the highest tray die
+// is dragged into a slot the Trawler picks and pinned there for the turn.
+const applyHijack = (next: BattleSnapshot, rng: RngStream): void => {
+  const pending = next.pendingHijack ?? 0;
+  next.pendingHijack = 0;
+  if (pending <= 0) return;
+  for (let i = 0; i < pending; i += 1) {
+    const tray = next.dice.filter((d) => d.state === "tray");
+    if (tray.length === 0) return;
+    const die = tray.reduce((best, d) => (d.value > best.value ? d : best));
+    const open = (Object.entries(next.slots) as [SlotId, SlotState][]).filter(
+      ([id, slot]) =>
+        slot.dieUid === undefined &&
+        !isSlotBlocked(next, id) &&
+        dieFitsSlot(next, die, slot, id),
+    );
+    if (open.length === 0) return;
+    const [chosen, slot] = rng.pick(open);
+    die.state = "placed";
+    die.slot = chosen;
+    die.pinned = true;
+    slot.dieUid = die.uid;
+  }
+};
+
 export const advanceTurn = (
   snapshot: BattleSnapshot,
   streams: RngStreams,
@@ -968,25 +1117,42 @@ export const advanceTurn = (
   next.blockedSlots = next.blockedSlots.filter((b) => b.untilTurn >= next.turn);
   next.shrunkSlots = next.shrunkSlots.filter((b) => b.untilTurn >= next.turn);
   next.lockedDice = next.lockedDice.filter((l) => l.untilTurn >= next.turn);
+  next.cursedDice = (next.cursedDice ?? []).filter(
+    (c) => c.untilTurn >= next.turn,
+  );
   next.dice = next.dice.filter(
     (die) => die.expiresTurn === undefined || die.expiresTurn >= next.turn,
   );
   next.dice = next.dice.map((die) => {
     if (isDieLocked(next, die.uid)) {
-      return { ...die, state: "locked" as const, slot: undefined, lastValue: undefined };
+      return {
+        ...die,
+        state: "locked" as const,
+        slot: undefined,
+        lastValue: undefined,
+        pinned: undefined,
+      };
     }
     if (die.state === "reserved") {
-      return { ...die, state: "tray" as const, slot: undefined, lastValue: undefined };
+      return {
+        ...die,
+        state: "tray" as const,
+        slot: undefined,
+        lastValue: undefined,
+        pinned: undefined,
+      };
     }
     const base = rollBaseValue(die.defId, die.tier, streams.dice);
     const rolled = Math.min(die.tier, Math.max(1, base + next.nextRollBonus));
     const banked = die.bankedValue;
+    const shown = banked ?? rolled + (die.growth ?? 0);
     return {
       ...die,
-      value: banked ?? rolled + (die.growth ?? 0),
+      value: Math.max(1, shown - curseOn(next, die.uid)),
       lastValue: die.value,
       state: "tray" as const,
       slot: undefined,
+      pinned: undefined,
       bankedValue: undefined,
       activeUsed: banked === undefined ? die.activeUsed : false,
     };
@@ -1013,6 +1179,7 @@ export const advanceTurn = (
     emit(rolledSources, "rolled", ctx);
   }
   ctx.subjectDie = null;
+  applyHijack(next, streams.dice);
   syncCtxFlags(next, ctx);
 
   return next;

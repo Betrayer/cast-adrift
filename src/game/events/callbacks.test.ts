@@ -58,11 +58,9 @@ describe("flag callbacks", () => {
   it("hunterMark injects the Bounty Huntress into the next elite once", () => {
     useRunStore.getState().setFlag("hunterMark");
     expect(shouldInjectBounty("elite", useRunStore.getState().flags)).toBe(true);
-    const ids = buildEncounterIds(
-      "elite",
-      createStream(2),
-      useRunStore.getState().flags,
-    );
+    const ids = buildEncounterIds("elite", createStream(2), {
+      flags: useRunStore.getState().flags,
+    });
     expect(ids).toContain("bountyHuntress");
 
     useRunStore.getState().setFlag("hunterEngaged");

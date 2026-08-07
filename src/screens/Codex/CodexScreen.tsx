@@ -58,6 +58,7 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
         justify="space-between"
         wrap="nowrap"
         style={{ cursor: "pointer" }}
+        data-codex-entry={entry.id}
         onClick={toggle}
       >
         <Text size="sm" fw={600} c={tokens.text}>
@@ -70,9 +71,16 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
         ) : null}
       </Group>
       {open ? (
-        <Text size="sm" c={tokens.dim} mt="xs">
-          {t(entry.body)}
-        </Text>
+        <Stack gap={4} mt="xs">
+          {entry.signature === undefined ? null : (
+            <Text size="sm" c={tokens.accent} data-codex-signature={entry.id}>
+              {t(entry.signature)}
+            </Text>
+          )}
+          <Text size="sm" c={tokens.dim}>
+            {t(entry.body)}
+          </Text>
+        </Stack>
       ) : null}
     </Paper>
   );

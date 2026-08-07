@@ -31,6 +31,7 @@ import type { BattleState } from "@/stores/battleStore";
 import type {
   Beat,
   EnemyBeat,
+  EnemyBeatKind,
   ResolutionBundle,
   RolledDie,
   SlotId,
@@ -43,6 +44,7 @@ export interface BattleSceneLabels {
   reserveTitle: string;
   statusGlyph: (key: StatusKey) => string;
   jamLabel: string;
+  beatGlyph: (kind: EnemyBeatKind) => string;
 }
 
 const MINI_DIE_SIZE = 40;
@@ -1091,6 +1093,17 @@ export class BattleScene {
         sprite.scale.set(this.slotDieScale());
         sprite.alpha = 1;
         sprite.visible = true;
+        // A hijacked die is welded into the slot the Trawler picked: it wears the
+        // same lock the tray uses, because the player cannot pull it back out.
+        if (die.pinned === true) {
+          this.syncLockOverlay(
+            die.uid,
+            anchor.x,
+            anchor.y,
+            this.layout.slotDieSize,
+          );
+          visibleLocks.add(die.uid);
+        }
         if (state.selectedDieUid === die.uid) {
           this.syncSelectionRing(
             die.uid,
@@ -1975,6 +1988,72 @@ export class BattleScene {
     }
     if (beat.kind === "summon") {
       playSfx("summon");
+      this.flashEnemy(beat.enemyId);
+      return;
+    }
+    // R6 signatures. R10 owns the bespoke sounds (juice backlog); until then each
+    // one borrows the nearest existing cue and gets its own readable glyph.
+    if (beat.kind === "curse" && beat.dieUid !== undefined) {
+      const anchor = this.trayAnchor(beat.dieUid, useBattleStore.getState());
+      playSfx("invalid");
+      this.fireProjectile(origin, anchor);
+      this.spawnNumber(
+        anchor.x,
+        anchor.y - 16,
+        `-${String(beat.amount)}`,
+        statusTint("burn"),
+      );
+      return;
+    }
+    if (beat.kind === "gate") {
+      playSfx("shields");
+      this.spawnNumber(
+        origin.x,
+        origin.y - this.layout.enemySize / 2,
+        this.labels.beatGlyph(beat.kind),
+        schools.blue.text,
+      );
+      return;
+    }
+    if (beat.kind === "siphon" || beat.kind === "drain") {
+      playSfx("invalid");
+      this.fireProjectile(this.layout.playerHit, origin);
+      this.spawnNumber(
+        this.layout.playerHit.x,
+        this.layout.playerHit.y,
+        `-${String(beat.amount)}`,
+        beat.kind === "siphon" ? schools.blue.text : tokens.amber,
+      );
+      return;
+    }
+    if (beat.kind === "bargain") {
+      playSfx("charge");
+      this.flashEnemy(beat.enemyId);
+      this.spawnNumber(
+        origin.x,
+        origin.y - this.layout.enemySize / 2,
+        `+${String(beat.amount)}`,
+        schools.green.text,
+      );
+      return;
+    }
+    if (beat.kind === "enrage") {
+      playSfx("charge");
+      this.flashEnemy(beat.enemyId);
+      this.spawnNumber(
+        origin.x,
+        origin.y - this.layout.enemySize / 2,
+        `${this.labels.beatGlyph(beat.kind)}${String(beat.amount)}`,
+        schools.red.text,
+      );
+      return;
+    }
+    if (beat.kind === "hijack") {
+      playSfx("place");
+      this.fireProjectile(origin, this.layout.playerHit);
+      return;
+    }
+    if (beat.kind === "ward") {
       this.flashEnemy(beat.enemyId);
     }
   }

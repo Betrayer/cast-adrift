@@ -182,6 +182,20 @@
   white-space: nowrap;
 }
 
+.enemyTraitRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+}
+
+.enemyTraitChip {
+  border-radius: 6px;
+  border: 0.75px solid;
+  padding: 0 5px;
+  font-size: 10px;
+  white-space: nowrap;
+}
+
 .intentPulse {
   animation: intent-pulse 420ms ease-out;
 }

@@ -25,6 +25,7 @@ import type {
   Intent,
   PatternStep,
   School,
+  StepCond,
 } from "@/types/content";
 
 export const TIER_LADDER: readonly DieTier[] = [4, 6, 8, 10, 12, 20, 100];
@@ -85,6 +86,7 @@ export interface BattleInit {
   runCounters?: Readonly<Record<string, number>>;
   hull?: number;
   hullMax?: number;
+  runScrap?: number;
   chargeCap?: number;
   ascension?: number;
   sectorHpPct?: number;
@@ -187,7 +189,7 @@ const heaviestAttack = (pattern: readonly PatternStep[]): PatternStep | undefine
   let best: PatternStep | undefined;
   let bestN = -1;
   for (const step of pattern) {
-    if ("pick" in step) continue;
+    if ("pick" in step || "when" in step) continue;
     const n =
       step.t === "attack" ? step.n : step.t === "multi" ? step.n * step.k : -1;
     if (n > bestN) {
@@ -196,6 +198,62 @@ const heaviestAttack = (pattern: readonly PatternStep[]): PatternStep | undefine
     }
   }
   return best;
+};
+
+// The enemy-side mirror of the R1 condition vocabulary. A conditional step is
+// read when the *next* intent is drawn — at the end of the previous enemy turn —
+// so the telegraph the player sees is the intent that will actually fire.
+export interface StepContext {
+  selfHpPct: number;
+  selfShield: number;
+  playerShield: number;
+  playerCharge: number;
+  playerHullPct: number;
+  allies: number;
+  turn: number;
+}
+
+export const NEUTRAL_STEP_CONTEXT: StepContext = {
+  selfHpPct: 100,
+  selfShield: 0,
+  playerShield: 0,
+  playerCharge: 0,
+  playerHullPct: 100,
+  allies: 1,
+  turn: 1,
+};
+
+export const stepContextFor = (
+  snapshot: Pick<BattleSnapshot, "shield" | "charge" | "hull" | "hullMax" | "turn" | "enemies">,
+  enemy: Pick<EnemyState, "hp" | "hpMax" | "shield">,
+): StepContext => ({
+  selfHpPct: enemy.hpMax > 0 ? (enemy.hp / enemy.hpMax) * 100 : 0,
+  selfShield: enemy.shield,
+  playerShield: snapshot.shield,
+  playerCharge: snapshot.charge,
+  playerHullPct:
+    snapshot.hullMax > 0 ? (snapshot.hull / snapshot.hullMax) * 100 : 0,
+  allies: snapshot.enemies.filter((e) => e.hp > 0).length,
+  turn: snapshot.turn,
+});
+
+export const stepCondHolds = (cond: StepCond, ctx: StepContext): boolean => {
+  switch (cond.c) {
+    case "selfHpPctLt":
+      return ctx.selfHpPct < cond.n;
+    case "selfShielded":
+      return ctx.selfShield > 0;
+    case "playerShielded":
+      return ctx.playerShield > 0;
+    case "playerChargeAtLeast":
+      return ctx.playerCharge >= cond.n;
+    case "playerHullPctLt":
+      return ctx.playerHullPct < cond.n;
+    case "alliesAtLeast":
+      return ctx.allies >= cond.n;
+    case "turnGte":
+      return ctx.turn >= cond.n;
+  }
 };
 
 export const patternFor = (
@@ -221,12 +279,14 @@ export const drawIntent = (
   enemyStream: RngStream,
   phase = 0,
   ascension = 0,
+  ctx: StepContext = NEUTRAL_STEP_CONTEXT,
 ): Intent => {
   const pattern = patternFor(def, phase, ascension);
   const step = pattern[intentIndex % pattern.length];
   if (step === undefined)
     throw new Error(`drawIntent: "${def.id}" empty pattern`);
   if ("pick" in step) return enemyStream.weighted(step.pick);
+  if ("when" in step) return stepCondHolds(step.when, ctx) ? step.then : step.else;
   return step;
 };
 
@@ -240,6 +300,22 @@ export interface SpawnInit {
 
 const isTough = (def: EnemyDef): boolean =>
   def.elite === true || def.miniboss === true || def.boss === true;
+
+// A warded hull keeps one school out at a time and rotates it on its own turn,
+// so the ward the player reads during placement is the one that will bite.
+export const WARD_SCHOOLS: readonly School[] = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "black",
+  "grey",
+];
+
+export const rotateWard = (current: School | undefined, stream: RngStream): School => {
+  const options = WARD_SCHOOLS.filter((school) => school !== current);
+  return stream.pick(options);
+};
 
 export const spawnEnemy = (
   defId: string,
@@ -275,6 +351,7 @@ export const spawnEnemy = (
     intentIndex: 0,
     nextIntent: drawIntent(def, 0, enemyStream, phase, ascension),
     statuses: {},
+    ...(def.ward === true ? { ward: rotateWard(undefined, enemyStream) } : {}),
     subsystems: subs.map((sub) => ({
       id: `${id}:${sub.id}`,
       key: sub.id,
@@ -339,6 +416,7 @@ export const buildBattleSnapshot = (
     shieldPersist: 0,
     charge: 0,
     scrap: 0,
+    runScrap: Math.max(0, init.runScrap ?? 0),
     tide,
     interference: Math.max(0, init.interference ?? 0),
     perks: [...(init.perks ?? [])],
@@ -370,6 +448,8 @@ export const buildBattleSnapshot = (
     blockedSlots: [],
     shrunkSlots: [],
     lockedDice: [],
+    cursedDice: [],
+    pendingHijack: 0,
     resonance,
     survivedLethal: false,
     lastPlayerDamage: 0,
@@ -427,6 +507,14 @@ export const isDieLocked = (
   snapshot.lockedDice.some(
     (l) => l.uid === uid && l.untilTurn >= snapshot.turn,
   );
+
+export const curseOn = (
+  snapshot: Pick<BattleSnapshot, "cursedDice" | "turn">,
+  uid: string,
+): number =>
+  (snapshot.cursedDice ?? [])
+    .filter((c) => c.uid === uid && c.untilTurn >= snapshot.turn)
+    .reduce((sum, c) => sum + c.n, 0);
 
 export const exceedCapGrantFor = (
   snapshot: Pick<BattleSnapshot, "exceedCap">,

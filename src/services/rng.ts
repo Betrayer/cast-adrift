@@ -123,3 +123,17 @@ export const restoreStreams = (states: StreamStates): RngStreams => {
   }
   return streams;
 };
+
+declare global {
+  interface Window {
+    __rng?: { createStreams: typeof createStreams };
+  }
+}
+
+// The same DEV-only escape hatch the stores expose, so a Playwright driver can
+// start a seeded battle instead of borrowing whatever streams happen to be live.
+// The window check comes first here, unlike in the stores: this module is also
+// imported by the node scripts, where `import.meta.env` does not exist at all.
+if (typeof window !== "undefined" && import.meta.env.DEV) {
+  window.__rng = { createStreams };
+}

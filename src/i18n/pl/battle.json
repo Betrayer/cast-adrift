@@ -63,7 +63,15 @@
     "capShrink": "Zmniejsza limit miejsca w slocie",
     "twistDie": "Obraca jedną z twoich kości",
     "swapValues": "Zamienia wartości maksymalne i minimalne",
-    "storm": "Burza prawdopodobieństw"
+    "storm": "Burza prawdopodobieństw",
+    "curseDie": "Przekleństwa i kostka –{{n}}",
+    "shieldGate": "Podnosi bramę {{n}}",
+    "mirrorSchool": "Odzwierciedla dane spisu ludności",
+    "drainCharge": "Opłata za odprowadzenie ścieków „{{n}}”",
+    "siphonShield": "Syfon „{{n}}” – tarcza",
+    "bargain": "{{n}} z Bills: albo złom, albo kadłub",
+    "enrage": "Enrages + {{n}}",
+    "hijack": "Przejmuje twoją najlepszą kostkę"
   },
   "slot": {
     "weaponA": "Broń A",
@@ -90,5 +98,18 @@
   "swap": "Zamień",
   "swapPick": "Wybierz kostkę…",
   "bank": "Fasada banku",
-  "split": "Split"
+  "split": "Split",
+  "beat": {
+    "curse": "KLĄTWA",
+    "gate": "GATE",
+    "drain": "ODPŁYW",
+    "siphon": "SIFON",
+    "bargain": "OFERTA",
+    "enrage": "RAGE",
+    "hijack": "HIJACK",
+    "ward": "WARD"
+  },
+  "enemyWard": "Okręg: {{school}}",
+  "enemyGate": "Strona główna {{n}}",
+  "enemyRage": "Rage i{{n}}"
 }

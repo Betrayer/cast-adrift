@@ -22,6 +22,7 @@
     "sim:sweep": "tsx scripts/sim.mts --mode sweep --runs 500 --seed 11",
     "sim:perks": "tsx scripts/sim.mts --mode perks --runs 200 --sector 2 --seed 5",
     "sim:economy": "tsx scripts/sim.mts --mode economy --runs 200 --seed 11",
+    "sim:roster": "tsx scripts/sim.mts --mode roster --runs 40 --seed 13",
     "lint:keys": "tsx scripts/missingKeys.mts",
     "i18n:merge": "tsx scripts/mergeI18n.mts",
     "lint:dupes": "tsx scripts/dedupeScan.mts"

@@ -32,8 +32,12 @@ import { createStream } from "../src/services/rng";
 import {
   ENCOUNTER_GROUPS,
   ALL_ENEMIES,
+  BASE_ENEMIES,
+  DRIFTER_ENEMIES,
+  SECTOR_ROSTERS,
   isEncounterGroup,
 } from "../src/data/enemies";
+import { sectorDef } from "../src/data/sectors";
 import { ALL_EVENTS } from "../src/data/events";
 import { ALL_PERKS } from "../src/data/perks";
 import { PUZZLES } from "../src/data/puzzles";
@@ -78,6 +82,14 @@ import ruMeta from "../src/i18n/ru/meta.json" with { type: "json" };
 import type { Action, Cond, EffectDef } from "../src/game/effects/types";
 import type { GoalSpec } from "../src/game/run/goals";
 import type { EventOption, Outcome } from "../src/types/events";
+import {
+  INTENT_KINDS,
+  claimKey,
+  intentsOfStep,
+  isFlatPattern,
+  specialClaimCount,
+  trueClaimsOf,
+} from "../src/types/content";
 import type { Intent, PatternStep } from "../src/types/content";
 
 type ContentNode = string | { [key: string]: ContentNode };
@@ -294,15 +306,57 @@ for (const bonus of RESONANCE_BONUSES) {
 
 const enemyIds = new Set(ALL_ENEMIES.map((e) => e.id));
 
-const flattenStep = (step: PatternStep): Intent[] =>
-  "pick" in step ? step.pick.map(([intent]) => intent) : [step];
+const flattenStep = (step: PatternStep): readonly Intent[] => intentsOfStep(step);
+
+// R6 roster gates. The budget is the silhouette rule: a base enemy reads as one
+// idea, an elite as two on top of its frame, a gate fight or a boss as three.
+const CLAIM_BUDGET: Readonly<Record<string, number>> = {
+  base: 2,
+  elite: 3,
+  miniboss: 3,
+  boss: 3,
+};
+
+const tierOf = (def: (typeof ALL_ENEMIES)[number]): string =>
+  def.boss === true
+    ? "boss"
+    : def.miniboss === true
+      ? "miniboss"
+      : def.elite === true
+        ? "elite"
+        : "base";
+
+const usedIntents = new Set<string>();
 
 for (const enemy of ALL_ENEMIES) {
   if (enemy.pattern.length === 0)
     errors.push(`enemies: "${enemy.id}" has an empty pattern`);
   if (enemy.hp <= 0) errors.push(`enemies: "${enemy.id}" hp must be positive`);
   checkLocKey(`enemies.${enemy.id}`, enemy.name);
-  for (const step of enemy.pattern) {
+  checkLocKey(`enemies.${enemy.id}`, enemy.signature);
+  if (enemy.signature !== `content:signature.${enemy.id}`)
+    errors.push(`enemies: "${enemy.id}" signature key does not match its id`);
+  if (!resolveContentKey(`content:dossier.${enemy.id}`))
+    errors.push(`enemies: "${enemy.id}" has no dossier line`);
+  if (enemy.claims.length === 0)
+    errors.push(`enemies: "${enemy.id}" states no signature claim`);
+  const trueClaims = trueClaimsOf(enemy);
+  for (const claim of enemy.claims) {
+    if (!trueClaims.has(claimKey(claim)))
+      errors.push(
+        `enemies: "${enemy.id}" claims ${claimKey(claim)}, which its def does not carry`,
+      );
+  }
+  const budget = CLAIM_BUDGET[tierOf(enemy)] ?? 2;
+  if (specialClaimCount(enemy) > budget)
+    errors.push(
+      `enemies: "${enemy.id}" declares ${String(specialClaimCount(enemy))} special claims, budget ${String(budget)}`,
+    );
+  const allSteps = [
+    ...enemy.pattern,
+    ...(enemy.phases ?? []).flatMap((phase) => [...phase.pattern]),
+  ];
+  for (const step of allSteps) {
     if ("pick" in step) {
       if (step.pick.length === 0)
         errors.push(`enemies: "${enemy.id}" has an empty weighted step`);
@@ -312,11 +366,17 @@ for (const enemy of ALL_ENEMIES) {
       }
     }
     for (const intent of flattenStep(step)) {
+      usedIntents.add(intent.t);
       if (intent.t === "summon" && !enemyIds.has(intent.id)) {
         errors.push(
           `enemies: "${enemy.id}" summons unknown enemy "${intent.id}"`,
         );
       }
+    }
+  }
+  for (const phase of enemy.phases ?? []) {
+    for (const intent of [...(phase.onEnter ?? []), ...(phase.everyTurn ?? [])]) {
+      usedIntents.add(intent.t);
     }
   }
   for (const sub of enemy.subsystems ?? []) {
@@ -326,6 +386,116 @@ for (const enemy of ALL_ENEMIES) {
       );
     checkLocKey(`enemies.${enemy.id}.${sub.id}`, sub.name);
   }
+}
+
+for (const kind of INTENT_KINDS) {
+  if (!usedIntents.has(kind))
+    errors.push(`enemies: intent "${kind}" is declared but no enemy uses it`);
+}
+
+const ROSTER_TARGET: Readonly<Record<string, number>> = {
+  base: 55,
+  elite: 14,
+  miniboss: 12,
+  boss: 10,
+};
+const rosterCount = new Map<string, number>();
+for (const enemy of ALL_ENEMIES) {
+  const tier = tierOf(enemy);
+  rosterCount.set(tier, (rosterCount.get(tier) ?? 0) + 1);
+}
+for (const [tier, want] of Object.entries(ROSTER_TARGET)) {
+  const got = rosterCount.get(tier) ?? 0;
+  if (got !== want)
+    errors.push(`enemies: ${tier} roster holds ${String(got)}, target ${String(want)}`);
+}
+
+// Sector parity: ten bespoke base enemies per sector, and the sector's own draw
+// pool has to actually contain at least eight of them.
+const BESPOKE_PER_SECTOR = 10;
+const POOL_BESPOKE_FLOOR = 8;
+SECTOR_ROSTERS.forEach((roster, index) => {
+  const sector = index + 1;
+  if (roster.length !== BESPOKE_PER_SECTOR)
+    errors.push(
+      `enemies: sector ${String(sector)} has ${String(roster.length)} bespoke base enemies, target ${String(BESPOKE_PER_SECTOR)}`,
+    );
+  const ids = new Set(roster.map((e) => e.id));
+  const inPool = sectorDef(sector).enemyPool.filter(([id]) => ids.has(id)).length;
+  if (inPool < POOL_BESPOKE_FLOOR)
+    errors.push(
+      `enemies: sector ${String(sector)} draws only ${String(inPool)} of its bespoke enemies, floor ${String(POOL_BESPOKE_FLOOR)}`,
+    );
+});
+
+// Flat patterns are a sector-1 teaching device, not a roster default.
+const flatEnemies = BASE_ENEMIES.filter(isFlatPattern);
+const FLAT_PCT_CAP = 20;
+const flatPct = (flatEnemies.length / Math.max(1, BASE_ENEMIES.length)) * 100;
+if (flatPct > FLAT_PCT_CAP)
+  errors.push(
+    `enemies: ${flatPct.toFixed(1)}% of the base roster is a flat loop, cap ${String(FLAT_PCT_CAP)}%`,
+  );
+const sector1Ids = new Set(SECTOR_ROSTERS[0]?.map((e) => e.id) ?? []);
+const drifterIds = new Set(DRIFTER_ENEMIES.map((e) => e.id));
+for (const def of flatEnemies) {
+  if (!sector1Ids.has(def.id) && !drifterIds.has(def.id))
+    errors.push(
+      `enemies: "${def.id}" is a flat loop outside sector 1 and the drifter pool`,
+    );
+}
+
+// Variety floor: a third of the base roster has to branch, by weighted pick or
+// by reading the battle state.
+const VARIED_PCT = 30;
+const variedBase = BASE_ENEMIES.filter((def) =>
+  def.pattern.some((step) => "pick" in step || "when" in step),
+).length;
+const variedPct = (variedBase / Math.max(1, BASE_ENEMIES.length)) * 100;
+if (variedPct < VARIED_PCT)
+  errors.push(
+    `enemies: ${variedPct.toFixed(1)}% of the base roster branches, target ${String(VARIED_PCT)}%`,
+  );
+
+// Rotation: every sector needs a real draw for its gate row and its boss, and
+// every def in the roster has to be reachable from some pool.
+const reachable = new Set<string>();
+for (let sector = 1; sector <= 5; sector += 1) {
+  const def = sectorDef(sector);
+  if (def.minibossPool.length < 3)
+    errors.push(
+      `sectors: sector ${String(sector)} minibossPool holds ${String(def.minibossPool.length)}, floor 3`,
+    );
+  if (def.bossPool.length !== 2)
+    errors.push(
+      `sectors: sector ${String(sector)} bossPool holds ${String(def.bossPool.length)}, target 2`,
+    );
+  for (const id of [
+    ...def.enemyPool.map(([enemyId]) => enemyId),
+    ...def.elitePool,
+    ...def.minibossPool,
+    ...def.bossPool,
+    ...def.pairPool.flat(),
+  ]) {
+    if (!enemyIds.has(id))
+      errors.push(`sectors: sector ${String(sector)} references unknown enemy "${id}"`);
+    reachable.add(id);
+  }
+}
+for (const member of Object.values(ENCOUNTER_GROUPS).flat()) reachable.add(member);
+for (const enemy of ALL_ENEMIES) {
+  for (const step of [
+    ...enemy.pattern,
+    ...(enemy.phases ?? []).flatMap((p) => [...p.pattern, ...(p.everyTurn ?? [])]),
+  ]) {
+    for (const intent of flattenStep(step)) {
+      if (intent.t === "summon") reachable.add(intent.id);
+    }
+  }
+}
+for (const enemy of ALL_ENEMIES) {
+  if (!reachable.has(enemy.id))
+    errors.push(`enemies: "${enemy.id}" is in no sector pool and nothing summons it`);
 }
 
 for (const ship of SHIPS) {
@@ -727,7 +897,7 @@ const ENGRAVING_TOTAL = 50;
 const FRAGMENT_TOTAL = 80;
 const KEEPER_TOTAL = 40;
 const DICE_TOTAL = 90;
-const DOSSIER_TOTAL = 54;
+const DOSSIER_TOTAL = 91;
 
 checkUniqueIds("modules", ALL_MODULES.map((m) => m.id));
 checkUniqueIds("engravings", ENGRAVINGS.map((e) => e.id));
@@ -1285,7 +1455,7 @@ console.log("lint:content: puzzle calibration");
 for (const row of puzzleTable(PUZZLES)) console.log(`  ${row}`);
 
 console.log(
-  `lint:content: totals — dice ${String(ALL_DICE.length)}/90 · perks ${String(ALL_PERKS.length)}/180 · modules ${String(ALL_MODULES.length)}/60 · engravings ${String(ENGRAVINGS.length)}/50 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/54 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/54 · keeper ${String(KEEPER_LINES.length)}/40`,
+  `lint:content: totals — dice ${String(ALL_DICE.length)}/90 · perks ${String(ALL_PERKS.length)}/180 · modules ${String(ALL_MODULES.length)}/60 · engravings ${String(ENGRAVINGS.length)}/50 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/91 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/91 · keeper ${String(KEEPER_LINES.length)}/40`,
 );
 
 console.log(

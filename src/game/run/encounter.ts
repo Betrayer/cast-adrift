@@ -2,7 +2,8 @@ import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies";
 import { sectorDef } from "@/data/sectors";
 import { createStream, deriveSeed, type RngStream } from "@/services/rng";
 import type { NodeType } from "@/game/map/types";
-import type { EnemyRole, Intent, PatternStep } from "@/types/content";
+import { intentsOfStep } from "@/types/content";
+import type { EnemyRole } from "@/types/content";
 import type { FlagValue } from "@/types/events";
 
 const flagSet = (flags: Record<string, FlagValue>, key: string): boolean =>
@@ -78,9 +79,6 @@ export const templatesFor = (
       roles.every((role) => poolForRole(sector, role).length > 0),
   );
 
-const intentsOf = (step: PatternStep): readonly Intent[] =>
-  "pick" in step ? step.pick.map(([intent]) => intent) : [step];
-
 export const enemyThreat = (defId: string): number => {
   const def = ENEMY_BY_ID.get(defId);
   if (def === undefined) return 0;
@@ -90,7 +88,7 @@ export const enemyThreat = (defId: string): number => {
   ];
   let worst = 0;
   for (const step of steps) {
-    for (const intent of intentsOf(step)) {
+    for (const intent of intentsOfStep(step)) {
       const n =
         intent.t === "attack"
           ? intent.n

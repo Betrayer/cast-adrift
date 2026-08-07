@@ -21,6 +21,7 @@ import type {
   RolledDie,
   SlotId,
 } from "@/types/battle";
+import { intentsOfStep } from "@/types/content";
 import type { DieTier, Intent } from "@/types/content";
 
 const enemyStream = () => createStream(1234);
@@ -67,6 +68,7 @@ const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
   shieldPersist: 0,
   charge: 0,
   scrap: 0,
+  runScrap: 0,
   tide: 0,
   interference: 0,
   perks: [],
@@ -672,8 +674,8 @@ describe("enemy phase basics", () => {
     const step = def?.pattern[1];
     const { next } = resolveEnemyPhase(snap(), enemyStream());
     expect(next.enemies[0]?.intentIndex).toBe(1);
-    if (step !== undefined && !("pick" in step)) {
-      expect(next.enemies[0]?.nextIntent).toEqual(step);
+    if (step !== undefined) {
+      expect(intentsOfStep(step)).toContainEqual(next.enemies[0]?.nextIntent);
     }
   });
 });

@@ -333,6 +333,7 @@ const runBattleInit = (nodeKey: string, pocket = false) => {
     runCounters: s.counters,
     hull: s.hull,
     hullMax: s.hullMax,
+    runScrap: s.scrap,
     chargeCap: Math.max(
       1,
       runChargeCap(s.perks, s.chartPicks, s.modules) + mut.chargeCapDelta,
