@@ -147,7 +147,7 @@ export const ShopScreen = () => {
   // The counter greeting is drawn from the node's own seed, so a reloaded save
   // hears the same line (DESIGN §2.1, 40 keeper lines).
   const greeting = createStream(deriveSeed(seed, `keeper:${nodeId}`)).pick(
-    keeperLinesFor("shop"),
+    keeperLinesFor("shop", flags),
   );
   const items = shop?.items ?? [];
   const moduleItems = shop?.modules ?? [];

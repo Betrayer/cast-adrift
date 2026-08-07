@@ -3,12 +3,13 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
-import { fragmentsForSector } from '@/data/narrative/fragments';
+import { pickFragment } from '@/data/narrative/fragments';
 import { sectorDef } from '@/data/sectors';
 import { playSfx } from '@/services/audio';
 import { createStream, deriveSeed } from '@/services/rng';
 import { useAppStore } from '@/stores/appStore';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
+import { useMetaStore } from '@/stores/metaStore';
 import { useRunStore } from '@/stores/runStore';
 import styles from './InterstitialScreen.module.css';
 
@@ -16,6 +17,8 @@ export const InterstitialScreen = () => {
   const { t } = useTranslation(['run', 'content']);
   const sector = useRunStore((s) => s.sector);
   const seed = useRunStore((s) => s.seed);
+  const flags = useRunStore((s) => s.flags);
+  const seenFragments = useMetaStore((s) => s.seenFragments);
   const go = useAppStore((s) => s.go);
   const def = sectorDef(sector);
   const reduced = resolveReducedMotion(
@@ -36,10 +39,19 @@ export const InterstitialScreen = () => {
   );
 
   const fragment = useMemo(() => {
-    const pool = fragmentsForSector(sector);
     const stream = createStream(deriveSeed(seed, `jump:${String(sector)}`));
-    return pool.length === 0 ? null : stream.pick(pool);
-  }, [sector, seed]);
+    return pickFragment(sector, flags, seenFragments, (items) =>
+      stream.pick(items),
+    );
+    // The pool is drawn once per arrival; re-reading `seenFragments` after the
+    // mark below would swap the line out from under the player.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sector, seed, flags]);
+
+  useEffect(() => {
+    if (fragment === null) return;
+    useMetaStore.getState().markFragmentSeen(fragment.id);
+  }, [fragment]);
 
   return (
     <Screen centered width="wide" className={styles.frame}>
@@ -86,6 +98,7 @@ export const InterstitialScreen = () => {
         size="md"
         color="accent"
         className={styles.cta}
+        data-interstitial-enter
         onClick={() => {
           go('map');
         }}

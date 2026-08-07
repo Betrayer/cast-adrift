@@ -13,11 +13,16 @@ export const PrologueScreen = () => {
   const { t } = useTranslation(['run', 'content']);
   const [index, setIndex] = useState(0);
   const go = useAppStore((s) => s.go);
+  const replay = useAppStore((s) => s.params?.replay) === '1';
   const beat = PROLOGUE_BEATS[index];
 
   const advance = (): void => {
     if (index + 1 < PROLOGUE_BEATS.length) {
       setIndex(index + 1);
+      return;
+    }
+    if (replay) {
+      go('codex');
       return;
     }
     useMetaStore.getState().markPrologueDone();
@@ -54,15 +59,17 @@ export const PrologueScreen = () => {
               max: PROLOGUE_BEATS.length,
             })}
           </Text>
-          <Button size="md" fullWidth onClick={advance}>
-            {t(beat.cta)}
+          <Button size="md" fullWidth data-prologue-next onClick={advance}>
+            {replay && index + 1 === PROLOGUE_BEATS.length
+              ? t('run:prologue.replayDone')
+              : t(beat.cta)}
           </Button>
           <Button
             size="compact-xs"
             variant="subtle"
             color="gray"
             onClick={() => {
-              go('menu');
+              go(replay ? 'codex' : 'menu');
             }}
           >
             {t('run:prologue.leave')}

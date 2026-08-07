@@ -48,6 +48,7 @@ const metaValues = (): MetaValues => {
     codex: s.codex,
     codexRead: s.codexRead,
     seenPuzzles: s.seenPuzzles,
+    seenFragments: s.seenFragments,
     contracts: s.contracts,
     dailyPlayed: s.dailyPlayed,
     best: s.best,

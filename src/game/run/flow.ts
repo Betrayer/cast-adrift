@@ -7,7 +7,7 @@ import { STARTER_DECK } from "@/data/decks";
 import { computeMutatorMods } from "@/data/mutators";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { beaconsResolved } from "@/data/events/beacons";
-import { finalMemoryCodexId, memoryAt } from "@/data/narrative/memories";
+import { sealFinalMemory, syncMemoryArc } from "@/game/narrative/memoryArc";
 import { PROLOGUE_ENEMY, PROLOGUE_SCRIPT } from "@/data/narrative/prologue";
 import { SECTOR_COUNT, sectorDef } from "@/data/sectors";
 import { shipHullMax } from "@/game/battle/setup";
@@ -33,7 +33,7 @@ import {
   sectorHpPct,
 } from "@/game/run/encounter";
 import { applyEdgeMotifs, applyNodeMotifs } from "@/game/run/motifs";
-import { battleEndAxisDelta, countDeckSchool } from "@/game/run/axis";
+import { settleSectorDrift } from "@/game/run/journal";
 import { emitBark, resetBarkMemory } from "@/game/narrative";
 import { computePerkMods } from "@/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
@@ -74,6 +74,7 @@ import { clearRun, saveRunSnapshot } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
 import { battleTally, useBattleStore } from "@/stores/battleStore";
 import { SMOTRITEL_BADGE, useMetaStore } from "@/stores/metaStore";
+import { useNarrativeStore } from "@/stores/narrativeStore";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
 import type {
   BattleTally,
@@ -82,7 +83,7 @@ import type {
   RunValues,
 } from "@/stores/runStore";
 import { PERK_BY_ID } from "@/data/perks";
-import type { RunSnapshot } from "@/types";
+import type { RunSnapshot, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
 import type { School } from "@/types/content";
 import type { FlagValue, ForcedBattle } from "@/types/events";
@@ -233,8 +234,20 @@ export const endRun = (win: boolean): void => {
   }
   useRunStore.setState({ active: false });
   if (isScoredMode(run.mode)) void finishScoredRun();
-  useAppStore.getState().go(isScoredMode(run.mode) ? "driftSummary" : "summary");
+  // Defeat earns the same closing beat a clear does: Echo speaks, the tally
+  // reads back what the run actually did, and only then come the numbers.
+  if (win) useAppStore.getState().go(summaryScreenFor(run.mode));
+  else useAppStore.getState().go("ending", { death: "1" });
   autosaveRun();
+};
+
+export const summaryScreenFor = (mode: RunMode): ScreenId =>
+  isScoredMode(mode) ? "driftSummary" : "summary";
+
+export const leaveDeathEpilogue = (): void => {
+  useAppStore
+    .getState()
+    .go(summaryScreenFor(useRunStore.getState().mode));
 };
 
 export const autosaveRun = (): void => {
@@ -264,16 +277,11 @@ const announceVictory = (
   else emitBark("battleWin");
 };
 
-// Echo's arc advances one slot per boss / mini-boss first kill of the campaign
-// (11 gates + the finale = 12 slots).
+// Echo's arc advances on pressure rather than on a counter: the ten gate fights
+// of a campaign, the elites hunted across every run, and the beacons put back on
+// the network. `syncMemoryArc` owns the arithmetic; this is the barks hook.
 export const unlockNextMemory = (): void => {
-  const run = useRunStore.getState();
-  const next = run.memoriesUnlocked + 1;
-  const memory = memoryAt(next);
-  if (memory === undefined) return;
-  useRunStore.getState().unlockNextMemory();
-  useMetaStore.getState().unlockCodex(memory.codexId);
-  emitBark("memory");
+  if (syncMemoryArc().length > 0) emitBark("memory");
 };
 
 const encounterInit = (pocket: boolean) => {
@@ -535,9 +543,12 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   useRunStore.getState().hydrate(values);
   useBattleStore.getState().reset();
   useSummaryStore.getState().clear();
+  useNarrativeStore.getState().reset();
   resetActionLog();
   resetBarkMemory();
-  useAppStore.getState().go("map");
+  // Sector 1 gets the same arrival beat every other sector gets: the wash, the
+  // name, and a fragment before the map.
+  useAppStore.getState().go("interstitial");
   emitBark(`sectorEnter:${String(values.sector)}`);
   trackEvent({ name: "run_start", params: { mode, ship: shipId } });
   autosaveRun();
@@ -564,6 +575,7 @@ export const startDailyRun = (date: string): void => {
 // interstitial screen owns the wash + fragment line before the map returns.
 // Drift keeps climbing sectorIndex past five; the content sector stays clamped.
 export const advanceSector = (): void => {
+  settleSectorDrift();
   const s = useRunStore.getState();
   const endless = s.mode === "drift";
   const nextIndex = endless
@@ -642,10 +654,12 @@ const afterBossVictory = (): void => {
   }
   // A contract is one sector: clearing its boss ends the run and scores the stars.
   if (run.mode === "contract") {
+    settleSectorDrift();
     endRun(true);
     return;
   }
   if (run.sectorIndex >= SECTOR_COUNT) {
+    settleSectorDrift();
     useAppStore.getState().go("finale");
     autosaveRun();
     pushRunCloud();
@@ -682,6 +696,8 @@ const finalizeNode = (
           ? { bosses: 1 }
           : {};
   run.bumpStats({ nodesCleared: 1, kills: result.kills ?? 0, ...typeDelta });
+  if (node.type === "elite") useMetaStore.getState().bumpLifetime({ elites: 1 });
+  unlockNextMemory();
   trackEvent({
     name: "node_complete",
     params: {
@@ -842,18 +858,15 @@ export const resolveRunBattle = (): void => {
   const battleHull = b.hull;
   const enemyDefIds = b.enemies.map((e) => e.defId);
   const tally = takeBattleTally();
-  const axisDelta = battleEndAxisDelta(
-    b.blackUsed,
-    b.blueUsed,
-    countDeckSchool(run.deck, "black"),
-    countDeckSchool(run.deck, "blue"),
-  );
+  const survivedLethal = b.survivedLethal;
   useBattleStore.getState().reset();
   run.noteBattleTally(tally);
-  if (axisDelta !== 0) run.addAxis(axisDelta);
+  run.noteDriftUsage(b.blackUsed, b.blueUsed);
+  // The epilogue's «last breath» line reads a run flag, so the battle-scoped
+  // save has to be promoted before the battle store is thrown away.
+  if (survivedLethal) run.setFlag("survivedLethal");
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
-  if (node.type === "miniboss" || node.type === "boss") unlockNextMemory();
 
   const lootStream = createStream(deriveSeed(run.seed, `loot:${node.id}`));
   const mods = computeRunMods(run.perks, run.chartPicks, run.modules);
@@ -942,15 +955,13 @@ export const resolveEventBattle = (): void => {
   const battleHull = b.hull;
   const enemyDefIds = b.enemies.map((e) => e.defId);
   const tally = takeBattleTally();
-  const axisDelta = battleEndAxisDelta(
-    b.blackUsed,
-    b.blueUsed,
-    countDeckSchool(run.deck, "black"),
-    countDeckSchool(run.deck, "blue"),
-  );
+  const survivedLethal = b.survivedLethal;
   useBattleStore.getState().reset();
   run.noteBattleTally(tally);
-  if (axisDelta !== 0) run.addAxis(axisDelta);
+  run.noteDriftUsage(b.blackUsed, b.blueUsed);
+  // The epilogue's «last breath» line reads a run flag, so the battle-scoped
+  // save has to be promoted before the battle store is thrown away.
+  if (survivedLethal) run.setFlag("survivedLethal");
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
 
@@ -1130,9 +1141,8 @@ export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
 export const chooseEnding = (endingId: string): void => {
   const run = useRunStore.getState();
   run.setEnding(endingId);
-  useMetaStore.getState().unlockCodex(finalMemoryCodexId(endingId));
+  sealFinalMemory(endingId);
   useMetaStore.getState().recordEnding(endingId);
-  useRunStore.setState({ memoriesUnlocked: 12 });
   trackEvent({
     name: "ending",
     params: { id: endingId, ascension: run.ascension },
@@ -1157,6 +1167,7 @@ export const currentBossName = (sector: number): string =>
 export const abandonRun = (): void => {
   useRunStore.getState().reset();
   useBattleStore.getState().reset();
+  useNarrativeStore.getState().reset();
   resetActionLog();
   clearRun();
   useAppStore.getState().go("menu");
@@ -1167,6 +1178,7 @@ export const abandonRun = (): void => {
 export const discardActiveRun = (): void => {
   useRunStore.getState().reset();
   useBattleStore.getState().reset();
+  useNarrativeStore.getState().reset();
   resetActionLog();
   clearRun();
 };

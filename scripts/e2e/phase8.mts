@@ -70,6 +70,7 @@ const main = async (): Promise<void> => {
         driftRuns: 0,
         dailyRuns: 0,
         contractRuns: 0,
+        elites: 0,
       },
     });
     window.__app?.getState().go("menu");

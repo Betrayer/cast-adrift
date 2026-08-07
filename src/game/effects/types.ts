@@ -76,7 +76,9 @@ export interface NodeEnterInfo {
 
 export interface EventOutcomeInfo {
   eventId: string;
+  optionId: string;
   optionIndex: number;
+  beacon?: boolean;
   passed?: boolean;
 }
 

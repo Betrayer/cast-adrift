@@ -67,7 +67,16 @@
     "pass": "Sukces — {{total}}",
     "fail": "Niepowodzenie — {{total}}",
     "roll": "Rolka",
-    "back": "Powrót"
+    "back": "Powrót",
+    "reqAxisMin": "wymaga wersji {{n}} lub nowszej",
+    "reqAxisMax": "wymaga wersji {{n}} lub starszej",
+    "checkLowest": "Nic powyżej {{n}}",
+    "checkSchool": "{{school}} tylko kostki",
+    "checkTierMin": "tylko modele {{tier}} i większe",
+    "checkTierMax": "tylko pliki o rozmiarze {{tier}} i mniejsze",
+    "outcomeOdds": "kursy {{odds}}",
+    "beaconTitle": "Latarnia",
+    "beaconCounter": "Latarnia {{n}} z {{max}}"
   },
   "anomaly": {
     "title": "Anomalia",
@@ -185,7 +194,10 @@
     "glyphLegend": {
       "title": "Symbole szkolne",
       "body": "Każda kostka ma inny kształt rogu, dzięki czemu szkoły mogą się od siebie odróżniać bez użycia kolorów: czerwony — trójkąt · niebieski — kwadrat · zielony — liść · żółty — pierścień · czarny — kolczasty · szary — kropka · pryzmatyczny — gwiazda."
-    }
+    },
+    "prologueTitle": "Pierwsze przejście",
+    "prologueBody": "Odtwórz początkowe takty. Nic się nie zaczęło, nic nie zostało utracone.",
+    "prologueReplay": "Powtórka"
   },
   "consequenceToast": "Wynik: {{text}}",
   "rewards": {
@@ -254,7 +266,8 @@
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Powrót do menu"
+    "leave": "Powrót do menu",
+    "replayDone": "Powrót do „Kodeks”"
   },
   "interstitial": {
     "sector": "Sektor{{n}}",
@@ -270,7 +283,9 @@
     "next": "Kontynuuj",
     "step": "{{cur}} / {{max}}",
     "tally": "To, co po sobie zostawiłeś",
-    "continue": "Zamknij dziennik"
+    "continue": "Zamknij dziennik",
+    "deathTitle": "Tutaj kończy się bieg",
+    "deathWhere": "Sektor{{sector}} · głębokość{{depth}}"
   },
   "setup": {
     "title": "Uruchomienie",
@@ -376,5 +391,43 @@
     "engravings": "Kości z grawerunkiem ({{n}})",
     "banished": "Wygnany",
     "empty": "Na razie nic"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Rezonans {{n}}",
+    "stability": "Stabilność {{n}}",
+    "neutral": "Oś wyważona",
+    "preview": "{{from}} → {{to}}",
+    "short": "Oś"
+  },
+  "journal": {
+    "title": "Dziennik biegowy",
+    "open": "Czasopismo",
+    "back": "Powrót do mapy",
+    "empty": "Jeszcze nic nie zostało napisane. Sektor nie zwrócił się do ciebie z żadną prośbą.",
+    "sector": "Sektor{{n}}",
+    "beacon": "Latarnia źródło — {{n}} z {{max}}",
+    "memory": "Echo przypomniało mi się coś — fragment {{n}}",
+    "axisTitle": "Oś",
+    "axis": {
+      "choice": "Twój wybór spowodował przesunięcie osi {{from}} → {{to}}",
+      "drift": "pokład, który faktycznie umieściłeś, przesunął oś {{from}} → {{to}}",
+      "beacon": "beacon zmienił adres {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Sygnalizatory",
+    "beaconsCount": "{{n}} kwestia dotycząca {{max}} została rozwiązana",
+    "beaconsHint": "Łańcuch się trzyma. Coś w Rdzeniu też ich liczy.",
+    "here": "Znajdujesz się w sektorze „{{n}}”.",
+    "chainsTitle": "Wątki",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "tutaj"
+  },
+  "memory": {
+    "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",
+    "continue": "Niech to dokończy",
+    "hintGate": "Przełamaj bram{{n}}a w ramach jednej kampanii",
+    "hintElite": "Poluj na elity z gry „{{n}}” podczas swoich biegów",
+    "hintBeacons": "Rozpoznaj sygnały nawigacyjne typu „{{n}}” w jednym przebiegu",
+    "hintEnding": "Przejdź do sekcji „Core” i wybierz"
   }
 }

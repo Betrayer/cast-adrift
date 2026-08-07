@@ -6,7 +6,7 @@ import {
 } from "@/game/economy/prices";
 import { rollDrop, type RarityWeights } from "@/game/economy/rewards";
 import { createStream, deriveSeed } from "@/services/rng";
-import type { Rarity } from "@/types/content";
+import type { LocKey, Rarity } from "@/types/content";
 import type { FlagValue } from "@/types/events";
 
 export interface ShopItem {
@@ -43,24 +43,45 @@ export const SHOP_WEIGHTS: RarityWeights = {
   legendary: 3,
 };
 
-// Callback consumer (DESIGN §3): Mara remembers what you did at the Rim, and a
-// freed courier's route pays off. Positive = cheaper stock.
+// Callback consumers (DESIGN §3): the counter remembers what you did. Positive
+// pct = cheaper stock. Declared as data so the flag lint can see every reader.
+export interface ShopFlagRule {
+  key: string;
+  pct: number;
+  consequence?: LocKey;
+}
+
+export const SHOP_FLAG_RULES: readonly ShopFlagRule[] = [
+  { key: "maraFriend", pct: 15, consequence: "content:consequence.maraFriend" },
+  { key: "maraGrudge", pct: -20, consequence: "content:consequence.maraGrudge" },
+  { key: "maraDebt", pct: -12, consequence: "content:consequence.maraDebtShop" },
+  { key: "courtFair", pct: 10, consequence: "content:consequence.courtFairShop" },
+  { key: "vaultKept", pct: 12, consequence: "content:consequence.vaultKeptShop" },
+  { key: "ledgerSolved", pct: 8, consequence: "content:consequence.ledgerShop" },
+  { key: "beaconRebuilt", pct: 10, consequence: "content:consequence.beaconRebuiltShop" },
+];
+
+export const COURIER_DISCOUNT_PCT = 20;
+
 export const flagShopDiscount = (
   flags: Record<string, FlagValue>,
 ): number => {
-  let pct = 0;
-  if (flags.maraFriend !== undefined) pct += 15;
-  if (flags.maraGrudge !== undefined) pct -= 20;
+  let pct = SHOP_FLAG_RULES.reduce(
+    (sum, rule) => (flags[rule.key] === undefined ? sum : sum + rule.pct),
+    0,
+  );
   const courier = flags.courierDiscount;
-  if (typeof courier === "number" && courier > 0) pct += 20;
+  if (typeof courier === "number" && courier > 0) pct += COURIER_DISCOUNT_PCT;
   return pct;
 };
 
 export const flagShopConsequence = (
   flags: Record<string, FlagValue>,
 ): string | null => {
-  if (flags.maraFriend !== undefined) return "content:consequence.maraFriend";
-  if (flags.maraGrudge !== undefined) return "content:consequence.maraGrudge";
+  const rule = SHOP_FLAG_RULES.find(
+    (r) => flags[r.key] !== undefined && r.consequence !== undefined,
+  );
+  if (rule?.consequence !== undefined) return rule.consequence;
   const courier = flags.courierDiscount;
   if (typeof courier === "number" && courier > 0)
     return "content:consequence.courierFreed";

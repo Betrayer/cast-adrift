@@ -10,6 +10,7 @@ import {
 import { CoachMarks } from '@/components/CoachMarks';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
+import { MemoryCeremony } from '@/components/MemoryCeremony';
 import { MusicDirector } from '@/components/MusicDirector';
 import { PerfOverlay } from '@/components/PerfOverlay';
 import { RotateGate } from '@/components/RotateGate';
@@ -50,6 +51,7 @@ export const App = () => {
       <Router />
       <MusicDirector />
       <ToastHost />
+      <MemoryCeremony />
       <CoachMarks />
       <RotateGate />
       <DevOverlay />

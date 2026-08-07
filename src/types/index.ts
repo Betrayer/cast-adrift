@@ -13,6 +13,7 @@ export type ScreenId =
   | 'driftSummary'
   | 'runSetup'
   | 'map'
+  | 'journal'
   | 'battle'
   | 'event'
   | 'puzzle'

@@ -1,4 +1,9 @@
 import type { MkLevel } from "@/data/slots";
+import {
+  CHAIN_WEIGHT_BOOST,
+  liveChainEvents,
+} from "@/data/narrative/chains";
+import type { AxisRange } from "@/game/run/axis";
 import type { RngStream } from "@/services/rng";
 import type { SlotId } from "@/types/battle";
 import type { DieTier, School } from "@/types/content";
@@ -27,6 +32,7 @@ export interface DeckDie {
 export interface OptionContext {
   scrap: number;
   hull: number;
+  axis: number;
   deck: readonly DeckDie[];
   mkLevels: Partial<Record<SlotId, MkLevel>>;
   flags: Record<string, FlagValue>;
@@ -73,6 +79,13 @@ export const eligibleEvents = (
 ): EventDef[] =>
   pool.filter((e) => eventKind(e) === kind && eventEligible(e, ctx));
 
+// A chain step the run can advance right now draws at CHAIN_WEIGHT_BOOST times
+// its authored weight, so a thread keeps moving without the pool being rigged.
+export const eventWeight = (def: EventDef, ctx: EventContext): number => {
+  const live = liveChainEvents(ctx.flags, ctx.sector);
+  return live.has(def.id) ? def.weight * CHAIN_WEIGHT_BOOST : def.weight;
+};
+
 export const pickEvent = (
   pool: readonly EventDef[],
   ctx: EventContext,
@@ -82,7 +95,7 @@ export const pickEvent = (
   const eligible = eligibleEvents(pool, ctx, kind);
   if (eligible.length === 0) return null;
   if (eligible.length === 1) return eligible[0] ?? null;
-  return stream.weighted(eligible.map((e) => [e, e.weight] as const));
+  return stream.weighted(eligible.map((e) => [e, eventWeight(e, ctx)] as const));
 };
 
 export const outcomeWeight = (outcome: Outcome): number => outcome.weight ?? 1;
@@ -122,7 +135,30 @@ export const optionMet = (
       return (ctx.mkLevels[req.slot] ?? 1) >= req.mk;
     case "flag":
       return flagPresent(ctx.flags, req.key);
+    case "axis":
+      return (
+        (req.min === undefined || ctx.axis >= req.min) &&
+        (req.max === undefined || ctx.axis <= req.max)
+      );
   }
+};
+
+// The preview a player sees before committing: how far this option can move the
+// axis. A weighted fork shows the whole span, never a single flattering number.
+export const optionAxisRange = (option: EventOption): AxisRange | null => {
+  const lists = [
+    ...(option.outcomes ?? []),
+    ...(option.onPass ?? []),
+    ...(option.onFail ?? []),
+  ];
+  const deltas = lists.map((outcome) =>
+    outcome.effects.reduce(
+      (sum, effect) => (effect.k === "axis" ? sum + effect.n : sum),
+      0,
+    ),
+  );
+  if (deltas.length === 0 || deltas.every((d) => d === 0)) return null;
+  return { min: Math.min(...deltas), max: Math.max(...deltas) };
 };
 
 export const optionOutcomes = (

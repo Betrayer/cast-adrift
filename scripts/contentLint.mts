@@ -19,8 +19,14 @@ import {
   usesModuleVocabulary,
   type ShapedContent,
 } from "../src/data/contentShape";
-import { FRAGMENTS } from "../src/data/narrative/fragments";
-import { KEEPER_LINES } from "../src/data/narrative/keeperLines";
+import {
+  FRAGMENTS,
+  GATED_FRAGMENTS,
+} from "../src/data/narrative/fragments";
+import {
+  KEEPER_LINES,
+  REACTIVE_KEEPER_LINES,
+} from "../src/data/narrative/keeperLines";
 import { CHART_ADJACENCY, CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
 import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
@@ -39,6 +45,15 @@ import {
 } from "../src/data/enemies";
 import { sectorDef } from "../src/data/sectors";
 import { ALL_EVENTS } from "../src/data/events";
+import { CHAINS, CHAIN_EVENT_IDS } from "../src/data/narrative/chains";
+import { ENDINGS } from "../src/data/narrative/endings";
+import {
+  earnedMemoryOrders,
+  MEMORIES,
+  MEMORY_CODEX_IDS,
+  MEMORY_TOTAL,
+  NUMBERED_MEMORIES,
+} from "../src/data/narrative/memories";
 import { ALL_PERKS } from "../src/data/perks";
 import { PUZZLES } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
@@ -96,16 +111,10 @@ type ContentNode = string | { [key: string]: ContentNode };
 
 const errors: string[] = [];
 
-// Flags the run sets outside the event pipeline (battle entry, prologue).
-const RUNTIME_FLAGS: readonly string[] = [
-  "hunterEngaged",
-  "prologueRun",
-  "beacon1",
-  "beacon2",
-  "beacon3",
-  "beacon4",
-  "beacon5",
-];
+import { RUNTIME_FLAGS } from "../src/data/flags";
+import { deadFlags, unwritableFlags } from "../src/game/narrative/flagGraph";
+import { DEATH_LINES } from "../src/data/narrative/deathLines";
+import { EPILOGUE_ENTRIES } from "../src/data/narrative/epilogue";
 const hooks = new Set<string>(HOOKS);
 const actionNames = new Set<string>(ACTION_NAMES);
 const SUBJECT_HOOK_SET = new Set<string>(SUBJECT_HOOKS);
@@ -703,8 +712,23 @@ for (const event of ALL_EVENTS) {
   }
 }
 
-const EVENT_TOTAL = 100;
-const CALLBACK_TARGET = 30;
+// R7 quality bars. Counts alone were how the v1 pool got to 100 events with 84
+// of them offering exactly two options, so every number here has a shape rule
+// beside it.
+const EVENT_TOTAL = 164;
+const CALLBACK_TARGET = 55;
+const THREE_OPTION_PCT = 35;
+const WEIGHTED_TARGET = 25;
+const SECTOR_TARGET: Readonly<Record<string, number>> = {
+  S1: 31,
+  S2: 22,
+  S3: 22,
+  S4: 20,
+  S5: 20,
+  common: 35,
+  beacon: 6,
+};
+
 if (ALL_EVENTS.length < EVENT_TOTAL)
   errors.push(
     `events: expected at least ${String(EVENT_TOTAL)} events, found ${String(ALL_EVENTS.length)}`,
@@ -713,6 +737,73 @@ if (callbackCount < CALLBACK_TARGET)
   errors.push(
     `events: expected at least ${String(CALLBACK_TARGET)} callback events, found ${String(callbackCount)}`,
   );
+
+const eventBucket = (def: (typeof ALL_EVENTS)[number]): string => {
+  if (def.kind === "beacon") return "beacon";
+  if (CHAIN_EVENT_IDS.has(def.id)) return "chain";
+  const sectors = def.requires?.sector;
+  return sectors !== undefined && sectors.length === 1
+    ? `S${String(sectors[0])}`
+    : "common";
+};
+
+const bucketCount = new Map<string, number>();
+for (const event of ALL_EVENTS) {
+  const bucket = eventBucket(event);
+  bucketCount.set(bucket, (bucketCount.get(bucket) ?? 0) + 1);
+}
+for (const [bucket, want] of Object.entries(SECTOR_TARGET)) {
+  const got = bucketCount.get(bucket) ?? 0;
+  if (got < want)
+    errors.push(
+      `events: ${bucket} holds ${String(got)} scenes, target ${String(want)}`,
+    );
+}
+
+const threeOptionEvents = ALL_EVENTS.filter((e) => e.options.length >= 3).length;
+const threePct = (threeOptionEvents / Math.max(1, ALL_EVENTS.length)) * 100;
+if (threePct < THREE_OPTION_PCT)
+  errors.push(
+    `events: ${threePct.toFixed(1)}% offer three or more options, target ${String(THREE_OPTION_PCT)}%`,
+  );
+
+const weightedEvents = ALL_EVENTS.filter((e) =>
+  e.options.some(
+    (o) =>
+      (o.outcomes ?? []).length > 1 ||
+      (o.onPass ?? []).length > 1 ||
+      (o.onFail ?? []).length > 1,
+  ),
+).length;
+if (weightedEvents < WEIGHTED_TARGET)
+  errors.push(
+    `events: ${String(weightedEvents)} carry a weighted fork, target ${String(WEIGHTED_TARGET)}`,
+  );
+
+// A vending machine pays out and leaves no trace: no gate, no check, no flag,
+// no consequence, no follow, no codex. DESIGN §3 does not allow one.
+const vending = ALL_EVENTS.filter((event) => {
+  if (event.requires?.flags !== undefined) return false;
+  if (event.codex !== undefined) return false;
+  return !event.options.some((option) => {
+    if (option.check !== undefined) return true;
+    if (option.requires?.req === "flag" || option.requires?.req === "axis")
+      return true;
+    return [
+      ...(option.outcomes ?? []),
+      ...(option.onPass ?? []),
+      ...(option.onFail ?? []),
+    ].some(
+      (outcome) =>
+        outcome.consequence !== undefined ||
+        outcome.follow !== undefined ||
+        outcome.codex !== undefined ||
+        outcome.effects.some((eff) => eff.k === "flag"),
+    );
+  });
+});
+for (const event of vending)
+  errors.push(`events: "${event.id}" is a vending machine — it leaves no trace`);
 
 // Unreachable events: a callback whose required flags no outcome anywhere can
 // set is dead content, not a hidden secret.
@@ -741,6 +832,121 @@ for (const event of ALL_EVENTS) {
     if (!settableFlags.has(key))
       errors.push(`events: "${event.id}" requires flag "${key}" that nothing sets`);
   }
+}
+
+// R7 flag graph: a flag written by content has to be read by content. The
+// readers are declared as data (event gates, epilogue/death/ending `reads`,
+// shop rules), so this is a graph check rather than a grep.
+for (const flag of deadFlags()) {
+  errors.push(
+    `flags: "${flag.key}" is written by ${flag.owners.join(", ")} and read by nothing`,
+  );
+}
+for (const flag of unwritableFlags()) {
+  errors.push(
+    `flags: "${flag.key}" is read by ${flag.owners.join(", ")} but nothing sets it`,
+  );
+}
+
+// Echo's arc has to be completable by playing, not by reading the data files.
+// A standard clear is ten gate fights, five beacons and roughly five elites on
+// the path actually taken; two of those clears must reach every fragment the
+// finale does not write itself.
+const CLEAR_GATES = 10;
+const CLEAR_BEACONS = 5;
+const CLEAR_ELITES = 5;
+const ONE_CLEAR_FLOOR = 12;
+
+if (MEMORIES.length !== MEMORY_TOTAL)
+  errors.push(
+    `memories: expected ${String(MEMORY_TOTAL)} fragments, found ${String(MEMORIES.length)}`,
+  );
+
+const afterOneClear = earnedMemoryOrders({
+  gateKills: CLEAR_GATES,
+  lifetimeElites: CLEAR_ELITES,
+  beaconsResolved: CLEAR_BEACONS,
+});
+const afterTwoClears = earnedMemoryOrders({
+  gateKills: CLEAR_GATES,
+  lifetimeElites: CLEAR_ELITES * 2,
+  beaconsResolved: CLEAR_BEACONS,
+});
+if (afterOneClear.length < ONE_CLEAR_FLOOR)
+  errors.push(
+    `memories: one clear reaches ${String(afterOneClear.length)} fragments, floor ${String(ONE_CLEAR_FLOOR)}`,
+  );
+const unreachable = NUMBERED_MEMORIES.filter(
+  (m) => !afterTwoClears.includes(m.order),
+);
+if (unreachable.length > 0)
+  errors.push(
+    `memories: ${unreachable.map((m) => m.codexId).join(" ")} unreachable in two standard clears`,
+  );
+for (const id of MEMORY_CODEX_IDS) {
+  if (!CODEX_BY_ID.has(id))
+    errors.push(`memories: "${id}" has no Codex entry`);
+}
+
+// R7 chains: every declared step has to name events that exist, live in the
+// sectors those events can appear in, and end on a flag some outcome sets.
+const CHAIN_TARGET = 4;
+const CHAIN_MIN_STEPS = 3;
+const eventById = new Map(ALL_EVENTS.map((e) => [e.id, e]));
+if (CHAINS.length !== CHAIN_TARGET)
+  errors.push(
+    `chains: expected ${String(CHAIN_TARGET)} NPC chains, found ${String(CHAINS.length)}`,
+  );
+for (const chain of CHAINS) {
+  checkLocKey(`chain.${chain.id}`, chain.name);
+  checkLocKey(`chain.${chain.id}`, chain.payoff);
+  checkLocKey(`chain.${chain.id}`, chain.betrayalLine);
+  if (chain.steps.length < CHAIN_MIN_STEPS)
+    errors.push(
+      `chains: "${chain.id}" has ${String(chain.steps.length)} steps, floor ${String(CHAIN_MIN_STEPS)}`,
+    );
+  if (chain.betrayal.length === 0)
+    errors.push(`chains: "${chain.id}" has no betrayal branch`);
+  let hasPayoff = false;
+  for (const step of chain.steps) {
+    checkLocKey(`chain.${chain.id}.${step.id}`, step.hint);
+    if (step.done.length === 0)
+      errors.push(`chains: "${chain.id}.${step.id}" can never resolve`);
+    for (const key of step.done) {
+      if (!settableFlags.has(key))
+        errors.push(
+          `chains: "${chain.id}.${step.id}" waits on flag "${key}" that nothing sets`,
+        );
+    }
+    for (const eventId of step.events) {
+      const def = eventById.get(eventId);
+      if (def === undefined) {
+        errors.push(`chains: "${chain.id}.${step.id}" names unknown event "${eventId}"`);
+        continue;
+      }
+      const sectors = def.requires?.sector;
+      if (sectors !== undefined && !step.sector.some((n) => sectors.includes(n)))
+        errors.push(
+          `chains: "${chain.id}.${step.id}" can never fire — event "${eventId}" lives in sectors ${sectors.join("/")}`,
+        );
+      if (def.options.some((o) => o.outcomes !== undefined || o.check !== undefined))
+        hasPayoff = true;
+    }
+  }
+  if (!hasPayoff)
+    errors.push(`chains: "${chain.id}" has no step that pays anything out`);
+}
+
+const EPILOGUE_TARGET = 24;
+if (EPILOGUE_ENTRIES.length < EPILOGUE_TARGET)
+  errors.push(
+    `epilogue: expected at least ${String(EPILOGUE_TARGET)} entries, found ${String(EPILOGUE_ENTRIES.length)}`,
+  );
+for (const entry of EPILOGUE_ENTRIES) checkLocKey(`epilogue.${entry.id}`, entry.text);
+for (const line of DEATH_LINES) checkLocKey(`death.${line.id}`, line.text);
+for (const ending of ENDINGS) {
+  for (const beat of ending.beats) checkLocKey(`ending.${ending.id}`, beat);
+  for (const v of ending.variants ?? []) checkLocKey(`ending.${v.id}`, v.text);
 }
 
 for (const entry of CODEX) {
@@ -894,8 +1100,10 @@ for (const [trigger, quota] of Object.entries(BARK_QUOTA)) {
 
 const MODULE_TOTAL = 60;
 const ENGRAVING_TOTAL = 50;
-const FRAGMENT_TOTAL = 80;
-const KEEPER_TOTAL = 40;
+const FRAGMENT_TOTAL = 100;
+const GATED_FRAGMENT_TARGET = 15;
+const KEEPER_TOTAL = 80;
+const KEEPER_REACTIVE_TARGET = 30;
 const DICE_TOTAL = 90;
 const DOSSIER_TOTAL = 91;
 
@@ -916,10 +1124,34 @@ if (FRAGMENTS.length !== FRAGMENT_TOTAL)
   errors.push(
     `fragments: expected ${String(FRAGMENT_TOTAL)}, found ${String(FRAGMENTS.length)}`,
   );
+if (GATED_FRAGMENTS.length < GATED_FRAGMENT_TARGET)
+  errors.push(
+    `fragments: ${String(GATED_FRAGMENTS.length)} are state-gated, target ${String(GATED_FRAGMENT_TARGET)}`,
+  );
+for (const frag of GATED_FRAGMENTS) {
+  const query = frag.requires;
+  for (const key of [...(query?.all ?? []), ...(query?.any ?? []), ...(query?.not ?? [])]) {
+    if (!settableFlags.has(key))
+      errors.push(`fragments: "${frag.id}" waits on flag "${key}" that nothing sets`);
+  }
+}
 if (KEEPER_LINES.length !== KEEPER_TOTAL)
   errors.push(
     `keeperLines: expected ${String(KEEPER_TOTAL)}, found ${String(KEEPER_LINES.length)}`,
   );
+if (REACTIVE_KEEPER_LINES.length < KEEPER_REACTIVE_TARGET)
+  errors.push(
+    `keeperLines: ${String(REACTIVE_KEEPER_LINES.length)} react to a flag, target ${String(KEEPER_REACTIVE_TARGET)}`,
+  );
+for (const keeperLine of REACTIVE_KEEPER_LINES) {
+  const query = keeperLine.requires;
+  for (const key of [...(query?.all ?? []), ...(query?.any ?? []), ...(query?.not ?? [])]) {
+    if (!settableFlags.has(key))
+      errors.push(
+        `keeperLines: "${keeperLine.id}" waits on flag "${key}" that nothing sets`,
+      );
+  }
+}
 if (ALL_DICE.length !== DICE_TOTAL)
   errors.push(
     `dice: expected ${String(DICE_TOTAL)}, found ${String(ALL_DICE.length)}`,
@@ -1455,7 +1687,7 @@ console.log("lint:content: puzzle calibration");
 for (const row of puzzleTable(PUZZLES)) console.log(`  ${row}`);
 
 console.log(
-  `lint:content: totals — dice ${String(ALL_DICE.length)}/90 · perks ${String(ALL_PERKS.length)}/180 · modules ${String(ALL_MODULES.length)}/60 · engravings ${String(ENGRAVINGS.length)}/50 · events ${String(ALL_EVENTS.length)}/100 (${String(callbackCount)}/30 callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/91 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/80 · dossiers ${String(dossierCount)}/91 · keeper ${String(KEEPER_LINES.length)}/40`,
+  `lint:content: totals — dice ${String(ALL_DICE.length)}/90 · perks ${String(ALL_PERKS.length)}/180 · modules ${String(ALL_MODULES.length)}/60 · engravings ${String(ENGRAVINGS.length)}/50 · events ${String(ALL_EVENTS.length)}/${String(EVENT_TOTAL)} (${String(callbackCount)}/${String(CALLBACK_TARGET)} callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/91 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/${String(FRAGMENT_TOTAL)} · dossiers ${String(dossierCount)}/91 · keeper ${String(KEEPER_LINES.length)}/${String(KEEPER_TOTAL)}`,
 );
 
 console.log(

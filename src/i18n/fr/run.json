@@ -67,7 +67,16 @@
     "pass": "Succès — {{total}}",
     "fail": "Échec — {{total}}",
     "roll": "Rouleau",
-    "back": "Retour"
+    "back": "Retour",
+    "reqAxisMin": "nécessite la version {{n}} ou une version ultérieure d'Axis",
+    "reqAxisMax": "nécessite la version {{n}} ou une version antérieure d'Axis",
+    "checkLowest": "Rien de plus haut que {{n}}",
+    "checkSchool": "{{school}} uniquement les dés",
+    "checkTierMin": "{{tier}}s et plus uniquement",
+    "checkTierMax": "{{tier}}s et moins uniquement",
+    "outcomeOdds": "cotes {{odds}}",
+    "beaconTitle": "Balise",
+    "beaconCounter": "Balise {{n}} de {{max}}"
   },
   "anomaly": {
     "title": "Anomalie",
@@ -185,7 +194,10 @@
     "glyphLegend": {
       "title": "Symboles scolaires",
       "body": "Chaque dé présente une forme différente dans un coin, ce qui permet de distinguer les écoles sans avoir recours à la couleur : Rouge — triangle · Bleu — carré · Vert — feuille · Jaune — anneau · Noir — pointe · Gris — point · Prismatique — étoile."
-    }
+    },
+    "prologueTitle": "La première traversée",
+    "prologueBody": "Réécoute les premières mesures. Rien n'a commencé, rien n'est perdu.",
+    "prologueReplay": "Rediffusion"
   },
   "consequenceToast": "Conséquence : {{text}}",
   "rewards": {
@@ -254,7 +266,8 @@
     "title": "Prologue",
     "echo": "ECHO : {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Retour au menu"
+    "leave": "Retour au menu",
+    "replayDone": "Retour à l'Codex"
   },
   "interstitial": {
     "sector": "{{n}} du secteur",
@@ -270,7 +283,9 @@
     "next": "Continuer",
     "step": "{{cur}} / {{max}}",
     "tally": "Ce que tu as laissé derrière toi",
-    "continue": "Fermer le journal"
+    "continue": "Fermer le journal",
+    "deathTitle": "C'est ici que s'achève la course",
+    "deathWhere": "Secteur {{sector}} · profondeur {{depth}}"
   },
   "setup": {
     "title": "Lancement",
@@ -376,5 +391,43 @@
     "engravings": "Dés gravés ({{n}})",
     "banished": "Banni",
     "empty": "Rien pour l'instant"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Résonance {{n}}",
+    "stability": "{{n}} de stabilité",
+    "neutral": "Équilibre des axes",
+    "preview": "axe {{from}} → {{to}}",
+    "short": "Axis"
+  },
+  "journal": {
+    "title": "Journal de course",
+    "open": "Journal",
+    "back": "Retour à la carte",
+    "empty": "Rien n'a encore été écrit. Le secteur ne vous a rien demandé.",
+    "sector": "{{n}} du secteur",
+    "beacon": "Balise résolu — {{n}} de {{max}}",
+    "memory": "Echo je me suis souvenu de quelque chose — extrait de {{n}}",
+    "axisTitle": "Axe",
+    "axis": {
+      "choice": "Votre choix a déplacé l'axe {{from}} → {{to}}",
+      "drift": "La carte que vous avez effectivement placée a déplacé l'axe {{from}} → {{to}}",
+      "beacon": "la balise a déplacé l'axe {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Balises",
+    "beaconsCount": "{{n}} Problème de « {{max}} » résolu",
+    "beaconsHint": "La chaîne tient bon. Quelque chose au cœur du système les compte également.",
+    "here": "Vous êtes dans le secteur «{{n}} ».",
+    "chainsTitle": "Fils de discussion",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "ici"
+  },
+  "memory": {
+    "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",
+    "continue": "Laisse-la finir",
+    "hintGate": "Dépasser les limites d'{{n}}s en une seule campagne",
+    "hintElite": "Partez à la chasse aux élites d’{{n}} au fil de vos parties",
+    "hintBeacons": "Traiter les balises «{{n}}» en une seule opération",
+    "hintEnding": "Accédez à « Core » et sélectionnez"
   }
 }

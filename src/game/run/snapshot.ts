@@ -12,14 +12,17 @@ import {
 import { emitBark, resetBarkMemory } from "@/game/narrative";
 import { restoreActionLog } from "@/game/run/actionLog";
 import { useAppStore } from "@/stores/appStore";
+import { useNarrativeStore } from "@/stores/narrativeStore";
+import type { JournalEntry } from "@/game/run/journal";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 5;
+export const RUN_SNAPSHOT_V = 6;
 
 export interface RunSnapshotV1 {
   v: number;
   screen: ScreenId;
   run: RunValues;
+  journal: JournalEntry[];
   battle: BattleSaveState | null;
 }
 
@@ -54,6 +57,9 @@ const pickRunValues = (s: RunState): RunValues => ({
   flags: { ...s.flags },
   counters: { ...s.counters },
   axis: s.axis,
+  driftBlack: s.driftBlack,
+  driftBlue: s.driftBlue,
+  driftSpent: s.driftSpent,
   seenEvents: [...s.seenEvents],
   solvedPuzzles: [...s.solvedPuzzles],
   puzzleRuns: Object.fromEntries(
@@ -120,7 +126,7 @@ const pickRunValues = (s: RunState): RunValues => ({
   vouchers: s.vouchers,
   usedMinibosses: [...s.usedMinibosses],
   bossesKilled: [...s.bossesKilled],
-  memoriesUnlocked: s.memoriesUnlocked,
+  memoryOrders: [...s.memoryOrders],
   endingId: s.endingId,
   startedAt: s.startedAt,
 });
@@ -129,6 +135,7 @@ export const captureRunSnapshot = (): RunSnapshotV1 => ({
   v: RUN_SNAPSHOT_V,
   screen: useAppStore.getState().screen,
   run: pickRunValues(useRunStore.getState()),
+  journal: useNarrativeStore.getState().journal.map((entry) => ({ ...entry })),
   battle: serializeBattle(),
 });
 
@@ -139,7 +146,8 @@ const isRunSnapshot = (data: unknown): data is RunSnapshotV1 => {
     snap.v === RUN_SNAPSHOT_V &&
     typeof snap.screen === "string" &&
     typeof snap.run === "object" &&
-    snap.run !== null
+    snap.run !== null &&
+    Array.isArray(snap.journal)
   );
 };
 
@@ -147,6 +155,8 @@ export const restoreRunSnapshot = (data: unknown): boolean => {
   if (!isRunSnapshot(data)) return false;
   const values = { ...createInitialRunValues(), ...data.run };
   useRunStore.getState().hydrate(values);
+  useNarrativeStore.getState().reset();
+  useNarrativeStore.getState().setJournal(data.journal);
   restoreActionLog({
     hash: values.stats.actionHash,
     count: values.stats.actionCount,

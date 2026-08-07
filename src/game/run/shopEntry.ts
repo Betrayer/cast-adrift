@@ -7,7 +7,7 @@ import {
 } from "@/game/economy/shop";
 import { computeRunMods } from "@/game/run/runMods";
 import { emitRunHook } from "@/game/run/runEffects";
-import { useNarrativeStore } from "@/stores/narrativeStore";
+import { logConsequence } from "@/game/run/journal";
 import { useRunStore, type RunValues } from "@/stores/runStore";
 import type { NodeId } from "@/game/map/types";
 
@@ -29,9 +29,7 @@ export const enterShop = (nodeId: NodeId): boolean => {
     modules: generateShopModules(state.seed, nodeId, 0, pct),
   });
   const consequence = flagShopConsequence(state.flags);
-  if (consequence !== null) {
-    useNarrativeStore.getState().pushConsequence(consequence);
-  }
+  if (consequence !== null) logConsequence(consequence);
   emitRunHook("shopEnter", { shop: { nodeId, sector: state.sector } });
   return true;
 };

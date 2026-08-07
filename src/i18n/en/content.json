@@ -758,7 +758,209 @@
     "mirrorSpoke": "Consequence: you spoke to the mirror.",
     "pactOpened": "Consequence: the pact lies open.",
     "pactSigned": "Consequence: you signed the pact.",
-    "relayFixed": "Consequence: you repaired the relay."
+    "relayFixed": "Consequence: you repaired the relay.",
+    "reactorAttuned": "you tuned yourself to a dying reactor (Sector 1)",
+    "quietCharted": "you charted the silent field (Sector 1)",
+    "fieldAligned": "you lifted the graveyard clean (Sector 2)",
+    "hymnCopied": "you sang the Choir's hymn back at them (Sector 2)",
+    "mirrorBound": "you stepped through the mirror (Sector 3)",
+    "ledgerSolved": "you reconciled the anomaly ledger (Sector 3)",
+    "hymnHarmonized": "you harmonized with the hymn gate (Sector 4)",
+    "reliquaryCatalogued": "you catalogued the reliquary (Sector 4)",
+    "tideSteadied": "you held the hull against the causality tide (Sector 5)",
+    "hereticFleetLed": "you took the lead of the heretic fleet (Sector 5)",
+    "beaconRebuilt": "you rebuilt the relay with the Keeper's key (Sector 2)",
+    "hunterPaid": "you paid the Huntress off instead of fighting her",
+    "fleetAnswered": "the fleet's people answered when you called",
+    "favorHeld": "you called in Mara's favour",
+    "choirBetrayed": "you used the Choir's own hymn against it",
+    "turnWritten": "you wrote down the turn the empty suit never made",
+    "maraDebtShop": "Mara takes her cut off the top — her ledger, her prices",
+    "courtFairShop": "the salvage court's fair-price ruling travels ahead of you",
+    "vaultKeptShop": "the Keeper's vault stock reaches this counter",
+    "ledgerShop": "the reconciled ledger is currency here",
+    "beaconRebuiltShop": "the rebuilt relay put this counter back on the network",
+    "maraSupplyRun": "you flew Mara's escort",
+    "maraSkim": "you skimmed Mara's cargo",
+    "favorRefused": "you turned Mara's job down",
+    "maraVault": "you opened Mara's vault",
+    "maraVaultLeft": "you left Mara's vault shut",
+    "maraUsurerPaid": "you paid the Usurer off",
+    "maraUsurerFought": "you refused the Usurer's lien",
+    "maraUsurerRun": "you ran the Usurer's lane",
+    "fleetLaneOpen": "you opened the refugee lane",
+    "fleetLaneClosed": "you charged the procession for passage",
+    "fleetLaneSealed": "you sealed the lane behind you",
+    "fleetTruthShared": "you put the fleet's truth on an open channel",
+    "bargainReady": "you read deeper into the hymn",
+    "pactHeld": "you held the pact where you signed it",
+    "pactBroken": "you tore the pact up",
+    "preacherSang": "you sang with the Preacher one last time",
+    "preacherAnswered": "you told the Preacher what you would say to the Core",
+    "preacherCut": "you cut the Preacher off mid-verse",
+    "keeperRepaid": "you squared up with the Beacon Keeper",
+    "keeperLog": "you merged your beacon log with the Keeper's",
+    "keeperLogLost": "your beacon log reached the Keeper broken",
+    "yardStripped": "you stripped the breaker yard (Sector 2)",
+    "yardStopped": "you shut the breaker yard down (Sector 2)",
+    "tugsPaid": "you stood with the tug strike (Sector 2)",
+    "tugsCrossed": "you crossed the tug picket (Sector 2)",
+    "quarantineKept": "you respected a forty-year quarantine (Sector 2)",
+    "quarantineBroken": "you broke a quarantine seal (Sector 2)",
+    "schoolHelped": "you kept the drift school running (Sector 2)",
+    "schoolRobbed": "you took the drift school's reactor (Sector 2)",
+    "clanRespect": "you honoured a clan funeral (Sector 2)",
+    "bloomTapped": "you tapped the coolant bloom (Sector 2)",
+    "bloomSource": "you found what was feeding the bloom (Sector 2)",
+    "bloomBurned": "you burned the coolant bloom off (Sector 2)",
+    "manifestWon": "you bought the blind manifest (Sector 2)",
+    "scriptBacked": "you vouched for old fleet script (Sector 2)",
+    "auctionJammed": "you jammed the manifest auction (Sector 2)",
+    "wardenAnswered": "you told a Warden his orders still stand (Sector 2)",
+    "wardenReleased": "you released a Warden from his post (Sector 2)",
+    "relayTraced": "you traced the odd relay mast (Sector 2)",
+    "relayStripped": "you stripped the relay farm (Sector 2)",
+    "raceWon": "you came out ahead at the tether crossing (Sector 2)",
+    "raceLost": "the tether crossing cost you (Sector 2)",
+    "tetherCut": "you cut the haulers' tether (Sector 2)",
+    "apprenticeTold": "you told Yusuf what his apprentice did (Sector 2)",
+    "lighterLoaded": "you loaded the ice lighter's endless run (Sector 2)",
+    "lighterStripped": "you stripped the ice lighter (Sector 2)",
+    "lighterStopped": "you gave the ice lighter its stop order (Sector 2)",
+    "courtRigged": "you rigged a salvage court (Sector 2)",
+    "courtFair": "you split the salvage court's ruling three ways (Sector 2)",
+    "driftFriends": "the Drift Fields sent someone to fly with you (Sector 3)",
+    "wakeJammed": "you jammed the broadcast of your own record (Sector 3)",
+    "wakeAnswered": "you read your own record back without arguing (Sector 3)",
+    "foldRead": "you read the tight fold instead of running it (Sector 3)",
+    "postAccepted": "you took a Warden post nobody has held in forty years (Sector 3)",
+    "rosterWiped": "you wiped the Warden duty roster (Sector 3)",
+    "buyerBound": "the manifest buyer can still find you (Sector 3)",
+    "buyerCut": "you cut the manifest buyer loose (Sector 3)",
+    "crossingOpened": "the haulers' crossing opened with your name on it (Sector 3)",
+    "crossingTolled": "you take a cut of the haulers' crossing (Sector 3)",
+    "archiveCatalogued": "you added the tenth catalogue to the folded archive (Sector 3)",
+    "archiveBurned": "you burned the folded archive's catalogues (Sector 3)",
+    "twinChosen": "you answered one of the two identical hulls (Sector 3)",
+    "twinRefused": "you answered neither of the identical hulls (Sector 3)",
+    "surgeryTaken": "you took the surgeon hull's appointment (Sector 3)",
+    "surgeryStripped": "you stripped the surgeon hull (Sector 3)",
+    "surgeryBooked": "you gave the surgeon hull's slots away (Sector 3)",
+    "causalDebt": "you took from the Rift on credit (Sector 3)",
+    "causalPaid": "you settled with the Rift up front (Sector 3)",
+    "chapelAsked": "you questioned the Preacher's recording (Sector 3)",
+    "chapelSilenced": "you cut the unlit chapel's hymn (Sector 3)",
+    "pilotHired": "you hired a Rift pilot (Sector 3)",
+    "boardRead": "you read the pilots' rate board (Sector 3)",
+    "boardTaken": "you took the pilots' rate board (Sector 3)",
+    "cutRecorded": "you recorded eleven seconds of the Cut (Sector 3)",
+    "cutRidden": "you rode the Cut's own reading (Sector 3)",
+    "cutRefused": "you shut every instrument rather than listen (Sector 3)",
+    "haulersSent": "you sent the haulers home before the Procession (Sector 4)",
+    "haulersUsed": "you put the haulers to work in the Procession (Sector 4)",
+    "haulersArmed": "you armed the haulers out of your own scrap (Sector 4)",
+    "brokerDealt": "you kept dealing with the broker after he took orders (Sector 4)",
+    "brokerCleared": "you got your registry off the broker's hand (Sector 4)",
+    "transitPapers": "you drew transit papers on a dead Warden post (Sector 4)",
+    "papersForged": "you forged Warden transit papers (Sector 4)",
+    "checkpointOpened": "you opened the Warden checkpoint to everyone (Sector 4)",
+    "ledgerStruck": "you struck your name out of the Choir's ledger (Sector 4)",
+    "ledgerRead": "you read the Choir's ledger of intentions (Sector 4)",
+    "triageRun": "you ran the triage at the field hospital (Sector 4)",
+    "queueSold": "you sold places in the hospital queue (Sector 4)",
+    "riftSettled": "you settled the Rift's half of the trade (Sector 4)",
+    "riftDisputed": "you disputed the Rift's collection (Sector 4)",
+    "twinBoarded": "you boarded the hull that flies your engine note (Sector 4)",
+    "twinHailed": "you hailed your double on the open channel (Sector 4)",
+    "twinLeft": "you let your double keep its place in the line (Sector 4)",
+    "hymnSchoolSeen": "you saw the Choir teaching the hymn to children (Sector 4)",
+    "hymnSchoolBroken": "you took children out of the Choir's school (Sector 4)",
+    "censusHelped": "you helped count the Procession (Sector 4)",
+    "censusBought": "you bought eleven years of the Procession's tally (Sector 4)",
+    "censusTold": "you told the counter where the four hundred went (Sector 4)",
+    "pilgrimsFerried": "you ferried the pilgrims yourself (Sector 4)",
+    "ferryBought": "you bought the acolyte's failing hull (Sector 4)",
+    "ferryWatched": "you watched the acolyte make the crossing (Sector 4)",
+    "tribunalSeated": "you seated the Warden tribunal (Sector 4)",
+    "tribunalDissolved": "you dissolved the Warden tribunal (Sector 4)",
+    "picketHeld": "the haulers held a picket at the Core for you (Sector 5)",
+    "picketStood": "you sent the haulers home from the Core (Sector 5)",
+    "ledgerTorn": "you tore your page out of the Choir's ledger (Sector 5)",
+    "lastPostCleared": "you cleared the last Warden post by the book (Sector 5)",
+    "lastPostRelieved": "you relieved the last Warden of duty (Sector 5)",
+    "lastPostRun": "you ran the last Warden post (Sector 5)",
+    "convoyCovered": "you covered the hospital convoy at the Core (Sector 5)",
+    "convoyMoved": "you walked the hospital convoy back out (Sector 5)",
+    "theatreTaken": "you took the surgery theatre for yourself (Sector 5)",
+    "auditAccepted": "you accepted the Rift's audit (Sector 5)",
+    "auditBeaten": "you found the Rift's double entry (Sector 5)",
+    "auditBurned": "you burned the Rift's audit room (Sector 5)",
+    "doubleAhead": "you let your double cross the threshold first (Sector 5)",
+    "doubleNamed": "you took your double's name (Sector 5)",
+    "doubleJoined": "you and your double crossed together (Sector 5)",
+    "childrenTaken": "you got the Choir's children out (Sector 5)",
+    "childrenJoined": "you sang the hymn with the children at the edge (Sector 5)",
+    "namesRead": "you read four hundred and eleven names into the dark (Sector 5)",
+    "namesKept": "you are carrying the full tally out (Sector 5)",
+    "namesBurned": "you burned eleven years of the tally (Sector 5)",
+    "silenceAnswered": "you broadcast into the Core's silence (Sector 5)",
+    "silenceRefused": "you flew the last six hours deaf on purpose (Sector 5)",
+    "lastYardUsed": "you refitted at the yard in the Core's shadow (Sector 5)",
+    "lastYardWarned": "you told the last yard to leave (Sector 5)",
+    "lastYardCrew": "you hired out of the last yard (Sector 5)",
+    "thresholdBought": "you bought out the stall at the threshold (Sector 5)",
+    "thresholdAsked": "you learned whose prices were waiting at the threshold (Sector 5)",
+    "thresholdStocked": "you left your own stock at the threshold (Sector 5)",
+    "coreListened": "you listened to the Core without answering",
+    "libraryRead": "you read what somebody printed out to keep",
+    "librarySold": "you sold a hull full of somebody's fear by weight",
+    "salvagerSplit": "you split a wreck with another salvager",
+    "salvagerBeaten": "you raced another salvager for a wreck",
+    "salvagerYielded": "you gave a wreck to the salvager who got there with you",
+    "distressAnswered": "you answered a forty-year-old distress call",
+    "distressTraced": "you traced the frozen distress call",
+    "distressCut": "you cut a distress loop for its transmitter",
+    "lienCleared": "you cleared a stranger's lien",
+    "hullBought": "you bought a lien-heavy hull outright",
+    "debtHeld": "you bought somebody's debt instead of paying it",
+    "deadZoneCrossed": "you crossed the dead zone on dead reckoning",
+    "deadZoneAvoided": "you took the long way round the dead zone",
+    "deadZoneMapped": "you mapped the dead zone's edge and sold it",
+    "petitionRead": "four people you helped wrote you a petition",
+    "petitionAccepted": "you took the petitioners aboard",
+    "petitionRefused": "you bought the petitioners passage the other way",
+    "beaconSinging": "a beacon you fixed is broadcasting your registry",
+    "beaconScrubbed": "you scrubbed your registry off the beacon",
+    "beaconBoosted": "you spent your own parts making a beacon louder",
+    "bloomRidden": "you rode the early tide through the wreck field",
+    "bloomWaited": "you waited the early tide out",
+    "bloomForced": "you pushed straight through the early tide",
+    "letterRead": "you read the letter that came back",
+    "letterSent": "you relaunched a forty-year-old letter",
+    "letterKept": "you kept the message capsule for parts",
+    "wakeNamed": "you gave a scavenger's body a name",
+    "wakeJoined": "you stayed for a scavenger wake",
+    "wakeBought": "you bought the hull out from under a wake",
+    "auctionRun": "you worked the floodlit scrap auction",
+    "stowawayCalled": "you decided what to do with the stowaway",
+    "merchantSwap": "you met the drift merchant and answered his offer",
+    "pocketCrossed": "you dealt with the radiation pocket",
+    "leakHandled": "you handled the cracking probability core",
+    "flareMet": "you met the mirror-flare",
+    "runnersRaced": "you answered the convoy runners",
+    "ghostResolved": "you settled the sensor ghost",
+    "hulkAnswered": "you dealt with the tethered hulk",
+    "fuelBloomWorked": "you worked the drive-fuel bloom",
+    "veinWorked": "you worked the Rift shard vein",
+    "twinWreckOpened": "you opened one of the twin wrecks",
+    "warpedYardUsed": "you let the self-built yard work on you",
+    "titheSettled": "you settled with the tithe station",
+    "voiceHandled": "you answered the thing on your intercom",
+    "coldEngineWorked": "you did something with the cold drive assembly",
+    "rainMet": "you decided what to do about the probability rain",
+    "rimBoardRead": "you read the Rim's noticeboard (Sector 1)",
+    "rimBoardPosted": "you posted your own registry on the Rim's board (Sector 1)",
+    "rimBoardTaken": "you stripped the Rim's noticeboard for the alloy (Sector 1)"
   },
   "events": {
     "driftingPod": {
@@ -861,12 +1063,14 @@
       "text": "A gutted hauler's reactor still ticks over, leaking charge into the dark. You could tap it, if the field holds.",
       "opt": {
         "siphon": "Siphon the charge",
-        "salvage": "Strip it for scrap"
+        "salvage": "Strip it for scrap",
+        "attune": "Let it sing into your coils"
       },
       "out": {
         "siphonPass": "The tap holds. Your cells drink deep — a head start on the fights ahead.",
         "siphonFail": "The field collapses mid-draw and bleeds into your hull.",
-        "salvage": "You cut it apart the safe way and haul off the good plating."
+        "salvage": "You cut it apart the safe way and haul off the good plating.",
+        "attune": "You match the reactor's pitch instead of tapping it. The hum crosses into your own lines and stays there, warm and patient, for four fights."
       }
     },
     "mineFieldGap": {
@@ -1048,10 +1252,12 @@
     "silentField": {
       "text": "A field of dead static, no signal, no wreckage. Just the hum of the Rim and your own breathing.",
       "opt": {
-        "drift": "Drift through, listening"
+        "drift": "Drift through, listening",
+        "chart": "Chart the silence"
       },
       "out": {
-        "drift": "Nothing answers. You scavenge loose plating on the way out."
+        "drift": "Nothing answers. You scavenge loose plating on the way out.",
+        "chart": "You run a clean survey instead of drifting through it. Three rows of the lane resolve, and the hull settles into the quiet like it was built for it."
       }
     },
     "tollGate": {
@@ -1291,12 +1497,14 @@
       "opt": {
         "strip": "Strip the hulls",
         "salvageCore": "Cut out a core",
-        "leave": "Leave them locked"
+        "leave": "Leave them locked",
+        "alignField": "Align the field, lift clean"
       },
       "out": {
         "strip": "Good haul. The clamps take a bite out of your plating on the way out.",
         "salvageCore": "One core still holds a charge. It comes free clean.",
-        "leave": "You cut power and drift past. The field quiets behind you."
+        "leave": "You cut power and drift past. The field quiets behind you.",
+        "alignField": "You reverse the polarity in steps rather than yanking. The wrecks let go one by one and nothing tears."
       }
     },
     "yusufDebt": {
@@ -1348,11 +1556,13 @@
       "text": "A chapel welded into a hauler's hold. The Preacher keeps the door open and the arithmetic running.",
       "opt": {
         "listen": "Sit and listen",
-        "refuse": "Walk out"
+        "refuse": "Walk out",
+        "sing": "Sing it back"
       },
       "out": {
         "listen": "The numbers make an unpleasant kind of sense. You leave carrying current.",
-        "refuse": "You leave mid-verse. The hull feels solider for the refusal."
+        "refuse": "You leave mid-verse. The hull feels solider for the refusal.",
+        "sing": "You answer the hymn in its own key. The preacher stops mid-verse, listens, and hands you a coil that was never his to give."
       }
     },
     "tetheredHulk": {
@@ -1370,11 +1580,13 @@
       "text": "A relay mast, half its array sheared off. It still tries to speak on the hour.",
       "opt": {
         "repairIt": "Repair the array",
-        "stripIt": "Strip the array"
+        "stripIt": "Strip the array",
+        "useKey": "Use the Keeper's key"
       },
       "out": {
         "repairIt": "It comes back up mid-sentence. The Keeper's network notes who fixed it.",
-        "stripIt": "Good parts. The mast goes dark behind you and stays dark."
+        "stripIt": "Good parts. The mast goes dark behind you and stays dark.",
+        "useKey": "The key fits a socket nobody bothered to hide. The relay wakes up whole instead of patched, and two rows of the lane come with it."
       }
     },
     "fuelBloom": {
@@ -1404,11 +1616,13 @@
       "text": "A hull identical to yours holds station off the bow. Its running lights answer half a second before you signal.",
       "opt": {
         "speak": "Speak to it",
-        "shoot": "Fire on it"
+        "shoot": "Fire on it",
+        "stepThrough": "Step through"
       },
       "out": {
         "speak": "It answers in your own voice, and it is kinder than you are. You leave carrying something it gave you.",
-        "shoot": "It breaks apart without resistance. Your own hull takes the damage anyway."
+        "shoot": "It breaks apart without resistance. Your own hull takes the damage anyway.",
+        "stepThrough": "You cross. Something of yours stays on the other side and something of the other side comes back with you. The hull is smaller now and it knows things."
       }
     },
     "clanEscort": {
@@ -1481,12 +1695,14 @@
       "text": "A ward tablet, floating in clean vacuum. Somebody wrote the arithmetic out longhand and left it here.",
       "opt": {
         "solveIt": "Solve the ward",
-        "burnLedger": "Burn the tablet"
+        "burnLedger": "Burn the tablet",
+        "auditIt": "Audit it by the book"
       },
       "out": {
         "solvePass": "The arithmetic closes. Whatever the ward was holding shut hands you a core.",
         "solveFail": "You get the sign wrong. The ward opens the wrong way, and the sector notices.",
-        "burnLedger": "You unmake the question. The Rift quiets, and something out here approves."
+        "burnLedger": "You unmake the question. The Rift quiets, and something out here approves.",
+        "auditIt": "You do not solve the ledger — you reconcile it. Every entry balances, the ward opens itself, and the arithmetic sticks to your rerolls."
       }
     },
     "twinWreck": {
@@ -1528,11 +1744,13 @@
       "text": "A gate of hulls, all tuned to one chord. They will open for a voice, or for silence.",
       "opt": {
         "singAlong": "Sing the verse",
-        "jamIt": "Jam the chord"
+        "jamIt": "Jam the chord",
+        "harmonize": "Harmonize with the gate"
       },
       "out": {
         "singAlong": "Your reactor picks up the chord and keeps it. The gate opens gladly.",
-        "jamIt": "You put a wall of noise across their band. The gate opens because it has to."
+        "jamIt": "You put a wall of noise across their band. The gate opens because it has to.",
+        "harmonize": "You let the gate's chord run through the reactor unopposed. It opens without asking a price, and the charge stays in the coils for two fights."
       }
     },
     "pactSealing": {
@@ -1583,22 +1801,26 @@
       "text": "«One favour,» the Huntress says. «Spend it here or carry it. Your ledger.»",
       "opt": {
         "callFavor": "Call it in now",
-        "saveFavor": "Keep it for later"
+        "saveFavor": "Keep it for later",
+        "debtPaid": "Remind her the debt is settled"
       },
       "out": {
         "callFavor": "She drops a crate on your dorsal clamp and is gone before you thank her.",
-        "saveFavor": "She routes you a private supply channel instead. It keeps paying."
+        "saveFavor": "She routes you a private supply channel instead. It keeps paying.",
+        "debtPaid": "«Paid is paid,» she says, and means it. The bounty board goes quiet, and she leaves a charged cell on your dock as interest."
       }
     },
     "reliquaryRun": {
       "text": "A reliquary hull, escorted by one cantor. Whatever's inside has not been opened in decades.",
       "opt": {
         "raidIt": "Take the reliquary",
-        "trade": "Trade for it"
+        "trade": "Trade for it",
+        "catalogue": "Catalogue it properly"
       },
       "out": {
         "raidIt": "You commit. The cantor stops singing and starts firing.",
-        "trade": "They accept a yellow core as tribute and swap you something stranger."
+        "trade": "They accept a yellow core as tribute and swap you something stranger.",
+        "catalogue": "You inventory the reliquary instead of stripping it. The Choir's own quartermasters buy the list, and a yard three jumps on honours the paperwork."
       }
     },
     "choirTithe": {
@@ -1663,11 +1885,13 @@
       "text": "A tide of loose causality, running the wrong way down the lane.",
       "opt": {
         "rideTide": "Ride it",
-        "anchorHere": "Anchor and wait"
+        "anchorHere": "Anchor and wait",
+        "steady": "Hold the hull steady"
       },
       "out": {
         "rideTide": "You arrive five rows further along than you should. The hull disagrees about how.",
-        "anchorHere": "You hold position until it passes. The crew gets an hour that counts."
+        "anchorHere": "You hold position until it passes. The crew gets an hour that counts.",
+        "steady": "You refuse to move with the tide. It breaks around a ship that will not admit two pasts, and the plating knits itself shut."
       }
     },
     "coreBargain": {
@@ -1684,11 +1908,11 @@
     "hereticFleet": {
       "text": "The heretics you armed have made a fleet of it, and they are asking who leads.",
       "opt": {
-        "leadThem": "Lead them",
+        "leadThem": "Take the lead",
         "sendThemHome": "Send them home"
       },
       "out": {
-        "leadThem": "Nine hulls fall in behind you, singing nothing, very loudly.",
+        "leadThem": "They were waiting for anyone who would say it out loud. You do, and the ragged fleet forms up behind your wake with a gift in its teeth.",
         "sendThemHome": "They leave you their stores and their gratitude. Both are heavy."
       }
     },
@@ -1707,11 +1931,13 @@
       "text": "The acolyte you sheltered is waiting at the last waypoint, with a route and a request.",
       "opt": {
         "takeHerAboard": "Take her aboard",
-        "sendHerBack": "Send her back"
+        "sendHerBack": "Send her back",
+        "callCrew": "Call her people up from the hold"
       },
       "out": {
         "takeHerAboard": "She runs your tray like she was born to it. Nothing in the Choir surprises her.",
-        "sendHerBack": "She leaves you everything she carried. It is more than you expected."
+        "sendHerBack": "She leaves you everything she carried. It is more than you expected.",
+        "callCrew": "They come up blinking, eleven of them, and start working before anyone asks. The hull gets bigger the way a crewed hull always does."
       }
     },
     "brokenLighthouse": {
@@ -1776,22 +2002,26 @@
       "text": "Not Mara — her collector. He has the page with your name and no interest in conversation.",
       "opt": {
         "settleDebt": "Settle up",
-        "outrun": "Outrun him"
+        "outrun": "Outrun him",
+        "callFavour": "Call in the favour she owes"
       },
       "out": {
         "settleDebt": "He tears the page out and hands it to you. «She says you're welcome back.»",
-        "outrun": "You lose him in the lane. He was never the expensive part."
+        "outrun": "You lose him in the lane. He was never the expensive part.",
+        "callFavour": "Mara does not enjoy it, but she honours it. The collection stands, marked as debt rather than theft, and a yard down the lane takes her word for it."
       }
     },
     "hymnResidue": {
       "text": "The chord you sang is still in the reactor housing. It has not stopped.",
       "opt": {
         "keepHumming": "Let it run",
-        "scourIt": "Scour it out"
+        "scourIt": "Scour it out",
+        "playCopy": "Play your copy back at it"
       },
       "out": {
         "keepHumming": "It feeds the reactor and asks nothing. That is the concerning part.",
-        "scourIt": "You cut it out plate by plate. The silence afterwards is yours again."
+        "scourIt": "You cut it out plate by plate. The silence afterwards is yours again.",
+        "playCopy": "Your recording answers the residue in its own voice. The pattern unravels, spits out something the Choir was keeping — and the Choir will know exactly who took it."
       }
     },
     "jammedChoir": {
@@ -1831,11 +2061,13 @@
       "text": "A suit drifting alone, arms folded, tether cut from the inside.",
       "opt": {
         "readLog": "Read the log",
-        "stripSuit": "Strip the suit"
+        "stripSuit": "Strip the suit",
+        "matchChart": "Match it against your quiet-field chart"
       },
       "out": {
         "readLog": "Coordinates, a name, and a route somebody wanted found.",
-        "stripSuit": "Good seals, good scrap. You leave the name plate where it is."
+        "stripSuit": "Good seals, good scrap. You leave the name plate where it is.",
+        "matchChart": "The suit's last heading crosses your survey exactly. You know where it was going, and now the turn it never made is written down somewhere."
       }
     },
     "coldEngine": {
@@ -1894,6 +2126,920 @@
         "bidHigh": "Mara knocks it down to you and files your name under 'pays'.",
         "bidLow": "You take the second lot. Nobody else wanted it, which may be the point.",
         "heckle": "You talk the price down for somebody else and pocket their thanks. Mara does not thank you."
+      }
+    },
+    "maraSupplyRun": {
+      "text": "Mara's voice comes through on a lane channel, clipped and businesslike. «Four crates of coolant, one escort, one lane. My buyer is nervous and my usual hands are dead. You want the work or do I ask the clan?»",
+      "opt": {
+        "escort": "Take the escort",
+        "skim": "Take a crate off the top",
+        "decline": "Tell her to find other hands"
+      },
+      "out": {
+        "escort": "You fly it straight. Something with clan markings tries the lane behind you and finds out what an escort is for.",
+        "skim": "One crate goes into your hold and the manifest is short. Mara does not say anything at delivery. She just looks at the number twice.",
+        "skimCaught": "You lift a crate and her tally clerk is standing right there. The payout halves, the buyer's people follow you two jumps, and Mara says nothing at all.",
+        "decline": "«Fine. Fine.» She cuts the channel without a threat, which from Mara is nearly a kindness. You spend the saved hours on the hull."
+      }
+    },
+    "maraVault": {
+      "text": "A shuttered bay in the last market, and Mara at the panel. «This is where I keep what I do not sell. You paid for the look. Take one thing, take the cash, or leave it shut — I have had a very long decade and any of the three is fine.»",
+      "opt": {
+        "openIt": "Take something off the rack",
+        "takeCash": "Take the cash instead",
+        "leaveItHers": "Leave the vault shut"
+      },
+      "out": {
+        "openIt": "You lift a die out of a foam cradle that was cut for it forty years ago. Her yard contact honours the paperwork three jumps on.",
+        "takeCash": "She counts it out in old fleet script and does not pretend it is a fair trade. It spends anyway.",
+        "leaveItHers": "«Nobody has done that,» she says, and then, after a while, sends over the plating she was saving for her own hull."
+      }
+    },
+    "maraUsurer": {
+      "text": "Where Mara's counter should be there is a lien notice and a hull the size of a chapel. The Usurer runs her debts now — she sold the book to cover what you cost her. «Principal, interest, and the inconvenience,» it says.",
+      "opt": {
+        "payInFull": "Pay it in full",
+        "fightIt": "Refuse and hold station",
+        "runTheLane": "Run the lane"
+      },
+      "out": {
+        "payInFull": "You pay. The lien clears, the book goes back to Mara, and she meets you at the far end of the market with nothing to say and a full toolkit.",
+        "fightIt": "The Usurer does not negotiate twice. It undocks, and the market clears a firing lane like it has done this before.",
+        "runPass": "You thread the market's service lanes and come out the far side with the lien unserved. Somewhere behind you a very large hull is turning around slowly.",
+        "runFail": "The lane closes on you halfway. You get out, but not cleanly, and the Usurer puts a tail on you for the rest of the sector."
+      }
+    },
+    "yusufConvoyDefense": {
+      "text": "Yusuf is escorting nineteen hulls of people who used to be a fleet, and the rift ahead of him is not empty. «I have the manifest and no guns worth the name. You have guns. I am not going to insult you by pretending this is a job offer.»",
+      "opt": {
+        "holdTheLine": "Hold the line for the convoy",
+        "tellThem": "Tell them what the black box said",
+        "sellManifest": "Sell the manifest ahead of him"
+      },
+      "out": {
+        "holdTheLine": "You take the rift side and hold it until the last hull is through. Nineteen ships log your transponder. Yusuf logs it twice.",
+        "tellThem": "You put the black box on the open channel. Nobody screams. They just stop pretending, all at once, and the convoy re-forms tighter than before.",
+        "sellManifest": "A broker two jumps ahead pays well for nineteen names and a heading. The convoy still gets through, mostly.",
+        "sellCaught": "You sell it and the buyer talks. Yusuf hears his own manifest quoted back at him on an open channel before you are out of the sector."
+      }
+    },
+    "yusufRefugeeLane": {
+      "text": "The procession has stalled at a pinch point you happen to know how to open. Yusuf does not ask. He just floats there with the lane map on his screen where you can see it.",
+      "opt": {
+        "openLane": "Open the lane for them",
+        "chargeToll": "Charge for the passage",
+        "sealIt": "Seal it behind you"
+      },
+      "out": {
+        "openLane": "You burn the pinch open and hold position while they file through. It takes hours you do not have. Every hull that passes marks your heading as safe.",
+        "chargeToll": "They pay. Of course they pay. Yusuf pays first and loudest so the ones behind him do not have to argue.",
+        "sealIt": "You go through and bring the pinch down behind you. Nothing follows you. Nothing follows them either."
+      }
+    },
+    "choirDeepPact": {
+      "text": "The Preacher meets you inside the hymn this time, not beside it. «You signed at the shallow end. There is a deeper reading. It costs more of the hull and gives more of the pattern, and I will not pretend the trade is even.»",
+      "opt": {
+        "goDeeper": "Take the deeper reading",
+        "holdHere": "Hold at what you signed",
+        "breakIt": "Tear the pact up here"
+      },
+      "out": {
+        "goDeeper": "The hymn takes a bite out of the hull and leaves something in the hole that was never manufactured. Your reactor learns a verse.",
+        "holdHere": "«Prudent.» He does not sound disappointed, which is worse. The shallow reading holds, and it pays what it promised.",
+        "breakIt": "You break the signature line by line on an open channel. The Choir hears every word of it, and the nearest Cantor comes to collect the difference."
+      }
+    },
+    "preacherFinale": {
+      "text": "The Preacher is waiting at the last quiet station before the Core, and for once he is not performing. «Whatever you decided about us, you are going in there. I would like to know what you will say when it asks.»",
+      "opt": {
+        "singWithHim": "Sing it with him one last time",
+        "answerPlainly": "Tell him what you will actually say",
+        "cutHimOff": "Cut the channel"
+      },
+      "out": {
+        "singWithHim": "You take the lower line. He takes the higher. For ninety seconds the sector has a shape, and the reactor holds the charge long after the sound stops.",
+        "answerPlainly": "You tell him plainly. He listens the whole way through without correcting a word, and then hands over the plating he was going to be buried in.",
+        "cutHimOff": "You cut him off mid-verse. His acolytes take that about as well as you expected, and they are between you and the Core."
+      }
+    },
+    "keeperThread": {
+      "text": "The Keeper's relay finds you between beacons. «You have been doing my work. I do not know whether to thank you or bill you. Come to that — what do you want out of this?»",
+      "opt": {
+        "repayHim": "Square what you owe him",
+        "askMore": "Ask him for more",
+        "handTheLog": "Hand him your beacon log"
+      },
+      "out": {
+        "repayHim": "You send the scrap and the tally of every beacon you touched. He does not thank you. He files it, which for him is the same thing.",
+        "askMore": "He gives you something out of the maintenance stock and does not say another word for two jumps.",
+        "askMoreCold": "He pays you off in salvage rights, cold as vacuum, and stops routing you the easy beacons.",
+        "logPass": "Your log dovetails with his. Two half-maps become one map, and three rows of the lane resolve out of the static.",
+        "logFail": "The transfer corrupts halfway. He gets a broken log and a broken impression, and the tide comes up behind the failed handshake."
+      }
+    },
+    "hullBreakerYard": {
+      "text": "A breaker yard still running on automatic. It has been cutting the same hull into the same pieces for years, and the pieces are stacked in a way that suggests somebody was still collecting.",
+      "opt": {
+        "takeStack": "Take the stack",
+        "stopTheYard": "Cut the yard's power",
+        "restartIt": "Point it at something else"
+      },
+      "out": {
+        "takeStack": "Clean plate, cut to a standard nobody uses any more. It sells anyway.",
+        "takeStackTrap": "The stack was load-bearing. Half the yard comes down across your dorsal.",
+        "stopTheYard": "You kill the bus and the arms sag. Whatever ship that was, it is allowed to stop being cut now.",
+        "restartPass": "You reprogram the cutting order. It starts producing parts you can actually use.",
+        "restartFail": "The arms take your instruction as a target designation."
+      }
+    },
+    "tugStrike": {
+      "text": "Eleven tugs holding station across the lane, engines cold, transponders reading the same three words: NOT UNTIL PAID.",
+      "opt": {
+        "payThem": "Pay the strike fund",
+        "crossPicket": "Cross the line",
+        "haulForThem": "Haul one load for them"
+      },
+      "out": {
+        "payThem": "They open the lane and hand you their route notes, which are better than anything you were flying on.",
+        "crossPicket": "Nobody shoots. Eleven transponders write your registry down at the same moment.",
+        "haulForThem": "You take a load nobody is being paid for. The yards downstream hear about it before you arrive."
+      }
+    },
+    "salvageQuarantine": {
+      "text": "A quarantine buoy, forty years expired, still politely refusing to let anyone into a debris field it has no authority over.",
+      "opt": {
+        "obeyIt": "Respect the quarantine",
+        "breakSeal": "Break the seal",
+        "readBuoy": "Read the buoy's log"
+      },
+      "out": {
+        "obeyIt": "You route around. Whatever it was protecting stays protected for another few decades.",
+        "breakSeal": "Sealed cargo, sealed for a reason that stopped applying decades ago. Mostly.",
+        "breakSealBad": "The reason it was sealed is still in there, and it has had forty years to get hungry.",
+        "readBuoy": "It logged every hull that ignored it. The list is long, and the headings on it are useful."
+      }
+    },
+    "driftSchool": {
+      "text": "Somebody has been running a school out of a gutted freighter. Nine children, one very tired adult, and a curriculum that is mostly about not dying in a drift field.",
+      "opt": {
+        "donate": "Leave them supplies",
+        "teachThem": "Teach one lesson",
+        "takeTheFreighter": "Take the freighter's core"
+      },
+      "out": {
+        "donate": "The tired adult does not thank you. One of the children draws your hull on the bulkhead, badly and permanently.",
+        "teachThem": "You explain lane discipline to nine people who will outlive you. Explaining it out loud fixes something in your own hands.",
+        "takeTheFreighter": "It powers the lights and the air. They will manage. People here usually manage."
+      }
+    },
+    "clanFuneral": {
+      "text": "A clan is burning one of its own into the field, which out here means opening the hull and letting the drift take her. They have noticed your registry.",
+      "opt": {
+        "standDown": "Cut engines and wait",
+        "salvageDrift": "Follow the drift after",
+        "sendSalute": "Send the fleet salute"
+      },
+      "out": {
+        "standDown": "You hold station for the full nineteen minutes. Their yardmaster remembers who did that.",
+        "salvageDrift": "The hull she went out in was worth more than the ceremony. Somebody was going to take it.",
+        "salvageDriftSeen": "They left a picket. Of course they left a picket.",
+        "sendSalute": "Nobody out here has heard the old three-tone in thirty years. Two of the clan ships answer it before they think."
+      }
+    },
+    "coolantBloom": {
+      "text": "A coolant bloom the size of a city block, freezing and re-freezing on a slow cycle. Something is keeping it fed.",
+      "opt": {
+        "tapBloom": "Tap the bloom",
+        "findSource": "Find what feeds it",
+        "burnIt": "Burn it off"
+      },
+      "out": {
+        "tapPass": "Slow hands, slow valves, no spike. The tanks come back full and the reactor runs cold for a while.",
+        "tapFail": "One valve opens too far and the bloom answers the way pressure always answers.",
+        "findSource": "A hull under the ice, still venting, still running its cycle for a crew that is not aboard.",
+        "burnIt": "It goes up clean and the lane clears for everybody. Whatever was living in it does not get a vote."
+      }
+    },
+    "manifestAuction": {
+      "text": "An open-channel auction for a cargo manifest nobody has seen. Three bidders, and one of them is bidding in fleet script that stopped being money forty years ago.",
+      "opt": {
+        "bidHigh": "Outbid them all",
+        "backScript": "Back the fleet bidder",
+        "jamAuction": "Jam the auction"
+      },
+      "out": {
+        "bidHigh": "The manifest is real. Half of it is already salvaged, and the other half is worth the whole bid.",
+        "bidHighDud": "The cargo is gone. The routes on the manifest are not, and routes out here are almost cargo.",
+        "backScript": "You vouch for the script on an open channel. Somebody's grandmother's pay finally buys something.",
+        "jamAuction": "Nobody wins it. You collect the lot at the reserve price two hours later, from a very annoyed clerk."
+      }
+    },
+    "wardenPatrolBoat": {
+      "text": "A Warden patrol boat, one crew, forty years past its rotation. It hails you with a standard stop order and then, after a pause, asks whether the order still means anything.",
+      "opt": {
+        "answerYes": "Tell him it still means something",
+        "answerNo": "Tell him it does not",
+        "showPapers": "Present salvage papers"
+      },
+      "out": {
+        "answerYes": "He runs the full stop-and-inspect, by the book, for the first time in a decade. Then he gives you the patrol grid.",
+        "answerNo": "He is quiet for a while. Then he strips the boat's ordnance and gives it to you, because he will not be needing it.",
+        "papersPass": "Your paperwork is in order in the way only a real salvager's paperwork is. He pays the standing bounty on it.",
+        "papersFail": "He finds the discrepancy in eleven seconds and fines you, apologetically, out of forty years of habit."
+      }
+    },
+    "wreckedRelayFarm": {
+      "text": "Sixty relay masts in a row, all pointed the same way, all dead. The sixty-first is pointed somewhere else and is drawing power.",
+      "opt": {
+        "traceIt": "Trace where it points",
+        "stripFarm": "Strip the dead sixty",
+        "realign": "Turn the sixty-first back"
+      },
+      "out": {
+        "traceIt": "The heading is not on any chart. It is on yours now.",
+        "stripFarm": "Sixty masts of good copper. The sixty-first keeps drawing power the whole time you work.",
+        "realign": "You put it back in line with its sixty siblings. The array wakes up for eleven seconds and says a name."
+      }
+    },
+    "tetherRace": {
+      "text": "Two haulers have strung a tether across a gap and are betting on who can cross it faster without cutting it. They have space for a third.",
+      "opt": {
+        "race": "Take the third slot",
+        "bet": "Bet on the older hauler",
+        "cutTether": "Cut the tether and go"
+      },
+      "out": {
+        "racePass": "You cross clean and the tether is still humming behind you. Both haulers pay without arguing.",
+        "raceFail": "You cut it. Nobody gets paid, and one hauler is now on foot in the most literal sense available out here.",
+        "betWin": "Old hulls know their own tolerances. She crosses like she has done it a thousand times, which she has.",
+        "betLose": "Old hulls also know their own limits, and hers picks today to find one.",
+        "cutTether": "Good line, good winch, and two people who will be telling this story about you for a while."
+      }
+    },
+    "yusufApprentice": {
+      "text": "Yusuf's apprentice hails you privately. «He will not ask, so I am asking. There is a part he needs and a yard that will not sell to him.»",
+      "opt": {
+        "buyIt": "Buy it under your registry",
+        "stealIt": "Take it off the yard",
+        "tellHim": "Tell Yusuf his apprentice asked"
+      },
+      "out": {
+        "buyIt": "He works out where it came from in about four minutes and says nothing about it for the rest of the sector.",
+        "stealIt": "The yard will not miss it for a month. The apprentice will not say where it came from for longer than that.",
+        "stealItSeen": "The yard misses it immediately. You get out with the part and a tail.",
+        "tellHim": "He is angry for about ten seconds and then very carefully not angry. He fixes something on your hull he was not asked to fix."
+      }
+    },
+    "iceLighter": {
+      "text": "An ice lighter, still under thrust, still empty. Its autopilot has been running the same delivery loop since before the Cut and has never once been told to stop.",
+      "opt": {
+        "loadIt": "Load it and let it run",
+        "boardIt": "Board and strip it",
+        "stopIt": "Give it the stop order"
+      },
+      "out": {
+        "loadIt": "It accepts the load, logs it, and carries on. Somewhere down the loop, somebody is going to get a delivery.",
+        "boardIt": "Forty years of maintenance on a hull nobody used. Every part comes off clean.",
+        "stopIt": "It acknowledges, cuts thrust, and goes dark in under a second. Forty years, and it took one word."
+      }
+    },
+    "driftCourt": {
+      "text": "Three hulls have convened a salvage court over a wreck, which out here means shouting at each other on a shared channel until somebody concedes. They want a fourth party to rule.",
+      "opt": {
+        "ruleFair": "Rule it three ways",
+        "ruleForSelf": "Rule it your way",
+        "auditWreck": "Audit the wreck first"
+      },
+      "out": {
+        "ruleFair": "Nobody is happy, which all three of them recognise as the shape of a fair ruling. Your fee is paid in thirds.",
+        "ruleForSelf": "You award the wreck to the only party present with guns, and take a finder's cut off the top.",
+        "auditPass": "The wreck is not what any of them think it is, and your reading settles the argument in four sentences.",
+        "auditFail": "Your survey is wrong in a way all three of them can see, and the shouting resumes with you in it."
+      }
+    },
+    "driftReputation": {
+      "text": "A hauler out of the Drift Fields matches your vector without being asked. «You are the one who did the decent thing back there. We pass that along.»",
+      "opt": {
+        "takeEscort": "Let them fly with you",
+        "askCargo": "Ask what they are carrying",
+        "sendThemHome": "Send them back"
+      },
+      "out": {
+        "takeEscort": "They fly your flank through the whole Rift and peel off without asking for anything.",
+        "askCargo": "Salvage, mostly. They give you the piece they were arguing about.",
+        "askCargoEmpty": "Nothing. They are running empty and paying you anyway, out of a fund nobody administers.",
+        "sendThemHome": "The Rift is not for haulers. They go, and leave you their charts on the way out."
+      }
+    },
+    "driftWake": {
+      "text": "Someone has been broadcasting your registry on the Drift Fields band with a short list attached. The list is accurate.",
+      "opt": {
+        "jamIt": "Jam the broadcast",
+        "answerIt": "Answer on the same band",
+        "findSender": "Find the sender"
+      },
+      "out": {
+        "jamIt": "The band goes quiet. Everything else on it goes quiet too, which people notice.",
+        "answerIt": "You read the list back, item by item, and do not argue with any of it. The band stays quiet for a different reason.",
+        "findPass": "A single relay on a dead hull. Whoever set it up is long gone; the recording is not.",
+        "findFail": "You chase it into a fold and lose two hours and some plating. The broadcast continues."
+      }
+    },
+    "quietPassage": {
+      "text": "The Rift here is folded so tight that sound arrives before the thing that made it. Your own engine note reaches you from ahead.",
+      "opt": {
+        "followTheNote": "Follow your own note",
+        "cutEngines": "Cut engines and drift",
+        "soundIt": "Sound the fold"
+      },
+      "out": {
+        "followTheNote": "You fly toward the sound of yourself and come out three rows further along than you should have.",
+        "cutEngines": "The fold has nothing to echo. For eleven minutes nothing at all happens, and the hull uses them.",
+        "soundPass": "The return comes back clean and carries something with it that was not in the fold a moment ago.",
+        "soundFail": "The fold returns your ping forty times, all at once, from every direction."
+      }
+    },
+    "wardenRelay": {
+      "text": "A Warden relay wakes up as you pass and reads you a duty roster. Every name on it is yours, assigned to posts that no longer exist.",
+      "opt": {
+        "acceptPost": "Accept a post",
+        "wipeRoster": "Wipe the roster",
+        "copyRoster": "Copy it and move on"
+      },
+      "out": {
+        "acceptPost": "You log in against a post that has been empty for forty years. The relay grants you its standing authority, which is nothing and everything.",
+        "wipeRoster": "The roster goes. The relay's memory is worth something intact and more in pieces.",
+        "copyRoster": "Forty years of posts, watches and reliefs. Somebody should have this, and now somebody does."
+      }
+    },
+    "manifestBuyer": {
+      "text": "The buyer from the Drift Fields auction has found you, which is impressive, because you did not leave a heading.",
+      "opt": {
+        "dealAgain": "Deal with him again",
+        "cutHim": "Cut him loose",
+        "traceHim": "Trace how he found you"
+      },
+      "out": {
+        "dealAgain": "He pays over the odds, twice, and then asks how you like being findable.",
+        "cutHim": "You change your transponder in front of him. It is rude, effective, and he respects both halves.",
+        "tracePass": "A tag on your hull, welded during the auction. You pull it and keep the transmitter.",
+        "traceFail": "You find nothing, which is worse than finding something, and he keeps finding you."
+      }
+    },
+    "haulerReunion": {
+      "text": "The tether haulers have set up a permanent crossing in the Rift and named it after the crossing you were part of. They want you to cut the ribbon, which here means the first run.",
+      "opt": {
+        "firstRun": "Take the first run",
+        "refuseHonour": "Refuse the honour",
+        "tollIt": "Ask for a share of the tolls"
+      },
+      "out": {
+        "firstRun": "You cross first and the line holds. Eleven hulls follow you through before the hour is out.",
+        "firstRunRough": "The line holds. Your dorsal does not. They pay the difference without being asked.",
+        "refuseHonour": "You tell them to send their oldest hull instead. She crosses, and the crossing gets her name.",
+        "tollIt": "They agree, because they named it after you and cannot now say no. The tolls arrive on time and feel exactly as good as that."
+      }
+    },
+    "foldedArchive": {
+      "text": "An archive hull, folded into itself so that every corridor leads to the same room. The room has been catalogued nine times, in nine hands.",
+      "opt": {
+        "addTenth": "Add a tenth catalogue",
+        "burnThem": "Burn the nine",
+        "readNinth": "Read the ninth hand"
+      },
+      "out": {
+        "addTenth": "You write your own list in your own hand. The fold accepts it and something in the arithmetic loosens.",
+        "burnThem": "Nine catalogues, one fire, one room that finally stops insisting on being described.",
+        "ninthPass": "The ninth hand is recent. Weeks, not decades. It lists an exit the other eight do not.",
+        "ninthFail": "You lose the thread halfway and take the lamp with you when you leave. The tenth catalogue will not be written."
+      }
+    },
+    "twinTransit": {
+      "text": "Two identical hulls pass you on identical vectors, four seconds apart. Both hail you. Both use your name.",
+      "opt": {
+        "answerFirst": "Answer the first",
+        "answerSecond": "Answer the second",
+        "answerNeither": "Answer neither"
+      },
+      "out": {
+        "answerFirst": "The first is grateful and gives you something. The second stops transmitting mid-word.",
+        "answerSecond": "The second knows things about the next four hours that have not happened yet. It shares two of them.",
+        "answerNeither": "You hold silence for eleven minutes. Only one hull comes out the far side of the fold, and it is not on your scope."
+      }
+    },
+    "riftSurgeon": {
+      "text": "A medical hull, still lit, still sterile, running a surgery bay that has not had a patient in decades. It offers you an appointment.",
+      "opt": {
+        "takeIt": "Take the appointment",
+        "stripBay": "Strip the surgery bay",
+        "bookOther": "Book it for someone else"
+      },
+      "out": {
+        "takeIt": "Whatever it does to the hull, it does properly, and it logs the procedure under a patient number from before the Cut.",
+        "takeItOff": "It works from a manual for a hull class that no longer exists. Most of the procedure still applies.",
+        "stripBay": "Sterile field emitters keep their value. The hull's lights stay on the whole time you work.",
+        "bookOther": "You broadcast the coordinates and the appointment slots on an open channel. Within the hour, three hulls have booked."
+      }
+    },
+    "causalDebt": {
+      "text": "A fold offers you a trade with no counterparty: take something now, and the Rift will take something back at a moment of its choosing.",
+      "opt": {
+        "takeNow": "Take it now",
+        "payFirst": "Pay first",
+        "declineIt": "Decline the trade"
+      },
+      "out": {
+        "takeNow": "The thing is in your hold before you finish agreeing. The other half of the trade has not happened yet.",
+        "payFirst": "You open a bulkhead and let it take the plating up front. The books balance and stay balanced.",
+        "declineIt": "Refusing is itself an answer, and the fold files it. The way through opens without a fee."
+      }
+    },
+    "unlitChapel": {
+      "text": "A Choir chapel with the lights off and the hymn running anyway. The Preacher is not here; a recording of him is, and it is answering questions.",
+      "opt": {
+        "askIt": "Ask the recording a question",
+        "silenceIt": "Cut the hymn",
+        "copyIt": "Copy the hymn"
+      },
+      "out": {
+        "askIt": "It answers a question you did not ask, correctly, and then answers the one you did.",
+        "silenceIt": "The chapel goes quiet in the middle of a line. Nothing objects, which is somehow the worst part.",
+        "copyIt": "You take a clean recording. It is shorter than it sounded and it does not loop where you expected."
+      }
+    },
+    "riftPilotage": {
+      "text": "A pilot's guild board, half-burned, still listing rates for lanes that fold differently every year. Somebody has kept it updated by hand.",
+      "opt": {
+        "hirePilot": "Hire a pilot",
+        "readBoard": "Just read the board",
+        "takeBoard": "Take the board"
+      },
+      "out": {
+        "hirePilot": "She has flown this fold eleven hundred times and charges as if it were the first.",
+        "readBoard": "The rates say more about the lanes than the charts do. The expensive ones are expensive for a reason.",
+        "takeBoard": "It comes off the bulkhead in one piece. Whoever was updating it is going to arrive and find nothing to update."
+      }
+    },
+    "echoOfTheCut": {
+      "text": "For eleven seconds every instrument you own agrees on a single reading, and the reading is forty years old.",
+      "opt": {
+        "recordIt": "Record it",
+        "rideIt": "Ride the reading",
+        "shutItOut": "Shut every instrument down"
+      },
+      "out": {
+        "recordIt": "Eleven seconds of the Cut, from outside it. Echo listens to it four times and says nothing.",
+        "ridePass": "You match the old reading and hold it. For a moment the Rift treats you as something it has already accounted for.",
+        "rideFail": "You cannot hold it. Whatever the Rift was about to account for, it accounts for the plating instead.",
+        "shutItOut": "Eleven seconds of nothing at all, chosen on purpose. The hull comes out of it steadier than it went in."
+      }
+    },
+    "processionEscort": {
+      "text": "The haulers who followed you out of the Drift Fields have caught up, and they have brought the whole crossing crew with them into a place none of them should be.",
+      "opt": {
+        "sendBack": "Order them back",
+        "useThem": "Put them to work",
+        "armThem": "Arm them and hold the lane"
+      },
+      "out": {
+        "sendBack": "They argue for four minutes and then go. Somebody leaves a spare pump on your dock on the way out.",
+        "useThem": "Eleven crews stripping a Procession wreck work faster than any yard. Everyone gets paid.",
+        "useThemCost": "It goes well until it does not. Two hulls do not come back and everybody keeps working anyway.",
+        "armThem": "You spend your own scrap on their turrets. The lane behind you stays open for the rest of the sector."
+      }
+    },
+    "brokerInTheChoir": {
+      "text": "The buyer has taken orders. He is wearing Choir grey now and he still has your registry written on the back of his hand.",
+      "opt": {
+        "dealAnyway": "Deal with him anyway",
+        "buyBackName": "Buy your registry back",
+        "readOrders": "Read his orders"
+      },
+      "out": {
+        "dealAnyway": "The Choir's stock is better than the Rim's and its prices are stranger. He does not haggle any more.",
+        "buyBackName": "He washes his hand in front of you, slowly, and looks genuinely relieved about it.",
+        "ordersPass": "The orders name three hulls and a heading. One of the hulls is yours; the heading is useful.",
+        "ordersFail": "You get halfway through before he notices, and the rest of the page is now a matter of doctrine."
+      }
+    },
+    "postingOrders": {
+      "text": "A Warden checkpoint in the Procession, staffed by nobody, still issuing transit papers to anyone who asks correctly.",
+      "opt": {
+        "useAuthority": "Ask as an officer",
+        "forgeThem": "Forge the papers",
+        "openIt": "Open it to everyone"
+      },
+      "out": {
+        "useAuthority": "The checkpoint recognises the post you are logged against and stamps everything you put in front of it.",
+        "forgeThem": "Blank stock, working stamp, nobody to check. You print more than you need and sell the rest.",
+        "forgeThemFlag": "The stamp logs every impression. Somewhere a very old system starts flagging your registry.",
+        "openIt": "You broadcast the correct phrasing on an open channel. Anyone in the Procession can have papers now."
+      }
+    },
+    "reliquaryLedger": {
+      "text": "The Choir keeps a ledger of everything it has taken and everything it intends to. Your name is in the second half.",
+      "opt": {
+        "strikeName": "Strike your name out",
+        "readForward": "Read forward",
+        "copyLedger": "Copy it and leave it"
+      },
+      "out": {
+        "strikeName": "One line, one stroke, and a doctrine problem that will be somebody's job to solve.",
+        "readForward": "The intentions are specific, dated and mostly on time. It is the most accurate chart you have ever held.",
+        "copyLedger": "You take a copy and put the original back exactly as it was, which takes longer than stealing it."
+      }
+    },
+    "fieldHospital": {
+      "text": "The surgeon hull's appointment list reached the Procession before you did. Forty hulls are queued at a station that cannot treat them.",
+      "opt": {
+        "triage": "Run the triage yourself",
+        "sellPlaces": "Sell places in the queue",
+        "fetchSurgeon": "Go and fetch the surgeon hull"
+      },
+      "out": {
+        "triage": "You spend a day sorting forty hulls into three lines. Nobody thanks you and the queue moves.",
+        "sellPlaces": "There is a price for going first and forty hulls willing to discuss it.",
+        "fetchSurgeon": "It comes when called. It has been waiting to be called for a very long time."
+      }
+    },
+    "debtCollector": {
+      "text": "The Rift's half of your trade has arrived, wearing the shape of a Procession hull and holding out an itemised list.",
+      "opt": {
+        "payIt": "Pay the list",
+        "disputeIt": "Dispute the list",
+        "outrunIt": "Outrun the collector"
+      },
+      "out": {
+        "payIt": "It takes plating, time and one instrument you liked. The books close and stay closed.",
+        "disputeIt": "Two of the items were never yours. It concedes both, immediately, and looks embarrassed about it.",
+        "disputeItLose": "The list is correct in every line, and disputing it adds a line.",
+        "outrunIt": "You can outrun it. You cannot outrun the arithmetic, but you can put some distance between you and the arithmetic."
+      }
+    },
+    "twinInTheProcession": {
+      "text": "One of the Procession's hulls is broadcasting your engine note. It has been in the line for years, according to everyone in it.",
+      "opt": {
+        "boardIt": "Board it",
+        "hailIt": "Hail it in the open",
+        "letItRide": "Let it fly"
+      },
+      "out": {
+        "boardIt": "The layout is yours down to the cable runs. The log is not, and the log is the interesting part.",
+        "boardItEmpty": "There is nobody aboard and there never was. The engine note keeps playing after you leave.",
+        "hailIt": "You put the question on the Procession's own channel. Four hundred hulls hear the answer, and the answer is your voice.",
+        "letItRide": "Whatever it is, it is holding a place in a line that needs places held."
+      }
+    },
+    "hymnSchool": {
+      "text": "The Choir is teaching the hymn to children. The Preacher watches you notice, and does not look away.",
+      "opt": {
+        "sayNothing": "Say nothing",
+        "takeThem": "Take the children out",
+        "arguePoint": "Argue the doctrine"
+      },
+      "out": {
+        "sayNothing": "He takes your silence as agreement and gives you the teaching verse, which is not the verse you have been hearing.",
+        "takeThem": "Nine of them come. Two do not, and the two who stay are the reason the Choir will remember your name.",
+        "arguePass": "You find the contradiction in the teaching verse and say it out loud in front of the class.",
+        "argueFail": "He lets you finish, then answers in four words, and one of the children writes them down."
+      }
+    },
+    "processionCensus": {
+      "text": "Somebody is counting the Procession, hull by hull, and has been for eleven years. They are four hundred short and will not say of what.",
+      "opt": {
+        "helpCount": "Help with the count",
+        "buyCount": "Buy the tally",
+        "tellTruth": "Tell them where the four hundred went"
+      },
+      "out": {
+        "helpCount": "Two days of tallying. The gap closes to three hundred and ninety-one and the counter weeps about it.",
+        "buyCount": "Eleven years of headings, registries and dates. Worth more than the hull that carried it.",
+        "tellTruth": "You have seen enough of the Rift to guess, and your guess is close enough to end eleven years of counting."
+      }
+    },
+    "acolyteFerry": {
+      "text": "An acolyte is ferrying pilgrims across a dead zone in a hull that will not survive the round trip, and knows it.",
+      "opt": {
+        "takeThemOver": "Ferry them yourself",
+        "buyHull": "Buy his hull off him",
+        "letItGo": "Let him make the crossing"
+      },
+      "out": {
+        "takeThemOver": "Two crossings, forty pilgrims, one hull that holds. They leave you something from the reliquary they were carrying.",
+        "buyHull": "He takes the scrap and walks the pilgrims the long way round, which takes a month and costs nobody anything.",
+        "letItGo": "He makes it. The hull does not make it back, and he is fine with the arithmetic.",
+        "letItGoBad": "He does not make it. You salvage what comes back through, because somebody was going to."
+      }
+    },
+    "wardenTribunal": {
+      "text": "Three Warden hulls have convened a tribunal over a lane murder from thirty years ago. They are still arguing about jurisdiction.",
+      "opt": {
+        "giveJurisdiction": "Grant them jurisdiction",
+        "dissolveIt": "Dissolve the tribunal",
+        "standWitness": "Stand as witness"
+      },
+      "out": {
+        "giveJurisdiction": "You say the words that make a court a court. They convict in nine minutes and adjourn for thirty years of paperwork.",
+        "dissolveIt": "You point out that none of them has authority and all three of them know it. They dock and sell you their evidence.",
+        "standWitness": "You did not see it happen. You saw the wreck, which is thirty years closer than anybody else got."
+      }
+    },
+    "haulersAtTheCore": {
+      "text": "The haulers are here. Not near the Core — at it, holding a picket line across the approach so nothing follows you in.",
+      "opt": {
+        "thankThem": "Thank them and go in",
+        "sendThemOff": "Order them off the line",
+        "armThemAgain": "Give them everything you can spare"
+      },
+      "out": {
+        "thankThem": "They will hold as long as they can hold. Everyone involved understands what that means.",
+        "sendThemOff": "It takes four minutes of shouting. Eleven hulls turn for home and you go the rest of the way with nobody behind you.",
+        "armThemAgain": "You strip your own hold into their racks. The line holds a great deal longer than anybody expected."
+      }
+    },
+    "ledgerAtTheThreshold": {
+      "text": "The Choir's ledger is here, open, and the intention written against today's date is a single word: yours.",
+      "opt": {
+        "signIt": "Sign under the intention",
+        "tearPage": "Tear the page out",
+        "writeSomeoneElse": "Write another name"
+      },
+      "out": {
+        "signIt": "You write your own name under the Choir's copy of it. Both versions agree from here on.",
+        "tearPage": "The page comes out clean. The Choir does not need the page; it needed you to leave it in.",
+        "writeSomeoneElse": "There is nothing stopping you. Nothing at all. The Choir accepts the substitution without comment.",
+        "writeSomeoneElseSeen": "The name you write is already three lines above, in the same hand as yours."
+      }
+    },
+    "lastCheckpoint": {
+      "text": "The last Warden post before the Core, and it is manned. One officer, forty-one years on station, asking for papers.",
+      "opt": {
+        "showPapers": "Show your papers",
+        "relieveHim": "Relieve him of duty",
+        "runPost": "Run the post"
+      },
+      "out": {
+        "showPapers": "He reads every line. Then he stamps them, salutes, and gives you the last forty-one years of his log.",
+        "relieveHim": "You use the words. He blinks twice, says «about time», and hands over the whole post before he can think about it.",
+        "runPost": "He does not fire. He logs it, which after forty-one years is the only thing he has left to do about anything."
+      }
+    },
+    "hospitalConvoy": {
+      "text": "The queue from the Procession followed the surgeon hull all the way here. Forty patients, one theatre, and a Core that is about to make the question moot.",
+      "opt": {
+        "buyTime": "Buy them time",
+        "moveThem": "Move the queue out",
+        "takeTheatre": "Take the theatre for yourself"
+      },
+      "out": {
+        "buyTime": "You stand between forty hulls and whatever is coming out of the Core for as long as the plating lasts.",
+        "moveThem": "Two days of shepherding forty damaged hulls backwards up a lane. They pay you in parts, which is all they have.",
+        "takeTheatre": "One patient, one theatre, one very short queue. The forty are still outside when you undock."
+      }
+    },
+    "riftAudit": {
+      "text": "Every fold between you and the Core opens onto the same room, and in the room is your account, itemised to the second.",
+      "opt": {
+        "acceptAudit": "Accept the audit",
+        "contestIt": "Contest the account",
+        "burnBooks": "Burn the room"
+      },
+      "out": {
+        "acceptAudit": "You sign every page without reading it, because you already know what is on them. The folds stop repeating.",
+        "contestPass": "You find the double entry. The Rift has been billing you twice for the same second since Sector Three.",
+        "contestFail": "Every line holds. Contesting an accurate account costs exactly what the account said it would.",
+        "burnBooks": "The room burns. The folds keep opening onto it, burning, over and over, all the way to the Core."
+      }
+    },
+    "doubleAtTheDoor": {
+      "text": "Your double is at the Core's threshold, holding station, and it has been waiting long enough to have painted a name on its hull. The name is not yours.",
+      "opt": {
+        "letItGoFirst": "Let it go first",
+        "takeItsName": "Take its name",
+        "goTogether": "Go in together"
+      },
+      "out": {
+        "letItGoFirst": "It goes in. Whatever the Core asks, it asks that one first, and the answer arrives back out to you.",
+        "takeItsName": "You paint it on your own hull. It fits. It has always fitted, which is the problem.",
+        "goTogether": "Two hulls, one threshold, one engine note. The Core will have to decide which of you it was expecting."
+      }
+    },
+    "hymnAtTheEdge": {
+      "text": "The children are singing it here, at the edge, in a hull with no engines. Somebody brought them all this way to be close to it.",
+      "opt": {
+        "takeThemHome": "Take them out",
+        "singWithThem": "Sing it with them",
+        "giveThemEngines": "Give them engines"
+      },
+      "out": {
+        "takeThemHome": "Nine of them fit if you cut the hold in half. You cut the hold in half.",
+        "singWithThem": "The hull with no engines has better acoustics than anything the Choir built on purpose.",
+        "giveThemEngines": "You buy them thrust out of your own hold. Whether they use it to leave is not your part of it."
+      }
+    },
+    "finalCount": {
+      "text": "The counter is here, at the very edge, and the tally is finally complete. Four hundred and eleven names, all in one place, all accounted for.",
+      "opt": {
+        "readThemOut": "Read the names out",
+        "keepList": "Keep the list",
+        "burnList": "Burn the list"
+      },
+      "out": {
+        "readThemOut": "Four hundred and eleven names on an open channel, one at a time, into whatever is listening.",
+        "keepList": "Somebody has to carry it out, and the counter is not going any further than this.",
+        "burnList": "Eleven years of work, gone in nine seconds. The counter watches and does not stop you, which is its own kind of answer."
+      }
+    },
+    "approachSilence": {
+      "text": "Six hours out from the Core the noise stops. Not the signal — the noise. Every band you own goes flat and clean at once.",
+      "opt": {
+        "broadcast": "Broadcast into it",
+        "listenOnly": "Only listen",
+        "shutDown": "Shut the receivers off"
+      },
+      "out": {
+        "broadcast": "Your voice goes out and does not come back, and something adjusts to make room for it.",
+        "listenOnly": "Six hours of clean silence, recorded in full. Echo asks you to play it back twice.",
+        "shutDown": "You cut every antenna and fly the last six hours blind and quiet, which is the only rest you get."
+      }
+    },
+    "lastYard": {
+      "text": "A yard has set up in the Core's shadow, run by people who came out here to work and could not think of a reason to leave.",
+      "opt": {
+        "refitHere": "Refit here",
+        "warnThem": "Tell them to leave",
+        "hireCrew": "Hire a crew off them"
+      },
+      "out": {
+        "refitHere": "They work fast and they work well and nobody asks what you are going in there to do.",
+        "warnThem": "Four of them go. The rest stay, and one of them fixes your engines for free out of spite.",
+        "hireCrew": "Three of them sign on, and they are better at your own systems than you are.",
+        "hireCrewNone": "Nobody signs on. They spend your scrap on your hull instead and tell you to come back for them after."
+      }
+    },
+    "thresholdMarket": {
+      "text": "Somebody is running a stall at the threshold itself. Not Mara — but the prices are hers, and so is the handwriting on the board.",
+      "opt": {
+        "buyEverything": "Buy the whole stall",
+        "askWhose": "Ask whose handwriting",
+        "leaveStock": "Leave your own stock"
+      },
+      "out": {
+        "buyEverything": "It is not much of a stall. What is on it is the last inventory anyone will take out here.",
+        "askWhose": "«She sent the prices ahead,» they say. «Said somebody would come this far and need them fair.»",
+        "leaveStock": "You add what you can spare to the board and price it at cost, in the same handwriting."
+      }
+    },
+    "derelictLibrary": {
+      "text": "A hull packed floor to ceiling with paper. Somebody spent a working life printing out everything they were afraid of losing.",
+      "opt": {
+        "readSome": "Read some of it",
+        "takeItAll": "Take the lot",
+        "indexIt": "Index it for whoever comes next"
+      },
+      "out": {
+        "readSome": "Charts, mostly. Charts and one long letter that is not addressed to anybody.",
+        "readSomeGold": "Between two boxes of manifests there is a schematic that was never meant to be printed.",
+        "takeItAll": "Paper burns and paper sells. You choose the second one and fill the hold.",
+        "indexIt": "Four hours of sorting somebody else's fear into alphabetical order. It steadies your hands."
+      }
+    },
+    "theOtherSalvager": {
+      "text": "Another salvager is working the same wreck from the other side. Neither of you saw the other arrive.",
+      "opt": {
+        "splitIt": "Offer to split it",
+        "raceThem": "Race them for it",
+        "giveWay": "Give them the wreck"
+      },
+      "out": {
+        "splitIt": "Half each and both of you out before the tide. It goes better than either of you expected.",
+        "splitItBetter": "They know the hull class and you know the wiring. Together you get to something neither would have found.",
+        "raceThem": "You are faster. They are still cutting when you undock, and they say nothing at all.",
+        "raceThemLose": "They are faster. You take a torch burn across the arm proving otherwise.",
+        "giveWay": "You undock and leave the cut open for them. They log your registry as one of the good ones."
+      }
+    },
+    "frozenBroadcast": {
+      "text": "A distress call, forty years old, still repeating on a loop that has outlived everyone it was for.",
+      "opt": {
+        "answerIt": "Answer it",
+        "triangulate": "Triangulate the source",
+        "killLoop": "Kill the loop"
+      },
+      "out": {
+        "answerIt": "Nobody answers back. The loop stops anyway, which was presumably the point of it.",
+        "answerItLive": "Somebody answers back. Two words, badly compressed, and then nothing for the rest of the sector.",
+        "triangulate": "The source is a hull that is not where the call says it is, and has not been for a long time.",
+        "killLoop": "The transmitter is worth something and the band is worth more. Both are yours in eleven minutes."
+      }
+    },
+    "debtorsHull": {
+      "text": "A hull with three liens on it and one very tired owner, who has heard that you settle up.",
+      "opt": {
+        "clearOne": "Clear one lien",
+        "buyTheHull": "Buy the hull outright",
+        "buyTheDebt": "Buy the debt instead"
+      },
+      "out": {
+        "clearOne": "One down, two to go, and one owner who now knows exactly where you are going.",
+        "buyTheHull": "Three liens, one signature, one hull you will strip for the one part you actually wanted.",
+        "buyTheDebt": "Now the liens are yours. The owner works for you until they are not, which is a different kind of kindness."
+      }
+    },
+    "noSignalDrift": {
+      "text": "A pocket of the lane where nothing propagates. Sensors, comms, even your own hull noise stop at the boundary.",
+      "opt": {
+        "feelThrough": "Feel your way through",
+        "goAround": "Go around it",
+        "mapIt": "Map the boundary"
+      },
+      "out": {
+        "feelPass": "Dead reckoning, old numbers, steady hands. You come out where you meant to.",
+        "feelFail": "You come out somewhere else, and something in the pocket comes out with you before it lets go.",
+        "goAround": "The long way costs you time you do not have and no plating at all.",
+        "mapIt": "A dead zone with a known edge is worth more than a lane, and every hauler in the sector will buy the edge."
+      }
+    },
+    "crewPetition": {
+      "text": "Four people you have helped at various points have found each other and drafted something. It is, technically, a petition.",
+      "opt": {
+        "readIt": "Read the petition",
+        "takeThem": "Take them aboard",
+        "sendThemOn": "Send them somewhere safer"
+      },
+      "out": {
+        "readIt": "They want to come with you. All four of them. The document runs to two pages of reasons.",
+        "takeThem": "Four more people, four more sets of hands, four more ways this ends badly. Two of them can weld.",
+        "sendThemOn": "You buy them passage the other way and they argue the entire time it takes to arrange."
+      }
+    },
+    "beaconWake": {
+      "text": "A beacon you have already resolved is transmitting again, and it is transmitting your registry along with everything else.",
+      "opt": {
+        "letItSing": "Let it transmit",
+        "scrubName": "Scrub your registry out",
+        "boostIt": "Boost the transmitter"
+      },
+      "out": {
+        "letItSing": "Every hull in the sector now knows where the lane is safe and who made it that way.",
+        "scrubName": "The beacon keeps working. It just stops saying who fixed it, which is how you prefer it.",
+        "boostIt": "You spend your own parts making somebody else's beacon louder. The Keeper's network notices within the hour."
+      }
+    },
+    "interferenceBloom": {
+      "text": "The tide is running early here and it is running through a wreck field, which makes the whole area read as one enormous unstable die.",
+      "opt": {
+        "rideSmall": "Ride it on small dice",
+        "waitItOut": "Wait it out",
+        "pushThrough": "Push straight through"
+      },
+      "out": {
+        "rideSmallPass": "Nothing spikes. You cross on the quietest numbers you own and the tide goes out behind you.",
+        "rideSmallFail": "One number comes up loud and the whole field answers it.",
+        "waitItOut": "Six hours of nothing, burned fuel and repairs you had been putting off.",
+        "pushThrough": "You take the field at speed and come out the far side with a hold full of somebody's cargo.",
+        "pushThroughBad": "You take the field at speed and the field takes a strake off your flank for it."
+      }
+    },
+    "lastLetter": {
+      "text": "A message capsule, launched forty years ago on a heading that would have taken it out of the sector. Something turned it around.",
+      "opt": {
+        "readLetter": "Read it",
+        "relaunchIt": "Relaunch it",
+        "keepCapsule": "Keep the capsule"
+      },
+      "out": {
+        "readLetter": "It is addressed to somebody who was aboard the fleet. It says «do not come back», twice, in two different hands.",
+        "relaunchIt": "You give it thrust and a clean heading out of the sector. Forty years late and still going.",
+        "keepCapsule": "Forty-year-old launch gear, never used twice, in perfect condition. It will fetch a price."
+      }
+    },
+    "scavengerWake": {
+      "text": "A funeral, if you are generous about the word. Nine scavengers, one hull, and a body they cannot agree on the name of.",
+      "opt": {
+        "nameThem": "Give the body a name",
+        "joinWake": "Stay for the wake",
+        "takeTheHull": "Buy the hull off them"
+      },
+      "out": {
+        "nameThem": "You take a registry off the hull's plate and read it out. Nine people accept it instantly and gratefully.",
+        "joinWake": "Six hours of other people's stories. One of them turns out to be a chart.",
+        "joinWakeGift": "They send you off with the dead one's tools, because nobody else will take them.",
+        "takeTheHull": "They take the offer. They were always going to take the offer. Nobody enjoys the transaction."
+      }
+    },
+    "rimNoticeboard": {
+      "text": "A physical noticeboard bolted to a docking spar, forty years of paper on it, the top layer dated this week. Most of it is people looking for people.",
+      "opt": {
+        "readIt": "Read the top layer",
+        "postYours": "Post your own",
+        "stripBoard": "Strip the whole board"
+      },
+      "out": {
+        "readIt": "Two salvage tips, one warning about a lane, and a name you will hear again before the sector is out.",
+        "readItOld": "Under this week there is a salvage claim nobody ever filed. It is still valid, technically.",
+        "postYours": "You write your registry, your heading and one line about what you are looking for. It is the first honest thing you have done all week.",
+        "stripBoard": "Forty years of paper, one plate of good alloy underneath. You take the plate."
       }
     }
   },
@@ -1982,21 +3128,37 @@
       "title": "Fragment 11 — Me",
       "body": "I was the piece that fell off. Forty years of drifting, and the pattern was still running."
     },
-    "memory-12-seal": {
+    "memory-16-seal": {
       "title": "Fragment 12 — Closed",
       "body": "It's over, I remember all of it, and none of it is happening any more. I'll take that trade."
     },
-    "memory-12-merge": {
+    "memory-16-merge": {
       "title": "Fragment 12 — Opened",
       "body": "You're in here with them now. I can hear you thinking in the pattern. It suits you."
     },
-    "memory-12-bargain": {
+    "memory-16-bargain": {
       "title": "Fragment 12 — Signed",
       "body": "They filed my crew under 'pending'. I am told that is not the same as lost."
     },
-    "memory-12-silent": {
+    "memory-16-silent": {
       "title": "Fragment 12 — Answered",
       "body": "Eleven ships. I remember every name. For the first time in forty years, so does someone else."
+    },
+    "memory-12": {
+      "title": "Fragment 12 — The Roster",
+      "body": "Eleven thousand names went into the Core and none came out. I still hold the list. I check it sometimes, in case one moves."
+    },
+    "memory-13": {
+      "title": "Fragment 13 — Standing Order",
+      "body": "My last instruction was to keep the fleet together. Nobody ever cancelled it. That is why I am still counting."
+    },
+    "memory-14": {
+      "title": "Fragment 14 — The Keeper",
+      "body": "He was our relay officer. When the pattern took hold he chose the beacons over the ship. I have never decided whether that was desertion."
+    },
+    "memory-15": {
+      "title": "Fragment 15 — What I Am For",
+      "body": "I am not the ship's memory. I am the part of the fleet that was outside the Core when it closed, and I have been trying to get back in ever since."
     }
   },
   "puzzle": {
@@ -2752,7 +3914,27 @@
     "f5-13": "The Core collapses uncertainty. It does not promise you like the result.",
     "f5-14": "Fleet doctrine said: observe, do not answer. Somebody answered.",
     "f5-15": "Forty years of silence, and the signal was never once repeated.",
-    "f5-16": "The Core keeps a copy of everything that has ever decided near it."
+    "f5-16": "The Core keeps a copy of everything that has ever decided near it.",
+    "f1-17": "The Rim keeps two ledgers: the one on the counter, and the one nobody writes down.",
+    "f1-18": "Cold sleep out here is not a technology. It is a bet that somebody will come.",
+    "f1-19": "Beacon One was the last thing the fleet built that was meant to outlive it.",
+    "f1-20": "A bounty on the Rim is a rumour with a price attached. The price is usually the honest part.",
+    "f2-17": "The Drift Fields were a staging yard. Nineteen thousand hulls came in. The yard is still full.",
+    "f2-18": "A black box does not record what happened. It records what the instruments were willing to admit.",
+    "f2-19": "The clans did not form after the Core. They formed on the third day of waiting for orders.",
+    "f2-20": "A relay that runs unattended for forty years is not equipment any more. It is a habit.",
+    "f3-17": "The Choir did not invent the hymn. They found it running and decided it needed singers.",
+    "f3-18": "Mirrors in the Rift do not show you. They show the version of you the Rift can still afford.",
+    "f3-19": "Nineteen hulls is not a fleet. Nineteen hulls that answer the same call sign is.",
+    "f3-20": "Every anomaly ledger balances. That is what makes them worse than the ones that do not.",
+    "f4-17": "A pact with the Choir is not signed in ink. It is signed in the part of the hull you stop asking about.",
+    "f4-18": "Heresy in the Procession means singing the hymn at the wrong speed. Nobody has explained which speed is right.",
+    "f4-19": "The Keeper's route was scheduled for nine years. He has been running it for forty-one.",
+    "f4-20": "Every pinch point in the Procession was once a shipping lane with a name.",
+    "f5-17": "The beacons were never a warning. They were a headcount, taken forever.",
+    "f5-18": "The Silent Fleet is not silent. It is on a channel nobody thought to keep open.",
+    "f5-19": "The lighthouse at the Core burned for eleven days after the Cut. Then somebody switched it off from inside.",
+    "f5-20": "Heresy this deep is not disagreement. It is the last group still willing to be wrong out loud."
   },
   "ending": {
     "seal": {
@@ -2763,7 +3945,11 @@
       "beat2": "The Rift closes like a mouth that has finally been fed. The pressure leaning on your hull for five sectors simply stops.",
       "beat3": "The fleet's beacons go quiet in order, oldest first, and the Hush Rim becomes just another dead sector on a chart.",
       "beat4": "You burn for the edge with a full hold and a sector behind you that will never make anyone else disappear.",
-      "echo": "You made the sector boring, captain. Kindest thing anyone's done out here in forty years."
+      "echo": "You made the sector boring, captain. Kindest thing anyone's done out here in forty years.",
+      "var": {
+        "silenced": "You sealed it the way you silenced it: without an answer, without a name, without giving it one more thing to hold.",
+        "answered": "You gave it your name first, then you sealed it. It knows exactly who shut the door, and it will remember."
+      }
     },
     "merge": {
       "title": "The Merge",
@@ -2773,7 +3959,12 @@
       "beat2": "The hull does not survive contact. You do — spread thin across every outcome the Core was still holding open.",
       "beat3": "From the inside the fleet is not lost. It is filed. Forty years of them, waiting for a better question.",
       "beat4": "The Hush Rim goes on humming. There is a new voice in it now, and the voice remembers being a captain.",
-      "echo": "I'll keep your logs. All of them. Even the ones where you swore at the reactor."
+      "echo": "I'll keep your logs. All of them. Even the ones where you swore at the reactor.",
+      "var": {
+        "answered": "You answered it once, at the threshold. Everything after that was just the sentence finishing itself.",
+        "silenced": "You silenced it and then walked in anyway. Whatever meets you inside does so without a word.",
+        "bound": "The part of you left behind the mirror gets there first, and it has been waiting a long time."
+      }
     },
     "bargain": {
       "title": "The Bargain",
@@ -2782,7 +3973,11 @@
       "beat1": "The Choir takes the Core the way a choir takes a note — carefully, in unison, without asking whether it wants to be sung.",
       "beat2": "They give you a ship, a rank, and a die you are not permitted to roll. The Rim opens like a door with your name on it.",
       "beat3": "Behind the hymn the fleet is still waiting, and nobody in the Choir considers that a loose end.",
-      "echo": "For the record, captain: I logged your objection. You didn't make one. I logged that too."
+      "echo": "For the record, captain: I logged your objection. You didn't make one. I logged that too.",
+      "var": {
+        "broken": "You broke the pact once already. The Choir has priced that in, and the price is now higher than the debt.",
+        "betrayed": "You sang their own hymn back at them and they let you. That was never mercy — that was collateral."
+      }
     },
     "silent": {
       "title": "The Silent Fleet",
@@ -2792,7 +3987,11 @@
       "beat2": "They were never destroyed. They were held — forty years of crews inside a decision the Core could not finish making.",
       "beat3": "You finish it for them. The Rim fills with running lights that have not moved since before you were born.",
       "beat4": "You lead them out. It takes eleven days and you do not sleep for any of them.",
-      "echo": "I know every one of those ships by name, captain. Thank you for making me say them out loud."
+      "echo": "I know every one of those ships by name, captain. Thank you for making me say them out loud.",
+      "var": {
+        "listened": "You listened without answering, and the fleet learned that silence can be a heading too.",
+        "rebuilt": "The relay you rebuilt carries the last order out — five beacons, one signal, nobody left behind."
+      }
     }
   },
   "epilogue": {
@@ -2808,7 +4007,44 @@
     "beacons": "Beacons answered: {{n}} of 5.",
     "ascension": "Cleared at ascension A{{n}}.",
     "lastBreath": "One hull point, once. You do not talk about it. Echo does, constantly.",
-    "quiet": "You leave the Rim quietly. Nobody out here writes anything down."
+    "quiet": "You leave the Rim quietly. Nobody out here writes anything down.",
+    "deathDeep": "you died deep — Sector {{sector}}, depth {{depth}}, further than most wrecks out here ever got",
+    "deathShallow": "you died shallow — Sector {{sector}}, depth {{depth}}, with the dark still ahead of you",
+    "deathMidway": "you died in the middle of it — Sector {{sector}}, depth {{depth}}, halfway to an answer",
+    "deathQuiet": "nothing you did out here left a mark anyone will find",
+    "maraGrudge": "Mara wrote your name in the column she does not forgive",
+    "fleetTruthKept": "you kept the fleet's truth to yourself",
+    "fleetTruthLost": "you wiped the fleet's truth and let it stay buried",
+    "hereticFleetLed": "a ragged fleet of heretics still flies the heading you gave them",
+    "keeperRepaid": "you squared your debt with the Beacon Keeper",
+    "keeperSlighted": "the Beacon Keeper never got what you owed him",
+    "lighthouseLit": "the broken lighthouse is burning again because of you",
+    "mirrorBound": "something of you is still on the other side of the mirror",
+    "mirrorBroken": "you shot your own reflection and it stayed shot",
+    "coreAnswered": "you answered the Core when it asked your name",
+    "coreSilenced": "you silenced the Core rather than give it an answer",
+    "axisResonant": "you leaned {{n}} steps into the Resonance and never leaned back",
+    "axisStable": "you held {{n}} steps of Stability against everything the sector offered",
+    "maraDebt": "you still owe Mara, and she still knows the number",
+    "fleetAnswered": "the fleet's survivors answered to your call sign at the end",
+    "defectorSold": "you sold the defector to the people she ran from",
+    "pactBroken": "you broke the pact after signing it",
+    "beaconRebuilt": "one relay in the Drift Fields runs again because you fixed it",
+    "turnWritten": "somewhere there is a chart with the turn the empty suit never made",
+    "coreListened": "you listened to the Core and said nothing back",
+    "picket": "the haulers you met in the Drift Fields were at the Core when you crossed",
+    "lastPost": "the last Warden post logged your crossing, forty-one years into a nine-year rotation",
+    "convoyKept": "the Procession's queue got its chance because you made room for it",
+    "theatreTaken": "you took the only theatre at the Core and left forty hulls outside it",
+    "riftAudit": "the Rift closed its account of you, one way or another",
+    "doubleAtDoor": "there was a second hull at the threshold flying your engine note",
+    "choirChildren": "the children who sang at the edge are part of your story now",
+    "tallyCarried": "four hundred and eleven names came out of the dark with you",
+    "tallyBurned": "eleven years of names ended in nine seconds of fire",
+    "coreSilence": "you decided what to do with six hours of the Core's silence",
+    "lastYard": "the yard in the Core's shadow remembers your registry",
+    "thresholdStall": "somebody was still keeping a stall at the threshold, and you dealt with it",
+    "ledgerTorn": "your page is not in the Choir's ledger any more"
   },
   "modules": {
     "magnetScoop": {
@@ -3400,7 +4636,47 @@
     "keeper7": "The Keeper: «Take the reading. Don't take the lamp.»",
     "keeper8": "The Keeper: «Everything the Rim swallows, a beacon saw first.»",
     "keeper9": "The Keeper: «I was crew once. The ship is still out there, technically.»",
-    "keeper10": "The Keeper: «If you get to the Core, tell it somebody kept the lights on.»"
+    "keeper10": "The Keeper: «If you get to the Core, tell it somebody kept the lights on.»",
+    "mara17": "«Everything on this side of the counter is priced. Everything on my side is not for sale.»",
+    "mara18": "«Do not tell me what it does. Tell me what it did to the last hull that ran it.»",
+    "mFriend1": "«You again. Good. I hate explaining my stock twice to strangers.»",
+    "mFriend2": "«I set two things aside. Not a discount — an order of looking.»",
+    "mFriend3": "«Nothing owed either way. That is rarer out here than the stock is.»",
+    "mGrudge1": "«Look all you like. Touch nothing you have not counted out first.»",
+    "mGrudge2": "«I remember the number. You remember the number. Let us not discuss it.»",
+    "mGrudge3": "«You owe me and you robbed me. Pick one to fix and I will pretend the other did not happen.»",
+    "mDebt1": "«Interest is not personal. It is just the only part of this that never sleeps.»",
+    "mDebt2": "«You are into me for the price of a good reactor. I am not worried. Yet.»",
+    "mFavor1": "«You flew that lane clean. Ask me for something before I change my mind about you.»",
+    "mVault1": "«The bay is empty now. Feels bigger than it did full, somehow.»",
+    "mCourt1": "«The court's fair-price ruling came through ahead of you. Congratulations, I suppose.»",
+    "mCourier1": "«Your courier's route came out of the dark last week. Half the Rim is eating because of that.»",
+    "yusuf15": "«Every weld I lay out here is temporary. Every one of them has held so far.»",
+    "yusuf16": "«I do not ask where the parts came from. I ask what they were doing when they came off.»",
+    "yFriend1": "«Sit. The kettle is a torch and the tea is terrible, but sit.»",
+    "yFriend2": "«You have never once made this harder than it had to be. I notice that.»",
+    "yGrudge1": "«I will do the work. The work is not the problem.»",
+    "yGrudge2": "«Cash first. I did not use to say that to anybody.»",
+    "yShared1": "«People stopped whispering after you put it on the open channel. That was worth something.»",
+    "yKept1": "«You are still holding it. I am not going to ask you again — but I am counting.»",
+    "yLost1": "«There is nothing left to argue about. You made sure of that.»",
+    "yAnswered1": "«Nineteen hulls logged your transponder. Nineteen. I checked twice.»",
+    "yLane1": "«The lane is still open. People are still coming through it. That is your weld, not mine.»",
+    "yLaneShut1": "«They paid you and they got through. I am trying to hold both of those in one hand.»",
+    "keeper11": "«A beacon is a promise somebody kept after they stopped being paid for it.»",
+    "keeper12": "«Do not fix a relay you do not intend to come back to.»",
+    "keeper13": "«The chain does not care in what order you light it. It only counts.»",
+    "keeper14": "«Forty years is not a long time for a beacon. It is a long time for a person.»",
+    "kTrust1": "«I have started routing you the hard ones. Take that as it was meant.»",
+    "kRepaid1": "«We are square. I have filed it. It stays filed.»",
+    "kSlighted1": "«I am still speaking to you, which should tell you how thin my options are.»",
+    "kSlighted2": "«You took what you took. I am not going to make a speech about it.»",
+    "kBroken1": "«One of mine went dark on your heading. I am not accusing. I am stating.»",
+    "kRebuilt1": "«That relay is transmitting again. I heard it before I heard about you.»",
+    "kLit1": "«The lighthouse is burning. I stopped expecting that about thirty years ago.»",
+    "kKey1": "«You still have my key. Use it or send it back — either is an answer.»",
+    "kThree1": "«Three. It has not been three since before you were built.»",
+    "kFive1": "«Five. All of them. Say nothing for a moment, I want to listen.»"
   },
   "signature": {
     "scavDrone": "Three cheap taps, then one heavier — the sector's metronome.",
@@ -3494,5 +4770,60 @@
     "cantorColossus": "Stacks 2 onto every future hit each turn, for ever — a sensor jam is the only thing that clears the stack.",
     "coreHeart": "A shell of valves over a storm: the body takes nothing while a valve lives, and the storm runs every turn from phase 2.",
     "mirrorHeart": "Fights with the census of your own deck — the purer the build, the harder it hits — behind a shell of faces."
+  },
+  "death": {
+    "pact": "«They will collect anyway. A contract does not care which of us is breathing.»",
+    "beacons": "«The beacons you lit stay lit. That part of you keeps going without you.»",
+    "resonant": "«You were almost through. One more step and the hull would not have mattered.»",
+    "stable": "«You held the line to the last plate. I logged every second of it.»",
+    "alone": "«Nobody out here owed you a rescue. I checked. Twice.»",
+    "friends": "«Someone will come looking. I have the coordinates ready for them.»",
+    "deep": "«Deeper than the last one. Deeper than the one before that. It counts.»",
+    "quiet": "«Hull integrity zero. I am still here. For a little while.»",
+    "firstRun": "«Your first crossing. Statistically, that is the one that ends like this.»"
+  },
+  "chain": {
+    "mara": {
+      "name": "Mara's ledger",
+      "payoff": "The book is closed, and it closed your way.",
+      "betrayal": "She has written you into the column she does not forgive.",
+      "step": {
+        "meet": "Find her counter in the Rim.",
+        "debt": "She will want the debt named before she names a favour.",
+        "favour": "There is work she cannot give to the clan.",
+        "payoff": "Whatever the ledger says, it settles in the last market."
+      }
+    },
+    "yusuf": {
+      "name": "Yusuf and the fleet",
+      "payoff": "The procession got through, and it got through because of you.",
+      "betrayal": "He knows what you sold, and to whom.",
+      "step": {
+        "blackbox": "The black box is still aboard something in the Drift Fields.",
+        "convoy": "Nineteen hulls need a gun on the rift side.",
+        "lane": "The procession is stalled at a pinch you can open."
+      }
+    },
+    "choir": {
+      "name": "The Choir's reading",
+      "payoff": "You and the hymn have an understanding, whatever shape it took.",
+      "betrayal": "The Choir is collecting, and it is not asking any more.",
+      "step": {
+        "invite": "The Preacher is broadcasting an invitation in the Rift.",
+        "seal": "The pact wants a signature or a refusal.",
+        "deep": "There is a deeper reading of what you signed.",
+        "finale": "He is waiting at the last station before the Core."
+      }
+    },
+    "keeper": {
+      "name": "The Keeper's thread",
+      "payoff": "Five beacons, one chain, and he knows exactly who strung it.",
+      "betrayal": "He has stopped routing you the easy beacons.",
+      "step": {
+        "intro": "Someone is still maintaining the beacons out here.",
+        "thread": "He wants to know what you want out of this.",
+        "core": "The last beacon is the Core, and it asks the question itself."
+      }
+    }
   }
 }

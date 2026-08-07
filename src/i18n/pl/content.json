@@ -758,7 +758,209 @@
     "mirrorSpoke": "Wynik: rozmawiałeś z lustrem.",
     "pactOpened": "Wynik: pakt pozostaje otwarty.",
     "pactSigned": "Wynik: podpisałeś pakt.",
-    "relayFixed": "Wynik: naprawiłeś przekaźnik."
+    "relayFixed": "Wynik: naprawiłeś przekaźnik.",
+    "reactorAttuned": "nastroniłeś się na umierający reaktor (Sektor 1)",
+    "quietCharted": "wytyczyłeś mapę cichego pola (Sektor 1)",
+    "fieldAligned": "wyczyściłeś cmentarz (Sektor 2)",
+    "hymnCopied": "odśpiewałeś im hymn chóru (Sektor 2)",
+    "mirrorBound": "przekroczyłeś lustro (Sektor 3)",
+    "ledgerSolved": "zrównałeś księgę anomalii (sektor 3)",
+    "hymnHarmonized": "zharmonizowałeś się z Bramą Hymnu (Sektor 4)",
+    "reliquaryCatalogued": "skatalogowałeś relikwiarz (sektor 4)",
+    "tideSteadied": "utrzymałeś kadłub w obliczu fali przyczynowości (Sektor 5)",
+    "hereticFleetLed": "objąłeś dowództwo nad flotą heretyków (Sektor 5)",
+    "beaconRebuilt": "odbudowałeś przekaźnik za pomocą klucza Strażnika (Sektor 2)",
+    "hunterPaid": "zapłaciłeś Łowczyni, zamiast z nią walczyć",
+    "fleetAnswered": "pracownicy floty odebrali telefon, kiedy zadzwoniłeś",
+    "favorHeld": "wykorzystałeś przysługę od Mary",
+    "choirBetrayed": "wykorzystałeś własny hymn chóru przeciwko niemu",
+    "turnWritten": "zapisałeś ruch, którego ten bezkartowy gracz nigdy nie wykonał",
+    "maraDebtShop": "Mara pobiera swoją część z zysków — to jej księga rachunkowa, to jej ceny",
+    "courtFairShop": "Orzeczenie sądu ds. mienia z wraku w sprawie uczciwej ceny wyprzedza cię",
+    "vaultKeptShop": "stan zapasów w skarbcu Strażnika osiąga ten poziom",
+    "ledgerShop": "w tym przypadku księga uzgodniona stanowi walutę",
+    "beaconRebuiltShop": "Odnowiony przekaźnik przywrócił ten licznik do sieci",
+    "maraSupplyRun": "pilotowałeś eskortę Mary",
+    "maraSkim": "przejrzałeś ładunek Mary",
+    "favorRefused": "odmówiłeś przyjęcia pracy u Mary",
+    "maraVault": "otworzyłeś skarbiec Mary",
+    "maraVaultLeft": "zostawiłeś skarbiec Mary zamknięty",
+    "maraUsurerPaid": "spłaciłeś lichwiarza",
+    "maraUsurerFought": "odrzuciłeś zastaw lichwiarza",
+    "maraUsurerRun": "przebiegłeś uliczkę lichwiarza",
+    "fleetLaneOpen": "otworzyłeś korytarz dla uchodźców",
+    "fleetLaneClosed": "zablokowałeś procesji drogę",
+    "fleetLaneSealed": "zablokowałeś pas ruchu za sobą",
+    "fleetTruthShared": "przekazałeś informacje o sytuacji floty na otwartym kanale",
+    "bargainReady": "zagłębiasz się w treść hymnu",
+    "pactHeld": "zachowałeś umowę w miejscu, w którym ją podpisałeś",
+    "pactBroken": "zerwałeś umowę",
+    "preacherSang": "śpiewałeś z Kaznodzieją po raz ostatni",
+    "preacherAnswered": "powiedziałeś Kaznodziei, co zamierzasz powiedzieć Rdzeniu",
+    "preacherCut": "przerwałeś kaznodziei w połowie wersetu",
+    "keeperRepaid": "zmierzyłeś się z Strażnikiem z „Latarnia”",
+    "keeperLog": "połączyłeś swój dziennik sygnału nawigacyjnego z dziennikiem Strażnika",
+    "keeperLogLost": "Twój dziennik sygnału nawigacyjnego dotarł do Strażnika w stanie uszkodzonym",
+    "yardStripped": "opróżniłeś złomowisko (Sektor 2)",
+    "yardStopped": "zamknąłeś plac złomowy (Sektor 2)",
+    "tugsPaid": "poparłeś strajk holowników (sektor 2)",
+    "tugsCrossed": "przekroczyłeś linię blokadową holowników (sektor 2)",
+    "quarantineKept": "przestrzegałeś czterdziestoletniej kwarantanny (Sektor 2)",
+    "quarantineBroken": "naruszyłeś plombę kwarantannową (Sektor 2)",
+    "schoolHelped": "to dzięki tobie szkoła driftu nadal działała (Sektor 2)",
+    "schoolRobbed": "zabrałeś reaktor ze szkoły driftowej (Sektor 2)",
+    "clanRespect": "uczestniczyłeś w pogrzebie klanowym (Sektor 2)",
+    "bloomTapped": "dotknąłeś plamy chłodziwa (Sektor 2)",
+    "bloomSource": "odkryłeś, co sprzyjało rozkwitowi (Sektor 2)",
+    "bloomBurned": "spaliłeś osad z płynu chłodzącego (sektor 2)",
+    "manifestWon": "kupiłeś manifest „Blind” (Sektor 2)",
+    "scriptBacked": "Ręczyłeś za stary skrypt floty (Sektor 2)",
+    "auctionJammed": "Zablokowałeś aukcję manifestową (Sektor 2)",
+    "wardenAnswered": "powiedziałeś strażnikowi, że jego rozkazy nadal obowiązują (Sektor 2)",
+    "wardenReleased": "zwolniłeś strażnika ze stanowiska (sektor 2)",
+    "relayTraced": "wyśledziłeś ten dziwny maszt przekaźnikowy (sektor 2)",
+    "relayStripped": "opróżniłeś farmę przekaźników (Sektor 2)",
+    "raceWon": "w punkcie skrzyżowania lin (sektor 2) wyszedłeś na prowadzenie",
+    "raceLost": "koszt przejścia przez linę (sektor 2)",
+    "tetherCut": "przeciąłeś linkę zabezpieczającą wózki transportowe (sektor 2)",
+    "apprenticeTold": "powiedziałeś Yusufowi, co zrobił jego uczeń (Sektor 2)",
+    "lighterLoaded": "uruchomiłeś niekończący się bieg „Ice Lighter” (Sektor 2)",
+    "lighterStripped": "rozebrałeś zapalniczkę lodową (Sektor 2)",
+    "lighterStopped": "wydałeś rozkaz wstrzymania pracy zapalnika lodowego (sektor 2)",
+    "courtRigged": "manipulowałeś w sądzie ds. mienia z wraku (Sektor 2)",
+    "courtFair": "podzieliliście orzeczenie sądu ds. mienia z wraku na trzy części (Sektor 2)",
+    "driftFriends": "Dryf: Fields wysłało kogoś, żeby poleciał z tobą (Sektor 3)",
+    "wakeJammed": "zakłóciłeś transmisję swojej własnej płyty („Sector 3”)",
+    "wakeAnswered": "odtworzyłeś własną wypowiedź bez sprzeciwu (Sektor 3)",
+    "foldRead": "przeczytałeś ciasną fałdę zamiast ją rozegrać (sektor 3)",
+    "postAccepted": "objąłeś stanowisko naczelnika, którego nikt nie zajmował od czterdziestu lat (Sektor 3)",
+    "rosterWiped": "skasowałeś harmonogram dyżurów strażników (sektor 3)",
+    "buyerBound": "nabywca z listy nadal może cię znaleźć (Sektor 3)",
+    "buyerCut": "wykluczyłeś oficjalnego nabywcę (Sektor 3)",
+    "crossingOpened": "otwarto przejście dla przewoźników z Twoim imieniem (Sektor 3)",
+    "crossingTolled": "pobierasz prowizję od opłat za przejazd przewoźników (Sektor 3)",
+    "archiveCatalogued": "dodałeś dziesiąty katalog do archiwum złożonego (Sektor 3)",
+    "archiveBurned": "spaliłeś katalogi ze złożonego archiwum (Sektor 3)",
+    "twinChosen": "odpowiedziałeś, że chodzi o jeden z dwóch identycznych kadłubów (Sektor 3)",
+    "twinRefused": "nie wskazałeś żadnego z identycznych kadłubów (Sektor 3)",
+    "surgeryTaken": "przyjąłeś wizytę u chirurga Hulla (Sektor 3)",
+    "surgeryStripped": "zdobyłeś kadłub statku „Surgeon” (Sektor 3)",
+    "surgeryBooked": "oddałeś chirurga Hullowi jego miejsca (Sektor 3)",
+    "causalDebt": "które zabrałeś z Riftu na kredyt (Sektor 3)",
+    "causalPaid": "rozlokowałeś się z Riftem z przodu (Sektor 3)",
+    "chapelAsked": "zakwestionowałeś nagranie Kaznodziei (Sektor 3)",
+    "chapelSilenced": "wyciąłeś hymn z nieoświetlonej kaplicy (Sektor 3)",
+    "pilotHired": "zatrudniłeś pilota statku typu Rift (Sektor 3)",
+    "boardRead": "zapoznałeś się z tabelą stawek dla pilotów (sektor 3)",
+    "boardTaken": "wziąłeś tabelę stawek dla pilotów (sektor 3)",
+    "cutRecorded": "nagrałeś jedenaście sekund fragmentu „Cut” (sektor 3)",
+    "cutRidden": "byłeś na autorskim czytaniu w Cut (Sektor 3)",
+    "cutRefused": "wolałeś wyłączyć wszystkie instrumenty, zamiast słuchać (Sektor 3)",
+    "haulersSent": "odesłałeś przewoźników do domu przed Procesją (Sektor 4)",
+    "haulersUsed": "wykorzystałeś transportery w Procesji (Sektor 4)",
+    "haulersArmed": "uzbroiłeś ciężarówki, wykorzystując własny złom (Sektor 4)",
+    "brokerDealt": "nadal utrzymywałeś kontakt z brokerem po tym, jak przyjął zlecenia (Sektor 4)",
+    "brokerCleared": "przejąłeś rejestr od pośrednika (Sektor 4)",
+    "transitPapers": "wypełniłeś dokumenty tranzytowe na opuszczonym stanowisku strażnika (Sektor 4)",
+    "papersForged": "sfałszowałeś dokumenty tranzytowe Straży (Sektor 4)",
+    "checkpointOpened": "otworzyłeś punkt kontrolny Strażników dla wszystkich (Sektor 4)",
+    "ledgerStruck": "wykreśliłeś swoje nazwisko z rejestru chóru (Sektor 4)",
+    "ledgerRead": "przeczytałeś księgę intencji Chóru (Sektor 4)",
+    "triageRun": "kierowałeś punktem segregacji medycznej w szpitalu polowym (Sektor 4)",
+    "queueSold": "sprzedawałeś miejsca w kolejce do szpitala (Sektor 4)",
+    "riftSettled": "zrealizowałeś część transakcji przypadającą na Rift (Sektor 4)",
+    "riftDisputed": "zgłosiłeś zastrzeżenie dotyczące pobrania opłaty za Rift (Sektor 4)",
+    "twinBoarded": "wszedłeś na pokład statku, który rozbrzmiewa odgłosem twojego silnika (Sektor 4)",
+    "twinHailed": "na kanale otwartym (Sektor 4) nawiązałeś łączność ze swoim sobowtórem",
+    "twinLeft": "pozwalasz swojemu sobowtórowi pozostać na swoim miejscu w szeregu (sektor 4)",
+    "hymnSchoolSeen": "widziałeś, jak chór uczył dzieci hymnu (sektor 4)",
+    "hymnSchoolBroken": "zabrałeś dzieci ze szkoły przy chórze (Sektor 4)",
+    "censusHelped": "pomogłeś w zliczeniu uczestników procesji (sektor 4)",
+    "censusBought": "zakupiłeś dane statystyczne dotyczące Procesji z ostatnich jedenastu lat (Sektor 4)",
+    "censusTold": "powiedziałeś kasjerowi, gdzie trafiły te czterysta (Sektor 4)",
+    "pilgrimsFerried": "sam przewiozłeś pielgrzymów (Sektor 4)",
+    "ferryBought": "kupiłeś uszkodzony kadłub akolity (Sektor 4)",
+    "ferryWatched": "obserwowałeś, jak akolita przekraczał granicę (Sektor 4)",
+    "tribunalSeated": "powołałeś skład trybunału Warden (Sektor 4)",
+    "tribunalDissolved": "rozwiązałeś trybunał Strażnika (Sektor 4)",
+    "picketHeld": "przewoźnicy zorganizowali dla was pikietę przed budynkiem „Core” (Sektor 5)",
+    "picketStood": "odesłałeś ciężarówki z Centrum (Sektor 5)",
+    "ledgerTorn": "wyciąłeś stronę z księgi chóru (Sektor 5)",
+    "lastPostCleared": "Udało ci się przejść ostatni punkt kontrolny Strażników zgodnie z zasadami (Sektor 5)",
+    "lastPostRelieved": "przejąłeś obowiązki ostatniego Strażnika (Sektor 5)",
+    "lastPostRun": "opublikowałeś ostatni wpis dotyczący Strażnika (Sektor 5)",
+    "convoyCovered": "osłanialiście konwój szpitalny w Core (Sektor 5)",
+    "convoyMoved": "odprowadziłeś konwój szpitalny z powrotem na zewnątrz (Sektor 5)",
+    "theatreTaken": "zajęliście salę operacyjną dla siebie (Sektor 5)",
+    "auditAccepted": "zaakceptowałeś audyt Riftu (Sektor 5)",
+    "auditBeaten": "znalazłeś podwójny wejście do Szczeliny (Sektor 5)",
+    "auditBurned": "spaliłeś pomieszczenie audytowe w Rift (Sektor 5)",
+    "doubleAhead": "pozwoliłeś swojemu sobowtórowi przekroczyć próg jako pierwszemu (Sektor 5)",
+    "doubleNamed": "przyjąłeś imię swojego sobowtóra (Sektor 5)",
+    "doubleJoined": "ty i twój sobowtór skrzyżowaliście się (Sektor 5)",
+    "childrenTaken": "wyciągnąłeś dzieci z Chóru (Sektor 5)",
+    "childrenJoined": "śpiewałeś hymn razem z dziećmi na skraju (Sektor 5)",
+    "namesRead": "odczytałeś czterysta jedenaście imion w ciemności (Sektor 5)",
+    "namesKept": "przeprowadzasz pełną inwentaryzację (Sektor 5)",
+    "namesBurned": "spaliłeś jedenaście lat z rejestru (Sektor 5)",
+    "silenceAnswered": "nadajesz w ciszy Rdzenia (Sektor 5)",
+    "silenceRefused": "przez ostatnie sześć godzin celowo leciałeś, udając, że nic nie słyszysz (Sektor 5)",
+    "lastYardUsed": "przeprowadziłeś remont w stoczni w cieniu Rdzenia (Sektor 5)",
+    "lastYardWarned": "poinformowałeś ostatnią ekipę, żeby się wycofała (Sektor 5)",
+    "lastYardCrew": "którego zatrudniłeś z ostatniej stoczni (Sektor 5)",
+    "thresholdBought": "wykupiłeś cały asortyment ze straganu przy progu (Sektor 5)",
+    "thresholdAsked": "dowiedziałeś się, czyje ceny czekały na progu (Sektor 5)",
+    "thresholdStocked": "zostawiłeś swoje zapasy na progu (sektor 5)",
+    "coreListened": "wysłuchałeś Core’a, nie odpowiadając",
+    "libraryRead": "przeczytałeś to, co ktoś wydrukował, żeby zachować",
+    "librarySold": "sprzedałeś całą ładownię czyjegoś strachu, ważąc go na wagę",
+    "salvagerSplit": "podzieliłeś się łupem z innym poszukiwaczem wraków",
+    "salvagerBeaten": "rywalizowałeś z innym poszukiwaczem złomu o wrak",
+    "salvagerYielded": "przekazałeś wrak firmie zajmującej się odzyskiem, która przyjechała tam razem z tobą",
+    "distressAnswered": "odpowiedziałeś na wezwanie pomocy sprzed czterdziestu lat",
+    "distressTraced": "namierzyłeś zamrożony sygnał SOS",
+    "distressCut": "wyciąłeś pętlę awaryjną dla jego nadajnika",
+    "lienCleared": "spłaciłeś zastaw na rzecz nieznajomego",
+    "hullBought": "kupiłeś za gotówkę kadłub obciążony licznymi zastawami",
+    "debtHeld": "zamiast spłacić czyjś dług, wykupiłeś go",
+    "deadZoneCrossed": "przekroczyłeś strefę martwą, kierując się nawigacją zliczeniową",
+    "deadZoneAvoided": "objechałeś strefę martwą okrężną drogą",
+    "deadZoneMapped": "zmapowałeś granicę martwej strefy i ją sprzedałeś",
+    "petitionRead": "cztery osoby, którym pomogłeś, wystosowały do ciebie petycję",
+    "petitionAccepted": "wpuściłeś składających petycję na pokład",
+    "petitionRefused": "zapłaciłeś za przejazd składających petycję w drugą stronę",
+    "beaconSinging": "nadajnik, który zainstalowałeś, transmituje dane z rejestru",
+    "beaconScrubbed": "usunąłeś swój wpis z listy sygnałów nawigacyjnych",
+    "beaconBoosted": "wykorzystałeś własne części, żeby wzmocnić sygnał nawigacyjny",
+    "bloomRidden": "płynąłeś z wczesnym prądem przez pole wraków",
+    "bloomWaited": "przeczekałeś, aż minie poranny przypływ",
+    "bloomForced": "przepłynąłeś prosto przez wczesny przypływ",
+    "letterRead": "przeczytałeś list, który wrócił",
+    "letterSent": "ponownie opublikowałeś list sprzed czterdziestu lat",
+    "letterKept": "zatrzymałeś kapsułę z wiadomością, żeby wykorzystać jej części",
+    "wakeNamed": "nadałeś imię ciału padlinożercy",
+    "wakeJoined": "zostałeś na pogrzebie w stylu „scavenger”",
+    "wakeBought": "wyjechałeś z fali tuż przed kadłubem",
+    "auctionRun": "pracowałeś na aukcji złomu przy sztucznym oświetleniu",
+    "stowawayCalled": "zdecydowałeś, co zrobić z pasażerem na gapę",
+    "merchantSwap": "spotkałeś handlarza dryfującym i odpowiedziałeś na jego ofertę",
+    "pocketCrossed": "zajęliście się ogniskiem promieniowania",
+    "leakHandled": "zajmowałeś się rdzeniem odpowiedzialnym za obliczanie prawdopodobieństwa pęknięcia",
+    "flareMet": "spotkałeś odbicie w lustrze",
+    "runnersRaced": "odpowiedziałeś kurierom konwoju",
+    "ghostResolved": "rozwiązałeś problem z „duchami” czujnika",
+    "hulkAnswered": "poradziłeś sobie z unieruchomionym kolosem",
+    "fuelBloomWorked": "zajmowałeś się procesem rozkwitu paliwa napędowego",
+    "veinWorked": "wydobywałeś rudę z żyły Rift",
+    "twinWreckOpened": "otworzyłeś jeden z bliźniaczych wraków",
+    "warpedYardUsed": "pozwoliłeś, by praca w ogrodzie, który sam stworzyłeś, na ciebie wpłynęła",
+    "titheSettled": "uzgodniłeś to z punktem poboru dziesięciny",
+    "voiceHandled": "odebrałeś połączenie przez domofon",
+    "coldEngineWorked": "zrobiłeś coś z zespołem napędu na zimno",
+    "rainMet": "zdecydowałeś, co zrobić w związku z prawdopodobieństwem opadów deszczu",
+    "rimBoardRead": "przeczytałeś ogłoszenia na tablicy ogłoszeń w Rim (Sektor 1)",
+    "rimBoardPosted": "opublikowałeś swój własny rejestr na forum Rim (Sektor 1)",
+    "rimBoardTaken": "zdjąłeś tablicę ogłoszeń z Rim, żeby zdobyć stop metali (Sektor 1)"
   },
   "events": {
     "driftingPod": {
@@ -861,12 +1063,14 @@
       "text": "Reaktor wypatroszonego transportowca wciąż pracuje, wyciekając ładunek w ciemność. Można by go podłączyć, o ile pole się utrzyma.",
       "opt": {
         "siphon": "Odprowadź ładunek za pomocą syfonu",
-        "salvage": "Zdemontuj to na złom"
+        "salvage": "Zdemontuj to na złom",
+        "attune": "Niech ta melodia rozbrzmiewa w twoich lokach"
       },
       "out": {
         "siphonPass": "Kran nie przecieka. Twoje komórki napawają się wodą — to dobry początek przed nadchodzącymi zmaganiami.",
         "siphonFail": "Pole załamuje się w trakcie rysowania i przenika do kadłuba.",
-        "salvage": "Rozcina się to w bezpieczny sposób i zdejmuje się dobrą powłokę."
+        "salvage": "Rozcina się to w bezpieczny sposób i zdejmuje się dobrą powłokę.",
+        "attune": "Dostosowujesz się do rytmu reaktora, zamiast go naśladować. Ten szum przenika do twoich własnych partii i pozostaje tam – ciepły i cierpliwy – przez cztery walki."
       }
     },
     "mineFieldGap": {
@@ -1048,10 +1252,12 @@
     "silentField": {
       "text": "Pustka wypełniona martwym szumem – ani sygnału, ani śladów katastrofy. Tylko szum Krawędzi i odgłos własnego oddechu.",
       "opt": {
-        "drift": "Dryf przez cały czas, słuchając"
+        "drift": "Dryf przez cały czas, słuchając",
+        "chart": "Przedstaw ciszę na wykresie"
       },
       "out": {
-        "drift": "Nic nie odpowiada. Wychodząc, zbierasz porozrzucane elementy poszycia."
+        "drift": "Nic nie odpowiada. Wychodząc, zbierasz porozrzucane elementy poszycia.",
+        "chart": "Płyniesz płynnie, zamiast dryfować. Trzy rzędy fal ustępują, a kadłub wtapia się w ciszę, jakby właśnie do tego został stworzony."
       }
     },
     "tollGate": {
@@ -1291,12 +1497,14 @@
       "opt": {
         "strip": "Obierz łupiny",
         "salvageCore": "Wytnij rdzeń",
-        "leave": "Zostaw je zamknięte"
+        "leave": "Zostaw je zamknięte",
+        "alignField": "Wyrównaj pole, podnieś prawidłowo"
       },
       "out": {
         "strip": "Niezły łup. Zaciski trochę zarysowują powłokę podczas wyjmowania.",
         "salvageCore": "Jeden rdzeń wciąż jest naładowany. Działa bez zarzutu.",
-        "leave": "Wyłączasz zasilanie i przemykasz obok. Za tobą zapada cisza."
+        "leave": "Wyłączasz zasilanie i przemykasz obok. Za tobą zapada cisza.",
+        "alignField": "Polarność zmienia się stopniowo, a nie gwałtownie. Elementy odłączają się jeden po drugim i nic się nie zrywa."
       }
     },
     "yusufDebt": {
@@ -1348,11 +1556,13 @@
       "text": "Kapliczka wbudowana w ładownię ciężarówki. Kaznodzieja trzyma drzwi otwarte i nie przestaje liczyć.",
       "opt": {
         "listen": "Usiądź i posłuchaj",
-        "refuse": "Wyjść"
+        "refuse": "Wyjść",
+        "sing": "Zaśpiewaj to razem"
       },
       "out": {
         "listen": "Te liczby mają w sobie coś nieprzyjemnie logicznego. Odchodzisz, niosąc ze sobą prąd.",
-        "refuse": "Odpływasz w połowie wersu. Kadłub wydaje się solidniejszy dzięki temu oporowi."
+        "refuse": "Odpływasz w połowie wersu. Kadłub wydaje się solidniejszy dzięki temu oporowi.",
+        "sing": "Odpowiadasz na hymn w jego własnej tonacji. Kaznodzieja przerywa w połowie zwrotki, nasłuchuje i wręcza ci zwój, który nigdy nie należał do niego."
       }
     },
     "tetheredHulk": {
@@ -1370,11 +1580,13 @@
       "text": "Mast przekaźnikowy, z którego połowa konstrukcji została zerwana. Nadal próbuje nadawać co godzinę.",
       "opt": {
         "repairIt": "Napraw tablicę",
-        "stripIt": "Oczyść tablicę"
+        "stripIt": "Oczyść tablicę",
+        "useKey": "Użyj klucza Strażnika"
       },
       "out": {
         "repairIt": "Powraca w połowie zdania. Sieć Strażnika odnotowuje, kto to naprawił.",
-        "stripIt": "Dobre fragmenty. Maszt ciemnieje za tobą i pozostaje ciemny."
+        "stripIt": "Dobre fragmenty. Maszt ciemnieje za tobą i pozostaje ciemny.",
+        "useKey": "Klucz pasuje do gniazda, którego nikt nie zadał sobie trudu, by ukryć. Przekaźnik uruchamia się w pełnej wersji, a nie w wersji prowizorycznej, a wraz z nim uruchamiają się dwa pasy ruchu."
       }
     },
     "fuelBloom": {
@@ -1404,11 +1616,13 @@
       "text": "Statek identyczny z twoim utrzymuje pozycję przed dziobem. Jego światła nawigacyjne reagują pół sekundy przed twoim sygnałem.",
       "opt": {
         "speak": "Porozmawiaj z nim",
-        "shoot": "Do dzieła!"
+        "shoot": "Do dzieła!",
+        "stepThrough": "Przejdź krok po kroku"
       },
       "out": {
         "speak": "Odpowiada twoim własnym głosem i jest milsze od ciebie. Odchodzisz, zabierając ze sobą coś, co ci dało.",
-        "shoot": "Rozpada się bez żadnego oporu. Tak czy inaczej, to twój kadłub ponosi obrażenia."
+        "shoot": "Rozpada się bez żadnego oporu. Tak czy inaczej, to twój kadłub ponosi obrażenia.",
+        "stepThrough": "Przekraczasz granicę. Coś z ciebie pozostaje po drugiej stronie, a coś z drugiej strony wraca wraz z tobą. Kadłub jest teraz mniejszy i wie już pewne rzeczy."
       }
     },
     "clanEscort": {
@@ -1481,12 +1695,14 @@
       "text": "Tabliczka szpitalna, unosząca się w czystej próżni. Ktoś napisał tu odręcznie obliczenia i zostawił je tutaj.",
       "opt": {
         "solveIt": "Rozwiąż zagadkę oddziału",
-        "burnLedger": "Spal tabletkę"
+        "burnLedger": "Spal tabletkę",
+        "auditIt": "Przeprowadź audyt zgodnie z przepisami"
       },
       "out": {
         "solvePass": "Obliczenia się kończą. Cokolwiek ta dzielnica skrywała, wręcza ci rdzeń.",
         "solveFail": "Źle odczytujesz znak. Oddział otwiera się w złym kierunku, a sektor to zauważa.",
-        "burnLedger": "Odpowiadasz na to pytanie. Szczelina milknie, a coś tam na zewnątrz wyraża aprobatę."
+        "burnLedger": "Odpowiadasz na to pytanie. Szczelina milknie, a coś tam na zewnątrz wyraża aprobatę.",
+        "auditIt": "Księgi nie rozwiązuje się — dokonuje się ich uzgodnienia. Każdy wpis się zgadza, oddział otwiera się sam, a obliczenia są zgodne z twoimi ponownymi rzutami."
       }
     },
     "twinWreck": {
@@ -1528,11 +1744,13 @@
       "text": "Brama z kadłubów, wszystkie nastrojone na ten sam akord. Otworzą się na głos albo na ciszę.",
       "opt": {
         "singAlong": "Zaśpiewaj tę zwrotkę",
-        "jamIt": "Zagraj ten akord"
+        "jamIt": "Zagraj ten akord",
+        "harmonize": "Wtop się w otoczenie bramy"
       },
       "out": {
         "singAlong": "Twój reaktor wychwytuje akord i utrzymuje go. Brama otwiera się z radością.",
-        "jamIt": "Wystawiasz przed ich zespołem ścianę hałasu. Brama się otwiera, bo musi."
+        "jamIt": "Wystawiasz przed ich zespołem ścianę hałasu. Brama się otwiera, bo musi.",
+        "harmonize": "Pozwalasz, by cewka bramy bez przeszkód przepłynęła przez reaktor. Otwiera się ona bez żądania opłaty, a ładunek pozostaje w cewkach przez dwie potyczki."
       }
     },
     "pactSealing": {
@@ -1583,22 +1801,26 @@
       "text": "„Jedna przysługa” – mówi Łowczyni. „Wydaj to tutaj albo zabierz ze sobą. Twoja księga rachunkowa”.",
       "opt": {
         "callFavor": "Zgłoś to już teraz",
-        "saveFavor": "Zachowaj to na później"
+        "saveFavor": "Zachowaj to na później",
+        "debtPaid": "Przypomnij jej, że dług został uregulowany"
       },
       "out": {
         "callFavor": "Rzuca skrzynkę na twój zacisk grzbietowy i znika, zanim zdążysz jej podziękować.",
-        "saveFavor": "Zamiast tego organizuje ci prywatny kanał dostaw. To się opłaca."
+        "saveFavor": "Zamiast tego organizuje ci prywatny kanał dostaw. To się opłaca.",
+        "debtPaid": "„Co zapłacone, to zapłacone” – mówi i naprawdę tak uważa. Na tablicy z zleceniami zapada cisza, a ona zostawia na twoim doku naładowany telefon komórkowy jako zabezpieczenie."
       }
     },
     "reliquaryRun": {
       "text": "Skrzynia relikwiarzowa, której eskortuje jeden kantor. Cokolwiek się w niej znajduje, nie było otwierane od dziesięcioleci.",
       "opt": {
         "raidIt": "Weź relikwiarz",
-        "trade": "Wymień to"
+        "trade": "Wymień to",
+        "catalogue": "Wprowadź to do katalogu w odpowiedni sposób"
       },
       "out": {
         "raidIt": "Decydujesz się. Kantor przestaje śpiewać i zaczyna strzelać.",
-        "trade": "Przyjmują żółty rdzeń jako daninę i w zamian dają ci coś jeszcze dziwniejszego."
+        "trade": "Przyjmują żółty rdzeń jako daninę i w zamian dają ci coś jeszcze dziwniejszego.",
+        "catalogue": "Zamiast go rozebrać, sporządzasz spis zawartości relikwiarza. Lista trafia do kwatermistrzów samego Chóru, a „yard three jumps” na honor ureguluje formalności."
       }
     },
     "choirTithe": {
@@ -1663,11 +1885,13 @@
       "text": "Fala luźnych powiązań, płynąca pod prąd wzdłuż alei.",
       "opt": {
         "rideTide": "Wsiadaj i jedź",
-        "anchorHere": "Zakotwicz się i poczekaj"
+        "anchorHere": "Zakotwicz się i poczekaj",
+        "steady": "Trzymaj kadłub stabilnie"
       },
       "out": {
         "rideTide": "Znajdujesz się pięć rzędów dalej niż powinieneś. Kadłub nie zgadza się co do tego, jak do tego doszło.",
-        "anchorHere": "Trzymasz pozycję, dopóki to nie minie. Załoga dostaje godzinę, która się liczy."
+        "anchorHere": "Trzymasz pozycję, dopóki to nie minie. Załoga dostaje godzinę, która się liczy.",
+        "steady": "Nie chcesz płynąć z prądem. Fale rozbijają się o statek, który nie chce pogodzić się z dwiema przeszłościami, a poszycie samoczynnie się zacieśnia."
       }
     },
     "coreBargain": {
@@ -1684,11 +1908,11 @@
     "hereticFleet": {
       "text": "Heretycy, których uzbroiliście, stworzyli z tego flotę i teraz pytają, kto nią dowodzi.",
       "opt": {
-        "leadThem": "Poprowadź ich",
+        "leadThem": "Przejmij inicjatywę",
         "sendThemHome": "Odeślij ich do domu"
       },
       "out": {
-        "leadThem": "Za tobą płynie dziewięć kadłubów, nie śpiewając nic, ale bardzo głośno.",
+        "leadThem": "Czekali na każdego, kto to powie na głos. Wystarczy, że to zrobisz, a zniszczona flota ustawi się w szyku za twoim śladem, trzymając w zębach prezent.",
         "sendThemHome": "Pozostawiają ci swoje zapasy i swoją wdzięczność. Jedno i drugie to ciężar."
       }
     },
@@ -1707,11 +1931,13 @@
       "text": "Akolita, któremu udzieliłeś schronienia, czeka przy ostatnim punkcie orientacyjnym z trasą i prośbą.",
       "opt": {
         "takeHerAboard": "Zabierz ją na pokład",
-        "sendHerBack": "Odeślij ją z powrotem"
+        "sendHerBack": "Odeślij ją z powrotem",
+        "callCrew": "Wezwij jej ludzi z ładowni"
       },
       "out": {
         "takeHerAboard": "Obsługuje twoją tacę tak, jakby to była jej naturalna rola. Nic w Chórze jej nie zaskakuje.",
-        "sendHerBack": "Zostawia ci wszystko, co miała. To więcej, niż się spodziewałeś."
+        "sendHerBack": "Zostawia ci wszystko, co miała. To więcej, niż się spodziewałeś.",
+        "callCrew": "Wychodzą, mrużąc oczy – jest ich jedenastu – i zabierają się do pracy, zanim ktokolwiek o to poprosi. Kadłub powiększa się tak, jak to zawsze bywa w przypadku kadłubów obsługiwanych przez załogę."
       }
     },
     "brokenLighthouse": {
@@ -1776,22 +2002,26 @@
       "text": "Nie Mara — tylko jej kolekcjoner. Ma stronę z twoim imieniem i nie ma ochoty na rozmowę.",
       "opt": {
         "settleDebt": "Rozliczyć się",
-        "outrun": "Wyprzedź go"
+        "outrun": "Wyprzedź go",
+        "callFavour": "Poproś ją o spłatę długu wdzięczności"
       },
       "out": {
         "settleDebt": "Wyrywa stronę i podaje ci ją. „Mówi, że możesz wrócić”.",
-        "outrun": "Tracisz go na linii rzutów. On nigdy nie był tym, co kosztowało najwięcej."
+        "outrun": "Tracisz go na linii rzutów. On nigdy nie był tym, co kosztowało najwięcej.",
+        "callFavour": "Mara nie czerpie z tego przyjemności, ale szanuje tę zasadę. Kolekcja pozostaje na swoim miejscu, uznana za dług, a nie kradzież, a sąsiad mieszkający o jeden podwórko dalej wierzy jej na słowo."
       }
     },
     "hymnResidue": {
       "text": "Akord, który zaśpiewałeś, wciąż rozbrzmiewa w obudowie reaktora. Nie ucichł.",
       "opt": {
         "keepHumming": "Niech działa",
-        "scourIt": "Przeszukaj to dokładnie"
+        "scourIt": "Przeszukaj to dokładnie",
+        "playCopy": "Spróbuj jeszcze raz"
       },
       "out": {
         "keepHumming": "Zasila reaktor i niczego nie wymaga. I właśnie to budzi niepokój.",
-        "scourIt": "Wycinasz to talerz po talerzu. Cisza, która po tym następuje, znów należy do ciebie."
+        "scourIt": "Wycinasz to talerz po talerzu. Cisza, która po tym następuje, znów należy do ciebie.",
+        "playCopy": "Twoje nagranie odpowiada na pozostałość własnym głosem. Wzór się rozplątuje, wyrzuca coś, co Chór skrywał — a Chór będzie dokładnie wiedział, kto to zabrał."
       }
     },
     "jammedChoir": {
@@ -1831,11 +2061,13 @@
       "text": "Kombinezon dryfujący samotnie, z założonymi rękami, z linką odciętą od wewnątrz.",
       "opt": {
         "readLog": "Przeczytaj dziennik",
-        "stripSuit": "Zdejmij kombinezon"
+        "stripSuit": "Zdejmij kombinezon",
+        "matchChart": "Porównaj to z wykresem dla pola cichego"
       },
       "out": {
         "readLog": "Współrzędne, imię i trasa, którą ktoś chciał znaleźć.",
-        "stripSuit": "Dobre uszczelki, dobry złom. Tabliczkę znamionową zostaw na swoim miejscu."
+        "stripSuit": "Dobre uszczelki, dobry złom. Tabliczkę znamionową zostaw na swoim miejscu.",
+        "matchChart": "Ostatni nagłówek pozwu idealnie pokrywa się z twoją ankietą. Wiesz, dokąd to zmierzało, a teraz ten zwrot, którego nigdy nie nastąpił, jest gdzieś zapisany."
       }
     },
     "coldEngine": {
@@ -1894,6 +2126,920 @@
         "bidHigh": "Mara przekazuje ci to i wpisuje twoje nazwisko do kategorii „płaci”.",
         "bidLow": "Weź drugą partię. Nikt inny jej nie chciał, co może być właśnie sednem sprawy.",
         "heckle": "Negujesz cenę dla kogoś innego i czerpiesz z tego satysfakcję. Mara ci nie dziękuje."
+      }
+    },
+    "maraSupplyRun": {
+      "text": "Z kanału komunikacyjnego dochodzi głos Mary – krótki i rzeczowy. „Cztery skrzynie chłodziwa, jeden eskortujący, jeden kanał. Mój nabywca się denerwuje, a moi zwykli ludzie nie żyją. Chcesz to zlecić, czy mam poprosić klan?”",
+      "opt": {
+        "escort": "Skorzystaj z usług eskorty",
+        "skim": "Zdejmij skrzynię z góry",
+        "decline": "Powiedz jej, żeby poszukała kogoś innego"
+      },
+      "out": {
+        "escort": "Leć prosto. Jakiś statek z oznaczeniami klanu próbuje wlecieć na pas za tobą i szybko przekonuje się, do czego służy eskorta.",
+        "skim": "Jedna skrzynia trafia do ładowni, a lista ładunku jest krótka. Mara nic nie mówi przy dostawie. Po prostu dwukrotnie sprawdza numer.",
+        "skimCaught": "Podnosisz skrzynię, a jej księgowa stoi tuż obok. Wynagrodzenie zmniejsza się o połowę, ludzie kupującego śledzą cię przez dwa skoki, a Mara nie mówi ani słowa.",
+        "decline": "„No dobrze. No dobrze.” Wyłącza kanał bez żadnych gróźb, co w przypadku Mary jest niemal aktem życzliwości. Zaoszczędzone godziny spędzasz na kadłubie."
+      }
+    },
+    "maraVault": {
+      "text": "Zamknięta witryna na ostatnim targu, a przy ladzie stoi Mara. „Tutaj trzymam to, czego nie sprzedaję. Zapłaciłeś za sam widok. Weź jedną rzecz, weź gotówkę albo zostaw to zamknięte — miałam za sobą bardzo długą dekadę i każda z tych trzech opcji mi odpowiada”.",
+      "opt": {
+        "openIt": "Wybierz coś z wieszaka",
+        "takeCash": "Weź raczej gotówkę",
+        "leaveItHers": "Zostaw skarbiec zamknięty"
+      },
+      "out": {
+        "openIt": "Wyjmujesz kostkę z piankowej podstawki, która została dla niej wycięta czterdzieści lat temu. Jej osoba kontaktowa w dziale podwórkowym załatwia formalności trzy etapy dalej.",
+        "takeCash": "Wypisuje to starym pismem floty i nie udaje, że to uczciwa wymiana. I tak się to wydaje.",
+        "leaveItHers": "„Nikt tego jeszcze nie zrobił” – mówi, a po chwili podaje mi element poszycia, który zachowała dla własnego kadłuba."
+      }
+    },
+    "maraUsurer": {
+      "text": "W miejscu, gdzie powinien znajdować się ladę Mary, wisi zawiadomienie o zastawie i kadłub wielkości kaplicy. Jej długami zajmuje się teraz Lichwiarz — sprzedała książkę, by pokryć koszty, jakie jej spowodowałeś. „Kapitał, odsetki i niedogodności” — tak tam jest napisane.",
+      "opt": {
+        "payInFull": "Spłać całość",
+        "fightIt": "Odmowa i utrzymanie pozycji",
+        "runTheLane": "Przebiegnij tor"
+      },
+      "out": {
+        "payInFull": "Ty płacisz. Zabezpieczenie zostaje zniesione, książka wraca do Mary, a ona spotyka się z tobą na drugim końcu targu – nie ma nic do powiedzenia, ale ma ze sobą pełny zestaw narzędzi.",
+        "fightIt": "„Usurer” nie negocjuje dwa razy. Statek odłącza się od doku, a rynek robi mu miejsce do strzału, jakby robił to już wcześniej.",
+        "runPass": "Przemykasz między pasami ruchu na rynku i wychodzisz po drugiej stronie, nie obsługując tego stanowiska. Gdzieś za tobą bardzo duży kadłub powoli zawraca.",
+        "runFail": "W połowie drogi pas się zamyka. Udaje ci się z niego wyjechać, ale nie do końca płynnie, a Lichwiarz bierze cię na cel przez resztę sektora."
+      }
+    },
+    "yusufConvoyDefense": {
+      "text": "Yusuf eskortuje dziewiętnaście statków, które kiedyś stanowiły flotę, a szczelina przed nim nie jest pusta. „Mam list ładunkowy i nie mam żadnej broni godnej tej nazwy. Ty masz broń. Nie zamierzam cię obrażać, udając, że to oferta pracy”.",
+      "opt": {
+        "holdTheLine": "Proszę poczekać na konwój",
+        "tellThem": "Powiedz im, co było w czarnej skrzynce",
+        "sellManifest": "Sprzedaj manifest przed nim"
+      },
+      "out": {
+        "holdTheLine": "Zajmujesz stronę szczeliny i utrzymujesz pozycję, dopóki ostatni kadłub nie przejdzie. Dziewiętnaście statków rejestruje sygnał z twojego transpondera. Yusuf rejestruje go dwukrotnie.",
+        "tellThem": "Umieszczasz czarną skrzynkę na otwartym kanale. Nikt nie krzyczy. Po prostu wszyscy naraz przestają udawać, a konwój ponownie się formuje, jeszcze bardziej zwarty niż wcześniej.",
+        "sellManifest": "Pośrednik, który wyprzedza o dwa kroki, dobrze płaci za dziewiętnaście nazwisk i nagłówek. Konwój w większości przypadków i tak się przedostaje.",
+        "sellCaught": "Sprzedajesz to, a kupujący zabiera głos. Yusuf słyszy, jak jego własny manifest jest mu cytowany na otwartym kanale, zanim zdążysz opuścić sektor."
+      }
+    },
+    "yusufRefugeeLane": {
+      "text": "Procesja utknęła w wąskim gardle, które, jak się okazuje, potrafisz otworzyć. Yusuf o nic nie pyta. Po prostu unosi się tam, a na jego ekranie widać mapę pasów ruchu, którą ty też możesz zobaczyć.",
+      "opt": {
+        "openLane": "Zróbcie im miejsce na pasie",
+        "chargeToll": "Opłata za przejazd",
+        "sealIt": "Zamknij to za sobą"
+      },
+      "out": {
+        "openLane": "Podpalisz otwór i utrzymujesz pozycję, dopóki nie przepłyną. To zajmuje godziny, których nie masz. Każdy przepływający kadłub oznacza, że twój kurs jest bezpieczny.",
+        "chargeToll": "Płacą. Oczywiście, że płacą. Yusuf płaci jako pierwszy i najgłośniej, żeby ci za nim nie musieli się kłócić.",
+        "sealIt": "Przechodzisz i opuszczasz szczypcę za sobą. Nic za tobą nie podąża. Nic też za nimi nie podąża."
+      }
+    },
+    "choirDeepPact": {
+      "text": "Tym razem Kaznodzieja spotyka cię w samym sercu hymnu, a nie na jego obrzeżach. „Zatrzymałeś się na płytkiej wodzie. Istnieje jednak głębsza interpretacja. Wymaga ona większego poświęcenia, ale pozwala lepiej zrozumieć wzór, i nie będę udawał, że to sprawiedliwa wymiana”.",
+      "opt": {
+        "goDeeper": "Zapoznaj się z bardziej szczegółowymi informacjami",
+        "holdHere": "Trzymaj się tego, co podpisałeś",
+        "breakIt": "Zerwij tę umowę tutaj"
+      },
+      "out": {
+        "goDeeper": "Hymn wygryza kawałek kadłuba i pozostawia w powstałej dziurze coś, czego nigdy nie wyprodukowano. Twój reaktor uczy się jednej zwrotki.",
+        "holdHere": "„Rozważny”. Nie brzmi na rozczarowanego, co jest jeszcze gorsze. Powierzchowna interpretacja się sprawdza i przynosi oczekiwane rezultaty.",
+        "breakIt": "Na otwartym kanale rozdzielasz podpis wiersz po wierszu. Chór słyszy każde słowo, a najbliższy kantor podchodzi, by odebrać różnicę."
+      }
+    },
+    "preacherFinale": {
+      "text": "Kaznodzieja czeka na ostatniej spokojnej stacji przed Rdzeniem i tym razem nie występuje. „Cokolwiek o nas postanowiłeś, wejdziesz tam. Chciałbym wiedzieć, co powiesz, kiedy ono zapyta”.",
+      "opt": {
+        "singWithHim": "Zaśpiewajcie z nim po raz ostatni",
+        "answerPlainly": "Powiedz mu, co naprawdę zamierzasz powiedzieć",
+        "cutHimOff": "Wyciąć kanał"
+      },
+      "out": {
+        "singWithHim": "Ty zajmujesz dolną linię. On zajmuje górną. Przez dziewięćdziesiąt sekund sektor nabiera kształtu, a reaktor utrzymuje ładunek jeszcze długo po tym, jak dźwięk ucichnie.",
+        "answerPlainly": "Powiedz mu to wprost. On wysłuchuje cię od początku do końca, nie poprawiając ani jednego słowa, a potem wręcza ci zbroję, w której miał zostać pochowany.",
+        "cutHimOff": "Przerwałeś mu w połowie wersetu. Jego zwolennicy przyjęli to mniej więcej tak, jak się spodziewałeś, a stoją między tobą a Rdzeniem."
+      }
+    },
+    "keeperThread": {
+      "text": "Przekaźnik Strażnika namierzył cię między dwoma nadajnikami. „Wykonywałeś moją pracę. Nie wiem, czy mam ci podziękować, czy wystawić rachunek. A skoro o tym mowa — czego chcesz w zamian?”",
+      "opt": {
+        "repayHim": "Spłać mu to, co jesteś mu winien",
+        "askMore": "Poproś go o więcej",
+        "handTheLog": "Przekaż mu swój dziennik sygnałów nawigacyjnych"
+      },
+      "out": {
+        "repayHim": "Przesyłasz mu notatkę i listę wszystkich nadajników, z którymi nawiązałeś kontakt. On ci nie dziękuje. Po prostu to archiwizuje, co dla niego oznacza to samo.",
+        "askMore": "Daje ci coś z zapasów eksploatacyjnych i przez dwa skoki nie mówi już ani słowa.",
+        "askMoreCold": "Wypłaca ci wynagrodzenie w postaci praw do złomu, zimny jak próżnia, i przestaje kierować do ciebie łatwe sygnały nawigacyjne.",
+        "logPass": "Twój dziennik idealnie pokrywa się z jego dziennikiem. Dwie połowy mapy łączą się w jedną, a trzy rzędy pasa ruchu wyłaniają się z szumu.",
+        "logFail": "Transfer ulega uszkodzeniu w połowie. Otrzymuje uszkodzony dziennik i uszkodzony odczyt, a po nieudanym nawiązaniu połączenia pojawia się fala."
+      }
+    },
+    "hullBreakerYard": {
+      "text": "Złomowisko nadal działające w trybie automatycznym. Od lat tnie ten sam kadłub na te same kawałki, a kawałki są ułożone w stosy w sposób sugerujący, że ktoś nadal je zbierał.",
+      "opt": {
+        "takeStack": "Weź stos",
+        "stopTheYard": "Odłącz zasilanie na podwórku",
+        "restartIt": "Skieruj to na coś innego"
+      },
+      "out": {
+        "takeStack": "Czysty talerz, wycięty według standardu, z którego już nikt nie korzysta. I tak się sprzedaje.",
+        "takeStackTrap": "Stos pełnił funkcję nośną. Połowa podwórka opadała na twój grzbiet.",
+        "stopTheYard": "Wyłączasz zasilanie autobusu, a ramiona opadają. Niezależnie od tego, jaki to był statek, można teraz przestać go ciąć.",
+        "restartPass": "Zmieniasz kolejność cięcia. Maszyna zaczyna produkować części, które faktycznie nadają się do użytku.",
+        "restartFail": "Systemy uzbrojenia traktują Twoje polecenie jako wyznaczenie celu."
+      }
+    },
+    "tugStrike": {
+      "text": "Jedenaście holowników utrzymywało pozycję w poprzek toru żeglugowego, z wyłączonymi silnikami, a ich transpondery wyświetlały te same trzy słowa: „NOT UNTIL PAID”.",
+      "opt": {
+        "payThem": "Wpłać składkę na fundusz strajkowy",
+        "crossPicket": "Przekrocz linię",
+        "haulForThem": "Zrób dla nich jeden kurs"
+      },
+      "out": {
+        "payThem": "Otwierają trasę i wręczają ci swoje notatki dotyczące trasy, które są lepsze niż wszystko, na podstawie czego dotychczas leciałeś.",
+        "crossPicket": "Nikt nie strzela. Jedenaście transponderów rejestruje twoje dane w tym samym momencie.",
+        "haulForThem": "Bierzesz ładunek, za który nikt nie dostaje zapłaty. Stocznie położone w dolnym biegu rzeki dowiadują się o tym, zanim jeszcze tam dotrzesz."
+      }
+    },
+    "salvageQuarantine": {
+      "text": "Boja kwarantannowa, której termin ważności upłynął czterdzieści lat temu, wciąż grzecznie odmawia wpuszczenia kogokolwiek na obszar zanieczyszczony, nad którym nie ma żadnej władzy.",
+      "opt": {
+        "obeyIt": "Przestrzegaj zasad kwarantanny",
+        "breakSeal": "Złam pieczęć",
+        "readBuoy": "Przeczytaj dziennik boi"
+      },
+      "out": {
+        "obeyIt": "Obejdziesz to. Cokolwiek to chroniło, pozostanie chronione przez kolejne kilkadziesiąt lat.",
+        "breakSeal": "Zapieczętowany ładunek – zapieczętowany z powodu, który już od dziesięcioleci nie ma zastosowania. Przynajmniej w większości przypadków.",
+        "breakSealBad": "Powód, dla którego zostało to zamknięte, wciąż tam jest, a przez czterdzieści lat zdążyło nabrać apetytu.",
+        "readBuoy": "Zarejestrowano w nim każdy statek, który go zignorował. Lista jest długa, a zawarte w niej nagłówki są przydatne."
+      }
+    },
+    "driftSchool": {
+      "text": "Ktoś prowadzi szkołę w wygospodarowanym z wnętrza wygospodarowanym frachtowcu. Dziewięcioro dzieci, jedna bardzo zmęczona osoba dorosła oraz program nauczania, który w większości polega na tym, by nie zginąć na polu dryfującym.",
+      "opt": {
+        "donate": "Zostaw im zapasy",
+        "teachThem": "Przeprowadź jedną lekcję",
+        "takeTheFreighter": "Zdobądź rdzeń frachtowca"
+      },
+      "out": {
+        "donate": "Zmęczony dorosły nie dziękuje ci. Jedno z dzieci rysuje twój kadłub na przegrodzie – nieudolnie i na stałe.",
+        "teachThem": "Wyjaśnij zasady poruszania się po pasach dziewięciu osobom, które przeżyją ciebie. Wyjaśnienie tego na głos pozwala ci zapanować nad pewnymi sprawami.",
+        "takeTheFreighter": "To zasila oświetlenie i klimatyzację. Poradzą sobie. Ludzie tutaj zazwyczaj sobie radzą."
+      }
+    },
+    "clanFuneral": {
+      "text": "Jeden z klanów „spala” na polu bitwy jedną ze swoich jednostek, co w tych warunkach oznacza otwarcie kadłuba i pozostawienie jej na łasce prądów. Zauważyli twój numer rejestracyjny.",
+      "opt": {
+        "standDown": "Wyłączyć silniki i czekać",
+        "salvageDrift": "Podążaj za nurtem po",
+        "sendSalute": "Wyślij salut floty"
+      },
+      "out": {
+        "standDown": "Musisz utrzymać pozycję przez całe dziewiętnaście minut. Ich dyspozytor pamięta, kto to zrobił.",
+        "salvageDrift": "Kadłub, na którym wypłynęła, był wart więcej niż sama uroczystość. Ktoś miał zamiar go zabrać.",
+        "salvageDriftSeen": "Zostawili pikietę. Oczywiście, że zostawili pikietę.",
+        "sendSalute": "Nikt tutaj nie słyszał tego starego, trzytonowego sygnału od trzydziestu lat. Dwa statki klanu odpowiadają na niego, zanim zdążą się zastanowić."
+      }
+    },
+    "coolantBloom": {
+      "text": "Pęcherz chłodziwa wielkości jednej przecznicy, który powoli zamarza i ponownie zamarza. Coś go nieustannie zasila.",
+      "opt": {
+        "tapBloom": "Dotknij kwiatu",
+        "findSource": "Odkryj, co je napędza",
+        "burnIt": "Spal to"
+      },
+      "out": {
+        "tapPass": "Powolne zawory, powolne regulatory, brak skoku ciśnienia. Zbiorniki wracają pełne, a reaktor przez chwilę pozostaje w stanie spoczynku.",
+        "tapFail": "Wystarczy, że jeden zawór otworzy się zbyt szeroko, a eksplozja reaguje tak, jak zawsze reaguje ciśnienie.",
+        "findSource": "Kadłub pod lodem, wciąż uwalniający gazy, wciąż przechodzący swój cykl dla załogi, której już na pokładzie nie ma.",
+        "burnIt": "Wznosi się płynnie, a pas ruchu zostaje wolny dla wszystkich. Cokolwiek tam mieszkało, nie ma prawa głosu."
+      }
+    },
+    "manifestAuction": {
+      "text": "Aukcja otwarta dotycząca listu ładunkowego, którego nikt nie widział. Trzech oferentów, a jeden z nich składa ofertę w walucie floty, która przestała być środkiem płatniczym czterdzieści lat temu.",
+      "opt": {
+        "bidHigh": "Przebij ich wszystkich",
+        "backScript": "Poprzyj oferenta flotowego",
+        "jamAuction": "Zablokuj aukcję"
+      },
+      "out": {
+        "bidHigh": "Lista ładunku jest prawdziwa. Połowa ładunku została już odzyskana, a druga połowa jest warta całej kwoty oferty.",
+        "bidHighDud": "Ładunek zniknął. Trasy wymienione w manifeście pozostały, a trasy w tej okolicy to niemal sam ładunek.",
+        "backScript": "Gwarantujesz za scenariusz na otwartym kanale. W końcu pieniądze babci kogoś się do czegoś przydały.",
+        "jamAuction": "Nikt tego nie wygrywa. Dwie godziny później odbierasz całą partię po cenie wywoławczej od bardzo zirytowanego sprzedawcy."
+      }
+    },
+    "wardenPatrolBoat": {
+      "text": "Łódź patrolowa typu „Warden”, jedna załoga, czterdzieści lat po terminie rotacji. Wydaje standardowy rozkaz zatrzymania, a po chwili pyta, czy ten rozkaz wciąż ma jakieś znaczenie.",
+      "opt": {
+        "answerYes": "Powiedz mu, że to wciąż coś znaczy",
+        "answerNo": "Powiedz mu, że to nie",
+        "showPapers": "Przedstawić dokumenty dotyczące odzysku"
+      },
+      "out": {
+        "answerYes": "Po raz pierwszy od dziesięciu lat przeprowadza pełną kontrolę drogową, ściśle zgodnie z przepisami. Następnie przekazuje ci plan patrolu.",
+        "answerNo": "Przez chwilę milczy. Potem zdejmuje uzbrojenie z łodzi i przekazuje ci je, bo sam już go nie będzie potrzebował.",
+        "papersPass": "Twoje dokumenty są w porządku tak, jak tylko dokumenty prawdziwego zbieracza złomu mogą być. On wypłaca za to ustaloną nagrodę.",
+        "papersFail": "W ciągu jedenastu sekund wykrywa rozbieżność i – przepraszająco – nakłada na ciebie grzywnę, kierując się czterdziestoletnim przyzwyczajeniem."
+      }
+    },
+    "wreckedRelayFarm": {
+      "text": "Sześćdziesiąt masztów przekaźnikowych ustawionych w rzędzie, wszystkie skierowane w tę samą stronę, wszystkie wyłączone. Sześćdziesiąty pierwszy jest skierowany w inną stronę i pobiera prąd.",
+      "opt": {
+        "traceIt": "Zobacz, dokąd to wskazuje",
+        "stripFarm": "Zlikwiduj tych sześćdziesięciu martwych",
+        "realign": "Cofnij do sześćdziesiątego pierwszego"
+      },
+      "out": {
+        "traceIt": "Ten kurs nie figuruje na żadnej mapie. Teraz jest już na twojej.",
+        "stripFarm": "Sześćdziesiąt masztów z dobrej miedzi. Sześćdziesiąty pierwszy cały czas pobiera energię, gdy pracujesz.",
+        "realign": "Odkładasz go z powrotem do szeregu wraz z sześćdziesięcioma innymi egzemplarzami. Układ budzi się na jedenaście sekund i wymawia imię."
+      }
+    },
+    "tetherRace": {
+      "text": "Dwóch przewoźników rozciągnęło linę nad przepaścią i obstawiają, kto szybciej ją pokona, nie przecinając jej. Jest jeszcze miejsce dla trzeciego.",
+      "opt": {
+        "race": "Zajmij trzecie miejsce",
+        "bet": "Postaw na starszy samochód ciężarowy",
+        "cutTether": "Odetnij linkę i ruszaj"
+      },
+      "out": {
+        "racePass": "Przejeżdżasz bez problemów, a lina wciąż brzęczy za tobą. Obaj przewoźnicy płacą bez sprzeciwu.",
+        "raceFail": "Sam to zepsułeś. Nikt nie dostanie wypłaty, a jeden z kierowców ciężarówki musi teraz poruszać się pieszo – w najbardziej dosłownym tego słowa znaczeniu, jakie można tu spotkać.",
+        "betWin": "Stare kadłuby znają swoje granice. Przechodzi przez to tak, jakby robiła to już tysiąc razy – a tak właśnie jest.",
+        "betLose": "Stare kadłuby też znają swoje ograniczenia, a jej kadłub właśnie dzisiaj postanowił je sprawdzić.",
+        "cutTether": "Dobra lina, dobra wciągarka i dwie osoby, które jeszcze przez jakiś czas będą opowiadać tę historię o tobie."
+      }
+    },
+    "yusufApprentice": {
+      "text": "Uczeń Yusufa zwraca się do ciebie na osobności. „On sam nie zapyta, więc pytam w jego imieniu. Potrzebuje pewnej części, a sklep nie chce mu jej sprzedać”.",
+      "opt": {
+        "buyIt": "Kup to z listy prezentów",
+        "stealIt": "Zabierz to z podwórka",
+        "tellHim": "Powiedz Yusufowi, że zapytał o to jego praktykant"
+      },
+      "out": {
+        "buyIt": "W ciągu około czterech minut ustala, skąd to się wzięło, i przez resztę sektora nie wspomina o tym ani słowem.",
+        "stealIt": "W stoczni nie zauważą jego braku przez miesiąc. Praktykant nie zdradzi, skąd to się wzięło, przez jeszcze dłuższy czas.",
+        "stealItSeen": "W warsztacie od razu to zauważają. Wychodzisz stamtąd z częścią i ogonem.",
+        "tellHim": "Jest zły przez jakieś dziesięć sekund, a potem bardzo starannie przestaje być zły. Naprawia coś na twoim kadłubie, o co nikt go nie prosił."
+      }
+    },
+    "iceLighter": {
+      "text": "Lodowy statek transportowy, wciąż napędzany silnikiem, wciąż pusty. Jego autopilot wykonuje tę samą trasę dostawczą już od czasów przed „Cięciem” i ani razu nie otrzymał polecenia, by się zatrzymać.",
+      "opt": {
+        "loadIt": "Uruchom program i pozwól mu działać",
+        "boardIt": "Obróbka i skrawanie",
+        "stopIt": "Wydaj polecenie zatrzymania"
+      },
+      "out": {
+        "loadIt": "Przyjmuje ładunek, rejestruje go i jedzie dalej. Gdzieś na tej trasie ktoś otrzyma przesyłkę.",
+        "boardIt": "Czterdzieści lat konserwacji kadłuba, z którego nikt nie korzystał. Każda część jest idealnie czysta.",
+        "stopIt": "Rozpoznaje, ogranicza siłę ciągu i przechodzi w tryb ciemny w mniej niż sekundę. Czterdzieści lat, a wystarczyło jedno słowo."
+      }
+    },
+    "driftCourt": {
+      "text": "Trzy statki zwołały posiedzenie sądu ds. ratownictwa morskiego w sprawie wraku, co w tych stronach oznacza wzajemne krzyczenie na siebie na wspólnym kanale, aż ktoś się podda. Chcą, by sprawę rozstrzygnęła czwarta strona.",
+      "opt": {
+        "ruleFair": "Trzy sposoby na to",
+        "ruleForSelf": "Rządź po swojemu",
+        "auditWreck": "Najpierw sprawdź wrak"
+      },
+      "out": {
+        "ruleFair": "Nikt nie jest zadowolony, co wszyscy trzej uznają za przejaw sprawiedliwego orzeczenia. Twoje wynagrodzenie zostanie wypłacone w trzech ratach.",
+        "ruleForSelf": "Wrak przyznajesz jedynej obecnej grupie, która ma broń, a sam bierzesz swoją część z zysku.",
+        "auditPass": "Wrak nie jest tym, za co każdy z nich go uważa, a twoja interpretacja rozstrzyga tę dyskusję w czterech zdaniach.",
+        "auditFail": "Twoja ankieta jest błędna w sposób, który wszyscy trzej dostrzegają, i znów rozlega się krzyk, w którym bierzesz udział."
+      }
+    },
+    "driftReputation": {
+      "text": "Kierowca ciężarówki z pola lotniskaDryf, bez żadnej prośby, potwierdza twoje dane. „To ty postąpiłeś tam jak należy. Przekazujemy to dalej”.",
+      "opt": {
+        "takeEscort": "Niech lecą razem z tobą",
+        "askCargo": "Zapytaj, co mają ze sobą",
+        "sendThemHome": "Odeślij je z powrotem"
+      },
+      "out": {
+        "takeEscort": "Przelatują obok ciebie przez całą Szczelinę i odłączają się, nie prosząc o nic w zamian.",
+        "askCargo": "Głównie po to, żeby uratować sytuację. Dają ci ten przedmiot, o który się kłócili.",
+        "askCargoEmpty": "Nic. Działają na zero, a i tak ci płacą z funduszu, którym nikt nie zarządza.",
+        "sendThemHome": "„The Rift” nie jest miejscem dla przewoźników. Przypływają i zostawiają ci swoje mapy, gdy odpływają."
+      }
+    },
+    "driftWake": {
+      "text": "Ktoś nadaje informacje o Twoim rejestrze na paśmie Dryf Fields, dołączając krótką listę. Lista ta jest poprawna.",
+      "opt": {
+        "jamIt": "Zakłócić transmisję",
+        "answerIt": "Odpowiedź na tym samym paśmie",
+        "findSender": "Znajdź nadawcę"
+      },
+      "out": {
+        "jamIt": "Zespół milknie. Wszystko inne na płycie również milknie, co ludzie zauważają.",
+        "answerIt": "Przeczytałeś tę listę od początku do końca, punkt po punkcie, i nie sprzeciwiłeś się żadnemu z tych punktów. Zespół milczy z innego powodu.",
+        "findPass": "Pojedynczy przekaźnik na opuszczonym kadłubie. Ktokolwiek go zainstalował, już dawno zniknął; nagranie jednak pozostało.",
+        "findFail": "Wpędzisz to w zagłębienie i stracisz dwie godziny oraz część powłoki. Transmisja trwa dalej."
+      }
+    },
+    "quietPassage": {
+      "text": "Szczelina jest tu tak ciasno zwinięta, że dźwięk dociera przed samym źródłem, które go wywołało. Odgłos własnego silnika dociera do ciebie z przodu.",
+      "opt": {
+        "followTheNote": "Postępuj zgodnie z własną notatką",
+        "cutEngines": "Wyłączyć silniki i dryfować",
+        "soundIt": "Zagraj akord „fold”"
+      },
+      "out": {
+        "followTheNote": "Lecisz w kierunku własnego głosu i wychodzisz trzy rzędy dalej, niż powinieneś.",
+        "cutEngines": "W tej zagłębieniu nie ma nic, co mogłoby się odbijać. Przez jedenaście minut nic się nie dzieje, a kadłub wykorzystuje ten czas.",
+        "soundPass": "Wynik jest czysty i zawiera coś, czego przed chwilą jeszcze tam nie było.",
+        "soundFail": "Fold odpowiada na twoje pingi czterdzieści razy naraz, ze wszystkich stron."
+      }
+    },
+    "wardenRelay": {
+      "text": "Gdy przechodzisz obok, budzi się przekaźnik Strażnika i odczytuje ci harmonogram dyżurów. Każde nazwisko na tej liście to twoje imię, przypisane do stanowisk, które już nie istnieją.",
+      "opt": {
+        "acceptPost": "Zaakceptuj wpis",
+        "wipeRoster": "Wyczyść listę zawodników",
+        "copyRoster": "Skopiuj to i przejdź dalej"
+      },
+      "out": {
+        "acceptPost": "Logujesz się do stanowiska, które od czterdziestu lat pozostaje nieobsadzone. Przekaziciel przyznaje ci swoją stałą władzę, która jest niczym i wszystkim zarazem.",
+        "wipeRoster": "Lista odchodzi. Pamięć sztafety ma wartość zarówno w całości, jak i w fragmentach.",
+        "copyRoster": "Czterdzieści lat służby, wart i zmian. Ktoś powinien to mieć, a teraz już ktoś to ma."
+      }
+    },
+    "manifestBuyer": {
+      "text": "Znalazł cię nabywca z aukcji „Dryf Fields”, co robi wrażenie, bo nie podałeś tytułu.",
+      "opt": {
+        "dealAgain": "Zajmij się nim jeszcze raz",
+        "cutHim": "Puść go",
+        "traceHim": "Prześledź, w jaki sposób cię znalazł"
+      },
+      "out": {
+        "dealAgain": "Płaci ponad normę, i to dwukrotnie, a potem pyta, jak ci się podoba to, że można cię łatwo znaleźć.",
+        "cutHim": "Wymieniasz transponder na jego oczach. To niegrzeczne, ale skuteczne, a on szanuje obie strony.",
+        "tracePass": "Plakietka na kadłubie, przyspawana podczas aukcji. Wyciągasz ją i zatrzymujesz nadajnik.",
+        "traceFail": "Nie znajdujesz niczego, co jest gorsze niż znalezienie czegoś, a on wciąż cię odnajduje."
+      }
+    },
+    "haulerReunion": {
+      "text": "Przewoźnicy na linach utworzyli stałe przejście w Rift i nazwali je na cześć przejścia, w którym brałeś udział. Chcą, żebyś przeciął wstęgę, co w tym przypadku oznacza pierwszy przejazd.",
+      "opt": {
+        "firstRun": "Zrób pierwszy przejazd",
+        "refuseHonour": "Odrzucić ten zaszczyt",
+        "tollIt": "Poproś o udział w opłatach za przejazd"
+      },
+      "out": {
+        "firstRun": "Przeprawiasz się jako pierwszy, a kolejka się nie przerywa. Zanim minie godzina, za tobą przeprawia się jeszcze jedenaście łodzi.",
+        "firstRunRough": "Linia się utrzymuje. Twój grzbietowy – nie. Pokrywają różnicę bez proszenia.",
+        "refuseHonour": "Powiedz im, żeby zamiast tego wysłali swój najstarszy statek. Statek ten przepłynie, a przeprawa zostanie nazwana jego imieniem.",
+        "tollIt": "Zgadzają się, bo nazwali to po tobie i nie mogą teraz odmówić. Opłaty przychodzą na czas i sprawiają dokładnie taką samą przyjemność."
+      }
+    },
+    "foldedArchive": {
+      "text": "Archiwalny kadłub, złożony w sobie tak, że każdy korytarz prowadzi do tego samego pomieszczenia. Pomieszczenie to zostało skatalogowane dziewięć razy przez dziewięć różnych osób.",
+      "opt": {
+        "addTenth": "Dodaj dziesiąty katalog",
+        "burnThem": "Spal dziewiątkę",
+        "readNinth": "Przeczytaj dziewiątą rękę"
+      },
+      "out": {
+        "addTenth": "Sam sporządzasz listę własnoręcznie. Skład przyjmuje ją, a coś w tej arytmetyce się rozluźnia.",
+        "burnThem": "Dziewięć katalogów, jeden pożar, jedno pomieszczenie, które w końcu przestaje domagać się opisu.",
+        "ninthPass": "Dziewiąty zapis jest niedawny. Mierzy się go w tygodniach, a nie w dziesięcioleciach. Zawiera on informację o wyjściu, której nie ma w pozostałych ośmiu.",
+        "ninthFail": "W połowie tracisz wątek i wychodząc, zabierasz ze sobą lampę. Dziesiąty katalog nie powstanie."
+      }
+    },
+    "twinTransit": {
+      "text": "Dwa identyczne statki mijają cię, poruszając się po identycznych trajektoriach, w odstępie czterech sekund. Oba nawiązują z tobą kontakt. Oba zwracają się do ciebie po imieniu.",
+      "opt": {
+        "answerFirst": "Odpowiedz na pierwsze pytanie",
+        "answerSecond": "Odpowiedź nr 2",
+        "answerNeither": "Nie odpowiadaj na żadne z tych pytań"
+      },
+      "out": {
+        "answerFirst": "Pierwszy jest wdzięczny i daje ci coś. Drugi przerywa transmisję w połowie słowa.",
+        "answerSecond": "Ten drugi wie o następnych czterech godzinach rzeczy, które jeszcze się nie wydarzyły. Dwie z nich ujawnia.",
+        "answerNeither": "Przez jedenaście minut zachowujesz ciszę. Z drugiej strony fałdy wyłania się tylko jeden kadłub, a nie ma go na twoim ekranie."
+      }
+    },
+    "riftSurgeon": {
+      "text": "Moduł medyczny, wciąż oświetlony, wciąż sterylny, z salą operacyjną, w której od dziesięcioleci nie operowano żadnego pacjenta. Oferuje ci wizytę.",
+      "opt": {
+        "takeIt": "Umów się na wizytę",
+        "stripBay": "Opróżnić salę operacyjną",
+        "bookOther": "Zarezerwuj to dla kogoś innego"
+      },
+      "out": {
+        "takeIt": "Cokolwiek robi z kadłubem, robi to jak należy, a całą procedurę rejestruje pod numerem pacjenta nadanym jeszcze przed „Cięciem”.",
+        "takeItOff": "Opiera się na instrukcji dotyczącej klasy kadłubów, która już nie istnieje. Większość procedur nadal ma zastosowanie.",
+        "stripBay": "Emitery pola sterylnego zachowują swoją skuteczność. Światła kadłuba pozostają włączone przez cały czas pracy.",
+        "bookOther": "Podajesz współrzędy i dostępne terminy na otwartym kanale. W ciągu godziny trzy statki zarezerwowały terminy."
+      }
+    },
+    "causalDebt": {
+      "text": "„Fold” oferuje transakcję bez kontrahenta: weź coś teraz, a Rift zabierze coś w zamian w wybranym przez siebie momencie.",
+      "opt": {
+        "takeNow": "Zrób to teraz",
+        "payFirst": "Najpierw zapłać",
+        "declineIt": "Odrzuć transakcję"
+      },
+      "out": {
+        "takeNow": "Towar znajduje się już w twoim ładowni, zanim jeszcze sfinalizujesz umowę. Druga część transakcji jeszcze nie doszła do skutku.",
+        "payFirst": "Otwierasz przegrodę i pozwalasz, by to ona przejęła obciążenie z przodu. Księgi się zgadzają i pozostają w równowadze.",
+        "declineIt": "Odmowa sama w sobie jest odpowiedzią, a system ją rejestruje. Droga staje się otwarta bez żadnych opłat."
+      }
+    },
+    "unlitChapel": {
+      "text": "Kaplica chóru z wyłączonymi światłami, a hymn i tak nadal brzmi. Kaznodziei tu nie ma; jest za to jego nagranie, które odpowiada na pytania.",
+      "opt": {
+        "askIt": "Zadaj pytanie nagraniu",
+        "silenceIt": "Wytnij fragment hymnu",
+        "copyIt": "Skopiuj tekst hymnu"
+      },
+      "out": {
+        "askIt": "Najpierw poprawnie odpowiada na pytanie, którego nie zadałeś, a potem odpowiada na to, które zadałeś.",
+        "silenceIt": "W kaplicy zapada cisza w samym środku zdania. Nikt nie protestuje, co jest w pewnym sensie najgorsze.",
+        "copyIt": "Masz czyste nagranie. Jest krótsze, niż się wydawało, i nie zapętla się tam, gdzie się spodziewałeś."
+      }
+    },
+    "riftPilotage": {
+      "text": "Tablica cechu pilotów, na wpół spalona, wciąż zawierająca cennik tras, których trasy co roku ulegają zmianom. Ktoś ręcznie aktualizował te informacje.",
+      "opt": {
+        "hirePilot": "Zatrudnij pilota",
+        "readBoard": "Wystarczy przeczytać forum",
+        "takeBoard": "Weź planszę"
+      },
+      "out": {
+        "hirePilot": "Przeleciała tę trasę już tysiąc sto razy, a atakuje tak, jakby to był jej pierwszy lot.",
+        "readBoard": "Ceny mówią więcej o torach niż wykresy. Te drogie są drogie nie bez powodu.",
+        "takeBoard": "Można go zdjąć z przegrody w jednym kawałku. Ktokolwiek miał go aktualizować, po przybyciu na miejsce nie znajdzie nic do aktualizacji."
+      }
+    },
+    "echoOfTheCut": {
+      "text": "Przez jedenaście sekund wszystkie twoje przyrządy wskazują ten sam odczyt, a odczyt ten pochodzi sprzed czterdziestu lat.",
+      "opt": {
+        "recordIt": "Nagraj to",
+        "rideIt": "Wyrusz w podróż po świecie czytania",
+        "shutItOut": "Wyłączcie wszystkie urządzenia"
+      },
+      "out": {
+        "recordIt": "Jedenaście sekund utworu „The Cut”, słyszanych z zewnątrz. Echo odsłuchuje go cztery razy i nic nie mówi.",
+        "ridePass": "Dopasowujesz się do poprzedniego odczytu i utrzymujesz go. Przez chwilę Szczelina traktuje cię jak coś, co już uwzględniła.",
+        "rideFail": "Nie da się tego utrzymać. Cokolwiek miało być przyczyną działania Riftu, zamiast tego wpłynęło na powłokę.",
+        "shutItOut": "Jedenaście sekund całkowitej ciszy, wybranych celowo. Kadłub wychodzi z tego stanu w stanie większej stabilności niż przedtem."
+      }
+    },
+    "processionEscort": {
+      "text": "Przewoźnicy, którzy podążali za tobą z PólDryf, dogonili cię i przyprowadzili ze sobą całą ekipę zajmującą się przekraczaniem granicy do miejsca, w którym nikt z nich nie powinien się znaleźć.",
+      "opt": {
+        "sendBack": "Zleć ich zwrot",
+        "useThem": "Zatrudnij ich",
+        "armThem": "Uzbrój ich i utrzymaj pozycję na linii"
+      },
+      "out": {
+        "sendBack": "Kłócą się przez cztery minuty, a potem odchodzą. Ktoś po drodze zostawia na twoim pomostu zapasową pompę.",
+        "useThem": "Jedenaście ekip rozbierających wrak statku „Procession” pracuje szybciej niż jakakolwiek stocznia. Wszyscy otrzymują wynagrodzenie.",
+        "useThemCost": "Wszystko idzie dobrze, dopóki nie zacznie iść źle. Dwa kadłuby nie wracają, a wszyscy i tak dalej pracują.",
+        "armThem": "Wydajesz własne zasoby na ich wieżyczki. Korytarz za tobą pozostaje otwarty do końca sektora."
+      }
+    },
+    "brokerInTheChoir": {
+      "text": "Kupujący przyjął zamówienia. Ma teraz na sobie szary strój chóralny, a na grzbiecie dłoni wciąż widnieje lista prezentów ślubnych.",
+      "opt": {
+        "dealAnyway": "Zajmij się nim mimo wszystko",
+        "buyBackName": "Odzyskaj swoją listę prezentów",
+        "readOrders": "Zapoznaj się z jego rozkazami"
+      },
+      "out": {
+        "dealAnyway": "Asortyment sklepu „Choir” jest lepszy niż w „Rim”, a ceny w nim są dziwniejsze. On już się nie targuje.",
+        "buyBackName": "Myje rękę na twoich oczach, powoli, i wygląda na to, że naprawdę odczuwa ulgę.",
+        "ordersPass": "W poleceniach wymieniono trzy kadłuby i kierunek. Jeden z kadłubów należy do ciebie; kierunek jest przydatny.",
+        "ordersFail": "Zanim on to zauważy, jesteś już w połowie, a reszta strony to już kwestia doktryny."
+      }
+    },
+    "postingOrders": {
+      "text": "Punkt kontrolny Wardenów w Procesji, w którym nie ma nikogo na służbie, nadal wydaje dokumenty tranzytowe każdemu, kto poprawnie o nie poprosi.",
+      "opt": {
+        "useAuthority": "Zapytaj jako funkcjonariusz",
+        "forgeThem": "Sfałszuj dokumenty",
+        "openIt": "Udostępnij to wszystkim"
+      },
+      "out": {
+        "useAuthority": "Punkt kontrolny rozpoznaje stanowisko, na które jesteś przypisany, i stempluje wszystko, co przed nim złożysz.",
+        "forgeThem": "Puste półki, stempel roboczy, nikogo do kontroli. Drukujesz więcej, niż potrzebujesz, a resztę sprzedajesz.",
+        "forgeThemFlag": "Pieczęć rejestruje każde odciskanie. Gdzieś tam jakiś bardzo stary system zaczyna zaznaczać twój wpis w rejestrze.",
+        "openIt": "Przekazałeś właściwą informację na otwartym kanale. Każdy uczestnik procesji może teraz otrzymać dokumenty."
+      }
+    },
+    "reliquaryLedger": {
+      "text": "Chór prowadzi rejestr wszystkiego, co już zabrał, i wszystkiego, co zamierza zabrać. Twoje imię znajduje się w drugiej części.",
+      "opt": {
+        "strikeName": "Przeciągnij kreskę przez swoje imię",
+        "readForward": "Czytaj dalej",
+        "copyLedger": "Skopiuj to i zostaw tak, jak jest"
+      },
+      "out": {
+        "strikeName": "Jedna linia, jedno pociągnięcie pióra – i problem doktrynalny, którego rozwiązanie będzie zadaniem kogoś innego.",
+        "readForward": "Zamiary są konkretne, opatrzone datą i w większości zrealizowane w terminie. To najdokładniejszy wykres, jaki kiedykolwiek miałeś w rękach.",
+        "copyLedger": "Bierzesz kopię, a oryginał odkładasz dokładnie tak, jak leżał, co zajmuje więcej czasu niż jego kradzież."
+      }
+    },
+    "fieldHospital": {
+      "text": "Lista pacjentów chirurga Hull'a dotarła do Procesji przed tobą. Czterdzieści kadłubów czeka w kolejce na stacji, która nie jest w stanie ich przyjąć.",
+      "opt": {
+        "triage": "Przeprowadź selekcję pacjentów samodzielnie",
+        "sellPlaces": "Sprzedaż miejsc w kolejce",
+        "fetchSurgeon": "Idź i przynieś kadłub „Surgeon”"
+      },
+      "out": {
+        "triage": "Spędzasz cały dzień na sortowaniu czterdziestu kadłubów do trzech linii. Nikt ci nie dziękuje, a kolejka posuwa się do przodu.",
+        "sellPlaces": "Bycie pierwszym ma swoją cenę, a czterdzieści jednostek jest gotowych to omówić.",
+        "fetchSurgeon": "Pojawia się na wezwanie. Od bardzo dawna czekało, aż ktoś je wezwie."
+      }
+    },
+    "debtCollector": {
+      "text": "Przybyła część twojej transakcji z Riftu – statek o kształcie kadłuba typu „Procession”, który wręcza ci szczegółową listę.",
+      "opt": {
+        "payIt": "Zapłać zgodnie z cennikiem",
+        "disputeIt": "Zgłoś zastrzeżenie do listy",
+        "outrunIt": "Wyprzedź komornika"
+      },
+      "out": {
+        "payIt": "Potrzeba do tego powłoki, czasu i jednego instrumentu, który ci się podobał. Książki się zamykają i pozostają zamknięte.",
+        "disputeIt": "Dwie z tych rzeczy nigdy nie należały do ciebie. Przyznaje to od razu i wygląda na to, że jest mu z tego powodu niezręcznie.",
+        "disputeItLose": "Lista jest poprawna w każdym wierszu, a kwestionowanie jej powoduje dodanie kolejnego wiersza.",
+        "outrunIt": "Możesz przed tym uciec. Nie da się uciec przed arytmetyką, ale możesz stworzyć pewien dystans między sobą a arytmetyką."
+      }
+    },
+    "twinInTheProcession": {
+      "text": "Jeden z kadłubów statku „Procession” transmituje odgłos twojego silnika. Według wszystkich, którzy się w nim znajdują, statek ten pływa w tej formacji już od lat.",
+      "opt": {
+        "boardIt": "Wsiądź na pokład",
+        "hailIt": "Ośpiewajcie to na głos",
+        "letItRide": "Niech leci"
+      },
+      "out": {
+        "boardIt": "Układ jest w Twojej gestii, łącznie z przebiegiem kabli. Dziennik jednak nie, a to właśnie on stanowi najciekawszą część.",
+        "boardItEmpty": "Na pokładzie nie ma nikogo i nigdy nie było. Odgłos silnika nadal rozbrzmiewa po tym, jak się oddalisz.",
+        "hailIt": "Zadajesz pytanie na własnym kanale Procesji. Czterysta statków słyszy odpowiedź, a odpowiedzią jest twój głos.",
+        "letItRide": "Cokolwiek by to nie było, zajmuje miejsce w kolejce, w której trzeba zajmować miejsca."
+      }
+    },
+    "hymnSchool": {
+      "text": "Chór uczy dzieci hymnu. Kaznodzieja widzi, że to zauważasz, i nie odwraca wzroku.",
+      "opt": {
+        "sayNothing": "Nie mów nic",
+        "takeThem": "Zabierz dzieci na spacer",
+        "arguePoint": "Przedstaw argumenty na poparcie tej doktryny"
+      },
+      "out": {
+        "sayNothing": "Traktuje twoje milczenie jako zgodę i podaje ci wers z nauczania, który nie jest tym wersem, który dotychczas słyszałeś.",
+        "takeThem": "Dziewięciu z nich przybędzie. Dwóch nie przybędzie, a właśnie ci dwaj, którzy zostaną, sprawią, że Chór zapamięta twoje imię.",
+        "arguePass": "Znajdujesz sprzeczność w wersecie do omówienia i wypowiadasz ją na głos przed klasą.",
+        "argueFail": "Pozwala ci dokończyć, a potem odpowiada czterema słowami, a jedno z dzieci je zapisuje."
+      }
+    },
+    "processionCensus": {
+      "text": "Ktoś od jedenastu lat liczy statki z „Procesji”, jeden po drugim. Brakuje czterystu, ale nie chcą powiedzieć, których.",
+      "opt": {
+        "helpCount": "Pomoc przy liczeniu",
+        "buyCount": "Kup zestaw liczący",
+        "tellTruth": "Powiedz im, gdzie podziało się te czterysta"
+      },
+      "out": {
+        "helpCount": "Dwa dni liczenia głosów. Różnica zmniejsza się do trzystu dziewięćdziesięciu jednego, a licznik płacze z tego powodu.",
+        "buyCount": "Jedenaście lat nagłówków, rejestrów i dat. Warte więcej niż kadłub, który je przewoził.",
+        "tellTruth": "Widziałeś już wystarczająco dużo z Riftu, by to odgadnąć, a twoje przypuszczenie jest na tyle trafne, że może zakończyć jedenaście lat liczenia."
+      }
+    },
+    "acolyteFerry": {
+      "text": "Akolita przewozi pielgrzymów przez strefę śmierci w statku, który nie przetrwa tej podróży tam i z powrotem, i doskonale o tym wie.",
+      "opt": {
+        "takeThemOver": "Przewieź ich samodzielnie",
+        "buyHull": "Kup od niego ten kadłub",
+        "letItGo": "Niech przejdzie na drugą stronę"
+      },
+      "out": {
+        "takeThemOver": "Dwa przeprawy, czterdziestu pielgrzymów, jeden kadłub, który wytrzymuje. Zostawiają ci coś z relikwiarza, który nieśli.",
+        "buyHull": "Bierze ten złom i prowadzi pielgrzymów okrężną drogą, co zajmuje miesiąc i nikogo nic nie kosztuje.",
+        "letItGo": "Udało mu się. Kadłub nie wrócił, ale jemu ta kalkulacja nie przeszkadza.",
+        "letItGoBad": "Nie udaje mu się. Wy czerpiecie korzyści z tego, co się udaje, bo i tak ktoś by to zrobił."
+      }
+    },
+    "wardenTribunal": {
+      "text": "Trzy kadłuby Wardenów zwołały trybunał w sprawie morderstwa popełnionego trzydzieści lat temu na pasie ruchu. Nadal spierają się o jurysdykcję.",
+      "opt": {
+        "giveJurisdiction": "Przyznać im jurysdykcję",
+        "dissolveIt": "Rozwiązać trybunał",
+        "standWitness": "Zostań świadkiem"
+      },
+      "out": {
+        "giveJurisdiction": "To właśnie twoje słowa sprawiają, że sąd jest sądem. W ciągu dziewięciu minut wydają wyrok skazujący, a potem ogłaszają przerwę na trzydzieści lat załatwiania formalności.",
+        "dissolveIt": "Zwracasz uwagę, że żaden z nich nie ma uprawnień i wszyscy trzej doskonale o tym wiedzą. Zatrzymują się i sprzedają ci swoje dowody.",
+        "standWitness": "Nie widziałeś, jak to się stało. Widziałeś tylko wrak, a to o trzydzieści lat bliżej niż ktokolwiek inny."
+      }
+    },
+    "haulersAtTheCore": {
+      "text": "Przyjechali przewoźnicy. Nie są w pobliżu Rdzenia — są właśnie przy nim, blokując dojazd pikietą, żeby nikt za tobą nie wjechał.",
+      "opt": {
+        "thankThem": "Podziękuj im i wejdź do środka",
+        "sendThemOff": "Wycofaj je z linii produkcyjnej",
+        "armThemAgain": "Daj im wszystko, co możesz im przeznaczyć"
+      },
+      "out": {
+        "thankThem": "Będą się trzymać tak długo, jak tylko będą w stanie. Wszyscy zaangażowani rozumieją, co to oznacza.",
+        "sendThemOff": "Wystarczy cztery minuty krzyczenia. Jedenaście łodzi zawraca do portu, a ty pokonujesz resztę trasy, nie mając nikogo za sobą.",
+        "armThemAgain": "Sam rozkładasz swój ładunek na ich regałach. Kolejka trwa znacznie dłużej, niż ktokolwiek się spodziewał."
+      }
+    },
+    "ledgerAtTheThreshold": {
+      "text": "Księga chóru leży tu, otwarta, a przy dzisiejszej dacie widnieje jedno słowo: „twoje”.",
+      "opt": {
+        "signIt": "Podpisz z własnej woli",
+        "tearPage": "Wyrwij tę stronę",
+        "writeSomeoneElse": "Wpisz inne imię"
+      },
+      "out": {
+        "signIt": "Wpisz swoje imię pod wersją, którą ma chór. Od tego miejsca obie wersje są zgodne.",
+        "tearPage": "Strona wygląda na czystą. Chór nie potrzebuje tej strony; potrzebował, żebyś ją tam zostawił.",
+        "writeSomeoneElse": "Nic cię nie powstrzymuje. Zupełnie nic. Chór przyjmuje tę zmianę bez komentarza.",
+        "writeSomeoneElseSeen": "Imię, które zapisałeś, znajduje się już trzy wiersze wyżej, napisane tym samym pismem co twoje."
+      }
+    },
+    "lastCheckpoint": {
+      "text": "Ostatni posterunek Straży przed Core’em – i jest obsadzony. Jeden funkcjonariusz, który pełni służbę na posterunku od czterdziestu jeden lat, prosi o okazanie dokumentów.",
+      "opt": {
+        "showPapers": "Pokaż swoje dokumenty",
+        "relieveHim": "Zwolnić go ze służby",
+        "runPost": "Opublikuj wpis"
+      },
+      "out": {
+        "showPapers": "Czyta każdą linijkę. Następnie stempluje je, salutuje i wręcza ci swój dziennik z ostatnich czterdziestu jeden lat.",
+        "relieveHim": "To ty wybierasz słowa. Mruga dwa razy, mówi „najwyższy czas” i przekazuje cały wpis, zanim zdąży to przemyśleć.",
+        "runPost": "Nie strzela. Zapisuje to w dzienniku, co po czterdziestu jeden latach jest jedyną rzeczą, jaką może jeszcze zrobić w jakiejkolwiek sprawie."
+      }
+    },
+    "hospitalConvoy": {
+      "text": "Kolejka z procesji podążała za kadłubem chirurgicznym aż do tego miejsca. Czterdziestu pacjentów, jedna sala operacyjna i Core, który wkrótce sprawi, że pytanie to straci znaczenie.",
+      "opt": {
+        "buyTime": "Zyskać im trochę czasu",
+        "moveThem": "Przenieś kolejkę na zewnątrz",
+        "takeTheatre": "Odkryj teatr na własną rękę"
+      },
+      "out": {
+        "buyTime": "Stoisz pomiędzy czterdziestoma kadłubami a tym, co wyłania się z Rdzenia, dopóki wytrzyma pancerz.",
+        "moveThem": "Dwa dni spędzone na przepychaniu czterdziestu uszkodzonych kadłubów tyłem w górę wąskiej uliczki. Płacą ci częściami – to wszystko, co mają.",
+        "takeTheatre": "Jeden pacjent, jedna sala operacyjna, jedna bardzo krótka kolejka. Kiedy się odłączasz, czterdziestu nadal czeka na zewnątrz."
+      }
+    },
+    "riftAudit": {
+      "text": "Każda warstwa oddzielająca cię od Rdzenia prowadzi do tego samego pomieszczenia, a w tym pomieszczeniu znajduje się twoje konto, z rozliczeniem co do sekundy.",
+      "opt": {
+        "acceptAudit": "Zgodzić się na audyt",
+        "contestIt": "Zgłoś zastrzeżenie do rachunku",
+        "burnBooks": "Spalcie ten pokój"
+      },
+      "out": {
+        "acceptAudit": "Podpisujesz każdą stronę, nie czytając jej, bo już wiesz, co na niej jest. Zagięcia przestają się powtarzać.",
+        "contestPass": "Zauważyłeś podwójny wpis. Od czasu Sektora Trzeciego „Rift” nalicza ci opłatę dwukrotnie za tę samą sekundę.",
+        "contestFail": "Każda linijka się zgadza. Zakwestionowanie dokładnego rozliczenia kosztuje dokładnie tyle, ile podano w rozliczeniu.",
+        "burnBooks": "Pomieszczenie płonie. Fałdy wciąż się w nim otwierają, płonąc raz po raz, aż do samego Rdzenia."
+      }
+    },
+    "doubleAtTheDoor": {
+      "text": "Twój sobowtór znajduje się u progu Rdzenia, utrzymując pozycję, i czekał już na tyle długo, że zdążył namalować imię na swoim kadłubie. To imię nie jest twoim.",
+      "opt": {
+        "letItGoFirst": "Najpierw to odpuść",
+        "takeItsName": "Weź tę nazwę",
+        "goTogether": "Zróbcie to razem"
+      },
+      "out": {
+        "letItGoFirst": "To tak działa. Cokolwiek zapyta Rdzeń, najpierw zadaje właśnie to pytanie, a odpowiedź wraca do ciebie.",
+        "takeItsName": "Malujesz to na własnym kadłubie. Pasuje. Zawsze pasowało, i w tym właśnie tkwi problem.",
+        "goTogether": "Dwa kadłuby, jeden próg, jeden odgłos silnika. Core będzie musiał zdecydować, na którego z was czekał."
+      }
+    },
+    "hymnAtTheEdge": {
+      "text": "Dzieci śpiewają tę piosenkę tutaj, na skraju, w kadłubie bez silników. Ktoś przywiózł je wszystkie aż tutaj, żeby mogły być blisko tego miejsca.",
+      "opt": {
+        "takeThemHome": "Wyjmij je",
+        "singWithThem": "Śpiewajcie razem z nimi",
+        "giveThemEngines": "Dajcie im silniki"
+      },
+      "out": {
+        "takeThemHome": "Jeśli przetniesz otwór na pół, zmieści się ich dziewięć. Przetnij otwór na pół.",
+        "singWithThem": "Kadłub bez silników ma lepszą akustykę niż jakakolwiek konstrukcja, którą Chór stworzył specjalnie w tym celu.",
+        "giveThemEngines": "Kupujesz je, wyrzucając je z własnego ładowni. To, czy wykorzystają je do ucieczki, nie leży w twojej gestii."
+      }
+    },
+    "finalCount": {
+      "text": "Licznik znajduje się tutaj, na samym skraju, a podsumowanie jest wreszcie kompletne. Czterysta jedenaście nazwisk, wszystkie w jednym miejscu, wszystkie uwzględnione.",
+      "opt": {
+        "readThemOut": "Wypowiedz te nazwiska na głos",
+        "keepList": "Zachowaj listę",
+        "burnList": "Spal tę listę"
+      },
+      "out": {
+        "readThemOut": "Czterysta jedenaście imion na otwartym kanale, po jednym na raz, do kogokolwiek, kto słucha.",
+        "keepList": "Ktoś musi to zrobić, a licznik nie pójdzie dalej niż do tego miejsca.",
+        "burnList": "Jedenaście lat pracy przepadło w dziewięć sekund. Licznik obserwuje i nie powstrzymuje cię, co samo w sobie jest pewnego rodzaju odpowiedzią."
+      }
+    },
+    "approachSilence": {
+      "text": "Sześć godzin drogi od Rdzenia hałas ustaje. Nie sygnał — hałas. Wszystkie pasma, które masz, nagle stają się płaskie i czyste.",
+      "opt": {
+        "broadcast": "Przesłać do niego",
+        "listenOnly": "Po prostu słuchaj",
+        "shutDown": "Wyłączcie odbiorniki"
+      },
+      "out": {
+        "broadcast": "Twój głos odchodzi i nie wraca, a coś się dostosowuje, by zrobić mu miejsce.",
+        "listenOnly": "Sześć godzin czystej ciszy, nagranych w całości. Projekt „Echo” zachęca do odtworzenia nagrania dwukrotnie.",
+        "shutDown": "Odcinasz wszystkie anteny i przez ostatnie sześć godzin lecisz na ślepo i w ciszy – to jedyny odpoczynek, jaki masz."
+      }
+    },
+    "lastYard": {
+      "text": "W cieniu Core powstała osada, prowadzona przez ludzi, którzy przybyli tu do pracy i nie znaleźli powodu, by stąd wyjeżdżać.",
+      "opt": {
+        "refitHere": "Przeprowadź remont tutaj",
+        "warnThem": "Powiedz im, żeby wyszli",
+        "hireCrew": "Zatrudnij u nich ekipę"
+      },
+      "out": {
+        "refitHere": "Pracują szybko i sprawnie, a nikt nie pyta, po co tam wchodzisz.",
+        "warnThem": "Czterech z nich wyrusza. Reszta zostaje, a jeden z nich z czystej złośliwości naprawia wam silniki za darmo.",
+        "hireCrew": "Trzech z nich dołącza do zespołu i znają twoje systemy lepiej niż ty sam.",
+        "hireCrewNone": "Nikt się nie zgłasza. Zamiast tego wydają twoje złomowe pieniądze na kadłub i mówią, żebyś wrócił po nie później."
+      }
+    },
+    "thresholdMarket": {
+      "text": "Ktoś prowadzi stragan tuż przy progu. To nie Mara — ale ceny są jej, podobnie jak pismo na tablicy.",
+      "opt": {
+        "buyEverything": "Kup całe stoisko",
+        "askWhose": "Zapytaj, czyje to pismo",
+        "leaveStock": "Dodaj własny asortyment"
+      },
+      "out": {
+        "buyEverything": "To nie jest zbyt obszerny stragan. To, co na nim leży, to ostatnie zapasy, jakie ktokolwiek stąd zabierze.",
+        "askWhose": "„Przesłała ceny z wyprzedzeniem” – mówią. „Powiedziała, że ktoś przyjedzie aż tutaj i będzie potrzebował uczciwych cen”.",
+        "leaveStock": "Dodajesz na tablicę to, co możesz przeznaczyć, i wyceniasz to po kosztach, pisząc tym samym pismem."
+      }
+    },
+    "derelictLibrary": {
+      "text": "Pomieszczenie wypełnione od podłogi do sufitu papierami. Ktoś spędził całe swoje życie zawodowe na drukowaniu wszystkiego, czego bał się utracić.",
+      "opt": {
+        "readSome": "Przeczytaj fragment",
+        "takeItAll": "Weź wszystko",
+        "indexIt": "Dodaj to do spisu dla kolejnych osób"
+      },
+      "out": {
+        "readSome": "Głównie wykresy. Wykresy i jeden długi list, który nie jest zaadresowany do nikogo.",
+        "readSomeGold": "Pomiędzy dwoma pudełkami z manifestami znajduje się schemat, który nigdy nie miał trafić do druku.",
+        "takeItAll": "Papier się pali, a papier się sprzedaje. Wybierasz tę drugą opcję i zapełniasz ładownię.",
+        "indexIt": "Cztery godziny porządkowania cudzych lęków według alfabetu. To uspokaja ręce."
+      }
+    },
+    "theOtherSalvager": {
+      "text": "Kolejny ratownik zajmuje się tym samym wrakiem z drugiej strony. Żadne z was nie zauważyło, kiedy drugie przybyło na miejsce.",
+      "opt": {
+        "splitIt": "Zaproponuj, żeby to podzielić",
+        "raceThem": "Zmierz się z nimi o to",
+        "giveWay": "Dajcie im ten wrak"
+      },
+      "out": {
+        "splitIt": "Po połowie dla każdego i oboje wyruszacie przed przypływem. Idzie wam lepiej, niż się spodziewaliście.",
+        "splitItBetter": "Oni znają klasę kadłuba, a ty znasz się na okablowaniu. Razem dochodzicie do czegoś, czego żadne z was nie odkryłoby samodzielnie.",
+        "raceThem": "Jesteś szybszy. Oni wciąż tną, kiedy się odłączasz, i nic nie mówią.",
+        "raceThemLose": "Są szybsze. Jeśli chcesz się przekonać, że to nieprawda, spróbuj przypalić sobie ramię pochodnią.",
+        "giveWay": "Odłączasz się i pozostawiasz im otwartą drogę. Wpisują cię do rejestru jako jednego z tych „dobrych”."
+      }
+    },
+    "frozenBroadcast": {
+      "text": "Sygnał SOS sprzed czterdziestu lat, wciąż powtarzający się w pętli, która przetrwała wszystkich, dla których był przeznaczony.",
+      "opt": {
+        "answerIt": "Odpowiedz na to",
+        "triangulate": "Określić położenie źródła metodą triangulacji",
+        "killLoop": "Przerwij pętlę"
+      },
+      "out": {
+        "answerIt": "Nikt nie odpowiada. Pętla i tak się zatrzymuje, co prawdopodobnie było jej celem.",
+        "answerItLive": "Ktoś odpowiada. Dwa słowa, bardzo zniekształcone, a potem cisza przez resztę sektora.",
+        "triangulate": "Źródłem jest kadłub, który nie znajduje się w miejscu wskazanym w zgłoszeniu i już od dłuższego czasu tam nie ma.",
+        "killLoop": "Nadajnik jest coś wart, a pasmo jest warte jeszcze więcej. Oba będą twoje za jedenaście minut."
+      }
+    },
+    "debtorsHull": {
+      "text": "Kadłub obciążony trzema zastawami i jeden bardzo zmęczony właściciel, który słyszał, że rozliczasz się z długami.",
+      "opt": {
+        "clearOne": "Usunąć jedno zastawne prawo",
+        "buyTheHull": "Kup kadłub za gotówkę",
+        "buyTheDebt": "Zamiast tego kup ten dług"
+      },
+      "out": {
+        "clearOne": "Jeden za nami, dwa przed nami, a właściciel już dokładnie wie, dokąd zmierzasz.",
+        "buyTheHull": "Trzy zastawy, jeden podpis, jeden kadłub, który rozbierzesz na części, by zdobyć tę jedną część, której naprawdę potrzebujesz.",
+        "buyTheDebt": "Teraz te zastawy należą do ciebie. Właściciel pracuje dla ciebie, dopóki tak nie jest – a to już inny rodzaj życzliwości."
+      }
+    },
+    "noSignalDrift": {
+      "text": "Obszar wzdłuż pasa ruchu, w którym nic się nie rozprzestrzenia. Czujniki, sygnały komunikacyjne, a nawet hałas własnego kadłuba zatrzymują się na granicy tego obszaru.",
+      "opt": {
+        "feelThrough": "Poruszaj się na wyczucie",
+        "goAround": "Obejdź to",
+        "mapIt": "Wyznacz granicę"
+      },
+      "out": {
+        "feelPass": "Nawigacja zliczeniowa, sprawdzone dane, pewna ręka. Docierasz dokładnie tam, gdzie chciałeś.",
+        "feelFail": "Wychodzisz gdzie indziej, a coś z kieszeni wysuwa się razem z tobą, zanim zdąży się odczepić.",
+        "goAround": "Dłuższa droga kosztuje cię czas, którego nie masz, i w ogóle nie zapewnia pokrycia galwanicznego.",
+        "mapIt": "Strefa martwa o znanej granicy jest warta więcej niż pas ruchu, a każdy przewoźnik w tym sektorze kupi tę granicę."
+      }
+    },
+    "crewPetition": {
+      "text": "Cztery osoby, którym pomogłeś w różnych momentach, nawiązały ze sobą kontakt i sporządziły pewien dokument. Technicznie rzecz biorąc, jest to petycja.",
+      "opt": {
+        "readIt": "Przeczytaj petycję",
+        "takeThem": "Zabierz ich na pokład",
+        "sendThemOn": "Wyślij ich w bezpieczniejsze miejsce"
+      },
+      "out": {
+        "readIt": "Chcą pojechać z tobą. Cała czwórka. W dokumencie na dwóch stronach wymieniono powody.",
+        "takeThem": "Jeszcze cztery osoby, jeszcze cztery pary rąk, jeszcze cztery sposoby, by to się źle skończyło. Dwie z nich potrafią spawać.",
+        "sendThemOn": "Kupujesz im bilety w drugą stronę, a oni kłócą się przez cały czas, jaki zajmuje załatwienie tej sprawy."
+      }
+    },
+    "beaconWake": {
+      "text": "Nadajnik, który już zidentyfikowałeś, znów nadaje i przekazuje twój wpis rejestru wraz z pozostałymi danymi.",
+      "opt": {
+        "letItSing": "Niech to się przekaże",
+        "scrubName": "Wyczyść rejestr",
+        "boostIt": "Zwiększ moc nadajnika"
+      },
+      "out": {
+        "letItSing": "Każdy statek w tym sektorze wie teraz, gdzie szlak jest bezpieczny i kto o to zadbał.",
+        "scrubName": "Sygnalizator nadal działa. Po prostu nie podaje już informacji o tym, kto go naprawił, co ci odpowiada.",
+        "boostIt": "Wykorzystujesz własne zasoby, by wzmocnić sygnał czyjegoś nadajnika. Sieć Strażnika wykrywa to w ciągu godziny."
+      }
+    },
+    "interferenceBloom": {
+      "text": "Fala przypływowa pojawia się tu wcześniej i przepływa przez pole wraków, przez co cały obszar wygląda jak jedna ogromna, niestabilna kostka.",
+      "opt": {
+        "rideSmall": "Zagraj w to na małych kostkach",
+        "waitItOut": "Poczekaj, aż to minie",
+        "pushThrough": "Przejdź prosto na wprost"
+      },
+      "out": {
+        "rideSmallPass": "Nic nie szaleje. Przechodzisz na najspokojniejszych numerach, jakie masz, a fala odpływa za tobą.",
+        "rideSmallFail": "Rozbrzmiewa jeden sygnał, a cała grupa na niego reaguje.",
+        "waitItOut": "Sześć godzin nicnierobienia, zużyte paliwo i naprawy, które odkładałeś na później.",
+        "pushThrough": "Wjeżdżasz na boisko z dużą prędkością i wyjeżdżasz z drugiej strony z koszem pełnym czyjegoś ładunku.",
+        "pushThroughBad": "Wbiegasz na pole z pełną prędkością, a pole za to wyrywa ci kawałek z boku."
+      }
+    },
+    "lastLetter": {
+      "text": "Kapsuła z wiadomością, wystrzelona czterdzieści lat temu na kursie, który miał ją wyprowadzić poza ten sektor. Coś sprawiło, że zmieniła kierunek.",
+      "opt": {
+        "readLetter": "Przeczytaj to",
+        "relaunchIt": "Uruchom to ponownie",
+        "keepCapsule": "Zachowaj kapsułkę"
+      },
+      "out": {
+        "readLetter": "List jest skierowany do osoby, która znajdowała się na pokładzie floty. Zawiera napis „nie wracaj”, dwukrotnie, napisany dwoma różnymi charakterami pisma.",
+        "relaunchIt": "Nadajesz mu pęd i utrzymujesz czysty kurs przy opuszczaniu sektora. Czterdzieści lat spóźnienia, a wciąż działa.",
+        "keepCapsule": "Czterdziestoletni sprzęt do wodowania, nigdy nie używany więcej niż raz, w idealnym stanie. Na pewno osiągnie wysoką cenę."
+      }
+    },
+    "scavengerWake": {
+      "text": "Pogrzeb – o ile można to tak nazwać. Dziewięciu padlinożerców, jeden kadłub i zwłoki, co do których nie mogą się zgodzić co do imienia.",
+      "opt": {
+        "nameThem": "Nadaj ciału imię",
+        "joinWake": "Zostań na czuwaniu",
+        "takeTheHull": "Kup od nich kadłub"
+      },
+      "out": {
+        "nameThem": "Zdejmujesz tabliczkę rejestracyjną z kadłuba i odczytujesz jej treść. Dziewięć osób natychmiast i z wdzięcznością to przyjmuje.",
+        "joinWake": "Sześć godzin opowieści innych ludzi. Jedna z nich okazuje się być wykresem.",
+        "joinWakeGift": "Wysyłają cię z narzędziami zmarłego, bo nikt inny ich nie weźmie.",
+        "takeTheHull": "Przyjmują ofertę. Od początku było jasne, że ją przyjmą. Nikomu ta transakcja nie sprawia przyjemności."
+      }
+    },
+    "rimNoticeboard": {
+      "text": "Fizyczna tablica ogłoszeń przykręcona do belki dokującej, na której od czterdziestu lat gromadzą się kartki papieru, a najnowsza z nich pochodzi z tego tygodnia. Większość ogłoszeń to osoby poszukujące innych osób.",
+      "opt": {
+        "readIt": "Odczytaj górną warstwę",
+        "postYours": "Opublikuj własny wpis",
+        "stripBoard": "Oczyść całą płytkę"
+      },
+      "out": {
+        "readIt": "Dwie wskazówki dotyczące odzyskiwania, jedno ostrzeżenie dotyczące pasa ruchu oraz imię, które jeszcze usłyszysz, zanim ten sektor się skończy.",
+        "readItOld": "W ramach tego tygodnia istnieje roszczenie z tytułu odzyskania mienia, którego nikt nigdy nie zgłosił. Technicznie rzecz biorąc, nadal jest ono ważne.",
+        "postYours": "Wpisujesz swoje dane, nagłówek i jedno zdanie o tym, czego szukasz. To pierwsza szczera rzecz, jaką zrobiłeś w całym tygodniu.",
+        "stripBoard": "Czterdzieści lat papieru, a pod spodem jedna blacha z dobrego stopu. Bierz tę blachę."
       }
     }
   },
@@ -1982,21 +3128,37 @@
       "title": "Fragment 11 — Ja",
       "body": "To ja byłem tym elementem, który odpadł. Czterdzieści lat błąkania się, a wzór wciąż się powtarzał."
     },
-    "memory-12-seal": {
+    "memory-16-seal": {
       "title": "Fragment 12 — Zamknięty",
       "body": "To już koniec, pamiętam to wszystko, a nic z tego już się nie dzieje. Zgadzam się na taką zamianę."
     },
-    "memory-12-merge": {
+    "memory-16-merge": {
       "title": "Fragment 12 — Otwarte",
       "body": "Jesteś tu teraz razem z nimi. Słyszę, jak myślisz zgodnie z tym schematem. To ci pasuje."
     },
-    "memory-12-bargain": {
+    "memory-16-bargain": {
       "title": "Fragment 12 — Podpisany",
       "body": "Moja załoga została zaklasyfikowana jako „w toku”. Powiedziano mi, że to nie to samo, co „zagubiona”."
     },
-    "memory-12-silent": {
+    "memory-16-silent": {
       "title": "Fragment 12 — Odpowiedź",
       "body": "Jedenaście statków. Pamiętam każdą nazwę. Po raz pierwszy od czterdziestu lat pamięta je również ktoś inny."
+    },
+    "memory-12": {
+      "title": "Fragment 12 — Skład",
+      "body": "Jedenastu tysięcy nazwisk trafiło do „Core” i żadne z nich stamtąd nie wyszło. Nadal mam tę listę. Czasami ją przeglądam, na wypadek gdyby ktoś się przeprowadził."
+    },
+    "memory-13": {
+      "title": "Fragment 13 — Stałe zlecenie",
+      "body": "Moim ostatnim rozkazem było utrzymywanie floty w zwarciu. Nikt nigdy go nie odwołał. Dlatego wciąż liczę."
+    },
+    "memory-14": {
+      "title": "Fragment 14 — Strażnik",
+      "body": "Był naszym oficerem łączności. Kiedy sytuacja się pogorszyła, wybrał nawigacyjne światła zamiast statku. Nigdy nie doszedłem do wniosku, czy było to dezercją."
+    },
+    "memory-15": {
+      "title": "Fragment 15 — Za czym się opowiadam",
+      "body": "Nie jestem pamięcią statku. Jestem częścią floty, która znajdowała się poza Rdzeniem, gdy ten się zamknął, i od tamtej pory próbuję się tam ponownie dostać."
     }
   },
   "puzzle": {
@@ -2752,7 +3914,27 @@
     "f5-13": "Core eliminuje niepewność. Nie obiecuje jednak, że wynik będzie taki, jakiego oczekujesz.",
     "f5-14": "Zgodnie z doktryną floty należało obserwować, a nie odpowiadać. Ktoś jednak odpowiedział.",
     "f5-15": "Czterdzieści lat ciszy, a sygnał ten ani razu się nie powtórzył.",
-    "f5-16": "Rdzeń przechowuje kopię wszystkiego, co kiedykolwiek zostało rozstrzygnięte w jego pobliżu."
+    "f5-16": "Rdzeń przechowuje kopię wszystkiego, co kiedykolwiek zostało rozstrzygnięte w jego pobliżu.",
+    "f1-17": "W lokalu „The Rim” prowadzone są dwie księgi: ta na ladzie i ta, do której nikt nie wpisuje.",
+    "f1-18": "„Zimny sen” tutaj nie jest technologią. To zakład, że ktoś przybędzie.",
+    "f1-19": "Latarnia Był to ostatni statek zbudowany przez flotę, który miał przetrwać dłużej niż ona sama.",
+    "f1-20": "Nagroda za głowę na Rimie to plotka, za którą wyznaczono cenę. Zazwyczaj to właśnie ta cena jest w niej prawdziwa.",
+    "f2-17": "Tereny „Dryf” służyły jako plac przeładunkowy. Przywieziono tam dziewiętnaście tysięcy kadłubów. Plac jest nadal pełny.",
+    "f2-18": "Czarna skrzynka nie rejestruje tego, co się wydarzyło. Rejestruje to, co przyrządy były skłonne ujawnić.",
+    "f2-19": "Klany nie powstały po wydarzeniach związanych z Rdzeniem. Powstały trzeciego dnia oczekiwania na rozkazy.",
+    "f2-20": "Przekaźnik, który działa bez nadzoru przez czterdzieści lat, nie jest już sprzętem. To nawyk.",
+    "f3-17": "Chór nie jest autorem tego hymnu. Znalazł go już w obiegu i uznał, że potrzebuje wykonawców.",
+    "f3-18": "Lustra w Rift nie pokazują ciebie. Pokazują wersję ciebie, na którą Rift wciąż może sobie pozwolić.",
+    "f3-19": "Dziewiętnaście jednostek to jeszcze nie flota. Flotą jest natomiast dziewiętnaście jednostek odpowiadających na ten sam sygnał wywoławczy.",
+    "f3-20": "Każda księga anomalii jest zbilansowana. Właśnie to sprawia, że są one gorsze od tych, które nie są zbilansowane.",
+    "f4-17": "Porozumienie z Chórem nie podpisuje się atramentem. Podpisuje się je w tej części kadłuba, o którą już nie pytasz.",
+    "f4-18": "„Herezja w procesji” oznacza śpiewanie hymnu w niewłaściwym tempie. Nikt nie wyjaśnił, jakie tempo jest właściwe.",
+    "f4-19": "Trasa Strażnika miała trwać dziewięć lat. On pokonuje ją już od czterdziestu jeden lat.",
+    "f4-20": "Każdy wąski punkt na trasie Procesji był niegdyś szlakiem żeglugowym o własnej nazwie.",
+    "f5-17": "Sygnały świetlne nigdy nie były ostrzeżeniem. Były to liczenia osób, trwające w nieskończoność.",
+    "f5-18": "„Cicha Flota” wcale nie jest cicha. Działa na kanale, o którego utrzymaniu nikt nie pomyślał.",
+    "f5-19": "Latarnia morska w Core świeciła przez jedenaście dni po „Cięciu”. Potem ktoś wyłączył ją od środka.",
+    "f5-20": "Tak głęboka herezja to nie zwykła różnica zdań. To ostatnia grupa, która wciąż jest gotowa głośno przyznawać się do błędu."
   },
   "ending": {
     "seal": {
@@ -2763,7 +3945,11 @@
       "beat2": "Rift zamyka się niczym usta, które w końcu zostały nakarmione. Ciśnienie, które przez pięć sektorów wywierało nacisk na kadłub, po prostu ustaje.",
       "beat3": "Sygnalizatory floty milkną po kolei, zaczynając od najstarszych, a Hush Rim staje się po prostu kolejnym martwym sektorem na mapie.",
       "beat4": "Palisz się pragnieniem osiągnięcia granicy, trzymając się mocno, a za sobą masz sektor, który nigdy nie sprawi, że ktokolwiek inny zniknie.",
-      "echo": "To pan sprawił, że ten sektor stał się nudny, kapitanie. To najmilsza rzecz, jaką ktokolwiek tu zrobił od czterdziestu lat."
+      "echo": "To pan sprawił, że ten sektor stał się nudny, kapitanie. To najmilsza rzecz, jaką ktokolwiek tu zrobił od czterdziestu lat.",
+      "var": {
+        "silenced": "Zamknąłeś to tak samo, jak uciszyłeś: bez odpowiedzi, bez imienia, nie dając temu niczego więcej, czego mogłoby się trzymać.",
+        "answered": "Najpierw nadałeś mu swoje imię, a potem je zapieczętowałeś. Wie dokładnie, kto zamknął drzwi, i zapamięta to."
+      }
     },
     "merge": {
       "title": "Połączenie",
@@ -2773,7 +3959,12 @@
       "beat2": "Kadłub nie przetrwa zderzenia. Ty jednak tak — rozprzestrzeniasz się po wszystkich możliwych scenariuszach, które Rdzeń wciąż utrzymywał w stanie otwartym.",
       "beat3": "Z perspektywy wewnętrznej flota nie jest zagubiona. Jest po prostu archiwizowana. Czterdzieści lat czeka na lepsze pytanie.",
       "beat4": "Hush Rim wciąż nuci. Słychać w nim teraz nowy głos, a głos ten pamięta, że był kiedyś kapitanem.",
-      "echo": "Zachowam twoje dzienniki. Wszystkie. Nawet te, w których przeklinałeś na reaktorze."
+      "echo": "Zachowam twoje dzienniki. Wszystkie. Nawet te, w których przeklinałeś na reaktorze.",
+      "var": {
+        "answered": "Odpowiedziałeś na to pytanie raz, na progu. Wszystko, co nastąpiło potem, było już tylko dopełnieniem tego zdania.",
+        "silenced": "Wyłączyłeś dźwięk, a potem i tak wszedłeś. Cokolwiek cię tam czeka, robi to bez słowa.",
+        "bound": "Ta część ciebie, która pozostała po drugiej stronie lustra, dociera tam pierwsza i czekała już od dawna."
+      }
     },
     "bargain": {
       "title": "Okazja",
@@ -2782,7 +3973,11 @@
       "beat1": "Chór przyjmuje „Core” tak samo, jak chór przyjmuje nutę — ostrożnie, zgodnie, nie zastanawiając się, czy chce ją zaśpiewać.",
       "beat2": "Dostajesz statek, stopień wojskowy i kostkę, której nie wolno ci rzucać. Krawędź otwiera się niczym drzwi z twoim imieniem na drzwiach.",
       "beat3": "W tle hymnu flota wciąż czeka, a nikt z chóru nie uważa tego za niedopowiedzenie.",
-      "echo": "Dla porządku, kapitanie: odnotowałem pański sprzeciw. Nie zgłosił pan sprzeciwu. To również odnotowałem."
+      "echo": "Dla porządku, kapitanie: odnotowałem pański sprzeciw. Nie zgłosił pan sprzeciwu. To również odnotowałem.",
+      "var": {
+        "broken": "Już raz złamałeś umowę. Chór uwzględnił to w wycenie, a cena jest teraz wyższa niż dług.",
+        "betrayed": "Odśpiewałeś im ich własny hymn, a oni ci na to pozwolili. To nigdy nie było miłosierdzie — to była strata uboczna."
+      }
     },
     "silent": {
       "title": "Cicha flota",
@@ -2792,7 +3987,11 @@
       "beat2": "Nigdy nie zostały zniszczone. Zostały zatrzymane — przez czterdzieści lat załogi pozostawały w stanie zawieszenia, w oczekiwaniu na decyzję, której Rdzeń nie był w stanie podjąć.",
       "beat3": "Dokończ to za nich. Obręcz wypełnia się światłami pozycyjnymi, które nie zmieniły swojego położenia od czasów, zanim się urodziłeś.",
       "beat4": "To ty ich wyprowadzasz. Podróż trwa jedenaście dni, a przez cały ten czas nie śpisz ani chwili.",
-      "echo": "Znam nazwy wszystkich tych statków, kapitanie. Dziękuję, że kazał mi je wymienić na głos."
+      "echo": "Znam nazwy wszystkich tych statków, kapitanie. Dziękuję, że kazał mi je wymienić na głos.",
+      "var": {
+        "listened": "Słuchałeś, nie odpowiadając, a flota przekonała się, że milczenie też może być kursem.",
+        "rebuilt": "Przebudowany przez ciebie przekaźnik realizuje ostatnie polecenie — pięć sygnałów nawigacyjnych, jeden sygnał, nikt nie zostanie w tyle."
+      }
     }
   },
   "epilogue": {
@@ -2808,7 +4007,44 @@
     "beacons": "Odpowiedzi na sygnały nawigacyjne: {{n}} z 5.",
     "ascension": "Zatwierdzono przy wznoszeniu A {{n}}.",
     "lastBreath": "Jeden punkt za kadłub – raz. Nie mówi się o tym. „Echo” jednak o tym mówi – nieustannie.",
-    "quiet": "Opuszczasz Rim w ciszy. Nikt tutaj niczego nie zapisuje."
+    "quiet": "Opuszczasz Rim w ciszy. Nikt tutaj niczego nie zapisuje.",
+    "deathDeep": "zginąłeś w głębi — sektor {{sector}}, głębokość {{depth}}, głębiej niż dotarły kiedykolwiek większość wraków w tej okolicy",
+    "deathShallow": "zginąłeś na płytkiej wodzie — sektor {{sector}}, głębokość {{depth}}, a ciemność wciąż przed tobą",
+    "deathMidway": "zginąłeś w samym środku tego — sektor {{sector}}, głębokość {{depth}}, w połowie drogi do odpowiedzi",
+    "deathQuiet": "nic, co tu zrobiłeś, nie pozostawiło śladu, który ktokolwiek mógłby znaleźć",
+    "maraGrudge": "Mara wpisała twoje imię do rubryki „Nie wybacza”",
+    "fleetTruthKept": "zatrzymałeś dla siebie prawdę o flocie",
+    "fleetTruthLost": "wymazałeś prawdę o flocie i pozwoliłeś, by pozostała w ukryciu",
+    "hereticFleetLed": "poszarpana flota heretyków wciąż płynie zgodnie z kursem, który im wyznaczyłeś",
+    "keeperRepaid": "uregulowałeś swoje zadłużenie wobec Strażnika Latarnia",
+    "keeperSlighted": "Latarnia Keeper nigdy nie otrzymał tego, co mu byłeś winien",
+    "lighthouseLit": "Zepsuta latarnia znów świeci dzięki tobie",
+    "mirrorBound": "coś z ciebie wciąż pozostaje po drugiej stronie lustra",
+    "mirrorBroken": "zastrzeliłeś swoje własne odbicie i pozostało ono zastrzelone",
+    "coreAnswered": "odpowiedziałeś „Core”, gdy zapytało cię o imię",
+    "coreSilenced": "zamiast udzielić mu odpowiedzi, uciszyłeś Rdzeń",
+    "axisResonant": "pochyliłeś się {{n}} kilka kroków w stronę Rezonans i już nigdy się nie wyprostowałeś",
+    "axisStable": "utrzymałeś pozycję „{{n}}” – „Kroki ku stabilności” – w obliczu wszystkiego, co oferował ten sektor",
+    "maraDebt": "nadal jesteś winien Marze, a ona wciąż zna tę kwotę",
+    "fleetAnswered": "ocalali członkowie floty odpowiedzieli na twój sygnał wywoławczy pod koniec",
+    "defectorSold": "sprzedałeś tę uciekinierkę ludziom, przed którymi uciekała",
+    "pactBroken": "złamałeś umowę po jej podpisaniu",
+    "beaconRebuilt": "Jeden przekaźnik na polach „Dryf” znów działa, bo go naprawiłeś",
+    "turnWritten": "gdzieś istnieje wykres przedstawiający zwrot, którego „pusty garnitur” nigdy nie wykonał",
+    "coreListened": "wysłuchałeś Core’a i nic nie odpowiedziałeś",
+    "picket": "przewoźnicy, których spotkałeś na PolaDryf, byli w Rdzeniu, kiedy je przekroczyłeś",
+    "lastPost": "ostatni wpis strażnika odnotował twoje przejście, po czterdziestu jeden latach z dziewięcioletniego cyklu",
+    "convoyKept": "Kolejka do Procesji miała swoją szansę, bo zrobiliście dla niej miejsce",
+    "theatreTaken": "zajęliście jedyny teatr w Core i zostawiliście przed nim czterdzieści kadłubów",
+    "riftAudit": "Rift zamknął twoje konto, tak czy inaczej",
+    "doubleAtDoor": "przy progu stał drugi kadłub, z którego dochodził odgłos twojego silnika",
+    "choirChildren": "dzieci, które śpiewały na skraju, są teraz częścią twojej historii",
+    "tallyCarried": "czterysta jedenaście imion wyszło z ciemności razem z tobą",
+    "tallyBurned": "jedenaście lat imion zakończyło się dziewięcioma sekundami ognia",
+    "coreSilence": "zdecydowałeś, co zrobić z sześcioma godzinami ciszy panującej w Core",
+    "lastYard": "podwórze w cieniu Core’a pamięta twój rejestr",
+    "thresholdStall": "ktoś nadal zajmował stragan przy progu, a ty sobie z tym poradziłeś",
+    "ledgerTorn": "Twoja strona nie figuruje już w rejestrze chóru"
   },
   "modules": {
     "magnetScoop": {
@@ -3400,7 +4636,47 @@
     "keeper7": "Strażnik: „Weź odczyt. Nie bierz lampy”.",
     "keeper8": "Strażnik: „Wszystko, co pochłania Rim, najpierw dostrzegła latarnia”.",
     "keeper9": "Strażnik: „Kiedyś byłem członkiem załogi. Technicznie rzecz biorąc, statek wciąż tam gdzieś jest”.",
-    "keeper10": "Strażnik: „Jeśli dotrzesz do Rdzenia, powiedz mu, że ktoś zadbał o to, by światła nie zgasły”."
+    "keeper10": "Strażnik: „Jeśli dotrzesz do Rdzenia, powiedz mu, że ktoś zadbał o to, by światła nie zgasły”.",
+    "mara17": "„Wszystko po tej stronie lady ma wycenę. Wszystko po mojej stronie nie jest na sprzedaż.”",
+    "mara18": "„Nie mów mi, jak to działa. Powiedz mi, co zrobiło z ostatnim statkiem, na którym to zainstalowano.”",
+    "mFriend1": "„Znowu ty. Świetnie. Nie znoszę wyjaśniać nieznajomym po raz drugi, czym się zajmuję.”",
+    "mFriend2": "„Odłożyłem na bok dwie rzeczy. Nie chodzi o zniżkę — chodzi o kolejność.”",
+    "mFriend3": "„Nikt nikomu nic nie jest winien. To tutaj rzadsze zjawisko niż sam ten gatunek.”",
+    "mGrudge1": "„Możesz się rozglądać do woli. Nie dotykaj niczego, czego wcześniej nie policzyłeś”.",
+    "mGrudge2": "„Pamiętam ten numer. Ty też go pamiętasz. Nie rozmawiajmy o tym.”",
+    "mGrudge3": "„Jesteś mi coś winien i okradłeś mnie. Wybierz jedną z tych spraw do załatwienia, a ja udam, że ta druga nigdy nie miała miejsca.”",
+    "mDebt1": "„Zainteresowanie nie ma charakteru osobistego. To po prostu jedyna rzecz w tym wszystkim, która nigdy nie zasypia.”",
+    "mDebt2": "„Jesteś mną zainteresowany za cenę dobrego reaktora. Nie martwię się. Jeszcze.”",
+    "mFavor1": "„Świetnie sobie poradziłeś na tym odcinku. Poproś mnie o coś, zanim zmienię zdanie na twój temat.”",
+    "mVault1": "„Zatoka jest teraz pusta. Wydaje się jakoś większa niż wtedy, gdy była pełna.”",
+    "mCourt1": "„Orzeczenie sądu w sprawie uczciwej ceny dotarło do ciebie wcześniej. Gratulacje, jak sądzę.”",
+    "mCourier1": "„W zeszłym tygodniu trasa twojego kuriera wyszła z cienia. Dzięki temu połowa Rim ma co jeść.”",
+    "yusuf15": "„Każda spoina, którą tu wykonuję, jest tymczasowa. Jak dotąd każda z nich się utrzymała.”",
+    "yusuf16": "„Nie pytam, skąd pochodzą te części. Pytam, co robiły, kiedy je zdemontowano.”",
+    "yFriend1": "„Usiądź. Czajnik przypomina latarkę, a herbata jest okropna, ale usiądź.”",
+    "yFriend2": "„Nigdy nawet raz nie utrudniłeś tego bardziej, niż było to konieczne. Zauważyłem to.”",
+    "yGrudge1": "„Zajmę się tym. Praca nie stanowi problemu.”",
+    "yGrudge2": "„Najpierw gotówka. Kiedyś nikomu tego nie mówiłem.”",
+    "yShared1": "„Ludzie przestali szeptać, kiedy nadałeś to na otwartym kanale. To było coś warte.”",
+    "yKept1": "„Wciąż to trzymasz. Nie będę cię o to pytać po raz kolejny — ale liczę.”",
+    "yLost1": "„Nie ma już o czym dyskutować. To dzięki tobie.”",
+    "yAnswered1": "„Dziewiętnaście statków zarejestrowało sygnał z twojego transpondera. Dziewiętnaście. Sprawdziłem to dwa razy.”",
+    "yLane1": "„Pas ruchu jest nadal otwarty. Ludzie wciąż nim przejeżdżają. To twoja spoina, a nie moja.”",
+    "yLaneShut1": "„Zapłacili ci i udało im się przejść. Próbuję trzymać obie te rzeczy w jednej ręce.”",
+    "keeper11": "„Latarnia morska to obietnica, którą ktoś dotrzymał, mimo że przestał za to otrzymywać wynagrodzenie.”",
+    "keeper12": "„Nie naprawiaj przekaźnika, do którego nie zamierzasz już wracać”.",
+    "keeper13": "„Łańcuchowi nie ma znaczenia, w jakiej kolejności go zapalasz. Liczy się tylko to, że go zapalasz.”",
+    "keeper14": "„Czterdzieści lat to niewiele dla latarni morskiej. Ale dla człowieka to długi czas.”",
+    "kTrust1": "„Zacząłem przekazywać ci te trudniejsze zadania. Potraktuj to tak, jak to zostało pomyślane.”",
+    "kRepaid1": "„Wszystko jest w porządku. Złożyłem to. I tak już zostanie.”",
+    "kSlighted1": "„Wciąż do ciebie mówię, co powinno ci dać do myślenia, jak niewielki mam wybór.”",
+    "kSlighted2": "„Wziąłeś, co wziąłeś. Nie zamierzam wygłaszać na ten temat przemowy.”",
+    "kBroken1": "„Jeden z moich statków stracił kontakt, gdy zmierzałeś w tym kierunku. Nie oskarżam nikogo. Po prostu stwierdzam fakt.”",
+    "kRebuilt1": "„Ta stacja przekaźnikowa znów nadaje. Usłyszałem ją, zanim dowiedziałem się o tobie.”",
+    "kLit1": "„Latarnia morska płonie. Przestałem się tego spodziewać jakieś trzydzieści lat temu.”",
+    "kKey1": "„Wciąż masz mój klucz. Użyj go albo odeślij — każda z tych opcji jest odpowiedzią.”",
+    "kThree1": "„Trzy. Nie minęły trzy od czasu, zanim cię zbudowano.”",
+    "kFive1": "„Pięć. Wszystkie. Nie mów nic przez chwilę, chcę posłuchać.”"
   },
   "signature": {
     "scavDrone": "Trzy lekkie uderzenia, a potem jedno mocniejsze — metronom tego fragmentu.",
@@ -3494,5 +4770,60 @@
     "cantorColossus": "W każdej turze dodaje 2 elementy do stosu przy każdym przyszłym trafieniu, i tak w nieskończoność — jedyną rzeczą, która usuwa zawartość stosu, jest zakłócenie czujnika.",
     "coreHeart": "Powłoka zaworów nad burzą: ciało nic nie pobiera, dopóki zawór funkcjonuje, a burza przebiega w każdej turze od fazy 2.",
     "mirrorHeart": "Walczy z własną talią — im czystsza konstrukcja, tym mocniejsze uderzenie — kryjąc się za maską twarzy."
+  },
+  "death": {
+    "pact": "„I tak będą ściągać długi. Umowa nie bierze pod uwagę, który z nas jeszcze żyje.”",
+    "beacons": "„Zapalone przez ciebie ogniska nadal płoną. Ta część ciebie trwa dalej bez ciebie.”",
+    "resonant": "„Byłeś już prawie na mecie. Jeszcze jeden krok, a kadłub nie miałby już żadnego znaczenia.”",
+    "stable": "„Wytrzymałeś do ostatniej płyty. Zapisałem każdą sekundę tego wyścigu.”",
+    "alone": "„Nikt z tych ludzi nie był ci winien ratunku. Sprawdziłem to. Dwukrotnie.”",
+    "friends": "„Ktoś przyjedzie nas szukać. Mam dla nich przygotowane współrzędne.”",
+    "deep": "„Głębiej niż poprzedni. Głębiej niż ten przed nim. To się liczy.”",
+    "quiet": "„Kadłub – integralność zerowa. Nadal tu jestem. Jeszcze przez chwilę.”",
+    "firstRun": "„Twoja pierwsza przeprawa. Statystycznie to właśnie ta, która kończy się właśnie tak.”"
+  },
+  "chain": {
+    "mara": {
+      "name": "Księga rachunkowa Mary",
+      "payoff": "Książka została zamknięta – i to tak, jak chciałeś.",
+      "betrayal": "Wpisała cię do listy osób, którym nie wybacza.",
+      "step": {
+        "meet": "Znajdź jej stoisko w Rim.",
+        "debt": "Zanim poprosi o przysługę, będzie chciała, żeby określono wysokość długu.",
+        "favour": "Są zadania, których nie może powierzyć klanowi.",
+        "payoff": "Niezależnie od tego, co wynika z księgi, rozliczenie następuje na ostatniej sesji giełdowej."
+      }
+    },
+    "yusuf": {
+      "name": "Yusuf i flota",
+      "payoff": "Procesja dotarła do celu, a to dzięki wam.",
+      "betrayal": "On wie, co sprzedałeś i komu.",
+      "step": {
+        "blackbox": "Czarna skrzynka wciąż znajduje się na pokładzie jakiegoś obiektu na PoluDryf.",
+        "convoy": "Dziewiętnaście kadłubów wymaga zamontowania działa po stronie szczeliny.",
+        "lane": "Procesja utknęła w wąskim miejscu, które można otworzyć."
+      }
+    },
+    "choir": {
+      "name": "Czytanie chóru",
+      "payoff": "Ty i ten hymn łączy pewna więź, niezależnie od tego, jaką formę przybrała.",
+      "betrayal": "Chór zbiera datki i nie prosi już o nic więcej.",
+      "step": {
+        "invite": "Kaznodzieja rozgłasza zaproszenie w Szczelinie.",
+        "seal": "Porozumienie wymaga podpisu albo odmowy.",
+        "deep": "Istnieje głębsza interpretacja tego, co podpisałeś.",
+        "finale": "Czeka na ostatniej stacji przed Rdzeniem."
+      }
+    },
+    "keeper": {
+      "name": "Wątek „Strażnika”",
+      "payoff": "Pięć latarni, jeden łańcuch – i on doskonale wie, kto go rozciągnął.",
+      "betrayal": "Przestał kierować cię do łatwych punktów nawigacyjnych.",
+      "step": {
+        "intro": "Ktoś wciąż dba o te latarnie tutaj.",
+        "thread": "Chce wiedzieć, czego od tego oczekujesz.",
+        "core": "Ostatnim sygnałem nawigacyjnym jest Rdzeń, który sam zadaje to pytanie."
+      }
+    }
   }
 }

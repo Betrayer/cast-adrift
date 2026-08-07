@@ -1,7 +1,7 @@
 import { DIE_BY_ID } from "@/data/dice";
 import type { RngStream } from "@/services/rng";
-import type { CheckPick } from "@/types/events";
-import type { DieTier } from "@/types/content";
+import type { CheckDef, CheckPick } from "@/types/events";
+import type { DieTier, School } from "@/types/content";
 
 export interface FaceDie {
   defId: string;
@@ -18,13 +18,34 @@ export const resolveFaces = (defId: string, tier: DieTier): number[] => {
 export interface DeckRef {
   defId: string;
   tier: DieTier;
+  school?: School;
 }
+
+// A narrowed check rolls only what the scene asks for. A deck that cannot field
+// the requested dice rolls fewer of them rather than borrowing from outside the
+// band — the odds preview shows exactly that shortfall.
+export const eligibleForCheck = (
+  deck: readonly DeckRef[],
+  check: Pick<CheckDef, "school" | "tierAtLeast" | "tierAtMost">,
+): DeckRef[] =>
+  deck.filter((d) => {
+    if (
+      check.school !== undefined &&
+      d.school !== check.school &&
+      d.school !== "prismatic"
+    )
+      return false;
+    if (check.tierAtLeast !== undefined && d.tier < check.tierAtLeast) return false;
+    if (check.tierAtMost !== undefined && d.tier > check.tierAtMost) return false;
+    return true;
+  });
 
 export const topDiceForCheck = (
   deck: readonly DeckRef[],
   count: number,
+  narrow?: Pick<CheckDef, "school" | "tierAtLeast" | "tierAtMost">,
 ): FaceDie[] =>
-  [...deck]
+  [...(narrow === undefined ? deck : eligibleForCheck(deck, narrow))]
     .sort((a, b) => b.tier - a.tier)
     .slice(0, count)
     .map((d) => ({ defId: d.defId, tier: d.tier, faces: resolveFaces(d.defId, d.tier) }));
@@ -69,6 +90,18 @@ export const highestSuccessOdds = (
   return 1 - allBelow;
 };
 
+// «Nothing may show more than N»: every die has to land at or under the target.
+export const lowestSuccessOdds = (
+  dice: readonly FaceDie[],
+  target: number,
+): number => {
+  let all = 1;
+  for (const die of dice) {
+    all *= die.faces.filter((f) => f <= target).length / die.faces.length;
+  }
+  return all;
+};
+
 export const checkOdds = (
   dice: readonly FaceDie[],
   pick: CheckPick,
@@ -78,7 +111,9 @@ export const checkOdds = (
   const raw =
     pick === "sum"
       ? sumSuccessOdds(dice, target)
-      : highestSuccessOdds(dice, target);
+      : pick === "lowest"
+        ? lowestSuccessOdds(dice, target)
+        : highestSuccessOdds(dice, target);
   return Math.max(0, Math.min(1, raw));
 };
 
@@ -92,4 +127,14 @@ export const rollCheckDice = (
 export const checkTotal = (values: readonly number[], pick: CheckPick): number =>
   pick === "sum"
     ? values.reduce((a, b) => a + b, 0)
-    : values.reduce((a, b) => Math.max(a, b), 0);
+    : pick === "lowest"
+      ? values.reduce((a, b) => Math.max(a, b), 0)
+      : values.reduce((a, b) => Math.max(a, b), 0);
+
+// A «lowest» check passes when the worst die is still at or under the target,
+// so its comparison inverts. Everything else clears a floor.
+export const checkPassed = (
+  total: number,
+  pick: CheckPick,
+  target: number,
+): boolean => (pick === "lowest" ? total <= target : total >= target);

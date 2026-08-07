@@ -76,7 +76,14 @@ import {
   deriveSeed,
 } from "../src/services/rng";
 import type { BattleSnapshot, SlotId } from "../src/types/battle";
-import type { EventEffect } from "../src/types/events";
+import type { EventDef, EventEffect, EventOption } from "../src/types/events";
+import { ALL_EVENTS } from "../src/data/events";
+import { pickEvent, type EventContext } from "../src/game/events/engine";
+import {
+  driftAllowed,
+  sectorDriftDelta,
+  DRIFT_RUN_CAP,
+} from "../src/game/run/axis";
 
 const TURN_CAP = 30;
 
@@ -1894,6 +1901,138 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
   );
 };
 
+// ── Axis mode (R7 Task 1) ────────────────────────────────────────────────────
+//
+// The question the table answers: after the R7 rebalance, can deck colour still
+// out-vote the player's choices? Three policies walk the real event pool through
+// the real map generator; drift is settled once per sector and capped for the
+// run, exactly as `settleSectorDrift` does at runtime.
+
+type AxisPolicy = "stability" | "resonance" | "greedy";
+
+const optionAxisSum = (option: EventOption): number => {
+  const lists = [
+    ...(option.outcomes ?? []),
+    ...(option.onPass ?? []),
+    ...(option.onFail ?? []),
+  ];
+  if (lists.length === 0) return 0;
+  const total = lists.reduce(
+    (sum, outcome) =>
+      sum +
+      outcome.effects.reduce(
+        (acc, effect) => (effect.k === "axis" ? acc + effect.n : acc),
+        0,
+      ),
+    0,
+  );
+  return total / lists.length;
+};
+
+// «greedy» is the player who never reads the meter: it takes a uniformly random
+// option and lets the axis land where it lands.
+const pickByPolicy = (
+  def: EventDef,
+  policy: AxisPolicy,
+  stream: ReturnType<typeof createStream>,
+): number => {
+  const deltas = def.options.map(optionAxisSum);
+  if (policy === "greedy") return stream.pick(deltas);
+  const best = policy === "stability" ? Math.max(...deltas) : Math.min(...deltas);
+  return policy === "stability" ? Math.max(0, best) : Math.min(0, best);
+};
+
+interface AxisRow {
+  policy: AxisPolicy;
+  finals: number[];
+  choiceTotal: number;
+  driftTotal: number;
+  events: number;
+}
+
+const eventNodesFor = (sector: number, seed: number): number => {
+  const map = generateSectorMap(
+    createStream(deriveSeed(seed, `map:${String(sector)}`)),
+    sector,
+    { bossAsGate: false, noShops: false },
+  );
+  return map.nodes.filter(
+    (node) => node.type === "event" || node.type === "beacon",
+  ).length;
+};
+
+const simulateAxisRun = (seed: number, policy: AxisPolicy, row: AxisRow): number => {
+  let axis = 0;
+  let driftSpent = 0;
+  const seen: string[] = [];
+  for (let sector = 1; sector <= SECTORS.length; sector += 1) {
+    const nodes = eventNodesFor(sector, seed);
+    row.events += nodes;
+    for (let n = 0; n < nodes; n += 1) {
+      const stream = createStream(deriveSeed(seed, `ev:${String(sector)}:${String(n)}`));
+      const ctx: EventContext = { sector, axis, flags: {}, seenEvents: seen };
+      const kind = n === 0 ? "beacon" : "event";
+      const def =
+        pickEvent(ALL_EVENTS, ctx, kind, stream) ??
+        pickEvent(ALL_EVENTS, ctx, "event", stream);
+      if (def === null) continue;
+      seen.push(def.id);
+      const delta = pickByPolicy(def, policy, stream);
+      row.choiceTotal += delta;
+      axis = Math.max(-10, Math.min(10, axis + delta));
+    }
+    // A mono-black deck: nine black dice placed, nothing blue.
+    const drift = driftAllowed(sectorDriftDelta(9, 0, 9, 0), driftSpent);
+    driftSpent += Math.abs(drift);
+    row.driftTotal += drift;
+    axis = Math.max(-10, Math.min(10, axis + drift));
+  }
+  return axis;
+};
+
+const axisModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const rows: AxisRow[] = (["stability", "resonance", "greedy"] as const).map(
+    (policy) => ({ policy, finals: [], choiceTotal: 0, driftTotal: 0, events: 0 }),
+  );
+  for (const row of rows) {
+    for (let i = 0; i < runs; i += 1) {
+      row.finals.push(simulateAxisRun(seed + i, row.policy, row));
+    }
+  }
+  console.log(
+    `sim: axis — ${String(runs)} runs/policy · drift cap ${String(DRIFT_RUN_CAP)} · mono-black deck throughout`,
+  );
+  console.log(
+    "  policy      mean   min   max   |axis|>=3   choice/run   drift/run",
+  );
+  const csv = [
+    "policy,mean,min,max,reachPct,choicePerRun,driftPerRun",
+  ];
+  for (const row of rows) {
+    const mean = row.finals.reduce((a, b) => a + b, 0) / row.finals.length;
+    const min = Math.min(...row.finals);
+    const max = Math.max(...row.finals);
+    const reach =
+      (row.finals.filter((v) => Math.abs(v) >= 3).length / row.finals.length) *
+      100;
+    const perRun = row.choiceTotal / runs;
+    const driftPerRun = row.driftTotal / runs;
+    console.log(
+      `  ${row.policy.padEnd(11)} ${mean.toFixed(2).padStart(5)} ${String(min).padStart(5)} ${String(max).padStart(5)} ${`${reach.toFixed(0)}%`.padStart(10)} ${perRun.toFixed(2).padStart(12)} ${driftPerRun.toFixed(2).padStart(11)}`,
+    );
+    csv.push(
+      `${row.policy},${mean.toFixed(2)},${String(min)},${String(max)},${reach.toFixed(0)},${perRun.toFixed(2)},${driftPerRun.toFixed(2)}`,
+    );
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, `axis-${String(seed)}.csv`);
+  writeFileSync(outPath, `${csv.join("\n")}\n`, "utf8");
+  console.log(
+    `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`,
+  );
+};
+
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
@@ -1908,7 +2047,9 @@ const main = (): void => {
             ? "200"
             : mode === "roster"
               ? "40"
-              : "1000";
+              : mode === "axis"
+                ? "200"
+                : "1000";
   const runs = Number(getArg("runs", defaultRuns));
   const seed = Number(getArg("seed", "7"));
   if (!Number.isFinite(runs) || runs <= 0) {
@@ -1941,6 +2082,10 @@ const main = (): void => {
   }
   if (mode === "roster") {
     rosterModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "axis") {
+    axisModeMain(runs, seed, startedAt);
     return;
   }
   battleModeMain(runs, seed, startedAt);

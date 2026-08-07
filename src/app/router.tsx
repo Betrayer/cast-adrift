@@ -69,6 +69,11 @@ const FinaleScreen = lazy(() =>
     default: m.FinaleScreen,
   })),
 );
+const JournalScreen = lazy(() =>
+  import('@/screens/Journal/JournalScreen').then((m) => ({
+    default: m.JournalScreen,
+  })),
+);
 const EndingScreen = lazy(() =>
   import('@/screens/Ending/EndingScreen').then((m) => ({
     default: m.EndingScreen,
@@ -81,6 +86,7 @@ const screenFor = (screen: ScreenId) => {
   if (screen === 'battle') return <BattleScreen />;
   if (screen === 'map') return <MapScreen />;
   if (screen === 'event') return <EventScreen />;
+  if (screen === 'journal') return <JournalScreen />;
   if (screen === 'puzzle') return <PuzzleScreen />;
   if (screen === 'shop') return <ShopScreen />;
   if (screen === 'shipyard') return <ShipyardScreen />;

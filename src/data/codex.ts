@@ -1,4 +1,5 @@
 import { ALL_ENEMIES } from "@/data/enemies";
+import { MEMORY_CODEX_IDS } from "@/data/narrative/memories";
 import type { LocKey } from "@/types/content";
 
 export type CodexGroup = "world" | "dossier" | "memory";
@@ -31,13 +32,9 @@ const memory = (id: string): CodexEntry => ({
   body: `content:codex.${id}.body`,
 });
 
-const MEMORY_ENTRIES: readonly CodexEntry[] = [
-  ...Array.from({ length: 11 }, (_, i) => memory(`memory-${String(i + 1)}`)),
-  memory("memory-12-seal"),
-  memory("memory-12-merge"),
-  memory("memory-12-bargain"),
-  memory("memory-12-silent"),
-];
+const MEMORY_ENTRIES: readonly CodexEntry[] = MEMORY_CODEX_IDS.map((id) =>
+  memory(id),
+);
 
 // One dossier per roster entry (DESIGN §6.4): the title is the enemy's own name,
 // the signature is its mechanically true line — lint cross-checks it against the

@@ -156,7 +156,7 @@ describe("run hook emission", () => {
     applyOutcome(
       { text: "content:events.test", effects: [{ k: "scrap", n: 1 }] },
       createStream(1),
-      { eventId: "probe", optionIndex: 2 },
+      { eventId: "probe", optionId: "probeOpt", optionIndex: 2 },
     );
     expect(countOf("eventOutcome")).toBe(1);
     expect(firstOf("eventOutcome")?.payload.event?.eventId).toBe("probe");

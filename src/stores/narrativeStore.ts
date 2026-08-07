@@ -1,7 +1,9 @@
 import { create } from "zustand";
+import type { JournalBody, JournalEntry } from "@/game/run/journal";
 import type { LocKey } from "@/types/content";
 
 export const TOAST_QUEUE_CAP = 3;
+export const JOURNAL_CAP = 160;
 
 export interface ConsequenceToast {
   id: number;
@@ -18,9 +20,15 @@ export interface NarrativeState {
   consequenceQueue: ConsequenceToast[];
   bark: BarkToast | null;
   barkQueue: BarkToast[];
+  journal: JournalEntry[];
+  memoryQueue: number[];
   seq: number;
   pushConsequence: (origin: LocKey) => void;
   pushBark: (line: LocKey) => void;
+  pushJournal: (entry: JournalBody & { sector: number }) => void;
+  pushMemory: (order: number) => void;
+  dismissMemory: () => void;
+  setJournal: (entries: readonly JournalEntry[]) => void;
   dismissConsequence: () => void;
   dismissBark: () => void;
   reset: () => void;
@@ -31,6 +39,8 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
   consequenceQueue: [],
   bark: null,
   barkQueue: [],
+  journal: [],
+  memoryQueue: [],
   seq: 0,
 
   pushConsequence: (origin) => {
@@ -49,6 +59,35 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
       if (s.barkQueue.length >= TOAST_QUEUE_CAP) return s;
       return { barkQueue: [...s.barkQueue, toast], seq: toast.id };
     });
+  },
+
+  pushJournal: (entry) => {
+    set((s) => {
+      const id = s.seq + 1;
+      return {
+        journal: [...s.journal, { ...entry, id }].slice(-JOURNAL_CAP),
+        seq: id,
+      };
+    });
+  },
+
+  pushMemory: (order) => {
+    set((s) =>
+      s.memoryQueue.includes(order)
+        ? s
+        : { memoryQueue: [...s.memoryQueue, order] },
+    );
+  },
+
+  dismissMemory: () => {
+    set((s) => ({ memoryQueue: s.memoryQueue.slice(1) }));
+  },
+
+  setJournal: (entries) => {
+    set((s) => ({
+      journal: [...entries].slice(-JOURNAL_CAP),
+      seq: Math.max(s.seq, ...entries.map((e) => e.id), 0),
+    }));
   },
 
   dismissConsequence: () => {
@@ -71,6 +110,8 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
       consequenceQueue: [],
       bark: null,
       barkQueue: [],
+      journal: [],
+      memoryQueue: [],
     });
   },
 }));

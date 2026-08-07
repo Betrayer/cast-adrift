@@ -6,10 +6,13 @@ import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { ALL_EVENTS, EVENT_BY_ID } from "@/data/events";
+import { beaconsResolved, BEACON_FLAGS } from "@/data/events/beacons";
 import { schools } from "@/data/schools";
+import { SPEAKER_GLYPH, SPEAKER_TONE } from "@/data/speakers";
 import { applyOutcome } from "@/game/events/apply";
 import {
   checkOdds,
+  checkPassed,
   checkTotal,
   oddsPercent,
   rollCheckDice,
@@ -17,6 +20,8 @@ import {
   type FaceDie,
 } from "@/game/events/checks";
 import {
+  eventKind,
+  optionAxisRange,
   optionMet,
   optionOutcomes,
   pickEvent,
@@ -24,15 +29,22 @@ import {
   type EventContext,
   type OptionContext,
 } from "@/game/events/engine";
+import { AxisMeter } from "@/components/AxisMeter";
+import { clampAxis } from "@/game/run/axis";
 import { emitEventOutcome } from "@/game/narrative/barks";
 import { completeNode, startEventBattle } from "@/game/run/flow";
 import { nodeById } from "@/game/map/types";
+import { eventPickSeed } from "@/game/narrative/chainMarkers";
+import { playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 import type { School } from "@/types/content";
+import styles from "./EventScreen.module.css";
 import type {
+  CheckDef,
   EventDef,
   EventKind,
   EventOption,
@@ -72,7 +84,7 @@ const resolveEventForNode = (
       streams: buildStreams(s.seed, `dbg:${forcedId}`),
     };
   }
-  const pickStream = createStream(deriveSeed(s.seed, `evpick:${nodeId}`));
+  const pickStream = createStream(eventPickSeed(s.seed, nodeId));
   const ctx: EventContext = {
     sector: s.sector,
     axis: s.axis,
@@ -110,12 +122,59 @@ const requirementLabel = (
       });
     case "flag":
       return t("run:event.reqFlag");
+    case "axis":
+      return req.min !== undefined
+        ? t("run:event.reqAxisMin", { n: req.min })
+        : t("run:event.reqAxisMax", { n: req.max ?? 0 });
   }
 };
 
 interface CheckFace extends FaceDie {
   school: School;
 }
+
+const checkGoalLabel = (
+  check: CheckDef,
+  t: TFunction<["run", "battle"]>,
+): string => {
+  if (check.pick === "sum") return t("run:event.checkSum", { n: check.target });
+  if (check.pick === "lowest")
+    return t("run:event.checkLowest", { n: check.target });
+  return t("run:event.checkHighest", { n: check.target });
+};
+
+// The narrowing is part of the promise: if a scene only reads black dice, or
+// only the small ones, the modal says so before the player commits.
+const checkPoolLabel = (
+  check: CheckDef,
+  t: TFunction<["run", "battle"]>,
+): string | null => {
+  const parts: string[] = [];
+  if (check.school !== undefined) {
+    parts.push(
+      t("run:event.checkSchool", { school: t(`battle:school.${check.school}`) }),
+    );
+  }
+  if (check.tierAtLeast !== undefined) {
+    parts.push(t("run:event.checkTierMin", { tier: check.tierAtLeast }));
+  }
+  if (check.tierAtMost !== undefined) {
+    parts.push(t("run:event.checkTierMax", { tier: check.tierAtMost }));
+  }
+  return parts.length === 0 ? null : parts.join(" · ");
+};
+
+// DESIGN §3: a weighted fork tells the player the odds it is weighting, in the
+// smallest whole ratio the weights reduce to.
+const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
+
+export const outcomeRatio = (option: EventOption): string | null => {
+  const outcomes = option.outcomes ?? [];
+  if (outcomes.length < 2) return null;
+  const weights = outcomes.map((o) => Math.max(1, o.weight ?? 1));
+  const divisor = weights.reduce((a, b) => gcd(a, b));
+  return weights.map((w) => String(Math.round(w / divisor))).join(":");
+};
 
 const DieChip = ({
   face,
@@ -175,7 +234,11 @@ const CheckModal = ({
   const doRoll = (): void => {
     const values = rollCheckDice(faces, streams.check);
     const total = checkTotal(values, check.pick);
-    setRolled({ values, total, success: total >= check.target });
+    setRolled({
+      values,
+      total,
+      success: checkPassed(total, check.pick, check.target),
+    });
   };
 
   const confirm = (): void => {
@@ -198,10 +261,13 @@ const CheckModal = ({
     >
       <Stack align="center" gap="md">
         <Text size="sm" c={tokens.dim} ta="center">
-          {check.pick === "sum"
-            ? t("run:event.checkSum", { n: check.target })
-            : t("run:event.checkHighest", { n: check.target })}
+          {checkGoalLabel(check, t)}
         </Text>
+        {checkPoolLabel(check, t) === null ? null : (
+          <Text size="xs" c={tokens.faint} ta="center">
+            {checkPoolLabel(check, t)}
+          </Text>
+        )}
         <Group gap="xs" justify="center">
           {faces.map((face, i) => (
             <DieChip
@@ -230,10 +296,14 @@ const CheckModal = ({
             <Button variant="default" onClick={onCancel}>
               {t("run:event.back")}
             </Button>
-            <Button onClick={doRoll}>{t("run:event.roll")}</Button>
+            <Button data-check-roll onClick={doRoll}>
+              {t("run:event.roll")}
+            </Button>
           </Group>
         ) : (
-          <Button onClick={confirm}>{t("run:event.continue")}</Button>
+          <Button data-check-confirm onClick={confirm}>
+            {t("run:event.continue")}
+          </Button>
         )}
       </Stack>
     </Modal>
@@ -252,6 +322,7 @@ const EventRunner = ({
   const { t } = useTranslation(["run", "battle", "content"]);
   const scrap = useRunStore((s) => s.scrap);
   const hull = useRunStore((s) => s.hull);
+  const axis = useRunStore((s) => s.axis);
   const flags = useRunStore((s) => s.flags);
   const deck = useRunStore((s) => s.deck);
   const mkLevels = useRunStore((s) => s.mkLevels);
@@ -272,6 +343,7 @@ const EventRunner = ({
   const optionCtx: OptionContext = {
     scrap,
     hull,
+    axis,
     deck: deckRefs,
     mkLevels,
     flags,
@@ -284,7 +356,9 @@ const EventRunner = ({
     }
     const result = applyOutcome(chosen, streams.loot, {
       eventId: event.id,
+      optionId: event.options[optionIndex]?.id ?? "",
       optionIndex,
+      ...(eventKind(event) === "beacon" ? { beacon: true } : {}),
     });
     emitEventOutcome(chosen);
     setOutcome(chosen);
@@ -318,27 +392,98 @@ const EventRunner = ({
     completeNode({ outcome: "cleared" });
   };
 
+  // A weighted fork previews its worst reachable end of the axis, so the meter
+  // never promises more than the option can pay.
+  const axisPreview = (option: EventOption): number | null => {
+    const range = optionAxisRange(option);
+    if (range === null) return null;
+    return clampAxis(axis + (Math.abs(range.min) >= Math.abs(range.max) ? range.min : range.max));
+  };
+
+  const beacon = eventKind(event) === "beacon";
+  const resolvedBeacons = beaconsResolved(flags);
+  const beaconIndex = Math.min(BEACON_FLAGS.length, resolvedBeacons + 1);
+
+  useEffect(() => {
+    if (!beacon) return;
+    playSfx("fogReveal");
+    haptic("ending");
+  }, [beacon]);
+
   const checkFaces: CheckFace[] =
     checkOption?.check === undefined
       ? []
-      : topDiceForCheck(deckRefs, checkOption.check.dice).map((f) => ({
+      : topDiceForCheck(deckRefs, checkOption.check.dice, checkOption.check).map((f) => ({
           ...f,
           school: DIE_BY_ID.get(f.defId)?.school ?? "grey",
         }));
 
   return (
     <Screen centered>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
+      <Paper
+        bg={tokens.surface1}
+        p="xl"
+        radius="md"
+        withBorder
+        w="100%"
+        className={beacon ? styles.beaconFrame : undefined}
+        style={
+          beacon
+            ? ({
+                "--ca-beacon-line": schools.green.stroke,
+                "--ca-beacon-glow": schools.green.text,
+              } as React.CSSProperties)
+            : undefined
+        }
+      >
         <Stack gap="md">
-          <Title order={3} c={tokens.text}>
-            {t("run:event.title")}
-          </Title>
+          <Group justify="space-between" align="center" wrap="nowrap">
+            <Title order={3} c={beacon ? schools.green.text : tokens.text}>
+              {t(beacon ? "run:event.beaconTitle" : "run:event.title")}
+            </Title>
+            <AxisMeter axis={axis} compact />
+          </Group>
+          {beacon ? (
+            <Group gap={10} align="center" data-beacon-counter={beaconIndex}>
+              <span
+                className={styles.beaconKicker}
+                style={{ color: schools.green.text }}
+              >
+                {t("run:event.beaconCounter", {
+                  n: beaconIndex,
+                  max: BEACON_FLAGS.length,
+                })}
+              </span>
+              <span className={styles.beaconPips}>
+                {BEACON_FLAGS.map((key, i) => (
+                  <span
+                    key={key}
+                    className={styles.pip}
+                    data-lit={i < resolvedBeacons}
+                    data-current={i === resolvedBeacons}
+                  />
+                ))}
+              </span>
+            </Group>
+          ) : null}
           {event.speaker !== undefined ? (
-            <Text size="sm" c={tokens.accent} fw={600}>
-              {t("run:event.speaker", {
-                name: t(`content:speaker.${event.speaker}`),
-              })}
-            </Text>
+            <Group gap={8} align="center" data-speaker={event.speaker}>
+              <span
+                aria-hidden
+                style={{
+                  color: SPEAKER_TONE[event.speaker],
+                  fontSize: 18,
+                  lineHeight: 1,
+                }}
+              >
+                {SPEAKER_GLYPH[event.speaker]}
+              </span>
+              <Text size="sm" c={SPEAKER_TONE[event.speaker]} fw={600}>
+                {t("run:event.speaker", {
+                  name: t(`content:speaker.${event.speaker}`),
+                })}
+              </Text>
+            </Group>
           ) : null}
           <Text c={tokens.dim}>{t(event.text)}</Text>
 
@@ -353,6 +498,7 @@ const EventRunner = ({
                       variant="default"
                       h="auto"
                       py={8}
+                      data-event-option={option.id}
                       disabled={!met}
                       styles={{ label: { whiteSpace: "normal", lineHeight: 1.3 } }}
                       onClick={() => {
@@ -366,12 +512,32 @@ const EventRunner = ({
                         {requirementLabel(option.requires, t)}
                       </Text>
                     ) : null}
+                    {outcomeRatio(option) === null ? null : (
+                      <Text size="xs" c={tokens.faint} ta="center">
+                        {t("run:event.outcomeOdds", {
+                          odds: outcomeRatio(option),
+                        })}
+                      </Text>
+                    )}
+                    {axisPreview(option) === null ? null : (
+                      <Group gap={6} justify="center">
+                        <AxisMeter
+                          axis={axis}
+                          preview={axisPreview(option) ?? axis}
+                          compact
+                        />
+                      </Group>
+                    )}
                     {option.check !== undefined ? (
                       <Text size="xs" c={tokens.faint} ta="center">
                         {t("run:event.checkHint", {
                           n: oddsPercent(
                             checkOdds(
-                              topDiceForCheck(deckRefs, option.check.dice),
+                              topDiceForCheck(
+                                deckRefs,
+                                option.check.dice,
+                                option.check,
+                              ),
                               option.check.pick,
                               option.check.target,
                             ),

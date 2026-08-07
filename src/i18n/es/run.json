@@ -67,7 +67,16 @@
     "pass": "Éxito — {{total}}",
     "fail": "Error — {{total}}",
     "roll": "Lanzamiento",
-    "back": "Atrás"
+    "back": "Atrás",
+    "reqAxisMin": "Requiere Axis {{n}} o una versión superior",
+    "reqAxisMax": "Requiere la versión {{n}} o inferior de Axis.",
+    "checkLowest": "Nada por encima de {{n}}",
+    "checkSchool": "{{school}} solo dados",
+    "checkTierMin": "Solo para modelos de {{tier}} y superiores",
+    "checkTierMax": "Solo para modelos «{{tier}}» y más pequeños",
+    "outcomeOdds": "cuotas {{odds}}",
+    "beaconTitle": "Baliza",
+    "beaconCounter": "Baliza {{n}} de {{max}}"
   },
   "anomaly": {
     "title": "Anomalía",
@@ -185,7 +194,10 @@
     "glyphLegend": {
       "title": "Glifos escolares",
       "body": "Cada dado tiene una forma en una de sus esquinas, lo que permite diferenciar a las escuelas sin necesidad de colores: Rojo — triángulo · Azul — cuadrado · Verde — hoja · Amarillo — anillo · Negro — púa · Gris — punto · Prismático — estrella."
-    }
+    },
+    "prologueTitle": "La primera travesía",
+    "prologueBody": "Vuelve a reproducir los primeros compases. No se ha iniciado nada, no se ha perdido nada.",
+    "prologueReplay": "Repetición"
   },
   "consequenceToast": "Consecuencia: {{text}}",
   "rewards": {
@@ -254,7 +266,8 @@
     "title": "Prólogo",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Volver al menú"
+    "leave": "Volver al menú",
+    "replayDone": "Volver a la «Códice»"
   },
   "interstitial": {
     "sector": "Sector{{n}}",
@@ -270,7 +283,9 @@
     "next": "Continuar",
     "step": "{{cur}} / {{max}}",
     "tally": "Lo que dejaste atrás",
-    "continue": "Cerrar el registro"
+    "continue": "Cerrar el registro",
+    "deathTitle": "La carrera termina aquí",
+    "deathWhere": "Sector{{sector}} · profundidad{{depth}}"
   },
   "setup": {
     "title": "Inicio",
@@ -376,5 +391,43 @@
     "engravings": "Dados grabados ({{n}})",
     "banished": "Desterrado",
     "empty": "De momento, nada"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Resonancia {{n}}",
+    "stability": "Estabilidad {{n}}",
+    "neutral": "Eje equilibrado",
+    "preview": "axis {{from}} → {{to}}",
+    "short": "Eje"
+  },
+  "journal": {
+    "title": "Diario de carreras",
+    "open": "Diario",
+    "back": "Volver al mapa",
+    "empty": "Aún no hay nada escrito. El sector no te ha pedido nada.",
+    "sector": "Sector{{n}}",
+    "beacon": "Baliza resuelto — {{n}} de {{max}}",
+    "memory": "Echo Recordé algo — fragmento {{n}}",
+    "axisTitle": "Eje",
+    "axis": {
+      "choice": "Tu elección ha cambiado el eje: {{from}} → {{to}}",
+      "drift": "La baraja que has colocado realmente ha desplazado el eje {{from}} → {{to}}",
+      "beacon": "La baliza ha cambiado de eje: {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Balizas",
+    "beaconsCount": "{{n}} Resuelto el problema de «{{max}}»",
+    "beaconsHint": "La cadena se mantiene. Algo en el Núcleo también los está contando.",
+    "here": "Te encuentras en el sector «{{n}}».",
+    "chainsTitle": "Hilos",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "aquí"
+  },
+  "memory": {
+    "kicker": "Echo recuerda · fragmento {{n}} de {{max}}",
+    "continue": "Deja que termine",
+    "hintGate": "Supera los límites de «{{n}}» en una sola campaña",
+    "hintElite": "Caza a las élites de «{{n}}» en tus partidas",
+    "hintBeacons": "Resolver las balizas «{{n}}» en una sola pasada",
+    "hintEnding": "Llega al núcleo y elige"
   }
 }

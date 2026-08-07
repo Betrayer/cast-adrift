@@ -1,11 +1,13 @@
 import { LOOT_DICE } from "@/data/dice";
+import { beaconsResolved } from "@/data/events/beacons";
+import { chainViews, type ChainView } from "@/data/narrative/chains";
 import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
+import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
 import { emitRunHook } from "@/game/run/runEffects";
 import type { RngStream } from "@/services/rng";
 import { useMetaStore } from "@/stores/metaStore";
-import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 import type { EventEffect, ForcedBattle, Outcome } from "@/types/events";
 
@@ -81,7 +83,7 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
       });
       return;
     case "axis":
-      run.addAxis(effect.n);
+      applyAxisDelta(effect.n, "choice");
       return;
     case "flag":
       run.setFlag(effect.key, effect.value ?? true);
@@ -116,18 +118,58 @@ export const applyEventEffects = (
   for (const effect of effects) applyEffect(effect, stream);
 };
 
+// A chain step that just resolved gets its own journal line, so the thread reads
+// as a thread rather than as three unrelated scenes.
+const logChainProgress = (
+  before: readonly ChainView[],
+  after: readonly ChainView[],
+): void => {
+  for (const view of after) {
+    const prior = before.find((v) => v.id === view.id);
+    if (prior === undefined || view.step <= prior.step) continue;
+    logJournal({
+      k: "chain",
+      chain: view.id,
+      step: view.step,
+      label: view.hint,
+    });
+  }
+};
+
 export const applyOutcome = (
   outcome: Outcome,
   stream: RngStream,
   info?: EventOutcomeInfo,
 ): ApplyResult => {
+  const sector = useRunStore.getState().sector;
+  const chainsBefore = chainViews(useRunStore.getState().flags, sector);
   applyEventEffects(outcome.effects, stream);
   if (outcome.codex !== undefined) {
     useMetaStore.getState().unlockCodex(outcome.codex);
   }
-  if (outcome.consequence !== undefined) {
-    useNarrativeStore.getState().pushConsequence(outcome.consequence);
+  if (info !== undefined) {
+    logJournal({
+      k: "choice",
+      event: info.eventId,
+      option: info.optionId,
+      text: outcome.text,
+      ...(outcome.consequence === undefined
+        ? {}
+        : { consequence: outcome.consequence }),
+    });
+    if (info.beacon === true) {
+      logJournal({
+        k: "beacon",
+        event: info.eventId,
+        resolved: beaconsResolved(useRunStore.getState().flags),
+      });
+    }
   }
+  logChainProgress(
+    chainsBefore,
+    chainViews(useRunStore.getState().flags, sector),
+  );
+  if (outcome.consequence !== undefined) logConsequence(outcome.consequence);
   emitRunHook("eventOutcome", info === undefined ? {} : { event: info });
   return { follow: outcome.follow ?? null };
 };

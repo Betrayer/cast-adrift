@@ -1,4 +1,5 @@
 import {
+  Badge,
   Button,
   Group,
   Paper,
@@ -13,6 +14,7 @@ import { lazy, Suspense, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
+import { unreadMemoryIds } from '@/game/narrative/memoryArc';
 import { progressWithinLevel } from '@/game/xp';
 import { useMetaStore } from '@/stores/metaStore';
 import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
@@ -55,6 +57,9 @@ export const MenuScreen = () => {
   const progress = progressWithinLevel(xp);
   const cloudResume = useAppStore((s) => s.cloudResume);
   const prologueDone = useMetaStore((s) => s.stats.prologueDone);
+  const codex = useMetaStore((s) => s.codex);
+  const codexRead = useMetaStore((s) => s.codexRead);
+  const unreadMemories = unreadMemoryIds(codex, codexRead).length;
   const [localResume] = useState(readLocalResume);
   const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
   const osReducedMotion = useReducedMotion(false);
@@ -158,6 +163,10 @@ export const MenuScreen = () => {
                   <Text size="xs" c={tokens.faint}>
                     {t('common:phaseHint', { phase: entry.phase })}
                   </Text>
+                ) : entry.key === 'codex' && unreadMemories > 0 ? (
+                  <Badge size="sm" color="accent" data-unread-memories>
+                    {unreadMemories}
+                  </Badge>
                 ) : undefined
               }
             >

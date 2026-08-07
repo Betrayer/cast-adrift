@@ -2,6 +2,12 @@ import { create } from "zustand";
 import { moduleSlots } from "@/data/modules";
 import type { ShipId } from "@/data/ships";
 import type { MkLevel } from "@/data/slots";
+import {
+  clampAxis,
+  countDeckSchool,
+  driftAllowed,
+  sectorDriftDelta,
+} from "@/game/run/axis";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
@@ -153,6 +159,9 @@ export interface RunValues {
   flags: Record<string, FlagValue>;
   counters: Record<string, number>;
   axis: number;
+  driftBlack: number;
+  driftBlue: number;
+  driftSpent: number;
   seenEvents: string[];
   solvedPuzzles: string[];
   puzzleRuns: Record<NodeId, PuzzleRunState>;
@@ -174,7 +183,7 @@ export interface RunValues {
   vouchers: number;
   usedMinibosses: string[];
   bossesKilled: string[];
-  memoriesUnlocked: number;
+  memoryOrders: number[];
   endingId: string | null;
   startedAt: number;
 }
@@ -197,6 +206,8 @@ export interface RunState extends RunValues {
   clearFlag: (key: string) => void;
   bumpCounter: (key: string, delta: number) => void;
   addAxis: (n: number) => void;
+  noteDriftUsage: (blackUsed: number, blueUsed: number) => void;
+  settleSectorDrift: () => number;
   markEventSeen: (id: string) => void;
   markPuzzleSolved: (id: string) => void;
   beginPuzzle: (nodeId: NodeId, puzzleId: string) => PuzzleRunState;
@@ -226,7 +237,7 @@ export interface RunState extends RunValues {
   spendVoucher: () => boolean;
   markMinibossUsed: (defId: string) => void;
   markBossKilled: (defId: string) => boolean;
-  unlockNextMemory: () => number;
+  unlockMemory: (order: number) => boolean;
   setEnding: (id: string | null) => void;
   reset: () => void;
 }
@@ -290,6 +301,9 @@ export const createInitialRunValues = (): RunValues => ({
   flags: {},
   counters: {},
   axis: 0,
+  driftBlack: 0,
+  driftBlue: 0,
+  driftSpent: 0,
   seenEvents: [],
   solvedPuzzles: [],
   puzzleRuns: {},
@@ -311,7 +325,7 @@ export const createInitialRunValues = (): RunValues => ({
   vouchers: 0,
   usedMinibosses: [],
   bossesKilled: [],
-  memoriesUnlocked: 0,
+  memoryOrders: [],
   endingId: null,
   startedAt: 0,
 });
@@ -423,7 +437,34 @@ export const useRunStore = create<RunState>()((set, get) => ({
   },
 
   addAxis: (n) => {
-    set((s) => ({ axis: Math.max(-10, Math.min(10, s.axis + n)) }));
+    set((s) => ({ axis: clampAxis(s.axis + n) }));
+  },
+
+  noteDriftUsage: (blackUsed, blueUsed) => {
+    set((s) => ({
+      driftBlack: s.driftBlack + blackUsed,
+      driftBlue: s.driftBlue + blueUsed,
+    }));
+  },
+
+  settleSectorDrift: () => {
+    const s = get();
+    const delta = driftAllowed(
+      sectorDriftDelta(
+        s.driftBlack,
+        s.driftBlue,
+        countDeckSchool(s.deck, "black"),
+        countDeckSchool(s.deck, "blue"),
+      ),
+      s.driftSpent,
+    );
+    set({
+      driftBlack: 0,
+      driftBlue: 0,
+      driftSpent: s.driftSpent + Math.abs(delta),
+      axis: clampAxis(s.axis + delta),
+    });
+    return delta;
   },
 
   markEventSeen: (id) => {
@@ -634,10 +675,10 @@ export const useRunStore = create<RunState>()((set, get) => ({
     return true;
   },
 
-  unlockNextMemory: () => {
-    const next = get().memoriesUnlocked + 1;
-    set({ memoriesUnlocked: next });
-    return next;
+  unlockMemory: (order) => {
+    if (get().memoryOrders.includes(order)) return false;
+    set((s) => ({ memoryOrders: [...s.memoryOrders, order].sort((a, b) => a - b) }));
+    return true;
   },
 
   setEnding: (id) => {

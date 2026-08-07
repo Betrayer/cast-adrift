@@ -7,7 +7,11 @@ import {
   finaleOptions,
   type EndingContext,
 } from "@/data/narrative/endings";
-import { buildEpilogue, EPILOGUE_ENTRIES } from "@/data/narrative/epilogue";
+import {
+  buildEpilogue,
+  DEATH_TALLY_LINES,
+  EPILOGUE_ENTRIES,
+} from "@/data/narrative/epilogue";
 import { finalMemoryCodexId } from "@/data/narrative/memories";
 import { CODEX_BY_ID } from "@/data/codex";
 import type { FlagValue } from "@/types/events";
@@ -96,8 +100,40 @@ describe("beacon tally", () => {
 });
 
 describe("epilogue tally", () => {
-  it("maps at least twelve distinct deeds", () => {
-    expect(EPILOGUE_ENTRIES.length).toBeGreaterThanOrEqual(12);
+  it("maps at least twenty-four distinct deeds", () => {
+    expect(EPILOGUE_ENTRIES.length).toBeGreaterThanOrEqual(24);
+  });
+
+  it("keeps the death-only entries out of a clear", () => {
+    const lines = buildEpilogue({
+      flags: {},
+      beaconsResolved: 0,
+      ascension: 0,
+      survivedLethal: false,
+      axis: 0,
+      sector: 5,
+      depth: 40,
+      death: false,
+    }).map((l) => l.id);
+    expect(lines).not.toContain("deathDeep");
+  });
+
+  it("caps the death tally and leads with where the run ended", () => {
+    const lines = buildEpilogue(
+      {
+        flags: { maraFriend: true, crewSaved: true, courierFreed: true },
+        beaconsResolved: 2,
+        ascension: 3,
+        survivedLethal: true,
+        axis: 0,
+        sector: 4,
+        depth: 31,
+        death: true,
+      },
+      DEATH_TALLY_LINES,
+    ).map((l) => l.id);
+    expect(lines).toHaveLength(DEATH_TALLY_LINES);
+    expect(lines[0]).toBe("deathDeep");
   });
 
   it("renders one line per earned deed and never conflicting Yusuf lines", () => {
@@ -118,6 +154,9 @@ describe("epilogue tally", () => {
       ascension: 2,
       survivedLethal: true,
       axis: 0,
+      sector: 5,
+      depth: 40,
+      death: false,
     }).map((l) => l.id);
     expect(lines).toContain("yusufGrudge");
     expect(lines).not.toContain("yusufFriend");
@@ -132,6 +171,9 @@ describe("epilogue tally", () => {
       ascension: 0,
       survivedLethal: false,
       axis: 0,
+      sector: 1,
+      depth: 0,
+      death: false,
     });
     expect(lines).toHaveLength(1);
     expect(lines[0]?.id).toBe("quiet");

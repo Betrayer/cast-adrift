@@ -27,6 +27,8 @@ import {
 import { nodeRisk } from "@/game/map/risk";
 import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
+import { AxisMeter } from "@/components/AxisMeter";
+import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
 import { BuildSheet } from "@/screens/Build/BuildSheet";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
@@ -202,6 +204,7 @@ const MapView = ({ map, position }: MapViewProps) => {
     })
     .join(" · ");
   const interference = useRunStore((s) => s.interferenceStacks);
+  const axis = useRunStore((s) => s.axis);
   const sector = useRunStore((s) => s.sector);
   const seed = useRunStore((s) => s.seed);
   const usedMinibosses = useRunStore((s) => s.usedMinibosses);
@@ -211,6 +214,14 @@ const MapView = ({ map, position }: MapViewProps) => {
   const sensorsMk = useRunStore((s) => s.mkLevels.sensors ?? 1);
   const reduced = resolveReducedMotion(
     useSettingsStore((s) => s.reducedMotion),
+  );
+
+  const flags = useRunStore((s) => s.flags);
+  const seenEvents = useRunStore((s) => s.seenEvents);
+  const chainNodes = useMemo(
+    () =>
+      chainMarkedNodes(map, { sector, axis, flags, seenEvents }, seed),
+    [map, sector, axis, flags, seenEvents, seed],
   );
 
   const geo = useMemo(() => mapGeometry(map.shape), [map.shape]);
@@ -371,6 +382,17 @@ const MapView = ({ map, position }: MapViewProps) => {
         </Text>
       </div>
       <div className={styles.headChips}>
+        <AxisMeter axis={axis} compact withLabel={false} />
+        <Button
+          size="compact-xs"
+          variant="default"
+          data-open-journal
+          onClick={() => {
+            useAppStore.getState().go("journal");
+          }}
+        >
+          {t("run:journal.open")}
+        </Button>
         <Button
           size="compact-xs"
           variant="default"
@@ -561,6 +583,19 @@ const MapView = ({ map, position }: MapViewProps) => {
                 >
                   {t(NODE_GLYPH[node.type])}
                 </text>
+                {chainNodes.has(node.id) ? (
+                  <text
+                    data-chain-marker={node.id}
+                    x={geo.nodeX(node) - geo.radius(node) + 1}
+                    y={geo.rowY(node.row) - geo.radius(node) + 6}
+                    textAnchor="middle"
+                    fontSize={12}
+                    fontWeight={700}
+                    fill={tokens.amber}
+                  >
+                    !
+                  </text>
+                ) : null}
                 {motifBadge(node) === null ? null : (
                   <text
                     x={geo.nodeX(node) + geo.radius(node) - 1}
@@ -664,6 +699,16 @@ const MapView = ({ map, position }: MapViewProps) => {
         <Text size="xs" c={tokens.dim}>
           {t("run:map.tide", { n: tide })}
         </Text>
+        <AxisMeter axis={axis} />
+        <Button
+          size="compact-xs"
+          variant="default"
+          onClick={() => {
+            useAppStore.getState().go("journal");
+          }}
+        >
+          {t("run:journal.open")}
+        </Button>
         {runModules.length > 0 ? (
           <Text size="xs" c={tokens.dim}>
             {moduleNames}

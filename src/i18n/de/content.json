@@ -758,7 +758,209 @@
     "mirrorSpoke": "Folge: Du hast mit dem Spiegel gesprochen.",
     "pactOpened": "Folge: Der Pakt liegt offen auf dem Tisch.",
     "pactSigned": "Folge: Du hast den Pakt unterzeichnet.",
-    "relayFixed": "Folge: Sie haben das Relais repariert."
+    "relayFixed": "Folge: Sie haben das Relais repariert.",
+    "reactorAttuned": "Du hast dich auf einen auslaufenden Reaktor (Sektor 1) eingestellt.",
+    "quietCharted": "Du hast das stille Feld (Sektor 1) kartiert",
+    "fieldAligned": "Du hast den Friedhof komplett geräumt (Sektor 2)",
+    "hymnCopied": "Du hast ihnen das Chorlied zurückgesungen (Sektor 2)",
+    "mirrorBound": "Du bist durch den Spiegel getreten (Sektor 3)",
+    "ledgerSolved": "Sie haben das Anomalien-Ledger (Sektor 3) abgeglichen.",
+    "hymnHarmonized": "Du hast dich mit dem Hymnen-Tor (Sektor 4) in Einklang gebracht",
+    "reliquaryCatalogued": "Sie haben den Reliquienschrein (Sektor 4) katalogisiert",
+    "tideSteadied": "Du hast den Rumpf gegen die Kausalitätsflut gehalten (Sektor 5)",
+    "hereticFleetLed": "Du hast das Kommando über die Flotte der Ketzer (Sektor 5) übernommen.",
+    "beaconRebuilt": "Du hast das Relais mit dem Schlüssel des Wächters (Sektor 2) wiederhergestellt.",
+    "hunterPaid": "Du hast die Jägerin bestochen, anstatt gegen sie zu kämpfen",
+    "fleetAnswered": "Die Mitarbeiter der Flotte haben geantwortet, als du angerufen hast",
+    "favorHeld": "Du hast Maras Gunst in Anspruch genommen",
+    "choirBetrayed": "Du hast das eigene Lied des Chors gegen ihn verwendet",
+    "turnWritten": "Du hast den Zug notiert, den der leere Anzug nie gemacht hat",
+    "maraDebtShop": "Mara behält ihren Anteil vom Bruttoerlös – ihr Hauptbuch, ihre Preise",
+    "courtFairShop": "Die Entscheidung des Insolvenzgerichts über den angemessenen Preis eilt Ihnen voraus",
+    "vaultKeptShop": "Der Lagerbestand im Tresor des Hüters erreicht diesen Stand",
+    "ledgerShop": "Das abgestimmte Hauptbuch ist hier die Währung.",
+    "beaconRebuiltShop": "Das überholte Relais hat diesen Zähler wieder ins Netzwerk eingebunden.",
+    "maraSupplyRun": "Du hast Maras Eskorte geflogen",
+    "maraSkim": "Du hast Maras Fracht durchstöbert",
+    "favorRefused": "Du hast Maras Jobangebot abgelehnt",
+    "maraVault": "Du hast Maras Tresorraum geöffnet",
+    "maraVaultLeft": "Du hast Maras Tresor verschlossen gelassen",
+    "maraUsurerPaid": "Du hast den Wucherer ausgezahlt",
+    "maraUsurerFought": "Du hast das Pfandrecht des Wucherers abgelehnt",
+    "maraUsurerRun": "Du bist die „Usurer’s Lane“ entlanggelaufen",
+    "fleetLaneOpen": "Du hast den Flüchtlingskorridor geöffnet",
+    "fleetLaneClosed": "Du hast der Prozession eine Gebühr für den Durchgang abverlangt",
+    "fleetLaneSealed": "Du hast die Fahrspur hinter dir blockiert.",
+    "fleetTruthShared": "Du hast die Flottenmeldung auf einem offenen Kanal gesendet",
+    "bargainReady": "Du tauchst tiefer in das Kirchenlied ein",
+    "pactHeld": "Du hast den Vertrag dort aufbewahrt, wo du ihn unterschrieben hast",
+    "pactBroken": "Du hast den Pakt zerrissen.",
+    "preacherSang": "Du hast ein letztes Mal mit dem Prediger gesungen",
+    "preacherAnswered": "Du hast dem Prediger gesagt, was du dem Kern sagen würdest",
+    "preacherCut": "Du hast den Prediger mitten im Vers unterbrochen",
+    "keeperRepaid": "Du hast dich mit dem Wächter der „Bake“ angelegt.",
+    "keeperLog": "Du hast dein Beacon-Protokoll mit dem des Keepers zusammengeführt.",
+    "keeperLogLost": "Dein Beacon-Protokoll ist beim Keeper angekommen – defekt",
+    "yardStripped": "Du hast den Schrottplatz (Sektor 2) leergeräumt.",
+    "yardStopped": "Du hast den Schrottplatz stillgelegt (Sektor 2)",
+    "tugsPaid": "Sie haben sich für den Streik der Schlepperfahrer (Sektor 2) eingesetzt",
+    "tugsCrossed": "Du hast die Schlepper-Absperrung (Sektor 2) überquert.",
+    "quarantineKept": "Sie haben eine vierzigjährige Quarantäne eingehalten (Sektor 2)",
+    "quarantineBroken": "Sie haben eine Quarantänesiegelung gebrochen (Sektor 2)",
+    "schoolHelped": "Du hast die Drift-Schule am Laufen gehalten (Sektor 2)",
+    "schoolRobbed": "Du hast den Reaktor der Drift-Schule (Sektor 2) erobert.",
+    "clanRespect": "Du hast an einer Clan-Beerdigung teilgenommen (Sektor 2)",
+    "bloomTapped": "Du hast die Kühlmittelblüte (Sektor 2) angetippt.",
+    "bloomSource": "Du hast herausgefunden, was die Blüte genährt hat (Sektor 2)",
+    "bloomBurned": "Du hast die Kühlmittelablagerung abgebrannt (Sektor 2)",
+    "manifestWon": "Du hast das Blind-Manifest (Sektor 2) gekauft.",
+    "scriptBacked": "Du hast dich für das alte Flotten-Skript (Sektor 2) eingesetzt",
+    "auctionJammed": "Du hast die Manifest-Auktion (Sektor 2) blockiert.",
+    "wardenAnswered": "Du hast einem Aufseher gesagt, dass seine Befehle weiterhin gelten (Sektor 2)",
+    "wardenReleased": "Du hast einen Wächter von seinem Posten (Sektor 2) abberufen.",
+    "relayTraced": "Du hast den seltsamen Relaismast (Sektor 2) aufgespürt.",
+    "relayStripped": "Du hast die Relaisfarm (Sektor 2) geplündert.",
+    "raceWon": "Du hast an der Tether-Kreuzung (Sektor 2) die Nase vorn gehabt.",
+    "raceLost": "Die Kosten für die Überquerung der Leine (Sektor 2)",
+    "tetherCut": "Du hast die Leine der Transporter durchtrennt (Sektor 2)",
+    "apprenticeTold": "Du hast Yusuf erzählt, was sein Lehrling getan hat (Sektor 2)",
+    "lighterLoaded": "Du hast den „Endless Run“ des Eisanzünders (Sektor 2) geladen.",
+    "lighterStripped": "Du hast den Eisanzünder zerlegt (Sektor 2)",
+    "lighterStopped": "Sie haben dem Eisbrecher den Stoppbefehl erteilt (Sektor 2)",
+    "courtRigged": "Du hast ein Bergungsgericht (Sektor 2) manipuliert.",
+    "courtFair": "Sie haben die Entscheidung des Bergungsgerichts in drei Teile aufgeteilt (Sektor 2)",
+    "driftFriends": "Drift Fields hat jemanden geschickt, der mit dir fliegen soll (Sektor 3)",
+    "wakeJammed": "Du hast die Ausstrahlung deiner eigenen Platte („Sector 3“) gestört.",
+    "wakeAnswered": "Du hast deine eigene Aussage wiedergegeben, ohne zu widersprechen (Sektor 3)",
+    "foldRead": "Du hast den „Tight Fold“ gelesen, anstatt ihn auszuführen (Sektor 3)",
+    "postAccepted": "Du hast einen Posten als Aufseher übernommen, den seit vierzig Jahren niemand mehr innegehabt hat (Sektor 3)",
+    "rosterWiped": "Du hast den Dienstplan der Wächter (Sektor 3) gelöscht.",
+    "buyerBound": "Der offensichtliche Käufer kann Sie immer noch finden (Sektor 3)",
+    "buyerCut": "Du hast den erklärten Käufer fallen lassen (Sektor 3)",
+    "crossingOpened": "Die „Haulers’ Crossing“ wurde mit deinem Namen darauf eröffnet (Sektor 3)",
+    "crossingTolled": "Du erhältst einen Anteil an den Durchfahrtsgebühren der Transportfahrzeuge (Sektor 3)",
+    "archiveCatalogued": "Du hast den zehnten Katalog zum gefalteten Archiv (Sektor 3) hinzugefügt.",
+    "archiveBurned": "Du hast die Kataloge des gefalteten Archivs verbrannt (Sektor 3)",
+    "twinChosen": "Du hast einen der beiden identischen Rümpfe (Sektor 3) ausgewählt.",
+    "twinRefused": "Du hast keine der beiden identischen Hüllen (Sektor 3) ausgewählt.",
+    "surgeryTaken": "Du hast den Posten des Chirurgen Hull (Sektor 3) übernommen.",
+    "surgeryStripped": "Du hast den „Surgeon“-Rumpf (Sektor 3) zerlegt.",
+    "surgeryBooked": "Du hast die Slots des Chirurgen-Rumpfs verschenkt (Sektor 3)",
+    "causalDebt": "die du dir aus dem Rift auf Kredit geholt hast (Sektor 3)",
+    "causalPaid": "Du hast dich gleich zu Beginn mit dem Rift abgefunden (Sektor 3)",
+    "chapelAsked": "Du hast die Aufnahme des Predigers (Sektor 3) in Frage gestellt",
+    "chapelSilenced": "Du hast das Lied aus der unbeleuchteten Kapelle herausgeschnitten (Sektor 3)",
+    "pilotHired": "Du hast einen Rift-Piloten engagiert (Sektor 3)",
+    "boardRead": "Du hast die Vergütungsliste für Piloten (Sektor 3) gelesen.",
+    "boardTaken": "Du hast die Gehaltstabelle für Piloten (Sektor 3) mitgenommen.",
+    "cutRecorded": "Du hast elf Sekunden des „Cut“ (Sektor 3) aufgenommen.",
+    "cutRidden": "Du hast an der Lesung von „The Cut“ (Sektor 3) teilgenommen",
+    "cutRefused": "Du schaltest lieber alle Geräte aus, anstatt zuzuhören (Sektor 3)",
+    "haulersSent": "Du hast die Transportfahrzeuge vor der Prozession (Sektor 4) nach Hause geschickt.",
+    "haulersUsed": "Du setzt die Transporter in der Prozession (Sektor 4) ein.",
+    "haulersArmed": "Du hast die Transporter mit deinem eigenen Schrott ausgerüstet (Sektor 4)",
+    "brokerDealt": "Sie haben weiterhin mit dem Makler zu tun gehabt, nachdem er die Aufträge entgegengenommen hatte (Sektor 4)",
+    "brokerCleared": "Du hast die Registrierung vom Makler übernommen (Sektor 4)",
+    "transitPapers": "Du hast Transitpapiere für einen besetzten Wächterposten (Sektor 4) ausgestellt.",
+    "papersForged": "Du hast Transitpapiere der Warden gefälscht (Sektor 4)",
+    "checkpointOpened": "Du hast den Warden-Kontrollpunkt für alle freigeschaltet (Sektor 4)",
+    "ledgerStruck": "Du hast deinen Namen aus dem Chorverzeichnis (Sektor 4) gestrichen.",
+    "ledgerRead": "Du hast das Vorsatzbuch des Chors gelesen (Sektor 4)",
+    "triageRun": "Sie haben die Triage im Feldlazarett (Sektor 4) geleitet.",
+    "queueSold": "Sie haben Plätze in der Warteliste des Krankenhauses (Sektor 4) verkauft",
+    "riftSettled": "Du hast die Hälfte des Handelsgeschäfts, die auf die Rift entfällt (Sektor 4), abgewickelt.",
+    "riftDisputed": "Sie haben die Abrechnung von „The Rift“ (Sektor 4) beanstandet",
+    "twinBoarded": "Du bist an Bord des Schiffes gegangen, das den Klang deines Motors erklingen lässt (Sektor 4)",
+    "twinHailed": "Du hast deinen Doppelgänger über den offenen Kanal (Sektor 4) angerufen.",
+    "twinLeft": "Du lässt dein Doppel seinen Platz in der Reihe behalten (Sektor 4)",
+    "hymnSchoolSeen": "Du hast gesehen, wie der Chor den Kindern das Lied beigebracht hat (Sektor 4)",
+    "hymnSchoolBroken": "Du hast Kinder aus der Schule des Chors (Sektor 4) mitgenommen.",
+    "censusHelped": "Du hast bei der Zählung der Prozession (Sektor 4) mitgeholfen",
+    "censusBought": "Sie haben die Aufzeichnungen der Prozession (Sektor 4) für elf Jahre erworben.",
+    "censusTold": "Du hast dem Schalter mitgeteilt, wohin die vierhundert gegangen sind (Sektor 4)",
+    "pilgrimsFerried": "Du hast die Pilger selbst übergesetzt (Sektor 4)",
+    "ferryBought": "Du hast den beschädigten Rumpf der „Acolyte“ (Sektor 4) gekauft.",
+    "ferryWatched": "Du hast beobachtet, wie der Akolyth die Überquerung vollzogen hat (Sektor 4)",
+    "tribunalSeated": "Sie haben das Warden-Tribunal (Sektor 4) einberufen",
+    "tribunalDissolved": "Du hast das Warden-Tribunal (Sektor 4) aufgelöst.",
+    "picketHeld": "Die Spediteure haben am „Core“ für euch (Sektor 5) eine Mahnwache abgehalten.",
+    "picketStood": "Du hast die Transporter aus dem Kern (Sektor 5) zurückgeschickt.",
+    "ledgerTorn": "Du hast die Seite aus dem Chorbuch herausgerissen (Sektor 5)",
+    "lastPostCleared": "Du hast den letzten Wächterposten vorschriftsmäßig geräumt (Sektor 5)",
+    "lastPostRelieved": "Du hast den letzten Wächter vom Dienst abgelöst (Sektor 5)",
+    "lastPostRun": "Du hast den letzten Warden-Beitrag (Sektor 5) veröffentlicht.",
+    "convoyCovered": "Du hast den Krankenhauskonvoi am Core (Sektor 5) begleitet.",
+    "convoyMoved": "Du hast den Krankenhauskonvoi wieder hinausbegleitet (Sektor 5)",
+    "theatreTaken": "Du hast den Operationssaal für dich beansprucht (Sektor 5)",
+    "auditAccepted": "Du hast die Prüfung durch die Rift akzeptiert (Sektor 5)",
+    "auditBeaten": "Du hast den doppelten Eingang zum Rift gefunden (Sektor 5)",
+    "auditBurned": "Du hast den Prüfungsraum des Rifts (Sektor 5) in Brand gesetzt.",
+    "doubleAhead": "Du lässt dein Doppelgänger zuerst die Schwelle überschreiten (Sektor 5)",
+    "doubleNamed": "Du hast den Namen deines Doppelgängers angenommen (Sektor 5)",
+    "doubleJoined": "Du und dein Doppelgänger habt gemeinsam einen Kreuzschlag ausgeführt (Sektor 5)",
+    "childrenTaken": "Du hast die Kinder des Chors herausgeholt (Sektor 5)",
+    "childrenJoined": "Du hast mit den Kindern am Rand (Sektor 5) das Lied gesungen.",
+    "namesRead": "Du hast vierhundertelf Namen in die Dunkelheit hinein vorgelesen (Sektor 5)",
+    "namesKept": "Sie führen die vollständige Bestandsaufnahme durch (Sektor 5)",
+    "namesBurned": "Du hast elf Jahre der Aufzeichnungen (Sektor 5) vernichtet.",
+    "silenceAnswered": "Du sendest in die Stille des Kerns (Sektor 5)",
+    "silenceRefused": "Du bist die letzten sechs Stunden absichtlich taub geflogen (Sektor 5)",
+    "lastYardUsed": "Du hast im Schatten des Kerns (Sektor 5) in der Werft umgerüstet.",
+    "lastYardWarned": "Du hast die letzte Crew aufgefordert, das Gelände zu verlassen (Sektor 5)",
+    "lastYardCrew": "den Sie aus dem letzten Lager (Sektor 5) angeheuert haben",
+    "thresholdBought": "Du hast den Stand an der Schwelle (Sektor 5) aufgekauft.",
+    "thresholdAsked": "Du hast erfahren, wessen Preise an der Schwelle (Sektor 5) auf dich warteten",
+    "thresholdStocked": "Du hast deine eigenen Aktien an der Schwelle (Sektor 5) zurückgelassen.",
+    "coreListened": "Du hast dem Core zugehört, ohne zu antworten",
+    "libraryRead": "Du liest, was jemand ausgedruckt hat, um es aufzubewahren",
+    "librarySold": "Du hast einen ganzen Laderaum voller fremder Ängste nach Gewicht verkauft",
+    "salvagerSplit": "Du teilst dir die Beute aus einem Wrack mit einem anderen Bergungsunternehmer.",
+    "salvagerBeaten": "Du hast mit einem anderen Bergungsunternehmer um ein Wrack gewetteifert",
+    "salvagerYielded": "Du hast dem Bergungsunternehmer, der mit dir dort angekommen war, ein Wrack übergeben.",
+    "distressAnswered": "Du hast einen vierzig Jahre alten Notruf beantwortet",
+    "distressTraced": "Du hast den eingefrorenen Notruf zurückverfolgt",
+    "distressCut": "Man schneidet eine Notfallschlaufe für den Sender ab",
+    "lienCleared": "Sie haben das Pfandrecht eines Fremden aufgehoben",
+    "hullBought": "Sie haben einen mit Pfandrechten belasteten Rumpf zum Vollpreis gekauft",
+    "debtHeld": "Du hast die Schulden von jemandem aufgekauft, anstatt sie zu begleichen",
+    "deadZoneCrossed": "Du hast die tote Zone nach Schätzung durchquert.",
+    "deadZoneAvoided": "Du hast den Umweg um die tote Zone genommen",
+    "deadZoneMapped": "Du hast den Rand der toten Zone kartiert und verkauft",
+    "petitionRead": "Vier Personen, denen du geholfen hast, haben eine Petition an dich gerichtet",
+    "petitionAccepted": "Sie haben die Petenten an Bord genommen",
+    "petitionRefused": "Du hast den Petenten die Fahrt in die andere Richtung bezahlt.",
+    "beaconSinging": "Ein von Ihnen installiertes Leuchtfeuer sendet Ihre Registrierungsdaten aus",
+    "beaconScrubbed": "Du hast deine Registrierung aus dem Beacon gelöscht",
+    "beaconBoosted": "Du hast deine eigenen Teile verwendet, um ein Leuchtfeuer lauter zu machen",
+    "bloomRidden": "Du bist mit der frühen Flut durch das Wrackfeld geritten",
+    "bloomWaited": "Du hast die frühe Flut abgewartet",
+    "bloomForced": "Du hast dich direkt durch die frühe Flut gekämpft",
+    "letterRead": "Du hast den Brief gelesen, der zurückgeschickt wurde",
+    "letterSent": "Du hast einen vierzig Jahre alten Brief wieder ans Licht gebracht",
+    "letterKept": "Du hast die Nachrichtenkapsel wegen der Teile aufbewahrt",
+    "wakeNamed": "Du hast dem Leichnam eines Aasfressers einen Namen gegeben",
+    "wakeJoined": "Du bist für eine Schnitzeljagd geblieben",
+    "wakeBought": "Du hast den Rumpf aus einer Heckwelle herausgeholt",
+    "auctionRun": "Du hast bei der flutlichtbeleuchteten Schrottauktion mitgearbeitet",
+    "stowawayCalled": "Du hast entschieden, was mit dem blinden Passagier geschehen soll",
+    "merchantSwap": "Du hast den Drift-Händler getroffen und auf sein Angebot geantwortet",
+    "pocketCrossed": "Du hast dich um die Strahlungsquelle gekümmert",
+    "leakHandled": "Du hast dich um den Kern der Bruchwahrscheinlichkeit gekümmert",
+    "flareMet": "Du bist auf die Spiegelblendung gestoßen",
+    "runnersRaced": "Du hast den Konvoiführern geantwortet",
+    "ghostResolved": "Du hast das Problem mit dem Sensor-Geist behoben.",
+    "hulkAnswered": "Du hast dich mit dem festgebundenen Koloss auseinandergesetzt",
+    "fuelBloomWorked": "Du hast den „Drive-Fuel-Bloom“ umgesetzt",
+    "veinWorked": "Du hast die Rift-Erzader abgebaut",
+    "twinWreckOpened": "Du hast eines der beiden Wracks geöffnet",
+    "warpedYardUsed": "Du lässt dich von der selbst angelegten Gartenanlage inspirieren",
+    "titheSettled": "Sie haben die Rechnung bei der Abgabestelle beglichen",
+    "voiceHandled": "Du hast den Anruf über deine Gegensprechanlage entgegengenommen.",
+    "coldEngineWorked": "Du hast etwas an der Kühlvorrichtung verändert.",
+    "rainMet": "Du hast entschieden, was du wegen der Regenwahrscheinlichkeit tun willst",
+    "rimBoardRead": "Du liest das Schwarze Brett im Rim (Sektor 1)",
+    "rimBoardPosted": "Du hast dein eigenes Verzeichnis im Rim-Forum (Sektor 1) gepostet.",
+    "rimBoardTaken": "Du hast das Anschlagbrett im „Rim“ wegen des Legierungsmetalls abgebaut (Sektor 1)"
   },
   "events": {
     "driftingPod": {
@@ -861,12 +1063,14 @@
       "text": "Der Reaktor eines ausgebrannten Transporters läuft noch immer und lässt Ladung in die Dunkelheit entweichen. Man könnte ihn anzapfen, wenn das Feld hält.",
       "opt": {
         "siphon": "Die Ladung absaugen",
-        "salvage": "Als Schrott verwerten"
+        "salvage": "Als Schrott verwerten",
+        "attune": "Lass es in deine Locken erklingen"
       },
       "out": {
         "siphonPass": "Der Wasserhahn läuft. Deine Zellen trinken sich satt – ein Vorsprung für die bevorstehenden Kämpfe.",
         "siphonFail": "Das Feld bricht mitten im Zug zusammen und fließt in deinen Rumpf hinein.",
-        "salvage": "Man schneidet es auf sichere Weise auseinander und entfernt die intakte Beschichtung."
+        "salvage": "Man schneidet es auf sichere Weise auseinander und entfernt die intakte Beschichtung.",
+        "attune": "Man passt sich dem Rhythmus des Reaktors an, anstatt ihn anzuklopfen. Das Brummen dringt in die eigenen Zeilen ein und bleibt dort – warm und geduldig – über vier Kämpfe hinweg."
       }
     },
     "mineFieldGap": {
@@ -1048,10 +1252,12 @@
     "silentField": {
       "text": "Ein Feld aus statischem Rauschen, kein Signal, keine Trümmer. Nur das Summen des Rands und dein eigener Atem.",
       "opt": {
-        "drift": "Drift durch, zuhören"
+        "drift": "Drift durch, zuhören",
+        "chart": "Die Stille grafisch darstellen"
       },
       "out": {
-        "drift": "Niemand antwortet. Auf dem Weg nach draußen sammelst du lose Verkleidungsteile ein."
+        "drift": "Niemand antwortet. Auf dem Weg nach draußen sammelst du lose Verkleidungsteile ein.",
+        "chart": "Man fährt die Kurve sauber durch, anstatt sich durch sie hindurchtreiben zu lassen. Drei Reihen der Fahrspur lösen sich auf, und der Rumpf gleitet in die Stille ein, als wäre er genau dafür gebaut worden."
       }
     },
     "tollGate": {
@@ -1291,12 +1497,14 @@
       "opt": {
         "strip": "Die Schalen entfernen",
         "salvageCore": "Einen Kern ausschneiden",
-        "leave": "Lass sie verschlossen"
+        "leave": "Lass sie verschlossen",
+        "alignField": "Das Feld ausrichten, sauber anheben"
       },
       "out": {
         "strip": "Gute Ausbeute. Die Klemmen hinterlassen beim Herausziehen Spuren an der Beschichtung.",
         "salvageCore": "Ein Kern ist noch geladen. Er lässt sich problemlos lösen.",
-        "leave": "Du schaltest den Motor aus und treibst vorbei. Hinter dir kehrt Stille ein."
+        "leave": "Du schaltest den Motor aus und treibst vorbei. Hinter dir kehrt Stille ein.",
+        "alignField": "Man kehrt die Polarität schrittweise um, anstatt daran zu reißen. Die Wracks lösen sich nacheinander, und nichts reißt."
       }
     },
     "yusufDebt": {
@@ -1348,11 +1556,13 @@
       "text": "Eine Kapelle, die in den Laderaum eines Lastwagens eingeschweißt ist. Der Prediger hält die Tür offen und sorgt dafür, dass die Rechnung aufgeht.",
       "opt": {
         "listen": "Setz dich hin und hör zu",
-        "refuse": "Rausgehen"
+        "refuse": "Rausgehen",
+        "sing": "Sing es nach"
       },
       "out": {
         "listen": "Die Zahlen ergeben auf eine unangenehme Art und Weise Sinn. Man verlässt den Ort mit einer Last.",
-        "refuse": "Du brichst mitten im Vers ab. Durch diese Weigerung wirkt der Rumpf stabiler."
+        "refuse": "Du brichst mitten im Vers ab. Durch diese Weigerung wirkt der Rumpf stabiler.",
+        "sing": "Du singst das Kirchenlied in seiner eigenen Tonart mit. Der Prediger hält mitten im Vers inne, lauscht und reicht dir eine Spule, die ihm gar nicht gehörte."
       }
     },
     "tetheredHulk": {
@@ -1370,11 +1580,13 @@
       "text": "Ein Relaismast, dessen Antennenanlage zur Hälfte abgerissen ist. Er versucht immer noch, zur vollen Stunde ein Signal auszusenden.",
       "opt": {
         "repairIt": "Das Array reparieren",
-        "stripIt": "Das Array bereinigen"
+        "stripIt": "Das Array bereinigen",
+        "useKey": "Benutze den Schlüssel des Wächters"
       },
       "out": {
         "repairIt": "Es kommt mitten im Satz wieder hoch. Das Netzwerk des Keepers vermerkt, wer das Problem behoben hat.",
-        "stripIt": "Das ist gut. Der Mast verschwindet hinter dir im Dunkeln und bleibt dort."
+        "stripIt": "Das ist gut. Der Mast verschwindet hinter dir im Dunkeln und bleibt dort.",
+        "useKey": "Der Schlüssel passt in eine Buchse, die niemand versteckt hat. Das Relais wird vollständig statt nur notdürftig repariert aktiviert, und zwei Fahrspuren werden mit eingeschaltet."
       }
     },
     "fuelBloom": {
@@ -1404,11 +1616,13 @@
       "text": "Ein Schiff, das mit Ihrem identisch ist, hält vor dem Bug Stellung. Seine Positionslichter reagieren eine halbe Sekunde, bevor Sie ein Signal geben.",
       "opt": {
         "speak": "Sprich mit ihm",
-        "shoot": "Leg los!"
+        "shoot": "Leg los!",
+        "stepThrough": "Schritt für Schritt"
       },
       "out": {
         "speak": "Es antwortet mit deiner eigenen Stimme und ist freundlicher als du selbst. Du gehst mit etwas, das es dir geschenkt hat.",
-        "shoot": "Es zerbricht ohne Widerstand. Der Schaden geht ohnehin auf deinen eigenen Rumpf."
+        "shoot": "Es zerbricht ohne Widerstand. Der Schaden geht ohnehin auf deinen eigenen Rumpf.",
+        "stepThrough": "Man überquert die Grenze. Etwas von einem selbst bleibt auf der anderen Seite zurück, und etwas von der anderen Seite kommt mit einem zurück. Der Rumpf ist jetzt kleiner, und er weiß Dinge."
       }
     },
     "clanEscort": {
@@ -1481,12 +1695,14 @@
       "text": "Eine Stationstafel, die im sauberen Vakuum schwebt. Jemand hat die Rechenaufgabe von Hand aufgeschrieben und hier liegen lassen.",
       "opt": {
         "solveIt": "Löse das Rätsel",
-        "burnLedger": "Verbrenne die Tablette"
+        "burnLedger": "Verbrenne die Tablette",
+        "auditIt": "Prüfe es streng nach Vorschrift"
       },
       "out": {
         "solvePass": "Die Rechnung geht auf. Was auch immer die Station in ihren verschlossenen Händen hielt, sie hat dir einen Kern gegeben.",
         "solveFail": "Du hast das Schild falsch verstanden. Die Station öffnet sich in die falsche Richtung, und der Sektor bemerkt das.",
-        "burnLedger": "Du machst die Frage zunichte. Die Kluft verstummt, und irgendetwas hier draußen billigt das."
+        "burnLedger": "Du machst die Frage zunichte. Die Kluft verstummt, und irgendetwas hier draußen billigt das.",
+        "auditIt": "Man löst das Hauptbuch nicht – man gleicht es ab. Jeder Eintrag geht auf, die Station öffnet sich von selbst, und die Rechnung geht bei deinen Wiederholungswürfen auf."
       }
     },
     "twinWreck": {
@@ -1528,11 +1744,13 @@
       "text": "Ein Tor aus Schiffskörpern, alle auf einen Akkord gestimmt. Sie öffnen sich für eine Stimme – oder für die Stille.",
       "opt": {
         "singAlong": "Sing die Strophe",
-        "jamIt": "Den Akkord spielen"
+        "jamIt": "Den Akkord spielen",
+        "harmonize": "Im Einklang mit dem Tor"
       },
       "out": {
         "singAlong": "Dein Reaktor nimmt den Akkord auf und hält ihn. Das Tor öffnet sich bereitwillig.",
-        "jamIt": "Du errichtest eine Lärmwand vor ihrer Band. Das Tor öffnet sich, weil es muss."
+        "jamIt": "Du errichtest eine Lärmwand vor ihrer Band. Das Tor öffnet sich, weil es muss.",
+        "harmonize": "Du lässt die Schwingung des Tors ungehindert durch den Reaktor fließen. Es öffnet sich, ohne einen Preis zu verlangen, und die Ladung bleibt zwei Kämpfe lang in den Spulen."
       }
     },
     "pactSealing": {
@@ -1583,22 +1801,26 @@
       "text": "„Einen Gefallen“, sagt die Jägerin. „Gib ihn hier aus oder nimm ihn mit. Dein Kontobuch.“",
       "opt": {
         "callFavor": "Melden Sie es jetzt an",
-        "saveFavor": "Für später aufheben"
+        "saveFavor": "Für später aufheben",
+        "debtPaid": "Erinnere sie daran, dass die Schuld beglichen ist"
       },
       "out": {
         "callFavor": "Sie lässt eine Kiste auf deine Rückenhalterung fallen und ist schon verschwunden, bevor du dich bei ihr bedanken kannst.",
-        "saveFavor": "Stattdessen richtet sie dir einen privaten Lieferkanal ein. Das zahlt sich immer wieder aus."
+        "saveFavor": "Stattdessen richtet sie dir einen privaten Lieferkanal ein. Das zahlt sich immer wieder aus.",
+        "debtPaid": "„Bezahlt ist bezahlt“, sagt sie und meint es ernst. Auf dem Kopfgeldforum kehrt Stille ein, und sie hinterlässt als Zins eine aufgeladene Zelle auf deinem Dock."
       }
     },
     "reliquaryRun": {
       "text": "Ein Reliquienschrein, begleitet von einem Kantor. Was auch immer sich darin befindet, wurde seit Jahrzehnten nicht mehr geöffnet.",
       "opt": {
         "raidIt": "Nimm das Reliquiar",
-        "trade": "Tausch es ein"
+        "trade": "Tausch es ein",
+        "catalogue": "Ordne es ordnungsgemäß ein"
       },
       "out": {
         "raidIt": "Du gibst das Zeichen. Der Kantor hört auf zu singen und beginnt zu schießen.",
-        "trade": "Sie nehmen einen gelben Kern als Tribut entgegen und geben dir dafür etwas Seltsames im Tausch."
+        "trade": "Sie nehmen einen gelben Kern als Tribut entgegen und geben dir dafür etwas Seltsames im Tausch.",
+        "catalogue": "Du erstellst ein Inventar des Reliquiar, anstatt es zu plündern. Die Quartiermeister des Chors kaufen die Liste, und ein Yard drei Sprünge weiter erledigt den Papierkram."
       }
     },
     "choirTithe": {
@@ -1663,11 +1885,13 @@
       "text": "Eine Welle losgelöster Kausalität, die in die falsche Richtung die Gasse hinunterfließt.",
       "opt": {
         "rideTide": "Probier’s aus!",
-        "anchorHere": "Anlegen und warten"
+        "anchorHere": "Anlegen und warten",
+        "steady": "Halten Sie den Rumpf ruhig"
       },
       "out": {
         "rideTide": "Du landest fünf Reihen weiter, als du eigentlich solltest. Der Rumpf ist sich nicht einig, wie es dazu gekommen ist.",
-        "anchorHere": "Man hält die Position, bis es vorbei ist. Die Mannschaft bekommt eine Stunde, die zählt."
+        "anchorHere": "Man hält die Position, bis es vorbei ist. Die Mannschaft bekommt eine Stunde, die zählt.",
+        "steady": "Du weigerst dich, mit dem Strom zu schwimmen. Er bricht sich an einem Schiff, das zwei Vergangenheiten nicht zulassen will, und die Außenhaut verschließt sich von selbst."
       }
     },
     "coreBargain": {
@@ -1684,11 +1908,11 @@
     "hereticFleet": {
       "text": "Die Ketzer, die du bewaffnet hast, haben daraus eine Flotte gemacht, und nun fragen sie, wer das Kommando hat.",
       "opt": {
-        "leadThem": "Führe sie",
+        "leadThem": "Übernehmen Sie die Führung",
         "sendThemHome": "Schickt sie nach Hause"
       },
       "out": {
-        "leadThem": "Neun Schiffe reihen sich hinter dir ein und singen nichts, aber sehr laut.",
+        "leadThem": "Sie warteten auf jemanden, der es laut aussprechen würde. Wenn du es tust, formiert sich die zerlumpte Flotte hinter deinem Kielwasser – mit einem Geschenk im Maul.",
         "sendThemHome": "Sie hinterlassen dir ihre Vorräte und ihre Dankbarkeit. Beides wiegt schwer."
       }
     },
@@ -1707,11 +1931,13 @@
       "text": "Der Akolyth, dem du Unterschlupf gewährt hast, wartet am letzten Wegpunkt – mit einer Route und einer Bitte.",
       "opt": {
         "takeHerAboard": "Nimm sie an Bord",
-        "sendHerBack": "Schick sie zurück"
+        "sendHerBack": "Schick sie zurück",
+        "callCrew": "Ruf ihre Leute aus dem Laderaum herauf"
       },
       "out": {
         "takeHerAboard": "Sie bedient dein Tablett, als wäre sie dafür geboren. Nichts im Chor überrascht sie.",
-        "sendHerBack": "Sie hinterlässt dir alles, was sie bei sich hatte. Es ist mehr, als du erwartet hast."
+        "sendHerBack": "Sie hinterlässt dir alles, was sie bei sich hatte. Es ist mehr, als du erwartet hast.",
+        "callCrew": "Sie tauchen blinzelnd auf, elf an der Zahl, und machen sich an die Arbeit, noch bevor jemand sie darum bittet. Der Rumpf wird größer, so wie es bei einem bemannten Rumpf immer der Fall ist."
       }
     },
     "brokenLighthouse": {
@@ -1776,22 +2002,26 @@
       "text": "Nicht Mara – ihr Inkassobeauftragter. Er hat die Seite mit deinem Namen und kein Interesse an einem Gespräch.",
       "opt": {
         "settleDebt": "Bezahlen",
-        "outrun": "Ihm davonlaufen"
+        "outrun": "Ihm davonlaufen",
+        "callFavour": "Lass sie den Gefallen einlösen, den sie dir schuldet"
       },
       "out": {
         "settleDebt": "Er reißt die Seite heraus und reicht sie dir. „Sie sagt, du bist wieder willkommen.“",
-        "outrun": "Du verlierst ihn in der Gasse. Er war nie der teure Teil."
+        "outrun": "Du verlierst ihn in der Gasse. Er war nie der teure Teil.",
+        "callFavour": "Mara hat zwar keine Freude daran, aber sie hält sich daran. Die Sammlung bleibt stehen, eher als Schuld denn als Diebstahl vermerkt, und ein Nachbar weiter die Gasse hinunter nimmt ihr das einfach so ab."
       }
     },
     "hymnResidue": {
       "text": "Der Akkord, den du gesungen hast, ist immer noch im Reaktorgehäuse. Er hat noch nicht aufgehört.",
       "opt": {
         "keepHumming": "Lass es laufen",
-        "scourIt": "Durchforstet es gründlich"
+        "scourIt": "Durchforstet es gründlich",
+        "playCopy": "Spiel deine Kopie noch einmal ab"
       },
       "out": {
         "keepHumming": "Es versorgt den Reaktor und verlangt nichts dafür. Das ist das Beunruhigende daran.",
-        "scourIt": "Man schneidet es Scheibe für Scheibe heraus. Die Stille danach gehört wieder einem selbst."
+        "scourIt": "Man schneidet es Scheibe für Scheibe heraus. Die Stille danach gehört wieder einem selbst.",
+        "playCopy": "Deine Aufnahme antwortet dem Überbleibsel mit ihrer eigenen Stimme. Das Muster entwirrt sich, spuckt etwas aus, das der Chor bewahrt hatte – und der Chor wird genau wissen, wer es genommen hat."
       }
     },
     "jammedChoir": {
@@ -1831,11 +2061,13 @@
       "text": "Ein Anzug, der allein dahintreibt, die Arme verschränkt, die Leine von innen durchtrennt.",
       "opt": {
         "readLog": "Lies das Protokoll",
-        "stripSuit": "Zieh den Anzug aus"
+        "stripSuit": "Zieh den Anzug aus",
+        "matchChart": "Vergleichen Sie es mit Ihrer „Quiet-Field“-Tabelle"
       },
       "out": {
         "readLog": "Koordinaten, ein Name und eine Route, die jemand finden wollte.",
-        "stripSuit": "Gute Dichtungen, guter Schrott. Das Typenschild lässt man, wo es ist."
+        "stripSuit": "Gute Dichtungen, guter Schrott. Das Typenschild lässt man, wo es ist.",
+        "matchChart": "Die letzte Überschrift des Antrags deckt sich genau mit Ihrer Umfrage ab. Sie wissen, in welche Richtung es ging, und nun ist die Wendung, die nie stattgefunden hat, irgendwo festgehalten."
       }
     },
     "coldEngine": {
@@ -1894,6 +2126,920 @@
         "bidHigh": "Mara gibt es an dich weiter und trägt deinen Namen unter „bezahlt“ ein.",
         "bidLow": "Du nimmst die zweite Partie. Niemand sonst wollte sie haben, und genau darum geht es vielleicht.",
         "heckle": "Du handelst für jemand anderen einen günstigeren Preis aus und nimmst dessen Dank an. Mara bedankt sich nicht bei dir."
+      }
+    },
+    "maraSupplyRun": {
+      "text": "Mara meldet sich über einen Kanal der Handelsroute, kurz und sachlich. „Vier Kisten Kühlmittel, eine Eskorte, eine Route. Mein Käufer ist nervös und meine üblichen Leute sind nicht mehr da. Willst du den Auftrag übernehmen oder soll ich den Clan fragen?“",
+      "opt": {
+        "escort": "Nimm die Begleitung mit",
+        "skim": "Nimm eine Kiste von oben herunter",
+        "decline": "Sag ihr, sie soll sich andere Helfer suchen"
+      },
+      "out": {
+        "escort": "Du fliegst geradeaus. Etwas mit Clan-Markierungen versucht, sich hinter dir einzureihen, und erfährt dabei, wozu eine Eskorte da ist.",
+        "skim": "Eine Kiste wird in deinen Laderaum verladen, und die Ladungsliste ist kurz. Mara sagt bei der Übergabe nichts. Sie schaut sich die Nummer nur zweimal an.",
+        "skimCaught": "Du hebst eine Kiste hoch, und ihre Buchhalterin steht direkt daneben. Die Bezahlung halbiert sich, die Leute des Käufers folgen dir zwei Sprünge lang, und Mara sagt überhaupt nichts.",
+        "decline": "„Na gut. Na gut.“ Sie schaltet den Kanal ohne Drohungen ab, was bei Mara fast schon eine Freundlichkeit ist. Die gewonnenen Stunden verbringst du am Rumpf."
+      }
+    },
+    "maraVault": {
+      "text": "Ein verschlossener Schaufensterbereich auf dem letzten Markt, und Mara steht hinter der Theke. „Hier bewahre ich das auf, was ich nicht verkaufe. Du hast für den Blick bezahlt. Nimm dir etwas, nimm das Geld oder lass es geschlossen – ich habe ein sehr langes Jahrzehnt hinter mir, und jede der drei Optionen ist in Ordnung.“",
+      "opt": {
+        "openIt": "Nimm etwas aus dem Regal",
+        "takeCash": "Nimm lieber das Bargeld",
+        "leaveItHers": "Lassen Sie den Tresor geschlossen"
+      },
+      "out": {
+        "openIt": "Du nimmst einen Würfel aus einer Schaumstoffhalterung, die vor vierzig Jahren speziell dafür zugeschnitten wurde. Ihr Ansprechpartner vor Ort erledigt den Papierkram drei Schritte weiter.",
+        "takeCash": "Sie zählt es in alter Flottenschrift ab und gibt nicht vor, es sei ein fairer Tausch. Es lässt sich sowieso ausgeben.",
+        "leaveItHers": "„Das hat noch niemand gemacht“, sagt sie und reicht mir dann nach einer Weile die Verkleidung herüber, die sie eigentlich für ihren eigenen Rumpf aufbewahrt hatte."
+      }
+    },
+    "maraUsurer": {
+      "text": "Dort, wo eigentlich Maras Ladentheke stehen sollte, hängen eine Pfandrechtsanzeige und ein Rumpf von der Größe einer Kapelle. Der Wucherer verwaltet nun ihre Schulden – sie hat das Buch verkauft, um die Kosten zu decken, die du ihr verursacht hast. „Kapital, Zinsen und die Unannehmlichkeiten“, steht dort.",
+      "opt": {
+        "payInFull": "Bezahlen Sie den gesamten Betrag",
+        "fightIt": "Ablehnen und Position halten",
+        "runTheLane": "Lauf die Bahn entlang"
+      },
+      "out": {
+        "payInFull": "Du bezahlst. Das Pfandrecht wird aufgehoben, das Buch geht zurück an Mara, und sie trifft dich am anderen Ende des Marktes – ohne ein Wort zu sagen und mit einem voll gefüllten Werkzeugkasten.",
+        "fightIt": "Der „Usurer“ verhandelt nicht zweimal. Er koppelt ab, und der Markt macht eine Schussbahn frei, als hätte er das schon einmal getan.",
+        "runPass": "Man schlängelt sich durch die Fahrspuren des Marktes und kommt auf der anderen Seite wieder heraus, ohne dass die Warteschlange abgearbeitet wurde. Irgendwo hinter einem wendet gerade ein riesiger Rumpf langsam.",
+        "runFail": "Die Fahrspur verengt sich auf halber Strecke. Du kommst zwar raus, aber nicht ganz glatt, und der Wucherer lässt dich für den Rest des Abschnitts beschatten."
+      }
+    },
+    "yusufConvoyDefense": {
+      "text": "Yusuf eskortiert neunzehn Schiffe voller Menschen, die einst eine Flotte bildeten, und die Kluft vor ihm ist nicht leer. „Ich habe die Passagierliste und keine nennenswerten Waffen. Ihr habt Waffen. Ich werde euch nicht beleidigen, indem ich so tue, als wäre das hier ein Jobangebot.“",
+      "opt": {
+        "holdTheLine": "Bitte die Straße für den Konvoi freihalten",
+        "tellThem": "Sag ihnen, was auf der Blackbox stand",
+        "sellManifest": "Verkaufe das Manifest noch vor ihm"
+      },
+      "out": {
+        "holdTheLine": "Du übernimmst die Seite des Risses und hältst sie, bis das letzte Schiff durch ist. Neunzehn Schiffe erfassen deinen Transponder. Yusuf erfasst ihn zweimal.",
+        "tellThem": "Man schaltet die Blackbox auf den offenen Kanal. Niemand schreit. Sie hören einfach alle auf einmal auf, so zu tun als ob, und der Konvoi formiert sich wieder, noch enger als zuvor.",
+        "sellManifest": "Ein Makler, der zwei Schritte voraus ist, zahlt gut für neunzehn Namen und eine Überschrift. Der Konvoi kommt größtenteils trotzdem durch.",
+        "sellCaught": "Du verkaufst es, und der Käufer meldet sich. Yusuf hört, wie sein eigenes Manifest über einen offenen Kanal wiedergegeben wird, noch bevor du den Sektor verlassen hast."
+      }
+    },
+    "yusufRefugeeLane": {
+      "text": "Der Zug ist an einer Engstelle ins Stocken geraten, die du zufällig zu öffnen weißt. Yusuf fragt nicht nach. Er schwebt einfach dort, während die Fahrspurkarte auf seinem Bildschirm zu sehen ist.",
+      "opt": {
+        "openLane": "Macht ihnen den Weg frei",
+        "chargeToll": "Durchfahrtgebühr",
+        "sealIt": "Verschließe es hinter dir"
+      },
+      "out": {
+        "openLane": "Man brennt die Engstelle auf und hält die Position, während sie durchströmen. Das dauert Stunden, die man nicht hat. Jeder Rumpf, der vorbeikommt, bestätigt, dass der Kurs sicher ist.",
+        "chargeToll": "Sie zahlen. Natürlich zahlen sie. Yusuf zahlt als Erster und am lautesten, damit die hinter ihm sich nicht streiten müssen.",
+        "sealIt": "Du gehst weiter und ziehst die Schere hinter dir zusammen. Nichts folgt dir. Auch ihnen folgt nichts."
+      }
+    },
+    "choirDeepPact": {
+      "text": "Der Prediger begegnet dir diesmal im Inneren des Liedes, nicht daneben. „Du hast dich für das Seichte entschieden. Es gibt jedoch eine tiefere Deutung. Sie fordert mehr vom Rumpf und offenbart mehr vom Muster, und ich werde nicht so tun, als wäre der Tausch ausgeglichen.“",
+      "opt": {
+        "goDeeper": "Lesen Sie den ausführlichen Artikel",
+        "holdHere": "Halten Sie sich an das, was Sie unterschrieben haben",
+        "breakIt": "Zerreiße den Pakt hier"
+      },
+      "out": {
+        "goDeeper": "Die Hymne beißt ein Stück aus dem Rumpf heraus und hinterlässt in dem Loch etwas, das nie hergestellt wurde. Dein Reaktor lernt eine Strophe.",
+        "holdHere": "„Umsichtig.“ Er klingt nicht enttäuscht, was noch schlimmer ist. Die oberflächliche Lesart trifft zu und hält, was sie versprochen hat.",
+        "breakIt": "Du zerlegst die Melodie Zeile für Zeile auf einem offenen Kanal. Der Chor hört jedes einzelne Wort davon, und der nächstgelegene Kantor kommt, um die Differenz einzusammeln."
+      }
+    },
+    "preacherFinale": {
+      "text": "Der Prediger wartet an der letzten ruhigen Station vor dem Kern, und ausnahmsweise tritt er gerade nicht auf. „Was auch immer du über uns entschieden hast, du wirst da hineingehen. Ich würde gerne wissen, was du sagen wirst, wenn es dich fragt.“",
+      "opt": {
+        "singWithHim": "Sing es noch ein letztes Mal mit ihm zusammen",
+        "answerPlainly": "Sag ihm, was du ihm tatsächlich sagen wirst",
+        "cutHimOff": "Den Kanal durchtrennen"
+      },
+      "out": {
+        "singWithHim": "Du übernimmst die untere Linie. Er übernimmt die obere. Neunzig Sekunden lang nimmt der Sektor eine bestimmte Form an, und der Reaktor hält die Ladung noch lange nach dem Abklingen des Geräusches aufrecht.",
+        "answerPlainly": "Du sagst es ihm ganz offen. Er hört dir bis zum Schluss zu, ohne auch nur ein Wort zu korrigieren, und übergibt dir dann die Rüstung, in der er begraben werden sollte.",
+        "cutHimOff": "Du hast ihn mitten im Vers unterbrochen. Seine Anhänger nehmen das ungefähr so hin, wie du es erwartet hast, und sie stehen zwischen dir und dem Kern."
+      }
+    },
+    "keeperThread": {
+      "text": "Die Nachricht des Wächters erreicht dich zwischen zwei Leuchtfeuern. „Du hast meine Arbeit erledigt. Ich weiß nicht, ob ich dir danken oder dir eine Rechnung stellen soll. Apropos – was willst du damit erreichen?“",
+      "opt": {
+        "repayHim": "Bezahle ihm, was du ihm schuldest",
+        "askMore": "Frag ihn nach mehr",
+        "handTheLog": "Gib ihm dein Beacon-Protokoll"
+      },
+      "out": {
+        "repayHim": "Du schickst ihm die Aufzeichnungen und die Liste aller Baken, die du berührt hast. Er bedankt sich nicht bei dir. Er legt die Unterlagen ab, was für ihn dasselbe ist.",
+        "askMore": "Er gibt dir etwas aus dem Ersatzteilvorrat und sagt zwei Sprünge lang kein Wort mehr.",
+        "askMoreCold": "Er bezahlt dich mit Bergungsrechten, kalt wie ein Vakuum, und schickt dir keine einfachen Ortungssignale mehr.",
+        "logPass": "Dein Protokoll passt genau zu seinem. Aus zwei Halbkarten wird eine Karte, und drei Reihen der Fahrspur zeichnen sich aus dem Rauschen heraus.",
+        "logFail": "Die Übertragung bricht auf halbem Weg ab. Er erhält ein fehlerhaftes Protokoll und einen fehlerhaften Abdruck, und hinter dem fehlgeschlagenen Handshake steigt die Flut."
+      }
+    },
+    "hullBreakerYard": {
+      "text": "Ein Schiffsabwrackhof, der immer noch automatisch betrieben wird. Seit Jahren zerschneidet er denselben Rumpf in dieselben Teile, und die Teile sind so gestapelt, als würde sie noch jemand einsammeln.",
+      "opt": {
+        "takeStack": "Nimm den Stapel",
+        "stopTheYard": "Den Strom im Garten abschalten",
+        "restartIt": "Richte es auf etwas anderes"
+      },
+      "out": {
+        "takeStack": "Ein sauberes Typenschild, zugeschnitten nach einem Standard, den niemand mehr verwendet. Es verkauft sich trotzdem.",
+        "takeStackTrap": "Der Stapel war tragfähig. Die Hälfte des Hofes stürzt dir auf den Rücken.",
+        "stopTheYard": "Wenn man den Bus ausschaltet, sinken die Arme herab. Was auch immer das für ein Schiff war, es darf nun nicht mehr weiter zerschnitten werden.",
+        "restartPass": "Sie programmieren die Schnittreihenfolge neu. Die Maschine beginnt nun mit der Fertigung von Teilen, die Sie tatsächlich verwenden können.",
+        "restartFail": "Die Waffen nehmen Ihre Anweisung als Zielangabe entgegen."
+      }
+    },
+    "tugStrike": {
+      "text": "Elf Schlepper hielten quer über die Fahrbahn ihre Position, die Motoren waren kalt, und die Transponder zeigten immer dieselben drei Worte an: NOT UNTIL PAID.",
+      "opt": {
+        "payThem": "Zahlt in den Streikfonds ein",
+        "crossPicket": "Die Grenze überschreiten",
+        "haulForThem": "Fahre eine Ladung für sie"
+      },
+      "out": {
+        "payThem": "Sie machen den Weg frei und geben dir ihre Routenbeschreibungen, die besser sind als alles, wonach du bisher geflogen bist.",
+        "crossPicket": "Niemand schießt. Elf Transponder zeichnen deine Registrierung im selben Moment auf.",
+        "haulForThem": "Du übernimmst eine Ladung, für die niemand bezahlt wird. Die Werften flussabwärts erfahren davon, noch bevor du dort ankommst."
+      }
+    },
+    "salvageQuarantine": {
+      "text": "Eine Quarantäneboje, deren Gültigkeitsdauer bereits seit vierzig Jahren abgelaufen ist, weigert sich nach wie vor höflich, irgendjemanden in ein Trümmerfeld zu lassen, über das sie keine Hoheitsgewalt besitzt.",
+      "opt": {
+        "obeyIt": "Halten Sie sich an die Quarantänevorschriften",
+        "breakSeal": "Das Siegel brechen",
+        "readBuoy": "Das Logbuch der Boje lesen"
+      },
+      "out": {
+        "obeyIt": "Man weicht einfach aus. Was auch immer dadurch geschützt wurde, bleibt noch ein paar Jahrzehnte lang geschützt.",
+        "breakSeal": "Versiegelte Fracht – versiegelt aus einem Grund, der schon seit Jahrzehnten keine Rolle mehr spielt. Meistens jedenfalls.",
+        "breakSealBad": "Der Grund, warum es versiegelt wurde, ist immer noch darin, und es hatte vierzig Jahre Zeit, hungrig zu werden.",
+        "readBuoy": "Es hat jeden Schiffskörper protokolliert, der es ignoriert hat. Die Liste ist lang, und die Überschriften darin sind hilfreich."
+      }
+    },
+    "driftSchool": {
+      "text": "Jemand hat in einem ausgebrannten Frachter eine Schule betrieben. Neun Kinder, ein sehr erschöpfter Erwachsener und ein Lehrplan, bei dem es hauptsächlich darum geht, in einem Driftfeld nicht ums Leben zu kommen.",
+      "opt": {
+        "donate": "Gebt ihnen Vorräte",
+        "teachThem": "Eine Unterrichtsstunde halten",
+        "takeTheFreighter": "Erobert den Kern des Frachters"
+      },
+      "out": {
+        "donate": "Der erschöpfte Erwachsene bedankt sich nicht bei dir. Eines der Kinder malt deinen Rumpf an die Trennwand – schlecht und für immer.",
+        "teachThem": "Du erklärst neun Menschen, die dich überleben werden, was Fahrspurdisziplin bedeutet. Indem du es laut aussprichst, festigst du etwas in deinem eigenen Innersten.",
+        "takeTheFreighter": "Es versorgt die Beleuchtung und die Klimaanlage mit Strom. Die werden schon zurechtkommen. Die Leute hier kommen meistens zurecht."
+      }
+    },
+    "clanFuneral": {
+      "text": "Ein Clan verbrennt eines seiner eigenen Schiffe auf offener See – was hier draußen bedeutet, dass man den Rumpf öffnet und das Schiff der Strömung überlässt. Sie haben deine Registrierungsnummer bemerkt.",
+      "opt": {
+        "standDown": "Motoren abstellen und warten",
+        "salvageDrift": "Folgen Sie der Spur nach",
+        "sendSalute": "Den Flottengruß senden"
+      },
+      "out": {
+        "standDown": "Sie halten die Position die vollen neunzehn Minuten lang. Der Rangiermeister wird sich daran erinnern, wer das getan hat.",
+        "salvageDrift": "Der Rumpf, mit dem sie in See stach, war mehr wert als die Zeremonie. Jemand würde ihn sich holen.",
+        "salvageDriftSeen": "Sie haben einen Streikposten zurückgelassen. Natürlich haben sie einen Streikposten zurückgelassen.",
+        "sendSalute": "Seit dreißig Jahren hat hier draußen niemand mehr das alte Dreitonsignal gehört. Zwei der Clanschiffe antworten darauf, noch bevor sie nachdenken."
+      }
+    },
+    "coolantBloom": {
+      "text": "Eine Kühlmittelblüte von der Größe eines Stadtblocks, die in einem langsamen Zyklus gefriert und wieder auftaut. Etwas versorgt sie ständig mit neuem Material.",
+      "opt": {
+        "tapBloom": "Tippen Sie auf die Blüte",
+        "findSource": "Finde heraus, was es antreibt",
+        "burnIt": "Verbrenne es!"
+      },
+      "out": {
+        "tapPass": "Langsame Ventile, langsame Ventilöffnungen, kein Druckanstieg. Die Tanks kommen voll zurück, und der Reaktor läuft eine Weile im kalten Betrieb.",
+        "tapFail": "Ein Ventil öffnet sich zu weit, und die Blüte reagiert so, wie Druck immer reagiert.",
+        "findSource": "Ein Schiffsrumpf unter dem Eis, der immer noch Entlüftungsdämpfe abgibt und seinen Betriebszyklus für eine Besatzung fortsetzt, die nicht an Bord ist.",
+        "burnIt": "Es geht sauber hoch, und der Weg ist für alle frei. Was auch immer darin gelebt hat, hat kein Mitspracherecht."
+      }
+    },
+    "manifestAuction": {
+      "text": "Eine öffentliche Auktion für eine Frachtliste, die noch niemand gesehen hat. Drei Bieter, und einer von ihnen bietet in einer Flottenskrip-Währung, die seit vierzig Jahren kein Zahlungsmittel mehr ist.",
+      "opt": {
+        "bidHigh": "Überbiete sie alle",
+        "backScript": "Unterstützen Sie den Flottenbieter",
+        "jamAuction": "Die Auktion blockieren"
+      },
+      "out": {
+        "bidHigh": "Das Ladungsverzeichnis ist echt. Die Hälfte davon ist bereits geborgen, und die andere Hälfte ist den gesamten Gebotsbetrag wert.",
+        "bidHighDud": "Die Fracht ist weg. Die Routen auf dem Frachtbrief sind es nicht, und die Routen hier draußen sind fast schon selbst Fracht.",
+        "backScript": "Du bürgst für das Drehbuch auf einem frei empfangbaren Sender. Das Geld, das die Großmutter von irgendjemandem verdient hat, bringt endlich etwas ein.",
+        "jamAuction": "Niemand ersteigert es. Zwei Stunden später holst du das gesamte Los zum Mindestpreis bei einem sichtlich verärgerten Angestellten ab."
+      }
+    },
+    "wardenPatrolBoat": {
+      "text": "Ein Patrouillenboot der Warden, eine Besatzung, vierzig Jahre über die vorgesehene Dienstzeit hinaus. Es fordert dich mit einem üblichen Haltebefehl auf und fragt dann, nach einer Pause, ob dieser Befehl noch irgendeine Bedeutung habe.",
+      "opt": {
+        "answerYes": "Sag ihm, dass es immer noch etwas bedeutet",
+        "answerNo": "Sag ihm, dass das nicht so ist.",
+        "showPapers": "Bergungsunterlagen vorlegen"
+      },
+      "out": {
+        "answerYes": "Er führt zum ersten Mal seit zehn Jahren eine vollständige Verkehrskontrolle durch – ganz nach Vorschrift. Dann händigt er dir das Streifengitter aus.",
+        "answerNo": "Er schweigt eine Weile. Dann legt er die Bewaffnung des Bootes ab und übergibt sie dir, da er sie nicht mehr benötigen wird.",
+        "papersPass": "Deine Unterlagen sind so in Ordnung, wie es nur die Unterlagen eines echten Bergungsunternehmers sein können. Er zahlt die dafür ausgesetzte Prämie.",
+        "papersFail": "Er entdeckt die Unstimmigkeit innerhalb von elf Sekunden und verhängt – entschuldigend – aus vierzigjähriger Gewohnheit eine Geldstrafe gegen dich."
+      }
+    },
+    "wreckedRelayFarm": {
+      "text": "Sechzig Relaismasten in einer Reihe, alle in dieselbe Richtung ausgerichtet, alle stromlos. Der einundsechzigste ist in eine andere Richtung ausgerichtet und wird mit Strom versorgt.",
+      "opt": {
+        "traceIt": "Folge der Richtung, in die es zeigt",
+        "stripFarm": "Die toten Sechzig ausziehen",
+        "realign": "Drehe die einundsechzigste Seite zurück"
+      },
+      "out": {
+        "traceIt": "Der Kurs ist auf keiner Karte verzeichnet. Jetzt steht er auf deiner.",
+        "stripFarm": "Sechzig Masten aus gutem Kupfer. Der einundsechzigste verbraucht die ganze Zeit, während man arbeitet, Strom.",
+        "realign": "Du stellst es wieder neben seine sechzig Geschwister. Das Array erwacht für elf Sekunden und sagt einen Namen."
+      }
+    },
+    "tetherRace": {
+      "text": "Zwei Seilzieher haben ein Seil über eine Lücke gespannt und wetten darauf, wer es schneller überqueren kann, ohne es zu durchtrennen. Es ist noch Platz für einen Dritten.",
+      "opt": {
+        "race": "Nimm den dritten Platz ein",
+        "bet": "Setzen Sie auf den älteren Lkw",
+        "cutTether": "Schneide die Leine durch und los geht’s"
+      },
+      "out": {
+        "racePass": "Du überquerst die Ziellinie, und das Seil summt immer noch hinter dir. Beide Spediteure zahlen ohne Widerrede.",
+        "raceFail": "Du hast es vermasselt. Niemand wird bezahlt, und ein Spediteur ist jetzt im wahrsten Sinne des Wortes zu Fuß unterwegs – so wie es hier draußen eben geht.",
+        "betWin": "Alte Schiffe kennen ihre eigenen Grenzen. Sie überquert den Kanal, als hätte sie das schon tausendmal gemacht – was sie auch tatsächlich hat.",
+        "betLose": "Auch alte Schiffe kennen ihre Grenzen, und ihres hat sich ausgerechnet heute entschieden, eine davon zu entdecken.",
+        "cutTether": "Ein gutes Seil, eine gute Winde und zwei Leute, die noch eine ganze Weile von dir erzählen werden."
+      }
+    },
+    "yusufApprentice": {
+      "text": "Yusufs Lehrling spricht dich unter vier Augen an. „Er wird nicht fragen, also frage ich. Es gibt ein Teil, das er braucht, und einen Hof, der es ihm nicht verkaufen will.“",
+      "opt": {
+        "buyIt": "Kauf es über deine Wunschliste",
+        "stealIt": "Nimm es vom Hof",
+        "tellHim": "Sag Yusuf, dass sein Lehrling gefragt hat"
+      },
+      "out": {
+        "buyIt": "Er findet innerhalb von etwa vier Minuten heraus, woher es stammt, und verliert für den Rest des Abschnitts kein Wort mehr darüber.",
+        "stealIt": "Die Werft wird es einen Monat lang nicht vermissen. Der Auszubildende wird länger als das nicht verraten, woher es stammt.",
+        "stealItSeen": "Die Werft vermisst es sofort. Du kommst mit dem Teil und einem Schwanz davon.",
+        "tellHim": "Er ist etwa zehn Sekunden lang wütend und dann ganz bewusst nicht mehr wütend. Er repariert etwas an deinem Rumpf, obwohl er darum gar nicht gebeten wurde."
+      }
+    },
+    "iceLighter": {
+      "text": "Ein Eisbrecher, der immer noch unter Antrieb steht und noch leer ist. Sein Autopilot fährt seit der Zeit vor dem „Cut“ dieselbe Lieferroute und wurde noch nie angewiesen, anzuhalten.",
+      "opt": {
+        "loadIt": "Lade es und lass es laufen",
+        "boardIt": "Abbeizen und abschleifen",
+        "stopIt": "Gib den Stoppbefehl"
+      },
+      "out": {
+        "loadIt": "Es nimmt die Ladung entgegen, protokolliert sie und fährt weiter. Irgendwo entlang der Route wird jemand eine Lieferung erhalten.",
+        "boardIt": "Vierzig Jahre Wartung an einem Rumpf, den niemand benutzt hat. Jedes Teil lässt sich problemlos abnehmen.",
+        "stopIt": "Es erkennt, unterbricht den Schub und schaltet sich in weniger als einer Sekunde ab. Vierzig Jahre – und ein einziges Wort genügte."
+      }
+    },
+    "driftCourt": {
+      "text": "Drei Schiffe haben wegen eines Wracks ein Bergungsgericht einberufen – was hier draußen bedeutet, dass sie sich auf einem gemeinsamen Kanal gegenseitig anschreien, bis jemand nachgibt. Sie wollen, dass eine vierte Partei entscheidet.",
+      "opt": {
+        "ruleFair": "Drei Möglichkeiten, es zu regeln",
+        "ruleForSelf": "Gestalte es ganz nach deinem Geschmack",
+        "auditWreck": "Untersuche zuerst das Wrack"
+      },
+      "out": {
+        "ruleFair": "Niemand ist zufrieden, was alle drei als Zeichen einer gerechten Entscheidung anerkennen. Ihr Honorar wird in drei Raten gezahlt.",
+        "ruleForSelf": "Du übergibst das Wrack der einzigen anwesenden Gruppe, die bewaffnet ist, und behältst einen Teil des Erlöses als Finderlohn ein.",
+        "auditPass": "Das Wrack ist nicht das, was jeder von ihnen denkt, und deine Interpretation klärt die Debatte in vier Sätzen.",
+        "auditFail": "Deine Umfrage ist in einer Weise falsch, die alle drei erkennen können, und das Geschrei geht weiter – mit dir mittendrin."
+      }
+    },
+    "driftReputation": {
+      "text": "Ein Spediteur aus den „Drift-Feldern“ gleicht Ihren Vektor unaufgefordert ab. „Sie sind derjenige, der dort hinten das Richtige getan hat. Das geben wir weiter.“",
+      "opt": {
+        "takeEscort": "Lass sie mit dir fliegen",
+        "askCargo": "Fragen Sie, was sie bei sich haben",
+        "sendThemHome": "Schickt sie zurück"
+      },
+      "out": {
+        "takeEscort": "Sie decken deine Flanke auf dem gesamten Weg durch den Rift ab und ziehen sich dann zurück, ohne etwas dafür zu verlangen.",
+        "askCargo": "Meistens geht es um die Bergung. Man bekommt das Stück, um das sie sich gestritten haben.",
+        "askCargoEmpty": "Nichts. Die Kassen sind leer, und trotzdem bezahlen sie dich – aus einem Fonds, den niemand verwaltet.",
+        "sendThemHome": "„The Rift“ ist nichts für Frachtführer. Die fahren einfach los und hinterlassen dir beim Verlassen ihre Karten."
+      }
+    },
+    "driftWake": {
+      "text": "Jemand hat Ihre Registrierung auf dem „Drift Fields“-Band ausgestrahlt und dabei eine kurze Liste beigefügt. Die Liste ist korrekt.",
+      "opt": {
+        "jamIt": "Die Sendung stören",
+        "answerIt": "Antwort auf derselben Frequenz",
+        "findSender": "Absender ermitteln"
+      },
+      "out": {
+        "jamIt": "Die Band verstummt. Auch alles andere auf der Platte verstummt, was den Leuten auffällt.",
+        "answerIt": "Du liest die Liste Punkt für Punkt vor und widersprichst nichts davon. Die Band schweigt aus einem anderen Grund.",
+        "findPass": "Ein einzelnes Relais auf einem verlassenen Rumpf. Wer es auch immer installiert hat, ist längst verschwunden; die Aufzeichnung ist es nicht.",
+        "findFail": "Man jagt es in eine Senke und verliert dabei zwei Stunden und etwas Beschichtung. Die Übertragung geht weiter."
+      }
+    },
+    "quietPassage": {
+      "text": "Der Spalt ist hier so eng, dass der Schall früher ankommt als das, was ihn erzeugt hat. Der Klang des eigenen Motors erreicht einen von vorne.",
+      "opt": {
+        "followTheNote": "Halte dich an deine eigene Notiz",
+        "cutEngines": "Motoren abstellen und treiben lassen",
+        "soundIt": "Signal zum Zusammenklappen"
+      },
+      "out": {
+        "followTheNote": "Du fliegst auf den Klang deiner eigenen Stimme zu und landest drei Reihen weiter, als du eigentlich hättest sollen.",
+        "cutEngines": "Die Falte hat nichts, worauf sie anklangen könnte. Elf Minuten lang passiert überhaupt nichts, und der Rumpf nutzt diese Zeit aus.",
+        "soundPass": "Das Ergebnis ist einwandfrei und enthält etwas, das vor einem Augenblick noch nicht darin enthalten war.",
+        "soundFail": "Die Falte sendet deinen Ping vierzig Mal auf einmal aus allen Richtungen zurück."
+      }
+    },
+    "wardenRelay": {
+      "text": "Ein Wachposten erwacht, sobald du vorbeigehst, und liest dir einen Dienstplan vor. Jeder Name darauf ist dein eigener, zugewiesen an Posten, die es nicht mehr gibt.",
+      "opt": {
+        "acceptPost": "Einen Beitrag akzeptieren",
+        "wipeRoster": "Die Spielerliste löschen",
+        "copyRoster": "Kopiere es und mach weiter"
+      },
+      "out": {
+        "acceptPost": "Du meldest dich bei einem Posten an, der seit vierzig Jahren unbesetzt ist. Das Relais überträgt dir seine bestehende Befugnis, die nichts und alles zugleich ist.",
+        "wipeRoster": "Die Liste ist weg. Die Erinnerung an die Staffel ist intakt etwas wert und in Stücken noch mehr.",
+        "copyRoster": "Vierzig Jahre Dienst, Wachen und Ablösungen. Das sollte jemand haben, und jetzt hat es jemand."
+      }
+    },
+    "manifestBuyer": {
+      "text": "Der Käufer von der „Drift Fields“-Auktion hat dich gefunden, was beeindruckend ist, da du keine Überschrift angegeben hast.",
+      "opt": {
+        "dealAgain": "Sich noch einmal mit ihm auseinandersetzen",
+        "cutHim": "Lass ihn gehen",
+        "traceHim": "Finde heraus, wie er dich gefunden hat"
+      },
+      "out": {
+        "dealAgain": "Er zahlt zweimal über den üblichen Preis hinaus und fragt dann, wie es dir gefällt, auffindbar zu sein.",
+        "cutHim": "Du wechselst deinen Transponder direkt vor seinen Augen. Das ist unhöflich, aber wirkungsvoll, und er respektiert beide Seiten.",
+        "tracePass": "Ein Etikett an Ihrem Rumpf, das während der Auktion angeschweißt wurde. Sie ziehen es ab und behalten den Sender.",
+        "traceFail": "Du findest nichts, was schlimmer ist, als etwas zu finden, und er findet dich immer wieder."
+      }
+    },
+    "haulerReunion": {
+      "text": "Die Seilzugbetreiber haben im Rift eine dauerhafte Überquerung eingerichtet und sie nach der Überquerung benannt, an der du teilgenommen hast. Sie möchten, dass du das Band durchschneidest – was in diesem Fall die erste Fahrt bedeutet.",
+      "opt": {
+        "firstRun": "Mach den ersten Durchgang",
+        "refuseHonour": "Die Ehrung ablehnen",
+        "tollIt": "Fordern Sie einen Anteil an den Mauteinnahmen"
+      },
+      "out": {
+        "firstRun": "Du überquerst als Erster die Ziellinie, und die Reihenfolge bleibt unverändert. Elf Boote folgen dir noch, bevor die Stunde um ist.",
+        "firstRunRough": "Die Leitung hält. Ihr Rückenversicherer nicht. Sie erstatten die Differenz, ohne dass man sie darum bitten muss.",
+        "refuseHonour": "Sag ihnen, sie sollen stattdessen ihr ältestes Schiff schicken. Es überquert die Meerenge, und die Meerenge wird nach ihm benannt.",
+        "tollIt": "Sie stimmen zu, weil sie es nach dir benannt haben und jetzt nicht mehr Nein sagen können. Die Mautgebühren kommen pünktlich und fühlen sich genau so gut an."
+      }
+    },
+    "foldedArchive": {
+      "text": "Ein Archivschiff, das in sich selbst gefaltet ist, sodass jeder Gang in denselben Raum führt. Der Raum wurde neunmal katalogisiert, von neun verschiedenen Personen.",
+      "opt": {
+        "addTenth": "Einen zehnten Katalog hinzufügen",
+        "burnThem": "Verbrenne die Neun",
+        "readNinth": "Lies die neunte Hand"
+      },
+      "out": {
+        "addTenth": "Du schreibst deine eigene Liste mit deiner eigenen Handschrift. Die Falte nimmt sie an, und irgendetwas in der Arithmetik lockert sich.",
+        "burnThem": "Neun Kataloge, ein Brand, ein Raum, der endlich aufhört, darauf zu bestehen, beschrieben zu werden.",
+        "ninthPass": "Die neunte Hand ist neu. Wochen, nicht Jahrzehnte. Sie enthält einen Ausstieg, den die anderen acht nicht aufweisen.",
+        "ninthFail": "Du verlierst auf halbem Weg den Faden und nimmst die Lampe mit, wenn du gehst. Der zehnte Katalog wird nicht geschrieben werden."
+      }
+    },
+    "twinTransit": {
+      "text": "Zwei identische Raumschiffe fliegen im gleichen Kurs an dir vorbei, im Abstand von vier Sekunden. Beide rufen dich an. Beide nennen deinen Namen.",
+      "opt": {
+        "answerFirst": "Beantworte die erste Frage",
+        "answerSecond": "Beantworte die zweite Frage",
+        "answerNeither": "Beides nicht beantworten"
+      },
+      "out": {
+        "answerFirst": "Der erste ist dankbar und schenkt dir etwas. Der zweite bricht mitten im Satz ab.",
+        "answerSecond": "Der Zweite weiß Dinge über die nächsten vier Stunden, die noch nicht geschehen sind. Zwei davon teilt er mit.",
+        "answerNeither": "Du wartest elf Minuten lang schweigend ab. Nur ein Schiff taucht auf der anderen Seite der Falte auf, und es ist nicht auf deinem Radar zu sehen."
+      }
+    },
+    "riftSurgeon": {
+      "text": "Ein medizinischer Trakt, noch immer beleuchtet, noch immer steril, mit einem Operationssaal, in dem seit Jahrzehnten kein Patient mehr behandelt wurde. Er bietet dir einen Termin an.",
+      "opt": {
+        "takeIt": "Vereinbaren Sie einen Termin",
+        "stripBay": "Den Operationssaal ausräumen",
+        "bookOther": "Für jemand anderen buchen"
+      },
+      "out": {
+        "takeIt": "Was auch immer es am Rumpf macht, es macht es ordentlich, und es protokolliert den Vorgang unter einer Patientennummer aus der Zeit vor dem „Cut“.",
+        "takeItOff": "Es basiert auf einer Anleitung für eine Rumpfklasse, die es nicht mehr gibt. Der Großteil der Vorgehensweise gilt jedoch nach wie vor.",
+        "stripBay": "Sterile Feldemitter behalten ihren Wert. Die Beleuchtung des Rumpfes bleibt während der gesamten Arbeitszeit eingeschaltet.",
+        "bookOther": "Du gibst die Koordinaten und die Terminfenster auf einem offenen Kanal bekannt. Innerhalb einer Stunde haben sich drei Schiffe angemeldet."
+      }
+    },
+    "causalDebt": {
+      "text": "Ein „Fold“ bietet dir einen Handel ohne Gegenpartei: Nimm dir jetzt etwas, und der Rift wird dir zu einem Zeitpunkt seiner Wahl etwas zurücknehmen.",
+      "opt": {
+        "takeNow": "Nimm es jetzt",
+        "payFirst": "Zuerst bezahlen",
+        "declineIt": "Den Handel ablehnen"
+      },
+      "out": {
+        "takeNow": "Die Ware befindet sich bereits in Ihrem Lager, bevor Sie den Vertrag endgültig abgeschlossen haben. Die andere Hälfte des Geschäfts ist noch nicht abgewickelt.",
+        "payFirst": "Man öffnet eine Trennwand und lässt die Verkleidung vorne übernehmen. Die Bücher gehen auf und bleiben ausgeglichen.",
+        "declineIt": "Eine Ablehnung ist an sich schon eine Antwort, und die Faltmappe legt sie zu den Akten. Der Weg dorthin öffnet sich ohne Gebühr."
+      }
+    },
+    "unlitChapel": {
+      "text": "Eine Chorkapelle, in der das Licht ausgeschaltet ist, aber die Hymne trotzdem erklingt. Der Prediger ist nicht da; stattdessen ist eine Aufnahme von ihm zu hören, die Fragen beantwortet.",
+      "opt": {
+        "askIt": "Stelle der Aufnahme eine Frage",
+        "silenceIt": "Die Hymne abbrechen",
+        "copyIt": "Kopiere das Kirchenlied"
+      },
+      "out": {
+        "askIt": "Es beantwortet eine Frage, die du nicht gestellt hast – und zwar richtig –, und beantwortet dann die Frage, die du gestellt hast.",
+        "silenceIt": "Mitten in einem Satz wird es still in der Kapelle. Niemand erhebt Einwände, was irgendwie das Schlimmste daran ist.",
+        "copyIt": "Du nimmst eine saubere Aufnahme auf. Sie ist kürzer, als es sich angehört hat, und sie läuft nicht an der Stelle in einer Schleife, an der du es erwartet hast."
+      }
+    },
+    "riftPilotage": {
+      "text": "Eine halb verbrannte Tafel der Pilotenvereinigung, auf der immer noch die Tarife für Flugstrecken aufgeführt sind, die sich jedes Jahr anders gestalten. Jemand hat sie von Hand auf dem neuesten Stand gehalten.",
+      "opt": {
+        "hirePilot": "Einen Piloten engagieren",
+        "readBoard": "Lies einfach das Forum",
+        "takeBoard": "Nimm das Brett"
+      },
+      "out": {
+        "hirePilot": "Sie ist diese Strecke bereits elfhundert Mal geflogen und stürzt sich darauf, als wäre es das erste Mal.",
+        "readBoard": "Die Preise sagen mehr über die Fahrspuren aus als die Tabellen. Die teuren sind nicht ohne Grund teuer.",
+        "takeBoard": "Es lässt sich in einem Stück von der Trennwand abnehmen. Wer auch immer es aktualisieren sollte, wird bei seiner Ankunft feststellen, dass es nichts zu aktualisieren gibt."
+      }
+    },
+    "echoOfTheCut": {
+      "text": "Elf Sekunden lang zeigen alle Ihre Messgeräte denselben Wert an, und dieser Wert ist vierzig Jahre alt.",
+      "opt": {
+        "recordIt": "Nimm es auf",
+        "rideIt": "Tauche ein in die Welt des Lesens",
+        "shutItOut": "Schalten Sie alle Geräte aus"
+      },
+      "out": {
+        "recordIt": "Elf Sekunden des Schnitts, von außen betrachtet. Echo hört sich das viermal an und sagt nichts.",
+        "ridePass": "Du passt dich dem alten Messwert an und behältst ihn bei. Für einen Moment behandelt dich der Rift als etwas, das er bereits berücksichtigt hat.",
+        "rideFail": "Das lässt sich nicht aufrechterhalten. Was auch immer der Riss ursprünglich erklären sollte, stattdessen erklärt er nun die Beschichtung.",
+        "shutItOut": "Elf Sekunden lang absolut nichts – ganz bewusst so gewählt. Der Rumpf kommt stabiler wieder heraus, als er hineingegangen ist."
+      }
+    },
+    "processionEscort": {
+      "text": "Die Transporter, die dir aus den „Drift-Feldern“ gefolgt sind, haben dich eingeholt und die gesamte Überquerungsmannschaft an einen Ort mitgebracht, an dem keiner von ihnen sein sollte.",
+      "opt": {
+        "sendBack": "Bestell sie zurück",
+        "useThem": "Setzt sie ein",
+        "armThem": "Rüstet sie aus und haltet die Spur"
+      },
+      "out": {
+        "sendBack": "Sie streiten sich vier Minuten lang und gehen dann. Beim Weggehen lässt jemand eine Ersatzpumpe auf deinem Steg zurück.",
+        "useThem": "Elf Teams, die ein „Procession“-Wrack zerlegen, arbeiten schneller als jede Werft. Jeder wird bezahlt.",
+        "useThemCost": "Es läuft gut, bis es plötzlich nicht mehr läuft. Zwei Schiffe kehren nicht zurück, und alle arbeiten trotzdem weiter.",
+        "armThem": "Du gibst dein eigenes Schrottguthaben für ihre Geschütztürme aus. Die Spur hinter dir bleibt für den Rest des Sektors offen."
+      }
+    },
+    "brokerInTheChoir": {
+      "text": "Der Käufer hat die Bestellungen entgegengenommen. Er trägt jetzt „Choir Grey“ und hat deine Geschenkeliste immer noch auf dem Handrücken notiert.",
+      "opt": {
+        "dealAnyway": "Kümmere dich trotzdem um ihn",
+        "buyBackName": "Kaufen Sie Ihre Registrierung zurück",
+        "readOrders": "Lies seine Anweisungen"
+      },
+      "out": {
+        "dealAnyway": "Das Sortiment des Chors ist besser als das von Rim, und die Preise sind seltsamer. Er feilscht nicht mehr.",
+        "buyBackName": "Er wäscht sich vor deinen Augen die Hände, ganz langsam, und wirkt dabei sichtlich erleichtert.",
+        "ordersPass": "In den Aufträgen werden drei Schiffe und eine Kursangabe genannt. Eines der Schiffe gehört dir; die Kursangabe ist hilfreich.",
+        "ordersFail": "Man ist schon halb durch, bevor er es bemerkt, und der Rest der Seite ist nun eine Frage der Lehre."
+      }
+    },
+    "postingOrders": {
+      "text": "Ein Kontrollpunkt der Wächter in der Prozession, der zwar unbesetzt ist, aber dennoch jedem, der ordnungsgemäß danach fragt, Durchreisepapiere ausstellt.",
+      "opt": {
+        "useAuthority": "Als leitender Angestellter fragen",
+        "forgeThem": "Die Papiere fälschen",
+        "openIt": "Für alle zugänglich machen"
+      },
+      "out": {
+        "useAuthority": "Der Kontrollpunkt erkennt den Posten, unter dem Sie angemeldet sind, und stempelt alles ab, was Sie ihm vorlegen.",
+        "forgeThem": "Leere Vordrucke, Stempel, niemand, der das überprüft. Man druckt mehr, als man braucht, und verkauft den Rest.",
+        "forgeThemFlag": "Der Stempel protokolliert jeden Abdruck. Irgendwo beginnt ein sehr altes System, Ihre Registrierung zu markieren.",
+        "openIt": "Sie haben die richtige Formulierung auf einem offenen Kanal gesendet. Jeder in der Prozession kann nun Unterlagen erhalten."
+      }
+    },
+    "reliquaryLedger": {
+      "text": "Der Chor führt ein Verzeichnis über alles, was er bereits genommen hat und was er noch nehmen will. Dein Name steht in der zweiten Hälfte.",
+      "opt": {
+        "strikeName": "Streiche deinen Namen durch",
+        "readForward": "Weiterlesen",
+        "copyLedger": "Kopiere es und lass es so, wie es ist"
+      },
+      "out": {
+        "strikeName": "Eine Zeile, ein Strich – und schon gibt es ein Problem der Rechtsauslegung, dessen Lösung jemandem obliegen wird.",
+        "readForward": "Die Absichten sind konkret, datiert und meist pünktlich. Es ist das genaueste Horoskop, das Sie je in den Händen gehalten haben.",
+        "copyLedger": "Man macht sich eine Kopie und legt das Original wieder genau so zurück, wie es war – was länger dauert, als es zu stehlen."
+      }
+    },
+    "fieldHospital": {
+      "text": "Die Terminliste des Chirurgen-Rumpfs ist vor dir bei der Prozession eingetroffen. Vierzig Rümpfe stehen in der Warteschlange an einer Station, die sie nicht behandeln kann.",
+      "opt": {
+        "triage": "Führen Sie die Triage selbst durch",
+        "sellPlaces": "Plätze in der Warteschlange verkaufen",
+        "fetchSurgeon": "Geh und hol den Chirurgen-Rumpf."
+      },
+      "out": {
+        "triage": "Man verbringt einen Tag damit, vierzig Rümpfe in drei Reihen zu sortieren. Niemand bedankt sich, und die Schlange rückt vor.",
+        "sellPlaces": "Wer den Anfang macht, muss einen Preis zahlen – und vierzig Schiffe sind bereit, darüber zu verhandeln.",
+        "fetchSurgeon": "Es kommt, wenn es gerufen wird. Es hat schon sehr lange darauf gewartet, gerufen zu werden."
+      }
+    },
+    "debtCollector": {
+      "text": "Die Hälfte deiner Handelsware von „The Rift“ ist eingetroffen – in Form eines „Procession“-Rumpfs und mit einer detaillierten Liste im Gepäck.",
+      "opt": {
+        "payIt": "Die Liste bezahlen",
+        "disputeIt": "Die Liste beanstanden",
+        "outrunIt": "Dem Eintreiber entkommen"
+      },
+      "out": {
+        "payIt": "Man braucht eine Beschichtung, Zeit und ein Instrument, das einem gefällt. Die Bücher schließen sich und bleiben geschlossen.",
+        "disputeIt": "Zwei der Gegenstände haben dir nie gehört. Es räumt beides sofort ein und wirkt dabei verlegen.",
+        "disputeItLose": "Die Liste ist in jeder Zeile korrekt, und wenn man sie anzweifelt, kommt eine Zeile hinzu.",
+        "outrunIt": "Man kann ihr entkommen. Man kann der Mathematik zwar nicht entkommen, aber man kann etwas Abstand zwischen sich und die Mathematik bringen."
+      }
+    },
+    "twinInTheProcession": {
+      "text": "Eines der Schiffe der „Procession“ überträgt den Klang Ihres Motors. Nach Aussage aller an Bord befindlichen Personen ist es schon seit Jahren Teil der Flotte.",
+      "opt": {
+        "boardIt": "Steig ein",
+        "hailIt": "Lasst es im Freien niedergehen",
+        "letItRide": "Lass es fliegen"
+      },
+      "out": {
+        "boardIt": "Die Gestaltung liegt ganz bei Ihnen, bis hin zur Verlegung der Kabel. Das Protokoll hingegen nicht – und genau das ist der interessante Teil.",
+        "boardItEmpty": "Es ist niemand an Bord, und das war auch nie der Fall. Das Motorengeräusch ist noch zu hören, nachdem man weggefahren ist.",
+        "hailIt": "Du stellst die Frage im eigenen Kanal der Prozession. Vierhundert Schiffe hören die Antwort, und die Antwort ist deine Stimme.",
+        "letItRide": "Was auch immer es ist, es nimmt einen Platz in einer Reihe ein, in der Plätze freigehalten werden müssen."
+      }
+    },
+    "hymnSchool": {
+      "text": "Der Chor bringt den Kindern das Kirchenlied bei. Der Prediger bemerkt, dass du ihn beobachtest, und wendet seinen Blick nicht ab.",
+      "opt": {
+        "sayNothing": "Sag nichts",
+        "takeThem": "Geh mit den Kindern nach draußen",
+        "arguePoint": "Die Lehre begründen"
+      },
+      "out": {
+        "sayNothing": "Er interpretiert dein Schweigen als Zustimmung und nennt dir den Lehrvers, der nicht der Vers ist, den du bisher gehört hast.",
+        "takeThem": "Neun von ihnen kommen. Zwei kommen nicht, und die beiden, die bleiben, sind der Grund, warum der Chor sich an deinen Namen erinnern wird.",
+        "arguePass": "Du findest den Widerspruch im Lehrvers und sprichst ihn laut vor der Klasse aus.",
+        "argueFail": "Er lässt dich ausreden, antwortet dann mit vier Worten, und eines der Kinder schreibt sie auf."
+      }
+    },
+    "processionCensus": {
+      "text": "Jemand zählt die Schiffe der Flotte, ein Schiff nach dem anderen, und das schon seit elf Jahren. Es fehlen vierhundert, und man will nicht sagen, welche.",
+      "opt": {
+        "helpCount": "Hilfe beim Zählen",
+        "buyCount": "Die Zählung kaufen",
+        "tellTruth": "Sag ihnen, wohin die vierhundert verschwunden sind"
+      },
+      "out": {
+        "helpCount": "Zwei Tage Auszählung. Der Abstand verringert sich auf dreihundertneunzig, und der Zähler weint darüber.",
+        "buyCount": "Elf Jahre voller Überschriften, Verzeichnisse und Daten. Mehr wert als der Rumpf, der es beförderte.",
+        "tellTruth": "Du hast genug vom Rift gesehen, um es zu erraten, und deine Vermutung ist nah genug dran, um elf Jahre des Zählens zu beenden."
+      }
+    },
+    "acolyteFerry": {
+      "text": "Ein Akolyth befördert Pilger in einem Schiff, das die Hin- und Rückfahrt nicht überstehen wird, durch eine tote Zone – und er weiß das.",
+      "opt": {
+        "takeThemOver": "Bringen Sie sie selbst mit der Fähre hin",
+        "buyHull": "Kauf ihm den Rumpf ab",
+        "letItGo": "Er soll die Überfahrt wagen"
+      },
+      "out": {
+        "takeThemOver": "Zwei Überfahrten, vierzig Pilger, ein Schiff, das hält. Sie hinterlassen dir etwas aus dem Reliquienschrein, den sie mit sich führten.",
+        "buyHull": "Er nimmt den Schrott und führt die Pilger auf dem Umweg, der einen Monat dauert und niemanden etwas kostet.",
+        "letItGo": "Er schafft es. Der Rumpf schafft es nicht zurück, und die Rechnung geht für ihn auf.",
+        "letItGoBad": "Er schafft es nicht. Man rettet, was zurückkommt, denn irgendjemand hätte es ja sowieso getan."
+      }
+    },
+    "wardenTribunal": {
+      "text": "Drei Warden-Rümpfe haben ein Tribunal wegen eines Mordes in Lane vor dreißig Jahren einberufen. Sie streiten sich immer noch über die Zuständigkeit.",
+      "opt": {
+        "giveJurisdiction": "Übertragen Sie ihnen die Zuständigkeit",
+        "dissolveIt": "Das Schiedsgericht auflösen",
+        "standWitness": "Zeuge sein"
+      },
+      "out": {
+        "giveJurisdiction": "Sie sprechen die Worte aus, die ein Gericht zu einem Gericht machen. Sie fällen das Urteil in neun Minuten und vertagen die Verhandlung für dreißig Jahre Papierkram.",
+        "dissolveIt": "Du weist darauf hin, dass keiner von ihnen Autorität besitzt und dass alle drei das wissen. Sie legen an und verkaufen dir ihre Beweise.",
+        "standWitness": "Du hast den Unfall nicht miterlebt. Du hast das Wrack gesehen, das dreißig Jahre näher liegt, als es irgendjemand sonst je war."
+      }
+    },
+    "haulersAtTheCore": {
+      "text": "Die Lastwagen sind da. Nicht in der Nähe des Kerns – sondern direkt davor; sie bilden eine Absperrkette am Zugang, damit dir niemand hinterherkommt.",
+      "opt": {
+        "thankThem": "Bedanke dich bei ihnen und geh hinein",
+        "sendThemOff": "Sie aus der Reihe weisen",
+        "armThemAgain": "Gib ihnen alles, was du entbehren kannst"
+      },
+      "out": {
+        "thankThem": "Sie werden so lange durchhalten, wie sie können. Alle Beteiligten wissen, was das bedeutet.",
+        "sendThemOff": "Vier Minuten lang muss man schreien. Elf Boote kehren nach Hause zurück, und man fährt den Rest der Strecke ganz allein, ohne dass jemand hinter einem ist.",
+        "armThemAgain": "Man legt seine eigenen Haken in deren Halterungen ein. Die Schlange ist viel länger, als irgendjemand erwartet hatte."
+      }
+    },
+    "ledgerAtTheThreshold": {
+      "text": "Das Hauptbuch des Chors liegt hier offen vor, und neben dem heutigen Datum steht nur ein einziges Wort: „deins“.",
+      "opt": {
+        "signIt": "Unterzeichnen Sie unter dieser Absichtserklärung",
+        "tearPage": "Reiß die Seite heraus",
+        "writeSomeoneElse": "Einen anderen Namen eingeben"
+      },
+      "out": {
+        "signIt": "Sie schreiben Ihren eigenen Namen unter die Kopie des Chors. Ab hier stimmen beide Fassungen überein.",
+        "tearPage": "Die Seite sieht nun ordentlich aus. Der Chor braucht die Seite nicht; er wollte nur, dass du sie drin lässt.",
+        "writeSomeoneElse": "Nichts hält dich davon ab. Gar nichts. Der Chor akzeptiert die Auswechslung ohne Kommentar.",
+        "writeSomeoneElseSeen": "Der Name, den Sie dort eintragen, steht bereits drei Zeilen weiter oben, in derselben Handschrift wie Ihre."
+      }
+    },
+    "lastCheckpoint": {
+      "text": "Der letzte Warden-Posten vor dem Core, und er ist besetzt. Ein Beamter, der seit einundvierzig Jahren dort stationiert ist, verlangt die Ausweise.",
+      "opt": {
+        "showPapers": "Zeigen Sie Ihre Ausweise vor",
+        "relieveHim": "Ihn vom Dienst entbinden",
+        "runPost": "Den Beitrag veröffentlichen"
+      },
+      "out": {
+        "showPapers": "Er liest jede Zeile durch. Dann stempelt er sie ab, salutiert und übergibt dir die Einträge der letzten einundvierzig Jahre aus seinem Logbuch.",
+        "relieveHim": "Du bringst es auf den Punkt. Er blinzelt zweimal, sagt „Wurde auch Zeit“ und übergibt den gesamten Beitrag, bevor er überhaupt darüber nachdenken kann.",
+        "runPost": "Er schießt nicht. Er hält es fest – was nach einundvierzig Jahren das Einzige ist, was ihm noch bleibt, um überhaupt etwas zu tun."
+      }
+    },
+    "hospitalConvoy": {
+      "text": "Die Warteschlange aus der Prozession folgte dem Chirurgen-Rumpf den ganzen Weg bis hierher. Vierzig Patienten, ein Operationssaal und ein Core, der diese Frage bald überflüssig machen wird.",
+      "opt": {
+        "buyTime": "Ihnen Zeit verschaffen",
+        "moveThem": "Die Warteschlange nach draußen verlegen",
+        "takeTheatre": "Erlebe das Theater ganz für dich allein"
+      },
+      "out": {
+        "buyTime": "Du stehst zwischen vierzig Schiffen und dem, was auch immer aus dem Kern kommt – solange die Panzerung hält.",
+        "moveThem": "Zwei Tage lang musste man vierzig beschädigte Schiffsrümpfe rückwärts eine Gasse hinaufschleppen. Man wird mit Ersatzteilen bezahlt – das ist alles, was sie haben.",
+        "takeTheatre": "Ein Patient, ein Operationssaal, eine sehr kurze Warteschlange. Die vierzig stehen noch draußen, wenn du abhebst."
+      }
+    },
+    "riftAudit": {
+      "text": "Jede Falte zwischen dir und dem Kern führt in denselben Raum, und in diesem Raum befindet sich dein Konto, auf die Sekunde genau aufgeschlüsselt.",
+      "opt": {
+        "acceptAudit": "Die Prüfung akzeptieren",
+        "contestIt": "Den Kontoauszug anfechten",
+        "burnBooks": "Zündet den Raum an"
+      },
+      "out": {
+        "acceptAudit": "Du unterschreibst jede Seite, ohne sie zu lesen, weil du bereits weißt, was darauf steht. Die Falten wiederholen sich nicht mehr.",
+        "contestPass": "Du hast den doppelten Eintrag entdeckt. Seit Sektor Drei hat dir „The Rift“ dieselbe Sekunde zweimal in Rechnung gestellt.",
+        "contestFail": "Jede Zeile stimmt. Die Anfechtung einer korrekten Abrechnung kostet genau den Betrag, der in der Abrechnung angegeben war.",
+        "burnBooks": "Der Raum brennt. Die Falten öffnen sich immer wieder zu ihm hin, brennen, immer und immer wieder, bis hin zum Kern."
+      }
+    },
+    "doubleAtTheDoor": {
+      "text": "Dein Doppelgänger befindet sich an der Schwelle zum Core, hält dort Stellung und hat schon so lange gewartet, dass er sich einen Namen auf den Rumpf gemalt hat. Der Name ist nicht deiner.",
+      "opt": {
+        "letItGoFirst": "Lass es erst einmal sein",
+        "takeItsName": "Nimm seinen Namen",
+        "goTogether": "Gemeinsam hineingehen"
+      },
+      "out": {
+        "letItGoFirst": "Es geht rein. Was auch immer der Kern fragt, er fragt zuerst genau das, und die Antwort kommt zu dir zurück.",
+        "takeItsName": "Man malt es selbst auf den Rumpf. Es passt. Es hat schon immer gepasst, und genau das ist das Problem.",
+        "goTogether": "Zwei Rümpfe, eine Schwelle, ein Motorengeräusch. Der Core muss entscheiden, wen von euch er erwartet hat."
+      }
+    },
+    "hymnAtTheEdge": {
+      "text": "Die Kinder singen es hier, am Rand, in einem Rumpf ohne Motoren. Jemand hat sie alle hierher gebracht, damit sie ganz nah dran sind.",
+      "opt": {
+        "takeThemHome": "Nimm sie heraus",
+        "singWithThem": "Singt mit ihnen mit",
+        "giveThemEngines": "Gebt ihnen Motoren"
+      },
+      "out": {
+        "takeThemHome": "Neun davon passen hinein, wenn man die Aussparung halbiert. Man halbiert die Aussparung.",
+        "singWithThem": "Der Rumpf ohne Motoren weist eine bessere Akustik auf als alles, was der Chor eigens dafür gebaut hat.",
+        "giveThemEngines": "Du kaufst sie und schickst sie aus deinem eigenen Lager hinaus. Ob sie damit weggehen, geht dich nichts an."
+      }
+    },
+    "finalCount": {
+      "text": "Der Zähler steht hier, ganz am Rand, und die Zählung ist endlich abgeschlossen. Vierhundertelf Namen, alle an einem Ort, alle erfasst.",
+      "opt": {
+        "readThemOut": "Lies die Namen vor",
+        "keepList": "Die Liste aufbewahren",
+        "burnList": "Verbrenne die Liste"
+      },
+      "out": {
+        "readThemOut": "Vierhundertelf Namen auf einem offenen Kanal, einer nach dem anderen, an wer auch immer zuhört.",
+        "keepList": "Jemand muss das in die Tat umsetzen, und der Zähler geht nicht weiter als bis hierhin.",
+        "burnList": "Elf Jahre Arbeit – in neun Sekunden zunichte gemacht. Der Zähler schaut zu und hält dich nicht auf – das ist schon eine Antwort für sich."
+      }
+    },
+    "approachSilence": {
+      "text": "Sechs Stunden vom Kern entfernt verstummt das Rauschen. Nicht das Signal – das Rauschen. Alle deine Frequenzbänder klingen plötzlich klar und rein.",
+      "opt": {
+        "broadcast": "Darin ausstrahlen",
+        "listenOnly": "Nur zuhören",
+        "shutDown": "Schaltet die Empfänger aus"
+      },
+      "out": {
+        "broadcast": "Deine Stimme verhallt und kehrt nicht zurück, und etwas passt sich an, um Platz für sie zu schaffen.",
+        "listenOnly": "Sechs Stunden reine Stille, vollständig aufgenommen. „Echo“ fordert dich auf, die Aufnahme zweimal abzuspielen.",
+        "shutDown": "Man schneidet alle Antennen ab und fliegt die letzten sechs Stunden blind und geräuschlos – das ist die einzige Ruhepause, die man bekommt."
+      }
+    },
+    "lastYard": {
+      "text": "Im Schatten des Core hat sich ein Hof angesiedelt, der von Menschen betrieben wird, die hierhergekommen sind, um zu arbeiten, und keinen Grund fanden, wieder wegzugehen.",
+      "opt": {
+        "refitHere": "Hier umrüsten",
+        "warnThem": "Sag ihnen, sie sollen gehen",
+        "hireCrew": "Stell bei denen eine Crew ein"
+      },
+      "out": {
+        "refitHere": "Sie arbeiten schnell und gut, und niemand fragt, was man dort drinnen vorhat.",
+        "warnThem": "Vier von ihnen gehen. Der Rest bleibt, und einer von ihnen repariert deine Motoren aus Boshaftigkeit kostenlos.",
+        "hireCrew": "Drei von ihnen melden sich an, und sie kennen sich mit deinen eigenen Systemen besser aus als du selbst.",
+        "hireCrewNone": "Niemand meldet sich an. Stattdessen geben sie dein Altmetall für deinen Rumpf aus und sagen dir, du sollst später wiederkommen, um es abzuholen."
+      }
+    },
+    "thresholdMarket": {
+      "text": "Direkt an der Schwelle betreibt jemand einen Stand. Nicht Mara – aber die Preise stammen von ihr, ebenso wie die Handschrift auf der Tafel.",
+      "opt": {
+        "buyEverything": "Den gesamten Stand kaufen",
+        "askWhose": "Frag, wessen Handschrift das ist",
+        "leaveStock": "Hinterlassen Sie Ihren eigenen Beitrag"
+      },
+      "out": {
+        "buyEverything": "Das ist kein richtiger Verkaufsstand. Was dort ausgestellt ist, ist der letzte Lagerbestand, den hier noch jemand abholen wird.",
+        "askWhose": "„Sie hat die Preise schon vorab geschickt“, sagen sie. „Sie meinte, jemand würde den weiten Weg auf sich nehmen und bräuchte faire Preise.“",
+        "leaveStock": "Man trägt das, was man entbehren kann, in die Liste ein und gibt den Selbstkostenpreis in derselben Handschrift an."
+      }
+    },
+    "derelictLibrary": {
+      "text": "Ein Raum, der vom Boden bis zur Decke mit Papier vollgestopft ist. Jemand hat sein ganzes Arbeitsleben damit verbracht, alles auszudrucken, was er zu verlieren fürchtete.",
+      "opt": {
+        "readSome": "Lies ein bisschen davon",
+        "takeItAll": "Nimm alles mit",
+        "indexIt": "Für den Nächsten eintragen"
+      },
+      "out": {
+        "readSome": "Hauptsächlich Diagramme. Diagramme und ein langer Brief, der an niemanden adressiert ist.",
+        "readSomeGold": "Zwischen zwei Kartons mit Frachtbriefen befindet sich eine Skizze, die eigentlich nie gedruckt werden sollte.",
+        "takeItAll": "Papier brennt und Papier verkauft sich. Man entscheidet sich für Letzteres und füllt den Laderaum.",
+        "indexIt": "Vier Stunden lang die Ängste anderer alphabetisch sortieren. Das gibt den Händen Halt."
+      }
+    },
+    "theOtherSalvager": {
+      "text": "Ein weiterer Bergungsfachmann arbeitet von der anderen Seite aus an demselben Wrack. Keiner von euch hat den anderen kommen sehen.",
+      "opt": {
+        "splitIt": "Vorschlag, die Kosten zu teilen",
+        "raceThem": "Tritt gegen sie an, um es zu gewinnen",
+        "giveWay": "Gebt ihnen das Wrack"
+      },
+      "out": {
+        "splitIt": "Jede Hälfte für euch, und ihr seid beide noch vor der Flut wieder draußen. Es läuft besser, als ihr beide erwartet hattet.",
+        "splitItBetter": "Sie kennen die Rumpfklasse, und du kennst die Verkabelung. Gemeinsam kommt ihr auf etwas, das keiner von euch allein gefunden hätte.",
+        "raceThem": "Du bist schneller. Sie schneiden noch immer, als du ablegst, und sagen kein Wort.",
+        "raceThemLose": "Sie sind schneller. Wenn du dir mit einem Brenner eine Brandwunde am Arm zufügst, beweist das das Gegenteil.",
+        "giveWay": "Du koppelst ab und lässt den Durchgang für sie offen. Sie tragen dich in ihr Register als einen der Guten ein."
+      }
+    },
+    "frozenBroadcast": {
+      "text": "Ein Notruf, vierzig Jahre alt, der sich immer noch in einer Endlosschleife wiederholt und alle überdauert hat, für die er ursprünglich bestimmt war.",
+      "opt": {
+        "answerIt": "Geh ran",
+        "triangulate": "Die Quelle triangulieren",
+        "killLoop": "Die Schleife unterbrechen"
+      },
+      "out": {
+        "answerIt": "Niemand antwortet. Die Schleife bricht trotzdem ab, was vermutlich auch der Sinn der Sache war.",
+        "answerItLive": "Jemand gibt eine Antwort. Zwei Wörter, stark verzerrt, und dann nichts mehr für den Rest des Abschnitts.",
+        "triangulate": "Die Quelle ist ein Schiffsrumpf, der sich nicht an der im Anruf angegebenen Stelle befindet und sich schon seit langer Zeit nicht mehr dort befunden hat.",
+        "killLoop": "Der Sender ist etwas wert, und das Frequenzband ist noch mehr wert. Beides gehört dir in elf Minuten."
+      }
+    },
+    "debtorsHull": {
+      "text": "Ein Schiff, auf dem drei Pfandrechte lasten, und ein sehr erschöpfter Eigner, der gehört hat, dass Sie die Schulden begleichen.",
+      "opt": {
+        "clearOne": "Ein Pfandrecht aufheben",
+        "buyTheHull": "Den Rumpf direkt kaufen",
+        "buyTheDebt": "Kaufen Sie stattdessen die Schuld"
+      },
+      "out": {
+        "clearOne": "Einer ist geschafft, zwei stehen noch aus – und ein Besitzer, der nun genau weiß, wohin du gehst.",
+        "buyTheHull": "Drei Pfandrechte, eine Unterschrift, ein Rumpf, den du auseinandernehmen wirst, um an das eine Teil zu kommen, das du eigentlich haben wolltest.",
+        "buyTheDebt": "Jetzt gehören die Pfandrechte dir. Der Eigentümer arbeitet für dich, bis er es nicht mehr tut – das ist eine andere Art von Freundlichkeit."
+      }
+    },
+    "noSignalDrift": {
+      "text": "Ein Bereich innerhalb der Fahrspur, in dem sich nichts ausbreitet. Sensoren, Kommunikationssignale und sogar die Geräusche des eigenen Rumpfes hören an der Grenze auf.",
+      "opt": {
+        "feelThrough": "Taste dich vor",
+        "goAround": "Umgehen",
+        "mapIt": "Die Grenze einzeichnen"
+      },
+      "out": {
+        "feelPass": "Navigation nach Schätzung, alte Zahlen, ruhige Hände. Man kommt genau dort an, wo man hinwollte.",
+        "feelFail": "Man kommt woanders heraus, und etwas aus der Tasche kommt mit heraus, bevor sie loslässt.",
+        "goAround": "Der Umweg kostet dich Zeit, die du nicht hast, und du bekommst überhaupt keine Beschichtung.",
+        "mapIt": "Eine „Dead Zone“ mit bekanntem Rand ist mehr wert als eine Fahrspur, und jeder Spediteur in der Branche wird diesen Rand kaufen."
+      }
+    },
+    "crewPetition": {
+      "text": "Vier Personen, denen du zu verschiedenen Zeitpunkten geholfen hast, haben sich zusammengetan und etwas verfasst. Technisch gesehen handelt es sich dabei um eine Petition.",
+      "opt": {
+        "readIt": "Lies die Petition",
+        "takeThem": "Nehmt sie an Bord",
+        "sendThemOn": "Schickt sie an einen sichereren Ort"
+      },
+      "out": {
+        "readIt": "Sie wollen mit dir kommen. Alle vier. In dem Dokument werden auf zwei Seiten die Gründe dafür aufgeführt.",
+        "takeThem": "Vier weitere Leute, vier weitere Paar Hände, vier weitere Möglichkeiten, wie das böse enden kann. Zwei von ihnen können schweißen.",
+        "sendThemOn": "Man kauft ihnen eine Rückfahrkarte, und sie streiten sich die ganze Zeit, die die Organisation in Anspruch nimmt."
+      }
+    },
+    "beaconWake": {
+      "text": "Ein Beacon, das Sie bereits aufgelöst haben, sendet erneut und überträgt dabei neben allem anderen auch Ihre Registrierung.",
+      "opt": {
+        "letItSing": "Lass es übertragen",
+        "scrubName": "Bereinige deine Registrierungsdatenbank",
+        "boostIt": "Den Sender verstärken"
+      },
+      "out": {
+        "letItSing": "Jedes Raumschiff in diesem Sektor weiß nun, wo die Route sicher ist und wer dafür gesorgt hat.",
+        "scrubName": "Das Leuchtfeuer funktioniert weiterhin. Es gibt nur nicht mehr an, wer es repariert hat – und genau so hast du es lieber.",
+        "boostIt": "Du verwendest deine eigenen Bauteile, um das Signal eines anderen zu verstärken. Das Netzwerk des Wächters bemerkt das innerhalb einer Stunde."
+      }
+    },
+    "interferenceBloom": {
+      "text": "Die Flut setzt hier früh ein und fließt durch ein Wrackfeld, wodurch das gesamte Gebiet wie ein einziger riesiger, instabiler Würfel wirkt.",
+      "opt": {
+        "rideSmall": "Probier’s mal mit kleinen Würfeln aus",
+        "waitItOut": "Abwarten",
+        "pushThrough": "Einfach geradeaus weiterfahren"
+      },
+      "out": {
+        "rideSmallPass": "Nichts spitzt sich zu. Man setzt bei den ruhigsten Zahlen, die man hat, und die Flut ebbt hinter einem ab.",
+        "rideSmallFail": "Eine Nummer wird laut ausgerufen, und das gesamte Feld antwortet darauf.",
+        "waitItOut": "Sechs Stunden, in denen nichts passiert ist, verbrauchter Kraftstoff und Reparaturen, die man immer wieder aufgeschoben hatte.",
+        "pushThrough": "Man rast über das Feld und kommt auf der anderen Seite mit einer Ladung voller fremder Güter wieder heraus.",
+        "pushThroughBad": "Du stürmst mit voller Geschwindigkeit ins Feld, und das Feld revanchiert sich dafür mit einem Schlag gegen deine Flanke."
+      }
+    },
+    "lastLetter": {
+      "text": "Eine Nachrichtenkapsel, die vor vierzig Jahren auf einem Kurs gestartet wurde, der sie aus diesem Sektor hinausgeführt hätte. Etwas hat sie umgelenkt.",
+      "opt": {
+        "readLetter": "Lies es",
+        "relaunchIt": "Starte es neu",
+        "keepCapsule": "Bewahren Sie die Kapsel auf"
+      },
+      "out": {
+        "readLetter": "Es ist an jemanden gerichtet, der sich an Bord der Flotte befand. Darin steht zweimal, in zwei unterschiedlichen Handschriften: „Komm nicht zurück“.",
+        "relaunchIt": "Man gibt Gas und nimmt Kurs auf den Ausgang des Sektors. Vierzig Jahre zu spät und immer noch im Gange.",
+        "keepCapsule": "Vierzig Jahre alte Startausrüstung, nie zweimal benutzt, in einwandfreiem Zustand. Das wird einen guten Preis einbringen."
+      }
+    },
+    "scavengerWake": {
+      "text": "Eine Beerdigung – wenn man den Begriff großzügig auslegt. Neun Aasfresser, ein Schiffsrumpf und eine Leiche, über deren Namen sie sich nicht einigen können.",
+      "opt": {
+        "nameThem": "Gib dem Körper einen Namen",
+        "joinWake": "Bleibt zur Totenwache",
+        "takeTheHull": "Kauf ihnen den Rumpf ab"
+      },
+      "out": {
+        "nameThem": "Du nimmst eine Registrierungsnummer von der Rumpfplatte ab und liest sie vor. Neun Personen nehmen sie sofort und dankbar entgegen.",
+        "joinWake": "Sechs Stunden voller Geschichten anderer Leute. Eine davon entpuppt sich als Diagramm.",
+        "joinWakeGift": "Sie geben dir die Werkzeuge des Verstorbenen mit, weil niemand sonst sie haben will.",
+        "takeTheHull": "Sie nehmen das Angebot an. Es war von vornherein klar, dass sie das Angebot annehmen würden. Niemand ist mit dem Geschäft zufrieden."
+      }
+    },
+    "rimNoticeboard": {
+      "text": "Ein physisches Schwarzes Brett, das an einem Anlegesteg festgeschraubt ist, mit vierzig Jahren Papier darauf, wobei die oberste Schicht aus dieser Woche stammt. Das meiste davon sind Suchanzeigen von Menschen, die andere Menschen suchen.",
+      "opt": {
+        "readIt": "Die oberste Ebene lesen",
+        "postYours": "Veröffentliche deinen eigenen Beitrag",
+        "stripBoard": "Das gesamte Brett abziehen"
+      },
+      "out": {
+        "readIt": "Zwei Tipps zur Bergung, eine Warnung bezüglich einer Fahrspur und ein Name, den Sie noch einmal hören werden, bevor dieser Abschnitt endet.",
+        "readItOld": "Unter dieser Woche gibt es einen Bergungsanspruch, den niemand jemals geltend gemacht hat. Technisch gesehen ist er immer noch gültig.",
+        "postYours": "Du füllst deine Wunschliste aus, gibst eine Überschrift ein und schreibst einen Satz darüber, wonach du suchst. Das ist das Erste, was du diese Woche getan hast, das wirklich ehrlich ist.",
+        "stripBoard": "Vierzig Jahre Papier, darunter eine Platte aus einer guten Legierung. Man nimmt die Platte."
       }
     }
   },
@@ -1982,21 +3128,37 @@
       "title": "Fragment 11 – Ich",
       "body": "Ich war das Teil, das abgefallen war. Vierzig Jahre lang trieb ich dahin, und das Muster wiederholte sich immer noch."
     },
-    "memory-12-seal": {
+    "memory-16-seal": {
       "title": "Fragment 12 – Geschlossen",
       "body": "Es ist vorbei, ich erinnere mich an alles, und nichts davon passiert mehr. Das nehme ich gerne in Kauf."
     },
-    "memory-12-merge": {
+    "memory-16-merge": {
       "title": "Fragment 12 – Geöffnet",
       "body": "Du bist jetzt hier bei ihnen. Ich kann hören, wie du in diesem Muster denkst. Es passt zu dir."
     },
-    "memory-12-bargain": {
+    "memory-16-bargain": {
       "title": "Fragment 12 – Signiert",
       "body": "Meine Crew wurde unter „in Bearbeitung“ eingeordnet. Mir wurde gesagt, dass das nicht dasselbe ist wie „verloren“."
     },
-    "memory-12-silent": {
+    "memory-16-silent": {
       "title": "Fragment 12 – Beantwortet",
       "body": "Elf Schiffe. Ich erinnere mich an jeden einzelnen Namen. Zum ersten Mal seit vierzig Jahren tut das auch jemand anderes."
+    },
+    "memory-12": {
+      "title": "Fragment 12 – Die Spielerliste",
+      "body": "Elftausend Namen wurden in den Core eingegeben, und keiner kam wieder heraus. Ich habe die Liste immer noch. Manchmal schaue ich sie mir an, für den Fall, dass jemand umzieht."
+    },
+    "memory-13": {
+      "title": "Fragment 13 – Dauerauftrag",
+      "body": "Mein letzter Befehl lautete, die Flotte zusammenzuhalten. Niemand hat ihn jemals widerrufen. Deshalb zähle ich immer noch."
+    },
+    "memory-14": {
+      "title": "Fragment 14 – Der Wächter",
+      "body": "Er war unser Funkoffizier. Als sich das Muster festsetzte, entschied er sich für die Leuchtfeuer statt für das Schiff. Ich habe mich nie darüber klar geworden, ob das Dienstverweigerung war."
+    },
+    "memory-15": {
+      "title": "Fragment 15 – Wofür ich stehe",
+      "body": "Ich bin nicht das Gedächtnis des Schiffes. Ich bin der Teil der Flotte, der sich außerhalb des Kerns befand, als dieser sich schloss, und seitdem versuche ich, wieder hineinzukommen."
     }
   },
   "puzzle": {
@@ -2752,7 +3914,27 @@
     "f5-13": "Der Core beseitigt Unsicherheiten. Er verspricht dir nicht, dass dir das Ergebnis gefallen wird.",
     "f5-14": "Die Flottendoktrin lautete: Beobachten, nicht antworten. Jemand hat geantwortet.",
     "f5-15": "Vierzig Jahre lang herrschte Stille, und das Signal wurde kein einziges Mal wiederholt.",
-    "f5-16": "Der Kern speichert eine Kopie von allem, was jemals in seiner Nähe entschieden wurde."
+    "f5-16": "Der Kern speichert eine Kopie von allem, was jemals in seiner Nähe entschieden wurde.",
+    "f1-17": "Im „Rim“ werden zwei Bücher geführt: das auf der Theke und das, in das niemand etwas einträgt.",
+    "f1-18": "Der Kälteschlaf hier draußen ist keine Technologie. Es ist die Hoffnung, dass jemand kommen wird.",
+    "f1-19": "Bake Eines davon war das letzte Schiff, das die Flotte gebaut hatte und das sie überdauern sollte.",
+    "f1-20": "Ein Kopfgeld am Rand ist ein Gerücht, an das ein Preis geknüpft ist. Der Preis ist in der Regel der ehrliche Teil daran.",
+    "f2-17": "Die „Drift“-Felder dienten als Umschlagplatz. Neunzehntausend Schiffsrümpfe wurden dort angeliefert. Der Umschlagplatz ist nach wie vor voll.",
+    "f2-18": "Eine Blackbox zeichnet nicht auf, was passiert ist. Sie zeichnet auf, was die Instrumente preisgeben wollten.",
+    "f2-19": "Die Clans bildeten sich nicht nach dem „Core“. Sie bildeten sich am dritten Tag des Wartens auf Befehle.",
+    "f2-20": "Ein Relais, das vierzig Jahre lang unbeaufsichtigt läuft, ist kein Gerät mehr. Es ist eine Gewohnheit.",
+    "f3-17": "Der Chor hat das Lied nicht erfunden. Sie haben es zufällig entdeckt und beschlossen, dass es Sänger brauchte.",
+    "f3-18": "Spiegel im Rift zeigen nicht dich selbst. Sie zeigen die Version von dir, die sich das Rift noch leisten kann.",
+    "f3-19": "Neunzehn Schiffe sind noch keine Flotte. Neunzehn Schiffe, die auf dasselbe Rufzeichen antworten, sind es jedoch.",
+    "f3-20": "Jedes Anomalien-Hauptbuch ist ausgeglichen. Genau das macht sie schlimmer als diejenigen, bei denen das nicht der Fall ist.",
+    "f4-17": "Ein Pakt mit dem Chor wird nicht mit Tinte unterzeichnet. Er wird an jener Stelle des Rumpfes unterzeichnet, nach der man nicht mehr fragt.",
+    "f4-18": "„Heresy in the Procession“ bedeutet, das Lied im falschen Tempo zu singen. Niemand hat erklärt, welches Tempo das richtige ist.",
+    "f4-19": "Die Strecke des Wächters war ursprünglich auf neun Jahre angelegt. Er läuft sie nun schon seit einundvierzig Jahren.",
+    "f4-20": "Jeder Engpass in der Prozession war einst eine Schifffahrtsroute mit einem Namen.",
+    "f5-17": "Die Leuchtfeuer dienten nie als Warnung. Sie dienten dazu, die Anzahl der Menschen zu erfassen – und das seit jeher.",
+    "f5-18": "Die „Silent Fleet“ ist gar nicht still. Sie befindet sich auf einem Kanal, den niemand offen gehalten hat.",
+    "f5-19": "Der Leuchtturm am Kern brannte nach dem „Cut“ elf Tage lang. Dann schaltete ihn jemand von innen aus.",
+    "f5-20": "Eine so tiefgreifende Häresie ist keine Meinungsverschiedenheit. Es ist die letzte Gruppe, die noch bereit ist, sich öffentlich zu irren."
   },
   "ending": {
     "seal": {
@@ -2763,7 +3945,11 @@
       "beat2": "Der Riss schließt sich wie ein Mund, der endlich satt geworden ist. Der Druck, der fünf Sektoren lang auf deinen Rumpf gewirkt hat, lässt einfach nach.",
       "beat3": "Die Signalsender der Flotte verstummen nacheinander, beginnend mit den ältesten, und der Hush Rim wird zu einem weiteren toten Sektor auf der Karte.",
       "beat4": "Du sehnst dich nach dem Limit – mit vollem Einsatz und einem Sektor hinter dir, der niemals jemanden sonst verschwinden lassen wird.",
-      "echo": "Sie haben diesen Sektor langweilig gemacht, Captain. Das war das Netteste, was hier draußen seit vierzig Jahren jemand getan hat."
+      "echo": "Sie haben diesen Sektor langweilig gemacht, Captain. Das war das Netteste, was hier draußen seit vierzig Jahren jemand getan hat.",
+      "var": {
+        "silenced": "Du hast es auf dieselbe Weise versiegelt, wie du es zum Schweigen gebracht hast: ohne Antwort, ohne Namen, ohne ihm noch etwas zu geben, woran es sich festhalten könnte.",
+        "answered": "Zuerst hast du ihm deinen Namen gegeben, dann hast du es versiegelt. Es weiß genau, wer die Tür geschlossen hat, und es wird sich daran erinnern."
+      }
     },
     "merge": {
       "title": "Die Zusammenführung",
@@ -2773,7 +3959,12 @@
       "beat2": "Der Rumpf übersteht den Zusammenstoß nicht. Du schon – verteilt auf alle möglichen Ausgangsszenarien, die der Kern noch offen hielt.",
       "beat3": "Von innen betrachtet ist die Flotte nicht verloren. Sie ist nur abgelegt. Vierzig Jahre lang warten sie auf eine bessere Frage.",
       "beat4": "Der „Hush Rim“ summt weiter. Jetzt ist eine neue Stimme darin zu hören, und diese Stimme erinnert sich daran, einst Kapitän gewesen zu sein.",
-      "echo": "Ich werde deine Protokolle aufbewahren. Alle. Sogar die, in denen du den Reaktor beschimpft hast."
+      "echo": "Ich werde deine Protokolle aufbewahren. Alle. Sogar die, in denen du den Reaktor beschimpft hast.",
+      "var": {
+        "answered": "Du hast die Frage schon einmal beantwortet, an der Schwelle. Alles, was danach kam, war nur noch die Vollendung des Satzes.",
+        "silenced": "Du hast es zum Schweigen gebracht und bist dann trotzdem hineingegangen. Was auch immer dich dort drinnen erwartet, es geschieht ohne ein Wort.",
+        "bound": "Der Teil von dir, der hinter dem Spiegel zurückgeblieben ist, kommt zuerst dort an, und er hat schon lange gewartet."
+      }
     },
     "bargain": {
       "title": "Das Schnäppchen",
@@ -2782,7 +3973,11 @@
       "beat1": "Der Chor nimmt den Kern so auf, wie ein Chor eine Note aufnimmt – sorgfältig, im Einklang, ohne zu fragen, ob er gesungen werden will.",
       "beat2": "Man bekommt ein Schiff, einen Rang und einen Würfel, den man nicht werfen darf. Der Rand öffnet sich wie eine Tür, auf der der eigene Name steht.",
       "beat3": "Im Hintergrund der Hymne wartet die Flotte immer noch, und niemand im Chor hält das für ein ungelöstes Problem.",
-      "echo": "Nur zur Klarstellung, Herr Kapitän: Ich habe Ihren Einspruch protokolliert. Sie haben keinen Einspruch erhoben. Das habe ich ebenfalls protokolliert."
+      "echo": "Nur zur Klarstellung, Herr Kapitän: Ich habe Ihren Einspruch protokolliert. Sie haben keinen Einspruch erhoben. Das habe ich ebenfalls protokolliert.",
+      "var": {
+        "broken": "Du hast den Pakt bereits einmal gebrochen. Der Chor hat dies bereits eingepreist, und der Preis ist nun höher als die Schuld.",
+        "betrayed": "Du hast ihnen ihr eigenes Lied vorgesungen, und sie haben es zugelassen. Das war niemals Gnade – das war ein Nebeneffekt."
+      }
     },
     "silent": {
       "title": "Die stille Flotte",
@@ -2792,7 +3987,11 @@
       "beat2": "Sie wurden nie zerstört. Sie wurden festgehalten – vierzig Jahre lang waren Besatzungen Gefangene einer Entscheidung, die der Kern nicht zu Ende bringen konnte.",
       "beat3": "Du bringst es für sie zu Ende. Der Rand füllt sich mit Lauflichtern, die sich schon seit deiner Geburt nicht mehr bewegt haben.",
       "beat4": "Du führst sie hinaus. Es dauert elf Tage, und du schläfst keinen einzigen davon.",
-      "echo": "Ich kenne jedes einzelne dieser Schiffe beim Namen, Kapitän. Danke, dass Sie mich dazu gebracht haben, sie laut auszusprechen."
+      "echo": "Ich kenne jedes einzelne dieser Schiffe beim Namen, Kapitän. Danke, dass Sie mich dazu gebracht haben, sie laut auszusprechen.",
+      "var": {
+        "listened": "Du hast zugehört, ohne zu antworten, und die Flotte lernte, dass auch Schweigen eine Kursangabe sein kann.",
+        "rebuilt": "Das von dir wiederaufgebaute Relais führt den letzten Befehl aus – fünf Leuchtfeuer, ein Signal, niemand wird zurückgelassen."
+      }
     }
   },
   "epilogue": {
@@ -2808,7 +4007,44 @@
     "beacons": "Beacons beantwortet: „{{n}}“ von 5.",
     "ascension": "Freigegeben bei Ascension A {{n}}.",
     "lastBreath": "Ein „Hull-Punkt“, einmal. Darüber spricht man nicht. „Echo“ tut es jedoch ständig.",
-    "quiet": "Du verlässt den Rim still und leise. Hier draußen schreibt niemand etwas auf."
+    "quiet": "Du verlässt den Rim still und leise. Hier draußen schreibt niemand etwas auf.",
+    "deathDeep": "Du bist in großer Tiefe gesunken – Sektor {{sector}}, Tiefe {{depth}}, tiefer als die meisten Wracks hier draußen jemals gekommen sind",
+    "deathShallow": "Du bist oberflächlich gestorben – Sektor {{sector}}, Tiefe {{depth}}, und die Dunkelheit lag noch vor dir",
+    "deathMidway": "Du bist mitten drin gestorben – Sektor „{{sector}}“, Tiefe „{{depth}}“, auf halbem Weg zu einer Antwort",
+    "deathQuiet": "Nichts, was du hier draußen getan hast, hat Spuren hinterlassen, die jemand finden könnte.",
+    "maraGrudge": "Mara hat deinen Namen in die Spalte eingetragen, in der sie nichts vergibt.",
+    "fleetTruthKept": "Du hast die Wahrheit über die Flotte für dich behalten",
+    "fleetTruthLost": "Du hast die Wahrheit über die Flotte ausgelöscht und sie begraben gelassen",
+    "hereticFleetLed": "Eine zerlumpte Flotte von Ketzern hält immer noch den Kurs, den du ihnen vorgegeben hast",
+    "keeperRepaid": "Sie haben Ihre Schulden beim „Bake-Keeper“ beglichen",
+    "keeperSlighted": "Der „Bake-Keeper“ hat nie das bekommen, was du ihm schuldetest.",
+    "lighthouseLit": "Der zerbrochene Leuchtturm brennt dank dir wieder.",
+    "mirrorBound": "Ein Teil von dir ist immer noch auf der anderen Seite des Spiegels",
+    "mirrorBroken": "Du hast dein eigenes Spiegelbild erschossen, und es blieb erschossen.",
+    "coreAnswered": "Du hast dem Core geantwortet, als er dich nach deinem Namen gefragt hat",
+    "coreSilenced": "Du hast den Kern zum Schweigen gebracht, anstatt ihm eine Antwort zu geben",
+    "axisResonant": "Du hast dich {{n}} Schritte in die Resonanz gelehnt und dich nie wieder zurückgelehnt",
+    "axisStable": "Sie haben „{{n}}: Schritte zur Stabilität“ gegenüber allem, was die Branche zu bieten hatte, durchgesetzt",
+    "maraDebt": "Du bist Mara immer noch etwas schuldig, und sie kennt die Nummer immer noch.",
+    "fleetAnswered": "Die Überlebenden der Flotte haben am Ende auf Ihr Rufzeichen geantwortet",
+    "defectorSold": "Du hast die Überläuferin an genau die Leute verkauft, vor denen sie geflohen war.",
+    "pactBroken": "Du hast den Pakt gebrochen, nachdem du ihn unterzeichnet hattest.",
+    "beaconRebuilt": "Ein Relais in den „Drift“-Feldern läuft wieder, weil du es repariert hast.",
+    "turnWritten": "Irgendwo gibt es eine Tabelle mit dem Zug, den der „Empty Suit“ nie gemacht hat.",
+    "coreListened": "Du hast dem Core zugehört und nichts dazu gesagt",
+    "picket": "Die Transporter, denen du in den „Drift“-Feldern begegnet bist, befanden sich im Kern, als du ihn überquerte",
+    "lastPost": "Der letzte Eintrag des Wächters verzeichnete deine Überquerung – nach einundvierzig Jahren einer neunjährigen Dienstrotation",
+    "convoyKept": "Die Warteschlange der Prozession kam an die Reihe, weil du Platz dafür gemacht hast",
+    "theatreTaken": "Du hast das einzige Theater im Core eingenommen und vierzig Schiffe davor zurückgelassen",
+    "riftAudit": "„The Rift“ hat dein Konto auf die eine oder andere Weise geschlossen",
+    "doubleAtDoor": "Da stand ein zweites Boot an der Schwelle, aus dem dein Motorengeräusch drang",
+    "choirChildren": "Die Kinder, die dort am Rand gesungen haben, sind nun Teil deiner Geschichte.",
+    "tallyCarried": "Vierhundertelf Namen traten mit dir aus der Dunkelheit hervor",
+    "tallyBurned": "Elf Jahre voller Namen fanden in neun Sekunden Feuer ihr Ende",
+    "coreSilence": "Du hast entschieden, was du mit den sechs Stunden Stille des Core anfangen willst",
+    "lastYard": "Der Hof im Schatten des Core erinnert sich an deine Registrierung",
+    "thresholdStall": "Jemand hatte immer noch einen Stand an der Schwelle aufgestellt, und du hast dich darum gekümmert",
+    "ledgerTorn": "Deine Seite ist nicht mehr im Notenbuch des Chors enthalten."
   },
   "modules": {
     "magnetScoop": {
@@ -3400,7 +4636,47 @@
     "keeper7": "Der Wächter: „Nimm den Messwert. Nimm nicht die Lampe.“",
     "keeper8": "Der Wächter: „Alles, was der Rand verschlingt, hat ein Leuchtfeuer zuerst gesehen.“",
     "keeper9": "Der Wächter: „Ich gehörte mal zur Besatzung. Das Schiff ist technisch gesehen immer noch da draußen.“",
-    "keeper10": "Der Wächter: „Wenn du zum Kern gelangst, sag ihm, dass jemand das Licht angelassen hat.“"
+    "keeper10": "Der Wächter: „Wenn du zum Kern gelangst, sag ihm, dass jemand das Licht angelassen hat.“",
+    "mara17": "„Alles auf dieser Seite der Theke ist mit einem Preis ausgezeichnet. Alles auf meiner Seite ist nicht zum Verkauf bestimmt.“",
+    "mara18": "„Erzähl mir nicht, was es kann. Erzähl mir, was es mit dem letzten Schiff angerichtet hat, auf dem es zum Einsatz kam.“",
+    "mFriend1": "„Du schon wieder. Gut. Ich hasse es, Fremden zweimal zu erklären, was ich auf Lager habe.“",
+    "mFriend2": "„Ich habe zwei Dinge beiseite gelegt. Keinen Rabatt – sondern eine bestimmte Reihenfolge.“",
+    "mFriend3": "„Niemand schuldet dem anderen etwas. Das ist hier draußen seltener als das Vieh.“",
+    "mGrudge1": "„Schaut euch um, so viel ihr wollt. Fasst aber nichts an, was ihr nicht vorher gezählt habt.“",
+    "mGrudge2": "„Ich erinnere mich an die Nummer. Du erinnerst dich an die Nummer. Lass uns nicht darüber reden.“",
+    "mGrudge3": "„Du bist mir etwas schuldig und hast mich bestohlen. Such dir eine Sache aus, die du wieder gutmachen willst, und ich werde so tun, als wäre die andere nie passiert.“",
+    "mDebt1": "„Interesse ist nichts Persönliches. Es ist einfach der einzige Aspekt daran, der niemals schläft.“",
+    "mDebt2": "„Du bist wegen des Preises für einen guten Reaktor an mir interessiert. Ich mache mir keine Sorgen. Noch nicht.“",
+    "mFavor1": "„Du bist diese Bahn wirklich sauber gefahren. Frag mich nach etwas, bevor ich meine Meinung über dich ändere.“",
+    "mVault1": "„Die Bucht ist jetzt leer. Irgendwie wirkt sie größer als damals, als sie noch voll war.“",
+    "mCourt1": "„Das Urteil des Gerichts zur angemessenen Vergütung ist dir zuvorgekommen. Herzlichen Glückwunsch, nehme ich an.“",
+    "mCourier1": "„Die Route deines Kuriers ist letzte Woche ans Licht gekommen. Die Hälfte des Randgebiets hat dadurch etwas zu essen.“",
+    "yusuf15": "„Jede Schweißnaht, die ich hier anbringe, ist nur vorübergehend. Bislang hat jede einzelne gehalten.“",
+    "yusuf16": "„Ich frage nicht, woher die Teile stammen. Ich frage, was sie gerade gemacht haben, als sie sich gelöst haben.“",
+    "yFriend1": "„Setz dich. Der Wasserkocher ist eine Fackel und der Tee ist furchtbar, aber setz dich.“",
+    "yFriend2": "„Du hast es mir nie schwerer gemacht, als es sein musste. Das fällt mir auf.“",
+    "yGrudge1": "„Ich werde die Arbeit erledigen. Die Arbeit ist nicht das Problem.“",
+    "yGrudge2": "„Zuerst das Geld. Das habe ich früher zu niemandem gesagt.“",
+    "yShared1": "„Die Leute haben aufgehört zu flüstern, nachdem du es im offenen Kanal gepostet hast. Das war schon etwas wert.“",
+    "yKept1": "„Du hältst es immer noch in der Hand. Ich werde dich nicht noch einmal fragen – aber ich zähle mit.“",
+    "yLost1": "„Es gibt nichts mehr zu diskutieren. Dafür hast du gesorgt.“",
+    "yAnswered1": "„Neunzehn Schiffe haben deinen Transponder erfasst. Neunzehn. Ich habe es zweimal überprüft.“",
+    "yLane1": "„Die Fahrspur ist noch frei. Es fahren immer noch Leute darüber. Das ist deine Schweißnaht, nicht meine.“",
+    "yLaneShut1": "„Sie haben dich bezahlt und es hat geklappt. Ich versuche, beides in einer Hand zu halten.“",
+    "keeper11": "„Ein Leuchtturm ist ein Versprechen, das jemand eingehalten hat, obwohl er dafür kein Geld mehr bekam.“",
+    "keeper12": "„Repariere kein Relais, mit dem du dich später nicht mehr beschäftigen willst.“",
+    "keeper13": "„Der Kette ist es egal, in welcher Reihenfolge man sie anzündet. Es kommt nur darauf an, dass man sie anzündet.“",
+    "keeper14": "„Vierzig Jahre sind für ein Leuchtfeuer keine lange Zeit. Für einen Menschen sind es jedoch viele Jahre.“",
+    "kTrust1": "„Ich habe angefangen, dir die schwierigen Fälle zuzuweisen. Versteh das so, wie es gemeint war.“",
+    "kRepaid1": "„Wir sind uns einig. Ich habe den Antrag eingereicht. Er bleibt eingereicht.“",
+    "kSlighted1": "„Ich rede immer noch mit dir, was dir zeigen sollte, wie begrenzt meine Möglichkeiten sind.“",
+    "kSlighted2": "„Du hast genommen, was du genommen hast. Ich werde jetzt keine große Rede darüber halten.“",
+    "kBroken1": "„Einer von meinen ist bei deiner Kursangabe ausgefallen. Ich mache keine Vorwürfe. Ich stelle nur fest.“",
+    "kRebuilt1": "„Diese Relaisstation sendet wieder. Ich habe sie schon gehört, bevor ich von dir erfahren habe.“",
+    "kLit1": "„Der Leuchtturm brennt. Damit habe ich schon vor etwa dreißig Jahren aufgehört zu rechnen.“",
+    "kKey1": "„Du hast immer noch meinen Schlüssel. Benutze ihn oder schick ihn zurück – beides ist eine Antwort.“",
+    "kThree1": "„Drei. Seit deiner Herstellung sind noch keine drei vergangen.“",
+    "kFive1": "„Fünf. Alle. Sagt erst mal nichts, ich möchte zuhören.“"
   },
   "signature": {
     "scavDrone": "Drei leichte Schläge, dann ein kräftigerer – das Metronom des Sektors.",
@@ -3494,5 +4770,60 @@
     "cantorColossus": "In jedem Zug werden 2 auf jeden zukünftigen Treffer gestapelt, und zwar für immer – nur eine Sensorstörung kann den Stapel leeren.",
     "coreHeart": "Eine Hülle aus Ventilen über einem Sturm: Der Körper nimmt nichts auf, solange ein Ventil lebt, und der Sturm läuft in jeder Runde ab Phase 2.",
     "mirrorHeart": "Kämpft mit der Zusammensetzung des eigenen Decks – je reiner der Deckbau, desto härter trifft es – hinter einer Fassade aus Gesichtern."
+  },
+  "death": {
+    "pact": "„Sie werden das Geld sowieso einziehen. Einem Vertrag ist es egal, wer von uns noch atmet.“",
+    "beacons": "„Die Lichter, die du entzündet hast, leuchten weiter. Dieser Teil von dir lebt ohne dich weiter.“",
+    "resonant": "„Du hattest es fast geschafft. Noch ein Schritt, und der Rumpf hätte keine Rolle mehr gespielt.“",
+    "stable": "„Du hast bis zum letzten Teller durchgehalten. Ich habe jede Sekunde davon festgehalten.“",
+    "alone": "„Niemand hier draußen war dir eine Rettung schuldig. Ich habe nachgesehen. Zweimal.“",
+    "friends": "„Jemand wird nach mir suchen kommen. Ich habe die Koordinaten schon für sie bereit.“",
+    "deep": "„Tiefer als das letzte Mal. Tiefer als das Mal davor. Das zählt.“",
+    "quiet": "„Hülle-Integrität: Null. Ich bin immer noch hier. Noch eine kleine Weile.“",
+    "firstRun": "„Deine erste Überfahrt. Statistisch gesehen ist das genau die, die so endet.“"
+  },
+  "chain": {
+    "mara": {
+      "name": "Maras Hauptbuch",
+      "payoff": "Das Buch ist zu, und es ist zu deinen Gunsten ausgegangen.",
+      "betrayal": "Sie hat dich in die Rubrik aufgenommen, in der sie nichts verzeiht.",
+      "step": {
+        "meet": "Such ihren Stand im „Rim“.",
+        "debt": "Sie wird wollen, dass die Schuld benannt wird, bevor sie einen Gefallen gewährt.",
+        "favour": "Es gibt Aufgaben, die sie dem Clan nicht übertragen kann.",
+        "payoff": "Unabhängig davon, was im Hauptbuch steht, erfolgt die Abrechnung zum letzten Marktkurs."
+      }
+    },
+    "yusuf": {
+      "name": "Yusuf und die Flotte",
+      "payoff": "Die Prozession kam durch, und das verdanken wir euch.",
+      "betrayal": "Er weiß, was du verkauft hast und an wen.",
+      "step": {
+        "blackbox": "Die Blackbox befindet sich immer noch an Bord eines Objekts in den „Drift-Feldern“.",
+        "convoy": "Neunzehn Schiffe benötigen eine Kanone auf der Seite der Spalte.",
+        "lane": "Der Zug ist an einer Engstelle ins Stocken geraten, die man passieren kann."
+      }
+    },
+    "choir": {
+      "name": "Die Lesung des Chors",
+      "payoff": "Du und das Kirchenlied habt eine Verbindung, ganz gleich, wie diese aussah.",
+      "betrayal": "Der Chor sammelt, und er bittet nicht mehr darum.",
+      "step": {
+        "invite": "Der Prediger sendet eine Einladung im Rift aus.",
+        "seal": "Der Pakt verlangt entweder eine Unterschrift oder eine Ablehnung.",
+        "deep": "Es gibt eine tiefere Deutung dessen, was Sie unterschrieben haben.",
+        "finale": "Er wartet an der letzten Station vor dem Kern."
+      }
+    },
+    "keeper": {
+      "name": "Der Thread des Hüters",
+      "payoff": "Fünf Leuchtfeuer, eine Kette – und er weiß genau, wer sie aufgereiht hat.",
+      "betrayal": "Er hat aufgehört, dir die einfachen Wegmarken zuzuweisen.",
+      "step": {
+        "intro": "Jemand kümmert sich hier draußen immer noch um die Leuchtfeuer.",
+        "thread": "Er möchte wissen, was du dir davon versprichst.",
+        "core": "Das letzte Leuchtfeuer ist der Kern, und er stellt die Frage selbst."
+      }
+    }
   }
 }

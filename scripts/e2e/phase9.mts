@@ -80,6 +80,7 @@ const seedProfile = async (page: Page): Promise<void> => {
         driftRuns: 12,
         dailyRuns: 6,
         contractRuns: 8,
+        elites: 24,
       },
     });
   });

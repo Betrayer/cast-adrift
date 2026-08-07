@@ -67,7 +67,16 @@
     "pass": "Erfolg — {{total}}",
     "fail": "Fehlgeschlagen — {{total}}",
     "roll": "Rolle",
-    "back": "Zurück"
+    "back": "Zurück",
+    "reqAxisMin": "Erfordert Axis {{n}} oder höher",
+    "reqAxisMax": "Erfordert Axis {{n}} oder eine niedrigere Version",
+    "checkLowest": "Nichts über {{n}}",
+    "checkSchool": "{{school}} nur Würfel",
+    "checkTierMin": "nur d{{tier}}e und größere Modelle",
+    "checkTierMax": "d nur {{tier}} und kleiner",
+    "outcomeOdds": "Quoten {{odds}}",
+    "beaconTitle": "Bake",
+    "beaconCounter": "Bake {{n}} von „{{max}}“"
   },
   "anomaly": {
     "title": "Anomalie",
@@ -185,7 +194,10 @@
     "glyphLegend": {
       "title": "Schulzeichen",
       "body": "Jeder Würfel hat eine bestimmte Eckenform, sodass die Schulen auch ohne Farbunterscheidung voneinander getrennt bleiben: Rot – Dreieck · Blau – Quadrat · Grün – Blatt · Gelb – Ring · Schwarz – Stachel · Grau – Punkt · Prismatisch – Stern."
-    }
+    },
+    "prologueTitle": "Die erste Überquerung",
+    "prologueBody": "Spiele die ersten Takte noch einmal ab. Nichts hat begonnen, nichts ist verloren.",
+    "prologueReplay": "Wiederholung"
   },
   "consequenceToast": "Folge: {{text}}",
   "rewards": {
@@ -254,7 +266,8 @@
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Zurück zum Menü"
+    "leave": "Zurück zum Menü",
+    "replayDone": "Zurück zu den „Kodex“"
   },
   "interstitial": {
     "sector": "Branchen{{n}}",
@@ -270,7 +283,9 @@
     "next": "Weiter",
     "step": "{{cur}} / {{max}}",
     "tally": "Was du zurückgelassen hast",
-    "continue": "Protokoll schließen"
+    "continue": "Protokoll schließen",
+    "deathTitle": "Hier endet der Lauf",
+    "deathWhere": "Sektor{{sector}} · Tiefe{{depth}}"
   },
   "setup": {
     "title": "Start",
@@ -376,5 +391,43 @@
     "engravings": "Gravierte Würfel ({{n}})",
     "banished": "Verbannt",
     "empty": "Noch nichts"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Resonanz {{n}}",
+    "stability": "Stabilitäts{{n}}",
+    "neutral": "Achsenausgleich",
+    "preview": "Axis {{from}} → {{to}}",
+    "short": "Achse"
+  },
+  "journal": {
+    "title": "Laufprotokoll",
+    "open": "Zeitschrift",
+    "back": "Zurück zur Karte",
+    "empty": "Es wurde noch nichts geschrieben. Die Branche hat noch keine Anfrage an Sie gerichtet.",
+    "sector": "Branchen{{n}}",
+    "beacon": "Bake gelöst — {{n}} von {{max}}",
+    "memory": "Echo mir ist etwas eingefallen — Fragment {{n}}",
+    "axisTitle": "Achse",
+    "axis": {
+      "choice": "Durch Ihre Auswahl wurde die Achse verschoben: {{from}} → {{to}}",
+      "drift": "Das Deck, das du tatsächlich platziert hast, hat die Achse verschoben {{from}} → {{to}}",
+      "beacon": "Das Leuchtfeuer hat die Achse verschoben {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Leuchtfeuer",
+    "beaconsCount": "{{n}} von „{{max}}“ gelöst",
+    "beaconsHint": "Die Kette hält. Auch etwas im Kern zählt sie.",
+    "here": "Sie befinden sich im Sektor „{{n}}“.",
+    "chainsTitle": "Themen",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "hier"
+  },
+  "memory": {
+    "kicker": "Echo erinnert sich · Auszug {{n}} von {{max}}",
+    "continue": "Lass sie ausreden",
+    "hintGate": "{{n}}-Gates in einer Kampagne durchbrechen",
+    "hintElite": "Jage während deiner Läufe nach „{{n}}“-Eliten",
+    "hintBeacons": "{{n}}-Beacons in einem einzigen Durchlauf auflösen",
+    "hintEnding": "Geh zum Kern und wähle"
   }
 }

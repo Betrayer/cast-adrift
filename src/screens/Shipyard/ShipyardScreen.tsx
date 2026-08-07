@@ -36,6 +36,7 @@ export const ShipyardScreen = () => {
   const vouchers = useRunStore((s) => s.vouchers);
   const seed = useRunStore((s) => s.seed);
   const position = useRunStore((s) => s.position);
+  const flags = useRunStore((s) => s.flags);
   const [repair, setRepair] = useState(0);
   const [swept, setSwept] = useState<{ slotId: SlotId; key: number } | null>(
     null,
@@ -44,7 +45,7 @@ export const ShipyardScreen = () => {
 
   const greeting = createStream(
     deriveSeed(seed, `keeper:${position ?? "yard"}`),
-  ).pick(keeperLinesFor("shipyard"));
+  ).pick(keeperLinesFor("shipyard", flags));
 
   const discountedMk = (target: Exclude<MkLevel, 1>): number =>
     Math.max(1, mkUpgradeCost(target) - shipyardDiscount);

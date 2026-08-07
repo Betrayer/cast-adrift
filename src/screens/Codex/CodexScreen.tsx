@@ -21,6 +21,7 @@ import {
 } from "@/data/codex";
 import { schoolGlyphPath } from "@/data/glyphs";
 import { SCHOOL_IDS, schools } from "@/data/schools";
+import { memoryUnlockHint } from "@/game/narrative/memoryArc";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 
@@ -38,11 +39,17 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
   const [open, setOpen] = useState(false);
 
   if (!unlocked) {
+    const hint = entry.group === "memory" ? memoryUnlockHint(entry.id) : null;
     return (
       <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder opacity={0.55}>
         <Text size="sm" c={tokens.faint}>
           {t("run:codex.locked")}
         </Text>
+        {hint === null ? null : (
+          <Text size="xs" c={tokens.faint} data-memory-hint={entry.id}>
+            {t(hint.key, hint.values)}
+          </Text>
+        )}
       </Paper>
     );
   }
@@ -142,6 +149,28 @@ export const CodexScreen = () => {
     >
       <Stack gap="md">
           <GlyphLegend />
+          <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder>
+            <Group justify="space-between" wrap="nowrap">
+              <Stack gap={2}>
+                <Text size="sm" fw={600} c={tokens.text}>
+                  {t("run:codex.prologueTitle")}
+                </Text>
+                <Text size="xs" c={tokens.faint}>
+                  {t("run:codex.prologueBody")}
+                </Text>
+              </Stack>
+              <Button
+                size="compact-sm"
+                variant="default"
+                data-replay-prologue
+                onClick={() => {
+                  go("prologue", { replay: "1" });
+                }}
+              >
+                {t("run:codex.prologueReplay")}
+              </Button>
+            </Group>
+          </Paper>
           {CODEX_GROUP_ORDER.map((group) => {
             const entries = codexByGroup(group);
             return (

@@ -67,7 +67,16 @@
     "pass": "Success — {{total}}",
     "fail": "Failed — {{total}}",
     "roll": "Roll",
-    "back": "Back"
+    "back": "Back",
+    "reqAxisMin": "needs axis {{n}} or higher",
+    "reqAxisMax": "needs axis {{n}} or lower",
+    "checkLowest": "Nothing above {{n}}",
+    "checkSchool": "{{school}} dice only",
+    "checkTierMin": "d{{tier}} and larger only",
+    "checkTierMax": "d{{tier}} and smaller only",
+    "outcomeOdds": "odds {{odds}}",
+    "beaconTitle": "Beacon",
+    "beaconCounter": "Beacon {{n}} of {{max}}"
   },
   "anomaly": {
     "title": "Anomaly",
@@ -185,7 +194,10 @@
     "glyphLegend": {
       "title": "School glyphs",
       "body": "Every die carries a corner shape so schools stay apart without colour: Red — triangle · Blue — square · Green — leaf · Yellow — ring · Black — spike · Grey — dot · Prismatic — star."
-    }
+    },
+    "prologueTitle": "The first crossing",
+    "prologueBody": "Replay the opening beats. Nothing is started, nothing is lost.",
+    "prologueReplay": "Replay"
   },
   "consequenceToast": "Consequence: {{text}}",
   "rewards": {
@@ -254,7 +266,8 @@
     "title": "Prologue",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Back to menu"
+    "leave": "Back to menu",
+    "replayDone": "Back to the Codex"
   },
   "interstitial": {
     "sector": "Sector {{n}}",
@@ -270,7 +283,9 @@
     "next": "Continue",
     "step": "{{cur}} / {{max}}",
     "tally": "What you left behind",
-    "continue": "Close the log"
+    "continue": "Close the log",
+    "deathTitle": "The run ends here",
+    "deathWhere": "Sector {{sector}} · depth {{depth}}"
   },
   "setup": {
     "title": "Launch",
@@ -376,5 +391,43 @@
     "engravings": "Engraved dice ({{n}})",
     "banished": "Banished",
     "empty": "Nothing yet"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Resonance {{n}}",
+    "stability": "Stability {{n}}",
+    "neutral": "Axis balanced",
+    "preview": "axis {{from}} → {{to}}",
+    "short": "Axis"
+  },
+  "journal": {
+    "title": "Run journal",
+    "open": "Journal",
+    "back": "Back to the map",
+    "empty": "Nothing written yet. The sector has not asked you for anything.",
+    "sector": "Sector {{n}}",
+    "beacon": "Beacon resolved — {{n}} of {{max}}",
+    "memory": "Echo remembered something — fragment {{n}}",
+    "axisTitle": "Axis",
+    "axis": {
+      "choice": "your choice moved the axis {{from}} → {{to}}",
+      "drift": "the deck you actually place moved the axis {{from}} → {{to}}",
+      "beacon": "the beacon moved the axis {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Beacons",
+    "beaconsCount": "{{n}} of {{max}} resolved",
+    "beaconsHint": "The chain is holding. Something at the Core is counting them too.",
+    "here": "You are in Sector {{n}}.",
+    "chainsTitle": "Threads",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "here"
+  },
+  "memory": {
+    "kicker": "Echo remembers · fragment {{n}} of {{max}}",
+    "continue": "Let her finish",
+    "hintGate": "Break {{n}} gates in one campaign",
+    "hintElite": "Hunt {{n}} elites across your runs",
+    "hintBeacons": "Resolve {{n}} beacons in a single run",
+    "hintEnding": "Reach the Core and choose"
   }
 }
