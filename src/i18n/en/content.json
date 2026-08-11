@@ -3767,6 +3767,30 @@
     "quietRun": {
       "name": "Quiet Run",
       "desc": "Cross the Rift placing as few dice as you can."
+    },
+    "deadReckoning": {
+      "name": "Dead Reckoning",
+      "desc": "No Star Chart, no charts at all — fog on the lane and a dock you must not need."
+    },
+    "ironTide": {
+      "name": "Iron Tide",
+      "desc": "The tide is already at three when you drop in. Hold the hull and end fights whole."
+    },
+    "prismWork": {
+      "name": "Prismwork",
+      "desc": "A prism-seeded deck. Six schools on the board, and fewer dice than you would like to place."
+    },
+    "ghostLane": {
+      "name": "Ghost Lane",
+      "desc": "Radio silence through sector two. Take the short way and leave the elites alone."
+    },
+    "voidTithe": {
+      "name": "The Void Tithe",
+      "desc": "Sector five under a resonant storm, prices raised by three quarters. Come out stable and rich."
+    },
+    "gauntlet": {
+      "name": "The Gauntlet",
+      "desc": "No perks, no chart, the Obsidian Pact bolted on. Four elites and a quarter of the hull."
     }
   },
   "sectors": {

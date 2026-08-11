@@ -12,8 +12,10 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
+import { ACHIEVEMENT_BY_ID } from "@/data/achievements";
+import { DIE_BY_ID } from "@/data/dice";
 import { PERK_BY_ID } from "@/data/perks";
-import { progressWithinLevel } from "@/game/xp";
+import { progressWithinLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { abandonRun } from "@/game/run/flow";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
@@ -88,12 +90,26 @@ export const SummaryScreen = () => {
         fromLevel={result.fromLevel}
         toLevel={result.toLevel}
         milestones={result.milestones}
+        unlocks={result.unlocks}
         reduced={reduced}
         onContinue={() => {
           setCeremonyDone(true);
         }}
       />
     ) : null;
+
+  const shards = result?.shards ?? ZERO_SHARD_BREAKDOWN;
+  const breakdown: readonly [string, number][] = [
+    ["meta:summary.fromSectors", shards.sectors],
+    ["meta:summary.fromBeacons", shards.beacons],
+    ["meta:summary.fromEnding", shards.firstEnding],
+    ["meta:summary.fromHull", shards.hullClear],
+    ["meta:summary.fromStreak", shards.streak],
+    ["meta:summary.fromAscension", shards.ascension],
+    ["meta:summary.fromFinds", result?.findShards ?? 0],
+    ["meta:summary.fromAchievements", result?.achievementShards ?? 0],
+  ];
+  const earned = breakdown.filter(([, value]) => value !== 0);
 
   return (
     <Screen
@@ -140,6 +156,38 @@ export const SummaryScreen = () => {
               +{shardsShown} ◈
             </Text>
           </Group>
+          {earned.length === 0 ? null : (
+            <Stack gap={2} data-shard-breakdown>
+              {earned.map(([label, value]) => (
+                <Group key={label} justify="space-between">
+                  <Text size="xs" c={tokens.faint}>
+                    {t(label)}
+                  </Text>
+                  <Text size="xs" c={tokens.dim}>
+                    +{value}
+                  </Text>
+                </Group>
+              ))}
+            </Stack>
+          )}
+          {(result?.firstFinds ?? []).length === 0 ? null : (
+            <Text size="xs" c={tokens.dim} data-first-finds>
+              {t("meta:summary.firstFinds", {
+                names: (result?.firstFinds ?? [])
+                  .map((id) => t(DIE_BY_ID.get(id)?.name ?? id))
+                  .join(" · "),
+              })}
+            </Text>
+          )}
+          {(result?.achievements ?? []).length === 0 ? null : (
+            <Stack gap={2} data-achievement-lines>
+              {(result?.achievements ?? []).map((id) => (
+                <Text key={id} size="xs" c={tokens.accent}>
+                  ✦ {t(ACHIEVEMENT_BY_ID.get(id)?.name ?? id)}
+                </Text>
+              ))}
+            </Stack>
+          )}
           <Group justify="space-between">
             <Text c={tokens.accent} fw={600}>
               {t("meta:summary.xp")}

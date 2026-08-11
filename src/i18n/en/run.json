@@ -297,7 +297,10 @@
     "aLevel": "A{{n}}",
     "tideCap": "Interference tide caps at {{n}}",
     "launch": "Launch",
-    "back": "Back"
+    "back": "Back",
+    "ascensionCost": "It costs you",
+    "ascensionGain": "It pays you",
+    "shardMult": "+{{n}}% shards for the whole run"
   },
   "package": {
     "title": "Gate package",

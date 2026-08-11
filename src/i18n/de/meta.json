@@ -73,7 +73,39 @@
     "keyIronDoctrine": "Eiserne Doktrin",
     "keyFatesFavorite": "Der Liebling des Schicksals",
     "keyPrismCascade": "Prisma-Kaskade",
-    "selectHint": "Tippe auf einen Knoten, um zu sehen, welche Funktion er hat."
+    "selectHint": "Tippe auf einen Knoten, um zu sehen, welche Funktion er hat.",
+    "filter": "Filter",
+    "filterOn": "Filter · {{n}}",
+    "filterClear": "Filter löschen",
+    "pathCost": "Pfad von hier aus: {{n}} Punkte (du hast {{have}})",
+    "refundFree": "Rückerstattung (kostenlos)",
+    "respecConfirmTitle": "Diesen Knoten zurückerstatten?",
+    "respecConfirmBody": "„{{name}}“ wird wieder in den Pool zurückgelegt, und der Punkt wird zurückgegeben. Kosten: {{cost}}◈.",
+    "respecConfirmYes": "Rückerstattung",
+    "redPowderRoom": "Gäste-WC",
+    "redRangeCard": "Schusskarte",
+    "redHairTrigger": "Haarauslöser",
+    "redCoreBreach": "Kernbruch",
+    "blueStormAnchor": "Sturmanker",
+    "blueSpillway": "Überlauf",
+    "blueLongLens": "Teleobjektiv",
+    "blueKeelPlate": "Kielplatte",
+    "greenGraftBench": "Graft-Bank",
+    "greenSapline": "Sapline",
+    "greenLoam": "Lehm",
+    "greenHollow": "Die Senke",
+    "yellowTollhouse": "Mautstelle",
+    "yellowFinderFee": "Vermittlungsgebühr",
+    "yellowShortWeight": "Untergewicht",
+    "yellowMintMark": "Prägezeichen",
+    "blackAshBed": "Aschebett",
+    "blackDeadMansSwitch": "Notschalter",
+    "blackTithe": "Der Zehnte",
+    "blackSlagHeap": "Schlackenhalde",
+    "greyShimStack": "Unterlegscheibenstapel",
+    "greyPatternBook": "Musterbuch",
+    "greyBallastTrim": "Ballasttrimmung",
+    "greyTallyStick": "Zählstab"
   },
   "chartFx": {
     "hubBudget": "+1 Hangar-Budget",
@@ -91,7 +123,15 @@
       "growthCapDelta": "{{n}} Wachstumsgrenze",
       "enginesThresholdDelta": "{{n}} Motorschwelle",
       "markBonusDelta": "{{n}} Markenbonus",
-      "battleEndHeal": "{{n}} heilen / kämpfen"
+      "battleEndHeal": "{{n}} heilen / kämpfen",
+      "hullMaxPct": "{{n}} % der maximalen Rumpfstärke",
+      "extraRerolls": "{{n}} Verwendung von „Reroll“",
+      "scrapPerKill": "{{n}} Schrott pro Kill",
+      "setCompleteCharge": "{{n}} Gebühr für ein vollständiges Set",
+      "freeShopRerolls": "{{n}} Kostenloser Neuzufall des Zählers",
+      "xpMultPct": "{{n}} % XP",
+      "tideEffectDelta": "{{n}} dem Biss der Flut",
+      "moduleSlotDelta": "{{n}} Modulschacht"
     },
     "fx": {
       "weaponsMaxFace": "Waffen +1 bei einem Würfel mit maximaler Augenzahl",
@@ -119,22 +159,81 @@
       "blackWell": "Der Reaktor speichert noch 2 Ladungen",
       "shopArrival": "+6 Schrott bei Ankunft auf einem Markt",
       "tideWard": "Repariere bei jedem Sprung 1 Rumpf, solange die Flut 2+ beträgt",
-      "detourScout": "+12 Schrott beim Einfahren in eine Umleitung"
+      "detourScout": "+12 Schrott beim Einfahren in eine Umleitung",
+      "redFinisher": "+2 auf den Waffenschaden gegen ein Ziel mit weniger als 30 % Rumpf.",
+      "redSwarmFire": "+1 auf die Waffen, solange zwei oder mehr Gegner noch im Kampf sind.",
+      "redBurnBite": "Ein Treffer mit einer Waffe auf ein brennendes Ziel verursacht 2 zusätzliche Schadenspunkte.",
+      "redRepeatCrit": "Ein Waffenwürfel, bei dem der letzte Wert bei einem kritischen Treffer wiederholt wird.",
+      "redSalvoTally": "Ab dem dritten Waffenwürfel einer Schlacht gibt es +1 auf die Waffenwerte.",
+      "redOpener": "Der erste Waffenwürfel der Runde erhält einen Bonus von +2.",
+      "redRiskCharge": "Wenn die Rumpfstärke unter 40 % liegt, beende jeden Zug mit 1 Ladung.",
+      "redPowderRoom": "Jeder Treffer auf ein brennendes Ziel verursacht einen weiteren Brandschaden.",
+      "redHairTrigger": "Der erste Waffenwürfel dieser Runde ergibt einen kritischen Treffer.",
+      "redCoreBreach": "+3 auf jeden Würfelwurf gegen ein Ziel mit weniger als 25 % Rumpf.",
+      "blueOvershield": "Bei 6 Schilden addiert ein Schild-Würfel 2 weitere hinzu.",
+      "blueStillness": "Ein blauer Würfel in Schilden erhält +1.",
+      "blueDeepGuard": "Halte 4 Schild während des gegnerischen Zuges, um 1 zu heilen.",
+      "blueJamOnLow": "Ein Sensorwert unter 4 wird als 5 gewertet.",
+      "blueWatch": "Ein blauer Würfel, der auf seiner niedrigsten Seite liegt, wird einmal erneut gewürfelt.",
+      "blueBreakwater": "Beginne jeden Kampf mit 3 Schildpunkten.",
+      "blueSpillway": "Bei einem Würfelwurf von 8 oder mehr auf die Schild-Fläche werden 3 Schilde hinzugefügt.",
+      "blueLongLens": "+2 bei den Sensoren.",
+      "greenGrowOnEngines": "Eine „Max-Face“-Maschine wächst um bis zu +2.",
+      "greenTendril": "Ein grüner Würfel mit einer Augenzahl von 6 oder mehr erhöht den Wert um bis zu +3.",
+      "greenMend": "Beende einen Zug mit mehr als 30 % Rumpf, um 1 Lebenspunkt zu regenerieren.",
+      "greenRootHold": "+2 bei Motoren unterhalb der Rumpfhalbhöhe.",
+      "greenSpore": "Ein gewonnener Kampf heilt 2.",
+      "greenQuietBerth": "Bei der Ankunft in einer Werft werden 2 Lebenspunkte wiederhergestellt.",
+      "greenSapline": "Beende einen Zug mit 4 Schildpunkten, um 2 zu heilen.",
+      "greenLoam": "Eine „Max-Face“-Maschine wächst um bis zu +3.",
+      "yellowTollBooth": "Das Erreichen einer Begegnung bringt 8 Schrott ein.",
+      "yellowKickback": "Ein gelber Würfel bringt bei seiner Auswertung 2 Schrott ein.",
+      "yellowLuckyOpen": "Der erste Würfel des Zuges bringt bei seiner Höchstzahl 6 Schrott.",
+      "yellowGleaner": "Ein gelber Würfel bringt auf seiner niedrigsten Seite 4 Schrott.",
+      "yellowWager": "Ein Würfel auf einer der beiden äußeren Seiten bringt 3 Schrott.",
+      "yellowTollhouse": "Wenn man an einem Schalter ankommt, erhält man 14 Schrott.",
+      "yellowMintMark": "Ein Reaktor-Chip bringt 4 Schrott ein.",
+      "blackBleedCharge": "+1 bei schwarzen Würfeln unter 60 % Rumpf.",
+      "blackOvercap": "Schwarze Würfel können die Slot-Obergrenze für 2 Rumpfplätze überschreiten.",
+      "blackPactTithe": "Beginne jeden Kampf mit 2 Ladepunkten und −2 Rumpf.",
+      "blackLastLight": "+2 bei jedem Würfelwurf, wenn der Rumpfschaden unter 25 % liegt.",
+      "blackReactorTally": "Ab dem zweiten Reaktor, der ausfällt, beende den Zug mit 1 Ladung.",
+      "blackSpite": "Bei weniger als der Hälfte der Rüstung endet der Zug des Gegners mit 1 Angriff.",
+      "blackNightWatch": "Ein schwarzer Würfel, der auf seiner Höchstseite liegt, ergibt 1 Ladung.",
+      "blackAshBed": "Ein Würfel auf seiner niedrigsten Seite ergibt 2 Ladung.",
+      "blackDeadMansSwitch": "Wenn die Rumpf-HP unter 25 % liegen, beende jeden Zug mit 3 Ladungen.",
+      "blackSlagHeap": "+3 im Reaktor bei 4 Ladungen.",
+      "greyScan": "Bei jedem Würfelwurf gibt es einen zusätzlichen Schub.",
+      "greyEvenKeel": "+1 für graue Würfel.",
+      "greyCounterweight": "Ein nicht grauer Würfel erhält auf seiner niedrigsten Seite +1.",
+      "greyToolbelt": "Ein zusätzlicher Wiederholungswurf pro Kampf.",
+      "greySpare": "Ein zusätzlicher Reserveplatz pro Gefecht.",
+      "greyMirror": "Ein grauer Würfel, der den letzten Wert wiederholt, erhöht die Anzahl der Wiederholungswürfe um 1.",
+      "greyLedgerKeep": "Wenn man gegen einen Tresen läuft, erhält man 10 Schrott.",
+      "greyPatternBook": "Ein Würfel, der den letzten Wert wiederholt, gewährt einen Wiederholungswurf.",
+      "greyTallyStick": "Sobald der zweite Sensor ausfällt, gibt es bei jedem Würfelwurf +2."
     },
     "trait": {
       "obsidianPact": "Schwarze Würfel zeigen nur ihren Mindest- oder Höchstwert an.",
       "singleCast": "Keine Wiederholungswürfe",
-      "coldLogic": "Anstöße sind kostenlos · Kritische Treffer deaktiviert"
-    }
+      "coldLogic": "Anstöße sind kostenlos · Kritische Treffer deaktiviert",
+      "overflowShield": "Die über die Obergrenze hinaus ausgegebenen Ladungen werden zu einem Schutzschild.",
+      "fateTwice": "Der Schicksalswürfel kann zweimal pro Kampf eingesetzt werden.",
+      "prismDouble": "Prismatische Würfel zählen bei der Resonanz doppelt."
+    },
+    "budgetDelta": "{{n}} Hangar-Punkt",
+    "slotTier": "{{slot}}: {{n}} die-size step"
   },
   "milestone": {
-    "budget": "Hangar-Budget +1",
+    "budget": "Hangar-Budget +2",
     "shipRam": "RAM entsperrt",
-    "contractRow": "Zweite Vertragsrunde (in Kürze)",
     "shipArk": "Die Arche wurde freigeschaltet",
-    "engraving": "Gravur Bahnhof (in Kürze)",
-    "dailyPreview": "Tägliche Vorschau (in Kürze)",
-    "respecPrestige": "Kostenlose Keystone-Neuzuweisung (in Kürze)"
+    "engraving": "Gravur Bahnhof geöffnet",
+    "dailyPreview": "Die morgige Tagesausgabe ist einsehbar",
+    "respecPrestige": "Kostenlose Umverteilung der Attribute + Prestige-Skin",
+    "diceWave": "Fusion-Würfel im Regal",
+    "contractWave": "Vertragswelle eröffnet",
+    "chartPoints": "Zwei Punkte für „Sternenkarte“"
   },
   "levelup": {
     "title": "Eine Stufe höher",
@@ -147,7 +246,16 @@
     "shards": "Splitter",
     "xp": "XP",
     "level": "Kapitänsstufe {{level}}",
-    "toNext": "{{into}} / {{need}} weiter"
+    "toNext": "{{into}} / {{need}} weiter",
+    "fromSectors": "Sektoren freigegeben",
+    "fromBeacons": "Beacons aufgelöst",
+    "fromEnding": "Ein neues Ende",
+    "fromHull": "Freiraum bis zur halben Rumpfhöhe",
+    "fromStreak": "Serie ohne Tod",
+    "fromAscension": "Aufstiegsbonus",
+    "fromFinds": "Erste Funde",
+    "fromAchievements": "Erfolge",
+    "firstFinds": "Erstmalig gesichtet: {{names}}"
   },
   "menu": {
     "level": "Lv{{level}}"
@@ -184,7 +292,31 @@
   "collection": {
     "title": "Sammlung",
     "count": "{{n}} Würfel",
-    "owned": "×{{n}}"
+    "owned": "×{{n}}",
+    "discount": "−{{n}} % — du bist auf diesen Würfel gestoßen",
+    "found": "Getroffen",
+    "undiscovered": "Noch nicht erfüllt",
+    "provenance": "Gefunden: Sektor {{sector}}, {{node}}",
+    "filterState": "Bundesland",
+    "stateAll": "Alle",
+    "stateOwned": "Im Besitz von",
+    "stateFound": "Getroffen",
+    "stateUnknown": "Unentdeckt",
+    "totals": "{{owned}} im Besitz von · {{found}} gefunden · {{total}} im Verzeichnis",
+    "node": {
+      "start": "die Fallstelle",
+      "battle": "ein Gefecht",
+      "elite": "eine Elite",
+      "miniboss": "ein Kampf am Tor",
+      "boss": "ein Chef",
+      "event": "eine Begegnung",
+      "shop": "ein Zähler",
+      "shipyard": "eine Werft",
+      "anomaly": "eine Kluft",
+      "beacon": "ein Leuchtfeuer",
+      "rest": "ein ruhiger Liegeplatz",
+      "pocket": "eine Tasche"
+    }
   },
   "modes": {
     "title": "Modi",
@@ -206,7 +338,9 @@
     "open": "Öffnen",
     "guardTitle": "Ein Lauf ist bereits im Gange",
     "guardBody": "Es gibt einen Lauf-Slot. Beim Starten dieses Modus wird der aktuelle Lauf sowohl lokal als auch in der Cloud gelöscht.",
-    "guardYes": "Löschen und starten"
+    "guardYes": "Löschen und starten",
+    "dailyPreview": "Morgen ({{date}})",
+    "dailyPreviewLocked": "Die Mutatoren von morgen auf Level {{n}}"
   },
   "contracts": {
     "title": "Verträge",
@@ -236,7 +370,9 @@
     "axisAtMost": "Beende den Lauf mit der Achse bei {{n}} oder darunter",
     "allBeaconsResolved": "Jedes Leuchtfeuer auflösen",
     "deckSchoolsAtLeast": "Zum Schluss: „{{n}}“ -Schulen im Deck",
-    "dicePlacedAtMost": "Setze höchstens {{n}} Würfel ein, die alle laufen"
+    "dicePlacedAtMost": "Setze höchstens {{n}} Würfel ein, die alle laufen",
+    "axisAtLeast": "Schlussnote in „Stability“{{n}}us oder höher",
+    "elitesAtMost": "Abgeschlossen mit höchstens {{n}} besiegten Eliten"
   },
   "drift": {
     "title": "Drift über",
@@ -285,7 +421,20 @@
     "none": "—",
     "place": "#{{rank}}",
     "endings": "Schluss",
-    "locked": "Versiegelt"
+    "locked": "Versiegelt",
+    "achievements": "Erfolge",
+    "achProgress": "{{have}} / {{need}}",
+    "achLocked": "Gesperrt",
+    "badges": "Abzeichen",
+    "achCount": "{{n}} von „{{total}}“",
+    "group": {
+      "combat": "Kampf",
+      "economy": "Wirtschaft",
+      "puzzles": "Anomalien",
+      "story": "Geschichte",
+      "collection": "Sammlung",
+      "modes": "Modi"
+    }
   },
   "engraving": {
     "title": "Gravur Bahnhof",
@@ -300,6 +449,245 @@
     "pair": "Passt gut zu „{{name}}“"
   },
   "badge": {
-    "keeper": "Torwart"
+    "keeper": "Torwart",
+    "ascendant": "Aszendent",
+    "chartwright": "Chartwright",
+    "archivist": "Archivar"
+  },
+  "unlock": {
+    "opened": "Freigeschaltet",
+    "new": "neu",
+    "locked": "Gesperrt",
+    "hintLevel": "Level-{{n}}",
+    "hintAchievement": "Erfolg „{{name}}“",
+    "hintAscension": "Einsicht unter A {{n}}",
+    "hintClears": "{{n}} Kampagne endet",
+    "hintDrop": "ein einzigartiger Tropfen",
+    "hintJoin": " oder ",
+    "hintUnknown": "unbekannt",
+    "diceL8": "Sechs d8-Rahmen – einer pro Schule",
+    "diceL15": "Sechs Fusionswürfel",
+    "diceL22": "Sechs seltene Lenkräder",
+    "diceL30": "Das prismatische Regal",
+    "diceL38": "Sechs d12-Schwergewichte",
+    "diceL46": "Sechs legendäre Karten",
+    "diceAchFirstClear": "Das oberste Regal",
+    "diceAchPuzzler": "Vier Anomalienverschmelzungen",
+    "diceAchCollector": "Drei Kollektorverschmelzungen",
+    "diceAchSurvivor": "Drei Überlebenswürfel",
+    "contractsL5": "Drei Aufträge: „Storm“, „Bare Armor“, „Blind Jump“",
+    "contractsL12": "Drei Verträge: Ram, Single Cast, Dead Reckoning",
+    "contractsL20": "Drei Verträge: Ark, Keeper, Iron Flut",
+    "contractsL28": "Drei Verträge: Choir, Prismwork, Ghost Lane",
+    "contractsA5": "Vertrag: Der Zehnte der Leere",
+    "contractsAchGauntlet": "Auftrag: „The Gauntlet“",
+    "skinAshen": "Die Haut: Aschgrau",
+    "skinVoidglass": "Die Skin: Voidglass",
+    "skinEmberglass": "Die Skin: Emberglass",
+    "prestigeTheme": "Thema: Aszendent",
+    "skinPrestige50": "Die Skin: Captain's Mark",
+    "skinChartwright": "Die Skin: Chartwright",
+    "featureShipRam": "Der Widder",
+    "featureShipArk": "Die Arche",
+    "featureEngraving": "Gravur Bahnhof",
+    "featureDailyPreview": "Tägliche Vorschau",
+    "featureFreeRespec": "Kostenlose Keystone-Neuzuweisung"
+  },
+  "skin": {
+    "title": "Die Skins",
+    "hint": "Nur kosmetisch – die Haut verändert niemals die Augenzahl eines Würfels.",
+    "use": "Verwendung",
+    "active": "Aktiv",
+    "default": {
+      "name": "Standard",
+      "desc": "Das Werk."
+    },
+    "ashen": {
+      "name": "Aschefarben",
+      "desc": "Scharfe Kanten, Eschenmaserung, kein Glanz."
+    },
+    "voidglass": {
+      "name": "Voidglass",
+      "desc": "Rund, tief, von innen beleuchtet."
+    },
+    "emberglass": {
+      "name": "Emberglas",
+      "desc": "Kräftiger bernsteinfarbener Rand, warmer Kern."
+    },
+    "prestige50": {
+      "name": "Kapitänszeichen",
+      "desc": "Serifen-Glyphen, weißer Rand."
+    },
+    "chartwright": {
+      "name": "Chartwright",
+      "desc": "Blaupause, quadratisch, einfarbige Glyphen."
+    }
+  },
+  "ach": {
+    "firstBlood": {
+      "name": "Erstes Blut",
+      "desc": "Töte 25 Gegner."
+    },
+    "hunter": {
+      "name": "Jäger",
+      "desc": "Töte 500 Gegner."
+    },
+    "eliteHunter": {
+      "name": "Elite-Jäger",
+      "desc": "Töte 25 Elitekämpfer."
+    },
+    "sectorFive": {
+      "name": "Fünf Kronen",
+      "desc": "Besiege alle fünf Sektor-Bosse."
+    },
+    "ironStreak": {
+      "name": "Eisenstreifen",
+      "desc": "Schließe drei Kampagnen hintereinander ab, ohne zu sterben."
+    },
+    "flawless": {
+      "name": "Makellos",
+      "desc": "Schließe eine Kampagne mit einer Rumpfintegrität von mindestens 90 % ab."
+    },
+    "ascendant": {
+      "name": "Aszendent",
+      "desc": "Schließe die Kampagne auf Stufe 10 ab."
+    },
+    "quickWork": {
+      "name": "Schnelle Arbeit",
+      "desc": "Schließe eine Kampagne in höchstens 11 Sprüngen ab."
+    },
+    "scrapper": {
+      "name": "Schrottsammler",
+      "desc": "Verdiene insgesamt 5.000 Schrott."
+    },
+    "tycoon": {
+      "name": "Tycoon",
+      "desc": "Verdiene insgesamt 25.000 Schrott."
+    },
+    "frugal": {
+      "name": "Sparsam",
+      "desc": "Schließe eine Kampagne ab, ohne auch nur einen Cent auszugeben."
+    },
+    "outfitter": {
+      "name": "Ausrüster",
+      "desc": "Besitze 30 verschiedene Würfel."
+    },
+    "tierFive": {
+      "name": "Stufe 5",
+      "desc": "Löse eine Anomalie der Stufe 5."
+    },
+    "cryptographer": {
+      "name": "Kryptograf",
+      "desc": "Löse zehn Anomalien der Stufe 5."
+    },
+    "anomalist": {
+      "name": "Anomalist",
+      "desc": "Löse vier Anomalien in einem Durchgang."
+    },
+    "puzzleBreadth": {
+      "name": "Belesen",
+      "desc": "Entdecken Sie 30 verschiedene Anomalien."
+    },
+    "maraSquared": {
+      "name": "Maras Hauptbuch",
+      "desc": "Sei Mara etwas schuldig und genieße ihre Gunst."
+    },
+    "keeperFriend": {
+      "name": "Der Faden des Hüters",
+      "desc": "Bezahle den Wächter zurück und baue das Leuchtfeuer wieder auf."
+    },
+    "fleetKept": {
+      "name": "Ein gehaltenes Versprechen",
+      "desc": "Bewahre die Wahrheit der Flotte."
+    },
+    "apostate": {
+      "name": "Abtrünniger",
+      "desc": "Brich den Pakt des Chors."
+    },
+    "bothMirrors": {
+      "name": "Beide Spiegel",
+      "desc": "Binde den Spiegel einmal und zerbreche ihn einmal."
+    },
+    "coreTrilogy": {
+      "name": "Drei Antworten",
+      "desc": "Antworte, schweige und höre auf dein Innerstes – über drei Durchgänge hinweg."
+    },
+    "lighthouse": {
+      "name": "Leuchtturm",
+      "desc": "Zünde den Leuchtturm an."
+    },
+    "beaconkeeper": {
+      "name": "Leuchtturmwärter",
+      "desc": "Löse vier Leuchtfeuer in einem Durchgang."
+    },
+    "allEndings": {
+      "name": "Jeder Weg",
+      "desc": "Erreiche alle vier Enden."
+    },
+    "fiftyFound": {
+      "name": "Fünfzig gefunden",
+      "desc": "Lerne 50 verschiedene Würfel in Serien kennen."
+    },
+    "everyColour": {
+      "name": "Jede Farbe",
+      "desc": "Besitze einen Würfel von allen sieben Schulen."
+    },
+    "archivist": {
+      "name": "Archivar",
+      "desc": "Schalte 60 „Kodex“-Einträge frei."
+    },
+    "keystoneThree": {
+      "name": "Chartwright",
+      "desc": "Halte drei Schlusssteine gleichzeitig fest."
+    },
+    "contractor": {
+      "name": "Auftragnehmer",
+      "desc": "Sammle 30 Vertragssterne."
+    },
+    "toast": "Leistung"
+  },
+  "chartTag": {
+    "red": "rot",
+    "blue": "blau",
+    "green": "grün",
+    "yellow": "gelb",
+    "black": "schwarz",
+    "grey": "grau",
+    "prismatic": "prismatisch",
+    "weapons": "Waffen",
+    "shields": "Schilde",
+    "engines": "Motoren",
+    "sensors": "Sensoren",
+    "reactor": "Reaktor",
+    "spinal": "spinal",
+    "repairBay": "Reparaturhalle",
+    "burn": "brennen",
+    "crit": "crit",
+    "growth": "Wachstum",
+    "reroll": "Neuwurf",
+    "charge": "Gebühr",
+    "scrap": "Schrott",
+    "overcap": "Überkappe",
+    "pierce": "durchbohren",
+    "dodge": "ausweichen",
+    "survival": "Überleben",
+    "control": "Steuerung",
+    "dice": "Würfel",
+    "shieldwall": "Schildwall",
+    "risk": "Risiko",
+    "swarm": "Schwarm",
+    "spike": "Spike",
+    "precision": "Genauigkeit"
+  },
+  "ascension": {
+    "reward": {
+      "shards": "Die Shard-Auszahlung steigt mit jedem Level",
+      "skinAshen": "die Haut „Ashen“",
+      "contract": "Vertrag „The Void Tithe“",
+      "skinVoidglass": "die Haut „Voidglass“",
+      "skinEmberglass": "Die Haut „Emberglass“",
+      "prestigeTheme": "Thema „Ascendant“",
+      "badge": "das „Ascendant“-Abzeichen"
+    }
   }
 }

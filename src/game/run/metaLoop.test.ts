@@ -8,7 +8,12 @@ import {
 } from "@/game/chart/engine";
 import { hangarBudget } from "@/data/milestones";
 import { validateDeck } from "@/game/meta/deck";
-import { campaignShards, runXp } from "@/game/xp";
+import {
+  campaignShards,
+  HALF_HULL_CLEAR_SHARDS,
+  runXp,
+  STREAK_SHARDS,
+} from "@/game/xp";
 import { endRun, startRun } from "@/game/run/flow";
 import { createInitialMetaStats, useMetaStore } from "@/stores/metaStore";
 import { createInitialRunStats, useRunStore } from "@/stores/runStore";
@@ -37,6 +42,8 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
     const counts = { nodes: 60, elites: 12, minibosses: 5, bosses: 5, contractStars: 0 };
     useRunStore.setState({
       active: true,
+      hull: 30,
+      hullMax: 30,
       stats: {
         ...createInitialRunStats(),
         nodesCleared: 60,
@@ -54,9 +61,21 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
     const meta1 = useMetaStore.getState();
     expect(result).not.toBeNull();
     expect(result?.xpGain).toBe(runXp(counts));
-    expect(result?.shardGain).toBe(campaignShards(5));
+    const expectedShards =
+      campaignShards(5) + HALF_HULL_CLEAR_SHARDS + STREAK_SHARDS;
+    expect(result?.shards.sectors).toBe(campaignShards(5));
+    expect(result?.shards.hullClear).toBe(HALF_HULL_CLEAR_SHARDS);
+    expect(result?.shards.streak).toBe(STREAK_SHARDS);
+    expect(result?.shards.beacons).toBe(0);
+    expect(result?.shards.ascension).toBe(0);
+    expect(result?.shards.total).toBe(expectedShards);
+    expect(result?.shardGain).toBe(
+      expectedShards +
+        (result?.findShards ?? 0) +
+        (result?.achievementShards ?? 0),
+    );
     expect(meta1.xp).toBe(runXp(counts));
-    expect(meta1.shards).toBe(campaignShards(5));
+    expect(meta1.shards).toBe(result?.shardGain);
     expect(result?.fromLevel).toBe(1);
     expect(result?.toLevel).toBeGreaterThan(1);
     expect(result?.milestones.length).toBeGreaterThan(0);

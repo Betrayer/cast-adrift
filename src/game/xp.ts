@@ -74,3 +74,67 @@ export const campaignShards = (sectorsCleared: number): number =>
     (sum, n) => sum + n,
     0,
   );
+
+export const ASCENSION_SHARD_PCT = 8;
+export const BEACON_SHARDS = 8;
+export const FIRST_ENDING_SHARDS = 25;
+export const HALF_HULL_CLEAR_SHARDS = 15;
+export const STREAK_SHARDS = 5;
+export const STREAK_SHARD_CAP = 25;
+export const HALF_HULL_PCT = 50;
+
+export const ascensionShardMult = (ascension: number): number =>
+  1 + (ASCENSION_SHARD_PCT / 100) * Math.max(0, ascension);
+
+export interface RunQualityInput {
+  win: boolean;
+  sectorsCleared: number;
+  beacons: number;
+  hullPct: number;
+  firstEnding: boolean;
+  streak: number;
+  ascension: number;
+}
+
+export interface ShardBreakdown {
+  sectors: number;
+  beacons: number;
+  firstEnding: number;
+  hullClear: number;
+  streak: number;
+  ascension: number;
+  total: number;
+}
+
+export const ZERO_SHARD_BREAKDOWN: ShardBreakdown = {
+  sectors: 0,
+  beacons: 0,
+  firstEnding: 0,
+  hullClear: 0,
+  streak: 0,
+  ascension: 0,
+  total: 0,
+};
+
+export const shardBreakdown = (input: RunQualityInput): ShardBreakdown => {
+  const sectors = campaignShards(input.sectorsCleared);
+  const beacons = Math.max(0, input.beacons) * BEACON_SHARDS;
+  const firstEnding = input.firstEnding ? FIRST_ENDING_SHARDS : 0;
+  const hullClear =
+    input.win && input.hullPct >= HALF_HULL_PCT ? HALF_HULL_CLEAR_SHARDS : 0;
+  const streak = Math.min(
+    STREAK_SHARD_CAP,
+    Math.max(0, input.streak) * STREAK_SHARDS,
+  );
+  const base = sectors + beacons + firstEnding + hullClear + streak;
+  const total = Math.round(base * ascensionShardMult(input.ascension));
+  return {
+    sectors,
+    beacons,
+    firstEnding,
+    hullClear,
+    streak,
+    ascension: total - base,
+    total,
+  };
+};

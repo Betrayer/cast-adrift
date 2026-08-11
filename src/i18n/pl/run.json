@@ -297,7 +297,10 @@
     "aLevel": "A {{n}}",
     "tideCap": "Szczyty pływów interferencyjnych na stronie {{n}}",
     "launch": "Uruchomienie",
-    "back": "Powrót"
+    "back": "Powrót",
+    "ascensionCost": "To cię kosztuje",
+    "ascensionGain": "To się opłaca",
+    "shardMult": "+{{n}}% fragmentów dla całego przebiegu"
   },
   "package": {
     "title": "Opakowanie typu Gate",

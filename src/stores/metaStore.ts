@@ -1,7 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CHART_NODE_BY_ID } from '@/data/chart';
+import { DEFAULT_DIE_SKIN, isDieSkinId } from '@/data/cosmetics';
 import { STARTER_DECK } from '@/data/decks';
+import { DIE_BY_ID } from '@/data/dice';
+import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
 import type { ShipId } from '@/data/ships';
 import { levelFromTotalXp } from '@/game/xp';
@@ -24,6 +27,24 @@ export interface MetaStats {
   dailyRuns: number;
   contractRuns: number;
   elites: number;
+  t5Solved: number;
+  beacons: number;
+  noDeathStreak: number;
+  bestNoDeathStreak: number;
+}
+
+export interface EncounterRecord {
+  sector: number;
+  node: string;
+}
+
+export interface RunEncounter extends EncounterRecord {
+  defId: string;
+}
+
+export interface EncounterResult {
+  firstFinds: string[];
+  shards: number;
 }
 
 export type DailyPlayState = "started" | "done";
@@ -66,6 +87,12 @@ export interface MetaValues {
   flagsArchive: string[];
   bossFirstKills: string[];
   endings: string[];
+  achievements: string[];
+  achievementsSeen: string[];
+  encountered: Record<string, EncounterRecord>;
+  unlocksGranted: string[];
+  unlocksSeen: string[];
+  dieSkin: string;
   stats: MetaStats;
 }
 
@@ -98,7 +125,7 @@ export interface MetaState extends MetaValues {
   awardBadge: (id: string) => boolean;
   archiveRunFlags: (flags: readonly string[]) => void;
   recordBossFirstKill: (bossId: string) => boolean;
-  recordEnding: (endingId: string) => void;
+  recordEnding: (endingId: string) => boolean;
   markPrologueDone: () => void;
   recordCampaignClear: (ascension: number) => void;
   recordContractStars: (id: string, mask: number) => number;
@@ -106,9 +133,16 @@ export interface MetaState extends MetaValues {
   recordDaily: (date: string, score: number, rank: number | null) => void;
   recordDriftScore: (score: number, week: string) => boolean;
   bumpLifetime: (delta: Partial<MetaStats>) => void;
+  unlockAchievement: (id: string) => boolean;
+  markAchievementsSeen: (ids: readonly string[]) => void;
+  grantUnlock: (id: string) => boolean;
+  markUnlocksSeen: (ids: readonly string[]) => void;
+  recordEncounters: (list: readonly RunEncounter[]) => EncounterResult;
+  setDieSkin: (id: string) => void;
+  recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 9;
+export const META_VERSION = 10;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -138,6 +172,10 @@ export const createInitialMetaStats = (): MetaStats => ({
   dailyRuns: 0,
   contractRuns: 0,
   elites: 0,
+  t5Solved: 0,
+  beacons: 0,
+  noDeathStreak: 0,
+  bestNoDeathStreak: 0,
 });
 
 const LIFETIME_KEYS = [
@@ -151,6 +189,8 @@ const LIFETIME_KEYS = [
   "dailyRuns",
   "contractRuns",
   "elites",
+  "t5Solved",
+  "beacons",
 ] as const;
 
 const createInitialMetaValues = (): MetaValues => ({
@@ -183,8 +223,33 @@ const createInitialMetaValues = (): MetaValues => ({
   flagsArchive: [],
   bossFirstKills: [],
   endings: [],
+  achievements: [],
+  achievementsSeen: [],
+  encountered: {},
+  unlocksGranted: [],
+  unlocksSeen: [],
+  dieSkin: DEFAULT_DIE_SKIN,
   stats: createInitialMetaStats(),
 });
+
+const coerceEncountered = (value: unknown): Record<string, EncounterRecord> => {
+  if (typeof value !== "object" || value === null) return {};
+  const out: Record<string, EncounterRecord> = {};
+  for (const [defId, raw] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof raw !== "object" || raw === null) continue;
+    const rec = raw as Partial<EncounterRecord>;
+    out[defId] = {
+      sector: typeof rec.sector === "number" ? rec.sector : 1,
+      node: typeof rec.node === "string" ? rec.node : "battle",
+    };
+  }
+  return out;
+};
+
+const coerceStrings = (value: unknown, base: string[]): string[] =>
+  Array.isArray(value)
+    ? value.filter((id): id is string => typeof id === "string")
+    : base;
 
 const coerceCollection = (value: unknown): CollectionEntry[] => {
   if (!Array.isArray(value)) return buildStarterCollection();
@@ -320,6 +385,15 @@ export const migrateMeta = (
       ? prev.bossFirstKills
       : base.bossFirstKills,
     endings: Array.isArray(prev.endings) ? prev.endings : base.endings,
+    achievements: coerceStrings(prev.achievements, base.achievements),
+    achievementsSeen: coerceStrings(
+      prev.achievementsSeen,
+      base.achievementsSeen,
+    ),
+    encountered: coerceEncountered(prev.encountered),
+    unlocksGranted: coerceStrings(prev.unlocksGranted, base.unlocksGranted),
+    unlocksSeen: coerceStrings(prev.unlocksSeen, base.unlocksSeen),
+    dieSkin: isDieSkinId(prev.dieSkin) ? prev.dieSkin : base.dieSkin,
     stats:
       typeof prev.stats === 'object' && prev.stats !== null
         ? { ...base.stats, ...(prev.stats as Partial<MetaStats>) }
@@ -397,7 +471,10 @@ export const useMetaStore = create<MetaState>()(
 
       addShards: (n) => {
         if (n <= 0) return;
-        set((s) => ({ shards: s.shards + n }));
+        set((s) => ({
+          shards: s.shards + n,
+          stats: { ...s.stats, shardsEarned: s.stats.shardsEarned + n },
+        }));
       },
 
       spendShards: (n) => {
@@ -524,11 +601,9 @@ export const useMetaStore = create<MetaState>()(
       },
 
       recordEnding: (endingId) => {
-        set((s) =>
-          s.endings.includes(endingId)
-            ? s
-            : { endings: [...s.endings, endingId] },
-        );
+        if (get().endings.includes(endingId)) return false;
+        set((s) => ({ endings: [...s.endings, endingId] }));
+        return true;
       },
 
       markPrologueDone: () => {
@@ -617,6 +692,71 @@ export const useMetaStore = create<MetaState>()(
           return { stats };
         });
       },
+
+      unlockAchievement: (id) => {
+        if (get().achievements.includes(id)) return false;
+        set((s) => ({ achievements: [...s.achievements, id] }));
+        return true;
+      },
+
+      markAchievementsSeen: (ids) => {
+        set((s) => ({
+          achievementsSeen: [...new Set([...s.achievementsSeen, ...ids])],
+        }));
+      },
+
+      grantUnlock: (id) => {
+        if (get().unlocksGranted.includes(id)) return false;
+        set((s) => ({ unlocksGranted: [...s.unlocksGranted, id] }));
+        return true;
+      },
+
+      markUnlocksSeen: (ids) => {
+        set((s) => ({
+          unlocksSeen: [...new Set([...s.unlocksSeen, ...ids])],
+        }));
+      },
+
+      recordEncounters: (list) => {
+        const known = get().encountered;
+        const firstFinds: string[] = [];
+        const added: Record<string, EncounterRecord> = {};
+        for (const entry of list) {
+          if (known[entry.defId] !== undefined) continue;
+          if (added[entry.defId] !== undefined) continue;
+          added[entry.defId] = { sector: entry.sector, node: entry.node };
+          firstFinds.push(entry.defId);
+        }
+        if (firstFinds.length === 0) return { firstFinds: [], shards: 0 };
+        const shards = firstFinds.reduce((sum, defId) => {
+          const rarity = DIE_BY_ID.get(defId)?.rarity ?? 'common';
+          return sum + (FIRST_FIND_SHARDS[rarity] ?? 0);
+        }, 0);
+        set((s) => ({
+          encountered: { ...s.encountered, ...added },
+          shards: s.shards + shards,
+          stats: { ...s.stats, shardsEarned: s.stats.shardsEarned + shards },
+        }));
+        return { firstFinds, shards };
+      },
+
+      setDieSkin: (id) => {
+        if (!isDieSkinId(id)) return;
+        set({ dieSkin: id });
+      },
+
+      recordStreak: (win) => {
+        set((s) => {
+          const streak = win ? s.stats.noDeathStreak + 1 : 0;
+          return {
+            stats: {
+              ...s.stats,
+              noDeathStreak: streak,
+              bestNoDeathStreak: Math.max(s.stats.bestNoDeathStreak, streak),
+            },
+          };
+        });
+      },
     }),
     {
       name: 'ca.meta',
@@ -646,6 +786,12 @@ export const useMetaStore = create<MetaState>()(
         flagsArchive: s.flagsArchive,
         bossFirstKills: s.bossFirstKills,
         endings: s.endings,
+        achievements: s.achievements,
+        achievementsSeen: s.achievementsSeen,
+        encountered: s.encountered,
+        unlocksGranted: s.unlocksGranted,
+        unlocksSeen: s.unlocksSeen,
+        dieSkin: s.dieSkin,
         stats: s.stats,
       }),
     },

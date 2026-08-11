@@ -297,7 +297,10 @@
     "aLevel": "Un e{{n}}",
     "tideCap": "Máximos de las mareas de interferencia en {{n}}",
     "launch": "Inicio",
-    "back": "Atrás"
+    "back": "Atrás",
+    "ascensionCost": "Te cuesta",
+    "ascensionGain": "Te compensa",
+    "shardMult": "+{{n}} % de fragmentos durante toda la ejecución"
   },
   "package": {
     "title": "Paquete «Gate»",

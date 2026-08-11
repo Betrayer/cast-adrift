@@ -3767,6 +3767,30 @@
     "quietRun": {
       "name": "Cicha jazda",
       "desc": "Przejdź przez Szczelinę, używając jak najmniejszej liczby kości."
+    },
+    "deadReckoning": {
+      "name": "Nawigacja zliczeniowa",
+      "desc": "Nie ma „Mapa gwiazd”, nie ma żadnych map — mgła na torze i nabrzeże, którego na pewno nie potrzebujesz."
+    },
+    "ironTide": {
+      "name": "Żelazo Przypływ",
+      "desc": "Kiedy się pojawisz, poziom wody wynosi już trzy. Trzymaj kadłub i wychodź z walk w jednym kawałku."
+    },
+    "prismWork": {
+      "name": "Prismwork",
+      "desc": "Talia z kartami „prism”. Na planszy znajduje się sześć szkół, a kości, które można rozłożyć, jest mniej, niż byś chciał."
+    },
+    "ghostLane": {
+      "name": "Ghost Lane",
+      "desc": "Cisza radiowa w sektorze drugim. Wybierzcie skrót i zostawcie elity w spokoju."
+    },
+    "voidTithe": {
+      "name": "Dziesięcina Pustki",
+      "desc": "Sektor piąty pogrążony w burzy rezonansowej, ceny wzrosły o trzy czwarte. Wyjdź z tego stabilny i bogaty."
+    },
+    "gauntlet": {
+      "name": "Gauntlet",
+      "desc": "Żadnych bonusów, żadnej tabeli – Pakt Obsydianu został po prostu dodany. Czterech elitarnych żołnierzy i jedna czwarta kadłuba."
     }
   },
   "sectors": {

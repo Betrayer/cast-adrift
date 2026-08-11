@@ -18,6 +18,8 @@ import { countStars } from "@/game/run/goals";
 import { progressWithinLevel } from "@/game/xp";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
+import { AchievementGrid } from "./AchievementGrid";
+import { BadgeRow } from "./BadgeRow";
 
 const StatCell = ({ label, value }: { label: string; value: string }) => (
   <Stack gap={0}>
@@ -183,6 +185,18 @@ export const ProfileScreen = () => {
               </Group>
             </Stack>
           </Paper>
+
+          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+            <Stack gap="xs">
+              <Text fw={600} c={tokens.text}>
+                {t("meta:profile.badges")}
+              </Text>
+              <Divider color={tokens.line} />
+              <BadgeRow />
+            </Stack>
+          </Paper>
+
+          <AchievementGrid />
 
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Stack gap="xs">

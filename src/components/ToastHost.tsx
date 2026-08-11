@@ -1,11 +1,13 @@
 import { useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
+import { ACHIEVEMENT_BY_ID } from '@/data/achievements';
 import { useNarrativeStore } from '@/stores/narrativeStore';
 import styles from './ToastHost.module.css';
 
 const CONSEQUENCE_MS = 4000;
 const BARK_MS = 3500;
+const ACHIEVEMENT_MS = 4500;
 
 const QueueDots = ({ count }: { count: number }) => {
   if (count <= 0) return null;
@@ -79,11 +81,49 @@ const BarkSlot = () => {
   );
 };
 
+const AchievementSlot = () => {
+  const { t } = useTranslation(['meta']);
+  const toast = useNarrativeStore((s) => s.achievement);
+  const queued = useNarrativeStore((s) => s.achievementQueue.length);
+  const dismiss = useNarrativeStore((s) => s.dismissAchievement);
+
+  useEffect(() => {
+    if (toast === null) return;
+    const id = window.setTimeout(dismiss, ACHIEVEMENT_MS);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [toast, dismiss]);
+
+  if (toast === null) return <div className={styles.slot} />;
+  const def = ACHIEVEMENT_BY_ID.get(toast.achievement);
+  return (
+    <div className={styles.slot}>
+      <div
+        role="status"
+        data-toast="achievement"
+        onClick={dismiss}
+        className={`${styles.toast ?? ''} ${styles.achievement ?? ''}`}
+      >
+        <span className={styles.achievementMark}>✦</span>
+        <span className={styles.achievementLabel}>
+          <span className={styles.achievementKicker}>
+            {t('meta:ach.toast')}
+          </span>
+          <span>{t(def?.name ?? toast.achievement)}</span>
+        </span>
+      </div>
+      <QueueDots count={queued} />
+    </div>
+  );
+};
+
 export const ToastHost = () => {
   if (typeof document === 'undefined') return null;
   return createPortal(
     <div className={styles.host} data-toast-host>
       <ConsequenceSlot />
+      <AchievementSlot />
       <BarkSlot />
     </div>,
     document.body,

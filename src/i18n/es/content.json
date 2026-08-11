@@ -3767,6 +3767,30 @@
     "quietRun": {
       "name": "Carrera tranquila",
       "desc": "Atraviesa la Grieta utilizando el menor número posible de dados."
+    },
+    "deadReckoning": {
+      "name": "Navegación a estima",
+      "desc": "Sin «Carta estelar», sin cartas náuticas en absoluto: niebla en el canal y un muelle que no te hace falta."
+    },
+    "ironTide": {
+      "name": "Marea de hierro",
+      "desc": "La marea ya está en tres cuando llegas. Mantén el casco a flote y sale ileso de los combates."
+    },
+    "prismWork": {
+      "name": "Prismwork",
+      "desc": "Un mazo con fichas de prisma. Hay seis escuelas en el tablero y menos dados de los que te gustaría colocar."
+    },
+    "ghostLane": {
+      "name": "El carril fantasma",
+      "desc": "Silencio de radio en el sector dos. Tomad el atajo y dejad en paz a los de élite."
+    },
+    "voidTithe": {
+      "name": "El diezmo del Vacío",
+      "desc": "El sector cinco se ve afectado por una tormenta resonante; los precios suben tres cuartos. Sale estable y próspero."
+    },
+    "gauntlet": {
+      "name": "El Gauntlet",
+      "desc": "Sin ventajas, sin mapa, con el Pacto de Obsidiana activado. Cuatro élites y una cuarta parte del casco."
     }
   },
   "sectors": {

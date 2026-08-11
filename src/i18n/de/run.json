@@ -297,7 +297,10 @@
     "aLevel": "Ein „{{n}}“",
     "tideCap": "Interferenzgezeiten am {{n}}",
     "launch": "Start",
-    "back": "Zurück"
+    "back": "Zurück",
+    "ascensionCost": "Das kostet dich",
+    "ascensionGain": "Es zahlt sich für dich aus",
+    "shardMult": "+{{n}} % Shards für den gesamten Durchlauf"
   },
   "package": {
     "title": "Gate-Gehäuse",

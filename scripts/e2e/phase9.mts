@@ -81,6 +81,10 @@ const seedProfile = async (page: Page): Promise<void> => {
         dailyRuns: 6,
         contractRuns: 8,
         elites: 24,
+        t5Solved: 3,
+        beacons: 9,
+        noDeathStreak: 1,
+        bestNoDeathStreak: 2,
       },
     });
   });

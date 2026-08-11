@@ -24,3 +24,15 @@ export const deckPoints = (deck: readonly string[]): number =>
 
 export const FATE_TIER = 100;
 export const DECK_MIN = 3;
+
+export const FIRST_FIND_SHARDS: Record<Rarity, number> = {
+  common: 8,
+  uncommon: 14,
+  rare: 22,
+  legendary: 34,
+};
+
+export const ENCOUNTER_DISCOUNT_PCT = 30;
+
+export const encounteredDiePrice = (defId: string): number =>
+  Math.round((metaDiePrice(defId) * (100 - ENCOUNTER_DISCOUNT_PCT)) / 100);

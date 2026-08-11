@@ -3767,6 +3767,30 @@
     "quietRun": {
       "name": "Leiser Lauf",
       "desc": "Überquere die Kluft und setze dabei so wenige Würfel wie möglich ein."
+    },
+    "deadReckoning": {
+      "name": "Navigation nach Schätzung",
+      "desc": "Kein „Sternenkarte“, überhaupt keine Seekarten – Nebel auf der Fahrrinne und ein Anlegeplatz, den man wohl nicht braucht."
+    },
+    "ironTide": {
+      "name": "Eisen-Flut",
+      "desc": "Die Flut steht bereits bei drei, wenn du ankommst. Halte den Rumpf fest und überstehe die Kämpfe unbeschadet."
+    },
+    "prismWork": {
+      "name": "Prismwork",
+      "desc": "Ein mit Prismen bestücktes Spiel. Sechs Schulen auf dem Spielbrett und weniger Würfel, als man gerne setzen würde."
+    },
+    "ghostLane": {
+      "name": "Geistergasse",
+      "desc": "Funkstille in Sektor zwei. Nehmt den kürzesten Weg und lasst die Eliten in Ruhe."
+    },
+    "voidTithe": {
+      "name": "Der Zehnte der Leere",
+      "desc": "Sektor fünf unter einem heftigen Sturm, Preise um drei Viertel erhöht. Geht stabil und reich daraus hervor."
+    },
+    "gauntlet": {
+      "name": "Der Gauntlet",
+      "desc": "Keine Extras, keine Karte – der Obsidian-Pakt wurde einfach draufgepackt. Vier Elitesoldaten und ein Viertel des Rumpfes."
     }
   },
   "sectors": {

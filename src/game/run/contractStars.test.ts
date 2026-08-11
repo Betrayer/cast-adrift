@@ -99,6 +99,62 @@ const scriptRun = (goals: readonly GoalSpec[]): GoalContext => {
       case "dicePlacedAtMost":
         stats.dicePlaced = spec.n;
         break;
+      case "axisAtLeast":
+        ctx.axis = spec.n;
+        break;
+      case "elitesAtMost":
+        stats.elites = spec.n;
+        break;
+    }
+  }
+  return ctx;
+};
+
+const sloppyRun = (goals: readonly GoalSpec[]): GoalContext => {
+  const stats: RunStats = {
+    ...createInitialRunStats(),
+    jumps: 99,
+    hullPctMin: 0,
+    shipyardVisits: 3,
+    rerollsUsed: 9,
+    scrapSpent: 300,
+    dicePlaced: 999,
+    minBattleTurns: 9,
+  };
+  const ctx: GoalContext = {
+    win: true,
+    stats,
+    hull: 1,
+    hullMax: 30,
+    scrap: 0,
+    deckSize: 1,
+    deckSchools: 1,
+    axis: 0,
+    solvedPuzzles: [],
+    flags: {},
+  };
+  for (const spec of goals) {
+    switch (spec.g) {
+      case "axisAtMost":
+        ctx.axis = spec.n + 1;
+        break;
+      case "axisAtLeast":
+        ctx.axis = spec.n - 1;
+        break;
+      case "elitesAtMost":
+        stats.elites = spec.n + 1;
+        break;
+      case "jumpsAtMost":
+        stats.jumps = spec.n + 1;
+        break;
+      case "dicePlacedAtMost":
+        stats.dicePlaced = spec.n + 1;
+        break;
+      case "fastBattleTurnsAtMost":
+        stats.minBattleTurns = spec.n + 1;
+        break;
+      default:
+        break;
     }
   }
   return ctx;
@@ -115,26 +171,7 @@ describe("contract stars are reachable", () => {
 
   it("awards only the clear for a bare win", () => {
     const bare = (def: ContractDef): number =>
-      goalStarsMask(def.goals, {
-        win: true,
-        stats: {
-          ...createInitialRunStats(),
-          jumps: 99,
-          hullPctMin: 1,
-          shipyardVisits: 3,
-          rerollsUsed: 9,
-          scrapSpent: 300,
-          dicePlaced: 999,
-        },
-        hull: 1,
-        hullMax: 30,
-        deckSchools: 1,
-        scrap: 0,
-        deckSize: 1,
-        axis: 5,
-        solvedPuzzles: [],
-        flags: {},
-      });
+      goalStarsMask(def.goals, sloppyRun(def.goals));
     for (const def of CONTRACTS) {
       expect(bare(def) & 1).toBe(1);
       expect(bare(def)).toBe(1);

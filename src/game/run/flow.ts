@@ -61,11 +61,18 @@ import {
 } from "@/game/run/modes";
 import {
   bossFirstKillShards,
-  campaignShards,
   runXp,
   sectorClearShards,
+  shardBreakdown,
+  ZERO_SHARD_BREAKDOWN,
 } from "@/game/xp";
-import { MILESTONES } from "@/data/milestones";
+import { milestonesBetween } from "@/data/milestones";
+import { settleAchievements } from "@/game/meta/achievements";
+import {
+  freshUnlocks,
+  grantDieUnlock,
+  unlockContextOf,
+} from "@/game/meta/unlockState";
 import { useSummaryStore } from "@/stores/summaryStore";
 import { captureRunSnapshot } from "@/game/run/snapshot";
 import { trackEvent } from "@/services/analytics";
@@ -190,8 +197,23 @@ export const endRun = (win: boolean): void => {
     1 +
     computeRunMods(run.perks, run.chartPicks, run.modules).xpMultPct / 100;
   const xpGain = Math.round(runXp(counts, run.ascension) * xpMult);
-  const shardGain = run.mode === "campaign" ? campaignShards(cleared) : 0;
-  const award = meta.awardRun(xpGain, shardGain, win);
+  const beacons = beaconsResolved(run.flags);
+  const hullPct = run.hullMax <= 0 ? 0 : (run.hull / run.hullMax) * 100;
+  meta.recordStreak(win && run.mode === "campaign");
+  const streak = useMetaStore.getState().stats.noDeathStreak;
+  const shards =
+    run.mode === "campaign"
+      ? shardBreakdown({
+          win,
+          sectorsCleared: cleared,
+          beacons,
+          hullPct,
+          firstEnding: run.endingFirstTime,
+          streak,
+          ascension: run.ascension,
+        })
+      : ZERO_SHARD_BREAKDOWN;
+  const award = meta.awardRun(xpGain, shards.total, win);
   meta.archiveRunFlags(Object.keys(run.flags));
   if (win && run.mode === "campaign") {
     meta.recordCampaignClear(run.ascension);
@@ -201,17 +223,36 @@ export const endRun = (win: boolean): void => {
   meta.bumpLifetime({
     kills: run.stats.kills,
     scrapEarned: run.stats.scrapEarned,
+    beacons,
     driftRuns: run.mode === "drift" ? 1 : 0,
     dailyRuns: run.mode === "daily" ? 1 : 0,
     contractRuns: run.mode === "contract" ? 1 : 0,
     ...(run.mode === "drift" ? { deepestDrift: run.stats.depth } : {}),
   });
-  const milestones = MILESTONES.filter(
-    (m) => m.level > award.fromLevel && m.level <= award.toLevel,
-  ).map((m) => m.label);
+  const finds = meta.recordEncounters(run.encounters);
+  const settled = settleAchievements({
+    win,
+    hullPct,
+    beacons,
+    puzzles: run.solvedPuzzles.length,
+    ascension: run.ascension,
+    stats: run.stats,
+  });
+  const milestones = milestonesBetween(award.fromLevel, award.toLevel).map(
+    (m) => m.label,
+  );
+  const after = useMetaStore.getState();
+  const unlocks = freshUnlocks(unlockContextOf(after), after.unlocksSeen);
   useSummaryStore.getState().setResult({
     xpGain,
-    shardGain,
+    shardGain: shards.total + finds.shards + settled.shards,
+    shards,
+    findShards: finds.shards,
+    firstFinds: finds.firstFinds,
+    achievements: settled.unlocked.map((def) => def.id),
+    achievementShards: settled.shards,
+    unlocks: unlocks.defs.map((def) => def.label),
+    unlockIds: unlocks.ids,
     fromLevel: award.fromLevel,
     toLevel: award.toLevel,
     win,
@@ -652,6 +693,7 @@ const afterBossVictory = (): void => {
   if (meta.recordBossFirstKill(bossId)) {
     meta.addShards(bossFirstKillShards(run.sector));
   }
+  settleAchievements();
   // A contract is one sector: clearing its boss ends the run and scores the stars.
   if (run.mode === "contract") {
     settleSectorDrift();
@@ -727,6 +769,10 @@ const finalizeNode = (
     RARE_RARITIES.has(DIE_BY_ID.get(pendingRewards.dieDrop)?.rarity ?? "")
   ) {
     emitBark("rareLoot");
+  }
+
+  if (node.type === "boss" && pendingRewards?.dieDrop != null) {
+    grantDieUnlock(pendingRewards.dieDrop);
   }
 
   if (hasRewards) {
@@ -1140,9 +1186,8 @@ export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
 
 export const chooseEnding = (endingId: string): void => {
   const run = useRunStore.getState();
-  run.setEnding(endingId);
   sealFinalMemory(endingId);
-  useMetaStore.getState().recordEnding(endingId);
+  run.setEnding(endingId, useMetaStore.getState().recordEnding(endingId));
   trackEvent({
     name: "ending",
     params: { id: endingId, ascension: run.ascension },

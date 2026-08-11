@@ -1,7 +1,24 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { STARTER_DECK } from "../src/data/decks";
-import { DIE_BY_ID } from "../src/data/dice";
+import { ALL_DICE, DIE_BY_ID } from "../src/data/dice";
+import { ENGRAVINGS } from "../src/data/engravings";
+import {
+  ENCOUNTER_DISCOUNT_PCT,
+  FIRST_FIND_SHARDS,
+  META_DIE_PRICE,
+} from "../src/data/metaShop";
+import { PLAYABLE_SHIPS } from "../src/data/ships";
+import { THEMES } from "../src/data/themes";
+import { RESPEC_SHARD_COST } from "../src/game/chart/engine";
+import {
+  bossFirstKillShards,
+  levelFromTotalXp,
+  MAX_LEVEL,
+  runXp,
+  shardBreakdown,
+  totalXpForLevel,
+} from "../src/game/xp";
 import {
   ALL_ENEMIES,
   ENEMY_BY_ID,
@@ -1902,7 +1919,6 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
 };
 
 // ── Axis mode (R7 Task 1) ────────────────────────────────────────────────────
-//
 // The question the table answers: after the R7 rebalance, can deck colour still
 // out-vote the player's choices? Three policies walk the real event pool through
 // the real map generator; drift is settled once per sector and capped for the
@@ -2033,6 +2049,229 @@ const axisModeMain = (runs: number, seed: number, startedAt: number): void => {
   );
 };
 
+interface CareerRun {
+  sectorsCleared: number;
+  nodes: number;
+  elites: number;
+  minibosses: number;
+  bosses: number;
+  hullPct: number;
+  beacons: number;
+  newDice: number;
+  contractStars: number;
+}
+
+type CareerProfile = "learning" | "mixed" | "ace";
+
+const careerRun = (profile: CareerProfile, index: number): CareerRun => {
+  const deep = (
+    sectorsCleared: number,
+    nodes: number,
+    elites: number,
+    minibosses: number,
+    bosses: number,
+    hullPct: number,
+    beacons: number,
+    newDice: number,
+  ): CareerRun => ({
+    sectorsCleared,
+    nodes,
+    elites,
+    minibosses,
+    bosses,
+    hullPct,
+    beacons,
+    newDice,
+    contractStars: 0,
+  });
+  if (profile === "ace") return deep(5, 60, 12, 5, 5, 70, 5, index < 12 ? 4 : 1);
+  if (profile === "learning") {
+    if (index < 8) return deep(1, 14, 2, 1, 1, 0, 0, index < 6 ? 3 : 1);
+    if (index < 20) return deep(2, 26, 4, 2, 2, 0, 1, index < 14 ? 2 : 1);
+    if (index < 34) return deep(3, 38, 7, 3, 3, 0, 2, 1);
+    return deep(4, 50, 10, 4, 4, 0, 3, 1);
+  }
+  if (index < 4) return deep(1, 14, 2, 1, 1, 0, 0, 3);
+  if (index < 10) return deep(3, 30, 5, 2, 2, 0, 1, 2);
+  if (index < 18) return deep(4, 44, 8, 4, 3, 0, 3, 1);
+  return deep(5, 60, 12, 5, 5, 62, 5, index < 26 ? 1 : 0);
+};
+
+interface CareerTally {
+  runs: number;
+  xp: number;
+  shards: number;
+  bySource: Record<string, number>;
+}
+
+const RARITY_ORDER = ["common", "uncommon", "rare", "legendary"] as const;
+
+const findShardsFor = (count: number, offset: number): number => {
+  let total = 0;
+  for (let i = 0; i < count; i += 1) {
+    const rarity = RARITY_ORDER[(offset + i) % RARITY_ORDER.length] ?? "common";
+    total += FIRST_FIND_SHARDS[rarity] ?? 0;
+  }
+  return total;
+};
+
+const walkCareer = (profile: CareerProfile, maxRuns: number): CareerTally => {
+  const tally: CareerTally = {
+    runs: 0,
+    xp: 0,
+    shards: 0,
+    bySource: {
+      sectors: 0,
+      beacons: 0,
+      firstEnding: 0,
+      hullClear: 0,
+      streak: 0,
+      ascension: 0,
+      bossFirstKill: 0,
+      finds: 0,
+    },
+  };
+  let streak = 0;
+  let endingsSeen = 0;
+  const bossKills = new Set<number>();
+  let findOffset = 0;
+  for (let i = 0; i < maxRuns; i += 1) {
+    const run = careerRun(profile, i);
+    const win = run.sectorsCleared >= 5;
+    streak = win ? streak + 1 : 0;
+    const firstEnding = win && endingsSeen < 4;
+    if (firstEnding) endingsSeen += 1;
+    const breakdown = shardBreakdown({
+      win,
+      sectorsCleared: run.sectorsCleared,
+      beacons: run.beacons,
+      hullPct: run.hullPct,
+      firstEnding,
+      streak,
+      ascension: 0,
+    });
+    let bossBonus = 0;
+    for (let sector = 1; sector <= run.bosses; sector += 1) {
+      if (bossKills.has(sector)) continue;
+      bossKills.add(sector);
+      bossBonus += bossFirstKillShards(sector);
+    }
+    const finds = findShardsFor(run.newDice, findOffset);
+    findOffset += run.newDice;
+    tally.runs = i + 1;
+    tally.xp += runXp({
+      nodes: run.nodes,
+      elites: run.elites,
+      minibosses: run.minibosses,
+      bosses: run.bosses,
+      contractStars: run.contractStars,
+    });
+    tally.shards += breakdown.total + bossBonus + finds;
+    tally.bySource.sectors = (tally.bySource.sectors ?? 0) + breakdown.sectors;
+    tally.bySource.beacons = (tally.bySource.beacons ?? 0) + breakdown.beacons;
+    tally.bySource.firstEnding =
+      (tally.bySource.firstEnding ?? 0) + breakdown.firstEnding;
+    tally.bySource.hullClear =
+      (tally.bySource.hullClear ?? 0) + breakdown.hullClear;
+    tally.bySource.streak = (tally.bySource.streak ?? 0) + breakdown.streak;
+    tally.bySource.ascension =
+      (tally.bySource.ascension ?? 0) + breakdown.ascension;
+    tally.bySource.bossFirstKill =
+      (tally.bySource.bossFirstKill ?? 0) + bossBonus;
+    tally.bySource.finds = (tally.bySource.finds ?? 0) + finds;
+    if (levelFromTotalXp(tally.xp) >= MAX_LEVEL) break;
+  }
+  return tally;
+};
+
+const L50_BAND: readonly [number, number] = [25, 35];
+const L50_SLACK = 0.1;
+
+const metaModeMain = (_runs: number, _seed: number, startedAt: number): void => {
+  const profiles: readonly CareerProfile[] = ["ace", "mixed", "learning"];
+  const CAP = 200;
+  console.log(
+    `sim: meta — L50 needs ${String(totalXpForLevel(MAX_LEVEL))} xp · band ${String(L50_BAND[0])}-${String(L50_BAND[1])} mixed runs ±${String(Math.round(L50_SLACK * 100))}%`,
+  );
+  console.log("  profile     runs to L50   xp/run   shards at L50   shards/run");
+  const rows: { profile: CareerProfile; tally: CareerTally }[] = [];
+  for (const profile of profiles) {
+    const tally = walkCareer(profile, CAP);
+    rows.push({ profile, tally });
+    console.log(
+      `  ${profile.padEnd(11)} ${String(tally.runs).padStart(11)} ${(tally.xp / tally.runs).toFixed(0).padStart(8)} ${String(tally.shards).padStart(15)} ${(tally.shards / tally.runs).toFixed(0).padStart(12)}`,
+    );
+  }
+
+  const mixed = rows.find((row) => row.profile === "mixed");
+  let outOfBand = false;
+  if (mixed !== undefined) {
+    const low = L50_BAND[0] * (1 - L50_SLACK);
+    const high = L50_BAND[1] * (1 + L50_SLACK);
+    outOfBand = mixed.tally.runs < low || mixed.tally.runs > high;
+    console.log(
+      `  mixed L50 pace ${String(mixed.tally.runs)} runs — ${outOfBand ? "OUT OF BAND" : "in band"} (${low.toFixed(1)}-${high.toFixed(1)})`,
+    );
+    console.log("  shard income by source (mixed career to L50):");
+    const total = mixed.tally.shards;
+    for (const [source, value] of Object.entries(mixed.tally.bySource)) {
+      if (value === 0) continue;
+      console.log(
+        `    ${source.padEnd(14)} ${String(value).padStart(6)}  ${((value / total) * 100).toFixed(1).padStart(5)}%`,
+      );
+    }
+  }
+
+  const diceFull = ALL_DICE.reduce(
+    (sum, die) => sum + META_DIE_PRICE[die.rarity],
+    0,
+  );
+  const diceMet = ALL_DICE.reduce(
+    (sum, die) =>
+      sum +
+      Math.round(
+        (META_DIE_PRICE[die.rarity] * (100 - ENCOUNTER_DISCOUNT_PCT)) / 100,
+      ),
+    0,
+  );
+  const ships = PLAYABLE_SHIPS.reduce((sum, ship) => sum + ship.price, 0);
+  const themes = THEMES.reduce((sum, theme) => sum + theme.price, 0);
+  const engravings = ENGRAVINGS.reduce((sum, def) => sum + def.price, 0);
+  const respecs = RESPEC_SHARD_COST * 10;
+  console.log("  shard sinks:");
+  const sinks: readonly [string, number][] = [
+    ["all 90 dice (full price)", diceFull],
+    ["all 90 dice (all met, −30%)", diceMet],
+    ["ships", ships],
+    ["themes", themes],
+    ["one of every engraving", engravings],
+    ["ten respecs before L50", respecs],
+  ];
+  for (const [label, value] of sinks) {
+    console.log(`    ${label.padEnd(30)} ${String(value).padStart(7)}`);
+  }
+
+  if (mixed !== undefined) {
+    const perRun = mixed.tally.shards / mixed.tally.runs;
+    console.log(
+      `  affordability horizon at ${perRun.toFixed(0)} shards/run: full ${String(Math.ceil(diceFull / perRun))} runs · all met ${String(Math.ceil(diceMet / perRun))} runs`,
+    );
+  }
+
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const csv = ["profile,runsToL50,xpPerRun,shardsAtL50,shardsPerRun"];
+  for (const row of rows) {
+    csv.push(
+      `${row.profile},${String(row.tally.runs)},${(row.tally.xp / row.tally.runs).toFixed(0)},${String(row.tally.shards)},${(row.tally.shards / row.tally.runs).toFixed(0)}`,
+    );
+  }
+  const outPath = join(outDir, "meta-curve.csv");
+  writeFileSync(outPath, `${csv.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (outOfBand) process.exitCode = 1;
+};
+
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
@@ -2086,6 +2325,10 @@ const main = (): void => {
   }
   if (mode === "axis") {
     axisModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "meta") {
+    metaModeMain(runs, seed, startedAt);
     return;
   }
   battleModeMain(runs, seed, startedAt);

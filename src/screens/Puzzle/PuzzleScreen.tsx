@@ -33,6 +33,8 @@ import {
   type Placement,
   type TrialScore,
 } from "@/game/puzzles/evaluate";
+import { settleAchievements } from "@/game/meta/achievements";
+import { grantDieUnlock } from "@/game/meta/unlockState";
 import { puzzleForNode } from "@/game/puzzles/selection";
 import {
   TIER_STAKES,
@@ -568,8 +570,13 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     if (reward.die !== undefined) {
       run.addDie(reward.die);
       useLootStore.getState().drop(reward.die);
+      if (puzzle.tier === 5) grantDieUnlock(reward.die);
     }
     run.markPuzzleSolved(puzzle.id);
+    if (puzzle.tier === 5) {
+      meta.bumpLifetime({ t5Solved: 1 });
+      settleAchievements();
+    }
   };
 
   const claimDie = (): void => {

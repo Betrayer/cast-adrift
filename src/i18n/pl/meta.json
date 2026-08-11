@@ -73,7 +73,39 @@
     "keyIronDoctrine": "Żelazna doktryna",
     "keyFatesFavorite": "Ulubieniec losu",
     "keyPrismCascade": "Kaskada pryzmatów",
-    "selectHint": "Dotknij węzła, aby sprawdzić, do czego służy."
+    "selectHint": "Dotknij węzła, aby sprawdzić, do czego służy.",
+    "filter": "Filtr",
+    "filterOn": "Filtr · {{n}}",
+    "filterClear": "Wyczyść filtr",
+    "pathCost": "Ścieżka stąd: {{n}} punktów (masz {{have}})",
+    "refundFree": "Zwrot kosztów (bezpłatny)",
+    "respecConfirmTitle": "Czy chcesz usunąć ten węzeł?",
+    "respecConfirmBody": "„{{name}}” wraca do puli, a punkt zostaje przywrócony. Koszt: {{cost}}◈.",
+    "respecConfirmYes": "Zwrot pieniędzy",
+    "redPowderRoom": "Toaleta dla kobiet",
+    "redRangeCard": "Karta zasięgu",
+    "redHairTrigger": "Bardzo czuły spust",
+    "redCoreBreach": "Naruszenie rdzenia",
+    "blueStormAnchor": "Kotwica burzowa",
+    "blueSpillway": "Przepust",
+    "blueLongLens": "Obiektyw o długim ogniskowej",
+    "blueKeelPlate": "Płyta kilowa",
+    "greenGraftBench": "Ławka Graft",
+    "greenSapline": "Sapline",
+    "greenLoam": "Gleba gliniasta",
+    "greenHollow": "The Hollow",
+    "yellowTollhouse": "Tollhouse",
+    "yellowFinderFee": "Prowizja za pośrednictwo",
+    "yellowShortWeight": "Niedowaga",
+    "yellowMintMark": "Znak mennicy",
+    "blackAshBed": "Warstwa popiołu",
+    "blackDeadMansSwitch": "Przełącznik „Dead Man's Switch”",
+    "blackTithe": "Dziesięcina",
+    "blackSlagHeap": "Hałda żużla",
+    "greyShimStack": "Stos podkładek",
+    "greyPatternBook": "Zbiór wzorów",
+    "greyBallastTrim": "Regulacja balastu",
+    "greyTallyStick": "Kij do liczenia"
   },
   "chartFx": {
     "hubBudget": "+1 budżet na hangar",
@@ -91,7 +123,15 @@
       "growthCapDelta": "{{n}} limit wzrostu",
       "enginesThresholdDelta": "{{n}} próg silnika",
       "markBonusDelta": "{{n}} premia za osiągnięcia",
-      "battleEndHeal": "{{n}} leczyć / walczyć"
+      "battleEndHeal": "{{n}} leczyć / walczyć",
+      "hullMaxPct": "{{n}} % maksymalnej wytrzymałości kadłuba",
+      "extraRerolls": "{{n}} ponowne wykorzystanie",
+      "scrapPerKill": "{{n}} punkty za zabicie",
+      "setCompleteCharge": "{{n}} opłata za kompletny zestaw",
+      "freeShopRerolls": "{{n}} bezpłatne ponowne losowanie licznika",
+      "xpMultPct": "{{n}} % XP",
+      "tideEffectDelta": "{{n}} pod wpływem przypływu",
+      "moduleSlotDelta": "{{n}} wnęka na moduły"
     },
     "fx": {
       "weaponsMaxFace": "Broń +1 przy rzucie kostką o maksymalnej wartości",
@@ -119,22 +159,81 @@
       "blackWell": "W reaktorze pozostały jeszcze 2 ładunki",
       "shopArrival": "+6 złomu po przybyciu na targ",
       "tideWard": "Naprawiaj 1 kadłub przy każdym skoku, gdy poziom fali wynosi 2+",
-      "detourScout": "+12 złomu przy wjeździe na objazd"
+      "detourScout": "+12 złomu przy wjeździe na objazd",
+      "redFinisher": "+2 do obrażeń zadawanych bronią w przypadku celu, którego wytrzymałość kadłuba spadła poniżej 30%.",
+      "redSwarmFire": "+1 do ataku, gdy na polu bitwy pozostają co najmniej dwaj przeciwnicy.",
+      "redBurnBite": "Trafienie bronią w płonący cel zadaje 2 dodatkowe punkty obrażeń.",
+      "redRepeatCrit": "Kostka broni, która w przypadku trafienia krytycznego powtarza ostatnią wartość.",
+      "redSalvoTally": "Począwszy od trzeciej kości broni w danej bitwie, +1 do broni.",
+      "redOpener": "Pierwsza kostka broni w tej turze otrzymuje +2.",
+      "redRiskCharge": "Gdy poziom pancerza spadnie poniżej 40%, na koniec każdej tury pozostaje 1 ładunek.",
+      "redPowderRoom": "Każde trafienie w płonący cel powoduje dodanie kolejnego efektu zapalenia.",
+      "redHairTrigger": "Pierwsza kostka broni w tej turze daje trafienie krytyczne.",
+      "redCoreBreach": "+3 do każdego rzutu przeciwko celowi, którego kadłub ma mniej niż 25% wytrzymałości.",
+      "blueOvershield": "Przy 6 punktach osłony kostka osłony dodaje jeszcze 2 punkty.",
+      "blueStillness": "Niebieska kostka w tarczach otrzymuje +1.",
+      "blueDeepGuard": "Utrzymaj 4 punktów osłony przez całą turę przeciwnika, aby wyleczyć 1 punkt zdrowia.",
+      "blueJamOnLow": "Wynik poniżej 4 jest odczytywany jako 5.",
+      "blueWatch": "Niebieską kostkę leżącą najniższą stroną do góry rzuca się ponownie jeden raz.",
+      "blueBreakwater": "Zaczynaj każdą bitwę z 3 punktami tarczy.",
+      "blueSpillway": "Wynik rzutu kostką na tarczę wynoszący 8 lub więcej zwiększa wartość tarczy o 3.",
+      "blueLongLens": "+2 czujniki.",
+      "greenGrowOnEngines": "Współczynnik powiększenia silników typu „max-face” wzrasta do wartości +2.",
+      "greenTendril": "Wynik 6 lub więcej na zielonej kostce powoduje wzrost o maksymalnie +3.",
+      "greenMend": "Jeśli na koniec tury stan kadłuba wynosi powyżej 30%, odzyskujesz 1 punkt zdrowia.",
+      "greenRootHold": "+2 w silnikach umieszczonych poniżej połowy kadłuba.",
+      "greenSpore": "Wygrana bitwa przywraca 2 punkty zdrowia.",
+      "greenQuietBerth": "Po przybyciu do stoczni odzyskujesz 2 punkty zdrowia.",
+      "greenSapline": "Zakończ turę z 4 punktami tarczy, aby wyleczyć 2 punkty zdrowia.",
+      "greenLoam": "Współczynnik powiększenia silników typu „max-face” wzrasta do wartości +3.",
+      "yellowTollBooth": "Za dotarcie do miejsca spotkania otrzymuje się 8 złomu.",
+      "yellowKickback": "Żółta kostka zapewnia 2 złomów podczas rozliczania.",
+      "yellowLuckyOpen": "Pierwsza kostka w tej turze, jeśli wypadnie na niej najwyższa wartość, daje 6 złomu.",
+      "yellowGleaner": "Żółta kostka, gdy wylosowana zostanie jej najniższa strona, daje 4 złom.",
+      "yellowWager": "Kostka na dowolnej z skrajnych ścianek daje 3 złom.",
+      "yellowTollhouse": "Za przybycie do lady otrzymuje się 14 złomu.",
+      "yellowMintMark": "Za matrycę reaktora otrzymuje się 4 sztuki złomu.",
+      "blackBleedCharge": "+1 do czarnych kości przy uszkodzeniu kadłuba poniżej 60%.",
+      "blackOvercap": "Czarne kości mogą przekroczyć limit miejsca na 2 punkty wytrzymałości kadłuba.",
+      "blackPactTithe": "W każdej bitwie zaczynasz z 2 punktami ładunku i -2 punktami wytrzymałości kadłuba.",
+      "blackLastLight": "+2 do każdego rzutu, gdy stan kadłuba spadnie poniżej 25%.",
+      "blackReactorTally": "Począwszy od drugiego reaktora, zakończ turę z 1 ładunkiem.",
+      "blackSpite": "Poniżej połowy pancerza tura przeciwnika kończy się 1 ładunkiem.",
+      "blackNightWatch": "Czarna kostka z najwyższą wartością zapewnia 1 ładunek.",
+      "blackAshBed": "Kość leżąca najniższą ścianką do góry daje 2 punkty ładunku.",
+      "blackDeadMansSwitch": "Gdy poziom zdrowia kadłuba spadnie poniżej 25%, na koniec każdej tury masz 3 punkty ładunku.",
+      "blackSlagHeap": "+3 w reaktorze przy 4 ładunkach.",
+      "greyScan": "Jedno dodatkowe pchnięcie przy każdym rzucie.",
+      "greyEvenKeel": "+1 za szare kości.",
+      "greyCounterweight": "Kość, która nie jest szara, otrzymuje +1, jeśli wylosowana zostanie jej najniższa ścianka.",
+      "greyToolbelt": "Jedno dodatkowe wykorzystanie ponownego rzutu na bitwę.",
+      "greySpare": "Jedno dodatkowe miejsce na rezerwę na każdą bitwę.",
+      "greyMirror": "Szara kostka, która powtarza ostatnią wartość, zwiększa liczbę ponownych rzutów o 1.",
+      "greyLedgerKeep": "Wejście do punktu obsługi kosztuje 10 złomu.",
+      "greyPatternBook": "Kość, na której pojawi się ostatnia wartość, daje możliwość ponownego rzutu.",
+      "greyTallyStick": "Od momentu, gdy przestaną działać drugie czujniki, +2 do każdego rzutu."
     },
     "trait": {
       "obsidianPact": "Czarne kości wypadają tylko z minimalną lub maksymalną wartością",
       "singleCast": "Nie ma możliwości ponownego rzutu",
-      "coldLogic": "Pchnięcia są darmowe · krytyczne trafienia wyłączone"
-    }
+      "coldLogic": "Pchnięcia są darmowe · krytyczne trafienia wyłączone",
+      "overflowShield": "Nadwyżka ładunku powyżej limitu zamienia się w osłonę.",
+      "fateTwice": "Kostkę Losu można zagrać dwa razy w trakcie każdej bitwy.",
+      "prismDouble": "Kostki pryzmatyczne liczą się podwójnie przy obliczaniu rezonansu."
+    },
+    "budgetDelta": "{{n}} punkt hangarowy",
+    "slotTier": "{{slot}}: {{n}} die-size step"
   },
   "milestone": {
-    "budget": "Budżet hangaru +1",
+    "budget": "Budżet hangaru +2",
     "shipRam": "Ram odblokowany",
-    "contractRow": "Kolejny spór dotyczący umowy (wkrótce)",
     "shipArk": "Odsłonięta Arka",
-    "engraving": "Grawerunek stacja (wkrótce)",
-    "dailyPreview": "Codzienny przegląd (wkrótce)",
-    "respecPrestige": "Bezpłatna zmiana specjalizacji Keystone (wkrótce)"
+    "engraving": "Grawerunek stacja otwarta",
+    "dailyPreview": "Jutrzejsze wydanie „Daily” jest już dostępne",
+    "respecPrestige": "Bezpłatna zmiana specjalizacji + skórka prestiżowa",
+    "diceWave": "Kości Fusion na półce",
+    "contractWave": "Otwarcie fali kontraktowej",
+    "chartPoints": "Dwa punkty w ramach akcji „Mapa gwiazd”"
   },
   "levelup": {
     "title": "Przejdź na wyższy poziom",
@@ -147,7 +246,16 @@
     "shards": "Odłamki",
     "xp": "XP",
     "level": "Poziom kapitana {{level}}",
-    "toNext": "{{into}} / {{need}} do następnej strony"
+    "toNext": "{{into}} / {{need}} do następnej strony",
+    "fromSectors": "Sektory oczyszczone",
+    "fromBeacons": "Rozwiązano problem z nadajnikami",
+    "fromEnding": "Zakończenie po raz pierwszy",
+    "fromHull": "Przezroczysty do połowy kadłuba",
+    "fromStreak": "Seria bez porażek",
+    "fromAscension": "Premia za awans",
+    "fromFinds": "Pierwsze znaleziska",
+    "fromAchievements": "Osiągnięcia",
+    "firstFinds": "Pierwsze doniesienie: {{names}}"
   },
   "menu": {
     "level": "Poziom{{level}}"
@@ -184,7 +292,31 @@
   "collection": {
     "title": "Kolekcja",
     "count": "{{n}} kości",
-    "owned": "×{{n}}"
+    "owned": "×{{n}}",
+    "discount": "−{{n}} % — trafiłeś na tę kostkę",
+    "found": "Spotkał się",
+    "undiscovered": "Jeszcze się nie spotkaliśmy",
+    "provenance": "znaleziono: sektor {{sector}}, {{node}}",
+    "filterState": "Stan",
+    "stateAll": "Wszystkie",
+    "stateOwned": "Własność",
+    "stateFound": "Spotkał się",
+    "stateUnknown": "Nieodkryte",
+    "totals": "{{owned}} w posiadaniu · {{found}} znaleziono · {{total}} w liście",
+    "node": {
+      "start": "punkt opadania",
+      "battle": "potyczka",
+      "elite": "elita",
+      "miniboss": "walka przy bramie",
+      "boss": "szef",
+      "event": "spotkanie",
+      "shop": "licznik",
+      "shipyard": "stocznia",
+      "anomaly": "rozłam",
+      "beacon": "latarnia",
+      "rest": "cicha kajuta",
+      "pocket": "kieszeń"
+    }
   },
   "modes": {
     "title": "Tryby",
@@ -206,7 +338,9 @@
     "open": "Otwórz",
     "guardTitle": "Bieg już się rozpoczął",
     "guardBody": "Dostępne jest jedno miejsce na przebieg. Uruchomienie tego trybu powoduje usunięcie bieżącego przebiegu zarówno lokalnie, jak i w chmurze.",
-    "guardYes": "Usuń i uruchom"
+    "guardYes": "Usuń i uruchom",
+    "dailyPreview": "Jutro ({{date}})",
+    "dailyPreviewLocked": "Jutrzejsze mutatory na poziomie{{n}}"
   },
   "contracts": {
     "title": "Umowy",
@@ -236,7 +370,9 @@
     "axisAtMost": "Zakończ z osią na poziomie „{{n}}” lub poniżej",
     "allBeaconsResolved": "Rozpoznaj wszystkie sygnały nawigacyjne",
     "deckSchoolsAtLeast": "Na koniec dodaj do talii karty ze szkół „{{n}}”",
-    "dicePlacedAtMost": "Umieść maksymalnie {{n}} kości, wszystkie w trybie „run”"
+    "dicePlacedAtMost": "Umieść maksymalnie {{n}} kości, wszystkie w trybie „run”",
+    "axisAtLeast": "Osiągnij poziom stabilności {{n}} lub wyższy",
+    "elitesAtMost": "Wygrana przy maksymalnie {{n}} pokonanych elitarnych przeciwnikach"
   },
   "drift": {
     "title": "Dryf ponad",
@@ -285,7 +421,20 @@
     "none": "—",
     "place": "#{{rank}}",
     "endings": "Zakończenia",
-    "locked": "Zapieczętowane"
+    "locked": "Zapieczętowane",
+    "achievements": "Osiągnięcia",
+    "achProgress": "{{have}} / {{need}}",
+    "achLocked": "Zablokowane",
+    "badges": "Odznaki",
+    "achCount": "{{n}} z {{total}}",
+    "group": {
+      "combat": "Walka",
+      "economy": "Gospodarka",
+      "puzzles": "Anomalie",
+      "story": "Opowieść",
+      "collection": "Kolekcja",
+      "modes": "Tryby"
+    }
   },
   "engraving": {
     "title": "Grawerunek Stacja",
@@ -300,6 +449,245 @@
     "pair": "Pasuje do: „{{name}}”"
   },
   "badge": {
-    "keeper": "Strażnik"
+    "keeper": "Strażnik",
+    "ascendant": "Ascendent",
+    "chartwright": "Chartwright",
+    "archivist": "Archiwista"
+  },
+  "unlock": {
+    "opened": "Odblokowane",
+    "new": "nowy",
+    "locked": "Zablokowane",
+    "hintLevel": "poziom {{n}}",
+    "hintAchievement": "osiągnięcie „{{name}}”",
+    "hintAscension": "szczegóły na stronie {{n}}",
+    "hintClears": "{{n}} wyniki kampanii",
+    "hintDrop": "wyjątkowa kropla",
+    "hintJoin": " lub ",
+    "hintUnknown": "nieznane",
+    "diceL8": "Sześć ramek d8 — po jednej na każdą szkołę",
+    "diceL15": "Sześć kości do gry w Fusion",
+    "diceL22": "Sześć rzadkich elementów układu kierowniczego",
+    "diceL30": "Półka pryzmatyczna",
+    "diceL38": "Sześć ciężkich jednostek d12",
+    "diceL46": "Sześć kart legendarnych",
+    "diceAchFirstClear": "Górna półka",
+    "diceAchPuzzler": "Cztery połączenia anomalii",
+    "diceAchCollector": "Trzy połączenia kolektorów",
+    "diceAchSurvivor": "Trzy kości ocalałych",
+    "contractsL5": "Trzy kontrakty: „Storm”, „Bare Armor”, „Blind Jump”",
+    "contractsL12": "Trzy kontrakty: Ram, Single Cast, Dead Reckoning",
+    "contractsL20": "Trzy umowy: Ark, Keeper, Iron Przypływ",
+    "contractsL28": "Trzy utwory: „Choir”, „Prismwork”, „Ghost Lane”",
+    "contractsA5": "Umowa: Dziesięcina Pustki",
+    "contractsAchGauntlet": "Umowa: „The Gauntlet”",
+    "skinAshen": "Kolor skóry: popielaty",
+    "skinVoidglass": "Skórka postaci: Voidglass",
+    "skinEmberglass": "Skórka: Emberglass",
+    "prestigeTheme": "Temat: Ascendent",
+    "skinPrestige50": "Die skin: Captain's Mark",
+    "skinChartwright": "Die skin: Chartwright",
+    "featureShipRam": "Barana",
+    "featureShipArk": "Arka",
+    "featureEngraving": "Grawerunek stacja",
+    "featureDailyPreview": "Codzienny przegląd",
+    "featureFreeRespec": "Bezpłatna zmiana specjalizacji Keystone"
+  },
+  "skin": {
+    "title": "Skórki",
+    "hint": "Tylko kosmetycznie — skóra nigdy nie zmienia wyników rzutu kostką.",
+    "use": "Zastosowanie",
+    "active": "Aktywne",
+    "default": {
+      "name": "Standardowy",
+      "desc": "Wygląd fabryki."
+    },
+    "ashen": {
+      "name": "Popielaty",
+      "desc": "Ostre krawędzie, słoje jesionu, brak połysku."
+    },
+    "voidglass": {
+      "name": "Voidglass",
+      "desc": "Okrągłe, głębokie, oświetlone od wewnątrz."
+    },
+    "emberglass": {
+      "name": "Emberglass",
+      "desc": "Intensywnie bursztynowa obwódka, ciepły środek."
+    },
+    "prestige50": {
+      "name": "Znak Kapitana",
+      "desc": "Znaki z serifami, biała obwódka."
+    },
+    "chartwright": {
+      "name": "Chartwright",
+      "desc": "Plansza z kwadratami, monograficzne symbole."
+    }
+  },
+  "ach": {
+    "firstBlood": {
+      "name": "Pierwsza krew",
+      "desc": "Zabij 25 przeciwników."
+    },
+    "hunter": {
+      "name": "Hunter",
+      "desc": "Zabij 500 przeciwników."
+    },
+    "eliteHunter": {
+      "name": "Elitarny Łowca",
+      "desc": "Zabij 25 elitarnych przeciwników."
+    },
+    "sectorFive": {
+      "name": "Pięć koron",
+      "desc": "Zabij wszystkich pięciu bossów sektorowych."
+    },
+    "ironStreak": {
+      "name": "Żelazna passa",
+      "desc": "Ukończ trzy kampanie z rzędu, nie ginąc ani razu."
+    },
+    "flawless": {
+      "name": "Bezbłędny",
+      "desc": "Ukończ kampanię, zachowując co najmniej 90% wytrzymałości kadłuba."
+    },
+    "ascendant": {
+      "name": "Ascendent",
+      "desc": "Ukończ kampanię na poziomie Ascension 10."
+    },
+    "quickWork": {
+      "name": "Szybka praca",
+      "desc": "Ukończ kampanię w maksymalnie 11 skokach."
+    },
+    "scrapper": {
+      "name": "Złomiarz",
+      "desc": "Zdobądź łącznie 5 000 złomu."
+    },
+    "tycoon": {
+      "name": "Magnat",
+      "desc": "Zbierz łącznie 25 000 złomu."
+    },
+    "frugal": {
+      "name": "Oszczędny",
+      "desc": "Ukończ kampanię, nie wydając ani grosza."
+    },
+    "outfitter": {
+      "name": "Sklep z odzieżą outdoorową",
+      "desc": "Posiadaj 30 różnych kości."
+    },
+    "tierFive": {
+      "name": "Poziom piąty",
+      "desc": "Rozwiąż anomalię poziomu 5."
+    },
+    "cryptographer": {
+      "name": "Kryptograf",
+      "desc": "Rozwiąż dziesięć anomalii poziomu 5."
+    },
+    "anomalist": {
+      "name": "Anomalista",
+      "desc": "Rozwiąż cztery anomalie za jednym razem."
+    },
+    "puzzleBreadth": {
+      "name": "Często czytane",
+      "desc": "Zobacz 30 różnych anomalii."
+    },
+    "maraSquared": {
+      "name": "Księga Marry",
+      "desc": "Miej wobec Mary dług i ciesz się jej przychylnością."
+    },
+    "keeperFriend": {
+      "name": "Wątek Strażnika",
+      "desc": "Spłać dług wobec Strażnika i odbuduj latarnię."
+    },
+    "fleetKept": {
+      "name": "Zachowane słowo",
+      "desc": "Zachowajcie prawdziwy obraz floty."
+    },
+    "apostate": {
+      "name": "Odstępca",
+      "desc": "Złam przymierze chóru."
+    },
+    "bothMirrors": {
+      "name": "Oba lustra",
+      "desc": "Zwiąż lustro raz i stłucz je raz."
+    },
+    "coreTrilogy": {
+      "name": "Trzy odpowiedzi",
+      "desc": "Odpowiadaj, milcz i wsłuchaj się w swoje wnętrze — podczas trzech przejazdów."
+    },
+    "lighthouse": {
+      "name": "Latarnia morska",
+      "desc": "Zapal latarnię morską."
+    },
+    "beaconkeeper": {
+      "name": "Strażnik latarni",
+      "desc": "Znajdź cztery sygnały nawigacyjne podczas jednego przejścia."
+    },
+    "allEndings": {
+      "name": "Każda droga",
+      "desc": "Osiągnij wszystkie cztery zakończenia."
+    },
+    "fiftyFound": {
+      "name": "Pięćdziesiąt znalezionych",
+      "desc": "Poznaj 50 różnych zestawów kości."
+    },
+    "everyColour": {
+      "name": "Każdy kolor",
+      "desc": "Zbierz wszystkie kostki reprezentujące wszystkie siedem szkół."
+    },
+    "archivist": {
+      "name": "Archiwista",
+      "desc": "Odblokuj 60 wpisów w „Kodeks”."
+    },
+    "keystoneThree": {
+      "name": "Chartwright",
+      "desc": "Trzymaj jednocześnie trzy kamienie węgielne."
+    },
+    "contractor": {
+      "name": "Wykonawca",
+      "desc": "Zdobądź 30 gwiazdek z kontraktów."
+    },
+    "toast": "Osiągnięcie"
+  },
+  "chartTag": {
+    "red": "czerwony",
+    "blue": "niebieski",
+    "green": "zielony",
+    "yellow": "żółty",
+    "black": "czarny",
+    "grey": "szary",
+    "prismatic": "pryzmatyczny",
+    "weapons": "broń",
+    "shields": "tarcze",
+    "engines": "silniki",
+    "sensors": "czujniki",
+    "reactor": "reaktor",
+    "spinal": "kręgosłupowy",
+    "repairBay": "stanowisko naprawcze",
+    "burn": "spalić",
+    "crit": "crit",
+    "growth": "wzrost",
+    "reroll": "ponowne rzucenie",
+    "charge": "opłata",
+    "scrap": "złom",
+    "overcap": "nadmiar",
+    "pierce": "przebić",
+    "dodge": "uniki",
+    "survival": "przetrwanie",
+    "control": "kontrola",
+    "dice": "kości",
+    "shieldwall": "ściana tarczowa",
+    "risk": "ryzyko",
+    "swarm": "rój",
+    "spike": "skok",
+    "precision": "precyzja"
+  },
+  "ascension": {
+    "reward": {
+      "shards": "Wysokość nagrody za odłamek rośnie wraz z każdym poziomem",
+      "skinAshen": "skórka „Ashen”",
+      "contract": "umowa „The Void Tithe”",
+      "skinVoidglass": "okładka „Voidglass”",
+      "skinEmberglass": "skórka „Emberglass”",
+      "prestigeTheme": "motyw „Ascendant”",
+      "badge": "odznaka Ascendant"
+    }
   }
 }

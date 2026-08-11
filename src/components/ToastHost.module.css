@@ -58,6 +58,39 @@
   font-weight: 700;
 }
 
+.achievement {
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-amber);
+  box-shadow: 0 8px 24px var(--ca-shadow);
+  color: var(--ca-text);
+  font-size: 13px;
+}
+
+.achievementMark {
+  color: var(--ca-amber);
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.achievementLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.achievementKicker {
+  color: var(--ca-faint);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 .queueDot {
   width: 4px;
   height: 4px;

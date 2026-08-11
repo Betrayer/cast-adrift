@@ -71,6 +71,10 @@ const main = async (): Promise<void> => {
         dailyRuns: 0,
         contractRuns: 0,
         elites: 0,
+        t5Solved: 0,
+        beacons: 0,
+        noDeathStreak: 0,
+        bestNoDeathStreak: 0,
       },
     });
     window.__app?.getState().go("menu");

@@ -3,6 +3,7 @@ import { beaconsResolved } from "@/data/events/beacons";
 import { chainViews, type ChainView } from "@/data/narrative/chains";
 import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
+import { settleAchievements } from "@/game/meta/achievements";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
 import { emitRunHook } from "@/game/run/runEffects";
@@ -165,10 +166,18 @@ export const applyOutcome = (
       });
     }
   }
-  logChainProgress(
-    chainsBefore,
-    chainViews(useRunStore.getState().flags, sector),
-  );
+  const chainsAfter = chainViews(useRunStore.getState().flags, sector);
+  logChainProgress(chainsBefore, chainsAfter);
+  const advanced = chainsAfter.some((view) => {
+    const prior = chainsBefore.find((v) => v.id === view.id);
+    return prior !== undefined && view.step > prior.step;
+  });
+  if (advanced) {
+    useMetaStore
+      .getState()
+      .archiveRunFlags(Object.keys(useRunStore.getState().flags));
+    settleAchievements();
+  }
   if (outcome.consequence !== undefined) logConsequence(outcome.consequence);
   emitRunHook("eventOutcome", info === undefined ? {} : { event: info });
   return { follow: outcome.follow ?? null };

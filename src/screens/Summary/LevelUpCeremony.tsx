@@ -12,6 +12,7 @@ interface Props {
   fromLevel: number;
   toLevel: number;
   milestones: readonly string[];
+  unlocks: readonly string[];
   reduced: boolean;
   onContinue: () => void;
 }
@@ -20,6 +21,7 @@ export const LevelUpCeremony = ({
   fromLevel,
   toLevel,
   milestones,
+  unlocks,
   reduced,
   onContinue,
 }: Props) => {
@@ -74,8 +76,29 @@ export const LevelUpCeremony = ({
           className={cls("card")}
           maw={320}
           w="100%"
+          data-milestone-card
         >
           <Text ta="center" c={tokens.amber} fw={600}>
+            {t(label)}
+          </Text>
+        </Paper>
+      ))}
+      {unlocks.map((label, i) => (
+        <Paper
+          key={`unlock-${String(i)}`}
+          bg={tokens.surface1}
+          p="sm"
+          radius="md"
+          withBorder
+          className={cls("card")}
+          maw={320}
+          w="100%"
+          data-unlock-card
+        >
+          <Text ta="center" size="xs" c={tokens.faint}>
+            {t("meta:unlock.opened")}
+          </Text>
+          <Text ta="center" c={tokens.accent} fw={600}>
             {t(label)}
           </Text>
         </Paper>

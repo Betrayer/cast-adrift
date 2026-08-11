@@ -5,5 +5,6 @@
   "rotate": {
     "title": "Drehen Sie Ihr Gerät",
     "body": "Cast Adrift wird im Hochformat gespielt. Drehen Sie das Gerät wieder ins Hochformat, um den Durchlauf fortzusetzen."
-  }
+  },
+  "cancel": "Abbrechen"
 }

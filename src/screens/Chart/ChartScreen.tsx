@@ -1,4 +1,14 @@
-import { ActionIcon, Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
+import {
+  ActionIcon,
+  Badge,
+  Button,
+  Chip,
+  Group,
+  Modal,
+  Paper,
+  Stack,
+  Text,
+} from "@mantine/core";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
@@ -7,12 +17,14 @@ import { tokens } from "@/app/theme";
 import { CHART_BOUNDS, CHART_NODES, CHART_NODE_BY_ID } from "@/data/chart";
 import type { ChartNodeDef, Constellation } from "@/data/chart";
 import { schools } from "@/data/schools";
+import type { ContentTag } from "@/data/tags";
 import {
   canAllocate,
   canDeallocate,
   isAllocatable,
+  pathTo,
   pointsAvailable,
-  RESPEC_SHARD_COST,
+  respecCost,
 } from "@/game/chart/engine";
 import { chartNodeLines, chartNodeTitle } from "@/game/chart/describe";
 import { useAppStore } from "@/stores/appStore";
@@ -34,7 +46,22 @@ import styles from "./ChartScreen.module.css";
 const DOUBLE_TAP_MS = 300;
 const DOUBLE_TAP_PX = 24;
 const REGION_PAD = 90;
-const LABEL_MIN_CSS = 9;
+const LABEL_PX = 12;
+
+const LABEL_MIN_CSS: Record<string, number> = {
+  keystone: 6,
+  gate: 6,
+  notable: 20,
+  minor: 26,
+  small: Infinity,
+};
+
+const labelBelow = (id: string): boolean => {
+  let h = 0;
+  for (let i = 0; i < id.length; i += 1) h = (h * 31 + id.charCodeAt(i)) | 0;
+  return (h & 1) === 1;
+};
+const HOLD_MS = 350;
 
 const constellationColor = (
   con: Constellation,
@@ -61,13 +88,25 @@ const uniqueEdges = (): [ChartNodeDef, ChartNodeDef][] => {
 
 const EDGES = uniqueEdges();
 
+const CHART_TAGS: readonly ContentTag[] = [
+  ...new Set(CHART_NODES.flatMap((node) => node.tags ?? [])),
+].sort();
+
 const nodeRadius = (kind: ChartNodeDef["kind"]): number =>
-  kind === "keystone" ? 13 : kind === "notable" ? 10 : kind === "gate" ? 8 : 6;
+  kind === "keystone"
+    ? 13
+    : kind === "notable"
+      ? 10
+      : kind === "minor"
+        ? 8
+        : kind === "gate"
+          ? 8
+          : 6;
 
 const IDENTITY: ChartView = { scale: 1, tx: 0, ty: 0 };
 
 export const ChartScreen = () => {
-  const { t } = useTranslation(["meta", "common"]);
+  const { t } = useTranslation(["meta", "common", "battle"]);
   const go = useAppStore((s) => s.go);
   const picks = useMetaStore((s) => s.chartPicks);
   const level = useMetaStore((s) => s.level);
@@ -79,7 +118,11 @@ export const ChartScreen = () => {
 
   const [view, setView] = useState<ChartView>(IDENTITY);
   const [selected, setSelected] = useState<string | null>(null);
+  const [hovered, setHovered] = useState<string | null>(null);
   const [respec, setRespec] = useState(false);
+  const [confirmRefund, setConfirmRefund] = useState<string | null>(null);
+  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [filterOpen, setFilterOpen] = useState(false);
   const [viewport, setViewport] = useState<Box>({ x: 0, y: 0, w: 0, h: 0 });
 
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -88,9 +131,28 @@ export const ChartScreen = () => {
   const pinch = useRef<{ dist: number; x: number; y: number } | null>(null);
   const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
   const framed = useRef(false);
+  const holdTimer = useRef<number | null>(null);
 
   const pickSet = useMemo(() => new Set(picks), [picks]);
   const points = pointsAvailable(level, picks);
+  const refundCost = respecCost(level);
+
+  const previewId = hovered ?? selected;
+  const preview = useMemo(
+    () => (previewId === null ? null : pathTo(previewId, picks)),
+    [previewId, picks],
+  );
+  const previewSet = useMemo(
+    () => new Set(preview?.ids ?? []),
+    [preview],
+  );
+  const filterSet = useMemo(() => new Set(tagFilter), [tagFilter]);
+  const matchesFilter = useCallback(
+    (node: ChartNodeDef): boolean =>
+      filterSet.size === 0 ||
+      (node.tags ?? []).some((tag) => filterSet.has(tag)),
+    [filterSet],
+  );
 
   const measure = useCallback((): Box => {
     const element = viewportRef.current;
@@ -133,6 +195,13 @@ export const ChartScreen = () => {
     };
   }, [measure, homeView]);
 
+  const clearHold = useCallback(() => {
+    if (holdTimer.current !== null) {
+      window.clearTimeout(holdTimer.current);
+      holdTimer.current = null;
+    }
+  }, []);
+
   const onPointerDown = useCallback((e: React.PointerEvent) => {
     (e.target as Element).setPointerCapture?.(e.pointerId);
     pointers.current.set(e.pointerId, { x: e.clientX, y: e.clientY });
@@ -163,16 +232,23 @@ export const ChartScreen = () => {
       }
       const dx = e.clientX - prev.x;
       const dy = e.clientY - prev.y;
-      if (Math.abs(dx) + Math.abs(dy) > 3) dragged.current = true;
+      if (Math.abs(dx) + Math.abs(dy) > 3) {
+        dragged.current = true;
+        clearHold();
+      }
       setView((v) => panBy(v, CHART_BOUNDS, box, dx, dy));
     },
-    [measure],
+    [measure, clearHold],
   );
 
-  const onPointerUp = useCallback((e: React.PointerEvent) => {
-    pointers.current.delete(e.pointerId);
-    if (pointers.current.size < 2) pinch.current = null;
-  }, []);
+  const onPointerUp = useCallback(
+    (e: React.PointerEvent) => {
+      pointers.current.delete(e.pointerId);
+      if (pointers.current.size < 2) pinch.current = null;
+      clearHold();
+    },
+    [clearHold],
+  );
 
   const onWheel = useCallback(
     (e: React.WheelEvent) => {
@@ -226,6 +302,13 @@ export const ChartScreen = () => {
     setSelected(id);
   };
 
+  const onNodeHold = (id: string): void => {
+    clearHold();
+    holdTimer.current = window.setTimeout(() => {
+      setHovered(id);
+    }, HOLD_MS);
+  };
+
   const allocate = (id: string): void => {
     if (!canAllocate(id, level, picks)) return;
     playSfx("chartAllocate");
@@ -234,13 +317,16 @@ export const ChartScreen = () => {
 
   const refund = (id: string): void => {
     if (!canDeallocate(id, picks)) return;
-    if (!spendShards(RESPEC_SHARD_COST)) return;
+    if (refundCost > 0 && !spendShards(refundCost)) return;
     trackEvent({ name: "meta_purchase", params: { kind: "respec" } });
     deallocatePick(id);
+    setConfirmRefund(null);
   };
 
   const selectedNode =
     selected !== null ? CHART_NODE_BY_ID.get(selected) : undefined;
+  const refundTarget =
+    confirmRefund !== null ? CHART_NODE_BY_ID.get(confirmRefund) : undefined;
   const cssPerUnit =
     viewport.w > 0
       ? Math.min(
@@ -248,7 +334,12 @@ export const ChartScreen = () => {
           viewport.h / CHART_BOUNDS.h,
         ) * view.scale
       : 0;
-  const labelsVisible = cssPerUnit * 10 >= LABEL_MIN_CSS;
+  const labelSize = cssPerUnit * 10;
+  const unitsPerPx = cssPerUnit > 0 ? 1 / cssPerUnit : 1;
+  const labelVisibleFor = (node: ChartNodeDef): boolean =>
+    selected === node.id ||
+    hovered === node.id ||
+    labelSize >= (LABEL_MIN_CSS[node.kind] ?? Infinity);
 
   const detail =
     selectedNode === undefined ? null : (
@@ -258,6 +349,7 @@ export const ChartScreen = () => {
         p="md"
         radius="md"
         withBorder
+        data-chart-detail
       >
         <Stack gap="xs">
           <Group justify="space-between">
@@ -275,24 +367,42 @@ export const ChartScreen = () => {
             </Badge>
           </Group>
           {chartNodeLines(selectedNode, t).map((line, i) => (
-            <Text key={i} size="sm" c={tokens.dim}>
-              · {line}
+            <Text
+              key={i}
+              size="sm"
+              c={line.drawback ? tokens.danger : tokens.dim}
+              data-chart-line
+              data-chart-drawback={line.drawback ? "1" : undefined}
+            >
+              · {line.text}
             </Text>
           ))}
+          {(selectedNode.tags ?? []).length === 0 ? null : (
+            <Group gap={4}>
+              {(selectedNode.tags ?? []).map((tag) => (
+                <Badge key={tag} size="xs" variant="outline" color="gray">
+                  {t(`meta:chartTag.${tag}`)}
+                </Badge>
+              ))}
+            </Group>
+          )}
           {pickSet.has(selectedNode.id) ? (
             respec ? (
               <Button
                 size="xs"
                 color="danger"
+                data-chart-refund
                 disabled={
                   !canDeallocate(selectedNode.id, picks) ||
-                  shards < RESPEC_SHARD_COST
+                  shards < refundCost
                 }
                 onClick={() => {
-                  refund(selectedNode.id);
+                  setConfirmRefund(selectedNode.id);
                 }}
               >
-                {t("meta:chart.refundCost", { cost: RESPEC_SHARD_COST })}
+                {refundCost === 0
+                  ? t("meta:chart.refundFree")
+                  : t("meta:chart.refundCost", { cost: refundCost })}
               </Button>
             ) : (
               <Badge color="teal" variant="light">
@@ -300,17 +410,27 @@ export const ChartScreen = () => {
               </Badge>
             )
           ) : (
-            <Button
-              size="xs"
-              disabled={!canAllocate(selectedNode.id, level, picks)}
-              onClick={() => {
-                allocate(selectedNode.id);
-              }}
-            >
-              {points <= 0
-                ? t("meta:chart.noPoints")
-                : t("meta:chart.allocate")}
-            </Button>
+            <>
+              {preview !== null && preview.cost > 0 ? (
+                <Text size="xs" c={tokens.accent} data-chart-path>
+                  {t("meta:chart.pathCost", {
+                    n: preview.cost,
+                    have: Math.max(0, points),
+                  })}
+                </Text>
+              ) : null}
+              <Button
+                size="xs"
+                disabled={!canAllocate(selectedNode.id, level, picks)}
+                onClick={() => {
+                  allocate(selectedNode.id);
+                }}
+              >
+                {points <= 0
+                  ? t("meta:chart.noPoints")
+                  : t("meta:chart.allocate")}
+              </Button>
+            </>
           )}
         </Stack>
       </Paper>
@@ -335,16 +455,30 @@ export const ChartScreen = () => {
           <Text size="sm" c={tokens.text}>
             {t("meta:chart.header", { points, level })}
           </Text>
-          <Button
-            size="xs"
-            variant={respec ? "filled" : "default"}
-            color={respec ? "danger" : undefined}
-            onClick={() => {
-              setRespec((r) => !r);
-            }}
-          >
-            {respec ? t("meta:chart.respecOff") : t("meta:chart.respecMode")}
-          </Button>
+          <Group gap={6}>
+            <Button
+              size="xs"
+              variant={filterOpen ? "filled" : "default"}
+              data-chart-filter-toggle
+              onClick={() => {
+                setFilterOpen((open) => !open);
+              }}
+            >
+              {tagFilter.length === 0
+                ? t("meta:chart.filter")
+                : t("meta:chart.filterOn", { n: tagFilter.length })}
+            </Button>
+            <Button
+              size="xs"
+              variant={respec ? "filled" : "default"}
+              color={respec ? "danger" : undefined}
+              onClick={() => {
+                setRespec((r) => !r);
+              }}
+            >
+              {respec ? t("meta:chart.respecOff") : t("meta:chart.respecMode")}
+            </Button>
+          </Group>
         </div>
       }
     >
@@ -371,6 +505,10 @@ export const ChartScreen = () => {
             >
               {EDGES.map(([a, b]) => {
                 const lit = pickSet.has(a.id) && pickSet.has(b.id);
+                const onPath =
+                  (previewSet.has(a.id) || pickSet.has(a.id)) &&
+                  (previewSet.has(b.id) || pickSet.has(b.id)) &&
+                  (previewSet.has(a.id) || previewSet.has(b.id));
                 return (
                   <line
                     key={`${a.id}|${b.id}`}
@@ -378,9 +516,15 @@ export const ChartScreen = () => {
                     y1={a.pos.y}
                     x2={b.pos.x}
                     y2={b.pos.y}
-                    stroke={lit ? tokens.accent : tokens.line}
-                    strokeWidth={lit ? 2 : 1}
-                    opacity={lit ? 0.9 : 0.35}
+                    stroke={
+                      lit
+                        ? tokens.accent
+                        : onPath
+                          ? tokens.amber
+                          : tokens.line
+                    }
+                    strokeWidth={lit || onPath ? 2 : 1}
+                    opacity={lit ? 0.9 : onPath ? 0.85 : 0.35}
                   />
                 );
               })}
@@ -388,10 +532,18 @@ export const ChartScreen = () => {
                 const color = constellationColor(node.constellation);
                 const allocated = pickSet.has(node.id);
                 const canGet = !allocated && isAllocatable(node.id, picks);
+                const onPath = previewSet.has(node.id);
+                const dimmed = !matchesFilter(node) && !allocated;
                 const r = nodeRadius(node.kind);
                 const fill = allocated ? color.stroke : color.fill;
                 const stroke = allocated || canGet ? color.stroke : tokens.faint;
-                const opacity = allocated ? 1 : canGet ? 1 : 0.4;
+                const opacity = dimmed
+                  ? 0.12
+                  : allocated
+                    ? 1
+                    : canGet || onPath
+                      ? 1
+                      : 0.4;
                 const highlight = selected === node.id;
                 const hitR = hitRadiusFor(
                   r,
@@ -399,6 +551,11 @@ export const ChartScreen = () => {
                   viewport,
                   view.scale,
                 );
+                const outline = highlight
+                  ? tokens.text
+                  : onPath
+                    ? tokens.amber
+                    : stroke;
                 return (
                   <g key={node.id}>
                     {node.kind === "keystone" ? (
@@ -410,7 +567,7 @@ export const ChartScreen = () => {
                         height={r * 2}
                         transform={`rotate(45 ${String(node.pos.x)} ${String(node.pos.y)})`}
                         fill={fill}
-                        stroke={highlight ? tokens.text : stroke}
+                        stroke={outline}
                         strokeWidth={highlight ? 3 : 2}
                         opacity={opacity}
                       />
@@ -421,21 +578,37 @@ export const ChartScreen = () => {
                         cy={node.pos.y}
                         r={r}
                         fill={fill}
-                        stroke={highlight ? tokens.text : stroke}
+                        stroke={outline}
                         strokeWidth={
-                          highlight ? 3 : node.kind === "notable" ? 3 : 1.5
+                          highlight
+                            ? 3
+                            : node.kind === "notable"
+                              ? 3
+                              : node.kind === "minor"
+                                ? 2.5
+                                : 1.5
                         }
                         opacity={opacity}
                       />
                     )}
-                    {labelsVisible && node.kind !== "small" ? (
+                    {labelVisibleFor(node) ? (
                       <text
                         className={styles.label}
                         x={node.pos.x}
-                        y={node.pos.y - r - 6}
+                        y={
+                          labelBelow(node.id)
+                            ? node.pos.y + r + LABEL_PX * unitsPerPx
+                            : node.pos.y - r - 6 * unitsPerPx
+                        }
                         textAnchor="middle"
-                        fontSize={12}
-                        fill={allocated ? tokens.text : tokens.dim}
+                        fontSize={LABEL_PX * unitsPerPx}
+                        fill={
+                          highlight
+                            ? tokens.text
+                            : allocated
+                              ? tokens.text
+                              : tokens.dim
+                        }
                         opacity={opacity}
                       >
                         {chartNodeTitle(node, t)}
@@ -446,6 +619,16 @@ export const ChartScreen = () => {
                       cx={node.pos.x}
                       cy={node.pos.y}
                       r={hitR}
+                      data-chart-node={node.id}
+                      onPointerEnter={() => {
+                        if (wide) setHovered(node.id);
+                      }}
+                      onPointerLeave={() => {
+                        setHovered(null);
+                      }}
+                      onPointerDown={() => {
+                        onNodeHold(node.id);
+                      }}
                       onPointerUp={() => {
                         onNodeTap(node.id);
                       }}
@@ -478,6 +661,46 @@ export const ChartScreen = () => {
               ⟲
             </ActionIcon>
           </div>
+          {filterOpen ? (
+            <Paper
+              className={styles.filterBar}
+              bg={tokens.surface1}
+              p="xs"
+              radius="md"
+              withBorder
+              data-chart-filter
+            >
+              <Chip.Group
+                multiple
+                value={tagFilter}
+                onChange={(value) => {
+                  setTagFilter(value as string[]);
+                }}
+              >
+                <Group gap={4}>
+                  {CHART_TAGS.map((tag) => (
+                    <Chip key={tag} value={tag} size="xs">
+                      <span data-chart-tag={tag}>
+                        {t(`meta:chartTag.${tag}`)}
+                      </span>
+                    </Chip>
+                  ))}
+                </Group>
+              </Chip.Group>
+              {tagFilter.length === 0 ? null : (
+                <Button
+                  size="compact-xs"
+                  variant="subtle"
+                  mt={4}
+                  onClick={() => {
+                    setTagFilter([]);
+                  }}
+                >
+                  {t("meta:chart.filterClear")}
+                </Button>
+              )}
+            </Paper>
+          ) : null}
           {wide ? null : detail}
         </div>
         {wide ? (
@@ -496,6 +719,45 @@ export const ChartScreen = () => {
           )
         ) : null}
       </div>
+      <Modal
+        opened={confirmRefund !== null}
+        onClose={() => {
+          setConfirmRefund(null);
+        }}
+        title={t("meta:chart.respecConfirmTitle")}
+        centered
+        data-respec-confirm
+      >
+        <Stack gap="sm">
+          <Text size="sm" c={tokens.dim}>
+            {refundTarget === undefined
+              ? ""
+              : t("meta:chart.respecConfirmBody", {
+                  name: chartNodeTitle(refundTarget, t),
+                  cost: refundCost,
+                })}
+          </Text>
+          <Group grow>
+            <Button
+              variant="default"
+              onClick={() => {
+                setConfirmRefund(null);
+              }}
+            >
+              {t("common:cancel")}
+            </Button>
+            <Button
+              color="danger"
+              data-respec-yes
+              onClick={() => {
+                if (confirmRefund !== null) refund(confirmRefund);
+              }}
+            >
+              {t("meta:chart.respecConfirmYes")}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Screen>
   );
 };

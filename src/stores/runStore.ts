@@ -39,6 +39,12 @@ export interface ConsumedBattleMods {
   enemyPlus: number;
 }
 
+export interface RunEncounter {
+  defId: string;
+  sector: number;
+  node: string;
+}
+
 export interface PendingBattle {
   enemyIds: string[];
   originNodeId: NodeId;
@@ -185,6 +191,8 @@ export interface RunValues {
   bossesKilled: string[];
   memoryOrders: number[];
   endingId: string | null;
+  endingFirstTime: boolean;
+  encounters: RunEncounter[];
   startedAt: number;
 }
 
@@ -238,7 +246,7 @@ export interface RunState extends RunValues {
   markMinibossUsed: (defId: string) => void;
   markBossKilled: (defId: string) => boolean;
   unlockMemory: (order: number) => boolean;
-  setEnding: (id: string | null) => void;
+  setEnding: (id: string | null, firstTime?: boolean) => void;
   reset: () => void;
 }
 
@@ -327,6 +335,8 @@ export const createInitialRunValues = (): RunValues => ({
   bossesKilled: [],
   memoryOrders: [],
   endingId: null,
+  endingFirstTime: false,
+  encounters: [],
   startedAt: 0,
 });
 
@@ -357,10 +367,17 @@ export const useRunStore = create<RunState>()((set, get) => ({
 
   addDie: (defId, growthBonus) => {
     const uid = `d${String(get().deckSeq)}`;
-    set((s) => ({
-      deck: [...s.deck, { uid, defId, ...(growthBonus ? { growthBonus } : {}) }],
-      deckSeq: s.deckSeq + 1,
-    }));
+    set((s) => {
+      const node =
+        s.map?.nodes.find((n) => n.id === s.position)?.type ?? "start";
+      return {
+        deck: [...s.deck, { uid, defId, ...(growthBonus ? { growthBonus } : {}) }],
+        deckSeq: s.deckSeq + 1,
+        encounters: s.encounters.some((e) => e.defId === defId)
+          ? s.encounters
+          : [...s.encounters, { defId, sector: s.sector, node }],
+      };
+    });
     return uid;
   },
 
@@ -681,8 +698,8 @@ export const useRunStore = create<RunState>()((set, get) => ({
     return true;
   },
 
-  setEnding: (id) => {
-    set({ endingId: id });
+  setEnding: (id, firstTime = false) => {
+    set({ endingId: id, endingFirstTime: firstTime });
   },
 
   reset: () => {

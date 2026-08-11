@@ -1,7 +1,24 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
-import { ASCENSIONS, MAX_ASCENSION } from "../src/data/ascension";
+import {
+  ASCENSIONS,
+  ASCENSION_REWARDS,
+  MAX_ASCENSION,
+} from "../src/data/ascension";
+import {
+  ACHIEVEMENTS,
+  ACHIEVEMENT_GROUPS,
+} from "../src/data/achievements";
+import { BADGES, BADGE_BY_ID, DIE_SKINS } from "../src/data/cosmetics";
+import { MILESTONES } from "../src/data/milestones";
+import { THEMES } from "../src/data/themes";
+import {
+  OPEN_CONTRACTS,
+  OPEN_DICE,
+  UNLOCKS,
+  UNLOCK_BY_ID,
+} from "../src/data/unlocks";
 import { BARKS, BARK_QUOTA } from "../src/data/barks";
 import {
   ENGRAVINGS,
@@ -28,6 +45,10 @@ import {
   REACTIVE_KEEPER_LINES,
 } from "../src/data/narrative/keeperLines";
 import { CHART_ADJACENCY, CHART_NODES, CHART_NODE_BY_ID } from "../src/data/chart";
+import {
+  chartNodeLines,
+  UNDESCRIBED_MOD_KEYS,
+} from "../src/game/chart/describe";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
 import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
@@ -516,12 +537,19 @@ checkUniqueIds(
   CHART_NODES.map((n) => n.id),
 );
 
-const CHART_NODE_TOTAL = 220;
+const CHART_NODE_TOTAL = 240;
+const CHART_MINORS = 24;
 const CHART_NOTABLES = 32;
 const CHART_KEYSTONES = 8;
+const CHART_DISTINCT_SMALLS = 100;
 if (CHART_NODES.length !== CHART_NODE_TOTAL)
   errors.push(
     `chart: expected ${String(CHART_NODE_TOTAL)} nodes, found ${String(CHART_NODES.length)}`,
+  );
+const minorCount = CHART_NODES.filter((n) => n.kind === "minor").length;
+if (minorCount !== CHART_MINORS)
+  errors.push(
+    `chart: expected ${String(CHART_MINORS)} minor notables, found ${String(minorCount)}`,
   );
 const notableCount = CHART_NODES.filter((n) => n.kind === "notable").length;
 if (notableCount !== CHART_NOTABLES)
@@ -533,6 +561,53 @@ if (keystoneCount !== CHART_KEYSTONES)
   errors.push(
     `chart: expected ${String(CHART_KEYSTONES)} keystones, found ${String(keystoneCount)}`,
   );
+
+const chartPayloadKey = (node: (typeof CHART_NODES)[number]): string =>
+  JSON.stringify([
+    node.mods ?? null,
+    node.effects ?? null,
+    node.traits ?? null,
+    node.fx ?? null,
+    node.hubBudget ?? null,
+    node.budgetDelta ?? null,
+    node.slotTierDelta ?? null,
+  ]);
+
+const chartSmalls = CHART_NODES.filter((n) => n.kind === "small");
+const distinctSmalls = new Set(chartSmalls.map(chartPayloadKey)).size;
+if (distinctSmalls < CHART_DISTINCT_SMALLS)
+  errors.push(
+    `chart: expected at least ${String(CHART_DISTINCT_SMALLS)} distinct small payloads, found ${String(distinctSmalls)}`,
+  );
+
+for (const node of CHART_NODES) {
+  for (const other of CHART_ADJACENCY.get(node.id) ?? []) {
+    const neighbour = CHART_NODE_BY_ID.get(other);
+    if (neighbour === undefined) continue;
+    if (chartPayloadKey(neighbour) === chartPayloadKey(node)) {
+      errors.push(
+        `chart: "${node.id}" and its neighbour "${other}" carry the same payload`,
+      );
+    }
+  }
+}
+
+const missingChartKeys = new Set<string>();
+const chartTranslate = (key: string): string => {
+  const [ns, path] = key.includes(":") ? key.split(":") : ["meta", key];
+  if (path === undefined) return key;
+  const root =
+    ns === "battle"
+      ? (enBattle as unknown as ContentNode)
+      : (enMeta as unknown as ContentNode);
+  if (!resolveIn(root, path)) {
+    missingChartKeys.add(key);
+    return "";
+  }
+  return path;
+};
+
+const chartTagSet = new Set<string>();
 for (const node of CHART_NODES) {
   checkLocKey(`chart.${node.id}`, node.name);
   checkLocKey(`chart.${node.id}`, node.desc);
@@ -551,6 +626,40 @@ for (const node of CHART_NODES) {
   ) {
     errors.push(`chart: "${node.id}" is a no-op (no effects, mods, traits, or budget)`);
   }
+  if (node.name !== undefined && !resolveMetaKey(node.name.replace("meta:", "")))
+    errors.push(`chart: "${node.id}" has no en name for "${node.name}"`);
+  const lines = chartNodeLines(node, chartTranslate);
+  if (lines.length === 0)
+    errors.push(`chart: "${node.id}" renders a blank card`);
+  for (const line of lines) {
+    if (line.text === "")
+      errors.push(`chart: "${node.id}" renders an untranslated line`);
+  }
+  const drawbackKeys = Object.entries(node.mods ?? {}).filter(
+    ([key, value]) =>
+      typeof value === "number" &&
+      (key === "nudgeCostDelta" || key === "tideEffectDelta"
+        ? value > 0
+        : value < 0),
+  );
+  if (drawbackKeys.length > 0 && !lines.some((line) => line.drawback))
+    errors.push(`chart: "${node.id}" hides a drawback`);
+  for (const tag of node.tags ?? []) {
+    checkTag(`chart.${node.id}`, tag);
+    chartTagSet.add(tag);
+  }
+}
+for (const key of missingChartKeys) {
+  errors.push(`chart: missing en key "${key}"`);
+}
+if (UNDESCRIBED_MOD_KEYS.length > 0) {
+  errors.push(
+    `chart: describe.ts omits mod keys ${UNDESCRIBED_MOD_KEYS.join(", ")}`,
+  );
+}
+for (const tag of chartTagSet) {
+  if (!resolveMetaKey(`chartTag.${tag}`))
+    errors.push(`chart: no en label for tag chip "${tag}"`);
 }
 
 // Orphans and reachability: every node must reach an entry node through the
@@ -1231,7 +1340,7 @@ if (dossierCount !== DOSSIER_TOTAL)
 // ── Phase 9: mutators, contracts, goals ─────────────────────────────────────
 
 const MUTATOR_COUNT = 12;
-const CONTRACT_COUNT = 14;
+const CONTRACT_COUNT = 20;
 const MUTATOR_MOD_KEYS = new Set(Object.keys(ZERO_MUTATOR_MODS));
 
 checkUniqueIds(
@@ -1318,6 +1427,155 @@ for (const def of CONTRACTS) {
   }
   if (setup.sector !== undefined && (setup.sector < 1 || setup.sector > 5)) {
     errors.push(`contracts: "${def.id}" sector ${String(setup.sector)} is out of range`);
+  }
+}
+
+const ACHIEVEMENT_COUNT = 30;
+const ACHIEVEMENT_GATES = 8;
+const ACHIEVEMENT_FLAG_READERS = 6;
+
+checkUniqueIds(
+  "achievements",
+  ACHIEVEMENTS.map((a) => a.id),
+);
+if (ACHIEVEMENTS.length !== ACHIEVEMENT_COUNT) {
+  errors.push(
+    `achievements: expected exactly ${String(ACHIEVEMENT_COUNT)}, found ${String(ACHIEVEMENTS.length)}`,
+  );
+}
+const gatingAchievements = ACHIEVEMENTS.filter(
+  (def) => def.reward?.unlockId !== undefined,
+);
+if (gatingAchievements.length < ACHIEVEMENT_GATES) {
+  errors.push(
+    `achievements: only ${String(gatingAchievements.length)} gate content, need ${String(ACHIEVEMENT_GATES)}`,
+  );
+}
+const flagAchievements = ACHIEVEMENTS.filter((def) => def.cond.c === "flags");
+if (flagAchievements.length < ACHIEVEMENT_FLAG_READERS) {
+  errors.push(
+    `achievements: only ${String(flagAchievements.length)} read flagsArchive, need ${String(ACHIEVEMENT_FLAG_READERS)}`,
+  );
+}
+for (const def of ACHIEVEMENTS) {
+  if (!resolveMetaKey(def.name.replace("meta:", "")))
+    errors.push(`achievements: "${def.id}" has no en name`);
+  if (!resolveMetaKey(def.desc.replace("meta:", "")))
+    errors.push(`achievements: "${def.id}" has no en desc`);
+  const reward = def.reward;
+  if (reward?.unlockId !== undefined && !UNLOCK_BY_ID.has(reward.unlockId)) {
+    errors.push(
+      `achievements: "${def.id}" rewards unknown unlock "${reward.unlockId}"`,
+    );
+  }
+  if (reward?.badge !== undefined && !BADGE_BY_ID.has(reward.badge)) {
+    errors.push(`achievements: "${def.id}" rewards unknown badge "${reward.badge}"`);
+  }
+  if (reward !== undefined && reward.shards === undefined && reward.unlockId === undefined && reward.badge === undefined) {
+    errors.push(`achievements: "${def.id}" declares an empty reward`);
+  }
+}
+for (const group of ACHIEVEMENT_GROUPS) {
+  if (!resolveMetaKey(`profile.group.${group}`))
+    errors.push(`achievements: group "${group}" has no en label`);
+  if (!ACHIEVEMENTS.some((def) => def.group === group))
+    errors.push(`achievements: group "${group}" is empty`);
+}
+
+const GRINDY_RUN_CONDS = new Set(["runStatAtLeast"]);
+for (const def of ACHIEVEMENTS) {
+  if (GRINDY_RUN_CONDS.has(def.cond.c))
+    errors.push(`achievements: "${def.id}" asks for repetition without a decision`);
+}
+
+const unlockIds = new Set(UNLOCKS.map((def) => def.id));
+if (unlockIds.size !== UNLOCKS.length)
+  errors.push("unlocks: duplicate unlock id");
+const wavedDice = UNLOCKS.flatMap((def) => def.dice ?? []);
+if (new Set(wavedDice).size !== wavedDice.length)
+  errors.push("unlocks: a die appears in two waves");
+for (const id of [...OPEN_DICE, ...wavedDice]) {
+  if (!dieIdSet.has(id)) errors.push(`unlocks: unknown die "${id}"`);
+}
+const diceCovered = new Set([...OPEN_DICE, ...wavedDice]);
+if (diceCovered.size !== ALL_DICE.length) {
+  errors.push(
+    `unlocks: ${String(diceCovered.size)} of ${String(ALL_DICE.length)} dice are reachable — the rest can never be bought`,
+  );
+}
+const wavedContracts = UNLOCKS.flatMap((def) => def.contracts ?? []);
+const contractIdSet = new Set(CONTRACTS.map((c) => c.id));
+for (const id of [...OPEN_CONTRACTS, ...wavedContracts]) {
+  if (!contractIdSet.has(id)) errors.push(`unlocks: unknown contract "${id}"`);
+}
+const contractsCovered = new Set([...OPEN_CONTRACTS, ...wavedContracts]);
+if (contractsCovered.size !== CONTRACTS.length) {
+  errors.push(
+    `unlocks: ${String(contractsCovered.size)} of ${String(CONTRACTS.length)} contracts are reachable`,
+  );
+}
+for (const def of UNLOCKS) {
+  if (!resolveMetaKey(def.label.replace("meta:", "")))
+    errors.push(`unlocks: "${def.id}" has no en label`);
+  if (
+    def.source.level === undefined &&
+    def.source.achievement === undefined &&
+    def.source.ascension === undefined &&
+    def.source.clears === undefined
+  ) {
+    errors.push(`unlocks: "${def.id}" has no source at all`);
+  }
+  if (
+    def.source.achievement !== undefined &&
+    !ACHIEVEMENTS.some((a) => a.id === def.source.achievement)
+  ) {
+    errors.push(
+      `unlocks: "${def.id}" waits on unknown achievement "${def.source.achievement}"`,
+    );
+  }
+  if (def.cosmetic !== undefined) {
+    const known =
+      DIE_SKINS.some((skin) => skin.cosmetic === def.cosmetic) ||
+      THEMES.some((theme) => theme.unlock === def.cosmetic);
+    if (!known)
+      errors.push(`unlocks: "${def.id}" grants unknown cosmetic "${def.cosmetic}"`);
+  }
+}
+for (const milestone of MILESTONES) {
+  if (!resolveMetaKey(milestone.label.replace("meta:", "")))
+    errors.push(`milestones: L${String(milestone.level)} has no en label`);
+  const payload =
+    (milestone.budget ?? 0) > 0 || (milestone.chartPoints ?? 0) > 0;
+  const unlock =
+    milestone.unlockId !== undefined && unlockIds.has(milestone.unlockId);
+  if (!payload && !unlock)
+    errors.push(
+      `milestones: L${String(milestone.level)} (${milestone.kind}) promises nothing real`,
+    );
+}
+for (const skin of DIE_SKINS) {
+  if (!resolveMetaKey(skin.name.replace("meta:", "")))
+    errors.push(`cosmetics: skin "${skin.id}" has no en name`);
+  if (!resolveMetaKey(skin.desc.replace("meta:", "")))
+    errors.push(`cosmetics: skin "${skin.id}" has no en desc`);
+  if (
+    skin.cosmetic !== undefined &&
+    !UNLOCKS.some((def) => def.cosmetic === skin.cosmetic)
+  ) {
+    errors.push(`cosmetics: skin "${skin.id}" can never be unlocked`);
+  }
+}
+for (const badge of BADGES) {
+  if (!resolveMetaKey(badge.name.replace("meta:", "")))
+    errors.push(`cosmetics: badge "${badge.id}" has no en name`);
+}
+for (const reward of ASCENSION_REWARDS) {
+  if (!resolveMetaKey(reward.label.replace("meta:", "")))
+    errors.push(`ascension: A${String(reward.level)} reward has no en label`);
+  if (reward.unlockId !== undefined && !unlockIds.has(reward.unlockId)) {
+    errors.push(
+      `ascension: A${String(reward.level)} rewards unknown unlock "${reward.unlockId}"`,
+    );
   }
 }
 
@@ -1687,7 +1945,7 @@ console.log("lint:content: puzzle calibration");
 for (const row of puzzleTable(PUZZLES)) console.log(`  ${row}`);
 
 console.log(
-  `lint:content: totals — dice ${String(ALL_DICE.length)}/90 · perks ${String(ALL_PERKS.length)}/180 · modules ${String(ALL_MODULES.length)}/60 · engravings ${String(ENGRAVINGS.length)}/50 · events ${String(ALL_EVENTS.length)}/${String(EVENT_TOTAL)} (${String(callbackCount)}/${String(CALLBACK_TARGET)} callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/220 · enemies ${String(ALL_ENEMIES.length)}/91 · contracts ${String(CONTRACTS.length)}/14 · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/${String(FRAGMENT_TOTAL)} · dossiers ${String(dossierCount)}/91 · keeper ${String(KEEPER_LINES.length)}/${String(KEEPER_TOTAL)}`,
+  `lint:content: totals — dice ${String(ALL_DICE.length)}/90 · perks ${String(ALL_PERKS.length)}/180 · modules ${String(ALL_MODULES.length)}/60 · engravings ${String(ENGRAVINGS.length)}/50 · events ${String(ALL_EVENTS.length)}/${String(EVENT_TOTAL)} (${String(callbackCount)}/${String(CALLBACK_TARGET)} callbacks) · riddles ${String(PUZZLES.length)}/60 · chart ${String(CHART_NODES.length)}/240 · enemies ${String(ALL_ENEMIES.length)}/91 · contracts ${String(CONTRACTS.length)}/20 · achievements ${String(ACHIEVEMENTS.length)}/30 · unlocks ${String(UNLOCKS.length)} · barks ${String(barkLines)}/150 · fragments ${String(FRAGMENTS.length)}/${String(FRAGMENT_TOTAL)} · dossiers ${String(dossierCount)}/91 · keeper ${String(KEEPER_LINES.length)}/${String(KEEPER_TOTAL)}`,
 );
 
 console.log(

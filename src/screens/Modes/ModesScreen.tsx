@@ -12,7 +12,10 @@ import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { CONTRACTS } from "@/data/contracts";
+import { DAILY_PREVIEW_LEVEL } from "@/data/milestones";
 import { MUTATOR_BY_ID } from "@/data/mutators";
+import { hasFeature } from "@/data/unlocks";
+import { unlockContextOf } from "@/game/meta/unlockState";
 import { claimDailyAttempt } from "@/game/run/boards";
 import {
   hasActiveRun,
@@ -34,6 +37,8 @@ const countdownLabel = (ms: number): { h: number; m: number } => ({
   m: Math.floor((ms % 3_600_000) / 60_000),
 });
 
+const DAY_MS = 86_400_000;
+
 export const ModesScreen = () => {
   const { t } = useTranslation(["meta", "common", "content", "run"]);
   const go = useAppStore((s) => s.go);
@@ -43,11 +48,28 @@ export const ModesScreen = () => {
   const best = useMetaStore((s) => s.best);
   const contracts = useMetaStore((s) => s.contracts);
   const dailyPlayed = useMetaStore((s) => s.dailyPlayed);
+  const level = useMetaStore((s) => s.level);
+  const achievements = useMetaStore((s) => s.achievements);
+  const ascension = useMetaStore((s) => s.ascension);
+  const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
+  const clears = useMetaStore((s) => s.stats.campaignClears);
+  const previewUnlocked = hasFeature(
+    unlockContextOf({
+      level,
+      achievements,
+      ascension,
+      unlocksGranted,
+      stats: { campaignClears: clears },
+    }),
+    "dailyPreview",
+  );
   const [now] = useState(() => Date.now());
   const [pending, setPending] = useState<(() => void) | null>(null);
 
   const date = utcDateKey(now);
   const mutators = dailyMutators(date);
+  const tomorrow = utcDateKey(now + DAY_MS);
+  const tomorrowMutators = dailyMutators(tomorrow);
   const dailyRecord = dailyPlayed[date];
   const reset = countdownLabel(msUntilUtcReset(now));
   const starTotal = CONTRACTS.reduce(
@@ -216,6 +238,26 @@ export const ModesScreen = () => {
             <Text size="xs" c={tokens.faint}>
               {t("meta:modes.dailyReset", { h: reset.h, m: reset.m })}
             </Text>
+            {previewUnlocked ? (
+              <Stack gap={4} data-daily-preview>
+                <Text size="xs" c={tokens.accent}>
+                  {t("meta:modes.dailyPreview", { date: tomorrow })}
+                </Text>
+                <Group gap="xs">
+                  {tomorrowMutators.map((id) => (
+                    <Badge key={id} color="accent" variant="light">
+                      {t(MUTATOR_BY_ID.get(id)?.name ?? id)}
+                    </Badge>
+                  ))}
+                </Group>
+              </Stack>
+            ) : (
+              <Text size="xs" c={tokens.faint} data-daily-preview-locked>
+                {t("meta:modes.dailyPreviewLocked", {
+                  n: DAILY_PREVIEW_LEVEL,
+                })}
+              </Text>
+            )}
             <Group grow>
               <Button
                 color="accent"

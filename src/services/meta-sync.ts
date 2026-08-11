@@ -56,6 +56,12 @@ const metaValues = (): MetaValues => {
     flagsArchive: s.flagsArchive,
     bossFirstKills: s.bossFirstKills,
     endings: s.endings,
+    achievements: s.achievements,
+    achievementsSeen: s.achievementsSeen,
+    encountered: s.encountered,
+    unlocksGranted: s.unlocksGranted,
+    unlocksSeen: s.unlocksSeen,
+    dieSkin: s.dieSkin,
     stats: s.stats,
   };
 };

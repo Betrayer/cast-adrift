@@ -297,7 +297,10 @@
     "aLevel": "Un «{{n}} »",
     "tideCap": "Niveaux maximaux des marées d'interférence à l'{{n}}",
     "launch": "Lancement",
-    "back": "Retour"
+    "back": "Retour",
+    "ascensionCost": "Cela vous coûte",
+    "ascensionGain": "Ça te rapporte",
+    "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution"
   },
   "package": {
     "title": "Boîtier de porte",
@@ -398,7 +401,7 @@
     "stability": "{{n}} de stabilité",
     "neutral": "Équilibre des axes",
     "preview": "axe {{from}} → {{to}}",
-    "short": "Axis"
+    "short": "Axe"
   },
   "journal": {
     "title": "Journal de course",

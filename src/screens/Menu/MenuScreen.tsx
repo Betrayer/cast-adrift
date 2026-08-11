@@ -19,6 +19,7 @@ import { progressWithinLevel } from '@/game/xp';
 import { useMetaStore } from '@/stores/metaStore';
 import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
 import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
+import { MenuBadge, menuBadgeId } from '@/screens/Profile/BadgeRow';
 import { ResumeCard } from '@/screens/Menu/ResumeCard';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -59,6 +60,8 @@ export const MenuScreen = () => {
   const prologueDone = useMetaStore((s) => s.stats.prologueDone);
   const codex = useMetaStore((s) => s.codex);
   const codexRead = useMetaStore((s) => s.codexRead);
+  const badges = useMetaStore((s) => s.badges);
+  const topBadge = menuBadgeId(badges);
   const unreadMemories = unreadMemoryIds(codex, codexRead).length;
   const [localResume] = useState(readLocalResume);
   const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
@@ -95,6 +98,7 @@ export const MenuScreen = () => {
             go('chart');
           }}
           aria-label={t('meta:menu.level', { level })}
+          style={{ position: 'relative' }}
         >
           <RingProgress
             size={56}
@@ -107,6 +111,7 @@ export const MenuScreen = () => {
               </Text>
             }
           />
+          {topBadge === null ? null : <MenuBadge id={topBadge} />}
         </UnstyledButton>
       }
     >

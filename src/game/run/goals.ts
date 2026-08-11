@@ -26,7 +26,9 @@ export type GoalSpec =
   | { g: "axisAtMost"; n: number }
   | { g: "allBeaconsResolved" }
   | { g: "deckSchoolsAtLeast"; n: number }
-  | { g: "dicePlacedAtMost"; n: number };
+  | { g: "dicePlacedAtMost"; n: number }
+  | { g: "axisAtLeast"; n: number }
+  | { g: "elitesAtMost"; n: number };
 
 export type GoalKind = GoalSpec["g"];
 
@@ -101,6 +103,10 @@ export const evaluateGoal = (spec: GoalSpec, ctx: GoalContext): boolean => {
       return ctx.deckSchools >= spec.n;
     case "dicePlacedAtMost":
       return ctx.stats.dicePlaced <= spec.n;
+    case "axisAtLeast":
+      return ctx.axis >= spec.n;
+    case "elitesAtMost":
+      return ctx.stats.elites <= spec.n;
   }
 };
 
@@ -111,10 +117,12 @@ const WIN_ONLY: ReadonlySet<GoalKind> = new Set<GoalKind>([
   "hullPctAtLeast",
   "scrapAtLeast",
   "axisAtMost",
+  "axisAtLeast",
   "depthWithDeckAtLeast",
   "allBeaconsResolved",
   "deckSchoolsAtLeast",
   "dicePlacedAtMost",
+  "elitesAtMost",
 ]);
 
 export const goalMet = (spec: GoalSpec, ctx: GoalContext): boolean => {

@@ -115,6 +115,31 @@ export const ascensionMods = (level: number): AscensionMods => {
 export const maxSelectableAscension = (cleared: number): number =>
   Math.max(0, Math.min(MAX_ASCENSION, cleared));
 
+export type AscensionRewardKind = "shards" | "cosmetic" | "contract" | "badge";
+
+export interface AscensionReward {
+  level: number;
+  kind: AscensionRewardKind;
+  label: LocKey;
+  unlockId?: string;
+}
+
+export const ASCENSION_REWARDS: readonly AscensionReward[] = [
+  { level: 1, kind: "shards", label: "meta:ascension.reward.shards" },
+  { level: 3, kind: "cosmetic", label: "meta:ascension.reward.skinAshen", unlockId: "skinAshen" },
+  { level: 5, kind: "contract", label: "meta:ascension.reward.contract", unlockId: "contractsA5" },
+  { level: 6, kind: "cosmetic", label: "meta:ascension.reward.skinVoidglass", unlockId: "skinVoidglass" },
+  { level: 9, kind: "cosmetic", label: "meta:ascension.reward.skinEmberglass", unlockId: "skinEmberglass" },
+  { level: 10, kind: "cosmetic", label: "meta:ascension.reward.prestigeTheme", unlockId: "prestigeTheme" },
+  { level: 10, kind: "badge", label: "meta:ascension.reward.badge" },
+];
+
+export const ascensionRewardsUpTo = (level: number): AscensionReward[] =>
+  ASCENSION_REWARDS.filter((reward) => reward.level <= level);
+
+export const ascensionRewardsAt = (level: number): AscensionReward[] =>
+  ASCENSION_REWARDS.filter((reward) => reward.level === level);
+
 // A6 bolts one extra subsystem onto every elite; A8 inserts an extra pattern
 // step into boss phases. Both are data shapes the resolver already understands.
 export const A6_ELITE_SUBSYSTEM = {

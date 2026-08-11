@@ -3,6 +3,7 @@ import {
   Divider,
   Group,
   Paper,
+  SimpleGrid,
   Stack,
   Text,
   Title,
@@ -14,9 +15,11 @@ import { tokens } from '@/app/theme';
 import {
   ASCENSIONS,
   ascensionMods,
+  ascensionRewardsUpTo,
   maxSelectableAscension,
 } from '@/data/ascension';
 import { SHIP_BY_ID } from '@/data/ships';
+import { ascensionShardMult } from '@/game/xp';
 import { startRun } from '@/game/run/flow';
 import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
@@ -70,18 +73,38 @@ export const RunSetupScreen = () => {
               ))}
             </Group>
           )}
-          <Stack gap={2}>
-            {ASCENSIONS.filter((a) => a.level <= ascension).map((a) => (
-              <Text key={a.level} size="xs" c={tokens.amber}>
-                {`A${String(a.level)} · ${t(a.desc)}`}
-              </Text>
-            ))}
-            {ascension > 0 ? (
+          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
+            <Stack gap={2} data-ascension-penalties>
               <Text size="xs" c={tokens.faint}>
-                {t('run:setup.tideCap', { n: 3 + mods.tideCapDelta })}
+                {t('run:setup.ascensionCost')}
               </Text>
-            ) : null}
-          </Stack>
+              {ASCENSIONS.filter((a) => a.level <= ascension).map((a) => (
+                <Text key={a.level} size="xs" c={tokens.danger}>
+                  {`A${String(a.level)} · ${t(a.desc)}`}
+                </Text>
+              ))}
+              {ascension > 0 ? (
+                <Text size="xs" c={tokens.faint}>
+                  {t('run:setup.tideCap', { n: 3 + mods.tideCapDelta })}
+                </Text>
+              ) : null}
+            </Stack>
+            <Stack gap={2} data-ascension-rewards>
+              <Text size="xs" c={tokens.faint}>
+                {t('run:setup.ascensionGain')}
+              </Text>
+              <Text size="xs" c={tokens.amber}>
+                {t('run:setup.shardMult', {
+                  n: Math.round((ascensionShardMult(ascension) - 1) * 100),
+                })}
+              </Text>
+              {ascensionRewardsUpTo(ascension).map((reward, i) => (
+                <Text key={`${String(reward.level)}-${String(i)}`} size="xs" c={tokens.amber}>
+                  {`A${String(reward.level)} · ${t(reward.label)}`}
+                </Text>
+              ))}
+            </Stack>
+          </SimpleGrid>
           <Button
             size="md"
             fullWidth

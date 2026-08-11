@@ -1,15 +1,27 @@
-import { CHART_NODE_BY_ID, chartNeighbors, isEntryNode } from "@/data/chart";
+import {
+  CHART_NODES,
+  CHART_NODE_BY_ID,
+  chartNeighbors,
+  isEntryNode,
+} from "@/data/chart";
+import { bonusChartPoints, FREE_RESPEC_LEVEL } from "@/data/milestones";
 import { MAX_LEVEL } from "@/game/xp";
 import type { SlotId } from "@/types/battle";
 
 export const RESPEC_SHARD_COST = 20;
 
+export const respecCost = (level: number): number =>
+  level >= FREE_RESPEC_LEVEL ? 0 : RESPEC_SHARD_COST;
+
 export const pointsSpent = (picks: readonly string[]): number => picks.length;
+
+export const pointsTotal = (level: number): number =>
+  Math.min(MAX_LEVEL, level) + bonusChartPoints(level);
 
 export const pointsAvailable = (
   level: number,
   picks: readonly string[],
-): number => Math.min(MAX_LEVEL, level) - picks.length;
+): number => pointsTotal(level) - picks.length;
 
 export const isAllocatable = (
   id: string,
@@ -59,6 +71,58 @@ export const canDeallocate = (
 ): boolean => {
   if (!picks.includes(id)) return false;
   return allConnectedToEntry(picks.filter((p) => p !== id));
+};
+
+export interface ChartPath {
+  ids: string[];
+  cost: number;
+}
+
+export const pathTo = (
+  target: string,
+  picks: readonly string[],
+): ChartPath | null => {
+  if (!CHART_NODE_BY_ID.has(target)) return null;
+  const owned = new Set(picks);
+  if (owned.has(target)) return { ids: [], cost: 0 };
+  const dist = new Map<string, number>();
+  const from = new Map<string, string>();
+  const deque: string[] = [];
+  for (const id of picks) {
+    dist.set(id, 0);
+    deque.push(id);
+  }
+  for (const node of CHART_NODES) {
+    if (node.entry !== true || owned.has(node.id)) continue;
+    dist.set(node.id, 1);
+    deque.push(node.id);
+  }
+  deque.sort((a, b) => (dist.get(a) ?? 0) - (dist.get(b) ?? 0));
+  while (deque.length > 0) {
+    const current = deque.shift();
+    if (current === undefined) break;
+    const base = dist.get(current) ?? 0;
+    if (current === target) break;
+    for (const next of chartNeighbors(current)) {
+      const step = owned.has(next) ? 0 : 1;
+      const candidate = base + step;
+      const known = dist.get(next);
+      if (known !== undefined && known <= candidate) continue;
+      dist.set(next, candidate);
+      from.set(next, current);
+      if (step === 0) deque.unshift(next);
+      else deque.push(next);
+    }
+  }
+  const cost = dist.get(target);
+  if (cost === undefined) return null;
+  const ids: string[] = [];
+  let cursor: string | undefined = target;
+  while (cursor !== undefined) {
+    if (!owned.has(cursor)) ids.unshift(cursor);
+    cursor = from.get(cursor);
+  }
+  return { ids, cost };
 };
 
 // «Инженерный отсек» adds a hangar slot, «Prism Cascade» takes two away; both

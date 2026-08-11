@@ -297,7 +297,10 @@
     "aLevel": "A{{n}}",
     "tideCap": "Межа припливу завад: {{n}}",
     "launch": "Старт",
-    "back": "Назад"
+    "back": "Назад",
+    "ascensionCost": "Що це коштує",
+    "ascensionGain": "Що це дає",
+    "shardMult": "+{{n}}% уламків за весь прохід"
   },
   "package": {
     "title": "Пакет за браму",

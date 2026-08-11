@@ -29,7 +29,8 @@
     "active": "Active",
     "owned": "Unlocked",
     "unlock": "Unlock",
-    "price": "{{n}} shards"
+    "price": "{{n}} shards",
+    "ascendant": "Ascendant"
   },
   "diagnostics": {
     "version": "Build {{version}}",

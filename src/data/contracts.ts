@@ -55,6 +55,17 @@ const MIXED_DECK: readonly string[] = [
   "grey-d4",
 ];
 
+const PRISM_DECK: readonly string[] = [
+  "glimmer",
+  "prismChip",
+  "red-d6",
+  "blue-d6",
+  "green-d4",
+  "yellow-d6",
+  "black-d6",
+  "grey-d4",
+];
+
 export const CONTRACTS: readonly ContractDef[] = [
   {
     id: "bareHull",
@@ -204,6 +215,76 @@ export const CONTRACTS: readonly ContractDef[] = [
       { g: "win" },
       { g: "dicePlacedAtMost", n: 20 },
       { g: "jumpsAtMost", n: 14 },
+    ],
+  },
+  {
+    id: "deadReckoning",
+    name: "content:contracts.deadReckoning.name",
+    desc: "content:contracts.deadReckoning.desc",
+    setup: { chartDisabled: true, mutators: ["fog"] },
+    goals: [
+      { g: "win" },
+      { g: "jumpsAtMost", n: 13 },
+      { g: "noShipyardVisits" },
+    ],
+  },
+  {
+    id: "ironTide",
+    name: "content:contracts.ironTide.name",
+    desc: "content:contracts.ironTide.desc",
+    setup: { tideStart: 3 },
+    goals: [
+      { g: "win" },
+      { g: "hullNeverBelowPct", n: 30 },
+      { g: "fullHullBattleEndsAtLeast", n: 2 },
+    ],
+  },
+  {
+    id: "prismWork",
+    name: "content:contracts.prismWork.name",
+    desc: "content:contracts.prismWork.desc",
+    setup: { deckPreset: PRISM_DECK },
+    goals: [
+      { g: "win" },
+      { g: "deckSchoolsAtLeast", n: 6 },
+      { g: "dicePlacedAtMost", n: 26 },
+    ],
+  },
+  {
+    id: "ghostLane",
+    name: "content:contracts.ghostLane.name",
+    desc: "content:contracts.ghostLane.desc",
+    setup: { sector: 2, mutators: ["radioSilence"] },
+    goals: [
+      { g: "win" },
+      { g: "elitesAtMost", n: 1 },
+      { g: "jumpsAtMost", n: 12 },
+    ],
+  },
+  {
+    id: "voidTithe",
+    name: "content:contracts.voidTithe.name",
+    desc: "content:contracts.voidTithe.desc",
+    setup: { sector: 5, mutators: ["resonantStorm"], shopPricePct: 75 },
+    goals: [
+      { g: "win" },
+      { g: "axisAtLeast", n: 3 },
+      { g: "scrapAtLeast", n: 120 },
+    ],
+  },
+  {
+    id: "gauntlet",
+    name: "content:contracts.gauntlet.name",
+    desc: "content:contracts.gauntlet.desc",
+    setup: {
+      forcedTraits: ["obsidianPact"],
+      perksDisabled: true,
+      chartDisabled: true,
+    },
+    goals: [
+      { g: "win" },
+      { g: "elitesAtLeast", n: 4 },
+      { g: "hullPctAtLeast", n: 25 },
     ],
   },
 ];

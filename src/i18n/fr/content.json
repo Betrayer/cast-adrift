@@ -3767,6 +3767,30 @@
     "quietRun": {
       "name": "Course tranquille",
       "desc": "Traversez la Faille en plaçant le moins de dés possible."
+    },
+    "deadReckoning": {
+      "name": "Navigation à l'estime",
+      "desc": "Pas d'Carte stellaires, pas de cartes du tout — du brouillard sur le chenal et un quai dont vous n'avez sans doute pas besoin."
+    },
+    "ironTide": {
+      "name": "Marée de fer",
+      "desc": "La marée en est déjà au niveau trois quand tu arrives. Maintiens la coque et sors indemne des combats."
+    },
+    "prismWork": {
+      "name": "Prismwork",
+      "desc": "Un jeu de cartes « Prism-seeded ». Six écoles sur le plateau, et moins de dés que vous ne le souhaiteriez pour jouer."
+    },
+    "ghostLane": {
+      "name": "La voie des fantômes",
+      "desc": "Silence radio dans le secteur 2. Prenez le raccourci et laissez les élites tranquilles."
+    },
+    "voidTithe": {
+      "name": "La dîme du Vide",
+      "desc": "Le secteur 5 est en proie à une tempête retentissante, les prix ont augmenté de trois quarts. On en ressort stable et riche."
+    },
+    "gauntlet": {
+      "name": "Le Gauntlet",
+      "desc": "Pas d'avantages, pas de carte, le Pacte d'Obsidienne s'est lancé à toute vitesse. Quatre élites et un quart de la coque."
     }
   },
   "sectors": {

@@ -70,6 +70,16 @@
   z-index: var(--z-hud);
 }
 
+.filterBar {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  max-height: 40%;
+  overflow-y: auto;
+  z-index: var(--z-hud);
+}
+
 .pulse {
   animation: pulse 1.6s ease-in-out infinite;
   transform-box: fill-box;

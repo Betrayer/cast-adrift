@@ -15,22 +15,31 @@ export interface BarkToast {
   line: LocKey;
 }
 
+export interface AchievementToast {
+  id: number;
+  achievement: string;
+}
+
 export interface NarrativeState {
   consequence: ConsequenceToast | null;
   consequenceQueue: ConsequenceToast[];
   bark: BarkToast | null;
   barkQueue: BarkToast[];
+  achievement: AchievementToast | null;
+  achievementQueue: AchievementToast[];
   journal: JournalEntry[];
   memoryQueue: number[];
   seq: number;
   pushConsequence: (origin: LocKey) => void;
   pushBark: (line: LocKey) => void;
+  pushAchievement: (achievement: string) => void;
   pushJournal: (entry: JournalBody & { sector: number }) => void;
   pushMemory: (order: number) => void;
   dismissMemory: () => void;
   setJournal: (entries: readonly JournalEntry[]) => void;
   dismissConsequence: () => void;
   dismissBark: () => void;
+  dismissAchievement: () => void;
   reset: () => void;
 }
 
@@ -39,6 +48,8 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
   consequenceQueue: [],
   bark: null,
   barkQueue: [],
+  achievement: null,
+  achievementQueue: [],
   journal: [],
   memoryQueue: [],
   seq: 0,
@@ -58,6 +69,18 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
       if (s.bark === null) return { bark: toast, seq: toast.id };
       if (s.barkQueue.length >= TOAST_QUEUE_CAP) return s;
       return { barkQueue: [...s.barkQueue, toast], seq: toast.id };
+    });
+  },
+
+  pushAchievement: (achievement) => {
+    set((s) => {
+      const toast = { id: s.seq + 1, achievement };
+      if (s.achievement === null) return { achievement: toast, seq: toast.id };
+      if (s.achievementQueue.length >= TOAST_QUEUE_CAP) return s;
+      return {
+        achievementQueue: [...s.achievementQueue, toast],
+        seq: toast.id,
+      };
     });
   },
 
@@ -104,12 +127,21 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
     }));
   },
 
+  dismissAchievement: () => {
+    set((s) => ({
+      achievement: s.achievementQueue[0] ?? null,
+      achievementQueue: s.achievementQueue.slice(1),
+    }));
+  },
+
   reset: () => {
     set({
       consequence: null,
       consequenceQueue: [],
       bark: null,
       barkQueue: [],
+      achievement: null,
+      achievementQueue: [],
       journal: [],
       memoryQueue: [],
     });

@@ -29,7 +29,8 @@
     "active": "Actif",
     "owned": "Déverrouillé",
     "unlock": "Déverrouiller",
-    "price": "{{n}} éclats"
+    "price": "{{n}} éclats",
+    "ascendant": "Ascendant"
   },
   "diagnostics": {
     "version": "{{version}} de compilation",

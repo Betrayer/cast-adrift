@@ -9,9 +9,11 @@ import type { Application, Renderer, Texture } from "pixi.js";
 import { registerTextureUsage } from "@/pixi/perf";
 import { mixHex } from "@/app/color";
 import { currentTheme, tokens } from "@/app/theme";
+import { DIE_SKIN_BY_ID, dieSkinStyle } from "@/data/cosmetics";
 import { schoolGlyphPath } from "@/data/glyphs";
 import { schools } from "@/data/schools";
 import { fnv1a, mulberry32 } from "@/services/rng";
+import { useMetaStore } from "@/stores/metaStore";
 import type { DieTier, School } from "@/types/content";
 
 export const PIXI_FONT_FAMILY =
@@ -120,7 +122,9 @@ export const dieTexture = (
 ): Texture => {
   const { school, tier, value } = options;
   const theme = currentTheme();
-  const style = theme.dieStyle;
+  const skinId = useMetaStore.getState().dieSkin;
+  const style = dieSkinStyle(theme.dieStyle, skinId);
+  const skinEdge = DIE_SKIN_BY_ID.get(skinId)?.edge;
   const engraved = options.engraved === true;
   const growth = options.growth ?? 0;
   const hasActive = options.hasActive === true;
@@ -130,6 +134,7 @@ export const dieTexture = (
   const cache = cacheFor(app.renderer);
   const key = [
     theme.id,
+    skinId,
     school,
     tier,
     value,
@@ -167,7 +172,10 @@ export const dieTexture = (
   const box = new Graphics()
     .roundRect(inset, inset, size - style.strokeW, size - style.strokeW, radius)
     .fill(gradient)
-    .stroke({ color: colors.stroke, width: style.strokeW });
+    .stroke({
+      color: skinEdge ?? colors.stroke,
+      width: style.strokeW,
+    });
 
   const noise = new Graphics();
   paintNoise(noise, fnv1a(defId), size, style.noise, colors.text);

@@ -29,7 +29,8 @@
     "active": "Aktywne",
     "owned": "Odblokowane",
     "unlock": "Odblokuj",
-    "price": "{{n}} odłamki"
+    "price": "{{n}} odłamki",
+    "ascendant": "Ascendent"
   },
   "diagnostics": {
     "version": "Zbuduj wersję „{{version}}”",

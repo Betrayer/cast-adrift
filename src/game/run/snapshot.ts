@@ -16,7 +16,7 @@ import { useNarrativeStore } from "@/stores/narrativeStore";
 import type { JournalEntry } from "@/game/run/journal";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 6;
+export const RUN_SNAPSHOT_V = 7;
 
 export interface RunSnapshotV1 {
   v: number;
@@ -128,6 +128,8 @@ const pickRunValues = (s: RunState): RunValues => ({
   bossesKilled: [...s.bossesKilled],
   memoryOrders: [...s.memoryOrders],
   endingId: s.endingId,
+  endingFirstTime: s.endingFirstTime,
+  encounters: s.encounters.map((e) => ({ ...e })),
   startedAt: s.startedAt,
 });
 

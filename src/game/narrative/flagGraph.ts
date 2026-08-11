@@ -1,3 +1,4 @@
+import { ACHIEVEMENTS } from "@/data/achievements";
 import { ALL_EVENTS } from "@/data/events";
 import { BEACON_FLAGS } from "@/data/events/beacons";
 import { COUNTER_FLAGS, RESERVED_FLAGS, RUNTIME_FLAGS } from "@/data/flags";
@@ -97,6 +98,10 @@ export const readFlags = (): Map<string, string[]> => {
   for (const rule of SHOP_FLAG_RULES) add(out, rule.key, "shop:price");
   for (const key of COUNTER_FLAGS) add(out, key, "shop:counter");
   for (const key of BEACON_FLAGS) add(out, key, "beacons:tally");
+  for (const def of ACHIEVEMENTS) {
+    if (def.cond.c !== "flags") continue;
+    for (const key of def.cond.keys) add(out, key, `achievement:${def.id}`);
+  }
   return out;
 };
 
