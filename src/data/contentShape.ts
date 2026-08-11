@@ -59,7 +59,7 @@ const effectShape = (def: EffectDef): string => {
   return `${def.on}[${conds.join("+")}]>${actions.join("+")}`;
 };
 
-export const shapeKey = (def: ShapedContent): string => {
+const computeShapeKey = (def: ShapedContent): string => {
   const effects = (def.effects ?? []).map(effectShape).sort((a, b) =>
     a.localeCompare(b),
   );
@@ -73,6 +73,19 @@ export const shapeKey = (def: ShapedContent): string => {
   ]
     .filter((part) => part !== "")
     .join(" ");
+};
+
+// Content defs are frozen module data, so a shape is a property of the object
+// rather than of the moment it was asked for. The perk draft asks for the same
+// 180 shapes hundreds of times per offer; without this the sorts dominate.
+const shapeCache = new WeakMap<ShapedContent, string>();
+
+export const shapeKey = (def: ShapedContent): string => {
+  const cached = shapeCache.get(def);
+  if (cached !== undefined) return cached;
+  const key = computeShapeKey(def);
+  shapeCache.set(def, key);
+  return key;
 };
 
 const SCALAR_ACTIONS: ReadonlySet<Action["a"]> = new Set([
