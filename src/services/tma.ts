@@ -22,6 +22,14 @@ export type HapticEvent =
   | "hitTaken"
   | "reveal"
   | "bossIntro"
+  | "kill"
+  | "setComplete"
+  | "purchase"
+  | "chainStep"
+  | "mapJump"
+  | "puzzleSolve"
+  | "bossDefeat"
+  | "achievement"
   | "levelUp"
   | "ending";
 
@@ -33,6 +41,12 @@ const IMPACTS: Partial<
   hitTaken: "medium",
   reveal: "medium",
   bossIntro: "heavy",
+  kill: "medium",
+  setComplete: "medium",
+  purchase: "light",
+  chainStep: "light",
+  mapJump: "soft",
+  bossDefeat: "heavy",
 };
 
 const ENDING_ECHO_MS = 160;

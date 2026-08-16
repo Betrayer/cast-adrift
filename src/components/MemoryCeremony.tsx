@@ -15,12 +15,19 @@ export const MemoryCeremony = () => {
   const order = useNarrativeStore((s) => s.memoryQueue[0]);
   const dismiss = useNarrativeStore((s) => s.dismissMemory);
 
+  // Echo's arc fires up to fifteen times a campaign; the finale still has to
+  // sound like the finale, so the ceremony no longer borrows the ending sting.
   useEffect(() => {
     if (order === undefined) return;
-    playSfx("endingSting");
+    playSfx("memoryReveal", { rate: 0.94 + order * 0.008 });
     duckMusic(2000);
-    haptic("ending");
+    haptic("reveal");
   }, [order]);
+
+  const close = (): void => {
+    playSfx("journalStamp", { gain: 2.2 });
+    dismiss();
+  };
 
   if (order === undefined) return null;
   const memory = memoryAt(order);
@@ -31,7 +38,7 @@ export const MemoryCeremony = () => {
     <div
       className={styles.veil}
       data-memory-ceremony={order}
-      onClick={dismiss}
+      onClick={close}
       style={
         {
           "--ca-memory-line": tokens.line,
@@ -57,7 +64,7 @@ export const MemoryCeremony = () => {
           <Text size="sm" c={tokens.dim}>
             {t(entry?.body ?? memory.body)}
           </Text>
-          <Button mt="sm" fullWidth data-memory-continue onClick={dismiss}>
+          <Button mt="sm" fullWidth data-memory-continue onClick={close}>
             {t("run:memory.continue")}
           </Button>
         </Stack>

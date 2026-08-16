@@ -24,7 +24,8 @@ import {
   type MapNode,
   type NodeId,
 } from "@/game/map/types";
-import { nodeRisk } from "@/game/map/risk";
+import { nodeRisk, type RiskBand } from "@/game/map/risk";
+import { haptic } from "@/services/tma";
 import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
 import { AxisMeter } from "@/components/AxisMeter";
@@ -111,6 +112,12 @@ const nodeStamp = (
     default:
       return null;
   }
+};
+
+const RISK_RATE: Record<RiskBand, number> = {
+  low: 1.14,
+  raised: 0.96,
+  high: 0.78,
 };
 
 const MOTIF_BADGE = {
@@ -257,6 +264,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<SVGSVGElement | null>(null);
   const prevTide = useRef(tide);
+  const prevTideCue = useRef(tide);
   const prevLimit = useRef(0);
   const [tidePulse, setTidePulse] = useState(false);
 
@@ -298,6 +306,15 @@ const MapView = ({ map, position }: MapViewProps) => {
     prevLimit.current = visibleLimit;
   }, [visibleLimit]);
 
+  // The ripple is motion-gated; the warning it carries is not, so the cue keeps
+  // its own high-water mark and fires either way.
+  useEffect(() => {
+    if (tide > prevTideCue.current) {
+      playSfx("tideUp", { rate: 1 - Math.min(4, tide) * 0.03 });
+    }
+    prevTideCue.current = tide;
+  }, [tide]);
+
   useEffect(() => {
     if (tide > prevTide.current && !reduced) {
       setTidePulse(true);
@@ -312,11 +329,37 @@ const MapView = ({ map, position }: MapViewProps) => {
     prevTide.current = tide;
   }, [tide, reduced]);
 
+  // Selecting a node reads its risk band before the player commits: same tick,
+  // pitched down as the band gets worse.
+  const selectNode = (id: NodeId): void => {
+    if (id !== selected) {
+      const node = byId.get(id);
+      playSfx("navTick", {
+        rate: node === undefined ? 1 : RISK_RATE[nodeRisk(node)] ?? 1,
+        gain: 2.2,
+      });
+    }
+    setSelected(id);
+  };
+
   const onJump = (): void => {
     if (selected === null || jumping) return;
     const target = byId.get(selected);
     if (target === undefined || !isLegal(target)) return;
     playSfx("jump");
+    haptic("mapJump");
+    // Every motif the lane carries announces itself as the ship commits to it.
+    if (target.pocket === true) playSfx("detourEntry");
+    if (target.cache === true) playSfx("cacheClaim");
+    if (target.blessing !== undefined) {
+      playSfx("laneMotif", { rate: target.blessing === "cursed" ? 0.72 : 1.18 });
+    }
+    if (target.storm === true) playSfx("stormBeat", { gain: 0.6 });
+    if (target.inverted === true) playSfx("inversionCue", { gain: 0.6 });
+    if (edgeMarkFor(map, position, target.id) === "mine") {
+      playSfx("hullHit", { gain: 0.5 });
+      playSfx("gateBreak", { gain: 0.45 });
+    }
     if (reduced) {
       jumpTo(selected);
       return;
@@ -570,7 +613,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 }`}
                 style={reduced ? undefined : { animationDelay: `${String(Math.min(index, 24) * 45)}ms` }}
                 opacity={done ? 0.5 : 1}
-                onClick={legal ? () => { setSelected(node.id); } : undefined}
+                onClick={legal ? () => { selectNode(node.id); } : undefined}
               >
                 {legal && !chosen && !reduced ? (
                   <circle

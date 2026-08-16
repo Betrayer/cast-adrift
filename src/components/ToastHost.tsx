@@ -1,8 +1,11 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ACHIEVEMENT_BY_ID } from '@/data/achievements';
+import { playSfx } from '@/services/audio';
+import { haptic } from '@/services/tma';
 import { useNarrativeStore } from '@/stores/narrativeStore';
+import { useSettingsStore } from '@/stores/settingsStore';
 import styles from './ToastHost.module.css';
 
 const CONSEQUENCE_MS = 4000;
@@ -28,6 +31,7 @@ const ConsequenceSlot = () => {
 
   useEffect(() => {
     if (consequence === null) return;
+    playSfx('consequenceChime');
     const id = window.setTimeout(dismiss, CONSEQUENCE_MS);
     return () => {
       window.clearTimeout(id);
@@ -55,14 +59,20 @@ const BarkSlot = () => {
   const bark = useNarrativeStore((s) => s.bark);
   const queued = useNarrativeStore((s) => s.barkQueue.length);
   const dismiss = useNarrativeStore((s) => s.dismissBark);
+  const verbosity = useSettingsStore((s) => s.echoVerbosity);
 
+  // Echo's chime follows her verbosity setting, and a queued line arrives
+  // quieter so three backed-up barks do not read as three separate events.
   useEffect(() => {
     if (bark === null) return;
+    if (verbosity === 'normal') {
+      playSfx('barkChime', { gain: queued > 0 ? 0.45 : 1 });
+    }
     const id = window.setTimeout(dismiss, BARK_MS);
     return () => {
       window.clearTimeout(id);
     };
-  }, [bark, dismiss]);
+  }, [bark, dismiss, verbosity, queued]);
 
   if (bark === null) return <div className={styles.slot} />;
   return (
@@ -89,6 +99,8 @@ const AchievementSlot = () => {
 
   useEffect(() => {
     if (toast === null) return;
+    playSfx('achievement');
+    haptic('achievement');
     const id = window.setTimeout(dismiss, ACHIEVEMENT_MS);
     return () => {
       window.clearTimeout(id);
@@ -118,10 +130,25 @@ const AchievementSlot = () => {
   );
 };
 
+// The run journal writes itself in the background; a pen tick is the only way a
+// player who missed the toast still knows the moment was recorded.
+const JournalTick = () => {
+  const entries = useNarrativeStore((s) => s.journal.length);
+  const previous = useRef(entries);
+
+  useEffect(() => {
+    if (entries > previous.current) playSfx('journalStamp');
+    previous.current = entries;
+  }, [entries]);
+
+  return null;
+};
+
 export const ToastHost = () => {
   if (typeof document === 'undefined') return null;
   return createPortal(
     <div className={styles.host} data-toast-host>
+      <JournalTick />
       <ConsequenceSlot />
       <AchievementSlot />
       <BarkSlot />

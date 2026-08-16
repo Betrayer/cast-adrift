@@ -62,6 +62,7 @@ const labelBelow = (id: string): boolean => {
   return (h & 1) === 1;
 };
 const HOLD_MS = 350;
+const PATH_TICK_MS = 45;
 
 const constellationColor = (
   con: Constellation,
@@ -142,6 +143,21 @@ export const ChartScreen = () => {
     () => (previewId === null ? null : pathTo(previewId, picks)),
     [previewId, picks],
   );
+  // A route lights up node by node; one quiet tick per step tells the player how
+  // long the route is without counting the dots.
+  const previewLength = preview?.ids.length ?? 0;
+  useEffect(() => {
+    if (previewLength === 0) return;
+    const timers = Array.from({ length: Math.min(previewLength, 8) }, (_, i) =>
+      window.setTimeout(() => {
+        playSfx("navTick", { rate: 1 + i * 0.06, gain: 1.6 });
+      }, i * PATH_TICK_MS),
+    );
+    return () => {
+      for (const id of timers) window.clearTimeout(id);
+    };
+  }, [previewLength, previewId]);
+
   const previewSet = useMemo(
     () => new Set(preview?.ids ?? []),
     [preview],
@@ -318,6 +334,7 @@ export const ChartScreen = () => {
   const refund = (id: string): void => {
     if (!canDeallocate(id, picks)) return;
     if (refundCost > 0 && !spendShards(refundCost)) return;
+    playSfx("respecConfirm");
     trackEvent({ name: "meta_purchase", params: { kind: "respec" } });
     deallocatePick(id);
     setConfirmRefund(null);

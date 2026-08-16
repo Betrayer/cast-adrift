@@ -12,7 +12,12 @@ import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { beaconsResolved } from '@/data/events/beacons';
 import { deathLineFor } from '@/data/narrative/deathLines';
-import { endingBeats, ENDING_BY_ID } from '@/data/narrative/endings';
+import { ENDING_SFX } from '@/data/audio';
+import {
+  endingBeats,
+  ENDING_BY_ID,
+  type EndingId,
+} from '@/data/narrative/endings';
 import {
   buildEpilogue,
   DEATH_TALLY_LINES,
@@ -27,6 +32,9 @@ import { haptic } from '@/services/tma';
 import { useAppStore } from '@/stores/appStore';
 import { useRunStore } from '@/stores/runStore';
 import styles from './EndingScreen.module.css';
+
+const TALLY_DELAY_MS = 420;
+const DEATH_TALLY_STAGGER_MS = 130;
 
 const useEpilogueContext = (death: boolean): EpilogueContext => {
   const flags = useRunStore((s) => s.flags);
@@ -60,11 +68,27 @@ const DeathEpilogue = () => {
     [ctx],
   );
 
+  // Death gets the ending sting's lower, slower relative, and the tally lines
+  // tick in as they slide.
   useEffect(() => {
-    playSfx('endingSting');
+    playSfx('epilogueSting');
     duckMusic(2200);
     haptic('ending');
   }, []);
+
+  useEffect(() => {
+    const timers = tally.map((_, index) =>
+      window.setTimeout(
+        () => {
+          playSfx('journalStamp', { gain: 1.8 });
+        },
+        TALLY_DELAY_MS + index * DEATH_TALLY_STAGGER_MS,
+      ),
+    );
+    return () => {
+      for (const id of timers) window.clearTimeout(id);
+    };
+  }, [tally]);
 
   return (
     <Screen centered width="wide">
@@ -113,11 +137,13 @@ const VictoryEnding = ({ endingId }: { endingId: string }) => {
   const ctx = useEpilogueContext(false);
   const [beatIndex, setBeatIndex] = useState(0);
 
+  // Five endings, five stings. «Ответ» in particular had earned its own.
   useEffect(() => {
-    playSfx('endingSting');
-    duckMusic(2600);
+    const sting = ENDING_SFX[endingId as EndingId] ?? 'endingSting';
+    playSfx(sting);
+    duckMusic(endingId === 'answer' ? 3200 : 2600);
     haptic('ending');
-  }, []);
+  }, [endingId]);
 
   const ending = ENDING_BY_ID.get(endingId);
   const tally = useMemo(() => buildEpilogue(ctx), [ctx]);
@@ -199,6 +225,7 @@ const VictoryEnding = ({ endingId }: { endingId: string }) => {
                 size="md"
                 fullWidth
                 onClick={() => {
+                  playSfx('optionTick', { rate: 0.9 + beatIndex * 0.04 });
                   setBeatIndex(beatIndex + 1);
                 }}
               >

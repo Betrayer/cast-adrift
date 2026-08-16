@@ -19,6 +19,7 @@ import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { FUSION_COST, mkUpgradeCost } from "@/game/economy/prices";
 import { autosaveRun, completeNode } from "@/game/run/flow";
 import { playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
@@ -70,6 +71,8 @@ export const ShipyardScreen = () => {
 
   const markUpgraded = (slotId: SlotId): void => {
     playSfx("buy");
+    playSfx("mkSweep");
+    haptic("purchase");
     setSwept({ slotId, key: sweepKey.current + 1 });
     sweepKey.current += 1;
   };

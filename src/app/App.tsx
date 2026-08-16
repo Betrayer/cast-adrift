@@ -11,7 +11,7 @@ import { CoachMarks } from '@/components/CoachMarks';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
 import { MemoryCeremony } from '@/components/MemoryCeremony';
-import { MusicDirector } from '@/components/MusicDirector';
+import { AudioDirector } from '@/components/AudioDirector';
 import { PerfOverlay } from '@/components/PerfOverlay';
 import { RotateGate } from '@/components/RotateGate';
 import { ToastHost } from '@/components/ToastHost';
@@ -49,7 +49,7 @@ export const App = () => {
   return (
     <MantineProvider theme={mantine} forceColorScheme="dark">
       <Router />
-      <MusicDirector />
+      <AudioDirector />
       <ToastHost />
       <MemoryCeremony />
       <CoachMarks />

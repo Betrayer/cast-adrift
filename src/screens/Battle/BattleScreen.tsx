@@ -7,6 +7,7 @@ import { useLootStore } from '@/stores/lootStore';
 import type { TFunction } from 'i18next';
 import type { Application } from 'pixi.js';
 import { tokens } from '@/app/theme';
+import { WarpStreaks } from '@/components/WarpStreaks';
 import { STARTER_DECK } from '@/data/decks';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { DIE_BY_ID } from '@/data/dice';
@@ -55,6 +56,7 @@ import type { Intent } from '@/types/content';
 import styles from './BattleScreen.module.css';
 
 const BOSS_HIT_STOP_MS = 300;
+const BATTLE_WARP_MS = 400;
 
 const startTestBattleIfIdle = (): void => {
   const store = useBattleStore.getState();
@@ -151,9 +153,19 @@ const CausalityBanner = () => {
   const { t } = useTranslation(['battle']);
   const inverted = useBattleStore((s) => isInverted(s));
   const storm = useBattleStore((s) => s.nodeStorm);
+
+  // A fight that opens backwards says so out loud, once, at the moment the
+  // banner slides in — the warning used to be silent.
+  useEffect(() => {
+    if (inverted) playSfx('inversionCue');
+  }, [inverted]);
+
   if (!inverted && !storm) return null;
   return (
-    <div className={styles.causalityBanner} data-band="causality">
+    <div
+      className={`${styles.causalityBanner ?? ''} ${inverted ? styles.causalitySlide ?? '' : ''}`}
+      data-band="causality"
+    >
       {inverted ? (
         <span
           className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}
@@ -800,6 +812,7 @@ export const BattleScreen = () => {
   const resolvedRef = useRef(false);
   const lowHullRef = useRef(false);
   const [buildOpen, setBuildOpen] = useState(false);
+  const [warping, setWarping] = useState(true);
 
   useEffect(() => {
     if (!runActive || hullMax <= 0) {
@@ -815,6 +828,18 @@ export const BattleScreen = () => {
     initAudio();
     if (!useRunStore.getState().active) startTestBattleIfIdle();
   }, []);
+
+  // Battle-enter warp: the same streaks the sector jump uses, cut short, so
+  // dropping into a fight lands as an arrival rather than a screen swap.
+  useEffect(() => {
+    if (reduced) return;
+    const id = window.setTimeout(() => {
+      setWarping(false);
+    }, BATTLE_WARP_MS);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [reduced]);
 
   // Echo calls the turn when a boss rewrites itself mid-fight.
   useEffect(() => {
@@ -895,6 +920,13 @@ export const BattleScreen = () => {
               onClose={() => {
                 setBuildOpen(false);
               }}
+            />
+          ) : null}
+          {warping && !reduced ? (
+            <WarpStreaks
+              color={tokens.accent}
+              count={14}
+              durationMs={BATTLE_WARP_MS}
             />
           ) : null}
           <LootReveal />

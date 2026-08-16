@@ -7,7 +7,9 @@ import { settleAchievements } from "@/game/meta/achievements";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
 import { emitRunHook } from "@/game/run/runEffects";
+import { playSfx } from "@/services/audio";
 import type { RngStream } from "@/services/rng";
+import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 import type { EventEffect, ForcedBattle, Outcome } from "@/types/events";
@@ -173,6 +175,16 @@ export const applyOutcome = (
     return prior !== undefined && view.step > prior.step;
   });
   if (advanced) {
+    // Two notes, pitched by how deep the thread now runs: the same motif every
+    // chain uses, so progress on any of them is recognisable as progress.
+    const deepest = chainsAfter.reduce((most, view) => {
+      const prior = chainsBefore.find((v) => v.id === view.id);
+      return prior !== undefined && view.step > prior.step
+        ? Math.max(most, view.step)
+        : most;
+    }, 1);
+    playSfx("chainStep", { rate: 0.92 + deepest * 0.07 });
+    haptic("chainStep");
     useMetaStore
       .getState()
       .archiveRunFlags(Object.keys(useRunStore.getState().flags));

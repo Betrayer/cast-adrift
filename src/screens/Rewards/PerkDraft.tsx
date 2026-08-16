@@ -1,8 +1,10 @@
 import { Button, Text } from "@mantine/core";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { rarityColor } from "@/app/rarity";
 import { tokens } from "@/app/theme";
 import { TagChips } from "@/components/TagChips";
+import { LOOT_SFX } from "@/data/audio";
 import { PERK_BY_ID } from "@/data/perks";
 import { loadoutCensus } from "@/game/effects/census";
 import {
@@ -14,9 +16,13 @@ import {
   rerollPerkDraft,
   resolvePerkChoice,
 } from "@/game/run/flow";
+import { duckMusic, playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useRunStore } from "@/stores/runStore";
 import styles from "./Rewards.module.css";
+
+const CARD_FLIP_MS = 90;
 
 export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
   const { t } = useTranslation(["run", "content"]);
@@ -36,6 +42,29 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
     perks,
     modules,
   });
+
+  // The cards flip in on a stagger; each one gets its own soft reveal so three
+  // cards read as three offers rather than one noise.
+  useEffect(() => {
+    const timers = choices.map((_, index) =>
+      window.setTimeout(() => {
+        playSfx("unlockCard", { rate: 1 + index * 0.05 });
+      }, index * CARD_FLIP_MS),
+    );
+    return () => {
+      for (const id of timers) window.clearTimeout(id);
+    };
+  }, [choices]);
+
+  const pick = (id: string): void => {
+    const rarity = PERK_BY_ID.get(id)?.rarity;
+    if (rarity !== undefined) {
+      playSfx(LOOT_SFX[rarity]);
+      duckMusic(rarity === "rare" ? 1800 : 1100);
+      haptic("reveal");
+    }
+    resolvePerkChoice(id);
+  };
 
   return (
     <div className={styles.overlay}>
@@ -70,7 +99,7 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
                 size="sm"
                 fullWidth
                 onClick={() => {
-                  resolvePerkChoice(id);
+                  pick(id);
                 }}
               >
                 {t("run:perk.pick")}
@@ -81,6 +110,7 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
                 color="gray"
                 disabled={banishUsed}
                 onClick={() => {
+                  playSfx("banish");
                   banishPerkChoice(id);
                 }}
               >
@@ -96,7 +126,11 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
           variant="default"
           data-draft="reroll"
           disabled={rerollUsed || scrap < DRAFT_REROLL_COST}
-          onClick={rerollPerkDraft}
+          onClick={() => {
+            playSfx("buy", { gain: 0.7 });
+            playSfx("draftReroll");
+            rerollPerkDraft();
+          }}
         >
           {t("run:perk.reroll", { n: DRAFT_REROLL_COST })}
         </Button>
@@ -104,6 +138,7 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
           variant="subtle"
           color="gray"
           onClick={() => {
+            playSfx("optionTick", { rate: 0.88 });
             resolvePerkChoice(null);
           }}
         >

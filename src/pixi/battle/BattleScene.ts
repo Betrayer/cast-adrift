@@ -4,6 +4,7 @@ import { bodyRect, subscribeBodyRect } from "@/app/bands";
 import { mixHex } from "@/app/color";
 import { currentTheme, onThemeChange, tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
+import { ENEMY_BY_ID } from "@/data/enemies";
 import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
 import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
@@ -52,7 +53,8 @@ const BEAT_GAP_NORMAL_MS = 180;
 const BEAT_GAP_FAST_MS = 90;
 const GLOW_HZ = 1.2;
 const DAMAGE_POOL_SIZE = 12;
-const PARTICLE_POOL_SIZE = 24;
+const PARTICLE_POOL_SIZE = 40;
+const GLOW_POOL_SIZE = 3;
 const DRAG_THRESHOLD = 6;
 const REROLL_LIFT = 4;
 const CHARGE_PIP_COUNT = 10;
@@ -60,6 +62,11 @@ const SHAKE_AMPLITUDE = 6;
 const SHAKE_MS = 180;
 const BIG_HIT_DAMAGE = 10;
 const HIT_STOP_MS = 70;
+const HEAVY_HIT_STOP_MS = 90;
+const PROJECTILE_MS = 120;
+const DEATH_MS = 560;
+const NUMBER_STACK_OFFSET = 22;
+const NUMBER_STACK_WINDOW_MS = 420;
 
 const beatGapMs = (): number =>
   useSettingsStore.getState().battleSpeed === "fast"
@@ -69,6 +76,16 @@ const beatGapMs = (): number =>
 const emptySlotFill = (): string => mixHex(tokens.surface1, tokens.bg, 0.45);
 const emptySlotStroke = (): string => mixHex(tokens.line, tokens.faint, 0.5);
 const enemyFill = (): string => tokens.surface2;
+
+const WARD_RATE: Record<School, number> = {
+  red: 0.82,
+  blue: 1.24,
+  green: 1.06,
+  black: 0.7,
+  yellow: 1.14,
+  grey: 0.94,
+  prismatic: 1.42,
+};
 
 const statusTint = (key: StatusKey): string => {
   switch (key) {
@@ -121,6 +138,9 @@ interface DragState {
 interface PooledNumber {
   text: Text;
   cancels: (() => void)[];
+  x: number;
+  y: number;
+  at: number;
 }
 
 const contains = (rect: Rect, x: number, y: number): boolean =>
@@ -250,9 +270,12 @@ export class BattleScene {
   private drag: DragState | null = null;
   private glowTime = 0;
   private shakeMs = 0;
+  private hitStopMs = 0;
+  private elapsedMs = 0;
   private readonly particlePool: Graphics[] = [];
+  private readonly glowPool: Graphics[] = [];
   private readonly particleCancels = new Set<() => void>();
-  private sceneGlow: Graphics | null = null;
+  private readonly dyingEnemies = new Set<string>();
   private readonly mirrorIntents = new Set<string>();
   private readonly unsubscribe: () => void;
   private readonly unsubscribeTheme: () => void;
@@ -286,6 +309,7 @@ export class BattleScene {
     this.rebuild(initial);
     this.maybeTumble(initial);
     if (initial.phase === "placement") playSfx("rollTumble");
+    this.announceElites(initial);
     this.unsubscribe = useBattleStore.subscribe(this.onStoreChange);
     this.unsubscribeTheme = onThemeChange(this.onThemeSwitch);
     this.unsubscribeBands = subscribeBodyRect(this.onResize);
@@ -384,7 +408,7 @@ export class BattleScene {
       text.anchor.set(0.5);
       text.visible = false;
       this.fxLayer.addChild(text);
-      this.numberPool.push({ text, cancels: [] });
+      this.numberPool.push({ text, cancels: [], x: 0, y: 0, at: -Infinity });
     }
   }
 
@@ -392,8 +416,16 @@ export class BattleScene {
     for (let i = 0; i < PARTICLE_POOL_SIZE; i += 1) {
       const dot = new Graphics();
       dot.visible = false;
+      dot.eventMode = "none";
       this.fxLayer.addChild(dot);
       this.particlePool.push(dot);
+    }
+    for (let i = 0; i < GLOW_POOL_SIZE; i += 1) {
+      const glow = new Graphics();
+      glow.visible = false;
+      glow.eventMode = "none";
+      this.fxLayer.addChild(glow);
+      this.glowPool.push(glow);
     }
   }
 
@@ -437,6 +469,8 @@ export class BattleScene {
   private resonanceBurst(school: School): void {
     const colors = schools[school];
     playSfx("setComplete");
+    haptic("setComplete");
+    duckMusic(900);
     if (this.reduced()) {
       this.sceneGlowPulse(colors.stroke, 0.18, 220);
       return;
@@ -468,19 +502,33 @@ export class BattleScene {
     this.sceneGlowPulse(colors.stroke, 0.22, 420);
   }
 
+  // One shared glow meant a second pulse re-tinted the first mid-fade; each
+  // pulse now takes its own pooled layer and gives it back on completion.
   private sceneGlowPulse(color: string, alpha: number, ms: number): void {
-    if (this.sceneGlow === null) {
-      this.sceneGlow = new Graphics();
-      this.sceneGlow.eventMode = "none";
-      this.fxLayer.addChild(this.sceneGlow);
-    }
-    const glow = this.sceneGlow;
+    const glow = this.glowPool.find((g) => !g.visible);
+    if (glow === undefined) return;
     glow.clear();
     glow
       .rect(0, 0, this.app.screen.width, this.app.screen.height)
       .fill({ color, alpha: 1 });
     glow.alpha = alpha;
-    this.tweens.to(glow, { alpha: 0 }, ms, easeOutQuad);
+    glow.visible = true;
+    this.trackParticle(
+      this.tweens.to(glow, { alpha: 0 }, ms, easeOutQuad, () => {
+        glow.visible = false;
+      }),
+    );
+  }
+
+  // Every one of the fourteen elites states a test on sight; the plate that
+  // carries it deserves a cue that is not the boss horn.
+  private announceElites(state: BattleState): void {
+    const elite = state.enemies.some(
+      (enemy) => ENEMY_BY_ID.get(enemy.defId)?.elite === true,
+    );
+    if (!elite || state.introPending) return;
+    playSfx("eliteIntro");
+    this.sceneGlowPulse(tokens.amber, 0.14, 320);
   }
 
   // Boss intro: one expanding ring from the enemy line, no particles.
@@ -492,15 +540,17 @@ export class BattleScene {
       this.sceneGlowPulse(tokens.danger, 0.2, 240);
       return;
     }
-    const ring = new Graphics();
-    ring.circle(0, 0, 28).stroke({ color: tokens.danger, width: 3 });
-    ring.position.set(anchor.x, anchor.y);
-    ring.eventMode = "none";
-    this.fxLayer.addChild(ring);
-    this.tweens.to(ring.scale, { x: 7, y: 7 }, 620, easeOutQuad);
-    this.tweens.to(ring, { alpha: 0 }, 620, linear, () => {
-      ring.destroy();
-    });
+    const ring = this.takeParticle();
+    if (ring !== undefined) {
+      ring.circle(0, 0, 28).stroke({ color: tokens.danger, width: 3 });
+      ring.position.set(anchor.x, anchor.y);
+      this.trackParticle(this.tweens.to(ring.scale, { x: 7, y: 7 }, 620, easeOutQuad));
+      this.trackParticle(
+        this.tweens.to(ring, { alpha: 0 }, 620, linear, () => {
+          ring.visible = false;
+        }),
+      );
+    }
     this.shake();
   }
 
@@ -509,7 +559,8 @@ export class BattleScene {
     const view = this.enemyViews.get(enemyId);
     if (view === undefined || this.reduced()) return;
     const size = this.layout.enemySize;
-    const sheen = new Graphics();
+    const sheen = this.takeParticle();
+    if (sheen === undefined) return;
     sheen
       .moveTo(-size * 0.1, -size / 2)
       .lineTo(size * 0.16, -size / 2)
@@ -517,13 +568,15 @@ export class BattleScene {
       .lineTo(-size * 0.28, size / 2)
       .closePath()
       .fill({ color: "#FFFFFF", alpha: 0.5 });
-    sheen.eventMode = "none";
-    sheen.x = -size * 0.7;
-    view.root.addChild(sheen);
-    this.tweens.to(sheen, { x: size * 0.9 }, 560, easeOutQuad);
-    this.tweens.to(sheen, { alpha: 0 }, 560, linear, () => {
-      sheen.destroy();
-    });
+    sheen.position.set(view.root.x - size * 0.7, view.root.y);
+    this.trackParticle(
+      this.tweens.to(sheen, { x: view.root.x + size * 0.9 }, 560, easeOutQuad),
+    );
+    this.trackParticle(
+      this.tweens.to(sheen, { alpha: 0 }, 560, linear, () => {
+        sheen.visible = false;
+      }),
+    );
   }
 
   // Core Heart's third phase is the loudest beat in the game: a double ring
@@ -540,21 +593,69 @@ export class BattleScene {
       return;
     }
     for (let i = 0; i < 2; i += 1) {
-      const ring = new Graphics();
+      const ring = this.takeParticle();
+      if (ring === undefined) break;
       ring.circle(0, 0, 20).stroke({ color: tokens.danger, width: 4 - i });
       ring.position.set(anchor.x, anchor.y);
-      ring.eventMode = "none";
-      this.fxLayer.addChild(ring);
-      this.tweens.to(ring.scale, { x: 5 + i, y: 5 + i }, 520 + i * 160, easeOutQuad);
-      this.tweens.to(ring, { alpha: 0 }, 520 + i * 160, linear, () => {
-        ring.destroy();
-      });
+      this.trackParticle(
+        this.tweens.to(ring.scale, { x: 5 + i, y: 5 + i }, 520 + i * 160, easeOutQuad),
+      );
+      this.trackParticle(
+        this.tweens.to(ring, { alpha: 0 }, 520 + i * 160, linear, () => {
+          ring.visible = false;
+        }),
+      );
     }
     this.shake();
   }
 
   // A kill pays out visibly: shards of the hull scatter and the scrap it was
   // worth flies toward the counter in the HUD's top-right corner.
+  // A hull that stops existing should be seen to stop existing: it tips, drops
+  // and fades instead of snapping to a quarter-opacity ghost.
+  private deathFall(enemyId: string): void {
+    const view = this.enemyViews.get(enemyId);
+    if (view === undefined || this.reduced()) return;
+    const { root } = view;
+    const restY = root.y;
+    this.dyingEnemies.add(enemyId);
+    this.tweens.to(root, { rotation: 0.42, y: restY + 26 }, DEATH_MS, easeOutQuad);
+    this.tweens.to(root.scale, { x: 0.86, y: 0.86 }, DEATH_MS, easeOutQuad);
+    this.tweens.to(root, { alpha: 0.25 }, DEATH_MS, linear, () => {
+      root.rotation = 0;
+      root.y = restY;
+      root.scale.set(1);
+      this.dyingEnemies.delete(enemyId);
+    });
+    for (let i = 0; i < 6; i += 1) {
+      const shard = this.takeParticle();
+      if (shard === undefined) break;
+      const size = this.layout.enemySize;
+      shard
+        .rect(-3, -3, 6, 6)
+        .fill({ color: enemyFill(), alpha: 0.9 })
+        .stroke({ color: tokens.line, width: 1 });
+      shard.position.set(root.x, root.y);
+      const angle = (i / 6) * Math.PI + Math.PI * 0.15;
+      this.trackParticle(
+        this.tweens.to(
+          shard,
+          {
+            x: root.x + Math.cos(angle) * size * 0.7,
+            y: root.y + Math.abs(Math.sin(angle)) * size * 0.6 + 20,
+          },
+          DEATH_MS,
+          easeOutQuad,
+        ),
+      );
+      this.trackParticle(
+        this.tweens.to(shard, { alpha: 0 }, DEATH_MS, linear, () => {
+          shard.visible = false;
+        }),
+      );
+    }
+  }
+
   private killBurst(enemyId: string, scrap: number): void {
     const view = this.enemyViews.get(enemyId);
     if (view === undefined) return;
@@ -927,7 +1028,9 @@ export class BattleScene {
       const view = this.enemyViews.get(enemy.id);
       if (view === undefined) continue;
       const alive = enemy.hp > 0;
-      view.root.alpha = alive ? 1 : 0.25;
+      if (alive || !this.dyingEnemies.has(enemy.id)) {
+        view.root.alpha = alive ? 1 : 0.25;
+      }
       view.root.eventMode = alive ? "passive" : "none";
       view.body.eventMode = alive ? "static" : "none";
       view.body.cursor = alive ? "pointer" : "default";
@@ -1261,7 +1364,19 @@ export class BattleScene {
       if (enemy.hp > 0) continue;
       const before = prev.enemies.find((e) => e.id === enemy.id);
       if (before === undefined || before.hp <= 0) continue;
+      const def = ENEMY_BY_ID.get(enemy.defId);
+      const headline = def?.boss === true || def?.miniboss === true;
+      this.deathFall(enemy.id);
       this.killBurst(enemy.id, Math.max(0, state.scrap - prev.scrap));
+      if (headline) {
+        playSfx("bossDown");
+        duckMusic(2200);
+        haptic("bossDefeat");
+        this.hitStop(HEAVY_HIT_STOP_MS);
+        this.shake();
+      } else {
+        haptic("kill");
+      }
     }
   }
 
@@ -1282,13 +1397,27 @@ export class BattleScene {
     this.rebuild(useBattleStore.getState());
   };
 
+  // Hit-stop runs on wall clock, not on tween time: the tweens are exactly what
+  // it is holding still.
+  private hitStop(ms: number): void {
+    if (this.reduced()) return;
+    this.hitStopMs = Math.max(this.hitStopMs, ms);
+    this.tweens.timeScale = 0;
+  }
+
   private readonly tick = (ticker: Ticker): void => {
+    this.elapsedMs += ticker.deltaMS;
     reportPool(
       "battleFx",
       this.numberPool.filter((p) => p.text.visible).length +
-        this.particlePool.filter((p) => p.visible).length,
-      this.numberPool.length + this.particlePool.length,
+        this.particlePool.filter((p) => p.visible).length +
+        this.glowPool.filter((p) => p.visible).length,
+      this.numberPool.length + this.particlePool.length + this.glowPool.length,
     );
+    if (this.hitStopMs > 0) {
+      this.hitStopMs = Math.max(0, this.hitStopMs - ticker.deltaMS);
+      if (this.hitStopMs === 0) this.tweens.timeScale = 1;
+    }
     if (this.shakeMs > 0) {
       this.shakeMs = Math.max(0, this.shakeMs - ticker.deltaMS);
       const decay = this.shakeMs / SHAKE_MS;
@@ -1653,21 +1782,39 @@ export class BattleScene {
     this.tweens.to(view.glow, { alpha: 0 }, 260, easeOutQuad);
   }
 
+  // Two hits on the same target inside one beat window used to print one number
+  // on top of the other; each new number now steps up over the live stack.
+  private stackOffset(x: number, y: number): number {
+    const now = this.elapsedMs;
+    let step = 0;
+    for (const slot of this.numberPool) {
+      if (!slot.text.visible) continue;
+      if (now - slot.at > NUMBER_STACK_WINDOW_MS) continue;
+      if (Math.abs(slot.x - x) > 26 || Math.abs(slot.y - y) > 48) continue;
+      step += 1;
+    }
+    return step * NUMBER_STACK_OFFSET;
+  }
+
   private spawnNumber(x: number, y: number, value: string, fill: string): void {
     const slot =
       this.numberPool.find((p) => !p.text.visible) ?? this.numberPool[0];
     if (slot === undefined) return;
     for (const cancel of slot.cancels) cancel();
     slot.cancels = [];
+    const top = y - this.stackOffset(x, y);
     const { text } = slot;
     text.text = value;
     text.style.fill = fill;
-    text.position.set(x, y);
+    text.position.set(x, top);
     text.alpha = 1;
     text.scale.set(1);
     text.visible = true;
+    slot.x = x;
+    slot.y = y;
+    slot.at = this.elapsedMs;
     slot.cancels.push(
-      this.tweens.to(text, { y: y - 28 }, 350, easeOutQuad),
+      this.tweens.to(text, { y: top - 28 }, 350, easeOutQuad),
       this.tweens.to(text, { alpha: 0 }, 350, linear, () => {
         text.visible = false;
       }),
@@ -1675,6 +1822,24 @@ export class BattleScene {
         slot.cancels.push(
           this.tweens.to(text.scale, { x: 1, y: 1 }, 230, easeOutQuad),
         );
+      }),
+    );
+  }
+
+  private dieFlash(at: { x: number; y: number }, color: string): void {
+    const flash = this.takeParticle();
+    if (flash === undefined) return;
+    const size = this.layout.slotDieSize;
+    flash
+      .roundRect(-size / 2 - 3, -size / 2 - 3, size + 6, size + 6, size * 0.26)
+      .stroke({ color, width: 3 });
+    flash.position.set(at.x, at.y);
+    this.trackParticle(
+      this.tweens.to(flash.scale, { x: 1.3, y: 1.3 }, 280, easeOutQuad),
+    );
+    this.trackParticle(
+      this.tweens.to(flash, { alpha: 0 }, 280, linear, () => {
+        flash.visible = false;
       }),
     );
   }
@@ -1703,43 +1868,65 @@ export class BattleScene {
     };
   }
 
+  // A shot now travels: a short bolt is tweened from the muzzle to the target and
+  // the impact ring only opens once it lands.
   private fireProjectile(
     from: { x: number; y: number },
     to: { x: number; y: number },
+    color = schools.red.stroke,
   ): void {
-    const line = new Graphics();
-    line
-      .moveTo(from.x, from.y)
-      .lineTo(to.x, to.y)
-      .stroke({ color: schools.red.stroke, width: 2 });
-    line.alpha = 0.9;
-    this.fxLayer.addChild(line);
-    this.tweens.to(line, { alpha: 0 }, 200, linear, () => {
-      line.destroy();
-    });
-    const ring = new Graphics();
-    ring.circle(to.x, to.y, 6).stroke({ color: schools.red.stroke, width: 2 });
-    ring.alpha = 0.9;
-    this.fxLayer.addChild(ring);
-    this.tweens.to(ring.scale, { x: 2.2, y: 2.2 }, 240, easeOutQuad);
-    ring.pivot.set(to.x, to.y);
-    ring.position.set(to.x, to.y);
-    this.tweens.to(ring, { alpha: 0 }, 240, linear, () => {
-      ring.destroy();
-    });
+    const dx = to.x - from.x;
+    const dy = to.y - from.y;
+    const length = Math.hypot(dx, dy);
+    const impactRing = (): void => {
+      const ring = this.takeParticle();
+      if (ring === undefined) return;
+      ring.circle(0, 0, 6).stroke({ color, width: 2 });
+      ring.position.set(to.x, to.y);
+      this.trackParticle(
+        this.tweens.to(ring.scale, { x: 2.2, y: 2.2 }, 240, easeOutQuad),
+      );
+      this.trackParticle(
+        this.tweens.to(ring, { alpha: 0 }, 240, linear, () => {
+          ring.visible = false;
+        }),
+      );
+    };
+    const bolt = this.takeParticle();
+    if (bolt === undefined || length < 1 || this.reduced()) {
+      impactRing();
+      return;
+    }
+    const trail = Math.min(length, 34);
+    const ux = dx / length;
+    const uy = dy / length;
+    bolt
+      .moveTo(0, 0)
+      .lineTo(-ux * trail, -uy * trail)
+      .stroke({ color, width: 2 });
+    bolt.position.set(from.x, from.y);
+    this.trackParticle(
+      this.tweens.to(bolt, { x: to.x, y: to.y }, PROJECTILE_MS, linear, () => {
+        bolt.visible = false;
+        impactRing();
+      }),
+    );
   }
 
   private shieldShimmer(): void {
     const { playerHit } = this.layout;
-    const arc = new Graphics();
+    const arc = this.takeParticle();
+    if (arc === undefined) return;
     arc
-      .arc(playerHit.x, playerHit.y + 10, 48, Math.PI * 1.15, Math.PI * 1.85)
+      .arc(0, 0, 48, Math.PI * 1.15, Math.PI * 1.85)
       .stroke({ color: schools.blue.stroke, width: 3 });
+    arc.position.set(playerHit.x, playerHit.y + 10);
     arc.alpha = 0.95;
-    this.fxLayer.addChild(arc);
-    this.tweens.to(arc, { alpha: 0 }, 320, linear, () => {
-      arc.destroy();
-    });
+    this.trackParticle(
+      this.tweens.to(arc, { alpha: 0 }, 320, linear, () => {
+        arc.visible = false;
+      }),
+    );
   }
 
   private thrusterPuff(): void {
@@ -1747,17 +1934,18 @@ export class BattleScene {
     const cx = rect === undefined ? this.layout.playerHit.x : rect.x + rect.w / 2;
     const cy = rect === undefined ? this.layout.playerHit.y : rect.y + rect.h / 2;
     for (let i = 0; i < 3; i += 1) {
-      const puff = new Graphics();
-      puff
-        .circle(cx - 14 + i * 14, cy, 5)
-        .fill({ color: schools.green.stroke, alpha: 0.7 });
-      this.fxLayer.addChild(puff);
-      this.tweens.to(puff.scale, { x: 2, y: 2 }, 260 + i * 40, easeOutQuad);
-      puff.pivot.set(cx - 14 + i * 14, cy);
+      const puff = this.takeParticle();
+      if (puff === undefined) return;
+      puff.circle(0, 0, 5).fill({ color: schools.green.stroke, alpha: 0.7 });
       puff.position.set(cx - 14 + i * 14, cy);
-      this.tweens.to(puff, { alpha: 0 }, 260 + i * 40, linear, () => {
-        puff.destroy();
-      });
+      this.trackParticle(
+        this.tweens.to(puff.scale, { x: 2, y: 2 }, 260 + i * 40, easeOutQuad),
+      );
+      this.trackParticle(
+        this.tweens.to(puff, { alpha: 0 }, 260 + i * 40, linear, () => {
+          puff.visible = false;
+        }),
+      );
     }
   }
 
@@ -1765,18 +1953,22 @@ export class BattleScene {
     const anchor = this.enemyAnchor(targetId);
     if (anchor === undefined) return;
     const size = this.layout.enemySize;
-    const sweep = new Graphics();
+    const sweep = this.takeParticle();
+    if (sweep === undefined) return;
     sweep
-      .moveTo(anchor.x - size / 2 - 4, 0)
-      .lineTo(anchor.x + size / 2 + 4, 0)
+      .moveTo(-size / 2 - 4, 0)
+      .lineTo(size / 2 + 4, 0)
       .stroke({ color: schools.prismatic.stroke, width: 2 });
-    sweep.y = anchor.y - size / 2;
+    sweep.position.set(anchor.x, anchor.y - size / 2);
     sweep.alpha = 0.9;
-    this.fxLayer.addChild(sweep);
-    this.tweens.to(sweep, { y: anchor.y + size / 2 }, 280, linear);
-    this.tweens.to(sweep, { alpha: 0 }, 320, linear, () => {
-      sweep.destroy();
-    });
+    this.trackParticle(
+      this.tweens.to(sweep, { y: anchor.y + size / 2 }, 280, linear),
+    );
+    this.trackParticle(
+      this.tweens.to(sweep, { alpha: 0 }, 320, linear, () => {
+        sweep.visible = false;
+      }),
+    );
   }
 
   private startResolution(state: BattleState): void {
@@ -1815,8 +2007,10 @@ export class BattleScene {
       this.playBeat(beat);
       haptic("resolveTick");
       useBattleStore.getState().applyBeatSnapshot(beat.after);
-      // DESIGN §10 hit-stop: a heavy hit holds the frame before the next beat.
+      // DESIGN §10 hit-stop: a heavy hit freezes the board, then the sequence
+      // resumes — the gap that used to stand in for it read as lag.
       const heavy = beat.kind === "damage" && beat.amount >= BIG_HIT_DAMAGE;
+      if (heavy) this.hitStop(HEAVY_HIT_STOP_MS);
       await this.sleep(beatGapMs() + (heavy ? HIT_STOP_MS : 0), run);
     }
     for (const beat of bundle.enemyBeats) {
@@ -1884,9 +2078,11 @@ export class BattleScene {
       return;
     }
     // A probability storm lands on a die that is already in its slot, so the
-    // number rises off the slot rather than off the tray.
+    // number rises off the slot rather than off the tray — and the die itself
+    // flashes, because the storm happened *to it*.
     if (beat.kind === "storm") {
-      playSfx("reroll");
+      playSfx("stormBeat");
+      this.dieFlash(slotAnchor, schools.prismatic.stroke);
       this.shake();
       this.spawnNumber(
         slotAnchor.x,
@@ -2004,12 +2200,12 @@ export class BattleScene {
       this.flashEnemy(beat.enemyId);
       return;
     }
-    // R6 signatures. R10 owns the bespoke sounds (juice backlog); until then each
-    // one borrows the nearest existing cue and gets its own readable glyph.
+    // R6 signatures, each with the cue it asked for in the juice backlog: the
+    // mechanic and the sound now describe the same event.
     if (beat.kind === "curse" && beat.dieUid !== undefined) {
       const anchor = this.trayAnchor(beat.dieUid, useBattleStore.getState());
-      playSfx("invalid");
-      this.fireProjectile(origin, anchor);
+      playSfx("curseTick");
+      this.fireProjectile(origin, anchor, statusTint("burn"));
       this.spawnNumber(
         anchor.x,
         anchor.y - 16,
@@ -2019,7 +2215,7 @@ export class BattleScene {
       return;
     }
     if (beat.kind === "gate") {
-      playSfx("shields");
+      playSfx(beat.amount > 0 ? "gateRaise" : "gateBreak");
       this.spawnNumber(
         origin.x,
         origin.y - this.layout.enemySize / 2,
@@ -2028,9 +2224,14 @@ export class BattleScene {
       );
       return;
     }
+    // The pull runs from the player toward the enemy; so does the sound.
     if (beat.kind === "siphon" || beat.kind === "drain") {
-      playSfx("invalid");
-      this.fireProjectile(this.layout.playerHit, origin);
+      playSfx("siphonPull", { rate: beat.kind === "drain" ? 0.88 : 1 });
+      this.fireProjectile(
+        this.layout.playerHit,
+        origin,
+        beat.kind === "siphon" ? schools.blue.stroke : tokens.amber,
+      );
       this.spawnNumber(
         this.layout.playerHit.x,
         this.layout.playerHit.y,
@@ -2040,7 +2241,7 @@ export class BattleScene {
       return;
     }
     if (beat.kind === "bargain") {
-      playSfx("charge");
+      playSfx("bargainCoin");
       this.flashEnemy(beat.enemyId);
       this.spawnNumber(
         origin.x,
@@ -2050,8 +2251,9 @@ export class BattleScene {
       );
       return;
     }
+    // Rage +6 has to sound worse than Rage +2, so the step climbs with the stack.
     if (beat.kind === "enrage") {
-      playSfx("charge");
+      playSfx("enrageStep", { rate: 0.92 + Math.min(6, beat.amount) * 0.06 });
       this.flashEnemy(beat.enemyId);
       this.spawnNumber(
         origin.x,
@@ -2062,11 +2264,21 @@ export class BattleScene {
       return;
     }
     if (beat.kind === "hijack") {
-      playSfx("place");
-      this.fireProjectile(origin, this.layout.playerHit);
+      playSfx("hijackDrag");
+      this.fireProjectile(origin, this.layout.playerHit, tokens.amber);
       return;
     }
+    // The ward's new school is audible in the timbre, so the player hears the
+    // rotation without reading the chip.
     if (beat.kind === "ward") {
+      const school = beat.after.enemies.find((e) => e.id === beat.enemyId)?.ward;
+      playSfx("wardShift", { rate: school === undefined ? 1 : WARD_RATE[school] });
+      this.flashEnemy(beat.enemyId);
+      return;
+    }
+    if (beat.kind === "fold") {
+      playSfx("foldBeat");
+      this.sceneGlowPulse(schools.prismatic.stroke, 0.18, 320);
       this.flashEnemy(beat.enemyId);
     }
   }

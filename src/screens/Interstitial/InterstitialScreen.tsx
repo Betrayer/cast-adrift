@@ -3,6 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
+import { WarpStreaks } from '@/components/WarpStreaks';
 import { pickFragment } from '@/data/narrative/fragments';
 import { sectorDef } from '@/data/sectors';
 import { playSfx } from '@/services/audio';
@@ -29,15 +30,6 @@ export const InterstitialScreen = () => {
     playSfx('jump');
   }, []);
 
-  const streaks = useMemo(
-    () =>
-      Array.from({ length: 18 }, (_, i) => ({
-        angle: (i / 18) * 360 + (i % 3) * 7,
-        delay: (i % 6) * 40,
-      })),
-    [],
-  );
-
   const fragment = useMemo(() => {
     const stream = createStream(deriveSeed(seed, `jump:${String(sector)}`));
     return pickFragment(sector, flags, seenFragments, (items) =>
@@ -56,21 +48,7 @@ export const InterstitialScreen = () => {
   return (
     <Screen centered width="wide" className={styles.frame}>
       <Stack align="center" justify="center" gap="lg" p="lg" style={{ background: def.wash }}>
-      {reduced ? null : (
-        <div className={styles.warp}>
-          {streaks.map((streak) => (
-            <span
-              key={streak.angle}
-              className={styles.streak}
-              style={{
-                background: def.accent,
-                transform: `rotate(${String(streak.angle)}deg)`,
-                animationDelay: `${String(streak.delay)}ms`,
-              }}
-            />
-          ))}
-        </div>
-      )}
+      {reduced ? null : <WarpStreaks color={def.accent} />}
       <div
         className={styles.wash}
         style={{ background: `radial-gradient(circle at 50% 40%, ${def.accent}33, transparent 62%)` }}

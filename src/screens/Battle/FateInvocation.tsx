@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { duckMusic, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
 import { useBattleStore } from '@/stores/battleStore';
@@ -22,6 +23,9 @@ export const FateInvocation = () => {
     const grew = fateUses > prevUses.current;
     prevUses.current = fateUses;
     if (!grew) return;
+    playSfx('thresholdHold', { gain: 0.55 });
+    playSfx('surge');
+    duckMusic(1200);
     haptic('reveal');
     setVisible(true);
     const id = window.setTimeout(

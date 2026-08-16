@@ -1,5 +1,5 @@
 import { Button, Divider, Paper, Stack, Text, Title } from '@mantine/core';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
@@ -7,6 +7,8 @@ import { beaconsResolved } from '@/data/events/beacons';
 import { finaleOptions } from '@/data/narrative/endings';
 import { echoArcComplete } from '@/game/narrative/memoryArc';
 import { canCrossThreshold, chooseEnding, crossThreshold } from '@/game/run/flow';
+import { duckMusic, playSfx } from '@/services/audio';
+import { haptic } from '@/services/tma';
 import { useRunStore } from '@/stores/runStore';
 
 export const FinaleScreen = () => {
@@ -28,6 +30,20 @@ export const FinaleScreen = () => {
   );
 
   const offerThreshold = canCrossThreshold();
+
+  // The threshold offer is the biggest decision in the game; a held low tone
+  // under the card, ducking the bed, is the only warning it gets.
+  useEffect(() => {
+    if (!offerThreshold) return;
+    playSfx('thresholdHold');
+    duckMusic(2400);
+  }, [offerThreshold]);
+
+  const cross = (): void => {
+    playSfx('foldBeat');
+    haptic('ending');
+    crossThreshold();
+  };
 
   return (
     <Screen centered>
@@ -52,6 +68,7 @@ export const FinaleScreen = () => {
                   variant="default"
                   data-ending-option={ending.id}
                   onClick={() => {
+                    playSfx('optionTick', { rate: 0.94 });
                     chooseEnding(ending.id);
                   }}
                 >
@@ -70,7 +87,7 @@ export const FinaleScreen = () => {
                 fullWidth
                 color="grape"
                 data-threshold-cross
-                onClick={crossThreshold}
+                onClick={cross}
               >
                 {t('run:finale.thresholdCross')}
               </Button>

@@ -17,6 +17,7 @@ import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { schools } from "@/data/schools";
 import { playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import {
   DECK_CAP,
   ptsForDie,
@@ -70,6 +71,7 @@ export const ShopScreen = () => {
     if (state.deck.length >= DECK_CAP || state.scrap < item.price) return;
     if (!state.spendScrap(item.price)) return;
     playSfx("buy");
+    haptic("purchase");
     state.addDie(item.defId);
     setShop({
       ...current,
@@ -93,6 +95,7 @@ export const ShopScreen = () => {
       return;
     }
     playSfx("buy");
+    haptic("purchase");
     setShop({
       ...current,
       modules: current.modules.map((it, i) =>

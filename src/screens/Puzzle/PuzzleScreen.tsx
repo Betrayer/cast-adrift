@@ -1,5 +1,5 @@
 import { Badge, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Screen } from "@/app/Screen";
@@ -48,7 +48,9 @@ import {
 import { completeNode } from "@/game/run/flow";
 import { interferenceImminent } from "@/game/run/interference";
 import { LootReveal } from "@/screens/Battle/LootReveal";
+import { duckMusic, playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
+import { haptic } from "@/services/tma";
 import { useAppStore } from "@/stores/appStore";
 import { useLootStore } from "@/stores/lootStore";
 import { useMetaStore } from "@/stores/metaStore";
@@ -389,6 +391,8 @@ interface FlowProps {
   forced: boolean;
 }
 
+const tierRate = (tier: number): number => 1.16 - tier * 0.045;
+
 const EntryCard = ({
   puzzle,
   reward,
@@ -403,6 +407,17 @@ const EntryCard = ({
   const { t } = useTranslation(["run", "battle", "content"]);
   const interference = useRunStore((s) => s.interferenceStacks);
 
+  // The badge flourish is the tier speaking: a T5 board announces itself lower
+  // and heavier than a T1 one, before a single die is read.
+  useEffect(() => {
+    playSfx("eventOpen", { rate: tierRate(puzzle.tier) });
+  }, [puzzle.tier]);
+
+  const takeReading = (): void => {
+    playSfx("checkDrum", { rate: tierRate(puzzle.tier) });
+    onEnter();
+  };
+
   return (
     <Screen
       width="narrow"
@@ -414,7 +429,7 @@ const EntryCard = ({
       }
       footer={
         <Stack gap={6}>
-          <Button size="md" onClick={onEnter} data-testid="puzzle-enter">
+          <Button size="md" onClick={takeReading} data-testid="puzzle-enter">
             {t("run:anomaly.entryEnter")}
           </Button>
           <Button variant="subtle" color="gray" onClick={onLeave}>
@@ -546,6 +561,16 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
   const solved = checked === true;
   const failedOut = checked === false && left <= 0;
 
+  // The rule-check tick fires when the board's answer to the goal moves, so the
+  // player hears a placement help or hurt without reading the banner.
+  const lastReached = useRef(reached);
+  useEffect(() => {
+    if (reached !== lastReached.current) {
+      playSfx("ruleTick", { rate: reached ? 1.22 : 0.84 });
+      lastReached.current = reached;
+    }
+  }, [reached]);
+
   const done = (): void => {
     if (!forced && !grantedRef.current) {
       useRunStore.getState().recordAnomalyUnsolved();
@@ -581,6 +606,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
 
   const claimDie = (): void => {
     if (claimed || reward.choice === undefined) return;
+    playSfx("optionTick", { rate: 1.14 });
     setClaimed(true);
     if (forced) return;
     useRunStore.getState().addDie(reward.choice.die);
@@ -589,6 +615,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
 
   const claimVoucher = (): void => {
     if (claimed || reward.choice === undefined) return;
+    playSfx("optionTick", { rate: 0.86 });
     setClaimed(true);
     if (forced) return;
     useRunStore.getState().addVoucher(reward.choice.vouchers);
@@ -633,8 +660,10 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
       selected === reserved ||
       !legalAssign(puzzle, selected, slot, turnIndex)
     ) {
+      playSfx("invalid", { gain: 0.5 });
       return;
     }
+    playSfx("puzzlePlace");
     setPlacement((p) => ({ ...p, [slot]: selected }));
     setSelected(null);
     setChecked(null);
@@ -652,6 +681,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
       setRerollPick([]);
       return;
     }
+    playSfx("reroll");
     const seq = rerollSeq + 1;
     setRerollSeq(seq);
     const stream = createStream(
@@ -682,6 +712,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
   const newAttempt = (): void => {
     if (left <= 0) return;
     if (nextCost > 0 && !useRunStore.getState().spendScrap(nextCost)) return;
+    playSfx(nextCost > 0 ? "buy" : "attemptSpent");
     const attempt = useRunStore.getState().spendPuzzleAttempt(nodeId);
     setValues(rollDeck(puzzle, seed, `trial:${nodeId}:${String(attempt - 1)}`));
     setPlacement({});
@@ -724,10 +755,22 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     const won = reached;
     setChecked(won);
     if (won) {
+      // T1–T3 gets a fanfare, T4–T5 gets the ceremony: the duck and the haptic
+      // are what separate "solved it" from "solved *that*".
+      const ceremony = puzzle.tier >= 4;
+      playSfx(ceremony ? "solveT45" : "solveT13");
+      if (ceremony) {
+        duckMusic(2000);
+        haptic("puzzleSolve");
+      }
       grantReward();
       return;
     }
-    if (deduction) useRunStore.getState().spendPuzzleAttempt(nodeId);
+    playSfx("puzzleFail");
+    if (deduction) {
+      useRunStore.getState().spendPuzzleAttempt(nodeId);
+      playSfx("attemptSpent");
+    }
   };
 
   const showLeaveWarning =

@@ -8,6 +8,9 @@ import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import styles from "./LevelUpCeremony.module.css";
 
+const CARD_DELAY_MS = 620;
+const CARD_STAGGER_MS = 240;
+
 interface Props {
   fromLevel: number;
   toLevel: number;
@@ -28,12 +31,26 @@ export const LevelUpCeremony = ({
   const { t } = useTranslation(["meta"]);
   const points = toLevel - fromLevel;
 
+  // The cards land one at a time under the level-up sting: an unlock is its own
+  // moment, not a line of text that appeared while the fanfare was still ringing.
   useEffect(() => {
     emitBark("levelUp");
     playSfx("levelUp");
     duckMusic(2200);
     haptic("levelUp");
-  }, []);
+    const cards = [...milestones, ...unlocks];
+    const timers = cards.map((_, index) =>
+      window.setTimeout(
+        () => {
+          playSfx("unlockCard", { rate: 1 + index * 0.06 });
+        },
+        CARD_DELAY_MS + index * CARD_STAGGER_MS,
+      ),
+    );
+    return () => {
+      for (const id of timers) window.clearTimeout(id);
+    };
+  }, [milestones, unlocks]);
 
   const cls = (name: string): string => (reduced ? "" : (styles[name] ?? ""));
 

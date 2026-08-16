@@ -35,7 +35,7 @@ import { emitEventOutcome } from "@/game/narrative/barks";
 import { completeNode, startEventBattle } from "@/game/run/flow";
 import { nodeById } from "@/game/map/types";
 import { eventPickSeed } from "@/game/narrative/chainMarkers";
-import { playSfx } from "@/services/audio";
+import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useAppStore } from "@/stores/appStore";
@@ -205,6 +205,11 @@ const DieChip = ({
   );
 };
 
+// The drum rolls first and the verdict lands on top of its tail, so a check
+// reads as one beat rather than two unrelated cues.
+const CHECK_STING_MS = 340;
+const AXIS_THRESHOLD = 3;
+
 interface CheckModalProps {
   option: EventOption;
   faces: CheckFace[];
@@ -234,11 +239,12 @@ const CheckModal = ({
   const doRoll = (): void => {
     const values = rollCheckDice(faces, streams.check);
     const total = checkTotal(values, check.pick);
-    setRolled({
-      values,
-      total,
-      success: checkPassed(total, check.pick, check.target),
-    });
+    const success = checkPassed(total, check.pick, check.target);
+    playSfx("checkDrum");
+    window.setTimeout(() => {
+      playSfx(success ? "checkPass" : "checkFail");
+    }, CHECK_STING_MS);
+    setRolled({ values, total, success });
   };
 
   const confirm = (): void => {
@@ -310,6 +316,18 @@ const CheckModal = ({
   );
 };
 
+// A notch tick per shift; crossing a pole threshold drops the same cue a fifth
+// so the player hears the difference between drifting and committing.
+const announceAxisShift = (before: number, after: number): void => {
+  if (before === after) return;
+  const crossed =
+    Math.abs(after) >= AXIS_THRESHOLD && Math.abs(before) < AXIS_THRESHOLD;
+  playSfx("axisTick", {
+    rate: crossed ? 0.68 : after > before ? 1.08 : 0.92,
+    gain: crossed ? 1.6 : 1,
+  });
+};
+
 const EventRunner = ({
   event,
   streams,
@@ -354,6 +372,7 @@ const EventRunner = ({
       completeNode({ outcome: "cleared" });
       return;
     }
+    const axisBefore = useRunStore.getState().axis;
     const result = applyOutcome(chosen, streams.loot, {
       eventId: event.id,
       optionId: event.options[optionIndex]?.id ?? "",
@@ -361,6 +380,8 @@ const EventRunner = ({
       ...(eventKind(event) === "beacon" ? { beacon: true } : {}),
     });
     emitEventOutcome(chosen);
+    playSfx("consequenceChime");
+    announceAxisShift(axisBefore, useRunStore.getState().axis);
     setOutcome(chosen);
     setFollow(result.follow);
     setCheckOption(null);
@@ -370,6 +391,7 @@ const EventRunner = ({
     event.options.findIndex((o) => o.id === option.id);
 
   const pickOption = (option: EventOption): void => {
+    playSfx("optionTick");
     if (option.check !== undefined) {
       setCheckOption(option);
       return;
@@ -405,10 +427,25 @@ const EventRunner = ({
   const beaconIndex = Math.min(BEACON_FLAGS.length, resolvedBeacons + 1);
 
   useEffect(() => {
-    if (!beacon) return;
-    playSfx("fogReveal");
+    if (!beacon) {
+      playSfx("eventOpen");
+      return;
+    }
+    playSfx("beaconEntry");
+    duckMusic(1400);
     haptic("ending");
   }, [beacon]);
+
+  // "N of 5" rises with the count: the fifth beacon must not sound like the first.
+  useEffect(() => {
+    if (!beacon) return;
+    const id = window.setTimeout(() => {
+      playSfx("chainStep", { rate: 0.9 + beaconIndex * 0.08 });
+    }, 520);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [beacon, beaconIndex]);
 
   const checkFaces: CheckFace[] =
     checkOption?.check === undefined
