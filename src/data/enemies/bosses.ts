@@ -84,7 +84,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "breakerBarge",
-    hp: 73,
+    hp: 59,
     boss: true,
     stealOnHit: 6,
     claims: [
@@ -100,7 +100,7 @@ export const BOSSES: readonly BossDef[] = [
       {
         untilHpPct: 40,
         pattern: [
-          { t: "attack", n: 8 },
+          { t: "attack", n: 7 },
           { t: "stealScrap", n: 6 },
           { t: "multi", n: 4, k: 2 },
         ],
@@ -108,22 +108,22 @@ export const BOSSES: readonly BossDef[] = [
       {
         untilHpPct: 0,
         pattern: [
-          { t: "multi", n: 5, k: 2 },
-          { t: "attack", n: 9 },
+          { t: "multi", n: 4, k: 2 },
+          { t: "attack", n: 8 },
           { t: "stealScrap", n: 6 },
         ],
         onEnter: [{ t: "charge" }],
       },
     ],
     pattern: [
-      { t: "attack", n: 8 },
+      { t: "attack", n: 7 },
       { t: "stealScrap", n: 6 },
       { t: "multi", n: 4, k: 2 },
     ],
   }),
   bossDef({
     id: "auctionCorvette",
-    hp: 90,
+    hp: 104,
     boss: true,
     stealOnHit: 5,
     claims: [
@@ -140,15 +140,15 @@ export const BOSSES: readonly BossDef[] = [
         untilHpPct: 45,
         pattern: [
           { t: "bargain", n: 7, heal: 4 },
-          { t: "attack", n: 11 },
-          { t: "multi", n: 5, k: 2 },
+          { t: "attack", n: 10 },
+          { t: "multi", n: 4, k: 2 },
         ],
       },
       {
         untilHpPct: 0,
         pattern: [
-          { t: "bargain", n: 9, heal: 6 },
-          { t: "multi", n: 6, k: 2 },
+          { t: "bargain", n: 8, heal: 5 },
+          { t: "multi", n: 5, k: 2 },
           { t: "drainCharge", n: 6 },
         ],
         onEnter: [{ t: "charge" }],
@@ -156,13 +156,13 @@ export const BOSSES: readonly BossDef[] = [
     ],
     pattern: [
       { t: "bargain", n: 7, heal: 4 },
-      { t: "attack", n: 11 },
-      { t: "multi", n: 5, k: 2 },
+      { t: "attack", n: 10 },
+      { t: "multi", n: 4, k: 2 },
     ],
   }),
   bossDef({
     id: "riftMaw",
-    hp: 68,
+    hp: 78,
     boss: true,
     claims: [
       { k: "aura", is: "twistEachTurn" },
@@ -177,28 +177,28 @@ export const BOSSES: readonly BossDef[] = [
       {
         untilHpPct: 50,
         pattern: [
-          { t: "multi", n: 4, k: 2 },
-          { t: "attack", n: 10 },
+          { t: "multi", n: 5, k: 2 },
+          { t: "attack", n: 11 },
         ],
       },
       {
         untilHpPct: 0,
         pattern: [
-          { t: "multi", n: 4, k: 2 },
-          { t: "attack", n: 10 },
+          { t: "multi", n: 5, k: 2 },
+          { t: "attack", n: 12 },
         ],
         everyTurn: [{ t: "capShrink" }],
         onEnter: [{ t: "capShrink" }],
       },
     ],
     pattern: [
-      { t: "multi", n: 4, k: 2 },
-      { t: "attack", n: 10 },
+      { t: "multi", n: 5, k: 2 },
+      { t: "attack", n: 11 },
     ],
   }),
   bossDef({
     id: "riftBranch",
-    hp: 55,
+    hp: 68,
     boss: true,
     claims: [
       { k: "intent", t: "capShrink" },
@@ -222,8 +222,8 @@ export const BOSSES: readonly BossDef[] = [
         untilHpPct: 0,
         pattern: [
           { t: "curseDie", n: 3 },
-          { t: "multi", n: 4, k: 2 },
-          { t: "attack", n: 9 },
+          { t: "multi", n: 5, k: 2 },
+          { t: "attack", n: 11 },
         ],
         everyTurn: [{ t: "capShrink" }],
         onEnter: [{ t: "curseDie", n: 3 }],
@@ -237,7 +237,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "choirFlagship",
-    hp: 77,
+    hp: 81,
     boss: true,
     claims: [
       { k: "aura", is: "chargeAllies" },
@@ -275,7 +275,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "cantorColossus",
-    hp: 49,
+    hp: 45,
     boss: true,
     jamClearsRage: true,
     claims: [
@@ -360,7 +360,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "mirrorHeart",
-    hp: 58,
+    hp: 76,
     boss: true,
     shell: true,
     claims: [
@@ -378,15 +378,15 @@ export const BOSSES: readonly BossDef[] = [
         pattern: [
           { t: "shield", n: 8 },
           { t: "mirrorSchool" },
-          { t: "multi", n: 4, k: 2 },
+          { t: "multi", n: 5, k: 2 },
         ],
       },
       {
         untilHpPct: 25,
         pattern: [
-          { t: "shield", n: 8 },
+          { t: "attack", n: 11 },
           { t: "mirrorSchool" },
-          { t: "multi", n: 4, k: 2 },
+          { t: "multi", n: 5, k: 2 },
         ],
         onEnter: [{ t: "storm" }],
       },
@@ -395,7 +395,7 @@ export const BOSSES: readonly BossDef[] = [
         pattern: [
           { t: "shield", n: 10 },
           { t: "mirrorSchool" },
-          { t: "attack", n: 10 },
+          { t: "attack", n: 13 },
         ],
         everyTurn: [{ t: "storm" }],
         onEnter: [{ t: "shield", n: 10 }],
@@ -404,7 +404,7 @@ export const BOSSES: readonly BossDef[] = [
     pattern: [
       { t: "shield", n: 8 },
       { t: "mirrorSchool" },
-      { t: "multi", n: 4, k: 2 },
+      { t: "multi", n: 5, k: 2 },
     ],
   }),
   // «За Ядром» rotates two finales that ask opposite questions. The Hush takes
@@ -413,7 +413,7 @@ export const BOSSES: readonly BossDef[] = [
   // phase window at a time, so the fight is about remembering how you beat them.
   bossDef({
     id: "theHush",
-    hp: 62,
+    hp: 51,
     boss: true,
     jamReleasesBlocks: true,
     claims: [
@@ -462,7 +462,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "echoFleet",
-    hp: 108,
+    hp: 126,
     boss: true,
     claims: [
       { k: "trait", is: "phases" },

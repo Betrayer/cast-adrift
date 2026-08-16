@@ -145,7 +145,7 @@ export const MINIBOSSES: readonly EnemyDef[] = [
   }),
   enemy({
     id: "resonator",
-    hp: 46,
+    hp: 58,
     miniboss: true,
     claims: [
       { k: "intent", t: "mirrorSchool" },
@@ -154,14 +154,14 @@ export const MINIBOSSES: readonly EnemyDef[] = [
     subsystems: [sub("resonator", "coil", 14, "shieldSelf6")],
     pattern: [
       { t: "mirrorSchool" },
-      { t: "multi", n: 4, k: 3 },
+      { t: "multi", n: 5, k: 3 },
       { t: "mirrorSchool" },
-      { t: "attack", n: 8 },
+      { t: "attack", n: 11 },
     ],
   }),
   enemy({
     id: "quarantineTwin",
-    hp: 46,
+    hp: 38,
     miniboss: true,
     shell: true,
     alternating: true,
@@ -170,13 +170,13 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { k: "trait", is: "shell" },
     ],
     subsystems: [
-      sub("quarantineTwin", "twinA", 18, "atk+2"),
-      sub("quarantineTwin", "twinB", 18, "shieldAllies3"),
+      sub("quarantineTwin", "twinA", 12, "atk+2"),
+      sub("quarantineTwin", "twinB", 12, "shieldAllies3"),
     ],
     pattern: [
-      { t: "multi", n: 4, k: 3 },
-      { t: "shield", n: 7 },
-      { t: "attack", n: 9 },
+      { t: "multi", n: 4, k: 2 },
+      { t: "shield", n: 6 },
+      { t: "attack", n: 8 },
     ],
   }),
   enemy({

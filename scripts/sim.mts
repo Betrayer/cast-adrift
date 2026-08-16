@@ -1,7 +1,38 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { STARTER_DECK } from "../src/data/decks";
-import { ALL_DICE, DIE_BY_ID } from "../src/data/dice";
+import { ALL_DICE } from "../src/data/dice";
+import { PUZZLES, type PuzzleTier } from "../src/data/puzzles";
+import { difficultyOf, TIER_BANDS } from "../src/game/puzzles/difficulty";
+import { maxAttempts, TIER_STAKES } from "../src/game/puzzles/stakes";
+import {
+  buildChartPicks,
+  MID_COLLECTION_LEVEL,
+} from "./simPolicy/chart";
+import {
+  EXPECTED_DMG_PER_FIGHT,
+  FIGHT_TYPES,
+  fightsUntilRest,
+  greedyNext,
+  type RouteState,
+} from "./simPolicy/map";
+import {
+  applyEdgeMotifs,
+  applyNodeMotifs,
+  createRunState,
+  emptyPuzzleTally,
+  emptySinks,
+  gain,
+  greedyShipyard,
+  greedyShop,
+  maxMk,
+  maxRealSchoolCount,
+  runAnomaly,
+  runDraft,
+  takeDie,
+  type PuzzleTally,
+  type RunState,
+} from "./simPolicy/state";
 import { ENGRAVINGS } from "../src/data/engravings";
 import {
   ENCOUNTER_DISCOUNT_PCT,
@@ -25,28 +56,15 @@ import {
   expandEncounterIds,
   isEncounterGroup,
 } from "../src/data/enemies";
-import {
-  DECK_CAP,
-  mkUpgradeCost,
-  ptsForDie,
-  sellValue,
-} from "../src/game/economy/prices";
+import { DECK_CAP } from "../src/game/economy/prices";
 import { computeNodeReward, isDraftNode } from "../src/game/economy/rewards";
-import { generateShopStock } from "../src/game/economy/shop";
-import { SECTORS, sectorDef } from "../src/data/sectors";
+import { SECTORS } from "../src/data/sectors";
 import {
   bossNodeIdFor,
   generateSectorMap,
   START_NODE_ID,
 } from "../src/game/map/generator";
-import {
-  edgeMarkFor,
-  nodeById,
-  outgoingEdges,
-  type MapGraph,
-  type MapNode,
-  type NodeType,
-} from "../src/game/map/types";
+import { nodeById, type MapGraph } from "../src/game/map/types";
 import {
   depthFor,
   DRIFT_LOOP_HP_PCT,
@@ -74,17 +92,15 @@ import {
   buildEncounterIds,
   sectorHpPct,
 } from "../src/game/run/encounter";
-import {
-  rollPerkChoices,
-  type DraftContext,
-} from "../src/game/run/perkDraft";
 import { computePerkMods } from "../src/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
 import { ascensionMods } from "../src/data/ascension";
 import { moduleSlots } from "../src/data/modules";
-import { ALL_PERKS, PERK_BY_ID } from "../src/data/perks";
+import { ALL_PERKS } from "../src/data/perks";
+import { PERK_DRAFT_SIZE } from "../src/game/run/perkDraft";
+import { decideDraft } from "./simPolicy/draft";
+import { schoolOf } from "./simPolicy/state";
 import { rollModule } from "../src/game/economy/rewards";
-import { generateShopModules } from "../src/game/economy/shop";
 import { shipHullMax } from "../src/game/battle/setup";
 import type { MkLevels } from "../src/stores/runStore";
 import {
@@ -93,7 +109,7 @@ import {
   deriveSeed,
 } from "../src/services/rng";
 import type { BattleSnapshot, SlotId } from "../src/types/battle";
-import type { EventDef, EventEffect, EventOption } from "../src/types/events";
+import type { EventDef, EventOption } from "../src/types/events";
 import { ALL_EVENTS } from "../src/data/events";
 import { pickEvent, type EventContext } from "../src/game/events/engine";
 import {
@@ -109,8 +125,10 @@ interface BattleInit {
   hullMax?: number;
   runScrap?: number;
   tide?: number;
+  interference?: number;
   mkLevels?: MkLevels;
   perks?: readonly string[];
+  chartPicks?: readonly string[];
   modules?: readonly string[];
   sectorHpPct?: number;
   enemyHpBonusPct?: number;
@@ -165,7 +183,9 @@ const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
 const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
   const cost = Math.max(
     1,
-    NUDGE + computeRunMods(init.perks ?? [], [], init.modules ?? []).nudgeCostDelta,
+    NUDGE +
+      computeRunMods(init.perks ?? [], init.chartPicks ?? [], init.modules ?? [])
+        .nudgeCostDelta,
   );
   if (snapshot.charge >= SURGE && snapshot.nextRollBonus === 0) {
     snapshot.charge -= SURGE;
@@ -205,12 +225,18 @@ const simulateBattle = (
     init.mkLevels ?? {},
     {
       tide: init.tide,
+      interference: init.interference,
       perks: init.perks,
+      chartPicks: init.chartPicks,
       modules: init.modules,
       hull: init.hull,
       hullMax: init.hullMax,
       runScrap: init.runScrap,
-      chargeCap: runChargeCap(init.perks ?? [], [], init.modules ?? []),
+      chargeCap: runChargeCap(
+        init.perks ?? [],
+        init.chartPicks ?? [],
+        init.modules ?? [],
+      ),
       sectorHpPct: init.sectorHpPct,
       enemyHpBonusPct: init.enemyHpBonusPct,
       eliteShield: init.eliteShield,
@@ -299,317 +325,6 @@ const DECILES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
 
 // ── Run mode ────────────────────────────────────────────────────────────────
 
-const PATH_PRIORITY: readonly NodeType[] = [
-  "shipyard",
-  "shop",
-  "event",
-  "anomaly",
-  "beacon",
-  "battle",
-  "elite",
-  "miniboss",
-  "boss",
-  "start",
-];
-
-const priorityOf = (type: NodeType): number => {
-  const index = PATH_PRIORITY.indexOf(type);
-  return index < 0 ? PATH_PRIORITY.length : index;
-};
-
-interface RunState {
-  hull: number;
-  hullMax: number;
-  scrap: number;
-  scrapEarned: number;
-  scrapSpent: number;
-  deck: string[];
-  mkLevels: MkLevels;
-  perks: string[];
-  modules: string[];
-  tide: number;
-  jumpsSinceTide: number;
-  kills: number;
-  nodes: number;
-  fights: number;
-  pockets: number;
-  draftsSinceRare: number;
-}
-
-const simDraftContext = (
-  state: RunState,
-  sector: number,
-): DraftContext => ({
-  owned: state.perks,
-  banished: [],
-  sector,
-  deckDefIds: state.deck,
-  modules: state.modules,
-  shipId: "wanderer",
-  draftsSinceRare: state.draftsSinceRare,
-});
-
-const noteSimDraft = (state: RunState, choices: readonly string[]): void => {
-  if (choices.length === 0) return;
-  state.draftsSinceRare = choices.some(
-    (id) => PERK_BY_ID.get(id)?.rarity === "rare",
-  )
-    ? 0
-    : state.draftsSinceRare + 1;
-};
-
-const spend = (state: RunState, cost: number): boolean => {
-  if (cost < 0 || state.scrap < cost) return false;
-  state.scrap -= cost;
-  state.scrapSpent += cost;
-  return true;
-};
-
-const gain = (state: RunState, amount: number): void => {
-  if (amount <= 0) return;
-  state.scrap += amount;
-  state.scrapEarned += amount;
-};
-
-const REAL_SCHOOLS = [
-  "red",
-  "blue",
-  "green",
-  "yellow",
-  "black",
-  "grey",
-] as const;
-
-// Resonance-aware target school, anchored to the starter deck's dominant real school
-// (2×red → the red set) and self-reinforcing as the bot buys into it.
-const deckTargetSchool = (deck: readonly string[]): string => {
-  const census = new Map<string, number>();
-  let prismatic = 0;
-  for (const defId of deck) {
-    const school = DIE_BY_ID.get(defId)?.school;
-    if (school === undefined) continue;
-    if (school === "prismatic") prismatic += 1;
-    else census.set(school, (census.get(school) ?? 0) + 1);
-  }
-  let best = "red";
-  let bestN = -1;
-  for (const s of REAL_SCHOOLS) {
-    const n = (census.get(s) ?? 0) + (s === best ? prismatic : 0);
-    if (n > bestN) {
-      best = s;
-      bestN = n;
-    }
-  }
-  return best;
-};
-
-const greedyShop = (state: RunState, seed: number, node: MapNode): void => {
-  const discount = computeRunMods(state.perks, [], state.modules).shopDiscountPct;
-  // The bot buys any module it can afford while the bay has room: modules are a
-  // strict upgrade at these prices, so a greedy rule is the honest baseline.
-  for (const item of generateShopModules(seed, node.id, 0, discount)) {
-    if (state.modules.length >= moduleSlots(0)) break;
-    if (state.scrap >= item.price && spend(state, item.price)) {
-      state.modules.push(item.moduleId);
-    }
-  }
-  const items = generateShopStock(seed, node.id, 0, discount);
-  const target = deckTargetSchool(state.deck);
-  const rank = (defId: string): number => {
-    const school = DIE_BY_ID.get(defId)?.school;
-    if (school === target || school === "prismatic") return 0;
-    if (school === "red" || school === "blue") return 1;
-    return 2;
-  };
-  const sorted = [...items].sort((a, b) => {
-    const r = rank(a.defId) - rank(b.defId);
-    return r !== 0 ? r : ptsForDie(b.defId) - ptsForDie(a.defId);
-  });
-  for (const item of sorted) {
-    if (state.deck.length >= DECK_CAP) break;
-    if (state.scrap >= item.price && spend(state, item.price)) {
-      state.deck.push(item.defId);
-    }
-  }
-};
-
-const UPGRADE_SLOTS: readonly SlotId[] = [
-  "weaponA",
-  "weaponB",
-  "shields",
-  "reactor",
-];
-
-const repairToFull = (state: RunState): void => {
-  const missing = state.hullMax - state.hull;
-  const repairable = Math.min(missing, Math.floor(state.scrap / 2));
-  if (repairable > 0 && spend(state, repairable * 2)) {
-    state.hull = Math.min(state.hullMax, state.hull + repairable);
-  }
-};
-
-const buyUpgrades = (state: RunState): void => {
-  for (const slotId of UPGRADE_SLOTS) {
-    let mk = state.mkLevels[slotId] ?? 1;
-    while (mk < 3) {
-      const target = (mk + 1) as 2 | 3;
-      const cost = mkUpgradeCost(target);
-      if (state.scrap < cost || !spend(state, cost)) break;
-      mk = target;
-      state.mkLevels = { ...state.mkLevels, [slotId]: mk };
-    }
-  }
-};
-
-// Hull-aware: if the forecast damage to the next rest exceeds ~60% of current hull,
-// repair before sinking surplus into Mk (weapons first); otherwise front-load damage.
-const greedyShipyard = (state: RunState, repairFirst: boolean): void => {
-  if (repairFirst) {
-    repairToFull(state);
-    buyUpgrades(state);
-  } else {
-    buyUpgrades(state);
-    repairToFull(state);
-  }
-  repairToFull(state);
-};
-
-const FIGHT_TYPES: ReadonlySet<NodeType> = new Set([
-  "battle",
-  "elite",
-  "miniboss",
-  "boss",
-]);
-const EXPECTED_DMG_PER_FIGHT = 7;
-
-// Detours are worth their raised risk only with hull to spare, and a marked
-// mine edge is worth half a node of priority to walk around.
-const POCKET_HULL_PCT = 60;
-const MINE_PENALTY = 0.5;
-const CURSED_PENALTY = 0.75;
-const BLESSED_BONUS = 0.25;
-
-const pocketPayoff = (
-  map: MapGraph,
-  byId: ReadonlyMap<string, MapNode>,
-  node: MapNode,
-): NodeType => {
-  const rewardId = outgoingEdges(map, node.id)[0];
-  const reward = rewardId === undefined ? undefined : byId.get(rewardId);
-  return reward?.type ?? node.type;
-};
-
-const stepCost = (
-  map: MapGraph,
-  byId: ReadonlyMap<string, MapNode>,
-  from: string,
-  node: MapNode,
-): number => {
-  const base =
-    node.pocket === true
-      ? priorityOf(pocketPayoff(map, byId, node))
-      : priorityOf(node.type);
-  const blessing =
-    node.blessing === "cursed"
-      ? CURSED_PENALTY
-      : node.blessing === "blessed"
-        ? -BLESSED_BONUS
-        : 0;
-  return (
-    base +
-    blessing +
-    (edgeMarkFor(map, from, node.id) === "mine" ? MINE_PENALTY : 0)
-  );
-};
-
-const greedyNext = (
-  map: MapGraph,
-  byId: ReadonlyMap<string, MapNode>,
-  position: string,
-  posRow: number,
-  hullPct = 100,
-): MapNode | undefined =>
-  outgoingEdges(map, position)
-    .map((id) => byId.get(id))
-    .filter((n): n is MapNode => n !== undefined && n.row > posRow)
-    .filter((n) => n.pocket !== true || hullPct >= POCKET_HULL_PCT)
-    .sort(
-      (a, b) =>
-        stepCost(map, byId, position, a) - stepCost(map, byId, position, b),
-    )[0];
-
-const motifsOf = (sector: number) => sectorDef(sector).shape.motifs;
-
-const applyEffectsToState = (
-  state: RunState,
-  effects: readonly EventEffect[],
-  tideCap: number,
-): void => {
-  for (const effect of effects) {
-    if (effect.k === "scrap") gain(state, effect.n);
-    else if (effect.k === "hull") {
-      state.hull = Math.max(1, Math.min(state.hullMax, state.hull + effect.n));
-    } else if (effect.k === "tide") {
-      state.tide = Math.max(0, Math.min(tideCap, state.tide + effect.n));
-    }
-  }
-};
-
-const applyNodeMotifsSim = (
-  state: RunState,
-  sector: number,
-  node: MapNode,
-  tideCap: number,
-): void => {
-  for (const motif of motifsOf(sector)) {
-    if (motif.m === "cache" && node.cache === true) {
-      applyEffectsToState(state, motif.gain, tideCap);
-    }
-    if (motif.m === "procession" && node.blessing !== undefined) {
-      applyEffectsToState(
-        state,
-        node.blessing === "blessed" ? motif.blessed : motif.cursed,
-        tideCap,
-      );
-    }
-  }
-};
-
-const applyEdgeMotifsSim = (
-  state: RunState,
-  sector: number,
-  map: MapGraph,
-  from: string,
-  to: string,
-  tideCap: number,
-): void => {
-  if (edgeMarkFor(map, from, to) !== "mine") return;
-  for (const motif of motifsOf(sector)) {
-    if (motif.m === "mineEdges") applyEffectsToState(state, motif.toll, tideCap);
-  }
-};
-
-// Forecast the number of fights on the greedy path from here to the next shipyard/boss.
-const fightsUntilRest = (
-  map: MapGraph,
-  byId: ReadonlyMap<string, MapNode>,
-  position: string,
-  posRow: number,
-): number => {
-  let cur = position;
-  let row = posRow;
-  let fights = 0;
-  for (let guard = 0; guard < 40; guard += 1) {
-    const next = greedyNext(map, byId, cur, row);
-    if (next === undefined || next.type === "shipyard") break;
-    if (FIGHT_TYPES.has(next.type)) fights += 1;
-    if (next.type === "boss") break;
-    cur = next.id;
-    row = next.row;
-  }
-  return fights;
-};
-
 interface SectorResult {
   win: boolean;
   deathRow: number;
@@ -635,151 +350,192 @@ const median = (values: readonly number[]): number => {
     : (sorted[mid] ?? 0);
 };
 
-const maxRealSchoolCount = (deck: readonly string[]): number => {
-  const census = new Map<string, number>();
-  let prismatic = 0;
-  for (const defId of deck) {
-    const school = DIE_BY_ID.get(defId)?.school;
-    if (school === undefined) continue;
-    if (school === "prismatic") prismatic += 1;
-    else census.set(school, (census.get(school) ?? 0) + 1);
-  }
-  let best = 0;
-  for (const s of REAL_SCHOOLS) best = Math.max(best, census.get(s) ?? 0);
-  return best + prismatic;
-};
+interface WalkOptions {
+  sector: number;
+  seed: number;
+  ns: string;
+  tideCap: number;
+  scrapMult: number;
+  ascension: number;
+  enemyHpBonusPct: number;
+  eliteShield: number;
+  bossAsGate: boolean;
+  stopRow: number;
+  rollModules: boolean;
+  guard: number;
+  noDraft?: boolean;
+}
 
-const maxMk = (mkLevels: MkLevels): number =>
-  Math.max(1, ...Object.values(mkLevels).map((mk) => mk ?? 1));
+interface WalkResult {
+  cleared: boolean;
+  deathRow: number;
+  rows: number;
+  hullEntering: number[];
+}
 
-const runSector = (seed: number): SectorResult => {
-  const streams = createStreams(seed);
-  const map: MapGraph = generateSectorMap(streams.map, 1);
-  const bossId = bossNodeIdFor(1);
+const nsKey = (ns: string, prefix: string, id: string): string =>
+  ns === "" ? `${prefix}:${id}` : `${prefix}:${ns}:${id}`;
+
+const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
+  const { seed, sector, ns } = opts;
+  const streams =
+    ns === "" ? createStreams(seed) : createStreams(deriveSeed(seed, `map:${ns}`));
+  const map: MapGraph = generateSectorMap(streams.map, sector, {
+    bossAsGate: opts.bossAsGate,
+  });
+  const bossId = bossNodeIdFor(sector);
   const byId = nodeById(map);
-  const state: RunState = {
-    hull: 30,
-    hullMax: 30,
-    scrap: 0,
-    scrapEarned: 0,
-    scrapSpent: 0,
-    deck: [...STARTER_DECK],
-    mkLevels: {},
-    perks: [],
-    modules: [],
-    tide: 0,
-    jumpsSinceTide: 0,
-    kills: 0,
-    nodes: 0,
-    fights: 0,
-    pockets: 0,
-    draftsSinceRare: 0,
-  };
-
+  const hullEntering: number[] = [];
   let position = START_NODE_ID;
   let posRow = 0;
-  const hullEntering: number[] = [];
 
-  const finish = (win: boolean, deathRow: number): SectorResult => ({
-    win,
-    deathRow,
-    nodes: state.nodes,
-    fights: state.fights,
-    kills: state.kills,
-    scrapEarned: state.scrapEarned,
-    scrapSpent: state.scrapSpent,
-    scrapUnspent: state.scrap,
-    hullMin: hullEntering.length > 0 ? Math.min(...hullEntering) : state.hull,
-    hullMedian: median(hullEntering.length > 0 ? hullEntering : [state.hull]),
-    resonanceSet: maxRealSchoolCount(state.deck) >= 4,
-    mkReached: maxMk(state.mkLevels),
-    pockets: state.pockets,
+  const route = (): RouteState => ({
+    hullPct: (state.hull / Math.max(1, state.hullMax)) * 100,
+    anomalyStreak: state.anomalyStreak,
+    scrap: state.scrap,
   });
 
-  while (position !== bossId) {
-    const hullPct = (state.hull / Math.max(1, state.hullMax)) * 100;
-    const next = greedyNext(map, byId, position, posRow, hullPct);
-    if (next === undefined) break;
+  const stop = (cleared: boolean, deathRow: number): WalkResult => ({
+    cleared,
+    deathRow,
+    rows: posRow,
+    hullEntering,
+  });
 
-    applyEdgeMotifsSim(state, 1, map, position, next.id, 3);
+  for (let guard = 0; guard < opts.guard; guard += 1) {
+    if (position === bossId) break;
+    const next = greedyNext(map, byId, position, posRow, route());
+    if (next === undefined) break;
+    applyEdgeMotifs(state, sector, map, position, next.id, opts.tideCap);
     position = next.id;
     posRow = next.row;
     if (next.pocket === true) state.pockets += 1;
-    applyNodeMotifsSim(state, 1, next, 3);
+    applyNodeMotifs(state, sector, next, opts.tideCap);
     state.jumpsSinceTide += 1;
     if (state.jumpsSinceTide >= 4) {
-      state.tide = Math.min(3, state.tide + 1);
+      state.tide = Math.min(opts.tideCap, state.tide + 1);
       state.jumpsSinceTide = 0;
     }
 
     const type = next.type;
-    if (
-      type === "battle" ||
-      type === "elite" ||
-      type === "miniboss" ||
-      type === "boss"
-    ) {
+    if (FIGHT_TYPES.has(type)) {
       hullEntering.push(state.hull);
-      const encStream = createStream(deriveSeed(seed, `enc:${next.id}`));
-      const enemyIds = buildEncounterIds(type, encStream, { seed });
+      const encStream = createStream(deriveSeed(seed, nsKey(ns, "enc", next.id)));
+      const enemyIds = buildEncounterIds(type, encStream, { sector, seed });
       const res = simulateBattle(
         enemyIds,
         state.deck,
-        deriveSeed(seed, `node:${next.id}`),
+        deriveSeed(seed, nsKey(ns, "node", next.id)),
         {
           hull: state.hull,
           hullMax: state.hullMax,
+          runScrap: state.scrap,
           tide: state.tide,
+          interference: state.interference,
           mkLevels: state.mkLevels,
           perks: state.perks,
-          sectorHpPct: sectorHpPct({ sector: 1, pocket: next.pocket === true }),
+          chartPicks: state.chartPicks,
+          modules: state.modules,
+          sectorHpPct: sectorHpPct({ sector, pocket: next.pocket === true }),
+          enemyHpBonusPct: opts.enemyHpBonusPct,
+          eliteShield: opts.eliteShield,
+          ascension: opts.ascension,
+          inverted: next.inverted === true,
+          nodeStorm: next.storm === true,
         },
       );
       state.hull = res.hullLeft;
       state.kills += res.kills;
-      if (!res.win) {
-        return finish(false, next.row);
-      }
+      if (!res.win) return stop(false, next.row);
       state.nodes += 1;
-      const loot = createStream(deriveSeed(seed, `loot:${next.id}`));
+      state.fights += 1;
+      const loot = createStream(deriveSeed(seed, nsKey(ns, "loot", next.id)));
       const reward = computeNodeReward(type, loot, 0, next.pocket === true);
-      const mods = computeRunMods(state.perks, [], state.modules);
-      gain(state, Math.round(reward.scrap * (1 + mods.scrapMultPct / 100)));
+      const mods = computeRunMods(state.perks, state.chartPicks, state.modules);
+      gain(
+        state,
+        Math.round(reward.scrap * opts.scrapMult * (1 + mods.scrapMultPct / 100)),
+      );
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
-      if (reward.dieDrop !== null) {
-        if (state.deck.length < DECK_CAP) state.deck.push(reward.dieDrop);
-        else gain(state, sellValue(ptsForDie(reward.dieDrop)));
-      }
-      if (isDraftNode(type)) {
-        const choices = rollPerkChoices(loot, simDraftContext(state, 1));
-        noteSimDraft(state, choices);
-        const pick = choices[0];
-        if (pick !== undefined) {
-          state.perks.push(pick);
-          const picked = computePerkMods([pick]);
-          if (picked.hullMaxDelta > 0) {
-            state.hullMax += picked.hullMaxDelta;
-            state.hull = Math.min(state.hullMax, state.hull + picked.hullMaxDelta);
-          }
+      if (reward.dieDrop !== null) takeDie(state, reward.dieDrop);
+      if (opts.rollModules && (type === "elite" || type === "miniboss")) {
+        const moduleId = rollModule(loot, state.modules, "common");
+        if (state.modules.length < moduleSlots(mods.moduleSlotDelta)) {
+          state.modules.push(moduleId);
         }
       }
-      if (type === "boss") {
-        return finish(true, -1);
+      if (isDraftNode(type) && opts.noDraft !== true) {
+        runDraft(state, sector, loot);
       }
+      if (type === "boss") return stop(true, -1);
+      if (opts.stopRow > 0 && posRow >= opts.stopRow) return stop(true, -1);
+    } else if (type === "anomaly") {
+      runAnomaly(state, sector, next, deriveSeed(seed, `anomaly:${ns}`));
+      state.nodes += 1;
+    } else if (type === "beacon") {
+      if (opts.noDraft !== true) {
+        runDraft(
+          state,
+          sector,
+          createStream(deriveSeed(seed, nsKey(ns, "beacon", next.id))),
+        );
+      }
+      state.nodes += 1;
     } else if (type === "shop") {
-      greedyShop(state, seed, next);
+      greedyShop(state, ns === "" ? seed : deriveSeed(seed, `shop:${ns}`), next);
       state.nodes += 1;
     } else if (type === "shipyard") {
       const forecast =
-        fightsUntilRest(map, byId, next.id, next.row) * EXPECTED_DMG_PER_FIGHT;
+        fightsUntilRest(map, byId, next.id, next.row, route()) *
+        EXPECTED_DMG_PER_FIGHT;
       greedyShipyard(state, forecast > state.hull * 0.6);
       state.nodes += 1;
     } else {
       state.nodes += 1;
     }
   }
+  return stop(position === bossId, -1);
+};
 
-  return finish(position === bossId, -1);
+const sectorResultOf = (
+  state: RunState,
+  walk: WalkResult,
+): SectorResult => ({
+  win: walk.cleared,
+  deathRow: walk.deathRow,
+  nodes: state.nodes,
+  fights: state.fights,
+  kills: state.kills,
+  scrapEarned: state.scrapEarned,
+  scrapSpent: state.scrapSpent,
+  scrapUnspent: state.scrap,
+  hullMin:
+    walk.hullEntering.length > 0 ? Math.min(...walk.hullEntering) : state.hull,
+  hullMedian: median(
+    walk.hullEntering.length > 0 ? walk.hullEntering : [state.hull],
+  ),
+  resonanceSet: maxRealSchoolCount(state.deck) >= 4,
+  mkReached: maxMk(state.mkLevels),
+  pockets: state.pockets,
+});
+
+const runSector = (seed: number): SectorResult => {
+  const state = createRunState({ hull: 30, hullMax: 30, deck: STARTER_DECK });
+  const walk = walkSector(state, {
+    sector: 1,
+    seed,
+    ns: "",
+    tideCap: 3,
+    scrapMult: 1,
+    ascension: 0,
+    enemyHpBonusPct: 0,
+    eliteShield: 0,
+    bossAsGate: false,
+    stopRow: 0,
+    rollModules: false,
+    guard: 64,
+  });
+  return sectorResultOf(state, walk);
 };
 
 // ── Drift mode ────────────────────────────────────────────────────────────────
@@ -798,104 +554,23 @@ const driftSector = (
   seed: number,
   sectorIndex: number,
 ): { cleared: boolean; rows: number } => {
-  const streams = createStreams(deriveSeed(seed, `map:${String(sectorIndex)}`));
   const sector = Math.min(SECTORS.length, sectorIndex);
-  const map: MapGraph = generateSectorMap(streams.map, sector, {
+  const walk = walkSector(state, {
+    sector,
+    seed,
+    ns: String(sectorIndex),
+    tideCap: DRIFT_TIDE_CAP,
+    scrapMult: SECTORS.find((s2) => s2.id === sector)?.scrapMult ?? 1,
+    ascension: 0,
+    enemyHpBonusPct:
+      DRIFT_LOOP_HP_PCT * Math.max(0, sectorIndex - SECTORS.length),
+    eliteShield: 0,
     bossAsGate: true,
+    stopRow: sectorDepth(sectorIndex),
+    rollModules: false,
+    guard: 64,
   });
-  const byId = nodeById(map);
-  const loopHpPct = DRIFT_LOOP_HP_PCT * Math.max(0, sectorIndex - SECTORS.length);
-
-  let position = START_NODE_ID;
-  let posRow = 0;
-
-  for (let guard = 0; guard < 64; guard += 1) {
-    const hullPct = (state.hull / Math.max(1, state.hullMax)) * 100;
-    const next = greedyNext(map, byId, position, posRow, hullPct);
-    if (next === undefined) return { cleared: false, rows: posRow };
-    applyEdgeMotifsSim(state, sector, map, position, next.id, DRIFT_TIDE_CAP);
-    position = next.id;
-    posRow = next.row;
-    if (next.pocket === true) state.pockets += 1;
-    applyNodeMotifsSim(state, sector, next, DRIFT_TIDE_CAP);
-    state.jumpsSinceTide += 1;
-    if (state.jumpsSinceTide >= 4) {
-      state.tide = Math.min(DRIFT_TIDE_CAP, state.tide + 1);
-      state.jumpsSinceTide = 0;
-    }
-
-    const type = next.type;
-    if (FIGHT_TYPES.has(type)) {
-      const encStream = createStream(
-        deriveSeed(seed, `enc:${String(sectorIndex)}:${next.id}`),
-      );
-      const enemyIds = buildEncounterIds(type, encStream, { sector, seed });
-      const res = simulateBattle(
-        enemyIds,
-        state.deck,
-        deriveSeed(seed, `node:${String(sectorIndex)}:${next.id}`),
-        {
-          hull: state.hull,
-          hullMax: state.hullMax,
-          tide: state.tide,
-          mkLevels: state.mkLevels,
-          perks: state.perks,
-          sectorHpPct: sectorHpPct({ sector, pocket: next.pocket === true }),
-          enemyHpBonusPct: loopHpPct,
-        },
-      );
-      state.hull = res.hullLeft;
-      state.kills += res.kills;
-      if (!res.win) return { cleared: false, rows: posRow };
-      state.nodes += 1;
-      const loot = createStream(
-        deriveSeed(seed, `loot:${String(sectorIndex)}:${next.id}`),
-      );
-      const reward = computeNodeReward(type, loot, 0, next.pocket === true);
-      const mods = computePerkMods(state.perks);
-      gain(
-        state,
-        Math.round(
-          reward.scrap *
-            (SECTORS.find((s) => s.id === sector)?.scrapMult ?? 1) *
-            (1 + mods.scrapMultPct / 100),
-        ),
-      );
-      state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
-      if (reward.dieDrop !== null) {
-        if (state.deck.length < DECK_CAP) state.deck.push(reward.dieDrop);
-        else gain(state, sellValue(ptsForDie(reward.dieDrop)));
-      }
-      if (isDraftNode(type)) {
-        const choices = rollPerkChoices(loot, simDraftContext(state, sector));
-        noteSimDraft(state, choices);
-        const pick = choices[0];
-        if (pick !== undefined) {
-          state.perks.push(pick);
-          const picked = computePerkMods([pick]);
-          if (picked.hullMaxDelta > 0) {
-            state.hullMax += picked.hullMaxDelta;
-            state.hull = Math.min(
-              state.hullMax,
-              state.hull + picked.hullMaxDelta,
-            );
-          }
-        }
-      }
-      if (posRow >= sectorDepth(sectorIndex)) return { cleared: true, rows: posRow };
-    } else if (type === "shop") {
-      greedyShop(state, deriveSeed(seed, `shop:${String(sectorIndex)}`), next);
-      state.nodes += 1;
-    } else if (type === "shipyard") {
-      const forecast =
-        fightsUntilRest(map, byId, next.id, next.row) * EXPECTED_DMG_PER_FIGHT;
-      greedyShipyard(state, forecast > state.hull * 0.6);
-      state.nodes += 1;
-    } else {
-      state.nodes += 1;
-    }
-  }
-  return { cleared: false, rows: posRow };
+  return { cleared: walk.cleared, rows: walk.rows };
 };
 
 // The starter deck dies in sector 1 (same as `--mode run`), so the loop scaling is
@@ -921,24 +596,12 @@ const DRIFT_MID_MK: MkLevels = {
 };
 
 const runDrift = (seed: number, mid: boolean): DriftResult => {
-  const state: RunState = {
+  const state = createRunState({
     hull: 30,
     hullMax: 30,
-    scrap: 0,
-    scrapEarned: 0,
-    scrapSpent: 0,
-    deck: mid ? [...DRIFT_MID_DECK] : [...STARTER_DECK],
+    deck: mid ? DRIFT_MID_DECK : STARTER_DECK,
     mkLevels: mid ? { ...DRIFT_MID_MK } : {},
-    perks: [],
-    modules: [],
-    tide: 0,
-    jumpsSinceTide: 0,
-    kills: 0,
-    nodes: 0,
-    fights: 0,
-    pockets: 0,
-    draftsSinceRare: 0,
-  };
+  });
 
   let sectorIndex = 1;
   let depth = 0;
@@ -1152,7 +815,6 @@ const battleModeMain = (
     process.exit(1);
   }
   const deck = STARTER_DECK;
-  void DIE_BY_ID;
 
   const encounters = enemyArg
     .split(";")
@@ -1422,6 +1084,10 @@ interface SweepOptions {
   ascension: number;
   archetype: Archetype;
   forcedPerk?: string;
+  // The dead-perk harness compares «exactly this perk» against «no perk», so
+  // both arms have to refuse the draft. Letting the baseline arm draft six perks
+  // measured the draft, not the card.
+  noDraft?: boolean;
   // The deep mode measures the ship a sector-6 entrant actually flies, which is
   // not the ship the sector sweep gives every act: five cleared sectors of
   // drafts, upgrades and loot ride into «За Ядром» with the captain.
@@ -1430,161 +1096,67 @@ interface SweepOptions {
   mkLevels?: MkLevels;
 }
 
-const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
-  const streams = createStreams(seed);
-  const map: MapGraph = generateSectorMap(streams.map, opts.sector);
-  const bossId = bossNodeIdFor(opts.sector);
-  const byId = nodeById(map);
+const sweepState = (opts: SweepOptions): RunState => {
   const aMods = ascensionMods(opts.ascension);
+  const carried =
+    opts.forcedPerk !== undefined ? [opts.forcedPerk] : [...(opts.perks ?? [])];
+  // A perk handed to the profile at construction never went through `takePerk`,
+  // so its `hullMaxDelta` was silently dropped and every hull perk read as a
+  // perk with no body.
   const hullMax = Math.max(
     1,
-    Math.round(shipHullMax("wanderer") * (1 + aMods.hullPct / 100)),
+    Math.round(shipHullMax("wanderer") * (1 + aMods.hullPct / 100)) +
+      computePerkMods(carried).hullMaxDelta,
   );
-  const state: RunState = {
+  return createRunState({
     hull: hullMax,
     hullMax,
-    scrap: 0,
-    scrapEarned: 0,
-    scrapSpent: 0,
     deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(0, DECK_CAP),
     mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
-    perks:
-      opts.forcedPerk !== undefined
-        ? [opts.forcedPerk]
-        : [...(opts.perks ?? [])],
+    perks: carried,
     modules: [...opts.archetype.modules],
-    tide: 0,
-    jumpsSinceTide: 0,
-    kills: 0,
-    nodes: 0,
-    fights: 0,
-    pockets: 0,
-    draftsSinceRare: 0,
-  };
-
-  let position = START_NODE_ID;
-  let posRow = 0;
-  const hullEntering: number[] = [];
-  const tideCap =
-    (SECTORS.find((sd) => sd.id === opts.sector)?.tideCap ?? 3) +
-    aMods.tideCapDelta;
-
-  const finish = (win: boolean, deathRow: number): SectorResult => ({
-    win,
-    deathRow,
-    nodes: state.nodes,
-    fights: state.fights,
-    kills: state.kills,
-    scrapEarned: state.scrapEarned,
-    scrapSpent: state.scrapSpent,
-    scrapUnspent: state.scrap,
-    hullMin: hullEntering.length > 0 ? Math.min(...hullEntering) : state.hull,
-    hullMedian: median(hullEntering.length > 0 ? hullEntering : [state.hull]),
-    resonanceSet: maxRealSchoolCount(state.deck) >= 4,
-    mkReached: maxMk(state.mkLevels),
-    pockets: state.pockets,
   });
-
-  while (position !== bossId) {
-    const hullPct = (state.hull / Math.max(1, state.hullMax)) * 100;
-    const next = greedyNext(map, byId, position, posRow, hullPct);
-    if (next === undefined) break;
-    applyEdgeMotifsSim(state, opts.sector, map, position, next.id, tideCap);
-    position = next.id;
-    posRow = next.row;
-    if (next.pocket === true) state.pockets += 1;
-    applyNodeMotifsSim(state, opts.sector, next, tideCap);
-    state.jumpsSinceTide += 1;
-    if (state.jumpsSinceTide >= 4) {
-      state.tide = Math.min(tideCap, state.tide + 1);
-      state.jumpsSinceTide = 0;
-    }
-
-    const type = next.type;
-    if (FIGHT_TYPES.has(type)) {
-      hullEntering.push(state.hull);
-      const encStream = createStream(deriveSeed(seed, `enc:${next.id}`));
-      const enemyIds = buildEncounterIds(type, encStream, {
-        sector: opts.sector,
-        seed,
-      });
-      const res = simulateBattle(
-        enemyIds,
-        state.deck,
-        deriveSeed(seed, `node:${next.id}`),
-        {
-          hull: state.hull,
-          hullMax: state.hullMax,
-          tide: state.tide,
-          mkLevels: state.mkLevels,
-          perks: state.perks,
-          modules: state.modules,
-          sectorHpPct: sectorHpPct({
-            sector: opts.sector,
-            pocket: next.pocket === true,
-          }),
-          enemyHpBonusPct: aMods.enemyHpPct,
-          eliteShield: aMods.eliteShield,
-          ascension: opts.ascension,
-          inverted: next.inverted === true,
-          nodeStorm: next.storm === true,
-        },
-      );
-      state.hull = res.hullLeft;
-      state.kills += res.kills;
-      if (!res.win) return finish(false, next.row);
-      state.nodes += 1;
-      state.fights += 1;
-      const loot = createStream(deriveSeed(seed, `loot:${next.id}`));
-      const reward = computeNodeReward(type, loot, 0, next.pocket === true);
-      const mods = computeRunMods(state.perks, [], state.modules);
-      const sectorMult =
-        SECTORS.find((sd) => sd.id === opts.sector)?.scrapMult ?? 1;
-      gain(
-        state,
-        Math.round(reward.scrap * sectorMult * (1 + mods.scrapMultPct / 100)),
-      );
-      state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
-      if (reward.dieDrop !== null && state.deck.length < DECK_CAP) {
-        state.deck.push(reward.dieDrop);
-      }
-      if (type === "elite" || type === "miniboss") {
-        const moduleId = rollModule(loot, state.modules, "common");
-        if (state.modules.length < moduleSlots(0)) state.modules.push(moduleId);
-      }
-      if (isDraftNode(type) && opts.forcedPerk === undefined) {
-        const draftChoices = rollPerkChoices(
-          loot,
-          simDraftContext(state, opts.sector),
-        );
-        noteSimDraft(state, draftChoices);
-        const pick = draftChoices[0];
-        if (pick !== undefined) {
-          state.perks.push(pick);
-          const picked = computePerkMods([pick]);
-          if (picked.hullMaxDelta > 0) {
-            state.hullMax += picked.hullMaxDelta;
-            state.hull = Math.min(state.hullMax, state.hull + picked.hullMaxDelta);
-          }
-        }
-      }
-      if (type === "boss") return finish(true, -1);
-    } else if (type === "shop") {
-      greedyShop(state, seed, next);
-      state.nodes += 1;
-    } else if (type === "shipyard") {
-      const forecast =
-        fightsUntilRest(map, byId, next.id, next.row) * EXPECTED_DMG_PER_FIGHT;
-      greedyShipyard(state, forecast > state.hull * 0.6);
-      state.nodes += 1;
-    } else {
-      state.nodes += 1;
-    }
-  }
-  return finish(position === bossId, -1);
 };
 
+const sweepWalkOptions = (opts: SweepOptions): WalkOptions => {
+  const aMods = ascensionMods(opts.ascension);
+  return {
+    sector: opts.sector,
+    seed: 0,
+    ns: "",
+    tideCap:
+      (SECTORS.find((sd) => sd.id === opts.sector)?.tideCap ?? 3) +
+      aMods.tideCapDelta,
+    scrapMult: SECTORS.find((sd) => sd.id === opts.sector)?.scrapMult ?? 1,
+    ascension: opts.ascension,
+    enemyHpBonusPct: aMods.enemyHpPct,
+    eliteShield: aMods.eliteShield,
+    bossAsGate: false,
+    stopRow: 0,
+    rollModules: true,
+    guard: 64,
+    noDraft: opts.noDraft === true,
+  };
+};
+
+const runSweepSectorWithState = (
+  seed: number,
+  opts: SweepOptions,
+): { result: SectorResult; state: RunState } => {
+  const state = sweepState(opts);
+  const walk = walkSector(state, { ...sweepWalkOptions(opts), seed });
+  return { result: sectorResultOf(state, walk), state };
+};
+
+const runSweepSector = (seed: number, opts: SweepOptions): SectorResult =>
+  runSweepSectorWithState(seed, opts).result;
+
 const SWEEP_ASCENSIONS: readonly number[] = [0, 3, 6];
+
+// The DoD band lives here rather than on the campaign's conditional clear rate:
+// the sweep flies one loadout through every act, so it is the only read that
+// isolates the sector from the build that arrives in it.
+const LADDER_GAP_PP = 18;
 
 const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
   const rows: string[] = [
@@ -1593,6 +1165,7 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
   console.log(
     `sim sweep: ${String(SECTORS.length)} sectors x ${String(SWEEP_ASCENSIONS.length)} ascensions x ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
   );
+  const ladder = new Map<number, number[]>();
   for (const sector of SECTORS.map((def) => def.id)) {
     for (const ascension of SWEEP_ASCENSIONS) {
       for (const archetype of ARCHETYPES) {
@@ -1602,7 +1175,7 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
             runSweepSector(
               deriveSeed(
                 seed,
-                `sweep:${String(sector)}:${String(ascension)}:${archetype.name}:${String(i)}`,
+                `sweep:${String(sector)}:${archetype.name}:${String(i)}`,
               ),
               { sector, ascension, archetype },
             ),
@@ -1612,6 +1185,11 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
         const avg = (f: (r: SectorResult) => number): number =>
           results.reduce((sum, r) => sum + f(r), 0) / n;
         const winrate = results.filter((r) => r.win).length / n;
+        if (ascension === 0 && archetype.name !== "black-edge") {
+          const cell = ladder.get(sector) ?? [];
+          cell.push(winrate);
+          ladder.set(sector, cell);
+        }
         rows.push(
           [
             String(sector),
@@ -1634,16 +1212,65 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
       }
     }
   }
+  console.log(
+    "\nsim sweep: intrinsic difficulty ladder (A0, red+blue — one loadout, every act)",
+  );
+  rows.push("");
+  rows.push("sector,a0Winrate,gapToPreviousPp,verdict");
+  let cliffs = 0;
+  let rises = 0;
+  let previous: number | null = null;
+  for (const sector of SECTORS.map((def) => def.id)) {
+    const cell = ladder.get(sector) ?? [];
+    const mean = cell.reduce((sum, v) => sum + v, 0) / Math.max(1, cell.length);
+    const gap = previous === null ? 0 : (mean - previous) * 100;
+    const cliff = previous !== null && Math.abs(gap) > LADDER_GAP_PP;
+    const rise = previous !== null && gap > 0;
+    if (cliff) cliffs += 1;
+    if (rise) rises += 1;
+    console.log(
+      `  S${String(sector)} ${(mean * 100).toFixed(1).padStart(6)}%${previous === null ? "" : `  gap ${gap >= 0 ? "+" : ""}${gap.toFixed(1)}pp${cliff ? " — CLIFF" : ""}${rise ? " — EASIER THAN THE ACT BEFORE" : ""}`}`,
+    );
+    rows.push(
+      `${String(sector)},${mean.toFixed(3)},${gap.toFixed(1)},${cliff ? "CLIFF" : rise ? "RISE" : "ok"}`,
+    );
+    previous = mean;
+  }
+  console.log(
+    `  ${String(cliffs)} gap(s) over ${String(LADDER_GAP_PP)}pp · ${String(rises)} act(s) easier than the one before`,
+  );
+
   const outDir = join(process.cwd(), "sim-out");
   mkdirSync(outDir, { recursive: true });
   const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
   const outPath = join(outDir, `sweep-${stamp}.csv`);
   writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (cliffs > 0 || rises > 0) process.exitCode = 1;
 };
 
 // Dead-perk report: every perk is force-picked for a fixed run budget and its
-// winrate compared with the no-perk baseline on the same seeds.
+// winrate compared with the no-perk baseline on the same seeds. R11 adds the
+// tag axis: a perk that carries a synergy tag the loadout never mentions is a
+// different failure from a perk whose numbers are small, and only the tag roll
+// up separates them.
+// The dead line is two standard errors of a winrate difference at the default
+// run budget, so a flagged perk is a measurement rather than a coin flip: at 200
+// runs SE(delta) is about 4.2 pp, so 8 pp is the smallest honest claim.
+const DEAD_PERK_LINE = -8;
+// «Dominant at equal offer» is a pick-rate claim, not a winrate one: a perk is
+// dominant when the draft policy takes it out of a three-card offer of its own
+// rarity more often than this. Comparing a forced winrate against an absolute
+// 60 % line measured the sector, not the perk — the S2 baseline alone sits at
+// 77 % — and offering a rare beside two commons only measures the rarity ladder,
+// which is doing its job. The rate is averaged over all three archetypes for the
+// same reason: a red perk that a red build always takes is the draft working,
+// not a dominant card. What this flags is the perk every build takes anyway.
+const DOMINANT_PICK_PCT = 60;
+const PICK_TRIALS = 120;
+// Two standard errors of a winrate difference at the documented run budget.
+const DOMINANT_EDGE_PP = 8;
+
 const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
   const archetype = ARCHETYPES[0];
   if (archetype === undefined) return;
@@ -1653,33 +1280,84 @@ const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
     for (let i = 0; i < runs; i += 1) {
       const res = runSweepSector(
         deriveSeed(seed, `perk:${String(sector)}:${String(i)}`),
-        { sector, ascension: 0, archetype, forcedPerk },
+        { sector, ascension: 0, archetype, forcedPerk, noDraft: true },
       );
       if (res.win) wins += 1;
     }
     return wins / Math.max(1, runs);
   };
 
+  const pickBudget = { scrap: 0, sector, banishLeft: 0, rerollLeft: 0 };
+  const pickStream = createStream(deriveSeed(seed, "pickRate"));
+  const pickRates = new Map<string, number>();
+  for (const perk of ALL_PERKS) {
+    const peers = ALL_PERKS.filter(
+      (d) => d.id !== perk.id && d.rarity === perk.rarity,
+    ).map((d) => d.id);
+    let taken = 0;
+    let trials = 0;
+    for (const build of ARCHETYPES) {
+      const pickLoadout = {
+        deckDefIds: build.deck,
+        perks: [] as string[],
+        modules: build.modules,
+      };
+      for (let i = 0; i < PICK_TRIALS; i += 1) {
+        const others = pickStream.shuffle(peers).slice(0, PERK_DRAFT_SIZE - 1);
+        const offer = pickStream.shuffle([perk.id, ...others]);
+        trials += 1;
+        if (
+          decideDraft(offer, pickLoadout, pickBudget, schoolOf).pick === perk.id
+        ) {
+          taken += 1;
+        }
+      }
+    }
+    pickRates.set(perk.id, taken / Math.max(1, trials));
+  }
   const base = baseline();
-  const rows: string[] = ["perk,pool,rarity,winrate,baseline,delta_pct"];
-  const deltas: { id: string; delta: number }[] = [];
+  const rows: string[] = [
+    "perk,pool,rarity,tags,synergy,winrate,baseline,delta_pct,pickRate",
+  ];
+  const deltas: { id: string; delta: number; winrate: number }[] = [];
+  const byTag = new Map<string, { n: number; total: number }>();
+  const bumpTag = (tag: string, delta: number): void => {
+    const cell = byTag.get(tag) ?? { n: 0, total: 0 };
+    cell.n += 1;
+    cell.total += delta;
+    byTag.set(tag, cell);
+  };
   for (const perk of ALL_PERKS) {
     const wr = baseline(perk.id);
     const delta = (wr - base) * 100;
-    deltas.push({ id: perk.id, delta });
+    deltas.push({ id: perk.id, delta, winrate: wr });
+    for (const tag of perk.tags ?? []) bumpTag(tag, delta);
+    for (const tag of perk.synergy ?? []) bumpTag(`synergy:${tag}`, delta);
     rows.push(
       [
         perk.id,
         perk.pool,
         perk.rarity,
+        (perk.tags ?? []).join("|"),
+        (perk.synergy ?? []).join("|"),
         wr.toFixed(3),
         base.toFixed(3),
         delta.toFixed(1),
+        (pickRates.get(perk.id) ?? 0).toFixed(3),
       ].join(","),
     );
   }
   deltas.sort((a, b) => a.delta - b.delta);
-  const dead = deltas.filter((d) => d.delta < -3);
+  const dead = deltas.filter((d) => d.delta < DEAD_PERK_LINE);
+  // Both halves have to agree before a card is called dominant: a high pick rate
+  // alone only reports what the draft policy likes, and a high winrate alone only
+  // reports what one forced run budget did. The intersection is the card every
+  // build takes and that measurably wins.
+  const dominant = deltas
+    .map((d) => ({ ...d, pickRate: pickRates.get(d.id) ?? 0 }))
+    .filter(
+      (d) => d.pickRate * 100 > DOMINANT_PICK_PCT && d.delta > DOMINANT_EDGE_PP,
+    );
   console.log(
     `sim perks: baseline ${(base * 100).toFixed(1)}% over ${String(runs)} runs on S${String(sector)}`,
   );
@@ -1691,15 +1369,45 @@ const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
   );
   console.log(
     dead.length === 0
-      ? "  no perk below the -3% dead-weight line"
-      : `  BELOW -3%: ${dead.map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
+      ? `  no perk below the ${String(DEAD_PERK_LINE)}% dead-weight line`
+      : `  BELOW ${String(DEAD_PERK_LINE)}%: ${dead.map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
   );
+  console.log(
+    dominant.length === 0
+      ? `  no perk is picked from an equal offer more than ${String(DOMINANT_PICK_PCT)}% of the time`
+      : `  DOMINANT (>${String(DOMINANT_PICK_PCT)}% pick rate at equal offer): ${dominant.map((d) => `${d.id} ${(d.pickRate * 100).toFixed(1)}%`).join(" · ")}`,
+  );
+
+  const tagRows = [...byTag.entries()]
+    .map(([tag, cell]) => ({ tag, n: cell.n, mean: cell.total / cell.n }))
+    .filter((row) => row.n >= 3)
+    .sort((a, b) => a.mean - b.mean);
+  console.log(`  tag roll-up (${String(tagRows.length)} tags with n>=3):`);
+  for (const row of tagRows.slice(0, 6)) {
+    console.log(
+      `    ${row.tag.padEnd(20)} n=${String(row.n).padStart(3)}  ${row.mean.toFixed(2).padStart(6)}pp`,
+    );
+  }
+  console.log("    …");
+  for (const row of tagRows.slice(-6).reverse()) {
+    console.log(
+      `    ${row.tag.padEnd(20)} n=${String(row.n).padStart(3)}  ${row.mean.toFixed(2).padStart(6)}pp`,
+    );
+  }
+  rows.push("");
+  rows.push("tag,perks,mean_delta_pct");
+  for (const row of tagRows) {
+    rows.push(`${row.tag},${String(row.n)},${row.mean.toFixed(2)}`);
+  }
+
   const outDir = join(process.cwd(), "sim-out");
   mkdirSync(outDir, { recursive: true });
   const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
   const outPath = join(outDir, `perks-${stamp}.csv`);
   writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
-  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  console.log(
+    `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(dead.length)} dead, ${String(dominant.length)} dominant`,
+  );
 };
 
 // Economy pass (Phase-10 Task 10). DESIGN §9.3 prices every node type; the
@@ -1731,6 +1439,13 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   const rows: string[] = [
     "sector,deck,runs,clears,medianEarnedPerFight,medianEarned,basis,medianSpent,spendShare,verdict",
   ];
+  const sectorSinks: {
+    sector: number;
+    deck: string;
+    sinks: Record<string, number>;
+    pockets: number;
+    skips: number;
+  }[] = [];
   let failures = 0;
   for (const sector of [1, 3, 5, 6]) {
     const def = SECTORS.find((sd) => sd.id === sector);
@@ -1740,15 +1455,30 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       const perNode: number[] = [];
       const clearedEarned: number[] = [];
       const spent: number[] = [];
+      const sinks = emptySinks();
+      let pockets = 0;
+      let skipIncome = 0;
       for (let i = 0; i < runs; i += 1) {
-        const r = runSweepSector(
+        const { result: r, state } = runSweepSectorWithState(
           deriveSeed(seed, `eco:${String(sector)}:${archetype.name}:${String(i)}`),
           { sector, ascension: 0, archetype },
         );
         spent.push(r.scrapSpent);
         if (r.win) clearedEarned.push(r.scrapEarned);
         if (r.fights > 0) perNode.push(r.scrapEarned / r.fights);
+        pockets += r.pockets;
+        skipIncome += state.draftSkips;
+        for (const key of Object.keys(sinks)) {
+          sinks[key] = (sinks[key] ?? 0) + (state.sinks[key] ?? 0);
+        }
       }
+      sectorSinks.push({
+        sector,
+        deck: archetype.name,
+        sinks,
+        pockets: pockets / Math.max(1, runs),
+        skips: skipIncome / Math.max(1, runs),
+      });
       const mEarnedPerNode = median(perNode);
       const clears = clearedEarned.length;
       const projected = clears >= ECONOMY_MIN_CLEARS;
@@ -1785,6 +1515,25 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       );
     }
   }
+  const sinkKeys = Object.keys(emptySinks());
+  console.log("\nsim economy: sink table (mean scrap per run)");
+  console.log(
+    `  sector deck        ${sinkKeys.map((k) => k.padStart(13)).join("")}  pockets  skips`,
+  );
+  rows.push("");
+  rows.push(`sector,deck,${sinkKeys.join(",")},pockets,draftSkips`);
+  for (const row of sectorSinks) {
+    const cells = sinkKeys.map((key) =>
+      ((row.sinks[key] ?? 0) / Math.max(1, runs)).toFixed(1),
+    );
+    console.log(
+      `  S${String(row.sector)}     ${row.deck.padEnd(11)} ${cells.map((c) => c.padStart(13)).join("")}  ${row.pockets.toFixed(2).padStart(7)}  ${row.skips.toFixed(2).padStart(5)}`,
+    );
+    rows.push(
+      `${String(row.sector)},${row.deck},${cells.join(",")},${row.pockets.toFixed(2)},${row.skips.toFixed(2)}`,
+    );
+  }
+
   const outDir = join(process.cwd(), "sim-out");
   mkdirSync(outDir, { recursive: true });
   const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
@@ -1797,7 +1546,488 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   }
 };
 
-// ── Deep mode (R9 Task 5) ───────────────────────────────────────────────────
+/// ── Dice mode (R11) ─────────────────────────────────────────────────────────
+//
+// The dead-die question is not the dead-perk question. A perk is added to a
+// loadout; a die *replaces* one, because the deck is capped. So the harness
+// swaps each die into the archetype's worst slot and compares against the same
+// archetype with no swap, on the same seeds and with the draft refused in both
+// arms — the same fairness the perk harness needed.
+const DEAD_DIE_LINE = -8;
+
+const diceModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const archetype = ARCHETYPES[0];
+  if (archetype === undefined) return;
+  const sector = Number(getArg("sector", "2"));
+  const winrateWith = (swapIn?: string): number => {
+    let wins = 0;
+    for (let i = 0; i < runs; i += 1) {
+      const deck = [...archetype.deck];
+      if (swapIn !== undefined) deck[deck.length - 1] = swapIn;
+      const res = runSweepSector(
+        deriveSeed(seed, `die:${String(sector)}:${String(i)}`),
+        {
+          sector,
+          ascension: 0,
+          archetype: { ...archetype, deck },
+          noDraft: true,
+        },
+      );
+      if (res.win) wins += 1;
+    }
+    return wins / Math.max(1, runs);
+  };
+
+  const base = winrateWith();
+  const rows: string[] = [
+    "die,school,rarity,tier,pts,winrate,baseline,delta_pct,verdict",
+  ];
+  const deltas: { id: string; delta: number }[] = [];
+  for (const die of ALL_DICE) {
+    const wr = winrateWith(die.id);
+    const delta = (wr - base) * 100;
+    deltas.push({ id: die.id, delta });
+    rows.push(
+      [
+        die.id,
+        die.school,
+        die.rarity,
+        String(die.tier),
+        String(die.pts),
+        wr.toFixed(3),
+        base.toFixed(3),
+        delta.toFixed(1),
+        delta < DEAD_DIE_LINE ? "DEAD" : "ok",
+      ].join(","),
+    );
+  }
+  deltas.sort((a, b) => a.delta - b.delta);
+  const dead = deltas.filter((d) => d.delta < DEAD_DIE_LINE);
+  console.log(
+    `sim dice: baseline ${(base * 100).toFixed(1)}% over ${String(runs)} runs on S${String(sector)}, one slot swapped`,
+  );
+  console.log(
+    `  worst five: ${deltas.slice(0, 5).map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
+  );
+  console.log(
+    `  best five: ${deltas.slice(-5).reverse().map((d) => `${d.id} +${d.delta.toFixed(1)}%`).join(" · ")}`,
+  );
+  console.log(
+    dead.length === 0
+      ? `  no die below the ${String(DEAD_DIE_LINE)}% dead-weight line`
+      : `  BELOW ${String(DEAD_DIE_LINE)}%: ${dead.map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
+  );
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `dice-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(
+    `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(dead.length)} dead of ${String(ALL_DICE.length)}`,
+  );
+};
+
+// ── Campaign mode (R11) ─────────────────────────────────────────────────────
+//
+// The A0 campaign band is a claim about a chained five-act run: hull, deck,
+// perks, modules, Mk and purse cross every sector boundary, and only the tide
+// and the jump counter reset. `sweep` re-issues a mid-collection loadout per
+// sector, so the product of its columns is not this number.
+
+interface CampaignResult {
+  cleared: boolean;
+  sectorsCleared: number;
+  deathSector: number;
+  deathRow: number;
+  nodes: number;
+  kills: number;
+  scrapEarned: number;
+  scrapSpent: number;
+  hullEnd: number;
+  perks: number;
+  mk: number;
+  puzzleByTier: Record<number, PuzzleTally>;
+  sinks: Record<string, number>;
+  draftSkips: number;
+  draftRerolls: number;
+  interference: number;
+}
+
+const CAMPAIGN_SECTORS = 5;
+
+// A mid-collection captain is a deck *and* a chart. Sitting on zero picks read
+// the campaign as a level-1 profile flying level-25 content.
+const MID_COLLECTION_PICKS: readonly string[] = buildChartPicks(
+  MID_COLLECTION_LEVEL,
+);
+
+const runCampaign = (
+  seed: number,
+  archetype: Archetype,
+  ascension: number,
+): CampaignResult => {
+  const aMods = ascensionMods(ascension);
+  const hullMax = Math.max(
+    1,
+    Math.round(shipHullMax("wanderer") * (1 + aMods.hullPct / 100)),
+  );
+  const state = createRunState({
+    hull: hullMax,
+    hullMax,
+    deck: archetype.deck,
+    chartPicks: MID_COLLECTION_PICKS,
+  });
+  let cleared = 0;
+  let deathSector = 0;
+  let deathRow = -1;
+  for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
+    state.tide = 0;
+    state.jumpsSinceTide = 0;
+    const walk = walkSector(state, {
+      sector,
+      seed,
+      ns: String(sector),
+      tideCap:
+        (SECTORS.find((sd) => sd.id === sector)?.tideCap ?? 3) +
+        aMods.tideCapDelta,
+      scrapMult: SECTORS.find((sd) => sd.id === sector)?.scrapMult ?? 1,
+      ascension,
+      enemyHpBonusPct: aMods.enemyHpPct,
+      eliteShield: aMods.eliteShield,
+      bossAsGate: false,
+      stopRow: 0,
+      rollModules: true,
+      guard: 64,
+    });
+    if (!walk.cleared) {
+      deathSector = sector;
+      deathRow = walk.deathRow;
+      break;
+    }
+    cleared += 1;
+  }
+  return {
+    cleared: cleared === CAMPAIGN_SECTORS,
+    sectorsCleared: cleared,
+    deathSector,
+    deathRow,
+    nodes: state.nodes,
+    kills: state.kills,
+    scrapEarned: state.scrapEarned,
+    scrapSpent: state.scrapSpent,
+    hullEnd: state.hull,
+    perks: state.perks.length,
+    mk: maxMk(state.mkLevels),
+    puzzleByTier: state.puzzleByTier,
+    sinks: state.sinks,
+    draftSkips: state.draftSkips,
+    draftRerolls: state.draftRerolls,
+    interference: state.interference,
+  };
+};
+
+const CAMPAIGN_BAND: readonly [number, number] = [0.55, 0.65];
+const MONOTONIC_GAP_PP = 18;
+
+const mergeTallies = (
+  into: Record<number, PuzzleTally>,
+  from: Record<number, PuzzleTally>,
+): void => {
+  for (const tier of [1, 2, 3, 4, 5]) {
+    const target = into[tier];
+    const source = from[tier];
+    if (target === undefined || source === undefined) continue;
+    target.entered += source.entered;
+    target.solved += source.solved;
+    target.attempts += source.attempts;
+    target.paid += source.paid;
+  }
+};
+
+const mergeSinks = (
+  into: Record<string, number>,
+  from: Record<string, number>,
+): void => {
+  for (const [key, value] of Object.entries(from)) {
+    into[key] = (into[key] ?? 0) + value;
+  }
+};
+
+interface CampaignRoll {
+  archetype: string;
+  ascension: number;
+  runs: number;
+  winrate: number;
+  avgSectors: number;
+  avgNodes: number;
+  avgEarned: number;
+  avgSpent: number;
+  deathHist: Map<number, number>;
+}
+
+const campaignRoll = (
+  runs: number,
+  seed: number,
+  archetype: Archetype,
+  ascension: number,
+): { roll: CampaignRoll; results: CampaignResult[] } => {
+  const results: CampaignResult[] = [];
+  for (let i = 0; i < runs; i += 1) {
+    results.push(
+      runCampaign(
+        deriveSeed(seed, `campaign:${archetype.name}:${String(i)}`),
+        archetype,
+        ascension,
+      ),
+    );
+  }
+  const n = Math.max(1, results.length);
+  const avg = (f: (r: CampaignResult) => number): number =>
+    results.reduce((sum, r) => sum + f(r), 0) / n;
+  const deathHist = new Map<number, number>();
+  for (const r of results) {
+    if (r.cleared) continue;
+    deathHist.set(r.deathSector, (deathHist.get(r.deathSector) ?? 0) + 1);
+  }
+  return {
+    roll: {
+      archetype: archetype.name,
+      ascension,
+      runs: results.length,
+      winrate: results.filter((r) => r.cleared).length / n,
+      avgSectors: avg((r) => r.sectorsCleared),
+      avgNodes: avg((r) => r.nodes),
+      avgEarned: avg((r) => r.scrapEarned),
+      avgSpent: avg((r) => r.scrapSpent),
+      deathHist,
+    },
+    results,
+  };
+};
+
+const campaignModeMain = (
+  runs: number,
+  seed: number,
+  startedAt: number,
+): void => {
+  const rows: string[] = [
+    "deck,ascension,runs,winrate,avgSectorsCleared,avgNodes,avgScrapEarned,avgScrapSpent,verdict",
+  ];
+  console.log(
+    `sim campaign: S1-S5 chained, ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
+  );
+  const tallies = emptyPuzzleTally();
+  const sinks = emptySinks();
+  let skips = 0;
+  let rerolls = 0;
+  let outOfBand = 0;
+  const a0: number[] = [];
+  const a0Runs: CampaignResult[] = [];
+  for (const ascension of [0, 3]) {
+    for (const archetype of ARCHETYPES) {
+      const { roll, results } = campaignRoll(runs, seed, archetype, ascension);
+      if (ascension === 0) {
+        for (const r of results) {
+          mergeTallies(tallies, r.puzzleByTier);
+          mergeSinks(sinks, r.sinks);
+          skips += r.draftSkips;
+          rerolls += r.draftRerolls;
+        }
+        if (archetype.name !== "black-edge") {
+          a0.push(roll.winrate);
+          a0Runs.push(...results);
+        }
+      }
+      const banded =
+        ascension === 0 && archetype.name !== "black-edge"
+          ? roll.winrate >= CAMPAIGN_BAND[0] && roll.winrate <= CAMPAIGN_BAND[1]
+          : true;
+      if (!banded) outOfBand += 1;
+      rows.push(
+        [
+          archetype.name,
+          `A${String(ascension)}`,
+          String(roll.runs),
+          roll.winrate.toFixed(3),
+          roll.avgSectors.toFixed(2),
+          roll.avgNodes.toFixed(1),
+          roll.avgEarned.toFixed(1),
+          roll.avgSpent.toFixed(1),
+          banded ? "ok" : "OUT_OF_BAND",
+        ].join(","),
+      );
+      const hist = [...roll.deathHist.entries()]
+        .sort((a, b) => a[0] - b[0])
+        .map(([sector, n]) => `s${String(sector)}:${String(n)}`)
+        .join(" ");
+      console.log(
+        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}${banded ? "" : " — OUT OF BAND"}`,
+      );
+    }
+  }
+  const mean = a0.reduce((sum, v) => sum + v, 0) / Math.max(1, a0.length);
+  console.log(
+    `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${String(CAMPAIGN_BAND[0] * 100)}-${String(CAMPAIGN_BAND[1] * 100)}%`,
+  );
+
+  const conditional: number[] = [];
+  console.log(
+    "  per-sector conditional clear rate (A0, red+blue — the monotonicity read):",
+  );
+  rows.push("");
+  rows.push("sector,entered,cleared,conditionalClearRate,gapToPrevious");
+  let previous: number | null = null;
+  let cliffs = 0;
+  for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
+    const entered = a0Runs.filter((r) => r.sectorsCleared >= sector - 1).length;
+    const clearedHere = a0Runs.filter((r) => r.sectorsCleared >= sector).length;
+    const rate = entered === 0 ? 0 : clearedHere / entered;
+    conditional.push(rate);
+    const gap = previous === null ? 0 : (rate - previous) * 100;
+    if (previous !== null && Math.abs(gap) > MONOTONIC_GAP_PP) cliffs += 1;
+    console.log(
+      `    S${String(sector)} ${String(clearedHere).padStart(4)}/${String(entered).padEnd(4)} ${(rate * 100).toFixed(1).padStart(6)}%${previous === null ? "" : `  gap ${gap >= 0 ? "+" : ""}${gap.toFixed(1)}pp${Math.abs(gap) > MONOTONIC_GAP_PP ? " — CLIFF" : ""}${gap > 0 ? " — EASIER THAN THE ACT BEFORE" : ""}`}`,
+    );
+    rows.push(
+      `${String(sector)},${String(entered)},${String(clearedHere)},${rate.toFixed(3)},${gap.toFixed(1)}`,
+    );
+    previous = rate;
+  }
+  console.log("  where a run dies inside its act (A0, red+blue):");
+  for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
+    const shape = SECTORS.find((sd) => sd.id === sector)?.shape;
+    const deaths = a0Runs.filter((r) => r.deathSector === sector);
+    if (deaths.length === 0) continue;
+    const hist = new Map<number, number>();
+    for (const r of deaths) hist.set(r.deathRow, (hist.get(r.deathRow) ?? 0) + 1);
+    const atGate = deaths.filter((r) => r.deathRow === shape?.gateRow).length;
+    const atBoss = deaths.filter((r) => r.deathRow === shape?.bossRow).length;
+    console.log(
+      `    S${String(sector)} ${String(deaths.length)} deaths · gate row ${String(shape?.gateRow ?? 0)}: ${String(atGate)} · boss row ${String(shape?.bossRow ?? 0)}: ${String(atBoss)} · ${[...hist.entries()]
+        .sort((a, b) => a[0] - b[0])
+        .map(([row, n]) => `r${String(row)}:${String(n)}`)
+        .join(" ")}`,
+    );
+  }
+
+  const rises = conditional.filter(
+    (rate, index) => index > 0 && rate > (conditional[index - 1] ?? 0),
+  ).length;
+  console.log(
+    `    ${String(cliffs)} cliff(s) over ${String(MONOTONIC_GAP_PP)}pp · ${String(rises)} act(s) easier than the one before`,
+  );
+  console.log("  campaign sinks (A0, all decks):");
+  for (const sink of Object.keys(sinks)) {
+    console.log(
+      `    ${sink.padEnd(14)} ${String(Math.round(sinks[sink] ?? 0))}`,
+    );
+  }
+  console.log(
+    `  draft agency: ${String(skips)} skips · ${String(rerolls)} rerolls over ${String(runs * ARCHETYPES.length)} A0 runs`,
+  );
+  console.log("  puzzles met in campaign:");
+  for (const tier of [1, 2, 3, 4, 5]) {
+    const tally = tallies[tier];
+    if (tally === undefined || tally.entered === 0) continue;
+    console.log(
+      `    T${String(tier)} entered ${String(tally.entered)} · solved ${((tally.solved / tally.entered) * 100).toFixed(1)}% · ${(tally.attempts / tally.entered).toFixed(2)} attempts · ${(tally.paid / tally.entered).toFixed(1)} scrap staked`,
+    );
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `campaign-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (outOfBand > 0) process.exitCode = 1;
+};
+
+// ── Puzzle mode (R11) ───────────────────────────────────────────────────────
+
+const PUZZLE_BELL: readonly number[] = [8, 15, 20, 12, 5];
+
+const puzzleModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const rows: string[] = [
+    "tier,authored,target,medianAttemptWin,medianBudgeted,floor,freeAttempts,paidSteps,inRunEntered,inRunSolveRate,avgAttempts,avgStaked,verdict",
+  ];
+  const tallies = emptyPuzzleTally();
+  for (const archetype of ARCHETYPES) {
+    for (let i = 0; i < runs; i += 1) {
+      const result = runCampaign(
+        deriveSeed(seed, `puzzles:${archetype.name}:${String(i)}`),
+        archetype,
+        0,
+      );
+      mergeTallies(tallies, result.puzzleByTier);
+    }
+  }
+  console.log(
+    `sim puzzles: ${String(PUZZLES.length)} authored · in-run telemetry over ${String(runs * ARCHETYPES.length)} A0 campaigns`,
+  );
+  console.log(
+    "  tier  n/target  attemptWin  budgeted  floor   entered  solved  attempts  staked",
+  );
+  let failures = 0;
+  for (const tier of [1, 2, 3, 4, 5] as PuzzleTier[]) {
+    const authored = PUZZLES.filter((p) => p.tier === tier);
+    const target = PUZZLE_BELL[tier - 1] ?? 0;
+    const attemptWins = authored
+      .map((p) => difficultyOf(p).attemptWin)
+      .sort((a, b) => a - b);
+    const budgeted = authored
+      .map((p) => difficultyOf(p).budgetedSolve)
+      .sort((a, b) => a - b);
+    const floor = TIER_BANDS.find((b) => b.tier === tier)?.solveFloor ?? 0;
+    const stakes = TIER_STAKES[tier];
+    const tally = tallies[tier] ?? {
+      entered: 0,
+      solved: 0,
+      attempts: 0,
+      paid: 0,
+    };
+    const solveRate = tally.entered === 0 ? 0 : tally.solved / tally.entered;
+    const ok = authored.length === target;
+    if (!ok) failures += 1;
+    rows.push(
+      [
+        String(tier),
+        String(authored.length),
+        String(target),
+        median(attemptWins).toFixed(3),
+        median(budgeted).toFixed(3),
+        floor.toFixed(2),
+        String(stakes.freeAttempts),
+        String(stakes.paidCosts.length),
+        String(tally.entered),
+        solveRate.toFixed(3),
+        tally.entered === 0 ? "0" : (tally.attempts / tally.entered).toFixed(2),
+        tally.entered === 0 ? "0" : (tally.paid / tally.entered).toFixed(1),
+        ok ? "ok" : "COUNT_OFF_BELL",
+      ].join(","),
+    );
+    console.log(
+      `  T${String(tier)}    ${String(authored.length).padStart(2)}/${String(target).padStart(2)}      ${median(attemptWins).toFixed(3)}      ${median(budgeted).toFixed(3)}    ${floor.toFixed(2)}    ${String(tally.entered).padStart(6)}  ${(solveRate * 100).toFixed(1).padStart(5)}%  ${(tally.entered === 0 ? 0 : tally.attempts / tally.entered).toFixed(2).padStart(7)}  ${(tally.entered === 0 ? 0 : tally.paid / tally.entered).toFixed(1).padStart(6)}${ok ? "" : "  COUNT OFF BELL"}`,
+    );
+  }
+  const maxed = PUZZLES.filter(
+    (p) => difficultyOf(p).budgetedSolve >= 0.999 && maxAttempts(p) > 1,
+  );
+  console.log(
+    maxed.length === 0
+      ? "  no puzzle is a guaranteed solve inside its budget"
+      : `  guaranteed inside budget: ${maxed.map((p) => p.id).join(" ")}`,
+  );
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `puzzles-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(
+    `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(failures)} tier(s) off the bell`,
+  );
+};
+
+// ── Sector 6 mode (R9 Task 5, `--mode s6`; `deep` kept as its alias) ────────
 //
 // «За Ядром» is entered by a captain who has just cleared five acts, so the
 // sector sweep's mid-collection loadout under-reads it by a whole campaign's
@@ -1854,10 +2084,7 @@ const deepModeMain = (runs: number, seed: number, startedAt: number): void => {
         for (let i = 0; i < runs; i += 1) {
           results.push(
             runSweepSector(
-              deriveSeed(
-                seed,
-                `deep:${String(ascension)}:${archetype.name}:${profile}:${String(i)}`,
-              ),
+              deriveSeed(seed, `deep:${archetype.name}:${profile}:${String(i)}`),
               {
                 sector: 6,
                 ascension,
@@ -2086,6 +2313,7 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(failures)} out of band, ${String(unfair)} unfair pair(s)`,
   );
+  if (failures > 0 || unfair > 0) process.exitCode = 1;
 };
 
 // ── Axis mode (R7 Task 1) ────────────────────────────────────────────────────
@@ -2457,11 +2685,17 @@ const main = (): void => {
             ? "200"
             : mode === "roster"
               ? "40"
-              : mode === "deep"
+              : mode === "deep" || mode === "s6"
                 ? "300"
                 : mode === "axis"
-                ? "200"
-                : "1000";
+                  ? "200"
+                  : mode === "campaign"
+                    ? "200"
+                    : mode === "puzzles"
+                      ? "60"
+                      : mode === "dice"
+                        ? "200"
+                        : "1000";
   const runs = Number(getArg("runs", defaultRuns));
   const seed = Number(getArg("seed", "7"));
   if (!Number.isFinite(runs) || runs <= 0) {
@@ -2496,8 +2730,20 @@ const main = (): void => {
     rosterModeMain(runs, seed, startedAt);
     return;
   }
-  if (mode === "deep") {
+  if (mode === "deep" || mode === "s6") {
     deepModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "campaign") {
+    campaignModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "puzzles") {
+    puzzleModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "dice") {
+    diceModeMain(runs, seed, startedAt);
     return;
   }
   if (mode === "axis") {

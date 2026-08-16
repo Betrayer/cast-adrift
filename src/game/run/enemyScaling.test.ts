@@ -116,6 +116,9 @@ const NO_INTEGER_PREIMAGE: readonly string[] = [
 // here is what keeps the rest of the table honest.
 const RETUNED_SINCE_REBASE: Readonly<Record<string, string>> = {
   leechQueen: "R6 raised the gate-fight floor: 44 → 50",
+  breakerBarge: "R11 softened the act-2 wall: 73 → 59",
+  riftMaw: "R11 raised the act-3 boss off the ceiling: 68 → 78",
+  choirFlagship: "R11 closed the act-4 twin spread: 77 → 81",
 };
 
 const LEGACY_CURVE_PCT: Readonly<Record<number, number>> = {

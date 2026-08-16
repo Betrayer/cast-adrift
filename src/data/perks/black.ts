@@ -100,10 +100,10 @@ export const BLACK_PERKS: readonly PerkDef[] = [
         on: "beforeResolveSlot",
         if: [
           { c: "firstOfTurn" },
-          { c: "not", of: { c: "hullPctLt", n: 45 } },
+          { c: "not", of: { c: "hullPctLt", n: 80 } },
         ],
         do: [
-          { a: "modDieValue", n: 3 },
+          { a: "modDieValue", n: 6 },
           { a: "hull", n: -1 },
         ],
       },
@@ -144,10 +144,10 @@ export const BLACK_PERKS: readonly PerkDef[] = [
     effects: [
       {
         on: "turnEnd",
-        if: [{ c: "not", of: { c: "hullPctLt", n: 30 } }],
+        if: [{ c: "not", of: { c: "hullPctLt", n: 85 } }],
         do: [
           { a: "hull", n: -1 },
-          { a: "dmg", n: 4 },
+          { a: "dmg", n: 9 },
         ],
       },
     ],

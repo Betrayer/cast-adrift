@@ -37,10 +37,24 @@ export const RED_PERKS: readonly PerkDef[] = [
     effects: [
       {
         on: "beforeResolveSlot",
-        if: [{ c: "slot", is: "weapons" }, { c: "isMaxFace" }],
+        if: [
+          { c: "slot", is: "weapons" },
+          { c: "isMaxFace" },
+          { c: "not", of: { c: "hullPctLt", n: 60 } },
+          {
+            c: "not",
+            of: {
+              c: "counterAtLeast",
+              scope: "battle",
+              key: "redPointBlank",
+              n: 1,
+            },
+          },
+        ],
         do: [
-          { a: "modDieValue", n: 3 },
+          { a: "modDieValue", n: 6 },
           { a: "hull", n: -1 },
+          { a: "counter", scope: "battle", key: "redPointBlank", delta: 1 },
         ],
       },
     ],
@@ -162,12 +176,26 @@ export const RED_PERKS: readonly PerkDef[] = [
       {
         on: "beforeResolveSlot",
         if: [{ c: "slot", is: "weapons" }],
-        do: [{ a: "modDieValue", n: 2 }],
+        do: [{ a: "modDieValue", n: 3 }],
       },
       {
         on: "turnEnd",
-        if: [{ c: "not", of: { c: "hullPctLt", n: 50 } }],
-        do: [{ a: "hull", n: -1 }],
+        if: [
+          { c: "not", of: { c: "hullPctLt", n: 60 } },
+          {
+            c: "not",
+            of: {
+              c: "counterAtLeast",
+              scope: "battle",
+              key: "redOverburn",
+              n: 1,
+            },
+          },
+        ],
+        do: [
+          { a: "hull", n: -1 },
+          { a: "counter", scope: "battle", key: "redOverburn", delta: 1 },
+        ],
       },
     ],
   }),

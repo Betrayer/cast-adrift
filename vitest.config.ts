@@ -8,7 +8,7 @@ export default defineConfig({
     },
   },
   test: {
-    include: ['src/**/*.test.ts'],
+    include: ['src/**/*.test.ts', 'scripts/**/*.test.ts'],
     environment: 'node',
     // CI runs on a 2-vCPU shared runner, where the solver and draft tests lose
     // several seconds to contention that they never lose on a dev box. The cap

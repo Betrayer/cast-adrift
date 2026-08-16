@@ -17,7 +17,7 @@ export const DROP_WEIGHTS: Record<"battle" | "elite" | "boss", RarityWeights> = 
   boss: { common: 0, uncommon: 0, rare: 80, legendary: 20 },
 };
 
-export const BATTLE_DROP_CHANCE = 0.35;
+export const BATTLE_DROP_CHANCE = 0.45;
 
 const RARITY_ORDER: readonly Rarity[] = [
   "legendary",

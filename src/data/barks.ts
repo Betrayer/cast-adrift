@@ -44,7 +44,7 @@ const firstKillBarks: readonly BarkDef[] = FIRST_KILL_ENEMIES.map((id) => ({
   cooldownSec: 30,
 }));
 
-// Echo barks (DESIGN §2.1 target: 150 lines). Quota per trigger:
+// Echo barks (Revision-3 target: 220 lines; 157 authored). Quota per trigger:
 // resume 10 · sectorEnter 18 · lowHull 10 · firstKill 20 · bossPhase 10 ·
 // minibossIntro 6 · setComplete 7 · rareLoot 12 · tideUp 6 · eventOutcome 10+10 ·
 // idleMap 6 · battleWin 12 · nearDeathWin 6 · levelUp 6 · memory 4 ·
