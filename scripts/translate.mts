@@ -374,7 +374,7 @@ const main = async (): Promise<void> => {
   const key = process.env.DEEPL_API_KEY?.trim();
   if (!key) {
     console.error(
-      "translate: DEEPL_API_KEY is not set — this is an owner step, see docs/phase-12-launch-notes.md",
+      "translate: DEEPL_API_KEY is not set — this is an owner step, see docs/release-checklist.md",
     );
     process.exit(1);
   }

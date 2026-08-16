@@ -19,7 +19,6 @@ jobs:
       - run: npm test
       - run: npm run lint:content
       - run: npm run lint:keys
-      - run: npm run lint:roadmap
       - run: npm run sim:smoke
       - run: npm run sim:economy
       - run: npm run sim:puzzles

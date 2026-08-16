@@ -1,8 +1,18 @@
-import { readFileSync, readdirSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
+import process from "node:process";
 
 const DIR = join(process.cwd(), "docs", "archive", "rework");
 const ROADMAP = join(DIR, "ROADMAP.md");
+
+if (!existsSync(ROADMAP)) {
+  console.error(
+    `lint:roadmap: ${ROADMAP} not found.\n` +
+      "docs/ is gitignored, so this check only runs where the working copy has them — " +
+      "it is an owner command, not a CI step.",
+  );
+  process.exit(1);
+}
 const TABLE_HEADING = "## Content targets";
 const DOD_HEADING = "## Definition of Done";
 
