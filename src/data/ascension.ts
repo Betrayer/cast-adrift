@@ -20,7 +20,6 @@ export interface AscensionDef {
 
 export const MAX_ASCENSION = 10;
 
-// A1–A10 per DESIGN §13. Each level stacks on top of the ones below it.
 export const ASCENSIONS: readonly AscensionDef[] = [
   {
     level: 1,
@@ -137,11 +136,6 @@ export const ASCENSION_REWARDS: readonly AscensionReward[] = [
 export const ascensionRewardsUpTo = (level: number): AscensionReward[] =>
   ASCENSION_REWARDS.filter((reward) => reward.level <= level);
 
-export const ascensionRewardsAt = (level: number): AscensionReward[] =>
-  ASCENSION_REWARDS.filter((reward) => reward.level === level);
-
-// A6 bolts one extra subsystem onto every elite; A8 inserts an extra pattern
-// step into boss phases. Both are data shapes the resolver already understands.
 export const A6_ELITE_SUBSYSTEM = {
   id: "overclock",
   name: "content:enemies.subsystem.overclock",

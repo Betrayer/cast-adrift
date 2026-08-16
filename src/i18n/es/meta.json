@@ -236,7 +236,6 @@
     "chartPoints": "Dos puntos de «Carta estelar»"
   },
   "levelup": {
-    "title": "Subir de nivel",
     "level": "Nivel de capitán {{level}}",
     "point": "+1 punto de «Carta estelar»",
     "points": "+{{n}} Carta estelar puntos",
@@ -256,7 +255,7 @@
     "fromFinds": "Primeros hallazgos",
     "fromAchievements": "Logros",
     "firstFinds": "Primera publicación: {{names}}",
-    "fromDeep": "Beyond the Core"
+    "fromDeep": "Más allá de lo esencial"
   },
   "menu": {
     "level": "N.º{{level}}"
@@ -264,14 +263,10 @@
   "hangar": {
     "title": "Hangar",
     "deck": "Cubierta",
-    "collection": "Colección",
     "shop": "Meta Shop",
     "budget": "Presupuesto: {{used}} / {{max}}",
-    "pts": "{{n}} puntos",
-    "owned": "×{{n}}",
     "add": "Añadir",
     "buy": "Comprar · {{price}}◈",
-    "sold": "Propiedad de",
     "save": "Guardar baraja",
     "saved": "Guardado",
     "invalidOver": "Por encima del presupuesto",
@@ -280,25 +275,19 @@
     "invalidFate": "Máximo 1 dado de destino",
     "valid": "Listo",
     "empty": "La baraja está vacía",
-    "ship": "Barco",
     "shipEquip": "Equipar",
     "shipEquipped": "Equipado",
     "shipBuy": "Comprar · {{price}}◈",
     "shipLocked": "Se desbloquea en el nivel{{level}}",
-    "filterSchool": "Colegio",
-    "filterTier": "Nivel",
-    "filterRarity": "Rareza",
     "filterAll": "Todos"
   },
   "collection": {
     "title": "Colección",
-    "count": "{{n}} dados",
     "owned": "×{{n}}",
     "discount": "−{{n}} % — ya te has enfrentado a este dado",
     "found": "Cumplido",
     "undiscovered": "Aún no lo he conocido",
     "provenance": "Encontrado en: sector {{sector}}, {{node}}",
-    "filterState": "Estado",
     "stateAll": "Todos",
     "stateOwned": "Propiedad de",
     "stateFound": "Cumplido",
@@ -425,7 +414,6 @@
     "locked": "Precintado",
     "achievements": "Logros",
     "achProgress": "{{have}} / {{need}}",
-    "achLocked": "Bloqueado",
     "badges": "Insignias",
     "achCount": "{{n}} de {{total}}",
     "group": {
@@ -435,8 +423,7 @@
       "story": "Historia",
       "collection": "Colección",
       "modes": "Modos"
-    },
-    "endingsHidden": "Some endings are not on this shelf."
+    }
   },
   "engraving": {
     "title": "Grabado Estación",
@@ -455,7 +442,7 @@
     "ascendant": "Ascendente",
     "chartwright": "Chartwright",
     "archivist": "Archivero",
-    "answer": "The Answer"
+    "answer": "La respuesta"
   },
   "unlock": {
     "opened": "Desbloqueado",
@@ -495,9 +482,9 @@
     "featureEngraving": "Grabado estación",
     "featureDailyPreview": "Resumen diario",
     "featureFreeRespec": "Reasignación gratuita de puntos de habilidad de Keystone",
-    "sectorSix": "Sector 6 «Beyond the Core»",
-    "diceS6": "Four causality dice",
-    "skinThreshold": "Die skin «Threshold»"
+    "sectorSix": "Sector 6 «Más allá del núcleo»",
+    "diceS6": "Cuatro dados de causalidad",
+    "skinThreshold": "La piel de «Threshold»"
   },
   "skin": {
     "title": "Las pieles",
@@ -529,8 +516,8 @@
       "desc": "Cuadrado de plano, glifos monocromáticos."
     },
     "threshold": {
-      "name": "Threshold",
-      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
+      "name": "Umbral",
+      "desc": "Redonda, apagada, con un borde de color gris claro. La llevaba el único capitán que nunca se inclinó."
     }
   },
   "ach": {
@@ -656,12 +643,12 @@
     },
     "toast": "Logro",
     "beyondTheCore": {
-      "name": "Beyond the Core",
-      "desc": "Cross the threshold and clear Sector 6."
+      "name": "Más allá de lo esencial",
+      "desc": "Cruza el umbral y despeja el Sector 6."
     },
     "theAnswer": {
-      "name": "The Answer",
-      "desc": "Reach the hidden ending past the Core."
+      "name": "La respuesta",
+      "desc": "Llega al final oculto más allá del Núcleo."
     }
   },
   "chartTag": {
@@ -707,8 +694,5 @@
       "prestigeTheme": "tema «Ascendente»",
       "badge": "la insignia «Ascendant»"
     }
-  },
-  "shard": {
-    "deepClear": "Beyond the Core"
   }
 }

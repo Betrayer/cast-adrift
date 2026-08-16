@@ -15,8 +15,6 @@ describe("locale availability", () => {
     }
   });
 
-  // The machine locales are generated artefacts: absent is a valid state and
-  // must not put a language in the picker that would render as English.
   it("never offers a machine locale that is not on disk", () => {
     for (const locale of ["de", "es", "fr", "pl"] as const) {
       if (!AVAILABLE_LOCALES.includes(locale)) continue;

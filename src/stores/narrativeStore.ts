@@ -147,13 +147,3 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
     });
   },
 }));
-
-declare global {
-  interface Window {
-    __narrative?: typeof useNarrativeStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__narrative = useNarrativeStore;
-}

@@ -89,8 +89,6 @@ export const GREY_DICE: readonly DieItemDef[] = [
     ],
   }),
   die("fate-d100", 100, "grey", "legendary"),
-  // «Тихий свет» is the answer to The Hush: the fewer systems you still have, the
-  // more this one is worth.
   die("hushlight", 8, "grey", "rare", {
     tags: ["survival", "precision", "dice"],
     effects: [

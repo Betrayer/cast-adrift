@@ -1,10 +1,6 @@
 import { enemy, sub } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// The twelve gate fights (DESIGN §6.4). Every sector routes its gate row through
-// one of these, drawn from the sector's pool; a campaign never repeats one while
-// the pool still has a fresh member. Each carries a single signature idea and
-// enough hull to make the player solve it rather than out-race it.
 export const MINIBOSSES: readonly EnemyDef[] = [
   enemy({
     id: "convoyAlpha",
@@ -127,7 +123,6 @@ export const MINIBOSSES: readonly EnemyDef[] = [
     ],
   }),
 
-  // ── the six new gates ─────────────────────────────────────────────────────
   enemy({
     id: "dragnet",
     hp: 50,
@@ -247,9 +242,6 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { t: "attack", n: 11 },
     ],
   }),
-  // The two «За Ядром» gates. The Fold Tyrant makes the order of your own ship a
-  // moving target; the Hush Warden takes the slots away one at a time and asks
-  // which one you were relying on.
   enemy({
     id: "foldTyrant",
     hp: 62,

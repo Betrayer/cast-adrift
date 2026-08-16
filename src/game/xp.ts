@@ -58,19 +58,11 @@ export const runXp = (counts: RunCounts, ascension = 0): number => {
   return Math.round(raw * ascensionMult(ascension));
 };
 
-// DESIGN §12.3 campaign table. Replaces the Phase-5 per-node slice formula:
-// shards now come from sector clears, not from node grinding.
 export const SECTOR_CLEAR_SHARDS: readonly number[] = [40, 55, 75, 100, 140];
 export const BOSS_FIRST_KILL_SHARDS: readonly number[] = [25, 35, 50, 70, 100];
 
-// «За Ядром» is paid as its own band rather than as a sixth entry in the sector
-// table: it is opt-in, it is not part of the campaign's clear count, and the
-// table's shape (§12.3) describes a five-act run.
 export const SECTOR_SIX_CLEAR_SHARDS = 180;
 export const SECTOR_SIX_BOSS_SHARDS = 60;
-
-export const sectorClearShards = (sector: number): number =>
-  SECTOR_CLEAR_SHARDS[Math.max(0, Math.min(4, sector - 1))] ?? 0;
 
 export const bossFirstKillShards = (sector: number): number =>
   sector > SECTOR_CLEAR_SHARDS.length

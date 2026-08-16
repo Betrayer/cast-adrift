@@ -22,8 +22,6 @@ export const DieReward = ({ dieId }: { dieId: string }) => {
   );
   const rarity = DIE_BY_ID.get(dieId)?.rarity;
 
-  // The reward path is an acquisition like any other: same fanfare family, same
-  // duck, same haptic as the in-battle loot reveal.
   useEffect(() => {
     if (rarity === undefined) return;
     playSfx(LOOT_SFX[rarity]);

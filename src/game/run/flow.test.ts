@@ -31,7 +31,6 @@ describe("run flow", () => {
     expect(s.visited).toContain(START_NODE_ID);
     expect(s.map).not.toBeNull();
     expect(s.deck.length).toBeGreaterThan(0);
-    // Sector 1 arrives through the same interstitial every other sector uses.
     expect(useAppStore.getState().screen).toBe("interstitial");
   });
 

@@ -1,8 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// The scenes that carry the four NPC threads (R7 Task 5). Every one of them is a
-// declared chain step, so its weight is boosted while it is the live step and the
-// map stamps a marker on any node that can host it.
 export const CHAIN_EVENTS: readonly EventDef[] = [
   {
     id: "maraSupplyRun",

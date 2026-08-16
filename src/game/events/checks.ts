@@ -21,9 +21,6 @@ export interface DeckRef {
   school?: School;
 }
 
-// A narrowed check rolls only what the scene asks for. A deck that cannot field
-// the requested dice rolls fewer of them rather than borrowing from outside the
-// band — the odds preview shows exactly that shortfall.
 export const eligibleForCheck = (
   deck: readonly DeckRef[],
   check: Pick<CheckDef, "school" | "tierAtLeast" | "tierAtMost">,
@@ -90,7 +87,6 @@ export const highestSuccessOdds = (
   return 1 - allBelow;
 };
 
-// «Nothing may show more than N»: every die has to land at or under the target.
 export const lowestSuccessOdds = (
   dice: readonly FaceDie[],
   target: number,
@@ -131,8 +127,6 @@ export const checkTotal = (values: readonly number[], pick: CheckPick): number =
       ? values.reduce((a, b) => Math.max(a, b), 0)
       : values.reduce((a, b) => Math.max(a, b), 0);
 
-// A «lowest» check passes when the worst die is still at or under the target,
-// so its comparison inverts. Everything else clears a floor.
 export const checkPassed = (
   total: number,
   pick: CheckPick,

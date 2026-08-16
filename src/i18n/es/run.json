@@ -21,7 +21,6 @@
     "jump": "Ir al nodo seleccionado",
     "jumpHint": "Selecciona un nodo accesible",
     "you": "Tú",
-    "boss": "Jefe",
     "abandon": "Abandonar la carrera",
     "previewMiniboss": "Minijefazo: {{name}}",
     "previewBoss": "Jefe: {{name}}",
@@ -37,7 +36,7 @@
       "anomaly": "Anomalía",
       "beacon": "Baliza",
       "boss": "Jefe",
-      "inverted": "inverted"
+      "inverted": "invertido"
     },
     "previewNode": "{{type}} · riesgo: {{risk}}",
     "previewPocket": "Desvío: mejor botín, combate más duro",
@@ -202,18 +201,15 @@
   },
   "consequenceToast": "Consecuencia: {{text}}",
   "rewards": {
-    "scrap": "+ Recorte de{{n}}",
     "dieTitle": "Matriz recuperada",
     "keep": "Dejar en la baraja",
     "sell": "Vender (+{{n}})",
-    "deckFull": "Baraja completa (9)",
-    "healed": "Reparado + {{n}}"
+    "deckFull": "Baraja completa (9)"
   },
   "perk": {
     "title": "Elige una mejora",
     "pick": "Toma",
     "skip": "Saltar (+recortes de{{n}})",
-    "sub": "1 de 3",
     "banish": "Desterrar",
     "banishHint": "El «destierro» elimina esa carta y todas las del mismo tipo del resto de la partida. Una vez por partida.",
     "reroll": "Borrador revisado (restos de {{n}})"
@@ -221,14 +217,12 @@
   "shop": {
     "title": "Mercado · Mara",
     "buy": "Comprar ({{n}})",
-    "sell": "Vender",
     "reroll": "Reposición ({{n}})",
     "leave": "Salir",
     "scrap": "Chatarra: {{n}}",
     "deck": "Cubierta {{n}} /9",
     "sellTitle": "Vender un dado",
     "empty": "Agotado",
-    "owned": "En cubierta",
     "modulesTitle": "Módulos {{used}} / {{max}}",
     "modulesFull": "Bahía llena",
     "rerollFree": "Reaprovisionar existencias (gratis)"
@@ -238,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · al máximo",
     "systems": "Sistemas",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusión",
     "fusionHint": "Dos dados idénticos → +1 nivel",
-    "fusionPick": "Elige un dado para fusionar",
     "repair": "Reparación",
     "repairHint": "2 piezas de chatarra por casco",
     "leave": "Salir",
@@ -256,10 +248,8 @@
     "nodes": "Nodos eliminados: {{n}}",
     "kills": "Asesinatos: {{n}}",
     "earned": "Chatarra Fuente: {{n}}",
-    "spent": "Chatarra gasto: {{n}}",
     "perks": "Actualizaciones:",
     "perksNone": "ninguno",
-    "meta": "Fragmentos & XP",
     "toMenu": "Ir al menú",
     "faced": "Fuente: {{names}}"
   },
@@ -279,11 +269,11 @@
     "intro": "Todo lo que has decidido aquí fuera es ahora una puerta. Solo se abrirán aquellas que te hayas ganado.",
     "thin": "Echoe: «Lo has dejado un poco flojo, capitán. Dos puertas, y en ambas se han encogido de hombros».",
     "axis": "Resonancia ↔ Eje de estabilidad: {{n}}",
-    "deepTitle": "Past the Core",
-    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
-    "thresholdTag": "Or do not end it",
-    "thresholdCross": "Cross the threshold",
-    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
+    "deepTitle": "Más allá del núcleo",
+    "deepIntro": "No queda nada más que superar. Sea lo que sea lo que hayas conservado tras el sexto acto, aquí es donde se agota.",
+    "thresholdTag": "¿O no lo termines?",
+    "thresholdCross": "Cruza el umbral",
+    "thresholdCost": "El recorrido continúa más allá del Núcleo. La marea deja de estar contenida, el final espera hasta el otro lado… y la opción que elijas allí será una interpretación más profunda de todo ello."
   },
   "ending": {
     "next": "Continuar",
@@ -351,8 +341,8 @@
     "unstable": "Fila inestable: se ha vuelto a calcular su contenido",
     "pocket": "El «buco»: mayor riesgo, mayor recompensa",
     "riftSplit": "La división de la grieta: las ramas solo se unen en la puerta",
-    "inversion": "Inverted row: systems resolve last to first",
-    "storm": "Probability storm: one placed die re-rolls at resolution"
+    "inversion": "Remada invertida: los sistemas se resuelven de último a primero",
+    "storm": "Tormenta de probabilidad: se vuelve a lanzar un dado colocado en su posición durante la resolución"
   },
   "tag": {
     "red": "Rojo",

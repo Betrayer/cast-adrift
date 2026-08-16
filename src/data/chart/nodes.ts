@@ -869,8 +869,6 @@ const NOTABLES: Record<School, readonly Named[]> = {
   ],
 };
 
-// Eight keystones (DESIGN §12.2): six school warps plus the two prismatic ones
-// added in Phase 10.
 const KEYSTONES: Record<School, readonly Named[]> = {
   red: [
     {
@@ -1184,4 +1182,3 @@ const buildChart = (): ChartNodeDef[] => {
 export const CHART_NODES: readonly ChartNodeDef[] = buildChart();
 
 export const HUB_BUDGET_NODE_ID = "hub-o12";
-export const HUB_MODULE_NODE_ID = "hub-o5";

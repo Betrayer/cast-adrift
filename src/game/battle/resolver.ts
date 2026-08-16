@@ -93,9 +93,6 @@ export const BLOOD_REACTOR_CHARGE = 3;
 const clone = (snapshot: BattleSnapshot): BattleSnapshot =>
   structuredClone(snapshot);
 
-// A probability storm re-rolls exactly one placed die before anything resolves.
-// It reads the battle's own `dice` stream, so the same seed always storms the
-// same die to the same face and a resumed save replays it.
 export const applyNodeStorm = (
   next: BattleSnapshot,
   rng: RngStream,
@@ -119,8 +116,6 @@ export const applyNodeStorm = (
 const battleMutators = (snapshot: BattleSnapshot): MutatorMods =>
   computeMutatorMods(snapshot.mutators ?? []);
 
-// «Стеклянный флот» cuts both ways: the same multiplier scales player weapon
-// hits and every incoming enemy hit.
 export const scaleDamage = (damage: number, multPct: number): number =>
   multPct === 0 ? damage : Math.round(damage * (1 + multPct / 100));
 
@@ -161,7 +156,6 @@ const finalizeOutcome = (next: BattleSnapshot): void => {
   if (aliveEnemies(next).length === 0) next.outcome = "victory";
 };
 
-// «Пробойник» fires once per battle, on the first weapon hit that lands.
 const consumePierce = (next: BattleSnapshot): boolean => {
   if (next.pierceUsed === true) return false;
   if (!sourceTrait(next, "firstHitPierce")) return false;
@@ -211,9 +205,7 @@ const applySlotEffect = (
     if (jam) {
       applyStatus(target.statuses, "jam");
       const targetDef = ENEMY_BY_ID.get(target.defId);
-      // «Глушитель» holds the slots shut with the same signal a jam breaks.
       if (targetDef?.jamReleasesBlocks === true) next.blockedSlots = [];
-      // «Кантор-исполин» loses the hymn it has been stacking.
       if (targetDef?.jamClearsRage === true) target.rage = 0;
     }
     const deepScan = value >= 7;
@@ -351,8 +343,6 @@ const applySlotEffect = (
     let overflow = 0;
     if (next.charge > next.chargeCap) {
       next.charge = next.chargeCap;
-      // «Теплоотвод» eats the first overflow of the battle; the charge is still
-      // capped, only the hull bill is waived.
       if (next.overflowShieldUsed !== true && sourceTrait(next, "overflowShield")) {
         next.overflowShieldUsed = true;
       } else {
@@ -524,7 +514,6 @@ export const resolvePlayerPhase = (
 
   const unplaced = next.dice.filter((d) => d.state === "tray").length;
   if (sourceTrait(next, "compost")) next.scrap += unplaced;
-  // «Утилизатор» pays in charge what «Компост» pays in scrap.
   if (sourceTrait(next, "recycler")) {
     next.charge = Math.min(next.chargeCap, next.charge + unplaced);
   }
@@ -562,8 +551,6 @@ const applyAttack = (
     (hasAliveAura(enemy, "atk+3") ? 3 : 0) +
     (enemy.rage ?? 0);
   const perkMods = sourceMods(next);
-  // «Полевой стабилизатор» dulls the tide's combat bite without touching the
-  // tide counter itself.
   const tide = Math.max(
     0,
     Math.max(0, next.tide) +
@@ -616,7 +603,6 @@ const lockRandomTrayDie = (
   enemyStream: RngStream,
   pick?: "highest",
 ): string | undefined => {
-  // «Якорь» keeps its die out of every lock pool.
   const candidates = next.dice.filter(
     (d) =>
       d.state === "tray" &&
@@ -647,9 +633,6 @@ const curseTrayDie = (
   return die.uid;
 };
 
-// A census mirror is aimed at the deck, not at the hull. At ×2 every archetype
-// deck sat on the cap and the mechanic had no gradient; at ×1 a mono build takes
-// eight and a spread build takes three, which is the read the signature promises.
 export const MIRROR_SCHOOL_MULT = 1;
 export const MIRROR_SCHOOL_CAP = 10;
 
@@ -661,8 +644,6 @@ export const stealScrap = (next: BattleSnapshot, n: number): number => {
   next.scrap -= fromBattle;
   const fromRun = n - fromBattle;
   next.stolenScrap += fromRun;
-  // The run purse is settled after the battle; mirroring the drain here keeps a
-  // second read inside the same fight honest.
   next.runScrap = Math.max(0, next.runScrap - fromRun);
   return n;
 };
@@ -850,15 +831,12 @@ const resolveIntent = (
       return;
     }
     case "bargain": {
-      // The purse it bills is the run's, not the battle's: the answer to a
-      // bargain is what the player spent at the last shop.
       if (next.scrap + next.runScrap >= intent.n) {
         stealScrap(next, intent.n);
         enemy.hp = Math.min(enemy.hpMax, enemy.hp + intent.heal);
         pushBeat(ctx, enemy.id, "bargain", intent.heal);
         return;
       }
-      // The bill is the damage: refusing costs exactly what paying would have.
       const result = applyAttack(next, enemy, intent.n, 1, ctx.attack);
       ctx.beats.push({
         enemyId: enemy.id,
@@ -878,8 +856,6 @@ const resolveIntent = (
       next.pendingHijack = (next.pendingHijack ?? 0) + 1;
       pushBeat(ctx, enemy.id, "hijack");
       return;
-    // «Ретро-эхо» bills the last turn back to you: the harder you hit, the harder
-    // the answer, and a quiet turn buys a quiet answer.
     case "echoTotal": {
       const echoed = Math.min(intent.cap, Math.max(0, next.lastPlayerDamage));
       if (echoed <= 0) {
@@ -897,16 +873,10 @@ const resolveIntent = (
       });
       return;
     }
-    // «Складка» buys exactly one inverted player phase: it acts after this
-    // turn's resolution, so the counter has to survive the turn boundary that
-    // follows and expire on the next one. On a row that is already inverted it
-    // folds the fold and hands the ordinary order back, which is the read the
-    // name promises.
     case "foldOrder":
       next.foldedTurns = (next.foldedTurns ?? 0) + 2;
       pushBeat(ctx, enemy.id, "fold");
       return;
-    // «Пожиратель вероятностей» eats the best face you did not commit.
     case "devourDie": {
       const tray = next.dice.filter((d) => d.state === "tray");
       if (tray.length === 0) {
@@ -986,14 +956,10 @@ const resolveAuras = (ctx: EnemyPhaseCtx): void => {
       enemy.shield += 6;
       pushBeat(ctx, enemy.id, "shield", 6);
     }
-    // The hymn swells every third turn rather than every turn: a permanent
-    // ally-wide charge doubles every incoming hit and is not survivable.
     if (hasAliveAura(enemy, "chargeAllies") && next.turn % 3 === 0) {
       for (const ally of aliveEnemies(next)) applyStatus(ally.statuses, "charge");
       pushBeat(ctx, enemy.id, "charge");
     }
-    // Each eye twists: killing one halves the pressure, which is the whole
-    // reason to shoot the Maw's subsystems.
     const twists = countAliveAura(enemy, "twistEachTurn");
     if (twists > 0) {
       next.pendingTwist += twists;
@@ -1037,8 +1003,6 @@ export const resolveEnemyPhase = (
     attack: { dodgeSpent: false },
   };
 
-  // «Хрупкие щиты»: the shield sags on the turn boundary, before the enemy acts,
-  // so raising it still matters — it just protects less than it reads.
   const decayPct = battleMutators(next).shieldDecayPct;
   if (decayPct > 0 && next.shield > 0) {
     next.shield = Math.floor((next.shield * (100 - decayPct)) / 100);
@@ -1119,8 +1083,6 @@ export const resolveEnemyPhase = (
 const clampToTier = (die: RolledDie, value: number): number =>
   Math.min(die.tier, Math.max(1, value));
 
-// Phase-8 amendment 2: enemy dice-manipulation lands on the fresh roll, before
-// the resonance floors and Obsidian Pact re-assert their invariants.
 export const applyPendingTwists = (
   next: BattleSnapshot,
   dice: RolledDie[],
@@ -1151,8 +1113,6 @@ export const applyPendingTwists = (
   next.pendingStorm = 0;
 };
 
-// «Тральщик» takes the best face out of the player's hands: the highest tray die
-// is dragged into a slot the Trawler picks and pinned there for the turn.
 const applyHijack = (next: BattleSnapshot, rng: RngStream): void => {
   const pending = next.pendingHijack ?? 0;
   next.pendingHijack = 0;

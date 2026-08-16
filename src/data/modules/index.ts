@@ -32,9 +32,6 @@ export const MODULE_POOL: Record<Rarity, readonly string[]> = {
   legendary: idsOfRarity("legendary"),
 };
 
-export const moduleDef = (id: string): ModuleDef | undefined =>
-  MODULE_BY_ID.get(id);
-
 export {
   BASE_MODULE_SLOTS,
   MAX_MODULE_SLOTS,

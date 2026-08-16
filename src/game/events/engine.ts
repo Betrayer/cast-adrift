@@ -79,8 +79,6 @@ export const eligibleEvents = (
 ): EventDef[] =>
   pool.filter((e) => eventKind(e) === kind && eventEligible(e, ctx));
 
-// A chain step the run can advance right now draws at CHAIN_WEIGHT_BOOST times
-// its authored weight, so a thread keeps moving without the pool being rigged.
 export const eventWeight = (def: EventDef, ctx: EventContext): number => {
   const live = liveChainEvents(ctx.flags, ctx.sector);
   return live.has(def.id) ? def.weight * CHAIN_WEIGHT_BOOST : def.weight;
@@ -143,8 +141,6 @@ export const optionMet = (
   }
 };
 
-// The preview a player sees before committing: how far this option can move the
-// axis. A weighted fork shows the whole span, never a single flattering number.
 export const optionAxisRange = (option: EventOption): AxisRange | null => {
   const lists = [
     ...(option.outcomes ?? []),

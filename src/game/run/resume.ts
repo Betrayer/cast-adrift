@@ -31,7 +31,6 @@ export type RelativeWhen =
   | { unit: "now" }
   | { unit: "minutes" | "hours" | "days"; n: number };
 
-// Relative timestamp for the menu resume card. The caller localises the unit.
 export const relativeWhen = (
   savedAt: number | null,
   now = Date.now(),

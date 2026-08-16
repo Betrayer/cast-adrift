@@ -9,7 +9,7 @@ import { ENEMY_BY_ID } from "@/data/enemies";
 import { beaconsResolved } from "@/data/events/beacons";
 import { sealFinalMemory, syncMemoryArc } from "@/game/narrative/memoryArc";
 import { PROLOGUE_ENEMY, PROLOGUE_SCRIPT } from "@/data/narrative/prologue";
-import { SECTOR_COUNT, SECTOR_SIX, SECTORS, sectorDef } from "@/data/sectors";
+import { SECTOR_COUNT, SECTORS, sectorDef } from "@/data/sectors";
 import { shipHullMax } from "@/game/battle/setup";
 import { chartSlotTierDelta } from "@/game/chart/engine";
 import {
@@ -62,7 +62,6 @@ import {
 import {
   bossFirstKillShards,
   runXp,
-  sectorClearShards,
   shardBreakdown,
   ZERO_SHARD_BREAKDOWN,
 } from "@/game/xp";
@@ -104,8 +103,6 @@ export const JUMPS_PER_TIDE = 4;
 export const STARTING_SCRAP = 0;
 export const MINIBOSS_PACKAGE_SCRAP: readonly [number, number] = [30, 40];
 
-// «Резонансный шторм» boosts one real school per battle, drawn from a per-node
-// stream so the boost is replayable and never touches the battle's own streams.
 const STORM_SCHOOLS: readonly School[] = [
   "red",
   "blue",
@@ -164,8 +161,6 @@ const goalContextFor = (win: boolean): GoalContext => {
   };
 };
 
-// Contract stars ride the ordinary XP pipeline: only bits the profile has never
-// held before are counted, so a replay grants nothing.
 const settleContract = (win: boolean): { stars: number; newStars: number } => {
   const run = useRunStore.getState();
   const def = contractDef(run.contractId);
@@ -219,7 +214,6 @@ export const endRun = (win: boolean): void => {
   meta.archiveRunFlags(Object.keys(run.flags));
   if (win && run.mode === "campaign") {
     meta.recordCampaignClear(run.ascension);
-    // «Смотритель»: the A10 clear badge, awarded exactly once.
     if (run.ascension >= MAX_ASCENSION) meta.awardBadge(SMOTRITEL_BADGE);
   }
   meta.bumpLifetime({
@@ -278,8 +272,6 @@ export const endRun = (win: boolean): void => {
   }
   useRunStore.setState({ active: false });
   if (isScoredMode(run.mode)) void finishScoredRun();
-  // Defeat earns the same closing beat a clear does: Echo speaks, the tally
-  // reads back what the run actually did, and only then come the numbers.
   if (win) useAppStore.getState().go(summaryScreenFor(run.mode));
   else useAppStore.getState().go("ending", { death: "1" });
   autosaveRun();
@@ -312,7 +304,6 @@ const announceVictory = (
   const meta = useMetaStore.getState();
   let firstNew: string | undefined;
   for (const defId of enemyDefIds) {
-    // First kill of a type unlocks its Codex dossier (DESIGN §2.1).
     meta.unlockCodex(dossierId(defId));
     if (run.markKilledType(defId) && firstNew === undefined) firstNew = defId;
   }
@@ -321,9 +312,6 @@ const announceVictory = (
   else emitBark("battleWin");
 };
 
-// Echo's arc advances on pressure rather than on a counter: the ten gate fights
-// of a campaign, the elites hunted across every run, and the beacons put back on
-// the network. `syncMemoryArc` owns the arithmetic; this is the barks hook.
 export const unlockNextMemory = (): void => {
   if (syncMemoryArc().length > 0) emitBark("memory");
 };
@@ -344,8 +332,6 @@ const encounterInit = (pocket: boolean) => {
   };
 };
 
-// Mutators and contract setups are constant for the run, so every battle in the
-// run enters through the same shaped encounter.
 const runBattleInit = (
   nodeKey: string,
   pocket = false,
@@ -560,8 +546,6 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     setup.deckPreset ??
     (meta.hangar.deck.length >= 3 ? meta.hangar.deck : STARTER_DECK);
   const chartMods = computeRunMods([], chartPicks);
-  // A10 and «Fate's Favorite» both cut a percentage off the ship before the
-  // chart's flat bonuses land.
   const ascension = Math.max(0, options.ascension ?? 0);
   const hullPct = ascensionMods(ascension).hullPct + chartMods.hullMaxPct;
   const hullMax = Math.max(
@@ -603,8 +587,6 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   useNarrativeStore.getState().reset();
   resetActionLog();
   resetBarkMemory();
-  // Sector 1 gets the same arrival beat every other sector gets: the wash, the
-  // name, and a fragment before the map.
   useAppStore.getState().go("interstitial");
   emitBark(`sectorEnter:${String(values.sector)}`);
   trackEvent({ name: "run_start", params: { mode, ship: shipId } });
@@ -628,16 +610,10 @@ export const startDailyRun = (date: string): void => {
   });
 };
 
-// Sector transition: fresh map, tide reset, position back to the start node. The
-// interstitial screen owns the wash + fragment line before the map returns.
-// Drift keeps climbing sectorIndex past five; the content sector stays clamped.
 export const advanceSector = (): void => {
   settleSectorDrift();
   const s = useRunStore.getState();
   const endless = s.mode === "drift";
-  // A run that crossed the threshold is allowed exactly one index past the
-  // campaign; everything else still stops at the fifth act, and drift keeps
-  // climbing with its content clamped.
   const lastIndex = s.crossedThreshold ? SECTORS.length : SECTOR_COUNT;
   const nextIndex = endless
     ? s.sectorIndex + 1
@@ -714,7 +690,6 @@ const afterBossVictory = (): void => {
     meta.addShards(bossFirstKillShards(run.sector));
   }
   settleAchievements();
-  // A contract is one sector: clearing its boss ends the run and scores the stars.
   if (run.mode === "contract") {
     settleSectorDrift();
     endRun(true);
@@ -730,8 +705,6 @@ const afterBossVictory = (): void => {
   advanceSector();
 };
 
-// Campaign ends a sector on its boss; drift replaces that boss with a gate, so
-// the exit is the row rather than the node type.
 const isSectorExit = (node: MapNode): boolean => {
   const run = useRunStore.getState();
   return run.mode === "drift"
@@ -868,9 +841,6 @@ const noteDraftOffer = (choices: readonly string[]): void => {
     );
 };
 
-// DESIGN §6.4: choice of a rare die OR a module, plus a Mk voucher, scrap and a
-// perk draft. Phase 8 substituted a second rare die because modules did not
-// exist yet; Phase 10 restores the real fork.
 const minibossPackage = (
   lootStream: ReturnType<typeof createStream>,
   run: RunState,
@@ -890,8 +860,6 @@ const minibossPackage = (
   ),
 });
 
-// Captured before the battle store resets, so the goal counters see the fight
-// that just happened rather than an empty store.
 const takeBattleTally = (): BattleTally =>
   battleTally(useBattleStore.getState());
 
@@ -928,8 +896,6 @@ export const resolveRunBattle = (): void => {
   useBattleStore.getState().reset();
   run.noteBattleTally(tally);
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
-  // The epilogue's «last breath» line reads a run flag, so the battle-scoped
-  // save has to be promoted before the battle store is thrown away.
   if (survivedLethal) run.setFlag("survivedLethal");
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
@@ -960,7 +926,6 @@ export const resolveRunBattle = (): void => {
               ? rollPerkChoices(lootStream, draftContext(run))
               : [],
           draftNodeId: node.id,
-          // Elites hand out a module alongside their die (DESIGN §9.4).
           ...(node.type === "elite"
             ? { moduleChoices: [rollModule(lootStream, run.modules, "common")] }
             : {}),
@@ -1025,8 +990,6 @@ export const resolveEventBattle = (): void => {
   useBattleStore.getState().reset();
   run.noteBattleTally(tally);
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
-  // The epilogue's «last breath» line reads a run flag, so the battle-scoped
-  // save has to be promoted before the battle store is thrown away.
   if (survivedLethal) run.setFlag("survivedLethal");
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
@@ -1114,8 +1077,6 @@ export const resolveDieChoice = (dieId: string): void => {
   autosaveRun();
 };
 
-// The package is one fork: taking the module closes the die offer and vice
-// versa. A full module bay pays the scrap value instead.
 export const resolveModuleChoice = (moduleId: string): void => {
   const run = useRunStore.getState();
   const pending = run.pendingRewards;
@@ -1174,8 +1135,6 @@ export const rerollPerkDraft = (): void => {
   redrawDraft("draftReroll");
 };
 
-// The prologue opens a real campaign run and then routes its scripted fight
-// through the ordinary event-battle path, so victory lands on the sector map.
 export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
   startRun(seed, 0);
   const s = useRunStore.getState();
@@ -1204,9 +1163,6 @@ export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
   autosaveRun();
 };
 
-// The threshold is offered exactly once, at the S5 finale, to a campaign run on
-// a profile that has already finished the campaign at least once. Nothing about
-// it exists anywhere else in the UI: the offer is the reveal.
 export const canCrossThreshold = (): boolean => {
   const run = useRunStore.getState();
   return (
@@ -1232,9 +1188,6 @@ export const crossThreshold = (): void => {
   advanceSector();
 };
 
-export const inDeepSector = (): boolean =>
-  useRunStore.getState().sector === SECTOR_SIX;
-
 export const chooseEnding = (endingId: string): void => {
   const run = useRunStore.getState();
   sealFinalMemory(endingId);
@@ -1251,15 +1204,6 @@ export const finishEnding = (): void => {
   endRun(true);
 };
 
-export const runBeaconsResolved = (): number =>
-  beaconsResolved(useRunStore.getState().flags);
-
-export const sectorShardPreview = (): number =>
-  sectorClearShards(useRunStore.getState().sector);
-
-export const currentBossName = (sector: number): string =>
-  ENEMY_BY_ID.get(pickBoss(sector, useRunStore.getState().seed))?.name ?? "";
-
 export const abandonRun = (): void => {
   useRunStore.getState().reset();
   useBattleStore.getState().reset();
@@ -1269,8 +1213,6 @@ export const abandonRun = (): void => {
   useAppStore.getState().go("menu");
 };
 
-// Every mode start funnels through here so the single-run-slot promise holds:
-// an active run is discarded exactly once, before the new run is hydrated.
 export const discardActiveRun = (): void => {
   useRunStore.getState().reset();
   useBattleStore.getState().reset();
@@ -1280,60 +1222,4 @@ export const discardActiveRun = (): void => {
 };
 
 export const hasActiveRun = (): boolean => useRunStore.getState().active;
-
-export interface FlowDevHooks {
-  startRunMode: typeof startRunMode;
-  startDriftRun: typeof startDriftRun;
-  startDailyRun: typeof startDailyRun;
-  startContractRun: typeof startContractRun;
-  advanceSector: typeof advanceSector;
-  endRun: typeof endRun;
-  jumpTo: typeof jumpTo;
-  abandonRun: typeof abandonRun;
-  offerPerkDraft: (seed: number) => string[];
-  resolvePerkChoice: typeof resolvePerkChoice;
-  banishPerkChoice: typeof banishPerkChoice;
-  rerollPerkDraft: typeof rerollPerkDraft;
-  autosaveRun: typeof autosaveRun;
-}
-
-// Deals a real draft at the run's current node so the driver exercises
-// `rollPerkChoices` and the pending-rewards plumbing rather than faking cards.
-const offerPerkDraft = (seed: number): string[] => {
-  const run = useRunStore.getState();
-  const choices = rollPerkChoices(createStream(seed), draftContext(run));
-  run.setPendingRewards({
-    dieDrop: null,
-    perkChoices: choices,
-    draftNodeId: run.position ?? START_NODE_ID,
-  });
-  noteDraftOffer(choices);
-  useAppStore.getState().go("rewards");
-  return choices;
-};
-
-declare global {
-  interface Window {
-    __flow?: FlowDevHooks;
-  }
-}
-
-// Same DEV-only escape hatch the stores expose, so the Playwright driver can
-// exercise real mode transitions instead of faking store state.
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__flow = {
-    startRunMode,
-    startDriftRun,
-    startDailyRun,
-    startContractRun,
-    advanceSector,
-    endRun,
-    jumpTo,
-    abandonRun,
-    offerPerkDraft,
-    resolvePerkChoice,
-    banishPerkChoice,
-    rerollPerkDraft,
-    autosaveRun,
-  };
-}
+;

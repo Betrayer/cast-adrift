@@ -21,7 +21,6 @@
     "jump": "Zum ausgewählten Knoten springen",
     "jumpHint": "Wählen Sie einen erreichbaren Knoten aus",
     "you": "Du",
-    "boss": "Chef",
     "abandon": "Lauf abbrechen",
     "previewMiniboss": "Mini-Boss: {{name}}",
     "previewBoss": "Chef: {{name}}",
@@ -37,7 +36,7 @@
       "anomaly": "Anomalie",
       "beacon": "Bake",
       "boss": "Chef",
-      "inverted": "inverted"
+      "inverted": "umgekehrt"
     },
     "previewNode": "{{type}} · Risiko: {{risk}}",
     "previewPocket": "Umweg: bessere Beute, härterer Kampf",
@@ -202,18 +201,15 @@
   },
   "consequenceToast": "Folge: {{text}}",
   "rewards": {
-    "scrap": "+ „{{n}}“-Ausschnitt",
     "dieTitle": "Wiederverwertete Matrize",
     "keep": "Im Deck behalten",
     "sell": "Verkaufen (+{{n}})",
-    "deckFull": "Deck voll (9)",
-    "healed": "Repariert + {{n}}"
+    "deckFull": "Deck voll (9)"
   },
   "perk": {
     "title": "Wählen Sie ein Upgrade aus",
     "pick": "Nimm",
     "skip": "Überspringen (+ {{n}}-Ausschnitt)",
-    "sub": "1 von 3",
     "banish": "Verbannen",
     "banishHint": "Durch „Verbannen“ werden diese Karte und alle Karten derselben Art für den Rest des Durchgangs entfernt. Einmal pro Durchgang.",
     "reroll": "Entwurf für einen Reroll (Auswurf aus {{n}})"
@@ -221,14 +217,12 @@
   "shop": {
     "title": "Markt · Mara",
     "buy": "Kaufen ({{n}})",
-    "sell": "Verkaufen",
     "reroll": "Restock ({{n}})",
     "leave": "Gehen",
     "scrap": "Schrott: {{n}}",
     "deck": "Deck-{{n}}/9",
     "sellTitle": "Einen Würfel verkaufen",
     "empty": "Ausverkauft",
-    "owned": "Im Deck",
     "modulesTitle": "Module {{used}} / {{max}}",
     "modulesFull": "Bucht voll",
     "rerollFree": "Reroll-Bestand (kostenlos)"
@@ -238,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · voll ausgebaut",
     "systems": "Systeme",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Zwei identische Würfel → +1 Stufe",
-    "fusionPick": "Wähle einen Würfel zum Verschmelzen aus",
     "repair": "Reparatur",
     "repairHint": "2 Schrott pro Rumpf",
     "leave": "Gehen",
@@ -256,10 +248,8 @@
     "nodes": "Gereinigte Knoten: {{n}}",
     "kills": "Kills: {{n}}",
     "earned": "Schrott Quelle: {{n}}",
-    "spent": "Schrott Quelle: {{n}}",
     "perks": "Upgrades:",
     "perksNone": "keine",
-    "meta": "Splitter & XP",
     "toMenu": "Zum Menü",
     "faced": "Quelle: {{names}}"
   },
@@ -279,11 +269,11 @@
     "intro": "Alles, wofür du dich hier draußen entschieden hast, ist nun eine Tür. Nur die, die du dir verdient hast, werden sich öffnen.",
     "thin": "Echo: „Das war ein bisschen dürftig, Captain. Zwei Türen, beide zuckten nur mit den Schultern.“",
     "axis": "Resonanz ↔ Stabilitätsachse: {{n}}",
-    "deepTitle": "Past the Core",
-    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
-    "thresholdTag": "Or do not end it",
-    "thresholdCross": "Cross the threshold",
-    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
+    "deepTitle": "Jenseits des Kerns",
+    "deepIntro": "Es gibt nichts mehr zu überwinden. Was auch immer du durch den sechsten Akt mitgebracht hast – hier wird es aufgebraucht.",
+    "thresholdTag": "Oder beende es nicht",
+    "thresholdCross": "Die Schwelle überschreiten",
+    "thresholdCost": "Der Lauf führt weiter am Kern vorbei. Die Flut wird nicht mehr aufgehalten, das Ende wartet auf der anderen Seite – und die Entscheidung, die du dort triffst, wird eine tiefere Bedeutung haben."
   },
   "ending": {
     "next": "Weiter",
@@ -351,8 +341,8 @@
     "unstable": "Instabiler Zeile: Ihr Inhalt wurde neu ausgewertet",
     "pocket": "Umweg-Tasche: höheres Risiko, höherer Gewinn",
     "riftSplit": "Spaltung: Die Zweige treffen sich erst am Tor",
-    "inversion": "Inverted row: systems resolve last to first",
-    "storm": "Probability storm: one placed die re-rolls at resolution"
+    "inversion": "Inverted Row: Systeme werden von hinten nach vorne abgearbeitet",
+    "storm": "Wahrscheinlichkeitssturm: Ein platzierter Würfel wird bei der Auswertung erneut gewürfelt"
   },
   "tag": {
     "red": "Rot",

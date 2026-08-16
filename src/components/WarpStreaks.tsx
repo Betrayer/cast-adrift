@@ -7,8 +7,6 @@ interface Props {
   durationMs?: number;
 }
 
-// The sector-jump warp, extracted so the battle-enter transition is literally
-// the same effect rather than a second one that looks almost like it.
 export const WarpStreaks = ({ color, count = 18, durationMs }: Props) => {
   const streaks = useMemo(
     () =>

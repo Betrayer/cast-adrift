@@ -31,8 +31,6 @@ export const FinaleScreen = () => {
 
   const offerThreshold = canCrossThreshold();
 
-  // The threshold offer is the biggest decision in the game; a held low tone
-  // under the card, ducking the bed, is the only warning it gets.
   useEffect(() => {
     if (!offerThreshold) return;
     playSfx('thresholdHold');

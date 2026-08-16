@@ -52,8 +52,6 @@ const RARITY_LADDER: readonly Rarity[] = [
   "legendary",
 ];
 
-// «Жирный лут» shifts the whole weight table one rung up the ladder; the mass
-// that runs off the top piles into legendary rather than vanishing.
 export const shiftWeights = (
   weights: RarityWeights,
   step: number,
@@ -150,8 +148,6 @@ const MODULE_LADDER: readonly Rarity[] = [
   "legendary",
 ];
 
-// Module offers never repeat what the ship already carries; the floor lifts the
-// draw for mini-boss packages.
 export const rollModule = (
   rng: RngStream,
   owned: readonly string[],

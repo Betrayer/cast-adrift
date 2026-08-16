@@ -62,8 +62,6 @@ export const restoreCloudRun = (): boolean => {
   return ok;
 };
 
-// Abandon clears both local slots (via flow) and the cloud doc, so the run does
-// not come back on the next device.
 export const dropCloudRun = async (): Promise<void> => {
   if (cloudTimer !== null) {
     clearTimeout(cloudTimer);

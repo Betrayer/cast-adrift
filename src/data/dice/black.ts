@@ -132,8 +132,6 @@ export const BLACK_DICE: readonly DieItemDef[] = [
       },
     ],
   }),
-  // «Ретроград» pays for the order being wrong, which is the whole argument for
-  // walking into an inverted row on purpose.
   die("retrograde", 10, "black", "rare", {
     tags: ["reactor", "charge", "overcap"],
     active: "bank",

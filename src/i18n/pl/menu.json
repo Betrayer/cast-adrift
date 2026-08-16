@@ -12,7 +12,6 @@
   "cloudFound": "W chmurze znaleziono nowszą wersję — czy kontynuować?",
   "cloudYes": "Bieg w chmurze",
   "cloudNo": "Lokalne",
-  "stub": "Ten ekran pojawia się w fazie „{{phase}}”.",
   "resumeCard": "Czytaj dalej: Sektor {{sector}} · szczegółowe informacje {{depth}} · {{when}}",
   "resumeContinue": "Kontynuuj",
   "resumeAbandon": "Zostaw to",

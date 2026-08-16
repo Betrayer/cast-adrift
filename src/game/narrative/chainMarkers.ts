@@ -7,9 +7,6 @@ import { createStream, deriveSeed } from "@/services/rng";
 export const eventPickSeed = (seed: number, nodeId: NodeId): number =>
   deriveSeed(seed, `evpick:${nodeId}`);
 
-// Honest markers: the map asks the same question the Event screen will ask when
-// the player lands there — same seed, same pool, same context — so an «!» never
-// promises a step the node cannot host.
 export const chainMarkedNodes = (
   map: MapGraph,
   ctx: EventContext,

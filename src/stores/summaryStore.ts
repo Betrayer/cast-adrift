@@ -60,13 +60,3 @@ export const useSummaryStore = create<SummaryState>()((set) => ({
     });
   },
 }));
-
-declare global {
-  interface Window {
-    __summary?: typeof useSummaryStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__summary = useSummaryStore;
-}

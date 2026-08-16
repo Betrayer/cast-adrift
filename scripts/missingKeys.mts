@@ -1,4 +1,6 @@
-import { writeFileSync } from "node:fs";
+import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import process from "node:process";
 import { BARKS } from "../src/data/barks";
 import { ASCENSIONS } from "../src/data/ascension";
 import { CHART_NODES } from "../src/data/chart";
@@ -118,7 +120,74 @@ for (const key of [...required].sort()) {
   if (!has(root, path)) missing.push(key);
 }
 
-writeFileSync("sim-out/missing-keys.txt", `${missing.join("\n")}\n`, "utf8");
-console.log(
-  `required ${String(required.size)} · missing ${String(missing.length)} → sim-out/missing-keys.txt`,
+const NAMESPACES = [
+  "battle",
+  "common",
+  "content",
+  "menu",
+  "meta",
+  "run",
+  "settings",
+] as const;
+
+const flatten = (node: Node, prefix: string, into: Set<string>): void => {
+  if (typeof node === "string") {
+    into.add(prefix);
+    return;
+  }
+  for (const [seg, child] of Object.entries(node)) {
+    flatten(child, prefix === "" ? seg : `${prefix}.${seg}`, into);
+  }
+};
+
+const authored = new Set<string>();
+for (const ns of NAMESPACES) {
+  const raw = JSON.parse(
+    readFileSync(join("src", "i18n", "en", `${ns}.json`), "utf8"),
+  ) as Node;
+  const keys = new Set<string>();
+  flatten(raw, "", keys);
+  for (const k of keys) authored.add(`${ns}:${k}`);
+}
+
+const sourceFiles: string[] = [];
+const walk = (dir: string): void => {
+  for (const entry of readdirSync(dir)) {
+    const p = join(dir, entry);
+    if (statSync(p).isDirectory()) walk(p);
+    else if (/\.(ts|tsx)$/.test(p)) sourceFiles.push(p);
+  }
+};
+walk("src");
+
+const referenced = new Set<string>();
+const prefixes = new Set<string>();
+const nsAlternation = NAMESPACES.join("|");
+const literal = new RegExp(`(?:${nsAlternation}):[A-Za-z0-9_.-]+`, "g");
+const dynamic = new RegExp(`(?:${nsAlternation}):[A-Za-z0-9_.-]*(?=\\$\\{)`, "g");
+for (const file of sourceFiles) {
+  const text = readFileSync(file, "utf8");
+  for (const m of text.matchAll(literal)) referenced.add(m[0]);
+  for (const m of text.matchAll(dynamic)) prefixes.add(m[0]);
+}
+
+const covered = (key: string): boolean => {
+  if (required.has(key) || referenced.has(key)) return true;
+  for (const p of prefixes) if (key.startsWith(p)) return true;
+  return false;
+};
+
+const orphans = [...authored].filter((k) => !covered(k)).sort();
+
+mkdirSync("sim-out", { recursive: true });
+writeFileSync(
+  "sim-out/missing-keys.txt",
+  `${["# missing (data -> i18n)", ...missing, "", "# orphans (i18n -> data)", ...orphans].join("\n")}\n`,
+  "utf8",
 );
+console.log(
+  `lint:keys — required ${String(required.size)} · authored ${String(authored.size)} · missing ${String(missing.length)} · orphans ${String(orphans.length)} → sim-out/missing-keys.txt`,
+);
+for (const k of missing) console.log(`  missing  ${k}`);
+for (const k of orphans) console.log(`  orphan   ${k}`);
+if (missing.length > 0 || orphans.length > 0) process.exit(1);

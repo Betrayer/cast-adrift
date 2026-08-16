@@ -11,11 +11,6 @@ export interface KeeperLine {
   requires?: FlagQuery;
 }
 
-// The recurring cast's counter talk (DESIGN §2.1). Shops draw Mara, shipyards
-// draw Yusuf, beacon scenes draw the Keeper — the seeded `shop` stream picks one
-// per visit so a reloaded save hears the same greeting. Lines carrying a
-// `requires` are the reactive half: when any of them matches, the counter says
-// something about what you actually did rather than something generic.
 const line = (
   id: string,
   speaker: SpeakerId,
@@ -86,10 +81,6 @@ const KEEPER_REACTIVE: readonly KeeperLine[] = [
   line("kFive1", "beaconKeeper", "beacon", { all: ["beacon5"] }),
 ];
 
-// «За Ядром». The one shop and the one shipyard past the threshold are staffed
-// by people who should not be there, and they know it; the Keeper's lines are
-// the closest the game comes to naming the balance «Ответ» asks for, and even
-// they only ever circle it.
 const BEYOND_REACTIVE: readonly KeeperLine[] = [
   line("bMara1", "mara", "shop", { all: ["crossedThreshold"] }),
   line("bMara2", "mara", "shop", { all: ["maraBeyond"] }),
@@ -131,9 +122,6 @@ const matches = (
   return true;
 };
 
-// When the run has given the counter something to react to, the reactive pool
-// wins outright — a callback the player earned should not lose a coin flip to
-// small talk.
 export const keeperLinesFor = (
   venue: KeeperVenue,
   flags: Record<string, FlagValue> = {},

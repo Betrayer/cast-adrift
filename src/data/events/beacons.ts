@@ -1,34 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// ── Beacon flag graph (Task 5) ────────────────────────────────────────────────
-//
-//  S1 beaconKeeperIntro ──┬─ take   → beaconKey1, axis +1
-//                         ├─ sell   → scrap,      axis −1, keeperSlighted
-//                         └─ smash  → tide −1,    axis −2, keeperSlighted, beaconBroken
-//
-//  S2 fleetBlackbox ──────┬─ share (needs yusufFriend) → fleetTruthShared, yusufFriend↑
-//                         ├─ keep   → fleetTruthKept, axis −1
-//                         └─ wipe   → axis +1, fleetTruthLost
-//
-//  S3 choirInvitation ────┬─ accept → pactStep1, axis −2
-//                         ├─ refuse → refusedChoir, axis +2
-//                         └─ probe (check) → pass: choirDoctrine codex + refusedChoir
-//                                            fail: hull loss, pactStep1
-//
-//  S4 pactSeal (requires pactStep1) ─┬─ complete → pactSealed  (unlocks Choir Bargain)
-//                                    └─ betray   → choirEnemy + elite fight
-//
-//  S5 coreThreshold ──────┬─ listen  → silentReady when all five beacons resolved
-//                         ├─ answer  → axis −1, coreAnswered
-//                         └─ silence → axis +1, coreSilenced
-//
-//  Endings read: axis (Seal/Merge), pactSealed (Bargain),
-//  silentReady + beaconsResolved≥5 + (crewSaved|courierFreed) (Silent Fleet).
-//
-//  Cross-references wired into earlier content: keeperSlighted (Mara's stock line),
-//  fleetTruthShared (Yusuf callback), refusedChoir (Preacher callback).
-// ──────────────────────────────────────────────────────────────────────────────
-
 export const BEACON_EVENTS: readonly EventDef[] = [
   {
     id: "beaconKeeperIntro",
@@ -371,9 +342,6 @@ export const BEACON_EVENTS: readonly EventDef[] = [
       },
     ],
   },
-  // «За Ядром»'s own beacon. It does not add a sixth counter — the five-beacon
-  // network is the campaign's — it hands the keeper's last hint to a captain who
-  // has already resolved all five, and writes the flag the true ending reads.
   {
     id: "thresholdBeacon",
     kind: "beacon",

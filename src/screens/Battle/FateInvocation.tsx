@@ -9,8 +9,6 @@ const DURATION_MS = 600;
 const GLYPHS = ['I', 'V', 'X', 'L', 'C', 'D'] as const;
 const ORBIT_RADIUS = 72;
 
-// DESIGN §7: rolling Fate is a ceremony, not a button press — the board dims
-// and the numeral ring turns once before the verdict is read.
 export const FateInvocation = () => {
   const fateUses = useBattleStore((s) => s.fateUses);
   const reduced = resolveReducedMotion(

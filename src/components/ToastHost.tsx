@@ -61,8 +61,6 @@ const BarkSlot = () => {
   const dismiss = useNarrativeStore((s) => s.dismissBark);
   const verbosity = useSettingsStore((s) => s.echoVerbosity);
 
-  // Echo's chime follows her verbosity setting, and a queued line arrives
-  // quieter so three backed-up barks do not read as three separate events.
   useEffect(() => {
     if (bark === null) return;
     if (verbosity === 'normal') {
@@ -130,8 +128,6 @@ const AchievementSlot = () => {
   );
 };
 
-// The run journal writes itself in the background; a pen tick is the only way a
-// player who missed the toast still knows the moment was recorded.
 const JournalTick = () => {
   const entries = useNarrativeStore((s) => s.journal.length);
   const previous = useRef(entries);

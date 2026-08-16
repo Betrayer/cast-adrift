@@ -84,7 +84,6 @@ describe("finale gating", () => {
     expect(reachable.size).toBe(ENDINGS.length);
   });
 
-  // Nine paths: four standard beat sets, four deep ones, and «Ответ».
   it("plays nine distinct beat sets across the four endings and the true one", () => {
     const sets = new Set<string>();
     for (const ending of ENDINGS) {

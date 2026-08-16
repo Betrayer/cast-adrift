@@ -1,14 +1,11 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-const DIR = join(process.cwd(), "docs", "rework");
+const DIR = join(process.cwd(), "docs", "archive", "rework");
 const ROADMAP = join(DIR, "ROADMAP.md");
 const TABLE_HEADING = "## Content targets";
 const DOD_HEADING = "## Definition of Done";
 
-// A count small enough to collide with prose ("3-4 steps", "1 hidden ending") is
-// not quoted back; those rows are held to naming the content only. Everything at
-// or above this is a headline number a Definition of Done can carry verbatim.
 const QUOTABLE_COUNT = 10;
 
 const errors: string[] = [];
@@ -65,8 +62,6 @@ const dodOf = (phase: string): string | null => {
   return section === "" ? null : section;
 };
 
-// The content name in the table is a label, not a token: "Run perks" has to find
-// "perks", "NPC chains" has to find "chains", "Chart nodes" has to find "chart".
 const keywordsOf = (content: string): string[] => {
   const words = content
     .toLowerCase()
@@ -81,8 +76,6 @@ const quotableCounts = (target: string): string[] =>
     .map((m) => m[0])
     .filter((n) => Number(n) >= QUOTABLE_COUNT);
 
-// A bare number match is worthless: "≥60% conditional" would satisfy "60 modules"
-// and "55–65% winrate" would satisfy "55 enemies". The count has to stand alone.
 const quotesCount = (line: string, count: string): boolean =>
   new RegExp(`(?<![\\d.,])${count}(?![\\d.,]|\\s*%|\\s*[–—-]\\s*\\d)`).test(line);
 

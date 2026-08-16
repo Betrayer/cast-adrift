@@ -9,8 +9,6 @@ import type { FlagValue } from "@/types/events";
 const flagSet = (flags: Record<string, FlagValue>, key: string): boolean =>
   flags[key] !== undefined;
 
-// Consequence hook (DESIGN §3): once the player carries the cursed-cargo bounty
-// mark, the Bounty Huntress stalks the next elite until engaged.
 export const shouldInjectBounty = (
   type: NodeType,
   flags: Record<string, FlagValue>,

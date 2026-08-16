@@ -407,8 +407,6 @@ const EntryCard = ({
   const { t } = useTranslation(["run", "battle", "content"]);
   const interference = useRunStore((s) => s.interferenceStacks);
 
-  // The badge flourish is the tier speaking: a T5 board announces itself lower
-  // and heavier than a T1 one, before a single die is read.
   useEffect(() => {
     playSfx("eventOpen", { rate: tierRate(puzzle.tier) });
   }, [puzzle.tier]);
@@ -561,8 +559,6 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
   const solved = checked === true;
   const failedOut = checked === false && left <= 0;
 
-  // The rule-check tick fires when the board's answer to the goal moves, so the
-  // player hears a placement help or hurt without reading the banner.
   const lastReached = useRef(reached);
   useEffect(() => {
     if (reached !== lastReached.current) {
@@ -755,8 +751,6 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     const won = reached;
     setChecked(won);
     if (won) {
-      // T1–T3 gets a fanfare, T4–T5 gets the ceremony: the duck and the haptic
-      // are what separate "solved it" from "solved *that*".
       const ceremony = puzzle.tier >= 4;
       playSfx(ceremony ? "solveT45" : "solveT13");
       if (ceremony) {

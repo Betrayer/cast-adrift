@@ -24,9 +24,6 @@ export interface SchoolTint {
   hue: number;
   hueMix: number;
   satScale: number;
-  // Additive lightness deltas normally; with `monochrome` set they are read as
-  // absolute lightness targets, which is what makes a single-hue theme keep
-  // seven separable school steps.
   lightShift: Partial<Record<School, number>>;
   monochrome?: boolean;
 }
@@ -284,5 +281,3 @@ export const DEFAULT_THEME_ID: ThemeId = "deepSpace";
 
 export const isThemeId = (value: unknown): value is ThemeId =>
   typeof value === "string" && value in THEME_BY_ID;
-
-export const themeDef = (id: ThemeId): ThemeDef => THEME_BY_ID[id];

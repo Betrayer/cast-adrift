@@ -338,8 +338,6 @@ const enemyIds = new Set(ALL_ENEMIES.map((e) => e.id));
 
 const flattenStep = (step: PatternStep): readonly Intent[] => intentsOfStep(step);
 
-// R6 roster gates. The budget is the silhouette rule: a base enemy reads as one
-// idea, an elite as two on top of its frame, a gate fight or a boss as three.
 const CLAIM_BUDGET: Readonly<Record<string, number>> = {
   base: 2,
   elite: 3,
@@ -440,10 +438,6 @@ for (const [tier, want] of Object.entries(ROSTER_TARGET)) {
     errors.push(`enemies: ${tier} roster holds ${String(got)}, target ${String(want)}`);
 }
 
-// Sector parity: ten bespoke base enemies per campaign sector, and the sector's
-// own draw pool has to actually contain at least eight of them. «За Ядром» is
-// eight — it is a shorter act by design and leans on a scaled reuse pool for the
-// rest, which the pool floor below still holds it to.
 const BESPOKE_PER_SECTOR: readonly number[] = [10, 10, 10, 10, 10, 8];
 const POOL_BESPOKE_FLOOR = 8;
 SECTOR_ROSTERS.forEach((roster, index) => {
@@ -461,7 +455,6 @@ SECTOR_ROSTERS.forEach((roster, index) => {
     );
 });
 
-// Flat patterns are a sector-1 teaching device, not a roster default.
 const flatEnemies = BASE_ENEMIES.filter(isFlatPattern);
 const FLAT_PCT_CAP = 20;
 const flatPct = (flatEnemies.length / Math.max(1, BASE_ENEMIES.length)) * 100;
@@ -478,8 +471,6 @@ for (const def of flatEnemies) {
     );
 }
 
-// Variety floor: a third of the base roster has to branch, by weighted pick or
-// by reading the battle state.
 const VARIED_PCT = 30;
 const variedBase = BASE_ENEMIES.filter((def) =>
   def.pattern.some((step) => "pick" in step || "when" in step),
@@ -490,8 +481,6 @@ if (variedPct < VARIED_PCT)
     `enemies: ${variedPct.toFixed(1)}% of the base roster branches, target ${String(VARIED_PCT)}%`,
   );
 
-// Rotation: every sector needs a real draw for its gate row and its boss, and
-// every def in the roster has to be reachable from some pool.
 const reachable = new Set<string>();
 for (let sector = 1; sector <= SECTOR_ROSTERS.length; sector += 1) {
   const def = sectorDef(sector);
@@ -660,8 +649,6 @@ for (const tag of chartTagSet) {
     errors.push(`chart: no en label for tag chip "${tag}"`);
 }
 
-// Orphans and reachability: every node must reach an entry node through the
-// undirected link graph, or no amount of points can ever buy it.
 const chartReached = new Set<string>();
 const chartQueue: string[] = CHART_NODES.filter((n) => n.entry === true).map(
   (n) => n.id,
@@ -693,7 +680,6 @@ if (ALL_PERKS.length !== PERK_TOTAL) {
   );
 }
 
-// DESIGN §9.4 rarity spread {c 50%, u 35%, r 15%}, ±4 points of slack.
 const RARITY_TARGET_PCT: Record<string, number> = {
   common: 50,
   uncommon: 35,
@@ -721,7 +707,6 @@ for (const perk of ALL_PERKS) {
   ) {
     errors.push(`perks: "${perk.id}" has no effects, mods, or traits`);
   }
-  // Every rare must point at something buildable (plan Task 4).
   if (perk.rarity === "rare") {
     const syn = perk.synergy;
     if (syn === undefined || syn.length === 0) {
@@ -819,9 +804,6 @@ for (const event of ALL_EVENTS) {
   }
 }
 
-// R7 quality bars. Counts alone were how the v1 pool got to 100 events with 84
-// of them offering exactly two options, so every number here has a shape rule
-// beside it.
 const EVENT_TOTAL = 177;
 const CALLBACK_TARGET = 55;
 const THREE_OPTION_PCT = 35;
@@ -888,8 +870,6 @@ if (weightedEvents < WEIGHTED_TARGET)
     `events: ${String(weightedEvents)} carry a weighted fork, target ${String(WEIGHTED_TARGET)}`,
   );
 
-// A vending machine pays out and leaves no trace: no gate, no check, no flag,
-// no consequence, no follow, no codex. DESIGN §3 does not allow one.
 const vending = ALL_EVENTS.filter((event) => {
   if (event.requires?.flags !== undefined) return false;
   if (event.codex !== undefined) return false;
@@ -913,8 +893,6 @@ const vending = ALL_EVENTS.filter((event) => {
 for (const event of vending)
   errors.push(`events: "${event.id}" is a vending machine — it leaves no trace`);
 
-// Unreachable events: a callback whose required flags no outcome anywhere can
-// set is dead content, not a hidden secret.
 const settableFlags = new Set<string>();
 for (const event of ALL_EVENTS) {
   for (const option of event.options) {
@@ -942,9 +920,6 @@ for (const event of ALL_EVENTS) {
   }
 }
 
-// R7 flag graph: a flag written by content has to be read by content. The
-// readers are declared as data (event gates, epilogue/death/ending `reads`,
-// shop rules), so this is a graph check rather than a grep.
 for (const flag of deadFlags()) {
   errors.push(
     `flags: "${flag.key}" is written by ${flag.owners.join(", ")} and read by nothing`,
@@ -956,10 +931,6 @@ for (const flag of unwritableFlags()) {
   );
 }
 
-// Echo's arc has to be completable by playing, not by reading the data files.
-// A standard clear is ten gate fights, five beacons and roughly five elites on
-// the path actually taken; two of those clears must reach every fragment the
-// finale does not write itself.
 const CLEAR_GATES = 10;
 const CLEAR_BEACONS = 5;
 const CLEAR_ELITES = 5;
@@ -996,8 +967,6 @@ for (const id of MEMORY_CODEX_IDS) {
     errors.push(`memories: "${id}" has no Codex entry`);
 }
 
-// R7 chains: every declared step has to name events that exist, live in the
-// sectors those events can appear in, and end on a flag some outcome sets.
 const CHAIN_TARGET = 4;
 const CHAIN_MIN_STEPS = 3;
 const eventById = new Map(ALL_EVENTS.map((e) => [e.id, e]));
@@ -1202,8 +1171,6 @@ for (const [trigger, quota] of Object.entries(BARK_QUOTA)) {
     );
 }
 
-// ── Phase 10: modules, engravings, fate, fragments, keeper lines ────────────
-
 const MODULE_TOTAL = 60;
 const ENGRAVING_TOTAL = 50;
 const FRAGMENT_TOTAL = 120;
@@ -1333,8 +1300,6 @@ if (dossierCount !== DOSSIER_TOTAL)
   errors.push(
     `codex: expected ${String(DOSSIER_TOTAL)} dossiers, found ${String(dossierCount)}`,
   );
-
-// ── Phase 9: mutators, contracts, goals ─────────────────────────────────────
 
 const MUTATOR_COUNT = 12;
 const CONTRACT_COUNT = 20;
@@ -1622,9 +1587,6 @@ for (const [ns, en, uk, ru] of NAMESPACES) {
   checkParity(ns, en, ru, "ru");
 }
 
-// Machine locales (Phase 12) are generated artefacts and may be absent from a
-// given checkout. Present means complete: a half-generated language would fall
-// back to English mid-sentence, which reads as a bug rather than as a locale.
 const MACHINE_LOCALES = ["de", "es", "fr", "pl"] as const;
 const I18N_DIR = join(process.cwd(), "src", "i18n");
 
@@ -1651,8 +1613,6 @@ for (const locale of MACHINE_LOCALES) {
     }
   }
 }
-
-// ── R5: depth gates ─────────────────────────────────────────────────────────
 
 const DEEP_PERK_PCT = 60;
 const TAG_REFERENCE_TARGET = 25;
@@ -1834,11 +1794,6 @@ if (activeDice.length < ACTIVE_DIE_TARGET) {
   );
 }
 
-// Counting a school with `countTag` is counting the deck, which is what
-// resonance already does. A school-tag condition may therefore not pay what a
-// tier of that school already pays — that is a resonance threshold re-spelled
-// with a different number. Mechanic tags are a different axis and are free to
-// reach a similar payload.
 const resonancePayloadsBySchool = new Map<string, Set<string>>();
 for (const bonus of RESONANCE_BONUSES) {
   const set = resonancePayloadsBySchool.get(bonus.school) ?? new Set<string>();
@@ -1876,15 +1831,6 @@ const checkTagVsResonance = (
 for (const perk of ALL_PERKS) checkTagVsResonance(`perks.${perk.id}`, perk.effects);
 for (const def of ALL_MODULES) checkTagVsResonance(`modules.${def.id}`, def.effects);
 for (const die of ALL_DICE) checkTagVsResonance(`dice.${die.id}`, die.effects);
-
-// ── Revision-3 totals, locked (R11 Task 3) ──────────────────────────────────
-//
-// One table, one assertion each, replacing the per-phase constants that were
-// scattered through this file. `target` is the Revision-3 ROADMAP number;
-// `have` is what the data actually holds. A row fails when it drops under its
-// target, so growth is free and a silent trim is not. `shortfall` names the row
-// that has not reached its target yet and says who owns the gap — it prints in
-// every run instead of being quietly rounded away.
 
 interface TotalsRow {
   label: string;

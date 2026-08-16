@@ -35,7 +35,6 @@ const MenuBackground = lazy(() =>
 interface MenuEntry {
   key: string;
   screen: ScreenId;
-  phase?: number;
   action?: 'startCampaign';
 }
 
@@ -160,15 +159,10 @@ export const MenuScreen = () => {
             <Button
               key={entry.key}
               size="md"
-              variant={entry.phase === undefined ? 'filled' : 'default'}
-              disabled={entry.phase !== undefined}
+              variant="filled"
               onClick={onSelect(entry)}
               rightSection={
-                entry.phase !== undefined ? (
-                  <Text size="xs" c={tokens.faint}>
-                    {t('common:phaseHint', { phase: entry.phase })}
-                  </Text>
-                ) : entry.key === 'codex' && unreadMemories > 0 ? (
+                entry.key === 'codex' && unreadMemories > 0 ? (
                   <Badge size="sm" color="accent" data-unread-memories>
                     {unreadMemories}
                   </Badge>

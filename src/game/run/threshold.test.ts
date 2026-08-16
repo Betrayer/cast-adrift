@@ -95,14 +95,12 @@ describe("the threshold", () => {
   it("survives a save/resume at the fork, mid-S6 and pre-boss", () => {
     eligible();
     atFinale();
-    // 1 — at the fork, before the decision.
     let snap = captureRunSnapshot();
     useRunStore.getState().reset();
     expect(restoreRunSnapshot(snap)).toBe(true);
     expect(useRunStore.getState().crossedThreshold).toBe(false);
     expect(canCrossThreshold()).toBe(true);
 
-    // 2 — mid-S6, right after crossing.
     crossThreshold();
     snap = captureRunSnapshot();
     useRunStore.getState().reset();
@@ -110,7 +108,6 @@ describe("the threshold", () => {
     expect(useRunStore.getState().crossedThreshold).toBe(true);
     expect(useRunStore.getState().sector).toBe(SECTORS.length);
 
-    // 3 — parked on the boss row, through the real local-storage path.
     const map = useRunStore.getState().map;
     const boss = map?.nodes.find((n) => n.type === "boss");
     expect(boss).toBeDefined();

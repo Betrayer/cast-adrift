@@ -275,8 +275,6 @@ describe("map generator", () => {
     }
   });
 
-  // «За Ядром» marks whole rows, never single nodes, and never the two rows the
-  // act is actually about.
   it("marks three inverted and three storm rows in sector 6, never the same one", () => {
     const shape = sectorDef(6).shape;
     for (let seed = 1; seed <= 25; seed += 1) {

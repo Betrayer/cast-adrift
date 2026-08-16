@@ -8,9 +8,6 @@ export const AXIS_DECK_THRESHOLD = 2;
 export const DRIFT_RUN_CAP = 2;
 export const AXIS_NOTCHES = 7;
 
-// Negative = Resonance, positive = Stability (DESIGN §2). Deck usage is a
-// tiebreaker, not the driver: it is settled once per sector and may contribute
-// at most DRIFT_RUN_CAP points across the whole run.
 export type AxisDelta = -1 | 0 | 1;
 
 export const sectorDriftDelta = (
@@ -46,8 +43,6 @@ export const axisLabel = (axis: number): "resonance" | "stability" | "neutral" =
 export const clampAxis = (axis: number): number =>
   Math.max(AXIS_MIN, Math.min(AXIS_MAX, axis));
 
-// Seven notches over the full −10..+10 span: the middle notch is the neutral
-// band, and the two outermost ones are the ending thresholds and beyond.
 const NOTCH_BOUNDS: readonly number[] = [-5, -3, -1, 2, 4, 6];
 
 export const axisNotch = (axis: number): number => {

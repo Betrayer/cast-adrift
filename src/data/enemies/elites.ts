@@ -1,10 +1,6 @@
 import { enemy, sub } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// Fourteen elites, each a named test of one build axis. Every one carries a
-// subsystem so A6's overclock module has something to bolt onto, and every one
-// states its test in its signature line: an elite the player cannot read is just
-// a bigger base enemy.
 export const ELITE_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "raiderAlpha",
@@ -147,7 +143,6 @@ export const ELITE_ENEMIES: readonly EnemyDef[] = [
     ],
   }),
 
-  // ── the six build-tests ───────────────────────────────────────────────────
   enemy({
     id: "slagGolem",
     hp: 36,

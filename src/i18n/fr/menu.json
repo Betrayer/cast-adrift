@@ -12,7 +12,6 @@
   "cloudFound": "Une nouvelle série a été détectée dans le nuage — faut-il la poursuivre ?",
   "cloudYes": "Course dans le cloud",
   "cloudNo": "Local",
-  "stub": "Cet écran apparaît dans la phase «{{phase}} ».",
   "resumeCard": "Lire la suite : Secteur {{sector}} · en détail {{depth}} · {{when}}",
   "resumeContinue": "Continuer",
   "resumeAbandon": "Laisse tomber",

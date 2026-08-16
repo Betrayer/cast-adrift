@@ -17,10 +17,6 @@ export interface TextureUsage {
 const NO_TEXTURES: TextureUsage = { live: 0, bytes: 0 };
 
 let app: Application | null = null;
-// Pushed in by the texture cache once Pixi is on screen. Reading it the other
-// way round would give this module a static pixi.js dependency, and the perf
-// overlay lives in the App shell — which is exactly the chunk Pixi must stay
-// out of (DESIGN §17).
 let readTextures: () => TextureUsage = () => NO_TEXTURES;
 const pools = new Map<string, { used: number; size: number }>();
 
@@ -48,13 +44,6 @@ const countObjects = (node: Container): number => {
   for (const child of node.children) total += countObjects(child as Container);
   return total;
 };
-
-declare global {
-  interface Window {
-    __perf?: () => PerfSnapshot;
-  }
-}
-
 export const readPerf = (): PerfSnapshot => {
   const textures = readTextures();
   let poolUsed = 0;
@@ -72,7 +61,3 @@ export const readPerf = (): PerfSnapshot => {
     poolSize,
   };
 };
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__perf = readPerf;
-}

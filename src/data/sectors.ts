@@ -509,15 +509,9 @@ export const SECTORS: readonly SectorDef[] = [
   },
 ];
 
-// The length of a standard campaign, which is what every call site of this
-// constant means: where the finale routes, where drift's content clamp lands,
-// how many sector clears a run can bank. Sector 6 lives past it by invitation
-// only, so it is deliberately not `SECTORS.length`.
 export const CAMPAIGN_SECTORS = 5;
 
 export const SECTOR_COUNT = CAMPAIGN_SECTORS;
-
-export const SECTOR_SIX: SectorId = 6;
 
 export const SECTOR_BY_ID: ReadonlyMap<number, SectorDef> = new Map(
   SECTORS.map((def) => [def.id, def]),

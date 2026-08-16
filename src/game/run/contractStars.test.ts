@@ -8,9 +8,6 @@ import {
 } from "@/game/run/goals";
 import { createInitialRunStats, type RunStats } from "@/stores/runStore";
 
-// A "scripted run": the run tally a perfect attempt at each contract would leave
-// behind. Building it from the goal specs themselves proves every star is
-// reachable and that no two stars in one contract contradict each other.
 const scriptRun = (goals: readonly GoalSpec[]): GoalContext => {
   const stats: RunStats = { ...createInitialRunStats() };
   const ctx: GoalContext = {

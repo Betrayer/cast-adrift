@@ -18,8 +18,6 @@ const KEEP_VISIBLE = 0.25;
 export const clampScale = (scale: number): number =>
   Math.min(MAX_SCALE, Math.max(MIN_SCALE, scale));
 
-// The svg is `preserveAspectRatio="xMidYMid meet"`, so one factor maps user
-// units to CSS pixels and the viewBox is letterboxed inside the element.
 export const fitScale = (bounds: Box, viewport: Box): number =>
   bounds.w <= 0 || bounds.h <= 0
     ? 1

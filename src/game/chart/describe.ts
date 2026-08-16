@@ -114,6 +114,3 @@ export const chartNodeLines = (
   }
   return lines;
 };
-
-export const chartNodeTexts = (node: ChartNodeDef, t: Translate): string[] =>
-  chartNodeLines(node, t).map((line) => line.text);

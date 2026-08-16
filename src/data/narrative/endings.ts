@@ -11,8 +11,6 @@ export interface EndingContext {
   echoArcComplete?: boolean;
 }
 
-// A beat variant rewrites one line of the ending, so the last beacon's answer is
-// audible in the ending it leads to rather than only in the tally.
 export interface EndingVariant {
   id: string;
   at: number;
@@ -27,9 +25,6 @@ export interface EndingDef {
   label: LocKey;
   requirement: LocKey;
   beats: readonly LocKey[];
-  // The set a run that crossed the threshold plays instead. It is a replacement,
-  // not an appendix: an act that changed the answer should not have to recite the
-  // shallower version of it first.
   deepBeats?: readonly LocKey[];
   echoLine: LocKey;
   reads: readonly string[];
@@ -59,10 +54,6 @@ const variant = (
   when: (ctx) => has(ctx, key),
 });
 
-// «Ответ» is the only ending that asks for balance rather than commitment: five
-// beacons answered in this run, Echo's arc finished across the profile, and an
-// axis that never picked a pole. It is never listed, never hinted at by a
-// checklist, and only ever appears at the far side of the threshold.
 export const TRUE_ENDING_AXIS = 2;
 
 export const answerQualifies = (ctx: EndingContext): boolean =>
@@ -179,8 +170,6 @@ export const endingBeats = (
 export const earnedEndings = (ctx: EndingContext): EndingDef[] =>
   ENDINGS.filter((e) => e.qualifies(ctx));
 
-// Rare fallback (Task 6 step 1): nobody qualified, so the axis sign decides the
-// fork and Echo says out loud how thin the margin was.
 export const fallbackEndings = (ctx: EndingContext): EndingDef[] => {
   const seal = ENDING_BY_ID.get("seal");
   const merge = ENDING_BY_ID.get("merge");

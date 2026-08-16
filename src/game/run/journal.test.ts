@@ -56,8 +56,6 @@ describe("run journal", () => {
       { eventId: "probe", optionId: "take", optionIndex: 0 },
     );
     const kinds = journal().map((e) => e.k);
-    // The flag also closes Mara's first chain step, so the thread logs itself
-    // between the choice and its consequence.
     expect(kinds).toEqual(["choice", "chain", "consequence"]);
     expect(useNarrativeStore.getState().consequence?.origin).toBe(
       "content:consequence.maraFriend",
@@ -94,8 +92,6 @@ describe("run journal", () => {
     expect(useRunStore.getState().driftBlack).toBe(0);
     const drift = journal().filter((e) => e.k === "axis");
     expect(drift).toHaveLength(1);
-    // A second settle with no usage in between is a no-op, so the sector
-    // boundary can be crossed twice without paying twice.
     settleSectorDrift();
     expect(useRunStore.getState().axis).toBe(-1);
   });

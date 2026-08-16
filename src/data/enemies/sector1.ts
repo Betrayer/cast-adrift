@@ -1,9 +1,6 @@
 import { enemy } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// Sector 1 is the teaching floor: every anti-mechanic the run will lean on later
-// shows up here once, cheap and alone. It is also the only pool allowed to carry
-// pure two-step loops (R6 DoD), because a metronome is what a tutorial needs.
 export const SECTOR1_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "scavDrone",

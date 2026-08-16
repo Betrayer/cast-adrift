@@ -1,9 +1,6 @@
 import { enemy } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// Sector 5 is causality: order of operations is the weapon. Swaps land before
-// the volley, storms land after the roll, shells and guards decide what may be
-// hit at all, and half the pool reads the player's own state before it acts.
 export const SECTOR5_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "coreFragment",

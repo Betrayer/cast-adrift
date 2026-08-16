@@ -459,8 +459,6 @@ const applyDebugRoll = (
     };
   });
 
-// Prologue overrides (Phase-8 Task 4): a per-turn allow-list of slots, applied at
-// the store boundary so the resolver stays a single engine.
 export const allowedSlotsForTurn = (
   scriptedSlots: readonly (readonly SlotId[])[] | null,
   turn: number,
@@ -484,9 +482,6 @@ interface TurnTally {
   burnKilledElite: boolean;
 }
 
-// Contract goals count things no other system tracks (shields absorbed, the
-// biggest Spinal hit, a burn tick that finished an elite). The beats already
-// carry every number, so the counters read them instead of touching the resolver.
 export const tallyBundle = (bundle: ResolutionBundle): TurnTally => {
   let shieldAbsorbed = 0;
   let repairBayHealed = 0;
@@ -593,7 +588,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const singleCast =
       runHasTrait(perks, chartPicks, "singleCast", modules) ||
       forcedTraits.includes("singleCast");
-    // Resonator pays out once per completed 4-set the deck actually holds.
     const setCharge =
       mods.setCompleteCharge *
       SET_SCHOOLS.filter((school) =>
@@ -684,7 +678,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set((s) => {
       if (s.phase !== "placement") return s;
       const die = s.dice.find((d) => d.uid === uid);
-      // A hijacked die is welded into the slot the Trawler picked.
       if (die?.pinned === true) return s;
       if (die?.state !== "placed" || die.slot === undefined) return s;
       const slot = s.slots[die.slot];
@@ -844,7 +837,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (die.state !== "tray" && die.state !== "placed") return s;
       const value = Math.min(die.tier, Math.max(1, die.value + dir));
       if (value === die.value) return s;
-      // The spring engraving spends its own once-per-battle nudge first.
       const springFree =
         dieHasGrant(s.engravings, die.defId, "freeNudge") &&
         !s.spentGrants.includes(`nudge:${uid}`);
@@ -952,8 +944,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     });
   },
 
-  // DESIGN section 7: the Fate die is never slotted. One button, one roll per
-  // battle, resolved through the ordinary Action vocabulary.
   rollFate: () => {
     const s = get();
     if (s.phase !== "placement" || s.rerollMode) return;
@@ -1022,15 +1012,12 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       }
       const streams = s.streams;
       const blueFloor = resonanceAtLeast(s.resonance, "blue", 2);
-      // The edge engraving: a reroll made only of engraved dice is free.
       const free = s.rerollSelection.every((uid) => {
         const die = s.dice.find((d) => d.uid === uid);
         return (
           die !== undefined && dieHasGrant(s.engravings, die.defId, "freeReroll")
         );
       });
-      // «Кассир» bills the reroll itself: whatever the tray gains, it gains a
-      // charge, so the answer to it is planning rather than spending.
       const taxed = s.enemies.some(
         (e) => e.hp > 0 && ENEMY_BY_ID.get(e.defId)?.feedsOnReroll === true,
       );
@@ -1294,13 +1281,3 @@ export const hydrateBattle = (save: BattleSaveState): void => {
     useBattleStore.getState().finishResolution();
   }
 };
-
-declare global {
-  interface Window {
-    __battle?: typeof useBattleStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__battle = useBattleStore;
-}

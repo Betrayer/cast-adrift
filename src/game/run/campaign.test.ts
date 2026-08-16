@@ -75,8 +75,6 @@ describe("campaign progression", () => {
     expect(useRunStore.getState().sector).toBe(SECTOR_COUNT);
   });
 
-  // The threshold is the only thing that lets a campaign run climb past the
-  // fifth act, and it still stops one sector later.
   it("walks into sector 6 once the run has crossed the threshold", () => {
     startRun(4242, 0);
     for (let i = 0; i < 4; i += 1) advanceSector();

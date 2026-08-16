@@ -177,9 +177,6 @@ const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
   return snapshot.charge + Math.floor(die.value * mult) > snapshot.chargeCap;
 };
 
-// Charge is a resource the greedy bot used to ignore entirely, which made every
-// reactor-leaning build unmeasurable. A competent player spends it: surge when
-// the bank is full, otherwise nudge the placed weapon dice up.
 const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
   const cost = Math.max(
     1,
@@ -256,8 +253,6 @@ const simulateBattle = (
           ? { ...d, value: streams.dice.int(1, d.tier) }
           : d,
       );
-      // Bot fidelity for «Кассир» (R6): the store bills every confirmed reroll,
-      // so the sim has to bill it too or the elite reads as free.
       for (const live of snapshot.enemies) {
         if (live.hp <= 0) continue;
         if (ENEMY_BY_ID.get(live.defId)?.feedsOnReroll !== true) continue;
@@ -267,8 +262,6 @@ const simulateBattle = (
     const decision = decidePlacements(snapshot);
     if (decision.targetId !== null) snapshot.targetId = decision.targetId;
     for (const placement of decision.placements) {
-      // A competent player does not pour a die into a reactor that is about to
-      // overflow: the −2 hull is strictly worse than burning the die.
       if (placement.slot === "reactor" && overflows(snapshot, placement.uid)) {
         continue;
       }
@@ -322,8 +315,6 @@ const decile = (sorted: readonly number[], q: number): number => {
 };
 
 const DECILES = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1];
-
-// ── Run mode ────────────────────────────────────────────────────────────────
 
 interface SectorResult {
   win: boolean;
@@ -538,8 +529,6 @@ const runSector = (seed: number): SectorResult => {
   return sectorResultOf(state, walk);
 };
 
-// ── Drift mode ────────────────────────────────────────────────────────────────
-
 interface DriftResult {
   depth: number;
   sectors: number;
@@ -573,9 +562,6 @@ const driftSector = (
   return { cleared: walk.cleared, rows: walk.rows };
 };
 
-// The starter deck dies in sector 1 (same as `--mode run`), so the loop scaling is
-// never reached. `--deck mid` enters drift with what a mid-collection profile
-// actually brings, which is the only way to measure the +8%/loop ramp.
 const DRIFT_MID_DECK: readonly string[] = [
   "red-d6",
   "red-d6",
@@ -609,7 +595,6 @@ const runDrift = (seed: number, mid: boolean): DriftResult => {
     const { cleared, rows } = driftSector(state, seed, sectorIndex);
     depth = depthFor(sectorIndex, rows);
     if (!cleared) break;
-    // Drift keeps the tide between sectors only through its cap; the map resets.
     state.tide = Math.max(0, state.tide - 1);
     state.jumpsSinceTide = 0;
   }
@@ -801,8 +786,6 @@ const runModeMain = (runs: number, seed: number, startedAt: number): void => {
   );
 };
 
-// ── Battle mode (default) ─────────────────────────────────────────────────────
-
 const battleModeMain = (
   runs: number,
   seed: number,
@@ -901,22 +884,15 @@ const battleModeMain = (
   );
 };
 
-// ── Boss / gate mode ─────────────────────────────────────────────────────────
-
 interface GateProfile {
   sector: number;
   deck: readonly string[];
   mkLevels: MkLevels;
   hull: number;
   tide: number;
-  // What the same player is carrying when they arrive. R6 made this matter: a
-  // `bargain` bills the run purse, so a harness with no purse measures the
-  // broke-player worst case rather than the ordinary arrival.
   scrap: number;
 }
 
-// A "mid deck" for each act: what a player who bought sensibly and upgraded on
-// cadence actually brings to the gate. Used only for balance measurement.
 const GATE_PROFILES: readonly GateProfile[] = [
   {
     sector: 1,
@@ -1032,20 +1008,13 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
 };
 
-// ── Sweep mode (Phase-10 Task 10) ────────────────────────────────────────────
-
 interface Archetype {
   name: string;
   deck: readonly string[];
   mkLevels: MkLevels;
-  // The two modules a player running this build buys first. A mid-collection
-  // profile always reaches a shop before the gate, so starting empty would
-  // measure a ship nobody actually flies.
   modules: readonly string[];
 }
 
-// Three mid-collection builds a real profile can actually assemble, one per
-// axis the balance bands care about: burst, sustain, and risk.
 const ARCHETYPES: readonly Archetype[] = [
   {
     name: "red-burn",
@@ -1057,7 +1026,6 @@ const ARCHETYPES: readonly Archetype[] = [
     modules: ["siegeMount", "emberInjector"],
   },
   {
-    // A four-set is the build; the rest is the weapons core every deck needs.
     name: "blue-wall",
     deck: [
       "blue-d6", "frostplate", "bulwark", "aegis",
@@ -1067,8 +1035,6 @@ const ARCHETYPES: readonly Archetype[] = [
     modules: ["ablativeWeave", "dampingCoil"],
   },
   {
-    // Black's measurable identity is the exceed-cap gamble (DESIGN §7), not the
-    // reactor: the bot converts charge at 3:1, so reactor value under-reads.
     name: "black-edge",
     deck: [
       "black-d6", "ashen", "pitch", "eclipse", "voidmaw",
@@ -1084,13 +1050,7 @@ interface SweepOptions {
   ascension: number;
   archetype: Archetype;
   forcedPerk?: string;
-  // The dead-perk harness compares «exactly this perk» against «no perk», so
-  // both arms have to refuse the draft. Letting the baseline arm draft six perks
-  // measured the draft, not the card.
   noDraft?: boolean;
-  // The deep mode measures the ship a sector-6 entrant actually flies, which is
-  // not the ship the sector sweep gives every act: five cleared sectors of
-  // drafts, upgrades and loot ride into «За Ядром» with the captain.
   perks?: readonly string[];
   deckExtra?: readonly string[];
   mkLevels?: MkLevels;
@@ -1100,9 +1060,6 @@ const sweepState = (opts: SweepOptions): RunState => {
   const aMods = ascensionMods(opts.ascension);
   const carried =
     opts.forcedPerk !== undefined ? [opts.forcedPerk] : [...(opts.perks ?? [])];
-  // A perk handed to the profile at construction never went through `takePerk`,
-  // so its `hullMaxDelta` was silently dropped and every hull perk read as a
-  // perk with no body.
   const hullMax = Math.max(
     1,
     Math.round(shipHullMax("wanderer") * (1 + aMods.hullPct / 100)) +
@@ -1153,9 +1110,6 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult =>
 
 const SWEEP_ASCENSIONS: readonly number[] = [0, 3, 6];
 
-// The DoD band lives here rather than on the campaign's conditional clear rate:
-// the sweep flies one loadout through every act, so it is the only read that
-// isolates the sector from the build that arrives in it.
 const LADDER_GAP_PP = 18;
 
 const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
@@ -1249,26 +1203,9 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
   if (cliffs > 0 || rises > 0) process.exitCode = 1;
 };
 
-// Dead-perk report: every perk is force-picked for a fixed run budget and its
-// winrate compared with the no-perk baseline on the same seeds. R11 adds the
-// tag axis: a perk that carries a synergy tag the loadout never mentions is a
-// different failure from a perk whose numbers are small, and only the tag roll
-// up separates them.
-// The dead line is two standard errors of a winrate difference at the default
-// run budget, so a flagged perk is a measurement rather than a coin flip: at 200
-// runs SE(delta) is about 4.2 pp, so 8 pp is the smallest honest claim.
 const DEAD_PERK_LINE = -8;
-// «Dominant at equal offer» is a pick-rate claim, not a winrate one: a perk is
-// dominant when the draft policy takes it out of a three-card offer of its own
-// rarity more often than this. Comparing a forced winrate against an absolute
-// 60 % line measured the sector, not the perk — the S2 baseline alone sits at
-// 77 % — and offering a rare beside two commons only measures the rarity ladder,
-// which is doing its job. The rate is averaged over all three archetypes for the
-// same reason: a red perk that a red build always takes is the draft working,
-// not a dominant card. What this flags is the perk every build takes anyway.
 const DOMINANT_PICK_PCT = 60;
 const PICK_TRIALS = 120;
-// Two standard errors of a winrate difference at the documented run budget.
 const DOMINANT_EDGE_PP = 8;
 
 const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
@@ -1349,10 +1286,6 @@ const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
   }
   deltas.sort((a, b) => a.delta - b.delta);
   const dead = deltas.filter((d) => d.delta < DEAD_PERK_LINE);
-  // Both halves have to agree before a card is called dominant: a high pick rate
-  // alone only reports what the draft policy likes, and a high winrate alone only
-  // reports what one forced run budget did. The intersection is the card every
-  // build takes and that measurably wins.
   const dominant = deltas
     .map((d) => ({ ...d, pickRate: pickRates.get(d.id) ?? 0 }))
     .filter(
@@ -1410,30 +1343,11 @@ const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
   );
 };
 
-// Economy pass (Phase-10 Task 10). DESIGN §9.3 prices every node type; the
-// assertion here is the derived one: scrap earned per cleared node must sit
-// inside the battle-floor..elite-ceiling band once the sector multiplier is
-// applied, and a healthy run must convert a real share of it into upgrades.
 const ECONOMY_PER_NODE_MIN = 12;
 const ECONOMY_PER_NODE_MAX = 60;
-// A sector must fund at least one Mk3 (130) and never so much that prices stop
-// mattering — six Mk3s is the ceiling the §9.3 spend list implies.
 const ECONOMY_SECTOR_MIN = 130;
 const ECONOMY_SECTOR_MAX = 130 * 6;
-// The sector floor is a claim about a *traversed* sector, so it is measured on
-// the runs that traversed one. Measured over every run it stops being an
-// economy number and becomes a survival number: the greedy policy prices charge
-// at 3:1 and has no lookahead, so a black deck's median run dies mid-sector and
-// drags the total under a floor the sector's own price list never missed. The
-// per-node rate stays over the whole population — that one is the income rate,
-// and it is unbiased. Below this many clears the sample is too thin to read, and
-// the row falls back to projecting the per-node rate across the sector's depth.
 const ECONOMY_MIN_CLEARS = 12;
-// The §9.3 price list is a list of *fight* prices — battle, elite, mini-boss,
-// boss — so the rate is per fight cleared, not per node walked. The distinction
-// was invisible while every sector had roughly sector 1's node mix; «За Ядром»
-// is half events, and this harness resolves none of them, so dividing by every
-// node would read the act's whole narrative half as zero income.
 
 const economyModeMain = (runs: number, seed: number, startedAt: number): void => {
   const rows: string[] = [
@@ -1546,13 +1460,6 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   }
 };
 
-/// ── Dice mode (R11) ─────────────────────────────────────────────────────────
-//
-// The dead-die question is not the dead-perk question. A perk is added to a
-// loadout; a die *replaces* one, because the deck is capped. So the harness
-// swaps each die into the archetype's worst slot and compares against the same
-// archetype with no swap, on the same seeds and with the draft refused in both
-// arms — the same fairness the perk harness needed.
 const DEAD_DIE_LINE = -8;
 
 const diceModeMain = (runs: number, seed: number, startedAt: number): void => {
@@ -1627,13 +1534,6 @@ const diceModeMain = (runs: number, seed: number, startedAt: number): void => {
   );
 };
 
-// ── Campaign mode (R11) ─────────────────────────────────────────────────────
-//
-// The A0 campaign band is a claim about a chained five-act run: hull, deck,
-// perks, modules, Mk and purse cross every sector boundary, and only the tide
-// and the jump counter reset. `sweep` re-issues a mid-collection loadout per
-// sector, so the product of its columns is not this number.
-
 interface CampaignResult {
   cleared: boolean;
   sectorsCleared: number;
@@ -1655,8 +1555,6 @@ interface CampaignResult {
 
 const CAMPAIGN_SECTORS = 5;
 
-// A mid-collection captain is a deck *and* a chart. Sitting on zero picks read
-// the campaign as a level-1 profile flying level-25 content.
 const MID_COLLECTION_PICKS: readonly string[] = buildChartPicks(
   MID_COLLECTION_LEVEL,
 );
@@ -1942,8 +1840,6 @@ const campaignModeMain = (
   if (outOfBand > 0) process.exitCode = 1;
 };
 
-// ── Puzzle mode (R11) ───────────────────────────────────────────────────────
-
 const PUZZLE_BELL: readonly number[] = [8, 15, 20, 12, 5];
 
 const puzzleModeMain = (runs: number, seed: number, startedAt: number): void => {
@@ -2027,14 +1923,6 @@ const puzzleModeMain = (runs: number, seed: number, startedAt: number): void => 
   );
 };
 
-// ── Sector 6 mode (R9 Task 5, `--mode s6`; `deep` kept as its alias) ────────
-//
-// «За Ядром» is entered by a captain who has just cleared five acts, so the
-// sector sweep's mid-collection loadout under-reads it by a whole campaign's
-// worth of drafts. This mode measures the same three archetypes at the state
-// the threshold is actually crossed in: every system at Mk3, eight perks, and
-// the rare drops five sectors hand out.
-
 const S6_ENTRY_MK: MkLevels = {
   weaponA: 3,
   weaponB: 3,
@@ -2058,15 +1946,8 @@ const S6_ENTRY_PERKS: readonly string[] = [
   "fullRefit",
 ];
 
-// A five-act clear leaves a deck that has actually grown. Deck cap trims the
-// overflow, so this is «what fits» rather than «what a wishlist holds».
 const S6_ENTRY_DICE: readonly string[] = ["aurora", "coreshard", "lodestar"];
 
-// The band is a claim about the act at its default difficulty: an opt-in sixth
-// act has to be beatable by the ship that earned the invitation, and it has to
-// stay a fight. Ascension exists precisely to push a run under a floor like this
-// one, so A3 and A6 are recorded beside A0 and never asserted against — and the
-// black column stays the standing bot anti-signal (R5), printed, not enforced.
 const DEEP_BAND: readonly [number, number] = [0.35, 0.75];
 
 const deepModeMain = (runs: number, seed: number, startedAt: number): void => {
@@ -2104,9 +1985,6 @@ const deepModeMain = (runs: number, seed: number, startedAt: number): void => {
         const avg = (f: (r: SectorResult) => number): number =>
           results.reduce((sum, r) => sum + f(r), 0) / n;
         const winrate = results.filter((r) => r.win).length / n;
-        // Only the entry profile is held to the band; the sector-sweep row is
-        // printed beside it to show how much of the act a campaign's worth of
-        // upgrades is actually paying for.
         const ok =
           profile !== "entry" ||
           ascension !== 0 ||
@@ -2146,11 +2024,6 @@ const deepModeMain = (runs: number, seed: number, startedAt: number): void => {
   );
 };
 
-// ── Roster mode (R6 Task 5) ─────────────────────────────────────────────────
-
-// The home sector a def is actually met in, so the 1v1 harness measures it
-// against the deck and the HP curve it is designed against rather than against
-// sector 1 for everybody.
 const homeSectorOf = (id: string): number => {
   for (const def of SECTORS) {
     const pooled =
@@ -2183,10 +2056,6 @@ const rosterTierOf = (id: string): string => {
   return "base";
 };
 
-// A 1v1 at full hull with a tuned deck is not the fight the player has. Each
-// tier is measured at the state it is actually met in: an ordinary battle early
-// in a sector, an elite after two, a gate fight at the row it gates, a boss at
-// the end of the sector with the tide up.
 interface RosterEntry {
   hullPct: number;
   tide: number;
@@ -2200,9 +2069,6 @@ const ROSTER_ENTRY: Readonly<Record<string, RosterEntry>> = {
   boss: { hullPct: 55, tide: 3, scrap: 60 },
 };
 
-// Solvability bands. The floor is the real gate the plan asks for — nothing may
-// be unwinnable at an on-curve deck — and the ceiling catches a fight that has
-// stopped being one.
 const ROSTER_BANDS: Readonly<Record<string, readonly [number, number]>> = {
   base: [0.8, 1],
   elite: [0.55, 1],
@@ -2277,8 +2143,6 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
     const totalRuns = perTier.reduce((sum, r) => sum + r.runs, 0);
     const rate = total / Math.max(1, totalRuns);
     const band = ROSTER_BANDS[tier] ?? [0, 1];
-    // The harness flies one mid-collection deck at every sector, so sector-1
-    // content reads at the ceiling by construction. The floor still applies.
     const ceiling = sector === 1 ? 1 : band[1];
     const ok = rate >= band[0] && rate <= ceiling;
     if (!ok) failures += 1;
@@ -2316,12 +2180,6 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
   if (failures > 0 || unfair > 0) process.exitCode = 1;
 };
 
-// ── Axis mode (R7 Task 1) ────────────────────────────────────────────────────
-// The question the table answers: after the R7 rebalance, can deck colour still
-// out-vote the player's choices? Three policies walk the real event pool through
-// the real map generator; drift is settled once per sector and capped for the
-// run, exactly as `settleSectorDrift` does at runtime.
-
 type AxisPolicy = "stability" | "resonance" | "greedy";
 
 const optionAxisSum = (option: EventOption): number => {
@@ -2343,8 +2201,6 @@ const optionAxisSum = (option: EventOption): number => {
   return total / lists.length;
 };
 
-// «greedy» is the player who never reads the meter: it takes a uniformly random
-// option and lets the axis land where it lands.
 const pickByPolicy = (
   def: EventDef,
   policy: AxisPolicy,
@@ -2395,7 +2251,6 @@ const simulateAxisRun = (seed: number, policy: AxisPolicy, row: AxisRow): number
       row.choiceTotal += delta;
       axis = Math.max(-10, Math.min(10, axis + delta));
     }
-    // A mono-black deck: nine black dice placed, nothing blue.
     const drift = driftAllowed(sectorDriftDelta(9, 0, 9, 0), driftSpent);
     driftSpent += Math.abs(drift);
     row.driftTotal += drift;

@@ -81,8 +81,6 @@ export interface RunStats {
   actionCount: number;
 }
 
-// Everything a finished battle contributes to the goal counters, captured before
-// the battle store resets.
 export interface BattleTally {
   won: boolean;
   turns: number;
@@ -713,13 +711,3 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set(createInitialRunValues());
   },
 }));
-
-declare global {
-  interface Window {
-    __run?: typeof useRunStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__run = useRunStore;
-}

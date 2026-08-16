@@ -22,9 +22,6 @@ export interface ChainDef {
 
 export const CHAIN_WEIGHT_BOOST = 3;
 
-// Four threads through the campaign. A step is «done» when any of its `done`
-// flags is set — those flags are the chain's declared readers, so the flag lint
-// sees a chain as a consumer like any event gate.
 export const CHAINS: readonly ChainDef[] = [
   {
     id: "mara",
@@ -267,8 +264,6 @@ export const chainViews = (
   sector: number,
 ): ChainView[] => CHAINS.map((c) => chainView(c, flags, sector));
 
-// The event ids a boosted draw should favour right now: exactly the next step of
-// every chain that can advance in this sector.
 export const liveChainEvents = (
   flags: Record<string, FlagValue>,
   sector: number,

@@ -74,9 +74,6 @@ describe("resolution order", () => {
     expect(beats.map((b) => b.slot)).toEqual(["weaponA", "sensors"]);
   });
 
-  // The mark a Sensors die lays is worth nothing on an inverted row: the guns
-  // have already fired by the time it lands. That is the whole trade the motif
-  // is asking the player to plan around, so it is worth a test of its own.
   it("makes a sensor mark useless on an inverted row", () => {
     const build = (inverted: boolean): number => {
       const dice = [
@@ -148,7 +145,6 @@ describe("probability storm", () => {
     expect(beatA?.slot).toBe(beatB?.slot);
     const changed = a.dice.filter((d, i) => d.value !== build().dice[i]?.value);
     expect(changed.length).toBeLessThanOrEqual(1);
-    // The tray die is never the one the storm takes.
     expect(a.dice.find((d) => d.uid === "d2")?.value).toBe(4);
   });
 

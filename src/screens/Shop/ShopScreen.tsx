@@ -105,7 +105,6 @@ export const ShopScreen = () => {
     autosaveRun();
   };
 
-  // «Лотерейный блок» pays for the first reroll of every shop it visits.
   const rerollCost = (rerolls: number): number =>
     rerolls < mods.freeShopRerolls ? 0 : SHOP_REROLL_COST;
 
@@ -147,8 +146,6 @@ export const ShopScreen = () => {
     completeNode({ outcome: "cleared" });
   };
 
-  // The counter greeting is drawn from the node's own seed, so a reloaded save
-  // hears the same line (DESIGN §2.1, 40 keeper lines).
   const greeting = createStream(deriveSeed(seed, `keeper:${nodeId}`)).pick(
     keeperLinesFor("shop", flags),
   );

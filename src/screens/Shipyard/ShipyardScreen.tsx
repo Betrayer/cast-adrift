@@ -91,7 +91,6 @@ export const ShipyardScreen = () => {
     autosaveRun();
   };
 
-  // The mini-boss Mk-voucher: one free tier at any shipyard, no scrap spent.
   const redeemVoucher = (slotId: SlotId): void => {
     const state = useRunStore.getState();
     if ((state.mkLevels[slotId] ?? 1) >= 3) return;

@@ -40,8 +40,6 @@ const bed: BedState = {
   suspended: false,
 };
 
-// Ducks nest: a loot fanfare inside a level-up ceremony must not un-duck the bed
-// when the shorter of the two expires, so the depth is a count, not a flag.
 let duckDepth = 0;
 
 interface Voice {
@@ -52,8 +50,6 @@ interface Voice {
 const voices = new Map<SfxId, Voice[]>();
 const cursors = new Map<SfxId, number>();
 
-// Detune walks a fixed ring instead of a random draw: the same reason the clips
-// themselves are seeded — two identical sessions must sound identical.
 const JITTER_RING = [0, 0.62, -0.41, 0.93, -0.78, 0.25, -0.95, 0.47];
 let jitterCursor = 0;
 
@@ -198,8 +194,6 @@ export const playSfx = (id: SfxId, options?: SfxOptions): void => {
   if (rate !== 1) howl.rate(Math.max(0.5, Math.min(4, rate)), soundId);
 };
 
-// One bed at a time plus an optional layer that rides on top of it: the boss
-// intensity track is the same length, so it stays phase-locked to the battle bed.
 export const playMusic = (
   track: MusicId | null,
   options?: { layer?: MusicId | null; layerGain?: number; fadeMs?: number },
@@ -224,8 +218,6 @@ export const playMusic = (
   retune(options?.fadeMs ?? (gainOnly ? 700 : CROSSFADE_MS));
 };
 
-// DESIGN §10: fanfares own the mix for their length — the bed steps back
-// instead of fighting them.
 export const duckMusic = (ms = 1600): void => {
   duckDepth += 1;
   retune(160);
@@ -237,7 +229,7 @@ export const duckMusic = (ms = 1600): void => {
 
 export const musicDuckDepth = (): number => duckDepth;
 
-export const disposeAudio = (): void => {
+const disposeAudio = (): void => {
   unsubscribe?.();
   unsubscribe = null;
   if (visibilityBound && typeof document !== "undefined") {

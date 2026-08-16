@@ -12,7 +12,6 @@
   "cloudFound": "Se ha encontrado una ejecución más reciente en la nube. ¿Quieres continuar con ella?",
   "cloudYes": "Carrera en la nube",
   "cloudNo": "Local",
-  "stub": "Esta pantalla aparece en la fase «{{phase}}».",
   "resumeCard": "Continuar: Sector {{sector}} · profundidad {{depth}} · {{when}}",
   "resumeContinue": "Continuar",
   "resumeAbandon": "Déjalo estar",

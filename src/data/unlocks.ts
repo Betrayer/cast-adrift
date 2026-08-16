@@ -296,9 +296,6 @@ export const UNLOCKS: readonly UnlockDef[] = [
     source: { level: 50 },
     feature: "freeRespec",
   },
-  // The only unlock with no tease anywhere: the offer at the S5 finale is its
-  // own reveal, so a first-time captain meets «За Ядром» as a surprise rather
-  // than as a locked row they have been walking past for twenty runs.
   {
     id: "s6-threshold",
     kind: "feature",
@@ -435,6 +432,3 @@ export const contractUnlockHints = (id: string): UnlockHint[] => {
     hintFor,
   );
 };
-
-export const cosmeticUnlockHints = (id: string): UnlockHint[] =>
-  UNLOCKS.filter((def) => def.cosmetic === id).map(hintFor);

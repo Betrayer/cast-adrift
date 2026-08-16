@@ -3,6 +3,7 @@ import {
   existsSync,
   mkdirSync,
   readdirSync,
+  readFileSync,
   renameSync,
   rmSync,
   statSync,
@@ -10,15 +11,38 @@ import {
 import { join } from "node:path";
 import process from "node:process";
 
-// Vite builds the app at base `/` so the dev server and every Phase 7-11 e2e
-// driver keep working unchanged. Production wants the landing at the root and
-// the game one level down, so the split happens here, after the build: the app
-// HTML moves to /play/index.html and the static landing takes its place. Asset
-// URLs are absolute, so the app runs from either path.
 const ROOT = process.cwd();
 const DIST = join(ROOT, "dist");
 const LANDING = join(ROOT, "landing");
 const PLAY = join(DIST, "play");
+
+const UNLINTABLE = [
+  "firestore.rules",
+  join("landing", "index.html"),
+  join("landing", "privacy.html"),
+];
+
+const assertNoComments = (): void => {
+  const offenders: string[] = [];
+  for (const relative of UNLINTABLE) {
+    const path = join(ROOT, relative);
+    if (!existsSync(path)) continue;
+    readFileSync(path, "utf8")
+      .split(/\r?\n/)
+      .forEach((line, index) => {
+        if (/^\s*(\/\/|<!--)/.test(line)) {
+          offenders.push(`${relative}:${String(index + 1)}`);
+        }
+      });
+  }
+  if (offenders.length === 0) return;
+  console.error(
+    `build-site: comments are not allowed — move the rationale to docs/design-notes.md:\n  ${offenders.join("\n  ")}`,
+  );
+  process.exit(1);
+};
+
+assertNoComments();
 
 if (!existsSync(join(DIST, "index.html"))) {
   console.error("build-site: dist/index.html missing — run `vite build` first");

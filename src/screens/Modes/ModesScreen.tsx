@@ -77,8 +77,6 @@ export const ModesScreen = () => {
     0,
   );
 
-  // A `?startapp=daily` deep link lands on this screen, so the card it asked for
-  // has to announce itself rather than sit third in a scroll.
   useEffect(() => {
     if (focus === undefined) return;
     focusRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
@@ -92,8 +90,6 @@ export const ModesScreen = () => {
     action();
   }, []);
 
-  // The attempt is claimed on the board before the run opens, so a second device
-  // cannot start the same day (plan Task 2.3).
   const startDaily = (): void => {
     void claimDailyAttempt(date).then(() => {
       startDailyRun(date);

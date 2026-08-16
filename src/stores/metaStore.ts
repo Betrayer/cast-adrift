@@ -288,8 +288,6 @@ const coerceDailyPlayed = (value: unknown): Record<string, DailyRecord> => {
   return out;
 };
 
-// v5 → v6: engravings and badges are new; anything that is not a clean
-// defId → string[] map is dropped rather than half-restored.
 const coerceEngravings = (value: unknown): Record<string, string[]> => {
   if (typeof value !== 'object' || value === null) return {};
   const out: Record<string, string[]> = {};
@@ -555,8 +553,6 @@ export const useMetaStore = create<MetaState>()(
         set({ tutorialSeen: [] });
       },
 
-      // Engravings are keyed by die definition (Phase-10 amendment 3): the
-      // collection has no per-copy identity to hang one on.
       engrave: (defId, engravingId, price) => {
         const current = get().engravings[defId] ?? [];
         if (current.includes(engravingId)) return false;
@@ -622,8 +618,6 @@ export const useMetaStore = create<MetaState>()(
         }));
       },
 
-      // Stars are a 3-bit mask and only ever accumulate, so a replay of a
-      // contract already three-starred grants no XP.
       recordContractStars: (id, mask) => {
         const previous = get().contracts[id] ?? 0;
         const gained = mask & ~previous;
@@ -800,13 +794,3 @@ export const useMetaStore = create<MetaState>()(
     },
   ),
 );
-
-declare global {
-  interface Window {
-    __meta?: typeof useMetaStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== 'undefined') {
-  window.__meta = useMetaStore;
-}

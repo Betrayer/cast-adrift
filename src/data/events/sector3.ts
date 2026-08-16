@@ -1,7 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// Sector 3 — The Rift. Twelve scenes; five are callbacks
-// (clanPaid, clanSlighted, relayFixed, choirCurious, hunterBeaten).
 export const SECTOR3_EVENTS: readonly EventDef[] = [
   {
     id: "foldedHour",

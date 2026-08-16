@@ -84,9 +84,6 @@ const getServerSnapshot = (): Viewport => FALLBACK;
 export const useViewport = (): Viewport =>
   useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
-export const useBreakpoint = (): Breakpoint =>
-  breakpointFor(useViewport().width);
-
 export const useAtLeast = (bp: Breakpoint): boolean =>
   atLeast(useViewport().width, bp);
 

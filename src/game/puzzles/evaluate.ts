@@ -30,7 +30,6 @@ interface DieMeta {
   school: School;
 }
 
-// Carry state threaded between turns of a multiTurn puzzle.
 export interface CarryState {
   charge: number;
   burn: number;
@@ -76,11 +75,6 @@ export const resolveFaces = (defId: string, tier: DieTier): number[] => {
   const faces = DIE_BY_ID.get(defId)?.faces;
   if (faces !== undefined && faces.length > 0) return [...faces];
   return Array.from({ length: tier }, (_, i) => i + 1);
-};
-
-export const faceRange = (defId: string, tier: DieTier): [number, number] => {
-  const faces = resolveFaces(defId, tier);
-  return [Math.min(...faces), Math.max(...faces)];
 };
 
 const capFor = (puzzle: PuzzleDef, slot: SlotId): number =>
@@ -383,8 +377,6 @@ export const singleTurnSatisfied = (
   }
 };
 
-// Single-placement satisfaction for every non-multiTurn arm (the runner's
-// live check). multiTurn is handled by the turn simulator instead.
 export const placementSatisfied = (
   puzzle: PuzzleDef,
   values: readonly number[],
@@ -396,7 +388,6 @@ export const placementSatisfied = (
   return singleTurnSatisfied(puzzle, target, values, placement);
 };
 
-// A representative scalar for the banner ("Damage 12 / 14", "= 14", ...).
 export const primaryMetric = (goal: PuzzleGoal): PuzzleMetric | "hull" => {
   switch (goal.g) {
     case "damage":
@@ -504,8 +495,6 @@ export const legalAssign = (
   return canAssign(die, capFor(puzzle, slot), computeCensus(metas));
 };
 
-// ---- multiTurn simulator ----
-
 export interface TurnOutcome {
   turnDamage: number;
   endShield: number;
@@ -519,8 +508,6 @@ export const applyTurn = (
   carry: CarryState,
 ): TurnOutcome => {
   const score = scorePlacement(puzzle, values, placement, carry);
-  // Burn ticks at the turn boundary (mirrors tickBurn): deals its full stack,
-  // then decays by one. Its damage counts toward the cumulative total.
   const tickDamage = score.enemyBurn;
   const burnOut = Math.max(0, score.enemyBurn - 1);
   return {

@@ -12,28 +12,6 @@ export type NodeType =
   | "beacon"
   | "boss";
 
-export const NODE_TYPES: readonly NodeType[] = [
-  "start",
-  "battle",
-  "elite",
-  "miniboss",
-  "shop",
-  "shipyard",
-  "event",
-  "anomaly",
-  "beacon",
-  "boss",
-];
-
-export const SPECIAL_NODE_TYPES: readonly NodeType[] = [
-  "shipyard",
-  "shop",
-  "elite",
-  "event",
-  "anomaly",
-  "beacon",
-];
-
 export type NodeId = string;
 
 export type LaneBlessing = "blessed" | "cursed";
@@ -86,9 +64,6 @@ export const START_NODE_ID = nodeId(START_ROW, START_LANE);
 export const bossLaneFor = (shape: MapShape): number =>
   Math.min(START_LANE, shape.lanes - 1);
 
-export const bossNodeId = (shape: MapShape): NodeId =>
-  nodeId(shape.bossRow, bossLaneFor(shape));
-
 export const pocketLaneFor = (shape: MapShape): number => shape.lanes;
 
 export const NODE_GLYPH: Record<NodeType, LocKey> = {
@@ -109,9 +84,6 @@ export const nodeById = (map: MapGraph): ReadonlyMap<NodeId, MapNode> =>
 
 export const outgoingEdges = (map: MapGraph, from: NodeId): NodeId[] =>
   map.edges.filter(([a]) => a === from).map(([, b]) => b);
-
-export const incomingEdges = (map: MapGraph, to: NodeId): NodeId[] =>
-  map.edges.filter(([, b]) => b === to).map(([a]) => a);
 
 export const areConnected = (
   map: MapGraph,

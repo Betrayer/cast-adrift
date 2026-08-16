@@ -24,13 +24,8 @@ const ensureApp = (): FirebaseApp => {
   return app;
 };
 
-// `services/analytics.ts` needs the app instance and nothing else; components
-// still never import firebase directly (CLAUDE.md architecture rules).
 export const analyticsApp = (): FirebaseApp => ensureApp();
 
-// The uid persisted from a previous session, without creating one. Account
-// linking needs to read the anonymous profile before the Telegram sign-in
-// replaces it, and creating a throwaway anon user first would defeat that.
 export const restoredUid = async (): Promise<string | null> => {
   try {
     const auth = getAuth(ensureApp());
@@ -54,9 +49,6 @@ export const ensureAnonAuth = async (): Promise<string | null> => {
   }
 };
 
-// `api/telegram-auth` validates the initData HMAC server-side and mints a custom
-// token for the stable uid `tg:{telegram_id}` (DESIGN §4), so the same Telegram
-// account is the same profile on every device.
 export const signInWithTelegram = async (
   initDataRaw: string,
 ): Promise<string | null> => {

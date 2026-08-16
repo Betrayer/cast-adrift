@@ -25,9 +25,6 @@ export const App = () => {
   const fontScale = useSettingsStore((s) => s.fontScale);
   const reducedMotion = useSettingsStore((s) => s.reducedMotion);
 
-  // Applied during render, not in an effect: every screen below reads the
-  // live `tokens` object while rendering, so the switch has to land before
-  // the children of this provider render.
   const mantine = useMemo(() => mantineThemeFor(applyTheme(themeId)), [themeId]);
 
   useEffect(() => {

@@ -21,9 +21,6 @@ const sparkStyle = (index: number, color: string): CSSProperties => {
   return style as CSSProperties;
 };
 
-// A one-shot burst anchored at a screen point: used by the engraving station
-// the moment a rune takes on a die. The layer stays mounted and fades itself
-// out — a new burst restarts the animation by changing the React key.
 export const Sparkle = ({ burst }: { burst: SparkleBurst | null }) => {
   if (burst === null) return null;
   return (

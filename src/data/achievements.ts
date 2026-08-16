@@ -327,11 +327,3 @@ export const ACHIEVEMENT_GROUPS: readonly AchievementGroup[] = [
   "collection",
   "modes",
 ];
-
-export const ACHIEVEMENT_FLAGS: readonly string[] = [
-  ...new Set(
-    ACHIEVEMENTS.flatMap((def) =>
-      def.cond.c === "flags" ? [...def.cond.keys] : [],
-    ),
-  ),
-];

@@ -75,9 +75,6 @@ const computeShapeKey = (def: ShapedContent): string => {
     .join(" ");
 };
 
-// Content defs are frozen module data, so a shape is a property of the object
-// rather than of the moment it was asked for. The perk draft asks for the same
-// 180 shapes hundreds of times per offer; without this the sorts dominate.
 const shapeCache = new WeakMap<ShapedContent, string>();
 
 export const shapeKey = (def: ShapedContent): string => {

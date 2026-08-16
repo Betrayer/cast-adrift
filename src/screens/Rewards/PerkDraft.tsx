@@ -43,8 +43,6 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
     modules,
   });
 
-  // The cards flip in on a stagger; each one gets its own soft reveal so three
-  // cards read as three offers rather than one noise.
   useEffect(() => {
     const timers = choices.map((_, index) =>
       window.setTimeout(() => {

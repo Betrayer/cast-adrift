@@ -121,8 +121,6 @@ export const applyEventEffects = (
   for (const effect of effects) applyEffect(effect, stream);
 };
 
-// A chain step that just resolved gets its own journal line, so the thread reads
-// as a thread rather than as three unrelated scenes.
 const logChainProgress = (
   before: readonly ChainView[],
   after: readonly ChainView[],
@@ -175,8 +173,6 @@ export const applyOutcome = (
     return prior !== undefined && view.step > prior.step;
   });
   if (advanced) {
-    // Two notes, pitched by how deep the thread now runs: the same motif every
-    // chain uses, so progress on any of them is recognisable as progress.
     const deepest = chainsAfter.reduce((most, view) => {
       const prior = chainsBefore.find((v) => v.id === view.id);
       return prior !== undefined && view.step > prior.step

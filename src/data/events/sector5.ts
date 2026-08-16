@@ -1,7 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// Sector 5 — The Core. Nine scenes; four are callbacks
-// (pactSigned, hereticsArmed, silentReady, defectorSaved).
 export const SECTOR5_EVENTS: readonly EventDef[] = [
   {
     id: "causalityTide",

@@ -25,9 +25,6 @@ const starPath = (cx: number, cy: number, r: number): string => {
   return `M ${points.join(" L ")} Z`;
 };
 
-// One shape per school, defined once and rendered by both the Pixi die
-// texture and the SVG legend in the Codex — identity that survives a
-// monochrome theme and colour blindness alike.
 export const schoolGlyphPath = (
   school: School,
   cx: number,

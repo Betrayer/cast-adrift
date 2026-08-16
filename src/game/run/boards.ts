@@ -17,8 +17,6 @@ import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 import { useSummaryStore } from "@/stores/summaryStore";
 
-// The stored display name is deliberately locale-shaped: it is the captain's own
-// name, so a Russian client writes «Капитан-1A2B» and an English one Captain-1A2B.
 export const captainName = (): string => {
   const tgName = useAppStore.getState().tgName;
   if (tgName !== null && tgName.trim().length > 0) return truncateName(tgName);
@@ -41,9 +39,6 @@ export const boardUid = async (): Promise<string | null> => {
   }
 };
 
-// Everything the submission needs, read from the run store in one synchronous
-// pass. The run can be reset the moment the summary screen is dismissed, so
-// nothing after the first `await` may look at it again.
 const captureSubmission = (): {
   boards: string[];
   entry: Omit<BoardEntry, "uid">;
@@ -84,8 +79,6 @@ const captureSubmission = (): {
   };
 };
 
-// Called once when a scored run ends. Personal bests land locally first so the
-// summary is honest even with no network, then the board write is attempted.
 export const finishScoredRun = async (): Promise<void> => {
   const run = useRunStore.getState();
   const summary = useSummaryStore.getState();
@@ -129,8 +122,6 @@ export const finishScoredRun = async (): Promise<void> => {
     .recordDaily(captured.dailyDate, captured.score, rank);
 };
 
-// Starting the daily spends the attempt: the doc is claimed before the run so a
-// second device cannot open the same day.
 export const claimDailyAttempt = async (date: string): Promise<boolean> => {
   const meta = useMetaStore.getState();
   if (meta.dailyPlayed[date] !== undefined) return false;

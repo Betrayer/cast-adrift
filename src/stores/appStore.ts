@@ -5,9 +5,6 @@ export const ROOT_SCREEN: ScreenId = "menu";
 
 const STACK_LIMIT = 12;
 
-// Screens the player has to resolve rather than back out of: a fight, a choice,
-// a ceremony that has already paid out. The Telegram BackButton hides on these
-// instead of offering an exit that the run flow cannot honour.
 const BACK_LOCKED: ReadonlySet<ScreenId> = new Set<ScreenId>([
   "battle",
   "event",
@@ -37,9 +34,6 @@ export interface AppState {
   setCloudResume: (cloudResume: boolean) => void;
 }
 
-// Navigating to a screen that is already behind us is a return, not a push —
-// otherwise every Settings → Menu → Settings round trip grows the history and
-// the back button walks a loop the player never took.
 const nextStack = (stack: ScreenId[], from: ScreenId, to: ScreenId): ScreenId[] => {
   const at = stack.indexOf(to);
   if (at >= 0) return stack.slice(0, at);
@@ -75,13 +69,3 @@ export const useAppStore = create<AppState>()((set, get) => ({
   setUid: (uid) => set({ uid }),
   setCloudResume: (cloudResume) => set({ cloudResume }),
 }));
-
-declare global {
-  interface Window {
-    __app?: typeof useAppStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__app = useAppStore;
-}

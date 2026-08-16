@@ -1,10 +1,6 @@
 import { enemy } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// Sector 2 is the scrap economy: everything here bills you. Scrap theft, tolls,
-// mine fields and convoy shells — the pool attacks the wallet as often as the
-// hull, so a run that hoards for the shipyard pays a different price than one
-// that spends.
 export const SECTOR2_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "breakerDrone",

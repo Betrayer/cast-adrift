@@ -1,7 +1,6 @@
 {
   "appName": "Cast Adrift",
   "back": "Powrót",
-  "phaseHint": "Faza {{phase}}",
   "rotate": {
     "title": "Odwróć urządzenie",
     "body": "Cast Adrift gra się w pozycji pionowej. Aby kontynuować serię, należy obrócić ekran z powrotem do pozycji pionowej."

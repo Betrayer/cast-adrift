@@ -43,8 +43,6 @@ export const PackageReward = ({
     runModules.length >=
     moduleSlots(computeRunMods(perks, chartPicks).moduleSlotDelta);
 
-  // A package opens on its best card: the fanfare is the top rarity in the crate,
-  // then each card lands its own reveal on the same stagger the CSS uses.
   const best = choices.reduce<(typeof RARITY_ORDER)[number]>((top, dieId) => {
     const rarity = DIE_BY_ID.get(dieId)?.rarity;
     if (rarity === undefined) return top;

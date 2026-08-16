@@ -1,9 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// «За Ядром» — twelve scenes for an act the player chose to enter. The Rim's
-// events asked what you would take; these ask what you would give back. Every
-// scene writes a flag the deep endings or the epilogue read, and none of them
-// pays out without asking for something the run can still feel afterwards.
 export const SECTOR6_EVENTS: readonly EventDef[] = [
   {
     id: "hushAntechamber",

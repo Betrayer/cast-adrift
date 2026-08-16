@@ -25,9 +25,7 @@ const localAt = (): number => {
 const setLocalAt = (at: number): void => {
   try {
     localStorage.setItem(LOCAL_AT_KEY, String(at));
-  } catch {
-    /* storage unavailable */
-  }
+  } catch {}
 };
 
 const metaValues = (): MetaValues => {

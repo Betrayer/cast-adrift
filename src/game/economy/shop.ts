@@ -43,8 +43,6 @@ export const SHOP_WEIGHTS: RarityWeights = {
   legendary: 3,
 };
 
-// Callback consumers (DESIGN §3): the counter remembers what you did. Positive
-// pct = cheaper stock. Declared as data so the flag lint can see every reader.
 export interface ShopFlagRule {
   key: string;
   pct: number;
@@ -107,8 +105,6 @@ export const generateShopStock = (
   return items;
 };
 
-// Every shop carries one or two modules (DESIGN §9.4) on its own stream, so
-// adding modules never shifts the dice a saved run already rolled.
 export const generateShopModules = (
   seed: number,
   nodeId: string,

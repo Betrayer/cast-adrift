@@ -38,7 +38,7 @@ interface CacheEntry {
   bytes: number;
 }
 
-export interface TextureStats {
+interface TextureStats {
   built: number;
   evicted: number;
   live: number;
@@ -48,12 +48,9 @@ export interface TextureStats {
 const caches = new WeakMap<Renderer, Map<string, CacheEntry>>();
 const stats: TextureStats = { built: 0, evicted: 0, live: 0, bytes: 0 };
 
-export const textureStats = (): TextureStats => ({ ...stats });
 
 registerTextureUsage(() => ({ live: stats.live, bytes: stats.bytes }));
 
-// School identity has to survive Terminal's monochrome palette and every kind
-// of colour blindness, so each school also carries a shape (DESIGN a11y pass).
 export const drawSchoolGlyph = (
   g: Graphics,
   school: School,
@@ -68,8 +65,6 @@ export const drawSchoolGlyph = (
   else g.fill(color);
 };
 
-// Speckle stays inside the corner radius by construction — cheaper and more
-// predictable than masking the whole face during generateTexture.
 const paintNoise = (
   g: Graphics,
   seed: number,
@@ -224,7 +219,6 @@ export const dieTexture = (
     root.addChild(dot);
   }
 
-  // Engraved dice wear a corner rune: a notched chevron in the school stroke.
   if (engraved) {
     const r = size * 0.17;
     const runeInset = size * 0.13;
@@ -264,8 +258,6 @@ export const releaseDieTextures = (app: Application): void => {
   stats.bytes = 0;
 };
 
-// A theme switch invalidates every cached face; the scene rebuilds right
-// after, so dropping the whole map is cheaper than keying around it.
 export const clearDieTextureCache = (app: Application): void => {
   const cache = caches.get(app.renderer);
   if (cache === undefined) return;

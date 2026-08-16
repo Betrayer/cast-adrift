@@ -143,8 +143,6 @@ export const ChartScreen = () => {
     () => (previewId === null ? null : pathTo(previewId, picks)),
     [previewId, picks],
   );
-  // A route lights up node by node; one quiet tick per step tells the player how
-  // long the route is without counting the dots.
   const previewLength = preview?.ids.length ?? 0;
   useEffect(() => {
     if (previewLength === 0) return;
@@ -188,9 +186,6 @@ export const ChartScreen = () => {
     return region === null ? null : frameRegion(region, CHART_BOUNDS);
   }, [pickSet]);
 
-  // The measurement subscription doubles as the first-frame framing: the chart
-  // opens on the region the player has actually invested in, and a fresh
-  // profile opens on the hub instead of the middle of an empty canvas.
   useEffect(() => {
     const element = viewportRef.current;
     if (element === null) return;

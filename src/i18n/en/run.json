@@ -21,7 +21,6 @@
     "jump": "Jump to selected node",
     "jumpHint": "Select a reachable node",
     "you": "You",
-    "boss": "Boss",
     "abandon": "Abandon run",
     "previewMiniboss": "Mini-boss: {{name}}",
     "previewBoss": "Boss: {{name}}",
@@ -202,18 +201,15 @@
   },
   "consequenceToast": "Consequence: {{text}}",
   "rewards": {
-    "scrap": "+{{n}} scrap",
     "dieTitle": "Salvaged die",
     "keep": "Keep in deck",
     "sell": "Sell (+{{n}})",
-    "deckFull": "Deck full (9)",
-    "healed": "Repaired +{{n}}"
+    "deckFull": "Deck full (9)"
   },
   "perk": {
     "title": "Choose an upgrade",
     "pick": "Take",
     "skip": "Skip (+{{n}} scrap)",
-    "sub": "1 of 3",
     "banish": "Banish",
     "banishHint": "Banishing removes that card and its kind from the rest of the run. Once per run.",
     "reroll": "Reroll draft ({{n}} scrap)"
@@ -221,14 +217,12 @@
   "shop": {
     "title": "Market · Mara",
     "buy": "Buy ({{n}})",
-    "sell": "Sell",
     "reroll": "Restock ({{n}})",
     "leave": "Leave",
     "scrap": "Scrap: {{n}}",
     "deck": "Deck {{n}}/9",
     "sellTitle": "Sell a die",
     "empty": "Sold out",
-    "owned": "In deck",
     "modulesTitle": "Modules {{used}}/{{max}}",
     "modulesFull": "Bay full",
     "rerollFree": "Reroll stock (free)"
@@ -238,10 +232,8 @@
     "mk": "Mk{{mk}} — {{cost}}",
     "mkMax": "Mk3 · maxed",
     "systems": "Systems",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Two identical dice → +1 tier",
-    "fusionPick": "Pick a die to fuse",
     "repair": "Repair",
     "repairHint": "2 scrap per hull",
     "leave": "Leave",
@@ -256,10 +248,8 @@
     "nodes": "Nodes cleared: {{n}}",
     "kills": "Kills: {{n}}",
     "earned": "Scrap earned: {{n}}",
-    "spent": "Scrap spent: {{n}}",
     "perks": "Upgrades:",
     "perksNone": "none",
-    "meta": "Shards & XP",
     "toMenu": "To menu",
     "faced": "Faced: {{names}}"
   },

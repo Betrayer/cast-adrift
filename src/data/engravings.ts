@@ -647,8 +647,6 @@ export const ENGRAVING_BY_ID: ReadonlyMap<string, EngravingDef> = new Map(
   ENGRAVINGS.map((def) => [def.id, def]),
 );
 
-export const ENGRAVING_REMOVAL_REFUND = 0;
-
 const TWO_SOCKET_RARITIES: ReadonlySet<Rarity> = new Set(["rare", "legendary"]);
 
 export const socketsForDie = (defId: string): number => {

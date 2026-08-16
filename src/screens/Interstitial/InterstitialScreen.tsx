@@ -1,5 +1,5 @@
 import { Button, Stack, Text, Title } from '@mantine/core';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
@@ -19,7 +19,7 @@ export const InterstitialScreen = () => {
   const sector = useRunStore((s) => s.sector);
   const seed = useRunStore((s) => s.seed);
   const flags = useRunStore((s) => s.flags);
-  const seenFragments = useMetaStore((s) => s.seenFragments);
+  const [seenOnArrival] = useState(() => useMetaStore.getState().seenFragments);
   const go = useAppStore((s) => s.go);
   const def = sectorDef(sector);
   const reduced = resolveReducedMotion(
@@ -32,13 +32,10 @@ export const InterstitialScreen = () => {
 
   const fragment = useMemo(() => {
     const stream = createStream(deriveSeed(seed, `jump:${String(sector)}`));
-    return pickFragment(sector, flags, seenFragments, (items) =>
+    return pickFragment(sector, flags, seenOnArrival, (items) =>
       stream.pick(items),
     );
-    // The pool is drawn once per arrival; re-reading `seenFragments` after the
-    // mark below would swap the line out from under the player.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sector, seed, flags]);
+  }, [sector, seed, flags, seenOnArrival]);
 
   useEffect(() => {
     if (fragment === null) return;

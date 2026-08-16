@@ -11,8 +11,6 @@ export interface DeathLine {
 const flag = (ctx: EpilogueContext, key: string): boolean =>
   ctx.flags[key] !== undefined;
 
-// Echo's last word. The first match wins, so the pool reads top-down from the
-// most specific state to the line that always fits.
 export const DEATH_LINES: readonly DeathLine[] = [
   {
     id: "pact",

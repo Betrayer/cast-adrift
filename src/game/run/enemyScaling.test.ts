@@ -110,10 +110,6 @@ const NO_INTEGER_PREIMAGE: readonly string[] = [
   "coreHeart",
 ];
 
-// Defs whose HP was deliberately re-authored after the R3 rebase. The rebase
-// evidence below is about the ladder, not about balance being frozen: a def that
-// has since been retuned no longer has a legacy pre-image to match, and saying so
-// here is what keeps the rest of the table honest.
 const RETUNED_SINCE_REBASE: Readonly<Record<string, string>> = {
   leechQueen: "R6 raised the gate-fight floor: 44 → 50",
   breakerBarge: "R11 softened the act-2 wall: 73 → 59",
@@ -196,10 +192,6 @@ describe("enemy scaling", () => {
     }
   });
 
-  // The table is R3's rebase evidence: it holds the defs whose HP number was
-  // baked on the old per-sector ladder. R6's roster was authored directly on the
-  // rebased curve and has no legacy pre-image, so the invariant is that no
-  // rebased def has silently left the roster — not that every def is in here.
   it("keeps every rebased def in the roster", () => {
     const ids = new Set(ALL_ENEMIES.map((def) => def.id));
     for (const id of Object.keys(LEGACY_EFFECTIVE_HP)) {

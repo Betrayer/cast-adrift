@@ -236,7 +236,6 @@
     "chartPoints": "Zwei Punkte für „Sternenkarte“"
   },
   "levelup": {
-    "title": "Eine Stufe höher",
     "level": "Kapitänsstufe {{level}}",
     "point": "+1 Punkt für „Sternenkarte“",
     "points": "+{{n}} Sternenkarte Punkte",
@@ -256,7 +255,7 @@
     "fromFinds": "Erste Funde",
     "fromAchievements": "Erfolge",
     "firstFinds": "Erstmalig gesichtet: {{names}}",
-    "fromDeep": "Beyond the Core"
+    "fromDeep": "Über den Kern hinaus"
   },
   "menu": {
     "level": "Lv{{level}}"
@@ -264,14 +263,10 @@
   "hangar": {
     "title": "Hangar",
     "deck": "Deck",
-    "collection": "Sammlung",
     "shop": "Meta Shop",
     "budget": "Budget {{used}} / {{max}}",
-    "pts": "{{n}} Punkte",
-    "owned": "×{{n}}",
     "add": "Hinzufügen",
     "buy": "Kaufen · {{price}}◈",
-    "sold": "Im Besitz von",
     "save": "Deck speichern",
     "saved": "Gespeichert",
     "invalidOver": "Über dem Budget",
@@ -280,25 +275,19 @@
     "invalidFate": "Maximal 1 Schicksalswürfel",
     "valid": "Bereit",
     "empty": "Der Stapel ist leer",
-    "ship": "Schiff",
     "shipEquip": "Ausrüsten",
     "shipEquipped": "Ausgestattet",
     "shipBuy": "Kaufen · {{price}}◈",
     "shipLocked": "Wird ab Level{{level}} freigeschaltet",
-    "filterSchool": "Schule",
-    "filterTier": "Stufe",
-    "filterRarity": "Seltenheit",
     "filterAll": "Alle"
   },
   "collection": {
     "title": "Sammlung",
-    "count": "{{n}} Würfel",
     "owned": "×{{n}}",
     "discount": "−{{n}} % — du bist auf diesen Würfel gestoßen",
     "found": "Getroffen",
     "undiscovered": "Noch nicht erfüllt",
     "provenance": "Gefunden: Sektor {{sector}}, {{node}}",
-    "filterState": "Bundesland",
     "stateAll": "Alle",
     "stateOwned": "Im Besitz von",
     "stateFound": "Getroffen",
@@ -425,7 +414,6 @@
     "locked": "Versiegelt",
     "achievements": "Erfolge",
     "achProgress": "{{have}} / {{need}}",
-    "achLocked": "Gesperrt",
     "badges": "Abzeichen",
     "achCount": "{{n}} von „{{total}}“",
     "group": {
@@ -435,8 +423,7 @@
       "story": "Geschichte",
       "collection": "Sammlung",
       "modes": "Modi"
-    },
-    "endingsHidden": "Some endings are not on this shelf."
+    }
   },
   "engraving": {
     "title": "Gravur Bahnhof",
@@ -455,7 +442,7 @@
     "ascendant": "Aszendent",
     "chartwright": "Chartwright",
     "archivist": "Archivar",
-    "answer": "The Answer"
+    "answer": "Die Antwort"
   },
   "unlock": {
     "opened": "Freigeschaltet",
@@ -495,9 +482,9 @@
     "featureEngraving": "Gravur Bahnhof",
     "featureDailyPreview": "Tägliche Vorschau",
     "featureFreeRespec": "Kostenlose Keystone-Neuzuweisung",
-    "sectorSix": "Sector 6 «Beyond the Core»",
-    "diceS6": "Four causality dice",
-    "skinThreshold": "Die skin «Threshold»"
+    "sectorSix": "Sektor 6 „Jenseits des Kerns“",
+    "diceS6": "Vier Kausalitätswürfel",
+    "skinThreshold": "Die Skin „Threshold“"
   },
   "skin": {
     "title": "Die Skins",
@@ -529,8 +516,8 @@
       "desc": "Blaupause, quadratisch, einfarbige Glyphen."
     },
     "threshold": {
-      "name": "Threshold",
-      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
+      "name": "Schwellenwert",
+      "desc": "Rund, unbeleuchtet, mit einem Rand in Flottengrau. Getragen von dem einen Kapitän, der sich nie zurücklehnte."
     }
   },
   "ach": {
@@ -656,12 +643,12 @@
     },
     "toast": "Leistung",
     "beyondTheCore": {
-      "name": "Beyond the Core",
-      "desc": "Cross the threshold and clear Sector 6."
+      "name": "Über den Kern hinaus",
+      "desc": "Überquere die Schwelle und räume Sektor 6."
     },
     "theAnswer": {
-      "name": "The Answer",
-      "desc": "Reach the hidden ending past the Core."
+      "name": "Die Antwort",
+      "desc": "Erreiche das versteckte Ende jenseits des Kerns."
     }
   },
   "chartTag": {
@@ -707,8 +694,5 @@
       "prestigeTheme": "Thema „Ascendant“",
       "badge": "das „Ascendant“-Abzeichen"
     }
-  },
-  "shard": {
-    "deepClear": "Beyond the Core"
   }
 }

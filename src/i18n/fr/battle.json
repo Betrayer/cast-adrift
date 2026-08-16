@@ -72,9 +72,9 @@
     "bargain": "{{n}} de factures : votre ferraille ou votre coque",
     "enrage": "Enrages + {{n}}",
     "hijack": "Il s'empare de ton meilleur dé",
-    "echoTotal": "echoes your last turn (max {{n}})",
-    "foldOrder": "folds the order",
-    "devourDie": "eats your best spare die"
+    "echoTotal": "reprend votre dernier tour ({{n}} maximum)",
+    "foldOrder": "traite la commande",
+    "devourDie": "utilise ton meilleur dé de réserve"
   },
   "slot": {
     "weaponA": "Arme A",
@@ -111,14 +111,14 @@
     "enrage": "RAGE",
     "hijack": "DÉTOURNEMENT",
     "ward": "WARD",
-    "fold": "FOLD",
-    "devour": "EATEN"
+    "fold": "PLIER",
+    "devour": "MANGÉ"
   },
   "enemyWard": "Circonscription : {{school}}",
   "enemyGate": "{{n}} de l'entrée",
   "enemyRage": "Rage + {{n}}",
-  "inverted": "INVERTED ORDER",
-  "invertedHint": "Reactor first, Sensors last.",
-  "storm": "PROBABILITY STORM",
-  "stormHint": "One placed die re-rolls before anything resolves."
+  "inverted": "COMMANDE INVERSE",
+  "invertedHint": "Le réacteur d'abord, les capteurs ensuite.",
+  "storm": "TEMPÊTE DE PROBABILITÉS",
+  "stormHint": "On relance un dé déjà placé avant que quoi que ce soit ne soit résolu."
 }

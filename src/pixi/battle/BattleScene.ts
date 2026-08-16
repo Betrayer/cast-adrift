@@ -197,8 +197,6 @@ const dashedRoundRectStroke = (
   g.moveTo(x, y + r).arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
 };
 
-// Slot boards get their depth from drawing, not from bitmaps: a soft inner
-// rim plus short etched ticks along the cap edge.
 const paintSlotBoard = (
   g: Graphics,
   rect: Rect,
@@ -464,8 +462,6 @@ export class BattleScene {
     this.particleCancels.add(cancel);
   }
 
-  // 12 school-tinted shards fly out of the board centre and the whole scene
-  // takes a short glow — the "a set just completed" moment (DESIGN §10).
   private resonanceBurst(school: School): void {
     const colors = schools[school];
     playSfx("setComplete");
@@ -502,8 +498,6 @@ export class BattleScene {
     this.sceneGlowPulse(colors.stroke, 0.22, 420);
   }
 
-  // One shared glow meant a second pulse re-tinted the first mid-fade; each
-  // pulse now takes its own pooled layer and gives it back on completion.
   private sceneGlowPulse(color: string, alpha: number, ms: number): void {
     const glow = this.glowPool.find((g) => !g.visible);
     if (glow === undefined) return;
@@ -520,8 +514,6 @@ export class BattleScene {
     );
   }
 
-  // Every one of the fourteen elites states a test on sight; the plate that
-  // carries it deserves a cue that is not the boss horn.
   private announceElites(state: BattleState): void {
     const elite = state.enemies.some(
       (enemy) => ENEMY_BY_ID.get(enemy.defId)?.elite === true,
@@ -531,7 +523,6 @@ export class BattleScene {
     this.sceneGlowPulse(tokens.amber, 0.14, 320);
   }
 
-  // Boss intro: one expanding ring from the enemy line, no particles.
   private bossShockwave(): void {
     playSfx("bossIntro");
     duckMusic(1500);
@@ -554,7 +545,6 @@ export class BattleScene {
     this.shake();
   }
 
-  // Mirror Hull announces its reflection turn with a diagonal sheen.
   private mirrorShimmer(enemyId: string): void {
     const view = this.enemyViews.get(enemyId);
     if (view === undefined || this.reduced()) return;
@@ -579,8 +569,6 @@ export class BattleScene {
     );
   }
 
-  // Core Heart's third phase is the loudest beat in the game: a double ring
-  // out of the boss plus the one screen shake it is allowed.
   private corePulse(enemyId: string): void {
     const view = this.enemyViews.get(enemyId);
     const anchor =
@@ -609,10 +597,6 @@ export class BattleScene {
     this.shake();
   }
 
-  // A kill pays out visibly: shards of the hull scatter and the scrap it was
-  // worth flies toward the counter in the HUD's top-right corner.
-  // A hull that stops existing should be seen to stop existing: it tips, drops
-  // and fades instead of snapping to a quarter-opacity ghost.
   private deathFall(enemyId: string): void {
     const view = this.enemyViews.get(enemyId);
     if (view === undefined || this.reduced()) return;
@@ -697,7 +681,6 @@ export class BattleScene {
     );
   }
 
-  // Shake is bomb-tier only and always opt-out-able (DESIGN §10 + a11y).
   private shake(): void {
     if (this.reduced()) return;
     if (!useSettingsStore.getState().screenShake) return;
@@ -1196,8 +1179,6 @@ export class BattleScene {
         sprite.scale.set(this.slotDieScale());
         sprite.alpha = 1;
         sprite.visible = true;
-        // A hijacked die is welded into the slot the Trawler picked: it wears the
-        // same lock the tray uses, because the player cannot pull it back out.
         if (die.pinned === true) {
           this.syncLockOverlay(
             die.uid,
@@ -1397,8 +1378,6 @@ export class BattleScene {
     this.rebuild(useBattleStore.getState());
   };
 
-  // Hit-stop runs on wall clock, not on tween time: the tweens are exactly what
-  // it is holding still.
   private hitStop(ms: number): void {
     if (this.reduced()) return;
     this.hitStopMs = Math.max(this.hitStopMs, ms);
@@ -1782,8 +1761,6 @@ export class BattleScene {
     this.tweens.to(view.glow, { alpha: 0 }, 260, easeOutQuad);
   }
 
-  // Two hits on the same target inside one beat window used to print one number
-  // on top of the other; each new number now steps up over the live stack.
   private stackOffset(x: number, y: number): number {
     const now = this.elapsedMs;
     let step = 0;
@@ -1868,8 +1845,6 @@ export class BattleScene {
     };
   }
 
-  // A shot now travels: a short bolt is tweened from the muzzle to the target and
-  // the impact ring only opens once it lands.
   private fireProjectile(
     from: { x: number; y: number },
     to: { x: number; y: number },
@@ -2007,8 +1982,6 @@ export class BattleScene {
       this.playBeat(beat);
       haptic("resolveTick");
       useBattleStore.getState().applyBeatSnapshot(beat.after);
-      // DESIGN §10 hit-stop: a heavy hit freezes the board, then the sequence
-      // resumes — the gap that used to stand in for it read as lag.
       const heavy = beat.kind === "damage" && beat.amount >= BIG_HIT_DAMAGE;
       if (heavy) this.hitStop(HEAVY_HIT_STOP_MS);
       await this.sleep(beatGapMs() + (heavy ? HIT_STOP_MS : 0), run);
@@ -2077,9 +2050,6 @@ export class BattleScene {
       this.thrusterPuff();
       return;
     }
-    // A probability storm lands on a die that is already in its slot, so the
-    // number rises off the slot rather than off the tray — and the die itself
-    // flashes, because the storm happened *to it*.
     if (beat.kind === "storm") {
       playSfx("stormBeat");
       this.dieFlash(slotAnchor, schools.prismatic.stroke);
@@ -2200,8 +2170,6 @@ export class BattleScene {
       this.flashEnemy(beat.enemyId);
       return;
     }
-    // R6 signatures, each with the cue it asked for in the juice backlog: the
-    // mechanic and the sound now describe the same event.
     if (beat.kind === "curse" && beat.dieUid !== undefined) {
       const anchor = this.trayAnchor(beat.dieUid, useBattleStore.getState());
       playSfx("curseTick");
@@ -2224,7 +2192,6 @@ export class BattleScene {
       );
       return;
     }
-    // The pull runs from the player toward the enemy; so does the sound.
     if (beat.kind === "siphon" || beat.kind === "drain") {
       playSfx("siphonPull", { rate: beat.kind === "drain" ? 0.88 : 1 });
       this.fireProjectile(
@@ -2251,7 +2218,6 @@ export class BattleScene {
       );
       return;
     }
-    // Rage +6 has to sound worse than Rage +2, so the step climbs with the stack.
     if (beat.kind === "enrage") {
       playSfx("enrageStep", { rate: 0.92 + Math.min(6, beat.amount) * 0.06 });
       this.flashEnemy(beat.enemyId);
@@ -2268,8 +2234,6 @@ export class BattleScene {
       this.fireProjectile(origin, this.layout.playerHit, tokens.amber);
       return;
     }
-    // The ward's new school is audible in the timbre, so the player hears the
-    // rotation without reading the chip.
     if (beat.kind === "ward") {
       const school = beat.after.enemies.find((e) => e.id === beat.enemyId)?.ward;
       playSfx("wardShift", { rate: school === undefined ? 1 : WARD_RATE[school] });

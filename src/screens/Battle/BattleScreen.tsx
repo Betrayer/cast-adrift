@@ -146,16 +146,11 @@ const intentPillClass = (intent: Intent): string => {
   return styles.intentUtility ?? '';
 };
 
-// «За Ядром» telegraphs on the map and has to keep telegraphing here: the fold
-// can arrive mid-fight from an enemy, so the banner reads the same predicate the
-// resolver does rather than the node's flag.
 const CausalityBanner = () => {
   const { t } = useTranslation(['battle']);
   const inverted = useBattleStore((s) => isInverted(s));
   const storm = useBattleStore((s) => s.nodeStorm);
 
-  // A fight that opens backwards says so out loud, once, at the moment the
-  // banner slides in — the warning used to be silent.
   useEffect(() => {
     if (inverted) playSfx('inversionCue');
   }, [inverted]);
@@ -299,9 +294,6 @@ const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
 
 const COMPACT_ENEMY_COUNT = 3;
 
-// The three enemy states the player has to read before placing a die: a warded
-// school, a damage gate and a stacked rage. All three are set by R6 signatures
-// and none of them are legible from the intent pill alone.
 const EnemyTraitChips = ({ enemy }: { enemy: EnemyState }) => {
   const { t } = useTranslation(['battle']);
   const chips: { key: string; label: string; color: string }[] = [];
@@ -604,8 +596,6 @@ const PerkControls = () => {
   );
 };
 
-// DESIGN §7 ceremony moment: the Fate die never enters a slot — it is one
-// button, once per battle, and the table's verdict is read out loud.
 const FateControls = () => {
   const { t } = useTranslation(['battle', 'content']);
   const dice = useBattleStore((s) => s.dice);
@@ -650,8 +640,6 @@ const FateControls = () => {
   );
 };
 
-// One band owns every mid-battle action. The three strips this replaced all
-// carried the same absolute position and stacked on top of each other.
 const ActionRail = () => {
   const phase = useBattleStore((s) => s.phase);
   const perks = useBattleStore((s) => s.perks);
@@ -829,8 +817,6 @@ export const BattleScreen = () => {
     if (!useRunStore.getState().active) startTestBattleIfIdle();
   }, []);
 
-  // Battle-enter warp: the same streaks the sector jump uses, cut short, so
-  // dropping into a fight lands as an arrival rather than a screen swap.
   useEffect(() => {
     if (reduced) return;
     const id = window.setTimeout(() => {
@@ -841,7 +827,6 @@ export const BattleScreen = () => {
     };
   }, [reduced]);
 
-  // Echo calls the turn when a boss rewrites itself mid-fight.
   useEffect(() => {
     if (!bossFight || beatSeq === 0) return;
     if (enemyBeats.some((b) => b.kind === 'phase')) emitBark('bossPhase');

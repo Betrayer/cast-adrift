@@ -31,8 +31,6 @@ export const LevelUpCeremony = ({
   const { t } = useTranslation(["meta"]);
   const points = toLevel - fromLevel;
 
-  // The cards land one at a time under the level-up sting: an unlock is its own
-  // moment, not a line of text that appeared while the fanfare was still ringing.
   useEffect(() => {
     emitBark("levelUp");
     playSfx("levelUp");

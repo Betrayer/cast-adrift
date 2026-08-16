@@ -88,8 +88,6 @@ const LEGEND_TYPES: readonly MapNode["type"][] = [
   "boss",
 ];
 
-// Each node type carries a stamp behind its glyph: a procedural silhouette
-// that reads at a glance and survives a monochrome theme.
 const nodeStamp = (
   node: MapNode,
   cx: number,
@@ -288,17 +286,19 @@ const MapView = ({ map, position }: MapViewProps) => {
     isVisible(node) &&
     areConnected(map, position, node.id);
 
+  const arrivalFraming = useRef({ positionRow, reduced, geo });
+
   useEffect(() => {
     const el = scrollRef.current;
     const stage = stageRef.current;
     if (el === null || stage === null) return;
-    const scale = stage.getBoundingClientRect().width / geo.viewW;
-    const targetY = geo.rowY(positionRow) * scale;
+    const framing = arrivalFraming.current;
+    const scale = stage.getBoundingClientRect().width / framing.geo.viewW;
+    const targetY = framing.geo.rowY(framing.positionRow) * scale;
     el.scrollTo({
       top: Math.max(0, targetY - el.clientHeight * 0.55),
-      behavior: reduced ? "auto" : "smooth",
+      behavior: framing.reduced ? "auto" : "smooth",
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -306,8 +306,6 @@ const MapView = ({ map, position }: MapViewProps) => {
     prevLimit.current = visibleLimit;
   }, [visibleLimit]);
 
-  // The ripple is motion-gated; the warning it carries is not, so the cue keeps
-  // its own high-water mark and fires either way.
   useEffect(() => {
     if (tide > prevTideCue.current) {
       playSfx("tideUp", { rate: 1 - Math.min(4, tide) * 0.03 });
@@ -329,8 +327,6 @@ const MapView = ({ map, position }: MapViewProps) => {
     prevTide.current = tide;
   }, [tide, reduced]);
 
-  // Selecting a node reads its risk band before the player commits: same tick,
-  // pitched down as the band gets worse.
   const selectNode = (id: NodeId): void => {
     if (id !== selected) {
       const node = byId.get(id);
@@ -348,7 +344,6 @@ const MapView = ({ map, position }: MapViewProps) => {
     if (target === undefined || !isLegal(target)) return;
     playSfx("jump");
     haptic("mapJump");
-    // Every motif the lane carries announces itself as the ship commits to it.
     if (target.pocket === true) playSfx("detourEntry");
     if (target.cache === true) playSfx("cacheClaim");
     if (target.blessing !== undefined) {
@@ -386,7 +381,6 @@ const MapView = ({ map, position }: MapViewProps) => {
   const canJump =
     !jumping && selectedNode !== undefined && selectedNode !== null && isLegal(selectedNode);
 
-  // Intent preview: what waits, how dangerous it is, and what a detour pays.
   const previewName = ((): string | null => {
     if (selectedNode === undefined || selectedNode === null) return null;
     if (selectedNode.type === "boss") {
@@ -834,8 +828,6 @@ export const MapScreen = () => {
     if (map === null || position === null) go("menu");
   }, [map, position, go]);
 
-  // Reading the map is the one unhurried moment in a run, so the battle chunk
-  // (Pixi + Matter) downloads here instead of at the node the player picks.
   useEffect(() => {
     const idle = window.requestIdleCallback?.bind(window) ?? window.setTimeout;
     idle(() => {

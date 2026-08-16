@@ -4,9 +4,6 @@ import {
   dieGrantId,
   hasFeature,
   resolveUnlocks,
-  unlockedContracts,
-  unlockedCosmetics,
-  unlockedDice,
   UNLOCK_BY_ID,
   type FeatureId,
   type UnlockContext,
@@ -33,18 +30,6 @@ export const metaUnlockContext = (): UnlockContext =>
 
 export const metaHasFeature = (feature: FeatureId): boolean =>
   hasFeature(metaUnlockContext(), feature);
-
-export const metaUnlockedDice = (): Set<string> =>
-  unlockedDice(metaUnlockContext());
-
-export const metaUnlockedContracts = (): Set<string> =>
-  unlockedContracts(metaUnlockContext());
-
-export const metaUnlockedCosmetics = (): Set<string> =>
-  unlockedCosmetics(metaUnlockContext());
-
-export const metaResolvedUnlocks = (): Set<string> =>
-  resolveUnlocks(metaUnlockContext());
 
 export const dieShopPrice = (
   defId: string,

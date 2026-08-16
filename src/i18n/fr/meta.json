@@ -236,7 +236,6 @@
     "chartPoints": "Deux points d'Carte stellaire"
   },
   "levelup": {
-    "title": "Passer au niveau supérieur",
     "level": "Niveau de capitaine {{level}}",
     "point": "+1 point «Carte stellaire »",
     "points": "+{{n}} Carte stellaire points",
@@ -256,7 +255,7 @@
     "fromFinds": "Premières découvertes",
     "fromAchievements": "Réalisations",
     "firstFinds": "Première publication : {{names}}",
-    "fromDeep": "Beyond the Core"
+    "fromDeep": "Au-delà de l'essentiel"
   },
   "menu": {
     "level": "Niv.{{level}}"
@@ -264,14 +263,10 @@
   "hangar": {
     "title": "Hangar",
     "deck": "Terrasse",
-    "collection": "Collection",
     "shop": "Meta Shop",
     "budget": "{{used}}s sur le budget / {{max}}",
-    "pts": "{{n}} pts",
-    "owned": "×{{n}}",
     "add": "Ajouter",
     "buy": "Acheter · {{price}}◈",
-    "sold": "Propriété",
     "save": "Enregistrer le jeu de cartes",
     "saved": "Enregistré",
     "invalidOver": "Dépassement du budget",
@@ -280,25 +275,19 @@
     "invalidFate": "1 dé du Destin au maximum",
     "valid": "Prêt",
     "empty": "Le tiroir est vide",
-    "ship": "Navire",
     "shipEquip": "Équiper",
     "shipEquipped": "Équipé",
     "shipBuy": "Acheter · {{price}}◈",
     "shipLocked": "Se débloque au niveau{{level}}",
-    "filterSchool": "École",
-    "filterTier": "Niveau",
-    "filterRarity": "Rareté",
     "filterAll": "Tout"
   },
   "collection": {
     "title": "Collection",
-    "count": "{{n}} dés",
     "owned": "×{{n}}",
     "discount": "−{{n}} % — vous avez rencontré ce dé",
     "found": "Rencontré",
     "undiscovered": "Pas encore rencontré",
     "provenance": "Trouvé sur : {{sector}}, {{node}}",
-    "filterState": "État",
     "stateAll": "Tout",
     "stateOwned": "Propriété",
     "stateFound": "Rencontré",
@@ -425,7 +414,6 @@
     "locked": "Scellé",
     "achievements": "Réalisations",
     "achProgress": "{{have}} / {{need}}",
-    "achLocked": "Verrouillé",
     "badges": "Insignes",
     "achCount": "{{n}} de {{total}}",
     "group": {
@@ -435,8 +423,7 @@
       "story": "Histoire",
       "collection": "Collection",
       "modes": "Modes"
-    },
-    "endingsHidden": "Some endings are not on this shelf."
+    }
   },
   "engraving": {
     "title": "Gravure Gare",
@@ -455,7 +442,7 @@
     "ascendant": "Ascendant",
     "chartwright": "Chartwright",
     "archivist": "Archiviste",
-    "answer": "The Answer"
+    "answer": "La réponse"
   },
   "unlock": {
     "opened": "Déverrouillé",
@@ -495,9 +482,9 @@
     "featureEngraving": "Gravure gare",
     "featureDailyPreview": "Aperçu quotidien",
     "featureFreeRespec": "Réattribution gratuite des points de caractéristiques « Keystone »",
-    "sectorSix": "Sector 6 «Beyond the Core»",
-    "diceS6": "Four causality dice",
-    "skinThreshold": "Die skin «Threshold»"
+    "sectorSix": "Secteur 6 « Au-delà du centre »",
+    "diceS6": "Quatre dés de causalité",
+    "skinThreshold": "Le skin « Threshold »"
   },
   "skin": {
     "title": "Les skins",
@@ -529,8 +516,8 @@
       "desc": "Carré de plan, glyphes mono."
     },
     "threshold": {
-      "name": "Threshold",
-      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
+      "name": "Seuil",
+      "desc": "Ronde, éteinte, bordée de gris clair. Portée par le seul capitaine qui ne se soit jamais penché."
     }
   },
   "ach": {
@@ -656,12 +643,12 @@
     },
     "toast": "Réussite",
     "beyondTheCore": {
-      "name": "Beyond the Core",
-      "desc": "Cross the threshold and clear Sector 6."
+      "name": "Au-delà de l'essentiel",
+      "desc": "Franchissez le seuil et nettoyez le Secteur 6."
     },
     "theAnswer": {
-      "name": "The Answer",
-      "desc": "Reach the hidden ending past the Core."
+      "name": "La réponse",
+      "desc": "Atteignez la fin cachée au-delà du Noyau."
     }
   },
   "chartTag": {
@@ -707,8 +694,5 @@
       "prestigeTheme": "thème « Ascendant »",
       "badge": "le badge « Ascendant »"
     }
-  },
-  "shard": {
-    "deepClear": "Beyond the Core"
   }
 }

@@ -1,9 +1,7 @@
 import { contractDef, type ContractSetup } from "@/data/contracts";
 import {
-  computeMutatorMods,
   pickDailyMutators,
   type MutatorId,
-  type MutatorMods,
 } from "@/data/mutators";
 import { SECTOR_COUNT, sectorDef } from "@/data/sectors";
 import { createStream, deriveSeed, fnv1a } from "@/services/rng";
@@ -20,8 +18,6 @@ export const utcDateKey = (now: number): string =>
 export const msUntilUtcReset = (now: number): number =>
   DAY_MS - (now % DAY_MS);
 
-// ISO-8601 week, so a weekly drift board rolls over at the same instant for
-// everyone regardless of locale.
 export const isoWeekKey = (now: number): string => {
   const date = new Date(now);
   const day = date.getUTCDay() === 0 ? 7 : date.getUTCDay();
@@ -42,9 +38,6 @@ export const dailyMutators = (date: string): MutatorId[] => {
   return pickDailyMutators((max) => stream.int(0, max - 1));
 };
 
-// Depth is rows advanced from the run origin. Sectors have different depths
-// (DESIGN §9.1), so the sectors already passed are summed rather than
-// multiplied, and a drift run keeps counting across sectors.
 export const sectorDepth = (sectorIndex: number): number =>
   sectorDef(contentSector(sectorIndex)).shape.bossRow;
 
@@ -60,8 +53,6 @@ export const driftLoop = (sectorIndex: number): number =>
 export const driftLoopHpPct = (loop: number): number =>
   DRIFT_LOOP_HP_PCT * Math.max(0, loop);
 
-// Drift keeps counting sectors past five; the content sector stays clamped so
-// pools, quotas and bosses keep resolving.
 export const contentSector = (sectorIndex: number): number =>
   Math.min(SECTOR_COUNT, Math.max(1, sectorIndex));
 
@@ -77,8 +68,6 @@ export interface ScoreBreakdown {
 export const SCORE_PER_DEPTH = 50;
 export const SCORE_PER_KILL = 5;
 
-// DESIGN §13: depth×50 + kills×5 + scrap. Scrap is what the run *earned*, so
-// spending it in a market never costs score.
 export const scoreBreakdown = (stats: RunStats): ScoreBreakdown => {
   const depthPoints = stats.depth * SCORE_PER_DEPTH;
   const killPoints = stats.kills * SCORE_PER_KILL;
@@ -95,8 +84,6 @@ export const scoreBreakdown = (stats: RunStats): ScoreBreakdown => {
 export const runScore = (stats: RunStats): number =>
   scoreBreakdown(stats).total;
 
-export const isEndlessMode = (mode: RunMode): boolean => mode === "drift";
-
 export const scoredModes: readonly RunMode[] = ["drift", "daily"];
 
 export const isScoredMode = (mode: RunMode): boolean =>
@@ -105,11 +92,5 @@ export const isScoredMode = (mode: RunMode): boolean =>
 export const setupForRun = (run: Pick<RunValues, "contractId">): ContractSetup =>
   contractDef(run.contractId)?.setup ?? {};
 
-export const runMutatorMods = (
-  run: Pick<RunValues, "mutators">,
-): MutatorMods => computeMutatorMods(run.mutators);
-
-// A drift sector's last row is a gate, not a boss, and clearing it hands the
-// run straight to the next map.
 export const isSectorExitRow = (sectorIndex: number, row: number): boolean =>
   row === sectorDepth(sectorIndex);

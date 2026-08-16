@@ -143,8 +143,6 @@ const checkGoalLabel = (
   return t("run:event.checkHighest", { n: check.target });
 };
 
-// The narrowing is part of the promise: if a scene only reads black dice, or
-// only the small ones, the modal says so before the player commits.
 const checkPoolLabel = (
   check: CheckDef,
   t: TFunction<["run", "battle"]>,
@@ -164,8 +162,6 @@ const checkPoolLabel = (
   return parts.length === 0 ? null : parts.join(" · ");
 };
 
-// DESIGN §3: a weighted fork tells the player the odds it is weighting, in the
-// smallest whole ratio the weights reduce to.
 const gcd = (a: number, b: number): number => (b === 0 ? a : gcd(b, a % b));
 
 export const outcomeRatio = (option: EventOption): string | null => {
@@ -205,8 +201,6 @@ const DieChip = ({
   );
 };
 
-// The drum rolls first and the verdict lands on top of its tail, so a check
-// reads as one beat rather than two unrelated cues.
 const CHECK_STING_MS = 340;
 const AXIS_THRESHOLD = 3;
 
@@ -316,8 +310,6 @@ const CheckModal = ({
   );
 };
 
-// A notch tick per shift; crossing a pole threshold drops the same cue a fifth
-// so the player hears the difference between drifting and committing.
 const announceAxisShift = (before: number, after: number): void => {
   if (before === after) return;
   const crossed =
@@ -414,8 +406,6 @@ const EventRunner = ({
     completeNode({ outcome: "cleared" });
   };
 
-  // A weighted fork previews its worst reachable end of the axis, so the meter
-  // never promises more than the option can pay.
   const axisPreview = (option: EventOption): number | null => {
     const range = optionAxisRange(option);
     if (range === null) return null;
@@ -436,7 +426,6 @@ const EventRunner = ({
     haptic("ending");
   }, [beacon]);
 
-  // "N of 5" rises with the count: the fifth beacon must not sound like the first.
   useEffect(() => {
     if (!beacon) return;
     const id = window.setTimeout(() => {

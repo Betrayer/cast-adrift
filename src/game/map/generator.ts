@@ -4,7 +4,6 @@ import {
   bossLaneFor,
   edgeKey,
   nodeId,
-  pocketLaneFor,
   START_LANE,
   START_NODE_ID,
   START_ROW,
@@ -26,8 +25,6 @@ const BEACON_START_FRACTION = 0.33;
 const BEACON_END_FRACTION = 0.73;
 
 export interface MapGenOptions {
-  // Drift never ends: the last row becomes a second mini-boss gate, and
-  // clearing it hands the run to the next sector instead of the finale.
   bossAsGate?: boolean;
   noShops?: boolean;
 }
@@ -197,8 +194,6 @@ export const buildQuota = (
     last,
   );
   push("anomaly", quotas.anomalies, 1, last);
-  // «Глушь» keeps the shipyards — a run with no repairs at all is unwinnable —
-  // and takes the markets instead.
   if (options.noShops !== true) push("shop", quotas.shops, 1, last);
   push("event", rng.int(quotas.events[0], quotas.events[1]), 1, last);
   return slots;
@@ -327,10 +322,6 @@ const applyCollapse = (
   }
 };
 
-// «Инверсия» and «Вероятностный шторм» stamp whole rows, exactly as `collapse`
-// does, so the warning is on the map before the jump rather than on the battle
-// screen after it. The gate and the boss stay clean: those fights are about the
-// thing waiting in them, not about the weather.
 const causalityRows = (
   rng: RngStream,
   shape: SectorShape,
@@ -577,6 +568,3 @@ export const generateSectorMap = (
 
 export const bossNodeIdFor = (sector: number): NodeId =>
   nodeId(shapeOf(sector).bossRow, bossLaneFor(mapShapeOf(sector)));
-
-export const pocketLaneOf = (sector: number): number =>
-  pocketLaneFor(mapShapeOf(sector));

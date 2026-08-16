@@ -1168,17 +1168,11 @@
       "text": "Scavengers ring a floodlit wreck, bidding on sealed cores. The auctioneer eyes your scrap.",
       "opt": {
         "bid": "Bid on a core (25)",
-        "watch": "Just watch",
-        "bidHigh": "Bid high",
-        "bidLow": "Bid low",
-        "heckle": "Heckle the bidding"
+        "watch": "Just watch"
       },
       "out": {
         "bid": "Your bid holds. The core is yours — and it's a good one.",
-        "watch": "You pocket a few loose parts nobody bid on.",
-        "bidHigh": "Mara knocks it down to you and files your name under 'pays'.",
-        "bidLow": "You take the second lot. Nobody else wanted it, which may be the point.",
-        "heckle": "You talk the price down for somebody else and pocket their thanks. Mara does not thank you."
+        "watch": "You pocket a few loose parts nobody bid on."
       }
     },
     "stowaway": {
@@ -1368,15 +1362,11 @@
       "text": "Yusuf, convoy master, hails you plainly. \"Raiders are shadowing my haulers. Escort us through and I'll make it worth your while. Or tax us and be gone.\"",
       "opt": {
         "escort": "Escort the convoy",
-        "tax": "Tax the convoy",
-        "escortHim": "Ride escort",
-        "takeCargo": "Take the cargo instead"
+        "tax": "Tax the convoy"
       },
       "out": {
         "escort": "You take point. The raiders won't like it, but Yusuf will remember.",
-        "tax": "You clip his margins and let him pass. He remembers that too.",
-        "escortHim": "You take point. Yusuf's yard opens its books to you at the far end.",
-        "takeCargo": "You cut the tether and run. Yusuf says nothing on the open channel. That's worse."
+        "tax": "You clip his margins and let him pass. He remembers that too."
       }
     },
     "yusufEscortPaid": {

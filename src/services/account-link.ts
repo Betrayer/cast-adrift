@@ -28,9 +28,7 @@ const readMarker = (): boolean => {
 const writeMarker = (): void => {
   try {
     localStorage.setItem(LINKED_KEY, String(Date.now()));
-  } catch {
-    /* storage unavailable */
-  }
+  } catch {}
 };
 
 const asMetaDoc = (value: unknown): MetaDoc | null => {
@@ -45,9 +43,6 @@ const asMetaDoc = (value: unknown): MetaDoc | null => {
   };
 };
 
-// The merge policy from DESIGN §4, isolated from Firestore so it is testable:
-// an empty Telegram profile takes the anonymous one whole; two real profiles
-// never interleave — the newer one wins and the loser is archived.
 export const resolveLink = (
   anon: MetaDoc | null,
   telegram: MetaDoc | null,
@@ -59,8 +54,6 @@ export const resolveLink = (
     : "replaced-telegram";
 };
 
-// The anonymous meta document has to be read while the anonymous user is still
-// signed in, so the caller checks this first, reads, then swaps identities.
 export const shouldAttemptLink = (anonUid: string | null): boolean =>
   anonUid !== null && !isTelegramUid(anonUid) && !readMarker();
 
@@ -70,8 +63,6 @@ export interface LinkAccountsOptions {
   anonMeta: MetaDoc | null;
 }
 
-// Runs at most once per device: the marker survives the sign-in swap, and a
-// second Telegram boot from the same browser has nothing left to migrate.
 export const linkAccounts = async ({
   anonUid,
   telegramUid,

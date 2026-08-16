@@ -1,10 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// Cross-sector pool for S2–S5: the scenes that are not tied to one sector's
-// idea. Many are beacon and cast callbacks (DESIGN §3 wants the player to *see*
-// causality) — the Keeper's network remembers a sold beacon, Yusuf's lane
-// remembers a shared black box, the Preacher remembers a public refusal, Mara
-// remembers the ledger, and a broken beacon leaves a wake.
 export const COMMON_EVENTS: readonly EventDef[] = [
   {
     id: "keeperEcho",

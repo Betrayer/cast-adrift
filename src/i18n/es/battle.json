@@ -72,9 +72,9 @@
     "bargain": "{{n}} de los Bills: o te vas, o te quedas",
     "enrage": "Enrages + {{n}}",
     "hijack": "Te quita tu mejor dado",
-    "echoTotal": "echoes your last turn (max {{n}})",
-    "foldOrder": "folds the order",
-    "devourDie": "eats your best spare die"
+    "echoTotal": "repite tu último turno (máx. {{n}})",
+    "foldOrder": "pliega el pedido",
+    "devourDie": "te quita tu mejor dado de reserva"
   },
   "slot": {
     "weaponA": "Arma A",
@@ -111,14 +111,14 @@
     "enrage": "RAGE",
     "hijack": "SECUESTRO",
     "ward": "WARD",
-    "fold": "FOLD",
-    "devour": "EATEN"
+    "fold": "PLEGAR",
+    "devour": "COMIDO"
   },
   "enemyWard": "Distrito: {{school}}",
   "enemyGate": "Puerta {{n}}",
   "enemyRage": "Rage y{{n}}",
-  "inverted": "INVERTED ORDER",
-  "invertedHint": "Reactor first, Sensors last.",
-  "storm": "PROBABILITY STORM",
-  "stormHint": "One placed die re-rolls before anything resolves."
+  "inverted": "PEDIDO INVERTIDO",
+  "invertedHint": "Primero el reactor, luego los sensores.",
+  "storm": "TORMENTA DE PROBABILIDADES",
+  "stormHint": "Las tiradas de un dado colocado se repiten antes de que se resuelva nada."
 }

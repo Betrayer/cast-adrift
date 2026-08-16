@@ -170,8 +170,3 @@ export const restoreRunSnapshot = (data: unknown): boolean => {
   if (data.run.active) emitBark("resume");
   return true;
 };
-
-export const runSummaryLabel = (data: unknown): string | null => {
-  if (!isRunSnapshot(data)) return null;
-  return `${String(data.run.sector)}:${String(data.run.depthRow)}`;
-};

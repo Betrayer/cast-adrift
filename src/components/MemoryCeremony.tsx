@@ -15,8 +15,6 @@ export const MemoryCeremony = () => {
   const order = useNarrativeStore((s) => s.memoryQueue[0]);
   const dismiss = useNarrativeStore((s) => s.dismissMemory);
 
-  // Echo's arc fires up to fifteen times a campaign; the finale still has to
-  // sound like the finale, so the ceremony no longer borrows the ending sting.
   useEffect(() => {
     if (order === undefined) return;
     playSfx("memoryReveal", { rate: 0.94 + order * 0.008 });

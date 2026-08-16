@@ -17,9 +17,6 @@ export interface FateOutcome {
   do: readonly Action[];
 }
 
-// DESIGN §7: the d100 is never slotted. Once per battle it rolls against this
-// table — 1 catastrophe · 2–20 setback · 21–60 mixed · 61–95 boon · 96–100
-// miracle — through the ordinary Action vocabulary, so no bespoke code path.
 export const FATE_TABLE: readonly FateOutcome[] = [
   {
     id: "severance",

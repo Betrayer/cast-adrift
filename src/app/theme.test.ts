@@ -51,8 +51,6 @@ describe("theme contrast (WCAG AA)", () => {
       }
     });
 
-    // Only a single-hue theme has to carry school identity in luminance; the
-    // others separate by hue, and every theme separates by glyph shape.
     it(`${theme.id}: school strokes are separable by luminance alone`, () => {
       if (theme.schoolTint?.monochrome !== true) return;
       const palette = tintedSchools(theme.schoolTint);

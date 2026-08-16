@@ -30,8 +30,6 @@ export const DIE_BY_ID: ReadonlyMap<string, DieItemDef> = new Map(
   ALL_DICE.map((def) => [def.id, def]),
 );
 
-// The Fate die is a deck-building choice, never a drop: it is capped at one per
-// deck and the run has no way to enforce that on loot.
 export const LOOT_DICE: readonly DieItemDef[] = POOL_DICE.filter(
   (d) => d.tier !== 100,
 );

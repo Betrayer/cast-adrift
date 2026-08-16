@@ -164,14 +164,6 @@ export type EnemyRole =
   | "anchor"
   | "swarm";
 
-export const ENEMY_ROLES: readonly EnemyRole[] = [
-  "bruiser",
-  "support",
-  "harrier",
-  "anchor",
-  "swarm",
-];
-
 export type EnemyTrait =
   | "shell"
   | "guarded"
@@ -233,8 +225,6 @@ export const intentsOfStep = (step: PatternStep): readonly Intent[] => {
   return [step];
 };
 
-// Environmental bodies (a mine, a spark) are one intent by construction and are
-// not counted against the flat-pattern budget.
 export const isFlatPattern = (def: EnemyDef): boolean =>
   def.env !== true &&
   (def.phases ?? []).length === 0 &&
@@ -274,9 +264,6 @@ const FLAG_TRAITS: readonly FlagTrait[] = [
   "jamClearsRage",
 ];
 
-// The claim set a def actually carries. `lint:content` and the roster test both
-// read this: an authored claim outside it is a signature line promising a
-// mechanic the def does not have.
 export const trueClaimsOf = (def: EnemyDef): ReadonlySet<string> => {
   const out = new Set<string>();
   for (const step of def.pattern) stepClaims(step, out);
@@ -306,8 +293,5 @@ export const trueClaimsOf = (def: EnemyDef): ReadonlySet<string> => {
 
 export const claimKey = (claim: SignatureClaim): string => JSON.stringify(claim);
 
-// Silhouette budget (plan Task 1.3): a base enemy reads as one idea, an elite as
-// at most two on top of its frame. Intent claims are the idea; everything else
-// is the extra machinery that has to stay countable.
 export const specialClaimCount = (def: EnemyDef): number =>
   def.claims.filter((c) => c.k !== "intent").length;

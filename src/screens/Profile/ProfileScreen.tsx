@@ -22,8 +22,6 @@ import { useMetaStore } from "@/stores/metaStore";
 import { AchievementGrid } from "./AchievementGrid";
 import { BadgeRow } from "./BadgeRow";
 
-// «Ответ» has no silhouette on the shelf: a fifth locked circle would be the
-// checklist the ending exists to avoid. The slot appears the moment it is earned.
 const endingSlots = (earned: readonly string[]): typeof ENDINGS =>
   earned.includes("answer") ? ENDINGS : STANDARD_ENDINGS;
 

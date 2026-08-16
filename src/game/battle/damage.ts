@@ -13,9 +13,6 @@ export const aliveEnemies = (snapshot: BattleSnapshot): EnemyState[] =>
 const aliveSubsystems = (enemy: EnemyState): SubsystemState[] =>
   enemy.subsystems.filter((s) => s.hp > 0);
 
-// Two data-driven immunities (Phase-8 amendment 5): `shell` keeps the body safe
-// while its own subsystems live; `guarded` keeps it safe while any other enemy
-// lives (kill-order fights).
 export const isBodyImmune = (
   snapshot: BattleSnapshot,
   enemy: EnemyState,
@@ -67,7 +64,6 @@ export const handleDeath = (next: BattleSnapshot, enemy: EnemyState): void => {
       return;
     }
     case "curseDie": {
-      // A dying warp-thing marks the die that killed it: the highest tray face.
       const tray = next.dice.filter((d) => d.state === "tray");
       const worst = tray.reduce<(typeof tray)[number] | undefined>(
         (best, die) => (best === undefined || die.value > best.value ? die : best),
@@ -130,12 +126,10 @@ export const applyWeaponDamage = (
 ): number => {
   const def = ENEMY_BY_ID.get(target.enemy.defId);
   let damage = baseDamage;
-  // A warded hull halves whatever school it is holding out this turn.
   if (def?.ward === true && school !== undefined && target.enemy.ward === school) {
     damage = Math.ceil(damage / 2);
   }
   if (target.subsystem !== undefined) {
-    // «Карантинный близнец»: the same hull twice in a row absorbs nothing.
     if (def?.alternating === true && target.enemy.lastHitKey === target.subsystem.key) {
       return 0;
     }
@@ -150,16 +144,12 @@ export const applyWeaponDamage = (
   const marked = consumeStatus(target.enemy.statuses, "mark");
   if (marked) damage += bonus;
   if (crit) damage = Math.floor(damage * 1.5);
-  // A gate absorbs anything under its rating whole; a mark reads past it, and a
-  // hit that clears the rating breaks it.
   const gate = target.enemy.gate ?? 0;
   if (gate > 0 && !marked) {
     if (damage < gate) return 0;
     target.enemy.gate = 0;
   }
-  // «Голем-рой»: a single hit above the cap wastes the rest.
   if (def?.spikeCap !== undefined) damage = Math.min(damage, def.spikeCap);
-  // «Пробойник» spends its one charge to put the whole hit past the shield.
   const absorbed = pierce ? 0 : Math.min(target.enemy.shield, damage);
   target.enemy.shield -= absorbed;
   target.enemy.hp = Math.max(0, target.enemy.hp - (damage - absorbed));

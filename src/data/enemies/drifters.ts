@@ -1,9 +1,6 @@
 import { enemy } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// The five that belong to no sector: summoned hazards and the cheap bodies the
-// composer uses to fill an escort slot anywhere on the map. They are the only
-// base enemies allowed to be one idea and no more.
 export const DRIFTER_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "mine",

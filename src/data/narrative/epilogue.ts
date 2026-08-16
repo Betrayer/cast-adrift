@@ -35,10 +35,6 @@ const flag = (ctx: EpilogueContext, key: string): boolean =>
 
 export const DEATH_TALLY_LINES = 3;
 
-// Nexus-style tally: deed → line, resolved against the run's flag set at the
-// epilogue. `reads` is what the flag lint sees, so an entry can never quietly
-// stop consuming the flag it was written for. Order here is the order they
-// slide in, and the death epilogue takes the first DEATH_TALLY_LINES of them.
 export const EPILOGUE_ENTRIES: readonly EpilogueEntry[] = [
   {
     id: "deathDeep",
@@ -347,8 +343,6 @@ export const EPILOGUE_ENTRIES: readonly EpilogueEntry[] = [
     reads: ["survivedLethal"],
     applies: (ctx) => ctx.survivedLethal,
   },
-  // «За Ядром». Six lines the fifth act can never produce, so a deep run's tally
-  // reads differently from the first line down rather than gaining a footnote.
   {
     id: "thresholdCrossed",
     text: "content:epilogue.thresholdCrossed",

@@ -10,15 +10,8 @@ import {
 import { join } from "node:path";
 import process from "node:process";
 
-// DESIGN §17: main bundle <= 600 KB gz, whole initial payload <= 1.2 MB gz.
-// "Initial" is what a cold visitor must download before the menu paints — the
-// entry chunk plus everything the manifest marks as its static import, plus the
-// CSS those chunks pull in. Lazily imported screens are deliberately excluded;
-// that is the entire point of the split.
 const MAIN_BUDGET = 600 * 1024;
 const INITIAL_BUDGET = 1200 * 1024;
-// R10: the WebM/Opus set is what a player actually downloads. The WAV masters
-// stay on disk as the Safari fallback and are reported, not budgeted.
 const AUDIO_BUDGET = 400 * 1024;
 
 const DIST = join(process.cwd(), "dist");
@@ -141,7 +134,7 @@ if (mainGz > MAIN_BUDGET)
 if (initialGz > INITIAL_BUDGET)
   failures.push(`initial total ${kb(initialGz)} exceeds ${kb(INITIAL_BUDGET)}`);
 if (shippedAudio === 0)
-  failures.push("no encoded audio found — run `npm run gensfx` with an encoder");
+  failures.push("no encoded audio found in public/audio — see docs/audio-credits.md");
 if (shippedAudio > AUDIO_BUDGET)
   failures.push(`audio ${kb(shippedAudio)} exceeds ${kb(AUDIO_BUDGET)}`);
 

@@ -130,7 +130,6 @@ describe("leaderboard entries", () => {
     const board = "drift-alltime";
     expect(entryHidden(legit(), board)).toBe(false);
     expect(entryHidden(legit({ flagged: true }), board)).toBe(true);
-    // Forged straight into Firestore without the flag: the reader still hides it.
     expect(entryHidden(legit({ score: 400_000, depth: 12 }), board)).toBe(true);
   });
 
@@ -174,7 +173,6 @@ describe("leaderboard entries", () => {
 });
 
 describe("around-me on a seeded 50-entry board", () => {
-  // Descending scores 5000, 4900, … 100 — so uid-N sits at rank N exactly.
   const BOARD: BoardEntry[] = Array.from({ length: 50 }, (_, i) =>
     legit({
       uid: `uid-${String(i + 1)}`,
@@ -211,7 +209,6 @@ describe("around-me on a seeded 50-entry board", () => {
     expect(rows.find((e) => e.isMe)?.rank).toBe(25);
     expect(rows[0]?.rank).toBe(20);
     expect(rows[rows.length - 1]?.rank).toBe(30);
-    // Ranks stay contiguous across the window.
     expect(rows.map((e) => e.rank)).toEqual(
       Array.from({ length: 11 }, (_, i) => 20 + i),
     );
@@ -238,7 +235,6 @@ describe("around-me on a seeded 50-entry board", () => {
     const shown = rows.filter((e) => e.isMe || !entryHidden(e, board));
     expect(shown.find((e) => e.isMe)).toBeDefined();
     expect(shown.filter((e) => !e.isMe)).toHaveLength(50);
-    // …but everyone else's view drops it.
     expect(visibleEntries([...BOARD, forged], board, false)).toHaveLength(50);
   });
 });

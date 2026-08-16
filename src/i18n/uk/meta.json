@@ -236,7 +236,6 @@
     "chartPoints": "Два очки Зоряної карти"
   },
   "levelup": {
-    "title": "Новий рівень",
     "level": "Рівень капітана {{level}}",
     "point": "+1 очко Зоряної карти",
     "points": "+{{n}} оч. Зоряної карти",
@@ -264,14 +263,10 @@
   "hangar": {
     "title": "Ангар",
     "deck": "Колода",
-    "collection": "Колекція",
     "shop": "Мета-крамниця",
     "budget": "Бюджет {{used}} / {{max}}",
-    "pts": "{{n}} оч.",
-    "owned": "×{{n}}",
     "add": "Додати",
     "buy": "Купити · {{price}}◈",
-    "sold": "У наявності",
     "save": "Зберегти колоду",
     "saved": "Збережено",
     "invalidOver": "Перевищено бюджет",
@@ -280,25 +275,19 @@
     "invalidFate": "Не більше 1 куба Долі",
     "valid": "Готово",
     "empty": "Колода порожня",
-    "ship": "Корабель",
     "shipEquip": "Обрати",
     "shipEquipped": "Обрано",
     "shipBuy": "Купити · {{price}}◈",
     "shipLocked": "Відкриється на рівні {{level}}",
-    "filterSchool": "Школа",
-    "filterTier": "Тир",
-    "filterRarity": "Рідкість",
     "filterAll": "Усі"
   },
   "collection": {
     "title": "Колекція",
-    "count": "{{n}} кубів",
     "owned": "×{{n}}",
     "discount": "−{{n}}% — цей куб уже зустрічався",
     "found": "Зустрінуто",
     "undiscovered": "Ще не зустрінуто",
     "provenance": "знайдено: сектор {{sector}}, {{node}}",
-    "filterState": "Стан",
     "stateAll": "Усі",
     "stateOwned": "У наявності",
     "stateFound": "Зустрінуто",
@@ -425,7 +414,6 @@
     "locked": "Запечатано",
     "achievements": "Досягнення",
     "achProgress": "{{have}} / {{need}}",
-    "achLocked": "Закрито",
     "badges": "Знаки",
     "achCount": "{{n}} з {{total}}",
     "group": {
@@ -435,8 +423,7 @@
       "story": "Історія",
       "collection": "Колекція",
       "modes": "Режими"
-    },
-    "endingsHidden": "Деякі фінали на цій полиці не стоять."
+    }
   },
   "engraving": {
     "title": "Станція гравіювання",
@@ -707,8 +694,5 @@
       "prestigeTheme": "тема «Вознесений»",
       "badge": "знак «Вознесений»"
     }
-  },
-  "shard": {
-    "deepClear": "За Ядром"
   }
 }

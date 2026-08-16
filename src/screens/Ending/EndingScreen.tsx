@@ -68,8 +68,6 @@ const DeathEpilogue = () => {
     [ctx],
   );
 
-  // Death gets the ending sting's lower, slower relative, and the tally lines
-  // tick in as they slide.
   useEffect(() => {
     playSfx('epilogueSting');
     duckMusic(2200);
@@ -137,7 +135,6 @@ const VictoryEnding = ({ endingId }: { endingId: string }) => {
   const ctx = useEpilogueContext(false);
   const [beatIndex, setBeatIndex] = useState(0);
 
-  // Five endings, five stings. «Ответ» in particular had earned its own.
   useEffect(() => {
     const sting = ENDING_SFX[endingId as EndingId] ?? 'endingSting';
     playSfx(sting);

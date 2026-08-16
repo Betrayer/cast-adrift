@@ -122,8 +122,6 @@ export const buildShipSlots = (
   return slots;
 };
 
-// Mutators and contract setups shrink or remove whole systems (Радиомолчание
-// drops sensors a tier, «Слепой прыжок» removes the slot outright).
 export const applySlotOverrides = (
   slots: Partial<Record<SlotId, SlotState>>,
   tierDelta: Partial<Record<SlotId, number>> = {},
@@ -185,8 +183,6 @@ export const phaseIndexForHp = (
   return phases.length - 1;
 };
 
-// A8 inserts one extra beat into every boss phase: the phase's heaviest attack
-// runs a second time, so the pattern reads familiar but hits harder.
 const heaviestAttack = (pattern: readonly PatternStep[]): PatternStep | undefined => {
   let best: PatternStep | undefined;
   let bestN = -1;
@@ -202,9 +198,6 @@ const heaviestAttack = (pattern: readonly PatternStep[]): PatternStep | undefine
   return best;
 };
 
-// The enemy-side mirror of the R1 condition vocabulary. A conditional step is
-// read when the *next* intent is drawn — at the end of the previous enemy turn —
-// so the telegraph the player sees is the intent that will actually fire.
 export interface StepContext {
   selfHpPct: number;
   selfShield: number;
@@ -303,8 +296,6 @@ export interface SpawnInit {
 const isTough = (def: EnemyDef): boolean =>
   def.elite === true || def.miniboss === true || def.boss === true;
 
-// A warded hull keeps one school out at a time and rotates it on its own turn,
-// so the ward the player reads during placement is the one that will bite.
 export const WARD_SCHOOLS: readonly School[] = [
   "red",
   "blue",
@@ -337,7 +328,6 @@ export const spawnEnemy = (
   const hp = scale(def.hp);
   const ascension = init.ascension ?? 0;
   const phase = phaseIndexForHp(def, hp, hp, ascension);
-  // A6 bolts an overclock module onto every elite (DESIGN §13).
   const subs = [
     ...(def.subsystems ?? []),
     ...(def.elite === true && ascensionMods(ascension).eliteSubsystem
@@ -572,7 +562,6 @@ export const canPlaceDie = (
   const die = snapshot.dice.find((d) => d.uid === uid);
   const slot = snapshot.slots[slotId];
   if (die === undefined || slot === undefined) return false;
-  // «клин» ignores the placement ban a Jammer put on the slot.
   const blocked =
     isSlotBlocked(snapshot, slotId) &&
     !dieHasGrant(snapshot.engravings, die.defId, "blockImmune");

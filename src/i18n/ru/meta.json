@@ -236,7 +236,6 @@
     "chartPoints": "Два очка Звёздной карты"
   },
   "levelup": {
-    "title": "Новый уровень",
     "level": "Уровень капитана {{level}}",
     "point": "+1 очко Звёздной карты",
     "points": "+{{n}} очк. Звёздной карты",
@@ -264,14 +263,10 @@
   "hangar": {
     "title": "Ангар",
     "deck": "Колода",
-    "collection": "Коллекция",
     "shop": "Мета-лавка",
     "budget": "Бюджет {{used}} / {{max}}",
-    "pts": "{{n}} очк.",
-    "owned": "×{{n}}",
     "add": "Добавить",
     "buy": "Купить · {{price}}◈",
-    "sold": "В наличии",
     "save": "Сохранить колоду",
     "saved": "Сохранено",
     "invalidOver": "Превышен бюджет",
@@ -280,25 +275,19 @@
     "invalidFate": "Не более 1 куба Судьбы",
     "valid": "Готово",
     "empty": "Колода пуста",
-    "ship": "Корабль",
     "shipEquip": "Выбрать",
     "shipEquipped": "Выбран",
     "shipBuy": "Купить · {{price}}◈",
     "shipLocked": "Откроется на уровне {{level}}",
-    "filterSchool": "Школа",
-    "filterTier": "Тир",
-    "filterRarity": "Редкость",
     "filterAll": "Все"
   },
   "collection": {
     "title": "Коллекция",
-    "count": "{{n}} кубов",
     "owned": "×{{n}}",
     "discount": "−{{n}}% — этот куб уже встречался",
     "found": "Встречен",
     "undiscovered": "Ещё не встречен",
     "provenance": "найден: сектор {{sector}}, {{node}}",
-    "filterState": "Состояние",
     "stateAll": "Все",
     "stateOwned": "В наличии",
     "stateFound": "Встречен",
@@ -425,7 +414,6 @@
     "locked": "Запечатан",
     "achievements": "Достижения",
     "achProgress": "{{have}} / {{need}}",
-    "achLocked": "Закрыто",
     "badges": "Знаки",
     "achCount": "{{n}} из {{total}}",
     "group": {
@@ -435,8 +423,7 @@
       "story": "История",
       "collection": "Коллекция",
       "modes": "Режимы"
-    },
-    "endingsHidden": "Некоторые финалы на этой полке не стоят."
+    }
   },
   "engraving": {
     "title": "Станция гравировки",
@@ -707,8 +694,5 @@
       "prestigeTheme": "тема «Восшедший»",
       "badge": "знак «Восшедший»"
     }
-  },
-  "shard": {
-    "deepClear": "За Ядром"
   }
 }

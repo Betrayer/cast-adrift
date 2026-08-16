@@ -72,9 +72,9 @@
     "bargain": "{{n}} z Bills: albo złom, albo kadłub",
     "enrage": "Enrages + {{n}}",
     "hijack": "Przejmuje twoją najlepszą kostkę",
-    "echoTotal": "echoes your last turn (max {{n}})",
-    "foldOrder": "folds the order",
-    "devourDie": "eats your best spare die"
+    "echoTotal": "powtarza twoją ostatnią turę (maksymalnie {{n}})",
+    "foldOrder": "realizuje zamówienie",
+    "devourDie": "zużywa twoją najlepszą zapasową kostkę"
   },
   "slot": {
     "weaponA": "Broń A",
@@ -111,14 +111,14 @@
     "enrage": "RAGE",
     "hijack": "HIJACK",
     "ward": "WARD",
-    "fold": "FOLD",
-    "devour": "EATEN"
+    "fold": "ZŁÓŻ",
+    "devour": "ZJEDZONE"
   },
   "enemyWard": "Okręg: {{school}}",
   "enemyGate": "Strona główna {{n}}",
   "enemyRage": "Rage i{{n}}",
-  "inverted": "INVERTED ORDER",
-  "invertedHint": "Reactor first, Sensors last.",
-  "storm": "PROBABILITY STORM",
-  "stormHint": "One placed die re-rolls before anything resolves."
+  "inverted": "ODWRÓCONA KOLEJNOŚĆ",
+  "invertedHint": "Najpierw reaktor, na końcu czujniki.",
+  "storm": "BURZA PRAWDOPODOBIEŃSTW",
+  "stormHint": "Rzut jedną umieszczoną kostką powtarza się przed rozstrzygnięciem jakichkolwiek innych akcji."
 }

@@ -111,8 +111,6 @@ const writeCssVariables = (def: ThemeDef): void => {
 export const applyTheme = (id: ThemeId): ThemeDef => {
   const def = THEME_BY_ID[id] ?? THEME_BY_ID[DEFAULT_THEME_ID];
   if (active.id === def.id && tokens.bg === def.palette.bg) {
-    // Still write the DOM side: a boot call has to seed the variables even
-    // when the id already matches the module default.
     writeCssVariables(def);
     return def;
   }
@@ -124,9 +122,6 @@ export const applyTheme = (id: ThemeId): ThemeDef => {
   return def;
 };
 
-// The setting is tri-state (auto/on/off), so the DOM is told the *resolved*
-// answer instead of letting a bare `prefers-reduced-motion` media query
-// override a player who deliberately turned motion back on.
 export const applyMotion = (reduced: boolean): void => {
   if (typeof document === 'undefined') return;
   document.documentElement.dataset.caMotion = reduced ? 'reduced' : 'full';

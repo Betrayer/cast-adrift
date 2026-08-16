@@ -23,8 +23,6 @@ export const BossIntro = () => {
     if (introPending) haptic('bossIntro');
   }, [introPending]);
 
-  // The subsystem pips are the boss telling you where it can be hurt; each one
-  // lands with its own tick as it appears.
   useEffect(() => {
     if (!introPending) return;
     const timers = Array.from({ length: pipCount }, (_, index) =>

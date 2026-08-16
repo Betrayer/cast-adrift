@@ -1,11 +1,6 @@
 import { bossDef, sub } from "@/data/enemies/builder";
 import type { BossDef } from "@/types/content";
 
-// Ten act bosses, two per sector, drawn from `bossPool` by the run seed. HP is
-// the sector-1 baseline (DESIGN §9.5); the sector curve, tide and ascension all
-// scale at spawn. Phases are ordered high hp% → low; the first phase whose
-// `untilHpPct` the boss is still above owns the pattern. Each pair is a
-// contrast, not a variant: the alternate tests the axis the incumbent ignores.
 export const BOSSES: readonly BossDef[] = [
   bossDef({
     id: "quarantineWarden",
@@ -407,10 +402,6 @@ export const BOSSES: readonly BossDef[] = [
       { t: "multi", n: 5, k: 2 },
     ],
   }),
-  // «За Ядром» rotates two finales that ask opposite questions. The Hush takes
-  // the ship apart slot by slot, so the fight is about deciding what you can
-  // afford to lose. The Echo Fleet gives you back the five sector bosses one
-  // phase window at a time, so the fight is about remembering how you beat them.
   bossDef({
     id: "theHush",
     hp: 51,

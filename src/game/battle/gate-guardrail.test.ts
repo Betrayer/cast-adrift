@@ -15,11 +15,6 @@ import {
 import { createStreams, deriveSeed } from "@/services/rng";
 import type { BattleSnapshot, SlotId } from "@/types/battle";
 
-// The "intended" red-resonance build a competent player assembles mid-run: 7 red dice
-// (red-6 → first Weapons slot resolves twice + red-4 Burn + red-2 +1 + red affinity),
-// blue support, on Mk2 weapons. This is a guardrail — it proves the row-8 gate is
-// beatable by the designed build, so a low greedy-bot floor is a bot/economy problem,
-// not an unwinnable gate.
 const INTENDED_DECK: readonly string[] = [
   "slug",
   "slug",
@@ -109,10 +104,6 @@ describe("gate guardrail", () => {
       if (simulateGate(deriveSeed(20240706, `gate-${String(i)}`))) wins += 1;
     }
     const winrate = wins / runs;
-    // Logged so the number lands in the balance notes.
-    console.log(
-      `gate guardrail: intended red-6 deck vs raiderAlpha tide 2 — ${(winrate * 100).toFixed(1)}% over ${String(runs)} runs`,
-    );
     expect(winrate).toBeGreaterThanOrEqual(0.55);
   }, 30000);
 });

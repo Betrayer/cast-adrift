@@ -8,9 +8,6 @@ export interface FragmentDef {
   requires?: FlagQuery;
 }
 
-// Jump fragments: one-line world facts shown on the sector interstitial, drawn
-// unseen-first across runs (DESIGN §2.1). Twenty per sector, four of which only
-// surface once the run has earned them.
 export const FRAGMENTS_PER_SECTOR = 20;
 export const GATED_PER_SECTOR = 4;
 
@@ -20,8 +17,6 @@ const fragment = (sector: number, index: number): FragmentDef => ({
   text: `content:fragment.f${String(sector)}-${String(index)}`,
 });
 
-// The gated tail of each sector: the same slot ids, plus the state that has to
-// hold before the line is true.
 const GATES: Readonly<Record<number, readonly FlagQuery[]>> = {
   1: [
     { any: ["maraFriend", "maraGrudge"] },
@@ -97,8 +92,6 @@ export const fragmentsForSector = (
 ): FragmentDef[] =>
   FRAGMENTS.filter((f) => f.sector === sector && matches(flags, f.requires));
 
-// Unseen-first, for real: a line the profile has already read only comes back
-// when the sector has nothing left to say.
 export const pickFragment = (
   sector: number,
   flags: Record<string, FlagValue>,

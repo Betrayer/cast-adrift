@@ -3,8 +3,39 @@ import importPlugin from 'eslint-plugin-import';
 import reactHooks from 'eslint-plugin-react-hooks';
 import tseslint from 'typescript-eslint';
 
+const isTripleSlashDirective = (comment, sourceCode) =>
+  comment.type === 'Line' &&
+  comment.value.startsWith('/ <reference') &&
+  sourceCode.getIndexFromLoc(comment.loc.start) === 0;
+
+const castAdrift = {
+  rules: {
+    'no-comments': {
+      meta: {
+        type: 'problem',
+        docs: { description: 'source carries no comments; rationale lives in docs/design-notes.md' },
+        schema: [],
+        messages: {
+          found: 'no comments in src — move the rationale to docs/design-notes.md',
+        },
+      },
+      create(context) {
+        const sourceCode = context.sourceCode;
+        return {
+          Program() {
+            for (const comment of sourceCode.getAllComments()) {
+              if (isTripleSlashDirective(comment, sourceCode)) continue;
+              context.report({ loc: comment.loc, messageId: 'found' });
+            }
+          },
+        };
+      },
+    },
+  },
+};
+
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'coverage'] },
+  { ignores: ['dist', 'node_modules', 'coverage', '.claude', 'sim-out'] },
   js.configs.recommended,
   ...tseslint.configs.strict,
   {
@@ -31,6 +62,14 @@ export default tseslint.config(
         },
       ],
       'import/no-default-export': 'error',
+      'no-empty': ['error', { allowEmptyCatch: true }],
+    },
+  },
+  {
+    files: ['**/*.{ts,tsx,mts,js}'],
+    plugins: { 'cast-adrift': castAdrift },
+    rules: {
+      'cast-adrift/no-comments': 'error',
     },
   },
   {

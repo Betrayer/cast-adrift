@@ -21,7 +21,6 @@
     "jump": "Przejdź do wybranego węzła",
     "jumpHint": "Wybierz dostępny węzeł",
     "you": "Ty",
-    "boss": "Szef",
     "abandon": "Przerwij przebieg",
     "previewMiniboss": "Mini-boss: {{name}}",
     "previewBoss": "Szef: {{name}}",
@@ -37,7 +36,7 @@
       "anomaly": "Anomalia",
       "beacon": "Latarnia",
       "boss": "Szef",
-      "inverted": "inverted"
+      "inverted": "odwrócony"
     },
     "previewNode": "{{type}} · ryzyko: {{risk}}",
     "previewPocket": "Objazd: lepsze łupy, trudniejsza walka",
@@ -202,18 +201,15 @@
   },
   "consequenceToast": "Wynik: {{text}}",
   "rewards": {
-    "scrap": "+ fragment z{{n}}",
     "dieTitle": "Odzyskana matryca",
     "keep": "Zostawić na pokładzie",
     "sell": "Sprzedaj (+{{n}})",
-    "deckFull": "Pełna talia (9)",
-    "healed": "Naprawiono + {{n}}"
+    "deckFull": "Pełna talia (9)"
   },
   "perk": {
     "title": "Wybierz opcję rozszerzenia",
     "pick": "Weź",
     "skip": "Pomiń (+odpad z {{n}})",
-    "sub": "1 z 3",
     "banish": "Wyeliminować",
     "banishHint": "Wypędzenie powoduje usunięcie tej karty i wszystkich kart tego samego rodzaju z pozostałej części rundy. Raz na rundę.",
     "reroll": "Przeróbka projektu (fragment z „{{n}}”)"
@@ -221,14 +217,12 @@
   "shop": {
     "title": "Rynek · Mara",
     "buy": "Kup ({{n}})",
-    "sell": "Sprzedaj",
     "reroll": "Uzupełnienie zapasów ({{n}})",
     "leave": "Wyjść",
     "scrap": "Złom: {{n}}",
     "deck": "Pokład {{n}} /9",
     "sellTitle": "Sprzedaj kostkę do gry",
     "empty": "Wyprzedane",
-    "owned": "Na pokładzie",
     "modulesTitle": "Moduły {{used}} / {{max}}",
     "modulesFull": "Zatoka pełna",
     "rerollFree": "Ponowne losowanie zasobów (bezpłatne)"
@@ -238,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · na maksa",
     "systems": "Systemy",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Dwie identyczne kostki → +1 poziom",
-    "fusionPick": "Wybierz kostkę do połączenia",
     "repair": "Naprawa",
     "repairHint": "2 sztuki złomu na kadłub",
     "leave": "Wyjść",
@@ -256,10 +248,8 @@
     "nodes": "Wyczyściło się węzły: {{n}}",
     "kills": "Zabójstwa: {{n}}",
     "earned": "Złom źródło: {{n}}",
-    "spent": "Złom źródło: {{n}}",
     "perks": "Ulepszenia:",
     "perksNone": "brak",
-    "meta": "Odłamki & XP",
     "toMenu": "Do menu",
     "faced": "Źródło: {{names}}"
   },
@@ -279,11 +269,11 @@
     "intro": "Wszystko, o czym tu zdecydowałeś, stało się teraz drzwiami. Otworzą się tylko te, na które zasłużyłeś.",
     "thin": "Echo: „Nie do końca to doprecyzowałeś, kapitanie. Dwoje ludzi, oboje wzruszają ramionami”.",
     "axis": "Rezonans ↔ Oś stabilności: {{n}}",
-    "deepTitle": "Past the Core",
-    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
-    "thresholdTag": "Or do not end it",
-    "thresholdCross": "Cross the threshold",
-    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
+    "deepTitle": "Poza rdzeniem",
+    "deepIntro": "Nie ma już nic więcej do pokonania. Cokolwiek udało ci się przenieść przez szósty akt, właśnie tutaj to się wyczerpuje.",
+    "thresholdTag": "Albo nie kończ tego",
+    "thresholdCross": "Przekrocz próg",
+    "thresholdCost": "Podróż trwa dalej, za Rdzeniem. Fala przestaje być powstrzymywana, a zakończenie czeka po drugiej stronie — a to, co tam wybierzesz, będzie głębszym wyjaśnieniem całej historii."
   },
   "ending": {
     "next": "Kontynuuj",
@@ -351,8 +341,8 @@
     "unstable": "Niestabilny wiersz: jego zawartość została ponownie wygenerowana",
     "pocket": "Kieszeń „objazdowa”: większe ryzyko, większa nagroda",
     "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie",
-    "inversion": "Inverted row: systems resolve last to first",
-    "storm": "Probability storm: one placed die re-rolls at resolution"
+    "inversion": "Podciąganie odwrócone: systemy są rozpatrywane od ostatniego do pierwszego",
+    "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania"
   },
   "tag": {
     "red": "Czerwony",

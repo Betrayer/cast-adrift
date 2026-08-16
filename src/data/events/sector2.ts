@@ -1,7 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// Sector 2 — The Drift Fields. Twelve scenes; five are callbacks
-// (yusufFriend, yusufGrudge, crewSaved, maraFriend, hunterEngaged).
 export const SECTOR2_EVENTS: readonly EventDef[] = [
   {
     id: "clanToll",

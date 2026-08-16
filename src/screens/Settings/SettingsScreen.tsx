@@ -35,7 +35,6 @@ import type {
   ReducedMotionSetting,
 } from '@/types';
 
-// Endonyms, not flags: a language is not a country (DESIGN §4 i18n row).
 const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
   uk: 'Українська',
@@ -254,9 +253,6 @@ const ThemePicker = () => {
   );
 };
 
-// Self-serve bug reports: the player can read the exact build and the errors
-// this session actually raised instead of describing a blank screen. The list is
-// the in-memory ring from `services/errors.ts`, never a Firestore read.
 const Diagnostics = () => {
   const { t } = useTranslation(['settings']);
   const [open, setOpen] = useState(false);

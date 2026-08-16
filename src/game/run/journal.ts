@@ -23,8 +23,6 @@ export const logJournal = (body: JournalBody): void => {
     .pushJournal({ ...body, sector: useRunStore.getState().sector });
 };
 
-// The one place a consequence surfaces: the toast can be missed, the journal
-// entry cannot, so both are written from here and nowhere else.
 export const logConsequence = (origin: LocKey): void => {
   useNarrativeStore.getState().pushConsequence(origin);
   logJournal({ k: "consequence", origin });

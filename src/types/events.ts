@@ -38,9 +38,6 @@ export type OptionRequirement =
 
 export type CheckPick = "sum" | "highest" | "lowest";
 
-// A check can narrow the pool it rolls before it rolls it: a school-check reads
-// only the dice of one school, a tier-check only the dice inside a tier band.
-// The odds preview is computed on the narrowed pool, so it stays honest.
 export interface CheckDef {
   dice: number;
   pick: CheckPick;

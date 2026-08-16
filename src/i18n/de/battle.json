@@ -72,9 +72,9 @@
     "bargain": "{{n}} von Bills: Entsorgung oder Schiffsrumpf",
     "enrage": "Enrages + {{n}}",
     "hijack": "Entführt deinen besten Würfel",
-    "echoTotal": "echoes your last turn (max {{n}})",
-    "foldOrder": "folds the order",
-    "devourDie": "eats your best spare die"
+    "echoTotal": "gibt deinen letzten Zug wieder (maximal {{n}})",
+    "foldOrder": "bearbeitet die Bestellung",
+    "devourDie": "verschlingt deinen besten Ersatzwürfel"
   },
   "slot": {
     "weaponA": "Waffe A",
@@ -112,13 +112,13 @@
     "hijack": "HIJACK",
     "ward": "WARD",
     "fold": "FOLD",
-    "devour": "EATEN"
+    "devour": "VERZEHRT"
   },
   "enemyWard": "Wahlbezirk: {{school}}",
   "enemyGate": "Gate{{n}}",
   "enemyRage": "Rage und{{n}}",
-  "inverted": "INVERTED ORDER",
-  "invertedHint": "Reactor first, Sensors last.",
-  "storm": "PROBABILITY STORM",
-  "stormHint": "One placed die re-rolls before anything resolves."
+  "inverted": "UMGEKEHRTE REIHENFOLGE",
+  "invertedHint": "Zuerst der Reaktor, dann die Sensoren.",
+  "storm": "WAHRSCHEINLICHKEITSSTURM",
+  "stormHint": "Ein platzierter Würfel wird erneut gewürfelt, bevor irgendetwas ausgewertet wird."
 }

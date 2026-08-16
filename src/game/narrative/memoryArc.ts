@@ -23,8 +23,6 @@ export const memoryProgress = (): MemoryProgress => {
   };
 };
 
-// Called wherever a memory source can move: a gate cleared, an elite killed, a
-// beacon resolved. Idempotent — a threshold crossed twice pays once.
 export const syncMemoryArc = (): number[] => {
   const earned = earnedMemoryOrders(memoryProgress());
   const run = useRunStore.getState();
@@ -41,8 +39,6 @@ export const syncMemoryArc = (): number[] => {
   return fresh;
 };
 
-// «Ответ» asks for the arc, not for the run: every numbered fragment in the
-// profile's Codex plus a sixteenth slot some earlier ending already wrote.
 export const echoArcComplete = (): boolean => {
   const codex = new Set(useMetaStore.getState().codex);
   return (
@@ -62,8 +58,6 @@ export interface MemoryHint {
   values?: Record<string, number>;
 }
 
-// Non-spoiler silhouettes: the Codex says what would earn the fragment, never
-// what it says.
 export const memoryUnlockHint = (codexId: string): MemoryHint | null => {
   if (FINAL_MEMORY_IDS.includes(codexId)) return { key: "run:memory.hintEnding" };
   const def = NUMBERED_MEMORIES.find((m) => m.codexId === codexId);

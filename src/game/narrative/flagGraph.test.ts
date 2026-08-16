@@ -52,9 +52,6 @@ describe("flag graph", () => {
   });
 });
 
-// Five representative flags, each driven from the write to the thing the player
-// can see: a price, an ending beat, a tally line, a locked option, Echo's last
-// word.
 describe("flag consumers end to end", () => {
   it("maraDebt moves the counter price and shows in the tally", () => {
     expect(flagShopDiscount({})).toBe(0);

@@ -43,8 +43,6 @@ const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
   const w = window.innerWidth;
   const h = window.innerHeight;
 
-  // The card's height depends on the localised body, so it is measured rather
-  // than assumed, then clamped inside the safe area.
   useLayoutEffect(() => {
     const card = cardRef.current;
     if (card === null) return;
@@ -123,9 +121,6 @@ const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
   );
 };
 
-// The anchors live in Pixi and in freshly mounted DOM, so the host samples
-// them on a timer rather than guessing when they exist. Remounting per screen
-// (via the key below) is what clears a stale mark on navigation.
 const CoachMarkHost = ({ screen }: { screen: ScreenId }) => {
   const seen = useMetaStore((s) => s.tutorialSeen);
   const markSeen = useMetaStore((s) => s.markTutorialSeen);

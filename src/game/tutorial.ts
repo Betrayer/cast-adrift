@@ -34,8 +34,6 @@ const fromSelector =
     };
   };
 
-// The dice tray lives inside the Pixi canvas, so the scene publishes the band it
-// actually laid the tray into rather than letting this file guess at fractions.
 const trayAnchor = (): CoachRect | null => {
   const band = trayAnchorRect();
   if (band === null || band.h === 0) return null;
@@ -47,9 +45,6 @@ const trayAnchor = (): CoachRect | null => {
   };
 };
 
-// The prologue's scripted battle already walks the player through turns 1–2
-// (it hard-limits which slots are legal), so coach marks stay out of its way
-// and only fire in an unscripted first fight.
 const battleReady = (): boolean => {
   const s = useBattleStore.getState();
   return s.phase === "placement" && !s.introPending && s.scriptedSlots === null;

@@ -1,8 +1,5 @@
 import type { LocKey } from "@/types/content";
 
-// Where a fragment comes from. Echo remembers on pressure, not on a counter:
-// the gates you break open, the elites you have hunted across every run, and
-// the beacons you put back on the network.
 export type MemorySource =
   | { s: "gate"; n: number }
   | { s: "elite"; n: number }
@@ -32,9 +29,6 @@ const memory = (order: number, source: MemorySource): MemoryDef => ({
   source,
 });
 
-// Orders 1–10 ride the campaign's ten gate fights, 11–13 the lifetime elite
-// count, 14–15 the beacons resolved inside a single run, and 16 is written at
-// the finale by the ending you pick.
 export const MEMORIES: readonly MemoryDef[] = [
   ...Array.from({ length: GATE_MEMORIES }, (_, i) =>
     memory(i + 1, { s: "gate", n: i + 1 }),
@@ -74,8 +68,6 @@ export const FINAL_MEMORY_IDS: readonly string[] = Object.values(
   FINAL_MEMORY_BY_ENDING,
 );
 
-// The sixteenth slot has no entry of its own: the finale writes one of the four
-// ending variants into it, so the Codex lists 15 numbered fragments plus those.
 export const NUMBERED_MEMORIES: readonly MemoryDef[] = MEMORIES.filter(
   (m) => m.source.s !== "ending",
 );
@@ -110,7 +102,5 @@ const reached = (source: MemorySource, p: MemoryProgress): boolean => {
   }
 };
 
-// Every order the progress has earned, in ascending order. The caller diffs it
-// against what the run already unlocked, so a threshold crossed twice pays once.
 export const earnedMemoryOrders = (p: MemoryProgress): number[] =>
   MEMORIES.filter((m) => reached(m.source, p)).map((m) => m.order);

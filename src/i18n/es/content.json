@@ -90,10 +90,10 @@
     "smallChange": "Cambio de poca monta",
     "wager": "Apuesta",
     "hedge": "Cobertura",
-    "retrograde": "Retrograde",
+    "retrograde": "Retrógrado",
     "hushlight": "Hushlight",
-    "foldline": "Foldline",
-    "answerchip": "Answer Chip"
+    "foldline": "Línea de pliegue",
+    "answerchip": "Chip de respuestas"
   },
   "diceDesc": {
     "ember": "En «Armas», otorga +2 siempre que tu configuración incluya 4 o más objetos rojos.",
@@ -186,10 +186,10 @@
     "smallChange": "Sus caras son dos 2, dos 3 y dos 4; una vez por combate, se divide en dos dados grises de 4 caras para el resto del combate.",
     "wager": "Muestra tres «1» y tres «6»; una vez por combate intercambia su valor con el de otro dado, y un «1» en una ranura de arma se convierte en un «6» por 2 de casco.",
     "hedge": "Solo saca 1, 3, 5 o 7; una vez por combate, cambia de cara y comienza el siguiente turno con esa cara.",
-    "retrograde": "+3 while the order is inverted; +2 charge when it pays the Reactor there.",
-    "hushlight": "Its lowest face reads 4 instead; below half hull it heals 2 and shields 2.",
-    "foldline": "+2 to every roll on an inverted node; on an ordinary one a max face primes prismatic +3.",
-    "answerchip": "Faces 2–5. Pays +2 charge, +3 shield and +1 hull on 3 or 4 — never at its own extremes. One free nudge."
+    "retrograde": "+3 mientras el orden esté invertido; +2 de carga cuando se pague al reactor de allí.",
+    "hushlight": "En su cara más baja, en cambio, marca un 4; por debajo de la mitad del casco, cura 2 y protege 2.",
+    "foldline": "+2 a cada tirada en un nodo invertido; en uno normal, la cara máxima del prisma aporta +3.",
+    "answerchip": "Caras 2-5. Aporta +2 de carga, +3 de escudo y +1 de casco en 3 o 4 — nunca en sus extremos. Un empujón gratuito."
   },
   "resonance": {
     "red-2": "Los dados rojos en las armas otorgan +1.",
@@ -355,23 +355,23 @@
     "mirrorHeart-faceB": "Cara chapada",
     "retroEcho": "Retro-Echo",
     "foldWraith": "The Fold",
-    "slowStrider": "Slowstrider",
-    "oddsEater": "Odds-Eater",
-    "causalSplinter": "Causal Splinter",
+    "slowStrider": "Caminante lento",
+    "oddsEater": "Devorador de probabilidades",
+    "causalSplinter": "Astilla causal",
     "preEcho": "Pre-Echo",
-    "hushHerald": "Herald of the Hush",
-    "paradoxLoom": "Paradox Loom",
-    "paradoxLoom-shuttle": "Shuttle",
+    "hushHerald": "El heraldo del silencio",
+    "paradoxLoom": "Telar Paradox",
+    "paradoxLoom-shuttle": "Servicio de transporte",
     "foldTyrant": "Fold Tyrant",
-    "foldTyrant-pleat": "Pleat",
+    "foldTyrant-pleat": "Pliegue",
     "hushWarden": "Hush Warden",
-    "hushWarden-muffle": "Muffle",
-    "theHush": "The Hush",
-    "theHush-throat": "Throat",
-    "theHush-bell": "Bell",
-    "echoFleet": "The Echo Fleet",
-    "echoFleet-wake": "Wake",
-    "echoFleet-chorus": "Chorus"
+    "hushWarden-muffle": "Silenciador",
+    "theHush": "El silencio",
+    "theHush-throat": "Garganta",
+    "theHush-bell": "Campana",
+    "echoFleet": "La flota de «Echo»",
+    "echoFleet-wake": "Vigilia",
+    "echoFleet-chorus": "Estribillo"
   },
   "ships": {
     "wanderer": "Viajero",
@@ -828,7 +828,7 @@
     "keeperRepaid": "Te has enfrentado al Guardián de «Baliza»",
     "keeperLog": "Has fusionado tu registro de balizas con el del Keeper",
     "keeperLogLost": "Tu registro de baliza llegó al Guardián, pero estaba dañado",
-    "yardStripped": "The folded yard is picked clean.",
+    "yardStripped": "El patio, ya recogido, está completamente limpio.",
     "yardStopped": "has cerrado el desguace (Sector 2)",
     "tugsPaid": "apoyaste la huelga de los remolcadores (Sector 2)",
     "tugsCrossed": "Has cruzado el cordón de remolcadores (Sector 2)",
@@ -988,36 +988,36 @@
     "rimBoardRead": "has leído el tablón de anuncios de Rim (Sector 1)",
     "rimBoardPosted": "Has publicado tu propia lista de regalos en el foro de Rim (Sector 1)",
     "rimBoardTaken": "Has desmontado el tablón de anuncios de Rim para quedarte con la aleación (Sector 1)",
-    "hushHeard": "The Hush has your silence.",
-    "hushRefused": "The Hush has your voice.",
-    "retroTaken": "The buoy was yours all along.",
-    "maraBeyond": "Mara is trading past the Core.",
-    "fleetRemembered": "The fleet has your heading.",
-    "fleetSilenced": "The fleet channel is dead again.",
-    "auditFolded": "Your manifest is on file, out of order.",
-    "auditForged": "You filed a cargo you never carried.",
-    "auditRefused": "Everything downstream knows your heading.",
-    "choirQuieted": "You took the empty part.",
-    "choirCut": "The held note stopped.",
-    "logRead": "You have read tomorrow.",
-    "logWritten": "You have written tomorrow.",
-    "logBurned": "Tomorrow is nobody's fault now.",
-    "stormRidden": "You went through the front.",
-    "stormAnchored": "One face held the front open.",
-    "twinTraded": "You traded dice with yourself.",
-    "twinWarned": "The other you was warned.",
-    "twinFought": "Only one of you leaves this row.",
-    "turnBorrowed": "You are carrying borrowed time.",
-    "turnRepaid": "The account is closed.",
-    "keeperCarried": "You carry the last marker.",
-    "keeperRelieved": "The Keeper is off watch.",
-    "keeperLeft": "The Keeper stays at his post.",
-    "remainderMeasured": "The remainder has been read.",
-    "remainderKept": "The remainder is in your hold.",
-    "remainderReturned": "The remainder is back in its gap.",
-    "thresholdHeard": "The needle did not move.",
-    "thresholdCommitted": "You gave the marker a side.",
-    "thresholdWalked": "You left the needle alone."
+    "hushHeard": "The Hush se queda con tu silencio.",
+    "hushRefused": "El Hush tiene tu voz.",
+    "retroTaken": "La boya fue tuya desde el principio.",
+    "maraBeyond": "Mara está operando más allá del Núcleo.",
+    "fleetRemembered": "La flota sigue tu rumbo.",
+    "fleetSilenced": "El canal de flotas ha vuelto a desaparecer.",
+    "auditFolded": "Tu manifiesto figura en nuestros archivos, pero no está en regla.",
+    "auditForged": "Has declarado una carga que nunca has transportado.",
+    "auditRefused": "Todos los que están más abajo conocen tu rumbo.",
+    "choirQuieted": "Te quedaste con la parte vacía.",
+    "choirCut": "La nota sostenida se detuvo.",
+    "logRead": "Ya has leído «mañana».",
+    "logWritten": "Has escrito «mañana».",
+    "logBurned": "Lo de mañana ya no es culpa de nadie.",
+    "stormRidden": "Entraste por la puerta principal.",
+    "stormAnchored": "Una persona se quedó en la entrada para mantenerla abierta.",
+    "twinTraded": "Te has intercambiado los dados contigo mismo.",
+    "twinWarned": "Ya se lo habían advertido a tu otro yo.",
+    "twinFought": "Solo uno de vosotros se va de esta fila.",
+    "turnBorrowed": "Tu tiempo es prestado.",
+    "turnRepaid": "La cuenta está cerrada.",
+    "keeperCarried": "Tú llevas el último marcador.",
+    "keeperRelieved": "El guardián ha terminado su turno.",
+    "keeperLeft": "El guardián permanece en su puesto.",
+    "remainderMeasured": "El resto ya se ha leído.",
+    "remainderKept": "El resto está en tu bodega.",
+    "remainderReturned": "El resto ha vuelto a su hueco.",
+    "thresholdHeard": "La aguja no se movió.",
+    "thresholdCommitted": "Le has dado un lado al marcador.",
+    "thresholdWalked": "No le has tocado la aguja."
   },
   "events": {
     "driftingPod": {
@@ -1168,17 +1168,11 @@
       "text": "Los chatarreros rodean un pecio iluminado por focos, pujando por los núcleos sellados. El subastador examina tu chatarra.",
       "opt": {
         "bid": "Pujar por un núcleo (25)",
-        "watch": "Solo tienes que mirar",
-        "bidHigh": "Pujad alto",
-        "bidLow": "Pujar bajo",
-        "heckle": "Interrumpir la subasta"
+        "watch": "Solo tienes que mirar"
       },
       "out": {
         "bid": "Tu puja sigue en pie. El núcleo es tuyo, y es uno muy bueno.",
-        "watch": "Te quedas con algunas piezas sueltas por las que nadie ha pujado.",
-        "bidHigh": "Mara te lo deja claro y te archiva en la categoría de «paga».",
-        "bidLow": "Tú te quedas con el segundo lote. Nadie más lo quería, y quizá esa sea la clave.",
-        "heckle": "Le rebajas el precio a otra persona y te quedas con su agradecimiento. Mara no te da las gracias."
+        "watch": "Te quedas con algunas piezas sueltas por las que nadie ha pujado."
       }
     },
     "stowaway": {
@@ -1368,15 +1362,11 @@
       "text": "Yusuf, el jefe de la caravana, te saluda sin rodeos: «Unos asaltantes están siguiendo a mis transportistas. Escuértanos hasta el otro lado y te compensaré generosamente. O bien, cobrános un peaje y lárgate».",
       "opt": {
         "escort": "Escoltar el convoy",
-        "tax": "Gravar fiscalmente a la caravana",
-        "escortHim": "Acompañante en ruta",
-        "takeCargo": "Llévate la carga, mejor"
+        "tax": "Gravar fiscalmente a la caravana"
       },
       "out": {
         "escort": "Tú vas delante. A los asaltantes no les va a gustar, pero Yusuf lo recordará.",
-        "tax": "Le recortas los márgenes y le dejas pasar. Él también se acuerda de eso.",
-        "escortHim": "Tú vas delante. El patio de Yusuf se abre ante ti al final del camino.",
-        "takeCargo": "Cortas el cable y echas a correr. Yusuf no dice nada en el canal abierto. Eso es aún peor."
+        "tax": "Le recortas los márgenes y le dejas pasar. Él también se acuerda de eso."
       }
     },
     "yusufEscortPaid": {
@@ -3100,127 +3090,127 @@
       }
     },
     "hushAntechamber": {
-      "text": "A room of dead space the size of a fleet yard, and no sound reaches into it — not your engines, not the tide. The Keeper's marker floats at its centre, still transmitting, its message eaten one word from the edge.",
-      "listen": "Cut the engines and listen",
-      "listenOut": "Twenty minutes of nothing. Then the shape of the nothing, which is not the same thing, and Echo maps three rows of it before the silence closes again.",
-      "speak": "Broadcast into it",
-      "speakOut": "You give it your callsign. It gives you back the marker's salvage rights and a pressure behind the eyes that does not leave.",
-      "pass": "Route around the whole room",
-      "passOut": "The long way costs an hour and a little fuel. Echo runs a hull patch with the quiet time and says nothing about it."
+      "text": "Una sala de espacio muerto del tamaño de un astillero, a la que no llega ningún sonido: ni el de tus motores, ni el de la marea. El marcador del Guardián flota en su centro, sin dejar de transmitir, con su mensaje incompleto, a la que falta una palabra por el borde.",
+      "listen": "Apagad los motores y escuchad",
+      "listenOut": "Veinte minutos de nada. Luego, la forma de la nada, que no es lo mismo, y «Echo» traza tres filas de ella antes de que el silencio vuelva a imponerse.",
+      "speak": "Transmítelo por ese canal",
+      "speakOut": "Le das tu indicativo. A cambio, te concede los derechos de recuperación del marcador y una presión detrás de los ojos que no desaparece.",
+      "pass": "Recorre toda la sala",
+      "passOut": "El camino largo cuesta una hora y un poco de combustible. Echo publica una noticia sobre el parche del casco en un momento de calma y no dice nada al respecto."
     },
     "retroSalvage": {
-      "text": "A salvage buoy, correctly filed, correctly tagged — with your registry on it. The timestamp is four hours from now. Whatever left it here has not left it yet.",
-      "take": "Open it",
-      "takeA": "Inside is a die you have not bought yet, packed the way you pack things. You decide not to think about the packing.",
-      "takeB": "Inside is a hull sample. Yours. Torn, not cut. You seal the buoy again and the tear on your own plating opens on schedule.",
-      "log": "File it and sell the coordinates",
-      "logOut": "Somebody in the Rim will pay for a buoy that files itself. You let them find out the rest on their own time.",
-      "leave": "Leave it sealed",
-      "leaveOut": "You log the position and move on. Four hours later Echo notes, without comment, that the buoy is gone."
+      "text": "Una boya de salvamento, debidamente registrada y etiquetada, con tu número de registro. La marca de tiempo indica que faltan cuatro horas para ese momento. Lo que sea que la haya dejado aquí aún no se ha marchado.",
+      "take": "Ábrelo",
+      "takeA": "Dentro hay un dado que aún no has comprado, empaquetado tal y como tú sueles empaquetar las cosas. Decides no pensar en cómo está empaquetado.",
+      "takeB": "Dentro hay una muestra del casco. La tuya. Rasgada, no cortada. Vuelves a sellar la boya y el desgarro en tu propio blindaje se abre según lo previsto.",
+      "log": "Archívalo y vende las coordenadas",
+      "logOut": "Alguien de Rim pagará por una boya que se registra sola. Deja que descubran el resto por su cuenta.",
+      "leave": "Déjalo cerrado",
+      "leaveOut": "Anotas la posición y sigues adelante. Cuatro horas más tarde, Echo señala, sin hacer ningún comentario, que la boya ha desaparecido."
     },
     "foldedYard": {
-      "text": "Mara's stall is here. It should not be — you left her nineteen jumps and one act behind. She is restocking, badly, from crates that keep arriving before she orders them.",
-      "trade": "Buy the hull work (60 scrap)",
-      "tradeOut": "She welds a plate she says she bought from you last week. The plate is good. You pay and do not argue the calendar.",
-      "ask": "Ask her how she got here",
-      "askOut": "«Same way as you. Somebody asked me to stay and I said yes.» She patches you for free and marks your ledger open at every yard past this one.",
-      "salvage": "Strip the stall while she is turned away",
-      "salvagePass": "You take the crates that have not been ordered yet. She notices at exactly the wrong time, which out here is also the right one.",
-      "salvageFail": "The crate you pick is the one she throws. Mara has excellent aim in every direction of time."
+      "text": "El puesto de Mara está aquí. No debería estar: la dejaste diecinueve saltos y una prueba por detrás. Está reponiendo existencias, sin mucho orden, a partir de cajas que no dejan de llegar antes de que ella las haya pedido.",
+      "trade": "Comprar el casco (60 chatarra)",
+      "tradeOut": "Ella suelda una placa que, según dice, te compró la semana pasada. La placa está en buen estado. Tú pagas y no discutes sobre la fecha.",
+      "ask": "Pregúntale cómo ha llegado hasta aquí",
+      "askOut": "«Igual que tú. Alguien me pidió que me quedara y dije que sí». Te hace los parches gratis y te anota en el libro de cuentas cada yarda que recorras a partir de esta.",
+      "salvage": "Desmonta la cuadra mientras ella está de espaldas",
+      "salvagePass": "Coges las cajas que aún no se han pedido. Ella se da cuenta justo en el momento menos oportuno, que aquí fuera también es el más oportuno.",
+      "salvageFail": "La caja que elijas es la que ella lanza. Mara tiene una puntería excelente en todas las direcciones del tiempo."
     },
     "ghostFleetSignal": {
-      "text": "Fleet-standard hail, forty years stale, on a channel that was decommissioned before it was built. Yusuf's voice is on it. Yusuf is nineteen jumps behind you and has never been here.",
-      "answer": "Answer on the fleet channel",
-      "answerOut": "You give them your name and your heading. Twelve carriers acknowledge. Their reactors are still warm on your instruments, and yours borrows from them.",
-      "record": "Record it and say nothing",
-      "recordOut": "Forty years of a fleet's last hour, clean, in your hold. Someone in the Rim will pay a great deal not to hear it.",
-      "jam": "Jam the channel",
-      "jamOut": "The hail stops mid-word. Whatever was riding the carrier stops with it, and the interference in this whole reach drops a step."
+      "text": "Una llamada estándar de la flota, con cuarenta años de antigüedad, en un canal que quedó fuera de servicio antes incluso de que se construyera. Se oye la voz de Yusuf. Yusuf está a diecinueve saltos detrás de ti y nunca ha estado aquí.",
+      "answer": "Respuesta en el canal de la flota",
+      "answerOut": "Les das tu nombre y tu rumbo. Doce portaaviones confirman la recepción. Sus reactores aún están calientes en tus instrumentos, y los tuyos se alimentan de ellos.",
+      "record": "Grábalo y no digas nada",
+      "recordOut": "Cuarenta años de la última hora de una flota, intactos, en tu bodega. Alguien en el Borde pagará una fortuna por no oírlo.",
+      "jam": "Bloquear el canal",
+      "jamOut": "El granizo cesa en mitad de una palabra. Lo que fuera que se desplazara sobre el portador se detiene con él, y la interferencia en todo este tramo disminuye un poco."
     },
     "causalityAudit": {
-      "text": "A customs drone with no registry hails you for a manifest of the cargo you are going to carry. It is very polite. It has been waiting here for a long time to be polite at somebody.",
-      "submit": "Submit an honest manifest",
-      "submitPass": "The numbers agree with a future you have not had yet. The drone stamps everything and hands you a bonded crate as a courtesy.",
-      "submitFail": "The numbers do not agree. The drone files a discrepancy, and the whole reach tightens by a notch to accommodate it.",
-      "forge": "File a manifest you like better",
-      "forgeOut": "You write the cargo you would rather have had. The drone believes you, and pays out the difference in salvage rights.",
-      "refuse": "Refuse the audit",
-      "refuseOut": "«Noted.» It is still polite. It also flags your heading to everything downstream of here, which answers promptly."
+      "text": "Un dron de aduanas sin matrícula te pide el manifiesto de la carga que vas a transportar. Es muy educado. Lleva mucho tiempo esperando aquí para poder ser educado con alguien.",
+      "submit": "Presenta un manifiesto sincero",
+      "submitPass": "Las cifras coinciden con un futuro que aún no has vivido. El dron lo etiqueta todo y te entrega una caja precintada como gesto de cortesía.",
+      "submitFail": "Las cifras no cuadran. El dron registra una discrepancia y todo el alcance se ajusta ligeramente para compensarla.",
+      "forge": "Presenta el manifiesto que más te guste",
+      "forgeOut": "Escribes la carga que te hubiera gustado tener. El dron te cree y te abona la diferencia en concepto de derechos de salvamento.",
+      "refuse": "Rechazar la auditoría",
+      "refuseOut": "«Entendido». Sigue siendo una forma educada de responder. Además, indica a todos los que lean esto a continuación que has recibido el mensaje, lo que garantiza una respuesta rápida."
     },
     "quietChoir": {
-      "text": "The Choir got this far. Their hulls are here, arranged in the formation they use for singing, and the formation is holding without any of them alive in it.",
-      "sing": "Take the empty part and sing it",
-      "singOut": "The formation accepts you. For two fights afterwards your reactor starts full and something is very pleased about that.",
-      "listen": "Hold position and listen",
-      "listenOut": "It is not a hymn. It is forty years of one held note, and it repairs what it passes through, including you.",
-      "cut": "Cut the formation apart",
-      "cutOut": "Four hulls come loose and the note stops. The salvage is good. The stopping is what you will remember."
+      "text": "El Coro ha llegado hasta aquí. Sus cascos están aquí, dispuestos en la formación que utilizan para cantar, y la formación se mantiene intacta a pesar de que ya no queda nadie con vida en ella.",
+      "sing": "Coge la parte vacía y cántala",
+      "singOut": "La formación te acepta. Durante los dos combates siguientes, tu reactor empieza a pleno rendimiento y hay algo que se alegra mucho por ello.",
+      "listen": "Quédate quieto y escucha",
+      "listenOut": "No es un himno. Son cuarenta años de una sola nota sostenida, y repara todo aquello por lo que pasa, incluyéndote a ti.",
+      "cut": "Rompe la formación",
+      "cutOut": "Se sueltan cuatro cascos y la nota se detiene. El rescate ha salido bien. Lo que recordarás es el momento en que se detuvo."
     },
     "unwrittenLog": {
-      "text": "A ship's log, powered, current, and blank — except for tomorrow. Tomorrow is written out in full, in a hand that has your pressure and your spelling.",
-      "read": "Read tomorrow",
-      "readA": "Three rows of route, three names of things that live on them, and the hour you get through. You take the route.",
-      "readB": "Tomorrow is very short. You close the log before the last line and the ship takes the damage anyway, on time.",
-      "write": "Write a different tomorrow",
-      "writeOut": "You write a quiet day and sign it. Something out here files it. For the rest of the act your repairs land a little kinder.",
-      "burn": "Burn the log",
-      "burnOut": "The casing alone is worth the trip. Tomorrow still happens; it just stops being anyone's fault."
+      "text": "El diario de a bordo, con las páginas numeradas, actual y en blanco… salvo por mañana. «Mañana» está escrito con todas las letras, con una letra que tiene tu trazo y tu ortografía.",
+      "read": "Léelo mañana",
+      "readA": "Tres tramos de la ruta, tres nombres de cosas que habitan en ellos y la hora a la que pasas por allí. Sigues la ruta.",
+      "readB": "Mañana es muy corto. Si cierras el diario antes de la última línea, el barco sufre el daño de todos modos, justo a tiempo.",
+      "write": "Escribe un mañana diferente",
+      "writeOut": "Escribes «un día tranquilo» y lo firmas. Algo de aquí fuera lo archiva. Durante el resto del acto, tus reparaciones salen un poco mejor.",
+      "burn": "Quema el tronco",
+      "burnOut": "Solo por la carcasa ya merece la pena el viaje. El mañana sigue llegando; simplemente deja de ser culpa de nadie."
     },
     "stormBreak": {
-      "text": "A probability front, three rows wide, walking towards you at the speed of a decision. Inside it dice have no settled faces until something looks at them.",
-      "ride": "Ride it through",
-      "rideA": "You come out the far side with a hold full of unsettled faces and a re-roll that reaches one die further.",
-      "rideB": "You come out the far side. Most of you does. The plating settles into a shape it has not agreed to.",
-      "anchor": "Anchor on a blue die",
-      "anchorOut": "You fix one face and let the front break around it. It costs an hour and takes a step of pressure out of the whole reach.",
-      "wait": "Sit it out in the lee of a wreck",
-      "waitOut": "Six hours in someone else's shadow. Boring, cheap, and the hull comes back a little."
+      "text": "Un frente de probabilidad, de tres filas de ancho, que avanza hacia ti a la velocidad de una decisión. En su interior, los dados no tienen caras definidas hasta que algo los mira.",
+      "ride": "Atrévete a recorrerlo",
+      "rideA": "Sales por el otro lado con un puñado de caras inquietas y una repetición de tirada que llega un dado más lejos.",
+      "rideB": "Sales por el otro lado. La mayoría de vosotros lo hacéis. El recubrimiento adopta una forma con la que no estaba de acuerdo.",
+      "anchor": "Un ancla en un dado azul",
+      "anchorOut": "Fijas una cara y dejas que la parte delantera se rompa a su alrededor. Tarda una hora y elimina un punto de presión de todo el alcance.",
+      "wait": "Quédate a resguardo junto a un pecio",
+      "waitOut": "Seis horas a la sombra de otra persona. Aburrido, cutre y el casco se hunde un poco."
     },
     "secondCaptain": {
-      "text": "Your ship, station-keeping, lights correct, hail correct. In the chair is you — the version that turned back at the Core and has been out here ever since, learning things.",
-      "trade": "Trade your worst die for theirs",
-      "tradeOut": "«Take it. I remember hating that one.» The exchange is clean, and neither of you mentions how they knew which one.",
-      "warn": "Warn them what is ahead",
-      "warnOut": "You tell them everything. They listen properly, which is more than you did, and they leave you their spare plating for it.",
-      "fight": "Only one of you gets to be the one",
-      "fightOut": "They saw it coming, obviously. They have been rehearsing it for forty years."
+      "text": "Tu nave, en posición estacionaria, con las luces en orden y la señal de llamada correcta. En el asiento estás tú: la versión que dio media vuelta en el Núcleo y lleva aquí desde entonces, aprendiendo cosas.",
+      "trade": "Cambia tu peor dado por uno de los suyos",
+      "tradeOut": "«Tómatelo. Recuerdo que ese me daba asco». El intercambio es sencillo, y ninguno de los dos menciona cómo sabían cuál era.",
+      "warn": "Avísales de lo que les espera",
+      "warnOut": "Cuéntaselo todo. Te escuchan con atención, que es más de lo que tú hiciste, y te dejan su recambio para eso.",
+      "fight": "Solo uno de vosotros podrá ser el elegido",
+      "fightOut": "Obviamente, ya se lo veían venir. Llevan cuarenta años preparándolo."
     },
     "borrowedTurn": {
-      "text": "A lender's buoy, Choir make, still solvent. It will advance you time against the ship: a fuller reactor now, a smaller hull to put it in, forever.",
-      "borrow": "Borrow the turn",
-      "borrowOut": "Three fights open with the bank already full. The hull it came out of does not grow back.",
-      "repay": "Settle the turn you already wrote",
-      "repayOut": "The buoy accepts your own signature back and closes the account. The relief is physical and the plating knows it.",
-      "decline": "Decline and strip its transmitter",
-      "declineOut": "It does not argue. Lenders out here have all the time there is, and they know it."
+      "text": "Una boya de un prestamista, de la marca Choir, aún en buen estado. Te adelantará tiempo a cambio del barco: un reactor más completo ahora, un casco más pequeño en el que alojarlo, para siempre.",
+      "borrow": "Aprovechar el giro",
+      "borrowOut": "Tres combates comienzan con el banco ya lleno. El casco del que salió no vuelve a crecer.",
+      "repay": "Resuelve el turno que ya has escrito",
+      "repayOut": "La boya acepta tu propia firma y cierra la cuenta. El alivio es físico y la placa lo sabe.",
+      "decline": "Desmontar y desmontar su transmisor",
+      "declineOut": "No hay discusión posible. Los prestamistas de por aquí tienen todo el tiempo del mundo, y lo saben."
     },
     "lastKeeper": {
-      "text": "The Keeper is here, at the last marker, and has been for a while. «Five,» he says, without turning round. «You did the five. Nobody has done the five since the fleet.»",
-      "carry": "Take the marker and carry it in",
-      "carryOut": "«Then hold it level.» He says that twice, and the second time it is clearly not about the marker.",
-      "relieve": "Relieve him of the post",
-      "relieveOut": "He hands over the log, the key and a die he says was never his. Then he sits down, which he has not done in forty years.",
-      "leave": "Leave him to it",
-      "leaveOut": "«Of course.» He goes back to the marker. There is salvage in the shell of the old post, and taking it is easy."
+      "text": "El Guardián está aquí, en el último hito, y lleva ya un rato. «Cinco», dice, sin volverse. «Tú hiciste el cinco. Nadie ha hecho el cinco desde la flota».",
+      "carry": "Coge el rotulador y llévalo dentro",
+      "carryOut": "«Entonces mantenlo nivelado». Lo dice dos veces, y la segunda vez está claro que no se refiere al marcador.",
+      "relieve": "Destituirlo de su cargo",
+      "relieveOut": "Le entrega el tronco, la llave y un dado que, según dice, nunca fue suyo. A continuación, se sienta, algo que no había hecho en cuarenta años.",
+      "leave": "Déjale a su aire",
+      "leaveOut": "«Por supuesto». Vuelve al marcador. En los restos del antiguo poste hay material que se puede aprovechar, y es fácil recuperarlo."
     },
     "coreRemainder": {
-      "text": "What is left of the Core after the Core: a remainder, roughly the size of a lifeboat, still deciding things at a low volume. It has not noticed you yet, or it noticed you first.",
-      "measure": "Measure it before touching it",
-      "measurePass": "Small, steady numbers. Echo builds a shield lattice off them and the ship comes out of the reading bigger than it went in.",
-      "measureFail": "The numbers look back. The whole reach leans a step closer to whatever it is they were measuring.",
-      "keep": "Cut it loose and keep it",
-      "keepOut": "It fits in the hold. It keeps deciding in there. Echo asks you, once, to reconsider, and then never mentions it again.",
-      "return": "Put it back",
-      "returnOut": "You seat it back into the gap it came from. It settles, and something the size of the sector exhales through your hull."
+      "text": "Lo que queda del Núcleo tras el Núcleo: un resto, más o menos del tamaño de un bote salvavidas, que sigue tomando decisiones en segundo plano. Todavía no se ha fijado en ti, o quizá se fijó en ti primero.",
+      "measure": "Mídelo antes de tocarlo",
+      "measurePass": "Cifras pequeñas y constantes. El «Echo» construye una red de escudos a partir de ellas y la nave sale de la lectura más grande de lo que era al entrar.",
+      "measureFail": "Los números miran hacia atrás. Todo el conjunto se inclina un paso más hacia lo que sea que estuvieran midiendo.",
+      "keep": "Suéltalo y quédatelo",
+      "keepOut": "Cabe en la bodega. Sigue decidiendo allí dentro. «Echo» te pide, una sola vez, que lo reconsideres, y luego ya no vuelve a mencionarlo.",
+      "return": "Vuelve a ponerlo en su sitio",
+      "returnOut": "Lo vuelves a colocar en el hueco del que salió. Se asienta, y algo del tamaño del sector exhala a través de tu casco."
     },
     "thresholdBeacon": {
-      "text": "The sixth marker was never on the network. It has no message and no owner; it only measures, and what it measures is how far you are leaning.",
-      "hold": "Hold the needle where it is",
-      "holdOut": "The needle does not move, which the marker appears to find remarkable. Something acknowledges, at a frequency Echo files and does not translate.",
-      "commit": "Push the needle to your side",
-      "commitOut": "You give it a straight answer. It pays like a straight answer: full banks for three fights and a crate of nothing complicated.",
-      "walk": "Walk past without reading it",
-      "walkOut": "You leave the needle to itself. The reach relaxes a step, and three more rows come out of the fog on the way past."
+      "text": "El sexto marcador nunca estuvo conectado a la red. No tiene ningún mensaje ni propietario; solo mide, y lo que mide es cuánto te inclinas.",
+      "hold": "No muevas la aguja de ahí",
+      "holdOut": "La aguja no se mueve, lo que al marcador le parece sorprendente. Algo responde a una frecuencia que Echo registra, pero no traduce.",
+      "commit": "Empuja la aguja hacia tu lado",
+      "commitOut": "Dale una respuesta clara. La recompensa es acorde con una respuesta clara: las arcas llenas por tres combates y una caja sin complicaciones.",
+      "walk": "Pasar de largo sin leerlo",
+      "walkOut": "Dejas que la aguja siga su curso. La tensión se relaja un poco y, al pasar, surgen de la niebla tres filas más."
     }
   },
   "codex": {
@@ -3341,32 +3331,32 @@
       "body": "No soy la memoria de la nave. Soy la parte de la flota que se encontraba fuera del Núcleo cuando este se cerró, y desde entonces he estado intentando volver a entrar."
     },
     "beyondTheCore": {
-      "title": "Beyond the Core",
-      "body": "The expedition charts stop at the Core because the expedition stopped at the Core. What is past it is not more sector; it is the same sector with the order of operations taken out. Rows here run backwards on their own schedule and the fleet's old warning holds: do not lean."
+      "title": "Más allá de lo esencial",
+      "body": "Los mapas de la expedición se detienen en el Núcleo porque la expedición se detuvo en el Núcleo. Lo que hay más allá no es otro sector; es el mismo sector, pero sin el orden de operaciones. Las filas aquí discurren al revés, siguiendo su propio ritmo, y sigue vigente la antigua advertencia de la flota: no te inclines."
     },
     "echoFleetLog": {
-      "title": "The Echo Fleet",
-      "body": "Twelve carriers answer a hail on a decommissioned channel. Their reactor signatures are warm, correct, and forty years old. The fleet did not survive; the sector simply keeps a very good copy, and the copy fights the way the originals did — one remembered manoeuvre at a time."
+      "title": "La flota de «Echo»",
+      "body": "Doce naves responden a una llamada en un canal fuera de servicio. Las señales de sus reactores son cálidas, correctas y tienen cuarenta años. La flota no sobrevivió; el sector simplemente conserva una copia muy buena, y esa copia lucha tal y como lo hacían los originales: maniobra a maniobra, tal y como se las recordaban."
     },
     "secondCaptain": {
-      "title": "The Second Captain",
-      "body": "Every salvager who crosses the threshold meets a version of themselves that did not. They are not ghosts and they are not lies; they are the outcome the sector kept when you took the other one. They have had longer to practise."
+      "title": "El segundo capitán",
+      "body": "Cada rescatador que cruza el umbral se encuentra con una versión de sí mismo que no lo hizo. No son fantasmas ni mentiras; son el resultado que el sector conservó cuando tú te quedaste con el otro. Han tenido más tiempo para practicar."
     },
     "keeperBeyond": {
-      "title": "The Last Post",
-      "body": "There was never a sixth beacon on the network. There was a sixth Keeper, posted past the Core to watch the five from the outside, and he has been at it since before the network had five. He counts. He does not intervene. He has views about leaning."
+      "title": "La última llamada",
+      "body": "Nunca hubo una sexta baliza en la red. Había un sexto Guardián, apostado más allá del Núcleo para vigilar a los cinco desde fuera, y lleva haciéndolo desde antes de que la red contara con cinco. Él cuenta. No interviene. Tiene sus propias opiniones sobre la inclinación."
     },
     "coreRemainder": {
-      "title": "The Remainder",
-      "body": "A probability core collapses uncertainty into outcomes. The Core did that for a whole sector for forty years, and something was always left over — the outcomes it did not pick. The remainder is that pile, still warm, still deciding at a volume too low to argue with."
+      "title": "El resto",
+      "body": "Un núcleo de probabilidad reduce la incertidumbre a resultados concretos. El núcleo hizo eso con todo un sector durante cuarenta años, y siempre quedaba algo: los resultados que no había seleccionado. Ese resto es ese montón, aún caliente, que sigue decidiendo con un volumen demasiado bajo como para rebatirlo."
     },
     "thresholdBeacon": {
-      "title": "The Sixth Marker",
-      "body": "It carries no message. It has one instrument and one needle, and the needle reads how far the ship in front of it has committed in either direction. The fleet's logs call it the honesty gauge. Nobody in the logs ever got a flat reading."
+      "title": "El sexto hito",
+      "body": "No transmite ningún mensaje. Cuenta con un instrumento y una aguja, y la aguja indica hasta qué punto el barco que va delante se ha desviado en cualquier dirección. En los diarios de navegación de la flota se le conoce como el «indicador de honestidad». Nadie en los diarios ha obtenido nunca una lectura nula."
     },
     "memory-16-answer": {
-      "title": "Fragment 16 — The Answer",
-      "body": "«I was built to collapse a question into an answer. Forty years I have been the answer, and nobody came to hear it. You did not come to hear it either. You came and you did not lean, and that turned out to be the question. Thank you, captain. It is a good one.»"
+      "title": "Fragmento 16 — La respuesta",
+      "body": "«Me crearon para convertir una pregunta en una respuesta. Durante cuarenta años he sido la respuesta, y nadie vino a escucharla. Tú tampoco viniste a escucharla. Viniste y no te inclinaste, y eso resultó ser la pregunta. Gracias, capitán. Es una buena pregunta»."
     }
   },
   "puzzle": {
@@ -3869,15 +3859,15 @@
       "1": "Ha dejado de cambiar de canal. Ya casi me había acostumbrado."
     },
     "sectorEnter6": {
-      "1": "Captain. Nothing out here is charted. Including us.",
-      "2": "I am reading our own hull ahead of us. Twice.",
-      "3": "Whatever the Core was keeping out, we just walked around it."
+      "1": "Capitán. Aquí no hay nada cartografiado. Ni siquiera nosotros.",
+      "2": "Estoy analizando nuestro propio casco, el que tenemos delante. Dos veces.",
+      "3": "Fuera lo que fuera lo que el Núcleo impedía el paso, simplemente lo rodeamos."
     },
     "threshold": {
-      "1": "You could have ended it. I logged that you didn't.",
-      "2": "For the record: I would have followed you either way.",
-      "3": "The tide does not stop at three past this line. Nothing does.",
-      "4": "Ending it was the answer. You wanted the question."
+      "1": "Podrías haberlo terminado. He registrado que no lo hiciste.",
+      "2": "Que conste: te habría seguido de todas formas.",
+      "3": "La marea no se detiene tres minutos después de pasar esta línea. Nada lo hace.",
+      "4": "La solución era ponerle fin. Tú querías la pregunta."
     }
   },
   "mutators": {
@@ -4018,7 +4008,7 @@
     "3": "La Grieta",
     "4": "El coro",
     "5": "El núcleo",
-    "6": "Beyond the Core"
+    "6": "Más allá de lo esencial"
   },
   "ascension": {
     "1": {
@@ -4179,26 +4169,26 @@
     "f5-18": "La Flota Silenciosa no es silenciosa. Se encuentra en un canal que a nadie se le ocurrió mantener abierto.",
     "f5-19": "El faro del Núcleo permaneció encendido durante once días tras el Corte. Después, alguien lo apagó desde dentro.",
     "f5-20": "Una herejía tan arraigada no es una simple discrepancia. Es el último grupo que aún está dispuesto a admitir abiertamente que se equivoca.",
-    "f6-1": "Charts end here. The sector does not.",
-    "f6-2": "Past the Core, «before» is a heading, not a time.",
-    "f6-3": "The tide has no ceiling out here. It was never the ceiling that stopped it.",
-    "f6-4": "Three rows in every reach run backwards. They are marked. They are always marked.",
-    "f6-5": "Salvagers here file their manifests in advance and are usually right.",
-    "f6-6": "The expedition mapped this far. Then it stopped being an expedition.",
-    "f6-7": "Nothing past the Core has a first time.",
-    "f6-8": "A probability storm settles when something looks at it. Look carefully.",
-    "f6-9": "Ships out here run their reactors before their guns. It helps. Not much.",
-    "f6-10": "There are two of most things. Neither of them is the copy.",
-    "f6-11": "The Hush is not an absence of sound. It is an absence of consequence.",
-    "f6-12": "Lenders out here advance time. The collateral is always hull.",
-    "f6-13": "Every wreck past the Core is arranged. None of them are arranged by us.",
-    "f6-14": "The fleet came this way. That is not a rumour; it is a debris field.",
-    "f6-15": "Out here a good captain is one whose log matches tomorrow.",
-    "f6-16": "The old warning is one word long, and the word is «level».",
-    "f6-17": "You resolved five markers. The sixth resolved you.",
-    "f6-18": "The fleet channel is warm again, and nobody will say who warmed it.",
-    "f6-19": "Whatever the last marker measures, it has never seen a flat reading.",
-    "f6-20": "The Core left a remainder. Somebody is carrying it now."
+    "f6-1": "Los gráficos terminan aquí. El sector, no.",
+    "f6-2": "Más allá del Núcleo, «antes» es un título, no un momento en el tiempo.",
+    "f6-3": "Aquí fuera, la marea no tiene límite. Nunca fue el límite lo que la detuvo.",
+    "f6-4": "En cada tramo hay tres filas que van en sentido contrario. Están señalizadas. Siempre están señalizadas.",
+    "f6-5": "Los recuperadores de aquí presentan sus manifiestos con antelación y, por lo general, aciertan.",
+    "f6-6": "La expedición cartografió el territorio hasta este punto. A partir de ahí, dejó de ser una expedición.",
+    "f6-7": "Nada más allá del Núcleo tiene una primera vez.",
+    "f6-8": "Una tormenta de probabilidades se calma cuando algo la mira. Fíjate bien.",
+    "f6-9": "Aquí, las naves ponen en marcha los reactores antes que los cañones. Eso ayuda. Aunque no mucho.",
+    "f6-10": "De la mayoría de las cosas hay dos. Ninguna de las dos es la copia.",
+    "f6-11": "El silencio no es la ausencia de sonido. Es la ausencia de consecuencias.",
+    "f6-12": "Por aquí, los prestamistas adelantan el dinero. La garantía siempre es el casco.",
+    "f6-13": "Todos los restos de naufragios más allá del Núcleo están colocados de forma ordenada. Ninguno de ellos lo hemos colocado nosotros.",
+    "f6-14": "La flota pasó por aquí. No es un rumor; es una zona llena de restos.",
+    "f6-15": "Por aquí, un buen capitán es aquel cuyo diario de navegación coincide con lo que pasará mañana.",
+    "f6-16": "La antigua advertencia consta de una sola palabra, y esa palabra es «nivel».",
+    "f6-17": "Resolviste cinco marcadores. El sexto te resolvió a ti.",
+    "f6-18": "El canal de la flota vuelve a estar caliente, y nadie dice quién lo ha calentado.",
+    "f6-19": "Sea cual sea el valor que marque el último indicador, nunca ha registrado un valor estable.",
+    "f6-20": "El Núcleo dejó un resto. Ahora alguien lo lleva consigo."
   },
   "ending": {
     "seal": {
@@ -4214,10 +4204,10 @@
         "silenced": "Lo sellaste igual que lo silenciaste: sin respuesta, sin nombre, sin darle nada más a lo que aferrarse.",
         "answered": "Primero le pusiste tu nombre y luego la cerraste. Sabe perfectamente quién cerró la puerta y lo recordará."
       },
-      "deep1": "You seal it from the far side, which is the side nobody has ever sealed it from.",
-      "deep2": "Everything past the Core goes with it: the folded yards, the borrowed turns, the second captains.",
-      "deep3": "The Rim gets a border again. It is a hard one, and it holds, and the traders learn the new charts fast.",
-      "deep4": "You are the only captain who ever saw what was on the other side, and the only one who can never describe it."
+      "deep1": "Lo sellas desde el lado más alejado, que es el lado desde el que nadie lo ha sellado nunca.",
+      "deep2": "Todo lo que hay más allá del Núcleo se lleva consigo: las yardas dobladas, los giros prestados, los segundos capitanes.",
+      "deep3": "El Rim vuelve a tener una frontera. Es una frontera dura, pero se mantiene, y los comerciantes aprenden rápidamente los nuevos mapas.",
+      "deep4": "Eres el único capitán que ha visto alguna vez lo que hay al otro lado, y el único que nunca podrá describirlo."
     },
     "merge": {
       "title": "La fusión",
@@ -4233,10 +4223,10 @@
         "silenced": "Lo silenciaste y, aun así, entraste. Lo que te encuentres dentro, lo hará sin decir una palabra.",
         "bound": "La parte de ti que se quedó al otro lado del espejo llega primero, y lleva mucho tiempo esperando."
       },
-      "deep1": "You join it where it is thinnest, past the Core, where there is nothing left to argue with.",
-      "deep2": "There is more of you out here than there was in the fifth act, and it all fits.",
-      "deep3": "The second captains stop being separate. So do the folded yards. So does Mara, eventually, which she finds funny.",
-      "deep4": "Ships that come through afterwards report a sector that is helpful, and cannot say why that frightens them."
+      "deep1": "Te unes a ella por donde es más delgada, más allá del Núcleo, donde ya no queda nada con lo que discutir.",
+      "deep2": "Aquí hay más de ti que en el quinto acto, y todo encaja a la perfección.",
+      "deep3": "Los segundos capitanes dejan de estar separados. Lo mismo ocurre con las vergas dobladas. Y Mara también, al final, lo cual le hace gracia.",
+      "deep4": "Los barcos que pasan por allí después dicen que es una zona que les resulta útil, y no saben explicar por qué les da miedo."
     },
     "bargain": {
       "title": "La ganga",
@@ -4250,9 +4240,9 @@
         "broken": "Ya has incumplido el pacto una vez. El Coro ya lo ha tenido en cuenta, y el precio es ahora más alto que la deuda.",
         "betrayed": "Les devolviste su propio himno y te dejaron hacerlo. Eso nunca fue misericordia, fue un efecto colateral."
       },
-      "deep1": "The Choir's last formation is still holding out here, and it has a part open for you.",
-      "deep2": "The price past the Core is higher and simpler: not the ship, not the crew, only every road you did not take.",
-      "deep3": "You sing the empty part. Forty years of one held note gets a second voice, and the Rim hears it from the inside."
+      "deep1": "La última formación del coro sigue en pie aquí, y tiene una plaza libre para ti.",
+      "deep2": "El precio más allá del Núcleo es más alto y más sencillo: no es la nave, ni la tripulación, sino cada camino que no has tomado.",
+      "deep3": "Tú cantas la parte vacía. Cuarenta años de una sola nota sostenida encuentran una segunda voz, y el Rim la oye desde dentro."
     },
     "silent": {
       "title": "La flota silenciosa",
@@ -4267,24 +4257,24 @@
         "listened": "Escuchaste sin responder, y la flota aprendió que el silencio también puede ser un rumbo.",
         "rebuilt": "El relé que has reconstruido ejecuta la última orden: cinco balizas, una señal, nadie se queda atrás."
       },
-      "deep1": "You reach the fleet's last channel from the outside, which is the only side it ever worked from.",
-      "deep2": "Twelve carriers acknowledge. Not copies this time: the copies were how they kept the acknowledgement alive.",
-      "deep3": "The fleet comes home the long way, past the Core, in a formation that has been rehearsing for forty years.",
-      "deep4": "They ask who found them. Echo answers before you can, and gets your rank slightly wrong on purpose."
+      "deep1": "Llegas al último canal de la flota desde el exterior, que es el único lado desde el que ha operado alguna vez.",
+      "deep2": "Doce transportistas confirman la recepción. Esta vez no se trata de copias: las copias eran la forma que tenían de mantener viva la confirmación.",
+      "deep3": "La flota regresa a casa dando un rodeo, pasando por el Núcleo, en una formación que lleva cuarenta años ensayándose.",
+      "deep4": "Te preguntan quién los ha encontrado. Echo responde antes de que puedas hacerlo tú y se equivoca un poco a propósito con tu rango."
     },
     "answer": {
-      "title": "The Answer",
-      "label": "Give it the question",
-      "req": "Every beacon answered, Echo's arc whole, and never once leaning.",
-      "echo": "«Forty years of being an answer, captain. You are the first thing that ever asked.»",
-      "beat1": "The last of the Echo Fleet goes quiet, and the sector does not fill the gap with anything.",
-      "beat2": "The five markers you answered come up on the board at once, all of them still lit, all of them pointing here.",
-      "beat3": "Echo reads out her sixteenth fragment without being asked. It is short, and it is not about her.",
-      "beat4": "The needle on the sixth marker sits dead centre. It has never done that for anyone.",
-      "beat5": "The thing that was the Core does not offer you a door. It asks what you would like to know.",
-      "beat6": "You ask. The sector spends the next forty years working on it, and the Hush Rim is loud again by the time you are old.",
+      "title": "La respuesta",
+      "label": "Plantea la pregunta",
+      "req": "Todas las balizas respondieron; el arco de «Echo» permaneció intacto, sin inclinarse ni una sola vez.",
+      "echo": "«Cuarenta años siendo una respuesta, capitán. Tú eres lo primero que jamás me ha preguntado nada».",
+      "beat1": "La última nave de la flota «Echo» deja de emitir señales, y el sector no cubre ese vacío con nada.",
+      "beat2": "Los cinco indicadores a los que has respondido aparecen en la pantalla a la vez, todos ellos aún encendidos y apuntando hacia aquí.",
+      "beat3": "Echo lee en voz alta su decimosexto fragmento sin que nadie se lo haya pedido. Es breve y no trata sobre ella.",
+      "beat4": "La aguja del sexto marcador está justo en el centro. Nunca le había pasado eso a nadie.",
+      "beat5": "Aquello que era el Núcleo no te ofrece una puerta. Te pregunta qué te gustaría saber.",
+      "beat6": "Tú lo preguntas. El sector se pasa los siguientes cuarenta años trabajando en ello, y para cuando seas mayor, el Hush Rim vuelve a ser ruidoso.",
       "var": {
-        "heard": "The sixth marker's needle never moved for you, and the thing behind it has been waiting to say so."
+        "heard": "La aguja del sexto marcador nunca se movió para ti, y lo que hay detrás ha estado esperando para decírtelo."
       }
     }
   },
@@ -4339,23 +4329,23 @@
     "lastYard": "El patio, a la sombra del Core, recuerda tu registro",
     "thresholdStall": "Todavía había alguien con un puesto en la entrada, y tú te encargaste de ello",
     "ledgerTorn": "Tu página ya no aparece en el libro de registro del coro.",
-    "thresholdCrossed": "You were offered an ending and asked for a sixth act instead.",
-    "thresholdLost": "You died past the Core, where nobody files a report.",
-    "hushHeard": "You met the Hush and answered it your own way.",
-    "fleetRemembered": "The lost fleet has your name on its last channel.",
-    "thresholdHeard": "The sixth marker measured you and found no lean.",
-    "balanceHeld": "You finished {{n}} points from centre, and the sector noticed.",
-    "deepSalvage": "A buoy with your registry on it, filed four hours ahead.",
-    "deepYard": "A yard that had already stopped existing, and what you did in it.",
-    "deepAudit": "Somewhere there is a manifest of cargo you had not carried yet.",
-    "deepChoir": "The Choir's last formation, and whether it is still holding.",
-    "deepLog": "A log with only tomorrow in it, and what tomorrow says now.",
-    "deepStorm": "A probability front three rows wide, and the line you took through it.",
-    "deepTwin": "The captain who turned back at the Core, and how that ended.",
-    "deepBorrowed": "Time was on offer against the hull. The ledger remembers your answer.",
-    "deepKeeper": "The Keeper was still at the last marker when you found him.",
-    "deepRemainder": "What was left of the Core after the Core, and where it is now.",
-    "deepFleetLog": "Forty years of a fleet's last hour, and who ended up holding it."
+    "thresholdCrossed": "Te propusieron un final y, en cambio, pediste un sexto acto.",
+    "thresholdLost": "Moriste más allá del Núcleo, donde nadie presenta ningún informe.",
+    "hushHeard": "Te enfrentaste al Hush y le respondiste a tu manera.",
+    "fleetRemembered": "La flota perdida tiene tu nombre en su último canal.",
+    "thresholdHeard": "El sexto marcador te evaluó y no detectó ningún déficit de masa magra.",
+    "balanceHeld": "Has terminado a {{n}} puntos del centro, y el sector se ha dado cuenta.",
+    "deepSalvage": "Una boya con tu número de registro, colocada cuatro horas antes.",
+    "deepYard": "Un patio que ya había dejado de existir, y lo que hiciste en él.",
+    "deepAudit": "En algún sitio hay un albarán de una carga que aún no has transportado.",
+    "deepChoir": "La última composición del coro y si sigue manteniéndose.",
+    "deepLog": "Un diario en el que solo figura el mañana, y lo que el mañana dice ahora.",
+    "deepStorm": "Un frente de probabilidad de tres filas de ancho, y la línea que trazaste a través de él.",
+    "deepTwin": "El capitán que dio media vuelta en el Núcleo, y cómo acabó todo aquello.",
+    "deepBorrowed": "El tiempo estaba en juego frente al casco. El libro mayor recuerda tu respuesta.",
+    "deepKeeper": "El Guardián todavía estaba en el último punto de referencia cuando lo encontraste.",
+    "deepRemainder": "Lo que quedó del Núcleo tras el Núcleo, y dónde se encuentra ahora.",
+    "deepFleetLog": "Cuarenta años desde la última hora de una flota, y quién acabó quedándose con ella."
   },
   "modules": {
     "magnetScoop": {
@@ -4906,18 +4896,18 @@
     "riftBranch": "Una rama del Coro que creció a través de la grieta y salió mal formada.",
     "cantorColossus": "Una sola voz frente a las cien que aportó el Flagship. Suena más fuerte.",
     "mirrorHeart": "El Núcleo aprendió a interpretar una baraja. Esto es lo que creó a partir de esa interpretación.",
-    "retroEcho": "It is not a scan of you. It is the last minute of you, played back at the volume you chose. Quiet turns are cheap out here.",
-    "foldWraith": "The crews that met one described the same thing: firing before aiming, and being right anyway.",
-    "slowStrider": "Nothing about it is fast. That is the point: it wins the fights that last, and it never starts a short one.",
-    "oddsEater": "It does not want your ship. It wants the die you were saving, and it can tell which one that is.",
-    "causalSplinter": "Killing it is the trigger. Everything past the Core has learned to charge for its own death.",
-    "preEcho": "It arrives before the fleet it belongs to. There is no fleet. There has not been one for forty years.",
-    "hushHerald": "It does not attack the ship. It attacks the list of things the ship is allowed to do.",
-    "paradoxLoom": "Something is being woven. The Keeper says it is a name. The Keeper says a great many things.",
-    "foldTyrant": "It rules a stretch of space three rows wide where the word «after» has no fixed meaning.",
-    "hushWarden": "A door with opinions. It decides which of your systems were ever really yours.",
-    "theHush": "The forty years of silence had a shape, and this is it. It does not kill you. It subtracts you.",
-    "echoFleet": "Five ships you already sank, remembered well enough to sink you back."
+    "retroEcho": "No es una copia escaneada de ti. Es el último minuto de tu vida, reproducido al volumen que tú elegiste. Los momentos de silencio no valen nada por aquí.",
+    "foldWraith": "Los equipos que se encontraron con uno de ellos describieron lo mismo: disparaban antes de apuntar y, aun así, acertaban.",
+    "slowStrider": "No tiene nada de rápido. Esa es la clave: gana las peleas que se alargan y nunca se mete en una corta.",
+    "oddsEater": "No quiere tu nave. Quiere el dado que estabas guardando, y sabe cuál es.",
+    "causalSplinter": "La clave está en matarlo. Todo lo que hay más allá del Núcleo ha aprendido a lanzarse hacia su propia muerte.",
+    "preEcho": "Llega antes que la flota a la que pertenece. No hay ninguna flota. No ha habido ninguna desde hace cuarenta años.",
+    "hushHerald": "No ataca al barco. Ataca la lista de cosas que el barco tiene permiso para hacer.",
+    "paradoxLoom": "Se está tejiendo algo. El Guardián dice que es un nombre. El Guardián dice muchas cosas.",
+    "foldTyrant": "Ocupa un espacio de tres filas de ancho en el que la palabra «after» no tiene un significado fijo.",
+    "hushWarden": "Una puerta con opiniones. Ella decide cuáles de tus sistemas fueron realmente tuyos en algún momento.",
+    "theHush": "Los cuarenta años de silencio tenían una forma, y esta es. No te mata. Te resta.",
+    "echoFleet": "Cinco barcos que ya hundiste, y que recuerdo lo suficientemente bien como para hundirte a ti también."
   },
   "keeper": {
     "mara1": "Mara: «Aquí todo funciona. Aunque primero habría que definir qué se entiende por \"funciona\"».",
@@ -5000,18 +4990,18 @@
     "kKey1": "«Todavía tienes mi llave. Úsala o devuélvemela; cualquiera de las dos opciones es una respuesta».",
     "kThree1": "«Tres. No han pasado tres desde antes de que te construyeran.»",
     "kFive1": "«Cinco. Todos ellos. No digáis nada un momento, quiero escuchar».",
-    "bMara1": "You are not supposed to be able to buy anything here, captain. Neither am I. Let us both keep quiet.",
-    "bMara2": "The hull you bought off me back there is still holding. That is the nicest thing I have said all year.",
-    "bMara3": "You stripped a yard that had already stopped existing. I respect the thoroughness.",
-    "bYusuf1": "Past the Core the convoy discipline is the only thing that still works. Keep your lane.",
-    "bYusuf2": "You answered them. Forty years of nobody answering, and you did.",
-    "bYusuf3": "You shut the signal down. Some of us needed to hear it. Some of us needed it to stop.",
-    "bKeeper1": "You crossed. Then the only advice left is the old one: do not lean.",
-    "bKeeper2": "You stood in it and did not fill it. Very few do.",
-    "bKeeper3": "You spoke into it. It has your voice now. It is patient with voices.",
-    "bKeeper4": "Balance is not a virtue out here. It is a frequency. Hold it and something answers.",
-    "bKeeper5": "You picked a side at the last door. That is allowed. It is just not the only door.",
-    "bKeeper6": "You walked past the beacon without touching it. So did the fleet. Look how that went."
+    "bMara1": "Se supone que aquí no se puede comprar nada, capitán. Yo tampoco. Mejor callémonos los dos.",
+    "bMara2": "El casco que me compraste hace un tiempo sigue aguantando. Es lo más bonito que he dicho en todo el año.",
+    "bMara3": "Has desmontado un jardín que ya había dejado de existir. Respeto tu minuciosidad.",
+    "bYusuf1": "Más allá del Core, la disciplina del convoy es lo único que sigue funcionando. Mantén tu carril.",
+    "bYusuf2": "Tú les respondiste. Cuarenta años sin que nadie les respondiera, y tú lo hiciste.",
+    "bYusuf3": "Tú has cortado la señal. Algunos necesitábamos oírla. Otros necesitábamos que se callara.",
+    "bKeeper1": "Ya has cruzado. Así que el único consejo que me queda es el de siempre: no te inclines.",
+    "bKeeper2": "Te metiste en ella y no la llenaste. Muy pocos lo consiguen.",
+    "bKeeper3": "Le has hablado. Ahora tiene tu voz. Es paciente con las voces.",
+    "bKeeper4": "El equilibrio no es una virtud aquí fuera. Es una frecuencia. Manténla y algo te responderá.",
+    "bKeeper5": "En la última puerta elegiste un bando. Eso está permitido. Pero no es la única puerta.",
+    "bKeeper6": "Pasaste junto a la baliza sin tocarla. Lo mismo hizo la flota. Mira cómo acabó todo."
   },
   "signature": {
     "scavDrone": "Tres golpes suaves y luego uno más fuerte: el metrónomo del sector.",
@@ -5105,18 +5095,18 @@
     "cantorColossus": "Añade 2 a cada impacto futuro en cada turno, para siempre; lo único que borra la pila es una interferencia en el sensor.",
     "coreHeart": "Una coraza de válvulas sobre una tormenta: el cuerpo no absorbe nada mientras la válvula está activa, y la tormenta se activa en cada turno a partir de la fase 2.",
     "mirrorHeart": "Lucha con las cartas de tu propio mazo —cuanto más puro sea el mazo, más fuerte será el golpe— tras una fachada de caras.",
-    "retroEcho": "Answers with the damage you dealt last turn, up to 14.",
-    "foldWraith": "Folds the resolution order for one turn — sometimes twice in a row.",
-    "slowStrider": "Cannot be hit while an ally lives, and gates its shield from turn 4.",
-    "oddsEater": "Eats your highest unplaced die and wears its value as shield.",
-    "causalSplinter": "Curses one of your dice when it dies, and sometimes before that.",
-    "preEcho": "Opens with a storm, then heals the pack if it still has one.",
-    "hushHerald": "Shuts two slots at once, and drains the bank if you hoard charge.",
-    "paradoxLoom": "Its shuttle twists a die every turn, and it mirrors your widest colour.",
-    "foldTyrant": "Folds the order every cycle and eats a die once the pleat gives out.",
-    "hushWarden": "Shuts slots, and a jam of its own emitter opens every one of them.",
-    "theHush": "Silences a slot every turn from the second phase; jam it to reopen them all.",
-    "echoFleet": "Each phase window borrows a different sector boss's signature move."
+    "retroEcho": "Responde con el daño que infligiste en el último turno, hasta un máximo de 14.",
+    "foldWraith": "Reduce el orden de resolución en un turno; a veces, dos veces seguidas.",
+    "slowStrider": "No puede recibir golpes mientras haya algún aliado vivo, y activa su escudo a partir del turno 4.",
+    "oddsEater": "Se queda con tu dado de mayor valor que no haya sido colocado y utiliza ese valor como escudo.",
+    "causalSplinter": "Maldice uno de tus dados cuando muere, y a veces incluso antes.",
+    "preEcho": "Comienza con una tormenta y, a continuación, cura a la manada si aún le queda alguna.",
+    "hushHerald": "Cierra dos ranuras a la vez y agota la reserva si acumulas cargas.",
+    "paradoxLoom": "Su lanzadera gira un dado en cada turno y reproduce tu color más intenso.",
+    "foldTyrant": "Dobla el pedido en cada ciclo y se come un dado en cuanto se rompe el pliegue.",
+    "hushWarden": "Cierra las ranuras, y un atasco de su propio emisor las abre todas.",
+    "theHush": "Silencia una ranura cada turno a partir de la segunda fase; utilízalo para volver a abrirlas todas.",
+    "echoFleet": "Cada ventana de fase toma prestado el movimiento característico de un jefe de sector diferente."
   },
   "death": {
     "pact": "«De todas formas, cobrarán. A un contrato no le importa quién de los dos siga vivo».",

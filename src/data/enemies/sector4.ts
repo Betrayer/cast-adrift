@@ -1,9 +1,6 @@
 import { enemy } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// Sector 4 fights as a web, not as a line: heals, shields, charges and summons
-// all point sideways at the pack. Kill order is the whole puzzle, and half the
-// pool is worth more dead than alive to the choir around it.
 export const SECTOR4_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "choirAcolyte",

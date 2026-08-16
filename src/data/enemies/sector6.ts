@@ -1,11 +1,6 @@
 import { enemy, sub } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// Sector 6 is causality after it has stopped pretending. Sector 5 bent the order
-// of operations; «За Ядром» bills you for it. Half the pool reads a turn that has
-// already happened — the damage you dealt, the die you did not commit, the slot
-// order you were counting on — and answers with it. The other half makes the
-// answer arrive before the question.
 export const SECTOR6_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "retroEcho",

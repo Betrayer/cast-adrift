@@ -95,8 +95,6 @@ describe("shipped audio files", () => {
     expect(missing).toEqual([]);
   });
 
-  // The boss layer rides on top of the battle bed at the same offset, so any
-  // drift in bed length turns the layer into a phasing artefact.
   it("keeps every music bed exactly the same length", () => {
     const lengths = MUSIC_IDS.map((id) =>
       wavSeconds(join(dir, "music", `${id}.wav`)),

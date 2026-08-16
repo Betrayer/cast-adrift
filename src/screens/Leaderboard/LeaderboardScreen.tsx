@@ -35,17 +35,12 @@ const boardIdFor = (tab: Tab, now: number): string => {
 
 type View = "top" | "around";
 
-// The fetched board carries the request it answered, so switching tabs shows the
-// loader instead of the previous tab's rows — and no setState happens in the
-// effect body itself.
 interface LoadedBoard {
   key: string;
   rows: RankedEntry[];
   myRank: number | null;
 }
 
-// `?debug=1` greys flagged rows instead of hiding them, so a forged submission is
-// visible while testing but invisible in play (plan Task 5.3).
 const debugBoards = (): boolean => {
   if (typeof window === "undefined") return false;
   return new URLSearchParams(window.location.search).get("debug") === "1";

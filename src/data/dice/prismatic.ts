@@ -115,8 +115,6 @@ export const PRISMATIC_DICE: readonly DieItemDef[] = [
       },
     ],
   }),
-  // «Линия сгиба» reads the fold both ways: an inverted row hands the whole tray
-  // a bonus, an ordinary one hands the storm a floor.
   die("foldline", 10, "prismatic", "rare", {
     tags: ["dice", "precision", "spike"],
     effects: [
@@ -132,8 +130,6 @@ export const PRISMATIC_DICE: readonly DieItemDef[] = [
       },
     ],
   }),
-  // «Фишка ответа» is the balance die: it pays nothing at the extremes of a turn
-  // and everything in the middle, which is «Ответ»'s own argument in miniature.
   die("answerchip", 6, "prismatic", "legendary", {
     faces: [2, 3, 3, 4, 4, 5],
     tags: ["dice", "charge", "survival"],

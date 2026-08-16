@@ -1,9 +1,6 @@
 import { enemy } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// Sector 3 attacks the dice rather than the hull: caps shrink, faces twist,
-// values swap and curses ride a die for two turns. Nothing here out-damages
-// sector 2 — it makes the deck you built stop being the deck you play.
 export const SECTOR3_ENEMIES: readonly EnemyDef[] = [
   enemy({
     id: "riftling",

@@ -36,10 +36,6 @@ const MEMORY_ENTRIES: readonly CodexEntry[] = MEMORY_CODEX_IDS.map((id) =>
   memory(id),
 );
 
-// One dossier per roster entry (DESIGN §6.4): the title is the enemy's own name,
-// the signature is its mechanically true line — lint cross-checks it against the
-// def's claims — and the body is the hand-written flavour. The stat block is
-// rendered from the EnemyDef at read time, so no numbers live in the strings.
 export const dossierId = (enemyId: string): string => `dossier-${enemyId}`;
 
 const DOSSIER_ENTRIES: readonly CodexEntry[] = ALL_ENEMIES.map((enemy) => ({

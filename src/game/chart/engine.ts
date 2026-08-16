@@ -13,8 +13,6 @@ export const RESPEC_SHARD_COST = 20;
 export const respecCost = (level: number): number =>
   level >= FREE_RESPEC_LEVEL ? 0 : RESPEC_SHARD_COST;
 
-export const pointsSpent = (picks: readonly string[]): number => picks.length;
-
 export const pointsTotal = (level: number): number =>
   Math.min(MAX_LEVEL, level) + bonusChartPoints(level);
 
@@ -125,16 +123,12 @@ export const pathTo = (
   return { ids, cost };
 };
 
-// «Инженерный отсек» adds a hangar slot, «Prism Cascade» takes two away; both
-// are the same signed delta so the budget stays one number.
 export const hubBudgetBonus = (picks: readonly string[]): number =>
   picks.reduce(
     (sum, id) => sum + (CHART_NODE_BY_ID.get(id)?.budgetDelta ?? 0),
     0,
   );
 
-// «Iron Doctrine» is the only chart node that shrinks a slot cap; the run merges
-// this with the mutator deltas before the battle is built.
 export const chartSlotTierDelta = (
   picks: readonly string[],
 ): Partial<Record<SlotId, number>> => {

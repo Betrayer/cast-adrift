@@ -1,7 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// Sector 4 — The Choir. Twelve scenes; five are callbacks
-// (pactOpened, refusedChoir, keeperTrust, mirrorSpoke, hunterAllied).
 export const SECTOR4_EVENTS: readonly EventDef[] = [
   {
     id: "hymnGate",

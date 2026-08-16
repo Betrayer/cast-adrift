@@ -35,8 +35,6 @@ export const computeModuleMods = (modules: readonly string[]): PerkMods => {
   return mods;
 };
 
-// Perks, Star-Chart picks and installed modules are the three run-modifier
-// sources; they aggregate once here so no call site has to know about all three.
 export const computeRunMods = (
   perks: readonly string[],
   chartPicks: readonly string[] = [],

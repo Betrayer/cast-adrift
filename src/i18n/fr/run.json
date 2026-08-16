@@ -21,7 +21,6 @@
     "jump": "Aller au nœud sélectionné",
     "jumpHint": "Sélectionnez un nœud accessible",
     "you": "Toi",
-    "boss": "Patron",
     "abandon": "Abandonner la course",
     "previewMiniboss": "Mini-boss : {{name}}",
     "previewBoss": "Boss : {{name}}",
@@ -37,7 +36,7 @@
       "anomaly": "Anomalie",
       "beacon": "Balise",
       "boss": "Patron",
-      "inverted": "inverted"
+      "inverted": "inversé"
     },
     "previewNode": "{{type}} · risque : {{risk}}",
     "previewPocket": "Détour : un butin plus intéressant, un combat plus difficile",
@@ -202,18 +201,15 @@
   },
   "consequenceToast": "Conséquence : {{text}}",
   "rewards": {
-    "scrap": "+ Déchet de{{n}}",
     "dieTitle": "Matrice récupérée",
     "keep": "Garder dans le paquet",
     "sell": "Vendre (+ {{n}})",
-    "deckFull": "Jeu complet (9)",
-    "healed": "Réparé + {{n}}"
+    "deckFull": "Jeu complet (9)"
   },
   "perk": {
     "title": "Choisissez une mise à niveau",
     "pick": "Prendre",
     "skip": "Passer (+ {{n}}s de chutes)",
-    "sub": "1 sur 3",
     "banish": "Bannir",
     "banishHint": "L'effet « Bannissement » élimine cette carte et toutes les cartes de ce type du reste de la partie. Une fois par partie.",
     "reroll": "Nouvelle version du projet (extrait de « {{n}} »)"
@@ -221,14 +217,12 @@
   "shop": {
     "title": "Marché · Mara",
     "buy": "Acheter ({{n}})",
-    "sell": "Vendre",
     "reroll": "Réapprovisionnement ({{n}})",
     "leave": "Partir",
     "scrap": "Ferraille: {{n}}",
     "deck": "{{n}}s sur le pont /9",
     "sellTitle": "Vendre un dé",
     "empty": "Épuisé",
-    "owned": "Sur le pont",
     "modulesTitle": "Modules {{used}} / {{max}}",
     "modulesFull": "Baie pleine",
     "rerollFree": "Réapprovisionnement (gratuit)"
@@ -238,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · à fond",
     "systems": "Systèmes",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Deux dés identiques → +1 niveau",
-    "fusionPick": "Choisissez un dé à fusionner",
     "repair": "Réparation",
     "repairHint": "2 pièces de ferraille par coque",
     "leave": "Partir",
@@ -256,10 +248,8 @@
     "nodes": "Nœuds effacés : {{n}}",
     "kills": "Kills : {{n}}",
     "earned": "Ferraille Source : {{n}}",
-    "spent": "Ferraille source : {{n}}",
     "perks": "Mises à jour :",
     "perksNone": "aucun",
-    "meta": "Éclats & XP",
     "toMenu": "Retour au menu",
     "faced": "Source : {{names}}"
   },
@@ -279,11 +269,11 @@
     "intro": "Toutes les décisions que tu as prises ici sont désormais autant de portes. Seules celles que tu as méritées s'ouvriront.",
     "thin": "Echo : « Vous n'avez pas été très convaincant, capitaine. Deux portes, et les deux ont haussé les épaules. »",
     "axis": "Résonance ↔ Axe de stabilité : {{n}}",
-    "deepTitle": "Past the Core",
-    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
-    "thresholdTag": "Or do not end it",
-    "thresholdCross": "Cross the threshold",
-    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
+    "deepTitle": "Au-delà du noyau",
+    "deepIntro": "Il n'y a plus rien à franchir. Tout ce que vous avez emporté avec vous jusqu'au sixième acte, c'est ici que cela se joue.",
+    "thresholdTag": "Ou alors, n'y mets pas fin",
+    "thresholdCross": "Franchir le seuil",
+    "thresholdCost": "Le parcours se poursuit au-delà du Noyau. La marée n'est plus contenue, la fin n'arrive qu'une fois l'autre rive atteinte — et le choix que tu feras là-bas en révélera toute la profondeur."
   },
   "ending": {
     "next": "Continuer",
@@ -351,8 +341,8 @@
     "unstable": "Ligne instable : son contenu a été recalculé",
     "pocket": "La poche de détour : un risque accru, mais aussi un gain accru",
     "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte",
-    "inversion": "Inverted row: systems resolve last to first",
-    "storm": "Probability storm: one placed die re-rolls at resolution"
+    "inversion": "Série inversée : les systèmes sont traités du dernier au premier",
+    "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution"
   },
   "tag": {
     "red": "Rouge",

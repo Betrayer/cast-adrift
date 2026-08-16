@@ -236,7 +236,6 @@
     "chartPoints": "Two Star Chart points"
   },
   "levelup": {
-    "title": "Level Up",
     "level": "Captain Level {{level}}",
     "point": "+1 Star Chart point",
     "points": "+{{n}} Star Chart points",
@@ -264,14 +263,10 @@
   "hangar": {
     "title": "Hangar",
     "deck": "Deck",
-    "collection": "Collection",
     "shop": "Meta Shop",
     "budget": "Budget {{used}} / {{max}}",
-    "pts": "{{n}} pts",
-    "owned": "×{{n}}",
     "add": "Add",
     "buy": "Buy · {{price}}◈",
-    "sold": "Owned",
     "save": "Save deck",
     "saved": "Saved",
     "invalidOver": "Over budget",
@@ -280,25 +275,19 @@
     "invalidFate": "Max 1 Fate die",
     "valid": "Ready",
     "empty": "Deck is empty",
-    "ship": "Ship",
     "shipEquip": "Equip",
     "shipEquipped": "Equipped",
     "shipBuy": "Buy · {{price}}◈",
     "shipLocked": "Unlocks at Level {{level}}",
-    "filterSchool": "School",
-    "filterTier": "Tier",
-    "filterRarity": "Rarity",
     "filterAll": "All"
   },
   "collection": {
     "title": "Collection",
-    "count": "{{n}} dice",
     "owned": "×{{n}}",
     "discount": "−{{n}}% — you have met this die",
     "found": "Met",
     "undiscovered": "Not yet met",
     "provenance": "found: sector {{sector}}, {{node}}",
-    "filterState": "State",
     "stateAll": "All",
     "stateOwned": "Owned",
     "stateFound": "Met",
@@ -425,7 +414,6 @@
     "locked": "Sealed",
     "achievements": "Achievements",
     "achProgress": "{{have}} / {{need}}",
-    "achLocked": "Locked",
     "badges": "Badges",
     "achCount": "{{n}} of {{total}}",
     "group": {
@@ -435,8 +423,7 @@
       "story": "Story",
       "collection": "Collection",
       "modes": "Modes"
-    },
-    "endingsHidden": "Some endings are not on this shelf."
+    }
   },
   "engraving": {
     "title": "Engraving Station",
@@ -707,8 +694,5 @@
       "prestigeTheme": "theme «Ascendant»",
       "badge": "the Ascendant badge"
     }
-  },
-  "shard": {
-    "deepClear": "Beyond the Core"
   }
 }

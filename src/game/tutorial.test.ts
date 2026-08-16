@@ -94,7 +94,7 @@ describe("coach mark gating", () => {
     expect(nextCoachMark("battle", [])?.id).toBe("place");
   });
 
-  it("covers exactly the five marks the phase plan asks for", () => {
+  it("declares exactly the five coach marks the tutorial ships", () => {
     expect(ALL_COACH_MARK_IDS).toEqual([
       "place",
       "endTurn",

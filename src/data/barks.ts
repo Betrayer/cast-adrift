@@ -11,8 +11,6 @@ export interface BarkDef {
 const lines = (id: string, n: number): LocKey[] =>
   Array.from({ length: n }, (_, i) => `content:bark.${id}.${String(i + 1)}`);
 
-// The twenty enemies worth a first-kill line: the ones a player meets as a
-// named threat rather than as chaff.
 const FIRST_KILL_ENEMIES: readonly string[] = [
   "raider",
   "scavDrone",
@@ -44,11 +42,6 @@ const firstKillBarks: readonly BarkDef[] = FIRST_KILL_ENEMIES.map((id) => ({
   cooldownSec: 30,
 }));
 
-// Echo barks (Revision-3 target: 220 lines; 157 authored). Quota per trigger:
-// resume 10 · sectorEnter 18 · lowHull 10 · firstKill 20 · bossPhase 10 ·
-// minibossIntro 6 · setComplete 7 · rareLoot 12 · tideUp 6 · eventOutcome 10+10 ·
-// idleMap 6 · battleWin 12 · nearDeathWin 6 · levelUp 6 · memory 4 ·
-// threshold 4 = 157.
 export const BARKS: readonly BarkDef[] = [
   { id: "levelUp", trigger: "levelUp", lines: lines("levelUp", 6), weight: 1, cooldownSec: 30 },
   { id: "resume", trigger: "resume", lines: lines("resume", 10), weight: 1, cooldownSec: 120 },
@@ -74,10 +67,6 @@ export const BARKS: readonly BarkDef[] = [
   ...firstKillBarks,
 ];
 
-export const BARK_LINE_TOTAL = BARKS.reduce((n, b) => n + b.lines.length, 0);
-
-// Per-trigger quota the content lint enforces, so a trimmed pool fails CI
-// instead of quietly making Echo repetitive.
 export const BARK_QUOTA: Readonly<Record<string, number>> = {
   resume: 10,
   sectorEnter: 18,

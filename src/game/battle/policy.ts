@@ -222,8 +222,6 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
     killSum - stormMargin(snapshot, killCandidates) >= totalEnemyHp &&
     totalEnemyHp > 0;
 
-  // Front-load the aura subsystem (turret) so the atk+2 aura drops early — unless we
-  // can lethal-clear the core this turn, in which case just kill the enemy.
   const targetSub = auraSubsystems[0];
   const healer =
     alive.length > 1
@@ -261,10 +259,6 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
     if (engineDie !== undefined) tryPlace(engineDie, "engines");
   }
 
-  // On an inverted row Sensors resolve after the guns, so the mark they lay is
-  // worth nothing this turn. A competent player stops feeding the slot and pours
-  // the die into the reactor instead; without this the bot reads every inverted
-  // node as a flat damage loss it never chose.
   if (!isInverted(snapshot)) {
     const sensorDie = [...available()].sort((a, b) => a.value - b.value)[0];
     if (sensorDie !== undefined) tryPlace(sensorDie, "sensors");

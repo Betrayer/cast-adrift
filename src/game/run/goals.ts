@@ -48,8 +48,6 @@ export interface GoalContext {
 const hullPct = (ctx: GoalContext): number =>
   ctx.hullMax <= 0 ? 0 : (ctx.hull / ctx.hullMax) * 100;
 
-// Every goal is a pure read of the run's own tally — no goal ever touches a
-// store, so a scripted run and a real one score identically.
 export const evaluateGoal = (spec: GoalSpec, ctx: GoalContext): boolean => {
   switch (spec.g) {
     case "win":
@@ -110,8 +108,6 @@ export const evaluateGoal = (spec: GoalSpec, ctx: GoalContext): boolean => {
   }
 };
 
-// Goals that only make sense on a completed run: a contract you died in never
-// awards them, even if the counter happens to be satisfied.
 const WIN_ONLY: ReadonlySet<GoalKind> = new Set<GoalKind>([
   "win",
   "hullPctAtLeast",
