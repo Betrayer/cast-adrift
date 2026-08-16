@@ -247,4 +247,78 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { t: "attack", n: 11 },
     ],
   }),
+  // The two «За Ядром» gates. The Fold Tyrant makes the order of your own ship a
+  // moving target; the Hush Warden takes the slots away one at a time and asks
+  // which one you were relying on.
+  enemy({
+    id: "foldTyrant",
+    hp: 62,
+    miniboss: true,
+    claims: [
+      { k: "intent", t: "foldOrder" },
+      { k: "trait", is: "phases" },
+      { k: "aura", is: "twistEachTurn" },
+    ],
+    subsystems: [sub("foldTyrant", "pleat", 14, "twistEachTurn")],
+    phases: [
+      {
+        untilHpPct: 50,
+        pattern: [
+          { t: "foldOrder" },
+          { t: "multi", n: 5, k: 3 },
+          { t: "attack", n: 10 },
+        ],
+      },
+      {
+        untilHpPct: 0,
+        pattern: [
+          { t: "foldOrder" },
+          { t: "attack", n: 12 },
+          { t: "devourDie" },
+        ],
+        onEnter: [{ t: "foldOrder" }],
+      },
+    ],
+    pattern: [
+      { t: "foldOrder" },
+      { t: "multi", n: 5, k: 3 },
+      { t: "attack", n: 10 },
+    ],
+  }),
+  enemy({
+    id: "hushWarden",
+    hp: 78,
+    miniboss: true,
+    jamReleasesBlocks: true,
+    claims: [
+      { k: "trait", is: "jamReleasesBlocks" },
+      { k: "intent", t: "jamSlot" },
+      { k: "trait", is: "phases" },
+    ],
+    subsystems: [sub("hushWarden", "muffle", 16, "shieldSelf6")],
+    phases: [
+      {
+        untilHpPct: 55,
+        pattern: [
+          { t: "jamSlot" },
+          { t: "shield", n: 8 },
+          { t: "attack", n: 10 },
+        ],
+      },
+      {
+        untilHpPct: 0,
+        pattern: [
+          { t: "jamSlot", k: 2 },
+          { t: "capShrink" },
+          { t: "multi", n: 7, k: 2 },
+        ],
+        onEnter: [{ t: "jamSlot", k: 2 }],
+      },
+    ],
+    pattern: [
+      { t: "jamSlot" },
+      { t: "shield", n: 8 },
+      { t: "attack", n: 10 },
+    ],
+  }),
 ];

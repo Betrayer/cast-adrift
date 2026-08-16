@@ -9,6 +9,7 @@ export const RUNTIME_FLAGS: readonly string[] = [
   "beacon3",
   "beacon4",
   "beacon5",
+  "crossedThreshold",
 ];
 
 // Written by R7 content, read by a system that lands in a later phase. The flag

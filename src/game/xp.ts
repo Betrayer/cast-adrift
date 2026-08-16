@@ -63,11 +63,19 @@ export const runXp = (counts: RunCounts, ascension = 0): number => {
 export const SECTOR_CLEAR_SHARDS: readonly number[] = [40, 55, 75, 100, 140];
 export const BOSS_FIRST_KILL_SHARDS: readonly number[] = [25, 35, 50, 70, 100];
 
+// «За Ядром» is paid as its own band rather than as a sixth entry in the sector
+// table: it is opt-in, it is not part of the campaign's clear count, and the
+// table's shape (§12.3) describes a five-act run.
+export const SECTOR_SIX_CLEAR_SHARDS = 180;
+export const SECTOR_SIX_BOSS_SHARDS = 60;
+
 export const sectorClearShards = (sector: number): number =>
   SECTOR_CLEAR_SHARDS[Math.max(0, Math.min(4, sector - 1))] ?? 0;
 
 export const bossFirstKillShards = (sector: number): number =>
-  BOSS_FIRST_KILL_SHARDS[Math.max(0, Math.min(4, sector - 1))] ?? 0;
+  sector > SECTOR_CLEAR_SHARDS.length
+    ? SECTOR_SIX_BOSS_SHARDS
+    : (BOSS_FIRST_KILL_SHARDS[Math.max(0, Math.min(4, sector - 1))] ?? 0);
 
 export const campaignShards = (sectorsCleared: number): number =>
   SECTOR_CLEAR_SHARDS.slice(0, Math.max(0, sectorsCleared)).reduce(
@@ -94,6 +102,7 @@ export interface RunQualityInput {
   firstEnding: boolean;
   streak: number;
   ascension: number;
+  deepClear: boolean;
 }
 
 export interface ShardBreakdown {
@@ -102,6 +111,7 @@ export interface ShardBreakdown {
   firstEnding: number;
   hullClear: number;
   streak: number;
+  deepClear: number;
   ascension: number;
   total: number;
 }
@@ -112,6 +122,7 @@ export const ZERO_SHARD_BREAKDOWN: ShardBreakdown = {
   firstEnding: 0,
   hullClear: 0,
   streak: 0,
+  deepClear: 0,
   ascension: 0,
   total: 0,
 };
@@ -126,7 +137,10 @@ export const shardBreakdown = (input: RunQualityInput): ShardBreakdown => {
     STREAK_SHARD_CAP,
     Math.max(0, input.streak) * STREAK_SHARDS,
   );
-  const base = sectors + beacons + firstEnding + hullClear + streak;
+  const deepClear =
+    input.win && input.deepClear ? SECTOR_SIX_CLEAR_SHARDS : 0;
+  const base =
+    sectors + beacons + firstEnding + hullClear + streak + deepClear;
   const total = Math.round(base * ascensionShardMult(input.ascension));
   return {
     sectors,
@@ -134,6 +148,7 @@ export const shardBreakdown = (input: RunQualityInput): ShardBreakdown => {
     firstEnding,
     hullClear,
     streak,
+    deepClear,
     ascension: total - base,
     total,
   };

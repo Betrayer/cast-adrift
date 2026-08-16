@@ -31,6 +31,7 @@ import {
   NUDGE_COST,
   SURGE_COST,
 } from '@/game/battle/resolver';
+import { isInverted } from '@/game/battle/order';
 import { resolveActiveBattle } from '@/game/run/flow';
 import { emitBark } from '@/game/narrative';
 import { hasTrait } from '@/game/run/perkMods';
@@ -113,6 +114,12 @@ const intentLabel = (t: TFunction<['battle', 'content']>, intent: Intent): strin
       return t('battle:intent.enrage', { n: intent.n });
     case 'hijack':
       return t('battle:intent.hijack');
+    case 'echoTotal':
+      return t('battle:intent.echoTotal', { n: intent.cap });
+    case 'foldOrder':
+      return t('battle:intent.foldOrder');
+    case 'devourDie':
+      return t('battle:intent.devourDie');
   }
 };
 
@@ -135,6 +142,38 @@ const intentPillClass = (intent: Intent): string => {
   if (ATTACK_INTENTS.has(intent.t)) return styles.intentAttack ?? '';
   if (SHIELD_INTENTS.has(intent.t)) return styles.intentShield ?? '';
   return styles.intentUtility ?? '';
+};
+
+// «За Ядром» telegraphs on the map and has to keep telegraphing here: the fold
+// can arrive mid-fight from an enemy, so the banner reads the same predicate the
+// resolver does rather than the node's flag.
+const CausalityBanner = () => {
+  const { t } = useTranslation(['battle']);
+  const inverted = useBattleStore((s) => isInverted(s));
+  const storm = useBattleStore((s) => s.nodeStorm);
+  if (!inverted && !storm) return null;
+  return (
+    <div className={styles.causalityBanner} data-band="causality">
+      {inverted ? (
+        <span
+          className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}
+          data-causality="inverted"
+          title={t('battle:invertedHint')}
+        >
+          {t('battle:inverted')}
+        </span>
+      ) : null}
+      {storm ? (
+        <span
+          className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}
+          data-causality="storm"
+          title={t('battle:stormHint')}
+        >
+          {t('battle:storm')}
+        </span>
+      ) : null}
+    </div>
+  );
 };
 
 const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
@@ -834,6 +873,7 @@ export const BattleScreen = () => {
       background={<PixiCanvas mount={mountScene} />}
       header={
         <div className={styles.topBands}>
+          <CausalityBanner />
           <StatusCard
             onOpenBuild={() => {
               setBuildOpen(true);

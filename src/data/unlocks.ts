@@ -7,7 +7,8 @@ export type FeatureId =
   | "shipArk"
   | "engravingStation"
   | "dailyPreview"
-  | "freeRespec";
+  | "freeRespec"
+  | "sectorSix";
 
 export interface UnlockSource {
   level?: number;
@@ -294,6 +295,30 @@ export const UNLOCKS: readonly UnlockDef[] = [
     label: "meta:unlock.featureFreeRespec",
     source: { level: 50 },
     feature: "freeRespec",
+  },
+  // The only unlock with no tease anywhere: the offer at the S5 finale is its
+  // own reveal, so a first-time captain meets «За Ядром» as a surprise rather
+  // than as a locked row they have been walking past for twenty runs.
+  {
+    id: "s6-threshold",
+    kind: "feature",
+    label: "meta:unlock.sectorSix",
+    source: { clears: 1 },
+    feature: "sectorSix",
+  },
+  {
+    id: "diceS6",
+    kind: "diceWave",
+    label: "meta:unlock.diceS6",
+    source: { achievement: "beyondTheCore" },
+    dice: ["retrograde", "hushlight", "foldline", "answerchip"],
+  },
+  {
+    id: "skinThreshold",
+    kind: "cosmetic",
+    label: "meta:unlock.skinThreshold",
+    source: { achievement: "theAnswer" },
+    cosmetic: "thresholdSkin",
   },
 ];
 

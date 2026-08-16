@@ -53,6 +53,12 @@ const GATES: Readonly<Record<number, readonly FlagQuery[]>> = {
     { any: ["lighthouseLit"] },
     { any: ["hereticFleetLed", "preacherAnswered"] },
   ],
+  6: [
+    { any: ["hushHeard", "hushRefused"] },
+    { any: ["fleetRemembered", "fleetSilenced"] },
+    { any: ["thresholdHeard", "thresholdCommitted", "thresholdWalked"] },
+    { any: ["remainderKept", "remainderReturned"] },
+  ],
 };
 
 const sectorFragments = (sector: number): FragmentDef[] => {
@@ -65,7 +71,7 @@ const sectorFragments = (sector: number): FragmentDef[] => {
   });
 };
 
-export const FRAGMENTS: readonly FragmentDef[] = [1, 2, 3, 4, 5].flatMap(
+export const FRAGMENTS: readonly FragmentDef[] = [1, 2, 3, 4, 5, 6].flatMap(
   sectorFragments,
 );
 

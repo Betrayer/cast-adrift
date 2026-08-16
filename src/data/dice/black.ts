@@ -132,4 +132,22 @@ export const BLACK_DICE: readonly DieItemDef[] = [
       },
     ],
   }),
+  // «Ретроград» pays for the order being wrong, which is the whole argument for
+  // walking into an inverted row on purpose.
+  die("retrograde", 10, "black", "rare", {
+    tags: ["reactor", "charge", "overcap"],
+    active: "bank",
+    effects: [
+      {
+        on: "beforeResolveSlot",
+        if: [{ c: "inverted" }],
+        do: [{ a: "modDieValue", n: 3 }],
+      },
+      {
+        on: "afterResolveSlot",
+        if: [{ c: "inverted" }, { c: "slot", is: "reactor" }],
+        do: [{ a: "charge", n: 2 }],
+      },
+    ],
+  }),
 ];

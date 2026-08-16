@@ -25,6 +25,7 @@ export type AchievementCond =
   | { c: "runPuzzles"; n: number }
   | { c: "clearAtAscension"; n: number }
   | { c: "endings"; n: number }
+  | { c: "endingReached"; id: string }
   | { c: "bossFirstKills"; n: number }
   | { c: "collectionOwned"; n: number }
   | { c: "collectionSchools"; n: number }
@@ -287,6 +288,22 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
     group: "modes",
     cond: { c: "keystones", n: 3 },
     reward: { unlockId: "skinChartwright", shards: 70, badge: "chartwright" },
+  },
+  {
+    id: "beyondTheCore",
+    name: "meta:ach.beyondTheCore.name",
+    desc: "meta:ach.beyondTheCore.desc",
+    group: "combat",
+    cond: { c: "lifetime", stat: "deepClears", n: 1 },
+    reward: { unlockId: "diceS6", shards: 150 },
+  },
+  {
+    id: "theAnswer",
+    name: "meta:ach.theAnswer.name",
+    desc: "meta:ach.theAnswer.desc",
+    group: "story",
+    cond: { c: "endingReached", id: "answer" },
+    reward: { unlockId: "skinThreshold", shards: 200, badge: "answer" },
   },
   {
     id: "contractor",

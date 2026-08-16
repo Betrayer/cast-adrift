@@ -275,6 +275,44 @@ describe("map generator", () => {
     }
   });
 
+  // «За Ядром» marks whole rows, never single nodes, and never the two rows the
+  // act is actually about.
+  it("marks three inverted and three storm rows in sector 6, never the same one", () => {
+    const shape = sectorDef(6).shape;
+    for (let seed = 1; seed <= 25; seed += 1) {
+      const map = generate(seed, 6);
+      const inverted = new Set(
+        map.nodes.filter((n) => n.inverted === true).map((n) => n.row),
+      );
+      const storm = new Set(
+        map.nodes.filter((n) => n.storm === true).map((n) => n.row),
+      );
+      expect(inverted.size).toBe(3);
+      expect(storm.size).toBe(3);
+      for (const row of storm) expect(inverted.has(row)).toBe(false);
+      for (const row of [...inverted, ...storm]) {
+        expect(row).not.toBe(shape.gateRow);
+        expect(row).not.toBe(shape.bossRow);
+        expect(row).toBeGreaterThan(1);
+      }
+      for (const node of map.nodes) {
+        if (node.inverted !== true) continue;
+        const peers = map.nodes.filter(
+          (n) => n.row === node.row && n.pocket !== true,
+        );
+        for (const peer of peers) expect(peer.inverted).toBe(true);
+      }
+    }
+  });
+
+  it("never marks a campaign sector with causality rows", () => {
+    for (let sector = 1; sector <= 5; sector += 1) {
+      const map = generate(7, sector);
+      expect(map.nodes.some((n) => n.inverted === true)).toBe(false);
+      expect(map.nodes.some((n) => n.storm === true)).toBe(false);
+    }
+  });
+
   it("produces a stable snapshot per sector for seed 42", () => {
     for (const def of SECTORS) {
       const map = generate(42, def.id);
@@ -284,6 +322,8 @@ describe("map generator", () => {
             n.cache === true ? "c" : "",
             n.unstable === true ? "u" : "",
             n.blessing === "blessed" ? "+" : n.blessing === "cursed" ? "-" : "",
+            n.inverted === true ? "i" : "",
+            n.storm === true ? "s" : "",
           ].join("");
           return `${n.id}:${n.type}${marks === "" ? "" : `:${marks}`}`;
         })

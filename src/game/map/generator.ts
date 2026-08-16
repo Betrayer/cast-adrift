@@ -327,6 +327,64 @@ const applyCollapse = (
   }
 };
 
+// «Инверсия» and «Вероятностный шторм» stamp whole rows, exactly as `collapse`
+// does, so the warning is on the map before the jump rather than on the battle
+// screen after it. The gate and the boss stay clean: those fights are about the
+// thing waiting in them, not about the weather.
+const causalityRows = (
+  rng: RngStream,
+  shape: SectorShape,
+  count: number,
+  taken: ReadonlySet<number>,
+): number[] =>
+  rng
+    .shuffle(
+      Array.from({ length: shape.bossRow - 2 }, (_, i) => i + 2).filter(
+        (row) => row !== shape.gateRow && !taken.has(row),
+      ),
+    )
+    .slice(0, count);
+
+const markedRows = (
+  nodes: readonly MapNode[],
+  key: "inverted" | "storm",
+): Set<number> => {
+  const out = new Set<number>();
+  for (const node of nodes) {
+    if (node[key] === true) out.add(node.row);
+  }
+  return out;
+};
+
+const applyInversion = (
+  nodes: MapNode[],
+  rng: RngStream,
+  shape: SectorShape,
+  motif: Extract<SectorMotif, { m: "inversion" }>,
+): void => {
+  const rows = causalityRows(rng, shape, motif.rows, new Set());
+  for (const node of nodes) {
+    if (rows.includes(node.row)) node.inverted = true;
+  }
+};
+
+const applyStorm = (
+  nodes: MapNode[],
+  rng: RngStream,
+  shape: SectorShape,
+  motif: Extract<SectorMotif, { m: "storm" }>,
+): void => {
+  const rows = causalityRows(
+    rng,
+    shape,
+    motif.rows,
+    markedRows(nodes, "inverted"),
+  );
+  for (const node of nodes) {
+    if (rows.includes(node.row)) node.storm = true;
+  }
+};
+
 const applyMineEdges = (
   edges: readonly [NodeId, NodeId][],
   byId: ReadonlyMap<NodeId, MapNode>,
@@ -466,6 +524,12 @@ const applyMotifs = (
           ...marks,
           ...applyMineEdges(edges, byId, rng, motif, shape),
         };
+        break;
+      case "inversion":
+        applyInversion(nodes, rng, shape, motif);
+        break;
+      case "storm":
+        applyStorm(nodes, rng, shape, motif);
         break;
       case "riftSplit":
         break;

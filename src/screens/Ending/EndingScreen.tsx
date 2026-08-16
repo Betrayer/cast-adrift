@@ -35,6 +35,7 @@ const useEpilogueContext = (death: boolean): EpilogueContext => {
   const sector = useRunStore((s) => s.sector);
   const sectorIndex = useRunStore((s) => s.sectorIndex);
   const depthRow = useRunStore((s) => s.depthRow);
+  const crossedThreshold = useRunStore((s) => s.crossedThreshold);
   return useMemo(
     () => ({
       flags,
@@ -45,8 +46,9 @@ const useEpilogueContext = (death: boolean): EpilogueContext => {
       sector,
       depth: Math.round(depthFor(sectorIndex, depthRow)),
       death,
+      crossedThreshold,
     }),
-    [flags, ascension, axis, sector, sectorIndex, depthRow, death],
+    [flags, ascension, axis, sector, sectorIndex, depthRow, death, crossedThreshold],
   );
 };
 
@@ -127,6 +129,7 @@ const VictoryEnding = ({ endingId }: { endingId: string }) => {
             axis: ctx.axis,
             flags: ctx.flags,
             beaconsResolved: ctx.beaconsResolved,
+            crossedThreshold: ctx.crossedThreshold,
           }),
     [ending, ctx],
   );

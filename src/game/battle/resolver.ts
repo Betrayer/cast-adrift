@@ -28,6 +28,12 @@ import {
   stepContextFor,
   type SpawnInit,
 } from "@/game/battle/setup";
+import {
+  INVERTED_RESOLUTION_ORDER,
+  isInverted,
+  RESOLUTION_ORDER,
+  resolutionOrder,
+} from "@/game/battle/order";
 import { applyStatus, consumeStatus, tickBurn } from "@/game/battle/statuses";
 import {
   applyActions,
@@ -63,17 +69,12 @@ const enemySpawnInit = (next: BattleSnapshot): SpawnInit => ({
   ascension: next.ascension,
 });
 
-export const RESOLUTION_ORDER: readonly SlotId[] = [
-  "sensors",
-  "weaponA",
-  "weaponB",
-  "spinal",
-  "shields",
-  "shieldsB",
-  "engines",
-  "reactor",
-  "repairBay",
-];
+export {
+  INVERTED_RESOLUTION_ORDER,
+  isInverted,
+  RESOLUTION_ORDER,
+  resolutionOrder,
+};
 
 export const OVERLOAD_HULL_COST = 2;
 
@@ -91,6 +92,29 @@ export const BLOOD_REACTOR_CHARGE = 3;
 
 const clone = (snapshot: BattleSnapshot): BattleSnapshot =>
   structuredClone(snapshot);
+
+// A probability storm re-rolls exactly one placed die before anything resolves.
+// It reads the battle's own `dice` stream, so the same seed always storms the
+// same die to the same face and a resumed save replays it.
+export const applyNodeStorm = (
+  next: BattleSnapshot,
+  rng: RngStream,
+): Beat | null => {
+  if (next.nodeStorm !== true) return null;
+  const placed = next.dice.filter(
+    (d) => d.state === "placed" && d.slot !== undefined,
+  );
+  if (placed.length === 0) return null;
+  const die = rng.pick(placed);
+  const rolled = rng.int(1, die.tier) + (die.growth ?? 0);
+  die.value = Math.min(die.tier, Math.max(1, rolled));
+  return {
+    slot: die.slot ?? "reactor",
+    kind: "storm",
+    amount: die.value,
+    after: clone(next),
+  };
+};
 
 const battleMutators = (snapshot: BattleSnapshot): MutatorMods =>
   computeMutatorMods(snapshot.mutators ?? []);
@@ -461,9 +485,14 @@ const emitBattleEnd = (
 
 export const resolvePlayerPhase = (
   snapshot: BattleSnapshot,
+  diceStream?: RngStream,
 ): { next: BattleSnapshot; beats: Beat[] } => {
   const next = clone(snapshot);
   const beats: Beat[] = [];
+  if (diceStream !== undefined) {
+    const storm = applyNodeStorm(next, diceStream);
+    if (storm !== null) beats.push(storm);
+  }
   const ctx = new BattleCtx(next, next.flags);
   const sources = buildSources(next);
   const perkMods = sourceMods(next);
@@ -485,7 +514,7 @@ export const resolvePlayerPhase = (
     overkill: 0,
   };
 
-  for (const slotId of RESOLUTION_ORDER) {
+  for (const slotId of resolutionOrder(next)) {
     const slot = next.slots[slotId];
     if (slot?.dieUid === undefined) continue;
     const die = next.dice.find((d) => d.uid === slot.dieUid);
@@ -849,6 +878,48 @@ const resolveIntent = (
       next.pendingHijack = (next.pendingHijack ?? 0) + 1;
       pushBeat(ctx, enemy.id, "hijack");
       return;
+    // «Ретро-эхо» bills the last turn back to you: the harder you hit, the harder
+    // the answer, and a quiet turn buys a quiet answer.
+    case "echoTotal": {
+      const echoed = Math.min(intent.cap, Math.max(0, next.lastPlayerDamage));
+      if (echoed <= 0) {
+        pushBeat(ctx, enemy.id, "charge");
+        return;
+      }
+      const result = applyAttack(next, enemy, echoed, 1, ctx.attack);
+      ctx.beats.push({
+        enemyId: enemy.id,
+        kind: "attack",
+        amount: result.dealt,
+        hullDamage: result.hullDamage,
+        shieldDamage: result.shieldDamage,
+        after: clone(next),
+      });
+      return;
+    }
+    // «Складка» buys exactly one inverted player phase: it acts after this
+    // turn's resolution, so the counter has to survive the turn boundary that
+    // follows and expire on the next one. On a row that is already inverted it
+    // folds the fold and hands the ordinary order back, which is the read the
+    // name promises.
+    case "foldOrder":
+      next.foldedTurns = (next.foldedTurns ?? 0) + 2;
+      pushBeat(ctx, enemy.id, "fold");
+      return;
+    // «Пожиратель вероятностей» eats the best face you did not commit.
+    case "devourDie": {
+      const tray = next.dice.filter((d) => d.state === "tray");
+      if (tray.length === 0) {
+        pushBeat(ctx, enemy.id, "devour");
+        return;
+      }
+      const die = tray.reduce((best, d) => (d.value > best.value ? d : best));
+      const eaten = die.value;
+      enemy.shield += eaten;
+      die.value = 1;
+      pushBeat(ctx, enemy.id, "devour", eaten, { dieUid: die.uid });
+      return;
+    }
     case "twistDie":
       next.pendingTwist += 1;
       pushBeat(ctx, enemy.id, "twist");
@@ -1111,6 +1182,7 @@ export const advanceTurn = (
 ): BattleSnapshot => {
   const next = clone(snapshot);
   next.turn += 1;
+  next.foldedTurns = Math.max(0, (next.foldedTurns ?? 0) - 1);
   const ctx = new BattleCtx(next, next.flags);
   const sources = buildSources(next);
   emit(sources, "rollStart", ctx);

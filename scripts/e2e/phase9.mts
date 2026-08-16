@@ -83,6 +83,7 @@ const seedProfile = async (page: Page): Promise<void> => {
         elites: 24,
         t5Solved: 3,
         beacons: 9,
+        deepClears: 0,
         noDeathStreak: 1,
         bestNoDeathStreak: 2,
       },

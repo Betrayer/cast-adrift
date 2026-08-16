@@ -13,13 +13,19 @@ import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
-import { ENDINGS } from "@/data/narrative/endings";
+import { ENDINGS, STANDARD_ENDINGS } from "@/data/narrative/endings";
+
 import { countStars } from "@/game/run/goals";
 import { progressWithinLevel } from "@/game/xp";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { AchievementGrid } from "./AchievementGrid";
 import { BadgeRow } from "./BadgeRow";
+
+// «Ответ» has no silhouette on the shelf: a fifth locked circle would be the
+// checklist the ending exists to avoid. The slot appears the moment it is earned.
+const endingSlots = (earned: readonly string[]): typeof ENDINGS =>
+  earned.includes("answer") ? ENDINGS : STANDARD_ENDINGS;
 
 const StatCell = ({ label, value }: { label: string; value: string }) => (
   <Stack gap={0}>
@@ -204,8 +210,8 @@ export const ProfileScreen = () => {
                 {t("meta:profile.endings")}
               </Text>
               <Divider color={tokens.line} />
-              <SimpleGrid cols={{ base: 2, xs: 4 }} spacing="xs">
-                {ENDINGS.map((def) => {
+              <SimpleGrid cols={{ base: 2, xs: 5 }} spacing="xs">
+                {endingSlots(endings).map((def) => {
                   const earned = endings.includes(def.id);
                   return (
                     <Stack key={def.id} align="center" gap={2}>

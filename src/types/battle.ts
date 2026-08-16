@@ -150,6 +150,13 @@ export interface BattleSnapshot {
   ascension: number;
   sectorHpPct: number;
   enemyHpPct: number;
+  // «За Ядром»: the node's own causality. `inverted` reverses the resolution
+  // order for the whole fight; `nodeStorm` re-rolls one placed die at the start
+  // of every resolution. `foldedTurns` is the same inversion bought for a single
+  // turn by an enemy, and counts down on the turn boundary.
+  inverted?: boolean;
+  nodeStorm?: boolean;
+  foldedTurns?: number;
   overflowShieldUsed?: boolean;
   pierceUsed?: boolean;
   outcome?: BattleOutcome;
@@ -162,7 +169,8 @@ export type BeatKind =
   | "engine"
   | "sensor"
   | "charge"
-  | "repair";
+  | "repair"
+  | "storm";
 
 export interface SensorResult {
   mark: boolean;
@@ -205,7 +213,9 @@ export type EnemyBeatKind =
   | "bargain"
   | "enrage"
   | "hijack"
-  | "ward";
+  | "ward"
+  | "fold"
+  | "devour";
 
 export interface EnemyBeat {
   enemyId: string;

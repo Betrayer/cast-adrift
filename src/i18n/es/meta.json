@@ -255,7 +255,8 @@
     "fromAscension": "Bonificación por ascensión",
     "fromFinds": "Primeros hallazgos",
     "fromAchievements": "Logros",
-    "firstFinds": "Primera publicación: {{names}}"
+    "firstFinds": "Primera publicación: {{names}}",
+    "fromDeep": "Beyond the Core"
   },
   "menu": {
     "level": "N.º{{level}}"
@@ -434,7 +435,8 @@
       "story": "Historia",
       "collection": "Colección",
       "modes": "Modos"
-    }
+    },
+    "endingsHidden": "Some endings are not on this shelf."
   },
   "engraving": {
     "title": "Grabado Estación",
@@ -452,7 +454,8 @@
     "keeper": "Portero",
     "ascendant": "Ascendente",
     "chartwright": "Chartwright",
-    "archivist": "Archivero"
+    "archivist": "Archivero",
+    "answer": "The Answer"
   },
   "unlock": {
     "opened": "Desbloqueado",
@@ -491,7 +494,10 @@
     "featureShipArk": "El Arca",
     "featureEngraving": "Grabado estación",
     "featureDailyPreview": "Resumen diario",
-    "featureFreeRespec": "Reasignación gratuita de puntos de habilidad de Keystone"
+    "featureFreeRespec": "Reasignación gratuita de puntos de habilidad de Keystone",
+    "sectorSix": "Sector 6 «Beyond the Core»",
+    "diceS6": "Four causality dice",
+    "skinThreshold": "Die skin «Threshold»"
   },
   "skin": {
     "title": "Las pieles",
@@ -521,6 +527,10 @@
     "chartwright": {
       "name": "Chartwright",
       "desc": "Cuadrado de plano, glifos monocromáticos."
+    },
+    "threshold": {
+      "name": "Threshold",
+      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
     }
   },
   "ach": {
@@ -644,7 +654,15 @@
       "name": "Contratista",
       "desc": "Consigue 30 estrellas de contrato."
     },
-    "toast": "Logro"
+    "toast": "Logro",
+    "beyondTheCore": {
+      "name": "Beyond the Core",
+      "desc": "Cross the threshold and clear Sector 6."
+    },
+    "theAnswer": {
+      "name": "The Answer",
+      "desc": "Reach the hidden ending past the Core."
+    }
   },
   "chartTag": {
     "red": "rojo",
@@ -689,5 +707,8 @@
       "prestigeTheme": "tema «Ascendente»",
       "badge": "la insignia «Ascendant»"
     }
+  },
+  "shard": {
+    "deepClear": "Beyond the Core"
   }
 }

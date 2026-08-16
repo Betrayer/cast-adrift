@@ -63,6 +63,14 @@ export const DIE_SKINS: readonly DieSkinDef[] = [
     edge: "#7C5CFF",
     cosmetic: "chartwrightSkin",
   },
+  {
+    id: "threshold",
+    name: "meta:skin.threshold.name",
+    desc: "meta:skin.threshold.desc",
+    style: { radius: 0.5, strokeW: 2, noise: 0, gradient: 0.5, glyphFont: SERIF },
+    edge: "#B9C6D6",
+    cosmetic: "thresholdSkin",
+  },
 ];
 
 export const DIE_SKIN_BY_ID: ReadonlyMap<string, DieSkinDef> = new Map(
@@ -111,6 +119,12 @@ export const BADGES: readonly BadgeDef[] = [
     name: "meta:badge.archivist",
     glyph: "❖",
     kind: "static",
+  },
+  {
+    id: "answer",
+    name: "meta:badge.answer",
+    glyph: "◉",
+    kind: "animated",
   },
 ];
 

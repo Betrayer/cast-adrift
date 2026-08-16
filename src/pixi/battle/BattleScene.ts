@@ -1883,6 +1883,19 @@ export class BattleScene {
       this.thrusterPuff();
       return;
     }
+    // A probability storm lands on a die that is already in its slot, so the
+    // number rises off the slot rather than off the tray.
+    if (beat.kind === "storm") {
+      playSfx("reroll");
+      this.shake();
+      this.spawnNumber(
+        slotAnchor.x,
+        slotAnchor.y - 24,
+        `~${String(beat.amount)}`,
+        schools.prismatic.text,
+      );
+      return;
+    }
     playSfx(beat.kind === "repair" ? "repair" : "reactor");
     this.spawnNumber(
       slotAnchor.x,

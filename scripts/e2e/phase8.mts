@@ -73,6 +73,7 @@ const main = async (): Promise<void> => {
         elites: 0,
         t5Solved: 0,
         beacons: 0,
+        deepClears: 0,
         noDeathStreak: 0,
         bestNoDeathStreak: 0,
       },

@@ -71,7 +71,10 @@
     "siphonShield": "Bouclier «{{n}} » de Siphons",
     "bargain": "{{n}} de factures : votre ferraille ou votre coque",
     "enrage": "Enrages + {{n}}",
-    "hijack": "Il s'empare de ton meilleur dé"
+    "hijack": "Il s'empare de ton meilleur dé",
+    "echoTotal": "echoes your last turn (max {{n}})",
+    "foldOrder": "folds the order",
+    "devourDie": "eats your best spare die"
   },
   "slot": {
     "weaponA": "Arme A",
@@ -107,9 +110,15 @@
     "bargain": "OFFRE",
     "enrage": "RAGE",
     "hijack": "DÉTOURNEMENT",
-    "ward": "WARD"
+    "ward": "WARD",
+    "fold": "FOLD",
+    "devour": "EATEN"
   },
   "enemyWard": "Circonscription : {{school}}",
   "enemyGate": "{{n}} de l'entrée",
-  "enemyRage": "Rage + {{n}}"
+  "enemyRage": "Rage + {{n}}",
+  "inverted": "INVERTED ORDER",
+  "invertedHint": "Reactor first, Sensors last.",
+  "storm": "PROBABILITY STORM",
+  "stormHint": "One placed die re-rolls before anything resolves."
 }

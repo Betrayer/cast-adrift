@@ -95,6 +95,8 @@ export interface BattleInit {
   resonanceBoost?: ResonanceBoost;
   slotTierDelta?: Partial<Record<SlotId, number>>;
   disabledSlots?: readonly SlotId[];
+  inverted?: boolean;
+  nodeStorm?: boolean;
 }
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
@@ -460,6 +462,9 @@ export const buildBattleSnapshot = (
     ascension,
     sectorHpPct: init.sectorHpPct ?? 0,
     enemyHpPct: init.enemyHpBonusPct ?? 0,
+    inverted: init.inverted === true,
+    nodeStorm: init.nodeStorm === true,
+    foldedTurns: 0,
   };
   const perks = init.perks ?? [];
   const modules = init.modules ?? [];

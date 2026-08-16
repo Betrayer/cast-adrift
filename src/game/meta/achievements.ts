@@ -103,6 +103,8 @@ export const achievementProgress = (
       );
     case "endings":
       return of(ctx.endings.length, cond.n);
+    case "endingReached":
+      return flag(ctx.endings.includes(cond.id));
     case "bossFirstKills":
       return of(ctx.bossFirstKills.length, cond.n);
     case "collectionOwned":

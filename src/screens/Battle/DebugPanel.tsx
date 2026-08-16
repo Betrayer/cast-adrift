@@ -87,6 +87,12 @@ const intentSummary = (intent: Intent): string => {
       return `enrage ${String(intent.n)}`;
     case 'hijack':
       return 'hijack';
+    case 'echoTotal':
+      return `echoTotal ${String(intent.cap)}`;
+    case 'foldOrder':
+      return 'foldOrder';
+    case 'devourDie':
+      return 'devourDie';
   }
 };
 

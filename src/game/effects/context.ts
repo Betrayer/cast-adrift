@@ -8,6 +8,7 @@ import { loadoutCensus, type TagCensus } from "@/game/effects/census";
 import { createStream, fnv1a, type RngStream } from "@/services/rng";
 import type { ContentTag } from "@/data/tags";
 import { resonanceAtLeast } from "@/game/battle/resonance";
+import { isInverted } from "@/game/battle/order";
 import { applyStatus, type StatusKey } from "@/game/battle/statuses";
 import { sourceTrait } from "@/game/run/runMods";
 import type { EffectCtx } from "@/game/effects/ctx";
@@ -146,6 +147,10 @@ export class BattleCtx implements EffectCtx {
 
   tideValue(): number {
     return this.snapshot.tide + this.snapshot.interference;
+  }
+
+  invertedOrder(): boolean {
+    return isInverted(this.snapshot);
   }
 
   counter(scope: CounterScope, key: string): number {

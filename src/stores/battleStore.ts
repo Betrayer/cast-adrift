@@ -100,6 +100,8 @@ export interface BattleEncounter {
   resonanceBoost?: ResonanceBoost;
   slotTierDelta?: Partial<Record<SlotId, number>>;
   disabledSlots?: readonly SlotId[];
+  inverted?: boolean;
+  nodeStorm?: boolean;
   forcedTraits?: readonly PerkTrait[];
   scriptedSlots?: readonly (readonly SlotId[])[];
 }
@@ -165,6 +167,9 @@ export interface BattleValues {
   pendingSwap: number;
   pendingStorm: number;
   ascension: number;
+  inverted: boolean;
+  nodeStorm: boolean;
+  foldedTurns: number;
   overflowShieldUsed: boolean;
   pierceUsed: boolean;
   fateUses: number;
@@ -288,6 +293,9 @@ export const createInitialBattleValues = (): BattleValues => ({
   pendingStorm: 0,
   swapSourceUid: null,
   ascension: 0,
+  inverted: false,
+  nodeStorm: false,
+  foldedTurns: 0,
   overflowShieldUsed: false,
   pierceUsed: false,
   fateUses: 0,
@@ -365,6 +373,9 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
   enemyHpPct: s.enemyHpPct,
+  inverted: s.inverted,
+  nodeStorm: s.nodeStorm,
+  foldedTurns: s.foldedTurns,
   overflowShieldUsed: s.overflowShieldUsed,
   pierceUsed: s.pierceUsed,
   outcome: s.outcome,
@@ -419,6 +430,9 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   ascension: snap.ascension,
   sectorHpPct: snap.sectorHpPct,
   enemyHpPct: snap.enemyHpPct,
+  inverted: snap.inverted === true,
+  nodeStorm: snap.nodeStorm === true,
+  foldedTurns: snap.foldedTurns ?? 0,
   overflowShieldUsed: snap.overflowShieldUsed ?? false,
   pierceUsed: snap.pierceUsed ?? false,
   outcome: snap.outcome,
@@ -565,6 +579,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         resonanceBoost: encounter.resonanceBoost,
         slotTierDelta: encounter.slotTierDelta,
         disabledSlots: encounter.disabledSlots,
+        inverted: encounter.inverted,
+        nodeStorm: encounter.nodeStorm,
       },
     );
     const perks = encounter.perks ?? [];
@@ -1050,7 +1066,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       s.blackUsed + placed.filter((d) => d.school === "black").length;
     const blueUsed =
       s.blueUsed + placed.filter((d) => d.school === "blue").length;
-    const player = resolvePlayerPhase(battleSnapshot(s));
+    const player = resolvePlayerPhase(battleSnapshot(s), s.streams.dice);
     let bundle: ResolutionBundle;
     if (player.next.outcome !== undefined) {
       bundle = {
@@ -1227,6 +1243,9 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
   enemyHpPct: s.enemyHpPct,
+  inverted: s.inverted,
+  nodeStorm: s.nodeStorm,
+  foldedTurns: s.foldedTurns,
   overflowShieldUsed: s.overflowShieldUsed,
   pierceUsed: s.pierceUsed,
   fateUses: s.fateUses,

@@ -192,6 +192,7 @@ export interface RunValues {
   memoryOrders: number[];
   endingId: string | null;
   endingFirstTime: boolean;
+  crossedThreshold: boolean;
   encounters: RunEncounter[];
   startedAt: number;
 }
@@ -247,6 +248,7 @@ export interface RunState extends RunValues {
   markBossKilled: (defId: string) => boolean;
   unlockMemory: (order: number) => boolean;
   setEnding: (id: string | null, firstTime?: boolean) => void;
+  crossThreshold: () => void;
   reset: () => void;
 }
 
@@ -336,6 +338,7 @@ export const createInitialRunValues = (): RunValues => ({
   memoryOrders: [],
   endingId: null,
   endingFirstTime: false,
+  crossedThreshold: false,
   encounters: [],
   startedAt: 0,
 });
@@ -700,6 +703,10 @@ export const useRunStore = create<RunState>()((set, get) => ({
 
   setEnding: (id, firstTime = false) => {
     set({ endingId: id, endingFirstTime: firstTime });
+  },
+
+  crossThreshold: () => {
+    set({ crossedThreshold: true });
   },
 
   reset: () => {

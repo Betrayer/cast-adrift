@@ -55,15 +55,15 @@ const def = (id: string) => {
 };
 
 describe("achievement catalogue", () => {
-  it("ships thirty definitions with unique ids", () => {
-    expect(ACHIEVEMENTS).toHaveLength(30);
-    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(30);
+  it("ships thirty-two definitions with unique ids", () => {
+    expect(ACHIEVEMENTS).toHaveLength(32);
+    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(32);
   });
 
-  it("gates nine of them on content and reads flags in seven", () => {
+  it("gates eleven of them on content and reads flags in seven", () => {
     expect(
       ACHIEVEMENTS.filter((a) => a.reward?.unlockId !== undefined),
-    ).toHaveLength(9);
+    ).toHaveLength(11);
     expect(ACHIEVEMENTS.filter((a) => a.cond.c === "flags")).toHaveLength(7);
   });
 

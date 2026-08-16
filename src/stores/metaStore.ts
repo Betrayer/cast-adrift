@@ -29,6 +29,7 @@ export interface MetaStats {
   elites: number;
   t5Solved: number;
   beacons: number;
+  deepClears: number;
   noDeathStreak: number;
   bestNoDeathStreak: number;
 }
@@ -142,7 +143,7 @@ export interface MetaState extends MetaValues {
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 10;
+export const META_VERSION = 11;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -174,6 +175,7 @@ export const createInitialMetaStats = (): MetaStats => ({
   elites: 0,
   t5Solved: 0,
   beacons: 0,
+  deepClears: 0,
   noDeathStreak: 0,
   bestNoDeathStreak: 0,
 });
@@ -191,6 +193,7 @@ const LIFETIME_KEYS = [
   "elites",
   "t5Solved",
   "beacons",
+  "deepClears",
 ] as const;
 
 const createInitialMetaValues = (): MetaValues => ({

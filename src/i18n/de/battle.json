@@ -71,7 +71,10 @@
     "siphonShield": "Siphons „{{n}}“-Abschirmung",
     "bargain": "{{n}} von Bills: Entsorgung oder Schiffsrumpf",
     "enrage": "Enrages + {{n}}",
-    "hijack": "Entführt deinen besten Würfel"
+    "hijack": "Entführt deinen besten Würfel",
+    "echoTotal": "echoes your last turn (max {{n}})",
+    "foldOrder": "folds the order",
+    "devourDie": "eats your best spare die"
   },
   "slot": {
     "weaponA": "Waffe A",
@@ -107,9 +110,15 @@
     "bargain": "ANGEBOT",
     "enrage": "RAGE",
     "hijack": "HIJACK",
-    "ward": "WARD"
+    "ward": "WARD",
+    "fold": "FOLD",
+    "devour": "EATEN"
   },
   "enemyWard": "Wahlbezirk: {{school}}",
   "enemyGate": "Gate{{n}}",
-  "enemyRage": "Rage und{{n}}"
+  "enemyRage": "Rage und{{n}}",
+  "inverted": "INVERTED ORDER",
+  "invertedHint": "Reactor first, Sensors last.",
+  "storm": "PROBABILITY STORM",
+  "stormHint": "One placed die re-rolls before anything resolves."
 }

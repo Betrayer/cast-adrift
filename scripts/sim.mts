@@ -116,6 +116,8 @@ interface BattleInit {
   enemyHpBonusPct?: number;
   eliteShield?: number;
   ascension?: number;
+  inverted?: boolean;
+  nodeStorm?: boolean;
 }
 
 interface BattleResult {
@@ -213,6 +215,8 @@ const simulateBattle = (
       enemyHpBonusPct: init.enemyHpBonusPct,
       eliteShield: init.eliteShield,
       ascension: init.ascension,
+      inverted: init.inverted,
+      nodeStorm: init.nodeStorm,
     },
   );
   let dealt = 0;
@@ -252,7 +256,7 @@ const simulateBattle = (
     }
     spendCharge(snapshot, init);
 
-    const player = resolvePlayerPhase(snapshot);
+    const player = resolvePlayerPhase(snapshot, streams.dice);
     dealt += player.beats
       .filter((b) => b.kind === "damage")
       .reduce((sum, b) => sum + b.amount, 0);
@@ -327,6 +331,7 @@ interface RunState {
   jumpsSinceTide: number;
   kills: number;
   nodes: number;
+  fights: number;
   pockets: number;
   draftsSinceRare: number;
 }
@@ -609,6 +614,7 @@ interface SectorResult {
   win: boolean;
   deathRow: number;
   nodes: number;
+  fights: number;
   kills: number;
   scrapEarned: number;
   scrapSpent: number;
@@ -665,6 +671,7 @@ const runSector = (seed: number): SectorResult => {
     jumpsSinceTide: 0,
     kills: 0,
     nodes: 0,
+    fights: 0,
     pockets: 0,
     draftsSinceRare: 0,
   };
@@ -677,6 +684,7 @@ const runSector = (seed: number): SectorResult => {
     win,
     deathRow,
     nodes: state.nodes,
+    fights: state.fights,
     kills: state.kills,
     scrapEarned: state.scrapEarned,
     scrapSpent: state.scrapSpent,
@@ -927,6 +935,7 @@ const runDrift = (seed: number, mid: boolean): DriftResult => {
     jumpsSinceTide: 0,
     kills: 0,
     nodes: 0,
+    fights: 0,
     pockets: 0,
     draftsSinceRare: 0,
   };
@@ -1413,6 +1422,12 @@ interface SweepOptions {
   ascension: number;
   archetype: Archetype;
   forcedPerk?: string;
+  // The deep mode measures the ship a sector-6 entrant actually flies, which is
+  // not the ship the sector sweep gives every act: five cleared sectors of
+  // drafts, upgrades and loot ride into «За Ядром» with the captain.
+  perks?: readonly string[];
+  deckExtra?: readonly string[];
+  mkLevels?: MkLevels;
 }
 
 const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
@@ -1431,14 +1446,18 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
     scrap: 0,
     scrapEarned: 0,
     scrapSpent: 0,
-    deck: [...opts.archetype.deck],
-    mkLevels: { ...opts.archetype.mkLevels },
-    perks: opts.forcedPerk !== undefined ? [opts.forcedPerk] : [],
+    deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(0, DECK_CAP),
+    mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
+    perks:
+      opts.forcedPerk !== undefined
+        ? [opts.forcedPerk]
+        : [...(opts.perks ?? [])],
     modules: [...opts.archetype.modules],
     tide: 0,
     jumpsSinceTide: 0,
     kills: 0,
     nodes: 0,
+    fights: 0,
     pockets: 0,
     draftsSinceRare: 0,
   };
@@ -1446,12 +1465,15 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
   let position = START_NODE_ID;
   let posRow = 0;
   const hullEntering: number[] = [];
-  const tideCap = 3 + aMods.tideCapDelta;
+  const tideCap =
+    (SECTORS.find((sd) => sd.id === opts.sector)?.tideCap ?? 3) +
+    aMods.tideCapDelta;
 
   const finish = (win: boolean, deathRow: number): SectorResult => ({
     win,
     deathRow,
     nodes: state.nodes,
+    fights: state.fights,
     kills: state.kills,
     scrapEarned: state.scrapEarned,
     scrapSpent: state.scrapSpent,
@@ -1504,12 +1526,15 @@ const runSweepSector = (seed: number, opts: SweepOptions): SectorResult => {
           enemyHpBonusPct: aMods.enemyHpPct,
           eliteShield: aMods.eliteShield,
           ascension: opts.ascension,
+          inverted: next.inverted === true,
+          nodeStorm: next.storm === true,
         },
       );
       state.hull = res.hullLeft;
       state.kills += res.kills;
       if (!res.win) return finish(false, next.row);
       state.nodes += 1;
+      state.fights += 1;
       const loot = createStream(deriveSeed(seed, `loot:${next.id}`));
       const reward = computeNodeReward(type, loot, 0, next.pocket === true);
       const mods = computeRunMods(state.perks, [], state.modules);
@@ -1566,9 +1591,9 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
     "sector,ascension,deck,runs,winrate,avgNodes,avgKills,avgScrapEarned,avgScrapSpent,avgHullMedian,avgMk,avgPockets",
   ];
   console.log(
-    `sim sweep: 5 sectors x ${String(SWEEP_ASCENSIONS.length)} ascensions x ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
+    `sim sweep: ${String(SECTORS.length)} sectors x ${String(SWEEP_ASCENSIONS.length)} ascensions x ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
   );
-  for (const sector of [1, 2, 3, 4, 5]) {
+  for (const sector of SECTORS.map((def) => def.id)) {
     for (const ascension of SWEEP_ASCENSIONS) {
       for (const archetype of ARCHETYPES) {
         const results: SectorResult[] = [];
@@ -1687,29 +1712,50 @@ const ECONOMY_PER_NODE_MAX = 60;
 // mattering — six Mk3s is the ceiling the §9.3 spend list implies.
 const ECONOMY_SECTOR_MIN = 130;
 const ECONOMY_SECTOR_MAX = 130 * 6;
+// The sector floor is a claim about a *traversed* sector, so it is measured on
+// the runs that traversed one. Measured over every run it stops being an
+// economy number and becomes a survival number: the greedy policy prices charge
+// at 3:1 and has no lookahead, so a black deck's median run dies mid-sector and
+// drags the total under a floor the sector's own price list never missed. The
+// per-node rate stays over the whole population — that one is the income rate,
+// and it is unbiased. Below this many clears the sample is too thin to read, and
+// the row falls back to projecting the per-node rate across the sector's depth.
+const ECONOMY_MIN_CLEARS = 12;
+// The §9.3 price list is a list of *fight* prices — battle, elite, mini-boss,
+// boss — so the rate is per fight cleared, not per node walked. The distinction
+// was invisible while every sector had roughly sector 1's node mix; «За Ядром»
+// is half events, and this harness resolves none of them, so dividing by every
+// node would read the act's whole narrative half as zero income.
 
 const economyModeMain = (runs: number, seed: number, startedAt: number): void => {
   const rows: string[] = [
-    "sector,deck,runs,medianEarnedPerNode,medianEarned,medianSpent,spendShare,verdict",
+    "sector,deck,runs,clears,medianEarnedPerFight,medianEarned,basis,medianSpent,spendShare,verdict",
   ];
   let failures = 0;
-  for (const sector of [1, 3, 5]) {
-    const mult = SECTORS.find((sd) => sd.id === sector)?.scrapMult ?? 1;
+  for (const sector of [1, 3, 5, 6]) {
+    const def = SECTORS.find((sd) => sd.id === sector);
+    const mult = def?.scrapMult ?? 1;
+    const depth = def?.shape.bossRow ?? 15;
     for (const archetype of ARCHETYPES) {
       const perNode: number[] = [];
-      const earned: number[] = [];
+      const clearedEarned: number[] = [];
       const spent: number[] = [];
       for (let i = 0; i < runs; i += 1) {
         const r = runSweepSector(
           deriveSeed(seed, `eco:${String(sector)}:${archetype.name}:${String(i)}`),
           { sector, ascension: 0, archetype },
         );
-        earned.push(r.scrapEarned);
         spent.push(r.scrapSpent);
-        if (r.nodes > 0) perNode.push(r.scrapEarned / r.nodes);
+        if (r.win) clearedEarned.push(r.scrapEarned);
+        if (r.fights > 0) perNode.push(r.scrapEarned / r.fights);
       }
       const mEarnedPerNode = median(perNode);
-      const mEarned = median(earned);
+      const clears = clearedEarned.length;
+      const projected = clears >= ECONOMY_MIN_CLEARS;
+      const mEarned = projected
+        ? median(clearedEarned)
+        : mEarnedPerNode * depth;
+      const basis = projected ? "cleared" : "projected";
       const mSpent = median(spent);
       const share = mEarned > 0 ? mSpent / mEarned : 0;
       const lo = ECONOMY_PER_NODE_MIN * mult;
@@ -1725,15 +1771,17 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
           String(sector),
           archetype.name,
           String(runs),
+          String(clears),
           mEarnedPerNode.toFixed(2),
           mEarned.toFixed(1),
+          basis,
           mSpent.toFixed(1),
           share.toFixed(3),
           ok ? "ok" : "OUT_OF_BAND",
         ].join(","),
       );
       console.log(
-        `sim economy: S${String(sector)} ${archetype.name.padEnd(10)} ${mEarnedPerNode.toFixed(1)}/node (band ${lo.toFixed(0)}-${hi.toFixed(0)}) · earned ${mEarned.toFixed(0)} · spent ${mSpent.toFixed(0)} (${(share * 100).toFixed(0)}%) — ${ok ? "ok" : "OUT OF BAND"}`,
+        `sim economy: S${String(sector)} ${archetype.name.padEnd(10)} ${mEarnedPerNode.toFixed(1)}/fight (band ${lo.toFixed(0)}-${hi.toFixed(0)}) · ${basis} ${mEarned.toFixed(0)} (${String(clears)}/${String(runs)} clears) · spent ${mSpent.toFixed(0)} (${(share * 100).toFixed(0)}%) — ${ok ? "ok" : "OUT OF BAND"}`,
       );
     }
   }
@@ -1747,6 +1795,128 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     console.error(`sim economy: ${String(failures)} row(s) outside the §9.3 envelope`);
     process.exit(1);
   }
+};
+
+// ── Deep mode (R9 Task 5) ───────────────────────────────────────────────────
+//
+// «За Ядром» is entered by a captain who has just cleared five acts, so the
+// sector sweep's mid-collection loadout under-reads it by a whole campaign's
+// worth of drafts. This mode measures the same three archetypes at the state
+// the threshold is actually crossed in: every system at Mk3, eight perks, and
+// the rare drops five sectors hand out.
+
+const S6_ENTRY_MK: MkLevels = {
+  weaponA: 3,
+  weaponB: 3,
+  spinal: 3,
+  shields: 3,
+  shieldsB: 3,
+  engines: 3,
+  sensors: 3,
+  reactor: 3,
+  repairBay: 3,
+};
+
+const S6_ENTRY_PERKS: readonly string[] = [
+  "targeter",
+  "bulkhead",
+  "stabilizer",
+  "hardenedHull",
+  "targetingSuite",
+  "refitCrew",
+  "piercingRounds",
+  "fullRefit",
+];
+
+// A five-act clear leaves a deck that has actually grown. Deck cap trims the
+// overflow, so this is «what fits» rather than «what a wishlist holds».
+const S6_ENTRY_DICE: readonly string[] = ["aurora", "coreshard", "lodestar"];
+
+// The band is a claim about the act at its default difficulty: an opt-in sixth
+// act has to be beatable by the ship that earned the invitation, and it has to
+// stay a fight. Ascension exists precisely to push a run under a floor like this
+// one, so A3 and A6 are recorded beside A0 and never asserted against — and the
+// black column stays the standing bot anti-signal (R5), printed, not enforced.
+const DEEP_BAND: readonly [number, number] = [0.35, 0.75];
+
+const deepModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const rows: string[] = [
+    "sector,ascension,deck,profile,runs,winrate,avgNodes,avgScrapEarned,avgHullMedian,verdict",
+  ];
+  console.log(
+    `sim deep: sector 6 at entry quality, ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
+  );
+  let outOfBand = 0;
+  for (const ascension of [0, 3, 6]) {
+    for (const archetype of ARCHETYPES) {
+      for (const profile of ["entry", "sectorSweep"] as const) {
+        const results: SectorResult[] = [];
+        for (let i = 0; i < runs; i += 1) {
+          results.push(
+            runSweepSector(
+              deriveSeed(
+                seed,
+                `deep:${String(ascension)}:${archetype.name}:${profile}:${String(i)}`,
+              ),
+              {
+                sector: 6,
+                ascension,
+                archetype,
+                ...(profile === "entry"
+                  ? {
+                      perks: S6_ENTRY_PERKS,
+                      deckExtra: S6_ENTRY_DICE,
+                      mkLevels: S6_ENTRY_MK,
+                    }
+                  : {}),
+              },
+            ),
+          );
+        }
+        const n = Math.max(1, results.length);
+        const avg = (f: (r: SectorResult) => number): number =>
+          results.reduce((sum, r) => sum + f(r), 0) / n;
+        const winrate = results.filter((r) => r.win).length / n;
+        // Only the entry profile is held to the band; the sector-sweep row is
+        // printed beside it to show how much of the act a campaign's worth of
+        // upgrades is actually paying for.
+        const ok =
+          profile !== "entry" ||
+          ascension !== 0 ||
+          archetype.name === "black-edge" ||
+          (winrate >= DEEP_BAND[0] && winrate <= DEEP_BAND[1]);
+        if (!ok) outOfBand += 1;
+        rows.push(
+          [
+            "6",
+            `A${String(ascension)}`,
+            archetype.name,
+            profile,
+            String(n),
+            winrate.toFixed(3),
+            avg((r) => r.nodes).toFixed(2),
+            avg((r) => r.scrapEarned).toFixed(1),
+            avg((r) => r.hullMedian).toFixed(1),
+            ok ? "ok" : "OUT_OF_BAND",
+          ].join(","),
+        );
+        console.log(
+          `sim deep: A${String(ascension)} ${archetype.name.padEnd(10)} ${profile.padEnd(11)} winrate ${(winrate * 100).toFixed(1)}% · nodes ${avg((r) => r.nodes).toFixed(1)} · scrap +${avg((r) => r.scrapEarned).toFixed(0)}${ok ? "" : " — OUT OF BAND"}`,
+        );
+      }
+    }
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `deep-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  console.log(
+    outOfBand === 0
+      ? `sim deep: every entry-quality row inside the ${String(DEEP_BAND[0] * 100)}-${String(DEEP_BAND[1] * 100)}% band`
+      : `sim deep: ${String(outOfBand)} entry-quality row(s) outside the band`,
+  );
 };
 
 // ── Roster mode (R6 Task 5) ─────────────────────────────────────────────────
@@ -2149,6 +2319,7 @@ const walkCareer = (profile: CareerProfile, maxRuns: number): CareerTally => {
       firstEnding,
       streak,
       ascension: 0,
+      deepClear: false,
     });
     let bossBonus = 0;
     for (let sector = 1; sector <= run.bosses; sector += 1) {
@@ -2240,8 +2411,8 @@ const metaModeMain = (_runs: number, _seed: number, startedAt: number): void => 
   const respecs = RESPEC_SHARD_COST * 10;
   console.log("  shard sinks:");
   const sinks: readonly [string, number][] = [
-    ["all 90 dice (full price)", diceFull],
-    ["all 90 dice (all met, −30%)", diceMet],
+    [`all ${String(ALL_DICE.length)} dice (full price)`, diceFull],
+    [`all ${String(ALL_DICE.length)} dice (all met, −30%)`, diceMet],
     ["ships", ships],
     ["themes", themes],
     ["one of every engraving", engravings],
@@ -2286,7 +2457,9 @@ const main = (): void => {
             ? "200"
             : mode === "roster"
               ? "40"
-              : mode === "axis"
+              : mode === "deep"
+                ? "300"
+                : mode === "axis"
                 ? "200"
                 : "1000";
   const runs = Number(getArg("runs", defaultRuns));
@@ -2321,6 +2494,10 @@ const main = (): void => {
   }
   if (mode === "roster") {
     rosterModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "deep") {
+    deepModeMain(runs, seed, startedAt);
     return;
   }
   if (mode === "axis") {

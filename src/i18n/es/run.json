@@ -36,7 +36,8 @@
       "event": "Evento",
       "anomaly": "Anomalía",
       "beacon": "Baliza",
-      "boss": "Jefe"
+      "boss": "Jefe",
+      "inverted": "inverted"
     },
     "previewNode": "{{type}} · riesgo: {{risk}}",
     "previewPocket": "Desvío: mejor botín, combate más duro",
@@ -277,7 +278,12 @@
     "title": "El «Core Heart» está abierto",
     "intro": "Todo lo que has decidido aquí fuera es ahora una puerta. Solo se abrirán aquellas que te hayas ganado.",
     "thin": "Echoe: «Lo has dejado un poco flojo, capitán. Dos puertas, y en ambas se han encogido de hombros».",
-    "axis": "Resonancia ↔ Eje de estabilidad: {{n}}"
+    "axis": "Resonancia ↔ Eje de estabilidad: {{n}}",
+    "deepTitle": "Past the Core",
+    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
+    "thresholdTag": "Or do not end it",
+    "thresholdCross": "Cross the threshold",
+    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
   },
   "ending": {
     "next": "Continuar",
@@ -344,7 +350,9 @@
     "cursed": "La pista maldita: aumentan las interferencias",
     "unstable": "Fila inestable: se ha vuelto a calcular su contenido",
     "pocket": "El «buco»: mayor riesgo, mayor recompensa",
-    "riftSplit": "La división de la grieta: las ramas solo se unen en la puerta"
+    "riftSplit": "La división de la grieta: las ramas solo se unen en la puerta",
+    "inversion": "Inverted row: systems resolve last to first",
+    "storm": "Probability storm: one placed die re-rolls at resolution"
   },
   "tag": {
     "red": "Rojo",

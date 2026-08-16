@@ -82,6 +82,8 @@ const condMatches = (
       return (ctx.shieldValue?.() ?? 0) >= cond.n;
     case "tideAtLeast":
       return (ctx.tideValue?.() ?? 0) >= cond.n;
+    case "inverted":
+      return ctx.invertedOrder?.() ?? false;
     case "counterAtLeast":
       return (ctx.counter?.(cond.scope, cond.key) ?? 0) >= cond.n;
     case "enemyHpPctLt": {

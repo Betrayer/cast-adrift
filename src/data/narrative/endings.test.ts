@@ -3,8 +3,10 @@ import { ASCENSIONS, ascensionMods, maxSelectableAscension } from "@/data/ascens
 import { BEACON_FLAGS, beaconsResolved } from "@/data/events/beacons";
 import {
   earnedEndings,
+  endingBeats,
   ENDINGS,
   finaleOptions,
+  STANDARD_ENDINGS,
   type EndingContext,
 } from "@/data/narrative/endings";
 import {
@@ -70,10 +72,55 @@ describe("finale gating", () => {
         flags: { ...allBeacons(), silentReady: true, courierFreed: true },
         beaconsResolved: 5,
       }),
+      ctx({
+        flags: allBeacons(),
+        beaconsResolved: 5,
+        crossedThreshold: true,
+        echoArcComplete: true,
+      }),
     ]) {
       for (const ending of earnedEndings(state)) reachable.add(ending.id);
     }
     expect(reachable.size).toBe(ENDINGS.length);
+  });
+
+  // Nine paths: four standard beat sets, four deep ones, and «Ответ».
+  it("plays nine distinct beat sets across the four endings and the true one", () => {
+    const sets = new Set<string>();
+    for (const ending of ENDINGS) {
+      for (const crossed of [false, true]) {
+        if (ending.id === "answer" && !crossed) continue;
+        const beats = endingBeats(
+          ending,
+          ctx({ crossedThreshold: crossed, beaconsResolved: 5 }),
+        );
+        expect(beats.length).toBeGreaterThan(0);
+        sets.add(beats.join("|"));
+      }
+    }
+    expect(sets.size).toBe(9);
+  });
+
+  it("gives every standard ending a deep set that replaces it, never appends", () => {
+    for (const ending of STANDARD_ENDINGS) {
+      const shallow = endingBeats(ending, ctx());
+      const deep = endingBeats(ending, ctx({ crossedThreshold: true }));
+      expect(deep).toHaveLength(shallow.length);
+      expect(deep).not.toEqual(shallow);
+    }
+  });
+
+  it("still applies flag variants inside a deep set", () => {
+    const seal = ENDINGS.find((e) => e.id === "seal");
+    expect(seal).toBeDefined();
+    if (seal === undefined) return;
+    const plain = endingBeats(seal, ctx({ crossedThreshold: true }));
+    const varied = endingBeats(
+      seal,
+      ctx({ crossedThreshold: true, flags: { coreSilenced: true } }),
+    );
+    expect(varied).not.toEqual(plain);
+    expect(varied[2]).toBe("content:ending.seal.var.silenced");
   });
 
   it("falls back to a Seal/Merge fork when nothing was earned", () => {

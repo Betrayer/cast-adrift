@@ -255,7 +255,8 @@
     "fromAscension": "Premia za awans",
     "fromFinds": "Pierwsze znaleziska",
     "fromAchievements": "Osiągnięcia",
-    "firstFinds": "Pierwsze doniesienie: {{names}}"
+    "firstFinds": "Pierwsze doniesienie: {{names}}",
+    "fromDeep": "Beyond the Core"
   },
   "menu": {
     "level": "Poziom{{level}}"
@@ -434,7 +435,8 @@
       "story": "Opowieść",
       "collection": "Kolekcja",
       "modes": "Tryby"
-    }
+    },
+    "endingsHidden": "Some endings are not on this shelf."
   },
   "engraving": {
     "title": "Grawerunek Stacja",
@@ -452,7 +454,8 @@
     "keeper": "Strażnik",
     "ascendant": "Ascendent",
     "chartwright": "Chartwright",
-    "archivist": "Archiwista"
+    "archivist": "Archiwista",
+    "answer": "The Answer"
   },
   "unlock": {
     "opened": "Odblokowane",
@@ -491,7 +494,10 @@
     "featureShipArk": "Arka",
     "featureEngraving": "Grawerunek stacja",
     "featureDailyPreview": "Codzienny przegląd",
-    "featureFreeRespec": "Bezpłatna zmiana specjalizacji Keystone"
+    "featureFreeRespec": "Bezpłatna zmiana specjalizacji Keystone",
+    "sectorSix": "Sector 6 «Beyond the Core»",
+    "diceS6": "Four causality dice",
+    "skinThreshold": "Die skin «Threshold»"
   },
   "skin": {
     "title": "Skórki",
@@ -521,6 +527,10 @@
     "chartwright": {
       "name": "Chartwright",
       "desc": "Plansza z kwadratami, monograficzne symbole."
+    },
+    "threshold": {
+      "name": "Threshold",
+      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
     }
   },
   "ach": {
@@ -644,7 +654,15 @@
       "name": "Wykonawca",
       "desc": "Zdobądź 30 gwiazdek z kontraktów."
     },
-    "toast": "Osiągnięcie"
+    "toast": "Osiągnięcie",
+    "beyondTheCore": {
+      "name": "Beyond the Core",
+      "desc": "Cross the threshold and clear Sector 6."
+    },
+    "theAnswer": {
+      "name": "The Answer",
+      "desc": "Reach the hidden ending past the Core."
+    }
   },
   "chartTag": {
     "red": "czerwony",
@@ -689,5 +707,8 @@
       "prestigeTheme": "motyw „Ascendant”",
       "badge": "odznaka Ascendant"
     }
+  },
+  "shard": {
+    "deepClear": "Beyond the Core"
   }
 }

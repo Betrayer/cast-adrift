@@ -48,6 +48,8 @@ export interface MapNode {
   pocket?: true;
   cache?: true;
   unstable?: true;
+  inverted?: true;
+  storm?: true;
   blessing?: LaneBlessing;
   tierWindow?: readonly [number, number];
 }

@@ -30,16 +30,16 @@ const stream = () => createStream(31337);
 const content = enContent as unknown as Record<string, Record<string, string>>;
 
 describe("roster counts", () => {
-  it("holds 55 base, 14 elites, 12 mini-bosses and 10 bosses", () => {
-    expect(BASE_ENEMIES).toHaveLength(55);
+  it("holds 63 base, 14 elites, 14 mini-bosses and 12 bosses", () => {
+    expect(BASE_ENEMIES).toHaveLength(63);
     expect(ELITE_ENEMIES).toHaveLength(14);
-    expect(MINIBOSSES).toHaveLength(12);
-    expect(BOSSES).toHaveLength(10);
-    expect(ALL_ENEMIES).toHaveLength(91);
+    expect(MINIBOSSES).toHaveLength(14);
+    expect(BOSSES).toHaveLength(12);
+    expect(ALL_ENEMIES).toHaveLength(103);
   });
 
-  it("gives every sector ten bespoke base enemies", () => {
-    for (const roster of SECTOR_ROSTERS) expect(roster).toHaveLength(10);
+  it("gives every campaign sector ten bespoke base enemies and S6 eight", () => {
+    expect(SECTOR_ROSTERS.map((r) => r.length)).toEqual([10, 10, 10, 10, 10, 8]);
   });
 
   it("gives every base enemy a role the composer can draw", () => {

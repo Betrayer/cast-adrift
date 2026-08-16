@@ -119,6 +119,7 @@ export type Cond =
   | { c: "chargeAtLeast"; n: number }
   | { c: "shieldAtLeast"; n: number }
   | { c: "tideAtLeast"; n: number }
+  | { c: "inverted" }
   | { c: "counterAtLeast"; scope: CounterScope; key: string; n: number }
   | { c: "enemyHpPctLt"; n: number }
   | { c: "enemyShielded" }
@@ -218,6 +219,7 @@ const COND_NAME_SET: Record<Cond["c"], true> = {
   chargeAtLeast: true,
   shieldAtLeast: true,
   tideAtLeast: true,
+  inverted: true,
   counterAtLeast: true,
   enemyHpPctLt: true,
   enemyShielded: true,

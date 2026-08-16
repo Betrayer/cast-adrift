@@ -119,12 +119,16 @@ const MOTIF_BADGE = {
   unstable: "⚡",
   blessed: "○",
   cursed: "●",
+  inversion: "⇅",
+  storm: "≋",
 } as const;
 
 const motifBadge = (node: MapNode): string | null => {
   if (node.pocket === true) return MOTIF_BADGE.pocket;
   if (node.cache === true) return MOTIF_BADGE.cache;
   if (node.unstable === true) return MOTIF_BADGE.unstable;
+  if (node.inverted === true) return MOTIF_BADGE.inversion;
+  if (node.storm === true) return MOTIF_BADGE.storm;
   if (node.blessing !== undefined) return MOTIF_BADGE[node.blessing];
   return null;
 };
@@ -133,6 +137,8 @@ const motifColor = (node: MapNode): string => {
   if (node.pocket === true) return tokens.amber;
   if (node.cache === true) return schools.yellow.text;
   if (node.unstable === true) return schools.red.text;
+  if (node.inverted === true) return schools.prismatic.text;
+  if (node.storm === true) return schools.blue.text;
   return node.blessing === "cursed" ? schools.red.text : schools.blue.text;
 };
 
@@ -173,6 +179,18 @@ const MOTIF_LEGEND: readonly MotifLegendEntry[] = [
     badge: MOTIF_BADGE.cursed,
     color: schools.red.text,
     present: (map) => map.nodes.some((n) => n.blessing === "cursed"),
+  },
+  {
+    key: "inversion",
+    badge: MOTIF_BADGE.inversion,
+    color: schools.prismatic.text,
+    present: (map) => map.nodes.some((n) => n.inverted === true),
+  },
+  {
+    key: "storm",
+    badge: MOTIF_BADGE.storm,
+    color: schools.blue.text,
+    present: (map) => map.nodes.some((n) => n.storm === true),
   },
   {
     key: "mine",
@@ -360,6 +378,8 @@ const MapView = ({ map, position }: MapViewProps) => {
           ...(selectedNode.pocket === true ? [t("run:map.previewPocket")] : []),
           ...(selectedNode.cache === true ? [t("run:motif.cache")] : []),
           ...(selectedNode.unstable === true ? [t("run:motif.unstable")] : []),
+          ...(selectedNode.inverted === true ? [t("run:motif.inversion")] : []),
+          ...(selectedNode.storm === true ? [t("run:motif.storm")] : []),
           ...(selectedNode.blessing === undefined
             ? []
             : [t(`run:motif.${selectedNode.blessing}`)]),
@@ -538,6 +558,13 @@ const MapView = ({ map, position }: MapViewProps) => {
               <g
                 key={node.id}
                 data-node={node.id}
+                data-causality={
+                  node.inverted === true
+                    ? "inverted"
+                    : node.storm === true
+                      ? "storm"
+                      : undefined
+                }
                 className={`${legal ? styles.nodeSelectable ?? "" : styles.node ?? ""} ${
                   reduced ? "" : styles.nodeStagger ?? ""
                 }`}

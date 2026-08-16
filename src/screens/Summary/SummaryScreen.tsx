@@ -105,6 +105,7 @@ export const SummaryScreen = () => {
     ["meta:summary.fromEnding", shards.firstEnding],
     ["meta:summary.fromHull", shards.hullClear],
     ["meta:summary.fromStreak", shards.streak],
+    ["meta:summary.fromDeep", shards.deepClear],
     ["meta:summary.fromAscension", shards.ascension],
     ["meta:summary.fromFinds", result?.findShards ?? 0],
     ["meta:summary.fromAchievements", result?.achievementShards ?? 0],

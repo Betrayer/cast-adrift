@@ -71,7 +71,10 @@
     "siphonShield": "Siphons {{n}} shield",
     "bargain": "Bills {{n}}: your scrap, or your hull",
     "enrage": "Enrages +{{n}}",
-    "hijack": "Hijacks your best die"
+    "hijack": "Hijacks your best die",
+    "echoTotal": "echoes your last turn (max {{n}})",
+    "foldOrder": "folds the order",
+    "devourDie": "eats your best spare die"
   },
   "slot": {
     "weaponA": "Weapon A",
@@ -107,9 +110,15 @@
     "bargain": "DEAL",
     "enrage": "RAGE",
     "hijack": "HIJACK",
-    "ward": "WARD"
+    "ward": "WARD",
+    "fold": "FOLD",
+    "devour": "EATEN"
   },
   "enemyWard": "Ward: {{school}}",
   "enemyGate": "Gate {{n}}",
-  "enemyRage": "Rage +{{n}}"
+  "enemyRage": "Rage +{{n}}",
+  "inverted": "INVERTED ORDER",
+  "invertedHint": "Reactor first, Sensors last.",
+  "storm": "PROBABILITY STORM",
+  "stormHint": "One placed die re-rolls before anything resolves."
 }

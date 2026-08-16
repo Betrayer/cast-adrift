@@ -36,7 +36,8 @@
       "event": "Event",
       "anomaly": "Anomaly",
       "beacon": "Beacon",
-      "boss": "Boss"
+      "boss": "Boss",
+      "inverted": "inverted"
     },
     "previewNode": "{{type}} · risk: {{risk}}",
     "previewPocket": "Detour: better loot, tougher fight",
@@ -277,7 +278,12 @@
     "title": "The Core Heart is open",
     "intro": "Everything you decided out here is now a door. Only the ones you earned will open.",
     "thin": "Echo: \"You left it thin, captain. Two doors, both of them shrugging.\"",
-    "axis": "Resonance ↔ Stability axis: {{n}}"
+    "axis": "Resonance ↔ Stability axis: {{n}}",
+    "deepTitle": "Past the Core",
+    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
+    "thresholdTag": "Or do not end it",
+    "thresholdCross": "Cross the threshold",
+    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
   },
   "ending": {
     "next": "Continue",
@@ -344,7 +350,9 @@
     "cursed": "Cursed lane: interference rises",
     "unstable": "Unstable row: its contents were re-rolled",
     "pocket": "Detour pocket: raised risk, raised reward",
-    "riftSplit": "Rift split: the branches only meet at the gate"
+    "riftSplit": "Rift split: the branches only meet at the gate",
+    "inversion": "Inverted row: systems resolve last to first",
+    "storm": "Probability storm: one placed die re-rolls at resolution"
   },
   "tag": {
     "red": "Red",

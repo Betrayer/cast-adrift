@@ -9,7 +9,7 @@ import {
   NUMBERED_MEMORIES,
 } from "@/data/narrative/memories";
 import { sealFinalMemory } from "@/game/narrative/memoryArc";
-import { SECTORS } from "@/data/sectors";
+import { SECTOR_COUNT, SECTORS } from "@/data/sectors";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import {
   advanceSector,
@@ -69,9 +69,23 @@ describe("campaign progression", () => {
     expect(useAppStore.getState().screen).toBe("interstitial");
   });
 
-  it("walks S1 → S5 and stops at the last sector", () => {
+  it("walks S1 → S5 and stops at the last campaign sector", () => {
     startRun(4242, 0);
     for (let i = 0; i < 6; i += 1) advanceSector();
+    expect(useRunStore.getState().sector).toBe(SECTOR_COUNT);
+  });
+
+  // The threshold is the only thing that lets a campaign run climb past the
+  // fifth act, and it still stops one sector later.
+  it("walks into sector 6 once the run has crossed the threshold", () => {
+    startRun(4242, 0);
+    for (let i = 0; i < 4; i += 1) advanceSector();
+    expect(useRunStore.getState().sector).toBe(SECTOR_COUNT);
+    useRunStore.getState().crossThreshold();
+    advanceSector();
+    expect(useRunStore.getState().sector).toBe(SECTORS.length);
+    expect(useRunStore.getState().map?.shape.bossRow).toBe(16);
+    advanceSector();
     expect(useRunStore.getState().sector).toBe(SECTORS.length);
   });
 
@@ -79,6 +93,11 @@ describe("campaign progression", () => {
     expect(tideCapFor(0)).toBe(3);
     expect(tideCapFor(4)).toBe(4);
     expect(tideCapFor(5)).toBe(4);
+  });
+
+  it("lets the sixth sector run its own uncapped tide", () => {
+    expect(tideCapFor(0, "campaign", 6)).toBe(5);
+    expect(tideCapFor(4, "campaign", 6)).toBe(6);
   });
 });
 

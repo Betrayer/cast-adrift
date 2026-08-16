@@ -255,7 +255,8 @@
     "fromAscension": "Aufstiegsbonus",
     "fromFinds": "Erste Funde",
     "fromAchievements": "Erfolge",
-    "firstFinds": "Erstmalig gesichtet: {{names}}"
+    "firstFinds": "Erstmalig gesichtet: {{names}}",
+    "fromDeep": "Beyond the Core"
   },
   "menu": {
     "level": "Lv{{level}}"
@@ -434,7 +435,8 @@
       "story": "Geschichte",
       "collection": "Sammlung",
       "modes": "Modi"
-    }
+    },
+    "endingsHidden": "Some endings are not on this shelf."
   },
   "engraving": {
     "title": "Gravur Bahnhof",
@@ -452,7 +454,8 @@
     "keeper": "Torwart",
     "ascendant": "Aszendent",
     "chartwright": "Chartwright",
-    "archivist": "Archivar"
+    "archivist": "Archivar",
+    "answer": "The Answer"
   },
   "unlock": {
     "opened": "Freigeschaltet",
@@ -491,7 +494,10 @@
     "featureShipArk": "Die Arche",
     "featureEngraving": "Gravur Bahnhof",
     "featureDailyPreview": "Tägliche Vorschau",
-    "featureFreeRespec": "Kostenlose Keystone-Neuzuweisung"
+    "featureFreeRespec": "Kostenlose Keystone-Neuzuweisung",
+    "sectorSix": "Sector 6 «Beyond the Core»",
+    "diceS6": "Four causality dice",
+    "skinThreshold": "Die skin «Threshold»"
   },
   "skin": {
     "title": "Die Skins",
@@ -521,6 +527,10 @@
     "chartwright": {
       "name": "Chartwright",
       "desc": "Blaupause, quadratisch, einfarbige Glyphen."
+    },
+    "threshold": {
+      "name": "Threshold",
+      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
     }
   },
   "ach": {
@@ -644,7 +654,15 @@
       "name": "Auftragnehmer",
       "desc": "Sammle 30 Vertragssterne."
     },
-    "toast": "Leistung"
+    "toast": "Leistung",
+    "beyondTheCore": {
+      "name": "Beyond the Core",
+      "desc": "Cross the threshold and clear Sector 6."
+    },
+    "theAnswer": {
+      "name": "The Answer",
+      "desc": "Reach the hidden ending past the Core."
+    }
   },
   "chartTag": {
     "red": "rot",
@@ -689,5 +707,8 @@
       "prestigeTheme": "Thema „Ascendant“",
       "badge": "das „Ascendant“-Abzeichen"
     }
+  },
+  "shard": {
+    "deepClear": "Beyond the Core"
   }
 }

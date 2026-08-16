@@ -62,6 +62,12 @@ export const CODEX: readonly CodexEntry[] = [
   world("choirDoctrine"),
   world("pactLedger"),
   world("coreThreshold"),
+  world("beyondTheCore"),
+  world("echoFleetLog"),
+  world("secondCaptain"),
+  world("keeperBeyond"),
+  world("coreRemainder"),
+  world("thresholdBeacon"),
   ...MEMORY_ENTRIES,
 ];
 

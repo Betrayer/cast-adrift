@@ -179,6 +179,7 @@ const main = async (): Promise<void> => {
         firstEnding: 0,
         hullClear: 0,
         streak: 0,
+        deepClear: 0,
         ascension: 0,
         total: 0,
       },

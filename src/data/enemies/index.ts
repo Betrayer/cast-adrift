@@ -7,6 +7,7 @@ import { SECTOR2_ENEMIES } from "@/data/enemies/sector2";
 import { SECTOR3_ENEMIES } from "@/data/enemies/sector3";
 import { SECTOR4_ENEMIES } from "@/data/enemies/sector4";
 import { SECTOR5_ENEMIES } from "@/data/enemies/sector5";
+import { SECTOR6_ENEMIES } from "@/data/enemies/sector6";
 import type { EnemyDef } from "@/types/content";
 
 export const BASE_ENEMIES: readonly EnemyDef[] = [
@@ -15,6 +16,7 @@ export const BASE_ENEMIES: readonly EnemyDef[] = [
   ...SECTOR3_ENEMIES,
   ...SECTOR4_ENEMIES,
   ...SECTOR5_ENEMIES,
+  ...SECTOR6_ENEMIES,
   ...DRIFTER_ENEMIES,
 ];
 
@@ -24,6 +26,7 @@ export const SECTOR_ROSTERS: readonly (readonly EnemyDef[])[] = [
   SECTOR3_ENEMIES,
   SECTOR4_ENEMIES,
   SECTOR5_ENEMIES,
+  SECTOR6_ENEMIES,
 ];
 
 export const ALL_ENEMIES: readonly EnemyDef[] = [
@@ -59,3 +62,4 @@ export { SECTOR2_ENEMIES } from "@/data/enemies/sector2";
 export { SECTOR3_ENEMIES } from "@/data/enemies/sector3";
 export { SECTOR4_ENEMIES } from "@/data/enemies/sector4";
 export { SECTOR5_ENEMIES } from "@/data/enemies/sector5";
+export { SECTOR6_ENEMIES } from "@/data/enemies/sector6";

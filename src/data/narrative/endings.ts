@@ -1,12 +1,14 @@
 import type { LocKey } from "@/types/content";
 import type { FlagValue } from "@/types/events";
 
-export type EndingId = "seal" | "merge" | "bargain" | "silent";
+export type EndingId = "seal" | "merge" | "bargain" | "silent" | "answer";
 
 export interface EndingContext {
   axis: number;
   flags: Record<string, FlagValue>;
   beaconsResolved: number;
+  crossedThreshold?: boolean;
+  echoArcComplete?: boolean;
 }
 
 // A beat variant rewrites one line of the ending, so the last beacon's answer is
@@ -25,6 +27,10 @@ export interface EndingDef {
   label: LocKey;
   requirement: LocKey;
   beats: readonly LocKey[];
+  // The set a run that crossed the threshold plays instead. It is a replacement,
+  // not an appendix: an act that changed the answer should not have to recite the
+  // shallower version of it first.
+  deepBeats?: readonly LocKey[];
   echoLine: LocKey;
   reads: readonly string[];
   variants?: readonly EndingVariant[];
@@ -36,6 +42,9 @@ const has = (ctx: EndingContext, key: string): boolean =>
 
 const beats = (id: string, n: number): LocKey[] =>
   Array.from({ length: n }, (_, i) => `content:ending.${id}.beat${String(i + 1)}`);
+
+const deepBeats = (id: string, n: number): LocKey[] =>
+  Array.from({ length: n }, (_, i) => `content:ending.${id}.deep${String(i + 1)}`);
 
 const variant = (
   ending: string,
@@ -50,6 +59,18 @@ const variant = (
   when: (ctx) => has(ctx, key),
 });
 
+// «Ответ» is the only ending that asks for balance rather than commitment: five
+// beacons answered in this run, Echo's arc finished across the profile, and an
+// axis that never picked a pole. It is never listed, never hinted at by a
+// checklist, and only ever appears at the far side of the threshold.
+export const TRUE_ENDING_AXIS = 2;
+
+export const answerQualifies = (ctx: EndingContext): boolean =>
+  ctx.crossedThreshold === true &&
+  ctx.echoArcComplete === true &&
+  ctx.beaconsResolved >= 5 &&
+  Math.abs(ctx.axis) <= TRUE_ENDING_AXIS;
+
 export const ENDINGS: readonly EndingDef[] = [
   {
     id: "seal",
@@ -57,6 +78,7 @@ export const ENDINGS: readonly EndingDef[] = [
     label: "content:ending.seal.label",
     requirement: "content:ending.seal.req",
     beats: beats("seal", 4),
+    deepBeats: deepBeats("seal", 4),
     echoLine: "content:ending.seal.echo",
     reads: [],
     variants: [
@@ -71,6 +93,7 @@ export const ENDINGS: readonly EndingDef[] = [
     label: "content:ending.merge.label",
     requirement: "content:ending.merge.req",
     beats: beats("merge", 4),
+    deepBeats: deepBeats("merge", 4),
     echoLine: "content:ending.merge.echo",
     reads: [],
     variants: [
@@ -86,6 +109,7 @@ export const ENDINGS: readonly EndingDef[] = [
     label: "content:ending.bargain.label",
     requirement: "content:ending.bargain.req",
     beats: beats("bargain", 3),
+    deepBeats: deepBeats("bargain", 3),
     echoLine: "content:ending.bargain.echo",
     reads: ["pactSealed", "bargainReady"],
     variants: [
@@ -100,6 +124,7 @@ export const ENDINGS: readonly EndingDef[] = [
     label: "content:ending.silent.label",
     requirement: "content:ending.silent.req",
     beats: beats("silent", 4),
+    deepBeats: deepBeats("silent", 4),
     echoLine: "content:ending.silent.echo",
     reads: ["silentReady", "crewSaved", "courierFreed"],
     variants: [
@@ -111,17 +136,35 @@ export const ENDINGS: readonly EndingDef[] = [
       ctx.beaconsResolved >= 5 &&
       (has(ctx, "crewSaved") || has(ctx, "courierFreed")),
   },
+  {
+    id: "answer",
+    title: "content:ending.answer.title",
+    label: "content:ending.answer.label",
+    requirement: "content:ending.answer.req",
+    beats: beats("answer", 6),
+    echoLine: "content:ending.answer.echo",
+    reads: ["thresholdHeard"],
+    variants: [variant("answer", "heard", 4, "thresholdHeard")],
+    qualifies: answerQualifies,
+  },
 ];
 
 export const ENDING_BY_ID: ReadonlyMap<string, EndingDef> = new Map(
   ENDINGS.map((e) => [e.id, e]),
 );
 
+export const STANDARD_ENDINGS: readonly EndingDef[] = ENDINGS.filter(
+  (e) => e.id !== "answer",
+);
+
 export const endingBeats = (
   def: EndingDef,
   ctx: EndingContext,
 ): readonly LocKey[] => {
-  const out = [...def.beats];
+  const out =
+    ctx.crossedThreshold === true && def.deepBeats !== undefined
+      ? [...def.deepBeats]
+      : [...def.beats];
   const used = new Set<number>();
   for (const v of def.variants ?? []) {
     if (used.has(v.at)) continue;

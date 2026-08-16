@@ -407,6 +407,108 @@ export const BOSSES: readonly BossDef[] = [
       { t: "multi", n: 4, k: 2 },
     ],
   }),
+  // «За Ядром» rotates two finales that ask opposite questions. The Hush takes
+  // the ship apart slot by slot, so the fight is about deciding what you can
+  // afford to lose. The Echo Fleet gives you back the five sector bosses one
+  // phase window at a time, so the fight is about remembering how you beat them.
+  bossDef({
+    id: "theHush",
+    hp: 62,
+    boss: true,
+    jamReleasesBlocks: true,
+    claims: [
+      { k: "intent", t: "jamSlot" },
+      { k: "trait", is: "phases" },
+      { k: "trait", is: "jamReleasesBlocks" },
+    ],
+    subsystems: [
+      sub("theHush", "throat", 16, "shieldSelf6"),
+      sub("theHush", "bell", 16, "atk+3"),
+    ],
+    phases: [
+      {
+        untilHpPct: 66,
+        pattern: [
+          { t: "jamSlot" },
+          { t: "shield", n: 8 },
+          { t: "attack", n: 10 },
+        ],
+      },
+      {
+        untilHpPct: 33,
+        pattern: [
+          { t: "jamSlot" },
+          { t: "multi", n: 5, k: 2 },
+          { t: "capShrink" },
+        ],
+        everyTurn: [{ t: "jamSlot" }],
+        onEnter: [{ t: "jamSlot", k: 2 }],
+      },
+      {
+        untilHpPct: 0,
+        pattern: [
+          { t: "attack", n: 11 },
+          { t: "devourDie" },
+          { t: "multi", n: 5, k: 2 },
+        ],
+        onEnter: [{ t: "shield", n: 10 }],
+      },
+    ],
+    pattern: [
+      { t: "jamSlot" },
+      { t: "shield", n: 8 },
+      { t: "attack", n: 10 },
+    ],
+  }),
+  bossDef({
+    id: "echoFleet",
+    hp: 108,
+    boss: true,
+    claims: [
+      { k: "trait", is: "phases" },
+      { k: "aura", is: "twistEachTurn" },
+      { k: "aura", is: "lockEvery3" },
+    ],
+    subsystems: [
+      sub("echoFleet", "wake", 14, "twistEachTurn"),
+      sub("echoFleet", "chorus", 14, "lockEvery3"),
+    ],
+    phases: [
+      {
+        untilHpPct: 66,
+        pattern: [
+          { t: "shieldGate", n: 10 },
+          { t: "stealScrap", n: 8 },
+          { t: "multi", n: 7, k: 2 },
+          { t: "siphonShield", n: 6 },
+        ],
+      },
+      {
+        untilHpPct: 33,
+        pattern: [
+          { t: "capShrink" },
+          { t: "charge" },
+          { t: "multi", n: 7, k: 2 },
+        ],
+        onEnter: [{ t: "shieldAll", n: 8 }],
+      },
+      {
+        untilHpPct: 0,
+        pattern: [
+          { t: "mirrorSchool" },
+          { t: "attack", n: 14 },
+          { t: "echoTotal", cap: 16 },
+        ],
+        everyTurn: [{ t: "storm" }],
+        onEnter: [{ t: "shield", n: 12 }],
+      },
+    ],
+    pattern: [
+      { t: "shieldGate", n: 8 },
+      { t: "stealScrap", n: 8 },
+      { t: "siphonShield", n: 6 },
+    ],
+  }),
 ];
 
 export const BOSS_BY_ID: ReadonlyMap<string, BossDef> = new Map(

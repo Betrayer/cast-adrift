@@ -255,7 +255,8 @@
     "fromAscension": "Ascension bonus",
     "fromFinds": "First finds",
     "fromAchievements": "Achievements",
-    "firstFinds": "First sighting: {{names}}"
+    "firstFinds": "First sighting: {{names}}",
+    "fromDeep": "Beyond the Core"
   },
   "menu": {
     "level": "Lv {{level}}"
@@ -434,7 +435,8 @@
       "story": "Story",
       "collection": "Collection",
       "modes": "Modes"
-    }
+    },
+    "endingsHidden": "Some endings are not on this shelf."
   },
   "engraving": {
     "title": "Engraving Station",
@@ -452,7 +454,8 @@
     "keeper": "Keeper",
     "ascendant": "Ascendant",
     "chartwright": "Chartwright",
-    "archivist": "Archivist"
+    "archivist": "Archivist",
+    "answer": "The Answer"
   },
   "unlock": {
     "opened": "Unlocked",
@@ -491,7 +494,10 @@
     "featureShipArk": "The Ark",
     "featureEngraving": "Engraving station",
     "featureDailyPreview": "Daily preview",
-    "featureFreeRespec": "Free keystone respec"
+    "featureFreeRespec": "Free keystone respec",
+    "sectorSix": "Sector 6 «Beyond the Core»",
+    "diceS6": "Four causality dice",
+    "skinThreshold": "Die skin «Threshold»"
   },
   "skin": {
     "title": "Die skins",
@@ -521,6 +527,10 @@
     "chartwright": {
       "name": "Chartwright",
       "desc": "Blueprint square, mono glyphs."
+    },
+    "threshold": {
+      "name": "Threshold",
+      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
     }
   },
   "ach": {
@@ -644,7 +654,15 @@
       "name": "Contractor",
       "desc": "Earn 30 contract stars."
     },
-    "toast": "Achievement"
+    "toast": "Achievement",
+    "beyondTheCore": {
+      "name": "Beyond the Core",
+      "desc": "Cross the threshold and clear Sector 6."
+    },
+    "theAnswer": {
+      "name": "The Answer",
+      "desc": "Reach the hidden ending past the Core."
+    }
   },
   "chartTag": {
     "red": "red",
@@ -689,5 +707,8 @@
       "prestigeTheme": "theme «Ascendant»",
       "badge": "the Ascendant badge"
     }
+  },
+  "shard": {
+    "deepClear": "Beyond the Core"
   }
 }

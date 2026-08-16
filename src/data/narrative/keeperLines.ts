@@ -86,6 +86,25 @@ const KEEPER_REACTIVE: readonly KeeperLine[] = [
   line("kFive1", "beaconKeeper", "beacon", { all: ["beacon5"] }),
 ];
 
+// «За Ядром». The one shop and the one shipyard past the threshold are staffed
+// by people who should not be there, and they know it; the Keeper's lines are
+// the closest the game comes to naming the balance «Ответ» asks for, and even
+// they only ever circle it.
+const BEYOND_REACTIVE: readonly KeeperLine[] = [
+  line("bMara1", "mara", "shop", { all: ["crossedThreshold"] }),
+  line("bMara2", "mara", "shop", { all: ["maraBeyond"] }),
+  line("bMara3", "mara", "shop", { all: ["yardStripped"] }),
+  line("bYusuf1", "yusuf", "shipyard", { all: ["crossedThreshold"] }),
+  line("bYusuf2", "yusuf", "shipyard", { all: ["fleetRemembered"] }),
+  line("bYusuf3", "yusuf", "shipyard", { all: ["fleetSilenced"] }),
+  line("bKeeper1", "beaconKeeper", "beacon", { all: ["crossedThreshold"] }),
+  line("bKeeper2", "beaconKeeper", "beacon", { all: ["hushHeard"] }),
+  line("bKeeper3", "beaconKeeper", "beacon", { all: ["hushRefused"] }),
+  line("bKeeper4", "beaconKeeper", "beacon", { all: ["thresholdHeard"] }),
+  line("bKeeper5", "beaconKeeper", "beacon", { all: ["thresholdCommitted"] }),
+  line("bKeeper6", "beaconKeeper", "beacon", { all: ["thresholdWalked"] }),
+];
+
 export const KEEPER_LINES: readonly KeeperLine[] = [
   ...series("mara", "mara", "shop", 18),
   ...MARA_REACTIVE,
@@ -93,6 +112,7 @@ export const KEEPER_LINES: readonly KeeperLine[] = [
   ...YUSUF_REACTIVE,
   ...series("keeper", "beaconKeeper", "beacon", 14),
   ...KEEPER_REACTIVE,
+  ...BEYOND_REACTIVE,
 ];
 
 export const REACTIVE_KEEPER_LINES: readonly KeeperLine[] = KEEPER_LINES.filter(

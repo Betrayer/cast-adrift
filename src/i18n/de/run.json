@@ -36,7 +36,8 @@
       "event": "Veranstaltung",
       "anomaly": "Anomalie",
       "beacon": "Bake",
-      "boss": "Chef"
+      "boss": "Chef",
+      "inverted": "inverted"
     },
     "previewNode": "{{type}} · Risiko: {{risk}}",
     "previewPocket": "Umweg: bessere Beute, härterer Kampf",
@@ -277,7 +278,12 @@
     "title": "Das Kernherz ist offen",
     "intro": "Alles, wofür du dich hier draußen entschieden hast, ist nun eine Tür. Nur die, die du dir verdient hast, werden sich öffnen.",
     "thin": "Echo: „Das war ein bisschen dürftig, Captain. Zwei Türen, beide zuckten nur mit den Schultern.“",
-    "axis": "Resonanz ↔ Stabilitätsachse: {{n}}"
+    "axis": "Resonanz ↔ Stabilitätsachse: {{n}}",
+    "deepTitle": "Past the Core",
+    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
+    "thresholdTag": "Or do not end it",
+    "thresholdCross": "Cross the threshold",
+    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
   },
   "ending": {
     "next": "Weiter",
@@ -344,7 +350,9 @@
     "cursed": "Die verfluchte Fahrspur: Die Störungen nehmen zu",
     "unstable": "Instabiler Zeile: Ihr Inhalt wurde neu ausgewertet",
     "pocket": "Umweg-Tasche: höheres Risiko, höherer Gewinn",
-    "riftSplit": "Spaltung: Die Zweige treffen sich erst am Tor"
+    "riftSplit": "Spaltung: Die Zweige treffen sich erst am Tor",
+    "inversion": "Inverted row: systems resolve last to first",
+    "storm": "Probability storm: one placed die re-rolls at resolution"
   },
   "tag": {
     "red": "Rot",

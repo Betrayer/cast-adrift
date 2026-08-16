@@ -41,6 +41,16 @@ export const syncMemoryArc = (): number[] => {
   return fresh;
 };
 
+// «Ответ» asks for the arc, not for the run: every numbered fragment in the
+// profile's Codex plus a sixteenth slot some earlier ending already wrote.
+export const echoArcComplete = (): boolean => {
+  const codex = new Set(useMetaStore.getState().codex);
+  return (
+    NUMBERED_MEMORIES.every((m) => codex.has(m.codexId)) &&
+    FINAL_MEMORY_IDS.some((id) => codex.has(id))
+  );
+};
+
 export const sealFinalMemory = (endingId: string): void => {
   useRunStore.getState().unlockMemory(MEMORY_TOTAL);
   useMetaStore.getState().unlockCodex(finalMemoryCodexId(endingId));

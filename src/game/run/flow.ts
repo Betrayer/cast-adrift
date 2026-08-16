@@ -9,7 +9,7 @@ import { ENEMY_BY_ID } from "@/data/enemies";
 import { beaconsResolved } from "@/data/events/beacons";
 import { sealFinalMemory, syncMemoryArc } from "@/game/narrative/memoryArc";
 import { PROLOGUE_ENEMY, PROLOGUE_SCRIPT } from "@/data/narrative/prologue";
-import { SECTOR_COUNT, sectorDef } from "@/data/sectors";
+import { SECTOR_COUNT, SECTOR_SIX, SECTORS, sectorDef } from "@/data/sectors";
 import { shipHullMax } from "@/game/battle/setup";
 import { chartSlotTierDelta } from "@/game/chart/engine";
 import {
@@ -71,6 +71,7 @@ import { settleAchievements } from "@/game/meta/achievements";
 import {
   freshUnlocks,
   grantDieUnlock,
+  metaHasFeature,
   unlockContextOf,
 } from "@/game/meta/unlockState";
 import { useSummaryStore } from "@/stores/summaryStore";
@@ -211,6 +212,7 @@ export const endRun = (win: boolean): void => {
           firstEnding: run.endingFirstTime,
           streak,
           ascension: run.ascension,
+          deepClear: run.crossedThreshold,
         })
       : ZERO_SHARD_BREAKDOWN;
   const award = meta.awardRun(xpGain, shards.total, win);
@@ -227,6 +229,7 @@ export const endRun = (win: boolean): void => {
     driftRuns: run.mode === "drift" ? 1 : 0,
     dailyRuns: run.mode === "daily" ? 1 : 0,
     contractRuns: run.mode === "contract" ? 1 : 0,
+    deepClears: win && run.crossedThreshold ? 1 : 0,
     ...(run.mode === "drift" ? { deepestDrift: run.stats.depth } : {}),
   });
   const finds = meta.recordEncounters(run.encounters);
@@ -343,7 +346,11 @@ const encounterInit = (pocket: boolean) => {
 
 // Mutators and contract setups are constant for the run, so every battle in the
 // run enters through the same shaped encounter.
-const runBattleInit = (nodeKey: string, pocket = false) => {
+const runBattleInit = (
+  nodeKey: string,
+  pocket = false,
+  causality: { inverted?: boolean; storm?: boolean } = {},
+) => {
   const s = useRunStore.getState();
   const setup = setupForRun(s);
   const mut = computeMutatorMods(s.mutators);
@@ -392,6 +399,8 @@ const runBattleInit = (nodeKey: string, pocket = false) => {
     slotTierDelta,
     disabledSlots,
     resonanceBoost,
+    inverted: causality.inverted === true,
+    nodeStorm: causality.storm === true,
     ...encounterInit(pocket),
   };
 };
@@ -425,7 +434,10 @@ const startBattleNode = (node: MapNode): void => {
     {
       enemyIds: withEnemyCopies(enemyIds),
       startCharge: mods.startCharge,
-      ...runBattleInit(node.id, node.pocket === true),
+      ...runBattleInit(node.id, node.pocket === true, {
+        inverted: node.inverted,
+        storm: node.storm,
+      }),
     },
     s.deck.map((d) => d.defId),
     streams,
@@ -458,6 +470,10 @@ export const startEventBattle = (follow: ForcedBattle): void => {
       ...runBattleInit(
         `ev:${s.position}`,
         nodeById(s.map).get(s.position)?.pocket === true,
+        {
+          inverted: nodeById(s.map).get(s.position)?.inverted,
+          storm: nodeById(s.map).get(s.position)?.storm,
+        },
       ),
     },
     s.deck.map((d) => d.defId),
@@ -619,10 +635,14 @@ export const advanceSector = (): void => {
   settleSectorDrift();
   const s = useRunStore.getState();
   const endless = s.mode === "drift";
+  // A run that crossed the threshold is allowed exactly one index past the
+  // campaign; everything else still stops at the fifth act, and drift keeps
+  // climbing with its content clamped.
+  const lastIndex = s.crossedThreshold ? SECTORS.length : SECTOR_COUNT;
   const nextIndex = endless
     ? s.sectorIndex + 1
-    : Math.min(SECTOR_COUNT, s.sectorIndex + 1);
-  const nextSector = contentSector(nextIndex);
+    : Math.min(lastIndex, s.sectorIndex + 1);
+  const nextSector = endless ? contentSector(nextIndex) : nextIndex;
   const map = generateSectorMap(
     createStream(deriveSeed(s.seed, `map:${String(nextIndex)}`)),
     nextSector,
@@ -660,7 +680,7 @@ export const jumpTo = (toNodeId: NodeId): boolean => {
   if (node === undefined) return false;
 
   const jumps = s.jumpsSinceTide + 1;
-  const cap = tideCapFor(s.ascension, s.mode);
+  const cap = tideCapFor(s.ascension, s.mode, s.sector);
   let tide = s.tide;
   let jumpsSinceTide = jumps;
   if (jumps >= jumpsPerTideFor(s.mutators)) {
@@ -1183,6 +1203,37 @@ export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
   useAppStore.getState().go("battle");
   autosaveRun();
 };
+
+// The threshold is offered exactly once, at the S5 finale, to a campaign run on
+// a profile that has already finished the campaign at least once. Nothing about
+// it exists anywhere else in the UI: the offer is the reveal.
+export const canCrossThreshold = (): boolean => {
+  const run = useRunStore.getState();
+  return (
+    run.mode === "campaign" &&
+    run.active &&
+    !run.crossedThreshold &&
+    run.sector === SECTOR_COUNT &&
+    run.sectorIndex >= SECTOR_COUNT &&
+    metaHasFeature("sectorSix")
+  );
+};
+
+export const crossThreshold = (): void => {
+  if (!canCrossThreshold()) return;
+  const run = useRunStore.getState();
+  run.crossThreshold();
+  run.setFlag("crossedThreshold");
+  trackEvent({
+    name: "threshold",
+    params: { ascension: run.ascension, axis: run.axis },
+  });
+  emitBark("threshold");
+  advanceSector();
+};
+
+export const inDeepSector = (): boolean =>
+  useRunStore.getState().sector === SECTOR_SIX;
 
 export const chooseEnding = (endingId: string): void => {
   const run = useRunStore.getState();

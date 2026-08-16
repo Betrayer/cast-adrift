@@ -10,6 +10,7 @@ export interface EpilogueContext {
   sector: number;
   depth: number;
   death: boolean;
+  crossedThreshold?: boolean;
 }
 
 export interface EpilogueLine {
@@ -345,6 +346,132 @@ export const EPILOGUE_ENTRIES: readonly EpilogueEntry[] = [
     text: "content:epilogue.lastBreath",
     reads: ["survivedLethal"],
     applies: (ctx) => ctx.survivedLethal,
+  },
+  // «За Ядром». Six lines the fifth act can never produce, so a deep run's tally
+  // reads differently from the first line down rather than gaining a footnote.
+  {
+    id: "thresholdCrossed",
+    text: "content:epilogue.thresholdCrossed",
+    reads: ["crossedThreshold"],
+    scope: "clearOnly",
+    applies: (ctx) => ctx.crossedThreshold === true,
+  },
+  {
+    id: "thresholdLost",
+    text: "content:epilogue.thresholdLost",
+    reads: ["crossedThreshold"],
+    scope: "deathOnly",
+    applies: (ctx) => ctx.crossedThreshold === true,
+  },
+  {
+    id: "hushHeard",
+    text: "content:epilogue.hushHeard",
+    reads: ["hushHeard", "hushRefused"],
+    applies: (ctx) => flag(ctx, "hushHeard") || flag(ctx, "hushRefused"),
+  },
+  {
+    id: "fleetRemembered",
+    text: "content:epilogue.fleetRemembered",
+    reads: ["fleetRemembered"],
+    applies: (ctx) => flag(ctx, "fleetRemembered"),
+  },
+  {
+    id: "thresholdHeard",
+    text: "content:epilogue.thresholdHeard",
+    reads: ["thresholdHeard"],
+    applies: (ctx) => flag(ctx, "thresholdHeard"),
+  },
+  {
+    id: "balanceHeld",
+    text: "content:epilogue.balanceHeld",
+    reads: [],
+    scope: "clearOnly",
+    applies: (ctx) => ctx.crossedThreshold === true && Math.abs(ctx.axis) <= 2,
+    values: (ctx) => ({ n: Math.abs(ctx.axis) }),
+  },
+  {
+    id: "deepSalvage",
+    text: "content:epilogue.deepSalvage",
+    reads: ["retroTaken", "retroLeft"],
+    applies: (ctx) => flag(ctx, "retroTaken") || flag(ctx, "retroLeft"),
+  },
+  {
+    id: "deepYard",
+    text: "content:epilogue.deepYard",
+    reads: ["maraBeyond", "yardStripped"],
+    applies: (ctx) => flag(ctx, "maraBeyond") || flag(ctx, "yardStripped"),
+  },
+  {
+    id: "deepAudit",
+    text: "content:epilogue.deepAudit",
+    reads: ["auditFolded", "auditForged", "auditRefused"],
+    applies: (ctx) =>
+      flag(ctx, "auditFolded") ||
+      flag(ctx, "auditForged") ||
+      flag(ctx, "auditRefused"),
+  },
+  {
+    id: "deepChoir",
+    text: "content:epilogue.deepChoir",
+    reads: ["choirQuieted", "choirHeard", "choirCut"],
+    applies: (ctx) =>
+      flag(ctx, "choirQuieted") || flag(ctx, "choirHeard") || flag(ctx, "choirCut"),
+  },
+  {
+    id: "deepLog",
+    text: "content:epilogue.deepLog",
+    reads: ["logRead", "logWritten", "logBurned"],
+    applies: (ctx) =>
+      flag(ctx, "logRead") || flag(ctx, "logWritten") || flag(ctx, "logBurned"),
+  },
+  {
+    id: "deepStorm",
+    text: "content:epilogue.deepStorm",
+    reads: ["stormRidden", "stormAnchored", "stormWaited"],
+    applies: (ctx) =>
+      flag(ctx, "stormRidden") ||
+      flag(ctx, "stormAnchored") ||
+      flag(ctx, "stormWaited"),
+  },
+  {
+    id: "deepTwin",
+    text: "content:epilogue.deepTwin",
+    reads: ["twinTraded", "twinWarned", "twinFought", "twinBeaten"],
+    applies: (ctx) =>
+      flag(ctx, "twinTraded") || flag(ctx, "twinWarned") || flag(ctx, "twinFought"),
+  },
+  {
+    id: "deepBorrowed",
+    text: "content:epilogue.deepBorrowed",
+    reads: ["turnBorrowed", "turnRepaid", "turnDeclined"],
+    applies: (ctx) =>
+      flag(ctx, "turnBorrowed") ||
+      flag(ctx, "turnRepaid") ||
+      flag(ctx, "turnDeclined"),
+  },
+  {
+    id: "deepKeeper",
+    text: "content:epilogue.deepKeeper",
+    reads: ["keeperCarried", "keeperRelieved", "keeperLeft"],
+    applies: (ctx) =>
+      flag(ctx, "keeperCarried") ||
+      flag(ctx, "keeperRelieved") ||
+      flag(ctx, "keeperLeft"),
+  },
+  {
+    id: "deepRemainder",
+    text: "content:epilogue.deepRemainder",
+    reads: ["remainderMeasured", "remainderKept", "remainderReturned"],
+    applies: (ctx) =>
+      flag(ctx, "remainderMeasured") ||
+      flag(ctx, "remainderKept") ||
+      flag(ctx, "remainderReturned"),
+  },
+  {
+    id: "deepFleetLog",
+    text: "content:epilogue.deepFleetLog",
+    reads: ["fleetRecorded", "fleetSilenced"],
+    applies: (ctx) => flag(ctx, "fleetRecorded") || flag(ctx, "fleetSilenced"),
   },
 ];
 

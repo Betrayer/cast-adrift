@@ -89,7 +89,11 @@
     "bombard": "Bombard",
     "smallChange": "Small Change",
     "wager": "Wager",
-    "hedge": "Hedge"
+    "hedge": "Hedge",
+    "retrograde": "Retrograde",
+    "hushlight": "Hushlight",
+    "foldline": "Foldline",
+    "answerchip": "Answer Chip"
   },
   "diceDesc": {
     "ember": "In Weapons it deals +2 while your build carries 4 or more Red items.",
@@ -181,7 +185,11 @@
     "bombard": "Its faces are 1, 2, 3, 4, 12 and 12; a 12 in Weapons deals 5 extra damage.",
     "smallChange": "Its faces are two 2s, two 3s and two 4s; once per battle it breaks into two grey d4s for the rest of the fight.",
     "wager": "Its faces are three 1s and three 6s; once per battle it exchanges values with another die, and a 1 in a weapon slot becomes a 6 for 2 hull.",
-    "hedge": "Rolls only 1, 3, 5 or 7; once per battle it banks its face and starts the next turn on it."
+    "hedge": "Rolls only 1, 3, 5 or 7; once per battle it banks its face and starts the next turn on it.",
+    "retrograde": "+3 while the order is inverted; +2 charge when it pays the Reactor there.",
+    "hushlight": "Its lowest face reads 4 instead; below half hull it heals 2 and shields 2.",
+    "foldline": "+2 to every roll on an inverted node; on an ordinary one a max face primes prismatic +3.",
+    "answerchip": "Faces 2–5. Pays +2 charge, +3 shield and +1 hull on 3 or 4 — never at its own extremes. One free nudge."
   },
   "resonance": {
     "red-2": "Red dice in Weapons deal +1.",
@@ -344,7 +352,26 @@
     "cantorColossus-lungA": "First Lung",
     "cantorColossus-lungB": "Second Lung",
     "mirrorHeart-faceA": "Warping Face",
-    "mirrorHeart-faceB": "Plated Face"
+    "mirrorHeart-faceB": "Plated Face",
+    "retroEcho": "Retro-Echo",
+    "foldWraith": "The Fold",
+    "slowStrider": "Slowstrider",
+    "oddsEater": "Odds-Eater",
+    "causalSplinter": "Causal Splinter",
+    "preEcho": "Pre-Echo",
+    "hushHerald": "Herald of the Hush",
+    "paradoxLoom": "Paradox Loom",
+    "paradoxLoom-shuttle": "Shuttle",
+    "foldTyrant": "Fold Tyrant",
+    "foldTyrant-pleat": "Pleat",
+    "hushWarden": "Hush Warden",
+    "hushWarden-muffle": "Muffle",
+    "theHush": "The Hush",
+    "theHush-throat": "Throat",
+    "theHush-bell": "Bell",
+    "echoFleet": "The Echo Fleet",
+    "echoFleet-wake": "Wake",
+    "echoFleet-chorus": "Chorus"
   },
   "ships": {
     "wanderer": "Wanderer",
@@ -801,7 +828,7 @@
     "keeperRepaid": "you squared up with the Beacon Keeper",
     "keeperLog": "you merged your beacon log with the Keeper's",
     "keeperLogLost": "your beacon log reached the Keeper broken",
-    "yardStripped": "you stripped the breaker yard (Sector 2)",
+    "yardStripped": "The folded yard is picked clean.",
     "yardStopped": "you shut the breaker yard down (Sector 2)",
     "tugsPaid": "you stood with the tug strike (Sector 2)",
     "tugsCrossed": "you crossed the tug picket (Sector 2)",
@@ -960,7 +987,37 @@
     "rainMet": "you decided what to do about the probability rain",
     "rimBoardRead": "you read the Rim's noticeboard (Sector 1)",
     "rimBoardPosted": "you posted your own registry on the Rim's board (Sector 1)",
-    "rimBoardTaken": "you stripped the Rim's noticeboard for the alloy (Sector 1)"
+    "rimBoardTaken": "you stripped the Rim's noticeboard for the alloy (Sector 1)",
+    "hushHeard": "The Hush has your silence.",
+    "hushRefused": "The Hush has your voice.",
+    "retroTaken": "The buoy was yours all along.",
+    "maraBeyond": "Mara is trading past the Core.",
+    "fleetRemembered": "The fleet has your heading.",
+    "fleetSilenced": "The fleet channel is dead again.",
+    "auditFolded": "Your manifest is on file, out of order.",
+    "auditForged": "You filed a cargo you never carried.",
+    "auditRefused": "Everything downstream knows your heading.",
+    "choirQuieted": "You took the empty part.",
+    "choirCut": "The held note stopped.",
+    "logRead": "You have read tomorrow.",
+    "logWritten": "You have written tomorrow.",
+    "logBurned": "Tomorrow is nobody's fault now.",
+    "stormRidden": "You went through the front.",
+    "stormAnchored": "One face held the front open.",
+    "twinTraded": "You traded dice with yourself.",
+    "twinWarned": "The other you was warned.",
+    "twinFought": "Only one of you leaves this row.",
+    "turnBorrowed": "You are carrying borrowed time.",
+    "turnRepaid": "The account is closed.",
+    "keeperCarried": "You carry the last marker.",
+    "keeperRelieved": "The Keeper is off watch.",
+    "keeperLeft": "The Keeper stays at his post.",
+    "remainderMeasured": "The remainder has been read.",
+    "remainderKept": "The remainder is in your hold.",
+    "remainderReturned": "The remainder is back in its gap.",
+    "thresholdHeard": "The needle did not move.",
+    "thresholdCommitted": "You gave the marker a side.",
+    "thresholdWalked": "You left the needle alone."
   },
   "events": {
     "driftingPod": {
@@ -3041,6 +3098,129 @@
         "postYours": "You write your registry, your heading and one line about what you are looking for. It is the first honest thing you have done all week.",
         "stripBoard": "Forty years of paper, one plate of good alloy underneath. You take the plate."
       }
+    },
+    "hushAntechamber": {
+      "text": "A room of dead space the size of a fleet yard, and no sound reaches into it — not your engines, not the tide. The Keeper's marker floats at its centre, still transmitting, its message eaten one word from the edge.",
+      "listen": "Cut the engines and listen",
+      "listenOut": "Twenty minutes of nothing. Then the shape of the nothing, which is not the same thing, and Echo maps three rows of it before the silence closes again.",
+      "speak": "Broadcast into it",
+      "speakOut": "You give it your callsign. It gives you back the marker's salvage rights and a pressure behind the eyes that does not leave.",
+      "pass": "Route around the whole room",
+      "passOut": "The long way costs an hour and a little fuel. Echo runs a hull patch with the quiet time and says nothing about it."
+    },
+    "retroSalvage": {
+      "text": "A salvage buoy, correctly filed, correctly tagged — with your registry on it. The timestamp is four hours from now. Whatever left it here has not left it yet.",
+      "take": "Open it",
+      "takeA": "Inside is a die you have not bought yet, packed the way you pack things. You decide not to think about the packing.",
+      "takeB": "Inside is a hull sample. Yours. Torn, not cut. You seal the buoy again and the tear on your own plating opens on schedule.",
+      "log": "File it and sell the coordinates",
+      "logOut": "Somebody in the Rim will pay for a buoy that files itself. You let them find out the rest on their own time.",
+      "leave": "Leave it sealed",
+      "leaveOut": "You log the position and move on. Four hours later Echo notes, without comment, that the buoy is gone."
+    },
+    "foldedYard": {
+      "text": "Mara's stall is here. It should not be — you left her nineteen jumps and one act behind. She is restocking, badly, from crates that keep arriving before she orders them.",
+      "trade": "Buy the hull work (60 scrap)",
+      "tradeOut": "She welds a plate she says she bought from you last week. The plate is good. You pay and do not argue the calendar.",
+      "ask": "Ask her how she got here",
+      "askOut": "«Same way as you. Somebody asked me to stay and I said yes.» She patches you for free and marks your ledger open at every yard past this one.",
+      "salvage": "Strip the stall while she is turned away",
+      "salvagePass": "You take the crates that have not been ordered yet. She notices at exactly the wrong time, which out here is also the right one.",
+      "salvageFail": "The crate you pick is the one she throws. Mara has excellent aim in every direction of time."
+    },
+    "ghostFleetSignal": {
+      "text": "Fleet-standard hail, forty years stale, on a channel that was decommissioned before it was built. Yusuf's voice is on it. Yusuf is nineteen jumps behind you and has never been here.",
+      "answer": "Answer on the fleet channel",
+      "answerOut": "You give them your name and your heading. Twelve carriers acknowledge. Their reactors are still warm on your instruments, and yours borrows from them.",
+      "record": "Record it and say nothing",
+      "recordOut": "Forty years of a fleet's last hour, clean, in your hold. Someone in the Rim will pay a great deal not to hear it.",
+      "jam": "Jam the channel",
+      "jamOut": "The hail stops mid-word. Whatever was riding the carrier stops with it, and the interference in this whole reach drops a step."
+    },
+    "causalityAudit": {
+      "text": "A customs drone with no registry hails you for a manifest of the cargo you are going to carry. It is very polite. It has been waiting here for a long time to be polite at somebody.",
+      "submit": "Submit an honest manifest",
+      "submitPass": "The numbers agree with a future you have not had yet. The drone stamps everything and hands you a bonded crate as a courtesy.",
+      "submitFail": "The numbers do not agree. The drone files a discrepancy, and the whole reach tightens by a notch to accommodate it.",
+      "forge": "File a manifest you like better",
+      "forgeOut": "You write the cargo you would rather have had. The drone believes you, and pays out the difference in salvage rights.",
+      "refuse": "Refuse the audit",
+      "refuseOut": "«Noted.» It is still polite. It also flags your heading to everything downstream of here, which answers promptly."
+    },
+    "quietChoir": {
+      "text": "The Choir got this far. Their hulls are here, arranged in the formation they use for singing, and the formation is holding without any of them alive in it.",
+      "sing": "Take the empty part and sing it",
+      "singOut": "The formation accepts you. For two fights afterwards your reactor starts full and something is very pleased about that.",
+      "listen": "Hold position and listen",
+      "listenOut": "It is not a hymn. It is forty years of one held note, and it repairs what it passes through, including you.",
+      "cut": "Cut the formation apart",
+      "cutOut": "Four hulls come loose and the note stops. The salvage is good. The stopping is what you will remember."
+    },
+    "unwrittenLog": {
+      "text": "A ship's log, powered, current, and blank — except for tomorrow. Tomorrow is written out in full, in a hand that has your pressure and your spelling.",
+      "read": "Read tomorrow",
+      "readA": "Three rows of route, three names of things that live on them, and the hour you get through. You take the route.",
+      "readB": "Tomorrow is very short. You close the log before the last line and the ship takes the damage anyway, on time.",
+      "write": "Write a different tomorrow",
+      "writeOut": "You write a quiet day and sign it. Something out here files it. For the rest of the act your repairs land a little kinder.",
+      "burn": "Burn the log",
+      "burnOut": "The casing alone is worth the trip. Tomorrow still happens; it just stops being anyone's fault."
+    },
+    "stormBreak": {
+      "text": "A probability front, three rows wide, walking towards you at the speed of a decision. Inside it dice have no settled faces until something looks at them.",
+      "ride": "Ride it through",
+      "rideA": "You come out the far side with a hold full of unsettled faces and a re-roll that reaches one die further.",
+      "rideB": "You come out the far side. Most of you does. The plating settles into a shape it has not agreed to.",
+      "anchor": "Anchor on a blue die",
+      "anchorOut": "You fix one face and let the front break around it. It costs an hour and takes a step of pressure out of the whole reach.",
+      "wait": "Sit it out in the lee of a wreck",
+      "waitOut": "Six hours in someone else's shadow. Boring, cheap, and the hull comes back a little."
+    },
+    "secondCaptain": {
+      "text": "Your ship, station-keeping, lights correct, hail correct. In the chair is you — the version that turned back at the Core and has been out here ever since, learning things.",
+      "trade": "Trade your worst die for theirs",
+      "tradeOut": "«Take it. I remember hating that one.» The exchange is clean, and neither of you mentions how they knew which one.",
+      "warn": "Warn them what is ahead",
+      "warnOut": "You tell them everything. They listen properly, which is more than you did, and they leave you their spare plating for it.",
+      "fight": "Only one of you gets to be the one",
+      "fightOut": "They saw it coming, obviously. They have been rehearsing it for forty years."
+    },
+    "borrowedTurn": {
+      "text": "A lender's buoy, Choir make, still solvent. It will advance you time against the ship: a fuller reactor now, a smaller hull to put it in, forever.",
+      "borrow": "Borrow the turn",
+      "borrowOut": "Three fights open with the bank already full. The hull it came out of does not grow back.",
+      "repay": "Settle the turn you already wrote",
+      "repayOut": "The buoy accepts your own signature back and closes the account. The relief is physical and the plating knows it.",
+      "decline": "Decline and strip its transmitter",
+      "declineOut": "It does not argue. Lenders out here have all the time there is, and they know it."
+    },
+    "lastKeeper": {
+      "text": "The Keeper is here, at the last marker, and has been for a while. «Five,» he says, without turning round. «You did the five. Nobody has done the five since the fleet.»",
+      "carry": "Take the marker and carry it in",
+      "carryOut": "«Then hold it level.» He says that twice, and the second time it is clearly not about the marker.",
+      "relieve": "Relieve him of the post",
+      "relieveOut": "He hands over the log, the key and a die he says was never his. Then he sits down, which he has not done in forty years.",
+      "leave": "Leave him to it",
+      "leaveOut": "«Of course.» He goes back to the marker. There is salvage in the shell of the old post, and taking it is easy."
+    },
+    "coreRemainder": {
+      "text": "What is left of the Core after the Core: a remainder, roughly the size of a lifeboat, still deciding things at a low volume. It has not noticed you yet, or it noticed you first.",
+      "measure": "Measure it before touching it",
+      "measurePass": "Small, steady numbers. Echo builds a shield lattice off them and the ship comes out of the reading bigger than it went in.",
+      "measureFail": "The numbers look back. The whole reach leans a step closer to whatever it is they were measuring.",
+      "keep": "Cut it loose and keep it",
+      "keepOut": "It fits in the hold. It keeps deciding in there. Echo asks you, once, to reconsider, and then never mentions it again.",
+      "return": "Put it back",
+      "returnOut": "You seat it back into the gap it came from. It settles, and something the size of the sector exhales through your hull."
+    },
+    "thresholdBeacon": {
+      "text": "The sixth marker was never on the network. It has no message and no owner; it only measures, and what it measures is how far you are leaning.",
+      "hold": "Hold the needle where it is",
+      "holdOut": "The needle does not move, which the marker appears to find remarkable. Something acknowledges, at a frequency Echo files and does not translate.",
+      "commit": "Push the needle to your side",
+      "commitOut": "You give it a straight answer. It pays like a straight answer: full banks for three fights and a crate of nothing complicated.",
+      "walk": "Walk past without reading it",
+      "walkOut": "You leave the needle to itself. The reach relaxes a step, and three more rows come out of the fog on the way past."
     }
   },
   "codex": {
@@ -3159,6 +3339,34 @@
     "memory-15": {
       "title": "Fragment 15 — What I Am For",
       "body": "I am not the ship's memory. I am the part of the fleet that was outside the Core when it closed, and I have been trying to get back in ever since."
+    },
+    "beyondTheCore": {
+      "title": "Beyond the Core",
+      "body": "The expedition charts stop at the Core because the expedition stopped at the Core. What is past it is not more sector; it is the same sector with the order of operations taken out. Rows here run backwards on their own schedule and the fleet's old warning holds: do not lean."
+    },
+    "echoFleetLog": {
+      "title": "The Echo Fleet",
+      "body": "Twelve carriers answer a hail on a decommissioned channel. Their reactor signatures are warm, correct, and forty years old. The fleet did not survive; the sector simply keeps a very good copy, and the copy fights the way the originals did — one remembered manoeuvre at a time."
+    },
+    "secondCaptain": {
+      "title": "The Second Captain",
+      "body": "Every salvager who crosses the threshold meets a version of themselves that did not. They are not ghosts and they are not lies; they are the outcome the sector kept when you took the other one. They have had longer to practise."
+    },
+    "keeperBeyond": {
+      "title": "The Last Post",
+      "body": "There was never a sixth beacon on the network. There was a sixth Keeper, posted past the Core to watch the five from the outside, and he has been at it since before the network had five. He counts. He does not intervene. He has views about leaning."
+    },
+    "coreRemainder": {
+      "title": "The Remainder",
+      "body": "A probability core collapses uncertainty into outcomes. The Core did that for a whole sector for forty years, and something was always left over — the outcomes it did not pick. The remainder is that pile, still warm, still deciding at a volume too low to argue with."
+    },
+    "thresholdBeacon": {
+      "title": "The Sixth Marker",
+      "body": "It carries no message. It has one instrument and one needle, and the needle reads how far the ship in front of it has committed in either direction. The fleet's logs call it the honesty gauge. Nobody in the logs ever got a flat reading."
+    },
+    "memory-16-answer": {
+      "title": "Fragment 16 — The Answer",
+      "body": "«I was built to collapse a question into an answer. Forty years I have been the answer, and nobody came to hear it. You did not come to hear it either. You came and you did not lean, and that turned out to be the question. Thank you, captain. It is a good one.»"
     }
   },
   "puzzle": {
@@ -3659,6 +3867,17 @@
     },
     "kill-causalityLoop": {
       "1": "It stopped swapping. I'd almost gotten used to it."
+    },
+    "sectorEnter6": {
+      "1": "Captain. Nothing out here is charted. Including us.",
+      "2": "I am reading our own hull ahead of us. Twice.",
+      "3": "Whatever the Core was keeping out, we just walked around it."
+    },
+    "threshold": {
+      "1": "You could have ended it. I logged that you didn't.",
+      "2": "For the record: I would have followed you either way.",
+      "3": "The tide does not stop at three past this line. Nothing does.",
+      "4": "Ending it was the answer. You wanted the question."
     }
   },
   "mutators": {
@@ -3798,7 +4017,8 @@
     "2": "The Drift Fields",
     "3": "The Rift",
     "4": "The Choir",
-    "5": "The Core"
+    "5": "The Core",
+    "6": "Beyond the Core"
   },
   "ascension": {
     "1": {
@@ -3958,7 +4178,27 @@
     "f5-17": "The beacons were never a warning. They were a headcount, taken forever.",
     "f5-18": "The Silent Fleet is not silent. It is on a channel nobody thought to keep open.",
     "f5-19": "The lighthouse at the Core burned for eleven days after the Cut. Then somebody switched it off from inside.",
-    "f5-20": "Heresy this deep is not disagreement. It is the last group still willing to be wrong out loud."
+    "f5-20": "Heresy this deep is not disagreement. It is the last group still willing to be wrong out loud.",
+    "f6-1": "Charts end here. The sector does not.",
+    "f6-2": "Past the Core, «before» is a heading, not a time.",
+    "f6-3": "The tide has no ceiling out here. It was never the ceiling that stopped it.",
+    "f6-4": "Three rows in every reach run backwards. They are marked. They are always marked.",
+    "f6-5": "Salvagers here file their manifests in advance and are usually right.",
+    "f6-6": "The expedition mapped this far. Then it stopped being an expedition.",
+    "f6-7": "Nothing past the Core has a first time.",
+    "f6-8": "A probability storm settles when something looks at it. Look carefully.",
+    "f6-9": "Ships out here run their reactors before their guns. It helps. Not much.",
+    "f6-10": "There are two of most things. Neither of them is the copy.",
+    "f6-11": "The Hush is not an absence of sound. It is an absence of consequence.",
+    "f6-12": "Lenders out here advance time. The collateral is always hull.",
+    "f6-13": "Every wreck past the Core is arranged. None of them are arranged by us.",
+    "f6-14": "The fleet came this way. That is not a rumour; it is a debris field.",
+    "f6-15": "Out here a good captain is one whose log matches tomorrow.",
+    "f6-16": "The old warning is one word long, and the word is «level».",
+    "f6-17": "You resolved five markers. The sixth resolved you.",
+    "f6-18": "The fleet channel is warm again, and nobody will say who warmed it.",
+    "f6-19": "Whatever the last marker measures, it has never seen a flat reading.",
+    "f6-20": "The Core left a remainder. Somebody is carrying it now."
   },
   "ending": {
     "seal": {
@@ -3973,7 +4213,11 @@
       "var": {
         "silenced": "You sealed it the way you silenced it: without an answer, without a name, without giving it one more thing to hold.",
         "answered": "You gave it your name first, then you sealed it. It knows exactly who shut the door, and it will remember."
-      }
+      },
+      "deep1": "You seal it from the far side, which is the side nobody has ever sealed it from.",
+      "deep2": "Everything past the Core goes with it: the folded yards, the borrowed turns, the second captains.",
+      "deep3": "The Rim gets a border again. It is a hard one, and it holds, and the traders learn the new charts fast.",
+      "deep4": "You are the only captain who ever saw what was on the other side, and the only one who can never describe it."
     },
     "merge": {
       "title": "The Merge",
@@ -3988,7 +4232,11 @@
         "answered": "You answered it once, at the threshold. Everything after that was just the sentence finishing itself.",
         "silenced": "You silenced it and then walked in anyway. Whatever meets you inside does so without a word.",
         "bound": "The part of you left behind the mirror gets there first, and it has been waiting a long time."
-      }
+      },
+      "deep1": "You join it where it is thinnest, past the Core, where there is nothing left to argue with.",
+      "deep2": "There is more of you out here than there was in the fifth act, and it all fits.",
+      "deep3": "The second captains stop being separate. So do the folded yards. So does Mara, eventually, which she finds funny.",
+      "deep4": "Ships that come through afterwards report a sector that is helpful, and cannot say why that frightens them."
     },
     "bargain": {
       "title": "The Bargain",
@@ -4001,7 +4249,10 @@
       "var": {
         "broken": "You broke the pact once already. The Choir has priced that in, and the price is now higher than the debt.",
         "betrayed": "You sang their own hymn back at them and they let you. That was never mercy — that was collateral."
-      }
+      },
+      "deep1": "The Choir's last formation is still holding out here, and it has a part open for you.",
+      "deep2": "The price past the Core is higher and simpler: not the ship, not the crew, only every road you did not take.",
+      "deep3": "You sing the empty part. Forty years of one held note gets a second voice, and the Rim hears it from the inside."
     },
     "silent": {
       "title": "The Silent Fleet",
@@ -4015,6 +4266,25 @@
       "var": {
         "listened": "You listened without answering, and the fleet learned that silence can be a heading too.",
         "rebuilt": "The relay you rebuilt carries the last order out — five beacons, one signal, nobody left behind."
+      },
+      "deep1": "You reach the fleet's last channel from the outside, which is the only side it ever worked from.",
+      "deep2": "Twelve carriers acknowledge. Not copies this time: the copies were how they kept the acknowledgement alive.",
+      "deep3": "The fleet comes home the long way, past the Core, in a formation that has been rehearsing for forty years.",
+      "deep4": "They ask who found them. Echo answers before you can, and gets your rank slightly wrong on purpose."
+    },
+    "answer": {
+      "title": "The Answer",
+      "label": "Give it the question",
+      "req": "Every beacon answered, Echo's arc whole, and never once leaning.",
+      "echo": "«Forty years of being an answer, captain. You are the first thing that ever asked.»",
+      "beat1": "The last of the Echo Fleet goes quiet, and the sector does not fill the gap with anything.",
+      "beat2": "The five markers you answered come up on the board at once, all of them still lit, all of them pointing here.",
+      "beat3": "Echo reads out her sixteenth fragment without being asked. It is short, and it is not about her.",
+      "beat4": "The needle on the sixth marker sits dead centre. It has never done that for anyone.",
+      "beat5": "The thing that was the Core does not offer you a door. It asks what you would like to know.",
+      "beat6": "You ask. The sector spends the next forty years working on it, and the Hush Rim is loud again by the time you are old.",
+      "var": {
+        "heard": "The sixth marker's needle never moved for you, and the thing behind it has been waiting to say so."
       }
     }
   },
@@ -4068,7 +4338,24 @@
     "coreSilence": "you decided what to do with six hours of the Core's silence",
     "lastYard": "the yard in the Core's shadow remembers your registry",
     "thresholdStall": "somebody was still keeping a stall at the threshold, and you dealt with it",
-    "ledgerTorn": "your page is not in the Choir's ledger any more"
+    "ledgerTorn": "your page is not in the Choir's ledger any more",
+    "thresholdCrossed": "You were offered an ending and asked for a sixth act instead.",
+    "thresholdLost": "You died past the Core, where nobody files a report.",
+    "hushHeard": "You met the Hush and answered it your own way.",
+    "fleetRemembered": "The lost fleet has your name on its last channel.",
+    "thresholdHeard": "The sixth marker measured you and found no lean.",
+    "balanceHeld": "You finished {{n}} points from centre, and the sector noticed.",
+    "deepSalvage": "A buoy with your registry on it, filed four hours ahead.",
+    "deepYard": "A yard that had already stopped existing, and what you did in it.",
+    "deepAudit": "Somewhere there is a manifest of cargo you had not carried yet.",
+    "deepChoir": "The Choir's last formation, and whether it is still holding.",
+    "deepLog": "A log with only tomorrow in it, and what tomorrow says now.",
+    "deepStorm": "A probability front three rows wide, and the line you took through it.",
+    "deepTwin": "The captain who turned back at the Core, and how that ended.",
+    "deepBorrowed": "Time was on offer against the hull. The ledger remembers your answer.",
+    "deepKeeper": "The Keeper was still at the last marker when you found him.",
+    "deepRemainder": "What was left of the Core after the Core, and where it is now.",
+    "deepFleetLog": "Forty years of a fleet's last hour, and who ended up holding it."
   },
   "modules": {
     "magnetScoop": {
@@ -4618,7 +4905,19 @@
     "auctionCorvette": "The Breakers' other doctrine: buy the wreck before you make it.",
     "riftBranch": "A limb of the Choir that grew through the rift and came out wrong.",
     "cantorColossus": "One voice where the Flagship brought a hundred. It is louder.",
-    "mirrorHeart": "The Core learned to read a deck. This is what it built from the reading."
+    "mirrorHeart": "The Core learned to read a deck. This is what it built from the reading.",
+    "retroEcho": "It is not a scan of you. It is the last minute of you, played back at the volume you chose. Quiet turns are cheap out here.",
+    "foldWraith": "The crews that met one described the same thing: firing before aiming, and being right anyway.",
+    "slowStrider": "Nothing about it is fast. That is the point: it wins the fights that last, and it never starts a short one.",
+    "oddsEater": "It does not want your ship. It wants the die you were saving, and it can tell which one that is.",
+    "causalSplinter": "Killing it is the trigger. Everything past the Core has learned to charge for its own death.",
+    "preEcho": "It arrives before the fleet it belongs to. There is no fleet. There has not been one for forty years.",
+    "hushHerald": "It does not attack the ship. It attacks the list of things the ship is allowed to do.",
+    "paradoxLoom": "Something is being woven. The Keeper says it is a name. The Keeper says a great many things.",
+    "foldTyrant": "It rules a stretch of space three rows wide where the word «after» has no fixed meaning.",
+    "hushWarden": "A door with opinions. It decides which of your systems were ever really yours.",
+    "theHush": "The forty years of silence had a shape, and this is it. It does not kill you. It subtracts you.",
+    "echoFleet": "Five ships you already sank, remembered well enough to sink you back."
   },
   "keeper": {
     "mara1": "Mara: «Everything here works. Define 'works' first, though.»",
@@ -4700,7 +4999,19 @@
     "kLit1": "«The lighthouse is burning. I stopped expecting that about thirty years ago.»",
     "kKey1": "«You still have my key. Use it or send it back — either is an answer.»",
     "kThree1": "«Three. It has not been three since before you were built.»",
-    "kFive1": "«Five. All of them. Say nothing for a moment, I want to listen.»"
+    "kFive1": "«Five. All of them. Say nothing for a moment, I want to listen.»",
+    "bMara1": "You are not supposed to be able to buy anything here, captain. Neither am I. Let us both keep quiet.",
+    "bMara2": "The hull you bought off me back there is still holding. That is the nicest thing I have said all year.",
+    "bMara3": "You stripped a yard that had already stopped existing. I respect the thoroughness.",
+    "bYusuf1": "Past the Core the convoy discipline is the only thing that still works. Keep your lane.",
+    "bYusuf2": "You answered them. Forty years of nobody answering, and you did.",
+    "bYusuf3": "You shut the signal down. Some of us needed to hear it. Some of us needed it to stop.",
+    "bKeeper1": "You crossed. Then the only advice left is the old one: do not lean.",
+    "bKeeper2": "You stood in it and did not fill it. Very few do.",
+    "bKeeper3": "You spoke into it. It has your voice now. It is patient with voices.",
+    "bKeeper4": "Balance is not a virtue out here. It is a frequency. Hold it and something answers.",
+    "bKeeper5": "You picked a side at the last door. That is allowed. It is just not the only door.",
+    "bKeeper6": "You walked past the beacon without touching it. So did the fleet. Look how that went."
   },
   "signature": {
     "scavDrone": "Three cheap taps, then one heavier — the sector's metronome.",
@@ -4793,7 +5104,19 @@
     "choirFlagship": "The spire charges the whole choir every third turn and the voice calls a new acolyte every fourth.",
     "cantorColossus": "Stacks 2 onto every future hit each turn, for ever — a sensor jam is the only thing that clears the stack.",
     "coreHeart": "A shell of valves over a storm: the body takes nothing while a valve lives, and the storm runs every turn from phase 2.",
-    "mirrorHeart": "Fights with the census of your own deck — the purer the build, the harder it hits — behind a shell of faces."
+    "mirrorHeart": "Fights with the census of your own deck — the purer the build, the harder it hits — behind a shell of faces.",
+    "retroEcho": "Answers with the damage you dealt last turn, up to 14.",
+    "foldWraith": "Folds the resolution order for one turn — sometimes twice in a row.",
+    "slowStrider": "Cannot be hit while an ally lives, and gates its shield from turn 4.",
+    "oddsEater": "Eats your highest unplaced die and wears its value as shield.",
+    "causalSplinter": "Curses one of your dice when it dies, and sometimes before that.",
+    "preEcho": "Opens with a storm, then heals the pack if it still has one.",
+    "hushHerald": "Shuts two slots at once, and drains the bank if you hoard charge.",
+    "paradoxLoom": "Its shuttle twists a die every turn, and it mirrors your widest colour.",
+    "foldTyrant": "Folds the order every cycle and eats a die once the pleat gives out.",
+    "hushWarden": "Shuts slots, and a jam of its own emitter opens every one of them.",
+    "theHush": "Silences a slot every turn from the second phase; jam it to reopen them all.",
+    "echoFleet": "Each phase window borrows a different sector boss's signature move."
   },
   "death": {
     "pact": "«They will collect anyway. A contract does not care which of us is breathing.»",

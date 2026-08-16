@@ -35,6 +35,7 @@ export interface EffectCtx {
   chargeValue?: () => number;
   shieldValue?: () => number;
   tideValue?: () => number;
+  invertedOrder?: () => boolean;
   counter?: (scope: CounterScope, key: string) => number;
   bumpCounter?: (scope: CounterScope, key: string, delta: number) => void;
   tagCount?: (tag: ContentTag) => number;

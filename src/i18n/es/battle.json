@@ -71,7 +71,10 @@
     "siphonShield": "Sifones: escudo «{{n}}»",
     "bargain": "{{n}} de los Bills: o te vas, o te quedas",
     "enrage": "Enrages + {{n}}",
-    "hijack": "Te quita tu mejor dado"
+    "hijack": "Te quita tu mejor dado",
+    "echoTotal": "echoes your last turn (max {{n}})",
+    "foldOrder": "folds the order",
+    "devourDie": "eats your best spare die"
   },
   "slot": {
     "weaponA": "Arma A",
@@ -107,9 +110,15 @@
     "bargain": "OFERTA",
     "enrage": "RAGE",
     "hijack": "SECUESTRO",
-    "ward": "WARD"
+    "ward": "WARD",
+    "fold": "FOLD",
+    "devour": "EATEN"
   },
   "enemyWard": "Distrito: {{school}}",
   "enemyGate": "Puerta {{n}}",
-  "enemyRage": "Rage y{{n}}"
+  "enemyRage": "Rage y{{n}}",
+  "inverted": "INVERTED ORDER",
+  "invertedHint": "Reactor first, Sensors last.",
+  "storm": "PROBABILITY STORM",
+  "stormHint": "One placed die re-rolls before anything resolves."
 }

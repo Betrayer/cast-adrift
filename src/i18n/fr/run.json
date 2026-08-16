@@ -36,7 +36,8 @@
       "event": "Événement",
       "anomaly": "Anomalie",
       "beacon": "Balise",
-      "boss": "Patron"
+      "boss": "Patron",
+      "inverted": "inverted"
     },
     "previewNode": "{{type}} · risque : {{risk}}",
     "previewPocket": "Détour : un butin plus intéressant, un combat plus difficile",
@@ -277,7 +278,12 @@
     "title": "Le « Core Heart » est ouvert",
     "intro": "Toutes les décisions que tu as prises ici sont désormais autant de portes. Seules celles que tu as méritées s'ouvriront.",
     "thin": "Echo : « Vous n'avez pas été très convaincant, capitaine. Deux portes, et les deux ont haussé les épaules. »",
-    "axis": "Résonance ↔ Axe de stabilité : {{n}}"
+    "axis": "Résonance ↔ Axe de stabilité : {{n}}",
+    "deepTitle": "Past the Core",
+    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
+    "thresholdTag": "Or do not end it",
+    "thresholdCross": "Cross the threshold",
+    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
   },
   "ending": {
     "next": "Continuer",
@@ -344,7 +350,9 @@
     "cursed": "La voie maudite : les interférences s'intensifient",
     "unstable": "Ligne instable : son contenu a été recalculé",
     "pocket": "La poche de détour : un risque accru, mais aussi un gain accru",
-    "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte"
+    "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte",
+    "inversion": "Inverted row: systems resolve last to first",
+    "storm": "Probability storm: one placed die re-rolls at resolution"
   },
   "tag": {
     "red": "Rouge",

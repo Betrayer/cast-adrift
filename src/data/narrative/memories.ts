@@ -67,6 +67,7 @@ export const FINAL_MEMORY_BY_ENDING: Readonly<Record<string, string>> = {
   merge: "memory-16-merge",
   bargain: "memory-16-bargain",
   silent: "memory-16-silent",
+  answer: "memory-16-answer",
 };
 
 export const FINAL_MEMORY_IDS: readonly string[] = Object.values(

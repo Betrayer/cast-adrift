@@ -36,7 +36,8 @@
       "event": "Wydarzenie",
       "anomaly": "Anomalia",
       "beacon": "Latarnia",
-      "boss": "Szef"
+      "boss": "Szef",
+      "inverted": "inverted"
     },
     "previewNode": "{{type}} · ryzyko: {{risk}}",
     "previewPocket": "Objazd: lepsze łupy, trudniejsza walka",
@@ -277,7 +278,12 @@
     "title": "Serce Rdzenia jest otwarte",
     "intro": "Wszystko, o czym tu zdecydowałeś, stało się teraz drzwiami. Otworzą się tylko te, na które zasłużyłeś.",
     "thin": "Echo: „Nie do końca to doprecyzowałeś, kapitanie. Dwoje ludzi, oboje wzruszają ramionami”.",
-    "axis": "Rezonans ↔ Oś stabilności: {{n}}"
+    "axis": "Rezonans ↔ Oś stabilności: {{n}}",
+    "deepTitle": "Past the Core",
+    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
+    "thresholdTag": "Or do not end it",
+    "thresholdCross": "Cross the threshold",
+    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
   },
   "ending": {
     "next": "Kontynuuj",
@@ -344,7 +350,9 @@
     "cursed": "Przeklęta linia: nasilają się zakłócenia",
     "unstable": "Niestabilny wiersz: jego zawartość została ponownie wygenerowana",
     "pocket": "Kieszeń „objazdowa”: większe ryzyko, większa nagroda",
-    "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie"
+    "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie",
+    "inversion": "Inverted row: systems resolve last to first",
+    "storm": "Probability storm: one placed die re-rolls at resolution"
   },
   "tag": {
     "red": "Czerwony",

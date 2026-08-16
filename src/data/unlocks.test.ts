@@ -45,7 +45,7 @@ describe("unlock wave tables", () => {
     const achievement = UNLOCKS.filter(
       (def) => def.kind === "diceWave" && def.source.achievement !== undefined,
     ).flatMap((def) => def.dice ?? []);
-    expect(achievement).toHaveLength(14);
+    expect(achievement).toHaveLength(18);
   });
 
   it("partitions all 20 contracts", () => {

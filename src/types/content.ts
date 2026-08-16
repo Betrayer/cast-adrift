@@ -61,7 +61,10 @@ export type Intent =
   | { t: "siphonShield"; n: number }
   | { t: "bargain"; n: number; heal: number }
   | { t: "enrage"; n: number }
-  | { t: "hijack" };
+  | { t: "hijack" }
+  | { t: "echoTotal"; cap: number }
+  | { t: "foldOrder" }
+  | { t: "devourDie" };
 
 export type IntentKind = Intent["t"];
 
@@ -89,6 +92,9 @@ export const INTENT_KINDS: readonly IntentKind[] = [
   "bargain",
   "enrage",
   "hijack",
+  "echoTotal",
+  "foldOrder",
+  "devourDie",
 ];
 
 export type StepCond =

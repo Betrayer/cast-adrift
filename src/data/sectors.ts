@@ -2,7 +2,7 @@ import type { NodeType } from "@/game/map/types";
 import type { LocKey } from "@/types/content";
 import type { EventEffect } from "@/types/events";
 
-export type SectorId = 1 | 2 | 3 | 4 | 5;
+export type SectorId = 1 | 2 | 3 | 4 | 5 | 6;
 
 export interface NodeQuotas {
   elites: readonly [number, number];
@@ -27,7 +27,9 @@ export type SectorMotif =
       blessed: readonly EventEffect[];
       cursed: readonly EventEffect[];
     }
-  | { m: "collapse"; rows: number; chance: number };
+  | { m: "collapse"; rows: number; chance: number }
+  | { m: "inversion"; rows: number }
+  | { m: "storm"; rows: number };
 
 export type MotifKind = SectorMotif["m"];
 
@@ -181,6 +183,31 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
       ["anomaly", 3],
       ["event", 2],
       ["shop", 2],
+    ],
+    anomalyTiers: [3, 5],
+  },
+  6: {
+    bossRow: 16,
+    gateRow: 9,
+    lanes: 3,
+    branchiness: 0.65,
+    quotas: {
+      elites: [2, 2],
+      events: [10, 12],
+      shops: 1,
+      shipyards: 1,
+      anomalies: 2,
+      beacons: 1,
+    },
+    motifs: [
+      { m: "inversion", rows: 3 },
+      { m: "storm", rows: 3 },
+    ],
+    pockets: [2, 2],
+    pocketTable: [
+      ["anomaly", 3],
+      ["event", 3],
+      ["shipyard", 2],
     ],
     anomalyTiers: [3, 5],
   },
@@ -431,16 +458,73 @@ export const SECTORS: readonly SectorDef[] = [
     scrapMult: 1.4,
     beaconId: "coreThreshold",
   },
+  {
+    id: 6,
+    name: "content:sectors.6",
+    accent: "#B9C6D6",
+    wash: "#141A21",
+    enemyPool: [
+      ["retroEcho", 3],
+      ["foldWraith", 3],
+      ["slowStrider", 2],
+      ["oddsEater", 2],
+      ["causalSplinter", 3],
+      ["preEcho", 2],
+      ["hushHerald", 2],
+      ["paradoxLoom", 2],
+      ["causalityLoop", 1],
+      ["probabilityKnot", 1],
+      ["voidWarden", 1],
+      ["retrocausalMote", 1],
+    ],
+    pairPool: [
+      ["retroEcho", "foldWraith"],
+      ["hushHerald", "oddsEater"],
+      ["paradoxLoom", "causalSplinter"],
+      ["preEcho", "retroEcho"],
+      ["slowStrider", "causalSplinter"],
+      ["foldWraith", "probabilityKnot"],
+      ["oddsEater", "retrocausalMote"],
+      ["hushHerald", "causalityLoop"],
+    ],
+    elitePool: [
+      "coreSentinel",
+      "riftTyrant",
+      "capacitorWraith",
+      "choirCantor",
+      "brineSiphon",
+    ],
+    minibossPool: ["foldTyrant", "hushWarden", "resonator"],
+    bossPool: ["theHush", "echoFleet"],
+    tideCap: 5,
+    encounter: {
+      bespokeWeight: 14,
+      threatCap: 46,
+      sizeWeights: [4, 2, 0.5],
+    },
+    shape: SHAPES[6],
+    scaling: { hpPct: 72, pocketPct: 30 },
+    scrapMult: 1.5,
+    beaconId: "thresholdBeacon",
+  },
 ];
 
-export const SECTOR_COUNT = SECTORS.length;
+// The length of a standard campaign, which is what every call site of this
+// constant means: where the finale routes, where drift's content clamp lands,
+// how many sector clears a run can bank. Sector 6 lives past it by invitation
+// only, so it is deliberately not `SECTORS.length`.
+export const CAMPAIGN_SECTORS = 5;
+
+export const SECTOR_COUNT = CAMPAIGN_SECTORS;
+
+export const SECTOR_SIX: SectorId = 6;
 
 export const SECTOR_BY_ID: ReadonlyMap<number, SectorDef> = new Map(
   SECTORS.map((def) => [def.id, def]),
 );
 
 export const sectorDef = (sector: number): SectorDef => {
-  const clamped = Math.max(1, Math.min(SECTOR_COUNT, Math.round(sector)));
+  const clamped = Math.max(1, Math.min(SECTORS.length, Math.round(sector)));
   const def = SECTOR_BY_ID.get(clamped);
   if (def === undefined) throw new Error(`sectorDef: unknown sector ${String(sector)}`);
   return def;

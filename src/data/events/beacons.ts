@@ -371,6 +371,66 @@ export const BEACON_EVENTS: readonly EventDef[] = [
       },
     ],
   },
+  // «За Ядром»'s own beacon. It does not add a sixth counter — the five-beacon
+  // network is the campaign's — it hands the keeper's last hint to a captain who
+  // has already resolved all five, and writes the flag the true ending reads.
+  {
+    id: "thresholdBeacon",
+    kind: "beacon",
+    weight: 1,
+    speaker: "beaconKeeper",
+    requires: { sector: [6] },
+    text: "content:events.thresholdBeacon.text",
+    codex: "thresholdBeacon",
+    options: [
+      {
+        id: "hold",
+        label: "content:events.thresholdBeacon.hold",
+        requires: { req: "axis", min: -2, max: 2 },
+        outcomes: [
+          {
+            text: "content:events.thresholdBeacon.holdOut",
+            effects: [
+              { k: "flag", key: "thresholdHeard" },
+              { k: "hull", n: 10 },
+            ],
+            codex: "thresholdBeacon",
+            consequence: "content:consequence.thresholdHeard",
+          },
+        ],
+      },
+      {
+        id: "commit",
+        label: "content:events.thresholdBeacon.commit",
+        outcomes: [
+          {
+            text: "content:events.thresholdBeacon.commitOut",
+            effects: [
+              { k: "flag", key: "thresholdCommitted" },
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 3 },
+              { k: "scrap", n: 50 },
+            ],
+            consequence: "content:consequence.thresholdCommitted",
+          },
+        ],
+      },
+      {
+        id: "walk",
+        label: "content:events.thresholdBeacon.walk",
+        outcomes: [
+          {
+            text: "content:events.thresholdBeacon.walkOut",
+            effects: [
+              { k: "flag", key: "thresholdWalked" },
+              { k: "tide", n: -1 },
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+            ],
+            consequence: "content:consequence.thresholdWalked",
+          },
+        ],
+      },
+    ],
+  },
 ];
 
 export const BEACON_FLAGS: readonly string[] = [

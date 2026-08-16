@@ -71,7 +71,10 @@
     "siphonShield": "Syfon „{{n}}” – tarcza",
     "bargain": "{{n}} z Bills: albo złom, albo kadłub",
     "enrage": "Enrages + {{n}}",
-    "hijack": "Przejmuje twoją najlepszą kostkę"
+    "hijack": "Przejmuje twoją najlepszą kostkę",
+    "echoTotal": "echoes your last turn (max {{n}})",
+    "foldOrder": "folds the order",
+    "devourDie": "eats your best spare die"
   },
   "slot": {
     "weaponA": "Broń A",
@@ -107,9 +110,15 @@
     "bargain": "OFERTA",
     "enrage": "RAGE",
     "hijack": "HIJACK",
-    "ward": "WARD"
+    "ward": "WARD",
+    "fold": "FOLD",
+    "devour": "EATEN"
   },
   "enemyWard": "Okręg: {{school}}",
   "enemyGate": "Strona główna {{n}}",
-  "enemyRage": "Rage i{{n}}"
+  "enemyRage": "Rage i{{n}}",
+  "inverted": "INVERTED ORDER",
+  "invertedHint": "Reactor first, Sensors last.",
+  "storm": "PROBABILITY STORM",
+  "stormHint": "One placed die re-rolls before anything resolves."
 }

@@ -1,4 +1,5 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { isInverted } from "@/game/battle/order";
 import { canPlaceDie, isSlotBlocked } from "@/game/battle/setup";
 import type { BattleSnapshot, RolledDie, SlotId } from "@/types/battle";
 
@@ -136,8 +137,14 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
     if (engineDie !== undefined) tryPlace(engineDie, "engines");
   }
 
-  const sensorDie = [...available()].sort((a, b) => a.value - b.value)[0];
-  if (sensorDie !== undefined) tryPlace(sensorDie, "sensors");
+  // On an inverted row Sensors resolve after the guns, so the mark they lay is
+  // worth nothing this turn. A competent player stops feeding the slot and pours
+  // the die into the reactor instead; without this the bot reads every inverted
+  // node as a flat damage loss it never chose.
+  if (!isInverted(snapshot)) {
+    const sensorDie = [...available()].sort((a, b) => a.value - b.value)[0];
+    if (sensorDie !== undefined) tryPlace(sensorDie, "sensors");
+  }
 
   placeWeapons([...available()].sort((a, b) => b.value - a.value));
 

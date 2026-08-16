@@ -19,7 +19,8 @@ export type AnalyticsEvent =
   | { name: "ending"; params: { id: string; ascension: number } }
   | { name: "meta_purchase"; params: { kind: string } }
   | { name: "daily_played"; params: { date: string; score: number } }
-  | { name: "contract_star"; params: { contract: string; stars: number } };
+  | { name: "contract_star"; params: { contract: string; stars: number } }
+  | { name: "threshold"; params: { ascension: number; axis: number } };
 
 type EventParams = Record<string, string | number | boolean>;
 

@@ -64,7 +64,7 @@ import {
   SECTOR_ROSTERS,
   isEncounterGroup,
 } from "../src/data/enemies";
-import { sectorDef } from "../src/data/sectors";
+import { SECTORS, sectorDef } from "../src/data/sectors";
 import { ALL_EVENTS } from "../src/data/events";
 import { CHAINS, CHAIN_EVENT_IDS } from "../src/data/narrative/chains";
 import { ENDINGS } from "../src/data/narrative/endings";
@@ -424,10 +424,10 @@ for (const kind of INTENT_KINDS) {
 }
 
 const ROSTER_TARGET: Readonly<Record<string, number>> = {
-  base: 55,
+  base: 63,
   elite: 14,
-  miniboss: 12,
-  boss: 10,
+  miniboss: 14,
+  boss: 12,
 };
 const rosterCount = new Map<string, number>();
 for (const enemy of ALL_ENEMIES) {
@@ -440,15 +440,18 @@ for (const [tier, want] of Object.entries(ROSTER_TARGET)) {
     errors.push(`enemies: ${tier} roster holds ${String(got)}, target ${String(want)}`);
 }
 
-// Sector parity: ten bespoke base enemies per sector, and the sector's own draw
-// pool has to actually contain at least eight of them.
-const BESPOKE_PER_SECTOR = 10;
+// Sector parity: ten bespoke base enemies per campaign sector, and the sector's
+// own draw pool has to actually contain at least eight of them. «За Ядром» is
+// eight — it is a shorter act by design and leans on a scaled reuse pool for the
+// rest, which the pool floor below still holds it to.
+const BESPOKE_PER_SECTOR: readonly number[] = [10, 10, 10, 10, 10, 8];
 const POOL_BESPOKE_FLOOR = 8;
 SECTOR_ROSTERS.forEach((roster, index) => {
   const sector = index + 1;
-  if (roster.length !== BESPOKE_PER_SECTOR)
+  const want = BESPOKE_PER_SECTOR[index] ?? 10;
+  if (roster.length !== want)
     errors.push(
-      `enemies: sector ${String(sector)} has ${String(roster.length)} bespoke base enemies, target ${String(BESPOKE_PER_SECTOR)}`,
+      `enemies: sector ${String(sector)} has ${String(roster.length)} bespoke base enemies, target ${String(want)}`,
     );
   const ids = new Set(roster.map((e) => e.id));
   const inPool = sectorDef(sector).enemyPool.filter(([id]) => ids.has(id)).length;
@@ -490,7 +493,7 @@ if (variedPct < VARIED_PCT)
 // Rotation: every sector needs a real draw for its gate row and its boss, and
 // every def in the roster has to be reachable from some pool.
 const reachable = new Set<string>();
-for (let sector = 1; sector <= 5; sector += 1) {
+for (let sector = 1; sector <= SECTOR_ROSTERS.length; sector += 1) {
   const def = sectorDef(sector);
   if (def.minibossPool.length < 3)
     errors.push(
@@ -824,7 +827,7 @@ for (const event of ALL_EVENTS) {
 // R7 quality bars. Counts alone were how the v1 pool got to 100 events with 84
 // of them offering exactly two options, so every number here has a shape rule
 // beside it.
-const EVENT_TOTAL = 164;
+const EVENT_TOTAL = 177;
 const CALLBACK_TARGET = 55;
 const THREE_OPTION_PCT = 35;
 const WEIGHTED_TARGET = 25;
@@ -834,8 +837,9 @@ const SECTOR_TARGET: Readonly<Record<string, number>> = {
   S3: 22,
   S4: 20,
   S5: 20,
+  S6: 12,
   common: 35,
-  beacon: 6,
+  beacon: 7,
 };
 
 if (ALL_EVENTS.length < EVENT_TOTAL)
@@ -1046,7 +1050,7 @@ for (const chain of CHAINS) {
     errors.push(`chains: "${chain.id}" has no step that pays anything out`);
 }
 
-const EPILOGUE_TARGET = 24;
+const EPILOGUE_TARGET = 30;
 if (EPILOGUE_ENTRIES.length < EPILOGUE_TARGET)
   errors.push(
     `epilogue: expected at least ${String(EPILOGUE_TARGET)} entries, found ${String(EPILOGUE_ENTRIES.length)}`,
@@ -1055,8 +1059,11 @@ for (const entry of EPILOGUE_ENTRIES) checkLocKey(`epilogue.${entry.id}`, entry.
 for (const line of DEATH_LINES) checkLocKey(`death.${line.id}`, line.text);
 for (const ending of ENDINGS) {
   for (const beat of ending.beats) checkLocKey(`ending.${ending.id}`, beat);
+  for (const beat of ending.deepBeats ?? [])
+    checkLocKey(`ending.${ending.id}.deep`, beat);
   for (const v of ending.variants ?? []) checkLocKey(`ending.${v.id}`, v.text);
 }
+for (const def of SECTORS) checkLocKey(`sectors.${String(def.id)}`, def.name);
 
 for (const entry of CODEX) {
   checkLocKey(`codex.${entry.id}`, entry.title);
@@ -1175,7 +1182,7 @@ PUZZLE_BELL.forEach((want, index) => {
     );
 });
 
-const BARK_LINE_TOTAL = 150;
+const BARK_LINE_TOTAL = 157;
 let barkLines = 0;
 const barkByQuota = new Map<string, number>();
 for (const bark of BARKS) {
@@ -1209,12 +1216,12 @@ for (const [trigger, quota] of Object.entries(BARK_QUOTA)) {
 
 const MODULE_TOTAL = 60;
 const ENGRAVING_TOTAL = 50;
-const FRAGMENT_TOTAL = 100;
+const FRAGMENT_TOTAL = 120;
 const GATED_FRAGMENT_TARGET = 15;
-const KEEPER_TOTAL = 80;
+const KEEPER_TOTAL = 92;
 const KEEPER_REACTIVE_TARGET = 30;
-const DICE_TOTAL = 90;
-const DOSSIER_TOTAL = 91;
+const DICE_TOTAL = 94;
+const DOSSIER_TOTAL = 103;
 
 checkUniqueIds("modules", ALL_MODULES.map((m) => m.id));
 checkUniqueIds("engravings", ENGRAVINGS.map((e) => e.id));
@@ -1430,7 +1437,7 @@ for (const def of CONTRACTS) {
   }
 }
 
-const ACHIEVEMENT_COUNT = 30;
+const ACHIEVEMENT_COUNT = 32;
 const ACHIEVEMENT_GATES = 8;
 const ACHIEVEMENT_FLAG_READERS = 6;
 

@@ -340,7 +340,7 @@ const main = async (): Promise<void> => {
     (await desktop.locator("[data-badge]").count()) === 2,
   );
   const achRows = await desktop.locator("[data-achievement]").count();
-  check("profile renders all 30 achievements", achRows === 30, `${String(achRows)} rows`);
+  check("profile renders every achievement", achRows === 32, `${String(achRows)} rows`);
   const achUnlocked = await desktop
     .locator('[data-achievement-state="unlocked"]')
     .count();
@@ -372,7 +372,7 @@ const main = async (): Promise<void> => {
   await setMeta(desktop, { ascension: { campaign: 6 }, dieSkin: "default" });
   await go(desktop, "settings");
   const skins = await desktop.locator("[data-skin]").count();
-  check("settings offers every die skin", skins === 6, `${String(skins)} cards`);
+  check("settings offers every die skin", skins === 7, `${String(skins)} cards`);
   const skinHints = await desktop.locator("[data-skin-hint]").count();
   check(
     "a locked skin states its route",
@@ -402,6 +402,7 @@ const main = async (): Promise<void> => {
         firstEnding: 25,
         hullClear: 15,
         streak: 10,
+        deepClear: 0,
         ascension: 0,
         total: 492,
       },

@@ -45,9 +45,10 @@ const firstKillBarks: readonly BarkDef[] = FIRST_KILL_ENEMIES.map((id) => ({
 }));
 
 // Echo barks (DESIGN §2.1 target: 150 lines). Quota per trigger:
-// resume 10 · sectorEnter 15 · lowHull 10 · firstKill 20 · bossPhase 10 ·
+// resume 10 · sectorEnter 18 · lowHull 10 · firstKill 20 · bossPhase 10 ·
 // minibossIntro 6 · setComplete 7 · rareLoot 12 · tideUp 6 · eventOutcome 10+10 ·
-// idleMap 6 · battleWin 12 · nearDeathWin 6 · levelUp 6 · memory 4 = 150.
+// idleMap 6 · battleWin 12 · nearDeathWin 6 · levelUp 6 · memory 4 ·
+// threshold 4 = 157.
 export const BARKS: readonly BarkDef[] = [
   { id: "levelUp", trigger: "levelUp", lines: lines("levelUp", 6), weight: 1, cooldownSec: 30 },
   { id: "resume", trigger: "resume", lines: lines("resume", 10), weight: 1, cooldownSec: 120 },
@@ -59,6 +60,8 @@ export const BARKS: readonly BarkDef[] = [
   { id: "sectorEnter3", trigger: "sectorEnter:3", lines: lines("sectorEnter3", 3), weight: 1, cooldownSec: 300 },
   { id: "sectorEnter4", trigger: "sectorEnter:4", lines: lines("sectorEnter4", 3), weight: 1, cooldownSec: 300 },
   { id: "sectorEnter5", trigger: "sectorEnter:5", lines: lines("sectorEnter5", 3), weight: 1, cooldownSec: 300 },
+  { id: "sectorEnter6", trigger: "sectorEnter:6", lines: lines("sectorEnter6", 3), weight: 1, cooldownSec: 300 },
+  { id: "threshold", trigger: "threshold", lines: lines("threshold", 4), weight: 1, cooldownSec: 600 },
   { id: "lowHull", trigger: "lowHull", lines: lines("lowHull", 10), weight: 1, cooldownSec: 60 },
   { id: "battleWin", trigger: "battleWin", lines: lines("battleWin", 12), weight: 1, cooldownSec: 45 },
   { id: "nearDeathWin", trigger: "nearDeathWin", lines: lines("nearDeathWin", 6), weight: 1, cooldownSec: 60 },
@@ -77,7 +80,7 @@ export const BARK_LINE_TOTAL = BARKS.reduce((n, b) => n + b.lines.length, 0);
 // instead of quietly making Echo repetitive.
 export const BARK_QUOTA: Readonly<Record<string, number>> = {
   resume: 10,
-  sectorEnter: 15,
+  sectorEnter: 18,
   lowHull: 10,
   firstKill: 20,
   bossPhase: 10,
@@ -92,4 +95,5 @@ export const BARK_QUOTA: Readonly<Record<string, number>> = {
   nearDeathWin: 6,
   levelUp: 6,
   memory: 4,
+  threshold: 4,
 };
