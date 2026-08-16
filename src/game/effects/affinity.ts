@@ -1,5 +1,6 @@
 import { AFFINITY, affinitySchoolForSlot, slotInAffinity } from "@/data/slots";
-import type { BattleCtx, ResolveScope } from "@/game/effects/context";
+import { BattleCtx, type ResolveScope } from "@/game/effects/context";
+import type { EffectCtx } from "@/game/effects/ctx";
 import type { EffectSource } from "@/game/effects/pipeline";
 import type { RolledDie } from "@/types/battle";
 import type { School } from "@/types/content";
@@ -28,9 +29,10 @@ const applyAffinity = (scope: ResolveScope, school: School): void => {
 
 export const buildAffinitySource = (): EffectSource => ({
   key: "affinity",
-  run: (hook, ctx: BattleCtx, subject: RolledDie | null) => {
+  run: (hook, ctx: EffectCtx, subject: RolledDie | null) => {
     if (hook !== "beforeResolveSlot") return;
-    if (ctx.scope === null || subject === null) return;
+    if (!(ctx instanceof BattleCtx) || ctx.scope === null || subject === null)
+      return;
     applyAffinity(ctx.scope, subject.school);
   },
 });

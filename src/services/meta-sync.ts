@@ -25,9 +25,7 @@ const localAt = (): number => {
 const setLocalAt = (at: number): void => {
   try {
     localStorage.setItem(LOCAL_AT_KEY, String(at));
-  } catch {
-    /* storage unavailable */
-  }
+  } catch {}
 };
 
 const metaValues = (): MetaValues => {
@@ -47,6 +45,8 @@ const metaValues = (): MetaValues => {
     badges: s.badges,
     codex: s.codex,
     codexRead: s.codexRead,
+    seenPuzzles: s.seenPuzzles,
+    seenFragments: s.seenFragments,
     contracts: s.contracts,
     dailyPlayed: s.dailyPlayed,
     best: s.best,
@@ -54,6 +54,12 @@ const metaValues = (): MetaValues => {
     flagsArchive: s.flagsArchive,
     bossFirstKills: s.bossFirstKills,
     endings: s.endings,
+    achievements: s.achievements,
+    achievementsSeen: s.achievementsSeen,
+    encountered: s.encountered,
+    unlocksGranted: s.unlocksGranted,
+    unlocksSeen: s.unlocksSeen,
+    dieSkin: s.dieSkin,
     stats: s.stats,
   };
 };

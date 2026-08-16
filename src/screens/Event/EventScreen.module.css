@@ -1,0 +1,42 @@
+.beaconFrame {
+  position: relative;
+  border-color: var(--ca-beacon-line);
+  box-shadow: 0 0 34px -14px var(--ca-beacon-glow);
+}
+
+.beaconFrame::before {
+  content: '';
+  position: absolute;
+  inset: 6px;
+  border-radius: 8px;
+  border: 1px solid var(--ca-beacon-line);
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.beaconKicker {
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.beaconPips {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.pip {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  border: 1px solid var(--ca-beacon-line);
+}
+
+.pip[data-lit='true'] {
+  background: var(--ca-beacon-glow);
+}
+
+.pip[data-current='true'] {
+  box-shadow: 0 0 8px 1px var(--ca-beacon-glow);
+}

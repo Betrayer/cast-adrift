@@ -7,7 +7,6 @@ import {
   startDriftRun,
   tideCapFor,
 } from "@/game/run/flow";
-import { BOSS_ROW } from "@/game/map/types";
 import { claimDailyAttempt } from "@/game/run/boards";
 import {
   contentSector,
@@ -67,7 +66,7 @@ describe("drift mode", () => {
     expect(run.sector).toBe(1);
     const nodes = run.map?.nodes ?? [];
     expect(nodes.some((n) => n.type === "boss")).toBe(false);
-    const last = nodes.filter((n) => n.row === BOSS_ROW);
+    const last = nodes.filter((n) => n.row === (run.map?.shape.bossRow ?? 0));
     expect(last.length).toBeGreaterThan(0);
     for (const node of last) expect(node.type).toBe("miniboss");
   });

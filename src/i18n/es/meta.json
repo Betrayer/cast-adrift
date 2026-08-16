@@ -72,7 +72,40 @@
     "keyStormChaser": "Cazador de tormentas",
     "keyIronDoctrine": "La doctrina de hierro",
     "keyFatesFavorite": "El favorito del destino",
-    "keyPrismCascade": "Cascada Prism"
+    "keyPrismCascade": "Cascada Prism",
+    "selectHint": "Pulsa en un nodo para ver para qué sirve.",
+    "filter": "Filtro",
+    "filterOn": "Filtro · {{n}}",
+    "filterClear": "Borrar filtro",
+    "pathCost": "Ruta desde aquí: {{n}} puntos (tienes {{have}})",
+    "refundFree": "Reembolso (gratis)",
+    "respecConfirmTitle": "¿Quieres devolver este nodo?",
+    "respecConfirmBody": "«{{name}}» vuelve al pozo y se recupera el punto. Coste: {{cost}}◈.",
+    "respecConfirmYes": "Reembolso",
+    "redPowderRoom": "Aseo de invitados",
+    "redRangeCard": "Ficha de alcance",
+    "redHairTrigger": "Gatillo sensible",
+    "redCoreBreach": "Brecha en el núcleo",
+    "blueStormAnchor": "Ancla para tormentas",
+    "blueSpillway": "Aliviadero",
+    "blueLongLens": "Objetivo de gran alcance",
+    "blueKeelPlate": "Placa de quilla",
+    "greenGraftBench": "Banco de injertos",
+    "greenSapline": "Sapline",
+    "greenLoam": "Tierra franca",
+    "greenHollow": "El Hueco",
+    "yellowTollhouse": "Tollhouse",
+    "yellowFinderFee": "Comisión de intermediación",
+    "yellowShortWeight": "Peso inferior al normal",
+    "yellowMintMark": "Marca de ceca",
+    "blackAshBed": "Cama de ceniza",
+    "blackDeadMansSwitch": "El interruptor de emergencia",
+    "blackTithe": "El diezmo",
+    "blackSlagHeap": "Montón de escoria",
+    "greyShimStack": "Pila de cuñas",
+    "greyPatternBook": "Libro de patrones",
+    "greyBallastTrim": "Ajuste del lastre",
+    "greyTallyStick": "Palo de conteo"
   },
   "chartFx": {
     "hubBudget": "+1 presupuesto para hangares",
@@ -90,7 +123,15 @@
       "growthCapDelta": "{{n}} límite de crecimiento",
       "enginesThresholdDelta": "{{n}} umbral del motor",
       "markBonusDelta": "{{n}} bonificación por puntuación",
-      "battleEndHeal": "{{n}} curar / luchar"
+      "battleEndHeal": "{{n}} curar / luchar",
+      "hullMaxPct": "{{n}} % del casco máximo",
+      "extraRerolls": "{{n}} uso de la repetición",
+      "scrapPerKill": "{{n}} chatarra por presa",
+      "setCompleteCharge": "{{n}} precio de un juego completo",
+      "freeShopRerolls": "{{n}} repetición gratuita del contador",
+      "xpMultPct": "{{n}} % de XP",
+      "tideEffectDelta": "{{n}} ante la fuerza de la marea",
+      "moduleSlotDelta": "{{n}} compartimento para módulos"
     },
     "fx": {
       "weaponsMaxFace": "Armas +1 al tirar un dado de cara máxima",
@@ -115,25 +156,86 @@
       "redFirestorm": "El valor máximo de «face» en las armas añade «Burn 3»",
       "redSpine": "+4 en la montura espinal",
       "greenCanopy": "+3 en motores",
-      "blackWell": "El reactor tiene capacidad para 2 cargas más."
+      "blackWell": "El reactor tiene capacidad para 2 cargas más.",
+      "shopArrival": "+6 de chatarra al llegar a un mercado",
+      "tideWard": "Repara 1 punto de casco en cada salto mientras la marea sea 2+",
+      "detourScout": "+12 de chatarra al entrar en un desvío",
+      "redFinisher": "+2 al daño de las armas contra un objetivo con menos del 30 % de casco.",
+      "redSwarmFire": "+1 en armas mientras haya dos o más enemigos en pie.",
+      "redBurnBite": "Un impacto de arma contra un objetivo en llamas inflige 2 puntos de daño adicionales.",
+      "redRepeatCrit": "Un dado de arma que repite el último valor en los golpes críticos.",
+      "redSalvoTally": "A partir del tercer dado de arma de una batalla, +1 en armas.",
+      "redOpener": "El primer dado de arma del turno obtiene +2.",
+      "redRiskCharge": "Por debajo del 40 % de la vida del casco, termina cada turno con 1 carga.",
+      "redPowderRoom": "Cada impacto en un objetivo en llamas le inflige otra quemadura.",
+      "redHairTrigger": "El primer dado de arma del turno resulta un crítico.",
+      "redCoreBreach": "+3 en cualquier tirada contra un objetivo con menos del 25 % de casco.",
+      "blueOvershield": "Con 6 de escudo, una tirada de escudo suma 2 más.",
+      "blueStillness": "Un dado azul en los escudos obtiene +1.",
+      "blueDeepGuard": "Mantén 4 de escudo durante el turno del enemigo para curarte 1.",
+      "blueJamOnLow": "Si la tirada de un sensor es inferior a 4, se considera un 5.",
+      "blueWatch": "Un dado azul que haya caído con la cara de menor valor se vuelve a lanzar una vez.",
+      "blueBreakwater": "Empieza cada batalla con 3 de escudo.",
+      "blueSpillway": "Una tirada de 8 o más en la tirada de escudos añade 3 puntos de escudo.",
+      "blueLongLens": "+2 en sensores.",
+      "greenGrowOnEngines": "El número de caras máximas de un motor aumenta hasta +2.",
+      "greenTendril": "Si se obtiene un 6 o más con un dado verde, la tirada aumenta hasta +3.",
+      "greenMend": "Si terminas un turno con más del 30 % de vida del casco, recuperas 1 punto de vida.",
+      "greenRootHold": "+2 en los motores situados por debajo de la mitad del casco.",
+      "greenSpore": "Una batalla ganada cura 2.",
+      "greenQuietBerth": "Al llegar a un astillero, recuperas 2 puntos de vida.",
+      "greenSapline": "Si terminas un turno con 4 de escudo, te curas 2.",
+      "greenLoam": "El número de caras máximas de un motor aumenta hasta +3.",
+      "yellowTollBooth": "Al llegar a un encuentro se obtienen 8 chatarra.",
+      "yellowKickback": "Un dado amarillo da 2 chatarra cuando se resuelve.",
+      "yellowLuckyOpen": "El primer dado del turno, si sale su cara de mayor valor, da 6 chatarra.",
+      "yellowGleaner": "Un dado amarillo que caiga con la cara de menor valor da 4 chatarra.",
+      "yellowWager": "Si sale un dado en cualquiera de las dos caras extremas, se ganan 3 chatarra.",
+      "yellowTollhouse": "Al llegar a un mostrador, se obtienen 14 chatarra.",
+      "yellowMintMark": "Un troquel de reactor da 4 de chatarra.",
+      "blackBleedCharge": "+1 en los dados negros cuando el casco está por debajo del 60 %.",
+      "blackOvercap": "Los dados negros pueden superar el límite de una ranura para 2 de casco.",
+      "blackPactTithe": "Empieza cada batalla con 2 de carga y −2 de casco.",
+      "blackLastLight": "+2 en cada tirada cuando el casco esté por debajo del 25 %.",
+      "blackReactorTally": "A partir del momento en que el segundo reactor se apague, termina el turno con 1 carga.",
+      "blackSpite": "Por debajo de la mitad de los puntos de vida, el turno del enemigo termina con 1 carga.",
+      "blackNightWatch": "Un dado negro que salga en su cara de máximo valor otorga 1 carga.",
+      "blackAshBed": "Un dado en su cara de menor valor otorga 2 de carga.",
+      "blackDeadMansSwitch": "Si la vida del casco es inferior al 25 %, termina cada turno con 3 de carga.",
+      "blackSlagHeap": "+3 en el reactor mientras se mantienen 4 cargas.",
+      "greyScan": "Un empujoncito extra en cada tirada.",
+      "greyEvenKeel": "+1 para los dados grises.",
+      "greyCounterweight": "Un dado que no sea gris y esté en su cara más baja obtiene +1.",
+      "greyToolbelt": "Un uso adicional de la repetición de tirada por combate.",
+      "greySpare": "Una plaza de reserva adicional por batalla.",
+      "greyMirror": "Un dado gris que repite el último valor aumenta la repetición de la tirada en 1.",
+      "greyLedgerKeep": "Al acercarse a un mostrador se pagan 10 chatarra.",
+      "greyPatternBook": "Si un dado repite el último valor, se obtiene una tirada adicional.",
+      "greyTallyStick": "A partir del segundo dado de sensores, +2 en cada tirada."
     },
     "trait": {
       "obsidianPact": "Los dados negros solo dan el mínimo o el máximo.",
       "singleCast": "No se permiten repeticiones de tiradas",
-      "coldLogic": "Los empujones son gratis · los golpes críticos están desactivados"
-    }
+      "coldLogic": "Los empujones son gratis · los golpes críticos están desactivados",
+      "overflowShield": "La carga que supere el límite máximo se convierte en escudo.",
+      "fateTwice": "La ficha de «Destino» se puede jugar dos veces por batalla.",
+      "prismDouble": "Los dados prismáticos cuentan doble para la resonancia."
+    },
+    "budgetDelta": "{{n}} punto de hangar",
+    "slotTier": "{{slot}}: {{n}} cambio de tamaño de troquel"
   },
   "milestone": {
-    "budget": "Presupuesto del hangar +1",
+    "budget": "Presupuesto del hangar +2",
     "shipRam": "RAM desbloqueada",
-    "contractRow": "Segunda disputa contractual (próximamente)",
     "shipArk": "Arca desbloqueada",
-    "engraving": "Grabado estación (próximamente)",
-    "dailyPreview": "Avance diario (próximamente)",
-    "respecPrestige": "Reasignación gratuita de puntos de keystone (próximamente)"
+    "engraving": "Grabado estación abierta",
+    "dailyPreview": "Ya se puede ver el «Daily» de mañana",
+    "respecPrestige": "Reasignación de puntos gratuita + skin de prestigio",
+    "diceWave": "Dados Fusion en la estantería",
+    "contractWave": "Apertura de la ola de contratos",
+    "chartPoints": "Dos puntos de «Carta estelar»"
   },
   "levelup": {
-    "title": "Subir de nivel",
     "level": "Nivel de capitán {{level}}",
     "point": "+1 punto de «Carta estelar»",
     "points": "+{{n}} Carta estelar puntos",
@@ -143,7 +245,17 @@
     "shards": "Fragmentos",
     "xp": "XP",
     "level": "Nivel de capitán {{level}}",
-    "toNext": "{{into}} / {{need}} a la siguiente"
+    "toNext": "{{into}} / {{need}} a la siguiente",
+    "fromSectors": "Sectores despejados",
+    "fromBeacons": "Balizas resueltas",
+    "fromEnding": "Final de la primera vez",
+    "fromHull": "Despejado hasta la mitad del casco",
+    "fromStreak": "Racha sin muertes",
+    "fromAscension": "Bonificación por ascensión",
+    "fromFinds": "Primeros hallazgos",
+    "fromAchievements": "Logros",
+    "firstFinds": "Primera publicación: {{names}}",
+    "fromDeep": "Más allá de lo esencial"
   },
   "menu": {
     "level": "N.º{{level}}"
@@ -151,14 +263,10 @@
   "hangar": {
     "title": "Hangar",
     "deck": "Cubierta",
-    "collection": "Colección",
     "shop": "Meta Shop",
     "budget": "Presupuesto: {{used}} / {{max}}",
-    "pts": "{{n}} puntos",
-    "owned": "×{{n}}",
     "add": "Añadir",
     "buy": "Comprar · {{price}}◈",
-    "sold": "Propiedad de",
     "save": "Guardar baraja",
     "saved": "Guardado",
     "invalidOver": "Por encima del presupuesto",
@@ -167,20 +275,38 @@
     "invalidFate": "Máximo 1 dado de destino",
     "valid": "Listo",
     "empty": "La baraja está vacía",
-    "ship": "Barco",
     "shipEquip": "Equipar",
     "shipEquipped": "Equipado",
     "shipBuy": "Comprar · {{price}}◈",
     "shipLocked": "Se desbloquea en el nivel{{level}}",
-    "filterSchool": "Colegio",
-    "filterTier": "Nivel",
-    "filterRarity": "Rareza",
     "filterAll": "Todos"
   },
   "collection": {
     "title": "Colección",
-    "count": "{{n}} dados",
-    "owned": "×{{n}}"
+    "owned": "×{{n}}",
+    "discount": "−{{n}} % — ya te has enfrentado a este dado",
+    "found": "Cumplido",
+    "undiscovered": "Aún no lo he conocido",
+    "provenance": "Encontrado en: sector {{sector}}, {{node}}",
+    "stateAll": "Todos",
+    "stateOwned": "Propiedad de",
+    "stateFound": "Cumplido",
+    "stateUnknown": "Por descubrir",
+    "totals": "{{owned}} propiedad de · {{found}} se encontró con · {{total}} en la lista",
+    "node": {
+      "start": "el punto de caída",
+      "battle": "una escaramuza",
+      "elite": "una élite",
+      "miniboss": "una pelea en la puerta",
+      "boss": "un jefe",
+      "event": "un encuentro",
+      "shop": "un contador",
+      "shipyard": "un astillero",
+      "anomaly": "una brecha",
+      "beacon": "un faro",
+      "rest": "un amarre tranquilo",
+      "pocket": "un bolsillo"
+    }
   },
   "modes": {
     "title": "Modos",
@@ -202,7 +328,9 @@
     "open": "Abrir",
     "guardTitle": "Ya se ha puesto en marcha una carrera",
     "guardBody": "Hay una ranura de partida. Al iniciar este modo, se borra la partida actual, tanto localmente como en la nube.",
-    "guardYes": "Borrar e iniciar"
+    "guardYes": "Borrar e iniciar",
+    "dailyPreview": "Mañana ({{date}})",
+    "dailyPreviewLocked": "Los mutadores de mañana en el nivel{{n}}"
   },
   "contracts": {
     "title": "Contratos",
@@ -232,7 +360,9 @@
     "axisAtMost": "Termina con el eje en {{n}} o en una dirección inferior",
     "allBeaconsResolved": "Resuelve todas las balizas",
     "deckSchoolsAtLeast": "Termina con las escuelas de «{{n}}» en la baraja",
-    "dicePlacedAtMost": "Coloca como máximo {{n}} dados, todos en la misma fila."
+    "dicePlacedAtMost": "Coloca como máximo {{n}} dados, todos en la misma fila.",
+    "axisAtLeast": "Obtener una puntuación de {{n}} o superior en la prueba de estabilidad",
+    "elitesAtMost": "Superar la prueba con un máximo de {{n}} élites enfrentadas"
   },
   "drift": {
     "title": "Deriva más allá de",
@@ -281,7 +411,19 @@
     "none": "—",
     "place": "#{{rank}}",
     "endings": "Finales",
-    "locked": "Precintado"
+    "locked": "Precintado",
+    "achievements": "Logros",
+    "achProgress": "{{have}} / {{need}}",
+    "badges": "Insignias",
+    "achCount": "{{n}} de {{total}}",
+    "group": {
+      "combat": "Combate",
+      "economy": "Economía",
+      "puzzles": "Anomalías",
+      "story": "Historia",
+      "collection": "Colección",
+      "modes": "Modos"
+    }
   },
   "engraving": {
     "title": "Grabado Estación",
@@ -292,9 +434,265 @@
     "empty": "No lleva grabados.",
     "remove": "eliminar",
     "fitted": "ajustado",
-    "fit": "{{price}} ◈"
+    "fit": "{{price}} ◈",
+    "pair": "Combina con «{{name}}»"
   },
   "badge": {
-    "keeper": "Portero"
+    "keeper": "Portero",
+    "ascendant": "Ascendente",
+    "chartwright": "Chartwright",
+    "archivist": "Archivero",
+    "answer": "La respuesta"
+  },
+  "unlock": {
+    "opened": "Desbloqueado",
+    "new": "nuevo",
+    "locked": "Bloqueado",
+    "hintLevel": "nivel{{n}}",
+    "hintAchievement": "logro «{{name}}»",
+    "hintAscension": "Más información en A {{n}}",
+    "hintClears": "{{n}} la campaña se aclara",
+    "hintDrop": "una pieza única",
+    "hintJoin": " o ",
+    "hintUnknown": "desconocido",
+    "diceL8": "Seis marcos d8: uno por colegio",
+    "diceL15": "Seis dados de fusión",
+    "diceL22": "Seis piezas de dirección poco comunes",
+    "diceL30": "La estantería prismática",
+    "diceL38": "Seis unidades pesadas d12",
+    "diceL46": "Seis legendarios",
+    "diceAchFirstClear": "El estante de arriba",
+    "diceAchPuzzler": "Cuatro fusiones anómalas",
+    "diceAchCollector": "Tres fusiones de colectores",
+    "diceAchSurvivor": "Tres dados de superviviente",
+    "contractsL5": "Tres contratos: «Storm», «Bare Armor» y «Blind Jump»",
+    "contractsL12": "Tres contratos: Ram, Single Cast y Dead Reckoning",
+    "contractsL20": "Tres contratos: Ark, Keeper, Iron Marea",
+    "contractsL28": "Tres contratos: Choir, Prismwork, Ghost Lane",
+    "contractsA5": "Contrato: El diezmo del vacío",
+    "contractsAchGauntlet": "Contrato: «The Gauntlet»",
+    "skinAshen": "La piel de Die: Cenicienta",
+    "skinVoidglass": "La piel de Die: Voidglass",
+    "skinEmberglass": "La piel de Die: Emberglass",
+    "prestigeTheme": "Tema: Ascendente",
+    "skinPrestige50": "La piel de Die: Captain's Mark",
+    "skinChartwright": "La piel: Chartwright",
+    "featureShipRam": "El Carnero",
+    "featureShipArk": "El Arca",
+    "featureEngraving": "Grabado estación",
+    "featureDailyPreview": "Resumen diario",
+    "featureFreeRespec": "Reasignación gratuita de puntos de habilidad de Keystone",
+    "sectorSix": "Sector 6 «Más allá del núcleo»",
+    "diceS6": "Cuatro dados de causalidad",
+    "skinThreshold": "La piel de «Threshold»"
+  },
+  "skin": {
+    "title": "Las pieles",
+    "hint": "Es solo una cuestión estética: la piel nunca cambia los resultados de un dado.",
+    "use": "Uso",
+    "active": "Activo",
+    "default": {
+      "name": "Estándar",
+      "desc": "La fachada de la fábrica."
+    },
+    "ashen": {
+      "name": "Ceniciento",
+      "desc": "Esquinas marcadas, vetas de fresno, sin brillo."
+    },
+    "voidglass": {
+      "name": "Voidglass",
+      "desc": "Redondo, profundo, iluminado desde dentro."
+    },
+    "emberglass": {
+      "name": "Emberglass",
+      "desc": "Borde de color ámbar intenso, centro cálido."
+    },
+    "prestige50": {
+      "name": "La marca del capitán",
+      "desc": "Glifos con serifas, borde blanco."
+    },
+    "chartwright": {
+      "name": "Chartwright",
+      "desc": "Cuadrado de plano, glifos monocromáticos."
+    },
+    "threshold": {
+      "name": "Umbral",
+      "desc": "Redonda, apagada, con un borde de color gris claro. La llevaba el único capitán que nunca se inclinó."
+    }
+  },
+  "ach": {
+    "firstBlood": {
+      "name": "Primera sangre",
+      "desc": "Elimina a 25 enemigos."
+    },
+    "hunter": {
+      "name": "Cazador",
+      "desc": "Mata a 500 enemigos."
+    },
+    "eliteHunter": {
+      "name": "Cazador de élite",
+      "desc": "Elimina a 25 enemigos de élite."
+    },
+    "sectorFive": {
+      "name": "Cinco coronas",
+      "desc": "Elimina a los cinco jefes de sector."
+    },
+    "ironStreak": {
+      "name": "Racha de hierro",
+      "desc": "Supera tres campañas seguidas sin morir."
+    },
+    "flawless": {
+      "name": "Impecable",
+      "desc": "Supera una campaña con un 90 % o más de integridad del casco."
+    },
+    "ascendant": {
+      "name": "Ascendente",
+      "desc": "Supera la campaña en Ascensión 10."
+    },
+    "quickWork": {
+      "name": "Trabajo rápido",
+      "desc": "Supera una campaña en 11 saltos o menos."
+    },
+    "scrapper": {
+      "name": "Desguazador",
+      "desc": "Consigue un total de 5 000 chatarra."
+    },
+    "tycoon": {
+      "name": "Magnate",
+      "desc": "Consigue un total de 25 000 chatarra."
+    },
+    "frugal": {
+      "name": "Ahorrativo",
+      "desc": "Supera una campaña sin gastar ni un céntimo."
+    },
+    "outfitter": {
+      "name": "Proveedor de equipamiento",
+      "desc": "Tienes 30 dados diferentes."
+    },
+    "tierFive": {
+      "name": "Nivel cinco",
+      "desc": "Resuelve una anomalía de nivel 5."
+    },
+    "cryptographer": {
+      "name": "Criptógrafo",
+      "desc": "Resuelve diez anomalías de nivel 5."
+    },
+    "anomalist": {
+      "name": "Anomalista",
+      "desc": "Resuelve cuatro anomalías de una sola vez."
+    },
+    "puzzleBreadth": {
+      "name": "Bien leído",
+      "desc": "Descubre 30 anomalías diferentes."
+    },
+    "maraSquared": {
+      "name": "El libro de cuentas de Mara",
+      "desc": "Ten una deuda con Mara y cuida de ganarte su favor."
+    },
+    "keeperFriend": {
+      "name": "El hilo del guardián",
+      "desc": "Devuelve lo que le debes al Guardián y reconstruye el faro."
+    },
+    "fleetKept": {
+      "name": "Palabra cumplida",
+      "desc": "Mantén la verdad de la flota."
+    },
+    "apostate": {
+      "name": "Apóstata",
+      "desc": "Rompe el pacto del coro."
+    },
+    "bothMirrors": {
+      "name": "Ambos espejos",
+      "desc": "Atá el espejo una vez y rómpelo una vez."
+    },
+    "coreTrilogy": {
+      "name": "Tres respuestas",
+      "desc": "Responde, guarda silencio y escucha tu interior — a lo largo de tres series."
+    },
+    "lighthouse": {
+      "name": "Faro",
+      "desc": "Enciende el faro."
+    },
+    "beaconkeeper": {
+      "name": "Guardián del faro",
+      "desc": "Supera cuatro balizas en una sola tanda."
+    },
+    "allEndings": {
+      "name": "Cada camino",
+      "desc": "Consigue los cuatro finales."
+    },
+    "fiftyFound": {
+      "name": "Cincuenta hallados",
+      "desc": "Descubre 50 dados diferentes en series."
+    },
+    "everyColour": {
+      "name": "Todos los colores",
+      "desc": "Ten un dado de cada una de las siete escuelas."
+    },
+    "archivist": {
+      "name": "Archivero",
+      "desc": "Desbloquea 60 entradas de «Códice»."
+    },
+    "keystoneThree": {
+      "name": "Chartwright",
+      "desc": "Sujeta tres piedras angulares a la vez."
+    },
+    "contractor": {
+      "name": "Contratista",
+      "desc": "Consigue 30 estrellas de contrato."
+    },
+    "toast": "Logro",
+    "beyondTheCore": {
+      "name": "Más allá de lo esencial",
+      "desc": "Cruza el umbral y despeja el Sector 6."
+    },
+    "theAnswer": {
+      "name": "La respuesta",
+      "desc": "Llega al final oculto más allá del Núcleo."
+    }
+  },
+  "chartTag": {
+    "red": "rojo",
+    "blue": "azul",
+    "green": "verde",
+    "yellow": "amarillo",
+    "black": "negro",
+    "grey": "gris",
+    "prismatic": "prismático",
+    "weapons": "armas",
+    "shields": "escudos",
+    "engines": "motores",
+    "sensors": "sensores",
+    "reactor": "reactor",
+    "spinal": "espinal",
+    "repairBay": "taller de reparación",
+    "burn": "quemarse",
+    "crit": "crit",
+    "growth": "crecimiento",
+    "reroll": "repetir tirada",
+    "charge": "cargo",
+    "scrap": "chatarra",
+    "overcap": "sobrecubierta",
+    "pierce": "perforar",
+    "dodge": "esquivar",
+    "survival": "supervivencia",
+    "control": "control",
+    "dice": "dados",
+    "shieldwall": "muro de escudos",
+    "risk": "riesgo",
+    "swarm": "enjambre",
+    "spike": "pico",
+    "precision": "precisión"
+  },
+  "ascension": {
+    "reward": {
+      "shards": "La recompensa de fragmentos aumenta con cada nivel",
+      "skinAshen": "la piel «Ashen»",
+      "contract": "contrato «El diezmo del Vacío»",
+      "skinVoidglass": "la piel «Voidglass»",
+      "skinEmberglass": "la piel «Emberglass»",
+      "prestigeTheme": "tema «Ascendente»",
+      "badge": "la insignia «Ascendant»"
+    }
   }
 }

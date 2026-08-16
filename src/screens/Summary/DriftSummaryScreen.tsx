@@ -9,6 +9,7 @@ import {
   Title,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { MUTATOR_BY_ID } from "@/data/mutators";
 import { abandonRun } from "@/game/run/flow";
@@ -36,8 +37,8 @@ export const DriftSummaryScreen = () => {
   const daily = result?.mode === "daily";
 
   return (
-    <Stack align="center" justify="center" mih="var(--ca-vh)" p="md" bg={tokens.bg}>
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder maw={420} w="100%">
+    <Screen centered>
+      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="sm">
           <Title order={2} c={tokens.text} ta="center">
             {t(daily ? "meta:drift.dailyTitle" : "meta:drift.title")}
@@ -121,6 +122,6 @@ export const DriftSummaryScreen = () => {
           </Button>
         </Stack>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

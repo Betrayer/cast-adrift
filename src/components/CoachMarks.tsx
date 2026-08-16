@@ -1,6 +1,7 @@
 import { Button } from '@mantine/core';
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { coachCardPlacement, type Bounds } from '@/components/coachPlacement';
 import {
   ALL_COACH_MARK_IDS,
   nextCoachMark,
@@ -14,19 +15,20 @@ import styles from './CoachMarks.module.css';
 
 const POLL_MS = 400;
 const CARD_W = 300;
-const CARD_H = 132;
+const EDGE = 12;
 
-const cardPosition = (rect: CoachRect): { left: number; top: number } => {
-  const margin = 12;
-  const below = rect.y + rect.h + margin;
-  const fitsBelow = below + CARD_H < window.innerHeight;
-  const top = fitsBelow ? below : Math.max(margin, rect.y - CARD_H - margin);
-  const left = Math.min(
-    Math.max(margin, rect.x + rect.w / 2 - CARD_W / 2),
-    window.innerWidth - CARD_W - margin,
-  );
-  return { left, top };
+const inset = (name: string): number => {
+  const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
+  const parsed = Number.parseFloat(raw);
+  return Number.isFinite(parsed) ? parsed : 0;
 };
+
+const safeBounds = (): Bounds => ({
+  top: inset('--ca-safe-top') + EDGE,
+  left: inset('--ca-safe-left') + EDGE,
+  right: window.innerWidth - inset('--ca-safe-right') - EDGE,
+  bottom: window.innerHeight - inset('--ca-safe-bottom') - EDGE,
+});
 
 interface MarkViewProps {
   mark: CoachMarkDef;
@@ -37,9 +39,31 @@ interface MarkViewProps {
 
 const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
   const { t } = useTranslation(['run', 'common']);
-  const { left, top } = cardPosition(rect);
+  const cardRef = useRef<HTMLDivElement | null>(null);
   const w = window.innerWidth;
   const h = window.innerHeight;
+
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    if (card === null) return;
+    const place = (): void => {
+      const { left, top } = coachCardPlacement(
+        rect,
+        { w: card.offsetWidth, h: card.offsetHeight },
+        safeBounds(),
+      );
+      card.style.left = `${String(left)}px`;
+      card.style.top = `${String(top)}px`;
+    };
+    place();
+    const observer = new ResizeObserver(place);
+    observer.observe(card);
+    window.addEventListener('resize', place);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', place);
+    };
+  }, [rect]);
   return (
     <div className={styles.root}>
       <div
@@ -77,7 +101,11 @@ const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
         className={styles.cutout}
         style={{ left: rect.x, top: rect.y, width: rect.w, height: rect.h }}
       />
-      <div className={styles.card} style={{ left, top, width: CARD_W }}>
+      <div
+        ref={cardRef}
+        className={styles.card}
+        style={{ width: Math.min(CARD_W, w - 2 * EDGE) }}
+      >
         <span className={styles.title}>{t(mark.title)}</span>
         <span className={styles.body}>{t(mark.body)}</span>
         <div className={styles.actions}>
@@ -93,9 +121,6 @@ const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
   );
 };
 
-// The anchors live in Pixi and in freshly mounted DOM, so the host samples
-// them on a timer rather than guessing when they exist. Remounting per screen
-// (via the key below) is what clears a stale mark on navigation.
 const CoachMarkHost = ({ screen }: { screen: ScreenId }) => {
   const seen = useMetaStore((s) => s.tutorialSeen);
   const markSeen = useMetaStore((s) => s.markTutorialSeen);

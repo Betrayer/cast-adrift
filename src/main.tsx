@@ -1,5 +1,6 @@
 import '@mantine/core/styles.css';
 import '@/app/global.css';
+import '@/app/zindex.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
@@ -28,10 +29,6 @@ setupErrorReporting();
 setupAutosave();
 setupMetaSync();
 
-// Telegram players get the stable `tg:` uid; the anonymous profile a device may
-// already carry is merged into it exactly once (DESIGN §4). The anonymous meta
-// document has to be read before the sign-in swaps identities, because the
-// rules stop the Telegram user from reading it afterwards.
 const bootAuth = async (session: TmaSession): Promise<void> => {
   const { ensureAnonAuth, restoredUid, signInWithTelegram } = await import(
     '@/services/firebase'
@@ -97,8 +94,6 @@ const mount = (): void => {
   );
 };
 
-// The active locale is a lazy chunk, so the first paint waits for it — a frame
-// of English before a Ukrainian menu reads as a bug, not as a fast boot.
 void initI18n()
   .catch((error: unknown) => {
     console.error('boot: i18n init failed', error);

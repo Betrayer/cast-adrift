@@ -12,7 +12,6 @@
   "cloudFound": "A fresher run was found in the cloud — continue it?",
   "cloudYes": "Cloud run",
   "cloudNo": "Local",
-  "stub": "This screen arrives in Phase {{phase}}.",
   "resumeCard": "Continue: Sector {{sector}} · depth {{depth}} · {{when}}",
   "resumeContinue": "Continue",
   "resumeAbandon": "Leave it",

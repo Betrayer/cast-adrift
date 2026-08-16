@@ -8,13 +8,18 @@ import {
 } from "@/game/chart/engine";
 import { hangarBudget } from "@/data/milestones";
 import { validateDeck } from "@/game/meta/deck";
-import { campaignShards, runXp } from "@/game/xp";
+import {
+  campaignShards,
+  HALF_HULL_CLEAR_SHARDS,
+  runXp,
+  STREAK_SHARDS,
+} from "@/game/xp";
 import { endRun, startRun } from "@/game/run/flow";
 import { createInitialMetaStats, useMetaStore } from "@/stores/metaStore";
 import { createInitialRunStats, useRunStore } from "@/stores/runStore";
 import { useSummaryStore } from "@/stores/summaryStore";
 
-describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
+describe("meta loop (real flow/store/engine, end-to-end)", () => {
   it("run -> summary award -> chart alloc/respec -> hangar -> next run reflects picks", () => {
     useMetaStore.setState({
       shards: 0, xp: 0, level: 1, chartPicks: [],
@@ -33,10 +38,11 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
       stats: createInitialMetaStats(),
     });
 
-    // [1] Run-end award (boss-win path)
     const counts = { nodes: 60, elites: 12, minibosses: 5, bosses: 5, contractStars: 0 };
     useRunStore.setState({
       active: true,
+      hull: 30,
+      hullMax: 30,
       stats: {
         ...createInitialRunStats(),
         nodesCleared: 60,
@@ -54,16 +60,27 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
     const meta1 = useMetaStore.getState();
     expect(result).not.toBeNull();
     expect(result?.xpGain).toBe(runXp(counts));
-    expect(result?.shardGain).toBe(campaignShards(5));
+    const expectedShards =
+      campaignShards(5) + HALF_HULL_CLEAR_SHARDS + STREAK_SHARDS;
+    expect(result?.shards.sectors).toBe(campaignShards(5));
+    expect(result?.shards.hullClear).toBe(HALF_HULL_CLEAR_SHARDS);
+    expect(result?.shards.streak).toBe(STREAK_SHARDS);
+    expect(result?.shards.beacons).toBe(0);
+    expect(result?.shards.ascension).toBe(0);
+    expect(result?.shards.total).toBe(expectedShards);
+    expect(result?.shardGain).toBe(
+      expectedShards +
+        (result?.findShards ?? 0) +
+        (result?.achievementShards ?? 0),
+    );
     expect(meta1.xp).toBe(runXp(counts));
-    expect(meta1.shards).toBe(campaignShards(5));
+    expect(meta1.shards).toBe(result?.shardGain);
     expect(result?.fromLevel).toBe(1);
     expect(result?.toLevel).toBeGreaterThan(1);
     expect(result?.milestones.length).toBeGreaterThan(0);
     expect(useRunStore.getState().active).toBe(false);
     expect(meta1.flagsArchive).toContain("metCartographer");
 
-    // [2] Star Chart allocation + respec
     const level = meta1.level;
     expect(pointsAvailable(level, meta1.chartPicks)).toBe(level);
     expect(canAllocate("red-gate", level, [])).toBe(true);
@@ -75,16 +92,17 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
     expect(canAllocate(neighbor as string, level, ["red-gate"])).toBe(true);
     useMetaStore.getState().allocatePick(neighbor as string);
     const picks2 = useMetaStore.getState().chartPicks;
+    const cutVertexPick = "red-gate";
+    const leafPick = neighbor as string;
     expect(picks2.length).toBe(2);
-    expect(canDeallocate("red-gate", picks2)).toBe(false); // cut vertex
-    expect(canDeallocate(neighbor as string, picks2)).toBe(true); // leaf
+    expect(canDeallocate(cutVertexPick, picks2)).toBe(false);
+    expect(canDeallocate(leafPick, picks2)).toBe(true);
     const before = useMetaStore.getState().shards;
     expect(useMetaStore.getState().spendShards(RESPEC_SHARD_COST)).toBe(true);
     useMetaStore.getState().deallocatePick(neighbor as string);
     expect(useMetaStore.getState().shards).toBe(before - RESPEC_SHARD_COST);
     expect(useMetaStore.getState().chartPicks).not.toContain(neighbor);
 
-    // [3] Hangar deck-build + ship purchase
     const budget = hangarBudget(useMetaStore.getState().level);
     const newDeck = ["red-d6", "blue-d6", "green-d4", "black-d6"];
     expect(validateDeck(newDeck, budget).valid).toBe(true);
@@ -94,7 +112,6 @@ describe("Phase 7 meta loop (real flow/store/engine, end-to-end)", () => {
     expect(useMetaStore.getState().buyShip("ram", 800)).toBe(true);
     expect(useMetaStore.getState().selectedShip).toBe("ram");
 
-    // [4] Next run reflects picks/ship/deck
     startRun(12345);
     const run = useRunStore.getState();
     expect(run.shipId).toBe("ram");

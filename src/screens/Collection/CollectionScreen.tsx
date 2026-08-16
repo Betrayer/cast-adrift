@@ -3,18 +3,20 @@ import {
   Button,
   Group,
   Paper,
-  ScrollArea,
   Select,
   SimpleGrid,
-  Stack,
   Text,
 } from "@mantine/core";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
-import { DIE_BY_ID } from "@/data/dice";
+import { ALL_DICE } from "@/data/dice";
 import { schools } from "@/data/schools";
-import { diePoints } from "@/data/metaShop";
+import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
+import { unlockedDice } from "@/data/unlocks";
+import { dieRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
+import { unlockContextOf } from "@/game/meta/unlockState";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import type { DieTier, School } from "@/types/content";
@@ -31,25 +33,72 @@ const SCHOOLS: readonly (School | "all")[] = [
 ];
 const TIERS: readonly (DieTier | 0)[] = [0, 4, 6, 8, 10, 12, 20, 100];
 
+type StateFilter = "all" | "owned" | "found" | "unknown";
+
+const STATES: readonly StateFilter[] = ["all", "owned", "found", "unknown"];
+
 export const CollectionScreen = () => {
   const { t } = useTranslation(["meta", "common", "content"]);
   const go = useAppStore((s) => s.go);
   const collection = useMetaStore((s) => s.collection);
+  const encountered = useMetaStore((s) => s.encountered);
+  const level = useMetaStore((s) => s.level);
+  const achievements = useMetaStore((s) => s.achievements);
+  const ascension = useMetaStore((s) => s.ascension);
+  const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
+  const clears = useMetaStore((s) => s.stats.campaignClears);
   const [schoolFilter, setSchoolFilter] = useState<School | "all">("all");
   const [tierFilter, setTierFilter] = useState<number>(0);
+  const [stateFilter, setStateFilter] = useState<StateFilter>("all");
 
-  const owned = [...collection].filter((e) => e.count > 0);
-  const filtered = owned.filter((e) => {
-    const def = DIE_BY_ID.get(e.defId);
-    if (def === undefined) return false;
-    if (schoolFilter !== "all" && def.school !== schoolFilter) return false;
-    if (tierFilter !== 0 && def.tier !== tierFilter) return false;
+  const ownedCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const entry of collection) {
+      if (entry.count > 0) map.set(entry.defId, entry.count);
+    }
+    return map;
+  }, [collection]);
+
+  const openDice = useMemo(
+    () =>
+      unlockedDice(
+        unlockContextOf({
+          level,
+          achievements,
+          ascension,
+          unlocksGranted,
+          stats: { campaignClears: clears },
+        }),
+      ),
+    [level, achievements, ascension, unlocksGranted, clears],
+  );
+
+  const rows = useMemo(
+    () =>
+      ALL_DICE.map((def) => {
+        const owned = ownedCounts.get(def.id) ?? 0;
+        const met = encountered[def.id];
+        const state: StateFilter =
+          owned > 0 ? "owned" : met !== undefined ? "found" : "unknown";
+        return { def, owned, met, state };
+      }),
+    [ownedCounts, encountered],
+  );
+
+  const filtered = rows.filter((row) => {
+    if (schoolFilter !== "all" && row.def.school !== schoolFilter) return false;
+    if (tierFilter !== 0 && row.def.tier !== tierFilter) return false;
+    if (stateFilter !== "all" && row.state !== stateFilter) return false;
     return true;
   });
 
+  const ownedTotal = rows.filter((row) => row.owned > 0).length;
+  const foundTotal = Object.keys(encountered).length;
+
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+    <Screen
+      header={
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between" mb="xs">
           <Text fw={700} c={tokens.text}>
             {t("meta:collection.title")}
@@ -58,13 +107,17 @@ export const CollectionScreen = () => {
             {t("common:back")}
           </Button>
         </Group>
-        <Text size="xs" c={tokens.faint} mb="xs">
-          {t("meta:collection.count", { n: owned.reduce((a, e) => a + e.count, 0) })}
+        <Text size="xs" c={tokens.faint} mb="xs" data-collection-totals>
+          {t("meta:collection.totals", {
+            owned: ownedTotal,
+            found: foundTotal,
+            total: ALL_DICE.length,
+          })}
         </Text>
-        <Group gap="xs">
+        <Group gap="xs" grow wrap="wrap">
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={schoolFilter}
             onChange={(v) => { setSchoolFilter((v as School | "all") ?? "all"); }}
             data={SCHOOLS.map((s) => ({
@@ -77,7 +130,7 @@ export const CollectionScreen = () => {
           />
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={String(tierFilter)}
             onChange={(v) => { setTierFilter(Number(v ?? 0)); }}
             data={TIERS.map((tier) => ({
@@ -85,40 +138,98 @@ export const CollectionScreen = () => {
               label: tier === 0 ? t("meta:hangar.filterAll") : `d${String(tier)}`,
             }))}
           />
+          <Select
+            size="xs"
+            miw={120}
+            value={stateFilter}
+            data-collection-state
+            onChange={(v) => { setStateFilter((v as StateFilter) ?? "all"); }}
+            data={STATES.map((state) => ({
+              value: state,
+              label: t(
+                state === "all"
+                  ? "meta:collection.stateAll"
+                  : state === "owned"
+                    ? "meta:collection.stateOwned"
+                    : state === "found"
+                      ? "meta:collection.stateFound"
+                      : "meta:collection.stateUnknown",
+              ),
+            }))}
+          />
         </Group>
-      </Paper>
-
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
-        <ScrollArea h={420}>
-          <SimpleGrid cols={2} spacing="xs">
-            {filtered.map((entry) => {
-              const def = DIE_BY_ID.get(entry.defId);
-              if (def === undefined) return null;
+        </Paper>
+      }
+    >
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
+            {filtered.map((row) => {
+              const def = row.def;
+              const unknown = row.state === "unknown";
               return (
                 <Paper
-                  key={entry.defId}
+                  key={def.id}
                   p="xs"
                   radius="md"
                   withBorder
-                  bg={schools[def.school].fill}
+                  data-collection-entry={def.id}
+                  data-collection-state={row.state}
+                  bg={unknown ? tokens.bg : schools[def.school].fill}
+                  style={unknown ? { opacity: 0.65 } : undefined}
                 >
                   <Group justify="space-between">
-                    <Text size="sm" style={{ color: schools[def.school].text }}>
+                    <Text
+                      size="sm"
+                      style={{
+                        color: unknown
+                          ? tokens.faint
+                          : schools[def.school].text,
+                      }}
+                    >
                       {t(def.name)}
                     </Text>
-                    <Badge size="sm" variant="light" color="gray">
-                      {t("meta:collection.owned", { n: entry.count })}
-                    </Badge>
+                    {row.owned > 0 ? (
+                      <Badge size="sm" variant="light" color="gray">
+                        {t("meta:collection.owned", { n: row.owned })}
+                      </Badge>
+                    ) : row.state === "found" ? (
+                      <Badge size="sm" variant="light" color="teal">
+                        {t("meta:collection.found")}
+                      </Badge>
+                    ) : (
+                      <Badge size="sm" variant="outline" color="gray">
+                        {t("meta:collection.undiscovered")}
+                      </Badge>
+                    )}
                   </Group>
                   <Text size="xs" c={tokens.faint}>
-                    d{def.tier} · {def.rarity} · {diePoints(entry.defId)} pts
+                    d{def.tier} · {def.rarity} · {diePoints(def.id)} pts
                   </Text>
+                  {row.met === undefined ? null : (
+                    <Text size="xs" c={tokens.dim} data-collection-provenance>
+                      {t("meta:collection.provenance", {
+                        sector: row.met.sector,
+                        node: t(`meta:collection.node.${row.met.node}`),
+                      })}
+                    </Text>
+                  )}
+                  {row.met !== undefined && row.owned === 0 ? (
+                    <Text size="xs" c="teal">
+                      {t("meta:collection.discount", {
+                        n: ENCOUNTER_DISCOUNT_PCT,
+                      })}
+                    </Text>
+                  ) : null}
+                  {unknown && !openDice.has(def.id) ? (
+                    <Text size="xs" c={tokens.amber} data-collection-hint>
+                      {unlockHintsLine(dieRoutes(def.id), t)}
+                    </Text>
+                  ) : null}
                 </Paper>
               );
             })}
           </SimpleGrid>
-        </ScrollArea>
       </Paper>
-    </Stack>
+    </Screen>
   );
 };

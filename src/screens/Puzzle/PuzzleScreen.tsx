@@ -1,12 +1,13 @@
-import { Box, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
-import { useMemo, useRef, useState } from "react";
+import { Badge, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
+import { TierBadge } from "@/components/TierBadge";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import {
   PUZZLE_BY_ID,
-  PUZZLES,
   type ConstraintRule,
   type OrderStep,
   type PuzzleDef,
@@ -16,8 +17,10 @@ import { schools } from "@/data/schools";
 import { slotCapForMk } from "@/data/slots";
 import {
   advanceMultiTurn,
+  dieIsLocked,
   evalConstraintRule,
   evalOrderStep,
+  goalTarget,
   initialMultiTurnState,
   legalAssign,
   multiTurnMetric,
@@ -30,20 +33,33 @@ import {
   type Placement,
   type TrialScore,
 } from "@/game/puzzles/evaluate";
+import { settleAchievements } from "@/game/meta/achievements";
+import { grantDieUnlock } from "@/game/meta/unlockState";
+import { puzzleForNode } from "@/game/puzzles/selection";
+import {
+  TIER_STAKES,
+  attemptCost,
+  attemptsLeft,
+  isDeduction,
+  maxAttempts,
+  rewardFor,
+  type PuzzleReward,
+} from "@/game/puzzles/stakes";
 import { completeNode } from "@/game/run/flow";
 import { interferenceImminent } from "@/game/run/interference";
+import { LootReveal } from "@/screens/Battle/LootReveal";
+import { duckMusic, playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
+import { haptic } from "@/services/tma";
 import { useAppStore } from "@/stores/appStore";
+import { useLootStore } from "@/stores/lootStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
 import type { School } from "@/types/content";
 
 const DEFAULT_REROLL_SIZE = 2;
-const MAX_NEW_ROLLS = 3;
 const GREEN = "#A8DF8E";
-
-let entryNonce = 0;
 
 const withoutSlot = (placement: Placement, slot: SlotId): Placement => {
   const next: Placement = {};
@@ -51,14 +67,6 @@ const withoutSlot = (placement: Placement, slot: SlotId): Placement => {
     if (s !== slot && i !== undefined) next[s as SlotId] = i;
   }
   return next;
-};
-
-const pickPuzzle = (nodeId: string): PuzzleDef | null => {
-  const s = useRunStore.getState();
-  const stream = createStream(deriveSeed(s.seed, `puzzle:${nodeId}`));
-  const unsolved = PUZZLES.filter((p) => !s.solvedPuzzles.includes(p.id));
-  const pool = unsolved.length > 0 ? unsolved : PUZZLES;
-  return pool.length > 0 ? stream.pick(pool) : null;
 };
 
 const rollDeck = (
@@ -123,6 +131,44 @@ const stepLabel = (t: TFunction, step: OrderStep): string => {
   }
 };
 
+const rewardLines = (
+  t: TFunction,
+  puzzle: PuzzleDef,
+  reward: PuzzleReward,
+): string[] => {
+  const lines = [t("run:anomaly.rewardScrap", { n: reward.scrap })];
+  if (reward.codex !== undefined) lines.push(t("run:anomaly.rewardCodex"));
+  if (reward.choice !== undefined) {
+    lines.push(
+      t("run:anomaly.rewardChoice", {
+        name: t(DIE_BY_ID.get(reward.choice.die)?.name ?? reward.choice.die),
+      }),
+    );
+  }
+  if (reward.die !== undefined) {
+    lines.push(
+      t("run:anomaly.rewardDie", {
+        name: t(DIE_BY_ID.get(reward.die)?.name ?? reward.die),
+      }),
+    );
+  }
+  return [...lines, ...(puzzle.tier === 5 ? [t("run:anomaly.rewardOnce")] : [])];
+};
+
+const stakeLine = (t: TFunction, puzzle: PuzzleDef): string => {
+  if (isDeduction(puzzle)) {
+    return t("run:anomaly.stakeDeduction", { n: maxAttempts(puzzle) });
+  }
+  const stakes = TIER_STAKES[puzzle.tier];
+  if (stakes.paidCosts.length === 0) {
+    return t("run:anomaly.stakeFree", { n: stakes.freeAttempts });
+  }
+  return t("run:anomaly.stakePaid", {
+    n: stakes.freeAttempts,
+    costs: stakes.paidCosts.join(" · "),
+  });
+};
+
 const CheckRow = ({ ok, label }: { ok: boolean; label: string }) => (
   <Group gap={8} wrap="nowrap">
     <Text fw={700} c={ok ? GREEN : tokens.faint} style={{ width: 16 }}>
@@ -140,6 +186,7 @@ const DieChip = ({
   active,
   faded,
   reserved,
+  locked,
   color,
   onClick,
 }: {
@@ -148,6 +195,7 @@ const DieChip = ({
   active: boolean;
   faded: boolean;
   reserved: boolean;
+  locked: boolean;
   color: string;
   onClick: () => void;
 }) => {
@@ -168,8 +216,8 @@ const DieChip = ({
         color: colors.text,
         fontWeight: 700,
         fontSize: 18,
-        opacity: faded ? 0.4 : 1,
-        cursor: "pointer",
+        opacity: faded || locked ? 0.4 : 1,
+        cursor: locked ? "not-allowed" : "pointer",
       }}
     >
       {value}
@@ -188,6 +236,23 @@ const DieChip = ({
           }}
         >
           R
+        </span>
+      ) : null}
+      {locked ? (
+        <span
+          style={{
+            position: "absolute",
+            bottom: -6,
+            right: -6,
+            background: tokens.line,
+            color: tokens.text,
+            borderRadius: 6,
+            fontSize: 10,
+            fontWeight: 800,
+            padding: "0 4px",
+          }}
+        >
+          ✕
         </span>
       ) : null}
     </div>
@@ -307,7 +372,6 @@ const GoalBanner = ({ puzzle, score, placement, t, mtMetric }: GoalBannerProps) 
     );
   }
 
-  // legacy scalar arms
   const metric = primaryMetric(goal);
   const now = scoreMetric(metric, score);
   const target = goal.g === "survive" ? null : goal.min;
@@ -321,34 +385,131 @@ const GoalBanner = ({ puzzle, score, placement, t, mtMetric }: GoalBannerProps) 
   );
 };
 
-const PuzzleRunner = ({
-  puzzle,
-  nodeId,
-  forced,
-}: {
+interface FlowProps {
   puzzle: PuzzleDef;
   nodeId: string;
   forced: boolean;
+}
+
+const tierRate = (tier: number): number => 1.16 - tier * 0.045;
+
+const EntryCard = ({
+  puzzle,
+  reward,
+  onEnter,
+  onLeave,
+}: {
+  puzzle: PuzzleDef;
+  reward: PuzzleReward;
+  onEnter: () => void;
+  onLeave: () => void;
 }) => {
   const { t } = useTranslation(["run", "battle", "content"]);
-  const seed = useRunStore((s) => s.seed);
-  const anomalyStreak = useRunStore((s) => s.anomalyStreak);
-  const attemptRef = useRef(0);
-  const rerollSeqRef = useRef(0);
-  const grantedRef = useRef(false);
-  const [runKey] = useState(() => {
-    entryNonce += 1;
-    return `${nodeId}:${String(entryNonce)}`;
-  });
+  const interference = useRunStore((s) => s.interferenceStacks);
 
-  const isDeduction = puzzle.goal.g === "deduction";
+  useEffect(() => {
+    playSfx("eventOpen", { rate: tierRate(puzzle.tier) });
+  }, [puzzle.tier]);
+
+  const takeReading = (): void => {
+    playSfx("checkDrum", { rate: tierRate(puzzle.tier) });
+    onEnter();
+  };
+
+  return (
+    <Screen
+      width="narrow"
+      centered
+      header={
+        <Title order={3} c={tokens.text}>
+          {t("run:anomaly.title")}
+        </Title>
+      }
+      footer={
+        <Stack gap={6}>
+          <Button size="md" onClick={takeReading} data-testid="puzzle-enter">
+            {t("run:anomaly.entryEnter")}
+          </Button>
+          <Button variant="subtle" color="gray" onClick={onLeave}>
+            {t("run:anomaly.leave")}
+          </Button>
+          <Text size="xs" c={tokens.faint} ta="center">
+            {t("run:anomaly.entryLeaveNote")}
+          </Text>
+        </Stack>
+      }
+    >
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <Stack gap="sm">
+          <Group gap="sm" wrap="nowrap">
+            <TierBadge
+              tier={puzzle.tier}
+              label={t(`run:anomaly.tierName.${puzzle.tier}`)}
+            />
+            <Text fw={700} c={tokens.accent}>
+              {t(puzzle.title)}
+            </Text>
+          </Group>
+
+          <Text size="sm" c={tokens.dim}>
+            {t(puzzle.goalText, { n: goalTarget(puzzle.goal) })}
+          </Text>
+
+          <Stack gap={2}>
+            <Text size="xs" c={tokens.faint}>
+              {t("run:anomaly.rewardPreview")}
+            </Text>
+            {rewardLines(t, puzzle, reward).map((line) => (
+              <Text key={line} size="sm" c={tokens.text}>
+                {line}
+              </Text>
+            ))}
+          </Stack>
+
+          <Stack gap={2}>
+            <Text size="xs" c={tokens.faint}>
+              {t("run:anomaly.stakes")}
+            </Text>
+            <Text size="sm" c={tokens.text}>
+              {stakeLine(t, puzzle)}
+            </Text>
+          </Stack>
+
+          <Text size="sm" c={interference > 0 ? tokens.danger : tokens.dim}>
+            {interference > 0
+              ? t("run:anomaly.interferenceNow", { n: interference })
+              : t("run:anomaly.interferenceNone")}
+          </Text>
+        </Stack>
+      </Paper>
+    </Screen>
+  );
+};
+
+const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
+  const { t } = useTranslation(["run", "battle", "content"]);
+  const seed = useRunStore((s) => s.seed);
+  const scrap = useRunStore((s) => s.scrap);
+  const anomalyStreak = useRunStore((s) => s.anomalyStreak);
+  const attemptsUsed = useRunStore(
+    (s) => s.puzzleRuns[nodeId]?.attempts ?? 0,
+  );
+  const grantedRef = useRef(false);
+
+  const reward = useMemo(
+    () => rewardFor(puzzle, createStream(deriveSeed(seed, `reward:${nodeId}`))),
+    [puzzle, seed, nodeId],
+  );
+
+  const deduction = isDeduction(puzzle);
   const isMultiTurn = puzzle.goal.g === "multiTurn";
   const turns = puzzle.goal.g === "multiTurn" ? puzzle.goal.turns : 1;
+  const boardIndex = deduction ? 0 : Math.max(0, attemptsUsed - 1);
 
   const [values, setValues] = useState<number[]>(() =>
     puzzle.fixedRoll !== undefined
       ? [...puzzle.fixedRoll]
-      : rollDeck(puzzle, seed, `trial:${runKey}:0`),
+      : rollDeck(puzzle, seed, `trial:${nodeId}:${String(boardIndex)}`),
   );
   const [placement, setPlacement] = useState<Placement>({});
   const [selected, setSelected] = useState<number | null>(null);
@@ -358,14 +519,17 @@ const PuzzleRunner = ({
     initialMultiTurnState(puzzle),
   );
   const [rerollsLeft, setRerollsLeft] = useState(puzzle.rerolls);
+  const [rerollSeq, setRerollSeq] = useState(0);
   const [rerollMode, setRerollMode] = useState(false);
   const [rerollPick, setRerollPick] = useState<number[]>([]);
   const [checked, setChecked] = useState<boolean | null>(null);
-  const [newRolls, setNewRolls] = useState(0);
-  const [failedOut, setFailedOut] = useState(false);
+  const [claimed, setClaimed] = useState(reward.choice === undefined);
 
   const rerollSize = puzzle.rerollSize ?? DEFAULT_REROLL_SIZE;
   const blocked = new Set<SlotId>(puzzle.blocked ?? []);
+  const left = attemptsLeft(puzzle, attemptsUsed);
+  const nextCost = attemptCost(puzzle, attemptsUsed);
+  const canAfford = nextCost <= scrap;
 
   const slotOfDie = useMemo(() => {
     const map = new Map<number, SlotId>();
@@ -392,6 +556,17 @@ const PuzzleRunner = ({
     ? projected !== null && isFinalTurn && multiTurnSatisfied(puzzle, projected)
     : placementSatisfied(puzzle, values, placement);
 
+  const solved = checked === true;
+  const failedOut = checked === false && left <= 0;
+
+  const lastReached = useRef(reached);
+  useEffect(() => {
+    if (reached !== lastReached.current) {
+      playSfx("ruleTick", { rate: reached ? 1.22 : 0.84 });
+      lastReached.current = reached;
+    }
+  }, [reached]);
+
   const done = (): void => {
     if (!forced && !grantedRef.current) {
       useRunStore.getState().recordAnomalyUnsolved();
@@ -403,25 +578,47 @@ const PuzzleRunner = ({
   const grantReward = (): void => {
     if (grantedRef.current) return;
     grantedRef.current = true;
-    const run = useRunStore.getState();
+    const meta = useMetaStore.getState();
     if (forced) {
-      if (puzzle.reward.codex !== undefined) {
-        useMetaStore.getState().unlockCodex(puzzle.reward.codex);
-      }
+      if (reward.codex !== undefined) meta.unlockCodex(reward.codex);
       return;
     }
+    const run = useRunStore.getState();
     run.recordAnomalySolved();
-    if (!run.solvedPuzzles.includes(puzzle.id)) {
-      run.addScrap(puzzle.reward.scrap);
-      if (puzzle.reward.die !== undefined) run.addDie(puzzle.reward.die);
-      if (puzzle.reward.codex !== undefined) {
-        useMetaStore.getState().unlockCodex(puzzle.reward.codex);
-      }
-      run.markPuzzleSolved(puzzle.id);
+    if (run.solvedPuzzles.includes(puzzle.id)) return;
+    run.addScrap(reward.scrap);
+    if (reward.codex !== undefined) meta.unlockCodex(reward.codex);
+    if (reward.die !== undefined) {
+      run.addDie(reward.die);
+      useLootStore.getState().drop(reward.die);
+      if (puzzle.tier === 5) grantDieUnlock(reward.die);
+    }
+    run.markPuzzleSolved(puzzle.id);
+    if (puzzle.tier === 5) {
+      meta.bumpLifetime({ t5Solved: 1 });
+      settleAchievements();
     }
   };
 
+  const claimDie = (): void => {
+    if (claimed || reward.choice === undefined) return;
+    playSfx("optionTick", { rate: 1.14 });
+    setClaimed(true);
+    if (forced) return;
+    useRunStore.getState().addDie(reward.choice.die);
+    useLootStore.getState().drop(reward.choice.die);
+  };
+
+  const claimVoucher = (): void => {
+    if (claimed || reward.choice === undefined) return;
+    playSfx("optionTick", { rate: 0.86 });
+    setClaimed(true);
+    if (forced) return;
+    useRunStore.getState().addVoucher(reward.choice.vouchers);
+  };
+
   const tapDie = (index: number): void => {
+    if (dieIsLocked(puzzle, index, turnIndex)) return;
     if (rerollMode) {
       if (slotOfDie.has(index) || index === reserved) return;
       setRerollPick((pick) =>
@@ -454,9 +651,15 @@ const PuzzleRunner = ({
       setChecked(null);
       return;
     }
-    if (selected === null || selected === reserved || !legalAssign(puzzle, selected, slot)) {
+    if (
+      selected === null ||
+      selected === reserved ||
+      !legalAssign(puzzle, selected, slot, turnIndex)
+    ) {
+      playSfx("invalid", { gain: 0.5 });
       return;
     }
+    playSfx("puzzlePlace");
     setPlacement((p) => ({ ...p, [slot]: selected }));
     setSelected(null);
     setChecked(null);
@@ -474,10 +677,14 @@ const PuzzleRunner = ({
       setRerollPick([]);
       return;
     }
-    const seq = rerollSeqRef.current + 1;
-    rerollSeqRef.current = seq;
+    playSfx("reroll");
+    const seq = rerollSeq + 1;
+    setRerollSeq(seq);
     const stream = createStream(
-      deriveSeed(seed, `trial:${runKey}:${String(attemptRef.current)}:t${String(turnIndex)}:r${String(seq)}`),
+      deriveSeed(
+        seed,
+        `trial:${nodeId}:${String(boardIndex)}:t${String(turnIndex)}:r${String(seq)}`,
+      ),
     );
     setValues((vals) =>
       vals.map((v, i) => {
@@ -498,325 +705,431 @@ const PuzzleRunner = ({
     setChecked(null);
   };
 
-  const fresh = (): void => {
-    const attempt = attemptRef.current + 1;
-    attemptRef.current = attempt;
-    setValues(rollDeck(puzzle, seed, `trial:${runKey}:${String(attempt)}`));
+  const newAttempt = (): void => {
+    if (left <= 0) return;
+    if (nextCost > 0 && !useRunStore.getState().spendScrap(nextCost)) return;
+    playSfx(nextCost > 0 ? "buy" : "attemptSpent");
+    const attempt = useRunStore.getState().spendPuzzleAttempt(nodeId);
+    setValues(rollDeck(puzzle, seed, `trial:${nodeId}:${String(attempt - 1)}`));
     setPlacement({});
     setSelected(null);
     setReserved(null);
     setTurnIndex(0);
     setMtState(initialMultiTurnState(puzzle));
     setRerollsLeft(puzzle.rerolls);
+    setRerollSeq(0);
     setRerollMode(false);
     setRerollPick([]);
     setChecked(null);
   };
 
-  // New rolls (full re-rolls of the board) are budgeted so a trial can't be
-  // brute-forced by spamming a fresh roll until the right values land. Rerolls
-  // (partial, per board) stay governed by puzzle.rerolls.
-  const newRollsLeft = MAX_NEW_ROLLS - newRolls;
-  const requestNewRoll = (): void => {
-    if (newRollsLeft <= 0) {
-      setFailedOut(true);
-      return;
-    }
-    fresh();
-    setNewRolls((n) => n + 1);
-  };
-
   const endTurn = (): void => {
     if (projected === null) return;
-    const attempt = attemptRef.current;
     const nextTurn = turnIndex + 1;
     const carried = reserved;
     setMtState(projected);
     setTurnIndex(nextTurn);
     setValues(
-      rollDeck(puzzle, seed, `trial:${runKey}:${String(attempt)}:turn${String(nextTurn)}`, (i) =>
-        i === carried ? values[i] : undefined,
+      rollDeck(
+        puzzle,
+        seed,
+        `trial:${nodeId}:${String(boardIndex)}:turn${String(nextTurn)}`,
+        (i) => (i === carried ? values[i] : undefined),
       ),
     );
     setPlacement({});
     setSelected(null);
     setReserved(null);
     setRerollsLeft(puzzle.rerolls);
+    setRerollSeq(0);
     setRerollMode(false);
     setRerollPick([]);
     setChecked(null);
   };
 
   const resolve = (): void => {
-    const solved = reached;
-    setChecked(solved);
-    if (solved) grantReward();
+    const won = reached;
+    setChecked(won);
+    if (won) {
+      const ceremony = puzzle.tier >= 4;
+      playSfx(ceremony ? "solveT45" : "solveT13");
+      if (ceremony) {
+        duckMusic(2000);
+        haptic("puzzleSolve");
+      }
+      grantReward();
+      return;
+    }
+    playSfx("puzzleFail");
+    if (deduction) {
+      useRunStore.getState().spendPuzzleAttempt(nodeId);
+      playSfx("attemptSpent");
+    }
   };
 
-  const solved = checked === true;
-  const showLeaveWarning = !forced && interferenceImminent(anomalyStreak) && !solved;
+  const showLeaveWarning =
+    !forced && interferenceImminent(anomalyStreak) && !solved;
+
+  const attemptsChip = deduction
+    ? t("run:anomaly.submissionsLeft", { n: left })
+    : t("run:anomaly.attemptChip", {
+        cur: attemptsUsed,
+        max: maxAttempts(puzzle),
+      });
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
-      <Group justify="space-between">
-        <Title order={3} c={tokens.text}>
-          {t("run:anomaly.title")}
-        </Title>
-        <Button size="compact-sm" variant="subtle" color="gray" onClick={done}>
-          {t("run:anomaly.leave")}
-        </Button>
-      </Group>
-
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-        <Group justify="space-between">
-          <Text fw={600} c={tokens.accent}>
-            {t(puzzle.title)}
-          </Text>
-          {isMultiTurn ? (
-            <Text size="sm" fw={700} c={tokens.amber}>
-              {t("run:anomaly.turn", { cur: turnIndex + 1, max: turns })}
-            </Text>
-          ) : null}
+    <Screen
+      width="wide"
+      overlay={<LootReveal />}
+      header={
+        <Group justify="space-between" wrap="nowrap">
+          <Group gap="xs" wrap="nowrap">
+            <TierBadge tier={puzzle.tier} compact />
+            <Title order={4} c={tokens.text}>
+              {t("run:anomaly.title")}
+            </Title>
+          </Group>
+          <Button size="compact-sm" variant="subtle" color="gray" onClick={done}>
+            {t("run:anomaly.leave")}
+          </Button>
         </Group>
-        <Text size="sm" c={tokens.dim} mt={4}>
-          {t("run:anomaly.goal")}: {t(puzzle.goalText)}
-        </Text>
+      }
+    >
+      <Stack gap="sm">
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <Group justify="space-between">
+            <Text fw={600} c={tokens.accent}>
+              {t(puzzle.title)}
+            </Text>
+            {isMultiTurn ? (
+              <Text size="sm" fw={700} c={tokens.amber}>
+                {t("run:anomaly.turn", { cur: turnIndex + 1, max: turns })}
+              </Text>
+            ) : null}
+          </Group>
+          <Text size="sm" c={tokens.dim} mt={4}>
+            {t("run:anomaly.goal")}: {t(puzzle.goalText, { n: goalTarget(puzzle.goal) })}
+          </Text>
 
-        <GoalBanner
-          puzzle={puzzle}
-          score={score}
-          placement={placement}
-          t={t}
-          mtMetric={mtMetric}
-        />
+          <GoalBanner
+            puzzle={puzzle}
+            score={score}
+            placement={placement}
+            t={t}
+            mtMetric={mtMetric}
+          />
 
-        {isMultiTurn ? (
-          <Text size="xs" c={tokens.faint} mt={6}>
-            {t("run:anomaly.carry")}{" "}
-            {mtState.cumDamage === 0 &&
+          {isMultiTurn ? (
+            <Text size="xs" c={tokens.faint} mt={6}>
+              {t("run:anomaly.carry")}{" "}
+              {mtState.cumDamage === 0 &&
               mtState.carry.charge === 0 &&
               mtState.carry.burn === 0 &&
               reserved === null
-              ? t("run:anomaly.carryNone")
-              : [
-                mtState.carry.charge > 0
-                  ? t("run:anomaly.carryCharge", { n: mtState.carry.charge })
-                  : null,
-                mtState.carry.burn > 0
-                  ? t("run:anomaly.carryBurn", { n: mtState.carry.burn })
-                  : null,
-                reserved !== null
-                  ? t("run:anomaly.carryReserved", {
-                    n: DIE_BY_ID.get(puzzle.deck[reserved] ?? "")?.tier ?? 6,
-                  })
-                  : null,
-              ]
-                .filter(Boolean)
-                .join(" · ")}
-          </Text>
-        ) : null}
-
-        {!isDeduction ? (
-          <Text size="sm" c={tokens.dim} mt={6} style={{ textAlign: "right" }}>
-            {t("run:anomaly.rerolls", { n: rerollsLeft })}
-          </Text>
-        ) : null}
-      </Paper>
-
-      <Text size="xs" c={tokens.faint}>
-        {isDeduction
-          ? t("run:anomaly.fixed")
-          : rerollMode
-            ? t("run:anomaly.rerollHint", { n: rerollSize })
-            : t("run:anomaly.tray")}
-      </Text>
-      <Group gap="xs">
-        {puzzle.deck.map((defId, index) => {
-          const def = DIE_BY_ID.get(defId);
-          const placed = slotOfDie.has(index);
-          const marked = rerollPick.includes(index);
-          return (
-            <DieChip
-              key={index}
-              school={def?.school ?? "grey"}
-              value={values[index] ?? 1}
-              active={rerollMode ? marked : selected === index}
-              faded={placed}
-              reserved={reserved === index}
-              color={rerollMode ? tokens.danger : tokens.amber}
-              onClick={() => {
-                tapDie(index);
-              }}
-            />
-          );
-        })}
-      </Group>
-
-      {isMultiTurn && !rerollMode ? (
-        <Button
-          size="compact-xs"
-          variant="default"
-          disabled={selected === null || (selected !== null && slotOfDie.has(selected))}
-          onClick={toggleReserve}
-        >
-          {reserved !== null && reserved === selected
-            ? t("run:anomaly.unreserve")
-            : t("run:anomaly.reserve")}
-        </Button>
-      ) : null}
-
-      <Text size="xs" c={tokens.faint}>
-        {t("run:anomaly.slots")}
-      </Text>
-      <Stack gap={6}>
-        {puzzle.slots.map((slot) => {
-          const isBlocked = blocked.has(slot);
-          const occupant = placement[slot];
-          const value = occupant !== undefined ? values[occupant] : undefined;
-          const mk = puzzle.mk?.[slot] ?? 1;
-          return (
-            <Paper
-              key={slot}
-              bg={isBlocked ? tokens.bg : tokens.surface1}
-              p="xs"
-              radius="sm"
-              withBorder
-              opacity={isBlocked ? 0.5 : 1}
-              style={{ cursor: isBlocked || rerollMode ? "default" : "pointer" }}
-              onClick={() => {
-                if (!isBlocked) tapSlot(slot);
-              }}
-            >
-              <Group justify="space-between" wrap="nowrap">
-                <Stack gap={0}>
-                  <Text size="sm" c={tokens.text}>
-                    {t(`battle:slot.${slot}`)}
-                  </Text>
-                  <Text size="xs" c={tokens.faint}>
-                    {t("battle:slot.cap", { cap: slotCapForMk(slot, mk), mk })}
-                  </Text>
-                </Stack>
-                {isBlocked ? (
-                  <Text size="sm" c={tokens.danger}>
-                    {t("battle:jam")}
-                  </Text>
-                ) : value !== undefined ? (
-                  <Text size="lg" fw={700} c={tokens.text}>
-                    {value}
-                  </Text>
-                ) : (
-                  <Text size="sm" c={tokens.faint}>
-                    +
-                  </Text>
-                )}
-              </Group>
-            </Paper>
-          );
-        })}
-      </Stack>
-
-      {checked !== null ? (
-        <Paper
-          bg={tokens.surface2}
-          p="sm"
-          radius="sm"
-          withBorder
-          style={{ borderColor: solved ? "#6FBF4B" : tokens.danger }}
-        >
-          <Text c={solved ? GREEN : tokens.danger} fw={600}>
-            {solved ? t("run:anomaly.solved") : t("run:anomaly.failed")}
-          </Text>
-          {solved ? (
-            <Text size="sm" c={tokens.dim}>
-              {t("run:anomaly.reward", { n: puzzle.reward.scrap })}
+                ? t("run:anomaly.carryNone")
+                : [
+                    mtState.carry.charge > 0
+                      ? t("run:anomaly.carryCharge", { n: mtState.carry.charge })
+                      : null,
+                    mtState.carry.burn > 0
+                      ? t("run:anomaly.carryBurn", { n: mtState.carry.burn })
+                      : null,
+                    reserved !== null
+                      ? t("run:anomaly.carryReserved", {
+                          n: DIE_BY_ID.get(puzzle.deck[reserved] ?? "")?.tier ?? 6,
+                        })
+                      : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
             </Text>
           ) : null}
-        </Paper>
-      ) : null}
 
-      {failedOut ? (
-        <Paper
-          bg={tokens.surface2}
-          p="sm"
-          radius="sm"
-          withBorder
-          style={{ borderColor: tokens.danger }}
-        >
-          <Text c={tokens.danger} fw={600}>
-            {t("run:anomaly.outOfRollsTitle")}
-          </Text>
-          <Text size="sm" c={tokens.dim}>
-            {t("run:anomaly.outOfRolls")}
-          </Text>
+          <Group justify="space-between" mt={6} wrap="wrap" gap={6}>
+            <Badge
+              variant="light"
+              color={left <= 0 ? "red" : left === 1 ? "yellow" : "gray"}
+              data-testid="puzzle-attempts"
+            >
+              {attemptsChip}
+            </Badge>
+            {!deduction ? (
+              <Text size="sm" c={tokens.dim}>
+                {t("run:anomaly.rerolls", { n: rerollsLeft })}
+              </Text>
+            ) : null}
+          </Group>
         </Paper>
-      ) : null}
 
-      {showLeaveWarning && !failedOut ? (
-        <Text size="xs" c={tokens.danger} ta="center">
-          {t("run:anomaly.interferenceWarn")}
+        <Text size="xs" c={tokens.faint}>
+          {deduction
+            ? t("run:anomaly.fixed")
+            : rerollMode
+              ? t("run:anomaly.rerollHint", { n: rerollSize })
+              : t("run:anomaly.tray")}
         </Text>
-      ) : null}
-
-      {failedOut ? (
-        <Button mt="auto" color="red" onClick={done}>
-          {t("run:anomaly.toMap")}
-        </Button>
-      ) : solved ? (
-        <Button mt="auto" onClick={done}>
-          {t("run:event.continue")}
-        </Button>
-      ) : rerollMode ? (
-        <Group grow mt="auto">
-          <Button
-            variant="default"
-            onClick={() => {
-              setRerollMode(false);
-              setRerollPick([]);
-            }}
-          >
-            {t("run:anomaly.rerollCancel")}
-          </Button>
-          <Button disabled={rerollPick.length === 0} onClick={confirmReroll}>
-            {t("run:anomaly.rerollConfirm", { k: rerollPick.length })}
-          </Button>
-        </Group>
-      ) : (
-        <Stack gap={6} mt="auto">
-          {isDeduction ? (
-            <Button variant="default" onClick={resetPlacement}>
-              {t("run:anomaly.reset")}
-            </Button>
-          ) : (
-            <Group grow>
-              <Button
-                variant="default"
-                disabled={rerollsLeft <= 0}
+        <Group gap="xs">
+          {puzzle.deck.map((defId, index) => {
+            const def = DIE_BY_ID.get(defId);
+            const placed = slotOfDie.has(index);
+            const marked = rerollPick.includes(index);
+            return (
+              <DieChip
+                key={index}
+                school={def?.school ?? "grey"}
+                value={values[index] ?? 1}
+                active={rerollMode ? marked : selected === index}
+                faded={placed}
+                reserved={reserved === index}
+                locked={dieIsLocked(puzzle, index, turnIndex)}
+                color={rerollMode ? tokens.danger : tokens.amber}
                 onClick={() => {
-                  setRerollMode(true);
-                  setSelected(null);
+                  tapDie(index);
+                }}
+              />
+            );
+          })}
+        </Group>
+
+        {(puzzle.locks ?? 0) > 0 && turnIndex === 0 ? (
+          <Text size="xs" c={tokens.faint}>
+            {t("run:anomaly.locked", { n: puzzle.locks ?? 0 })}
+          </Text>
+        ) : null}
+
+        {isMultiTurn && !rerollMode ? (
+          <Button
+            size="compact-xs"
+            variant="default"
+            disabled={selected === null || (selected !== null && slotOfDie.has(selected))}
+            onClick={toggleReserve}
+          >
+            {reserved !== null && reserved === selected
+              ? t("run:anomaly.unreserve")
+              : t("run:anomaly.reserve")}
+          </Button>
+        ) : null}
+
+        <Text size="xs" c={tokens.faint}>
+          {t("run:anomaly.slots")}
+        </Text>
+        <Stack gap={6}>
+          {puzzle.slots.map((slot) => {
+            const isBlocked = blocked.has(slot);
+            const occupant = placement[slot];
+            const value = occupant !== undefined ? values[occupant] : undefined;
+            const mk = puzzle.mk?.[slot] ?? 1;
+            return (
+              <Paper
+                key={slot}
+                bg={isBlocked ? tokens.bg : tokens.surface1}
+                p="xs"
+                radius="sm"
+                withBorder
+                opacity={isBlocked ? 0.5 : 1}
+                style={{ cursor: isBlocked || rerollMode ? "default" : "pointer" }}
+                onClick={() => {
+                  if (!isBlocked) tapSlot(slot);
                 }}
               >
-                {t("run:anomaly.reroll", { n: rerollsLeft })}
-              </Button>
-              <Button
-                variant="default"
-                color={newRollsLeft <= 0 ? "red" : undefined}
-                onClick={requestNewRoll}
-              >
-                {newRollsLeft > 0
-                  ? t("run:anomaly.retryLeft", { n: newRollsLeft })
-                  : t("run:anomaly.giveUp")}
-              </Button>
-            </Group>
-          )}
-          {isMultiTurn && !isFinalTurn ? (
-            <Button onClick={endTurn}>{t("run:anomaly.nextTurn")}</Button>
-          ) : (
-            <Button onClick={resolve}>{t("run:anomaly.resolve")}</Button>
-          )}
+                <Group justify="space-between" wrap="nowrap">
+                  <Stack gap={0}>
+                    <Text size="sm" c={tokens.text}>
+                      {t(`battle:slot.${slot}`)}
+                    </Text>
+                    <Text size="xs" c={tokens.faint}>
+                      {t("battle:slot.cap", { cap: slotCapForMk(slot, mk), mk })}
+                    </Text>
+                  </Stack>
+                  {isBlocked ? (
+                    <Text size="sm" c={tokens.danger}>
+                      {t("battle:jam")}
+                    </Text>
+                  ) : value !== undefined ? (
+                    <Text size="lg" fw={700} c={tokens.text}>
+                      {value}
+                    </Text>
+                  ) : (
+                    <Text size="sm" c={tokens.faint}>
+                      +
+                    </Text>
+                  )}
+                </Group>
+              </Paper>
+            );
+          })}
         </Stack>
-      )}
-    </Stack>
+
+        {checked !== null ? (
+          <Paper
+            bg={tokens.surface2}
+            p="sm"
+            radius="sm"
+            withBorder
+            style={{ borderColor: solved ? "#6FBF4B" : tokens.danger }}
+            data-testid={solved ? "puzzle-solved" : "puzzle-missed"}
+          >
+            <Text c={solved ? GREEN : tokens.danger} fw={600}>
+              {solved ? t("run:anomaly.solved") : t("run:anomaly.failed")}
+            </Text>
+            {solved ? (
+              <Stack gap={4} mt={4}>
+                {rewardLines(t, puzzle, reward).map((line) => (
+                  <Text key={line} size="sm" c={tokens.dim}>
+                    {line}
+                  </Text>
+                ))}
+                {reward.choice !== undefined && !claimed ? (
+                  <Group grow mt={4}>
+                    <Button size="compact-sm" onClick={claimDie}>
+                      {t("run:anomaly.takeDie", {
+                        name: t(
+                          DIE_BY_ID.get(reward.choice.die)?.name ??
+                            reward.choice.die,
+                        ),
+                      })}
+                    </Button>
+                    <Button size="compact-sm" variant="default" onClick={claimVoucher}>
+                      {t("run:anomaly.takeVoucher")}
+                    </Button>
+                  </Group>
+                ) : null}
+              </Stack>
+            ) : null}
+          </Paper>
+        ) : null}
+
+        {failedOut ? (
+          <Paper
+            bg={tokens.surface2}
+            p="sm"
+            radius="sm"
+            withBorder
+            style={{ borderColor: tokens.danger }}
+            data-testid="puzzle-out"
+          >
+            <Text c={tokens.danger} fw={600}>
+              {t("run:anomaly.outOfAttemptsTitle")}
+            </Text>
+            <Text size="sm" c={tokens.dim}>
+              {t("run:anomaly.outOfAttempts")}
+            </Text>
+          </Paper>
+        ) : null}
+
+        {showLeaveWarning && !failedOut ? (
+          <Text size="xs" c={tokens.danger} ta="center">
+            {t("run:anomaly.interferenceWarn")}
+          </Text>
+        ) : null}
+
+        {failedOut ? (
+          <Button mt="auto" color="red" onClick={done}>
+            {t("run:anomaly.toMap")}
+          </Button>
+        ) : solved ? (
+          <Button mt="auto" disabled={!claimed} onClick={done}>
+            {t("run:event.continue")}
+          </Button>
+        ) : rerollMode ? (
+          <Group grow mt="auto">
+            <Button
+              variant="default"
+              onClick={() => {
+                setRerollMode(false);
+                setRerollPick([]);
+              }}
+            >
+              {t("run:anomaly.rerollCancel")}
+            </Button>
+            <Button disabled={rerollPick.length === 0} onClick={confirmReroll}>
+              {t("run:anomaly.rerollConfirm", { k: rerollPick.length })}
+            </Button>
+          </Group>
+        ) : (
+          <Stack gap={6} mt="auto">
+            {deduction ? (
+              <Button variant="default" onClick={resetPlacement}>
+                {t("run:anomaly.reset")}
+              </Button>
+            ) : (
+              <Group grow align="stretch">
+                <Button
+                  variant="default"
+                  styles={{ label: { whiteSpace: "normal", lineHeight: 1.2 } }}
+                  disabled={rerollsLeft <= 0}
+                  onClick={() => {
+                    setRerollMode(true);
+                    setSelected(null);
+                  }}
+                >
+                  {t("run:anomaly.reroll", { n: rerollsLeft })}
+                </Button>
+                <Button
+                  variant="default"
+                  styles={{ label: { whiteSpace: "normal", lineHeight: 1.2 } }}
+                  disabled={left <= 0 || !canAfford}
+                  onClick={newAttempt}
+                  data-testid="puzzle-new-attempt"
+                >
+                  {nextCost > 0
+                    ? t("run:anomaly.newAttemptCost", { n: nextCost })
+                    : t("run:anomaly.newAttempt", { n: left })}
+                </Button>
+              </Group>
+            )}
+            {isMultiTurn && !isFinalTurn ? (
+              <Button onClick={endTurn}>{t("run:anomaly.nextTurn")}</Button>
+            ) : (
+              <Button onClick={resolve} data-testid="puzzle-resolve">
+                {t("run:anomaly.resolve")}
+              </Button>
+            )}
+          </Stack>
+        )}
+      </Stack>
+    </Screen>
+  );
+};
+
+const PuzzleFlow = ({ puzzle, nodeId, forced }: FlowProps) => {
+  const bound = useRunStore((s) => s.puzzleRuns[nodeId]);
+  const entered = forced || bound?.puzzleId === puzzle.id;
+  const seed = useRunStore((s) => s.seed);
+  const reward = useMemo(
+    () => rewardFor(puzzle, createStream(deriveSeed(seed, `reward:${nodeId}`))),
+    [puzzle, seed, nodeId],
+  );
+
+  const enter = (): void => {
+    const run = useRunStore.getState();
+    run.beginPuzzle(nodeId, puzzle.id);
+    useMetaStore.getState().markPuzzleSeen(puzzle.id);
+    if (!isDeduction(puzzle)) run.spendPuzzleAttempt(nodeId);
+  };
+
+  const leave = (): void => {
+    useRunStore.getState().recordAnomalyUnsolved();
+    completeNode({ outcome: "cleared" });
+  };
+
+  if (!entered) {
+    return (
+      <EntryCard
+        puzzle={puzzle}
+        reward={reward}
+        onEnter={enter}
+        onLeave={leave}
+      />
+    );
+  }
+  return (
+    <PuzzleRunner
+      key={puzzle.id}
+      puzzle={puzzle}
+      nodeId={nodeId}
+      forced={forced}
+    />
   );
 };
 
@@ -825,13 +1138,22 @@ export const PuzzleScreen = () => {
   const forcedId = useAppStore((s) => s.params?.puzzleId);
   const forced = forcedId !== undefined;
   const nodeId = position ?? "dbg";
+
   const [puzzle] = useState<PuzzleDef | null>(() => {
     if (forcedId !== undefined) return PUZZLE_BY_ID.get(forcedId) ?? null;
-    return position === null ? null : pickPuzzle(position);
+    const run = useRunStore.getState();
+    const bound = run.puzzleRuns[nodeId];
+    if (bound !== undefined) return PUZZLE_BY_ID.get(bound.puzzleId) ?? null;
+    const node = run.map?.nodes.find((n) => n.id === position);
+    if (node === undefined) return null;
+    return puzzleForNode(
+      run.seed,
+      node,
+      run.solvedPuzzles,
+      useMetaStore.getState().seenPuzzles,
+    );
   });
 
-  if (puzzle === null || (!forced && position === null)) {
-    return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
-  }
-  return <PuzzleRunner puzzle={puzzle} nodeId={nodeId} forced={forced} />;
+  if (puzzle === null || (!forced && position === null)) return <Screen />;
+  return <PuzzleFlow puzzle={puzzle} nodeId={nodeId} forced={forced} />;
 };

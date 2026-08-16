@@ -17,7 +17,7 @@ export const DROP_WEIGHTS: Record<"battle" | "elite" | "boss", RarityWeights> = 
   boss: { common: 0, uncommon: 0, rare: 80, legendary: 20 },
 };
 
-export const BATTLE_DROP_CHANCE = 0.35;
+export const BATTLE_DROP_CHANCE = 0.45;
 
 const RARITY_ORDER: readonly Rarity[] = [
   "legendary",
@@ -52,8 +52,6 @@ const RARITY_LADDER: readonly Rarity[] = [
   "legendary",
 ];
 
-// «Жирный лут» shifts the whole weight table one rung up the ladder; the mass
-// that runs off the top piles into legendary rather than vanishing.
 export const shiftWeights = (
   weights: RarityWeights,
   step: number,
@@ -106,40 +104,50 @@ export const dieForRarity = (
   rarityStep = 0,
 ): string => rng.pick(poolForRarity(bumpRarity(rarity, rarityStep)));
 
+export const POCKET_SCRAP_MULT = 1.5;
+export const POCKET_RARITY_STEP = 1;
+
 export const computeNodeReward = (
   type: NodeType,
   rng: RngStream,
   rarityStep = 0,
+  pocket = false,
 ): NodeReward => {
+  const step = rarityStep + (pocket ? POCKET_RARITY_STEP : 0);
+  const scrap = (n: number): number =>
+    pocket ? Math.round(n * POCKET_SCRAP_MULT) : n;
   switch (type) {
     case "battle":
       return {
-        scrap: rng.int(12, 20),
+        scrap: scrap(rng.int(12, 20)),
         dieDrop:
           rng.next() < BATTLE_DROP_CHANCE
-            ? rollDrop(rng, DROP_WEIGHTS.battle, rarityStep)
+            ? rollDrop(rng, DROP_WEIGHTS.battle, step)
             : null,
       };
     case "elite":
     case "miniboss":
       return {
-        scrap: rng.int(45, 60),
-        dieDrop: rollDrop(rng, DROP_WEIGHTS.elite, rarityStep),
+        scrap: scrap(rng.int(45, 60)),
+        dieDrop: rollDrop(rng, DROP_WEIGHTS.elite, step),
       };
     case "boss":
       return {
         scrap: 80,
-        dieDrop: rollDrop(rng, DROP_WEIGHTS.boss, rarityStep),
+        dieDrop: rollDrop(rng, DROP_WEIGHTS.boss, step),
       };
     default:
       return { scrap: 0, dieDrop: null };
   }
 };
 
-const MODULE_LADDER: readonly Rarity[] = ["common", "uncommon", "rare"];
+const MODULE_LADDER: readonly Rarity[] = [
+  "common",
+  "uncommon",
+  "rare",
+  "legendary",
+];
 
-// Module offers never repeat what the ship already carries; the floor lifts the
-// draw for mini-boss packages.
 export const rollModule = (
   rng: RngStream,
   owned: readonly string[],
@@ -149,7 +157,7 @@ export const rollModule = (
   const tiers = MODULE_LADDER.slice(start);
   const weights: [Rarity, number][] = tiers.map((r, i) => [
     r,
-    [55, 33, 12][i + start] ?? 10,
+    [55, 33, 10, 2][i + start] ?? 2,
   ]);
   const rarity = rng.weighted(weights);
   const available = (r: Rarity): string[] =>

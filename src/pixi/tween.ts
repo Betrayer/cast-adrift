@@ -27,6 +27,8 @@ interface ActiveTween {
 }
 
 export class Tweens {
+  timeScale = 1;
+
   private readonly ticker: Ticker;
   private readonly active = new Set<ActiveTween>();
 
@@ -66,8 +68,9 @@ export class Tweens {
   }
 
   private readonly update = (ticker: Ticker): void => {
+    if (this.timeScale <= 0) return;
     for (const tween of [...this.active]) {
-      tween.elapsed += ticker.deltaMS;
+      tween.elapsed += ticker.deltaMS * this.timeScale;
       const t = Math.min(1, tween.elapsed / tween.ms);
       const k = tween.ease(t);
       for (const key of Object.keys(tween.to)) {

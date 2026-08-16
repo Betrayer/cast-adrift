@@ -72,7 +72,40 @@
     "keyStormChaser": "Chasseur de tempêtes",
     "keyIronDoctrine": "La doctrine de fer",
     "keyFatesFavorite": "Le chouchou du destin",
-    "keyPrismCascade": "Cascade de prismes"
+    "keyPrismCascade": "Cascade de prismes",
+    "selectHint": "Appuyez sur un nœud pour découvrir son fonctionnement.",
+    "filter": "Filtre",
+    "filterOn": "Filtre · {{n}}",
+    "filterClear": "Vider le filtre",
+    "pathCost": "Chemin d'accès à partir d'ici : {{n}} points (vous avez {{have}})",
+    "refundFree": "Remboursement (gratuit)",
+    "respecConfirmTitle": "Rembourser ce nœud ?",
+    "respecConfirmBody": "« {{name}} » retourne dans la réserve et le point est rétabli. Coût : {{cost}}◈.",
+    "respecConfirmYes": "Remboursement",
+    "redPowderRoom": "Salle d'eau",
+    "redRangeCard": "Fiche de portée",
+    "redHairTrigger": "Déclencheur ultra-sensible",
+    "redCoreBreach": "Brèche dans le noyau",
+    "blueStormAnchor": "Ancre de tempête",
+    "blueSpillway": "Déversoir",
+    "blueLongLens": "Objectif à longue focale",
+    "blueKeelPlate": "Plaque de quille",
+    "greenGraftBench": "Banc de greffe",
+    "greenSapline": "Sapline",
+    "greenLoam": "Terreau",
+    "greenHollow": "Le Creux",
+    "yellowTollhouse": "Tollhouse",
+    "yellowFinderFee": "Commission d'intermédiaire",
+    "yellowShortWeight": "Poids insuffisant",
+    "yellowMintMark": "Marque d'atelier",
+    "blackAshBed": "Lit de cendres",
+    "blackDeadMansSwitch": "Le « Dead Man's Switch »",
+    "blackTithe": "La dîme",
+    "blackSlagHeap": "Terril",
+    "greyShimStack": "Pile de cales",
+    "greyPatternBook": "Recueil de modèles",
+    "greyBallastTrim": "Réglage du lest",
+    "greyTallyStick": "Bâton de comptage"
   },
   "chartFx": {
     "hubBudget": "+1 budget pour le hangar",
@@ -90,7 +123,15 @@
       "growthCapDelta": "{{n}} plafond de croissance",
       "enginesThresholdDelta": "{{n}} seuil du moteur",
       "markBonusDelta": "{{n}} bonus de note",
-      "battleEndHeal": "{{n}} soigner / combattre"
+      "battleEndHeal": "{{n}} soigner / combattre",
+      "hullMaxPct": "{{n}} % de la coque maximale",
+      "extraRerolls": "{{n}} utilisation de la fonction « reroll »",
+      "scrapPerKill": "{{n}} butin par victime",
+      "setCompleteCharge": "{{n}} prix d'un ensemble complet",
+      "freeShopRerolls": "{{n}} re-lancer gratuit du compteur",
+      "xpMultPct": "{{n}} % d'XP",
+      "tideEffectDelta": "{{n}} sous l'emprise de la marée",
+      "moduleSlotDelta": "{{n}} baie de modules"
     },
     "fx": {
       "weaponsMaxFace": "Armes +1 sur un dé à face maximale",
@@ -115,25 +156,86 @@
       "redFirestorm": "La valeur maximale de « face » dans les armes ajoute « Brûlure 3 »",
       "redSpine": "+4 en montage dorsal",
       "greenCanopy": "+3 dans la catégorie « Moteurs »",
-      "blackWell": "Le réacteur peut encore contenir deux charges supplémentaires."
+      "blackWell": "Le réacteur peut encore contenir deux charges supplémentaires.",
+      "shopArrival": "+6 de ferraille à l'arrivée sur un marché",
+      "tideWard": "Répare 1 point de coque à chaque saut tant que la marée est de 2 ou plus",
+      "detourScout": "+12 points de casse en empruntant un détour",
+      "redFinisher": "+2 aux dégâts infligés par les armes contre une cible dont la coque est en dessous de 30 %.",
+      "redSwarmFire": "+1 en attaque tant qu'il reste au moins deux ennemis debout.",
+      "redBurnBite": "Un coup porté par une arme sur une cible en feu inflige 2 points de dégâts supplémentaires.",
+      "redRepeatCrit": "Un dé d'arme qui, lorsqu'il affiche la même valeur que la précédente, donne un coup critique.",
+      "redSalvoTally": "À partir du troisième dé d'arme d'une bataille, +1 en armes.",
+      "redOpener": "Le premier dé d'arme du tour bénéficie d'un bonus de +2.",
+      "redRiskCharge": "Lorsque les points de vie de la coque sont inférieurs à 40 %, terminez chaque tour avec 1 charge.",
+      "redPowderRoom": "Chaque coup porté à une cible en feu ajoute un effet de brûlure supplémentaire.",
+      "redHairTrigger": "Le premier dé d'arme du tour donne un coup critique.",
+      "redCoreBreach": "+3 à chaque jet de dé contre une cible dont la coque est inférieure à 25 %.",
+      "blueOvershield": "Avec 6 boucliers activés, un dé de boucliers en ajoute 2 supplémentaires.",
+      "blueStillness": "Un dé bleu dans les boucliers donne +1.",
+      "blueDeepGuard": "Conservez 4 points de bouclier pendant le tour de l'adversaire pour récupérer 1 point de vie.",
+      "blueJamOnLow": "Si le résultat d'un jet de dés est inférieur à 4, il est considéré comme égal à 5.",
+      "blueWatch": "Un dé bleu posé sur sa face la plus basse est relancé une fois.",
+      "blueBreakwater": "Commencez chaque combat avec 3 points de bouclier.",
+      "blueSpillway": "Un jet de bouclier de 8 ou plus ajoute 3 points de bouclier.",
+      "blueLongLens": "+2 au niveau des capteurs.",
+      "greenGrowOnEngines": "Le nombre de faces d'un moteur « max-face » augmente, jusqu'à +2.",
+      "greenTendril": "Un dé vert affichant un résultat de 6 ou plus augmente, jusqu’à +3.",
+      "greenMend": "Si vous terminez un tour avec plus de 30 % de vie, vous gagnez 1 point de vie.",
+      "greenRootHold": "+2 pour les moteurs situés sous la moitié de la coque.",
+      "greenSpore": "Une bataille remportée soigne de 2 points.",
+      "greenQuietBerth": "Arriver dans un chantier naval permet de regagner 2 points de vie.",
+      "greenSapline": "Terminer un tour avec 4 points de bouclier pour regagner 2 points de vie.",
+      "greenLoam": "Le nombre de faces d'un moteur « max-face » augmente, jusqu'à +3.",
+      "yellowTollBooth": "Chaque rencontre rapportée rapporte 8 ferrailles.",
+      "yellowKickback": "Un dé jaune rapporte 2 ferrailles lors de son évaluation.",
+      "yellowLuckyOpen": "Le premier dé du tour, s'il affiche sa face la plus élevée, rapporte 6 ferrailles.",
+      "yellowGleaner": "Un dé jaune dont la face la plus basse est visible rapporte 4 ferrailles.",
+      "yellowWager": "Un dé sur l'une ou l'autre des faces extrêmes rapporte 3 ferrailles.",
+      "yellowTollhouse": "Lorsque vous arrivez à un comptoir, vous recevez 14 ferrailles.",
+      "yellowMintMark": "Une matrice de réacteur rapporte 4 ferraille.",
+      "blackBleedCharge": "+1 pour les dés noirs lorsque la coque est en dessous de 60 %.",
+      "blackOvercap": "Les dés noirs peuvent dépasser la limite d'un emplacement pour 2 coques.",
+      "blackPactTithe": "Commencez chaque combat avec 2 points de charge et −2 points de coque.",
+      "blackLastLight": "+2 à chaque jet de dé lorsque la coque est en dessous de 25 %.",
+      "blackReactorTally": "À partir du deuxième réacteur détruit, terminez le tour avec 1 charge.",
+      "blackSpite": "En dessous de la moitié des points de vie, le tour de l'ennemi se termine avec 1 charge.",
+      "blackNightWatch": "Un dé noir affichant sa face maximale donne 1 charge.",
+      "blackAshBed": "Un dé posé sur sa face la plus basse donne 2 points de charge.",
+      "blackDeadMansSwitch": "Lorsque la santé de la coque est inférieure à 25 %, terminez chaque tour avec 3 points de charge.",
+      "blackSlagHeap": "+3 dans le réacteur tout en conservant 4 charges.",
+      "greyScan": "Un petit coup de pouce supplémentaire à chaque jet de dé.",
+      "greyEvenKeel": "+1 pour les dés gris.",
+      "greyCounterweight": "Un dé non gris dont la face la plus basse est visible bénéficie d'un bonus de +1.",
+      "greyToolbelt": "Une utilisation supplémentaire de la fonction « relancer » par combat.",
+      "greySpare": "Un emplacement de réserve supplémentaire par combat.",
+      "greyMirror": "Un dé gris qui reproduit la dernière valeur augmente le nombre de relances de 1.",
+      "greyLedgerKeep": "Se rendre à un comptoir rapporte 10 ferrailles.",
+      "greyPatternBook": "Un dé qui affiche à nouveau la dernière valeur permet de relancer le dé.",
+      "greyTallyStick": "Dès que le deuxième capteur tombe en panne, +2 à chaque jet de dé."
     },
     "trait": {
       "obsidianPact": "Les dés noirs n'affichent que leur valeur minimale ou maximale.",
       "singleCast": "Pas de relances",
-      "coldLogic": "Les « nudges » sont gratuits · les coups critiques sont désactivés"
-    }
+      "coldLogic": "Les « nudges » sont gratuits · les coups critiques sont désactivés",
+      "overflowShield": "La charge dépassant le plafond se transforme en bouclier.",
+      "fateTwice": "Le dé du Destin peut être utilisé deux fois par combat.",
+      "prismDouble": "Les dés prismatiques comptent double pour la résonance."
+    },
+    "budgetDelta": "{{n}} point d'amarrage",
+    "slotTier": "{{slot}} : {{n}} die-size step"
   },
   "milestone": {
-    "budget": "Budget du hangar +1",
+    "budget": "Budget du hangar +2",
     "shipRam": "Mémoire vive déverrouillée",
-    "contractRow": "Deuxième litige contractuel (prochainement)",
     "shipArk": "L'Arche déverrouillée",
-    "engraving": "Gravure gare (prochainement)",
-    "dailyPreview": "Aperçu quotidien (à venir)",
-    "respecPrestige": "Réattribution gratuite des points de compétence « Keystone » (bientôt disponible)"
+    "engraving": "Gravure gare ouverte",
+    "dailyPreview": "Le « Daily » de demain est disponible",
+    "respecPrestige": "Réattribution gratuite des points de caractéristiques + skin Prestige",
+    "diceWave": "Les dés Fusion sur l'étagère",
+    "contractWave": "Ouverture de la vague de contrats",
+    "chartPoints": "Deux points d'Carte stellaire"
   },
   "levelup": {
-    "title": "Passer au niveau supérieur",
     "level": "Niveau de capitaine {{level}}",
     "point": "+1 point «Carte stellaire »",
     "points": "+{{n}} Carte stellaire points",
@@ -143,7 +245,17 @@
     "shards": "Éclats",
     "xp": "XP",
     "level": "Niveau de capitaine {{level}}",
-    "toNext": "{{into}} / {{need}} vers la page suivante"
+    "toNext": "{{into}} / {{need}} vers la page suivante",
+    "fromSectors": "Secteurs déblayés",
+    "fromBeacons": "Balises résolues",
+    "fromEnding": "Une fin inédite",
+    "fromHull": "Dégagé à mi-coque",
+    "fromStreak": "Série sans décès",
+    "fromAscension": "Bonus d'ascension",
+    "fromFinds": "Premières découvertes",
+    "fromAchievements": "Réalisations",
+    "firstFinds": "Première publication : {{names}}",
+    "fromDeep": "Au-delà de l'essentiel"
   },
   "menu": {
     "level": "Niv.{{level}}"
@@ -151,14 +263,10 @@
   "hangar": {
     "title": "Hangar",
     "deck": "Terrasse",
-    "collection": "Collection",
     "shop": "Meta Shop",
     "budget": "{{used}}s sur le budget / {{max}}",
-    "pts": "{{n}} pts",
-    "owned": "×{{n}}",
     "add": "Ajouter",
     "buy": "Acheter · {{price}}◈",
-    "sold": "Propriété",
     "save": "Enregistrer le jeu de cartes",
     "saved": "Enregistré",
     "invalidOver": "Dépassement du budget",
@@ -167,20 +275,38 @@
     "invalidFate": "1 dé du Destin au maximum",
     "valid": "Prêt",
     "empty": "Le tiroir est vide",
-    "ship": "Navire",
     "shipEquip": "Équiper",
     "shipEquipped": "Équipé",
     "shipBuy": "Acheter · {{price}}◈",
     "shipLocked": "Se débloque au niveau{{level}}",
-    "filterSchool": "École",
-    "filterTier": "Niveau",
-    "filterRarity": "Rareté",
     "filterAll": "Tout"
   },
   "collection": {
     "title": "Collection",
-    "count": "{{n}} dés",
-    "owned": "×{{n}}"
+    "owned": "×{{n}}",
+    "discount": "−{{n}} % — vous avez rencontré ce dé",
+    "found": "Rencontré",
+    "undiscovered": "Pas encore rencontré",
+    "provenance": "Trouvé sur : {{sector}}, {{node}}",
+    "stateAll": "Tout",
+    "stateOwned": "Propriété",
+    "stateFound": "Rencontré",
+    "stateUnknown": "À découvrir",
+    "totals": "{{owned}} détenu · {{found}} rencontré · {{total}} dans la liste des joueurs",
+    "node": {
+      "start": "le point de chute",
+      "battle": "une escarmouche",
+      "elite": "une élite",
+      "miniboss": "une bagarre à la porte",
+      "boss": "un patron",
+      "event": "une rencontre",
+      "shop": "un compteur",
+      "shipyard": "un chantier naval",
+      "anomaly": "une fracture",
+      "beacon": "un phare",
+      "rest": "une couchette tranquille",
+      "pocket": "une poche"
+    }
   },
   "modes": {
     "title": "Modes",
@@ -202,7 +328,9 @@
     "open": "Ouvrir",
     "guardTitle": "Une course est déjà en cours",
     "guardBody": "Il n'y a qu'un seul emplacement de partie. Le lancement de ce mode efface la partie en cours, tant localement que dans le cloud.",
-    "guardYes": "Effacer et démarrer"
+    "guardYes": "Effacer et démarrer",
+    "dailyPreview": "Demain ({{date}})",
+    "dailyPreviewLocked": "Les mutateurs de demain au niveau{{n}}"
   },
   "contracts": {
     "title": "Contrats",
@@ -232,7 +360,9 @@
     "axisAtMost": "Terminer avec l'axe à {{n}} ou en dessous",
     "allBeaconsResolved": "Traiter toutes les balises",
     "deckSchoolsAtLeast": "Terminer avec les écoles «{{n}} » dans le jeu de cartes",
-    "dicePlacedAtMost": "Placer au maximum {{n}} dés, tous en ligne"
+    "dicePlacedAtMost": "Placer au maximum {{n}} dés, tous en ligne",
+    "axisAtLeast": "Obtenir une note finale d'au moins {{n}}",
+    "elitesAtMost": "Terminer la mission en affrontant au maximum {{n}} d'élites"
   },
   "drift": {
     "title": "Dérive plus de",
@@ -281,7 +411,19 @@
     "none": "—",
     "place": "#{{rank}}",
     "endings": "Fin",
-    "locked": "Scellé"
+    "locked": "Scellé",
+    "achievements": "Réalisations",
+    "achProgress": "{{have}} / {{need}}",
+    "badges": "Insignes",
+    "achCount": "{{n}} de {{total}}",
+    "group": {
+      "combat": "Combat",
+      "economy": "Économie",
+      "puzzles": "Anomalies",
+      "story": "Histoire",
+      "collection": "Collection",
+      "modes": "Modes"
+    }
   },
   "engraving": {
     "title": "Gravure Gare",
@@ -292,9 +434,265 @@
     "empty": "Aucune gravure n'a été apposée.",
     "remove": "supprimer",
     "fitted": "ajusté",
-    "fit": "{{price}} ◈"
+    "fit": "{{price}} ◈",
+    "pair": "À associer avec « {{name}} »"
   },
   "badge": {
-    "keeper": "Gardien"
+    "keeper": "Gardien",
+    "ascendant": "Ascendant",
+    "chartwright": "Chartwright",
+    "archivist": "Archiviste",
+    "answer": "La réponse"
+  },
+  "unlock": {
+    "opened": "Déverrouillé",
+    "new": "nouveau",
+    "locked": "Verrouillé",
+    "hintLevel": "niveau {{n}}",
+    "hintAchievement": "succès « {{name}} »",
+    "hintAscension": "à consulter sur {{n}}",
+    "hintClears": "{{n}} résultats de la campagne",
+    "hintDrop": "une édition limitée unique",
+    "hintJoin": " ou ",
+    "hintUnknown": "inconnu",
+    "diceL8": "Six cadres d8 — un par école",
+    "diceL15": "Six dés de fusion",
+    "diceL22": "Six pièces de direction rares",
+    "diceL30": "L'étagère prismatique",
+    "diceL38": "Six figurines lourdes d12",
+    "diceL46": "Six cartes légendaires",
+    "diceAchFirstClear": "L'étagère du haut",
+    "diceAchPuzzler": "Quatre fusions d'anomalies",
+    "diceAchCollector": "Trois fusions de collecteurs",
+    "diceAchSurvivor": "Trois dés de survivants",
+    "contractsL5": "Trois contrats : « Storm », « Bare Armor » et « Blind Jump »",
+    "contractsL12": "Trois contrats : Ram, Single Cast, Dead Reckoning",
+    "contractsL20": "Trois contrats : Ark, Keeper, Iron Marée",
+    "contractsL28": "Trois contrats : Choir, Prismwork, Ghost Lane",
+    "contractsA5": "Contrat : La dîme du Vide",
+    "contractsAchGauntlet": "Contrat : « The Gauntlet »",
+    "skinAshen": "La peau de Die : cendrée",
+    "skinVoidglass": "La peau du die : Voidglass",
+    "skinEmberglass": "La peau de Die : Emberglass",
+    "prestigeTheme": "Thème : Ascendant",
+    "skinPrestige50": "Le motif : Captain's Mark",
+    "skinChartwright": "Le skin : Chartwright",
+    "featureShipRam": "Le bélier",
+    "featureShipArk": "L'Arche",
+    "featureEngraving": "Gravure gare",
+    "featureDailyPreview": "Aperçu quotidien",
+    "featureFreeRespec": "Réattribution gratuite des points de caractéristiques « Keystone »",
+    "sectorSix": "Secteur 6 « Au-delà du centre »",
+    "diceS6": "Quatre dés de causalité",
+    "skinThreshold": "Le skin « Threshold »"
+  },
+  "skin": {
+    "title": "Les skins",
+    "hint": "C'est purement cosmétique : l'apparence ne change jamais le résultat d'un lancer de dé.",
+    "use": "Utilisation",
+    "active": "Actif",
+    "default": {
+      "name": "Standard",
+      "desc": "La façade de l'usine."
+    },
+    "ashen": {
+      "name": "Cendré",
+      "desc": "Angles marqués, grain de frêne, pas de brillance."
+    },
+    "voidglass": {
+      "name": "Voidglass",
+      "desc": "Rond, profond, éclairé de l'intérieur."
+    },
+    "emberglass": {
+      "name": "Emberglass",
+      "desc": "Une bordure ambrée intense, un cœur chaleureux."
+    },
+    "prestige50": {
+      "name": "La marque du capitaine",
+      "desc": "Caractères à empattement, contour blanc."
+    },
+    "chartwright": {
+      "name": "Chartwright",
+      "desc": "Carré de plan, glyphes mono."
+    },
+    "threshold": {
+      "name": "Seuil",
+      "desc": "Ronde, éteinte, bordée de gris clair. Portée par le seul capitaine qui ne se soit jamais penché."
+    }
+  },
+  "ach": {
+    "firstBlood": {
+      "name": "Premier sang",
+      "desc": "Éliminez 25 ennemis."
+    },
+    "hunter": {
+      "name": "Chasseur",
+      "desc": "Éliminez 500 ennemis."
+    },
+    "eliteHunter": {
+      "name": "Chasseur d'élite",
+      "desc": "Tuez 25 ennemis d'élite."
+    },
+    "sectorFive": {
+      "name": "Cinq couronnes",
+      "desc": "Éliminez les cinq boss de secteur."
+    },
+    "ironStreak": {
+      "name": "Série de victoires",
+      "desc": "Terminez trois campagnes d'affilée sans mourir."
+    },
+    "flawless": {
+      "name": "Impeccable",
+      "desc": "Terminez une campagne en conservant au moins 90 % de la résistance de la coque."
+    },
+    "ascendant": {
+      "name": "Ascendant",
+      "desc": "Terminez la campagne au niveau Ascension 10."
+    },
+    "quickWork": {
+      "name": "Travail rapide",
+      "desc": "Terminez une campagne en 11 sauts ou moins."
+    },
+    "scrapper": {
+      "name": "Ferrailleur",
+      "desc": "Gagnez 5 000 ferrailles au total."
+    },
+    "tycoon": {
+      "name": "Magnat",
+      "desc": "Gagnez 25 000 ferrailles au total."
+    },
+    "frugal": {
+      "name": "Économique",
+      "desc": "Terminer une campagne sans dépenser le moindre centime."
+    },
+    "outfitter": {
+      "name": "Fournisseur d'équipement",
+      "desc": "Posséder 30 dés différents."
+    },
+    "tierFive": {
+      "name": "Niveau 5",
+      "desc": "Résoudre une anomalie de niveau 5."
+    },
+    "cryptographer": {
+      "name": "Cryptographe",
+      "desc": "Résolvez dix anomalies de niveau 5."
+    },
+    "anomalist": {
+      "name": "Anomaliste",
+      "desc": "Résolvez quatre anomalies en une seule fois."
+    },
+    "puzzleBreadth": {
+      "name": "Bien lu",
+      "desc": "Découvrez 30 anomalies différentes."
+    },
+    "maraSquared": {
+      "name": "Le grand livre de Mara",
+      "desc": "Avoir une dette envers Mara et bénéficier de sa bienveillance."
+    },
+    "keeperFriend": {
+      "name": "Le fil du Gardien",
+      "desc": "Remboursez le Gardien et reconstruisez la balise."
+    },
+    "fleetKept": {
+      "name": "Parole tenue",
+      "desc": "Préservez l'intégrité de la flotte."
+    },
+    "apostate": {
+      "name": "Apostat",
+      "desc": "Rompez le pacte du Chœur."
+    },
+    "bothMirrors": {
+      "name": "Les deux miroirs",
+      "desc": "Lier le miroir une fois et le briser une fois."
+    },
+    "coreTrilogy": {
+      "name": "Trois réponses",
+      "desc": "Répondez, taisez-vous et écoutez votre for intérieur — au cours de trois descentes."
+    },
+    "lighthouse": {
+      "name": "Phare",
+      "desc": "Allumez le phare."
+    },
+    "beaconkeeper": {
+      "name": "Gardien du phare",
+      "desc": "Passez quatre balises en un seul passage."
+    },
+    "allEndings": {
+      "name": "Chaque route",
+      "desc": "Atteignez les quatre fins."
+    },
+    "fiftyFound": {
+      "name": "Cinquante trouvés",
+      "desc": "Découvrez 50 dés différents par séries."
+    },
+    "everyColour": {
+      "name": "Toutes les couleurs",
+      "desc": "Posséder un dé représentant les sept écoles."
+    },
+    "archivist": {
+      "name": "Archiviste",
+      "desc": "Débloquez 60 entrées «Codex »."
+    },
+    "keystoneThree": {
+      "name": "Chartwright",
+      "desc": "Tenez trois clés de voûte à la fois."
+    },
+    "contractor": {
+      "name": "Entrepreneur",
+      "desc": "Gagnez 30 étoiles de contrat."
+    },
+    "toast": "Réussite",
+    "beyondTheCore": {
+      "name": "Au-delà de l'essentiel",
+      "desc": "Franchissez le seuil et nettoyez le Secteur 6."
+    },
+    "theAnswer": {
+      "name": "La réponse",
+      "desc": "Atteignez la fin cachée au-delà du Noyau."
+    }
+  },
+  "chartTag": {
+    "red": "rouge",
+    "blue": "bleu",
+    "green": "vert",
+    "yellow": "jaune",
+    "black": "noir",
+    "grey": "gris",
+    "prismatic": "prismatique",
+    "weapons": "armes",
+    "shields": "boucliers",
+    "engines": "moteurs",
+    "sensors": "capteurs",
+    "reactor": "réacteur",
+    "spinal": "spinal",
+    "repairBay": "atelier de réparation",
+    "burn": "brûler",
+    "crit": "crit",
+    "growth": "croissance",
+    "reroll": "réessayer",
+    "charge": "frais",
+    "scrap": "ferraille",
+    "overcap": "surcapuchon",
+    "pierce": "percer",
+    "dodge": "esquiver",
+    "survival": "survie",
+    "control": "contrôle",
+    "dice": "dés",
+    "shieldwall": "mur de boucliers",
+    "risk": "risque",
+    "swarm": "essaim",
+    "spike": "pic",
+    "precision": "précision"
+  },
+  "ascension": {
+    "reward": {
+      "shards": "Le gain en éclats augmente à chaque niveau",
+      "skinAshen": "la peau « Ashen »",
+      "contract": "contrat « The Void Tithe »",
+      "skinVoidglass": "la peau « Voidglass »",
+      "skinEmberglass": "la peau « Emberglass »",
+      "prestigeTheme": "thème « Ascendant »",
+      "badge": "le badge « Ascendant »"
+    }
   }
 }

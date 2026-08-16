@@ -26,7 +26,8 @@ import { useBattleStore } from '@/stores/battleStore';
 import { useLootStore } from '@/stores/lootStore';
 import { useRunStore } from '@/stores/runStore';
 import type { SlotId } from '@/types/battle';
-import type { Intent, PatternStep } from '@/types/content';
+import { intentsOfStep } from '@/types/content';
+import type { Intent } from '@/types/content';
 
 const MK_SLOTS: readonly SlotId[] = [
   'weaponA',
@@ -37,9 +38,6 @@ const MK_SLOTS: readonly SlotId[] = [
   'reactor',
   'spinal',
 ];
-
-const flattenStep = (step: PatternStep): Intent[] =>
-  'pick' in step ? step.pick.map(([intent]) => intent) : [step];
 
 const intentSummary = (intent: Intent): string => {
   switch (intent.t) {
@@ -73,6 +71,28 @@ const intentSummary = (intent: Intent): string => {
       return 'swap';
     case 'storm':
       return 'storm';
+    case 'curseDie':
+      return `curse ${String(intent.n)}`;
+    case 'shieldGate':
+      return `gate ${String(intent.n)}`;
+    case 'mirrorSchool':
+      return 'mirrorSchool';
+    case 'drainCharge':
+      return `drain ${String(intent.n)}`;
+    case 'siphonShield':
+      return `siphon ${String(intent.n)}`;
+    case 'bargain':
+      return `bargain ${String(intent.n)}/${String(intent.heal)}`;
+    case 'enrage':
+      return `enrage ${String(intent.n)}`;
+    case 'hijack':
+      return 'hijack';
+    case 'echoTotal':
+      return `echoTotal ${String(intent.cap)}`;
+    case 'foldOrder':
+      return 'foldOrder';
+    case 'devourDie':
+      return 'devourDie';
   }
 };
 
@@ -159,7 +179,7 @@ export const DebugPanel = () => {
         const def = ENEMY_BY_ID.get(enemy.defId);
         const step = def?.pattern[stepIndex];
         if (def === undefined || step === undefined) return enemy;
-        const intent = flattenStep(step)[optionIndex];
+        const intent = intentsOfStep(step)[optionIndex];
         if (intent === undefined) return enemy;
         return { ...enemy, intentIndex: stepIndex, nextIntent: intent };
       }),
@@ -173,7 +193,7 @@ export const DebugPanel = () => {
   const firstEnemy = useBattleStore((s) => s.enemies[0]);
   const pattern = ENEMY_BY_ID.get(firstEnemy?.defId ?? '')?.pattern ?? [];
   const intentOptions = pattern.flatMap((step, stepIndex) =>
-    flattenStep(step).map((intent, optionIndex) => ({
+    intentsOfStep(step).map((intent, optionIndex) => ({
       value: `${String(stepIndex)}:${String(optionIndex)}`,
       label: `${String(stepIndex)}: ${intentSummary(intent)}`,
     })),
@@ -188,7 +208,7 @@ export const DebugPanel = () => {
       p="xs"
       radius="md"
       withBorder
-      style={{ zIndex: 400 }}
+      style={{ zIndex: 'var(--z-dev)' }}
     >
       <Stack gap="xs">
         <Text size="xs" fw={700}>
@@ -203,7 +223,7 @@ export const DebugPanel = () => {
             if (v !== null) setEncounter(v);
           }}
           searchable
-          comboboxProps={{ zIndex: 1000, withinPortal: true }}
+          comboboxProps={{ zIndex: 'var(--z-dropdown)', withinPortal: true }}
         />
         <TextInput
           size="xs"
@@ -275,7 +295,7 @@ export const DebugPanel = () => {
           label="force intent"
           data={intentOptions}
           onChange={forceIntent}
-          comboboxProps={{ zIndex: 1000, withinPortal: true }}
+          comboboxProps={{ zIndex: 'var(--z-dropdown)', withinPortal: true }}
         />
         <Text size="xs" fw={700}>
           shipyard (bump Mk, then restart)

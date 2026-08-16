@@ -1,6 +1,5 @@
-import { Box } from "@mantine/core";
 import { useEffect } from "react";
-import { tokens } from "@/app/theme";
+import { Screen } from "@/app/Screen";
 import { finishRewards } from "@/game/run/flow";
 import { useRunStore } from "@/stores/runStore";
 import { DieReward } from "./DieReward";
@@ -20,20 +19,22 @@ export const RewardsScreen = () => {
     if (done) finishRewards();
   }, [done]);
 
-  if (pending === null) return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
-  if (
+  if (pending === null) return <Screen />;
+  const packaged =
     (pending.dieChoices ?? []).length > 0 ||
-    (pending.moduleChoices ?? []).length > 0
-  ) {
-    return (
-      <PackageReward
-        choices={pending.dieChoices ?? []}
-        moduleChoices={pending.moduleChoices ?? []}
-      />
-    );
-  }
-  if (pending.dieDrop !== null) return <DieReward dieId={pending.dieDrop} />;
-  if (pending.perkChoices.length > 0)
-    return <PerkDraft choices={pending.perkChoices} />;
-  return <Box bg={tokens.bg} mih="var(--ca-vh)" />;
+    (pending.moduleChoices ?? []).length > 0;
+  return (
+    <Screen centered width="wide">
+      {packaged ? (
+        <PackageReward
+          choices={pending.dieChoices ?? []}
+          moduleChoices={pending.moduleChoices ?? []}
+        />
+      ) : pending.dieDrop !== null ? (
+        <DieReward dieId={pending.dieDrop} />
+      ) : pending.perkChoices.length > 0 ? (
+        <PerkDraft choices={pending.perkChoices} />
+      ) : null}
+    </Screen>
+  );
 };

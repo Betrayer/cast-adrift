@@ -10,9 +10,11 @@ import {
 import { CoachMarks } from '@/components/CoachMarks';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
-import { MusicDirector } from '@/components/MusicDirector';
-import { NarrativeToasts } from '@/components/NarrativeToasts';
+import { MemoryCeremony } from '@/components/MemoryCeremony';
+import { AudioDirector } from '@/components/AudioDirector';
 import { PerfOverlay } from '@/components/PerfOverlay';
+import { RotateGate } from '@/components/RotateGate';
+import { ToastHost } from '@/components/ToastHost';
 import {
   resolveReducedMotion,
   useSettingsStore,
@@ -23,9 +25,6 @@ export const App = () => {
   const fontScale = useSettingsStore((s) => s.fontScale);
   const reducedMotion = useSettingsStore((s) => s.reducedMotion);
 
-  // Applied during render, not in an effect: every screen below reads the
-  // live `tokens` object while rendering, so the switch has to land before
-  // the children of this provider render.
   const mantine = useMemo(() => mantineThemeFor(applyTheme(themeId)), [themeId]);
 
   useEffect(() => {
@@ -47,9 +46,11 @@ export const App = () => {
   return (
     <MantineProvider theme={mantine} forceColorScheme="dark">
       <Router />
-      <MusicDirector />
-      <NarrativeToasts />
+      <AudioDirector />
+      <ToastHost />
+      <MemoryCeremony />
       <CoachMarks />
+      <RotateGate />
       <DevOverlay />
       <PerfOverlay />
       <DevPanel />

@@ -2,6 +2,12 @@ import { create } from "zustand";
 import { moduleSlots } from "@/data/modules";
 import type { ShipId } from "@/data/ships";
 import type { MkLevel } from "@/data/slots";
+import {
+  clampAxis,
+  countDeckSchool,
+  driftAllowed,
+  sectorDriftDelta,
+} from "@/game/run/axis";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
@@ -31,6 +37,12 @@ export interface RunBattleMod {
 export interface ConsumedBattleMods {
   startCharge: number;
   enemyPlus: number;
+}
+
+export interface RunEncounter {
+  defId: string;
+  sector: number;
+  node: string;
 }
 
 export interface PendingBattle {
@@ -69,8 +81,6 @@ export interface RunStats {
   actionCount: number;
 }
 
-// Everything a finished battle contributes to the goal counters, captured before
-// the battle store resets.
 export interface BattleTally {
   won: boolean;
   turns: number;
@@ -113,6 +123,13 @@ export interface PendingRewards {
   moduleChoices?: string[];
   voucher?: boolean;
   packageScrap?: number;
+  draftNodeId?: NodeId;
+  draftFloor?: "common" | "uncommon" | "rare";
+}
+
+export interface PuzzleRunState {
+  puzzleId: string;
+  attempts: number;
 }
 
 export interface RunValues {
@@ -135,14 +152,23 @@ export interface RunValues {
   deck: DieInstance[];
   perks: string[];
   modules: string[];
+  banishedPerks: string[];
+  draftsSinceRare: number;
+  draftRerollUsed: boolean;
+  banishUsed: boolean;
   chartPicks: string[];
   mkLevels: MkLevels;
   tide: number;
   jumpsSinceTide: number;
   flags: Record<string, FlagValue>;
+  counters: Record<string, number>;
   axis: number;
+  driftBlack: number;
+  driftBlue: number;
+  driftSpent: number;
   seenEvents: string[];
   solvedPuzzles: string[];
+  puzzleRuns: Record<NodeId, PuzzleRunState>;
   anomalyStreak: number;
   interferenceStacks: number;
   killedTypes: string[];
@@ -161,8 +187,11 @@ export interface RunValues {
   vouchers: number;
   usedMinibosses: string[];
   bossesKilled: string[];
-  memoriesUnlocked: number;
+  memoryOrders: number[];
   endingId: string | null;
+  endingFirstTime: boolean;
+  crossedThreshold: boolean;
+  encounters: RunEncounter[];
   startedAt: number;
 }
 
@@ -175,13 +204,21 @@ export interface RunState extends RunValues {
   healHull: (n: number) => void;
   setHull: (n: number) => void;
   addPerk: (perkId: string) => void;
+  noteDraftOffer: (hadRare: boolean) => void;
+  banishPerk: (perkId: string) => boolean;
+  useDraftReroll: () => boolean;
   addModule: (moduleId: string) => boolean;
   removeModule: (moduleId: string) => void;
   setFlag: (key: string, value?: FlagValue) => void;
   clearFlag: (key: string) => void;
+  bumpCounter: (key: string, delta: number) => void;
   addAxis: (n: number) => void;
+  noteDriftUsage: (blackUsed: number, blueUsed: number) => void;
+  settleSectorDrift: () => number;
   markEventSeen: (id: string) => void;
   markPuzzleSolved: (id: string) => void;
+  beginPuzzle: (nodeId: NodeId, puzzleId: string) => PuzzleRunState;
+  spendPuzzleAttempt: (nodeId: NodeId) => number;
   recordAnomalySolved: () => void;
   recordAnomalyUnsolved: () => void;
   markKilledType: (defId: string) => boolean;
@@ -207,8 +244,9 @@ export interface RunState extends RunValues {
   spendVoucher: () => boolean;
   markMinibossUsed: (defId: string) => void;
   markBossKilled: (defId: string) => boolean;
-  unlockNextMemory: () => number;
-  setEnding: (id: string | null) => void;
+  unlockMemory: (order: number) => boolean;
+  setEnding: (id: string | null, firstTime?: boolean) => void;
+  crossThreshold: () => void;
   reset: () => void;
 }
 
@@ -238,6 +276,8 @@ export const createInitialRunStats = (): RunStats => ({
   actionCount: 0,
 });
 
+export const MAX_SHIPYARD_DISCOUNT = 60;
+
 export const createInitialRunValues = (): RunValues => ({
   active: false,
   seed: 0,
@@ -258,14 +298,23 @@ export const createInitialRunValues = (): RunValues => ({
   deck: [],
   perks: [],
   modules: [],
+  banishedPerks: [],
+  draftsSinceRare: 0,
+  draftRerollUsed: false,
+  banishUsed: false,
   chartPicks: [],
   mkLevels: {},
   tide: 0,
   jumpsSinceTide: 0,
   flags: {},
+  counters: {},
   axis: 0,
+  driftBlack: 0,
+  driftBlue: 0,
+  driftSpent: 0,
   seenEvents: [],
   solvedPuzzles: [],
+  puzzleRuns: {},
   anomalyStreak: 0,
   interferenceStacks: 0,
   killedTypes: [],
@@ -284,8 +333,11 @@ export const createInitialRunValues = (): RunValues => ({
   vouchers: 0,
   usedMinibosses: [],
   bossesKilled: [],
-  memoriesUnlocked: 0,
+  memoryOrders: [],
   endingId: null,
+  endingFirstTime: false,
+  crossedThreshold: false,
+  encounters: [],
   startedAt: 0,
 });
 
@@ -316,10 +368,17 @@ export const useRunStore = create<RunState>()((set, get) => ({
 
   addDie: (defId, growthBonus) => {
     const uid = `d${String(get().deckSeq)}`;
-    set((s) => ({
-      deck: [...s.deck, { uid, defId, ...(growthBonus ? { growthBonus } : {}) }],
-      deckSeq: s.deckSeq + 1,
-    }));
+    set((s) => {
+      const node =
+        s.map?.nodes.find((n) => n.id === s.position)?.type ?? "start";
+      return {
+        deck: [...s.deck, { uid, defId, ...(growthBonus ? { growthBonus } : {}) }],
+        deckSeq: s.deckSeq + 1,
+        encounters: s.encounters.some((e) => e.defId === defId)
+          ? s.encounters
+          : [...s.encounters, { defId, sector: s.sector, node }],
+      };
+    });
     return uid;
   },
 
@@ -339,6 +398,23 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set((s) =>
       s.perks.includes(perkId) ? s : { perks: [...s.perks, perkId] },
     );
+  },
+
+  noteDraftOffer: (hadRare) => {
+    set((s) => ({ draftsSinceRare: hadRare ? 0 : s.draftsSinceRare + 1 }));
+  },
+
+  banishPerk: (perkId) => {
+    const s = get();
+    if (s.banishUsed || s.banishedPerks.includes(perkId)) return false;
+    set({ banishUsed: true, banishedPerks: [...s.banishedPerks, perkId] });
+    return true;
+  },
+
+  useDraftReroll: () => {
+    if (get().draftRerollUsed) return false;
+    set({ draftRerollUsed: true });
+    return true;
   },
 
   addModule: (moduleId) => {
@@ -372,8 +448,41 @@ export const useRunStore = create<RunState>()((set, get) => ({
     });
   },
 
+  bumpCounter: (key, delta) => {
+    set((s) => ({
+      counters: { ...s.counters, [key]: (s.counters[key] ?? 0) + delta },
+    }));
+  },
+
   addAxis: (n) => {
-    set((s) => ({ axis: Math.max(-10, Math.min(10, s.axis + n)) }));
+    set((s) => ({ axis: clampAxis(s.axis + n) }));
+  },
+
+  noteDriftUsage: (blackUsed, blueUsed) => {
+    set((s) => ({
+      driftBlack: s.driftBlack + blackUsed,
+      driftBlue: s.driftBlue + blueUsed,
+    }));
+  },
+
+  settleSectorDrift: () => {
+    const s = get();
+    const delta = driftAllowed(
+      sectorDriftDelta(
+        s.driftBlack,
+        s.driftBlue,
+        countDeckSchool(s.deck, "black"),
+        countDeckSchool(s.deck, "blue"),
+      ),
+      s.driftSpent,
+    );
+    set({
+      driftBlack: 0,
+      driftBlue: 0,
+      driftSpent: s.driftSpent + Math.abs(delta),
+      axis: clampAxis(s.axis + delta),
+    });
+    return delta;
   },
 
   markEventSeen: (id) => {
@@ -388,6 +497,22 @@ export const useRunStore = create<RunState>()((set, get) => ({
         ? s
         : { solvedPuzzles: [...s.solvedPuzzles, id] },
     );
+  },
+
+  beginPuzzle: (nodeId, puzzleId) => {
+    const existing = get().puzzleRuns[nodeId];
+    if (existing !== undefined && existing.puzzleId === puzzleId) return existing;
+    const fresh: PuzzleRunState = { puzzleId, attempts: 0 };
+    set((s) => ({ puzzleRuns: { ...s.puzzleRuns, [nodeId]: fresh } }));
+    return fresh;
+  },
+
+  spendPuzzleAttempt: (nodeId) => {
+    const current = get().puzzleRuns[nodeId];
+    if (current === undefined) return 0;
+    const next = { ...current, attempts: current.attempts + 1 };
+    set((s) => ({ puzzleRuns: { ...s.puzzleRuns, [nodeId]: next } }));
+    return next.attempts;
   },
 
   recordAnomalySolved: () => {
@@ -443,7 +568,12 @@ export const useRunStore = create<RunState>()((set, get) => ({
   },
 
   addShipyardDiscount: (n) => {
-    set((s) => ({ shipyardDiscount: Math.max(0, s.shipyardDiscount + n) }));
+    set((s) => ({
+      shipyardDiscount: Math.max(
+        0,
+        Math.min(MAX_SHIPYARD_DISCOUNT, s.shipyardDiscount + n),
+      ),
+    }));
   },
 
   setPendingBattle: (pending) => {
@@ -563,27 +693,21 @@ export const useRunStore = create<RunState>()((set, get) => ({
     return true;
   },
 
-  unlockNextMemory: () => {
-    const next = get().memoriesUnlocked + 1;
-    set({ memoriesUnlocked: next });
-    return next;
+  unlockMemory: (order) => {
+    if (get().memoryOrders.includes(order)) return false;
+    set((s) => ({ memoryOrders: [...s.memoryOrders, order].sort((a, b) => a - b) }));
+    return true;
   },
 
-  setEnding: (id) => {
-    set({ endingId: id });
+  setEnding: (id, firstTime = false) => {
+    set({ endingId: id, endingFirstTime: firstTime });
+  },
+
+  crossThreshold: () => {
+    set({ crossedThreshold: true });
   },
 
   reset: () => {
     set(createInitialRunValues());
   },
 }));
-
-declare global {
-  interface Window {
-    __run?: typeof useRunStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__run = useRunStore;
-}

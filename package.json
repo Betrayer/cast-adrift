@@ -1,7 +1,7 @@
 {
   "name": "cast-adrift",
   "private": true,
-  "version": "1.0.0",
+  "version": "2.0.0-pre",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -15,13 +15,18 @@
     "typecheck": "tsc --noEmit",
     "sim": "tsx scripts/sim.mts",
     "sim:smoke": "tsx scripts/sim.mts --enemy raider --runs 100 --seed 7",
-    "sim:chart": "tsx scripts/chartSim.mts",
     "lint:content": "tsx scripts/contentLint.mts",
-    "test:rules": "tsx scripts/rulesTest.mts",
-    "gensfx": "tsx scripts/genSfx.mts",
+    "lint:roadmap": "tsx scripts/roadmapLint.mts",
     "sim:sweep": "tsx scripts/sim.mts --mode sweep --runs 500 --seed 11",
-    "sim:perks": "tsx scripts/sim.mts --mode perks --runs 200 --sector 2 --seed 5",
+    "sim:perks": "tsx scripts/sim.mts --mode perks --runs 500 --sector 2 --seed 5",
     "sim:economy": "tsx scripts/sim.mts --mode economy --runs 200 --seed 11",
+    "sim:deep": "tsx scripts/sim.mts --mode deep --runs 300 --seed 17",
+    "sim:meta": "tsx scripts/sim.mts --mode meta",
+    "sim:campaign": "tsx scripts/sim.mts --mode campaign --runs 300 --seed 11",
+    "sim:puzzles": "tsx scripts/sim.mts --mode puzzles --runs 60 --seed 11",
+    "sim:roster": "tsx scripts/sim.mts --mode roster --runs 120 --seed 13",
+    "sim:s6": "tsx scripts/sim.mts --mode s6 --runs 300 --seed 17",
+    "sim:dice": "tsx scripts/sim.mts --mode dice --runs 200 --sector 2 --seed 5",
     "lint:keys": "tsx scripts/missingKeys.mts"
   },
   "dependencies": {
@@ -41,7 +46,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
-    "@playwright/test": "^1.62.0",
     "@types/howler": "^2.2.13",
     "@types/matter-js": "^0.20.2",
     "@types/node": "^22.20.0",

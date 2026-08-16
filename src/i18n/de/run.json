@@ -21,11 +21,30 @@
     "jump": "Zum ausgewählten Knoten springen",
     "jumpHint": "Wählen Sie einen erreichbaren Knoten aus",
     "you": "Du",
-    "boss": "Chef",
     "abandon": "Lauf abbrechen",
     "previewMiniboss": "Mini-Boss: {{name}}",
     "previewBoss": "Chef: {{name}}",
-    "modules": "Module {{used}} / {{max}}"
+    "modules": "Module {{used}} / {{max}}",
+    "legend": "Legende",
+    "node": {
+      "battle": "Schlacht",
+      "elite": "Elite",
+      "miniboss": "Mini-Boss",
+      "shop": "Shop",
+      "shipyard": "Werft",
+      "event": "Veranstaltung",
+      "anomaly": "Anomalie",
+      "beacon": "Bake",
+      "boss": "Chef",
+      "inverted": "umgekehrt"
+    },
+    "previewNode": "{{type}} · Risiko: {{risk}}",
+    "previewPocket": "Umweg: bessere Beute, härterer Kampf",
+    "risk": {
+      "low": "niedrig",
+      "raised": "erhöht",
+      "high": "hoch"
+    }
   },
   "event": {
     "title": "Signal",
@@ -48,26 +67,29 @@
     "pass": "Erfolg — {{total}}",
     "fail": "Fehlgeschlagen — {{total}}",
     "roll": "Rolle",
-    "back": "Zurück"
+    "back": "Zurück",
+    "reqAxisMin": "Erfordert Axis {{n}} oder höher",
+    "reqAxisMax": "Erfordert Axis {{n}} oder eine niedrigere Version",
+    "checkLowest": "Nichts über {{n}}",
+    "checkSchool": "{{school}} nur Würfel",
+    "checkTierMin": "nur d{{tier}}e und größere Modelle",
+    "checkTierMax": "d nur {{tier}} und kleiner",
+    "outcomeOdds": "Quoten {{odds}}",
+    "beaconTitle": "Bake",
+    "beaconCounter": "Bake {{n}} von „{{max}}“"
   },
   "anomaly": {
     "title": "Anomalie",
     "goal": "Ziel",
     "resolve": "Entschlossenheit",
-    "retry": "Neue Rolle",
     "solved": "Gelöst",
     "failed": "Noch nicht – noch einmal würfeln oder neu würfeln",
-    "reward": "+ „{{n}}“-Ausschnitt",
     "leave": "Gehen",
     "tray": "Gewürfelte Würfel",
     "slots": "Systeme",
     "rerolls": "Wiederholungswürfe: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Neue Rolle (links: {{n}})",
-    "giveUp": "Keine neuen Rollen mehr",
     "toMap": "Zurück zur Karte",
-    "outOfRollsTitle": "Anomalie weiterhin ungeklärt",
-    "outOfRolls": "Es sind keine neuen Rollen mehr vorhanden. Verlassen von „StokesResonanz-Interferenz“.",
     "rerollHint": "Nimm bis zu {{n}} Würfel, um erneut zu würfeln",
     "rerollCancel": "Abbrechen",
     "rerollConfirm": "{{k}} erneut würfeln",
@@ -87,7 +109,6 @@
     "carryReserved": "reserviert d {{n}}",
     "carryNone": "noch nichts",
     "reserve": "Reserve",
-    "reserved": "Reserviert",
     "unreserve": "Reservierung aufheben",
     "nextTurn": "Ende der Runde",
     "reset": "Platzierung zurücksetzen",
@@ -129,7 +150,37 @@
       "damage": "Schaden",
       "charge": "Gebühr",
       "shield": "Schild"
-    }
+    },
+    "tierName": {
+      "1": "schwacher Messwert",
+      "2": "gleichmäßiges Lesen",
+      "3": "vertiefendes Lesen",
+      "4": "anspruchsvolles Lesen",
+      "5": "Einzellektüre"
+    },
+    "entryEnter": "Den Messwert ablesen",
+    "entryLeaveNote": "Ein Abbruch gilt als ungelöst und wird an „Resonanz Interference“ weitergeleitet.",
+    "rewardPreview": "Belohnung",
+    "rewardScrap": "{{n}} Schrott",
+    "rewardCodex": "ein Kodex-Eintrag",
+    "rewardChoice": "Deine Wahl: der Stempel „{{name}}“ oder ein Gutschein für eine Gravur",
+    "rewardDie": "Der Würfel „{{name}}“",
+    "rewardOnce": "fällt nirgendwo anders hin",
+    "stakes": "Einsätze",
+    "stakeFree": "{{n}} Versuche, beide kostenlos",
+    "stakePaid": "{{n}} kostenlos, dann {{costs}}-Restposten",
+    "stakeDeduction": "Festgelegte Lektüre · „{{n}}“-Beiträge",
+    "interferenceNow": "Resonanz Der Lauf „Interference × {{n}}“ läuft – jede Lösung beendet ihn.",
+    "interferenceNone": "Keine Beeinträchtigung des Rumpfes.",
+    "attemptChip": "Versuchen Sie es unter {{cur}} / {{max}}",
+    "submissionsLeft": "Verbleibende Antworten: {{n}}",
+    "newAttempt": "Neues Board ({{n}} links)",
+    "newAttemptCost": "Neues Forum – „{{n}}“ (Schrott)",
+    "outOfAttemptsTitle": "Die Lesung endet",
+    "outOfAttempts": "Keine Versuche mehr übrig. Verlassen von Stokes Resonanz Behinderung.",
+    "locked": "{{n}} Der Würfel wird außerhalb der ersten Runde gehalten",
+    "takeDie": "Nimm „{{name}}“",
+    "takeVoucher": "Nimm den Gutschein"
   },
   "codex": {
     "title": "Kodex",
@@ -143,34 +194,35 @@
     "glyphLegend": {
       "title": "Schulzeichen",
       "body": "Jeder Würfel hat eine bestimmte Eckenform, sodass die Schulen auch ohne Farbunterscheidung voneinander getrennt bleiben: Rot – Dreieck · Blau – Quadrat · Grün – Blatt · Gelb – Ring · Schwarz – Stachel · Grau – Punkt · Prismatisch – Stern."
-    }
+    },
+    "prologueTitle": "Die erste Überquerung",
+    "prologueBody": "Spiele die ersten Takte noch einmal ab. Nichts hat begonnen, nichts ist verloren.",
+    "prologueReplay": "Wiederholung"
   },
   "consequenceToast": "Folge: {{text}}",
   "rewards": {
-    "scrap": "+ „{{n}}“-Ausschnitt",
     "dieTitle": "Wiederverwertete Matrize",
     "keep": "Im Deck behalten",
     "sell": "Verkaufen (+{{n}})",
-    "deckFull": "Deck voll (9)",
-    "healed": "Repariert + {{n}}"
+    "deckFull": "Deck voll (9)"
   },
   "perk": {
     "title": "Wählen Sie ein Upgrade aus",
     "pick": "Nimm",
     "skip": "Überspringen (+ {{n}}-Ausschnitt)",
-    "sub": "1 von 3"
+    "banish": "Verbannen",
+    "banishHint": "Durch „Verbannen“ werden diese Karte und alle Karten derselben Art für den Rest des Durchgangs entfernt. Einmal pro Durchgang.",
+    "reroll": "Entwurf für einen Reroll (Auswurf aus {{n}})"
   },
   "shop": {
     "title": "Markt · Mara",
     "buy": "Kaufen ({{n}})",
-    "sell": "Verkaufen",
     "reroll": "Restock ({{n}})",
     "leave": "Gehen",
     "scrap": "Schrott: {{n}}",
     "deck": "Deck-{{n}}/9",
     "sellTitle": "Einen Würfel verkaufen",
     "empty": "Ausverkauft",
-    "owned": "Im Deck",
     "modulesTitle": "Module {{used}} / {{max}}",
     "modulesFull": "Bucht voll",
     "rerollFree": "Reroll-Bestand (kostenlos)"
@@ -180,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · voll ausgebaut",
     "systems": "Systeme",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Zwei identische Würfel → +1 Stufe",
-    "fusionPick": "Wähle einen Würfel zum Verschmelzen aus",
     "repair": "Reparatur",
     "repairHint": "2 Schrott pro Rumpf",
     "leave": "Gehen",
@@ -198,17 +248,17 @@
     "nodes": "Gereinigte Knoten: {{n}}",
     "kills": "Kills: {{n}}",
     "earned": "Schrott Quelle: {{n}}",
-    "spent": "Schrott Quelle: {{n}}",
     "perks": "Upgrades:",
     "perksNone": "keine",
-    "meta": "Splitter & XP",
-    "toMenu": "Zum Menü"
+    "toMenu": "Zum Menü",
+    "faced": "Quelle: {{names}}"
   },
   "prologue": {
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Zurück zum Menü"
+    "leave": "Zurück zum Menü",
+    "replayDone": "Zurück zu den „Kodex“"
   },
   "interstitial": {
     "sector": "Branchen{{n}}",
@@ -218,13 +268,20 @@
     "title": "Das Kernherz ist offen",
     "intro": "Alles, wofür du dich hier draußen entschieden hast, ist nun eine Tür. Nur die, die du dir verdient hast, werden sich öffnen.",
     "thin": "Echo: „Das war ein bisschen dürftig, Captain. Zwei Türen, beide zuckten nur mit den Schultern.“",
-    "axis": "Resonanz ↔ Stabilitätsachse: {{n}}"
+    "axis": "Resonanz ↔ Stabilitätsachse: {{n}}",
+    "deepTitle": "Jenseits des Kerns",
+    "deepIntro": "Es gibt nichts mehr zu überwinden. Was auch immer du durch den sechsten Akt mitgebracht hast – hier wird es aufgebraucht.",
+    "thresholdTag": "Oder beende es nicht",
+    "thresholdCross": "Die Schwelle überschreiten",
+    "thresholdCost": "Der Lauf führt weiter am Kern vorbei. Die Flut wird nicht mehr aufgehalten, das Ende wartet auf der anderen Seite – und die Entscheidung, die du dort triffst, wird eine tiefere Bedeutung haben."
   },
   "ending": {
     "next": "Weiter",
     "step": "{{cur}} / {{max}}",
     "tally": "Was du zurückgelassen hast",
-    "continue": "Protokoll schließen"
+    "continue": "Protokoll schließen",
+    "deathTitle": "Hier endet der Lauf",
+    "deathWhere": "Sektor{{sector}} · Tiefe{{depth}}"
   },
   "setup": {
     "title": "Start",
@@ -236,7 +293,10 @@
     "aLevel": "Ein „{{n}}“",
     "tideCap": "Interferenzgezeiten am {{n}}",
     "launch": "Start",
-    "back": "Zurück"
+    "back": "Zurück",
+    "ascensionCost": "Das kostet dich",
+    "ascensionGain": "Es zahlt sich für dich aus",
+    "shardMult": "+{{n}} % Shards für den gesamten Durchlauf"
   },
   "package": {
     "title": "Gate-Gehäuse",
@@ -271,5 +331,104 @@
       "title": "Wählen Sie den nächsten Knoten aus",
       "body": "Tippe auf einen beleuchteten Knoten und wähle dann „Springen“. Nebel verdeckt die vor dir liegenden Reihen; Sensoren und Tiefenscans verschieben den Horizont weiter nach vorne."
     }
+  },
+  "motif": {
+    "title": "Branchenmerkmale",
+    "cache": "Cache: Bergung bei Ankunft",
+    "mine": "Minenlauf: Überquerung kostet den Rumpf",
+    "blessed": "Gesegnete Bahn: Der Chor ist dir wohlgesonnen",
+    "cursed": "Die verfluchte Fahrspur: Die Störungen nehmen zu",
+    "unstable": "Instabiler Zeile: Ihr Inhalt wurde neu ausgewertet",
+    "pocket": "Umweg-Tasche: höheres Risiko, höherer Gewinn",
+    "riftSplit": "Spaltung: Die Zweige treffen sich erst am Tor",
+    "inversion": "Inverted Row: Systeme werden von hinten nach vorne abgearbeitet",
+    "storm": "Wahrscheinlichkeitssturm: Ein platzierter Würfel wird bei der Auswertung erneut gewürfelt"
+  },
+  "tag": {
+    "red": "Rot",
+    "blue": "Blau",
+    "green": "Grün",
+    "yellow": "Gelb",
+    "black": "Schwarz",
+    "grey": "Grau",
+    "prismatic": "Prismatisch",
+    "weapons": "Waffen",
+    "shields": "Schilde",
+    "engines": "Motoren",
+    "sensors": "Sensoren",
+    "reactor": "Reaktor",
+    "spinal": "Wirbelsäule",
+    "repairBay": "Reparaturhalle",
+    "burn": "Verbrennen",
+    "crit": "Krit",
+    "growth": "Wachstum",
+    "reroll": "Neuer Versuch",
+    "charge": "Anklage",
+    "scrap": "Schrott",
+    "overcap": "Überkappe",
+    "pierce": "Pierce",
+    "dodge": "Ausweichen",
+    "survival": "Überleben",
+    "control": "Steuerung",
+    "dice": "Würfel",
+    "shieldwall": "Schildwall",
+    "risk": "Risiko",
+    "swarm": "Schwarm",
+    "spike": "Spike",
+    "precision": "Präzision",
+    "owned": "{{name}} ×{{n}}"
+  },
+  "build": {
+    "title": "Dein Build",
+    "close": "Schließen",
+    "open": "Erstellen",
+    "resonance": "Resonanz",
+    "resonanceNext": "{{n}} mehr für die nächste Stufe",
+    "resonanceNextDesc": "{{n}} mehr → {{desc}}",
+    "resonanceMax": "Alle Stufen sind aktiv",
+    "tags": "Aktive Tags",
+    "perks": "Perks ({{n}})",
+    "modules": "Module ({{n}})",
+    "engravings": "Gravierte Würfel ({{n}})",
+    "banished": "Verbannt",
+    "empty": "Noch nichts"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Resonanz {{n}}",
+    "stability": "Stabilitäts{{n}}",
+    "neutral": "Achsenausgleich",
+    "preview": "Axis {{from}} → {{to}}",
+    "short": "Achse"
+  },
+  "journal": {
+    "title": "Laufprotokoll",
+    "open": "Zeitschrift",
+    "back": "Zurück zur Karte",
+    "empty": "Es wurde noch nichts geschrieben. Die Branche hat noch keine Anfrage an Sie gerichtet.",
+    "sector": "Branchen{{n}}",
+    "beacon": "Bake gelöst — {{n}} von {{max}}",
+    "memory": "Echo mir ist etwas eingefallen — Fragment {{n}}",
+    "axisTitle": "Achse",
+    "axis": {
+      "choice": "Durch Ihre Auswahl wurde die Achse verschoben: {{from}} → {{to}}",
+      "drift": "Das Deck, das du tatsächlich platziert hast, hat die Achse verschoben {{from}} → {{to}}",
+      "beacon": "Das Leuchtfeuer hat die Achse verschoben {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Leuchtfeuer",
+    "beaconsCount": "{{n}} von „{{max}}“ gelöst",
+    "beaconsHint": "Die Kette hält. Auch etwas im Kern zählt sie.",
+    "here": "Sie befinden sich im Sektor „{{n}}“.",
+    "chainsTitle": "Themen",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "hier"
+  },
+  "memory": {
+    "kicker": "Echo erinnert sich · Auszug {{n}} von {{max}}",
+    "continue": "Lass sie ausreden",
+    "hintGate": "{{n}}-Gates in einer Kampagne durchbrechen",
+    "hintElite": "Jage während deiner Läufe nach „{{n}}“-Eliten",
+    "hintBeacons": "{{n}}-Beacons in einem einzigen Durchlauf auflösen",
+    "hintEnding": "Geh zum Kern und wähle"
   }
 }

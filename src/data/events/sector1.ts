@@ -321,6 +321,21 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
     text: "content:events.derelictReactor.text",
     options: [
       {
+        id: "attune",
+        label: "content:events.derelictReactor.opt.attune",
+        requires: { req: "axis", max: -2 },
+        outcomes: [
+          {
+            text: "content:events.derelictReactor.out.attune",
+            effects: [
+              { k: "battleMod", mod: "startCharge", n: 3, battles: 4 },
+              { k: "axis", n: -1 },
+            ],
+            consequence: "content:consequence.reactorAttuned",
+          },
+        ],
+      },
+      {
         id: "siphon",
         label: "content:events.derelictReactor.opt.siphon",
         check: { dice: 1, pick: "highest", target: 6 },
@@ -469,6 +484,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.scrapAuction.out.bid",
+            consequence: "content:consequence.auctionRun",
             effects: [
               { k: "scrap", n: -25 },
               { k: "loot", rarity: "rare" },
@@ -482,6 +498,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.scrapAuction.out.watch",
+            consequence: "content:consequence.auctionRun",
             effects: [{ k: "scrap", n: 8 }],
           },
         ],
@@ -500,6 +517,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.stowaway.out.keep",
+            consequence: "content:consequence.stowawayCalled",
             effects: [
               { k: "hullMax", n: -2 },
               { k: "nodeMod", mod: "endHeal", n: 1 },
@@ -513,6 +531,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.stowaway.out.handOver",
+            consequence: "content:consequence.stowawayCalled",
             effects: [
               { k: "scrap", n: 20 },
               { k: "axis", n: -1 },
@@ -603,6 +622,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.driftMerchant.out.swap",
+            consequence: "content:consequence.merchantSwap",
             effects: [{ k: "swapLowestDie" }],
           },
         ],
@@ -613,6 +633,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.driftMerchant.out.decline",
+            consequence: "content:consequence.merchantSwap",
             effects: [{ k: "scrap", n: 6 }],
           },
         ],
@@ -631,6 +652,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.radiationPocket.out.push",
+            consequence: "content:consequence.pocketCrossed",
             effects: [
               { k: "hull", n: -3 },
               { k: "tide", n: -1 },
@@ -644,6 +666,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.radiationPocket.out.detour",
+            consequence: "content:consequence.pocketCrossed",
             effects: [{ k: "scrap", n: 8 }],
           },
         ],
@@ -854,6 +877,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.probCoreLeak.out.stabilize",
+            consequence: "content:consequence.leakHandled",
             effects: [
               { k: "axis", n: 2 },
               { k: "hull", n: 2 },
@@ -868,6 +892,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.probCoreLeak.out.harvest",
+            consequence: "content:consequence.leakHandled",
             effects: [
               { k: "axis", n: -2 },
               { k: "loot", die: "black-d6" },
@@ -885,6 +910,22 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
     codex: "silentField",
     text: "content:events.silentField.text",
     options: [
+      {
+        id: "chart",
+        label: "content:events.silentField.opt.chart",
+        requires: { req: "axis", min: 2 },
+        outcomes: [
+          {
+            text: "content:events.silentField.out.chart",
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+              { k: "hullMax", n: 2 },
+              { k: "flag", key: "quietCharted" },
+            ],
+            consequence: "content:consequence.quietCharted",
+          },
+        ],
+      },
       {
         id: "drift",
         label: "content:events.silentField.opt.drift",
@@ -959,6 +1000,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.mirrorFlare.out.absorb",
+            consequence: "content:consequence.flareMet",
             effects: [
               { k: "loot", rarity: "uncommon" },
               { k: "axis", n: -1 },
@@ -972,6 +1014,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.mirrorFlare.out.lookAway",
+            consequence: "content:consequence.flareMet",
             effects: [{ k: "axis", n: 1 }],
           },
         ],
@@ -992,6 +1035,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.driftRace.out.race",
+            consequence: "content:consequence.runnersRaced",
             effects: [{ k: "scrap", n: 35 }],
           },
         ],
@@ -1002,6 +1046,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.driftRace.out.decline",
+            consequence: "content:consequence.runnersRaced",
             effects: [{ k: "scrap", n: 5 }],
           },
         ],
@@ -1021,6 +1066,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.sensorGhost.out.reveal",
+            consequence: "content:consequence.ghostResolved",
             effects: [{ k: "nodeMod", mod: "revealRows", n: 2 }],
           },
         ],
@@ -1031,6 +1077,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.sensorGhost.out.fire",
+            consequence: "content:consequence.ghostResolved",
             effects: [
               { k: "hull", n: -2 },
               { k: "scrap", n: 8 },
@@ -1106,6 +1153,68 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             text: "content:events.yusufEscortPaid.out.wave",
             effects: [{ k: "axis", n: 1 }],
             consequence: "content:consequence.yusufFriend",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "rimNoticeboard",
+    weight: 14,
+    requires: { sector: [1] },
+    text: "content:events.rimNoticeboard.text",
+    options: [
+      {
+        id: "readIt",
+        label: "content:events.rimNoticeboard.opt.readIt",
+        outcomes: [
+          {
+            text: "content:events.rimNoticeboard.out.readIt",
+            weight: 3,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+              { k: "flag", key: "boardRead" }
+            ],
+            consequence: "content:consequence.rimBoardRead",
+          },
+          {
+            text: "content:events.rimNoticeboard.out.readItOld",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 25 },
+              { k: "flag", key: "boardRead" }
+            ],
+            consequence: "content:consequence.rimBoardRead",
+          },
+        ],
+      },
+      {
+        id: "postYours",
+        label: "content:events.rimNoticeboard.opt.postYours",
+        outcomes: [
+          {
+            text: "content:events.rimNoticeboard.out.postYours",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "flag", key: "boardPosted" },
+              { k: "nodeMod", mod: "endHeal", n: 1 }
+            ],
+            consequence: "content:consequence.rimBoardPosted",
+          },
+        ],
+      },
+      {
+        id: "stripBoard",
+        label: "content:events.rimNoticeboard.opt.stripBoard",
+        outcomes: [
+          {
+            text: "content:events.rimNoticeboard.out.stripBoard",
+            effects: [
+              { k: "scrap", n: 45 },
+              { k: "axis", n: -2 },
+              { k: "flag", key: "boardTaken" }
+            ],
+            consequence: "content:consequence.rimBoardTaken",
           },
         ],
       },

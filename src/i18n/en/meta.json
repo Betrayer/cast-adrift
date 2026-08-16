@@ -72,7 +72,40 @@
     "keyStormChaser": "Storm Chaser",
     "keyIronDoctrine": "Iron Doctrine",
     "keyFatesFavorite": "Fate's Favourite",
-    "keyPrismCascade": "Prism Cascade"
+    "keyPrismCascade": "Prism Cascade",
+    "selectHint": "Tap a node to see what it does.",
+    "filter": "Filter",
+    "filterOn": "Filter · {{n}}",
+    "filterClear": "Clear filter",
+    "pathCost": "Path from here: {{n}} points (you have {{have}})",
+    "refundFree": "Refund (free)",
+    "respecConfirmTitle": "Refund this node?",
+    "respecConfirmBody": "«{{name}}» goes back into the pool and the point returns. Cost: {{cost}}◈.",
+    "respecConfirmYes": "Refund",
+    "redPowderRoom": "Powder Room",
+    "redRangeCard": "Range Card",
+    "redHairTrigger": "Hair Trigger",
+    "redCoreBreach": "Core Breach",
+    "blueStormAnchor": "Storm Anchor",
+    "blueSpillway": "Spillway",
+    "blueLongLens": "Long Lens",
+    "blueKeelPlate": "Keel Plate",
+    "greenGraftBench": "Graft Bench",
+    "greenSapline": "Sapline",
+    "greenLoam": "Loam",
+    "greenHollow": "The Hollow",
+    "yellowTollhouse": "Tollhouse",
+    "yellowFinderFee": "Finder's Fee",
+    "yellowShortWeight": "Short Weight",
+    "yellowMintMark": "Mint Mark",
+    "blackAshBed": "Ash Bed",
+    "blackDeadMansSwitch": "Dead Man's Switch",
+    "blackTithe": "The Tithe",
+    "blackSlagHeap": "Slag Heap",
+    "greyShimStack": "Shim Stack",
+    "greyPatternBook": "Pattern Book",
+    "greyBallastTrim": "Ballast Trim",
+    "greyTallyStick": "Tally Stick"
   },
   "chartFx": {
     "hubBudget": "+1 hangar budget",
@@ -90,7 +123,15 @@
       "growthCapDelta": "{{n}} growth cap",
       "enginesThresholdDelta": "{{n}} engine threshold",
       "markBonusDelta": "{{n}} mark bonus",
-      "battleEndHeal": "{{n}} heal / battle"
+      "battleEndHeal": "{{n}} heal / battle",
+      "hullMaxPct": "{{n}}% max hull",
+      "extraRerolls": "{{n}} reroll use",
+      "scrapPerKill": "{{n}} scrap per kill",
+      "setCompleteCharge": "{{n}} charge on a completed set",
+      "freeShopRerolls": "{{n}} free counter reroll",
+      "xpMultPct": "{{n}}% XP",
+      "tideEffectDelta": "{{n}} to the tide's bite",
+      "moduleSlotDelta": "{{n}} module bay"
     },
     "fx": {
       "weaponsMaxFace": "Weapons +1 on a max-face die",
@@ -115,25 +156,86 @@
       "redFirestorm": "Max face in weapons adds Burn 3",
       "redSpine": "+4 in the Spinal Mount",
       "greenCanopy": "+3 in engines",
-      "blackWell": "The reactor stores 2 more charge"
+      "blackWell": "The reactor stores 2 more charge",
+      "shopArrival": "+6 scrap on arriving at a market",
+      "tideWard": "Repair 1 hull on every jump while tide is 2+",
+      "detourScout": "+12 scrap on entering a detour",
+      "redFinisher": "+2 in weapons against a target under 30% hull.",
+      "redSwarmFire": "+1 in weapons while two or more enemies stand.",
+      "redBurnBite": "A weapon hit on a burning target deals 2 more.",
+      "redRepeatCrit": "A weapon die that repeats the last value crits.",
+      "redSalvoTally": "From the third weapon die of a battle on, +1 in weapons.",
+      "redOpener": "The turn's first weapon die gets +2.",
+      "redRiskCharge": "Below 40% hull, end each turn with 1 charge.",
+      "redPowderRoom": "Any hit on a burning target adds another burn.",
+      "redHairTrigger": "The turn's first weapon die crits.",
+      "redCoreBreach": "+3 on any die against a target under 25% hull.",
+      "blueOvershield": "With 6 shield up, a shields die adds 2 more.",
+      "blueStillness": "A blue die in shields gets +1.",
+      "blueDeepGuard": "Hold 4 shield through the enemy turn to heal 1.",
+      "blueJamOnLow": "A sensors die below 4 is read as 5.",
+      "blueWatch": "A blue die on its lowest face is rerolled once.",
+      "blueBreakwater": "Start every battle with 3 shield.",
+      "blueSpillway": "A shields die of 8 or more adds 3 shield.",
+      "blueLongLens": "+2 in sensors.",
+      "greenGrowOnEngines": "A max-face engines die grows, up to +2.",
+      "greenTendril": "A green die of 6 or more grows, up to +3.",
+      "greenMend": "End a turn above 30% hull to heal 1.",
+      "greenRootHold": "+2 in engines below half hull.",
+      "greenSpore": "A won battle heals 2.",
+      "greenQuietBerth": "Arriving at a shipyard heals 2.",
+      "greenSapline": "End a turn with 4 shield to heal 2.",
+      "greenLoam": "A max-face engines die grows, up to +3.",
+      "yellowTollBooth": "Arriving at an encounter pays 8 scrap.",
+      "yellowKickback": "A yellow die pays 2 scrap when it resolves.",
+      "yellowLuckyOpen": "The turn's first die, on its max face, pays 6 scrap.",
+      "yellowGleaner": "A yellow die on its lowest face pays 4 scrap.",
+      "yellowWager": "A die on either extreme face pays 3 scrap.",
+      "yellowTollhouse": "Arriving at a counter pays 14 scrap.",
+      "yellowMintMark": "A reactor die pays 4 scrap.",
+      "blackBleedCharge": "+1 on black dice below 60% hull.",
+      "blackOvercap": "Black dice may exceed a slot cap for 2 hull.",
+      "blackPactTithe": "Start every battle with 2 charge and −2 hull.",
+      "blackLastLight": "+2 on every die below 25% hull.",
+      "blackReactorTally": "From the second reactor die on, end the turn with 1 charge.",
+      "blackSpite": "Below half hull, the enemy turn ends with 1 charge.",
+      "blackNightWatch": "A black die on its max face gives 1 charge.",
+      "blackAshBed": "A die on its lowest face gives 2 charge.",
+      "blackDeadMansSwitch": "Below 25% hull, end each turn with 3 charge.",
+      "blackSlagHeap": "+3 in reactor while holding 4 charge.",
+      "greyScan": "One extra nudge every roll.",
+      "greyEvenKeel": "+1 on grey dice.",
+      "greyCounterweight": "A non-grey die on its lowest face gets +1.",
+      "greyToolbelt": "One extra reroll use per battle.",
+      "greySpare": "One extra reserve slot per battle.",
+      "greyMirror": "A grey die repeating the last value widens the reroll by 1.",
+      "greyLedgerKeep": "Walking into a counter pays 10 scrap.",
+      "greyPatternBook": "A die repeating the last value grants a reroll use.",
+      "greyTallyStick": "From the second sensors die on, +2 on every die."
     },
     "trait": {
       "obsidianPact": "Black dice roll only their min or max",
       "singleCast": "No rerolls",
-      "coldLogic": "Nudges are free · crits disabled"
-    }
+      "coldLogic": "Nudges are free · crits disabled",
+      "overflowShield": "Charge spent over the cap becomes shield.",
+      "fateTwice": "The Fate die may be played twice per battle.",
+      "prismDouble": "Prismatic dice count twice for resonance."
+    },
+    "budgetDelta": "{{n}} hangar point",
+    "slotTier": "{{slot}}: {{n}} die-size step"
   },
   "milestone": {
-    "budget": "Hangar budget +1",
+    "budget": "Hangar budget +2",
     "shipRam": "Ram unlocked",
-    "contractRow": "Second contract row (soon)",
     "shipArk": "Ark unlocked",
-    "engraving": "Engraving station (soon)",
-    "dailyPreview": "Daily preview (soon)",
-    "respecPrestige": "Free keystone respec (soon)"
+    "engraving": "Engraving station open",
+    "dailyPreview": "Tomorrow's Daily is visible",
+    "respecPrestige": "Free respec + prestige skin",
+    "diceWave": "Fusion dice on the shelf",
+    "contractWave": "Contract wave open",
+    "chartPoints": "Two Star Chart points"
   },
   "levelup": {
-    "title": "Level Up",
     "level": "Captain Level {{level}}",
     "point": "+1 Star Chart point",
     "points": "+{{n}} Star Chart points",
@@ -143,7 +245,17 @@
     "shards": "Shards",
     "xp": "XP",
     "level": "Captain Level {{level}}",
-    "toNext": "{{into}} / {{need}} to next"
+    "toNext": "{{into}} / {{need}} to next",
+    "fromSectors": "Sectors cleared",
+    "fromBeacons": "Beacons resolved",
+    "fromEnding": "First-time ending",
+    "fromHull": "Clear at half hull",
+    "fromStreak": "No-death streak",
+    "fromAscension": "Ascension bonus",
+    "fromFinds": "First finds",
+    "fromAchievements": "Achievements",
+    "firstFinds": "First sighting: {{names}}",
+    "fromDeep": "Beyond the Core"
   },
   "menu": {
     "level": "Lv {{level}}"
@@ -151,14 +263,10 @@
   "hangar": {
     "title": "Hangar",
     "deck": "Deck",
-    "collection": "Collection",
     "shop": "Meta Shop",
     "budget": "Budget {{used}} / {{max}}",
-    "pts": "{{n}} pts",
-    "owned": "×{{n}}",
     "add": "Add",
     "buy": "Buy · {{price}}◈",
-    "sold": "Owned",
     "save": "Save deck",
     "saved": "Saved",
     "invalidOver": "Over budget",
@@ -167,20 +275,38 @@
     "invalidFate": "Max 1 Fate die",
     "valid": "Ready",
     "empty": "Deck is empty",
-    "ship": "Ship",
     "shipEquip": "Equip",
     "shipEquipped": "Equipped",
     "shipBuy": "Buy · {{price}}◈",
     "shipLocked": "Unlocks at Level {{level}}",
-    "filterSchool": "School",
-    "filterTier": "Tier",
-    "filterRarity": "Rarity",
     "filterAll": "All"
   },
   "collection": {
     "title": "Collection",
-    "count": "{{n}} dice",
-    "owned": "×{{n}}"
+    "owned": "×{{n}}",
+    "discount": "−{{n}}% — you have met this die",
+    "found": "Met",
+    "undiscovered": "Not yet met",
+    "provenance": "found: sector {{sector}}, {{node}}",
+    "stateAll": "All",
+    "stateOwned": "Owned",
+    "stateFound": "Met",
+    "stateUnknown": "Undiscovered",
+    "totals": "{{owned}} owned · {{found}} met · {{total}} in the roster",
+    "node": {
+      "start": "the drop point",
+      "battle": "a skirmish",
+      "elite": "an elite",
+      "miniboss": "a gate fight",
+      "boss": "a boss",
+      "event": "an encounter",
+      "shop": "a counter",
+      "shipyard": "a shipyard",
+      "anomaly": "a rift",
+      "beacon": "a beacon",
+      "rest": "a quiet berth",
+      "pocket": "a pocket"
+    }
   },
   "modes": {
     "title": "Modes",
@@ -202,7 +328,9 @@
     "open": "Open",
     "guardTitle": "A run is already under way",
     "guardBody": "There is one run slot. Starting this mode erases the current run, locally and in the cloud.",
-    "guardYes": "Erase and launch"
+    "guardYes": "Erase and launch",
+    "dailyPreview": "Tomorrow ({{date}})",
+    "dailyPreviewLocked": "Tomorrow's mutators at level {{n}}"
   },
   "contracts": {
     "title": "Contracts",
@@ -232,7 +360,9 @@
     "axisAtMost": "Finish with the axis at {{n}} or below",
     "allBeaconsResolved": "Resolve every beacon",
     "deckSchoolsAtLeast": "Finish with {{n}} schools in the deck",
-    "dicePlacedAtMost": "Place at most {{n}} dice all run"
+    "dicePlacedAtMost": "Place at most {{n}} dice all run",
+    "axisAtLeast": "Finish at stability {{n}} or higher",
+    "elitesAtMost": "Clear with at most {{n}} elites fought"
   },
   "drift": {
     "title": "Drift over",
@@ -281,7 +411,19 @@
     "none": "—",
     "place": "#{{rank}}",
     "endings": "Endings",
-    "locked": "Sealed"
+    "locked": "Sealed",
+    "achievements": "Achievements",
+    "achProgress": "{{have}} / {{need}}",
+    "badges": "Badges",
+    "achCount": "{{n}} of {{total}}",
+    "group": {
+      "combat": "Combat",
+      "economy": "Economy",
+      "puzzles": "Anomalies",
+      "story": "Story",
+      "collection": "Collection",
+      "modes": "Modes"
+    }
   },
   "engraving": {
     "title": "Engraving Station",
@@ -292,9 +434,265 @@
     "empty": "No engravings fitted.",
     "remove": "remove",
     "fitted": "fitted",
-    "fit": "{{price}} ◈"
+    "fit": "{{price}} ◈",
+    "pair": "Pairs with {{name}}"
   },
   "badge": {
-    "keeper": "Keeper"
+    "keeper": "Keeper",
+    "ascendant": "Ascendant",
+    "chartwright": "Chartwright",
+    "archivist": "Archivist",
+    "answer": "The Answer"
+  },
+  "unlock": {
+    "opened": "Unlocked",
+    "new": "new",
+    "locked": "Locked",
+    "hintLevel": "level {{n}}",
+    "hintAchievement": "achievement «{{name}}»",
+    "hintAscension": "clear at A{{n}}",
+    "hintClears": "{{n}} campaign clears",
+    "hintDrop": "a unique drop",
+    "hintJoin": " or ",
+    "hintUnknown": "unknown",
+    "diceL8": "Six d8 frames — one per school",
+    "diceL15": "Six fusion dice",
+    "diceL22": "Six steering rares",
+    "diceL30": "The prismatic shelf",
+    "diceL38": "Six d12 heavies",
+    "diceL46": "Six legendaries",
+    "diceAchFirstClear": "The top shelf",
+    "diceAchPuzzler": "Four anomaly fusions",
+    "diceAchCollector": "Three collector fusions",
+    "diceAchSurvivor": "Three survivor dice",
+    "contractsL5": "Three contracts: Storm, Bare Armor, Blind Jump",
+    "contractsL12": "Three contracts: Ram, Single Cast, Dead Reckoning",
+    "contractsL20": "Three contracts: Ark, Keeper, Iron Tide",
+    "contractsL28": "Three contracts: Choir, Prismwork, Ghost Lane",
+    "contractsA5": "Contract: The Void Tithe",
+    "contractsAchGauntlet": "Contract: The Gauntlet",
+    "skinAshen": "Die skin: Ashen",
+    "skinVoidglass": "Die skin: Voidglass",
+    "skinEmberglass": "Die skin: Emberglass",
+    "prestigeTheme": "Theme: Ascendant",
+    "skinPrestige50": "Die skin: Captain's Mark",
+    "skinChartwright": "Die skin: Chartwright",
+    "featureShipRam": "The Ram",
+    "featureShipArk": "The Ark",
+    "featureEngraving": "Engraving station",
+    "featureDailyPreview": "Daily preview",
+    "featureFreeRespec": "Free keystone respec",
+    "sectorSix": "Sector 6 «Beyond the Core»",
+    "diceS6": "Four causality dice",
+    "skinThreshold": "Die skin «Threshold»"
+  },
+  "skin": {
+    "title": "Die skins",
+    "hint": "Cosmetic only — a skin never changes a die's numbers.",
+    "use": "Use",
+    "active": "Active",
+    "default": {
+      "name": "Standard",
+      "desc": "The factory face."
+    },
+    "ashen": {
+      "name": "Ashen",
+      "desc": "Sharp corners, ash grain, no shine."
+    },
+    "voidglass": {
+      "name": "Voidglass",
+      "desc": "Round, deep, lit from inside."
+    },
+    "emberglass": {
+      "name": "Emberglass",
+      "desc": "Heavy amber edge, warm core."
+    },
+    "prestige50": {
+      "name": "Captain's Mark",
+      "desc": "Serif glyphs, white edge."
+    },
+    "chartwright": {
+      "name": "Chartwright",
+      "desc": "Blueprint square, mono glyphs."
+    },
+    "threshold": {
+      "name": "Threshold",
+      "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
+    }
+  },
+  "ach": {
+    "firstBlood": {
+      "name": "First Blood",
+      "desc": "Kill 25 hostiles."
+    },
+    "hunter": {
+      "name": "Hunter",
+      "desc": "Kill 500 hostiles."
+    },
+    "eliteHunter": {
+      "name": "Elite Hunter",
+      "desc": "Kill 25 elites."
+    },
+    "sectorFive": {
+      "name": "Five Crowns",
+      "desc": "Kill all five sector bosses."
+    },
+    "ironStreak": {
+      "name": "Iron Streak",
+      "desc": "Clear three campaigns in a row without dying."
+    },
+    "flawless": {
+      "name": "Flawless",
+      "desc": "Clear a campaign with 90% hull or more."
+    },
+    "ascendant": {
+      "name": "Ascendant",
+      "desc": "Clear the campaign at Ascension 10."
+    },
+    "quickWork": {
+      "name": "Quick Work",
+      "desc": "Clear a campaign in 11 jumps or fewer."
+    },
+    "scrapper": {
+      "name": "Scrapper",
+      "desc": "Earn 5 000 scrap in total."
+    },
+    "tycoon": {
+      "name": "Tycoon",
+      "desc": "Earn 25 000 scrap in total."
+    },
+    "frugal": {
+      "name": "Frugal",
+      "desc": "Clear a campaign without spending a single scrap."
+    },
+    "outfitter": {
+      "name": "Outfitter",
+      "desc": "Own 30 different dice."
+    },
+    "tierFive": {
+      "name": "Tier Five",
+      "desc": "Solve a tier-5 anomaly."
+    },
+    "cryptographer": {
+      "name": "Cryptographer",
+      "desc": "Solve ten tier-5 anomalies."
+    },
+    "anomalist": {
+      "name": "Anomalist",
+      "desc": "Solve four anomalies in one run."
+    },
+    "puzzleBreadth": {
+      "name": "Well Read",
+      "desc": "See 30 different anomalies."
+    },
+    "maraSquared": {
+      "name": "Mara's Ledger",
+      "desc": "Owe Mara a debt and hold her favour."
+    },
+    "keeperFriend": {
+      "name": "The Keeper's Thread",
+      "desc": "Repay the Keeper and rebuild the beacon."
+    },
+    "fleetKept": {
+      "name": "Kept Word",
+      "desc": "Keep the fleet's truth."
+    },
+    "apostate": {
+      "name": "Apostate",
+      "desc": "Break the Choir's pact."
+    },
+    "bothMirrors": {
+      "name": "Both Mirrors",
+      "desc": "Bind the mirror once and break it once."
+    },
+    "coreTrilogy": {
+      "name": "Three Answers",
+      "desc": "Answer, silence and listen to the Core — across three runs."
+    },
+    "lighthouse": {
+      "name": "Lighthouse",
+      "desc": "Light the lighthouse."
+    },
+    "beaconkeeper": {
+      "name": "Beaconkeeper",
+      "desc": "Resolve four beacons in one run."
+    },
+    "allEndings": {
+      "name": "Every Road",
+      "desc": "Reach all four endings."
+    },
+    "fiftyFound": {
+      "name": "Fifty Found",
+      "desc": "Meet 50 different dice in runs."
+    },
+    "everyColour": {
+      "name": "Every Colour",
+      "desc": "Own a die of all seven schools."
+    },
+    "archivist": {
+      "name": "Archivist",
+      "desc": "Unlock 60 Codex entries."
+    },
+    "keystoneThree": {
+      "name": "Chartwright",
+      "desc": "Hold three keystones at once."
+    },
+    "contractor": {
+      "name": "Contractor",
+      "desc": "Earn 30 contract stars."
+    },
+    "toast": "Achievement",
+    "beyondTheCore": {
+      "name": "Beyond the Core",
+      "desc": "Cross the threshold and clear Sector 6."
+    },
+    "theAnswer": {
+      "name": "The Answer",
+      "desc": "Reach the hidden ending past the Core."
+    }
+  },
+  "chartTag": {
+    "red": "red",
+    "blue": "blue",
+    "green": "green",
+    "yellow": "yellow",
+    "black": "black",
+    "grey": "grey",
+    "prismatic": "prismatic",
+    "weapons": "weapons",
+    "shields": "shields",
+    "engines": "engines",
+    "sensors": "sensors",
+    "reactor": "reactor",
+    "spinal": "spinal",
+    "repairBay": "repair bay",
+    "burn": "burn",
+    "crit": "crit",
+    "growth": "growth",
+    "reroll": "reroll",
+    "charge": "charge",
+    "scrap": "scrap",
+    "overcap": "overcap",
+    "pierce": "pierce",
+    "dodge": "dodge",
+    "survival": "survival",
+    "control": "control",
+    "dice": "dice",
+    "shieldwall": "shieldwall",
+    "risk": "risk",
+    "swarm": "swarm",
+    "spike": "spike",
+    "precision": "precision"
+  },
+  "ascension": {
+    "reward": {
+      "shards": "shard payout scales with every level",
+      "skinAshen": "die skin «Ashen»",
+      "contract": "contract «The Void Tithe»",
+      "skinVoidglass": "die skin «Voidglass»",
+      "skinEmberglass": "die skin «Emberglass»",
+      "prestigeTheme": "theme «Ascendant»",
+      "badge": "the Ascendant badge"
+    }
   }
 }

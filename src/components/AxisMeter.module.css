@@ -1,0 +1,49 @@
+.meter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notches {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+
+.notch {
+  width: 7px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--ca-notch-off);
+  transition: background 220ms ease;
+}
+
+.notch[data-on='true'] {
+  background: var(--ca-notch-on);
+}
+
+.notch[data-center='true'] {
+  height: 16px;
+}
+
+.label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.compact .notch {
+  width: 5px;
+  height: 9px;
+}
+
+.compact .notch[data-center='true'] {
+  height: 13px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notch {
+    transition: none;
+  }
+}

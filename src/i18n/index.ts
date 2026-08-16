@@ -30,9 +30,6 @@ export const EN_RESOURCES = {
   meta: enMeta,
 } as const;
 
-// One language is 155 KB of JSON; seven of them bundled eagerly would be the
-// whole performance budget (DESIGN §17). Only `en` ships in the main chunk as
-// the i18next fallback — every other locale is a chunk fetched on demand.
 type Loader = () => Promise<unknown>;
 
 const files = import.meta.glob(["./*/*.json", "!./en/*.json"]) as Record<
@@ -56,13 +53,7 @@ for (const [path, load] of Object.entries(files)) {
 const isComplete = (locale: Locale): boolean =>
   locale === "en" || loaders.get(locale)?.size === NAMESPACES.length;
 
-// The machine locales are generated artefacts (`npm run i18n:translate`). Until
-// they exist the settings picker must not offer a language that would render as
-// English, so availability is read off the file system at build time.
 export const AVAILABLE_LOCALES: readonly Locale[] = LOCALES.filter(isComplete);
-
-export const isAvailableLocale = (value: string): value is Locale =>
-  AVAILABLE_LOCALES.includes(value as Locale);
 
 const loaded = new Set<Locale>(["en"]);
 

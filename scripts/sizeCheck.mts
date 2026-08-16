@@ -1,15 +1,18 @@
 import { gzipSync } from "node:zlib";
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import {
+  existsSync,
+  mkdirSync,
+  readdirSync,
+  readFileSync,
+  statSync,
+  writeFileSync,
+} from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
 
-// DESIGN §17: main bundle <= 600 KB gz, whole initial payload <= 1.2 MB gz.
-// "Initial" is what a cold visitor must download before the menu paints — the
-// entry chunk plus everything the manifest marks as its static import, plus the
-// CSS those chunks pull in. Lazily imported screens are deliberately excluded;
-// that is the entire point of the split.
 const MAIN_BUDGET = 600 * 1024;
 const INITIAL_BUDGET = 1200 * 1024;
+const AUDIO_BUDGET = 400 * 1024;
 
 const DIST = join(process.cwd(), "dist");
 const APP_DIST = existsSync(join(DIST, "play")) ? join(DIST, "play") : DIST;
@@ -24,6 +27,27 @@ interface ManifestEntry {
 }
 
 const report = process.argv.includes("--report");
+
+const AUDIO_DIR = existsSync(join(APP_DIST, "audio"))
+  ? join(APP_DIST, "audio")
+  : join(process.cwd(), "public", "audio");
+
+const audioBytes = (ext: string): number => {
+  let total = 0;
+  const walk = (dir: string): void => {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) walk(path);
+      else if (entry.name.endsWith(ext)) total += statSync(path).size;
+    }
+  };
+  walk(AUDIO_DIR);
+  return total;
+};
+
+const shippedAudio = audioBytes(".webm");
+const fallbackAudio = audioBytes(".wav");
 
 if (!existsSync(MANIFEST)) {
   console.error(
@@ -87,13 +111,19 @@ for (const row of rows) {
 }
 console.log(`  main chunk   ${kb(mainGz)} / ${kb(MAIN_BUDGET)}`);
 console.log(`  initial total ${kb(initialGz)} / ${kb(INITIAL_BUDGET)}`);
+console.log(`  audio (opus)  ${kb(shippedAudio)} / ${kb(AUDIO_BUDGET)}`);
+console.log(`  audio (wav fallback, unbudgeted) ${kb(fallbackAudio)}`);
 
 if (report) {
   const out = join(process.cwd(), "sim-out", "phase12");
   mkdirSync(out, { recursive: true });
   writeFileSync(
     join(out, "size.json"),
-    `${JSON.stringify({ mainGz, initialGz, rows }, null, 2)}\n`,
+    `${JSON.stringify(
+      { mainGz, initialGz, shippedAudio, fallbackAudio, rows },
+      null,
+      2,
+    )}\n`,
   );
   console.log(`size-check: wrote ${join(out, "size.json")}`);
 }
@@ -103,6 +133,10 @@ if (mainGz > MAIN_BUDGET)
   failures.push(`main chunk ${kb(mainGz)} exceeds ${kb(MAIN_BUDGET)}`);
 if (initialGz > INITIAL_BUDGET)
   failures.push(`initial total ${kb(initialGz)} exceeds ${kb(INITIAL_BUDGET)}`);
+if (shippedAudio === 0)
+  failures.push("no encoded audio found in public/audio — see docs/audio-credits.md");
+if (shippedAudio > AUDIO_BUDGET)
+  failures.push(`audio ${kb(shippedAudio)} exceeds ${kb(AUDIO_BUDGET)}`);
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`size-check: ${failure}`);

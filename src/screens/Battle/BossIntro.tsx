@@ -3,9 +3,12 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tokens } from '@/app/theme';
 import { ENEMY_BY_ID } from '@/data/enemies';
+import { playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { useBattleStore } from '@/stores/battleStore';
 import styles from './BossIntro.module.css';
+
+const PIP_STAGGER_MS = 120;
 
 export const BossIntro = () => {
   const { t } = useTranslation(['battle', 'content']);
@@ -13,10 +16,24 @@ export const BossIntro = () => {
   const introEnemyId = useBattleStore((s) => s.introEnemyId);
   const enemies = useBattleStore((s) => s.enemies);
   const dismissIntro = useBattleStore((s) => s.dismissIntro);
+  const pipCount =
+    enemies.find((e) => e.defId === introEnemyId)?.subsystems.length ?? 0;
 
   useEffect(() => {
     if (introPending) haptic('bossIntro');
   }, [introPending]);
+
+  useEffect(() => {
+    if (!introPending) return;
+    const timers = Array.from({ length: pipCount }, (_, index) =>
+      window.setTimeout(() => {
+        playSfx('sensors', { gain: 0.4, rate: 0.9 + index * 0.07 });
+      }, index * PIP_STAGGER_MS),
+    );
+    return () => {
+      for (const id of timers) window.clearTimeout(id);
+    };
+  }, [introPending, pipCount]);
 
   if (!introPending || introEnemyId === null) return null;
   const def = ENEMY_BY_ID.get(introEnemyId);
@@ -25,7 +42,7 @@ export const BossIntro = () => {
   const subsystems = state?.subsystems ?? [];
 
   return (
-    <Overlay backgroundOpacity={0.88} color={tokens.bg} blur={3} zIndex={7}>
+    <Overlay backgroundOpacity={0.88} color={tokens.bg} blur={3} zIndex="var(--z-modal)">
       <Stack align="center" justify="center" h="100%" gap="lg" p="lg">
         <Text className={styles.kicker} c={tokens.danger}>
           {t(def.boss === true ? 'battle:intro.boss' : 'battle:intro.miniboss')}

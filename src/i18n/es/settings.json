@@ -29,7 +29,8 @@
     "active": "Activo",
     "owned": "Desbloqueado",
     "unlock": "Desbloquear",
-    "price": "{{n}} fragmentos"
+    "price": "{{n}} fragmentos",
+    "ascendant": "Ascendente"
   },
   "diagnostics": {
     "version": "Compilar {{version}}",

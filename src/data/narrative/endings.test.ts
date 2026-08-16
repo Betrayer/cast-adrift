@@ -3,11 +3,17 @@ import { ASCENSIONS, ascensionMods, maxSelectableAscension } from "@/data/ascens
 import { BEACON_FLAGS, beaconsResolved } from "@/data/events/beacons";
 import {
   earnedEndings,
+  endingBeats,
   ENDINGS,
   finaleOptions,
+  STANDARD_ENDINGS,
   type EndingContext,
 } from "@/data/narrative/endings";
-import { buildEpilogue, EPILOGUE_ENTRIES } from "@/data/narrative/epilogue";
+import {
+  buildEpilogue,
+  DEATH_TALLY_LINES,
+  EPILOGUE_ENTRIES,
+} from "@/data/narrative/epilogue";
 import { finalMemoryCodexId } from "@/data/narrative/memories";
 import { CODEX_BY_ID } from "@/data/codex";
 import type { FlagValue } from "@/types/events";
@@ -66,10 +72,54 @@ describe("finale gating", () => {
         flags: { ...allBeacons(), silentReady: true, courierFreed: true },
         beaconsResolved: 5,
       }),
+      ctx({
+        flags: allBeacons(),
+        beaconsResolved: 5,
+        crossedThreshold: true,
+        echoArcComplete: true,
+      }),
     ]) {
       for (const ending of earnedEndings(state)) reachable.add(ending.id);
     }
     expect(reachable.size).toBe(ENDINGS.length);
+  });
+
+  it("plays nine distinct beat sets across the four endings and the true one", () => {
+    const sets = new Set<string>();
+    for (const ending of ENDINGS) {
+      for (const crossed of [false, true]) {
+        if (ending.id === "answer" && !crossed) continue;
+        const beats = endingBeats(
+          ending,
+          ctx({ crossedThreshold: crossed, beaconsResolved: 5 }),
+        );
+        expect(beats.length).toBeGreaterThan(0);
+        sets.add(beats.join("|"));
+      }
+    }
+    expect(sets.size).toBe(9);
+  });
+
+  it("gives every standard ending a deep set that replaces it, never appends", () => {
+    for (const ending of STANDARD_ENDINGS) {
+      const shallow = endingBeats(ending, ctx());
+      const deep = endingBeats(ending, ctx({ crossedThreshold: true }));
+      expect(deep).toHaveLength(shallow.length);
+      expect(deep).not.toEqual(shallow);
+    }
+  });
+
+  it("still applies flag variants inside a deep set", () => {
+    const seal = ENDINGS.find((e) => e.id === "seal");
+    expect(seal).toBeDefined();
+    if (seal === undefined) return;
+    const plain = endingBeats(seal, ctx({ crossedThreshold: true }));
+    const varied = endingBeats(
+      seal,
+      ctx({ crossedThreshold: true, flags: { coreSilenced: true } }),
+    );
+    expect(varied).not.toEqual(plain);
+    expect(varied[2]).toBe("content:ending.seal.var.silenced");
   });
 
   it("falls back to a Seal/Merge fork when nothing was earned", () => {
@@ -96,8 +146,40 @@ describe("beacon tally", () => {
 });
 
 describe("epilogue tally", () => {
-  it("maps at least twelve distinct deeds", () => {
-    expect(EPILOGUE_ENTRIES.length).toBeGreaterThanOrEqual(12);
+  it("maps at least twenty-four distinct deeds", () => {
+    expect(EPILOGUE_ENTRIES.length).toBeGreaterThanOrEqual(24);
+  });
+
+  it("keeps the death-only entries out of a clear", () => {
+    const lines = buildEpilogue({
+      flags: {},
+      beaconsResolved: 0,
+      ascension: 0,
+      survivedLethal: false,
+      axis: 0,
+      sector: 5,
+      depth: 40,
+      death: false,
+    }).map((l) => l.id);
+    expect(lines).not.toContain("deathDeep");
+  });
+
+  it("caps the death tally and leads with where the run ended", () => {
+    const lines = buildEpilogue(
+      {
+        flags: { maraFriend: true, crewSaved: true, courierFreed: true },
+        beaconsResolved: 2,
+        ascension: 3,
+        survivedLethal: true,
+        axis: 0,
+        sector: 4,
+        depth: 31,
+        death: true,
+      },
+      DEATH_TALLY_LINES,
+    ).map((l) => l.id);
+    expect(lines).toHaveLength(DEATH_TALLY_LINES);
+    expect(lines[0]).toBe("deathDeep");
   });
 
   it("renders one line per earned deed and never conflicting Yusuf lines", () => {
@@ -118,6 +200,9 @@ describe("epilogue tally", () => {
       ascension: 2,
       survivedLethal: true,
       axis: 0,
+      sector: 5,
+      depth: 40,
+      death: false,
     }).map((l) => l.id);
     expect(lines).toContain("yusufGrudge");
     expect(lines).not.toContain("yusufFriend");
@@ -132,6 +217,9 @@ describe("epilogue tally", () => {
       ascension: 0,
       survivedLethal: false,
       axis: 0,
+      sector: 1,
+      depth: 0,
+      death: false,
     });
     expect(lines).toHaveLength(1);
     expect(lines[0]?.id).toBe("quiet");

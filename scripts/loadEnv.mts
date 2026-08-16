@@ -2,10 +2,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
 
-// Vite loads .env files for the app; a standalone tsx script does not, so an
-// owner key that lives in .env.local would be invisible to `npm run` scripts
-// without this. A real environment variable always wins, so CI and one-off
-// shell overrides keep working.
 const FILES = [".env.local", ".env"];
 
 const stripQuotes = (value: string): string => {

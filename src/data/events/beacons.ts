@@ -1,34 +1,5 @@
 import type { EventDef } from "@/types/events";
 
-// ── Beacon flag graph (Task 5) ────────────────────────────────────────────────
-//
-//  S1 beaconKeeperIntro ──┬─ take   → beaconKey1, axis +1
-//                         ├─ sell   → scrap,      axis −1, keeperSlighted
-//                         └─ smash  → tide −1,    axis −2, keeperSlighted, beaconBroken
-//
-//  S2 fleetBlackbox ──────┬─ share (needs yusufFriend) → fleetTruthShared, yusufFriend↑
-//                         ├─ keep   → fleetTruthKept, axis −1
-//                         └─ wipe   → axis +1, fleetTruthLost
-//
-//  S3 choirInvitation ────┬─ accept → pactStep1, axis −2
-//                         ├─ refuse → refusedChoir, axis +2
-//                         └─ probe (check) → pass: choirDoctrine codex + refusedChoir
-//                                            fail: hull loss, pactStep1
-//
-//  S4 pactSeal (requires pactStep1) ─┬─ complete → pactSealed  (unlocks Choir Bargain)
-//                                    └─ betray   → choirEnemy + elite fight
-//
-//  S5 coreThreshold ──────┬─ listen  → silentReady when all five beacons resolved
-//                         ├─ answer  → axis −1, coreAnswered
-//                         └─ silence → axis +1, coreSilenced
-//
-//  Endings read: axis (Seal/Merge), pactSealed (Bargain),
-//  silentReady + beaconsResolved≥5 + (crewSaved|courierFreed) (Silent Fleet).
-//
-//  Cross-references wired into earlier content: keeperSlighted (Mara's stock line),
-//  fleetTruthShared (Yusuf callback), refusedChoir (Preacher callback).
-// ──────────────────────────────────────────────────────────────────────────────
-
 export const BEACON_EVENTS: readonly EventDef[] = [
   {
     id: "beaconKeeperIntro",
@@ -366,6 +337,63 @@ export const BEACON_EVENTS: readonly EventDef[] = [
               { k: "axis", n: 1 },
               { k: "nodeMod", mod: "endHeal", n: 2 },
             ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "thresholdBeacon",
+    kind: "beacon",
+    weight: 1,
+    speaker: "beaconKeeper",
+    requires: { sector: [6] },
+    text: "content:events.thresholdBeacon.text",
+    codex: "thresholdBeacon",
+    options: [
+      {
+        id: "hold",
+        label: "content:events.thresholdBeacon.hold",
+        requires: { req: "axis", min: -2, max: 2 },
+        outcomes: [
+          {
+            text: "content:events.thresholdBeacon.holdOut",
+            effects: [
+              { k: "flag", key: "thresholdHeard" },
+              { k: "hull", n: 10 },
+            ],
+            codex: "thresholdBeacon",
+            consequence: "content:consequence.thresholdHeard",
+          },
+        ],
+      },
+      {
+        id: "commit",
+        label: "content:events.thresholdBeacon.commit",
+        outcomes: [
+          {
+            text: "content:events.thresholdBeacon.commitOut",
+            effects: [
+              { k: "flag", key: "thresholdCommitted" },
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 3 },
+              { k: "scrap", n: 50 },
+            ],
+            consequence: "content:consequence.thresholdCommitted",
+          },
+        ],
+      },
+      {
+        id: "walk",
+        label: "content:events.thresholdBeacon.walk",
+        outcomes: [
+          {
+            text: "content:events.thresholdBeacon.walkOut",
+            effects: [
+              { k: "flag", key: "thresholdWalked" },
+              { k: "tide", n: -1 },
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+            ],
+            consequence: "content:consequence.thresholdWalked",
           },
         ],
       },

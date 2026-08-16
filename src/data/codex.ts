@@ -1,4 +1,5 @@
 import { ALL_ENEMIES } from "@/data/enemies";
+import { MEMORY_CODEX_IDS } from "@/data/narrative/memories";
 import type { LocKey } from "@/types/content";
 
 export type CodexGroup = "world" | "dossier" | "memory";
@@ -8,6 +9,7 @@ export interface CodexEntry {
   group: CodexGroup;
   title: LocKey;
   body: LocKey;
+  signature?: LocKey;
 }
 
 export const CODEX_GROUP_ORDER: readonly CodexGroup[] = [
@@ -30,23 +32,17 @@ const memory = (id: string): CodexEntry => ({
   body: `content:codex.${id}.body`,
 });
 
-const MEMORY_ENTRIES: readonly CodexEntry[] = [
-  ...Array.from({ length: 11 }, (_, i) => memory(`memory-${String(i + 1)}`)),
-  memory("memory-12-seal"),
-  memory("memory-12-merge"),
-  memory("memory-12-bargain"),
-  memory("memory-12-silent"),
-];
+const MEMORY_ENTRIES: readonly CodexEntry[] = MEMORY_CODEX_IDS.map((id) =>
+  memory(id),
+);
 
-// One dossier per roster entry (DESIGN §2.1, 54 of them): the title is the
-// enemy's own name and the body is its hand-written flavour line. The stat block
-// is rendered from the EnemyDef at read time, so no numbers live in the string.
 export const dossierId = (enemyId: string): string => `dossier-${enemyId}`;
 
 const DOSSIER_ENTRIES: readonly CodexEntry[] = ALL_ENEMIES.map((enemy) => ({
   id: dossierId(enemy.id),
   group: "dossier" as const,
   title: enemy.name,
+  signature: enemy.signature,
   body: `content:dossier.${enemy.id}`,
 }));
 
@@ -62,6 +58,12 @@ export const CODEX: readonly CodexEntry[] = [
   world("choirDoctrine"),
   world("pactLedger"),
   world("coreThreshold"),
+  world("beyondTheCore"),
+  world("echoFleetLog"),
+  world("secondCaptain"),
+  world("keeperBeyond"),
+  world("coreRemainder"),
+  world("thresholdBeacon"),
   ...MEMORY_ENTRIES,
 ];
 

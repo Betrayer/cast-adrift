@@ -12,7 +12,6 @@
   "cloudFound": "In der Cloud wurde ein neuerer Durchlauf gefunden – soll dieser fortgesetzt werden?",
   "cloudYes": "Cloud-Lauf",
   "cloudNo": "Lokal",
-  "stub": "Dieser Bildschirm erscheint in Phase „{{phase}}“.",
   "resumeCard": "Weiter: Sektor {{sector}} · Tiefe {{depth}} · {{when}}",
   "resumeContinue": "Weiter",
   "resumeAbandon": "Lass es so",

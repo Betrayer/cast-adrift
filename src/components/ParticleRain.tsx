@@ -20,8 +20,6 @@ interface Props {
 
 const GRAVITY = 0.00022;
 
-// A single pooled canvas — no per-particle DOM node, so the ceremony costs one
-// draw call instead of a hundred layout nodes.
 export const ParticleRain = ({
   color,
   count = 90,
@@ -43,8 +41,6 @@ export const ParticleRain = ({
     ctx.scale(dpr, dpr);
 
     const rng = createStream(deriveSeed(0, 'levelUpRain'));
-    // Seeded so the ceremony looks identical every time: the field starts
-    // already spread over the screen instead of trickling in from above.
     const particles: Particle[] = Array.from({ length: count }, () => ({
       x: rng.next() * w,
       y: (rng.next() * 1.3 - 0.3) * h,

@@ -1,9 +1,16 @@
 import { LOOT_DICE } from "@/data/dice";
+import { beaconsResolved } from "@/data/events/beacons";
+import { chainViews, type ChainView } from "@/data/narrative/chains";
+import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
+import { settleAchievements } from "@/game/meta/achievements";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
+import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
+import { emitRunHook } from "@/game/run/runEffects";
+import { playSfx } from "@/services/audio";
 import type { RngStream } from "@/services/rng";
+import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
-import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 import type { EventEffect, ForcedBattle, Outcome } from "@/types/events";
 
@@ -79,7 +86,7 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
       });
       return;
     case "axis":
-      run.addAxis(effect.n);
+      applyAxisDelta(effect.n, "choice");
       return;
     case "flag":
       run.setFlag(effect.key, effect.value ?? true);
@@ -107,16 +114,79 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
   }
 };
 
+export const applyEventEffects = (
+  effects: readonly EventEffect[],
+  stream: RngStream,
+): void => {
+  for (const effect of effects) applyEffect(effect, stream);
+};
+
+const logChainProgress = (
+  before: readonly ChainView[],
+  after: readonly ChainView[],
+): void => {
+  for (const view of after) {
+    const prior = before.find((v) => v.id === view.id);
+    if (prior === undefined || view.step <= prior.step) continue;
+    logJournal({
+      k: "chain",
+      chain: view.id,
+      step: view.step,
+      label: view.hint,
+    });
+  }
+};
+
 export const applyOutcome = (
   outcome: Outcome,
   stream: RngStream,
+  info?: EventOutcomeInfo,
 ): ApplyResult => {
-  for (const effect of outcome.effects) applyEffect(effect, stream);
+  const sector = useRunStore.getState().sector;
+  const chainsBefore = chainViews(useRunStore.getState().flags, sector);
+  applyEventEffects(outcome.effects, stream);
   if (outcome.codex !== undefined) {
     useMetaStore.getState().unlockCodex(outcome.codex);
   }
-  if (outcome.consequence !== undefined) {
-    useNarrativeStore.getState().pushConsequence(outcome.consequence);
+  if (info !== undefined) {
+    logJournal({
+      k: "choice",
+      event: info.eventId,
+      option: info.optionId,
+      text: outcome.text,
+      ...(outcome.consequence === undefined
+        ? {}
+        : { consequence: outcome.consequence }),
+    });
+    if (info.beacon === true) {
+      logJournal({
+        k: "beacon",
+        event: info.eventId,
+        resolved: beaconsResolved(useRunStore.getState().flags),
+      });
+    }
   }
+  const chainsAfter = chainViews(useRunStore.getState().flags, sector);
+  logChainProgress(chainsBefore, chainsAfter);
+  const advanced = chainsAfter.some((view) => {
+    const prior = chainsBefore.find((v) => v.id === view.id);
+    return prior !== undefined && view.step > prior.step;
+  });
+  if (advanced) {
+    const deepest = chainsAfter.reduce((most, view) => {
+      const prior = chainsBefore.find((v) => v.id === view.id);
+      return prior !== undefined && view.step > prior.step
+        ? Math.max(most, view.step)
+        : most;
+    }, 1);
+    playSfx("chainStep", { rate: 0.92 + deepest * 0.07 });
+    haptic("chainStep");
+    useMetaStore
+      .getState()
+      .archiveRunFlags(Object.keys(useRunStore.getState().flags));
+    settleAchievements();
+  }
+  if (outcome.consequence !== undefined) logConsequence(outcome.consequence);
+  emitRunHook("eventOutcome", info === undefined ? {} : { event: info });
   return { follow: outcome.follow ?? null };
 };

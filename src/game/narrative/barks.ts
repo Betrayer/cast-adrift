@@ -6,7 +6,6 @@ import { useRunStore } from "@/stores/runStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import type { Outcome } from "@/types/events";
 
-// Phase 10 widens the anti-repeat window to twenty lines (plan Task 8).
 const RING = 20;
 const GLOBAL_MS = 20000;
 
@@ -42,7 +41,6 @@ const eligible = (
 export const emitBark = (trigger: string): void => {
   const verbosity = useSettingsStore.getState().echoVerbosity;
   if (verbosity === "off") return;
-  // «Радиомолчание» cuts Echo off for the whole run.
   if (computeMutatorMods(useRunStore.getState().mutators).barksOff) return;
   const now = clock();
   if (now - lastBarkAt < GLOBAL_MS) return;

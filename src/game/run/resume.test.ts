@@ -44,7 +44,7 @@ describe("save / resume", () => {
     expect(useRunStore.getState().scrap).toBe(beforeScrap);
     expect(useRunStore.getState().deck.length).toBe(beforeDeck);
     expect(useRunStore.getState().position).toBe(beforePos);
-    expect(useAppStore.getState().screen).toBe("map");
+    expect(useAppStore.getState().screen).toBe("interstitial");
   });
 
   it("restores a mid-battle placement exactly", () => {

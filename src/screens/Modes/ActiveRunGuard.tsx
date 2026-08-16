@@ -10,8 +10,6 @@ interface ActiveRunGuardProps {
   onConfirm: () => void;
 }
 
-// One dialog for every mode start (DoD: the single run slot is never silently
-// overwritten). Confirming drops both local copies and the cloud snapshot.
 export const ActiveRunGuard = ({
   opened,
   onCancel,

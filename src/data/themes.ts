@@ -1,6 +1,11 @@
 import type { School } from "@/types/content";
 
-export type ThemeId = "deepSpace" | "terminal" | "blueprint" | "aurora";
+export type ThemeId =
+  | "deepSpace"
+  | "terminal"
+  | "blueprint"
+  | "aurora"
+  | "ascendant";
 
 export interface ThemeTokens {
   bg: string;
@@ -19,9 +24,6 @@ export interface SchoolTint {
   hue: number;
   hueMix: number;
   satScale: number;
-  // Additive lightness deltas normally; with `monochrome` set they are read as
-  // absolute lightness targets, which is what makes a single-hue theme keep
-  // seven separable school steps.
   lightShift: Partial<Record<School, number>>;
   monochrome?: boolean;
 }
@@ -56,6 +58,7 @@ export interface ThemeDef {
   slotStyle: SlotStyle;
   bgStyle: BgStyle;
   price: number;
+  unlock?: string;
 }
 
 const SANS =
@@ -216,11 +219,54 @@ const aurora: ThemeDef = {
   price: THEME_PRICE,
 };
 
+const ascendant: ThemeDef = {
+  id: "ascendant",
+  name: "settings:theme.ascendant",
+  unlock: "ascendant",
+  palette: {
+    bg: "#100A18",
+    surface1: "#1A1026",
+    surface2: "#251636",
+    line: "#4A2C6B",
+    text: "#F6ECFF",
+    dim: "#C4A8E0",
+    faint: "#9075B4",
+    accent: "#C79BFF",
+    danger: "#FF6E8E",
+    amber: "#FFD98A",
+  },
+  schoolTint: {
+    hue: 282,
+    hueMix: 0.3,
+    satScale: 1.06,
+    lightShift: {
+      red: 0.06,
+      yellow: 0.05,
+      prismatic: 0.08,
+      blue: 0.02,
+      green: 0.03,
+      grey: -0.02,
+      black: -0.05,
+    },
+  },
+  dieStyle: {
+    radius: 0.36,
+    strokeW: 2,
+    glyphFont: SANS,
+    noise: 0.02,
+    gradient: 0.34,
+  },
+  slotStyle: { dashed: false, innerShadow: 0.26, etching: true },
+  bgStyle: { starDensity: 1.6, hue: 282 },
+  price: 0,
+};
+
 export const THEMES: readonly ThemeDef[] = [
   deepSpace,
   terminal,
   blueprint,
   aurora,
+  ascendant,
 ];
 
 export const THEME_BY_ID: Record<ThemeId, ThemeDef> = {
@@ -228,11 +274,10 @@ export const THEME_BY_ID: Record<ThemeId, ThemeDef> = {
   terminal,
   blueprint,
   aurora,
+  ascendant,
 };
 
 export const DEFAULT_THEME_ID: ThemeId = "deepSpace";
 
 export const isThemeId = (value: unknown): value is ThemeId =>
   typeof value === "string" && value in THEME_BY_ID;
-
-export const themeDef = (id: ThemeId): ThemeDef => THEME_BY_ID[id];

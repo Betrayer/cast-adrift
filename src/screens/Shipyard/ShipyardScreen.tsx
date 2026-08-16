@@ -3,13 +3,13 @@ import {
   Divider,
   Group,
   Paper,
-  ScrollArea,
   Slider,
   Stack,
   Text,
 } from "@mantine/core";
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { fusionTarget } from "@/data/dice/fusion";
@@ -19,6 +19,7 @@ import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { FUSION_COST, mkUpgradeCost } from "@/game/economy/prices";
 import { autosaveRun, completeNode } from "@/game/run/flow";
 import { playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
@@ -36,6 +37,7 @@ export const ShipyardScreen = () => {
   const vouchers = useRunStore((s) => s.vouchers);
   const seed = useRunStore((s) => s.seed);
   const position = useRunStore((s) => s.position);
+  const flags = useRunStore((s) => s.flags);
   const [repair, setRepair] = useState(0);
   const [swept, setSwept] = useState<{ slotId: SlotId; key: number } | null>(
     null,
@@ -44,7 +46,7 @@ export const ShipyardScreen = () => {
 
   const greeting = createStream(
     deriveSeed(seed, `keeper:${position ?? "yard"}`),
-  ).pick(keeperLinesFor("shipyard"));
+  ).pick(keeperLinesFor("shipyard", flags));
 
   const discountedMk = (target: Exclude<MkLevel, 1>): number =>
     Math.max(1, mkUpgradeCost(target) - shipyardDiscount);
@@ -69,6 +71,8 @@ export const ShipyardScreen = () => {
 
   const markUpgraded = (slotId: SlotId): void => {
     playSfx("buy");
+    playSfx("mkSweep");
+    haptic("purchase");
     setSwept({ slotId, key: sweepKey.current + 1 });
     sweepKey.current += 1;
   };
@@ -87,7 +91,6 @@ export const ShipyardScreen = () => {
     autosaveRun();
   };
 
-  // The mini-boss Mk-voucher: one free tier at any shipyard, no scrap spent.
   const redeemVoucher = (slotId: SlotId): void => {
     const state = useRunStore.getState();
     if ((state.mkLevels[slotId] ?? 1) >= 3) return;
@@ -120,7 +123,21 @@ export const ShipyardScreen = () => {
   };
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
+    <Screen
+      width="wide"
+      footer={
+        <Button
+          size="md"
+          fullWidth
+          onClick={() => {
+            completeNode({ outcome: "cleared" });
+          }}
+        >
+          {t("run:shipyard.leave")}
+        </Button>
+      }
+    >
+      <Stack gap="sm">
       <Group justify="space-between">
         <Text fw={600} c={tokens.text}>
           {t("run:shipyard.title")}
@@ -146,7 +163,6 @@ export const ShipyardScreen = () => {
       ) : null}
 
       <Divider color={tokens.line} label={t("run:shipyard.systems")} />
-      <ScrollArea.Autosize mah={260}>
         <Stack gap={6}>
           {slotIds.map((slotId) => {
             const mk = mkLevels[slotId] ?? 1;
@@ -207,7 +223,6 @@ export const ShipyardScreen = () => {
             );
           })}
         </Stack>
-      </ScrollArea.Autosize>
 
       <Divider color={tokens.line} label={t("run:shipyard.fusionTitle")} />
       {fusable.length === 0 ? (
@@ -257,16 +272,7 @@ export const ShipyardScreen = () => {
       >
         {`${t("run:shipyard.repair")} +${String(repair)} (${String(repair * 2)})`}
       </Button>
-
-      <Button
-        size="md"
-        mt="auto"
-        onClick={() => {
-          completeNode({ outcome: "cleared" });
-        }}
-      >
-        {t("run:shipyard.leave")}
-      </Button>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

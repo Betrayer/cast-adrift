@@ -1,5 +1,4 @@
 import { describe, expect, it } from "vitest";
-import { BOSS_ROW } from "@/game/map/types";
 import {
   contentSector,
   depthFor,
@@ -11,6 +10,7 @@ import {
   msUntilUtcReset,
   runScore,
   scoreBreakdown,
+  sectorDepth,
   SCORE_PER_DEPTH,
   SCORE_PER_KILL,
   utcDateKey,
@@ -49,11 +49,16 @@ describe("drift score", () => {
 });
 
 describe("drift depth and looping", () => {
-  it("counts rows advanced, so a sector's boss row is depth 15", () => {
+  it("counts rows advanced, summing the depths of the sectors already passed", () => {
     expect(depthFor(1, 0)).toBe(0);
-    expect(depthFor(1, BOSS_ROW)).toBe(BOSS_ROW);
-    expect(depthFor(2, 0)).toBe(BOSS_ROW);
-    expect(depthFor(3, 7)).toBe(2 * BOSS_ROW + 7);
+    expect(depthFor(1, sectorDepth(1))).toBe(sectorDepth(1));
+    expect(depthFor(2, 0)).toBe(sectorDepth(1));
+    expect(depthFor(3, 7)).toBe(sectorDepth(1) + sectorDepth(2) + 7);
+    expect(sectorDepth(3)).not.toBe(sectorDepth(4));
+  });
+
+  it("keeps counting past the last sector by repeating its depth", () => {
+    expect(depthFor(7, 0) - depthFor(6, 0)).toBe(sectorDepth(5));
   });
 
   it("clamps the content sector at five while the index keeps climbing", () => {

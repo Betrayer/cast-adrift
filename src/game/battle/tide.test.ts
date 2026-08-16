@@ -2,14 +2,29 @@ import { describe, expect, it } from "vitest";
 import { harnessEnemy, harnessSnap } from "@/game/battle/battleHarness";
 import { resolveEnemyPhase } from "@/game/battle/resolver";
 import { spawnEnemy } from "@/game/battle/setup";
-import { scaleHpForTide } from "@/game/run/encounter";
+import { scaleEnemyHp, sectorHpPct } from "@/game/run/encounter";
 import { createStream } from "@/services/rng";
 
 describe("interference tide", () => {
   it("scales enemy hp by +10% per level (rounded)", () => {
-    expect(scaleHpForTide(32, 0)).toBe(32);
-    expect(scaleHpForTide(32, 2)).toBe(38);
-    expect(scaleHpForTide(32, 3)).toBe(42);
+    expect(scaleEnemyHp(32, { tide: 0 })).toBe(32);
+    expect(scaleEnemyHp(32, { tide: 2 })).toBe(38);
+    expect(scaleEnemyHp(32, { tide: 3 })).toBe(42);
+  });
+
+  it("multiplies the sector curve with the tide instead of adding it", () => {
+    const pct = sectorHpPct({ sector: 5 });
+    expect(scaleEnemyHp(20, { tide: 0, sectorHpPct: pct })).toBe(
+      Math.round(20 * (1 + pct / 100)),
+    );
+    expect(
+      scaleEnemyHp(20, { tide: 3, sectorHpPct: pct, hpBonusPct: 20 }),
+    ).toBe(Math.round(20 * 1.3 * (1 + pct / 100) * 1.2));
+    expect(
+      scaleEnemyHp(20, { tide: 3, sectorHpPct: pct, hpBonusPct: 20 }),
+    ).toBeGreaterThan(
+      Math.round(20 * (1 + (30 + pct + 20) / 100)),
+    );
   });
 
   it("spawns enemies with tide-scaled hp", () => {

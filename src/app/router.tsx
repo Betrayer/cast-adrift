@@ -1,7 +1,6 @@
 import { Box } from '@mantine/core';
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, type ReactElement } from 'react';
 import { tokens } from '@/app/theme';
-import { StubScreen } from '@/components/StubScreen';
 import { CollectionScreen } from '@/screens/Collection/CollectionScreen';
 import { ContractsScreen } from '@/screens/Contracts/ContractsScreen';
 import { EngravingScreen } from '@/screens/Engraving/EngravingScreen';
@@ -21,9 +20,6 @@ import { useAppStore } from '@/stores/appStore';
 import type { ScreenId } from '@/types';
 import styles from './Router.module.css';
 
-// Battle drags in Pixi and Matter, the Star Chart its own SVG engine, the Codex
-// the whole lore corpus, and the ceremonies their particle work — none of it
-// belongs in the chunk that has to paint the menu (DESIGN §17).
 const BattleScreen = lazy(() =>
   import('@/screens/Battle/BattleScreen').then((m) => ({
     default: m.BattleScreen,
@@ -69,49 +65,52 @@ const FinaleScreen = lazy(() =>
     default: m.FinaleScreen,
   })),
 );
+const JournalScreen = lazy(() =>
+  import('@/screens/Journal/JournalScreen').then((m) => ({
+    default: m.JournalScreen,
+  })),
+);
 const EndingScreen = lazy(() =>
   import('@/screens/Ending/EndingScreen').then((m) => ({
     default: m.EndingScreen,
   })),
 );
 
-const screenFor = (screen: ScreenId) => {
-  if (screen === 'menu') return <MenuScreen />;
-  if (screen === 'settings') return <SettingsScreen />;
-  if (screen === 'battle') return <BattleScreen />;
-  if (screen === 'map') return <MapScreen />;
-  if (screen === 'event') return <EventScreen />;
-  if (screen === 'puzzle') return <PuzzleScreen />;
-  if (screen === 'shop') return <ShopScreen />;
-  if (screen === 'shipyard') return <ShipyardScreen />;
-  if (screen === 'rewards') return <RewardsScreen />;
-  if (screen === 'summary') return <SummaryScreen />;
-  if (screen === 'driftSummary') return <DriftSummaryScreen />;
-  if (screen === 'modes') return <ModesScreen />;
-  if (screen === 'contracts') return <ContractsScreen />;
-  if (screen === 'leaderboard') return <LeaderboardScreen />;
-  if (screen === 'profile') return <ProfileScreen />;
-  if (screen === 'codex') return <CodexScreen />;
-  if (screen === 'chart') return <ChartScreen />;
-  if (screen === 'hangar') return <HangarScreen />;
-  if (screen === 'collection') return <CollectionScreen />;
-  if (screen === 'engraving') return <EngravingScreen />;
-  if (screen === 'runSetup') return <RunSetupScreen />;
-  if (screen === 'prologue') return <PrologueScreen />;
-  if (screen === 'interstitial') return <InterstitialScreen />;
-  if (screen === 'finale') return <FinaleScreen />;
-  if (screen === 'ending') return <EndingScreen />;
-  return <StubScreen screen={screen} />;
+const SCREENS: Record<ScreenId, () => ReactElement> = {
+  menu: () => <MenuScreen />,
+  settings: () => <SettingsScreen />,
+  battle: () => <BattleScreen />,
+  map: () => <MapScreen />,
+  event: () => <EventScreen />,
+  journal: () => <JournalScreen />,
+  puzzle: () => <PuzzleScreen />,
+  shop: () => <ShopScreen />,
+  shipyard: () => <ShipyardScreen />,
+  rewards: () => <RewardsScreen />,
+  summary: () => <SummaryScreen />,
+  driftSummary: () => <DriftSummaryScreen />,
+  modes: () => <ModesScreen />,
+  contracts: () => <ContractsScreen />,
+  leaderboard: () => <LeaderboardScreen />,
+  profile: () => <ProfileScreen />,
+  codex: () => <CodexScreen />,
+  chart: () => <ChartScreen />,
+  hangar: () => <HangarScreen />,
+  collection: () => <CollectionScreen />,
+  engraving: () => <EngravingScreen />,
+  runSetup: () => <RunSetupScreen />,
+  prologue: () => <PrologueScreen />,
+  interstitial: () => <InterstitialScreen />,
+  finale: () => <FinaleScreen />,
+  ending: () => <EndingScreen />,
 };
 
-// Screens crossfade on entry (DESIGN §10 transitions). The wrapper is keyed by
-// screen id so React remounts it and the animation replays every navigation.
 export const Router = () => {
   const screen = useAppStore((s) => s.screen);
   return (
     <div key={screen} className={styles.screen}>
       <Suspense fallback={<Box mih="var(--ca-vh)" bg={tokens.bg} />}>
-        {screenFor(screen)}
+        {SCREENS[screen]()}
       </Suspense>
     </div>
   );

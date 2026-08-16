@@ -33,14 +33,18 @@ export type OptionRequirement =
   | { req: "dieTier"; tier: DieTier }
   | { req: "dieSchool"; school: School }
   | { req: "mk"; slot: SlotId; mk: MkLevel }
-  | { req: "flag"; key: string };
+  | { req: "flag"; key: string }
+  | { req: "axis"; min?: number; max?: number };
 
-export type CheckPick = "sum" | "highest";
+export type CheckPick = "sum" | "highest" | "lowest";
 
 export interface CheckDef {
   dice: number;
   pick: CheckPick;
   target: number;
+  school?: School;
+  tierAtLeast?: DieTier;
+  tierAtMost?: DieTier;
 }
 
 export type BattleModKind = "startCharge" | "enemyPlus";

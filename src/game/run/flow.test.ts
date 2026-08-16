@@ -31,7 +31,7 @@ describe("run flow", () => {
     expect(s.visited).toContain(START_NODE_ID);
     expect(s.map).not.toBeNull();
     expect(s.deck.length).toBeGreaterThan(0);
-    expect(useAppStore.getState().screen).toBe("map");
+    expect(useAppStore.getState().screen).toBe("interstitial");
   });
 
   it("rejects an illegal jump to an unconnected node", () => {

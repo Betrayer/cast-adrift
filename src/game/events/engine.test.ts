@@ -111,6 +111,7 @@ describe("optionMet requirements", () => {
   const base: OptionContext = {
     scrap: 20,
     hull: 15,
+    axis: 0,
     deck: [
       { school: "black", tier: 6 },
       { school: "red", tier: 8 },

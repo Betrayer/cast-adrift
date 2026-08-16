@@ -11,6 +11,7 @@
   "defeat": "Défaite",
   "toMenu": "Retour au menu",
   "hp": "HP {{hp}} / {{max}}",
+  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Réserve",
   "reroll": "Reroll ({{n}})",
   "rerollConfirm": "Rejouer « {{k}} » / {{size}}",
@@ -62,7 +63,18 @@
     "capShrink": "Réduit la taille d'un capuchon d'emplacement",
     "twistDie": "Fait tourner l'un de vos dés",
     "swapValues": "Inverse vos valeurs maximales et minimales",
-    "storm": "Tempête de probabilités"
+    "storm": "Tempête de probabilités",
+    "curseDie": "« Curses a die » − {{n}}",
+    "shieldGate": "Affiche une fenêtre contextuelle «{{n}} »",
+    "mirrorSchool": "Reflète votre recensement",
+    "drainCharge": "Frais de «{{n}} » des canalisations",
+    "siphonShield": "Bouclier «{{n}} » de Siphons",
+    "bargain": "{{n}} de factures : votre ferraille ou votre coque",
+    "enrage": "Enrages + {{n}}",
+    "hijack": "Il s'empare de ton meilleur dé",
+    "echoTotal": "reprend votre dernier tour ({{n}} maximum)",
+    "foldOrder": "traite la commande",
+    "devourDie": "utilise ton meilleur dé de réserve"
   },
   "slot": {
     "weaponA": "Arme A",
@@ -85,5 +97,28 @@
   },
   "scriptHint": "Prologue : seule la compétence « {{slots}} » peut être utilisée lors de ce tour.",
   "fate": "Lancer de dés du destin",
-  "fateResult": "Fate {{roll}} — {{text}}"
+  "fateResult": "Fate {{roll}} — {{text}}",
+  "swap": "Échange",
+  "swapPick": "Choisis un dé…",
+  "bank": "Face de la banque",
+  "split": "Split",
+  "beat": {
+    "curse": "MALÉDICTION",
+    "gate": "GATE",
+    "drain": "VIDANGE",
+    "siphon": "SIPHON",
+    "bargain": "OFFRE",
+    "enrage": "RAGE",
+    "hijack": "DÉTOURNEMENT",
+    "ward": "WARD",
+    "fold": "PLIER",
+    "devour": "MANGÉ"
+  },
+  "enemyWard": "Circonscription : {{school}}",
+  "enemyGate": "{{n}} de l'entrée",
+  "enemyRage": "Rage + {{n}}",
+  "inverted": "COMMANDE INVERSE",
+  "invertedHint": "Le réacteur d'abord, les capteurs ensuite.",
+  "storm": "TEMPÊTE DE PROBABILITÉS",
+  "stormHint": "On relance un dé déjà placé avant que quoi que ce soit ne soit résolu."
 }

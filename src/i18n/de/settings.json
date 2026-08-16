@@ -29,7 +29,8 @@
     "active": "Aktiv",
     "owned": "Freigeschaltet",
     "unlock": "Entsperren",
-    "price": "{{n}} Splitter"
+    "price": "{{n}} Splitter",
+    "ascendant": "Aszendent"
   },
   "diagnostics": {
     "version": "Build-{{version}}",

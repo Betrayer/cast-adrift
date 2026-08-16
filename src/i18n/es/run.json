@@ -21,11 +21,30 @@
     "jump": "Ir al nodo seleccionado",
     "jumpHint": "Selecciona un nodo accesible",
     "you": "Tú",
-    "boss": "Jefe",
     "abandon": "Abandonar la carrera",
     "previewMiniboss": "Minijefazo: {{name}}",
     "previewBoss": "Jefe: {{name}}",
-    "modules": "Módulos {{used}} / {{max}}"
+    "modules": "Módulos {{used}} / {{max}}",
+    "legend": "Leyenda",
+    "node": {
+      "battle": "Batalla",
+      "elite": "Élite",
+      "miniboss": "Minijefazo",
+      "shop": "Tienda",
+      "shipyard": "Astillero",
+      "event": "Evento",
+      "anomaly": "Anomalía",
+      "beacon": "Baliza",
+      "boss": "Jefe",
+      "inverted": "invertido"
+    },
+    "previewNode": "{{type}} · riesgo: {{risk}}",
+    "previewPocket": "Desvío: mejor botín, combate más duro",
+    "risk": {
+      "low": "bajo",
+      "raised": "criado",
+      "high": "alto"
+    }
   },
   "event": {
     "title": "Señal",
@@ -48,26 +67,29 @@
     "pass": "Éxito — {{total}}",
     "fail": "Error — {{total}}",
     "roll": "Lanzamiento",
-    "back": "Atrás"
+    "back": "Atrás",
+    "reqAxisMin": "Requiere Axis {{n}} o una versión superior",
+    "reqAxisMax": "Requiere la versión {{n}} o inferior de Axis.",
+    "checkLowest": "Nada por encima de {{n}}",
+    "checkSchool": "{{school}} solo dados",
+    "checkTierMin": "Solo para modelos de {{tier}} y superiores",
+    "checkTierMax": "Solo para modelos «{{tier}}» y más pequeños",
+    "outcomeOdds": "cuotas {{odds}}",
+    "beaconTitle": "Baliza",
+    "beaconCounter": "Baliza {{n}} de {{max}}"
   },
   "anomaly": {
     "title": "Anomalía",
     "goal": "Objetivo",
     "resolve": "Resolución",
-    "retry": "Nuevo rollo",
     "solved": "Resuelto",
     "failed": "Todavía no: vuelve a tirar o tira de nuevo",
-    "reward": "+ Recorte de{{n}}",
     "leave": "Salir",
     "tray": "Dados lanzados",
     "slots": "Sistemas",
     "rerolls": "repeticiones: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Nuevo rollo (a la izquierda de {{n}})",
-    "giveUp": "No quedan rollos nuevos",
     "toMap": "Volver al mapa",
-    "outOfRollsTitle": "Anomalía sin resolver",
-    "outOfRolls": "No quedan nuevos rollos. Salida de Stokes Resonancia Interferencia.",
     "rerollHint": "Elige hasta un{{n}}es dados para volver a tirar",
     "rerollCancel": "Cancelar",
     "rerollConfirm": "Volver a jugar «{{k}}»",
@@ -87,7 +109,6 @@
     "carryReserved": "reservado d {{n}}",
     "carryNone": "Todavía nada",
     "reserve": "Reserva",
-    "reserved": "Reservado",
     "unreserve": "Desreservar",
     "nextTurn": "Fin de turno",
     "reset": "Restablecer la ubicación",
@@ -129,7 +150,37 @@
       "damage": "daños",
       "charge": "cargo",
       "shield": "escudo"
-    }
+    },
+    "tierName": {
+      "1": "lectura débil",
+      "2": "lectura constante",
+      "3": "lectura en profundidad",
+      "4": "lectura exigente",
+      "5": "lectura singular"
+    },
+    "entryEnter": "Toma la lectura",
+    "entryLeaveNote": "Si te vas, se considerará un caso sin resolver y se registrará como una interferencia en Resonancia.",
+    "rewardPreview": "Recompensa",
+    "rewardScrap": "{{n}} chatarra",
+    "rewardCodex": "una entrada del códice",
+    "rewardChoice": "Elige lo que prefieras: el dado «{{name}}» o un vale para un grabado",
+    "rewardDie": "el dado «{{name}}»",
+    "rewardOnce": "no cae en ningún otro sitio",
+    "stakes": "Lo que está en juego",
+    "stakeFree": "{{n}} intentos, tanto gratuitos",
+    "stakePaid": "{{n}} gratis, luego un recorte de {{costs}}",
+    "stakeDeduction": "lectura fija · envíos a «{{n}}»",
+    "interferenceNow": "Resonancia Se está ejecutando «Interference × {{n}}»; cualquier solución la borra.",
+    "interferenceNone": "Sin interferencias en el casco.",
+    "attemptChip": "Prueba en {{cur}} / {{max}}",
+    "submissionsLeft": "Respuestas pendientes: {{n}}",
+    "newAttempt": "Nueva junta directiva ({{n}}, a la izquierda)",
+    "newAttemptCost": "Nuevo foro — Desguace de «{{n}}»",
+    "outOfAttemptsTitle": "La lectura llega a su fin",
+    "outOfAttempts": "No quedan intentos. Se sanciona a Stokes por interferencia Resonancia.",
+    "locked": "{{n}} el dado se deja fuera del turno 1",
+    "takeDie": "Escucha «{{name}}»",
+    "takeVoucher": "Coge el vale"
   },
   "codex": {
     "title": "Códice",
@@ -143,34 +194,35 @@
     "glyphLegend": {
       "title": "Glifos escolares",
       "body": "Cada dado tiene una forma en una de sus esquinas, lo que permite diferenciar a las escuelas sin necesidad de colores: Rojo — triángulo · Azul — cuadrado · Verde — hoja · Amarillo — anillo · Negro — púa · Gris — punto · Prismático — estrella."
-    }
+    },
+    "prologueTitle": "La primera travesía",
+    "prologueBody": "Vuelve a reproducir los primeros compases. No se ha iniciado nada, no se ha perdido nada.",
+    "prologueReplay": "Repetición"
   },
   "consequenceToast": "Consecuencia: {{text}}",
   "rewards": {
-    "scrap": "+ Recorte de{{n}}",
     "dieTitle": "Matriz recuperada",
     "keep": "Dejar en la baraja",
     "sell": "Vender (+{{n}})",
-    "deckFull": "Baraja completa (9)",
-    "healed": "Reparado + {{n}}"
+    "deckFull": "Baraja completa (9)"
   },
   "perk": {
     "title": "Elige una mejora",
     "pick": "Toma",
     "skip": "Saltar (+recortes de{{n}})",
-    "sub": "1 de 3"
+    "banish": "Desterrar",
+    "banishHint": "El «destierro» elimina esa carta y todas las del mismo tipo del resto de la partida. Una vez por partida.",
+    "reroll": "Borrador revisado (restos de {{n}})"
   },
   "shop": {
     "title": "Mercado · Mara",
     "buy": "Comprar ({{n}})",
-    "sell": "Vender",
     "reroll": "Reposición ({{n}})",
     "leave": "Salir",
     "scrap": "Chatarra: {{n}}",
     "deck": "Cubierta {{n}} /9",
     "sellTitle": "Vender un dado",
     "empty": "Agotado",
-    "owned": "En cubierta",
     "modulesTitle": "Módulos {{used}} / {{max}}",
     "modulesFull": "Bahía llena",
     "rerollFree": "Reaprovisionar existencias (gratis)"
@@ -180,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · al máximo",
     "systems": "Sistemas",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusión",
     "fusionHint": "Dos dados idénticos → +1 nivel",
-    "fusionPick": "Elige un dado para fusionar",
     "repair": "Reparación",
     "repairHint": "2 piezas de chatarra por casco",
     "leave": "Salir",
@@ -198,17 +248,17 @@
     "nodes": "Nodos eliminados: {{n}}",
     "kills": "Asesinatos: {{n}}",
     "earned": "Chatarra Fuente: {{n}}",
-    "spent": "Chatarra gasto: {{n}}",
     "perks": "Actualizaciones:",
     "perksNone": "ninguno",
-    "meta": "Fragmentos & XP",
-    "toMenu": "Ir al menú"
+    "toMenu": "Ir al menú",
+    "faced": "Fuente: {{names}}"
   },
   "prologue": {
     "title": "Prólogo",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Volver al menú"
+    "leave": "Volver al menú",
+    "replayDone": "Volver a la «Códice»"
   },
   "interstitial": {
     "sector": "Sector{{n}}",
@@ -218,13 +268,20 @@
     "title": "El «Core Heart» está abierto",
     "intro": "Todo lo que has decidido aquí fuera es ahora una puerta. Solo se abrirán aquellas que te hayas ganado.",
     "thin": "Echoe: «Lo has dejado un poco flojo, capitán. Dos puertas, y en ambas se han encogido de hombros».",
-    "axis": "Resonancia ↔ Eje de estabilidad: {{n}}"
+    "axis": "Resonancia ↔ Eje de estabilidad: {{n}}",
+    "deepTitle": "Más allá del núcleo",
+    "deepIntro": "No queda nada más que superar. Sea lo que sea lo que hayas conservado tras el sexto acto, aquí es donde se agota.",
+    "thresholdTag": "¿O no lo termines?",
+    "thresholdCross": "Cruza el umbral",
+    "thresholdCost": "El recorrido continúa más allá del Núcleo. La marea deja de estar contenida, el final espera hasta el otro lado… y la opción que elijas allí será una interpretación más profunda de todo ello."
   },
   "ending": {
     "next": "Continuar",
     "step": "{{cur}} / {{max}}",
     "tally": "Lo que dejaste atrás",
-    "continue": "Cerrar el registro"
+    "continue": "Cerrar el registro",
+    "deathTitle": "La carrera termina aquí",
+    "deathWhere": "Sector{{sector}} · profundidad{{depth}}"
   },
   "setup": {
     "title": "Inicio",
@@ -236,7 +293,10 @@
     "aLevel": "Un e{{n}}",
     "tideCap": "Máximos de las mareas de interferencia en {{n}}",
     "launch": "Inicio",
-    "back": "Atrás"
+    "back": "Atrás",
+    "ascensionCost": "Te cuesta",
+    "ascensionGain": "Te compensa",
+    "shardMult": "+{{n}} % de fragmentos durante toda la ejecución"
   },
   "package": {
     "title": "Paquete «Gate»",
@@ -271,5 +331,104 @@
       "title": "Elige el siguiente nodo",
       "body": "Toca un nodo iluminado y, a continuación, pulsa «Saltar». La niebla oculta las filas que hay más adelante; los sensores y los escáneres profundos amplían el horizonte."
     }
+  },
+  "motif": {
+    "title": "Características del sector",
+    "cache": "Caché: recuperación a la llegada",
+    "mine": "Recorrido por la mina: el cruce daña el casco",
+    "blessed": "Camino bendito: el coro te favorece",
+    "cursed": "La pista maldita: aumentan las interferencias",
+    "unstable": "Fila inestable: se ha vuelto a calcular su contenido",
+    "pocket": "El «buco»: mayor riesgo, mayor recompensa",
+    "riftSplit": "La división de la grieta: las ramas solo se unen en la puerta",
+    "inversion": "Remada invertida: los sistemas se resuelven de último a primero",
+    "storm": "Tormenta de probabilidad: se vuelve a lanzar un dado colocado en su posición durante la resolución"
+  },
+  "tag": {
+    "red": "Rojo",
+    "blue": "Azul",
+    "green": "Verde",
+    "yellow": "Amarillo",
+    "black": "Negro",
+    "grey": "Gris",
+    "prismatic": "Prismático",
+    "weapons": "Armas",
+    "shields": "Escudos",
+    "engines": "Motores",
+    "sensors": "Sensores",
+    "reactor": "Reactor",
+    "spinal": "Espinal",
+    "repairBay": "Taller de reparaciones",
+    "burn": "Quemar",
+    "crit": "Crit",
+    "growth": "Crecimiento",
+    "reroll": "Volver a lanzar",
+    "charge": "Cargo",
+    "scrap": "Chatarra",
+    "overcap": "Exceso de capacidad",
+    "pierce": "Pierce",
+    "dodge": "Dodge",
+    "survival": "Supervivencia",
+    "control": "Control",
+    "dice": "Dados",
+    "shieldwall": "Muro de escudos",
+    "risk": "Riesgo",
+    "swarm": "Enjambre",
+    "spike": "Spike",
+    "precision": "Precisión",
+    "owned": "{{name}} ×{{n}}"
+  },
+  "build": {
+    "title": "Tu configuración",
+    "close": "Cerrar",
+    "open": "Compilar",
+    "resonance": "Resonancia",
+    "resonanceNext": "{{n}} más para el siguiente nivel",
+    "resonanceNextDesc": "{{n}} más → {{desc}}",
+    "resonanceMax": "Todos los niveles activos",
+    "tags": "Etiquetas activas",
+    "perks": "Perks ({{n}})",
+    "modules": "Módulos ({{n}})",
+    "engravings": "Dados grabados ({{n}})",
+    "banished": "Desterrado",
+    "empty": "De momento, nada"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Resonancia {{n}}",
+    "stability": "Estabilidad {{n}}",
+    "neutral": "Eje equilibrado",
+    "preview": "axis {{from}} → {{to}}",
+    "short": "Eje"
+  },
+  "journal": {
+    "title": "Diario de carreras",
+    "open": "Diario",
+    "back": "Volver al mapa",
+    "empty": "Aún no hay nada escrito. El sector no te ha pedido nada.",
+    "sector": "Sector{{n}}",
+    "beacon": "Baliza resuelto — {{n}} de {{max}}",
+    "memory": "Echo Recordé algo — fragmento {{n}}",
+    "axisTitle": "Eje",
+    "axis": {
+      "choice": "Tu elección ha cambiado el eje: {{from}} → {{to}}",
+      "drift": "La baraja que has colocado realmente ha desplazado el eje {{from}} → {{to}}",
+      "beacon": "La baliza ha cambiado de eje: {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Balizas",
+    "beaconsCount": "{{n}} Resuelto el problema de «{{max}}»",
+    "beaconsHint": "La cadena se mantiene. Algo en el Núcleo también los está contando.",
+    "here": "Te encuentras en el sector «{{n}}».",
+    "chainsTitle": "Hilos",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "aquí"
+  },
+  "memory": {
+    "kicker": "Echo recuerda · fragmento {{n}} de {{max}}",
+    "continue": "Deja que termine",
+    "hintGate": "Supera los límites de «{{n}}» en una sola campaña",
+    "hintElite": "Caza a las élites de «{{n}}» en tus partidas",
+    "hintBeacons": "Resolver las balizas «{{n}}» en una sola pasada",
+    "hintEnding": "Llega al núcleo y elige"
   }
 }

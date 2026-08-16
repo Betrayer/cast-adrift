@@ -21,11 +21,30 @@
     "jump": "Przejdź do wybranego węzła",
     "jumpHint": "Wybierz dostępny węzeł",
     "you": "Ty",
-    "boss": "Szef",
     "abandon": "Przerwij przebieg",
     "previewMiniboss": "Mini-boss: {{name}}",
     "previewBoss": "Szef: {{name}}",
-    "modules": "Moduły {{used}} / {{max}}"
+    "modules": "Moduły {{used}} / {{max}}",
+    "legend": "Legenda",
+    "node": {
+      "battle": "Bitwa",
+      "elite": "Elita",
+      "miniboss": "Mini-boss",
+      "shop": "Sklep",
+      "shipyard": "Stocznia",
+      "event": "Wydarzenie",
+      "anomaly": "Anomalia",
+      "beacon": "Latarnia",
+      "boss": "Szef",
+      "inverted": "odwrócony"
+    },
+    "previewNode": "{{type}} · ryzyko: {{risk}}",
+    "previewPocket": "Objazd: lepsze łupy, trudniejsza walka",
+    "risk": {
+      "low": "niski",
+      "raised": "podniesiony",
+      "high": "wysoki"
+    }
   },
   "event": {
     "title": "Sygnał",
@@ -48,26 +67,29 @@
     "pass": "Sukces — {{total}}",
     "fail": "Niepowodzenie — {{total}}",
     "roll": "Rolka",
-    "back": "Powrót"
+    "back": "Powrót",
+    "reqAxisMin": "wymaga wersji {{n}} lub nowszej",
+    "reqAxisMax": "wymaga wersji {{n}} lub starszej",
+    "checkLowest": "Nic powyżej {{n}}",
+    "checkSchool": "{{school}} tylko kostki",
+    "checkTierMin": "tylko modele {{tier}} i większe",
+    "checkTierMax": "tylko pliki o rozmiarze {{tier}} i mniejsze",
+    "outcomeOdds": "kursy {{odds}}",
+    "beaconTitle": "Latarnia",
+    "beaconCounter": "Latarnia {{n}} z {{max}}"
   },
   "anomaly": {
     "title": "Anomalia",
     "goal": "Cel",
     "resolve": "Rozwiązanie",
-    "retry": "Nowa rolka",
     "solved": "Rozwiązane",
     "failed": "Jeszcze nie — spróbuj ponownie lub rzuć kostką od nowa",
-    "reward": "+ fragment z{{n}}",
     "leave": "Wyjść",
     "tray": "Rzucone kości",
     "slots": "Systemy",
     "rerolls": "powtórki: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Nowa rolka (po lewej: {{n}})",
-    "giveUp": "Brak nowych rolek",
     "toMap": "Powrót do mapy",
-    "outOfRollsTitle": "Anomalia nierozwiązana",
-    "outOfRolls": "Nie ma już nowych rzutów. Opuszcza boisko – faul Rezonans.",
     "rerollHint": "Wybierz maksymalnie{{n}}-kości, aby rzucić ponownie",
     "rerollCancel": "Anuluj",
     "rerollConfirm": "Ponowne losowanie {{k}}",
@@ -87,7 +109,6 @@
     "carryReserved": "zastrzeżone d {{n}}",
     "carryNone": "na razie nic",
     "reserve": "Rezerwa",
-    "reserved": "Zarezerwowane",
     "unreserve": "Znieść rezerwację",
     "nextTurn": "Koniec zakrętu",
     "reset": "Zresetuj rozmieszczenie",
@@ -129,7 +150,37 @@
       "damage": "uszkodzenie",
       "charge": "opłata",
       "shield": "tarcza"
-    }
+    },
+    "tierName": {
+      "1": "słaby odczyt",
+      "2": "czytanie w spokojnym tempie",
+      "3": "dogłębna lektura",
+      "4": "trudny tekst",
+      "5": "odczyt w liczbie pojedynczej"
+    },
+    "entryEnter": "Sprawdź wynik",
+    "entryLeaveNote": "Odejście traktowane jest jako sprawa nierozwiązana i przyczynia się do zakłóceń w grze „Rezonans”.",
+    "rewardPreview": "Nagroda",
+    "rewardScrap": "{{n}} złom",
+    "rewardCodex": "wpis w kodeksie",
+    "rewardChoice": "do wyboru: kostka „{{name}}” lub bon na grawerunek",
+    "rewardDie": "kostka „{{name}}”",
+    "rewardOnce": "nie spada nigdzie indziej",
+    "stakes": "Stawki",
+    "stakeFree": "{{n}} próby, zarówno bezpłatne",
+    "stakePaid": "{{n}} za darmo, a potem {{costs}} scrap",
+    "stakeDeduction": "czytanie w trybie stałym · zgłoszenia na adres {{n}}",
+    "interferenceNow": "Rezonans Trwa zadanie „Interference × {{n}}” — każde rozwiązanie powoduje jego wyzerowanie.",
+    "interferenceNone": "Brak ingerencji w kadłub.",
+    "attemptChip": "spróbuj {{cur}} / {{max}}",
+    "submissionsLeft": "pozostałe odpowiedzi: {{n}}",
+    "newAttempt": "Nowa rada ({{n}} po lewej)",
+    "newAttemptCost": "Nowa płytka — fragmenty z „{{n}}”",
+    "outOfAttemptsTitle": "Czytanie dobiega końca",
+    "outOfAttempts": "Nie pozostały już żadne próby. Opuszcza boisko Stokes Rezonans Faul.",
+    "locked": "{{n}} kostka jest wyłożona poza kolejnością 1",
+    "takeDie": "Posłuchaj utworu „{{name}}”",
+    "takeVoucher": "Odbierz kupon"
   },
   "codex": {
     "title": "Kodeks",
@@ -143,34 +194,35 @@
     "glyphLegend": {
       "title": "Symbole szkolne",
       "body": "Każda kostka ma inny kształt rogu, dzięki czemu szkoły mogą się od siebie odróżniać bez użycia kolorów: czerwony — trójkąt · niebieski — kwadrat · zielony — liść · żółty — pierścień · czarny — kolczasty · szary — kropka · pryzmatyczny — gwiazda."
-    }
+    },
+    "prologueTitle": "Pierwsze przejście",
+    "prologueBody": "Odtwórz początkowe takty. Nic się nie zaczęło, nic nie zostało utracone.",
+    "prologueReplay": "Powtórka"
   },
   "consequenceToast": "Wynik: {{text}}",
   "rewards": {
-    "scrap": "+ fragment z{{n}}",
     "dieTitle": "Odzyskana matryca",
     "keep": "Zostawić na pokładzie",
     "sell": "Sprzedaj (+{{n}})",
-    "deckFull": "Pełna talia (9)",
-    "healed": "Naprawiono + {{n}}"
+    "deckFull": "Pełna talia (9)"
   },
   "perk": {
     "title": "Wybierz opcję rozszerzenia",
     "pick": "Weź",
     "skip": "Pomiń (+odpad z {{n}})",
-    "sub": "1 z 3"
+    "banish": "Wyeliminować",
+    "banishHint": "Wypędzenie powoduje usunięcie tej karty i wszystkich kart tego samego rodzaju z pozostałej części rundy. Raz na rundę.",
+    "reroll": "Przeróbka projektu (fragment z „{{n}}”)"
   },
   "shop": {
     "title": "Rynek · Mara",
     "buy": "Kup ({{n}})",
-    "sell": "Sprzedaj",
     "reroll": "Uzupełnienie zapasów ({{n}})",
     "leave": "Wyjść",
     "scrap": "Złom: {{n}}",
     "deck": "Pokład {{n}} /9",
     "sellTitle": "Sprzedaj kostkę do gry",
     "empty": "Wyprzedane",
-    "owned": "Na pokładzie",
     "modulesTitle": "Moduły {{used}} / {{max}}",
     "modulesFull": "Zatoka pełna",
     "rerollFree": "Ponowne losowanie zasobów (bezpłatne)"
@@ -180,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · na maksa",
     "systems": "Systemy",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Dwie identyczne kostki → +1 poziom",
-    "fusionPick": "Wybierz kostkę do połączenia",
     "repair": "Naprawa",
     "repairHint": "2 sztuki złomu na kadłub",
     "leave": "Wyjść",
@@ -198,17 +248,17 @@
     "nodes": "Wyczyściło się węzły: {{n}}",
     "kills": "Zabójstwa: {{n}}",
     "earned": "Złom źródło: {{n}}",
-    "spent": "Złom źródło: {{n}}",
     "perks": "Ulepszenia:",
     "perksNone": "brak",
-    "meta": "Odłamki & XP",
-    "toMenu": "Do menu"
+    "toMenu": "Do menu",
+    "faced": "Źródło: {{names}}"
   },
   "prologue": {
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Powrót do menu"
+    "leave": "Powrót do menu",
+    "replayDone": "Powrót do „Kodeks”"
   },
   "interstitial": {
     "sector": "Sektor{{n}}",
@@ -218,13 +268,20 @@
     "title": "Serce Rdzenia jest otwarte",
     "intro": "Wszystko, o czym tu zdecydowałeś, stało się teraz drzwiami. Otworzą się tylko te, na które zasłużyłeś.",
     "thin": "Echo: „Nie do końca to doprecyzowałeś, kapitanie. Dwoje ludzi, oboje wzruszają ramionami”.",
-    "axis": "Rezonans ↔ Oś stabilności: {{n}}"
+    "axis": "Rezonans ↔ Oś stabilności: {{n}}",
+    "deepTitle": "Poza rdzeniem",
+    "deepIntro": "Nie ma już nic więcej do pokonania. Cokolwiek udało ci się przenieść przez szósty akt, właśnie tutaj to się wyczerpuje.",
+    "thresholdTag": "Albo nie kończ tego",
+    "thresholdCross": "Przekrocz próg",
+    "thresholdCost": "Podróż trwa dalej, za Rdzeniem. Fala przestaje być powstrzymywana, a zakończenie czeka po drugiej stronie — a to, co tam wybierzesz, będzie głębszym wyjaśnieniem całej historii."
   },
   "ending": {
     "next": "Kontynuuj",
     "step": "{{cur}} / {{max}}",
     "tally": "To, co po sobie zostawiłeś",
-    "continue": "Zamknij dziennik"
+    "continue": "Zamknij dziennik",
+    "deathTitle": "Tutaj kończy się bieg",
+    "deathWhere": "Sektor{{sector}} · głębokość{{depth}}"
   },
   "setup": {
     "title": "Uruchomienie",
@@ -236,7 +293,10 @@
     "aLevel": "A {{n}}",
     "tideCap": "Szczyty pływów interferencyjnych na stronie {{n}}",
     "launch": "Uruchomienie",
-    "back": "Powrót"
+    "back": "Powrót",
+    "ascensionCost": "To cię kosztuje",
+    "ascensionGain": "To się opłaca",
+    "shardMult": "+{{n}}% fragmentów dla całego przebiegu"
   },
   "package": {
     "title": "Opakowanie typu Gate",
@@ -271,5 +331,104 @@
       "title": "Wybierz następny węzeł",
       "body": "Dotknij podświetlonego węzła, a następnie wybierz opcję „Skok”. Mgła zasłania kolejne rzędy; czujniki i szczegółowe skanowanie poszerzają horyzont."
     }
+  },
+  "motif": {
+    "title": "Cechy charakterystyczne sektora",
+    "cache": "Pamięć podręczna: odzyskiwanie po dostarczeniu",
+    "mine": "Przejazd przez kopalnię: koszty związane z kadłubem",
+    "blessed": "Błogosławiona droga: chór ci sprzyja",
+    "cursed": "Przeklęta linia: nasilają się zakłócenia",
+    "unstable": "Niestabilny wiersz: jego zawartość została ponownie wygenerowana",
+    "pocket": "Kieszeń „objazdowa”: większe ryzyko, większa nagroda",
+    "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie",
+    "inversion": "Podciąganie odwrócone: systemy są rozpatrywane od ostatniego do pierwszego",
+    "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania"
+  },
+  "tag": {
+    "red": "Czerwony",
+    "blue": "Niebieski",
+    "green": "Zielony",
+    "yellow": "Żółty",
+    "black": "Czarny",
+    "grey": "Szary",
+    "prismatic": "Pryzmatyczny",
+    "weapons": "Broń",
+    "shields": "Tarcze",
+    "engines": "Silniki",
+    "sensors": "Czujniki",
+    "reactor": "Reaktor",
+    "spinal": "Kręgosłup",
+    "repairBay": "Stacja naprawcza",
+    "burn": "Spalić",
+    "crit": "Krytyka",
+    "growth": "Wzrost",
+    "reroll": "Ponowne losowanie",
+    "charge": "Opłata",
+    "scrap": "Złom",
+    "overcap": "Nadmierna pojemność",
+    "pierce": "Pierce",
+    "dodge": "Dodge",
+    "survival": "Przetrwanie",
+    "control": "Sterowanie",
+    "dice": "Kości",
+    "shieldwall": "Ściana tarczowa",
+    "risk": "Ryzyko",
+    "swarm": "Rój",
+    "spike": "Spike",
+    "precision": "Precyzja",
+    "owned": "{{name}} ×{{n}}"
+  },
+  "build": {
+    "title": "Twoja kompilacja",
+    "close": "Zamknij",
+    "open": "Zbuduj",
+    "resonance": "Rezonans",
+    "resonanceNext": "{{n}} więcej na następnym poziomie",
+    "resonanceNextDesc": "{{n}} więcej → {{desc}}",
+    "resonanceMax": "Wszystkie poziomy są aktywne",
+    "tags": "Aktywne tagi",
+    "perks": "Perks ({{n}})",
+    "modules": "Moduły ({{n}})",
+    "engravings": "Kości z grawerunkiem ({{n}})",
+    "banished": "Wygnany",
+    "empty": "Na razie nic"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Rezonans {{n}}",
+    "stability": "Stabilność {{n}}",
+    "neutral": "Oś wyważona",
+    "preview": "{{from}} → {{to}}",
+    "short": "Oś"
+  },
+  "journal": {
+    "title": "Dziennik biegowy",
+    "open": "Czasopismo",
+    "back": "Powrót do mapy",
+    "empty": "Jeszcze nic nie zostało napisane. Sektor nie zwrócił się do ciebie z żadną prośbą.",
+    "sector": "Sektor{{n}}",
+    "beacon": "Latarnia źródło — {{n}} z {{max}}",
+    "memory": "Echo przypomniało mi się coś — fragment {{n}}",
+    "axisTitle": "Oś",
+    "axis": {
+      "choice": "Twój wybór spowodował przesunięcie osi {{from}} → {{to}}",
+      "drift": "pokład, który faktycznie umieściłeś, przesunął oś {{from}} → {{to}}",
+      "beacon": "beacon zmienił adres {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Sygnalizatory",
+    "beaconsCount": "{{n}} kwestia dotycząca {{max}} została rozwiązana",
+    "beaconsHint": "Łańcuch się trzyma. Coś w Rdzeniu też ich liczy.",
+    "here": "Znajdujesz się w sektorze „{{n}}”.",
+    "chainsTitle": "Wątki",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "tutaj"
+  },
+  "memory": {
+    "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",
+    "continue": "Niech to dokończy",
+    "hintGate": "Przełamaj bram{{n}}a w ramach jednej kampanii",
+    "hintElite": "Poluj na elity z gry „{{n}}” podczas swoich biegów",
+    "hintBeacons": "Rozpoznaj sygnały nawigacyjne typu „{{n}}” w jednym przebiegu",
+    "hintEnding": "Przejdź do sekcji „Core” i wybierz"
   }
 }

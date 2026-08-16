@@ -8,8 +8,6 @@ export const CHART_NODE_BY_ID: ReadonlyMap<string, ChartNodeDef> = new Map(
   CHART_NODES.map((n) => [n.id, n]),
 );
 
-// The 220-node layout runs past the old fixed 0..1000 canvas, so the screen
-// takes its viewBox from the data rather than from a constant.
 const CHART_PAD = 40;
 
 export const CHART_BOUNDS = ((): {

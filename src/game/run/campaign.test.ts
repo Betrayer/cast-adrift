@@ -1,8 +1,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { MINIBOSSES } from "@/data/enemies";
-import { MEMORIES } from "@/data/narrative/memories";
-import { SECTORS, sectorDef } from "@/data/sectors";
-import { pickMiniboss } from "@/game/run/encounter";
+import {
+  BEACON_FLAGS,
+} from "@/data/events/beacons";
+import {
+  GATE_MEMORIES,
+  MEMORY_TOTAL,
+  NUMBERED_MEMORIES,
+} from "@/data/narrative/memories";
+import { sealFinalMemory } from "@/game/narrative/memoryArc";
+import { SECTOR_COUNT, SECTORS } from "@/data/sectors";
+import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import {
   advanceSector,
   startRun,
@@ -43,7 +51,7 @@ describe("campaign progression", () => {
     expect(run.sector).toBe(1);
     expect(run.ascension).toBe(3);
     expect(run.map).not.toBeNull();
-    expect(useAppStore.getState().screen).toBe("map");
+    expect(useAppStore.getState().screen).toBe("interstitial");
   });
 
   it("advanceSector rebuilds the map, resets tide and shows the interstitial", () => {
@@ -61,9 +69,21 @@ describe("campaign progression", () => {
     expect(useAppStore.getState().screen).toBe("interstitial");
   });
 
-  it("walks S1 → S5 and stops at the last sector", () => {
+  it("walks S1 → S5 and stops at the last campaign sector", () => {
     startRun(4242, 0);
     for (let i = 0; i < 6; i += 1) advanceSector();
+    expect(useRunStore.getState().sector).toBe(SECTOR_COUNT);
+  });
+
+  it("walks into sector 6 once the run has crossed the threshold", () => {
+    startRun(4242, 0);
+    for (let i = 0; i < 4; i += 1) advanceSector();
+    expect(useRunStore.getState().sector).toBe(SECTOR_COUNT);
+    useRunStore.getState().crossThreshold();
+    advanceSector();
+    expect(useRunStore.getState().sector).toBe(SECTORS.length);
+    expect(useRunStore.getState().map?.shape.bossRow).toBe(16);
+    advanceSector();
     expect(useRunStore.getState().sector).toBe(SECTORS.length);
   });
 
@@ -71,6 +91,11 @@ describe("campaign progression", () => {
     expect(tideCapFor(0)).toBe(3);
     expect(tideCapFor(4)).toBe(4);
     expect(tideCapFor(5)).toBe(4);
+  });
+
+  it("lets the sixth sector run its own uncapped tide", () => {
+    expect(tideCapFor(0, "campaign", 6)).toBe(5);
+    expect(tideCapFor(4, "campaign", 6)).toBe(6);
   });
 });
 
@@ -122,12 +147,40 @@ describe("Echo memory arc", () => {
     useRunStore.getState().reset();
   });
 
-  it("unlocks the eleven gate fragments in order and then stops", () => {
-    for (let i = 0; i < 15; i += 1) unlockNextMemory();
-    const run = useRunStore.getState();
-    expect(run.memoriesUnlocked).toBe(MEMORIES.length);
+  it("unlocks the ten gate fragments and nothing an unfought elite owes", () => {
+    for (let gate = 1; gate <= GATE_MEMORIES + 4; gate += 1) {
+      useRunStore.getState().bumpStats({ bosses: 1 });
+      unlockNextMemory();
+    }
+    expect(useRunStore.getState().memoryOrders).toEqual(
+      Array.from({ length: GATE_MEMORIES }, (_, i) => i + 1),
+    );
+  });
+
+  it("pays the elite and beacon thresholds their own fragments", () => {
+    useMetaStore.getState().bumpLifetime({ elites: 6 });
+    useRunStore.getState().setFlag("beacon1");
+    useRunStore.getState().setFlag("beacon2");
+    useRunStore.getState().setFlag("beacon3");
+    unlockNextMemory();
+    const orders = useRunStore.getState().memoryOrders;
+    expect(orders).toContain(11);
+    expect(orders).toContain(12);
+    expect(orders).not.toContain(13);
+    expect(orders).toContain(14);
+    expect(orders).not.toContain(15);
+  });
+
+  it("reaches every fragment across a full clear", () => {
+    useRunStore.getState().bumpStats({ bosses: GATE_MEMORIES });
+    useMetaStore.getState().bumpLifetime({ elites: 9 });
+    for (const key of BEACON_FLAGS) useRunStore.getState().setFlag(key);
+    unlockNextMemory();
+    sealFinalMemory("seal");
+    expect(useRunStore.getState().memoryOrders).toHaveLength(MEMORY_TOTAL);
     const codex = useMetaStore.getState().codex;
-    for (const memory of MEMORIES) expect(codex).toContain(memory.codexId);
+    for (const memory of NUMBERED_MEMORIES) expect(codex).toContain(memory.codexId);
+    expect(codex).toContain("memory-16-seal");
   });
 });
 
@@ -141,8 +194,8 @@ describe("campaign shard table", () => {
   it("pays a first-kill bonus once per boss per profile", () => {
     resetMeta();
     const meta = useMetaStore.getState();
-    expect(meta.recordBossFirstKill(sectorDef(1).bossId)).toBe(true);
-    expect(useMetaStore.getState().recordBossFirstKill(sectorDef(1).bossId)).toBe(
+    expect(meta.recordBossFirstKill(pickBoss(1, 7))).toBe(true);
+    expect(useMetaStore.getState().recordBossFirstKill(pickBoss(1, 7))).toBe(
       false,
     );
     expect(bossFirstKillShards(1)).toBe(25);

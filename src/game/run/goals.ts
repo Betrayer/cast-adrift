@@ -26,7 +26,9 @@ export type GoalSpec =
   | { g: "axisAtMost"; n: number }
   | { g: "allBeaconsResolved" }
   | { g: "deckSchoolsAtLeast"; n: number }
-  | { g: "dicePlacedAtMost"; n: number };
+  | { g: "dicePlacedAtMost"; n: number }
+  | { g: "axisAtLeast"; n: number }
+  | { g: "elitesAtMost"; n: number };
 
 export type GoalKind = GoalSpec["g"];
 
@@ -46,8 +48,6 @@ export interface GoalContext {
 const hullPct = (ctx: GoalContext): number =>
   ctx.hullMax <= 0 ? 0 : (ctx.hull / ctx.hullMax) * 100;
 
-// Every goal is a pure read of the run's own tally — no goal ever touches a
-// store, so a scripted run and a real one score identically.
 export const evaluateGoal = (spec: GoalSpec, ctx: GoalContext): boolean => {
   switch (spec.g) {
     case "win":
@@ -101,20 +101,24 @@ export const evaluateGoal = (spec: GoalSpec, ctx: GoalContext): boolean => {
       return ctx.deckSchools >= spec.n;
     case "dicePlacedAtMost":
       return ctx.stats.dicePlaced <= spec.n;
+    case "axisAtLeast":
+      return ctx.axis >= spec.n;
+    case "elitesAtMost":
+      return ctx.stats.elites <= spec.n;
   }
 };
 
-// Goals that only make sense on a completed run: a contract you died in never
-// awards them, even if the counter happens to be satisfied.
 const WIN_ONLY: ReadonlySet<GoalKind> = new Set<GoalKind>([
   "win",
   "hullPctAtLeast",
   "scrapAtLeast",
   "axisAtMost",
+  "axisAtLeast",
   "depthWithDeckAtLeast",
   "allBeaconsResolved",
   "deckSchoolsAtLeast",
   "dicePlacedAtMost",
+  "elitesAtMost",
 ]);
 
 export const goalMet = (spec: GoalSpec, ctx: GoalContext): boolean => {

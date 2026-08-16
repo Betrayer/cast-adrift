@@ -5,19 +5,25 @@ import {
   Paper,
   Progress,
   RingProgress,
-  ScrollArea,
   SimpleGrid,
   Stack,
   Text,
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
-import { ENDINGS } from "@/data/narrative/endings";
+import { ENDINGS, STANDARD_ENDINGS } from "@/data/narrative/endings";
+
 import { countStars } from "@/game/run/goals";
 import { progressWithinLevel } from "@/game/xp";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
+import { AchievementGrid } from "./AchievementGrid";
+import { BadgeRow } from "./BadgeRow";
+
+const endingSlots = (earned: readonly string[]): typeof ENDINGS =>
+  earned.includes("answer") ? ENDINGS : STANDARD_ENDINGS;
 
 const StatCell = ({ label, value }: { label: string; value: string }) => (
   <Stack gap={0}>
@@ -47,26 +53,27 @@ export const ProfileScreen = () => {
   );
 
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
-        <Group justify="space-between">
-          <Text fw={700} c={tokens.text}>
-            {t("meta:profile.title")}
-          </Text>
-          <Button
-            size="xs"
-            variant="default"
-            onClick={() => {
-              go("modes");
-            }}
-          >
-            {t("common:back")}
-          </Button>
-        </Group>
-      </Paper>
-
-      <ScrollArea h="calc(var(--ca-vh) - 110px)" w="100%" maw={460}>
-        <Stack gap="sm" pb="md">
+    <Screen
+      header={
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <Group justify="space-between">
+            <Text fw={700} c={tokens.text}>
+              {t("meta:profile.title")}
+            </Text>
+            <Button
+              size="xs"
+              variant="default"
+              onClick={() => {
+                go("modes");
+              }}
+            >
+              {t("common:back")}
+            </Button>
+          </Group>
+        </Paper>
+      }
+    >
+      <Stack gap="sm">
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Group>
               <RingProgress
@@ -186,11 +193,23 @@ export const ProfileScreen = () => {
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Stack gap="xs">
               <Text fw={600} c={tokens.text}>
+                {t("meta:profile.badges")}
+              </Text>
+              <Divider color={tokens.line} />
+              <BadgeRow />
+            </Stack>
+          </Paper>
+
+          <AchievementGrid />
+
+          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+            <Stack gap="xs">
+              <Text fw={600} c={tokens.text}>
                 {t("meta:profile.endings")}
               </Text>
               <Divider color={tokens.line} />
-              <SimpleGrid cols={4} spacing="xs">
-                {ENDINGS.map((def) => {
+              <SimpleGrid cols={{ base: 2, xs: 5 }} spacing="xs">
+                {endingSlots(endings).map((def) => {
                   const earned = endings.includes(def.id);
                   return (
                     <Stack key={def.id} align="center" gap={2}>
@@ -224,8 +243,7 @@ export const ProfileScreen = () => {
               </SimpleGrid>
             </Stack>
           </Paper>
-        </Stack>
-      </ScrollArea>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

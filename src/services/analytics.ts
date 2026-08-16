@@ -19,7 +19,8 @@ export type AnalyticsEvent =
   | { name: "ending"; params: { id: string; ascension: number } }
   | { name: "meta_purchase"; params: { kind: string } }
   | { name: "daily_played"; params: { date: string; score: number } }
-  | { name: "contract_star"; params: { contract: string; stars: number } };
+  | { name: "contract_star"; params: { contract: string; stars: number } }
+  | { name: "threshold"; params: { ascension: number; axis: number } };
 
 type EventParams = Record<string, string | number | boolean>;
 
@@ -30,9 +31,6 @@ let pending: Promise<Analytics | null> | null = null;
 const measurementId = (): string =>
   import.meta.env.VITE_FB_MEASUREMENT_ID.trim();
 
-// Analytics is best-effort by construction: an ad blocker, a missing
-// measurement id, or a dead network all resolve to "no analytics" rather than
-// to a thrown error inside a game action.
 const ensureAnalytics = async (): Promise<Analytics | null> => {
   if (instance !== null) return instance;
   if (unavailable) return null;
@@ -74,9 +72,7 @@ export const trackEvent = (event: AnalyticsEvent): void => {
         ...(event.params as EventParams),
         version: APP_VERSION,
       });
-    } catch {
-      /* never let telemetry break a game action */
-    }
+    } catch {}
   })();
 };
 

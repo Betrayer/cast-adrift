@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { duckMusic, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
 import { useBattleStore } from '@/stores/battleStore';
@@ -8,8 +9,6 @@ const DURATION_MS = 600;
 const GLYPHS = ['I', 'V', 'X', 'L', 'C', 'D'] as const;
 const ORBIT_RADIUS = 72;
 
-// DESIGN §7: rolling Fate is a ceremony, not a button press — the board dims
-// and the numeral ring turns once before the verdict is read.
 export const FateInvocation = () => {
   const fateUses = useBattleStore((s) => s.fateUses);
   const reduced = resolveReducedMotion(
@@ -22,6 +21,9 @@ export const FateInvocation = () => {
     const grew = fateUses > prevUses.current;
     prevUses.current = fateUses;
     if (!grew) return;
+    playSfx('thresholdHold', { gain: 0.55 });
+    playSfx('surge');
+    duckMusic(1200);
     haptic('reveal');
     setVisible(true);
     const id = window.setTimeout(

@@ -12,7 +12,6 @@
   "cloudFound": "У хмарі знайдено свіжіший забіг — продовжити його?",
   "cloudYes": "Хмарний",
   "cloudNo": "Локальний",
-  "stub": "Цей екран з’явиться у Фазі {{phase}}.",
   "resumeCard": "Продовжити: Сектор {{sector}} · глибина {{depth}} · {{when}}",
   "resumeContinue": "Продовжити",
   "resumeAbandon": "Залишити",

@@ -11,6 +11,7 @@
   "defeat": "Defeat",
   "toMenu": "To menu",
   "hp": "HP {{hp}}/{{max}}",
+  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Reserve",
   "reroll": "Reroll ({{n}})",
   "rerollConfirm": "Reroll {{k}}/{{size}}",
@@ -62,7 +63,18 @@
     "capShrink": "Shrinks a slot cap",
     "twistDie": "Twists one of your dice",
     "swapValues": "Swaps your high and low",
-    "storm": "Probability storm"
+    "storm": "Probability storm",
+    "curseDie": "Curses a die −{{n}}",
+    "shieldGate": "Raises a gate {{n}}",
+    "mirrorSchool": "Mirrors your census",
+    "drainCharge": "Drains {{n}} charge",
+    "siphonShield": "Siphons {{n}} shield",
+    "bargain": "Bills {{n}}: your scrap, or your hull",
+    "enrage": "Enrages +{{n}}",
+    "hijack": "Hijacks your best die",
+    "echoTotal": "echoes your last turn (max {{n}})",
+    "foldOrder": "folds the order",
+    "devourDie": "eats your best spare die"
   },
   "slot": {
     "weaponA": "Weapon A",
@@ -85,5 +97,28 @@
   },
   "scriptHint": "Prologue: only {{slots}} may be used this turn.",
   "fate": "Roll Fate",
-  "fateResult": "Fate {{roll}} — {{text}}"
+  "fateResult": "Fate {{roll}} — {{text}}",
+  "swap": "Swap",
+  "swapPick": "Pick a die…",
+  "bank": "Bank face",
+  "split": "Split",
+  "beat": {
+    "curse": "CURSE",
+    "gate": "GATE",
+    "drain": "DRAIN",
+    "siphon": "SIPHON",
+    "bargain": "DEAL",
+    "enrage": "RAGE",
+    "hijack": "HIJACK",
+    "ward": "WARD",
+    "fold": "FOLD",
+    "devour": "EATEN"
+  },
+  "enemyWard": "Ward: {{school}}",
+  "enemyGate": "Gate {{n}}",
+  "enemyRage": "Rage +{{n}}",
+  "inverted": "INVERTED ORDER",
+  "invertedHint": "Reactor first, Sensors last.",
+  "storm": "PROBABILITY STORM",
+  "stormHint": "One placed die re-rolls before anything resolves."
 }

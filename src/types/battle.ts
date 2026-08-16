@@ -1,17 +1,19 @@
-import type { DieTier, Intent, School, SubsystemAura } from "@/types/content";
+import type {
+  DieTier,
+  Intent,
+  School,
+  SlotId,
+  SubsystemAura,
+} from "@/types/content";
 import type { ShipId } from "@/data/ships";
 import type { Statuses } from "@/game/battle/statuses";
+import type {
+  ExceedCapGrant,
+  GrantKey,
+  ScheduledEffect,
+} from "@/game/effects/types";
 
-export type SlotId =
-  | "weaponA"
-  | "weaponB"
-  | "spinal"
-  | "shields"
-  | "shieldsB"
-  | "engines"
-  | "sensors"
-  | "reactor"
-  | "repairBay";
+export type { SlotId };
 
 export type DieState = "tray" | "placed" | "reserved" | "locked" | "burned";
 
@@ -27,6 +29,10 @@ export interface RolledDie {
   lastValue?: number;
   overCap?: boolean;
   activeUsed?: boolean;
+  temp?: boolean;
+  expiresTurn?: number;
+  bankedValue?: number;
+  pinned?: boolean;
 }
 
 export interface SlotState {
@@ -55,6 +61,10 @@ export interface EnemyState {
   statuses: Statuses;
   subsystems: SubsystemState[];
   phase: number;
+  gate?: number;
+  rage?: number;
+  ward?: School;
+  lastHitKey?: string;
 }
 
 export type ResonanceThreshold = 2 | 4 | 6;
@@ -84,6 +94,12 @@ export interface LockedDie {
   untilTurn: number;
 }
 
+export interface CursedDie {
+  uid: string;
+  n: number;
+  untilTurn: number;
+}
+
 export interface BattleSnapshot {
   turn: number;
   hull: number;
@@ -92,6 +108,7 @@ export interface BattleSnapshot {
   shieldPersist: number;
   charge: number;
   scrap: number;
+  runScrap: number;
   tide: number;
   interference: number;
   perks: string[];
@@ -99,6 +116,12 @@ export interface BattleSnapshot {
   mutators?: string[];
   modules?: string[];
   engravings?: Readonly<Record<string, readonly string[]>>;
+  flags?: string[];
+  counters?: Record<string, number>;
+  runCounters?: Record<string, number>;
+  exceedCap: ExceedCapGrant[];
+  scheduled?: ScheduledEffect[];
+  grants?: Partial<Record<GrantKey, number>>;
   shipId?: ShipId;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
@@ -115,6 +138,8 @@ export interface BattleSnapshot {
   blockedSlots: BlockedSlot[];
   shrunkSlots: BlockedSlot[];
   lockedDice: LockedDie[];
+  cursedDice?: CursedDie[];
+  pendingHijack?: number;
   resonance: ResonanceCensus;
   survivedLethal: boolean;
   lastPlayerDamage: number;
@@ -123,6 +148,11 @@ export interface BattleSnapshot {
   pendingSwap: number;
   pendingStorm: number;
   ascension: number;
+  sectorHpPct: number;
+  enemyHpPct: number;
+  inverted?: boolean;
+  nodeStorm?: boolean;
+  foldedTurns?: number;
   overflowShieldUsed?: boolean;
   pierceUsed?: boolean;
   outcome?: BattleOutcome;
@@ -135,7 +165,8 @@ export type BeatKind =
   | "engine"
   | "sensor"
   | "charge"
-  | "repair";
+  | "repair"
+  | "storm";
 
 export interface SensorResult {
   mark: boolean;
@@ -170,7 +201,17 @@ export type EnemyBeatKind =
   | "swap"
   | "storm"
   | "explode"
-  | "phase";
+  | "phase"
+  | "curse"
+  | "gate"
+  | "drain"
+  | "siphon"
+  | "bargain"
+  | "enrage"
+  | "hijack"
+  | "ward"
+  | "fold"
+  | "devour";
 
 export interface EnemyBeat {
   enemyId: string;

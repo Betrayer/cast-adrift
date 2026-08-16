@@ -1,45 +1,52 @@
+import { enemy, sub } from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
-// The six gate fights (DESIGN §6.4). Row 8 of every sector routes through one of
-// these; a campaign never repeats one. Each carries a single signature idea.
 export const MINIBOSSES: readonly EnemyDef[] = [
-  {
+  enemy({
     id: "convoyAlpha",
-    name: "content:enemies.convoyAlpha",
     hp: 42,
     miniboss: true,
     shell: true,
+    claims: [
+      { k: "trait", is: "shell" },
+      { k: "aura", is: "lockEvery3" },
+    ],
     subsystems: [
-      { id: "escortA", name: "content:enemies.convoyAlpha-escortA", hp: 12, aura: "atk+2" },
-      { id: "escortB", name: "content:enemies.convoyAlpha-escortB", hp: 12, aura: "shieldAllies3" },
-      { id: "escortC", name: "content:enemies.convoyAlpha-escortC", hp: 12, aura: "lockEvery3" },
+      sub("convoyAlpha", "escortA", 12, "atk+2"),
+      sub("convoyAlpha", "escortB", 12, "shieldAllies3"),
+      sub("convoyAlpha", "escortC", 12, "lockEvery3"),
     ],
     pattern: [
       { t: "multi", n: 4, k: 2 },
       { t: "shield", n: 8 },
       { t: "attack", n: 8 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "wardenFragment",
-    name: "content:enemies.wardenFragment",
     hp: 58,
     miniboss: true,
     markVulnerable: true,
-    subsystems: [
-      { id: "plate", name: "content:enemies.wardenFragment-plate", hp: 18, aura: "shieldSelf6" },
+    claims: [
+      { k: "trait", is: "markVulnerable" },
+      { k: "aura", is: "shieldSelf6" },
     ],
+    subsystems: [sub("wardenFragment", "plate", 18, "shieldSelf6")],
     pattern: [
       { t: "shield", n: 8 },
       { t: "multi", n: 4, k: 2 },
       { t: "attack", n: 8 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "leechQueen",
-    name: "content:enemies.leechQueen",
-    hp: 44,
+    hp: 50,
     miniboss: true,
+    claims: [
+      { k: "intent", t: "lockDie" },
+      { k: "intent", t: "summon" },
+      { k: "trait", is: "phases" },
+    ],
     phases: [
       {
         untilHpPct: 50,
@@ -63,12 +70,15 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { t: "attack", n: 7 },
       { t: "multi", n: 4, k: 2 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "mineTyrant",
-    name: "content:enemies.mineTyrant",
     hp: 48,
     miniboss: true,
+    claims: [
+      { k: "intent", t: "summon" },
+      { k: "trait", is: "phases" },
+    ],
     phases: [
       {
         untilHpPct: 0,
@@ -83,12 +93,15 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { t: "attack", n: 9 },
       { t: "multi", n: 5, k: 2 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "choirHerald",
-    name: "content:enemies.choirHerald",
     hp: 60,
     miniboss: true,
+    claims: [
+      { k: "intent", t: "charge" },
+      { k: "intent", t: "jamSlot" },
+    ],
     pattern: [
       { t: "charge" },
       { t: "jamSlot" },
@@ -96,17 +109,208 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { t: "charge" },
       { t: "attack", n: 8 },
     ],
-  },
-  {
+  }),
+  enemy({
     id: "mirrorHull",
-    name: "content:enemies.mirrorHull",
     hp: 46,
     miniboss: true,
+    claims: [{ k: "intent", t: "mirrorHalf" }],
     pattern: [
       { t: "mirrorHalf" },
       { t: "shield", n: 6 },
       { t: "mirrorHalf" },
       { t: "attack", n: 6 },
     ],
-  },
+  }),
+
+  enemy({
+    id: "dragnet",
+    hp: 50,
+    miniboss: true,
+    claims: [
+      { k: "intent", t: "hijack" },
+      { k: "aura", is: "lockEvery3" },
+    ],
+    subsystems: [sub("dragnet", "winch", 14, "lockEvery3")],
+    pattern: [
+      { t: "hijack" },
+      { t: "multi", n: 5, k: 3 },
+      { t: "attack", n: 9 },
+    ],
+  }),
+  enemy({
+    id: "resonator",
+    hp: 58,
+    miniboss: true,
+    claims: [
+      { k: "intent", t: "mirrorSchool" },
+      { k: "aura", is: "shieldSelf6" },
+    ],
+    subsystems: [sub("resonator", "coil", 14, "shieldSelf6")],
+    pattern: [
+      { t: "mirrorSchool" },
+      { t: "multi", n: 5, k: 3 },
+      { t: "mirrorSchool" },
+      { t: "attack", n: 11 },
+    ],
+  }),
+  enemy({
+    id: "quarantineTwin",
+    hp: 38,
+    miniboss: true,
+    shell: true,
+    alternating: true,
+    claims: [
+      { k: "trait", is: "alternating" },
+      { k: "trait", is: "shell" },
+    ],
+    subsystems: [
+      sub("quarantineTwin", "twinA", 12, "atk+2"),
+      sub("quarantineTwin", "twinB", 12, "shieldAllies3"),
+    ],
+    pattern: [
+      { t: "multi", n: 4, k: 2 },
+      { t: "shield", n: 6 },
+      { t: "attack", n: 8 },
+    ],
+  }),
+  enemy({
+    id: "usurer",
+    hp: 64,
+    miniboss: true,
+    claims: [
+      { k: "intent", t: "bargain" },
+      { k: "aura", is: "stealOnHit6" },
+    ],
+    subsystems: [sub("usurer", "vault", 14, "stealOnHit6")],
+    pattern: [
+      { t: "bargain", n: 6, heal: 4 },
+      { t: "multi", n: 5, k: 3 },
+      { t: "bargain", n: 6, heal: 4 },
+      { t: "attack", n: 10 },
+    ],
+  }),
+  enemy({
+    id: "silencer",
+    hp: 50,
+    miniboss: true,
+    jamReleasesBlocks: true,
+    claims: [
+      { k: "trait", is: "jamReleasesBlocks" },
+      { k: "intent", t: "jamSlot" },
+      { k: "trait", is: "phases" },
+    ],
+    subsystems: [sub("silencer", "emitter", 14, "atk+2")],
+    phases: [
+      {
+        untilHpPct: 55,
+        pattern: [
+          { t: "jamSlot" },
+          { t: "multi", n: 4, k: 3 },
+          { t: "attack", n: 8 },
+        ],
+      },
+      {
+        untilHpPct: 0,
+        pattern: [
+          { t: "jamSlot", k: 2 },
+          { t: "multi", n: 5, k: 3 },
+          { t: "attack", n: 9 },
+        ],
+        onEnter: [{ t: "jamSlot", k: 2 }],
+      },
+    ],
+    pattern: [
+      { t: "jamSlot" },
+      { t: "multi", n: 4, k: 3 },
+      { t: "attack", n: 8 },
+    ],
+  }),
+  enemy({
+    id: "coreSliver",
+    hp: 56,
+    miniboss: true,
+    ward: true,
+    claims: [
+      { k: "trait", is: "ward" },
+      { k: "aura", is: "twistEachTurn" },
+    ],
+    subsystems: [sub("coreSliver", "facet", 12, "twistEachTurn")],
+    pattern: [
+      { t: "multi", n: 5, k: 3 },
+      { t: "shield", n: 6 },
+      { t: "attack", n: 11 },
+    ],
+  }),
+  enemy({
+    id: "foldTyrant",
+    hp: 62,
+    miniboss: true,
+    claims: [
+      { k: "intent", t: "foldOrder" },
+      { k: "trait", is: "phases" },
+      { k: "aura", is: "twistEachTurn" },
+    ],
+    subsystems: [sub("foldTyrant", "pleat", 14, "twistEachTurn")],
+    phases: [
+      {
+        untilHpPct: 50,
+        pattern: [
+          { t: "foldOrder" },
+          { t: "multi", n: 5, k: 3 },
+          { t: "attack", n: 10 },
+        ],
+      },
+      {
+        untilHpPct: 0,
+        pattern: [
+          { t: "foldOrder" },
+          { t: "attack", n: 12 },
+          { t: "devourDie" },
+        ],
+        onEnter: [{ t: "foldOrder" }],
+      },
+    ],
+    pattern: [
+      { t: "foldOrder" },
+      { t: "multi", n: 5, k: 3 },
+      { t: "attack", n: 10 },
+    ],
+  }),
+  enemy({
+    id: "hushWarden",
+    hp: 78,
+    miniboss: true,
+    jamReleasesBlocks: true,
+    claims: [
+      { k: "trait", is: "jamReleasesBlocks" },
+      { k: "intent", t: "jamSlot" },
+      { k: "trait", is: "phases" },
+    ],
+    subsystems: [sub("hushWarden", "muffle", 16, "shieldSelf6")],
+    phases: [
+      {
+        untilHpPct: 55,
+        pattern: [
+          { t: "jamSlot" },
+          { t: "shield", n: 8 },
+          { t: "attack", n: 10 },
+        ],
+      },
+      {
+        untilHpPct: 0,
+        pattern: [
+          { t: "jamSlot", k: 2 },
+          { t: "capShrink" },
+          { t: "multi", n: 7, k: 2 },
+        ],
+        onEnter: [{ t: "jamSlot", k: 2 }],
+      },
+    ],
+    pattern: [
+      { t: "jamSlot" },
+      { t: "shield", n: 8 },
+      { t: "attack", n: 10 },
+    ],
+  }),
 ];

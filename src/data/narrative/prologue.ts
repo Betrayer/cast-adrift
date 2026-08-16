@@ -47,9 +47,6 @@ export const PROLOGUE_BEATS: readonly PrologueBeat[] = [
   },
 ];
 
-// The scripted first fight: a PuzzleDef-style per-turn slot override rather than
-// a second battle engine. Turn 1 teaches Weapons, turn 2 teaches Shields, then the
-// board opens up.
 export const PROLOGUE_ENEMY = "scavDrone";
 
 export const PROLOGUE_SCRIPT: readonly (readonly SlotId[])[] = [

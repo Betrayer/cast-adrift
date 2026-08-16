@@ -5,13 +5,6 @@ import { loadEnv } from "./loadEnv.mjs";
 
 loadEnv();
 
-// The only writer of src/i18n/{de,es,fr,pl}. en is the source language, uk and
-// ru are hand-written and are never touched here (DESIGN §4). Needs DEEPL_API_KEY.
-//
-//   npm run i18n:translate            all four machine locales, cached
-//   npm run i18n:translate -- --only de
-//   npm run i18n:translate -- --check verify existing files, no API calls
-
 const SOURCE_LOCALE = "en";
 const MACHINE_LOCALES = ["de", "es", "fr", "pl"] as const;
 type MachineLocale = (typeof MACHINE_LOCALES)[number];
@@ -87,17 +80,8 @@ const unflatten = (flat: Map<string, string>): Tree => {
   return root;
 };
 
-// i18next interpolation and any inline markup must survive the round trip
-// byte-for-byte; DeepL is told to leave <ph> alone and the tags are stripped
-// after. Glossary terms ride the same channel, so a pinned term can never be
-// re-translated on the way back.
 const PLACEHOLDER = /(\{\{[^}]+\}\}|<\/?\d+>)/g;
 
-// tag_handling: xml makes DeepL parse every string as an XML document, so a
-// bare & or < in the English source is an invalid token and rejects the whole
-// batch. Everything outside a placeholder is escaped on the way out and
-// unescaped on the way back — otherwise DeepL answers with the entity intact
-// and "Shards &amp; XP" lands in the UI.
 const escapeXml = (value: string): string =>
   value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -219,10 +203,6 @@ const postBatch = async (
   return last;
 };
 
-// A rejected batch used to abort the whole run and lose every translation that
-// had not been flushed yet. One bad string now costs only itself: the batch is
-// halved until the offender is alone, and it comes back as null so the caller
-// can keep the English source and report the key.
 const translateBatch = async (
   key: string,
   texts: string[],
@@ -270,9 +250,6 @@ const cache: Record<string, string> = existsSync(CACHE_PATH)
 const cacheKey = (locale: string, source: string): string =>
   `${locale} ${source}`;
 
-// Flushed after every batch rather than at the end of the run: the content
-// namespace alone is ~1900 strings and several minutes of API calls, and an
-// interrupted run must never charge the owner's quota twice for the same string.
 const saveCache = (): void => {
   writeFileSync(CACHE_PATH, `${JSON.stringify(cache)}\n`, "utf8");
 };
@@ -354,10 +331,6 @@ const generate = async (key: string, locale: MachineLocale): Promise<void> => {
         const raw = translated[index];
         const candidate =
           raw == null ? "" : restore(raw, entry.protection.slots);
-        // DeepL occasionally answers with an empty string or drops an ignored
-        // tag. An empty label in the UI is worse than an untranslated one, so
-        // the English source stands in and the key is reported rather than
-        // cached — a re-run gets another chance at it.
         const usable =
           candidate.trim() !== "" &&
           placeholdersOf(candidate).join("|") ===
@@ -401,7 +374,7 @@ const main = async (): Promise<void> => {
   const key = process.env.DEEPL_API_KEY?.trim();
   if (!key) {
     console.error(
-      "translate: DEEPL_API_KEY is not set — this is an owner step, see docs/phase-12-launch-notes.md",
+      "translate: DEEPL_API_KEY is not set — this is an owner step, see docs/release-checklist.md",
     );
     process.exit(1);
   }

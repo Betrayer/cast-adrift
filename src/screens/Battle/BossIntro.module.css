@@ -53,7 +53,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  z-index: 6;
+  z-index: var(--z-modal);
   background: radial-gradient(
     circle at 50% 42%,
     rgba(255, 240, 220, 0.55),

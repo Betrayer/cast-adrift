@@ -45,7 +45,7 @@ export const PerfOverlay = () => {
         position: 'fixed',
         right: 8,
         bottom: 8,
-        zIndex: 500,
+        zIndex: 'var(--z-dev)',
         padding: '6px 8px',
         borderRadius: 8,
         border: `1px solid ${tokens.line}`,

@@ -11,6 +11,7 @@
   "defeat": "Porażka",
   "toMenu": "Do menu",
   "hp": "HP {{hp}} / {{max}}",
+  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Rezerwa",
   "reroll": "Reroll ({{n}})",
   "rerollConfirm": "Ponowne losowanie {{k}} / {{size}}",
@@ -62,7 +63,18 @@
     "capShrink": "Zmniejsza limit miejsca w slocie",
     "twistDie": "Obraca jedną z twoich kości",
     "swapValues": "Zamienia wartości maksymalne i minimalne",
-    "storm": "Burza prawdopodobieństw"
+    "storm": "Burza prawdopodobieństw",
+    "curseDie": "Przekleństwa i kostka –{{n}}",
+    "shieldGate": "Podnosi bramę {{n}}",
+    "mirrorSchool": "Odzwierciedla dane spisu ludności",
+    "drainCharge": "Opłata za odprowadzenie ścieków „{{n}}”",
+    "siphonShield": "Syfon „{{n}}” – tarcza",
+    "bargain": "{{n}} z Bills: albo złom, albo kadłub",
+    "enrage": "Enrages + {{n}}",
+    "hijack": "Przejmuje twoją najlepszą kostkę",
+    "echoTotal": "powtarza twoją ostatnią turę (maksymalnie {{n}})",
+    "foldOrder": "realizuje zamówienie",
+    "devourDie": "zużywa twoją najlepszą zapasową kostkę"
   },
   "slot": {
     "weaponA": "Broń A",
@@ -85,5 +97,28 @@
   },
   "scriptHint": "Prolog: w tej turze można użyć wyłącznie „{{slots}}”.",
   "fate": "Rzuć kostką losu",
-  "fateResult": "Fate {{roll}} — {{text}}"
+  "fateResult": "Fate {{roll}} — {{text}}",
+  "swap": "Zamień",
+  "swapPick": "Wybierz kostkę…",
+  "bank": "Fasada banku",
+  "split": "Split",
+  "beat": {
+    "curse": "KLĄTWA",
+    "gate": "GATE",
+    "drain": "ODPŁYW",
+    "siphon": "SIFON",
+    "bargain": "OFERTA",
+    "enrage": "RAGE",
+    "hijack": "HIJACK",
+    "ward": "WARD",
+    "fold": "ZŁÓŻ",
+    "devour": "ZJEDZONE"
+  },
+  "enemyWard": "Okręg: {{school}}",
+  "enemyGate": "Strona główna {{n}}",
+  "enemyRage": "Rage i{{n}}",
+  "inverted": "ODWRÓCONA KOLEJNOŚĆ",
+  "invertedHint": "Najpierw reaktor, na końcu czujniki.",
+  "storm": "BURZA PRAWDOPODOBIEŃSTW",
+  "stormHint": "Rzut jedną umieszczoną kostką powtarza się przed rozstrzygnięciem jakichkolwiek innych akcji."
 }

@@ -1,5 +1,9 @@
 import { create } from "zustand";
+import type { JournalBody, JournalEntry } from "@/game/run/journal";
 import type { LocKey } from "@/types/content";
+
+export const TOAST_QUEUE_CAP = 3;
+export const JOURNAL_CAP = 160;
 
 export interface ConsequenceToast {
   id: number;
@@ -11,42 +15,135 @@ export interface BarkToast {
   line: LocKey;
 }
 
+export interface AchievementToast {
+  id: number;
+  achievement: string;
+}
+
 export interface NarrativeState {
   consequence: ConsequenceToast | null;
+  consequenceQueue: ConsequenceToast[];
   bark: BarkToast | null;
+  barkQueue: BarkToast[];
+  achievement: AchievementToast | null;
+  achievementQueue: AchievementToast[];
+  journal: JournalEntry[];
+  memoryQueue: number[];
   seq: number;
   pushConsequence: (origin: LocKey) => void;
   pushBark: (line: LocKey) => void;
+  pushAchievement: (achievement: string) => void;
+  pushJournal: (entry: JournalBody & { sector: number }) => void;
+  pushMemory: (order: number) => void;
+  dismissMemory: () => void;
+  setJournal: (entries: readonly JournalEntry[]) => void;
   dismissConsequence: () => void;
   dismissBark: () => void;
+  dismissAchievement: () => void;
   reset: () => void;
 }
 
 export const useNarrativeStore = create<NarrativeState>()((set) => ({
   consequence: null,
+  consequenceQueue: [],
   bark: null,
+  barkQueue: [],
+  achievement: null,
+  achievementQueue: [],
+  journal: [],
+  memoryQueue: [],
   seq: 0,
 
   pushConsequence: (origin) => {
-    set((s) => ({ consequence: { id: s.seq + 1, origin }, seq: s.seq + 1 }));
+    set((s) => {
+      const toast = { id: s.seq + 1, origin };
+      if (s.consequence === null) return { consequence: toast, seq: toast.id };
+      if (s.consequenceQueue.length >= TOAST_QUEUE_CAP) return s;
+      return { consequenceQueue: [...s.consequenceQueue, toast], seq: toast.id };
+    });
   },
 
   pushBark: (line) => {
     set((s) => {
-      if (s.bark !== null) return s;
-      return { bark: { id: s.seq + 1, line }, seq: s.seq + 1 };
+      const toast = { id: s.seq + 1, line };
+      if (s.bark === null) return { bark: toast, seq: toast.id };
+      if (s.barkQueue.length >= TOAST_QUEUE_CAP) return s;
+      return { barkQueue: [...s.barkQueue, toast], seq: toast.id };
     });
   },
 
+  pushAchievement: (achievement) => {
+    set((s) => {
+      const toast = { id: s.seq + 1, achievement };
+      if (s.achievement === null) return { achievement: toast, seq: toast.id };
+      if (s.achievementQueue.length >= TOAST_QUEUE_CAP) return s;
+      return {
+        achievementQueue: [...s.achievementQueue, toast],
+        seq: toast.id,
+      };
+    });
+  },
+
+  pushJournal: (entry) => {
+    set((s) => {
+      const id = s.seq + 1;
+      return {
+        journal: [...s.journal, { ...entry, id }].slice(-JOURNAL_CAP),
+        seq: id,
+      };
+    });
+  },
+
+  pushMemory: (order) => {
+    set((s) =>
+      s.memoryQueue.includes(order)
+        ? s
+        : { memoryQueue: [...s.memoryQueue, order] },
+    );
+  },
+
+  dismissMemory: () => {
+    set((s) => ({ memoryQueue: s.memoryQueue.slice(1) }));
+  },
+
+  setJournal: (entries) => {
+    set((s) => ({
+      journal: [...entries].slice(-JOURNAL_CAP),
+      seq: Math.max(s.seq, ...entries.map((e) => e.id), 0),
+    }));
+  },
+
   dismissConsequence: () => {
-    set({ consequence: null });
+    set((s) => ({
+      consequence: s.consequenceQueue[0] ?? null,
+      consequenceQueue: s.consequenceQueue.slice(1),
+    }));
   },
 
   dismissBark: () => {
-    set({ bark: null });
+    set((s) => ({
+      bark: s.barkQueue[0] ?? null,
+      barkQueue: s.barkQueue.slice(1),
+    }));
+  },
+
+  dismissAchievement: () => {
+    set((s) => ({
+      achievement: s.achievementQueue[0] ?? null,
+      achievementQueue: s.achievementQueue.slice(1),
+    }));
   },
 
   reset: () => {
-    set({ consequence: null, bark: null });
+    set({
+      consequence: null,
+      consequenceQueue: [],
+      bark: null,
+      barkQueue: [],
+      achievement: null,
+      achievementQueue: [],
+      journal: [],
+      memoryQueue: [],
+    });
   },
 }));

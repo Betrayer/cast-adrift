@@ -21,11 +21,30 @@
     "jump": "Jump to selected node",
     "jumpHint": "Select a reachable node",
     "you": "You",
-    "boss": "Boss",
     "abandon": "Abandon run",
     "previewMiniboss": "Mini-boss: {{name}}",
     "previewBoss": "Boss: {{name}}",
-    "modules": "Modules {{used}}/{{max}}"
+    "modules": "Modules {{used}}/{{max}}",
+    "legend": "Legend",
+    "node": {
+      "battle": "Battle",
+      "elite": "Elite",
+      "miniboss": "Mini-boss",
+      "shop": "Shop",
+      "shipyard": "Shipyard",
+      "event": "Event",
+      "anomaly": "Anomaly",
+      "beacon": "Beacon",
+      "boss": "Boss",
+      "inverted": "inverted"
+    },
+    "previewNode": "{{type}} · risk: {{risk}}",
+    "previewPocket": "Detour: better loot, tougher fight",
+    "risk": {
+      "low": "low",
+      "raised": "raised",
+      "high": "high"
+    }
   },
   "event": {
     "title": "Signal",
@@ -48,26 +67,29 @@
     "pass": "Success — {{total}}",
     "fail": "Failed — {{total}}",
     "roll": "Roll",
-    "back": "Back"
+    "back": "Back",
+    "reqAxisMin": "needs axis {{n}} or higher",
+    "reqAxisMax": "needs axis {{n}} or lower",
+    "checkLowest": "Nothing above {{n}}",
+    "checkSchool": "{{school}} dice only",
+    "checkTierMin": "d{{tier}} and larger only",
+    "checkTierMax": "d{{tier}} and smaller only",
+    "outcomeOdds": "odds {{odds}}",
+    "beaconTitle": "Beacon",
+    "beaconCounter": "Beacon {{n}} of {{max}}"
   },
   "anomaly": {
     "title": "Anomaly",
     "goal": "Goal",
     "resolve": "Resolve",
-    "retry": "New roll",
     "solved": "Solved",
     "failed": "Not yet — reroll or roll anew",
-    "reward": "+{{n}} scrap",
     "leave": "Leave",
     "tray": "Rolled dice",
     "slots": "Systems",
     "rerolls": "rerolls: {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "New roll ({{n}} left)",
-    "giveUp": "Out of new rolls",
     "toMap": "Back to the map",
-    "outOfRollsTitle": "Anomaly unresolved",
-    "outOfRolls": "No new rolls left. Leaving stokes Resonance Interference.",
     "rerollHint": "Pick up to {{n}} dice to reroll",
     "rerollCancel": "Cancel",
     "rerollConfirm": "Reroll {{k}}",
@@ -87,7 +109,6 @@
     "carryReserved": "reserved d{{n}}",
     "carryNone": "nothing yet",
     "reserve": "Reserve",
-    "reserved": "Reserved",
     "unreserve": "Unreserve",
     "nextTurn": "End turn",
     "reset": "Reset placement",
@@ -129,7 +150,37 @@
       "damage": "damage",
       "charge": "charge",
       "shield": "shield"
-    }
+    },
+    "tierName": {
+      "1": "faint reading",
+      "2": "steady reading",
+      "3": "deep reading",
+      "4": "severe reading",
+      "5": "singular reading"
+    },
+    "entryEnter": "Take the reading",
+    "entryLeaveNote": "Walking away counts as unsolved and feeds Resonance Interference.",
+    "rewardPreview": "Reward",
+    "rewardScrap": "{{n}} scrap",
+    "rewardCodex": "a codex entry",
+    "rewardChoice": "your pick: the die «{{name}}» or an engraving voucher",
+    "rewardDie": "the die «{{name}}»",
+    "rewardOnce": "drops nowhere else",
+    "stakes": "Stakes",
+    "stakeFree": "{{n}} attempts, both free",
+    "stakePaid": "{{n}} free, then {{costs}} scrap",
+    "stakeDeduction": "fixed reading · {{n}} submissions",
+    "interferenceNow": "Resonance Interference ×{{n}} is running — any solve clears it.",
+    "interferenceNone": "No interference on the hull.",
+    "attemptChip": "attempt {{cur}}/{{max}}",
+    "submissionsLeft": "answers left: {{n}}",
+    "newAttempt": "New board ({{n}} left)",
+    "newAttemptCost": "New board — {{n}} scrap",
+    "outOfAttemptsTitle": "The reading closes",
+    "outOfAttempts": "No attempts left. Leaving stokes Resonance Interference.",
+    "locked": "{{n}} die is held out of turn 1",
+    "takeDie": "Take «{{name}}»",
+    "takeVoucher": "Take the voucher"
   },
   "codex": {
     "title": "Codex",
@@ -143,34 +194,35 @@
     "glyphLegend": {
       "title": "School glyphs",
       "body": "Every die carries a corner shape so schools stay apart without colour: Red — triangle · Blue — square · Green — leaf · Yellow — ring · Black — spike · Grey — dot · Prismatic — star."
-    }
+    },
+    "prologueTitle": "The first crossing",
+    "prologueBody": "Replay the opening beats. Nothing is started, nothing is lost.",
+    "prologueReplay": "Replay"
   },
   "consequenceToast": "Consequence: {{text}}",
   "rewards": {
-    "scrap": "+{{n}} scrap",
     "dieTitle": "Salvaged die",
     "keep": "Keep in deck",
     "sell": "Sell (+{{n}})",
-    "deckFull": "Deck full (9)",
-    "healed": "Repaired +{{n}}"
+    "deckFull": "Deck full (9)"
   },
   "perk": {
     "title": "Choose an upgrade",
     "pick": "Take",
     "skip": "Skip (+{{n}} scrap)",
-    "sub": "1 of 3"
+    "banish": "Banish",
+    "banishHint": "Banishing removes that card and its kind from the rest of the run. Once per run.",
+    "reroll": "Reroll draft ({{n}} scrap)"
   },
   "shop": {
     "title": "Market · Mara",
     "buy": "Buy ({{n}})",
-    "sell": "Sell",
     "reroll": "Restock ({{n}})",
     "leave": "Leave",
     "scrap": "Scrap: {{n}}",
     "deck": "Deck {{n}}/9",
     "sellTitle": "Sell a die",
     "empty": "Sold out",
-    "owned": "In deck",
     "modulesTitle": "Modules {{used}}/{{max}}",
     "modulesFull": "Bay full",
     "rerollFree": "Reroll stock (free)"
@@ -180,10 +232,8 @@
     "mk": "Mk{{mk}} — {{cost}}",
     "mkMax": "Mk3 · maxed",
     "systems": "Systems",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Two identical dice → +1 tier",
-    "fusionPick": "Pick a die to fuse",
     "repair": "Repair",
     "repairHint": "2 scrap per hull",
     "leave": "Leave",
@@ -198,17 +248,17 @@
     "nodes": "Nodes cleared: {{n}}",
     "kills": "Kills: {{n}}",
     "earned": "Scrap earned: {{n}}",
-    "spent": "Scrap spent: {{n}}",
     "perks": "Upgrades:",
     "perksNone": "none",
-    "meta": "Shards & XP",
-    "toMenu": "To menu"
+    "toMenu": "To menu",
+    "faced": "Faced: {{names}}"
   },
   "prologue": {
     "title": "Prologue",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Back to menu"
+    "leave": "Back to menu",
+    "replayDone": "Back to the Codex"
   },
   "interstitial": {
     "sector": "Sector {{n}}",
@@ -218,13 +268,20 @@
     "title": "The Core Heart is open",
     "intro": "Everything you decided out here is now a door. Only the ones you earned will open.",
     "thin": "Echo: \"You left it thin, captain. Two doors, both of them shrugging.\"",
-    "axis": "Resonance ↔ Stability axis: {{n}}"
+    "axis": "Resonance ↔ Stability axis: {{n}}",
+    "deepTitle": "Past the Core",
+    "deepIntro": "There is nothing further to cross. Whatever you carried through the sixth act, this is where it is spent.",
+    "thresholdTag": "Or do not end it",
+    "thresholdCross": "Cross the threshold",
+    "thresholdCost": "The run continues past the Core. The tide stops being capped, the ending waits until the far side — and the one you pick there will be a deeper telling of it."
   },
   "ending": {
     "next": "Continue",
     "step": "{{cur}} / {{max}}",
     "tally": "What you left behind",
-    "continue": "Close the log"
+    "continue": "Close the log",
+    "deathTitle": "The run ends here",
+    "deathWhere": "Sector {{sector}} · depth {{depth}}"
   },
   "setup": {
     "title": "Launch",
@@ -236,7 +293,10 @@
     "aLevel": "A{{n}}",
     "tideCap": "Interference tide caps at {{n}}",
     "launch": "Launch",
-    "back": "Back"
+    "back": "Back",
+    "ascensionCost": "It costs you",
+    "ascensionGain": "It pays you",
+    "shardMult": "+{{n}}% shards for the whole run"
   },
   "package": {
     "title": "Gate package",
@@ -271,5 +331,104 @@
       "title": "Choose the next node",
       "body": "Tap a lit node, then Jump. Fog hides the rows ahead; Sensors and deep scans push the horizon further."
     }
+  },
+  "motif": {
+    "title": "Sector traits",
+    "cache": "Cache: salvage on arrival",
+    "mine": "Mine run: crossing costs hull",
+    "blessed": "Blessed lane: the Choir favours you",
+    "cursed": "Cursed lane: interference rises",
+    "unstable": "Unstable row: its contents were re-rolled",
+    "pocket": "Detour pocket: raised risk, raised reward",
+    "riftSplit": "Rift split: the branches only meet at the gate",
+    "inversion": "Inverted row: systems resolve last to first",
+    "storm": "Probability storm: one placed die re-rolls at resolution"
+  },
+  "tag": {
+    "red": "Red",
+    "blue": "Blue",
+    "green": "Green",
+    "yellow": "Yellow",
+    "black": "Black",
+    "grey": "Grey",
+    "prismatic": "Prismatic",
+    "weapons": "Weapons",
+    "shields": "Shields",
+    "engines": "Engines",
+    "sensors": "Sensors",
+    "reactor": "Reactor",
+    "spinal": "Spinal",
+    "repairBay": "Repair Bay",
+    "burn": "Burn",
+    "crit": "Crit",
+    "growth": "Growth",
+    "reroll": "Reroll",
+    "charge": "Charge",
+    "scrap": "Scrap",
+    "overcap": "Overcap",
+    "pierce": "Pierce",
+    "dodge": "Dodge",
+    "survival": "Survival",
+    "control": "Control",
+    "dice": "Dice",
+    "shieldwall": "Shieldwall",
+    "risk": "Risk",
+    "swarm": "Swarm",
+    "spike": "Spike",
+    "precision": "Precision",
+    "owned": "{{name}} ×{{n}}"
+  },
+  "build": {
+    "title": "Your build",
+    "close": "Close",
+    "open": "Build",
+    "resonance": "Resonance",
+    "resonanceNext": "{{n}} more for the next tier",
+    "resonanceNextDesc": "{{n}} more → {{desc}}",
+    "resonanceMax": "All tiers active",
+    "tags": "Active tags",
+    "perks": "Perks ({{n}})",
+    "modules": "Modules ({{n}})",
+    "engravings": "Engraved dice ({{n}})",
+    "banished": "Banished",
+    "empty": "Nothing yet"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Resonance {{n}}",
+    "stability": "Stability {{n}}",
+    "neutral": "Axis balanced",
+    "preview": "axis {{from}} → {{to}}",
+    "short": "Axis"
+  },
+  "journal": {
+    "title": "Run journal",
+    "open": "Journal",
+    "back": "Back to the map",
+    "empty": "Nothing written yet. The sector has not asked you for anything.",
+    "sector": "Sector {{n}}",
+    "beacon": "Beacon resolved — {{n}} of {{max}}",
+    "memory": "Echo remembered something — fragment {{n}}",
+    "axisTitle": "Axis",
+    "axis": {
+      "choice": "your choice moved the axis {{from}} → {{to}}",
+      "drift": "the deck you actually place moved the axis {{from}} → {{to}}",
+      "beacon": "the beacon moved the axis {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Beacons",
+    "beaconsCount": "{{n}} of {{max}} resolved",
+    "beaconsHint": "The chain is holding. Something at the Core is counting them too.",
+    "here": "You are in Sector {{n}}.",
+    "chainsTitle": "Threads",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "here"
+  },
+  "memory": {
+    "kicker": "Echo remembers · fragment {{n}} of {{max}}",
+    "continue": "Let her finish",
+    "hintGate": "Break {{n}} gates in one campaign",
+    "hintElite": "Hunt {{n}} elites across your runs",
+    "hintBeacons": "Resolve {{n}} beacons in a single run",
+    "hintEnding": "Reach the Core and choose"
   }
 }

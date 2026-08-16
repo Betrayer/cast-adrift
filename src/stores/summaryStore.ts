@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import type { ScoreBreakdown } from "@/game/run/modes";
+import type { ShardBreakdown } from "@/game/xp";
 import type { RunMode } from "@/stores/runStore";
 
 export type SubmitState = "idle" | "pending" | "sent" | "failed" | "offline";
@@ -7,6 +8,13 @@ export type SubmitState = "idle" | "pending" | "sent" | "failed" | "offline";
 export interface RunResult {
   xpGain: number;
   shardGain: number;
+  shards: ShardBreakdown;
+  findShards: number;
+  firstFinds: readonly string[];
+  achievements: readonly string[];
+  achievementShards: number;
+  unlocks: readonly string[];
+  unlockIds: readonly string[];
   fromLevel: number;
   toLevel: number;
   win: boolean;
@@ -15,6 +23,7 @@ export interface RunResult {
   score: ScoreBreakdown | null;
   contractId: string | null;
   contractStars: number;
+  rotation: readonly string[];
 }
 
 export interface SummaryState {
@@ -51,13 +60,3 @@ export const useSummaryStore = create<SummaryState>()((set) => ({
     });
   },
 }));
-
-declare global {
-  interface Window {
-    __summary?: typeof useSummaryStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__summary = useSummaryStore;
-}

@@ -138,9 +138,6 @@ export const MUTATOR_BY_ID: ReadonlyMap<string, MutatorDef> = new Map(
   MUTATORS.map((def) => [def.id, def]),
 );
 
-export const isMutatorId = (id: string): id is MutatorId =>
-  MUTATOR_BY_ID.has(id);
-
 const NUMERIC_KEYS = [
   "shieldDecayPct",
   "lootRarityStep",
@@ -157,8 +154,6 @@ const NUMERIC_KEYS = [
   "copyHpPct",
 ] as const;
 
-// Numbers add, booleans OR — the same aggregation shape as ascension mods, so a
-// daily's two mutators and a contract's forced set stack without special cases.
 export const computeMutatorMods = (
   ids: readonly string[],
 ): MutatorMods => {
@@ -176,7 +171,6 @@ export const computeMutatorMods = (
 
 export const DAILY_MUTATOR_COUNT = 2;
 
-// Two distinct mutators per day, drawn from a stream the client cannot influence.
 export const pickDailyMutators = (
   pick: (max: number) => number,
 ): MutatorId[] => {

@@ -5,23 +5,32 @@ import {
   Group,
   Paper,
   Progress,
-  ScrollArea,
   SegmentedControl,
   Select,
   Stack,
   Text,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { trackEvent } from "@/services/analytics";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { ALL_DICE, DIE_BY_ID } from "@/data/dice";
 import { schools } from "@/data/schools";
 import { PLAYABLE_SHIPS } from "@/data/ships";
-import { diePoints, metaDiePrice } from "@/data/metaShop";
+import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
+import { unlockedDice } from "@/data/unlocks";
 import { hubBudgetBonus } from "@/game/chart/engine";
 import { validateDeck } from "@/game/meta/deck";
-import { ENGRAVING_STATION_LEVEL, hangarBudget } from "@/data/milestones";
+import { dieRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
+import {
+  dieShopPrice,
+  freshDiceIds,
+  freshUnlockIdsOfKind,
+  unlockContextOf,
+} from "@/game/meta/unlockState";
+import { hangarBudget } from "@/data/milestones";
+import { hasFeature } from "@/data/unlocks";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import type { DieItemDef, Rarity, School } from "@/types/content";
@@ -57,10 +66,38 @@ export const HangarScreen = () => {
   const shards = useMetaStore((s) => s.shards);
   const ships = useMetaStore((s) => s.ships);
   const selectedShip = useMetaStore((s) => s.selectedShip);
+  const encountered = useMetaStore((s) => s.encountered);
+  const achievements = useMetaStore((s) => s.achievements);
+  const ascension = useMetaStore((s) => s.ascension);
+  const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
+  const unlocksSeen = useMetaStore((s) => s.unlocksSeen);
+  const stats = useMetaStore((s) => s.stats);
   const setDeck = useMetaStore((s) => s.setDeck);
   const buyDie = useMetaStore((s) => s.buyDie);
   const buyShip = useMetaStore((s) => s.buyShip);
   const selectShip = useMetaStore((s) => s.selectShip);
+
+  const unlockCtx = useMemo(
+    () =>
+      unlockContextOf({
+        level,
+        achievements,
+        ascension,
+        unlocksGranted,
+        stats: { campaignClears: stats.campaignClears },
+      }),
+    [level, achievements, ascension, unlocksGranted, stats.campaignClears],
+  );
+  const openDice = useMemo(() => unlockedDice(unlockCtx), [unlockCtx]);
+
+  const [freshAtMount] = useState(() => ({
+    dice: freshDiceIds(unlockCtx, unlocksSeen),
+    ids: freshUnlockIdsOfKind(unlockCtx, unlocksSeen, "diceWave"),
+  }));
+  const fresh = freshAtMount.dice;
+  useEffect(() => {
+    useMetaStore.getState().markUnlocksSeen(freshAtMount.ids);
+  }, [freshAtMount]);
 
   const [tab, setTab] = useState("build");
   const [draft, setDraft] = useState<string[]>([...savedDeck]);
@@ -115,8 +152,9 @@ export const HangarScreen = () => {
   const shopIds = filtered(ALL_DICE.map((d) => d.id));
 
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+    <Screen>
+      <Stack gap="sm">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between" mb="xs">
           <Text fw={700} c={tokens.text}>
             {t("meta:hangar.title")}
@@ -135,7 +173,12 @@ export const HangarScreen = () => {
           {PLAYABLE_SHIPS.map((ship) => {
             const isOwned = ships.includes(ship.id);
             const equipped = selectedShip === ship.id;
-            const unlocked = level >= ship.unlockLevel;
+            const unlocked =
+              ship.id === "wanderer" ||
+              hasFeature(
+                unlockCtx,
+                ship.id === "ram" ? "shipRam" : "shipArk",
+              );
             return (
               <Paper
                 key={ship.id}
@@ -191,13 +234,19 @@ export const HangarScreen = () => {
           value={tab}
           onChange={setTab}
           data={[
-            { value: "build", label: t("meta:hangar.deck") },
-            { value: "shop", label: t("meta:hangar.shop") },
+            {
+              value: "build",
+              label: <span data-hangar-tab="build">{t("meta:hangar.deck")}</span>,
+            },
+            {
+              value: "shop",
+              label: <span data-hangar-tab="shop">{t("meta:hangar.shop")}</span>,
+            },
           ]}
         />
       </Paper>
 
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between">
           <Text size="sm" c={validation.over ? tokens.danger : tokens.dim}>
             {t("meta:hangar.budget", { used: validation.pts, max: budget })}
@@ -255,11 +304,11 @@ export const HangarScreen = () => {
         </Button>
       </Paper>
 
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
-        <Group gap="xs" mb="xs">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <Group gap="xs" mb="xs" grow wrap="wrap">
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={schoolFilter}
             onChange={(v) => { setSchoolFilter((v as School | "all") ?? "all"); }}
             data={SCHOOLS.map((s) => ({
@@ -269,7 +318,7 @@ export const HangarScreen = () => {
           />
           <Select
             size="xs"
-            w={130}
+            miw={120}
             value={rarityFilter}
             onChange={(v) => { setRarityFilter((v as Rarity | "all") ?? "all"); }}
             data={RARITIES.map((r) => ({
@@ -278,32 +327,57 @@ export const HangarScreen = () => {
             }))}
           />
         </Group>
-        <ScrollArea h={280}>
           <Stack gap={6}>
             {(tab === "build" ? collectionIds : shopIds).map((id) => {
               const def = DIE_BY_ID.get(id);
               if (def === undefined) return null;
               const ownedCount = owned.get(id) ?? 0;
               const usedCount = inDeck.get(id) ?? 0;
+              const isOpen = openDice.has(id);
+              const price = dieShopPrice(id, encountered);
+              const discounted = encountered[id] !== undefined;
+              const hints = dieRoutes(id);
               return (
                 <Group
                   key={id}
                   justify="space-between"
                   px="xs"
                   py={4}
+                  data-die-row={id}
+                  data-die-locked={!isOpen && tab === "shop" ? "1" : undefined}
                   style={{
                     border: `1px solid ${tokens.line}`,
                     borderRadius: 8,
+                    opacity: !isOpen && tab === "shop" ? 0.55 : 1,
                   }}
                 >
                   <Stack gap={0}>
-                    <Text size="sm" style={{ color: schools[def.school].text }}>
-                      {dieLabel(def, t)}
-                    </Text>
+                    <Group gap={4} wrap="nowrap">
+                      <Text size="sm" style={{ color: schools[def.school].text }}>
+                        {dieLabel(def, t)}
+                      </Text>
+                      {fresh.has(id) ? (
+                        <Badge size="xs" color="accent" data-unlock-new>
+                          {t("meta:unlock.new")}
+                        </Badge>
+                      ) : null}
+                    </Group>
                     <Text size="xs" c={tokens.faint}>
                       {def.rarity} · {diePoints(id)} pts ·{" "}
                       {t("meta:collection.owned", { n: ownedCount })}
                     </Text>
+                    {tab === "shop" && !isOpen ? (
+                      <Text size="xs" c={tokens.amber} data-unlock-hint>
+                        {unlockHintsLine(hints, t)}
+                      </Text>
+                    ) : null}
+                    {tab === "shop" && isOpen && discounted ? (
+                      <Text size="xs" c="teal" data-die-discount>
+                        {t("meta:collection.discount", {
+                          n: ENCOUNTER_DISCOUNT_PCT,
+                        })}
+                      </Text>
+                    ) : null}
                   </Stack>
                   {tab === "build" ? (
                     <Button
@@ -314,20 +388,23 @@ export const HangarScreen = () => {
                     >
                       {t("meta:hangar.add")}
                     </Button>
-                  ) : (
+                  ) : isOpen ? (
                     <Button
                       size="compact-xs"
-                      disabled={shards < metaDiePrice(id)}
-                      onClick={() => { buyDie(id, metaDiePrice(id)); }}
+                      disabled={shards < price}
+                      onClick={() => { buyDie(id, price); }}
                     >
-                      {t("meta:hangar.buy", { price: metaDiePrice(id) })}
+                      {t("meta:hangar.buy", { price })}
                     </Button>
+                  ) : (
+                    <Badge size="sm" variant="light" color="gray">
+                      {t("meta:unlock.locked")}
+                    </Badge>
                   )}
                 </Group>
               );
             })}
           </Stack>
-        </ScrollArea>
         <Divider my="xs" color={tokens.line} />
         <Group gap="xs" grow>
           <Button
@@ -340,13 +417,14 @@ export const HangarScreen = () => {
           <Button
             size="xs"
             variant="subtle"
-            disabled={level < ENGRAVING_STATION_LEVEL}
+            disabled={!hasFeature(unlockCtx, "engravingStation")}
             onClick={() => { go("engraving"); }}
           >
             {t("meta:engraving.title")}
           </Button>
         </Group>
       </Paper>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

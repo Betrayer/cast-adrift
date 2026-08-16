@@ -1,53 +1,11 @@
-import { DIE_PTS } from "@/data/tiers";
+import { die } from "@/data/dice/builder";
 import type { DieItemDef } from "@/types/content";
 
 export const BASIC_DICE: readonly DieItemDef[] = [
-  {
-    id: "red-d6",
-    name: "content:dice.red-d6",
-    tier: 6,
-    school: "red",
-    rarity: "common",
-    pts: DIE_PTS[6],
-  },
-  {
-    id: "blue-d6",
-    name: "content:dice.blue-d6",
-    tier: 6,
-    school: "blue",
-    rarity: "common",
-    pts: DIE_PTS[6],
-  },
-  {
-    id: "grey-d4",
-    name: "content:dice.grey-d4",
-    tier: 4,
-    school: "grey",
-    rarity: "common",
-    pts: DIE_PTS[4],
-  },
-  {
-    id: "green-d4",
-    name: "content:dice.green-d4",
-    tier: 4,
-    school: "green",
-    rarity: "common",
-    pts: DIE_PTS[4],
-  },
-  {
-    id: "yellow-d6",
-    name: "content:dice.yellow-d6",
-    tier: 6,
-    school: "yellow",
-    rarity: "common",
-    pts: DIE_PTS[6],
-  },
-  {
-    id: "black-d6",
-    name: "content:dice.black-d6",
-    tier: 6,
-    school: "black",
-    rarity: "common",
-    pts: DIE_PTS[6],
-  },
+  die("red-d6", 6, "red", "common", { tags: ["weapons"] }),
+  die("blue-d6", 6, "blue", "common", { tags: ["shields"] }),
+  die("grey-d4", 4, "grey", "common", { tags: ["swarm"] }),
+  die("green-d4", 4, "green", "common", { tags: ["swarm", "engines"] }),
+  die("yellow-d6", 6, "yellow", "common", { tags: ["scrap"] }),
+  die("black-d6", 6, "black", "common", { tags: ["risk"] }),
 ];

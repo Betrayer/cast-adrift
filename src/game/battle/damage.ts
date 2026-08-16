@@ -1,10 +1,11 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
-import { consumeStatus } from "@/game/battle/statuses";
+import { applyStatus, consumeStatus } from "@/game/battle/statuses";
 import type {
   BattleSnapshot,
   EnemyState,
   SubsystemState,
 } from "@/types/battle";
+import type { School } from "@/types/content";
 
 export const aliveEnemies = (snapshot: BattleSnapshot): EnemyState[] =>
   snapshot.enemies.filter((e) => e.hp > 0);
@@ -12,9 +13,6 @@ export const aliveEnemies = (snapshot: BattleSnapshot): EnemyState[] =>
 const aliveSubsystems = (enemy: EnemyState): SubsystemState[] =>
   enemy.subsystems.filter((s) => s.hp > 0);
 
-// Two data-driven immunities (Phase-8 amendment 5): `shell` keeps the body safe
-// while its own subsystems live; `guarded` keeps it safe while any other enemy
-// lives (kill-order fights).
 export const isBodyImmune = (
   snapshot: BattleSnapshot,
   enemy: EnemyState,
@@ -29,19 +27,55 @@ export const isBodyImmune = (
 };
 
 export const handleDeath = (next: BattleSnapshot, enemy: EnemyState): void => {
-  const def = ENEMY_BY_ID.get(enemy.defId);
-  if (def?.onDeath?.t === "blockSlot") {
-    next.blockedSlots.push({
-      slot: def.onDeath.slot,
-      untilTurn: next.turn + 1,
-    });
-    return;
-  }
-  if (def?.onDeath?.t === "explode") {
-    const damage = def.onDeath.n;
-    const absorbed = Math.min(next.shield, damage);
-    next.shield -= absorbed;
-    next.hull = Math.max(0, next.hull - (damage - absorbed));
+  const onDeath = ENEMY_BY_ID.get(enemy.defId)?.onDeath;
+  if (onDeath === undefined) return;
+  switch (onDeath.t) {
+    case "blockSlot":
+      next.blockedSlots.push({ slot: onDeath.slot, untilTurn: next.turn + 1 });
+      return;
+    case "explode": {
+      const absorbed = Math.min(next.shield, onDeath.n);
+      next.shield -= absorbed;
+      next.hull = Math.max(0, next.hull - (onDeath.n - absorbed));
+      return;
+    }
+    case "healAllies":
+      for (const ally of aliveEnemies(next)) {
+        if (ally.id === enemy.id) continue;
+        ally.hp = Math.min(ally.hpMax, ally.hp + onDeath.n);
+      }
+      return;
+    case "shieldAllies":
+      for (const ally of aliveEnemies(next)) {
+        if (ally.id === enemy.id) continue;
+        ally.shield += onDeath.n;
+      }
+      return;
+    case "chargeAllies":
+      for (const ally of aliveEnemies(next)) {
+        if (ally.id === enemy.id) continue;
+        applyStatus(ally.statuses, "charge");
+      }
+      return;
+    case "stealScrap": {
+      const fromBattle = Math.min(next.scrap, onDeath.n);
+      next.scrap -= fromBattle;
+      next.stolenScrap += onDeath.n - fromBattle;
+      return;
+    }
+    case "curseDie": {
+      const tray = next.dice.filter((d) => d.state === "tray");
+      const worst = tray.reduce<(typeof tray)[number] | undefined>(
+        (best, die) => (best === undefined || die.value > best.value ? die : best),
+        undefined,
+      );
+      if (worst === undefined) return;
+      next.cursedDice = [
+        ...(next.cursedDice ?? []),
+        { uid: worst.uid, n: onDeath.n, untilTurn: next.turn + 2 },
+      ];
+      return;
+    }
   }
 };
 
@@ -88,20 +122,34 @@ export const applyWeaponDamage = (
   crit = false,
   markBonus = 2,
   pierce = false,
+  school?: School,
 ): number => {
+  const def = ENEMY_BY_ID.get(target.enemy.defId);
   let damage = baseDamage;
+  if (def?.ward === true && school !== undefined && target.enemy.ward === school) {
+    damage = Math.ceil(damage / 2);
+  }
   if (target.subsystem !== undefined) {
+    if (def?.alternating === true && target.enemy.lastHitKey === target.subsystem.key) {
+      return 0;
+    }
     if (crit) damage = Math.floor(damage * 1.5);
+    if (def?.alternating === true) target.enemy.lastHitKey = target.subsystem.key;
     target.subsystem.hp = Math.max(0, target.subsystem.hp - damage);
     if (target.subsystem.hp === 0) retargetAfterKill(next, target.enemy, true);
     return damage;
   }
   if (isBodyImmune(next, target.enemy)) return 0;
-  const def = ENEMY_BY_ID.get(target.enemy.defId);
   const bonus = def?.markVulnerable === true ? markBonus * 2 : markBonus;
-  if (consumeStatus(target.enemy.statuses, "mark")) damage += bonus;
+  const marked = consumeStatus(target.enemy.statuses, "mark");
+  if (marked) damage += bonus;
   if (crit) damage = Math.floor(damage * 1.5);
-  // «Пробойник» spends its one charge to put the whole hit past the shield.
+  const gate = target.enemy.gate ?? 0;
+  if (gate > 0 && !marked) {
+    if (damage < gate) return 0;
+    target.enemy.gate = 0;
+  }
+  if (def?.spikeCap !== undefined) damage = Math.min(damage, def.spikeCap);
   const absorbed = pierce ? 0 : Math.min(target.enemy.shield, damage);
   target.enemy.shield -= absorbed;
   target.enemy.hp = Math.max(0, target.enemy.hp - (damage - absorbed));

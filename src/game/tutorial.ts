@@ -1,3 +1,4 @@
+import { trayAnchorRect } from "@/pixi/battle/anchors";
 import { useBattleStore } from "@/stores/battleStore";
 import { useRunStore } from "@/stores/runStore";
 import type { ScreenId } from "@/types";
@@ -33,24 +34,17 @@ const fromSelector =
     };
   };
 
-// The dice tray lives inside the Pixi canvas, so its coach mark is anchored to
-// the canvas box at the same fractions BattleScene lays the tray out with.
 const trayAnchor = (): CoachRect | null => {
-  const canvas = document.querySelector("canvas");
-  if (canvas === null) return null;
-  const r = canvas.getBoundingClientRect();
-  if (r.height === 0) return null;
+  const band = trayAnchorRect();
+  if (band === null || band.h === 0) return null;
   return {
-    x: r.left + 6,
-    y: r.top + r.height * 0.29,
-    w: r.width - 12,
-    h: r.height * 0.11,
+    x: band.x - 6,
+    y: band.y - 6,
+    w: band.w + 12,
+    h: band.h + 12,
   };
 };
 
-// The prologue's scripted battle already walks the player through turns 1–2
-// (it hard-limits which slots are legal), so coach marks stay out of its way
-// and only fire in an unscripted first fight.
 const battleReady = (): boolean => {
   const s = useBattleStore.getState();
   return s.phase === "placement" && !s.introPending && s.scriptedSlots === null;

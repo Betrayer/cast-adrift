@@ -50,8 +50,6 @@ const DEFAULTS: SettingsValues = {
 const isFontScale = (value: unknown): value is FontScale =>
   value === 's' || value === 'm' || value === 'l';
 
-// v1 → v2: theme, fontScale and battleSpeed are new; an unknown theme id
-// (a locked or renamed theme) falls back to the free default.
 export const migrateSettings = (
   persisted: unknown,
   fromVersion: number,
@@ -112,13 +110,3 @@ export const resolveReducedMotion = (setting: ReducedMotionSetting): boolean => 
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
 };
-
-declare global {
-  interface Window {
-    __settings?: typeof useSettingsStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== 'undefined') {
-  window.__settings = useSettingsStore;
-}

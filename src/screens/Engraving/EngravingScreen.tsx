@@ -4,18 +4,20 @@ import {
   Divider,
   Group,
   Paper,
-  ScrollArea,
   Stack,
   Text,
 } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
+import { TagChips } from "@/components/TagChips";
 import { DIE_BY_ID } from "@/data/dice";
 import {
   ENGRAVINGS,
   ENGRAVING_BY_ID,
+  ENGRAVING_PAIRS,
   socketsForDie,
 } from "@/data/engravings";
 import { ENGRAVING_STATION_LEVEL } from "@/data/milestones";
@@ -23,6 +25,14 @@ import { schools } from "@/data/schools";
 import { playSfx } from "@/services/audio";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
+
+const pairPartner = (id: string): string | undefined => {
+  for (const [a, b] of ENGRAVING_PAIRS) {
+    if (a === id) return b;
+    if (b === id) return a;
+  }
+  return undefined;
+};
 
 export const EngravingScreen = () => {
   const { t } = useTranslation(["meta", "common", "content"]);
@@ -44,8 +54,9 @@ export const EngravingScreen = () => {
   const free = sockets - fitted.length;
 
   return (
-    <Stack align="center" mih="var(--ca-vh)" p="md" bg={tokens.bg} gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder maw={460} w="100%">
+    <Screen
+      header={
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group justify="space-between">
           <Text fw={700} c={tokens.text}>
             {t("meta:engraving.title")}
@@ -64,22 +75,16 @@ export const EngravingScreen = () => {
             ? t("meta:engraving.hint")
             : t("meta:engraving.locked", { level: ENGRAVING_STATION_LEVEL })}
         </Text>
-      </Paper>
-
+        </Paper>
+      }
+    >
+      <Stack gap="sm">
       {unlocked ? (
         <>
-          <Paper
-            bg={tokens.surface1}
-            p="md"
-            radius="md"
-            withBorder
-            maw={460}
-            w="100%"
-          >
+          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Text size="sm" c={tokens.dim} mb={6}>
               {t("meta:engraving.pickDie")}
             </Text>
-            <ScrollArea.Autosize mah={150}>
               <Group gap={4}>
                 {owned.map((entry) => {
                   const def = DIE_BY_ID.get(entry.defId);
@@ -103,7 +108,6 @@ export const EngravingScreen = () => {
                   );
                 })}
               </Group>
-            </ScrollArea.Autosize>
 
             <Divider my="xs" color={tokens.line} />
             <Text size="sm" c={tokens.dim}>
@@ -134,15 +138,7 @@ export const EngravingScreen = () => {
             </Group>
           </Paper>
 
-          <Paper
-            bg={tokens.surface1}
-            p="md"
-            radius="md"
-            withBorder
-            maw={460}
-            w="100%"
-          >
-            <ScrollArea h={300}>
+          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
               <Stack gap={6}>
                 {ENGRAVINGS.map((def) => {
                   const already = fitted.includes(def.id);
@@ -162,13 +158,24 @@ export const EngravingScreen = () => {
                         borderRadius: 8,
                       }}
                     >
-                      <Stack gap={0} style={{ flex: 1 }}>
+                      <Stack gap={2} style={{ flex: 1 }}>
                         <Text size="sm" c={tokens.text}>
                           {t(def.name)}
                         </Text>
                         <Text size="xs" c={tokens.faint}>
                           {t(def.desc)}
                         </Text>
+                        <TagChips tags={def.tags ?? []} />
+                        {pairPartner(def.id) === undefined ? null : (
+                          <Text size="xs" c={tokens.amber}>
+                            {t("meta:engraving.pair", {
+                              name: t(
+                                ENGRAVING_BY_ID.get(pairPartner(def.id) ?? "")
+                                  ?.name ?? "",
+                              ),
+                            })}
+                          </Text>
+                        )}
                       </Stack>
                       <Button
                         size="compact-xs"
@@ -195,11 +202,11 @@ export const EngravingScreen = () => {
                   );
                 })}
               </Stack>
-            </ScrollArea>
           </Paper>
         </>
       ) : null}
       <Sparkle burst={burst} />
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

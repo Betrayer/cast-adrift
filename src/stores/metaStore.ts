@@ -1,7 +1,10 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CHART_NODE_BY_ID } from '@/data/chart';
+import { DEFAULT_DIE_SKIN, isDieSkinId } from '@/data/cosmetics';
 import { STARTER_DECK } from '@/data/decks';
+import { DIE_BY_ID } from '@/data/dice';
+import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
 import type { ShipId } from '@/data/ships';
 import { levelFromTotalXp } from '@/game/xp';
@@ -23,6 +26,26 @@ export interface MetaStats {
   driftRuns: number;
   dailyRuns: number;
   contractRuns: number;
+  elites: number;
+  t5Solved: number;
+  beacons: number;
+  deepClears: number;
+  noDeathStreak: number;
+  bestNoDeathStreak: number;
+}
+
+export interface EncounterRecord {
+  sector: number;
+  node: string;
+}
+
+export interface RunEncounter extends EncounterRecord {
+  defId: string;
+}
+
+export interface EncounterResult {
+  firstFinds: string[];
+  shards: number;
 }
 
 export type DailyPlayState = "started" | "done";
@@ -56,6 +79,8 @@ export interface MetaValues {
   badges: string[];
   codex: string[];
   codexRead: string[];
+  seenPuzzles: string[];
+  seenFragments: string[];
   contracts: Record<string, number>;
   dailyPlayed: Record<string, DailyRecord>;
   best: BestScores;
@@ -63,6 +88,12 @@ export interface MetaValues {
   flagsArchive: string[];
   bossFirstKills: string[];
   endings: string[];
+  achievements: string[];
+  achievementsSeen: string[];
+  encountered: Record<string, EncounterRecord>;
+  unlocksGranted: string[];
+  unlocksSeen: string[];
+  dieSkin: string;
   stats: MetaStats;
 }
 
@@ -74,6 +105,8 @@ export interface RunAward {
 export interface MetaState extends MetaValues {
   unlockCodex: (id: string) => boolean;
   markCodexRead: (id: string) => void;
+  markPuzzleSeen: (id: string) => void;
+  markFragmentSeen: (id: string) => void;
   markAllCodexRead: () => void;
   awardRun: (xpGain: number, shardGain: number, win: boolean) => RunAward;
   addShards: (n: number) => void;
@@ -93,7 +126,7 @@ export interface MetaState extends MetaValues {
   awardBadge: (id: string) => boolean;
   archiveRunFlags: (flags: readonly string[]) => void;
   recordBossFirstKill: (bossId: string) => boolean;
-  recordEnding: (endingId: string) => void;
+  recordEnding: (endingId: string) => boolean;
   markPrologueDone: () => void;
   recordCampaignClear: (ascension: number) => void;
   recordContractStars: (id: string, mask: number) => number;
@@ -101,9 +134,19 @@ export interface MetaState extends MetaValues {
   recordDaily: (date: string, score: number, rank: number | null) => void;
   recordDriftScore: (score: number, week: string) => boolean;
   bumpLifetime: (delta: Partial<MetaStats>) => void;
+  unlockAchievement: (id: string) => boolean;
+  markAchievementsSeen: (ids: readonly string[]) => void;
+  grantUnlock: (id: string) => boolean;
+  markUnlocksSeen: (ids: readonly string[]) => void;
+  recordEncounters: (list: readonly RunEncounter[]) => EncounterResult;
+  setDieSkin: (id: string) => void;
+  recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 7;
+export const META_VERSION = 11;
+
+export const SEEN_PUZZLE_MEMORY = 40;
+export const SEEN_FRAGMENT_MEMORY = 60;
 
 export const SMOTRITEL_BADGE = 'keeper';
 
@@ -129,6 +172,12 @@ export const createInitialMetaStats = (): MetaStats => ({
   driftRuns: 0,
   dailyRuns: 0,
   contractRuns: 0,
+  elites: 0,
+  t5Solved: 0,
+  beacons: 0,
+  deepClears: 0,
+  noDeathStreak: 0,
+  bestNoDeathStreak: 0,
 });
 
 const LIFETIME_KEYS = [
@@ -141,6 +190,10 @@ const LIFETIME_KEYS = [
   "driftRuns",
   "dailyRuns",
   "contractRuns",
+  "elites",
+  "t5Solved",
+  "beacons",
+  "deepClears",
 ] as const;
 
 const createInitialMetaValues = (): MetaValues => ({
@@ -158,6 +211,8 @@ const createInitialMetaValues = (): MetaValues => ({
   badges: [],
   codex: [],
   codexRead: [],
+  seenPuzzles: [],
+  seenFragments: [],
   contracts: {},
   dailyPlayed: {},
   best: {
@@ -171,8 +226,33 @@ const createInitialMetaValues = (): MetaValues => ({
   flagsArchive: [],
   bossFirstKills: [],
   endings: [],
+  achievements: [],
+  achievementsSeen: [],
+  encountered: {},
+  unlocksGranted: [],
+  unlocksSeen: [],
+  dieSkin: DEFAULT_DIE_SKIN,
   stats: createInitialMetaStats(),
 });
+
+const coerceEncountered = (value: unknown): Record<string, EncounterRecord> => {
+  if (typeof value !== "object" || value === null) return {};
+  const out: Record<string, EncounterRecord> = {};
+  for (const [defId, raw] of Object.entries(value as Record<string, unknown>)) {
+    if (typeof raw !== "object" || raw === null) continue;
+    const rec = raw as Partial<EncounterRecord>;
+    out[defId] = {
+      sector: typeof rec.sector === "number" ? rec.sector : 1,
+      node: typeof rec.node === "string" ? rec.node : "battle",
+    };
+  }
+  return out;
+};
+
+const coerceStrings = (value: unknown, base: string[]): string[] =>
+  Array.isArray(value)
+    ? value.filter((id): id is string => typeof id === "string")
+    : base;
 
 const coerceCollection = (value: unknown): CollectionEntry[] => {
   if (!Array.isArray(value)) return buildStarterCollection();
@@ -208,8 +288,6 @@ const coerceDailyPlayed = (value: unknown): Record<string, DailyRecord> => {
   return out;
 };
 
-// v5 → v6: engravings and badges are new; anything that is not a clean
-// defId → string[] map is dropped rather than half-restored.
 const coerceEngravings = (value: unknown): Record<string, string[]> => {
   if (typeof value !== 'object' || value === null) return {};
   const out: Record<string, string[]> = {};
@@ -283,6 +361,12 @@ export const migrateMeta = (
     badges: Array.isArray(prev.badges) ? prev.badges : base.badges,
     codex: Array.isArray(prev.codex) ? prev.codex : base.codex,
     codexRead: Array.isArray(prev.codexRead) ? prev.codexRead : base.codexRead,
+    seenFragments: Array.isArray(prev.seenFragments)
+      ? prev.seenFragments.slice(-SEEN_FRAGMENT_MEMORY)
+      : base.seenFragments,
+    seenPuzzles: Array.isArray(prev.seenPuzzles)
+      ? prev.seenPuzzles.slice(-SEEN_PUZZLE_MEMORY)
+      : base.seenPuzzles,
     contracts:
       typeof prev.contracts === 'object' && prev.contracts !== null
         ? (prev.contracts as Record<string, number>)
@@ -302,6 +386,15 @@ export const migrateMeta = (
       ? prev.bossFirstKills
       : base.bossFirstKills,
     endings: Array.isArray(prev.endings) ? prev.endings : base.endings,
+    achievements: coerceStrings(prev.achievements, base.achievements),
+    achievementsSeen: coerceStrings(
+      prev.achievementsSeen,
+      base.achievementsSeen,
+    ),
+    encountered: coerceEncountered(prev.encountered),
+    unlocksGranted: coerceStrings(prev.unlocksGranted, base.unlocksGranted),
+    unlocksSeen: coerceStrings(prev.unlocksSeen, base.unlocksSeen),
+    dieSkin: isDieSkinId(prev.dieSkin) ? prev.dieSkin : base.dieSkin,
     stats:
       typeof prev.stats === 'object' && prev.stats !== null
         ? { ...base.stats, ...(prev.stats as Partial<MetaStats>) }
@@ -323,6 +416,32 @@ export const useMetaStore = create<MetaState>()(
       markCodexRead: (id) => {
         set((s) =>
           s.codexRead.includes(id) ? s : { codexRead: [...s.codexRead, id] },
+        );
+      },
+
+      markPuzzleSeen: (id) => {
+        set((s) =>
+          s.seenPuzzles[s.seenPuzzles.length - 1] === id
+            ? s
+            : {
+                seenPuzzles: [
+                  ...s.seenPuzzles.filter((seen) => seen !== id),
+                  id,
+                ].slice(-SEEN_PUZZLE_MEMORY),
+              },
+        );
+      },
+
+      markFragmentSeen: (id) => {
+        set((s) =>
+          s.seenFragments[s.seenFragments.length - 1] === id
+            ? s
+            : {
+                seenFragments: [
+                  ...s.seenFragments.filter((seen) => seen !== id),
+                  id,
+                ].slice(-SEEN_FRAGMENT_MEMORY),
+              },
         );
       },
 
@@ -353,7 +472,10 @@ export const useMetaStore = create<MetaState>()(
 
       addShards: (n) => {
         if (n <= 0) return;
-        set((s) => ({ shards: s.shards + n }));
+        set((s) => ({
+          shards: s.shards + n,
+          stats: { ...s.stats, shardsEarned: s.stats.shardsEarned + n },
+        }));
       },
 
       spendShards: (n) => {
@@ -431,8 +553,6 @@ export const useMetaStore = create<MetaState>()(
         set({ tutorialSeen: [] });
       },
 
-      // Engravings are keyed by die definition (Phase-10 amendment 3): the
-      // collection has no per-copy identity to hang one on.
       engrave: (defId, engravingId, price) => {
         const current = get().engravings[defId] ?? [];
         if (current.includes(engravingId)) return false;
@@ -480,11 +600,9 @@ export const useMetaStore = create<MetaState>()(
       },
 
       recordEnding: (endingId) => {
-        set((s) =>
-          s.endings.includes(endingId)
-            ? s
-            : { endings: [...s.endings, endingId] },
-        );
+        if (get().endings.includes(endingId)) return false;
+        set((s) => ({ endings: [...s.endings, endingId] }));
+        return true;
       },
 
       markPrologueDone: () => {
@@ -500,8 +618,6 @@ export const useMetaStore = create<MetaState>()(
         }));
       },
 
-      // Stars are a 3-bit mask and only ever accumulate, so a replay of a
-      // contract already three-starred grants no XP.
       recordContractStars: (id, mask) => {
         const previous = get().contracts[id] ?? 0;
         const gained = mask & ~previous;
@@ -573,6 +689,71 @@ export const useMetaStore = create<MetaState>()(
           return { stats };
         });
       },
+
+      unlockAchievement: (id) => {
+        if (get().achievements.includes(id)) return false;
+        set((s) => ({ achievements: [...s.achievements, id] }));
+        return true;
+      },
+
+      markAchievementsSeen: (ids) => {
+        set((s) => ({
+          achievementsSeen: [...new Set([...s.achievementsSeen, ...ids])],
+        }));
+      },
+
+      grantUnlock: (id) => {
+        if (get().unlocksGranted.includes(id)) return false;
+        set((s) => ({ unlocksGranted: [...s.unlocksGranted, id] }));
+        return true;
+      },
+
+      markUnlocksSeen: (ids) => {
+        set((s) => ({
+          unlocksSeen: [...new Set([...s.unlocksSeen, ...ids])],
+        }));
+      },
+
+      recordEncounters: (list) => {
+        const known = get().encountered;
+        const firstFinds: string[] = [];
+        const added: Record<string, EncounterRecord> = {};
+        for (const entry of list) {
+          if (known[entry.defId] !== undefined) continue;
+          if (added[entry.defId] !== undefined) continue;
+          added[entry.defId] = { sector: entry.sector, node: entry.node };
+          firstFinds.push(entry.defId);
+        }
+        if (firstFinds.length === 0) return { firstFinds: [], shards: 0 };
+        const shards = firstFinds.reduce((sum, defId) => {
+          const rarity = DIE_BY_ID.get(defId)?.rarity ?? 'common';
+          return sum + (FIRST_FIND_SHARDS[rarity] ?? 0);
+        }, 0);
+        set((s) => ({
+          encountered: { ...s.encountered, ...added },
+          shards: s.shards + shards,
+          stats: { ...s.stats, shardsEarned: s.stats.shardsEarned + shards },
+        }));
+        return { firstFinds, shards };
+      },
+
+      setDieSkin: (id) => {
+        if (!isDieSkinId(id)) return;
+        set({ dieSkin: id });
+      },
+
+      recordStreak: (win) => {
+        set((s) => {
+          const streak = win ? s.stats.noDeathStreak + 1 : 0;
+          return {
+            stats: {
+              ...s.stats,
+              noDeathStreak: streak,
+              bestNoDeathStreak: Math.max(s.stats.bestNoDeathStreak, streak),
+            },
+          };
+        });
+      },
     }),
     {
       name: 'ca.meta',
@@ -593,6 +774,8 @@ export const useMetaStore = create<MetaState>()(
         badges: s.badges,
         codex: s.codex,
         codexRead: s.codexRead,
+        seenPuzzles: s.seenPuzzles,
+        seenFragments: s.seenFragments,
         contracts: s.contracts,
         dailyPlayed: s.dailyPlayed,
         best: s.best,
@@ -600,18 +783,14 @@ export const useMetaStore = create<MetaState>()(
         flagsArchive: s.flagsArchive,
         bossFirstKills: s.bossFirstKills,
         endings: s.endings,
+        achievements: s.achievements,
+        achievementsSeen: s.achievementsSeen,
+        encountered: s.encountered,
+        unlocksGranted: s.unlocksGranted,
+        unlocksSeen: s.unlocksSeen,
+        dieSkin: s.dieSkin,
         stats: s.stats,
       }),
     },
   ),
 );
-
-declare global {
-  interface Window {
-    __meta?: typeof useMetaStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== 'undefined') {
-  window.__meta = useMetaStore;
-}

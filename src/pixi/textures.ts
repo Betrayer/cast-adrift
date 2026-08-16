@@ -9,9 +9,11 @@ import type { Application, Renderer, Texture } from "pixi.js";
 import { registerTextureUsage } from "@/pixi/perf";
 import { mixHex } from "@/app/color";
 import { currentTheme, tokens } from "@/app/theme";
+import { DIE_SKIN_BY_ID, dieSkinStyle } from "@/data/cosmetics";
 import { schoolGlyphPath } from "@/data/glyphs";
 import { schools } from "@/data/schools";
 import { fnv1a, mulberry32 } from "@/services/rng";
+import { useMetaStore } from "@/stores/metaStore";
 import type { DieTier, School } from "@/types/content";
 
 export const PIXI_FONT_FAMILY =
@@ -36,7 +38,7 @@ interface CacheEntry {
   bytes: number;
 }
 
-export interface TextureStats {
+interface TextureStats {
   built: number;
   evicted: number;
   live: number;
@@ -46,12 +48,9 @@ export interface TextureStats {
 const caches = new WeakMap<Renderer, Map<string, CacheEntry>>();
 const stats: TextureStats = { built: 0, evicted: 0, live: 0, bytes: 0 };
 
-export const textureStats = (): TextureStats => ({ ...stats });
 
 registerTextureUsage(() => ({ live: stats.live, bytes: stats.bytes }));
 
-// School identity has to survive Terminal's monochrome palette and every kind
-// of colour blindness, so each school also carries a shape (DESIGN a11y pass).
 export const drawSchoolGlyph = (
   g: Graphics,
   school: School,
@@ -66,8 +65,6 @@ export const drawSchoolGlyph = (
   else g.fill(color);
 };
 
-// Speckle stays inside the corner radius by construction — cheaper and more
-// predictable than masking the whole face during generateTexture.
 const paintNoise = (
   g: Graphics,
   seed: number,
@@ -120,7 +117,9 @@ export const dieTexture = (
 ): Texture => {
   const { school, tier, value } = options;
   const theme = currentTheme();
-  const style = theme.dieStyle;
+  const skinId = useMetaStore.getState().dieSkin;
+  const style = dieSkinStyle(theme.dieStyle, skinId);
+  const skinEdge = DIE_SKIN_BY_ID.get(skinId)?.edge;
   const engraved = options.engraved === true;
   const growth = options.growth ?? 0;
   const hasActive = options.hasActive === true;
@@ -130,6 +129,7 @@ export const dieTexture = (
   const cache = cacheFor(app.renderer);
   const key = [
     theme.id,
+    skinId,
     school,
     tier,
     value,
@@ -167,7 +167,10 @@ export const dieTexture = (
   const box = new Graphics()
     .roundRect(inset, inset, size - style.strokeW, size - style.strokeW, radius)
     .fill(gradient)
-    .stroke({ color: colors.stroke, width: style.strokeW });
+    .stroke({
+      color: skinEdge ?? colors.stroke,
+      width: style.strokeW,
+    });
 
   const noise = new Graphics();
   paintNoise(noise, fnv1a(defId), size, style.noise, colors.text);
@@ -216,7 +219,6 @@ export const dieTexture = (
     root.addChild(dot);
   }
 
-  // Engraved dice wear a corner rune: a notched chevron in the school stroke.
   if (engraved) {
     const r = size * 0.17;
     const runeInset = size * 0.13;
@@ -256,8 +258,6 @@ export const releaseDieTextures = (app: Application): void => {
   stats.bytes = 0;
 };
 
-// A theme switch invalidates every cached face; the scene rebuilds right
-// after, so dropping the whole map is cheaper than keying around it.
 export const clearDieTextureCache = (app: Application): void => {
   const cache = caches.get(app.renderer);
   if (cache === undefined) return;

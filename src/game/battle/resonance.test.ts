@@ -4,6 +4,7 @@ import {
   harnessEnemy,
   harnessSnap,
   place,
+  startedSnap,
 } from "@/game/battle/battleHarness";
 import { canCopy } from "@/game/battle/actives";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
@@ -12,13 +13,16 @@ import { applyRollFloors } from "@/game/battle/rollFloors";
 import { BattleCtx } from "@/game/effects/context";
 import { buildSources, emit } from "@/game/effects/pipeline";
 import { createStream } from "@/services/rng";
-import { grantsFromCensus } from "@/stores/battleStore";
+import { grantsOf } from "@/stores/battleStore";
 import type { RolledDie } from "@/types/battle";
 
 const filler = (defId: string, n: number): RolledDie[] =>
   Array.from({ length: n }, (_, i) =>
     harnessDie(`${defId}-${String(i)}`, defId),
   );
+
+const grantsFor = (defId: string, n: number) =>
+  grantsOf(startedSnap(filler(defId, n)));
 
 const weaponBeats = (dice: RolledDie[], placeUid: string, slot: "weaponA") => {
   const snap = harnessSnap(dice);
@@ -83,7 +87,7 @@ describe("blue resonance", () => {
   });
 
   it("blue-4: blue shields persist through the enemy turn reset", () => {
-    const snap = harnessSnap(filler("frostplate", 4), {
+    const snap = harnessSnap(filler("blue-d6", 4), {
       enemies: [harnessEnemy({ nextIntent: { t: "charge" } })],
     });
     const first = snap.dice[0];
@@ -150,6 +154,28 @@ describe("green resonance", () => {
     const { next } = resolvePlayerPhase(snap);
     expect(next.dice.find((d) => d.uid === "g")?.growth).toBe(1);
   });
+
+  it("green-6 and a field-growth die keep the higher ceiling, not the lower", () => {
+    const grow = (perks: string[], turns: number): number => {
+      let snap = harnessSnap(
+        [harnessDie("s", "sprout", 4), ...filler("green-d4", 5)],
+        { perks },
+      );
+      for (let turn = 0; turn < turns; turn += 1) {
+        const die = snap.dice.find((d) => d.uid === "s");
+        if (die === undefined) throw new Error("no sprout");
+        die.value = 6 + (die.growth ?? 0);
+        die.state = "tray";
+        die.slot = undefined;
+        for (const slot of Object.values(snap.slots)) slot.dieUid = undefined;
+        place(snap, "s", "sensors");
+        snap = resolvePlayerPhase(snap).next;
+      }
+      return snap.dice.find((d) => d.uid === "s")?.growth ?? 0;
+    };
+    expect(grow([], 5)).toBe(3);
+    expect(grow(["overgrowthPact"], 5)).toBe(4);
+  });
 });
 
 describe("yellow resonance", () => {
@@ -170,9 +196,7 @@ describe("yellow resonance", () => {
   });
 
   it("yellow-6: grants +1 reroll die", () => {
-    expect(
-      grantsFromCensus(computeCensus(filler("yellow-d6", 6))).rerollBase,
-    ).toBe(3);
+    expect(grantsFor("yellow-d6", 6).rerollBase).toBe(3);
   });
 });
 
@@ -182,7 +206,7 @@ describe("black resonance", () => {
       harnessDie("o", "obsidian", 8),
       harnessDie("f", "black-d6", 3),
     ];
-    const snap = harnessSnap(dice);
+    const snap = startedSnap(dice);
     expect(resonanceAtLeast(snap.resonance, "black", 2)).toBe(true);
     place(snap, "o", "engines");
     const { next } = resolvePlayerPhase(snap);
@@ -216,9 +240,7 @@ describe("black resonance", () => {
 
 describe("grey and prismatic resonance", () => {
   it("grey-2: reroll capacity rises to 3", () => {
-    expect(
-      grantsFromCensus(computeCensus(filler("grey-d4", 3))).rerollBase,
-    ).toBe(3);
+    expect(grantsFor("grey-d4", 3).rerollBase).toBe(3);
   });
 
   it("grey-4: grey dice may copy an adjacent value", () => {
@@ -228,14 +250,10 @@ describe("grey and prismatic resonance", () => {
   });
 
   it("grey-6: reserve capacity +1", () => {
-    expect(
-      grantsFromCensus(computeCensus(filler("grey-d4", 6))).reserveCap,
-    ).toBe(2);
+    expect(grantsFor("grey-d4", 6).reserveCap).toBe(2);
   });
 
   it("prismatic-2: +1 free nudge per battle", () => {
-    expect(
-      grantsFromCensus(computeCensus(filler("coreshard", 2))).freeNudges,
-    ).toBe(1);
+    expect(grantsFor("coreshard", 2).freeNudges).toBe(1);
   });
 });

@@ -29,7 +29,8 @@
     "active": "Активна",
     "owned": "Відкрита",
     "unlock": "Відкрити",
-    "price": "{{n}} уламків"
+    "price": "{{n}} уламків",
+    "ascendant": "Вознесений"
   },
   "diagnostics": {
     "version": "Збірка {{version}}",

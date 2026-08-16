@@ -40,9 +40,6 @@ const describe = (reason: unknown): { message: string; stack: string } => {
   return { message: clip(String(reason), MESSAGE_LIMIT), stack: "" };
 };
 
-// Deliberately cheap and lossy: a crash loop must not turn into a write loop
-// against a free-tier Firestore quota. Five reports per session, one per ten
-// seconds, and never the same message on the same screen twice.
 const shouldSend = (report: ErrorReport): boolean => {
   const key = `${report.message}@${report.screen}`;
   if (seen.has(key)) return false;
@@ -67,9 +64,7 @@ const push = async (report: ErrorReport): Promise<void> => {
       screen: report.screen,
       version: report.version,
     });
-  } catch {
-    /* reporting an error must never raise one */
-  }
+  } catch {}
 };
 
 export const reportError = (reason: unknown): void => {

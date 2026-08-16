@@ -2,11 +2,18 @@ import { create } from "zustand";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import {
+  adjacentCopyValue,
+  canBank,
   canCopy,
   canFlip,
-  adjacentCopyValue,
+  canSplit,
+  canSwap,
   flippedValue,
+  isSwapTarget,
+  SPLIT_DIE_COUNT,
+  SPLIT_DIE_DEF,
 } from "@/game/battle/actives";
+import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import {
   advanceTurn,
@@ -40,7 +47,12 @@ import {
   type StreamStates,
 } from "@/services/rng";
 import { computeRunMods, runHasTrait } from "@/game/run/runMods";
-import { applyDefs, BattleCtx } from "@/game/effects";
+import { applyActions, BattleCtx, buildSources, emit } from "@/game/effects";
+import type {
+  ExceedCapGrant,
+  GrantKey,
+  ScheduledEffect,
+} from "@/game/effects/types";
 import { recordAction } from "@/game/run/actionLog";
 import { useRunStore, type BattleTally } from "@/stores/runStore";
 import type { School } from "@/types/content";
@@ -50,6 +62,7 @@ import type {
   BattleSnapshot,
   Beat,
   BlockedSlot,
+  CursedDie,
   EnemyBeat,
   EnemyState,
   EngineTier,
@@ -72,18 +85,23 @@ export interface BattleEncounter {
   mutators?: readonly string[];
   modules?: readonly string[];
   engravings?: EngravingMap;
+  flags?: readonly string[];
+  runCounters?: Readonly<Record<string, number>>;
   hull?: number;
   hullMax?: number;
+  runScrap?: number;
   chargeCap?: number;
   startCharge?: number;
   rerollSizeBonus?: number;
   ascension?: number;
+  sectorHpPct?: number;
   enemyHpBonusPct?: number;
-  gateHpBonusPct?: number;
   eliteShield?: number;
   resonanceBoost?: ResonanceBoost;
   slotTierDelta?: Partial<Record<SlotId, number>>;
   disabledSlots?: readonly SlotId[];
+  inverted?: boolean;
+  nodeStorm?: boolean;
   forcedTraits?: readonly PerkTrait[];
   scriptedSlots?: readonly (readonly SlotId[])[];
 }
@@ -98,13 +116,22 @@ export interface BattleValues {
   shieldPersist: number;
   charge: number;
   scrap: number;
+  runScrap: number;
   tide: number;
+  sectorHpPct: number;
+  enemyHpPct: number;
   interference: number;
   perks: string[];
   chartPicks: string[];
   mutators: string[];
   modules: string[];
   engravings: EngravingMap;
+  flags: string[];
+  counters: Record<string, number>;
+  runCounters: Record<string, number>;
+  exceedCap: ExceedCapGrant[];
+  scheduled: ScheduledEffect[];
+  grants: Partial<Record<GrantKey, number>>;
   forcedTraits: PerkTrait[];
   chargeCap: number;
   sacrificePool: number;
@@ -120,6 +147,7 @@ export interface BattleValues {
   reserveCap: number;
   freeNudges: number;
   selectedDieUid: string | null;
+  swapSourceUid: string | null;
   enemies: EnemyState[];
   targetId: string | null;
   engineState: EngineTier | null;
@@ -129,6 +157,8 @@ export interface BattleValues {
   blockedSlots: BlockedSlot[];
   shrunkSlots: BlockedSlot[];
   lockedDice: LockedDie[];
+  cursedDice: CursedDie[];
+  pendingHijack: number;
   resonance: ResonanceCensus;
   survivedLethal: boolean;
   lastPlayerDamage: number;
@@ -137,6 +167,9 @@ export interface BattleValues {
   pendingSwap: number;
   pendingStorm: number;
   ascension: number;
+  inverted: boolean;
+  nodeStorm: boolean;
+  foldedTurns: number;
   overflowShieldUsed: boolean;
   pierceUsed: boolean;
   fateUses: number;
@@ -184,6 +217,10 @@ export interface BattleState extends BattleValues {
   sacrificeDie: (uid: string) => void;
   flipDie: (uid: string) => void;
   copyDie: (uid: string) => void;
+  beginSwap: (uid: string) => void;
+  cancelSwap: () => void;
+  bankDie: (uid: string) => void;
+  splitDie: (uid: string) => void;
   rollFate: () => void;
   clearFateResult: () => void;
   toggleRerollMode: () => void;
@@ -205,6 +242,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   shieldPersist: 0,
   charge: 0,
   scrap: 0,
+  runScrap: 0,
   tide: 0,
   interference: 0,
   perks: [],
@@ -212,6 +250,14 @@ export const createInitialBattleValues = (): BattleValues => ({
   mutators: [],
   modules: [],
   engravings: {},
+  flags: [],
+  counters: {},
+  runCounters: {},
+  exceedCap: [],
+  sectorHpPct: 0,
+  enemyHpPct: 0,
+  scheduled: [],
+  grants: {},
   forcedTraits: [],
   chargeCap: DEFAULT_CHARGE_CAP,
   sacrificePool: 0,
@@ -236,6 +282,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   blockedSlots: [],
   shrunkSlots: [],
   lockedDice: [],
+  cursedDice: [],
+  pendingHijack: 0,
   resonance: computeCensus([]),
   survivedLethal: false,
   lastPlayerDamage: 0,
@@ -243,7 +291,11 @@ export const createInitialBattleValues = (): BattleValues => ({
   pendingTwist: 0,
   pendingSwap: 0,
   pendingStorm: 0,
+  swapSourceUid: null,
   ascension: 0,
+  inverted: false,
+  nodeStorm: false,
+  foldedTurns: 0,
   overflowShieldUsed: false,
   pierceUsed: false,
   fateUses: 0,
@@ -271,7 +323,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   debugNextRoll: null,
 });
 
-const toSnapshot = (s: BattleState): BattleSnapshot => ({
+export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   turn: s.turn,
   hull: s.hull,
   hullMax: s.hullMax,
@@ -279,6 +331,7 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   shieldPersist: s.shieldPersist,
   charge: s.charge,
   scrap: s.scrap,
+  runScrap: s.runScrap,
   tide: s.tide,
   interference: s.interference,
   perks: s.perks,
@@ -286,6 +339,12 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   mutators: s.mutators,
   modules: s.modules,
   engravings: s.engravings,
+  flags: s.flags,
+  counters: s.counters,
+  runCounters: s.runCounters,
+  exceedCap: s.exceedCap,
+  scheduled: s.scheduled,
+  grants: s.grants,
   shipId: s.shipId,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
@@ -302,6 +361,8 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
+  cursedDice: s.cursedDice,
+  pendingHijack: s.pendingHijack,
   resonance: s.resonance,
   survivedLethal: s.survivedLethal,
   lastPlayerDamage: s.lastPlayerDamage,
@@ -310,6 +371,11 @@ const toSnapshot = (s: BattleState): BattleSnapshot => ({
   pendingSwap: s.pendingSwap,
   pendingStorm: s.pendingStorm,
   ascension: s.ascension,
+  sectorHpPct: s.sectorHpPct,
+  enemyHpPct: s.enemyHpPct,
+  inverted: s.inverted,
+  nodeStorm: s.nodeStorm,
+  foldedTurns: s.foldedTurns,
   overflowShieldUsed: s.overflowShieldUsed,
   pierceUsed: s.pierceUsed,
   outcome: s.outcome,
@@ -323,6 +389,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   shieldPersist: snap.shieldPersist,
   charge: snap.charge,
   scrap: snap.scrap,
+  runScrap: snap.runScrap,
   tide: snap.tide,
   interference: snap.interference,
   perks: snap.perks,
@@ -330,6 +397,12 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   mutators: snap.mutators ?? [],
   modules: snap.modules ?? [],
   engravings: snap.engravings ?? {},
+  flags: snap.flags ?? [],
+  counters: snap.counters ?? {},
+  runCounters: snap.runCounters ?? {},
+  exceedCap: snap.exceedCap ?? [],
+  scheduled: snap.scheduled ?? [],
+  grants: snap.grants ?? {},
   chargeCap: snap.chargeCap,
   sacrificePool: snap.sacrificePool,
   bloodReactorUsed: snap.bloodReactorUsed,
@@ -345,6 +418,8 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   blockedSlots: snap.blockedSlots,
   shrunkSlots: snap.shrunkSlots,
   lockedDice: snap.lockedDice,
+  cursedDice: snap.cursedDice ?? [],
+  pendingHijack: snap.pendingHijack ?? 0,
   resonance: snap.resonance,
   survivedLethal: snap.survivedLethal,
   lastPlayerDamage: snap.lastPlayerDamage,
@@ -353,10 +428,20 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pendingSwap: snap.pendingSwap,
   pendingStorm: snap.pendingStorm,
   ascension: snap.ascension,
+  sectorHpPct: snap.sectorHpPct,
+  enemyHpPct: snap.enemyHpPct,
+  inverted: snap.inverted === true,
+  nodeStorm: snap.nodeStorm === true,
+  foldedTurns: snap.foldedTurns ?? 0,
   overflowShieldUsed: snap.overflowShieldUsed ?? false,
   pierceUsed: snap.pierceUsed ?? false,
   outcome: snap.outcome,
 });
+
+const syncSnapshotFlags = (snapshot: BattleSnapshot, ctx: BattleCtx): void => {
+  if (ctx.flags.size === (snapshot.flags?.length ?? 0)) return;
+  snapshot.flags = [...ctx.flags];
+};
 
 const applyDebugRoll = (
   dice: RolledDie[],
@@ -374,8 +459,6 @@ const applyDebugRoll = (
     };
   });
 
-// Prologue overrides (Phase-8 Task 4): a per-turn allow-list of slots, applied at
-// the store boundary so the resolver stays a single engine.
 export const allowedSlotsForTurn = (
   scriptedSlots: readonly (readonly SlotId[])[] | null,
   turn: number,
@@ -399,9 +482,6 @@ interface TurnTally {
   burnKilledElite: boolean;
 }
 
-// Contract goals count things no other system tracks (shields absorbed, the
-// biggest Spinal hit, a burn tick that finished an elite). The beats already
-// carry every number, so the counters read them instead of touching the resolver.
 export const tallyBundle = (bundle: ResolutionBundle): TurnTally => {
   let shieldAbsorbed = 0;
   let repairBayHealed = 0;
@@ -451,15 +531,12 @@ const SET_SCHOOLS: readonly School[] = [
   "grey",
 ];
 
-export const grantsFromCensus = (
-  census: ResonanceCensus,
+export const grantsOf = (
+  snapshot: Pick<BattleSnapshot, "grants">,
 ): { rerollBase: number; reserveCap: number; freeNudges: number } => ({
-  rerollBase:
-    BASE_REROLL_SIZE +
-    (resonanceAtLeast(census, "grey", 2) ? 1 : 0) +
-    (resonanceAtLeast(census, "yellow", 6) ? 1 : 0),
-  reserveCap: resonanceAtLeast(census, "grey", 6) ? 2 : 1,
-  freeNudges: resonanceAtLeast(census, "prismatic", 2) ? 1 : 0,
+  rerollBase: BASE_REROLL_SIZE + (snapshot.grants?.rerollSize ?? 0),
+  reserveCap: 1 + (snapshot.grants?.reserve ?? 0),
+  freeNudges: snapshot.grants?.nudge ?? 0,
 });
 
 export const useBattleStore = create<BattleState>()((set, get) => ({
@@ -484,32 +561,33 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         mutators: encounter.mutators,
         modules: encounter.modules,
         engravings: encounter.engravings,
+        flags: encounter.flags,
+        runCounters: encounter.runCounters,
         hull: encounter.hull,
         hullMax: encounter.hullMax,
+        runScrap: encounter.runScrap,
         chargeCap: encounter.chargeCap,
         ascension: encounter.ascension,
+        sectorHpPct: encounter.sectorHpPct,
         enemyHpBonusPct: encounter.enemyHpBonusPct,
-        gateHpBonusPct: encounter.gateHpBonusPct,
         eliteShield: encounter.eliteShield,
         resonanceBoost: encounter.resonanceBoost,
         slotTierDelta: encounter.slotTierDelta,
         disabledSlots: encounter.disabledSlots,
+        inverted: encounter.inverted,
+        nodeStorm: encounter.nodeStorm,
       },
     );
-    const grants = grantsFromCensus(snapshot.resonance);
     const perks = encounter.perks ?? [];
     const chartPicks = encounter.chartPicks ?? [];
     const modules = encounter.modules ?? [];
     const forcedTraits = encounter.forcedTraits ?? [];
     const mods = computeRunMods(perks, chartPicks, modules);
-    const rerollBase =
-      grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
     const passive = SHIP_BY_ID.get(shipId)?.passive;
     const scrapperScrap = passive?.kind === "scrapper" ? passive.scrap : 0;
     const singleCast =
       runHasTrait(perks, chartPicks, "singleCast", modules) ||
       forcedTraits.includes("singleCast");
-    // Resonator pays out once per completed 4-set the deck actually holds.
     const setCharge =
       mods.setCompleteCharge *
       SET_SCHOOLS.filter((school) =>
@@ -519,6 +597,20 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const def = ENEMY_BY_ID.get(e.defId);
       return def?.boss === true || def?.miniboss === true;
     });
+    snapshot.scrap = Math.max(
+      0,
+      snapshot.scrap + mods.battleStartScrap + scrapperScrap,
+    );
+    snapshot.charge = Math.max(
+      0,
+      Math.min(
+        snapshot.chargeCap,
+        snapshot.charge + (encounter.startCharge ?? 0) + setCharge,
+      ),
+    );
+    const grants = grantsOf(snapshot);
+    const rerollBase =
+      grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
     set({
       ...createInitialBattleValues(),
       ...fromSnapshot(snapshot),
@@ -535,12 +627,11 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       modules: [...modules],
       engravings: encounter.engravings ?? {},
       forcedTraits: [...forcedTraits],
-      scrap: mods.battleStartScrap + scrapperScrap,
-      charge: Math.min(
-        snapshot.chargeCap,
-        Math.max(0, (encounter.startCharge ?? 0) + setCharge),
-      ),
-      rerollsLeft: singleCast ? 0 : 1 + Math.max(0, mods.extraRerolls),
+      rerollsLeft: singleCast
+        ? 0
+        : 1 +
+          Math.max(0, mods.extraRerolls) +
+          (snapshot.grants?.rerollUses ?? 0),
       rerollSize: rerollBase,
       rerollBase,
       reserveCap: grants.reserveCap + mods.reserveDelta,
@@ -558,20 +649,28 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
       if (!slotAllowedThisTurn(s, slotId)) return s;
-      if (!canPlaceDie(toSnapshot(s), uid, slotId)) return s;
+      if (!canPlaceDie(battleSnapshot(s), uid, slotId)) return s;
       const slot = s.slots[slotId];
       if (slot === undefined) return s;
       const die = s.dice.find((d) => d.uid === uid);
       if (die !== undefined) {
         recordAction(`place:${die.defId}:${String(die.value)}:${slotId}`);
       }
-      return {
-        dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, state: "placed" as const, slot: slotId } : d,
-        ),
-        slots: { ...s.slots, [slotId]: { ...slot, dieUid: uid } },
-        selectedDieUid: null,
+      const snapshot = battleSnapshot(s);
+      snapshot.dice = s.dice.map((d) =>
+        d.uid === uid ? { ...d, state: "placed" as const, slot: slotId } : d,
+      );
+      snapshot.slots = { ...s.slots, [slotId]: { ...slot, dieUid: uid } };
+      snapshot.enemies = structuredClone(s.enemies);
+      const placed = snapshot.dice.find((d) => d.uid === uid);
+      const ctx = new BattleCtx(snapshot, snapshot.flags);
+      ctx.payload = {
+        slot: slotId,
+        ...(placed === undefined ? {} : { die: placed }),
       };
+      emit(buildSources(snapshot), "place", ctx);
+      syncSnapshotFlags(snapshot, ctx);
+      return { ...fromSnapshot(snapshot), selectedDieUid: null };
     });
   },
 
@@ -579,6 +678,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     set((s) => {
       if (s.phase !== "placement") return s;
       const die = s.dice.find((d) => d.uid === uid);
+      if (die?.pinned === true) return s;
       if (die?.state !== "placed" || die.slot === undefined) return s;
       const slot = s.slots[die.slot];
       if (slot === undefined) return s;
@@ -629,11 +729,89 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
   selectDie: (uid) => {
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
-      if (uid === null) return { selectedDieUid: null };
+      if (uid === null) return { selectedDieUid: null, swapSourceUid: null };
       const die = s.dice.find((d) => d.uid === uid);
       if (die === undefined) return s;
       if (die.state !== "tray" && die.state !== "placed") return s;
-      return { selectedDieUid: uid };
+      const source =
+        s.swapSourceUid === null
+          ? undefined
+          : s.dice.find((d) => d.uid === s.swapSourceUid);
+      if (source === undefined || !isSwapTarget(source, die)) {
+        return { selectedDieUid: uid };
+      }
+      return {
+        selectedDieUid: uid,
+        swapSourceUid: null,
+        dice: s.dice.map((d) =>
+          d.uid === source.uid
+            ? { ...d, value: die.value, activeUsed: true }
+            : d.uid === die.uid
+              ? { ...d, value: source.value }
+              : d,
+        ),
+      };
+    });
+  },
+
+  beginSwap: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canSwap(die)) return s;
+      return { swapSourceUid: uid };
+    });
+  },
+
+  cancelSwap: () => {
+    set({ swapSourceUid: null });
+  },
+
+  bankDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canBank(die)) return s;
+      return {
+        dice: s.dice.map((d) =>
+          d.uid === uid ? { ...d, bankedValue: d.value, activeUsed: true } : d,
+        ),
+      };
+    });
+  },
+
+  splitDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      if (s.streams === null) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canSplit(die)) return s;
+      const spawned: RolledDie[] = [];
+      for (let i = 0; i < SPLIT_DIE_COUNT; i += 1) {
+        const def = DIE_BY_ID.get(SPLIT_DIE_DEF);
+        if (def === undefined) break;
+        spawned.push({
+          uid: `${uid}-split${String(i)}`,
+          defId: SPLIT_DIE_DEF,
+          tier: def.tier,
+          school: def.school,
+          value: rollBaseValue(SPLIT_DIE_DEF, def.tier, s.streams.dice),
+          state: "tray",
+          temp: true,
+        });
+      }
+      if (spawned.length === 0) return s;
+      return {
+        selectedDieUid: null,
+        dice: [
+          ...s.dice.map((d) =>
+            d.uid === uid
+              ? { ...d, state: "burned" as const, slot: undefined, activeUsed: true }
+              : d,
+          ),
+          ...spawned,
+        ],
+      };
     });
   },
 
@@ -659,7 +837,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (die.state !== "tray" && die.state !== "placed") return s;
       const value = Math.min(die.tier, Math.max(1, die.value + dir));
       if (value === die.value) return s;
-      // The spring engraving spends its own once-per-battle nudge first.
       const springFree =
         dieHasGrant(s.engravings, die.defId, "freeNudge") &&
         !s.spentGrants.includes(`nudge:${uid}`);
@@ -767,8 +944,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     });
   },
 
-  // DESIGN section 7: the Fate die is never slotted. One button, one roll per
-  // battle, resolved through the ordinary Action vocabulary.
   rollFate: () => {
     const s = get();
     if (s.phase !== "placement" || s.rerollMode) return;
@@ -780,14 +955,12 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     if (!s.dice.some((d) => d.defId === FATE_DIE_ID)) return;
     const roll = s.streams.fate.int(1, 100);
     const outcome: FateOutcome = fateOutcomeFor(roll);
-    const snapshot = toSnapshot(s);
-    const ctx = new BattleCtx(snapshot);
-    applyDefs(
-      [{ on: "battleStart", do: [...outcome.do] }],
-      "battleStart",
-      ctx,
-      null,
-    );
+    const snapshot = battleSnapshot(s);
+    snapshot.enemies = structuredClone(s.enemies);
+    snapshot.blockedSlots = [...s.blockedSlots];
+    const ctx = new BattleCtx(snapshot, snapshot.flags);
+    applyActions(outcome.do, ctx);
+    syncSnapshotFlags(snapshot, ctx);
     snapshot.charge = Math.max(0, Math.min(snapshot.chargeCap, snapshot.charge));
     snapshot.scrap = Math.max(0, snapshot.scrap);
     set({
@@ -839,13 +1012,15 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       }
       const streams = s.streams;
       const blueFloor = resonanceAtLeast(s.resonance, "blue", 2);
-      // The edge engraving: a reroll made only of engraved dice is free.
       const free = s.rerollSelection.every((uid) => {
         const die = s.dice.find((d) => d.uid === uid);
         return (
           die !== undefined && dieHasGrant(s.engravings, die.defId, "freeReroll")
         );
       });
+      const taxed = s.enemies.some(
+        (e) => e.hp > 0 && ENEMY_BY_ID.get(e.defId)?.feedsOnReroll === true,
+      );
       return {
         dice: s.dice.map((d) => {
           if (!s.rerollSelection.includes(d.uid) || d.state !== "tray")
@@ -854,6 +1029,13 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
           if (blueFloor && d.school === "blue") value = Math.max(value, 2);
           return { ...d, value };
         }),
+        enemies: taxed
+          ? s.enemies.map((e) =>
+              e.hp > 0 && ENEMY_BY_ID.get(e.defId)?.feedsOnReroll === true
+                ? { ...e, statuses: { ...e.statuses, charge: 1 } }
+                : e,
+            )
+          : s.enemies,
         rerollsLeft: free ? s.rerollsLeft : s.rerollsLeft - 1,
         rerollsUsed: s.rerollsUsed + 1,
         rerollMode: false,
@@ -871,7 +1053,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       s.blackUsed + placed.filter((d) => d.school === "black").length;
     const blueUsed =
       s.blueUsed + placed.filter((d) => d.school === "blue").length;
-    const player = resolvePlayerPhase(toSnapshot(s));
+    const player = resolvePlayerPhase(battleSnapshot(s), s.streams.dice);
     let bundle: ResolutionBundle;
     if (player.next.outcome !== undefined) {
       bundle = {
@@ -945,6 +1127,14 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     if (final.pendingDeepScan) {
       useRunStore.setState({ pendingDeepScan: true });
     }
+    const run = useRunStore.getState();
+    for (const key of final.flags ?? []) {
+      if (run.flags[key] === undefined) run.setFlag(key);
+    }
+    for (const [key, value] of Object.entries(final.runCounters ?? {})) {
+      const delta = value - (run.counters[key] ?? 0);
+      if (delta !== 0) run.bumpCounter(key, delta);
+    }
     const canReroll =
       finalPhase === "placement" &&
       !runHasTrait(s.perks, s.chartPicks, "singleCast", s.modules) &&
@@ -958,7 +1148,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       pendingDeepScan: false,
       phase: finalPhase,
       resolution: null,
-      rerollsLeft: canReroll ? 1 + extra : 0,
+      rerollsLeft: canReroll ? 1 + extra + (final.grants?.rerollUses ?? 0) : 0,
       rerollSize: s.rerollBase,
     });
   },
@@ -989,6 +1179,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   shieldPersist: s.shieldPersist,
   charge: s.charge,
   scrap: s.scrap,
+  runScrap: s.runScrap,
   tide: s.tide,
   interference: s.interference,
   perks: s.perks,
@@ -996,6 +1187,12 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   mutators: s.mutators,
   modules: s.modules,
   engravings: s.engravings,
+  flags: s.flags,
+  counters: s.counters,
+  runCounters: s.runCounters,
+  exceedCap: s.exceedCap,
+  scheduled: s.scheduled,
+  grants: s.grants,
   forcedTraits: s.forcedTraits,
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
@@ -1020,6 +1217,8 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
+  cursedDice: s.cursedDice,
+  pendingHijack: s.pendingHijack,
   resonance: s.resonance,
   survivedLethal: s.survivedLethal,
   lastPlayerDamage: s.lastPlayerDamage,
@@ -1027,7 +1226,13 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   pendingTwist: s.pendingTwist,
   pendingSwap: s.pendingSwap,
   pendingStorm: s.pendingStorm,
+  swapSourceUid: s.swapSourceUid,
   ascension: s.ascension,
+  sectorHpPct: s.sectorHpPct,
+  enemyHpPct: s.enemyHpPct,
+  inverted: s.inverted,
+  nodeStorm: s.nodeStorm,
+  foldedTurns: s.foldedTurns,
   overflowShieldUsed: s.overflowShieldUsed,
   pierceUsed: s.pierceUsed,
   fateUses: s.fateUses,
@@ -1076,13 +1281,3 @@ export const hydrateBattle = (save: BattleSaveState): void => {
     useBattleStore.getState().finishResolution();
   }
 };
-
-declare global {
-  interface Window {
-    __battle?: typeof useBattleStore;
-  }
-}
-
-if (import.meta.env.DEV && typeof window !== "undefined") {
-  window.__battle = useBattleStore;
-}

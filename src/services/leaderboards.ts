@@ -51,9 +51,6 @@ export const onlyIfHigher = (board: string): boolean =>
 export const truncateName = (raw: string): string =>
   raw.trim().slice(0, NAME_MAX);
 
-// Mirrors firestore.rules for /leaderboards/{board}/entries/{uid}. The rules are
-// the enforcement; this is the pre-flight so an honest client never gets a write
-// rejected, and it is what the unit tests pin.
 export const entryValid = (entry: BoardEntry): boolean =>
   typeof entry.uid === "string" &&
   entry.uid.length > 0 &&
@@ -74,8 +71,6 @@ export const entryValid = (entry: BoardEntry): boolean =>
   typeof entry.ship === "string" &&
   entry.ship.length > 0;
 
-// Defence in depth: the viewer re-derives the bounds from the entry's own fields,
-// so a forged doc written straight to Firestore is still hidden here.
 export const entryHidden = (entry: BoardEntry, board: string): boolean => {
   if (entry.flagged === true) return true;
   if (boardKind(board) === "daily" && entry.state === "started") return true;
@@ -211,8 +206,6 @@ export const myEntry = async (
   }
 };
 
-// Rank comes from a count query, the window from two small range queries — never
-// from downloading the board.
 export const aroundMe = async (
   board: string,
   uid: string,

@@ -4,18 +4,20 @@ import {
   Divider,
   Group,
   Paper,
-  ScrollArea,
+  SimpleGrid,
   Stack,
   Text,
 } from "@mantine/core";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ascensionMods } from "@/data/ascension";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { schools } from "@/data/schools";
 import { playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import {
   DECK_CAP,
   ptsForDie,
@@ -23,16 +25,15 @@ import {
   SHOP_REROLL_COST,
 } from "@/game/economy/prices";
 import {
-  flagShopConsequence,
   flagShopDiscount,
   generateShopModules,
   generateShopStock,
 } from "@/game/economy/shop";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { autosaveRun, completeNode } from "@/game/run/flow";
+import { enterShop } from "@/game/run/shopEntry";
 import { computeRunMods } from "@/game/run/runMods";
 import { createStream, deriveSeed } from "@/services/rng";
-import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 
 export const ShopScreen = () => {
@@ -58,24 +59,7 @@ export const ShopScreen = () => {
   const slots = moduleSlots(computeRunMods(perks, chartPicks).moduleSlotDelta);
 
   useEffect(() => {
-    if (nodeId === "") return;
-    const state = useRunStore.getState();
-    const current = state.shop;
-    if (current !== null && current.nodeId === nodeId) return;
-    const pct =
-      computeRunMods(state.perks, state.chartPicks, state.modules)
-        .shopDiscountPct +
-      flagShopDiscount(state.flags) -
-      ascensionMods(state.ascension).shopPricePct;
-    state.setShop({
-      nodeId,
-      rerolls: 0,
-      items: generateShopStock(seed, nodeId, 0, pct),
-      modules: generateShopModules(seed, nodeId, 0, pct),
-    });
-    const conseq = flagShopConsequence(state.flags);
-    if (conseq !== null) useNarrativeStore.getState().pushConsequence(conseq);
-    autosaveRun();
+    if (enterShop(nodeId)) autosaveRun();
   }, [nodeId, seed]);
 
   const buy = (index: number): void => {
@@ -87,6 +71,7 @@ export const ShopScreen = () => {
     if (state.deck.length >= DECK_CAP || state.scrap < item.price) return;
     if (!state.spendScrap(item.price)) return;
     playSfx("buy");
+    haptic("purchase");
     state.addDie(item.defId);
     setShop({
       ...current,
@@ -110,6 +95,7 @@ export const ShopScreen = () => {
       return;
     }
     playSfx("buy");
+    haptic("purchase");
     setShop({
       ...current,
       modules: current.modules.map((it, i) =>
@@ -119,7 +105,6 @@ export const ShopScreen = () => {
     autosaveRun();
   };
 
-  // «Лотерейный блок» pays for the first reroll of every shop it visits.
   const rerollCost = (rerolls: number): number =>
     rerolls < mods.freeShopRerolls ? 0 : SHOP_REROLL_COST;
 
@@ -161,17 +146,23 @@ export const ShopScreen = () => {
     completeNode({ outcome: "cleared" });
   };
 
-  // The counter greeting is drawn from the node's own seed, so a reloaded save
-  // hears the same line (DESIGN §2.1, 40 keeper lines).
   const greeting = createStream(deriveSeed(seed, `keeper:${nodeId}`)).pick(
-    keeperLinesFor("shop"),
+    keeperLinesFor("shop", flags),
   );
   const items = shop?.items ?? [];
   const moduleItems = shop?.modules ?? [];
   const nextRerollCost = rerollCost(shop?.rerolls ?? 0);
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
+    <Screen
+      width="wide"
+      footer={
+        <Button size="md" fullWidth onClick={leave}>
+          {t("run:shop.leave")}
+        </Button>
+      }
+    >
+      <Stack gap="sm">
       <Group justify="space-between">
         <Text fw={600} c={tokens.text}>
           {t("run:shop.title")}
@@ -190,7 +181,7 @@ export const ShopScreen = () => {
         {t(greeting.text)}
       </Text>
 
-      <Group gap="sm" grow>
+      <SimpleGrid cols={{ base: 2, sm: 3 }} spacing="sm" maw={720}>
         {items.map((item, index) => {
           const def = DIE_BY_ID.get(item.defId);
           if (def === undefined) return null;
@@ -241,7 +232,7 @@ export const ShopScreen = () => {
             </Paper>
           );
         })}
-      </Group>
+      </SimpleGrid>
 
       <Divider
         color={tokens.line}
@@ -250,7 +241,7 @@ export const ShopScreen = () => {
           max: slots,
         })}
       />
-      <Group gap="sm" grow>
+      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" maw={720}>
         {moduleItems.map((item, index) => {
           const def = MODULE_BY_ID.get(item.moduleId);
           if (def === undefined) return null;
@@ -297,7 +288,7 @@ export const ShopScreen = () => {
             </Paper>
           );
         })}
-      </Group>
+      </SimpleGrid>
 
       <Button
         variant="default"
@@ -310,8 +301,7 @@ export const ShopScreen = () => {
       </Button>
 
       <Divider color={tokens.line} label={t("run:shop.sellTitle")} />
-      <ScrollArea.Autosize mah={200}>
-        <Group gap="xs">
+        <Group gap="xs" wrap="wrap">
           {deck.map((die) => {
             const def = DIE_BY_ID.get(die.defId);
             if (def === undefined) return null;
@@ -331,11 +321,7 @@ export const ShopScreen = () => {
             );
           })}
         </Group>
-      </ScrollArea.Autosize>
-
-      <Button size="md" mt="auto" onClick={leave}>
-        {t("run:shop.leave")}
-      </Button>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

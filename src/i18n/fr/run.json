@@ -21,11 +21,30 @@
     "jump": "Aller au nœud sélectionné",
     "jumpHint": "Sélectionnez un nœud accessible",
     "you": "Toi",
-    "boss": "Patron",
     "abandon": "Abandonner la course",
     "previewMiniboss": "Mini-boss : {{name}}",
     "previewBoss": "Boss : {{name}}",
-    "modules": "Modules {{used}} / {{max}}"
+    "modules": "Modules {{used}} / {{max}}",
+    "legend": "Légende",
+    "node": {
+      "battle": "Bataille",
+      "elite": "Élite",
+      "miniboss": "Mini-boss",
+      "shop": "Boutique",
+      "shipyard": "Chantier naval",
+      "event": "Événement",
+      "anomaly": "Anomalie",
+      "beacon": "Balise",
+      "boss": "Patron",
+      "inverted": "inversé"
+    },
+    "previewNode": "{{type}} · risque : {{risk}}",
+    "previewPocket": "Détour : un butin plus intéressant, un combat plus difficile",
+    "risk": {
+      "low": "faible",
+      "raised": "élevé",
+      "high": "élevé"
+    }
   },
   "event": {
     "title": "Signal",
@@ -48,26 +67,29 @@
     "pass": "Succès — {{total}}",
     "fail": "Échec — {{total}}",
     "roll": "Rouleau",
-    "back": "Retour"
+    "back": "Retour",
+    "reqAxisMin": "nécessite la version {{n}} ou une version ultérieure d'Axis",
+    "reqAxisMax": "nécessite la version {{n}} ou une version antérieure d'Axis",
+    "checkLowest": "Rien de plus haut que {{n}}",
+    "checkSchool": "{{school}} uniquement les dés",
+    "checkTierMin": "{{tier}}s et plus uniquement",
+    "checkTierMax": "{{tier}}s et moins uniquement",
+    "outcomeOdds": "cotes {{odds}}",
+    "beaconTitle": "Balise",
+    "beaconCounter": "Balise {{n}} de {{max}}"
   },
   "anomaly": {
     "title": "Anomalie",
     "goal": "Objectif",
     "resolve": "Résolution",
-    "retry": "Nouveau rouleau",
     "solved": "Résolu",
     "failed": "Pas encore — relancer le dé ou relancer une nouvelle fois",
-    "reward": "+ Déchet de{{n}}",
     "leave": "Partir",
     "tray": "Lancer de dés",
     "slots": "Systèmes",
     "rerolls": "Relances : {{n}}",
     "reroll": "Reroll ({{n}})",
-    "retryLeft": "Nouveau rouleau (à {{n}}, à gauche)",
-    "giveUp": "Plus de rouleaux neufs",
     "toMap": "Retour à la carte",
-    "outOfRollsTitle": "Anomalie non résolue",
-    "outOfRolls": "Il ne reste plus de nouveaux rouleaux. Départ de Stokes Résonance Interférence.",
     "rerollHint": "Choisissez jusqu’à {{n}} dés à relancer",
     "rerollCancel": "Annuler",
     "rerollConfirm": "Rejouer «{{k}} »",
@@ -87,7 +109,6 @@
     "carryReserved": "réservé d {{n}}",
     "carryNone": "rien pour l'instant",
     "reserve": "Réserve",
-    "reserved": "Réservé",
     "unreserve": "Sans réserve",
     "nextTurn": "Fin de virage",
     "reset": "Réinitialiser le placement",
@@ -129,7 +150,37 @@
       "damage": "dégâts",
       "charge": "frais",
       "shield": "bouclier"
-    }
+    },
+    "tierName": {
+      "1": "valeur faible",
+      "2": "lecture continue",
+      "3": "lecture approfondie",
+      "4": "lecture exigeante",
+      "5": "lecture au singulier"
+    },
+    "entryEnter": "Prenez la mesure",
+    "entryLeaveNote": "Le fait de s'en aller est considéré comme un cas non résolu et alimente l'« Interférence dRésonance ».",
+    "rewardPreview": "Récompense",
+    "rewardScrap": "{{n}} ferraille",
+    "rewardCodex": "une entrée du codex",
+    "rewardChoice": "À vous de choisir : le dé « {{name}} » ou un bon d'achat pour une gravure",
+    "rewardDie": "le dé « {{name}} »",
+    "rewardOnce": "ne tombe nulle part ailleurs",
+    "stakes": "Enjeux",
+    "stakeFree": "{{n}} tentatives, toutes deux gratuites",
+    "stakePaid": "{{n}} gratuit, puis {{costs}} scrap",
+    "stakeDeduction": "lecture fixe · soumissions à « {{n}} »",
+    "interferenceNow": "Résonance L'événement « Interference × {{n}} » est en cours — toute résolution met fin à cet événement.",
+    "interferenceNone": "Aucune interférence sur la coque.",
+    "attemptChip": "essayez {{cur}} / {{max}}",
+    "submissionsLeft": "Réponses restantes : {{n}}",
+    "newAttempt": "Nouvelle planche (à gauche : {{n}})",
+    "newAttemptCost": "Nouveau forum — {{n}} scrap",
+    "outOfAttemptsTitle": "La lecture se termine",
+    "outOfAttempts": "Plus aucune tentative restante. Sortie de Stokes Résonance Interférence.",
+    "locked": "{{n}} le dé est retiré dès le premier tour",
+    "takeDie": "Prenez « {{name}} »",
+    "takeVoucher": "Prenez le bon"
   },
   "codex": {
     "title": "Codex",
@@ -143,34 +194,35 @@
     "glyphLegend": {
       "title": "Symboles scolaires",
       "body": "Chaque dé présente une forme différente dans un coin, ce qui permet de distinguer les écoles sans avoir recours à la couleur : Rouge — triangle · Bleu — carré · Vert — feuille · Jaune — anneau · Noir — pointe · Gris — point · Prismatique — étoile."
-    }
+    },
+    "prologueTitle": "La première traversée",
+    "prologueBody": "Réécoute les premières mesures. Rien n'a commencé, rien n'est perdu.",
+    "prologueReplay": "Rediffusion"
   },
   "consequenceToast": "Conséquence : {{text}}",
   "rewards": {
-    "scrap": "+ Déchet de{{n}}",
     "dieTitle": "Matrice récupérée",
     "keep": "Garder dans le paquet",
     "sell": "Vendre (+ {{n}})",
-    "deckFull": "Jeu complet (9)",
-    "healed": "Réparé + {{n}}"
+    "deckFull": "Jeu complet (9)"
   },
   "perk": {
     "title": "Choisissez une mise à niveau",
     "pick": "Prendre",
     "skip": "Passer (+ {{n}}s de chutes)",
-    "sub": "1 sur 3"
+    "banish": "Bannir",
+    "banishHint": "L'effet « Bannissement » élimine cette carte et toutes les cartes de ce type du reste de la partie. Une fois par partie.",
+    "reroll": "Nouvelle version du projet (extrait de « {{n}} »)"
   },
   "shop": {
     "title": "Marché · Mara",
     "buy": "Acheter ({{n}})",
-    "sell": "Vendre",
     "reroll": "Réapprovisionnement ({{n}})",
     "leave": "Partir",
     "scrap": "Ferraille: {{n}}",
     "deck": "{{n}}s sur le pont /9",
     "sellTitle": "Vendre un dé",
     "empty": "Épuisé",
-    "owned": "Sur le pont",
     "modulesTitle": "Modules {{used}} / {{max}}",
     "modulesFull": "Baie pleine",
     "rerollFree": "Réapprovisionnement (gratuit)"
@@ -180,10 +232,8 @@
     "mk": "Mk {{mk}} — {{cost}}",
     "mkMax": "Mk3 · à fond",
     "systems": "Systèmes",
-    "fusion": "Fuse ({{cost}})",
     "fusionTitle": "Fusion",
     "fusionHint": "Deux dés identiques → +1 niveau",
-    "fusionPick": "Choisissez un dé à fusionner",
     "repair": "Réparation",
     "repairHint": "2 pièces de ferraille par coque",
     "leave": "Partir",
@@ -198,17 +248,17 @@
     "nodes": "Nœuds effacés : {{n}}",
     "kills": "Kills : {{n}}",
     "earned": "Ferraille Source : {{n}}",
-    "spent": "Ferraille source : {{n}}",
     "perks": "Mises à jour :",
     "perksNone": "aucun",
-    "meta": "Éclats & XP",
-    "toMenu": "Retour au menu"
+    "toMenu": "Retour au menu",
+    "faced": "Source : {{names}}"
   },
   "prologue": {
     "title": "Prologue",
     "echo": "ECHO : {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Retour au menu"
+    "leave": "Retour au menu",
+    "replayDone": "Retour à l'Codex"
   },
   "interstitial": {
     "sector": "{{n}} du secteur",
@@ -218,13 +268,20 @@
     "title": "Le « Core Heart » est ouvert",
     "intro": "Toutes les décisions que tu as prises ici sont désormais autant de portes. Seules celles que tu as méritées s'ouvriront.",
     "thin": "Echo : « Vous n'avez pas été très convaincant, capitaine. Deux portes, et les deux ont haussé les épaules. »",
-    "axis": "Résonance ↔ Axe de stabilité : {{n}}"
+    "axis": "Résonance ↔ Axe de stabilité : {{n}}",
+    "deepTitle": "Au-delà du noyau",
+    "deepIntro": "Il n'y a plus rien à franchir. Tout ce que vous avez emporté avec vous jusqu'au sixième acte, c'est ici que cela se joue.",
+    "thresholdTag": "Ou alors, n'y mets pas fin",
+    "thresholdCross": "Franchir le seuil",
+    "thresholdCost": "Le parcours se poursuit au-delà du Noyau. La marée n'est plus contenue, la fin n'arrive qu'une fois l'autre rive atteinte — et le choix que tu feras là-bas en révélera toute la profondeur."
   },
   "ending": {
     "next": "Continuer",
     "step": "{{cur}} / {{max}}",
     "tally": "Ce que tu as laissé derrière toi",
-    "continue": "Fermer le journal"
+    "continue": "Fermer le journal",
+    "deathTitle": "C'est ici que s'achève la course",
+    "deathWhere": "Secteur {{sector}} · profondeur {{depth}}"
   },
   "setup": {
     "title": "Lancement",
@@ -236,7 +293,10 @@
     "aLevel": "Un «{{n}} »",
     "tideCap": "Niveaux maximaux des marées d'interférence à l'{{n}}",
     "launch": "Lancement",
-    "back": "Retour"
+    "back": "Retour",
+    "ascensionCost": "Cela vous coûte",
+    "ascensionGain": "Ça te rapporte",
+    "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution"
   },
   "package": {
     "title": "Boîtier de porte",
@@ -271,5 +331,104 @@
       "title": "Choisissez le nœud suivant",
       "body": "Appuyez sur un nœud allumé, puis sur « Sauter ». Le brouillard masque les rangées qui se trouvent devant ; les capteurs et les analyses approfondies repoussent l'horizon plus loin."
     }
+  },
+  "motif": {
+    "title": "Caractéristiques du secteur",
+    "cache": "Cache : récupération à l'arrivée",
+    "mine": "Parcours dans la mine : le franchissement endommage la coque",
+    "blessed": "Chemin béni : le chœur te comble de ses faveurs",
+    "cursed": "La voie maudite : les interférences s'intensifient",
+    "unstable": "Ligne instable : son contenu a été recalculé",
+    "pocket": "La poche de détour : un risque accru, mais aussi un gain accru",
+    "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte",
+    "inversion": "Série inversée : les systèmes sont traités du dernier au premier",
+    "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution"
+  },
+  "tag": {
+    "red": "Rouge",
+    "blue": "Bleu",
+    "green": "Vert",
+    "yellow": "Jaune",
+    "black": "Noir",
+    "grey": "Gris",
+    "prismatic": "Prismatique",
+    "weapons": "Armes",
+    "shields": "Boucliers",
+    "engines": "Moteurs",
+    "sensors": "Capteurs",
+    "reactor": "Réacteur",
+    "spinal": "Vertébral",
+    "repairBay": "Atelier de réparation",
+    "burn": "Brûler",
+    "crit": "Crit",
+    "growth": "Croissance",
+    "reroll": "Nouvelle tentative",
+    "charge": "Frais",
+    "scrap": "Ferraille",
+    "overcap": "Surcapacité",
+    "pierce": "Pierce",
+    "dodge": "Dodge",
+    "survival": "Survie",
+    "control": "Contrôle",
+    "dice": "Dés",
+    "shieldwall": "Mur de boucliers",
+    "risk": "Risque",
+    "swarm": "Essaim",
+    "spike": "Spike",
+    "precision": "Précision",
+    "owned": "{{name}} ×{{n}}"
+  },
+  "build": {
+    "title": "Votre configuration",
+    "close": "Fermer",
+    "open": "Construire",
+    "resonance": "Résonance",
+    "resonanceNext": "{{n}} plus pour le niveau suivant",
+    "resonanceNextDesc": "{{n}} en savoir plus → {{desc}}",
+    "resonanceMax": "Tous les niveaux sont actifs",
+    "tags": "Balises actives",
+    "perks": "Perks ({{n}})",
+    "modules": "Modules ({{n}})",
+    "engravings": "Dés gravés ({{n}})",
+    "banished": "Banni",
+    "empty": "Rien pour l'instant"
+  },
+  "axis": {
+    "title": "Axis {{n}}",
+    "resonance": "Résonance {{n}}",
+    "stability": "{{n}} de stabilité",
+    "neutral": "Équilibre des axes",
+    "preview": "axe {{from}} → {{to}}",
+    "short": "Axe"
+  },
+  "journal": {
+    "title": "Journal de course",
+    "open": "Journal",
+    "back": "Retour à la carte",
+    "empty": "Rien n'a encore été écrit. Le secteur ne vous a rien demandé.",
+    "sector": "{{n}} du secteur",
+    "beacon": "Balise résolu — {{n}} de {{max}}",
+    "memory": "Echo je me suis souvenu de quelque chose — extrait de {{n}}",
+    "axisTitle": "Axe",
+    "axis": {
+      "choice": "Votre choix a déplacé l'axe {{from}} → {{to}}",
+      "drift": "La carte que vous avez effectivement placée a déplacé l'axe {{from}} → {{to}}",
+      "beacon": "la balise a déplacé l'axe {{from}} → {{to}}"
+    },
+    "beaconsTitle": "Balises",
+    "beaconsCount": "{{n}} Problème de « {{max}} » résolu",
+    "beaconsHint": "La chaîne tient bon. Quelque chose au cœur du système les compte également.",
+    "here": "Vous êtes dans le secteur «{{n}} ».",
+    "chainsTitle": "Fils de discussion",
+    "chainStep": "{{cur}}/{{max}}",
+    "chainHere": "ici"
+  },
+  "memory": {
+    "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",
+    "continue": "Laisse-la finir",
+    "hintGate": "Dépasser les limites d'{{n}}s en une seule campagne",
+    "hintElite": "Partez à la chasse aux élites d’{{n}} au fil de vos parties",
+    "hintBeacons": "Traiter les balises «{{n}}» en une seule opération",
+    "hintEnding": "Accédez à « Core » et sélectionnez"
   }
 }

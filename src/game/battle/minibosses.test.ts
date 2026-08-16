@@ -4,9 +4,10 @@ import { applyWeaponDamage } from "@/game/battle/damage";
 import { advanceTurn, resolveEnemyPhase } from "@/game/battle/resolver";
 import {
   effectiveCap,
-  gateHpBonusPct,
   spawnEnemy,
 } from "@/game/battle/setup";
+import { sectorDef } from "@/data/sectors";
+import { sectorHpPct } from "@/game/run/encounter";
 import { createStream, createStreams } from "@/services/rng";
 import type { BattleSnapshot, EnemyState } from "@/types/battle";
 
@@ -134,25 +135,39 @@ describe("cap shrink", () => {
   });
 });
 
-describe("gate curve", () => {
-  it("scales mini-boss hull with the sector, and leaves bosses alone", () => {
-    expect(gateHpBonusPct(1)).toBe(0);
-    expect(gateHpBonusPct(5)).toBe(60);
+describe("sector curve", () => {
+  it("scales every enemy with the sector it spawns in", () => {
+    expect(sectorHpPct({ sector: 1 })).toBe(0);
+    expect(sectorHpPct({ sector: 5 })).toBe(sectorDef(5).scaling.hpPct);
+    const lateMult = 1 + sectorDef(5).scaling.hpPct / 100;
     const early = spawnEnemy("mirrorHull", "e", stream(), {
-      gateHpBonusPct: gateHpBonusPct(1),
+      sectorHpPct: sectorHpPct({ sector: 1 }),
     });
     const late = spawnEnemy("mirrorHull", "e", stream(), {
-      gateHpBonusPct: gateHpBonusPct(5),
+      sectorHpPct: sectorHpPct({ sector: 5 }),
     });
-    expect(late.hpMax).toBe(Math.round(early.hpMax * 1.6));
+    expect(late.hpMax).toBe(Math.round(early.hpMax * lateMult));
 
     const bossEarly = spawnEnemy("coreHeart", "e", stream(), {
-      gateHpBonusPct: gateHpBonusPct(1),
+      sectorHpPct: sectorHpPct({ sector: 1 }),
     });
     const bossLate = spawnEnemy("coreHeart", "e", stream(), {
-      gateHpBonusPct: gateHpBonusPct(5),
+      sectorHpPct: sectorHpPct({ sector: 5 }),
     });
-    expect(bossLate.hpMax).toBe(bossEarly.hpMax);
+    expect(bossLate.hpMax).toBe(Math.round(bossEarly.hpMax * lateMult));
+  });
+
+  it("adds the pocket surcharge on top of the sector curve", () => {
+    expect(sectorHpPct({ sector: 3, pocket: true })).toBe(
+      sectorDef(3).scaling.hpPct + sectorDef(3).scaling.pocketPct,
+    );
+    const plain = spawnEnemy("riftling", "e", stream(), {
+      sectorHpPct: sectorHpPct({ sector: 3 }),
+    });
+    const pocket = spawnEnemy("riftling", "e", stream(), {
+      sectorHpPct: sectorHpPct({ sector: 3, pocket: true }),
+    });
+    expect(pocket.hpMax).toBeGreaterThan(plain.hpMax);
   });
 });
 

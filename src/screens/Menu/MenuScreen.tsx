@@ -1,5 +1,5 @@
 import {
-  Box,
+  Badge,
   Button,
   Group,
   Paper,
@@ -12,15 +12,19 @@ import {
 import { useReducedMotion } from '@mantine/hooks';
 import { lazy, Suspense, useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
+import { unreadMemoryIds } from '@/game/narrative/memoryArc';
 import { progressWithinLevel } from '@/game/xp';
 import { useMetaStore } from '@/stores/metaStore';
 import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
 import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
+import { MenuBadge, menuBadgeId } from '@/screens/Profile/BadgeRow';
 import { ResumeCard } from '@/screens/Menu/ResumeCard';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
+import styles from './MenuScreen.module.css';
 
 const MenuBackground = lazy(() =>
   import('@/screens/Menu/MenuBackground').then((m) => ({
@@ -31,7 +35,6 @@ const MenuBackground = lazy(() =>
 interface MenuEntry {
   key: string;
   screen: ScreenId;
-  phase?: number;
   action?: 'startCampaign';
 }
 
@@ -54,6 +57,11 @@ export const MenuScreen = () => {
   const progress = progressWithinLevel(xp);
   const cloudResume = useAppStore((s) => s.cloudResume);
   const prologueDone = useMetaStore((s) => s.stats.prologueDone);
+  const codex = useMetaStore((s) => s.codex);
+  const codexRead = useMetaStore((s) => s.codexRead);
+  const badges = useMetaStore((s) => s.badges);
+  const topBadge = menuBadgeId(badges);
+  const unreadMemories = unreadMemoryIds(codex, codexRead).length;
   const [localResume] = useState(readLocalResume);
   const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
   const osReducedMotion = useReducedMotion(false);
@@ -74,50 +82,48 @@ export const MenuScreen = () => {
   );
 
   return (
-    <Box pos="relative" mih="var(--ca-vh)" bg={tokens.bg} style={{ overflow: 'hidden' }}>
-      <Suspense fallback={null}>
-        <MenuBackground reducedMotion={reducedMotion} />
-      </Suspense>
-      <UnstyledButton
-        pos="absolute"
-        top={12}
-        right={12}
-        onClick={() => {
-          go('chart');
-        }}
-        style={{ zIndex: 2, pointerEvents: 'auto' }}
-        aria-label={t('meta:menu.level', { level })}
-      >
-        <RingProgress
-          size={56}
-          thickness={4}
-          roundCaps
-          sections={[{ value: progress.pct * 100, color: 'accent' }]}
-          label={
-            <Text ta="center" size="xs" c={tokens.text} fw={700}>
-              {level}
-            </Text>
-          }
-        />
-      </UnstyledButton>
-      <Stack
-        pos="relative"
-        align="center"
-        justify="center"
-        mih="var(--ca-vh)"
-        gap="xl"
-        p="lg"
-        style={{ zIndex: 1, pointerEvents: 'none' }}
-      >
-        <Stack align="center" gap="xs">
+    <Screen
+      width="full"
+      centered
+      background={
+        <Suspense fallback={null}>
+          <MenuBackground reducedMotion={reducedMotion} />
+        </Suspense>
+      }
+      overlay={
+        <UnstyledButton
+          className={styles.levelBadge}
+          onClick={() => {
+            go('chart');
+          }}
+          aria-label={t('meta:menu.level', { level })}
+          style={{ position: 'relative' }}
+        >
+          <RingProgress
+            size={56}
+            thickness={4}
+            roundCaps
+            sections={[{ value: progress.pct * 100, color: 'accent' }]}
+            label={
+              <Text ta="center" size="xs" c={tokens.text} fw={700}>
+                {level}
+              </Text>
+            }
+          />
+          {topBadge === null ? null : <MenuBadge id={topBadge} />}
+        </UnstyledButton>
+      }
+    >
+      <div className={styles.hero}>
+        <div className={styles.title}>
           <Title order={1} c={tokens.text}>
             {t('common:appName')}
           </Title>
           <Text c={tokens.dim} size="sm">
             {t('menu:tagline')}
           </Text>
-        </Stack>
-        <Stack gap="sm" w={280} style={{ pointerEvents: 'auto' }}>
+        </div>
+        <div className={styles.actions}>
           {cloudResume ? (
             <Paper bg={tokens.surface1} p="sm" radius="md" withBorder>
               <Stack gap="xs">
@@ -153,22 +159,21 @@ export const MenuScreen = () => {
             <Button
               key={entry.key}
               size="md"
-              variant={entry.phase === undefined ? 'filled' : 'default'}
-              disabled={entry.phase !== undefined}
+              variant="filled"
               onClick={onSelect(entry)}
               rightSection={
-                entry.phase !== undefined ? (
-                  <Text size="xs" c={tokens.faint}>
-                    {t('common:phaseHint', { phase: entry.phase })}
-                  </Text>
+                entry.key === 'codex' && unreadMemories > 0 ? (
+                  <Badge size="sm" color="accent" data-unread-memories>
+                    {unreadMemories}
+                  </Badge>
                 ) : undefined
               }
             >
               {t(`menu:${entry.key}`)}
             </Button>
           ))}
-        </Stack>
-      </Stack>
-    </Box>
+        </div>
+      </div>
+    </Screen>
   );
 };

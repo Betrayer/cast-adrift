@@ -5,9 +5,6 @@ export interface StartTarget {
   params?: Record<string, string>;
 }
 
-// `t.me/castadrift_bot/app?startapp=daily` and the bot's own `/daily` command
-// both arrive here as `tgWebAppStartParam`. Telegram restricts the value to
-// [A-Za-z0-9_-], so the routes are flat words rather than paths.
 const ROUTES: Record<string, StartTarget> = {
   play: { screen: "modes" },
   modes: { screen: "modes" },

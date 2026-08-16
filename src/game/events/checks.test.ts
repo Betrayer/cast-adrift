@@ -2,7 +2,9 @@ import { describe, expect, it } from "vitest";
 import { createStream } from "@/services/rng";
 import {
   checkOdds,
+  checkPassed,
   checkTotal,
+  eligibleForCheck,
   rollCheckDice,
   topDiceForCheck,
   type FaceDie,
@@ -79,5 +81,42 @@ describe("check rolls", () => {
       const [value] = rollCheckDice(dice, stream);
       expect(value === 1 || value === 8).toBe(true);
     }
+  });
+});
+
+describe("narrowed checks (R7)", () => {
+  const deck = [
+    { defId: "black-d6", tier: 6 as const, school: "black" as const },
+    { defId: "blue-d8", tier: 8 as const, school: "blue" as const },
+    { defId: "red-d12", tier: 12 as const, school: "red" as const },
+    { defId: "grey-d4", tier: 4 as const, school: "grey" as const },
+  ];
+
+  it("a school check rolls only that school", () => {
+    const pool = eligibleForCheck(deck, { school: "blue" });
+    expect(pool.map((d) => d.defId)).toEqual(["blue-d8"]);
+  });
+
+  it("a tier band drops the dice outside it", () => {
+    expect(
+      eligibleForCheck(deck, { tierAtLeast: 8 }).map((d) => d.defId),
+    ).toEqual(["blue-d8", "red-d12"]);
+    expect(
+      eligibleForCheck(deck, { tierAtMost: 6 }).map((d) => d.defId),
+    ).toEqual(["black-d6", "grey-d4"]);
+  });
+
+  it("a narrowed pool rolls fewer dice rather than borrowing", () => {
+    const faces = topDiceForCheck(deck, 3, { school: "blue" });
+    expect(faces).toHaveLength(1);
+  });
+
+  it("a lowest check passes only when every die stays under the cap", () => {
+    const faces = topDiceForCheck(deck, 2, { tierAtMost: 6 });
+    expect(checkOdds(faces, "lowest", 6)).toBe(1);
+    expect(checkOdds(faces, "lowest", 1)).toBeLessThan(0.3);
+    expect(checkPassed(2, "lowest", 3)).toBe(true);
+    expect(checkPassed(5, "lowest", 3)).toBe(false);
+    expect(checkPassed(5, "sum", 3)).toBe(true);
   });
 });

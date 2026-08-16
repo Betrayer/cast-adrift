@@ -146,8 +146,8 @@ describe("star masks", () => {
 });
 
 describe("contract catalogue", () => {
-  it("ships fourteen contracts, each with three distinct goals", () => {
-    expect(CONTRACTS).toHaveLength(14);
+  it("ships twenty contracts, each with three distinct goals", () => {
+    expect(CONTRACTS).toHaveLength(20);
     for (const def of CONTRACTS) {
       expect(def.goals).toHaveLength(CONTRACT_STAR_COUNT);
       expect(new Set(def.goals.map((g) => g.g)).size).toBe(CONTRACT_STAR_COUNT);

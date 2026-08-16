@@ -12,14 +12,17 @@ import {
 import { emitBark, resetBarkMemory } from "@/game/narrative";
 import { restoreActionLog } from "@/game/run/actionLog";
 import { useAppStore } from "@/stores/appStore";
+import { useNarrativeStore } from "@/stores/narrativeStore";
+import type { JournalEntry } from "@/game/run/journal";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 1;
+export const RUN_SNAPSHOT_V = 8;
 
 export interface RunSnapshotV1 {
   v: number;
   screen: ScreenId;
   run: RunValues;
+  journal: JournalEntry[];
   battle: BattleSaveState | null;
 }
 
@@ -43,14 +46,25 @@ const pickRunValues = (s: RunState): RunValues => ({
   deck: s.deck.map((d) => ({ ...d })),
   perks: [...s.perks],
   modules: [...s.modules],
+  banishedPerks: [...s.banishedPerks],
+  draftsSinceRare: s.draftsSinceRare,
+  draftRerollUsed: s.draftRerollUsed,
+  banishUsed: s.banishUsed,
   chartPicks: [...s.chartPicks],
   mkLevels: { ...s.mkLevels },
   tide: s.tide,
   jumpsSinceTide: s.jumpsSinceTide,
   flags: { ...s.flags },
+  counters: { ...s.counters },
   axis: s.axis,
+  driftBlack: s.driftBlack,
+  driftBlue: s.driftBlue,
+  driftSpent: s.driftSpent,
   seenEvents: [...s.seenEvents],
   solvedPuzzles: [...s.solvedPuzzles],
+  puzzleRuns: Object.fromEntries(
+    Object.entries(s.puzzleRuns).map(([nodeId, state]) => [nodeId, { ...state }]),
+  ),
   anomalyStreak: s.anomalyStreak,
   interferenceStacks: s.interferenceStacks,
   killedTypes: [...s.killedTypes],
@@ -90,6 +104,12 @@ const pickRunValues = (s: RunState): RunValues => ({
           ...(s.pendingRewards.packageScrap !== undefined
             ? { packageScrap: s.pendingRewards.packageScrap }
             : {}),
+          ...(s.pendingRewards.draftNodeId !== undefined
+            ? { draftNodeId: s.pendingRewards.draftNodeId }
+            : {}),
+          ...(s.pendingRewards.draftFloor !== undefined
+            ? { draftFloor: s.pendingRewards.draftFloor }
+            : {}),
         },
   shop:
     s.shop === null
@@ -106,8 +126,11 @@ const pickRunValues = (s: RunState): RunValues => ({
   vouchers: s.vouchers,
   usedMinibosses: [...s.usedMinibosses],
   bossesKilled: [...s.bossesKilled],
-  memoriesUnlocked: s.memoriesUnlocked,
+  memoryOrders: [...s.memoryOrders],
   endingId: s.endingId,
+  endingFirstTime: s.endingFirstTime,
+  crossedThreshold: s.crossedThreshold,
+  encounters: s.encounters.map((e) => ({ ...e })),
   startedAt: s.startedAt,
 });
 
@@ -115,6 +138,7 @@ export const captureRunSnapshot = (): RunSnapshotV1 => ({
   v: RUN_SNAPSHOT_V,
   screen: useAppStore.getState().screen,
   run: pickRunValues(useRunStore.getState()),
+  journal: useNarrativeStore.getState().journal.map((entry) => ({ ...entry })),
   battle: serializeBattle(),
 });
 
@@ -125,7 +149,8 @@ const isRunSnapshot = (data: unknown): data is RunSnapshotV1 => {
     snap.v === RUN_SNAPSHOT_V &&
     typeof snap.screen === "string" &&
     typeof snap.run === "object" &&
-    snap.run !== null
+    snap.run !== null &&
+    Array.isArray(snap.journal)
   );
 };
 
@@ -133,6 +158,8 @@ export const restoreRunSnapshot = (data: unknown): boolean => {
   if (!isRunSnapshot(data)) return false;
   const values = { ...createInitialRunValues(), ...data.run };
   useRunStore.getState().hydrate(values);
+  useNarrativeStore.getState().reset();
+  useNarrativeStore.getState().setJournal(data.journal);
   restoreActionLog({
     hash: values.stats.actionHash,
     count: values.stats.actionCount,
@@ -142,9 +169,4 @@ export const restoreRunSnapshot = (data: unknown): boolean => {
   resetBarkMemory();
   if (data.run.active) emitBark("resume");
   return true;
-};
-
-export const runSummaryLabel = (data: unknown): string | null => {
-  if (!isRunSnapshot(data)) return null;
-  return `${String(data.run.sector)}:${String(data.run.depthRow)}`;
 };

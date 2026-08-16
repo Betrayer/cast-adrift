@@ -8,12 +8,12 @@ import {
 
 describe("chart mods aggregation", () => {
   it("sums a chart node's mods", () => {
-    expect(computeChartMods(["yellow-s1"]).scrapMultPct).toBe(5);
+    expect(computeChartMods(["yellow-s15"]).scrapMultPct).toBe(5);
     expect(computeChartMods([]).scrapMultPct).toBe(0);
   });
 
   it("computeRunMods merges perk and chart mods", () => {
-    const mods = computeRunMods([], ["yellow-s1", "yellow-not1"]);
+    const mods = computeRunMods([], ["yellow-s15", "yellow-not1"]);
     expect(mods.scrapMultPct).toBe(20);
   });
 

@@ -1,8 +1,5 @@
 import { SCORE_PER_DEPTH, SCORE_PER_KILL } from "@/game/run/modes";
 
-// Deterrence, not prevention (DESIGN §15). Without server functions the client
-// signs nothing, so the board only rejects submissions that could not have come
-// from a legal run: too much score, too many kills or too much scrap per row.
 export const MAX_KILLS_PER_DEPTH = 4;
 export const MAX_SCRAP_PER_DEPTH = 80;
 export const MAX_SCORE_PER_DEPTH =

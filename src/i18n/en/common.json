@@ -1,5 +1,9 @@
 {
   "appName": "Cast Adrift",
   "back": "Back",
-  "phaseHint": "Phase {{phase}}"
+  "rotate": {
+    "title": "Turn your device",
+    "body": "Cast Adrift is played upright. Rotate back to portrait to continue the run."
+  },
+  "cancel": "Cancel"
 }

@@ -1,15 +1,23 @@
 import { Button, Group, Stack, Text } from "@mantine/core";
+import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
+import { LOOT_SFX } from "@/data/audio";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { schools } from "@/data/schools";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import { resolveDieChoice, resolveModuleChoice } from "@/game/run/flow";
 import { computeRunMods } from "@/game/run/runMods";
+import { duckMusic, playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useRunStore } from "@/stores/runStore";
 import styles from "./Rewards.module.css";
+
+const CARD_FLIP_MS = 140;
+
+const RARITY_ORDER = ["common", "uncommon", "rare", "legendary"] as const;
 
 interface PackageRewardProps {
   choices: readonly string[];
@@ -34,6 +42,29 @@ export const PackageReward = ({
   const bayFull =
     runModules.length >=
     moduleSlots(computeRunMods(perks, chartPicks).moduleSlotDelta);
+
+  const best = choices.reduce<(typeof RARITY_ORDER)[number]>((top, dieId) => {
+    const rarity = DIE_BY_ID.get(dieId)?.rarity;
+    if (rarity === undefined) return top;
+    return RARITY_ORDER.indexOf(rarity) > RARITY_ORDER.indexOf(top)
+      ? rarity
+      : top;
+  }, "common");
+  const cardCount = choices.length + moduleChoices.length;
+
+  useEffect(() => {
+    playSfx(LOOT_SFX[best]);
+    duckMusic(best === "legendary" ? 2000 : 1300);
+    haptic("reveal");
+    const timers = Array.from({ length: cardCount }, (_, index) =>
+      window.setTimeout(() => {
+        playSfx("unlockCard", { rate: 1 + index * 0.04 });
+      }, index * CARD_FLIP_MS),
+    );
+    return () => {
+      for (const id of timers) window.clearTimeout(id);
+    };
+  }, [best, cardCount]);
 
   return (
     <div className={styles.overlay}>
@@ -83,6 +114,7 @@ export const PackageReward = ({
                 mt="sm"
                 fullWidth
                 onClick={() => {
+                  playSfx(deckFull ? "buy" : "optionTick", { rate: 1.12 });
                   resolveDieChoice(dieId);
                 }}
               >
@@ -124,6 +156,7 @@ export const PackageReward = ({
                 mt="sm"
                 fullWidth
                 onClick={() => {
+                  playSfx(bayFull ? "buy" : "mkSweep");
                   resolveModuleChoice(moduleId);
                 }}
               >

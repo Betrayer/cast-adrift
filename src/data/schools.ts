@@ -20,8 +20,6 @@ export const BASE_SCHOOLS: Record<School, SchoolColors> = {
 
 export const SCHOOL_IDS = Object.keys(BASE_SCHOOLS) as School[];
 
-// Live palette: the theme engine rewrites these entries in place so every
-// existing `schools[school].stroke` read re-skins without a re-import.
 export const schools: Record<School, SchoolColors> = {
   red: { ...BASE_SCHOOLS.red },
   blue: { ...BASE_SCHOOLS.blue },

@@ -37,7 +37,6 @@ describe("«Стеклянный флот» — damage ×1.5 both ways", () => {
       const after = resolvePlayerPhase(snap).next;
       return 200 - (after.enemies[0]?.hp ?? 0);
     };
-    // 6 on the face + 2 red-in-weapon affinity = 8, then ×1.5.
     const base = dealtWith([]);
     expect(base).toBe(8);
     expect(dealtWith(["glassFleet"])).toBe(scaleDamage(base, 50));
@@ -70,7 +69,6 @@ describe("«Хрупкие щиты» — the shield sags before the enemy acts"
       });
       return resolveEnemyPhase(snap, createStream(5)).next.hull;
     };
-    // 10 shield absorbs the whole hit; halved it absorbs 5.
     expect(hullAfter([])).toBe(40);
     expect(hullAfter(["brittleShields"])).toBe(35);
   });

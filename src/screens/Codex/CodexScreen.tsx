@@ -5,13 +5,13 @@ import {
   Divider,
   Group,
   Paper,
-  ScrollArea,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import {
   CODEX_GROUP_ORDER,
@@ -21,6 +21,7 @@ import {
 } from "@/data/codex";
 import { schoolGlyphPath } from "@/data/glyphs";
 import { SCHOOL_IDS, schools } from "@/data/schools";
+import { memoryUnlockHint } from "@/game/narrative/memoryArc";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 
@@ -38,11 +39,17 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
   const [open, setOpen] = useState(false);
 
   if (!unlocked) {
+    const hint = entry.group === "memory" ? memoryUnlockHint(entry.id) : null;
     return (
       <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder opacity={0.55}>
         <Text size="sm" c={tokens.faint}>
           {t("run:codex.locked")}
         </Text>
+        {hint === null ? null : (
+          <Text size="xs" c={tokens.faint} data-memory-hint={entry.id}>
+            {t(hint.key, hint.values)}
+          </Text>
+        )}
       </Paper>
     );
   }
@@ -58,6 +65,7 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
         justify="space-between"
         wrap="nowrap"
         style={{ cursor: "pointer" }}
+        data-codex-entry={entry.id}
         onClick={toggle}
       >
         <Text size="sm" fw={600} c={tokens.text}>
@@ -70,9 +78,16 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
         ) : null}
       </Group>
       {open ? (
-        <Text size="sm" c={tokens.dim} mt="xs">
-          {t(entry.body)}
-        </Text>
+        <Stack gap={4} mt="xs">
+          {entry.signature === undefined ? null : (
+            <Text size="sm" c={tokens.accent} data-codex-signature={entry.id}>
+              {t(entry.signature)}
+            </Text>
+          )}
+          <Text size="sm" c={tokens.dim}>
+            {t(entry.body)}
+          </Text>
+        </Stack>
       ) : null}
     </Paper>
   );
@@ -119,18 +134,43 @@ export const CodexScreen = () => {
   const go = useAppStore((s) => s.go);
 
   return (
-    <Stack mih="var(--ca-vh)" p="md" gap="sm" bg={tokens.bg}>
-      <Group justify="space-between">
-        <Title order={3} c={tokens.text}>
-          {t("run:codex.title")}
-        </Title>
-        <Button size="compact-sm" variant="default" onClick={() => { go("menu"); }}>
-          {t("run:codex.back")}
-        </Button>
-      </Group>
-      <ScrollArea.Autosize mah="82dvh">
-        <Stack gap="md">
+    <Screen
+      width="wide"
+      header={
+        <Group justify="space-between">
+          <Title order={3} c={tokens.text}>
+            {t("run:codex.title")}
+          </Title>
+          <Button size="compact-sm" variant="default" onClick={() => { go("menu"); }}>
+            {t("run:codex.back")}
+          </Button>
+        </Group>
+      }
+    >
+      <Stack gap="md">
           <GlyphLegend />
+          <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder>
+            <Group justify="space-between" wrap="nowrap">
+              <Stack gap={2}>
+                <Text size="sm" fw={600} c={tokens.text}>
+                  {t("run:codex.prologueTitle")}
+                </Text>
+                <Text size="xs" c={tokens.faint}>
+                  {t("run:codex.prologueBody")}
+                </Text>
+              </Stack>
+              <Button
+                size="compact-sm"
+                variant="default"
+                data-replay-prologue
+                onClick={() => {
+                  go("prologue", { replay: "1" });
+                }}
+              >
+                {t("run:codex.prologueReplay")}
+              </Button>
+            </Group>
+          </Paper>
           {CODEX_GROUP_ORDER.map((group) => {
             const entries = codexByGroup(group);
             return (
@@ -150,8 +190,7 @@ export const CodexScreen = () => {
               </Box>
             );
           })}
-        </Stack>
-      </ScrollArea.Autosize>
-    </Stack>
+      </Stack>
+    </Screen>
   );
 };

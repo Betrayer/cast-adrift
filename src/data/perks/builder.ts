@@ -1,6 +1,9 @@
 import type { PerkDef, PerkPool, PerkRarity } from "@/data/perks/types";
 
-type PerkBody = Pick<PerkDef, "effects" | "mods" | "traits" | "synergy">;
+type PerkBody = Pick<
+  PerkDef,
+  "effects" | "mods" | "traits" | "synergy" | "tags"
+>;
 
 export const perk = (
   id: string,
