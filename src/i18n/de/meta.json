@@ -391,7 +391,8 @@
     "myRank": "Deine Seite: {{rank}}",
     "noRank": "Auf diesem Forum gibt es noch keinen Eintrag",
     "empty": "Hier steht noch nichts.",
-    "depth": "d {{n}}"
+    "depth": "d {{n}}",
+    "offline": "Offline — die Rangliste war nicht erreichbar. Dein Ergebnis liegt lokal gesichert."
   },
   "profile": {
     "title": "Profil",

@@ -391,7 +391,8 @@
     "myRank": "Votre site : {{rank}}",
     "noRank": "Il n'y a pas encore de message sur ce forum.",
     "empty": "Il n'y a encore rien ici.",
-    "depth": "d {{n}}"
+    "depth": "d {{n}}",
+    "offline": "Hors ligne — le classement est inaccessible. Ton score est sauvegardé en local."
   },
   "profile": {
     "title": "Profil",

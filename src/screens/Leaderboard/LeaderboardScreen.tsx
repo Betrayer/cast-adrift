@@ -14,6 +14,7 @@ import { boardUid } from "@/game/run/boards";
 import { isoWeekKey, utcDateKey } from "@/game/run/modes";
 import {
   aroundMe,
+  boardsReachable,
   dailyBoardId,
   driftWeeklyBoardId,
   DRIFT_ALLTIME_BOARD,
@@ -39,6 +40,7 @@ interface LoadedBoard {
   key: string;
   rows: RankedEntry[];
   myRank: number | null;
+  offline: boolean;
 }
 
 const debugBoards = (): boolean => {
@@ -81,6 +83,7 @@ export const LeaderboardScreen = () => {
         key: `${board}:${view}`,
         rows,
         myRank: rows.find((e) => e.isMe)?.rank ?? null,
+        offline: uid === null || !boardsReachable(),
       });
     };
     void fetchBoard();
@@ -92,6 +95,7 @@ export const LeaderboardScreen = () => {
   const ready = loaded !== null && loaded.key === requestKey;
   const rows = ready ? loaded.rows : null;
   const myRank = ready ? loaded.myRank : null;
+  const offline = ready ? loaded.offline : false;
 
   return (
     <Screen
@@ -153,8 +157,12 @@ export const LeaderboardScreen = () => {
           </Group>
         ) : rows.length === 0 ? (
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-            <Text size="sm" c={tokens.dim}>
-              {t("meta:board.empty")}
+            <Text
+              size="sm"
+              c={offline ? tokens.danger : tokens.dim}
+              data-testid={offline ? "board-offline" : "board-empty"}
+            >
+              {t(offline ? "meta:board.offline" : "meta:board.empty")}
             </Text>
           </Paper>
         ) : (

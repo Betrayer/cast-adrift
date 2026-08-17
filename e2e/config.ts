@@ -53,9 +53,22 @@ export const createConfig = (mode: E2eMode): PlaywrightTestConfig => ({
     mode === 'e2e-emu'
       ? [
           {
-            name: 'emulator',
+            name: 'emulatorMobile',
             testMatch: EMULATOR_SPECS,
-            use: { ...touchDevice, viewport: { width: 390, height: 844 } },
+            use: {
+              ...touchDevice,
+              viewport: { width: 390, height: 844 },
+              isMobile: true,
+            },
+          },
+          {
+            name: 'emulatorDesktop',
+            testMatch: EMULATOR_SPECS,
+            use: {
+              ...devices['Desktop Chrome'],
+              deviceScaleFactor: 1,
+              viewport: { width: 1280, height: 800 },
+            },
           },
         ]
       : [

@@ -8,6 +8,7 @@ import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
 import type { ShipId } from '@/data/ships';
 import { levelFromTotalXp } from '@/game/xp';
+import { scopedPersistStorage } from '@/stores/scopedStorage';
 
 export interface CollectionEntry {
   defId: string;
@@ -196,7 +197,9 @@ const LIFETIME_KEYS = [
   "deepClears",
 ] as const;
 
-const createInitialMetaValues = (): MetaValues => ({
+export const META_PERSIST_KEY = 'meta';
+
+export const createInitialMetaValues = (): MetaValues => ({
   shards: 0,
   xp: 0,
   level: 1,
@@ -756,7 +759,8 @@ export const useMetaStore = create<MetaState>()(
       },
     }),
     {
-      name: 'ca.meta',
+      name: META_PERSIST_KEY,
+      storage: scopedPersistStorage<MetaValues>(),
       version: META_VERSION,
       migrate: migrateMeta,
       partialize: (s): MetaValues => ({

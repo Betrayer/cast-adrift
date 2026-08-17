@@ -99,6 +99,7 @@ export default tseslint.config(
     files: [
       'vite.config.ts',
       'vitest.config.ts',
+      'vitest.rules.config.ts',
       'playwright.config.ts',
       'playwright.emu.config.ts',
       'eslint.config.js',

@@ -391,7 +391,8 @@
     "myRank": "Tu página: {{rank}}",
     "noRank": "Aún no hay ninguna entrada en este foro",
     "empty": "De momento no hay nada aquí.",
-    "depth": "d {{n}}"
+    "depth": "d {{n}}",
+    "offline": "Sin conexión: no se pudo acceder a la tabla. Tu puntuación está guardada en local."
   },
   "profile": {
     "title": "Perfil",

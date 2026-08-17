@@ -1,5 +1,10 @@
 import { expect, type Locator, type Page } from '@playwright/test';
-import type { SeedRunConfig, TestState } from '@/services/testApi';
+import type {
+  AccountView,
+  CloudMetaView,
+  SeedRunConfig,
+  TestState,
+} from '@/services/testApi';
 import type { SlotId } from '@/types/battle';
 
 export const FROZEN_NOW = 1_760_000_000_000;
@@ -53,6 +58,102 @@ export class Screens {
       const api = window.caTest;
       if (api === undefined) throw new Error('caTest is not mounted');
       return api.state();
+    });
+  }
+
+  account(): Promise<AccountView> {
+    return this.page.evaluate(() => {
+      const api = window.caTest;
+      if (api === undefined) throw new Error('caTest is not mounted');
+      return api.account();
+    });
+  }
+
+  async waitForUid(): Promise<string> {
+    await expect
+      .poll(async () => (await this.account()).uid, { timeout: READY_TIMEOUT })
+      .not.toBeNull();
+    const uid = (await this.account()).uid;
+    if (uid === null) throw new Error('uid never resolved');
+    return uid;
+  }
+
+  cloudMeta(): Promise<CloudMetaView | null> {
+    return this.page.evaluate(() => {
+      const api = window.caTest;
+      if (api === undefined) throw new Error('caTest is not mounted');
+      return api.cloudMeta();
+    });
+  }
+
+  async waitForCloudMeta(shards: number): Promise<void> {
+    await expect
+      .poll(async () => (await this.cloudMeta())?.shards ?? null, {
+        timeout: READY_TIMEOUT,
+      })
+      .toBe(shards);
+  }
+
+  async waitForAuthSettled(): Promise<void> {
+    await expect
+      .poll(
+        async () => {
+          const account = await this.account();
+          return account.uid !== null || account.authError !== null;
+        },
+        { timeout: READY_TIMEOUT },
+      )
+      .toBe(true);
+  }
+
+  async openAccount(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.caTest?.go('settings');
+    });
+    await this.expectScreen('settings');
+    await expect(this.testId('account-section')).toBeVisible();
+  }
+
+  async submitEmailForm(email: string, password: string): Promise<void> {
+    await this.testId('email-input').fill(email);
+    await this.testId('password-input').fill(password);
+    await this.testId('email-submit').click();
+  }
+
+  async registerEmail(email: string, password: string): Promise<void> {
+    await this.testId('account-email').click();
+    await expect(this.testId('email-modal')).toBeVisible();
+    await this.submitEmailForm(email, password);
+  }
+
+  async signInEmail(email: string, password: string): Promise<void> {
+    await this.testId('account-email').click();
+    await expect(this.testId('email-modal')).toBeVisible();
+    await this.testId('email-mode-signin').click();
+    await this.submitEmailForm(email, password);
+  }
+
+  async signOut(): Promise<void> {
+    await this.testId('account-signout').click();
+    await this.testId('account-signout-confirm').click();
+    await this.expectScreen('menu');
+  }
+
+  async wipeDevice(): Promise<void> {
+    await this.page.evaluate(async () => {
+      localStorage.clear();
+      await new Promise<void>((resolve) => {
+        const request = indexedDB.deleteDatabase('firebaseLocalStorageDb');
+        request.onsuccess = () => {
+          resolve();
+        };
+        request.onerror = () => {
+          resolve();
+        };
+        request.onblocked = () => {
+          resolve();
+        };
+      });
     });
   }
 

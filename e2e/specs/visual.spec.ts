@@ -3,10 +3,15 @@ import type { Screens } from '../screens';
 
 const SEED = 7;
 
-const shot = (app: Screens, name: string): Promise<void> =>
-  expect(app.page).toHaveScreenshot(name, {
-    mask: [app.page.locator('[data-toast-host]')],
-  });
+const HIDE_TOASTS = '[data-toast-host]{display:none !important}';
+
+const quiet = (app: Screens): Promise<unknown> =>
+  app.page.addStyleTag({ content: HIDE_TOASTS });
+
+const shot = async (app: Screens, name: string): Promise<void> => {
+  await quiet(app);
+  await expect(app.page).toHaveScreenshot(name);
+};
 
 test.describe('visual baselines', () => {
   test('menu', async ({ app }) => {
@@ -51,6 +56,15 @@ test.describe('visual baselines', () => {
   test('settings', async ({ app }) => {
     await app.testId('menu-settings').click();
     await app.expectScreen('settings');
+    await app.waitForAuthSettled();
     await shot(app, 'settings.png');
+  });
+
+  test('account section', async ({ app }) => {
+    await app.testId('menu-settings').click();
+    await app.expectScreen('settings');
+    await app.waitForAuthSettled();
+    await quiet(app);
+    await expect(app.testId('account-section')).toHaveScreenshot('account.png');
   });
 });

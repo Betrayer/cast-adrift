@@ -391,7 +391,8 @@
     "myRank": "Your place: {{rank}}",
     "noRank": "No entry on this board yet",
     "empty": "Nothing here yet.",
-    "depth": "d{{n}}"
+    "depth": "d{{n}}",
+    "offline": "Offline — the board could not be reached. Your score is saved locally."
   },
   "profile": {
     "title": "Profile",

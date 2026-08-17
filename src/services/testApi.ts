@@ -2,9 +2,17 @@ import type { ShipId } from "@/data/ships";
 import { canPlaceDie } from "@/game/battle/setup";
 import { ALL_COACH_MARK_IDS } from "@/game/tutorial";
 import type { NodeId } from "@/game/map/types";
+import { lastClaimOutcome } from "@/services/account";
+import { readClaim } from "@/services/account-link";
+import { captainName } from "@/game/run/boards";
 import { discardActiveRun, jumpTo, startRunMode } from "@/game/run/flow";
+import { isoWeekKey } from "@/game/run/modes";
 import { totalXpForLevel } from "@/game/xp";
+import { DRIFT_ALLTIME_BOARD, submit, top } from "@/services/leaderboards";
+import { profileSummary, readMetaDocFromServer } from "@/services/metaDoc";
 import { now as clockNow, setClockSource } from "@/services/clock";
+import { activeUid, deviceKeys, scopedKey } from "@/services/profile";
+import { profileSwitches } from "@/services/profileSwitch";
 import { createStreams } from "@/services/rng";
 import { clearRun } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
@@ -96,6 +104,36 @@ export interface DieView {
   slot: SlotId | null;
 }
 
+export interface AccountView {
+  uid: string | null;
+  isAnonymous: boolean;
+  providers: string[];
+  email: string | null;
+  namespace: string;
+  activeUid: string | null;
+  switches: number;
+  authError: string | null;
+  authBusy: boolean;
+  claimOutcome: string | null;
+  claimSource: string | null;
+  merge: {
+    sourceUid: string;
+    targetUid: string;
+    recommended: string;
+    sourceLevel: number;
+    targetLevel: number;
+  } | null;
+  keys: string[];
+}
+
+export interface CloudMetaView {
+  updatedAt: number;
+  level: number;
+  shards: number;
+  runs: number;
+  linkedFrom: string | null;
+}
+
 export interface TestState {
   screen: ScreenId;
   params: Record<string, string> | null;
@@ -144,6 +182,10 @@ export interface TestApi {
   slotsFor: (uid: string) => SlotId[];
   anchors: () => BattleAnchors | null;
   state: () => TestState;
+  account: () => AccountView;
+  cloudMeta: () => Promise<CloudMetaView | null>;
+  submitDriftScore: (score: number) => Promise<boolean>;
+  boardUids: () => Promise<string[]>;
   reset: () => void;
 }
 
@@ -151,6 +193,7 @@ export const TEST_API_MARKER = "ca-test-api";
 
 const STARTER_ENEMY = "raider";
 const DEFAULT_SEED = 7;
+const BOARD_PROBE_DEPTH = 60;
 
 const applyMeta = (patch: MetaPatch): void => {
   const meta = useMetaStore.getState();
@@ -279,6 +322,37 @@ const readState = (): TestState => {
   };
 };
 
+const readAccount = (): AccountView => {
+  const app = useAppStore.getState();
+  const merge = app.merge;
+  return {
+    uid: app.uid,
+    isAnonymous: app.account?.isAnonymous ?? true,
+    providers: [...(app.account?.providers ?? [])],
+    email: app.account?.email ?? null,
+    namespace: scopedKey("meta"),
+    activeUid: activeUid(),
+    switches: profileSwitches(),
+    authError: app.authError,
+    authBusy: app.authBusy,
+    claimOutcome: lastClaimOutcome(),
+    claimSource: readClaim()?.sourceUid ?? null,
+    merge:
+      merge === null
+        ? null
+        : {
+            sourceUid: merge.sourceUid,
+            targetUid: merge.targetUid,
+            recommended: merge.recommended,
+            sourceLevel: merge.source.level,
+            targetLevel: merge.target.level,
+          },
+    keys: deviceKeys()
+      .filter((key) => key.startsWith("ca."))
+      .sort(),
+  };
+};
+
 export const createTestApi = (): TestApi => ({
   seedRun: (config = {}) => {
     const meta = useMetaStore.getState();
@@ -385,6 +459,44 @@ export const createTestApi = (): TestApi => ({
   anchors: () => battleAnchors(),
 
   state: readState,
+
+  account: readAccount,
+
+  cloudMeta: async () => {
+    const uid = activeUid();
+    if (uid === null) return null;
+    const doc = await readMetaDocFromServer(uid);
+    if (doc === null) return null;
+    const summary = profileSummary(doc);
+    return {
+      updatedAt: doc.updatedAt,
+      level: summary.level,
+      shards: summary.shards,
+      runs: summary.runs,
+      linkedFrom: doc.linkedFrom ?? null,
+    };
+  },
+
+  submitDriftScore: async (score) => {
+    const uid = useAppStore.getState().uid;
+    if (uid === null) return false;
+    const meta = useMetaStore.getState();
+    meta.recordDriftScore(score, isoWeekKey(Date.now()));
+    return await submit(DRIFT_ALLTIME_BOARD, {
+      uid,
+      name: captainName(),
+      score,
+      level: useMetaStore.getState().level,
+      ship: useMetaStore.getState().selectedShip,
+      depth: BOARD_PROBE_DEPTH,
+      kills: 10,
+      scrap: 200,
+      updatedAt: Date.now(),
+    });
+  },
+
+  boardUids: async () =>
+    (await top(DRIFT_ALLTIME_BOARD)).map((entry) => entry.uid),
 
   reset: () => {
     discardActiveRun();

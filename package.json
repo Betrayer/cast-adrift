@@ -37,7 +37,8 @@
     "e2e:build": "vite build",
     "e2e:serve": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "e2e:emu": "npx -y firebase-tools@14 emulators:exec --only auth,firestore --project cast-adrift-e2e \"playwright test -c playwright.emu.config.ts\"",
-    "e2e:emu:auth": "npx -y firebase-tools@14 emulators:exec --only auth --project cast-adrift-e2e \"playwright test -c playwright.emu.config.ts\""
+    "e2e:emu:auth": "npx -y firebase-tools@14 emulators:exec --only auth --project cast-adrift-e2e \"playwright test -c playwright.emu.config.ts --grep-invert @firestore\"",
+    "test:rules": "npx -y firebase-tools@14 emulators:exec --only auth,firestore --project cast-adrift-rules \"vitest run --config vitest.rules.config.ts\""
   },
   "dependencies": {
     "@mantine/core": "^9.4.1",

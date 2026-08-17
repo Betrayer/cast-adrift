@@ -34,6 +34,7 @@ import type {
   Locale,
   ReducedMotionSetting,
 } from '@/types';
+import { AccountSection } from './AccountSection';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
@@ -314,6 +315,8 @@ export const SettingsScreen = () => {
       <Title order={2} c={tokens.text}>
         {t('settings:title')}
       </Title>
+
+      <AccountSection />
 
       <Stack gap="xs">
         <Text size="sm" c={tokens.dim}>

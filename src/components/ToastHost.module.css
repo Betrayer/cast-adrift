@@ -119,3 +119,15 @@
 :root[data-ca-motion='reduced'] .toast {
   animation: none;
 }
+
+.auth {
+  pointer-events: none;
+  max-width: 460px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-danger);
+  box-shadow: 0 8px 24px var(--ca-shadow);
+  color: var(--ca-text);
+  font-size: 13px;
+}

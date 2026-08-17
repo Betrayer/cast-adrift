@@ -1,6 +1,7 @@
 import { expect, test } from '../fixtures';
 
 const BATTLE_SEEDS = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59];
+const LOCALE_CHUNK_TIMEOUT = 30_000;
 
 test.describe('smoke', () => {
   test('boot renders the menu with its entry points', async ({ app }) => {
@@ -92,11 +93,15 @@ test.describe('smoke', () => {
     await expect
       .poll(async () => (await app.state()).screen)
       .toBe('settings');
-    await expect(app.testId('settings-back')).toHaveText('Назад');
+    await expect(app.testId('settings-back')).toHaveText('Назад', {
+      timeout: LOCALE_CHUNK_TIMEOUT,
+    });
 
     await app.testId('settings-back').click();
     await app.expectScreen('menu');
-    await expect(app.testId('menu-settings')).toHaveText('Настройки');
+    await expect(app.testId('menu-settings')).toHaveText('Настройки', {
+      timeout: LOCALE_CHUNK_TIMEOUT,
+    });
   });
 
   test('a run survives a reload and resumes from the menu card', async ({

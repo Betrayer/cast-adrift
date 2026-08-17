@@ -17,6 +17,7 @@ import { ENDINGS, STANDARD_ENDINGS } from "@/data/narrative/endings";
 
 import { countStars } from "@/game/run/goals";
 import { progressWithinLevel } from "@/game/xp";
+import { isGuestAccount, supportId } from "@/services/uid";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { AchievementGrid } from "./AchievementGrid";
@@ -24,6 +25,46 @@ import { BadgeRow } from "./BadgeRow";
 
 const endingSlots = (earned: readonly string[]): typeof ENDINGS =>
   earned.includes("answer") ? ENDINGS : STANDARD_ENDINGS;
+
+const AccountLine = () => {
+  const { t } = useTranslation(["settings"]);
+  const go = useAppStore((s) => s.go);
+  const account = useAppStore((s) => s.account);
+  const uid = useAppStore((s) => s.uid);
+  const status = isGuestAccount(account)
+    ? t("settings:account.guest")
+    : account?.email !== null && account?.email !== undefined
+      ? account.email
+      : t("settings:account.telegramProfile");
+
+  return (
+    <Paper bg={tokens.surface1} p="sm" radius="md" withBorder>
+      <Group justify="space-between" wrap="nowrap">
+        <Stack gap={0}>
+          <Text size="xs" c={tokens.faint}>
+            {t("settings:account.title")}
+          </Text>
+          <Text size="sm" fw={600} c={tokens.text} data-testid="profile-account">
+            {status}
+          </Text>
+          <Text size="10px" c={tokens.faint}>
+            {t("settings:account.supportId", { id: supportId(uid) })}
+          </Text>
+        </Stack>
+        <Button
+          size="xs"
+          variant="default"
+          data-testid="profile-account-open"
+          onClick={() => {
+            go("settings");
+          }}
+        >
+          {t("settings:title")}
+        </Button>
+      </Group>
+    </Paper>
+  );
+};
 
 const StatCell = ({ label, value }: { label: string; value: string }) => (
   <Stack gap={0}>
@@ -37,7 +78,7 @@ const StatCell = ({ label, value }: { label: string; value: string }) => (
 );
 
 export const ProfileScreen = () => {
-  const { t } = useTranslation(["meta", "common", "content"]);
+  const { t } = useTranslation(["meta", "common", "content", "settings"]);
   const go = useAppStore((s) => s.go);
   const level = useMetaStore((s) => s.level);
   const xp = useMetaStore((s) => s.xp);
@@ -74,6 +115,8 @@ export const ProfileScreen = () => {
       }
     >
       <Stack gap="sm">
+          <AccountLine />
+
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Group>
               <RingProgress

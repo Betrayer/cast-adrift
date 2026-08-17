@@ -5,6 +5,7 @@ import {
   init,
   isTMA,
   miniApp,
+  openLink,
   retrieveLaunchParams,
   retrieveRawInitData,
   swipeBehavior,
@@ -197,6 +198,15 @@ export const bindTelegramChrome = (hasRun: () => boolean): void => {
 
   sync();
   useAppStore.subscribe(sync);
+};
+
+export const openExternalLink = (url: string): boolean => {
+  try {
+    return openLink.ifAvailable(url).ok;
+  } catch (error) {
+    console.warn("tma: external link unavailable", error);
+    return false;
+  }
 };
 
 export const initTma = async (): Promise<TmaSession> => {

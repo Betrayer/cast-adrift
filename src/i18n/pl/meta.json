@@ -391,7 +391,8 @@
     "myRank": "Twoja strona: {{rank}}",
     "noRank": "Na tym forum nie ma jeszcze żadnych wpisów",
     "empty": "Na razie nic tu nie ma.",
-    "depth": "d {{n}}"
+    "depth": "d {{n}}",
+    "offline": "Brak połączenia — tabela nieosiągalna. Wynik zapisany lokalnie."
   },
   "profile": {
     "title": "Profil",

@@ -11,6 +11,7 @@ import { CoachMarks } from '@/components/CoachMarks';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
 import { MemoryCeremony } from '@/components/MemoryCeremony';
+import { MergeCard } from '@/components/MergeCard';
 import { AudioDirector } from '@/components/AudioDirector';
 import { PerfOverlay } from '@/components/PerfOverlay';
 import { RotateGate } from '@/components/RotateGate';
@@ -49,6 +50,7 @@ export const App = () => {
       <AudioDirector />
       <ToastHost />
       <MemoryCeremony />
+      <MergeCard />
       <CoachMarks />
       <RotateGate />
       <DevOverlay />
