@@ -30,6 +30,7 @@ import { pushRunCloud } from "@/game/run/cloud";
 import {
   buildEncounterIds,
   pickBoss,
+  sectorDmgPct,
   sectorHpPct,
 } from "@/game/run/encounter";
 import { applyEdgeMotifs, applyNodeMotifs } from "@/game/run/motifs";
@@ -324,6 +325,7 @@ const encounterInit = (pocket: boolean) => {
   return {
     ascension: s.ascension,
     sectorHpPct: sectorHpPct({ sector: s.sector, pocket }),
+    sectorDmgPct: sectorDmgPct({ sector: s.sector }),
     enemyHpBonusPct:
       mods.enemyHpPct +
       mut.enemyHpPct +

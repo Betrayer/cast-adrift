@@ -30,6 +30,7 @@
   "collect": "Zbierz",
   "lootNew": "Nowa matryca",
   "jam": "JAM",
+  "pierce": "WYŁOM {{n}}",
   "school": {
     "red": "Czerwony",
     "blue": "Niebieski",
@@ -86,7 +87,8 @@
     "sensors": "Czujniki",
     "reactor": "Reaktor",
     "repairBay": "Stacja naprawcza",
-    "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "unik {{dodge}}% · muśnięcie {{glancing}}%"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -117,6 +119,7 @@
   "enemyWard": "Okręg: {{school}}",
   "enemyGate": "Strona główna {{n}}",
   "enemyRage": "Rage i{{n}}",
+  "enemyVulnerable": "Wrażliwy +{{n}}",
   "inverted": "ODWRÓCONA KOLEJNOŚĆ",
   "invertedHint": "Najpierw reaktor, na końcu czujniki.",
   "storm": "BURZA PRAWDOPODOBIEŃSTW",

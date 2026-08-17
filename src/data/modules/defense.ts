@@ -9,7 +9,7 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
     price: 45,
     tag: "defense",
     tags: ["survival"],
-    mods: { hullMaxDelta: 5, enginesThresholdDelta: -1 },
+    mods: { hullMaxDelta: 5, evasionDelta: -6 },
     effects: [{ on: "nodeEnter", do: [{ a: "heal", n: 1 }] }],
   },
   {
@@ -20,7 +20,7 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
     price: 50,
     tag: "defense",
     tags: ["engines", "dodge"],
-    mods: { enginesThresholdDelta: 1 },
+    mods: { evasionDelta: 6 },
     effects: [
       {
         on: "beforeResolveSlot",
@@ -213,7 +213,7 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
     price: 85,
     tag: "defense",
     tags: ["survival", "shieldwall"],
-    mods: { hullMaxDelta: 8, enginesThresholdDelta: -1 },
+    mods: { hullMaxDelta: 8, evasionDelta: -6 },
     effects: [
       {
         on: "battleStart",

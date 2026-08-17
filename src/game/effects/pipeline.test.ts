@@ -14,7 +14,6 @@ const scopeFor = (ctx: BattleCtx, die: RolledDie): void => {
     die,
     value: die.value,
     chargeMult: 1,
-    thresholdBonus: 0,
     crit: false,
     repeat: false,
   };
@@ -140,7 +139,6 @@ describe("emit ordering and die scoping", () => {
       die: cinderA,
       value: 4,
       chargeMult: 1,
-      thresholdBonus: 0,
       crit: false,
       repeat: false,
     };

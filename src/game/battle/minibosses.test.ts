@@ -38,14 +38,14 @@ describe("Convoy Alpha — kill order", () => {
 describe("Warden Fragment — weak to mark", () => {
   it("takes double the mark bonus", () => {
     const marked = gate("wardenFragment");
-    marked.statuses.mark = 1;
+    marked.statuses.mark = 2;
     const markedSnap = withEnemy(marked);
-    const markedDealt = applyWeaponDamage(markedSnap, { enemy: marked }, 5, false, 2);
+    const markedDealt = applyWeaponDamage(markedSnap, { enemy: marked }, 5);
 
     const plain = spawnEnemy("raider", "enemy-0", stream());
-    plain.statuses.mark = 1;
+    plain.statuses.mark = 2;
     const plainSnap = withEnemy(plain);
-    const plainDealt = applyWeaponDamage(plainSnap, { enemy: plain }, 5, false, 2);
+    const plainDealt = applyWeaponDamage(plainSnap, { enemy: plain }, 5);
 
     expect(plainDealt).toBe(7);
     expect(markedDealt).toBe(9);

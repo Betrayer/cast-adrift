@@ -329,7 +329,7 @@
     },
     "jump": {
       "title": "Choose the next node",
-      "body": "Tap a lit node, then Jump. Fog hides the rows ahead; Sensors and deep scans push the horizon further."
+      "body": "Tap a lit node, then Jump. Fog hides the rows ahead; every Sensors upgrade pushes the horizon further."
     }
   },
   "motif": {

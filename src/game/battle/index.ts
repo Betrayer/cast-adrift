@@ -3,7 +3,7 @@ export {
   BASE_REROLL_SIZE,
   BONUS_REROLL_COST,
   CHARGE_CAP,
-  engineTier,
+  evasionFor,
   NUDGE_COST,
   OVERFLOW_HULL_COST,
   RESOLUTION_ORDER,

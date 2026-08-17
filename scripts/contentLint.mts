@@ -76,7 +76,7 @@ import {
   NUMBERED_MEMORIES,
 } from "../src/data/narrative/memories";
 import { ALL_PERKS } from "../src/data/perks";
-import { PUZZLES } from "../src/data/puzzles";
+import { PUZZLES, type PuzzleGoal } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
 import { SHIPS } from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
@@ -1034,6 +1034,11 @@ for (const entry of CODEX) {
   checkLocKey(`codex.${entry.id}`, entry.body);
 }
 
+const survivesEnemyTurn = (goal: PuzzleGoal): boolean => {
+  const inner = goal.g === "deduction" ? goal.inner : goal;
+  return inner.g === "survive" || inner.g === "survivePlus";
+};
+
 for (const puzzle of PUZZLES) {
   checkLocKey(`puzzle.${puzzle.id}`, puzzle.title);
   checkLocKey(`puzzle.${puzzle.id}`, puzzle.goalText);
@@ -1057,6 +1062,10 @@ for (const puzzle of PUZZLES) {
     );
   if (puzzle.locks !== undefined && puzzle.locks >= puzzle.deck.length)
     errors.push(`puzzles: "${puzzle.id}" locks its whole deck out of turn 1`);
+  if (survivesEnemyTurn(puzzle.goal) && puzzle.slots.includes("engines"))
+    errors.push(
+      `puzzles: "${puzzle.id}" survives an enemy turn and may not offer the engines slot — evasion is a roll`,
+    );
   if (puzzle.goal.g === "deduction") {
     if (puzzle.fixedRoll === undefined)
       errors.push(`puzzles: "${puzzle.id}" is a deduction puzzle without a fixedRoll`);

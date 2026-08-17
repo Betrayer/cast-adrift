@@ -18,7 +18,7 @@ const MOD_ORDER: readonly (keyof PerkMods)[] = [
   "markBonusDelta",
   "jamPowerDelta",
   "growthCapDelta",
-  "enginesThresholdDelta",
+  "evasionDelta",
   "rerollSizeDelta",
   "extraRerolls",
   "reserveDelta",

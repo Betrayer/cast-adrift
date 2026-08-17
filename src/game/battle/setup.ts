@@ -90,6 +90,7 @@ export interface BattleInit {
   chargeCap?: number;
   ascension?: number;
   sectorHpPct?: number;
+  sectorDmgPct?: number;
   enemyHpBonusPct?: number;
   eliteShield?: number;
   resonanceBoost?: ResonanceBoost;
@@ -429,10 +430,9 @@ export const buildBattleSnapshot = (
     ),
     enemies,
     targetId: enemies[0]?.id ?? null,
-    engineState: null,
+    evasion: null,
     nextTurnMods: {},
     nextRollBonus: 0,
-    pendingDeepScan: false,
     chargeCap: init.chargeCap ?? DEFAULT_CHARGE_CAP,
     sacrificePool: 0,
     bloodReactorUsed: false,
@@ -451,6 +451,7 @@ export const buildBattleSnapshot = (
     pendingStorm: 0,
     ascension,
     sectorHpPct: init.sectorHpPct ?? 0,
+    sectorDmgPct: init.sectorDmgPct ?? 0,
     enemyHpPct: init.enemyHpBonusPct ?? 0,
     inverted: init.inverted === true,
     nodeStorm: init.nodeStorm === true,

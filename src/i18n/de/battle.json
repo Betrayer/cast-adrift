@@ -30,6 +30,7 @@
   "collect": "Sammeln",
   "lootNew": "Neuer Stempel",
   "jam": "JAM",
+  "pierce": "DURCHBRUCH {{n}}",
   "school": {
     "red": "Rot",
     "blue": "Blau",
@@ -86,7 +87,8 @@
     "sensors": "Sensoren",
     "reactor": "Reaktor",
     "repairBay": "Reparaturhalle",
-    "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "Ausweichen {{dodge}}% · Streifer {{glancing}}%"
   },
   "intro": {
     "miniboss": "Mini-Boss",
@@ -117,6 +119,7 @@
   "enemyWard": "Wahlbezirk: {{school}}",
   "enemyGate": "Gate{{n}}",
   "enemyRage": "Rage und{{n}}",
+  "enemyVulnerable": "Verwundbar +{{n}}",
   "inverted": "UMGEKEHRTE REIHENFOLGE",
   "invertedHint": "Zuerst der Reaktor, dann die Sensoren.",
   "storm": "WAHRSCHEINLICHKEITSSTURM",

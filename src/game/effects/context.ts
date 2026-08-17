@@ -1,6 +1,7 @@
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import {
   aliveEnemies,
+  applyJam,
   applyWeaponDamage,
   resolveWeaponTarget,
 } from "@/game/battle/damage";
@@ -39,7 +40,6 @@ export interface ResolveScope {
   die: RolledDie;
   value: number;
   chargeMult: number;
-  thresholdBonus: number;
   crit: boolean;
   repeat: boolean;
 }
@@ -342,6 +342,10 @@ export class BattleCtx implements EffectCtx {
     if (target !== "target") return;
     const enemy = this.currentTargetEnemy();
     if (enemy === undefined) return;
+    if (s === "jam") {
+      applyJam(this.snapshot, enemy);
+      return;
+    }
     let amount = n;
     if (
       s === "burn" &&

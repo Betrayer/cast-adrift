@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import type {
   AccountView,
+  BattlePatch,
   CloudMetaView,
   SeedRunConfig,
   TestState,
@@ -161,6 +162,12 @@ export class Screens {
     await this.page.evaluate((cfg) => {
       window.caTest?.seedRun(cfg);
     }, config);
+  }
+
+  async startBattle(patch: BattlePatch): Promise<void> {
+    await this.page.evaluate((cfg) => {
+      window.caTest?.setBattle(cfg);
+    }, patch);
   }
 
   async grantRun(scrap: number): Promise<void> {

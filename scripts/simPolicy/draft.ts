@@ -37,7 +37,7 @@ const MOD_WEIGHTS: Partial<Record<keyof PerkMods, number>> = {
   blueReserveDelta: 0.3,
   markBonusDelta: 0.5,
   jamPowerDelta: 0.3,
-  enginesThresholdDelta: 0.3,
+  evasionDelta: 0.05,
   growthCapDelta: 0.25,
   scrapPerKill: 0.25,
   setCompleteCharge: 0.2,

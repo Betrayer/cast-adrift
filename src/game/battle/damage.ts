@@ -1,5 +1,5 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
-import { applyStatus, consumeStatus } from "@/game/battle/statuses";
+import { applyStatus, markMagnitude } from "@/game/battle/statuses";
 import type {
   BattleSnapshot,
   EnemyState,
@@ -24,6 +24,13 @@ export const isBodyImmune = (
     def.guarded === true &&
     aliveEnemies(snapshot).some((e) => e.id !== enemy.id)
   );
+};
+
+export const applyJam = (next: BattleSnapshot, enemy: EnemyState): void => {
+  applyStatus(enemy.statuses, "jam");
+  const def = ENEMY_BY_ID.get(enemy.defId);
+  if (def?.jamReleasesBlocks === true) next.blockedSlots = [];
+  if (def?.jamClearsRage === true) enemy.rage = 0;
 };
 
 export const handleDeath = (next: BattleSnapshot, enemy: EnemyState): void => {
@@ -120,7 +127,6 @@ export const applyWeaponDamage = (
   target: WeaponTarget,
   baseDamage: number,
   crit = false,
-  markBonus = 2,
   pierce = false,
   school?: School,
 ): number => {
@@ -140,9 +146,11 @@ export const applyWeaponDamage = (
     return damage;
   }
   if (isBodyImmune(next, target.enemy)) return 0;
-  const bonus = def?.markVulnerable === true ? markBonus * 2 : markBonus;
-  const marked = consumeStatus(target.enemy.statuses, "mark");
-  if (marked) damage += bonus;
+  const vulnerable = markMagnitude(target.enemy.statuses);
+  const marked = vulnerable > 0;
+  if (marked) {
+    damage += def?.markVulnerable === true ? vulnerable * 2 : vulnerable;
+  }
   if (crit) damage = Math.floor(damage * 1.5);
   const gate = target.enemy.gate ?? 0;
   if (gate > 0 && !marked) {

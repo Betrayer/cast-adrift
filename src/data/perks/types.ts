@@ -43,7 +43,7 @@ export interface PerkMods {
   chargeCapDelta: number;
   hullMaxDelta: number;
   hullMaxPct: number;
-  enginesThresholdDelta: number;
+  evasionDelta: number;
   markBonusDelta: number;
   jamPowerDelta: number;
   growthCapDelta: number;
@@ -83,7 +83,7 @@ export const ZERO_PERK_MODS: PerkMods = {
   chargeCapDelta: 0,
   hullMaxDelta: 0,
   hullMaxPct: 0,
-  enginesThresholdDelta: 0,
+  evasionDelta: 0,
   markBonusDelta: 0,
   jamPowerDelta: 0,
   growthCapDelta: 0,

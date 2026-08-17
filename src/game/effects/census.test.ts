@@ -73,7 +73,6 @@ describe("tag conditions in battle", () => {
       die: oneBurn.dice[0] ?? harnessDie("a", "grey-d4", 3),
       value: 3,
       chargeMult: 1,
-      thresholdBonus: 0,
       crit: false,
       repeat: false,
     };
@@ -91,7 +90,6 @@ describe("tag conditions in battle", () => {
       die: twoBurn.dice[0] ?? harnessDie("a", "grey-d4", 3),
       value: 3,
       chargeMult: 1,
-      thresholdBonus: 0,
       crit: false,
       repeat: false,
     };

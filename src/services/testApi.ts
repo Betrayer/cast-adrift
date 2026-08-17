@@ -159,7 +159,22 @@ export interface TestState {
     selectedDieUid: string | null;
     dice: DieView[];
     slots: { id: SlotId; dieUid: string | null }[];
-    enemies: { id: string; defId: string; hp: number; hpMax: number }[];
+    enemies: {
+      id: string;
+      defId: string;
+      hp: number;
+      hpMax: number;
+      shield: number;
+      vulnerable: number;
+    }[];
+    evasion: { dodgePct: number; glancingPct: number; intercept: boolean } | null;
+    sensorBeats: { vulnerable: number; pierce: number }[];
+    attackBeats: {
+      amount: number;
+      hullDamage: number;
+      dodged: number;
+      glanced: number;
+    }[];
   };
   meta: {
     level: number;
@@ -311,7 +326,24 @@ const readState = (): TestState => {
         defId: e.defId,
         hp: e.hp,
         hpMax: e.hpMax,
+        shield: e.shield,
+        vulnerable: e.statuses.mark ?? 0,
       })),
+      evasion: battle.evasion,
+      sensorBeats: battle.beats
+        .filter((b) => b.kind === "sensor" && b.sensor !== undefined)
+        .map((b) => ({
+          vulnerable: b.sensor?.vulnerable ?? 0,
+          pierce: b.sensor?.pierce ?? 0,
+        })),
+      attackBeats: battle.enemyBeats
+        .filter((b) => b.kind === "attack")
+        .map((b) => ({
+          amount: b.amount,
+          hullDamage: b.hullDamage,
+          dodged: b.dodged ?? 0,
+          glanced: b.glanced ?? 0,
+        })),
     },
     meta: {
       level: meta.level,

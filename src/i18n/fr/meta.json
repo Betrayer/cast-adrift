@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} réserve bleue",
       "jamPowerDelta": "{{n}} puissance de jam",
       "growthCapDelta": "{{n}} plafond de croissance",
-      "enginesThresholdDelta": "{{n}} seuil du moteur",
+      "evasionDelta": "{{n}}% d'esquive",
       "markBonusDelta": "{{n}} bonus de note",
       "battleEndHeal": "{{n}} soigner / combattre",
       "hullMaxPct": "{{n}} % de la coque maximale",

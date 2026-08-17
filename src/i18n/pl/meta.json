@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} niebieska rezerwa",
       "jamPowerDelta": "{{n}} moc dżemu",
       "growthCapDelta": "{{n}} limit wzrostu",
-      "enginesThresholdDelta": "{{n}} próg silnika",
+      "evasionDelta": "{{n}}% uniku",
       "markBonusDelta": "{{n}} premia za osiągnięcia",
       "battleEndHeal": "{{n}} leczyć / walczyć",
       "hullMaxPct": "{{n}} % maksymalnej wytrzymałości kadłuba",

@@ -319,6 +319,13 @@ const EnemyTraitChips = ({ enemy }: { enemy: EnemyState }) => {
       color: schools.red.text,
     });
   }
+  if ((enemy.statuses.mark ?? 0) > 0) {
+    chips.push({
+      key: 'vulnerable',
+      label: t('battle:enemyVulnerable', { n: enemy.statuses.mark }),
+      color: schools.grey.text,
+    });
+  }
   if (chips.length === 0) return null;
   return (
     <div className={styles.enemyTraitRow} data-enemy-traits={enemy.id}>
@@ -867,6 +874,9 @@ export const BattleScreen = () => {
       mountBattleScene(app, {
         slotTitle: (slot) => t(`battle:slot.${slot}`),
         capLabel: (cap, mk) => t('battle:slot.cap', { cap, mk }),
+        evasionLabel: (dodge, glancing) =>
+          t('battle:slot.evasion', { dodge, glancing }),
+        pierceLabel: (n) => t('battle:pierce', { n }),
         reserveTitle: t('battle:reserve'),
         statusGlyph: (key) => t(`battle:status.${key}`),
         jamLabel: t('battle:jam'),

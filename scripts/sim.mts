@@ -90,6 +90,7 @@ import {
 } from "../src/game/battle/setup";
 import {
   buildEncounterIds,
+  sectorDmgPct,
   sectorHpPct,
 } from "../src/game/run/encounter";
 import { computePerkMods } from "../src/game/run/perkMods";
@@ -131,6 +132,7 @@ interface BattleInit {
   chartPicks?: readonly string[];
   modules?: readonly string[];
   sectorHpPct?: number;
+  sectorDmgPct?: number;
   enemyHpBonusPct?: number;
   eliteShield?: number;
   ascension?: number;
@@ -146,6 +148,9 @@ interface BattleResult {
   kills: number;
   dealt: number;
   taken: number;
+  turnsPlayed: number;
+  sensorTurns: number;
+  engineTurns: number;
 }
 
 const getArg = (name: string, fallback: string): string => {
@@ -235,6 +240,7 @@ const simulateBattle = (
         init.modules ?? [],
       ),
       sectorHpPct: init.sectorHpPct,
+      sectorDmgPct: init.sectorDmgPct,
       enemyHpBonusPct: init.enemyHpBonusPct,
       eliteShield: init.eliteShield,
       ascension: init.ascension,
@@ -244,6 +250,9 @@ const simulateBattle = (
   );
   let dealt = 0;
   let taken = 0;
+  let turnsPlayed = 0;
+  let sensorTurns = 0;
+  let engineTurns = 0;
 
   for (let round = 0; round < TURN_CAP; round += 1) {
     const rerollUids = decideReroll(snapshot);
@@ -275,6 +284,10 @@ const simulateBattle = (
     }
     spendCharge(snapshot, init);
 
+    turnsPlayed += 1;
+    if (snapshot.slots.sensors?.dieUid !== undefined) sensorTurns += 1;
+    if (snapshot.slots.engines?.dieUid !== undefined) engineTurns += 1;
+
     const player = resolvePlayerPhase(snapshot, streams.dice);
     dealt += player.beats
       .filter((b) => b.kind === "damage")
@@ -282,7 +295,7 @@ const simulateBattle = (
     snapshot = player.next;
     if (snapshot.outcome !== undefined) break;
 
-    const enemy = resolveEnemyPhase(snapshot, enemyStream);
+    const enemy = resolveEnemyPhase(snapshot, enemyStream, streams.defense);
     taken += enemy.beats.reduce(
       (sum, b) => sum + b.hullDamage + b.shieldDamage,
       0,
@@ -302,6 +315,9 @@ const simulateBattle = (
     kills: snapshot.enemies.filter((e) => e.hp <= 0).length,
     dealt,
     taken,
+    turnsPlayed,
+    sensorTurns,
+    engineTurns,
   };
 };
 
@@ -428,6 +444,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           chartPicks: state.chartPicks,
           modules: state.modules,
           sectorHpPct: sectorHpPct({ sector, pocket: next.pocket === true }),
+          sectorDmgPct: sectorDmgPct({ sector }),
           enemyHpBonusPct: opts.enemyHpBonusPct,
           eliteShield: opts.eliteShield,
           ascension: opts.ascension,
@@ -869,8 +886,20 @@ const battleModeMain = (
         ...DECILES.map((q) => String(decile(takenSorted, q))),
       ].join(","),
     );
+    const turnsPlayed = results.reduce((sum, r) => sum + r.turnsPlayed, 0);
+    const sensorShare =
+      turnsPlayed === 0
+        ? 0
+        : results.reduce((sum, r) => sum + r.sensorTurns, 0) / turnsPlayed;
+    const engineShare =
+      turnsPlayed === 0
+        ? 0
+        : results.reduce((sum, r) => sum + r.engineTurns, 0) / turnsPlayed;
     console.log(
       `sim: ${key} — winrate ${(winrate * 100).toFixed(1)}% · avgTurns ${avgTurns.toFixed(1)} · avgHullLeft(wins) ${avgHullLeftWins.toFixed(1)} · timeouts ${String(timeouts)}`,
+    );
+    console.log(
+      `sim: ${key} — slot use: sensors ${(sensorShare * 100).toFixed(0)}% · engines ${(engineShare * 100).toFixed(0)}% of played turns`,
     );
   }
 
@@ -970,6 +999,7 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
               tide: profile.tide,
               mkLevels: profile.mkLevels,
               sectorHpPct: sectorHpPct({ sector: profile.sector }),
+              sectorDmgPct: sectorDmgPct({ sector: profile.sector }),
             },
           ),
         );
@@ -2103,6 +2133,7 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
             mkLevels: archetype.mkLevels,
             modules: [...archetype.modules],
             sectorHpPct: sectorHpPct({ sector }),
+            sectorDmgPct: sectorDmgPct({ sector }),
             hull: Math.round((hullMax * entry.hullPct) / 100),
             hullMax,
             runScrap: entry.scrap,

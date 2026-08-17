@@ -6,7 +6,6 @@ import {
   useBattleStore,
   type BattleValues,
 } from "@/stores/battleStore";
-import { useRunStore } from "@/stores/runStore";
 import type { RolledDie } from "@/types/battle";
 
 const start = (seed = 42, enemyIds: string[] = ["raider"]) => {
@@ -28,7 +27,7 @@ const materialValues = (s: BattleValues) => ({
   slots: s.slots,
   enemies: s.enemies,
   targetId: s.targetId,
-  engineState: s.engineState,
+  evasion: s.evasion,
   nextTurnMods: s.nextTurnMods,
   blockedSlots: s.blockedSlots,
   lockedDice: s.lockedDice,
@@ -39,7 +38,6 @@ const materialValues = (s: BattleValues) => ({
 beforeEach(() => {
   useBattleStore.setState(useBattleStore.getInitialState(), true);
   useBattleStore.setState(createInitialBattleValues());
-  useRunStore.setState({ pendingDeepScan: false });
 });
 
 describe("startBattle", () => {
@@ -380,7 +378,7 @@ describe("resolution flow", () => {
     expect(s.hull).toBe(0);
   });
 
-  it("mirrors deep scan into the run store", () => {
+  it("carries the sensors vulnerability onto the target", () => {
     start();
     const d6 = useBattleStore.getState().dice.find((d) => d.tier === 6);
     const uid = d6?.uid ?? "";
@@ -388,13 +386,12 @@ describe("resolution flow", () => {
       dice: s.dice.map((d) => (d.uid === uid ? { ...d, value: 6 } : d)),
     }));
     useBattleStore.getState().placeDie(uid, "sensors");
-    useBattleStore.setState((s) => ({
-      dice: s.dice.map((d) => (d.uid === uid ? { ...d, value: 7 } : d)),
-    }));
     useBattleStore.getState().endTurn();
-    finish();
-    expect(useRunStore.getState().pendingDeepScan).toBe(true);
-    expect(useBattleStore.getState().pendingDeepScan).toBe(false);
+    const marks = useBattleStore
+      .getState()
+      .beats.filter((b) => b.kind === "sensor")
+      .map((b) => b.sensor?.vulnerable);
+    expect(marks).toEqual([3]);
   });
 
   it("blocks placement during resolving", () => {

@@ -30,6 +30,7 @@
   "collect": "Recoger",
   "lootNew": "Nueva matriz",
   "jam": "JAM",
+  "pierce": "BRECHA {{n}}",
   "school": {
     "red": "Rojo",
     "blue": "Azul",
@@ -86,7 +87,8 @@
     "sensors": "Sensores",
     "reactor": "Reactor",
     "repairBay": "Taller de reparaciones",
-    "cap": "cap ≤ d {{cap}} · Mk {{mk}}"
+    "cap": "cap ≤ d {{cap}} · Mk {{mk}}",
+    "evasion": "esquiva {{dodge}}% · roce {{glancing}}%"
   },
   "intro": {
     "miniboss": "Minijefazo",
@@ -117,6 +119,7 @@
   "enemyWard": "Distrito: {{school}}",
   "enemyGate": "Puerta {{n}}",
   "enemyRage": "Rage y{{n}}",
+  "enemyVulnerable": "Vulnerable +{{n}}",
   "inverted": "PEDIDO INVERTIDO",
   "invertedHint": "Primero el reactor, luego los sensores.",
   "storm": "TORMENTA DE PROBABILIDADES",

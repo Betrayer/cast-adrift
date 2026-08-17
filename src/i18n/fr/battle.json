@@ -30,6 +30,7 @@
   "collect": "Collecter",
   "lootNew": "Nouvelle matrice",
   "jam": "JAM",
+  "pierce": "BRÈCHE {{n}}",
   "school": {
     "red": "Rouge",
     "blue": "Bleu",
@@ -86,7 +87,8 @@
     "sensors": "Capteurs",
     "reactor": "Réacteur",
     "repairBay": "Atelier de réparation",
-    "cap": "cap ≤ d {{cap}} · Mk {{mk}}"
+    "cap": "cap ≤ d {{cap}} · Mk {{mk}}",
+    "evasion": "esquive {{dodge}}% · frôlement {{glancing}}%"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -117,6 +119,7 @@
   "enemyWard": "Circonscription : {{school}}",
   "enemyGate": "{{n}} de l'entrée",
   "enemyRage": "Rage + {{n}}",
+  "enemyVulnerable": "Vulnérable +{{n}}",
   "inverted": "COMMANDE INVERSE",
   "invertedHint": "Le réacteur d'abord, les capteurs ensuite.",
   "storm": "TEMPÊTE DE PROBABILITÉS",

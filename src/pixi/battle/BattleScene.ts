@@ -8,6 +8,7 @@ import { ENEMY_BY_ID } from "@/data/enemies";
 import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
 import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
+import { projectedEvasion } from "@/game/battle/projection";
 import { canPlaceDie } from "@/game/battle/setup";
 import type { StatusKey } from "@/game/battle/statuses";
 import { duckMusic, playSfx } from "@/services/audio";
@@ -45,6 +46,8 @@ import type { School } from "@/types/content";
 export interface BattleSceneLabels {
   slotTitle: (slot: SlotId) => string;
   capLabel: (cap: number, mk: number) => string;
+  evasionLabel: (dodge: number, glancing: number) => string;
+  pierceLabel: (n: number) => string;
   reserveTitle: string;
   statusGlyph: (key: StatusKey) => string;
   jamLabel: string;
@@ -1087,7 +1090,7 @@ export class BattleScene {
           continue;
         }
         text.text =
-          key === "burn"
+          key === "burn" || key === "mark"
             ? `${this.labels.statusGlyph(key)}${String(value)}`
             : this.labels.statusGlyph(key);
         text.position.set(-totalWidth / 2 + statusX + 8, size / 2 + 6);
@@ -1317,8 +1320,30 @@ export class BattleScene {
         this.drawSlotBox(slotId, occupied, blocked);
       }
     }
+    this.syncEnginesLabel(state);
     this.drawChargePips(state);
     this.publishAnchors(state);
+  }
+
+  private syncEnginesLabel(state: BattleState): void {
+    const view = this.slotViews.get("engines");
+    const slot = state.slots.engines;
+    if (view === undefined || slot === undefined) return;
+    const die =
+      slot.dieUid === undefined
+        ? undefined
+        : state.dice.find((d) => d.uid === slot.dieUid);
+    if (die === undefined) {
+      view.cap.text = this.labels.capLabel(slot.cap, slot.mk);
+      view.cap.style.fill = tokens.faint;
+      return;
+    }
+    const evasion = projectedEvasion(state, die, slot);
+    view.cap.text = this.labels.evasionLabel(
+      evasion.dodgePct,
+      evasion.glancingPct,
+    );
+    view.cap.style.fill = schools.green.text;
   }
 
   private readonly onStoreChange = (
@@ -2086,6 +2111,20 @@ export class BattleScene {
     if (beat.kind === "sensor" && beat.targetId !== undefined) {
       playSfx("sensors");
       this.scanSweep(beat.targetId);
+      const pierce = beat.sensor?.pierce ?? 0;
+      if (pierce > 0) {
+        const anchor = this.enemyAnchor(beat.targetId);
+        if (anchor !== undefined) {
+          playSfx("shields");
+          this.flashEnemy(beat.targetId);
+          this.spawnNumber(
+            anchor.x,
+            anchor.y - this.layout.enemySize / 2,
+            this.labels.pierceLabel(pierce),
+            schools.blue.text,
+          );
+        }
+      }
       return;
     }
     if (beat.kind === "shield") {

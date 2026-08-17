@@ -30,6 +30,7 @@
   "collect": "Collect",
   "lootNew": "New die",
   "jam": "JAM",
+  "pierce": "BREACH {{n}}",
   "school": {
     "red": "Red",
     "blue": "Blue",
@@ -86,7 +87,8 @@
     "sensors": "Sensors",
     "reactor": "Reactor",
     "repairBay": "Repair Bay",
-    "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "dodge {{dodge}}% · glancing {{glancing}}%"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -117,6 +119,7 @@
   "enemyWard": "Ward: {{school}}",
   "enemyGate": "Gate {{n}}",
   "enemyRage": "Rage +{{n}}",
+  "enemyVulnerable": "Vulnerable +{{n}}",
   "inverted": "INVERTED ORDER",
   "invertedHint": "Reactor first, Sensors last.",
   "storm": "PROBABILITY STORM",

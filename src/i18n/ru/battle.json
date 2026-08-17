@@ -30,6 +30,7 @@
   "collect": "Забрать",
   "lootNew": "Новый кубик",
   "jam": "КЛИН",
+  "pierce": "ПРОБОЙ {{n}}",
   "school": {
     "red": "Красн.",
     "blue": "Син.",
@@ -86,7 +87,8 @@
     "sensors": "Сенсоры",
     "reactor": "Реактор",
     "repairBay": "Ремонтный отсек",
-    "cap": "кап ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "кап ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "уворот {{dodge}}% · скольжение {{glancing}}%"
   },
   "intro": {
     "miniboss": "Мини-босс",
@@ -117,6 +119,7 @@
   "enemyWard": "Защита: {{school}}",
   "enemyGate": "Заслон {{n}}",
   "enemyRage": "Ярость +{{n}}",
+  "enemyVulnerable": "Уязвим +{{n}}",
   "inverted": "ПОРЯДОК ПЕРЕВЁРНУТ",
   "invertedHint": "Сначала реактор, сенсоры последними.",
   "storm": "ВЕРОЯТНОСТНЫЙ ШТОРМ",

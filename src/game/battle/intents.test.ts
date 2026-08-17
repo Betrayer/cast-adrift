@@ -1,12 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { harnessDie, harnessSnap } from "@/game/battle/battleHarness";
-import { applyWeaponDamage } from "@/game/battle/damage";
-import {
-  advanceTurn,
-  resolveEnemyPhase,
-  resolvePlayerPhase,
-} from "@/game/battle/resolver";
+import { applyJam, applyWeaponDamage } from "@/game/battle/damage";
+import { advanceTurn, resolveEnemyPhase } from "@/game/battle/resolver";
 import {
   drawIntent,
   NEUTRAL_STEP_CONTEXT,
@@ -86,12 +82,12 @@ describe("shieldGate", () => {
     expect(live.gate).toBe(0);
   });
 
-  it("a mark reads straight past the gate", () => {
+  it("a vulnerable target reads straight past the gate", () => {
     const enemy = armed("anchorHulk", { t: "shieldGate", n: 6 });
     const gated = resolveEnemyPhase(withEnemy(enemy), stream());
     const live = gated.next.enemies[0];
     if (live === undefined) throw new Error("no enemy");
-    live.statuses.mark = 1;
+    live.statuses.mark = 2;
     expect(applyWeaponDamage(gated.next, { enemy: live }, 3)).toBe(5);
     expect(live.gate).toBe(6);
   });
@@ -256,8 +252,8 @@ describe("enemy traits", () => {
     const sliver = spawnEnemy("coreSliver", "enemy-0", stream());
     sliver.ward = "red";
     const snap = withEnemy(sliver);
-    expect(applyWeaponDamage(snap, { enemy: sliver }, 8, false, 2, false, "red")).toBe(4);
-    expect(applyWeaponDamage(snap, { enemy: sliver }, 8, false, 2, false, "blue")).toBe(8);
+    expect(applyWeaponDamage(snap, { enemy: sliver }, 8, false, false, "red")).toBe(4);
+    expect(applyWeaponDamage(snap, { enemy: sliver }, 8, false, false, "blue")).toBe(8);
   });
 
   it("the ward rotates to a different school on the enemy turn", () => {
@@ -268,20 +264,16 @@ describe("enemy traits", () => {
     expect(result.beats.some((b) => b.kind === "ward")).toBe(true);
   });
 
-  it("a sensor jam clears every block the Silencer holds", () => {
+  it("a jam clears every block the Silencer holds", () => {
     const silencer = armed("silencer", { t: "jamSlot", k: 2 });
     const blocked = resolveEnemyPhase(withEnemy(silencer), stream());
     expect(blocked.next.blockedSlots.length).toBeGreaterThan(0);
 
     const snap = blocked.next;
-    const die = harnessDie("s0", "red-d6", 6);
-    die.state = "placed";
-    die.slot = "sensors";
-    snap.dice = [die];
-    snap.slots.sensors = { cap: 6, mk: 1, dieUid: "s0" };
-    snap.targetId = snap.enemies[0]?.id ?? null;
-    const jammed = resolvePlayerPhase(snap);
-    expect(jammed.next.blockedSlots).toHaveLength(0);
+    const live = snap.enemies[0];
+    if (live === undefined) throw new Error("no enemy");
+    applyJam(snap, live);
+    expect(snap.blockedSlots).toHaveLength(0);
   });
 
   it("every reroll charges the Tollmaster", () => {

@@ -27,7 +27,7 @@ export const createConfig = (mode: E2eMode): PlaywrightTestConfig => ({
   fullyParallel: true,
   forbidOnly: isCI,
   retries: isCI ? 1 : 0,
-  workers: isCI ? 2 : undefined,
+  workers: isCI ? 2 : 1,
   reporter: isCI ? [['github'], ['list']] : [['list']],
   timeout: 90_000,
   expect: {

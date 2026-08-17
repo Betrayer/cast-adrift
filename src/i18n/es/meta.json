@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} reserva azul",
       "jamPowerDelta": "{{n}} potencia de la mermelada",
       "growthCapDelta": "{{n}} límite de crecimiento",
-      "enginesThresholdDelta": "{{n}} umbral del motor",
+      "evasionDelta": "{{n}}% de esquiva",
       "markBonusDelta": "{{n}} bonificación por puntuación",
       "battleEndHeal": "{{n}} curar / luchar",
       "hullMaxPct": "{{n}} % del casco máximo",

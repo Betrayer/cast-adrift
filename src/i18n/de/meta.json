@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} blaue Reserve",
       "jamPowerDelta": "{{n}} Jam-Power",
       "growthCapDelta": "{{n}} Wachstumsgrenze",
-      "enginesThresholdDelta": "{{n}} Motorschwelle",
+      "evasionDelta": "{{n}}% Ausweichen",
       "markBonusDelta": "{{n}} Markenbonus",
       "battleEndHeal": "{{n}} heilen / kämpfen",
       "hullMaxPct": "{{n}} % der maximalen Rumpfstärke",

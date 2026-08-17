@@ -65,7 +65,7 @@ import type {
   CursedDie,
   EnemyBeat,
   EnemyState,
-  EngineTier,
+  EvasionState,
   LockedDie,
   NextTurnMods,
   ResonanceCensus,
@@ -95,6 +95,7 @@ export interface BattleEncounter {
   rerollSizeBonus?: number;
   ascension?: number;
   sectorHpPct?: number;
+  sectorDmgPct?: number;
   enemyHpBonusPct?: number;
   eliteShield?: number;
   resonanceBoost?: ResonanceBoost;
@@ -119,6 +120,7 @@ export interface BattleValues {
   runScrap: number;
   tide: number;
   sectorHpPct: number;
+  sectorDmgPct: number;
   enemyHpPct: number;
   interference: number;
   perks: string[];
@@ -150,10 +152,9 @@ export interface BattleValues {
   swapSourceUid: string | null;
   enemies: EnemyState[];
   targetId: string | null;
-  engineState: EngineTier | null;
+  evasion: EvasionState | null;
   nextTurnMods: NextTurnMods;
   nextRollBonus: number;
-  pendingDeepScan: boolean;
   blockedSlots: BlockedSlot[];
   shrunkSlots: BlockedSlot[];
   lockedDice: LockedDie[];
@@ -255,6 +256,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   runCounters: {},
   exceedCap: [],
   sectorHpPct: 0,
+  sectorDmgPct: 0,
   enemyHpPct: 0,
   scheduled: [],
   grants: {},
@@ -275,10 +277,9 @@ export const createInitialBattleValues = (): BattleValues => ({
   selectedDieUid: null,
   enemies: [],
   targetId: null,
-  engineState: null,
+  evasion: null,
   nextTurnMods: {},
   nextRollBonus: 0,
-  pendingDeepScan: false,
   blockedSlots: [],
   shrunkSlots: [],
   lockedDice: [],
@@ -354,10 +355,9 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   slots: s.slots,
   enemies: s.enemies,
   targetId: s.targetId,
-  engineState: s.engineState,
+  evasion: s.evasion,
   nextTurnMods: s.nextTurnMods,
   nextRollBonus: s.nextRollBonus,
-  pendingDeepScan: s.pendingDeepScan,
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
@@ -372,6 +372,7 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   pendingStorm: s.pendingStorm,
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
+  sectorDmgPct: s.sectorDmgPct,
   enemyHpPct: s.enemyHpPct,
   inverted: s.inverted,
   nodeStorm: s.nodeStorm,
@@ -411,10 +412,9 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   slots: snap.slots,
   enemies: snap.enemies,
   targetId: snap.targetId,
-  engineState: snap.engineState,
+  evasion: snap.evasion,
   nextTurnMods: snap.nextTurnMods,
   nextRollBonus: snap.nextRollBonus,
-  pendingDeepScan: snap.pendingDeepScan,
   blockedSlots: snap.blockedSlots,
   shrunkSlots: snap.shrunkSlots,
   lockedDice: snap.lockedDice,
@@ -429,6 +429,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pendingStorm: snap.pendingStorm,
   ascension: snap.ascension,
   sectorHpPct: snap.sectorHpPct,
+  sectorDmgPct: snap.sectorDmgPct,
   enemyHpPct: snap.enemyHpPct,
   inverted: snap.inverted === true,
   nodeStorm: snap.nodeStorm === true,
@@ -569,6 +570,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         chargeCap: encounter.chargeCap,
         ascension: encounter.ascension,
         sectorHpPct: encounter.sectorHpPct,
+        sectorDmgPct: encounter.sectorDmgPct,
         enemyHpBonusPct: encounter.enemyHpBonusPct,
         eliteShield: encounter.eliteShield,
         resonanceBoost: encounter.resonanceBoost,
@@ -1063,7 +1065,11 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         finalPhase: "ended",
       };
     } else {
-      const enemy = resolveEnemyPhase(player.next, s.enemyStream);
+      const enemy = resolveEnemyPhase(
+        player.next,
+        s.enemyStream,
+        s.streams.defense,
+      );
       if (enemy.next.outcome !== undefined) {
         bundle = {
           beats: player.beats,
@@ -1124,9 +1130,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const s = get();
     if (s.phase !== "resolving" || s.resolution === null) return;
     const { final, finalPhase } = s.resolution;
-    if (final.pendingDeepScan) {
-      useRunStore.setState({ pendingDeepScan: true });
-    }
     const run = useRunStore.getState();
     for (const key of final.flags ?? []) {
       if (run.flags[key] === undefined) run.setFlag(key);
@@ -1145,7 +1148,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     );
     set({
       ...fromSnapshot(final),
-      pendingDeepScan: false,
       phase: finalPhase,
       resolution: null,
       rerollsLeft: canReroll ? 1 + extra + (final.grants?.rerollUses ?? 0) : 0,
@@ -1210,10 +1212,9 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   selectedDieUid: s.selectedDieUid,
   enemies: s.enemies,
   targetId: s.targetId,
-  engineState: s.engineState,
+  evasion: s.evasion,
   nextTurnMods: s.nextTurnMods,
   nextRollBonus: s.nextRollBonus,
-  pendingDeepScan: s.pendingDeepScan,
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
@@ -1229,6 +1230,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   swapSourceUid: s.swapSourceUid,
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
+  sectorDmgPct: s.sectorDmgPct,
   enemyHpPct: s.enemyHpPct,
   inverted: s.inverted,
   nodeStorm: s.nodeStorm,
