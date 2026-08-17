@@ -61,6 +61,7 @@ export const DieReward = ({ dieId }: { dieId: string }) => {
         <Button
           size="md"
           disabled={deckFull}
+          data-testid="reward-die-keep"
           onClick={() => {
             playSfx("optionTick", { rate: 1.12 });
             resolveDieReward(true);
@@ -71,6 +72,7 @@ export const DieReward = ({ dieId }: { dieId: string }) => {
         <Button
           size="md"
           variant="default"
+          data-testid="reward-die-sell"
           onClick={() => {
             playSfx("buy");
             resolveDieReward(false);

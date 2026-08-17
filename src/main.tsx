@@ -82,6 +82,12 @@ const bootPlatform = async (): Promise<void> => {
   await bootCloud();
 };
 
+if (import.meta.env.VITE_E2E === '1') {
+  void import('@/services/testApi').then((module) => {
+    module.mountTestApi();
+  });
+}
+
 void bootPlatform();
 
 const mount = (): void => {

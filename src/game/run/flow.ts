@@ -76,6 +76,7 @@ import {
 import { useSummaryStore } from "@/stores/summaryStore";
 import { captureRunSnapshot } from "@/game/run/snapshot";
 import { trackEvent } from "@/services/analytics";
+import { now } from "@/services/clock";
 import { createStream, createStreams, deriveSeed } from "@/services/rng";
 import { clearRun, saveRunSnapshot } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
@@ -522,13 +523,13 @@ const mapOptionsFor = (mutators: readonly string[], mode: RunMode) => ({
   noShops: computeMutatorMods(mutators).noShops,
 });
 
-export const startRun = (seed = Date.now() >>> 0, ascension = 0): void => {
+export const startRun = (seed = now() >>> 0, ascension = 0): void => {
   startRunMode({ mode: "campaign", seed, ascension });
 };
 
 export const startRunMode = (options: StartRunOptions = {}): void => {
   const mode = options.mode ?? "campaign";
-  const rootSeed = (options.seed ?? Date.now()) >>> 0;
+  const rootSeed = (options.seed ?? now()) >>> 0;
   const contract = contractDef(options.contractId ?? null);
   const setup = contract?.setup ?? {};
   const mutators = [...(options.mutators ?? setup.mutators ?? [])];
@@ -574,7 +575,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     chartPicks,
     tide: Math.max(0, setup.tideStart ?? 0),
     ascension,
-    startedAt: Date.now(),
+    startedAt: now(),
     deck: deckIds.map((defId, index) => ({
       uid: `d${String(index)}`,
       defId,
@@ -593,7 +594,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   autosaveRun();
 };
 
-export const startDriftRun = (seed = Date.now() >>> 0): void => {
+export const startDriftRun = (seed = now() >>> 0): void => {
   startRunMode({ mode: "drift", seed });
 };
 
@@ -1135,7 +1136,7 @@ export const rerollPerkDraft = (): void => {
   redrawDraft("draftReroll");
 };
 
-export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
+export const startPrologueBattle = (seed = now() >>> 0): void => {
   startRun(seed, 0);
   const s = useRunStore.getState();
   s.setPendingBattle({

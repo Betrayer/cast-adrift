@@ -1,3 +1,4 @@
+import { now } from '@/services/clock';
 import { fnv1a } from '@/services/rng';
 import type { RunSnapshot } from '@/types';
 
@@ -105,7 +106,7 @@ export const createSaveService = (
     const data = JSON.stringify(snapshot);
     const payload: SavePayload = {
       v: RUN_SAVE_V,
-      savedAt: Date.now(),
+      savedAt: now(),
       checksum: fnv1a(data),
       data,
     };

@@ -157,7 +157,7 @@ export const ShopScreen = () => {
     <Screen
       width="wide"
       footer={
-        <Button size="md" fullWidth onClick={leave}>
+        <Button size="md" fullWidth data-testid="shop-leave" onClick={leave}>
           {t("run:shop.leave")}
         </Button>
       }
@@ -195,6 +195,8 @@ export const ShopScreen = () => {
               p="sm"
               radius="md"
               withBorder
+              data-testid={`shop-item-${String(index)}`}
+              data-sold={item.sold ? '1' : '0'}
               style={{ opacity: item.sold ? 0.4 : 1 }}
             >
               <Stack gap={4} align="center">
@@ -220,6 +222,7 @@ export const ShopScreen = () => {
                   mt={4}
                   fullWidth
                   disabled={!affordable}
+                  data-testid={`shop-buy-${String(index)}`}
                   onClick={() => {
                     buy(index);
                   }}
@@ -293,6 +296,7 @@ export const ShopScreen = () => {
       <Button
         variant="default"
         disabled={scrap < nextRerollCost}
+        data-testid="shop-reroll"
         onClick={reroll}
       >
         {nextRerollCost === 0

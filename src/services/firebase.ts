@@ -1,14 +1,23 @@
 import { initializeApp } from "firebase/app";
 import type { FirebaseApp } from "firebase/app";
 import {
+  connectAuthEmulator,
   getAuth,
   signInAnonymously,
   signInWithCustomToken,
 } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
+import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 
+const EMULATOR_HOST = "127.0.0.1";
+const AUTH_EMULATOR_PORT = 9099;
+const FIRESTORE_EMULATOR_PORT = 8080;
+
+const emulatorEnabled = (): boolean => import.meta.env.VITE_FB_EMULATOR === "1";
+
 let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
 let firestore: Firestore | null = null;
 
 const ensureApp = (): FirebaseApp => {
@@ -26,11 +35,24 @@ const ensureApp = (): FirebaseApp => {
 
 export const analyticsApp = (): FirebaseApp => ensureApp();
 
+const ensureAuth = (): Auth => {
+  if (auth !== null) return auth;
+  auth = getAuth(ensureApp());
+  if (emulatorEnabled()) {
+    connectAuthEmulator(
+      auth,
+      `http://${EMULATOR_HOST}:${String(AUTH_EMULATOR_PORT)}`,
+      { disableWarnings: true },
+    );
+  }
+  return auth;
+};
+
 export const restoredUid = async (): Promise<string | null> => {
   try {
-    const auth = getAuth(ensureApp());
-    await auth.authStateReady();
-    return auth.currentUser?.uid ?? null;
+    const current = ensureAuth();
+    await current.authStateReady();
+    return current.currentUser?.uid ?? null;
   } catch (error) {
     console.warn("firebase: auth state restore failed", error);
     return null;
@@ -39,9 +61,9 @@ export const restoredUid = async (): Promise<string | null> => {
 
 export const ensureAnonAuth = async (): Promise<string | null> => {
   try {
-    const auth = getAuth(ensureApp());
-    if (auth.currentUser !== null) return auth.currentUser.uid;
-    const credential = await signInAnonymously(auth);
+    const current = ensureAuth();
+    if (current.currentUser !== null) return current.currentUser.uid;
+    const credential = await signInAnonymously(current);
     return credential.user.uid;
   } catch (error) {
     console.error("firebase: anonymous sign-in failed", error);
@@ -70,7 +92,7 @@ export const signInWithTelegram = async (
         ? (body as { token?: unknown }).token
         : null;
     if (typeof token !== "string") return null;
-    const credential = await signInWithCustomToken(getAuth(ensureApp()), token);
+    const credential = await signInWithCustomToken(ensureAuth(), token);
     return credential.user.uid;
   } catch (error) {
     console.warn("firebase: telegram sign-in failed", error);
@@ -79,6 +101,14 @@ export const signInWithTelegram = async (
 };
 
 export const db = (): Firestore => {
-  firestore ??= getFirestore(ensureApp());
+  if (firestore !== null) return firestore;
+  firestore = getFirestore(ensureApp());
+  if (emulatorEnabled()) {
+    connectFirestoreEmulator(
+      firestore,
+      EMULATOR_HOST,
+      FIRESTORE_EMULATOR_PORT,
+    );
+  }
   return firestore;
 };

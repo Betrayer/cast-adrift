@@ -74,6 +74,7 @@ export const InterstitialScreen = () => {
         color="accent"
         className={styles.cta}
         data-interstitial-enter
+        data-testid="interstitial-enter"
         onClick={() => {
           go('map');
         }}

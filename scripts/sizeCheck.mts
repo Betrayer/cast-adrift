@@ -49,6 +49,29 @@ const audioBytes = (ext: string): number => {
 const shippedAudio = audioBytes(".webm");
 const fallbackAudio = audioBytes(".wav");
 
+const E2E_MARKERS: readonly string[] = ["caTest", "ca-test-api"];
+
+const e2eLeaks = (): string[] => {
+  const hits: string[] = [];
+  const walk = (dir: string): void => {
+    if (!existsSync(dir)) return;
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      const path = join(dir, entry.name);
+      if (entry.isDirectory()) {
+        walk(path);
+        continue;
+      }
+      if (!entry.name.endsWith(".js")) continue;
+      const source = readFileSync(path, "utf8");
+      for (const marker of E2E_MARKERS) {
+        if (source.includes(marker)) hits.push(`${entry.name} → ${marker}`);
+      }
+    }
+  };
+  walk(join(DIST, "assets"));
+  return hits;
+};
+
 if (!existsSync(MANIFEST)) {
   console.error(
     `size-check: no manifest at ${MANIFEST} — run \`npm run build\` first`,
@@ -128,7 +151,11 @@ if (report) {
   console.log(`size-check: wrote ${join(out, "size.json")}`);
 }
 
+const leaks = e2eLeaks();
+if (leaks.length === 0) console.log("  e2e hooks   absent from the bundle");
+
 const failures: string[] = [];
+for (const leak of leaks) failures.push(`e2e hook shipped to production: ${leak}`);
 if (mainGz > MAIN_BUDGET)
   failures.push(`main chunk ${kb(mainGz)} exceeds ${kb(MAIN_BUDGET)}`);
 if (initialGz > INITIAL_BUDGET)

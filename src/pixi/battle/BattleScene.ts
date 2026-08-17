@@ -19,7 +19,10 @@ import {
   releaseDieTextures,
 } from "@/pixi/textures";
 import { clearPool, reportPool } from "@/pixi/perf";
-import { publishTrayAnchor } from "@/pixi/battle/anchors";
+import {
+  publishBattleAnchors,
+  publishTrayAnchor,
+} from "@/pixi/battle/anchors";
 import { computeBattleLayout, type BattleLayout, type Rect } from "@/pixi/battle/layout";
 import { easeOutQuad, linear, Tweens } from "@/pixi/tween";
 import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
@@ -349,6 +352,7 @@ export class BattleScene {
       layer.destroy({ children: true });
     }
     publishTrayAnchor(null);
+    publishBattleAnchors(null);
     clearPool("battleFx");
     releaseDieTextures(this.app);
   }
@@ -695,6 +699,55 @@ export class BattleScene {
       y: canvas.top + band.y,
       w: band.w,
       h: band.h,
+    });
+  }
+
+  private publishAnchors(state: BattleState): void {
+    if (import.meta.env.VITE_E2E !== "1") return;
+    const canvas = this.app.canvas.getBoundingClientRect();
+    const band = this.layout.trayBand;
+    const reserve = this.layout.reserve;
+    publishBattleAnchors({
+      dice: state.dice.flatMap((die) => {
+        const sprite = this.dieSprites.get(die.uid);
+        if (sprite === undefined || !sprite.visible) return [];
+        return [
+          {
+            uid: die.uid,
+            x: canvas.left + sprite.x,
+            y: canvas.top + sprite.y,
+            size:
+              die.state === "tray" || die.state === "locked"
+                ? this.layout.dieSize
+                : this.layout.slotDieSize,
+          },
+        ];
+      }),
+      slots: activeSlotIds(state).flatMap((id) => {
+        const rect = this.layout.slots[id];
+        if (rect === undefined) return [];
+        return [
+          {
+            id,
+            x: canvas.left + rect.x,
+            y: canvas.top + rect.y,
+            w: rect.w,
+            h: rect.h,
+          },
+        ];
+      }),
+      reserve: {
+        x: canvas.left + reserve.x,
+        y: canvas.top + reserve.y,
+        w: reserve.w,
+        h: reserve.h,
+      },
+      tray: {
+        x: canvas.left + band.x,
+        y: canvas.top + band.y,
+        w: band.w,
+        h: band.h,
+      },
     });
   }
 
@@ -1265,6 +1318,7 @@ export class BattleScene {
       }
     }
     this.drawChargePips(state);
+    this.publishAnchors(state);
   }
 
   private readonly onStoreChange = (

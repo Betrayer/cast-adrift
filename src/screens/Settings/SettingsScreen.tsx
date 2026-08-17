@@ -326,6 +326,7 @@ export const SettingsScreen = () => {
             if (value !== null) settings.setLocale(value as Locale);
           }}
           data={LOCALE_OPTIONS}
+          data-testid="settings-locale"
           comboboxProps={{ withinPortal: true }}
         />
       </Stack>
@@ -452,6 +453,7 @@ export const SettingsScreen = () => {
 
       <Button
         variant="default"
+        data-testid="settings-back"
         onClick={() => {
           go('menu');
         }}

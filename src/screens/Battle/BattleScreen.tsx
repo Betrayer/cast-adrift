@@ -40,6 +40,7 @@ import { runHasTrait } from '@/game/run/runMods';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { initAudio, playSfx } from '@/services/audio';
+import { now } from '@/services/clock';
 import { haptic } from '@/services/tma';
 import { createStreams } from '@/services/rng';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
@@ -64,7 +65,7 @@ const startTestBattleIfIdle = (): void => {
   store.startBattle(
     { enemyIds: ['raider'] },
     STARTER_DECK,
-    createStreams(Date.now() >>> 0),
+    createStreams(now() >>> 0),
   );
 };
 
@@ -704,6 +705,7 @@ const BottomBar = () => {
               className={styles.clickable}
               size="sm"
               variant="default"
+              data-testid="battle-reroll-cancel"
               onClick={toggleRerollMode}
             >
               {t('battle:rerollCancel')}
@@ -712,6 +714,7 @@ const BottomBar = () => {
               className={styles.clickable}
               size="sm"
               disabled={rerollSelection.length === 0}
+              data-testid="battle-reroll-confirm"
               onClick={() => {
                 playSfx('reroll');
                 confirmReroll();
@@ -731,6 +734,7 @@ const BottomBar = () => {
             disabled={phase !== 'placement' || rerollsLeft <= 0}
             onClick={toggleRerollMode}
             data-coach="reroll"
+            data-testid="battle-reroll"
           >
             {t('battle:reroll', { n: rerollsLeft })}
           </Button>
@@ -743,6 +747,7 @@ const BottomBar = () => {
         disabled={phase !== 'placement' || rerollMode}
         onClick={endTurn}
         data-coach="endTurn"
+        data-testid="battle-end-turn"
       >
         {t('battle:endTurn')}
       </Button>
@@ -766,6 +771,7 @@ const EndOverlay = () => {
         </Title>
         <Button
           size="md"
+          data-testid="battle-to-menu"
           onClick={() => {
             clearLoot();
             reset();

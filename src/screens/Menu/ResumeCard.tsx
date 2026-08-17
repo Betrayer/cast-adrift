@@ -56,6 +56,7 @@ export const ResumeCard = ({ resume }: { resume: LocalResume }) => {
           <Button
             size="sm"
             color="accent"
+            data-testid="resume-continue"
             onClick={() => {
               resumeLocalRun();
             }}
@@ -65,6 +66,7 @@ export const ResumeCard = ({ resume }: { resume: LocalResume }) => {
           <Button
             size="sm"
             variant="default"
+            data-testid="resume-abandon"
             onClick={() => {
               setConfirming(true);
             }}
@@ -94,6 +96,7 @@ export const ResumeCard = ({ resume }: { resume: LocalResume }) => {
           <Group grow>
             <Button
               variant="default"
+              data-testid="resume-abandon-cancel"
               onClick={() => {
                 setConfirming(false);
               }}
@@ -102,6 +105,7 @@ export const ResumeCard = ({ resume }: { resume: LocalResume }) => {
             </Button>
             <Button
               color="red"
+              data-testid="resume-abandon-confirm"
               onClick={() => {
                 setConfirming(false);
                 void dropCloudRun();
