@@ -102,5 +102,27 @@
       "providerDisabled": "Este método de inicio de sesión está desactivado. Escribe a {{email}}.",
       "unknown": "No se pudo iniciar sesión. Inténtalo otra vez y escribe a {{email}} si sigue fallando."
     }
+  },
+  "layout": {
+    "title": "Interfaz de combate",
+    "hint": "Un combate, tres presentaciones. Cambiar es seguro incluso en plena pelea.",
+    "synced": "guardado en la cuenta",
+    "active": "Activo",
+    "use": "Usar",
+    "console": {
+      "name": "Consola",
+      "tag": "Muelle de ranuras en orden de disparo · consola de acciones permanente",
+      "desc": "Tarjetas en cuadrícula, cada control siempre en el mismo sitio."
+    },
+    "orbit": {
+      "name": "Órbita",
+      "tag": "Cápsulas de ranura en arco alrededor de tu nave · menú radial junto al dado",
+      "desc": "Tu nave está en pantalla y recibe los golpes; las acciones se abren junto al dado."
+    },
+    "tablet": {
+      "name": "Tableta",
+      "tag": "Cinta de ranuras con salida en vivo · pronóstico del turno",
+      "desc": "Todos los números en una columna, el turno entero calculado antes de terminarlo."
+    }
   }
 }

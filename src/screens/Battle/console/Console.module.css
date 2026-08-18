@@ -9,6 +9,42 @@
   border-radius: 14px;
 }
 
+.consoleCompact {
+  gap: 4px;
+  padding: 4px 6px;
+}
+
+.consoleCompact .btn {
+  font-size: 10.5px;
+  padding: 6px 2px;
+}
+
+.miniCompact {
+  min-height: 0;
+  gap: 0;
+  padding: 2px 6px;
+}
+
+.miniCompact .miniDesc {
+  display: none;
+}
+
+.miniCompact .miniHead {
+  font-size: 10.5px;
+  line-height: 13px;
+}
+
+.miniCompact .miniMeta {
+  font-size: 9px;
+  line-height: 11px;
+}
+
+.consoleCompact .reason {
+  min-height: 12px;
+  font-size: 9px;
+  line-height: 12px;
+}
+
 .row {
   display: flex;
   gap: 5px;

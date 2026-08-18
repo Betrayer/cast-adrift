@@ -72,6 +72,18 @@
   font-size: 13px;
 }
 
+.hint {
+  max-width: 420px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--ca-surface1);
+  border: 1px dashed var(--ca-accent);
+  box-shadow: 0 8px 24px var(--ca-shadow);
+  color: var(--ca-dim);
+  font-size: 12.5px;
+  line-height: 17px;
+}
+
 .achievementMark {
   color: var(--ca-amber);
   font-size: 16px;

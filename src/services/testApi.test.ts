@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { ALL_COACH_MARK_IDS } from "@/game/tutorial";
+import { ALL_COACH_MARK_IDS, HINT_IDS } from "@/game/tutorial";
 import { abandonRun } from "@/game/run/flow";
 import { totalXpForLevel } from "@/game/xp";
 import { setClockSource } from "@/services/clock";
@@ -79,7 +79,7 @@ describe("testApi", () => {
     expect(meta.achievements).toContain("firstBlood");
     expect(meta.collection.find((e) => e.defId === "vulture")?.count).toBe(2);
     expect(meta.stats.prologueDone).toBe(true);
-    expect(meta.tutorialSeen).toEqual([...ALL_COACH_MARK_IDS]);
+    expect(meta.tutorialSeen).toEqual([...ALL_COACH_MARK_IDS, ...HINT_IDS]);
   });
 
   it("grantMeta lowers shards as well as raising them", () => {

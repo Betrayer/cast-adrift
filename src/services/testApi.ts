@@ -1,6 +1,7 @@
 import type { ShipId } from "@/data/ships";
 import { canPlaceDie } from "@/game/battle/setup";
-import { ALL_COACH_MARK_IDS } from "@/game/tutorial";
+import { enemyForecast, type TurnForecast } from "@/game/battle/view";
+import { ALL_COACH_MARK_IDS, HINT_IDS } from "@/game/tutorial";
 import type { NodeId } from "@/game/map/types";
 import { lastClaimOutcome } from "@/services/account";
 import { readClaim } from "@/services/account-link";
@@ -13,6 +14,7 @@ import { profileSummary, readMetaDocFromServer } from "@/services/metaDoc";
 import { now as clockNow, setClockSource } from "@/services/clock";
 import { activeUid, deviceKeys, scopedKey } from "@/services/profile";
 import { profileSwitches } from "@/services/profileSwitch";
+import { battleLayoutId, chooseBattleLayout } from "@/services/prefs";
 import { createStreams } from "@/services/rng";
 import { clearRun } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
@@ -26,7 +28,7 @@ import { useMetaStore, type MetaStats } from "@/stores/metaStore";
 import { useRunStore, type RunMode } from "@/stores/runStore";
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
-import type { ScreenId } from "@/types";
+import type { BattleLayoutId, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
 
 export interface SeedRunConfig {
@@ -137,6 +139,7 @@ export interface CloudMetaView {
 
 export interface TestState {
   screen: ScreenId;
+  layout: BattleLayoutId;
   params: Record<string, string> | null;
   uid: string | null;
   run: {
@@ -192,6 +195,8 @@ export interface TestApi {
   setBattle: (patch: BattlePatch) => void;
   skipToNode: (nodeId: NodeId) => boolean;
   settings: (patch: Partial<SettingsValues>) => void;
+  layout: (id: BattleLayoutId) => void;
+  forecast: () => TurnForecast | null;
   now: (at?: number | null) => number;
   go: (screen: ScreenId, params?: Record<string, string>) => void;
   mapNodes: () => MapNodeView[];
@@ -243,7 +248,9 @@ const applyMeta = (patch: MetaPatch): void => {
   if (patch.prologueDone === true) meta.markPrologueDone();
   if (patch.tutorialSeen !== undefined) {
     const ids =
-      patch.tutorialSeen === "all" ? ALL_COACH_MARK_IDS : patch.tutorialSeen;
+      patch.tutorialSeen === "all"
+        ? [...ALL_COACH_MARK_IDS, ...HINT_IDS]
+        : patch.tutorialSeen;
     for (const id of ids) meta.markTutorialSeen(id);
   }
   if (patch.stats !== undefined) meta.bumpLifetime(patch.stats);
@@ -279,6 +286,7 @@ const applySettings = (patch: Partial<SettingsValues>): void => {
   if (patch.theme !== undefined) settings.setTheme(patch.theme);
   if (patch.fontScale !== undefined) settings.setFontScale(patch.fontScale);
   if (patch.battleSpeed !== undefined) settings.setBattleSpeed(patch.battleSpeed);
+  if (patch.battleLayout !== undefined) chooseBattleLayout(patch.battleLayout);
 };
 
 const readState = (): TestState => {
@@ -288,6 +296,7 @@ const readState = (): TestState => {
   const meta = useMetaStore.getState();
   return {
     screen: app.screen,
+    layout: battleLayoutId(),
     params: app.params ?? null,
     uid: app.uid,
     run: {
@@ -453,6 +462,14 @@ export const createTestApi = (): TestApi => ({
   skipToNode: (nodeId) => jumpTo(nodeId),
 
   settings: applySettings,
+
+  layout: chooseBattleLayout,
+
+  forecast: () => {
+    const battle = useBattleStore.getState();
+    if (battle.phase !== "placement") return null;
+    return enemyForecast(battleSnapshot(battle));
+  },
 
   now: (at) => {
     if (at === undefined) return clockNow();

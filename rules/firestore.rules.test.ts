@@ -169,6 +169,28 @@ describe('meta documents', () => {
     ).toBe(true);
   });
 
+  it('carries account preferences inside the payload, never beside it', async () => {
+    expect(
+      await allowed(
+        setDoc(
+          progress(me),
+          metaProgress({
+            data: JSON.stringify({
+              level: 3,
+              shards: 40,
+              prefs: { battleLayout: 'orbit', theme: 'terminal' },
+            }),
+          }),
+        ),
+      ),
+    ).toBe(true);
+    expect(
+      await denied(
+        setDoc(progress(me), metaProgress({ prefs: { battleLayout: 'orbit' } })),
+      ),
+    ).toBe(true);
+  });
+
   it('never lets a meta document be deleted', async () => {
     await setDoc(progress(me), metaProgress());
     expect(await denied(deleteDoc(progress(me)))).toBe(true);

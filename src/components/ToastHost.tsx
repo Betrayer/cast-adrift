@@ -14,6 +14,7 @@ const CONSEQUENCE_MS = 4000;
 const BARK_MS = 3500;
 const ACHIEVEMENT_MS = 4500;
 const AUTH_MS = 6000;
+const HINT_MS = 7000;
 
 const QueueDots = ({ count }: { count: number }) => {
   if (count <= 0) return null;
@@ -164,6 +165,34 @@ const AuthSlot = () => {
   );
 };
 
+const HintSlot = () => {
+  const { t } = useTranslation(['battle']);
+  const hint = useNarrativeStore((s) => s.hint);
+  const dismiss = useNarrativeStore((s) => s.dismissHint);
+
+  useEffect(() => {
+    if (hint === null) return;
+    const id = window.setTimeout(dismiss, HINT_MS);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [hint, dismiss]);
+
+  if (hint === null) return <div className={styles.slot} />;
+  return (
+    <div className={styles.slot}>
+      <div
+        role="status"
+        data-toast="hint"
+        onClick={dismiss}
+        className={`${styles.toast ?? ''} ${styles.hint ?? ''}`}
+      >
+        {t(hint.line)}
+      </div>
+    </div>
+  );
+};
+
 const JournalTick = () => {
   const entries = useNarrativeStore((s) => s.journal.length);
   const previous = useRef(entries);
@@ -183,6 +212,7 @@ export const ToastHost = () => {
       <JournalTick />
       <ConsequenceSlot />
       <AuthSlot />
+      <HintSlot />
       <AchievementSlot />
       <BarkSlot />
     </div>,

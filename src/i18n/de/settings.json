@@ -102,5 +102,27 @@
       "providerDisabled": "Diese Anmeldeart ist abgeschaltet. Schreib an {{email}}.",
       "unknown": "Anmeldung fehlgeschlagen. Versuche es erneut und schreib an {{email}}, wenn es dabei bleibt."
     }
+  },
+  "layout": {
+    "title": "Kampfoberfläche",
+    "hint": "Ein Kampf, drei Darstellungen. Umschalten ist auch mitten im Gefecht sicher.",
+    "synced": "im Konto gespeichert",
+    "active": "Aktiv",
+    "use": "Wählen",
+    "console": {
+      "name": "Pult",
+      "tag": "Slot-Dock in Feuerreihenfolge · dauerhaftes Aktionspult",
+      "desc": "Karten im Raster, jede Schaltfläche immer am selben Platz."
+    },
+    "orbit": {
+      "name": "Orbit",
+      "tag": "Slot-Kapseln im Bogen um dein Schiff · Radialmenü am Würfel",
+      "desc": "Dein Schiff steht auf dem Schirm und nimmt die Treffer; Aktionen öffnen am Würfel."
+    },
+    "tablet": {
+      "name": "Tablet",
+      "tag": "Slot-Förderband mit Live-Ausgabe · Zugvorhersage",
+      "desc": "Alle Zahlen in einer Spalte, der ganze Zug ausgerechnet, bevor du ihn beendest."
+    }
   }
 }

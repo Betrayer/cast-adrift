@@ -30,7 +30,7 @@ export const badgesFor = (
   return badges;
 };
 
-export const DieMiniCard = () => {
+export const DieMiniCard = ({ compact = false }: { compact?: boolean }) => {
   const { t } = useTranslation(['battle', 'content']);
   const selectedDieUid = useBattleStore((s) => s.selectedDieUid);
   const dice = useBattleStore((s) => s.dice);
@@ -40,7 +40,10 @@ export const DieMiniCard = () => {
 
   if (die === undefined || def === undefined) {
     return (
-      <div className={styles.mini} data-die-card="none">
+      <div
+        className={`${styles.mini ?? ''} ${compact ? styles.miniCompact ?? '' : ''}`}
+        data-die-card="none"
+      >
         <span className={styles.miniHint}>{t('battle:pickDie')}</span>
       </div>
     );
@@ -54,7 +57,10 @@ export const DieMiniCard = () => {
       : t('battle:dieFaces', { min: 1, max: def.tier });
 
   return (
-    <div className={styles.mini} data-die-card={die.defId}>
+    <div
+      className={`${styles.mini ?? ''} ${compact ? styles.miniCompact ?? '' : ''}`}
+      data-die-card={die.defId}
+    >
       <span className={styles.miniHead} data-school={die.school}>
         {t(def.name)}
       </span>

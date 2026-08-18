@@ -90,7 +90,8 @@
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "кап ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "тут: {{school}} +{{n}}",
-    "inheritsMult": "тут: {{school}} ×{{n}}"
+    "inheritsMult": "тут: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Міні-бос",
@@ -178,5 +179,24 @@
     "engraved": "З гравіруванням",
     "growth": "Росте на максимумі",
     "faces": "Нестандартні грані"
-  }
+  },
+  "layoutHint": "Хочеш інший вигляд бою? Налаштування → Бойовий інтерфейс.",
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "forecastStrip": "завдаси ~{{out}} · отримаєш {{hull}}",
+  "forecastBreak": "атака {{raw}} − ухилення {{evade}} − щит {{shield}}"
 }

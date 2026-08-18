@@ -108,3 +108,7 @@ export const nextCoachMark = (
 export const ALL_COACH_MARK_IDS: readonly string[] = COACH_MARKS.map(
   (mark) => mark.id,
 );
+
+export const BATTLE_LAYOUT_HINT = "battleLayouts";
+
+export const HINT_IDS: readonly string[] = [BATTLE_LAYOUT_HINT];

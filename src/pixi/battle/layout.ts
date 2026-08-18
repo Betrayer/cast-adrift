@@ -18,6 +18,7 @@ export interface SubsystemPlacement {
 }
 
 export interface BattleLayout {
+  ship: Rect | null;
   dieSize: number;
   trayRows: number;
   tray: Point[];
@@ -35,6 +36,7 @@ export interface BattleLayoutInput {
   enemyBand: Rect;
   trayBand: Rect;
   dockBand: Rect;
+  shipBand?: Rect | null;
   diceCount: number;
   enemyCount: number;
   maxSubsystems: number;
@@ -144,6 +146,13 @@ export const computeBattleLayout = (
   const enemyCount = Math.max(input.enemyCount, 1);
   const subs = Math.max(input.maxSubsystems, 0);
   const { enemyBand, trayBand, dockBand } = input;
+  const shipBand =
+    input.shipBand !== undefined &&
+    input.shipBand !== null &&
+    input.shipBand.w > 0 &&
+    input.shipBand.h > 0
+      ? input.shipBand
+      : null;
 
   const counts = rowCountsFor(
     diceCount,
@@ -201,6 +210,7 @@ export const computeBattleLayout = (
   );
 
   return {
+    ship: shipBand,
     dieSize,
     trayRows: rowsUsed,
     tray,
@@ -221,9 +231,12 @@ export const computeBattleLayout = (
       w: trayBand.w,
       h: Math.max(dieSize, trayBottom - Math.min(tumbleTop, trayBottom - dieSize)),
     },
-    playerHit: {
-      x: dockBand.x + dockBand.w / 2,
-      y: dockBand.y + Math.min(28, dockBand.h / 2),
-    },
+    playerHit:
+      shipBand === null
+        ? {
+            x: dockBand.x + dockBand.w / 2,
+            y: dockBand.y + Math.min(28, dockBand.h / 2),
+          }
+        : { x: shipBand.x + shipBand.w / 2, y: shipBand.y + shipBand.h / 2 },
   };
 };

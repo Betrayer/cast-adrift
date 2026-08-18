@@ -90,7 +90,8 @@
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "кап ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "здесь: {{school}} +{{n}}",
-    "inheritsMult": "здесь: {{school}} ×{{n}}"
+    "inheritsMult": "здесь: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Мини-босс",
@@ -178,5 +179,24 @@
     "engraved": "С гравировкой",
     "growth": "Растёт на максимуме",
     "faces": "Нестандартные грани"
-  }
+  },
+  "layoutHint": "Хочешь другой вид боя? Настройки → Боевой интерфейс.",
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "forecastStrip": "нанесёшь ~{{out}} · получишь {{hull}}",
+  "forecastBreak": "атака {{raw}} − уклонение {{evade}} − щит {{shield}}"
 }

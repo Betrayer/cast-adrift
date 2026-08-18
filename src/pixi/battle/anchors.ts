@@ -17,7 +17,13 @@ export interface SlotAnchor {
   well: AnchorRect;
 }
 
-export type BoardRegion = "enemies" | "tray" | "dock";
+export type BoardRegion = "enemies" | "tray" | "dock" | "ship";
+
+export interface DieAnchor {
+  x: number;
+  y: number;
+  size: number;
+}
 
 export interface BattleAnchors {
   dice: (AnchorPoint & { uid: string; size: number })[];
@@ -31,6 +37,7 @@ const regions = new Map<BoardRegion, AnchorRect>();
 const listeners = new Set<() => void>();
 
 let reserve: SlotAnchor | null = null;
+let selection: DieAnchor | null = null;
 let reserveWells: AnchorRect[] = [];
 let battle: BattleAnchors | null = null;
 let revision = 0;
@@ -96,6 +103,27 @@ export const publishReserveAnchor = (
   notify();
 };
 
+export const publishSelectionAnchor = (anchor: DieAnchor | null): void => {
+  if (anchor === null) {
+    if (selection === null) return;
+    selection = null;
+    notify();
+    return;
+  }
+  if (
+    selection !== null &&
+    selection.x === anchor.x &&
+    selection.y === anchor.y &&
+    selection.size === anchor.size
+  ) {
+    return;
+  }
+  selection = anchor;
+  notify();
+};
+
+export const selectionAnchor = (): DieAnchor | null => selection;
+
 export const publishRegion = (
   name: BoardRegion,
   rect: AnchorRect | null,
@@ -122,11 +150,19 @@ export const boardRegion = (name: BoardRegion): AnchorRect | undefined =>
   regions.get(name);
 
 export const clearBoardAnchors = (): void => {
-  if (slots.size === 0 && regions.size === 0 && reserve === null) return;
+  if (
+    slots.size === 0 &&
+    regions.size === 0 &&
+    reserve === null &&
+    selection === null
+  ) {
+    return;
+  }
   slots.clear();
   regions.clear();
   reserve = null;
   reserveWells = [];
+  selection = null;
   notify();
 };
 

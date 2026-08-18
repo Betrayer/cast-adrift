@@ -252,7 +252,7 @@ describe("enemy forecast", () => {
 
   it("equals the damage actually taken when nothing dodges", () => {
     let checked = 0;
-    for (let index = 0; index < 40; index += 1) {
+    for (let index = 0; index < 140; index += 1) {
       const spec = { ...specFor(index), enemyIds: ["raider"] as const };
       startCase(spec);
       const board = useBattleStore.getState();
@@ -268,14 +268,15 @@ describe("enemy forecast", () => {
         .enemyBeats.filter((b) => b.kind === "attack");
       const hull = attacks.reduce((sum, b) => sum + b.hullDamage, 0);
       const shielded = attacks.reduce((sum, b) => sum + b.shieldDamage, 0);
-      expect({ case: index, hull, shielded }).toEqual({
+      expect({ case: index, hull, shielded, raw: forecast.raw }).toEqual({
         case: index,
         hull: forecast.toHull,
         shielded: forecast.toShield,
+        raw: forecast.incoming,
       });
       checked += 1;
     }
-    expect(checked).toBeGreaterThan(10);
+    expect(checked).toBeGreaterThanOrEqual(50);
   });
 
   it("reads evasion as the mean over the whole defense stream", () => {

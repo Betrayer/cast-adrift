@@ -102,5 +102,27 @@
       "providerDisabled": "Ten sposób logowania jest wyłączony. Napisz na {{email}}.",
       "unknown": "Logowanie nie udało się. Spróbuj ponownie, a jeśli się powtórzy — napisz na {{email}}."
     }
+  },
+  "layout": {
+    "title": "Interfejs walki",
+    "hint": "Jedna walka, trzy prezentacje. Przełączanie w trakcie walki jest bezpieczne.",
+    "synced": "zapisano na koncie",
+    "active": "Aktywny",
+    "use": "Wybierz",
+    "console": {
+      "name": "Pulpit",
+      "tag": "Dok slotów w kolejności strzałów · stały pulpit akcji",
+      "desc": "Karty w siatce, każdy przycisk zawsze w tym samym miejscu."
+    },
+    "orbit": {
+      "name": "Orbita",
+      "tag": "Kapsuły slotów łukiem wokół statku · menu radialne przy kostce",
+      "desc": "Twój statek jest na ekranie i przyjmuje ciosy; akcje otwierają się przy kostce."
+    },
+    "tablet": {
+      "name": "Tablet",
+      "tag": "Taśma slotów z żywym wynikiem · prognoza tury",
+      "desc": "Wszystkie liczby w jednej kolumnie, cała tura policzona, zanim ją zakończysz."
+    }
   }
 }

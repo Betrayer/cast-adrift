@@ -6,6 +6,8 @@ import type {
   SeedRunConfig,
   TestState,
 } from '@/services/testApi';
+import type { TurnForecast } from '@/game/battle/view';
+import type { BattleLayoutId } from '@/types';
 import type { SlotId } from '@/types/battle';
 
 export const FROZEN_NOW = 1_760_000_000_000;
@@ -164,6 +166,16 @@ export class Screens {
     }, config);
   }
 
+  async setLayout(id: BattleLayoutId): Promise<void> {
+    await this.page.evaluate((layout) => {
+      window.caTest?.layout(layout);
+    }, id);
+  }
+
+  forecast(): Promise<TurnForecast | null> {
+    return this.page.evaluate(() => window.caTest?.forecast() ?? null);
+  }
+
   async startBattle(patch: BattlePatch): Promise<void> {
     await this.page.evaluate((cfg) => {
       window.caTest?.setBattle(cfg);
@@ -230,9 +242,16 @@ export class Screens {
 
   async selectDie(uid: string): Promise<void> {
     await this.waitForStableAnchors();
-    await this.tapDie(uid);
     await expect
-      .poll(async () => (await this.state()).battle.selectedDieUid)
+      .poll(
+        async () => {
+          const current = (await this.state()).battle.selectedDieUid;
+          if (current === uid) return current;
+          await this.tapDie(uid);
+          return (await this.state()).battle.selectedDieUid;
+        },
+        { timeout: BATTLE_TIMEOUT },
+      )
       .toBe(uid);
   }
 
@@ -342,7 +361,11 @@ export class Screens {
     }
   }
 
-  async playTurn(): Promise<void> {
+  async endTurn(): Promise<void> {
+    await this.testId('battle-end-turn').click();
+  }
+
+  async placeTurn(): Promise<void> {
     const plan = await this.page.evaluate(() => {
       const api = window.caTest;
       if (api === undefined) throw new Error('caTest is not mounted');
@@ -365,7 +388,11 @@ export class Screens {
     for (const move of plan) {
       await this.dragDieToSlot(move.uid, move.slotId);
     }
-    await this.testId('battle-end-turn').click();
+  }
+
+  async playTurn(): Promise<void> {
+    await this.placeTurn();
+    await this.endTurn();
   }
 
   async playUntilBattleEnds(maxTurns = 12): Promise<'victory' | 'defeat'> {

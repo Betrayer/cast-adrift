@@ -102,5 +102,27 @@
       "providerDisabled": "Ce mode de connexion est désactivé. Écris à {{email}}.",
       "unknown": "La connexion a échoué. Réessaie, et écris à {{email}} si cela persiste."
     }
+  },
+  "layout": {
+    "title": "Interface de combat",
+    "hint": "Un combat, trois présentations. Changer en plein combat ne pose aucun problème.",
+    "synced": "enregistré sur le compte",
+    "active": "Actif",
+    "use": "Utiliser",
+    "console": {
+      "name": "Console",
+      "tag": "Dock de slots dans l'ordre de tir · console d'actions permanente",
+      "desc": "Des cartes en grille, chaque commande toujours au même endroit."
+    },
+    "orbit": {
+      "name": "Orbite",
+      "tag": "Capsules de slots en arc autour du vaisseau · menu radial près du dé",
+      "desc": "Ton vaisseau est à l'écran et encaisse les coups ; les actions s'ouvrent près du dé."
+    },
+    "tablet": {
+      "name": "Tablette",
+      "tag": "Convoyeur de slots avec sortie en direct · prévision du tour",
+      "desc": "Tous les chiffres dans une colonne, le tour entier chiffré avant de le finir."
+    }
   }
 }

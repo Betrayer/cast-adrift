@@ -7,10 +7,10 @@ import {
 
 describe('settings migrations', () => {
   it('current version is wired', () => {
-    expect(SETTINGS_VERSION).toBe(2);
+    expect(SETTINGS_VERSION).toBe(3);
   });
 
-  it('v1 blobs keep their values and gain the v2 defaults', () => {
+  it('v1 blobs keep their values and gain the later defaults', () => {
     const persisted = {
       locale: 'uk',
       sfxVol: 0.5,
@@ -24,6 +24,7 @@ describe('settings migrations', () => {
       theme: 'deepSpace',
       fontScale: 'm',
       battleSpeed: 'normal',
+      battleLayout: 'console',
     });
   });
 
@@ -36,6 +37,15 @@ describe('settings migrations', () => {
     const values = migrateSettings({ fontScale: 'xl', battleSpeed: 'warp' }, 1);
     expect(values.fontScale).toBe('m');
     expect(values.battleSpeed).toBe('normal');
+  });
+
+  it('keeps a known battle layout and drops an unknown one', () => {
+    expect(migrateSettings({ battleLayout: 'orbit' }, 2).battleLayout).toBe(
+      'orbit',
+    );
+    expect(migrateSettings({ battleLayout: 'holodeck' }, 2).battleLayout).toBe(
+      'console',
+    );
   });
 });
 

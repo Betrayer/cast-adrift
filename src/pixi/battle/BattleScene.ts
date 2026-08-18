@@ -8,6 +8,7 @@ import { FATE_DIE_ID } from "@/data/fate";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
+import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
 import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
 import { legalTargets } from "@/game/battle/view";
 import type { StatusKey } from "@/game/battle/statuses";
@@ -25,6 +26,7 @@ import { focusEnemy } from "@/pixi/battle/enemyFocus";
 import {
   boardRegion,
   publishBattleAnchors,
+  publishSelectionAnchor,
   reserveAnchor,
   reserveWellAt,
   slotAnchor,
@@ -229,6 +231,14 @@ const activeSlotIds = (state: BattleState): SlotId[] =>
 const isDieLockedNow = (state: BattleState, uid: string): boolean =>
   state.lockedDice.some((l) => l.uid === uid && l.untilTurn >= state.turn);
 
+const sameShipRect = (a: Rect | null, b: Rect | null): boolean =>
+  a !== null &&
+  b !== null &&
+  a.x === b.x &&
+  a.y === b.y &&
+  a.w === b.w &&
+  a.h === b.h;
+
 const cardElement = (target: DropTarget): HTMLElement | null =>
   document.querySelector<HTMLElement>(
     target === "reserve" ? "[data-reserve]" : `[data-slot="${target}"]`,
@@ -258,6 +268,9 @@ export class BattleScene {
   private readonly animating = new Set<string>();
   private readonly numberPool: PooledNumber[] = [];
   private readonly flaggedCards = new Set<DropTarget>();
+  private shipView: Container | null = null;
+  private shipFlash: Graphics | null = null;
+  private shipFlashCancel: (() => void) | null = null;
   private tumbleFx: Tumble | null = null;
   private readonly tumblingUids = new Set<string>();
   private beatTimeouts: number[] = [];
@@ -328,6 +341,11 @@ export class BattleScene {
 
   destroy(): void {
     this.stopBeats();
+    this.shipFlashCancel?.();
+    this.shipFlashCancel = null;
+    this.shipView?.destroy({ children: true });
+    this.shipView = null;
+    this.shipFlash = null;
     this.tumbleFx?.destroy();
     this.tumbleFx = null;
     if (useBattleStore.getState().phase === "resolving") {
@@ -360,6 +378,7 @@ export class BattleScene {
       layer.destroy({ children: true });
     }
     publishBattleAnchors(null);
+    publishSelectionAnchor(null);
     clearPool("battleFx");
     releaseDieTextures(this.app);
   }
@@ -383,6 +402,11 @@ export class BattleScene {
       w: rect.w,
       h: rect.h,
     };
+  }
+
+  private shipBand(): Rect | null {
+    const rect = boardRegion("ship");
+    return rect === undefined ? null : this.toStageRect(rect);
   }
 
   private band(name: "enemies" | "tray" | "dock"): Rect {
@@ -429,6 +453,7 @@ export class BattleScene {
       enemyBand: this.band("enemies"),
       trayBand: this.band("tray"),
       dockBand: this.band("dock"),
+      shipBand: this.shipBand(),
       diceCount: state.dice.length,
       enemyCount: state.enemies.length,
       maxSubsystems: state.enemies.reduce(
@@ -803,9 +828,80 @@ export class BattleScene {
   private rebuild(state: BattleState): void {
     this.readOrigin();
     this.layout = this.computeLayout();
+    this.syncShip(state);
     this.buildEnemies(state);
     this.syncBoard(state);
     this.syncEnemies(state);
+  }
+
+  private syncShip(state: BattleState): void {
+    this.shipFlashCancel?.();
+    this.shipFlashCancel = null;
+    this.shipView?.destroy({ children: true });
+    this.shipView = null;
+    this.shipFlash = null;
+    const rect = this.layout.ship;
+    if (rect === null) return;
+    const glyph = shipGlyphFor(state.shipId);
+    const size = Math.min(rect.w, rect.h);
+    const poly = (points: readonly GlyphPoint[]): number[] =>
+      points.flatMap(([x, y]) => [x * size, y * size]);
+    const root = new Container();
+    root.position.set(rect.x + rect.w / 2, rect.y + rect.h / 2);
+    const body = new Graphics()
+      .poly(poly(glyph.hull))
+      .fill(mixHex(tokens.surface2, tokens.accent, 0.2))
+      .stroke({ color: tokens.accent, width: 1.5 });
+    for (const fin of glyph.fins) {
+      body
+        .poly(poly(fin))
+        .fill(emptySlotFill())
+        .stroke({ color: tokens.line, width: 1 });
+    }
+    const cockpit = new Graphics()
+      .circle(
+        glyph.cockpit.x * size,
+        glyph.cockpit.y * size,
+        glyph.cockpit.r * size,
+      )
+      .fill(tokens.accent);
+    const flash = new Graphics().poly(poly(glyph.hull)).fill("#FFFFFF");
+    flash.alpha = 0;
+    root.addChild(body, cockpit, flash);
+    this.bg.addChild(root);
+    this.shipView = root;
+    this.shipFlash = flash;
+  }
+
+  private flashShip(color: string): void {
+    const flash = this.shipFlash;
+    if (flash === null) return;
+    this.shipFlashCancel?.();
+    flash.tint = color;
+    flash.alpha = this.reduced() ? 0.4 : 0.72;
+    this.shipFlashCancel = this.tweens.to(
+      flash,
+      { alpha: 0 },
+      this.reduced() ? 160 : 280,
+      linear,
+      () => {
+        this.shipFlashCancel = null;
+      },
+    );
+  }
+
+  private publishSelection(state: BattleState): void {
+    const uid = state.selectedDieUid;
+    const sprite = uid === null ? undefined : this.dieSprites.get(uid);
+    if (uid === null || sprite === undefined || !sprite.visible) {
+      publishSelectionAnchor(null);
+      return;
+    }
+    publishSelectionAnchor({
+      x: this.origin.left + sprite.x,
+      y: this.origin.top + sprite.y,
+      size: Math.max(sprite.width, sprite.height),
+    });
   }
 
   private buildEnemies(state: BattleState): void {
@@ -1228,6 +1324,7 @@ export class BattleScene {
         this.prismRims.delete(uid);
       }
     }
+    this.publishSelection(state);
     this.publishAnchors(state);
   }
 
@@ -1240,6 +1337,7 @@ export class BattleScene {
       state.enemies.length !== prev.enemies.length ||
       Object.keys(state.slots).length !== Object.keys(prev.slots).length
     ) {
+      if (state.turn !== prev.turn) this.clearDieAnimations();
       this.cancelDrag(state);
       this.rebuild(state);
       if (state.turn !== prev.turn) {
@@ -1344,7 +1442,12 @@ export class BattleScene {
 
   private readonly onAnchorsChange = (): void => {
     this.readOrigin();
+    const before = this.layout.ship;
     this.layout = this.computeLayout();
+    const after = this.layout.ship;
+    if (before === null || after === null || !sameShipRect(before, after)) {
+      this.syncShip(useBattleStore.getState());
+    }
     this.repositionEnemies();
     this.syncBoard(useBattleStore.getState());
   };
@@ -1833,6 +1936,15 @@ export class BattleScene {
     step(0);
   }
 
+  private clearDieAnimations(): void {
+    for (const cancel of this.dieCancels.values()) cancel();
+    this.dieCancels.clear();
+    this.animating.clear();
+    for (const sprite of this.dieSprites.values()) {
+      if (sprite.parent === this.dragLayer) this.trayLayer.addChild(sprite);
+    }
+  }
+
   private finishDieAnimation(uid: string): void {
     this.animating.delete(uid);
     this.dieCancels.delete(uid);
@@ -2190,6 +2302,7 @@ export class BattleScene {
       const { playerHit } = this.layout;
       if (beat.hullDamage > 0) {
         playSfx("hullHit");
+        this.flashShip(schools.red.stroke);
         const state = useBattleStore.getState();
         if (beat.hullDamage >= state.hull) this.shake();
         this.spawnNumber(
@@ -2204,6 +2317,7 @@ export class BattleScene {
             ? "shieldBreak"
             : "shieldHit",
         );
+        this.flashShip(schools.blue.stroke);
         this.spawnNumber(
           playerHit.x,
           playerHit.y,

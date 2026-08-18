@@ -103,6 +103,94 @@ test.describe('visual baselines', () => {
     await shot(app, 'battle-prismatic.png');
   });
 
+  test('battle orbit', async ({ app }) => {
+    await app.setLayout('orbit');
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['raider'],
+        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen', 'coreshard'],
+        seed: 42,
+        startCharge: 6,
+      });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    await shot(app, 'battle-orbit.png');
+  });
+
+  test('battle orbit narrow fallback', async ({ app }) => {
+    await app.page.setViewportSize({ width: 330, height: 720 });
+    await app.setLayout('orbit');
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['raider'],
+        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen'],
+        seed: 42,
+      });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    await shot(app, 'battle-orbit-narrow.png');
+  });
+
+  test('battle tablet', async ({ app }) => {
+    await app.setLayout('tablet');
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['raider'],
+        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen', 'coreshard'],
+        seed: 42,
+        startCharge: 6,
+      });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    await shot(app, 'battle-tablet.png');
+  });
+
+  test('battle tablet forecast — taking damage', async ({ app }) => {
+    await app.setLayout('tablet');
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['raider'],
+        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen'],
+        seed: 42,
+        hull: 6,
+        hullMax: 30,
+      });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    await expect(
+      app.page.locator('[data-forecast-strip]'),
+    ).toHaveAttribute('data-forecast-state', 'lethal');
+    await shot(app, 'battle-tablet-lethal.png');
+  });
+
+  test('battle tablet forecast — clearing the field', async ({ app }) => {
+    await app.setLayout('tablet');
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['sparkMote'],
+        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen'],
+        seed: 42,
+      });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    await app.placeTurn();
+    await app.waitForStableAnchors();
+    await expect(
+      app.page.locator('[data-forecast-strip]'),
+    ).toHaveAttribute('data-forecast-state', 'clear');
+    await shot(app, 'battle-tablet-clear.png');
+  });
+
   test('shop', async ({ app }) => {
     await app.seedRun({ seed: SEED });
     await app.grantRun(400);

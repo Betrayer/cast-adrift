@@ -1,20 +1,10 @@
-import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { enemyForecast } from '@/game/battle/view';
-import { battleSnapshot, useBattleStore } from '@/stores/battleStore';
+import { useTurnForecast } from '@/screens/Battle/shell/useTurnForecast';
 import styles from './Console.module.css';
 
 export const Forecast = () => {
   const { t } = useTranslation(['battle']);
-  const board = useBattleStore();
-
-  const forecast = useMemo(
-    () =>
-      board.phase === 'placement'
-        ? enemyForecast(battleSnapshot(board))
-        : null,
-    [board],
-  );
+  const forecast = useTurnForecast();
 
   return (
     <div

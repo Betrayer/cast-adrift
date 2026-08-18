@@ -90,7 +90,8 @@
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "cap ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "ici : {{school}} +{{n}}",
-    "inheritsMult": "ici : {{school}} ×{{n}}"
+    "inheritsMult": "ici : {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -178,5 +179,24 @@
     "engraved": "Gravé",
     "growth": "Grandit sur la face max",
     "faces": "Faces non standard"
-  }
+  },
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "layoutHint": "Une autre présentation du combat ? Réglages → Interface de combat.",
+  "forecastStrip": "tu infliges ~{{out}} · tu subis {{hull}}",
+  "forecastBreak": "attaque {{raw}} − esquive {{evade}} − bouclier {{shield}}"
 }

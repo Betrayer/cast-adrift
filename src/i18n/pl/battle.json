@@ -90,7 +90,8 @@
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "limit ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "tutaj: {{school}} +{{n}}",
-    "inheritsMult": "tutaj: {{school}} ×{{n}}"
+    "inheritsMult": "tutaj: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -178,5 +179,24 @@
     "engraved": "Grawerowana",
     "growth": "Rośnie na maksymalnej ścianie",
     "faces": "Niestandardowe ściany"
-  }
+  },
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "layoutHint": "Wolisz inny układ walki? Ustawienia → Interfejs walki.",
+  "forecastStrip": "zadasz ~{{out}} · otrzymasz {{hull}}",
+  "forecastBreak": "atak {{raw}} − unik {{evade}} − tarcza {{shield}}"
 }

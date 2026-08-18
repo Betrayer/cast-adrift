@@ -10,6 +10,7 @@ import type {
 
 export interface TurnForecast {
   outgoing: number;
+  raw: number;
   incoming: number;
   toShield: number;
   toHull: number;
@@ -39,6 +40,7 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
   if (next.outcome !== undefined) {
     return {
       outgoing,
+      raw: 0,
       incoming: 0,
       toShield: 0,
       toHull: 0,
@@ -56,6 +58,7 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
       ? Math.floor((next.shield * (100 - decayPct)) / 100)
       : next.shield;
   let incoming = 0;
+  let rawTotal = 0;
   let toShield = 0;
   let toHull = 0;
 
@@ -70,6 +73,7 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
         delete enemy.statuses.jam;
       }
       for (const raw of raws) {
+        rawTotal += raw;
         const damage = expectedHit(raw, next.evasion);
         incoming += damage;
         const absorbed = Math.min(shield, damage);
@@ -82,6 +86,7 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
 
   return {
     outgoing,
+    raw: rawTotal,
     incoming: Math.round(incoming),
     toShield: Math.round(toShield),
     toHull: Math.round(toHull),

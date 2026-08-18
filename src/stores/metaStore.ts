@@ -1,12 +1,15 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { isBattleLayoutId } from '@/data/battleLayouts';
 import { CHART_NODE_BY_ID } from '@/data/chart';
 import { DEFAULT_DIE_SKIN, isDieSkinId } from '@/data/cosmetics';
 import { STARTER_DECK } from '@/data/decks';
 import { DIE_BY_ID } from '@/data/dice';
 import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
+import { isThemeId, type ThemeId } from '@/data/themes';
 import type { ShipId } from '@/data/ships';
+import type { BattleLayoutId } from '@/types';
 import { levelFromTotalXp } from '@/game/xp';
 import { scopedPersistStorage } from '@/stores/scopedStorage';
 
@@ -65,6 +68,11 @@ export interface BestScores {
   dailyDate: string | null;
 }
 
+export interface AccountPrefs {
+  battleLayout?: BattleLayoutId;
+  theme?: ThemeId;
+}
+
 export interface MetaValues {
   shards: number;
   xp: number;
@@ -95,6 +103,7 @@ export interface MetaValues {
   unlocksGranted: string[];
   unlocksSeen: string[];
   dieSkin: string;
+  prefs: AccountPrefs;
   stats: MetaStats;
 }
 
@@ -141,10 +150,11 @@ export interface MetaState extends MetaValues {
   markUnlocksSeen: (ids: readonly string[]) => void;
   recordEncounters: (list: readonly RunEncounter[]) => EncounterResult;
   setDieSkin: (id: string) => void;
+  setPrefs: (patch: AccountPrefs) => void;
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 11;
+export const META_VERSION = 12;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -235,6 +245,7 @@ export const createInitialMetaValues = (): MetaValues => ({
   unlocksGranted: [],
   unlocksSeen: [],
   dieSkin: DEFAULT_DIE_SKIN,
+  prefs: {},
   stats: createInitialMetaStats(),
 });
 
@@ -300,6 +311,17 @@ const coerceEngravings = (value: unknown): Record<string, string[]> => {
     if (ids.length > 0) out[defId] = ids;
   }
   return out;
+};
+
+export const coercePrefs = (value: unknown): AccountPrefs => {
+  if (typeof value !== 'object' || value === null) return {};
+  const prev = value as Partial<Record<keyof AccountPrefs, unknown>>;
+  return {
+    ...(isBattleLayoutId(prev.battleLayout)
+      ? { battleLayout: prev.battleLayout }
+      : {}),
+    ...(isThemeId(prev.theme) ? { theme: prev.theme } : {}),
+  };
 };
 
 const coerceBest = (value: unknown, base: BestScores): BestScores => {
@@ -398,6 +420,7 @@ export const migrateMeta = (
     unlocksGranted: coerceStrings(prev.unlocksGranted, base.unlocksGranted),
     unlocksSeen: coerceStrings(prev.unlocksSeen, base.unlocksSeen),
     dieSkin: isDieSkinId(prev.dieSkin) ? prev.dieSkin : base.dieSkin,
+    prefs: coercePrefs(prev.prefs),
     stats:
       typeof prev.stats === 'object' && prev.stats !== null
         ? { ...base.stats, ...(prev.stats as Partial<MetaStats>) }
@@ -745,6 +768,18 @@ export const useMetaStore = create<MetaState>()(
         set({ dieSkin: id });
       },
 
+      setPrefs: (patch) => {
+        set((s) => {
+          const next = { ...s.prefs, ...patch };
+          const same = (Object.keys(next) as (keyof AccountPrefs)[]).every(
+            (key) => next[key] === s.prefs[key],
+          );
+          return same && Object.keys(next).length === Object.keys(s.prefs).length
+            ? s
+            : { prefs: next };
+        });
+      },
+
       recordStreak: (win) => {
         set((s) => {
           const streak = win ? s.stats.noDeathStreak + 1 : 0;
@@ -793,6 +828,7 @@ export const useMetaStore = create<MetaState>()(
         unlocksGranted: s.unlocksGranted,
         unlocksSeen: s.unlocksSeen,
         dieSkin: s.dieSkin,
+        prefs: s.prefs,
         stats: s.stats,
       }),
     },

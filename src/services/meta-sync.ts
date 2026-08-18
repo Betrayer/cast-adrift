@@ -19,6 +19,7 @@ import {
   useMetaStore,
   type MetaValues,
 } from "@/stores/metaStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 
 const DEBOUNCE = 3000;
 const PUSH_TIMEOUT = 5000;
@@ -78,6 +79,7 @@ const metaValues = (): MetaValues => {
     unlocksGranted: s.unlocksGranted,
     unlocksSeen: s.unlocksSeen,
     dieSkin: s.dieSkin,
+    prefs: s.prefs,
     stats: s.stats,
   };
 };
@@ -91,12 +93,22 @@ export const metaDocSnapshot = (): MetaDoc => {
   };
 };
 
+const adoptPrefs = (): void => {
+  const { prefs } = useMetaStore.getState();
+  const settings = useSettingsStore.getState();
+  if (prefs.battleLayout !== undefined) {
+    settings.setBattleLayout(prefs.battleLayout);
+  }
+  if (prefs.theme !== undefined) settings.setTheme(prefs.theme);
+};
+
 export const applyMetaDoc = (doc: MetaDoc): boolean => {
   try {
     const parsed = JSON.parse(doc.data) as unknown;
     applyingRemote = true;
     useMetaStore.setState(migrateMeta(parsed, META_VERSION));
     applyingRemote = false;
+    adoptPrefs();
     setLocalAt(doc.updatedAt);
     return true;
   } catch (error) {

@@ -102,5 +102,27 @@
       "providerDisabled": "This sign-in method is switched off. Write to {{email}}.",
       "unknown": "Sign-in failed. Try again, and write to {{email}} if it keeps failing."
     }
+  },
+  "layout": {
+    "title": "Battle interface",
+    "hint": "One battle, three presentations. Switching is safe mid-fight.",
+    "synced": "saved to the account",
+    "active": "Active",
+    "use": "Use",
+    "console": {
+      "name": "Console",
+      "tag": "Slot dock in firing order · permanent action console",
+      "desc": "Cards in a grid, every control always in the same place."
+    },
+    "orbit": {
+      "name": "Orbit",
+      "tag": "Slot pods on an arc around your ship · radial die menu",
+      "desc": "Your ship is on screen and takes the hits; actions open at the die."
+    },
+    "tablet": {
+      "name": "Tablet",
+      "tag": "Slot conveyor with live outputs · turn forecast",
+      "desc": "Every number in one column, the whole turn priced before you end it."
+    }
   }
 }
