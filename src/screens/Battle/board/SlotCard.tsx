@@ -21,7 +21,7 @@ export interface SlotCardProps {
   blocked: boolean;
   shrunk: boolean;
   legal: boolean;
-  offTurn: boolean;
+  goal: boolean;
   charge: number;
   onTap: (slotId: SlotId) => void;
   preview?: boolean;
@@ -63,7 +63,7 @@ export const SlotCard = ({
   blocked,
   shrunk,
   legal,
-  offTurn,
+  goal,
   charge,
   onTap,
   preview = false,
@@ -78,6 +78,7 @@ export const SlotCard = ({
     <button
       type="button"
       {...(preview ? {} : { 'data-slot': slotId })}
+      {...(preview || !goal ? {} : { 'data-goal': '1' })}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
       className={[
@@ -85,7 +86,6 @@ export const SlotCard = ({
         legal ? styles.cardLegal ?? '' : '',
         occupiedBy === undefined ? '' : styles.cardOccupied ?? '',
         blocked ? styles.cardBlocked ?? '' : '',
-        offTurn ? styles.cardOffTurn ?? '' : '',
       ]
         .filter((name) => name !== '')
         .join(' ')}
@@ -120,6 +120,7 @@ export const SlotCard = ({
         <span
           className={`${styles.proj ?? ''} ${toneClass(projection)}`}
           data-proj={preview ? undefined : slotId}
+          data-tone={preview ? undefined : projectionTone(projection)}
         >
           {projectionText(t, slotId, projection)}
         </span>

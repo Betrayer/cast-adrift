@@ -1,9 +1,9 @@
 import type { ShipId } from "@/data/ships";
-import { canPlaceDie } from "@/game/battle/setup";
-import { enemyForecast, type TurnForecast } from "@/game/battle/view";
-import { ALL_COACH_MARK_IDS, HINT_IDS } from "@/game/tutorial";
+import { enemyForecast, legalTargets, type TurnForecast } from "@/game/battle/view";
+import { ALL_COACH_MARK_IDS, HINT_IDS, nextCoachMark } from "@/game/tutorial";
 import type { NodeId } from "@/game/map/types";
 import { lastClaimOutcome } from "@/services/account";
+import { trackedEvents } from "@/services/analytics";
 import { readClaim } from "@/services/account-link";
 import { captainName } from "@/game/run/boards";
 import { discardActiveRun, jumpTo, startRunMode } from "@/game/run/flow";
@@ -57,6 +57,7 @@ export interface MetaPatch {
   codex?: readonly string[];
   achievements?: readonly string[];
   prologueDone?: boolean;
+  systemsCheckDone?: boolean;
   tutorialSeen?: "all" | readonly string[];
   stats?: Partial<MetaStats>;
 }
@@ -172,6 +173,15 @@ export interface TestState {
       vulnerable: number;
     }[];
     evasion: { dodgePct: number; glancingPct: number; intercept: boolean } | null;
+    freeNudges: number;
+    lastBlock: string | null;
+    check: {
+      stepId: string;
+      stepIndex: number;
+      stepCount: number;
+      moves: { uid: string; slot: SlotId }[] | null;
+      sandbox: boolean;
+    } | null;
     sensorBeats: { vulnerable: number; pierce: number }[];
     attackBeats: {
       amount: number;
@@ -185,6 +195,8 @@ export interface TestState {
     xp: number;
     shards: number;
     selectedShip: ShipId;
+    tutorialSeen: string[];
+    systemsCheckDone: boolean;
   };
 }
 
@@ -201,6 +213,11 @@ export interface TestApi {
   go: (screen: ScreenId, params?: Record<string, string>) => void;
   mapNodes: () => MapNodeView[];
   slotsFor: (uid: string) => SlotId[];
+  coach: () => { active: string | null; seen: string[] };
+  events: () => { name: string; params: Record<string, string | number | boolean>; at: number }[];
+  resetTutorial: () => void;
+  skipCheck: () => void;
+  restartCheckStep: () => void;
   anchors: () => BattleAnchors | null;
   state: () => TestState;
   account: () => AccountView;
@@ -246,6 +263,7 @@ const applyMeta = (patch: MetaPatch): void => {
   }
   if (patch.deck !== undefined) meta.setDeck(patch.deck);
   if (patch.prologueDone === true) meta.markPrologueDone();
+  if (patch.systemsCheckDone === true) meta.markSystemsCheckDone();
   if (patch.tutorialSeen !== undefined) {
     const ids =
       patch.tutorialSeen === "all"
@@ -294,6 +312,7 @@ const readState = (): TestState => {
   const run = useRunStore.getState();
   const battle = useBattleStore.getState();
   const meta = useMetaStore.getState();
+  const checkStep = battle.checkSteps?.[battle.checkIndex];
   return {
     screen: app.screen,
     layout: battleLayoutId(),
@@ -340,6 +359,20 @@ const readState = (): TestState => {
         vulnerable: e.statuses.mark ?? 0,
       })),
       evasion: battle.evasion,
+      freeNudges: battle.freeNudges,
+      lastBlock: battle.lastBlock?.key ?? null,
+      check: checkStep === undefined
+        ? null
+        : {
+            stepId: checkStep.id,
+            stepIndex: battle.checkIndex,
+            stepCount: battle.checkSteps?.length ?? 0,
+            moves:
+              checkStep.moves == null
+                ? null
+                : checkStep.moves.map((m) => ({ uid: m.uid, slot: m.slot })),
+            sandbox: battle.checkSandbox,
+          },
       sensorBeats: battle.beats
         .filter((b) => b.kind === "sensor" && b.sensor !== undefined)
         .map((b) => ({
@@ -360,6 +393,8 @@ const readState = (): TestState => {
       xp: meta.xp,
       shards: meta.shards,
       selectedShip: meta.selectedShip,
+      tutorialSeen: [...meta.tutorialSeen],
+      systemsCheckDone: meta.stats.systemsCheckDone,
     },
   };
 };
@@ -499,12 +534,28 @@ export const createTestApi = (): TestApi => ({
     }));
   },
 
-  slotsFor: (uid) => {
-    const battle = useBattleStore.getState();
-    const snapshot = battleSnapshot(battle);
-    return (Object.keys(battle.slots) as SlotId[]).filter((slotId) =>
-      canPlaceDie(snapshot, uid, slotId),
-    );
+  slotsFor: (uid) => legalTargets(useBattleStore.getState(), uid).slots,
+
+  events: () => trackedEvents().map((e) => ({ ...e, params: { ...e.params } })),
+
+  coach: () => {
+    const seen = useMetaStore.getState().tutorialSeen;
+    return {
+      active: nextCoachMark(useAppStore.getState().screen, seen)?.id ?? null,
+      seen: [...seen],
+    };
+  },
+
+  resetTutorial: () => {
+    useMetaStore.getState().resetTutorial();
+  },
+
+  skipCheck: () => {
+    useBattleStore.getState().skipCheck();
+  },
+
+  restartCheckStep: () => {
+    useBattleStore.getState().restartCheckStep();
   },
 
   anchors: () => battleAnchors(),

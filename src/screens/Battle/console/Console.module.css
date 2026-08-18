@@ -317,4 +317,20 @@
   .miniDesc {
     display: none;
   }
+
+  .console {
+    gap: 4px;
+    padding: 4px 6px;
+  }
+
+  .btn {
+    font-size: 10.5px;
+    padding: 6px 2px;
+  }
+
+  .reason {
+    min-height: 12px;
+    font-size: 9px;
+    line-height: 12px;
+  }
 }

@@ -63,12 +63,11 @@ export const onSlotTap = (slotId: SlotId): void => {
     return;
   }
   if (live.selectedDieUid === null) return;
-  if (!legalTargets(live, live.selectedDieUid).slots.includes(slotId)) {
-    playSfx('invalid');
-    return;
-  }
+  const seq = live.lastBlock?.seq ?? 0;
   live.placeDie(live.selectedDieUid, slotId);
-  playSfx('place');
+  const after = useBattleStore.getState();
+  const bounced = (after.lastBlock?.seq ?? 0) > seq;
+  playSfx(bounced ? 'invalid' : 'place');
 };
 
 export const onReserveTap = (): void => {

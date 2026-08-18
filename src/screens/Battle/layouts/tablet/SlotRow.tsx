@@ -20,7 +20,7 @@ export interface SlotRowProps {
   blocked: boolean;
   shrunk: boolean;
   legal: boolean;
-  offTurn: boolean;
+  goal: boolean;
   onTap: (slotId: SlotId) => void;
   preview?: boolean;
 }
@@ -41,7 +41,7 @@ export const SlotRow = ({
   blocked,
   shrunk,
   legal,
-  offTurn,
+  goal,
   onTap,
   preview = false,
 }: SlotRowProps) => {
@@ -60,6 +60,7 @@ export const SlotRow = ({
     <button
       type="button"
       {...(preview ? {} : { 'data-slot': slotId })}
+      {...(preview || !goal ? {} : { 'data-goal': '1' })}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
       className={[
@@ -67,7 +68,6 @@ export const SlotRow = ({
         legal ? styles.rowLegal ?? '' : '',
         occupiedBy === undefined ? '' : styles.rowOccupied ?? '',
         blocked ? styles.rowBlocked ?? '' : '',
-        offTurn ? styles.rowOffTurn ?? '' : '',
       ]
         .filter((name) => name !== '')
         .join(' ')}
@@ -101,6 +101,11 @@ export const SlotRow = ({
           projection === undefined ? styles.outIdle ?? '' : toneClass(projection)
         }`}
         data-proj={preview ? undefined : slotId}
+        data-tone={
+          preview || projection === undefined
+            ? undefined
+            : projectionTone(projection)
+        }
       >
         {projection === undefined
           ? t('battle:conveyor.unknown')

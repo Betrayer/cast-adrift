@@ -100,7 +100,6 @@
     "begin": "Zacznij",
     "hull": "Kadłub {{n}}"
   },
-  "scriptHint": "Prolog: w tej turze można użyć wyłącznie „{{slots}}”.",
   "fate": "Rzuć kostką losu",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Zamień",
@@ -157,7 +156,9 @@
     "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
     "damage": "{{n}} obrażeń",
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
-    "none": "—"
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
   },
   "block": {
     "resolving": "Poczekaj na rozliczenie tury",
@@ -198,5 +199,9 @@
   },
   "layoutHint": "Wolisz inny układ walki? Ustawienia → Interfejs walki.",
   "forecastStrip": "zadasz ~{{out}} · otrzymasz {{hull}}",
-  "forecastBreak": "atak {{raw}} − unik {{evade}} − tarcza {{shield}}"
+  "forecastBreak": "atak {{raw}} − unik {{evade}} − tarcza {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

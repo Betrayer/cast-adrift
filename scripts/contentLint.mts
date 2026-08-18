@@ -69,6 +69,11 @@ import { ALL_EVENTS } from "../src/data/events";
 import { CHAINS, CHAIN_EVENT_IDS } from "../src/data/narrative/chains";
 import { ENDINGS } from "../src/data/narrative/endings";
 import {
+  CHECK_DECK,
+  PROLOGUE_BEATS,
+  SYSTEMS_CHECK,
+} from "../src/data/narrative/prologue";
+import {
   earnedMemoryOrders,
   MEMORIES,
   MEMORY_CODEX_IDS,
@@ -1288,6 +1293,44 @@ for (const band of FATE_TABLE) {
 }
 for (let n = 1; n <= 100; n += 1) {
   if (!fateCovered.has(n)) errors.push(`fate: roll ${String(n)} has no outcome`);
+}
+
+checkUniqueIds(
+  "systemsCheck",
+  SYSTEMS_CHECK.map((step) => step.id),
+);
+const CHECK_UIDS = new Set(
+  CHECK_DECK.map((_, index) => `die-${String(index)}`),
+);
+const WANDERER_SLOTS = new Set(
+  Object.keys(SHIPS.find((ship) => ship.id === "wanderer")?.slots ?? {}),
+);
+for (const step of SYSTEMS_CHECK) {
+  checkLocKey(`check.${step.id}`, step.sayKey);
+  if (step.failKey !== null) checkLocKey(`check.${step.id}`, step.failKey);
+  if (step.moves === null) continue;
+  if (step.moves.length === 0)
+    errors.push(`systemsCheck ${step.id}: empty move list`);
+  const seenSlots = new Set<string>();
+  const seenDice = new Set<string>();
+  for (const mv of step.moves) {
+    if (!CHECK_UIDS.has(mv.uid))
+      errors.push(`systemsCheck ${step.id}: no die "${mv.uid}" in the check deck`);
+    if (!WANDERER_SLOTS.has(mv.slot))
+      errors.push(`systemsCheck ${step.id}: the wanderer has no slot "${mv.slot}"`);
+    if (seenSlots.has(mv.slot))
+      errors.push(`systemsCheck ${step.id}: slot "${mv.slot}" is claimed twice`);
+    if (seenDice.has(mv.uid))
+      errors.push(`systemsCheck ${step.id}: die "${mv.uid}" is placed twice`);
+    seenSlots.add(mv.slot);
+    seenDice.add(mv.uid);
+  }
+  if (step.fixedRoll !== null && step.fixedRoll.length !== CHECK_DECK.length)
+    errors.push(`systemsCheck ${step.id}: fixed roll does not cover the deck`);
+}
+for (const beat of PROLOGUE_BEATS) {
+  checkLocKey(`prologue.${beat.id}`, beat.cta);
+  for (const line of beat.lines) checkLocKey(`prologue.${beat.id}`, line.text);
 }
 
 for (const f of FRAGMENTS) checkLocKey(`fragment.${f.id}`, f.text);

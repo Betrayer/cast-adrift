@@ -1,6 +1,7 @@
 import type {
   DieTier,
   Intent,
+  LocKey,
   School,
   SlotId,
   SubsystemAura,
@@ -235,4 +236,21 @@ export interface ResolutionBundle {
   enemyBeats: EnemyBeat[];
   final: BattleSnapshot;
   finalPhase: Extract<BattlePhase, "placement" | "ended">;
+}
+
+export interface CheckMove {
+  uid: string;
+  slot: SlotId;
+}
+
+export interface CheckStep {
+  id: string;
+  moves: readonly CheckMove[] | null;
+  fixedRoll: readonly number[] | null;
+  enemyIntent?: Intent;
+  setCharge?: number;
+  grantFreeNudge?: number;
+  defenseRolls?: readonly number[];
+  sayKey: LocKey;
+  failKey: LocKey | null;
 }

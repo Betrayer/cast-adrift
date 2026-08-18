@@ -10,7 +10,7 @@ import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
 import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
 import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
-import { legalTargets } from "@/game/battle/view";
+import { boardSlotIds, legalTargets } from "@/game/battle/view";
 import type { StatusKey } from "@/game/battle/statuses";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
@@ -1724,7 +1724,8 @@ export class BattleScene {
 
     const fresh = useBattleStore.getState();
     const legal = legalTargets(fresh, press.uid);
-    const targets: DropTarget[] = [...legal.slots];
+    const targets: DropTarget[] =
+      fresh.checkSteps === null ? [...legal.slots] : boardSlotIds(fresh);
     if (legal.reserve) targets.push("reserve");
 
     this.drag = {

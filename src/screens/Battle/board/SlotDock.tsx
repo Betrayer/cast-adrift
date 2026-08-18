@@ -21,6 +21,7 @@ export const ReserveButton = ({
     <button
       type="button"
       data-reserve
+      data-coach="reserve"
       data-testid="slot-reserve"
       className={[
         className ?? styles.reserve ?? '',

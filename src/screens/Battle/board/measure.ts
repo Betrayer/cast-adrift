@@ -26,11 +26,13 @@ export const useMeasured = (
     if (body !== null) observer.observe(body);
     const unsubscribe = subscribeBodyRect(measure);
     window.addEventListener('resize', measure);
+    window.addEventListener('scroll', measure, true);
     return () => {
       cancelAnimationFrame(frame);
       observer.disconnect();
       unsubscribe();
       window.removeEventListener('resize', measure);
+      window.removeEventListener('scroll', measure, true);
       release();
     };
   }, [observed, measure, release]);

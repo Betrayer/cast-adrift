@@ -100,7 +100,6 @@
     "begin": "Beginn",
     "hull": "Hülle {{n}}"
   },
-  "scriptHint": "Prolog: In diesem Zug darf nur „{{slots}}“ eingesetzt werden.",
   "fate": "Schicksal würfeln",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Tauschen",
@@ -157,7 +156,9 @@
     "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
     "damage": "{{n}} Schaden",
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
-    "none": "—"
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
   },
   "block": {
     "resolving": "Warte auf die Auflösung",
@@ -198,5 +199,9 @@
   },
   "layoutHint": "Lieber ein anderes Kampf-Layout? Einstellungen → Kampfoberfläche.",
   "forecastStrip": "du machst ~{{out}} · du nimmst {{hull}}",
-  "forecastBreak": "Angriff {{raw}} − Ausweichen {{evade}} − Schild {{shield}}"
+  "forecastBreak": "Angriff {{raw}} − Ausweichen {{evade}} − Schild {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

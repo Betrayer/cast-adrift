@@ -10,7 +10,7 @@ import {
   SCHOOL_ORDER,
 } from '@/game/battle/resonance';
 import { CHARGE_CAP } from '@/game/battle/resolver';
-import { allowedSlotsForTurn } from '@/game/battle/view';
+import { checkEndTurnBlocked } from '@/game/battle/view';
 import { playSfx } from '@/services/audio';
 import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
@@ -116,7 +116,6 @@ export const StatusBar = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
         ) : null}
         <span
           className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}
-          data-coach="charge"
         >
           {t('battle:charge', { n: charge, max: CHARGE_CAP })}
         </span>
@@ -191,6 +190,7 @@ export const ResonanceChips = () => {
         type="button"
         className={styles.resonanceRow}
         data-testid="resonance-row"
+        data-coach="resonance"
         onClick={() => {
           setOpen((value) => !value);
         }}
@@ -237,32 +237,18 @@ export const ResonanceChips = () => {
   );
 };
 
-export const ScriptHint = () => {
-  const { t } = useTranslation(['battle']);
-  const scriptedSlots = useBattleStore((s) => s.scriptedSlots);
-  const turn = useBattleStore((s) => s.turn);
-  const allowed = allowedSlotsForTurn(scriptedSlots, turn);
-  if (allowed === null || allowed.length === 0) return null;
-  return (
-    <Text size="xs" c={tokens.amber} ta="center">
-      {t('battle:scriptHint', {
-        slots: allowed.map((slot) => t(`battle:slot.${slot}`)).join(' · '),
-      })}
-    </Text>
-  );
-};
-
 export const EndTurnButton = () => {
   const { t } = useTranslation(['battle']);
   const phase = useBattleStore((s) => s.phase);
   const rerollMode = useBattleStore((s) => s.rerollMode);
   const endTurn = useBattleStore((s) => s.endTurn);
+  const checkBlocked = useBattleStore(checkEndTurnBlocked);
   return (
     <Button
       className={styles.clickable}
       size="md"
       fullWidth
-      disabled={phase !== 'placement' || rerollMode}
+      disabled={phase !== 'placement' || rerollMode || checkBlocked}
       onClick={endTurn}
       data-coach="endTurn"
       data-testid="battle-end-turn"

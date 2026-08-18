@@ -23,6 +23,7 @@ export interface MetaStats {
   wins: number;
   shardsEarned: number;
   prologueDone: boolean;
+  systemsCheckDone: boolean;
   campaignClears: number;
   kills: number;
   scrapEarned: number;
@@ -138,6 +139,7 @@ export interface MetaState extends MetaValues {
   recordBossFirstKill: (bossId: string) => boolean;
   recordEnding: (endingId: string) => boolean;
   markPrologueDone: () => void;
+  markSystemsCheckDone: () => void;
   recordCampaignClear: (ascension: number) => void;
   recordContractStars: (id: string, mask: number) => number;
   markDailyStarted: (date: string) => void;
@@ -176,6 +178,7 @@ export const createInitialMetaStats = (): MetaStats => ({
   wins: 0,
   shardsEarned: 0,
   prologueDone: false,
+  systemsCheckDone: false,
   campaignClears: 0,
   kills: 0,
   scrapEarned: 0,
@@ -576,7 +579,10 @@ export const useMetaStore = create<MetaState>()(
       },
 
       resetTutorial: () => {
-        set({ tutorialSeen: [] });
+        set((s) => ({
+          tutorialSeen: [],
+          stats: { ...s.stats, systemsCheckDone: false },
+        }));
       },
 
       engrave: (defId, engravingId, price) => {
@@ -633,6 +639,10 @@ export const useMetaStore = create<MetaState>()(
 
       markPrologueDone: () => {
         set((s) => ({ stats: { ...s.stats, prologueDone: true } }));
+      },
+
+      markSystemsCheckDone: () => {
+        set((s) => ({ stats: { ...s.stats, systemsCheckDone: true } }));
       },
 
       recordCampaignClear: (ascension) => {

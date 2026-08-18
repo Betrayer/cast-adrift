@@ -4062,9 +4062,6 @@
     "salvageCta": "Mettez-le en ligne",
     "signal1": "Au cœur du secteur, quelque chose émet sur une porteuse structurée. Ce n'est pas un appel de détresse. C'est un motif.",
     "signal2": "Il y a deux façons d'interpréter cette tendance, capitaine. Aucune des deux n'est rassurante.",
-    "signal3": "Une aiguille que vous n'aviez jamais remarquée auparavant fait un petit mouvement, puis revient au centre.",
-    "signalCta": "Tracer un itinéraire",
-    "contact1": "Contact. Drone Scav — bon marché, affamé et sur le point d'apprendre quelque chose. Commençons par les armes : chargez le canon.",
     "contact2": "Le drone se tourne vers vous, ses propulseurs crachant des flammes.",
     "contactCta": "S'engager"
   },
@@ -5161,6 +5158,31 @@
         "thread": "Il veut savoir ce que tu attends de tout ça.",
         "core": "La dernière balise est le « Core », et c'est elle-même qui pose la question."
       }
+    }
+  },
+  "check": {
+    "engines": {
+      "say": "Engines first. The green die is theirs — a school in its own slot always pays a bonus.",
+      "fail": "Engines want the green school. That is what affinity means."
+    },
+    "shields": {
+      "say": "Shields take blue. A card's tint names the school that is strongest in it.",
+      "fail": "Shields want blue. Read the tint before you commit."
+    },
+    "weapons": {
+      "say": "Weapon A. Red plus its affinity — a five leaves as a seven.",
+      "fail": "Weapons want red. The card shows the sum before you drop."
+    },
+    "sensors": {
+      "say": "Sensors, then the gun. Systems fire by the numbers on their cards: sensors are 1, weapons are 2, so the mark lands before the shot.",
+      "fail": "Sensors take grey, and the gun still wants the red die this turn."
+    },
+    "reactor": {
+      "say": "Black feeds the reactor at one and a half. A four would overflow the pool and cost two hull — nudge it down. This one is on me.",
+      "fail": "The reactor is the black school's slot."
+    },
+    "free": {
+      "say": "Check complete. Free turn — the board is yours."
     }
   }
 }

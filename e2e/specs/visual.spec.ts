@@ -14,7 +14,46 @@ const shot = async (app: Screens, name: string): Promise<void> => {
   await expect(app.page).toHaveScreenshot(name);
 };
 
+const CHECK_SCRIPT: readonly (readonly (readonly [string, SlotId])[])[] = [
+  [['die-0', 'engines']],
+  [['die-1', 'shields']],
+  [['die-2', 'weaponA']],
+  [
+    ['die-3', 'sensors'],
+    ['die-2', 'weaponA'],
+  ],
+];
+
+const openCheck = async (fresh: Screens, step: number): Promise<void> => {
+  await fresh.testId('menu-newRun').click();
+  await fresh.walkPrologue();
+  for (let i = 1; i < step; i += 1) {
+    await fresh.waitForCheckStep(i);
+    await fresh.playCheckStep(CHECK_SCRIPT[i - 1] ?? []);
+  }
+  await fresh.waitForCheckStep(step);
+  await fresh.waitForStableAnchors();
+};
+
 test.describe('visual baselines', () => {
+  test('systems check step 1', async ({ fresh }) => {
+    await openCheck(fresh, 1);
+    await fresh.selectDie('die-0');
+    await shot(fresh, 'check-step-1.png');
+  });
+
+  test('systems check step 4', async ({ fresh }) => {
+    await openCheck(fresh, 4);
+    await fresh.selectDie('die-3');
+    await shot(fresh, 'check-step-4.png');
+  });
+
+  test('systems check step 5', async ({ fresh }) => {
+    await openCheck(fresh, 5);
+    await fresh.selectDie('die-4');
+    await shot(fresh, 'check-step-5.png');
+  });
+
   test('menu', async ({ app }) => {
     await shot(app, 'menu.png');
   });

@@ -100,7 +100,6 @@
     "begin": "Commencer",
     "hull": "Coque {{n}}"
   },
-  "scriptHint": "Prologue : seule la compétence « {{slots}} » peut être utilisée lors de ce tour.",
   "fate": "Lancer de dés du destin",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Échange",
@@ -157,7 +156,9 @@
     "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
     "damage": "{{n}} dégâts",
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
-    "none": "—"
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
   },
   "block": {
     "resolving": "Attends la résolution du tour",
@@ -198,5 +199,9 @@
   },
   "layoutHint": "Une autre présentation du combat ? Réglages → Interface de combat.",
   "forecastStrip": "tu infliges ~{{out}} · tu subis {{hull}}",
-  "forecastBreak": "attaque {{raw}} − esquive {{evade}} − bouclier {{shield}}"
+  "forecastBreak": "attaque {{raw}} − esquive {{evade}} − bouclier {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

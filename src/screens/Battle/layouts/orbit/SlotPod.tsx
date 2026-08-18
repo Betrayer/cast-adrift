@@ -18,7 +18,7 @@ export interface SlotPodProps {
   occupiedBy: string | undefined;
   blocked: boolean;
   legal: boolean;
-  offTurn: boolean;
+  goal: boolean;
   size: number;
   x: number;
   y: number;
@@ -41,7 +41,7 @@ export const SlotPod = ({
   occupiedBy,
   blocked,
   legal,
-  offTurn,
+  goal,
   size,
   x,
   y,
@@ -57,6 +57,7 @@ export const SlotPod = ({
     <button
       type="button"
       {...(preview ? {} : { 'data-slot': slotId })}
+      {...(preview || !goal ? {} : { 'data-goal': '1' })}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
       className={[
@@ -64,7 +65,6 @@ export const SlotPod = ({
         legal ? styles.podLegal ?? '' : '',
         occupied ? styles.podOccupied ?? '' : '',
         blocked ? styles.podBlocked ?? '' : '',
-        offTurn ? styles.podOffTurn ?? '' : '',
       ]
         .filter((name) => name !== '')
         .join(' ')}
@@ -93,6 +93,7 @@ export const SlotPod = ({
             <span
               className={`${styles.podValue ?? ''} ${toneClass(projection)}`}
               data-proj={preview ? undefined : slotId}
+              data-tone={preview ? undefined : projectionTone(projection)}
             >
               {projectionShort(t, slotId, projection)}
             </span>

@@ -36,7 +36,7 @@ const ConsolePreview = () => (
           blocked={false}
           shrunk={false}
           legal={entry.legal}
-          offTurn={false}
+          goal={false}
           charge={6}
           onTap={noop}
           preview
@@ -77,7 +77,7 @@ const OrbitPreview = () => {
               occupiedBy={undefined}
               blocked={false}
               legal={entry.legal}
-              offTurn={false}
+              goal={false}
               size={solution.podSize}
               x={pod.x}
               y={pod.y}
@@ -106,7 +106,7 @@ const TabletPreview = () => (
           blocked={false}
           shrunk={false}
           legal={entry.legal}
-          offTurn={false}
+          goal={false}
           onTap={noop}
           preview
         />

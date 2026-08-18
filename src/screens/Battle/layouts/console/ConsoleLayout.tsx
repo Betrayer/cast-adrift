@@ -1,12 +1,13 @@
 import { useRegion } from '@/screens/Battle/board/measure';
+import { useBattleStore } from '@/stores/battleStore';
 import { SlotDock } from '@/screens/Battle/board/SlotDock';
 import { Console } from '@/screens/Battle/console/Console';
 import { Forecast } from '@/screens/Battle/console/Forecast';
 import {
   EndTurnButton,
   ResonanceChips,
-  ScriptHint,
 } from '@/screens/Battle/shell/BattleShell';
+import { CheckBanner } from '@/screens/Battle/shell/CheckBanner';
 import boardStyles from '@/screens/Battle/board/Board.module.css';
 import styles from '@/screens/Battle/BattleScreen.module.css';
 
@@ -22,12 +23,15 @@ export const ConsoleBody = () => {
   );
 };
 
-export const ConsoleFooter = () => (
-  <div className={styles.centreColumn}>
-    <ResonanceChips />
-    <ScriptHint />
-    <Forecast />
-    <Console />
-    <EndTurnButton />
-  </div>
-);
+export const ConsoleFooter = () => {
+  const checkActive = useBattleStore((s) => s.checkSteps !== null);
+  return (
+    <div className={styles.centreColumn}>
+      <ResonanceChips />
+      <CheckBanner />
+      <Forecast />
+      <Console compact={checkActive} />
+      <EndTurnButton />
+    </div>
+  );
+};

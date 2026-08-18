@@ -9,7 +9,7 @@ import { WarpStreaks } from '@/components/WarpStreaks';
 import { STARTER_DECK } from '@/data/decks';
 import { resolveActiveBattle } from '@/game/run/flow';
 import { emitBark } from '@/game/narrative';
-import { BATTLE_LAYOUT_HINT } from '@/game/tutorial';
+import { offerLayoutHint } from '@/game/onboarding';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { initAudio } from '@/services/audio';
@@ -18,9 +18,8 @@ import { haptic } from '@/services/tma';
 import { useBattleLayoutId } from '@/services/prefs';
 import { createStreams } from '@/services/rng';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
+import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
-import { useMetaStore } from '@/stores/metaStore';
-import { useNarrativeStore } from '@/stores/narrativeStore';
 import { useRunStore } from '@/stores/runStore';
 import { BossIntro } from '@/screens/Battle/BossIntro';
 import { FateInvocation } from '@/screens/Battle/FateInvocation';
@@ -45,13 +44,6 @@ const startTestBattleIfIdle = (): void => {
   );
 };
 
-const offerLayoutHint = (): void => {
-  const meta = useMetaStore.getState();
-  if (meta.tutorialSeen.includes(BATTLE_LAYOUT_HINT)) return;
-  meta.markTutorialSeen(BATTLE_LAYOUT_HINT);
-  useNarrativeStore.getState().pushHint('battle:layoutHint');
-};
-
 export const BattleScreen = () => {
   const { t } = useTranslation(['battle']);
   const phase = useBattleStore((s) => s.phase);
@@ -63,7 +55,9 @@ export const BattleScreen = () => {
   const introEnemyId = useBattleStore((s) => s.introEnemyId);
   const enemyBeats = useBattleStore((s) => s.enemyBeats);
   const beatSeq = useBattleStore((s) => s.beatSeq);
-  const layoutId = useBattleLayoutId();
+  const preferredLayout = useBattleLayoutId();
+  const checkActive = useBattleStore((s) => s.checkSteps !== null);
+  const layoutId = checkActive ? 'console' : preferredLayout;
   const bossFight = introEnemyId !== null;
   const reduced = resolveReducedMotion(
     useSettingsStore((s) => s.reducedMotion),
@@ -89,7 +83,7 @@ export const BattleScreen = () => {
   useEffect(() => {
     initAudio();
     if (!useRunStore.getState().active) startTestBattleIfIdle();
-    offerLayoutHint();
+    if (useBattleStore.getState().checkSteps === null) offerLayoutHint();
   }, []);
 
   useEffect(() => {
@@ -111,6 +105,11 @@ export const BattleScreen = () => {
     if (runActive) return;
     if (outcome === 'victory' && !droppedRef.current) {
       droppedRef.current = true;
+      if (useBattleStore.getState().checkSandbox) {
+        useBattleStore.getState().reset();
+        useAppStore.getState().go('codex');
+        return;
+      }
       dropLoot('vulture');
     }
     if (outcome === undefined) droppedRef.current = false;

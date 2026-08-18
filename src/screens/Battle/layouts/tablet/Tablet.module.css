@@ -266,8 +266,8 @@
   opacity: 0.72;
 }
 
-.rowOffTurn {
-  opacity: 0.45;
+.row[data-goal='1'] {
+  box-shadow: 0 0 0 2px var(--ca-amber);
 }
 
 .rowOccupied {

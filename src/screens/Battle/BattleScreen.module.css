@@ -42,8 +42,37 @@
   }
 }
 
-:root[data-ca-motion='reduced'] .causalitySlide {
+:root[data-ca-motion='reduced'] .causalitySlide,
+:root[data-ca-motion='reduced'] .checkBanner {
   animation: none;
+}
+
+.checkBanner {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: causalityDrop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
+}
+
+.checkSay {
+  flex: 1 1 200px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ca-text);
+}
+
+.checkSkip {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ca-dim);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .statusCard {
@@ -287,8 +316,33 @@
   }
 
   .centreColumn {
+    gap: 3px;
+    padding: 0 10px 6px;
+  }
+
+  .checkBanner {
+    gap: 6px;
+  }
+
+  .checkSay {
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .resonanceRow {
+    flex-wrap: nowrap;
     gap: 4px;
-    padding: 0 12px 8px;
+  }
+
+  .resChip {
+    gap: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .resPips {
+    display: none;
   }
 }
 

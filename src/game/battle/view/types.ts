@@ -1,5 +1,9 @@
 import type { PerkTrait } from "@/data/perks/types";
-import type { BattlePhase, BattleSnapshot, SlotId } from "@/types/battle";
+import type {
+  BattlePhase,
+  BattleSnapshot,
+  CheckStep,
+} from "@/types/battle";
 
 export interface BattleBoard extends BattleSnapshot {
   phase: BattlePhase;
@@ -14,5 +18,6 @@ export interface BattleBoard extends BattleSnapshot {
   spentGrants: readonly string[];
   fateUses: number;
   forcedTraits: readonly PerkTrait[];
-  scriptedSlots: readonly (readonly SlotId[])[] | null;
+  checkSteps: readonly CheckStep[] | null;
+  checkIndex: number;
 }

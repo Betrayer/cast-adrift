@@ -100,7 +100,6 @@
     "begin": "Начать",
     "hull": "Корпус {{n}}"
   },
-  "scriptHint": "Пролог: в этом ходу доступно только {{slots}}.",
   "fate": "Бросить Фатум",
   "fateResult": "Фатум {{roll}} — {{text}}",
   "swap": "Обмен",
@@ -157,7 +156,9 @@
     "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
     "damage": "{{n}} урона",
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
-    "none": "—"
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
   },
   "block": {
     "resolving": "Дождись, пока ход разрешится",
@@ -198,5 +199,9 @@
     "unknown": "→ ?"
   },
   "forecastStrip": "нанесёшь ~{{out}} · получишь {{hull}}",
-  "forecastBreak": "атака {{raw}} − уклонение {{evade}} − щит {{shield}}"
+  "forecastBreak": "атака {{raw}} − уклонение {{evade}} − щит {{shield}}",
+  "check": {
+    "step": "Проверка систем {{cur}}/{{max}}",
+    "skip": "Пропустить проверку"
+  }
 }

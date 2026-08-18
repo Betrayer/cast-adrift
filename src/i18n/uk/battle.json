@@ -100,7 +100,6 @@
     "begin": "Почати",
     "hull": "Корпус {{n}}"
   },
-  "scriptHint": "Пролог: цього ходу доступно лише {{slots}}.",
   "fate": "Кинути Фатум",
   "fateResult": "Фатум {{roll}} — {{text}}",
   "swap": "Обмін",
@@ -157,7 +156,9 @@
     "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
     "damage": "{{n}} шкоди",
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
-    "none": "—"
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
   },
   "block": {
     "resolving": "Зачекай, поки хід розв’яжеться",
@@ -198,5 +199,9 @@
     "unknown": "→ ?"
   },
   "forecastStrip": "завдаси ~{{out}} · отримаєш {{hull}}",
-  "forecastBreak": "атака {{raw}} − ухилення {{evade}} − щит {{shield}}"
+  "forecastBreak": "атака {{raw}} − ухилення {{evade}} − щит {{shield}}",
+  "check": {
+    "step": "Перевірка систем {{cur}}/{{max}}",
+    "skip": "Пропустити перевірку"
+  }
 }

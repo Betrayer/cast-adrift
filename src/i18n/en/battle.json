@@ -100,7 +100,6 @@
     "begin": "Begin",
     "hull": "Hull {{n}}"
   },
-  "scriptHint": "Prologue: only {{slots}} may be used this turn.",
   "fate": "Roll Fate",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Swap",
@@ -157,7 +156,9 @@
     "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
     "damage": "{{n}} dmg",
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
-    "none": "—"
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
   },
   "block": {
     "resolving": "Wait for the turn to resolve",
@@ -198,5 +199,9 @@
     "unknown": "→ ?"
   },
   "forecastStrip": "you deal ~{{out}} · you take {{hull}}",
-  "forecastBreak": "attack {{raw}} − evasion {{evade}} − shield {{shield}}"
+  "forecastBreak": "attack {{raw}} − evasion {{evade}} − shield {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

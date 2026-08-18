@@ -54,7 +54,12 @@ export type ConsoleBlock =
   | "atCeiling"
   | "reserveFull"
   | "used"
-  | "hullLow";
+  | "hullLow"
+  | "notAllowed"
+  | "occupied"
+  | "tierCap"
+  | "slotBlocked"
+  | "dieLocked";
 
 export interface ConsoleAction {
   id: ConsoleActionId;

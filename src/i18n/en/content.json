@@ -4062,9 +4062,6 @@
     "salvageCta": "Bring it online",
     "signal1": "Deep in the sector, something is broadcasting on a structured carrier. Not a distress call. A pattern.",
     "signal2": "There are two ways to read that pattern, captain. Neither is comforting.",
-    "signal3": "A needle you have never noticed before twitches once, then settles back to centre.",
-    "signalCta": "Plot a course",
-    "contact1": "Contact. Scav drone — cheap, hungry, and about to learn something. Weapons first: put a die in the gun.",
     "contact2": "The drone turns toward you, thrusters flaring.",
     "contactCta": "Engage"
   },
@@ -5161,6 +5158,31 @@
         "thread": "He wants to know what you want out of this.",
         "core": "The last beacon is the Core, and it asks the question itself."
       }
+    }
+  },
+  "check": {
+    "engines": {
+      "say": "Engines first. The green die is theirs — a school in its own slot always pays a bonus.",
+      "fail": "Engines want the green school. That is what affinity means."
+    },
+    "shields": {
+      "say": "Shields take blue. A card's tint names the school that is strongest in it.",
+      "fail": "Shields want blue. Read the tint before you commit."
+    },
+    "weapons": {
+      "say": "Weapon A. Red plus its affinity — a five leaves as a seven.",
+      "fail": "Weapons want red. The card shows the sum before you drop."
+    },
+    "sensors": {
+      "say": "Sensors, then the gun. Systems fire by the numbers on their cards: sensors are 1, weapons are 2, so the mark lands before the shot.",
+      "fail": "Sensors take grey, and the gun still wants the red die this turn."
+    },
+    "reactor": {
+      "say": "Black feeds the reactor at one and a half. A four would overflow the pool and cost two hull — nudge it down. This one is on me.",
+      "fail": "The reactor is the black school's slot."
+    },
+    "free": {
+      "say": "Check complete. Free turn — the board is yours."
     }
   }
 }

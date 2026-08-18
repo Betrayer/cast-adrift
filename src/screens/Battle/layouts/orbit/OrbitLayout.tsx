@@ -7,7 +7,7 @@ import {
   type RefObject,
 } from 'react';
 import { isSlotBlocked } from '@/game/battle/setup';
-import { slotAllowedThisTurn } from '@/game/battle/view';
+import { goalSlotsNow } from '@/game/battle/view';
 import { publishRegion } from '@/pixi/battle/anchors';
 import { rectOf, useRegion } from '@/screens/Battle/board/measure';
 import { ReserveButton } from '@/screens/Battle/board/SlotDock';
@@ -22,8 +22,8 @@ import { Forecast } from '@/screens/Battle/console/Forecast';
 import {
   EndTurnButton,
   ResonanceChips,
-  ScriptHint,
 } from '@/screens/Battle/shell/BattleShell';
+import { CheckBanner } from '@/screens/Battle/shell/CheckBanner';
 import { solveArc } from './arc';
 import { RadialMenu } from './RadialMenu';
 import { SlotPod } from './SlotPod';
@@ -125,7 +125,7 @@ const OrbitDock = () => {
                 occupiedBy={slot.dieUid}
                 blocked={isSlotBlocked(board, slotId)}
                 legal={legal.slots.includes(slotId)}
-                offTurn={!slotAllowedThisTurn(board, slotId)}
+                goal={goalSlotsNow(board).includes(slotId)}
                 size={solution.podSize}
                 x={pod.x}
                 y={pod.y}
@@ -178,7 +178,7 @@ export const OrbitBody = () => {
 export const OrbitFooter = () => (
   <div className={screenStyles.centreColumn}>
     <ResonanceChips />
-    <ScriptHint />
+    <CheckBanner />
     <Forecast />
     <Console compact />
     <EndTurnButton />

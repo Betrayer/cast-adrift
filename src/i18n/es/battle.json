@@ -100,7 +100,6 @@
     "begin": "Empezar",
     "hull": "Casco {{n}}"
   },
-  "scriptHint": "Prólogo: en este turno solo se puede utilizar «{{slots}}».",
   "fate": "Tirada de destino",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Intercambio",
@@ -157,7 +156,9 @@
     "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
     "damage": "{{n}} de daño",
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
-    "none": "—"
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
   },
   "block": {
     "resolving": "Espera a que se resuelva el turno",
@@ -198,5 +199,9 @@
   },
   "layoutHint": "¿Prefieres otra interfaz de combate? Ajustes → Interfaz de combate.",
   "forecastStrip": "infliges ~{{out}} · recibes {{hull}}",
-  "forecastBreak": "ataque {{raw}} − evasión {{evade}} − escudo {{shield}}"
+  "forecastBreak": "ataque {{raw}} − evasión {{evade}} − escudo {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

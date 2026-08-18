@@ -29,7 +29,22 @@ export class Screens {
     });
     await this.page.evaluate((at) => {
       window.caTest?.now(at);
-      window.caTest?.grantMeta({ tutorialSeen: 'all', prologueDone: true });
+      window.caTest?.grantMeta({
+        tutorialSeen: 'all',
+        prologueDone: true,
+        systemsCheckDone: true,
+      });
+    }, FROZEN_NOW);
+    await this.expectScreen('menu');
+  }
+
+  async bootFresh(): Promise<void> {
+    await this.page.goto('/');
+    await this.page.waitForFunction(() => window.caTest !== undefined, null, {
+      timeout: READY_TIMEOUT,
+    });
+    await this.page.evaluate((at) => {
+      window.caTest?.now(at);
     }, FROZEN_NOW);
     await this.expectScreen('menu');
   }
@@ -218,6 +233,29 @@ export class Screens {
     await this.testId('map-jump').click();
   }
 
+  async expectBoardFits(): Promise<void> {
+    await expect
+      .poll(
+        () =>
+          this.page.evaluate(() => {
+            const body = document.querySelector('[data-screen-body]');
+            if (body === null) return null;
+            const box = body.getBoundingClientRect();
+            const cut: string[] = [];
+            for (const el of document.querySelectorAll('[data-slot]')) {
+              const rect = el.getBoundingClientRect();
+              if (rect.height === 0) continue;
+              if (rect.bottom > box.bottom + 1 || rect.top < box.top - 1) {
+                cut.push(el.getAttribute('data-slot') ?? '?');
+              }
+            }
+            return { scrolled: body.scrollTop, cut };
+          }),
+        { timeout: BATTLE_TIMEOUT },
+      )
+      .toEqual({ scrolled: 0, cut: [] });
+  }
+
   async waitForPlacement(): Promise<void> {
     await this.expectScreen('battle');
     await this.page.waitForFunction(
@@ -233,6 +271,7 @@ export class Screens {
       null,
       { timeout: BATTLE_TIMEOUT },
     );
+    await this.expectBoardFits();
   }
 
   async tapDie(uid: string): Promise<void> {
@@ -363,6 +402,62 @@ export class Screens {
 
   async endTurn(): Promise<void> {
     await this.testId('battle-end-turn').click();
+  }
+
+  checkBanner(): Locator {
+    return this.testId('check-banner');
+  }
+
+  reason(): Locator {
+    return this.page.locator('[data-console-reason]');
+  }
+
+  async waitForCheckStep(step: number): Promise<void> {
+    await this.waitForPlacement();
+    await this.page.waitForFunction(
+      (target) => window.caTest?.state().battle.check?.stepIndex === target - 1,
+      step,
+      { timeout: BATTLE_TIMEOUT },
+    );
+    const restricted = await this.page.evaluate(
+      () => window.caTest?.state().battle.check?.moves !== null,
+    );
+    if (restricted) {
+      await expect(this.checkBanner()).toHaveAttribute(
+        'data-check-step',
+        String(step),
+      );
+    } else {
+      await expect(this.checkBanner()).toHaveCount(0);
+    }
+  }
+
+  async playCheckStep(
+    placements: readonly (readonly [string, SlotId])[],
+  ): Promise<void> {
+    for (const [uid, slotId] of placements) {
+      await this.placeByTap(uid, slotId);
+    }
+    await this.endTurn();
+  }
+
+  async dismissCoachMarks(max = 12): Promise<void> {
+    for (let i = 0; i < max; i += 1) {
+      const next = this.testId('coach-next');
+      if ((await next.count()) === 0) return;
+      await next.click();
+    }
+  }
+
+  async walkPrologue(maxBeats = 8): Promise<void> {
+    await this.expectScreen('prologue');
+    for (let beat = 0; beat < maxBeats; beat += 1) {
+      const next = this.testId('prologue-next');
+      await expect(next).toBeVisible({ timeout: READY_TIMEOUT });
+      await next.click();
+      if ((await this.state()).screen !== 'prologue') return;
+    }
+    throw new Error('walkPrologue: the prologue never handed over');
   }
 
   async placeTurn(): Promise<void> {

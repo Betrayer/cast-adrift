@@ -23,15 +23,23 @@ export type {
 export { enemyForecast, expectedHit } from "@/game/battle/view/forecast";
 export type { TurnForecast } from "@/game/battle/view/forecast";
 export {
-  allowedSlotsForTurn,
+  allowedSlotsNow,
   boardSlotIds,
   canReserve,
+  checkEndTurnBlocked,
+  checkMovesNow,
+  currentCheckStep,
+  goalDiceNow,
+  goalSlotsNow,
   legalTargets,
+  moveAllowedNow,
+  pendingCheckMoves,
+  placeBlockFor,
   reserveCapacity,
   reservedCount,
-  slotAllowedThisTurn,
+  slotAllowedNow,
 } from "@/game/battle/view/legal";
-export type { LegalTargets } from "@/game/battle/view/legal";
+export type { LegalTargets, PlaceBlock } from "@/game/battle/view/legal";
 export {
   orderBadgeFor,
   orderInverted,

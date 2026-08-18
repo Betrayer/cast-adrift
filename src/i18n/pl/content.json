@@ -4062,9 +4062,6 @@
     "salvageCta": "Uruchom to w sieci",
     "signal1": "Głęboko w tym sektorze coś nadaje na modulowanej fali nośnej. To nie jest sygnał SOS. To pewien wzór.",
     "signal2": "Istnieją dwa sposoby interpretacji tego schematu, kapitanie. Żaden z nich nie napawa optymizmem.",
-    "signal3": "Igła, której wcześniej nie zauważyłeś, drga raz, po czym wraca do pozycji środkowej.",
-    "signalCta": "Wyznacz trasę",
-    "contact1": "Kontakt. Dron Scav — tani, głodny i gotowy, by się czegoś nauczyć. Najpierw broń: załaduj nabój do broni.",
     "contact2": "Dron skręca w twoją stronę, a jego silniki rozbłyskują.",
     "contactCta": "Zaangażuj się"
   },
@@ -5161,6 +5158,31 @@
         "thread": "Chce wiedzieć, czego od tego oczekujesz.",
         "core": "Ostatnim sygnałem nawigacyjnym jest Rdzeń, który sam zadaje to pytanie."
       }
+    }
+  },
+  "check": {
+    "engines": {
+      "say": "Engines first. The green die is theirs — a school in its own slot always pays a bonus.",
+      "fail": "Engines want the green school. That is what affinity means."
+    },
+    "shields": {
+      "say": "Shields take blue. A card's tint names the school that is strongest in it.",
+      "fail": "Shields want blue. Read the tint before you commit."
+    },
+    "weapons": {
+      "say": "Weapon A. Red plus its affinity — a five leaves as a seven.",
+      "fail": "Weapons want red. The card shows the sum before you drop."
+    },
+    "sensors": {
+      "say": "Sensors, then the gun. Systems fire by the numbers on their cards: sensors are 1, weapons are 2, so the mark lands before the shot.",
+      "fail": "Sensors take grey, and the gun still wants the red die this turn."
+    },
+    "reactor": {
+      "say": "Black feeds the reactor at one and a half. A four would overflow the pool and cost two hull — nudge it down. This one is on me.",
+      "fail": "The reactor is the black school's slot."
+    },
+    "free": {
+      "say": "Check complete. Free turn — the board is yours."
     }
   }
 }

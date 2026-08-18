@@ -1,5 +1,5 @@
 import { isSlotBlocked, isSlotShrunk } from '@/game/battle/setup';
-import { slotAllowedThisTurn } from '@/game/battle/view';
+import { goalSlotsNow } from '@/game/battle/view';
 import { useRegion } from '@/screens/Battle/board/measure';
 import { ReserveButton } from '@/screens/Battle/board/SlotDock';
 import {
@@ -11,8 +11,8 @@ import { Console } from '@/screens/Battle/console/Console';
 import {
   EndTurnButton,
   ResonanceChips,
-  ScriptHint,
 } from '@/screens/Battle/shell/BattleShell';
+import { CheckBanner } from '@/screens/Battle/shell/CheckBanner';
 import { ForecastStrip } from './ForecastStrip';
 import { SlotRow } from './SlotRow';
 import boardStyles from '@/screens/Battle/board/Board.module.css';
@@ -40,7 +40,7 @@ const Conveyor = () => {
             blocked={isSlotBlocked(board, slotId)}
             shrunk={isSlotShrunk(board, slotId)}
             legal={legal.slots.includes(slotId)}
-            offTurn={!slotAllowedThisTurn(board, slotId)}
+            goal={goalSlotsNow(board).includes(slotId)}
             onTap={onSlotTap}
           />
         );
@@ -73,7 +73,7 @@ export const TabletBody = () => {
 export const TabletFooter = () => (
   <div className={screenStyles.centreColumn}>
     <ResonanceChips />
-    <ScriptHint />
+    <CheckBanner />
     <Console compact />
     <EndTurnButton />
   </div>

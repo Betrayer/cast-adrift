@@ -1,5 +1,5 @@
 import { isSlotBlocked, isSlotShrunk } from '@/game/battle/setup';
-import { slotAllowedThisTurn, type SlotProjection } from '@/game/battle/view';
+import { goalSlotsNow, type SlotProjection } from '@/game/battle/view';
 import type { BattleState } from '@/stores/battleStore';
 import type { SlotId } from '@/types/battle';
 import { SlotCard } from './SlotCard';
@@ -34,7 +34,7 @@ export const SlotGrid = ({
           blocked={isSlotBlocked(board, slotId)}
           shrunk={isSlotShrunk(board, slotId)}
           legal={legal.includes(slotId)}
-          offTurn={!slotAllowedThisTurn(board, slotId)}
+          goal={goalSlotsNow(board).includes(slotId)}
           charge={board.charge}
           onTap={onSlotTap}
         />

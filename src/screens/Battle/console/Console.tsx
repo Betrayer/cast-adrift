@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  checkMovesNow,
   consoleActions,
   consoleShape,
   type ConsoleAction,
@@ -38,9 +39,10 @@ const grow = (prev: ConsoleShape, next: ConsoleShape): ConsoleShape => {
 };
 
 export const Console = ({ compact = false }: { compact?: boolean }) => {
-  const { t } = useTranslation(['battle']);
-  const [reason, setReason] = useState<string | null>(null);
+  const { t } = useTranslation(['battle', 'content']);
   const board = useBattleStore();
+  const reason = board.lastBlock?.key ?? null;
+  const scripted = checkMovesNow(board) !== null;
   const [shape, setShape] = useState<ConsoleShape>(() =>
     consoleShape(useBattleStore.getState()),
   );
@@ -52,22 +54,29 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
   const actions = useMemo(() => consoleActions(board), [board]);
 
   const run = useCallback((action: ConsoleAction, effect: () => void) => {
+    const note = useBattleStore.getState().noteBlock;
     if (!action.enabled) {
-      setReason(action.block === null ? null : `battle:block.${action.block}`);
+      note(action.block === null ? null : `battle:block.${action.block}`);
       playSfx('invalid');
       return;
     }
-    setReason(null);
+    note(null);
     effect();
   }, []);
 
-  const button = (id: ConsoleActionId, label: string, extra?: string) => {
+  const button = (
+    id: ConsoleActionId,
+    label: string,
+    extra?: string,
+    coach?: string,
+  ) => {
     const action = actions[id];
     return (
       <button
         key={id}
         type="button"
         data-testid={`console-${id}`}
+        {...(coach === undefined ? {} : { 'data-coach': coach })}
         className={`${styles.btn ?? ''} ${extra ?? ''}`}
         aria-disabled={!action.enabled}
         onClick={() => {
@@ -87,7 +96,7 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
       data-band="console"
       data-console
     >
-      <DieMiniCard compact={compact} />
+      {scripted ? null : <DieMiniCard compact={compact} />}
       <div className={styles.row}>
         <button
           type="button"
@@ -107,23 +116,28 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
         >
           {rerollLabel(t, board)}
         </button>
-        {button('nudgeMinus', nudgeLabel(t, actions, '-'))}
+        {button('nudgeMinus', nudgeLabel(t, actions, '-'), undefined, 'nudge')}
         {button('nudgePlus', nudgeLabel(t, actions, '+'))}
         {button('reserve', t('battle:reserve'))}
         {shape.fate
-          ? button('fate', t('battle:fate'), styles.btnFate ?? '')
+          ? button('fate', t('battle:fate'), styles.btnFate ?? '', 'fate')
           : null}
       </div>
-      <div className={styles.row}>
-        {button('buyReroll', t('battle:buyReroll', { n: actions.buyReroll.cost }))}
-        {button('surge', t('battle:surge', { n: actions.surge.cost }))}
-        {shape.bloodReactor
-          ? button('bloodReactor', t('battle:bloodReactor'))
-          : null}
-        {shape.sacrifice ? button('sacrifice', t('battle:sacrifice')) : null}
-      </div>
-      {shape.actives.length === 0 ? null : (
-        <div className={styles.row} data-console-actives>
+      {scripted ? null : (
+        <div className={styles.row}>
+          {button(
+            'buyReroll',
+            t('battle:buyReroll', { n: actions.buyReroll.cost }),
+          )}
+          {button('surge', t('battle:surge', { n: actions.surge.cost }))}
+          {shape.bloodReactor
+            ? button('bloodReactor', t('battle:bloodReactor'))
+            : null}
+          {shape.sacrifice ? button('sacrifice', t('battle:sacrifice')) : null}
+        </div>
+      )}
+      {scripted || shape.actives.length === 0 ? null : (
+        <div className={styles.row} data-console-actives data-coach="actives">
           {shape.actives.map((id) =>
             button(
               id,

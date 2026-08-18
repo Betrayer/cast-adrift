@@ -22,7 +22,12 @@ export const projectionText = (
         ? t('battle:proj.markPierce', { n: projection.sensor.vulnerable })
         : t('battle:proj.mark', { n: projection.sensor?.vulnerable ?? 0 });
     case 'charge':
-      return t('battle:proj.charge', { n: projection.amount });
+      return projection.overflowHull > 0
+        ? t('battle:proj.chargeOverflow', {
+            n: projection.amount,
+            hull: projection.overflowHull,
+          })
+        : t('battle:proj.charge', { n: projection.amount });
     case 'repair':
       return t('battle:proj.heal', { n: projection.amount });
     case 'shield':
@@ -33,7 +38,15 @@ export const projectionText = (
             base: projection.base,
             bonus: projection.bonus,
           });
-    case 'damage':
+    case 'damage': {
+      const mark = projection.amount - projection.value;
+      if (mark > 0) {
+        return t('battle:proj.damageMark', {
+          amount: projection.amount,
+          value: projection.value,
+          mark,
+        });
+      }
       return projection.bonus === 0
         ? t('battle:proj.damage', { n: projection.value })
         : t('battle:proj.damageSum', {
@@ -41,6 +54,7 @@ export const projectionText = (
             base: projection.base,
             bonus: projection.bonus,
           });
+    }
     default:
       return slotId === 'spinal' ? t('battle:proj.jam') : t('battle:proj.none');
   }

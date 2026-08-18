@@ -185,8 +185,8 @@
   opacity: 0.72;
 }
 
-.podOffTurn {
-  opacity: 0.45;
+.pod[data-goal='1'] {
+  box-shadow: 0 0 0 2.5px var(--ca-amber);
 }
 
 .podOccupied {
