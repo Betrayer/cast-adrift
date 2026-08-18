@@ -215,11 +215,14 @@ describe("effect perks", () => {
     expect(snap.charge).toBe(1);
   });
 
-  it("targeter increases mark damage and softens jam", () => {
+  it("targeter deepens the vulnerability sensors applies", () => {
     const marked = (perks: string[]) =>
-      build(perks, [harnessDie("w", "ember", 5)], { weaponA: "w" }, {
-        enemies: [harnessEnemy({ statuses: { mark: 1 } })],
-      });
+      build(
+        perks,
+        [harnessDie("s", "grey-d4", 3), harnessDie("w", "ember", 5)],
+        { sensors: "s", weaponA: "w" },
+        { enemies: [harnessEnemy()] },
+      );
     const withT = resolvePlayerPhase(marked(["targeter"]));
     const without = resolvePlayerPhase(marked([]));
     expect(enemyHp(without.next) - enemyHp(withT.next)).toBe(1);
@@ -276,15 +279,23 @@ describe("trait perks", () => {
     expect(snap.burnDoubleUsed).toBe(true);
   });
 
-  it("afterburner lowers the engine threshold", () => {
+  it("afterburner raises the evasion percentages", () => {
     const base = resolvePlayerPhase(
       build([], [harnessDie("e", "frostplate", 3)], { engines: "e" }),
     );
     const boosted = resolvePlayerPhase(
       build(["afterburner"], [harnessDie("e", "frostplate", 3)], { engines: "e" }),
     );
-    expect(base.next.engineState).toBe("brace");
-    expect(boosted.next.engineState).toBe("dodge");
+    expect(base.next.evasion).toEqual({
+      dodgePct: 18,
+      glancingPct: 9,
+      intercept: false,
+    });
+    expect(boosted.next.evasion).toEqual({
+      dodgePct: 24,
+      glancingPct: 12,
+      intercept: false,
+    });
   });
 
   it("ricochet carries overkill to the next enemy", () => {
@@ -303,7 +314,7 @@ describe("trait perks", () => {
   it("mirrorLattice deals damage back on a dodge", () => {
     const res = resolveEnemyPhase(
       build(["mirrorLattice"], [], {}, {
-        engineState: "dodge",
+        evasion: { dodgePct: 100, glancingPct: 0, intercept: false },
         enemies: [harnessEnemy({ nextIntent: { t: "attack", n: 5 }, hp: 20, hpMax: 20 })],
       }),
       createStream(1),
@@ -314,7 +325,7 @@ describe("trait perks", () => {
   it("tug grants charge on a dodge", () => {
     const res = resolveEnemyPhase(
       build(["tug"], [], {}, {
-        engineState: "dodge",
+        evasion: { dodgePct: 100, glancingPct: 0, intercept: false },
         charge: 0,
         enemies: [harnessEnemy({ nextIntent: { t: "attack", n: 5 } })],
       }),

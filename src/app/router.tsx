@@ -108,7 +108,7 @@ const SCREENS: Record<ScreenId, () => ReactElement> = {
 export const Router = () => {
   const screen = useAppStore((s) => s.screen);
   return (
-    <div key={screen} className={styles.screen}>
+    <div key={screen} className={styles.screen} data-screen={screen}>
       <Suspense fallback={<Box mih="var(--ca-vh)" bg={tokens.bg} />}>
         {SCREENS[screen]()}
       </Suspense>

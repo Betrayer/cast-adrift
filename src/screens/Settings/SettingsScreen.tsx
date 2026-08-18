@@ -26,6 +26,7 @@ import { recentErrors } from '@/services/errors';
 import { APP_VERSION } from '@/services/version';
 import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
+import { chooseTheme } from '@/services/prefs';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type {
   BattleSpeed,
@@ -34,6 +35,8 @@ import type {
   Locale,
   ReducedMotionSetting,
 } from '@/types';
+import { AccountSection } from './AccountSection';
+import { LayoutPicker } from './LayoutPicker';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
@@ -130,7 +133,6 @@ const SkinPicker = () => {
 const ThemePicker = () => {
   const { t } = useTranslation(['settings', 'meta']);
   const active = useSettingsStore((s) => s.theme);
-  const setTheme = useSettingsStore((s) => s.setTheme);
   const owned = useMetaStore((s) => s.themes);
   const shards = useMetaStore((s) => s.shards);
   const spendShards = useMetaStore((s) => s.spendShards);
@@ -225,7 +227,7 @@ const ThemePicker = () => {
                   variant={selected ? 'filled' : 'default'}
                   disabled={selected}
                   onClick={() => {
-                    setTheme(def.id as ThemeId);
+                    chooseTheme(def.id as ThemeId);
                   }}
                 >
                   {t(selected ? 'settings:theme.active' : 'settings:theme.use')}
@@ -238,7 +240,7 @@ const ThemePicker = () => {
                     if (!spendShards(def.price)) return;
                     trackEvent({ name: 'meta_purchase', params: { kind: 'theme' } });
                     unlockTheme(def.id);
-                    setTheme(def.id);
+                    chooseTheme(def.id as ThemeId);
                     playSfx('buy');
                   }}
                 >
@@ -315,6 +317,8 @@ export const SettingsScreen = () => {
         {t('settings:title')}
       </Title>
 
+      <AccountSection />
+
       <Stack gap="xs">
         <Text size="sm" c={tokens.dim}>
           {t('settings:language')}
@@ -326,9 +330,12 @@ export const SettingsScreen = () => {
             if (value !== null) settings.setLocale(value as Locale);
           }}
           data={LOCALE_OPTIONS}
+          data-testid="settings-locale"
           comboboxProps={{ withinPortal: true }}
         />
       </Stack>
+
+      <LayoutPicker />
 
       <ThemePicker />
 
@@ -444,7 +451,11 @@ export const SettingsScreen = () => {
         }}
       />
 
-      <Button variant="default" onClick={resetTutorial}>
+      <Button
+        variant="default"
+        data-testid="settings-tutorial-reset"
+        onClick={resetTutorial}
+      >
         {t('settings:tutorialReset')}
       </Button>
 
@@ -452,6 +463,7 @@ export const SettingsScreen = () => {
 
       <Button
         variant="default"
+        data-testid="settings-back"
         onClick={() => {
           go('menu');
         }}

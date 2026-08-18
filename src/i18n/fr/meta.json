@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} réserve bleue",
       "jamPowerDelta": "{{n}} puissance de jam",
       "growthCapDelta": "{{n}} plafond de croissance",
-      "enginesThresholdDelta": "{{n}} seuil du moteur",
+      "evasionDelta": "{{n}}% d'esquive",
       "markBonusDelta": "{{n}} bonus de note",
       "battleEndHeal": "{{n}} soigner / combattre",
       "hullMaxPct": "{{n}} % de la coque maximale",
@@ -391,7 +391,8 @@
     "myRank": "Votre site : {{rank}}",
     "noRank": "Il n'y a pas encore de message sur ce forum.",
     "empty": "Il n'y a encore rien ici.",
-    "depth": "d {{n}}"
+    "depth": "d {{n}}",
+    "offline": "Hors ligne — le classement est inaccessible. Ton score est sauvegardé en local."
   },
   "profile": {
     "title": "Profil",

@@ -160,6 +160,7 @@ export const MenuScreen = () => {
               key={entry.key}
               size="md"
               variant="filled"
+              data-testid={`menu-${entry.key}`}
               onClick={onSelect(entry)}
               rightSection={
                 entry.key === 'codex' && unreadMemories > 0 ? (

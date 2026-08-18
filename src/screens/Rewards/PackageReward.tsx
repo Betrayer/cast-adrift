@@ -113,6 +113,7 @@ export const PackageReward = ({
                 size="sm"
                 mt="sm"
                 fullWidth
+                data-testid={`reward-package-die-${String(index)}`}
                 onClick={() => {
                   playSfx(deckFull ? "buy" : "optionTick", { rate: 1.12 });
                   resolveDieChoice(dieId);
@@ -155,6 +156,7 @@ export const PackageReward = ({
                 size="sm"
                 mt="sm"
                 fullWidth
+                data-testid={`reward-package-module-${String(index)}`}
                 onClick={() => {
                   playSfx(bayFull ? "buy" : "mkSweep");
                   resolveModuleChoice(moduleId);

@@ -1,14 +1,16 @@
-import { Circle, Container, Graphics, Rectangle, Sprite, Text } from "pixi.js";
-import type { Application, FederatedPointerEvent, Ticker } from "pixi.js";
-import { bodyRect, subscribeBodyRect } from "@/app/bands";
+import { Container, Graphics, Sprite, Text } from "pixi.js";
+import type { Application, Ticker } from "pixi.js";
+import { subscribeBodyRect } from "@/app/bands";
 import { mixHex } from "@/app/color";
-import { currentTheme, onThemeChange, tokens } from "@/app/theme";
+import { onThemeChange, tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
+import { FATE_DIE_ID } from "@/data/fate";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
+import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
 import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
-import { canPlaceDie } from "@/game/battle/setup";
+import { boardSlotIds, legalTargets } from "@/game/battle/view";
 import type { StatusKey } from "@/game/battle/statuses";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
@@ -19,45 +21,59 @@ import {
   releaseDieTextures,
 } from "@/pixi/textures";
 import { clearPool, reportPool } from "@/pixi/perf";
-import { publishTrayAnchor } from "@/pixi/battle/anchors";
-import { computeBattleLayout, type BattleLayout, type Rect } from "@/pixi/battle/layout";
+import { setDraggedDie } from "@/pixi/battle/dragState";
+import { focusEnemy } from "@/pixi/battle/enemyFocus";
+import {
+  boardRegion,
+  publishBattleAnchors,
+  publishSelectionAnchor,
+  reserveAnchor,
+  reserveWellAt,
+  slotAnchor,
+  subscribeAnchors,
+  type AnchorRect,
+} from "@/pixi/battle/anchors";
+import {
+  computeBattleLayout,
+  type BattleLayout,
+  type Rect,
+} from "@/pixi/battle/layout";
 import { easeOutQuad, linear, Tweens } from "@/pixi/tween";
 import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
 import {
   resolveReducedMotion,
   useSettingsStore,
 } from "@/stores/settingsStore";
-import { battleSnapshot, useBattleStore } from "@/stores/battleStore";
+import { useBattleStore } from "@/stores/battleStore";
 import type { BattleState } from "@/stores/battleStore";
 import type {
   Beat,
   EnemyBeat,
   EnemyBeatKind,
+  EnemyState,
   ResolutionBundle,
   RolledDie,
   SlotId,
 } from "@/types/battle";
-import type { School } from "@/types/content";
+import type { Intent, School } from "@/types/content";
 
 export interface BattleSceneLabels {
-  slotTitle: (slot: SlotId) => string;
-  capLabel: (cap: number, mk: number) => string;
-  reserveTitle: string;
   statusGlyph: (key: StatusKey) => string;
   jamLabel: string;
+  pierceLabel: (n: number) => string;
   beatGlyph: (kind: EnemyBeatKind) => string;
 }
+
+export type DropTarget = SlotId | "reserve";
 
 const MINI_DIE_SIZE = 40;
 const BEAT_GAP_NORMAL_MS = 180;
 const BEAT_GAP_FAST_MS = 90;
-const GLOW_HZ = 1.2;
 const DAMAGE_POOL_SIZE = 12;
 const PARTICLE_POOL_SIZE = 40;
 const GLOW_POOL_SIZE = 3;
 const DRAG_THRESHOLD = 6;
 const REROLL_LIFT = 4;
-const CHARGE_PIP_COUNT = 10;
 const SHAKE_AMPLITUDE = 6;
 const SHAKE_MS = 180;
 const BIG_HIT_DAMAGE = 10;
@@ -67,6 +83,10 @@ const PROJECTILE_MS = 120;
 const DEATH_MS = 560;
 const NUMBER_STACK_OFFSET = 22;
 const NUMBER_STACK_WINDOW_MS = 420;
+const DIE_HIT_PAD = 4;
+const CARD_PULSE_MS = 340;
+const PRISM_HZ = 0.28;
+const FALLBACK_BAND: AnchorRect = { x: 0, y: 0, w: 0, h: 0 };
 
 const beatGapMs = (): number =>
   useSettingsStore.getState().battleSpeed === "fast"
@@ -74,7 +94,6 @@ const beatGapMs = (): number =>
     : BEAT_GAP_NORMAL_MS;
 
 const emptySlotFill = (): string => mixHex(tokens.surface1, tokens.bg, 0.45);
-const emptySlotStroke = (): string => mixHex(tokens.line, tokens.faint, 0.5);
 const enemyFill = (): string => tokens.surface2;
 
 const WARD_RATE: Record<School, number> = {
@@ -86,6 +105,59 @@ const WARD_RATE: Record<School, number> = {
   grey: 0.94,
   prismatic: 1.42,
 };
+
+const INTENT_GLYPH: Record<Intent["t"], string> = {
+  attack: "⚔",
+  multi: "⚔",
+  mirrorHalf: "⚔",
+  mirrorSchool: "⚔",
+  enrage: "⚔",
+  echoTotal: "⚔",
+  bargain: "◈",
+  stealScrap: "◈",
+  shield: "⛨",
+  shieldAll: "⛨",
+  shieldGate: "▣",
+  siphonShield: "⇣",
+  healAllies: "✚",
+  charge: "⚡",
+  drainCharge: "⚡",
+  jamSlot: "⊘",
+  lockDie: "⛓",
+  summon: "✦",
+  capShrink: "▽",
+  twistDie: "↯",
+  swapValues: "⇄",
+  storm: "↯",
+  curseDie: "☠",
+  hijack: "↱",
+  foldOrder: "∞",
+  devourDie: "◉",
+};
+
+const ATTACK_INTENTS: ReadonlySet<Intent["t"]> = new Set([
+  "attack",
+  "multi",
+  "mirrorHalf",
+  "mirrorSchool",
+  "enrage",
+  "echoTotal",
+]);
+
+const intentAmount = (intent: Intent): string => {
+  if (intent.t === "multi") return `${String(intent.n)}×${String(intent.k)}`;
+  if ("n" in intent) return String(intent.n);
+  if (intent.t === "echoTotal") return String(intent.cap);
+  return "";
+};
+
+const intentLabelFor = (intent: Intent): string => {
+  const amount = intentAmount(intent);
+  return amount === "" ? INTENT_GLYPH[intent.t] : `${INTENT_GLYPH[intent.t]}${amount}`;
+};
+
+const intentTint = (intent: Intent): string =>
+  ATTACK_INTENTS.has(intent.t) ? schools.red.text : tokens.dim;
 
 const statusTint = (key: StatusKey): string => {
   switch (key) {
@@ -100,21 +172,13 @@ const statusTint = (key: StatusKey): string => {
   }
 };
 
-interface SlotView {
-  box: Graphics;
-  glow: Graphics;
-  title: Text;
-  cap: Text;
-  pips: Graphics;
-  occupied: boolean;
-  blocked: boolean;
-}
-
 interface EnemyView {
   root: Container;
   body: Graphics;
   flash: Graphics;
   targetRing: Graphics;
+  hpRing: Graphics;
+  intent: Text;
   statusTexts: Map<StatusKey, Text>;
   subsystemViews: Map<string, { chip: Container; ring: Graphics; hp: Text }>;
   cancelFlash?: () => void;
@@ -124,15 +188,17 @@ interface PendingPress {
   uid: string;
   startX: number;
   startY: number;
+  pointerId: number;
 }
 
 interface DragState {
   uid: string;
+  pointerId: number;
   sprite: Sprite;
   offsetX: number;
   offsetY: number;
-  validSlots: SlotId[];
-  reserveValid: boolean;
+  targets: DropTarget[];
+  over: DropTarget | null;
 }
 
 interface PooledNumber {
@@ -142,9 +208,6 @@ interface PooledNumber {
   y: number;
   at: number;
 }
-
-const contains = (rect: Rect, x: number, y: number): boolean =>
-  x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 
 const overlapArea = (
   rect: Rect,
@@ -159,70 +222,8 @@ const overlapArea = (
   return w > 0 && h > 0 ? w * h : 0;
 };
 
-const dashLine = (
-  g: Graphics,
-  x1: number,
-  y1: number,
-  x2: number,
-  y2: number,
-  dash = 6,
-  gap = 4,
-): void => {
-  const len = Math.hypot(x2 - x1, y2 - y1);
-  if (len === 0) return;
-  const ux = (x2 - x1) / len;
-  const uy = (y2 - y1) / len;
-  let d = 0;
-  while (d < len) {
-    const e = Math.min(d + dash, len);
-    g.moveTo(x1 + ux * d, y1 + uy * d).lineTo(x1 + ux * e, y1 + uy * e);
-    d = e + gap;
-  }
-};
-
-const dashedRoundRectStroke = (
-  g: Graphics,
-  rect: Rect,
-  radius: number,
-): void => {
-  const { x, y, w, h } = rect;
-  const r = Math.min(radius, w / 2, h / 2);
-  dashLine(g, x + r, y, x + w - r, y);
-  dashLine(g, x + w, y + r, x + w, y + h - r);
-  dashLine(g, x + w - r, y + h, x + r, y + h);
-  dashLine(g, x, y + h - r, x, y + r);
-  g.moveTo(x + w - r, y).arc(x + w - r, y + r, r, -Math.PI / 2, 0);
-  g.moveTo(x + w, y + h - r).arc(x + w - r, y + h - r, r, 0, Math.PI / 2);
-  g.moveTo(x + r, y + h).arc(x + r, y + h - r, r, Math.PI / 2, Math.PI);
-  g.moveTo(x, y + r).arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
-};
-
-const paintSlotBoard = (
-  g: Graphics,
-  rect: Rect,
-  style: { innerShadow: number; etching: boolean },
-): void => {
-  if (style.innerShadow > 0) {
-    g.roundRect(rect.x + 1.5, rect.y + 1.5, rect.w - 3, rect.h - 3, 11).stroke({
-      color: "#000000",
-      alpha: style.innerShadow,
-      width: 3,
-    });
-    g.roundRect(rect.x + 1, rect.y + 1, rect.w - 2, rect.h * 0.5, 10).fill({
-      color: "#FFFFFF",
-      alpha: style.innerShadow * 0.06,
-    });
-  }
-  if (!style.etching) return;
-  const ticks = 6;
-  const span = rect.w * 0.34;
-  const start = rect.x + rect.w - span - 10;
-  for (let i = 0; i < ticks; i += 1) {
-    const x = start + (span / (ticks - 1)) * i;
-    g.moveTo(x, rect.y + rect.h - 7).lineTo(x, rect.y + rect.h - 3);
-  }
-  g.stroke({ color: tokens.line, alpha: 0.85, width: 1 });
-};
+const contains = (rect: Rect, x: number, y: number): boolean =>
+  x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 
 const activeSlotIds = (state: BattleState): SlotId[] =>
   Object.keys(state.slots) as SlotId[];
@@ -230,9 +231,17 @@ const activeSlotIds = (state: BattleState): SlotId[] =>
 const isDieLockedNow = (state: BattleState, uid: string): boolean =>
   state.lockedDice.some((l) => l.uid === uid && l.untilTurn >= state.turn);
 
-const isSlotBlockedNow = (state: BattleState, slotId: SlotId): boolean =>
-  state.blockedSlots.some(
-    (b) => b.slot === slotId && b.untilTurn >= state.turn,
+const sameShipRect = (a: Rect | null, b: Rect | null): boolean =>
+  a !== null &&
+  b !== null &&
+  a.x === b.x &&
+  a.y === b.y &&
+  a.w === b.w &&
+  a.h === b.h;
+
+const cardElement = (target: DropTarget): HTMLElement | null =>
+  document.querySelector<HTMLElement>(
+    target === "reserve" ? "[data-reserve]" : `[data-slot="${target}"]`,
   );
 
 export class BattleScene {
@@ -242,31 +251,32 @@ export class BattleScene {
 
   private readonly bg = new Container();
   private readonly enemiesLayer = new Container();
-  private readonly slotsLayer = new Container();
   private readonly trayLayer = new Container();
   private readonly overlayLayer = new Container();
   private readonly dragLayer = new Container();
   private readonly fxLayer = new Container();
 
   private layout: BattleLayout;
-  private readonly slotViews = new Map<SlotId, SlotView>();
+  private origin = { left: 0, top: 0 };
   private readonly enemyViews = new Map<string, EnemyView>();
   private readonly dieSprites = new Map<string, Sprite>();
   private readonly lockOverlays = new Map<string, Graphics>();
   private readonly selectionRings = new Map<string, Graphics>();
+  private readonly prismRims = new Map<string, Graphics>();
+  private prismPhase = 0;
   private readonly dieCancels = new Map<string, () => void>();
   private readonly animating = new Set<string>();
   private readonly numberPool: PooledNumber[] = [];
-  private reserveBox: Graphics | null = null;
-  private reserveGlow: Graphics | null = null;
-  private reserveTitle: Text | null = null;
+  private readonly flaggedCards = new Set<DropTarget>();
+  private shipView: Container | null = null;
+  private shipFlash: Graphics | null = null;
+  private shipFlashCancel: (() => void) | null = null;
   private tumbleFx: Tumble | null = null;
   private readonly tumblingUids = new Set<string>();
   private beatTimeouts: number[] = [];
   private beatRun: { cancelled: boolean } | null = null;
   private pendingPress: PendingPress | null = null;
   private drag: DragState | null = null;
-  private glowTime = 0;
   private shakeMs = 0;
   private hitStopMs = 0;
   private elapsedMs = 0;
@@ -278,28 +288,36 @@ export class BattleScene {
   private readonly unsubscribe: () => void;
   private readonly unsubscribeTheme: () => void;
   private readonly unsubscribeBands: () => void;
+  private readonly unsubscribeAnchors: () => void;
+  private readonly unsubscribeSettings: () => void;
+  private readonly motionQuery: MediaQueryList;
+  private motionReduced = false;
 
   constructor(app: Application, labels: BattleSceneLabels) {
     this.app = app;
     this.labels = labels;
     this.tweens = new Tweens(app.ticker);
+    this.motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    this.motionReduced = resolveReducedMotion(
+      useSettingsStore.getState().reducedMotion,
+    );
+    this.readOrigin();
     this.layout = this.computeLayout();
 
     app.stage.addChild(
       this.bg,
       this.enemiesLayer,
-      this.slotsLayer,
       this.trayLayer,
       this.overlayLayer,
       this.dragLayer,
       this.fxLayer,
     );
-    app.stage.eventMode = "static";
-    app.stage.hitArea = app.screen;
-    app.stage.on("pointerdown", this.onStagePointerDown);
-    app.stage.on("globalpointermove", this.onPointerMove);
-    app.stage.on("pointerup", this.onPointerUp);
-    app.stage.on("pointerupoutside", this.onPointerUp);
+    app.stage.eventMode = "none";
+
+    window.addEventListener("pointerdown", this.onPointerDown, true);
+    window.addEventListener("pointermove", this.onPointerMove, true);
+    window.addEventListener("pointerup", this.onPointerUp, true);
+    window.addEventListener("pointercancel", this.onPointerCancel, true);
 
     this.buildNumberPool();
     this.buildParticlePool();
@@ -311,6 +329,9 @@ export class BattleScene {
     this.unsubscribe = useBattleStore.subscribe(this.onStoreChange);
     this.unsubscribeTheme = onThemeChange(this.onThemeSwitch);
     this.unsubscribeBands = subscribeBodyRect(this.onResize);
+    this.unsubscribeAnchors = subscribeAnchors(this.onAnchorsChange);
+    this.unsubscribeSettings = useSettingsStore.subscribe(this.onMotionChange);
+    this.motionQuery.addEventListener("change", this.onMotionChange);
     this.app.renderer.on("resize", this.onResize);
     this.app.ticker.add(this.tick);
     if (useBattleStore.getState().phase === "resolving") {
@@ -320,27 +341,35 @@ export class BattleScene {
 
   destroy(): void {
     this.stopBeats();
+    this.shipFlashCancel?.();
+    this.shipFlashCancel = null;
+    this.shipView?.destroy({ children: true });
+    this.shipView = null;
+    this.shipFlash = null;
     this.tumbleFx?.destroy();
     this.tumbleFx = null;
     if (useBattleStore.getState().phase === "resolving") {
       useBattleStore.getState().finishResolution();
     }
+    this.clearCardFlags();
     this.unsubscribe();
     this.unsubscribeTheme();
     this.unsubscribeBands();
+    this.unsubscribeAnchors();
+    this.unsubscribeSettings();
+    this.motionQuery.removeEventListener("change", this.onMotionChange);
     this.app.stage.position.set(0, 0);
     this.app.renderer.off("resize", this.onResize);
     this.app.ticker.remove(this.tick);
-    this.app.stage.off("pointerdown", this.onStagePointerDown);
-    this.app.stage.off("globalpointermove", this.onPointerMove);
-    this.app.stage.off("pointerup", this.onPointerUp);
-    this.app.stage.off("pointerupoutside", this.onPointerUp);
+    window.removeEventListener("pointerdown", this.onPointerDown, true);
+    window.removeEventListener("pointermove", this.onPointerMove, true);
+    window.removeEventListener("pointerup", this.onPointerUp, true);
+    window.removeEventListener("pointercancel", this.onPointerCancel, true);
     this.tweens.destroy();
     this.app.stage.removeChildren();
     for (const layer of [
       this.bg,
       this.enemiesLayer,
-      this.slotsLayer,
       this.trayLayer,
       this.overlayLayer,
       this.dragLayer,
@@ -348,7 +377,8 @@ export class BattleScene {
     ]) {
       layer.destroy({ children: true });
     }
-    publishTrayAnchor(null);
+    publishBattleAnchors(null);
+    publishSelectionAnchor(null);
     clearPool("battleFx");
     releaseDieTextures(this.app);
   }
@@ -360,35 +390,76 @@ export class BattleScene {
     this.beatTimeouts = [];
   }
 
-  private boardRegion(): Rect {
-    const full: Rect = {
-      x: 0,
-      y: 0,
-      w: this.app.screen.width,
-      h: this.app.screen.height,
+  private readOrigin(): void {
+    const rect = this.app.canvas.getBoundingClientRect();
+    this.origin = { left: rect.left, top: rect.top };
+  }
+
+  private toStageRect(rect: AnchorRect): Rect {
+    return {
+      x: rect.x - this.origin.left,
+      y: rect.y - this.origin.top,
+      w: rect.w,
+      h: rect.h,
     };
-    const published = bodyRect();
-    if (published.w <= 0 || published.h <= 0) return full;
-    const canvas = this.app.canvas.getBoundingClientRect();
-    if (canvas.width <= 0 || canvas.height <= 0) return full;
-    const x = Math.max(0, Math.min(published.x - canvas.left, full.w));
-    const y = Math.max(0, Math.min(published.y - canvas.top, full.h));
-    const w = Math.max(120, Math.min(published.w, full.w - x));
-    const h = Math.max(160, Math.min(published.h, full.h - y));
-    return { x, y, w, h };
+  }
+
+  private shipBand(): Rect | null {
+    const rect = boardRegion("ship");
+    return rect === undefined ? null : this.toStageRect(rect);
+  }
+
+  private band(name: "enemies" | "tray" | "dock"): Rect {
+    const rect = boardRegion(name);
+    if (rect === undefined) {
+      const width = this.app.screen.width;
+      const height = this.app.screen.height;
+      const slice = height / 3;
+      const index = name === "enemies" ? 0 : name === "tray" ? 1 : 2;
+      return width > 0
+        ? { x: 0, y: slice * index, w: width, h: slice }
+        : FALLBACK_BAND;
+    }
+    return this.toStageRect(rect);
+  }
+
+  private slotRect(slotId: SlotId): Rect | undefined {
+    const anchor = slotAnchor(slotId);
+    return anchor === undefined ? undefined : this.toStageRect(anchor.rect);
+  }
+
+  private slotWell(slotId: SlotId): Rect | undefined {
+    const anchor = slotAnchor(slotId);
+    return anchor === undefined ? undefined : this.toStageRect(anchor.well);
+  }
+
+  private reserveRect(): Rect | undefined {
+    const anchor = reserveAnchor();
+    return anchor === null ? undefined : this.toStageRect(anchor.rect);
+  }
+
+  private reserveWell(index: number): Rect | undefined {
+    const well = reserveWellAt(index);
+    return well === undefined ? undefined : this.toStageRect(well);
+  }
+
+  private dropRect(target: DropTarget): Rect | undefined {
+    return target === "reserve" ? this.reserveRect() : this.slotRect(target);
   }
 
   private computeLayout(): BattleLayout {
     const state = useBattleStore.getState();
     return computeBattleLayout({
-      board: this.boardRegion(),
+      enemyBand: this.band("enemies"),
+      trayBand: this.band("tray"),
+      dockBand: this.band("dock"),
+      shipBand: this.shipBand(),
       diceCount: state.dice.length,
       enemyCount: state.enemies.length,
       maxSubsystems: state.enemies.reduce(
         (most, enemy) => Math.max(most, enemy.subsystems.length),
         0,
       ),
-      slotIds: activeSlotIds(state),
     });
   }
 
@@ -427,8 +498,14 @@ export class BattleScene {
     }
   }
 
+  private readonly onMotionChange = (): void => {
+    this.motionReduced = resolveReducedMotion(
+      useSettingsStore.getState().reducedMotion,
+    );
+  };
+
   private reduced(): boolean {
-    return resolveReducedMotion(useSettingsStore.getState().reducedMotion);
+    return this.motionReduced;
   }
 
   private readonly onThemeSwitch = (): void => {
@@ -447,6 +524,36 @@ export class BattleScene {
     clearDieTextureCache(this.app);
     this.rebuild(useBattleStore.getState());
   };
+
+  private setCardFlag(target: DropTarget, name: string, on: boolean): void {
+    const el = cardElement(target);
+    if (el === null) return;
+    if (on) {
+      el.setAttribute(name, "1");
+      this.flaggedCards.add(target);
+    } else {
+      el.removeAttribute(name);
+    }
+  }
+
+  private clearCardFlags(): void {
+    for (const target of this.flaggedCards) {
+      cardElement(target)?.removeAttribute("data-over");
+    }
+    this.flaggedCards.clear();
+    setDraggedDie(null);
+  }
+
+  private pulseCard(target: DropTarget): void {
+    const el = cardElement(target);
+    if (el === null) return;
+    el.removeAttribute("data-pulse");
+    void el.offsetWidth;
+    el.setAttribute("data-pulse", "1");
+    window.setTimeout(() => {
+      el.removeAttribute("data-pulse");
+    }, CARD_PULSE_MS);
+  }
 
   private takeParticle(): Graphics | undefined {
     const free = this.particlePool.find((dot) => !dot.visible);
@@ -471,7 +578,7 @@ export class BattleScene {
       this.sceneGlowPulse(colors.stroke, 0.18, 220);
       return;
     }
-    const rect = this.layout.slots.reactor ?? this.layout.reserve;
+    const rect = this.slotRect("reactor") ?? this.band("dock");
     const cx = rect.x + rect.w / 2;
     const cy = rect.y + rect.h / 2;
     for (let i = 0; i < 12; i += 1) {
@@ -687,205 +794,114 @@ export class BattleScene {
     this.shakeMs = SHAKE_MS;
   }
 
-  private publishTrayAnchor(): void {
-    const canvas = this.app.canvas.getBoundingClientRect();
+  private publishAnchors(state: BattleState): void {
+    if (import.meta.env.VITE_E2E !== "1") return;
     const band = this.layout.trayBand;
-    publishTrayAnchor({
-      x: canvas.left + band.x,
-      y: canvas.top + band.y,
-      w: band.w,
-      h: band.h,
+    const reserve = reserveAnchor();
+    publishBattleAnchors({
+      dice: state.dice.flatMap((die) => {
+        const sprite = this.dieSprites.get(die.uid);
+        if (sprite === undefined || !sprite.visible) return [];
+        return [
+          {
+            uid: die.uid,
+            x: this.origin.left + sprite.x,
+            y: this.origin.top + sprite.y,
+            size: Math.max(sprite.width, sprite.height),
+          },
+        ];
+      }),
+      slots: activeSlotIds(state).flatMap((id) => {
+        const anchor = slotAnchor(id);
+        return anchor === undefined ? [] : [{ id, ...anchor.rect }];
+      }),
+      reserve: reserve?.rect ?? { x: 0, y: 0, w: 0, h: 0 },
+      tray: {
+        x: this.origin.left + band.x,
+        y: this.origin.top + band.y,
+        w: band.w,
+        h: band.h,
+      },
     });
   }
 
   private rebuild(state: BattleState): void {
+    this.readOrigin();
     this.layout = this.computeLayout();
-    this.publishTrayAnchor();
-    this.buildSlots(state);
-    this.buildReserve();
+    this.syncShip(state);
     this.buildEnemies(state);
     this.syncBoard(state);
     this.syncEnemies(state);
   }
 
-  private buildSlots(state: BattleState): void {
-    for (const view of this.slotViews.values()) {
-      view.box.destroy();
-      view.glow.destroy();
-      view.title.destroy();
-      view.cap.destroy();
-      view.pips.destroy();
-    }
-    this.slotViews.clear();
-    for (const slotId of activeSlotIds(state)) {
-      const rect = this.layout.slots[slotId];
-      const slot = state.slots[slotId];
-      if (rect === undefined) continue;
-      const box = new Graphics();
-      const glow = new Graphics();
-      glow
-        .roundRect(rect.x - 1.5, rect.y - 1.5, rect.w + 3, rect.h + 3, 13)
-        .stroke({
-          color: tokens.accent,
-          width: 2,
-        });
-      glow.alpha = 0;
-      const title = new Text({
-        text: this.labels.slotTitle(slotId),
-        style: { fontFamily: PIXI_FONT_FAMILY, fontSize: 13, fill: tokens.dim },
-      });
-      const cap = new Text({
-        text: slot === undefined ? "" : this.labels.capLabel(slot.cap, slot.mk),
-        style: {
-          fontFamily: PIXI_FONT_FAMILY,
-          fontSize: 11,
-          fill: tokens.faint,
-        },
-      });
-      this.placeSlotLabels(title, cap, rect);
-      const pips = new Graphics();
-      this.slotsLayer.addChild(box, glow, title, cap, pips);
-      const view: SlotView = {
-        box,
-        glow,
-        title,
-        cap,
-        pips,
-        occupied: false,
-        blocked: false,
-      };
-      this.slotViews.set(slotId, view);
-      this.drawSlotBox(slotId, false, isSlotBlockedNow(state, slotId));
-    }
-  }
-
-  private placeSlotLabels(title: Text, cap: Text, rect: Rect): void {
-    if (this.layout.compactCells) {
-      title.anchor.set(0, 0.5);
-      cap.anchor.set(1, 0.5);
-      title.position.set(rect.x + 12, rect.y + rect.h * 0.42);
-      cap.position.set(rect.x + rect.w - 12, rect.y + rect.h * 0.42);
-      return;
-    }
-    title.anchor.set(0, 0);
-    cap.anchor.set(0, 0);
-    title.position.set(rect.x + 12, rect.y + 10);
-    cap.position.set(rect.x + 12, rect.y + 30);
-  }
-
-  private drawSlotBox(
-    slotId: SlotId,
-    occupied: boolean,
-    blocked: boolean,
-  ): void {
-    const view = this.slotViews.get(slotId);
-    const rect = this.layout.slots[slotId];
-    if (view === undefined || rect === undefined) return;
-    view.occupied = occupied;
-    view.blocked = blocked;
-    const g = view.box;
-    g.clear();
-    const style = currentTheme().slotStyle;
-    if (occupied) {
-      g.roundRect(rect.x, rect.y, rect.w, rect.h, 12)
-        .fill(tokens.surface2)
+  private syncShip(state: BattleState): void {
+    this.shipFlashCancel?.();
+    this.shipFlashCancel = null;
+    this.shipView?.destroy({ children: true });
+    this.shipView = null;
+    this.shipFlash = null;
+    const rect = this.layout.ship;
+    if (rect === null) return;
+    const glyph = shipGlyphFor(state.shipId);
+    const size = Math.min(rect.w, rect.h);
+    const poly = (points: readonly GlyphPoint[]): number[] =>
+      points.flatMap(([x, y]) => [x * size, y * size]);
+    const root = new Container();
+    root.position.set(rect.x + rect.w / 2, rect.y + rect.h / 2);
+    const body = new Graphics()
+      .poly(poly(glyph.hull))
+      .fill(mixHex(tokens.surface2, tokens.accent, 0.2))
+      .stroke({ color: tokens.accent, width: 1.5 });
+    for (const fin of glyph.fins) {
+      body
+        .poly(poly(fin))
+        .fill(emptySlotFill())
         .stroke({ color: tokens.line, width: 1 });
-    } else {
-      g.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill(emptySlotFill());
-      if (style.dashed) {
-        dashedRoundRectStroke(g, rect, 12);
-        g.stroke({ color: emptySlotStroke(), width: 1 });
-      } else {
-        g.roundRect(rect.x, rect.y, rect.w, rect.h, 12).stroke({
-          color: emptySlotStroke(),
-          width: 1,
-        });
-      }
     }
-    paintSlotBoard(g, rect, style);
-    if (blocked) {
-      g.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill({
-        color: tokens.danger,
-        alpha: 0.12,
-      });
-      const inset = 14;
-      g.moveTo(rect.x + inset, rect.y + inset)
-        .lineTo(rect.x + rect.w - inset, rect.y + rect.h - inset)
-        .moveTo(rect.x + rect.w - inset, rect.y + inset)
-        .lineTo(rect.x + inset, rect.y + rect.h - inset)
-        .stroke({ color: tokens.danger, width: 3 });
-    }
-    view.title.style.fill = occupied ? tokens.text : tokens.dim;
-    view.title.alpha = blocked ? 0.55 : 1;
+    const cockpit = new Graphics()
+      .circle(
+        glyph.cockpit.x * size,
+        glyph.cockpit.y * size,
+        glyph.cockpit.r * size,
+      )
+      .fill(tokens.accent);
+    const flash = new Graphics().poly(poly(glyph.hull)).fill("#FFFFFF");
+    flash.alpha = 0;
+    root.addChild(body, cockpit, flash);
+    this.bg.addChild(root);
+    this.shipView = root;
+    this.shipFlash = flash;
   }
 
-  private drawChargePips(state: BattleState): void {
-    const view = this.slotViews.get("reactor");
-    const rect = this.layout.slots.reactor;
-    if (view === undefined || rect === undefined) return;
-    const g = view.pips;
-    g.clear();
-    if (this.layout.compactCells) {
-      const track = rect.w - 24;
-      const filled = (track * Math.min(state.charge, CHARGE_PIP_COUNT)) /
-        CHARGE_PIP_COUNT;
-      g.roundRect(rect.x + 12, rect.y + rect.h - 7, track, 3, 2).fill({
-        color: tokens.faint,
-        alpha: 0.4,
-      });
-      if (filled > 0) {
-        g.roundRect(rect.x + 12, rect.y + rect.h - 7, filled, 3, 2).fill(
-          tokens.amber,
-        );
-      }
+  private flashShip(color: string): void {
+    const flash = this.shipFlash;
+    if (flash === null) return;
+    this.shipFlashCancel?.();
+    flash.tint = color;
+    flash.alpha = this.reduced() ? 0.4 : 0.72;
+    this.shipFlashCancel = this.tweens.to(
+      flash,
+      { alpha: 0 },
+      this.reduced() ? 160 : 280,
+      linear,
+      () => {
+        this.shipFlashCancel = null;
+      },
+    );
+  }
+
+  private publishSelection(state: BattleState): void {
+    const uid = state.selectedDieUid;
+    const sprite = uid === null ? undefined : this.dieSprites.get(uid);
+    if (uid === null || sprite === undefined || !sprite.visible) {
+      publishSelectionAnchor(null);
       return;
     }
-    const usable = rect.w - this.layout.slotDieSize - 34;
-    const step = usable / CHARGE_PIP_COUNT;
-    const radius = Math.max(1.5, Math.min(4, step * 0.3));
-    const y = rect.y + rect.h - 12;
-    for (let i = 0; i < CHARGE_PIP_COUNT; i += 1) {
-      const x = rect.x + 12 + step * i + step / 2;
-      if (i < state.charge) {
-        g.circle(x, y, radius).fill(tokens.amber);
-      } else {
-        g.circle(x, y, radius).stroke({ color: tokens.faint, width: 1 });
-      }
-    }
-  }
-
-  private buildReserve(): void {
-    this.reserveBox?.destroy();
-    this.reserveGlow?.destroy();
-    this.reserveTitle?.destroy();
-    const rect = this.layout.reserve;
-    const style = currentTheme().slotStyle;
-    const box = new Graphics();
-    box.roundRect(rect.x, rect.y, rect.w, rect.h, 12).fill(emptySlotFill());
-    if (style.dashed) {
-      dashedRoundRectStroke(box, rect, 12);
-      box.stroke({ color: emptySlotStroke(), width: 1 });
-    } else {
-      box
-        .roundRect(rect.x, rect.y, rect.w, rect.h, 12)
-        .stroke({ color: emptySlotStroke(), width: 1 });
-    }
-    paintSlotBoard(box, rect, style);
-    const glow = new Graphics();
-    glow
-      .roundRect(rect.x - 1.5, rect.y - 1.5, rect.w + 3, rect.h + 3, 13)
-      .stroke({ color: tokens.accent, width: 2 });
-    glow.alpha = 0;
-    const title = new Text({
-      text: this.labels.reserveTitle,
-      style: { fontFamily: PIXI_FONT_FAMILY, fontSize: 13, fill: tokens.dim },
+    publishSelectionAnchor({
+      x: this.origin.left + sprite.x,
+      y: this.origin.top + sprite.y,
+      size: Math.max(sprite.width, sprite.height),
     });
-    title.anchor.set(0, 0.5);
-    title.position.set(rect.x + 12, rect.y + rect.h / 2);
-    this.slotsLayer.addChild(box, glow, title);
-    this.reserveBox = box;
-    this.reserveGlow = glow;
-    this.reserveTitle = title;
   }
 
   private buildEnemies(state: BattleState): void {
@@ -914,25 +930,22 @@ export class BattleScene {
         .roundRect(-size / 2, -size / 2, size, size, 12)
         .fill("#FFFFFF");
       flash.alpha = 0;
-      flash.eventMode = "none";
       const targetRing = new Graphics()
         .roundRect(-size / 2 - 5, -size / 2 - 5, size + 10, size + 10, 14)
         .stroke({ color: tokens.accent, width: 2.5 });
       targetRing.visible = false;
-      targetRing.eventMode = "none";
-      root.addChild(body, targetRing, flash);
-
-      const enemyId = enemy.id;
-      const hit = this.layout.enemyHit;
-      root.eventMode = "passive";
-      body.eventMode = "static";
-      body.cursor = "pointer";
-      body.hitArea = new Rectangle(hit.x, hit.y, hit.w, hit.h);
-      body.on("pointertap", () => {
-        if (useBattleStore.getState().phase === "placement") {
-          useBattleStore.getState().setTarget(enemyId);
-        }
+      const hpRing = new Graphics();
+      const intent = new Text({
+        text: "",
+        style: {
+          fontFamily: PIXI_FONT_FAMILY,
+          fontSize: 12,
+          fontWeight: "700",
+          fill: tokens.dim,
+        },
       });
+      intent.anchor.set(0.5, 1);
+      root.addChild(hpRing, body, targetRing, flash, intent);
 
       const statusTexts = new Map<StatusKey, Text>();
       (["burn", "mark", "jam", "charge"] as const).forEach((key) => {
@@ -947,7 +960,6 @@ export class BattleScene {
         });
         text.anchor.set(0.5, 0);
         text.visible = false;
-        text.eventMode = "none";
         root.addChild(text);
         statusTexts.set(key, text);
       });
@@ -964,21 +976,10 @@ export class BattleScene {
           .circle(0, 0, chips.radius * 0.78)
           .fill(enemyFill())
           .stroke({ color: tokens.amber, width: 1.5 });
-        circle.eventMode = "none";
-        const subId = sub.id;
-        chip.eventMode = "static";
-        chip.cursor = "pointer";
-        chip.hitArea = new Circle(0, 0, chips.radius);
-        chip.on("pointertap", () => {
-          if (useBattleStore.getState().phase === "placement") {
-            useBattleStore.getState().setTarget(subId);
-          }
-        });
         const ring = new Graphics()
           .circle(0, 0, chips.radius)
           .stroke({ color: tokens.accent, width: 2 });
         ring.visible = false;
-        ring.eventMode = "none";
         const hp = new Text({
           text: String(sub.hp),
           style: {
@@ -1000,6 +1001,8 @@ export class BattleScene {
         body,
         flash,
         targetRing,
+        hpRing,
+        intent,
         statusTexts,
         subsystemViews,
       });
@@ -1014,12 +1017,21 @@ export class BattleScene {
       if (alive || !this.dyingEnemies.has(enemy.id)) {
         view.root.alpha = alive ? 1 : 0.25;
       }
-      view.root.eventMode = alive ? "passive" : "none";
-      view.body.eventMode = alive ? "static" : "none";
-      view.body.cursor = alive ? "pointer" : "default";
-      view.targetRing.visible = alive && state.targetId === enemy.id;
+      view.targetRing.visible =
+        alive &&
+        (state.targetId === enemy.id ||
+          enemy.subsystems.some((sub) => sub.id === state.targetId));
 
       const size = this.layout.enemySize;
+      this.drawHpRing(view, enemy, size);
+      if (alive) {
+        view.intent.text = intentLabelFor(enemy.nextIntent);
+        view.intent.style.fill = intentTint(enemy.nextIntent);
+        view.intent.position.set(0, -size * 0.72 - 8);
+        view.intent.visible = true;
+      } else {
+        view.intent.visible = false;
+      }
       let statusX = 0;
       const active = (["burn", "mark", "jam", "charge"] as const).filter(
         (key) => enemy.statuses[key] !== undefined,
@@ -1034,7 +1046,7 @@ export class BattleScene {
           continue;
         }
         text.text =
-          key === "burn"
+          key === "burn" || key === "mark"
             ? `${this.labels.statusGlyph(key)}${String(value)}`
             : this.labels.statusGlyph(key);
         text.position.set(-totalWidth / 2 + statusX + 8, size / 2 + 6);
@@ -1052,25 +1064,55 @@ export class BattleScene {
     }
   }
 
-  private slotDieAnchor(slotId: SlotId): { x: number; y: number } | undefined {
-    const rect = this.layout.slots[slotId];
-    if (rect === undefined) return undefined;
+  private drawHpRing(view: EnemyView, enemy: EnemyState, size: number): void {
+    const radius = size * 0.72;
+    const ratio =
+      enemy.hpMax > 0 ? Math.max(0, Math.min(1, enemy.hp / enemy.hpMax)) : 0;
+    const g = view.hpRing;
+    g.clear();
+    g.circle(0, 0, radius).stroke({ color: tokens.line, width: 3.5 });
+    if (ratio > 0) {
+      g.arc(
+        0,
+        0,
+        radius,
+        -Math.PI / 2,
+        -Math.PI / 2 + Math.PI * 2 * ratio,
+      ).stroke({
+        color: ratio > 0.35 ? tokens.danger : tokens.amber,
+        width: 3,
+      });
+    }
+    if (enemy.shield > 0) {
+      g.circle(0, 0, radius + 4).stroke({
+        color: schools.blue.stroke,
+        width: 1.5,
+      });
+    }
+  }
+
+  private slotDieAnchor(
+    slotId: SlotId,
+  ): { x: number; y: number; size: number } | undefined {
+    const well = this.slotWell(slotId);
+    if (well === undefined) return undefined;
     return {
-      x: rect.x + rect.w - this.layout.slotDieSize / 2 - 10,
-      y: rect.y + rect.h / 2,
+      x: well.x + well.w / 2,
+      y: well.y + well.h / 2,
+      size: Math.min(well.w, well.h),
     };
   }
 
-  private reserveAnchor(): { x: number; y: number } {
-    const rect = this.layout.reserve;
+  private reserveDieAnchor(
+    index: number,
+  ): { x: number; y: number; size: number } | undefined {
+    const well = this.reserveWell(index);
+    if (well === undefined) return undefined;
     return {
-      x: rect.x + rect.w - this.layout.slotDieSize / 2 - 10,
-      y: rect.y + rect.h / 2,
+      x: well.x + well.w / 2,
+      y: well.y + well.h / 2,
+      size: Math.min(well.w, well.h),
     };
-  }
-
-  private slotDieScale(): number {
-    return this.layout.slotDieSize / MINI_DIE_SIZE;
   }
 
   private trayAnchor(
@@ -1079,17 +1121,16 @@ export class BattleScene {
   ): { x: number; y: number } {
     const index = state.dice.findIndex((d) => d.uid === uid);
     const base = this.layout.tray[index] ?? {
-      x: this.app.screen.width / 2,
-      y: this.layout.tray[0]?.y ?? 0,
+      x: this.layout.trayBand.x + this.layout.trayBand.w / 2,
+      y: this.layout.trayBand.y + this.layout.trayBand.h / 2,
     };
     const lifted =
-      state.rerollMode && state.rerollSelection.includes(uid)
-        ? REROLL_LIFT
-        : 0;
+      state.rerollMode && state.rerollSelection.includes(uid) ? REROLL_LIFT : 0;
     return { x: base.x, y: base.y - lifted };
   }
 
   private dieTextureFor(die: RolledDie, size: number) {
+    const def = DIE_BY_ID.get(die.defId);
     return dieTexture(this.app, {
       school: die.school,
       tier: die.tier,
@@ -1097,11 +1138,31 @@ export class BattleScene {
       size,
       defId: die.defId,
       growth: die.growth ?? 0,
-      hasActive: DIE_BY_ID.get(die.defId)?.active !== undefined,
+      hasActive: def?.active !== undefined,
+      customFaces: def?.faces !== undefined && def.faces.length > 0,
+      fate: die.defId === FATE_DIE_ID,
       engraved:
         engravingsForDie(useBattleStore.getState().engravings, die.defId)
           .length > 0,
     });
+  }
+
+  private syncPrismRim(uid: string, x: number, y: number, size: number): void {
+    let rim = this.prismRims.get(uid);
+    if (rim === undefined) {
+      rim = new Graphics();
+      this.overlayLayer.addChild(rim);
+      this.prismRims.set(uid, rim);
+    }
+    rim.clear();
+    const half = size / 2 + 3;
+    const radius = size * 0.26;
+    rim
+      .roundRect(-half, -half, half * 2, half * 2, radius)
+      .stroke({ color: schools.prismatic.stroke, width: 2 });
+    rim.position.set(x, y);
+    rim.alpha = this.reduced() ? 0.6 : 0.35 + 0.35 * this.prismPhase;
+    rim.visible = true;
   }
 
   private ensureDieSprite(die: RolledDie): Sprite {
@@ -1109,12 +1170,7 @@ export class BattleScene {
     if (sprite === undefined) {
       sprite = new Sprite();
       sprite.anchor.set(0.5);
-      sprite.eventMode = "static";
-      sprite.cursor = "pointer";
-      const uid = die.uid;
-      sprite.on("pointerdown", (e: FederatedPointerEvent) => {
-        this.onDiePointerDown(uid, e);
-      });
+      sprite.eventMode = "none";
       this.trayLayer.addChild(sprite);
       this.dieSprites.set(die.uid, sprite);
     }
@@ -1166,42 +1222,46 @@ export class BattleScene {
     const seen = new Set<string>();
     const visibleRings = new Set<string>();
     const visibleLocks = new Set<string>();
+    const visibleRims = new Set<string>();
+    let reserveIndex = 0;
     for (const die of state.dice) {
       seen.add(die.uid);
       const sprite = this.ensureDieSprite(die);
+      if (die.state === "reserved") reserveIndex += 1;
       if (this.drag?.uid === die.uid || this.animating.has(die.uid)) continue;
       const locked = die.state === "locked" || isDieLockedNow(state, die.uid);
       if (die.state === "placed" && die.slot !== undefined) {
         const anchor = this.slotDieAnchor(die.slot);
-        if (anchor === undefined) continue;
+        if (anchor === undefined) {
+          sprite.visible = false;
+          continue;
+        }
         sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
         sprite.position.set(anchor.x, anchor.y);
-        sprite.scale.set(this.slotDieScale());
+        sprite.scale.set(anchor.size / MINI_DIE_SIZE);
         sprite.alpha = 1;
         sprite.visible = true;
+        if (die.school === "prismatic") {
+          this.syncPrismRim(die.uid, anchor.x, anchor.y, anchor.size);
+          visibleRims.add(die.uid);
+        }
         if (die.pinned === true) {
-          this.syncLockOverlay(
-            die.uid,
-            anchor.x,
-            anchor.y,
-            this.layout.slotDieSize,
-          );
+          this.syncLockOverlay(die.uid, anchor.x, anchor.y, anchor.size);
           visibleLocks.add(die.uid);
         }
         if (state.selectedDieUid === die.uid) {
-          this.syncSelectionRing(
-            die.uid,
-            anchor.x,
-            anchor.y,
-            this.layout.slotDieSize,
-          );
+          this.syncSelectionRing(die.uid, anchor.x, anchor.y, anchor.size);
           visibleRings.add(die.uid);
         }
       } else if (die.state === "reserved") {
-        const anchor = this.reserveAnchor();
+        const anchor = this.reserveDieAnchor(reserveIndex - 1);
+        if (anchor === undefined) {
+          sprite.visible = false;
+          continue;
+        }
         sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
         sprite.position.set(anchor.x, anchor.y);
-        sprite.scale.set(this.slotDieScale());
+        sprite.scale.set(anchor.size / MINI_DIE_SIZE);
         sprite.alpha = 1;
         sprite.visible = true;
       } else if (die.state === "tray" || die.state === "locked") {
@@ -1215,6 +1275,10 @@ export class BattleScene {
         sprite.scale.set(1);
         sprite.alpha = locked ? 0.55 : 1;
         sprite.visible = true;
+        if (die.school === "prismatic") {
+          this.syncPrismRim(die.uid, anchor.x, anchor.y, this.layout.dieSize);
+          visibleRims.add(die.uid);
+        }
         if (locked) {
           this.syncLockOverlay(die.uid, anchor.x, anchor.y, this.layout.dieSize);
           visibleLocks.add(die.uid);
@@ -1253,18 +1317,15 @@ export class BattleScene {
         this.lockOverlays.delete(uid);
       }
     }
-    for (const slotId of activeSlotIds(state)) {
-      const occupied = state.slots[slotId]?.dieUid !== undefined;
-      const blocked = isSlotBlockedNow(state, slotId);
-      const view = this.slotViews.get(slotId);
-      if (
-        view !== undefined &&
-        (view.occupied !== occupied || view.blocked !== blocked)
-      ) {
-        this.drawSlotBox(slotId, occupied, blocked);
+    for (const [uid, rim] of this.prismRims) {
+      if (!visibleRims.has(uid)) rim.visible = false;
+      if (!seen.has(uid)) {
+        rim.destroy();
+        this.prismRims.delete(uid);
       }
     }
-    this.drawChargePips(state);
+    this.publishSelection(state);
+    this.publishAnchors(state);
   }
 
   private readonly onStoreChange = (
@@ -1276,6 +1337,7 @@ export class BattleScene {
       state.enemies.length !== prev.enemies.length ||
       Object.keys(state.slots).length !== Object.keys(prev.slots).length
     ) {
+      if (state.turn !== prev.turn) this.clearDieAnimations();
       this.cancelDrag(state);
       this.rebuild(state);
       if (state.turn !== prev.turn) {
@@ -1378,6 +1440,29 @@ export class BattleScene {
     this.rebuild(useBattleStore.getState());
   };
 
+  private readonly onAnchorsChange = (): void => {
+    this.readOrigin();
+    const before = this.layout.ship;
+    this.layout = this.computeLayout();
+    const after = this.layout.ship;
+    if (before === null || after === null || !sameShipRect(before, after)) {
+      this.syncShip(useBattleStore.getState());
+    }
+    this.repositionEnemies();
+    this.syncBoard(useBattleStore.getState());
+  };
+
+  private repositionEnemies(): void {
+    const state = useBattleStore.getState();
+    state.enemies.forEach((enemy, index) => {
+      const anchor = this.layout.enemies[index];
+      const view = this.enemyViews.get(enemy.id);
+      if (anchor === undefined || view === undefined) return;
+      if (this.dyingEnemies.has(enemy.id)) return;
+      view.root.position.set(anchor.x, anchor.y);
+    });
+  }
+
   private hitStop(ms: number): void {
     if (this.reduced()) return;
     this.hitStopMs = Math.max(this.hitStopMs, ms);
@@ -1386,6 +1471,13 @@ export class BattleScene {
 
   private readonly tick = (ticker: Ticker): void => {
     this.elapsedMs += ticker.deltaMS;
+    if (this.prismRims.size > 0 && !this.reduced()) {
+      this.prismPhase =
+        0.5 + 0.5 * Math.sin((this.elapsedMs / 1000) * PRISM_HZ * Math.PI * 2);
+      for (const rim of this.prismRims.values()) {
+        if (rim.visible) rim.alpha = 0.35 + 0.35 * this.prismPhase;
+      }
+    }
     reportPool(
       "battleFx",
       this.numberPool.filter((p) => p.text.visible).length +
@@ -1408,26 +1500,11 @@ export class BattleScene {
       );
       if (this.shakeMs === 0) this.app.stage.position.set(0, 0);
     }
-    if (this.drag === null) return;
-    this.glowTime += ticker.deltaMS;
-    const alpha =
-      0.75 + 0.25 * Math.sin((this.glowTime / 1000) * GLOW_HZ * Math.PI * 2);
-    for (const slotId of this.drag.validSlots) {
-      const view = this.slotViews.get(slotId);
-      if (view !== undefined) view.glow.alpha = alpha;
-    }
-    if (this.drag.reserveValid && this.reserveGlow !== null) {
-      this.reserveGlow.alpha = alpha;
-    }
   };
-
-  private tumbleBox(): Rect {
-    return this.layout.tumble;
-  }
 
   private maybeTumble(state: BattleState): void {
     if (state.phase !== "placement") return;
-    if (resolveReducedMotion(useSettingsStore.getState().reducedMotion)) return;
+    if (this.reduced()) return;
     const vfx = useBattleStore.getState().streams?.vfx;
     if (vfx === undefined) return;
     const trayDice = state.dice.filter(
@@ -1449,7 +1526,7 @@ export class BattleScene {
       };
     });
     this.syncBoard(state);
-    this.tumbleFx.run(dice, this.tumbleBox(), this.layout.dieSize, () => {
+    this.tumbleFx.run(dice, this.layout.tumble, this.layout.dieSize, () => {
       this.tumblingUids.clear();
       this.syncBoard(useBattleStore.getState());
     });
@@ -1467,36 +1544,160 @@ export class BattleScene {
     this.pendingPress = null;
     if (this.drag === null) return;
     const { sprite } = this.drag;
-    this.clearGlow();
+    this.clearCardFlags();
     this.drag = null;
     if (sprite.parent === this.dragLayer) this.trayLayer.addChild(sprite);
     this.syncBoard(state);
   }
 
-  private clearGlow(): void {
-    for (const view of this.slotViews.values()) view.glow.alpha = 0;
-    if (this.reserveGlow !== null) this.reserveGlow.alpha = 0;
+  private toStagePoint(clientX: number, clientY: number): { x: number; y: number } {
+    return { x: clientX - this.origin.left, y: clientY - this.origin.top };
   }
 
-  private onDiePointerDown(uid: string, e: FederatedPointerEvent): void {
-    if (this.drag !== null || this.pendingPress !== null) return;
+  private dieAt(x: number, y: number): string | null {
+    let best: string | null = null;
+    let bestDistance = Infinity;
+    for (const [uid, sprite] of this.dieSprites) {
+      if (!sprite.visible) continue;
+      const halfW = sprite.width / 2 + DIE_HIT_PAD;
+      const halfH = sprite.height / 2 + DIE_HIT_PAD;
+      const dx = Math.abs(x - sprite.x);
+      const dy = Math.abs(y - sprite.y);
+      if (dx > halfW || dy > halfH) continue;
+      const distance = dx * dx + dy * dy;
+      if (distance < bestDistance) {
+        bestDistance = distance;
+        best = uid;
+      }
+    }
+    return best;
+  }
+
+  private enemyAt(x: number, y: number): string | null {
     const state = useBattleStore.getState();
-    if (state.phase !== "placement") return;
-    const die = state.dice.find((d) => d.uid === uid);
-    if (die === undefined) return;
-    if (die.state === "locked" || isDieLockedNow(state, uid)) return;
-    if (die.state !== "tray" && die.state !== "placed" && die.state !== "reserved")
-      return;
-    this.pendingPress = { uid, startX: e.global.x, startY: e.global.y };
+    const chips = this.layout.subsystems;
+    for (const enemy of state.enemies) {
+      if (enemy.hp <= 0) continue;
+      const view = this.enemyViews.get(enemy.id);
+      if (view === undefined) continue;
+      for (const sub of enemy.subsystems) {
+        if (sub.hp <= 0) continue;
+        const chip = view.subsystemViews.get(sub.id);
+        if (chip === undefined) continue;
+        const cx = view.root.x + chip.chip.x;
+        const cy = view.root.y + chip.chip.y;
+        if (Math.hypot(x - cx, y - cy) <= chips.radius) return sub.id;
+      }
+      const hit = this.layout.enemyHit;
+      if (
+        contains(
+          {
+            x: view.root.x + hit.x,
+            y: view.root.y + hit.y,
+            w: hit.w,
+            h: hit.h,
+          },
+          x,
+          y,
+        )
+      ) {
+        return enemy.id;
+      }
+    }
+    return null;
   }
 
-  private beginDrag(e: FederatedPointerEvent): void {
+  private readonly onPointerDown = (event: PointerEvent): void => {
+    const state = useBattleStore.getState();
+    if (state.phase === "resolving") {
+      this.stopBeats();
+      useBattleStore.getState().finishResolution();
+      return;
+    }
+    if (state.phase !== "placement") return;
+    if (this.drag !== null || this.pendingPress !== null) return;
+    const point = this.toStagePoint(event.clientX, event.clientY);
+    const uid = this.dieAt(point.x, point.y);
+    if (uid !== null) {
+      const die = state.dice.find((d) => d.uid === uid);
+      if (die === undefined) return;
+      if (die.state === "locked" || isDieLockedNow(state, uid)) return;
+      if (
+        die.state !== "tray" &&
+        die.state !== "placed" &&
+        die.state !== "reserved"
+      ) {
+        return;
+      }
+      event.preventDefault();
+      event.stopPropagation();
+      this.pendingPress = {
+        uid,
+        startX: point.x,
+        startY: point.y,
+        pointerId: event.pointerId,
+      };
+      return;
+    }
+    const target = this.enemyAt(point.x, point.y);
+    if (target !== null) {
+      event.preventDefault();
+      event.stopPropagation();
+      useBattleStore.getState().setTarget(target);
+      if (!target.includes(":")) focusEnemy(target);
+    }
+  };
+
+  private readonly onPointerMove = (event: PointerEvent): void => {
+    const point = this.toStagePoint(event.clientX, event.clientY);
+    if (this.pendingPress !== null && this.drag === null) {
+      if (event.pointerId !== this.pendingPress.pointerId) return;
+      const dx = point.x - this.pendingPress.startX;
+      const dy = point.y - this.pendingPress.startY;
+      if (Math.hypot(dx, dy) >= DRAG_THRESHOLD) this.beginDrag(point);
+      return;
+    }
+    if (this.drag === null) return;
+    if (event.pointerId !== this.drag.pointerId) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.drag.sprite.position.set(
+      point.x + this.drag.offsetX,
+      point.y + this.drag.offsetY,
+    );
+    this.updateDropTarget();
+  };
+
+  private readonly onPointerUp = (event: PointerEvent): void => {
+    if (this.pendingPress !== null && this.drag === null) {
+      if (event.pointerId !== this.pendingPress.pointerId) return;
+      const { uid } = this.pendingPress;
+      this.pendingPress = null;
+      event.stopPropagation();
+      this.onDieTap(uid);
+      return;
+    }
+    if (this.drag === null) return;
+    if (event.pointerId !== this.drag.pointerId) return;
+    event.stopPropagation();
+    this.dropDrag();
+  };
+
+  private readonly onPointerCancel = (): void => {
+    this.pendingPress = null;
+    if (this.drag !== null) this.cancelDrag(useBattleStore.getState());
+  };
+
+  private beginDrag(point: { x: number; y: number }): void {
     const press = this.pendingPress;
     if (press === null) return;
     this.pendingPress = null;
     this.cancelTumble();
+    if (useBattleStore.getState().rerollMode) {
+      useBattleStore.getState().toggleRerollMode();
+    }
     const state = useBattleStore.getState();
-    if (state.phase !== "placement" || state.rerollMode) return;
+    if (state.phase !== "placement") return;
     const die = state.dice.find((d) => d.uid === press.uid);
     if (die === undefined) return;
 
@@ -1522,90 +1723,72 @@ export class BattleScene {
     sprite.visible = true;
 
     const fresh = useBattleStore.getState();
-    const snapshot = battleSnapshot(fresh);
-    const validSlots = activeSlotIds(fresh).filter((slotId) =>
-      canPlaceDie(snapshot, press.uid, slotId),
-    );
-    const reserveValid = !fresh.dice.some((d) => d.state === "reserved");
+    const legal = legalTargets(fresh, press.uid);
+    const targets: DropTarget[] =
+      fresh.checkSteps === null ? [...legal.slots] : boardSlotIds(fresh);
+    if (legal.reserve) targets.push("reserve");
 
-    this.glowTime = 0;
     this.drag = {
       uid: press.uid,
+      pointerId: press.pointerId,
       sprite,
-      offsetX: sprite.x - e.global.x,
-      offsetY: sprite.y - e.global.y,
-      validSlots,
-      reserveValid,
+      offsetX: sprite.x - point.x,
+      offsetY: sprite.y - point.y,
+      targets,
+      over: null,
     };
+    setDraggedDie(press.uid);
+    this.updateDropTarget();
   }
 
-  private readonly onStagePointerDown = (): void => {
-    const state = useBattleStore.getState();
-    if (state.phase === "resolving") {
-      this.stopBeats();
-      useBattleStore.getState().finishResolution();
-    }
-  };
-
-  private readonly onPointerMove = (e: FederatedPointerEvent): void => {
-    if (this.pendingPress !== null && this.drag === null) {
-      const dx = e.global.x - this.pendingPress.startX;
-      const dy = e.global.y - this.pendingPress.startY;
-      if (Math.hypot(dx, dy) >= DRAG_THRESHOLD) {
-        this.beginDrag(e);
-      }
-      return;
-    }
-    if (this.drag === null) return;
-    this.drag.sprite.position.set(
-      e.global.x + this.drag.offsetX,
-      e.global.y + this.drag.offsetY,
-    );
-  };
-
-  private readonly onPointerUp = (e: FederatedPointerEvent): void => {
-    if (this.pendingPress !== null && this.drag === null) {
-      const uid = this.pendingPress.uid;
-      this.pendingPress = null;
-      this.onDieTap(uid);
-      return;
-    }
-    if (this.drag === null) return;
-    const { uid, sprite, validSlots, reserveValid } = this.drag;
-    this.drag = null;
-    this.clearGlow();
-
-    const px = e.global.x;
-    const py = e.global.y;
-    let best: SlotId | undefined;
+  private bestDropTarget(): DropTarget | null {
+    if (this.drag === null) return null;
+    const { sprite, targets } = this.drag;
+    let best: DropTarget | null = null;
     let bestArea = 0;
-    for (const slotId of validSlots) {
-      const rect = this.layout.slots[slotId];
+    for (const target of targets) {
+      const rect = this.dropRect(target);
       if (rect === undefined) continue;
       const area = overlapArea(rect, sprite.x, sprite.y, this.layout.dieSize);
       if (area > bestArea) {
         bestArea = area;
-        best = slotId;
+        best = target;
       }
     }
-    const reserveArea = reserveValid
-      ? overlapArea(this.layout.reserve, sprite.x, sprite.y, this.layout.dieSize)
-      : 0;
-    if (best === undefined && reserveArea === 0) {
-      best = validSlots.find((slotId) => {
-        const rect = this.layout.slots[slotId];
-        return rect !== undefined && contains(rect, px, py);
-      });
-    }
+    if (best !== null) return best;
+    return (
+      targets.find((target) => {
+        const rect = this.dropRect(target);
+        return rect !== undefined && contains(rect, sprite.x, sprite.y);
+      }) ?? null
+    );
+  }
 
-    if (reserveArea > bestArea) {
+  private updateDropTarget(): void {
+    if (this.drag === null) return;
+    const next = this.bestDropTarget();
+    if (next === this.drag.over) return;
+    if (this.drag.over !== null) {
+      this.setCardFlag(this.drag.over, "data-over", false);
+    }
+    this.drag.over = next;
+    if (next !== null) this.setCardFlag(next, "data-over", true);
+  }
+
+  private dropDrag(): void {
+    if (this.drag === null) return;
+    const { uid, sprite } = this.drag;
+    const target = this.bestDropTarget();
+    this.drag = null;
+    this.clearCardFlags();
+    if (target === "reserve") {
       this.animateReserve(uid, sprite);
-    } else if (best !== undefined) {
-      this.animatePlace(uid, best, sprite);
+    } else if (target !== null) {
+      this.animatePlace(uid, target, sprite);
     } else {
       this.animateReturn(uid, sprite, true);
     }
-  };
+  }
 
   private onDieTap(uid: string): void {
     const state = useBattleStore.getState();
@@ -1637,9 +1820,10 @@ export class BattleScene {
     haptic("place");
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
+    const scale = anchor.size / MINI_DIE_SIZE;
     const cancelScale = this.tweens.to(
       sprite.scale,
-      { x: this.slotDieScale(), y: this.slotDieScale() },
+      { x: scale, y: scale },
       120,
       easeOutQuad,
     );
@@ -1650,7 +1834,7 @@ export class BattleScene {
       easeOutQuad,
       () => {
         this.finishDieAnimation(uid);
-        this.pulseSlot(slotId);
+        this.pulseCard(slotId);
       },
     );
     this.dieCancels.set(uid, () => {
@@ -1667,13 +1851,21 @@ export class BattleScene {
       this.animateReturn(uid, sprite, true);
       return;
     }
-    const anchor = this.reserveAnchor();
+    const index = state.dice
+      .filter((d) => d.state === "reserved")
+      .findIndex((d) => d.uid === uid);
+    const anchor = this.reserveDieAnchor(Math.max(0, index));
+    if (anchor === undefined) {
+      this.finishDieAnimation(uid);
+      return;
+    }
     this.animating.add(uid);
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
+    const scale = anchor.size / MINI_DIE_SIZE;
     const cancelScale = this.tweens.to(
       sprite.scale,
-      { x: this.slotDieScale(), y: this.slotDieScale() },
+      { x: scale, y: scale },
       120,
       easeOutQuad,
     );
@@ -1684,6 +1876,7 @@ export class BattleScene {
       easeOutQuad,
       () => {
         this.finishDieAnimation(uid);
+        this.pulseCard("reserve");
       },
     );
     this.dieCancels.set(uid, () => {
@@ -1744,6 +1937,15 @@ export class BattleScene {
     step(0);
   }
 
+  private clearDieAnimations(): void {
+    for (const cancel of this.dieCancels.values()) cancel();
+    this.dieCancels.clear();
+    this.animating.clear();
+    for (const sprite of this.dieSprites.values()) {
+      if (sprite.parent === this.dragLayer) this.trayLayer.addChild(sprite);
+    }
+  }
+
   private finishDieAnimation(uid: string): void {
     this.animating.delete(uid);
     this.dieCancels.delete(uid);
@@ -1752,13 +1954,6 @@ export class BattleScene {
       this.trayLayer.addChild(sprite);
     }
     this.syncBoard(useBattleStore.getState());
-  }
-
-  private pulseSlot(slotId: SlotId): void {
-    const view = this.slotViews.get(slotId);
-    if (view === undefined) return;
-    view.glow.alpha = 0.8;
-    this.tweens.to(view.glow, { alpha: 0 }, 260, easeOutQuad);
   }
 
   private stackOffset(x: number, y: number): number {
@@ -1806,7 +2001,7 @@ export class BattleScene {
   private dieFlash(at: { x: number; y: number }, color: string): void {
     const flash = this.takeParticle();
     if (flash === undefined) return;
-    const size = this.layout.slotDieSize;
+    const size = MINI_DIE_SIZE;
     flash
       .roundRect(-size / 2 - 3, -size / 2 - 3, size + 6, size + 6, size * 0.26)
       .stroke({ color, width: 3 });
@@ -1905,7 +2100,7 @@ export class BattleScene {
   }
 
   private thrusterPuff(): void {
-    const rect = this.layout.slots.engines;
+    const rect = this.slotRect("engines");
     const cx = rect === undefined ? this.layout.playerHit.x : rect.x + rect.w / 2;
     const cy = rect === undefined ? this.layout.playerHit.y : rect.y + rect.h / 2;
     for (let i = 0; i < 3; i += 1) {
@@ -1951,10 +2146,7 @@ export class BattleScene {
     if (bundle === null) return;
     this.cancelTumble();
     this.stopBeats();
-    const reduced = resolveReducedMotion(
-      useSettingsStore.getState().reducedMotion,
-    );
-    if (reduced) {
+    if (this.reduced()) {
       useBattleStore.getState().finishResolution();
       return;
     }
@@ -1999,25 +2191,26 @@ export class BattleScene {
   }
 
   private slotCenter(slotId: SlotId): { x: number; y: number } {
-    const rect = this.layout.slots[slotId];
+    const rect = this.slotRect(slotId);
     if (rect === undefined) return this.layout.playerHit;
     return { x: rect.x + rect.w / 2, y: rect.y + rect.h / 2 };
   }
 
   private playBeat(beat: Beat): void {
-    this.pulseSlot(beat.slot);
-    const slotAnchor = this.slotDieAnchor(beat.slot) ?? this.slotCenter(beat.slot);
+    this.pulseCard(beat.slot);
+    const anchor = this.slotDieAnchor(beat.slot);
+    const slotAnchorPoint = anchor ?? this.slotCenter(beat.slot);
     if (beat.kind === "damage" && beat.targetId !== undefined) {
-      const anchor = this.enemyAnchor(beat.targetId);
-      if (anchor !== undefined) {
+      const target = this.enemyAnchor(beat.targetId);
+      if (target !== undefined) {
         playSfx(beat.slot === "spinal" ? "spinalFire" : "weapons");
         if (beat.slot === "spinal" && beat.amount >= 15) this.shake();
-        this.fireProjectile(slotAnchor, anchor);
+        this.fireProjectile(slotAnchorPoint, target);
         const parentId = beat.targetId.split(":")[0] ?? beat.targetId;
         this.flashEnemy(parentId);
         this.spawnNumber(
-          anchor.x,
-          anchor.y - this.layout.enemySize / 2,
+          target.x,
+          target.y - this.layout.enemySize / 2,
           `-${String(beat.amount)}`,
           schools.red.text,
         );
@@ -2026,20 +2219,39 @@ export class BattleScene {
     }
     if (beat.kind === "spinalJam") {
       playSfx("spinalJam");
-      this.spawnNumber(slotAnchor.x, slotAnchor.y - 20, this.labels.jamLabel, tokens.danger);
+      this.spawnNumber(
+        slotAnchorPoint.x,
+        slotAnchorPoint.y - 20,
+        this.labels.jamLabel,
+        tokens.danger,
+      );
       return;
     }
     if (beat.kind === "sensor" && beat.targetId !== undefined) {
       playSfx("sensors");
       this.scanSweep(beat.targetId);
+      const pierce = beat.sensor?.pierce ?? 0;
+      if (pierce > 0) {
+        const target = this.enemyAnchor(beat.targetId);
+        if (target !== undefined) {
+          playSfx("shields");
+          this.flashEnemy(beat.targetId);
+          this.spawnNumber(
+            target.x,
+            target.y - this.layout.enemySize / 2,
+            this.labels.pierceLabel(pierce),
+            schools.blue.text,
+          );
+        }
+      }
       return;
     }
     if (beat.kind === "shield") {
       playSfx("shields");
       this.shieldShimmer();
       this.spawnNumber(
-        slotAnchor.x,
-        slotAnchor.y - 24,
+        slotAnchorPoint.x,
+        slotAnchorPoint.y - 24,
         `+${String(beat.amount)}`,
         schools.blue.text,
       );
@@ -2052,11 +2264,11 @@ export class BattleScene {
     }
     if (beat.kind === "storm") {
       playSfx("stormBeat");
-      this.dieFlash(slotAnchor, schools.prismatic.stroke);
+      this.dieFlash(slotAnchorPoint, schools.prismatic.stroke);
       this.shake();
       this.spawnNumber(
-        slotAnchor.x,
-        slotAnchor.y - 24,
+        slotAnchorPoint.x,
+        slotAnchorPoint.y - 24,
         `~${String(beat.amount)}`,
         schools.prismatic.text,
       );
@@ -2064,8 +2276,8 @@ export class BattleScene {
     }
     playSfx(beat.kind === "repair" ? "repair" : "reactor");
     this.spawnNumber(
-      slotAnchor.x,
-      slotAnchor.y - 24,
+      slotAnchorPoint.x,
+      slotAnchorPoint.y - 24,
       `+${String(beat.amount)}`,
       tokens.amber,
     );
@@ -2091,6 +2303,7 @@ export class BattleScene {
       const { playerHit } = this.layout;
       if (beat.hullDamage > 0) {
         playSfx("hullHit");
+        this.flashShip(schools.red.stroke);
         const state = useBattleStore.getState();
         if (beat.hullDamage >= state.hull) this.shake();
         this.spawnNumber(
@@ -2105,6 +2318,7 @@ export class BattleScene {
             ? "shieldBreak"
             : "shieldHit",
         );
+        this.flashShip(schools.blue.stroke);
         this.spawnNumber(
           playerHit.x,
           playerHit.y,

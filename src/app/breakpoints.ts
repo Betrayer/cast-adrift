@@ -87,6 +87,12 @@ export const useViewport = (): Viewport =>
 export const useAtLeast = (bp: Breakpoint): boolean =>
   atLeast(useViewport().width, bp);
 
+export const isCompactHeight = (height: number): boolean =>
+  height <= HEIGHTS.compact;
+
+export const useCompactHeight = (): boolean =>
+  isCompactHeight(useViewport().height);
+
 export const useRotateGate = (): boolean => {
   const { width, height } = useViewport();
   return needsRotateGate(width, height);

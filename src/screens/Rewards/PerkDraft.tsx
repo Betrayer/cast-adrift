@@ -96,6 +96,7 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
               <Button
                 size="sm"
                 fullWidth
+                data-testid={`reward-perk-pick-${String(index)}`}
                 onClick={() => {
                   pick(id);
                 }}
@@ -135,6 +136,7 @@ export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
         <Button
           variant="subtle"
           color="gray"
+          data-testid="reward-perk-skip"
           onClick={() => {
             playSfx("optionTick", { rate: 0.88 });
             resolvePerkChoice(null);

@@ -19,10 +19,18 @@ const VENDOR_CHUNKS: Record<string, readonly string[]> = {
   'vendor-mantine': ['/node_modules/@mantine/'],
 };
 
-export default defineConfig({
+const E2E_MODES: readonly string[] = ['e2e', 'e2e-emu'];
+
+export default defineConfig(({ mode }) => ({
   plugins: [react()],
   define: {
     __APP_VERSION__: JSON.stringify(pkg.version),
+    'import.meta.env.VITE_E2E': JSON.stringify(
+      E2E_MODES.includes(mode) ? '1' : '0',
+    ),
+    'import.meta.env.VITE_FB_EMULATOR': JSON.stringify(
+      mode === 'e2e-emu' ? '1' : '0',
+    ),
   },
   resolve: {
     alias: {
@@ -30,6 +38,7 @@ export default defineConfig({
     },
   },
   build: {
+    outDir: E2E_MODES.includes(mode) ? 'dist-e2e' : 'dist',
     manifest: true,
     rollupOptions: {
       output: {
@@ -46,4 +55,4 @@ export default defineConfig({
       },
     },
   },
-});
+}));

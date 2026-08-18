@@ -35,7 +35,18 @@ const castAdrift = {
 };
 
 export default tseslint.config(
-  { ignores: ['dist', 'node_modules', 'coverage', '.claude', 'sim-out'] },
+  {
+    ignores: [
+      'dist',
+      'dist-e2e',
+      'node_modules',
+      'coverage',
+      '.claude',
+      'sim-out',
+      'e2e/.artifacts',
+      'playwright-report',
+    ],
+  },
   js.configs.recommended,
   ...tseslint.configs.strict,
   {
@@ -79,7 +90,21 @@ export default tseslint.config(
     },
   },
   {
-    files: ['vite.config.ts', 'vitest.config.ts', 'eslint.config.js', 'api/**'],
+    files: ['e2e/**'],
+    rules: {
+      'react-hooks/rules-of-hooks': 'off',
+    },
+  },
+  {
+    files: [
+      'vite.config.ts',
+      'vitest.config.ts',
+      'vitest.rules.config.ts',
+      'playwright.config.ts',
+      'playwright.emu.config.ts',
+      'eslint.config.js',
+      'api/**',
+    ],
     rules: {
       'import/no-default-export': 'off',
     },

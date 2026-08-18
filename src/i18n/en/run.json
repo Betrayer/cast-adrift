@@ -257,8 +257,7 @@
     "title": "Prologue",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Back to menu",
-    "replayDone": "Back to the Codex"
+    "leave": "Back to menu"
   },
   "interstitial": {
     "sector": "Sector {{n}}",
@@ -312,12 +311,12 @@
     "next": "Next",
     "skipAll": "Skip all",
     "place": {
-      "title": "Drag a die into a system",
-      "body": "Roll, then drag dice from the tray onto Weapons, Shields, Engines, Sensors or the Reactor. A die never fits a slot whose cap is below its face."
+      "title": "Send a die to a system",
+      "body": "Tap a die, then tap a lit system card — or drag it there. Each card shows what the die will do before you commit, and a die never fits a card whose cap is below its face."
     },
     "endTurn": {
       "title": "Resolve the turn",
-      "body": "When the board reads the way you want it, end the turn. Systems fire top to bottom, then the enemy answers."
+      "body": "When the board reads the way you want it, end the turn. Systems fire in the order of the numbers on their cards, then the enemy answers."
     },
     "reroll": {
       "title": "Rerolls are free once",
@@ -325,11 +324,39 @@
     },
     "nudge": {
       "title": "Charge buys precision",
-      "body": "Select a die and spend charge to nudge its face up or down by one. Charge also pays for extra rerolls and surges."
+      "body": "Select a die, then use − and + on the console to move its face by one. Charge pays for it; a free nudge spends nothing."
     },
     "jump": {
       "title": "Choose the next node",
-      "body": "Tap a lit node, then Jump. Fog hides the rows ahead; Sensors and deep scans push the horizon further."
+      "body": "Tap a lit node, then Jump. Fog hides the rows ahead; every Sensors upgrade pushes the horizon further."
+    },
+    "targeting": {
+      "title": "Pick what you are shooting at",
+      "body": "Tap an enemy to make it the target. Weapons, marks and pierce all land on the target — subsystems are targeted the same way."
+    },
+    "reserve": {
+      "title": "Keep a die for next turn",
+      "body": "A reserved die skips the reroll and comes back with its face intact. Use it to hold a number the board cannot spend yet."
+    },
+    "actives": {
+      "title": "Some dice do more than sit",
+      "body": "A die with an active can flip, copy, bank or split. The row lights up only for the actives your tray can currently pay for."
+    },
+    "resonance": {
+      "title": "Schools reward company",
+      "body": "The chips count how many dice of each school the battle holds. Cross a threshold and the whole school gains a bonus for the fight."
+    },
+    "affinity": {
+      "title": "The bonus is the slot",
+      "body": "A school placed in its own system adds to the face before anything else reads it. That is the sum on the card, and it is free."
+    },
+    "prismatic": {
+      "title": "Prismatic counts as anything",
+      "body": "A prismatic die satisfies any school, and in a slot it inherits that slot’s affinity — bonus included. It also counts for resonance."
+    },
+    "fate": {
+      "title": "Fate is one roll, once",
+      "body": "The Fate die never enters a slot. One press, one roll per battle, and the table reads out what it gave you."
     }
   },
   "motif": {

@@ -30,7 +30,25 @@ export interface DieTextureOptions {
   engraved?: boolean;
   growth?: number;
   hasActive?: boolean;
+  customFaces?: boolean;
+  fate?: boolean;
 }
+
+export const DIE_BADGE_GLYPH = {
+  fate: "★",
+  active: "◆",
+  engraved: "⟡",
+  faces: "▦",
+} as const;
+
+const PRISM_STOPS: readonly string[] = [
+  "#E4574E",
+  "#E8B23A",
+  "#6FBF4B",
+  "#4A90E2",
+  "#B08CFF",
+  "#E4574E",
+];
 
 interface CacheEntry {
   texture: Texture;
@@ -123,6 +141,8 @@ export const dieTexture = (
   const engraved = options.engraved === true;
   const growth = options.growth ?? 0;
   const hasActive = options.hasActive === true;
+  const customFaces = options.customFaces === true;
+  const isFate = options.fate === true;
   const defId = options.defId ?? `${school}-d${String(tier)}`;
   const size = Math.round(options.size);
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -139,6 +159,8 @@ export const dieTexture = (
     engraved ? "e" : "-",
     growth,
     hasActive ? "a" : "-",
+    customFaces ? "f" : "-",
+    isFate ? "t" : "-",
   ].join(":");
   const cached = cache.get(key);
   if (cached !== undefined) {
@@ -166,11 +188,24 @@ export const dieTexture = (
 
   const box = new Graphics()
     .roundRect(inset, inset, size - style.strokeW, size - style.strokeW, radius)
-    .fill(gradient)
-    .stroke({
-      color: skinEdge ?? colors.stroke,
-      width: style.strokeW,
+    .fill(gradient);
+  if (school === "prismatic" && skinEdge === undefined) {
+    box.stroke({
+      fill: new FillGradient({
+        type: "linear",
+        start: { x: 0, y: 0 },
+        end: { x: 1, y: 1 },
+        textureSpace: "local",
+        colorStops: PRISM_STOPS.map((color, index) => ({
+          offset: index / (PRISM_STOPS.length - 1),
+          color,
+        })),
+      }),
+      width: style.strokeW + 0.5,
     });
+  } else {
+    box.stroke({ color: skinEdge ?? colors.stroke, width: style.strokeW });
+  }
 
   const noise = new Graphics();
   paintNoise(noise, fnv1a(defId), size, style.noise, colors.text);
@@ -188,11 +223,11 @@ export const dieTexture = (
   num.position.set(size / 2, size * 0.46);
 
   const tag = new Text({
-    text: growth > 0 ? `d${String(tier)}+${String(growth)}` : `d${String(tier)}`,
+    text: `d${String(tier)}`,
     style: {
       fontFamily: style.glyphFont,
       fontSize: Math.max(9, size * 0.18),
-      fill: growth > 0 ? tokens.amber : tokens.faint,
+      fill: tokens.faint,
     },
   });
   tag.anchor.set(0.5, 1);
@@ -211,26 +246,35 @@ export const dieTexture = (
 
   root.addChild(box, noise, glyph, num, tag);
 
+  const badges: { glyph: string; fill: string }[] = [];
+  if (isFate) badges.push({ glyph: DIE_BADGE_GLYPH.fate, fill: tokens.amber });
   if (hasActive) {
-    const dot = new Graphics()
-      .circle(size * 0.83, size * 0.83, size * 0.055)
-      .fill(tokens.accent)
-      .stroke({ color: colors.fill, width: Math.max(1, size * 0.02) });
-    root.addChild(dot);
+    badges.push({ glyph: DIE_BADGE_GLYPH.active, fill: tokens.accent });
   }
-
   if (engraved) {
-    const r = size * 0.17;
-    const runeInset = size * 0.13;
-    const rune = new Graphics()
-      .moveTo(size - runeInset - r, runeInset)
-      .lineTo(size - runeInset, runeInset)
-      .lineTo(size - runeInset, runeInset + r)
-      .stroke({ color: colors.stroke, width: Math.max(1.5, size * 0.05) })
-      .moveTo(size - runeInset - r * 0.55, runeInset + r * 0.55)
-      .lineTo(size - runeInset - r * 0.05, runeInset + r * 0.05)
-      .stroke({ color: colors.text, width: Math.max(1, size * 0.04) });
-    root.addChild(rune);
+    badges.push({ glyph: DIE_BADGE_GLYPH.engraved, fill: colors.stroke });
+  }
+  if (customFaces) {
+    badges.push({ glyph: DIE_BADGE_GLYPH.faces, fill: colors.text });
+  }
+  if (growth > 0) {
+    badges.push({ glyph: `+${String(growth)}`, fill: tokens.amber });
+  }
+  let badgeX = size - size * 0.08;
+  for (const badge of badges) {
+    const mark = new Text({
+      text: badge.glyph,
+      style: {
+        fontFamily: style.glyphFont,
+        fontSize: Math.max(7, size * 0.2),
+        fontWeight: "700",
+        fill: badge.fill,
+      },
+    });
+    mark.anchor.set(1, 0);
+    mark.position.set(badgeX, size * 0.04);
+    badgeX -= mark.width + size * 0.05;
+    root.addChild(mark);
   }
 
   const texture = app.renderer.generateTexture({

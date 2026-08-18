@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} к синему резерву",
       "jamPowerDelta": "{{n}} к силе помех",
       "growthCapDelta": "{{n}} к лимиту роста",
-      "enginesThresholdDelta": "{{n}} к порогу двигателей",
+      "evasionDelta": "{{n}}% к уклонению",
       "markBonusDelta": "{{n}} к метке",
       "battleEndHeal": "{{n}} лечения за бой",
       "hullMaxPct": "{{n}}% к макс. корпусу",
@@ -391,7 +391,8 @@
     "myRank": "Ваше место: {{rank}}",
     "noRank": "В этой таблице вас ещё нет",
     "empty": "Пока пусто.",
-    "depth": "г{{n}}"
+    "depth": "г{{n}}",
+    "offline": "Нет связи — таблица недоступна. Результат сохранён локально."
   },
   "profile": {
     "title": "Профиль",

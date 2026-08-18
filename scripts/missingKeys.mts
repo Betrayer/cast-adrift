@@ -15,6 +15,10 @@ import { ALL_MODULES } from "../src/data/modules";
 import { MUTATORS } from "../src/data/mutators";
 import { FRAGMENTS } from "../src/data/narrative/fragments";
 import { KEEPER_LINES } from "../src/data/narrative/keeperLines";
+import {
+  PROLOGUE_BEATS,
+  SYSTEMS_CHECK,
+} from "../src/data/narrative/prologue";
 import { ALL_PERKS } from "../src/data/perks";
 import { PUZZLES } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
@@ -68,6 +72,14 @@ for (const c of CODEX) {
 for (const f of FATE_TABLE) add(f.text);
 for (const f of FRAGMENTS) add(f.text);
 for (const k of KEEPER_LINES) add(k.text);
+for (const step of SYSTEMS_CHECK) {
+  add(step.sayKey);
+  if (step.failKey !== null) add(step.failKey);
+}
+for (const beat of PROLOGUE_BEATS) {
+  add(beat.cta);
+  for (const line of beat.lines) add(line.text);
+}
 for (const b of BARKS) for (const l of b.lines) add(l);
 for (const p of PUZZLES) {
   add(p.title);

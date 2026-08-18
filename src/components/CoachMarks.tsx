@@ -65,7 +65,7 @@ const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
     };
   }, [rect]);
   return (
-    <div className={styles.root}>
+    <div className={styles.root} data-coach-mark={mark.id}>
       <div
         className={styles.dim}
         style={{ left: 0, top: 0, width: w, height: Math.max(0, rect.y) }}
@@ -109,10 +109,15 @@ const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
         <span className={styles.title}>{t(mark.title)}</span>
         <span className={styles.body}>{t(mark.body)}</span>
         <div className={styles.actions}>
-          <Button size="compact-xs" variant="subtle" onClick={onSkipAll}>
+          <Button
+            size="compact-xs"
+            variant="subtle"
+            data-testid="coach-skip"
+            onClick={onSkipAll}
+          >
             {t('run:tutorial.skipAll')}
           </Button>
-          <Button size="compact-xs" onClick={onNext}>
+          <Button size="compact-xs" data-testid="coach-next" onClick={onNext}>
             {t('run:tutorial.next')}
           </Button>
         </div>

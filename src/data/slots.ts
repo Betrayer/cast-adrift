@@ -20,18 +20,26 @@ export const slotCapForMk = (slotId: SlotId, mk: MkLevel): DieTier => {
   return caps[mk - 1] ?? caps[0];
 };
 
-export type AffinitySlot = "weapons" | "shields" | "engines" | "reactor";
+export type AffinitySlot =
+  | "weapons"
+  | "shields"
+  | "engines"
+  | "sensors"
+  | "reactor";
 
 export type AffinityDef =
-  | { slot: "weapons"; kind: "weaponBonus"; values: readonly [number, number, number] }
-  | { slot: "shields"; kind: "shieldBonus"; values: readonly [number, number, number] }
-  | { slot: "engines"; kind: "thresholdBonus"; values: readonly [number, number, number] }
+  | {
+      slot: Exclude<AffinitySlot, "reactor">;
+      kind: "valueBonus";
+      values: readonly [number, number, number];
+    }
   | { slot: "reactor"; kind: "chargeMult"; mult: number };
 
 export const AFFINITY: Partial<Record<School, AffinityDef>> = {
-  red: { slot: "weapons", kind: "weaponBonus", values: [2, 3, 4] },
-  blue: { slot: "shields", kind: "shieldBonus", values: [2, 3, 4] },
-  green: { slot: "engines", kind: "thresholdBonus", values: [2, 3, 4] },
+  red: { slot: "weapons", kind: "valueBonus", values: [2, 3, 4] },
+  blue: { slot: "shields", kind: "valueBonus", values: [2, 3, 4] },
+  green: { slot: "engines", kind: "valueBonus", values: [2, 3, 4] },
+  grey: { slot: "sensors", kind: "valueBonus", values: [1, 2, 3] },
   black: { slot: "reactor", kind: "chargeMult", mult: 1.5 },
 };
 
@@ -54,6 +62,7 @@ export const affinitySchoolForSlot = (slotId: SlotId): School | undefined => {
   if (WEAPON_SLOTS.has(slotId)) return "red";
   if (SHIELD_SLOTS.has(slotId)) return "blue";
   if (slotId === "engines") return "green";
+  if (slotId === "sensors") return "grey";
   if (slotId === "reactor") return "black";
   return undefined;
 };

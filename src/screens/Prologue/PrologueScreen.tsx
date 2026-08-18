@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { PROLOGUE_BEATS } from '@/data/narrative/prologue';
-import { startPrologueBattle } from '@/game/run/flow';
+import { startPrologueBattle, startSystemsCheckSandbox } from '@/game/run/flow';
 import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
 import styles from './PrologueScreen.module.css';
@@ -22,7 +22,7 @@ export const PrologueScreen = () => {
       return;
     }
     if (replay) {
-      go('codex');
+      startSystemsCheckSandbox();
       return;
     }
     useMetaStore.getState().markPrologueDone();
@@ -59,15 +59,20 @@ export const PrologueScreen = () => {
               max: PROLOGUE_BEATS.length,
             })}
           </Text>
-          <Button size="md" fullWidth data-prologue-next onClick={advance}>
-            {replay && index + 1 === PROLOGUE_BEATS.length
-              ? t('run:prologue.replayDone')
-              : t(beat.cta)}
+          <Button
+            size="md"
+            fullWidth
+            data-prologue-next
+            data-testid="prologue-next"
+            onClick={advance}
+          >
+            {t(beat.cta)}
           </Button>
           <Button
             size="compact-xs"
             variant="subtle"
             color="gray"
+            data-testid="prologue-leave"
             onClick={() => {
               go(replay ? 'codex' : 'menu');
             }}

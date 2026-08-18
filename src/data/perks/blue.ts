@@ -219,7 +219,7 @@ export const BLUE_PERKS: readonly PerkDef[] = [
     synergy: ["dodge"],
     tags: ["engines", "dodge"],
     traits: ["reflectDodge"],
-    mods: { enginesThresholdDelta: 1 },
+    mods: { evasionDelta: 6 },
     effects: [
       {
         on: "beforeResolveSlot",

@@ -34,7 +34,12 @@ import {
   RESOLUTION_ORDER,
   resolutionOrder,
 } from "@/game/battle/order";
-import { applyStatus, consumeStatus, tickBurn } from "@/game/battle/statuses";
+import {
+  applyStatus,
+  clearMark,
+  consumeStatus,
+  tickBurn,
+} from "@/game/battle/statuses";
 import {
   applyActions,
   BattleCtx,
@@ -42,6 +47,7 @@ import {
   dieFaceMax,
   emit,
   type EffectSource,
+  type ResolveScope,
 } from "@/game/effects";
 import { dieHasGrant } from "@/data/engravings";
 import { sourceMods, sourceTrait } from "@/game/run/runMods";
@@ -54,7 +60,7 @@ import type {
   EnemyBeat,
   EnemyBeatKind,
   EnemyState,
-  EngineTier,
+  EvasionState,
   RolledDie,
   SlotId,
   SlotState,
@@ -109,6 +115,7 @@ export const applyNodeStorm = (
     slot: die.slot ?? "reactor",
     kind: "storm",
     amount: die.value,
+    value: die.value,
     after: clone(next),
   };
 };
@@ -119,11 +126,39 @@ const battleMutators = (snapshot: BattleSnapshot): MutatorMods =>
 export const scaleDamage = (damage: number, multPct: number): number =>
   multPct === 0 ? damage : Math.round(damage * (1 + multPct / 100));
 
-export const engineTier = (value: number): EngineTier => {
-  if (value <= 3) return "brace";
-  if (value <= 6) return "dodge";
-  return "dodgePlus";
+export const DODGE_PCT_PER_VALUE = 6;
+export const GLANCING_PCT_PER_VALUE = 3;
+export const DODGE_PCT_CAP = 55;
+export const GLANCING_PCT_CAP = 25;
+export const INTERCEPT_VALUE = 8;
+export const INTERCEPT_WEAPONS_BONUS = 1;
+export const VULNERABLE_CAP = 4;
+export const VULNERABLE_DIVISOR = 2;
+
+const clampPct = (raw: number, cap: number): number =>
+  Math.max(0, Math.min(cap, Math.round(raw)));
+
+export const evasionFor = (value: number, evasionDelta = 0): EvasionState => {
+  const effective = Math.max(0, value);
+  return {
+    dodgePct: clampPct(
+      effective * DODGE_PCT_PER_VALUE + evasionDelta,
+      DODGE_PCT_CAP,
+    ),
+    glancingPct: clampPct(
+      effective * GLANCING_PCT_PER_VALUE + evasionDelta / 2,
+      GLANCING_PCT_CAP,
+    ),
+    intercept: effective >= INTERCEPT_VALUE,
+  };
 };
+
+export const vulnerableFor = (value: number, markBonusDelta = 0): number =>
+  Math.max(
+    0,
+    Math.min(VULNERABLE_CAP, Math.ceil(Math.max(0, value) / VULNERABLE_DIVISOR)) +
+      markBonusDelta,
+  );
 
 const hasAliveAura = (
   enemy: EnemyState,
@@ -188,7 +223,6 @@ const applySlotEffect = (
   slotId: SlotId,
   die: RolledDie,
   value: number,
-  thresholdBonus: number,
   chargeMult: number,
   crit: boolean,
   sc: SlotContext,
@@ -200,29 +234,23 @@ const applySlotEffect = (
       next.enemies.find((e) => e.id === next.targetId && e.hp > 0) ??
       aliveEnemies(next)[0];
     if (target === undefined) return;
-    applyStatus(target.statuses, "mark");
-    const jam = value >= 4;
-    if (jam) {
-      applyStatus(target.statuses, "jam");
-      const targetDef = ENEMY_BY_ID.get(target.defId);
-      if (targetDef?.jamReleasesBlocks === true) next.blockedSlots = [];
-      if (targetDef?.jamClearsRage === true) target.rage = 0;
-    }
-    const deepScan = value >= 7;
-    if (deepScan) next.pendingDeepScan = true;
+    const vulnerable = vulnerableFor(value, perkMods.markBonusDelta);
+    applyStatus(target.statuses, "mark", vulnerable);
+    const pierce =
+      die.value >= dieFaceMax(die) ? Math.min(value, target.shield) : 0;
+    if (pierce > 0) target.shield -= pierce;
     beats.push({
       slot: slotId,
       kind: "sensor",
       amount: value,
       targetId: target.id,
-      sensor: { mark: true, jam, deepScan },
+      sensor: { vulnerable, pierce },
       after: clone(next),
     });
   } else if (slotId === "weaponA" || slotId === "weaponB") {
     const target = resolveWeaponTarget(next);
     if (target === undefined) return;
     const targetId = (target.subsystem ?? target.enemy).id;
-    const markBonus = 2 + perkMods.markBonusDelta;
     const preHp =
       target.subsystem === undefined
         ? target.enemy.hp + target.enemy.shield
@@ -233,7 +261,6 @@ const applySlotEffect = (
       target,
       scaleDamage(value + (mods.weapons ?? 0), damageMultPct),
       crit,
-      markBonus,
       pierce,
       die.school,
     );
@@ -263,8 +290,6 @@ const applySlotEffect = (
             next,
             { enemy: nextEnemy },
             overkill,
-            false,
-            markBonus,
           );
           beats.push({
             slot: slotId,
@@ -294,7 +319,6 @@ const applySlotEffect = (
         target,
         scaleDamage(value + (mods.spinal ?? 0), damageMultPct),
         crit,
-        2 + perkMods.markBonusDelta,
         false,
         die.school,
       );
@@ -323,18 +347,13 @@ const applySlotEffect = (
     next.hull = Math.min(next.hullMax, next.hull + heal);
     beats.push({ slot: slotId, kind: "repair", amount: heal, after: clone(next) });
   } else if (slotId === "engines") {
-    const tier = engineTier(
-      value + thresholdBonus + perkMods.enginesThresholdDelta,
-    );
-    next.engineState = tier;
-    if (tier === "dodgePlus") {
-      next.nextTurnMods.weapons = (next.nextTurnMods.weapons ?? 0) + 2;
-    }
+    const evasion = evasionFor(value, perkMods.evasionDelta);
+    next.evasion = evasion;
     beats.push({
       slot: slotId,
       kind: "engine",
       amount: value,
-      engineTier: tier,
+      evasion,
       after: clone(next),
     });
   } else if (slotId === "reactor") {
@@ -360,21 +379,19 @@ const applySlotEffect = (
   }
 };
 
-const resolveSlot = (
-  next: BattleSnapshot,
+export const openSlotScope = (
+  ctx: BattleCtx,
+  sources: readonly EffectSource[],
   slotId: SlotId,
   slot: SlotState,
   die: RolledDie,
-  sc: SlotContext,
-): void => {
-  const { ctx, sources } = sc;
-  const scope = {
+): ResolveScope => {
+  const scope: ResolveScope = {
     slotId,
     slot,
     die,
     value: die.value,
     chargeMult: 1,
-    thresholdBonus: 0,
     crit: false,
     repeat: false,
   };
@@ -388,6 +405,18 @@ const resolveSlot = (
   }
 
   emit(sources, "beforeResolveSlot", ctx);
+  return scope;
+};
+
+const resolveSlot = (
+  next: BattleSnapshot,
+  slotId: SlotId,
+  slot: SlotState,
+  die: RolledDie,
+  sc: SlotContext,
+): void => {
+  const { ctx, sources } = sc;
+  const scope = openSlotScope(ctx, sources, slotId, slot, die);
 
   const isWeapon =
     slotId === "weaponA" || slotId === "weaponB" || slotId === "spinal";
@@ -406,17 +435,9 @@ const resolveSlot = (
   }
 
   const crit = isWeapon && scope.crit && !sourceTrait(next, "coldLogic");
+  const beatsBefore = sc.beats.length;
 
-  applySlotEffect(
-    next,
-    slotId,
-    die,
-    scope.value,
-    scope.thresholdBonus,
-    scope.chargeMult,
-    crit,
-    sc,
-  );
+  applySlotEffect(next, slotId, die, scope.value, scope.chargeMult, crit, sc);
 
   emit(sources, "afterResolveSlot", ctx);
 
@@ -431,16 +452,12 @@ const resolveSlot = (
   }
 
   if (scope.repeat) {
-    applySlotEffect(
-      next,
-      slotId,
-      die,
-      scope.value,
-      scope.thresholdBonus,
-      scope.chargeMult,
-      crit,
-      sc,
-    );
+    applySlotEffect(next, slotId, die, scope.value, scope.chargeMult, crit, sc);
+  }
+
+  for (let i = beatsBefore; i < sc.beats.length; i += 1) {
+    const beat = sc.beats[i];
+    if (beat !== undefined) beat.value = scope.value;
   }
 
   ctx.scope = null;
@@ -536,16 +553,45 @@ export const resolvePlayerPhase = (
 };
 
 interface AttackContext {
-  dodgeSpent: boolean;
+  firstDodgeSpent: boolean;
+  defense: RngStream;
 }
 
-const applyAttack = (
+export interface AttackResult {
+  dealt: number;
+  hullDamage: number;
+  shieldDamage: number;
+  dodged: number;
+  glanced: number;
+}
+
+const rewardDodge = (
+  next: BattleSnapshot,
+  enemy: EnemyState,
+  context: AttackContext,
+  evasion: EvasionState,
+): void => {
+  if (context.firstDodgeSpent) return;
+  context.firstDodgeSpent = true;
+  if (sourceTrait(next, "reflectDodge")) {
+    enemy.hp = Math.max(0, enemy.hp - REFLECT_DODGE_DAMAGE);
+  }
+  if (sourceTrait(next, "dodgeCharge")) {
+    next.charge = Math.min(next.chargeCap, next.charge + 1);
+  }
+  if (evasion.intercept) {
+    next.nextTurnMods.weapons =
+      (next.nextTurnMods.weapons ?? 0) + INTERCEPT_WEAPONS_BONUS;
+  }
+};
+
+export const incomingHits = (
   next: BattleSnapshot,
   enemy: EnemyState,
   perHit: number,
   hits: number,
-  context: AttackContext,
-): { dealt: number; hullDamage: number; shieldDamage: number } => {
+): number[] => {
+  const def = ENEMY_BY_ID.get(enemy.defId);
   const aura =
     (hasAliveAura(enemy, "atk+2") ? 2 : 0) +
     (hasAliveAura(enemy, "atk+3") ? 3 : 0) +
@@ -557,36 +603,60 @@ const applyAttack = (
       Math.max(0, next.interference) +
       perkMods.tideEffectDelta,
   );
-  const damageMultPct = battleMutators(next).damageMultPct;
-  const reflectDodge = sourceTrait(next, "reflectDodge");
-  const dodgeCharge = sourceTrait(next, "dodgeCharge");
-  const chargeMult = consumeStatus(enemy.statuses, "charge") ? 2 : 1;
-  const jamPenalty = consumeStatus(enemy.statuses, "jam")
-    ? 2 + perkMods.jamPowerDelta
-    : 0;
-  const brace = next.engineState === "brace" ? 1 : 0;
-  const dodges =
-    next.engineState === "dodge" || next.engineState === "dodgePlus";
+  const authored =
+    def?.boss === true || def?.miniboss === true || def?.elite === true;
+  const damageMultPct =
+    battleMutators(next).damageMultPct +
+    (authored ? 0 : Math.max(0, next.sectorDmgPct));
+  const chargeMult = enemy.statuses.charge === undefined ? 1 : 2;
+  const jamPenalty =
+    enemy.statuses.jam === undefined ? 0 : 2 + perkMods.jamPowerDelta;
+  const out: number[] = [];
+  for (let i = 0; i < hits; i += 1) {
+    out.push(
+      Math.max(
+        0,
+        scaleDamage(
+          (perHit + aura + tide) * chargeMult - (i === 0 ? jamPenalty : 0),
+          damageMultPct,
+        ),
+      ),
+    );
+  }
+  return out;
+};
+
+const applyAttack = (
+  next: BattleSnapshot,
+  enemy: EnemyState,
+  perHit: number,
+  hits: number,
+  context: AttackContext,
+): AttackResult => {
+  const raw = incomingHits(next, enemy, perHit, hits);
+  consumeStatus(enemy.statuses, "charge");
+  consumeStatus(enemy.statuses, "jam");
+  const evasion = next.evasion;
+  const rolls = evasion !== null && evasion.dodgePct + evasion.glancingPct > 0;
   let dealt = 0;
   let hullDamage = 0;
   let shieldDamage = 0;
-  for (let i = 0; i < hits; i += 1) {
-    let damage = Math.max(
-      0,
-      scaleDamage(
-        (perHit + aura + tide) * chargeMult - (i === 0 ? jamPenalty : 0),
-        damageMultPct,
-      ),
-    );
-    if (dodges && !context.dodgeSpent) {
-      context.dodgeSpent = true;
-      if (reflectDodge) enemy.hp = Math.max(0, enemy.hp - REFLECT_DODGE_DAMAGE);
-      if (dodgeCharge) {
-        next.charge = Math.min(next.chargeCap, next.charge + 1);
+  let dodged = 0;
+  let glanced = 0;
+  for (let i = 0; i < raw.length; i += 1) {
+    let damage = raw[i] ?? 0;
+    if (rolls && evasion !== null) {
+      const roll = context.defense.int(1, 100);
+      if (roll <= evasion.dodgePct) {
+        dodged += 1;
+        rewardDodge(next, enemy, context, evasion);
+        continue;
       }
-      continue;
+      if (roll <= evasion.dodgePct + evasion.glancingPct) {
+        glanced += 1;
+        damage = Math.ceil(damage / 2);
+      }
     }
-    damage = Math.max(0, damage - brace);
     const absorbed = Math.min(next.shield, damage);
     next.shield -= absorbed;
     const toHull = damage - absorbed;
@@ -595,7 +665,7 @@ const applyAttack = (
     hullDamage += toHull;
     shieldDamage += absorbed;
   }
-  return { dealt, hullDamage, shieldDamage };
+  return { dealt, hullDamage, shieldDamage, dodged, glanced };
 };
 
 const lockRandomTrayDie = (
@@ -661,6 +731,43 @@ const shrinkRandomSlot = (
   return slot;
 };
 
+export const intentHits = (
+  next: BattleSnapshot,
+  enemy: EnemyState,
+  intent: Intent,
+): number[] => {
+  switch (intent.t) {
+    case "attack":
+      return incomingHits(next, enemy, intent.n, 1);
+    case "multi":
+      return incomingHits(next, enemy, intent.n, intent.k);
+    case "mirrorHalf":
+      return incomingHits(
+        next,
+        enemy,
+        Math.min(MIRROR_CAP, Math.ceil(Math.max(0, next.lastPlayerDamage) / 2)),
+        1,
+      );
+    case "mirrorSchool":
+      return incomingHits(
+        next,
+        enemy,
+        Math.min(MIRROR_SCHOOL_CAP, largestSchoolCount(next) * MIRROR_SCHOOL_MULT),
+        1,
+      );
+    case "echoTotal": {
+      const echoed = Math.min(intent.cap, Math.max(0, next.lastPlayerDamage));
+      return echoed <= 0 ? [] : incomingHits(next, enemy, echoed, 1);
+    }
+    case "bargain":
+      return next.scrap + next.runScrap >= intent.n
+        ? []
+        : incomingHits(next, enemy, intent.n, 1);
+    default:
+      return [];
+  }
+};
+
 interface EnemyPhaseCtx {
   next: BattleSnapshot;
   beats: EnemyBeat[];
@@ -686,6 +793,23 @@ const pushBeat = (
   });
 };
 
+const pushAttackBeat = (
+  ctx: EnemyPhaseCtx,
+  enemy: EnemyState,
+  result: AttackResult,
+): void => {
+  ctx.beats.push({
+    enemyId: enemy.id,
+    kind: "attack",
+    amount: result.dealt,
+    hullDamage: result.hullDamage,
+    shieldDamage: result.shieldDamage,
+    ...(result.dodged > 0 ? { dodged: result.dodged } : {}),
+    ...(result.glanced > 0 ? { glanced: result.glanced } : {}),
+    after: clone(ctx.next),
+  });
+};
+
 const stealsOnHit = (enemy: EnemyState, def: EnemyDef): number => {
   if (hasAliveAura(enemy, "stealOnHit6")) return 6;
   return def.stealOnHit ?? 0;
@@ -703,14 +827,7 @@ const resolveIntent = (
     case "multi": {
       const hits = intent.t === "multi" ? intent.k : 1;
       const result = applyAttack(next, enemy, intent.n, hits, ctx.attack);
-      ctx.beats.push({
-        enemyId: enemy.id,
-        kind: "attack",
-        amount: result.dealt,
-        hullDamage: result.hullDamage,
-        shieldDamage: result.shieldDamage,
-        after: clone(next),
-      });
+      pushAttackBeat(ctx, enemy, result);
       const steal = stealsOnHit(enemy, def);
       if (steal > 0 && result.dealt > 0) {
         stealScrap(next, steal);
@@ -752,14 +869,7 @@ const resolveIntent = (
         Math.ceil(Math.max(0, next.lastPlayerDamage) / 2),
       );
       const result = applyAttack(next, enemy, mirrored, 1, ctx.attack);
-      ctx.beats.push({
-        enemyId: enemy.id,
-        kind: "attack",
-        amount: result.dealt,
-        hullDamage: result.hullDamage,
-        shieldDamage: result.shieldDamage,
-        after: clone(next),
-      });
+      pushAttackBeat(ctx, enemy, result);
       return;
     }
     case "stealScrap":
@@ -806,14 +916,7 @@ const resolveIntent = (
         largestSchoolCount(next) * MIRROR_SCHOOL_MULT,
       );
       const result = applyAttack(next, enemy, mirrored, 1, ctx.attack);
-      ctx.beats.push({
-        enemyId: enemy.id,
-        kind: "attack",
-        amount: result.dealt,
-        hullDamage: result.hullDamage,
-        shieldDamage: result.shieldDamage,
-        after: clone(next),
-      });
+      pushAttackBeat(ctx, enemy, result);
       return;
     }
     case "drainCharge": {
@@ -838,14 +941,7 @@ const resolveIntent = (
         return;
       }
       const result = applyAttack(next, enemy, intent.n, 1, ctx.attack);
-      ctx.beats.push({
-        enemyId: enemy.id,
-        kind: "attack",
-        amount: result.dealt,
-        hullDamage: result.hullDamage,
-        shieldDamage: result.shieldDamage,
-        after: clone(next),
-      });
+      pushAttackBeat(ctx, enemy, result);
       return;
     }
     case "enrage":
@@ -863,14 +959,7 @@ const resolveIntent = (
         return;
       }
       const result = applyAttack(next, enemy, echoed, 1, ctx.attack);
-      ctx.beats.push({
-        enemyId: enemy.id,
-        kind: "attack",
-        amount: result.dealt,
-        hullDamage: result.hullDamage,
-        shieldDamage: result.shieldDamage,
-        after: clone(next),
-      });
+      pushAttackBeat(ctx, enemy, result);
       return;
     }
     case "foldOrder":
@@ -993,6 +1082,7 @@ const resolveAuras = (ctx: EnemyPhaseCtx): void => {
 export const resolveEnemyPhase = (
   snapshot: BattleSnapshot,
   enemyStream: RngStream,
+  defenseStream: RngStream = enemyStream,
 ): { next: BattleSnapshot; beats: EnemyBeat[] } => {
   const next = clone(snapshot);
   const beats: EnemyBeat[] = [];
@@ -1000,7 +1090,7 @@ export const resolveEnemyPhase = (
     next,
     beats,
     enemyStream,
-    attack: { dodgeSpent: false },
+    attack: { firstDodgeSpent: false, defense: defenseStream },
   };
 
   const decayPct = battleMutators(next).shieldDecayPct;
@@ -1192,7 +1282,8 @@ export const advanceTurn = (
   for (const slot of Object.values(next.slots)) {
     slot.dieUid = undefined;
   }
-  next.engineState = null;
+  for (const enemy of next.enemies) clearMark(enemy.statuses);
+  next.evasion = null;
   next.nextRollBonus = 0;
   next.sacrificePool = 0;
   next.bloodReactorUsed = false;

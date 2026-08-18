@@ -156,16 +156,16 @@ const buildSnapshot = (
     slots,
     enemies: [dummyEnemy(puzzle.incoming, carry.burn)],
     targetId: "dummy",
-    engineState: null,
+    evasion: null,
     nextTurnMods: {},
     nextRollBonus: 0,
-    pendingDeepScan: false,
     chargeCap: puzzle.chargeCap ?? DEFAULT_PUZZLE_CHARGE_CAP,
     sacrificePool: 0,
     bloodReactorUsed: false,
     burnDoubleUsed: false,
     exceedCap: [],
     sectorHpPct: 0,
+    sectorDmgPct: 0,
     enemyHpPct: 0,
     blockedSlots: [],
     shrunkSlots: [],
@@ -326,7 +326,7 @@ export const evalOrderStep = (step: OrderStep, score: TrialScore): boolean => {
   switch (step.s) {
     case "mark":
       return score.beats.some(
-        (b) => b.kind === "sensor" && b.sensor?.mark === true,
+        (b) => b.kind === "sensor" && (b.sensor?.vulnerable ?? 0) > 0,
       );
     case "damage":
       return score.damage >= step.min;

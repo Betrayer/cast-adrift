@@ -1,5 +1,3 @@
-import type { SlotId } from "@/types/battle";
-
 export interface Rect {
   x: number;
   y: number;
@@ -20,14 +18,11 @@ export interface SubsystemPlacement {
 }
 
 export interface BattleLayout {
+  ship: Rect | null;
   dieSize: number;
-  slotDieSize: number;
-  compactCells: boolean;
   trayRows: number;
   tray: Point[];
   trayBand: Rect;
-  slots: Partial<Record<SlotId, Rect>>;
-  reserve: Rect;
   enemies: Point[];
   enemySize: number;
   enemyPitch: number;
@@ -38,46 +33,27 @@ export interface BattleLayout {
 }
 
 export interface BattleLayoutInput {
-  board: Rect;
+  enemyBand: Rect;
+  trayBand: Rect;
+  dockBand: Rect;
+  shipBand?: Rect | null;
   diceCount: number;
   enemyCount: number;
   maxSubsystems: number;
-  slotIds: readonly SlotId[];
 }
 
-export const SLOT_GRID: Partial<Record<SlotId, { row: number; col: number }>> = {
-  weaponA: { row: 0, col: 0 },
-  weaponB: { row: 0, col: 1 },
-  shieldsB: { row: 0, col: 1 },
-  shields: { row: 1, col: 0 },
-  engines: { row: 1, col: 1 },
-  sensors: { row: 2, col: 0 },
-  spinal: { row: 2, col: 0 },
-  repairBay: { row: 2, col: 0 },
-  reactor: { row: 2, col: 1 },
-};
-
-const MARGIN = 12;
-const GAP = 10;
-const TRAY_ROW_GAP = 8;
+const TRAY_GAP = 8;
 const TRAY_MAX_ROWS = 3;
 const DIE_TAPPABLE = 40;
 const DIE_MAX = 56;
-const DIE_FLOOR = 30;
-const ENEMY_MIN = 34;
-const ENEMY_MAX = 56;
+const DIE_FLOOR = 26;
+const ENEMY_MIN = 30;
+const ENEMY_MAX = 60;
 const ENEMY_HIT_PAD = 6;
-const ENEMY_BAND_SHARE = 0.4;
+const RING_REACH = 0.72;
+const ENEMY_GAP = 10;
 const SUB_CHIP_GAP = 20;
-const RESERVE_H = 46;
-const RESERVE_MIN_H = 30;
-const CELL_H_MAX = 56;
-const CELL_H_EXPAND = 84;
-const CELL_H_MIN = 32;
-const CELL_COMPACT_H = 50;
-const SURPLUS_ABOVE = 0.35;
-const GRID_ROWS = 3;
-const STACK_GAPS = 3 * GAP;
+const INTENT_HEADROOM = 16;
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -96,28 +72,29 @@ const enemyBlockFor = (
 ): EnemyBlock => {
   const radius = clamp(enemySize * 0.34, 12, 18);
   const chipPitch = Math.max(2 * radius + 2, enemySize * 0.7);
-  const sideReach = enemySize / 2 + SUB_CHIP_GAP + radius;
-  const sideFits = subs === 0 || pitch >= sideReach + enemySize / 2 + GAP;
+  const sideReach = enemySize * RING_REACH + SUB_CHIP_GAP + radius;
+  const sideFits =
+    subs === 0 || pitch >= sideReach + enemySize * RING_REACH + ENEMY_GAP;
   const subsystems: SubsystemPlacement = sideFits
     ? {
-        x: enemySize / 2 + SUB_CHIP_GAP,
+        x: enemySize * RING_REACH + SUB_CHIP_GAP,
         y0: -enemySize / 4,
         pitch: chipPitch,
         radius,
       }
     : {
         x: 0,
-        y0: enemySize / 2 + radius + 4,
+        y0: enemySize * RING_REACH + radius + 4,
         pitch: chipPitch,
         radius,
       };
   const lastChipY =
     subs === 0 ? 0 : subsystems.y0 + (subs - 1) * subsystems.pitch;
-  const extentUp = enemySize / 2;
+  const extentUp = enemySize * RING_REACH + INTENT_HEADROOM;
   const extentDown =
     subs === 0
-      ? enemySize / 2
-      : Math.max(enemySize / 2, lastChipY + radius);
+      ? enemySize * RING_REACH
+      : Math.max(enemySize * RING_REACH, lastChipY + radius);
   return {
     extentUp,
     extentDown,
@@ -139,137 +116,105 @@ const rowCountsFor = (diceCount: number, rows: number): number[] => {
 };
 
 const dieSizeFor = (availWidth: number, perRow: number): number =>
-  (availWidth - (perRow - 1) * TRAY_ROW_GAP) / perRow;
+  (availWidth - (perRow - 1) * TRAY_GAP) / perRow;
 
-const trayRowsFor = (availWidth: number, diceCount: number): number => {
+const trayRowsFor = (
+  availWidth: number,
+  availHeight: number,
+  diceCount: number,
+): number => {
   for (let rows = 1; rows <= TRAY_MAX_ROWS; rows += 1) {
     const perRow = Math.ceil(diceCount / rows);
-    if (dieSizeFor(availWidth, perRow) >= DIE_TAPPABLE) return rows;
+    const byWidth = dieSizeFor(availWidth, perRow);
+    const byHeight = (availHeight - (rows - 1) * TRAY_GAP) / rows;
+    if (Math.min(byWidth, byHeight) >= DIE_TAPPABLE) return rows;
   }
-  return TRAY_MAX_ROWS;
+  const byHeightRows = Math.max(
+    1,
+    Math.min(
+      TRAY_MAX_ROWS,
+      Math.floor((availHeight + TRAY_GAP) / (DIE_FLOOR + TRAY_GAP)),
+    ),
+  );
+  return byHeightRows;
 };
 
 export const computeBattleLayout = (
   input: BattleLayoutInput,
 ): BattleLayout => {
-  const { board } = input;
   const diceCount = Math.max(input.diceCount, 1);
   const enemyCount = Math.max(input.enemyCount, 1);
   const subs = Math.max(input.maxSubsystems, 0);
+  const { enemyBand, trayBand, dockBand } = input;
+  const shipBand =
+    input.shipBand !== undefined &&
+    input.shipBand !== null &&
+    input.shipBand.w > 0 &&
+    input.shipBand.h > 0
+      ? input.shipBand
+      : null;
 
-  const availW = Math.max(120, board.w - 2 * MARGIN);
-  const left = board.x + MARGIN;
-  const availH = Math.max(160, board.h - 2 * MARGIN);
-
-  const counts = rowCountsFor(diceCount, trayRowsFor(availW, diceCount));
-  const rowsUsed = counts.length;
-  const widestRow = Math.max(...counts);
-  const dieByWidth = clamp(dieSizeFor(availW, widestRow), DIE_FLOOR, DIE_MAX);
-
-  const naturalTrayH = rowsUsed * dieByWidth + (rowsUsed - 1) * TRAY_ROW_GAP;
-  const minTrayH = rowsUsed * DIE_FLOOR + (rowsUsed - 1) * TRAY_ROW_GAP;
-  const naturalGridH = GRID_ROWS * CELL_H_MAX + (GRID_ROWS - 1) * GAP;
-  const minGridH = GRID_ROWS * CELL_H_MIN + (GRID_ROWS - 1) * GAP;
-
-  const enemyPitch = availW / (enemyCount + 1);
-  const chipReach = subs > 0 ? SUB_CHIP_GAP + 18 : 0;
-  let enemySize = clamp(enemyPitch - chipReach - GAP, ENEMY_MIN, ENEMY_MAX);
-  let block = enemyBlockFor(enemySize, subs, enemyPitch);
-  const minRest = minGridH + minTrayH + RESERVE_MIN_H + STACK_GAPS;
-  const minEnemyH = enemyBlockFor(ENEMY_MIN, subs, enemyPitch).height;
-  const enemyBudget = Math.max(
-    minEnemyH,
-    Math.min(block.height, availH - minRest, availH * ENEMY_BAND_SHARE),
+  const counts = rowCountsFor(
+    diceCount,
+    trayRowsFor(trayBand.w, trayBand.h, diceCount),
   );
-  if (block.height > enemyBudget) {
-    enemySize = Math.max(16, enemySize * (enemyBudget / block.height));
-    block = enemyBlockFor(enemySize, subs, enemyPitch);
-  }
-
-  const room = Math.max(60, availH - block.height - STACK_GAPS);
-  let deficit = naturalGridH + naturalTrayH + RESERVE_H - room;
-  const shrink = (value: number, min: number): number => {
-    if (deficit <= 0) return value;
-    const take = Math.min(deficit, Math.max(0, value - min));
-    deficit -= take;
-    return value - take;
-  };
-
-  let gridH = shrink(naturalGridH, minGridH);
-  let reserveH = shrink(RESERVE_H, RESERVE_MIN_H);
-  let trayH = shrink(naturalTrayH, minTrayH);
-  if (deficit > 0) {
-    const k = room / (gridH + trayH + reserveH);
-    gridH *= k;
-    trayH *= k;
-    reserveH *= k;
-  } else {
-    gridH = Math.min(
-      gridH - deficit,
-      GRID_ROWS * CELL_H_EXPAND + (GRID_ROWS - 1) * GAP,
-    );
-  }
-
+  const rowsUsed = Math.max(1, counts.length);
+  const widestRow = Math.max(1, ...counts);
   const dieSize = clamp(
-    (trayH - (rowsUsed - 1) * TRAY_ROW_GAP) / rowsUsed,
-    4,
-    dieByWidth,
+    Math.min(
+      dieSizeFor(trayBand.w, widestRow),
+      (trayBand.h - (rowsUsed - 1) * TRAY_GAP) / rowsUsed,
+    ),
+    DIE_FLOOR,
+    DIE_MAX,
   );
 
-  const stackH = block.height + trayH + gridH + reserveH + 3 * GAP;
-  let y = board.y + MARGIN + Math.max(0, availH - stackH) * SURPLUS_ABOVE;
-  const enemyCenterY = y + block.extentUp;
-  y += block.height + GAP;
-  const trayTop = y;
-  y += trayH + GAP;
-  const gridTop = y;
-  y += gridH + GAP;
-  const reserveTop = y;
-
+  const trayHeight = rowsUsed * dieSize + (rowsUsed - 1) * TRAY_GAP;
+  const trayTop = trayBand.y + Math.max(0, (trayBand.h - trayHeight) / 2);
   const tray: Point[] = [];
   counts.forEach((count, row) => {
-    const rowWidth = count * dieSize + (count - 1) * TRAY_ROW_GAP;
-    const start = left + (availW - rowWidth) / 2 + dieSize / 2;
-    const centreY = trayTop + dieSize / 2 + row * (dieSize + TRAY_ROW_GAP);
+    const rowWidth = count * dieSize + (count - 1) * TRAY_GAP;
+    const start = trayBand.x + (trayBand.w - rowWidth) / 2 + dieSize / 2;
+    const centreY = trayTop + dieSize / 2 + row * (dieSize + TRAY_GAP);
     for (let i = 0; i < count; i += 1) {
-      tray.push({ x: start + i * (dieSize + TRAY_ROW_GAP), y: centreY });
+      tray.push({ x: start + i * (dieSize + TRAY_GAP), y: centreY });
     }
   });
 
-  const cellW = (availW - GAP) / 2;
-  const cellH = (gridH - (GRID_ROWS - 1) * GAP) / GRID_ROWS;
-  const slots: Partial<Record<SlotId, Rect>> = {};
-  for (const slotId of input.slotIds) {
-    const pos = SLOT_GRID[slotId];
-    if (pos === undefined) continue;
-    slots[slotId] = {
-      x: left + pos.col * (cellW + GAP),
-      y: gridTop + pos.row * (cellH + GAP),
-      w: cellW,
-      h: cellH,
-    };
+  const enemyPitch = enemyBand.w / (enemyCount + 1);
+  const chipReach = subs > 0 ? SUB_CHIP_GAP + 18 : 0;
+  let enemySize = clamp(
+    enemyPitch - chipReach - ENEMY_GAP,
+    ENEMY_MIN,
+    ENEMY_MAX,
+  );
+  let block = enemyBlockFor(enemySize, subs, enemyPitch);
+  if (block.height > enemyBand.h && block.height > 0) {
+    enemySize = Math.max(16, enemySize * (enemyBand.h / block.height));
+    block = enemyBlockFor(enemySize, subs, enemyPitch);
   }
+  const enemyCenterY =
+    enemyBand.y +
+    Math.max(0, (enemyBand.h - block.height) / 2) +
+    block.extentUp;
 
   const enemies: Point[] = Array.from({ length: enemyCount }, (_, i) => ({
-    x: left + (availW * (i + 1)) / (enemyCount + 1),
+    x: enemyBand.x + (enemyBand.w * (i + 1)) / (enemyCount + 1),
     y: enemyCenterY,
   }));
 
-  const trayBottom = trayTop + trayH;
+  const trayBottom = trayTop + trayHeight;
   const tumbleTop = Math.max(
-    board.y + 4,
-    Math.min(enemyCenterY + block.extentDown + 4, trayBottom - dieSize * 2.4),
+    enemyCenterY + block.extentDown + 6,
+    trayBottom - dieSize * 3.2,
   );
 
   return {
+    ship: shipBand,
     dieSize,
-    slotDieSize: clamp(Math.min(dieSize, cellH - 10, cellW * 0.42), 22, DIE_MAX),
-    compactCells: cellH < CELL_COMPACT_H,
     trayRows: rowsUsed,
     tray,
-    trayBand: { x: left, y: trayTop, w: availW, h: trayH },
-    slots,
-    reserve: { x: left, y: reserveTop, w: cellW, h: reserveH },
+    trayBand: { x: trayBand.x, y: trayTop, w: trayBand.w, h: trayHeight },
     enemies,
     enemySize,
     enemyPitch,
@@ -281,14 +226,17 @@ export const computeBattleLayout = (
     },
     subsystems: block.subsystems,
     tumble: {
-      x: left,
-      y: tumbleTop,
-      w: availW,
-      h: trayBottom - tumbleTop,
+      x: trayBand.x,
+      y: Math.min(tumbleTop, trayBottom - dieSize),
+      w: trayBand.w,
+      h: Math.max(dieSize, trayBottom - Math.min(tumbleTop, trayBottom - dieSize)),
     },
-    playerHit: {
-      x: board.x + board.w / 2,
-      y: reserveTop + reserveH / 2,
-    },
+    playerHit:
+      shipBand === null
+        ? {
+            x: dockBand.x + dockBand.w / 2,
+            y: dockBand.y + Math.min(28, dockBand.h / 2),
+          }
+        : { x: shipBand.x + shipBand.w / 2, y: shipBand.y + shipBand.h / 2 },
   };
 };

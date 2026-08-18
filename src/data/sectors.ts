@@ -15,6 +15,7 @@ export interface NodeQuotas {
 
 export interface SectorScaling {
   hpPct: number;
+  dmgPct: number;
   pocketPct: number;
 }
 
@@ -257,7 +258,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [4, 1],
     },
     shape: SHAPES[1],
-    scaling: { hpPct: 0, pocketPct: 20 },
+    scaling: { hpPct: 0, dmgPct: 0, pocketPct: 20 },
     scrapMult: 1,
     beaconId: "beaconKeeperIntro",
   },
@@ -300,7 +301,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [4, 1.4, 0.2],
     },
     shape: SHAPES[2],
-    scaling: { hpPct: 3, pocketPct: 25 },
+    scaling: { hpPct: 3, dmgPct: 10, pocketPct: 25 },
     scrapMult: 1.1,
     beaconId: "fleetBlackbox",
   },
@@ -350,7 +351,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [3.95, 1.8, 0.3],
     },
     shape: SHAPES[3],
-    scaling: { hpPct: 19, pocketPct: 25 },
+    scaling: { hpPct: 19, dmgPct: 44, pocketPct: 25 },
     scrapMult: 1.25,
     beaconId: "choirInvitation",
   },
@@ -399,7 +400,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [3.6, 2.4, 0.7],
     },
     shape: SHAPES[4],
-    scaling: { hpPct: 38, pocketPct: 30 },
+    scaling: { hpPct: 38, dmgPct: 60, pocketPct: 30 },
     scrapMult: 1.2,
     beaconId: "pactSeal",
   },
@@ -454,7 +455,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [2.6, 3.4, 1],
     },
     shape: SHAPES[5],
-    scaling: { hpPct: 126, pocketPct: 30 },
+    scaling: { hpPct: 126, dmgPct: 92, pocketPct: 30 },
     scrapMult: 1.25,
     beaconId: "coreThreshold",
   },
@@ -503,7 +504,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [4, 2, 0.5],
     },
     shape: SHAPES[6],
-    scaling: { hpPct: 138, pocketPct: 30 },
+    scaling: { hpPct: 138, dmgPct: 0, pocketPct: 30 },
     scrapMult: 1.5,
     beaconId: "thresholdBeacon",
   },

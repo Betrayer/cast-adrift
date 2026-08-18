@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} niebieska rezerwa",
       "jamPowerDelta": "{{n}} moc dżemu",
       "growthCapDelta": "{{n}} limit wzrostu",
-      "enginesThresholdDelta": "{{n}} próg silnika",
+      "evasionDelta": "{{n}}% uniku",
       "markBonusDelta": "{{n}} premia za osiągnięcia",
       "battleEndHeal": "{{n}} leczyć / walczyć",
       "hullMaxPct": "{{n}} % maksymalnej wytrzymałości kadłuba",
@@ -391,7 +391,8 @@
     "myRank": "Twoja strona: {{rank}}",
     "noRank": "Na tym forum nie ma jeszcze żadnych wpisów",
     "empty": "Na razie nic tu nie ma.",
-    "depth": "d {{n}}"
+    "depth": "d {{n}}",
+    "offline": "Brak połączenia — tabela nieosiągalna. Wynik zapisany lokalnie."
   },
   "profile": {
     "title": "Profil",

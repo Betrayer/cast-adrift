@@ -211,7 +211,11 @@ describe("black resonance", () => {
     place(snap, "o", "engines");
     const { next } = resolvePlayerPhase(snap);
     expect(next.hull).toBe(29);
-    expect(next.engineState).toBe("dodgePlus");
+    expect(next.evasion).toEqual({
+      dodgePct: 48,
+      glancingPct: 24,
+      intercept: true,
+    });
   });
 
   it("black-4: a min-face black roll maxes the next black die", () => {

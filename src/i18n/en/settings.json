@@ -37,5 +37,92 @@
     "show": "Diagnostics ({{n}})",
     "hide": "Hide diagnostics",
     "clean": "No errors this session."
+  },
+  "account": {
+    "title": "Account",
+    "guest": "Guest",
+    "guestBody": "This profile lives on this device only. Attach Google or an email and it follows you anywhere.",
+    "signedInAs": "Signed in as {{email}}",
+    "telegramProfile": "Telegram profile",
+    "supportId": "Support id {{id}}",
+    "save": "Save my progress",
+    "google": "Continue with Google",
+    "googleLink": "Attach Google",
+    "email": "Use an email",
+    "emailLink": "Attach an email",
+    "signOut": "Sign out",
+    "signOutGuestWarning": "Signing out of a guest profile loses it for good — there is no way back in.",
+    "signOutBody": "You will land on a fresh guest profile. This account keeps everything and opens again on the next sign-in.",
+    "signOutConfirm": "Sign out anyway",
+    "telegramHint": "Attach an email to this Telegram profile and the same account opens on the web.",
+    "telegramGoogleHint": "Google needs a real browser window. The button opens Cast Adrift outside Telegram.",
+    "provider": {
+      "google": "Google",
+      "password": "Email",
+      "telegram": "Telegram"
+    },
+    "form": {
+      "registerTitle": "Create an account",
+      "signInTitle": "Sign in",
+      "resetTitle": "Reset the password",
+      "email": "Email",
+      "password": "Password",
+      "passwordHint": "At least 6 characters.",
+      "submitRegister": "Create",
+      "submitSignIn": "Sign in",
+      "submitReset": "Send the link",
+      "toSignIn": "I already have an account",
+      "toRegister": "I am new here",
+      "toReset": "I forgot the password",
+      "resetSent": "Check the inbox for {{email}}."
+    },
+    "merge": {
+      "title": "Two profiles, one account",
+      "body": "Both sides carry progress. Pick the one to keep — the other is archived, never deleted.",
+      "thisDevice": "This device",
+      "thisAccount": "The account you signed into",
+      "stats": "Level {{level}} · {{shards}} shards · {{runs}} runs",
+      "never": "never played",
+      "recommended": "Newer",
+      "keep": "Keep this one"
+    },
+    "error": {
+      "cancelled": "Sign-in cancelled.",
+      "popupBlocked": "The browser blocked the sign-in window. Allow pop-ups and try again.",
+      "network": "No connection to the server. Progress stays on this device until it is back.",
+      "invalidEmail": "That does not look like an email address.",
+      "weakPassword": "Pick a password of at least 6 characters.",
+      "wrongPassword": "Wrong email or password.",
+      "userNotFound": "No account with that email.",
+      "emailInUse": "That email already has an account. Sign in instead.",
+      "credentialInUse": "That account already exists — signing you into it.",
+      "providerLinked": "Already attached to this profile.",
+      "tooManyRequests": "Too many attempts. Wait a minute and try again.",
+      "recentLoginRequired": "Sign in again to confirm it is you.",
+      "providerDisabled": "This sign-in method is switched off. Write to {{email}}.",
+      "unknown": "Sign-in failed. Try again, and write to {{email}} if it keeps failing."
+    }
+  },
+  "layout": {
+    "title": "Battle interface",
+    "hint": "One battle, three presentations. Switching is safe mid-fight.",
+    "synced": "saved to the account",
+    "active": "Active",
+    "use": "Use",
+    "console": {
+      "name": "Console",
+      "tag": "Slot dock in firing order · permanent action console",
+      "desc": "Cards in a grid, every control always in the same place."
+    },
+    "orbit": {
+      "name": "Orbit",
+      "tag": "Slot pods on an arc around your ship · radial die menu",
+      "desc": "Your ship is on screen and takes the hits; actions open at the die."
+    },
+    "tablet": {
+      "name": "Tablet",
+      "tag": "Slot conveyor with live outputs · turn forecast",
+      "desc": "Every number in one column, the whole turn priced before you end it."
+    }
   }
 }

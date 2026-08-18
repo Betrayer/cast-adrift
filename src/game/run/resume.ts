@@ -1,3 +1,4 @@
+import { now } from "@/services/clock";
 import { loadRunSnapshot, localSavedAt } from "@/services/save";
 import { restoreRunSnapshot, type RunSnapshotV1 } from "@/game/run/snapshot";
 
@@ -33,10 +34,10 @@ export type RelativeWhen =
 
 export const relativeWhen = (
   savedAt: number | null,
-  now = Date.now(),
+  at = now(),
 ): RelativeWhen => {
   if (savedAt === null) return { unit: "now" };
-  const delta = Math.max(0, now - savedAt);
+  const delta = Math.max(0, at - savedAt);
   if (delta < MINUTE) return { unit: "now" };
   if (delta < HOUR) return { unit: "minutes", n: Math.floor(delta / MINUTE) };
   if (delta < DAY) return { unit: "hours", n: Math.floor(delta / HOUR) };

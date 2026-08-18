@@ -37,5 +37,92 @@
     "show": "Diagnósticos ({{n}})",
     "hide": "Ocultar diagnósticos",
     "clean": "No se han producido errores en esta sesión."
+  },
+  "account": {
+    "title": "Cuenta",
+    "guest": "Invitado",
+    "guestBody": "Este perfil vive solo en este dispositivo. Vincula Google o un correo y te seguirá a cualquier parte.",
+    "signedInAs": "Sesión iniciada como {{email}}",
+    "telegramProfile": "Perfil de Telegram",
+    "supportId": "ID de soporte {{id}}",
+    "save": "Guardar mi progreso",
+    "google": "Continuar con Google",
+    "googleLink": "Vincular Google",
+    "email": "Usar un correo",
+    "emailLink": "Vincular un correo",
+    "signOut": "Cerrar sesión",
+    "signOutGuestWarning": "Cerrar la sesión de un perfil de invitado lo pierde para siempre: no hay forma de volver.",
+    "signOutBody": "Aterrizarás en un perfil de invitado nuevo. Esta cuenta conserva todo y se abre otra vez al iniciar sesión.",
+    "signOutConfirm": "Cerrar sesión igualmente",
+    "telegramHint": "Vincula un correo a este perfil de Telegram y la misma cuenta se abrirá en la web.",
+    "telegramGoogleHint": "Google necesita una ventana de navegador real. El botón abre Cast Adrift fuera de Telegram.",
+    "provider": {
+      "google": "Google",
+      "password": "Correo",
+      "telegram": "Telegram"
+    },
+    "form": {
+      "registerTitle": "Crear una cuenta",
+      "signInTitle": "Iniciar sesión",
+      "resetTitle": "Restablecer la contraseña",
+      "email": "Correo",
+      "password": "Contraseña",
+      "passwordHint": "Al menos 6 caracteres.",
+      "submitRegister": "Crear",
+      "submitSignIn": "Iniciar sesión",
+      "submitReset": "Enviar el enlace",
+      "toSignIn": "Ya tengo una cuenta",
+      "toRegister": "Soy nuevo aquí",
+      "toReset": "Olvidé la contraseña",
+      "resetSent": "Revisa la bandeja de {{email}}."
+    },
+    "merge": {
+      "title": "Dos perfiles, una cuenta",
+      "body": "Ambos lados llevan progreso. Elige el que se queda: el otro se archiva, nunca se borra.",
+      "thisDevice": "Este dispositivo",
+      "thisAccount": "La cuenta en la que iniciaste sesión",
+      "stats": "Nivel {{level}} · {{shards}} fragmentos · {{runs}} partidas",
+      "never": "nunca jugó",
+      "recommended": "Más reciente",
+      "keep": "Quedarme con este"
+    },
+    "error": {
+      "cancelled": "Inicio de sesión cancelado.",
+      "popupBlocked": "El navegador bloqueó la ventana de inicio de sesión. Permite las ventanas emergentes e inténtalo otra vez.",
+      "network": "Sin conexión con el servidor. Hasta que vuelva, el progreso se queda en este dispositivo.",
+      "invalidEmail": "Eso no parece una dirección de correo.",
+      "weakPassword": "Elige una contraseña de al menos 6 caracteres.",
+      "wrongPassword": "Correo o contraseña incorrectos.",
+      "userNotFound": "No hay ninguna cuenta con ese correo.",
+      "emailInUse": "Ese correo ya tiene una cuenta. Inicia sesión en su lugar.",
+      "credentialInUse": "Esa cuenta ya existe: te estamos iniciando sesión en ella.",
+      "providerLinked": "Ya está vinculado a este perfil.",
+      "tooManyRequests": "Demasiados intentos. Espera un minuto e inténtalo otra vez.",
+      "recentLoginRequired": "Inicia sesión otra vez para confirmar que eres tú.",
+      "providerDisabled": "Este método de inicio de sesión está desactivado. Escribe a {{email}}.",
+      "unknown": "No se pudo iniciar sesión. Inténtalo otra vez y escribe a {{email}} si sigue fallando."
+    }
+  },
+  "layout": {
+    "title": "Interfaz de combate",
+    "hint": "Un combate, tres presentaciones. Cambiar es seguro incluso en plena pelea.",
+    "synced": "guardado en la cuenta",
+    "active": "Activo",
+    "use": "Usar",
+    "console": {
+      "name": "Consola",
+      "tag": "Muelle de ranuras en orden de disparo · consola de acciones permanente",
+      "desc": "Tarjetas en cuadrícula, cada control siempre en el mismo sitio."
+    },
+    "orbit": {
+      "name": "Órbita",
+      "tag": "Cápsulas de ranura en arco alrededor de tu nave · menú radial junto al dado",
+      "desc": "Tu nave está en pantalla y recibe los golpes; las acciones se abren junto al dado."
+    },
+    "tablet": {
+      "name": "Tableta",
+      "tag": "Cinta de ranuras con salida en vivo · pronóstico del turno",
+      "desc": "Todos los números en una columna, el turno entero calculado antes de terminarlo."
+    }
   }
 }

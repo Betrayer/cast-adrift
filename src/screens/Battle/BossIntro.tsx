@@ -74,7 +74,12 @@ export const BossIntro = () => {
             </div>
           </Stack>
         ) : null}
-        <Button size="md" color="accent" onClick={dismissIntro}>
+        <Button
+          size="md"
+          color="accent"
+          data-testid="boss-intro-begin"
+          onClick={dismissIntro}
+        >
           {t('battle:intro.begin')}
         </Button>
       </Stack>

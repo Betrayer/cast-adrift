@@ -9,25 +9,37 @@ export const STATUS_KEYS: readonly StatusKey[] = [
   "charge",
 ];
 
+export const MARK_DEFAULT_MAGNITUDE = 2;
+
 export const applyStatus = (
   statuses: Statuses,
   key: StatusKey,
-  amount = 1,
+  amount?: number,
 ): void => {
   if (key === "burn") {
-    statuses.burn = (statuses.burn ?? 0) + amount;
+    statuses.burn = (statuses.burn ?? 0) + (amount ?? 1);
+    return;
+  }
+  if (key === "mark") {
+    const magnitude = Math.max(1, amount ?? MARK_DEFAULT_MAGNITUDE);
+    statuses.mark = Math.max(statuses.mark ?? 0, magnitude);
     return;
   }
   statuses[key] = 1;
 };
 
+export const markMagnitude = (statuses: Statuses): number => statuses.mark ?? 0;
+
+export const clearMark = (statuses: Statuses): void => {
+  delete statuses.mark;
+};
+
 export const consumeStatus = (
   statuses: Statuses,
-  key: Exclude<StatusKey, "burn">,
+  key: Exclude<StatusKey, "burn" | "mark">,
 ): boolean => {
   if (statuses[key] === undefined) return false;
-  if (key === "mark") delete statuses.mark;
-  else if (key === "jam") delete statuses.jam;
+  if (key === "jam") delete statuses.jam;
   else delete statuses.charge;
   return true;
 };

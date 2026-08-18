@@ -509,6 +509,7 @@ const MapView = ({ map, position }: MapViewProps) => {
         disabled={!canJump}
         onClick={onJump}
         data-coach="jump"
+        data-testid="map-jump"
       >
         {t("run:map.jump")}
       </Button>
@@ -521,6 +522,7 @@ const MapView = ({ map, position }: MapViewProps) => {
         size="compact-xs"
         variant="subtle"
         color="gray"
+        data-testid="map-abandon"
         onClick={abandonRun}
       >
         {t("run:map.abandon")}
@@ -595,6 +597,9 @@ const MapView = ({ map, position }: MapViewProps) => {
               <g
                 key={node.id}
                 data-node={node.id}
+                data-testid={`map-node-${node.id}`}
+                data-node-type={node.type}
+                data-node-legal={legal ? '1' : '0'}
                 data-causality={
                   node.inverted === true
                     ? "inverted"

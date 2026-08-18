@@ -37,5 +37,92 @@
     "show": "Diagnostics ({{n}})",
     "hide": "Masquer les diagnostics",
     "clean": "Aucune erreur n'a été détectée au cours de cette session."
+  },
+  "account": {
+    "title": "Compte",
+    "guest": "Invité",
+    "guestBody": "Ce profil ne vit que sur cet appareil. Associe Google ou une adresse e-mail et il te suivra partout.",
+    "signedInAs": "Connecté en tant que {{email}}",
+    "telegramProfile": "Profil Telegram",
+    "supportId": "Identifiant support {{id}}",
+    "save": "Sauvegarder ma progression",
+    "google": "Continuer avec Google",
+    "googleLink": "Associer Google",
+    "email": "Utiliser une adresse e-mail",
+    "emailLink": "Associer une adresse e-mail",
+    "signOut": "Se déconnecter",
+    "signOutGuestWarning": "Se déconnecter d’un profil invité le perd définitivement — aucun retour possible.",
+    "signOutBody": "Tu atterriras sur un nouveau profil invité. Ce compte garde tout et se rouvrira à la prochaine connexion.",
+    "signOutConfirm": "Se déconnecter quand même",
+    "telegramHint": "Associe une adresse e-mail à ce profil Telegram et le même compte s’ouvrira sur le web.",
+    "telegramGoogleHint": "Google exige une vraie fenêtre de navigateur. Le bouton ouvre Cast Adrift en dehors de Telegram.",
+    "provider": {
+      "google": "Google",
+      "password": "E-mail",
+      "telegram": "Telegram"
+    },
+    "form": {
+      "registerTitle": "Créer un compte",
+      "signInTitle": "Connexion",
+      "resetTitle": "Réinitialiser le mot de passe",
+      "email": "E-mail",
+      "password": "Mot de passe",
+      "passwordHint": "Au moins 6 caractères.",
+      "submitRegister": "Créer",
+      "submitSignIn": "Se connecter",
+      "submitReset": "Envoyer le lien",
+      "toSignIn": "J’ai déjà un compte",
+      "toRegister": "Je suis nouveau ici",
+      "toReset": "J’ai oublié le mot de passe",
+      "resetSent": "Regarde la boîte de {{email}}."
+    },
+    "merge": {
+      "title": "Deux profils, un compte",
+      "body": "Les deux côtés portent de la progression. Choisis celui à garder — l’autre est archivé, jamais supprimé.",
+      "thisDevice": "Cet appareil",
+      "thisAccount": "Le compte auquel tu viens de te connecter",
+      "stats": "Niveau {{level}} · {{shards}} éclats · {{runs}} parties",
+      "never": "jamais joué",
+      "recommended": "Plus récent",
+      "keep": "Garder celui-ci"
+    },
+    "error": {
+      "cancelled": "Connexion annulée.",
+      "popupBlocked": "Le navigateur a bloqué la fenêtre de connexion. Autorise les pop-ups et réessaie.",
+      "network": "Pas de connexion au serveur. En attendant, la progression reste sur cet appareil.",
+      "invalidEmail": "Cela ne ressemble pas à une adresse e-mail.",
+      "weakPassword": "Choisis un mot de passe d’au moins 6 caractères.",
+      "wrongPassword": "E-mail ou mot de passe incorrect.",
+      "userNotFound": "Aucun compte avec cette adresse.",
+      "emailInUse": "Cette adresse a déjà un compte. Connecte-toi plutôt.",
+      "credentialInUse": "Ce compte existe déjà — connexion en cours.",
+      "providerLinked": "Déjà associé à ce profil.",
+      "tooManyRequests": "Trop de tentatives. Attends une minute et réessaie.",
+      "recentLoginRequired": "Reconnecte-toi pour confirmer que c’est bien toi.",
+      "providerDisabled": "Ce mode de connexion est désactivé. Écris à {{email}}.",
+      "unknown": "La connexion a échoué. Réessaie, et écris à {{email}} si cela persiste."
+    }
+  },
+  "layout": {
+    "title": "Interface de combat",
+    "hint": "Un combat, trois présentations. Changer en plein combat ne pose aucun problème.",
+    "synced": "enregistré sur le compte",
+    "active": "Actif",
+    "use": "Utiliser",
+    "console": {
+      "name": "Console",
+      "tag": "Dock de slots dans l'ordre de tir · console d'actions permanente",
+      "desc": "Des cartes en grille, chaque commande toujours au même endroit."
+    },
+    "orbit": {
+      "name": "Orbite",
+      "tag": "Capsules de slots en arc autour du vaisseau · menu radial près du dé",
+      "desc": "Ton vaisseau est à l'écran et encaisse les coups ; les actions s'ouvrent près du dé."
+    },
+    "tablet": {
+      "name": "Tablette",
+      "tag": "Convoyeur de slots avec sortie en direct · prévision du tour",
+      "desc": "Tous les chiffres dans une colonne, le tour entier chiffré avant de le finir."
+    }
   }
 }

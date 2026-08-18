@@ -257,8 +257,7 @@
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Zurück zum Menü",
-    "replayDone": "Zurück zu den „Kodex“"
+    "leave": "Zurück zum Menü"
   },
   "interstitial": {
     "sector": "Branchen{{n}}",
@@ -312,24 +311,52 @@
     "next": "Weiter",
     "skipAll": "Alle überspringen",
     "place": {
-      "title": "Ziehe einen Würfel in ein System",
-      "body": "Würfle und ziehe dann die Würfel aus dem Fach auf die Felder „Waffen“, „Schilde“, „Triebwerke“, „Sensoren“ oder „Reaktor“. Ein Würfel passt niemals in ein Feld, dessen Oberkante unterhalb seiner Augenzahl liegt."
+      "title": "Schick einen Würfel in ein System",
+      "body": "Tippe einen Würfel an, dann eine leuchtende Systemkarte — oder zieh ihn dorthin. Jede Karte zeigt vorab, was der Würfel bewirkt, und er passt nie in eine Karte, deren Kappe unter seiner Seite liegt."
     },
     "endTurn": {
-      "title": "Die Kurve meistern",
-      "body": "Wenn das Spielfeld so aussieht, wie du es dir vorstellst, beende den Zug. Die Systeme feuern von oben nach unten, dann antwortet der Gegner."
+      "title": "Runde auflösen",
+      "body": "Wenn das Brett passt, beende die Runde. Die Systeme feuern in der Reihenfolge der Nummern auf ihren Karten, dann antwortet der Gegner."
     },
     "reroll": {
       "title": "Einmal kann man kostenlos neu würfeln",
       "body": "Wähle beliebige Würfel aus, die sich noch in der Schale befinden, und würfle sie erneut. Wiederholwürfe werden nicht von einer Runde in die nächste übertragen – ein nicht genutzter Wiederholwurf verfällt."
     },
     "nudge": {
-      "title": "Investition sorgt für Präzision",
-      "body": "Wähle einen Würfel aus und gib eine Ladung aus, um seine Augenzahl um eins nach oben oder unten zu verschieben. Mit Ladungen kannst du auch zusätzliche Würfe und „Surges“ bezahlen."
+      "title": "Charge buys precision",
+      "body": "Select a die, then use − and + on the console to move its face by one. Charge pays for it; a free nudge spends nothing."
     },
     "jump": {
       "title": "Wählen Sie den nächsten Knoten aus",
       "body": "Tippe auf einen beleuchteten Knoten und wähle dann „Springen“. Nebel verdeckt die vor dir liegenden Reihen; Sensoren und Tiefenscans verschieben den Horizont weiter nach vorne."
+    },
+    "targeting": {
+      "title": "Pick what you are shooting at",
+      "body": "Tap an enemy to make it the target. Weapons, marks and pierce all land on the target — subsystems are targeted the same way."
+    },
+    "reserve": {
+      "title": "Keep a die for next turn",
+      "body": "A reserved die skips the reroll and comes back with its face intact. Use it to hold a number the board cannot spend yet."
+    },
+    "actives": {
+      "title": "Some dice do more than sit",
+      "body": "A die with an active can flip, copy, bank or split. The row lights up only for the actives your tray can currently pay for."
+    },
+    "resonance": {
+      "title": "Schools reward company",
+      "body": "The chips count how many dice of each school the battle holds. Cross a threshold and the whole school gains a bonus for the fight."
+    },
+    "affinity": {
+      "title": "The bonus is the slot",
+      "body": "A school placed in its own system adds to the face before anything else reads it. That is the sum on the card, and it is free."
+    },
+    "prismatic": {
+      "title": "Prismatic counts as anything",
+      "body": "A prismatic die satisfies any school, and in a slot it inherits that slot’s affinity — bonus included. It also counts for resonance."
+    },
+    "fate": {
+      "title": "Fate is one roll, once",
+      "body": "The Fate die never enters a slot. One press, one roll per battle, and the table reads out what it gave you."
     }
   },
   "motif": {

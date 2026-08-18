@@ -1,9 +1,11 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { ACHIEVEMENT_BY_ID } from '@/data/achievements';
 import { playSfx } from '@/services/audio';
+import { SUPPORT_EMAIL } from '@/services/support';
 import { haptic } from '@/services/tma';
+import { useAppStore } from '@/stores/appStore';
 import { useNarrativeStore } from '@/stores/narrativeStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import styles from './ToastHost.module.css';
@@ -11,6 +13,8 @@ import styles from './ToastHost.module.css';
 const CONSEQUENCE_MS = 4000;
 const BARK_MS = 3500;
 const ACHIEVEMENT_MS = 4500;
+const AUTH_MS = 6000;
+const HINT_MS = 7000;
 
 const QueueDots = ({ count }: { count: number }) => {
   if (count <= 0) return null;
@@ -128,6 +132,67 @@ const AchievementSlot = () => {
   );
 };
 
+const AuthSlot = () => {
+  const { t } = useTranslation(['settings']);
+  const error = useAppStore((s) => s.authError);
+  const screen = useAppStore((s) => s.screen);
+  const [dismissed, setDismissed] = useState<string | null>(null);
+  const visible = error !== null && error !== dismissed && screen !== 'settings';
+
+  useEffect(() => {
+    if (!visible) return;
+    const id = window.setTimeout(() => {
+      setDismissed(error);
+    }, AUTH_MS);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [visible, error]);
+
+  if (!visible) return <div className={styles.slot} />;
+  return (
+    <div className={styles.slot}>
+      <div
+        role="status"
+        data-toast="auth"
+        className={`${styles.toast ?? ''} ${styles.auth ?? ''}`}
+      >
+        {t(`settings:account.error.${error ?? 'unknown'}`, {
+          email: SUPPORT_EMAIL,
+        })}
+      </div>
+    </div>
+  );
+};
+
+const HintSlot = () => {
+  const { t } = useTranslation(['battle']);
+  const hint = useNarrativeStore((s) => s.hint);
+  const dismiss = useNarrativeStore((s) => s.dismissHint);
+
+  useEffect(() => {
+    if (hint === null) return;
+    const id = window.setTimeout(dismiss, HINT_MS);
+    return () => {
+      window.clearTimeout(id);
+    };
+  }, [hint, dismiss]);
+
+  if (hint === null) return <div className={styles.slot} />;
+  return (
+    <div className={styles.slot}>
+      <div
+        role="status"
+        data-toast="hint"
+        onClick={dismiss}
+        className={`${styles.toast ?? ''} ${styles.hint ?? ''}`}
+      >
+        {t(hint.line)}
+      </div>
+    </div>
+  );
+};
+
 const JournalTick = () => {
   const entries = useNarrativeStore((s) => s.journal.length);
   const previous = useRef(entries);
@@ -146,6 +211,8 @@ export const ToastHost = () => {
     <div className={styles.host} data-toast-host>
       <JournalTick />
       <ConsequenceSlot />
+      <AuthSlot />
+      <HintSlot />
       <AchievementSlot />
       <BarkSlot />
     </div>,

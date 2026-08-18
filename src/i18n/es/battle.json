@@ -11,16 +11,15 @@
   "defeat": "Derrota",
   "toMenu": "Ir al menú",
   "hp": "HP {{hp}} / {{max}}",
-  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Reserva",
   "reroll": "Reroll ({{n}})",
   "rerollConfirm": "Volver a jugar a «{{k}}» / {{size}}",
   "rerollCancel": "Cancelar",
   "rerollHint": "Toca hasta un{{size}}es de dados para volver a tirar",
-  "buyReroll": "+1 tirada de repetición (5⚡)",
-  "surge": "Pico de tensión (10⚡)",
-  "nudgeMinus": "−1 (3⚡)",
-  "nudgePlus": "+1 (3⚡)",
+  "buyReroll": "+1 dado de tirada ({{n}}⚡)",
+  "surge": "Sobrecarga ({{n}}⚡)",
+  "nudgeMinus": "−1 ({{n}}⚡)",
+  "nudgePlus": "+1 ({{n}}⚡)",
   "nudgeFree": "−1 (gratis)",
   "nudgeFreePlus": "+1 (gratis)",
   "flip": "Dar la vuelta",
@@ -30,6 +29,7 @@
   "collect": "Recoger",
   "lootNew": "Nueva matriz",
   "jam": "JAM",
+  "pierce": "BRECHA {{n}}",
   "school": {
     "red": "Rojo",
     "blue": "Azul",
@@ -39,8 +39,6 @@
     "grey": "Gris",
     "prismatic": "Prisma"
   },
-  "resChip": "{{school}} {{count}}/{{next}}",
-  "resChipFull": "{{school}} {{count}}",
   "shipyard": "astillero (depuración)",
   "status": {
     "burn": "B",
@@ -86,7 +84,14 @@
     "sensors": "Sensores",
     "reactor": "Reactor",
     "repairBay": "Taller de reparaciones",
-    "cap": "cap ≤ d {{cap}} · Mk {{mk}}"
+    "cap": "cap ≤ d {{cap}} · Mk {{mk}}",
+    "evasion": "esquiva {{dodge}}% · roce {{glancing}}%",
+    "affinity": "{{school}} +{{n}}",
+    "affinityMult": "{{school}} ×{{n}}",
+    "capShrunk": "tope ≤ d{{cap}} ▽ · Mk{{mk}}",
+    "inherits": "aquí: {{school}} +{{n}}",
+    "inheritsMult": "aquí: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Minijefazo",
@@ -95,7 +100,6 @@
     "begin": "Empezar",
     "hull": "Casco {{n}}"
   },
-  "scriptHint": "Prólogo: en este turno solo se puede utilizar «{{slots}}».",
   "fate": "Tirada de destino",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Intercambio",
@@ -117,8 +121,87 @@
   "enemyWard": "Distrito: {{school}}",
   "enemyGate": "Puerta {{n}}",
   "enemyRage": "Rage y{{n}}",
+  "enemyVulnerable": "Vulnerable +{{n}}",
   "inverted": "PEDIDO INVERTIDO",
-  "invertedHint": "Primero el reactor, luego los sensores.",
+  "invertedHint": "La tarjeta 1 dispara la última y la 6 la primera: los números se invierten con el orden.",
   "storm": "TORMENTA DE PROBABILIDADES",
-  "stormHint": "Las tiradas de un dado colocado se repiten antes de que se resuelva nada."
+  "stormHint": "Las tiradas de un dado colocado se repiten antes de que se resuelva nada.",
+  "reserveCap": "{{n}}/{{max}}",
+  "close": "Cerrar",
+  "pickDie": "Elige un dado para ver su ficha",
+  "dieFaces": "{{min}}–{{max}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "targetBody": "Apuntar al casco",
+  "targetSub": "{{name}} {{hp}}/{{max}}",
+  "mitigation": "bruto {{raw}} → ~{{expected}} · escudo {{shield}} · casco {{hull}}",
+  "mitigationNone": "Esta intención no hace daño",
+  "forecast": "harás {{out}} · recibirás ~{{inc}} (el escudo aguanta {{shield}})",
+  "forecastClear": "{{out}} de daño despeja el campo",
+  "resBoard": "{{school}} {{placed}}+{{tray}}",
+  "resDetail": "mazo {{deck}} · colocados {{placed}} · bandeja {{tray}} · reserva {{reserved}}",
+  "schoolShort": {
+    "red": "roj",
+    "blue": "azu",
+    "green": "ver",
+    "grey": "gri",
+    "black": "neg"
+  },
+  "proj": {
+    "jam": "ATASCA",
+    "mark": "Vulnerable +{{n}}",
+    "markPierce": "Vulnerable +{{n}} · brecha",
+    "charge": "+{{n}}⚡",
+    "heal": "+{{n}}♥",
+    "shield": "+{{n}} escudo",
+    "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
+    "damage": "{{n}} de daño",
+    "damageSum": "{{value}} = {{base}}+{{bonus}}",
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+  },
+  "block": {
+    "resolving": "Espera a que se resuelva el turno",
+    "rerollMode": "Termina la tirada primero",
+    "noSelection": "Elige un dado primero",
+    "notInTray": "Ese dado no está en la bandeja",
+    "noCharge": "No hay carga suficiente",
+    "noRerolls": "No quedan tiradas este turno",
+    "atFloor": "Ya es la cara más baja",
+    "atCeiling": "Ya es la cara más alta",
+    "reserveFull": "La reserva está llena",
+    "used": "Ya usado este turno",
+    "hullLow": "Casco demasiado bajo"
+  },
+  "resPrism": "un dado prismático cuenta para esta escuela",
+  "badge": {
+    "fate": "Dado del Destino",
+    "active": "Tiene una activa",
+    "engraved": "Grabado",
+    "growth": "Crece en la cara máxima",
+    "faces": "Caras no estándar"
+  },
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "layoutHint": "¿Prefieres otra interfaz de combate? Ajustes → Interfaz de combate.",
+  "forecastStrip": "infliges ~{{out}} · recibes {{hull}}",
+  "forecastBreak": "ataque {{raw}} − evasión {{evade}} − escudo {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

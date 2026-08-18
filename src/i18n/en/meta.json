@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} blue reserve",
       "jamPowerDelta": "{{n}} jam power",
       "growthCapDelta": "{{n}} growth cap",
-      "enginesThresholdDelta": "{{n}} engine threshold",
+      "evasionDelta": "{{n}}% dodge",
       "markBonusDelta": "{{n}} mark bonus",
       "battleEndHeal": "{{n}} heal / battle",
       "hullMaxPct": "{{n}}% max hull",
@@ -391,7 +391,8 @@
     "myRank": "Your place: {{rank}}",
     "noRank": "No entry on this board yet",
     "empty": "Nothing here yet.",
-    "depth": "d{{n}}"
+    "depth": "d{{n}}",
+    "offline": "Offline — the board could not be reached. Your score is saved locally."
   },
   "profile": {
     "title": "Profile",

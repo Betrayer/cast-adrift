@@ -11,16 +11,15 @@
   "defeat": "Defeat",
   "toMenu": "To menu",
   "hp": "HP {{hp}}/{{max}}",
-  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Reserve",
   "reroll": "Reroll ({{n}})",
   "rerollConfirm": "Reroll {{k}}/{{size}}",
   "rerollCancel": "Cancel",
   "rerollHint": "Tap up to {{size}} dice to reroll",
-  "buyReroll": "+1 reroll die (5⚡)",
-  "surge": "Surge (10⚡)",
-  "nudgeMinus": "−1 (3⚡)",
-  "nudgePlus": "+1 (3⚡)",
+  "buyReroll": "+1 reroll die ({{n}}⚡)",
+  "surge": "Surge ({{n}}⚡)",
+  "nudgeMinus": "−1 ({{n}}⚡)",
+  "nudgePlus": "+1 ({{n}}⚡)",
   "nudgeFree": "−1 (free)",
   "nudgeFreePlus": "+1 (free)",
   "flip": "Flip",
@@ -30,6 +29,7 @@
   "collect": "Collect",
   "lootNew": "New die",
   "jam": "JAM",
+  "pierce": "BREACH {{n}}",
   "school": {
     "red": "Red",
     "blue": "Blue",
@@ -39,8 +39,6 @@
     "grey": "Grey",
     "prismatic": "Prism"
   },
-  "resChip": "{{school}} {{count}}/{{next}}",
-  "resChipFull": "{{school}} {{count}}",
   "shipyard": "shipyard (debug)",
   "status": {
     "burn": "B",
@@ -86,7 +84,14 @@
     "sensors": "Sensors",
     "reactor": "Reactor",
     "repairBay": "Repair Bay",
-    "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "dodge {{dodge}}% · glancing {{glancing}}%",
+    "affinity": "{{school}} +{{n}}",
+    "affinityMult": "{{school}} ×{{n}}",
+    "capShrunk": "cap ≤ d{{cap}} ▽ · Mk{{mk}}",
+    "inherits": "here: {{school}} +{{n}}",
+    "inheritsMult": "here: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -95,7 +100,6 @@
     "begin": "Begin",
     "hull": "Hull {{n}}"
   },
-  "scriptHint": "Prologue: only {{slots}} may be used this turn.",
   "fate": "Roll Fate",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Swap",
@@ -117,8 +121,87 @@
   "enemyWard": "Ward: {{school}}",
   "enemyGate": "Gate {{n}}",
   "enemyRage": "Rage +{{n}}",
+  "enemyVulnerable": "Vulnerable +{{n}}",
   "inverted": "INVERTED ORDER",
-  "invertedHint": "Reactor first, Sensors last.",
+  "invertedHint": "Card 1 fires last, card 6 first — the numbers flip with the order.",
   "storm": "PROBABILITY STORM",
-  "stormHint": "One placed die re-rolls before anything resolves."
+  "stormHint": "One placed die re-rolls before anything resolves.",
+  "reserveCap": "{{n}}/{{max}}",
+  "close": "Close",
+  "pickDie": "Pick a die to read its card",
+  "dieFaces": "{{min}}–{{max}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "targetBody": "Target the hull",
+  "targetSub": "{{name}} {{hp}}/{{max}}",
+  "mitigation": "raw {{raw}} → ~{{expected}} · shield {{shield}} · hull {{hull}}",
+  "mitigationNone": "No damage from this intent",
+  "forecast": "you deal {{out}} · you take ~{{inc}} (shield holds {{shield}})",
+  "forecastClear": "{{out}} damage clears the field",
+  "resBoard": "{{school}} {{placed}}+{{tray}}",
+  "resDetail": "deck {{deck}} · placed {{placed}} · tray {{tray}} · reserved {{reserved}}",
+  "schoolShort": {
+    "red": "red",
+    "blue": "blue",
+    "green": "grn",
+    "grey": "gry",
+    "black": "blk"
+  },
+  "proj": {
+    "jam": "JAMS",
+    "mark": "Vulnerable +{{n}}",
+    "markPierce": "Vulnerable +{{n}} · breach",
+    "charge": "+{{n}}⚡",
+    "heal": "+{{n}}♥",
+    "shield": "+{{n}} shield",
+    "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
+    "damage": "{{n}} dmg",
+    "damageSum": "{{value}} = {{base}}+{{bonus}}",
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+  },
+  "block": {
+    "resolving": "Wait for the turn to resolve",
+    "rerollMode": "Finish the reroll first",
+    "noSelection": "Pick a die first",
+    "notInTray": "That die is not in the tray",
+    "noCharge": "Not enough charge",
+    "noRerolls": "No rerolls left this turn",
+    "atFloor": "Already at the lowest face",
+    "atCeiling": "Already at the highest face",
+    "reserveFull": "Reserve is full",
+    "used": "Already used this turn",
+    "hullLow": "Hull is too low"
+  },
+  "resPrism": "a prismatic die counts toward this school",
+  "badge": {
+    "fate": "Fate die",
+    "active": "Has an active",
+    "engraved": "Engraved",
+    "growth": "Grows on a max face",
+    "faces": "Non-standard faces"
+  },
+  "layoutHint": "Prefer another battle layout? Settings → Battle interface.",
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "forecastStrip": "you deal ~{{out}} · you take {{hull}}",
+  "forecastBreak": "attack {{raw}} − evasion {{evade}} − shield {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

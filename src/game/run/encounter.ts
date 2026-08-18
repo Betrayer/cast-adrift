@@ -174,6 +174,9 @@ export const sectorHpPct = (ctx: EnemyScaleContext = {}): number => {
   return scaling.hpPct + (ctx.pocket === true ? scaling.pocketPct : 0);
 };
 
+export const sectorDmgPct = (ctx: EnemyScaleContext = {}): number =>
+  sectorDef(ctx.sector ?? 1).scaling.dmgPct;
+
 export interface EnemyScale {
   tide?: number;
   sectorHpPct?: number;

@@ -1,6 +1,7 @@
 import type {
   DieTier,
   Intent,
+  LocKey,
   School,
   SlotId,
   SubsystemAura,
@@ -77,7 +78,11 @@ export type BattlePhase = "idle" | "placement" | "resolving" | "ended";
 
 export type BattleOutcome = "victory" | "defeat";
 
-export type EngineTier = "brace" | "dodge" | "dodgePlus";
+export interface EvasionState {
+  dodgePct: number;
+  glancingPct: number;
+  intercept: boolean;
+}
 
 export interface NextTurnMods {
   weapons?: number;
@@ -127,10 +132,9 @@ export interface BattleSnapshot {
   slots: Partial<Record<SlotId, SlotState>>;
   enemies: EnemyState[];
   targetId: string | null;
-  engineState: EngineTier | null;
+  evasion: EvasionState | null;
   nextTurnMods: NextTurnMods;
   nextRollBonus: number;
-  pendingDeepScan: boolean;
   chargeCap: number;
   sacrificePool: number;
   bloodReactorUsed: boolean;
@@ -149,6 +153,7 @@ export interface BattleSnapshot {
   pendingStorm: number;
   ascension: number;
   sectorHpPct: number;
+  sectorDmgPct: number;
   enemyHpPct: number;
   inverted?: boolean;
   nodeStorm?: boolean;
@@ -169,17 +174,17 @@ export type BeatKind =
   | "storm";
 
 export interface SensorResult {
-  mark: boolean;
-  jam: boolean;
-  deepScan: boolean;
+  vulnerable: number;
+  pierce: number;
 }
 
 export interface Beat {
   slot: SlotId;
   kind: BeatKind;
   amount: number;
+  value?: number;
   targetId?: string;
-  engineTier?: EngineTier;
+  evasion?: EvasionState;
   sensor?: SensorResult;
   overflowHull?: number;
   after: BattleSnapshot;
@@ -219,6 +224,8 @@ export interface EnemyBeat {
   amount: number;
   hullDamage: number;
   shieldDamage: number;
+  dodged?: number;
+  glanced?: number;
   slot?: SlotId;
   dieUid?: string;
   after: BattleSnapshot;
@@ -229,4 +236,21 @@ export interface ResolutionBundle {
   enemyBeats: EnemyBeat[];
   final: BattleSnapshot;
   finalPhase: Extract<BattlePhase, "placement" | "ended">;
+}
+
+export interface CheckMove {
+  uid: string;
+  slot: SlotId;
+}
+
+export interface CheckStep {
+  id: string;
+  moves: readonly CheckMove[] | null;
+  fixedRoll: readonly number[] | null;
+  enemyIntent?: Intent;
+  setCharge?: number;
+  grantFreeNudge?: number;
+  defenseRolls?: readonly number[];
+  sayKey: LocKey;
+  failKey: LocKey | null;
 }

@@ -12,6 +12,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
+import { now } from '@/services/clock';
 import {
   ASCENSIONS,
   ascensionMods,
@@ -110,7 +111,7 @@ export const RunSetupScreen = () => {
             fullWidth
             color="accent"
             onClick={() => {
-              startRun(Date.now() >>> 0, ascension);
+              startRun(now() >>> 0, ascension);
             }}
           >
             {t('run:setup.launch')}

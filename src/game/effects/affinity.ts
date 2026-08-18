@@ -14,12 +14,8 @@ const applyAffinity = (scope: ResolveScope, school: School): void => {
   if (!slotInAffinity(scope.slotId, aff.slot)) return;
   const mkIndex = scope.slot.mk - 1;
   switch (aff.kind) {
-    case "weaponBonus":
-    case "shieldBonus":
+    case "valueBonus":
       scope.value += aff.values[mkIndex] ?? 0;
-      return;
-    case "thresholdBonus":
-      scope.thresholdBonus += aff.values[mkIndex] ?? 0;
       return;
     case "chargeMult":
       scope.chargeMult *= aff.mult;

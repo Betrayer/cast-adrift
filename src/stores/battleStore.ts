@@ -29,7 +29,6 @@ import {
 } from "@/game/battle/resolver";
 import {
   buildBattleSnapshot,
-  canPlaceDie,
   createEnemyStream,
   DEFAULT_CHARGE_CAP,
   type ResonanceBoost,
@@ -47,6 +46,17 @@ import {
   type StreamStates,
 } from "@/services/rng";
 import { computeRunMods, runHasTrait } from "@/game/run/runMods";
+import {
+  checkEndTurnBlocked,
+  checkMovesNow,
+  currentCheckStep,
+  placeBlockFor,
+} from "@/game/battle/view";
+import {
+  noteCheckFinished,
+  noteCheckSkipped,
+  noteCheckStep,
+} from "@/game/onboarding";
 import { applyActions, BattleCtx, buildSources, emit } from "@/game/effects";
 import type {
   ExceedCapGrant,
@@ -62,10 +72,11 @@ import type {
   BattleSnapshot,
   Beat,
   BlockedSlot,
+  CheckStep,
   CursedDie,
   EnemyBeat,
   EnemyState,
-  EngineTier,
+  EvasionState,
   LockedDie,
   NextTurnMods,
   ResonanceCensus,
@@ -95,6 +106,7 @@ export interface BattleEncounter {
   rerollSizeBonus?: number;
   ascension?: number;
   sectorHpPct?: number;
+  sectorDmgPct?: number;
   enemyHpBonusPct?: number;
   eliteShield?: number;
   resonanceBoost?: ResonanceBoost;
@@ -103,7 +115,8 @@ export interface BattleEncounter {
   inverted?: boolean;
   nodeStorm?: boolean;
   forcedTraits?: readonly PerkTrait[];
-  scriptedSlots?: readonly (readonly SlotId[])[];
+  checkSteps?: readonly CheckStep[];
+  checkSandbox?: boolean;
 }
 
 export interface BattleValues {
@@ -119,6 +132,7 @@ export interface BattleValues {
   runScrap: number;
   tide: number;
   sectorHpPct: number;
+  sectorDmgPct: number;
   enemyHpPct: number;
   interference: number;
   perks: string[];
@@ -150,10 +164,9 @@ export interface BattleValues {
   swapSourceUid: string | null;
   enemies: EnemyState[];
   targetId: string | null;
-  engineState: EngineTier | null;
+  evasion: EvasionState | null;
   nextTurnMods: NextTurnMods;
   nextRollBonus: number;
-  pendingDeepScan: boolean;
   blockedSlots: BlockedSlot[];
   shrunkSlots: BlockedSlot[];
   lockedDice: LockedDie[];
@@ -178,7 +191,10 @@ export interface BattleValues {
   spentGrants: string[];
   introPending: boolean;
   introEnemyId: string | null;
-  scriptedSlots: SlotId[][] | null;
+  checkSteps: CheckStep[] | null;
+  checkIndex: number;
+  checkSandbox: boolean;
+  lastBlock: BlockNotice | null;
   outcome?: BattleOutcome;
   resolution: ResolutionBundle | null;
   beats: Beat[];
@@ -205,6 +221,9 @@ export interface BattleState extends BattleValues {
     streams: RngStreams,
   ) => void;
   placeDie: (uid: string, slotId: SlotId) => void;
+  noteBlock: (key: string | null) => void;
+  skipCheck: () => void;
+  restartCheckStep: () => void;
   unplaceDie: (uid: string) => void;
   reserveDie: (uid: string) => void;
   unreserveDie: (uid: string) => void;
@@ -255,6 +274,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   runCounters: {},
   exceedCap: [],
   sectorHpPct: 0,
+  sectorDmgPct: 0,
   enemyHpPct: 0,
   scheduled: [],
   grants: {},
@@ -275,10 +295,9 @@ export const createInitialBattleValues = (): BattleValues => ({
   selectedDieUid: null,
   enemies: [],
   targetId: null,
-  engineState: null,
+  evasion: null,
   nextTurnMods: {},
   nextRollBonus: 0,
-  pendingDeepScan: false,
   blockedSlots: [],
   shrunkSlots: [],
   lockedDice: [],
@@ -304,7 +323,10 @@ export const createInitialBattleValues = (): BattleValues => ({
   spentGrants: [],
   introPending: false,
   introEnemyId: null,
-  scriptedSlots: null,
+  checkSteps: null,
+  checkIndex: 0,
+  checkSandbox: false,
+  lastBlock: null,
   outcome: undefined,
   resolution: null,
   beats: [],
@@ -323,7 +345,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   debugNextRoll: null,
 });
 
-export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
+export const battleSnapshot = (s: BattleSnapshot): BattleSnapshot => ({
   turn: s.turn,
   hull: s.hull,
   hullMax: s.hullMax,
@@ -354,10 +376,9 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   slots: s.slots,
   enemies: s.enemies,
   targetId: s.targetId,
-  engineState: s.engineState,
+  evasion: s.evasion,
   nextTurnMods: s.nextTurnMods,
   nextRollBonus: s.nextRollBonus,
-  pendingDeepScan: s.pendingDeepScan,
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
@@ -372,6 +393,7 @@ export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
   pendingStorm: s.pendingStorm,
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
+  sectorDmgPct: s.sectorDmgPct,
   enemyHpPct: s.enemyHpPct,
   inverted: s.inverted,
   nodeStorm: s.nodeStorm,
@@ -411,10 +433,9 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   slots: snap.slots,
   enemies: snap.enemies,
   targetId: snap.targetId,
-  engineState: snap.engineState,
+  evasion: snap.evasion,
   nextTurnMods: snap.nextTurnMods,
   nextRollBonus: snap.nextRollBonus,
-  pendingDeepScan: snap.pendingDeepScan,
   blockedSlots: snap.blockedSlots,
   shrunkSlots: snap.shrunkSlots,
   lockedDice: snap.lockedDice,
@@ -429,6 +450,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pendingStorm: snap.pendingStorm,
   ascension: snap.ascension,
   sectorHpPct: snap.sectorHpPct,
+  sectorDmgPct: snap.sectorDmgPct,
   enemyHpPct: snap.enemyHpPct,
   inverted: snap.inverted === true,
   nodeStorm: snap.nodeStorm === true,
@@ -442,6 +464,18 @@ const syncSnapshotFlags = (snapshot: BattleSnapshot, ctx: BattleCtx): void => {
   if (ctx.flags.size === (snapshot.flags?.length ?? 0)) return;
   snapshot.flags = [...ctx.flags];
 };
+
+export interface BlockNotice {
+  key: string;
+  slotId: SlotId | null;
+  seq: number;
+}
+
+const noticeOf = (
+  prev: BlockNotice | null,
+  key: string,
+  slotId: SlotId | null,
+): BlockNotice => ({ key, slotId, seq: prev === null ? 1 : prev.seq + 1 });
 
 const applyDebugRoll = (
   dice: RolledDie[],
@@ -459,20 +493,51 @@ const applyDebugRoll = (
     };
   });
 
-export const allowedSlotsForTurn = (
-  scriptedSlots: readonly (readonly SlotId[])[] | null,
-  turn: number,
-): readonly SlotId[] | null => {
-  if (scriptedSlots === null) return null;
-  return scriptedSlots[turn - 1] ?? null;
+const applyCheckStep = (
+  snapshot: BattleSnapshot,
+  step: CheckStep,
+): BattleSnapshot => {
+  const carried = new Set(
+    snapshot.dice
+      .filter((d) => d.state === "reserved" || d.state === "locked")
+      .map((d) => d.uid),
+  );
+  const dice =
+    step.fixedRoll === null
+      ? snapshot.dice
+      : applyDebugRoll(snapshot.dice, [...step.fixedRoll], carried);
+  const intent = step.enemyIntent;
+  const enemies =
+    intent === undefined
+      ? snapshot.enemies
+      : snapshot.enemies.map((e, i) =>
+          i === 0 ? { ...e, nextIntent: intent } : e,
+        );
+  const charge =
+    step.setCharge === undefined
+      ? snapshot.charge
+      : Math.max(0, Math.min(snapshot.chargeCap, step.setCharge));
+  return { ...snapshot, dice, enemies, charge };
 };
 
-const slotAllowedThisTurn = (
-  s: Pick<BattleValues, "scriptedSlots" | "turn">,
-  slotId: SlotId,
-): boolean => {
-  const allowed = allowedSlotsForTurn(s.scriptedSlots, s.turn);
-  return allowed === null || allowed.includes(slotId);
+const scriptedDefense = (
+  rolls: readonly number[],
+  fallback: RngStream,
+): RngStream => {
+  let index = 0;
+  return {
+    next: fallback.next,
+    int: (min, max) => {
+      const pinned = rolls[index];
+      index += 1;
+      if (pinned === undefined) return fallback.int(min, max);
+      return Math.min(max, Math.max(min, pinned));
+    },
+    pick: fallback.pick,
+    weighted: fallback.weighted,
+    shuffle: fallback.shuffle,
+    state: fallback.state,
+  };
 };
 
 interface TurnTally {
@@ -569,6 +634,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         chargeCap: encounter.chargeCap,
         ascension: encounter.ascension,
         sectorHpPct: encounter.sectorHpPct,
+        sectorDmgPct: encounter.sectorDmgPct,
         enemyHpBonusPct: encounter.enemyHpBonusPct,
         eliteShield: encounter.eliteShield,
         resonanceBoost: encounter.resonanceBoost,
@@ -608,6 +674,14 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         snapshot.charge + (encounter.startCharge ?? 0) + setCharge,
       ),
     );
+    const steps = encounter.checkSteps ?? null;
+    const firstStep = steps?.[0];
+    if (firstStep !== undefined) {
+      const seeded = applyCheckStep(snapshot, firstStep);
+      snapshot.dice = seeded.dice;
+      snapshot.enemies = seeded.enemies;
+      snapshot.charge = seeded.charge;
+    }
     const grants = grantsOf(snapshot);
     const rerollBase =
       grants.rerollBase + mods.rerollSizeDelta + (encounter.rerollSizeBonus ?? 0);
@@ -617,10 +691,9 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       phase: "placement",
       introPending: introEnemy !== undefined,
       introEnemyId: introEnemy?.defId ?? null,
-      scriptedSlots:
-        encounter.scriptedSlots === undefined
-          ? null
-          : encounter.scriptedSlots.map((row) => [...row]),
+      checkSteps: steps === null ? null : steps.map((step) => ({ ...step })),
+      checkIndex: 0,
+      checkSandbox: encounter.checkSandbox === true,
       shipId,
       chartPicks: [...chartPicks],
       mutators: [...(encounter.mutators ?? [])],
@@ -635,7 +708,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       rerollSize: rerollBase,
       rerollBase,
       reserveCap: grants.reserveCap + mods.reserveDelta,
-      freeNudges: grants.freeNudges,
+      freeNudges: grants.freeNudges + (firstStep?.grantFreeNudge ?? 0),
       streams,
       enemyStream,
     });
@@ -648,8 +721,15 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
   placeDie: (uid, slotId) => {
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
-      if (!slotAllowedThisTurn(s, slotId)) return s;
-      if (!canPlaceDie(battleSnapshot(s), uid, slotId)) return s;
+      const block = placeBlockFor(s, uid, slotId);
+      if (block !== null) {
+        const step = currentCheckStep(s);
+        const key =
+          block === "notAllowed" && step?.failKey != null
+            ? step.failKey
+            : `battle:block.${block}`;
+        return { lastBlock: noticeOf(s.lastBlock, key, slotId) };
+      }
       const slot = s.slots[slotId];
       if (slot === undefined) return s;
       const die = s.dice.find((d) => d.uid === uid);
@@ -674,6 +754,33 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     });
   },
 
+  noteBlock: (key) => {
+    set((s) => {
+      if (key === null) return s.lastBlock === null ? s : { lastBlock: null };
+      return { lastBlock: noticeOf(s.lastBlock, key, null) };
+    });
+  },
+
+  skipCheck: () => {
+    const before = get();
+    if (before.checkSteps === null) return;
+    set({ checkSteps: null, checkIndex: 0, lastBlock: null });
+    if (!before.checkSandbox) noteCheckSkipped(before.checkIndex);
+    noteCheckFinished(before.checkSandbox, true);
+  },
+
+  restartCheckStep: () => {
+    set((s) => {
+      const step = s.checkSteps?.[s.checkIndex];
+      if (step === undefined || s.phase !== "placement") return s;
+      return {
+        ...fromSnapshot(applyCheckStep(battleSnapshot(s), step)),
+        lastBlock: null,
+        selectedDieUid: null,
+      };
+    });
+  },
+
   unplaceDie: (uid) => {
     set((s) => {
       if (s.phase !== "placement") return s;
@@ -694,6 +801,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
   reserveDie: (uid) => {
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
+      if (checkMovesNow(s) !== null) return s;
       const die = s.dice.find((d) => d.uid === uid);
       if (die?.state !== "tray") return s;
       const reserved = s.dice.filter((d) => d.state === "reserved").length;
@@ -1048,11 +1156,15 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const s = get();
     if (s.phase !== "placement" || s.streams === null || s.enemyStream === null)
       return;
+    if (checkEndTurnBlocked(s)) return;
+    const scripted = checkMovesNow(s) !== null;
     const placed = s.dice.filter((d) => d.state === "placed");
-    const blackUsed =
-      s.blackUsed + placed.filter((d) => d.school === "black").length;
-    const blueUsed =
-      s.blueUsed + placed.filter((d) => d.school === "blue").length;
+    const blackUsed = scripted
+      ? s.blackUsed
+      : s.blackUsed + placed.filter((d) => d.school === "black").length;
+    const blueUsed = scripted
+      ? s.blueUsed
+      : s.blueUsed + placed.filter((d) => d.school === "blue").length;
     const player = resolvePlayerPhase(battleSnapshot(s), s.streams.dice);
     let bundle: ResolutionBundle;
     if (player.next.outcome !== undefined) {
@@ -1063,7 +1175,12 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         finalPhase: "ended",
       };
     } else {
-      const enemy = resolveEnemyPhase(player.next, s.enemyStream);
+      const step = currentCheckStep(s);
+      const defense =
+        step?.defenseRolls === undefined
+          ? s.streams.defense
+          : scriptedDefense(step.defenseRolls, s.streams.defense);
+      const enemy = resolveEnemyPhase(player.next, s.enemyStream, defense);
       if (enemy.next.outcome !== undefined) {
         bundle = {
           beats: player.beats,
@@ -1084,6 +1201,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
             dice: applyDebugRoll(final.dice, s.debugNextRoll, carried),
           };
         }
+        const nextStep = s.checkSteps?.[s.checkIndex + 1];
+        if (nextStep !== undefined) final = applyCheckStep(final, nextStep);
         bundle = {
           beats: player.beats,
           enemyBeats: enemy.beats,
@@ -1109,6 +1228,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       rerollMode: false,
       rerollSelection: [],
       selectedDieUid: null,
+      lastBlock: null,
       debugNextRoll: null,
     });
   },
@@ -1124,9 +1244,6 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const s = get();
     if (s.phase !== "resolving" || s.resolution === null) return;
     const { final, finalPhase } = s.resolution;
-    if (final.pendingDeepScan) {
-      useRunStore.setState({ pendingDeepScan: true });
-    }
     const run = useRunStore.getState();
     for (const key of final.flags ?? []) {
       if (run.flags[key] === undefined) run.setFlag(key);
@@ -1143,14 +1260,33 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       0,
       computeRunMods(s.perks, s.chartPicks, s.modules).extraRerolls,
     );
+    const steps = s.checkSteps;
+    const advanced =
+      steps === null || finalPhase !== "placement"
+        ? s.checkIndex
+        : s.checkIndex + 1;
+    const checkDone = steps !== null && advanced >= steps.length;
     set({
       ...fromSnapshot(final),
-      pendingDeepScan: false,
       phase: finalPhase,
       resolution: null,
       rerollsLeft: canReroll ? 1 + extra + (final.grants?.rerollUses ?? 0) : 0,
       rerollSize: s.rerollBase,
+      checkSteps: checkDone ? null : steps,
+      checkIndex: checkDone ? 0 : advanced,
+      freeNudges:
+        steps === null || checkDone
+          ? s.freeNudges
+          : (steps[advanced]?.grantFreeNudge ?? s.freeNudges),
+      lastBlock: null,
     });
+    if (steps !== null && advanced !== s.checkIndex && !s.checkSandbox) {
+      const done = steps[s.checkIndex];
+      if (done !== undefined) noteCheckStep(s.checkIndex, done.id);
+    }
+    if (steps !== null && (checkDone || finalPhase === "ended")) {
+      noteCheckFinished(s.checkSandbox, false);
+    }
   },
 
   reset: () => {
@@ -1160,7 +1296,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
 
 export type BattleSaveValues = Omit<
   BattleValues,
-  "streams" | "enemyStream" | "debugNextRoll"
+  "streams" | "enemyStream" | "debugNextRoll" | "lastBlock"
 >;
 
 export interface BattleSaveState {
@@ -1210,10 +1346,9 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   selectedDieUid: s.selectedDieUid,
   enemies: s.enemies,
   targetId: s.targetId,
-  engineState: s.engineState,
+  evasion: s.evasion,
   nextTurnMods: s.nextTurnMods,
   nextRollBonus: s.nextRollBonus,
-  pendingDeepScan: s.pendingDeepScan,
   blockedSlots: s.blockedSlots,
   shrunkSlots: s.shrunkSlots,
   lockedDice: s.lockedDice,
@@ -1229,6 +1364,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   swapSourceUid: s.swapSourceUid,
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
+  sectorDmgPct: s.sectorDmgPct,
   enemyHpPct: s.enemyHpPct,
   inverted: s.inverted,
   nodeStorm: s.nodeStorm,
@@ -1241,7 +1377,9 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   spentGrants: s.spentGrants,
   introPending: s.introPending,
   introEnemyId: s.introEnemyId,
-  scriptedSlots: s.scriptedSlots,
+  checkSteps: s.checkSteps,
+  checkIndex: s.checkIndex,
+  checkSandbox: s.checkSandbox,
   outcome: s.outcome,
   resolution: s.resolution,
   beats: s.beats,

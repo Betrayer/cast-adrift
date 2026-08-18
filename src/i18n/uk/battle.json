@@ -11,16 +11,15 @@
   "defeat": "Поразка",
   "toMenu": "У меню",
   "hp": "HP {{hp}}/{{max}}",
-  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Резерв",
   "reroll": "Перекид ({{n}})",
   "rerollConfirm": "Перекинути {{k}}/{{size}}",
   "rerollCancel": "Скасувати",
   "rerollHint": "Обери до {{size}} кубів для перекиду",
-  "buyReroll": "+1 куб перекиду (5⚡)",
-  "surge": "Сплеск (10⚡)",
-  "nudgeMinus": "−1 (3⚡)",
-  "nudgePlus": "+1 (3⚡)",
+  "buyReroll": "+1 куб перекиду ({{n}}⚡)",
+  "surge": "Сплеск ({{n}}⚡)",
+  "nudgeMinus": "−1 ({{n}}⚡)",
+  "nudgePlus": "+1 ({{n}}⚡)",
   "nudgeFree": "−1 (безкоштовно)",
   "nudgeFreePlus": "+1 (безкоштовно)",
   "flip": "Переворот",
@@ -30,6 +29,7 @@
   "collect": "Забрати",
   "lootNew": "Новий кубик",
   "jam": "КЛИН",
+  "pierce": "ПРОБІЙ {{n}}",
   "school": {
     "red": "Черв.",
     "blue": "Син.",
@@ -39,8 +39,6 @@
     "grey": "Сір.",
     "prismatic": "Призм."
   },
-  "resChip": "{{school}} {{count}}/{{next}}",
-  "resChipFull": "{{school}} {{count}}",
   "shipyard": "верф (налагодження)",
   "status": {
     "burn": "B",
@@ -86,7 +84,14 @@
     "sensors": "Сенсори",
     "reactor": "Реактор",
     "repairBay": "Ремонтний відсік",
-    "cap": "кап ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "кап ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "ухилення {{dodge}}% · ковзання {{glancing}}%",
+    "affinity": "{{school}} +{{n}}",
+    "affinityMult": "{{school}} ×{{n}}",
+    "capShrunk": "кап ≤ d{{cap}} ▽ · Mk{{mk}}",
+    "inherits": "тут: {{school}} +{{n}}",
+    "inheritsMult": "тут: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Міні-бос",
@@ -95,7 +100,6 @@
     "begin": "Почати",
     "hull": "Корпус {{n}}"
   },
-  "scriptHint": "Пролог: цього ходу доступно лише {{slots}}.",
   "fate": "Кинути Фатум",
   "fateResult": "Фатум {{roll}} — {{text}}",
   "swap": "Обмін",
@@ -117,8 +121,87 @@
   "enemyWard": "Захист: {{school}}",
   "enemyGate": "Заслін {{n}}",
   "enemyRage": "Лють +{{n}}",
+  "enemyVulnerable": "Вразливий +{{n}}",
   "inverted": "ПОРЯДОК ПЕРЕВЕРНУТО",
-  "invertedHint": "Спершу реактор, сенсори останніми.",
+  "invertedHint": "Картка 1 спрацює останньою, картка 6 — першою: номери перевернулися разом із порядком.",
   "storm": "ІМОВІРНІСНИЙ ШТОРМ",
-  "stormHint": "Одна розміщена кістка перекидається до розвʼязання."
+  "stormHint": "Одна розміщена кістка перекидається до розвʼязання.",
+  "reserveCap": "{{n}}/{{max}}",
+  "close": "Закрити",
+  "pickDie": "Обери кість — покажу її картку",
+  "dieFaces": "{{min}}–{{max}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "targetBody": "Ціль — корпус",
+  "targetSub": "{{name}} {{hp}}/{{max}}",
+  "mitigation": "сирий {{raw}} → ~{{expected}} · щит {{shield}} · корпус {{hull}}",
+  "mitigationNone": "Цей намір не завдає шкоди",
+  "forecast": "завдаси {{out}} · отримаєш ~{{inc}} (щит тримає {{shield}})",
+  "forecastClear": "{{out}} шкоди — поле чисте",
+  "resBoard": "{{school}} {{placed}}+{{tray}}",
+  "resDetail": "колода {{deck}} · у слотах {{placed}} · у лотку {{tray}} · у резерві {{reserved}}",
+  "schoolShort": {
+    "red": "чрв",
+    "blue": "син",
+    "green": "зел",
+    "grey": "сір",
+    "black": "чор"
+  },
+  "proj": {
+    "jam": "КЛИН",
+    "mark": "Вразливий +{{n}}",
+    "markPierce": "Вразливий +{{n}} · пробій",
+    "charge": "+{{n}}⚡",
+    "heal": "+{{n}}♥",
+    "shield": "+{{n}} щита",
+    "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
+    "damage": "{{n}} шкоди",
+    "damageSum": "{{value}} = {{base}}+{{bonus}}",
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+  },
+  "block": {
+    "resolving": "Зачекай, поки хід розв’яжеться",
+    "rerollMode": "Спершу заверши перекид",
+    "noSelection": "Спершу обери кість",
+    "notInTray": "Ця кість не в лотку",
+    "noCharge": "Бракує заряду",
+    "noRerolls": "Перекидів на хід не лишилося",
+    "atFloor": "Уже найменша грань",
+    "atCeiling": "Уже найбільша грань",
+    "reserveFull": "Резерв заповнено",
+    "used": "Уже використано цього ходу",
+    "hullLow": "Замало корпусу"
+  },
+  "resPrism": "призматична кість рахується за цю школу",
+  "badge": {
+    "fate": "Кість Фатуму",
+    "active": "Є актив",
+    "engraved": "З гравіруванням",
+    "growth": "Росте на максимумі",
+    "faces": "Нестандартні грані"
+  },
+  "layoutHint": "Хочеш інший вигляд бою? Налаштування → Бойовий інтерфейс.",
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "forecastStrip": "завдаси ~{{out}} · отримаєш {{hull}}",
+  "forecastBreak": "атака {{raw}} − ухилення {{evade}} − щит {{shield}}",
+  "check": {
+    "step": "Перевірка систем {{cur}}/{{max}}",
+    "skip": "Пропустити перевірку"
+  }
 }

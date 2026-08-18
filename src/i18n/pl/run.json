@@ -257,8 +257,7 @@
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Powrót do menu",
-    "replayDone": "Powrót do „Kodeks”"
+    "leave": "Powrót do menu"
   },
   "interstitial": {
     "sector": "Sektor{{n}}",
@@ -312,24 +311,52 @@
     "next": "Dalej",
     "skipAll": "Pomiń wszystko",
     "place": {
-      "title": "Przeciągnij kostkę do systemu",
-      "body": "Rzuć kostką, a następnie przeciągnij ją z tacki na pola „Broń”, „Tarcze”, „Silniki”, „Czujniki” lub „Reaktor”. Kostka nigdy nie zmieści się w polu, którego limit jest niższy od jej wartości."
+      "title": "Wyślij kość do systemu",
+      "body": "Dotknij kości, potem podświetlonej karty systemu — albo przeciągnij ją tam. Każda karta pokazuje wynik przed zatwierdzeniem, a kość nigdy nie wejdzie na kartę, której limit jest niższy od jej ściany."
     },
     "endTurn": {
-      "title": "Rozstrzygnij ruch",
-      "body": "Gdy układ na planszy będzie taki, jak chcesz, zakończ turę. Systemy strzelają od góry do dołu, a następnie odpowiada przeciwnik."
+      "title": "Rozlicz turę",
+      "body": "Gdy plansza wygląda jak trzeba, zakończ turę. Systemy odpalają w kolejności numerów na kartach, potem odpowiada wróg."
     },
     "reroll": {
       "title": "Dodatkowe próby są dostępne raz za darmo",
       "body": "Wybierz dowolną kostkę, która nadal znajduje się w tacki, i rzuć nią ponownie. Powtórne rzuty nie przechodzą na kolejną turę — niewykorzystany rzut przepada."
     },
     "nudge": {
-      "title": "Za opłatą zyskujesz precyzję",
-      "body": "Wybierz kostkę i wykorzystaj punkty mocy, aby zmienić wynik na jednej ściance o jeden w górę lub w dół. Punkty mocy pozwalają również na dodatkowe rzuty oraz wzmocnienia."
+      "title": "Charge buys precision",
+      "body": "Select a die, then use − and + on the console to move its face by one. Charge pays for it; a free nudge spends nothing."
     },
     "jump": {
       "title": "Wybierz następny węzeł",
       "body": "Dotknij podświetlonego węzła, a następnie wybierz opcję „Skok”. Mgła zasłania kolejne rzędy; czujniki i szczegółowe skanowanie poszerzają horyzont."
+    },
+    "targeting": {
+      "title": "Pick what you are shooting at",
+      "body": "Tap an enemy to make it the target. Weapons, marks and pierce all land on the target — subsystems are targeted the same way."
+    },
+    "reserve": {
+      "title": "Keep a die for next turn",
+      "body": "A reserved die skips the reroll and comes back with its face intact. Use it to hold a number the board cannot spend yet."
+    },
+    "actives": {
+      "title": "Some dice do more than sit",
+      "body": "A die with an active can flip, copy, bank or split. The row lights up only for the actives your tray can currently pay for."
+    },
+    "resonance": {
+      "title": "Schools reward company",
+      "body": "The chips count how many dice of each school the battle holds. Cross a threshold and the whole school gains a bonus for the fight."
+    },
+    "affinity": {
+      "title": "The bonus is the slot",
+      "body": "A school placed in its own system adds to the face before anything else reads it. That is the sum on the card, and it is free."
+    },
+    "prismatic": {
+      "title": "Prismatic counts as anything",
+      "body": "A prismatic die satisfies any school, and in a slot it inherits that slot’s affinity — bonus included. It also counts for resonance."
+    },
+    "fate": {
+      "title": "Fate is one roll, once",
+      "body": "The Fate die never enters a slot. One press, one roll per battle, and the table reads out what it gave you."
     }
   },
   "motif": {

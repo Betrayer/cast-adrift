@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} reserva azul",
       "jamPowerDelta": "{{n}} potencia de la mermelada",
       "growthCapDelta": "{{n}} límite de crecimiento",
-      "enginesThresholdDelta": "{{n}} umbral del motor",
+      "evasionDelta": "{{n}}% de esquiva",
       "markBonusDelta": "{{n}} bonificación por puntuación",
       "battleEndHeal": "{{n}} curar / luchar",
       "hullMaxPct": "{{n}} % del casco máximo",
@@ -391,7 +391,8 @@
     "myRank": "Tu página: {{rank}}",
     "noRank": "Aún no hay ninguna entrada en este foro",
     "empty": "De momento no hay nada aquí.",
-    "depth": "d {{n}}"
+    "depth": "d {{n}}",
+    "offline": "Sin conexión: no se pudo acceder a la tabla. Tu puntuación está guardada en local."
   },
   "profile": {
     "title": "Perfil",

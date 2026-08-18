@@ -37,5 +37,92 @@
     "show": "Diagnostik ({{n}})",
     "hide": "Diagnose ausblenden",
     "clean": "In dieser Sitzung sind keine Fehler aufgetreten."
+  },
+  "account": {
+    "title": "Konto",
+    "guest": "Gast",
+    "guestBody": "Dieses Profil lebt nur auf diesem Gerät. Verknüpfe Google oder eine E-Mail, und es folgt dir überall hin.",
+    "signedInAs": "Angemeldet als {{email}}",
+    "telegramProfile": "Telegram-Profil",
+    "supportId": "Support-ID {{id}}",
+    "save": "Fortschritt sichern",
+    "google": "Mit Google fortfahren",
+    "googleLink": "Google verknüpfen",
+    "email": "E-Mail verwenden",
+    "emailLink": "E-Mail verknüpfen",
+    "signOut": "Abmelden",
+    "signOutGuestWarning": "Wer sich aus einem Gastprofil abmeldet, verliert es endgültig — es gibt keinen Weg zurück.",
+    "signOutBody": "Du landest in einem neuen Gastprofil. Dieses Konto behält alles und öffnet sich bei der nächsten Anmeldung wieder.",
+    "signOutConfirm": "Trotzdem abmelden",
+    "telegramHint": "Verknüpfe eine E-Mail mit diesem Telegram-Profil, und dasselbe Konto öffnet sich im Web.",
+    "telegramGoogleHint": "Google braucht ein echtes Browserfenster. Die Schaltfläche öffnet Cast Adrift außerhalb von Telegram.",
+    "provider": {
+      "google": "Google",
+      "password": "E-Mail",
+      "telegram": "Telegram"
+    },
+    "form": {
+      "registerTitle": "Konto erstellen",
+      "signInTitle": "Anmelden",
+      "resetTitle": "Passwort zurücksetzen",
+      "email": "E-Mail",
+      "password": "Passwort",
+      "passwordHint": "Mindestens 6 Zeichen.",
+      "submitRegister": "Erstellen",
+      "submitSignIn": "Anmelden",
+      "submitReset": "Link senden",
+      "toSignIn": "Ich habe schon ein Konto",
+      "toRegister": "Ich bin neu hier",
+      "toReset": "Ich habe das Passwort vergessen",
+      "resetSent": "Sieh im Postfach von {{email}} nach."
+    },
+    "merge": {
+      "title": "Zwei Profile, ein Konto",
+      "body": "Beide Seiten tragen Fortschritt. Wähle, welches bleibt — das andere wird archiviert, nie gelöscht.",
+      "thisDevice": "Dieses Gerät",
+      "thisAccount": "Das Konto, in das du dich angemeldet hast",
+      "stats": "Stufe {{level}} · {{shards}} Splitter · {{runs}} Läufe",
+      "never": "nie gespielt",
+      "recommended": "Neuer",
+      "keep": "Dieses behalten"
+    },
+    "error": {
+      "cancelled": "Anmeldung abgebrochen.",
+      "popupBlocked": "Der Browser hat das Anmeldefenster blockiert. Erlaube Pop-ups und versuche es erneut.",
+      "network": "Keine Verbindung zum Server. Bis sie zurück ist, bleibt der Fortschritt auf diesem Gerät.",
+      "invalidEmail": "Das sieht nicht nach einer E-Mail-Adresse aus.",
+      "weakPassword": "Wähle ein Passwort mit mindestens 6 Zeichen.",
+      "wrongPassword": "Falsche E-Mail oder falsches Passwort.",
+      "userNotFound": "Kein Konto mit dieser E-Mail.",
+      "emailInUse": "Für diese E-Mail gibt es schon ein Konto. Melde dich stattdessen an.",
+      "credentialInUse": "Dieses Konto existiert bereits — du wirst angemeldet.",
+      "providerLinked": "Bereits mit diesem Profil verknüpft.",
+      "tooManyRequests": "Zu viele Versuche. Warte eine Minute und versuche es erneut.",
+      "recentLoginRequired": "Melde dich erneut an, um zu bestätigen, dass es du bist.",
+      "providerDisabled": "Diese Anmeldeart ist abgeschaltet. Schreib an {{email}}.",
+      "unknown": "Anmeldung fehlgeschlagen. Versuche es erneut und schreib an {{email}}, wenn es dabei bleibt."
+    }
+  },
+  "layout": {
+    "title": "Kampfoberfläche",
+    "hint": "Ein Kampf, drei Darstellungen. Umschalten ist auch mitten im Gefecht sicher.",
+    "synced": "im Konto gespeichert",
+    "active": "Aktiv",
+    "use": "Wählen",
+    "console": {
+      "name": "Pult",
+      "tag": "Slot-Dock in Feuerreihenfolge · dauerhaftes Aktionspult",
+      "desc": "Karten im Raster, jede Schaltfläche immer am selben Platz."
+    },
+    "orbit": {
+      "name": "Orbit",
+      "tag": "Slot-Kapseln im Bogen um dein Schiff · Radialmenü am Würfel",
+      "desc": "Dein Schiff steht auf dem Schirm und nimmt die Treffer; Aktionen öffnen am Würfel."
+    },
+    "tablet": {
+      "name": "Tablet",
+      "tag": "Slot-Förderband mit Live-Ausgabe · Zugvorhersage",
+      "desc": "Alle Zahlen in einer Spalte, der ganze Zug ausgerechnet, bevor du ihn beendest."
+    }
   }
 }

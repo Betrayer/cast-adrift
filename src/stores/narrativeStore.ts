@@ -20,6 +20,11 @@ export interface AchievementToast {
   achievement: string;
 }
 
+export interface HintToast {
+  id: number;
+  line: LocKey;
+}
+
 export interface NarrativeState {
   consequence: ConsequenceToast | null;
   consequenceQueue: ConsequenceToast[];
@@ -27,12 +32,14 @@ export interface NarrativeState {
   barkQueue: BarkToast[];
   achievement: AchievementToast | null;
   achievementQueue: AchievementToast[];
+  hint: HintToast | null;
   journal: JournalEntry[];
   memoryQueue: number[];
   seq: number;
   pushConsequence: (origin: LocKey) => void;
   pushBark: (line: LocKey) => void;
   pushAchievement: (achievement: string) => void;
+  pushHint: (line: LocKey) => void;
   pushJournal: (entry: JournalBody & { sector: number }) => void;
   pushMemory: (order: number) => void;
   dismissMemory: () => void;
@@ -40,6 +47,7 @@ export interface NarrativeState {
   dismissConsequence: () => void;
   dismissBark: () => void;
   dismissAchievement: () => void;
+  dismissHint: () => void;
   reset: () => void;
 }
 
@@ -50,6 +58,7 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
   barkQueue: [],
   achievement: null,
   achievementQueue: [],
+  hint: null,
   journal: [],
   memoryQueue: [],
   seq: 0,
@@ -84,6 +93,12 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
     });
   },
 
+  pushHint: (line) => {
+    set((s) =>
+      s.hint === null ? { hint: { id: s.seq + 1, line }, seq: s.seq + 1 } : s,
+    );
+  },
+
   pushJournal: (entry) => {
     set((s) => {
       const id = s.seq + 1;
@@ -111,6 +126,10 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
       journal: [...entries].slice(-JOURNAL_CAP),
       seq: Math.max(s.seq, ...entries.map((e) => e.id), 0),
     }));
+  },
+
+  dismissHint: () => {
+    set({ hint: null });
   },
 
   dismissConsequence: () => {
@@ -142,6 +161,7 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
       barkQueue: [],
       achievement: null,
       achievementQueue: [],
+      hint: null,
       journal: [],
       memoryQueue: [],
     });

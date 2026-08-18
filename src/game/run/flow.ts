@@ -8,9 +8,15 @@ import { computeMutatorMods } from "@/data/mutators";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { beaconsResolved } from "@/data/events/beacons";
 import { sealFinalMemory, syncMemoryArc } from "@/game/narrative/memoryArc";
-import { PROLOGUE_ENEMY, PROLOGUE_SCRIPT } from "@/data/narrative/prologue";
+import {
+  CHECK_DECK,
+  CHECK_ENEMY_HP_PCT,
+  PROLOGUE_ENEMY,
+  SYSTEMS_CHECK,
+} from "@/data/narrative/prologue";
 import { SECTOR_COUNT, SECTORS, sectorDef } from "@/data/sectors";
 import { shipHullMax } from "@/game/battle/setup";
+import { beginCheckFunnel } from "@/game/onboarding";
 import { chartSlotTierDelta } from "@/game/chart/engine";
 import {
   computeNodeReward,
@@ -30,6 +36,7 @@ import { pushRunCloud } from "@/game/run/cloud";
 import {
   buildEncounterIds,
   pickBoss,
+  sectorDmgPct,
   sectorHpPct,
 } from "@/game/run/encounter";
 import { applyEdgeMotifs, applyNodeMotifs } from "@/game/run/motifs";
@@ -76,6 +83,7 @@ import {
 import { useSummaryStore } from "@/stores/summaryStore";
 import { captureRunSnapshot } from "@/game/run/snapshot";
 import { trackEvent } from "@/services/analytics";
+import { now } from "@/services/clock";
 import { createStream, createStreams, deriveSeed } from "@/services/rng";
 import { clearRun, saveRunSnapshot } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
@@ -323,6 +331,7 @@ const encounterInit = (pocket: boolean) => {
   return {
     ascension: s.ascension,
     sectorHpPct: sectorHpPct({ sector: s.sector, pocket }),
+    sectorDmgPct: sectorDmgPct({ sector: s.sector }),
     enemyHpBonusPct:
       mods.enemyHpPct +
       mut.enemyHpPct +
@@ -522,13 +531,13 @@ const mapOptionsFor = (mutators: readonly string[], mode: RunMode) => ({
   noShops: computeMutatorMods(mutators).noShops,
 });
 
-export const startRun = (seed = Date.now() >>> 0, ascension = 0): void => {
+export const startRun = (seed = now() >>> 0, ascension = 0): void => {
   startRunMode({ mode: "campaign", seed, ascension });
 };
 
 export const startRunMode = (options: StartRunOptions = {}): void => {
   const mode = options.mode ?? "campaign";
-  const rootSeed = (options.seed ?? Date.now()) >>> 0;
+  const rootSeed = (options.seed ?? now()) >>> 0;
   const contract = contractDef(options.contractId ?? null);
   const setup = contract?.setup ?? {};
   const mutators = [...(options.mutators ?? setup.mutators ?? [])];
@@ -574,7 +583,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     chartPicks,
     tide: Math.max(0, setup.tideStart ?? 0),
     ascension,
-    startedAt: Date.now(),
+    startedAt: now(),
     deck: deckIds.map((defId, index) => ({
       uid: `d${String(index)}`,
       defId,
@@ -593,7 +602,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   autosaveRun();
 };
 
-export const startDriftRun = (seed = Date.now() >>> 0): void => {
+export const startDriftRun = (seed = now() >>> 0): void => {
   startRunMode({ mode: "drift", seed });
 };
 
@@ -1135,7 +1144,8 @@ export const rerollPerkDraft = (): void => {
   redrawDraft("draftReroll");
 };
 
-export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
+export const startPrologueBattle = (seed = now() >>> 0): void => {
+  beginCheckFunnel();
   startRun(seed, 0);
   const s = useRunStore.getState();
   s.setPendingBattle({
@@ -1154,13 +1164,36 @@ export const startPrologueBattle = (seed = Date.now() >>> 0): void => {
       hull: s.hull,
       hullMax: s.hullMax,
       chargeCap: runChargeCap(s.perks, s.chartPicks),
-      scriptedSlots: PROLOGUE_SCRIPT,
+      enemyHpBonusPct: CHECK_ENEMY_HP_PCT,
+      checkSteps: SYSTEMS_CHECK,
     },
-    s.deck.map((d) => d.defId),
+    CHECK_DECK,
     createStreams(deriveSeed(s.seed, "prologue")),
   );
   useAppStore.getState().go("battle");
   autosaveRun();
+};
+
+export const CHECK_SANDBOX_SEED = 0x5ec7;
+
+export const startSystemsCheckSandbox = (): void => {
+  const shipId = useMetaStore.getState().selectedShip;
+  const hullMax = shipHullMax(shipId);
+  useBattleStore.getState().reset();
+  useBattleStore.getState().startBattle(
+    {
+      enemyIds: [PROLOGUE_ENEMY],
+      shipId,
+      hull: hullMax,
+      hullMax,
+      enemyHpBonusPct: CHECK_ENEMY_HP_PCT,
+      checkSteps: SYSTEMS_CHECK,
+      checkSandbox: true,
+    },
+    CHECK_DECK,
+    createStreams(CHECK_SANDBOX_SEED),
+  );
+  useAppStore.getState().go("battle");
 };
 
 export const canCrossThreshold = (): boolean => {

@@ -1,4 +1,7 @@
 import { create } from "zustand";
+import type { MergePrompt } from "@/services/account-link";
+import type { AuthErrorCode } from "@/services/authErrors";
+import type { AccountInfo } from "@/services/uid";
 import type { ScreenId } from "@/types";
 
 export const ROOT_SCREEN: ScreenId = "menu";
@@ -24,13 +27,23 @@ export interface AppState {
   stack: ScreenId[];
   tgUserId: number | null;
   tgName: string | null;
+  isTelegram: boolean;
   uid: string | null;
+  account: AccountInfo | null;
+  authError: AuthErrorCode | null;
+  authBusy: boolean;
+  merge: MergePrompt | null;
   cloudResume: boolean;
   go: (screen: ScreenId, params?: Record<string, string>) => void;
   back: () => void;
   setTgUserId: (tgUserId: number | null) => void;
   setTgName: (tgName: string | null) => void;
+  setIsTelegram: (isTelegram: boolean) => void;
   setUid: (uid: string | null) => void;
+  setAccount: (account: AccountInfo | null) => void;
+  setAuthError: (authError: AuthErrorCode | null) => void;
+  setAuthBusy: (authBusy: boolean) => void;
+  setMerge: (merge: MergePrompt | null) => void;
   setCloudResume: (cloudResume: boolean) => void;
 }
 
@@ -49,7 +62,12 @@ export const useAppStore = create<AppState>()((set, get) => ({
   stack: [],
   tgUserId: null,
   tgName: null,
+  isTelegram: false,
   uid: null,
+  account: null,
+  authError: null,
+  authBusy: false,
+  merge: null,
   cloudResume: false,
   go: (screen, params) =>
     set((s) =>
@@ -66,6 +84,11 @@ export const useAppStore = create<AppState>()((set, get) => ({
   },
   setTgUserId: (tgUserId) => set({ tgUserId }),
   setTgName: (tgName) => set({ tgName }),
+  setIsTelegram: (isTelegram) => set({ isTelegram }),
   setUid: (uid) => set({ uid }),
+  setAccount: (account) => set({ account, uid: account?.uid ?? null }),
+  setAuthError: (authError) => set({ authError }),
+  setAuthBusy: (authBusy) => set({ authBusy }),
+  setMerge: (merge) => set({ merge }),
   setCloudResume: (cloudResume) => set({ cloudResume }),
 }));

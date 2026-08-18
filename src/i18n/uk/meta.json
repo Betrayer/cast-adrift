@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} до синього резерву",
       "jamPowerDelta": "{{n}} до сили завад",
       "growthCapDelta": "{{n}} до ліміту росту",
-      "enginesThresholdDelta": "{{n}} до порогу двигунів",
+      "evasionDelta": "{{n}}% до ухилення",
       "markBonusDelta": "{{n}} до мітки",
       "battleEndHeal": "{{n}} лікування за бій",
       "hullMaxPct": "{{n}}% до макс. корпусу",
@@ -391,7 +391,8 @@
     "myRank": "Ваше місце: {{rank}}",
     "noRank": "У цій таблиці вас ще немає",
     "empty": "Поки порожньо.",
-    "depth": "г{{n}}"
+    "depth": "г{{n}}",
+    "offline": "Немає зв’язку — таблиця недоступна. Результат збережено локально."
   },
   "profile": {
     "title": "Профіль",

@@ -11,16 +11,15 @@
   "defeat": "Porażka",
   "toMenu": "Do menu",
   "hp": "HP {{hp}} / {{max}}",
-  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Rezerwa",
   "reroll": "Reroll ({{n}})",
   "rerollConfirm": "Ponowne losowanie {{k}} / {{size}}",
   "rerollCancel": "Anuluj",
   "rerollHint": "Dotknij maksymalnie {{size}} kości, aby rzucić ponownie",
-  "buyReroll": "+1 rzut dodatkową kostką (5⚡)",
-  "surge": "Przepięcie (10⚡)",
-  "nudgeMinus": "−1 (3⚡)",
-  "nudgePlus": "+1 (3⚡)",
+  "buyReroll": "+1 kość przerzutu ({{n}}⚡)",
+  "surge": "Skok ({{n}}⚡)",
+  "nudgeMinus": "−1 ({{n}}⚡)",
+  "nudgePlus": "+1 ({{n}}⚡)",
   "nudgeFree": "−1 (bezpłatnie)",
   "nudgeFreePlus": "+1 (bezpłatnie)",
   "flip": "Flip",
@@ -30,6 +29,7 @@
   "collect": "Zbierz",
   "lootNew": "Nowa matryca",
   "jam": "JAM",
+  "pierce": "WYŁOM {{n}}",
   "school": {
     "red": "Czerwony",
     "blue": "Niebieski",
@@ -39,8 +39,6 @@
     "grey": "Szary",
     "prismatic": "Pryzmat"
   },
-  "resChip": "{{school}} {{count}}/{{next}}",
-  "resChipFull": "{{school}} {{count}}",
   "shipyard": "stocznia (debugowanie)",
   "status": {
     "burn": "B",
@@ -86,7 +84,14 @@
     "sensors": "Czujniki",
     "reactor": "Reaktor",
     "repairBay": "Stacja naprawcza",
-    "cap": "cap ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "unik {{dodge}}% · muśnięcie {{glancing}}%",
+    "affinity": "{{school}} +{{n}}",
+    "affinityMult": "{{school}} ×{{n}}",
+    "capShrunk": "limit ≤ d{{cap}} ▽ · Mk{{mk}}",
+    "inherits": "tutaj: {{school}} +{{n}}",
+    "inheritsMult": "tutaj: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -95,7 +100,6 @@
     "begin": "Zacznij",
     "hull": "Kadłub {{n}}"
   },
-  "scriptHint": "Prolog: w tej turze można użyć wyłącznie „{{slots}}”.",
   "fate": "Rzuć kostką losu",
   "fateResult": "Fate {{roll}} — {{text}}",
   "swap": "Zamień",
@@ -117,8 +121,87 @@
   "enemyWard": "Okręg: {{school}}",
   "enemyGate": "Strona główna {{n}}",
   "enemyRage": "Rage i{{n}}",
+  "enemyVulnerable": "Wrażliwy +{{n}}",
   "inverted": "ODWRÓCONA KOLEJNOŚĆ",
-  "invertedHint": "Najpierw reaktor, na końcu czujniki.",
+  "invertedHint": "Karta 1 odpala ostatnia, karta 6 pierwsza — numery odwracają się razem z kolejnością.",
   "storm": "BURZA PRAWDOPODOBIEŃSTW",
-  "stormHint": "Rzut jedną umieszczoną kostką powtarza się przed rozstrzygnięciem jakichkolwiek innych akcji."
+  "stormHint": "Rzut jedną umieszczoną kostką powtarza się przed rozstrzygnięciem jakichkolwiek innych akcji.",
+  "reserveCap": "{{n}}/{{max}}",
+  "close": "Zamknij",
+  "pickDie": "Wybierz kość, pokażę jej kartę",
+  "dieFaces": "{{min}}–{{max}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "targetBody": "Celuj w kadłub",
+  "targetSub": "{{name}} {{hp}}/{{max}}",
+  "mitigation": "surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
+  "mitigationNone": "Ten zamiar nie zadaje obrażeń",
+  "forecast": "zadasz {{out}} · przyjmiesz ~{{inc}} (tarcza trzyma {{shield}})",
+  "forecastClear": "{{out}} obrażeń czyści pole",
+  "resBoard": "{{school}} {{placed}}+{{tray}}",
+  "resDetail": "talia {{deck}} · w slotach {{placed}} · taca {{tray}} · rezerwa {{reserved}}",
+  "schoolShort": {
+    "red": "czw",
+    "blue": "nie",
+    "green": "zie",
+    "grey": "sza",
+    "black": "cza"
+  },
+  "proj": {
+    "jam": "ZACINA",
+    "mark": "Podatny +{{n}}",
+    "markPierce": "Podatny +{{n}} · wyłom",
+    "charge": "+{{n}}⚡",
+    "heal": "+{{n}}♥",
+    "shield": "+{{n}} tarczy",
+    "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
+    "damage": "{{n}} obrażeń",
+    "damageSum": "{{value}} = {{base}}+{{bonus}}",
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+  },
+  "block": {
+    "resolving": "Poczekaj na rozliczenie tury",
+    "rerollMode": "Najpierw zakończ przerzut",
+    "noSelection": "Najpierw wybierz kość",
+    "notInTray": "Tej kości nie ma na tacy",
+    "noCharge": "Za mało ładunku",
+    "noRerolls": "Brak przerzutów w tej turze",
+    "atFloor": "Już najniższa ściana",
+    "atCeiling": "Już najwyższa ściana",
+    "reserveFull": "Rezerwa pełna",
+    "used": "Już użyte w tej turze",
+    "hullLow": "Za mało kadłuba"
+  },
+  "resPrism": "kość pryzmatyczna liczy się do tej szkoły",
+  "badge": {
+    "fate": "Kość Losu",
+    "active": "Ma aktywną",
+    "engraved": "Grawerowana",
+    "growth": "Rośnie na maksymalnej ścianie",
+    "faces": "Niestandardowe ściany"
+  },
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "layoutHint": "Wolisz inny układ walki? Ustawienia → Interfejs walki.",
+  "forecastStrip": "zadasz ~{{out}} · otrzymasz {{hull}}",
+  "forecastBreak": "atak {{raw}} − unik {{evade}} − tarcza {{shield}}",
+  "check": {
+    "step": "Systems check {{cur}}/{{max}}",
+    "skip": "Skip the check"
+  }
 }

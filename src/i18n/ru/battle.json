@@ -11,16 +11,15 @@
   "defeat": "Поражение",
   "toMenu": "В меню",
   "hp": "HP {{hp}}/{{max}}",
-  "hpShort": "{{hp}}/{{max}}",
   "reserve": "Резерв",
   "reroll": "Переброс ({{n}})",
   "rerollConfirm": "Перебросить {{k}}/{{size}}",
   "rerollCancel": "Отмена",
   "rerollHint": "Выбери до {{size}} кубов для переброса",
-  "buyReroll": "+1 куб переброса (5⚡)",
-  "surge": "Всплеск (10⚡)",
-  "nudgeMinus": "−1 (3⚡)",
-  "nudgePlus": "+1 (3⚡)",
+  "buyReroll": "+1 куб переброса ({{n}}⚡)",
+  "surge": "Всплеск ({{n}}⚡)",
+  "nudgeMinus": "−1 ({{n}}⚡)",
+  "nudgePlus": "+1 ({{n}}⚡)",
   "nudgeFree": "−1 (бесплатно)",
   "nudgeFreePlus": "+1 (бесплатно)",
   "flip": "Переворот",
@@ -30,6 +29,7 @@
   "collect": "Забрать",
   "lootNew": "Новый кубик",
   "jam": "КЛИН",
+  "pierce": "ПРОБОЙ {{n}}",
   "school": {
     "red": "Красн.",
     "blue": "Син.",
@@ -39,8 +39,6 @@
     "grey": "Сер.",
     "prismatic": "Призм."
   },
-  "resChip": "{{school}} {{count}}/{{next}}",
-  "resChipFull": "{{school}} {{count}}",
   "shipyard": "верфь (отладка)",
   "status": {
     "burn": "B",
@@ -86,7 +84,14 @@
     "sensors": "Сенсоры",
     "reactor": "Реактор",
     "repairBay": "Ремонтный отсек",
-    "cap": "кап ≤ d{{cap}} · Mk{{mk}}"
+    "cap": "кап ≤ d{{cap}} · Mk{{mk}}",
+    "evasion": "уворот {{dodge}}% · скольжение {{glancing}}%",
+    "affinity": "{{school}} +{{n}}",
+    "affinityMult": "{{school}} ×{{n}}",
+    "capShrunk": "кап ≤ d{{cap}} ▽ · Mk{{mk}}",
+    "inherits": "здесь: {{school}} +{{n}}",
+    "inheritsMult": "здесь: {{school}} ×{{n}}",
+    "capShort": "≤d{{cap}}"
   },
   "intro": {
     "miniboss": "Мини-босс",
@@ -95,7 +100,6 @@
     "begin": "Начать",
     "hull": "Корпус {{n}}"
   },
-  "scriptHint": "Пролог: в этом ходу доступно только {{slots}}.",
   "fate": "Бросить Фатум",
   "fateResult": "Фатум {{roll}} — {{text}}",
   "swap": "Обмен",
@@ -117,8 +121,87 @@
   "enemyWard": "Защита: {{school}}",
   "enemyGate": "Заслон {{n}}",
   "enemyRage": "Ярость +{{n}}",
+  "enemyVulnerable": "Уязвим +{{n}}",
   "inverted": "ПОРЯДОК ПЕРЕВЁРНУТ",
-  "invertedHint": "Сначала реактор, сенсоры последними.",
+  "invertedHint": "Карточка 1 срабатывает последней, карточка 6 — первой: номера перевернулись вместе с порядком.",
   "storm": "ВЕРОЯТНОСТНЫЙ ШТОРМ",
-  "stormHint": "Одна размещённая кость перебрасывается до разрешения."
+  "stormHint": "Одна размещённая кость перебрасывается до разрешения.",
+  "reserveCap": "{{n}}/{{max}}",
+  "close": "Закрыть",
+  "pickDie": "Выбери кость — покажу её карточку",
+  "dieFaces": "{{min}}–{{max}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "targetBody": "Цель — корпус",
+  "targetSub": "{{name}} {{hp}}/{{max}}",
+  "mitigation": "сырой {{raw}} → ~{{expected}} · щит {{shield}} · корпус {{hull}}",
+  "mitigationNone": "Этот замысел не наносит урона",
+  "forecast": "нанесёшь {{out}} · получишь ~{{inc}} (щит держит {{shield}})",
+  "forecastClear": "{{out}} урона — поле чистое",
+  "resBoard": "{{school}} {{placed}}+{{tray}}",
+  "resDetail": "колода {{deck}} · в слотах {{placed}} · в лотке {{tray}} · в резерве {{reserved}}",
+  "schoolShort": {
+    "red": "кр",
+    "blue": "син",
+    "green": "зел",
+    "grey": "сер",
+    "black": "чёр"
+  },
+  "proj": {
+    "jam": "КЛИН",
+    "mark": "Уязвим +{{n}}",
+    "markPierce": "Уязвим +{{n}} · пробой",
+    "charge": "+{{n}}⚡",
+    "heal": "+{{n}}♥",
+    "shield": "+{{n}} щита",
+    "shieldSum": "+{{value}} = {{base}}+{{bonus}}",
+    "damage": "{{n}} урона",
+    "damageSum": "{{value}} = {{base}}+{{bonus}}",
+    "none": "—",
+    "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
+    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+  },
+  "block": {
+    "resolving": "Дождись, пока ход разрешится",
+    "rerollMode": "Сначала заверши переброс",
+    "noSelection": "Сначала выбери кость",
+    "notInTray": "Эта кость не в лотке",
+    "noCharge": "Не хватает заряда",
+    "noRerolls": "Перебросов на ход не осталось",
+    "atFloor": "Уже минимальная грань",
+    "atCeiling": "Уже максимальная грань",
+    "reserveFull": "Резерв заполнен",
+    "used": "Уже использовано в этом ходу",
+    "hullLow": "Слишком мало корпуса"
+  },
+  "resPrism": "призматическая кость считается за эту школу",
+  "badge": {
+    "fate": "Кость Фатума",
+    "active": "Есть актив",
+    "engraved": "С гравировкой",
+    "growth": "Растёт на максимуме",
+    "faces": "Нестандартные грани"
+  },
+  "layoutHint": "Хочешь другой вид боя? Настройки → Боевой интерфейс.",
+  "radial": {
+    "reroll": "↻",
+    "nudgeMinus": "−1",
+    "nudgePlus": "+1",
+    "reserve": "▣"
+  },
+  "projShort": {
+    "dodge": "{{n}}%",
+    "mark": "+{{n}}",
+    "value": "{{n}}",
+    "none": "—"
+  },
+  "conveyor": {
+    "out": "→ {{text}}",
+    "unknown": "→ ?"
+  },
+  "forecastStrip": "нанесёшь ~{{out}} · получишь {{hull}}",
+  "forecastBreak": "атака {{raw}} − уклонение {{evade}} − щит {{shield}}",
+  "check": {
+    "step": "Проверка систем {{cur}}/{{max}}",
+    "skip": "Пропустить проверку"
+  }
 }

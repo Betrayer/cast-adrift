@@ -1,7 +1,12 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import {
+  DEFAULT_BATTLE_LAYOUT,
+  isBattleLayoutId,
+} from '@/data/battleLayouts';
 import { DEFAULT_THEME_ID, isThemeId, type ThemeId } from '@/data/themes';
 import type {
+  BattleLayoutId,
   BattleSpeed,
   EchoVerbosity,
   FontScale,
@@ -19,6 +24,7 @@ export interface SettingsValues {
   theme: ThemeId;
   fontScale: FontScale;
   battleSpeed: BattleSpeed;
+  battleLayout: BattleLayoutId;
 }
 
 export interface SettingsState extends SettingsValues {
@@ -31,9 +37,10 @@ export interface SettingsState extends SettingsValues {
   setTheme: (theme: ThemeId) => void;
   setFontScale: (fontScale: FontScale) => void;
   setBattleSpeed: (battleSpeed: BattleSpeed) => void;
+  setBattleLayout: (battleLayout: BattleLayoutId) => void;
 }
 
-export const SETTINGS_VERSION = 2;
+export const SETTINGS_VERSION = 3;
 
 const DEFAULTS: SettingsValues = {
   locale: 'en',
@@ -45,6 +52,7 @@ const DEFAULTS: SettingsValues = {
   theme: DEFAULT_THEME_ID,
   fontScale: 'm',
   battleSpeed: 'normal',
+  battleLayout: DEFAULT_BATTLE_LAYOUT,
 };
 
 const isFontScale = (value: unknown): value is FontScale =>
@@ -66,6 +74,9 @@ export const migrateSettings = (
     theme: isThemeId(prev.theme) ? prev.theme : DEFAULTS.theme,
     fontScale: isFontScale(prev.fontScale) ? prev.fontScale : DEFAULTS.fontScale,
     battleSpeed: prev.battleSpeed === 'fast' ? 'fast' : DEFAULTS.battleSpeed,
+    battleLayout: isBattleLayoutId(prev.battleLayout)
+      ? prev.battleLayout
+      : DEFAULTS.battleLayout,
   };
 };
 
@@ -82,6 +93,7 @@ export const useSettingsStore = create<SettingsState>()(
       setTheme: (theme) => set({ theme }),
       setFontScale: (fontScale) => set({ fontScale }),
       setBattleSpeed: (battleSpeed) => set({ battleSpeed }),
+      setBattleLayout: (battleLayout) => set({ battleLayout }),
     }),
     {
       name: 'ca.settings',
@@ -97,6 +109,7 @@ export const useSettingsStore = create<SettingsState>()(
         theme: s.theme,
         fontScale: s.fontScale,
         battleSpeed: s.battleSpeed,
+        battleLayout: s.battleLayout,
       }),
     },
   ),

@@ -3,9 +3,10 @@ import { ENEMY_BY_ID } from "@/data/enemies";
 import {
   advanceTurn,
   CHARGE_CAP,
-  engineTier,
+  evasionFor,
   resolveEnemyPhase,
   resolvePlayerPhase,
+  vulnerableFor,
 } from "@/game/battle/resolver";
 import {
   buildEnemies,
@@ -14,7 +15,13 @@ import {
   spawnEnemy,
 } from "@/game/battle/setup";
 import { computeCensus } from "@/game/battle/resonance";
-import { createStream, createStreams } from "@/services/rng";
+import {
+  createStream,
+  createStreamFromState,
+  createStreams,
+  restoreStreams,
+  serializeStreams,
+} from "@/services/rng";
 import type {
   BattleSnapshot,
   EnemyState,
@@ -83,10 +90,9 @@ const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
   },
   enemies: [enemy("raider")],
   targetId: "enemy-0",
-  engineState: null,
+  evasion: null,
   nextTurnMods: {},
   nextRollBonus: 0,
-  pendingDeepScan: false,
   chargeCap: 10,
   sacrificePool: 0,
   bloodReactorUsed: false,
@@ -104,6 +110,7 @@ const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
   ascension: 0,
   exceedCap: [],
   sectorHpPct: 0,
+  sectorDmgPct: 0,
   enemyHpPct: 0,
   ...over,
 });
@@ -137,16 +144,64 @@ const forceIntent = (state: EnemyState, intent: Intent): EnemyState => ({
   nextIntent: intent,
 });
 
-describe("engineTier thresholds", () => {
+describe("evasion band math", () => {
   it.each([
-    [1, "brace"],
-    [3, "brace"],
-    [4, "dodge"],
-    [6, "dodge"],
-    [7, "dodgePlus"],
-    [10, "dodgePlus"],
-  ] as const)("value %i → %s", (value, tier) => {
-    expect(engineTier(value)).toBe(tier);
+    [1, 6, 3],
+    [3, 18, 9],
+    [5, 30, 15],
+    [8, 48, 24],
+  ])("V %i → dodge %i%% · glancing %i%%", (value, dodge, glancing) => {
+    const evasion = evasionFor(value);
+    expect(evasion.dodgePct).toBe(dodge);
+    expect(evasion.glancingPct).toBe(glancing);
+  });
+
+  it("caps dodge at 55% and glancing at 25%", () => {
+    expect(evasionFor(20)).toEqual({
+      dodgePct: 55,
+      glancingPct: 25,
+      intercept: true,
+    });
+  });
+
+  it("adds the evasion delta and halves it for glancing", () => {
+    expect(evasionFor(3, 6)).toEqual({
+      dodgePct: 24,
+      glancingPct: 12,
+      intercept: false,
+    });
+    expect(evasionFor(3, 1)).toEqual({
+      dodgePct: 19,
+      glancingPct: 10,
+      intercept: false,
+    });
+  });
+
+  it("never drops below zero and flags intercept only from V 8", () => {
+    expect(evasionFor(1, -30)).toEqual({
+      dodgePct: 0,
+      glancingPct: 0,
+      intercept: false,
+    });
+    expect(evasionFor(7).intercept).toBe(false);
+    expect(evasionFor(8).intercept).toBe(true);
+  });
+});
+
+describe("vulnerability math", () => {
+  it.each([
+    [1, 1],
+    [2, 1],
+    [3, 2],
+    [7, 4],
+    [12, 4],
+  ])("V %i → +%i", (value, d) => {
+    expect(vulnerableFor(value)).toBe(d);
+  });
+
+  it("adds the mark bonus delta on top of the cap", () => {
+    expect(vulnerableFor(12, 2)).toBe(6);
+    expect(vulnerableFor(3, -1)).toBe(1);
   });
 });
 
@@ -174,36 +229,68 @@ describe("resolution order", () => {
 });
 
 describe("sensors", () => {
-  it("marks the target at any value", () => {
+  it("applies vulnerability at any value and never jams", () => {
     const { next, beats } = resolvePlayerPhase(withPlacements({ sensors: 1 }));
     expect(next.enemies[0]?.statuses.mark).toBe(1);
     expect(next.enemies[0]?.statuses.jam).toBeUndefined();
-    expect(next.pendingDeepScan).toBe(false);
-    expect(beats[0]?.sensor).toEqual({
-      mark: true,
-      jam: false,
-      deepScan: false,
-    });
+    expect(beats[0]?.sensor).toEqual({ vulnerable: 1, pierce: 0 });
   });
 
-  it("also jams at 4+", () => {
-    const { next } = resolvePlayerPhase(withPlacements({ sensors: 4 }));
-    expect(next.enemies[0]?.statuses.jam).toBe(1);
-    expect(next.pendingDeepScan).toBe(false);
+  it("scales vulnerability with the placed value", () => {
+    const { next } = resolvePlayerPhase(withPlacements({ sensors: 7 }));
+    expect(next.enemies[0]?.statuses.mark).toBe(4);
   });
 
-  it("also flags deep scan at 7+", () => {
-    const { next, beats } = resolvePlayerPhase(withPlacements({ sensors: 7 }));
-    expect(next.enemies[0]?.statuses.jam).toBe(1);
-    expect(next.pendingDeepScan).toBe(true);
-    expect(beats[0]?.sensor?.deepScan).toBe(true);
-  });
-
-  it("mark grants +2 to the next weapon hit and is consumed", () => {
+  it("vulnerability raises every player hit that turn", () => {
     const { next } = resolvePlayerPhase(
-      withPlacements({ sensors: 1, weaponA: 4 }, { enemies: [mkEnemy()] }),
+      withPlacements(
+        { sensors: 5, weaponA: 4, weaponB: 4 },
+        { enemies: [mkEnemy()] },
+      ),
     );
-    expect(next.enemies[0]?.hp).toBe(12);
+    expect(next.enemies[0]?.hp).toBe(4);
+    expect(next.enemies[0]?.statuses.mark).toBe(3);
+  });
+
+  it("re-application keeps the larger magnitude", () => {
+    const { next } = resolvePlayerPhase(
+      withPlacements(
+        { sensors: 3 },
+        { enemies: [mkEnemy({ statuses: { mark: 4 } })] },
+      ),
+    );
+    expect(next.enemies[0]?.statuses.mark).toBe(4);
+  });
+
+  it("a max face strips min(V, shield) from the target", () => {
+    const shielded = mkEnemy({ shield: 3 });
+    const { next, beats } = resolvePlayerPhase(
+      withPlacements({ sensors: 20 }, { enemies: [shielded] }),
+    );
+    expect(beats[0]?.sensor?.pierce).toBe(3);
+    expect(next.enemies[0]?.shield).toBe(0);
+  });
+
+  it("a max face strips no more than the placed value", () => {
+    const shielded = mkEnemy({ shield: 9 });
+    const { next, beats } = resolvePlayerPhase(
+      withPlacements({ sensors: 20 }, { enemies: [shielded] }),
+    );
+    expect(beats[0]?.sensor?.pierce).toBe(9);
+    expect(next.enemies[0]?.shield).toBe(0);
+  });
+
+  it("a sub-max face never pierces", () => {
+    const shielded = mkEnemy({ shield: 4 });
+    const { beats } = resolvePlayerPhase(
+      withPlacements({ sensors: 5 }, { enemies: [shielded] }),
+    );
+    expect(beats[0]?.sensor?.pierce).toBe(0);
+  });
+
+  it("vulnerability expires when the next turn is rolled", () => {
+    const marked = snap({ enemies: [mkEnemy({ statuses: { mark: 3 } })] });
+    const next = advanceTurn(marked, createStreams(1));
     expect(next.enemies[0]?.statuses.mark).toBeUndefined();
   });
 
@@ -219,41 +306,124 @@ describe("sensors", () => {
 });
 
 describe("engines", () => {
-  it("brace reduces every hit by 1 during the enemy phase", () => {
-    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 2 });
-    const { next } = resolveEnemyPhase(
-      snap({ enemies: [attacker], engineState: "brace" }),
+  const alwaysDodge = { dodgePct: 100, glancingPct: 0, intercept: false };
+  const alwaysGlance = { dodgePct: 0, glancingPct: 100, intercept: false };
+
+  it("rolls once per incoming hit", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 4, k: 3 });
+    const { next, beats } = resolveEnemyPhase(
+      snap({ enemies: [attacker], evasion: evasionFor(5) }),
       enemyStream(),
+      createStream(3),
     );
-    expect(next.hull).toBe(26);
+    expect(next.hull).toBe(22);
+    expect(beats[0]?.dodged).toBe(1);
+    expect(beats[0]?.glanced).toBeUndefined();
   });
 
-  it("dodge consumes exactly one hit of a multi-attack", () => {
-    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 2 });
-    const { next } = resolveEnemyPhase(
-      snap({ enemies: [attacker], engineState: "dodge" }),
+  it("a glancing hit is halved, rounded up", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "attack", n: 5 });
+    const { next, beats } = resolveEnemyPhase(
+      snap({ enemies: [attacker], evasion: evasionFor(3) }),
       enemyStream(),
+      createStream(99),
     );
     expect(next.hull).toBe(27);
+    expect(beats[0]?.glanced).toBe(1);
   });
 
-  it("dodge evades only the first hit across multiple enemies", () => {
+  it("evades across enemies, not just the first hit", () => {
     const first = forceIntent(enemy("scavDrone"), { t: "attack", n: 2 });
     const second = forceIntent(enemy("scavDrone", { id: "enemy-1" }), {
       t: "attack",
       n: 3,
     });
     const { next } = resolveEnemyPhase(
-      snap({ enemies: [first, second], engineState: "dodge" }),
+      snap({ enemies: [first, second], evasion: alwaysDodge }),
       enemyStream(),
+      createStream(3),
     );
-    expect(next.hull).toBe(27);
+    expect(next.hull).toBe(30);
   });
 
-  it("engines die sets engineState and 7+ grants +2 weapons next turn", () => {
-    const { next } = resolvePlayerPhase(withPlacements({ engines: 7 }));
-    expect(next.engineState).toBe("dodgePlus");
-    expect(next.nextTurnMods.weapons).toBe(2);
+  it("an empty engines slot never rolls", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 2 });
+    const { next, beats } = resolveEnemyPhase(
+      snap({ enemies: [attacker] }),
+      enemyStream(),
+      createStream(3),
+    );
+    expect(next.hull).toBe(24);
+    expect(beats[0]?.dodged).toBeUndefined();
+  });
+
+  it("a glancing roll halves every hit it lands on", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 5, k: 2 });
+    const { next, beats } = resolveEnemyPhase(
+      snap({ enemies: [attacker], evasion: alwaysGlance }),
+      enemyStream(),
+      createStream(3),
+    );
+    expect(next.hull).toBe(24);
+    expect(beats[0]?.glanced).toBe(2);
+  });
+
+  it("intercept grants weapons +1 once per turn on the first dodge", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 3 });
+    const { next } = resolveEnemyPhase(
+      snap({
+        enemies: [attacker],
+        evasion: { dodgePct: 100, glancingPct: 0, intercept: true },
+      }),
+      enemyStream(),
+      createStream(3),
+    );
+    expect(next.nextTurnMods.weapons).toBe(1);
+  });
+
+  it("no intercept below V 8", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 3 });
+    const { next } = resolveEnemyPhase(
+      snap({ enemies: [attacker], evasion: alwaysDodge }),
+      enemyStream(),
+      createStream(3),
+    );
+    expect(next.nextTurnMods.weapons).toBeUndefined();
+  });
+
+  it("an engines die sets the turn's evasion", () => {
+    const { next, beats } = resolvePlayerPhase(withPlacements({ engines: 7 }));
+    expect(next.evasion).toEqual({
+      dodgePct: 42,
+      glancingPct: 21,
+      intercept: false,
+    });
+    expect(beats[0]?.evasion).toEqual(next.evasion);
+  });
+
+  it("evasion clears when the next turn is rolled", () => {
+    const rolled = advanceTurn(
+      snap({ evasion: evasionFor(5) }),
+      createStreams(1),
+    );
+    expect(rolled.evasion).toBeNull();
+  });
+
+  it("the same defense state replays the same outcome", () => {
+    const attacker = () =>
+      forceIntent(enemy("raider"), { t: "multi", n: 4, k: 3 });
+    const board = () => snap({ enemies: [attacker()], evasion: evasionFor(5) });
+    const streams = createStreams(7);
+    const first = resolveEnemyPhase(board(), enemyStream(), streams.defense);
+    const resumed = restoreStreams(serializeStreams(createStreams(7)));
+    const second = resolveEnemyPhase(board(), enemyStream(), resumed.defense);
+    expect(second.next.hull).toBe(first.next.hull);
+    const third = resolveEnemyPhase(
+      board(),
+      enemyStream(),
+      createStreamFromState(createStreams(7).defense.state()),
+    );
+    expect(third.next.hull).toBe(first.next.hull);
   });
 
   it("weapons +2 applies to weapon A and B next resolution, then is consumed", () => {

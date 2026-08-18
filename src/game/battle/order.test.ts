@@ -99,7 +99,7 @@ describe("resolution order", () => {
     place(snapshot, "d1", "repairBay");
     const { beats, next } = resolvePlayerPhase(snapshot);
     expect(beats.map((b) => b.slot)).toEqual(["repairBay", "engines"]);
-    expect(next.engineState).toBe("dodge");
+    expect(next.evasion?.dodgePct).toBe(36);
   });
 
   it("keeps the spinal jam rule intact when the order flips", () => {

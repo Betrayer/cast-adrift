@@ -37,5 +37,92 @@
     "show": "Diagnostyka ({{n}})",
     "hide": "Ukryj informacje diagnostyczne",
     "clean": "W tej sesji nie wystąpiły żadne błędy."
+  },
+  "account": {
+    "title": "Konto",
+    "guest": "Gość",
+    "guestBody": "Ten profil żyje tylko na tym urządzeniu. Podłącz Google albo e-mail i pójdzie za tobą wszędzie.",
+    "signedInAs": "Zalogowano jako {{email}}",
+    "telegramProfile": "Profil Telegrama",
+    "supportId": "ID pomocy {{id}}",
+    "save": "Zapisz mój postęp",
+    "google": "Kontynuuj z Google",
+    "googleLink": "Podłącz Google",
+    "email": "Użyj e-maila",
+    "emailLink": "Podłącz e-mail",
+    "signOut": "Wyloguj",
+    "signOutGuestWarning": "Wylogowanie z profilu gościa traci go na zawsze — nie ma drogi powrotnej.",
+    "signOutBody": "Wylądujesz na nowym profilu gościa. To konto zachowa wszystko i otworzy się przy następnym logowaniu.",
+    "signOutConfirm": "Wyloguj i tak",
+    "telegramHint": "Podłącz e-mail do tego profilu Telegrama i to samo konto otworzy się w przeglądarce.",
+    "telegramGoogleHint": "Google wymaga prawdziwego okna przeglądarki. Przycisk otworzy Cast Adrift poza Telegramem.",
+    "provider": {
+      "google": "Google",
+      "password": "E-mail",
+      "telegram": "Telegram"
+    },
+    "form": {
+      "registerTitle": "Utwórz konto",
+      "signInTitle": "Logowanie",
+      "resetTitle": "Zmiana hasła",
+      "email": "E-mail",
+      "password": "Hasło",
+      "passwordHint": "Co najmniej 6 znaków.",
+      "submitRegister": "Utwórz",
+      "submitSignIn": "Zaloguj",
+      "submitReset": "Wyślij link",
+      "toSignIn": "Mam już konto",
+      "toRegister": "Jestem tu pierwszy raz",
+      "toReset": "Zapomniałem hasła",
+      "resetSent": "Sprawdź skrzynkę {{email}}."
+    },
+    "merge": {
+      "title": "Dwa profile, jedno konto",
+      "body": "Postęp jest po obu stronach. Wybierz ten, który zostaje — drugi idzie do archiwum, nie do kosza.",
+      "thisDevice": "To urządzenie",
+      "thisAccount": "Konto, do którego się zalogowałeś",
+      "stats": "Poziom {{level}} · {{shards}} odłamków · przebiegi: {{runs}}",
+      "never": "ani jednego przebiegu",
+      "recommended": "Nowszy",
+      "keep": "Zostaw ten"
+    },
+    "error": {
+      "cancelled": "Logowanie anulowane.",
+      "popupBlocked": "Przeglądarka zablokowała okno logowania. Zezwól na wyskakujące okna i spróbuj ponownie.",
+      "network": "Brak połączenia z serwerem. Dopóki go nie ma, postęp zostaje na urządzeniu.",
+      "invalidEmail": "To nie wygląda na adres e-mail.",
+      "weakPassword": "Wybierz hasło z co najmniej 6 znaków.",
+      "wrongPassword": "Błędny e-mail albo hasło.",
+      "userNotFound": "Nie ma konta z tym adresem.",
+      "emailInUse": "Na ten e-mail konto już istnieje. Zaloguj się do niego.",
+      "credentialInUse": "Takie konto już istnieje — loguję cię do niego.",
+      "providerLinked": "Już podłączone do tego profilu.",
+      "tooManyRequests": "Za dużo prób. Poczekaj minutę i spróbuj ponownie.",
+      "recentLoginRequired": "Zaloguj się jeszcze raz, aby potwierdzić, że to ty.",
+      "providerDisabled": "Ten sposób logowania jest wyłączony. Napisz na {{email}}.",
+      "unknown": "Logowanie nie udało się. Spróbuj ponownie, a jeśli się powtórzy — napisz na {{email}}."
+    }
+  },
+  "layout": {
+    "title": "Interfejs walki",
+    "hint": "Jedna walka, trzy prezentacje. Przełączanie w trakcie walki jest bezpieczne.",
+    "synced": "zapisano na koncie",
+    "active": "Aktywny",
+    "use": "Wybierz",
+    "console": {
+      "name": "Pulpit",
+      "tag": "Dok slotów w kolejności strzałów · stały pulpit akcji",
+      "desc": "Karty w siatce, każdy przycisk zawsze w tym samym miejscu."
+    },
+    "orbit": {
+      "name": "Orbita",
+      "tag": "Kapsuły slotów łukiem wokół statku · menu radialne przy kostce",
+      "desc": "Twój statek jest na ekranie i przyjmuje ciosy; akcje otwierają się przy kostce."
+    },
+    "tablet": {
+      "name": "Tablet",
+      "tag": "Taśma slotów z żywym wynikiem · prognoza tury",
+      "desc": "Wszystkie liczby w jednej kolumnie, cała tura policzona, zanim ją zakończysz."
+    }
   }
 }
