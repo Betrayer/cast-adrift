@@ -47,6 +47,7 @@ import {
   type StreamStates,
 } from "@/services/rng";
 import { computeRunMods, runHasTrait } from "@/game/run/runMods";
+import { slotAllowedThisTurn } from "@/game/battle/view";
 import { applyActions, BattleCtx, buildSources, emit } from "@/game/effects";
 import type {
   ExceedCapGrant,
@@ -324,7 +325,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   debugNextRoll: null,
 });
 
-export const battleSnapshot = (s: BattleValues): BattleSnapshot => ({
+export const battleSnapshot = (s: BattleSnapshot): BattleSnapshot => ({
   turn: s.turn,
   hull: s.hull,
   hullMax: s.hullMax,
@@ -459,22 +460,6 @@ const applyDebugRoll = (
       value: Math.min(Math.max(1, Math.round(forced)), die.tier),
     };
   });
-
-export const allowedSlotsForTurn = (
-  scriptedSlots: readonly (readonly SlotId[])[] | null,
-  turn: number,
-): readonly SlotId[] | null => {
-  if (scriptedSlots === null) return null;
-  return scriptedSlots[turn - 1] ?? null;
-};
-
-const slotAllowedThisTurn = (
-  s: Pick<BattleValues, "scriptedSlots" | "turn">,
-  slotId: SlotId,
-): boolean => {
-  const allowed = allowedSlotsForTurn(s.scriptedSlots, s.turn);
-  return allowed === null || allowed.includes(slotId);
-};
 
 interface TurnTally {
   shieldAbsorbed: number;

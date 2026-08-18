@@ -312,12 +312,12 @@
     "next": "Weiter",
     "skipAll": "Alle überspringen",
     "place": {
-      "title": "Ziehe einen Würfel in ein System",
-      "body": "Würfle und ziehe dann die Würfel aus dem Fach auf die Felder „Waffen“, „Schilde“, „Triebwerke“, „Sensoren“ oder „Reaktor“. Ein Würfel passt niemals in ein Feld, dessen Oberkante unterhalb seiner Augenzahl liegt."
+      "title": "Schick einen Würfel in ein System",
+      "body": "Tippe einen Würfel an, dann eine leuchtende Systemkarte — oder zieh ihn dorthin. Jede Karte zeigt vorab, was der Würfel bewirkt, und er passt nie in eine Karte, deren Kappe unter seiner Seite liegt."
     },
     "endTurn": {
-      "title": "Die Kurve meistern",
-      "body": "Wenn das Spielfeld so aussieht, wie du es dir vorstellst, beende den Zug. Die Systeme feuern von oben nach unten, dann antwortet der Gegner."
+      "title": "Runde auflösen",
+      "body": "Wenn das Brett passt, beende die Runde. Die Systeme feuern in der Reihenfolge der Nummern auf ihren Karten, dann antwortet der Gegner."
     },
     "reroll": {
       "title": "Einmal kann man kostenlos neu würfeln",

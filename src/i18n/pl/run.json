@@ -312,12 +312,12 @@
     "next": "Dalej",
     "skipAll": "Pomiń wszystko",
     "place": {
-      "title": "Przeciągnij kostkę do systemu",
-      "body": "Rzuć kostką, a następnie przeciągnij ją z tacki na pola „Broń”, „Tarcze”, „Silniki”, „Czujniki” lub „Reaktor”. Kostka nigdy nie zmieści się w polu, którego limit jest niższy od jej wartości."
+      "title": "Wyślij kość do systemu",
+      "body": "Dotknij kości, potem podświetlonej karty systemu — albo przeciągnij ją tam. Każda karta pokazuje wynik przed zatwierdzeniem, a kość nigdy nie wejdzie na kartę, której limit jest niższy od jej ściany."
     },
     "endTurn": {
-      "title": "Rozstrzygnij ruch",
-      "body": "Gdy układ na planszy będzie taki, jak chcesz, zakończ turę. Systemy strzelają od góry do dołu, a następnie odpowiada przeciwnik."
+      "title": "Rozlicz turę",
+      "body": "Gdy plansza wygląda jak trzeba, zakończ turę. Systemy odpalają w kolejności numerów na kartach, potem odpowiada wróg."
     },
     "reroll": {
       "title": "Dodatkowe próby są dostępne raz za darmo",

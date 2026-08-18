@@ -83,6 +83,7 @@ export interface BattlePatch {
   chargeCap?: number;
   startCharge?: number;
   ascension?: number;
+  inverted?: boolean;
   snapshot?: BattleSaveState;
 }
 
@@ -441,6 +442,7 @@ export const createTestApi = (): TestApi => ({
           ? {}
           : { startCharge: patch.startCharge }),
         ...(patch.ascension === undefined ? {} : { ascension: patch.ascension }),
+        ...(patch.inverted === undefined ? {} : { inverted: patch.inverted }),
       },
       deck,
       createStreams(patch.seed ?? DEFAULT_SEED),

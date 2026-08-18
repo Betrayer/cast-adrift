@@ -312,12 +312,12 @@
     "next": "Next",
     "skipAll": "Skip all",
     "place": {
-      "title": "Drag a die into a system",
-      "body": "Roll, then drag dice from the tray onto Weapons, Shields, Engines, Sensors or the Reactor. A die never fits a slot whose cap is below its face."
+      "title": "Send a die to a system",
+      "body": "Tap a die, then tap a lit system card — or drag it there. Each card shows what the die will do before you commit, and a die never fits a card whose cap is below its face."
     },
     "endTurn": {
       "title": "Resolve the turn",
-      "body": "When the board reads the way you want it, end the turn. Systems fire top to bottom, then the enemy answers."
+      "body": "When the board reads the way you want it, end the turn. Systems fire in the order of the numbers on their cards, then the enemy answers."
     },
     "reroll": {
       "title": "Rerolls are free once",

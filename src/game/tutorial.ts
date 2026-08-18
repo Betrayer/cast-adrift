@@ -1,4 +1,4 @@
-import { trayAnchorRect } from "@/pixi/battle/anchors";
+import { boardRegion } from "@/pixi/battle/anchors";
 import { useBattleStore } from "@/stores/battleStore";
 import { useRunStore } from "@/stores/runStore";
 import type { ScreenId } from "@/types";
@@ -35,8 +35,8 @@ const fromSelector =
   };
 
 const trayAnchor = (): CoachRect | null => {
-  const band = trayAnchorRect();
-  if (band === null || band.h === 0) return null;
+  const band = boardRegion("tray");
+  if (band === undefined || band.h === 0) return null;
   return {
     x: band.x - 6,
     y: band.y - 6,

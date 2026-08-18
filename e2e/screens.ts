@@ -228,6 +228,53 @@ export class Screens {
     await this.page.mouse.click(point.x, point.y);
   }
 
+  async selectDie(uid: string): Promise<void> {
+    await this.waitForStableAnchors();
+    await this.tapDie(uid);
+    await expect
+      .poll(async () => (await this.state()).battle.selectedDieUid)
+      .toBe(uid);
+  }
+
+  slotCard(slotId: SlotId): Locator {
+    return this.testId(`slot-${slotId}`);
+  }
+
+  projection(slotId: SlotId): Locator {
+    return this.page.locator(`[data-proj="${slotId}"]`);
+  }
+
+  console(id: string): Locator {
+    return this.testId(`console-${id}`);
+  }
+
+  async tapSlot(slotId: SlotId): Promise<void> {
+    await this.slotCard(slotId).click();
+  }
+
+  async placeByTap(uid: string, slotId: SlotId): Promise<void> {
+    await this.selectDie(uid);
+    await this.tapSlot(slotId);
+    await this.page.waitForFunction(
+      (target) =>
+        window.caTest
+          ?.state()
+          .battle.slots.some(
+            (slot) => slot.id === target.slotId && slot.dieUid === target.uid,
+          ) === true,
+      { uid, slotId },
+      { timeout: BATTLE_TIMEOUT },
+    );
+  }
+
+  async tapEnemy(): Promise<void> {
+    const box = await this.page
+      .locator('[data-band="enemies"]')
+      .boundingBox();
+    if (box === null) throw new Error('no enemy band');
+    await this.page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+  }
+
   async waitForStableAnchors(): Promise<void> {
     await this.page.waitForFunction(
       () =>

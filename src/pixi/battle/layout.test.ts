@@ -2,27 +2,49 @@ import { describe, expect, it } from "vitest";
 import {
   computeBattleLayout,
   type BattleLayout,
+  type BattleLayoutInput,
   type Rect,
 } from "@/pixi/battle/layout";
-import type { SlotId } from "@/types/battle";
 
-const SLOTS: SlotId[] = [
-  "weaponA",
-  "weaponB",
-  "shields",
-  "engines",
-  "sensors",
-  "reactor",
-];
+const band = (x: number, y: number, w: number, h: number): Rect => ({
+  x,
+  y,
+  w,
+  h,
+});
 
-const board = (w: number, h: number, x = 0, y = 0): Rect => ({ x, y, w, h });
+interface Frame {
+  name: string;
+  enemyBand: Rect;
+  trayBand: Rect;
+  dockBand: Rect;
+}
 
-const BOARDS = [
-  { name: "360x640 phone", board: board(360, 402, 0, 118) },
-  { name: "390x844 phone", board: board(390, 560, 0, 172) },
-  { name: "768x1024 tablet", board: board(768, 700, 0, 180) },
-  { name: "1280x800 desktop", board: board(560, 520, 360, 160) },
-  { name: "1920x1080 desktop", board: board(560, 760, 680, 180) },
+const frameFor = (
+  name: string,
+  width: number,
+  top: number,
+  height: number,
+): Frame => {
+  const pad = 12;
+  const inner = width - pad * 2;
+  const dockH = Math.min(190, height * 0.42);
+  const rest = height - dockH;
+  const enemyH = rest * 0.55;
+  return {
+    name,
+    enemyBand: band(pad, top, inner, enemyH),
+    trayBand: band(pad, top + enemyH, inner, rest - enemyH),
+    dockBand: band(pad, top + rest, inner, dockH),
+  };
+};
+
+const FRAMES: readonly Frame[] = [
+  frameFor("360x640 phone", 360, 118, 402),
+  frameFor("390x844 phone", 390, 172, 560),
+  frameFor("768x1024 tablet", 768, 180, 700),
+  frameFor("1280x800 desktop", 560, 160, 520),
+  frameFor("1920x1080 desktop", 560, 180, 760),
 ];
 
 const DECKS = [5, 7, 9];
@@ -34,33 +56,30 @@ const FIGHTS = [
   { enemies: 3, subs: 2 },
 ];
 
-const layoutsForMatrix = (): {
-  name: string;
-  region: Rect;
-  layout: BattleLayout;
-}[] => {
-  const out: { name: string; region: Rect; layout: BattleLayout }[] = [];
-  for (const size of BOARDS) {
-    for (const dice of DECKS) {
-      for (const fight of FIGHTS) {
-        out.push({
-          name: `${size.name} · ${String(dice)} dice · ${String(fight.enemies)}x${String(fight.subs)} subs`,
-          region: size.board,
-          layout: computeBattleLayout({
-            board: size.board,
-            diceCount: dice,
-            enemyCount: fight.enemies,
-            maxSubsystems: fight.subs,
-            slotIds: SLOTS,
-          }),
-        });
-      }
-    }
-  }
-  return out;
-};
+const inputFor = (frame: Frame, dice: number, fight: (typeof FIGHTS)[number]): BattleLayoutInput => ({
+  enemyBand: frame.enemyBand,
+  trayBand: frame.trayBand,
+  dockBand: frame.dockBand,
+  diceCount: dice,
+  enemyCount: fight.enemies,
+  maxSubsystems: fight.subs,
+});
 
-const MATRIX = layoutsForMatrix();
+interface Entry {
+  name: string;
+  frame: Frame;
+  layout: BattleLayout;
+}
+
+const MATRIX: Entry[] = FRAMES.flatMap((frame) =>
+  DECKS.flatMap((dice) =>
+    FIGHTS.map((fight) => ({
+      name: `${frame.name} · ${String(dice)} dice · ${String(fight.enemies)}x${String(fight.subs)} subs`,
+      frame,
+      layout: computeBattleLayout(inputFor(frame, dice, fight)),
+    })),
+  ),
+);
 
 const inside = (region: Rect, x: number, y: number, pad = 0.5): boolean =>
   x >= region.x - pad &&
@@ -71,15 +90,15 @@ const inside = (region: Rect, x: number, y: number, pad = 0.5): boolean =>
 const rectsOverlap = (a: Rect, b: Rect): boolean =>
   a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
-describe("battle board layout", () => {
-  it("keeps every tray die fully inside the board on all matrix sizes", () => {
+describe("battle band layout", () => {
+  it("keeps every tray die inside the tray band on all matrix sizes", () => {
     const offenders: string[] = [];
     for (const entry of MATRIX) {
       const half = entry.layout.dieSize / 2;
       for (const die of entry.layout.tray) {
         if (
-          !inside(entry.region, die.x - half, die.y - half) ||
-          !inside(entry.region, die.x + half, die.y + half)
+          !inside(entry.frame.trayBand, die.x - half, die.y - half) ||
+          !inside(entry.frame.trayBand, die.x + half, die.y + half)
         ) {
           offenders.push(entry.name);
           break;
@@ -89,80 +108,85 @@ describe("battle board layout", () => {
     expect(offenders).toEqual([]);
   });
 
+  it("lays out one anchor per die", () => {
+    for (const frame of FRAMES) {
+      for (const dice of DECKS) {
+        const layout = computeBattleLayout(inputFor(frame, dice, FIGHTS[0] ?? { enemies: 1, subs: 0 }));
+        expect(layout.tray).toHaveLength(dice);
+      }
+    }
+  });
+
   it("wraps a nine-die deck onto two rows at 360px instead of shrinking it off-screen", () => {
-    const layout = computeBattleLayout({
-      board: board(360, 402, 0, 118),
-      diceCount: 9,
-      enemyCount: 1,
-      maxSubsystems: 0,
-      slotIds: SLOTS,
-    });
+    const frame = FRAMES[0];
+    expect(frame).toBeDefined();
+    if (frame === undefined) return;
+    const layout = computeBattleLayout(
+      inputFor(frame, 9, { enemies: 1, subs: 0 }),
+    );
     expect(layout.trayRows).toBe(2);
-    expect(layout.tray).toHaveLength(9);
     expect(layout.dieSize).toBeGreaterThanOrEqual(40);
   });
 
   it("keeps a five-die deck on one row", () => {
-    const layout = computeBattleLayout({
-      board: board(390, 560, 0, 172),
-      diceCount: 5,
-      enemyCount: 1,
-      maxSubsystems: 0,
-      slotIds: SLOTS,
-    });
+    const frame = FRAMES[1];
+    if (frame === undefined) return;
+    const layout = computeBattleLayout(
+      inputFor(frame, 5, { enemies: 1, subs: 0 }),
+    );
     expect(layout.trayRows).toBe(1);
   });
 
-  it("ends the reserve inside the board on all matrix sizes", () => {
-    const offenders: string[] = [];
+  it("never lets the tray band leave the tray region", () => {
     for (const entry of MATRIX) {
-      const bottom = entry.layout.reserve.y + entry.layout.reserve.h;
-      if (bottom > entry.region.y + entry.region.h + 0.5) {
-        offenders.push(`${entry.name} → ${String(Math.round(bottom))}`);
-      }
+      const { trayBand } = entry.layout;
+      expect(
+        inside(entry.frame.trayBand, trayBand.x, trayBand.y) &&
+          inside(
+            entry.frame.trayBand,
+            trayBand.x + trayBand.w,
+            trayBand.y + trayBand.h,
+          ),
+      ).toBe(true);
     }
-    expect(offenders).toEqual([]);
   });
 
-  it("keeps every slot cell inside the board on all matrix sizes", () => {
+  it("keeps enemies inside the enemy band and out of the tray", () => {
     const offenders: string[] = [];
     for (const entry of MATRIX) {
-      for (const rect of Object.values(entry.layout.slots)) {
-        if (
-          !inside(entry.region, rect.x, rect.y) ||
-          !inside(entry.region, rect.x + rect.w, rect.y + rect.h)
-        ) {
-          offenders.push(entry.name);
-          break;
+      for (const anchor of entry.layout.enemies) {
+        const half = entry.layout.enemySize / 2;
+        if (!inside(entry.frame.enemyBand, anchor.x - half, anchor.y - half, 1)) {
+          offenders.push(`${entry.name} top`);
+        }
+        if (anchor.y + half > entry.frame.trayBand.y + 1) {
+          offenders.push(`${entry.name} tray`);
         }
       }
     }
     expect(offenders).toEqual([]);
   });
 
-  it("never overlaps the tray band with the slot grid or the reserve", () => {
-    const offenders: string[] = [];
-    for (const entry of MATRIX) {
-      const { trayBand, reserve, slots } = entry.layout;
-      for (const rect of Object.values(slots)) {
-        if (rectsOverlap(trayBand, rect)) offenders.push(`${entry.name} tray/slot`);
-        if (rectsOverlap(reserve, rect)) offenders.push(`${entry.name} reserve/slot`);
-      }
-    }
-    expect(offenders).toEqual([]);
-  });
-
-  it("clamps the tumble box inside the board and above the tray floor", () => {
+  it("clamps the tumble box to the tray floor", () => {
     const offenders: string[] = [];
     for (const entry of MATRIX) {
       const { tumble, trayBand } = entry.layout;
       const bottom = tumble.y + tumble.h;
-      if (tumble.y < entry.region.y - 0.5) offenders.push(`${entry.name} top`);
-      if (bottom > trayBand.y + trayBand.h + 0.5)
+      if (bottom > trayBand.y + trayBand.h + 0.5) {
         offenders.push(`${entry.name} floor`);
+      }
       if (tumble.h <= 0) offenders.push(`${entry.name} empty`);
     }
     expect(offenders).toEqual([]);
+  });
+
+  it("puts the player hit point at the top of the dock", () => {
+    for (const entry of MATRIX) {
+      const { playerHit } = entry.layout;
+      expect(inside(entry.frame.dockBand, playerHit.x, playerHit.y, 1)).toBe(
+        true,
+      );
+    }
   });
 });
 
@@ -178,7 +202,11 @@ describe("enemy hit geometry", () => {
     };
   };
 
-  const chipRects = (layout: BattleLayout, index: number, subs: number): Rect[] => {
+  const chipRects = (
+    layout: BattleLayout,
+    index: number,
+    subs: number,
+  ): Rect[] => {
     const anchor = layout.enemies[index];
     if (anchor === undefined) throw new Error("missing enemy anchor");
     const { subsystems } = layout;
@@ -195,7 +223,12 @@ describe("enemy hit geometry", () => {
     for (const entry of MATRIX) {
       const count = entry.layout.enemies.length;
       for (let i = 0; i + 1 < count; i += 1) {
-        if (rectsOverlap(absoluteHit(entry.layout, i), absoluteHit(entry.layout, i + 1))) {
+        if (
+          rectsOverlap(
+            absoluteHit(entry.layout, i),
+            absoluteHit(entry.layout, i + 1),
+          )
+        ) {
           offenders.push(entry.name);
         }
       }
@@ -205,23 +238,17 @@ describe("enemy hit geometry", () => {
 
   it("never lets an enemy hit rectangle swallow a neighbour's subsystem chip", () => {
     const offenders: string[] = [];
-    for (const size of BOARDS) {
+    for (const frame of FRAMES) {
       for (const fight of FIGHTS) {
         if (fight.subs === 0 || fight.enemies < 2) continue;
-        const layout = computeBattleLayout({
-          board: size.board,
-          diceCount: 9,
-          enemyCount: fight.enemies,
-          maxSubsystems: fight.subs,
-          slotIds: SLOTS,
-        });
+        const layout = computeBattleLayout(inputFor(frame, 9, fight));
         for (let i = 0; i < fight.enemies; i += 1) {
           for (let j = 0; j < fight.enemies; j += 1) {
             if (i === j) continue;
             for (const chip of chipRects(layout, i, fight.subs)) {
               if (rectsOverlap(absoluteHit(layout, j), chip)) {
                 offenders.push(
-                  `${size.name} ${String(fight.enemies)}x${String(fight.subs)}`,
+                  `${frame.name} ${String(fight.enemies)}x${String(fight.subs)}`,
                 );
               }
             }
@@ -232,7 +259,7 @@ describe("enemy hit geometry", () => {
     expect(offenders).toEqual([]);
   });
 
-  it("keeps subsystem chips at a 32px minimum tap diameter", () => {
+  it("keeps subsystem chips at a 24px minimum tap diameter", () => {
     for (const entry of MATRIX) {
       expect(entry.layout.subsystems.radius * 2).toBeGreaterThanOrEqual(24);
     }
@@ -240,11 +267,12 @@ describe("enemy hit geometry", () => {
 
   it("stacks subsystem chips below the body when there is no room beside it", () => {
     const layout = computeBattleLayout({
-      board: board(320, 420, 0, 110),
+      enemyBand: band(12, 110, 252, 150),
+      trayBand: band(12, 260, 252, 110),
+      dockBand: band(12, 370, 252, 160),
       diceCount: 9,
       enemyCount: 3,
       maxSubsystems: 2,
-      slotIds: SLOTS,
     });
     expect(layout.subsystems.x).toBe(0);
     expect(layout.subsystems.y0).toBeGreaterThan(0);

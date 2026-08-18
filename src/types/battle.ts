@@ -181,6 +181,7 @@ export interface Beat {
   slot: SlotId;
   kind: BeatKind;
   amount: number;
+  value?: number;
   targetId?: string;
   evasion?: EvasionState;
   sensor?: SensorResult;

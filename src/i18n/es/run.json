@@ -312,12 +312,12 @@
     "next": "Siguiente",
     "skipAll": "Saltar todo",
     "place": {
-      "title": "Arrastra un dado a un sistema",
-      "body": "Tira los dados y, a continuación, arrástralos desde la bandeja hasta las casillas de «Armas», «Escudos», «Motores», «Sensores» o «Reactor». Un dado nunca encaja en una casilla cuyo límite esté por debajo de su cara."
+      "title": "Envía un dado a un sistema",
+      "body": "Toca un dado y luego una tarjeta de sistema iluminada — o arrástralo hasta ella. Cada tarjeta muestra el resultado antes de colocarlo, y un dado nunca cabe en una tarjeta cuyo tope sea menor que su cara."
     },
     "endTurn": {
-      "title": "Resolver el turno",
-      "body": "Cuando el tablero se vea tal y como quieres, da por terminado el turno. Los sistemas disparan de arriba abajo y, a continuación, el enemigo responde."
+      "title": "Resuelve el turno",
+      "body": "Cuando el tablero te convenza, termina el turno. Los sistemas disparan en el orden de los números de sus tarjetas y luego responde el enemigo."
     },
     "reroll": {
       "title": "Las repeticiones son gratuitas una vez",

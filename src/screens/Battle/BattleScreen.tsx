@@ -1,42 +1,24 @@
-import { Button, Group, Overlay, Stack, Text, Title } from '@mantine/core';
+import { Button, Overlay, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
 import { LootReveal } from '@/screens/Battle/LootReveal';
 import { useLootStore } from '@/stores/lootStore';
-import type { TFunction } from 'i18next';
 import type { Application } from 'pixi.js';
 import { tokens } from '@/app/theme';
 import { WarpStreaks } from '@/components/WarpStreaks';
 import { STARTER_DECK } from '@/data/decks';
-import { ENEMY_BY_ID } from '@/data/enemies';
-import { DIE_BY_ID } from '@/data/dice';
-import { FATE_DIE_ID, FATE_TABLE } from '@/data/fate';
 import { schools } from '@/data/schools';
 import {
-  canBank,
-  canCopy,
-  canFlip,
-  canSplit,
-  canSwap,
-} from '@/game/battle/actives';
-import {
   activeThresholds,
-  nextThreshold,
   RESONANCE_THRESHOLDS,
   SCHOOL_ORDER,
 } from '@/game/battle/resonance';
-import {
-  BONUS_REROLL_COST,
-  CHARGE_CAP,
-  NUDGE_COST,
-  SURGE_COST,
-} from '@/game/battle/resolver';
+import { CHARGE_CAP } from '@/game/battle/resolver';
 import { isInverted } from '@/game/battle/order';
+import { allowedSlotsForTurn } from '@/game/battle/view';
 import { resolveActiveBattle } from '@/game/run/flow';
 import { emitBark } from '@/game/narrative';
-import { hasTrait } from '@/game/run/perkMods';
-import { runHasTrait } from '@/game/run/runMods';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { initAudio, playSfx } from '@/services/audio';
@@ -45,15 +27,19 @@ import { haptic } from '@/services/tma';
 import { createStreams } from '@/services/rng';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
 import { useAppStore } from '@/stores/appStore';
-import { allowedSlotsForTurn, useBattleStore } from '@/stores/battleStore';
+import { useBattleStore } from '@/stores/battleStore';
 import { useRunStore } from '@/stores/runStore';
 import { BossIntro } from '@/screens/Battle/BossIntro';
 import { FateInvocation } from '@/screens/Battle/FateInvocation';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
 import { BuildSheet } from '@/screens/Build/BuildSheet';
+import { SlotDock } from '@/screens/Battle/board/SlotDock';
+import { useRegion } from '@/screens/Battle/board/measure';
+import { Console } from '@/screens/Battle/console/Console';
+import { EnemyDetail } from '@/screens/Battle/console/EnemyDetail';
+import { Forecast } from '@/screens/Battle/console/Forecast';
 import bossStyles from './BossIntro.module.css';
-import type { EnemyState } from '@/types/battle';
-import type { Intent } from '@/types/content';
+import boardStyles from './board/Board.module.css';
 import styles from './BattleScreen.module.css';
 
 const BOSS_HIT_STOP_MS = 300;
@@ -67,84 +53,6 @@ const startTestBattleIfIdle = (): void => {
     STARTER_DECK,
     createStreams(now() >>> 0),
   );
-};
-
-const intentLabel = (t: TFunction<['battle', 'content']>, intent: Intent): string => {
-  switch (intent.t) {
-    case 'attack':
-      return t('battle:intent.attack', { n: intent.n });
-    case 'shield':
-      return t('battle:intent.shield', { n: intent.n });
-    case 'shieldAll':
-      return t('battle:intent.shieldAll', { n: intent.n });
-    case 'multi':
-      return t('battle:intent.multi', { n: intent.n, k: intent.k });
-    case 'charge':
-      return t('battle:intent.charge');
-    case 'jamSlot':
-      return t('battle:intent.jamSlot');
-    case 'lockDie':
-      return t('battle:intent.lockDie');
-    case 'summon':
-      return t('battle:intent.summon');
-    case 'healAllies':
-      return t('battle:intent.healAllies', { n: intent.n });
-    case 'mirrorHalf':
-      return t('battle:intent.mirrorHalf');
-    case 'stealScrap':
-      return t('battle:intent.stealScrap', { n: intent.n });
-    case 'capShrink':
-      return t('battle:intent.capShrink');
-    case 'twistDie':
-      return t('battle:intent.twistDie');
-    case 'swapValues':
-      return t('battle:intent.swapValues');
-    case 'storm':
-      return t('battle:intent.storm');
-    case 'curseDie':
-      return t('battle:intent.curseDie', { n: intent.n });
-    case 'shieldGate':
-      return t('battle:intent.shieldGate', { n: intent.n });
-    case 'mirrorSchool':
-      return t('battle:intent.mirrorSchool');
-    case 'drainCharge':
-      return t('battle:intent.drainCharge', { n: intent.n });
-    case 'siphonShield':
-      return t('battle:intent.siphonShield', { n: intent.n });
-    case 'bargain':
-      return t('battle:intent.bargain', { n: intent.n, heal: intent.heal });
-    case 'enrage':
-      return t('battle:intent.enrage', { n: intent.n });
-    case 'hijack':
-      return t('battle:intent.hijack');
-    case 'echoTotal':
-      return t('battle:intent.echoTotal', { n: intent.cap });
-    case 'foldOrder':
-      return t('battle:intent.foldOrder');
-    case 'devourDie':
-      return t('battle:intent.devourDie');
-  }
-};
-
-const ATTACK_INTENTS: ReadonlySet<Intent['t']> = new Set([
-  'attack',
-  'multi',
-  'mirrorHalf',
-  'mirrorSchool',
-  'enrage',
-]);
-
-const SHIELD_INTENTS: ReadonlySet<Intent['t']> = new Set([
-  'shield',
-  'shieldAll',
-  'shieldGate',
-  'siphonShield',
-]);
-
-const intentPillClass = (intent: Intent): string => {
-  if (ATTACK_INTENTS.has(intent.t)) return styles.intentAttack ?? '';
-  if (SHIELD_INTENTS.has(intent.t)) return styles.intentShield ?? '';
-  return styles.intentUtility ?? '';
 };
 
 const CausalityBanner = () => {
@@ -184,7 +92,7 @@ const CausalityBanner = () => {
   );
 };
 
-const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
+const StatusBar = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
   const { t } = useTranslation(['battle', 'run']);
   const hull = useBattleStore((s) => s.hull);
   const hullMax = useBattleStore((s) => s.hullMax);
@@ -193,11 +101,6 @@ const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
   const scrap = useBattleStore((s) => s.scrap);
   const interference = useBattleStore((s) => s.interference);
   const turn = useBattleStore((s) => s.turn);
-  const phase = useBattleStore((s) => s.phase);
-  const rerollMode = useBattleStore((s) => s.rerollMode);
-  const rerollsLeft = useBattleStore((s) => s.rerollsLeft);
-  const spendBonusReroll = useBattleStore((s) => s.spendBonusReroll);
-  const spendSurge = useBattleStore((s) => s.spendSurge);
   const fillRef = useRef<HTMLDivElement | null>(null);
   const prevHull = useRef(hull);
 
@@ -213,14 +116,18 @@ const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
   }, [hull]);
 
   const ratio = hullMax > 0 ? Math.max(0, Math.min(1, hull / hullMax)) : 0;
-  const spendable = phase === 'placement' && !rerollMode;
 
   return (
     <div className={styles.statusCard} data-band="status">
       <div className={styles.statusLeft}>
-        <Text size="sm" c={tokens.text}>
-          {t('battle:hull', { hp: hull, max: hullMax })}
-        </Text>
+        <div className={styles.statusHeadline}>
+          <Text size="sm" c={tokens.text}>
+            {t('battle:hull', { hp: hull, max: hullMax })}
+          </Text>
+          <Text size="xs" c={tokens.dim}>
+            {t('battle:turn', { n: turn })}
+          </Text>
+        </div>
         <div className={styles.hullTrack}>
           <div
             ref={fillRef}
@@ -228,14 +135,13 @@ const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
             style={{ width: `${String(ratio * 100)}%` }}
           />
         </div>
-        <Text size="xs" c={tokens.dim}>
-          {t('battle:turn', { n: turn })}
-        </Text>
       </div>
       <div className={styles.statusRight}>
-        <span className={`${styles.pill ?? ''} ${styles.pillShield ?? ''}`}>
-          {t('battle:shield', { n: shield })}
-        </span>
+        {shield > 0 ? (
+          <span className={`${styles.pill ?? ''} ${styles.pillShield ?? ''}`}>
+            {t('battle:shield', { n: shield })}
+          </span>
+        ) : null}
         {interference > 0 ? (
           <span className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}>
             {t('battle:interference', { n: interference })}
@@ -252,155 +158,17 @@ const StatusCard = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
         >
           {t('battle:charge', { n: charge, max: CHARGE_CAP })}
         </span>
-        <Group gap={4} justify="flex-end">
-          <Button
-            className={styles.clickable}
-            size="compact-xs"
-            variant="default"
-            disabled={!spendable || rerollsLeft <= 0 || charge < BONUS_REROLL_COST}
-            onClick={() => {
-              playSfx('reroll');
-              spendBonusReroll();
-            }}
-          >
-            {t('battle:buyReroll')}
-          </Button>
-          <Button
-            className={styles.clickable}
-            size="compact-xs"
-            variant="default"
-            disabled={!spendable || charge < SURGE_COST}
-            onClick={() => {
-              playSfx('surge');
-              spendSurge();
-            }}
-          >
-            {t('battle:surge')}
-          </Button>
-          <Button
-            className={styles.clickable}
-            size="compact-xs"
-            variant="subtle"
-            color="gray"
-            data-open-build
-            onClick={onOpenBuild}
-          >
-            {t('run:build.open')}
-          </Button>
-        </Group>
-      </div>
-    </div>
-  );
-};
-
-const COMPACT_ENEMY_COUNT = 3;
-
-const EnemyTraitChips = ({ enemy }: { enemy: EnemyState }) => {
-  const { t } = useTranslation(['battle']);
-  const chips: { key: string; label: string; color: string }[] = [];
-  if (enemy.ward !== undefined) {
-    chips.push({
-      key: 'ward',
-      label: t('battle:enemyWard', { school: t(`battle:school.${enemy.ward}`) }),
-      color: schools[enemy.ward].text,
-    });
-  }
-  if ((enemy.gate ?? 0) > 0) {
-    chips.push({
-      key: 'gate',
-      label: t('battle:enemyGate', { n: enemy.gate }),
-      color: schools.blue.text,
-    });
-  }
-  if ((enemy.rage ?? 0) > 0) {
-    chips.push({
-      key: 'rage',
-      label: t('battle:enemyRage', { n: enemy.rage }),
-      color: schools.red.text,
-    });
-  }
-  if ((enemy.statuses.mark ?? 0) > 0) {
-    chips.push({
-      key: 'vulnerable',
-      label: t('battle:enemyVulnerable', { n: enemy.statuses.mark }),
-      color: schools.grey.text,
-    });
-  }
-  if (chips.length === 0) return null;
-  return (
-    <div className={styles.enemyTraitRow} data-enemy-traits={enemy.id}>
-      {chips.map((chip) => (
-        <span
-          key={chip.key}
-          className={styles.enemyTraitChip}
-          style={{ color: chip.color, borderColor: chip.color }}
+        <Button
+          className={styles.clickable}
+          size="compact-xs"
+          variant="subtle"
+          color="gray"
+          data-open-build
+          onClick={onOpenBuild}
         >
-          {chip.label}
-        </span>
-      ))}
-    </div>
-  );
-};
-
-const EnemyChips = () => {
-  const { t } = useTranslation(['battle', 'content']);
-  const enemies = useBattleStore((s) => s.enemies);
-  const targetId = useBattleStore((s) => s.targetId);
-  const setTarget = useBattleStore((s) => s.setTarget);
-  const compact = enemies.length >= COMPACT_ENEMY_COUNT;
-  return (
-    <div className={styles.enemyRow} data-band="enemies">
-      {enemies.map((enemy) => {
-        const def = ENEMY_BY_ID.get(enemy.defId);
-        if (def === undefined) return null;
-        const intent = enemy.nextIntent;
-        const targeted =
-          targetId === enemy.id ||
-          enemy.subsystems.some((sub) => sub.id === targetId);
-        return (
-          <div
-            key={enemy.id}
-            role="button"
-            tabIndex={0}
-            className={`${styles.enemyChip ?? ''} ${compact ? styles.enemyChipCompact ?? '' : ''} ${targeted ? styles.enemyChipTargeted ?? '' : ''}`}
-            style={{ opacity: enemy.hp > 0 ? 1 : 0.45 }}
-            onClick={() => {
-              if (enemy.hp > 0) setTarget(enemy.id);
-            }}
-            onKeyDown={(event) => {
-              if (event.key !== 'Enter' && event.key !== ' ') return;
-              if (enemy.hp > 0) setTarget(enemy.id);
-            }}
-          >
-            <Text
-              size={compact ? 'xs' : 'sm'}
-              fw={600}
-              c={tokens.text}
-              className={styles.enemyName}
-            >
-              {t(def.name)}
-            </Text>
-            <Text size="xs" c={tokens.dim}>
-              {t(compact ? 'battle:hpShort' : 'battle:hp', {
-                hp: enemy.hp,
-                max: enemy.hpMax,
-              })}
-              {enemy.shield > 0
-                ? ` · ${t('battle:shield', { n: enemy.shield })}`
-                : ''}
-            </Text>
-            {enemy.hp > 0 ? <EnemyTraitChips enemy={enemy} /> : null}
-            {enemy.hp > 0 ? (
-              <span
-                key={intentLabel(t, intent)}
-                className={`${styles.intentPill ?? ''} ${intentPillClass(intent)} ${styles.intentPulse ?? ''}`}
-              >
-                {intentLabel(t, intent)}
-              </span>
-            ) : null}
-          </div>
-        );
-      })}
+          {t('run:build.open')}
+        </Button>
+      </div>
     </div>
   );
 };
@@ -408,261 +176,94 @@ const EnemyChips = () => {
 const ResonanceChips = () => {
   const { t } = useTranslation(['battle']);
   const resonance = useBattleStore((s) => s.resonance);
-  const present = SCHOOL_ORDER.filter((school) => resonance.counts[school] > 0);
-  if (present.length === 0) return null;
+  const dice = useBattleStore((s) => s.dice);
+  const [open, setOpen] = useState(false);
+
+  const census = useMemo(() => {
+    const rows = SCHOOL_ORDER.map((school) => {
+      const owned = dice.filter((d) => d.school === school);
+      return {
+        school,
+        deck: resonance.counts[school],
+        prism: resonance.counts[school] > owned.length,
+        placed: owned.filter((d) => d.state === 'placed').length,
+        tray: owned.filter((d) => d.state === 'tray').length,
+        reserved: owned.filter((d) => d.state === 'reserved').length,
+      };
+    });
+    return rows.filter(
+      (row) => row.deck > 0 || row.placed + row.tray + row.reserved > 0,
+    );
+  }, [dice, resonance]);
+
+  if (census.length === 0) return null;
   return (
-    <div className={styles.resonanceRow}>
-      {present.map((school) => {
-        const count = resonance.counts[school];
-        const next = nextThreshold(count);
-        const active = activeThresholds(resonance, school);
-        const colors = schools[school];
-        const schoolLabel = t(`battle:school.${school}`);
-        const label =
-          next === null
-            ? t('battle:resChipFull', { school: schoolLabel, count })
-            : t('battle:resChip', { school: schoolLabel, count, next });
-        return (
-          <span
-            key={school}
-            className={`${styles.resChip ?? ''} ${active.length > 0 ? styles.resChipActive ?? '' : ''
+    <div className={styles.resonanceWrap}>
+      {open ? (
+        <div className={styles.resPopover} data-res-popover>
+          {census.map((row) => (
+            <div key={row.school} className={styles.resPopRow}>
+              <span style={{ color: schools[row.school].text }}>
+                {t(`battle:school.${row.school}`)}
+              </span>
+              <span>
+                {t('battle:resDetail', {
+                  deck: row.deck,
+                  placed: row.placed,
+                  tray: row.tray,
+                  reserved: row.reserved,
+                })}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : null}
+      <button
+        type="button"
+        className={styles.resonanceRow}
+        data-testid="resonance-row"
+        onClick={() => {
+          setOpen((value) => !value);
+        }}
+      >
+        {census.map((row) => {
+          const active = activeThresholds(resonance, row.school);
+          const colors = schools[row.school];
+          return (
+            <span
+              key={row.school}
+              className={`${styles.resChip ?? ''} ${
+                active.length > 0 ? styles.resChipActive ?? '' : ''
               }`}
-            style={{ borderColor: colors.stroke, color: colors.text }}
-          >
-            {label}
-            <span className={styles.resPips}>
-              {RESONANCE_THRESHOLDS.map((th) => (
+              style={{ borderColor: colors.stroke, color: colors.text }}
+              data-res-school={row.school}
+            >
+              {t('battle:resBoard', {
+                school: t(`battle:school.${row.school}`),
+                placed: row.placed,
+                tray: row.tray,
+              })}
+              {row.prism ? (
                 <span
-                  key={th}
-                  className={`${styles.resPip ?? ''} ${active.includes(th) ? styles.resPipOn ?? '' : ''
-                    }`}
+                  className={styles.resPrism}
+                  data-res-prism={row.school}
+                  title={t('battle:resPrism')}
                 />
-              ))}
+              ) : null}
+              <span className={styles.resPips}>
+                {RESONANCE_THRESHOLDS.map((th) => (
+                  <span
+                    key={th}
+                    className={`${styles.resPip ?? ''} ${
+                      active.includes(th) ? styles.resPipOn ?? '' : ''
+                    }`}
+                  />
+                ))}
+              </span>
             </span>
-          </span>
-        );
-      })}
-    </div>
-  );
-};
-
-const DieControls = () => {
-  const { t } = useTranslation(['battle', 'content']);
-  const charge = useBattleStore((s) => s.charge);
-  const freeNudges = useBattleStore((s) => s.freeNudges);
-  const resonance = useBattleStore((s) => s.resonance);
-  const selectedDieUid = useBattleStore((s) => s.selectedDieUid);
-  const spendNudge = useBattleStore((s) => s.spendNudge);
-  const flipDie = useBattleStore((s) => s.flipDie);
-  const copyDie = useBattleStore((s) => s.copyDie);
-  const beginSwap = useBattleStore((s) => s.beginSwap);
-  const cancelSwap = useBattleStore((s) => s.cancelSwap);
-  const bankDie = useBattleStore((s) => s.bankDie);
-  const splitDie = useBattleStore((s) => s.splitDie);
-  const swapSourceUid = useBattleStore((s) => s.swapSourceUid);
-  const die = useBattleStore((s) =>
-    s.dice.find((d) => d.uid === s.selectedDieUid),
-  );
-  if (selectedDieUid === null || die === undefined) return null;
-  const def = DIE_BY_ID.get(die.defId);
-  const free = freeNudges > 0;
-  const affordable = free || charge >= NUDGE_COST;
-  return (
-    <>
-      {def !== undefined ? (
-        <Text size="xs" fw={600} c={tokens.text} className={styles.railLabel}>
-          {`${t(def.name)} · d${String(def.tier)}`}
-        </Text>
-      ) : null}
-      <Button
-        className={styles.clickable}
-        size="compact-sm"
-        variant="default"
-        disabled={!affordable || die.value <= 1}
-        onClick={() => {
-          playSfx('nudge');
-          spendNudge(selectedDieUid, -1);
-        }}
-      >
-        {t(free ? 'battle:nudgeFree' : 'battle:nudgeMinus')}
-      </Button>
-      <Button
-        className={styles.clickable}
-        size="compact-sm"
-        variant="default"
-        disabled={!affordable || die.value >= die.tier}
-        onClick={() => {
-          playSfx('nudge');
-          spendNudge(selectedDieUid, 1);
-        }}
-      >
-        {t(free ? 'battle:nudgeFreePlus' : 'battle:nudgePlus')}
-      </Button>
-      {canFlip(die) ? (
-        <Button
-          className={styles.clickable}
-          size="compact-sm"
-          variant="default"
-          onClick={() => {
-            flipDie(selectedDieUid);
-          }}
-        >
-          {t('battle:flip')}
-        </Button>
-      ) : null}
-      {die.state === 'tray' && canCopy(die, resonance) ? (
-        <Button
-          className={styles.clickable}
-          size="compact-sm"
-          variant="default"
-          onClick={() => {
-            copyDie(selectedDieUid);
-          }}
-        >
-          {t('battle:copy')}
-        </Button>
-      ) : null}
-      {canSwap(die) ? (
-        <Button
-          className={styles.clickable}
-          size="compact-sm"
-          variant={swapSourceUid === die.uid ? 'filled' : 'default'}
-          onClick={() => {
-            if (swapSourceUid === die.uid) cancelSwap();
-            else beginSwap(selectedDieUid);
-          }}
-        >
-          {t(swapSourceUid === die.uid ? 'battle:swapPick' : 'battle:swap')}
-        </Button>
-      ) : null}
-      {canBank(die) ? (
-        <Button
-          className={styles.clickable}
-          size="compact-sm"
-          variant="default"
-          onClick={() => {
-            bankDie(selectedDieUid);
-          }}
-        >
-          {t('battle:bank')}
-        </Button>
-      ) : null}
-      {canSplit(die) ? (
-        <Button
-          className={styles.clickable}
-          size="compact-sm"
-          variant="default"
-          onClick={() => {
-            splitDie(selectedDieUid);
-          }}
-        >
-          {t('battle:split')}
-        </Button>
-      ) : null}
-    </>
-  );
-};
-
-const PerkControls = () => {
-  const { t } = useTranslation(['battle']);
-  const perks = useBattleStore((s) => s.perks);
-  const hull = useBattleStore((s) => s.hull);
-  const bloodUsed = useBattleStore((s) => s.bloodReactorUsed);
-  const selected = useBattleStore((s) => s.selectedDieUid);
-  const bloodReactor = useBattleStore((s) => s.bloodReactor);
-  const sacrificeDie = useBattleStore((s) => s.sacrificeDie);
-  const hasBlood = hasTrait(perks, 'bloodReactor');
-  const hasSac = hasTrait(perks, 'sacrifice');
-  if (!hasBlood && !hasSac) return null;
-  return (
-    <>
-      {hasBlood ? (
-        <Button
-          className={styles.clickable}
-          size="compact-sm"
-          variant="default"
-          disabled={bloodUsed || hull <= 2}
-          onClick={bloodReactor}
-        >
-          {t('battle:bloodReactor')}
-        </Button>
-      ) : null}
-      {hasSac ? (
-        <Button
-          className={styles.clickable}
-          size="compact-sm"
-          variant="default"
-          disabled={selected === null}
-          onClick={() => {
-            if (selected !== null) sacrificeDie(selected);
-          }}
-        >
-          {t('battle:sacrifice')}
-        </Button>
-      ) : null}
-    </>
-  );
-};
-
-const FateControls = () => {
-  const { t } = useTranslation(['battle', 'content']);
-  const dice = useBattleStore((s) => s.dice);
-  const fateUses = useBattleStore((s) => s.fateUses);
-  const perks = useBattleStore((s) => s.perks);
-  const chartPicks = useBattleStore((s) => s.chartPicks);
-  const modules = useBattleStore((s) => s.modules);
-  const fateRoll = useBattleStore((s) => s.fateRoll);
-  const fateOutcomeId = useBattleStore((s) => s.fateOutcomeId);
-  const rollFate = useBattleStore((s) => s.rollFate);
-  const clearFateResult = useBattleStore((s) => s.clearFateResult);
-  const hasFate = dice.some((d) => d.defId === FATE_DIE_ID);
-  const maxUses = runHasTrait(perks, chartPicks, 'fateTwice', modules) ? 2 : 1;
-  const fateUsed = fateUses >= maxUses;
-  if (!hasFate) return null;
-  const outcome =
-    fateOutcomeId === null
-      ? undefined
-      : FATE_TABLE.find((o) => o.id === fateOutcomeId);
-  return (
-    <>
-      <Button
-        className={styles.clickable}
-        size="compact-sm"
-        variant={fateUsed ? 'default' : 'filled'}
-        disabled={fateUsed}
-        onClick={rollFate}
-      >
-        {t('battle:fate')}
-      </Button>
-      {fateRoll !== null && outcome !== undefined ? (
-        <Text
-          size="xs"
-          c={tokens.amber}
-          className={`${styles.clickable ?? ''} ${styles.railLabel ?? ''}`}
-          onClick={clearFateResult}
-        >
-          {t('battle:fateResult', { roll: fateRoll, text: t(outcome.text) })}
-        </Text>
-      ) : null}
-    </>
-  );
-};
-
-const ActionRail = () => {
-  const phase = useBattleStore((s) => s.phase);
-  const perks = useBattleStore((s) => s.perks);
-  const dice = useBattleStore((s) => s.dice);
-  const selectedDieUid = useBattleStore((s) => s.selectedDieUid);
-  const hasPerkControls =
-    hasTrait(perks, 'bloodReactor') || hasTrait(perks, 'sacrifice');
-  const hasFate = dice.some((d) => d.defId === FATE_DIE_ID);
-  if (phase !== 'placement') return null;
-  if (selectedDieUid === null && !hasPerkControls && !hasFate) return null;
-  return (
-    <div className={styles.actionRail} data-band="rail" data-action-rail>
-      <DieControls />
-      <PerkControls />
-      <FateControls />
+          );
+        })}
+      </button>
     </div>
   );
 };
@@ -682,83 +283,23 @@ const ScriptHint = () => {
   );
 };
 
-const BottomBar = () => {
+const EndTurnButton = () => {
   const { t } = useTranslation(['battle']);
   const phase = useBattleStore((s) => s.phase);
-  const rerollsLeft = useBattleStore((s) => s.rerollsLeft);
-  const rerollSize = useBattleStore((s) => s.rerollSize);
   const rerollMode = useBattleStore((s) => s.rerollMode);
-  const rerollSelection = useBattleStore((s) => s.rerollSelection);
-  const toggleRerollMode = useBattleStore((s) => s.toggleRerollMode);
-  const confirmReroll = useBattleStore((s) => s.confirmReroll);
   const endTurn = useBattleStore((s) => s.endTurn);
   return (
-    <div className={styles.bottomBar} data-band="bottom">
-      <ResonanceChips />
-      <ScriptHint />
-      {rerollMode ? (
-        <Text size="xs" c={tokens.dim} ta="center" className={styles.hint}>
-          {t('battle:rerollHint', { size: rerollSize })}
-        </Text>
-      ) : (
-        <Text size="xs" c={tokens.faint} ta="center" className={styles.hint}>
-          {t('battle:burnHint')}
-        </Text>
-      )}
-      <div className={styles.rerollRow}>
-        {rerollMode ? (
-          <>
-            <Button
-              className={styles.clickable}
-              size="sm"
-              variant="default"
-              data-testid="battle-reroll-cancel"
-              onClick={toggleRerollMode}
-            >
-              {t('battle:rerollCancel')}
-            </Button>
-            <Button
-              className={styles.clickable}
-              size="sm"
-              disabled={rerollSelection.length === 0}
-              data-testid="battle-reroll-confirm"
-              onClick={() => {
-                playSfx('reroll');
-                confirmReroll();
-              }}
-            >
-              {t('battle:rerollConfirm', {
-                k: rerollSelection.length,
-                size: rerollSize,
-              })}
-            </Button>
-          </>
-        ) : (
-          <Button
-            className={styles.clickable}
-            size="sm"
-            variant="default"
-            disabled={phase !== 'placement' || rerollsLeft <= 0}
-            onClick={toggleRerollMode}
-            data-coach="reroll"
-            data-testid="battle-reroll"
-          >
-            {t('battle:reroll', { n: rerollsLeft })}
-          </Button>
-        )}
-      </div>
-      <Button
-        className={styles.clickable}
-        size="md"
-        fullWidth
-        disabled={phase !== 'placement' || rerollMode}
-        onClick={endTurn}
-        data-coach="endTurn"
-        data-testid="battle-end-turn"
-      >
-        {t('battle:endTurn')}
-      </Button>
-    </div>
+    <Button
+      className={styles.clickable}
+      size="md"
+      fullWidth
+      disabled={phase !== 'placement' || rerollMode}
+      onClick={endTurn}
+      data-coach="endTurn"
+      data-testid="battle-end-turn"
+    >
+      {t('battle:endTurn')}
+    </Button>
   );
 };
 
@@ -789,6 +330,18 @@ const EndOverlay = () => {
         </Button>
       </Stack>
     </Overlay>
+  );
+};
+
+const BoardColumn = () => {
+  const enemyRef = useRegion('enemies');
+  const trayRef = useRegion('tray');
+  return (
+    <div className={boardStyles.column}>
+      <div ref={enemyRef} className={boardStyles.enemyBand} data-band="enemies" />
+      <div ref={trayRef} className={boardStyles.trayBand} data-band="tray" />
+      <SlotDock />
+    </div>
   );
 };
 
@@ -872,14 +425,9 @@ export const BattleScreen = () => {
   const mountScene = useMemo(
     () => (app: Application) =>
       mountBattleScene(app, {
-        slotTitle: (slot) => t(`battle:slot.${slot}`),
-        capLabel: (cap, mk) => t('battle:slot.cap', { cap, mk }),
-        evasionLabel: (dodge, glancing) =>
-          t('battle:slot.evasion', { dodge, glancing }),
-        pierceLabel: (n) => t('battle:pierce', { n }),
-        reserveTitle: t('battle:reserve'),
         statusGlyph: (key) => t(`battle:status.${key}`),
         jamLabel: t('battle:jam'),
+        pierceLabel: (n) => t('battle:pierce', { n }),
         beatGlyph: (kind) => t(`battle:beat.${kind}`),
       }),
     [t],
@@ -896,26 +444,30 @@ export const BattleScreen = () => {
       scroll={false}
       passThrough
       bodyClassName={styles.board}
-      background={<PixiCanvas mount={mountScene} />}
+      innerClassName={styles.inner}
       header={
         <div className={styles.topBands}>
           <CausalityBanner />
-          <StatusCard
+          <StatusBar
             onOpenBuild={() => {
               setBuildOpen(true);
             }}
           />
-          <EnemyChips />
-          <ActionRail />
         </div>
       }
       footer={
         <div className={styles.centreColumn}>
-          <BottomBar />
+          <ResonanceChips />
+          <ScriptHint />
+          <Forecast />
+          <Console />
+          <EndTurnButton />
         </div>
       }
       overlay={
         <>
+          <PixiCanvas mount={mountScene} transparent />
+          <EnemyDetail />
           {buildOpen ? (
             <BuildSheet
               onClose={() => {
@@ -938,6 +490,8 @@ export const BattleScreen = () => {
           {debugEnabled ? <DebugPanel /> : null}
         </>
       }
-    />
+    >
+      <BoardColumn />
+    </Screen>
   );
 };

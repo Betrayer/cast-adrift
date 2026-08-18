@@ -1,5 +1,6 @@
 import { expect, test } from '../fixtures';
 import type { Screens } from '../screens';
+import type { SlotId } from '@/types/battle';
 
 const SEED = 7;
 
@@ -32,6 +33,74 @@ test.describe('visual baselines', () => {
     await app.waitForPlacement();
     await app.waitForStableAnchors();
     await shot(app, 'battle-placement.png');
+  });
+
+  test('battle loaded board', async ({ app }) => {
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['raider'],
+        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen'],
+        seed: 42,
+        startCharge: 6,
+      });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    const plan = await app.page.evaluate(() => {
+      const api = window.caTest;
+      if (api === undefined) return [];
+      const taken = new Set<string>();
+      const moves: { uid: string; slotId: SlotId }[] = [];
+      for (const die of api.state().battle.dice) {
+        if (die.state !== 'tray') continue;
+        const slot = api.slotsFor(die.uid).find((id) => !taken.has(id));
+        if (slot === undefined) continue;
+        taken.add(slot);
+        moves.push({ uid: die.uid, slotId: slot });
+      }
+      return moves;
+    });
+    for (const move of plan) await app.placeByTap(move.uid, move.slotId);
+    await app.waitForStableAnchors();
+    await shot(app, 'battle-loaded.png');
+  });
+
+  test('battle boss fight', async ({ app }) => {
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['quarantineWarden'],
+        seed: 42,
+        hull: 24,
+        hullMax: 30,
+      });
+    });
+    await app.waitForPlacement();
+    await app.testId('boss-intro-begin').click();
+    await app.waitForStableAnchors();
+    await shot(app, 'battle-boss.png');
+  });
+
+  test('battle prismatic selection', async ({ app }) => {
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({
+        enemyIds: ['raider'],
+        deck: ['coreshard', 'fate-d100', 'obsidian', 'taproot', 'ember'],
+        seed: 11,
+      });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    const prism = await app.page.evaluate(
+      () =>
+        window.caTest
+          ?.state()
+          .battle.dice.find((die) => die.school === 'prismatic')?.uid ?? null,
+    );
+    if (prism !== null) await app.selectDie(prism);
+    await shot(app, 'battle-prismatic.png');
   });
 
   test('shop', async ({ app }) => {

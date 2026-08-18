@@ -312,12 +312,12 @@
     "next": "Suivant",
     "skipAll": "Tout ignorer",
     "place": {
-      "title": "Faites glisser un dé dans un système",
-      "body": "Lancez les dés, puis faites-les glisser depuis le plateau vers les cases « Armes », « Boucliers », « Moteurs », « Capteurs » ou « Réacteur ». Un dé ne peut jamais être placé dans une case dont le niveau maximal est inférieur à sa face."
+      "title": "Envoie un dé dans un système",
+      "body": "Touche un dé, puis une carte de système allumée — ou fais-le glisser jusque-là. Chaque carte affiche le résultat avant de valider, et un dé n’entre jamais dans une carte dont le plafond est sous sa face."
     },
     "endTurn": {
-      "title": "Résoudre le virage",
-      "body": "Lorsque le plateau correspond à ce que vous souhaitez, terminez votre tour. Les systèmes tirent de haut en bas, puis l'ennemi riposte."
+      "title": "Résoudre le tour",
+      "body": "Quand le plateau te convient, termine le tour. Les systèmes tirent dans l’ordre des numéros de leurs cartes, puis l’ennemi répond."
     },
     "reroll": {
       "title": "On a droit à un relance gratuit une seule fois",
