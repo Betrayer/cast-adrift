@@ -1,0 +1,29 @@
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ca-line);
+  background: none;
+  color: var(--ca-faint);
+  font: inherit;
+  font-size: 10.5px;
+  line-height: 16px;
+  cursor: pointer;
+}
+
+.chip[data-on='1'] {
+  border-color: var(--ca-accent);
+  color: var(--ca-accent);
+}
+
+.glyph {
+  font-weight: 700;
+}

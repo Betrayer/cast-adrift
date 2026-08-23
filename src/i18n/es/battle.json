@@ -91,7 +91,8 @@
     "capShrunk": "tope ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "aquí: {{school}} +{{n}}",
     "inheritsMult": "aquí: {{school}} ×{{n}}",
-    "capShort": "≤d{{cap}}"
+    "capShort": "≤d{{cap}}",
+    "mkTitle": "Niveles Mk"
   },
   "intro": {
     "miniboss": "Minijefazo",
@@ -130,7 +131,7 @@
   "close": "Cerrar",
   "pickDie": "Elige un dado para ver su ficha",
   "dieFaces": "{{min}}–{{max}}",
-  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}} · med. {{ev}}",
   "targetBody": "Apuntar al casco",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "bruto {{raw}} → ~{{expected}} · escudo {{shield}} · casco {{hull}}",
@@ -203,5 +204,123 @@
   "check": {
     "step": "Systems check {{cur}}/{{max}}",
     "skip": "Skip the check"
-  }
+  },
+  "die": {
+    "stats": "d{{tier}} · {{rarity}} · {{pts}} pts",
+    "avg": "med. {{n}}",
+    "rarity": {
+      "common": "Común",
+      "uncommon": "Poco común",
+      "rare": "Rara",
+      "legendary": "Legendaria"
+    },
+    "engravings": "Grabados",
+    "engravingLine": "{{name}} — {{desc}}",
+    "features": "Rasgos",
+    "feature": {
+      "fate": "Dado del Destino — una vez por combate tira la tabla d100.",
+      "active": "Activa — {{what}}",
+      "engraved": "Grabado — {{names}}",
+      "faces": "Caras no estándar — {{list}}",
+      "growth": "Crecimiento — +{{per}} en cara máxima, hasta +{{cap}}",
+      "growthField": "Crecimiento — +{{n}} acumulado en el campo",
+      "prismatic": "Prisma — cuenta como cualquier escuela y hereda la afinidad de la ranura"
+    },
+    "active": {
+      "flip": "una vez por combate, gira a la cara opuesta",
+      "copy": "una vez por combate, copia el valor vecino más alto",
+      "swap": "una vez por combate, intercambia el valor con otro dado",
+      "bank": "una vez por combate, fija la cara — las retiradas no la cambian",
+      "split": "una vez por combate, se divide en dos d4 grises"
+    },
+    "open": "{{name}} — abrir ficha",
+    "filter": {
+      "active": "Activa",
+      "engraved": "Grabado",
+      "growth": "Crecimiento",
+      "faces": "Caras",
+      "fate": "Destino"
+    }
+  },
+  "ship": {
+    "hull": "Casco {{n}}",
+    "slots": "Esquema",
+    "slot": "{{name}} · ≤d{{cap}} · Mk{{mk}}",
+    "jamAt": "se atasca con ≤{{n}}",
+    "price": "{{n}} ◈",
+    "free": "Nave inicial",
+    "locked": "Nivel de capitán {{n}}",
+    "passiveNone": "Sin pasiva."
+  },
+  "intentWhy": {
+    "attack": "Te golpea por {{n}} — primero el escudo, luego el casco.",
+    "attackSelf": "Te golpea por {{n}} y se arranca {{self}} del propio casco.",
+    "shield": "Se pone {{n}} de escudo.",
+    "shieldAll": "Pone {{n}} de escudo a cada enemigo vivo.",
+    "multi": "{{k}} golpes separados de {{n}} — {{total}} en bruto, cada uno tirado contra tu evasión por separado.",
+    "charge": "Se carga: su próximo ataque llega doblado.",
+    "jamSlot": "Atasca {{n}} de tus ranuras hasta el turno siguiente.",
+    "lockDie": "Bloquea un dado de la bandeja durante el turno: ni se coloca ni se retira.",
+    "lockDieHighest": "Bloquea tu dado más alto de la bandeja durante el turno.",
+    "summon": "Llama a otra nave, hasta el límite del campo.",
+    "healAllies": "Cura {{n}} a cada enemigo vivo.",
+    "mirrorHalf": "Devuelve la mitad del daño que hiciste el turno pasado, con tope de {{cap}}.",
+    "stealScrap": "Saca {{n}} de chatarra de tu bodega.",
+    "capShrink": "Baja una ranura un nivel hasta el turno siguiente.",
+    "twistDie": "Retira un dado de la bandeja y se queda con el valor menor.",
+    "swapValues": "Intercambia los valores de tu dado más alto y el más bajo.",
+    "storm": "Mueve dos dados aleatorios de la bandeja en ±1.",
+    "curseDie": "Maldice un dado de la bandeja: −{{n}} a lo que saque.",
+    "shieldGate": "Levanta una compuerta en {{n}}: un golpe por debajo no hace nada, uno de {{n}} o más la rompe. La vulnerabilidad la ignora.",
+    "mirrorSchool": "Golpea por el tamaño de tu escuela mayor, con tope de {{cap}}.",
+    "drainCharge": "Drena {{n}} de carga; si la tenías, se carga él en su lugar.",
+    "siphonShield": "Se lleva hasta {{n}} de tu escudo y lo suma al suyo.",
+    "bargain": "Te cobra {{n}} de chatarra: si pagas, el enemigo se cura {{heal}}; si no puedes, te golpea por {{n}}.",
+    "enrage": "Furia: +{{n}} a cada golpe suyo desde ahora.",
+    "hijack": "Agarra tu dado más alto de la bandeja y lo clava en una ranura a su elección.",
+    "echoTotal": "Repite el daño que hiciste el turno pasado, con tope de {{n}}.",
+    "foldOrder": "Pliega el orden de resolución durante dos turnos.",
+    "devourDie": "Se come tu dado más alto: baja a 1 y el enemigo gana ese escudo."
+  },
+  "aura": {
+    "atk+2": "+2 a cada golpe de este enemigo.",
+    "atk+3": "+3 a cada golpe de este enemigo.",
+    "shieldAllies3": "Cada turno: +3 de escudo a cada enemigo vivo.",
+    "shieldSelf6": "Cada turno: +6 de escudo a su portador.",
+    "lockEachTurn": "Cada turno: bloquea un dado de tu bandeja.",
+    "lockEvery3": "Cada tres turnos: bloquea un dado de tu bandeja.",
+    "twistEachTurn": "Cada turno: retira un dado de la bandeja y se queda con el valor menor.",
+    "chargeAllies": "Cada tres turnos: carga a cada enemigo vivo.",
+    "summonEvery4": "Cada cuatro turnos: llama a un acólito.",
+    "stealOnHit6": "Cada golpe que entra se lleva 6 de chatarra."
+  },
+  "statusName": {
+    "burn": "Quemadura",
+    "mark": "Vulnerable",
+    "jam": "Atascado",
+    "charge": "Cargado"
+  },
+  "statusDesc": {
+    "burn": "Aplica daño al final de cada turno enemigo.",
+    "mark": "Cada golpe a este enemigo hace +N e ignora una compuerta de escudo.",
+    "jam": "Su próximo ataque es 2 más débil.",
+    "charge": "Su próximo ataque llega doblado."
+  },
+  "statusLegend": "Estados enemigos",
+  "statusPair": "{{name}} {{n}}",
+  "tideWhy": "+10% de casco enemigo por nivel y +{{n}} de daño plano por golpe. Ahora: +{{pct}}% de casco, +{{n}} de daño.",
+  "tideTitle": "Marea de interferencia",
+  "interferenceWhy": "Las anomalías omitidas se acumulan: cada acumulación añade otro nivel de marea el resto de la partida. Resolver una anomalía las borra todas.",
+  "interferenceTitle": "Interferencia",
+  "axisWhy": "Los dados negros tiran hacia Resonancia, los azules hacia Estabilidad. Los eventos y la deriva también mueven el eje.",
+  "chargeWhy": "La carga paga acciones: −1 cuesta 3, +1 cuesta 3, una retirada comprada 5, una sobrecarga 10.",
+  "chargeTitle": "Carga",
+  "mkWhy": "Mk sube el límite de la ranura y el bono de afinidad de su escuela.",
+  "resEarned": "Logrado",
+  "manoeuvreTitle": "Maniobra",
+  "manoeuvreWhy": "Un dado en Motores fija una tirada de evasión para el turno: esquiva {{dodge}}% × valor (máx. {{dodgeCap}}%), roce {{glancing}}% × valor (máx. {{glancingCap}}%). La esquiva no recibe nada, el roce la mitad, lo demás entra entero. Desde valor {{intercept}} el primer golpe se intercepta del todo. El valor es el dado tras afinidad y bonos.",
+  "targetingTitle": "Designación",
+  "targetingWhy": "Un dado en Sensores deja al objetivo Vulnerable +D durante el turno: D es la mitad del valor del dado redondeada hacia arriba, con tope de {{cap}}, y cada golpe de este turno hace esa cantidad de más. En la cara máxima del dado el golpe además perfora el escudo. El Mk de Sensores además revela una fila más del mapa por cada nivel sobre Mk1.",
+  "resEarnedLine": "{{n}} · {{desc}}",
+  "systemsTitle": "Sistemas"
 }

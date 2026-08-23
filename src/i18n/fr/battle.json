@@ -91,7 +91,8 @@
     "capShrunk": "cap ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "ici : {{school}} +{{n}}",
     "inheritsMult": "ici : {{school}} ×{{n}}",
-    "capShort": "≤d{{cap}}"
+    "capShort": "≤d{{cap}}",
+    "mkTitle": "Niveaux Mk"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -130,7 +131,7 @@
   "close": "Fermer",
   "pickDie": "Choisis un dé pour voir sa fiche",
   "dieFaces": "{{min}}–{{max}}",
-  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}} · moy. {{ev}}",
   "targetBody": "Viser la coque",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "brut {{raw}} → ~{{expected}} · bouclier {{shield}} · coque {{hull}}",
@@ -203,5 +204,123 @@
   "check": {
     "step": "Systems check {{cur}}/{{max}}",
     "skip": "Skip the check"
-  }
+  },
+  "die": {
+    "stats": "d{{tier}} · {{rarity}} · {{pts}} pts",
+    "avg": "moy. {{n}}",
+    "rarity": {
+      "common": "Commun",
+      "uncommon": "Peu commun",
+      "rare": "Rare",
+      "legendary": "Légendaire"
+    },
+    "engravings": "Gravures",
+    "engravingLine": "{{name}} — {{desc}}",
+    "features": "Particularités",
+    "feature": {
+      "fate": "Dé du Destin — une fois par combat, il lance la table d100.",
+      "active": "Actif — {{what}}",
+      "engraved": "Gravure — {{names}}",
+      "faces": "Faces non standard — {{list}}",
+      "growth": "Croissance — +{{per}} sur une face maximale, jusqu’à +{{cap}}",
+      "growthField": "Croissance — +{{n}} accumulé sur le terrain",
+      "prismatic": "Prisme — compte comme n’importe quelle école et hérite de l’affinité de l’emplacement"
+    },
+    "active": {
+      "flip": "une fois par combat, retourne le dé sur la face opposée",
+      "copy": "une fois par combat, copie la plus haute valeur voisine",
+      "swap": "une fois par combat, échange sa valeur avec un autre dé",
+      "bank": "une fois par combat, fige la face — les relances n’y touchent pas",
+      "split": "une fois par combat, se divise en deux d4 gris"
+    },
+    "open": "{{name}} — ouvrir la fiche",
+    "filter": {
+      "active": "Actif",
+      "engraved": "Gravé",
+      "growth": "Croissance",
+      "faces": "Faces",
+      "fate": "Destin"
+    }
+  },
+  "ship": {
+    "hull": "Coque {{n}}",
+    "slots": "Schéma",
+    "slot": "{{name}} · ≤d{{cap}} · Mk{{mk}}",
+    "jamAt": "se coince à ≤{{n}}",
+    "price": "{{n}} ◈",
+    "free": "Vaisseau de départ",
+    "locked": "Niveau de capitaine {{n}}",
+    "passiveNone": "Aucun passif."
+  },
+  "intentWhy": {
+    "attack": "Te frappe pour {{n}} — bouclier d’abord, coque ensuite.",
+    "attackSelf": "Te frappe pour {{n}} et arrache {{self}} à sa propre coque.",
+    "shield": "S’ajoute {{n}} de bouclier.",
+    "shieldAll": "Ajoute {{n}} de bouclier à chaque ennemi vivant.",
+    "multi": "{{k}} frappes distinctes de {{n}} — {{total}} brut, chacune tirée contre ton esquive séparément.",
+    "charge": "Se charge : sa prochaine attaque arrive doublée.",
+    "jamSlot": "Brouille {{n}} de tes emplacements jusqu’au tour suivant.",
+    "lockDie": "Verrouille un dé du plateau pour le tour — ni placé ni relancé.",
+    "lockDieHighest": "Verrouille ton dé le plus haut du plateau pour le tour.",
+    "summon": "Appelle un autre vaisseau, jusqu’à la limite du terrain.",
+    "healAllies": "Soigne chaque ennemi vivant de {{n}}.",
+    "mirrorHalf": "Renvoie la moitié des dégâts du tour précédent, plafonnée à {{cap}}.",
+    "stealScrap": "Prélève {{n}} ferraille dans ta soute.",
+    "capShrink": "Baisse un emplacement d’un rang jusqu’au tour suivant.",
+    "twistDie": "Relance un dé du plateau et garde la plus basse des deux valeurs.",
+    "swapValues": "Échange les valeurs de ton dé le plus haut et du plus bas.",
+    "storm": "Décale deux dés du plateau au hasard de ±1.",
+    "curseDie": "Maudit un dé du plateau : −{{n}} sur ce qu’il tire.",
+    "shieldGate": "Dresse une porte à {{n}} : un coup en dessous ne fait rien, un coup à {{n}} ou plus la brise. La vulnérabilité l’ignore.",
+    "mirrorSchool": "Frappe selon la taille de ta plus grande école, plafonnée à {{cap}}.",
+    "drainCharge": "Draine {{n}} de charge ; si tu l’avais, il se charge à la place.",
+    "siphonShield": "Prend jusqu’à {{n}} de ton bouclier et l’ajoute au sien.",
+    "bargain": "Te facture {{n}} ferraille : paie et l’ennemi se soigne de {{heal}}, sinon il frappe pour {{n}}.",
+    "enrage": "Rage : +{{n}} à chacun de ses coups à partir de maintenant.",
+    "hijack": "Attrape ton dé le plus haut et le cloue dans un emplacement de son choix.",
+    "echoTotal": "Renvoie les dégâts du tour précédent, plafonnés à {{n}}.",
+    "foldOrder": "Replie l’ordre de résolution pendant deux tours.",
+    "devourDie": "Dévore ton dé le plus haut : il tombe à 1 et l’ennemi gagne autant de bouclier."
+  },
+  "aura": {
+    "atk+2": "+2 à chaque coup de cet ennemi.",
+    "atk+3": "+3 à chaque coup de cet ennemi.",
+    "shieldAllies3": "Chaque tour : +3 bouclier à chaque ennemi vivant.",
+    "shieldSelf6": "Chaque tour : +6 bouclier à son porteur.",
+    "lockEachTurn": "Chaque tour : verrouille un de tes dés du plateau.",
+    "lockEvery3": "Tous les trois tours : verrouille un de tes dés du plateau.",
+    "twistEachTurn": "Chaque tour : relance un dé du plateau et garde la valeur la plus basse.",
+    "chargeAllies": "Tous les trois tours : charge chaque ennemi vivant.",
+    "summonEvery4": "Tous les quatre tours : appelle un acolyte.",
+    "stealOnHit6": "Chaque coup qui passe prélève 6 ferraille."
+  },
+  "statusName": {
+    "burn": "Brûlure",
+    "mark": "Vulnérable",
+    "jam": "Brouillé",
+    "charge": "Chargé"
+  },
+  "statusDesc": {
+    "burn": "Inflige des dégâts à la fin de chaque tour ennemi.",
+    "mark": "Chaque coup sur cet ennemi fait +N et ignore une porte de bouclier.",
+    "jam": "Sa prochaine attaque est plus faible de 2.",
+    "charge": "Sa prochaine attaque arrive doublée."
+  },
+  "statusLegend": "États ennemis",
+  "statusPair": "{{name}} {{n}}",
+  "tideWhy": "+10% de coque ennemie par niveau et +{{n}} de dégâts fixes par coup. Actuellement : +{{pct}}% de coque, +{{n}} de dégâts.",
+  "tideTitle": "Marée d’interférence",
+  "interferenceWhy": "Les anomalies évitées s’empilent : chaque pile ajoute un niveau de marée pour le reste de la partie. Résoudre une anomalie les efface toutes.",
+  "interferenceTitle": "Interférence",
+  "axisWhy": "Les dés noirs tirent vers la Résonance, les bleus vers la Stabilité. Les événements et la dérive déplacent aussi l’axe.",
+  "chargeWhy": "La charge paie les actions : −1 coûte 3, +1 coûte 3, une relance achetée 5, une surtension 10.",
+  "chargeTitle": "Charge",
+  "mkWhy": "Mk relève le plafond de l’emplacement et le bonus d’affinité de son école.",
+  "resEarned": "Acquis",
+  "manoeuvreTitle": "Manœuvre",
+  "manoeuvreWhy": "Un dé dans les Moteurs fixe un jet d’esquive pour le tour : esquive {{dodge}}% × valeur (max. {{dodgeCap}}%), effleurement {{glancing}}% × valeur (max. {{glancingCap}}%). Une esquive ne prend rien, un effleurement la moitié, le reste passe en entier. À partir de la valeur {{intercept}}, le premier coup est intercepté d’office. La valeur est le dé après affinité et bonus.",
+  "targetingTitle": "Désignation",
+  "targetingWhy": "Un dé dans les Capteurs rend la cible Vulnérable +D pour le tour : D vaut la moitié de la valeur du dé arrondie au supérieur, plafonnée à {{cap}}, et chaque coup de ce tour fait d’autant plus. Sur la face maximale du dé, le coup perce aussi le bouclier. Le Mk des Capteurs révèle en plus une rangée de carte par niveau au-dessus de Mk1.",
+  "resEarnedLine": "{{n}} · {{desc}}",
+  "systemsTitle": "Systèmes"
 }

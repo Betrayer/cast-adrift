@@ -3,6 +3,7 @@ import type { Screens } from '../screens';
 import type { SlotId } from '@/types/battle';
 
 const SEED = 7;
+const TALLY_SEEDS = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
 
 const HIDE_TOASTS = '[data-toast-host]{display:none !important}';
 
@@ -312,6 +313,69 @@ test.describe('visual baselines', () => {
     });
     await expect(app.testId('memory-ceremony')).toBeVisible();
     await shot(app, 'memory-ceremony.png');
+  });
+
+  test('die card', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.grantMeta({
+        level: 30,
+        collection: [{ defId: 'flare', count: 2 }],
+      });
+    });
+    await app.goTo('hangar');
+    await app.testId('hangar-card-flare').click();
+    await expect(app.testId('die-card-modal')).toBeVisible();
+    await quiet(app);
+    await expect(app.testId('die-card-modal')).toHaveScreenshot('die-card.png');
+  });
+
+  test('ship card', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.grantMeta({ level: 30, shards: 4000 });
+    });
+    await app.goTo('runSetup');
+    await expect(app.page.locator('[data-ship-card="wanderer"]')).toBeVisible();
+    await quiet(app);
+    await expect(
+      app.page.locator('[data-ship-card="wanderer"]'),
+    ).toHaveScreenshot('ship-card.png');
+  });
+
+  test('enemy detail', async ({ app }) => {
+    await app.seedRun({ seed: SEED });
+    await app.page.evaluate(() => {
+      window.caTest?.setBattle({ enemyIds: ['slagGolem'], seed: 42 });
+    });
+    await app.waitForPlacement();
+    await app.waitForStableAnchors();
+    await app.tapEnemy();
+    await expect(app.page.locator('[data-enemy-detail]')).toBeVisible();
+    await quiet(app);
+    await expect(app.page.locator('[data-enemy-detail]')).toHaveScreenshot(
+      'enemy-detail.png',
+    );
+  });
+
+  test('battle tally', async ({ app }) => {
+    const { nodeId } = await app.seedRunWithNode('battle', TALLY_SEEDS);
+    await app.expectScreen('map');
+    await app.jumpToNodeInUi(nodeId);
+    await app.waitForPlacement();
+    await app.playUntilBattleEnds();
+    await app.expectScreen('rewards');
+    await expect(app.page.locator('[data-battle-tally]')).toBeVisible();
+    await quiet(app);
+    await expect(app.page.locator('[data-battle-tally]')).toHaveScreenshot(
+      'battle-tally.png',
+    );
+  });
+
+  test('summary expanded', async ({ app }) => {
+    await app.seedRun({ seed: SEED });
+    await app.goTo('summary');
+    await app.testId('summary-more').click();
+    await expect(app.page.locator('[data-summary-detail]')).toBeVisible();
+    await shot(app, 'summary-expanded.png');
   });
 
   test('account section', async ({ app }) => {

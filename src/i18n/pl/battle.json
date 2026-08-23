@@ -91,7 +91,8 @@
     "capShrunk": "limit ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "tutaj: {{school}} +{{n}}",
     "inheritsMult": "tutaj: {{school}} ×{{n}}",
-    "capShort": "≤d{{cap}}"
+    "capShort": "≤d{{cap}}",
+    "mkTitle": "Poziomy Mk"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -130,7 +131,7 @@
   "close": "Zamknij",
   "pickDie": "Wybierz kość, pokażę jej kartę",
   "dieFaces": "{{min}}–{{max}}",
-  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}} · śr. {{ev}}",
   "targetBody": "Celuj w kadłub",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
@@ -203,5 +204,123 @@
   "check": {
     "step": "Systems check {{cur}}/{{max}}",
     "skip": "Skip the check"
-  }
+  },
+  "die": {
+    "stats": "d{{tier}} · {{rarity}} · {{pts}} pkt",
+    "avg": "śr. {{n}}",
+    "rarity": {
+      "common": "Zwykła",
+      "uncommon": "Niezwykła",
+      "rare": "Rzadka",
+      "legendary": "Legendarna"
+    },
+    "engravings": "Grawerunki",
+    "engravingLine": "{{name}} — {{desc}}",
+    "features": "Cechy",
+    "feature": {
+      "fate": "Kość Losu — raz na walkę rzuca tabelą d100.",
+      "active": "Aktyw — {{what}}",
+      "engraved": "Grawerunek — {{names}}",
+      "faces": "Niestandardowe ścianki — {{list}}",
+      "growth": "Wzrost — +{{per}} na najwyższej ściance, do +{{cap}}",
+      "growthField": "Wzrost — +{{n}} zebrane w polu",
+      "prismatic": "Pryzmat — liczy się jako dowolna szkoła i dziedziczy powinowactwo slotu"
+    },
+    "active": {
+      "flip": "raz na walkę obraca kość na przeciwną ściankę",
+      "copy": "raz na walkę kopiuje wyższą wartość sąsiada",
+      "swap": "raz na walkę zamienia wartość z inną kością",
+      "bank": "raz na walkę utrwala ściankę — przerzuty jej nie zmienią",
+      "split": "raz na walkę dzieli się na dwie szare d4"
+    },
+    "open": "{{name}} — otwórz kartę",
+    "filter": {
+      "active": "Aktyw",
+      "engraved": "Grawer",
+      "growth": "Wzrost",
+      "faces": "Ścianki",
+      "fate": "Los"
+    }
+  },
+  "ship": {
+    "hull": "Kadłub {{n}}",
+    "slots": "Układ",
+    "slot": "{{name}} · ≤d{{cap}} · Mk{{mk}}",
+    "jamAt": "klinuje przy ≤{{n}}",
+    "price": "{{n}} ◈",
+    "free": "Statek startowy",
+    "locked": "Poziom kapitana {{n}}",
+    "passiveNone": "Brak pasywki."
+  },
+  "intentWhy": {
+    "attack": "Uderza na {{n}} — najpierw tarcza, potem kadłub.",
+    "attackSelf": "Uderza na {{n}} i zrywa {{self}} z własnego kadłuba.",
+    "shield": "Zakłada sobie {{n}} tarczy.",
+    "shieldAll": "Zakłada {{n}} tarczy każdemu żywemu wrogowi.",
+    "multi": "{{k}} osobne trafienia po {{n}} — {{total}} surowo, każde rzucane przeciw uniku osobno.",
+    "charge": "Ładuje się: następny atak przyjdzie podwojony.",
+    "jamSlot": "Zakłóca {{n}} twoich slotów do następnej tury.",
+    "lockDie": "Blokuje kość na tacy na turę — ani jej postawić, ani przerzucić.",
+    "lockDieHighest": "Blokuje twoją najwyższą kość na tacy na turę.",
+    "summon": "Wzywa kolejny statek, do limitu pola.",
+    "healAllies": "Leczy każdego żywego wroga o {{n}}.",
+    "mirrorHalf": "Odbija połowę obrażeń z twojej poprzedniej tury, do {{cap}}.",
+    "stealScrap": "Wyciąga {{n}} złomu z ładowni.",
+    "capShrink": "Obniża jeden slot o poziom do następnej tury.",
+    "twistDie": "Przerzuca kość na tacy i zostawia niższą z dwóch wartości.",
+    "swapValues": "Zamienia wartości twojej najwyższej i najniższej kości.",
+    "storm": "Przesuwa dwie losowe kości na tacy o ±1.",
+    "curseDie": "Przeklina kość na tacy: −{{n}} do tego, co wyrzuci.",
+    "shieldGate": "Stawia bramę na {{n}}: cios poniżej nie robi nic, cios od {{n}} w górę łamie bramę. Podatność bramę ignoruje.",
+    "mirrorSchool": "Uderza za rozmiar twojej największej szkoły, do {{cap}}.",
+    "drainCharge": "Wysysa {{n}} ładunku; jeśli go miałeś, wróg ładuje się sam.",
+    "siphonShield": "Zabiera do {{n}} twojej tarczy i dokłada do własnej.",
+    "bargain": "Wystawia rachunek na {{n}} złomu: zapłać, a wróg leczy {{heal}}; nie masz czym — uderza na {{n}}.",
+    "enrage": "Wściekłość: +{{n}} do każdego jego ciosu od teraz.",
+    "hijack": "Chwyta twoją najwyższą kość i przybija ją w wybranym slocie.",
+    "echoTotal": "Odbija obrażenia z twojej poprzedniej tury, do {{n}}.",
+    "foldOrder": "Składa kolejność rozstrzygania na dwie tury.",
+    "devourDie": "Zjada twoją najwyższą kość: spada do 1, a wróg zyskuje tyle tarczy."
+  },
+  "aura": {
+    "atk+2": "+2 do każdego ciosu tego wroga.",
+    "atk+3": "+3 do każdego ciosu tego wroga.",
+    "shieldAllies3": "Co turę: +3 tarczy każdemu żywemu wrogowi.",
+    "shieldSelf6": "Co turę: +6 tarczy właścicielowi.",
+    "lockEachTurn": "Co turę: blokuje jedną z twoich kości na tacy.",
+    "lockEvery3": "Co trzecią turę: blokuje jedną z twoich kości na tacy.",
+    "twistEachTurn": "Co turę: przerzuca kość z tacy i zostawia niższą wartość.",
+    "chargeAllies": "Co trzecią turę: ładuje każdego żywego wroga.",
+    "summonEvery4": "Co czwartą turę: wzywa akolitę.",
+    "stealOnHit6": "Każdy trafiony cios zabiera 6 złomu."
+  },
+  "statusName": {
+    "burn": "Płomień",
+    "mark": "Podatność",
+    "jam": "Zakłócenie",
+    "charge": "Ładunek"
+  },
+  "statusDesc": {
+    "burn": "Tyka obrażeniami na koniec każdej tury wroga.",
+    "mark": "Każdy cios w tego wroga zadaje +N i ignoruje bramę tarczy.",
+    "jam": "Jego następny atak jest słabszy o 2.",
+    "charge": "Jego następny atak przyjdzie podwojony."
+  },
+  "statusLegend": "Statusy wrogów",
+  "statusPair": "{{name}} {{n}}",
+  "tideWhy": "+10% kadłuba wrogów za poziom i +{{n}} płaskich obrażeń na cios. Teraz: +{{pct}}% kadłuba, +{{n}} obrażeń.",
+  "tideTitle": "Przypływ zakłóceń",
+  "interferenceWhy": "Pominięte anomalie się kumulują: każdy stos dokłada kolejny poziom przypływu do końca przebiegu. Rozwiązanie anomalii kasuje wszystkie.",
+  "interferenceTitle": "Zakłócenia",
+  "axisWhy": "Czarne kości ciągną ku Rezonansowi, niebieskie ku Stabilności. Zdarzenia i dryf też ruszają oś.",
+  "chargeWhy": "Ładunek płaci za akcje: −1 kosztuje 3, +1 kosztuje 3, kupiony przerzut 5, zryw 10.",
+  "chargeTitle": "Ładunek",
+  "mkWhy": "Mk podnosi limit slotu i bonus powinowactwa jego szkoły.",
+  "resEarned": "Zdobyte",
+  "manoeuvreTitle": "Manewr",
+  "manoeuvreWhy": "Kość w Silnikach ustala jeden rzut uniku na turę: unik {{dodge}}% × wartość (maks. {{dodgeCap}}%), muśnięcie {{glancing}}% × wartość (maks. {{glancingCap}}%). Unik nie przyjmuje nic, muśnięcie połowę, reszta trafia w całości. Od wartości {{intercept}} pierwszy cios jest przechwytywany w całości. Wartość to kość po powinowactwie i bonusach.",
+  "targetingTitle": "Naprowadzanie",
+  "targetingWhy": "Kość w Sensorach czyni cel Podatnym +D na turę: D to połowa wartości kości zaokrąglona w górę, nie więcej niż {{cap}}, a każdy cios w tej turze zadaje o tyle więcej. Na najwyższej ściance kości cios dodatkowo przebija tarczę. Mk Sensorów dodatkowo odsłania jeden rząd mapy za każdy poziom powyżej Mk1.",
+  "resEarnedLine": "{{n}} · {{desc}}",
+  "systemsTitle": "Systemy"
 }

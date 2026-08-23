@@ -4,6 +4,8 @@ export {
   slotAffinity,
 } from "@/game/battle/view/affinity";
 export type { SlotAffinity } from "@/game/battle/view/affinity";
+export { mitigationOf } from "@/game/battle/view/forecast";
+export type { Mitigation } from "@/game/battle/view/forecast";
 export {
   ACTIVE_IDS,
   consoleActions,

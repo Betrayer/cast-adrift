@@ -1,0 +1,118 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
+  text-align: left;
+}
+
+.card[data-ship-card-size='compact'] {
+  gap: 4px;
+  padding: 8px 10px;
+  border-radius: 10px;
+}
+
+.plain {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.name {
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 18px;
+  color: var(--ca-text);
+}
+
+.hull {
+  flex: 0 0 auto;
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ca-danger);
+}
+
+.passive {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.passiveName {
+  font-size: 11.5px;
+  line-height: 15px;
+  font-weight: 700;
+  color: var(--ca-accent);
+}
+
+.passiveDesc {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ca-dim);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 5px;
+  border-top: 1px solid var(--ca-line);
+}
+
+.sectionTitle {
+  font-size: 9.5px;
+  line-height: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ca-faint);
+}
+
+.slotRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 10.5px;
+  line-height: 15px;
+  color: var(--ca-dim);
+}
+
+.slotNote {
+  color: var(--ca-faint);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.chip {
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1px solid var(--ca-line);
+  font-size: 10px;
+  line-height: 16px;
+  color: var(--ca-dim);
+}
+
+.price {
+  font-size: 10.5px;
+  line-height: 15px;
+  color: var(--ca-amber);
+}
+
+.footer {
+  margin-top: 2px;
+}

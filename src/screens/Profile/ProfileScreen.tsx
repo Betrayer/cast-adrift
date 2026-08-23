@@ -9,6 +9,7 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
@@ -20,7 +21,7 @@ import { countStars } from "@/game/run/goals";
 import { progressWithinLevel } from "@/game/xp";
 import { isGuestAccount, supportId } from "@/services/uid";
 import { useAppStore } from "@/stores/appStore";
-import { useMetaStore } from "@/stores/metaStore";
+import { useMetaStore, type MetaStats } from "@/stores/metaStore";
 import { AchievementGrid } from "./AchievementGrid";
 import { BadgeRow } from "./BadgeRow";
 
@@ -67,6 +68,43 @@ const AccountLine = () => {
   );
 };
 
+const DETAIL_ROWS: readonly {
+  id: string;
+  label: string;
+  read: (stats: MetaStats) => number;
+}[] = [
+  {
+    id: "shardsEarned",
+    label: "meta:profile.shardsEarned",
+    read: (s) => s.shardsEarned,
+  },
+  { id: "elites", label: "meta:profile.elites", read: (s) => s.elites },
+  { id: "t5Solved", label: "meta:profile.t5Solved", read: (s) => s.t5Solved },
+  { id: "beacons", label: "meta:profile.beacons", read: (s) => s.beacons },
+  {
+    id: "streak",
+    label: "meta:profile.streak",
+    read: (s) => s.noDeathStreak,
+  },
+  {
+    id: "bestStreak",
+    label: "meta:profile.bestStreak",
+    read: (s) => s.bestNoDeathStreak,
+  },
+  {
+    id: "deepClears",
+    label: "meta:profile.deepClears",
+    read: (s) => s.deepClears,
+  },
+  { id: "driftRuns", label: "meta:profile.driftRuns", read: (s) => s.driftRuns },
+  { id: "dailyRuns", label: "meta:profile.dailyRuns", read: (s) => s.dailyRuns },
+  {
+    id: "contractRuns",
+    label: "meta:profile.contractRuns",
+    read: (s) => s.contractRuns,
+  },
+];
+
 const StatCell = ({ label, value }: { label: string; value: string }) => (
   <Stack gap={0}>
     <Text size="xs" c={tokens.faint}>
@@ -87,6 +125,7 @@ export const ProfileScreen = () => {
   const best = useMetaStore((s) => s.best);
   const endings = useMetaStore((s) => s.endings);
   const contracts = useMetaStore((s) => s.contracts);
+  const [detailed, setDetailed] = useState(false);
   const progress = progressWithinLevel(xp);
   const starTotal = CONTRACTS.reduce(
     (sum, def) => sum + countStars(contracts[def.id] ?? 0),
@@ -167,6 +206,34 @@ export const ProfileScreen = () => {
                   value={String(stats.campaignClears)}
                 />
               </SimpleGrid>
+              <Button
+                size="compact-xs"
+                variant="subtle"
+                color="gray"
+                data-testid="profile-more"
+                onClick={() => {
+                  setDetailed((value) => !value);
+                }}
+              >
+                {t(detailed ? "meta:profile.less" : "meta:profile.more")}
+              </Button>
+              {detailed ? (
+                <SimpleGrid
+                  cols={2}
+                  spacing="xs"
+                  verticalSpacing="xs"
+                  data-profile-detail
+                >
+                  {DETAIL_ROWS.map((row) => (
+                    <div key={row.id} data-profile-row={row.id}>
+                      <StatCell
+                        label={t(row.label)}
+                        value={String(row.read(stats))}
+                      />
+                    </div>
+                  ))}
+                </SimpleGrid>
+              ) : null}
             </Stack>
           </Paper>
 

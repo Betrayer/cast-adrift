@@ -20,19 +20,20 @@ import {
   ascensionRewardsUpTo,
   maxSelectableAscension,
 } from '@/data/ascension';
-import { SHIP_BY_ID } from '@/data/ships';
+import { ShipCard } from '@/components/ShipCard';
 import { ascensionShardMult } from '@/game/xp';
 import { startRun } from '@/game/run/flow';
+import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
 
 export const RunSetupScreen = () => {
   const { t } = useTranslation(['run', 'content', 'menu']);
+  const go = useAppStore((s) => s.go);
   const shipId = useMetaStore((s) => s.selectedShip);
   const deck = useMetaStore((s) => s.hangar.deck);
   const cleared = useMetaStore((s) => s.ascension.campaign);
   const maxAscension = maxSelectableAscension(cleared);
   const [ascension, setAscension] = useState(0);
-  const ship = SHIP_BY_ID.get(shipId);
   const mods = ascensionMods(ascension);
 
   return (
@@ -46,12 +47,26 @@ export const RunSetupScreen = () => {
             {t('run:setup.mode')}
           </Text>
           <Divider color={tokens.line} label={t('run:setup.ship')} />
-          <Group justify="space-between">
-            <Text c={tokens.text}>{ship === undefined ? shipId : t(ship.name)}</Text>
-            <Text size="sm" c={tokens.faint}>
-              {t('run:setup.deck', { n: deck.length })}
-            </Text>
-          </Group>
+          <ShipCard
+            shipId={shipId}
+            footer={
+              <Group justify="space-between" wrap="nowrap">
+                <Text size="sm" c={tokens.faint}>
+                  {t('run:setup.deck', { n: deck.length })}
+                </Text>
+                <Button
+                  size="compact-xs"
+                  variant="default"
+                  data-testid="setup-change-ship"
+                  onClick={() => {
+                    go('hangar');
+                  }}
+                >
+                  {t('run:setup.changeShip')}
+                </Button>
+              </Group>
+            }
+          />
           <Divider color={tokens.line} label={t('run:setup.ascension')} />
           {maxAscension === 0 ? (
             <Text size="xs" c={tokens.faint}>

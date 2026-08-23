@@ -11,6 +11,8 @@ export type ShipPassive =
 export interface ShipDef {
   id: ShipId;
   name: LocKey;
+  passiveName?: LocKey;
+  passiveDesc?: LocKey;
   hullMax: number;
   slots: Partial<Record<SlotId, Omit<SlotState, "dieUid">>>;
   passive?: ShipPassive;
@@ -22,7 +24,9 @@ export interface ShipDef {
 export const SHIPS: readonly ShipDef[] = [
   {
     id: "wanderer",
-    name: "content:ships.wanderer",
+    name: "content:ships.wanderer.name",
+    passiveName: "content:ships.wanderer.passiveName",
+    passiveDesc: "content:ships.wanderer.passiveDesc",
     hullMax: 30,
     price: 0,
     unlockLevel: 1,
@@ -38,7 +42,9 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "ram",
-    name: "content:ships.ram",
+    name: "content:ships.ram.name",
+    passiveName: "content:ships.ram.passiveName",
+    passiveDesc: "content:ships.ram.passiveDesc",
     hullMax: 34,
     price: 800,
     unlockLevel: 10,
@@ -54,7 +60,9 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "ark",
-    name: "content:ships.ark",
+    name: "content:ships.ark.name",
+    passiveName: "content:ships.ark.passiveName",
+    passiveDesc: "content:ships.ark.passiveDesc",
     hullMax: 28,
     price: 1500,
     unlockLevel: 25,
@@ -70,7 +78,7 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "ram-proto",
-    name: "content:ships.ram-proto",
+    name: "content:ships.ram-proto.name",
     hullMax: 30,
     price: 0,
     unlockLevel: 1,
@@ -95,3 +103,16 @@ export const shipHasPassive = (
   shipId: ShipId,
   kind: ShipPassive["kind"],
 ): boolean => SHIP_BY_ID.get(shipId)?.passive?.kind === kind;
+
+export const shipTextIssues = (defs: readonly ShipDef[]): string[] => {
+  const out: string[] = [];
+  for (const def of defs) {
+    if (def.passive === undefined) continue;
+    if (def.passiveName === undefined || def.passiveDesc === undefined) {
+      out.push(
+        `ships: "${def.id}" carries a ${def.passive.kind} passive with no authored text`,
+      );
+    }
+  }
+  return out;
+};

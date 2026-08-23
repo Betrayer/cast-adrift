@@ -25,20 +25,6 @@
   padding: 2px 6px;
 }
 
-.miniCompact .miniDesc {
-  display: none;
-}
-
-.miniCompact .miniHead {
-  font-size: 10.5px;
-  line-height: 13px;
-}
-
-.miniCompact .miniMeta {
-  font-size: 9px;
-  line-height: 11px;
-}
-
 .consoleCompact .reason {
   min-height: 12px;
   font-size: 9px;
@@ -109,86 +95,6 @@
   font-size: 10px;
   line-height: 14px;
   color: var(--ca-faint);
-}
-
-.miniHead {
-  font-size: 11.5px;
-  line-height: 14px;
-  font-weight: 700;
-  color: var(--ca-text);
-}
-
-.miniHead[data-school='red'] {
-  color: var(--ca-school-red-text);
-}
-
-.miniHead[data-school='blue'] {
-  color: var(--ca-school-blue-text);
-}
-
-.miniHead[data-school='green'] {
-  color: var(--ca-school-green-text);
-}
-
-.miniHead[data-school='grey'] {
-  color: var(--ca-school-grey-text);
-}
-
-.miniHead[data-school='yellow'] {
-  color: var(--ca-school-yellow-text);
-}
-
-.miniHead[data-school='black'] {
-  color: var(--ca-school-black-text);
-}
-
-.miniHead[data-school='prismatic'] {
-  color: var(--ca-school-prismatic-text);
-}
-
-.miniMeta {
-  font-size: 9.5px;
-  line-height: 12px;
-  color: var(--ca-dim);
-}
-
-.miniDesc {
-  font-size: 9.5px;
-  line-height: 12px;
-  color: var(--ca-faint);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.miniBadges {
-  display: flex;
-  gap: 4px;
-  margin-top: 1px;
-}
-
-.badge {
-  font-size: 9px;
-  line-height: 12px;
-  padding: 0 4px;
-  border-radius: 5px;
-  border: 0.75px solid var(--ca-line);
-  color: var(--ca-dim);
-}
-
-.badge[data-badge='fate'] {
-  color: var(--ca-amber);
-  border-color: var(--ca-amber);
-}
-
-.badge[data-badge='active'] {
-  color: var(--ca-accent);
-  border-color: var(--ca-accent);
-}
-
-.badge[data-badge='growth'] {
-  color: var(--ca-school-green-text);
-  border-color: var(--ca-school-green-stroke);
 }
 
 .forecast {
@@ -301,21 +207,11 @@
     font-size: 12px;
     padding: 8px 4px;
   }
-
-  .miniDesc,
-  .miniMeta {
-    font-size: 10.5px;
-    line-height: 13px;
-  }
 }
 
 @media (max-height: 700px) {
   .mini {
     min-height: 34px;
-  }
-
-  .miniDesc {
-    display: none;
   }
 
   .console {
@@ -333,4 +229,63 @@
     font-size: 9px;
     line-height: 12px;
   }
+}
+
+.sheetWhy {
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-dim);
+}
+
+.sheetStatuses {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 5px;
+  border-top: 1px solid var(--ca-line);
+}
+
+.sheetLabel {
+  font-size: 9.5px;
+  line-height: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ca-faint);
+}
+
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-faint);
+}
+
+.statusGlyph {
+  min-width: 15px;
+  padding: 0 4px;
+  border-radius: 5px;
+  border: 1px solid var(--ca-line);
+  text-align: center;
+  font-weight: 700;
+  color: var(--ca-text);
+}
+
+.statusName {
+  font-weight: 700;
+  color: var(--ca-dim);
+}
+
+.statusDesc {
+  flex: 1 1 100%;
+  padding-left: 20px;
+}
+
+.subAura {
+  display: block;
+  font-size: 9.5px;
+  line-height: 13px;
+  color: var(--ca-faint);
 }

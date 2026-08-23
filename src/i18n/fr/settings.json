@@ -124,5 +124,6 @@
       "tag": "Convoyeur de slots avec sortie en direct · prévision du tour",
       "desc": "Tous les chiffres dans une colonne, le tour entier chiffré avant de le finir."
     }
-  }
+  },
+  "skipTally": "Passer le bilan du combat"
 }

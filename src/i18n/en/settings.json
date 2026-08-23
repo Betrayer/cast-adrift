@@ -124,5 +124,6 @@
       "tag": "Slot conveyor with live outputs · turn forecast",
       "desc": "Every number in one column, the whole turn priced before you end it."
     }
-  }
+  },
+  "skipTally": "Skip the battle tally"
 }

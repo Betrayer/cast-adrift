@@ -3,11 +3,14 @@ import type {
   AccountView,
   BattlePatch,
   CloudMetaView,
+  DieCardView,
   SeedRunConfig,
+  ShipCardView,
   TestState,
 } from '@/services/testApi';
-import type { TurnForecast } from '@/game/battle/view';
-import type { BattleLayoutId } from '@/types';
+import type { Mitigation, TurnForecast } from '@/game/battle/view';
+import type { BattleTally } from '@/stores/runStore';
+import type { BattleLayoutId, ScreenId } from '@/types';
 import type { SlotId } from '@/types/battle';
 
 export const FROZEN_NOW = 1_760_000_000_000;
@@ -245,6 +248,47 @@ export class Screens {
     return found;
   }
 
+  dieCard(defId: string): Promise<DieCardView | null> {
+    return this.page.evaluate(
+      (id) => window.caTest?.dieCard(id) ?? null,
+      defId,
+    );
+  }
+
+  async expectDieCard(card: Locator, defId: string): Promise<DieCardView> {
+    const data = await this.dieCard(defId);
+    if (data === null) throw new Error(`unknown die ${defId}`);
+    await expect(card).toHaveAttribute('data-die-faces', data.faces);
+    await expect(card).toHaveAttribute('data-die-ev', data.ev);
+    await expect(card).toHaveAttribute('data-die-tier', String(data.tier));
+    return data;
+  }
+
+  shipCard(shipId: string): Promise<ShipCardView | null> {
+    return this.page.evaluate(
+      (id) => window.caTest?.shipCard(id as never) ?? null,
+      shipId,
+    );
+  }
+
+  mitigation(enemyId: string): Promise<Mitigation | null> {
+    return this.page.evaluate(
+      (id) => window.caTest?.mitigation(id) ?? null,
+      enemyId,
+    );
+  }
+
+  tally(): Promise<BattleTally | null> {
+    return this.page.evaluate(() => window.caTest?.tally() ?? null);
+  }
+
+  async goTo(screen: ScreenId): Promise<void> {
+    await this.page.evaluate((id) => {
+      window.caTest?.go(id);
+    }, screen);
+    await this.expectScreen(screen);
+  }
+
   async jumpToNodeInUi(nodeId: string): Promise<void> {
     await this.page.locator(`[data-node="${nodeId}"]`).click();
     await this.testId('map-jump').click();
@@ -397,6 +441,7 @@ export class Screens {
       'reward-die-sell',
       'reward-perk-pick-0',
       'reward-perk-skip',
+      'tally-continue',
     ];
     for (let step = 0; step < maxSteps; step += 1) {
       if ((await this.state()).screen !== 'rewards') return;

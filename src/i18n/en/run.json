@@ -44,7 +44,9 @@
       "low": "low",
       "raised": "raised",
       "high": "high"
-    }
+    },
+    "hull": "Hull {{cur}}/{{max}}",
+    "scrap": "Scrap {{n}}"
   },
   "event": {
     "title": "Signal",
@@ -195,7 +197,8 @@
     },
     "prologueTitle": "The first crossing",
     "prologueBody": "Replay the opening beats. Nothing is started, nothing is lost.",
-    "prologueReplay": "Replay"
+    "prologueReplay": "Replay",
+    "badgeLegend": "Die badges"
   },
   "consequenceToast": "Consequence: {{text}}",
   "rewards": {
@@ -238,7 +241,8 @@
     "scrap": "Scrap: {{n}}",
     "hull": "Hull {{cur}}/{{max}}",
     "voucher": "Mk-voucher ×{{n}} — one free tier",
-    "voucherUse": "Free"
+    "voucherUse": "Free",
+    "fuse": "Fuse — {{n}}"
   },
   "summary": {
     "victory": "Sector cleared",
@@ -249,7 +253,16 @@
     "perks": "Upgrades:",
     "perksNone": "none",
     "toMenu": "To menu",
-    "faced": "Faced: {{names}}"
+    "faced": "Faced: {{names}}",
+    "more": "More",
+    "less": "Less",
+    "elites": "Elites",
+    "minibosses": "Mini-bosses",
+    "bosses": "Bosses",
+    "scrapSpent": "Scrap spent",
+    "hullPctMin": "Lowest hull",
+    "dicePlaced": "Dice placed",
+    "pct": "{{n}}%"
   },
   "prologue": {
     "title": "Prologue",
@@ -292,7 +305,8 @@
     "launch": "Launch",
     "ascensionCost": "It costs you",
     "ascensionGain": "It pays you",
-    "shardMult": "+{{n}}% shards for the whole run"
+    "shardMult": "+{{n}}% shards for the whole run",
+    "changeShip": "Change ship"
   },
   "package": {
     "title": "Gate package",
@@ -400,7 +414,12 @@
     "swarm": "Swarm",
     "spike": "Spike",
     "precision": "Precision",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Tag glossary",
+    "glossaryBody": "Tags are how dice, perks, modules and engravings find each other: an effect that counts a tag counts every item carrying it.",
+    "glossarySchools": "Schools",
+    "glossarySystems": "Systems",
+    "glossaryMechanics": "Mechanics"
   },
   "build": {
     "title": "Your build",
@@ -423,7 +442,8 @@
     "stability": "Stability {{n}}",
     "neutral": "Axis balanced",
     "preview": "axis {{from}} → {{to}}",
-    "short": "Axis"
+    "short": "Axis",
+    "moves": "Black dice push toward Resonance, blue toward Stability; events and drift move it too."
   },
   "journal": {
     "title": "Run journal",
@@ -460,5 +480,52 @@
     "toMenu": "Suspend to main menu",
     "toMenuHint": "The run is saved — pick it up from the menu.",
     "open": "Menu"
+  },
+  "tally": {
+    "title": "Battle tally",
+    "titleLoss": "Last stand",
+    "turns": "Turns",
+    "dealt": "Damage dealt",
+    "taken": "Damage taken",
+    "shield": "Shield absorbed",
+    "best": "Best spinal hit",
+    "rerolls": "Rerolls used",
+    "placed": "Dice placed",
+    "scrap": "Scrap picked up",
+    "hull": "Hull {{cur}}/{{max}}",
+    "continue": "Continue"
+  },
+  "tagDesc": {
+    "red": "Aggression: weapon damage, burn and spikes.",
+    "blue": "Defence: shields, absorption and staying power.",
+    "green": "Motion: engines, evasion and growth.",
+    "yellow": "Economy: scrap, payouts and shop leverage.",
+    "black": "Risk: charge, sacrifice and the Resonance axis.",
+    "grey": "Reading: sensors, dice handling and precision.",
+    "prismatic": "Wildcard: counts as any school and inherits the slot affinity.",
+    "weapons": "Anything that resolves in a weapon slot.",
+    "shields": "Anything that resolves in a shield slot.",
+    "engines": "Anything that resolves in the engines slot.",
+    "sensors": "Anything that resolves in the sensors slot.",
+    "reactor": "Anything that resolves in the reactor slot.",
+    "spinal": "The spinal mount: one huge shot that wedges on a low roll.",
+    "repairBay": "The repair bay: hull healed mid-battle.",
+    "burn": "Damage over time that ticks at the end of the enemy turn.",
+    "crit": "Hits multiplied by 1.5 before shields.",
+    "growth": "Values that climb permanently on a max face.",
+    "reroll": "Rerolling dice, free or bought.",
+    "charge": "The reactor pool that pays for nudges, rerolls and surges.",
+    "scrap": "The run currency: shops, repairs and Mk upgrades.",
+    "overcap": "Placing a die above its slot cap.",
+    "pierce": "Damage that ignores the enemy shield.",
+    "dodge": "Evasion rolled per incoming hit.",
+    "survival": "Staying alive: hull, lethal saves and floors.",
+    "control": "Denying the enemy: jams, locks and gates.",
+    "dice": "Handling the dice themselves: flip, copy, swap, bank, split.",
+    "shieldwall": "Stacked shielding that carries across turns.",
+    "risk": "Costs paid in hull, scrap or certainty.",
+    "swarm": "Many small dice instead of a few big ones.",
+    "spike": "One enormous value instead of a steady stream.",
+    "precision": "Tight, predictable faces and exact values."
   }
 }

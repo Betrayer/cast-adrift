@@ -14,6 +14,7 @@ import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
 import { TagChips } from "@/components/TagChips";
+import { DieCard } from "@/components/DieCard";
 import { DIE_BY_ID } from "@/data/dice";
 import {
   ENGRAVINGS,
@@ -99,6 +100,16 @@ export const EngravingScreen = () => {
                   );
                 })}
               </Group>
+
+            {activeDie === null ? null : (
+              <Paper bg={tokens.bg} p={0} mt="xs" radius="md">
+                <DieCard
+                  defId={activeDie}
+                  size="full"
+                  engravings={engravings}
+                />
+              </Paper>
+            )}
 
             <Divider my="xs" color={tokens.line} />
             <Text size="sm" c={tokens.dim}>

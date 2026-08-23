@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tokens } from '@/app/theme';
 import { TapPopover } from '@/components/TapPopover';
+import { RESONANCE_BONUSES } from '@/data/resonance';
 import { schools } from '@/data/schools';
 import { isInverted } from '@/game/battle/order';
 import {
@@ -121,20 +122,46 @@ export const StatusBar = () => {
           </span>
         ) : null}
         {interference > 0 ? (
-          <span className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}>
-            {t('battle:interference', { n: interference })}
-          </span>
+          <TapPopover
+            className={styles.clickable}
+            label={t('battle:interferenceTitle')}
+            testId="interference-why"
+            align="end"
+            content={
+              <>
+                <b>{t('battle:interferenceTitle')}</b>
+                <br />
+                {t('battle:interferenceWhy')}
+              </>
+            }
+          >
+            <span className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}>
+              {t('battle:interference', { n: interference })}
+            </span>
+          </TapPopover>
         ) : null}
         {scrap > 0 ? (
           <span className={`${styles.pill ?? ''} ${styles.pillScrap ?? ''}`}>
             {t('battle:scrap', { n: scrap })}
           </span>
         ) : null}
-        <span
-          className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}
+        <TapPopover
+          className={styles.clickable}
+          label={t('battle:chargeTitle')}
+          testId="charge-why"
+          align="end"
+          content={
+            <>
+              <b>{t('battle:chargeTitle')}</b>
+              <br />
+              {t('battle:chargeWhy')}
+            </>
+          }
         >
-          {t('battle:charge', { n: charge, max: CHARGE_CAP })}
-        </span>
+          <span className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}>
+            {t('battle:charge', { n: charge, max: CHARGE_CAP })}
+          </span>
+        </TapPopover>
         <Button
           className={styles.clickable}
           size="compact-xs"
@@ -173,7 +200,7 @@ export const TopBands = () => (
 );
 
 export const ResonanceChips = () => {
-  const { t } = useTranslation(['battle']);
+  const { t } = useTranslation(['battle', 'content']);
   const resonance = useBattleStore((s) => s.resonance);
   const dice = useBattleStore((s) => s.dice);
   const [open, setOpen] = useState(false);
@@ -213,6 +240,22 @@ export const ResonanceChips = () => {
                   reserved: row.reserved,
                 })}
               </span>
+              {activeThresholds(resonance, row.school).map((th) => {
+                const desc = RESONANCE_BONUSES.find(
+                  (bonus) =>
+                    bonus.school === row.school && bonus.threshold === th,
+                )?.desc;
+                if (desc === undefined) return null;
+                return (
+                  <span
+                    key={th}
+                    className={styles.resEarned}
+                    data-res-earned={`${row.school}-${String(th)}`}
+                  >
+                    {t('battle:resEarnedLine', { n: th, desc: t(desc) })}
+                  </span>
+                );
+              })}
             </div>
           ))}
         </div>

@@ -16,7 +16,7 @@ import { useNarrativeStore } from "@/stores/narrativeStore";
 import type { JournalEntry } from "@/game/run/journal";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 8;
+export const RUN_SNAPSHOT_V = 9;
 
 export interface RunSnapshotV1 {
   v: number;
@@ -86,6 +86,7 @@ const pickRunValues = (s: RunState): RunValues => ({
           clearFlags: [...s.pendingBattle.clearFlags],
         },
   pendingDeepScan: s.pendingDeepScan,
+  lastTally: s.lastTally === null ? null : { ...s.lastTally },
   pendingRewards:
     s.pendingRewards === null
       ? null

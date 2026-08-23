@@ -423,7 +423,19 @@
       "story": "Historia",
       "collection": "Colección",
       "modes": "Modos"
-    }
+    },
+    "more": "Más",
+    "less": "Menos",
+    "shardsEarned": "Fragmentos ganados",
+    "t5Solved": "Anomalías de nivel 5",
+    "beacons": "Balizas encendidas",
+    "streak": "Racha sin muertes",
+    "bestStreak": "Mejor racha sin muertes",
+    "driftRuns": "Partidas a la deriva",
+    "dailyRuns": "Partidas diarias",
+    "contractRuns": "Partidas por contrato",
+    "deepClears": "Limpiezas profundas",
+    "elites": "Élites abatidas"
   },
   "achievements": {
     "title": "Logros"

@@ -91,7 +91,8 @@
     "capShrunk": "Kappe ≤ d{{cap}} ▽ · Mk{{mk}}",
     "inherits": "hier: {{school}} +{{n}}",
     "inheritsMult": "hier: {{school}} ×{{n}}",
-    "capShort": "≤d{{cap}}"
+    "capShort": "≤d{{cap}}",
+    "mkTitle": "Mk-Stufen"
   },
   "intro": {
     "miniboss": "Mini-Boss",
@@ -130,7 +131,7 @@
   "close": "Schließen",
   "pickDie": "Wähle einen Würfel für seine Karte",
   "dieFaces": "{{min}}–{{max}}",
-  "dieMeta": "d{{tier}} · {{school}} · {{faces}}",
+  "dieMeta": "d{{tier}} · {{school}} · {{faces}} · Ø {{ev}}",
   "targetBody": "Rumpf anvisieren",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "roh {{raw}} → ~{{expected}} · Schild {{shield}} · Rumpf {{hull}}",
@@ -203,5 +204,123 @@
   "check": {
     "step": "Systems check {{cur}}/{{max}}",
     "skip": "Skip the check"
-  }
+  },
+  "die": {
+    "stats": "d{{tier}} · {{rarity}} · {{pts}} Pkt.",
+    "avg": "Ø {{n}}",
+    "rarity": {
+      "common": "Gewöhnlich",
+      "uncommon": "Ungewöhnlich",
+      "rare": "Selten",
+      "legendary": "Legendär"
+    },
+    "engravings": "Gravuren",
+    "engravingLine": "{{name}} — {{desc}}",
+    "features": "Besonderheiten",
+    "feature": {
+      "fate": "Schicksalswürfel — einmal pro Kampf würfelt er die d100-Tabelle.",
+      "active": "Aktiv — {{what}}",
+      "engraved": "Gravur — {{names}}",
+      "faces": "Ungewöhnliche Seiten — {{list}}",
+      "growth": "Wachstum — +{{per}} bei einer Höchstseite, bis +{{cap}}",
+      "growthField": "Wachstum — +{{n}} im Feld angesammelt",
+      "prismatic": "Prisma — zählt als jede Schule und erbt die Affinität des Slots"
+    },
+    "active": {
+      "flip": "einmal pro Kampf auf die gegenüberliegende Seite drehen",
+      "copy": "einmal pro Kampf den höheren Nachbarwert kopieren",
+      "swap": "einmal pro Kampf den Wert mit einem anderen Würfel tauschen",
+      "bank": "einmal pro Kampf die Seite sichern — Neuwürfe ändern sie nicht",
+      "split": "einmal pro Kampf in zwei graue d4 teilen"
+    },
+    "open": "{{name}} — Karte öffnen",
+    "filter": {
+      "active": "Aktiv",
+      "engraved": "Graviert",
+      "growth": "Wachstum",
+      "faces": "Seiten",
+      "fate": "Schicksal"
+    }
+  },
+  "ship": {
+    "hull": "Hülle {{n}}",
+    "slots": "Aufbau",
+    "slot": "{{name}} · ≤d{{cap}} · Mk{{mk}}",
+    "jamAt": "klemmt bei ≤{{n}}",
+    "price": "{{n}} ◈",
+    "free": "Startschiff",
+    "locked": "Kapitänsstufe {{n}}",
+    "passiveNone": "Keine Passivfähigkeit."
+  },
+  "intentWhy": {
+    "attack": "Trifft dich für {{n}} — erst Schild, dann Hülle.",
+    "attackSelf": "Trifft dich für {{n}} und reißt {{self}} von der eigenen Hülle.",
+    "shield": "Legt sich {{n}} Schild an.",
+    "shieldAll": "Legt jedem lebenden Gegner {{n}} Schild an.",
+    "multi": "{{k}} einzelne Treffer zu je {{n}} — {{total}} roh, jeder einzeln gegen deine Ausweichchance.",
+    "charge": "Lädt auf: Der nächste Angriff schlägt doppelt ein.",
+    "jamSlot": "Blockiert {{n}} deiner Slots bis zur nächsten Runde.",
+    "lockDie": "Sperrt einen Würfel im Fach für die Runde — weder setzbar noch neu würfelbar.",
+    "lockDieHighest": "Sperrt deinen höchsten Würfel im Fach für die Runde.",
+    "summon": "Ruft ein weiteres Schiff herbei, bis zum Feldlimit.",
+    "healAllies": "Heilt jeden lebenden Gegner um {{n}}.",
+    "mirrorHalf": "Wirft die Hälfte deines letzten Rundenschadens zurück, höchstens {{cap}}.",
+    "stealScrap": "Nimmt {{n}} Schrott aus deinem Laderaum.",
+    "capShrink": "Senkt einen Slot bis zur nächsten Runde um eine Stufe.",
+    "twistDie": "Würfelt einen Fachwürfel neu und behält den niedrigeren Wert.",
+    "swapValues": "Tauscht die Werte deines höchsten und niedrigsten Fachwürfels.",
+    "storm": "Verschiebt zwei zufällige Fachwürfel um ±1.",
+    "curseDie": "Verflucht einen Fachwürfel: −{{n}} auf alles, was er würfelt.",
+    "shieldGate": "Errichtet ein Tor bei {{n}}: Ein Treffer darunter richtet nichts aus, ein Treffer ab {{n}} bricht das Tor. Verwundbarkeit ignoriert das Tor.",
+    "mirrorSchool": "Trifft für die Größe deiner größten Schule, höchstens {{cap}}.",
+    "drainCharge": "Zieht {{n}} Ladung ab; hattest du so viel, lädt er sich stattdessen selbst auf.",
+    "siphonShield": "Nimmt bis zu {{n}} deines Schilds und legt es sich an.",
+    "bargain": "Stellt {{n}} Schrott in Rechnung: Zahlst du, heilt der Gegner {{heal}}; kannst du nicht, trifft er für {{n}}.",
+    "enrage": "Wut: +{{n}} auf jeden Treffer von jetzt an.",
+    "hijack": "Greift deinen höchsten Fachwürfel und heftet ihn in einen Slot seiner Wahl.",
+    "echoTotal": "Wirft deinen letzten Rundenschaden zurück, höchstens {{n}}.",
+    "foldOrder": "Faltet die Auflösungsreihenfolge für zwei Runden.",
+    "devourDie": "Frisst deinen höchsten Fachwürfel: Er fällt auf 1, der Gegner gewinnt so viel Schild."
+  },
+  "aura": {
+    "atk+2": "+2 auf jeden Treffer dieses Gegners.",
+    "atk+3": "+3 auf jeden Treffer dieses Gegners.",
+    "shieldAllies3": "Jede Runde: +3 Schild für jeden lebenden Gegner.",
+    "shieldSelf6": "Jede Runde: +6 Schild für den Besitzer.",
+    "lockEachTurn": "Jede Runde: sperrt einen deiner Fachwürfel.",
+    "lockEvery3": "Jede dritte Runde: sperrt einen deiner Fachwürfel.",
+    "twistEachTurn": "Jede Runde: würfelt einen Fachwürfel neu und behält den niedrigeren Wert.",
+    "chargeAllies": "Jede dritte Runde: lädt jeden lebenden Gegner auf.",
+    "summonEvery4": "Jede vierte Runde: ruft einen Akolythen herbei.",
+    "stealOnHit6": "Jeder gelandete Treffer nimmt 6 Schrott."
+  },
+  "statusName": {
+    "burn": "Brand",
+    "mark": "Verwundbar",
+    "jam": "Gestört",
+    "charge": "Geladen"
+  },
+  "statusDesc": {
+    "burn": "Tickt am Ende jeder Gegnerrunde Schaden.",
+    "mark": "Jeder Treffer auf diesen Gegner macht +N und ignoriert ein Schildtor.",
+    "jam": "Sein nächster Angriff ist um 2 schwächer.",
+    "charge": "Sein nächster Angriff schlägt doppelt ein."
+  },
+  "statusLegend": "Gegnerstatus",
+  "statusPair": "{{name}} {{n}}",
+  "tideWhy": "+10% Gegnerhülle pro Stufe und +{{n}} Flachschaden pro Treffer. Aktuell: +{{pct}}% Hülle, +{{n}} Schaden.",
+  "tideTitle": "Störflut",
+  "interferenceWhy": "Ausgelassene Anomalien stapeln sich: Jeder Stapel gibt für den Rest des Laufs eine weitere Flutstufe. Eine Anomalie zu lösen räumt alle ab.",
+  "interferenceTitle": "Störung",
+  "axisWhy": "Schwarze Würfel ziehen zur Resonanz, blaue zur Stabilität. Ereignisse und Drift bewegen die Achse ebenfalls.",
+  "chargeWhy": "Ladung zahlt Aktionen: −1 kostet 3, +1 kostet 3, ein gekaufter Neuwurf 5, ein Schub 10.",
+  "chargeTitle": "Ladung",
+  "mkWhy": "Mk hebt die Slot-Obergrenze und den Affinitätsbonus seiner Schule.",
+  "resEarned": "Erreicht",
+  "manoeuvreTitle": "Manöver",
+  "manoeuvreWhy": "Ein Würfel in den Triebwerken setzt einen Ausweichwurf für die Runde: Ausweichen {{dodge}}% × Wert (max. {{dodgeCap}}%), Streifschuss {{glancing}}% × Wert (max. {{glancingCap}}%). Ausweichen nimmt nichts, ein Streifschuss die Hälfte, alles andere trifft voll. Ab Wert {{intercept}} wird der erste Treffer ganz abgefangen. Der Wert ist der Würfel nach Affinität und Boni.",
+  "targetingTitle": "Zielerfassung",
+  "targetingWhy": "Ein Würfel in den Sensoren macht das Ziel für die Runde Verwundbar +D: D ist der halbe Würfelwert aufgerundet, höchstens {{cap}}, und jeder Treffer dieser Runde macht so viel mehr. Auf der Höchstseite durchschlägt der Treffer zusätzlich den Schild. Sensor-Mk deckt außerdem pro Stufe über Mk1 eine weitere Kartenzeile auf.",
+  "resEarnedLine": "{{n}} · {{desc}}",
+  "systemsTitle": "Systeme"
 }

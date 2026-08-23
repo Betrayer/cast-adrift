@@ -5,6 +5,7 @@ import { everyTurnFor } from "@/game/battle/setup";
 import type {
   BattleOutcome,
   BattleSnapshot,
+  EnemyState,
   EvasionState,
 } from "@/types/battle";
 
@@ -95,5 +96,30 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
     evasion: next.evasion,
     lethal: toHull >= next.hull,
     ends: null,
+  };
+};
+
+export interface Mitigation {
+  raw: number;
+  expected: number;
+  shield: number;
+  hull: number;
+}
+
+export const mitigationOf = (
+  snapshot: BattleSnapshot,
+  enemy: EnemyState,
+): Mitigation => {
+  const hits = intentHits(snapshot, enemy, enemy.nextIntent);
+  const expected = hits.reduce(
+    (sum, hit) => sum + expectedHit(hit, snapshot.evasion),
+    0,
+  );
+  const absorbed = Math.min(snapshot.shield, expected);
+  return {
+    raw: hits.reduce((sum, hit) => sum + hit, 0),
+    expected: Math.round(expected),
+    shield: Math.round(absorbed),
+    hull: Math.round(expected - absorbed),
   };
 };

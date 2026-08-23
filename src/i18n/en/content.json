@@ -374,10 +374,24 @@
     "echoFleet-chorus": "Chorus"
   },
   "ships": {
-    "wanderer": "Wanderer",
-    "ram": "Ram",
-    "ark": "Ark",
-    "ram-proto": "Ram Prototype"
+    "wanderer": {
+      "name": "Wanderer",
+      "passiveName": "Salvage Rig",
+      "passiveDesc": "Every battle opens with +2 scrap."
+    },
+    "ram": {
+      "name": "Ram",
+      "passiveName": "Overload",
+      "passiveDesc": "A weapon slot accepts a die above its cap; each such placement costs 2 hull."
+    },
+    "ark": {
+      "name": "Ark",
+      "passiveName": "Bulwark",
+      "passiveDesc": "A quarter of the standing shield carries into the next turn."
+    },
+    "ram-proto": {
+      "name": "Ram Prototype"
+    }
   },
   "perks": {
     "hot-charge": "Hot Charge",

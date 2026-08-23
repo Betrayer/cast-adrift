@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { LOOT_SFX } from "@/data/audio";
+import { DieCard } from "@/components/DieCard";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
 import { schools } from "@/data/schools";
@@ -11,6 +12,7 @@ import { resolveDieChoice, resolveModuleChoice } from "@/game/run/flow";
 import { computeRunMods } from "@/game/run/runMods";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
+import { useMetaStore } from "@/stores/metaStore";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useRunStore } from "@/stores/runStore";
 import styles from "./Rewards.module.css";
@@ -30,6 +32,7 @@ export const PackageReward = ({
 }: PackageRewardProps) => {
   const { t } = useTranslation(["run", "battle", "content"]);
   const deckSize = useRunStore((s) => s.deck.length);
+  const engravings = useMetaStore((s) => s.engravings);
   const vouchers = useRunStore((s) => s.vouchers);
   const chartPicks = useRunStore((s) => s.chartPicks);
   const perks = useRunStore((s) => s.perks);
@@ -91,38 +94,32 @@ export const PackageReward = ({
           return (
             <div
               key={`${dieId}-${String(index)}`}
-              className={`${styles.card ?? ""} ${reduced ? "" : styles.reveal ?? ""}`}
+              className={`${styles.card ?? ""} ${styles.cardDie ?? ""} ${reduced ? "" : styles.reveal ?? ""}`}
               style={{
                 borderColor: colors.stroke,
                 animationDelay: reduced ? undefined : `${String(index * 140)}ms`,
               }}
             >
-              <Text className={styles.dieName} c={tokens.text}>
-                {t(def.name)}
-              </Text>
-              <Text className={styles.tier} c={tokens.dim}>
-                {`d${String(def.tier)}`}
-              </Text>
-              <span
-                className={styles.chip}
-                style={{ borderColor: colors.stroke, color: colors.text }}
-              >
-                {t(`battle:school.${def.school}`)}
-              </span>
-              <Button
-                size="sm"
-                mt="sm"
-                fullWidth
-                data-testid={`reward-package-die-${String(index)}`}
-                onClick={() => {
-                  playSfx(deckFull ? "buy" : "optionTick", { rate: 1.12 });
-                  resolveDieChoice(dieId);
-                }}
-              >
-                {deckFull
-                  ? t("run:package.sell", { n: sellValue(ptsForDie(dieId)) })
-                  : t("run:package.take")}
-              </Button>
+              <DieCard
+                defId={dieId}
+                plain
+                engravings={engravings}
+                footer={
+                  <Button
+                    size="sm"
+                    fullWidth
+                    data-testid={`reward-package-die-${String(index)}`}
+                    onClick={() => {
+                      playSfx(deckFull ? "buy" : "optionTick", { rate: 1.12 });
+                      resolveDieChoice(dieId);
+                    }}
+                  >
+                    {deckFull
+                      ? t("run:package.sell", { n: sellValue(ptsForDie(dieId)) })
+                      : t("run:package.take")}
+                  </Button>
+                }
+              />
             </div>
           );
         })}

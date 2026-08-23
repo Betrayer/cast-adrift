@@ -203,6 +203,8 @@ export interface BattleValues {
   blackUsed: number;
   blueUsed: number;
   shieldAbsorbed: number;
+  damageDealt: number;
+  damageTaken: number;
   spinalMaxHit: number;
   rerollsUsed: number;
   repairBayHealed: number;
@@ -335,6 +337,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   blackUsed: 0,
   blueUsed: 0,
   shieldAbsorbed: 0,
+  damageDealt: 0,
+  damageTaken: 0,
   spinalMaxHit: 0,
   rerollsUsed: 0,
   repairBayHealed: 0,
@@ -542,6 +546,8 @@ const scriptedDefense = (
 
 interface TurnTally {
   shieldAbsorbed: number;
+  damageDealt: number;
+  damageTaken: number;
   repairBayHealed: number;
   spinalMaxHit: number;
   burnKilledElite: boolean;
@@ -549,11 +555,14 @@ interface TurnTally {
 
 export const tallyBundle = (bundle: ResolutionBundle): TurnTally => {
   let shieldAbsorbed = 0;
+  let damageDealt = 0;
+  let damageTaken = 0;
   let repairBayHealed = 0;
   let spinalMaxHit = 0;
   let burnKilledElite = false;
 
   for (const beat of bundle.beats) {
+    if (beat.kind === "damage") damageDealt += beat.amount;
     if (beat.slot === "spinal" && beat.kind === "damage") {
       spinalMaxHit = Math.max(spinalMaxHit, beat.amount);
     }
@@ -563,6 +572,7 @@ export const tallyBundle = (bundle: ResolutionBundle): TurnTally => {
   }
   for (const beat of bundle.enemyBeats) {
     shieldAbsorbed += beat.shieldDamage;
+    damageTaken += beat.hullDamage;
     if (beat.kind !== "burnTick") continue;
     const enemy = beat.after.enemies.find((e) => e.id === beat.enemyId);
     if (enemy === undefined || enemy.hp > 0) continue;
@@ -571,13 +581,25 @@ export const tallyBundle = (bundle: ResolutionBundle): TurnTally => {
       burnKilledElite = true;
     }
   }
-  return { shieldAbsorbed, repairBayHealed, spinalMaxHit, burnKilledElite };
+  return {
+    shieldAbsorbed,
+    damageDealt,
+    damageTaken,
+    repairBayHealed,
+    spinalMaxHit,
+    burnKilledElite,
+  };
 };
 
 export const battleTally = (s: BattleValues): BattleTally => ({
   won: s.outcome === "victory",
   turns: s.turn,
   shieldAbsorbed: s.shieldAbsorbed,
+  damageDealt: s.damageDealt,
+  damageTaken: s.damageTaken,
+  scrap: s.scrap,
+  hull: s.hull,
+  hullMax: s.hullMax,
   spinalMaxHit: s.spinalMaxHit,
   rerollsUsed: s.rerollsUsed,
   repairBayHealed: s.repairBayHealed,
@@ -1222,6 +1244,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       blueUsed,
       dicePlaced: s.dicePlaced + placed.length,
       shieldAbsorbed: s.shieldAbsorbed + tally.shieldAbsorbed,
+      damageDealt: s.damageDealt + tally.damageDealt,
+      damageTaken: s.damageTaken + tally.damageTaken,
       repairBayHealed: s.repairBayHealed + tally.repairBayHealed,
       spinalMaxHit: Math.max(s.spinalMaxHit, tally.spinalMaxHit),
       burnKilledElite: s.burnKilledElite || tally.burnKilledElite,
@@ -1388,6 +1412,8 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   blackUsed: s.blackUsed,
   blueUsed: s.blueUsed,
   shieldAbsorbed: s.shieldAbsorbed,
+  damageDealt: s.damageDealt,
+  damageTaken: s.damageTaken,
   spinalMaxHit: s.spinalMaxHit,
   rerollsUsed: s.rerollsUsed,
   repairBayHealed: s.repairBayHealed,

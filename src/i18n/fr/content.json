@@ -374,10 +374,24 @@
     "echoFleet-chorus": "Refrain"
   },
   "ships": {
-    "wanderer": "Le vagabond",
-    "ram": "Ram",
-    "ark": "Arche",
-    "ram-proto": "Prototype Ram"
+    "wanderer": {
+      "name": "Vagabond",
+      "passiveName": "Gréement de récupération",
+      "passiveDesc": "Chaque combat débute avec +2 ferraille."
+    },
+    "ram": {
+      "name": "Bélier",
+      "passiveName": "Surcharge",
+      "passiveDesc": "Un emplacement d’arme accepte un dé au-dessus de son plafond ; chaque placement de ce type coûte 2 coque."
+    },
+    "ark": {
+      "name": "Arche",
+      "passiveName": "Bastion",
+      "passiveDesc": "Un quart du bouclier restant passe au tour suivant."
+    },
+    "ram-proto": {
+      "name": "Prototype Bélier"
+    }
   },
   "perks": {
     "hot-charge": "Charge à chaud",

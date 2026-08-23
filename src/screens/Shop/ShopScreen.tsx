@@ -15,9 +15,10 @@ import { useBackGuard } from "@/app/backGuard";
 import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
+import { DieCard } from "@/components/DieCard";
+import { DieCardTrigger } from "@/components/DieCardModal";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
-import { schools } from "@/data/schools";
 import { playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import {
@@ -36,6 +37,7 @@ import { autosaveRun, completeNode } from "@/game/run/flow";
 import { enterShop } from "@/game/run/shopEntry";
 import { computeRunMods } from "@/game/run/runMods";
 import { createStream, deriveSeed } from "@/services/rng";
+import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 
 export const ShopScreen = () => {
@@ -49,6 +51,7 @@ export const ShopScreen = () => {
   const flags = useRunStore((s) => s.flags);
   const position = useRunStore((s) => s.position);
   const shop = useRunStore((s) => s.shop);
+  const engravings = useMetaStore((s) => s.engravings);
   const setShop = useRunStore((s) => s.setShop);
 
   const ascension = useRunStore((s) => s.ascension);
@@ -189,54 +192,35 @@ export const ShopScreen = () => {
         {items.map((item, index) => {
           const def = DIE_BY_ID.get(item.defId);
           if (def === undefined) return null;
-          const colors = schools[def.school];
           const affordable =
             !item.sold && scrap >= item.price && deck.length < DECK_CAP;
           return (
-            <Paper
+            <div
               key={index}
-              bg={tokens.surface1}
-              p="sm"
-              radius="md"
-              withBorder
               data-testid={`shop-item-${String(index)}`}
               data-sold={item.sold ? '1' : '0'}
               style={{ opacity: item.sold ? 0.4 : 1 }}
             >
-              <Stack gap={4} align="center">
-                <Text fw={600} c={tokens.text} ta="center">
-                  {t(def.name)}
-                </Text>
-                <Text size="xs" c={tokens.dim}>
-                  {`d${String(def.tier)}`}
-                </Text>
-                <span
-                  style={{
-                    border: `1px solid ${colors.stroke}`,
-                    color: colors.text,
-                    borderRadius: 10,
-                    padding: "2px 8px",
-                    fontSize: 11,
-                  }}
-                >
-                  {t(`battle:school.${def.school}`)}
-                </span>
-                <Button
-                  size="compact-sm"
-                  mt={4}
-                  fullWidth
-                  disabled={!affordable}
-                  data-testid={`shop-buy-${String(index)}`}
-                  onClick={() => {
-                    buy(index);
-                  }}
-                >
-                  {item.sold
-                    ? t("run:shop.empty")
-                    : t("run:shop.buy", { n: item.price })}
-                </Button>
-              </Stack>
-            </Paper>
+              <DieCard
+                defId={item.defId}
+                engravings={engravings}
+                footer={
+                  <Button
+                    size="compact-sm"
+                    fullWidth
+                    disabled={!affordable}
+                    data-testid={`shop-buy-${String(index)}`}
+                    onClick={() => {
+                      buy(index);
+                    }}
+                  >
+                    {item.sold
+                      ? t("run:shop.empty")
+                      : t("run:shop.buy", { n: item.price })}
+                  </Button>
+                }
+              />
+            </div>
           );
         })}
       </SimpleGrid>
@@ -314,18 +298,30 @@ export const ShopScreen = () => {
             const def = DIE_BY_ID.get(die.defId);
             if (def === undefined) return null;
             return (
-              <Button
-                key={die.uid}
-                size="compact-xs"
-                variant="light"
-                color="gray"
-                disabled={deck.length <= 1}
-                onClick={() => {
-                  sellDie(die.uid);
-                }}
-              >
-                {`${t(def.name)} · +${String(sellValue(ptsForDie(die.defId)))}`}
-              </Button>
+              <Group key={die.uid} gap={4} wrap="nowrap">
+                <DieCardTrigger
+                  defId={die.defId}
+                  engravings={engravings}
+                  growthBonus={die.growthBonus ?? 0}
+                  testId={`shop-sell-card-${die.uid}`}
+                >
+                  <Text size="xs" c={tokens.dim}>
+                    {t(def.name)}
+                  </Text>
+                </DieCardTrigger>
+                <Button
+                  size="compact-xs"
+                  variant="light"
+                  color="gray"
+                  disabled={deck.length <= 1}
+                  data-testid={`shop-sell-${die.uid}`}
+                  onClick={() => {
+                    sellDie(die.uid);
+                  }}
+                >
+                  {`+${String(sellValue(ptsForDie(die.defId)))}`}
+                </Button>
+              </Group>
             );
           })}
         </Group>

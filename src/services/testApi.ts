@@ -1,11 +1,20 @@
-import type { ShipId } from "@/data/ships";
-import { enemyForecast, legalTargets, type TurnForecast } from "@/game/battle/view";
+import { SHIP_BY_ID, type ShipId } from "@/data/ships";
+import { slotCapForMk } from "@/data/slots";
+import {
+  enemyForecast,
+  legalTargets,
+  mitigationOf,
+  type Mitigation,
+  type TurnForecast,
+} from "@/game/battle/view";
 import { ALL_COACH_MARK_IDS, HINT_IDS, nextCoachMark } from "@/game/tutorial";
 import type { NodeId } from "@/game/map/types";
 import { lastClaimOutcome } from "@/services/account";
 import { trackedEvents } from "@/services/analytics";
 import { readClaim } from "@/services/account-link";
+import i18n from "i18next";
 import { captainName } from "@/game/run/boards";
+import { dieCardModel, evLabel } from "@/game/dice/card";
 import { discardActiveRun, jumpTo, startRunMode } from "@/game/run/flow";
 import { isoWeekKey } from "@/game/run/modes";
 import { totalXpForLevel } from "@/game/xp";
@@ -27,7 +36,11 @@ import {
 } from "@/stores/battleStore";
 import { useMetaStore, type MetaStats } from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
-import { useRunStore, type RunMode } from "@/stores/runStore";
+import {
+  useRunStore,
+  type BattleTally,
+  type RunMode,
+} from "@/stores/runStore";
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
 import type { BattleLayoutId, ScreenId } from "@/types";
@@ -90,6 +103,28 @@ export interface BattlePatch {
   ascension?: number;
   inverted?: boolean;
   snapshot?: BattleSaveState;
+}
+
+export interface DieCardView {
+  defId: string;
+  tier: number;
+  school: string;
+  rarity: string;
+  pts: number;
+  faces: string;
+  custom: boolean;
+  ev: string;
+  badges: string[];
+  features: string[];
+}
+
+export interface ShipCardView {
+  shipId: string;
+  hull: number;
+  slots: string[];
+  caps: number[];
+  passive: string | null;
+  hasPassiveText: boolean;
 }
 
 export interface MapNodeView {
@@ -223,6 +258,10 @@ export interface TestApi {
   showMemory: (order: number) => void;
   mapNodes: () => MapNodeView[];
   slotsFor: (uid: string) => SlotId[];
+  dieCard: (defId: string) => DieCardView | null;
+  shipCard: (shipId: ShipId) => ShipCardView | null;
+  mitigation: (enemyId: string) => Mitigation | null;
+  tally: () => BattleTally | null;
   coach: () => { active: string | null; seen: string[] };
   events: () => { name: string; params: Record<string, string | number | boolean>; at: number }[];
   resetTutorial: () => void;
@@ -314,6 +353,7 @@ const applySettings = (patch: Partial<SettingsValues>): void => {
   if (patch.theme !== undefined) settings.setTheme(patch.theme);
   if (patch.fontScale !== undefined) settings.setFontScale(patch.fontScale);
   if (patch.battleSpeed !== undefined) settings.setBattleSpeed(patch.battleSpeed);
+  if (patch.skipTally !== undefined) settings.setSkipTally(patch.skipTally);
   if (patch.battleLayout !== undefined) chooseBattleLayout(patch.battleLayout);
 };
 
@@ -570,6 +610,60 @@ export const createTestApi = (): TestApi => ({
   },
 
   slotsFor: (uid) => legalTargets(useBattleStore.getState(), uid).slots,
+
+  dieCard: (defId) => {
+    const model = dieCardModel({
+      defId,
+      engravings: useMetaStore.getState().engravings,
+    });
+    if (model === null) return null;
+    return {
+      defId: model.def.id,
+      tier: model.def.tier,
+      school: model.def.school,
+      rarity: model.def.rarity,
+      pts: model.def.pts,
+      faces: model.faces.custom
+        ? model.faces.faces.join("·")
+        : i18n.t("battle:dieFaces", {
+            min: model.faces.min,
+            max: model.faces.max,
+          }),
+      custom: model.faces.custom,
+      ev: evLabel(model.faces.ev),
+      badges: [...model.badges],
+      features: [...model.features],
+    };
+  },
+
+  shipCard: (shipId) => {
+    const def = SHIP_BY_ID.get(shipId);
+    if (def === undefined) return null;
+    const slots = Object.keys(def.slots) as SlotId[];
+    return {
+      shipId: def.id,
+      hull: def.hullMax,
+      slots,
+      caps: slots.map((slotId) =>
+        slotCapForMk(slotId, def.slots[slotId]?.mk ?? 1),
+      ),
+      passive: def.passive?.kind ?? null,
+      hasPassiveText:
+        def.passiveName !== undefined && def.passiveDesc !== undefined,
+    };
+  },
+
+  mitigation: (enemyId) => {
+    const battle = useBattleStore.getState();
+    const enemy = battle.enemies.find((e) => e.id === enemyId);
+    if (enemy === undefined) return null;
+    return mitigationOf(battleSnapshot(battle), enemy);
+  },
+
+  tally: () => {
+    const value = useRunStore.getState().lastTally;
+    return value === null ? null : { ...value };
+  },
 
   events: () => trackedEvents().map((e) => ({ ...e, params: { ...e.params } })),
 

@@ -124,5 +124,6 @@
       "tag": "Taśma slotów z żywym wynikiem · prognoza tury",
       "desc": "Wszystkie liczby w jednej kolumnie, cała tura policzona, zanim ją zakończysz."
     }
-  }
+  },
+  "skipTally": "Pomijaj podsumowanie walki"
 }

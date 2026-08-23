@@ -44,7 +44,9 @@
       "low": "bajo",
       "raised": "criado",
       "high": "alto"
-    }
+    },
+    "hull": "Casco {{cur}}/{{max}}",
+    "scrap": "Chatarra {{n}}"
   },
   "event": {
     "title": "Señal",
@@ -195,7 +197,8 @@
     },
     "prologueTitle": "La primera travesía",
     "prologueBody": "Vuelve a reproducir los primeros compases. No se ha iniciado nada, no se ha perdido nada.",
-    "prologueReplay": "Repetición"
+    "prologueReplay": "Repetición",
+    "badgeLegend": "Distintivos de dados"
   },
   "consequenceToast": "Consecuencia: {{text}}",
   "rewards": {
@@ -238,7 +241,8 @@
     "scrap": "Chatarra: {{n}}",
     "hull": "Casco {{cur}}/{{max}}",
     "voucher": "Cupón Mk × {{n}}: un nivel gratuito",
-    "voucherUse": "Gratis"
+    "voucherUse": "Gratis",
+    "fuse": "Fusionar — {{n}}"
   },
   "summary": {
     "victory": "Sector despejado",
@@ -249,7 +253,16 @@
     "perks": "Actualizaciones:",
     "perksNone": "ninguno",
     "toMenu": "Ir al menú",
-    "faced": "Fuente: {{names}}"
+    "faced": "Fuente: {{names}}",
+    "more": "Más",
+    "less": "Menos",
+    "elites": "Élites",
+    "minibosses": "Minijefes",
+    "bosses": "Jefes",
+    "scrapSpent": "Chatarra gastada",
+    "hullPctMin": "Casco más bajo",
+    "dicePlaced": "Dados colocados",
+    "pct": "{{n}}%"
   },
   "prologue": {
     "title": "Prólogo",
@@ -292,7 +305,8 @@
     "launch": "Inicio",
     "ascensionCost": "Te cuesta",
     "ascensionGain": "Te compensa",
-    "shardMult": "+{{n}} % de fragmentos durante toda la ejecución"
+    "shardMult": "+{{n}} % de fragmentos durante toda la ejecución",
+    "changeShip": "Cambiar de nave"
   },
   "package": {
     "title": "Paquete «Gate»",
@@ -400,7 +414,12 @@
     "swarm": "Enjambre",
     "spike": "Spike",
     "precision": "Precisión",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Glosario de etiquetas",
+    "glossaryBody": "Las etiquetas son como los dados, ventajas, módulos y grabados se encuentran: un efecto que cuenta una etiqueta cuenta todo objeto que la lleve.",
+    "glossarySchools": "Escuelas",
+    "glossarySystems": "Sistemas",
+    "glossaryMechanics": "Mecánicas"
   },
   "build": {
     "title": "Tu configuración",
@@ -423,7 +442,8 @@
     "stability": "Estabilidad {{n}}",
     "neutral": "Eje equilibrado",
     "preview": "axis {{from}} → {{to}}",
-    "short": "Eje"
+    "short": "Eje",
+    "moves": "Los dados negros empujan hacia Resonancia, los azules hacia Estabilidad; los eventos y la deriva también lo mueven."
   },
   "journal": {
     "title": "Diario de carreras",
@@ -460,5 +480,52 @@
     "toMenu": "Volver al menú principal",
     "toMenuHint": "La partida está guardada: retómala desde el menú.",
     "open": "Menú"
+  },
+  "tally": {
+    "title": "Resumen del combate",
+    "titleLoss": "Último combate",
+    "turns": "Turnos",
+    "dealt": "Daño infligido",
+    "taken": "Daño recibido",
+    "shield": "Absorbido por el escudo",
+    "best": "Mejor golpe espinal",
+    "rerolls": "Retiradas usadas",
+    "placed": "Dados colocados",
+    "scrap": "Chatarra recogida",
+    "hull": "Casco {{cur}}/{{max}}",
+    "continue": "Continuar"
+  },
+  "tagDesc": {
+    "red": "Agresión: daño de armas, quemadura y picos.",
+    "blue": "Defensa: escudos, absorción y aguante.",
+    "green": "Movimiento: motores, evasión y crecimiento.",
+    "yellow": "Economía: chatarra, pagos y ventaja en la tienda.",
+    "black": "Riesgo: carga, sacrificio y el eje de Resonancia.",
+    "grey": "Lectura: sensores, manejo de dados y precisión.",
+    "prismatic": "Comodín: cuenta como cualquier escuela y hereda la afinidad de la ranura.",
+    "weapons": "Todo lo que se resuelve en una ranura de armas.",
+    "shields": "Todo lo que se resuelve en una ranura de escudos.",
+    "engines": "Todo lo que se resuelve en la ranura de motores.",
+    "sensors": "Todo lo que se resuelve en la ranura de sensores.",
+    "reactor": "Todo lo que se resuelve en la ranura del reactor.",
+    "spinal": "El montaje espinal: un disparo enorme que se atasca con una tirada baja.",
+    "repairBay": "La bahía de reparación: casco curado en pleno combate.",
+    "burn": "Daño con el tiempo que se aplica al final del turno enemigo.",
+    "crit": "Golpes multiplicados por 1,5 antes de los escudos.",
+    "growth": "Valores que suben para siempre en una cara máxima.",
+    "reroll": "Retirar dados, gratis o comprado.",
+    "charge": "La reserva del reactor que paga empujes, retiradas y sobrecargas.",
+    "scrap": "La moneda de la partida: tiendas, reparaciones y mejoras Mk.",
+    "overcap": "Colocar un dado por encima del límite de su ranura.",
+    "pierce": "Daño que ignora el escudo enemigo.",
+    "dodge": "Evasión tirada por cada golpe entrante.",
+    "survival": "Seguir vivo: casco, salvadas letales y suelos.",
+    "control": "Negarle al enemigo: atascos, bloqueos y compuertas.",
+    "dice": "Manejar los dados en sí: girar, copiar, cambiar, fijar, dividir.",
+    "shieldwall": "Escudo apilado que pasa de turno en turno.",
+    "risk": "Costes pagados en casco, chatarra o certeza.",
+    "swarm": "Muchos dados pequeños en vez de unos pocos grandes.",
+    "spike": "Un valor enorme en vez de un flujo constante.",
+    "precision": "Caras estrechas y predecibles y valores exactos."
   }
 }

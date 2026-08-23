@@ -423,7 +423,19 @@
       "story": "Geschichte",
       "collection": "Sammlung",
       "modes": "Modi"
-    }
+    },
+    "more": "Mehr",
+    "less": "Weniger",
+    "shardsEarned": "Splitter verdient",
+    "t5Solved": "Anomalien Stufe 5",
+    "beacons": "Baken entzündet",
+    "streak": "Serie ohne Tod",
+    "bestStreak": "Beste Serie ohne Tod",
+    "driftRuns": "Drift-Läufe",
+    "dailyRuns": "Tägliche Läufe",
+    "contractRuns": "Vertragsläufe",
+    "deepClears": "Tiefe Durchgänge",
+    "elites": "Elite erlegt"
   },
   "achievements": {
     "title": "Erfolge"

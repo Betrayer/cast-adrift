@@ -25,6 +25,7 @@ export interface SettingsValues {
   fontScale: FontScale;
   battleSpeed: BattleSpeed;
   battleLayout: BattleLayoutId;
+  skipTally: boolean;
 }
 
 export interface SettingsState extends SettingsValues {
@@ -38,9 +39,10 @@ export interface SettingsState extends SettingsValues {
   setFontScale: (fontScale: FontScale) => void;
   setBattleSpeed: (battleSpeed: BattleSpeed) => void;
   setBattleLayout: (battleLayout: BattleLayoutId) => void;
+  setSkipTally: (skipTally: boolean) => void;
 }
 
-export const SETTINGS_VERSION = 3;
+export const SETTINGS_VERSION = 4;
 
 const DEFAULTS: SettingsValues = {
   locale: 'en',
@@ -53,6 +55,7 @@ const DEFAULTS: SettingsValues = {
   fontScale: 'm',
   battleSpeed: 'normal',
   battleLayout: DEFAULT_BATTLE_LAYOUT,
+  skipTally: false,
 };
 
 const isFontScale = (value: unknown): value is FontScale =>
@@ -77,6 +80,7 @@ export const migrateSettings = (
     battleLayout: isBattleLayoutId(prev.battleLayout)
       ? prev.battleLayout
       : DEFAULTS.battleLayout,
+    skipTally: prev.skipTally === true,
   };
 };
 
@@ -94,6 +98,7 @@ export const useSettingsStore = create<SettingsState>()(
       setFontScale: (fontScale) => set({ fontScale }),
       setBattleSpeed: (battleSpeed) => set({ battleSpeed }),
       setBattleLayout: (battleLayout) => set({ battleLayout }),
+      setSkipTally: (skipTally) => set({ skipTally }),
     }),
     {
       name: 'ca.settings',
@@ -110,6 +115,7 @@ export const useSettingsStore = create<SettingsState>()(
         fontScale: s.fontScale,
         battleSpeed: s.battleSpeed,
         battleLayout: s.battleLayout,
+        skipTally: s.skipTally,
       }),
     },
   ),

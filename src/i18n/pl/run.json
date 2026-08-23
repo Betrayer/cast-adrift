@@ -44,7 +44,9 @@
       "low": "niski",
       "raised": "podniesiony",
       "high": "wysoki"
-    }
+    },
+    "hull": "Kadłub {{cur}}/{{max}}",
+    "scrap": "Złom {{n}}"
   },
   "event": {
     "title": "Sygnał",
@@ -195,7 +197,8 @@
     },
     "prologueTitle": "Pierwsze przejście",
     "prologueBody": "Odtwórz początkowe takty. Nic się nie zaczęło, nic nie zostało utracone.",
-    "prologueReplay": "Powtórka"
+    "prologueReplay": "Powtórka",
+    "badgeLegend": "Odznaki kości"
   },
   "consequenceToast": "Wynik: {{text}}",
   "rewards": {
@@ -238,7 +241,8 @@
     "scrap": "Złom: {{n}}",
     "hull": "Kadłub {{cur}}/{{max}}",
     "voucher": "Kupon Mk ×{{n}} — jeden bezpłatny poziom",
-    "voucherUse": "Bezpłatny"
+    "voucherUse": "Bezpłatny",
+    "fuse": "Stop — {{n}}"
   },
   "summary": {
     "victory": "Sektor oczyszczony",
@@ -249,7 +253,16 @@
     "perks": "Ulepszenia:",
     "perksNone": "brak",
     "toMenu": "Do menu",
-    "faced": "Źródło: {{names}}"
+    "faced": "Źródło: {{names}}",
+    "more": "Więcej",
+    "less": "Mniej",
+    "elites": "Elity",
+    "minibosses": "Minibossowie",
+    "bosses": "Bossowie",
+    "scrapSpent": "Wydany złom",
+    "hullPctMin": "Najniższy kadłub",
+    "dicePlaced": "Postawione kości",
+    "pct": "{{n}}%"
   },
   "prologue": {
     "title": "Prolog",
@@ -292,7 +305,8 @@
     "launch": "Uruchomienie",
     "ascensionCost": "To cię kosztuje",
     "ascensionGain": "To się opłaca",
-    "shardMult": "+{{n}}% fragmentów dla całego przebiegu"
+    "shardMult": "+{{n}}% fragmentów dla całego przebiegu",
+    "changeShip": "Zmień statek"
   },
   "package": {
     "title": "Opakowanie typu Gate",
@@ -400,7 +414,12 @@
     "swarm": "Rój",
     "spike": "Spike",
     "precision": "Precyzja",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Słownik tagów",
+    "glossaryBody": "Tagi to sposób, w jaki kości, atuty, moduły i grawerunki się odnajdują: efekt liczący tag liczy każdy przedmiot, który go nosi.",
+    "glossarySchools": "Szkoły",
+    "glossarySystems": "Systemy",
+    "glossaryMechanics": "Mechaniki"
   },
   "build": {
     "title": "Twoja kompilacja",
@@ -423,7 +442,8 @@
     "stability": "Stabilność {{n}}",
     "neutral": "Oś wyważona",
     "preview": "{{from}} → {{to}}",
-    "short": "Oś"
+    "short": "Oś",
+    "moves": "Czarne kości pchają ku Rezonansowi, niebieskie ku Stabilności; zdarzenia i dryf też ją ruszają."
   },
   "journal": {
     "title": "Dziennik biegowy",
@@ -460,5 +480,52 @@
     "toMenu": "Zwiń do menu głównego",
     "toMenuHint": "Przebieg jest zapisany — wróć do niego z menu.",
     "open": "Menu"
+  },
+  "tally": {
+    "title": "Podsumowanie walki",
+    "titleLoss": "Ostatnia walka",
+    "turns": "Tury",
+    "dealt": "Zadane obrażenia",
+    "taken": "Otrzymane obrażenia",
+    "shield": "Pochłonięte przez tarczę",
+    "best": "Najlepszy cios spinalny",
+    "rerolls": "Użyte przerzuty",
+    "placed": "Postawione kości",
+    "scrap": "Zebrany złom",
+    "hull": "Kadłub {{cur}}/{{max}}",
+    "continue": "Dalej"
+  },
+  "tagDesc": {
+    "red": "Agresja: obrażenia broni, płomień i skoki.",
+    "blue": "Obrona: tarcze, pochłanianie i wytrzymałość.",
+    "green": "Ruch: silniki, unik i wzrost.",
+    "yellow": "Ekonomia: złom, wypłaty i dźwignia w sklepie.",
+    "black": "Ryzyko: ładunek, poświęcenie i oś Rezonansu.",
+    "grey": "Czytanie: sensory, obsługa kości i precyzja.",
+    "prismatic": "Joker: liczy się jako dowolna szkoła i dziedziczy powinowactwo slotu.",
+    "weapons": "Wszystko, co rozstrzyga się w slocie broni.",
+    "shields": "Wszystko, co rozstrzyga się w slocie tarcz.",
+    "engines": "Wszystko, co rozstrzyga się w slocie silników.",
+    "sensors": "Wszystko, co rozstrzyga się w slocie sensorów.",
+    "reactor": "Wszystko, co rozstrzyga się w slocie reaktora.",
+    "spinal": "Działo spinalne: jeden ogromny strzał, który klinuje przy niskim rzucie.",
+    "repairBay": "Zatoka naprawcza: kadłub leczony w trakcie walki.",
+    "burn": "Obrażenia w czasie, tykające na koniec tury wroga.",
+    "crit": "Ciosy mnożone przez 1,5 przed tarczami.",
+    "growth": "Wartości rosnące na stałe na najwyższej ściance.",
+    "reroll": "Przerzucanie kości, darmowe lub kupione.",
+    "charge": "Zasób reaktora płacący za popchnięcia, przerzuty i zrywy.",
+    "scrap": "Waluta przebiegu: sklepy, naprawy i ulepszenia Mk.",
+    "overcap": "Postawienie kości powyżej limitu slotu.",
+    "pierce": "Obrażenia ignorujące tarczę wroga.",
+    "dodge": "Unik rzucany na każdy przychodzący cios.",
+    "survival": "Utrzymanie się przy życiu: kadłub, ratunki od śmierci i podłogi.",
+    "control": "Odmawianie wrogowi: zakłócenia, blokady i bramy.",
+    "dice": "Praca z samymi kośćmi: obrót, kopia, zamiana, utrwalenie, podział.",
+    "shieldwall": "Warstwowa tarcza przenoszona między turami.",
+    "risk": "Koszt płacony kadłubem, złomem lub pewnością.",
+    "swarm": "Wiele małych kości zamiast kilku dużych.",
+    "spike": "Jedna ogromna wartość zamiast równego strumienia.",
+    "precision": "Wąskie, przewidywalne ścianki i dokładne wartości."
   }
 }

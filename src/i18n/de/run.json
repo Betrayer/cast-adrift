@@ -44,7 +44,9 @@
       "low": "niedrig",
       "raised": "erhöht",
       "high": "hoch"
-    }
+    },
+    "hull": "Hülle {{cur}}/{{max}}",
+    "scrap": "Schrott {{n}}"
   },
   "event": {
     "title": "Signal",
@@ -195,7 +197,8 @@
     },
     "prologueTitle": "Die erste Überquerung",
     "prologueBody": "Spiele die ersten Takte noch einmal ab. Nichts hat begonnen, nichts ist verloren.",
-    "prologueReplay": "Wiederholung"
+    "prologueReplay": "Wiederholung",
+    "badgeLegend": "Würfelabzeichen"
   },
   "consequenceToast": "Folge: {{text}}",
   "rewards": {
@@ -238,7 +241,8 @@
     "scrap": "Schrott: {{n}}",
     "hull": "Hülle {{cur}}/{{max}}",
     "voucher": "Mk-Gutschein ×{{n}} – eine kostenlose Stufe",
-    "voucherUse": "Kostenlos"
+    "voucherUse": "Kostenlos",
+    "fuse": "Verschmelzen — {{n}}"
   },
   "summary": {
     "victory": "Sektor geräumt",
@@ -249,7 +253,16 @@
     "perks": "Upgrades:",
     "perksNone": "keine",
     "toMenu": "Zum Menü",
-    "faced": "Quelle: {{names}}"
+    "faced": "Quelle: {{names}}",
+    "more": "Mehr",
+    "less": "Weniger",
+    "elites": "Elite",
+    "minibosses": "Mini-Bosse",
+    "bosses": "Bosse",
+    "scrapSpent": "Schrott ausgegeben",
+    "hullPctMin": "Niedrigste Hülle",
+    "dicePlaced": "Würfel gesetzt",
+    "pct": "{{n}}%"
   },
   "prologue": {
     "title": "Prolog",
@@ -292,7 +305,8 @@
     "launch": "Start",
     "ascensionCost": "Das kostet dich",
     "ascensionGain": "Es zahlt sich für dich aus",
-    "shardMult": "+{{n}} % Shards für den gesamten Durchlauf"
+    "shardMult": "+{{n}} % Shards für den gesamten Durchlauf",
+    "changeShip": "Schiff wechseln"
   },
   "package": {
     "title": "Gate-Gehäuse",
@@ -400,7 +414,12 @@
     "swarm": "Schwarm",
     "spike": "Spike",
     "precision": "Präzision",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Tag-Glossar",
+    "glossaryBody": "Tags sind, wie Würfel, Perks, Module und Gravuren einander finden: Ein Effekt, der ein Tag zählt, zählt jeden Gegenstand mit diesem Tag.",
+    "glossarySchools": "Schulen",
+    "glossarySystems": "Systeme",
+    "glossaryMechanics": "Mechaniken"
   },
   "build": {
     "title": "Dein Build",
@@ -423,7 +442,8 @@
     "stability": "Stabilitäts{{n}}",
     "neutral": "Achsenausgleich",
     "preview": "Axis {{from}} → {{to}}",
-    "short": "Achse"
+    "short": "Achse",
+    "moves": "Schwarze Würfel drücken zur Resonanz, blaue zur Stabilität; Ereignisse und Drift bewegen sie ebenfalls."
   },
   "journal": {
     "title": "Laufprotokoll",
@@ -460,5 +480,52 @@
     "toMenu": "Ins Hauptmenü zurück",
     "toMenuHint": "Der Lauf ist gespeichert — setze ihn im Menü fort.",
     "open": "Menü"
+  },
+  "tally": {
+    "title": "Kampfbilanz",
+    "titleLoss": "Letztes Gefecht",
+    "turns": "Runden",
+    "dealt": "Schaden ausgeteilt",
+    "taken": "Schaden erlitten",
+    "shield": "Vom Schild aufgefangen",
+    "best": "Bester Spinaltreffer",
+    "rerolls": "Neuwürfe",
+    "placed": "Würfel gesetzt",
+    "scrap": "Schrott gesammelt",
+    "hull": "Hülle {{cur}}/{{max}}",
+    "continue": "Weiter"
+  },
+  "tagDesc": {
+    "red": "Aggression: Waffenschaden, Brand und Spitzen.",
+    "blue": "Verteidigung: Schilde, Absorption und Ausdauer.",
+    "green": "Bewegung: Triebwerke, Ausweichen und Wachstum.",
+    "yellow": "Wirtschaft: Schrott, Auszahlungen und Hebel im Laden.",
+    "black": "Risiko: Ladung, Opfer und die Resonanzachse.",
+    "grey": "Lesen: Sensoren, Würfelhandhabung und Präzision.",
+    "prismatic": "Joker: zählt als jede Schule und erbt die Affinität des Slots.",
+    "weapons": "Alles, was in einem Waffenslot aufgelöst wird.",
+    "shields": "Alles, was in einem Schildslot aufgelöst wird.",
+    "engines": "Alles, was im Triebwerksslot aufgelöst wird.",
+    "sensors": "Alles, was im Sensorslot aufgelöst wird.",
+    "reactor": "Alles, was im Reaktorslot aufgelöst wird.",
+    "spinal": "Die Spinallafette: ein riesiger Schuss, der bei niedrigem Wurf klemmt.",
+    "repairBay": "Die Reparaturbucht: Hülle wird mitten im Kampf geheilt.",
+    "burn": "Schaden über Zeit, der am Ende der Gegnerrunde tickt.",
+    "crit": "Treffer, vor Schilden mit 1,5 multipliziert.",
+    "growth": "Werte, die auf einer Höchstseite dauerhaft steigen.",
+    "reroll": "Würfel neu werfen, gratis oder gekauft.",
+    "charge": "Der Reaktorvorrat, der Stupser, Neuwürfe und Schübe zahlt.",
+    "scrap": "Die Laufwährung: Läden, Reparaturen und Mk-Ausbauten.",
+    "overcap": "Einen Würfel über die Obergrenze seines Slots setzen.",
+    "pierce": "Schaden, der den Gegnerschild ignoriert.",
+    "dodge": "Ausweichen, pro eingehendem Treffer gewürfelt.",
+    "survival": "Am Leben bleiben: Hülle, Todesrettungen und Mindestwerte.",
+    "control": "Dem Gegner etwas verwehren: Störung, Sperren und Tore.",
+    "dice": "Umgang mit den Würfeln selbst: drehen, kopieren, tauschen, sichern, teilen.",
+    "shieldwall": "Gestapelter Schild, der über Runden trägt.",
+    "risk": "Kosten, gezahlt in Hülle, Schrott oder Gewissheit.",
+    "swarm": "Viele kleine Würfel statt weniger großer.",
+    "spike": "Ein enormer Wert statt eines steten Stroms.",
+    "precision": "Enge, vorhersehbare Seiten und exakte Werte."
   }
 }

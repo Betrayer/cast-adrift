@@ -12,7 +12,10 @@ import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
 import { useScreenParam } from "@/app/useScreenParam";
 import { tokens } from "@/app/theme";
+import { DieCardTrigger } from "@/components/DieCardModal";
+import { DieFilterChips } from "@/components/DieFilterChips";
 import { ALL_DICE } from "@/data/dice";
+import { DIE_FILTERS, dieHasFeature, type DieFeature } from "@/game/dice/card";
 import { schools } from "@/data/schools";
 import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
 import { unlockedDice } from "@/data/unlocks";
@@ -39,9 +42,12 @@ type StateFilter = "all" | "owned" | "found" | "unknown";
 
 const STATES: readonly StateFilter[] = ["all", "owned", "found", "unknown"];
 
+const FEATURES: readonly (DieFeature | "all")[] = ["all", ...DIE_FILTERS];
+
 export const CollectionScreen = () => {
-  const { t } = useTranslation(["meta", "common", "content"]);
+  const { t } = useTranslation(["meta", "common", "content", "battle"]);
   const collection = useMetaStore((s) => s.collection);
+  const engravings = useMetaStore((s) => s.engravings);
   const encountered = useMetaStore((s) => s.encountered);
   const level = useMetaStore((s) => s.level);
   const achievements = useMetaStore((s) => s.achievements);
@@ -57,6 +63,11 @@ export const CollectionScreen = () => {
   const [stateFilter, setStateFilter] = useScreenParam<StateFilter>(
     "state",
     STATES,
+    "all",
+  );
+  const [featureFilter, setFeatureFilter] = useScreenParam<DieFeature | "all">(
+    "feature",
+    FEATURES,
     "all",
   );
   const tierFilter = Number(tierParam);
@@ -99,6 +110,11 @@ export const CollectionScreen = () => {
     if (schoolFilter !== "all" && row.def.school !== schoolFilter) return false;
     if (tierFilter !== 0 && row.def.tier !== tierFilter) return false;
     if (stateFilter !== "all" && row.state !== stateFilter) return false;
+    if (
+      featureFilter !== "all" &&
+      !dieHasFeature(row.def.id, featureFilter, engravings)
+    )
+      return false;
     return true;
   });
 
@@ -164,6 +180,11 @@ export const CollectionScreen = () => {
             }))}
           />
         </Group>
+        <DieFilterChips
+          value={featureFilter}
+          onChange={setFeatureFilter}
+          testId="collection-feature-filter"
+        />
         </Paper>
         </>
       }
@@ -185,16 +206,24 @@ export const CollectionScreen = () => {
                   style={unknown ? { opacity: 0.65 } : undefined}
                 >
                   <Group justify="space-between">
-                    <Text
-                      size="sm"
-                      style={{
-                        color: unknown
-                          ? tokens.faint
-                          : schools[def.school].text,
-                      }}
-                    >
-                      {t(def.name)}
-                    </Text>
+                    {unknown ? (
+                      <Text size="sm" style={{ color: tokens.faint }}>
+                        {t(def.name)}
+                      </Text>
+                    ) : (
+                      <DieCardTrigger
+                        defId={def.id}
+                        engravings={engravings}
+                        testId={`collection-card-${def.id}`}
+                      >
+                        <Text
+                          size="sm"
+                          style={{ color: schools[def.school].text }}
+                        >
+                          {t(def.name)}
+                        </Text>
+                      </DieCardTrigger>
+                    )}
                     {row.owned > 0 ? (
                       <Badge size="sm" variant="light" color="gray">
                         {t("meta:collection.owned", { n: row.owned })}
@@ -210,7 +239,8 @@ export const CollectionScreen = () => {
                     )}
                   </Group>
                   <Text size="xs" c={tokens.faint}>
-                    d{def.tier} · {def.rarity} · {diePoints(def.id)} pts
+                    d{def.tier} · {t(`battle:die.rarity.${def.rarity}`)} ·{" "}
+                    {diePoints(def.id)} pts
                   </Text>
                   {row.met === undefined ? null : (
                     <Text size="xs" c={tokens.dim} data-collection-provenance>

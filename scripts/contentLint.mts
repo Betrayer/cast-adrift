@@ -83,7 +83,7 @@ import {
 import { ALL_PERKS } from "../src/data/perks";
 import { PUZZLES, type PuzzleGoal } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
-import { SHIPS } from "../src/data/ships";
+import { SHIPS, shipTextIssues } from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
 import {
   ACTION_NAMES,
@@ -95,6 +95,7 @@ import {
   SUBJECT_HOOKS,
 } from "../src/game/effects/types";
 import { CONTENT_TAGS, SCHOOL_TAGS, isContentTag } from "../src/data/tags";
+import { STATUS_KEYS } from "../src/game/battle/statuses";
 import { moduleTags } from "../src/data/modules/types";
 import { calibrationIssues } from "../src/game/puzzles/difficulty";
 import { PUZZLE_CODEX, rewardFor } from "../src/game/puzzles/stakes";
@@ -125,6 +126,7 @@ import type { GoalSpec } from "../src/game/run/goals";
 import type { EventOption, Outcome } from "../src/types/events";
 import {
   INTENT_KINDS,
+  SUBSYSTEM_AURAS,
   claimKey,
   intentsOfStep,
   isFlatPattern,
@@ -525,9 +527,45 @@ for (const enemy of ALL_ENEMIES) {
     errors.push(`enemies: "${enemy.id}" is in no sector pool and nothing summons it`);
 }
 
+const battleRoot = enBattle as unknown as ContentNode;
+const needsBattleKey = (owner: string, path: string): void => {
+  if (!resolveIn(battleRoot, path)) {
+    errors.push(`${owner}: missing en battle key "${path}"`);
+  }
+};
+
+for (const kind of INTENT_KINDS) {
+  needsBattleKey("intents", `intent.${kind}`);
+  needsBattleKey("intents", `intentWhy.${kind}`);
+}
+for (const aura of SUBSYSTEM_AURAS) {
+  needsBattleKey("subsystems", `aura.${aura}`);
+}
+for (const status of STATUS_KEYS) {
+  needsBattleKey("statuses", `status.${status}`);
+  needsBattleKey("statuses", `statusName.${status}`);
+  needsBattleKey("statuses", `statusDesc.${status}`);
+}
+for (const tag of CONTENT_TAGS) {
+  if (!resolveIn(enRun as unknown as ContentNode, `tagDesc.${tag}`)) {
+    errors.push(`tags: missing en run key "tagDesc.${tag}"`);
+  }
+}
+const usedAuras = new Set(
+  ALL_ENEMIES.flatMap((def) => (def.subsystems ?? []).map((sub) => sub.aura)),
+);
+for (const aura of usedAuras) {
+  if (!SUBSYSTEM_AURAS.includes(aura)) {
+    errors.push(`subsystems: aura "${aura}" is not in SUBSYSTEM_AURAS`);
+  }
+}
+
 for (const ship of SHIPS) {
   checkLocKey(`ships.${ship.id}`, ship.name);
+  checkLocKey(`ships.${ship.id}`, ship.passiveName);
+  checkLocKey(`ships.${ship.id}`, ship.passiveDesc);
 }
+errors.push(...shipTextIssues(SHIPS));
 
 checkUniqueIds(
   "chart",
@@ -1742,6 +1780,8 @@ for (const def of ENGRAVINGS) {
 
 for (const die of ALL_DICE) {
   if (die.desc === undefined) errors.push(`dice: "${die.id}" has no diceDesc`);
+  checkLocKey(`dice.${die.id}`, die.name);
+  checkLocKey(`dice.${die.id}`, die.desc);
   for (const tag of die.tags ?? []) {
     if (tag === die.school) {
       errors.push(`dice: "${die.id}" repeats its own school in tags`);

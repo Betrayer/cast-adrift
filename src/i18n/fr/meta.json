@@ -423,7 +423,19 @@
       "story": "Histoire",
       "collection": "Collection",
       "modes": "Modes"
-    }
+    },
+    "more": "Plus",
+    "less": "Moins",
+    "shardsEarned": "Éclats gagnés",
+    "t5Solved": "Anomalies de rang 5",
+    "beacons": "Balises allumées",
+    "streak": "Série sans mort",
+    "bestStreak": "Meilleure série sans mort",
+    "driftRuns": "Parties à la dérive",
+    "dailyRuns": "Parties quotidiennes",
+    "contractRuns": "Parties sous contrat",
+    "deepClears": "Nettoyages profonds",
+    "elites": "Élites abattues"
   },
   "achievements": {
     "title": "Succès"

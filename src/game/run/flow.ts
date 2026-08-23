@@ -91,6 +91,7 @@ import { battleTally, useBattleStore } from "@/stores/battleStore";
 import { SMOTRITEL_BADGE, useMetaStore } from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import type {
   BattleTally,
   RunMode,
@@ -777,7 +778,11 @@ const finalizeNode = (
     grantDieUnlock(pendingRewards.dieDrop);
   }
 
-  if (hasRewards) {
+  const tallyPending =
+    useRunStore.getState().lastTally !== null &&
+    !useSettingsStore.getState().skipTally;
+
+  if (hasRewards || tallyPending) {
     useAppStore.getState().go("rewards");
     autosaveRun();
     pushRunCloud();
@@ -814,6 +819,7 @@ export const completeNode = (result: NodeResult): void => {
 export const finishRewards = (): void => {
   const run = useRunStore.getState();
   run.setPendingRewards(null);
+  run.clearBattleTally();
   const node =
     run.map === null || run.position === null
       ? undefined

@@ -374,10 +374,24 @@
     "echoFleet-chorus": "Refrain"
   },
   "ships": {
-    "wanderer": "Wanderer",
-    "ram": "Ram",
-    "ark": "Arche",
-    "ram-proto": "Ram-Prototyp"
+    "wanderer": {
+      "name": "Wanderer",
+      "passiveName": "Bergungsgeschirr",
+      "passiveDesc": "Jeder Kampf beginnt mit +2 Schrott."
+    },
+    "ram": {
+      "name": "Ramme",
+      "passiveName": "Überlast",
+      "passiveDesc": "Ein Waffenslot nimmt einen Würfel über seiner Obergrenze an; jede solche Platzierung kostet 2 Hülle."
+    },
+    "ark": {
+      "name": "Arche",
+      "passiveName": "Bollwerk",
+      "passiveDesc": "Ein Viertel des stehenden Schilds wird in die nächste Runde übernommen."
+    },
+    "ram-proto": {
+      "name": "Rammen-Prototyp"
+    }
   },
   "perks": {
     "hot-charge": "Heiße Ladung",

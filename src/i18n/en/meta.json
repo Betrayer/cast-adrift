@@ -423,7 +423,19 @@
       "story": "Story",
       "collection": "Collection",
       "modes": "Modes"
-    }
+    },
+    "more": "More",
+    "less": "Less",
+    "shardsEarned": "Shards earned",
+    "t5Solved": "Tier-5 anomalies",
+    "beacons": "Beacons lit",
+    "streak": "Deathless streak",
+    "bestStreak": "Best deathless streak",
+    "driftRuns": "Drift runs",
+    "dailyRuns": "Daily runs",
+    "contractRuns": "Contract runs",
+    "deepClears": "Deep clears",
+    "elites": "Elites felled"
   },
   "achievements": {
     "title": "Achievements"

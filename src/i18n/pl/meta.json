@@ -423,7 +423,19 @@
       "story": "Opowieść",
       "collection": "Kolekcja",
       "modes": "Tryby"
-    }
+    },
+    "more": "Więcej",
+    "less": "Mniej",
+    "shardsEarned": "Zdobyte odłamki",
+    "t5Solved": "Anomalie 5. poziomu",
+    "beacons": "Zapalone latarnie",
+    "streak": "Seria bez śmierci",
+    "bestStreak": "Najlepsza seria bez śmierci",
+    "driftRuns": "Przebiegi w dryfie",
+    "dailyRuns": "Przebiegi dzienne",
+    "contractRuns": "Przebiegi kontraktowe",
+    "deepClears": "Głębokie przejścia",
+    "elites": "Powalone elity"
   },
   "achievements": {
     "title": "Osiągnięcia"

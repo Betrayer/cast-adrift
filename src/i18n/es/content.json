@@ -374,10 +374,24 @@
     "echoFleet-chorus": "Estribillo"
   },
   "ships": {
-    "wanderer": "Viajero",
-    "ram": "Ram",
-    "ark": "Arca",
-    "ram-proto": "Prototipo Ram"
+    "wanderer": {
+      "name": "Errante",
+      "passiveName": "Aparejo de rescate",
+      "passiveDesc": "Cada combate empieza con +2 de chatarra."
+    },
+    "ram": {
+      "name": "Ariete",
+      "passiveName": "Sobrecarga",
+      "passiveDesc": "Una ranura de armas acepta un dado por encima de su límite; cada colocación así cuesta 2 de casco."
+    },
+    "ark": {
+      "name": "Arca",
+      "passiveName": "Baluarte",
+      "passiveDesc": "Un cuarto del escudo en pie pasa al turno siguiente."
+    },
+    "ram-proto": {
+      "name": "Prototipo Ariete"
+    }
   },
   "perks": {
     "hot-charge": "Carga en caliente",

@@ -44,7 +44,9 @@
       "low": "faible",
       "raised": "élevé",
       "high": "élevé"
-    }
+    },
+    "hull": "Coque {{cur}}/{{max}}",
+    "scrap": "Ferraille {{n}}"
   },
   "event": {
     "title": "Signal",
@@ -195,7 +197,8 @@
     },
     "prologueTitle": "La première traversée",
     "prologueBody": "Réécoute les premières mesures. Rien n'a commencé, rien n'est perdu.",
-    "prologueReplay": "Rediffusion"
+    "prologueReplay": "Rediffusion",
+    "badgeLegend": "Badges des dés"
   },
   "consequenceToast": "Conséquence : {{text}}",
   "rewards": {
@@ -238,7 +241,8 @@
     "scrap": "Ferraille: {{n}}",
     "hull": "Coque {{cur}}/{{max}}",
     "voucher": "Code promo Mk × {{n}} — un niveau gratuit",
-    "voucherUse": "Gratuit"
+    "voucherUse": "Gratuit",
+    "fuse": "Fusionner — {{n}}"
   },
   "summary": {
     "victory": "Secteur dégagé",
@@ -249,7 +253,16 @@
     "perks": "Mises à jour :",
     "perksNone": "aucun",
     "toMenu": "Retour au menu",
-    "faced": "Source : {{names}}"
+    "faced": "Source : {{names}}",
+    "more": "Plus",
+    "less": "Moins",
+    "elites": "Élites",
+    "minibosses": "Mini-boss",
+    "bosses": "Boss",
+    "scrapSpent": "Ferraille dépensée",
+    "hullPctMin": "Coque la plus basse",
+    "dicePlaced": "Dés placés",
+    "pct": "{{n}}%"
   },
   "prologue": {
     "title": "Prologue",
@@ -292,7 +305,8 @@
     "launch": "Lancement",
     "ascensionCost": "Cela vous coûte",
     "ascensionGain": "Ça te rapporte",
-    "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution"
+    "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution",
+    "changeShip": "Changer de vaisseau"
   },
   "package": {
     "title": "Boîtier de porte",
@@ -400,7 +414,12 @@
     "swarm": "Essaim",
     "spike": "Spike",
     "precision": "Précision",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Glossaire des tags",
+    "glossaryBody": "Les tags sont la façon dont dés, atouts, modules et gravures se trouvent : un effet qui compte un tag compte chaque objet qui le porte.",
+    "glossarySchools": "Écoles",
+    "glossarySystems": "Systèmes",
+    "glossaryMechanics": "Mécaniques"
   },
   "build": {
     "title": "Votre configuration",
@@ -423,7 +442,8 @@
     "stability": "{{n}} de stabilité",
     "neutral": "Équilibre des axes",
     "preview": "axe {{from}} → {{to}}",
-    "short": "Axe"
+    "short": "Axe",
+    "moves": "Les dés noirs poussent vers la Résonance, les bleus vers la Stabilité ; les événements et la dérive la déplacent aussi."
   },
   "journal": {
     "title": "Journal de course",
@@ -460,5 +480,52 @@
     "toMenu": "Revenir au menu principal",
     "toMenuHint": "La partie est sauvegardée — reprenez-la depuis le menu.",
     "open": "Menu"
+  },
+  "tally": {
+    "title": "Bilan du combat",
+    "titleLoss": "Dernier combat",
+    "turns": "Tours",
+    "dealt": "Dégâts infligés",
+    "taken": "Dégâts subis",
+    "shield": "Absorbé par le bouclier",
+    "best": "Meilleur coup dorsal",
+    "rerolls": "Relances utilisées",
+    "placed": "Dés placés",
+    "scrap": "Ferraille récupérée",
+    "hull": "Coque {{cur}}/{{max}}",
+    "continue": "Continuer"
+  },
+  "tagDesc": {
+    "red": "Agression : dégâts d'arme, brûlure et pics.",
+    "blue": "Défense : boucliers, absorption et endurance.",
+    "green": "Mouvement : moteurs, esquive et croissance.",
+    "yellow": "Économie : ferraille, gains et levier en boutique.",
+    "black": "Risque : charge, sacrifice et l'axe de Résonance.",
+    "grey": "Lecture : capteurs, manipulation des dés et précision.",
+    "prismatic": "Joker : compte comme n'importe quelle école et hérite de l'affinité de l'emplacement.",
+    "weapons": "Tout ce qui se résout dans un emplacement d'arme.",
+    "shields": "Tout ce qui se résout dans un emplacement de bouclier.",
+    "engines": "Tout ce qui se résout dans l'emplacement des moteurs.",
+    "sensors": "Tout ce qui se résout dans l'emplacement des capteurs.",
+    "reactor": "Tout ce qui se résout dans l'emplacement du réacteur.",
+    "spinal": "Le canon dorsal : un tir énorme qui se coince sur un jet bas.",
+    "repairBay": "La baie de réparation : coque soignée en plein combat.",
+    "burn": "Dégâts dans le temps appliqués à la fin du tour ennemi.",
+    "crit": "Coups multipliés par 1,5 avant les boucliers.",
+    "growth": "Valeurs qui montent définitivement sur une face maximale.",
+    "reroll": "Relancer les dés, gratuitement ou en payant.",
+    "charge": "La réserve du réacteur qui paie poussées, relances et surtensions.",
+    "scrap": "La monnaie de la partie : boutiques, réparations et améliorations Mk.",
+    "overcap": "Placer un dé au-dessus du plafond de son emplacement.",
+    "pierce": "Dégâts qui ignorent le bouclier ennemi.",
+    "dodge": "Esquive tirée pour chaque coup entrant.",
+    "survival": "Rester en vie : coque, sauvetages létaux et planchers.",
+    "control": "Priver l'ennemi : brouillages, verrous et portes.",
+    "dice": "Manipuler les dés eux-mêmes : retourner, copier, échanger, figer, diviser.",
+    "shieldwall": "Bouclier empilé qui se reporte d'un tour à l'autre.",
+    "risk": "Coûts payés en coque, ferraille ou certitude.",
+    "swarm": "Beaucoup de petits dés plutôt que quelques gros.",
+    "spike": "Une valeur énorme plutôt qu'un flux régulier.",
+    "precision": "Faces étroites et prévisibles, valeurs exactes."
   }
 }

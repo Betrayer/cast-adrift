@@ -98,7 +98,11 @@ for (const m of MUTATORS) {
   add(m.desc);
 }
 for (const r of RESONANCE_BONUSES) add(r.desc);
-for (const s of SHIPS) add(s.name);
+for (const s of SHIPS) {
+  add(s.name);
+  add(s.passiveName);
+  add(s.passiveDesc);
+}
 for (const n of CHART_NODES) {
   add(n.name);
   add(n.desc);

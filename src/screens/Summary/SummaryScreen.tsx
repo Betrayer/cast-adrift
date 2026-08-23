@@ -4,6 +4,7 @@ import {
   Group,
   Paper,
   Progress,
+  SimpleGrid,
   Stack,
   Text,
   Title,
@@ -13,19 +14,50 @@ import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
 import { ACHIEVEMENT_BY_ID } from "@/data/achievements";
+import { ShipCard } from "@/components/ShipCard";
+import { BattleTallyPanel } from "@/screens/Rewards/BattleTallyPanel";
 import { DIE_BY_ID } from "@/data/dice";
 import { PERK_BY_ID } from "@/data/perks";
 import { progressWithinLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { abandonRun } from "@/game/run/flow";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import { useRunStore, type RunStats } from "@/stores/runStore";
 import {
   resolveReducedMotion,
   useSettingsStore,
 } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
 import { LevelUpCeremony } from "./LevelUpCeremony";
+
+const DETAIL_ROWS: readonly {
+  id: string;
+  label: string;
+  read: (stats: RunStats) => number;
+}[] = [
+  { id: "elites", label: "run:summary.elites", read: (s) => s.elites },
+  {
+    id: "minibosses",
+    label: "run:summary.minibosses",
+    read: (s) => s.minibosses,
+  },
+  { id: "bosses", label: "run:summary.bosses", read: (s) => s.bosses },
+  {
+    id: "scrapSpent",
+    label: "run:summary.scrapSpent",
+    read: (s) => s.scrapSpent,
+  },
+  {
+    id: "hullPctMin",
+    label: "run:summary.hullPctMin",
+    read: (s) => s.hullPctMin,
+  },
+  {
+    id: "dicePlaced",
+    label: "run:summary.dicePlaced",
+    read: (s) => s.dicePlaced,
+  },
+];
 
 const useCountUp = (target: number, reduced: boolean): number => {
   const [value, setValue] = useState(reduced ? target : 0);
@@ -51,6 +83,9 @@ const useCountUp = (target: number, reduced: boolean): number => {
 export const SummaryScreen = () => {
   const { t } = useTranslation(["run", "meta"]);
   const stats = useRunStore((s) => s.stats);
+  const shipId = useRunStore((s) => s.shipId);
+  const mkLevels = useRunStore((s) => s.mkLevels);
+  const tally = useRunStore((s) => s.lastTally);
   const perks = useRunStore((s) => s.perks);
   const result = useSummaryStore((s) => s.result);
   const level = useMetaStore((s) => s.level);
@@ -66,6 +101,7 @@ export const SummaryScreen = () => {
     result !== null && result.toLevel > result.fromLevel;
   const [ceremonyDone, setCeremonyDone] = useState(!leveled);
   const [barsDone, setBarsDone] = useState(reduced);
+  const [detailed, setDetailed] = useState(false);
 
   useEffect(() => {
     if (reduced) return;
@@ -121,6 +157,7 @@ export const SummaryScreen = () => {
           <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">
             {t(win ? "run:summary.victory" : "run:summary.defeat")}
           </Title>
+          <ShipCard shipId={shipId} size="compact" mkLevels={mkLevels} />
           <Divider color={tokens.line} />
           <Text c={tokens.dim}>
             {t("run:summary.nodes", { n: stats.nodesCleared })}
@@ -129,6 +166,36 @@ export const SummaryScreen = () => {
           <Text c={tokens.dim}>
             {t("run:summary.earned", { n: stats.scrapEarned })}
           </Text>
+          <Button
+            size="compact-xs"
+            variant="subtle"
+            color="gray"
+            data-testid="summary-more"
+            onClick={() => {
+              setDetailed((value) => !value);
+            }}
+          >
+            {t(detailed ? "run:summary.less" : "run:summary.more")}
+          </Button>
+          {detailed ? (
+            <SimpleGrid cols={2} spacing={4} data-summary-detail>
+              {DETAIL_ROWS.map((row) => (
+                <Group key={row.id} justify="space-between" data-summary-row={row.id}>
+                  <Text size="xs" c={tokens.faint}>
+                    {t(row.label)}
+                  </Text>
+                  <Text size="xs" c={tokens.dim} data-summary-value={row.id}>
+                    {row.id === "hullPctMin"
+                      ? t("run:summary.pct", { n: Math.round(row.read(stats)) })
+                      : row.read(stats)}
+                  </Text>
+                </Group>
+              ))}
+            </SimpleGrid>
+          ) : null}
+          {detailed && tally !== null ? (
+            <BattleTallyPanel tally={tally} />
+          ) : null}
           {(result?.rotation ?? []).length === 0 ? null : (
             <Text c={tokens.dim}>
               {t("run:summary.faced", {

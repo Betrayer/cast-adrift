@@ -77,6 +77,8 @@ export const AxisMeter = ({
           <b>{t("run:axis.title", { n: axis })}</b>
           <br />
           {t(`run:axis.${axisLabel(target)}`, { n: target })}
+          <br />
+          {t("run:axis.moves")}
         </>
       }
     >

@@ -30,6 +30,8 @@ import {
   type OptionContext,
 } from "@/game/events/engine";
 import { AxisMeter } from "@/components/AxisMeter";
+import { DieCard } from "@/components/DieCard";
+import { TapPopover } from "@/components/TapPopover";
 import { clampAxis } from "@/game/run/axis";
 import { emitEventOutcome } from "@/game/narrative/barks";
 import { useBackGuard } from "@/app/backGuard";
@@ -271,11 +273,16 @@ const CheckModal = ({
         )}
         <Group gap="xs" justify="center">
           {faces.map((face, i) => (
-            <DieChip
+            <TapPopover
               key={`${face.defId}-${String(i)}`}
-              face={face}
-              value={rolled?.values[i] ?? null}
-            />
+              label={t("battle:die.open", {
+                name: t(DIE_BY_ID.get(face.defId)?.name ?? face.defId),
+              })}
+              testId={`check-die-${String(i)}`}
+              content={<DieCard defId={face.defId} plain />}
+            >
+              <DieChip face={face} value={rolled?.values[i] ?? null} />
+            </TapPopover>
           ))}
         </Group>
         {rolled === null ? (

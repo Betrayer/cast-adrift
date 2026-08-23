@@ -446,6 +446,15 @@ export const SettingsScreen = () => {
         }}
       />
 
+      <Switch
+        label={t('settings:skipTally')}
+        data-testid="settings-skip-tally"
+        checked={settings.skipTally}
+        onChange={(event) => {
+          settings.setSkipTally(event.currentTarget.checked);
+        }}
+      />
+
       <Button
         variant="default"
         data-testid="settings-tutorial-reset"

@@ -124,5 +124,6 @@
       "tag": "Slot-Förderband mit Live-Ausgabe · Zugvorhersage",
       "desc": "Alle Zahlen in einer Spalte, der ganze Zug ausgerechnet, bevor du ihn beendest."
     }
-  }
+  },
+  "skipTally": "Kampfbilanz überspringen"
 }

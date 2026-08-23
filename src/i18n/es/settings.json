@@ -124,5 +124,6 @@
       "tag": "Cinta de ranuras con salida en vivo · pronóstico del turno",
       "desc": "Todos los números en una columna, el turno entero calculado antes de terminarlo."
     }
-  }
+  },
+  "skipTally": "Saltar el resumen de combate"
 }

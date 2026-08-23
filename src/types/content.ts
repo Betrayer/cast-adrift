@@ -123,6 +123,19 @@ export type SubsystemAura =
   | "summonEvery4"
   | "stealOnHit6";
 
+export const SUBSYSTEM_AURAS: readonly SubsystemAura[] = [
+  "atk+2",
+  "atk+3",
+  "shieldAllies3",
+  "shieldSelf6",
+  "lockEachTurn",
+  "lockEvery3",
+  "twistEachTurn",
+  "chargeAllies",
+  "summonEvery4",
+  "stealOnHit6",
+];
+
 export interface SubsystemDef {
   id: string;
   name: LocKey;

@@ -21,6 +21,14 @@ import {
 } from "@/data/codex";
 import { schoolGlyphPath } from "@/data/glyphs";
 import { SCHOOL_IDS, schools } from "@/data/schools";
+import {
+  MECHANIC_TAGS,
+  SCHOOL_TAGS,
+  SYSTEM_TAGS,
+  type ContentTag,
+} from "@/data/tags";
+import { STATUS_KEYS } from "@/game/battle/statuses";
+import { DIE_BADGE_GLYPH, DIE_BADGE_ORDER } from "@/game/dice/card";
 import { memoryUnlockHint } from "@/game/narrative/memoryArc";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
@@ -125,6 +133,90 @@ const GlyphLegend = () => {
       <Text size="xs" c={tokens.faint} mt="xs">
         {t("run:codex.glyphLegend.body")}
       </Text>
+
+      <Divider my="xs" color={tokens.line} />
+      <Text size="sm" fw={600} c={tokens.text}>
+        {t("run:codex.badgeLegend")}
+      </Text>
+      <Stack gap={2} mt={4} data-badge-legend>
+        {DIE_BADGE_ORDER.map((badge) => (
+          <Group key={badge} gap={6} wrap="nowrap" data-legend-badge={badge}>
+            <Text size="sm" fw={700} c={tokens.text} w={18} ta="center">
+              {DIE_BADGE_GLYPH[badge]}
+            </Text>
+            <Text size="xs" c={tokens.dim}>
+              {t(`battle:badge.${badge}`)}
+            </Text>
+          </Group>
+        ))}
+        <Group gap={6} wrap="nowrap" data-legend-badge="prismatic">
+          <Text size="sm" fw={700} c={schools.prismatic.text} w={18} ta="center">
+            ◈
+          </Text>
+          <Text size="xs" c={tokens.dim}>
+            {t("battle:die.feature.prismatic")}
+          </Text>
+        </Group>
+      </Stack>
+
+      <Divider my="xs" color={tokens.line} />
+      <Text size="sm" fw={600} c={tokens.text}>
+        {t("battle:statusLegend")}
+      </Text>
+      <Stack gap={2} mt={4} data-status-legend>
+        {STATUS_KEYS.map((key) => (
+          <Group key={key} gap={6} wrap="nowrap" data-legend-status={key}>
+            <Text size="sm" fw={700} c={tokens.text} w={18} ta="center">
+              {t(`battle:status.${key}`)}
+            </Text>
+            <Stack gap={0}>
+              <Text size="xs" c={tokens.dim}>
+                {t(`battle:statusName.${key}`)}
+              </Text>
+              <Text size="xs" c={tokens.faint}>
+                {t(`battle:statusDesc.${key}`)}
+              </Text>
+            </Stack>
+          </Group>
+        ))}
+      </Stack>
+    </Paper>
+  );
+};
+
+const TAG_GROUPS: readonly (readonly [string, readonly ContentTag[]])[] = [
+  ["run:tag.glossarySchools", SCHOOL_TAGS],
+  ["run:tag.glossarySystems", SYSTEM_TAGS],
+  ["run:tag.glossaryMechanics", MECHANIC_TAGS],
+];
+
+const TagGlossary = () => {
+  const { t } = useTranslation(["run"]);
+  return (
+    <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder data-tag-glossary>
+      <Text size="sm" fw={600} c={tokens.text}>
+        {t("run:tag.glossaryTitle")}
+      </Text>
+      <Text size="xs" c={tokens.faint} mt={2}>
+        {t("run:tag.glossaryBody")}
+      </Text>
+      {TAG_GROUPS.map(([label, tags]) => (
+        <Box key={label} mt="xs">
+          <Divider color={tokens.line} label={t(label)} />
+          <Stack gap={2} mt={4}>
+            {tags.map((tag) => (
+              <Group key={tag} gap={6} wrap="nowrap" data-glossary-tag={tag}>
+                <Text size="xs" fw={700} c={tokens.dim} miw={82}>
+                  {t(`run:tag.${tag}`)}
+                </Text>
+                <Text size="xs" c={tokens.faint}>
+                  {t(`run:tagDesc.${tag}`)}
+                </Text>
+              </Group>
+            ))}
+          </Stack>
+        </Box>
+      ))}
     </Paper>
   );
 };
@@ -140,6 +232,7 @@ export const CodexScreen = () => {
     >
       <Stack gap="md">
           <GlyphLegend />
+          <TagGlossary />
           <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder>
             <Group justify="space-between" wrap="nowrap">
               <Stack gap={2}>

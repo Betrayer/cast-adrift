@@ -374,10 +374,24 @@
     "echoFleet-chorus": "Refren"
   },
   "ships": {
-    "wanderer": "Wędrowiec",
-    "ram": "Ram",
-    "ark": "Arka",
-    "ram-proto": "Prototyp Ram"
+    "wanderer": {
+      "name": "Wędrowiec",
+      "passiveName": "Osprzęt złomiarski",
+      "passiveDesc": "Każda walka zaczyna się z +2 złomu."
+    },
+    "ram": {
+      "name": "Taran",
+      "passiveName": "Przeciążenie",
+      "passiveDesc": "Slot broni przyjmuje kość powyżej limitu; każde takie umieszczenie kosztuje 2 kadłuba."
+    },
+    "ark": {
+      "name": "Arka",
+      "passiveName": "Bastion",
+      "passiveDesc": "Ćwierć stojącej tarczy przechodzi na następną turę."
+    },
+    "ram-proto": {
+      "name": "Prototyp Taran"
+    }
   },
   "perks": {
     "hot-charge": "Gorący ładunek",

@@ -32,6 +32,7 @@ import { TierBadge } from "@/components/TierBadge";
 import { AbandonConfirm } from "@/components/AbandonConfirm";
 import { AxisMeter } from "@/components/AxisMeter";
 import { TapPopover } from "@/components/TapPopover";
+import { TIDE_HP_PCT } from "@/game/run/encounter";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
@@ -213,7 +214,7 @@ interface MapViewProps {
 }
 
 const MapView = ({ map, position }: MapViewProps) => {
-  const { t } = useTranslation(["run", "common"]);
+  const { t } = useTranslation(["run", "common", "battle", "content"]);
   const visited = useRunStore((s) => s.visited);
   const tide = useRunStore((s) => s.tide);
   const runModules = useRunStore((s) => s.modules);
@@ -229,6 +230,9 @@ const MapView = ({ map, position }: MapViewProps) => {
     })
     .join(" · ");
   const interference = useRunStore((s) => s.interferenceStacks);
+  const hull = useRunStore((s) => s.hull);
+  const hullMax = useRunStore((s) => s.hullMax);
+  const scrap = useRunStore((s) => s.scrap);
   const axis = useRunStore((s) => s.axis);
   const sector = useRunStore((s) => s.sector);
   const seed = useRunStore((s) => s.seed);
@@ -472,15 +476,47 @@ const MapView = ({ map, position }: MapViewProps) => {
         >
           {t("run:system.open")}
         </Button>
-        <span
-          className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
-        >
-          {t("run:map.tide", { n: tide })}
+        <span className={styles.tideChip ?? ""} data-map-hull>
+          {t("run:map.hull", { cur: hull, max: hullMax })}
         </span>
-        {interference > 0 ? (
-          <span className={styles.tideChip ?? ""}>
-            {t("run:map.interference", { n: interference })}
+        <span className={styles.tideChip ?? ""} data-map-scrap>
+          {t("run:map.scrap", { n: scrap })}
+        </span>
+        <TapPopover
+          label={t("battle:tideTitle")}
+          testId="map-tide"
+          align="end"
+          content={
+            <>
+              <b>{t("battle:tideTitle")}</b>
+              <br />
+              {t("battle:tideWhy", { n: tide, pct: tide * TIDE_HP_PCT })}
+            </>
+          }
+        >
+          <span
+            className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
+          >
+            {t("run:map.tide", { n: tide })}
           </span>
+        </TapPopover>
+        {interference > 0 ? (
+          <TapPopover
+            label={t("battle:interferenceTitle")}
+            testId="map-interference"
+            align="end"
+            content={
+              <>
+                <b>{t("battle:interferenceTitle")}</b>
+                <br />
+                {t("battle:interferenceWhy")}
+              </>
+            }
+          >
+            <span className={styles.tideChip ?? ""}>
+              {t("run:map.interference", { n: interference })}
+            </span>
+          </TapPopover>
         ) : null}
         {runModules.length > 0 ? (
           <TapPopover

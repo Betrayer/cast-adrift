@@ -384,3 +384,30 @@
     padding: 4px 10px;
   }
 }
+
+.cell {
+  position: relative;
+  min-width: 0;
+}
+
+.formula {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  z-index: 1;
+}
+
+.formulaMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
+  color: var(--ca-faint);
+  font-size: 9px;
+  line-height: 11px;
+  font-weight: 700;
+}

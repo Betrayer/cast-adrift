@@ -7,7 +7,7 @@ import {
 
 describe('settings migrations', () => {
   it('current version is wired', () => {
-    expect(SETTINGS_VERSION).toBe(3);
+    expect(SETTINGS_VERSION).toBe(4);
   });
 
   it('v1 blobs keep their values and gain the later defaults', () => {
@@ -25,7 +25,13 @@ describe('settings migrations', () => {
       fontScale: 'm',
       battleSpeed: 'normal',
       battleLayout: 'console',
+      skipTally: false,
     });
+  });
+
+  it('carries a v3 skip-tally choice forward', () => {
+    expect(migrateSettings({ skipTally: true }, 3).skipTally).toBe(true);
+    expect(migrateSettings({ skipTally: 'yes' }, 3).skipTally).toBe(false);
   });
 
   it('an unknown theme id falls back to the free default', () => {

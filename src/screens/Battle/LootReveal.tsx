@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { rarityColor } from '@/app/rarity';
 import { useEscapeKey } from '@/components/dismiss';
 import { tokens } from '@/app/theme';
+import { DieCard } from '@/components/DieCard';
 import { DIE_BY_ID } from '@/data/dice';
 import { LOOT_SFX } from '@/data/audio';
-import { schools } from '@/data/schools';
 import { duckMusic, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
@@ -65,7 +65,6 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
   const def = DIE_BY_ID.get(dieId);
   if (def === undefined) return null;
 
-  const colors = schools[def.school];
   const frameColor = rarityColor(def.rarity);
 
 
@@ -99,18 +98,7 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
               }`}
             style={{ borderColor: frameColor, color: frameColor }}
           >
-            <Text className={styles.dieName} c={tokens.text}>
-              {t(def.name)}
-            </Text>
-            <Text className={styles.tier} c={tokens.dim}>
-              {`d${String(def.tier)}`}
-            </Text>
-            <span
-              className={styles.schoolChip}
-              style={{ borderColor: colors.stroke, color: colors.text }}
-            >
-              {t(`battle:school.${def.school}`)}
-            </span>
+            <DieCard defId={dieId} plain className={styles.dieBody} />
           </div>
           {revealed && !reduced ? (
             <div className={styles.burst}>
@@ -118,7 +106,7 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
                 <span
                   key={i}
                   className={styles.dot}
-                  style={dotStyle(i, colors.stroke)}
+                  style={dotStyle(i, frameColor)}
                 />
               ))}
             </div>

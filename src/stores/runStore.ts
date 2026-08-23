@@ -85,6 +85,11 @@ export interface BattleTally {
   won: boolean;
   turns: number;
   shieldAbsorbed: number;
+  damageDealt: number;
+  damageTaken: number;
+  scrap: number;
+  hull: number;
+  hullMax: number;
   spinalMaxHit: number;
   rerollsUsed: number;
   repairBayHealed: number;
@@ -180,6 +185,7 @@ export interface RunValues {
   pendingBattle: PendingBattle | null;
   pendingDeepScan: boolean;
   pendingRewards: PendingRewards | null;
+  lastTally: BattleTally | null;
   shop: ShopState | null;
   deckSeq: number;
   stats: RunStats;
@@ -233,6 +239,7 @@ export interface RunState extends RunValues {
   noteDepth: (depth: number) => void;
   noteHullPct: (pct: number) => void;
   noteBattleTally: (tally: BattleTally) => void;
+  clearBattleTally: () => void;
   clearPendingDeepScan: () => void;
   setPendingDeepScan: (value: boolean) => void;
   setPendingRewards: (rewards: PendingRewards | null) => void;
@@ -326,6 +333,7 @@ export const createInitialRunValues = (): RunValues => ({
   pendingBattle: null,
   pendingDeepScan: false,
   pendingRewards: null,
+  lastTally: null,
   shop: null,
   deckSeq: 0,
   stats: createInitialRunStats(),
@@ -610,6 +618,7 @@ export const useRunStore = create<RunState>()((set, get) => ({
       const prev = s.stats;
       const turns = Math.max(1, tally.turns);
       return {
+        lastTally: tally,
         stats: {
           ...prev,
           battlesWon: prev.battlesWon + (tally.won ? 1 : 0),
@@ -635,6 +644,10 @@ export const useRunStore = create<RunState>()((set, get) => ({
         },
       };
     });
+  },
+
+  clearBattleTally: () => {
+    set({ lastTally: null });
   },
 
   clearPendingDeepScan: () => {

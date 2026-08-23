@@ -1,0 +1,277 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
+  text-align: left;
+}
+
+.card[data-die-card-size='mini'] {
+  gap: 1px;
+  min-height: 46px;
+  padding: 3px 6px;
+  border-radius: 9px;
+  background: var(--ca-surface2);
+}
+
+.card[data-die-card-size='full'] {
+  gap: 6px;
+  padding: 12px 14px;
+  border-radius: 12px;
+}
+
+.plain,
+.plain[data-die-card-size='full'],
+.plain[data-die-card-size='mini'] {
+  padding: 0;
+  border: 0;
+  background: none;
+}
+
+.dense {
+  min-height: 0;
+  gap: 0;
+  padding: 2px 6px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+  min-width: 0;
+}
+
+.name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 17px;
+  color: var(--ca-text);
+}
+
+.card[data-die-card-size='mini'] .name {
+  font-size: 11.5px;
+  line-height: 14px;
+}
+
+.dense .name {
+  font-size: 10.5px;
+  line-height: 13px;
+}
+
+.card[data-die-card-size='full'] .name {
+  font-size: 15px;
+  line-height: 20px;
+  white-space: normal;
+}
+
+.chip {
+  flex: 0 0 auto;
+  padding: 0 7px;
+  border-radius: 9px;
+  border: 1px solid var(--ca-line);
+  font-size: 10px;
+  line-height: 16px;
+}
+
+.chip[data-prismatic='1'] {
+  background: linear-gradient(
+    90deg,
+    var(--ca-school-red-fill),
+    var(--ca-school-yellow-fill),
+    var(--ca-school-green-fill),
+    var(--ca-school-blue-fill),
+    var(--ca-school-black-fill)
+  );
+}
+
+.meta {
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-dim);
+}
+
+.card[data-die-card-size='mini'] .meta {
+  font-size: 9.5px;
+  line-height: 12px;
+}
+
+.dense .meta {
+  font-size: 9px;
+  line-height: 11px;
+}
+
+.faces {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3px;
+}
+
+.face {
+  min-width: 17px;
+  padding: 0 3px;
+  border-radius: 4px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface2);
+  font-size: 10px;
+  line-height: 16px;
+  text-align: center;
+  color: var(--ca-text);
+}
+
+.face[data-face-peak='1'] {
+  border-color: currentColor;
+  font-weight: 700;
+}
+
+.range {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ca-dim);
+}
+
+.ev {
+  margin-left: auto;
+  font-size: 10.5px;
+  line-height: 16px;
+  color: var(--ca-faint);
+}
+
+.desc {
+  margin: 0;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ca-dim);
+}
+
+.card[data-die-card-size='mini'] .desc {
+  font-size: 9.5px;
+  line-height: 12px;
+  color: var(--ca-faint);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dense .desc {
+  display: none;
+}
+
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 1px;
+}
+
+.badge {
+  font-size: 9px;
+  line-height: 12px;
+  padding: 0 4px;
+  border-radius: 5px;
+  border: 0.75px solid var(--ca-line);
+  color: var(--ca-dim);
+}
+
+.badge[data-badge='fate'] {
+  color: var(--ca-amber);
+  border-color: var(--ca-amber);
+}
+
+.badge[data-badge='active'] {
+  color: var(--ca-accent);
+  border-color: var(--ca-accent);
+}
+
+.badge[data-badge='growth'] {
+  color: var(--ca-school-green-text);
+  border-color: var(--ca-school-green-stroke);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 5px;
+  border-top: 1px solid var(--ca-line);
+}
+
+.sectionTitle {
+  font-size: 9.5px;
+  line-height: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ca-faint);
+}
+
+.line {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 10.5px;
+  line-height: 15px;
+  color: var(--ca-dim);
+}
+
+.lineGlyph {
+  flex: 0 0 auto;
+  min-width: 14px;
+  font-weight: 700;
+  color: var(--ca-text);
+}
+
+.footer {
+  margin-top: 2px;
+}
+
+.closeBtn {
+  width: 100%;
+  margin-top: 8px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface2);
+  color: var(--ca-dim);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.trigger {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .card[data-die-card-size='mini'] .desc,
+  .card[data-die-card-size='mini'] .meta {
+    font-size: 10.5px;
+    line-height: 13px;
+  }
+}
+
+@media (max-height: 700px) {
+  .card[data-die-card-size='mini'] {
+    min-height: 34px;
+  }
+
+  .card[data-die-card-size='mini'] .desc {
+    display: none;
+  }
+}
