@@ -8,7 +8,12 @@ import {
 } from "../src/data/ascension";
 import {
   ACHIEVEMENTS,
+  ACHIEVEMENT_ALIASES,
+  ACHIEVEMENT_BY_ID,
+  ACHIEVEMENT_FAMILIES,
   ACHIEVEMENT_GROUPS,
+  ACHIEVEMENT_ROWS,
+  SINGLE_ACHIEVEMENTS,
 } from "../src/data/achievements";
 import { BADGES, BADGE_BY_ID, DIE_SKINS } from "../src/data/cosmetics";
 import { MILESTONES } from "../src/data/milestones";
@@ -202,6 +207,16 @@ const resolveContentKey = (key: string): boolean => {
   const [ns, path] = key.split(":");
   if (ns !== "content" || path === undefined) return true;
   return resolveIn(content, path);
+};
+
+const stringAt = (root: ContentNode, path: string): string | undefined => {
+  let node: ContentNode | undefined = root;
+  for (const seg of path.split(".")) {
+    if (typeof node !== "object" || node === null) return undefined;
+    node = node[seg];
+    if (node === undefined) return undefined;
+  }
+  return typeof node === "string" ? node : undefined;
 };
 
 const resolveMetaKey = (path: string): boolean =>
@@ -1482,9 +1497,11 @@ for (const def of CONTRACTS) {
   }
 }
 
-const ACHIEVEMENT_COUNT = 32;
+const ACHIEVEMENT_COUNT = 90;
 const ACHIEVEMENT_GATES = 8;
 const ACHIEVEMENT_FLAG_READERS = 6;
+const ACHIEVEMENT_FAMILY_TARGET = 20;
+const ACHIEVEMENT_LOCALES = ["en", "uk", "ru", "de", "es", "fr", "pl"] as const;
 
 checkUniqueIds(
   "achievements",
@@ -1493,6 +1510,19 @@ checkUniqueIds(
 if (ACHIEVEMENTS.length !== ACHIEVEMENT_COUNT) {
   errors.push(
     `achievements: expected exactly ${String(ACHIEVEMENT_COUNT)}, found ${String(ACHIEVEMENTS.length)}`,
+  );
+}
+if (ACHIEVEMENT_FAMILIES.length < ACHIEVEMENT_FAMILY_TARGET) {
+  errors.push(
+    `achievements: only ${String(ACHIEVEMENT_FAMILIES.length)} families, need ${String(ACHIEVEMENT_FAMILY_TARGET)}`,
+  );
+}
+const rowMembers = ACHIEVEMENT_ROWS.flatMap((row) =>
+  row.kind === "family" ? row.tiers.map((tier) => tier.id) : [row.def.id],
+);
+if (rowMembers.length !== ACHIEVEMENTS.length) {
+  errors.push(
+    `achievements: rows cover ${String(rowMembers.length)} of ${String(ACHIEVEMENTS.length)} definitions`,
   );
 }
 const gatingAchievements = ACHIEVEMENTS.filter(
@@ -1509,11 +1539,89 @@ if (flagAchievements.length < ACHIEVEMENT_FLAG_READERS) {
     `achievements: only ${String(flagAchievements.length)} read flagsArchive, need ${String(ACHIEVEMENT_FLAG_READERS)}`,
   );
 }
+const localeMeta = new Map<string, ContentNode>();
+for (const locale of ACHIEVEMENT_LOCALES) {
+  const path = join(process.cwd(), "src", "i18n", locale, "meta.json");
+  if (!existsSync(path)) {
+    errors.push(`achievements: locale "${locale}" has no meta.json`);
+    continue;
+  }
+  try {
+    localeMeta.set(locale, JSON.parse(readFileSync(path, "utf8")) as ContentNode);
+  } catch {
+    errors.push(`achievements: locale "${locale}" meta.json is not valid JSON`);
+  }
+}
+const checkAchievementText = (owner: string, name: string, desc: string): void => {
+  for (const [locale, root] of localeMeta) {
+    if (!resolveIn(root, name.replace("meta:", "")))
+      errors.push(`achievements: "${owner}" has no ${locale} name`);
+    if (!resolveIn(root, desc.replace("meta:", "")))
+      errors.push(`achievements: "${owner}" has no ${locale} desc`);
+  }
+};
+for (const family of ACHIEVEMENT_FAMILIES) {
+  checkAchievementText(family.id, family.name, family.desc);
+  if (family.tiers.length < 2)
+    errors.push(`achievements: family "${family.id}" needs at least two tiers`);
+  let lastNeed = -Infinity;
+  let lastShards = -Infinity;
+  family.tiers.forEach((tier, index) => {
+    const last = index === family.tiers.length - 1;
+    if (tier.need <= lastNeed) {
+      errors.push(
+        `achievements: family "${family.id}" tier ${String(index + 1)} does not raise the bar`,
+      );
+    }
+    if (tier.shards < lastShards) {
+      errors.push(
+        `achievements: family "${family.id}" tier ${String(index + 1)} pays less than the tier below`,
+      );
+    }
+    lastNeed = tier.need;
+    lastShards = tier.shards;
+    if (tier.legendary === true && !last) {
+      errors.push(
+        `achievements: family "${family.id}" marks a non-final tier legendary`,
+      );
+    }
+    if (tier.voucher !== undefined && tier.legendary !== true) {
+      errors.push(
+        `achievements: family "${family.id}" tier ${String(index + 1)} pays a voucher without a legendary tier`,
+      );
+    }
+    if (tier.voucher !== undefined && (tier.altShards ?? 0) <= 0) {
+      errors.push(
+        `achievements: family "${family.id}" offers a voucher with no shard alternative`,
+      );
+    }
+  });
+  const enRoot = localeMeta.get("en");
+  const enDesc =
+    enRoot === undefined
+      ? undefined
+      : stringAt(enRoot, family.desc.replace("meta:", ""));
+  if (enDesc !== undefined && !enDesc.includes("{{n}}")) {
+    errors.push(
+      `achievements: family "${family.id}" desc never states its tier target`,
+    );
+  }
+}
+for (const single of SINGLE_ACHIEVEMENTS) {
+  checkAchievementText(single.id, single.name, single.desc);
+  if (single.reward?.voucher !== undefined) {
+    errors.push(`achievements: single "${single.id}" pays a voucher`);
+  }
+}
+for (const [oldId, newId] of Object.entries(ACHIEVEMENT_ALIASES)) {
+  if (!ACHIEVEMENT_BY_ID.has(newId)) {
+    errors.push(`achievements: alias "${oldId}" points at unknown "${newId}"`);
+  }
+  if (ACHIEVEMENT_BY_ID.has(oldId)) {
+    errors.push(`achievements: alias "${oldId}" shadows a live achievement`);
+  }
+}
 for (const def of ACHIEVEMENTS) {
-  if (!resolveMetaKey(def.name.replace("meta:", "")))
-    errors.push(`achievements: "${def.id}" has no en name`);
-  if (!resolveMetaKey(def.desc.replace("meta:", "")))
-    errors.push(`achievements: "${def.id}" has no en desc`);
   const reward = def.reward;
   if (reward?.unlockId !== undefined && !UNLOCK_BY_ID.has(reward.unlockId)) {
     errors.push(
@@ -1523,8 +1631,16 @@ for (const def of ACHIEVEMENTS) {
   if (reward?.badge !== undefined && !BADGE_BY_ID.has(reward.badge)) {
     errors.push(`achievements: "${def.id}" rewards unknown badge "${reward.badge}"`);
   }
-  if (reward !== undefined && reward.shards === undefined && reward.unlockId === undefined && reward.badge === undefined) {
+  if (
+    reward !== undefined &&
+    reward.shards === undefined &&
+    reward.unlockId === undefined &&
+    reward.badge === undefined
+  ) {
     errors.push(`achievements: "${def.id}" declares an empty reward`);
+  }
+  if (reward?.voucher !== undefined && def.legendary !== true) {
+    errors.push(`achievements: "${def.id}" pays a voucher without legendary rank`);
   }
 }
 for (const group of ACHIEVEMENT_GROUPS) {
@@ -1955,7 +2071,7 @@ const REVISION_3_TOTALS: readonly TotalsRow[] = [
   { label: "fragments", have: FRAGMENTS.length, target: 100 },
   { label: "epilogue", have: EPILOGUE_ENTRIES.length, target: EPILOGUE_TARGET },
   { label: "contracts", have: CONTRACTS.length, target: 20 },
-  { label: "achievements", have: ACHIEVEMENTS.length, target: 30 },
+  { label: "achievements", have: ACHIEVEMENTS.length, target: 70 },
   { label: "unlocks", have: UNLOCKS.length, target: 24 },
 ];
 

@@ -310,7 +310,10 @@
     "ascensionCost": "To cię kosztuje",
     "ascensionGain": "To się opłaca",
     "shardMult": "+{{n}}% fragmentów dla całego przebiegu",
-    "changeShip": "Zmień statek"
+    "changeShip": "Zmień statek",
+    "voucher": "Kupon: startowy atut",
+    "voucherCount": "{{n}} w banku",
+    "voucherHint": "Wydaj kupon, aby wybrać atut przed pierwszym skokiem."
   },
   "package": {
     "title": "Opakowanie typu Gate",
@@ -480,7 +483,8 @@
     "wormholeWay": {
       "forward": "głębiej",
       "backward": "wstecz"
-    }
+    },
+    "achievement": "Osiągnięcie: {{name}}"
   },
   "memory": {
     "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",

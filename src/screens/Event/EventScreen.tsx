@@ -42,6 +42,7 @@ import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useAppStore } from "@/stores/appStore";
+import { noteCheckWon } from "@/game/meta/counters";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 import type { School } from "@/types/content";
@@ -237,6 +238,7 @@ const CheckModal = ({
     const values = rollCheckDice(faces, streams.check);
     const total = checkTotal(values, check.pick);
     const success = checkPassed(total, check.pick, check.target);
+    if (success) noteCheckWon();
     playSfx("checkDrum");
     window.setTimeout(() => {
       playSfx(success ? "checkPass" : "checkFail");

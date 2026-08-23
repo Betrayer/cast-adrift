@@ -22,7 +22,7 @@ import { progressWithinLevel } from "@/game/xp";
 import { isGuestAccount, supportId } from "@/services/uid";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore, type MetaStats } from "@/stores/metaStore";
-import { AchievementGrid } from "./AchievementGrid";
+import { AchievementSummary } from "./AchievementSummary";
 import { BadgeRow } from "./BadgeRow";
 
 const endingSlots = (earned: readonly string[]): typeof ENDINGS =>
@@ -303,7 +303,7 @@ export const ProfileScreen = () => {
             </Stack>
           </Paper>
 
-          <AchievementGrid />
+          <AchievementSummary />
 
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Stack gap="xs">

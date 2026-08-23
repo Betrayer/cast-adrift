@@ -13,7 +13,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
-import { ACHIEVEMENT_BY_ID } from "@/data/achievements";
+import { achievementTitleById } from "@/game/meta/achievements";
 import { ShipCard } from "@/components/ShipCard";
 import { BattleTallyPanel } from "@/screens/Rewards/BattleTallyPanel";
 import { DIE_BY_ID } from "@/data/dice";
@@ -249,7 +249,7 @@ export const SummaryScreen = () => {
             <Stack gap={2} data-achievement-lines>
               {(result?.achievements ?? []).map((id) => (
                 <Text key={id} size="xs" c={tokens.accent}>
-                  ✦ {t(ACHIEVEMENT_BY_ID.get(id)?.name ?? id)}
+                  ✦ {achievementTitleById(id, t)}
                 </Text>
               ))}
             </Stack>

@@ -437,7 +437,10 @@
     "deepClears": "Tiefe Durchgänge",
     "elites": "Elite erlegt",
     "wormholeRides": "Wurmloch-Fahrten",
-    "holesBypassed": "Übersprungene Löcher"
+    "holesBypassed": "Übersprungene Löcher",
+    "achClosest": "Am nächsten: {{name}} — {{have}} / {{need}}",
+    "achNoneClose": "Noch nichts begonnen.",
+    "achOpen": "Erfolge öffnen"
   },
   "achievements": {
     "title": "Erfolge"
@@ -538,25 +541,9 @@
     }
   },
   "ach": {
-    "firstBlood": {
-      "name": "Erstes Blut",
-      "desc": "Töte 25 Gegner."
-    },
-    "hunter": {
-      "name": "Jäger",
-      "desc": "Töte 500 Gegner."
-    },
-    "eliteHunter": {
-      "name": "Elite-Jäger",
-      "desc": "Töte 25 Elitekämpfer."
-    },
     "sectorFive": {
       "name": "Fünf Kronen",
       "desc": "Besiege alle fünf Sektor-Bosse."
-    },
-    "ironStreak": {
-      "name": "Eisenstreifen",
-      "desc": "Schließe drei Kampagnen hintereinander ab, ohne zu sterben."
     },
     "flawless": {
       "name": "Makellos",
@@ -570,29 +557,17 @@
       "name": "Schnelle Arbeit",
       "desc": "Schließe eine Kampagne in höchstens 11 Sprüngen ab."
     },
-    "scrapper": {
-      "name": "Schrottsammler",
-      "desc": "Verdiene insgesamt 5.000 Schrott."
-    },
-    "tycoon": {
-      "name": "Tycoon",
-      "desc": "Verdiene insgesamt 25.000 Schrott."
-    },
     "frugal": {
       "name": "Sparsam",
       "desc": "Schließe eine Kampagne ab, ohne auch nur einen Cent auszugeben."
     },
     "outfitter": {
       "name": "Ausrüster",
-      "desc": "Besitze 30 verschiedene Würfel."
+      "desc": "Verschiedene Würfel im Besitz: {{n}}"
     },
     "tierFive": {
-      "name": "Stufe 5",
-      "desc": "Löse eine Anomalie der Stufe 5."
-    },
-    "cryptographer": {
       "name": "Kryptograf",
-      "desc": "Löse zehn Anomalien der Stufe 5."
+      "desc": "Gelöste Anomalien der Stufe 5: {{n}}"
     },
     "anomalist": {
       "name": "Anomalist",
@@ -600,7 +575,7 @@
     },
     "puzzleBreadth": {
       "name": "Belesen",
-      "desc": "Entdecken Sie 30 verschiedene Anomalien."
+      "desc": "Gesehene verschiedene Anomalien: {{n}}"
     },
     "maraSquared": {
       "name": "Maras Hauptbuch",
@@ -639,8 +614,8 @@
       "desc": "Erreiche alle vier Enden."
     },
     "fiftyFound": {
-      "name": "Fünfzig gefunden",
-      "desc": "Lerne 50 verschiedene Würfel in Serien kennen."
+      "name": "Sammler",
+      "desc": "In Läufen getroffene Würfel: {{n}}"
     },
     "everyColour": {
       "name": "Jede Farbe",
@@ -648,7 +623,7 @@
     },
     "archivist": {
       "name": "Archivar",
-      "desc": "Schalte 60 „Kodex“-Einträge frei."
+      "desc": "Freigeschaltete Kodex-Einträge: {{n}}"
     },
     "keystoneThree": {
       "name": "Chartwright",
@@ -656,7 +631,7 @@
     },
     "contractor": {
       "name": "Auftragnehmer",
-      "desc": "Sammle 30 Vertragssterne."
+      "desc": "Verdiente Auftragssterne: {{n}}"
     },
     "toast": "Leistung",
     "beyondTheCore": {
@@ -666,7 +641,107 @@
     "theAnswer": {
       "name": "Die Antwort",
       "desc": "Erreiche das versteckte Ende jenseits des Kerns."
-    }
+    },
+    "bounty": {
+      "name": "Kopfgeldjäger",
+      "desc": "Getötete Gegner: {{n}}"
+    },
+    "eliteHunt": {
+      "name": "Elitejäger",
+      "desc": "Niedergestreckte Elitegegner: {{n}}"
+    },
+    "deathless": {
+      "name": "Ohne Verluste",
+      "desc": "Kampagnenserie ohne Tod: {{n}}"
+    },
+    "flawlessBoss": {
+      "name": "Unberührt",
+      "desc": "Ohne Hüllenverlust getötete Bosse: {{n}}"
+    },
+    "resonant": {
+      "name": "In Resonanz",
+      "desc": "Kämpfe mit Sechs-Würfel-Resonanz: {{n}}"
+    },
+    "voidRider": {
+      "name": "Leerenreiter",
+      "desc": "Wurmlochritte: {{n}}"
+    },
+    "rimRunner": {
+      "name": "Randläufer",
+      "desc": "Gegen Zoll umgangene Schwarze Löcher: {{n}}"
+    },
+    "scrapBaron": {
+      "name": "Schrottbaron",
+      "desc": "Insgesamt verdienter Schrott: {{n}}"
+    },
+    "machinist": {
+      "name": "Maschinist",
+      "desc": "Verschmolzene Würfelpaare: {{n}}"
+    },
+    "engraver": {
+      "name": "Graveur",
+      "desc": "Eingesetzte Gravuren: {{n}}"
+    },
+    "refit": {
+      "name": "Umrüstung",
+      "desc": "Auf Mk3 gebrachte Systeme: {{n}}"
+    },
+    "eventful": {
+      "name": "Weitgereist",
+      "desc": "Aufgelöste Ereignisse: {{n}}"
+    },
+    "gambler": {
+      "name": "Gegen die Quote",
+      "desc": "Gewonnene Proben: {{n}}"
+    },
+    "dailyRunner": {
+      "name": "Tageswerk",
+      "desc": "Beendete Tagesläufe: {{n}}"
+    },
+    "driftDeep": {
+      "name": "Tiefenläufer",
+      "desc": "Im Drift erreichte Tiefe: {{n}}"
+    },
+    "chainMara": {
+      "name": "Rechnung beglichen",
+      "desc": "Führe Maras Geschichte bis zur letzten Seite."
+    },
+    "chainYusuf": {
+      "name": "Yusufs lange Fahrt",
+      "desc": "Führe Yusufs Geschichte bis zur letzten Seite."
+    },
+    "chainChoir": {
+      "name": "Die letzte Strophe des Chors",
+      "desc": "Führe die Geschichte des Chors bis zur letzten Seite."
+    },
+    "chainKeeper": {
+      "name": "Das letzte Licht des Wächters",
+      "desc": "Führe die Geschichte des Wächters bis zur letzten Seite."
+    },
+    "allChains": {
+      "name": "Vier Fäden",
+      "desc": "Beende alle vier Geschichten der Besatzung."
+    },
+    "wandererClear": {
+      "name": "Weg des Wanderers",
+      "desc": "Schließe die Kampagne an Bord der Wanderer ab."
+    },
+    "ramClear": {
+      "name": "Weg des Rammbocks",
+      "desc": "Schließe die Kampagne an Bord der Ram ab."
+    },
+    "arkClear": {
+      "name": "Weg der Arche",
+      "desc": "Schließe die Kampagne an Bord der Ark ab."
+    },
+    "spectrumClear": {
+      "name": "Volles Spektrum",
+      "desc": "Schließe die Kampagne mit allen sechs Schulen im Deck ab."
+    },
+    "shards": "+{{n}} ◈",
+    "badgeChip": "Abzeichen",
+    "voucherChip": "Gutschein",
+    "maxed": "Abgeschlossen"
   },
   "chartTag": {
     "red": "rot",
@@ -711,5 +786,14 @@
       "prestigeTheme": "Thema „Ascendant“",
       "badge": "das „Ascendant“-Abzeichen"
     }
+  },
+  "voucher": {
+    "title": "Legendäre Belohnung",
+    "kicker": "Legendäre Stufe",
+    "body": "Nimm den Gutschein und starte den nächsten Lauf mit einer Perk-Auswahl 1 aus 3 — oder nimm jetzt die Splitter.",
+    "take": "Gutschein nehmen",
+    "shards": "{{n}} ◈ nehmen",
+    "bank": "Im Depot: {{n}} / {{max}}",
+    "full": "Dein Gutscheindepot ist voll ({{max}}). Nimm die Splitter."
   }
 }

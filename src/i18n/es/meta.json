@@ -437,7 +437,10 @@
     "deepClears": "Limpiezas profundas",
     "elites": "Élites abatidas",
     "wormholeRides": "Atracciones de agujeros de gusano",
-    "holesBypassed": "Agujeros omitidos"
+    "holesBypassed": "Agujeros omitidos",
+    "achClosest": "Lo más cerca: {{name}} — {{have}} / {{need}}",
+    "achNoneClose": "Aún no hay nada en marcha.",
+    "achOpen": "Abrir logros"
   },
   "achievements": {
     "title": "Logros"
@@ -538,25 +541,9 @@
     }
   },
   "ach": {
-    "firstBlood": {
-      "name": "Primera sangre",
-      "desc": "Elimina a 25 enemigos."
-    },
-    "hunter": {
-      "name": "Cazador",
-      "desc": "Mata a 500 enemigos."
-    },
-    "eliteHunter": {
-      "name": "Cazador de élite",
-      "desc": "Elimina a 25 enemigos de élite."
-    },
     "sectorFive": {
       "name": "Cinco coronas",
       "desc": "Elimina a los cinco jefes de sector."
-    },
-    "ironStreak": {
-      "name": "Racha de hierro",
-      "desc": "Supera tres campañas seguidas sin morir."
     },
     "flawless": {
       "name": "Impecable",
@@ -570,29 +557,17 @@
       "name": "Trabajo rápido",
       "desc": "Supera una campaña en 11 saltos o menos."
     },
-    "scrapper": {
-      "name": "Desguazador",
-      "desc": "Consigue un total de 5 000 chatarra."
-    },
-    "tycoon": {
-      "name": "Magnate",
-      "desc": "Consigue un total de 25 000 chatarra."
-    },
     "frugal": {
       "name": "Ahorrativo",
       "desc": "Supera una campaña sin gastar ni un céntimo."
     },
     "outfitter": {
       "name": "Proveedor de equipamiento",
-      "desc": "Tienes 30 dados diferentes."
+      "desc": "Dados diferentes en propiedad: {{n}}"
     },
     "tierFive": {
-      "name": "Nivel cinco",
-      "desc": "Resuelve una anomalía de nivel 5."
-    },
-    "cryptographer": {
       "name": "Criptógrafo",
-      "desc": "Resuelve diez anomalías de nivel 5."
+      "desc": "Anomalías de nivel 5 resueltas: {{n}}"
     },
     "anomalist": {
       "name": "Anomalista",
@@ -600,7 +575,7 @@
     },
     "puzzleBreadth": {
       "name": "Bien leído",
-      "desc": "Descubre 30 anomalías diferentes."
+      "desc": "Anomalías diferentes vistas: {{n}}"
     },
     "maraSquared": {
       "name": "El libro de cuentas de Mara",
@@ -639,8 +614,8 @@
       "desc": "Consigue los cuatro finales."
     },
     "fiftyFound": {
-      "name": "Cincuenta hallados",
-      "desc": "Descubre 50 dados diferentes en series."
+      "name": "Coleccionista",
+      "desc": "Dados diferentes encontrados en partidas: {{n}}"
     },
     "everyColour": {
       "name": "Todos los colores",
@@ -648,7 +623,7 @@
     },
     "archivist": {
       "name": "Archivero",
-      "desc": "Desbloquea 60 entradas de «Códice»."
+      "desc": "Entradas del Códice desbloqueadas: {{n}}"
     },
     "keystoneThree": {
       "name": "Chartwright",
@@ -656,7 +631,7 @@
     },
     "contractor": {
       "name": "Contratista",
-      "desc": "Consigue 30 estrellas de contrato."
+      "desc": "Estrellas de contrato ganadas: {{n}}"
     },
     "toast": "Logro",
     "beyondTheCore": {
@@ -666,7 +641,107 @@
     "theAnswer": {
       "name": "La respuesta",
       "desc": "Llega al final oculto más allá del Núcleo."
-    }
+    },
+    "bounty": {
+      "name": "Cazarrecompensas",
+      "desc": "Enemigos eliminados: {{n}}"
+    },
+    "eliteHunt": {
+      "name": "Cazador de élites",
+      "desc": "Enemigos de élite abatidos: {{n}}"
+    },
+    "deathless": {
+      "name": "Sin bajas",
+      "desc": "Racha de campañas sin morir: {{n}}"
+    },
+    "flawlessBoss": {
+      "name": "Intacto",
+      "desc": "Jefes matados sin perder casco: {{n}}"
+    },
+    "resonant": {
+      "name": "En resonancia",
+      "desc": "Combates con resonancia de seis dados: {{n}}"
+    },
+    "voidRider": {
+      "name": "Jinete del vacío",
+      "desc": "Viajes por agujeros de gusano: {{n}}"
+    },
+    "rimRunner": {
+      "name": "Corredor del borde",
+      "desc": "Agujeros negros esquivados pagando peaje: {{n}}"
+    },
+    "scrapBaron": {
+      "name": "Barón de la chatarra",
+      "desc": "Chatarra ganada en total: {{n}}"
+    },
+    "machinist": {
+      "name": "Maquinista",
+      "desc": "Parejas de dados fusionadas: {{n}}"
+    },
+    "engraver": {
+      "name": "Grabador",
+      "desc": "Grabados colocados: {{n}}"
+    },
+    "refit": {
+      "name": "Reacondicionamiento",
+      "desc": "Sistemas llevados a Mk3: {{n}}"
+    },
+    "eventful": {
+      "name": "Curtido",
+      "desc": "Eventos resueltos: {{n}}"
+    },
+    "gambler": {
+      "name": "Contra pronóstico",
+      "desc": "Pruebas ganadas: {{n}}"
+    },
+    "dailyRunner": {
+      "name": "Rutina diaria",
+      "desc": "Partidas diarias terminadas: {{n}}"
+    },
+    "driftDeep": {
+      "name": "Corredor profundo",
+      "desc": "Profundidad alcanzada en Deriva: {{n}}"
+    },
+    "chainMara": {
+      "name": "Cuenta saldada",
+      "desc": "Lleva la historia de Mara hasta su última página."
+    },
+    "chainYusuf": {
+      "name": "El largo viaje de Yusuf",
+      "desc": "Lleva la historia de Yusuf hasta su última página."
+    },
+    "chainChoir": {
+      "name": "El último verso del Coro",
+      "desc": "Lleva la historia del Coro hasta su última página."
+    },
+    "chainKeeper": {
+      "name": "La última luz del Guardián",
+      "desc": "Lleva la historia del Guardián hasta su última página."
+    },
+    "allChains": {
+      "name": "Cuatro hilos",
+      "desc": "Termina las cuatro historias del reparto."
+    },
+    "wandererClear": {
+      "name": "El camino del Errante",
+      "desc": "Completa la campaña a bordo del Errante."
+    },
+    "ramClear": {
+      "name": "El camino del Ariete",
+      "desc": "Completa la campaña a bordo del Ariete."
+    },
+    "arkClear": {
+      "name": "El camino del Arca",
+      "desc": "Completa la campaña a bordo del Arca."
+    },
+    "spectrumClear": {
+      "name": "Espectro completo",
+      "desc": "Completa la campaña con las seis escuelas en tu mazo."
+    },
+    "shards": "+{{n}} ◈",
+    "badgeChip": "Insignia",
+    "voucherChip": "Vale",
+    "maxed": "Completado"
   },
   "chartTag": {
     "red": "rojo",
@@ -711,5 +786,14 @@
       "prestigeTheme": "tema «Ascendente»",
       "badge": "la insignia «Ascendant»"
     }
+  },
+  "voucher": {
+    "title": "Recompensa legendaria",
+    "kicker": "Nivel legendario",
+    "body": "Toma el vale y empieza tu próxima partida con un draft de ventajas 1 de 3, o llévate los fragmentos ahora.",
+    "take": "Tomar el vale",
+    "shards": "Tomar {{n}} ◈",
+    "bank": "En reserva: {{n}} / {{max}}",
+    "full": "Tu reserva de vales está llena ({{max}}). Llévate los fragmentos."
   }
 }

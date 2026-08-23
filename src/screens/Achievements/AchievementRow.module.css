@@ -1,0 +1,77 @@
+.row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border: 1px solid var(--ca-line);
+  border-radius: var(--mantine-radius-md);
+  background: var(--ca-bg);
+}
+
+.rowEarned {
+  border-color: var(--ca-amber);
+  background: var(--ca-surface2);
+}
+
+.rowLegendary {
+  border-color: var(--ca-amber);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ca-amber) 40%, transparent);
+  background: linear-gradient(
+    140deg,
+    color-mix(in srgb, var(--ca-amber) 12%, var(--ca-surface2)),
+    var(--ca-surface1)
+  );
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.title {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+}
+
+.pips {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.pip {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid var(--ca-line);
+  background: transparent;
+}
+
+.pipDone {
+  border-color: var(--ca-amber);
+  background: var(--ca-amber);
+}
+
+.pipLegendary {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  transform: rotate(45deg);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mark {
+  color: var(--ca-amber);
+  font-size: 13px;
+  line-height: 1;
+}

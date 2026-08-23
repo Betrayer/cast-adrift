@@ -21,6 +21,8 @@ import {
   type WormholeThrow,
 } from "@/game/map/wormhole";
 import { holeTollFor } from "@/game/run/motifs";
+import { ACHIEVEMENTS } from "@/data/achievements";
+import { settleLifetimeAchievements } from "@/game/meta/achievements";
 import {
   chaosMocked,
   scriptedChaos,
@@ -173,6 +175,14 @@ export interface WormholeEdgeView {
   bypass: NodeId;
 }
 
+export interface AchievementsView {
+  total: number;
+  earned: string[];
+  unseen: number;
+  vouchers: number;
+  offers: string[];
+}
+
 export interface WormholeView {
   pending: NodeId | null;
   rides: number;
@@ -302,6 +312,8 @@ export interface TestApi {
   landings: (budget: number, direction: ThrowDirection) => NodeId[];
   ride: (holeId: NodeId) => WormholeThrow | null;
   wormhole: () => WormholeView;
+  achievements: () => AchievementsView;
+  settleAchievements: () => string[];
   mockChaos: (script: ChaosScript | null) => void;
   settings: (patch: Partial<SettingsValues>) => void;
   layout: (id: BattleLayoutId) => void;
@@ -734,6 +746,21 @@ export const createTestApi = (): TestApi => ({
       last: run.lastWormhole === null ? null : { ...run.lastWormhole },
     };
   },
+
+  achievements: () => {
+    const meta = useMetaStore.getState();
+    const seen = new Set(meta.achievementsSeen);
+    return {
+      total: ACHIEVEMENTS.length,
+      earned: [...meta.achievements],
+      unseen: meta.achievements.filter((id) => !seen.has(id)).length,
+      vouchers: meta.vouchers.perkDraft,
+      offers: [...meta.voucherOffers],
+    };
+  },
+
+  settleAchievements: () =>
+    settleLifetimeAchievements().unlocked.map((def) => def.id),
 
   mockChaos: (script) => {
     setChaosSource(script === null ? null : scriptedChaos(script));

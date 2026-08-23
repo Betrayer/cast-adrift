@@ -310,7 +310,10 @@
     "ascensionCost": "It costs you",
     "ascensionGain": "It pays you",
     "shardMult": "+{{n}}% shards for the whole run",
-    "changeShip": "Change ship"
+    "changeShip": "Change ship",
+    "voucher": "Voucher: starting perk",
+    "voucherCount": "{{n}} banked",
+    "voucherHint": "Spend one voucher to draft a perk before the first jump."
   },
   "package": {
     "title": "Gate package",
@@ -480,7 +483,8 @@
     "wormholeWay": {
       "forward": "deeper",
       "backward": "back"
-    }
+    },
+    "achievement": "Achievement: {{name}}"
   },
   "memory": {
     "kicker": "Echo remembers · fragment {{n}} of {{max}}",

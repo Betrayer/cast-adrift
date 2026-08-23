@@ -70,6 +70,11 @@ export const MenuScreen = () => {
   const codex = useMetaStore((s) => s.codex);
   const codexRead = useMetaStore((s) => s.codexRead);
   const badges = useMetaStore((s) => s.badges);
+  const achievements = useMetaStore((s) => s.achievements);
+  const achievementsSeen = useMetaStore((s) => s.achievementsSeen);
+  const unseenAchievements = achievements.filter(
+    (id) => !achievementsSeen.includes(id),
+  ).length;
   const topBadge = menuBadgeId(badges);
   const unreadMemories = unreadMemoryIds(codex, codexRead).length;
   const [localResume] = useState(readLocalResume);
@@ -179,6 +184,10 @@ export const MenuScreen = () => {
                 entry.key === 'codex' && unreadMemories > 0 ? (
                   <Badge size="sm" color="accent" data-unread-memories>
                     {unreadMemories}
+                  </Badge>
+                ) : entry.key === 'achievements' && unseenAchievements > 0 ? (
+                  <Badge size="sm" color="yellow" data-unseen-achievements>
+                    {unseenAchievements}
                   </Badge>
                 ) : undefined
               }

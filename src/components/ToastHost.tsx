@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
-import { ACHIEVEMENT_BY_ID } from '@/data/achievements';
+import { achievementTitleById } from '@/game/meta/achievements';
 import { playSfx } from '@/services/audio';
 import { SUPPORT_EMAIL } from '@/services/support';
 import { haptic } from '@/services/tma';
@@ -110,7 +110,6 @@ const AchievementSlot = () => {
   }, [toast, dismiss]);
 
   if (toast === null) return <div className={styles.slot} />;
-  const def = ACHIEVEMENT_BY_ID.get(toast.achievement);
   return (
     <div className={styles.slot}>
       <div
@@ -124,7 +123,7 @@ const AchievementSlot = () => {
           <span className={styles.achievementKicker}>
             {t('meta:ach.toast')}
           </span>
-          <span>{t(def?.name ?? toast.achievement)}</span>
+          <span>{achievementTitleById(toast.achievement, t)}</span>
         </span>
       </div>
       <QueueDots count={queued} />

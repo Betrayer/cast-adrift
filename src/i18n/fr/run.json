@@ -310,7 +310,10 @@
     "ascensionCost": "Cela vous coûte",
     "ascensionGain": "Ça te rapporte",
     "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution",
-    "changeShip": "Changer de vaisseau"
+    "changeShip": "Changer de vaisseau",
+    "voucher": "Bon : atout de départ",
+    "voucherCount": "{{n}} en réserve",
+    "voucherHint": "Dépensez un bon pour choisir un atout avant le premier saut."
   },
   "package": {
     "title": "Boîtier de porte",
@@ -480,7 +483,8 @@
     "wormholeWay": {
       "forward": "plus profond",
       "backward": "retour"
-    }
+    },
+    "achievement": "Réussite : {{name}}"
   },
   "memory": {
     "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",

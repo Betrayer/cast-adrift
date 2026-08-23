@@ -310,7 +310,10 @@
     "ascensionCost": "Te cuesta",
     "ascensionGain": "Te compensa",
     "shardMult": "+{{n}} % de fragmentos durante toda la ejecución",
-    "changeShip": "Cambiar de nave"
+    "changeShip": "Cambiar de nave",
+    "voucher": "Vale: ventaja inicial",
+    "voucherCount": "{{n}} en reserva",
+    "voucherHint": "Gasta un vale para elegir una ventaja antes del primer salto."
   },
   "package": {
     "title": "Paquete «Gate»",
@@ -480,7 +483,8 @@
     "wormholeWay": {
       "forward": "más profundo",
       "backward": "atrás"
-    }
+    },
+    "achievement": "Logro: {{name}}"
   },
   "memory": {
     "kicker": "Echo recuerda · fragmento {{n}} de {{max}}",

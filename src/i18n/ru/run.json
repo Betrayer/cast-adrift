@@ -310,7 +310,10 @@
     "ascensionCost": "Что это стоит",
     "ascensionGain": "Что это даёт",
     "shardMult": "+{{n}}% осколков за весь прогон",
-    "changeShip": "Сменить корабль"
+    "changeShip": "Сменить корабль",
+    "voucher": "Ваучер: стартовый перк",
+    "voucherCount": "{{n}} в банке",
+    "voucherHint": "Потрать ваучер, чтобы взять перк до первого прыжка."
   },
   "package": {
     "title": "Пакет за врата",
@@ -480,7 +483,8 @@
     "wormholeWay": {
       "forward": "вглубь",
       "backward": "назад"
-    }
+    },
+    "achievement": "Достижение: {{name}}"
   },
   "memory": {
     "kicker": "Эхо вспоминает · фрагмент {{n}} из {{max}}",

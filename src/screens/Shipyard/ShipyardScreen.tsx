@@ -19,7 +19,8 @@ import { fusionTarget } from "@/data/dice/fusion";
 import { SHIP_BY_ID } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
-import { FUSION_COST, mkUpgradeCost } from "@/game/economy/prices";
+import { FUSION_COST, MK_TOP, mkUpgradeCost } from "@/game/economy/prices";
+import { noteFusion, noteMkTop } from "@/game/meta/counters";
 import { useBackGuard } from "@/app/backGuard";
 import { autosaveRun, completeNode } from "@/game/run/flow";
 import { playSfx } from "@/services/audio";
@@ -76,6 +77,7 @@ export const ShipyardScreen = () => {
   const maxRepair = Math.min(hullMax - hull, Math.floor(scrap / 2));
 
   const markUpgraded = (slotId: SlotId): void => {
+    if ((useRunStore.getState().mkLevels[slotId] ?? 1) >= MK_TOP) noteMkTop();
     playSfx("buy");
     playSfx("mkSweep");
     haptic("purchase");
@@ -116,6 +118,7 @@ export const ShipyardScreen = () => {
     state.removeDie(first.uid);
     state.removeDie(second.uid);
     state.addDie(target);
+    noteFusion();
     autosaveRun();
   };
 

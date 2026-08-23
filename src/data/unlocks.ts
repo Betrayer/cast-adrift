@@ -160,21 +160,21 @@ export const UNLOCKS: readonly UnlockDef[] = [
     id: "diceAchPuzzler",
     kind: "diceWave",
     label: "meta:unlock.diceAchPuzzler",
-    source: { achievement: "tierFive" },
+    source: { achievement: "tierFive-1" },
     dice: ["fused-railslug", "fused-rampart", "fused-bloom", "fused-keel"],
   },
   {
     id: "diceAchCollector",
     kind: "diceWave",
     label: "meta:unlock.diceAchCollector",
-    source: { achievement: "fiftyFound" },
+    source: { achievement: "fiftyFound-2" },
     dice: ["fused-pyroclast", "fused-glacier", "fused-tendril"],
   },
   {
     id: "diceAchSurvivor",
     kind: "diceWave",
     label: "meta:unlock.diceAchSurvivor",
-    source: { achievement: "ironStreak" },
+    source: { achievement: "deathless-2" },
     dice: ["eclipse", "seedpod", "fused-windfall"],
   },
   {
@@ -216,7 +216,7 @@ export const UNLOCKS: readonly UnlockDef[] = [
     id: "contractsAchGauntlet",
     kind: "contractWave",
     label: "meta:unlock.contractsAchGauntlet",
-    source: { achievement: "eliteHunter" },
+    source: { achievement: "eliteHunt-2" },
     contracts: ["gauntlet"],
   },
   {

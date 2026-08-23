@@ -209,6 +209,7 @@ export interface BattleValues {
   rerollsUsed: number;
   repairBayHealed: number;
   dicePlaced: number;
+  maxResonance: number;
   burnKilledElite: boolean;
   streams: RngStreams | null;
   enemyStream: RngStream | null;
@@ -343,6 +344,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   rerollsUsed: 0,
   repairBayHealed: 0,
   dicePlaced: 0,
+  maxResonance: 0,
   burnKilledElite: false,
   streams: null,
   enemyStream: null,
@@ -591,6 +593,9 @@ export const tallyBundle = (bundle: ResolutionBundle): TurnTally => {
   };
 };
 
+export const largestResonance = (census: ResonanceCensus): number =>
+  Math.max(0, ...Object.values(census.counts));
+
 export const battleTally = (s: BattleValues): BattleTally => ({
   won: s.outcome === "victory",
   turns: s.turn,
@@ -606,6 +611,7 @@ export const battleTally = (s: BattleValues): BattleTally => ({
   endedFullHull: s.hull >= s.hullMax,
   blackPlaced: s.blackUsed,
   dicePlaced: s.dicePlaced,
+  maxResonance: s.maxResonance,
   burnKilledElite: s.burnKilledElite,
 });
 
@@ -1243,6 +1249,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       blackUsed,
       blueUsed,
       dicePlaced: s.dicePlaced + placed.length,
+      maxResonance: Math.max(s.maxResonance, largestResonance(s.resonance)),
       shieldAbsorbed: s.shieldAbsorbed + tally.shieldAbsorbed,
       damageDealt: s.damageDealt + tally.damageDealt,
       damageTaken: s.damageTaken + tally.damageTaken,
@@ -1418,6 +1425,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   rerollsUsed: s.rerollsUsed,
   repairBayHealed: s.repairBayHealed,
   dicePlaced: s.dicePlaced,
+  maxResonance: s.maxResonance,
   burnKilledElite: s.burnKilledElite,
 });
 

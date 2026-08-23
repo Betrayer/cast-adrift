@@ -310,7 +310,10 @@
     "ascensionCost": "Das kostet dich",
     "ascensionGain": "Es zahlt sich für dich aus",
     "shardMult": "+{{n}} % Shards für den gesamten Durchlauf",
-    "changeShip": "Schiff wechseln"
+    "changeShip": "Schiff wechseln",
+    "voucher": "Gutschein: Start-Perk",
+    "voucherCount": "{{n}} im Depot",
+    "voucherHint": "Gib einen Gutschein aus, um vor dem ersten Sprung einen Perk zu ziehen."
   },
   "package": {
     "title": "Gate-Gehäuse",
@@ -480,7 +483,8 @@
     "wormholeWay": {
       "forward": "tiefer",
       "backward": "zurück"
-    }
+    },
+    "achievement": "Erfolg: {{name}}"
   },
   "memory": {
     "kicker": "Echo erinnert sich · Auszug {{n}} von {{max}}",

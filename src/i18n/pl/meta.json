@@ -437,7 +437,10 @@
     "deepClears": "Głębokie przejścia",
     "elites": "Powalone elity",
     "wormholeRides": "Przejażdżki przez tunele czasoprzestrzenne",
-    "holesBypassed": "Pominięte dziury"
+    "holesBypassed": "Pominięte dziury",
+    "achClosest": "Najbliżej: {{name}} — {{have}} / {{need}}",
+    "achNoneClose": "Nic jeszcze nie rozpoczęto.",
+    "achOpen": "Otwórz osiągnięcia"
   },
   "achievements": {
     "title": "Osiągnięcia"
@@ -538,25 +541,9 @@
     }
   },
   "ach": {
-    "firstBlood": {
-      "name": "Pierwsza krew",
-      "desc": "Zabij 25 przeciwników."
-    },
-    "hunter": {
-      "name": "Hunter",
-      "desc": "Zabij 500 przeciwników."
-    },
-    "eliteHunter": {
-      "name": "Elitarny Łowca",
-      "desc": "Zabij 25 elitarnych przeciwników."
-    },
     "sectorFive": {
       "name": "Pięć koron",
       "desc": "Zabij wszystkich pięciu bossów sektorowych."
-    },
-    "ironStreak": {
-      "name": "Żelazna passa",
-      "desc": "Ukończ trzy kampanie z rzędu, nie ginąc ani razu."
     },
     "flawless": {
       "name": "Bezbłędny",
@@ -570,37 +557,25 @@
       "name": "Szybka praca",
       "desc": "Ukończ kampanię w maksymalnie 11 skokach."
     },
-    "scrapper": {
-      "name": "Złomiarz",
-      "desc": "Zdobądź łącznie 5 000 złomu."
-    },
-    "tycoon": {
-      "name": "Magnat",
-      "desc": "Zbierz łącznie 25 000 złomu."
-    },
     "frugal": {
       "name": "Oszczędny",
       "desc": "Ukończ kampanię, nie wydając ani grosza."
     },
     "outfitter": {
-      "name": "Sklep z odzieżą outdoorową",
-      "desc": "Posiadaj 30 różnych kości."
+      "name": "Zaopatrzeniowiec",
+      "desc": "Posiadane różne kości: {{n}}"
     },
     "tierFive": {
-      "name": "Poziom piąty",
-      "desc": "Rozwiąż anomalię poziomu 5."
-    },
-    "cryptographer": {
       "name": "Kryptograf",
-      "desc": "Rozwiąż dziesięć anomalii poziomu 5."
+      "desc": "Rozwiązane anomalie piątego poziomu: {{n}}"
     },
     "anomalist": {
       "name": "Anomalista",
       "desc": "Rozwiąż cztery anomalie za jednym razem."
     },
     "puzzleBreadth": {
-      "name": "Często czytane",
-      "desc": "Zobacz 30 różnych anomalii."
+      "name": "Oczytany",
+      "desc": "Zobaczone różne anomalie: {{n}}"
     },
     "maraSquared": {
       "name": "Księga Marry",
@@ -639,8 +614,8 @@
       "desc": "Osiągnij wszystkie cztery zakończenia."
     },
     "fiftyFound": {
-      "name": "Pięćdziesiąt znalezionych",
-      "desc": "Poznaj 50 różnych zestawów kości."
+      "name": "Kolekcjoner",
+      "desc": "Różne kości napotkane w wyprawach: {{n}}"
     },
     "everyColour": {
       "name": "Każdy kolor",
@@ -648,7 +623,7 @@
     },
     "archivist": {
       "name": "Archiwista",
-      "desc": "Odblokuj 60 wpisów w „Kodeks”."
+      "desc": "Odblokowane wpisy Kodeksu: {{n}}"
     },
     "keystoneThree": {
       "name": "Chartwright",
@@ -656,7 +631,7 @@
     },
     "contractor": {
       "name": "Wykonawca",
-      "desc": "Zdobądź 30 gwiazdek z kontraktów."
+      "desc": "Zdobyte gwiazdki kontraktów: {{n}}"
     },
     "toast": "Osiągnięcie",
     "beyondTheCore": {
@@ -666,7 +641,107 @@
     "theAnswer": {
       "name": "Odpowiedź",
       "desc": "Dotrzyj do ukrytego zakończenia za Rdzeniem."
-    }
+    },
+    "bounty": {
+      "name": "Łowca nagród",
+      "desc": "Zabici przeciwnicy: {{n}}"
+    },
+    "eliteHunt": {
+      "name": "Łowca elit",
+      "desc": "Powaleni elitarni przeciwnicy: {{n}}"
+    },
+    "deathless": {
+      "name": "Bez strat",
+      "desc": "Seria kampanii bez śmierci: {{n}}"
+    },
+    "flawlessBoss": {
+      "name": "Nietknięty",
+      "desc": "Bossowie zabici bez utraty kadłuba: {{n}}"
+    },
+    "resonant": {
+      "name": "W rezonansie",
+      "desc": "Walki z rezonansem sześciu kości: {{n}}"
+    },
+    "voidRider": {
+      "name": "Jeździec pustki",
+      "desc": "Przeloty przez tunel czasoprzestrzenny: {{n}}"
+    },
+    "rimRunner": {
+      "name": "Biegacz krawędzi",
+      "desc": "Czarne dziury ominięte za myto: {{n}}"
+    },
+    "scrapBaron": {
+      "name": "Baron złomu",
+      "desc": "Łącznie zdobyty złom: {{n}}"
+    },
+    "machinist": {
+      "name": "Maszynista",
+      "desc": "Stopione pary kości: {{n}}"
+    },
+    "engraver": {
+      "name": "Grawer",
+      "desc": "Założone grawerunki: {{n}}"
+    },
+    "refit": {
+      "name": "Przezbrojenie",
+      "desc": "Systemy rozbudowane do Mk3: {{n}}"
+    },
+    "eventful": {
+      "name": "Bywalec",
+      "desc": "Rozstrzygnięte zdarzenia: {{n}}"
+    },
+    "gambler": {
+      "name": "Wbrew szansom",
+      "desc": "Wygrane testy: {{n}}"
+    },
+    "dailyRunner": {
+      "name": "Codzienna trasa",
+      "desc": "Ukończone codzienne wyprawy: {{n}}"
+    },
+    "driftDeep": {
+      "name": "Głębinowiec",
+      "desc": "Głębokość osiągnięta w Dryfie: {{n}}"
+    },
+    "chainMara": {
+      "name": "Rachunek zamknięty",
+      "desc": "Doprowadź historię Mary do ostatniej strony."
+    },
+    "chainYusuf": {
+      "name": "Długa trasa Yusufa",
+      "desc": "Doprowadź historię Yusufa do ostatniej strony."
+    },
+    "chainChoir": {
+      "name": "Ostatnia zwrotka Chóru",
+      "desc": "Doprowadź historię Chóru do ostatniej strony."
+    },
+    "chainKeeper": {
+      "name": "Ostatnie światło Strażnika",
+      "desc": "Doprowadź historię Strażnika do ostatniej strony."
+    },
+    "allChains": {
+      "name": "Cztery nici",
+      "desc": "Ukończ wszystkie cztery historie załogi."
+    },
+    "wandererClear": {
+      "name": "Droga Wędrowca",
+      "desc": "Ukończ kampanię na pokładzie Wędrowca."
+    },
+    "ramClear": {
+      "name": "Droga Tarana",
+      "desc": "Ukończ kampanię na pokładzie Tarana."
+    },
+    "arkClear": {
+      "name": "Droga Arki",
+      "desc": "Ukończ kampanię na pokładzie Arki."
+    },
+    "spectrumClear": {
+      "name": "Pełne spektrum",
+      "desc": "Ukończ kampanię, mając w talii wszystkie sześć szkół."
+    },
+    "shards": "+{{n}} ◈",
+    "badgeChip": "Odznaka",
+    "voucherChip": "Kupon",
+    "maxed": "Ukończone"
   },
   "chartTag": {
     "red": "czerwony",
@@ -711,5 +786,14 @@
       "prestigeTheme": "motyw „Ascendant”",
       "badge": "odznaka Ascendant"
     }
+  },
+  "voucher": {
+    "title": "Legendarna nagroda",
+    "kicker": "Legendarny poziom",
+    "body": "Weź kupon i rozpocznij następną wyprawę od draftu atutu 1 z 3 albo weź odłamki teraz.",
+    "take": "Weź kupon",
+    "shards": "Weź {{n}} ◈",
+    "bank": "W banku: {{n}} / {{max}}",
+    "full": "Bank kuponów jest pełny ({{max}}). Weź odłamki."
   }
 }

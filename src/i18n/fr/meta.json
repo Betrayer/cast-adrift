@@ -437,7 +437,10 @@
     "deepClears": "Nettoyages profonds",
     "elites": "Élites abattues",
     "wormholeRides": "Manèges « Wormhole »",
-    "holesBypassed": "Trous contournés"
+    "holesBypassed": "Trous contournés",
+    "achClosest": "Au plus près : {{name}} — {{have}} / {{need}}",
+    "achNoneClose": "Rien n'est encore entamé.",
+    "achOpen": "Ouvrir les réussites"
   },
   "achievements": {
     "title": "Succès"
@@ -538,25 +541,9 @@
     }
   },
   "ach": {
-    "firstBlood": {
-      "name": "Premier sang",
-      "desc": "Éliminez 25 ennemis."
-    },
-    "hunter": {
-      "name": "Chasseur",
-      "desc": "Éliminez 500 ennemis."
-    },
-    "eliteHunter": {
-      "name": "Chasseur d'élite",
-      "desc": "Tuez 25 ennemis d'élite."
-    },
     "sectorFive": {
       "name": "Cinq couronnes",
       "desc": "Éliminez les cinq boss de secteur."
-    },
-    "ironStreak": {
-      "name": "Série de victoires",
-      "desc": "Terminez trois campagnes d'affilée sans mourir."
     },
     "flawless": {
       "name": "Impeccable",
@@ -570,37 +557,25 @@
       "name": "Travail rapide",
       "desc": "Terminez une campagne en 11 sauts ou moins."
     },
-    "scrapper": {
-      "name": "Ferrailleur",
-      "desc": "Gagnez 5 000 ferrailles au total."
-    },
-    "tycoon": {
-      "name": "Magnat",
-      "desc": "Gagnez 25 000 ferrailles au total."
-    },
     "frugal": {
       "name": "Économique",
       "desc": "Terminer une campagne sans dépenser le moindre centime."
     },
     "outfitter": {
       "name": "Fournisseur d'équipement",
-      "desc": "Posséder 30 dés différents."
+      "desc": "Dés différents possédés : {{n}}"
     },
     "tierFive": {
-      "name": "Niveau 5",
-      "desc": "Résoudre une anomalie de niveau 5."
-    },
-    "cryptographer": {
       "name": "Cryptographe",
-      "desc": "Résolvez dix anomalies de niveau 5."
+      "desc": "Anomalies de rang 5 résolues : {{n}}"
     },
     "anomalist": {
       "name": "Anomaliste",
       "desc": "Résolvez quatre anomalies en une seule fois."
     },
     "puzzleBreadth": {
-      "name": "Bien lu",
-      "desc": "Découvrez 30 anomalies différentes."
+      "name": "Érudit",
+      "desc": "Anomalies différentes vues : {{n}}"
     },
     "maraSquared": {
       "name": "Le grand livre de Mara",
@@ -639,8 +614,8 @@
       "desc": "Atteignez les quatre fins."
     },
     "fiftyFound": {
-      "name": "Cinquante trouvés",
-      "desc": "Découvrez 50 dés différents par séries."
+      "name": "Collectionneur",
+      "desc": "Dés différents rencontrés en expédition : {{n}}"
     },
     "everyColour": {
       "name": "Toutes les couleurs",
@@ -648,15 +623,15 @@
     },
     "archivist": {
       "name": "Archiviste",
-      "desc": "Débloquez 60 entrées «Codex »."
+      "desc": "Entrées du Codex débloquées : {{n}}"
     },
     "keystoneThree": {
       "name": "Chartwright",
       "desc": "Tenez trois clés de voûte à la fois."
     },
     "contractor": {
-      "name": "Entrepreneur",
-      "desc": "Gagnez 30 étoiles de contrat."
+      "name": "Sous-traitant",
+      "desc": "Étoiles de contrat gagnées : {{n}}"
     },
     "toast": "Réussite",
     "beyondTheCore": {
@@ -666,7 +641,107 @@
     "theAnswer": {
       "name": "La réponse",
       "desc": "Atteignez la fin cachée au-delà du Noyau."
-    }
+    },
+    "bounty": {
+      "name": "Chasseur de primes",
+      "desc": "Ennemis éliminés : {{n}}"
+    },
+    "eliteHunt": {
+      "name": "Chasseur d'élites",
+      "desc": "Ennemis d'élite abattus : {{n}}"
+    },
+    "deathless": {
+      "name": "Sans pertes",
+      "desc": "Série de campagnes sans mourir : {{n}}"
+    },
+    "flawlessBoss": {
+      "name": "Intouché",
+      "desc": "Boss tués sans perdre de coque : {{n}}"
+    },
+    "resonant": {
+      "name": "En résonance",
+      "desc": "Combats avec une résonance de six dés : {{n}}"
+    },
+    "voidRider": {
+      "name": "Cavalier du vide",
+      "desc": "Traversées de trou de ver : {{n}}"
+    },
+    "rimRunner": {
+      "name": "Coureur de bord",
+      "desc": "Trous noirs contournés en payant le péage : {{n}}"
+    },
+    "scrapBaron": {
+      "name": "Baron de la ferraille",
+      "desc": "Ferraille gagnée au total : {{n}}"
+    },
+    "machinist": {
+      "name": "Machiniste",
+      "desc": "Paires de dés fusionnées : {{n}}"
+    },
+    "engraver": {
+      "name": "Graveur",
+      "desc": "Gravures posées : {{n}}"
+    },
+    "refit": {
+      "name": "Refonte",
+      "desc": "Systèmes montés au Mk3 : {{n}}"
+    },
+    "eventful": {
+      "name": "Grand voyageur",
+      "desc": "Événements résolus : {{n}}"
+    },
+    "gambler": {
+      "name": "Contre toute attente",
+      "desc": "Jets réussis : {{n}}"
+    },
+    "dailyRunner": {
+      "name": "Routine quotidienne",
+      "desc": "Expéditions quotidiennes terminées : {{n}}"
+    },
+    "driftDeep": {
+      "name": "Coureur des profondeurs",
+      "desc": "Profondeur atteinte en Dérive : {{n}}"
+    },
+    "chainMara": {
+      "name": "Compte soldé",
+      "desc": "Menez l'histoire de Mara jusqu'à sa dernière page."
+    },
+    "chainYusuf": {
+      "name": "Le long voyage de Yusuf",
+      "desc": "Menez l'histoire de Yusuf jusqu'à sa dernière page."
+    },
+    "chainChoir": {
+      "name": "Le dernier vers du Chœur",
+      "desc": "Menez l'histoire du Chœur jusqu'à sa dernière page."
+    },
+    "chainKeeper": {
+      "name": "La dernière lumière du Gardien",
+      "desc": "Menez l'histoire du Gardien jusqu'à sa dernière page."
+    },
+    "allChains": {
+      "name": "Quatre fils",
+      "desc": "Terminez les quatre histoires de l'équipage."
+    },
+    "wandererClear": {
+      "name": "La route du Vagabond",
+      "desc": "Terminez la campagne à bord du Vagabond."
+    },
+    "ramClear": {
+      "name": "La route du Bélier",
+      "desc": "Terminez la campagne à bord du Bélier."
+    },
+    "arkClear": {
+      "name": "La route de l'Arche",
+      "desc": "Terminez la campagne à bord de l'Arche."
+    },
+    "spectrumClear": {
+      "name": "Spectre complet",
+      "desc": "Terminez la campagne avec les six écoles dans votre deck."
+    },
+    "shards": "+{{n}} ◈",
+    "badgeChip": "Insigne",
+    "voucherChip": "Bon",
+    "maxed": "Terminé"
   },
   "chartTag": {
     "red": "rouge",
@@ -711,5 +786,14 @@
       "prestigeTheme": "thème « Ascendant »",
       "badge": "le badge « Ascendant »"
     }
+  },
+  "voucher": {
+    "title": "Récompense légendaire",
+    "kicker": "Palier légendaire",
+    "body": "Prenez le bon et commencez votre prochaine expédition avec un choix d'atout 1 sur 3, ou prenez les fragments maintenant.",
+    "take": "Prendre le bon",
+    "shards": "Prendre {{n}} ◈",
+    "bank": "En réserve : {{n}} / {{max}}",
+    "full": "Votre réserve de bons est pleine ({{max}}). Prenez les fragments."
   }
 }

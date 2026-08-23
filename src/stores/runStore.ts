@@ -99,6 +99,7 @@ export interface BattleTally {
   endedFullHull: boolean;
   blackPlaced: number;
   dicePlaced: number;
+  maxResonance: number;
   burnKilledElite: boolean;
 }
 

@@ -310,7 +310,10 @@
     "ascensionCost": "Що це коштує",
     "ascensionGain": "Що це дає",
     "shardMult": "+{{n}}% уламків за весь прохід",
-    "changeShip": "Змінити корабель"
+    "changeShip": "Змінити корабель",
+    "voucher": "Ваучер: стартовий перк",
+    "voucherCount": "{{n}} у банку",
+    "voucherHint": "Витрать ваучер, щоб узяти перк до першого стрибка."
   },
   "package": {
     "title": "Пакет за браму",
@@ -480,7 +483,8 @@
     "wormholeWay": {
       "forward": "углиб",
       "backward": "назад"
-    }
+    },
+    "achievement": "Досягнення: {{name}}"
   },
   "memory": {
     "kicker": "Ехо згадує · фрагмент {{n}} з {{max}}",

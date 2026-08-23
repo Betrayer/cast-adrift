@@ -16,6 +16,7 @@ import {
 } from "@/data/narrative/prologue";
 import { SECTOR_COUNT, SECTORS, sectorDef } from "@/data/sectors";
 import { shipHullMax } from "@/game/battle/setup";
+import type { ShipId } from "@/data/ships";
 import { beginCheckFunnel } from "@/game/onboarding";
 import { chartSlotTierDelta } from "@/game/chart/engine";
 import {
@@ -84,7 +85,10 @@ import {
   ZERO_SHARD_BREAKDOWN,
 } from "@/game/xp";
 import { milestonesBetween } from "@/data/milestones";
-import { settleAchievements } from "@/game/meta/achievements";
+import {
+  settleAchievements,
+  settleLifetimeAchievements,
+} from "@/game/meta/achievements";
 import {
   freshUnlocks,
   grantDieUnlock,
@@ -99,7 +103,11 @@ import { createStream, createStreams, deriveSeed } from "@/services/rng";
 import { clearRun, saveRunSnapshot } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
 import { battleTally, useBattleStore } from "@/stores/battleStore";
-import { SMOTRITEL_BADGE, useMetaStore } from "@/stores/metaStore";
+import {
+  SMOTRITEL_BADGE,
+  useMetaStore,
+  type MetaStats,
+} from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -141,6 +149,48 @@ const runRotation = (run: RunValues): string[] => {
   return faced
     .map((id) => ENEMY_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
+};
+
+const runDeckSchools = (run: RunValues): number =>
+  new Set(
+    run.deck
+      .map((d) => DIE_BY_ID.get(d.defId)?.school)
+      .filter(
+        (school): school is School =>
+          school !== undefined && school !== "prismatic",
+      ),
+  ).size;
+
+export const FULL_RESONANCE = 6;
+
+const shipClearDelta = (
+  shipId: ShipId,
+  win: boolean,
+  mode: RunMode,
+): Partial<MetaStats> => {
+  if (!win || mode !== "campaign") return {};
+  switch (shipId) {
+    case "wanderer":
+      return { clearsWanderer: 1 };
+    case "ram":
+      return { clearsRam: 1 };
+    case "ark":
+      return { clearsArk: 1 };
+    default:
+      return {};
+  }
+};
+
+const noteBattleLifetime = (
+  tally: BattleTally,
+  flawlessBoss: boolean,
+): void => {
+  const delta: Partial<MetaStats> = {
+    ...(tally.maxResonance >= FULL_RESONANCE ? { resonance6: 1 } : {}),
+    ...(flawlessBoss ? { flawlessBosses: 1 } : {}),
+  };
+  if (Object.keys(delta).length === 0) return;
+  useMetaStore.getState().bumpLifetime(delta);
 };
 
 const contractPerksDisabled = (): boolean =>
@@ -238,9 +288,9 @@ export const endRun = (win: boolean): void => {
     if (run.ascension >= MAX_ASCENSION) meta.awardBadge(SMOTRITEL_BADGE);
   }
   meta.bumpLifetime({
-    kills: run.stats.kills,
     scrapEarned: run.stats.scrapEarned,
     beacons,
+    ...shipClearDelta(run.shipId, win, run.mode),
     driftRuns: run.mode === "drift" ? 1 : 0,
     dailyRuns: run.mode === "daily" ? 1 : 0,
     contractRuns: run.mode === "contract" ? 1 : 0,
@@ -254,6 +304,7 @@ export const endRun = (win: boolean): void => {
     beacons,
     puzzles: run.solvedPuzzles.length,
     ascension: run.ascension,
+    deckSchools: runDeckSchools(run),
     stats: run.stats,
   });
   const milestones = milestonesBetween(award.fromLevel, award.toLevel).map(
@@ -537,6 +588,7 @@ export interface StartRunOptions {
   contractId?: string | null;
   dailyDate?: string | null;
   mutators?: readonly string[];
+  startDraft?: boolean;
 }
 
 const mapOptionsFor = (mutators: readonly string[], mode: RunMode) => ({
@@ -544,8 +596,25 @@ const mapOptionsFor = (mutators: readonly string[], mode: RunMode) => ({
   noShops: computeMutatorMods(mutators).noShops,
 });
 
-export const startRun = (seed = now() >>> 0, ascension = 0): void => {
-  startRunMode({ mode: "campaign", seed, ascension });
+export const startRun = (
+  seed = now() >>> 0,
+  ascension = 0,
+  startDraft = false,
+): void => {
+  startRunMode({ mode: "campaign", seed, ascension, startDraft });
+};
+
+const openStartDraft = (rootSeed: number): void => {
+  const run = useRunStore.getState();
+  const stream = createStream(deriveSeed(rootSeed, "voucherDraft"));
+  const choices = rollPerkChoices(stream, draftContext(run));
+  if (choices.length === 0) return;
+  run.setPendingRewards({
+    dieDrop: null,
+    perkChoices: choices,
+    draftNodeId: START_NODE_ID,
+  });
+  noteDraftOffer(choices);
 };
 
 export const startRunMode = (options: StartRunOptions = {}): void => {
@@ -609,6 +678,13 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   useNarrativeStore.getState().reset();
   resetActionLog();
   resetBarkMemory();
+  if (
+    options.startDraft === true &&
+    !contractPerksDisabled() &&
+    useMetaStore.getState().spendVoucher("perkDraft")
+  ) {
+    openStartDraft(rootSeed);
+  }
   useAppStore.getState().go("interstitial");
   emitBark(`sectorEnter:${String(values.sector)}`);
   trackEvent({ name: "run_start", params: { mode, ship: shipId } });
@@ -754,6 +830,7 @@ export const bypassHole = (holeId: NodeId): boolean => {
   applyHoleToll(gate.run.sector, gate.from, holeId);
   useRunStore.getState().bumpStats({ holesBypassed: 1 });
   useMetaStore.getState().bumpLifetime({ holesBypassed: 1 });
+  settleLifetimeAchievements();
   const to = nodeById(gate.map).get(target);
   logJournal({
     k: "wormhole",
@@ -826,6 +903,7 @@ export const rideWormhole = (
   });
   useRunStore.getState().bumpStats({ jumps: 1, wormholeRides: 1 });
   useMetaStore.getState().bumpLifetime({ wormholeRides: 1 });
+  settleLifetimeAchievements();
   useRunStore.getState().noteDepth(depthFor(s.sectorIndex, node.row));
   logJournal({
     k: "wormhole",
@@ -890,7 +968,11 @@ const finalizeNode = (
           ? { bosses: 1 }
           : {};
   run.bumpStats({ nodesCleared: 1, kills: result.kills ?? 0, ...typeDelta });
-  if (node.type === "elite") useMetaStore.getState().bumpLifetime({ elites: 1 });
+  useMetaStore.getState().bumpLifetime({
+    kills: result.kills ?? 0,
+    ...(node.type === "elite" ? { elites: 1 } : {}),
+  });
+  settleLifetimeAchievements();
   unlockNextMemory();
   trackEvent({
     name: "node_complete",
@@ -1040,7 +1122,9 @@ export const resolveRunBattle = (): void => {
       name: "battle_result",
       params: { win: false, turns: b.turn, sector: run.sector },
     });
-    run.noteBattleTally(takeBattleTally());
+    const lost = takeBattleTally();
+    run.noteBattleTally(lost);
+    noteBattleLifetime(lost, false);
     useBattleStore.getState().reset();
     endRun(false);
     return;
@@ -1059,6 +1143,10 @@ export const resolveRunBattle = (): void => {
   const survivedLethal = b.survivedLethal;
   useBattleStore.getState().reset();
   run.noteBattleTally(tally);
+  noteBattleLifetime(
+    tally,
+    node.type === "boss" && tally.damageTaken === 0 && battleHull >= run.hull,
+  );
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
   if (survivedLethal) run.setFlag("survivedLethal");
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
@@ -1134,7 +1222,9 @@ export const resolveEventBattle = (): void => {
       name: "battle_result",
       params: { win: false, turns: b.turn, sector: run.sector },
     });
-    run.noteBattleTally(takeBattleTally());
+    const lost = takeBattleTally();
+    run.noteBattleTally(lost);
+    noteBattleLifetime(lost, false);
     useBattleStore.getState().reset();
     endRun(false);
     return;
@@ -1153,6 +1243,7 @@ export const resolveEventBattle = (): void => {
   const survivedLethal = b.survivedLethal;
   useBattleStore.getState().reset();
   run.noteBattleTally(tally);
+  noteBattleLifetime(tally, false);
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
   if (survivedLethal) run.setFlag("survivedLethal");
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));

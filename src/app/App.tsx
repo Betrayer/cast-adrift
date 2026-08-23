@@ -18,6 +18,7 @@ import { PerfOverlay } from '@/components/PerfOverlay';
 import { RotateGate } from '@/components/RotateGate';
 import { SystemMenu } from '@/components/SystemMenu';
 import { ToastHost } from '@/components/ToastHost';
+import { VoucherCeremony } from '@/components/VoucherCeremony';
 import {
   resolveReducedMotion,
   useSettingsStore,
@@ -54,6 +55,7 @@ export const App = () => {
       <BuildSheetHost />
       <ToastHost />
       <MemoryCeremony />
+      <VoucherCeremony />
       <MergeCard />
       <CoachMarks />
       <RotateGate />

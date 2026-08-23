@@ -437,6 +437,45 @@ test.describe('visual baselines', () => {
     await shot(app, 'summary-expanded.png');
   });
 
+  test('achievements screen', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.grantMeta({
+        stats: { kills: 60, elites: 6, wormholeRides: 12, scrapEarned: 6000 },
+      });
+      window.caTest?.settleAchievements();
+    });
+    await app.goTo('achievements');
+    await expect(
+      app.page.locator('[data-achievement-group="combat"]'),
+    ).toBeVisible();
+    await shot(app, 'achievements-screen.png');
+  });
+
+  test('family row — legendary and complete', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.grantMeta({ stats: { kills: 500 } });
+      window.caTest?.settleAchievements();
+    });
+    await app.testId('voucher-shards').click();
+    await app.goTo('achievements');
+    const row = app.page.locator('[data-achievement="bounty"]');
+    await expect(row).toBeVisible();
+    await quiet(app);
+    await expect(row).toHaveScreenshot('achievement-row-legendary.png');
+  });
+
+  test('voucher ceremony', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.grantMeta({ stats: { kills: 500 } });
+      window.caTest?.settleAchievements();
+    });
+    await expect(app.testId('voucher-ceremony')).toBeVisible();
+    await quiet(app);
+    await expect(app.testId('voucher-ceremony')).toHaveScreenshot(
+      'voucher-ceremony.png',
+    );
+  });
+
   test('account section', async ({ app }) => {
     await app.testId('menu-settings').click();
     await app.expectScreen('settings');

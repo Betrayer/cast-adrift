@@ -1,10 +1,12 @@
 import {
+  Badge,
   Button,
   Divider,
   Group,
   Paper,
   SimpleGrid,
   Stack,
+  Switch,
   Text,
   Title,
 } from '@mantine/core';
@@ -32,9 +34,12 @@ export const RunSetupScreen = () => {
   const shipId = useMetaStore((s) => s.selectedShip);
   const deck = useMetaStore((s) => s.hangar.deck);
   const cleared = useMetaStore((s) => s.ascension.campaign);
+  const vouchers = useMetaStore((s) => s.vouchers.perkDraft);
   const maxAscension = maxSelectableAscension(cleared);
   const [ascension, setAscension] = useState(0);
+  const [useVoucher, setUseVoucher] = useState(false);
   const mods = ascensionMods(ascension);
+  const spendVoucher = useVoucher && vouchers > 0;
 
   return (
     <Screen centered header={<AppHeader />}>
@@ -120,12 +125,44 @@ export const RunSetupScreen = () => {
               ))}
             </Stack>
           </SimpleGrid>
+          {vouchers > 0 ? (
+            <Paper
+              bg={tokens.surface2}
+              p="sm"
+              radius="md"
+              withBorder
+              data-testid="setup-voucher"
+              style={{ borderColor: tokens.amber }}
+            >
+              <Stack gap={4}>
+                <Group justify="space-between" wrap="nowrap">
+                  <Switch
+                    size="sm"
+                    color="accent"
+                    checked={useVoucher}
+                    label={t('run:setup.voucher')}
+                    data-testid="setup-voucher-toggle"
+                    onChange={(event) => {
+                      setUseVoucher(event.currentTarget.checked);
+                    }}
+                  />
+                  <Badge size="sm" variant="light" color="yellow">
+                    {t('run:setup.voucherCount', { n: vouchers })}
+                  </Badge>
+                </Group>
+                <Text size="xs" c={tokens.faint}>
+                  {t('run:setup.voucherHint')}
+                </Text>
+              </Stack>
+            </Paper>
+          ) : null}
           <Button
             size="md"
             fullWidth
             color="accent"
+            data-testid="setup-launch"
             onClick={() => {
-              startRun(now() >>> 0, ascension);
+              startRun(now() >>> 0, ascension, spendVoucher);
             }}
           >
             {t('run:setup.launch')}

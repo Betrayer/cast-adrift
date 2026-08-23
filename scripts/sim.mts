@@ -1814,6 +1814,7 @@ const runCampaign = (
   seed: number,
   archetype: Archetype,
   ascension: number,
+  startDraft = false,
 ): CampaignResult => {
   const aMods = ascensionMods(ascension);
   const hullMax = Math.max(
@@ -1826,6 +1827,9 @@ const runCampaign = (
     deck: archetype.deck,
     chartPicks: MID_COLLECTION_PICKS,
   });
+  if (startDraft) {
+    runDraft(state, 1, createStream(deriveSeed(seed, "voucherDraft")));
+  }
   const wormholes = emptyWormholeTally();
   let cleared = 0;
   let deathSector = 0;
@@ -1922,6 +1926,7 @@ const campaignRoll = (
   seed: number,
   archetype: Archetype,
   ascension: number,
+  startDraft = false,
 ): { roll: CampaignRoll; results: CampaignResult[] } => {
   const results: CampaignResult[] = [];
   for (let i = 0; i < runs; i += 1) {
@@ -1930,6 +1935,7 @@ const campaignRoll = (
         deriveSeed(seed, `campaign:${archetype.name}:${String(i)}`),
         archetype,
         ascension,
+        startDraft,
       ),
     );
   }
@@ -1962,11 +1968,12 @@ const campaignModeMain = (
   seed: number,
   startedAt: number,
 ): void => {
+  const startDraft = process.argv.includes("--start-draft");
   const rows: string[] = [
     "deck,ascension,runs,winrate,avgSectorsCleared,avgNodes,avgScrapEarned,avgScrapSpent,verdict",
   ];
   console.log(
-    `sim campaign: S1-S5 chained, ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
+    `sim campaign: S1-S5 chained, ${String(ARCHETYPES.length)} decks x ${String(runs)} runs${startDraft ? " · voucher start draft" : ""}`,
   );
   const tallies = emptyPuzzleTally();
   const sinks = emptySinks();
@@ -1977,7 +1984,13 @@ const campaignModeMain = (
   const a0Runs: CampaignResult[] = [];
   for (const ascension of [0, 3]) {
     for (const archetype of ARCHETYPES) {
-      const { roll, results } = campaignRoll(runs, seed, archetype, ascension);
+      const { roll, results } = campaignRoll(
+        runs,
+        seed,
+        archetype,
+        ascension,
+        startDraft,
+      );
       if (ascension === 0) {
         for (const r of results) {
           mergeTallies(tallies, r.puzzleByTier);

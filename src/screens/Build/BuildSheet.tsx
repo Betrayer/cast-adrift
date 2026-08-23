@@ -187,6 +187,7 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
                 <div
                   key={id}
                   className={styles.entry}
+                  data-build-perk={id}
                   style={{ borderLeftColor: rarityColor(def.rarity) }}
                 >
                   <Text size="sm" fw={600} c={tokens.text}>

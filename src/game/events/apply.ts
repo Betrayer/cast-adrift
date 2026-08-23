@@ -4,6 +4,7 @@ import { chainViews, type ChainView } from "@/data/narrative/chains";
 import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
 import { settleAchievements } from "@/game/meta/achievements";
+import { noteEventResolved } from "@/game/meta/counters";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
 import { emitRunHook } from "@/game/run/runEffects";
@@ -149,6 +150,7 @@ export const applyOutcome = (
     useMetaStore.getState().unlockCodex(outcome.codex);
   }
   if (info !== undefined) {
+    noteEventResolved();
     logJournal({
       k: "choice",
       event: info.eventId,

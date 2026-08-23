@@ -14,6 +14,7 @@ export type JournalBody =
   | { k: "chain"; chain: string; step: number; label: LocKey }
   | { k: "beacon"; event: string; resolved: number }
   | { k: "memory"; order: number }
+  | { k: "achievement"; achievement: string }
   | { k: "axis"; from: number; to: number; source: AxisSource }
   | {
       k: "wormhole";

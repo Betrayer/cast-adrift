@@ -7,6 +7,7 @@ import { tokens } from "@/app/theme";
 import { AxisMeter, axisTone } from "@/components/AxisMeter";
 import { beaconsResolved, BEACON_FLAGS } from "@/data/events/beacons";
 import { chainViews } from "@/data/narrative/chains";
+import { achievementTitleById } from "@/game/meta/achievements";
 import { SPEAKER_TONE } from "@/data/speakers";
 import { AXIS_MAX, AXIS_MIN } from "@/game/run/axis";
 import { journalAxisHistory, type JournalEntry } from "@/game/run/journal";
@@ -20,6 +21,7 @@ const MARKER: Record<JournalEntry["k"], string> = {
   chain: "⟡",
   beacon: "✦",
   memory: "◈",
+  achievement: "✧",
   axis: "±",
   wormhole: "◉",
 };
@@ -73,6 +75,10 @@ const EntryRow = ({ entry }: { entry: JournalEntry }) => {
         return t("run:journal.beacon", { n: entry.resolved, max: BEACON_FLAGS.length });
       case "memory":
         return t("run:journal.memory", { n: entry.order });
+      case "achievement":
+        return t("run:journal.achievement", {
+          name: achievementTitleById(entry.achievement, t),
+        });
       case "axis":
         return t(`run:journal.axis.${entry.source}`, {
           from: entry.from,

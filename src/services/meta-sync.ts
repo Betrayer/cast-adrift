@@ -51,6 +51,8 @@ const metaValues = (): MetaValues => {
   const s = useMetaStore.getState();
   return {
     shards: s.shards,
+    vouchers: s.vouchers,
+    voucherOffers: s.voucherOffers,
     xp: s.xp,
     level: s.level,
     chartPicks: s.chartPicks,

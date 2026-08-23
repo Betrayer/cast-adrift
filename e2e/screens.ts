@@ -1,6 +1,7 @@
 import { expect, type Locator, type Page } from '@playwright/test';
 import type {
   AccountView,
+  AchievementsView,
   BattlePatch,
   CloudMetaView,
   DieCardView,
@@ -8,6 +9,7 @@ import type {
   ShipCardView,
   TestState,
 } from '@/services/testApi';
+import type { MetaStats } from '@/stores/metaStore';
 import type { Mitigation, TurnForecast } from '@/game/battle/view';
 import type { BattleTally } from '@/stores/runStore';
 import type { BattleLayoutId, ScreenId } from '@/types';
@@ -199,6 +201,28 @@ export class Screens {
     await this.page.evaluate((cfg) => {
       window.caTest?.seedRun(cfg);
     }, config);
+  }
+
+  achievements(): Promise<AchievementsView> {
+    return this.page.evaluate(() => {
+      const api = window.caTest;
+      if (api === undefined) throw new Error('caTest is not mounted');
+      return api.achievements();
+    });
+  }
+
+  async grantStats(stats: Partial<MetaStats>): Promise<void> {
+    await this.page.evaluate((patch) => {
+      window.caTest?.grantMeta({ stats: patch });
+    }, stats);
+  }
+
+  async settleAchievements(): Promise<string[]> {
+    return this.page.evaluate(() => {
+      const api = window.caTest;
+      if (api === undefined) throw new Error('caTest is not mounted');
+      return api.settleAchievements();
+    });
   }
 
   async setLayout(id: BattleLayoutId): Promise<void> {

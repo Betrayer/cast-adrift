@@ -437,7 +437,10 @@
     "deepClears": "Deep clears",
     "elites": "Elites felled",
     "wormholeRides": "Wormhole rides",
-    "holesBypassed": "Holes bypassed"
+    "holesBypassed": "Holes bypassed",
+    "achClosest": "Closest: {{name}} — {{have}} / {{need}}",
+    "achNoneClose": "Nothing in progress yet.",
+    "achOpen": "Open achievements"
   },
   "achievements": {
     "title": "Achievements"
@@ -538,25 +541,9 @@
     }
   },
   "ach": {
-    "firstBlood": {
-      "name": "First Blood",
-      "desc": "Kill 25 hostiles."
-    },
-    "hunter": {
-      "name": "Hunter",
-      "desc": "Kill 500 hostiles."
-    },
-    "eliteHunter": {
-      "name": "Elite Hunter",
-      "desc": "Kill 25 elites."
-    },
     "sectorFive": {
       "name": "Five Crowns",
       "desc": "Kill all five sector bosses."
-    },
-    "ironStreak": {
-      "name": "Iron Streak",
-      "desc": "Clear three campaigns in a row without dying."
     },
     "flawless": {
       "name": "Flawless",
@@ -570,29 +557,17 @@
       "name": "Quick Work",
       "desc": "Clear a campaign in 11 jumps or fewer."
     },
-    "scrapper": {
-      "name": "Scrapper",
-      "desc": "Earn 5 000 scrap in total."
-    },
-    "tycoon": {
-      "name": "Tycoon",
-      "desc": "Earn 25 000 scrap in total."
-    },
     "frugal": {
       "name": "Frugal",
       "desc": "Clear a campaign without spending a single scrap."
     },
     "outfitter": {
       "name": "Outfitter",
-      "desc": "Own 30 different dice."
+      "desc": "Different dice owned: {{n}}"
     },
     "tierFive": {
-      "name": "Tier Five",
-      "desc": "Solve a tier-5 anomaly."
-    },
-    "cryptographer": {
       "name": "Cryptographer",
-      "desc": "Solve ten tier-5 anomalies."
+      "desc": "Tier-5 anomalies solved: {{n}}"
     },
     "anomalist": {
       "name": "Anomalist",
@@ -600,7 +575,7 @@
     },
     "puzzleBreadth": {
       "name": "Well Read",
-      "desc": "See 30 different anomalies."
+      "desc": "Different anomalies seen: {{n}}"
     },
     "maraSquared": {
       "name": "Mara's Ledger",
@@ -639,8 +614,8 @@
       "desc": "Reach all four endings."
     },
     "fiftyFound": {
-      "name": "Fifty Found",
-      "desc": "Meet 50 different dice in runs."
+      "name": "Collector",
+      "desc": "Different dice met in runs: {{n}}"
     },
     "everyColour": {
       "name": "Every Colour",
@@ -648,7 +623,7 @@
     },
     "archivist": {
       "name": "Archivist",
-      "desc": "Unlock 60 Codex entries."
+      "desc": "Codex entries unlocked: {{n}}"
     },
     "keystoneThree": {
       "name": "Chartwright",
@@ -656,7 +631,7 @@
     },
     "contractor": {
       "name": "Contractor",
-      "desc": "Earn 30 contract stars."
+      "desc": "Contract stars earned: {{n}}"
     },
     "toast": "Achievement",
     "beyondTheCore": {
@@ -666,7 +641,107 @@
     "theAnswer": {
       "name": "The Answer",
       "desc": "Reach the hidden ending past the Core."
-    }
+    },
+    "bounty": {
+      "name": "Bounty Hunter",
+      "desc": "Hostiles killed: {{n}}"
+    },
+    "eliteHunt": {
+      "name": "Elite Hunter",
+      "desc": "Elites felled: {{n}}"
+    },
+    "deathless": {
+      "name": "Deathless",
+      "desc": "Deathless campaign streak: {{n}}"
+    },
+    "flawlessBoss": {
+      "name": "Untouched",
+      "desc": "Bosses killed without losing a hull point: {{n}}"
+    },
+    "resonant": {
+      "name": "In Resonance",
+      "desc": "Battles with a six-die resonance: {{n}}"
+    },
+    "voidRider": {
+      "name": "Void Rider",
+      "desc": "Wormhole rides: {{n}}"
+    },
+    "rimRunner": {
+      "name": "Rim Runner",
+      "desc": "Black holes skirted by paying the toll: {{n}}"
+    },
+    "scrapBaron": {
+      "name": "Scrap Baron",
+      "desc": "Scrap earned in total: {{n}}"
+    },
+    "machinist": {
+      "name": "Machinist",
+      "desc": "Dice pairs fused: {{n}}"
+    },
+    "engraver": {
+      "name": "Engraver",
+      "desc": "Engravings fitted: {{n}}"
+    },
+    "refit": {
+      "name": "Refit",
+      "desc": "Systems built up to Mk3: {{n}}"
+    },
+    "eventful": {
+      "name": "Well Travelled",
+      "desc": "Events resolved: {{n}}"
+    },
+    "gambler": {
+      "name": "Long Odds",
+      "desc": "Skill checks won: {{n}}"
+    },
+    "dailyRunner": {
+      "name": "Daily Driver",
+      "desc": "Daily runs finished: {{n}}"
+    },
+    "driftDeep": {
+      "name": "Deep Runner",
+      "desc": "Depth reached in Drift: {{n}}"
+    },
+    "chainMara": {
+      "name": "The Ledger Settled",
+      "desc": "See Mara's story through to its last page."
+    },
+    "chainYusuf": {
+      "name": "Yusuf's Long Haul",
+      "desc": "See Yusuf's story through to its last page."
+    },
+    "chainChoir": {
+      "name": "The Choir's Last Verse",
+      "desc": "See the Choir's story through to its last page."
+    },
+    "chainKeeper": {
+      "name": "The Keeper's Last Light",
+      "desc": "See the Keeper's story through to its last page."
+    },
+    "allChains": {
+      "name": "Four Threads",
+      "desc": "Finish all four cast stories."
+    },
+    "wandererClear": {
+      "name": "Wanderer's Road",
+      "desc": "Clear the campaign aboard the Wanderer."
+    },
+    "ramClear": {
+      "name": "Ram's Road",
+      "desc": "Clear the campaign aboard the Ram."
+    },
+    "arkClear": {
+      "name": "Ark's Road",
+      "desc": "Clear the campaign aboard the Ark."
+    },
+    "spectrumClear": {
+      "name": "Full Spectrum",
+      "desc": "Clear the campaign with all six schools in your deck."
+    },
+    "shards": "+{{n}} ◈",
+    "badgeChip": "Badge",
+    "voucherChip": "Voucher",
+    "maxed": "Complete"
   },
   "chartTag": {
     "red": "red",
@@ -711,5 +786,14 @@
       "prestigeTheme": "theme «Ascendant»",
       "badge": "the Ascendant badge"
     }
+  },
+  "voucher": {
+    "title": "Legendary Reward",
+    "kicker": "Legendary tier",
+    "body": "Take the voucher and start your next run with a 1-of-3 perk draft, or take the shards now.",
+    "take": "Take the voucher",
+    "shards": "Take {{n}} ◈",
+    "bank": "Banked: {{n}} / {{max}}",
+    "full": "Your voucher bank is full ({{max}}). Take the shards."
   }
 }
