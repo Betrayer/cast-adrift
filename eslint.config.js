@@ -74,6 +74,18 @@ export default tseslint.config(
       ],
       'import/no-default-export': 'error',
       'no-empty': ['error', { allowEmptyCatch: true }],
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@/services/chaos', '**/services/chaos'],
+              message:
+                'chaos entropy is the wormhole exception (DESIGN 9.1); nothing else may import it',
+            },
+          ],
+        },
+      ],
     },
   },
   {
@@ -87,6 +99,18 @@ export default tseslint.config(
     files: ['src/services/rng.ts'],
     rules: {
       'no-restricted-properties': 'off',
+    },
+  },
+  {
+    files: [
+      'src/services/chaos.ts',
+      'src/services/chaos.test.ts',
+      'src/game/run/flow.ts',
+      'src/game/run/wormholeFlow.test.ts',
+      'src/services/testApi.ts',
+    ],
+    rules: {
+      'no-restricted-imports': 'off',
     },
   },
   {

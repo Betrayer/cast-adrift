@@ -18,6 +18,7 @@
     "lint:content": "tsx scripts/contentLint.mts",
     "lint:roadmap": "tsx scripts/roadmapLint.mts",
     "sim:sweep": "tsx scripts/sim.mts --mode sweep --runs 500 --seed 11",
+    "sim:ladder": "tsx scripts/sim.mts --mode ladder --runs 200 --seed 11",
     "sim:perks": "tsx scripts/sim.mts --mode perks --runs 500 --sector 2 --seed 5",
     "sim:economy": "tsx scripts/sim.mts --mode economy --runs 200 --seed 11",
     "sim:deep": "tsx scripts/sim.mts --mode deep --runs 300 --seed 17",

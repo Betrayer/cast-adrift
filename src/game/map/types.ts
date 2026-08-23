@@ -16,7 +16,7 @@ export type NodeId = string;
 
 export type LaneBlessing = "blessed" | "cursed";
 
-export type EdgeMark = "mine" | "pocket";
+export type EdgeMark = "mine" | "pocket" | "wormhole";
 
 export interface MapNode {
   id: NodeId;
@@ -28,6 +28,7 @@ export interface MapNode {
   unstable?: true;
   inverted?: true;
   storm?: true;
+  hole?: true;
   blessing?: LaneBlessing;
   tierWindow?: readonly [number, number];
 }
@@ -38,11 +39,19 @@ export interface MapShape {
   lanes: number;
 }
 
+export interface WormholeEdge {
+  from: NodeId;
+  hole: NodeId;
+  bypass: NodeId;
+}
+
 export interface MapGraph {
   nodes: MapNode[];
   edges: [NodeId, NodeId][];
   shape: MapShape;
   edgeMarks: Record<string, EdgeMark>;
+  wormholes: Record<string, WormholeEdge>;
+  bossReach: NodeId[];
 }
 
 export const START_ROW = 0;
@@ -96,3 +105,9 @@ export const edgeMarkFor = (
   from: NodeId,
   to: NodeId,
 ): EdgeMark | undefined => map.edgeMarks[edgeKey(from, to)];
+
+export const wormholeFor = (
+  map: MapGraph,
+  from: NodeId,
+  to: NodeId,
+): WormholeEdge | undefined => map.wormholes[edgeKey(from, to)];

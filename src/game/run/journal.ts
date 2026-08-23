@@ -1,8 +1,12 @@
+import type { NodeId } from "@/game/map/types";
+import type { ThrowDirection } from "@/game/map/wormhole";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 import type { LocKey } from "@/types/content";
 
 export type AxisSource = "choice" | "drift" | "beacon";
+
+export type WormholeBranch = "ride" | "bypass";
 
 export type JournalBody =
   | { k: "choice"; event: string; option: string; text: LocKey; consequence?: LocKey }
@@ -10,7 +14,14 @@ export type JournalBody =
   | { k: "chain"; chain: string; step: number; label: LocKey }
   | { k: "beacon"; event: string; resolved: number }
   | { k: "memory"; order: number }
-  | { k: "axis"; from: number; to: number; source: AxisSource };
+  | { k: "axis"; from: number; to: number; source: AxisSource }
+  | {
+      k: "wormhole";
+      branch: WormholeBranch;
+      to: NodeId;
+      rows: number;
+      direction: ThrowDirection;
+    };
 
 export type JournalEntry = JournalBody & {
   id: number;

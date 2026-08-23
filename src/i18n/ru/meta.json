@@ -435,7 +435,9 @@
     "dailyRuns": "Ежедневные забеги",
     "contractRuns": "Контрактные забеги",
     "deepClears": "Глубокие зачистки",
-    "elites": "Элит повержено"
+    "elites": "Элит повержено",
+    "wormholeRides": "Броски через червоточины",
+    "holesBypassed": "Обходов дыр"
   },
   "achievements": {
     "title": "Достижения"

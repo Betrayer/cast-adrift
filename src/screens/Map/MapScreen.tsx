@@ -14,13 +14,23 @@ import { sectorDef } from "@/data/sectors";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
-import { jumpTo } from "@/game/run/flow";
+import {
+  bypassHole,
+  enterNode,
+  jumpTo,
+  openWormhole,
+  resumeUnenteredNode,
+  rideWormhole,
+} from "@/game/run/flow";
+import { holeTollFor } from "@/game/run/motifs";
+import { isGentleRide } from "@/game/map/wormhole";
 import { computeRunMods } from "@/game/run/runMods";
 import {
   areConnected,
   edgeMarkFor,
   NODE_GLYPH,
   nodeById,
+  wormholeFor,
   type MapGraph,
   type MapNode,
   type NodeId,
@@ -31,6 +41,8 @@ import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
 import { AbandonConfirm } from "@/components/AbandonConfirm";
 import { AxisMeter } from "@/components/AxisMeter";
+import { WarpStreaks } from "@/components/WarpStreaks";
+import { WormholeChoice } from "./WormholeChoice";
 import { TapPopover } from "@/components/TapPopover";
 import { TIDE_HP_PCT } from "@/game/run/encounter";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
@@ -129,9 +141,12 @@ const MOTIF_BADGE = {
   cursed: "●",
   inversion: "⇅",
   storm: "≋",
+  blackHoles: "◉",
+  wormhole: "◌",
 } as const;
 
 const motifBadge = (node: MapNode): string | null => {
+  if (node.hole === true) return null;
   if (node.pocket === true) return MOTIF_BADGE.pocket;
   if (node.cache === true) return MOTIF_BADGE.cache;
   if (node.unstable === true) return MOTIF_BADGE.unstable;
@@ -204,9 +219,36 @@ const MOTIF_LEGEND: readonly MotifLegendEntry[] = [
     key: "mine",
     badge: "─",
     color: schools.red.text,
-    present: (map) => Object.keys(map.edgeMarks).length > 0,
+    present: (map) =>
+      Object.values(map.edgeMarks).some((mark) => mark === "mine"),
+  },
+  {
+    key: "blackHoles",
+    badge: MOTIF_BADGE.blackHoles,
+    color: schools.black.text,
+    present: (map) => map.nodes.some((n) => n.hole === true),
+  },
+  {
+    key: "wormhole",
+    badge: MOTIF_BADGE.wormhole,
+    color: schools.black.text,
+    present: (map) =>
+      Object.values(map.edgeMarks).some((mark) => mark === "wormhole"),
   },
 ];
+
+const WARP_SUCK_MS = 420;
+const WARP_BURST_MS = 560;
+const WARP_LAND_MS = 620;
+const WARP_FLASH_MS = 260;
+
+interface WarpBeat {
+  phase: "suck" | "burst" | "land";
+  x: number;
+  y: number;
+  rows: number;
+  direction: "forward" | "backward";
+}
 
 interface MapViewProps {
   map: MapGraph;
@@ -230,7 +272,6 @@ const MapView = ({ map, position }: MapViewProps) => {
     })
     .join(" · ");
   const interference = useRunStore((s) => s.interferenceStacks);
-  const hull = useRunStore((s) => s.hull);
   const hullMax = useRunStore((s) => s.hullMax);
   const scrap = useRunStore((s) => s.scrap);
   const axis = useRunStore((s) => s.axis);
@@ -258,9 +299,15 @@ const MapView = ({ map, position }: MapViewProps) => {
   const posNode = byId.get(position);
   const positionRow = posNode?.row ?? 0;
 
+  const pendingWormhole = useRunStore((s) => s.pendingWormhole);
+  const hull = useRunStore((s) => s.hull);
+  const rides = useRunStore((s) => s.stats.wormholeRides);
+
   const [selected, setSelected] = useState<NodeId | null>(null);
   const [abandoning, setAbandoning] = useState(false);
   const [jumping, setJumping] = useState(false);
+  const [warp, setWarp] = useState<WarpBeat | null>(null);
+  const timers = useRef<number[]>([]);
   const [marker, setMarker] = useState(() => ({
     x: posNode ? geo.nodeX(posNode) : geo.centerX,
     y: geo.rowY(positionRow),
@@ -313,6 +360,26 @@ const MapView = ({ map, position }: MapViewProps) => {
   }, [visibleLimit]);
 
   useEffect(() => {
+    if (warp?.phase !== "land") return;
+    const el = scrollRef.current;
+    const stage = stageRef.current;
+    if (el === null || stage === null) return;
+    const scale = stage.getBoundingClientRect().width / geo.viewW;
+    el.scrollTo({
+      top: Math.max(0, warp.y * scale - el.clientHeight * 0.55),
+      behavior: reduced ? "auto" : "smooth",
+    });
+  }, [warp, geo, reduced]);
+
+  useEffect(
+    () => () => {
+      for (const id of timers.current) window.clearTimeout(id);
+      timers.current = [];
+    },
+    [],
+  );
+
+  useEffect(() => {
     if (tide > prevTideCue.current) {
       playSfx("tideUp", { rate: 1 - Math.min(4, tide) * 0.03 });
     }
@@ -344,10 +411,90 @@ const MapView = ({ map, position }: MapViewProps) => {
     setSelected(id);
   };
 
+  const after = (ms: number, run: () => void): void => {
+    timers.current.push(window.setTimeout(run, ms));
+  };
+
+  const onRide = (holeId: NodeId): void => {
+    if (jumping) return;
+    const hole = byId.get(holeId);
+    setJumping(true);
+    setSelected(null);
+    haptic("bossIntro");
+    playSfx("foldBeat", { gain: 0.9 });
+    if (reduced) {
+      const roll = rideWormhole(holeId, false);
+      const landed = roll?.landing == null ? undefined : byId.get(roll.landing);
+      playSfx("inversionCue");
+      setWarp({
+        phase: "land",
+        x: landed === undefined ? geo.centerX : geo.nodeX(landed),
+        y: geo.rowY(landed?.row ?? positionRow),
+        rows: Math.abs(roll?.rows ?? 0),
+        direction: roll?.direction ?? "forward",
+      });
+      after(WARP_FLASH_MS, () => {
+        setWarp(null);
+        if (roll?.landing != null) enterNode(roll.landing);
+      });
+      return;
+    }
+    setWarp({
+      phase: "suck",
+      x: hole === undefined ? geo.centerX : geo.nodeX(hole),
+      y: geo.rowY(hole?.row ?? positionRow),
+      rows: 0,
+      direction: "forward",
+    });
+    after(WARP_SUCK_MS, () => {
+      const roll = rideWormhole(holeId, false);
+      const landing = roll?.landing == null ? undefined : byId.get(roll.landing);
+      playSfx("inversionCue");
+      setWarp({
+        phase: "burst",
+        x: landing === undefined ? geo.centerX : geo.nodeX(landing),
+        y: geo.rowY(landing?.row ?? positionRow),
+        rows: Math.abs(roll?.rows ?? 0),
+        direction: roll?.direction ?? "forward",
+      });
+      after(WARP_BURST_MS, () => {
+        setWarp((beat) => (beat === null ? null : { ...beat, phase: "land" }));
+        after(WARP_LAND_MS, () => {
+          setWarp(null);
+          if (roll?.landing != null) enterNode(roll.landing);
+        });
+      });
+    });
+  };
+
+  const onBypass = (holeId: NodeId): void => {
+    if (jumping) return;
+    const record = wormholeFor(map, position, holeId);
+    const target = record === undefined ? undefined : byId.get(record.bypass);
+    playSfx("jump");
+    haptic("mapJump");
+    setSelected(null);
+    if (holeTollFor(sector, hull) > 0) playSfx("hullHit", { gain: 0.5 });
+    if (reduced || target === undefined) {
+      bypassHole(holeId);
+      return;
+    }
+    setJumping(true);
+    setMarker({ x: geo.nodeX(target), y: geo.rowY(target.row) });
+    after(430, () => {
+      bypassHole(holeId);
+    });
+  };
+
   const onJump = (): void => {
     if (selected === null || jumping) return;
     const target = byId.get(selected);
     if (target === undefined || !isLegal(target)) return;
+    if (target.hole === true) {
+      playSfx("eventOpen");
+      openWormhole(target.id);
+      return;
+    }
     playSfx("jump");
     haptic("mapJump");
     if (target.pocket === true) playSfx("detourEntry");
@@ -413,10 +560,20 @@ const MapView = ({ map, position }: MapViewProps) => {
     selectedNode === undefined || selectedNode === null
       ? []
       : [
-          t("run:map.previewNode", {
-            type: t(`run:map.node.${selectedNode.type}`),
-            risk: t(`run:map.risk.${nodeRisk(selectedNode)}`),
-          }),
+          selectedNode.hole === true
+            ? t("run:map.node.hole")
+            : t("run:map.previewNode", {
+                type: t(`run:map.node.${selectedNode.type}`),
+                risk: t(`run:map.risk.${nodeRisk(selectedNode)}`),
+              }),
+          ...(selectedNode.hole === true
+            ? [
+                t("run:map.previewHole"),
+                holeTollFor(sector, hull) > 0
+                  ? t("run:hole.bypassCost", { n: holeTollFor(sector, hull) })
+                  : t("run:hole.bypassFree"),
+              ]
+            : []),
           ...(previewName === null ? [] : [previewName]),
           ...(selectedNode.pocket === true ? [t("run:map.previewPocket")] : []),
           ...(selectedNode.cache === true ? [t("run:motif.cache")] : []),
@@ -428,6 +585,9 @@ const MapView = ({ map, position }: MapViewProps) => {
             : [t(`run:motif.${selectedNode.blessing}`)]),
           ...(edgeMarkFor(map, position, selectedNode.id) === "mine"
             ? [t("run:motif.mine")]
+            : []),
+          ...(edgeMarkFor(map, position, selectedNode.id) === "wormhole"
+            ? [t("run:motif.wormhole")]
             : []),
         ];
 
@@ -599,13 +759,31 @@ const MapView = ({ map, position }: MapViewProps) => {
       bodyRef={scrollRef}
       innerClassName={styles.body}
       overlay={
-        <AbandonConfirm
-          opened={abandoning}
-          prefix="map"
-          onCancel={() => {
-            setAbandoning(false);
-          }}
-        />
+        <>
+          <AbandonConfirm
+            opened={abandoning}
+            prefix="map"
+            onCancel={() => {
+              setAbandoning(false);
+            }}
+          />
+          {pendingWormhole === null ? null : (
+            <WormholeChoice
+              toll={holeTollFor(sector, hull)}
+              gentle={isGentleRide(rides)}
+              busy={jumping}
+              onBypass={() => {
+                onBypass(pendingWormhole);
+              }}
+              onRide={() => {
+                onRide(pendingWormhole);
+              }}
+            />
+          )}
+          {warp?.phase === "burst" ? (
+            <WarpStreaks color={schools.black.text} durationMs={WARP_BURST_MS} />
+          ) : null}
+        </>
       }
 
     >
@@ -616,6 +794,14 @@ const MapView = ({ map, position }: MapViewProps) => {
           viewBox={`0 0 ${String(geo.viewW)} ${String(geo.viewH)}`}
           role="img"
         >
+          <defs>
+            <radialGradient id="caHoleWash">
+              <stop offset="0%" stopColor={schools.black.stroke} stopOpacity={0.42} />
+              <stop offset="70%" stopColor={schools.black.fill} stopOpacity={0.22} />
+              <stop offset="100%" stopColor={schools.black.fill} stopOpacity={0} />
+            </radialGradient>
+          </defs>
+
           {map.edges.map(([a, b]) => {
             if (!visibleIds.has(a) || !visibleIds.has(b)) return null;
             const na = byId.get(a);
@@ -625,6 +811,7 @@ const MapView = ({ map, position }: MapViewProps) => {
             return (
               <line
                 key={`${a}-${b}`}
+                data-edge-mark={mark}
                 x1={geo.nodeX(na)}
                 y1={geo.rowY(na.row)}
                 x2={geo.nodeX(nb)}
@@ -634,10 +821,20 @@ const MapView = ({ map, position }: MapViewProps) => {
                     ? mixHex(tokens.line, tokens.faint, 0.35)
                     : mark === "mine"
                       ? schools.red.text
-                      : tokens.amber
+                      : mark === "wormhole"
+                        ? schools.black.text
+                        : tokens.amber
                 }
-                strokeWidth={mark === undefined ? 1.2 : 1.8}
-                strokeDasharray={mark === undefined ? undefined : "5 4"}
+                strokeWidth={
+                  mark === undefined ? 1.2 : mark === "wormhole" ? 2.2 : 1.8
+                }
+                strokeDasharray={
+                  mark === undefined
+                    ? undefined
+                    : mark === "wormhole"
+                      ? "3 5"
+                      : "5 4"
+                }
               />
             );
           })}
@@ -654,6 +851,63 @@ const MapView = ({ map, position }: MapViewProps) => {
               geo.rowY(node.row),
               geo.radius(node),
             );
+            if (node.hole === true) {
+              return (
+                <g
+                  key={node.id}
+                  data-node={node.id}
+                  data-testid={`map-node-${node.id}`}
+                  data-node-type="hole"
+                  data-node-hole="1"
+                  data-node-legal={legal ? '1' : '0'}
+                  className={legal ? styles.nodeSelectable ?? "" : styles.node ?? ""}
+                  onClick={legal ? () => { selectNode(node.id); } : undefined}
+                >
+                  <circle
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node) + 14}
+                    fill="url(#caHoleWash)"
+                  />
+                  <circle
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node)}
+                    fill={tokens.bg}
+                    stroke={chosen ? tokens.amber : schools.black.stroke}
+                    strokeWidth={chosen ? 2.6 : 1.4}
+                  />
+                  <circle
+                    className={reduced ? undefined : styles.vortex}
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node) - 4}
+                    fill="none"
+                    stroke={schools.black.text}
+                    strokeWidth={2}
+                    strokeDasharray="3 5"
+                  />
+                  <circle
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node) * 0.3}
+                    fill={tokens.bg}
+                    stroke={schools.black.stroke}
+                    strokeWidth={0.8}
+                  />
+                  <text
+                    x={geo.nodeX(node) + geo.radius(node) - 1}
+                    y={geo.rowY(node.row) - geo.radius(node) + 6}
+                    textAnchor="middle"
+                    fontSize={11}
+                    fontWeight={700}
+                    fill={schools.black.text}
+                  >
+                    {MOTIF_BADGE.blackHoles}
+                  </text>
+                </g>
+              );
+            }
             return (
               <g
                 key={node.id}
@@ -808,13 +1062,46 @@ const MapView = ({ map, position }: MapViewProps) => {
             </g>
           ) : null}
 
-          {jumping ? (
+          {warp === null && jumping ? (
             <g
               className={styles.marker}
               style={{ transform: `translate(${String(marker.x)}px, ${String(marker.y)}px)` }}
             >
               <circle r={6} fill={tokens.accent} />
             </g>
+          ) : null}
+
+          {warp === null ? null : (
+            <g
+              data-warp-phase={warp.phase}
+              className={
+                warp.phase === "suck"
+                  ? styles.warpSuck ?? ""
+                  : warp.phase === "land"
+                    ? styles.warpLand ?? ""
+                    : styles.warpHidden ?? ""
+              }
+              style={{ transform: `translate(${String(warp.x)}px, ${String(warp.y)}px)` }}
+            >
+              <circle r={9} fill={schools.black.text} />
+            </g>
+          )}
+
+          {warp?.phase === "land" ? (
+            <text
+              data-warp-label
+              x={warp.x}
+              y={warp.y - 26}
+              textAnchor="middle"
+              fontSize={12}
+              fontWeight={700}
+              fill={schools.black.text}
+            >
+              {t("run:hole.landed", {
+                rows: warp.rows,
+                way: t(`run:journal.wormholeWay.${warp.direction}`),
+              })}
+            </text>
           ) : null}
         </svg>
       </div>
@@ -898,6 +1185,10 @@ export const MapScreen = () => {
   useEffect(() => {
     if (map === null || position === null) go("menu");
   }, [map, position, go]);
+
+  useEffect(() => {
+    resumeUnenteredNode();
+  }, []);
 
   useEffect(() => {
     const idle = window.requestIdleCallback?.bind(window) ?? window.setTimeout;

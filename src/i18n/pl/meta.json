@@ -435,7 +435,9 @@
     "dailyRuns": "Przebiegi dzienne",
     "contractRuns": "Przebiegi kontraktowe",
     "deepClears": "Głębokie przejścia",
-    "elites": "Powalone elity"
+    "elites": "Powalone elity",
+    "wormholeRides": "Przejażdżki przez tunele czasoprzestrzenne",
+    "holesBypassed": "Pominięte dziury"
   },
   "achievements": {
     "title": "Osiągnięcia"

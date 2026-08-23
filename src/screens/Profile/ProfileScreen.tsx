@@ -103,6 +103,16 @@ const DETAIL_ROWS: readonly {
     label: "meta:profile.contractRuns",
     read: (s) => s.contractRuns,
   },
+  {
+    id: "wormholeRides",
+    label: "meta:profile.wormholeRides",
+    read: (s) => s.wormholeRides,
+  },
+  {
+    id: "holesBypassed",
+    label: "meta:profile.holesBypassed",
+    read: (s) => s.holesBypassed,
+  },
 ];
 
 const StatCell = ({ label, value }: { label: string; value: string }) => (

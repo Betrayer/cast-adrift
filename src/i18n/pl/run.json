@@ -36,7 +36,8 @@
       "anomaly": "Anomalia",
       "beacon": "Latarnia",
       "boss": "Szef",
-      "inverted": "odwrócony"
+      "inverted": "odwrócony",
+      "hole": "Czarna dziura"
     },
     "previewNode": "{{type}} · ryzyko: {{risk}}",
     "previewPocket": "Objazd: lepsze łupy, trudniejsza walka",
@@ -46,7 +47,8 @@
       "high": "wysoki"
     },
     "hull": "Kadłub {{cur}}/{{max}}",
-    "scrap": "Złom {{n}}"
+    "scrap": "Złom {{n}}",
+    "previewHole": "Czarna dziura: obejść ją czy przejechać przez tunel czasoprzestrzenny"
   },
   "event": {
     "title": "Sygnał",
@@ -262,7 +264,9 @@
     "scrapSpent": "Wydany złom",
     "hullPctMin": "Najniższy kadłub",
     "dicePlaced": "Postawione kości",
-    "pct": "{{n}}%"
+    "pct": "{{n}}%",
+    "wormholeRides": "Przejażdżki przez tunele czasoprzestrzenne",
+    "holesBypassed": "Pominięte dziury"
   },
   "prologue": {
     "title": "Prolog",
@@ -380,7 +384,11 @@
     "pocket": "Kieszeń „objazdowa”: większe ryzyko, większa nagroda",
     "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie",
     "inversion": "Podciąganie odwrócone: systemy są rozpatrywane od ostatniego do pierwszego",
-    "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania"
+    "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania",
+    "blackHoles": "Czarna dziura: komórka zniknęła; jej ścieżka tworzy tunel czasoprzestrzenny",
+    "wormhole": "Krawędź tunelu czasoprzestrzennego: na jej skraju czeka wybór",
+    "bypass": "Ominął krawędź: fala musnęła kadłub",
+    "holeScorch": "Kadłub zbyt mało pieniędzy na opłatę za przejazd — bariera cię przepuściła"
   },
   "tag": {
     "red": "Czerwony",
@@ -464,7 +472,15 @@
     "here": "Znajdujesz się w sektorze „{{n}}”.",
     "chainsTitle": "Wątki",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "tutaj"
+    "chainHere": "tutaj",
+    "wormhole": {
+      "ride": "Przejechałem przez tunel czasoprzestrzenny {{way}}, {{rows}} – oto kilka wierszy",
+      "bypass": "Okrążyłem czarną dziurę"
+    },
+    "wormholeWay": {
+      "forward": "głębiej",
+      "backward": "wstecz"
+    }
   },
   "memory": {
     "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",
@@ -527,5 +543,18 @@
     "swarm": "Wiele małych kości zamiast kilku dużych.",
     "spike": "Jedna ogromna wartość zamiast równego strumienia.",
     "precision": "Wąskie, przewidywalne ścianki i dokładne wartości."
+  },
+  "hole": {
+    "title": "Czarna dziura",
+    "body": "Komórka zniknęła. Jej krawędź albo pozwoli ci ją ominąć, albo zabierze cię tam, gdzie sama wybierze.",
+    "gentle": "Stabilna tunelowa dziura",
+    "gentleWhy": "Pierwsze dwa zjazdy w serii są krótkie i zawsze prowadzą coraz głębiej.",
+    "bypass": "Obejść",
+    "bypassCost": "Objazd: − kadłub typu{{n}}",
+    "bypassFree": "Objazd: bezpłatny — kadłub nie może za to zapłacić",
+    "ride": "Wsiadaj i jedź",
+    "rideCost": "Przejazd: przejazd pociągiem linii „{{min}}” – stacja{{max}}, kierunek nieznany",
+    "rideGentle": "Ride: rzut „{{min}}” – „{{max}}”, wyłącznie w głębszym zakresie",
+    "landed": "Rzuty {{rows}} wiersze {{way}}"
   }
 }

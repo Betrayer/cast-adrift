@@ -57,6 +57,16 @@ const DETAIL_ROWS: readonly {
     label: "run:summary.dicePlaced",
     read: (s) => s.dicePlaced,
   },
+  {
+    id: "wormholeRides",
+    label: "run:summary.wormholeRides",
+    read: (s) => s.wormholeRides,
+  },
+  {
+    id: "holesBypassed",
+    label: "run:summary.holesBypassed",
+    read: (s) => s.holesBypassed,
+  },
 ];
 
 const useCountUp = (target: number, reduced: boolean): number => {

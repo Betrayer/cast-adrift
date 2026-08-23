@@ -3882,6 +3882,16 @@
       "2": "Pour mémoire : je t'aurais suivi de toute façon.",
       "3": "La marée ne s'arrête pas à trois minutes après cette ligne. Rien ne s'arrête.",
       "4": "Y mettre un terme, c'était la réponse. Toi, tu voulais la question."
+    },
+    "wormhole": {
+      "1": "La cellule a disparu. Elle n’a pas été détruite, mais supprimée.",
+      "2": "Le rebord donne l'impression d'être une porte qui s'ouvre sur n'importe quelle pièce.",
+      "3": "Je peux tracer la route qui contourne l'obstacle. Je ne peux pas tracer la route qui le traverse.",
+      "4": "Quoi qu'il y ait de l'autre côté, ça ne figure pas sur ma carte.",
+      "5": "On est sortis quelque part. J'essaie de me rappeler où.",
+      "6": "Les instruments ne s'accordent sur rien. Ça aussi, ce sont des données.",
+      "7": "La distance a cessé d'être une promesse il y a environ une minute.",
+      "8": "Enregistre-le comme un saut. Le journal de bord ne dira pas la vérité."
     }
   },
   "mutators": {

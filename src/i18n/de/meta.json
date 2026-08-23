@@ -435,7 +435,9 @@
     "dailyRuns": "Tägliche Läufe",
     "contractRuns": "Vertragsläufe",
     "deepClears": "Tiefe Durchgänge",
-    "elites": "Elite erlegt"
+    "elites": "Elite erlegt",
+    "wormholeRides": "Wurmloch-Fahrten",
+    "holesBypassed": "Übersprungene Löcher"
   },
   "achievements": {
     "title": "Erfolge"

@@ -435,7 +435,9 @@
     "dailyRuns": "Partidas diarias",
     "contractRuns": "Partidas por contrato",
     "deepClears": "Limpiezas profundas",
-    "elites": "Élites abatidas"
+    "elites": "Élites abatidas",
+    "wormholeRides": "Atracciones de agujeros de gusano",
+    "holesBypassed": "Agujeros omitidos"
   },
   "achievements": {
     "title": "Logros"

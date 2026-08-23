@@ -3882,6 +3882,16 @@
       "2": "Nur damit das klar ist: Ich wäre dir so oder so gefolgt.",
       "3": "Die Flut hält nicht drei nach dieser Linie an. Nichts hält dort an.",
       "4": "Es zu beenden, war die Antwort. Du wolltest die Frage."
+    },
+    "wormhole": {
+      "1": "Die Zelle ist weg. Nicht zerstört – sondern entfernt.",
+      "2": "Der Rand wirkt wie eine Tür, die sich zu jedem beliebigen Raum hin öffnet.",
+      "3": "Ich kann den Weg drum herum aufzeichnen. Den Weg hindurch kann ich nicht aufzeichnen.",
+      "4": "Was auch immer sich dahinter befindet, es ist nicht auf meiner Karte verzeichnet.",
+      "5": "Wir sind irgendwo angekommen. Ich versuche gerade herauszufinden, wo.",
+      "6": "Die Messgeräte stimmen in nichts überein. Auch das sind Daten.",
+      "7": "Die Entfernung ist seit etwa einer Minute kein Versprechen mehr.",
+      "8": "Trage es als Sprung ein. Der Eintrag wird dann nicht der Wahrheit entsprechen."
     }
   },
   "mutators": {

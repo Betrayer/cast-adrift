@@ -21,6 +21,7 @@ const MARKER: Record<JournalEntry["k"], string> = {
   beacon: "✦",
   memory: "◈",
   axis: "±",
+  wormhole: "◉",
 };
 
 const SILENT_TELEGRAPH_AT = 3;
@@ -76,6 +77,11 @@ const EntryRow = ({ entry }: { entry: JournalEntry }) => {
         return t(`run:journal.axis.${entry.source}`, {
           from: entry.from,
           to: entry.to,
+        });
+      case "wormhole":
+        return t(`run:journal.wormhole.${entry.branch}`, {
+          rows: Math.abs(entry.rows),
+          way: t(`run:journal.wormholeWay.${entry.direction}`),
         });
     }
   })();

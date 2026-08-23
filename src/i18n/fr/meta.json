@@ -435,7 +435,9 @@
     "dailyRuns": "Parties quotidiennes",
     "contractRuns": "Parties sous contrat",
     "deepClears": "Nettoyages profonds",
-    "elites": "Élites abattues"
+    "elites": "Élites abattues",
+    "wormholeRides": "Manèges « Wormhole »",
+    "holesBypassed": "Trous contournés"
   },
   "achievements": {
     "title": "Succès"

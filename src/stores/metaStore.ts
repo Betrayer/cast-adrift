@@ -37,6 +37,8 @@ export interface MetaStats {
   deepClears: number;
   noDeathStreak: number;
   bestNoDeathStreak: number;
+  wormholeRides: number;
+  holesBypassed: number;
 }
 
 export interface EncounterRecord {
@@ -156,7 +158,7 @@ export interface MetaState extends MetaValues {
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 12;
+export const META_VERSION = 13;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -192,6 +194,8 @@ export const createInitialMetaStats = (): MetaStats => ({
   deepClears: 0,
   noDeathStreak: 0,
   bestNoDeathStreak: 0,
+  wormholeRides: 0,
+  holesBypassed: 0,
 });
 
 const LIFETIME_KEYS = [
@@ -208,6 +212,8 @@ const LIFETIME_KEYS = [
   "t5Solved",
   "beacons",
   "deepClears",
+  "wormholeRides",
+  "holesBypassed",
 ] as const;
 
 export const META_PERSIST_KEY = 'meta';

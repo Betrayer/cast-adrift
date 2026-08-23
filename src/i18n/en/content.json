@@ -3882,6 +3882,16 @@
       "2": "For the record: I would have followed you either way.",
       "3": "The tide does not stop at three past this line. Nothing does.",
       "4": "Ending it was the answer. You wanted the question."
+    },
+    "wormhole": {
+      "1": "Cell gone. Not destroyed — subtracted.",
+      "2": "The rim reads as a door that opens onto whichever room it likes.",
+      "3": "I can chart the way around. I cannot chart the way through.",
+      "4": "Whatever is on the far side of that, it is not on my map.",
+      "5": "We came out somewhere. I am working on where.",
+      "6": "The instruments agree on nothing. That is data too.",
+      "7": "Distance stopped being a promise about a minute ago.",
+      "8": "Log it as a jump. The log will be lying."
     }
   },
   "mutators": {

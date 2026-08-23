@@ -435,7 +435,9 @@
     "dailyRuns": "Щоденні забіги",
     "contractRuns": "Контрактні забіги",
     "deepClears": "Глибокі зачистки",
-    "elites": "Еліт повалено"
+    "elites": "Еліт повалено",
+    "wormholeRides": "Кидки крізь червоточини",
+    "holesBypassed": "Обходів дір"
   },
   "achievements": {
     "title": "Досягнення"

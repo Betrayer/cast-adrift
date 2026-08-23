@@ -36,7 +36,66 @@ const openCheck = async (fresh: Screens, step: number): Promise<void> => {
   await fresh.waitForStableAnchors();
 };
 
+
+interface SeatedHole {
+  seed: number;
+  sector: number;
+  record: { from: string; hole: string; bypass: string };
+}
+
+const seatHole = async (app: Screens): Promise<SeatedHole> => {
+  const found = await app.page.evaluate(() => {
+    const api = window.caTest;
+    if (api === undefined) throw new Error('caTest is not mounted');
+    for (const sector of [4, 6, 2]) {
+      for (const seed of [1, 2, 3, 5, 7, 11, 13, 17]) {
+        api.seedRun({ seed, sector });
+        const record = api.holes()[0];
+        if (record !== undefined) return { seed, sector, record };
+      }
+    }
+    return null;
+  });
+  if (found === null) throw new Error('no seed in the probe range holds a hole');
+  await app.page.evaluate((cfg: SeatedHole) => {
+    window.caTest?.standAt(cfg.record.from);
+  }, found);
+  await app.expectScreen('map');
+  await app.page
+    .locator(`[data-node="${found.record.hole}"]`)
+    .scrollIntoViewIfNeeded();
+  return found;
+};
+
 test.describe('visual baselines', () => {
+  test('map with a black hole', async ({ app }) => {
+    const at = await seatHole(app);
+    await shot(app, 'map-black-hole.png');
+    expect(at.record.hole).not.toBe('');
+  });
+
+  test('wormhole choice card', async ({ app }) => {
+    const at = await seatHole(app);
+    await app.page.locator(`[data-node="${at.record.hole}"]`).click();
+    await app.testId('map-jump').click();
+    await expect(app.testId('wormhole-card')).toBeVisible();
+    await shot(app, 'wormhole-card.png');
+  });
+
+  test('map after a wormhole throw', async ({ app }) => {
+    const at = await seatHole(app);
+    await app.page.evaluate((holeId: string) => {
+      const api = window.caTest;
+      if (api === undefined) throw new Error('caTest is not mounted');
+      api.mockChaos({ ints: [3, 0], picks: [0] });
+      api.ride(holeId);
+      api.mockChaos(null);
+    }, at.record.hole);
+    await app.expectScreen('map');
+    await app.page.locator('[data-node-legal="1"]').first().scrollIntoViewIfNeeded();
+    await shot(app, 'wormhole-landing.png');
+  });
+
   test('systems check step 1', async ({ fresh }) => {
     await openCheck(fresh, 1);
     await fresh.selectDie('die-0');

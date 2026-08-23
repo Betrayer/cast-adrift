@@ -20,6 +20,7 @@ const route = (over: Partial<RouteState> = {}): RouteState => ({
   hullPct: 100,
   anomalyStreak: 0,
   scrap: 100,
+  wormholeRides: 0,
   ...over,
 });
 

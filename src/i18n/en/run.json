@@ -36,7 +36,8 @@
       "anomaly": "Anomaly",
       "beacon": "Beacon",
       "boss": "Boss",
-      "inverted": "inverted"
+      "inverted": "inverted",
+      "hole": "Black hole"
     },
     "previewNode": "{{type}} · risk: {{risk}}",
     "previewPocket": "Detour: better loot, tougher fight",
@@ -46,7 +47,8 @@
       "high": "high"
     },
     "hull": "Hull {{cur}}/{{max}}",
-    "scrap": "Scrap {{n}}"
+    "scrap": "Scrap {{n}}",
+    "previewHole": "Black hole: go around, or ride the wormhole"
   },
   "event": {
     "title": "Signal",
@@ -262,7 +264,9 @@
     "scrapSpent": "Scrap spent",
     "hullPctMin": "Lowest hull",
     "dicePlaced": "Dice placed",
-    "pct": "{{n}}%"
+    "pct": "{{n}}%",
+    "wormholeRides": "Wormhole rides",
+    "holesBypassed": "Holes bypassed"
   },
   "prologue": {
     "title": "Prologue",
@@ -380,7 +384,11 @@
     "pocket": "Detour pocket: raised risk, raised reward",
     "riftSplit": "Rift split: the branches only meet at the gate",
     "inversion": "Inverted row: systems resolve last to first",
-    "storm": "Probability storm: one placed die re-rolls at resolution"
+    "storm": "Probability storm: one placed die re-rolls at resolution",
+    "blackHoles": "Black hole: the cell is gone; its lane offers a wormhole",
+    "wormhole": "Wormhole edge: a choice waits at the rim",
+    "bypass": "Skirted the rim: hull scraped by the tide",
+    "holeScorch": "Hull too thin to pay the toll — the rim let you past"
   },
   "tag": {
     "red": "Red",
@@ -464,7 +472,15 @@
     "here": "You are in Sector {{n}}.",
     "chainsTitle": "Threads",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "here"
+    "chainHere": "here",
+    "wormhole": {
+      "ride": "Rode the wormhole {{way}}, {{rows}} rows out",
+      "bypass": "Went around the black hole"
+    },
+    "wormholeWay": {
+      "forward": "deeper",
+      "backward": "back"
+    }
   },
   "memory": {
     "kicker": "Echo remembers · fragment {{n}} of {{max}}",
@@ -527,5 +543,18 @@
     "swarm": "Many small dice instead of a few big ones.",
     "spike": "One enormous value instead of a steady stream.",
     "precision": "Tight, predictable faces and exact values."
+  },
+  "hole": {
+    "title": "Black hole",
+    "body": "The cell is gone. Its rim will either let you around, or take you somewhere it picks.",
+    "gentle": "Stable wormhole",
+    "gentleWhy": "The first two rides of a run are short and always go deeper.",
+    "bypass": "Go around",
+    "bypassCost": "Bypass: −{{n}} hull",
+    "bypassFree": "Bypass: free — the hull cannot pay",
+    "ride": "Ride it",
+    "rideCost": "Ride: a throw of {{min}}–{{max}}, direction unknown",
+    "rideGentle": "Ride: a throw of {{min}}–{{max}}, deeper only",
+    "landed": "Thrown {{rows}} rows {{way}}"
   }
 }

@@ -1,11 +1,13 @@
 import { sectorDef } from "../../src/data/sectors";
 import {
+  edgeKey,
   edgeMarkFor,
   outgoingEdges,
   type MapGraph,
   type MapNode,
   type NodeType,
 } from "../../src/game/map/types";
+import { isGentleRide } from "../../src/game/map/wormhole";
 import {
   INTERFERENCE_STREAK_THRESHOLD,
   interferenceStacksForStreak,
@@ -38,6 +40,10 @@ export const UNSTABLE_PENALTY = 0.6;
 export const INVERTED_PENALTY = 0.8;
 export const STORM_PENALTY = 0.8;
 export const ANOMALY_STREAK_PULL = 1.2;
+export const HOLE_PENALTY = 0.5;
+export const HOLE_PULL = 0.3;
+export const HOLE_GENTLE_PULL = 1.2;
+export const RIDE_HULL_FLOOR_PCT = 25;
 export const POCKET_BONUS = 0.35;
 export const FIGHT_TYPES: ReadonlySet<NodeType> = new Set([
   "battle",
@@ -51,6 +57,7 @@ export interface RouteState {
   hullPct: number;
   anomalyStreak: number;
   scrap: number;
+  wormholeRides: number;
 }
 
 const causalityPenalty = (node: MapNode): number =>
@@ -73,6 +80,27 @@ export const anomalyPull = (state: RouteState): number =>
     ? ANOMALY_STREAK_PULL * (1 + interferenceStacksForStreak(state.anomalyStreak + 1))
     : 0;
 
+export const holeStandIn = (
+  map: MapGraph,
+  byId: ReadonlyMap<string, MapNode>,
+  from: string,
+  node: MapNode,
+): MapNode | undefined => {
+  const record = map.wormholes[edgeKey(from, node.id)];
+  return record === undefined ? undefined : byId.get(record.bypass);
+};
+
+export const holeBias = (state: RouteState): number => {
+  if (isGentleRide(state.wormholeRides)) return -HOLE_GENTLE_PULL;
+  return state.hullPct >= RIDE_HULL_FLOOR_PCT ? -HOLE_PULL : HOLE_PENALTY;
+};
+
+export const ridesWormhole = (state: RouteState, roll: number): boolean => {
+  if (isGentleRide(state.wormholeRides)) return true;
+  if (state.hullPct < RIDE_HULL_FLOOR_PCT) return false;
+  return roll < state.hullPct / 100;
+};
+
 export const stepCost = (
   map: MapGraph,
   byId: ReadonlyMap<string, MapNode>,
@@ -80,6 +108,12 @@ export const stepCost = (
   node: MapNode,
   state: RouteState,
 ): number => {
+  if (node.hole === true) {
+    const standIn = holeStandIn(map, byId, from, node);
+    return standIn === undefined
+      ? PATH_PRIORITY.length
+      : stepCost(map, byId, from, standIn, state) + holeBias(state);
+  }
   const payoff = node.pocket === true ? pocketPayoff(map, byId, node) : node.type;
   const base = priorityOf(payoff);
   const blessing =
@@ -129,7 +163,9 @@ export const fightsUntilRest = (
   let row = posRow;
   let fights = 0;
   for (let guard = 0; guard < 40; guard += 1) {
-    const next = greedyNext(map, byId, cur, row, state);
+    const step = greedyNext(map, byId, cur, row, state);
+    const next =
+      step?.hole === true ? holeStandIn(map, byId, cur, step) : step;
     if (next === undefined || next.type === "shipyard") break;
     if (FIGHT_TYPES.has(next.type)) fights += 1;
     if (next.type === "boss") break;

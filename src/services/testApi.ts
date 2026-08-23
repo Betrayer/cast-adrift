@@ -8,14 +8,39 @@ import {
   type TurnForecast,
 } from "@/game/battle/view";
 import { ALL_COACH_MARK_IDS, HINT_IDS, nextCoachMark } from "@/game/tutorial";
-import type { NodeId } from "@/game/map/types";
+import {
+  edgeKey,
+  nodeById,
+  type NodeId,
+} from "@/game/map/types";
+import {
+  budgetCapFor,
+  isGentleRide,
+  landingCandidates,
+  type ThrowDirection,
+  type WormholeThrow,
+} from "@/game/map/wormhole";
+import { holeTollFor } from "@/game/run/motifs";
+import {
+  chaosMocked,
+  scriptedChaos,
+  setChaosSource,
+  type ChaosScript,
+} from "@/services/chaos";
 import { lastClaimOutcome } from "@/services/account";
 import { trackedEvents } from "@/services/analytics";
 import { readClaim } from "@/services/account-link";
 import i18n from "i18next";
 import { captainName } from "@/game/run/boards";
 import { dieCardModel, evLabel } from "@/game/dice/card";
-import { discardActiveRun, jumpTo, startRunMode } from "@/game/run/flow";
+import {
+  advanceSector,
+  discardActiveRun,
+  jumpTo,
+  openWormhole,
+  rideWormhole,
+  startRunMode,
+} from "@/game/run/flow";
 import { isoWeekKey } from "@/game/run/modes";
 import { totalXpForLevel } from "@/game/xp";
 import { DRIFT_ALLTIME_BOARD, submit, top } from "@/services/leaderboards";
@@ -57,6 +82,7 @@ export interface SeedRunConfig {
   deck?: readonly string[];
   land?: "interstitial" | "map";
   node?: NodeId;
+  sector?: number;
 }
 
 export interface MetaPatch {
@@ -85,6 +111,8 @@ export interface RunPatch {
   perks?: readonly string[];
   modules?: readonly string[];
   flags?: readonly string[];
+  visited?: readonly NodeId[];
+  wormholeRides?: number;
 }
 
 export interface BattlePatch {
@@ -131,8 +159,29 @@ export interface MapNodeView {
   id: NodeId;
   type: string;
   row: number;
+  lane: number;
   visited: boolean;
   reachable: boolean;
+  hole: boolean;
+  wormhole: boolean;
+  bypass: NodeId | null;
+}
+
+export interface WormholeEdgeView {
+  from: NodeId;
+  hole: NodeId;
+  bypass: NodeId;
+}
+
+export interface WormholeView {
+  pending: NodeId | null;
+  rides: number;
+  bypassed: number;
+  gentle: boolean;
+  budgetCap: number;
+  toll: number;
+  mocked: boolean;
+  last: WormholeThrow | null;
 }
 
 export interface DieView {
@@ -248,6 +297,12 @@ export interface TestApi {
   grantRun: (patch: RunPatch) => void;
   setBattle: (patch: BattlePatch) => void;
   skipToNode: (nodeId: NodeId) => boolean;
+  standAt: (nodeId: NodeId) => boolean;
+  holes: () => WormholeEdgeView[];
+  landings: (budget: number, direction: ThrowDirection) => NodeId[];
+  ride: (holeId: NodeId) => WormholeThrow | null;
+  wormhole: () => WormholeView;
+  mockChaos: (script: ChaosScript | null) => void;
   settings: (patch: Partial<SettingsValues>) => void;
   layout: (id: BattleLayoutId) => void;
   forecast: () => TurnForecast | null;
@@ -336,6 +391,14 @@ const applyRun = (patch: RunPatch): void => {
   for (const id of patch.perks ?? []) run.addPerk(id);
   for (const id of patch.modules ?? []) run.addModule(id);
   for (const key of patch.flags ?? []) run.setFlag(key);
+  if (patch.visited !== undefined) {
+    useRunStore.setState({ visited: [...patch.visited] });
+  }
+  if (patch.wormholeRides !== undefined) {
+    useRunStore.setState((s) => ({
+      stats: { ...s.stats, wormholeRides: patch.wormholeRides ?? 0 },
+    }));
+  }
 };
 
 const applySettings = (patch: Partial<SettingsValues>): void => {
@@ -504,6 +567,9 @@ export const createTestApi = (): TestApi => ({
       dailyDate: config.dailyDate ?? null,
       ...(config.mutators === undefined ? {} : { mutators: config.mutators }),
     });
+    for (let index = 1; index < (config.sector ?? 1); index += 1) {
+      advanceSector();
+    }
     if (config.node !== undefined) {
       useAppStore.getState().go("map");
       jumpTo(config.node);
@@ -600,13 +666,77 @@ export const createTestApi = (): TestApi => ({
         .filter(([a]) => a === run.position)
         .map(([, b]) => b),
     );
-    return map.nodes.map((node) => ({
-      id: node.id,
-      type: node.type,
-      row: node.row,
-      visited: run.visited.includes(node.id),
-      reachable: outgoing.has(node.id) && !run.visited.includes(node.id),
-    }));
+    return map.nodes.map((node) => {
+      const record =
+        run.position === null
+          ? undefined
+          : map.wormholes[edgeKey(run.position, node.id)];
+      return {
+        id: node.id,
+        type: node.type,
+        row: node.row,
+        lane: node.lane,
+        visited: run.visited.includes(node.id),
+        reachable: outgoing.has(node.id) && !run.visited.includes(node.id),
+        hole: node.hole === true,
+        wormhole: record !== undefined,
+        bypass: record?.bypass ?? null,
+      };
+    });
+  },
+
+  standAt: (nodeId) => {
+    const run = useRunStore.getState();
+    const node = run.map === null ? undefined : nodeById(run.map).get(nodeId);
+    if (node === undefined) return false;
+    useRunStore.setState({
+      position: nodeId,
+      depthRow: node.row,
+      pendingWormhole: null,
+    });
+    useAppStore.getState().go("map");
+    return true;
+  },
+
+  holes: () => {
+    const map = useRunStore.getState().map;
+    if (map === null) return [];
+    return Object.values(map.wormholes).map((record) => ({ ...record }));
+  },
+
+  landings: (budget, direction) => {
+    const run = useRunStore.getState();
+    if (run.map === null || run.position === null) return [];
+    return landingCandidates(
+      run.map,
+      run.position,
+      run.visited,
+      budget,
+      direction,
+    ).map((node) => node.id);
+  },
+
+  ride: (holeId) => {
+    openWormhole(holeId);
+    return rideWormhole(holeId, false);
+  },
+
+  wormhole: () => {
+    const run = useRunStore.getState();
+    return {
+      pending: run.pendingWormhole,
+      rides: run.stats.wormholeRides,
+      bypassed: run.stats.holesBypassed,
+      gentle: isGentleRide(run.stats.wormholeRides),
+      budgetCap: budgetCapFor(run.stats.wormholeRides),
+      toll: holeTollFor(run.sector, run.hull),
+      mocked: chaosMocked(),
+      last: run.lastWormhole === null ? null : { ...run.lastWormhole },
+    };
+  },
+
+  mockChaos: (script) => {
+    setChaosSource(script === null ? null : scriptedChaos(script));
   },
 
   slotsFor: (uid) => legalTargets(useBattleStore.getState(), uid).slots,

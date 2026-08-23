@@ -132,7 +132,14 @@ describe("coach mark gating", () => {
     placement({});
     expect(nextCoachMark("map", [])).toBeNull();
     useRunStore.setState({
-      map: { nodes: [], edges: [], shape: DEFAULT_SHAPE, edgeMarks: {} },
+      map: {
+        nodes: [],
+        edges: [],
+        shape: DEFAULT_SHAPE,
+        edgeMarks: {},
+        wormholes: {},
+        bossReach: [],
+      },
     });
     expect(nextCoachMark("map", [])?.id).toBe("jump");
     expect(nextCoachMark("battle", [])?.id).toBe("place");

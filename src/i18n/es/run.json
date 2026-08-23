@@ -36,7 +36,8 @@
       "anomaly": "Anomalía",
       "beacon": "Baliza",
       "boss": "Jefe",
-      "inverted": "invertido"
+      "inverted": "invertido",
+      "hole": "Agujero negro"
     },
     "previewNode": "{{type}} · riesgo: {{risk}}",
     "previewPocket": "Desvío: mejor botín, combate más duro",
@@ -46,7 +47,8 @@
       "high": "alto"
     },
     "hull": "Casco {{cur}}/{{max}}",
-    "scrap": "Chatarra {{n}}"
+    "scrap": "Chatarra {{n}}",
+    "previewHole": "Agujero negro: rodearlo o atravesar el agujero de gusano"
   },
   "event": {
     "title": "Señal",
@@ -262,7 +264,9 @@
     "scrapSpent": "Chatarra gastada",
     "hullPctMin": "Casco más bajo",
     "dicePlaced": "Dados colocados",
-    "pct": "{{n}}%"
+    "pct": "{{n}}%",
+    "wormholeRides": "Atracciones de agujeros de gusano",
+    "holesBypassed": "Agujeros omitidos"
   },
   "prologue": {
     "title": "Prólogo",
@@ -380,7 +384,11 @@
     "pocket": "El «buco»: mayor riesgo, mayor recompensa",
     "riftSplit": "La división de la grieta: las ramas solo se unen en la puerta",
     "inversion": "Remada invertida: los sistemas se resuelven de último a primero",
-    "storm": "Tormenta de probabilidad: se vuelve a lanzar un dado colocado en su posición durante la resolución"
+    "storm": "Tormenta de probabilidad: se vuelve a lanzar un dado colocado en su posición durante la resolución",
+    "blackHoles": "Agujero negro: la célula ha desaparecido; su trayectoria ofrece un agujero de gusano",
+    "wormhole": "El borde del agujero de gusano: una decisión nos espera en el límite",
+    "bypass": "Rozó el borde: la marea rozó el casco",
+    "holeScorch": "Casco demasiado delgado para pagar el peaje: la llanta te dejó pasar"
   },
   "tag": {
     "red": "Rojo",
@@ -464,7 +472,15 @@
     "here": "Te encuentras en el sector «{{n}}».",
     "chainsTitle": "Hilos",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "aquí"
+    "chainHere": "aquí",
+    "wormhole": {
+      "ride": "He recorrido el agujero de gusano {{way}}, {{rows}} se aleja",
+      "bypass": "Di la vuelta al agujero negro"
+    },
+    "wormholeWay": {
+      "forward": "más profundo",
+      "backward": "atrás"
+    }
   },
   "memory": {
     "kicker": "Echo recuerda · fragmento {{n}} de {{max}}",
@@ -527,5 +543,18 @@
     "swarm": "Muchos dados pequeños en vez de unos pocos grandes.",
     "spike": "Un valor enorme en vez de un flujo constante.",
     "precision": "Caras estrechas y predecibles y valores exactos."
+  },
+  "hole": {
+    "title": "Agujero negro",
+    "body": "La celda ha desaparecido. Su borde o bien te dejará pasar, o bien te llevará a donde ella elija.",
+    "gentle": "Agujero de gusano estable",
+    "gentleWhy": "Los dos primeros tramos de un recorrido son cortos y siempre se adentran más en el terreno.",
+    "bypass": "Dar una vuelta",
+    "bypassCost": "Derivación: casco «{{n}}»",
+    "bypassFree": "Exención: gratuita — el buque no puede pagar",
+    "ride": "¡A por ello!",
+    "rideCost": "Recorrido: un trayecto de {{min}} –{{max}}, dirección desconocida",
+    "rideGentle": "Ride: una variación de «{{min}}» – «{{max}}», pero más profunda",
+    "landed": "Lanzado {{rows}} filas {{way}}"
   }
 }

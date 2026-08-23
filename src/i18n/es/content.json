@@ -3882,6 +3882,16 @@
       "2": "Que conste: te habría seguido de todas formas.",
       "3": "La marea no se detiene tres minutos después de pasar esta línea. Nada lo hace.",
       "4": "La solución era ponerle fin. Tú querías la pregunta."
+    },
+    "wormhole": {
+      "1": "La célula ha desaparecido. No se ha destruido, sino que se ha restado.",
+      "2": "El borde parece una puerta que se abre hacia cualquier habitación que se le antoje.",
+      "3": "Puedo trazar el camino que rodea el obstáculo. No puedo trazar el camino que lo atraviesa.",
+      "4": "Sea lo que sea lo que haya al otro lado de eso, no aparece en mi mapa.",
+      "5": "Hemos salido por algún sitio. Estoy intentando averiguar por dónde.",
+      "6": "Los instrumentos no coinciden en nada. Eso también son datos.",
+      "7": "La distancia dejó de ser una promesa hace aproximadamente un minuto.",
+      "8": "Regístralo como un salto. El registro será falso."
     }
   },
   "mutators": {

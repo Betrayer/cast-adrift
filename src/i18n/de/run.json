@@ -36,7 +36,8 @@
       "anomaly": "Anomalie",
       "beacon": "Bake",
       "boss": "Chef",
-      "inverted": "umgekehrt"
+      "inverted": "umgekehrt",
+      "hole": "Schwarzes Loch"
     },
     "previewNode": "{{type}} · Risiko: {{risk}}",
     "previewPocket": "Umweg: bessere Beute, härterer Kampf",
@@ -46,7 +47,8 @@
       "high": "hoch"
     },
     "hull": "Hülle {{cur}}/{{max}}",
-    "scrap": "Schrott {{n}}"
+    "scrap": "Schrott {{n}}",
+    "previewHole": "Schwarzes Loch: Umfliegen oder durch das Wurmloch fahren"
   },
   "event": {
     "title": "Signal",
@@ -262,7 +264,9 @@
     "scrapSpent": "Schrott ausgegeben",
     "hullPctMin": "Niedrigste Hülle",
     "dicePlaced": "Würfel gesetzt",
-    "pct": "{{n}}%"
+    "pct": "{{n}}%",
+    "wormholeRides": "Wurmloch-Fahrten",
+    "holesBypassed": "Übersprungene Löcher"
   },
   "prologue": {
     "title": "Prolog",
@@ -380,7 +384,11 @@
     "pocket": "Umweg-Tasche: höheres Risiko, höherer Gewinn",
     "riftSplit": "Spaltung: Die Zweige treffen sich erst am Tor",
     "inversion": "Inverted Row: Systeme werden von hinten nach vorne abgearbeitet",
-    "storm": "Wahrscheinlichkeitssturm: Ein platzierter Würfel wird bei der Auswertung erneut gewürfelt"
+    "storm": "Wahrscheinlichkeitssturm: Ein platzierter Würfel wird bei der Auswertung erneut gewürfelt",
+    "blackHoles": "Schwarzes Loch: Die Zelle ist verschwunden; ihre Bahn bildet ein Wurmloch",
+    "wormhole": "Rand des Wurmlochs: Am Rand wartet eine Entscheidung",
+    "bypass": "Den Rand gestreift: Der Rumpf wurde von der Flut gestreift",
+    "holeScorch": "Hülle zu dünn, um die Maut zu bezahlen – der Felgenrand ließ dich durch"
   },
   "tag": {
     "red": "Rot",
@@ -464,7 +472,15 @@
     "here": "Sie befinden sich im Sektor „{{n}}“.",
     "chainsTitle": "Themen",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "hier"
+    "chainHere": "hier",
+    "wormhole": {
+      "ride": "„Rode the Wormhole“ {{way}}, „{{rows}}“ erscheint",
+      "bypass": "Um das Schwarze Loch herumgeflogen"
+    },
+    "wormholeWay": {
+      "forward": "tiefer",
+      "backward": "zurück"
+    }
   },
   "memory": {
     "kicker": "Echo erinnert sich · Auszug {{n}} von {{max}}",
@@ -527,5 +543,18 @@
     "swarm": "Viele kleine Würfel statt weniger großer.",
     "spike": "Ein enormer Wert statt eines steten Stroms.",
     "precision": "Enge, vorhersehbare Seiten und exakte Werte."
+  },
+  "hole": {
+    "title": "Schwarzes Loch",
+    "body": "Die Zelle ist verschwunden. Ihr Rand lässt dich entweder vorbeigehen oder bringt dich an einen Ort, den er selbst bestimmt.",
+    "gentle": "Stabiles Wurmloch",
+    "gentleWhy": "Die ersten beiden Abfahrten einer Abfahrtsserie sind kurz und führen immer tiefer hinab.",
+    "bypass": "Umgehen",
+    "bypassCost": "Bypass: −Rumpf vom Typ „{{n}}“",
+    "bypassFree": "Umgehung: kostenlos – der Rumpf kann nicht bezahlen",
+    "ride": "Probier’s aus!",
+    "rideCost": "Fahrt: ein Abstecher von „{{min}}“ nach „{{max}}“, Richtung unbekannt",
+    "rideGentle": "Ride: Ein Mix aus „{{min}}“ und „{{max}}“, nur noch intensiver",
+    "landed": "Ausgelöst{{rows}}-Zeilen {{way}}"
   }
 }

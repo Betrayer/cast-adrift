@@ -1,0 +1,70 @@
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px 16px;
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.glyph {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 2px dashed var(--ca-school-black-text);
+  background:
+    radial-gradient(
+      circle at center,
+      var(--ca-bg) 0 34%,
+      var(--ca-school-black-fill) 35% 100%
+    );
+  animation: holeSpin 4.5s linear infinite;
+}
+
+@keyframes holeSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.gentle {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid var(--ca-school-blue-stroke);
+  background: var(--ca-school-blue-fill);
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+@media (min-width: 480px) {
+  .options {
+    flex-direction: row;
+  }
+
+  .option {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+:root[data-ca-motion='reduced'] .glyph {
+  animation: none;
+}

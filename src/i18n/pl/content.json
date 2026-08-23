@@ -3882,6 +3882,16 @@
       "2": "Żeby było jasne: i tak bym za tobą poszedł.",
       "3": "Fala nie zatrzymuje się trzy minuty po przekroczeniu tej linii. Nic się nie zatrzymuje.",
       "4": "Rozwiązaniem było zakończenie tego. Ty chciałeś zadać pytanie."
+    },
+    "wormhole": {
+      "1": "Komórka zniknęła. Nie została zniszczona — została odjęta.",
+      "2": "Obręcz sprawia wrażenie drzwi, które otwierają się do dowolnego pomieszczenia.",
+      "3": "Potrafię wytyczyć trasę dookoła. Nie potrafię jednak wytyczyć trasy przez to.",
+      "4": "Cokolwiek się tam za tym kryje, nie ma tego na mojej mapie.",
+      "5": "Wyszliśmy gdzieś. Próbuję ustalić, gdzie dokładnie.",
+      "6": "Wyniki pomiarów w ogóle się nie pokrywają. To też są dane.",
+      "7": "Odległość przestała być obietnicą mniej więcej minutę temu.",
+      "8": "Zapisz to jako skok. W dzienniku pojawi się nieprawdziwa informacja."
     }
   },
   "mutators": {

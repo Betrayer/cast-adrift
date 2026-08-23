@@ -435,7 +435,9 @@
     "dailyRuns": "Daily runs",
     "contractRuns": "Contract runs",
     "deepClears": "Deep clears",
-    "elites": "Elites felled"
+    "elites": "Elites felled",
+    "wormholeRides": "Wormhole rides",
+    "holesBypassed": "Holes bypassed"
   },
   "achievements": {
     "title": "Achievements"

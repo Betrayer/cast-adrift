@@ -14,10 +14,14 @@ import {
   FIGHT_TYPES,
   fightsUntilRest,
   greedyNext,
+  ridesWormhole,
   type RouteState,
 } from "./simPolicy/map";
+import { bypassTargetFor, rollThrow } from "../src/game/map/wormhole";
+import { holeTollFor } from "../src/game/run/motifs";
 import {
   applyEdgeMotifs,
+  applyEffectsToState,
   applyNodeMotifs,
   createRunState,
   emptyPuzzleTally,
@@ -64,7 +68,7 @@ import {
   generateSectorMap,
   START_NODE_ID,
 } from "../src/game/map/generator";
-import { nodeById, type MapGraph } from "../src/game/map/types";
+import { nodeById, type MapGraph, type MapNode } from "../src/game/map/types";
 import {
   depthFor,
   DRIFT_LOOP_HP_PCT,
@@ -108,6 +112,7 @@ import {
   createStream,
   createStreams,
   deriveSeed,
+  type RngStream,
 } from "../src/services/rng";
 import type { BattleSnapshot, SlotId } from "../src/types/battle";
 import type { EventDef, EventOption } from "../src/types/events";
@@ -371,6 +376,7 @@ interface WalkOptions {
   rollModules: boolean;
   guard: number;
   noDraft?: boolean;
+  wormholes?: WormholeTally;
 }
 
 interface WalkResult {
@@ -380,8 +386,66 @@ interface WalkResult {
   hullEntering: number[];
 }
 
+const resolveWormhole = (
+  state: RunState,
+  sector: number,
+  map: MapGraph,
+  byId: ReadonlyMap<string, MapNode>,
+  from: string,
+  hole: MapNode,
+  visited: readonly string[],
+  route: RouteState,
+  stream: RngStream,
+  tally: WormholeTally,
+  tideCap: number,
+): MapNode | undefined => {
+  const rides = tally.rides;
+  if (ridesWormhole(route, stream.next())) {
+    const roll = rollThrow(
+      { map, from, hole: hole.id, visited, rides },
+      stream,
+    );
+    const landing = roll.landing === null ? undefined : byId.get(roll.landing);
+    if (landing !== undefined) {
+      tally.rides += 1;
+      tally.rowsMoved += Math.abs(roll.rows);
+      if (roll.rows < 0) tally.backward += 1;
+      if (roll.fallback !== "none") tally.fallbacks += 1;
+      return landing;
+    }
+  }
+  const target = bypassTargetFor(map, from, hole.id, visited);
+  const node = target === null ? undefined : byId.get(target);
+  if (node === undefined) return undefined;
+  const toll = holeTollFor(sector, state.hull);
+  if (toll > 0) {
+    applyEffectsToState(state, [{ k: "hull", n: -toll }], tideCap);
+    tally.tollPaid += toll;
+  }
+  tally.bypasses += 1;
+  return node;
+};
+
 const nsKey = (ns: string, prefix: string, id: string): string =>
   ns === "" ? `${prefix}:${id}` : `${prefix}:${ns}:${id}`;
+
+export interface WormholeTally {
+  rides: number;
+  bypasses: number;
+  backward: number;
+  fallbacks: number;
+  rowsMoved: number;
+  tollPaid: number;
+}
+
+export const emptyWormholeTally = (): WormholeTally => ({
+  rides: 0,
+  bypasses: 0,
+  backward: 0,
+  fallbacks: 0,
+  rowsMoved: 0,
+  tollPaid: 0,
+});
 
 const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
   const { seed, sector, ns } = opts;
@@ -393,6 +457,9 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
   const bossId = bossNodeIdFor(sector);
   const byId = nodeById(map);
   const hullEntering: number[] = [];
+  const visited: string[] = [START_NODE_ID];
+  const chaosStream = createStream(deriveSeed(seed, `chaos:${ns}:${String(sector)}`));
+  const tally = opts.wormholes ?? emptyWormholeTally();
   let position = START_NODE_ID;
   let posRow = 0;
 
@@ -400,6 +467,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
     hullPct: (state.hull / Math.max(1, state.hullMax)) * 100,
     anomalyStreak: state.anomalyStreak,
     scrap: state.scrap,
+    wormholeRides: tally.rides,
   });
 
   const stop = (cleared: boolean, deathRow: number): WalkResult => ({
@@ -411,11 +479,31 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
 
   for (let guard = 0; guard < opts.guard; guard += 1) {
     if (position === bossId) break;
-    const next = greedyNext(map, byId, position, posRow, route());
-    if (next === undefined) break;
-    applyEdgeMotifs(state, sector, map, position, next.id, opts.tideCap);
+    const step = greedyNext(map, byId, position, posRow, route());
+    if (step === undefined) break;
+    let next = step;
+    if (step.hole === true) {
+      const resolved = resolveWormhole(
+        state,
+        sector,
+        map,
+        byId,
+        position,
+        step,
+        visited,
+        route(),
+        chaosStream,
+        tally,
+        opts.tideCap,
+      );
+      if (resolved === undefined) break;
+      next = resolved;
+    } else {
+      applyEdgeMotifs(state, sector, map, position, next.id, opts.tideCap);
+    }
     position = next.id;
     posRow = next.row;
+    visited.push(next.id);
     if (next.pocket === true) state.pockets += 1;
     applyNodeMotifs(state, sector, next, opts.tideCap);
     state.jumpsSinceTide += 1;
@@ -1082,6 +1170,7 @@ interface SweepOptions {
   forcedPerk?: string;
   noDraft?: boolean;
   perks?: readonly string[];
+  chartPicks?: readonly string[];
   deckExtra?: readonly string[];
   mkLevels?: MkLevels;
 }
@@ -1102,6 +1191,7 @@ const sweepState = (opts: SweepOptions): RunState => {
     mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
     perks: carried,
     modules: [...opts.archetype.modules],
+    chartPicks: [...(opts.chartPicks ?? [])],
   });
 };
 
@@ -1231,6 +1321,136 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
   writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (cliffs > 0 || rises > 0) process.exitCode = 1;
+};
+
+interface LadderCell {
+  label: string;
+  winrate: number;
+  avgNodes: number;
+  avgFights: number;
+  avgKills: number;
+  hullMedian: number;
+  resonancePct: number;
+  deathRows: Map<number, number>;
+  deathsAtGate: number;
+  deathsAtBoss: number;
+}
+
+const ladderCell = (
+  label: string,
+  runs: number,
+  seed: number,
+  sector: number,
+  build: Pick<SweepOptions, "perks" | "chartPicks">,
+): LadderCell => {
+  const shape = SECTORS.find((def) => def.id === sector)?.shape;
+  const results: SectorResult[] = [];
+  for (const archetype of ARCHETYPES) {
+    if (archetype.name === "black-edge") continue;
+    for (let i = 0; i < runs; i += 1) {
+      results.push(
+        runSweepSector(
+          deriveSeed(
+            seed,
+            `sweep:${String(sector)}:${archetype.name}:${String(i)}`,
+          ),
+          { sector, ascension: 0, archetype, ...build },
+        ),
+      );
+    }
+  }
+  const n = Math.max(1, results.length);
+  const avg = (f: (r: SectorResult) => number): number =>
+    results.reduce((sum, r) => sum + f(r), 0) / n;
+  const deathRows = new Map<number, number>();
+  let deathsAtGate = 0;
+  let deathsAtBoss = 0;
+  for (const r of results) {
+    if (r.win || r.deathRow < 0) continue;
+    deathRows.set(r.deathRow, (deathRows.get(r.deathRow) ?? 0) + 1);
+    if (r.deathRow === shape?.gateRow) deathsAtGate += 1;
+    if (r.deathRow === shape?.bossRow) deathsAtBoss += 1;
+  }
+  return {
+    label,
+    winrate: results.filter((r) => r.win).length / n,
+    avgNodes: avg((r) => r.nodes),
+    avgFights: avg((r) => r.fights),
+    avgKills: avg((r) => r.kills),
+    hullMedian: avg((r) => r.hullMedian),
+    resonancePct: (results.filter((r) => r.resonanceSet).length / n) * 100,
+    deathRows,
+    deathsAtGate,
+    deathsAtBoss,
+  };
+};
+
+const printLadderCell = (cell: LadderCell): void => {
+  const hist = [...cell.deathRows.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([row, count]) => `r${String(row)}:${String(count)}`)
+    .join(" ");
+  console.log(
+    `    ${cell.label.padEnd(22)} winrate ${(cell.winrate * 100).toFixed(1).padStart(5)}% · nodes ${cell.avgNodes.toFixed(1)} · fights ${cell.avgFights.toFixed(1)} · kills ${cell.avgKills.toFixed(1)} · hull(med) ${cell.hullMedian.toFixed(1)} · set ${cell.resonancePct.toFixed(0)}%`,
+  );
+  console.log(
+    `      deaths gate ${String(cell.deathsAtGate)} · boss ${String(cell.deathsAtBoss)} · ${hist === "" ? "none" : hist}`,
+  );
+};
+
+const LADDER_PERK_SAMPLE: readonly string[] = ALL_PERKS.slice(0, 6).map(
+  (perk) => perk.id,
+);
+
+const ladderModeMain = (runs: number, seed: number, startedAt: number): void => {
+  console.log(
+    `sim ladder: the sweep ladder under a microscope — A0, red+blue, ${String(runs)} runs per deck per act`,
+  );
+  console.log(
+    "  the sweep build is fixed and cold: no chart picks, no perks, no accumulated deck.",
+  );
+  console.log(
+    "  each act is measured three ways to separate act scaling from build strength.",
+  );
+  const rows: string[] = ["sector,build,winrate,nodes,fights,kills,hullMedian"];
+  for (const sector of SECTORS.map((def) => def.id)) {
+    console.log(`  S${String(sector)}`);
+    const builds: readonly {
+      label: string;
+      build: Pick<SweepOptions, "perks" | "chartPicks">;
+    }[] = [
+      { label: "cold (the ladder)", build: {} },
+      { label: "+ chart picks", build: { chartPicks: MID_COLLECTION_PICKS } },
+      {
+        label: "+ picks + 6 perks",
+        build: {
+          chartPicks: MID_COLLECTION_PICKS,
+          perks: LADDER_PERK_SAMPLE,
+        },
+      },
+    ];
+    for (const entry of builds) {
+      const cell = ladderCell(entry.label, runs, seed, sector, entry.build);
+      printLadderCell(cell);
+      rows.push(
+        [
+          String(sector),
+          entry.label,
+          cell.winrate.toFixed(3),
+          cell.avgNodes.toFixed(2),
+          cell.avgFights.toFixed(2),
+          cell.avgKills.toFixed(2),
+          cell.hullMedian.toFixed(1),
+        ].join(","),
+      );
+    }
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `ladder-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
 };
 
 const DEAD_PERK_LINE = -8;
@@ -1581,6 +1801,7 @@ interface CampaignResult {
   draftSkips: number;
   draftRerolls: number;
   interference: number;
+  wormholes: WormholeTally;
 }
 
 const CAMPAIGN_SECTORS = 5;
@@ -1605,6 +1826,7 @@ const runCampaign = (
     deck: archetype.deck,
     chartPicks: MID_COLLECTION_PICKS,
   });
+  const wormholes = emptyWormholeTally();
   let cleared = 0;
   let deathSector = 0;
   let deathRow = -1;
@@ -1626,6 +1848,7 @@ const runCampaign = (
       stopRow: 0,
       rollModules: true,
       guard: 64,
+      wormholes,
     });
     if (!walk.cleared) {
       deathSector = sector;
@@ -1651,6 +1874,7 @@ const runCampaign = (
     draftSkips: state.draftSkips,
     draftRerolls: state.draftRerolls,
     interference: state.interference,
+    wormholes,
   };
 };
 
@@ -1843,6 +2067,40 @@ const campaignModeMain = (
   ).length;
   console.log(
     `    ${String(cliffs)} cliff(s) over ${String(MONOTONIC_GAP_PP)}pp · ${String(rises)} act(s) easier than the one before`,
+  );
+  const holes = a0Runs.reduce(
+    (into: WormholeTally, run: CampaignResult) => ({
+      rides: into.rides + run.wormholes.rides,
+      bypasses: into.bypasses + run.wormholes.bypasses,
+      backward: into.backward + run.wormholes.backward,
+      fallbacks: into.fallbacks + run.wormholes.fallbacks,
+      rowsMoved: into.rowsMoved + run.wormholes.rowsMoved,
+      tollPaid: into.tollPaid + run.wormholes.tollPaid,
+    }),
+    emptyWormholeTally(),
+  );
+  const holeRuns = Math.max(1, a0Runs.length);
+  const metRuns = a0Runs.filter(
+    (run) => run.wormholes.rides + run.wormholes.bypasses > 0,
+  ).length;
+  console.log("  black holes (A0, red+blue):");
+  console.log(
+    `    met in ${((metRuns / holeRuns) * 100).toFixed(1)}% of runs · ${(
+      (holes.rides + holes.bypasses) / holeRuns
+    ).toFixed(2)} encounters/run`,
+  );
+  console.log(
+    `    rides ${String(holes.rides)} (${
+      holes.rides === 0
+        ? "0"
+        : ((holes.backward / holes.rides) * 100).toFixed(0)
+    }% backward · ${
+      holes.rides === 0
+        ? "0"
+        : ((holes.fallbacks / holes.rides) * 100).toFixed(0)
+    }% fallback · ${
+      holes.rides === 0 ? "0" : (holes.rowsMoved / holes.rides).toFixed(2)
+    } rows avg) · bypasses ${String(holes.bypasses)} (${String(holes.tollPaid)} hull paid)`,
   );
   console.log("  campaign sinks (A0, all decks):");
   for (const sink of Object.keys(sinks)) {
@@ -2563,6 +2821,8 @@ const main = (): void => {
   const defaultRuns =
     mode === "run"
       ? "300"
+      : mode === "ladder"
+        ? "200"
       : mode === "sweep"
         ? "500"
         : mode === "perks"
@@ -2602,6 +2862,10 @@ const main = (): void => {
   }
   if (mode === "sweep") {
     sweepModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "ladder") {
+    ladderModeMain(runs, seed, startedAt);
     return;
   }
   if (mode === "perks") {

@@ -28,9 +28,16 @@ import { generateSectorMap, START_NODE_ID } from "@/game/map/generator";
 import {
   areConnected,
   nodeById,
+  wormholeFor,
   type MapNode,
   type NodeId,
 } from "@/game/map/types";
+import {
+  bypassTargetFor,
+  rollThrow,
+  type WormholeThrow,
+} from "@/game/map/wormhole";
+import { chaos } from "@/services/chaos";
 import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
 import { pushRunCloud } from "@/game/run/cloud";
 import {
@@ -39,8 +46,12 @@ import {
   sectorDmgPct,
   sectorHpPct,
 } from "@/game/run/encounter";
-import { applyEdgeMotifs, applyNodeMotifs } from "@/game/run/motifs";
-import { settleSectorDrift } from "@/game/run/journal";
+import {
+  applyEdgeMotifs,
+  applyHoleToll,
+  applyNodeMotifs,
+} from "@/game/run/motifs";
+import { logJournal, settleSectorDrift } from "@/game/run/journal";
 import { emitBark, resetBarkMemory } from "@/game/narrative";
 import { computePerkMods } from "@/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
@@ -109,6 +120,7 @@ import { BASE_TIDE_CAP, tideCapFor } from "@/game/run/tide";
 export { BASE_TIDE_CAP, tideCapFor };
 
 export const JUMPS_PER_TIDE = 4;
+export const WORMHOLE_REVEAL = 1;
 export const STARTING_SCRAP = 0;
 export const MINIBOSS_PACKAGE_SCRAP: readonly [number, number] = [30, 40];
 
@@ -646,6 +658,8 @@ export const advanceSector = (): void => {
     shop: null,
     pendingRewards: null,
     pendingBattle: null,
+    pendingWormhole: null,
+    lastWormhole: null,
     pendingDeepScan: false,
     bonusReveal: 0,
   });
@@ -656,6 +670,22 @@ export const advanceSector = (): void => {
   pushRunCloud();
 };
 
+interface TideStep {
+  tide: number;
+  jumpsSinceTide: number;
+  raised: boolean;
+}
+
+const stepTide = (s: RunValues): TideStep => {
+  const jumps = s.jumpsSinceTide + 1;
+  const cap = tideCapFor(s.ascension, s.mode, s.sector);
+  if (jumps < jumpsPerTideFor(s.mutators)) {
+    return { tide: s.tide, jumpsSinceTide: jumps, raised: false };
+  }
+  const tide = Math.min(cap, s.tide + 1);
+  return { tide, jumpsSinceTide: 0, raised: tide > s.tide };
+};
+
 export const jumpTo = (toNodeId: NodeId): boolean => {
   const s = useRunStore.getState();
   if (!s.active || s.map === null || s.position === null) return false;
@@ -664,32 +694,151 @@ export const jumpTo = (toNodeId: NodeId): boolean => {
   if (!areConnected(s.map, s.position, toNodeId)) return false;
   const node = nodeById(s.map).get(toNodeId);
   if (node === undefined) return false;
+  if (node.hole === true) return false;
 
-  const jumps = s.jumpsSinceTide + 1;
-  const cap = tideCapFor(s.ascension, s.mode, s.sector);
-  let tide = s.tide;
-  let jumpsSinceTide = jumps;
-  if (jumps >= jumpsPerTideFor(s.mutators)) {
-    tide = Math.min(cap, tide + 1);
-    jumpsSinceTide = 0;
-  }
+  const step = stepTide(s);
 
   recordAction(`jump:${toNodeId}`);
   applyEdgeMotifs(s.map, s.position, toNodeId, s.sector);
   useRunStore.setState({
     position: toNodeId,
     depthRow: node.row,
-    jumpsSinceTide,
-    tide,
+    jumpsSinceTide: step.jumpsSinceTide,
+    tide: step.tide,
+    pendingWormhole: null,
     pendingDeepScan: false,
     bonusReveal: 0,
   });
   useRunStore.getState().bumpStats({ jumps: 1 });
   useRunStore.getState().noteDepth(depthFor(s.sectorIndex, node.row));
-  if (tide > s.tide) emitBark("tideUp");
+  if (step.raised) emitBark("tideUp");
   routeToNode(node);
   autosaveRun();
   return true;
+};
+
+export const openWormhole = (holeId: NodeId): boolean => {
+  const s = useRunStore.getState();
+  if (!s.active || s.map === null || s.position === null) return false;
+  if (wormholeFor(s.map, s.position, holeId) === undefined) return false;
+  if (s.pendingWormhole === holeId) return true;
+  useRunStore.setState({ pendingWormhole: holeId });
+  autosaveRun();
+  return true;
+};
+
+const wormholeGate = (
+  holeId: NodeId,
+): { run: RunValues; map: NonNullable<RunValues["map"]>; from: NodeId } | null => {
+  const s = useRunStore.getState();
+  if (!s.active || s.map === null || s.position === null) return null;
+  if (s.pendingWormhole !== holeId) return null;
+  if (wormholeFor(s.map, s.position, holeId) === undefined) return null;
+  return { run: s, map: s.map, from: s.position };
+};
+
+export const bypassHole = (holeId: NodeId): boolean => {
+  const gate = wormholeGate(holeId);
+  if (gate === null) return false;
+  const target = bypassTargetFor(
+    gate.map,
+    gate.from,
+    holeId,
+    gate.run.visited,
+  );
+  useRunStore.setState({ pendingWormhole: null });
+  if (target === null) {
+    autosaveRun();
+    return false;
+  }
+  applyHoleToll(gate.run.sector, gate.from, holeId);
+  useRunStore.getState().bumpStats({ holesBypassed: 1 });
+  useMetaStore.getState().bumpLifetime({ holesBypassed: 1 });
+  const to = nodeById(gate.map).get(target);
+  logJournal({
+    k: "wormhole",
+    branch: "bypass",
+    to: target,
+    rows: (to?.row ?? 0) - (nodeById(gate.map).get(gate.from)?.row ?? 0),
+    direction: "forward",
+  });
+  emitBark("wormhole");
+  return jumpTo(target);
+};
+
+export const enterNode = (nodeId: NodeId): boolean => {
+  const s = useRunStore.getState();
+  if (!s.active || s.map === null || s.position !== nodeId) return false;
+  const node = nodeById(s.map).get(nodeId);
+  if (node === undefined) return false;
+  routeToNode(node);
+  autosaveRun();
+  return true;
+};
+
+export const resumeUnenteredNode = (): boolean => {
+  const s = useRunStore.getState();
+  if (!s.active || s.map === null || s.position === null) return false;
+  if (s.pendingWormhole !== null) return false;
+  if (s.visited.includes(s.position)) return false;
+  return enterNode(s.position);
+};
+
+export const rideWormhole = (
+  holeId: NodeId,
+  route = true,
+): WormholeThrow | null => {
+  const gate = wormholeGate(holeId);
+  if (gate === null) return null;
+  const s = gate.run;
+  const roll = rollThrow(
+    {
+      map: gate.map,
+      from: gate.from,
+      hole: holeId,
+      visited: s.visited,
+      rides: s.stats.wormholeRides,
+    },
+    chaos,
+  );
+  const landingId =
+    roll.landing ??
+    bypassTargetFor(gate.map, gate.from, holeId, s.visited);
+  const node = landingId === null ? undefined : nodeById(gate.map).get(landingId);
+  if (node === undefined || landingId === null) {
+    useRunStore.setState({ pendingWormhole: null, lastWormhole: roll });
+    autosaveRun();
+    return roll;
+  }
+
+  const settled: WormholeThrow = { ...roll, landing: landingId };
+  const step = stepTide(s);
+  recordAction(`warp:${landingId}`);
+  useRunStore.setState({
+    position: landingId,
+    depthRow: node.row,
+    jumpsSinceTide: step.jumpsSinceTide,
+    tide: step.tide,
+    pendingWormhole: null,
+    lastWormhole: settled,
+    pendingDeepScan: false,
+    bonusReveal: WORMHOLE_REVEAL,
+  });
+  useRunStore.getState().bumpStats({ jumps: 1, wormholeRides: 1 });
+  useMetaStore.getState().bumpLifetime({ wormholeRides: 1 });
+  useRunStore.getState().noteDepth(depthFor(s.sectorIndex, node.row));
+  logJournal({
+    k: "wormhole",
+    branch: "ride",
+    to: landingId,
+    rows: settled.rows,
+    direction: settled.direction,
+  });
+  emitBark("wormhole");
+  if (step.raised) emitBark("tideUp");
+  autosaveRun();
+  if (route) enterNode(landingId);
+  return settled;
 };
 
 const afterBossVictory = (): void => {

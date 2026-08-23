@@ -36,7 +36,8 @@
       "anomaly": "Anomalie",
       "beacon": "Balise",
       "boss": "Patron",
-      "inverted": "inversé"
+      "inverted": "inversé",
+      "hole": "Trou noir"
     },
     "previewNode": "{{type}} · risque : {{risk}}",
     "previewPocket": "Détour : un butin plus intéressant, un combat plus difficile",
@@ -46,7 +47,8 @@
       "high": "élevé"
     },
     "hull": "Coque {{cur}}/{{max}}",
-    "scrap": "Ferraille {{n}}"
+    "scrap": "Ferraille {{n}}",
+    "previewHole": "Trou noir : le contourner ou emprunter le trou de ver"
   },
   "event": {
     "title": "Signal",
@@ -262,7 +264,9 @@
     "scrapSpent": "Ferraille dépensée",
     "hullPctMin": "Coque la plus basse",
     "dicePlaced": "Dés placés",
-    "pct": "{{n}}%"
+    "pct": "{{n}}%",
+    "wormholeRides": "Manèges « Wormhole »",
+    "holesBypassed": "Trous contournés"
   },
   "prologue": {
     "title": "Prologue",
@@ -380,7 +384,11 @@
     "pocket": "La poche de détour : un risque accru, mais aussi un gain accru",
     "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte",
     "inversion": "Série inversée : les systèmes sont traités du dernier au premier",
-    "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution"
+    "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution",
+    "blackHoles": "Trou noir : la cellule a disparu ; son sillon forme un trou de ver",
+    "wormhole": "Le bord du trou de ver : un choix s'impose à la lisière",
+    "bypass": "A frôlé le rebord : la coque a été éraflée par la marée",
+    "holeScorch": "Coque trop mince pour payer le péage — la jante t'a laissé passer"
   },
   "tag": {
     "red": "Rouge",
@@ -464,7 +472,15 @@
     "here": "Vous êtes dans le secteur «{{n}} ».",
     "chainsTitle": "Fils de discussion",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "ici"
+    "chainHere": "ici",
+    "wormhole": {
+      "ride": "J'ai parcouru le « wormhole » {{way}}, les lignes {{rows}} apparaissent",
+      "bypass": "J'ai contourné le trou noir"
+    },
+    "wormholeWay": {
+      "forward": "plus profond",
+      "backward": "retour"
+    }
   },
   "memory": {
     "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",
@@ -527,5 +543,18 @@
     "swarm": "Beaucoup de petits dés plutôt que quelques gros.",
     "spike": "Une valeur énorme plutôt qu'un flux régulier.",
     "precision": "Faces étroites et prévisibles, valeurs exactes."
+  },
+  "hole": {
+    "title": "Trou noir",
+    "body": "La cellule a disparu. Son pourtour te laissera passer, ou t'emmènera là où il le décidera.",
+    "gentle": "Trou de ver stable",
+    "gentleWhy": "Les deux premières descentes d'une série sont courtes et mènent toujours plus loin.",
+    "bypass": "Faire le tour",
+    "bypassCost": "Contournement : coque « {{n}} »",
+    "bypassFree": "Contournement : gratuit — la coque ne peut pas payer",
+    "ride": "Fais-le !",
+    "rideCost": "Trajet : un trajet d'{{min}}à{{max}}, direction inconnue",
+    "rideGentle": "Ride : une variante de l’{{min}}—{{max}}e, mais plus profonde",
+    "landed": "Lancé {{rows}} lignes {{way}}"
   }
 }
