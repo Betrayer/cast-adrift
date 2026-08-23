@@ -9,7 +9,7 @@ import { DIE_BY_ID } from '@/data/dice';
 import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
 import { isThemeId, type ThemeId } from '@/data/themes';
-import type { ShipId } from '@/data/ships';
+import { SHIP_BY_ID, type ShipId } from '@/data/ships';
 import type { BattleLayoutId } from '@/types';
 import { levelFromTotalXp } from '@/game/xp';
 import { scopedPersistStorage } from '@/stores/scopedStorage';
@@ -50,6 +50,9 @@ export interface MetaStats {
   clearsWanderer: number;
   clearsRam: number;
   clearsArk: number;
+  clearsCorsair: number;
+  clearsFoundry: number;
+  clearsPrism: number;
 }
 
 export interface EncounterRecord {
@@ -227,6 +230,9 @@ export const createInitialMetaStats = (): MetaStats => ({
   clearsWanderer: 0,
   clearsRam: 0,
   clearsArk: 0,
+  clearsCorsair: 0,
+  clearsFoundry: 0,
+  clearsPrism: 0,
 });
 
 const LIFETIME_KEYS = [
@@ -255,6 +261,9 @@ const LIFETIME_KEYS = [
   "clearsWanderer",
   "clearsRam",
   "clearsArk",
+  "clearsCorsair",
+  "clearsFoundry",
+  "clearsPrism",
 ] as const;
 
 export const META_PERSIST_KEY = 'meta';
@@ -414,6 +423,17 @@ const coerceVouchers = (value: unknown): VoucherBank => {
   };
 };
 
+const coerceShips = (value: unknown, base: readonly ShipId[]): ShipId[] =>
+  Array.isArray(value)
+    ? [
+        ...new Set(
+          [...base, ...value].filter((id): id is ShipId =>
+            SHIP_BY_ID.has(id as ShipId),
+          ),
+        ),
+      ]
+    : [...base];
+
 export const migrateMeta = (
   persisted: unknown,
   fromVersion: number,
@@ -425,6 +445,12 @@ export const migrateMeta = (
   }
   const prev = (persisted ?? {}) as Partial<MetaValues>;
   const base = createInitialMetaValues();
+  const ships = coerceShips(prev.ships, base.ships);
+  const selectedShip =
+    typeof prev.selectedShip === 'string' &&
+    ships.includes(prev.selectedShip as ShipId)
+      ? (prev.selectedShip as ShipId)
+      : base.selectedShip;
   return {
     ...base,
     shards: typeof prev.shards === 'number' ? prev.shards : base.shards,
@@ -443,11 +469,8 @@ export const migrateMeta = (
       ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
       : base.chartPicks,
     collection: coerceCollection(prev.collection),
-    ships: Array.isArray(prev.ships) ? (prev.ships as ShipId[]) : base.ships,
-    selectedShip:
-      typeof prev.selectedShip === 'string'
-        ? (prev.selectedShip as ShipId)
-        : base.selectedShip,
+    ships,
+    selectedShip,
     hangar:
       typeof prev.hangar === 'object' &&
       prev.hangar !== null &&

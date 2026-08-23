@@ -28,7 +28,11 @@ import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
 import { unlockedDice } from "@/data/unlocks";
 import { hubBudgetBonus } from "@/game/chart/engine";
 import { validateDeck } from "@/game/meta/deck";
-import { dieRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
+import {
+  dieRoutes,
+  featureRoutes,
+  unlockHintsLine,
+} from "@/game/meta/describeUnlock";
 import {
   dieShopPrice,
   freshDiceIds,
@@ -179,16 +183,17 @@ export const HangarScreen = () => {
     >
       <Stack gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="xs" mb="sm">
+        <SimpleGrid
+          cols={{ base: 1, sm: 2, lg: 3 }}
+          spacing="xs"
+          mb="sm"
+          data-hangar-ships
+        >
           {PLAYABLE_SHIPS.map((ship) => {
             const isOwned = ships.includes(ship.id);
             const equipped = selectedShip === ship.id;
             const unlocked =
-              ship.id === "wanderer" ||
-              hasFeature(
-                unlockCtx,
-                ship.id === "ram" ? "shipRam" : "shipArk",
-              );
+              ship.unlock === undefined || hasFeature(unlockCtx, ship.unlock);
             return (
               <ShipCard
                 key={ship.id}
@@ -223,8 +228,18 @@ export const HangarScreen = () => {
                       {t("meta:hangar.shipBuy", { price: ship.price })}
                     </Button>
                   ) : (
-                    <Text size="xs" c={tokens.faint} ta="center">
-                      {t("meta:hangar.shipLocked", { level: ship.unlockLevel })}
+                    <Text
+                      size="xs"
+                      c={tokens.faint}
+                      ta="center"
+                      data-ship-locked={ship.id}
+                    >
+                      {t("meta:hangar.shipLocked", {
+                        route:
+                          ship.unlock === undefined
+                            ? ""
+                            : unlockHintsLine(featureRoutes(ship.unlock), t),
+                      })}
                     </Text>
                   )
                 }

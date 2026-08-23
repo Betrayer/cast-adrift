@@ -389,6 +389,21 @@
       "passiveName": "Baluarte",
       "passiveDesc": "Un cuarto del escudo en pie pasa al turno siguiente."
     },
+    "corsair": {
+      "name": "Sabueso",
+      "passiveName": "Postcombustor",
+      "passiveDesc": "La maniobra se calienta: +10 % a la esquiva y un límite máximo de 70/30 en lugar de 55/25. Cada esquiva o impacto de refilón otorga +1 a las armas en el siguiente turno, hasta un máximo de +2 por turno."
+    },
+    "foundry": {
+      "name": "Forja",
+      "passiveName": "Recocido",
+      "passiveDesc": "Una vez por combate, dos dados de bandeja del mismo valor se fusionan en un dado de un nivel superior, que conserva ambos valores."
+    },
+    "prism": {
+      "name": "Prisma",
+      "passiveName": "Refractor",
+      "passiveDesc": "Los dados prismáticos cuentan doble en el recuento de resonancia. Una vez por batalla, un dado se vuelve prismático durante ese turno."
+    },
     "ram-proto": {
       "name": "Prototipo Ariete"
     }

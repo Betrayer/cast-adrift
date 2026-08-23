@@ -155,8 +155,8 @@ export const isConditional = (def: ShapedContent): boolean =>
 const PAIRED_SLOTS: ReadonlySet<string> = new Set([
   "weaponA",
   "weaponB",
-  "shields",
   "shieldsB",
+  "enginesB",
 ]);
 
 const HARDWARE_ACTIONS: ReadonlySet<Action["a"]> = new Set([

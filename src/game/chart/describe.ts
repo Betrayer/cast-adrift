@@ -52,6 +52,7 @@ const SLOT_ORDER: readonly SlotId[] = [
   "shields",
   "shieldsB",
   "engines",
+  "enginesB",
   "sensors",
   "reactor",
   "repairBay",

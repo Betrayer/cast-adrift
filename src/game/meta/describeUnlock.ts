@@ -3,6 +3,7 @@ import {
   OPEN_CONTRACTS,
   OPEN_DICE,
   UNLOCKS,
+  type FeatureId,
   type UnlockDef,
   type UnlockHint,
 } from "@/data/unlocks";
@@ -60,6 +61,9 @@ export const contractRoutes = (id: string): UnlockHint[] => {
   if (OPEN_CONTRACTS.includes(id)) return [];
   return routesFor(UNLOCKS.filter((def) => def.contracts?.includes(id) === true));
 };
+
+export const featureRoutes = (feature: FeatureId): UnlockHint[] =>
+  routesFor(UNLOCKS.filter((def) => def.feature === feature));
 
 export const cosmeticRoutes = (id: string): UnlockHint[] =>
   routesFor(UNLOCKS.filter((def) => def.cosmetic === id));

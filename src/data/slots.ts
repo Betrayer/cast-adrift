@@ -10,6 +10,7 @@ export const SLOT_MK: Record<SlotId, readonly [DieTier, DieTier, DieTier]> = {
   shields: [8, 10, 12],
   shieldsB: [8, 10, 12],
   engines: [6, 8, 10],
+  enginesB: [6, 8, 10],
   sensors: [6, 8, 10],
   reactor: [10, 12, 20],
   repairBay: [6, 8, 10],
@@ -51,17 +52,24 @@ const WEAPON_SLOTS: ReadonlySet<SlotId> = new Set([
 
 const SHIELD_SLOTS: ReadonlySet<SlotId> = new Set(["shields", "shieldsB"]);
 
+export const ENGINE_SLOTS: ReadonlySet<SlotId> = new Set([
+  "engines",
+  "enginesB",
+]);
+
 export const slotInAffinity = (slotId: SlotId, affSlot: AffinitySlot): boolean =>
   affSlot === "weapons"
     ? WEAPON_SLOTS.has(slotId)
     : affSlot === "shields"
       ? SHIELD_SLOTS.has(slotId)
-      : slotId === affSlot;
+      : affSlot === "engines"
+        ? ENGINE_SLOTS.has(slotId)
+        : slotId === affSlot;
 
 export const affinitySchoolForSlot = (slotId: SlotId): School | undefined => {
   if (WEAPON_SLOTS.has(slotId)) return "red";
   if (SHIELD_SLOTS.has(slotId)) return "blue";
-  if (slotId === "engines") return "green";
+  if (ENGINE_SLOTS.has(slotId)) return "green";
   if (slotId === "sensors") return "grey";
   if (slotId === "reactor") return "black";
   return undefined;

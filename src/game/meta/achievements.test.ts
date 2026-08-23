@@ -84,9 +84,9 @@ const chainFlags = (chainId: string): string[] => {
 };
 
 describe("achievement catalogue", () => {
-  it("compiles ninety definitions with unique ids", () => {
-    expect(ACHIEVEMENTS).toHaveLength(90);
-    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(90);
+  it("compiles ninety-three definitions with unique ids", () => {
+    expect(ACHIEVEMENTS).toHaveLength(93);
+    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(93);
   });
 
   it("gates eleven of them on content and reads flags in seven", () => {

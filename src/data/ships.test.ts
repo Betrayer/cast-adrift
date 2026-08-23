@@ -7,7 +7,6 @@ const stub = (body: Partial<ShipDef>): ShipDef => ({
   hullMax: 30,
   slots: {},
   price: 0,
-  unlockLevel: 1,
   ...body,
 });
 

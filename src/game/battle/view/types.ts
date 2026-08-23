@@ -15,6 +15,7 @@ export interface BattleBoard extends BattleSnapshot {
   freeNudges: number;
   selectedDieUid: string | null;
   swapSourceUid: string | null;
+  fuseSourceUid: string | null;
   spentGrants: readonly string[];
   fateUses: number;
   forcedTraits: readonly PerkTrait[];

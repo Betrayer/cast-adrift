@@ -359,8 +359,8 @@ export const SECTORS: readonly SectorDef[] = [
     tideCap: 3,
     encounter: {
       bespokeWeight: 12,
-      threatCap: 34,
-      sizeWeights: [3.95, 1.8, 0.3],
+      threatCap: 38,
+      sizeWeights: [3.6, 2.1, 0.45],
     },
     shape: SHAPES[3],
     scaling: { hpPct: 19, dmgPct: 44, pocketPct: 25 },
@@ -409,7 +409,7 @@ export const SECTORS: readonly SectorDef[] = [
     encounter: {
       bespokeWeight: 12,
       threatCap: 46,
-      sizeWeights: [3.6, 2.4, 0.7],
+      sizeWeights: [3.1, 2.9, 0.9],
     },
     shape: SHAPES[4],
     scaling: { hpPct: 38, dmgPct: 60, pocketPct: 30 },
@@ -464,7 +464,7 @@ export const SECTORS: readonly SectorDef[] = [
     encounter: {
       bespokeWeight: 12,
       threatCap: 54,
-      sizeWeights: [2.6, 3.4, 1],
+      sizeWeights: [2.85, 3.25, 0.9],
     },
     shape: SHAPES[5],
     scaling: { hpPct: 126, dmgPct: 92, pocketPct: 30 },

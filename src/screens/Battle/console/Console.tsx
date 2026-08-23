@@ -27,15 +27,17 @@ const grow = (prev: ConsoleShape, next: ConsoleShape): ConsoleShape => {
   const fate = prev.fate || next.fate;
   const bloodReactor = prev.bloodReactor || next.bloodReactor;
   const sacrifice = prev.sacrifice || next.sacrifice;
+  const passive = prev.passive ?? next.passive;
   if (
     fate === prev.fate &&
     bloodReactor === prev.bloodReactor &&
     sacrifice === prev.sacrifice &&
+    passive === prev.passive &&
     actives.length === prev.actives.length
   ) {
     return prev;
   }
-  return { fate, bloodReactor, sacrifice, actives };
+  return { fate, bloodReactor, sacrifice, passive, actives };
 };
 
 export const Console = ({ compact = false }: { compact?: boolean }) => {
@@ -134,6 +136,17 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
             ? button('bloodReactor', t('battle:bloodReactor'))
             : null}
           {shape.sacrifice ? button('sacrifice', t('battle:sacrifice')) : null}
+          {shape.passive === null
+            ? null
+            : button(
+                shape.passive,
+                shape.passive === 'fuse' && board.fuseSourceUid !== null
+                  ? t('battle:fusePick')
+                  : t(`battle:${shape.passive}`),
+                shape.passive === 'fuse' && board.fuseSourceUid !== null
+                  ? styles.btnActive ?? ''
+                  : '',
+              )}
         </div>
       )}
       {scripted || shape.actives.length === 0 ? null : (

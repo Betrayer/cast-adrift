@@ -26,6 +26,9 @@
   "copy": "Copiar",
   "bloodReactor": "Reactor de sangre (2♥→3⚡)",
   "sacrifice": "Sacrificio (+4)",
+  "reschool": "Refractar",
+  "fusePick": "Elige al gemelo",
+  "fuse": "Recocido",
   "collect": "Recoger",
   "lootNew": "Nueva matriz",
   "jam": "JAM",
@@ -92,7 +95,8 @@
     "inherits": "aquí: {{school}} +{{n}}",
     "inheritsMult": "aquí: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
-    "mkTitle": "Niveles Mk"
+    "mkTitle": "Niveles Mk",
+    "enginesB": "Motores II"
   },
   "intro": {
     "miniboss": "Minijefazo",
@@ -172,7 +176,9 @@
     "atCeiling": "Ya es la cara más alta",
     "reserveFull": "La reserva está llena",
     "used": "Ya usado este turno",
-    "hullLow": "Casco demasiado bajo"
+    "hullLow": "Casco demasiado bajo",
+    "noPartner": "El recocido requiere una segunda matriz de bandeja del mismo valor.",
+    "spent": "La nave puede hacer esto una vez por combate."
   },
   "resPrism": "un dado prismático cuenta para esta escuela",
   "badge": {
@@ -182,6 +188,7 @@
     "growth": "Crece en la cara máxima",
     "faces": "Caras no estándar"
   },
+  "layoutHint": "¿Prefieres otra interfaz de combate? Ajustes → Interfaz de combate.",
   "radial": {
     "reroll": "↻",
     "nudgeMinus": "−1",
@@ -198,7 +205,6 @@
     "out": "→ {{text}}",
     "unknown": "→ ?"
   },
-  "layoutHint": "¿Prefieres otra interfaz de combate? Ajustes → Interfaz de combate.",
   "forecastStrip": "infliges ~{{out}} · recibes {{hull}}",
   "forecastBreak": "ataque {{raw}} − evasión {{evade}} − escudo {{shield}}",
   "check": {
@@ -249,7 +255,7 @@
     "jamAt": "se atasca con ≤{{n}}",
     "price": "{{n}} ◈",
     "free": "Nave inicial",
-    "locked": "Nivel de capitán {{n}}",
+    "locked": "desbloqueos: {{route}}",
     "passiveNone": "Sin pasiva."
   },
   "intentWhy": {

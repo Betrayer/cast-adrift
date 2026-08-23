@@ -26,6 +26,9 @@
   "copy": "Copier",
   "bloodReactor": "Réacteur sanguin (2♥→3⚡)",
   "sacrifice": "Sacrifice (+4)",
+  "reschool": "Réfracter",
+  "fusePick": "Choisis le jumeau",
+  "fuse": "Recuit",
   "collect": "Collecter",
   "lootNew": "Nouvelle matrice",
   "jam": "JAM",
@@ -92,7 +95,8 @@
     "inherits": "ici : {{school}} +{{n}}",
     "inheritsMult": "ici : {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
-    "mkTitle": "Niveaux Mk"
+    "mkTitle": "Niveaux Mk",
+    "enginesB": "Moteurs II"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -172,7 +176,9 @@
     "atCeiling": "Déjà la face la plus haute",
     "reserveFull": "Réserve pleine",
     "used": "Déjà utilisé ce tour",
-    "hullLow": "Coque trop faible"
+    "hullLow": "Coque trop faible",
+    "noPartner": "Le recuit nécessite une deuxième matrice de même valeur.",
+    "spent": "Le navire peut effectuer cette action une fois par combat."
   },
   "resPrism": "un dé prismatique compte pour cette école",
   "badge": {
@@ -182,6 +188,7 @@
     "growth": "Grandit sur la face max",
     "faces": "Faces non standard"
   },
+  "layoutHint": "Une autre présentation du combat ? Réglages → Interface de combat.",
   "radial": {
     "reroll": "↻",
     "nudgeMinus": "−1",
@@ -198,7 +205,6 @@
     "out": "→ {{text}}",
     "unknown": "→ ?"
   },
-  "layoutHint": "Une autre présentation du combat ? Réglages → Interface de combat.",
   "forecastStrip": "tu infliges ~{{out}} · tu subis {{hull}}",
   "forecastBreak": "attaque {{raw}} − esquive {{evade}} − bouclier {{shield}}",
   "check": {
@@ -249,7 +255,7 @@
     "jamAt": "se coince à ≤{{n}}",
     "price": "{{n}} ◈",
     "free": "Vaisseau de départ",
-    "locked": "Niveau de capitaine {{n}}",
+    "locked": "liens : {{route}}",
     "passiveNone": "Aucun passif."
   },
   "intentWhy": {

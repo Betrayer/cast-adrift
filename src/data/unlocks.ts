@@ -5,6 +5,9 @@ export type UnlockKind = "diceWave" | "contractWave" | "cosmetic" | "feature";
 export type FeatureId =
   | "shipRam"
   | "shipArk"
+  | "shipCorsair"
+  | "shipFoundry"
+  | "shipPrism"
   | "engravingStation"
   | "dailyPreview"
   | "freeRespec"
@@ -274,6 +277,27 @@ export const UNLOCKS: readonly UnlockDef[] = [
     label: "meta:unlock.featureShipArk",
     source: { level: 25 },
     feature: "shipArk",
+  },
+  {
+    id: "featureShipCorsair",
+    kind: "feature",
+    label: "meta:unlock.featureShipCorsair",
+    source: { level: 35 },
+    feature: "shipCorsair",
+  },
+  {
+    id: "featureShipFoundry",
+    kind: "feature",
+    label: "meta:unlock.featureShipFoundry",
+    source: { level: 40 },
+    feature: "shipFoundry",
+  },
+  {
+    id: "featureShipPrism",
+    kind: "feature",
+    label: "meta:unlock.featureShipPrism",
+    source: { achievement: "spectrumClear" },
+    feature: "shipPrism",
   },
   {
     id: "featureEngraving",

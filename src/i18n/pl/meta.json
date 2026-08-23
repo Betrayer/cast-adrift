@@ -278,7 +278,7 @@
     "shipEquip": "Wyposażenie",
     "shipEquipped": "Wyposażony",
     "shipBuy": "Kup · {{price}}◈",
-    "shipLocked": "Odblokowuje się na poziomie{{level}}",
+    "shipLocked": "Odblokowuje: {{route}}",
     "filterAll": "Wszystkie"
   },
   "collection": {
@@ -504,7 +504,10 @@
     "featureFreeRespec": "Bezpłatna zmiana specjalizacji Keystone",
     "sectorSix": "Sektor 6 „Poza rdzeniem”",
     "diceS6": "Cztery kości przyczynowości",
-    "skinThreshold": "Okładka albumu „Threshold”"
+    "skinThreshold": "Okładka albumu „Threshold”",
+    "featureShipCorsair": "„Hound” jest już w sprzedaży",
+    "featureShipFoundry": "Obiekt „The Forge” jest na sprzedaż",
+    "featureShipPrism": "Urządzenie Prism jest już dostępne w sprzedaży"
   },
   "skin": {
     "title": "Skórki",
@@ -741,7 +744,19 @@
     "shards": "+{{n}} ◈",
     "badgeChip": "Odznaka",
     "voucherChip": "Kupon",
-    "maxed": "Ukończone"
+    "maxed": "Ukończone",
+    "corsairClear": {
+      "name": "Outrun",
+      "desc": "Ukończ kampanię, pilotując „Hounda”."
+    },
+    "foundryClear": {
+      "name": "Hartowane",
+      "desc": "Ukończ kampanię, w której dowodzisz statkiem „Forge”."
+    },
+    "prismClear": {
+      "name": "Załamane",
+      "desc": "Ukończ kampanię, pilotując „Prism”."
+    }
   },
   "chartTag": {
     "red": "czerwony",

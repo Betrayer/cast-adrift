@@ -278,7 +278,7 @@
     "shipEquip": "Обрати",
     "shipEquipped": "Обрано",
     "shipBuy": "Купити · {{price}}◈",
-    "shipLocked": "Відкриється на рівні {{level}}",
+    "shipLocked": "Відкривається: {{route}}",
     "filterAll": "Усі"
   },
   "collection": {
@@ -504,7 +504,10 @@
     "featureFreeRespec": "Безкоштовний респек",
     "sectorSix": "Сектор 6 «За Ядром»",
     "diceS6": "Чотири кістки причинності",
-    "skinThreshold": "Скін кісток «Поріг»"
+    "skinThreshold": "Скін кісток «Поріг»",
+    "featureShipCorsair": "«Гончак» з’явився на ринку",
+    "featureShipFoundry": "«Кузня» з’явилася на ринку",
+    "featureShipPrism": "«Призма» з’явилася на ринку"
   },
   "skin": {
     "title": "Скіни кубів",
@@ -741,7 +744,19 @@
     "shards": "+{{n}} ◈",
     "badgeChip": "Знак",
     "voucherChip": "Ваучер",
-    "maxed": "Завершено"
+    "maxed": "Завершено",
+    "corsairClear": {
+      "name": "Відірвався",
+      "desc": "Пройдіть кампанію на «Гончаку»."
+    },
+    "foundryClear": {
+      "name": "Загартований",
+      "desc": "Пройдіть кампанію на «Кузні»."
+    },
+    "prismClear": {
+      "name": "Заломлений",
+      "desc": "Пройдіть кампанію на «Призмі»."
+    }
   },
   "chartTag": {
     "red": "червоний",

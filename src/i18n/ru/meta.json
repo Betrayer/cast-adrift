@@ -278,7 +278,7 @@
     "shipEquip": "Выбрать",
     "shipEquipped": "Выбран",
     "shipBuy": "Купить · {{price}}◈",
-    "shipLocked": "Откроется на уровне {{level}}",
+    "shipLocked": "Открывается: {{route}}",
     "filterAll": "Все"
   },
   "collection": {
@@ -504,7 +504,10 @@
     "featureFreeRespec": "Бесплатный респек",
     "sectorSix": "Сектор 6 «За Ядром»",
     "diceS6": "Четыре кости причинности",
-    "skinThreshold": "Скин костей «Порог»"
+    "skinThreshold": "Скин костей «Порог»",
+    "featureShipCorsair": "«Гончая» появилась на рынке",
+    "featureShipFoundry": "«Кузница» появилась на рынке",
+    "featureShipPrism": "«Призма» появилась на рынке"
   },
   "skin": {
     "title": "Скины кубов",
@@ -741,7 +744,19 @@
     "shards": "+{{n}} ◈",
     "badgeChip": "Знак",
     "voucherChip": "Ваучер",
-    "maxed": "Завершено"
+    "maxed": "Завершено",
+    "corsairClear": {
+      "name": "Оторвался",
+      "desc": "Пройдите кампанию на «Гончей»."
+    },
+    "foundryClear": {
+      "name": "Закалён",
+      "desc": "Пройдите кампанию на «Кузнице»."
+    },
+    "prismClear": {
+      "name": "Преломлённый",
+      "desc": "Пройдите кампанию на «Призме»."
+    }
   },
   "chartTag": {
     "red": "красный",

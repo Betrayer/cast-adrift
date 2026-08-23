@@ -26,6 +26,9 @@
   "copy": "Kopieren",
   "bloodReactor": "Blutreaktor (2♥→3⚡)",
   "sacrifice": "Opfer (+4)",
+  "reschool": "Refrakt",
+  "fusePick": "Wähle den Zwilling aus",
+  "fuse": "Glühen",
   "collect": "Sammeln",
   "lootNew": "Neuer Stempel",
   "jam": "JAM",
@@ -92,7 +95,8 @@
     "inherits": "hier: {{school}} +{{n}}",
     "inheritsMult": "hier: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
-    "mkTitle": "Mk-Stufen"
+    "mkTitle": "Mk-Stufen",
+    "enginesB": "Motoren II"
   },
   "intro": {
     "miniboss": "Mini-Boss",
@@ -172,7 +176,9 @@
     "atCeiling": "Bereits die größte Seite",
     "reserveFull": "Reserve ist voll",
     "used": "Diese Runde schon benutzt",
-    "hullLow": "Rumpf zu niedrig"
+    "hullLow": "Rumpf zu niedrig",
+    "noPartner": "Für das Glühen wird eine zweite Schalenform mit demselben Wert benötigt.",
+    "spent": "Das Schiff kann dies einmal pro Gefecht tun."
   },
   "resPrism": "ein prismatischer Würfel zählt für diese Schule",
   "badge": {
@@ -182,6 +188,7 @@
     "growth": "Wächst bei Höchstseite",
     "faces": "Ungewöhnliche Seiten"
   },
+  "layoutHint": "Lieber ein anderes Kampf-Layout? Einstellungen → Kampfoberfläche.",
   "radial": {
     "reroll": "↻",
     "nudgeMinus": "−1",
@@ -198,7 +205,6 @@
     "out": "→ {{text}}",
     "unknown": "→ ?"
   },
-  "layoutHint": "Lieber ein anderes Kampf-Layout? Einstellungen → Kampfoberfläche.",
   "forecastStrip": "du machst ~{{out}} · du nimmst {{hull}}",
   "forecastBreak": "Angriff {{raw}} − Ausweichen {{evade}} − Schild {{shield}}",
   "check": {
@@ -249,7 +255,7 @@
     "jamAt": "klemmt bei ≤{{n}}",
     "price": "{{n}} ◈",
     "free": "Startschiff",
-    "locked": "Kapitänsstufe {{n}}",
+    "locked": "Freischaltungen: {{route}}",
     "passiveNone": "Keine Passivfähigkeit."
   },
   "intentWhy": {

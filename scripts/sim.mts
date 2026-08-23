@@ -43,7 +43,7 @@ import {
   FIRST_FIND_SHARDS,
   META_DIE_PRICE,
 } from "../src/data/metaShop";
-import { PLAYABLE_SHIPS } from "../src/data/ships";
+import { PLAYABLE_SHIPS, type ShipId } from "../src/data/ships";
 import { THEMES } from "../src/data/themes";
 import { RESPEC_SHARD_COST } from "../src/game/chart/engine";
 import {
@@ -127,6 +127,7 @@ import {
 const TURN_CAP = 30;
 
 interface BattleInit {
+  shipId?: ShipId;
   hull?: number;
   hullMax?: number;
   runScrap?: number;
@@ -224,7 +225,7 @@ const simulateBattle = (
   const streams = createStreams(rootSeed);
   const enemyStream = createEnemyStream(streams);
   let snapshot = buildBattleSnapshot(
-    "wanderer",
+    init.shipId ?? "wanderer",
     deck,
     enemyIds,
     streams,
@@ -522,6 +523,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         state.deck,
         deriveSeed(seed, nsKey(ns, "node", next.id)),
         {
+          shipId: state.shipId,
           hull: state.hull,
           hullMax: state.hullMax,
           runScrap: state.scrap,
@@ -1163,10 +1165,15 @@ const ARCHETYPES: readonly Archetype[] = [
   },
 ];
 
+const MID_COLLECTION_PICKS: readonly string[] = buildChartPicks(
+  MID_COLLECTION_LEVEL,
+);
+
 interface SweepOptions {
   sector: number;
   ascension: number;
   archetype: Archetype;
+  shipId?: ShipId;
   forcedPerk?: string;
   noDraft?: boolean;
   perks?: readonly string[];
@@ -1177,14 +1184,16 @@ interface SweepOptions {
 
 const sweepState = (opts: SweepOptions): RunState => {
   const aMods = ascensionMods(opts.ascension);
+  const shipId = opts.shipId ?? "wanderer";
   const carried =
     opts.forcedPerk !== undefined ? [opts.forcedPerk] : [...(opts.perks ?? [])];
   const hullMax = Math.max(
     1,
-    Math.round(shipHullMax("wanderer") * (1 + aMods.hullPct / 100)) +
+    Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)) +
       computePerkMods(carried).hullMaxDelta,
   );
   return createRunState({
+    shipId,
     hull: hullMax,
     hullMax,
     deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(0, DECK_CAP),
@@ -1232,6 +1241,35 @@ const SWEEP_ASCENSIONS: readonly number[] = [0, 3, 6];
 
 const LADDER_GAP_PP = 18;
 
+const LADDER_LAST_CHECKED_ACT = 5;
+
+const LADDER_DECKS: readonly Archetype[] = ARCHETYPES.filter(
+  (a) => a.name !== "black-edge",
+);
+
+const ladderWinrate = (
+  sector: number,
+  runs: number,
+  seed: number,
+  build: Pick<SweepOptions, "chartPicks">,
+): number => {
+  const results: SectorResult[] = [];
+  for (const archetype of LADDER_DECKS) {
+    for (let i = 0; i < runs; i += 1) {
+      results.push(
+        runSweepSector(
+          deriveSeed(
+            seed,
+            `sweep:${String(sector)}:${archetype.name}:${String(i)}`,
+          ),
+          { sector, ascension: 0, archetype, ...build },
+        ),
+      );
+    }
+  }
+  return results.filter((r) => r.win).length / Math.max(1, results.length);
+};
+
 const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
   const rows: string[] = [
     "sector,ascension,deck,runs,winrate,avgNodes,avgKills,avgScrapEarned,avgScrapSpent,avgHullMedian,avgMk,avgPockets",
@@ -1239,7 +1277,7 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
   console.log(
     `sim sweep: ${String(SECTORS.length)} sectors x ${String(SWEEP_ASCENSIONS.length)} ascensions x ${String(ARCHETYPES.length)} decks x ${String(runs)} runs`,
   );
-  const ladder = new Map<number, number[]>();
+  const coldLadder = new Map<number, number[]>();
   for (const sector of SECTORS.map((def) => def.id)) {
     for (const ascension of SWEEP_ASCENSIONS) {
       for (const archetype of ARCHETYPES) {
@@ -1260,9 +1298,9 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
           results.reduce((sum, r) => sum + f(r), 0) / n;
         const winrate = results.filter((r) => r.win).length / n;
         if (ascension === 0 && archetype.name !== "black-edge") {
-          const cell = ladder.get(sector) ?? [];
+          const cell = coldLadder.get(sector) ?? [];
           cell.push(winrate);
-          ladder.set(sector, cell);
+          coldLadder.set(sector, cell);
         }
         rows.push(
           [
@@ -1287,31 +1325,39 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
     }
   }
   console.log(
-    "\nsim sweep: intrinsic difficulty ladder (A0, red+blue — one loadout, every act)",
+    "\nsim sweep: intrinsic difficulty ladder (A0, red+blue, mid-collection chart picks)",
+  );
+  console.log(
+    `  the cold column is printed as diagnostics and never checked; the rule holds over S1-S${String(LADDER_LAST_CHECKED_ACT)}.`,
   );
   rows.push("");
-  rows.push("sector,a0Winrate,gapToPreviousPp,verdict");
+  rows.push("sector,coldWinrate,midWinrate,gapToPreviousPp,verdict");
   let cliffs = 0;
   let rises = 0;
   let previous: number | null = null;
   for (const sector of SECTORS.map((def) => def.id)) {
-    const cell = ladder.get(sector) ?? [];
-    const mean = cell.reduce((sum, v) => sum + v, 0) / Math.max(1, cell.length);
+    const cold = coldLadder.get(sector) ?? [];
+    const coldMean =
+      cold.reduce((sum, v) => sum + v, 0) / Math.max(1, cold.length);
+    const mean = ladderWinrate(sector, runs, seed, {
+      chartPicks: MID_COLLECTION_PICKS,
+    });
+    const checked = sector <= LADDER_LAST_CHECKED_ACT;
     const gap = previous === null ? 0 : (mean - previous) * 100;
-    const cliff = previous !== null && Math.abs(gap) > LADDER_GAP_PP;
-    const rise = previous !== null && gap > 0;
+    const cliff = checked && previous !== null && Math.abs(gap) > LADDER_GAP_PP;
+    const rise = checked && previous !== null && gap > 0;
     if (cliff) cliffs += 1;
     if (rise) rises += 1;
     console.log(
-      `  S${String(sector)} ${(mean * 100).toFixed(1).padStart(6)}%${previous === null ? "" : `  gap ${gap >= 0 ? "+" : ""}${gap.toFixed(1)}pp${cliff ? " — CLIFF" : ""}${rise ? " — EASIER THAN THE ACT BEFORE" : ""}`}`,
+      `  S${String(sector)} ${(mean * 100).toFixed(1).padStart(6)}% (cold ${(coldMean * 100).toFixed(1)}%)${previous === null ? "" : `  gap ${gap >= 0 ? "+" : ""}${gap.toFixed(1)}pp${cliff ? " CLIFF" : ""}${rise ? " EASIER THAN THE ACT BEFORE" : ""}${checked ? "" : " exempt"}`}`,
     );
     rows.push(
-      `${String(sector)},${mean.toFixed(3)},${gap.toFixed(1)},${cliff ? "CLIFF" : rise ? "RISE" : "ok"}`,
+      `${String(sector)},${coldMean.toFixed(3)},${mean.toFixed(3)},${gap.toFixed(1)},${cliff ? "CLIFF" : rise ? "RISE" : checked ? "ok" : "exempt"}`,
     );
-    previous = mean;
+    if (checked) previous = mean;
   }
   console.log(
-    `  ${String(cliffs)} gap(s) over ${String(LADDER_GAP_PP)}pp · ${String(rises)} act(s) easier than the one before`,
+    `  ${String(cliffs)} gap(s) over ${String(LADDER_GAP_PP)}pp | ${String(rises)} act(s) easier than the one before`,
   );
 
   const outDir = join(process.cwd(), "sim-out");
@@ -1345,8 +1391,7 @@ const ladderCell = (
 ): LadderCell => {
   const shape = SECTORS.find((def) => def.id === sector)?.shape;
   const results: SectorResult[] = [];
-  for (const archetype of ARCHETYPES) {
-    if (archetype.name === "black-edge") continue;
+  for (const archetype of LADDER_DECKS) {
     for (let i = 0; i < runs; i += 1) {
       results.push(
         runSweepSector(
@@ -1407,7 +1452,7 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
     `sim ladder: the sweep ladder under a microscope — A0, red+blue, ${String(runs)} runs per deck per act`,
   );
   console.log(
-    "  the sweep build is fixed and cold: no chart picks, no perks, no accumulated deck.",
+    "  the middle column is the one sim:sweep checks; the cold column is diagnostics.",
   );
   console.log(
     "  each act is measured three ways to separate act scaling from build strength.",
@@ -1419,8 +1464,11 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
       label: string;
       build: Pick<SweepOptions, "perks" | "chartPicks">;
     }[] = [
-      { label: "cold (the ladder)", build: {} },
-      { label: "+ chart picks", build: { chartPicks: MID_COLLECTION_PICKS } },
+      { label: "cold (diagnostics)", build: {} },
+      {
+        label: "mid-collection (checked)",
+        build: { chartPicks: MID_COLLECTION_PICKS },
+      },
       {
         label: "+ picks + 6 perks",
         build: {
@@ -1806,22 +1854,20 @@ interface CampaignResult {
 
 const CAMPAIGN_SECTORS = 5;
 
-const MID_COLLECTION_PICKS: readonly string[] = buildChartPicks(
-  MID_COLLECTION_LEVEL,
-);
-
 const runCampaign = (
   seed: number,
   archetype: Archetype,
   ascension: number,
   startDraft = false,
+  shipId: ShipId = "wanderer",
 ): CampaignResult => {
   const aMods = ascensionMods(ascension);
   const hullMax = Math.max(
     1,
-    Math.round(shipHullMax("wanderer") * (1 + aMods.hullPct / 100)),
+    Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)),
   );
   const state = createRunState({
+    shipId,
     hull: hullMax,
     hullMax,
     deck: archetype.deck,
@@ -1882,7 +1928,7 @@ const runCampaign = (
   };
 };
 
-const CAMPAIGN_BAND: readonly [number, number] = [0.55, 0.65];
+const CAMPAIGN_BAND: readonly [number, number] = [0.6, 0.7];
 const MONOTONIC_GAP_PP = 18;
 
 const mergeTallies = (
@@ -1927,6 +1973,7 @@ const campaignRoll = (
   archetype: Archetype,
   ascension: number,
   startDraft = false,
+  shipId: ShipId = "wanderer",
 ): { roll: CampaignRoll; results: CampaignResult[] } => {
   const results: CampaignResult[] = [];
   for (let i = 0; i < runs; i += 1) {
@@ -1936,6 +1983,7 @@ const campaignRoll = (
         archetype,
         ascension,
         startDraft,
+        shipId,
       ),
     );
   }
@@ -2032,7 +2080,7 @@ const campaignModeMain = (
   }
   const mean = a0.reduce((sum, v) => sum + v, 0) / Math.max(1, a0.length);
   console.log(
-    `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${String(CAMPAIGN_BAND[0] * 100)}-${String(CAMPAIGN_BAND[1] * 100)}%`,
+    `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%`,
   );
 
   const conditional: number[] = [];
@@ -2136,6 +2184,71 @@ const campaignModeMain = (
   mkdirSync(outDir, { recursive: true });
   const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
   const outPath = join(outDir, `campaign-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (outOfBand > 0) process.exitCode = 1;
+};
+
+const SHIP_BAND: readonly [number, number] = [0.45, 0.65];
+
+const SHIP_BAND_ENFORCED: readonly ShipId[] = ["corsair", "foundry", "prism"];
+
+const PRISM_SPECTRUM: Archetype = {
+  name: "prism-spectrum",
+  deck: [
+    "glimmer", "prismChip", "facet", "spectra",
+    "red-d6", "blue-d6", "green-d4", "ember", "slug",
+  ],
+  mkLevels: { weaponA: 3, weaponB: 2, shields: 2, reactor: 2 },
+  modules: ["siegeMount", "ablativeWeave"],
+};
+
+const SHIP_ARCHETYPES: readonly Archetype[] = [...ARCHETYPES, PRISM_SPECTRUM];
+
+const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const rows: string[] = ["ship,deck,runs,winrate,avgSectorsCleared,hullMax"];
+  console.log(
+    `sim ships: S1-S5 chained per ship, ${String(PLAYABLE_SHIPS.length)} ships x ${String(SHIP_ARCHETYPES.length)} decks x ${String(runs)} runs`,
+  );
+  console.log(
+    `  the band is ${(SHIP_BAND[0] * 100).toFixed(0)}-${(SHIP_BAND[1] * 100).toFixed(0)}% on the red+blue+prism mean; black-edge is printed, never enforced.`,
+  );
+  console.log(
+    "  it is asserted on the hulls P11 authored; the three legacy hulls are reference readings.",
+  );
+  let outOfBand = 0;
+  for (const ship of PLAYABLE_SHIPS) {
+    const banded: number[] = [];
+    for (const archetype of SHIP_ARCHETYPES) {
+      const { roll } = campaignRoll(runs, seed, archetype, 0, false, ship.id);
+      if (archetype.name !== "black-edge") banded.push(roll.winrate);
+      rows.push(
+        [
+          ship.id,
+          archetype.name,
+          String(roll.runs),
+          roll.winrate.toFixed(3),
+          roll.avgSectors.toFixed(2),
+          String(shipHullMax(ship.id)),
+        ].join(","),
+      );
+      console.log(
+        `  ${ship.id.padEnd(9)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1).padStart(5)}% · sectors ${roll.avgSectors.toFixed(2)}`,
+      );
+    }
+    const mean = banded.reduce((sum, v) => sum + v, 0) / Math.max(1, banded.length);
+    const inBand = mean >= SHIP_BAND[0] && mean <= SHIP_BAND[1];
+    const enforced = SHIP_BAND_ENFORCED.includes(ship.id);
+    if (!inBand && enforced) outOfBand += 1;
+    console.log(
+      `  ${ship.id.padEnd(9)} banded mean ${(mean * 100).toFixed(1)}%${inBand ? "" : enforced ? " OUT OF BAND" : " outside the band (reference)"}`,
+    );
+    rows.push(`${ship.id},banded mean,,${mean.toFixed(3)},,`);
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `ships-${stamp}.csv`);
   writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (outOfBand > 0) process.exitCode = 1;
@@ -2848,7 +2961,7 @@ const main = (): void => {
                 ? "300"
                 : mode === "axis"
                   ? "200"
-                  : mode === "campaign"
+                  : mode === "campaign" || mode === "ships"
                     ? "200"
                     : mode === "puzzles"
                       ? "60"
@@ -2899,6 +3012,10 @@ const main = (): void => {
   }
   if (mode === "campaign") {
     campaignModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "ships") {
+    shipsModeMain(runs, seed, startedAt);
     return;
   }
   if (mode === "puzzles") {

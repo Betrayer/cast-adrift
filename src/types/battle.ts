@@ -34,6 +34,7 @@ export interface RolledDie {
   expiresTurn?: number;
   bankedValue?: number;
   pinned?: boolean;
+  reschooled?: boolean;
 }
 
 export interface SlotState {
@@ -138,6 +139,7 @@ export interface BattleSnapshot {
   chargeCap: number;
   sacrificePool: number;
   bloodReactorUsed: boolean;
+  passiveUsed?: boolean;
   burnDoubleUsed: boolean;
   blockedSlots: BlockedSlot[];
   shrunkSlots: BlockedSlot[];

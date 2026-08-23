@@ -278,7 +278,7 @@
     "shipEquip": "Ausrüsten",
     "shipEquipped": "Ausgestattet",
     "shipBuy": "Kaufen · {{price}}◈",
-    "shipLocked": "Wird ab Level{{level}} freigeschaltet",
+    "shipLocked": "Freischaltungen: {{route}}",
     "filterAll": "Alle"
   },
   "collection": {
@@ -504,7 +504,10 @@
     "featureFreeRespec": "Kostenlose Keystone-Neuzuweisung",
     "sectorSix": "Sektor 6 „Jenseits des Kerns“",
     "diceS6": "Vier Kausalitätswürfel",
-    "skinThreshold": "Die Skin „Threshold“"
+    "skinThreshold": "Die Skin „Threshold“",
+    "featureShipCorsair": "Der Hound ist auf dem Markt",
+    "featureShipFoundry": "„The Forge“ ist auf dem Markt",
+    "featureShipPrism": "Das Prism ist auf dem Markt"
   },
   "skin": {
     "title": "Die Skins",
@@ -741,7 +744,19 @@
     "shards": "+{{n}} ◈",
     "badgeChip": "Abzeichen",
     "voucherChip": "Gutschein",
-    "maxed": "Abgeschlossen"
+    "maxed": "Abgeschlossen",
+    "corsairClear": {
+      "name": "Outrun",
+      "desc": "Schließe eine Kampagne mit der „Hound“ ab."
+    },
+    "foundryClear": {
+      "name": "Gehärtet",
+      "desc": "Schließe eine Kampagne ab, in der du die „Forge“ fliegst."
+    },
+    "prismClear": {
+      "name": "Gebrochen",
+      "desc": "Schließe eine Kampagne mit der „Prism“ ab."
+    }
   },
   "chartTag": {
     "red": "rot",

@@ -16,6 +16,7 @@ import { rollPerkChoices, type DraftContext } from "../../src/game/run/perkDraft
 import { puzzleForNode } from "../../src/game/puzzles/selection";
 import type { MapGraph, MapNode } from "../../src/game/map/types";
 import { edgeMarkFor } from "../../src/game/map/types";
+import type { ShipId } from "../../src/data/ships";
 import type { MkLevels } from "../../src/stores/runStore";
 import type { SlotId } from "../../src/types/battle";
 import type { EventEffect } from "../../src/types/events";
@@ -32,6 +33,7 @@ export interface PuzzleTally {
 }
 
 export interface RunState {
+  shipId: ShipId;
   hull: number;
   hullMax: number;
   scrap: number;
@@ -79,6 +81,7 @@ export const emptySinks = (): Record<string, number> => ({
 });
 
 export interface RunStateInit {
+  shipId?: ShipId;
   hull: number;
   hullMax: number;
   deck: readonly string[];
@@ -89,6 +92,7 @@ export interface RunStateInit {
 }
 
 export const createRunState = (init: RunStateInit): RunState => ({
+  shipId: init.shipId ?? "wanderer",
   hull: init.hull,
   hullMax: init.hullMax,
   scrap: 0,

@@ -389,6 +389,21 @@
       "passiveName": "Bastion",
       "passiveDesc": "Un quart du bouclier restant passe au tour suivant."
     },
+    "corsair": {
+      "name": "Chien de chasse",
+      "passiveName": "Postcombustion",
+      "passiveDesc": "La manœuvre « Runs Hot » : +10 % d'esquive et un plafond de 70/30 au lieu de 55/25. Chaque esquive ou coup effleuré confère +1 aux armes au tour suivant, jusqu'à +2 par tour."
+    },
+    "foundry": {
+      "name": "Forge",
+      "passiveName": "Recuit",
+      "passiveDesc": "Une fois par combat, deux dés de plateau de même valeur fusionnent pour former un dé d'un niveau supérieur, qui prend en compte les deux valeurs."
+    },
+    "prism": {
+      "name": "Prisme",
+      "passiveName": "Réfracteur",
+      "passiveDesc": "Les dés prismatiques comptent double dans le décompte de résonance. Une fois par combat, un dé devient prismatique pour ce tour."
+    },
     "ram-proto": {
       "name": "Prototype Bélier"
     }

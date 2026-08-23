@@ -202,6 +202,7 @@ export interface DieView {
   tier: number;
   state: string;
   slot: SlotId | null;
+  temp: boolean;
 }
 
 export interface AccountView {
@@ -262,6 +263,9 @@ export interface TestState {
     hull: number;
     charge: number;
     outcome: string | null;
+    shipId: ShipId;
+    passiveUsed: boolean;
+    nextWeapons: number;
     selectedDieUid: string | null;
     dice: DieView[];
     slots: { id: SlotId; dieUid: string | null }[];
@@ -469,6 +473,9 @@ const readState = (): TestState => {
       hull: battle.hull,
       charge: battle.charge,
       outcome: battle.outcome ?? null,
+      shipId: battle.shipId,
+      passiveUsed: battle.passiveUsed,
+      nextWeapons: battle.nextTurnMods.weapons ?? 0,
       selectedDieUid: battle.selectedDieUid,
       dice: battle.dice.map((d) => ({
         uid: d.uid,
@@ -478,6 +485,7 @@ const readState = (): TestState => {
         tier: d.tier,
         state: d.state,
         slot: d.slot ?? null,
+        temp: d.temp === true,
       })),
       slots: Object.entries(battle.slots).map(([id, slot]) => ({
         id: id as SlotId,

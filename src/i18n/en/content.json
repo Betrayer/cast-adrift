@@ -389,6 +389,21 @@
       "passiveName": "Bulwark",
       "passiveDesc": "A quarter of the standing shield carries into the next turn."
     },
+    "corsair": {
+      "name": "Hound",
+      "passiveName": "Afterburner",
+      "passiveDesc": "Manoeuvre runs hot: +10% dodge and a ceiling of 70/30 instead of 55/25. Every dodge or glancing hit grants Weapons +1 next turn, up to +2 a turn."
+    },
+    "foundry": {
+      "name": "Forge",
+      "passiveName": "Anneal",
+      "passiveDesc": "Once per battle, two tray dice of equal value fuse into one die a tier larger, carrying both values."
+    },
+    "prism": {
+      "name": "Prism",
+      "passiveName": "Refractor",
+      "passiveDesc": "Prismatic dice count twice in the resonance census. Once per battle, one die turns prismatic for this turn."
+    },
     "ram-proto": {
       "name": "Ram Prototype"
     }

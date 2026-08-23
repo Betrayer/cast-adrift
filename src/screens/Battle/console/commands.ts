@@ -64,6 +64,13 @@ export const runActionEffect = (id: ConsoleActionId): void => {
     case 'sacrifice':
       if (uid !== null) live.sacrificeDie(uid);
       return;
+    case 'fuse':
+      if (live.fuseSourceUid !== null) live.cancelFuse();
+      else if (uid !== null) live.beginFuse(uid);
+      return;
+    case 'reschool':
+      if (uid !== null) live.reschoolDie(uid);
+      return;
     default:
       activeEffect(id);
   }

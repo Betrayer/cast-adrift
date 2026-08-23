@@ -24,6 +24,7 @@
     "sim:deep": "tsx scripts/sim.mts --mode deep --runs 300 --seed 17",
     "sim:meta": "tsx scripts/sim.mts --mode meta",
     "sim:campaign": "tsx scripts/sim.mts --mode campaign --runs 300 --seed 11",
+    "sim:ships": "tsx scripts/sim.mts --mode ships --runs 200 --seed 11",
     "sim:puzzles": "tsx scripts/sim.mts --mode puzzles --runs 60 --seed 11",
     "sim:roster": "tsx scripts/sim.mts --mode roster --runs 120 --seed 13",
     "sim:s6": "tsx scripts/sim.mts --mode s6 --runs 300 --seed 17",

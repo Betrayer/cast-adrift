@@ -26,6 +26,9 @@
   "copy": "Copy",
   "bloodReactor": "Blood Reactor (2♥→3⚡)",
   "sacrifice": "Sacrifice (+4)",
+  "reschool": "Refract",
+  "fusePick": "Pick the twin",
+  "fuse": "Anneal",
   "collect": "Collect",
   "lootNew": "New die",
   "jam": "JAM",
@@ -92,7 +95,8 @@
     "inherits": "here: {{school}} +{{n}}",
     "inheritsMult": "here: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
-    "mkTitle": "Mk levels"
+    "mkTitle": "Mk levels",
+    "enginesB": "Engines II"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -172,7 +176,9 @@
     "atCeiling": "Already at the highest face",
     "reserveFull": "Reserve is full",
     "used": "Already used this turn",
-    "hullLow": "Hull is too low"
+    "hullLow": "Hull is too low",
+    "noPartner": "Annealing needs a second tray die of the same value.",
+    "spent": "The ship may do this once per battle."
   },
   "resPrism": "a prismatic die counts toward this school",
   "badge": {
@@ -249,7 +255,7 @@
     "jamAt": "wedges on ≤{{n}}",
     "price": "{{n}} ◈",
     "free": "Starting ship",
-    "locked": "Captain level {{n}}",
+    "locked": "unlocks: {{route}}",
     "passiveNone": "No passive."
   },
   "intentWhy": {

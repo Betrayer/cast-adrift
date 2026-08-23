@@ -150,6 +150,7 @@ export type SlotId =
   | "shields"
   | "shieldsB"
   | "engines"
+  | "enginesB"
   | "sensors"
   | "reactor"
   | "repairBay";

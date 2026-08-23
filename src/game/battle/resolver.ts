@@ -1,6 +1,5 @@
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { ENEMY_BY_ID } from "@/data/enemies";
-import { SHIP_BY_ID, shipHasPassive } from "@/data/ships";
 import {
   aliveEnemies,
   applyWeaponDamage,
@@ -8,6 +7,13 @@ import {
   resolveWeaponTarget,
 } from "@/game/battle/damage";
 import { resonanceGrantActive } from "@/data/resonance";
+import type { ShipId } from "@/data/ships";
+import { ENGINE_SLOTS } from "@/data/slots";
+import {
+  overCapAllowed,
+  shipProfile,
+  type EvasionTuning,
+} from "@/game/battle/passives";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import {
   applyObsidianPact,
@@ -82,8 +88,6 @@ export {
   resolutionOrder,
 };
 
-export const OVERLOAD_HULL_COST = 2;
-
 export const CHARGE_CAP = 10;
 export const OVERFLOW_HULL_COST = 2;
 export const NUDGE_COST = 3;
@@ -138,20 +142,34 @@ export const VULNERABLE_DIVISOR = 2;
 const clampPct = (raw: number, cap: number): number =>
   Math.max(0, Math.min(cap, Math.round(raw)));
 
-export const evasionFor = (value: number, evasionDelta = 0): EvasionState => {
+export const BASE_EVASION: EvasionTuning = {
+  delta: 0,
+  dodgeCap: DODGE_PCT_CAP,
+  glancingCap: GLANCING_PCT_CAP,
+};
+
+export const evasionFor = (
+  value: number,
+  evasionDelta = 0,
+  tuning: EvasionTuning = BASE_EVASION,
+): EvasionState => {
   const effective = Math.max(0, value);
+  const delta = evasionDelta + tuning.delta;
   return {
     dodgePct: clampPct(
-      effective * DODGE_PCT_PER_VALUE + evasionDelta,
-      DODGE_PCT_CAP,
+      effective * DODGE_PCT_PER_VALUE + delta,
+      tuning.dodgeCap,
     ),
     glancingPct: clampPct(
-      effective * GLANCING_PCT_PER_VALUE + evasionDelta / 2,
-      GLANCING_PCT_CAP,
+      effective * GLANCING_PCT_PER_VALUE + delta / 2,
+      tuning.glancingCap,
     ),
     intercept: effective >= INTERCEPT_VALUE,
   };
 };
+
+export const evasionTuningFor = (shipId: ShipId | undefined): EvasionTuning =>
+  shipProfile(shipId).evasion ?? BASE_EVASION;
 
 export const vulnerableFor = (value: number, markBonusDelta = 0): number =>
   Math.max(
@@ -206,6 +224,7 @@ interface SlotContext {
   perkMods: PerkMods;
   ricochet: boolean;
   overkill: number;
+  engineValue: number;
 }
 
 const noteOverkill = (
@@ -346,8 +365,13 @@ const applySlotEffect = (
     const heal = Math.ceil(value / 2);
     next.hull = Math.min(next.hullMax, next.hull + heal);
     beats.push({ slot: slotId, kind: "repair", amount: heal, after: clone(next) });
-  } else if (slotId === "engines") {
-    const evasion = evasionFor(value, perkMods.evasionDelta);
+  } else if (ENGINE_SLOTS.has(slotId)) {
+    sc.engineValue += value;
+    const evasion = evasionFor(
+      sc.engineValue,
+      perkMods.evasionDelta,
+      evasionTuningFor(next.shipId),
+    );
     next.evasion = evasion;
     beats.push({
       slot: slotId,
@@ -422,13 +446,10 @@ const resolveSlot = (
     slotId === "weaponA" || slotId === "weaponB" || slotId === "spinal";
 
   if (die.tier > effectiveCap(next, slotId, slot)) {
-    const overload =
-      isWeapon &&
-      next.shipId !== undefined &&
-      shipHasPassive(next.shipId, "overload");
+    const overload = overCapAllowed(next.shipId, slotId);
     const grant = exceedCapGrantFor(next, die, slotId);
-    if (overload) {
-      next.hull = Math.max(0, next.hull - OVERLOAD_HULL_COST);
+    if (overload !== null) {
+      next.hull = Math.max(0, next.hull - overload.hullCost);
     } else if (grant !== undefined) {
       next.hull = Math.max(0, next.hull - grant.hullCost);
     }
@@ -519,6 +540,7 @@ export const resolvePlayerPhase = (
     perkMods,
     ricochet,
     overkill: 0,
+    engineValue: 0,
   };
 
   for (const slotId of resolutionOrder(next)) {
@@ -554,6 +576,7 @@ export const resolvePlayerPhase = (
 
 interface AttackContext {
   firstDodgeSpent: boolean;
+  afterburnerGranted: number;
   defense: RngStream;
 }
 
@@ -564,6 +587,17 @@ export interface AttackResult {
   dodged: number;
   glanced: number;
 }
+
+const rewardEvade = (
+  next: BattleSnapshot,
+  context: AttackContext,
+): void => {
+  const rule = shipProfile(next.shipId).afterburner;
+  if (rule === null || context.afterburnerGranted >= rule.cap) return;
+  const grant = Math.min(rule.weapons, rule.cap - context.afterburnerGranted);
+  context.afterburnerGranted += grant;
+  next.nextTurnMods.weapons = (next.nextTurnMods.weapons ?? 0) + grant;
+};
 
 const rewardDodge = (
   next: BattleSnapshot,
@@ -650,11 +684,13 @@ const applyAttack = (
       if (roll <= evasion.dodgePct) {
         dodged += 1;
         rewardDodge(next, enemy, context, evasion);
+        rewardEvade(next, context);
         continue;
       }
       if (roll <= evasion.dodgePct + evasion.glancingPct) {
         glanced += 1;
         damage = Math.ceil(damage / 2);
+        rewardEvade(next, context);
       }
     }
     const absorbed = Math.min(next.shield, damage);
@@ -1090,7 +1126,11 @@ export const resolveEnemyPhase = (
     next,
     beats,
     enemyStream,
-    attack: { firstDodgeSpent: false, defense: defenseStream },
+    attack: {
+      firstDodgeSpent: false,
+      afterburnerGranted: 0,
+      defense: defenseStream,
+    },
   };
 
   const decayPct = battleMutators(next).shieldDecayPct;
@@ -1154,11 +1194,10 @@ export const resolveEnemyPhase = (
   const sources = buildSources(next);
   emit(sources, "enemyTurnEnd", effectCtx);
 
-  const passive =
-    next.shipId !== undefined ? SHIP_BY_ID.get(next.shipId)?.passive : undefined;
+  const keepPct = shipProfile(next.shipId).shieldKeepPct;
   const bulwarkFloor =
-    passive?.kind === "bulwark" && next.shield > 0
-      ? Math.floor(next.shield * (passive.keepPct / 100))
+    keepPct > 0 && next.shield > 0
+      ? Math.floor(next.shield * (keepPct / 100))
       : 0;
   next.shield = Math.min(
     next.shield,
@@ -1270,6 +1309,11 @@ export const advanceTurn = (
     const shown = banked ?? rolled + (die.growth ?? 0);
     return {
       ...die,
+      school:
+        die.reschooled === true
+          ? (DIE_BY_ID.get(die.defId)?.school ?? die.school)
+          : die.school,
+      reschooled: undefined,
       value: Math.max(1, shown - curseOn(next, die.uid)),
       lastValue: die.value,
       state: "tray" as const,

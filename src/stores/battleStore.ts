@@ -1,19 +1,24 @@
 import { create } from "zustand";
 import { ENEMY_BY_ID } from "@/data/enemies";
-import { SHIP_BY_ID, type ShipId } from "@/data/ships";
+import type { ShipId } from "@/data/ships";
 import {
   adjacentCopyValue,
   canBank,
   canCopy,
   canFlip,
+  canFuse,
+  canReschool,
   canSplit,
   canSwap,
   flippedValue,
+  fusedDie,
+  isFuseTarget,
   isSwapTarget,
   SPLIT_DIE_COUNT,
   SPLIT_DIE_DEF,
 } from "@/game/battle/actives";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
+import { passiveActionOf, shipProfile } from "@/game/battle/passives";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import {
   advanceTurn,
@@ -150,6 +155,7 @@ export interface BattleValues {
   chargeCap: number;
   sacrificePool: number;
   bloodReactorUsed: boolean;
+  passiveUsed: boolean;
   burnDoubleUsed: boolean;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
@@ -162,6 +168,7 @@ export interface BattleValues {
   freeNudges: number;
   selectedDieUid: string | null;
   swapSourceUid: string | null;
+  fuseSourceUid: string | null;
   enemies: EnemyState[];
   targetId: string | null;
   evasion: EvasionState | null;
@@ -243,6 +250,10 @@ export interface BattleState extends BattleValues {
   cancelSwap: () => void;
   bankDie: (uid: string) => void;
   splitDie: (uid: string) => void;
+  beginFuse: (uid: string) => void;
+  cancelFuse: () => void;
+  fuseDice: (uid: string) => void;
+  reschoolDie: (uid: string) => void;
   rollFate: () => void;
   clearFateResult: () => void;
   toggleRerollMode: () => void;
@@ -285,6 +296,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   chargeCap: DEFAULT_CHARGE_CAP,
   sacrificePool: 0,
   bloodReactorUsed: false,
+  passiveUsed: false,
   burnDoubleUsed: false,
   dice: [],
   slots: {},
@@ -314,6 +326,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   pendingSwap: 0,
   pendingStorm: 0,
   swapSourceUid: null,
+  fuseSourceUid: null,
   ascension: 0,
   inverted: false,
   nodeStorm: false,
@@ -377,6 +390,7 @@ export const battleSnapshot = (s: BattleSnapshot): BattleSnapshot => ({
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
   bloodReactorUsed: s.bloodReactorUsed,
+  passiveUsed: s.passiveUsed,
   burnDoubleUsed: s.burnDoubleUsed,
   dice: s.dice,
   slots: s.slots,
@@ -434,6 +448,7 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   chargeCap: snap.chargeCap,
   sacrificePool: snap.sacrificePool,
   bloodReactorUsed: snap.bloodReactorUsed,
+  passiveUsed: snap.passiveUsed === true,
   burnDoubleUsed: snap.burnDoubleUsed,
   dice: snap.dice,
   slots: snap.slots,
@@ -677,8 +692,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const modules = encounter.modules ?? [];
     const forcedTraits = encounter.forcedTraits ?? [];
     const mods = computeRunMods(perks, chartPicks, modules);
-    const passive = SHIP_BY_ID.get(shipId)?.passive;
-    const scrapperScrap = passive?.kind === "scrapper" ? passive.scrap : 0;
+    const scrapperScrap = shipProfile(shipId).battleStartScrap;
     const singleCast =
       runHasTrait(perks, chartPicks, "singleCast", modules) ||
       forcedTraits.includes("singleCast");
@@ -865,10 +879,20 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
   selectDie: (uid) => {
     set((s) => {
       if (s.phase !== "placement" || s.rerollMode) return s;
-      if (uid === null) return { selectedDieUid: null, swapSourceUid: null };
+      if (uid === null) {
+        return { selectedDieUid: null, swapSourceUid: null, fuseSourceUid: null };
+      }
       const die = s.dice.find((d) => d.uid === uid);
       if (die === undefined) return s;
       if (die.state !== "tray" && die.state !== "placed") return s;
+      const fuseFrom =
+        s.fuseSourceUid === null
+          ? undefined
+          : s.dice.find((d) => d.uid === s.fuseSourceUid);
+      if (fuseFrom !== undefined && isFuseTarget(fuseFrom, die)) {
+        get().fuseDice(uid);
+        return {};
+      }
       const source =
         s.swapSourceUid === null
           ? undefined
@@ -947,6 +971,67 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
           ),
           ...spawned,
         ],
+      };
+    });
+  },
+
+  beginFuse: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      if (passiveActionOf(s.shipId) !== "fuse" || s.passiveUsed) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canFuse(die)) return s;
+      if (!s.dice.some((d) => isFuseTarget(die, d))) return s;
+      return { fuseSourceUid: uid };
+    });
+  },
+
+  cancelFuse: () => {
+    set({ fuseSourceUid: null });
+  },
+
+  fuseDice: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      if (passiveActionOf(s.shipId) !== "fuse" || s.passiveUsed) return s;
+      const source = s.dice.find((d) => d.uid === s.fuseSourceUid);
+      const target = s.dice.find((d) => d.uid === uid);
+      if (source === undefined || target === undefined) return s;
+      if (!isFuseTarget(source, target)) return s;
+      const spawned = fusedDie(
+        source,
+        target,
+        shipProfile(s.shipId).fuseTierStep,
+      );
+      return {
+        passiveUsed: true,
+        fuseSourceUid: null,
+        selectedDieUid: spawned.uid,
+        dice: [
+          ...s.dice.map((d) =>
+            d.uid === source.uid || d.uid === target.uid
+              ? { ...d, state: "burned" as const, slot: undefined }
+              : d,
+          ),
+          { ...spawned, expiresTurn: s.turn },
+        ],
+      };
+    });
+  },
+
+  reschoolDie: (uid) => {
+    set((s) => {
+      if (s.phase !== "placement" || s.rerollMode) return s;
+      if (passiveActionOf(s.shipId) !== "reschool" || s.passiveUsed) return s;
+      const die = s.dice.find((d) => d.uid === uid);
+      if (die === undefined || !canReschool(die)) return s;
+      return {
+        passiveUsed: true,
+        dice: s.dice.map((d) =>
+          d.uid === uid
+            ? { ...d, school: "prismatic" as const, reschooled: true }
+            : d,
+        ),
       };
     });
   },
@@ -1309,6 +1394,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         steps === null || checkDone
           ? s.freeNudges
           : (steps[advanced]?.grantFreeNudge ?? s.freeNudges),
+      swapSourceUid: null,
+      fuseSourceUid: null,
       lastBlock: null,
     });
     if (steps !== null && advanced !== s.checkIndex && !s.checkSandbox) {
@@ -1364,6 +1451,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   chargeCap: s.chargeCap,
   sacrificePool: s.sacrificePool,
   bloodReactorUsed: s.bloodReactorUsed,
+  passiveUsed: s.passiveUsed,
   burnDoubleUsed: s.burnDoubleUsed,
   dice: s.dice,
   slots: s.slots,
@@ -1393,6 +1481,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   pendingSwap: s.pendingSwap,
   pendingStorm: s.pendingStorm,
   swapSourceUid: s.swapSourceUid,
+  fuseSourceUid: s.fuseSourceUid,
   ascension: s.ascension,
   sectorHpPct: s.sectorHpPct,
   sectorDmgPct: s.sectorDmgPct,

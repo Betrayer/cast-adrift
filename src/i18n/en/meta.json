@@ -278,7 +278,7 @@
     "shipEquip": "Equip",
     "shipEquipped": "Equipped",
     "shipBuy": "Buy · {{price}}◈",
-    "shipLocked": "Unlocks at Level {{level}}",
+    "shipLocked": "Unlocks: {{route}}",
     "filterAll": "All"
   },
   "collection": {
@@ -504,7 +504,10 @@
     "featureFreeRespec": "Free keystone respec",
     "sectorSix": "Sector 6 «Beyond the Core»",
     "diceS6": "Four causality dice",
-    "skinThreshold": "Die skin «Threshold»"
+    "skinThreshold": "Die skin «Threshold»",
+    "featureShipCorsair": "The Hound is on the market",
+    "featureShipFoundry": "The Forge is on the market",
+    "featureShipPrism": "The Prism is on the market"
   },
   "skin": {
     "title": "Die skins",
@@ -741,7 +744,19 @@
     "shards": "+{{n}} ◈",
     "badgeChip": "Badge",
     "voucherChip": "Voucher",
-    "maxed": "Complete"
+    "maxed": "Complete",
+    "corsairClear": {
+      "name": "Outrun",
+      "desc": "Clear a campaign flying the Hound."
+    },
+    "foundryClear": {
+      "name": "Tempered",
+      "desc": "Clear a campaign flying the Forge."
+    },
+    "prismClear": {
+      "name": "Refracted",
+      "desc": "Clear a campaign flying the Prism."
+    }
   },
   "chartTag": {
     "red": "red",

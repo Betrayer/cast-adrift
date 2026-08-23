@@ -278,7 +278,7 @@
     "shipEquip": "Equipar",
     "shipEquipped": "Equipado",
     "shipBuy": "Comprar · {{price}}◈",
-    "shipLocked": "Se desbloquea en el nivel{{level}}",
+    "shipLocked": "Desbloqueos: {{route}}",
     "filterAll": "Todos"
   },
   "collection": {
@@ -504,7 +504,10 @@
     "featureFreeRespec": "Reasignación gratuita de puntos de habilidad de Keystone",
     "sectorSix": "Sector 6 «Más allá del núcleo»",
     "diceS6": "Cuatro dados de causalidad",
-    "skinThreshold": "La piel de «Threshold»"
+    "skinThreshold": "La piel de «Threshold»",
+    "featureShipCorsair": "El Sabueso está a la venta",
+    "featureShipFoundry": "The Forge está a la venta",
+    "featureShipPrism": "El Prism ya está a la venta"
   },
   "skin": {
     "title": "Las pieles",
@@ -741,7 +744,19 @@
     "shards": "+{{n}} ◈",
     "badgeChip": "Insignia",
     "voucherChip": "Vale",
-    "maxed": "Completado"
+    "maxed": "Completado",
+    "corsairClear": {
+      "name": "Outrun",
+      "desc": "Supera una campaña pilotando el Hound."
+    },
+    "foundryClear": {
+      "name": "Templado",
+      "desc": "Supera una campaña con la nave «Forge»."
+    },
+    "prismClear": {
+      "name": "Refractado",
+      "desc": "Supera una campaña pilotando el Prism."
+    }
   },
   "chartTag": {
     "red": "rojo",

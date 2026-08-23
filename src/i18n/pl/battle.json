@@ -26,6 +26,9 @@
   "copy": "Kopiuj",
   "bloodReactor": "Reaktor krwi (2♥→3⚡)",
   "sacrifice": "Ofiara (+4)",
+  "reschool": "Refrakt",
+  "fusePick": "Wybierz bliźniaka",
+  "fuse": "Wyżarzanie",
   "collect": "Zbierz",
   "lootNew": "Nowa matryca",
   "jam": "JAM",
@@ -92,7 +95,8 @@
     "inherits": "tutaj: {{school}} +{{n}}",
     "inheritsMult": "tutaj: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
-    "mkTitle": "Poziomy Mk"
+    "mkTitle": "Poziomy Mk",
+    "enginesB": "Silniki II"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -172,7 +176,9 @@
     "atCeiling": "Już najwyższa ściana",
     "reserveFull": "Rezerwa pełna",
     "used": "Już użyte w tej turze",
-    "hullLow": "Za mało kadłuba"
+    "hullLow": "Za mało kadłuba",
+    "noPartner": "Do wyżarzania potrzebna jest druga matryca tacowa o tej samej wartości.",
+    "spent": "Statek może wykonać tę akcję raz na bitwę."
   },
   "resPrism": "kość pryzmatyczna liczy się do tej szkoły",
   "badge": {
@@ -182,6 +188,7 @@
     "growth": "Rośnie na maksymalnej ścianie",
     "faces": "Niestandardowe ściany"
   },
+  "layoutHint": "Wolisz inny układ walki? Ustawienia → Interfejs walki.",
   "radial": {
     "reroll": "↻",
     "nudgeMinus": "−1",
@@ -198,7 +205,6 @@
     "out": "→ {{text}}",
     "unknown": "→ ?"
   },
-  "layoutHint": "Wolisz inny układ walki? Ustawienia → Interfejs walki.",
   "forecastStrip": "zadasz ~{{out}} · otrzymasz {{hull}}",
   "forecastBreak": "atak {{raw}} − unik {{evade}} − tarcza {{shield}}",
   "check": {
@@ -249,7 +255,7 @@
     "jamAt": "klinuje przy ≤{{n}}",
     "price": "{{n}} ◈",
     "free": "Statek startowy",
-    "locked": "Poziom kapitana {{n}}",
+    "locked": "odblokowuje: {{route}}",
     "passiveNone": "Brak pasywki."
   },
   "intentWhy": {

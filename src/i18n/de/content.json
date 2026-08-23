@@ -389,6 +389,21 @@
       "passiveName": "Bollwerk",
       "passiveDesc": "Ein Viertel des stehenden Schilds wird in die nächste Runde übernommen."
     },
+    "corsair": {
+      "name": "Hund",
+      "passiveName": "Nachbrenner",
+      "passiveDesc": "„Manöver“ ist besonders wirkungsvoll: +10 % Ausweichen und eine Obergrenze von 70/30 statt 55/25. Jedes Ausweichen oder jeder Streiftreffer gewährt im nächsten Zug +1 auf die Waffen, bis zu +2 pro Zug."
+    },
+    "foundry": {
+      "name": "Schmiede",
+      "passiveName": "Glühen",
+      "passiveDesc": "Einmal pro Kampf verschmelzen zwei Würfel mit gleichem Wert zu einem Würfel einer höheren Stufe, der beide Werte aufweist."
+    },
+    "prism": {
+      "name": "Prisma",
+      "passiveName": "Refraktor",
+      "passiveDesc": "Prismatische Würfel zählen bei der Resonanzzählung doppelt. Einmal pro Kampf wird ein Würfel für diesen Zug prismatisch."
+    },
     "ram-proto": {
       "name": "Rammen-Prototyp"
     }

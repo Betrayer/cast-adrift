@@ -176,6 +176,12 @@ const shipClearDelta = (
       return { clearsRam: 1 };
     case "ark":
       return { clearsArk: 1 };
+    case "corsair":
+      return { clearsCorsair: 1 };
+    case "foundry":
+      return { clearsFoundry: 1 };
+    case "prism":
+      return { clearsPrism: 1 };
     default:
       return {};
   }

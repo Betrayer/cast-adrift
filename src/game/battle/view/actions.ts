@@ -6,9 +6,13 @@ import {
   canBank,
   canCopy,
   canFlip,
+  canFuse,
+  canReschool,
   canSplit,
   canSwap,
+  isFuseTarget,
 } from "@/game/battle/actives";
+import { passiveActionOf, type PassiveActionId } from "@/game/battle/passives";
 import {
   BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
@@ -41,6 +45,7 @@ export type ConsoleActionId =
   | "surge"
   | "bloodReactor"
   | "sacrifice"
+  | PassiveActionId
   | ActiveActionId;
 
 export type ConsoleBlock =
@@ -59,7 +64,9 @@ export type ConsoleBlock =
   | "occupied"
   | "tierCap"
   | "slotBlocked"
-  | "dieLocked";
+  | "dieLocked"
+  | "noPartner"
+  | "spent";
 
 export interface ConsoleAction {
   id: ConsoleActionId;
@@ -75,6 +82,7 @@ export interface ConsoleShape {
   fate: boolean;
   bloodReactor: boolean;
   sacrifice: boolean;
+  passive: PassiveActionId | null;
   actives: ActiveActionId[];
 }
 
@@ -213,6 +221,38 @@ export const consoleActions = (board: BattleBoard): ConsoleActions => {
             : null,
       ),
     ),
+    fuse: action(
+      "fuse",
+      gate(
+        passiveActionOf(board.shipId) !== "fuse"
+          ? "notAllowed"
+          : board.passiveUsed === true
+            ? "spent"
+            : die === undefined
+              ? "noSelection"
+              : !canFuse(die)
+                ? "notInTray"
+                : board.dice.some((d) => isFuseTarget(die, d))
+                  ? null
+                  : "noPartner",
+      ),
+    ),
+    reschool: action(
+      "reschool",
+      gate(
+        passiveActionOf(board.shipId) !== "reschool"
+          ? "notAllowed"
+          : board.passiveUsed === true
+            ? "spent"
+            : die === undefined
+              ? "noSelection"
+              : die.state !== "tray" && die.state !== "placed"
+                ? "notInTray"
+                : canReschool(die)
+                  ? null
+                  : "notAllowed",
+      ),
+    ),
     flip: action(
       "flip",
       gate(activeBlock(die, die !== undefined && canFlip(die), false)),
@@ -249,6 +289,7 @@ export const consoleShape = (board: BattleBoard): ConsoleShape => {
     fate: board.dice.some((d) => d.defId === FATE_DIE_ID),
     bloodReactor: sourceTrait(board, "bloodReactor"),
     sacrifice: sourceTrait(board, "sacrifice"),
+    passive: passiveActionOf(board.shipId),
     actives: ACTIVE_IDS.filter((id) => actives.has(id)),
   };
 };

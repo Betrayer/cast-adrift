@@ -278,7 +278,7 @@
     "shipEquip": "Équiper",
     "shipEquipped": "Équipé",
     "shipBuy": "Acheter · {{price}}◈",
-    "shipLocked": "Se débloque au niveau{{level}}",
+    "shipLocked": "Débloque : {{route}}",
     "filterAll": "Tout"
   },
   "collection": {
@@ -504,7 +504,10 @@
     "featureFreeRespec": "Réattribution gratuite des points de caractéristiques « Keystone »",
     "sectorSix": "Secteur 6 « Au-delà du centre »",
     "diceS6": "Quatre dés de causalité",
-    "skinThreshold": "Le skin « Threshold »"
+    "skinThreshold": "Le skin « Threshold »",
+    "featureShipCorsair": "« The Hound » est désormais disponible à la vente",
+    "featureShipFoundry": "La Forge est à vendre",
+    "featureShipPrism": "Le Prism est désormais disponible sur le marché"
   },
   "skin": {
     "title": "Les skins",
@@ -741,7 +744,19 @@
     "shards": "+{{n}} ◈",
     "badgeChip": "Insigne",
     "voucherChip": "Bon",
-    "maxed": "Terminé"
+    "maxed": "Terminé",
+    "corsairClear": {
+      "name": "Outrun",
+      "desc": "Terminez une campagne aux commandes du Hound."
+    },
+    "foundryClear": {
+      "name": "Trempé",
+      "desc": "Terminez une campagne avec le vaisseau « Forge »."
+    },
+    "prismClear": {
+      "name": "Réfracté",
+      "desc": "Terminez une campagne à bord du Prism."
+    }
   },
   "chartTag": {
     "red": "rouge",

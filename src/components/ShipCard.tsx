@@ -4,6 +4,7 @@ import { schools } from "@/data/schools";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { slotAffinity } from "@/game/battle/view";
+import { featureRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
 import type { SlotId } from "@/types/battle";
 import styles from "./ShipCard.module.css";
 
@@ -33,11 +34,15 @@ export const ShipCard = ({
   footer,
   className,
 }: ShipCardProps) => {
-  const { t } = useTranslation(["battle", "content"]);
+  const { t } = useTranslation(["battle", "content", "meta"]);
   const def = SHIP_BY_ID.get(shipId);
   if (def === undefined) return null;
 
   const slotIds = Object.keys(def.slots) as SlotId[];
+  const route =
+    def.unlock === undefined
+      ? null
+      : unlockHintsLine(featureRoutes(def.unlock), t);
 
   return (
     <div
@@ -128,7 +133,9 @@ export const ShipCard = ({
         <span className={styles.price} data-ship-price>
           {def.price === 0
             ? t("battle:ship.free")
-            : `${t("battle:ship.price", { n: def.price })} · ${t("battle:ship.locked", { n: def.unlockLevel })}`}
+            : route === null
+              ? t("battle:ship.price", { n: def.price })
+              : `${t("battle:ship.price", { n: def.price })} · ${t("battle:ship.locked", { route })}`}
         </span>
       ) : null}
 
