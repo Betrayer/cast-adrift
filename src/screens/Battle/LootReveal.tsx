@@ -1,7 +1,8 @@
 import { Button, Text } from '@mantine/core';
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { rarityColor } from '@/app/rarity';
+import { useEscapeKey } from '@/components/dismiss';
 import { tokens } from '@/app/theme';
 import { DIE_BY_ID } from '@/data/dice';
 import { LOOT_SFX } from '@/data/audio';
@@ -51,28 +52,32 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
     };
   }, [reduced, dieId]);
 
+  const advance = useCallback((): void => {
+    if (!revealed) {
+      setRevealed(true);
+      return;
+    }
+    onClose();
+  }, [revealed, onClose]);
+
+  useEscapeKey(true, advance);
+
   const def = DIE_BY_ID.get(dieId);
   if (def === undefined) return null;
 
   const colors = schools[def.school];
   const frameColor = rarityColor(def.rarity);
 
-  const onOverlayClick = (): void => {
-    if (!revealed) {
-      setRevealed(true);
-      return;
-    }
-    onClose();
-  };
 
   return (
     <div
       className={styles.overlay}
-      onClick={onOverlayClick}
+      data-loot-reveal={dieId}
+      onClick={advance}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onOverlayClick();
+        if (e.key === 'Enter' || e.key === ' ') advance();
       }}
     >
       <Text className={styles.title} c={tokens.dim}>

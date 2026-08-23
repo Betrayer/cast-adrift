@@ -12,6 +12,7 @@ import {
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { useAtLeast } from "@/app/breakpoints";
 import { tokens } from "@/app/theme";
 import { CHART_BOUNDS, CHART_NODES, CHART_NODE_BY_ID } from "@/data/chart";
@@ -27,7 +28,6 @@ import {
   respecCost,
 } from "@/game/chart/engine";
 import { chartNodeLines, chartNodeTitle } from "@/game/chart/describe";
-import { useAppStore } from "@/stores/appStore";
 import { trackEvent } from "@/services/analytics";
 import { playSfx } from "@/services/audio";
 import { useMetaStore } from "@/stores/metaStore";
@@ -108,7 +108,6 @@ const IDENTITY: ChartView = { scale: 1, tx: 0, ty: 0 };
 
 export const ChartScreen = () => {
   const { t } = useTranslation(["meta", "common", "battle"]);
-  const go = useAppStore((s) => s.go);
   const picks = useMetaStore((s) => s.chartPicks);
   const level = useMetaStore((s) => s.level);
   const shards = useMetaStore((s) => s.shards);
@@ -191,8 +190,9 @@ export const ChartScreen = () => {
     if (element === null) return;
     const sync = (): void => {
       const box = measure();
+      if (box.w <= 0) return;
       setViewport(box);
-      if (framed.current || box.w <= 0) return;
+      if (framed.current) return;
       framed.current = true;
       const home = homeView();
       if (home !== null) setView(home);
@@ -455,42 +455,35 @@ export const ChartScreen = () => {
       scroll={false}
       header={
         <div className={styles.headerBar}>
-          <Button
-            size="xs"
-            variant="default"
-            onClick={() => {
-              go("menu");
-            }}
-          >
-            {t("common:back")}
-          </Button>
-          <Text size="sm" c={tokens.text}>
-            {t("meta:chart.header", { points, level })}
-          </Text>
-          <Group gap={6}>
-            <Button
-              size="xs"
-              variant={filterOpen ? "filled" : "default"}
-              data-chart-filter-toggle
-              onClick={() => {
-                setFilterOpen((open) => !open);
-              }}
-            >
-              {tagFilter.length === 0
-                ? t("meta:chart.filter")
-                : t("meta:chart.filterOn", { n: tagFilter.length })}
-            </Button>
-            <Button
-              size="xs"
-              variant={respec ? "filled" : "default"}
-              color={respec ? "danger" : undefined}
-              onClick={() => {
-                setRespec((r) => !r);
-              }}
-            >
-              {respec ? t("meta:chart.respecOff") : t("meta:chart.respecMode")}
-            </Button>
-          </Group>
+          <AppHeader
+            subtitle={t("meta:chart.header", { points, level })}
+            actions={
+              <>
+                <Button
+                  size="compact-sm"
+                  variant={filterOpen ? "filled" : "default"}
+                  data-chart-filter-toggle
+                  onClick={() => {
+                    setFilterOpen((open) => !open);
+                  }}
+                >
+                  {tagFilter.length === 0
+                    ? t("meta:chart.filter")
+                    : t("meta:chart.filterOn", { n: tagFilter.length })}
+                </Button>
+                <Button
+                  size="compact-sm"
+                  variant={respec ? "filled" : "default"}
+                  color={respec ? "danger" : undefined}
+                  onClick={() => {
+                    setRespec((r) => !r);
+                  }}
+                >
+                  {respec ? t("meta:chart.respecOff") : t("meta:chart.respecMode")}
+                </Button>
+              </>
+            }
+          />
         </div>
       }
     >

@@ -41,11 +41,7 @@
 }
 
 .headerBar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   background: var(--ca-surface1);
   border-bottom: 1px solid var(--ca-line);
 }

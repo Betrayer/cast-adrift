@@ -16,13 +16,14 @@ import { trackSessionStart } from '@/services/analytics';
 import { authErrorCode, isSilentAuthError } from '@/services/authErrors';
 import { setupErrorReporting } from '@/services/errors';
 import { setupMetaSync } from '@/services/meta-sync';
+import { installBrowserNavHistory } from '@/services/nav-history';
 import {
   awaitProfileReady,
   bootProfileSync,
   installAuthWatch,
 } from '@/services/profileSwitch';
 import { hasRun } from '@/services/save';
-import { startTargetFor } from '@/services/start-param';
+import { seedStackFor, startTargetFor } from '@/services/start-param';
 import { bindTelegramChrome, initTma, type TmaSession } from '@/services/tma';
 import { useAppStore } from '@/stores/appStore';
 import {
@@ -74,8 +75,13 @@ const bootPlatform = async (): Promise<void> => {
     console.error('boot: tma init failed', error);
   }
   const target = startTargetFor(session.startParam);
-  if (target !== null) useAppStore.getState().go(target.screen, target.params);
+  if (target !== null) {
+    useAppStore
+      .getState()
+      .seed(seedStackFor(target), target.screen, target.params);
+  }
   bindTelegramChrome(hasRun);
+  if (!session.isTelegram) installBrowserNavHistory();
   trackSessionStart(session.isTelegram ? 'telegram' : 'web');
   try {
     await bootAuth(session);

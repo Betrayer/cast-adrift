@@ -310,7 +310,6 @@
   },
   "modes": {
     "title": "Tryby",
-    "profile": "Profil",
     "campaign": "Kampania",
     "drift": "Dryf",
     "driftDesc": "Bez końca. Sektor po sektorze, aż któryś z nich zwycięży.",
@@ -425,6 +424,9 @@
       "collection": "Kolekcja",
       "modes": "Tryby"
     }
+  },
+  "achievements": {
+    "title": "Osiągnięcia"
   },
   "engraving": {
     "title": "Grawerunek Stacja",

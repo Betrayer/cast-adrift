@@ -1,5 +1,4 @@
 import {
-  Button,
   Group,
   Loader,
   Paper,
@@ -24,9 +23,12 @@ import {
   type RankedEntry,
 } from "@/services/leaderboards";
 import { Screen } from "@/app/Screen";
-import { useAppStore } from "@/stores/appStore";
+import { AppHeader } from "@/components/AppHeader";
+import { useScreenParam } from "@/app/useScreenParam";
 
-type Tab = "daily" | "drift" | "week";
+const TABS = ["daily", "drift", "week"] as const;
+
+type Tab = (typeof TABS)[number];
 
 const boardIdFor = (tab: Tab, now: number): string => {
   if (tab === "daily") return dailyBoardId(utcDateKey(now));
@@ -50,11 +52,7 @@ const debugBoards = (): boolean => {
 
 export const LeaderboardScreen = () => {
   const { t } = useTranslation(["meta", "common"]);
-  const go = useAppStore((s) => s.go);
-  const params = useAppStore((s) => s.params);
-  const [tab, setTab] = useState<Tab>(
-    params?.tab === "daily" ? "daily" : params?.tab === "week" ? "week" : "drift",
-  );
+  const [tab, setTab] = useScreenParam<Tab>("tab", TABS, "drift");
   const [view, setView] = useState<View>("top");
   const [showFlagged] = useState(debugBoards);
   const [now] = useState(() => Date.now());
@@ -100,26 +98,15 @@ export const LeaderboardScreen = () => {
   return (
     <Screen
       header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <>
+        <AppHeader />
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder mt="xs">
           <Stack gap="xs">
-          <Group justify="space-between">
-            <Text fw={700} c={tokens.text}>
-              {t("meta:board.title")}
-            </Text>
-            <Button
-              size="xs"
-              variant="default"
-              onClick={() => {
-                go("modes");
-              }}
-            >
-              {t("common:back")}
-            </Button>
-          </Group>
           <SegmentedControl
             fullWidth
             size="xs"
             value={tab}
+            data-testid="board-tabs"
             onChange={(value) => {
               setTab(value as Tab);
             }}
@@ -148,6 +135,7 @@ export const LeaderboardScreen = () => {
             </Text>
           </Stack>
         </Paper>
+        </>
       }
     >
       <>

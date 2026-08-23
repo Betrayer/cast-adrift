@@ -14,6 +14,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { trackEvent } from "@/services/analytics";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { ALL_DICE, DIE_BY_ID } from "@/data/dice";
 import { schools } from "@/data/schools";
@@ -152,23 +153,19 @@ export const HangarScreen = () => {
   const shopIds = filtered(ALL_DICE.map((d) => d.id));
 
   return (
-    <Screen>
-      <Stack gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-        <Group justify="space-between" mb="xs">
-          <Text fw={700} c={tokens.text}>
-            {t("meta:hangar.title")}
-          </Text>
-          <Group gap="xs">
+    <Screen
+      header={
+        <AppHeader
+          actions={
             <Badge variant="light" color="yellow">
               {shards} ◈
             </Badge>
-            <Button size="xs" variant="default" onClick={() => { go("menu"); }}>
-              {t("common:back")}
-            </Button>
-          </Group>
-        </Group>
-
+          }
+        />
+      }
+    >
+      <Stack gap="sm">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <Group gap={6} mb="sm">
           {PLAYABLE_SHIPS.map((ship) => {
             const isOwned = ships.includes(ship.id);
@@ -271,7 +268,7 @@ export const HangarScreen = () => {
                   ? t("meta:hangar.invalidFate")
                   : t("meta:hangar.valid")}
         </Text>
-        <Group gap={4} mt="xs">
+        <Group gap={4} mt="xs" data-testid="hangar-draft">
           {draft.length === 0 ? (
             <Text size="xs" c={tokens.faint}>
               {t("meta:hangar.empty")}
@@ -383,6 +380,7 @@ export const HangarScreen = () => {
                     <Button
                       size="compact-xs"
                       variant="default"
+                      data-testid={`hangar-add-${id}`}
                       disabled={usedCount >= ownedCount || draft.length >= 9}
                       onClick={() => { addToDeck(id); }}
                     >
@@ -410,6 +408,7 @@ export const HangarScreen = () => {
           <Button
             size="xs"
             variant="subtle"
+            data-testid="hangar-collection"
             onClick={() => { go("collection"); }}
           >
             {t("meta:collection.title")}
@@ -418,6 +417,7 @@ export const HangarScreen = () => {
             size="xs"
             variant="subtle"
             disabled={!hasFeature(unlockCtx, "engravingStation")}
+            data-testid="hangar-engraving"
             onClick={() => { go("engraving"); }}
           >
             {t("meta:engraving.title")}

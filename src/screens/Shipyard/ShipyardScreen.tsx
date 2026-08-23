@@ -10,6 +10,7 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { fusionTarget } from "@/data/dice/fusion";
@@ -17,6 +18,7 @@ import { SHIP_BY_ID } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { FUSION_COST, mkUpgradeCost } from "@/game/economy/prices";
+import { useBackGuard } from "@/app/backGuard";
 import { autosaveRun, completeNode } from "@/game/run/flow";
 import { playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
@@ -113,6 +115,12 @@ export const ShipyardScreen = () => {
     autosaveRun();
   };
 
+  const leave = (): void => {
+    completeNode({ outcome: "cleared" });
+  };
+
+  useBackGuard("shipyard", leave);
+
   const doRepair = (): void => {
     const state = useRunStore.getState();
     if (repair <= 0 || state.scrap < repair * 2) return;
@@ -125,33 +133,32 @@ export const ShipyardScreen = () => {
   return (
     <Screen
       width="wide"
+      header={
+        <AppHeader
+          actions={
+            <>
+              <Text size="sm" c={tokens.amber}>
+                {t("run:shipyard.scrap", { n: scrap })}
+              </Text>
+              <Text size="sm" c={tokens.dim}>
+                {t("run:shipyard.hull", { cur: hull, max: hullMax })}
+              </Text>
+            </>
+          }
+        />
+      }
       footer={
         <Button
           size="md"
           fullWidth
-          onClick={() => {
-            completeNode({ outcome: "cleared" });
-          }}
+          data-testid="shipyard-leave"
+          onClick={leave}
         >
           {t("run:shipyard.leave")}
         </Button>
       }
     >
       <Stack gap="sm">
-      <Group justify="space-between">
-        <Text fw={600} c={tokens.text}>
-          {t("run:shipyard.title")}
-        </Text>
-        <Group gap="xs">
-          <Text size="sm" c={tokens.amber}>
-            {t("run:shipyard.scrap", { n: scrap })}
-          </Text>
-          <Text size="sm" c={tokens.dim}>
-            {t("run:shipyard.hull", { cur: hull, max: hullMax })}
-          </Text>
-        </Group>
-      </Group>
-
       <Text size="xs" c={tokens.dim} fs="italic">
         {t(greeting.text)}
       </Text>

@@ -67,7 +67,6 @@
     "pass": "Success — {{total}}",
     "fail": "Failed — {{total}}",
     "roll": "Roll",
-    "back": "Back",
     "reqAxisMin": "needs axis {{n}} or higher",
     "reqAxisMax": "needs axis {{n}} or lower",
     "checkLowest": "Nothing above {{n}}",
@@ -189,7 +188,6 @@
     "memory": "Echo Memory",
     "empty": "Nothing logged yet.",
     "locked": "Not yet uncovered",
-    "back": "Back",
     "unread": "new",
     "glyphLegend": {
       "title": "School glyphs",
@@ -292,7 +290,6 @@
     "aLevel": "A{{n}}",
     "tideCap": "Interference tide caps at {{n}}",
     "launch": "Launch",
-    "back": "Back",
     "ascensionCost": "It costs you",
     "ascensionGain": "It pays you",
     "shardMult": "+{{n}}% shards for the whole run"
@@ -431,7 +428,6 @@
   "journal": {
     "title": "Run journal",
     "open": "Journal",
-    "back": "Back to the map",
     "empty": "Nothing written yet. The sector has not asked you for anything.",
     "sector": "Sector {{n}}",
     "beacon": "Beacon resolved — {{n}} of {{max}}",
@@ -457,5 +453,12 @@
     "hintElite": "Hunt {{n}} elites across your runs",
     "hintBeacons": "Resolve {{n}} beacons in a single run",
     "hintEnding": "Reach the Core and choose"
+  },
+  "system": {
+    "title": "Ship menu",
+    "resume": "Resume",
+    "toMenu": "Suspend to main menu",
+    "toMenuHint": "The run is saved — pick it up from the menu.",
+    "open": "Menu"
   }
 }

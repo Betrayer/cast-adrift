@@ -1,0 +1,97 @@
+.scrim {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  background: var(--ca-bg-a86);
+  animation: scrimIn 180ms ease-out both;
+}
+
+.blurred {
+  backdrop-filter: blur(3px);
+}
+
+.scrimCeremony {
+  z-index: var(--z-ceremony);
+}
+
+.center {
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  padding-top: max(24px, var(--ca-safe-top));
+  padding-bottom: max(24px, var(--ca-safe-bottom));
+}
+
+.panelModal,
+.panelModalPlain {
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.panelModal {
+  border-radius: 14px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
+  box-shadow: 0 18px 48px var(--ca-shadow);
+  animation: panelIn 200ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+.sheetFrame {
+  align-items: stretch;
+  justify-content: center;
+}
+
+.panelSheet,
+.panelSheetPlain {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 0;
+  padding-top: var(--ca-safe-top);
+  padding-bottom: var(--ca-safe-bottom);
+}
+
+.panelSheet {
+  background: var(--ca-bg);
+  animation: sheetIn 200ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
+}
+
+@keyframes scrimIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes panelIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes sheetIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+:root[data-ca-motion='reduced'] .scrim,
+:root[data-ca-motion='reduced'] .panelModal,
+:root[data-ca-motion='reduced'] .panelSheet {
+  animation: none;
+}

@@ -10,6 +10,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS } from "@/data/contracts";
 import { DAILY_PREVIEW_LEVEL } from "@/data/milestones";
@@ -97,36 +98,8 @@ export const ModesScreen = () => {
   };
 
   return (
-    <Screen>
+    <Screen header={<AppHeader />}>
       <Stack gap="sm">
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-          <Group justify="space-between">
-            <Text fw={700} c={tokens.text}>
-              {t("meta:modes.title")}
-            </Text>
-            <Group gap="xs">
-              <Button
-                size="xs"
-                variant="default"
-                onClick={() => {
-                  go("profile");
-                }}
-              >
-                {t("meta:modes.profile")}
-              </Button>
-              <Button
-                size="xs"
-                variant="default"
-                onClick={() => {
-                  go("menu");
-                }}
-              >
-                {t("common:back")}
-              </Button>
-            </Group>
-          </Group>
-        </Paper>
-
         <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
           <Stack gap="xs">
             <Text fw={600} c={tokens.text}>

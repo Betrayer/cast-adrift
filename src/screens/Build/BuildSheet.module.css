@@ -1,14 +1,3 @@
-.sheet {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-modal);
-  display: flex;
-  flex-direction: column;
-  background: var(--ca-bg);
-  padding-top: env(safe-area-inset-top);
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
 .head {
   display: flex;
   align-items: center;

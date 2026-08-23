@@ -11,6 +11,7 @@ import {
   swipeBehavior,
   viewport,
 } from "@tma.js/sdk";
+import { isSwipeLocked } from "@/app/routes";
 import { tokens } from "@/app/theme";
 import { canGoBack, useAppStore } from "@/stores/appStore";
 import type { ScreenId } from "@/types";
@@ -136,16 +137,9 @@ const setupTelegramChrome = async (): Promise<void> => {
   }
 };
 
-const SWIPE_LOCKED: ReadonlySet<ScreenId> = new Set<ScreenId>([
-  "battle",
-  "map",
-  "puzzle",
-  "chart",
-]);
-
 const applySwipe = (screen: ScreenId): void => {
   try {
-    if (SWIPE_LOCKED.has(screen)) swipeBehavior.disableVertical.ifAvailable();
+    if (isSwipeLocked(screen)) swipeBehavior.disableVertical.ifAvailable();
     else swipeBehavior.enableVertical.ifAvailable();
   } catch {}
 };

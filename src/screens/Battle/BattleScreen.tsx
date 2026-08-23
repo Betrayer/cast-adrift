@@ -24,7 +24,6 @@ import { useRunStore } from '@/stores/runStore';
 import { BossIntro } from '@/screens/Battle/BossIntro';
 import { FateInvocation } from '@/screens/Battle/FateInvocation';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
-import { BuildSheet } from '@/screens/Build/BuildSheet';
 import { EnemyDetail } from '@/screens/Battle/console/EnemyDetail';
 import { LAYOUT_VIEWS } from '@/screens/Battle/layouts/registry';
 import { EndOverlay, TopBands } from '@/screens/Battle/shell/BattleShell';
@@ -67,7 +66,6 @@ export const BattleScreen = () => {
   const droppedRef = useRef(false);
   const resolvedRef = useRef(false);
   const lowHullRef = useRef(false);
-  const [buildOpen, setBuildOpen] = useState(false);
   const [warping, setWarping] = useState(true);
 
   useEffect(() => {
@@ -155,25 +153,12 @@ export const BattleScreen = () => {
       passThrough
       bodyClassName={styles.board}
       innerClassName={styles.inner}
-      header={
-        <TopBands
-          onOpenBuild={() => {
-            setBuildOpen(true);
-          }}
-        />
-      }
+      header={<TopBands />}
       footer={<view.Footer key={layoutId} />}
       overlay={
         <>
           <PixiCanvas mount={mountScene} transparent />
           <EnemyDetail />
-          {buildOpen ? (
-            <BuildSheet
-              onClose={() => {
-                setBuildOpen(false);
-              }}
-            />
-          ) : null}
           {warping && !reduced ? (
             <WarpStreaks
               color={tokens.accent}

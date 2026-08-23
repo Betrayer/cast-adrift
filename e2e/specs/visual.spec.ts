@@ -256,6 +256,64 @@ test.describe('visual baselines', () => {
     await shot(app, 'settings.png');
   });
 
+  test('header — hangar', async ({ app }) => {
+    await app.testId('menu-hangar').click();
+    await app.expectScreen('hangar');
+    await shot(app, 'header-hangar.png');
+  });
+
+  test('header — collection', async ({ app }) => {
+    await app.testId('menu-collection').click();
+    await app.expectScreen('collection');
+    await shot(app, 'header-collection.png');
+  });
+
+  test('header — codex', async ({ app }) => {
+    await app.testId('menu-codex').click();
+    await app.expectScreen('codex');
+    await shot(app, 'header-codex.png');
+  });
+
+  test('header — profile', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.grantMeta({ level: 8, shards: 250 });
+    });
+    await app.testId('menu-profile').click();
+    await app.expectScreen('profile');
+    await shot(app, 'header-profile.png');
+  });
+
+  test('header — achievements', async ({ app }) => {
+    await app.testId('menu-achievements').click();
+    await app.expectScreen('achievements');
+    await shot(app, 'header-achievements.png');
+  });
+
+  test('header — leaderboard', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.go('leaderboard', { tab: 'drift' });
+    });
+    await app.expectScreen('leaderboard');
+    await expect(app.testId('board-tabs')).toBeVisible();
+    await shot(app, 'header-leaderboard.png');
+  });
+
+  test('system menu', async ({ app }) => {
+    await app.seedRun({ seed: SEED });
+    await app.expectScreen('map');
+    await app.testId('map-system-menu').click();
+    await expect(app.testId('system-menu')).toBeVisible();
+    await shot(app, 'system-menu.png');
+  });
+
+  test('memory ceremony', async ({ app }) => {
+    await app.page.evaluate(() => {
+      window.caTest?.showMemory(1);
+    });
+    await expect(app.testId('memory-ceremony')).toBeVisible();
+    await shot(app, 'memory-ceremony.png');
+  });
+
   test('account section', async ({ app }) => {
     await app.testId('menu-settings').click();
     await app.expectScreen('settings');

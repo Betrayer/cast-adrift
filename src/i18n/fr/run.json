@@ -67,7 +67,6 @@
     "pass": "Succès — {{total}}",
     "fail": "Échec — {{total}}",
     "roll": "Rouleau",
-    "back": "Retour",
     "reqAxisMin": "nécessite la version {{n}} ou une version ultérieure d'Axis",
     "reqAxisMax": "nécessite la version {{n}} ou une version antérieure d'Axis",
     "checkLowest": "Rien de plus haut que {{n}}",
@@ -189,7 +188,6 @@
     "memory": "Echo Mémoire",
     "empty": "Rien n'a encore été enregistré.",
     "locked": "Pas encore découvert",
-    "back": "Retour",
     "unread": "nouveau",
     "glyphLegend": {
       "title": "Symboles scolaires",
@@ -292,7 +290,6 @@
     "aLevel": "Un «{{n}} »",
     "tideCap": "Niveaux maximaux des marées d'interférence à l'{{n}}",
     "launch": "Lancement",
-    "back": "Retour",
     "ascensionCost": "Cela vous coûte",
     "ascensionGain": "Ça te rapporte",
     "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution"
@@ -431,7 +428,6 @@
   "journal": {
     "title": "Journal de course",
     "open": "Journal",
-    "back": "Retour à la carte",
     "empty": "Rien n'a encore été écrit. Le secteur ne vous a rien demandé.",
     "sector": "{{n}} du secteur",
     "beacon": "Balise résolu — {{n}} de {{max}}",
@@ -457,5 +453,12 @@
     "hintElite": "Partez à la chasse aux élites d’{{n}} au fil de vos parties",
     "hintBeacons": "Traiter les balises «{{n}}» en une seule opération",
     "hintEnding": "Accédez à « Core » et sélectionnez"
+  },
+  "system": {
+    "title": "Menu du vaisseau",
+    "resume": "Reprendre",
+    "toMenu": "Revenir au menu principal",
+    "toMenuHint": "La partie est sauvegardée — reprenez-la depuis le menu.",
+    "open": "Menu"
   }
 }

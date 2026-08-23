@@ -67,7 +67,6 @@
     "pass": "Erfolg — {{total}}",
     "fail": "Fehlgeschlagen — {{total}}",
     "roll": "Rolle",
-    "back": "Zurück",
     "reqAxisMin": "Erfordert Axis {{n}} oder höher",
     "reqAxisMax": "Erfordert Axis {{n}} oder eine niedrigere Version",
     "checkLowest": "Nichts über {{n}}",
@@ -189,7 +188,6 @@
     "memory": "Echo Speicher",
     "empty": "Es wurde noch nichts protokolliert.",
     "locked": "Noch nicht aufgedeckt",
-    "back": "Zurück",
     "unread": "neu",
     "glyphLegend": {
       "title": "Schulzeichen",
@@ -292,7 +290,6 @@
     "aLevel": "Ein „{{n}}“",
     "tideCap": "Interferenzgezeiten am {{n}}",
     "launch": "Start",
-    "back": "Zurück",
     "ascensionCost": "Das kostet dich",
     "ascensionGain": "Es zahlt sich für dich aus",
     "shardMult": "+{{n}} % Shards für den gesamten Durchlauf"
@@ -431,7 +428,6 @@
   "journal": {
     "title": "Laufprotokoll",
     "open": "Zeitschrift",
-    "back": "Zurück zur Karte",
     "empty": "Es wurde noch nichts geschrieben. Die Branche hat noch keine Anfrage an Sie gerichtet.",
     "sector": "Branchen{{n}}",
     "beacon": "Bake gelöst — {{n}} von {{max}}",
@@ -457,5 +453,12 @@
     "hintElite": "Jage während deiner Läufe nach „{{n}}“-Eliten",
     "hintBeacons": "{{n}}-Beacons in einem einzigen Durchlauf auflösen",
     "hintEnding": "Geh zum Kern und wähle"
+  },
+  "system": {
+    "title": "Schiffsmenü",
+    "resume": "Fortsetzen",
+    "toMenu": "Ins Hauptmenü zurück",
+    "toMenuHint": "Der Lauf ist gespeichert — setze ihn im Menü fort.",
+    "open": "Menü"
   }
 }

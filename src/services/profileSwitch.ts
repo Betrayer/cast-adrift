@@ -1,3 +1,4 @@
+import { forgetParkedScreens } from "@/app/router";
 import { bootCloud, cancelRunCloud, dismissCloudRun } from "@/game/run/cloud";
 import { readClaim } from "@/services/account-link";
 import {
@@ -68,6 +69,7 @@ export const switchProfile = async (uid: string): Promise<void> => {
     clearMetaWatermark();
     useMetaStore.setState(createInitialMetaValues());
   }
+  forgetParkedScreens();
   if (hadRun) useAppStore.getState().go("menu");
   void (async () => {
     try {

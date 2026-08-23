@@ -8,11 +8,11 @@ import {
   Stack,
   Switch,
   Text,
-  Title,
 } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
+import { AppHeader } from '@/components/AppHeader';
 import { tokens } from '@/app/theme';
 import { DIE_SKINS } from '@/data/cosmetics';
 import { THEMES, type ThemeId } from '@/data/themes';
@@ -24,7 +24,6 @@ import { trackEvent } from '@/services/analytics';
 import { playSfx } from '@/services/audio';
 import { recentErrors } from '@/services/errors';
 import { APP_VERSION } from '@/services/version';
-import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
 import { chooseTheme } from '@/services/prefs';
 import { useSettingsStore } from '@/stores/settingsStore';
@@ -306,17 +305,12 @@ const Diagnostics = () => {
 
 export const SettingsScreen = () => {
   const { t } = useTranslation(['common', 'settings']);
-  const go = useAppStore((s) => s.go);
   const settings = useSettingsStore();
   const resetTutorial = useMetaStore((s) => s.resetTutorial);
 
   return (
-    <Screen>
+    <Screen header={<AppHeader />}>
       <Stack gap="lg">
-      <Title order={2} c={tokens.text}>
-        {t('settings:title')}
-      </Title>
-
       <AccountSection />
 
       <Stack gap="xs">
@@ -364,6 +358,7 @@ export const SettingsScreen = () => {
           {t('settings:sfxVolume')}
         </Text>
         <Slider
+          data-testid="settings-sfx"
           min={0}
           max={1}
           step={0.05}
@@ -460,16 +455,6 @@ export const SettingsScreen = () => {
       </Button>
 
       <Diagnostics />
-
-      <Button
-        variant="default"
-        data-testid="settings-back"
-        onClick={() => {
-          go('menu');
-        }}
-      >
-        {t('common:back')}
-      </Button>
       </Stack>
     </Screen>
   );

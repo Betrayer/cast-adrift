@@ -39,15 +39,25 @@ interface MenuEntry {
 }
 
 const ENTRIES: readonly MenuEntry[] = [
-  { key: 'testBattle', screen: 'battle' },
   { key: 'newRun', screen: 'runSetup', action: 'startCampaign' },
+  { key: 'modes', screen: 'modes' },
   { key: 'hangar', screen: 'hangar' },
   { key: 'starChart', screen: 'chart' },
   { key: 'collection', screen: 'collection' },
   { key: 'codex', screen: 'codex' },
-  { key: 'modes', screen: 'modes' },
+  { key: 'profile', screen: 'profile' },
+  { key: 'achievements', screen: 'achievements' },
   { key: 'settings', screen: 'settings' },
 ];
+
+const DEV_ENTRIES: readonly MenuEntry[] = [
+  { key: 'testBattle', screen: 'battle' },
+];
+
+const devMenu = (): boolean =>
+  import.meta.env.DEV &&
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('debug') === '1';
 
 export const MenuScreen = () => {
   const { t } = useTranslation(['common', 'menu', 'meta']);
@@ -63,6 +73,9 @@ export const MenuScreen = () => {
   const topBadge = menuBadgeId(badges);
   const unreadMemories = unreadMemoryIds(codex, codexRead).length;
   const [localResume] = useState(readLocalResume);
+  const [entries] = useState<readonly MenuEntry[]>(() =>
+    devMenu() ? [...ENTRIES, ...DEV_ENTRIES] : ENTRIES,
+  );
   const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
   const osReducedMotion = useReducedMotion(false);
   const reducedMotion =
@@ -155,7 +168,7 @@ export const MenuScreen = () => {
           ) : localResume !== null ? (
             <ResumeCard resume={localResume} />
           ) : null}
-          {ENTRIES.map((entry) => (
+          {entries.map((entry) => (
             <Button
               key={entry.key}
               size="md"

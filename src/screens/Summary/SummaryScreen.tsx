@@ -17,6 +17,7 @@ import { DIE_BY_ID } from "@/data/dice";
 import { PERK_BY_ID } from "@/data/perks";
 import { progressWithinLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { abandonRun } from "@/game/run/flow";
+import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 import {
@@ -24,7 +25,6 @@ import {
   useSettingsStore,
 } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
-import { BuildSheet } from "@/screens/Build/BuildSheet";
 import { LevelUpCeremony } from "./LevelUpCeremony";
 
 const useCountUp = (target: number, reduced: boolean): number => {
@@ -82,7 +82,6 @@ export const SummaryScreen = () => {
     .map((id) => PERK_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
 
-  const [buildOpen, setBuildOpen] = useState(false);
 
   const ceremony =
     leveled && barsDone && !ceremonyDone && result !== null ? (
@@ -115,18 +114,7 @@ export const SummaryScreen = () => {
   return (
     <Screen
       centered
-      overlay={
-        <>
-          {ceremony}
-          {buildOpen ? (
-            <BuildSheet
-              onClose={() => {
-                setBuildOpen(false);
-              }}
-            />
-          ) : null}
-        </>
-      }
+      overlay={ceremony}
     >
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="sm">
@@ -217,7 +205,7 @@ export const SummaryScreen = () => {
             variant="default"
             data-open-build
             onClick={() => {
-              setBuildOpen(true);
+              useAppStore.getState().setBuildSheet(true);
             }}
           >
             {t("run:build.open")}

@@ -7,11 +7,11 @@ import {
   Paper,
   Stack,
   Text,
-  Title,
 } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import {
   CODEX_GROUP_ORDER,
@@ -136,16 +136,7 @@ export const CodexScreen = () => {
   return (
     <Screen
       width="wide"
-      header={
-        <Group justify="space-between">
-          <Title order={3} c={tokens.text}>
-            {t("run:codex.title")}
-          </Title>
-          <Button size="compact-sm" variant="default" onClick={() => { go("menu"); }}>
-            {t("run:codex.back")}
-          </Button>
-        </Group>
-      }
+      header={<AppHeader />}
     >
       <Stack gap="md">
           <GlyphLegend />

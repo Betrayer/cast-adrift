@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
+import { TapPopover } from "@/components/TapPopover";
 import { schools } from "@/data/schools";
 import { AXIS_NOTCHES, axisLabel, axisNotch } from "@/game/run/axis";
 import styles from "./AxisMeter.module.css";
@@ -16,6 +17,7 @@ interface AxisMeterProps {
   preview?: number;
   compact?: boolean;
   withLabel?: boolean;
+  explain?: boolean;
 }
 
 export const AxisMeter = ({
@@ -23,6 +25,7 @@ export const AxisMeter = ({
   preview,
   compact = false,
   withLabel = true,
+  explain = false,
 }: AxisMeterProps) => {
   const { t } = useTranslation(["run"]);
   const target = preview ?? axis;
@@ -32,7 +35,7 @@ export const AxisMeter = ({
   const tone = axisTone(target);
   const center = Math.floor(AXIS_NOTCHES / 2);
 
-  return (
+  const meter = (
     <span
       data-axis-meter
       className={`${styles.meter ?? ""} ${compact ? styles.compact ?? "" : ""}`}
@@ -42,7 +45,6 @@ export const AxisMeter = ({
           "--ca-notch-off": tokens.line,
         } as React.CSSProperties
       }
-      title={t("run:axis.title", { n: axis })}
     >
       <span className={styles.notches}>
         {Array.from({ length: AXIS_NOTCHES }, (_, i) => (
@@ -62,5 +64,23 @@ export const AxisMeter = ({
         </span>
       ) : null}
     </span>
+  );
+
+  if (!explain) return meter;
+  return (
+    <TapPopover
+      label={t("run:axis.title", { n: axis })}
+      testId="axis-explain"
+      align="start"
+      content={
+        <>
+          <b>{t("run:axis.title", { n: axis })}</b>
+          <br />
+          {t(`run:axis.${axisLabel(target)}`, { n: target })}
+        </>
+      }
+    >
+      {meter}
+    </TapPopover>
   );
 };

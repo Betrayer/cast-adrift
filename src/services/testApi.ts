@@ -17,7 +17,8 @@ import { profileSwitches } from "@/services/profileSwitch";
 import { battleLayoutId, chooseBattleLayout } from "@/services/prefs";
 import { createStreams } from "@/services/rng";
 import { clearRun } from "@/services/save";
-import { useAppStore } from "@/stores/appStore";
+import { seedStackFor, startTargetFor } from "@/services/start-param";
+import { canGoBack, useAppStore } from "@/stores/appStore";
 import {
   battleSnapshot,
   hydrateBattle,
@@ -25,6 +26,7 @@ import {
   type BattleSaveState,
 } from "@/stores/battleStore";
 import { useMetaStore, type MetaStats } from "@/stores/metaStore";
+import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore, type RunMode } from "@/stores/runStore";
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
@@ -143,6 +145,11 @@ export interface TestState {
   layout: BattleLayoutId;
   params: Record<string, string> | null;
   uid: string | null;
+  nav: {
+    stack: { screen: ScreenId; params: Record<string, string> | null }[];
+    canBack: boolean;
+    systemMenu: boolean;
+  };
   run: {
     active: boolean;
     mode: RunMode;
@@ -211,6 +218,9 @@ export interface TestApi {
   forecast: () => TurnForecast | null;
   now: (at?: number | null) => number;
   go: (screen: ScreenId, params?: Record<string, string>) => void;
+  back: () => void;
+  deepLink: (param: string) => boolean;
+  showMemory: (order: number) => void;
   mapNodes: () => MapNodeView[];
   slotsFor: (uid: string) => SlotId[];
   coach: () => { active: string | null; seen: string[] };
@@ -318,6 +328,14 @@ const readState = (): TestState => {
     layout: battleLayoutId(),
     params: app.params ?? null,
     uid: app.uid,
+    nav: {
+      stack: app.stack.map((entry) => ({
+        screen: entry.screen,
+        params: entry.params ?? null,
+      })),
+      canBack: canGoBack(app),
+      systemMenu: app.systemMenu,
+    },
     run: {
       active: run.active,
       mode: run.mode,
@@ -514,6 +532,23 @@ export const createTestApi = (): TestApi => ({
 
   go: (screen, params) => {
     useAppStore.getState().go(screen, params);
+  },
+
+  back: () => {
+    useAppStore.getState().back();
+  },
+
+  deepLink: (param) => {
+    const target = startTargetFor(param);
+    if (target === null) return false;
+    useAppStore
+      .getState()
+      .seed(seedStackFor(target), target.screen, target.params);
+    return true;
+  },
+
+  showMemory: (order) => {
+    useNarrativeStore.getState().pushMemory(order);
   },
 
   mapNodes: () => {

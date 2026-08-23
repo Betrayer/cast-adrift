@@ -1,15 +1,16 @@
 import {
   Badge,
-  Button,
   Group,
   Paper,
   Select,
   SimpleGrid,
   Text,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
+import { useScreenParam } from "@/app/useScreenParam";
 import { tokens } from "@/app/theme";
 import { ALL_DICE } from "@/data/dice";
 import { schools } from "@/data/schools";
@@ -17,7 +18,6 @@ import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
 import { unlockedDice } from "@/data/unlocks";
 import { dieRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
 import { unlockContextOf } from "@/game/meta/unlockState";
-import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import type { DieTier, School } from "@/types/content";
 
@@ -33,13 +33,14 @@ const SCHOOLS: readonly (School | "all")[] = [
 ];
 const TIERS: readonly (DieTier | 0)[] = [0, 4, 6, 8, 10, 12, 20, 100];
 
+const TIER_PARAMS: readonly string[] = TIERS.map((tier) => String(tier));
+
 type StateFilter = "all" | "owned" | "found" | "unknown";
 
 const STATES: readonly StateFilter[] = ["all", "owned", "found", "unknown"];
 
 export const CollectionScreen = () => {
   const { t } = useTranslation(["meta", "common", "content"]);
-  const go = useAppStore((s) => s.go);
   const collection = useMetaStore((s) => s.collection);
   const encountered = useMetaStore((s) => s.encountered);
   const level = useMetaStore((s) => s.level);
@@ -47,9 +48,18 @@ export const CollectionScreen = () => {
   const ascension = useMetaStore((s) => s.ascension);
   const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
   const clears = useMetaStore((s) => s.stats.campaignClears);
-  const [schoolFilter, setSchoolFilter] = useState<School | "all">("all");
-  const [tierFilter, setTierFilter] = useState<number>(0);
-  const [stateFilter, setStateFilter] = useState<StateFilter>("all");
+  const [schoolFilter, setSchoolFilter] = useScreenParam<School | "all">(
+    "school",
+    SCHOOLS,
+    "all",
+  );
+  const [tierParam, setTierParam] = useScreenParam("tier", TIER_PARAMS, "0");
+  const [stateFilter, setStateFilter] = useScreenParam<StateFilter>(
+    "state",
+    STATES,
+    "all",
+  );
+  const tierFilter = Number(tierParam);
 
   const ownedCounts = useMemo(() => {
     const map = new Map<string, number>();
@@ -98,15 +108,9 @@ export const CollectionScreen = () => {
   return (
     <Screen
       header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-        <Group justify="space-between" mb="xs">
-          <Text fw={700} c={tokens.text}>
-            {t("meta:collection.title")}
-          </Text>
-          <Button size="xs" variant="default" onClick={() => { go("menu"); }}>
-            {t("common:back")}
-          </Button>
-        </Group>
+        <>
+        <AppHeader />
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder mt="xs">
         <Text size="xs" c={tokens.faint} mb="xs" data-collection-totals>
           {t("meta:collection.totals", {
             owned: ownedTotal,
@@ -119,6 +123,7 @@ export const CollectionScreen = () => {
             size="xs"
             miw={120}
             value={schoolFilter}
+            data-testid="collection-school"
             onChange={(v) => { setSchoolFilter((v as School | "all") ?? "all"); }}
             data={SCHOOLS.map((s) => ({
               value: s,
@@ -132,7 +137,8 @@ export const CollectionScreen = () => {
             size="xs"
             miw={120}
             value={String(tierFilter)}
-            onChange={(v) => { setTierFilter(Number(v ?? 0)); }}
+            data-testid="collection-tier"
+            onChange={(v) => { setTierParam(v ?? "0"); }}
             data={TIERS.map((tier) => ({
               value: String(tier),
               label: tier === 0 ? t("meta:hangar.filterAll") : `d${String(tier)}`,
@@ -159,6 +165,7 @@ export const CollectionScreen = () => {
           />
         </Group>
         </Paper>
+        </>
       }
     >
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder>

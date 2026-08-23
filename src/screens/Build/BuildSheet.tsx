@@ -1,5 +1,6 @@
 import { Button, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { AppSheet } from "@/components/AppModal";
 import { rarityColor } from "@/app/rarity";
 import { schools } from "@/data/schools";
 import { tokens } from "@/app/theme";
@@ -54,7 +55,11 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
     .filter((entry) => entry.ids.length > 0);
 
   return (
-    <div className={styles.sheet} data-build-sheet>
+    <AppSheet
+      label={t("run:build.title")}
+      testId="build-sheet"
+      onClose={onClose}
+    >
       <div className={styles.head}>
         <Text fw={700} c={tokens.text}>
           {t("run:build.title")}
@@ -231,6 +236,6 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
           </section>
         )}
       </div>
-    </div>
+    </AppSheet>
   );
 };

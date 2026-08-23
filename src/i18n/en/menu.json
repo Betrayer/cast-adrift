@@ -6,6 +6,8 @@
   "starChart": "Star Chart",
   "collection": "Collection",
   "codex": "Codex",
+  "profile": "Profile",
+  "achievements": "Achievements",
   "modes": "Modes",
   "settings": "Settings",
   "resume": "Continue: Sector {{sector}} · depth {{depth}}",

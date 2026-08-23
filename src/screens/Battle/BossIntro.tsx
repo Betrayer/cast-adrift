@@ -1,6 +1,7 @@
-import { Button, Overlay, Stack, Text, Title } from '@mantine/core';
+import { Button, Stack, Text, Title } from '@mantine/core';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { AppSheet } from '@/components/AppModal';
 import { tokens } from '@/app/theme';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { playSfx } from '@/services/audio';
@@ -42,7 +43,15 @@ export const BossIntro = () => {
   const subsystems = state?.subsystems ?? [];
 
   return (
-    <Overlay backgroundOpacity={0.88} color={tokens.bg} blur={3} zIndex="var(--z-modal)">
+    <AppSheet
+      label={t(def.name)}
+      testId="boss-intro"
+      dismiss="none"
+      plain
+      blur
+      className={styles.introPanel}
+      onClose={dismissIntro}
+    >
       <Stack align="center" justify="center" h="100%" gap="lg" p="lg">
         <Text className={styles.kicker} c={tokens.danger}>
           {t(def.boss === true ? 'battle:intro.boss' : 'battle:intro.miniboss')}
@@ -83,6 +92,6 @@ export const BossIntro = () => {
           {t('battle:intro.begin')}
         </Button>
       </Stack>
-    </Overlay>
+    </AppSheet>
   );
 };

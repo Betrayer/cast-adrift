@@ -2,6 +2,7 @@ import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
 import { MUTATOR_BY_ID } from "@/data/mutators";
@@ -14,7 +15,6 @@ import {
 } from "@/game/meta/unlockState";
 import { hasActiveRun, startContractRun } from "@/game/run/flow";
 import { goalAmount, goalSecondary, type GoalSpec } from "@/game/run/goals";
-import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { ActiveRunGuard } from "@/screens/Modes/ActiveRunGuard";
 
@@ -23,7 +23,6 @@ const STAR_EMPTY = "☆";
 
 export const ContractsScreen = () => {
   const { t } = useTranslation(["meta", "common", "content"]);
-  const go = useAppStore((s) => s.go);
   const contracts = useMetaStore((s) => s.contracts);
   const level = useMetaStore((s) => s.level);
   const achievements = useMetaStore((s) => s.achievements);
@@ -74,24 +73,7 @@ export const ContractsScreen = () => {
 
   return (
     <Screen
-      header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-          <Group justify="space-between">
-            <Text fw={700} c={tokens.text}>
-              {t("meta:contracts.title")}
-            </Text>
-            <Button
-              size="xs"
-              variant="default"
-              onClick={() => {
-                go("modes");
-              }}
-            >
-              {t("common:back")}
-            </Button>
-          </Group>
-        </Paper>
-      }
+      header={<AppHeader />}
     >
       <Stack gap="sm">
           {CONTRACTS.map((def) => {

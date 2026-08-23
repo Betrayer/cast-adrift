@@ -310,7 +310,6 @@
   },
   "modes": {
     "title": "Modes",
-    "profile": "Profil",
     "campaign": "Campagne",
     "drift": "Dérive",
     "driftDesc": "Sans fin. Secteur après secteur, jusqu’à ce que le secteur l’emporte.",
@@ -425,6 +424,9 @@
       "collection": "Collection",
       "modes": "Modes"
     }
+  },
+  "achievements": {
+    "title": "Succès"
   },
   "engraving": {
     "title": "Gravure Gare",

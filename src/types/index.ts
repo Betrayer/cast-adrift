@@ -8,6 +8,7 @@ export type ScreenId =
   | 'codex'
   | 'modes'
   | 'profile'
+  | 'achievements'
   | 'contracts'
   | 'leaderboard'
   | 'driftSummary'

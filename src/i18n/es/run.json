@@ -67,7 +67,6 @@
     "pass": "Éxito — {{total}}",
     "fail": "Error — {{total}}",
     "roll": "Lanzamiento",
-    "back": "Atrás",
     "reqAxisMin": "Requiere Axis {{n}} o una versión superior",
     "reqAxisMax": "Requiere la versión {{n}} o inferior de Axis.",
     "checkLowest": "Nada por encima de {{n}}",
@@ -189,7 +188,6 @@
     "memory": "Echo Memoria",
     "empty": "Aún no hay nada registrado.",
     "locked": "Aún no se ha descubierto",
-    "back": "Atrás",
     "unread": "nuevo",
     "glyphLegend": {
       "title": "Glifos escolares",
@@ -292,7 +290,6 @@
     "aLevel": "Un e{{n}}",
     "tideCap": "Máximos de las mareas de interferencia en {{n}}",
     "launch": "Inicio",
-    "back": "Atrás",
     "ascensionCost": "Te cuesta",
     "ascensionGain": "Te compensa",
     "shardMult": "+{{n}} % de fragmentos durante toda la ejecución"
@@ -431,7 +428,6 @@
   "journal": {
     "title": "Diario de carreras",
     "open": "Diario",
-    "back": "Volver al mapa",
     "empty": "Aún no hay nada escrito. El sector no te ha pedido nada.",
     "sector": "Sector{{n}}",
     "beacon": "Baliza resuelto — {{n}} de {{max}}",
@@ -457,5 +453,12 @@
     "hintElite": "Caza a las élites de «{{n}}» en tus partidas",
     "hintBeacons": "Resolver las balizas «{{n}}» en una sola pasada",
     "hintEnding": "Llega al núcleo y elige"
+  },
+  "system": {
+    "title": "Menú de la nave",
+    "resume": "Continuar",
+    "toMenu": "Volver al menú principal",
+    "toMenuHint": "La partida está guardada: retómala desde el menú.",
+    "open": "Menú"
   }
 }

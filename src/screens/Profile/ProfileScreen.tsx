@@ -11,6 +11,7 @@ import {
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
 import { ENDINGS, STANDARD_ENDINGS } from "@/data/narrative/endings";
@@ -79,7 +80,6 @@ const StatCell = ({ label, value }: { label: string; value: string }) => (
 
 export const ProfileScreen = () => {
   const { t } = useTranslation(["meta", "common", "content", "settings"]);
-  const go = useAppStore((s) => s.go);
   const level = useMetaStore((s) => s.level);
   const xp = useMetaStore((s) => s.xp);
   const shards = useMetaStore((s) => s.shards);
@@ -95,24 +95,7 @@ export const ProfileScreen = () => {
 
   return (
     <Screen
-      header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-          <Group justify="space-between">
-            <Text fw={700} c={tokens.text}>
-              {t("meta:profile.title")}
-            </Text>
-            <Button
-              size="xs"
-              variant="default"
-              onClick={() => {
-                go("modes");
-              }}
-            >
-              {t("common:back")}
-            </Button>
-          </Group>
-        </Paper>
-      }
+      header={<AppHeader />}
     >
       <Stack gap="sm">
           <AccountLine />

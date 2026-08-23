@@ -93,11 +93,11 @@ test.describe('smoke', () => {
     await expect
       .poll(async () => (await app.state()).screen)
       .toBe('settings');
-    await expect(app.testId('settings-back')).toHaveText('Назад', {
+    await expect(app.testId('app-back')).toHaveText('Назад', {
       timeout: LOCALE_CHUNK_TIMEOUT,
     });
 
-    await app.testId('settings-back').click();
+    await app.testId('app-back').click();
     await app.expectScreen('menu');
     await expect(app.testId('menu-settings')).toHaveText('Настройки', {
       timeout: LOCALE_CHUNK_TIMEOUT,

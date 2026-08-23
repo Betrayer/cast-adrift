@@ -1,7 +1,7 @@
 import { Button, Stack, Text, Title } from "@mantine/core";
 import { useEffect } from "react";
-import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
+import { AppModal } from "@/components/AppModal";
 import { tokens } from "@/app/theme";
 import { CODEX_BY_ID } from "@/data/codex";
 import { memoryAt, MEMORY_TOTAL } from "@/data/narrative/memories";
@@ -32,25 +32,16 @@ export const MemoryCeremony = () => {
   if (memory === undefined) return null;
   const entry = CODEX_BY_ID.get(memory.codexId);
 
-  return createPortal(
-    <div
-      className={styles.veil}
-      data-memory-ceremony={order}
-      onClick={close}
-      style={
-        {
-          "--ca-memory-line": tokens.line,
-          "--ca-memory-bg": tokens.surface1,
-          "--ca-memory-glow": tokens.accent,
-        } as React.CSSProperties
-      }
+  return (
+    <AppModal
+      label={t("run:memory.kicker", { n: order, max: MEMORY_TOTAL })}
+      testId="memory-ceremony"
+      ceremony
+      plain
+      className={styles.card}
+      onClose={close}
     >
-      <div
-        className={styles.card}
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-      >
+      <div data-memory-ceremony={order}>
         <Stack gap="xs">
           <Text className={styles.kicker} c={tokens.accent}>
             {t("run:memory.kicker", { n: order, max: MEMORY_TOTAL })}
@@ -67,7 +58,6 @@ export const MemoryCeremony = () => {
           </Button>
         </Stack>
       </div>
-    </div>,
-    document.body,
+    </AppModal>
   );
 };

@@ -1,8 +1,9 @@
-import { Badge, Button, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { TierBadge } from "@/components/TierBadge";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
@@ -45,6 +46,7 @@ import {
   rewardFor,
   type PuzzleReward,
 } from "@/game/puzzles/stakes";
+import { useBackGuard } from "@/app/backGuard";
 import { completeNode } from "@/game/run/flow";
 import { interferenceImminent } from "@/game/run/interference";
 import { LootReveal } from "@/screens/Battle/LootReveal";
@@ -416,15 +418,13 @@ const EntryCard = ({
     onEnter();
   };
 
+  useBackGuard("puzzle", onLeave);
+
   return (
     <Screen
       width="narrow"
       centered
-      header={
-        <Title order={3} c={tokens.text}>
-          {t("run:anomaly.title")}
-        </Title>
-      }
+      header={<AppHeader />}
       footer={
         <Stack gap={6}>
           <Button size="md" onClick={takeReading} data-testid="puzzle-enter">
@@ -574,6 +574,8 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     if (forced) useAppStore.getState().go("map");
     else completeNode({ outcome: "cleared" });
   };
+
+  useBackGuard("puzzle", done);
 
   const grantReward = (): void => {
     if (grantedRef.current) return;
@@ -782,17 +784,25 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
       width="wide"
       overlay={<LootReveal />}
       header={
-        <Group justify="space-between" wrap="nowrap">
-          <Group gap="xs" wrap="nowrap">
-            <TierBadge tier={puzzle.tier} compact />
-            <Title order={4} c={tokens.text}>
-              {t("run:anomaly.title")}
-            </Title>
-          </Group>
-          <Button size="compact-sm" variant="subtle" color="gray" onClick={done}>
-            {t("run:anomaly.leave")}
-          </Button>
-        </Group>
+        <AppHeader
+          title={
+            <Group gap="xs" wrap="nowrap">
+              <TierBadge tier={puzzle.tier} compact />
+              <span>{t("run:anomaly.title")}</span>
+            </Group>
+          }
+          actions={
+            <Button
+              size="compact-sm"
+              variant="subtle"
+              color="gray"
+              data-testid="puzzle-leave"
+              onClick={done}
+            >
+              {t("run:anomaly.leave")}
+            </Button>
+          }
+        />
       }
     >
       <Stack gap="sm">

@@ -51,6 +51,7 @@ export const Screen = ({
     if (element === null) return;
     const measure = (): void => {
       const rect = element.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
       publishBodyRect({
         x: rect.left,
         y: rect.top,

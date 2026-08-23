@@ -1,5 +1,6 @@
-import { useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useEscapeKey } from '@/components/dismiss';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { schools } from '@/data/schools';
 import { intentHits } from '@/game/battle/resolver';
@@ -19,6 +20,10 @@ export const EnemyDetail = () => {
   const targetId = useBattleStore((s) => s.targetId);
   const shield = useBattleStore((s) => s.shield);
   const setTarget = useBattleStore((s) => s.setTarget);
+  const close = useCallback(() => {
+    focusEnemy(null);
+  }, []);
+  useEscapeKey(focused !== null, close);
   const enemy = enemies.find((e) => e.id === focused);
   if (focused === null || enemy === undefined) return null;
   const def = ENEMY_BY_ID.get(enemy.defId);
@@ -31,9 +36,6 @@ export const EnemyDetail = () => {
     0,
   );
   const absorbed = Math.min(shield, expected);
-  const close = (): void => {
-    focusEnemy(null);
-  };
 
   return (
     <div className={styles.sheet} data-enemy-detail={enemy.id}>

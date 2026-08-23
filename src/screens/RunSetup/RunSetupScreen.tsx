@@ -11,6 +11,7 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
+import { AppHeader } from '@/components/AppHeader';
 import { tokens } from '@/app/theme';
 import { now } from '@/services/clock';
 import {
@@ -22,12 +23,10 @@ import {
 import { SHIP_BY_ID } from '@/data/ships';
 import { ascensionShardMult } from '@/game/xp';
 import { startRun } from '@/game/run/flow';
-import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
 
 export const RunSetupScreen = () => {
   const { t } = useTranslation(['run', 'content', 'menu']);
-  const go = useAppStore((s) => s.go);
   const shipId = useMetaStore((s) => s.selectedShip);
   const deck = useMetaStore((s) => s.hangar.deck);
   const cleared = useMetaStore((s) => s.ascension.campaign);
@@ -37,7 +36,7 @@ export const RunSetupScreen = () => {
   const mods = ascensionMods(ascension);
 
   return (
-    <Screen centered>
+    <Screen centered header={<AppHeader />}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>
@@ -115,16 +114,6 @@ export const RunSetupScreen = () => {
             }}
           >
             {t('run:setup.launch')}
-          </Button>
-          <Button
-            size="compact-xs"
-            variant="subtle"
-            color="gray"
-            onClick={() => {
-              go('menu');
-            }}
-          >
-            {t('run:setup.back')}
           </Button>
         </Stack>
       </Paper>

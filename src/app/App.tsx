@@ -7,14 +7,16 @@ import {
   applyTheme,
   mantineThemeFor,
 } from '@/app/theme';
+import { AudioDirector } from '@/components/AudioDirector';
+import { BuildSheetHost } from '@/components/BuildSheetHost';
 import { CoachMarks } from '@/components/CoachMarks';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
 import { MemoryCeremony } from '@/components/MemoryCeremony';
 import { MergeCard } from '@/components/MergeCard';
-import { AudioDirector } from '@/components/AudioDirector';
 import { PerfOverlay } from '@/components/PerfOverlay';
 import { RotateGate } from '@/components/RotateGate';
+import { SystemMenu } from '@/components/SystemMenu';
 import { ToastHost } from '@/components/ToastHost';
 import {
   resolveReducedMotion,
@@ -48,6 +50,8 @@ export const App = () => {
     <MantineProvider theme={mantine} forceColorScheme="dark">
       <Router />
       <AudioDirector />
+      <SystemMenu />
+      <BuildSheetHost />
       <ToastHost />
       <MemoryCeremony />
       <MergeCard />

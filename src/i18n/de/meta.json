@@ -310,7 +310,6 @@
   },
   "modes": {
     "title": "Modi",
-    "profile": "Profil",
     "campaign": "Kampagne",
     "drift": "Drift",
     "driftDesc": "Endlos. Ein Sektor nach dem anderen, bis der Sektor gewinnt.",
@@ -425,6 +424,9 @@
       "collection": "Sammlung",
       "modes": "Modi"
     }
+  },
+  "achievements": {
+    "title": "Erfolge"
   },
   "engraving": {
     "title": "Gravur Bahnhof",

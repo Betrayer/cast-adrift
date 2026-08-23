@@ -1,6 +1,7 @@
 import { Button, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBackGuard } from "@/app/backGuard";
 import { Screen } from "@/app/Screen";
 import { mixHex } from "@/app/color";
 import { prefetchBattle } from "@/app/prefetch";
@@ -13,7 +14,7 @@ import { sectorDef } from "@/data/sectors";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
-import { abandonRun, jumpTo } from "@/game/run/flow";
+import { jumpTo } from "@/game/run/flow";
 import { computeRunMods } from "@/game/run/runMods";
 import {
   areConnected,
@@ -28,9 +29,10 @@ import { nodeRisk, type RiskBand } from "@/game/map/risk";
 import { haptic } from "@/services/tma";
 import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
+import { AbandonConfirm } from "@/components/AbandonConfirm";
 import { AxisMeter } from "@/components/AxisMeter";
+import { TapPopover } from "@/components/TapPopover";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
-import { BuildSheet } from "@/screens/Build/BuildSheet";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useAppStore } from "@/stores/appStore";
@@ -253,7 +255,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const positionRow = posNode?.row ?? 0;
 
   const [selected, setSelected] = useState<NodeId | null>(null);
-  const [buildOpen, setBuildOpen] = useState(false);
+  const [abandoning, setAbandoning] = useState(false);
   const [jumping, setJumping] = useState(false);
   const [marker, setMarker] = useState(() => ({
     x: posNode ? geo.nodeX(posNode) : geo.centerX,
@@ -439,7 +441,7 @@ const MapView = ({ map, position }: MapViewProps) => {
         </Text>
       </div>
       <div className={styles.headChips}>
-        <AxisMeter axis={axis} compact withLabel={false} />
+        <AxisMeter axis={axis} compact withLabel={false} explain />
         <Button
           size="compact-xs"
           variant="default"
@@ -455,10 +457,20 @@ const MapView = ({ map, position }: MapViewProps) => {
           variant="default"
           data-open-build
           onClick={() => {
-            setBuildOpen(true);
+            useAppStore.getState().setBuildSheet(true);
           }}
         >
           {t("run:build.open")}
+        </Button>
+        <Button
+          size="compact-xs"
+          variant="default"
+          data-testid="map-system-menu"
+          onClick={() => {
+            useAppStore.getState().setSystemMenu(true);
+          }}
+        >
+          {t("run:system.open")}
         </Button>
         <span
           className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
@@ -471,12 +483,22 @@ const MapView = ({ map, position }: MapViewProps) => {
           </span>
         ) : null}
         {runModules.length > 0 ? (
-          <span className={styles.tideChip ?? ""} title={moduleNames}>
-            {t("run:map.modules", {
+          <TapPopover
+            label={t("run:map.modules", {
               used: runModules.length,
               max: moduleCap,
             })}
-          </span>
+            testId="map-modules"
+            align="end"
+            content={moduleNames}
+          >
+            <span className={styles.tideChip ?? ""}>
+              {t("run:map.modules", {
+                used: runModules.length,
+                max: moduleCap,
+              })}
+            </span>
+          </TapPopover>
         ) : null}
       </div>
     </div>
@@ -523,7 +545,9 @@ const MapView = ({ map, position }: MapViewProps) => {
         variant="subtle"
         color="gray"
         data-testid="map-abandon"
-        onClick={abandonRun}
+        onClick={() => {
+          setAbandoning(true);
+        }}
       >
         {t("run:map.abandon")}
       </Button>
@@ -539,14 +563,15 @@ const MapView = ({ map, position }: MapViewProps) => {
       bodyRef={scrollRef}
       innerClassName={styles.body}
       overlay={
-        buildOpen ? (
-          <BuildSheet
-            onClose={() => {
-              setBuildOpen(false);
-            }}
-          />
-        ) : null
+        <AbandonConfirm
+          opened={abandoning}
+          prefix="map"
+          onCancel={() => {
+            setAbandoning(false);
+          }}
+        />
       }
+
     >
       <div>
         <svg
@@ -828,6 +853,11 @@ export const MapScreen = () => {
   const map = useRunStore((s) => s.map);
   const position = useRunStore((s) => s.position);
   const go = useAppStore((s) => s.go);
+  const setSystemMenu = useAppStore((s) => s.setSystemMenu);
+
+  useBackGuard("map", () => {
+    setSystemMenu(true);
+  });
 
   useEffect(() => {
     if (map === null || position === null) go("menu");

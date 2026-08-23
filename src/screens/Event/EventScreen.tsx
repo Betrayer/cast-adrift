@@ -32,6 +32,7 @@ import {
 import { AxisMeter } from "@/components/AxisMeter";
 import { clampAxis } from "@/game/run/axis";
 import { emitEventOutcome } from "@/game/narrative/barks";
+import { useBackGuard } from "@/app/backGuard";
 import { completeNode, startEventBattle } from "@/game/run/flow";
 import { nodeById } from "@/game/map/types";
 import { eventPickSeed } from "@/game/narrative/chainMarkers";
@@ -219,7 +220,7 @@ const CheckModal = ({
   onCancel,
   streams,
 }: CheckModalProps) => {
-  const { t } = useTranslation(["run", "battle"]);
+  const { t } = useTranslation(["run", "battle", "common"]);
   const check = option.check;
   const [rolled, setRolled] = useState<{
     values: number[];
@@ -294,7 +295,7 @@ const CheckModal = ({
         {rolled === null ? (
           <Group>
             <Button variant="default" onClick={onCancel}>
-              {t("run:event.back")}
+              {t("common:cancel")}
             </Button>
             <Button data-check-roll onClick={doRoll}>
               {t("run:event.roll")}
@@ -405,6 +406,8 @@ const EventRunner = ({
     }
     completeNode({ outcome: "cleared" });
   };
+
+  useBackGuard("event", outcome === null ? null : onContinue);
 
   const axisPreview = (option: EventOption): number | null => {
     const range = optionAxisRange(option);
@@ -609,6 +612,10 @@ const EventRunner = ({
 
 const EventFallback = () => {
   const { t } = useTranslation(["run"]);
+  const leave = (): void => {
+    completeNode({ outcome: "cleared" });
+  };
+  useBackGuard("event", leave);
   return (
     <Screen centered>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
@@ -619,12 +626,7 @@ const EventFallback = () => {
           <Text c={tokens.dim} ta="center">
             {t("run:event.quiet")}
           </Text>
-          <Button
-            size="md"
-            onClick={() => {
-              completeNode({ outcome: "cleared" });
-            }}
-          >
+          <Button size="md" onClick={leave}>
             {t("run:event.continue")}
           </Button>
         </Stack>

@@ -124,6 +124,23 @@ export class Screens {
       .toBe(true);
   }
 
+  async hardwareBack(): Promise<void> {
+    await this.page.evaluate(() => {
+      window.caTest?.back();
+    });
+  }
+
+  async deepLink(param: string): Promise<boolean> {
+    return this.page.evaluate(
+      (value) => window.caTest?.deepLink(value) ?? false,
+      param,
+    );
+  }
+
+  async nav(): Promise<TestState['nav']> {
+    return (await this.state()).nav;
+  }
+
   async openAccount(): Promise<void> {
     await this.page.evaluate(() => {
       window.caTest?.go('settings');

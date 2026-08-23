@@ -169,6 +169,15 @@ describe("testApi", () => {
     expect(useAppStore.getState().params).toEqual({ tab: "lore" });
   });
 
+  it("deepLink seeds a stack so back always exists", () => {
+    expect(api.deepLink("board")).toBe(true);
+    expect(useAppStore.getState().screen).toBe("leaderboard");
+    expect(api.state().nav.canBack).toBe(true);
+    api.back();
+    expect(useAppStore.getState().screen).toBe("modes");
+    expect(api.deepLink("nowhere")).toBe(false);
+  });
+
   it("anchors is null while no battle scene is mounted", () => {
     expect(api.anchors()).toBeNull();
   });

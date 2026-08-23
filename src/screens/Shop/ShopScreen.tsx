@@ -11,7 +11,9 @@ import {
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ascensionMods } from "@/data/ascension";
+import { useBackGuard } from "@/app/backGuard";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
@@ -146,6 +148,8 @@ export const ShopScreen = () => {
     completeNode({ outcome: "cleared" });
   };
 
+  useBackGuard("shop", leave);
+
   const greeting = createStream(deriveSeed(seed, `keeper:${nodeId}`)).pick(
     keeperLinesFor("shop", flags),
   );
@@ -156,6 +160,20 @@ export const ShopScreen = () => {
   return (
     <Screen
       width="wide"
+      header={
+        <AppHeader
+          actions={
+            <>
+              <Text size="sm" c={tokens.amber}>
+                {t("run:shop.scrap", { n: scrap })}
+              </Text>
+              <Text size="sm" c={tokens.dim}>
+                {t("run:shop.deck", { n: deck.length })}
+              </Text>
+            </>
+          }
+        />
+      }
       footer={
         <Button size="md" fullWidth data-testid="shop-leave" onClick={leave}>
           {t("run:shop.leave")}
@@ -163,20 +181,6 @@ export const ShopScreen = () => {
       }
     >
       <Stack gap="sm">
-      <Group justify="space-between">
-        <Text fw={600} c={tokens.text}>
-          {t("run:shop.title")}
-        </Text>
-        <Group gap="xs">
-          <Text size="sm" c={tokens.amber}>
-            {t("run:shop.scrap", { n: scrap })}
-          </Text>
-          <Text size="sm" c={tokens.dim}>
-            {t("run:shop.deck", { n: deck.length })}
-          </Text>
-        </Group>
-      </Group>
-
       <Text size="xs" c={tokens.dim} fs="italic">
         {t(greeting.text)}
       </Text>

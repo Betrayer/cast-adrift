@@ -2,6 +2,7 @@ import { Button, Overlay, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { tokens } from '@/app/theme';
+import { TapPopover } from '@/components/TapPopover';
 import { schools } from '@/data/schools';
 import { isInverted } from '@/game/battle/order';
 import {
@@ -33,29 +34,44 @@ export const CausalityBanner = () => {
       data-band="causality"
     >
       {inverted ? (
-        <span
-          className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}
-          data-causality="inverted"
-          title={t('battle:invertedHint')}
+        <TapPopover
+          className={styles.clickable}
+          label={t('battle:inverted')}
+          testId="causality-inverted"
+          content={t('battle:invertedHint')}
         >
-          {t('battle:inverted')}
-        </span>
+          <span
+            className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}
+            data-causality="inverted"
+          >
+            {t('battle:inverted')}
+          </span>
+        </TapPopover>
       ) : null}
       {storm ? (
-        <span
-          className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}
-          data-causality="storm"
-          title={t('battle:stormHint')}
+        <TapPopover
+          className={styles.clickable}
+          label={t('battle:storm')}
+          testId="causality-storm"
+          content={t('battle:stormHint')}
         >
-          {t('battle:storm')}
-        </span>
+          <span
+            className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}
+            data-causality="storm"
+          >
+            {t('battle:storm')}
+          </span>
+        </TapPopover>
       ) : null}
     </div>
   );
 };
 
-export const StatusBar = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
+export const StatusBar = () => {
   const { t } = useTranslation(['battle', 'run']);
+  const phase = useBattleStore((s) => s.phase);
+  const setSystemMenu = useAppStore((s) => s.setSystemMenu);
+  const setBuildSheet = useAppStore((s) => s.setBuildSheet);
   const hull = useBattleStore((s) => s.hull);
   const hullMax = useBattleStore((s) => s.hullMax);
   const shield = useBattleStore((s) => s.shield);
@@ -125,19 +141,34 @@ export const StatusBar = ({ onOpenBuild }: { onOpenBuild: () => void }) => {
           variant="subtle"
           color="gray"
           data-open-build
-          onClick={onOpenBuild}
+          onClick={() => {
+            setBuildSheet(true);
+          }}
         >
           {t('run:build.open')}
+        </Button>
+        <Button
+          className={styles.clickable}
+          size="compact-xs"
+          variant="subtle"
+          color="gray"
+          data-testid="battle-system-menu"
+          disabled={phase !== 'placement'}
+          onClick={() => {
+            setSystemMenu(true);
+          }}
+        >
+          {t('run:system.open')}
         </Button>
       </div>
     </div>
   );
 };
 
-export const TopBands = ({ onOpenBuild }: { onOpenBuild: () => void }) => (
+export const TopBands = () => (
   <div className={styles.topBands}>
     <CausalityBanner />
-    <StatusBar onOpenBuild={onOpenBuild} />
+    <StatusBar />
   </div>
 );
 
@@ -216,7 +247,7 @@ export const ResonanceChips = () => {
                 <span
                   className={styles.resPrism}
                   data-res-prism={row.school}
-                  title={t('battle:resPrism')}
+                  aria-label={t('battle:resPrism')}
                 />
               ) : null}
               <span className={styles.resPips}>

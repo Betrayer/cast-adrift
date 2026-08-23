@@ -18,3 +18,7 @@
 :root[data-ca-motion='reduced'] .screen {
   animation: none;
 }
+
+.parked {
+  display: none !important;
+}

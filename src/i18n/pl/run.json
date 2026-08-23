@@ -67,7 +67,6 @@
     "pass": "Sukces — {{total}}",
     "fail": "Niepowodzenie — {{total}}",
     "roll": "Rolka",
-    "back": "Powrót",
     "reqAxisMin": "wymaga wersji {{n}} lub nowszej",
     "reqAxisMax": "wymaga wersji {{n}} lub starszej",
     "checkLowest": "Nic powyżej {{n}}",
@@ -189,7 +188,6 @@
     "memory": "Echo Pamięć",
     "empty": "Nie zarejestrowano jeszcze żadnych wpisów.",
     "locked": "Jeszcze nie odkryte",
-    "back": "Powrót",
     "unread": "nowy",
     "glyphLegend": {
       "title": "Symbole szkolne",
@@ -292,7 +290,6 @@
     "aLevel": "A {{n}}",
     "tideCap": "Szczyty pływów interferencyjnych na stronie {{n}}",
     "launch": "Uruchomienie",
-    "back": "Powrót",
     "ascensionCost": "To cię kosztuje",
     "ascensionGain": "To się opłaca",
     "shardMult": "+{{n}}% fragmentów dla całego przebiegu"
@@ -431,7 +428,6 @@
   "journal": {
     "title": "Dziennik biegowy",
     "open": "Czasopismo",
-    "back": "Powrót do mapy",
     "empty": "Jeszcze nic nie zostało napisane. Sektor nie zwrócił się do ciebie z żadną prośbą.",
     "sector": "Sektor{{n}}",
     "beacon": "Latarnia źródło — {{n}} z {{max}}",
@@ -457,5 +453,12 @@
     "hintElite": "Poluj na elity z gry „{{n}}” podczas swoich biegów",
     "hintBeacons": "Rozpoznaj sygnały nawigacyjne typu „{{n}}” w jednym przebiegu",
     "hintEnding": "Przejdź do sekcji „Core” i wybierz"
+  },
+  "system": {
+    "title": "Menu statku",
+    "resume": "Wróć do gry",
+    "toMenu": "Zwiń do menu głównego",
+    "toMenuHint": "Przebieg jest zapisany — wróć do niego z menu.",
+    "open": "Menu"
   }
 }

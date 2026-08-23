@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
 import { TagChips } from "@/components/TagChips";
@@ -23,7 +24,6 @@ import {
 import { ENGRAVING_STATION_LEVEL } from "@/data/milestones";
 import { schools } from "@/data/schools";
 import { playSfx } from "@/services/audio";
-import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 
 const pairPartner = (id: string): string | undefined => {
@@ -36,7 +36,6 @@ const pairPartner = (id: string): string | undefined => {
 
 export const EngravingScreen = () => {
   const { t } = useTranslation(["meta", "common", "content"]);
-  const go = useAppStore((s) => s.go);
   const level = useMetaStore((s) => s.level);
   const shards = useMetaStore((s) => s.shards);
   const collection = useMetaStore((s) => s.collection);
@@ -56,26 +55,18 @@ export const EngravingScreen = () => {
   return (
     <Screen
       header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-        <Group justify="space-between">
-          <Text fw={700} c={tokens.text}>
-            {t("meta:engraving.title")}
-          </Text>
-          <Group gap="xs">
+        <AppHeader
+          subtitle={
+            unlocked
+              ? t("meta:engraving.hint")
+              : t("meta:engraving.locked", { level: ENGRAVING_STATION_LEVEL })
+          }
+          actions={
             <Badge variant="light" color="yellow">
               {shards} ◈
             </Badge>
-            <Button size="xs" variant="default" onClick={() => { go("hangar"); }}>
-              {t("common:back")}
-            </Button>
-          </Group>
-        </Group>
-        <Text size="xs" mt={4} c={tokens.dim}>
-          {unlocked
-            ? t("meta:engraving.hint")
-            : t("meta:engraving.locked", { level: ENGRAVING_STATION_LEVEL })}
-        </Text>
-        </Paper>
+          }
+        />
       }
     >
       <Stack gap="sm">
