@@ -36,7 +36,8 @@
       "anomaly": "Anomalie",
       "beacon": "Bake",
       "boss": "Chef",
-      "inverted": "umgekehrt"
+      "inverted": "umgekehrt",
+      "hole": "Schwarzes Loch"
     },
     "previewNode": "{{type}} · Risiko: {{risk}}",
     "previewPocket": "Umweg: bessere Beute, härterer Kampf",
@@ -44,7 +45,10 @@
       "low": "niedrig",
       "raised": "erhöht",
       "high": "hoch"
-    }
+    },
+    "hull": "Hülle {{cur}}/{{max}}",
+    "scrap": "Schrott {{n}}",
+    "previewHole": "Schwarzes Loch: Umfliegen oder durch das Wurmloch fahren"
   },
   "event": {
     "title": "Signal",
@@ -67,7 +71,6 @@
     "pass": "Erfolg — {{total}}",
     "fail": "Fehlgeschlagen — {{total}}",
     "roll": "Rolle",
-    "back": "Zurück",
     "reqAxisMin": "Erfordert Axis {{n}} oder höher",
     "reqAxisMax": "Erfordert Axis {{n}} oder eine niedrigere Version",
     "checkLowest": "Nichts über {{n}}",
@@ -189,7 +192,6 @@
     "memory": "Echo Speicher",
     "empty": "Es wurde noch nichts protokolliert.",
     "locked": "Noch nicht aufgedeckt",
-    "back": "Zurück",
     "unread": "neu",
     "glyphLegend": {
       "title": "Schulzeichen",
@@ -197,7 +199,8 @@
     },
     "prologueTitle": "Die erste Überquerung",
     "prologueBody": "Spiele die ersten Takte noch einmal ab. Nichts hat begonnen, nichts ist verloren.",
-    "prologueReplay": "Wiederholung"
+    "prologueReplay": "Wiederholung",
+    "badgeLegend": "Würfelabzeichen"
   },
   "consequenceToast": "Folge: {{text}}",
   "rewards": {
@@ -240,7 +243,8 @@
     "scrap": "Schrott: {{n}}",
     "hull": "Hülle {{cur}}/{{max}}",
     "voucher": "Mk-Gutschein ×{{n}} – eine kostenlose Stufe",
-    "voucherUse": "Kostenlos"
+    "voucherUse": "Kostenlos",
+    "fuse": "Verschmelzen — {{n}}"
   },
   "summary": {
     "victory": "Sektor geräumt",
@@ -251,14 +255,24 @@
     "perks": "Upgrades:",
     "perksNone": "keine",
     "toMenu": "Zum Menü",
-    "faced": "Quelle: {{names}}"
+    "faced": "Quelle: {{names}}",
+    "more": "Mehr",
+    "less": "Weniger",
+    "elites": "Elite",
+    "minibosses": "Mini-Bosse",
+    "bosses": "Bosse",
+    "scrapSpent": "Schrott ausgegeben",
+    "hullPctMin": "Niedrigste Hülle",
+    "dicePlaced": "Würfel gesetzt",
+    "pct": "{{n}}%",
+    "wormholeRides": "Wurmloch-Fahrten",
+    "holesBypassed": "Übersprungene Löcher"
   },
   "prologue": {
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Zurück zum Menü",
-    "replayDone": "Zurück zu den „Kodex“"
+    "leave": "Zurück zum Menü"
   },
   "interstitial": {
     "sector": "Branchen{{n}}",
@@ -293,10 +307,13 @@
     "aLevel": "Ein „{{n}}“",
     "tideCap": "Interferenzgezeiten am {{n}}",
     "launch": "Start",
-    "back": "Zurück",
     "ascensionCost": "Das kostet dich",
     "ascensionGain": "Es zahlt sich für dich aus",
-    "shardMult": "+{{n}} % Shards für den gesamten Durchlauf"
+    "shardMult": "+{{n}} % Shards für den gesamten Durchlauf",
+    "changeShip": "Schiff wechseln",
+    "voucher": "Gutschein: Start-Perk",
+    "voucherCount": "{{n}} im Depot",
+    "voucherHint": "Gib einen Gutschein aus, um vor dem ersten Sprung einen Perk zu ziehen."
   },
   "package": {
     "title": "Gate-Gehäuse",
@@ -312,24 +329,52 @@
     "next": "Weiter",
     "skipAll": "Alle überspringen",
     "place": {
-      "title": "Ziehe einen Würfel in ein System",
-      "body": "Würfle und ziehe dann die Würfel aus dem Fach auf die Felder „Waffen“, „Schilde“, „Triebwerke“, „Sensoren“ oder „Reaktor“. Ein Würfel passt niemals in ein Feld, dessen Oberkante unterhalb seiner Augenzahl liegt."
+      "title": "Schick einen Würfel in ein System",
+      "body": "Tippe einen Würfel an, dann eine leuchtende Systemkarte — oder zieh ihn dorthin. Jede Karte zeigt vorab, was der Würfel bewirkt, und er passt nie in eine Karte, deren Kappe unter seiner Seite liegt."
     },
     "endTurn": {
-      "title": "Die Kurve meistern",
-      "body": "Wenn das Spielfeld so aussieht, wie du es dir vorstellst, beende den Zug. Die Systeme feuern von oben nach unten, dann antwortet der Gegner."
+      "title": "Runde auflösen",
+      "body": "Wenn das Brett passt, beende die Runde. Die Systeme feuern in der Reihenfolge der Nummern auf ihren Karten, dann antwortet der Gegner."
     },
     "reroll": {
       "title": "Einmal kann man kostenlos neu würfeln",
       "body": "Wähle beliebige Würfel aus, die sich noch in der Schale befinden, und würfle sie erneut. Wiederholwürfe werden nicht von einer Runde in die nächste übertragen – ein nicht genutzter Wiederholwurf verfällt."
     },
     "nudge": {
-      "title": "Investition sorgt für Präzision",
-      "body": "Wähle einen Würfel aus und gib eine Ladung aus, um seine Augenzahl um eins nach oben oder unten zu verschieben. Mit Ladungen kannst du auch zusätzliche Würfe und „Surges“ bezahlen."
+      "title": "Charge buys precision",
+      "body": "Select a die, then use − and + on the console to move its face by one. Charge pays for it; a free nudge spends nothing."
     },
     "jump": {
       "title": "Wählen Sie den nächsten Knoten aus",
       "body": "Tippe auf einen beleuchteten Knoten und wähle dann „Springen“. Nebel verdeckt die vor dir liegenden Reihen; Sensoren und Tiefenscans verschieben den Horizont weiter nach vorne."
+    },
+    "targeting": {
+      "title": "Pick what you are shooting at",
+      "body": "Tap an enemy to make it the target. Weapons, marks and pierce all land on the target — subsystems are targeted the same way."
+    },
+    "reserve": {
+      "title": "Keep a die for next turn",
+      "body": "A reserved die skips the reroll and comes back with its face intact. Use it to hold a number the board cannot spend yet."
+    },
+    "actives": {
+      "title": "Some dice do more than sit",
+      "body": "A die with an active can flip, copy, bank or split. The row lights up only for the actives your tray can currently pay for."
+    },
+    "resonance": {
+      "title": "Schools reward company",
+      "body": "The chips count how many dice of each school the battle holds. Cross a threshold and the whole school gains a bonus for the fight."
+    },
+    "affinity": {
+      "title": "The bonus is the slot",
+      "body": "A school placed in its own system adds to the face before anything else reads it. That is the sum on the card, and it is free."
+    },
+    "prismatic": {
+      "title": "Prismatic counts as anything",
+      "body": "A prismatic die satisfies any school, and in a slot it inherits that slot’s affinity — bonus included. It also counts for resonance."
+    },
+    "fate": {
+      "title": "Fate is one roll, once",
+      "body": "The Fate die never enters a slot. One press, one roll per battle, and the table reads out what it gave you."
     }
   },
   "motif": {
@@ -342,7 +387,11 @@
     "pocket": "Umweg-Tasche: höheres Risiko, höherer Gewinn",
     "riftSplit": "Spaltung: Die Zweige treffen sich erst am Tor",
     "inversion": "Inverted Row: Systeme werden von hinten nach vorne abgearbeitet",
-    "storm": "Wahrscheinlichkeitssturm: Ein platzierter Würfel wird bei der Auswertung erneut gewürfelt"
+    "storm": "Wahrscheinlichkeitssturm: Ein platzierter Würfel wird bei der Auswertung erneut gewürfelt",
+    "blackHoles": "Schwarzes Loch: Die Zelle ist verschwunden; ihre Bahn bildet ein Wurmloch",
+    "wormhole": "Rand des Wurmlochs: Am Rand wartet eine Entscheidung",
+    "bypass": "Den Rand gestreift: Der Rumpf wurde von der Flut gestreift",
+    "holeScorch": "Hülle zu dünn, um die Maut zu bezahlen – der Felgenrand ließ dich durch"
   },
   "tag": {
     "red": "Rot",
@@ -376,7 +425,12 @@
     "swarm": "Schwarm",
     "spike": "Spike",
     "precision": "Präzision",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Tag-Glossar",
+    "glossaryBody": "Tags sind, wie Würfel, Perks, Module und Gravuren einander finden: Ein Effekt, der ein Tag zählt, zählt jeden Gegenstand mit diesem Tag.",
+    "glossarySchools": "Schulen",
+    "glossarySystems": "Systeme",
+    "glossaryMechanics": "Mechaniken"
   },
   "build": {
     "title": "Dein Build",
@@ -399,12 +453,12 @@
     "stability": "Stabilitäts{{n}}",
     "neutral": "Achsenausgleich",
     "preview": "Axis {{from}} → {{to}}",
-    "short": "Achse"
+    "short": "Achse",
+    "moves": "Schwarze Würfel drücken zur Resonanz, blaue zur Stabilität; Ereignisse und Drift bewegen sie ebenfalls."
   },
   "journal": {
     "title": "Laufprotokoll",
     "open": "Zeitschrift",
-    "back": "Zurück zur Karte",
     "empty": "Es wurde noch nichts geschrieben. Die Branche hat noch keine Anfrage an Sie gerichtet.",
     "sector": "Branchen{{n}}",
     "beacon": "Bake gelöst — {{n}} von {{max}}",
@@ -421,7 +475,16 @@
     "here": "Sie befinden sich im Sektor „{{n}}“.",
     "chainsTitle": "Themen",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "hier"
+    "chainHere": "hier",
+    "wormhole": {
+      "ride": "„Rode the Wormhole“ {{way}}, „{{rows}}“ erscheint",
+      "bypass": "Um das Schwarze Loch herumgeflogen"
+    },
+    "wormholeWay": {
+      "forward": "tiefer",
+      "backward": "zurück"
+    },
+    "achievement": "Erfolg: {{name}}"
   },
   "memory": {
     "kicker": "Echo erinnert sich · Auszug {{n}} von {{max}}",
@@ -430,5 +493,72 @@
     "hintElite": "Jage während deiner Läufe nach „{{n}}“-Eliten",
     "hintBeacons": "{{n}}-Beacons in einem einzigen Durchlauf auflösen",
     "hintEnding": "Geh zum Kern und wähle"
+  },
+  "system": {
+    "title": "Schiffsmenü",
+    "resume": "Fortsetzen",
+    "toMenu": "Ins Hauptmenü zurück",
+    "toMenuHint": "Der Lauf ist gespeichert — setze ihn im Menü fort.",
+    "open": "Menü"
+  },
+  "tally": {
+    "title": "Kampfbilanz",
+    "titleLoss": "Letztes Gefecht",
+    "turns": "Runden",
+    "dealt": "Schaden ausgeteilt",
+    "taken": "Schaden erlitten",
+    "shield": "Vom Schild aufgefangen",
+    "best": "Bester Spinaltreffer",
+    "rerolls": "Neuwürfe",
+    "placed": "Würfel gesetzt",
+    "scrap": "Schrott gesammelt",
+    "hull": "Hülle {{cur}}/{{max}}",
+    "continue": "Weiter"
+  },
+  "tagDesc": {
+    "red": "Aggression: Waffenschaden, Brand und Spitzen.",
+    "blue": "Verteidigung: Schilde, Absorption und Ausdauer.",
+    "green": "Bewegung: Triebwerke, Ausweichen und Wachstum.",
+    "yellow": "Wirtschaft: Schrott, Auszahlungen und Hebel im Laden.",
+    "black": "Risiko: Ladung, Opfer und die Resonanzachse.",
+    "grey": "Lesen: Sensoren, Würfelhandhabung und Präzision.",
+    "prismatic": "Joker: zählt als jede Schule und erbt die Affinität des Slots.",
+    "weapons": "Alles, was in einem Waffenslot aufgelöst wird.",
+    "shields": "Alles, was in einem Schildslot aufgelöst wird.",
+    "engines": "Alles, was im Triebwerksslot aufgelöst wird.",
+    "sensors": "Alles, was im Sensorslot aufgelöst wird.",
+    "reactor": "Alles, was im Reaktorslot aufgelöst wird.",
+    "spinal": "Die Spinallafette: ein riesiger Schuss, der bei niedrigem Wurf klemmt.",
+    "repairBay": "Die Reparaturbucht: Hülle wird mitten im Kampf geheilt.",
+    "burn": "Schaden über Zeit, der am Ende der Gegnerrunde tickt.",
+    "crit": "Treffer, vor Schilden mit 1,5 multipliziert.",
+    "growth": "Werte, die auf einer Höchstseite dauerhaft steigen.",
+    "reroll": "Würfel neu werfen, gratis oder gekauft.",
+    "charge": "Der Reaktorvorrat, der Stupser, Neuwürfe und Schübe zahlt.",
+    "scrap": "Die Laufwährung: Läden, Reparaturen und Mk-Ausbauten.",
+    "overcap": "Einen Würfel über die Obergrenze seines Slots setzen.",
+    "pierce": "Schaden, der den Gegnerschild ignoriert.",
+    "dodge": "Ausweichen, pro eingehendem Treffer gewürfelt.",
+    "survival": "Am Leben bleiben: Hülle, Todesrettungen und Mindestwerte.",
+    "control": "Dem Gegner etwas verwehren: Störung, Sperren und Tore.",
+    "dice": "Umgang mit den Würfeln selbst: drehen, kopieren, tauschen, sichern, teilen.",
+    "shieldwall": "Gestapelter Schild, der über Runden trägt.",
+    "risk": "Kosten, gezahlt in Hülle, Schrott oder Gewissheit.",
+    "swarm": "Viele kleine Würfel statt weniger großer.",
+    "spike": "Ein enormer Wert statt eines steten Stroms.",
+    "precision": "Enge, vorhersehbare Seiten und exakte Werte."
+  },
+  "hole": {
+    "title": "Schwarzes Loch",
+    "body": "Die Zelle ist verschwunden. Ihr Rand lässt dich entweder vorbeigehen oder bringt dich an einen Ort, den er selbst bestimmt.",
+    "gentle": "Stabiles Wurmloch",
+    "gentleWhy": "Die ersten beiden Abfahrten einer Abfahrtsserie sind kurz und führen immer tiefer hinab.",
+    "bypass": "Umgehen",
+    "bypassCost": "Bypass: −Rumpf vom Typ „{{n}}“",
+    "bypassFree": "Umgehung: kostenlos – der Rumpf kann nicht bezahlen",
+    "ride": "Probier’s aus!",
+    "rideCost": "Fahrt: ein Abstecher von „{{min}}“ nach „{{max}}“, Richtung unbekannt",
+    "rideGentle": "Ride: Ein Mix aus „{{min}}“ und „{{max}}“, nur noch intensiver",
+    "landed": "Ausgelöst{{rows}}-Zeilen {{way}}"
   }
 }

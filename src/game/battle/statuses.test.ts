@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   applyStatus,
+  clearMark,
   consumeStatus,
   tickBurn,
   type Statuses,
@@ -20,16 +21,34 @@ describe("applyStatus", () => {
     applyStatus(statuses, "jam");
     applyStatus(statuses, "charge");
     applyStatus(statuses, "mark");
-    expect(statuses).toEqual({ mark: 1, jam: 1, charge: 1 });
+    expect(statuses).toEqual({ mark: 2, jam: 1, charge: 1 });
+  });
+
+  it("mark carries a magnitude and keeps the larger one", () => {
+    const statuses: Statuses = {};
+    applyStatus(statuses, "mark", 3);
+    expect(statuses.mark).toBe(3);
+    applyStatus(statuses, "mark", 1);
+    expect(statuses.mark).toBe(3);
+    applyStatus(statuses, "mark", 5);
+    expect(statuses.mark).toBe(5);
   });
 });
 
 describe("consumeStatus", () => {
   it("returns true once and removes the flag", () => {
-    const statuses: Statuses = { mark: 1 };
-    expect(consumeStatus(statuses, "mark")).toBe(true);
-    expect(statuses.mark).toBeUndefined();
-    expect(consumeStatus(statuses, "mark")).toBe(false);
+    const statuses: Statuses = { jam: 1 };
+    expect(consumeStatus(statuses, "jam")).toBe(true);
+    expect(statuses.jam).toBeUndefined();
+    expect(consumeStatus(statuses, "jam")).toBe(false);
+  });
+});
+
+describe("clearMark", () => {
+  it("drops the vulnerability outright", () => {
+    const statuses: Statuses = { mark: 4, burn: 2 };
+    clearMark(statuses);
+    expect(statuses).toEqual({ burn: 2 });
   });
 });
 

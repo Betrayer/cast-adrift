@@ -3,6 +3,7 @@ import { SECTORS, sectorDef } from "@/data/sectors";
 import { createStreams } from "@/services/rng";
 import {
   bossNodeIdFor,
+  bossReachOf,
   generateSectorMap,
   START_NODE_ID,
 } from "@/game/map/generator";
@@ -11,6 +12,8 @@ import {
   edgeKey,
   outgoingEdges,
   type MapGraph,
+  type MapNode,
+  type NodeId,
   type NodeType,
 } from "@/game/map/types";
 
@@ -322,11 +325,184 @@ describe("map generator", () => {
             n.blessing === "blessed" ? "+" : n.blessing === "cursed" ? "-" : "",
             n.inverted === true ? "i" : "",
             n.storm === true ? "s" : "",
+            n.hole === true ? "h" : "",
           ].join("");
           return `${n.id}:${n.type}${marks === "" ? "" : `:${marks}`}`;
         })
         .join(",");
       expect(`S${String(def.id)} ${summary}`).toMatchSnapshot();
     }
+  });
+});
+
+const HOLE_SECTORS: readonly number[] = [2, 3, 4, 5, 6];
+const HOLE_SWEEP = 200;
+
+const holeCountFor = (sector: number): number => {
+  const motif = sectorDef(sector).shape.motifs.find(
+    (m) => m.m === "blackHoles",
+  );
+  return motif?.m === "blackHoles" ? motif.count : 0;
+};
+
+const playReachable = (map: MapGraph): Set<NodeId> => {
+  const holes = new Set(
+    map.nodes.filter((n) => n.hole === true).map((n) => n.id),
+  );
+  const seen = new Set<NodeId>([START_NODE_ID]);
+  const queue: NodeId[] = [START_NODE_ID];
+  while (queue.length > 0) {
+    const cur = queue.shift();
+    if (cur === undefined) break;
+    for (const next of outgoingEdges(map, cur)) {
+      if (holes.has(next) || seen.has(next)) continue;
+      seen.add(next);
+      queue.push(next);
+    }
+  }
+  return seen;
+};
+
+describe("black holes", () => {
+  it("never places a hole in sector 1", () => {
+    for (let seed = 1; seed <= 40; seed += 1) {
+      const map = generate(seed, 1);
+      expect(map.nodes.some((n) => n.hole === true)).toBe(false);
+      expect(Object.keys(map.wormholes)).toHaveLength(0);
+    }
+  });
+
+  it("holds every hole invariant across 200 seeds in S2-S6", () => {
+    const degraded: Record<number, number> = {};
+    for (const sector of HOLE_SECTORS) {
+      const shape = sectorDef(sector).shape;
+      const want = holeCountFor(sector);
+      const lastRow = Math.min(shape.bossRow - 2, shape.gateRow + 3);
+      let short = 0;
+      for (let seed = 1; seed <= HOLE_SWEEP; seed += 1) {
+        const map = generate(seed, sector);
+        const label = `S${String(sector)} seed ${String(seed)}`;
+        const byId = new Map(map.nodes.map((n) => [n.id, n]));
+        const holes = map.nodes.filter((n) => n.hole === true);
+        expect(holes.length, label).toBeLessThanOrEqual(want);
+        if (holes.length < want) short += 1;
+
+        const rows = holes.map((n) => n.row).sort((a, b) => a - b);
+        rows.forEach((row, index) => {
+          expect(row, label).toBeGreaterThanOrEqual(4);
+          expect(row, label).toBeLessThanOrEqual(lastRow);
+          expect(row, label).not.toBe(shape.gateRow);
+          const prev = rows[index - 1];
+          if (prev !== undefined) expect(row - prev, label).toBeGreaterThanOrEqual(3);
+        });
+
+        for (const hole of holes) {
+          expect(hole.pocket, label).toBeUndefined();
+          expect(hole.type, label).toBe("battle");
+          const feeders = map.edges.filter(([, b]) => b === hole.id);
+          expect(feeders.length, `${label} ${hole.id} has a feeder`).toBeGreaterThan(0);
+          for (const [from] of feeders) {
+            const key = edgeKey(from, hole.id);
+            expect(map.edgeMarks[key], `${label} ${key} is a wormhole`).toBe(
+              "wormhole",
+            );
+            const record = map.wormholes[key];
+            expect(record, `${label} ${key} carries a record`).toBeDefined();
+            if (record === undefined) continue;
+            expect(record.from, label).toBe(from);
+            expect(record.hole, label).toBe(hole.id);
+            const bypass = byId.get(record.bypass);
+            expect(bypass, `${label} bypass exists`).toBeDefined();
+            expect(bypass?.hole, label).toBeUndefined();
+            expect(bypass?.row, label).toBe(hole.row);
+            expect(areConnected(map, from, record.bypass), label).toBe(true);
+            expect(map.edgeMarks[edgeKey(from, record.bypass)], label).toBeUndefined();
+          }
+        }
+
+        for (const node of map.nodes) {
+          if (node.hole === true) continue;
+          const outs = outgoingEdges(map, node.id);
+          if (outs.length === 0) continue;
+          const clean = outs.filter(
+            (to) =>
+              byId.get(to)?.hole !== true &&
+              map.edgeMarks[edgeKey(node.id, to)] !== "mine",
+          );
+          expect(clean.length, `${label} ${node.id} keeps a clean exit`).toBeGreaterThan(0);
+        }
+
+        const reached = playReachable(map);
+        const enterable = map.nodes.filter((n) => n.hole !== true);
+        expect(reached.size, `${label} every node stays enterable`).toBe(
+          enterable.length,
+        );
+        expect(reached.has(bossNodeIdFor(sector)), label).toBe(true);
+
+        const reach = new Set(map.bossReach);
+        expect(reach.has(bossNodeIdFor(sector)), label).toBe(true);
+        for (const node of enterable) {
+          expect(reach.has(node.id), `${label} ${node.id} reaches the boss`).toBe(
+            true,
+          );
+        }
+        for (const hole of holes) {
+          expect(reach.has(hole.id), `${label} ${hole.id} is not a landing`).toBe(
+            false,
+          );
+        }
+        expect([...reach].sort()).toEqual(
+          bossReachOf(map.nodes, map.edges, bossNodeIdFor(sector)),
+        );
+      }
+      degraded[sector] = short;
+    }
+    for (const sector of HOLE_SECTORS) {
+      const short = degraded[sector] ?? HOLE_SWEEP;
+      expect(
+        short / HOLE_SWEEP,
+        `S${String(sector)} degraded on ${String(short)}/${String(HOLE_SWEEP)} seeds`,
+      ).toBeLessThan(0.35);
+    }
+  });
+
+  it("keeps pockets off hole nodes", () => {
+    for (const sector of HOLE_SECTORS) {
+      for (let seed = 1; seed <= 40; seed += 1) {
+        const map = generate(seed, sector);
+        const byId = new Map(map.nodes.map((n) => [n.id, n]));
+        for (const [a, b] of map.edges) {
+          if (byId.get(b)?.pocket !== true) continue;
+          expect(byId.get(a)?.hole, `S${String(sector)} seed ${String(seed)}`).not.toBe(
+            true,
+          );
+        }
+        for (const node of map.nodes.filter((n) => n.pocket === true)) {
+          const rejoin = outgoingEdges(map, node.id)[0];
+          if (rejoin === undefined) continue;
+          expect(byId.get(rejoin)?.hole).not.toBe(true);
+        }
+      }
+    }
+  });
+
+  it("drops a node out of bossReach when a hole cuts its only way on", () => {
+    const nodes: MapNode[] = [
+      { id: "r0l0", row: 0, lane: 0, type: "start" },
+      { id: "r1l0", row: 1, lane: 0, type: "battle", hole: true },
+      { id: "r1l1", row: 1, lane: 1, type: "battle" },
+      { id: "r2l0", row: 2, lane: 0, type: "boss" },
+    ];
+    const edges: [NodeId, NodeId][] = [
+      ["r0l0", "r1l0"],
+      ["r0l0", "r1l1"],
+      ["r1l0", "r2l0"],
+      ["r1l1", "r2l0"],
+    ];
+    expect(bossReachOf(nodes, edges, "r2l0")).toEqual([
+      "r0l0",
+      "r1l1",
+      "r2l0",
+    ]);
   });
 });

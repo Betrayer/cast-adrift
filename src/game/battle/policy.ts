@@ -1,10 +1,15 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { isInverted } from "@/game/battle/order";
 import {
+  BASE_EVASION,
+  evasionFor,
+  evasionTuningFor,
   MIRROR_CAP,
   MIRROR_SCHOOL_CAP,
   MIRROR_SCHOOL_MULT,
+  vulnerableFor,
 } from "@/game/battle/resolver";
+import type { EvasionTuning } from "@/game/battle/passives";
 import { canPlaceDie, isSlotBlocked } from "@/game/battle/setup";
 import type {
   BattleSnapshot,
@@ -26,6 +31,9 @@ export interface PolicyDecision {
 }
 
 const WEAPON_SLOTS: readonly SlotId[] = ["weaponA", "weaponB"];
+const SHIELD_SLOTS: readonly SlotId[] = ["shields", "shieldsB"];
+const ENGINE_SLOTS: readonly SlotId[] = ["engines", "enginesB"];
+const REPAIR_HULL_PCT = 0.6;
 
 const trayDice = (snapshot: BattleSnapshot): RolledDie[] =>
   snapshot.dice.filter((d) => d.state === "tray");
@@ -153,6 +161,25 @@ const stormMargin = (
   return Math.max(0, worst.value - (worst.tier + 1) / 2);
 };
 
+export const evasionMitigation = (
+  value: number,
+  tuning: EvasionTuning = BASE_EVASION,
+): number => {
+  const evasion = evasionFor(value, 0, tuning);
+  return (evasion.dodgePct + evasion.glancingPct / 2) / 100;
+};
+
+const slotCap = (snapshot: BattleSnapshot, slotId: SlotId): number =>
+  snapshot.slots[slotId]?.cap ?? 0;
+
+const bestByGain = (
+  dice: readonly RolledDie[],
+  gain: (die: RolledDie) => number,
+): { die: RolledDie; gain: number } | undefined =>
+  dice
+    .map((die) => ({ die, gain: gain(die) }))
+    .sort((a, b) => b.gain - a.gain || a.die.value - b.die.value)[0];
+
 const gatedKillSum = (
   dice: readonly RolledDie[],
   gate: number,
@@ -246,22 +273,57 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
 
   const incoming = incomingEstimate(snapshot);
   if (incoming >= snapshot.hull * 0.25 && !shieldsWasted(snapshot)) {
-    const shieldDie = [...available()]
-      .filter((d) => d.tier <= (snapshot.slots.shields?.cap ?? 0))
-      .sort((a, b) => b.value - a.value)[0];
-    if (shieldDie !== undefined) tryPlace(shieldDie, "shields");
+    for (const slotId of SHIELD_SLOTS) {
+      if (snapshot.slots[slotId] === undefined) continue;
+      const shieldDie = [...available()]
+        .filter((d) => d.tier <= slotCap(snapshot, slotId))
+        .sort((a, b) => b.value - a.value)[0];
+      if (shieldDie !== undefined) tryPlace(shieldDie, slotId);
+    }
   }
 
   if (incoming > 0) {
-    const engineDie = [...available()]
-      .filter((d) => d.value >= 4 && d.value <= 6)
-      .sort((a, b) => a.value - b.value)[0];
-    if (engineDie !== undefined) tryPlace(engineDie, "engines");
+    const survivalWorth = incoming >= snapshot.hull * 0.25 ? 2 : 1;
+    const tuning = evasionTuningFor(snapshot.shipId);
+    let engineValue = 0;
+    for (const slotId of ENGINE_SLOTS) {
+      if (snapshot.slots[slotId] === undefined) continue;
+      const engineCap = slotCap(snapshot, slotId);
+      const carried = engineValue;
+      const best = bestByGain(
+        available().filter((d) => d.tier <= engineCap),
+        (d) =>
+          (evasionMitigation(carried + d.value, tuning) -
+            evasionMitigation(carried, tuning)) *
+            incoming *
+            survivalWorth -
+          d.value,
+      );
+      if (best === undefined || best.gain <= 0) continue;
+      if (tryPlace(best.die, slotId)) engineValue += best.die.value;
+    }
+  }
+
+  if (
+    snapshot.slots.repairBay !== undefined &&
+    snapshot.hull < snapshot.hullMax * REPAIR_HULL_PCT
+  ) {
+    const missing = snapshot.hullMax - snapshot.hull;
+    const best = bestByGain(
+      available().filter((d) => d.tier <= slotCap(snapshot, "repairBay")),
+      (d) => Math.min(missing, Math.ceil(d.value / 2)) - d.value / 2,
+    );
+    if (best !== undefined && best.gain > 0) tryPlace(best.die, "repairBay");
   }
 
   if (!isInverted(snapshot)) {
-    const sensorDie = [...available()].sort((a, b) => a.value - b.value)[0];
-    if (sensorDie !== undefined) tryPlace(sensorDie, "sensors");
+    const sensorCap = slotCap(snapshot, "sensors");
+    const hits = freeWeaponSlots(snapshot, usedSlots).length;
+    const best = bestByGain(
+      available().filter((d) => d.tier <= sensorCap),
+      (d) => vulnerableFor(d.value) * hits - d.value,
+    );
+    if (best !== undefined && best.gain > 0) tryPlace(best.die, "sensors");
   }
 
   placeWeapons([...available()].sort((a, b) => b.value - a.value));

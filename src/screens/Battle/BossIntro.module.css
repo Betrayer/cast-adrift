@@ -1,3 +1,21 @@
+.introPanel {
+  justify-content: center;
+  animation: introIn 220ms ease-out both;
+}
+
+@keyframes introIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:root[data-ca-motion='reduced'] .introPanel {
+  animation: none;
+}
+
 .kicker {
   font-size: 12px;
   letter-spacing: 0.24em;

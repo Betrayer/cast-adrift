@@ -1,15 +1,16 @@
-import { Button, Divider, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { Divider, Group, Paper, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { AxisMeter, axisTone } from "@/components/AxisMeter";
 import { beaconsResolved, BEACON_FLAGS } from "@/data/events/beacons";
 import { chainViews } from "@/data/narrative/chains";
+import { achievementTitleById } from "@/game/meta/achievements";
 import { SPEAKER_TONE } from "@/data/speakers";
 import { AXIS_MAX, AXIS_MIN } from "@/game/run/axis";
 import { journalAxisHistory, type JournalEntry } from "@/game/run/journal";
-import { useAppStore } from "@/stores/appStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 import styles from "./JournalScreen.module.css";
@@ -20,7 +21,9 @@ const MARKER: Record<JournalEntry["k"], string> = {
   chain: "⟡",
   beacon: "✦",
   memory: "◈",
+  achievement: "✧",
   axis: "±",
+  wormhole: "◉",
 };
 
 const SILENT_TELEGRAPH_AT = 3;
@@ -72,10 +75,19 @@ const EntryRow = ({ entry }: { entry: JournalEntry }) => {
         return t("run:journal.beacon", { n: entry.resolved, max: BEACON_FLAGS.length });
       case "memory":
         return t("run:journal.memory", { n: entry.order });
+      case "achievement":
+        return t("run:journal.achievement", {
+          name: achievementTitleById(entry.achievement, t),
+        });
       case "axis":
         return t(`run:journal.axis.${entry.source}`, {
           from: entry.from,
           to: entry.to,
+        });
+      case "wormhole":
+        return t(`run:journal.wormhole.${entry.branch}`, {
+          rows: Math.abs(entry.rows),
+          way: t(`run:journal.wormholeWay.${entry.direction}`),
         });
     }
   })();
@@ -101,7 +113,6 @@ export const JournalScreen = () => {
   const flags = useRunStore((s) => s.flags);
   const axis = useRunStore((s) => s.axis);
   const sector = useRunStore((s) => s.sector);
-  const go = useAppStore((s) => s.go);
 
   const resolved = useMemo(() => beaconsResolved(flags), [flags]);
   const chains = useMemo(() => chainViews(flags, sector), [flags, sector]);
@@ -117,22 +128,7 @@ export const JournalScreen = () => {
   return (
     <Screen
       width="wide"
-      header={
-        <Title order={3} c={tokens.text} p="sm">
-          {t("run:journal.title")}
-        </Title>
-      }
-      footer={
-        <Button
-          fullWidth
-          m="sm"
-          onClick={() => {
-            go("map");
-          }}
-        >
-          {t("run:journal.back")}
-        </Button>
-      }
+      header={<AppHeader />}
     >
       <div
         className={styles.columns}

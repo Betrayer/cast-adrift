@@ -1,117 +1,176 @@
-import { isTelegramUid } from "@/services/uid";
-
-const LINKED_KEY = "ca.link.at";
+import { now } from "@/services/clock";
+import {
+  firestoreMetaDocs,
+  isEmptyProfile,
+  profileSummary,
+  type MetaDoc,
+  type MetaDocPort,
+  type ProfileSummary,
+} from "@/services/metaDoc";
+import { deviceStorage } from "@/services/profile";
+import { isTelegramUid, type AccountInfo, type AuthProviderId } from "@/services/uid";
 
 export type LinkOutcome =
   | "skipped"
   | "already-linked"
+  | "nothing-to-claim"
   | "copied"
-  | "kept-telegram"
-  | "replaced-telegram"
+  | "kept-target"
+  | "replaced-target"
+  | "prompted"
+  | "pending"
   | "failed";
 
-export interface MetaDoc {
-  v: number;
-  updatedAt: number;
-  data: string;
-  linkedFrom?: string;
-}
+export const resolveLink = (
+  source: MetaDoc | null,
+  target: MetaDoc | null,
+): "copied" | "kept-target" | "replaced-target" => {
+  if (source === null) return "kept-target";
+  if (target === null) return "copied";
+  return target.updatedAt >= source.updatedAt ? "kept-target" : "replaced-target";
+};
 
-const readMarker = (): boolean => {
-  try {
-    return localStorage.getItem(LINKED_KEY) !== null;
-  } catch {
-    return false;
+export type ProviderAttachPlan = "sign-in" | "link" | "already-linked";
+
+export const planProviderAttach = (
+  account: AccountInfo | null,
+  provider: AuthProviderId,
+): ProviderAttachPlan => {
+  if (account === null) return "sign-in";
+  if (account.providers.includes(provider)) return "already-linked";
+  return "link";
+};
+
+export const switchAbandonsProfile = (
+  sourceUid: string | null,
+  targetUid: string,
+): boolean => sourceUid !== null && sourceUid !== targetUid;
+
+export const shouldHandOver = (previousUid: string | null): boolean =>
+  previousUid !== null && !isTelegramUid(previousUid);
+
+export type ClaimDecision =
+  | { kind: "nothing-to-claim" }
+  | { kind: "copy" }
+  | { kind: "prompt"; recommended: "source" | "target" };
+
+export const decideClaim = (
+  source: MetaDoc | null,
+  target: MetaDoc | null,
+): ClaimDecision => {
+  if (source === null || isEmptyProfile(profileSummary(source))) {
+    return { kind: "nothing-to-claim" };
   }
-};
-
-const writeMarker = (): void => {
-  try {
-    localStorage.setItem(LINKED_KEY, String(Date.now()));
-  } catch {}
-};
-
-const asMetaDoc = (value: unknown): MetaDoc | null => {
-  if (typeof value !== "object" || value === null) return null;
-  const doc = value as Partial<MetaDoc>;
-  if (typeof doc.v !== "number") return null;
-  if (typeof doc.data !== "string") return null;
+  if (target === null || isEmptyProfile(profileSummary(target))) {
+    return { kind: "copy" };
+  }
   return {
-    v: doc.v,
-    updatedAt: typeof doc.updatedAt === "number" ? doc.updatedAt : 0,
-    data: doc.data,
+    kind: "prompt",
+    recommended: resolveLink(source, target) === "kept-target" ? "target" : "source",
   };
 };
 
-export const resolveLink = (
-  anon: MetaDoc | null,
-  telegram: MetaDoc | null,
-): Exclude<LinkOutcome, "skipped" | "already-linked" | "failed"> => {
-  if (anon === null) return "kept-telegram";
-  if (telegram === null) return "copied";
-  return telegram.updatedAt >= anon.updatedAt
-    ? "kept-telegram"
-    : "replaced-telegram";
-};
-
-export const shouldAttemptLink = (anonUid: string | null): boolean =>
-  anonUid !== null && !isTelegramUid(anonUid) && !readMarker();
-
-export interface LinkAccountsOptions {
-  anonUid: string | null;
-  telegramUid: string | null;
-  anonMeta: MetaDoc | null;
+export interface MergePrompt {
+  sourceUid: string;
+  targetUid: string;
+  source: ProfileSummary;
+  target: ProfileSummary;
+  recommended: "source" | "target";
 }
 
-export const linkAccounts = async ({
-  anonUid,
-  telegramUid,
-  anonMeta,
-}: LinkAccountsOptions): Promise<LinkOutcome> => {
-  if (telegramUid === null || !isTelegramUid(telegramUid)) return "skipped";
-  if (anonUid === null || anonUid === telegramUid) return "skipped";
-  if (isTelegramUid(anonUid)) return "skipped";
-  if (readMarker()) return "already-linked";
+export const mergePromptFor = (
+  sourceUid: string,
+  targetUid: string,
+  source: MetaDoc | null,
+  target: MetaDoc | null,
+  recommended: "source" | "target",
+): MergePrompt => ({
+  sourceUid,
+  targetUid,
+  source: profileSummary(source),
+  target: profileSummary(target),
+  recommended,
+});
+
+export interface PendingClaim {
+  sourceUid: string;
+  meta: MetaDoc | null;
+  boards: string[];
+}
+
+const CLAIM_KEY = "ca.claim";
+
+export const stashClaim = (claim: PendingClaim): void => {
+  deviceStorage.setItem(CLAIM_KEY, JSON.stringify(claim));
+};
+
+export const readClaim = (): PendingClaim | null => {
+  const raw = deviceStorage.getItem(CLAIM_KEY);
+  if (raw === null) return null;
+  let parsed: unknown;
   try {
-    const anon = anonMeta;
-    const { db } = await import("@/services/firebase");
-    const { doc, getDoc, setDoc } = await import("firebase/firestore");
-    const target = doc(db(), "users", telegramUid, "meta", "progress");
-    const snapshot = await getDoc(target);
-    const telegram = snapshot.exists() ? asMetaDoc(snapshot.data()) : null;
-    const outcome = resolveLink(anon, telegram);
-    if (outcome === "copied" || outcome === "replaced-telegram") {
-      if (anon === null) return "failed";
-      if (telegram !== null) {
-        await setDoc(
-          doc(
-            db(),
-            "users",
-            telegramUid,
-            "meta",
-            `backup-${String(Date.now())}`,
-          ),
-          telegram,
-        );
-      }
-      await setDoc(target, { ...anon, linkedFrom: anonUid });
-    }
-    writeMarker();
-    return outcome;
+    parsed = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  if (typeof parsed !== "object" || parsed === null) return null;
+  const claim = parsed as Partial<PendingClaim>;
+  if (typeof claim.sourceUid !== "string") return null;
+  return {
+    sourceUid: claim.sourceUid,
+    meta: claim.meta ?? null,
+    boards: Array.isArray(claim.boards)
+      ? claim.boards.filter((board): board is string => typeof board === "string")
+      : [],
+  };
+};
+
+export const clearClaim = (): void => {
+  deviceStorage.removeItem(CLAIM_KEY);
+};
+
+export const linkMarkerKey = (fromUid: string, toUid: string): string =>
+  `ca.link.${fromUid}.${toUid}`;
+
+export const hasLinkMarker = (fromUid: string, toUid: string): boolean =>
+  deviceStorage.getItem(linkMarkerKey(fromUid, toUid)) !== null;
+
+export const writeLinkMarker = (fromUid: string, toUid: string): void => {
+  deviceStorage.setItem(linkMarkerKey(fromUid, toUid), String(now()));
+};
+
+export interface ClaimResult {
+  outcome: Extract<LinkOutcome, "copied" | "replaced-target" | "failed">;
+  written: MetaDoc | null;
+}
+
+export const claimProfile = async (
+  claim: PendingClaim,
+  targetUid: string,
+  port: MetaDocPort = firestoreMetaDocs,
+): Promise<ClaimResult> => {
+  const source = claim.meta;
+  if (source === null) return { outcome: "failed", written: null };
+  try {
+    const existing = await port.read(targetUid);
+    if (existing !== null) await port.archive(targetUid, existing, now());
+    const written: MetaDoc = {
+      v: source.v,
+      updatedAt: now(),
+      data: source.data,
+      linkedFrom: claim.sourceUid,
+    };
+    await port.write(targetUid, written);
+    writeLinkMarker(claim.sourceUid, targetUid);
+    clearClaim();
+    return { outcome: existing === null ? "copied" : "replaced-target", written };
   } catch (error) {
-    console.warn("account-link: merge failed", error);
-    return "failed";
+    console.warn("account-link: claim failed", error);
+    return { outcome: "failed", written: null };
   }
 };
 
-export const readMetaDocFor = async (uid: string): Promise<MetaDoc | null> => {
-  try {
-    const { db } = await import("@/services/firebase");
-    const { doc, getDoc } = await import("firebase/firestore");
-    const snapshot = await getDoc(doc(db(), "users", uid, "meta", "progress"));
-    return snapshot.exists() ? asMetaDoc(snapshot.data()) : null;
-  } catch (error) {
-    console.warn("account-link: anon meta read failed", error);
-    return null;
-  }
+export const abandonClaim = (claim: PendingClaim, targetUid: string): void => {
+  writeLinkMarker(claim.sourceUid, targetUid);
+  clearClaim();
 };

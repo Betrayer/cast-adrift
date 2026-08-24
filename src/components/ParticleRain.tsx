@@ -15,6 +15,7 @@ interface Props {
   color: string;
   count?: number;
   durationMs?: number;
+  seedLabel?: string;
   className?: string;
 }
 
@@ -24,11 +25,13 @@ export const ParticleRain = ({
   color,
   count = 90,
   durationMs = 2600,
+  seedLabel = 'particleRain',
   className,
 }: Props) => {
   const ref = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    if (document.documentElement.dataset.caMotion === 'reduced') return;
     const canvas = ref.current;
     if (canvas === null) return;
     const ctx = canvas.getContext('2d');
@@ -40,7 +43,7 @@ export const ParticleRain = ({
     canvas.height = Math.max(1, Math.round(h * dpr));
     ctx.scale(dpr, dpr);
 
-    const rng = createStream(deriveSeed(0, 'levelUpRain'));
+    const rng = createStream(deriveSeed(0, seedLabel));
     const particles: Particle[] = Array.from({ length: count }, () => ({
       x: rng.next() * w,
       y: (rng.next() * 1.3 - 0.3) * h,
@@ -81,7 +84,7 @@ export const ParticleRain = ({
     return () => {
       window.cancelAnimationFrame(raf);
     };
-  }, [color, count, durationMs]);
+  }, [color, count, durationMs, seedLabel]);
 
   return (
     <canvas

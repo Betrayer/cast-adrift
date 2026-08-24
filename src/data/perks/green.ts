@@ -174,7 +174,7 @@ export const GREEN_PERKS: readonly PerkDef[] = [
   }),
   perk("rhizome", "green", "uncommon", {
     tags: ["engines", "dodge"],
-    mods: { enginesThresholdDelta: 2, hullMaxDelta: -2 },
+    mods: { evasionDelta: 12, hullMaxDelta: -2 },
   }),
   perk("taproot", "green", "uncommon", {
     tags: ["survival", "shieldwall"],
@@ -229,7 +229,7 @@ export const GREEN_PERKS: readonly PerkDef[] = [
   perk("standingWave", "green", "rare", {
     synergy: ["engines"],
     tags: ["engines", "charge"],
-    mods: { enginesThresholdDelta: 1 },
+    mods: { evasionDelta: 6 },
     effects: [
       {
         on: "afterResolveSlot",

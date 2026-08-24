@@ -6,6 +6,8 @@ export const FUSION_COST = 40;
 export const REPAIR_PER_HULL = 2;
 export const DECK_CAP = 9;
 
+export const MK_TOP: MkLevel = 3;
+
 export const MK_COST: Record<Exclude<MkLevel, 1>, number> = {
   2: 60,
   3: 130,

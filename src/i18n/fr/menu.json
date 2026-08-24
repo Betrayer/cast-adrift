@@ -6,6 +6,8 @@
   "starChart": "Carte stellaire",
   "collection": "Collection",
   "codex": "Codex",
+  "profile": "Profil",
+  "achievements": "Succès",
   "modes": "Modes",
   "settings": "Paramètres",
   "resume": "Continuer : Secteur {{sector}} · analyse approfondie {{depth}}",
@@ -24,5 +26,6 @@
   "abandonTitle": "Faut-il abandonner cette course ?",
   "abandonBody": "Les sauvegardes locales et la copie sur le cloud sont toutes deux effacées. Il n'y a pas de retour en arrière possible.",
   "abandonNo": "Garde-le",
-  "abandonYes": "Abandonner"
+  "abandonYes": "Abandonner",
+  "version": "v{{version}}"
 }

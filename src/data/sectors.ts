@@ -15,6 +15,7 @@ export interface NodeQuotas {
 
 export interface SectorScaling {
   hpPct: number;
+  dmgPct: number;
   pocketPct: number;
 }
 
@@ -29,9 +30,8 @@ export type SectorMotif =
     }
   | { m: "collapse"; rows: number; chance: number }
   | { m: "inversion"; rows: number }
-  | { m: "storm"; rows: number };
-
-export type MotifKind = SectorMotif["m"];
+  | { m: "storm"; rows: number }
+  | { m: "blackHoles"; count: number; toll: readonly EventEffect[] };
 
 export interface EncounterMix {
   bespokeWeight: number;
@@ -105,7 +105,10 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
       anomalies: 2,
       beacons: 1,
     },
-    motifs: [{ m: "mineEdges", count: 4, toll: [{ k: "hull", n: -2 }] }],
+    motifs: [
+      { m: "mineEdges", count: 4, toll: [{ k: "hull", n: -2 }] },
+      { m: "blackHoles", count: 1, toll: [{ k: "hull", n: -1 }] },
+    ],
     pockets: [2, 2],
     pocketTable: [
       ["shop", 3],
@@ -127,7 +130,10 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
       anomalies: 2,
       beacons: 1,
     },
-    motifs: [{ m: "riftSplit", from: 3, to: 6 }],
+    motifs: [
+      { m: "riftSplit", from: 3, to: 6 },
+      { m: "blackHoles", count: 1, toll: [{ k: "hull", n: -1 }] },
+    ],
     pockets: [1, 1],
     pocketTable: [
       ["anomaly", 3],
@@ -155,6 +161,7 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
         blessed: [{ k: "nodeMod", mod: "shipyardDiscount", n: 12 }],
         cursed: [{ k: "tide", n: 1 }],
       },
+      { m: "blackHoles", count: 2, toll: [{ k: "hull", n: -2 }] },
     ],
     pockets: [2, 2],
     pocketTable: [
@@ -177,7 +184,10 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
       anomalies: 2,
       beacons: 1,
     },
-    motifs: [{ m: "collapse", rows: 2, chance: 0.5 }],
+    motifs: [
+      { m: "collapse", rows: 2, chance: 0.5 },
+      { m: "blackHoles", count: 1, toll: [{ k: "hull", n: -2 }] },
+    ],
     pockets: [1, 1],
     pocketTable: [
       ["anomaly", 3],
@@ -202,6 +212,7 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     motifs: [
       { m: "inversion", rows: 3 },
       { m: "storm", rows: 3 },
+      { m: "blackHoles", count: 2, toll: [{ k: "hull", n: -2 }] },
     ],
     pockets: [2, 2],
     pocketTable: [
@@ -257,7 +268,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [4, 1],
     },
     shape: SHAPES[1],
-    scaling: { hpPct: 0, pocketPct: 20 },
+    scaling: { hpPct: 0, dmgPct: 0, pocketPct: 20 },
     scrapMult: 1,
     beaconId: "beaconKeeperIntro",
   },
@@ -300,7 +311,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [4, 1.4, 0.2],
     },
     shape: SHAPES[2],
-    scaling: { hpPct: 3, pocketPct: 25 },
+    scaling: { hpPct: 3, dmgPct: 10, pocketPct: 25 },
     scrapMult: 1.1,
     beaconId: "fleetBlackbox",
   },
@@ -346,11 +357,11 @@ export const SECTORS: readonly SectorDef[] = [
     tideCap: 3,
     encounter: {
       bespokeWeight: 12,
-      threatCap: 34,
-      sizeWeights: [3.95, 1.8, 0.3],
+      threatCap: 38,
+      sizeWeights: [3.6, 2.1, 0.45],
     },
     shape: SHAPES[3],
-    scaling: { hpPct: 19, pocketPct: 25 },
+    scaling: { hpPct: 19, dmgPct: 44, pocketPct: 25 },
     scrapMult: 1.25,
     beaconId: "choirInvitation",
   },
@@ -396,10 +407,10 @@ export const SECTORS: readonly SectorDef[] = [
     encounter: {
       bespokeWeight: 12,
       threatCap: 46,
-      sizeWeights: [3.6, 2.4, 0.7],
+      sizeWeights: [3.1, 2.9, 0.9],
     },
     shape: SHAPES[4],
-    scaling: { hpPct: 38, pocketPct: 30 },
+    scaling: { hpPct: 38, dmgPct: 60, pocketPct: 30 },
     scrapMult: 1.2,
     beaconId: "pactSeal",
   },
@@ -451,10 +462,10 @@ export const SECTORS: readonly SectorDef[] = [
     encounter: {
       bespokeWeight: 12,
       threatCap: 54,
-      sizeWeights: [2.6, 3.4, 1],
+      sizeWeights: [2.85, 3.25, 0.9],
     },
     shape: SHAPES[5],
-    scaling: { hpPct: 126, pocketPct: 30 },
+    scaling: { hpPct: 126, dmgPct: 92, pocketPct: 30 },
     scrapMult: 1.25,
     beaconId: "coreThreshold",
   },
@@ -503,7 +514,7 @@ export const SECTORS: readonly SectorDef[] = [
       sizeWeights: [4, 2, 0.5],
     },
     shape: SHAPES[6],
-    scaling: { hpPct: 138, pocketPct: 30 },
+    scaling: { hpPct: 138, dmgPct: 0, pocketPct: 30 },
     scrapMult: 1.5,
     beaconId: "thresholdBeacon",
   },

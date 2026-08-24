@@ -36,7 +36,8 @@
       "anomaly": "Anomaly",
       "beacon": "Beacon",
       "boss": "Boss",
-      "inverted": "inverted"
+      "inverted": "inverted",
+      "hole": "Black hole"
     },
     "previewNode": "{{type}} · risk: {{risk}}",
     "previewPocket": "Detour: better loot, tougher fight",
@@ -44,7 +45,10 @@
       "low": "low",
       "raised": "raised",
       "high": "high"
-    }
+    },
+    "hull": "Hull {{cur}}/{{max}}",
+    "scrap": "Scrap {{n}}",
+    "previewHole": "Black hole: go around, or ride the wormhole"
   },
   "event": {
     "title": "Signal",
@@ -67,7 +71,6 @@
     "pass": "Success — {{total}}",
     "fail": "Failed — {{total}}",
     "roll": "Roll",
-    "back": "Back",
     "reqAxisMin": "needs axis {{n}} or higher",
     "reqAxisMax": "needs axis {{n}} or lower",
     "checkLowest": "Nothing above {{n}}",
@@ -189,7 +192,6 @@
     "memory": "Echo Memory",
     "empty": "Nothing logged yet.",
     "locked": "Not yet uncovered",
-    "back": "Back",
     "unread": "new",
     "glyphLegend": {
       "title": "School glyphs",
@@ -197,7 +199,8 @@
     },
     "prologueTitle": "The first crossing",
     "prologueBody": "Replay the opening beats. Nothing is started, nothing is lost.",
-    "prologueReplay": "Replay"
+    "prologueReplay": "Replay",
+    "badgeLegend": "Die badges"
   },
   "consequenceToast": "Consequence: {{text}}",
   "rewards": {
@@ -240,7 +243,8 @@
     "scrap": "Scrap: {{n}}",
     "hull": "Hull {{cur}}/{{max}}",
     "voucher": "Mk-voucher ×{{n}} — one free tier",
-    "voucherUse": "Free"
+    "voucherUse": "Free",
+    "fuse": "Fuse — {{n}}"
   },
   "summary": {
     "victory": "Sector cleared",
@@ -251,14 +255,24 @@
     "perks": "Upgrades:",
     "perksNone": "none",
     "toMenu": "To menu",
-    "faced": "Faced: {{names}}"
+    "faced": "Faced: {{names}}",
+    "more": "More",
+    "less": "Less",
+    "elites": "Elites",
+    "minibosses": "Mini-bosses",
+    "bosses": "Bosses",
+    "scrapSpent": "Scrap spent",
+    "hullPctMin": "Lowest hull",
+    "dicePlaced": "Dice placed",
+    "pct": "{{n}}%",
+    "wormholeRides": "Wormhole rides",
+    "holesBypassed": "Holes bypassed"
   },
   "prologue": {
     "title": "Prologue",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Back to menu",
-    "replayDone": "Back to the Codex"
+    "leave": "Back to menu"
   },
   "interstitial": {
     "sector": "Sector {{n}}",
@@ -293,10 +307,13 @@
     "aLevel": "A{{n}}",
     "tideCap": "Interference tide caps at {{n}}",
     "launch": "Launch",
-    "back": "Back",
     "ascensionCost": "It costs you",
     "ascensionGain": "It pays you",
-    "shardMult": "+{{n}}% shards for the whole run"
+    "shardMult": "+{{n}}% shards for the whole run",
+    "changeShip": "Change ship",
+    "voucher": "Voucher: starting perk",
+    "voucherCount": "{{n}} banked",
+    "voucherHint": "Spend one voucher to draft a perk before the first jump."
   },
   "package": {
     "title": "Gate package",
@@ -312,12 +329,12 @@
     "next": "Next",
     "skipAll": "Skip all",
     "place": {
-      "title": "Drag a die into a system",
-      "body": "Roll, then drag dice from the tray onto Weapons, Shields, Engines, Sensors or the Reactor. A die never fits a slot whose cap is below its face."
+      "title": "Send a die to a system",
+      "body": "Tap a die, then tap a lit system card — or drag it there. Each card shows what the die will do before you commit, and a die never fits a card whose cap is below its face."
     },
     "endTurn": {
       "title": "Resolve the turn",
-      "body": "When the board reads the way you want it, end the turn. Systems fire top to bottom, then the enemy answers."
+      "body": "When the board reads the way you want it, end the turn. Systems fire in the order of the numbers on their cards, then the enemy answers."
     },
     "reroll": {
       "title": "Rerolls are free once",
@@ -325,11 +342,39 @@
     },
     "nudge": {
       "title": "Charge buys precision",
-      "body": "Select a die and spend charge to nudge its face up or down by one. Charge also pays for extra rerolls and surges."
+      "body": "Select a die, then use − and + on the console to move its face by one. Charge pays for it; a free nudge spends nothing."
     },
     "jump": {
       "title": "Choose the next node",
-      "body": "Tap a lit node, then Jump. Fog hides the rows ahead; Sensors and deep scans push the horizon further."
+      "body": "Tap a lit node, then Jump. Fog hides the rows ahead; every Sensors upgrade pushes the horizon further."
+    },
+    "targeting": {
+      "title": "Pick what you are shooting at",
+      "body": "Tap an enemy to make it the target. Weapons, marks and pierce all land on the target — subsystems are targeted the same way."
+    },
+    "reserve": {
+      "title": "Keep a die for next turn",
+      "body": "A reserved die skips the reroll and comes back with its face intact. Use it to hold a number the board cannot spend yet."
+    },
+    "actives": {
+      "title": "Some dice do more than sit",
+      "body": "A die with an active can flip, copy, bank or split. The row lights up only for the actives your tray can currently pay for."
+    },
+    "resonance": {
+      "title": "Schools reward company",
+      "body": "The chips count how many dice of each school the battle holds. Cross a threshold and the whole school gains a bonus for the fight."
+    },
+    "affinity": {
+      "title": "The bonus is the slot",
+      "body": "A school placed in its own system adds to the face before anything else reads it. That is the sum on the card, and it is free."
+    },
+    "prismatic": {
+      "title": "Prismatic counts as anything",
+      "body": "A prismatic die satisfies any school, and in a slot it inherits that slot’s affinity — bonus included. It also counts for resonance."
+    },
+    "fate": {
+      "title": "Fate is one roll, once",
+      "body": "The Fate die never enters a slot. One press, one roll per battle, and the table reads out what it gave you."
     }
   },
   "motif": {
@@ -342,7 +387,11 @@
     "pocket": "Detour pocket: raised risk, raised reward",
     "riftSplit": "Rift split: the branches only meet at the gate",
     "inversion": "Inverted row: systems resolve last to first",
-    "storm": "Probability storm: one placed die re-rolls at resolution"
+    "storm": "Probability storm: one placed die re-rolls at resolution",
+    "blackHoles": "Black hole: the cell is gone; its lane offers a wormhole",
+    "wormhole": "Wormhole edge: a choice waits at the rim",
+    "bypass": "Skirted the rim: hull scraped by the tide",
+    "holeScorch": "Hull too thin to pay the toll — the rim let you past"
   },
   "tag": {
     "red": "Red",
@@ -376,7 +425,12 @@
     "swarm": "Swarm",
     "spike": "Spike",
     "precision": "Precision",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Tag glossary",
+    "glossaryBody": "Tags are how dice, perks, modules and engravings find each other: an effect that counts a tag counts every item carrying it.",
+    "glossarySchools": "Schools",
+    "glossarySystems": "Systems",
+    "glossaryMechanics": "Mechanics"
   },
   "build": {
     "title": "Your build",
@@ -399,12 +453,12 @@
     "stability": "Stability {{n}}",
     "neutral": "Axis balanced",
     "preview": "axis {{from}} → {{to}}",
-    "short": "Axis"
+    "short": "Axis",
+    "moves": "Black dice push toward Resonance, blue toward Stability; events and drift move it too."
   },
   "journal": {
     "title": "Run journal",
     "open": "Journal",
-    "back": "Back to the map",
     "empty": "Nothing written yet. The sector has not asked you for anything.",
     "sector": "Sector {{n}}",
     "beacon": "Beacon resolved — {{n}} of {{max}}",
@@ -421,7 +475,16 @@
     "here": "You are in Sector {{n}}.",
     "chainsTitle": "Threads",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "here"
+    "chainHere": "here",
+    "wormhole": {
+      "ride": "Rode the wormhole {{way}}, {{rows}} rows out",
+      "bypass": "Went around the black hole"
+    },
+    "wormholeWay": {
+      "forward": "deeper",
+      "backward": "back"
+    },
+    "achievement": "Achievement: {{name}}"
   },
   "memory": {
     "kicker": "Echo remembers · fragment {{n}} of {{max}}",
@@ -430,5 +493,72 @@
     "hintElite": "Hunt {{n}} elites across your runs",
     "hintBeacons": "Resolve {{n}} beacons in a single run",
     "hintEnding": "Reach the Core and choose"
+  },
+  "system": {
+    "title": "Ship menu",
+    "resume": "Resume",
+    "toMenu": "Suspend to main menu",
+    "toMenuHint": "The run is saved — pick it up from the menu.",
+    "open": "Menu"
+  },
+  "tally": {
+    "title": "Battle tally",
+    "titleLoss": "Last stand",
+    "turns": "Turns",
+    "dealt": "Damage dealt",
+    "taken": "Damage taken",
+    "shield": "Shield absorbed",
+    "best": "Best spinal hit",
+    "rerolls": "Rerolls used",
+    "placed": "Dice placed",
+    "scrap": "Scrap picked up",
+    "hull": "Hull {{cur}}/{{max}}",
+    "continue": "Continue"
+  },
+  "tagDesc": {
+    "red": "Aggression: weapon damage, burn and spikes.",
+    "blue": "Defence: shields, absorption and staying power.",
+    "green": "Motion: engines, evasion and growth.",
+    "yellow": "Economy: scrap, payouts and shop leverage.",
+    "black": "Risk: charge, sacrifice and the Resonance axis.",
+    "grey": "Reading: sensors, dice handling and precision.",
+    "prismatic": "Wildcard: counts as any school and inherits the slot affinity.",
+    "weapons": "Anything that resolves in a weapon slot.",
+    "shields": "Anything that resolves in a shield slot.",
+    "engines": "Anything that resolves in the engines slot.",
+    "sensors": "Anything that resolves in the sensors slot.",
+    "reactor": "Anything that resolves in the reactor slot.",
+    "spinal": "The spinal mount: one huge shot that wedges on a low roll.",
+    "repairBay": "The repair bay: hull healed mid-battle.",
+    "burn": "Damage over time that ticks at the end of the enemy turn.",
+    "crit": "Hits multiplied by 1.5 before shields.",
+    "growth": "Values that climb permanently on a max face.",
+    "reroll": "Rerolling dice, free or bought.",
+    "charge": "The reactor pool that pays for nudges, rerolls and surges.",
+    "scrap": "The run currency: shops, repairs and Mk upgrades.",
+    "overcap": "Placing a die above its slot cap.",
+    "pierce": "Damage that ignores the enemy shield.",
+    "dodge": "Evasion rolled per incoming hit.",
+    "survival": "Staying alive: hull, lethal saves and floors.",
+    "control": "Denying the enemy: jams, locks and gates.",
+    "dice": "Handling the dice themselves: flip, copy, swap, bank, split.",
+    "shieldwall": "Stacked shielding that carries across turns.",
+    "risk": "Costs paid in hull, scrap or certainty.",
+    "swarm": "Many small dice instead of a few big ones.",
+    "spike": "One enormous value instead of a steady stream.",
+    "precision": "Tight, predictable faces and exact values."
+  },
+  "hole": {
+    "title": "Black hole",
+    "body": "The cell is gone. Its rim will either let you around, or take you somewhere it picks.",
+    "gentle": "Stable wormhole",
+    "gentleWhy": "The first two rides of a run are short and always go deeper.",
+    "bypass": "Go around",
+    "bypassCost": "Bypass: −{{n}} hull",
+    "bypassFree": "Bypass: free — the hull cannot pay",
+    "ride": "Ride it",
+    "rideCost": "Ride: a throw of {{min}}–{{max}}, direction unknown",
+    "rideGentle": "Ride: a throw of {{min}}–{{max}}, deeper only",
+    "landed": "Thrown {{rows}} rows {{way}}"
   }
 }

@@ -1,6 +1,8 @@
 import { Button, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useBackGuard } from "@/app/backGuard";
+import { useAtLeast } from "@/app/breakpoints";
 import { Screen } from "@/app/Screen";
 import { mixHex } from "@/app/color";
 import { prefetchBattle } from "@/app/prefetch";
@@ -13,7 +15,16 @@ import { sectorDef } from "@/data/sectors";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
-import { abandonRun, jumpTo } from "@/game/run/flow";
+import {
+  bypassHole,
+  enterNode,
+  jumpTo,
+  openWormhole,
+  resumeUnenteredNode,
+  rideWormhole,
+} from "@/game/run/flow";
+import { holeTollFor } from "@/game/run/motifs";
+import { bypassTargetFor, isGentleRide } from "@/game/map/wormhole";
 import { computeRunMods } from "@/game/run/runMods";
 import {
   areConnected,
@@ -26,12 +37,29 @@ import {
 } from "@/game/map/types";
 import { nodeRisk, type RiskBand } from "@/game/map/risk";
 import { haptic } from "@/services/tma";
+import { flashVignette } from "@/services/vignette";
 import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
+import { AbandonConfirm } from "@/components/AbandonConfirm";
 import { AxisMeter } from "@/components/AxisMeter";
+import { WarpStreaks } from "@/components/WarpStreaks";
+import { WormholeChoice } from "./WormholeChoice";
+import { TapPopover } from "@/components/TapPopover";
+import { TIDE_HP_PCT } from "@/game/run/encounter";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
-import { BuildSheet } from "@/screens/Build/BuildSheet";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
+import {
+  arrivalStyle,
+  MAP_JUMP_MS,
+  MARKER_TRAVEL_MS,
+  markerStyle,
+  trailStyle,
+  WARP_BURST_MS,
+  WARP_FLASH_MS,
+  WARP_LAND_MS,
+  WARP_SUCK_MS,
+  type Point,
+} from "./travel";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useAppStore } from "@/stores/appStore";
 import { useRunStore } from "@/stores/runStore";
@@ -126,9 +154,12 @@ const MOTIF_BADGE = {
   cursed: "●",
   inversion: "⇅",
   storm: "≋",
+  blackHoles: "◉",
+  wormhole: "◌",
 } as const;
 
 const motifBadge = (node: MapNode): string | null => {
+  if (node.hole === true) return null;
   if (node.pocket === true) return MOTIF_BADGE.pocket;
   if (node.cache === true) return MOTIF_BADGE.cache;
   if (node.unstable === true) return MOTIF_BADGE.unstable;
@@ -201,17 +232,86 @@ const MOTIF_LEGEND: readonly MotifLegendEntry[] = [
     key: "mine",
     badge: "─",
     color: schools.red.text,
-    present: (map) => Object.keys(map.edgeMarks).length > 0,
+    present: (map) =>
+      Object.values(map.edgeMarks).some((mark) => mark === "mine"),
+  },
+  {
+    key: "blackHoles",
+    badge: MOTIF_BADGE.blackHoles,
+    color: schools.black.text,
+    present: (map) => map.nodes.some((n) => n.hole === true),
+  },
+  {
+    key: "wormhole",
+    badge: MOTIF_BADGE.wormhole,
+    color: schools.black.text,
+    present: (map) =>
+      Object.values(map.edgeMarks).some((mark) => mark === "wormhole"),
   },
 ];
+
+
+interface WarpBeat {
+  phase: "suck" | "burst" | "land";
+  x: number;
+  y: number;
+  rows: number;
+  direction: "forward" | "backward";
+}
 
 interface MapViewProps {
   map: MapGraph;
   position: NodeId;
 }
 
+const chainMemory = new Map<string, Set<NodeId>>();
+
+const chainMemoryKey = (seed: number, sector: number): string =>
+  `${String(seed)}:${String(sector)}`;
+
+const CHAIN_MARK_MS = 520;
+
+const MapShortcuts = () => {
+  const { t } = useTranslation(["run"]);
+  return (
+    <>
+      <Button
+        size="compact-xs"
+        variant="default"
+        data-open-journal
+        onClick={() => {
+          useAppStore.getState().go("journal");
+        }}
+      >
+        {t("run:journal.open")}
+      </Button>
+      <Button
+        size="compact-xs"
+        variant="default"
+        data-open-build
+        onClick={() => {
+          useAppStore.getState().setBuildSheet(true);
+        }}
+      >
+        {t("run:build.open")}
+      </Button>
+      <Button
+        size="compact-xs"
+        variant="default"
+        data-testid="map-system-menu"
+        onClick={() => {
+          useAppStore.getState().setSystemMenu(true);
+        }}
+      >
+        {t("run:system.open")}
+      </Button>
+    </>
+  );
+};
+
 const MapView = ({ map, position }: MapViewProps) => {
-  const { t } = useTranslation(["run", "common"]);
+  const wide = useAtLeast("lg");
+  const { t } = useTranslation(["run", "common", "battle", "content"]);
   const visited = useRunStore((s) => s.visited);
   const tide = useRunStore((s) => s.tide);
   const runModules = useRunStore((s) => s.modules);
@@ -227,6 +327,8 @@ const MapView = ({ map, position }: MapViewProps) => {
     })
     .join(" · ");
   const interference = useRunStore((s) => s.interferenceStacks);
+  const hullMax = useRunStore((s) => s.hullMax);
+  const scrap = useRunStore((s) => s.scrap);
   const axis = useRunStore((s) => s.axis);
   const sector = useRunStore((s) => s.sector);
   const seed = useRunStore((s) => s.seed);
@@ -252,13 +354,22 @@ const MapView = ({ map, position }: MapViewProps) => {
   const posNode = byId.get(position);
   const positionRow = posNode?.row ?? 0;
 
+  const pendingWormhole = useRunStore((s) => s.pendingWormhole);
+  const hull = useRunStore((s) => s.hull);
+  const rides = useRunStore((s) => s.stats.wormholeRides);
+
   const [selected, setSelected] = useState<NodeId | null>(null);
-  const [buildOpen, setBuildOpen] = useState(false);
+  const [abandoning, setAbandoning] = useState(false);
   const [jumping, setJumping] = useState(false);
-  const [marker, setMarker] = useState(() => ({
+  const [warp, setWarp] = useState<WarpBeat | null>(null);
+  const timers = useRef<number[]>([]);
+  const [marker, setMarker] = useState<Point>(() => ({
     x: posNode ? geo.nodeX(posNode) : geo.centerX,
     y: geo.rowY(positionRow),
   }));
+  const [trail, setTrail] = useState<{ from: Point; to: Point } | null>(null);
+  const [arrival, setArrival] = useState<Point | null>(null);
+  const travelFrames = useRef<number[]>([]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<SVGSVGElement | null>(null);
   const prevTide = useRef(tide);
@@ -307,6 +418,56 @@ const MapView = ({ map, position }: MapViewProps) => {
   }, [visibleLimit]);
 
   useEffect(() => {
+    const key = chainMemoryKey(seed, sector);
+    for (const stale of [...chainMemory.keys()]) {
+      if (!stale.startsWith(`${String(seed)}:`)) chainMemory.delete(stale);
+    }
+    const seated = chainMemory.has(key);
+    const known = chainMemory.get(key) ?? new Set<NodeId>();
+    const fresh = [...chainNodes].filter((id) => !known.has(id));
+    for (const id of chainNodes) known.add(id);
+    chainMemory.set(key, known);
+    if (!seated || fresh.length === 0) return;
+    playSfx("chainStep", { rate: 1 + Math.min(3, fresh.length) * 0.05 });
+    const popped: Element[] = [];
+    for (const id of fresh) {
+      const mark = document.querySelector(`[data-chain-marker="${id}"]`);
+      if (mark === null) continue;
+      mark.classList.add(styles.chainMark ?? "");
+      popped.push(mark);
+    }
+    const clear = window.setTimeout(() => {
+      for (const mark of popped) mark.classList.remove(styles.chainMark ?? "");
+    }, CHAIN_MARK_MS);
+    return () => {
+      window.clearTimeout(clear);
+      for (const mark of popped) mark.classList.remove(styles.chainMark ?? "");
+    };
+  }, [chainNodes, seed, sector]);
+
+  useEffect(() => {
+    if (warp?.phase !== "land") return;
+    const el = scrollRef.current;
+    const stage = stageRef.current;
+    if (el === null || stage === null) return;
+    const scale = stage.getBoundingClientRect().width / geo.viewW;
+    el.scrollTo({
+      top: Math.max(0, warp.y * scale - el.clientHeight * 0.55),
+      behavior: reduced ? "auto" : "smooth",
+    });
+  }, [warp, geo, reduced]);
+
+  useEffect(
+    () => () => {
+      for (const id of timers.current) window.clearTimeout(id);
+      timers.current = [];
+      for (const id of travelFrames.current) window.cancelAnimationFrame(id);
+      travelFrames.current = [];
+    },
+    [],
+  );
+
+  useEffect(() => {
     if (tide > prevTideCue.current) {
       playSfx("tideUp", { rate: 1 - Math.min(4, tide) * 0.03 });
     }
@@ -338,10 +499,141 @@ const MapView = ({ map, position }: MapViewProps) => {
     setSelected(id);
   };
 
+  const after = (ms: number, run: () => void): void => {
+    timers.current.push(window.setTimeout(run, ms));
+  };
+
+  const here = (): Point => ({
+    x: posNode ? geo.nodeX(posNode) : geo.centerX,
+    y: geo.rowY(positionRow),
+  });
+
+  const land = (arrive: () => void): void => {
+    setJumping(false);
+    setTrail(null);
+    setArrival(null);
+    arrive();
+  };
+
+  const travelTo = (to: Point, arrive: () => void): void => {
+    const from = here();
+    setJumping(true);
+    setArrival(null);
+    setMarker(from);
+    if (reduced) {
+      setTrail(null);
+      setMarker(to);
+      land(arrive);
+      return;
+    }
+    setTrail({ from, to });
+    travelFrames.current.push(
+      window.requestAnimationFrame(() => {
+        travelFrames.current.push(
+          window.requestAnimationFrame(() => {
+            setMarker(to);
+          }),
+        );
+      }),
+    );
+    after(MARKER_TRAVEL_MS, () => {
+      playSfx("navTick", { gain: 1.6 });
+      setArrival(to);
+    });
+    after(MAP_JUMP_MS, () => {
+      land(arrive);
+    });
+  };
+
+  const onRide = (holeId: NodeId): void => {
+    if (jumping) return;
+    const hole = byId.get(holeId);
+    setJumping(true);
+    setSelected(null);
+    haptic("bossIntro");
+    playSfx("foldBeat", { gain: 0.9 });
+    if (reduced) {
+      const roll = rideWormhole(holeId, false);
+      const landed = roll?.landing == null ? undefined : byId.get(roll.landing);
+      playSfx("inversionCue");
+      setWarp({
+        phase: "land",
+        x: landed === undefined ? geo.centerX : geo.nodeX(landed),
+        y: geo.rowY(landed?.row ?? positionRow),
+        rows: Math.abs(roll?.rows ?? 0),
+        direction: roll?.direction ?? "forward",
+      });
+      after(WARP_FLASH_MS, () => {
+        setWarp(null);
+        setJumping(false);
+        if (roll?.landing != null) enterNode(roll.landing);
+      });
+      return;
+    }
+    setWarp({
+      phase: "suck",
+      x: hole === undefined ? geo.centerX : geo.nodeX(hole),
+      y: geo.rowY(hole?.row ?? positionRow),
+      rows: 0,
+      direction: "forward",
+    });
+    after(WARP_SUCK_MS, () => {
+      const roll = rideWormhole(holeId, false);
+      const landing = roll?.landing == null ? undefined : byId.get(roll.landing);
+      playSfx("inversionCue");
+      setWarp({
+        phase: "burst",
+        x: landing === undefined ? geo.centerX : geo.nodeX(landing),
+        y: geo.rowY(landing?.row ?? positionRow),
+        rows: Math.abs(roll?.rows ?? 0),
+        direction: roll?.direction ?? "forward",
+      });
+      after(WARP_BURST_MS, () => {
+        setWarp((beat) => (beat === null ? null : { ...beat, phase: "land" }));
+        playSfx("navTick", { gain: 1.6 });
+        setArrival({
+          x: landing === undefined ? geo.centerX : geo.nodeX(landing),
+          y: geo.rowY(landing?.row ?? positionRow),
+        });
+        after(WARP_LAND_MS, () => {
+          setWarp(null);
+          setArrival(null);
+          setJumping(false);
+          if (roll?.landing != null) enterNode(roll.landing);
+        });
+      });
+    });
+  };
+
+  const onBypass = (holeId: NodeId): void => {
+    if (jumping) return;
+    const landing = bypassTargetFor(map, position, holeId, visited);
+    const target = landing === null ? undefined : byId.get(landing);
+    playSfx("jump");
+    haptic("mapJump");
+    setSelected(null);
+    if (holeTollFor(sector, hull) > 0) {
+      playSfx("hullHit", { gain: 0.5 });
+      flashVignette("toll");
+    }
+    if (target === undefined) {
+      bypassHole(holeId);
+      return;
+    }
+    travelTo({ x: geo.nodeX(target), y: geo.rowY(target.row) }, () => {
+      bypassHole(holeId);
+    });
+  };
+
   const onJump = (): void => {
     if (selected === null || jumping) return;
     const target = byId.get(selected);
     if (target === undefined || !isLegal(target)) return;
+    if (target.hole === true) {
+      playSfx("eventOpen");
+      openWormhole(target.id);
+      return;
+    }
     playSfx("jump");
     haptic("mapJump");
     if (target.pocket === true) playSfx("detourEntry");
@@ -350,20 +642,19 @@ const MapView = ({ map, position }: MapViewProps) => {
       playSfx("laneMotif", { rate: target.blessing === "cursed" ? 0.72 : 1.18 });
     }
     if (target.storm === true) playSfx("stormBeat", { gain: 0.6 });
+    if (target.unstable === true) {
+      playSfx("stormBeat", { gain: 0.45, rate: 0.78 });
+      flashVignette("surge", { strength: 0.6 });
+    }
     if (target.inverted === true) playSfx("inversionCue", { gain: 0.6 });
     if (edgeMarkFor(map, position, target.id) === "mine") {
       playSfx("hullHit", { gain: 0.5 });
       playSfx("gateBreak", { gain: 0.45 });
+      flashVignette("toll");
     }
-    if (reduced) {
+    travelTo({ x: geo.nodeX(target), y: geo.rowY(target.row) }, () => {
       jumpTo(selected);
-      return;
-    }
-    setJumping(true);
-    setMarker({ x: geo.nodeX(target), y: geo.rowY(target.row) });
-    window.setTimeout(() => {
-      jumpTo(selected);
-    }, 430);
+    });
   };
 
   const visibleNodes = map.nodes.filter(isVisible);
@@ -407,10 +698,20 @@ const MapView = ({ map, position }: MapViewProps) => {
     selectedNode === undefined || selectedNode === null
       ? []
       : [
-          t("run:map.previewNode", {
-            type: t(`run:map.node.${selectedNode.type}`),
-            risk: t(`run:map.risk.${nodeRisk(selectedNode)}`),
-          }),
+          selectedNode.hole === true
+            ? t("run:map.node.hole")
+            : t("run:map.previewNode", {
+                type: t(`run:map.node.${selectedNode.type}`),
+                risk: t(`run:map.risk.${nodeRisk(selectedNode)}`),
+              }),
+          ...(selectedNode.hole === true
+            ? [
+                t("run:map.previewHole"),
+                holeTollFor(sector, hull) > 0
+                  ? t("run:hole.bypassCost", { n: holeTollFor(sector, hull) })
+                  : t("run:hole.bypassFree"),
+              ]
+            : []),
           ...(previewName === null ? [] : [previewName]),
           ...(selectedNode.pocket === true ? [t("run:map.previewPocket")] : []),
           ...(selectedNode.cache === true ? [t("run:motif.cache")] : []),
@@ -422,6 +723,9 @@ const MapView = ({ map, position }: MapViewProps) => {
             : [t(`run:motif.${selectedNode.blessing}`)]),
           ...(edgeMarkFor(map, position, selectedNode.id) === "mine"
             ? [t("run:motif.mine")]
+            : []),
+          ...(edgeMarkFor(map, position, selectedNode.id) === "wormhole"
+            ? [t("run:motif.wormhole")]
             : []),
         ];
 
@@ -439,44 +743,67 @@ const MapView = ({ map, position }: MapViewProps) => {
         </Text>
       </div>
       <div className={styles.headChips}>
-        <AxisMeter axis={axis} compact withLabel={false} />
-        <Button
-          size="compact-xs"
-          variant="default"
-          data-open-journal
-          onClick={() => {
-            useAppStore.getState().go("journal");
-          }}
-        >
-          {t("run:journal.open")}
-        </Button>
-        <Button
-          size="compact-xs"
-          variant="default"
-          data-open-build
-          onClick={() => {
-            setBuildOpen(true);
-          }}
-        >
-          {t("run:build.open")}
-        </Button>
-        <span
-          className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
-        >
-          {t("run:map.tide", { n: tide })}
+        <AxisMeter axis={axis} compact withLabel={false} explain />
+        {wide ? null : <MapShortcuts />}
+        <span className={styles.tideChip ?? ""} data-map-hull>
+          {t("run:map.hull", { cur: hull, max: hullMax })}
         </span>
-        {interference > 0 ? (
-          <span className={styles.tideChip ?? ""}>
-            {t("run:map.interference", { n: interference })}
+        <span className={styles.tideChip ?? ""} data-map-scrap>
+          {t("run:map.scrap", { n: scrap })}
+        </span>
+        <TapPopover
+          label={t("battle:tideTitle")}
+          testId="map-tide"
+          align="end"
+          content={
+            <>
+              <b>{t("battle:tideTitle")}</b>
+              <br />
+              {t("battle:tideWhy", { n: tide, pct: tide * TIDE_HP_PCT })}
+            </>
+          }
+        >
+          <span
+            className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
+          >
+            {t("run:map.tide", { n: tide })}
           </span>
+        </TapPopover>
+        {interference > 0 ? (
+          <TapPopover
+            label={t("battle:interferenceTitle")}
+            testId="map-interference"
+            align="end"
+            content={
+              <>
+                <b>{t("battle:interferenceTitle")}</b>
+                <br />
+                {t("battle:interferenceWhy")}
+              </>
+            }
+          >
+            <span className={styles.tideChip ?? ""}>
+              {t("run:map.interference", { n: interference })}
+            </span>
+          </TapPopover>
         ) : null}
         {runModules.length > 0 ? (
-          <span className={styles.tideChip ?? ""} title={moduleNames}>
-            {t("run:map.modules", {
+          <TapPopover
+            label={t("run:map.modules", {
               used: runModules.length,
               max: moduleCap,
             })}
-          </span>
+            testId="map-modules"
+            align="end"
+            content={moduleNames}
+          >
+            <span className={styles.tideChip ?? ""}>
+              {t("run:map.modules", {
+                used: runModules.length,
+                max: moduleCap,
+              })}
+            </span>
+          </TapPopover>
         ) : null}
       </div>
     </div>
@@ -509,6 +836,7 @@ const MapView = ({ map, position }: MapViewProps) => {
         disabled={!canJump}
         onClick={onJump}
         data-coach="jump"
+        data-testid="map-jump"
       >
         {t("run:map.jump")}
       </Button>
@@ -521,7 +849,10 @@ const MapView = ({ map, position }: MapViewProps) => {
         size="compact-xs"
         variant="subtle"
         color="gray"
-        onClick={abandonRun}
+        data-testid="map-abandon"
+        onClick={() => {
+          setAbandoning(true);
+        }}
       >
         {t("run:map.abandon")}
       </Button>
@@ -537,14 +868,33 @@ const MapView = ({ map, position }: MapViewProps) => {
       bodyRef={scrollRef}
       innerClassName={styles.body}
       overlay={
-        buildOpen ? (
-          <BuildSheet
-            onClose={() => {
-              setBuildOpen(false);
+        <>
+          <AbandonConfirm
+            opened={abandoning}
+            prefix="map"
+            onCancel={() => {
+              setAbandoning(false);
             }}
           />
-        ) : null
+          {pendingWormhole === null ? null : (
+            <WormholeChoice
+              toll={holeTollFor(sector, hull)}
+              gentle={isGentleRide(rides)}
+              busy={jumping}
+              onBypass={() => {
+                onBypass(pendingWormhole);
+              }}
+              onRide={() => {
+                onRide(pendingWormhole);
+              }}
+            />
+          )}
+          {warp?.phase === "burst" ? (
+            <WarpStreaks color={schools.black.text} durationMs={WARP_BURST_MS} />
+          ) : null}
+        </>
       }
+
     >
       <div>
         <svg
@@ -553,6 +903,14 @@ const MapView = ({ map, position }: MapViewProps) => {
           viewBox={`0 0 ${String(geo.viewW)} ${String(geo.viewH)}`}
           role="img"
         >
+          <defs>
+            <radialGradient id="caHoleWash">
+              <stop offset="0%" stopColor={schools.black.stroke} stopOpacity={0.42} />
+              <stop offset="70%" stopColor={schools.black.fill} stopOpacity={0.22} />
+              <stop offset="100%" stopColor={schools.black.fill} stopOpacity={0} />
+            </radialGradient>
+          </defs>
+
           {map.edges.map(([a, b]) => {
             if (!visibleIds.has(a) || !visibleIds.has(b)) return null;
             const na = byId.get(a);
@@ -562,6 +920,7 @@ const MapView = ({ map, position }: MapViewProps) => {
             return (
               <line
                 key={`${a}-${b}`}
+                data-edge-mark={mark}
                 x1={geo.nodeX(na)}
                 y1={geo.rowY(na.row)}
                 x2={geo.nodeX(nb)}
@@ -571,10 +930,20 @@ const MapView = ({ map, position }: MapViewProps) => {
                     ? mixHex(tokens.line, tokens.faint, 0.35)
                     : mark === "mine"
                       ? schools.red.text
-                      : tokens.amber
+                      : mark === "wormhole"
+                        ? schools.black.text
+                        : tokens.amber
                 }
-                strokeWidth={mark === undefined ? 1.2 : 1.8}
-                strokeDasharray={mark === undefined ? undefined : "5 4"}
+                strokeWidth={
+                  mark === undefined ? 1.2 : mark === "wormhole" ? 2.2 : 1.8
+                }
+                strokeDasharray={
+                  mark === undefined
+                    ? undefined
+                    : mark === "wormhole"
+                      ? "3 5"
+                      : "5 4"
+                }
               />
             );
           })}
@@ -591,10 +960,70 @@ const MapView = ({ map, position }: MapViewProps) => {
               geo.rowY(node.row),
               geo.radius(node),
             );
+            if (node.hole === true) {
+              return (
+                <g
+                  key={node.id}
+                  data-node={node.id}
+                  data-testid={`map-node-${node.id}`}
+                  data-node-type="hole"
+                  data-node-hole="1"
+                  data-node-legal={legal ? '1' : '0'}
+                  className={legal ? styles.nodeSelectable ?? "" : styles.node ?? ""}
+                  onClick={legal ? () => { selectNode(node.id); } : undefined}
+                >
+                  <circle
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node) + 14}
+                    fill="url(#caHoleWash)"
+                  />
+                  <circle
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node)}
+                    fill={tokens.bg}
+                    stroke={chosen ? tokens.amber : schools.black.stroke}
+                    strokeWidth={chosen ? 2.6 : 1.4}
+                  />
+                  <circle
+                    className={reduced ? undefined : styles.vortex}
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node) - 4}
+                    fill="none"
+                    stroke={schools.black.text}
+                    strokeWidth={2}
+                    strokeDasharray="3 5"
+                  />
+                  <circle
+                    cx={geo.nodeX(node)}
+                    cy={geo.rowY(node.row)}
+                    r={geo.radius(node) * 0.3}
+                    fill={tokens.bg}
+                    stroke={schools.black.stroke}
+                    strokeWidth={0.8}
+                  />
+                  <text
+                    x={geo.nodeX(node) + geo.radius(node) - 1}
+                    y={geo.rowY(node.row) - geo.radius(node) + 6}
+                    textAnchor="middle"
+                    fontSize={11}
+                    fontWeight={700}
+                    fill={schools.black.text}
+                  >
+                    {MOTIF_BADGE.blackHoles}
+                  </text>
+                </g>
+              );
+            }
             return (
               <g
                 key={node.id}
                 data-node={node.id}
+                data-testid={`map-node-${node.id}`}
+                data-node-type={node.type}
+                data-node-legal={legal ? '1' : '0'}
                 data-causality={
                   node.inverted === true
                     ? "inverted"
@@ -650,6 +1079,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 {chainNodes.has(node.id) ? (
                   <text
                     data-chain-marker={node.id}
+
                     x={geo.nodeX(node) - geo.radius(node) + 1}
                     y={geo.rowY(node.row) - geo.radius(node) + 6}
                     textAnchor="middle"
@@ -742,13 +1172,78 @@ const MapView = ({ map, position }: MapViewProps) => {
             </g>
           ) : null}
 
-          {jumping ? (
+          {warp === null && jumping && trail !== null && !reduced ? (
+            <line
+              className={styles.trail}
+              data-map-trail
+              x1={trail.from.x}
+              y1={trail.from.y}
+              x2={trail.to.x}
+              y2={trail.to.y}
+              stroke={tokens.accent}
+              strokeWidth={2}
+              strokeLinecap="round"
+              style={trailStyle(trail.from, trail.to)}
+            />
+          ) : null}
+
+          {arrival === null ? null : (
+            <circle
+              className={styles.arrival}
+              data-map-arrival
+              style={arrivalStyle()}
+              cx={arrival.x}
+              cy={arrival.y}
+              r={10}
+              fill="none"
+              stroke={tokens.accent}
+              strokeWidth={2}
+            />
+          )}
+
+          {warp === null && jumping ? (
             <g
-              className={styles.marker}
-              style={{ transform: `translate(${String(marker.x)}px, ${String(marker.y)}px)` }}
+              className={`${styles.marker ?? ""} ${
+                reduced ? styles.markerInstant ?? "" : ""
+              }`}
+              data-map-marker
+              style={markerStyle(marker)}
             >
               <circle r={6} fill={tokens.accent} />
             </g>
+          ) : null}
+
+          {warp === null ? null : (
+            <g
+              data-warp-phase={warp.phase}
+              className={
+                warp.phase === "suck"
+                  ? styles.warpSuck ?? ""
+                  : warp.phase === "land"
+                    ? styles.warpLand ?? ""
+                    : styles.warpHidden ?? ""
+              }
+              style={{ transform: `translate(${String(warp.x)}px, ${String(warp.y)}px)` }}
+            >
+              <circle r={9} fill={schools.black.text} />
+            </g>
+          )}
+
+          {warp?.phase === "land" ? (
+            <text
+              data-warp-label
+              x={warp.x}
+              y={warp.y - 26}
+              textAnchor="middle"
+              fontSize={12}
+              fontWeight={700}
+              fill={schools.black.text}
+            >
+              {t("run:hole.landed", {
+                rows: warp.rows,
+                way: t(`run:journal.wormholeWay.${warp.direction}`),
+              })}
+            </text>
           ) : null}
         </svg>
       </div>
@@ -764,15 +1259,11 @@ const MapView = ({ map, position }: MapViewProps) => {
           {t("run:map.tide", { n: tide })}
         </Text>
         <AxisMeter axis={axis} />
-        <Button
-          size="compact-xs"
-          variant="default"
-          onClick={() => {
-            useAppStore.getState().go("journal");
-          }}
-        >
-          {t("run:journal.open")}
-        </Button>
+        {wide ? (
+          <div className={styles.panelShortcuts}>
+            <MapShortcuts />
+          </div>
+        ) : null}
         {runModules.length > 0 ? (
           <Text size="xs" c={tokens.dim}>
             {moduleNames}
@@ -823,10 +1314,19 @@ export const MapScreen = () => {
   const map = useRunStore((s) => s.map);
   const position = useRunStore((s) => s.position);
   const go = useAppStore((s) => s.go);
+  const setSystemMenu = useAppStore((s) => s.setSystemMenu);
+
+  useBackGuard("map", () => {
+    setSystemMenu(true);
+  });
 
   useEffect(() => {
     if (map === null || position === null) go("menu");
   }, [map, position, go]);
+
+  useEffect(() => {
+    resumeUnenteredNode();
+  }, []);
 
   useEffect(() => {
     const idle = window.requestIdleCallback?.bind(window) ?? window.setTimeout;

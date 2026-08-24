@@ -374,10 +374,39 @@
     "echoFleet-chorus": "Estribillo"
   },
   "ships": {
-    "wanderer": "Viajero",
-    "ram": "Ram",
-    "ark": "Arca",
-    "ram-proto": "Prototipo Ram"
+    "wanderer": {
+      "name": "Errante",
+      "passiveName": "Aparejo de rescate",
+      "passiveDesc": "Cada combate empieza con +2 de chatarra."
+    },
+    "ram": {
+      "name": "Ariete",
+      "passiveName": "Sobrecarga",
+      "passiveDesc": "Una ranura de armas acepta un dado por encima de su límite; cada colocación así cuesta 2 de casco."
+    },
+    "ark": {
+      "name": "Arca",
+      "passiveName": "Baluarte",
+      "passiveDesc": "Un cuarto del escudo en pie pasa al turno siguiente."
+    },
+    "corsair": {
+      "name": "Sabueso",
+      "passiveName": "Postcombustor",
+      "passiveDesc": "La maniobra se calienta: +10 % a la esquiva y un límite máximo de 70/30 en lugar de 55/25. Cada esquiva o impacto de refilón otorga +1 a las armas en el siguiente turno, hasta un máximo de +2 por turno."
+    },
+    "foundry": {
+      "name": "Forja",
+      "passiveName": "Recocido",
+      "passiveDesc": "Una vez por combate, dos dados de bandeja del mismo valor se fusionan en un dado de un nivel superior, que conserva ambos valores."
+    },
+    "prism": {
+      "name": "Prisma",
+      "passiveName": "Refractor",
+      "passiveDesc": "Los dados prismáticos cuentan doble en el recuento de resonancia. Una vez por batalla, un dado se vuelve prismático durante ese turno."
+    },
+    "ram-proto": {
+      "name": "Prototipo Ariete"
+    }
   },
   "perks": {
     "hot-charge": "Carga en caliente",
@@ -3868,6 +3897,16 @@
       "2": "Que conste: te habría seguido de todas formas.",
       "3": "La marea no se detiene tres minutos después de pasar esta línea. Nada lo hace.",
       "4": "La solución era ponerle fin. Tú querías la pregunta."
+    },
+    "wormhole": {
+      "1": "La célula ha desaparecido. No se ha destruido, sino que se ha restado.",
+      "2": "El borde parece una puerta que se abre hacia cualquier habitación que se le antoje.",
+      "3": "Puedo trazar el camino que rodea el obstáculo. No puedo trazar el camino que lo atraviesa.",
+      "4": "Sea lo que sea lo que haya al otro lado de eso, no aparece en mi mapa.",
+      "5": "Hemos salido por algún sitio. Estoy intentando averiguar por dónde.",
+      "6": "Los instrumentos no coinciden en nada. Eso también son datos.",
+      "7": "La distancia dejó de ser una promesa hace aproximadamente un minuto.",
+      "8": "Regístralo como un salto. El registro será falso."
     }
   },
   "mutators": {
@@ -4062,9 +4101,6 @@
     "salvageCta": "Ponlo en línea",
     "signal1": "En lo más profundo del sector, algo está emitiendo en una portadora estructurada. No es una llamada de socorro. Es un patrón.",
     "signal2": "Hay dos formas de interpretar ese patrón, capitán. Ninguna de las dos es tranquilizadora.",
-    "signal3": "Una aguja que nunca antes habías notado se mueve ligeramente una vez y luego vuelve a situarse en el centro.",
-    "signalCta": "Trazar una ruta",
-    "contact1": "Contacto. Dron Scav: barato, hambriento y a punto de aprender algo. Primero, las armas: mete un dado en la pistola.",
     "contact2": "El dron gira hacia ti, con los propulsores en plena acción.",
     "contactCta": "Participar"
   },
@@ -5161,6 +5197,31 @@
         "thread": "Quiere saber qué esperas de todo esto.",
         "core": "La última baliza es el Núcleo, y es ella misma la que plantea la pregunta."
       }
+    }
+  },
+  "check": {
+    "engines": {
+      "say": "Engines first. The green die is theirs — a school in its own slot always pays a bonus.",
+      "fail": "Engines want the green school. That is what affinity means."
+    },
+    "shields": {
+      "say": "Shields take blue. A card's tint names the school that is strongest in it.",
+      "fail": "Shields want blue. Read the tint before you commit."
+    },
+    "weapons": {
+      "say": "Weapon A. Red plus its affinity — a five leaves as a seven.",
+      "fail": "Weapons want red. The card shows the sum before you drop."
+    },
+    "sensors": {
+      "say": "Sensors, then the gun. Systems fire by the numbers on their cards: sensors are 1, weapons are 2, so the mark lands before the shot.",
+      "fail": "Sensors take grey, and the gun still wants the red die this turn."
+    },
+    "reactor": {
+      "say": "Black feeds the reactor at one and a half. A four would overflow the pool and cost two hull — nudge it down. This one is on me.",
+      "fail": "The reactor is the black school's slot."
+    },
+    "free": {
+      "say": "Check complete. Free turn — the board is yours."
     }
   }
 }

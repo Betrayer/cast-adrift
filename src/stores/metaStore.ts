@@ -1,13 +1,18 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { resolveAchievementId } from '@/data/achievements';
+import { isBattleLayoutId } from '@/data/battleLayouts';
 import { CHART_NODE_BY_ID } from '@/data/chart';
 import { DEFAULT_DIE_SKIN, isDieSkinId } from '@/data/cosmetics';
 import { STARTER_DECK } from '@/data/decks';
 import { DIE_BY_ID } from '@/data/dice';
 import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
-import type { ShipId } from '@/data/ships';
+import { isThemeId, type ThemeId } from '@/data/themes';
+import { SHIP_BY_ID, type ShipId } from '@/data/ships';
+import type { BattleLayoutId } from '@/types';
 import { levelFromTotalXp } from '@/game/xp';
+import { scopedPersistStorage } from '@/stores/scopedStorage';
 
 export interface CollectionEntry {
   defId: string;
@@ -19,6 +24,7 @@ export interface MetaStats {
   wins: number;
   shardsEarned: number;
   prologueDone: boolean;
+  systemsCheckDone: boolean;
   campaignClears: number;
   kills: number;
   scrapEarned: number;
@@ -32,6 +38,21 @@ export interface MetaStats {
   deepClears: number;
   noDeathStreak: number;
   bestNoDeathStreak: number;
+  wormholeRides: number;
+  holesBypassed: number;
+  eventsResolved: number;
+  checksWon: number;
+  fusions: number;
+  engravingsFitted: number;
+  mk3Built: number;
+  resonance6: number;
+  flawlessBosses: number;
+  clearsWanderer: number;
+  clearsRam: number;
+  clearsArk: number;
+  clearsCorsair: number;
+  clearsFoundry: number;
+  clearsPrism: number;
 }
 
 export interface EncounterRecord {
@@ -64,8 +85,19 @@ export interface BestScores {
   dailyDate: string | null;
 }
 
+export interface AccountPrefs {
+  battleLayout?: BattleLayoutId;
+  theme?: ThemeId;
+}
+
+export type VoucherKind = "perkDraft";
+
+export type VoucherBank = Record<VoucherKind, number>;
+
 export interface MetaValues {
   shards: number;
+  vouchers: VoucherBank;
+  voucherOffers: string[];
   xp: number;
   level: number;
   chartPicks: string[];
@@ -94,6 +126,7 @@ export interface MetaValues {
   unlocksGranted: string[];
   unlocksSeen: string[];
   dieSkin: string;
+  prefs: AccountPrefs;
   stats: MetaStats;
 }
 
@@ -128,6 +161,7 @@ export interface MetaState extends MetaValues {
   recordBossFirstKill: (bossId: string) => boolean;
   recordEnding: (endingId: string) => boolean;
   markPrologueDone: () => void;
+  markSystemsCheckDone: () => void;
   recordCampaignClear: (ascension: number) => void;
   recordContractStars: (id: string, mask: number) => number;
   markDailyStarted: (date: string) => void;
@@ -135,15 +169,20 @@ export interface MetaState extends MetaValues {
   recordDriftScore: (score: number, week: string) => boolean;
   bumpLifetime: (delta: Partial<MetaStats>) => void;
   unlockAchievement: (id: string) => boolean;
+  grantVoucher: (kind: VoucherKind) => boolean;
+  spendVoucher: (kind: VoucherKind) => boolean;
+  offerVoucher: (achievementId: string) => void;
+  clearVoucherOffer: (achievementId: string) => boolean;
   markAchievementsSeen: (ids: readonly string[]) => void;
   grantUnlock: (id: string) => boolean;
   markUnlocksSeen: (ids: readonly string[]) => void;
   recordEncounters: (list: readonly RunEncounter[]) => EncounterResult;
   setDieSkin: (id: string) => void;
+  setPrefs: (patch: AccountPrefs) => void;
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 11;
+export const META_VERSION = 14;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -165,6 +204,7 @@ export const createInitialMetaStats = (): MetaStats => ({
   wins: 0,
   shardsEarned: 0,
   prologueDone: false,
+  systemsCheckDone: false,
   campaignClears: 0,
   kills: 0,
   scrapEarned: 0,
@@ -178,6 +218,21 @@ export const createInitialMetaStats = (): MetaStats => ({
   deepClears: 0,
   noDeathStreak: 0,
   bestNoDeathStreak: 0,
+  wormholeRides: 0,
+  holesBypassed: 0,
+  eventsResolved: 0,
+  checksWon: 0,
+  fusions: 0,
+  engravingsFitted: 0,
+  mk3Built: 0,
+  resonance6: 0,
+  flawlessBosses: 0,
+  clearsWanderer: 0,
+  clearsRam: 0,
+  clearsArk: 0,
+  clearsCorsair: 0,
+  clearsFoundry: 0,
+  clearsPrism: 0,
 });
 
 const LIFETIME_KEYS = [
@@ -194,10 +249,33 @@ const LIFETIME_KEYS = [
   "t5Solved",
   "beacons",
   "deepClears",
+  "wormholeRides",
+  "holesBypassed",
+  "eventsResolved",
+  "checksWon",
+  "fusions",
+  "engravingsFitted",
+  "mk3Built",
+  "resonance6",
+  "flawlessBosses",
+  "clearsWanderer",
+  "clearsRam",
+  "clearsArk",
+  "clearsCorsair",
+  "clearsFoundry",
+  "clearsPrism",
 ] as const;
 
-const createInitialMetaValues = (): MetaValues => ({
+export const META_PERSIST_KEY = 'meta';
+
+export const VOUCHER_CAP = 3;
+
+export const createInitialVouchers = (): VoucherBank => ({ perkDraft: 0 });
+
+export const createInitialMetaValues = (): MetaValues => ({
   shards: 0,
+  vouchers: createInitialVouchers(),
+  voucherOffers: [],
   xp: 0,
   level: 1,
   chartPicks: [],
@@ -232,6 +310,7 @@ const createInitialMetaValues = (): MetaValues => ({
   unlocksGranted: [],
   unlocksSeen: [],
   dieSkin: DEFAULT_DIE_SKIN,
+  prefs: {},
   stats: createInitialMetaStats(),
 });
 
@@ -299,6 +378,17 @@ const coerceEngravings = (value: unknown): Record<string, string[]> => {
   return out;
 };
 
+export const coercePrefs = (value: unknown): AccountPrefs => {
+  if (typeof value !== 'object' || value === null) return {};
+  const prev = value as Partial<Record<keyof AccountPrefs, unknown>>;
+  return {
+    ...(isBattleLayoutId(prev.battleLayout)
+      ? { battleLayout: prev.battleLayout }
+      : {}),
+    ...(isThemeId(prev.theme) ? { theme: prev.theme } : {}),
+  };
+};
+
 const coerceBest = (value: unknown, base: BestScores): BestScores => {
   if (typeof value !== 'object' || value === null) return base;
   const prev = value as Partial<BestScores>;
@@ -317,6 +407,33 @@ const coerceBest = (value: unknown, base: BestScores): BestScores => {
   };
 };
 
+const migrateAchievementIds = (ids: readonly string[]): string[] => [
+  ...new Set(ids.map(resolveAchievementId)),
+];
+
+const coerceVouchers = (value: unknown): VoucherBank => {
+  const base = createInitialVouchers();
+  if (typeof value !== "object" || value === null) return base;
+  const prev = value as Partial<Record<VoucherKind, unknown>>;
+  return {
+    perkDraft:
+      typeof prev.perkDraft === "number"
+        ? Math.max(0, Math.min(VOUCHER_CAP, Math.trunc(prev.perkDraft)))
+        : base.perkDraft,
+  };
+};
+
+const coerceShips = (value: unknown, base: readonly ShipId[]): ShipId[] =>
+  Array.isArray(value)
+    ? [
+        ...new Set(
+          [...base, ...value].filter((id): id is ShipId =>
+            SHIP_BY_ID.has(id as ShipId),
+          ),
+        ),
+      ]
+    : [...base];
+
 export const migrateMeta = (
   persisted: unknown,
   fromVersion: number,
@@ -328,9 +445,19 @@ export const migrateMeta = (
   }
   const prev = (persisted ?? {}) as Partial<MetaValues>;
   const base = createInitialMetaValues();
+  const ships = coerceShips(prev.ships, base.ships);
+  const selectedShip =
+    typeof prev.selectedShip === 'string' &&
+    ships.includes(prev.selectedShip as ShipId)
+      ? (prev.selectedShip as ShipId)
+      : base.selectedShip;
   return {
     ...base,
     shards: typeof prev.shards === 'number' ? prev.shards : base.shards,
+    vouchers: coerceVouchers(prev.vouchers),
+    voucherOffers: migrateAchievementIds(
+      coerceStrings(prev.voucherOffers, base.voucherOffers),
+    ),
     xp: typeof prev.xp === 'number' ? prev.xp : base.xp,
     level:
       typeof prev.xp === 'number'
@@ -342,11 +469,8 @@ export const migrateMeta = (
       ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
       : base.chartPicks,
     collection: coerceCollection(prev.collection),
-    ships: Array.isArray(prev.ships) ? (prev.ships as ShipId[]) : base.ships,
-    selectedShip:
-      typeof prev.selectedShip === 'string'
-        ? (prev.selectedShip as ShipId)
-        : base.selectedShip,
+    ships,
+    selectedShip,
     hangar:
       typeof prev.hangar === 'object' &&
       prev.hangar !== null &&
@@ -386,15 +510,17 @@ export const migrateMeta = (
       ? prev.bossFirstKills
       : base.bossFirstKills,
     endings: Array.isArray(prev.endings) ? prev.endings : base.endings,
-    achievements: coerceStrings(prev.achievements, base.achievements),
-    achievementsSeen: coerceStrings(
-      prev.achievementsSeen,
-      base.achievementsSeen,
+    achievements: migrateAchievementIds(
+      coerceStrings(prev.achievements, base.achievements),
+    ),
+    achievementsSeen: migrateAchievementIds(
+      coerceStrings(prev.achievementsSeen, base.achievementsSeen),
     ),
     encountered: coerceEncountered(prev.encountered),
     unlocksGranted: coerceStrings(prev.unlocksGranted, base.unlocksGranted),
     unlocksSeen: coerceStrings(prev.unlocksSeen, base.unlocksSeen),
     dieSkin: isDieSkinId(prev.dieSkin) ? prev.dieSkin : base.dieSkin,
+    prefs: coercePrefs(prev.prefs),
     stats:
       typeof prev.stats === 'object' && prev.stats !== null
         ? { ...base.stats, ...(prev.stats as Partial<MetaStats>) }
@@ -550,7 +676,10 @@ export const useMetaStore = create<MetaState>()(
       },
 
       resetTutorial: () => {
-        set({ tutorialSeen: [] });
+        set((s) => ({
+          tutorialSeen: [],
+          stats: { ...s.stats, systemsCheckDone: false },
+        }));
       },
 
       engrave: (defId, engravingId, price) => {
@@ -562,6 +691,10 @@ export const useMetaStore = create<MetaState>()(
           engravings: {
             ...s.engravings,
             [defId]: [...(s.engravings[defId] ?? []), engravingId],
+          },
+          stats: {
+            ...s.stats,
+            engravingsFitted: s.stats.engravingsFitted + 1,
           },
         }));
         return true;
@@ -607,6 +740,10 @@ export const useMetaStore = create<MetaState>()(
 
       markPrologueDone: () => {
         set((s) => ({ stats: { ...s.stats, prologueDone: true } }));
+      },
+
+      markSystemsCheckDone: () => {
+        set((s) => ({ stats: { ...s.stats, systemsCheckDone: true } }));
       },
 
       recordCampaignClear: (ascension) => {
@@ -696,6 +833,38 @@ export const useMetaStore = create<MetaState>()(
         return true;
       },
 
+      grantVoucher: (kind) => {
+        if (get().vouchers[kind] >= VOUCHER_CAP) return false;
+        set((s) => ({
+          vouchers: { ...s.vouchers, [kind]: s.vouchers[kind] + 1 },
+        }));
+        return true;
+      },
+
+      spendVoucher: (kind) => {
+        if (get().vouchers[kind] <= 0) return false;
+        set((s) => ({
+          vouchers: { ...s.vouchers, [kind]: s.vouchers[kind] - 1 },
+        }));
+        return true;
+      },
+
+      offerVoucher: (achievementId) => {
+        set((s) =>
+          s.voucherOffers.includes(achievementId)
+            ? s
+            : { voucherOffers: [...s.voucherOffers, achievementId] },
+        );
+      },
+
+      clearVoucherOffer: (achievementId) => {
+        if (!get().voucherOffers.includes(achievementId)) return false;
+        set((s) => ({
+          voucherOffers: s.voucherOffers.filter((id) => id !== achievementId),
+        }));
+        return true;
+      },
+
       markAchievementsSeen: (ids) => {
         set((s) => ({
           achievementsSeen: [...new Set([...s.achievementsSeen, ...ids])],
@@ -742,6 +911,18 @@ export const useMetaStore = create<MetaState>()(
         set({ dieSkin: id });
       },
 
+      setPrefs: (patch) => {
+        set((s) => {
+          const next = { ...s.prefs, ...patch };
+          const same = (Object.keys(next) as (keyof AccountPrefs)[]).every(
+            (key) => next[key] === s.prefs[key],
+          );
+          return same && Object.keys(next).length === Object.keys(s.prefs).length
+            ? s
+            : { prefs: next };
+        });
+      },
+
       recordStreak: (win) => {
         set((s) => {
           const streak = win ? s.stats.noDeathStreak + 1 : 0;
@@ -756,11 +937,14 @@ export const useMetaStore = create<MetaState>()(
       },
     }),
     {
-      name: 'ca.meta',
+      name: META_PERSIST_KEY,
+      storage: scopedPersistStorage<MetaValues>(),
       version: META_VERSION,
       migrate: migrateMeta,
       partialize: (s): MetaValues => ({
         shards: s.shards,
+        vouchers: s.vouchers,
+        voucherOffers: s.voucherOffers,
         xp: s.xp,
         level: s.level,
         chartPicks: s.chartPicks,
@@ -789,6 +973,7 @@ export const useMetaStore = create<MetaState>()(
         unlocksGranted: s.unlocksGranted,
         unlocksSeen: s.unlocksSeen,
         dieSkin: s.dieSkin,
+        prefs: s.prefs,
         stats: s.stats,
       }),
     },

@@ -1,0 +1,413 @@
+.dock {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 0 12px;
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.card,
+.reserve {
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  appearance: none;
+  font: inherit;
+  color: var(--ca-text);
+  border: 1.5px solid var(--tint);
+  border-radius: 11px;
+  background:
+    linear-gradient(160deg, var(--wash), var(--ca-surface1));
+  padding: 5px 7px 4px;
+  cursor: pointer;
+  transition:
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+}
+
+.card {
+  --tint: var(--ca-line);
+  --wash: var(--ca-surface2);
+  --tone: var(--ca-dim);
+  min-height: 68px;
+}
+
+.card[data-school='red'] {
+  --tint: var(--ca-school-red-stroke);
+  --wash: var(--ca-school-red-fill);
+  --tone: var(--ca-school-red-text);
+}
+
+.card[data-school='blue'] {
+  --tint: var(--ca-school-blue-stroke);
+  --wash: var(--ca-school-blue-fill);
+  --tone: var(--ca-school-blue-text);
+}
+
+.card[data-school='green'] {
+  --tint: var(--ca-school-green-stroke);
+  --wash: var(--ca-school-green-fill);
+  --tone: var(--ca-school-green-text);
+}
+
+.card[data-school='grey'] {
+  --tint: var(--ca-school-grey-stroke);
+  --wash: var(--ca-school-grey-fill);
+  --tone: var(--ca-school-grey-text);
+}
+
+.card[data-school='black'] {
+  --tint: var(--ca-school-black-stroke);
+  --wash: var(--ca-school-black-fill);
+  --tone: var(--ca-school-black-text);
+}
+
+.card[data-school='yellow'] {
+  --tint: var(--ca-school-yellow-stroke);
+  --wash: var(--ca-school-yellow-fill);
+  --tone: var(--ca-school-yellow-text);
+}
+
+.reserve {
+  --tint: var(--ca-line);
+  --wash: var(--ca-surface2);
+  --tone: var(--ca-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 6px 10px;
+}
+
+.order {
+  position: absolute;
+  top: 3px;
+  right: 6px;
+  font-size: 9px;
+  line-height: 12px;
+  font-weight: 700;
+  color: var(--ca-faint);
+  border: 0.75px solid var(--ca-line);
+  border-radius: 6px;
+  min-width: 14px;
+  text-align: center;
+  padding: 0 3px;
+  background: var(--ca-bg-a86);
+}
+
+.head {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  padding-right: 20px;
+}
+
+.glyph {
+  width: 11px;
+  height: 11px;
+  flex: 0 0 auto;
+}
+
+.name {
+  display: block;
+  min-width: 0;
+  font-size: 10.5px;
+  line-height: 13px;
+  font-weight: 600;
+  color: var(--ca-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cap {
+  display: block;
+  font-size: 9px;
+  line-height: 11px;
+  color: var(--ca-dim);
+  white-space: nowrap;
+}
+
+.affinity {
+  display: block;
+  padding-right: 44px;
+  font-size: 9px;
+  line-height: 11px;
+  color: var(--tone);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.affinityInherited {
+  font-weight: 700;
+}
+
+.proj {
+  display: block;
+  margin-top: 2px;
+  padding-right: 44px;
+  min-height: 22px;
+  font-size: 9.5px;
+  line-height: 11px;
+  font-weight: 700;
+  color: var(--ca-dim);
+}
+
+.projBonus {
+  color: var(--ca-amber);
+}
+
+.projPlain {
+  color: var(--ca-text);
+}
+
+.projDanger {
+  color: var(--ca-danger);
+}
+
+.blocked {
+  position: absolute;
+  left: 7px;
+  bottom: 4px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ca-danger);
+}
+
+.well {
+  position: absolute;
+  right: 6px;
+  bottom: 5px;
+  width: 36px;
+  height: 36px;
+  border-radius: 9px;
+  border: 1px dashed var(--ca-line);
+  opacity: 0.45;
+}
+
+.cardOccupied .well {
+  border-color: transparent;
+  opacity: 0;
+}
+
+.wellSmall {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px dashed var(--ca-line);
+  opacity: 0.45;
+}
+
+.reserveWells {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+
+.pips {
+  position: absolute;
+  left: 7px;
+  bottom: 4px;
+  display: flex;
+  gap: 2px;
+}
+
+.pip {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  border: 0.75px solid var(--ca-faint);
+}
+
+.pipOn {
+  background: var(--ca-amber);
+  border-color: var(--ca-amber);
+}
+
+.cardLegal {
+  box-shadow: 0 0 0 1.5px var(--ca-accent);
+  animation: slot-breathe 1.1s ease-in-out infinite;
+}
+
+.card[data-over='1'],
+.reserve[data-over='1'] {
+  box-shadow: 0 0 0 3px var(--ca-accent);
+  animation: none;
+}
+
+.card[data-pulse='1'],
+.reserve[data-pulse='1'] {
+  animation: slot-pulse 320ms ease-out;
+}
+
+.cardBlocked {
+  border-style: dashed;
+  border-color: var(--ca-danger);
+  opacity: 0.72;
+}
+
+.card[data-goal='1'] {
+  box-shadow: 0 0 0 2px var(--ca-amber);
+}
+
+.cardOccupied {
+  background: linear-gradient(160deg, var(--wash), var(--ca-surface2));
+}
+
+@keyframes slot-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 1.5px var(--ca-accent);
+  }
+  50% {
+    box-shadow: 0 0 0 3px var(--ca-accent);
+  }
+}
+
+@keyframes slot-pulse {
+  0% {
+    box-shadow: 0 0 0 3px var(--ca-accent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--ca-danger-a0);
+  }
+}
+
+:root[data-ca-motion='reduced'] .cardLegal,
+:root[data-ca-motion='reduced'] .card[data-pulse='1'],
+:root[data-ca-motion='reduced'] .reserve[data-pulse='1'] {
+  animation: none;
+}
+
+.enemyBand,
+.trayBand {
+  pointer-events: none;
+  width: 100%;
+  min-width: 0;
+  touch-action: none;
+}
+
+.enemyBand {
+  flex: 1.15 1 0;
+  min-height: 104px;
+}
+
+.trayBand {
+  flex: 1 1 0;
+  min-height: 76px;
+}
+
+.column {
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  gap: 6px;
+}
+
+@media (min-width: 768px) {
+  .column {
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  .card {
+    min-height: 76px;
+  }
+
+  .affinity,
+  .proj {
+    padding-right: 52px;
+  }
+
+  .name {
+    font-size: 12px;
+    line-height: 15px;
+  }
+
+  .cap,
+  .affinity {
+    font-size: 10px;
+    line-height: 12px;
+  }
+
+  .proj {
+    font-size: 11px;
+    line-height: 13px;
+    min-height: 26px;
+  }
+
+  .well {
+    width: 42px;
+    height: 42px;
+  }
+}
+
+@media (max-height: 700px) {
+  .card {
+    min-height: 60px;
+  }
+
+  .cap {
+    display: none;
+  }
+
+  .proj {
+    min-height: 11px;
+  }
+
+  .enemyBand {
+    min-height: 72px;
+  }
+
+  .trayBand {
+    min-height: 60px;
+  }
+
+  .reserve {
+    min-height: 36px;
+    padding: 4px 10px;
+  }
+}
+
+.cell {
+  position: relative;
+  min-width: 0;
+}
+
+.formula {
+  position: absolute;
+  top: 2px;
+  right: 3px;
+  z-index: 1;
+}
+
+.formulaMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
+  color: var(--ca-faint);
+  font-size: 9px;
+  line-height: 11px;
+  font-weight: 700;
+}

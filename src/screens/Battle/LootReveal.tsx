@@ -1,11 +1,13 @@
 import { Button, Text } from '@mantine/core';
-import { useEffect, useState, type CSSProperties } from 'react';
+import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
 import { rarityColor } from '@/app/rarity';
+import { useEscapeKey } from '@/components/dismiss';
 import { tokens } from '@/app/theme';
+import { DieCard } from '@/components/DieCard';
+import { ParticleRain } from '@/components/ParticleRain';
 import { DIE_BY_ID } from '@/data/dice';
 import { LOOT_SFX } from '@/data/audio';
-import { schools } from '@/data/schools';
 import { duckMusic, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
@@ -51,35 +53,47 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
     };
   }, [reduced, dieId]);
 
-  const def = DIE_BY_ID.get(dieId);
-  if (def === undefined) return null;
-
-  const colors = schools[def.school];
-  const frameColor = rarityColor(def.rarity);
-
-  const onOverlayClick = (): void => {
+  const advance = useCallback((): void => {
     if (!revealed) {
       setRevealed(true);
       return;
     }
     onClose();
-  };
+  }, [revealed, onClose]);
+
+  useEscapeKey(true, advance);
+
+  const def = DIE_BY_ID.get(dieId);
+  if (def === undefined) return null;
+
+  const frameColor = rarityColor(def.rarity);
+
 
   return (
     <div
       className={styles.overlay}
-      onClick={onOverlayClick}
+      data-loot-reveal={dieId}
+      onClick={advance}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') onOverlayClick();
+        if (e.key === 'Enter' || e.key === ' ') advance();
       }}
     >
       <Text className={styles.title} c={tokens.dim}>
         {t('battle:lootNew')}
       </Text>
       {revealed && !reduced && def.rarity === 'legendary' ? (
-        <div className={styles.beam} style={{ color: frameColor }} />
+        <>
+          <div className={styles.beam} style={{ color: frameColor }} />
+          <ParticleRain
+            color={frameColor}
+            count={60}
+            durationMs={1800}
+            seedLabel={`loot:${dieId}`}
+            className={styles.rain}
+          />
+        </>
       ) : null}
       <div className={styles.stage}>
         <div
@@ -94,18 +108,7 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
               }`}
             style={{ borderColor: frameColor, color: frameColor }}
           >
-            <Text className={styles.dieName} c={tokens.text}>
-              {t(def.name)}
-            </Text>
-            <Text className={styles.tier} c={tokens.dim}>
-              {`d${String(def.tier)}`}
-            </Text>
-            <span
-              className={styles.schoolChip}
-              style={{ borderColor: colors.stroke, color: colors.text }}
-            >
-              {t(`battle:school.${def.school}`)}
-            </span>
+            <DieCard defId={dieId} plain className={styles.dieBody} />
           </div>
           {revealed && !reduced ? (
             <div className={styles.burst}>
@@ -113,7 +116,7 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
                 <span
                   key={i}
                   className={styles.dot}
-                  style={dotStyle(i, colors.stroke)}
+                  style={dotStyle(i, frameColor)}
                 />
               ))}
             </div>

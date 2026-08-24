@@ -42,7 +42,7 @@ describe("interference tide", () => {
         hull: 40,
         hullMax: 40,
         shield: 0,
-        engineState: null,
+        evasion: null,
         enemies: [harnessEnemy({ nextIntent: { t: "attack", n: 5 } })],
       });
       return resolveEnemyPhase(snap, createStream(9)).next.hull;

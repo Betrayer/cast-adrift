@@ -1,0 +1,324 @@
+.enemyBand,
+.trayBand {
+  pointer-events: none;
+  width: 100%;
+  min-width: 0;
+  touch-action: none;
+}
+
+.enemyBand {
+  flex: 0 0 auto;
+  min-height: 92px;
+  height: 22%;
+}
+
+.trayBand {
+  flex: 1 1 0;
+  min-height: 72px;
+}
+
+.dock {
+  pointer-events: auto;
+  position: relative;
+  flex: 2.6 1 0;
+  width: 100%;
+  min-height: 212px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+}
+
+.dock[data-arc-fallback='1'] {
+  justify-content: flex-start;
+  gap: 3px;
+}
+
+.stage {
+  position: relative;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+.pod {
+  position: absolute;
+  pointer-events: auto;
+  appearance: none;
+  font: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid var(--tint);
+  background: radial-gradient(circle at 34% 28%, var(--wash), var(--ca-surface1));
+  color: var(--ca-text);
+  cursor: pointer;
+  transition:
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+  --tint: var(--ca-line);
+  --wash: var(--ca-surface2);
+  --tone: var(--ca-dim);
+}
+
+.pod[data-school='red'] {
+  --tint: var(--ca-school-red-stroke);
+  --wash: var(--ca-school-red-fill);
+  --tone: var(--ca-school-red-text);
+}
+
+.pod[data-school='blue'] {
+  --tint: var(--ca-school-blue-stroke);
+  --wash: var(--ca-school-blue-fill);
+  --tone: var(--ca-school-blue-text);
+}
+
+.pod[data-school='green'] {
+  --tint: var(--ca-school-green-stroke);
+  --wash: var(--ca-school-green-fill);
+  --tone: var(--ca-school-green-text);
+}
+
+.pod[data-school='grey'] {
+  --tint: var(--ca-school-grey-stroke);
+  --wash: var(--ca-school-grey-fill);
+  --tone: var(--ca-school-grey-text);
+}
+
+.pod[data-school='black'] {
+  --tint: var(--ca-school-black-stroke);
+  --wash: var(--ca-school-black-fill);
+  --tone: var(--ca-school-black-text);
+}
+
+.pod[data-school='yellow'] {
+  --tint: var(--ca-school-yellow-stroke);
+  --wash: var(--ca-school-yellow-fill);
+  --tone: var(--ca-school-yellow-text);
+}
+
+.podOrder {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  font-size: 8.5px;
+  line-height: 11px;
+  font-weight: 700;
+  color: var(--ca-faint);
+  border: 0.75px solid var(--ca-line);
+  border-radius: 6px;
+  min-width: 13px;
+  text-align: center;
+  padding: 0 2px;
+  background: var(--ca-bg-a86);
+}
+
+.podName {
+  max-width: 84%;
+  font-size: 8px;
+  line-height: 10px;
+  font-weight: 600;
+  color: var(--ca-dim);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.podValue {
+  font-size: 12px;
+  line-height: 14px;
+  font-weight: 700;
+  color: var(--ca-dim);
+}
+
+.podValueBonus {
+  color: var(--ca-amber);
+}
+
+.podValuePlain {
+  color: var(--ca-text);
+}
+
+.podValueDanger {
+  color: var(--ca-danger);
+}
+
+.podBlockedMark {
+  position: absolute;
+  bottom: 4px;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--ca-danger);
+}
+
+.podWell {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 62%;
+  height: 62%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.podLegal {
+  box-shadow: 0 0 0 2px var(--ca-accent);
+  animation: pod-breathe 1.1s ease-in-out infinite;
+}
+
+.pod[data-over='1'] {
+  box-shadow: 0 0 0 4px var(--ca-accent);
+  animation: none;
+}
+
+.pod[data-pulse='1'] {
+  animation: pod-pulse 320ms ease-out;
+}
+
+.podBlocked {
+  border-style: dashed;
+  border-color: var(--ca-danger);
+  opacity: 0.72;
+}
+
+.pod[data-goal='1'] {
+  box-shadow: 0 0 0 2.5px var(--ca-amber);
+}
+
+.podOccupied {
+  background: radial-gradient(circle at 34% 28%, var(--wash), var(--ca-surface2));
+}
+
+@keyframes pod-breathe {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px var(--ca-accent);
+  }
+  50% {
+    box-shadow: 0 0 0 4px var(--ca-accent);
+  }
+}
+
+@keyframes pod-pulse {
+  0% {
+    box-shadow: 0 0 0 4px var(--ca-accent);
+  }
+  100% {
+    box-shadow: 0 0 0 0 var(--ca-danger-a0);
+  }
+}
+
+.ship {
+  position: absolute;
+  pointer-events: none;
+}
+
+.reserve {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  width: auto;
+  margin: 0 12px;
+  padding: 4px 10px;
+  appearance: none;
+  font: inherit;
+  text-align: left;
+  color: var(--ca-text);
+  border: 1.2px dashed var(--ca-line);
+  border-radius: 10px;
+  background: var(--ca-surface1-a92);
+  cursor: pointer;
+}
+
+.radial {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-overlay);
+  pointer-events: none;
+}
+
+.radialBtn {
+  position: absolute;
+  pointer-events: auto;
+  appearance: none;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: var(--ca-text);
+  background: var(--ca-surface2);
+  border: 1.5px solid var(--ca-accent);
+  box-shadow: 0 0 10px var(--ca-shadow);
+  cursor: pointer;
+  animation: radial-in 140ms ease-out both;
+}
+
+.radialBtn[aria-disabled='true'] {
+  opacity: 0.38;
+  border-color: var(--ca-line);
+  cursor: default;
+}
+
+.radialBtnActive {
+  background: var(--ca-accent);
+  color: var(--ca-bg);
+}
+
+@keyframes radial-in {
+  from {
+    opacity: 0;
+    transform: scale(0.7);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+:root[data-ca-motion='reduced'] .radialBtn,
+:root[data-ca-motion='reduced'] .podLegal,
+:root[data-ca-motion='reduced'] .pod[data-pulse='1'] {
+  animation: none;
+}
+
+.pod[data-wide='1'] .podName {
+  font-size: 10px;
+  line-height: 13px;
+}
+
+.pod[data-wide='1'] .podValue {
+  font-size: 15px;
+  line-height: 18px;
+}
+
+.pod[data-wide='1'] .podOrder {
+  font-size: 10px;
+  line-height: 13px;
+  min-width: 16px;
+}
+
+@media (max-height: 700px) {
+  .enemyBand {
+    min-height: 76px;
+    height: 20%;
+  }
+
+  .trayBand {
+    min-height: 56px;
+  }
+
+  .dock {
+    min-height: 150px;
+  }
+}

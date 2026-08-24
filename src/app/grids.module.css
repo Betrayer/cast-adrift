@@ -1,0 +1,14 @@
+.masonry {
+  column-gap: var(--mantine-spacing-lg, 20px);
+}
+
+.masonry > * {
+  break-inside: avoid;
+  margin-bottom: var(--mantine-spacing-lg, 20px);
+}
+
+@media (min-width: 900px) {
+  .masonry {
+    column-count: 2;
+  }
+}

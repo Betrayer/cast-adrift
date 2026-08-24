@@ -36,7 +36,8 @@
       "anomaly": "Anomalie",
       "beacon": "Balise",
       "boss": "Patron",
-      "inverted": "inversé"
+      "inverted": "inversé",
+      "hole": "Trou noir"
     },
     "previewNode": "{{type}} · risque : {{risk}}",
     "previewPocket": "Détour : un butin plus intéressant, un combat plus difficile",
@@ -44,7 +45,10 @@
       "low": "faible",
       "raised": "élevé",
       "high": "élevé"
-    }
+    },
+    "hull": "Coque {{cur}}/{{max}}",
+    "scrap": "Ferraille {{n}}",
+    "previewHole": "Trou noir : le contourner ou emprunter le trou de ver"
   },
   "event": {
     "title": "Signal",
@@ -67,7 +71,6 @@
     "pass": "Succès — {{total}}",
     "fail": "Échec — {{total}}",
     "roll": "Rouleau",
-    "back": "Retour",
     "reqAxisMin": "nécessite la version {{n}} ou une version ultérieure d'Axis",
     "reqAxisMax": "nécessite la version {{n}} ou une version antérieure d'Axis",
     "checkLowest": "Rien de plus haut que {{n}}",
@@ -189,7 +192,6 @@
     "memory": "Echo Mémoire",
     "empty": "Rien n'a encore été enregistré.",
     "locked": "Pas encore découvert",
-    "back": "Retour",
     "unread": "nouveau",
     "glyphLegend": {
       "title": "Symboles scolaires",
@@ -197,7 +199,8 @@
     },
     "prologueTitle": "La première traversée",
     "prologueBody": "Réécoute les premières mesures. Rien n'a commencé, rien n'est perdu.",
-    "prologueReplay": "Rediffusion"
+    "prologueReplay": "Rediffusion",
+    "badgeLegend": "Badges des dés"
   },
   "consequenceToast": "Conséquence : {{text}}",
   "rewards": {
@@ -240,7 +243,8 @@
     "scrap": "Ferraille: {{n}}",
     "hull": "Coque {{cur}}/{{max}}",
     "voucher": "Code promo Mk × {{n}} — un niveau gratuit",
-    "voucherUse": "Gratuit"
+    "voucherUse": "Gratuit",
+    "fuse": "Fusionner — {{n}}"
   },
   "summary": {
     "victory": "Secteur dégagé",
@@ -251,14 +255,24 @@
     "perks": "Mises à jour :",
     "perksNone": "aucun",
     "toMenu": "Retour au menu",
-    "faced": "Source : {{names}}"
+    "faced": "Source : {{names}}",
+    "more": "Plus",
+    "less": "Moins",
+    "elites": "Élites",
+    "minibosses": "Mini-boss",
+    "bosses": "Boss",
+    "scrapSpent": "Ferraille dépensée",
+    "hullPctMin": "Coque la plus basse",
+    "dicePlaced": "Dés placés",
+    "pct": "{{n}}%",
+    "wormholeRides": "Manèges « Wormhole »",
+    "holesBypassed": "Trous contournés"
   },
   "prologue": {
     "title": "Prologue",
     "echo": "ECHO : {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Retour au menu",
-    "replayDone": "Retour à l'Codex"
+    "leave": "Retour au menu"
   },
   "interstitial": {
     "sector": "{{n}} du secteur",
@@ -293,10 +307,13 @@
     "aLevel": "Un «{{n}} »",
     "tideCap": "Niveaux maximaux des marées d'interférence à l'{{n}}",
     "launch": "Lancement",
-    "back": "Retour",
     "ascensionCost": "Cela vous coûte",
     "ascensionGain": "Ça te rapporte",
-    "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution"
+    "shardMult": "+ {{n}} % de fragments pour l'ensemble de l'exécution",
+    "changeShip": "Changer de vaisseau",
+    "voucher": "Bon : atout de départ",
+    "voucherCount": "{{n}} en réserve",
+    "voucherHint": "Dépensez un bon pour choisir un atout avant le premier saut."
   },
   "package": {
     "title": "Boîtier de porte",
@@ -312,24 +329,52 @@
     "next": "Suivant",
     "skipAll": "Tout ignorer",
     "place": {
-      "title": "Faites glisser un dé dans un système",
-      "body": "Lancez les dés, puis faites-les glisser depuis le plateau vers les cases « Armes », « Boucliers », « Moteurs », « Capteurs » ou « Réacteur ». Un dé ne peut jamais être placé dans une case dont le niveau maximal est inférieur à sa face."
+      "title": "Envoie un dé dans un système",
+      "body": "Touche un dé, puis une carte de système allumée — ou fais-le glisser jusque-là. Chaque carte affiche le résultat avant de valider, et un dé n’entre jamais dans une carte dont le plafond est sous sa face."
     },
     "endTurn": {
-      "title": "Résoudre le virage",
-      "body": "Lorsque le plateau correspond à ce que vous souhaitez, terminez votre tour. Les systèmes tirent de haut en bas, puis l'ennemi riposte."
+      "title": "Résoudre le tour",
+      "body": "Quand le plateau te convient, termine le tour. Les systèmes tirent dans l’ordre des numéros de leurs cartes, puis l’ennemi répond."
     },
     "reroll": {
       "title": "On a droit à un relance gratuit une seule fois",
       "body": "Choisissez n'importe quel dé encore présent dans le plateau et relancez-le. Les relances ne se reportent pas d'un tour à l'autre : une relance non utilisée est perdue."
     },
     "nudge": {
-      "title": "La puissance d'attaque est synonyme de précision",
-      "body": "Choisissez un dé et dépensez des points de charge pour faire varier sa face de +1 ou -1. Les points de charge permettent également d'effectuer des relances supplémentaires et d'activer des « surges »."
+      "title": "Charge buys precision",
+      "body": "Select a die, then use − and + on the console to move its face by one. Charge pays for it; a free nudge spends nothing."
     },
     "jump": {
       "title": "Choisissez le nœud suivant",
       "body": "Appuyez sur un nœud allumé, puis sur « Sauter ». Le brouillard masque les rangées qui se trouvent devant ; les capteurs et les analyses approfondies repoussent l'horizon plus loin."
+    },
+    "targeting": {
+      "title": "Pick what you are shooting at",
+      "body": "Tap an enemy to make it the target. Weapons, marks and pierce all land on the target — subsystems are targeted the same way."
+    },
+    "reserve": {
+      "title": "Keep a die for next turn",
+      "body": "A reserved die skips the reroll and comes back with its face intact. Use it to hold a number the board cannot spend yet."
+    },
+    "actives": {
+      "title": "Some dice do more than sit",
+      "body": "A die with an active can flip, copy, bank or split. The row lights up only for the actives your tray can currently pay for."
+    },
+    "resonance": {
+      "title": "Schools reward company",
+      "body": "The chips count how many dice of each school the battle holds. Cross a threshold and the whole school gains a bonus for the fight."
+    },
+    "affinity": {
+      "title": "The bonus is the slot",
+      "body": "A school placed in its own system adds to the face before anything else reads it. That is the sum on the card, and it is free."
+    },
+    "prismatic": {
+      "title": "Prismatic counts as anything",
+      "body": "A prismatic die satisfies any school, and in a slot it inherits that slot’s affinity — bonus included. It also counts for resonance."
+    },
+    "fate": {
+      "title": "Fate is one roll, once",
+      "body": "The Fate die never enters a slot. One press, one roll per battle, and the table reads out what it gave you."
     }
   },
   "motif": {
@@ -342,7 +387,11 @@
     "pocket": "La poche de détour : un risque accru, mais aussi un gain accru",
     "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte",
     "inversion": "Série inversée : les systèmes sont traités du dernier au premier",
-    "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution"
+    "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution",
+    "blackHoles": "Trou noir : la cellule a disparu ; son sillon forme un trou de ver",
+    "wormhole": "Le bord du trou de ver : un choix s'impose à la lisière",
+    "bypass": "A frôlé le rebord : la coque a été éraflée par la marée",
+    "holeScorch": "Coque trop mince pour payer le péage — la jante t'a laissé passer"
   },
   "tag": {
     "red": "Rouge",
@@ -376,7 +425,12 @@
     "swarm": "Essaim",
     "spike": "Spike",
     "precision": "Précision",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Glossaire des tags",
+    "glossaryBody": "Les tags sont la façon dont dés, atouts, modules et gravures se trouvent : un effet qui compte un tag compte chaque objet qui le porte.",
+    "glossarySchools": "Écoles",
+    "glossarySystems": "Systèmes",
+    "glossaryMechanics": "Mécaniques"
   },
   "build": {
     "title": "Votre configuration",
@@ -399,12 +453,12 @@
     "stability": "{{n}} de stabilité",
     "neutral": "Équilibre des axes",
     "preview": "axe {{from}} → {{to}}",
-    "short": "Axe"
+    "short": "Axe",
+    "moves": "Les dés noirs poussent vers la Résonance, les bleus vers la Stabilité ; les événements et la dérive la déplacent aussi."
   },
   "journal": {
     "title": "Journal de course",
     "open": "Journal",
-    "back": "Retour à la carte",
     "empty": "Rien n'a encore été écrit. Le secteur ne vous a rien demandé.",
     "sector": "{{n}} du secteur",
     "beacon": "Balise résolu — {{n}} de {{max}}",
@@ -421,7 +475,16 @@
     "here": "Vous êtes dans le secteur «{{n}} ».",
     "chainsTitle": "Fils de discussion",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "ici"
+    "chainHere": "ici",
+    "wormhole": {
+      "ride": "J'ai parcouru le « wormhole » {{way}}, les lignes {{rows}} apparaissent",
+      "bypass": "J'ai contourné le trou noir"
+    },
+    "wormholeWay": {
+      "forward": "plus profond",
+      "backward": "retour"
+    },
+    "achievement": "Réussite : {{name}}"
   },
   "memory": {
     "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",
@@ -430,5 +493,72 @@
     "hintElite": "Partez à la chasse aux élites d’{{n}} au fil de vos parties",
     "hintBeacons": "Traiter les balises «{{n}}» en une seule opération",
     "hintEnding": "Accédez à « Core » et sélectionnez"
+  },
+  "system": {
+    "title": "Menu du vaisseau",
+    "resume": "Reprendre",
+    "toMenu": "Revenir au menu principal",
+    "toMenuHint": "La partie est sauvegardée — reprenez-la depuis le menu.",
+    "open": "Menu"
+  },
+  "tally": {
+    "title": "Bilan du combat",
+    "titleLoss": "Dernier combat",
+    "turns": "Tours",
+    "dealt": "Dégâts infligés",
+    "taken": "Dégâts subis",
+    "shield": "Absorbé par le bouclier",
+    "best": "Meilleur coup dorsal",
+    "rerolls": "Relances utilisées",
+    "placed": "Dés placés",
+    "scrap": "Ferraille récupérée",
+    "hull": "Coque {{cur}}/{{max}}",
+    "continue": "Continuer"
+  },
+  "tagDesc": {
+    "red": "Agression : dégâts d'arme, brûlure et pics.",
+    "blue": "Défense : boucliers, absorption et endurance.",
+    "green": "Mouvement : moteurs, esquive et croissance.",
+    "yellow": "Économie : ferraille, gains et levier en boutique.",
+    "black": "Risque : charge, sacrifice et l'axe de Résonance.",
+    "grey": "Lecture : capteurs, manipulation des dés et précision.",
+    "prismatic": "Joker : compte comme n'importe quelle école et hérite de l'affinité de l'emplacement.",
+    "weapons": "Tout ce qui se résout dans un emplacement d'arme.",
+    "shields": "Tout ce qui se résout dans un emplacement de bouclier.",
+    "engines": "Tout ce qui se résout dans l'emplacement des moteurs.",
+    "sensors": "Tout ce qui se résout dans l'emplacement des capteurs.",
+    "reactor": "Tout ce qui se résout dans l'emplacement du réacteur.",
+    "spinal": "Le canon dorsal : un tir énorme qui se coince sur un jet bas.",
+    "repairBay": "La baie de réparation : coque soignée en plein combat.",
+    "burn": "Dégâts dans le temps appliqués à la fin du tour ennemi.",
+    "crit": "Coups multipliés par 1,5 avant les boucliers.",
+    "growth": "Valeurs qui montent définitivement sur une face maximale.",
+    "reroll": "Relancer les dés, gratuitement ou en payant.",
+    "charge": "La réserve du réacteur qui paie poussées, relances et surtensions.",
+    "scrap": "La monnaie de la partie : boutiques, réparations et améliorations Mk.",
+    "overcap": "Placer un dé au-dessus du plafond de son emplacement.",
+    "pierce": "Dégâts qui ignorent le bouclier ennemi.",
+    "dodge": "Esquive tirée pour chaque coup entrant.",
+    "survival": "Rester en vie : coque, sauvetages létaux et planchers.",
+    "control": "Priver l'ennemi : brouillages, verrous et portes.",
+    "dice": "Manipuler les dés eux-mêmes : retourner, copier, échanger, figer, diviser.",
+    "shieldwall": "Bouclier empilé qui se reporte d'un tour à l'autre.",
+    "risk": "Coûts payés en coque, ferraille ou certitude.",
+    "swarm": "Beaucoup de petits dés plutôt que quelques gros.",
+    "spike": "Une valeur énorme plutôt qu'un flux régulier.",
+    "precision": "Faces étroites et prévisibles, valeurs exactes."
+  },
+  "hole": {
+    "title": "Trou noir",
+    "body": "La cellule a disparu. Son pourtour te laissera passer, ou t'emmènera là où il le décidera.",
+    "gentle": "Trou de ver stable",
+    "gentleWhy": "Les deux premières descentes d'une série sont courtes et mènent toujours plus loin.",
+    "bypass": "Faire le tour",
+    "bypassCost": "Contournement : coque « {{n}} »",
+    "bypassFree": "Contournement : gratuit — la coque ne peut pas payer",
+    "ride": "Fais-le !",
+    "rideCost": "Trajet : un trajet d'{{min}}à{{max}}, direction inconnue",
+    "rideGentle": "Ride : une variante de l’{{min}}—{{max}}e, mais plus profonde",
+    "landed": "Lancé {{rows}} lignes {{way}}"
   }
 }

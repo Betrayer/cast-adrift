@@ -1,5 +1,4 @@
 import {
-  Button,
   Group,
   Loader,
   Paper,
@@ -14,6 +13,7 @@ import { boardUid } from "@/game/run/boards";
 import { isoWeekKey, utcDateKey } from "@/game/run/modes";
 import {
   aroundMe,
+  boardsReachable,
   dailyBoardId,
   driftWeeklyBoardId,
   DRIFT_ALLTIME_BOARD,
@@ -23,9 +23,13 @@ import {
   type RankedEntry,
 } from "@/services/leaderboards";
 import { Screen } from "@/app/Screen";
-import { useAppStore } from "@/stores/appStore";
+import { riseStyle } from "@/app/motion";
+import { AppHeader } from "@/components/AppHeader";
+import { useScreenParam } from "@/app/useScreenParam";
 
-type Tab = "daily" | "drift" | "week";
+const TABS = ["daily", "drift", "week"] as const;
+
+type Tab = (typeof TABS)[number];
 
 const boardIdFor = (tab: Tab, now: number): string => {
   if (tab === "daily") return dailyBoardId(utcDateKey(now));
@@ -39,6 +43,7 @@ interface LoadedBoard {
   key: string;
   rows: RankedEntry[];
   myRank: number | null;
+  offline: boolean;
 }
 
 const debugBoards = (): boolean => {
@@ -48,11 +53,7 @@ const debugBoards = (): boolean => {
 
 export const LeaderboardScreen = () => {
   const { t } = useTranslation(["meta", "common"]);
-  const go = useAppStore((s) => s.go);
-  const params = useAppStore((s) => s.params);
-  const [tab, setTab] = useState<Tab>(
-    params?.tab === "daily" ? "daily" : params?.tab === "week" ? "week" : "drift",
-  );
+  const [tab, setTab] = useScreenParam<Tab>("tab", TABS, "drift");
   const [view, setView] = useState<View>("top");
   const [showFlagged] = useState(debugBoards);
   const [now] = useState(() => Date.now());
@@ -81,6 +82,7 @@ export const LeaderboardScreen = () => {
         key: `${board}:${view}`,
         rows,
         myRank: rows.find((e) => e.isMe)?.rank ?? null,
+        offline: uid === null || !boardsReachable(),
       });
     };
     void fetchBoard();
@@ -92,30 +94,29 @@ export const LeaderboardScreen = () => {
   const ready = loaded !== null && loaded.key === requestKey;
   const rows = ready ? loaded.rows : null;
   const myRank = ready ? loaded.myRank : null;
+  const offline = ready ? loaded.offline : false;
 
   return (
     <Screen
       header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <>
+        <AppHeader />
+        <Paper
+          bg={tokens.surface1}
+          p="md"
+          radius="md"
+          withBorder
+          mt="xs"
+          data-rise
+          data-board-controls
+          style={riseStyle(0)}
+        >
           <Stack gap="xs">
-          <Group justify="space-between">
-            <Text fw={700} c={tokens.text}>
-              {t("meta:board.title")}
-            </Text>
-            <Button
-              size="xs"
-              variant="default"
-              onClick={() => {
-                go("modes");
-              }}
-            >
-              {t("common:back")}
-            </Button>
-          </Group>
           <SegmentedControl
             fullWidth
             size="xs"
             value={tab}
+            data-testid="board-tabs"
             onChange={(value) => {
               setTab(value as Tab);
             }}
@@ -144,6 +145,7 @@ export const LeaderboardScreen = () => {
             </Text>
           </Stack>
         </Paper>
+        </>
       }
     >
       <>
@@ -152,14 +154,25 @@ export const LeaderboardScreen = () => {
             <Loader size="sm" color="accent" />
           </Group>
         ) : rows.length === 0 ? (
-          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-            <Text size="sm" c={tokens.dim}>
-              {t("meta:board.empty")}
+          <Paper
+            bg={tokens.surface1}
+            p="md"
+            radius="md"
+            withBorder
+            data-rise
+            style={riseStyle(0)}
+          >
+            <Text
+              size="sm"
+              c={offline ? tokens.danger : tokens.dim}
+              data-testid={offline ? "board-offline" : "board-empty"}
+            >
+              {t(offline ? "meta:board.offline" : "meta:board.empty")}
             </Text>
           </Paper>
         ) : (
           <Stack gap={4} pb="md">
-            {rows.map((entry) => {
+            {rows.map((entry, index) => {
               const flagged = showFlagged && entryHidden(entry, board);
               return (
                 <Paper
@@ -168,7 +181,12 @@ export const LeaderboardScreen = () => {
                   p="xs"
                   radius="sm"
                   withBorder
-                  style={flagged ? { opacity: 0.4 } : undefined}
+                  data-rise
+                  style={
+                    flagged
+                      ? { opacity: 0.4, ...riseStyle(index) }
+                      : riseStyle(index)
+                  }
                 >
                   <Group justify="space-between" wrap="nowrap" gap="xs">
                     <Text size="sm" c={tokens.faint} w={32}>

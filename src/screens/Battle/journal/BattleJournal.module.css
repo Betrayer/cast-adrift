@@ -1,0 +1,94 @@
+.panel {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+  flex: 1 1 auto;
+  padding: 8px 10px;
+  border: 1px solid var(--ca-line);
+  border-radius: 12px;
+  background: var(--ca-surface1-a92);
+  overflow: hidden;
+}
+
+.title {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 9.5px;
+  line-height: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ca-faint);
+}
+
+.empty {
+  margin: 0;
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-faint);
+}
+
+.turns {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.turn {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.turnHead {
+  font-size: 9.5px;
+  line-height: 13px;
+  font-weight: 700;
+  color: var(--ca-dim);
+  border-bottom: 1px solid var(--ca-line);
+  padding-bottom: 1px;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px;
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-text);
+}
+
+.actor {
+  font-weight: 600;
+  color: var(--ca-school-blue-text);
+}
+
+.rowFoe .actor {
+  color: var(--ca-school-red-text);
+}
+
+.what {
+  color: var(--ca-dim);
+}
+
+.hull {
+  font-weight: 700;
+  color: var(--ca-danger);
+}
+
+.shield {
+  color: var(--ca-school-blue-text);
+}
+
+.evaded {
+  color: var(--ca-school-green-text);
+}

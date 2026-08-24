@@ -64,6 +64,7 @@ export const BARKS: readonly BarkDef[] = [
   { id: "eventPos", trigger: "eventOutcome:positive", lines: lines("eventPos", 10), weight: 1, cooldownSec: 45 },
   { id: "idleMap", trigger: "idleMap", lines: lines("idleMap", 6), weight: 1, cooldownSec: 120 },
   { id: "setComplete", trigger: "setComplete", lines: lines("setComplete", 7), weight: 1, cooldownSec: 90 },
+  { id: "wormhole", trigger: "wormhole", lines: lines("wormhole", 8), weight: 1, cooldownSec: 45 },
   ...firstKillBarks,
 ];
 
@@ -85,4 +86,5 @@ export const BARK_QUOTA: Readonly<Record<string, number>> = {
   levelUp: 6,
   memory: 4,
   threshold: 4,
+  wormhole: 8,
 };

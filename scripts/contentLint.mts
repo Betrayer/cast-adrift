@@ -8,7 +8,12 @@ import {
 } from "../src/data/ascension";
 import {
   ACHIEVEMENTS,
+  ACHIEVEMENT_ALIASES,
+  ACHIEVEMENT_BY_ID,
+  ACHIEVEMENT_FAMILIES,
   ACHIEVEMENT_GROUPS,
+  ACHIEVEMENT_ROWS,
+  SINGLE_ACHIEVEMENTS,
 } from "../src/data/achievements";
 import { BADGES, BADGE_BY_ID, DIE_SKINS } from "../src/data/cosmetics";
 import { MILESTONES } from "../src/data/milestones";
@@ -69,6 +74,11 @@ import { ALL_EVENTS } from "../src/data/events";
 import { CHAINS, CHAIN_EVENT_IDS } from "../src/data/narrative/chains";
 import { ENDINGS } from "../src/data/narrative/endings";
 import {
+  CHECK_DECK,
+  PROLOGUE_BEATS,
+  SYSTEMS_CHECK,
+} from "../src/data/narrative/prologue";
+import {
   earnedMemoryOrders,
   MEMORIES,
   MEMORY_CODEX_IDS,
@@ -76,9 +86,9 @@ import {
   NUMBERED_MEMORIES,
 } from "../src/data/narrative/memories";
 import { ALL_PERKS } from "../src/data/perks";
-import { PUZZLES } from "../src/data/puzzles";
+import { PUZZLES, type PuzzleGoal } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
-import { SHIPS } from "../src/data/ships";
+import { SHIPS, shipTextIssues } from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
 import {
   ACTION_NAMES,
@@ -90,6 +100,7 @@ import {
   SUBJECT_HOOKS,
 } from "../src/game/effects/types";
 import { CONTENT_TAGS, SCHOOL_TAGS, isContentTag } from "../src/data/tags";
+import { STATUS_KEYS } from "../src/game/battle/statuses";
 import { moduleTags } from "../src/data/modules/types";
 import { calibrationIssues } from "../src/game/puzzles/difficulty";
 import { PUZZLE_CODEX, rewardFor } from "../src/game/puzzles/stakes";
@@ -120,6 +131,7 @@ import type { GoalSpec } from "../src/game/run/goals";
 import type { EventOption, Outcome } from "../src/types/events";
 import {
   INTENT_KINDS,
+  SUBSYSTEM_AURAS,
   claimKey,
   intentsOfStep,
   isFlatPattern,
@@ -195,6 +207,16 @@ const resolveContentKey = (key: string): boolean => {
   const [ns, path] = key.split(":");
   if (ns !== "content" || path === undefined) return true;
   return resolveIn(content, path);
+};
+
+const stringAt = (root: ContentNode, path: string): string | undefined => {
+  let node: ContentNode | undefined = root;
+  for (const seg of path.split(".")) {
+    if (typeof node !== "object" || node === null) return undefined;
+    node = node[seg];
+    if (node === undefined) return undefined;
+  }
+  return typeof node === "string" ? node : undefined;
 };
 
 const resolveMetaKey = (path: string): boolean =>
@@ -520,9 +542,45 @@ for (const enemy of ALL_ENEMIES) {
     errors.push(`enemies: "${enemy.id}" is in no sector pool and nothing summons it`);
 }
 
+const battleRoot = enBattle as unknown as ContentNode;
+const needsBattleKey = (owner: string, path: string): void => {
+  if (!resolveIn(battleRoot, path)) {
+    errors.push(`${owner}: missing en battle key "${path}"`);
+  }
+};
+
+for (const kind of INTENT_KINDS) {
+  needsBattleKey("intents", `intent.${kind}`);
+  needsBattleKey("intents", `intentWhy.${kind}`);
+}
+for (const aura of SUBSYSTEM_AURAS) {
+  needsBattleKey("subsystems", `aura.${aura}`);
+}
+for (const status of STATUS_KEYS) {
+  needsBattleKey("statuses", `status.${status}`);
+  needsBattleKey("statuses", `statusName.${status}`);
+  needsBattleKey("statuses", `statusDesc.${status}`);
+}
+for (const tag of CONTENT_TAGS) {
+  if (!resolveIn(enRun as unknown as ContentNode, `tagDesc.${tag}`)) {
+    errors.push(`tags: missing en run key "tagDesc.${tag}"`);
+  }
+}
+const usedAuras = new Set(
+  ALL_ENEMIES.flatMap((def) => (def.subsystems ?? []).map((sub) => sub.aura)),
+);
+for (const aura of usedAuras) {
+  if (!SUBSYSTEM_AURAS.includes(aura)) {
+    errors.push(`subsystems: aura "${aura}" is not in SUBSYSTEM_AURAS`);
+  }
+}
+
 for (const ship of SHIPS) {
   checkLocKey(`ships.${ship.id}`, ship.name);
+  checkLocKey(`ships.${ship.id}`, ship.passiveName);
+  checkLocKey(`ships.${ship.id}`, ship.passiveDesc);
 }
+errors.push(...shipTextIssues(SHIPS));
 
 checkUniqueIds(
   "chart",
@@ -1034,6 +1092,11 @@ for (const entry of CODEX) {
   checkLocKey(`codex.${entry.id}`, entry.body);
 }
 
+const survivesEnemyTurn = (goal: PuzzleGoal): boolean => {
+  const inner = goal.g === "deduction" ? goal.inner : goal;
+  return inner.g === "survive" || inner.g === "survivePlus";
+};
+
 for (const puzzle of PUZZLES) {
   checkLocKey(`puzzle.${puzzle.id}`, puzzle.title);
   checkLocKey(`puzzle.${puzzle.id}`, puzzle.goalText);
@@ -1057,6 +1120,10 @@ for (const puzzle of PUZZLES) {
     );
   if (puzzle.locks !== undefined && puzzle.locks >= puzzle.deck.length)
     errors.push(`puzzles: "${puzzle.id}" locks its whole deck out of turn 1`);
+  if (survivesEnemyTurn(puzzle.goal) && puzzle.slots.includes("engines"))
+    errors.push(
+      `puzzles: "${puzzle.id}" survives an enemy turn and may not offer the engines slot — evasion is a roll`,
+    );
   if (puzzle.goal.g === "deduction") {
     if (puzzle.fixedRoll === undefined)
       errors.push(`puzzles: "${puzzle.id}" is a deduction puzzle without a fixedRoll`);
@@ -1281,6 +1348,44 @@ for (let n = 1; n <= 100; n += 1) {
   if (!fateCovered.has(n)) errors.push(`fate: roll ${String(n)} has no outcome`);
 }
 
+checkUniqueIds(
+  "systemsCheck",
+  SYSTEMS_CHECK.map((step) => step.id),
+);
+const CHECK_UIDS = new Set(
+  CHECK_DECK.map((_, index) => `die-${String(index)}`),
+);
+const WANDERER_SLOTS = new Set(
+  Object.keys(SHIPS.find((ship) => ship.id === "wanderer")?.slots ?? {}),
+);
+for (const step of SYSTEMS_CHECK) {
+  checkLocKey(`check.${step.id}`, step.sayKey);
+  if (step.failKey !== null) checkLocKey(`check.${step.id}`, step.failKey);
+  if (step.moves === null) continue;
+  if (step.moves.length === 0)
+    errors.push(`systemsCheck ${step.id}: empty move list`);
+  const seenSlots = new Set<string>();
+  const seenDice = new Set<string>();
+  for (const mv of step.moves) {
+    if (!CHECK_UIDS.has(mv.uid))
+      errors.push(`systemsCheck ${step.id}: no die "${mv.uid}" in the check deck`);
+    if (!WANDERER_SLOTS.has(mv.slot))
+      errors.push(`systemsCheck ${step.id}: the wanderer has no slot "${mv.slot}"`);
+    if (seenSlots.has(mv.slot))
+      errors.push(`systemsCheck ${step.id}: slot "${mv.slot}" is claimed twice`);
+    if (seenDice.has(mv.uid))
+      errors.push(`systemsCheck ${step.id}: die "${mv.uid}" is placed twice`);
+    seenSlots.add(mv.slot);
+    seenDice.add(mv.uid);
+  }
+  if (step.fixedRoll !== null && step.fixedRoll.length !== CHECK_DECK.length)
+    errors.push(`systemsCheck ${step.id}: fixed roll does not cover the deck`);
+}
+for (const beat of PROLOGUE_BEATS) {
+  checkLocKey(`prologue.${beat.id}`, beat.cta);
+  for (const line of beat.lines) checkLocKey(`prologue.${beat.id}`, line.text);
+}
+
 for (const f of FRAGMENTS) checkLocKey(`fragment.${f.id}`, f.text);
 for (const k of KEEPER_LINES) checkLocKey(`keeper.${k.id}`, k.text);
 
@@ -1392,9 +1497,11 @@ for (const def of CONTRACTS) {
   }
 }
 
-const ACHIEVEMENT_COUNT = 32;
+const ACHIEVEMENT_COUNT = 93;
 const ACHIEVEMENT_GATES = 8;
 const ACHIEVEMENT_FLAG_READERS = 6;
+const ACHIEVEMENT_FAMILY_TARGET = 20;
+const ACHIEVEMENT_LOCALES = ["en", "uk", "ru", "de", "es", "fr", "pl"] as const;
 
 checkUniqueIds(
   "achievements",
@@ -1403,6 +1510,19 @@ checkUniqueIds(
 if (ACHIEVEMENTS.length !== ACHIEVEMENT_COUNT) {
   errors.push(
     `achievements: expected exactly ${String(ACHIEVEMENT_COUNT)}, found ${String(ACHIEVEMENTS.length)}`,
+  );
+}
+if (ACHIEVEMENT_FAMILIES.length < ACHIEVEMENT_FAMILY_TARGET) {
+  errors.push(
+    `achievements: only ${String(ACHIEVEMENT_FAMILIES.length)} families, need ${String(ACHIEVEMENT_FAMILY_TARGET)}`,
+  );
+}
+const rowMembers = ACHIEVEMENT_ROWS.flatMap((row) =>
+  row.kind === "family" ? row.tiers.map((tier) => tier.id) : [row.def.id],
+);
+if (rowMembers.length !== ACHIEVEMENTS.length) {
+  errors.push(
+    `achievements: rows cover ${String(rowMembers.length)} of ${String(ACHIEVEMENTS.length)} definitions`,
   );
 }
 const gatingAchievements = ACHIEVEMENTS.filter(
@@ -1419,11 +1539,89 @@ if (flagAchievements.length < ACHIEVEMENT_FLAG_READERS) {
     `achievements: only ${String(flagAchievements.length)} read flagsArchive, need ${String(ACHIEVEMENT_FLAG_READERS)}`,
   );
 }
+const localeMeta = new Map<string, ContentNode>();
+for (const locale of ACHIEVEMENT_LOCALES) {
+  const path = join(process.cwd(), "src", "i18n", locale, "meta.json");
+  if (!existsSync(path)) {
+    errors.push(`achievements: locale "${locale}" has no meta.json`);
+    continue;
+  }
+  try {
+    localeMeta.set(locale, JSON.parse(readFileSync(path, "utf8")) as ContentNode);
+  } catch {
+    errors.push(`achievements: locale "${locale}" meta.json is not valid JSON`);
+  }
+}
+const checkAchievementText = (owner: string, name: string, desc: string): void => {
+  for (const [locale, root] of localeMeta) {
+    if (!resolveIn(root, name.replace("meta:", "")))
+      errors.push(`achievements: "${owner}" has no ${locale} name`);
+    if (!resolveIn(root, desc.replace("meta:", "")))
+      errors.push(`achievements: "${owner}" has no ${locale} desc`);
+  }
+};
+for (const family of ACHIEVEMENT_FAMILIES) {
+  checkAchievementText(family.id, family.name, family.desc);
+  if (family.tiers.length < 2)
+    errors.push(`achievements: family "${family.id}" needs at least two tiers`);
+  let lastNeed = -Infinity;
+  let lastShards = -Infinity;
+  family.tiers.forEach((tier, index) => {
+    const last = index === family.tiers.length - 1;
+    if (tier.need <= lastNeed) {
+      errors.push(
+        `achievements: family "${family.id}" tier ${String(index + 1)} does not raise the bar`,
+      );
+    }
+    if (tier.shards < lastShards) {
+      errors.push(
+        `achievements: family "${family.id}" tier ${String(index + 1)} pays less than the tier below`,
+      );
+    }
+    lastNeed = tier.need;
+    lastShards = tier.shards;
+    if (tier.legendary === true && !last) {
+      errors.push(
+        `achievements: family "${family.id}" marks a non-final tier legendary`,
+      );
+    }
+    if (tier.voucher !== undefined && tier.legendary !== true) {
+      errors.push(
+        `achievements: family "${family.id}" tier ${String(index + 1)} pays a voucher without a legendary tier`,
+      );
+    }
+    if (tier.voucher !== undefined && (tier.altShards ?? 0) <= 0) {
+      errors.push(
+        `achievements: family "${family.id}" offers a voucher with no shard alternative`,
+      );
+    }
+  });
+  const enRoot = localeMeta.get("en");
+  const enDesc =
+    enRoot === undefined
+      ? undefined
+      : stringAt(enRoot, family.desc.replace("meta:", ""));
+  if (enDesc !== undefined && !enDesc.includes("{{n}}")) {
+    errors.push(
+      `achievements: family "${family.id}" desc never states its tier target`,
+    );
+  }
+}
+for (const single of SINGLE_ACHIEVEMENTS) {
+  checkAchievementText(single.id, single.name, single.desc);
+  if (single.reward?.voucher !== undefined) {
+    errors.push(`achievements: single "${single.id}" pays a voucher`);
+  }
+}
+for (const [oldId, newId] of Object.entries(ACHIEVEMENT_ALIASES)) {
+  if (!ACHIEVEMENT_BY_ID.has(newId)) {
+    errors.push(`achievements: alias "${oldId}" points at unknown "${newId}"`);
+  }
+  if (ACHIEVEMENT_BY_ID.has(oldId)) {
+    errors.push(`achievements: alias "${oldId}" shadows a live achievement`);
+  }
+}
 for (const def of ACHIEVEMENTS) {
-  if (!resolveMetaKey(def.name.replace("meta:", "")))
-    errors.push(`achievements: "${def.id}" has no en name`);
-  if (!resolveMetaKey(def.desc.replace("meta:", "")))
-    errors.push(`achievements: "${def.id}" has no en desc`);
   const reward = def.reward;
   if (reward?.unlockId !== undefined && !UNLOCK_BY_ID.has(reward.unlockId)) {
     errors.push(
@@ -1433,8 +1631,16 @@ for (const def of ACHIEVEMENTS) {
   if (reward?.badge !== undefined && !BADGE_BY_ID.has(reward.badge)) {
     errors.push(`achievements: "${def.id}" rewards unknown badge "${reward.badge}"`);
   }
-  if (reward !== undefined && reward.shards === undefined && reward.unlockId === undefined && reward.badge === undefined) {
+  if (
+    reward !== undefined &&
+    reward.shards === undefined &&
+    reward.unlockId === undefined &&
+    reward.badge === undefined
+  ) {
     errors.push(`achievements: "${def.id}" declares an empty reward`);
+  }
+  if (reward?.voucher !== undefined && def.legendary !== true) {
+    errors.push(`achievements: "${def.id}" pays a voucher without legendary rank`);
   }
 }
 for (const group of ACHIEVEMENT_GROUPS) {
@@ -1690,6 +1896,8 @@ for (const def of ENGRAVINGS) {
 
 for (const die of ALL_DICE) {
   if (die.desc === undefined) errors.push(`dice: "${die.id}" has no diceDesc`);
+  checkLocKey(`dice.${die.id}`, die.name);
+  checkLocKey(`dice.${die.id}`, die.desc);
   for (const tag of die.tags ?? []) {
     if (tag === die.school) {
       errors.push(`dice: "${die.id}" repeats its own school in tags`);
@@ -1855,15 +2063,14 @@ const REVISION_3_TOTALS: readonly TotalsRow[] = [
     label: "barkLines",
     have: barkLines,
     target: 220,
-    shortfall:
-      "the 150->220 budget was handed from R6 to R7 and never entered R7's Definition of Done, so no phase ever owned it; the 63 missing lines are trigger coverage for the R3-R9 systems (puzzle tier, interference, detour, storm, inversion, banish, achievement, chain step) and are an R7 amendment, not an R11 tuning number",
+    shortfall: `the 150->220 budget was handed from R6 to R7 and never entered R7's Definition of Done, so no phase ever owned it; the ${String(220 - barkLines)} missing lines are trigger coverage for the R3-R9 systems (puzzle tier, interference, detour, storm, inversion, banish, achievement, chain step) and are an R7 amendment, not an R11 tuning number`,
   },
   { label: "keeperLines", have: KEEPER_LINES.length, target: 80 },
   { label: "memories", have: MEMORIES.length, target: 16 },
   { label: "fragments", have: FRAGMENTS.length, target: 100 },
   { label: "epilogue", have: EPILOGUE_ENTRIES.length, target: EPILOGUE_TARGET },
   { label: "contracts", have: CONTRACTS.length, target: 20 },
-  { label: "achievements", have: ACHIEVEMENTS.length, target: 30 },
+  { label: "achievements", have: ACHIEVEMENTS.length, target: 70 },
   { label: "unlocks", have: UNLOCKS.length, target: 24 },
 ];
 

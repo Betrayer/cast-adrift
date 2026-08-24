@@ -14,6 +14,7 @@ export type StreamLabel =
   | "events"
   | "shop"
   | "fate"
+  | "defense"
   | "vfx";
 
 export type RngStreams = Record<StreamLabel, RngStream>;
@@ -25,6 +26,7 @@ const STREAM_LABELS: readonly StreamLabel[] = [
   "events",
   "shop",
   "fate",
+  "defense",
   "vfx",
 ];
 

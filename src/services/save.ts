@@ -1,19 +1,25 @@
+import { now } from '@/services/clock';
+import {
+  createMemoryStorage,
+  deviceStorage,
+  scopedKey,
+  type KeyValueStorage,
+} from '@/services/profile';
 import { fnv1a } from '@/services/rng';
 import type { RunSnapshot } from '@/types';
 
-export interface KeyValueStorage {
-  getItem: (key: string) => string | null;
-  setItem: (key: string, value: string) => void;
-  removeItem: (key: string) => void;
-}
+export type { KeyValueStorage };
+export { createMemoryStorage };
 
 export type RunMigration = (data: unknown) => unknown;
 
 export const RUN_SAVE_V = 1;
 
-const KEY_A = 'ca.run.a';
-const KEY_B = 'ca.run.b';
-const KEY_PTR = 'ca.run.ptr';
+export type SlotKey = 'run.a' | 'run.b' | 'run.ptr';
+
+export type KeyResolver = (suffix: SlotKey) => string;
+
+const unscoped: KeyResolver = (suffix) => `ca.${suffix}`;
 
 interface SavePayload {
   v: number;
@@ -32,24 +38,12 @@ export interface SaveService {
   pullCloudSnapshot: () => Promise<RunSnapshot | null>;
 }
 
-export const createMemoryStorage = (): KeyValueStorage => {
-  const store = new Map<string, string>();
-  return {
-    getItem: (key) => store.get(key) ?? null,
-    setItem: (key, value) => {
-      store.set(key, value);
-    },
-    removeItem: (key) => {
-      store.delete(key);
-    },
-  };
-};
-
 const runMigrations: Partial<Record<number, RunMigration>> = {};
 
 export const createSaveService = (
   storage: KeyValueStorage,
   migrations: Partial<Record<number, RunMigration>> = runMigrations,
+  keyOf: KeyResolver = unscoped,
 ): SaveService => {
   const readPayload = (key: string): SavePayload | null => {
     const raw = storage.getItem(key);
@@ -97,15 +91,18 @@ export const createSaveService = (
   };
 
   const activeKey = (): string =>
-    storage.getItem(KEY_PTR) === 'b' ? KEY_B : KEY_A;
+    storage.getItem(keyOf('run.ptr')) === 'b'
+      ? keyOf('run.b')
+      : keyOf('run.a');
 
-  const inactiveKey = (): string => (activeKey() === KEY_A ? KEY_B : KEY_A);
+  const inactiveKey = (): string =>
+    activeKey() === keyOf('run.a') ? keyOf('run.b') : keyOf('run.a');
 
   const saveRunSnapshot = (snapshot: RunSnapshot): void => {
     const data = JSON.stringify(snapshot);
     const payload: SavePayload = {
       v: RUN_SAVE_V,
-      savedAt: Date.now(),
+      savedAt: now(),
       checksum: fnv1a(data),
       data,
     };
@@ -115,7 +112,7 @@ export const createSaveService = (
     if (verified === null || verified.data !== data) {
       throw new Error('save: write verification failed, pointer not flipped');
     }
-    storage.setItem(KEY_PTR, target === KEY_B ? 'b' : 'a');
+    storage.setItem(keyOf('run.ptr'), target === keyOf('run.b') ? 'b' : 'a');
   };
 
   const loadRunSnapshot = (): RunSnapshot | null => {
@@ -139,9 +136,9 @@ export const createSaveService = (
   const hasRun = (): boolean => loadRunSnapshot() !== null;
 
   const clearRun = (): void => {
-    storage.removeItem(KEY_A);
-    storage.removeItem(KEY_B);
-    storage.removeItem(KEY_PTR);
+    storage.removeItem(keyOf('run.a'));
+    storage.removeItem(keyOf('run.b'));
+    storage.removeItem(keyOf('run.ptr'));
   };
 
   const pushCloudSnapshot = (): Promise<void> => Promise.resolve();
@@ -160,9 +157,6 @@ export const createSaveService = (
   };
 };
 
-const defaultStorage: KeyValueStorage =
-  typeof localStorage === 'undefined' ? createMemoryStorage() : localStorage;
-
 export const {
   saveRunSnapshot,
   loadRunSnapshot,
@@ -171,4 +165,4 @@ export const {
   clearRun,
   pushCloudSnapshot,
   pullCloudSnapshot,
-} = createSaveService(defaultStorage);
+} = createSaveService(deviceStorage, runMigrations, scopedKey);

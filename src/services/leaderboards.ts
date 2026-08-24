@@ -26,7 +26,22 @@ export interface BoardEntry {
   hash?: number;
   state?: DailyState;
   flagged?: boolean;
+  superseded?: boolean;
 }
+
+export interface OwnBoards {
+  driftBest: number;
+  driftWeek: string | null;
+  dailyDates: readonly string[];
+}
+
+export const ownBoardIds = (own: OwnBoards): string[] => {
+  const boards: string[] = [];
+  if (own.driftBest > 0) boards.push(DRIFT_ALLTIME_BOARD);
+  if (own.driftWeek !== null) boards.push(driftWeeklyBoardId(own.driftWeek));
+  for (const date of own.dailyDates) boards.push(dailyBoardId(date));
+  return boards;
+};
 
 export interface RankedEntry extends BoardEntry {
   rank: number;
@@ -37,6 +52,14 @@ export interface AroundMe {
   rank: number | null;
   rows: RankedEntry[];
 }
+
+let reachable = true;
+
+export const boardsReachable = (): boolean => reachable;
+
+const markReachable = (ok: boolean): void => {
+  reachable = ok;
+};
 
 export const boardKind = (board: string): BoardKind =>
   board.startsWith("daily-")
@@ -72,6 +95,7 @@ export const entryValid = (entry: BoardEntry): boolean =>
   entry.ship.length > 0;
 
 export const entryHidden = (entry: BoardEntry, board: string): boolean => {
+  if (entry.superseded === true) return true;
   if (entry.flagged === true) return true;
   if (boardKind(board) === "daily" && entry.state === "started") return true;
   return !plausibility({
@@ -84,12 +108,15 @@ export const entryHidden = (entry: BoardEntry, board: string): boolean => {
   }).ok;
 };
 
+export const liveEntries = (entries: readonly BoardEntry[]): BoardEntry[] =>
+  entries.filter((e) => e.superseded !== true);
+
 export const visibleEntries = (
   entries: readonly BoardEntry[],
   board: string,
   showFlagged: boolean,
 ): BoardEntry[] =>
-  showFlagged ? [...entries] : entries.filter((e) => !entryHidden(e, board));
+  liveEntries(entries).filter((e) => showFlagged || !entryHidden(e, board));
 
 export const rankEntries = (
   entries: readonly BoardEntry[],
@@ -136,6 +163,7 @@ const parseEntry = (uid: string, data: Record<string, unknown>): BoardEntry => (
     ? { state: data.state }
     : {}),
   ...(data.flagged === true ? { flagged: true } : {}),
+  ...(data.superseded === true ? { superseded: true } : {}),
 });
 
 export const submit = async (
@@ -181,11 +209,42 @@ export const top = async (
         limit(limitTo),
       ),
     );
-    return snapshot.docs.map((d) => parseEntry(d.id, d.data()));
+    markReachable(true);
+    return liveEntries(snapshot.docs.map((d) => parseEntry(d.id, d.data())));
   } catch (error) {
+    markReachable(false);
     console.warn("leaderboards: top failed", error);
     return [];
   }
+};
+
+export const markSuperseded = async (
+  board: string,
+  uid: string,
+): Promise<boolean> => {
+  try {
+    const { db } = await import("@/services/firebase");
+    const { doc, getDoc, setDoc } = await import("firebase/firestore");
+    const ref = doc(db(), "leaderboards", board, "entries", uid);
+    const snapshot = await getDoc(ref);
+    if (!snapshot.exists()) return false;
+    if (snapshot.data().superseded === true) return false;
+    await setDoc(ref, { superseded: true }, { merge: true });
+    return true;
+  } catch (error) {
+    console.warn("leaderboards: supersede failed", error);
+    return false;
+  }
+};
+
+export const supersedeOwnRows = async (
+  uid: string,
+  boards: readonly string[],
+): Promise<number> => {
+  const flipped = await Promise.all(
+    boards.map((board) => markSuperseded(board, uid)),
+  );
+  return flipped.filter(Boolean).length;
 };
 
 export const myEntry = async (
@@ -212,7 +271,7 @@ export const aroundMe = async (
 ): Promise<AroundMe> => {
   try {
     const mine = await myEntry(board, uid);
-    if (mine === null) return { rank: null, rows: [] };
+    if (mine === null || mine.superseded === true) return { rank: null, rows: [] };
     const { db } = await import("@/services/firebase");
     const {
       collection,
@@ -246,14 +305,19 @@ export const aroundMe = async (
         ),
       ),
     ]);
+    const aboveRows = liveEntries(
+      above.docs.map((d) => parseEntry(d.id, d.data())),
+    );
     const rows = [
-      ...above.docs.map((d) => parseEntry(d.id, d.data())),
+      ...aboveRows,
       mine,
-      ...below.docs.map((d) => parseEntry(d.id, d.data())),
+      ...liveEntries(below.docs.map((d) => parseEntry(d.id, d.data()))),
     ];
-    const firstRank = Math.max(1, rank - above.docs.length);
+    const firstRank = Math.max(1, rank - aboveRows.length);
+    markReachable(true);
     return { rank, rows: rankEntries(rows, uid, firstRank) };
   } catch (error) {
+    markReachable(false);
     console.warn("leaderboards: aroundMe failed", error);
     return { rank: null, rows: [] };
   }

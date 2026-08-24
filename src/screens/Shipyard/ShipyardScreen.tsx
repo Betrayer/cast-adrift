@@ -10,17 +10,23 @@ import {
 import { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
+import { DieCard } from "@/components/DieCard";
+import { TapPopover } from "@/components/TapPopover";
 import { DIE_BY_ID } from "@/data/dice";
 import { fusionTarget } from "@/data/dice/fusion";
 import { SHIP_BY_ID } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
-import { FUSION_COST, mkUpgradeCost } from "@/game/economy/prices";
+import { FUSION_COST, MK_TOP, mkUpgradeCost } from "@/game/economy/prices";
+import { noteFusion, noteMkTop } from "@/game/meta/counters";
+import { useBackGuard } from "@/app/backGuard";
 import { autosaveRun, completeNode } from "@/game/run/flow";
 import { playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { createStream, deriveSeed } from "@/services/rng";
+import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
 import styles from "./ShipyardScreen.module.css";
@@ -38,6 +44,7 @@ export const ShipyardScreen = () => {
   const seed = useRunStore((s) => s.seed);
   const position = useRunStore((s) => s.position);
   const flags = useRunStore((s) => s.flags);
+  const engravings = useMetaStore((s) => s.engravings);
   const [repair, setRepair] = useState(0);
   const [swept, setSwept] = useState<{ slotId: SlotId; key: number } | null>(
     null,
@@ -70,6 +77,7 @@ export const ShipyardScreen = () => {
   const maxRepair = Math.min(hullMax - hull, Math.floor(scrap / 2));
 
   const markUpgraded = (slotId: SlotId): void => {
+    if ((useRunStore.getState().mkLevels[slotId] ?? 1) >= MK_TOP) noteMkTop();
     playSfx("buy");
     playSfx("mkSweep");
     haptic("purchase");
@@ -110,8 +118,15 @@ export const ShipyardScreen = () => {
     state.removeDie(first.uid);
     state.removeDie(second.uid);
     state.addDie(target);
+    noteFusion();
     autosaveRun();
   };
+
+  const leave = (): void => {
+    completeNode({ outcome: "cleared" });
+  };
+
+  useBackGuard("shipyard", leave);
 
   const doRepair = (): void => {
     const state = useRunStore.getState();
@@ -125,33 +140,32 @@ export const ShipyardScreen = () => {
   return (
     <Screen
       width="wide"
+      header={
+        <AppHeader
+          actions={
+            <>
+              <Text size="sm" c={tokens.amber}>
+                {t("run:shipyard.scrap", { n: scrap })}
+              </Text>
+              <Text size="sm" c={tokens.dim}>
+                {t("run:shipyard.hull", { cur: hull, max: hullMax })}
+              </Text>
+            </>
+          }
+        />
+      }
       footer={
         <Button
           size="md"
           fullWidth
-          onClick={() => {
-            completeNode({ outcome: "cleared" });
-          }}
+          data-testid="shipyard-leave"
+          onClick={leave}
         >
           {t("run:shipyard.leave")}
         </Button>
       }
     >
       <Stack gap="sm">
-      <Group justify="space-between">
-        <Text fw={600} c={tokens.text}>
-          {t("run:shipyard.title")}
-        </Text>
-        <Group gap="xs">
-          <Text size="sm" c={tokens.amber}>
-            {t("run:shipyard.scrap", { n: scrap })}
-          </Text>
-          <Text size="sm" c={tokens.dim}>
-            {t("run:shipyard.hull", { cur: hull, max: hullMax })}
-          </Text>
-        </Group>
-      </Group>
-
       <Text size="xs" c={tokens.dim} fs="italic">
         {t(greeting.text)}
       </Text>
@@ -186,12 +200,22 @@ export const ShipyardScreen = () => {
                     <Text size="sm" c={tokens.text}>
                       {t(`battle:slot.${slotId}`)}
                     </Text>
-                    <Text size="xs" c={tokens.faint}>
-                      {t("battle:slot.cap", {
+                    <TapPopover
+                      label={t("battle:slot.cap", {
                         cap: slotCapForMk(slotId, mk),
                         mk,
                       })}
-                    </Text>
+                      testId={`shipyard-mk-${slotId}`}
+                      align="start"
+                      content={t("battle:mkWhy")}
+                    >
+                      <Text size="xs" c={tokens.faint}>
+                        {t("battle:slot.cap", {
+                          cap: slotCapForMk(slotId, mk),
+                          mk,
+                        })}
+                      </Text>
+                    </TapPopover>
                   </Stack>
                   <Group gap={6} wrap="nowrap">
                     {vouchers > 0 && !maxed ? (
@@ -230,24 +254,38 @@ export const ShipyardScreen = () => {
           {t("run:shipyard.fusionHint")}
         </Text>
       ) : (
-        <Group gap="xs">
+        <Group gap="sm" align="stretch" wrap="wrap">
           {fusable.map(([defId]) => {
             const def = DIE_BY_ID.get(defId);
             const target = fusionTarget(defId);
-            const targetDef = target ? DIE_BY_ID.get(target) : undefined;
+            const targetDef = target === undefined ? undefined : DIE_BY_ID.get(target);
             if (def === undefined || targetDef === undefined) return null;
             return (
-              <Button
+              <Paper
                 key={defId}
-                size="compact-sm"
-                variant="light"
-                disabled={scrap < FUSION_COST}
-                onClick={() => {
-                  fuse(defId);
-                }}
+                bg={tokens.surface1}
+                p="xs"
+                radius="md"
+                withBorder
+                className={styles.fusePair}
+                data-fusion-pair={defId}
               >
-                {`${t(def.name)} → ${t(targetDef.name)} (${String(FUSION_COST)})`}
-              </Button>
+                <DieCard defId={defId} engravings={engravings} />
+                <span className={styles.fuseArrow}>→</span>
+                <DieCard defId={targetDef.id} engravings={engravings} />
+                <Button
+                  size="compact-sm"
+                  variant="light"
+                  fullWidth
+                  disabled={scrap < FUSION_COST}
+                  data-testid={`fuse-${defId}`}
+                  onClick={() => {
+                    fuse(defId);
+                  }}
+                >
+                  {t("run:shipyard.fuse", { n: FUSION_COST })}
+                </Button>
+              </Paper>
             );
           })}
         </Group>

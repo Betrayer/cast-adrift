@@ -5,6 +5,9 @@ export type UnlockKind = "diceWave" | "contractWave" | "cosmetic" | "feature";
 export type FeatureId =
   | "shipRam"
   | "shipArk"
+  | "shipCorsair"
+  | "shipFoundry"
+  | "shipPrism"
   | "engravingStation"
   | "dailyPreview"
   | "freeRespec"
@@ -160,21 +163,21 @@ export const UNLOCKS: readonly UnlockDef[] = [
     id: "diceAchPuzzler",
     kind: "diceWave",
     label: "meta:unlock.diceAchPuzzler",
-    source: { achievement: "tierFive" },
+    source: { achievement: "tierFive-1" },
     dice: ["fused-railslug", "fused-rampart", "fused-bloom", "fused-keel"],
   },
   {
     id: "diceAchCollector",
     kind: "diceWave",
     label: "meta:unlock.diceAchCollector",
-    source: { achievement: "fiftyFound" },
+    source: { achievement: "fiftyFound-2" },
     dice: ["fused-pyroclast", "fused-glacier", "fused-tendril"],
   },
   {
     id: "diceAchSurvivor",
     kind: "diceWave",
     label: "meta:unlock.diceAchSurvivor",
-    source: { achievement: "ironStreak" },
+    source: { achievement: "deathless-2" },
     dice: ["eclipse", "seedpod", "fused-windfall"],
   },
   {
@@ -216,7 +219,7 @@ export const UNLOCKS: readonly UnlockDef[] = [
     id: "contractsAchGauntlet",
     kind: "contractWave",
     label: "meta:unlock.contractsAchGauntlet",
-    source: { achievement: "eliteHunter" },
+    source: { achievement: "eliteHunt-2" },
     contracts: ["gauntlet"],
   },
   {
@@ -274,6 +277,27 @@ export const UNLOCKS: readonly UnlockDef[] = [
     label: "meta:unlock.featureShipArk",
     source: { level: 25 },
     feature: "shipArk",
+  },
+  {
+    id: "featureShipCorsair",
+    kind: "feature",
+    label: "meta:unlock.featureShipCorsair",
+    source: { level: 35 },
+    feature: "shipCorsair",
+  },
+  {
+    id: "featureShipFoundry",
+    kind: "feature",
+    label: "meta:unlock.featureShipFoundry",
+    source: { level: 40 },
+    feature: "shipFoundry",
+  },
+  {
+    id: "featureShipPrism",
+    kind: "feature",
+    label: "meta:unlock.featureShipPrism",
+    source: { achievement: "spectrumClear" },
+    feature: "shipPrism",
   },
   {
     id: "featureEngraving",

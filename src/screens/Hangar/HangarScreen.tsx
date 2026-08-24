@@ -7,6 +7,7 @@ import {
   Progress,
   SegmentedControl,
   Select,
+  SimpleGrid,
   Stack,
   Text,
 } from "@mantine/core";
@@ -14,15 +15,26 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { trackEvent } from "@/services/analytics";
 import { Screen } from "@/app/Screen";
+import { DIE_LIST_COLUMNS, SHIP_COLUMNS } from "@/app/grids";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
+import { DieCardTrigger } from "@/components/DieCardModal";
+import { DieFilterChips } from "@/components/DieFilterChips";
+import { ShipCard } from "@/components/ShipCard";
+import { fireMotionFlag, riseStyle, SWEEP_MS } from "@/app/motion";
 import { ALL_DICE, DIE_BY_ID } from "@/data/dice";
+import { dieHasFeature, type DieFeature } from "@/game/dice/card";
 import { schools } from "@/data/schools";
 import { PLAYABLE_SHIPS } from "@/data/ships";
 import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
 import { unlockedDice } from "@/data/unlocks";
 import { hubBudgetBonus } from "@/game/chart/engine";
 import { validateDeck } from "@/game/meta/deck";
-import { dieRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
+import {
+  dieRoutes,
+  featureRoutes,
+  unlockHintsLine,
+} from "@/game/meta/describeUnlock";
 import {
   dieShopPrice,
   freshDiceIds,
@@ -34,6 +46,7 @@ import { hasFeature } from "@/data/unlocks";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import type { DieItemDef, Rarity, School } from "@/types/content";
+import styles from "./HangarScreen.module.css";
 
 const SCHOOLS: readonly (School | "all")[] = [
   "all",
@@ -57,7 +70,7 @@ const dieLabel = (def: DieItemDef, t: (k: string) => string): string =>
   `${t(def.name)} · d${String(def.tier)}`;
 
 export const HangarScreen = () => {
-  const { t } = useTranslation(["meta", "common", "content"]);
+  const { t } = useTranslation(["meta", "common", "content", "battle"]);
   const go = useAppStore((s) => s.go);
   const savedDeck = useMetaStore((s) => s.hangar.deck);
   const collection = useMetaStore((s) => s.collection);
@@ -71,6 +84,7 @@ export const HangarScreen = () => {
   const ascension = useMetaStore((s) => s.ascension);
   const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
   const unlocksSeen = useMetaStore((s) => s.unlocksSeen);
+  const engravings = useMetaStore((s) => s.engravings);
   const stats = useMetaStore((s) => s.stats);
   const setDeck = useMetaStore((s) => s.setDeck);
   const buyDie = useMetaStore((s) => s.buyDie);
@@ -103,6 +117,7 @@ export const HangarScreen = () => {
   const [draft, setDraft] = useState<string[]>([...savedDeck]);
   const [schoolFilter, setSchoolFilter] = useState<School | "all">("all");
   const [rarityFilter, setRarityFilter] = useState<Rarity | "all">("all");
+  const [featureFilter, setFeatureFilter] = useState<DieFeature | "all">("all");
 
   const budget = hangarBudget(level, hubBudgetBonus(chartPicks));
   const validation = useMemo(
@@ -130,6 +145,11 @@ export const HangarScreen = () => {
       if (def === undefined) return false;
       if (schoolFilter !== "all" && def.school !== schoolFilter) return false;
       if (rarityFilter !== "all" && def.rarity !== rarityFilter) return false;
+      if (
+        featureFilter !== "all" &&
+        !dieHasFeature(def.id, featureFilter, engravings)
+      )
+        return false;
       return true;
     });
 
@@ -152,55 +172,61 @@ export const HangarScreen = () => {
   const shopIds = filtered(ALL_DICE.map((d) => d.id));
 
   return (
-    <Screen>
-      <Stack gap="sm">
-      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-        <Group justify="space-between" mb="xs">
-          <Text fw={700} c={tokens.text}>
-            {t("meta:hangar.title")}
-          </Text>
-          <Group gap="xs">
+    <Screen
+      width="grid"
+      header={
+        <AppHeader
+          actions={
             <Badge variant="light" color="yellow">
               {shards} ◈
             </Badge>
-            <Button size="xs" variant="default" onClick={() => { go("menu"); }}>
-              {t("common:back")}
-            </Button>
-          </Group>
-        </Group>
-
-        <Group gap={6} mb="sm">
-          {PLAYABLE_SHIPS.map((ship) => {
+          }
+        />
+      }
+    >
+      <Stack gap="sm">
+      <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <SimpleGrid
+          cols={SHIP_COLUMNS}
+          spacing="xs"
+          mb="sm"
+          data-hangar-ships
+        >
+          {PLAYABLE_SHIPS.map((ship, index) => {
             const isOwned = ships.includes(ship.id);
             const equipped = selectedShip === ship.id;
             const unlocked =
-              ship.id === "wanderer" ||
-              hasFeature(
-                unlockCtx,
-                ship.id === "ram" ? "shipRam" : "shipArk",
-              );
+              ship.unlock === undefined || hasFeature(unlockCtx, ship.unlock);
             return (
-              <Paper
+              <div
                 key={ship.id}
-                p="xs"
-                radius="md"
-                withBorder
-                bg={equipped ? tokens.surface2 : tokens.bg}
-                style={{ flex: 1 }}
+                className={styles.shipCell}
+                data-rise
+                data-press
+                style={riseStyle(index)}
               >
-                <Stack gap={4} align="center">
-                  <Text size="sm" c={tokens.text}>
-                    {t(ship.name)}
-                  </Text>
-                  <Text size="xs" c={tokens.faint}>
-                    ♥ {ship.hullMax}
-                  </Text>
-                  {isOwned ? (
+              <ShipCard
+                shipId={ship.id}
+                showPrice={!isOwned}
+                className={equipped ? undefined : styles.shipDim}
+                footer={
+                  isOwned ? (
                     <Button
                       size="compact-xs"
+                      fullWidth
                       variant={equipped ? "filled" : "default"}
                       disabled={equipped}
-                      onClick={() => { selectShip(ship.id); }}
+                      data-testid={`hangar-ship-${ship.id}`}
+                      onClick={() => {
+                        selectShip(ship.id);
+                        fireMotionFlag(
+                          document.querySelector(
+                            `[data-ship-card="${ship.id}"]`,
+                          ),
+                          "data-sweep",
+                          SWEEP_MS,
+                        );
+                      }}
                     >
                       {equipped
                         ? t("meta:hangar.shipEquipped")
@@ -209,7 +235,9 @@ export const HangarScreen = () => {
                   ) : unlocked ? (
                     <Button
                       size="compact-xs"
+                      fullWidth
                       disabled={shards < ship.price}
+                      data-testid={`hangar-ship-${ship.id}`}
                       onClick={() => {
                         buyShip(ship.id, ship.price);
                         trackEvent({ name: "meta_purchase", params: { kind: "ship" } });
@@ -218,15 +246,26 @@ export const HangarScreen = () => {
                       {t("meta:hangar.shipBuy", { price: ship.price })}
                     </Button>
                   ) : (
-                    <Text size="xs" c={tokens.faint} ta="center">
-                      {t("meta:hangar.shipLocked", { level: ship.unlockLevel })}
+                    <Text
+                      size="xs"
+                      c={tokens.faint}
+                      ta="center"
+                      data-ship-locked={ship.id}
+                    >
+                      {t("meta:hangar.shipLocked", {
+                        route:
+                          ship.unlock === undefined
+                            ? ""
+                            : unlockHintsLine(featureRoutes(ship.unlock), t),
+                      })}
                     </Text>
-                  )}
-                </Stack>
-              </Paper>
+                  )
+                }
+              />
+              </div>
             );
           })}
-        </Group>
+        </SimpleGrid>
 
         <SegmentedControl
           fullWidth
@@ -271,7 +310,7 @@ export const HangarScreen = () => {
                   ? t("meta:hangar.invalidFate")
                   : t("meta:hangar.valid")}
         </Text>
-        <Group gap={4} mt="xs">
+        <Group gap={4} mt="xs" data-testid="hangar-draft">
           {draft.length === 0 ? (
             <Text size="xs" c={tokens.faint}>
               {t("meta:hangar.empty")}
@@ -323,12 +362,20 @@ export const HangarScreen = () => {
             onChange={(v) => { setRarityFilter((v as Rarity | "all") ?? "all"); }}
             data={RARITIES.map((r) => ({
               value: r,
-              label: r === "all" ? t("meta:hangar.filterAll") : r,
+              label:
+                r === "all"
+                  ? t("meta:hangar.filterAll")
+                  : t(`battle:die.rarity.${r}`),
             }))}
           />
         </Group>
-          <Stack gap={6}>
-            {(tab === "build" ? collectionIds : shopIds).map((id) => {
+        <DieFilterChips
+          value={featureFilter}
+          onChange={setFeatureFilter}
+          testId="hangar-feature-filter"
+        />
+          <SimpleGrid cols={DIE_LIST_COLUMNS} spacing={6} data-hangar-dice>
+            {(tab === "build" ? collectionIds : shopIds).map((id, index) => {
               const def = DIE_BY_ID.get(id);
               if (def === undefined) return null;
               const ownedCount = owned.get(id) ?? 0;
@@ -345,17 +392,25 @@ export const HangarScreen = () => {
                   py={4}
                   data-die-row={id}
                   data-die-locked={!isOpen && tab === "shop" ? "1" : undefined}
+                  data-rise
                   style={{
                     border: `1px solid ${tokens.line}`,
                     borderRadius: 8,
                     opacity: !isOpen && tab === "shop" ? 0.55 : 1,
+                    ...riseStyle(index),
                   }}
                 >
                   <Stack gap={0}>
                     <Group gap={4} wrap="nowrap">
-                      <Text size="sm" style={{ color: schools[def.school].text }}>
-                        {dieLabel(def, t)}
-                      </Text>
+                      <DieCardTrigger
+                        defId={id}
+                        engravings={engravings}
+                        testId={`hangar-card-${id}`}
+                      >
+                        <Text size="sm" style={{ color: schools[def.school].text }}>
+                          {dieLabel(def, t)}
+                        </Text>
+                      </DieCardTrigger>
                       {fresh.has(id) ? (
                         <Badge size="xs" color="accent" data-unlock-new>
                           {t("meta:unlock.new")}
@@ -363,7 +418,7 @@ export const HangarScreen = () => {
                       ) : null}
                     </Group>
                     <Text size="xs" c={tokens.faint}>
-                      {def.rarity} · {diePoints(id)} pts ·{" "}
+                      {t(`battle:die.rarity.${def.rarity}`)} · {diePoints(id)} pts ·{" "}
                       {t("meta:collection.owned", { n: ownedCount })}
                     </Text>
                     {tab === "shop" && !isOpen ? (
@@ -383,6 +438,7 @@ export const HangarScreen = () => {
                     <Button
                       size="compact-xs"
                       variant="default"
+                      data-testid={`hangar-add-${id}`}
                       disabled={usedCount >= ownedCount || draft.length >= 9}
                       onClick={() => { addToDeck(id); }}
                     >
@@ -404,12 +460,13 @@ export const HangarScreen = () => {
                 </Group>
               );
             })}
-          </Stack>
+          </SimpleGrid>
         <Divider my="xs" color={tokens.line} />
         <Group gap="xs" grow>
           <Button
             size="xs"
             variant="subtle"
+            data-testid="hangar-collection"
             onClick={() => { go("collection"); }}
           >
             {t("meta:collection.title")}
@@ -418,6 +475,7 @@ export const HangarScreen = () => {
             size="xs"
             variant="subtle"
             disabled={!hasFeature(unlockCtx, "engravingStation")}
+            data-testid="hangar-engraving"
             onClick={() => { go("engraving"); }}
           >
             {t("meta:engraving.title")}

@@ -1,9 +1,10 @@
 import { Badge, Button, Paper, RingProgress, Text, Title } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { ParticleRain } from "@/components/ParticleRain";
-import { emitBark } from "@/game/narrative";
+import { emitBark } from "@/game/narrative/barks";
+import { rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import styles from "./LevelUpCeremony.module.css";
@@ -36,27 +37,39 @@ export const LevelUpCeremony = ({
     playSfx("levelUp");
     duckMusic(2200);
     haptic("levelUp");
+    const clock = rafClock();
+    const tweens = new Tweens(clock);
     const cards = [...milestones, ...unlocks];
-    const timers = cards.map((_, index) =>
-      window.setTimeout(
-        () => {
+    tweens.channel(UI_GROUP).sequence([
+      { delay: CARD_DELAY_MS },
+      ...cards.map((_, index) => ({
+        ms: CARD_STAGGER_MS,
+        run: () => {
           playSfx("unlockCard", { rate: 1 + index * 0.06 });
         },
-        CARD_DELAY_MS + index * CARD_STAGGER_MS,
-      ),
-    );
+      })),
+    ]);
     return () => {
-      for (const id of timers) window.clearTimeout(id);
+      tweens.destroy();
+      clock.destroy();
     };
   }, [milestones, unlocks]);
 
   const cls = (name: string): string => (reduced ? "" : (styles[name] ?? ""));
+
+  const cardDelay = (index: number): CSSProperties | undefined =>
+    reduced
+      ? undefined
+      : {
+          animationDelay: `${String(CARD_DELAY_MS + index * CARD_STAGGER_MS)}ms`,
+        };
 
   return (
     <div className={`${styles.overlay ?? ""}`}>
       {reduced ? null : (
         <ParticleRain
           color={tokens.amber}
+          seedLabel="levelUpRain"
           className={styles.rain}
         />
       )}
@@ -89,6 +102,7 @@ export const LevelUpCeremony = ({
           radius="md"
           withBorder
           className={cls("card")}
+          style={cardDelay(i)}
           maw={320}
           w="100%"
           data-milestone-card
@@ -106,6 +120,7 @@ export const LevelUpCeremony = ({
           radius="md"
           withBorder
           className={cls("card")}
+          style={cardDelay(milestones.length + i)}
           maw={320}
           w="100%"
           data-unlock-card

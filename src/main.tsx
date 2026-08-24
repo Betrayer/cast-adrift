@@ -1,19 +1,31 @@
 import '@mantine/core/styles.css';
 import '@/app/global.css';
 import '@/app/zindex.css';
+import '@/app/transitions.css';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
 import { applyFontScale, applyMotion, applyTheme } from '@/app/theme';
 import { setupAutosave } from '@/game/run/autosave';
-import { bootCloud } from '@/game/run/cloud';
 import { initI18n } from '@/i18n';
-import { linkAccounts, readMetaDocFor, shouldAttemptLink } from '@/services/account-link';
+import {
+  beginIdentityHandover,
+  resolvePendingClaim,
+} from '@/services/account';
+import { shouldHandOver } from '@/services/account-link';
 import { trackSessionStart } from '@/services/analytics';
+import { authErrorCode, isSilentAuthError } from '@/services/authErrors';
 import { setupErrorReporting } from '@/services/errors';
-import { bootMetaSync, setupMetaSync } from '@/services/meta-sync';
+import { setupMetaSync } from '@/services/meta-sync';
+import { setupVignetteSync } from '@/services/vignetteSync';
+import { installBrowserNavHistory } from '@/services/nav-history';
+import {
+  awaitProfileReady,
+  bootProfileSync,
+  installAuthWatch,
+} from '@/services/profileSwitch';
 import { hasRun } from '@/services/save';
-import { startTargetFor } from '@/services/start-param';
+import { seedStackFor, startTargetFor } from '@/services/start-param';
 import { bindTelegramChrome, initTma, type TmaSession } from '@/services/tma';
 import { useAppStore } from '@/stores/appStore';
 import {
@@ -28,30 +40,25 @@ applyMotion(resolveReducedMotion(useSettingsStore.getState().reducedMotion));
 setupErrorReporting();
 setupAutosave();
 setupMetaSync();
+setupVignetteSync();
 
 const bootAuth = async (session: TmaSession): Promise<void> => {
-  const { ensureAnonAuth, restoredUid, signInWithTelegram } = await import(
-    '@/services/firebase'
-  );
+  const { consumeRedirect, ensureAnonAuth, restoredUid, signInWithTelegram } =
+    await import('@/services/firebase');
+  await installAuthWatch();
+  const redirect = await consumeRedirect();
+  if (redirect !== null && redirect.error !== null) {
+    const code = authErrorCode(redirect.error);
+    if (!isSilentAuthError(code)) useAppStore.getState().setAuthError(code);
+  }
   const previous = await restoredUid();
   let uid: string | null = null;
   if (session.isTelegram && session.initDataRaw !== null) {
-    const anonMeta =
-      previous !== null && shouldAttemptLink(previous)
-        ? await readMetaDocFor(previous)
-        : null;
+    if (shouldHandOver(previous)) await beginIdentityHandover();
     uid = await signInWithTelegram(session.initDataRaw);
-    if (uid !== null) {
-      const outcome = await linkAccounts({
-        anonUid: previous,
-        telegramUid: uid,
-        anonMeta,
-      });
-      if (import.meta.env.DEV) console.info(`boot: account link ${outcome}`);
-    }
   }
   uid ??= await ensureAnonAuth();
-  useAppStore.getState().setUid(uid);
+  if (uid === null) useAppStore.getState().setAuthError('network');
 };
 
 const bootPlatform = async (): Promise<void> => {
@@ -66,21 +73,34 @@ const bootPlatform = async (): Promise<void> => {
     session = await initTma();
     useAppStore.getState().setTgUserId(session.tgUserId);
     useAppStore.getState().setTgName(session.tgName);
+    useAppStore.getState().setIsTelegram(session.isTelegram);
   } catch (error) {
     console.error('boot: tma init failed', error);
   }
   const target = startTargetFor(session.startParam);
-  if (target !== null) useAppStore.getState().go(target.screen, target.params);
+  if (target !== null) {
+    useAppStore
+      .getState()
+      .seed(seedStackFor(target), target.screen, target.params);
+  }
   bindTelegramChrome(hasRun);
+  if (!session.isTelegram) installBrowserNavHistory();
   trackSessionStart(session.isTelegram ? 'telegram' : 'web');
   try {
     await bootAuth(session);
+    await awaitProfileReady();
+    await resolvePendingClaim();
   } catch (error) {
     console.error('boot: firebase boot failed', error);
   }
-  await bootMetaSync();
-  await bootCloud();
+  await bootProfileSync();
 };
+
+if (import.meta.env.VITE_E2E === '1') {
+  void import('@/services/testApi').then((module) => {
+    module.mountTestApi();
+  });
+}
 
 void bootPlatform();
 

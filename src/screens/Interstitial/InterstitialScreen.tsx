@@ -74,8 +74,13 @@ export const InterstitialScreen = () => {
         color="accent"
         className={styles.cta}
         data-interstitial-enter
+        data-testid="interstitial-enter"
         onClick={() => {
-          go('map');
+          go(
+            useRunStore.getState().pendingRewards === null
+              ? 'map'
+              : 'rewards',
+          );
         }}
       >
         {t('run:interstitial.enter')}

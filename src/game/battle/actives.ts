@@ -1,6 +1,7 @@
 import { DIE_BY_ID } from "@/data/dice";
 import { resonanceGrantActive } from "@/data/resonance";
-import type { DieActive } from "@/types/content";
+import { TIER_LADDER } from "@/game/battle/setup";
+import type { DieActive, DieTier } from "@/types/content";
 import type { ResonanceCensus, RolledDie } from "@/types/battle";
 
 export const SPLIT_DIE_DEF = "grey-d4";
@@ -55,3 +56,49 @@ export const isSwapTarget = (
 ): boolean =>
   candidate.uid !== source.uid &&
   (candidate.state === "tray" || candidate.state === "placed");
+
+export const FUSE_TIER_CEILING: DieTier = 20;
+
+export const growTier = (tier: DieTier, steps: number): DieTier => {
+  const index = TIER_LADDER.indexOf(tier);
+  const ceiling = TIER_LADDER.indexOf(FUSE_TIER_CEILING);
+  if (index < 0) return tier;
+  const capped = Math.min(ceiling, index + Math.max(0, steps));
+  return TIER_LADDER[capped] ?? tier;
+};
+
+export const canFuse = (die: RolledDie): boolean =>
+  die.state === "tray" && die.tier <= FUSE_TIER_CEILING;
+
+export const isFuseTarget = (
+  source: RolledDie,
+  candidate: RolledDie,
+): boolean =>
+  candidate.uid !== source.uid &&
+  candidate.state === "tray" &&
+  candidate.tier <= FUSE_TIER_CEILING &&
+  candidate.value === source.value;
+
+export const fusedDie = (
+  source: RolledDie,
+  target: RolledDie,
+  tierStep: number,
+): RolledDie => {
+  const tier = growTier(
+    source.tier >= target.tier ? source.tier : target.tier,
+    tierStep,
+  );
+  return {
+    uid: `${source.uid}-fused`,
+    defId: source.defId,
+    tier,
+    school: source.school,
+    value: Math.min(tier, source.value + target.value),
+    state: "tray",
+    temp: true,
+  };
+};
+
+export const canReschool = (die: RolledDie): boolean =>
+  (die.state === "tray" || die.state === "placed") &&
+  die.school !== "prismatic";

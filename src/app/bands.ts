@@ -17,8 +17,6 @@ const EMPTY: BodyRect = { x: 0, y: 0, w: 0, h: 0 };
 let current: BodyRect = EMPTY;
 const listeners = new Set<(rect: BodyRect) => void>();
 
-export const bodyRect = (): BodyRect => current;
-
 export const bandInsets = (
   rect: BodyRect,
   viewportWidth: number,

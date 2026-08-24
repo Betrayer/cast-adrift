@@ -21,10 +21,14 @@ import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
 import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
 import { MenuBadge, menuBadgeId } from '@/screens/Profile/BadgeRow';
 import { ResumeCard } from '@/screens/Menu/ResumeCard';
+import { haptic } from '@/services/tma';
+import { APP_VERSION } from '@/services/version';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
 import styles from './MenuScreen.module.css';
+
+const ASCENDANT_BADGE = 'ascendant';
 
 const MenuBackground = lazy(() =>
   import('@/screens/Menu/MenuBackground').then((m) => ({
@@ -39,15 +43,25 @@ interface MenuEntry {
 }
 
 const ENTRIES: readonly MenuEntry[] = [
-  { key: 'testBattle', screen: 'battle' },
   { key: 'newRun', screen: 'runSetup', action: 'startCampaign' },
+  { key: 'modes', screen: 'modes' },
   { key: 'hangar', screen: 'hangar' },
   { key: 'starChart', screen: 'chart' },
   { key: 'collection', screen: 'collection' },
   { key: 'codex', screen: 'codex' },
-  { key: 'modes', screen: 'modes' },
+  { key: 'profile', screen: 'profile' },
+  { key: 'achievements', screen: 'achievements' },
   { key: 'settings', screen: 'settings' },
 ];
+
+const DEV_ENTRIES: readonly MenuEntry[] = [
+  { key: 'testBattle', screen: 'battle' },
+];
+
+const devMenu = (): boolean =>
+  import.meta.env.DEV &&
+  typeof window !== 'undefined' &&
+  new URLSearchParams(window.location.search).get('debug') === '1';
 
 export const MenuScreen = () => {
   const { t } = useTranslation(['common', 'menu', 'meta']);
@@ -60,9 +74,17 @@ export const MenuScreen = () => {
   const codex = useMetaStore((s) => s.codex);
   const codexRead = useMetaStore((s) => s.codexRead);
   const badges = useMetaStore((s) => s.badges);
+  const achievements = useMetaStore((s) => s.achievements);
+  const achievementsSeen = useMetaStore((s) => s.achievementsSeen);
+  const unseenAchievements = achievements.filter(
+    (id) => !achievementsSeen.includes(id),
+  ).length;
   const topBadge = menuBadgeId(badges);
   const unreadMemories = unreadMemoryIds(codex, codexRead).length;
   const [localResume] = useState(readLocalResume);
+  const [entries] = useState<readonly MenuEntry[]>(() =>
+    devMenu() ? [...ENTRIES, ...DEV_ENTRIES] : ENTRIES,
+  );
   const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
   const osReducedMotion = useReducedMotion(false);
   const reducedMotion =
@@ -93,7 +115,9 @@ export const MenuScreen = () => {
       overlay={
         <UnstyledButton
           className={styles.levelBadge}
+          data-press
           onClick={() => {
+            haptic(topBadge === ASCENDANT_BADGE ? 'levelUp' : 'place');
             go('chart');
           }}
           aria-label={t('meta:menu.level', { level })}
@@ -121,6 +145,9 @@ export const MenuScreen = () => {
           </Title>
           <Text c={tokens.dim} size="sm">
             {t('menu:tagline')}
+          </Text>
+          <Text c={tokens.faint} size="xs" data-menu-version>
+            {t('menu:version', { version: APP_VERSION })}
           </Text>
         </div>
         <div className={styles.actions}>
@@ -155,16 +182,21 @@ export const MenuScreen = () => {
           ) : localResume !== null ? (
             <ResumeCard resume={localResume} />
           ) : null}
-          {ENTRIES.map((entry) => (
+          {entries.map((entry) => (
             <Button
               key={entry.key}
               size="md"
               variant="filled"
+              data-testid={`menu-${entry.key}`}
               onClick={onSelect(entry)}
               rightSection={
                 entry.key === 'codex' && unreadMemories > 0 ? (
                   <Badge size="sm" color="accent" data-unread-memories>
                     {unreadMemories}
+                  </Badge>
+                ) : entry.key === 'achievements' && unseenAchievements > 0 ? (
+                  <Badge size="sm" color="yellow" data-unseen-achievements>
+                    {unseenAchievements}
                   </Badge>
                 ) : undefined
               }

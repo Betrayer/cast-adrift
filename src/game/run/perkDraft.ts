@@ -68,6 +68,8 @@ const deckSchoolCount = (
     return def?.school === school || def?.school === "prismatic";
   }).length;
 
+const OVERSIZED_REACTOR_CAP = 12;
+
 const layoutTags = (shipId: ShipId): ReadonlySet<ContentTag> => {
   const slots = SHIP_BY_ID.get(shipId)?.slots ?? {};
   const tags = new Set<ContentTag>();
@@ -79,7 +81,13 @@ const layoutTags = (shipId: ShipId): ReadonlySet<ContentTag> => {
     tags.add("shieldwall");
     tags.add("shields");
   }
+  if (slots.enginesB !== undefined) {
+    tags.add("dodge");
+    tags.add("engines");
+  }
   if (slots.repairBay !== undefined) tags.add("repairBay");
+  if (slots.shields === undefined) tags.add("survival");
+  if ((slots.reactor?.cap ?? 0) >= OVERSIZED_REACTOR_CAP) tags.add("charge");
   return tags;
 };
 

@@ -3,7 +3,12 @@ import { sectorDef } from "@/data/sectors";
 import { generateSectorMap } from "@/game/map/generator";
 import { nodeRisk } from "@/game/map/risk";
 import { edgeKey, type MapGraph, type MapNode } from "@/game/map/types";
-import { applyEdgeMotifs, applyNodeMotifs } from "@/game/run/motifs";
+import {
+  applyEdgeMotifs,
+  applyHoleToll,
+  applyNodeMotifs,
+  holeTollFor,
+} from "@/game/run/motifs";
 import { createStreams } from "@/services/rng";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import { MAX_SHIPYARD_DISCOUNT, useRunStore } from "@/stores/runStore";
@@ -102,5 +107,51 @@ describe("node risk", () => {
     expect(nodeRisk(node({ type: "battle", blessing: "cursed" }))).toBe("raised");
     expect(nodeRisk(node({ type: "battle", pocket: true }))).toBe("high");
     expect(nodeRisk(node({ type: "shop", pocket: true }))).toBe("raised");
+  });
+});
+
+describe("the black-hole bypass toll", () => {
+  beforeEach(() => {
+    useRunStore.getState().reset();
+    useRunStore.setState({ hull: 30, hullMax: 30, seed: 11 });
+    useNarrativeStore.setState({ consequence: null, consequenceQueue: [] });
+  });
+
+  it("scales with the sector", () => {
+    expect(holeTollFor(1, 30)).toBe(0);
+    expect(holeTollFor(2, 30)).toBe(1);
+    expect(holeTollFor(3, 30)).toBe(1);
+    expect(holeTollFor(4, 30)).toBe(2);
+    expect(holeTollFor(5, 30)).toBe(2);
+    expect(holeTollFor(6, 30)).toBe(2);
+  });
+
+  it("waives itself once the hull cannot pay", () => {
+    expect(holeTollFor(4, 3)).toBe(2);
+    expect(holeTollFor(4, 2)).toBe(0);
+    expect(holeTollFor(4, 1)).toBe(0);
+    expect(holeTollFor(2, 1)).toBe(0);
+  });
+
+  it("charges the hull and names the motif", () => {
+    expect(applyHoleToll(4, "r5l1", "r6l1")).toBe(2);
+    expect(useRunStore.getState().hull).toBe(28);
+    expect(useNarrativeStore.getState().consequence?.origin).toBe(
+      "run:motif.bypass",
+    );
+  });
+
+  it("scorches instead of charging when the hull is at the toll", () => {
+    useRunStore.setState({ hull: 2 });
+    expect(applyHoleToll(4, "r5l1", "r6l1")).toBe(0);
+    expect(useRunStore.getState().hull).toBe(2);
+    expect(useNarrativeStore.getState().consequence?.origin).toBe(
+      "run:motif.holeScorch",
+    );
+  });
+
+  it("does nothing in a sector without the motif", () => {
+    expect(applyHoleToll(1, "r5l1", "r6l1")).toBe(0);
+    expect(useRunStore.getState().hull).toBe(30);
   });
 });

@@ -2,8 +2,9 @@ import { A6_ELITE_SUBSYSTEM, ascensionMods } from "@/data/ascension";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { dieHasGrant, type EngravingMap } from "@/data/engravings";
 import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies";
-import { SHIP_BY_ID, shipHasPassive, type ShipId } from "@/data/ships";
+import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
+import { overCapAllowed, shipProfile } from "@/game/battle/passives";
 import { computeCensus } from "@/game/battle/resonance";
 import { BattleCtx, buildSources, emit } from "@/game/effects";
 import { slotMatches } from "@/game/effects/evaluate";
@@ -37,12 +38,6 @@ export const shrinkTier = (tier: DieTier): DieTier => {
 
 export const MAX_ENEMIES = 3;
 export const DEFAULT_CHARGE_CAP = 10;
-
-const WEAPON_SLOTS: ReadonlySet<SlotId> = new Set([
-  "weaponA",
-  "weaponB",
-  "spinal",
-]);
 
 const dieFaceRange = (defId: string, tier: number): [number, number] => {
   const faces = DIE_BY_ID.get(defId)?.faces;
@@ -90,6 +85,7 @@ export interface BattleInit {
   chargeCap?: number;
   ascension?: number;
   sectorHpPct?: number;
+  sectorDmgPct?: number;
   enemyHpBonusPct?: number;
   eliteShield?: number;
   resonanceBoost?: ResonanceBoost;
@@ -388,14 +384,17 @@ export const buildBattleSnapshot = (
   const hullMax = init.hullMax ?? shipHullMax(shipId);
   const resonance = computeCensus(
     dice,
-    runHasTrait(
-      init.perks ?? [],
-      init.chartPicks ?? [],
-      "prismDouble",
-      init.modules ?? [],
-    )
-      ? 2
-      : 1,
+    Math.max(
+      shipProfile(shipId).prismaticCensusMult,
+      runHasTrait(
+        init.perks ?? [],
+        init.chartPicks ?? [],
+        "prismDouble",
+        init.modules ?? [],
+      )
+        ? 2
+        : 1,
+    ),
   );
   if (init.resonanceBoost !== undefined) {
     resonance.counts[init.resonanceBoost.school] += init.resonanceBoost.n;
@@ -429,10 +428,9 @@ export const buildBattleSnapshot = (
     ),
     enemies,
     targetId: enemies[0]?.id ?? null,
-    engineState: null,
+    evasion: null,
     nextTurnMods: {},
     nextRollBonus: 0,
-    pendingDeepScan: false,
     chargeCap: init.chargeCap ?? DEFAULT_CHARGE_CAP,
     sacrificePool: 0,
     bloodReactorUsed: false,
@@ -451,6 +449,7 @@ export const buildBattleSnapshot = (
     pendingStorm: 0,
     ascension,
     sectorHpPct: init.sectorHpPct ?? 0,
+    sectorDmgPct: init.sectorDmgPct ?? 0,
     enemyHpPct: init.enemyHpBonusPct ?? 0,
     inverted: init.inverted === true,
     nodeStorm: init.nodeStorm === true,
@@ -535,11 +534,7 @@ export const dieFitsSlot = (
 ): boolean => {
   if (die.tier <= effectiveCap(snapshot, slotId, slot)) return true;
   if (exceedCapGrantFor(snapshot, die, slotId) !== undefined) return true;
-  return (
-    snapshot.shipId !== undefined &&
-    shipHasPassive(snapshot.shipId, "overload") &&
-    WEAPON_SLOTS.has(slotId)
-  );
+  return overCapAllowed(snapshot.shipId, slotId) !== null;
 };
 
 export const canPlaceDie = (

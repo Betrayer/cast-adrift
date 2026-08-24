@@ -2,6 +2,17 @@
   pointer-events: auto;
 }
 
+.board {
+  width: 100%;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  min-height: 0;
+}
+
 .topBands {
   display: flex;
   flex-direction: column;
@@ -31,20 +42,61 @@
   }
 }
 
-:root[data-ca-motion='reduced'] .causalitySlide {
+:root[data-ca-motion='reduced'] .causalitySlide,
+:root[data-ca-motion='reduced'] .checkBanner {
   animation: none;
+}
+
+.checkBanner {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: causalityDrop 420ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
+}
+
+.checkSay {
+  flex: 1 1 200px;
+  min-width: 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ca-text);
+}
+
+.checkSkip {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ca-dim);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .statusCard {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 12px;
-  padding: 8px 12px;
+  padding: 6px 12px;
   background: var(--ca-surface2);
   border: 1px solid var(--ca-line);
   border-radius: 10px;
   pointer-events: auto;
+}
+
+.statusCardWide {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  max-width: none;
+}
+
+.statusCardWide .statusRight {
+  max-width: none;
+  justify-content: flex-start;
 }
 
 .statusLeft {
@@ -52,7 +104,14 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 3px;
+}
+
+.statusHeadline {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
 }
 
 .statusRight {
@@ -61,11 +120,11 @@
   justify-content: flex-end;
   align-items: center;
   gap: 4px;
-  max-width: 60%;
+  max-width: 56%;
 }
 
 .hullTrack {
-  height: 9px;
+  height: 8px;
   border-radius: 5px;
   background: var(--ca-hull-track);
   border: 0.5px solid var(--ca-line);
@@ -125,142 +184,17 @@
   color: var(--ca-danger);
 }
 
-.actionRail {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 8px;
-  background: var(--ca-surface2-a92);
-  border: 1px solid var(--ca-line);
-  border-radius: 10px;
-  pointer-events: auto;
-}
-
-.railLabel {
-  align-self: center;
-  white-space: nowrap;
-}
-
-.rerollRow {
-  display: flex;
-  justify-content: center;
-  gap: 8px;
-}
-
-.enemyRow {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 8px;
-  pointer-events: auto;
-}
-
-.enemyChip {
-  background: var(--ca-surface2-a92);
-  border: 1px solid var(--ca-line);
-  border-radius: 12px;
-  padding: 6px 10px;
+.centreColumn {
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-  flex: 0 1 auto;
-}
-
-.enemyChipCompact {
-  flex-direction: row;
-  align-items: center;
   gap: 5px;
-  padding: 3px 7px;
-}
-
-.enemyChipCompact .intentPill {
-  align-self: center;
-  margin-top: 0;
-  font-size: 10px;
-  padding: 1px 6px;
-}
-
-.enemyChipCompact .enemyName {
-  max-width: 26vw;
-}
-
-.enemyChipTargeted {
-  border-color: var(--ca-accent);
-}
-
-.enemyName {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 34vw;
-}
-
-.intentPill {
-  align-self: flex-start;
-  margin-top: 2px;
-  border-radius: 8px;
-  padding: 1px 8px;
-  font-size: 11px;
-  border: 0.75px solid;
-  white-space: nowrap;
-}
-
-.enemyTraitRow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 3px;
-}
-
-.enemyTraitChip {
-  border-radius: 6px;
-  border: 0.75px solid;
-  padding: 0 5px;
-  font-size: 10px;
-  white-space: nowrap;
-}
-
-.intentPulse {
-  animation: intent-pulse 420ms ease-out;
-}
-
-@keyframes intent-pulse {
-  0% {
-    transform: scale(0.86);
-    filter: brightness(1.9);
-  }
-  100% {
-    transform: scale(1);
-    filter: brightness(1);
-  }
-}
-
-.intentAttack {
-  background: var(--ca-school-red-fill);
-  border-color: var(--ca-danger);
-  color: var(--ca-school-red-text);
-}
-
-.intentShield {
-  background: var(--ca-school-blue-fill);
-  border-color: var(--ca-school-blue-stroke);
-  color: var(--ca-school-blue-text);
-}
-
-.intentUtility {
-  background: var(--ca-school-black-fill);
-  border-color: var(--ca-school-black-stroke);
-  color: var(--ca-school-black-text);
-}
-
-.bottomBar {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding: 0 12px 12px;
+  padding: 0 12px 10px;
   pointer-events: auto;
+}
+
+.resonanceWrap {
+  position: relative;
 }
 
 .resonanceRow {
@@ -268,7 +202,13 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 6px;
-  pointer-events: none;
+  width: 100%;
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
 }
 
 .resChip {
@@ -289,6 +229,20 @@
   box-shadow: 0 0 0 1px currentColor inset;
 }
 
+.resPrism {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: conic-gradient(
+    var(--ca-school-red-stroke),
+    var(--ca-school-yellow-stroke),
+    var(--ca-school-green-stroke),
+    var(--ca-school-blue-stroke),
+    var(--ca-school-black-stroke),
+    var(--ca-school-red-stroke)
+  );
+}
+
 .resPips {
   display: inline-flex;
   gap: 3px;
@@ -307,6 +261,39 @@
   opacity: 1;
 }
 
+.resPopover {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 100%;
+  margin-bottom: 6px;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: var(--ca-surface1);
+  border: 1px solid var(--ca-line);
+  box-shadow: 0 8px 24px var(--ca-shadow);
+}
+
+.resPopRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2px 10px;
+  font-size: 11px;
+  color: var(--ca-dim);
+}
+
+.resEarned {
+  flex: 1 1 100%;
+  font-size: 10px;
+  line-height: 13px;
+  color: var(--ca-faint);
+}
+
 @keyframes chip-pop {
   0% {
     transform: scale(0.7);
@@ -321,45 +308,26 @@
   }
 }
 
-.board {
-  width: 100%;
-}
-
-.centreColumn {
-  width: 100%;
-}
-
-.hint {
-  display: block;
-}
-
 @media (max-height: 700px) {
-  .hint {
-    display: none;
-  }
-
   .topBands {
     gap: 6px;
     padding: 6px 12px 0;
   }
 
   .statusCard {
-    padding: 6px 10px;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 6px;
+    padding: 4px 10px;
+    gap: 8px;
   }
 
   .statusLeft {
-    flex: 1 1 130px;
     flex-direction: row;
     align-items: center;
     gap: 8px;
   }
 
-  .statusRight {
-    flex: 1 1 auto;
-    max-width: none;
+  .statusHeadline {
+    flex: 0 0 auto;
+    gap: 6px;
   }
 
   .hullTrack {
@@ -367,33 +335,52 @@
     min-width: 50px;
   }
 
-  .enemyChipCompact {
-    padding: 2px 6px;
-    gap: 4px;
+  .centreColumn {
+    gap: 3px;
+    padding: 0 10px 6px;
   }
 
-  .enemyChipCompact .enemyName {
-    max-width: 20vw;
+  .checkBanner {
+    gap: 6px;
   }
 
-  .bottomBar {
+  .checkSay {
+    font-size: 11px;
+    line-height: 14px;
+  }
+
+  .resonanceRow {
+    flex-wrap: nowrap;
+    justify-content: safe center;
     gap: 4px;
-    padding: 0 12px 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .resonanceRow::-webkit-scrollbar {
+    display: none;
+  }
+
+  .resChip {
+    gap: 4px;
+    padding: 1px 6px;
+    font-size: 10px;
+    line-height: 14px;
+  }
+
+  .resPips {
+    display: none;
   }
 }
 
 @media (min-width: 768px) {
-  .board {
+  .statusCard {
     max-width: 560px;
-    align-self: center;
+    margin: 0 auto;
+    width: 100%;
   }
 
   .centreColumn {
-    max-width: 560px;
-    margin: 0 auto;
-  }
-
-  .enemyRow {
     max-width: 560px;
     margin: 0 auto;
   }
@@ -401,50 +388,7 @@
 
 @media (min-width: 900px) {
   .topBands {
-    display: grid;
-    grid-template-columns: 1fr minmax(0, 560px) 1fr;
-    grid-template-areas: 'status centre rail';
-    align-items: start;
-    gap: 16px;
     padding: 12px 16px 0;
-  }
-
-  .statusCard {
-    grid-area: status;
-    justify-self: end;
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    max-width: 300px;
-  }
-
-  .statusRight {
-    justify-content: flex-start;
-    max-width: none;
-  }
-
-  .enemyRow {
-    grid-area: centre;
-    margin: 0;
-  }
-
-  .actionRail {
-    grid-area: rail;
-    justify-self: start;
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-    max-width: 260px;
-  }
-
-  .board {
-    max-width: 560px;
-    align-self: center;
-  }
-
-  .centreColumn {
-    max-width: 560px;
-    margin: 0 auto;
   }
 }
 
@@ -453,7 +397,6 @@
 }
 
 :root[data-ca-motion='reduced'] .hullFlash,
-:root[data-ca-motion='reduced'] .intentPulse,
 :root[data-ca-motion='reduced'] .resChip {
   animation: none;
 }

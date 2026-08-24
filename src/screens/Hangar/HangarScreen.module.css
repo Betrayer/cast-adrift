@@ -1,0 +1,13 @@
+.shipDim {
+  opacity: 0.78;
+}
+
+.shipCell {
+  display: flex;
+  min-width: 0;
+}
+
+.shipCell > * {
+  flex: 1 1 auto;
+  min-width: 0;
+}

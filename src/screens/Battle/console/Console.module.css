@@ -1,0 +1,291 @@
+.console {
+  pointer-events: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px 8px;
+  background: var(--ca-surface1-a92);
+  border: 1px solid var(--ca-line);
+  border-radius: 14px;
+}
+
+.consoleCompact {
+  gap: 4px;
+  padding: 4px 6px;
+}
+
+.consoleCompact .btn {
+  font-size: 10.5px;
+  padding: 6px 2px;
+}
+
+.miniCompact {
+  min-height: 0;
+  gap: 0;
+  padding: 2px 6px;
+}
+
+.consoleCompact .reason {
+  min-height: 12px;
+  font-size: 9px;
+  line-height: 12px;
+}
+
+.row {
+  display: flex;
+  gap: 5px;
+}
+
+.btn {
+  flex: 1 1 0;
+  min-width: 0;
+  appearance: none;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  color: var(--ca-text);
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-line);
+  border-radius: 9px;
+  padding: 7px 2px;
+  text-align: center;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 120ms ease;
+}
+
+.btn[aria-disabled='true'] {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.btnActive {
+  border-color: var(--ca-accent);
+  box-shadow: 0 0 0 1px var(--ca-accent) inset;
+}
+
+.btnFate {
+  color: var(--ca-school-prismatic-text);
+  border-color: var(--ca-school-prismatic-stroke);
+}
+
+.reason {
+  min-height: 13px;
+  font-size: 9.5px;
+  line-height: 13px;
+  text-align: center;
+  color: var(--ca-dim);
+}
+
+.mini {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-height: 46px;
+  padding: 3px 6px;
+  border-radius: 9px;
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-line);
+}
+
+.miniHint {
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ca-faint);
+}
+
+.forecast {
+  min-height: 15px;
+  font-size: 10.5px;
+  line-height: 15px;
+  text-align: center;
+  color: var(--ca-dim);
+  pointer-events: none;
+}
+
+.forecastLethal {
+  color: var(--ca-danger);
+  font-weight: 700;
+}
+
+.sheet {
+  pointer-events: auto;
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: var(--z-overlay);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--ca-surface1);
+  border: 1px solid var(--ca-line);
+  box-shadow: 0 10px 30px var(--ca-shadow);
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.sheetHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.sheetName {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ca-text);
+}
+
+.sheetClose {
+  appearance: none;
+  font: inherit;
+  font-size: 11px;
+  color: var(--ca-dim);
+  background: none;
+  border: 1px solid var(--ca-line);
+  border-radius: 8px;
+  padding: 2px 8px;
+  cursor: pointer;
+}
+
+.sheetRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--ca-dim);
+}
+
+.sheetIntent {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ca-school-red-text);
+}
+
+.sheetMath {
+  font-size: 11px;
+  color: var(--ca-text);
+}
+
+.sheetTargets {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.targetRow {
+  appearance: none;
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  color: var(--ca-text);
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-line);
+  border-radius: 8px;
+  padding: 5px 8px;
+  cursor: pointer;
+}
+
+.targetRow:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.targetRowOn {
+  border-color: var(--ca-accent);
+}
+
+@media (min-width: 768px) {
+  .btn {
+    font-size: 12px;
+    padding: 8px 4px;
+  }
+}
+
+@media (max-height: 700px) {
+  .mini {
+    min-height: 34px;
+  }
+
+  .console {
+    gap: 4px;
+    padding: 4px 6px;
+  }
+
+  .btn {
+    font-size: 10.5px;
+    padding: 6px 2px;
+  }
+
+  .reason {
+    min-height: 12px;
+    font-size: 9px;
+    line-height: 12px;
+  }
+}
+
+.sheetWhy {
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-dim);
+}
+
+.sheetStatuses {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-top: 5px;
+  border-top: 1px solid var(--ca-line);
+}
+
+.sheetLabel {
+  font-size: 9.5px;
+  line-height: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ca-faint);
+}
+
+.statusRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 5px;
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-faint);
+}
+
+.statusGlyph {
+  min-width: 15px;
+  padding: 0 4px;
+  border-radius: 5px;
+  border: 1px solid var(--ca-line);
+  text-align: center;
+  font-weight: 700;
+  color: var(--ca-text);
+}
+
+.statusName {
+  font-weight: 700;
+  color: var(--ca-dim);
+}
+
+.statusDesc {
+  flex: 1 1 100%;
+  padding-left: 20px;
+}
+
+.subAura {
+  display: block;
+  font-size: 9.5px;
+  line-height: 13px;
+  color: var(--ca-faint);
+}

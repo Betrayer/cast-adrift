@@ -4,28 +4,75 @@ import {
   Group,
   Paper,
   Progress,
+  SimpleGrid,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
+import { rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
+import { playSfx } from "@/services/audio";
 import { tokens } from "@/app/theme";
-import { ACHIEVEMENT_BY_ID } from "@/data/achievements";
+import { achievementTitleById } from "@/game/meta/achievements";
+import { ShipCard } from "@/components/ShipCard";
+import { BattleTallyPanel } from "@/screens/Rewards/BattleTallyPanel";
 import { DIE_BY_ID } from "@/data/dice";
 import { PERK_BY_ID } from "@/data/perks";
 import { progressWithinLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { abandonRun } from "@/game/run/flow";
+import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import { useRunStore, type RunStats } from "@/stores/runStore";
 import {
   resolveReducedMotion,
   useSettingsStore,
 } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
-import { BuildSheet } from "@/screens/Build/BuildSheet";
 import { LevelUpCeremony } from "./LevelUpCeremony";
+
+const FIND_STAGGER_MS = 180;
+
+const DETAIL_ROWS: readonly {
+  id: string;
+  label: string;
+  read: (stats: RunStats) => number;
+}[] = [
+  { id: "elites", label: "run:summary.elites", read: (s) => s.elites },
+  {
+    id: "minibosses",
+    label: "run:summary.minibosses",
+    read: (s) => s.minibosses,
+  },
+  { id: "bosses", label: "run:summary.bosses", read: (s) => s.bosses },
+  {
+    id: "scrapSpent",
+    label: "run:summary.scrapSpent",
+    read: (s) => s.scrapSpent,
+  },
+  {
+    id: "hullPctMin",
+    label: "run:summary.hullPctMin",
+    read: (s) => s.hullPctMin,
+  },
+  {
+    id: "dicePlaced",
+    label: "run:summary.dicePlaced",
+    read: (s) => s.dicePlaced,
+  },
+  {
+    id: "wormholeRides",
+    label: "run:summary.wormholeRides",
+    read: (s) => s.wormholeRides,
+  },
+  {
+    id: "holesBypassed",
+    label: "run:summary.holesBypassed",
+    read: (s) => s.holesBypassed,
+  },
+];
 
 const useCountUp = (target: number, reduced: boolean): number => {
   const [value, setValue] = useState(reduced ? target : 0);
@@ -51,6 +98,9 @@ const useCountUp = (target: number, reduced: boolean): number => {
 export const SummaryScreen = () => {
   const { t } = useTranslation(["run", "meta"]);
   const stats = useRunStore((s) => s.stats);
+  const shipId = useRunStore((s) => s.shipId);
+  const mkLevels = useRunStore((s) => s.mkLevels);
+  const tally = useRunStore((s) => s.lastTally);
   const perks = useRunStore((s) => s.perks);
   const result = useSummaryStore((s) => s.result);
   const level = useMetaStore((s) => s.level);
@@ -66,6 +116,7 @@ export const SummaryScreen = () => {
     result !== null && result.toLevel > result.fromLevel;
   const [ceremonyDone, setCeremonyDone] = useState(!leveled);
   const [barsDone, setBarsDone] = useState(reduced);
+  const [detailed, setDetailed] = useState(false);
 
   useEffect(() => {
     if (reduced) return;
@@ -77,12 +128,32 @@ export const SummaryScreen = () => {
     };
   }, [reduced]);
 
+  const firstFinds = useMemo(() => result?.firstFinds ?? [], [result]);
+  const findShards = result?.findShards ?? 0;
+
+  useEffect(() => {
+    if (firstFinds.length === 0) return;
+    const clock = rafClock();
+    const tweens = new Tweens(clock);
+    tweens.channel(UI_GROUP).sequence(
+      firstFinds.map((_, index) => ({
+        ms: FIND_STAGGER_MS,
+        run: () => {
+          playSfx("cacheClaim", { rate: 1 + index * 0.07 });
+        },
+      })),
+      );
+    return () => {
+      tweens.destroy();
+      clock.destroy();
+    };
+  }, [firstFinds]);
+
   const progress = progressWithinLevel(xp);
   const perkNames = perks
     .map((id) => PERK_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
 
-  const [buildOpen, setBuildOpen] = useState(false);
 
   const ceremony =
     leveled && barsDone && !ceremonyDone && result !== null ? (
@@ -115,24 +186,14 @@ export const SummaryScreen = () => {
   return (
     <Screen
       centered
-      overlay={
-        <>
-          {ceremony}
-          {buildOpen ? (
-            <BuildSheet
-              onClose={() => {
-                setBuildOpen(false);
-              }}
-            />
-          ) : null}
-        </>
-      }
+      overlay={ceremony}
     >
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="sm">
           <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">
             {t(win ? "run:summary.victory" : "run:summary.defeat")}
           </Title>
+          <ShipCard shipId={shipId} size="compact" mkLevels={mkLevels} />
           <Divider color={tokens.line} />
           <Text c={tokens.dim}>
             {t("run:summary.nodes", { n: stats.nodesCleared })}
@@ -141,6 +202,36 @@ export const SummaryScreen = () => {
           <Text c={tokens.dim}>
             {t("run:summary.earned", { n: stats.scrapEarned })}
           </Text>
+          <Button
+            size="compact-xs"
+            variant="subtle"
+            color="gray"
+            data-testid="summary-more"
+            onClick={() => {
+              setDetailed((value) => !value);
+            }}
+          >
+            {t(detailed ? "run:summary.less" : "run:summary.more")}
+          </Button>
+          {detailed ? (
+            <SimpleGrid cols={2} spacing={4} data-summary-detail>
+              {DETAIL_ROWS.map((row) => (
+                <Group key={row.id} justify="space-between" data-summary-row={row.id}>
+                  <Text size="xs" c={tokens.faint}>
+                    {t(row.label)}
+                  </Text>
+                  <Text size="xs" c={tokens.dim} data-summary-value={row.id}>
+                    {row.id === "hullPctMin"
+                      ? t("run:summary.pct", { n: Math.round(row.read(stats)) })
+                      : row.read(stats)}
+                  </Text>
+                </Group>
+              ))}
+            </SimpleGrid>
+          ) : null}
+          {detailed && tally !== null ? (
+            <BattleTallyPanel tally={tally} />
+          ) : null}
           {(result?.rotation ?? []).length === 0 ? null : (
             <Text c={tokens.dim}>
               {t("run:summary.faced", {
@@ -171,10 +262,17 @@ export const SummaryScreen = () => {
               ))}
             </Stack>
           )}
-          {(result?.firstFinds ?? []).length === 0 ? null : (
-            <Text size="xs" c={tokens.dim} data-first-finds>
+          {firstFinds.length === 0 ? null : (
+            <Text
+              size="xs"
+              c={tokens.amber}
+              data-first-finds
+              data-find-shards={findShards}
+              data-rise
+              style={riseStyle(0)}
+            >
               {t("meta:summary.firstFinds", {
-                names: (result?.firstFinds ?? [])
+                names: firstFinds
                   .map((id) => t(DIE_BY_ID.get(id)?.name ?? id))
                   .join(" · "),
               })}
@@ -184,7 +282,7 @@ export const SummaryScreen = () => {
             <Stack gap={2} data-achievement-lines>
               {(result?.achievements ?? []).map((id) => (
                 <Text key={id} size="xs" c={tokens.accent}>
-                  ✦ {t(ACHIEVEMENT_BY_ID.get(id)?.name ?? id)}
+                  ✦ {achievementTitleById(id, t)}
                 </Text>
               ))}
             </Stack>
@@ -217,7 +315,7 @@ export const SummaryScreen = () => {
             variant="default"
             data-open-build
             onClick={() => {
-              setBuildOpen(true);
+              useAppStore.getState().setBuildSheet(true);
             }}
           >
             {t("run:build.open")}

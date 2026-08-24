@@ -107,6 +107,12 @@
     top: 16px;
   }
 
+  .panelShortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
   .legendRow {
     display: flex;
     align-items: baseline;
@@ -165,20 +171,137 @@
 }
 
 .marker {
-  transition: transform 400ms ease-in-out;
+  transition: transform var(--ca-map-jump-ms, 420ms) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trail {
+  animation: trailDraw var(--ca-map-jump-ms, 420ms) cubic-bezier(0.4, 0, 0.2, 1)
+    both;
+}
+
+@keyframes trailDraw {
+  0% {
+    stroke-dashoffset: var(--ca-trail-len, 100);
+    opacity: 0.55;
+  }
+  60% {
+    stroke-dashoffset: 0;
+    opacity: 0.45;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+.chainMark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: chainMarkIn 520ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+@keyframes chainMarkIn {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+  }
+  60% {
+    opacity: 1;
+    scale: 1.35;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.arrival {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: arrivalTick var(--ca-map-arrival-ms, 120ms) ease-out both;
+}
+
+@keyframes arrivalTick {
+  0% {
+    opacity: 0.9;
+    scale: 0.5;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.7;
+  }
+}
+
+.vortex {
+  animation: vortexSpin 4.5s linear infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+@keyframes vortexSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.warpSuck {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: warpSuck 420ms cubic-bezier(0.5, 0, 0.9, 0.4) both;
+}
+
+@keyframes warpSuck {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    scale: 0.08;
+    rotate: 540deg;
+  }
+}
+
+.warpHidden {
+  opacity: 0;
+}
+
+.warpLand {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: warpLand 620ms cubic-bezier(0.2, 0.9, 0.3, 1) both;
+}
+
+@keyframes warpLand {
+  0% {
+    opacity: 0;
+    scale: 0.1;
+  }
+  35% {
+    opacity: 1;
+    scale: 1.9;
+  }
+  100% {
+    opacity: 0;
+    scale: 1;
+  }
 }
 
 .markerInstant {
   transition: none;
 }
 
+:root[data-ca-motion='reduced'] .chainMark,
+:root[data-ca-motion='reduced'] .trail,
+:root[data-ca-motion='reduced'] .arrival,
 :root[data-ca-motion='reduced'] .tidePulse,
 :root[data-ca-motion='reduced'] .nodeStagger,
+:root[data-ca-motion='reduced'] .vortex,
+:root[data-ca-motion='reduced'] .warpSuck,
+:root[data-ca-motion='reduced'] .warpLand,
 :root[data-ca-motion='reduced'] .pulse {
   animation: none;
 }
 
-:root[data-ca-motion='reduced'] .fog,
-:root[data-ca-motion='reduced'] .marker {
+:root[data-ca-motion='reduced'] .fog {
   transition: none;
 }

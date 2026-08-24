@@ -9,21 +9,112 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import grids from "@/app/grids.module.css";
+import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
 import { ENDINGS, STANDARD_ENDINGS } from "@/data/narrative/endings";
 
 import { countStars } from "@/game/run/goals";
 import { progressWithinLevel } from "@/game/xp";
+import { isGuestAccount, supportId } from "@/services/uid";
 import { useAppStore } from "@/stores/appStore";
-import { useMetaStore } from "@/stores/metaStore";
-import { AchievementGrid } from "./AchievementGrid";
+import { useMetaStore, type MetaStats } from "@/stores/metaStore";
+import { AchievementSummary } from "./AchievementSummary";
 import { BadgeRow } from "./BadgeRow";
 
 const endingSlots = (earned: readonly string[]): typeof ENDINGS =>
   earned.includes("answer") ? ENDINGS : STANDARD_ENDINGS;
+
+const AccountLine = () => {
+  const { t } = useTranslation(["settings"]);
+  const go = useAppStore((s) => s.go);
+  const account = useAppStore((s) => s.account);
+  const uid = useAppStore((s) => s.uid);
+  const status = isGuestAccount(account)
+    ? t("settings:account.guest")
+    : account?.email !== null && account?.email !== undefined
+      ? account.email
+      : t("settings:account.telegramProfile");
+
+  return (
+    <Paper bg={tokens.surface1} p="sm" radius="md" withBorder>
+      <Group justify="space-between" wrap="nowrap">
+        <Stack gap={0}>
+          <Text size="xs" c={tokens.faint}>
+            {t("settings:account.title")}
+          </Text>
+          <Text size="sm" fw={600} c={tokens.text} data-testid="profile-account">
+            {status}
+          </Text>
+          <Text size="10px" c={tokens.faint}>
+            {t("settings:account.supportId", { id: supportId(uid) })}
+          </Text>
+        </Stack>
+        <Button
+          size="xs"
+          variant="default"
+          data-testid="profile-account-open"
+          onClick={() => {
+            go("settings");
+          }}
+        >
+          {t("settings:title")}
+        </Button>
+      </Group>
+    </Paper>
+  );
+};
+
+const DETAIL_ROWS: readonly {
+  id: string;
+  label: string;
+  read: (stats: MetaStats) => number;
+}[] = [
+  {
+    id: "shardsEarned",
+    label: "meta:profile.shardsEarned",
+    read: (s) => s.shardsEarned,
+  },
+  { id: "elites", label: "meta:profile.elites", read: (s) => s.elites },
+  { id: "t5Solved", label: "meta:profile.t5Solved", read: (s) => s.t5Solved },
+  { id: "beacons", label: "meta:profile.beacons", read: (s) => s.beacons },
+  {
+    id: "streak",
+    label: "meta:profile.streak",
+    read: (s) => s.noDeathStreak,
+  },
+  {
+    id: "bestStreak",
+    label: "meta:profile.bestStreak",
+    read: (s) => s.bestNoDeathStreak,
+  },
+  {
+    id: "deepClears",
+    label: "meta:profile.deepClears",
+    read: (s) => s.deepClears,
+  },
+  { id: "driftRuns", label: "meta:profile.driftRuns", read: (s) => s.driftRuns },
+  { id: "dailyRuns", label: "meta:profile.dailyRuns", read: (s) => s.dailyRuns },
+  {
+    id: "contractRuns",
+    label: "meta:profile.contractRuns",
+    read: (s) => s.contractRuns,
+  },
+  {
+    id: "wormholeRides",
+    label: "meta:profile.wormholeRides",
+    read: (s) => s.wormholeRides,
+  },
+  {
+    id: "holesBypassed",
+    label: "meta:profile.holesBypassed",
+    read: (s) => s.holesBypassed,
+  },
+];
 
 const StatCell = ({ label, value }: { label: string; value: string }) => (
   <Stack gap={0}>
@@ -37,8 +128,7 @@ const StatCell = ({ label, value }: { label: string; value: string }) => (
 );
 
 export const ProfileScreen = () => {
-  const { t } = useTranslation(["meta", "common", "content"]);
-  const go = useAppStore((s) => s.go);
+  const { t } = useTranslation(["meta", "common", "content", "settings"]);
   const level = useMetaStore((s) => s.level);
   const xp = useMetaStore((s) => s.xp);
   const shards = useMetaStore((s) => s.shards);
@@ -46,6 +136,7 @@ export const ProfileScreen = () => {
   const best = useMetaStore((s) => s.best);
   const endings = useMetaStore((s) => s.endings);
   const contracts = useMetaStore((s) => s.contracts);
+  const [detailed, setDetailed] = useState(false);
   const progress = progressWithinLevel(xp);
   const starTotal = CONTRACTS.reduce(
     (sum, def) => sum + countStars(contracts[def.id] ?? 0),
@@ -54,26 +145,12 @@ export const ProfileScreen = () => {
 
   return (
     <Screen
-      header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-          <Group justify="space-between">
-            <Text fw={700} c={tokens.text}>
-              {t("meta:profile.title")}
-            </Text>
-            <Button
-              size="xs"
-              variant="default"
-              onClick={() => {
-                go("modes");
-              }}
-            >
-              {t("common:back")}
-            </Button>
-          </Group>
-        </Paper>
-      }
+      width="grid"
+      header={<AppHeader />}
     >
       <Stack gap="sm">
+          <AccountLine />
+
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Group>
               <RingProgress
@@ -109,6 +186,7 @@ export const ProfileScreen = () => {
             </Group>
           </Paper>
 
+          <div className={grids.masonry} data-profile-columns>
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Stack gap="xs">
               <Text fw={600} c={tokens.text}>
@@ -141,6 +219,34 @@ export const ProfileScreen = () => {
                   value={String(stats.campaignClears)}
                 />
               </SimpleGrid>
+              <Button
+                size="compact-xs"
+                variant="subtle"
+                color="gray"
+                data-testid="profile-more"
+                onClick={() => {
+                  setDetailed((value) => !value);
+                }}
+              >
+                {t(detailed ? "meta:profile.less" : "meta:profile.more")}
+              </Button>
+              {detailed ? (
+                <SimpleGrid
+                  cols={2}
+                  spacing="xs"
+                  verticalSpacing="xs"
+                  data-profile-detail
+                >
+                  {DETAIL_ROWS.map((row) => (
+                    <div key={row.id} data-profile-row={row.id}>
+                      <StatCell
+                        label={t(row.label)}
+                        value={String(row.read(stats))}
+                      />
+                    </div>
+                  ))}
+                </SimpleGrid>
+              ) : null}
             </Stack>
           </Paper>
 
@@ -200,7 +306,7 @@ export const ProfileScreen = () => {
             </Stack>
           </Paper>
 
-          <AchievementGrid />
+          <AchievementSummary />
 
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Stack gap="xs">
@@ -243,6 +349,7 @@ export const ProfileScreen = () => {
               </SimpleGrid>
             </Stack>
           </Paper>
+          </div>
       </Stack>
     </Screen>
   );

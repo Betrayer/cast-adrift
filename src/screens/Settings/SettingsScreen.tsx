@@ -8,11 +8,13 @@ import {
   Stack,
   Switch,
   Text,
-  Title,
 } from '@mantine/core';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
+import grids from '@/app/grids.module.css';
+import { riseStyle } from '@/app/motion';
+import { AppHeader } from '@/components/AppHeader';
 import { tokens } from '@/app/theme';
 import { DIE_SKINS } from '@/data/cosmetics';
 import { THEMES, type ThemeId } from '@/data/themes';
@@ -23,9 +25,10 @@ import { AVAILABLE_LOCALES } from '@/i18n';
 import { trackEvent } from '@/services/analytics';
 import { playSfx } from '@/services/audio';
 import { recentErrors } from '@/services/errors';
+import { flashVignette } from '@/services/vignette';
 import { APP_VERSION } from '@/services/version';
-import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
+import { chooseTheme } from '@/services/prefs';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type {
   BattleSpeed,
@@ -33,7 +36,10 @@ import type {
   FontScale,
   Locale,
   ReducedMotionSetting,
+  VignetteIntensity,
 } from '@/types';
+import { AccountSection } from './AccountSection';
+import { LayoutPicker } from './LayoutPicker';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
@@ -130,7 +136,6 @@ const SkinPicker = () => {
 const ThemePicker = () => {
   const { t } = useTranslation(['settings', 'meta']);
   const active = useSettingsStore((s) => s.theme);
-  const setTheme = useSettingsStore((s) => s.setTheme);
   const owned = useMetaStore((s) => s.themes);
   const shards = useMetaStore((s) => s.shards);
   const spendShards = useMetaStore((s) => s.spendShards);
@@ -225,7 +230,7 @@ const ThemePicker = () => {
                   variant={selected ? 'filled' : 'default'}
                   disabled={selected}
                   onClick={() => {
-                    setTheme(def.id as ThemeId);
+                    chooseTheme(def.id as ThemeId);
                   }}
                 >
                   {t(selected ? 'settings:theme.active' : 'settings:theme.use')}
@@ -238,7 +243,7 @@ const ThemePicker = () => {
                     if (!spendShards(def.price)) return;
                     trackEvent({ name: 'meta_purchase', params: { kind: 'theme' } });
                     unlockTheme(def.id);
-                    setTheme(def.id);
+                    chooseTheme(def.id as ThemeId);
                     playSfx('buy');
                   }}
                 >
@@ -304,18 +309,24 @@ const Diagnostics = () => {
 
 export const SettingsScreen = () => {
   const { t } = useTranslation(['common', 'settings']);
-  const go = useAppStore((s) => s.go);
   const settings = useSettingsStore();
   const resetTutorial = useMetaStore((s) => s.resetTutorial);
 
   return (
-    <Screen>
+    <Screen width="grid" header={<AppHeader />}>
       <Stack gap="lg">
-      <Title order={2} c={tokens.text}>
-        {t('settings:title')}
-      </Title>
+      <div data-rise data-settings-section="account" style={riseStyle(0)}>
+        <AccountSection />
+      </div>
 
-      <Stack gap="xs">
+      <div className={grids.masonry} data-settings-columns>
+
+      <Stack
+        gap="xs"
+        data-rise
+        data-settings-section="language"
+        style={riseStyle(1)}
+      >
         <Text size="sm" c={tokens.dim}>
           {t('settings:language')}
         </Text>
@@ -326,13 +337,22 @@ export const SettingsScreen = () => {
             if (value !== null) settings.setLocale(value as Locale);
           }}
           data={LOCALE_OPTIONS}
+          data-testid="settings-locale"
           comboboxProps={{ withinPortal: true }}
         />
       </Stack>
 
-      <ThemePicker />
+      <div data-rise data-settings-section="layout" style={riseStyle(2)}>
+        <LayoutPicker />
+      </div>
 
-      <SkinPicker />
+      <div data-rise data-settings-section="theme" style={riseStyle(3)}>
+        <ThemePicker />
+      </div>
+
+      <div data-rise data-settings-section="skin" style={riseStyle(3)}>
+        <SkinPicker />
+      </div>
 
       <Stack gap="xs">
         <Text size="sm" c={tokens.dim}>
@@ -357,6 +377,7 @@ export const SettingsScreen = () => {
           {t('settings:sfxVolume')}
         </Text>
         <Slider
+          data-testid="settings-sfx"
           min={0}
           max={1}
           step={0.05}
@@ -444,20 +465,49 @@ export const SettingsScreen = () => {
         }}
       />
 
-      <Button variant="default" onClick={resetTutorial}>
+      <Stack gap="xs">
+        <Text size="sm" c={tokens.dim}>
+          {t('settings:vignette')}
+        </Text>
+        <SegmentedControl
+          fullWidth
+          data-testid="settings-vignette"
+          value={settings.vignette}
+          onChange={(value) => {
+            settings.setVignette(value as VignetteIntensity);
+            if (value !== 'off') flashVignette('shieldGain');
+          }}
+          data={[
+            { value: 'off', label: t('settings:off') },
+            { value: 'subtle', label: t('settings:vignetteSubtle') },
+            { value: 'full', label: t('settings:vignetteFull') },
+          ]}
+        />
+        <Text size="xs" c={tokens.faint}>
+          {t('settings:vignetteHint')}
+        </Text>
+      </Stack>
+
+      <Switch
+        label={t('settings:skipTally')}
+        data-testid="settings-skip-tally"
+        checked={settings.skipTally}
+        onChange={(event) => {
+          settings.setSkipTally(event.currentTarget.checked);
+        }}
+      />
+
+      <Button
+        variant="default"
+        data-press
+        data-testid="settings-tutorial-reset"
+        onClick={resetTutorial}
+      >
         {t('settings:tutorialReset')}
       </Button>
 
       <Diagnostics />
-
-      <Button
-        variant="default"
-        onClick={() => {
-          go('menu');
-        }}
-      >
-        {t('common:back')}
-      </Button>
+      </div>
       </Stack>
     </Screen>
   );

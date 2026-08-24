@@ -475,7 +475,7 @@ const SMALL_POOLS: Record<School, readonly Content[]> = {
   green: [
     mod({ battleEndHeal: 1 }, ["repairBay"]),
     mod({ growthCapDelta: 1 }, ["growth"]),
-    mod({ enginesThresholdDelta: 1 }, ["engines"]),
+    mod({ evasionDelta: 6 }, ["engines"]),
     eff([enginesBonus], "meta:chartFx.fx.enginesBonus", ["engines"]),
     eff([maxFaceHeal], "meta:chartFx.fx.greenHeal", ["green", "repairBay"]),
     eff([repeatValueCharge], "meta:chartFx.fx.repeatCharge", ["charge", "dice"]),
@@ -491,7 +491,7 @@ const SMALL_POOLS: Record<School, readonly Content[]> = {
     ]),
     mod({ growthCapDelta: 1, battleEndHeal: 1 }, ["growth", "repairBay"]),
     eff([greenSpore], "meta:chartFx.fx.greenSpore", ["green", "growth"]),
-    mod({ enginesThresholdDelta: 1, hullMaxDelta: 1 }, ["engines", "survival"]),
+    mod({ evasionDelta: 6, hullMaxDelta: 1 }, ["engines", "survival"]),
     eff([greenQuietBerth], "meta:chartFx.fx.greenQuietBerth", ["repairBay"]),
     mod({ battleEndHeal: 1, scrapPerKill: 1 }, ["repairBay", "scrap"]),
   ],
@@ -779,7 +779,7 @@ const NOTABLES: Record<School, readonly Named[]> = {
     },
     {
       key: "greenChloro",
-      mods: { growthCapDelta: 1, enginesThresholdDelta: 1 },
+      mods: { growthCapDelta: 1, evasionDelta: 6 },
       tags: ["growth", "engines"],
     },
     {

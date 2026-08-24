@@ -12,19 +12,19 @@ import type {
 } from "@/game/effects/types";
 import type { EnemyState, RolledDie, SlotId } from "@/types/battle";
 
-const WEAPON_SLOTS: ReadonlySet<SlotId> = new Set([
-  "weaponA",
-  "weaponB",
-  "spinal",
-]);
+const SLOT_FAMILIES: Readonly<Record<string, readonly SlotId[]>> = {
+  weapons: ["weaponA", "weaponB", "spinal"],
+  shields: ["shields", "shieldsB"],
+  engines: ["engines", "enginesB"],
+};
 
 export const slotMatches = (
   slotId: SlotId | undefined,
   match: SlotMatch,
 ): boolean => {
   if (slotId === undefined) return false;
-  if (match === "weapons") return WEAPON_SLOTS.has(slotId);
-  return slotId === match;
+  const family = SLOT_FAMILIES[match];
+  return family === undefined ? slotId === match : family.includes(slotId);
 };
 
 const enemyHpPct = (enemy: EnemyState): number =>

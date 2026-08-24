@@ -1,8 +1,9 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import { publishBodyRect } from '@/app/bands';
+import { EdgeVignette } from '@/components/EdgeVignette';
 import styles from './Screen.module.css';
 
-export type ScreenWidth = 'narrow' | 'wide' | 'full';
+export type ScreenWidth = 'narrow' | 'wide' | 'grid' | 'full';
 
 interface ScreenProps {
   children?: ReactNode;
@@ -21,12 +22,15 @@ interface ScreenProps {
   bodyRef?: RefObject<HTMLDivElement | null>;
 }
 
+const WIDTH_CLASS: Record<ScreenWidth, keyof typeof styles> = {
+  narrow: 'narrow',
+  wide: 'wide',
+  grid: 'grid',
+  full: 'full',
+};
+
 const widthClass = (width: ScreenWidth): string =>
-  width === 'wide'
-    ? styles.wide ?? ''
-    : width === 'full'
-      ? styles.full ?? ''
-      : styles.narrow ?? '';
+  styles[WIDTH_CLASS[width]] ?? '';
 
 export const Screen = ({
   children,
@@ -51,6 +55,7 @@ export const Screen = ({
     if (element === null) return;
     const measure = (): void => {
       const rect = element.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
       publishBodyRect({
         x: rect.left,
         y: rect.top,
@@ -104,7 +109,10 @@ export const Screen = ({
             if (bodyRef !== undefined) bodyRef.current = node;
           }}
         >
-          <div className={`${styles.inner ?? ''} ${innerClassName ?? ''}`}>
+          <div
+            className={`${styles.inner ?? ''} ${innerClassName ?? ''}`}
+            data-screen-inner
+          >
             {children}
           </div>
         </div>
@@ -113,6 +121,7 @@ export const Screen = ({
         )}
       </div>
       {overlay}
+      <EdgeVignette />
     </div>
   );
 };

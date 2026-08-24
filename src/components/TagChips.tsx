@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { TapPopover } from "@/components/TapPopover";
 import { schools } from "@/data/schools";
 import { type ContentTag } from "@/data/tags";
 import { tokens } from "@/app/theme";
@@ -24,15 +25,28 @@ export const TagChips = ({ tags, counts, size = "xs" }: TagChipsProps) => {
       {tags.map((tag) => {
         const owned = counts?.[tag] ?? 0;
         return (
-          <span
+          <TapPopover
             key={tag}
-            className={`${styles.chip ?? ""} ${size === "sm" ? styles.sm ?? "" : ""}`}
-            style={{ color: chipColor(tag), borderColor: chipColor(tag) }}
+            label={t(`run:tag.${tag}`)}
+            testId={`tag-${tag}`}
+            content={
+              <>
+                <b>{t(`run:tag.${tag}`)}</b>
+                <br />
+                {t(`run:tagDesc.${tag}`)}
+              </>
+            }
           >
-            {counts === undefined
-              ? t(`run:tag.${tag}`)
-              : t("run:tag.owned", { name: t(`run:tag.${tag}`), n: owned })}
-          </span>
+            <span
+              className={`${styles.chip ?? ""} ${size === "sm" ? styles.sm ?? "" : ""}`}
+              data-tag-chip={tag}
+              style={{ color: chipColor(tag), borderColor: chipColor(tag) }}
+            >
+              {counts === undefined
+                ? t(`run:tag.${tag}`)
+                : t("run:tag.owned", { name: t(`run:tag.${tag}`), n: owned })}
+            </span>
+          </TapPopover>
         );
       })}
     </div>

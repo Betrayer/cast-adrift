@@ -1,7 +1,7 @@
 {
   "name": "cast-adrift",
   "private": true,
-  "version": "2.0.0-pre",
+  "version": "2.1.0-pre",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -18,16 +18,29 @@
     "lint:content": "tsx scripts/contentLint.mts",
     "lint:roadmap": "tsx scripts/roadmapLint.mts",
     "sim:sweep": "tsx scripts/sim.mts --mode sweep --runs 500 --seed 11",
+    "sim:ladder": "tsx scripts/sim.mts --mode ladder --runs 200 --seed 11",
     "sim:perks": "tsx scripts/sim.mts --mode perks --runs 500 --sector 2 --seed 5",
     "sim:economy": "tsx scripts/sim.mts --mode economy --runs 200 --seed 11",
     "sim:deep": "tsx scripts/sim.mts --mode deep --runs 300 --seed 17",
     "sim:meta": "tsx scripts/sim.mts --mode meta",
     "sim:campaign": "tsx scripts/sim.mts --mode campaign --runs 300 --seed 11",
+    "sim:ships": "tsx scripts/sim.mts --mode ships --runs 200 --seed 11",
     "sim:puzzles": "tsx scripts/sim.mts --mode puzzles --runs 60 --seed 11",
     "sim:roster": "tsx scripts/sim.mts --mode roster --runs 120 --seed 13",
     "sim:s6": "tsx scripts/sim.mts --mode s6 --runs 300 --seed 17",
     "sim:dice": "tsx scripts/sim.mts --mode dice --runs 200 --sector 2 --seed 5",
-    "lint:keys": "tsx scripts/missingKeys.mts"
+    "lint:keys": "tsx scripts/missingKeys.mts",
+    "e2e": "playwright test",
+    "e2e:ui": "playwright test --ui",
+    "e2e:update": "playwright test --update-snapshots",
+    "e2e:smoke": "playwright test --grep smoke",
+    "e2e:visual": "playwright test --grep \"visual baselines\"",
+    "e2e:ci": "playwright test --project=mobile --project=desktop --grep smoke",
+    "e2e:build": "vite build",
+    "e2e:serve": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
+    "e2e:emu": "npx -y firebase-tools@14 emulators:exec --only auth,firestore --project cast-adrift-e2e \"playwright test -c playwright.emu.config.ts\"",
+    "e2e:emu:auth": "npx -y firebase-tools@14 emulators:exec --only auth --project cast-adrift-e2e \"playwright test -c playwright.emu.config.ts --grep-invert @firestore\"",
+    "test:rules": "npx -y firebase-tools@14 emulators:exec --only auth,firestore --project cast-adrift-rules \"vitest run --config vitest.rules.config.ts\""
   },
   "dependencies": {
     "@mantine/core": "^9.4.1",
@@ -46,6 +59,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
+    "@playwright/test": "^1.62.1",
     "@types/howler": "^2.2.13",
     "@types/matter-js": "^0.20.2",
     "@types/node": "^22.20.0",

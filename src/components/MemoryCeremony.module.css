@@ -1,22 +1,9 @@
-.veil {
-  position: fixed;
-  inset: 0;
-  z-index: var(--z-ceremony, 450);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 24px;
-  background: rgba(4, 6, 12, 0.82);
-  animation: fade 320ms ease both;
-}
-
 .card {
-  width: min(520px, 100%);
   padding: 24px;
   border-radius: 14px;
-  border: 1px solid var(--ca-memory-line);
-  background: var(--ca-memory-bg);
-  box-shadow: 0 0 46px -18px var(--ca-memory-glow);
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface1);
+  box-shadow: 0 0 46px -18px var(--ca-accent);
   animation: rise 420ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
@@ -32,15 +19,9 @@
   background: linear-gradient(
     90deg,
     transparent,
-    var(--ca-memory-glow),
+    var(--ca-accent),
     transparent
   );
-}
-
-@keyframes fade {
-  from {
-    opacity: 0;
-  }
 }
 
 @keyframes rise {
@@ -50,9 +31,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .veil,
-  .card {
-    animation: none;
-  }
+:root[data-ca-motion='reduced'] .card {
+  animation: none;
 }

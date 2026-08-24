@@ -8,6 +8,7 @@ export const RESOLUTION_ORDER: readonly SlotId[] = [
   "shields",
   "shieldsB",
   "engines",
+  "enginesB",
   "reactor",
   "repairBay",
 ];

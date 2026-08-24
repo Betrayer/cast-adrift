@@ -374,10 +374,39 @@
     "echoFleet-chorus": "Refren"
   },
   "ships": {
-    "wanderer": "Wędrowiec",
-    "ram": "Ram",
-    "ark": "Arka",
-    "ram-proto": "Prototyp Ram"
+    "wanderer": {
+      "name": "Wędrowiec",
+      "passiveName": "Osprzęt złomiarski",
+      "passiveDesc": "Każda walka zaczyna się z +2 złomu."
+    },
+    "ram": {
+      "name": "Taran",
+      "passiveName": "Przeciążenie",
+      "passiveDesc": "Slot broni przyjmuje kość powyżej limitu; każde takie umieszczenie kosztuje 2 kadłuba."
+    },
+    "ark": {
+      "name": "Arka",
+      "passiveName": "Bastion",
+      "passiveDesc": "Ćwierć stojącej tarczy przechodzi na następną turę."
+    },
+    "corsair": {
+      "name": "Pies myśliwski",
+      "passiveName": "Dopalacz",
+      "passiveDesc": "Umiejętność „Manewr” działa na pełnych obrotach: +10% szansy na unik oraz maksymalny współczynnik 70/30 zamiast 55/25. Każdy unik lub trafienie z boku zapewnia +1 do broni w następnej turze, maksymalnie +2 na turę."
+    },
+    "foundry": {
+      "name": "Kuźnia",
+      "passiveName": "Wyżarzanie",
+      "passiveDesc": "Raz na bitwę dwie kostki z tacy o tej samej wartości łączą się w jedną kostkę o jeden stopień większą, zachowując obie wartości."
+    },
+    "prism": {
+      "name": "Pryzmat",
+      "passiveName": "Refraktor",
+      "passiveDesc": "Kostki pryzmatyczne liczą się podwójnie w liczeniu rezonansu. Raz na bitwę jedna kostka staje się pryzmatyczna na tę turę."
+    },
+    "ram-proto": {
+      "name": "Prototyp Taran"
+    }
   },
   "perks": {
     "hot-charge": "Gorący ładunek",
@@ -3868,6 +3897,16 @@
       "2": "Żeby było jasne: i tak bym za tobą poszedł.",
       "3": "Fala nie zatrzymuje się trzy minuty po przekroczeniu tej linii. Nic się nie zatrzymuje.",
       "4": "Rozwiązaniem było zakończenie tego. Ty chciałeś zadać pytanie."
+    },
+    "wormhole": {
+      "1": "Komórka zniknęła. Nie została zniszczona — została odjęta.",
+      "2": "Obręcz sprawia wrażenie drzwi, które otwierają się do dowolnego pomieszczenia.",
+      "3": "Potrafię wytyczyć trasę dookoła. Nie potrafię jednak wytyczyć trasy przez to.",
+      "4": "Cokolwiek się tam za tym kryje, nie ma tego na mojej mapie.",
+      "5": "Wyszliśmy gdzieś. Próbuję ustalić, gdzie dokładnie.",
+      "6": "Wyniki pomiarów w ogóle się nie pokrywają. To też są dane.",
+      "7": "Odległość przestała być obietnicą mniej więcej minutę temu.",
+      "8": "Zapisz to jako skok. W dzienniku pojawi się nieprawdziwa informacja."
     }
   },
   "mutators": {
@@ -4062,9 +4101,6 @@
     "salvageCta": "Uruchom to w sieci",
     "signal1": "Głęboko w tym sektorze coś nadaje na modulowanej fali nośnej. To nie jest sygnał SOS. To pewien wzór.",
     "signal2": "Istnieją dwa sposoby interpretacji tego schematu, kapitanie. Żaden z nich nie napawa optymizmem.",
-    "signal3": "Igła, której wcześniej nie zauważyłeś, drga raz, po czym wraca do pozycji środkowej.",
-    "signalCta": "Wyznacz trasę",
-    "contact1": "Kontakt. Dron Scav — tani, głodny i gotowy, by się czegoś nauczyć. Najpierw broń: załaduj nabój do broni.",
     "contact2": "Dron skręca w twoją stronę, a jego silniki rozbłyskują.",
     "contactCta": "Zaangażuj się"
   },
@@ -5161,6 +5197,31 @@
         "thread": "Chce wiedzieć, czego od tego oczekujesz.",
         "core": "Ostatnim sygnałem nawigacyjnym jest Rdzeń, który sam zadaje to pytanie."
       }
+    }
+  },
+  "check": {
+    "engines": {
+      "say": "Engines first. The green die is theirs — a school in its own slot always pays a bonus.",
+      "fail": "Engines want the green school. That is what affinity means."
+    },
+    "shields": {
+      "say": "Shields take blue. A card's tint names the school that is strongest in it.",
+      "fail": "Shields want blue. Read the tint before you commit."
+    },
+    "weapons": {
+      "say": "Weapon A. Red plus its affinity — a five leaves as a seven.",
+      "fail": "Weapons want red. The card shows the sum before you drop."
+    },
+    "sensors": {
+      "say": "Sensors, then the gun. Systems fire by the numbers on their cards: sensors are 1, weapons are 2, so the mark lands before the shot.",
+      "fail": "Sensors take grey, and the gun still wants the red die this turn."
+    },
+    "reactor": {
+      "say": "Black feeds the reactor at one and a half. A four would overflow the pool and cost two hull — nudge it down. This one is on me.",
+      "fail": "The reactor is the black school's slot."
+    },
+    "free": {
+      "say": "Check complete. Free turn — the board is yours."
     }
   }
 }

@@ -6,7 +6,12 @@ import { registerPerfApp } from '@/pixi/perf';
 
 export type PixiMount = (app: Application) => (() => void) | undefined;
 
-export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
+export interface PixiCanvasProps {
+  mount: PixiMount;
+  transparent?: boolean;
+}
+
+export const PixiCanvas = ({ mount, transparent = false }: PixiCanvasProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -33,6 +38,7 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
       .init({
         resizeTo: container,
         background: tokens.bg,
+        backgroundAlpha: transparent ? 0 : 1,
         antialias: true,
         resolution: Math.min(window.devicePixelRatio, 2),
         autoDensity: true,
@@ -46,6 +52,7 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
         container.appendChild(app.canvas);
         unregisterPerf = registerPerfApp(app);
         unsubscribeTheme = onThemeChange((def) => {
+          if (transparent) return;
           app.renderer.background.color = hexToNumber(def.palette.bg);
         });
         cleanup = mount(app);
@@ -66,12 +73,17 @@ export const PixiCanvas = ({ mount }: { mount: PixiMount }) => {
         app.destroy({ removeView: true, releaseGlobalResources: false }, { children: true });
       }
     };
-  }, [mount]);
+  }, [mount, transparent]);
 
   return (
     <div
       ref={containerRef}
-      style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}
+      style={{
+        position: 'absolute',
+        inset: 0,
+        overflow: 'hidden',
+        pointerEvents: transparent ? 'none' : undefined,
+      }}
     />
   );
 };

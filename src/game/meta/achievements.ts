@@ -1,15 +1,23 @@
 import {
   ACHIEVEMENTS,
   ACHIEVEMENT_BY_ID,
+  tierNumeral,
   type AchievementCond,
   type AchievementDef,
 } from "@/data/achievements";
 import { CHART_NODE_BY_ID } from "@/data/chart";
 import { DIE_BY_ID } from "@/data/dice";
-import { useMetaStore, type CollectionEntry, type MetaStats } from "@/stores/metaStore";
+import { CHAINS, nextStep } from "@/data/narrative/chains";
+import {
+  useMetaStore,
+  type CollectionEntry,
+  type MetaStats,
+  type VoucherKind,
+} from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
-import type { RunStats } from "@/stores/runStore";
+import { useRunStore, type RunStats } from "@/stores/runStore";
 import type { School } from "@/types/content";
+import type { FlagValue } from "@/types/events";
 
 export interface AchievementRunCtx {
   win: boolean;
@@ -17,6 +25,7 @@ export interface AchievementRunCtx {
   beacons: number;
   puzzles: number;
   ascension: number;
+  deckSchools: number;
   stats: RunStats;
 }
 
@@ -67,6 +76,32 @@ const flagsHave = (
   archive: readonly string[],
 ): number => cond.keys.filter((key) => archive.includes(key)).length;
 
+const archiveFlags = (
+  archive: readonly string[],
+): Record<string, FlagValue> => {
+  const out: Record<string, FlagValue> = {};
+  for (const key of archive) out[key] = true;
+  return out;
+};
+
+const chainProgress = (
+  chainId: string,
+  archive: readonly string[],
+): AchievementProgress => {
+  const chain = CHAINS.find((c) => c.id === chainId);
+  if (chain === undefined) return { have: 0, need: 1, done: false };
+  const flags = archiveFlags(archive);
+  const have = chain.steps.filter((step) =>
+    step.done.some((key) => flags[key] !== undefined),
+  ).length;
+  return { have, need: chain.steps.length, done: have >= chain.steps.length };
+};
+
+const chainsDoneCount = (archive: readonly string[]): number => {
+  const flags = archiveFlags(archive);
+  return CHAINS.filter((chain) => nextStep(chain, flags) === null).length;
+};
+
 export const achievementProgress = (
   def: AchievementDef,
   ctx: AchievementCtx,
@@ -97,6 +132,10 @@ export const achievementProgress = (
       return of(ctx.run?.beacons ?? 0, cond.n);
     case "runPuzzles":
       return of(ctx.run?.puzzles ?? 0, cond.n);
+    case "runDeckSchools":
+      return flag(
+        ctx.run !== null && ctx.run.win && ctx.run.deckSchools >= cond.n,
+      );
     case "clearAtAscension":
       return flag(
         ctx.run !== null && ctx.run.win && ctx.run.ascension >= cond.n,
@@ -129,12 +168,31 @@ export const achievementProgress = (
       return of(ctx.seenPuzzles.length, cond.n);
     case "streak":
       return of(ctx.stats.bestNoDeathStreak, cond.n);
+    case "chainDone":
+      return chainProgress(cond.id, ctx.flagsArchive);
+    case "chainsDone":
+      return of(chainsDoneCount(ctx.flagsArchive), cond.n);
     case "flags":
       return cond.mode === "all"
         ? of(flagsHave(cond, ctx.flagsArchive), cond.keys.length)
         : flag(flagsHave(cond, ctx.flagsArchive) > 0);
   }
 };
+
+const RUN_SCOPED_CONDS: ReadonlySet<AchievementCond["c"]> = new Set([
+  "runStatAtMost",
+  "runHullPct",
+  "runBeacons",
+  "runPuzzles",
+  "runDeckSchools",
+  "clearAtAscension",
+]);
+
+export const isRunScoped = (def: AchievementDef): boolean =>
+  RUN_SCOPED_CONDS.has(def.cond.c);
+
+export const LIFETIME_ACHIEVEMENTS: readonly AchievementDef[] =
+  ACHIEVEMENTS.filter((def) => !isRunScoped(def));
 
 export const achievementMet = (
   def: AchievementDef,
@@ -144,11 +202,10 @@ export const achievementMet = (
 export const newlyMetAchievements = (
   ctx: AchievementCtx,
   already: readonly string[],
+  pool: readonly AchievementDef[] = ACHIEVEMENTS,
 ): AchievementDef[] => {
   const have = new Set(already);
-  return ACHIEVEMENTS.filter(
-    (def) => !have.has(def.id) && achievementMet(def, ctx),
-  );
+  return pool.filter((def) => !have.has(def.id) && achievementMet(def, ctx));
 };
 
 export const metaAchievementCtx = (
@@ -173,17 +230,26 @@ export const metaAchievementCtx = (
 export interface AchievementSettlement {
   unlocked: AchievementDef[];
   shards: number;
+  offers: string[];
 }
 
-export const settleAchievements = (
-  run: AchievementRunCtx | null = null,
-): AchievementSettlement => {
+const grantRewards = (defs: readonly AchievementDef[]): AchievementSettlement => {
   const meta = useMetaStore.getState();
-  const fresh = newlyMetAchievements(metaAchievementCtx(run), meta.achievements);
+  const unlocked: AchievementDef[] = [];
+  const offers: string[] = [];
   let shards = 0;
-  for (const def of fresh) {
+  for (const def of defs) {
     if (!meta.unlockAchievement(def.id)) continue;
+    unlocked.push(def);
     useNarrativeStore.getState().pushAchievement(def.id);
+    const run = useRunStore.getState();
+    if (run.active) {
+      useNarrativeStore.getState().pushJournal({
+        k: "achievement",
+        achievement: def.id,
+        sector: run.sector,
+      });
+    }
     const reward = def.reward;
     if (reward === undefined) continue;
     if (reward.shards !== undefined && reward.shards > 0) {
@@ -196,9 +262,91 @@ export const settleAchievements = (
     if (reward.badge !== undefined) {
       useMetaStore.getState().awardBadge(reward.badge);
     }
+    if (reward.voucher !== undefined) {
+      useMetaStore.getState().offerVoucher(def.id);
+      offers.push(def.id);
+    }
   }
-  return { unlocked: fresh, shards };
+  return { unlocked, shards, offers };
+};
+
+export const settleAchievements = (
+  run: AchievementRunCtx | null = null,
+): AchievementSettlement => {
+  const meta = useMetaStore.getState();
+  return grantRewards(
+    newlyMetAchievements(metaAchievementCtx(run), meta.achievements),
+  );
+};
+
+export const settleLifetimeAchievements = (): AchievementSettlement => {
+  const meta = useMetaStore.getState();
+  return grantRewards(
+    newlyMetAchievements(
+      metaAchievementCtx(null),
+      meta.achievements,
+      LIFETIME_ACHIEVEMENTS,
+    ),
+  );
+};
+
+export type VoucherChoice = "voucher" | "shards";
+
+export interface VoucherOffer {
+  achievement: string;
+  kind: VoucherKind;
+  altShards: number;
+}
+
+export const voucherOfferOf = (id: string): VoucherOffer | null => {
+  const def = ACHIEVEMENT_BY_ID.get(id);
+  const kind = def?.reward?.voucher;
+  if (def === undefined || kind === undefined) return null;
+  return {
+    achievement: id,
+    kind,
+    altShards: def.reward?.altShards ?? 0,
+  };
+};
+
+export const pendingVoucherOffer = (): VoucherOffer | null => {
+  for (const id of useMetaStore.getState().voucherOffers) {
+    const offer = voucherOfferOf(id);
+    if (offer !== null) return offer;
+  }
+  return null;
+};
+
+export const takeVoucherOffer = (
+  id: string,
+  choice: VoucherChoice,
+): boolean => {
+  const offer = voucherOfferOf(id);
+  if (offer === null) return false;
+  if (!useMetaStore.getState().clearVoucherOffer(id)) return false;
+  if (choice === "voucher" && useMetaStore.getState().grantVoucher(offer.kind)) {
+    return true;
+  }
+  useMetaStore.getState().addShards(offer.altShards);
+  return true;
 };
 
 export const achievementLabel = (id: string): string =>
   ACHIEVEMENT_BY_ID.get(id)?.name ?? id;
+
+export const achievementTitle = (
+  def: AchievementDef,
+  translate: (key: string) => string,
+): string =>
+  def.tier === undefined || (def.tierCount ?? 1) <= 1
+    ? translate(def.name)
+    : `${translate(def.name)} ${tierNumeral(def.tier)}`;
+
+export const achievementTitleById = (
+  id: string,
+  translate: (key: string) => string,
+): string => {
+  const def = ACHIEVEMENT_BY_ID.get(id);
+  return def === undefined ? id : achievementTitle(def, translate);
+};
+

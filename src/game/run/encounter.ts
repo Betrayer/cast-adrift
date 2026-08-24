@@ -174,18 +174,23 @@ export const sectorHpPct = (ctx: EnemyScaleContext = {}): number => {
   return scaling.hpPct + (ctx.pocket === true ? scaling.pocketPct : 0);
 };
 
+export const sectorDmgPct = (ctx: EnemyScaleContext = {}): number =>
+  sectorDef(ctx.sector ?? 1).scaling.dmgPct;
+
 export interface EnemyScale {
   tide?: number;
   sectorHpPct?: number;
   hpBonusPct?: number;
 }
 
+export const TIDE_HP_PCT = 10;
+
 export const scaleEnemyHp = (baseHp: number, scale: EnemyScale = {}): number =>
   Math.max(
     1,
     Math.round(
       baseHp *
-        (1 + 0.1 * Math.max(0, scale.tide ?? 0)) *
+        (1 + (TIDE_HP_PCT / 100) * Math.max(0, scale.tide ?? 0)) *
         (1 + Math.max(0, scale.sectorHpPct ?? 0) / 100) *
         (1 + Math.max(0, scale.hpBonusPct ?? 0) / 100),
     ),

@@ -374,10 +374,39 @@
     "echoFleet-chorus": "Refrain"
   },
   "ships": {
-    "wanderer": "Wanderer",
-    "ram": "Ram",
-    "ark": "Arche",
-    "ram-proto": "Ram-Prototyp"
+    "wanderer": {
+      "name": "Wanderer",
+      "passiveName": "Bergungsgeschirr",
+      "passiveDesc": "Jeder Kampf beginnt mit +2 Schrott."
+    },
+    "ram": {
+      "name": "Ramme",
+      "passiveName": "Überlast",
+      "passiveDesc": "Ein Waffenslot nimmt einen Würfel über seiner Obergrenze an; jede solche Platzierung kostet 2 Hülle."
+    },
+    "ark": {
+      "name": "Arche",
+      "passiveName": "Bollwerk",
+      "passiveDesc": "Ein Viertel des stehenden Schilds wird in die nächste Runde übernommen."
+    },
+    "corsair": {
+      "name": "Hund",
+      "passiveName": "Nachbrenner",
+      "passiveDesc": "„Manöver“ ist besonders wirkungsvoll: +10 % Ausweichen und eine Obergrenze von 70/30 statt 55/25. Jedes Ausweichen oder jeder Streiftreffer gewährt im nächsten Zug +1 auf die Waffen, bis zu +2 pro Zug."
+    },
+    "foundry": {
+      "name": "Schmiede",
+      "passiveName": "Glühen",
+      "passiveDesc": "Einmal pro Kampf verschmelzen zwei Würfel mit gleichem Wert zu einem Würfel einer höheren Stufe, der beide Werte aufweist."
+    },
+    "prism": {
+      "name": "Prisma",
+      "passiveName": "Refraktor",
+      "passiveDesc": "Prismatische Würfel zählen bei der Resonanzzählung doppelt. Einmal pro Kampf wird ein Würfel für diesen Zug prismatisch."
+    },
+    "ram-proto": {
+      "name": "Rammen-Prototyp"
+    }
   },
   "perks": {
     "hot-charge": "Heiße Ladung",
@@ -3868,6 +3897,16 @@
       "2": "Nur damit das klar ist: Ich wäre dir so oder so gefolgt.",
       "3": "Die Flut hält nicht drei nach dieser Linie an. Nichts hält dort an.",
       "4": "Es zu beenden, war die Antwort. Du wolltest die Frage."
+    },
+    "wormhole": {
+      "1": "Die Zelle ist weg. Nicht zerstört – sondern entfernt.",
+      "2": "Der Rand wirkt wie eine Tür, die sich zu jedem beliebigen Raum hin öffnet.",
+      "3": "Ich kann den Weg drum herum aufzeichnen. Den Weg hindurch kann ich nicht aufzeichnen.",
+      "4": "Was auch immer sich dahinter befindet, es ist nicht auf meiner Karte verzeichnet.",
+      "5": "Wir sind irgendwo angekommen. Ich versuche gerade herauszufinden, wo.",
+      "6": "Die Messgeräte stimmen in nichts überein. Auch das sind Daten.",
+      "7": "Die Entfernung ist seit etwa einer Minute kein Versprechen mehr.",
+      "8": "Trage es als Sprung ein. Der Eintrag wird dann nicht der Wahrheit entsprechen."
     }
   },
   "mutators": {
@@ -4062,9 +4101,6 @@
     "salvageCta": "Online stellen",
     "signal1": "Tief im Sektor sendet etwas auf einer strukturierten Trägerfrequenz. Kein Notruf. Ein Muster.",
     "signal2": "Es gibt zwei Möglichkeiten, dieses Muster zu interpretieren, Kapitän. Keine davon ist beruhigend.",
-    "signal3": "Eine Nadel, die dir bisher noch nie aufgefallen ist, zuckt einmal und kehrt dann wieder in die Mitte zurück.",
-    "signalCta": "Eine Route planen",
-    "contact1": "Kontakt. Scav-Drohne – billig, hungrig und kurz davor, etwas zu lernen. Zuerst die Waffen: Leg einen Würfel in die Waffe.",
     "contact2": "Die Drohne dreht sich zu dir um, ihre Triebwerke flackern auf.",
     "contactCta": "Mitmachen"
   },
@@ -5161,6 +5197,31 @@
         "thread": "Er möchte wissen, was du dir davon versprichst.",
         "core": "Das letzte Leuchtfeuer ist der Kern, und er stellt die Frage selbst."
       }
+    }
+  },
+  "check": {
+    "engines": {
+      "say": "Engines first. The green die is theirs — a school in its own slot always pays a bonus.",
+      "fail": "Engines want the green school. That is what affinity means."
+    },
+    "shields": {
+      "say": "Shields take blue. A card's tint names the school that is strongest in it.",
+      "fail": "Shields want blue. Read the tint before you commit."
+    },
+    "weapons": {
+      "say": "Weapon A. Red plus its affinity — a five leaves as a seven.",
+      "fail": "Weapons want red. The card shows the sum before you drop."
+    },
+    "sensors": {
+      "say": "Sensors, then the gun. Systems fire by the numbers on their cards: sensors are 1, weapons are 2, so the mark lands before the shot.",
+      "fail": "Sensors take grey, and the gun still wants the red die this turn."
+    },
+    "reactor": {
+      "say": "Black feeds the reactor at one and a half. A four would overflow the pool and cost two hull — nudge it down. This one is on me.",
+      "fail": "The reactor is the black school's slot."
+    },
+    "free": {
+      "say": "Check complete. Free turn — the board is yours."
     }
   }
 }

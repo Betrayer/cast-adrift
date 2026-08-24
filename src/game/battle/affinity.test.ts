@@ -63,11 +63,25 @@ describe("blue → Shields affinity", () => {
 });
 
 describe("green → Engines affinity", () => {
-  it("shifts the engine threshold tier", () => {
+  it("raises the evasion percentages by the Mk bonus", () => {
     const die = harnessDie("d0", "sprout", 5);
     const snap = harnessSnap([die]);
     place(snap, "d0", "engines");
-    expect(resolvePlayerPhase(snap).next.engineState).toBe("dodgePlus");
+    expect(resolvePlayerPhase(snap).next.evasion).toEqual({
+      dodgePct: 42,
+      glancingPct: 21,
+      intercept: false,
+    });
+  });
+});
+
+describe("grey → Sensors affinity", () => {
+  it("raises the vulnerability the sensors beat applies", () => {
+    const die = harnessDie("d0", "grey-d4", 3);
+    const snap = harnessSnap([die]);
+    place(snap, "d0", "sensors");
+    const { beats } = resolvePlayerPhase(snap);
+    expect(beats[0]?.sensor?.vulnerable).toBe(2);
   });
 });
 

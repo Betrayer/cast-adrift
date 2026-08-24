@@ -12,6 +12,7 @@ import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
+import type { WormholeThrow } from "@/game/map/wormhole";
 import type { SlotId } from "@/types/battle";
 import type { Rarity } from "@/types/content";
 import type { FlagValue } from "@/types/events";
@@ -77,6 +78,8 @@ export interface RunStats {
   maxBlackPlacedWin: number;
   dicePlaced: number;
   hullPctMin: number;
+  wormholeRides: number;
+  holesBypassed: number;
   actionHash: number;
   actionCount: number;
 }
@@ -85,12 +88,18 @@ export interface BattleTally {
   won: boolean;
   turns: number;
   shieldAbsorbed: number;
+  damageDealt: number;
+  damageTaken: number;
+  scrap: number;
+  hull: number;
+  hullMax: number;
   spinalMaxHit: number;
   rerollsUsed: number;
   repairBayHealed: number;
   endedFullHull: boolean;
   blackPlaced: number;
   dicePlaced: number;
+  maxResonance: number;
   burnKilledElite: boolean;
 }
 
@@ -111,6 +120,8 @@ const ADDITIVE_STAT_KEYS = [
   "burnKillElites",
   "shipyardVisits",
   "dicePlaced",
+  "wormholeRides",
+  "holesBypassed",
 ] as const;
 
 export const NO_BATTLE_TURNS = 0;
@@ -178,8 +189,11 @@ export interface RunValues {
   bonusReveal: number;
   shipyardDiscount: number;
   pendingBattle: PendingBattle | null;
+  pendingWormhole: NodeId | null;
+  lastWormhole: WormholeThrow | null;
   pendingDeepScan: boolean;
   pendingRewards: PendingRewards | null;
+  lastTally: BattleTally | null;
   shop: ShopState | null;
   deckSeq: number;
   stats: RunStats;
@@ -233,6 +247,7 @@ export interface RunState extends RunValues {
   noteDepth: (depth: number) => void;
   noteHullPct: (pct: number) => void;
   noteBattleTally: (tally: BattleTally) => void;
+  clearBattleTally: () => void;
   clearPendingDeepScan: () => void;
   setPendingDeepScan: (value: boolean) => void;
   setPendingRewards: (rewards: PendingRewards | null) => void;
@@ -272,6 +287,8 @@ export const createInitialRunStats = (): RunStats => ({
   maxBlackPlacedWin: 0,
   dicePlaced: 0,
   hullPctMin: FULL_HULL_PCT,
+  wormholeRides: 0,
+  holesBypassed: 0,
   actionHash: 0,
   actionCount: 0,
 });
@@ -324,8 +341,11 @@ export const createInitialRunValues = (): RunValues => ({
   bonusReveal: 0,
   shipyardDiscount: 0,
   pendingBattle: null,
+  pendingWormhole: null,
+  lastWormhole: null,
   pendingDeepScan: false,
   pendingRewards: null,
+  lastTally: null,
   shop: null,
   deckSeq: 0,
   stats: createInitialRunStats(),
@@ -610,6 +630,7 @@ export const useRunStore = create<RunState>()((set, get) => ({
       const prev = s.stats;
       const turns = Math.max(1, tally.turns);
       return {
+        lastTally: tally,
         stats: {
           ...prev,
           battlesWon: prev.battlesWon + (tally.won ? 1 : 0),
@@ -635,6 +656,10 @@ export const useRunStore = create<RunState>()((set, get) => ({
         },
       };
     });
+  },
+
+  clearBattleTally: () => {
+    set({ lastTally: null });
   },
 
   clearPendingDeepScan: () => {

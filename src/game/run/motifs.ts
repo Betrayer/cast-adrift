@@ -12,6 +12,7 @@ export const MOTIF_CONSEQUENCE: Readonly<Record<string, LocKey>> = {
   mine: "run:motif.mine",
   blessed: "run:motif.blessed",
   cursed: "run:motif.cursed",
+  bypass: "run:motif.bypass",
 };
 
 const motifOf = <K extends SectorMotif["m"]>(
@@ -57,6 +58,31 @@ export const applyEdgeMotifs = (
   const motif = motifOf(sector, "mineEdges");
   if (motif === undefined) return;
   fire(motif.toll, "mine", `mine:${from}:${to}`);
+};
+
+export const holeTollFor = (sector: number, hull: number): number => {
+  const motif = motifOf(sector, "blackHoles");
+  if (motif === undefined) return 0;
+  const toll = motif.toll.reduce(
+    (sum, effect) => (effect.k === "hull" && effect.n < 0 ? sum - effect.n : sum),
+    0,
+  );
+  return hull <= toll ? 0 : toll;
+};
+
+export const applyHoleToll = (
+  sector: number,
+  from: NodeId,
+  hole: NodeId,
+): number => {
+  const hull = useRunStore.getState().hull;
+  const cost = holeTollFor(sector, hull);
+  if (cost <= 0) {
+    useNarrativeStore.getState().pushConsequence("run:motif.holeScorch");
+    return 0;
+  }
+  fire([{ k: "hull", n: -cost }], "bypass", `bypass:${from}:${hole}`);
+  return cost;
 };
 
 export const applyNodeMotifs = (node: MapNode, sector: number): void => {

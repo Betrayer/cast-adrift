@@ -36,7 +36,8 @@
       "anomaly": "Anomalia",
       "beacon": "Latarnia",
       "boss": "Szef",
-      "inverted": "odwrócony"
+      "inverted": "odwrócony",
+      "hole": "Czarna dziura"
     },
     "previewNode": "{{type}} · ryzyko: {{risk}}",
     "previewPocket": "Objazd: lepsze łupy, trudniejsza walka",
@@ -44,7 +45,10 @@
       "low": "niski",
       "raised": "podniesiony",
       "high": "wysoki"
-    }
+    },
+    "hull": "Kadłub {{cur}}/{{max}}",
+    "scrap": "Złom {{n}}",
+    "previewHole": "Czarna dziura: obejść ją czy przejechać przez tunel czasoprzestrzenny"
   },
   "event": {
     "title": "Sygnał",
@@ -67,7 +71,6 @@
     "pass": "Sukces — {{total}}",
     "fail": "Niepowodzenie — {{total}}",
     "roll": "Rolka",
-    "back": "Powrót",
     "reqAxisMin": "wymaga wersji {{n}} lub nowszej",
     "reqAxisMax": "wymaga wersji {{n}} lub starszej",
     "checkLowest": "Nic powyżej {{n}}",
@@ -189,7 +192,6 @@
     "memory": "Echo Pamięć",
     "empty": "Nie zarejestrowano jeszcze żadnych wpisów.",
     "locked": "Jeszcze nie odkryte",
-    "back": "Powrót",
     "unread": "nowy",
     "glyphLegend": {
       "title": "Symbole szkolne",
@@ -197,7 +199,8 @@
     },
     "prologueTitle": "Pierwsze przejście",
     "prologueBody": "Odtwórz początkowe takty. Nic się nie zaczęło, nic nie zostało utracone.",
-    "prologueReplay": "Powtórka"
+    "prologueReplay": "Powtórka",
+    "badgeLegend": "Odznaki kości"
   },
   "consequenceToast": "Wynik: {{text}}",
   "rewards": {
@@ -240,7 +243,8 @@
     "scrap": "Złom: {{n}}",
     "hull": "Kadłub {{cur}}/{{max}}",
     "voucher": "Kupon Mk ×{{n}} — jeden bezpłatny poziom",
-    "voucherUse": "Bezpłatny"
+    "voucherUse": "Bezpłatny",
+    "fuse": "Stop — {{n}}"
   },
   "summary": {
     "victory": "Sektor oczyszczony",
@@ -251,14 +255,24 @@
     "perks": "Ulepszenia:",
     "perksNone": "brak",
     "toMenu": "Do menu",
-    "faced": "Źródło: {{names}}"
+    "faced": "Źródło: {{names}}",
+    "more": "Więcej",
+    "less": "Mniej",
+    "elites": "Elity",
+    "minibosses": "Minibossowie",
+    "bosses": "Bossowie",
+    "scrapSpent": "Wydany złom",
+    "hullPctMin": "Najniższy kadłub",
+    "dicePlaced": "Postawione kości",
+    "pct": "{{n}}%",
+    "wormholeRides": "Przejażdżki przez tunele czasoprzestrzenne",
+    "holesBypassed": "Pominięte dziury"
   },
   "prologue": {
     "title": "Prolog",
     "echo": "ECHO: {{line}}",
     "step": "{{cur}} / {{max}}",
-    "leave": "Powrót do menu",
-    "replayDone": "Powrót do „Kodeks”"
+    "leave": "Powrót do menu"
   },
   "interstitial": {
     "sector": "Sektor{{n}}",
@@ -293,10 +307,13 @@
     "aLevel": "A {{n}}",
     "tideCap": "Szczyty pływów interferencyjnych na stronie {{n}}",
     "launch": "Uruchomienie",
-    "back": "Powrót",
     "ascensionCost": "To cię kosztuje",
     "ascensionGain": "To się opłaca",
-    "shardMult": "+{{n}}% fragmentów dla całego przebiegu"
+    "shardMult": "+{{n}}% fragmentów dla całego przebiegu",
+    "changeShip": "Zmień statek",
+    "voucher": "Kupon: startowy atut",
+    "voucherCount": "{{n}} w banku",
+    "voucherHint": "Wydaj kupon, aby wybrać atut przed pierwszym skokiem."
   },
   "package": {
     "title": "Opakowanie typu Gate",
@@ -312,24 +329,52 @@
     "next": "Dalej",
     "skipAll": "Pomiń wszystko",
     "place": {
-      "title": "Przeciągnij kostkę do systemu",
-      "body": "Rzuć kostką, a następnie przeciągnij ją z tacki na pola „Broń”, „Tarcze”, „Silniki”, „Czujniki” lub „Reaktor”. Kostka nigdy nie zmieści się w polu, którego limit jest niższy od jej wartości."
+      "title": "Wyślij kość do systemu",
+      "body": "Dotknij kości, potem podświetlonej karty systemu — albo przeciągnij ją tam. Każda karta pokazuje wynik przed zatwierdzeniem, a kość nigdy nie wejdzie na kartę, której limit jest niższy od jej ściany."
     },
     "endTurn": {
-      "title": "Rozstrzygnij ruch",
-      "body": "Gdy układ na planszy będzie taki, jak chcesz, zakończ turę. Systemy strzelają od góry do dołu, a następnie odpowiada przeciwnik."
+      "title": "Rozlicz turę",
+      "body": "Gdy plansza wygląda jak trzeba, zakończ turę. Systemy odpalają w kolejności numerów na kartach, potem odpowiada wróg."
     },
     "reroll": {
       "title": "Dodatkowe próby są dostępne raz za darmo",
       "body": "Wybierz dowolną kostkę, która nadal znajduje się w tacki, i rzuć nią ponownie. Powtórne rzuty nie przechodzą na kolejną turę — niewykorzystany rzut przepada."
     },
     "nudge": {
-      "title": "Za opłatą zyskujesz precyzję",
-      "body": "Wybierz kostkę i wykorzystaj punkty mocy, aby zmienić wynik na jednej ściance o jeden w górę lub w dół. Punkty mocy pozwalają również na dodatkowe rzuty oraz wzmocnienia."
+      "title": "Charge buys precision",
+      "body": "Select a die, then use − and + on the console to move its face by one. Charge pays for it; a free nudge spends nothing."
     },
     "jump": {
       "title": "Wybierz następny węzeł",
       "body": "Dotknij podświetlonego węzła, a następnie wybierz opcję „Skok”. Mgła zasłania kolejne rzędy; czujniki i szczegółowe skanowanie poszerzają horyzont."
+    },
+    "targeting": {
+      "title": "Pick what you are shooting at",
+      "body": "Tap an enemy to make it the target. Weapons, marks and pierce all land on the target — subsystems are targeted the same way."
+    },
+    "reserve": {
+      "title": "Keep a die for next turn",
+      "body": "A reserved die skips the reroll and comes back with its face intact. Use it to hold a number the board cannot spend yet."
+    },
+    "actives": {
+      "title": "Some dice do more than sit",
+      "body": "A die with an active can flip, copy, bank or split. The row lights up only for the actives your tray can currently pay for."
+    },
+    "resonance": {
+      "title": "Schools reward company",
+      "body": "The chips count how many dice of each school the battle holds. Cross a threshold and the whole school gains a bonus for the fight."
+    },
+    "affinity": {
+      "title": "The bonus is the slot",
+      "body": "A school placed in its own system adds to the face before anything else reads it. That is the sum on the card, and it is free."
+    },
+    "prismatic": {
+      "title": "Prismatic counts as anything",
+      "body": "A prismatic die satisfies any school, and in a slot it inherits that slot’s affinity — bonus included. It also counts for resonance."
+    },
+    "fate": {
+      "title": "Fate is one roll, once",
+      "body": "The Fate die never enters a slot. One press, one roll per battle, and the table reads out what it gave you."
     }
   },
   "motif": {
@@ -342,7 +387,11 @@
     "pocket": "Kieszeń „objazdowa”: większe ryzyko, większa nagroda",
     "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie",
     "inversion": "Podciąganie odwrócone: systemy są rozpatrywane od ostatniego do pierwszego",
-    "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania"
+    "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania",
+    "blackHoles": "Czarna dziura: komórka zniknęła; jej ścieżka tworzy tunel czasoprzestrzenny",
+    "wormhole": "Krawędź tunelu czasoprzestrzennego: na jej skraju czeka wybór",
+    "bypass": "Ominął krawędź: fala musnęła kadłub",
+    "holeScorch": "Kadłub zbyt mało pieniędzy na opłatę za przejazd — bariera cię przepuściła"
   },
   "tag": {
     "red": "Czerwony",
@@ -376,7 +425,12 @@
     "swarm": "Rój",
     "spike": "Spike",
     "precision": "Precyzja",
-    "owned": "{{name}} ×{{n}}"
+    "owned": "{{name}} ×{{n}}",
+    "glossaryTitle": "Słownik tagów",
+    "glossaryBody": "Tagi to sposób, w jaki kości, atuty, moduły i grawerunki się odnajdują: efekt liczący tag liczy każdy przedmiot, który go nosi.",
+    "glossarySchools": "Szkoły",
+    "glossarySystems": "Systemy",
+    "glossaryMechanics": "Mechaniki"
   },
   "build": {
     "title": "Twoja kompilacja",
@@ -399,12 +453,12 @@
     "stability": "Stabilność {{n}}",
     "neutral": "Oś wyważona",
     "preview": "{{from}} → {{to}}",
-    "short": "Oś"
+    "short": "Oś",
+    "moves": "Czarne kości pchają ku Rezonansowi, niebieskie ku Stabilności; zdarzenia i dryf też ją ruszają."
   },
   "journal": {
     "title": "Dziennik biegowy",
     "open": "Czasopismo",
-    "back": "Powrót do mapy",
     "empty": "Jeszcze nic nie zostało napisane. Sektor nie zwrócił się do ciebie z żadną prośbą.",
     "sector": "Sektor{{n}}",
     "beacon": "Latarnia źródło — {{n}} z {{max}}",
@@ -421,7 +475,16 @@
     "here": "Znajdujesz się w sektorze „{{n}}”.",
     "chainsTitle": "Wątki",
     "chainStep": "{{cur}}/{{max}}",
-    "chainHere": "tutaj"
+    "chainHere": "tutaj",
+    "wormhole": {
+      "ride": "Przejechałem przez tunel czasoprzestrzenny {{way}}, {{rows}} – oto kilka wierszy",
+      "bypass": "Okrążyłem czarną dziurę"
+    },
+    "wormholeWay": {
+      "forward": "głębiej",
+      "backward": "wstecz"
+    },
+    "achievement": "Osiągnięcie: {{name}}"
   },
   "memory": {
     "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",
@@ -430,5 +493,72 @@
     "hintElite": "Poluj na elity z gry „{{n}}” podczas swoich biegów",
     "hintBeacons": "Rozpoznaj sygnały nawigacyjne typu „{{n}}” w jednym przebiegu",
     "hintEnding": "Przejdź do sekcji „Core” i wybierz"
+  },
+  "system": {
+    "title": "Menu statku",
+    "resume": "Wróć do gry",
+    "toMenu": "Zwiń do menu głównego",
+    "toMenuHint": "Przebieg jest zapisany — wróć do niego z menu.",
+    "open": "Menu"
+  },
+  "tally": {
+    "title": "Podsumowanie walki",
+    "titleLoss": "Ostatnia walka",
+    "turns": "Tury",
+    "dealt": "Zadane obrażenia",
+    "taken": "Otrzymane obrażenia",
+    "shield": "Pochłonięte przez tarczę",
+    "best": "Najlepszy cios spinalny",
+    "rerolls": "Użyte przerzuty",
+    "placed": "Postawione kości",
+    "scrap": "Zebrany złom",
+    "hull": "Kadłub {{cur}}/{{max}}",
+    "continue": "Dalej"
+  },
+  "tagDesc": {
+    "red": "Agresja: obrażenia broni, płomień i skoki.",
+    "blue": "Obrona: tarcze, pochłanianie i wytrzymałość.",
+    "green": "Ruch: silniki, unik i wzrost.",
+    "yellow": "Ekonomia: złom, wypłaty i dźwignia w sklepie.",
+    "black": "Ryzyko: ładunek, poświęcenie i oś Rezonansu.",
+    "grey": "Czytanie: sensory, obsługa kości i precyzja.",
+    "prismatic": "Joker: liczy się jako dowolna szkoła i dziedziczy powinowactwo slotu.",
+    "weapons": "Wszystko, co rozstrzyga się w slocie broni.",
+    "shields": "Wszystko, co rozstrzyga się w slocie tarcz.",
+    "engines": "Wszystko, co rozstrzyga się w slocie silników.",
+    "sensors": "Wszystko, co rozstrzyga się w slocie sensorów.",
+    "reactor": "Wszystko, co rozstrzyga się w slocie reaktora.",
+    "spinal": "Działo spinalne: jeden ogromny strzał, który klinuje przy niskim rzucie.",
+    "repairBay": "Zatoka naprawcza: kadłub leczony w trakcie walki.",
+    "burn": "Obrażenia w czasie, tykające na koniec tury wroga.",
+    "crit": "Ciosy mnożone przez 1,5 przed tarczami.",
+    "growth": "Wartości rosnące na stałe na najwyższej ściance.",
+    "reroll": "Przerzucanie kości, darmowe lub kupione.",
+    "charge": "Zasób reaktora płacący za popchnięcia, przerzuty i zrywy.",
+    "scrap": "Waluta przebiegu: sklepy, naprawy i ulepszenia Mk.",
+    "overcap": "Postawienie kości powyżej limitu slotu.",
+    "pierce": "Obrażenia ignorujące tarczę wroga.",
+    "dodge": "Unik rzucany na każdy przychodzący cios.",
+    "survival": "Utrzymanie się przy życiu: kadłub, ratunki od śmierci i podłogi.",
+    "control": "Odmawianie wrogowi: zakłócenia, blokady i bramy.",
+    "dice": "Praca z samymi kośćmi: obrót, kopia, zamiana, utrwalenie, podział.",
+    "shieldwall": "Warstwowa tarcza przenoszona między turami.",
+    "risk": "Koszt płacony kadłubem, złomem lub pewnością.",
+    "swarm": "Wiele małych kości zamiast kilku dużych.",
+    "spike": "Jedna ogromna wartość zamiast równego strumienia.",
+    "precision": "Wąskie, przewidywalne ścianki i dokładne wartości."
+  },
+  "hole": {
+    "title": "Czarna dziura",
+    "body": "Komórka zniknęła. Jej krawędź albo pozwoli ci ją ominąć, albo zabierze cię tam, gdzie sama wybierze.",
+    "gentle": "Stabilna tunelowa dziura",
+    "gentleWhy": "Pierwsze dwa zjazdy w serii są krótkie i zawsze prowadzą coraz głębiej.",
+    "bypass": "Obejść",
+    "bypassCost": "Objazd: − kadłub typu{{n}}",
+    "bypassFree": "Objazd: bezpłatny — kadłub nie może za to zapłacić",
+    "ride": "Wsiadaj i jedź",
+    "rideCost": "Przejazd: przejazd pociągiem linii „{{min}}” – stacja{{max}}, kierunek nieznany",
+    "rideGentle": "Ride: rzut „{{min}}” – „{{max}}”, wyłącznie w głębszym zakresie",
+    "landed": "Rzuty {{rows}} wiersze {{way}}"
   }
 }

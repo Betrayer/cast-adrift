@@ -6,6 +6,8 @@
   "starChart": "Carta estelar",
   "collection": "Colección",
   "codex": "Códice",
+  "profile": "Perfil",
+  "achievements": "Logros",
   "modes": "Modos",
   "settings": "Configuración",
   "resume": "Continuar: Sector {{sector}} · profundidad {{depth}}",
@@ -24,5 +26,6 @@
   "abandonTitle": "¿Abandonamos esta carrera?",
   "abandonBody": "Se borrarán tanto las partidas guardadas localmente como la copia en la nube. No hay vuelta atrás.",
   "abandonNo": "Guárdalo",
-  "abandonYes": "Abandonar"
+  "abandonYes": "Abandonar",
+  "version": "v{{version}}"
 }

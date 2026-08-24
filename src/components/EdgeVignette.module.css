@@ -1,0 +1,138 @@
+.layer {
+  position: fixed;
+  inset: var(--ca-safe-top) var(--ca-safe-right) var(--ca-safe-bottom)
+    var(--ca-safe-left);
+  z-index: var(--z-vignette);
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+
+.layer[data-vignette-intensity='off'] {
+  display: none;
+}
+
+.rim,
+.flash {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: opacity;
+}
+
+.rim[data-vignette-rim='shield'] {
+  background: radial-gradient(
+    ellipse 88% 74% at 50% 50%,
+    transparent 50%,
+    var(--ca-school-blue-stroke) 110%
+  );
+}
+
+.rim[data-vignette-rim='lowHull'] {
+  background: radial-gradient(
+    ellipse 88% 72% at 50% 50%,
+    transparent 46%,
+    var(--ca-danger) 108%
+  );
+}
+
+.rim[data-on='1'] {
+  opacity: calc(var(--vg-rim-alpha, 0.18) * var(--vg-scale, 1));
+  transition: opacity 320ms ease-out;
+}
+
+.rim[data-vignette-rim='lowHull'][data-on='1'] {
+  animation: vgBreathe 2600ms ease-in-out infinite;
+}
+
+@keyframes vgBreathe {
+  0%,
+  100% {
+    opacity: calc(var(--vg-rim-alpha, 0.14) * var(--vg-scale, 1) * 0.45);
+  }
+  50% {
+    opacity: calc(var(--vg-rim-alpha, 0.14) * var(--vg-scale, 1));
+  }
+}
+
+.flash[data-vignette-side='all'] {
+  background: radial-gradient(
+    ellipse 84% 70% at 50% 50%,
+    transparent 42%,
+    var(--vg-color, var(--ca-danger)) 104%
+  );
+}
+
+.flash[data-vignette-side='left'] {
+  background: linear-gradient(
+    to right,
+    var(--vg-color, var(--ca-danger)),
+    transparent 44%
+  );
+}
+
+.flash[data-vignette-side='right'] {
+  background: linear-gradient(
+    to left,
+    var(--vg-color, var(--ca-danger)),
+    transparent 44%
+  );
+}
+
+.flash[data-vignette-side='top'] {
+  background: linear-gradient(
+    to bottom,
+    var(--vg-color, var(--ca-danger)),
+    transparent 40%
+  );
+}
+
+.flash[data-vignette-side='bottom'] {
+  background: linear-gradient(
+    to top,
+    var(--vg-color, var(--ca-danger)),
+    transparent 40%
+  );
+}
+
+.flash[data-vignette-flash] {
+  animation: vgFlash var(--vg-ms, 400ms) var(--vg-ease, ease-out) both;
+}
+
+.flash[data-vignette-flash='shieldBreak'] {
+  animation-name: vgShatter;
+}
+
+@keyframes vgFlash {
+  0% {
+    opacity: 0;
+  }
+  16% {
+    opacity: calc(var(--vg-alpha, 0.3) * var(--vg-scale, 1));
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes vgShatter {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: calc(var(--vg-alpha, 0.34) * var(--vg-scale, 1));
+  }
+  26% {
+    opacity: calc(var(--vg-alpha, 0.34) * var(--vg-scale, 1) * 0.15);
+  }
+  42% {
+    opacity: calc(var(--vg-alpha, 0.34) * var(--vg-scale, 1) * 0.9);
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+:root[data-ca-motion='reduced'] .layer {
+  display: none;
+}

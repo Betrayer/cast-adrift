@@ -1,23 +1,28 @@
 import {
   Badge,
-  Button,
   Group,
   Paper,
   Select,
   SimpleGrid,
   Text,
 } from "@mantine/core";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { CARD_COLUMNS } from "@/app/grids";
+import { riseStyle } from "@/app/motion";
+import { AppHeader } from "@/components/AppHeader";
+import { useScreenParam } from "@/app/useScreenParam";
 import { tokens } from "@/app/theme";
+import { DieCardTrigger } from "@/components/DieCardModal";
+import { DieFilterChips } from "@/components/DieFilterChips";
 import { ALL_DICE } from "@/data/dice";
+import { DIE_FILTERS, dieHasFeature, type DieFeature } from "@/game/dice/card";
 import { schools } from "@/data/schools";
 import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
 import { unlockedDice } from "@/data/unlocks";
 import { dieRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
 import { unlockContextOf } from "@/game/meta/unlockState";
-import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import type { DieTier, School } from "@/types/content";
 
@@ -33,23 +38,41 @@ const SCHOOLS: readonly (School | "all")[] = [
 ];
 const TIERS: readonly (DieTier | 0)[] = [0, 4, 6, 8, 10, 12, 20, 100];
 
+const TIER_PARAMS: readonly string[] = TIERS.map((tier) => String(tier));
+
 type StateFilter = "all" | "owned" | "found" | "unknown";
 
 const STATES: readonly StateFilter[] = ["all", "owned", "found", "unknown"];
 
+const FEATURES: readonly (DieFeature | "all")[] = ["all", ...DIE_FILTERS];
+
 export const CollectionScreen = () => {
-  const { t } = useTranslation(["meta", "common", "content"]);
-  const go = useAppStore((s) => s.go);
+  const { t } = useTranslation(["meta", "common", "content", "battle"]);
   const collection = useMetaStore((s) => s.collection);
+  const engravings = useMetaStore((s) => s.engravings);
   const encountered = useMetaStore((s) => s.encountered);
   const level = useMetaStore((s) => s.level);
   const achievements = useMetaStore((s) => s.achievements);
   const ascension = useMetaStore((s) => s.ascension);
   const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
   const clears = useMetaStore((s) => s.stats.campaignClears);
-  const [schoolFilter, setSchoolFilter] = useState<School | "all">("all");
-  const [tierFilter, setTierFilter] = useState<number>(0);
-  const [stateFilter, setStateFilter] = useState<StateFilter>("all");
+  const [schoolFilter, setSchoolFilter] = useScreenParam<School | "all">(
+    "school",
+    SCHOOLS,
+    "all",
+  );
+  const [tierParam, setTierParam] = useScreenParam("tier", TIER_PARAMS, "0");
+  const [stateFilter, setStateFilter] = useScreenParam<StateFilter>(
+    "state",
+    STATES,
+    "all",
+  );
+  const [featureFilter, setFeatureFilter] = useScreenParam<DieFeature | "all">(
+    "feature",
+    FEATURES,
+    "all",
+  );
+  const tierFilter = Number(tierParam);
 
   const ownedCounts = useMemo(() => {
     const map = new Map<string, number>();
@@ -89,6 +112,11 @@ export const CollectionScreen = () => {
     if (schoolFilter !== "all" && row.def.school !== schoolFilter) return false;
     if (tierFilter !== 0 && row.def.tier !== tierFilter) return false;
     if (stateFilter !== "all" && row.state !== stateFilter) return false;
+    if (
+      featureFilter !== "all" &&
+      !dieHasFeature(row.def.id, featureFilter, engravings)
+    )
+      return false;
     return true;
   });
 
@@ -97,16 +125,11 @@ export const CollectionScreen = () => {
 
   return (
     <Screen
+      width="grid"
       header={
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-        <Group justify="space-between" mb="xs">
-          <Text fw={700} c={tokens.text}>
-            {t("meta:collection.title")}
-          </Text>
-          <Button size="xs" variant="default" onClick={() => { go("menu"); }}>
-            {t("common:back")}
-          </Button>
-        </Group>
+        <>
+        <AppHeader />
+        <Paper bg={tokens.surface1} p="md" radius="md" withBorder mt="xs">
         <Text size="xs" c={tokens.faint} mb="xs" data-collection-totals>
           {t("meta:collection.totals", {
             owned: ownedTotal,
@@ -119,6 +142,7 @@ export const CollectionScreen = () => {
             size="xs"
             miw={120}
             value={schoolFilter}
+            data-testid="collection-school"
             onChange={(v) => { setSchoolFilter((v as School | "all") ?? "all"); }}
             data={SCHOOLS.map((s) => ({
               value: s,
@@ -132,7 +156,8 @@ export const CollectionScreen = () => {
             size="xs"
             miw={120}
             value={String(tierFilter)}
-            onChange={(v) => { setTierFilter(Number(v ?? 0)); }}
+            data-testid="collection-tier"
+            onChange={(v) => { setTierParam(v ?? "0"); }}
             data={TIERS.map((tier) => ({
               value: String(tier),
               label: tier === 0 ? t("meta:hangar.filterAll") : `d${String(tier)}`,
@@ -158,12 +183,18 @@ export const CollectionScreen = () => {
             }))}
           />
         </Group>
+        <DieFilterChips
+          value={featureFilter}
+          onChange={setFeatureFilter}
+          testId="collection-feature-filter"
+        />
         </Paper>
+        </>
       }
     >
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
-            {filtered.map((row) => {
+          <SimpleGrid cols={CARD_COLUMNS} spacing="xs">
+            {filtered.map((row, index) => {
               const def = row.def;
               const unknown = row.state === "unknown";
               return (
@@ -174,20 +205,33 @@ export const CollectionScreen = () => {
                   withBorder
                   data-collection-entry={def.id}
                   data-collection-state={row.state}
+                  data-rise
                   bg={unknown ? tokens.bg : schools[def.school].fill}
-                  style={unknown ? { opacity: 0.65 } : undefined}
+                  style={
+                    unknown
+                      ? { opacity: 0.65, ...riseStyle(index) }
+                      : riseStyle(index)
+                  }
                 >
                   <Group justify="space-between">
-                    <Text
-                      size="sm"
-                      style={{
-                        color: unknown
-                          ? tokens.faint
-                          : schools[def.school].text,
-                      }}
-                    >
-                      {t(def.name)}
-                    </Text>
+                    {unknown ? (
+                      <Text size="sm" style={{ color: tokens.faint }}>
+                        {t(def.name)}
+                      </Text>
+                    ) : (
+                      <DieCardTrigger
+                        defId={def.id}
+                        engravings={engravings}
+                        testId={`collection-card-${def.id}`}
+                      >
+                        <Text
+                          size="sm"
+                          style={{ color: schools[def.school].text }}
+                        >
+                          {t(def.name)}
+                        </Text>
+                      </DieCardTrigger>
+                    )}
                     {row.owned > 0 ? (
                       <Badge size="sm" variant="light" color="gray">
                         {t("meta:collection.owned", { n: row.owned })}
@@ -203,7 +247,8 @@ export const CollectionScreen = () => {
                     )}
                   </Group>
                   <Text size="xs" c={tokens.faint}>
-                    d{def.tier} · {def.rarity} · {diePoints(def.id)} pts
+                    d{def.tier} · {t(`battle:die.rarity.${def.rarity}`)} ·{" "}
+                    {diePoints(def.id)} pts
                   </Text>
                   {row.met === undefined ? null : (
                     <Text size="xs" c={tokens.dim} data-collection-provenance>
