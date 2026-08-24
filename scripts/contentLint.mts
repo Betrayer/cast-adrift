@@ -2063,8 +2063,7 @@ const REVISION_3_TOTALS: readonly TotalsRow[] = [
     label: "barkLines",
     have: barkLines,
     target: 220,
-    shortfall:
-      "the 150->220 budget was handed from R6 to R7 and never entered R7's Definition of Done, so no phase ever owned it; the 63 missing lines are trigger coverage for the R3-R9 systems (puzzle tier, interference, detour, storm, inversion, banish, achievement, chain step) and are an R7 amendment, not an R11 tuning number",
+    shortfall: `the 150->220 budget was handed from R6 to R7 and never entered R7's Definition of Done, so no phase ever owned it; the ${String(220 - barkLines)} missing lines are trigger coverage for the R3-R9 systems (puzzle tier, interference, detour, storm, inversion, banish, achievement, chain step) and are an R7 amendment, not an R11 tuning number`,
   },
   { label: "keeperLines", have: KEEPER_LINES.length, target: 80 },
   { label: "memories", have: MEMORIES.length, target: 16 },

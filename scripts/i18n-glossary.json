@@ -105,6 +105,27 @@
       "es": "Casco",
       "fr": "Coque",
       "pl": "Kadłub"
+    },
+    {
+      "en": "Turn",
+      "de": "Zug",
+      "es": "Turno",
+      "fr": "Tour",
+      "pl": "Tura"
+    },
+    {
+      "en": "Shield",
+      "de": "Schild",
+      "es": "Escudo",
+      "fr": "Bouclier",
+      "pl": "Tarcza"
+    },
+    {
+      "en": "Charge",
+      "de": "Ladung",
+      "es": "Carga",
+      "fr": "Charge",
+      "pl": "Ładunek"
     }
   ]
 }

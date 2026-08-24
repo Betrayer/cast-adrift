@@ -233,6 +233,19 @@ export interface EnemyBeat {
   after: BattleSnapshot;
 }
 
+export interface BattleLogEntry {
+  id: string;
+  turn: number;
+  side: "you" | "foe";
+  kind: BeatKind | EnemyBeatKind;
+  actor: string;
+  amount: number;
+  hull: number;
+  shield: number;
+  dodged: number;
+  glanced: number;
+}
+
 export interface ResolutionBundle {
   beats: Beat[];
   enemyBeats: EnemyBeat[];

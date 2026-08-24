@@ -9,6 +9,7 @@ import {
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { CARD_COLUMNS } from "@/app/grids";
 import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { useScreenParam } from "@/app/useScreenParam";
@@ -124,6 +125,7 @@ export const CollectionScreen = () => {
 
   return (
     <Screen
+      width="grid"
       header={
         <>
         <AppHeader />
@@ -191,7 +193,7 @@ export const CollectionScreen = () => {
       }
     >
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
-          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
+          <SimpleGrid cols={CARD_COLUMNS} spacing="xs">
             {filtered.map((row, index) => {
               const def = row.def;
               const unknown = row.state === "unknown";

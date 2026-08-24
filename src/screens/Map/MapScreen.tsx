@@ -2,6 +2,7 @@ import { Button, Text } from "@mantine/core";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBackGuard } from "@/app/backGuard";
+import { useAtLeast } from "@/app/breakpoints";
 import { Screen } from "@/app/Screen";
 import { mixHex } from "@/app/color";
 import { prefetchBattle } from "@/app/prefetch";
@@ -274,7 +275,46 @@ export const forgetChainMarkers = (): void => {
   chainMemory.clear();
 };
 
+const MapShortcuts = () => {
+  const { t } = useTranslation(["run"]);
+  return (
+    <>
+      <Button
+        size="compact-xs"
+        variant="default"
+        data-open-journal
+        onClick={() => {
+          useAppStore.getState().go("journal");
+        }}
+      >
+        {t("run:journal.open")}
+      </Button>
+      <Button
+        size="compact-xs"
+        variant="default"
+        data-open-build
+        onClick={() => {
+          useAppStore.getState().setBuildSheet(true);
+        }}
+      >
+        {t("run:build.open")}
+      </Button>
+      <Button
+        size="compact-xs"
+        variant="default"
+        data-testid="map-system-menu"
+        onClick={() => {
+          useAppStore.getState().setSystemMenu(true);
+        }}
+      >
+        {t("run:system.open")}
+      </Button>
+    </>
+  );
+};
+
 const MapView = ({ map, position }: MapViewProps) => {
+  const wide = useAtLeast("lg");
   const { t } = useTranslation(["run", "common", "battle", "content"]);
   const visited = useRunStore((s) => s.visited);
   const tide = useRunStore((s) => s.tide);
@@ -708,36 +748,7 @@ const MapView = ({ map, position }: MapViewProps) => {
       </div>
       <div className={styles.headChips}>
         <AxisMeter axis={axis} compact withLabel={false} explain />
-        <Button
-          size="compact-xs"
-          variant="default"
-          data-open-journal
-          onClick={() => {
-            useAppStore.getState().go("journal");
-          }}
-        >
-          {t("run:journal.open")}
-        </Button>
-        <Button
-          size="compact-xs"
-          variant="default"
-          data-open-build
-          onClick={() => {
-            useAppStore.getState().setBuildSheet(true);
-          }}
-        >
-          {t("run:build.open")}
-        </Button>
-        <Button
-          size="compact-xs"
-          variant="default"
-          data-testid="map-system-menu"
-          onClick={() => {
-            useAppStore.getState().setSystemMenu(true);
-          }}
-        >
-          {t("run:system.open")}
-        </Button>
+        {wide ? null : <MapShortcuts />}
         <span className={styles.tideChip ?? ""} data-map-hull>
           {t("run:map.hull", { cur: hull, max: hullMax })}
         </span>
@@ -1252,15 +1263,11 @@ const MapView = ({ map, position }: MapViewProps) => {
           {t("run:map.tide", { n: tide })}
         </Text>
         <AxisMeter axis={axis} />
-        <Button
-          size="compact-xs"
-          variant="default"
-          onClick={() => {
-            useAppStore.getState().go("journal");
-          }}
-        >
-          {t("run:journal.open")}
-        </Button>
+        {wide ? (
+          <div className={styles.panelShortcuts}>
+            <MapShortcuts />
+          </div>
+        ) : null}
         {runModules.length > 0 ? (
           <Text size="xs" c={tokens.dim}>
             {moduleNames}

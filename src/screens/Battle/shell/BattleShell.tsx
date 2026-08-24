@@ -68,11 +68,44 @@ export const CausalityBanner = () => {
   );
 };
 
-export const StatusBar = () => {
-  const { t } = useTranslation(['battle', 'run']);
+export const RunActions = () => {
+  const { t } = useTranslation(['run']);
   const phase = useBattleStore((s) => s.phase);
   const setSystemMenu = useAppStore((s) => s.setSystemMenu);
   const setBuildSheet = useAppStore((s) => s.setBuildSheet);
+  return (
+    <>
+      <Button
+        className={styles.clickable}
+        size="compact-xs"
+        variant="subtle"
+        color="gray"
+        data-open-build
+        onClick={() => {
+          setBuildSheet(true);
+        }}
+      >
+        {t('run:build.open')}
+      </Button>
+      <Button
+        className={styles.clickable}
+        size="compact-xs"
+        variant="subtle"
+        color="gray"
+        data-testid="battle-system-menu"
+        disabled={phase !== 'placement'}
+        onClick={() => {
+          setSystemMenu(true);
+        }}
+      >
+        {t('run:system.open')}
+      </Button>
+    </>
+  );
+};
+
+export const StatusBar = ({ wide = false }: { wide?: boolean }) => {
+  const { t } = useTranslation(['battle', 'run']);
   const hull = useBattleStore((s) => s.hull);
   const hullMax = useBattleStore((s) => s.hullMax);
   const shield = useBattleStore((s) => s.shield);
@@ -97,7 +130,12 @@ export const StatusBar = () => {
   const ratio = hullMax > 0 ? Math.max(0, Math.min(1, hull / hullMax)) : 0;
 
   return (
-    <div className={styles.statusCard} data-band="status">
+    <div
+      className={`${styles.statusCard ?? ''} ${
+        wide ? styles.statusCardWide ?? '' : ''
+      }`}
+      data-band="status"
+    >
       <div className={styles.statusLeft}>
         <div className={styles.statusHeadline}>
           <Text size="sm" c={tokens.text}>
@@ -162,40 +200,16 @@ export const StatusBar = () => {
             {t('battle:charge', { n: charge, max: CHARGE_CAP })}
           </span>
         </TapPopover>
-        <Button
-          className={styles.clickable}
-          size="compact-xs"
-          variant="subtle"
-          color="gray"
-          data-open-build
-          onClick={() => {
-            setBuildSheet(true);
-          }}
-        >
-          {t('run:build.open')}
-        </Button>
-        <Button
-          className={styles.clickable}
-          size="compact-xs"
-          variant="subtle"
-          color="gray"
-          data-testid="battle-system-menu"
-          disabled={phase !== 'placement'}
-          onClick={() => {
-            setSystemMenu(true);
-          }}
-        >
-          {t('run:system.open')}
-        </Button>
+        {wide ? null : <RunActions />}
       </div>
     </div>
   );
 };
 
-export const TopBands = () => (
+export const TopBands = ({ wide = false }: { wide?: boolean }) => (
   <div className={styles.topBands}>
     <CausalityBanner />
-    <StatusBar />
+    <StatusBar wide={wide} />
   </div>
 );
 

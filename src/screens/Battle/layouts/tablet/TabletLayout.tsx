@@ -8,10 +8,18 @@ import {
   useDockModel,
 } from '@/screens/Battle/board/useDock';
 import { Console } from '@/screens/Battle/console/Console';
+import { BattleJournal } from '@/screens/Battle/journal/BattleJournal';
 import {
   EndTurnButton,
   ResonanceChips,
+  RunActions,
+  TopBands,
 } from '@/screens/Battle/shell/BattleShell';
+import {
+  WideCentre,
+  WideStage,
+} from '@/screens/Battle/layouts/wide/WideStage';
+import wideStyles from '@/screens/Battle/layouts/wide/Wide.module.css';
 import { CheckBanner } from '@/screens/Battle/shell/CheckBanner';
 import { ForecastStrip } from './ForecastStrip';
 import { SlotRow } from './SlotRow';
@@ -19,7 +27,7 @@ import boardStyles from '@/screens/Battle/board/Board.module.css';
 import screenStyles from '@/screens/Battle/BattleScreen.module.css';
 import styles from './Tablet.module.css';
 
-const Conveyor = () => {
+export const Conveyor = () => {
   const { board, ordered, legal, projections, reserved, reserveMax } =
     useDockModel();
   const { root } = useDockAnchors(ordered.length);
@@ -78,3 +86,49 @@ export const TabletFooter = () => (
     <EndTurnButton />
   </div>
 );
+
+export const TabletWide = () => {
+  const enemyRef = useRegion('enemies');
+  const trayRef = useRegion('tray');
+  return (
+    <WideStage
+      arena="wide"
+      left={
+        <>
+          <TopBands wide />
+          <div className={styles.wideConveyor}>
+            <Conveyor />
+          </div>
+        </>
+      }
+      centre={
+        <WideCentre
+          body={
+            <div className={boardStyles.column} data-layout="tablet">
+              <div
+                ref={enemyRef}
+                className={styles.wideEnemyBand}
+                data-band="enemies"
+              />
+              <div
+                ref={trayRef}
+                className={styles.wideTrayBand}
+                data-band="tray"
+              />
+            </div>
+          }
+          foot={<TabletFooter />}
+        />
+      }
+      right={
+        <>
+          <ForecastStrip />
+          <div className={wideStyles.railActions}>
+            <RunActions />
+          </div>
+          <BattleJournal />
+        </>
+      }
+    />
+  );
+};

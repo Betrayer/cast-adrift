@@ -485,3 +485,90 @@ test.describe('tablet specifics', () => {
     await expect(app.slotCard('reactor')).toContainText('×1.5');
   });
 });
+
+test.describe('desktop composition', () => {
+  test.skip(
+    ({ viewport }) => (viewport?.width ?? 0) < 900,
+    'the wide stage only exists from lg up',
+  );
+
+  for (const layout of LAYOUTS) {
+    test(`${layout} fills three columns and keeps the arena centred`, async ({
+      app,
+    }) => {
+      await openBattle(app, layout);
+      const stage = app.page.locator('[data-battle-wide]');
+      await expect(stage).toBeVisible();
+      const columns = await stage.evaluate(
+        (node) =>
+          getComputedStyle(node)
+            .gridTemplateColumns.split(' ')
+            .map((value) => Math.round(Number.parseFloat(value))),
+      );
+      expect(columns).toHaveLength(3);
+      for (const width of columns) expect(width).toBeGreaterThan(200);
+      const [left, centre, right] = columns;
+      expect(centre).toBeGreaterThanOrEqual(left ?? 0);
+      expect(centre).toBeGreaterThanOrEqual(right ?? 0);
+      await expect(
+        app.page.locator('[data-gutter="centre"] [data-layout]'),
+      ).toBeVisible();
+    });
+
+    test(`${layout} moves the run actions out of the status card`, async ({
+      app,
+    }) => {
+      await openBattle(app, layout);
+      await expect(
+        app.page.locator('[data-band="status"] [data-open-build]'),
+      ).toHaveCount(0);
+      await expect(
+        app.page.locator('[data-gutter] [data-open-build]'),
+      ).toBeVisible();
+      await expect(app.testId('battle-system-menu')).toBeVisible();
+    });
+
+    test(`${layout} carries the battle journal in a gutter`, async ({ app }) => {
+      await openBattle(app, layout);
+      const journal = app.page.locator('[data-battle-journal]');
+      await expect(journal).toBeVisible();
+      await expect(journal.locator('[data-journal-empty]')).toBeVisible();
+      const inGutter = await journal.evaluate(
+        (node) => node.closest('[data-gutter]')?.getAttribute('data-gutter') ?? '',
+      );
+      expect(['left', 'right']).toContain(inGutter);
+    });
+  }
+
+  test('the journal records both sides of a resolved turn', async ({ app }) => {
+    await openBattle(app, 'console');
+    await app.playTurn();
+    await app.waitForPlacement();
+    const journal = app.page.locator('[data-battle-journal]');
+    await expect(
+      journal.locator('[data-journal-side="you"]').first(),
+    ).toBeVisible();
+    await expect(
+      journal.locator('[data-journal-side="foe"]').first(),
+    ).toBeVisible();
+    await expect(journal.locator('[data-journal-empty]')).toHaveCount(0);
+  });
+});
+
+test.describe('narrow composition', () => {
+  test.skip(
+    ({ viewport }) => (viewport?.width ?? 0) >= 900,
+    'the stacked composition only exists below lg',
+  );
+
+  test('keeps the status in the header and the console in the footer', async ({
+    app,
+  }) => {
+    await openBattle(app, 'console');
+    await expect(app.page.locator('[data-battle-wide]')).toHaveCount(0);
+    await expect(app.page.locator('[data-battle-journal]')).toHaveCount(0);
+    await expect(
+      app.page.locator('[data-band="status"] [data-open-build]'),
+    ).toBeVisible();
+  });
+});

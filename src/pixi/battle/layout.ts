@@ -49,6 +49,9 @@ const DIE_MAX = 56;
 const DIE_FLOOR = 26;
 const ENEMY_MIN = 30;
 const ENEMY_MAX = 60;
+const WIDE_BAND = 480;
+const DIE_MAX_WIDE = 68;
+const ENEMY_MAX_WIDE = 78;
 const ENEMY_HIT_PAD = 6;
 const RING_REACH = 0.72;
 const ENEMY_GAP = 10;
@@ -57,6 +60,12 @@ const INTENT_HEADROOM = 16;
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
+
+export const dieCeilingFor = (bandWidth: number): number =>
+  bandWidth >= WIDE_BAND ? DIE_MAX_WIDE : DIE_MAX;
+
+export const enemyCeilingFor = (bandWidth: number): number =>
+  bandWidth >= WIDE_BAND ? ENEMY_MAX_WIDE : ENEMY_MAX;
 
 interface EnemyBlock {
   extentUp: number;
@@ -166,7 +175,7 @@ export const computeBattleLayout = (
       (trayBand.h - (rowsUsed - 1) * TRAY_GAP) / rowsUsed,
     ),
     DIE_FLOOR,
-    DIE_MAX,
+    dieCeilingFor(trayBand.w),
   );
 
   const trayHeight = rowsUsed * dieSize + (rowsUsed - 1) * TRAY_GAP;
@@ -186,7 +195,7 @@ export const computeBattleLayout = (
   let enemySize = clamp(
     enemyPitch - chipReach - ENEMY_GAP,
     ENEMY_MIN,
-    ENEMY_MAX,
+    enemyCeilingFor(enemyBand.w),
   );
   let block = enemyBlockFor(enemySize, subs, enemyPitch);
   if (block.height > enemyBand.h && block.height > 0) {

@@ -26,5 +26,6 @@
   "abandonTitle": "Бросить забег?",
   "abandonBody": "Обе локальные копии и облачная будут стёрты. Вернуться будет некуда.",
   "abandonNo": "Оставить забег",
-  "abandonYes": "Бросить"
+  "abandonYes": "Бросить",
+  "version": "v{{version}}"
 }

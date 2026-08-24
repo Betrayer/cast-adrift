@@ -19,6 +19,7 @@ import {
 } from "@/game/battle/actives";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { passiveActionOf, shipProfile } from "@/game/battle/passives";
+import { appendLog, logEntriesFrom } from "@/game/battle/log";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import {
   advanceTurn,
@@ -72,6 +73,7 @@ import { recordAction } from "@/game/run/actionLog";
 import { useRunStore, type BattleTally } from "@/stores/runStore";
 import type { School } from "@/types/content";
 import type {
+  BattleLogEntry,
   BattleOutcome,
   BattlePhase,
   BattleSnapshot,
@@ -207,6 +209,7 @@ export interface BattleValues {
   beats: Beat[];
   enemyBeats: EnemyBeat[];
   beatSeq: number;
+  log: BattleLogEntry[];
   blackUsed: number;
   blueUsed: number;
   shieldAbsorbed: number;
@@ -348,6 +351,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   beats: [],
   enemyBeats: [],
   beatSeq: 0,
+  log: [],
   blackUsed: 0,
   blueUsed: 0,
   shieldAbsorbed: 0,
@@ -1331,6 +1335,14 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       beats: bundle.beats,
       enemyBeats: bundle.enemyBeats,
       beatSeq: s.beatSeq + 1,
+      log: appendLog(
+        s.log,
+        logEntriesFrom(bundle, {
+          turn: s.turn,
+          seq: s.beatSeq + 1,
+          enemies: s.enemies,
+        }),
+      ),
       blackUsed,
       blueUsed,
       dicePlaced: s.dicePlaced + placed.length,
@@ -1505,6 +1517,7 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   beats: s.beats,
   enemyBeats: s.enemyBeats,
   beatSeq: s.beatSeq,
+  log: s.log,
   blackUsed: s.blackUsed,
   blueUsed: s.blueUsed,
   shieldAbsorbed: s.shieldAbsorbed,

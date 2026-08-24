@@ -26,6 +26,8 @@ export interface SlotPodProps {
   preview?: boolean;
 }
 
+const WIDE_POD = 72;
+
 const toneClass = (projection: SlotProjection): string => {
   const tone = projectionTone(projection);
   if (tone === 'danger') return styles.podValueDanger ?? '';
@@ -59,6 +61,7 @@ export const SlotPod = ({
       {...(preview ? {} : { 'data-slot': slotId })}
       {...(preview || !goal ? {} : { 'data-goal': '1' })}
       data-school={school}
+      {...(size >= WIDE_POD ? { 'data-wide': '1' } : {})}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
       className={[
         styles.pod ?? '',

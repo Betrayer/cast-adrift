@@ -329,5 +329,52 @@
   "targetingTitle": "Désignation",
   "targetingWhy": "Un dé dans les Capteurs rend la cible Vulnérable +D pour le tour : D vaut la moitié de la valeur du dé arrondie au supérieur, plafonnée à {{cap}}, et chaque coup de ce tour fait d’autant plus. Sur la face maximale du dé, le coup perce aussi le bouclier. Le Mk des Capteurs révèle en plus une rangée de carte par niveau au-dessus de Mk1.",
   "resEarnedLine": "{{n}} · {{desc}}",
-  "systemsTitle": "Systèmes"
+  "systemsTitle": "Systèmes",
+  "journal": {
+    "title": "Journal de combat",
+    "empty": "Rien n'a encore été résolu.",
+    "turn": "Tour {{n}}",
+    "hull": "−{{n}} Coque",
+    "shieldHit": "−{{n}} Bouclier",
+    "dodged": "esquivé ×{{n}}",
+    "glanced": "un coup d'œil ×{{n}}",
+    "you": {
+      "damage": "{{n}} dégâts",
+      "spinalJam": "blocage vertébral",
+      "shield": "+{{n}} Bouclier",
+      "engine": "ensemble d'évasion",
+      "sensor": "vulnérable + {{n}}",
+      "charge": "+{{n}} Charge",
+      "repair": "+{{n}} Coque",
+      "storm": "léger déplacement de la tempête"
+    },
+    "foe": {
+      "attack": "attaques visant {{n}}",
+      "shield": "boucliers + {{n}}",
+      "shieldAll": "protège le terrain + {{n}}",
+      "charge": "génère Charge",
+      "jamSlot": "bloque une fente",
+      "lockDie": "verrouille un moule",
+      "summon": "convocation",
+      "burnTick": "brûlures pour {{n}}",
+      "heal": "heals + {{n}}",
+      "steal": "vole des chutes de {{n}}",
+      "capShrink": "rétrécit un bouchon",
+      "twist": "tourne un dé",
+      "swap": "permet d'inverser vos valeurs",
+      "storm": "déclenche une tempête",
+      "explode": "fait un tabac à l'{{n}}",
+      "phase": "change de phase",
+      "curse": "curses a die −{{n}}",
+      "gate": "lève une barrière {{n}}",
+      "drain": "canalisations {{n}} Charge",
+      "siphon": "siphons {{n}} Bouclier",
+      "bargain": "vous facture {{n}}",
+      "enrage": "« Enrages » + «{{n}} »",
+      "hijack": "détourne un dé",
+      "ward": "élève un enfant",
+      "fold": "traite la commande",
+      "devour": "dévorer un dé"
+    }
+  }
 }

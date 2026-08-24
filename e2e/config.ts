@@ -9,7 +9,7 @@ export const isCI = process.env.CI === 'true' || process.env.CI === '1';
 
 const MOTION_SPECS = /.*\.motion\.spec\.ts/;
 const EMULATOR_SPECS = /.*\.emu\.spec\.ts/;
-const BASELINE_SPECS = /.*visual\.spec\.ts/;
+const BASELINE_SPECS = /[\\/]visual\.spec\.ts$/;
 
 const touchDevice = {
   ...devices['Desktop Chrome'],

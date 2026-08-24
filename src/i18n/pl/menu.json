@@ -26,5 +26,6 @@
   "abandonTitle": "Zrezygnować z tego przejazdu?",
   "abandonBody": "Zarówno pliki zapisane lokalnie, jak i kopia w chmurze zostaną usunięte. Nie ma już odwrotu.",
   "abandonNo": "Zachowaj to",
-  "abandonYes": "Porzucić"
+  "abandonYes": "Porzucić",
+  "version": "v{{version}}"
 }

@@ -10,6 +10,7 @@ import {
 import { useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import grids from "@/app/grids.module.css";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import {
@@ -39,7 +40,7 @@ export const AchievementsScreen = () => {
   );
 
   return (
-    <Screen header={<AppHeader />}>
+    <Screen width="grid" header={<AppHeader />}>
       <Stack gap="sm">
         <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
           <Stack gap="xs">
@@ -74,6 +75,7 @@ export const AchievementsScreen = () => {
             <BadgeRow />
           </Stack>
         </Paper>
+        <div className={grids.masonry} data-achievement-columns>
         {ACHIEVEMENT_GROUPS.map((group) => {
           const rows = ACHIEVEMENT_ROWS.filter((row) => row.group === group);
           if (rows.length === 0) return null;
@@ -103,6 +105,7 @@ export const AchievementsScreen = () => {
             </Paper>
           );
         })}
+        </div>
       </Stack>
     </Screen>
   );

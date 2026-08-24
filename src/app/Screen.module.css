@@ -35,6 +35,10 @@
   max-width: 720px;
 }
 
+.grid {
+  max-width: 1200px;
+}
+
 .full {
   max-width: none;
 }

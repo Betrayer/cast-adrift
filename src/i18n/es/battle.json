@@ -329,5 +329,52 @@
   "targetingTitle": "Designación",
   "targetingWhy": "Un dado en Sensores deja al objetivo Vulnerable +D durante el turno: D es la mitad del valor del dado redondeada hacia arriba, con tope de {{cap}}, y cada golpe de este turno hace esa cantidad de más. En la cara máxima del dado el golpe además perfora el escudo. El Mk de Sensores además revela una fila más del mapa por cada nivel sobre Mk1.",
   "resEarnedLine": "{{n}} · {{desc}}",
-  "systemsTitle": "Sistemas"
+  "systemsTitle": "Sistemas",
+  "journal": {
+    "title": "Registro de batalla",
+    "empty": "Todavía no se ha resuelto nada.",
+    "turn": "Turno {{n}}",
+    "hull": "−{{n}} Casco",
+    "shieldHit": "−{{n}} Escudo",
+    "dodged": "esquivó ×{{n}}",
+    "glanced": "de un vistazo ×{{n}}",
+    "you": {
+      "damage": "{{n}} daños",
+      "spinalJam": "bloqueo espinal",
+      "shield": "+{{n}} Escudo",
+      "engine": "conjunto de evasión",
+      "sensor": "vulnerable + {{n}}",
+      "charge": "+{{n}} Carga",
+      "repair": "+{{n}} Casco",
+      "storm": "empujón de tormenta"
+    },
+    "foe": {
+      "attack": "ataques contra {{n}}",
+      "shield": "escudos + {{n}}",
+      "shieldAll": "«Shields the Field» + «{{n}}»",
+      "charge": "crea Carga",
+      "jamSlot": "atascan una ranura",
+      "lockDie": "bloquea un troquel",
+      "summon": "citación",
+      "burnTick": "quemaduras por {{n}}",
+      "heal": "cura + {{n}}",
+      "steal": "roba un trozo de «{{n}}»",
+      "capShrink": "encoge una gorra",
+      "twist": "gira un dado",
+      "swap": "intercambia tus valores",
+      "storm": "desata una tormenta",
+      "explode": "se dispara en {{n}}",
+      "phase": "cambia de fase",
+      "curse": "curses a die −{{n}}",
+      "gate": "abre una puerta {{n}}",
+      "drain": "desagües {{n}} Carga",
+      "siphon": "sifones {{n}} Escudo",
+      "bargain": "te cobra {{n}}",
+      "enrage": "«Enrages» + «{{n}}»",
+      "hijack": "se apropia de un dado",
+      "ward": "cría a un pupilo",
+      "fold": "procesa el pedido",
+      "devour": "se traga un dado"
+    }
+  }
 }

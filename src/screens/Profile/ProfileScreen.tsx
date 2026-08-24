@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import grids from "@/app/grids.module.css";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
@@ -144,6 +145,7 @@ export const ProfileScreen = () => {
 
   return (
     <Screen
+      width="grid"
       header={<AppHeader />}
     >
       <Stack gap="sm">
@@ -184,6 +186,7 @@ export const ProfileScreen = () => {
             </Group>
           </Paper>
 
+          <div className={grids.masonry} data-profile-columns>
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
             <Stack gap="xs">
               <Text fw={600} c={tokens.text}>
@@ -346,6 +349,7 @@ export const ProfileScreen = () => {
               </SimpleGrid>
             </Stack>
           </Paper>
+          </div>
       </Stack>
     </Screen>
   );

@@ -26,5 +26,6 @@
   "abandonTitle": "Diesen Lauf abbrechen?",
   "abandonBody": "Sowohl die lokalen Speicherstände als auch die Cloud-Kopie werden gelöscht. Es gibt kein Zurück mehr.",
   "abandonNo": "Behalte es",
-  "abandonYes": "Aufgeben"
+  "abandonYes": "Aufgeben",
+  "version": "v{{version}}"
 }

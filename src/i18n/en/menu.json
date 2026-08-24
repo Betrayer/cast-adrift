@@ -26,5 +26,6 @@
   "abandonTitle": "Abandon this run?",
   "abandonBody": "Both local saves and the cloud copy are erased. There is no going back.",
   "abandonNo": "Keep it",
-  "abandonYes": "Abandon"
+  "abandonYes": "Abandon",
+  "version": "v{{version}}"
 }

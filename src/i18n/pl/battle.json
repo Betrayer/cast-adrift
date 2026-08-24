@@ -329,5 +329,52 @@
   "targetingTitle": "Naprowadzanie",
   "targetingWhy": "Kość w Sensorach czyni cel Podatnym +D na turę: D to połowa wartości kości zaokrąglona w górę, nie więcej niż {{cap}}, a każdy cios w tej turze zadaje o tyle więcej. Na najwyższej ściance kości cios dodatkowo przebija tarczę. Mk Sensorów dodatkowo odsłania jeden rząd mapy za każdy poziom powyżej Mk1.",
   "resEarnedLine": "{{n}} · {{desc}}",
-  "systemsTitle": "Systemy"
+  "systemsTitle": "Systemy",
+  "journal": {
+    "title": "Dziennik bitew",
+    "empty": "Na razie nic się nie wyjaśniło.",
+    "turn": "Tura {{n}}",
+    "hull": "−{{n}} Kadłub",
+    "shieldHit": "−{{n}} Tarcza",
+    "dodged": "uniknął × {{n}}",
+    "glanced": "rzucając okiem ×{{n}}",
+    "you": {
+      "damage": "{{n}} uszkodzenie",
+      "spinalJam": "zablokowanie kręgosłupa",
+      "shield": "+{{n}} Tarcza",
+      "engine": "zestaw do unikania",
+      "sensor": "osoby w trudnej sytuacji + {{n}}",
+      "charge": "+{{n}} Ładunek",
+      "repair": "+{{n}} Kadłub",
+      "storm": "lekki podmuch wiatru"
+    },
+    "foe": {
+      "attack": "ataki na stronę {{n}}",
+      "shield": "tarcze + {{n}}",
+      "shieldAll": "ochrona pola + {{n}}",
+      "charge": "tworzy Ładunek",
+      "jamSlot": "zablokowuje szczelinę",
+      "lockDie": "blokuje matrycę",
+      "summon": "wezwanie",
+      "burnTick": "płonie dla {{n}}",
+      "heal": "heals + {{n}}",
+      "steal": "kradnie złom z {{n}}",
+      "capShrink": "zmniejsza rozmiar czapki",
+      "twist": "kręci kostką",
+      "swap": "zamienia wartości",
+      "storm": "wywołuje burzę",
+      "explode": "wybucha dla {{n}}",
+      "phase": "zmienia fazę",
+      "curse": "curses a die —{{n}}",
+      "gate": "podnosi bramę {{n}}",
+      "drain": "odpływy {{n}} Ładunek",
+      "siphon": "syfon {{n}} Tarcza",
+      "bargain": "wysyła rachunki na adres {{n}}",
+      "enrage": "enrages + {{n}}",
+      "hijack": "przejmuje kontrolę nad kostką",
+      "ward": "wychowuje podopiecznego",
+      "fold": "realizuje zamówienie",
+      "devour": "pożera kostkę"
+    }
+  }
 }

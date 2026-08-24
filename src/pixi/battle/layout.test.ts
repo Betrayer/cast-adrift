@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   computeBattleLayout,
+  dieCeilingFor,
+  enemyCeilingFor,
   type BattleLayout,
   type BattleLayoutInput,
   type Rect,
@@ -126,6 +128,22 @@ describe("battle band layout", () => {
     );
     expect(layout.trayRows).toBe(2);
     expect(layout.dieSize).toBeGreaterThanOrEqual(40);
+  });
+
+  it("spends a desktop-wide band on bigger dice and a bigger enemy", () => {
+    const phone = frameFor("phone", 390, 172, 560);
+    const desktop = frameFor("desktop", 584, 172, 560);
+    const fight = { enemies: 1, subs: 0 };
+    const small = computeBattleLayout(inputFor(phone, 5, fight));
+    const large = computeBattleLayout(inputFor(desktop, 5, fight));
+    expect(dieCeilingFor(phone.trayBand.w)).toBeLessThan(
+      dieCeilingFor(desktop.trayBand.w),
+    );
+    expect(enemyCeilingFor(phone.enemyBand.w)).toBeLessThan(
+      enemyCeilingFor(desktop.enemyBand.w),
+    );
+    expect(large.dieSize).toBeGreaterThan(small.dieSize);
+    expect(large.enemySize).toBeGreaterThan(small.enemySize);
   });
 
   it("keeps a five-die deck on one row", () => {

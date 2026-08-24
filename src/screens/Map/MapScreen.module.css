@@ -107,6 +107,12 @@
     top: 16px;
   }
 
+  .panelShortcuts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
   .legendRow {
     display: flex;
     align-items: baseline;

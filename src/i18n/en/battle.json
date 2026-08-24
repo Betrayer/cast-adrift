@@ -329,5 +329,52 @@
   "targetingTitle": "Targeting",
   "targetingWhy": "A die in Sensors makes the target Vulnerable +D for the turn: D is half the die value rounded up, capped at {{cap}}, and every hit this turn deals that much more. On the die’s max face the hit also pierces the shield. Sensors Mk also reveals one more map row per level above Mk1.",
   "resEarnedLine": "{{n}} · {{desc}}",
-  "systemsTitle": "Systems"
+  "systemsTitle": "Systems",
+  "journal": {
+    "title": "Battle log",
+    "empty": "Nothing has resolved yet.",
+    "turn": "Turn {{n}}",
+    "hull": "−{{n}} Hull",
+    "shieldHit": "−{{n}} Shield",
+    "dodged": "dodged ×{{n}}",
+    "glanced": "glancing ×{{n}}",
+    "you": {
+      "damage": "{{n}} damage",
+      "spinalJam": "spinal jam",
+      "shield": "+{{n}} Shield",
+      "engine": "evasion set",
+      "sensor": "vulnerable +{{n}}",
+      "charge": "+{{n}} Charge",
+      "repair": "+{{n}} Hull",
+      "storm": "storm nudge"
+    },
+    "foe": {
+      "attack": "attacks for {{n}}",
+      "shield": "shields +{{n}}",
+      "shieldAll": "shields the field +{{n}}",
+      "charge": "builds Charge",
+      "jamSlot": "jams a slot",
+      "lockDie": "locks a die",
+      "summon": "summons",
+      "burnTick": "burns for {{n}}",
+      "heal": "heals +{{n}}",
+      "steal": "steals {{n}} scrap",
+      "capShrink": "shrinks a cap",
+      "twist": "twists a die",
+      "swap": "swaps your values",
+      "storm": "stirs a storm",
+      "explode": "explodes for {{n}}",
+      "phase": "changes phase",
+      "curse": "curses a die −{{n}}",
+      "gate": "raises a gate {{n}}",
+      "drain": "drains {{n}} Charge",
+      "siphon": "siphons {{n}} Shield",
+      "bargain": "bills you {{n}}",
+      "enrage": "enrages +{{n}}",
+      "hijack": "hijacks a die",
+      "ward": "raises a ward",
+      "fold": "folds the order",
+      "devour": "devours a die"
+    }
+  }
 }

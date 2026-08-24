@@ -26,5 +26,6 @@
   "abandonTitle": "¿Abandonamos esta carrera?",
   "abandonBody": "Se borrarán tanto las partidas guardadas localmente como la copia en la nube. No hay vuelta atrás.",
   "abandonNo": "Guárdalo",
-  "abandonYes": "Abandonar"
+  "abandonYes": "Abandonar",
+  "version": "v{{version}}"
 }

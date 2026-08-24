@@ -81,6 +81,9 @@ export class Screens {
 
   async expectScreen(id: string, timeout = READY_TIMEOUT): Promise<void> {
     await expect(this.screen(id)).toBeVisible({ timeout });
+    await expect(this.page.locator('[data-screen-loading]')).toHaveCount(0, {
+      timeout,
+    });
   }
 
   state(): Promise<TestState> {

@@ -87,6 +87,18 @@
   pointer-events: auto;
 }
 
+.statusCardWide {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  max-width: none;
+}
+
+.statusCardWide .statusRight {
+  max-width: none;
+  justify-content: flex-start;
+}
+
 .statusLeft {
   flex: 1;
   min-width: 0;
@@ -339,7 +351,14 @@
 
   .resonanceRow {
     flex-wrap: nowrap;
+    justify-content: safe center;
     gap: 4px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .resonanceRow::-webkit-scrollbar {
+    display: none;
   }
 
   .resChip {

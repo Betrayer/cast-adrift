@@ -114,7 +114,9 @@ export const forgetParkedScreens = (): void => {
   visitedKeepAlive.clear();
 };
 
-const Fallback = () => <Box mih="var(--ca-vh)" bg={tokens.bg} />;
+const Fallback = () => (
+  <Box mih="var(--ca-vh)" bg={tokens.bg} data-screen-loading />
+);
 
 export const Router = () => {
   const screen = useAppStore((s) => s.screen);

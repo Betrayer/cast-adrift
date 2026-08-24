@@ -26,5 +26,6 @@
   "abandonTitle": "Кинути забіг?",
   "abandonBody": "Обидві локальні копії та хмарна будуть стерті. Повертатися не буде куди.",
   "abandonNo": "Лишити забіг",
-  "abandonYes": "Кинути"
+  "abandonYes": "Кинути",
+  "version": "v{{version}}"
 }

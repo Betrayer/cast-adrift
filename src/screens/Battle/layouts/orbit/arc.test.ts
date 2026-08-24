@@ -1,7 +1,9 @@
 import { describe, expect, it } from "vitest";
 import { SHIPS } from "@/data/ships";
 import {
+  arcMaxPod,
   ARC_MAX_POD,
+  ARC_MAX_POD_WIDE,
   ARC_MIN_POD,
   ARC_MIN_WIDTH,
   ARC_SPAN_MAX,
@@ -52,7 +54,7 @@ describe("orbit arc solver", () => {
         const solution = solveArc({ ...viewport, count });
         if (!solution.fits) continue;
         expect(solution.podSize).toBeGreaterThanOrEqual(ARC_MIN_POD);
-        expect(solution.podSize).toBeLessThanOrEqual(ARC_MAX_POD);
+        expect(solution.podSize).toBeLessThanOrEqual(arcMaxPod(viewport.width));
         expect(solution.spanDeg).toBeGreaterThanOrEqual(ARC_SPAN_MIN);
         expect(solution.spanDeg).toBeLessThanOrEqual(ARC_SPAN_MAX);
         expect(solution.pods).toHaveLength(count);
@@ -118,6 +120,17 @@ describe("orbit arc solver", () => {
     expect(
       solveArc({ width: ARC_MIN_WIDTH, maxHeight: 300, count: 6 }).fits,
     ).toBe(true);
+  });
+
+  it("grows the pods and the silhouette once the arc is desktop-wide", () => {
+    const phone = solveArc({ width: 366, maxHeight: 320, count: 6 });
+    const desktop = solveArc({ width: 640, maxHeight: 460, count: 6 });
+    expect(phone.fits && desktop.fits).toBe(true);
+    expect(arcMaxPod(366)).toBe(ARC_MAX_POD);
+    expect(arcMaxPod(640)).toBe(ARC_MAX_POD_WIDE);
+    expect(desktop.podSize).toBeGreaterThan(phone.podSize);
+    expect(desktop.shipSize).toBeGreaterThan(phone.shipSize);
+    expect(desktop.radius).toBeGreaterThan(phone.radius);
   });
 
   it("orders pods left to right along the arc", () => {

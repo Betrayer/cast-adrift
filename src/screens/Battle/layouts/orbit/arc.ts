@@ -23,6 +23,10 @@ export interface ArcSolution {
 export const ARC_MIN_WIDTH = 340;
 export const ARC_MIN_POD = 48;
 export const ARC_MAX_POD = 64;
+export const ARC_WIDE_WIDTH = 560;
+export const ARC_MAX_POD_WIDE = 84;
+export const ARC_MAX_SHIP = 76;
+export const ARC_MAX_SHIP_WIDE = 116;
 export const ARC_SPAN_MIN = 150;
 export const ARC_SPAN_MAX = 170;
 
@@ -48,8 +52,15 @@ const clamp = (value: number, min: number, max: number): number =>
 
 const toRad = (deg: number): number => (deg * Math.PI) / 180;
 
+export const arcMaxPod = (width: number): number =>
+  width >= ARC_WIDE_WIDTH ? ARC_MAX_POD_WIDE : ARC_MAX_POD;
+
 export const arcShipSize = (width: number): number =>
-  clamp(width * 0.16, 44, 76);
+  clamp(
+    width * 0.16,
+    44,
+    width >= ARC_WIDE_WIDTH ? ARC_MAX_SHIP_WIDE : ARC_MAX_SHIP,
+  );
 
 const anglesFor = (count: number, spanDeg: number): number[] => {
   if (count <= 1) return [90];
@@ -111,7 +122,7 @@ export const solveArc = (input: ArcInput): ArcSolution => {
     return NO_FIT;
   }
   const shipSize = arcShipSize(input.width);
-  for (let pod = ARC_MAX_POD; pod >= ARC_MIN_POD; pod -= POD_STEP) {
+  for (let pod = arcMaxPod(input.width); pod >= ARC_MIN_POD; pod -= POD_STEP) {
     for (let span = ARC_SPAN_MIN; span <= ARC_SPAN_MAX; span += SPAN_STEP) {
       const attempt = tryFit(input, pod, span, shipSize);
       if (attempt === null) continue;

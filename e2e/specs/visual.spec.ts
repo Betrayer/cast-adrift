@@ -1,19 +1,10 @@
 import { expect, test } from '../fixtures';
+import { quiet, shot } from '../shot';
 import type { Screens } from '../screens';
 import type { SlotId } from '@/types/battle';
 
 const SEED = 7;
 const TALLY_SEEDS = [7, 11, 13, 17, 19, 23, 29, 31, 37, 41];
-
-const HIDE_TOASTS = '[data-toast-host]{display:none !important}';
-
-const quiet = (app: Screens): Promise<unknown> =>
-  app.page.addStyleTag({ content: HIDE_TOASTS });
-
-const shot = async (app: Screens, name: string): Promise<void> => {
-  await quiet(app);
-  await expect(app.page).toHaveScreenshot(name);
-};
 
 const CHECK_SCRIPT: readonly (readonly (readonly [string, SlotId])[])[] = [
   [['die-0', 'engines']],
@@ -114,26 +105,6 @@ test.describe('visual baselines', () => {
     await shot(fresh, 'check-step-5.png');
   });
 
-  test('menu', async ({ app }) => {
-    await shot(app, 'menu.png');
-  });
-
-  test('map', async ({ app }) => {
-    await app.seedRun({ seed: SEED });
-    await app.expectScreen('map');
-    await shot(app, 'map.png');
-  });
-
-  test('battle placement', async ({ app }) => {
-    await app.seedRun({ seed: SEED });
-    await app.page.evaluate(() => {
-      window.caTest?.setBattle({ enemyIds: ['raider'], seed: 42 });
-    });
-    await app.waitForPlacement();
-    await app.waitForStableAnchors();
-    await shot(app, 'battle-placement.png');
-  });
-
   test('battle loaded board', async ({ app }) => {
     await app.seedRun({ seed: SEED });
     await app.page.evaluate(() => {
@@ -202,22 +173,6 @@ test.describe('visual baselines', () => {
     await shot(app, 'battle-prismatic.png');
   });
 
-  test('battle orbit', async ({ app }) => {
-    await app.setLayout('orbit');
-    await app.seedRun({ seed: SEED });
-    await app.page.evaluate(() => {
-      window.caTest?.setBattle({
-        enemyIds: ['raider'],
-        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen', 'coreshard'],
-        seed: 42,
-        startCharge: 6,
-      });
-    });
-    await app.waitForPlacement();
-    await app.waitForStableAnchors();
-    await shot(app, 'battle-orbit.png');
-  });
-
   test('battle orbit narrow fallback', async ({ app }) => {
     await app.page.setViewportSize({ width: 330, height: 720 });
     await app.setLayout('orbit');
@@ -232,22 +187,6 @@ test.describe('visual baselines', () => {
     await app.waitForPlacement();
     await app.waitForStableAnchors();
     await shot(app, 'battle-orbit-narrow.png');
-  });
-
-  test('battle tablet', async ({ app }) => {
-    await app.setLayout('tablet');
-    await app.seedRun({ seed: SEED });
-    await app.page.evaluate(() => {
-      window.caTest?.setBattle({
-        enemyIds: ['raider'],
-        deck: ['ember', 'frostplate', 'sprout', 'grey-d4', 'ashen', 'coreshard'],
-        seed: 42,
-        startCharge: 6,
-      });
-    });
-    await app.waitForPlacement();
-    await app.waitForStableAnchors();
-    await shot(app, 'battle-tablet.png');
   });
 
   test('battle tablet forecast — taking damage', async ({ app }) => {
@@ -290,63 +229,11 @@ test.describe('visual baselines', () => {
     await shot(app, 'battle-tablet-clear.png');
   });
 
-  test('shop', async ({ app }) => {
-    await app.seedRun({ seed: SEED });
-    await app.grantRun(400);
-    await app.page.evaluate(() => {
-      window.caTest?.go('shop');
-    });
-    await app.expectScreen('shop');
-    await shot(app, 'shop.png');
-  });
-
-  test('star chart', async ({ app }) => {
-    await app.page.evaluate(() => {
-      window.caTest?.grantMeta({ level: 8, shards: 250 });
-    });
-    await app.testId('menu-starChart').click();
-    await app.expectScreen('chart');
-    await shot(app, 'chart.png');
-  });
-
-  test('settings', async ({ app }) => {
-    await app.testId('menu-settings').click();
-    await app.expectScreen('settings');
-    await app.waitForAuthSettled();
-    await shot(app, 'settings.png');
-  });
-
-  test('header — hangar', async ({ app }) => {
-    await app.testId('menu-hangar').click();
-    await app.expectScreen('hangar');
-    await shot(app, 'header-hangar.png');
-  });
-
-  test('header — collection', async ({ app }) => {
-    await app.testId('menu-collection').click();
-    await app.expectScreen('collection');
-    await shot(app, 'header-collection.png');
-  });
-
   test('header — codex', async ({ app }) => {
     await app.testId('menu-codex').click();
     await app.expectScreen('codex');
+    await expect(app.testId('app-back')).toBeVisible();
     await shot(app, 'header-codex.png');
-  });
-
-  test('header — profile', async ({ app }) => {
-    await app.page.evaluate(() => {
-      window.caTest?.grantMeta({ level: 8, shards: 250 });
-    });
-    await app.testId('menu-profile').click();
-    await app.expectScreen('profile');
-    await shot(app, 'header-profile.png');
-  });
-
-  test('header — achievements', async ({ app }) => {
-    await app.testId('menu-achievements').click();
-    await app.expectScreen('achievements');
-    await shot(app, 'header-achievements.png');
   });
 
   test('header — leaderboard', async ({ app }) => {

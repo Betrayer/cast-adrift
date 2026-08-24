@@ -15,6 +15,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { trackEvent } from "@/services/analytics";
 import { Screen } from "@/app/Screen";
+import { DIE_LIST_COLUMNS, SHIP_COLUMNS } from "@/app/grids";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { DieCardTrigger } from "@/components/DieCardModal";
@@ -172,6 +173,7 @@ export const HangarScreen = () => {
 
   return (
     <Screen
+      width="grid"
       header={
         <AppHeader
           actions={
@@ -185,7 +187,7 @@ export const HangarScreen = () => {
       <Stack gap="sm">
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
         <SimpleGrid
-          cols={{ base: 1, sm: 2, lg: 3 }}
+          cols={SHIP_COLUMNS}
           spacing="xs"
           mb="sm"
           data-hangar-ships
@@ -372,7 +374,7 @@ export const HangarScreen = () => {
           onChange={setFeatureFilter}
           testId="hangar-feature-filter"
         />
-          <Stack gap={6}>
+          <SimpleGrid cols={DIE_LIST_COLUMNS} spacing={6} data-hangar-dice>
             {(tab === "build" ? collectionIds : shopIds).map((id, index) => {
               const def = DIE_BY_ID.get(id);
               if (def === undefined) return null;
@@ -458,7 +460,7 @@ export const HangarScreen = () => {
                 </Group>
               );
             })}
-          </Stack>
+          </SimpleGrid>
         <Divider my="xs" color={tokens.line} />
         <Group gap="xs" grow>
           <Button

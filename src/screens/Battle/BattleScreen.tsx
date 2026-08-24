@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAtLeast } from '@/app/breakpoints';
 import { Screen } from '@/app/Screen';
 import { LootReveal } from '@/screens/Battle/LootReveal';
 import { useLootStore } from '@/stores/lootStore';
@@ -55,6 +56,7 @@ export const BattleScreen = () => {
   const enemyBeats = useBattleStore((s) => s.enemyBeats);
   const beatSeq = useBattleStore((s) => s.beatSeq);
   const preferredLayout = useBattleLayoutId();
+  const wide = useAtLeast('lg');
   const checkActive = useBattleStore((s) => s.checkSteps !== null);
   const layoutId = checkActive ? 'console' : preferredLayout;
   const bossFight = introEnemyId !== null;
@@ -153,8 +155,8 @@ export const BattleScreen = () => {
       passThrough
       bodyClassName={styles.board}
       innerClassName={styles.inner}
-      header={<TopBands />}
-      footer={<view.Footer key={layoutId} />}
+      header={wide ? undefined : <TopBands />}
+      footer={wide ? undefined : <view.Footer key={layoutId} />}
       overlay={
         <>
           <PixiCanvas mount={mountScene} transparent />
@@ -175,7 +177,11 @@ export const BattleScreen = () => {
         </>
       }
     >
-      <view.Body key={layoutId} />
+      {wide ? (
+        <view.Wide key={`wide-${layoutId}`} />
+      ) : (
+        <view.Body key={layoutId} />
+      )}
     </Screen>
   );
 };

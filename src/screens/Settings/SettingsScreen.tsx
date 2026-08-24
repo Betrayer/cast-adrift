@@ -12,6 +12,7 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
+import grids from '@/app/grids.module.css';
 import { riseStyle } from '@/app/motion';
 import { AppHeader } from '@/components/AppHeader';
 import { tokens } from '@/app/theme';
@@ -312,11 +313,13 @@ export const SettingsScreen = () => {
   const resetTutorial = useMetaStore((s) => s.resetTutorial);
 
   return (
-    <Screen header={<AppHeader />}>
+    <Screen width="grid" header={<AppHeader />}>
       <Stack gap="lg">
       <div data-rise data-settings-section="account" style={riseStyle(0)}>
         <AccountSection />
       </div>
+
+      <div className={grids.masonry} data-settings-columns>
 
       <Stack
         gap="xs"
@@ -504,6 +507,7 @@ export const SettingsScreen = () => {
       </Button>
 
       <Diagnostics />
+      </div>
       </Stack>
     </Screen>
   );

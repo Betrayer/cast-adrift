@@ -329,5 +329,52 @@
   "targetingTitle": "Zielerfassung",
   "targetingWhy": "Ein Würfel in den Sensoren macht das Ziel für die Runde Verwundbar +D: D ist der halbe Würfelwert aufgerundet, höchstens {{cap}}, und jeder Treffer dieser Runde macht so viel mehr. Auf der Höchstseite durchschlägt der Treffer zusätzlich den Schild. Sensor-Mk deckt außerdem pro Stufe über Mk1 eine weitere Kartenzeile auf.",
   "resEarnedLine": "{{n}} · {{desc}}",
-  "systemsTitle": "Systeme"
+  "systemsTitle": "Systeme",
+  "journal": {
+    "title": "Kampfprotokoll",
+    "empty": "Es hat sich noch nichts geklärt.",
+    "turn": "Zug {{n}}",
+    "hull": "−{{n}} Hülle",
+    "shieldHit": "−{{n}} Schild",
+    "dodged": "ausgewichen ×{{n}}",
+    "glanced": "flüchtiger Blick ×{{n}}",
+    "you": {
+      "damage": "{{n}} Schaden",
+      "spinalJam": "Wirbelsäulenblockade",
+      "shield": "+{{n}} Schild",
+      "engine": "Ausweichmanöver",
+      "sensor": "vulnerable + {{n}}",
+      "charge": "+{{n}} Ladung",
+      "repair": "+{{n}} Hülle",
+      "storm": "Sturm-Nudge"
+    },
+    "foe": {
+      "attack": "Angriffe auf {{n}}",
+      "shield": "Schilde + {{n}}",
+      "shieldAll": "schützt das Feld + {{n}}",
+      "charge": "erstellt Ladung",
+      "jamSlot": "verstopft einen Schlitz",
+      "lockDie": "sperrt einen Würfel",
+      "summon": "Vorladung",
+      "burnTick": "brennt für {{n}}",
+      "heal": "heilt + {{n}}",
+      "steal": "stiehlt Schrott von „{{n}}“",
+      "capShrink": "schrumpft eine Mütze",
+      "twist": "dreht einen Würfel",
+      "swap": "tauscht deine Werte aus",
+      "storm": "löst einen Sturm aus",
+      "explode": "explodiert für „{{n}}“",
+      "phase": "wechselt die Phase",
+      "curse": "curses a die –{{n}}",
+      "gate": "öffnet ein Tor {{n}}",
+      "drain": "Abflüsse {{n}} Ladung",
+      "siphon": "Siphons {{n}} Schild",
+      "bargain": "Rechnungen an Sie {{n}}",
+      "enrage": "„Enrages“ + „{{n}}“",
+      "hijack": "kapert einen Würfel",
+      "ward": "zieht einen Schützling groß",
+      "fold": "bearbeitet die Bestellung",
+      "devour": "verschlingt einen Würfel"
+    }
+  }
 }

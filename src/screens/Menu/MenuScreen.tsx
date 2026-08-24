@@ -22,6 +22,7 @@ import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
 import { MenuBadge, menuBadgeId } from '@/screens/Profile/BadgeRow';
 import { ResumeCard } from '@/screens/Menu/ResumeCard';
 import { haptic } from '@/services/tma';
+import { APP_VERSION } from '@/services/version';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
@@ -144,6 +145,9 @@ export const MenuScreen = () => {
           </Title>
           <Text c={tokens.dim} size="sm">
             {t('menu:tagline')}
+          </Text>
+          <Text c={tokens.faint} size="xs" data-menu-version>
+            {t('menu:version', { version: APP_VERSION })}
           </Text>
         </div>
         <div className={styles.actions}>
