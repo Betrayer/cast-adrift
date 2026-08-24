@@ -132,7 +132,7 @@ export const SummaryScreen = () => {
   const findShards = result?.findShards ?? 0;
 
   useEffect(() => {
-    if (firstFinds.length === 0 || reduced) return;
+    if (firstFinds.length === 0) return;
     const clock = rafClock();
     const tweens = new Tweens(clock);
     tweens.channel(UI_GROUP).sequence(
@@ -147,7 +147,7 @@ export const SummaryScreen = () => {
       tweens.destroy();
       clock.destroy();
     };
-  }, [firstFinds, reduced]);
+  }, [firstFinds]);
 
   const progress = progressWithinLevel(xp);
   const perkNames = perks
@@ -271,17 +271,11 @@ export const SummaryScreen = () => {
               data-rise
               style={riseStyle(0)}
             >
-              {t(
-                findShards > 0
-                  ? "meta:summary.firstFindsShards"
-                  : "meta:summary.firstFinds",
-                {
-                  names: firstFinds
-                    .map((id) => t(DIE_BY_ID.get(id)?.name ?? id))
-                    .join(" · "),
-                  n: findShards,
-                },
-              )}
+              {t("meta:summary.firstFinds", {
+                names: firstFinds
+                  .map((id) => t(DIE_BY_ID.get(id)?.name ?? id))
+                  .join(" · "),
+              })}
             </Text>
           )}
           {(result?.achievements ?? []).length === 0 ? null : (

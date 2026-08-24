@@ -258,6 +258,15 @@ export class Screens {
     );
   }
 
+  async summaryFinds(defIds: readonly string[], shards: number): Promise<void> {
+    await this.page.evaluate(
+      (value) => {
+        window.caTest?.summaryFinds(value.defIds, value.shards);
+      },
+      { defIds: [...defIds], shards },
+    );
+  }
+
   async vignetteRim(kind: VignetteRimKind, on: boolean): Promise<void> {
     await this.page.evaluate(
       (value) => {

@@ -255,8 +255,7 @@
     "fromFinds": "Primeros hallazgos",
     "fromAchievements": "Logros",
     "firstFinds": "Primera publicación: {{names}}",
-    "fromDeep": "Más allá de lo esencial",
-    "firstFindsShards": "Primer avistamiento: {{names}} · +{{n}} fragmentos"
+    "fromDeep": "Más allá de lo esencial"
   },
   "menu": {
     "level": "N.º{{level}}"

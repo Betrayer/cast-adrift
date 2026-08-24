@@ -255,8 +255,7 @@
     "fromFinds": "Erste Funde",
     "fromAchievements": "Erfolge",
     "firstFinds": "Erstmalig gesichtet: {{names}}",
-    "fromDeep": "Über den Kern hinaus",
-    "firstFindsShards": "Erstsichtung: {{names}} · +{{n}} Splitter"
+    "fromDeep": "Über den Kern hinaus"
   },
   "menu": {
     "level": "Lv{{level}}"

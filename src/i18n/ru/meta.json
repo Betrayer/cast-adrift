@@ -255,8 +255,7 @@
     "fromFinds": "Первые находки",
     "fromAchievements": "Достижения",
     "firstFinds": "Впервые встречено: {{names}}",
-    "fromDeep": "За Ядром",
-    "firstFindsShards": "Первая встреча: {{names}} · +{{n}} осколков"
+    "fromDeep": "За Ядром"
   },
   "menu": {
     "level": "Ур {{level}}"

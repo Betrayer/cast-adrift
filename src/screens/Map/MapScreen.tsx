@@ -23,25 +23,20 @@ import {
   rideWormhole,
 } from "@/game/run/flow";
 import { holeTollFor } from "@/game/run/motifs";
-import { isGentleRide } from "@/game/map/wormhole";
+import { bypassTargetFor, isGentleRide } from "@/game/map/wormhole";
 import { computeRunMods } from "@/game/run/runMods";
 import {
   areConnected,
   edgeMarkFor,
   NODE_GLYPH,
   nodeById,
-  wormholeFor,
   type MapGraph,
   type MapNode,
   type NodeId,
 } from "@/game/map/types";
 import { nodeRisk, type RiskBand } from "@/game/map/risk";
 import { haptic } from "@/services/tma";
-import {
-  clearVignette,
-  flashVignette,
-  syncHullRim,
-} from "@/services/vignette";
+import { flashVignette } from "@/services/vignette";
 import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
 import { AbandonConfirm } from "@/components/AbandonConfirm";
@@ -53,6 +48,7 @@ import { TIDE_HP_PCT } from "@/game/run/encounter";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
 import {
+  arrivalStyle,
   MAP_JUMP_MS,
   MARKER_TRAVEL_MS,
   markerStyle,
@@ -267,6 +263,17 @@ interface MapViewProps {
   position: NodeId;
 }
 
+const chainMemory = new Map<string, Set<NodeId>>();
+
+const chainMemoryKey = (seed: number, sector: number): string =>
+  `${String(seed)}:${String(sector)}`;
+
+const CHAIN_MARK_MS = 520;
+
+export const forgetChainMarkers = (): void => {
+  chainMemory.clear();
+};
+
 const MapView = ({ map, position }: MapViewProps) => {
   const { t } = useTranslation(["run", "common", "battle", "content"]);
   const visited = useRunStore((s) => s.visited);
@@ -327,8 +334,6 @@ const MapView = ({ map, position }: MapViewProps) => {
   const [trail, setTrail] = useState<{ from: Point; to: Point } | null>(null);
   const [arrival, setArrival] = useState<Point | null>(null);
   const travelFrames = useRef<number[]>([]);
-  const knownChains = useRef(new Set<NodeId>());
-  const seatedChains = useRef(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<SVGSVGElement | null>(null);
   const prevTide = useRef(tide);
@@ -377,26 +382,32 @@ const MapView = ({ map, position }: MapViewProps) => {
   }, [visibleLimit]);
 
   useEffect(() => {
-    syncHullRim(hull, hullMax);
-  }, [hull, hullMax]);
-
-  useEffect(
-    () => () => {
-      clearVignette();
-    },
-    [],
-  );
-
-  useEffect(() => {
-    const known = knownChains.current;
+    const key = chainMemoryKey(seed, sector);
+    for (const stale of [...chainMemory.keys()]) {
+      if (!stale.startsWith(`${String(seed)}:`)) chainMemory.delete(stale);
+    }
+    const seated = chainMemory.has(key);
+    const known = chainMemory.get(key) ?? new Set<NodeId>();
     const fresh = [...chainNodes].filter((id) => !known.has(id));
     for (const id of chainNodes) known.add(id);
-    if (fresh.length === 0 || !seatedChains.current) {
-      seatedChains.current = true;
-      return;
-    }
+    chainMemory.set(key, known);
+    if (!seated || fresh.length === 0) return;
     playSfx("chainStep", { rate: 1 + Math.min(3, fresh.length) * 0.05 });
-  }, [chainNodes]);
+    const popped: Element[] = [];
+    for (const id of fresh) {
+      const mark = document.querySelector(`[data-chain-marker="${id}"]`);
+      if (mark === null) continue;
+      mark.classList.add(styles.chainMark ?? "");
+      popped.push(mark);
+    }
+    const clear = window.setTimeout(() => {
+      for (const mark of popped) mark.classList.remove(styles.chainMark ?? "");
+    }, CHAIN_MARK_MS);
+    return () => {
+      window.clearTimeout(clear);
+      for (const mark of popped) mark.classList.remove(styles.chainMark ?? "");
+    };
+  }, [chainNodes, seed, sector]);
 
   useEffect(() => {
     if (warp?.phase !== "land") return;
@@ -518,6 +529,7 @@ const MapView = ({ map, position }: MapViewProps) => {
       });
       after(WARP_FLASH_MS, () => {
         setWarp(null);
+        setJumping(false);
         if (roll?.landing != null) enterNode(roll.landing);
       });
       return;
@@ -550,6 +562,7 @@ const MapView = ({ map, position }: MapViewProps) => {
         after(WARP_LAND_MS, () => {
           setWarp(null);
           setArrival(null);
+          setJumping(false);
           if (roll?.landing != null) enterNode(roll.landing);
         });
       });
@@ -558,8 +571,8 @@ const MapView = ({ map, position }: MapViewProps) => {
 
   const onBypass = (holeId: NodeId): void => {
     if (jumping) return;
-    const record = wormholeFor(map, position, holeId);
-    const target = record === undefined ? undefined : byId.get(record.bypass);
+    const landing = bypassTargetFor(map, position, holeId, visited);
+    const target = landing === null ? undefined : byId.get(landing);
     playSfx("jump");
     haptic("mapJump");
     setSelected(null);
@@ -1059,7 +1072,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 {chainNodes.has(node.id) ? (
                   <text
                     data-chain-marker={node.id}
-                    className={reduced ? undefined : styles.chainMark}
+
                     x={geo.nodeX(node) - geo.radius(node) + 1}
                     y={geo.rowY(node.row) - geo.radius(node) + 6}
                     textAnchor="middle"
@@ -1171,6 +1184,7 @@ const MapView = ({ map, position }: MapViewProps) => {
             <circle
               className={styles.arrival}
               data-map-arrival
+              style={arrivalStyle()}
               cx={arrival.x}
               cy={arrival.y}
               r={10}

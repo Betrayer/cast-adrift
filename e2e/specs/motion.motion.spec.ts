@@ -1,10 +1,13 @@
 import { expect, test } from '../fixtures';
 import type { Screens } from '../screens';
+import { MARKER_TRAVEL_MS } from '@/screens/Map/travel';
 import type { ScreenId } from '@/types';
 
 declare global {
   interface Window {
     caMotionProbe?: { marker: boolean; trail: boolean; arrival: boolean };
+    caTravelToken?: { duration: string; token: string } | null;
+    caPopProbe?: boolean;
   }
 }
 
@@ -25,6 +28,31 @@ const STATIC_SCREENS: readonly ScreenId[] = [
 
 const ANOMALY_SEEDS = [7, 11, 13, 17, 19, 23, 29, 31] as const;
 
+const SWAP_DIE = 'undertow';
+
+const SWAP_DECK = [SWAP_DIE, SWAP_DIE, SWAP_DIE, SWAP_DIE, SWAP_DIE];
+
+const MINIBOSS = 'leechQueen';
+
+const OTHER_MINIBOSS = 'mineTyrant';
+
+const enterAnimation = async (
+  app: Screens,
+  screen: ScreenId,
+): Promise<{ name: string; duration: string; fill: string } | null> =>
+  app.page.evaluate((id) => {
+    const inner = document.querySelector(
+      `[data-screen="${id}"] [data-screen-inner]`,
+    );
+    if (inner === null) return null;
+    const style = getComputedStyle(inner);
+    return {
+      name: style.animationName,
+      duration: style.animationDuration,
+      fill: style.animationFillMode,
+    };
+  }, screen);
+
 const animatedCount = async (app: Screens, screen: ScreenId): Promise<number> =>
   app.page.evaluate((id) => {
     const root = document.querySelector(`[data-screen="${id}"]`);
@@ -35,7 +63,7 @@ const animatedCount = async (app: Screens, screen: ScreenId): Promise<number> =>
       const style = getComputedStyle(node);
       return style.animationName !== 'none' && style.animationDuration !== '0s';
     });
-    return moving.length;
+    return moving.filter((node) => node.getAnimations().length > 0).length;
   }, screen);
 
 const openScreen = async (app: Screens, screen: ScreenId): Promise<void> => {
@@ -61,6 +89,11 @@ test.describe('screen motion', () => {
       'data-nav-dir',
       'forward',
     );
+    expect(await enterAnimation(app, 'settings')).toEqual({
+      name: 'caEnterForward',
+      duration: '0.18s',
+      fill: 'backwards',
+    });
   });
 
   test('back navigation slides in from the left', async ({ app }) => {
@@ -69,6 +102,30 @@ test.describe('screen motion', () => {
     await app.hardwareBack();
     await app.expectScreen('menu');
     await expect(app.screen('menu')).toHaveAttribute('data-nav-dir', 'back');
+    expect(await enterAnimation(app, 'menu')).toEqual({
+      name: 'caEnterBack',
+      duration: '0.18s',
+      fill: 'backwards',
+    });
+  });
+
+  test('a dimmed row rises to its own opacity, not to full', async ({ app }) => {
+    await app.goTo('contracts');
+    const locked = app.page.locator('[data-contract-locked="1"]').first();
+    await expect(locked).toBeVisible();
+    const ends = await app.page.evaluate(() => {
+      const node = document.querySelector('[data-contract-locked="1"]');
+      if (node === null) return null;
+      const rise = node
+        .getAnimations()
+        .find((animation) => (animation as CSSAnimation).animationName === 'caRise');
+      if (rise === undefined) return null;
+      const effect = rise.effect as KeyframeEffect | null;
+      const frames = effect === null ? [] : effect.getKeyframes();
+      const last = frames[frames.length - 1];
+      return String(last?.opacity ?? '');
+    });
+    expect(ends).toBe('0.6');
   });
 
   test('ceremonies and battle keep their bespoke entries', async ({ app }) => {
@@ -130,17 +187,26 @@ test.describe('map travel', () => {
     const { nodeId } = await app.seedRunWithNode('event', ANOMALY_SEEDS);
     await app.expectScreen('map');
     await app.page.locator(`[data-node="${nodeId}"]`).click();
-    await app.testId('map-jump').click();
-    const timing = await app.page.evaluate(() => {
-      const marker = document.querySelector('[data-map-marker]');
-      if (marker === null) return null;
-      const style = getComputedStyle(marker);
-      return {
-        duration: style.transitionDuration,
-        token: style.getPropertyValue('--ca-map-jump-ms').trim(),
-      };
+    await app.page.evaluate(() => {
+      window.caTravelToken = null;
+      const probe = new MutationObserver(() => {
+        if (window.caTravelToken !== null) return;
+        const marker = document.querySelector('[data-map-marker]');
+        if (marker === null) return;
+        const style = getComputedStyle(marker);
+        window.caTravelToken = {
+          duration: style.transitionDuration,
+          token: style.getPropertyValue('--ca-map-jump-ms').trim(),
+        };
+      });
+      probe.observe(document.body, { childList: true, subtree: true });
     });
-    expect(timing).toEqual({ duration: '0.42s', token: '420ms' });
+    await app.testId('map-jump').click();
+    await app.expectScreen('event');
+    expect(await app.page.evaluate(() => window.caTravelToken)).toEqual({
+      duration: `${String(MARKER_TRAVEL_MS / 1000)}s`,
+      token: `${String(MARKER_TRAVEL_MS)}ms`,
+    });
   });
 });
 
@@ -176,43 +242,69 @@ test.describe('juice hooks', () => {
     await app.seedRun({ seed: 7 });
     await app.startBattle({
       enemyIds: ['raider'],
-      deck: ['gyro', 'gyro', 'gyro', 'gyro', 'gyro'],
+      deck: SWAP_DECK,
       seed: 7,
     });
     await app.waitForPlacement();
-    const tray = (await app.state()).battle.dice.find((d) => d.state === 'tray');
-    expect(tray).toBeDefined();
+    const tray = (await app.state()).battle.dice.find(
+      (d) => d.state === 'tray' && d.defId === SWAP_DIE,
+    );
+    expect(tray, `the deck must offer a ${SWAP_DIE} in the tray`).toBeDefined();
     if (tray === undefined) return;
     await app.selectDie(tray.uid);
     const swap = app.console('swap');
-    if ((await swap.count()) === 0) return;
+    await expect(swap).toBeVisible();
+    await app.page.evaluate(() => {
+      window.caPopProbe = false;
+      const node = document.querySelector('[data-testid="console-swap"]');
+      if (node === null) return;
+      const probe = new MutationObserver(() => {
+        if (node.getAttribute('data-pop') === '1') window.caPopProbe = true;
+      });
+      probe.observe(node, { attributes: true, attributeFilter: ['data-pop'] });
+    });
     await swap.click();
-    await expect(swap).toHaveAttribute('data-pop', '1');
+    await expect
+      .poll(() => app.page.evaluate(() => window.caPopProbe))
+      .toBe(true);
   });
 
-  test('an alternate mini-boss announces a new signature', async ({ app }) => {
+  test('a mini-boss reads as an alternate only once another was faced', async ({
+    app,
+  }) => {
     await app.seedRun({ seed: 7 });
-    await app.page.evaluate(() => {
-      window.caTest?.grantRun({});
-    });
-    await app.startBattle({ enemyIds: ['quarantineWarden'], seed: 7 });
+    await app.startBattle({ enemyIds: [MINIBOSS], seed: 7 });
     await expect(app.testId('boss-intro')).toBeVisible();
     await expect(app.page.locator('[data-intro-kind]')).toHaveAttribute(
       'data-intro-kind',
-      'boss',
+      'miniboss',
+    );
+
+    await app.page.evaluate((used: string) => {
+      window.caTest?.grantRun({ usedMinibosses: [used] });
+    }, OTHER_MINIBOSS);
+    await app.startBattle({ enemyIds: [MINIBOSS], seed: 7 });
+    await expect(app.testId('boss-intro')).toBeVisible();
+    await expect(app.page.locator('[data-intro-kind]')).toHaveAttribute(
+      'data-intro-kind',
+      'minibossAlt',
     );
   });
 
-  test('the summary names the shards a first find paid', async ({ app }) => {
+  test('the summary lists the dice a run met for the first time', async ({
+    app,
+  }) => {
     await app.seedRun({ seed: 7 });
     await app.goTo('summary');
+    await expect(app.page.locator('[data-first-finds]')).toHaveCount(0);
+    await app.summaryFinds(['flare'], 12);
     const line = app.page.locator('[data-first-finds]');
-    if ((await line.count()) === 0) return;
-    await expect(line).toHaveAttribute('data-find-shards', /\d+/);
+    await expect(line).toBeVisible();
+    await expect(line).toHaveAttribute('data-find-shards', '12');
   });
 });
 
-test.describe('motion baselines', () => {
+test.describe('visual baselines — motion', () => {
   test('the screens settle where they would without motion', async ({ app }) => {
     await app.page.evaluate(() => {
       window.caTest?.grantMeta({ level: 30, shards: 4000 });

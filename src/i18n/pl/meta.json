@@ -255,8 +255,7 @@
     "fromFinds": "Pierwsze znaleziska",
     "fromAchievements": "Osiągnięcia",
     "firstFinds": "Pierwsze doniesienie: {{names}}",
-    "fromDeep": "Poza podstawami",
-    "firstFindsShards": "Pierwsze spotkanie: {{names}} · +{{n}} odłamków"
+    "fromDeep": "Poza podstawami"
   },
   "menu": {
     "level": "Poziom{{level}}"

@@ -76,9 +76,15 @@ export const rafClock = (): TweenClock & { destroy: () => void } => {
     const deltaMS = last === 0 ? FRAME_MS : Math.min(64, now - last);
     last = now;
     for (const listener of [...listeners]) listener({ deltaMS });
+    if (!running || listeners.size === 0) {
+      stop();
+      return;
+    }
     handle = window.requestAnimationFrame(frame);
   };
+  let running = false;
   const stop = (): void => {
+    running = false;
     if (handle !== 0) window.cancelAnimationFrame(handle);
     handle = 0;
     last = 0;
@@ -86,7 +92,9 @@ export const rafClock = (): TweenClock & { destroy: () => void } => {
   return {
     add: (fn) => {
       listeners.add(fn);
-      if (handle === 0) handle = window.requestAnimationFrame(frame);
+      if (running) return;
+      running = true;
+      handle = window.requestAnimationFrame(frame);
     },
     remove: (fn) => {
       listeners.delete(fn);
@@ -204,6 +212,7 @@ export class Tweens {
 
   private readonly update = (ticker: { deltaMS: number }): void => {
     for (const timer of [...this.timers]) {
+      if (!this.timers.has(timer)) continue;
       const scale = this.scaleFor(timer.group);
       if (scale <= 0) continue;
       timer.remaining -= ticker.deltaMS * scale;
@@ -212,14 +221,17 @@ export class Tweens {
       timer.run();
     }
     for (const tween of [...this.active]) {
+      if (!this.active.has(tween)) continue;
       const scale = this.scaleFor(tween.group);
       if (scale <= 0) continue;
       tween.elapsed += ticker.deltaMS * scale;
       if (tween.elapsed < tween.delay) continue;
       if (!tween.started) {
         tween.started = true;
-        for (const key of Object.keys(tween.to)) {
-          tween.from[key] = tween.target[key] ?? tween.from[key] ?? 0;
+        if (tween.delay > 0) {
+          for (const key of Object.keys(tween.to)) {
+            tween.from[key] = tween.target[key] ?? tween.from[key] ?? 0;
+          }
         }
       }
       const t = Math.min(1, (tween.elapsed - tween.delay) / tween.ms);

@@ -255,8 +255,7 @@
     "fromFinds": "First finds",
     "fromAchievements": "Achievements",
     "firstFinds": "First sighting: {{names}}",
-    "fromDeep": "Beyond the Core",
-    "firstFindsShards": "First sighting: {{names}} · +{{n}} shards"
+    "fromDeep": "Beyond the Core"
   },
   "menu": {
     "level": "Lv {{level}}"

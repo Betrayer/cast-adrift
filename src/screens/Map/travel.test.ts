@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  ARRIVAL_MS_VAR,
+  arrivalStyle,
   MAP_JUMP_MS,
   MARKER_ARRIVAL_MS,
   MARKER_MS_VAR,
@@ -23,6 +25,11 @@ describe("map travel timing", () => {
       string
     >;
     expect(trail[MARKER_MS_VAR]).toBe(`${String(MARKER_TRAVEL_MS)}ms`);
+  });
+
+  it("gives the arrival ring exactly the hold it is shown for", () => {
+    const style = arrivalStyle() as Record<string, string>;
+    expect(style[ARRIVAL_MS_VAR]).toBe(`${String(MARKER_ARRIVAL_MS)}ms`);
   });
 
   it("places the marker with a transform, never with layout", () => {

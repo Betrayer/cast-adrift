@@ -212,7 +212,7 @@
 .arrival {
   transform-box: fill-box;
   transform-origin: center;
-  animation: arrivalTick 340ms ease-out both;
+  animation: arrivalTick var(--ca-map-arrival-ms, 120ms) ease-out both;
 }
 
 @keyframes arrivalTick {

@@ -54,7 +54,12 @@ export const ROUTES: Record<ScreenId, RouteDef> = {
   journal: { group: 'run', backMode: 'stack', title: 'run:journal.title' },
   battle: { group: 'run', backMode: 'locked', swipeLock: true, enter: 'bespoke' },
   event: { group: 'node', backMode: 'guarded' },
-  puzzle: { group: 'node', backMode: 'guarded', swipeLock: true },
+  puzzle: {
+    group: 'node',
+    backMode: 'guarded',
+    swipeLock: true,
+    enter: 'bespoke',
+  },
   shop: { group: 'node', backMode: 'guarded', title: 'run:shop.title' },
   shipyard: { group: 'node', backMode: 'guarded', title: 'run:shipyard.title' },
   rewards: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },

@@ -1,5 +1,5 @@
 import { Badge, Button, Paper, RingProgress, Text, Title } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { ParticleRain } from "@/components/ParticleRain";
@@ -57,6 +57,13 @@ export const LevelUpCeremony = ({
 
   const cls = (name: string): string => (reduced ? "" : (styles[name] ?? ""));
 
+  const cardDelay = (index: number): CSSProperties | undefined =>
+    reduced
+      ? undefined
+      : {
+          animationDelay: `${String(CARD_DELAY_MS + index * CARD_STAGGER_MS)}ms`,
+        };
+
   return (
     <div className={`${styles.overlay ?? ""}`}>
       {reduced ? null : (
@@ -95,6 +102,7 @@ export const LevelUpCeremony = ({
           radius="md"
           withBorder
           className={cls("card")}
+          style={cardDelay(i)}
           maw={320}
           w="100%"
           data-milestone-card
@@ -112,6 +120,7 @@ export const LevelUpCeremony = ({
           radius="md"
           withBorder
           className={cls("card")}
+          style={cardDelay(milestones.length + i)}
           maw={320}
           w="100%"
           data-unlock-card

@@ -22,18 +22,27 @@ export const staggerStyle = (ms: number): CSSProperties =>
 
 export type MotionFlag = 'data-pop' | 'data-sweep';
 
+const firedFlags = new WeakMap<Element, Map<MotionFlag, number>>();
+
 export const fireMotionFlag = (
   element: Element | null,
   attribute: MotionFlag,
   ms: number,
 ): void => {
   if (element === null) return;
+  const timers = firedFlags.get(element) ?? new Map<MotionFlag, number>();
+  window.clearTimeout(timers.get(attribute));
   element.removeAttribute(attribute);
   void (element as HTMLElement).offsetWidth;
   element.setAttribute(attribute, '1');
-  window.setTimeout(() => {
-    element.removeAttribute(attribute);
-  }, ms);
+  timers.set(
+    attribute,
+    window.setTimeout(() => {
+      timers.delete(attribute);
+      element.removeAttribute(attribute);
+    }, ms),
+  );
+  firedFlags.set(element, timers);
 };
 
 export interface MotionFlagHandle<T extends HTMLElement> {

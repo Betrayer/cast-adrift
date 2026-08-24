@@ -100,11 +100,21 @@ test.describe('motion performance', () => {
     expect(frames.p95Ms).toBeLessThan(34);
   });
 
-  test('the same composite with the vignette off is the control', async ({
+  test('the same composite with the vignette off is a real control', async ({
     app,
   }) => {
     const frames = await seatComposite(app, 'off');
     report('vignette=off', frames);
+    const layer = await app.page.evaluate(() => {
+      const node = document.querySelector('[data-screen="battle"] [data-vignette]');
+      if (node === null) return null;
+      return {
+        intensity: node.getAttribute('data-vignette-intensity'),
+        painted: getComputedStyle(node).display !== 'none',
+        flashes: node.querySelectorAll('[data-vignette-flash]').length,
+      };
+    });
+    expect(layer).toEqual({ intensity: 'off', painted: false, flashes: 0 });
     expect(frames.frames).toBeGreaterThan(60);
     expect(frames.medianMs).toBeLessThan(LONG_FRAME_MS);
   });

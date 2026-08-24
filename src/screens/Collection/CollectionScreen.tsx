@@ -204,7 +204,6 @@ export const CollectionScreen = () => {
                   data-collection-entry={def.id}
                   data-collection-state={row.state}
                   data-rise
-                  data-press
                   bg={unknown ? tokens.bg : schools[def.school].fill}
                   style={
                     unknown

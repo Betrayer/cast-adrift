@@ -54,7 +54,7 @@ import {
   startRunMode,
 } from "@/game/run/flow";
 import { isoWeekKey } from "@/game/run/modes";
-import { totalXpForLevel } from "@/game/xp";
+import { totalXpForLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { DRIFT_ALLTIME_BOARD, submit, top } from "@/services/leaderboards";
 import { profileSummary, readMetaDocFromServer } from "@/services/metaDoc";
 import { now as clockNow, setClockSource } from "@/services/clock";
@@ -80,6 +80,7 @@ import {
   type RunMode,
 } from "@/stores/runStore";
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
+import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
 import type { BattleLayoutId, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
@@ -126,6 +127,7 @@ export interface RunPatch {
   flags?: readonly string[];
   visited?: readonly NodeId[];
   wormholeRides?: number;
+  usedMinibosses?: readonly string[];
 }
 
 export interface BattlePatch {
@@ -340,6 +342,7 @@ export interface TestApi {
   fireVignette: (kind: VignetteFlashKind, side?: VignetteSide) => void;
   vignetteRim: (kind: VignetteRimKind, on: boolean) => void;
   dropLoot: (defId: string | null) => void;
+  summaryFinds: (defIds: readonly string[], shards: number) => void;
   settings: (patch: Partial<SettingsValues>) => void;
   layout: (id: BattleLayoutId) => void;
   forecast: () => TurnForecast | null;
@@ -369,6 +372,27 @@ export interface TestApi {
 }
 
 export const TEST_API_MARKER = "ca-test-api";
+
+const EMPTY_RUN_RESULT: RunResult = {
+  xpGain: 0,
+  shardGain: 0,
+  shards: ZERO_SHARD_BREAKDOWN,
+  findShards: 0,
+  firstFinds: [],
+  achievements: [],
+  achievementShards: 0,
+  unlocks: [],
+  unlockIds: [],
+  fromLevel: 1,
+  toLevel: 1,
+  win: true,
+  milestones: [],
+  mode: "campaign",
+  score: null,
+  contractId: null,
+  contractStars: 0,
+  rotation: [],
+};
 
 const STARTER_ENEMY = "raider";
 const DEFAULT_SEED = 7;
@@ -436,6 +460,7 @@ const applyRun = (patch: RunPatch): void => {
       stats: { ...s.stats, wormholeRides: patch.wormholeRides ?? 0 },
     }));
   }
+  for (const defId of patch.usedMinibosses ?? []) run.markMinibossUsed(defId);
 };
 
 const applySettings = (patch: Partial<SettingsValues>): void => {
@@ -816,6 +841,16 @@ export const createTestApi = (): TestApi => ({
   dropLoot: (defId) => {
     if (defId === null) useLootStore.getState().clear();
     else useLootStore.getState().drop(defId);
+  },
+
+  summaryFinds: (defIds, shards) => {
+    const store = useSummaryStore.getState();
+    const current = store.result;
+    store.setResult({
+      ...(current ?? EMPTY_RUN_RESULT),
+      firstFinds: [...defIds],
+      findShards: shards,
+    });
   },
 
   slotsFor: (uid) => legalTargets(useBattleStore.getState(), uid).slots,

@@ -1,6 +1,7 @@
 .layer {
   position: fixed;
-  inset: 0;
+  inset: var(--ca-safe-top) var(--ca-safe-right) var(--ca-safe-bottom)
+    var(--ca-safe-left);
   z-index: var(--z-vignette);
   pointer-events: none;
   overflow: hidden;

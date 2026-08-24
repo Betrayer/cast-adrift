@@ -16,6 +16,8 @@ export const WARP_FLASH_MS = 260;
 
 export const MARKER_MS_VAR = "--ca-map-jump-ms";
 
+export const ARRIVAL_MS_VAR = "--ca-map-arrival-ms";
+
 export const TRAIL_LEN_VAR = "--ca-trail-len";
 
 export interface Point {
@@ -27,6 +29,11 @@ export const markerStyle = (at: Point): CSSProperties =>
   ({
     transform: `translate(${String(at.x)}px, ${String(at.y)}px)`,
     [MARKER_MS_VAR]: `${String(MARKER_TRAVEL_MS)}ms`,
+  }) as CSSProperties;
+
+export const arrivalStyle = (): CSSProperties =>
+  ({
+    [ARRIVAL_MS_VAR]: `${String(MARKER_ARRIVAL_MS)}ms`,
   }) as CSSProperties;
 
 export const trailStyle = (from: Point, to: Point): CSSProperties =>

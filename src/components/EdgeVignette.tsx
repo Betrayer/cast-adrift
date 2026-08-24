@@ -54,6 +54,7 @@ export const EdgeVignette = () => {
       const kind = node.dataset.vignetteRim as keyof VignetteRims | undefined;
       if (kind !== undefined) rimNodes.set(kind, node);
     }
+    const clears = new Map<HTMLDivElement, number>();
     let cursor = 0;
 
     const paintRims = (rims: VignetteRims): void => {
@@ -69,6 +70,7 @@ export const EdgeVignette = () => {
       cursor += 1;
       if (node === undefined) return;
       const style = FLASH_STYLE[flash.kind];
+      window.clearTimeout(clears.get(node));
       node.removeAttribute('data-vignette-flash');
       void node.offsetWidth;
       node.dataset.vignetteSide = flash.side;
@@ -78,36 +80,47 @@ export const EdgeVignette = () => {
       node.dataset.vignetteFlash = flash.kind;
       root.dataset.vignetteLast = flash.kind;
       root.dataset.vignetteSeq = String(flash.seq);
-      window.setTimeout(() => {
-        if (node.dataset.vignetteFlash === flash.kind) {
+      clears.set(
+        node,
+        window.setTimeout(() => {
+          clears.delete(node);
           node.removeAttribute('data-vignette-flash');
-        }
-      }, style.ms);
+        }, style.ms),
+      );
     };
 
     const applyIntensity = (value: VignetteIntensity): void => {
       root.dataset.vignetteIntensity = value;
       root.style.setProperty('--vg-scale', String(INTENSITY_SCALE[value]));
-      if (value !== 'off') paintRims(vignetteRims());
     };
+
+    const parked = (): boolean =>
+      root.closest('[data-parked-screen]') !== null;
 
     for (const [kind, node] of rimNodes) {
       node.style.setProperty('--vg-rim-alpha', String(RIM_ALPHA[kind]));
     }
     applyIntensity(useSettingsStore.getState().vignette);
+    paintRims(vignetteRims());
 
     const stopSettings = useSettingsStore.subscribe((state, prev) => {
       if (state.vignette !== prev.vignette) applyIntensity(state.vignette);
     });
     const stop = subscribeVignette((event) => {
+      if (event.k === 'rims') {
+        paintRims(event.rims);
+        return;
+      }
       if (motionReduced()) return;
       if (useSettingsStore.getState().vignette === 'off') return;
-      if (event.k === 'rims') paintRims(event.rims);
-      else paintFlash(event.flash);
+      if (parked()) return;
+      paintFlash(event.flash);
     });
     return () => {
       stop();
       stopSettings();
+      for (const id of clears.values()) window.clearTimeout(id);
+      clears.clear();
     };
   }, []);
 

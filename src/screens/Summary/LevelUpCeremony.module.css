@@ -25,7 +25,7 @@
 }
 
 .card {
-  animation: rise 500ms ease-out 360ms both;
+  animation: rise 500ms ease-out backwards;
 }
 
 @keyframes fadeIn {

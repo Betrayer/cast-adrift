@@ -198,6 +198,7 @@ export const HangarScreen = () => {
             return (
               <div
                 key={ship.id}
+                className={styles.shipCell}
                 data-rise
                 data-press
                 style={riseStyle(index)}
@@ -390,7 +391,6 @@ export const HangarScreen = () => {
                   data-die-row={id}
                   data-die-locked={!isOpen && tab === "shop" ? "1" : undefined}
                   data-rise
-                  data-press
                   style={{
                     border: `1px solid ${tokens.line}`,
                     borderRadius: 8,

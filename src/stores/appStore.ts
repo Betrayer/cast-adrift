@@ -38,7 +38,11 @@ export interface AppState {
   cloudResume: boolean;
   systemMenu: boolean;
   buildSheet: boolean;
-  go: (screen: ScreenId, params?: Record<string, string>) => void;
+  go: (
+    screen: ScreenId,
+    params?: Record<string, string>,
+    direction?: NavDirection,
+  ) => void;
   back: () => void;
   seed: (stack: readonly StackEntry[], screen: ScreenId, params?: ScreenParams) => void;
   setParams: (params: ScreenParams) => void;
@@ -115,14 +119,14 @@ export const useAppStore = create<AppState>()((set, get) => ({
   cloudResume: false,
   systemMenu: false,
   buildSheet: false,
-  go: (screen, params) =>
+  go: (screen, params, direction = "forward") =>
     set((s) =>
       s.screen === screen
         ? { params, systemMenu: false, buildSheet: false }
         : {
             screen,
             params,
-            navDir: "forward" as NavDirection,
+            navDir: direction,
             systemMenu: false,
             buildSheet: false,
             stack: nextStack(s.stack, { screen: s.screen, params: s.params }, screen),

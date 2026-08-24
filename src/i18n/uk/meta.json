@@ -255,8 +255,7 @@
     "fromFinds": "Перші знахідки",
     "fromAchievements": "Досягнення",
     "firstFinds": "Уперше зустрінуто: {{names}}",
-    "fromDeep": "За Ядром",
-    "firstFindsShards": "Перша зустріч: {{names}} · +{{n}} уламків"
+    "fromDeep": "За Ядром"
   },
   "menu": {
     "level": "Рів {{level}}"

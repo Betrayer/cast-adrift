@@ -8,11 +8,12 @@ import styles from './RotateGate.module.css';
 export const RotateGate = () => {
   const { t } = useTranslation(['common']);
   const blocked = useRotateGate();
-  const wasBlocked = useRef(false);
+  const wasBlocked = useRef<boolean | null>(null);
 
   useEffect(() => {
-    if (blocked === wasBlocked.current) return;
+    const seen = wasBlocked.current;
     wasBlocked.current = blocked;
+    if (seen === null || seen === blocked) return;
     playSfx('gateRaise', { gain: 0.5, rate: blocked ? 0.9 : 1.24 });
     haptic(blocked ? 'reveal' : 'place');
   }, [blocked]);

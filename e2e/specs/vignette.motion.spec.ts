@@ -28,12 +28,33 @@ test.describe('edge vignette', () => {
       await app.fireVignette(kind);
       await expect(layer).toHaveAttribute('data-vignette-last', kind);
       await expect(
-        app.page.locator(`[data-vignette-flash="${kind}"]`),
+        app.page.locator(
+          `[data-screen="settings"] [data-vignette-flash="${kind}"]`,
+        ),
       ).toHaveCount(1);
     }
     const view = await app.vignette();
     expect(view.last).toBe('toll');
     expect(view.seq).toBeGreaterThanOrEqual(KINDS.length);
+  });
+
+  test('each intensity scales the layer it paints with', async ({ app }) => {
+    await app.goTo('settings');
+    const layer = app.page.locator('[data-screen="settings"] [data-vignette]');
+    const scale = (): Promise<string> =>
+      app.page.evaluate(() => {
+        const node = document.querySelector(
+          '[data-screen="settings"] [data-vignette]',
+        );
+        if (node === null) return '';
+        return getComputedStyle(node).getPropertyValue('--vg-scale').trim();
+      });
+    await expect(layer).toHaveAttribute('data-vignette-intensity', 'full');
+    expect(await scale()).toBe('1');
+    await app.setSettings({ vignette: 'subtle' });
+    await expect(layer).toHaveAttribute('data-vignette-intensity', 'subtle');
+    expect(await scale()).toBe('0.5');
+    await app.setSettings({ vignette: 'full' });
   });
 
   test('the off intensity hides the layer entirely', async ({ app }) => {
@@ -48,8 +69,9 @@ test.describe('edge vignette', () => {
     await expect(layer).toBeVisible();
   });
 
-  test('composite of every edge state', async ({ app }) => {
+  test('visual baselines — vignette composite', async ({ app }) => {
     await app.goTo('settings');
+    await app.waitForAuthSettled();
     await app.fireVignette('hullHit', 'left');
     await app.fireVignette('dodge', 'right');
     await app.fireVignette('surge', 'top');
@@ -99,6 +121,22 @@ test.describe('edge vignette', () => {
       .poll(async () => (await app.vignette()).rims.shield, { timeout: 30_000 })
       .toBe(true);
     await expect(layer).toHaveAttribute('data-vignette-shield', '1');
+  });
+
+  test('a rim raised while motion is reduced is on screen once it is not', async ({
+    app,
+  }) => {
+    await app.goTo('settings');
+    await app.setSettings({ reducedMotion: 'on' });
+    await app.vignetteRim('lowHull', true);
+    const layer = app.page.locator('[data-screen="settings"] [data-vignette]');
+    await expect(layer).toBeHidden();
+    await app.setSettings({ reducedMotion: 'off' });
+    await expect(layer).toBeVisible();
+    await expect(layer).toHaveAttribute('data-vignette-low', '1');
+    await app.vignetteRim('lowHull', false);
+    await expect(layer).toHaveAttribute('data-vignette-low', '0');
+    await app.setSettings({ reducedMotion: 'auto' });
   });
 
   test('a hull under thirty percent breathes a red rim', async ({ app }) => {

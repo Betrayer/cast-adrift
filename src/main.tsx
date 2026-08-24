@@ -17,6 +17,7 @@ import { trackSessionStart } from '@/services/analytics';
 import { authErrorCode, isSilentAuthError } from '@/services/authErrors';
 import { setupErrorReporting } from '@/services/errors';
 import { setupMetaSync } from '@/services/meta-sync';
+import { setupVignetteSync } from '@/services/vignetteSync';
 import { installBrowserNavHistory } from '@/services/nav-history';
 import {
   awaitProfileReady,
@@ -39,6 +40,7 @@ applyMotion(resolveReducedMotion(useSettingsStore.getState().reducedMotion));
 setupErrorReporting();
 setupAutosave();
 setupMetaSync();
+setupVignetteSync();
 
 const bootAuth = async (session: TmaSession): Promise<void> => {
   const { consumeRedirect, ensureAnonAuth, restoredUid, signInWithTelegram } =

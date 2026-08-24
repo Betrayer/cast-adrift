@@ -1026,7 +1026,7 @@ const finalizeNode = (
   } else if (isSectorExit(node)) {
     leaveSector(node);
   } else {
-    useAppStore.getState().go("map");
+    useAppStore.getState().go("map", undefined, "back");
     autosaveRun();
     pushRunCloud();
   }
@@ -1064,7 +1064,7 @@ export const finishRewards = (): void => {
   if (node !== undefined && isSectorExit(node)) {
     leaveSector(node);
   } else {
-    useAppStore.getState().go("map");
+    useAppStore.getState().go("map", undefined, "back");
     autosaveRun();
     pushRunCloud();
   }
@@ -1276,7 +1276,7 @@ export const resolveEventBattle = (): void => {
 
   const node = nodeById(run.map).get(pending.originNodeId);
   if (node === undefined) {
-    useAppStore.getState().go("map");
+    useAppStore.getState().go("map", undefined, "back");
     autosaveRun();
     return;
   }

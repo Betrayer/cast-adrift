@@ -83,7 +83,7 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
         {...(coach === undefined ? {} : { 'data-coach': coach })}
         className={`${styles.btn ?? ''} ${extra ?? ''}`}
         aria-disabled={!action.enabled}
-        data-press
+        data-press={action.enabled ? '' : undefined}
         onClick={(event) => {
           const node = event.currentTarget;
           run(action, () => {

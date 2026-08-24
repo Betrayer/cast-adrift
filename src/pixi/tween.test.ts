@@ -9,10 +9,12 @@ interface FakeTicker {
 
 const fakeTicker = () => {
   let listener: ((ticker: FakeTicker) => void) | null = null;
+  let detached: ((ticker: FakeTicker) => void) | null = null;
   const ticker: FakeTicker = {
     deltaMS: 16,
     add: (fn) => {
       listener = fn;
+      detached = fn;
     },
     remove: () => {
       listener = null;
@@ -24,12 +26,22 @@ const fakeTicker = () => {
       ticker.deltaMS = ms;
       listener?.(ticker);
     },
+    stepDetached: (ms: number): void => {
+      ticker.deltaMS = ms;
+      detached?.(ticker);
+    },
+    attached: (): boolean => listener !== null,
   };
 };
 
 const makeTweens = () => {
-  const { ticker, step } = fakeTicker();
-  return { tweens: new Tweens(ticker as never), step };
+  const { ticker, step, stepDetached, attached } = fakeTicker();
+  return {
+    tweens: new Tweens(ticker as never),
+    step,
+    stepDetached,
+    attached,
+  };
 };
 
 describe("Tweens", () => {
@@ -155,14 +167,16 @@ describe("Tweens v2", () => {
     expect(seen).toEqual(["late"]);
   });
 
-  it("drops every timer and tween on destroy", () => {
-    const { tweens, step } = makeTweens();
+  it("drops every timer and tween on destroy, not just the ticker hook", () => {
+    const { tweens, step, stepDetached, attached } = makeTweens();
     const seen: string[] = [];
     const target = { x: 0 };
     tweens.to(target, { x: 100 }, 100, linear);
     tweens.after(50, () => seen.push("timer"));
     tweens.destroy();
+    expect(attached()).toBe(false);
     step(200);
+    stepDetached(200);
     expect(seen).toEqual([]);
     expect(target.x).toBe(0);
   });
@@ -194,5 +208,38 @@ describe("rafClock", () => {
     expect(cancelled).toEqual([1]);
     clock.destroy();
     globals.window = before;
+  });
+});
+
+describe("Tweens re-entrancy", () => {
+  it("does not tick a tween a timer cancelled in the same frame", () => {
+    const { tweens, step } = makeTweens();
+    const target = { x: 0 };
+    const cancel = tweens.to(target, { x: 100 }, 100, linear);
+    tweens.after(1, cancel);
+    step(50);
+    expect(target.x).toBe(0);
+  });
+
+  it("does not tick a timer an earlier timer cancelled in the same frame", () => {
+    const { tweens, step } = makeTweens();
+    const seen: string[] = [];
+    let cancelSecond: (() => void) | null = null;
+    tweens.after(10, () => {
+      seen.push("first");
+      cancelSecond?.();
+    });
+    cancelSecond = tweens.after(20, () => seen.push("second"));
+    step(50);
+    expect(seen).toEqual(["first"]);
+  });
+
+  it("keeps an undelayed tween's start value from the moment it was created", () => {
+    const { tweens, step } = makeTweens();
+    const target = { x: 0 };
+    tweens.to(target, { x: 100 }, 100, linear);
+    target.x = 90;
+    step(50);
+    expect(target.x).toBeCloseTo(50);
   });
 });

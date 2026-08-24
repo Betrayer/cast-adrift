@@ -1,13 +1,7 @@
 import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Application, Ticker } from "pixi.js";
 import { subscribeBodyRect } from "@/app/bands";
-import {
-  clearVignette,
-  flashVignette,
-  setVignetteRim,
-  sideForX,
-  syncHullRim,
-} from "@/services/vignette";
+import { flashVignette, sideForX } from "@/services/vignette";
 import { mixHex } from "@/app/color";
 import { onThemeChange, tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
@@ -351,8 +345,6 @@ export class BattleScene {
     this.app.renderer.on("resize", this.onResize);
     this.app.ticker.add(this.tick);
     const seated = useBattleStore.getState();
-    setVignetteRim("shield", seated.shield > 0);
-    syncHullRim(seated.hull, seated.hullMax);
     if (seated.phase === "resolving") {
       this.startResolution(seated);
     }
@@ -371,7 +363,6 @@ export class BattleScene {
       useBattleStore.getState().finishResolution();
     }
     this.clearCardFlags();
-    clearVignette();
     this.unsubscribe();
     this.unsubscribeTheme();
     this.unsubscribeBands();
@@ -1394,20 +1385,15 @@ export class BattleScene {
     if (state.enemies !== prev.enemies) {
       this.checkKills(state, prev);
     }
-    if (state.shield !== prev.shield) {
-      setVignetteRim("shield", state.shield > 0);
-    }
-    if (state.hull !== prev.hull || state.hullMax !== prev.hullMax) {
-      syncHullRim(state.hull, state.hullMax);
-    }
     if (prev.introPending && !state.introPending) this.bossShockwave();
     if (state.enemies !== prev.enemies) this.checkMirrorIntents(state);
+    if (state.dice !== prev.dice) this.checkTempDice(state, prev);
     if (state.dice !== prev.dice && state.turn === prev.turn) {
-      this.checkTempDice(state, prev);
       this.checkTrayRerolls(state, prev);
     }
     if (
       state.phase === "placement" &&
+      prev.phase === "placement" &&
       state.targetId !== prev.targetId &&
       state.targetId !== null
     ) {
@@ -1461,12 +1447,16 @@ export class BattleScene {
   }
 
   private checkTempDice(state: BattleState, prev: BattleState): void {
-    if (this.reduced()) return;
     const known = new Set(prev.dice.map((die) => die.uid));
     for (const die of state.dice) {
       if (die.temp !== true || known.has(die.uid)) continue;
       playSfx("summon", { gain: 0.45, rate: 1.18 });
-      this.dieFlash(this.trayAnchor(die.uid, state), schools.prismatic.stroke);
+      if (this.reduced()) continue;
+      this.dieFlash(
+        this.trayAnchor(die.uid, state),
+        schools.prismatic.stroke,
+        this.layout.dieSize,
+      );
     }
   }
 
@@ -1478,7 +1468,11 @@ export class BattleScene {
       const was = before.get(die.uid);
       if (was === undefined || was.state !== "tray") continue;
       if (was.value === die.value) continue;
-      this.dieFlash(this.trayAnchor(die.uid, state), schools[die.school].stroke);
+      this.dieFlash(
+        this.trayAnchor(die.uid, state),
+        schools[die.school].stroke,
+        this.layout.dieSize,
+      );
     }
   }
 
@@ -2080,10 +2074,14 @@ export class BattleScene {
     );
   }
 
-  private dieFlash(at: { x: number; y: number }, color: string): void {
+  private dieFlash(
+    at: { x: number; y: number },
+    color: string,
+    dieSize: number = MINI_DIE_SIZE,
+  ): void {
     const flash = this.takeParticle();
     if (flash === undefined) return;
-    const size = MINI_DIE_SIZE;
+    const size = dieSize;
     flash
       .roundRect(-size / 2 - 3, -size / 2 - 3, size + 6, size + 6, size * 0.26)
       .stroke({ color, width: 3 });
