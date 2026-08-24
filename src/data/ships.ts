@@ -175,11 +175,6 @@ export const PLAYABLE_SHIPS: readonly ShipDef[] = SHIPS.filter(
   (s) => s.debug !== true,
 );
 
-export const shipHasPassive = (
-  shipId: ShipId,
-  kind: ShipPassive["kind"],
-): boolean => SHIP_BY_ID.get(shipId)?.passive?.kind === kind;
-
 export const shipTextIssues = (defs: readonly ShipDef[]): string[] => {
   const out: string[] = [];
   for (const def of defs) {

@@ -1,4 +1,4 @@
-import { CHART_NODES, CHART_NODE_BY_ID } from "../../src/data/chart";
+import { CHART_NODES } from "../../src/data/chart";
 import type { ChartNodeDef } from "../../src/data/chart/types";
 import type { PerkMods } from "../../src/data/perks/types";
 import { canAllocate, pointsTotal } from "../../src/game/chart/engine";
@@ -72,5 +72,3 @@ export const buildChartPicks = (level: number): string[] => {
   return picks;
 };
 
-export const chartPickNames = (picks: readonly string[]): string[] =>
-  picks.map((id) => CHART_NODE_BY_ID.get(id)?.kind ?? "?");

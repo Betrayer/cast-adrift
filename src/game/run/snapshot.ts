@@ -9,7 +9,7 @@ import {
   type RunState,
   type RunValues,
 } from "@/stores/runStore";
-import { emitBark, resetBarkMemory } from "@/game/narrative";
+import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
 import { restoreActionLog } from "@/game/run/actionLog";
 import { useAppStore } from "@/stores/appStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";

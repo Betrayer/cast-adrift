@@ -1,9 +1,3 @@
-/* Safe areas come from two independent sources and both have to be honoured:
-   the browser's own `env()` insets (iOS Safari, notched Android Chrome) and the
-   Telegram viewport insets the SDK binds as CSS variables. Inside a fullscreen
-   Mini App the device inset and the content inset stack — the first clears the
-   notch, the second clears Telegram's own header controls. Outside Telegram the
-   tg-* variables are undefined and every value collapses to `env()` or zero. */
 :root {
   --ca-tg-top: calc(
     var(--tg-viewport-safe-area-inset-top, 0px) +
@@ -27,8 +21,6 @@
   --ca-safe-left: max(env(safe-area-inset-left, 0px), var(--ca-tg-left));
   --ca-safe-right: max(env(safe-area-inset-right, 0px), var(--ca-tg-right));
 
-  /* Every screen sizes itself against this instead of 100dvh, so the insets
-     shrink the content box rather than pushing the page into a scroll. */
   --ca-vh: calc(100dvh - var(--ca-safe-top) - var(--ca-safe-bottom));
 }
 

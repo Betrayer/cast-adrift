@@ -271,10 +271,6 @@ const chainMemoryKey = (seed: number, sector: number): string =>
 
 const CHAIN_MARK_MS = 520;
 
-export const forgetChainMarkers = (): void => {
-  chainMemory.clear();
-};
-
 const MapShortcuts = () => {
   const { t } = useTranslation(["run"]);
   return (

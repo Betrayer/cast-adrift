@@ -1,5 +1,3 @@
-/* Opacity only, deliberately: a transform on this wrapper would become the
-   containing block for every `position: fixed` overlay inside a screen. */
 .screen {
   animation: screenIn 180ms ease-out both;
   padding: var(--ca-safe-top) var(--ca-safe-right) var(--ca-safe-bottom)

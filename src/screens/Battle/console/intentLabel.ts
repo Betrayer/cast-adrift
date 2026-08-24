@@ -10,13 +10,6 @@ export const ATTACK_INTENTS: ReadonlySet<Intent['t']> = new Set([
   'echoTotal',
 ]);
 
-export const SHIELD_INTENTS: ReadonlySet<Intent['t']> = new Set([
-  'shield',
-  'shieldAll',
-  'shieldGate',
-  'siphonShield',
-]);
-
 export const intentLabel = (
   t: TFunction<['battle', 'content']>,
   intent: Intent,

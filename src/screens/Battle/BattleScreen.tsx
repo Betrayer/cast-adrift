@@ -9,7 +9,7 @@ import { tokens } from '@/app/theme';
 import { WarpStreaks } from '@/components/WarpStreaks';
 import { STARTER_DECK } from '@/data/decks';
 import { resolveActiveBattle } from '@/game/run/flow';
-import { emitBark } from '@/game/narrative';
+import { emitBark } from '@/game/narrative/barks';
 import { offerLayoutHint } from '@/game/onboarding';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
 import { PixiCanvas } from '@/pixi/PixiCanvas';

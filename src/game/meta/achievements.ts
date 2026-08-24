@@ -350,6 +350,3 @@ export const achievementTitleById = (
   return def === undefined ? id : achievementTitle(def, translate);
 };
 
-export const achievementDescArgs = (
-  def: AchievementDef,
-): { n: number } => ({ n: def.need ?? 0 });

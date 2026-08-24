@@ -33,8 +33,6 @@ export type SectorMotif =
   | { m: "storm"; rows: number }
   | { m: "blackHoles"; count: number; toll: readonly EventEffect[] };
 
-export type MotifKind = SectorMotif["m"];
-
 export interface EncounterMix {
   bespokeWeight: number;
   threatCap: number;

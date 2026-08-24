@@ -53,7 +53,7 @@ import {
   applyNodeMotifs,
 } from "@/game/run/motifs";
 import { logJournal, settleSectorDrift } from "@/game/run/journal";
-import { emitBark, resetBarkMemory } from "@/game/narrative";
+import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
 import { computePerkMods } from "@/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
 import {

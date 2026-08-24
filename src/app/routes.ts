@@ -73,15 +73,10 @@ export const ROUTES: Record<ScreenId, RouteDef> = {
 
 const FIXED_PREFIX = 'fixed:';
 
-export const routeOf = (screen: ScreenId): RouteDef => ROUTES[screen];
-
 export const fixedBackTarget = (mode: BackMode): ScreenId | null =>
   mode.startsWith(FIXED_PREFIX)
     ? (mode.slice(FIXED_PREFIX.length) as ScreenId)
     : null;
-
-export const isGuardedRoute = (screen: ScreenId): boolean =>
-  ROUTES[screen].backMode === 'guarded';
 
 export const isSwipeLocked = (screen: ScreenId): boolean =>
   ROUTES[screen].swipeLock === true;

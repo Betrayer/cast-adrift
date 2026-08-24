@@ -3,8 +3,6 @@
   overflow: hidden;
 }
 
-/* Mk upgrade: a hologram band sweeps the row once, then the row is just a row
-   again — no lingering state to clean up. */
 .sweep {
   position: absolute;
   inset: 0;

@@ -40,14 +40,12 @@ let reserve: SlotAnchor | null = null;
 let selection: DieAnchor | null = null;
 let reserveWells: AnchorRect[] = [];
 let battle: BattleAnchors | null = null;
-let revision = 0;
 let scheduled = false;
 
 const sameRect = (a: AnchorRect | undefined, b: AnchorRect): boolean =>
   a !== undefined && a.x === b.x && a.y === b.y && a.w === b.w && a.h === b.h;
 
 const notify = (): void => {
-  revision += 1;
   if (scheduled) return;
   scheduled = true;
   queueMicrotask(() => {
@@ -55,8 +53,6 @@ const notify = (): void => {
     for (const listener of [...listeners]) listener();
   });
 };
-
-export const anchorRevision = (): number => revision;
 
 export const subscribeAnchors = (listener: () => void): (() => void) => {
   listeners.add(listener);
@@ -139,8 +135,6 @@ export const publishRegion = (
 
 export const slotAnchor = (id: SlotId): SlotAnchor | undefined => slots.get(id);
 
-export const slotAnchorIds = (): SlotId[] => [...slots.keys()];
-
 export const reserveAnchor = (): SlotAnchor | null => reserve;
 
 export const reserveWellAt = (index: number): AnchorRect | undefined =>
@@ -148,23 +142,6 @@ export const reserveWellAt = (index: number): AnchorRect | undefined =>
 
 export const boardRegion = (name: BoardRegion): AnchorRect | undefined =>
   regions.get(name);
-
-export const clearBoardAnchors = (): void => {
-  if (
-    slots.size === 0 &&
-    regions.size === 0 &&
-    reserve === null &&
-    selection === null
-  ) {
-    return;
-  }
-  slots.clear();
-  regions.clear();
-  reserve = null;
-  reserveWells = [];
-  selection = null;
-  notify();
-};
 
 export const publishBattleAnchors = (anchors: BattleAnchors | null): void => {
   battle = anchors;

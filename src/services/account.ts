@@ -28,7 +28,6 @@ import {
 import { activeUid } from "@/services/profile";
 import { bootProfileSync, refreshAccount } from "@/services/profileSwitch";
 import { openExternalLink } from "@/services/tma";
-import type { AccountInfo } from "@/services/uid";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 
@@ -246,17 +245,6 @@ export const registerWithEmail = async (
   });
 };
 
-export const linkEmailToAccount = async (
-  email: string,
-  password: string,
-): Promise<void> => {
-  await runAuthAction(async () => {
-    const { linkEmail } = await import("@/services/firebase");
-    await linkEmail(email, password);
-    await settleIdentity();
-  });
-};
-
 export const signInWithEmailAccount = async (
   email: string,
   password: string,
@@ -294,5 +282,3 @@ export const leaveAccount = async (): Promise<void> => {
   });
 };
 
-export const accountOf = (): AccountInfo | null =>
-  useAppStore.getState().account;

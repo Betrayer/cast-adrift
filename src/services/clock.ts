@@ -9,7 +9,3 @@ export const now = (): number => source();
 export const setClockSource = (next: ClockSource | null): void => {
   source = next ?? systemClock;
 };
-
-export const freezeClock = (at: number): void => {
-  setClockSource(() => at);
-};

@@ -456,7 +456,7 @@
         try {
           localStorage.setItem('ca.landing.lang', lang);
         } catch (error) {
-          /* private mode */
+          void error;
         }
       }
 
@@ -472,7 +472,7 @@
       try {
         stored = localStorage.getItem('ca.landing.lang');
       } catch (error) {
-        /* private mode */
+        void error;
       }
       var guess = (navigator.language || 'en').slice(0, 2);
       apply(stored || (STRINGS[guess] ? guess : 'en'));

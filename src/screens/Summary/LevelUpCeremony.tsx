@@ -3,7 +3,7 @@ import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { ParticleRain } from "@/components/ParticleRain";
-import { emitBark } from "@/game/narrative";
+import { emitBark } from "@/game/narrative/barks";
 import { rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";

@@ -22,15 +22,20 @@ const UNLINTABLE = [
   join("landing", "privacy.html"),
 ];
 
+const cssFiles = (): string[] =>
+  readdirSync(join(ROOT, "src"), { recursive: true, encoding: "utf8" })
+    .filter((entry) => entry.endsWith(".css"))
+    .map((entry) => join("src", entry));
+
 const assertNoComments = (): void => {
   const offenders: string[] = [];
-  for (const relative of UNLINTABLE) {
+  for (const relative of [...UNLINTABLE, ...cssFiles()]) {
     const path = join(ROOT, relative);
     if (!existsSync(path)) continue;
     readFileSync(path, "utf8")
       .split(/\r?\n/)
       .forEach((line, index) => {
-        if (/^\s*(\/\/|<!--)/.test(line)) {
+        if (/^\s*(\/\/|<!--)/.test(line) || line.includes("/*")) {
           offenders.push(`${relative}:${String(index + 1)}`);
         }
       });

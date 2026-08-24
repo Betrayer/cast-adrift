@@ -696,11 +696,6 @@ export const ACHIEVEMENT_BY_ID: ReadonlyMap<string, AchievementDef> = new Map(
   ACHIEVEMENTS.map((def) => [def.id, def]),
 );
 
-export const ACHIEVEMENT_FAMILY_BY_ID: ReadonlyMap<
-  string,
-  AchievementFamilyDef
-> = new Map(ACHIEVEMENT_FAMILIES.map((family) => [family.id, family]));
-
 export const familyTiers = (familyId: string): readonly AchievementDef[] =>
   ACHIEVEMENTS.filter((def) => def.family === familyId);
 
