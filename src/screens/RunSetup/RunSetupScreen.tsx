@@ -13,6 +13,7 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
+import { riseStyle } from '@/app/motion';
 import { AppHeader } from '@/components/AppHeader';
 import { tokens } from '@/app/theme';
 import { now } from '@/services/clock';
@@ -45,13 +46,14 @@ export const RunSetupScreen = () => {
     <Screen centered header={<AppHeader />}>
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
-          <Title order={3} c={tokens.text}>
+          <Title order={3} c={tokens.text} data-rise style={riseStyle(0)}>
             {t('run:setup.title')}
           </Title>
-          <Text size="sm" c={tokens.dim}>
+          <Text size="sm" c={tokens.dim} data-rise style={riseStyle(0)}>
             {t('run:setup.mode')}
           </Text>
           <Divider color={tokens.line} label={t('run:setup.ship')} />
+          <div data-rise data-press style={riseStyle(1)}>
           <ShipCard
             shipId={shipId}
             footer={
@@ -72,6 +74,7 @@ export const RunSetupScreen = () => {
               </Group>
             }
           />
+          </div>
           <Divider color={tokens.line} label={t('run:setup.ascension')} />
           {maxAscension === 0 ? (
             <Text size="xs" c={tokens.faint}>
@@ -93,7 +96,12 @@ export const RunSetupScreen = () => {
               ))}
             </Group>
           )}
-          <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
+          <SimpleGrid
+            cols={{ base: 1, xs: 2 }}
+            spacing="xs"
+            data-rise
+            style={riseStyle(2)}
+          >
             <Stack gap={2} data-ascension-penalties>
               <Text size="xs" c={tokens.faint}>
                 {t('run:setup.ascensionCost')}
@@ -160,6 +168,9 @@ export const RunSetupScreen = () => {
             size="md"
             fullWidth
             color="accent"
+            data-rise
+            data-press
+            style={riseStyle(3)}
             data-testid="setup-launch"
             onClick={() => {
               startRun(now() >>> 0, ascension, spendVoucher);

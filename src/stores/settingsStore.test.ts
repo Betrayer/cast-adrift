@@ -7,7 +7,7 @@ import {
 
 describe('settings migrations', () => {
   it('current version is wired', () => {
-    expect(SETTINGS_VERSION).toBe(4);
+    expect(SETTINGS_VERSION).toBe(5);
   });
 
   it('v1 blobs keep their values and gain the later defaults', () => {
@@ -26,6 +26,7 @@ describe('settings migrations', () => {
       battleSpeed: 'normal',
       battleLayout: 'console',
       skipTally: false,
+      vignette: 'full',
     });
   });
 
@@ -43,6 +44,11 @@ describe('settings migrations', () => {
     const values = migrateSettings({ fontScale: 'xl', battleSpeed: 'warp' }, 1);
     expect(values.fontScale).toBe('m');
     expect(values.battleSpeed).toBe('normal');
+  });
+
+  it('keeps a known vignette intensity and drops an unknown one', () => {
+    expect(migrateSettings({ vignette: 'subtle' }, 4).vignette).toBe('subtle');
+    expect(migrateSettings({ vignette: 'blinding' }, 4).vignette).toBe('full');
   });
 
   it('keeps a known battle layout and drops an unknown one', () => {

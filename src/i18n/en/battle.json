@@ -103,7 +103,8 @@
     "boss": "Boss",
     "subsystems": "Subsystems",
     "begin": "Begin",
-    "hull": "Hull {{n}}"
+    "hull": "Hull {{n}}",
+    "minibossAlt": "Mini-boss · new signature"
   },
   "fate": "Roll Fate",
   "fateResult": "Fate {{roll}} — {{text}}",

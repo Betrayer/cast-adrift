@@ -20,6 +20,7 @@ import { tokens } from "@/app/theme";
 import { DieCardTrigger } from "@/components/DieCardModal";
 import { DieFilterChips } from "@/components/DieFilterChips";
 import { ShipCard } from "@/components/ShipCard";
+import { fireMotionFlag, riseStyle, SWEEP_MS } from "@/app/motion";
 import { ALL_DICE, DIE_BY_ID } from "@/data/dice";
 import { dieHasFeature, type DieFeature } from "@/game/dice/card";
 import { schools } from "@/data/schools";
@@ -189,14 +190,19 @@ export const HangarScreen = () => {
           mb="sm"
           data-hangar-ships
         >
-          {PLAYABLE_SHIPS.map((ship) => {
+          {PLAYABLE_SHIPS.map((ship, index) => {
             const isOwned = ships.includes(ship.id);
             const equipped = selectedShip === ship.id;
             const unlocked =
               ship.unlock === undefined || hasFeature(unlockCtx, ship.unlock);
             return (
-              <ShipCard
+              <div
                 key={ship.id}
+                data-rise
+                data-press
+                style={riseStyle(index)}
+              >
+              <ShipCard
                 shipId={ship.id}
                 showPrice={!isOwned}
                 className={equipped ? undefined : styles.shipDim}
@@ -208,7 +214,16 @@ export const HangarScreen = () => {
                       variant={equipped ? "filled" : "default"}
                       disabled={equipped}
                       data-testid={`hangar-ship-${ship.id}`}
-                      onClick={() => { selectShip(ship.id); }}
+                      onClick={() => {
+                        selectShip(ship.id);
+                        fireMotionFlag(
+                          document.querySelector(
+                            `[data-ship-card="${ship.id}"]`,
+                          ),
+                          "data-sweep",
+                          SWEEP_MS,
+                        );
+                      }}
                     >
                       {equipped
                         ? t("meta:hangar.shipEquipped")
@@ -244,6 +259,7 @@ export const HangarScreen = () => {
                   )
                 }
               />
+              </div>
             );
           })}
         </SimpleGrid>
@@ -356,7 +372,7 @@ export const HangarScreen = () => {
           testId="hangar-feature-filter"
         />
           <Stack gap={6}>
-            {(tab === "build" ? collectionIds : shopIds).map((id) => {
+            {(tab === "build" ? collectionIds : shopIds).map((id, index) => {
               const def = DIE_BY_ID.get(id);
               if (def === undefined) return null;
               const ownedCount = owned.get(id) ?? 0;
@@ -373,10 +389,13 @@ export const HangarScreen = () => {
                   py={4}
                   data-die-row={id}
                   data-die-locked={!isOpen && tab === "shop" ? "1" : undefined}
+                  data-rise
+                  data-press
                   style={{
                     border: `1px solid ${tokens.line}`,
                     borderRadius: 8,
                     opacity: !isOpen && tab === "shop" ? 0.55 : 1,
+                    ...riseStyle(index),
                   }}
                 >
                   <Stack gap={0}>

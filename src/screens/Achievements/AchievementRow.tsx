@@ -1,6 +1,10 @@
 import { Badge, Group, Progress, Stack, Text } from "@mantine/core";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
+import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
+import { now } from "@/services/clock";
+import { playSfx } from "@/services/audio";
 import {
   tierNumeral,
   type AchievementDef,
@@ -80,6 +84,7 @@ const FamilyRow = ({
   earned: ReadonlySet<string>;
 }) => {
   const { t } = useTranslation(["meta"]);
+  const [burst, setBurst] = useState<SparkleBurst | null>(null);
   const head = tiers[0];
   if (head === undefined) return null;
   const next = tiers.find((tier) => !earned.has(tier.id));
@@ -94,6 +99,7 @@ const FamilyRow = ({
     <div
       data-achievement={head.family ?? head.id}
       data-achievement-state={complete ? "unlocked" : "locked"}
+      data-press={legendary ? "" : undefined}
       className={[
         styles.row,
         complete ? styles.rowEarned : "",
@@ -101,7 +107,19 @@ const FamilyRow = ({
       ]
         .filter((name) => name !== "")
         .join(" ")}
+      onClick={(event) => {
+        if (!legendary) return;
+        const rect = event.currentTarget.getBoundingClientRect();
+        playSfx("achievement", { gain: 0.5 });
+        setBurst({
+          key: now(),
+          x: rect.left + rect.width / 2,
+          y: rect.top + rect.height / 2,
+          color: tokens.amber,
+        });
+      }}
     >
+      <Sparkle burst={burst} />
       <div className={styles.head}>
         <div className={styles.title}>
           <Text size="sm" fw={600} c={complete ? tokens.amber : tokens.text}>

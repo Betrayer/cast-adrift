@@ -23,6 +23,7 @@ import {
   type RankedEntry,
 } from "@/services/leaderboards";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { useScreenParam } from "@/app/useScreenParam";
 
@@ -100,7 +101,16 @@ export const LeaderboardScreen = () => {
       header={
         <>
         <AppHeader />
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder mt="xs">
+        <Paper
+          bg={tokens.surface1}
+          p="md"
+          radius="md"
+          withBorder
+          mt="xs"
+          data-rise
+          data-board-controls
+          style={riseStyle(0)}
+        >
           <Stack gap="xs">
           <SegmentedControl
             fullWidth
@@ -144,7 +154,14 @@ export const LeaderboardScreen = () => {
             <Loader size="sm" color="accent" />
           </Group>
         ) : rows.length === 0 ? (
-          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <Paper
+            bg={tokens.surface1}
+            p="md"
+            radius="md"
+            withBorder
+            data-rise
+            style={riseStyle(0)}
+          >
             <Text
               size="sm"
               c={offline ? tokens.danger : tokens.dim}
@@ -155,7 +172,7 @@ export const LeaderboardScreen = () => {
           </Paper>
         ) : (
           <Stack gap={4} pb="md">
-            {rows.map((entry) => {
+            {rows.map((entry, index) => {
               const flagged = showFlagged && entryHidden(entry, board);
               return (
                 <Paper
@@ -164,7 +181,12 @@ export const LeaderboardScreen = () => {
                   p="xs"
                   radius="sm"
                   withBorder
-                  style={flagged ? { opacity: 0.4 } : undefined}
+                  data-rise
+                  style={
+                    flagged
+                      ? { opacity: 0.4, ...riseStyle(index) }
+                      : riseStyle(index)
+                  }
                 >
                   <Group justify="space-between" wrap="nowrap" gap="xs">
                     <Text size="sm" c={tokens.faint} w={32}>

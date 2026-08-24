@@ -103,7 +103,8 @@
     "boss": "Szef",
     "subsystems": "Podsystemy",
     "begin": "Zacznij",
-    "hull": "Kadłub {{n}}"
+    "hull": "Kadłub {{n}}",
+    "minibossAlt": "Miniboss · nowa sygnatura"
   },
   "fate": "Rzuć kostką losu",
   "fateResult": "Fate {{roll}} — {{text}}",

@@ -103,7 +103,8 @@
     "boss": "Patron",
     "subsystems": "Sous-systèmes",
     "begin": "Commencer",
-    "hull": "Coque {{n}}"
+    "hull": "Coque {{n}}",
+    "minibossAlt": "Mini-boss · signature inédite"
   },
   "fate": "Lancer de dés du destin",
   "fateResult": "Fate {{roll}} — {{text}}",

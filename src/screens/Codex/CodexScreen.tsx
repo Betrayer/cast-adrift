@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import {
@@ -39,7 +40,7 @@ const groupLabel: Record<CodexGroup, string> = {
   memory: "run:codex.memory",
 };
 
-const EntryRow = ({ entry }: { entry: CodexEntry }) => {
+const EntryRow = ({ entry, index }: { entry: CodexEntry; index: number }) => {
   const { t } = useTranslation(["run", "content"]);
   const unlocked = useMetaStore((s) => s.codex.includes(entry.id));
   const read = useMetaStore((s) => s.codexRead.includes(entry.id));
@@ -49,7 +50,15 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
   if (!unlocked) {
     const hint = entry.group === "memory" ? memoryUnlockHint(entry.id) : null;
     return (
-      <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder opacity={0.55}>
+      <Paper
+        bg={tokens.surface1}
+        p="sm"
+        radius="sm"
+        withBorder
+        opacity={0.55}
+        data-rise
+        style={riseStyle(index)}
+      >
         <Text size="sm" c={tokens.faint}>
           {t("run:codex.locked")}
         </Text>
@@ -68,7 +77,15 @@ const EntryRow = ({ entry }: { entry: CodexEntry }) => {
   };
 
   return (
-    <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder>
+    <Paper
+      bg={tokens.surface1}
+      p="sm"
+      radius="sm"
+      withBorder
+      data-rise
+      data-press
+      style={riseStyle(index)}
+    >
       <Group
         justify="space-between"
         wrap="nowrap"
@@ -231,9 +248,21 @@ export const CodexScreen = () => {
       header={<AppHeader />}
     >
       <Stack gap="md">
-          <GlyphLegend />
-          <TagGlossary />
-          <Paper bg={tokens.surface1} p="sm" radius="sm" withBorder>
+          <div data-rise style={riseStyle(0)}>
+            <GlyphLegend />
+          </div>
+          <div data-rise style={riseStyle(1)}>
+            <TagGlossary />
+          </div>
+          <Paper
+            bg={tokens.surface1}
+            p="sm"
+            radius="sm"
+            withBorder
+            data-rise
+            data-press
+            style={riseStyle(2)}
+          >
             <Group justify="space-between" wrap="nowrap">
               <Stack gap={2}>
                 <Text size="sm" fw={600} c={tokens.text}>
@@ -266,8 +295,8 @@ export const CodexScreen = () => {
                       {t("run:codex.empty")}
                     </Text>
                   ) : (
-                    entries.map((entry) => (
-                      <EntryRow key={entry.id} entry={entry} />
+                    entries.map((entry, index) => (
+                      <EntryRow key={entry.id} entry={entry} index={index} />
                     ))
                   )}
                 </Stack>

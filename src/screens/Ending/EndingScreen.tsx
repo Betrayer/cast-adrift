@@ -25,6 +25,7 @@ import {
 } from '@/data/narrative/epilogue';
 import { finalMemoryCodexId } from '@/data/narrative/memories';
 import { CODEX_BY_ID } from '@/data/codex';
+import { ParticleRain } from '@/components/ParticleRain';
 import { finishEnding, leaveDeathEpilogue } from '@/game/run/flow';
 import { depthFor } from '@/game/run/modes';
 import { duckMusic, playSfx } from '@/services/audio';
@@ -130,6 +131,8 @@ const DeathEpilogue = () => {
   );
 };
 
+const TRUE_ENDING_ID = 'answer';
+
 const VictoryEnding = ({ endingId }: { endingId: string }) => {
   const { t } = useTranslation(['run', 'content']);
   const ctx = useEpilogueContext(false);
@@ -169,7 +172,21 @@ const VictoryEnding = ({ endingId }: { endingId: string }) => {
   const showTally = beatIndex >= beats.length;
 
   return (
-    <Screen centered width="wide">
+    <Screen
+      centered
+      width="wide"
+      overlay={
+        endingId === TRUE_ENDING_ID ? (
+          <ParticleRain
+            color={tokens.accent}
+            count={70}
+            durationMs={4200}
+            seedLabel="trueEnding"
+            className={styles.rain}
+          />
+        ) : undefined
+      }
+    >
       <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
         <Stack gap="md">
           <Title order={3} c={tokens.text}>

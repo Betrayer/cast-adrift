@@ -165,7 +165,65 @@
 }
 
 .marker {
-  transition: transform 400ms ease-in-out;
+  transition: transform var(--ca-map-jump-ms, 420ms) cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.trail {
+  animation: trailDraw var(--ca-map-jump-ms, 420ms) cubic-bezier(0.4, 0, 0.2, 1)
+    both;
+}
+
+@keyframes trailDraw {
+  0% {
+    stroke-dashoffset: var(--ca-trail-len, 100);
+    opacity: 0.55;
+  }
+  60% {
+    stroke-dashoffset: 0;
+    opacity: 0.45;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
+}
+
+.chainMark {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: chainMarkIn 520ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+}
+
+@keyframes chainMarkIn {
+  0% {
+    opacity: 0;
+    scale: 0.2;
+  }
+  60% {
+    opacity: 1;
+    scale: 1.35;
+  }
+  100% {
+    opacity: 1;
+    scale: 1;
+  }
+}
+
+.arrival {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: arrivalTick 340ms ease-out both;
+}
+
+@keyframes arrivalTick {
+  0% {
+    opacity: 0.9;
+    scale: 0.5;
+  }
+  100% {
+    opacity: 0;
+    scale: 1.7;
+  }
 }
 
 .vortex {
@@ -226,6 +284,9 @@
   transition: none;
 }
 
+:root[data-ca-motion='reduced'] .chainMark,
+:root[data-ca-motion='reduced'] .trail,
+:root[data-ca-motion='reduced'] .arrival,
 :root[data-ca-motion='reduced'] .tidePulse,
 :root[data-ca-motion='reduced'] .nodeStagger,
 :root[data-ca-motion='reduced'] .vortex,
@@ -235,7 +296,6 @@
   animation: none;
 }
 
-:root[data-ca-motion='reduced'] .fog,
-:root[data-ca-motion='reduced'] .marker {
+:root[data-ca-motion='reduced'] .fog {
   transition: none;
 }

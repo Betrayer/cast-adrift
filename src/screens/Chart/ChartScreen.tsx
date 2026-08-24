@@ -30,6 +30,7 @@ import {
 import { chartNodeLines, chartNodeTitle } from "@/game/chart/describe";
 import { trackEvent } from "@/services/analytics";
 import { playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
 import {
   boundsOf,
@@ -305,6 +306,8 @@ export const ChartScreen = () => {
     }
     lastTap.current = null;
     const anchor = clientToUser(CHART_BOUNDS, measure(), e.clientX, e.clientY);
+    playSfx("navTick", { rate: 1.28, gain: 1.5 });
+    haptic("place");
     setView((v) => zoomAt(v, CHART_BOUNDS, 1.8, anchor));
   };
 

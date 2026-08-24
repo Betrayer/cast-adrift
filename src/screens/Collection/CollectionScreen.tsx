@@ -9,6 +9,7 @@ import {
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { useScreenParam } from "@/app/useScreenParam";
 import { tokens } from "@/app/theme";
@@ -191,7 +192,7 @@ export const CollectionScreen = () => {
     >
       <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
           <SimpleGrid cols={{ base: 1, xs: 2 }} spacing="xs">
-            {filtered.map((row) => {
+            {filtered.map((row, index) => {
               const def = row.def;
               const unknown = row.state === "unknown";
               return (
@@ -202,8 +203,14 @@ export const CollectionScreen = () => {
                   withBorder
                   data-collection-entry={def.id}
                   data-collection-state={row.state}
+                  data-rise
+                  data-press
                   bg={unknown ? tokens.bg : schools[def.school].fill}
-                  style={unknown ? { opacity: 0.65 } : undefined}
+                  style={
+                    unknown
+                      ? { opacity: 0.65, ...riseStyle(index) }
+                      : riseStyle(index)
+                  }
                 >
                   <Group justify="space-between">
                     {unknown ? (

@@ -24,6 +24,12 @@
   height: 240px;
 }
 
+.rain {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
 .card {
   position: relative;
   width: 100%;
@@ -150,6 +156,10 @@
     opacity: 0;
     transform: scaleX(0.6);
   }
+}
+
+:root[data-ca-motion='reduced'] .rain {
+  display: none;
 }
 
 :root[data-ca-motion='reduced'] .overlay, :root[data-ca-motion='reduced'] .card, :root[data-ca-motion='reduced'] .dot, :root[data-ca-motion='reduced'] .beam {

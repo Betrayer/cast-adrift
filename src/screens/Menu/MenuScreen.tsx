@@ -21,10 +21,13 @@ import { dismissCloudRun, restoreCloudRun } from '@/game/run/cloud';
 import { readLocalResume, resumeLocalRun } from '@/game/run/resume';
 import { MenuBadge, menuBadgeId } from '@/screens/Profile/BadgeRow';
 import { ResumeCard } from '@/screens/Menu/ResumeCard';
+import { haptic } from '@/services/tma';
 import { useAppStore } from '@/stores/appStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
 import styles from './MenuScreen.module.css';
+
+const ASCENDANT_BADGE = 'ascendant';
 
 const MenuBackground = lazy(() =>
   import('@/screens/Menu/MenuBackground').then((m) => ({
@@ -111,7 +114,9 @@ export const MenuScreen = () => {
       overlay={
         <UnstyledButton
           className={styles.levelBadge}
+          data-press
           onClick={() => {
+            haptic(topBadge === ASCENDANT_BADGE ? 'levelUp' : 'place');
             go('chart');
           }}
           aria-label={t('meta:menu.level', { level })}

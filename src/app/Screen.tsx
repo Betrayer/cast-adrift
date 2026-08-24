@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import { publishBodyRect } from '@/app/bands';
+import { EdgeVignette } from '@/components/EdgeVignette';
 import styles from './Screen.module.css';
 
 export type ScreenWidth = 'narrow' | 'wide' | 'full';
@@ -105,7 +106,10 @@ export const Screen = ({
             if (bodyRef !== undefined) bodyRef.current = node;
           }}
         >
-          <div className={`${styles.inner ?? ''} ${innerClassName ?? ''}`}>
+          <div
+            className={`${styles.inner ?? ''} ${innerClassName ?? ''}`}
+            data-screen-inner
+          >
             {children}
           </div>
         </div>
@@ -114,6 +118,7 @@ export const Screen = ({
         )}
       </div>
       {overlay}
+      <EdgeVignette />
     </div>
   );
 };

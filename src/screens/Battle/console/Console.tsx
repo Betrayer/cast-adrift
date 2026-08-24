@@ -10,8 +10,10 @@ import {
 } from '@/game/battle/view';
 import { playSfx } from '@/services/audio';
 import { useBattleStore } from '@/stores/battleStore';
+import { fireMotionFlag, POP_MS } from '@/app/motion';
 import {
   ACTIVE_ORDER,
+  ARMING_ACTIONS,
   nudgeLabel,
   pressReroll,
   rerollLabel,
@@ -81,9 +83,14 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
         {...(coach === undefined ? {} : { 'data-coach': coach })}
         className={`${styles.btn ?? ''} ${extra ?? ''}`}
         aria-disabled={!action.enabled}
-        onClick={() => {
+        data-press
+        onClick={(event) => {
+          const node = event.currentTarget;
           run(action, () => {
             runActionEffect(id);
+            if (ARMING_ACTIONS.has(id)) {
+              fireMotionFlag(node, 'data-pop', POP_MS);
+            }
           });
         }}
       >

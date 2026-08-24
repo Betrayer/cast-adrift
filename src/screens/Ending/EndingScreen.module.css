@@ -31,3 +31,14 @@
 :root[data-ca-motion='reduced'] .beat, :root[data-ca-motion='reduced'] .tallyLine {
   animation: none;
 }
+
+.rain {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-overlay);
+}
+
+:root[data-ca-motion='reduced'] .rain {
+  display: none;
+}

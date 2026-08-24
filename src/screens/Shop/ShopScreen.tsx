@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ascensionMods } from "@/data/ascension";
 import { useBackGuard } from "@/app/backGuard";
+import { POP_MS, riseStyle, useMotionFlag } from "@/app/motion";
 import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
@@ -42,6 +43,10 @@ import { useRunStore } from "@/stores/runStore";
 
 export const ShopScreen = () => {
   const { t } = useTranslation(["run", "battle", "content"]);
+  const { attach: scrapRef, fire: pulseScrap } = useMotionFlag<HTMLDivElement>(
+    "data-pop",
+    POP_MS,
+  );
   const scrap = useRunStore((s) => s.scrap);
   const deck = useRunStore((s) => s.deck);
   const seed = useRunStore((s) => s.seed);
@@ -77,6 +82,7 @@ export const ShopScreen = () => {
     if (!state.spendScrap(item.price)) return;
     playSfx("buy");
     haptic("purchase");
+    pulseScrap();
     state.addDie(item.defId);
     setShop({
       ...current,
@@ -101,6 +107,7 @@ export const ShopScreen = () => {
     }
     playSfx("buy");
     haptic("purchase");
+    pulseScrap();
     setShop({
       ...current,
       modules: current.modules.map((it, i) =>
@@ -137,6 +144,7 @@ export const ShopScreen = () => {
     if (die === undefined) return;
     state.removeDie(uid);
     state.addScrap(sellValue(ptsForDie(die.defId)));
+    pulseScrap();
     autosaveRun();
   };
 
@@ -167,7 +175,12 @@ export const ShopScreen = () => {
         <AppHeader
           actions={
             <>
-              <Text size="sm" c={tokens.amber}>
+              <Text
+                ref={scrapRef}
+                size="sm"
+                c={tokens.amber}
+                data-shop-scrap
+              >
                 {t("run:shop.scrap", { n: scrap })}
               </Text>
               <Text size="sm" c={tokens.dim}>
@@ -199,7 +212,9 @@ export const ShopScreen = () => {
               key={index}
               data-testid={`shop-item-${String(index)}`}
               data-sold={item.sold ? '1' : '0'}
-              style={{ opacity: item.sold ? 0.4 : 1 }}
+              data-rise
+              data-press
+              style={{ opacity: item.sold ? 0.4 : 1, ...riseStyle(index) }}
             >
               <DieCard
                 defId={item.defId}
@@ -246,7 +261,9 @@ export const ShopScreen = () => {
               p="sm"
               radius="md"
               withBorder
-              style={{ opacity: item.sold ? 0.4 : 1 }}
+              data-rise
+              data-press
+              style={{ opacity: item.sold ? 0.4 : 1, ...riseStyle(index) }}
             >
               <Stack gap={4}>
                 <Group gap={6} justify="space-between">

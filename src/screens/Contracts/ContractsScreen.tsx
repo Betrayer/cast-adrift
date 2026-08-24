@@ -2,6 +2,7 @@ import { Badge, Button, Group, Paper, Stack, Text } from "@mantine/core";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
@@ -76,7 +77,7 @@ export const ContractsScreen = () => {
       header={<AppHeader />}
     >
       <Stack gap="sm">
-          {CONTRACTS.map((def) => {
+          {CONTRACTS.map((def, index) => {
             const mask = contracts[def.id] ?? 0;
             const isOpen = open.has(def.id);
             return (
@@ -88,7 +89,13 @@ export const ContractsScreen = () => {
                 withBorder
                 data-contract={def.id}
                 data-contract-locked={isOpen ? undefined : "1"}
-                style={isOpen ? undefined : { opacity: 0.6 }}
+                data-rise
+                data-press
+                style={
+                  isOpen
+                    ? riseStyle(index)
+                    : { opacity: 0.6, ...riseStyle(index) }
+                }
               >
                 <Stack gap={6}>
                   <Group justify="space-between" wrap="nowrap">

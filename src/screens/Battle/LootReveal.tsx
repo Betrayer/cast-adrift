@@ -5,6 +5,7 @@ import { rarityColor } from '@/app/rarity';
 import { useEscapeKey } from '@/components/dismiss';
 import { tokens } from '@/app/theme';
 import { DieCard } from '@/components/DieCard';
+import { ParticleRain } from '@/components/ParticleRain';
 import { DIE_BY_ID } from '@/data/dice';
 import { LOOT_SFX } from '@/data/audio';
 import { duckMusic, playSfx } from '@/services/audio';
@@ -83,7 +84,16 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
         {t('battle:lootNew')}
       </Text>
       {revealed && !reduced && def.rarity === 'legendary' ? (
-        <div className={styles.beam} style={{ color: frameColor }} />
+        <>
+          <div className={styles.beam} style={{ color: frameColor }} />
+          <ParticleRain
+            color={frameColor}
+            count={60}
+            durationMs={1800}
+            seedLabel={`loot:${dieId}`}
+            className={styles.rain}
+          />
+        </>
       ) : null}
       <div className={styles.stage}>
         <div

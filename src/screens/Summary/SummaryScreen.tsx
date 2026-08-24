@@ -9,9 +9,12 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
+import { rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
+import { playSfx } from "@/services/audio";
 import { tokens } from "@/app/theme";
 import { achievementTitleById } from "@/game/meta/achievements";
 import { ShipCard } from "@/components/ShipCard";
@@ -29,6 +32,8 @@ import {
 } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
 import { LevelUpCeremony } from "./LevelUpCeremony";
+
+const FIND_STAGGER_MS = 180;
 
 const DETAIL_ROWS: readonly {
   id: string;
@@ -122,6 +127,27 @@ export const SummaryScreen = () => {
       clearTimeout(id);
     };
   }, [reduced]);
+
+  const firstFinds = useMemo(() => result?.firstFinds ?? [], [result]);
+  const findShards = result?.findShards ?? 0;
+
+  useEffect(() => {
+    if (firstFinds.length === 0 || reduced) return;
+    const clock = rafClock();
+    const tweens = new Tweens(clock);
+    tweens.channel(UI_GROUP).sequence(
+      firstFinds.map((_, index) => ({
+        ms: FIND_STAGGER_MS,
+        run: () => {
+          playSfx("cacheClaim", { rate: 1 + index * 0.07 });
+        },
+      })),
+      );
+    return () => {
+      tweens.destroy();
+      clock.destroy();
+    };
+  }, [firstFinds, reduced]);
 
   const progress = progressWithinLevel(xp);
   const perkNames = perks
@@ -236,13 +262,26 @@ export const SummaryScreen = () => {
               ))}
             </Stack>
           )}
-          {(result?.firstFinds ?? []).length === 0 ? null : (
-            <Text size="xs" c={tokens.dim} data-first-finds>
-              {t("meta:summary.firstFinds", {
-                names: (result?.firstFinds ?? [])
-                  .map((id) => t(DIE_BY_ID.get(id)?.name ?? id))
-                  .join(" · "),
-              })}
+          {firstFinds.length === 0 ? null : (
+            <Text
+              size="xs"
+              c={tokens.amber}
+              data-first-finds
+              data-find-shards={findShards}
+              data-rise
+              style={riseStyle(0)}
+            >
+              {t(
+                findShards > 0
+                  ? "meta:summary.firstFindsShards"
+                  : "meta:summary.firstFinds",
+                {
+                  names: firstFinds
+                    .map((id) => t(DIE_BY_ID.get(id)?.name ?? id))
+                    .join(" · "),
+                  n: findShards,
+                },
+              )}
             </Text>
           )}
           {(result?.achievements ?? []).length === 0 ? null : (

@@ -1,6 +1,13 @@
 import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Application, Ticker } from "pixi.js";
 import { subscribeBodyRect } from "@/app/bands";
+import {
+  clearVignette,
+  flashVignette,
+  setVignetteRim,
+  sideForX,
+  syncHullRim,
+} from "@/services/vignette";
 import { mixHex } from "@/app/color";
 import { onThemeChange, tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
@@ -38,7 +45,14 @@ import {
   type BattleLayout,
   type Rect,
 } from "@/pixi/battle/layout";
-import { easeOutQuad, linear, Tweens } from "@/pixi/tween";
+import {
+  easeOutQuad,
+  FX_GROUP,
+  linear,
+  Tweens,
+  UI_GROUP,
+  type TweenChannel,
+} from "@/pixi/tween";
 import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
 import {
   resolveReducedMotion,
@@ -248,6 +262,7 @@ export class BattleScene {
   private readonly app: Application;
   private readonly labels: BattleSceneLabels;
   private readonly tweens: Tweens;
+  private readonly uiTweens: TweenChannel;
 
   private readonly bg = new Container();
   private readonly enemiesLayer = new Container();
@@ -297,6 +312,7 @@ export class BattleScene {
     this.app = app;
     this.labels = labels;
     this.tweens = new Tweens(app.ticker);
+    this.uiTweens = this.tweens.channel(UI_GROUP);
     this.motionQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     this.motionReduced = resolveReducedMotion(
       useSettingsStore.getState().reducedMotion,
@@ -334,8 +350,11 @@ export class BattleScene {
     this.motionQuery.addEventListener("change", this.onMotionChange);
     this.app.renderer.on("resize", this.onResize);
     this.app.ticker.add(this.tick);
-    if (useBattleStore.getState().phase === "resolving") {
-      this.startResolution(useBattleStore.getState());
+    const seated = useBattleStore.getState();
+    setVignetteRim("shield", seated.shield > 0);
+    syncHullRim(seated.hull, seated.hullMax);
+    if (seated.phase === "resolving") {
+      this.startResolution(seated);
     }
   }
 
@@ -352,6 +371,7 @@ export class BattleScene {
       useBattleStore.getState().finishResolution();
     }
     this.clearCardFlags();
+    clearVignette();
     this.unsubscribe();
     this.unsubscribeTheme();
     this.unsubscribeBands();
@@ -1374,8 +1394,25 @@ export class BattleScene {
     if (state.enemies !== prev.enemies) {
       this.checkKills(state, prev);
     }
+    if (state.shield !== prev.shield) {
+      setVignetteRim("shield", state.shield > 0);
+    }
+    if (state.hull !== prev.hull || state.hullMax !== prev.hullMax) {
+      syncHullRim(state.hull, state.hullMax);
+    }
     if (prev.introPending && !state.introPending) this.bossShockwave();
     if (state.enemies !== prev.enemies) this.checkMirrorIntents(state);
+    if (state.dice !== prev.dice && state.turn === prev.turn) {
+      this.checkTempDice(state, prev);
+      this.checkTrayRerolls(state, prev);
+    }
+    if (
+      state.phase === "placement" &&
+      state.targetId !== prev.targetId &&
+      state.targetId !== null
+    ) {
+      this.targetPing(state.targetId);
+    }
     if (state.charge > prev.charge) playSfx("charge");
     if (state.outcome !== prev.outcome && state.outcome !== undefined) {
       playSfx(state.outcome === "victory" ? "win" : "lose");
@@ -1423,6 +1460,51 @@ export class BattleScene {
     }
   }
 
+  private checkTempDice(state: BattleState, prev: BattleState): void {
+    if (this.reduced()) return;
+    const known = new Set(prev.dice.map((die) => die.uid));
+    for (const die of state.dice) {
+      if (die.temp !== true || known.has(die.uid)) continue;
+      playSfx("summon", { gain: 0.45, rate: 1.18 });
+      this.dieFlash(this.trayAnchor(die.uid, state), schools.prismatic.stroke);
+    }
+  }
+
+  private checkTrayRerolls(state: BattleState, prev: BattleState): void {
+    if (this.reduced()) return;
+    const before = new Map(prev.dice.map((die) => [die.uid, die]));
+    for (const die of state.dice) {
+      if (die.state !== "tray") continue;
+      const was = before.get(die.uid);
+      if (was === undefined || was.state !== "tray") continue;
+      if (was.value === die.value) continue;
+      this.dieFlash(this.trayAnchor(die.uid, state), schools[die.school].stroke);
+    }
+  }
+
+  private targetPing(targetId: string): void {
+    const anchor = this.enemyAnchor(targetId);
+    if (anchor === undefined) return;
+    playSfx("navTick", { gain: 1.4 });
+    if (this.reduced()) return;
+    const ring = this.takeParticle();
+    if (ring === undefined) return;
+    ring.circle(0, 0, this.layout.enemySize * 0.42).stroke({
+      color: tokens.accent,
+      width: 2,
+    });
+    ring.position.set(anchor.x, anchor.y);
+    ring.scale.set(1.25);
+    this.trackParticle(
+      this.tweens.to(ring.scale, { x: 1, y: 1 }, 220, easeOutQuad),
+    );
+    this.trackParticle(
+      this.tweens.to(ring, { alpha: 0 }, 260, linear, () => {
+        ring.visible = false;
+      }),
+    );
+  }
+
   private checkMirrorIntents(state: BattleState): void {
     for (const enemy of state.enemies) {
       const mirroring = enemy.hp > 0 && enemy.nextIntent.t === "mirrorHalf";
@@ -1466,7 +1548,7 @@ export class BattleScene {
   private hitStop(ms: number): void {
     if (this.reduced()) return;
     this.hitStopMs = Math.max(this.hitStopMs, ms);
-    this.tweens.timeScale = 0;
+    this.tweens.setGroupScale(FX_GROUP, 0);
   }
 
   private readonly tick = (ticker: Ticker): void => {
@@ -1487,7 +1569,7 @@ export class BattleScene {
     );
     if (this.hitStopMs > 0) {
       this.hitStopMs = Math.max(0, this.hitStopMs - ticker.deltaMS);
-      if (this.hitStopMs === 0) this.tweens.timeScale = 1;
+      if (this.hitStopMs === 0) this.tweens.setGroupScale(FX_GROUP, 1);
     }
     if (this.shakeMs > 0) {
       this.shakeMs = Math.max(0, this.shakeMs - ticker.deltaMS);
@@ -1821,13 +1903,13 @@ export class BattleScene {
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
     const scale = anchor.size / MINI_DIE_SIZE;
-    const cancelScale = this.tweens.to(
+    const cancelScale = this.uiTweens.to(
       sprite.scale,
       { x: scale, y: scale },
       120,
       easeOutQuad,
     );
-    const cancelMove = this.tweens.to(
+    const cancelMove = this.uiTweens.to(
       sprite,
       { x: anchor.x, y: anchor.y },
       120,
@@ -1863,13 +1945,13 @@ export class BattleScene {
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
     const scale = anchor.size / MINI_DIE_SIZE;
-    const cancelScale = this.tweens.to(
+    const cancelScale = this.uiTweens.to(
       sprite.scale,
       { x: scale, y: scale },
       120,
       easeOutQuad,
     );
-    const cancelMove = this.tweens.to(
+    const cancelMove = this.uiTweens.to(
       sprite,
       { x: anchor.x, y: anchor.y },
       120,
@@ -1890,13 +1972,13 @@ export class BattleScene {
     const anchor = this.trayAnchor(uid, state);
     this.animating.add(uid);
     const goBack = (): void => {
-      const cancelScale = this.tweens.to(
+      const cancelScale = this.uiTweens.to(
         sprite.scale,
         { x: 1, y: 1 },
         150,
         easeOutQuad,
       );
-      const cancelMove = this.tweens.to(
+      const cancelMove = this.uiTweens.to(
         sprite,
         { x: anchor.x, y: anchor.y },
         150,
@@ -1923,7 +2005,7 @@ export class BattleScene {
         goBack();
         return;
       }
-      const cancel = this.tweens.to(
+      const cancel = this.uiTweens.to(
         sprite,
         { x: baseX + offset },
         36,
@@ -2249,6 +2331,7 @@ export class BattleScene {
     if (beat.kind === "shield") {
       playSfx("shields");
       this.shieldShimmer();
+      flashVignette("shieldGain");
       this.spawnNumber(
         slotAnchorPoint.x,
         slotAnchorPoint.y - 24,
@@ -2305,6 +2388,10 @@ export class BattleScene {
         playSfx("hullHit");
         this.flashShip(schools.red.stroke);
         const state = useBattleStore.getState();
+        flashVignette("hullHit", {
+          side: sideForX(origin.x, this.app.screen.width),
+          strength: Math.min(1, 0.5 + beat.hullDamage / Math.max(1, state.hullMax)),
+        });
         if (beat.hullDamage >= state.hull) this.shake();
         this.spawnNumber(
           playerHit.x,
@@ -2313,12 +2400,10 @@ export class BattleScene {
           schools.red.text,
         );
       } else if (beat.shieldDamage > 0) {
-        playSfx(
-          beat.after.shield <= 0 && beat.shieldDamage > 0
-            ? "shieldBreak"
-            : "shieldHit",
-        );
+        const broken = beat.after.shield <= 0;
+        playSfx(broken ? "shieldBreak" : "shieldHit");
         this.flashShip(schools.blue.stroke);
+        if (broken) flashVignette("shieldBreak");
         this.spawnNumber(
           playerHit.x,
           playerHit.y,
@@ -2327,7 +2412,16 @@ export class BattleScene {
         );
       } else {
         playSfx("dodge");
+        flashVignette("dodge", {
+          side: sideForX(origin.x, this.app.screen.width),
+        });
         this.spawnNumber(playerHit.x, playerHit.y, "0", tokens.dim);
+      }
+      if ((beat.glanced ?? 0) > 0) {
+        flashVignette("glancing", {
+          side: sideForX(origin.x, this.app.screen.width),
+          strength: 0.5,
+        });
       }
       return;
     }

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { hasBackGuard, runBackGuard } from "@/app/backGuard";
-import { fixedBackTarget, ROUTES } from "@/app/routes";
+import { fixedBackTarget, ROUTES, type NavDirection } from "@/app/routes";
 import type { MergePrompt } from "@/services/account-link";
 import type { AuthErrorCode } from "@/services/authErrors";
 import type { AccountInfo } from "@/services/uid";
@@ -26,6 +26,7 @@ export interface AppState {
   screen: ScreenId;
   params: ScreenParams;
   stack: StackEntry[];
+  navDir: NavDirection;
   tgUserId: number | null;
   tgName: string | null;
   isTelegram: boolean;
@@ -102,6 +103,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   screen: ROOT_SCREEN,
   params: undefined,
   stack: [],
+  navDir: "forward",
   tgUserId: null,
   tgName: null,
   isTelegram: false,
@@ -120,6 +122,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
         : {
             screen,
             params,
+            navDir: "forward" as NavDirection,
             systemMenu: false,
             buildSheet: false,
             stack: nextStack(s.stack, { screen: s.screen, params: s.params }, screen),
@@ -137,12 +140,20 @@ export const useAppStore = create<AppState>()((set, get) => ({
       screen: action.entry.screen,
       params: action.entry.params,
       stack: action.stack,
+      navDir: "back",
       systemMenu: false,
       buildSheet: false,
     });
   },
   seed: (stack, screen, params) =>
-    set({ screen, params, stack: [...stack], systemMenu: false, buildSheet: false }),
+    set({
+      screen,
+      params,
+      stack: [...stack],
+      navDir: "forward",
+      systemMenu: false,
+      buildSheet: false,
+    }),
   setParams: (params) => set({ params }),
   setSystemMenu: (systemMenu) => set({ systemMenu }),
   setBuildSheet: (buildSheet) => set({ buildSheet }),

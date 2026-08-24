@@ -1,7 +1,12 @@
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { ROUTES, fixedBackTarget } from "@/app/routes";
+import {
+  ROUTES,
+  enterModeFor,
+  fixedBackTarget,
+  navAttrFor,
+} from "@/app/routes";
 import type { ScreenId } from "@/types";
 
 const NAMESPACES = ["battle", "common", "content", "menu", "meta", "run", "settings"] as const;
@@ -71,5 +76,22 @@ describe("header ownership", () => {
       readFileSync(file, "utf8").includes("common:back"),
     );
     expect(offenders).toEqual([]);
+  });
+});
+
+describe('enter modes', () => {
+  it('gives ceremonies and battle their bespoke entries', () => {
+    for (const screen of ['battle', 'rewards', 'summary', 'ending'] as const) {
+      expect(enterModeFor(screen)).toBe('bespoke');
+      expect(navAttrFor(screen, 'forward')).toBe('none');
+    }
+  });
+
+  it('slides every ordinary route in the direction it was reached', () => {
+    for (const screen of ['menu', 'settings', 'shop', 'map'] as const) {
+      expect(enterModeFor(screen)).toBe('slide');
+      expect(navAttrFor(screen, 'forward')).toBe('forward');
+      expect(navAttrFor(screen, 'back')).toBe('back');
+    }
   });
 });

@@ -4,12 +4,17 @@ export type RouteGroup = 'menu' | 'meta' | 'run' | 'node' | 'ceremony';
 
 export type BackMode = 'stack' | 'locked' | 'guarded' | `fixed:${ScreenId}`;
 
+export type EnterMode = 'slide' | 'bespoke';
+
+export type NavDirection = 'forward' | 'back';
+
 export interface RouteDef {
   group: RouteGroup;
   backMode: BackMode;
   title?: string;
   swipeLock?: true;
   keepAlive?: true;
+  enter?: 'bespoke';
 }
 
 export const ROUTES: Record<ScreenId, RouteDef> = {
@@ -47,18 +52,18 @@ export const ROUTES: Record<ScreenId, RouteDef> = {
   runSetup: { group: 'meta', backMode: 'stack', title: 'run:setup.title' },
   map: { group: 'run', backMode: 'guarded', swipeLock: true },
   journal: { group: 'run', backMode: 'stack', title: 'run:journal.title' },
-  battle: { group: 'run', backMode: 'locked', swipeLock: true },
+  battle: { group: 'run', backMode: 'locked', swipeLock: true, enter: 'bespoke' },
   event: { group: 'node', backMode: 'guarded' },
   puzzle: { group: 'node', backMode: 'guarded', swipeLock: true },
   shop: { group: 'node', backMode: 'guarded', title: 'run:shop.title' },
   shipyard: { group: 'node', backMode: 'guarded', title: 'run:shipyard.title' },
-  rewards: { group: 'ceremony', backMode: 'locked' },
-  summary: { group: 'ceremony', backMode: 'locked' },
-  driftSummary: { group: 'ceremony', backMode: 'locked' },
-  prologue: { group: 'ceremony', backMode: 'locked' },
-  interstitial: { group: 'ceremony', backMode: 'locked' },
-  finale: { group: 'ceremony', backMode: 'locked' },
-  ending: { group: 'ceremony', backMode: 'locked' },
+  rewards: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },
+  summary: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },
+  driftSummary: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },
+  prologue: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },
+  interstitial: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },
+  finale: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },
+  ending: { group: 'ceremony', backMode: 'locked', enter: 'bespoke' },
 };
 
 const FIXED_PREFIX = 'fixed:';
@@ -75,6 +80,15 @@ export const isGuardedRoute = (screen: ScreenId): boolean =>
 
 export const isSwipeLocked = (screen: ScreenId): boolean =>
   ROUTES[screen].swipeLock === true;
+
+export const enterModeFor = (screen: ScreenId): EnterMode =>
+  ROUTES[screen].enter === 'bespoke' ? 'bespoke' : 'slide';
+
+export const navAttrFor = (
+  screen: ScreenId,
+  direction: NavDirection,
+): NavDirection | 'none' =>
+  enterModeFor(screen) === 'bespoke' ? 'none' : direction;
 
 export const screenTitleKey = (screen: ScreenId): string | undefined =>
   ROUTES[screen].title;

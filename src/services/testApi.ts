@@ -24,6 +24,16 @@ import { holeTollFor } from "@/game/run/motifs";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { settleLifetimeAchievements } from "@/game/meta/achievements";
 import {
+  flashVignette,
+  lastVignetteFlash,
+  setVignetteRim,
+  vignetteRims,
+  type VignetteFlashKind,
+  type VignetteRimKind,
+  type VignetteRims,
+  type VignetteSide,
+} from "@/services/vignette";
+import {
   chaosMocked,
   scriptedChaos,
   setChaosSource,
@@ -61,6 +71,7 @@ import {
   useBattleStore,
   type BattleSaveState,
 } from "@/stores/battleStore";
+import { useLootStore } from "@/stores/lootStore";
 import { useMetaStore, type MetaStats } from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import {
@@ -181,6 +192,12 @@ export interface AchievementsView {
   unseen: number;
   vouchers: number;
   offers: string[];
+}
+
+export interface VignetteView {
+  last: VignetteFlashKind | null;
+  seq: number;
+  rims: VignetteRims;
 }
 
 export interface WormholeView {
@@ -319,6 +336,10 @@ export interface TestApi {
   achievements: () => AchievementsView;
   settleAchievements: () => string[];
   mockChaos: (script: ChaosScript | null) => void;
+  vignette: () => VignetteView;
+  fireVignette: (kind: VignetteFlashKind, side?: VignetteSide) => void;
+  vignetteRim: (kind: VignetteRimKind, on: boolean) => void;
+  dropLoot: (defId: string | null) => void;
   settings: (patch: Partial<SettingsValues>) => void;
   layout: (id: BattleLayoutId) => void;
   forecast: () => TurnForecast | null;
@@ -429,6 +450,7 @@ const applySettings = (patch: Partial<SettingsValues>): void => {
     settings.setEchoVerbosity(patch.echoVerbosity);
   }
   if (patch.screenShake !== undefined) settings.setScreenShake(patch.screenShake);
+  if (patch.vignette !== undefined) settings.setVignette(patch.vignette);
   if (patch.theme !== undefined) settings.setTheme(patch.theme);
   if (patch.fontScale !== undefined) settings.setFontScale(patch.fontScale);
   if (patch.battleSpeed !== undefined) settings.setBattleSpeed(patch.battleSpeed);
@@ -772,6 +794,28 @@ export const createTestApi = (): TestApi => ({
 
   mockChaos: (script) => {
     setChaosSource(script === null ? null : scriptedChaos(script));
+  },
+
+  vignette: () => {
+    const flash = lastVignetteFlash();
+    return {
+      last: flash?.kind ?? null,
+      seq: flash?.seq ?? 0,
+      rims: { ...vignetteRims() },
+    };
+  },
+
+  fireVignette: (kind, side) => {
+    flashVignette(kind, side === undefined ? {} : { side });
+  },
+
+  vignetteRim: (kind, on) => {
+    setVignetteRim(kind, on);
+  },
+
+  dropLoot: (defId) => {
+    if (defId === null) useLootStore.getState().clear();
+    else useLootStore.getState().drop(defId);
   },
 
   slotsFor: (uid) => legalTargets(useBattleStore.getState(), uid).slots,

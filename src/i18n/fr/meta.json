@@ -255,7 +255,8 @@
     "fromFinds": "Premières découvertes",
     "fromAchievements": "Réalisations",
     "firstFinds": "Première publication : {{names}}",
-    "fromDeep": "Au-delà de l'essentiel"
+    "fromDeep": "Au-delà de l'essentiel",
+    "firstFindsShards": "Première observation : {{names}} · +{{n}} éclats"
   },
   "menu": {
     "level": "Niv.{{level}}"

@@ -4,6 +4,7 @@ import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { ParticleRain } from "@/components/ParticleRain";
 import { emitBark } from "@/game/narrative";
+import { rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import styles from "./LevelUpCeremony.module.css";
@@ -36,17 +37,21 @@ export const LevelUpCeremony = ({
     playSfx("levelUp");
     duckMusic(2200);
     haptic("levelUp");
+    const clock = rafClock();
+    const tweens = new Tweens(clock);
     const cards = [...milestones, ...unlocks];
-    const timers = cards.map((_, index) =>
-      window.setTimeout(
-        () => {
+    tweens.channel(UI_GROUP).sequence([
+      { delay: CARD_DELAY_MS },
+      ...cards.map((_, index) => ({
+        ms: CARD_STAGGER_MS,
+        run: () => {
           playSfx("unlockCard", { rate: 1 + index * 0.06 });
         },
-        CARD_DELAY_MS + index * CARD_STAGGER_MS,
-      ),
-    );
+      })),
+    ]);
     return () => {
-      for (const id of timers) window.clearTimeout(id);
+      tweens.destroy();
+      clock.destroy();
     };
   }, [milestones, unlocks]);
 
@@ -57,6 +62,7 @@ export const LevelUpCeremony = ({
       {reduced ? null : (
         <ParticleRain
           color={tokens.amber}
+          seedLabel="levelUpRain"
           className={styles.rain}
         />
       )}

@@ -1,10 +1,22 @@
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useRotateGate } from '@/app/breakpoints';
+import { playSfx } from '@/services/audio';
+import { haptic } from '@/services/tma';
 import styles from './RotateGate.module.css';
 
 export const RotateGate = () => {
   const { t } = useTranslation(['common']);
   const blocked = useRotateGate();
+  const wasBlocked = useRef(false);
+
+  useEffect(() => {
+    if (blocked === wasBlocked.current) return;
+    wasBlocked.current = blocked;
+    playSfx('gateRaise', { gain: 0.5, rate: blocked ? 0.9 : 1.24 });
+    haptic(blocked ? 'reveal' : 'place');
+  }, [blocked]);
+
   if (!blocked) return null;
   return (
     <div className={styles.gate} role="alertdialog" data-rotate-gate>

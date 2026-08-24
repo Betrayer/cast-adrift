@@ -41,4 +41,6 @@ export type BattleLayoutId = 'console' | 'orbit' | 'tablet';
 
 export type EchoVerbosity = 'normal' | 'less' | 'off';
 
+export type VignetteIntensity = 'off' | 'subtle' | 'full';
+
 export type RunSnapshot = Record<string, unknown>;

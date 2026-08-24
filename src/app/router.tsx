@@ -17,7 +17,7 @@ import { RunSetupScreen } from '@/screens/RunSetup/RunSetupScreen';
 import { SettingsScreen } from '@/screens/Settings/SettingsScreen';
 import { ShipyardScreen } from '@/screens/Shipyard/ShipyardScreen';
 import { ShopScreen } from '@/screens/Shop/ShopScreen';
-import { KEEP_ALIVE_SCREENS } from '@/app/routes';
+import { KEEP_ALIVE_SCREENS, navAttrFor } from '@/app/routes';
 import { useAppStore } from '@/stores/appStore';
 import type { ScreenId } from '@/types';
 import styles from './Router.module.css';
@@ -118,6 +118,8 @@ const Fallback = () => <Box mih="var(--ca-vh)" bg={tokens.bg} />;
 
 export const Router = () => {
   const screen = useAppStore((s) => s.screen);
+  const navDir = useAppStore((s) => s.navDir);
+  const enterDir = navAttrFor(screen, navDir);
   const kept = KEEP_ALIVE_SCREENS.includes(screen);
   if (kept) visitedKeepAlive.add(screen);
   const alive = KEEP_ALIVE_SCREENS.filter((id) => visitedKeepAlive.has(id));
@@ -125,13 +127,23 @@ export const Router = () => {
   return (
     <>
       {kept ? null : (
-        <div key={screen} className={styles.screen} data-screen={screen}>
+        <div
+          key={screen}
+          className={styles.screen}
+          data-screen={screen}
+          data-nav-dir={enterDir}
+        >
           <Suspense fallback={<Fallback />}>{SCREENS[screen]()}</Suspense>
         </div>
       )}
       {alive.map((id) =>
         id === screen ? (
-          <div key={id} className={styles.screen} data-screen={id}>
+          <div
+            key={id}
+            className={styles.screen}
+            data-screen={id}
+            data-nav-dir={enterDir}
+          >
             <Suspense fallback={<Fallback />}>{SCREENS[id]()}</Suspense>
           </div>
         ) : (

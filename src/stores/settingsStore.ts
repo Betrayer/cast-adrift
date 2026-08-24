@@ -12,6 +12,7 @@ import type {
   FontScale,
   Locale,
   ReducedMotionSetting,
+  VignetteIntensity,
 } from '@/types';
 
 export interface SettingsValues {
@@ -21,6 +22,7 @@ export interface SettingsValues {
   reducedMotion: ReducedMotionSetting;
   echoVerbosity: EchoVerbosity;
   screenShake: boolean;
+  vignette: VignetteIntensity;
   theme: ThemeId;
   fontScale: FontScale;
   battleSpeed: BattleSpeed;
@@ -35,6 +37,7 @@ export interface SettingsState extends SettingsValues {
   setReducedMotion: (reducedMotion: ReducedMotionSetting) => void;
   setEchoVerbosity: (echoVerbosity: EchoVerbosity) => void;
   setScreenShake: (screenShake: boolean) => void;
+  setVignette: (vignette: VignetteIntensity) => void;
   setTheme: (theme: ThemeId) => void;
   setFontScale: (fontScale: FontScale) => void;
   setBattleSpeed: (battleSpeed: BattleSpeed) => void;
@@ -42,7 +45,7 @@ export interface SettingsState extends SettingsValues {
   setSkipTally: (skipTally: boolean) => void;
 }
 
-export const SETTINGS_VERSION = 4;
+export const SETTINGS_VERSION = 5;
 
 const DEFAULTS: SettingsValues = {
   locale: 'en',
@@ -51,6 +54,7 @@ const DEFAULTS: SettingsValues = {
   reducedMotion: 'auto',
   echoVerbosity: 'normal',
   screenShake: true,
+  vignette: 'full',
   theme: DEFAULT_THEME_ID,
   fontScale: 'm',
   battleSpeed: 'normal',
@@ -60,6 +64,9 @@ const DEFAULTS: SettingsValues = {
 
 const isFontScale = (value: unknown): value is FontScale =>
   value === 's' || value === 'm' || value === 'l';
+
+const isVignette = (value: unknown): value is VignetteIntensity =>
+  value === 'off' || value === 'subtle' || value === 'full';
 
 export const migrateSettings = (
   persisted: unknown,
@@ -81,6 +88,7 @@ export const migrateSettings = (
       ? prev.battleLayout
       : DEFAULTS.battleLayout,
     skipTally: prev.skipTally === true,
+    vignette: isVignette(prev.vignette) ? prev.vignette : DEFAULTS.vignette,
   };
 };
 
@@ -94,6 +102,7 @@ export const useSettingsStore = create<SettingsState>()(
       setReducedMotion: (reducedMotion) => set({ reducedMotion }),
       setEchoVerbosity: (echoVerbosity) => set({ echoVerbosity }),
       setScreenShake: (screenShake) => set({ screenShake }),
+      setVignette: (vignette) => set({ vignette }),
       setTheme: (theme) => set({ theme }),
       setFontScale: (fontScale) => set({ fontScale }),
       setBattleSpeed: (battleSpeed) => set({ battleSpeed }),
@@ -111,6 +120,7 @@ export const useSettingsStore = create<SettingsState>()(
         reducedMotion: s.reducedMotion,
         echoVerbosity: s.echoVerbosity,
         screenShake: s.screenShake,
+        vignette: s.vignette,
         theme: s.theme,
         fontScale: s.fontScale,
         battleSpeed: s.battleSpeed,

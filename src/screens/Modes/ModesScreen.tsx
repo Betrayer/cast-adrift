@@ -10,6 +10,7 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS } from "@/data/contracts";
@@ -100,7 +101,15 @@ export const ModesScreen = () => {
   return (
     <Screen header={<AppHeader />}>
       <Stack gap="sm">
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <Paper
+          bg={tokens.surface1}
+          p="md"
+          radius="md"
+          withBorder
+          data-rise
+          data-mode-card="campaign"
+          style={riseStyle(0)}
+        >
           <Stack gap="xs">
             <Text fw={600} c={tokens.text}>
               {t("meta:modes.campaign")}
@@ -129,7 +138,13 @@ export const ModesScreen = () => {
           withBorder
           maw={460}
           w="100%"
-          style={focus === "drift" ? { borderColor: tokens.accent } : undefined}
+          data-rise
+          data-mode-card="drift"
+          style={
+            focus === "drift"
+              ? { borderColor: tokens.accent, ...riseStyle(1) }
+              : riseStyle(1)
+          }
         >
           <Stack gap="xs">
             <Group justify="space-between">
@@ -174,7 +189,13 @@ export const ModesScreen = () => {
           withBorder
           maw={460}
           w="100%"
-          style={focus === "daily" ? { borderColor: tokens.accent } : undefined}
+          data-rise
+          data-mode-card="daily"
+          style={
+            focus === "daily"
+              ? { borderColor: tokens.accent, ...riseStyle(2) }
+              : riseStyle(2)
+          }
         >
           <Stack gap="xs">
             <Group justify="space-between">
@@ -251,7 +272,15 @@ export const ModesScreen = () => {
           </Stack>
         </Paper>
 
-        <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+        <Paper
+          bg={tokens.surface1}
+          p="md"
+          radius="md"
+          withBorder
+          data-rise
+          data-mode-card="contracts"
+          style={riseStyle(3)}
+        >
           <Stack gap="xs">
             <Group justify="space-between">
               <Text fw={600} c={tokens.text}>

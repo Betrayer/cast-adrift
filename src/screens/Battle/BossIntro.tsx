@@ -2,14 +2,18 @@ import { Button, Stack, Text, Title } from '@mantine/core';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AppSheet } from '@/components/AppModal';
+import { WarpStreaks } from '@/components/WarpStreaks';
 import { tokens } from '@/app/theme';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { useBattleStore } from '@/stores/battleStore';
+import { useRunStore } from '@/stores/runStore';
 import styles from './BossIntro.module.css';
 
 const PIP_STAGGER_MS = 120;
+
+const BOSS_SWEEP_MS = 900;
 
 export const BossIntro = () => {
   const { t } = useTranslation(['battle', 'content']);
@@ -17,6 +21,7 @@ export const BossIntro = () => {
   const introEnemyId = useBattleStore((s) => s.introEnemyId);
   const enemies = useBattleStore((s) => s.enemies);
   const dismissIntro = useBattleStore((s) => s.dismissIntro);
+  const usedMinibosses = useRunStore((s) => s.usedMinibosses);
   const pipCount =
     enemies.find((e) => e.defId === introEnemyId)?.subsystems.length ?? 0;
 
@@ -41,6 +46,9 @@ export const BossIntro = () => {
   if (def === undefined) return null;
   const state = enemies.find((e) => e.defId === introEnemyId);
   const subsystems = state?.subsystems ?? [];
+  const alternate =
+    def.miniboss === true &&
+    usedMinibosses.some((id) => id !== introEnemyId);
 
   return (
     <AppSheet
@@ -52,9 +60,28 @@ export const BossIntro = () => {
       className={styles.introPanel}
       onClose={dismissIntro}
     >
+      {def.boss === true ? (
+        <WarpStreaks
+          color={tokens.danger}
+          count={22}
+          durationMs={BOSS_SWEEP_MS}
+        />
+      ) : null}
       <Stack align="center" justify="center" h="100%" gap="lg" p="lg">
-        <Text className={styles.kicker} c={tokens.danger}>
-          {t(def.boss === true ? 'battle:intro.boss' : 'battle:intro.miniboss')}
+        <Text
+          className={styles.kicker}
+          c={alternate ? tokens.amber : tokens.danger}
+          data-intro-kind={
+            def.boss === true ? 'boss' : alternate ? 'minibossAlt' : 'miniboss'
+          }
+        >
+          {t(
+            def.boss === true
+              ? 'battle:intro.boss'
+              : alternate
+                ? 'battle:intro.minibossAlt'
+                : 'battle:intro.miniboss',
+          )}
         </Text>
         <Title order={1} c={tokens.text} ta="center" className={styles.plate}>
           {t(def.name)}

@@ -12,6 +12,7 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
+import { riseStyle } from '@/app/motion';
 import { AppHeader } from '@/components/AppHeader';
 import { tokens } from '@/app/theme';
 import { DIE_SKINS } from '@/data/cosmetics';
@@ -23,6 +24,7 @@ import { AVAILABLE_LOCALES } from '@/i18n';
 import { trackEvent } from '@/services/analytics';
 import { playSfx } from '@/services/audio';
 import { recentErrors } from '@/services/errors';
+import { flashVignette } from '@/services/vignette';
 import { APP_VERSION } from '@/services/version';
 import { useMetaStore } from '@/stores/metaStore';
 import { chooseTheme } from '@/services/prefs';
@@ -33,6 +35,7 @@ import type {
   FontScale,
   Locale,
   ReducedMotionSetting,
+  VignetteIntensity,
 } from '@/types';
 import { AccountSection } from './AccountSection';
 import { LayoutPicker } from './LayoutPicker';
@@ -311,9 +314,16 @@ export const SettingsScreen = () => {
   return (
     <Screen header={<AppHeader />}>
       <Stack gap="lg">
-      <AccountSection />
+      <div data-rise data-settings-section="account" style={riseStyle(0)}>
+        <AccountSection />
+      </div>
 
-      <Stack gap="xs">
+      <Stack
+        gap="xs"
+        data-rise
+        data-settings-section="language"
+        style={riseStyle(1)}
+      >
         <Text size="sm" c={tokens.dim}>
           {t('settings:language')}
         </Text>
@@ -329,11 +339,17 @@ export const SettingsScreen = () => {
         />
       </Stack>
 
-      <LayoutPicker />
+      <div data-rise data-settings-section="layout" style={riseStyle(2)}>
+        <LayoutPicker />
+      </div>
 
-      <ThemePicker />
+      <div data-rise data-settings-section="theme" style={riseStyle(3)}>
+        <ThemePicker />
+      </div>
 
-      <SkinPicker />
+      <div data-rise data-settings-section="skin" style={riseStyle(3)}>
+        <SkinPicker />
+      </div>
 
       <Stack gap="xs">
         <Text size="sm" c={tokens.dim}>
@@ -446,6 +462,29 @@ export const SettingsScreen = () => {
         }}
       />
 
+      <Stack gap="xs">
+        <Text size="sm" c={tokens.dim}>
+          {t('settings:vignette')}
+        </Text>
+        <SegmentedControl
+          fullWidth
+          data-testid="settings-vignette"
+          value={settings.vignette}
+          onChange={(value) => {
+            settings.setVignette(value as VignetteIntensity);
+            if (value !== 'off') flashVignette('shieldGain');
+          }}
+          data={[
+            { value: 'off', label: t('settings:off') },
+            { value: 'subtle', label: t('settings:vignetteSubtle') },
+            { value: 'full', label: t('settings:vignetteFull') },
+          ]}
+        />
+        <Text size="xs" c={tokens.faint}>
+          {t('settings:vignetteHint')}
+        </Text>
+      </Stack>
+
       <Switch
         label={t('settings:skipTally')}
         data-testid="settings-skip-tally"
@@ -457,6 +496,7 @@ export const SettingsScreen = () => {
 
       <Button
         variant="default"
+        data-press
         data-testid="settings-tutorial-reset"
         onClick={resetTutorial}
       >

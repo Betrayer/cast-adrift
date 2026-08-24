@@ -103,7 +103,8 @@
     "boss": "Chef",
     "subsystems": "Teilsysteme",
     "begin": "Beginn",
-    "hull": "Hülle {{n}}"
+    "hull": "Hülle {{n}}",
+    "minibossAlt": "Mini-Boss · neue Signatur"
   },
   "fate": "Schicksal würfeln",
   "fateResult": "Fate {{roll}} — {{text}}",

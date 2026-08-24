@@ -8,10 +8,17 @@ import type {
   SeedRunConfig,
   ShipCardView,
   TestState,
+  VignetteView,
 } from '@/services/testApi';
+import type {
+  VignetteFlashKind,
+  VignetteRimKind,
+  VignetteSide,
+} from '@/services/vignette';
 import type { MetaStats } from '@/stores/metaStore';
 import type { Mitigation, TurnForecast } from '@/game/battle/view';
 import type { BattleTally } from '@/stores/runStore';
+import type { SettingsValues } from '@/stores/settingsStore';
 import type { BattleLayoutId, ScreenId } from '@/types';
 import type { SlotId } from '@/types/battle';
 
@@ -223,6 +230,41 @@ export class Screens {
       if (api === undefined) throw new Error('caTest is not mounted');
       return api.settleAchievements();
     });
+  }
+
+  async setSettings(patch: Partial<SettingsValues>): Promise<void> {
+    await this.page.evaluate((values) => {
+      window.caTest?.settings(values);
+    }, patch);
+  }
+
+  vignette(): Promise<VignetteView> {
+    return this.page.evaluate(() => {
+      const api = window.caTest;
+      if (api === undefined) throw new Error('caTest is not mounted');
+      return api.vignette();
+    });
+  }
+
+  async fireVignette(
+    kind: VignetteFlashKind,
+    side?: VignetteSide,
+  ): Promise<void> {
+    await this.page.evaluate(
+      (value) => {
+        window.caTest?.fireVignette(value.kind, value.side);
+      },
+      { kind, side },
+    );
+  }
+
+  async vignetteRim(kind: VignetteRimKind, on: boolean): Promise<void> {
+    await this.page.evaluate(
+      (value) => {
+        window.caTest?.vignetteRim(value.kind, value.on);
+      },
+      { kind, on },
+    );
   }
 
   async setLayout(id: BattleLayoutId): Promise<void> {

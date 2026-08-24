@@ -5,6 +5,8 @@ import type {
   ConsoleActions,
 } from '@/game/battle/view';
 import { playSfx } from '@/services/audio';
+import { haptic } from '@/services/tma';
+import { flashVignette } from '@/services/vignette';
 import { useBattleStore, type BattleState } from '@/stores/battleStore';
 
 export const ACTIVE_ORDER: readonly ActiveActionId[] = [
@@ -21,13 +23,34 @@ const activeEffect = (id: ActiveActionId): void => {
   if (uid === null) return;
   if (id === 'flip') live.flipDie(uid);
   if (id === 'copy') live.copyDie(uid);
-  if (id === 'bank') live.bankDie(uid);
-  if (id === 'split') live.splitDie(uid);
+  if (id === 'bank') {
+    playSfx('shields', { rate: 1.24, gain: 0.7 });
+    haptic('place');
+    live.bankDie(uid);
+  }
+  if (id === 'split') {
+    playSfx('reroll', { rate: 1.18, gain: 0.8 });
+    haptic('place');
+    live.splitDie(uid);
+  }
   if (id === 'swap') {
-    if (live.swapSourceUid === uid) live.cancelSwap();
-    else live.beginSwap(uid);
+    if (live.swapSourceUid === uid) {
+      playSfx('invalid', { gain: 0.5 });
+      live.cancelSwap();
+    } else {
+      playSfx('nudge', { rate: 0.84 });
+      haptic('place');
+      live.beginSwap(uid);
+    }
   }
 };
+
+export const ARMING_ACTIONS: ReadonlySet<ConsoleActionId> = new Set<ConsoleActionId>([
+  'split',
+  'bank',
+  'swap',
+  'fuse',
+]);
 
 export const runActionEffect = (id: ConsoleActionId): void => {
   const live = useBattleStore.getState();
@@ -56,6 +79,7 @@ export const runActionEffect = (id: ConsoleActionId): void => {
       return;
     case 'surge':
       playSfx('surge');
+      flashVignette('surge');
       live.spendSurge();
       return;
     case 'bloodReactor':

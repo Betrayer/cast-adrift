@@ -48,6 +48,7 @@ export const ShipCard = ({
     <div
       className={classes(styles.card, plain && styles.plain, className)}
       data-ship-card={def.id}
+      data-sweep-host
       data-ship-card-size={size}
       data-ship-hull={def.hullMax}
       data-ship-slots={slotIds.join(",")}

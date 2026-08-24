@@ -103,7 +103,8 @@
     "boss": "Jefe",
     "subsystems": "Subsistemas",
     "begin": "Empezar",
-    "hull": "Casco {{n}}"
+    "hull": "Casco {{n}}",
+    "minibossAlt": "Minijefe · firma nueva"
   },
   "fate": "Tirada de destino",
   "fateResult": "Fate {{roll}} — {{text}}",

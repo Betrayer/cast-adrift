@@ -37,6 +37,11 @@ import {
 } from "@/game/map/types";
 import { nodeRisk, type RiskBand } from "@/game/map/risk";
 import { haptic } from "@/services/tma";
+import {
+  clearVignette,
+  flashVignette,
+  syncHullRim,
+} from "@/services/vignette";
 import { tierForNode } from "@/game/puzzles/selection";
 import { TierBadge } from "@/components/TierBadge";
 import { AbandonConfirm } from "@/components/AbandonConfirm";
@@ -47,6 +52,17 @@ import { TapPopover } from "@/components/TapPopover";
 import { TIDE_HP_PCT } from "@/game/run/encounter";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
+import {
+  MAP_JUMP_MS,
+  MARKER_TRAVEL_MS,
+  markerStyle,
+  trailStyle,
+  WARP_BURST_MS,
+  WARP_FLASH_MS,
+  WARP_LAND_MS,
+  WARP_SUCK_MS,
+  type Point,
+} from "./travel";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useAppStore } from "@/stores/appStore";
 import { useRunStore } from "@/stores/runStore";
@@ -237,10 +253,6 @@ const MOTIF_LEGEND: readonly MotifLegendEntry[] = [
   },
 ];
 
-const WARP_SUCK_MS = 420;
-const WARP_BURST_MS = 560;
-const WARP_LAND_MS = 620;
-const WARP_FLASH_MS = 260;
 
 interface WarpBeat {
   phase: "suck" | "burst" | "land";
@@ -308,10 +320,15 @@ const MapView = ({ map, position }: MapViewProps) => {
   const [jumping, setJumping] = useState(false);
   const [warp, setWarp] = useState<WarpBeat | null>(null);
   const timers = useRef<number[]>([]);
-  const [marker, setMarker] = useState(() => ({
+  const [marker, setMarker] = useState<Point>(() => ({
     x: posNode ? geo.nodeX(posNode) : geo.centerX,
     y: geo.rowY(positionRow),
   }));
+  const [trail, setTrail] = useState<{ from: Point; to: Point } | null>(null);
+  const [arrival, setArrival] = useState<Point | null>(null);
+  const travelFrames = useRef<number[]>([]);
+  const knownChains = useRef(new Set<NodeId>());
+  const seatedChains = useRef(false);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const stageRef = useRef<SVGSVGElement | null>(null);
   const prevTide = useRef(tide);
@@ -360,6 +377,28 @@ const MapView = ({ map, position }: MapViewProps) => {
   }, [visibleLimit]);
 
   useEffect(() => {
+    syncHullRim(hull, hullMax);
+  }, [hull, hullMax]);
+
+  useEffect(
+    () => () => {
+      clearVignette();
+    },
+    [],
+  );
+
+  useEffect(() => {
+    const known = knownChains.current;
+    const fresh = [...chainNodes].filter((id) => !known.has(id));
+    for (const id of chainNodes) known.add(id);
+    if (fresh.length === 0 || !seatedChains.current) {
+      seatedChains.current = true;
+      return;
+    }
+    playSfx("chainStep", { rate: 1 + Math.min(3, fresh.length) * 0.05 });
+  }, [chainNodes]);
+
+  useEffect(() => {
     if (warp?.phase !== "land") return;
     const el = scrollRef.current;
     const stage = stageRef.current;
@@ -375,6 +414,8 @@ const MapView = ({ map, position }: MapViewProps) => {
     () => () => {
       for (const id of timers.current) window.clearTimeout(id);
       timers.current = [];
+      for (const id of travelFrames.current) window.cancelAnimationFrame(id);
+      travelFrames.current = [];
     },
     [],
   );
@@ -413,6 +454,48 @@ const MapView = ({ map, position }: MapViewProps) => {
 
   const after = (ms: number, run: () => void): void => {
     timers.current.push(window.setTimeout(run, ms));
+  };
+
+  const here = (): Point => ({
+    x: posNode ? geo.nodeX(posNode) : geo.centerX,
+    y: geo.rowY(positionRow),
+  });
+
+  const land = (arrive: () => void): void => {
+    setJumping(false);
+    setTrail(null);
+    setArrival(null);
+    arrive();
+  };
+
+  const travelTo = (to: Point, arrive: () => void): void => {
+    const from = here();
+    setJumping(true);
+    setArrival(null);
+    setMarker(from);
+    if (reduced) {
+      setTrail(null);
+      setMarker(to);
+      land(arrive);
+      return;
+    }
+    setTrail({ from, to });
+    travelFrames.current.push(
+      window.requestAnimationFrame(() => {
+        travelFrames.current.push(
+          window.requestAnimationFrame(() => {
+            setMarker(to);
+          }),
+        );
+      }),
+    );
+    after(MARKER_TRAVEL_MS, () => {
+      playSfx("navTick", { gain: 1.6 });
+      setArrival(to);
+    });
+    after(MAP_JUMP_MS, () => {
+      land(arrive);
+    });
   };
 
   const onRide = (holeId: NodeId): void => {
@@ -459,8 +542,14 @@ const MapView = ({ map, position }: MapViewProps) => {
       });
       after(WARP_BURST_MS, () => {
         setWarp((beat) => (beat === null ? null : { ...beat, phase: "land" }));
+        playSfx("navTick", { gain: 1.6 });
+        setArrival({
+          x: landing === undefined ? geo.centerX : geo.nodeX(landing),
+          y: geo.rowY(landing?.row ?? positionRow),
+        });
         after(WARP_LAND_MS, () => {
           setWarp(null);
+          setArrival(null);
           if (roll?.landing != null) enterNode(roll.landing);
         });
       });
@@ -474,14 +563,15 @@ const MapView = ({ map, position }: MapViewProps) => {
     playSfx("jump");
     haptic("mapJump");
     setSelected(null);
-    if (holeTollFor(sector, hull) > 0) playSfx("hullHit", { gain: 0.5 });
-    if (reduced || target === undefined) {
+    if (holeTollFor(sector, hull) > 0) {
+      playSfx("hullHit", { gain: 0.5 });
+      flashVignette("toll");
+    }
+    if (target === undefined) {
       bypassHole(holeId);
       return;
     }
-    setJumping(true);
-    setMarker({ x: geo.nodeX(target), y: geo.rowY(target.row) });
-    after(430, () => {
+    travelTo({ x: geo.nodeX(target), y: geo.rowY(target.row) }, () => {
       bypassHole(holeId);
     });
   };
@@ -503,20 +593,19 @@ const MapView = ({ map, position }: MapViewProps) => {
       playSfx("laneMotif", { rate: target.blessing === "cursed" ? 0.72 : 1.18 });
     }
     if (target.storm === true) playSfx("stormBeat", { gain: 0.6 });
+    if (target.unstable === true) {
+      playSfx("stormBeat", { gain: 0.45, rate: 0.78 });
+      flashVignette("surge", { strength: 0.6 });
+    }
     if (target.inverted === true) playSfx("inversionCue", { gain: 0.6 });
     if (edgeMarkFor(map, position, target.id) === "mine") {
       playSfx("hullHit", { gain: 0.5 });
       playSfx("gateBreak", { gain: 0.45 });
+      flashVignette("toll");
     }
-    if (reduced) {
+    travelTo({ x: geo.nodeX(target), y: geo.rowY(target.row) }, () => {
       jumpTo(selected);
-      return;
-    }
-    setJumping(true);
-    setMarker({ x: geo.nodeX(target), y: geo.rowY(target.row) });
-    window.setTimeout(() => {
-      jumpTo(selected);
-    }, 430);
+    });
   };
 
   const visibleNodes = map.nodes.filter(isVisible);
@@ -970,6 +1059,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 {chainNodes.has(node.id) ? (
                   <text
                     data-chain-marker={node.id}
+                    className={reduced ? undefined : styles.chainMark}
                     x={geo.nodeX(node) - geo.radius(node) + 1}
                     y={geo.rowY(node.row) - geo.radius(node) + 6}
                     textAnchor="middle"
@@ -1062,10 +1152,41 @@ const MapView = ({ map, position }: MapViewProps) => {
             </g>
           ) : null}
 
+          {warp === null && jumping && trail !== null && !reduced ? (
+            <line
+              className={styles.trail}
+              data-map-trail
+              x1={trail.from.x}
+              y1={trail.from.y}
+              x2={trail.to.x}
+              y2={trail.to.y}
+              stroke={tokens.accent}
+              strokeWidth={2}
+              strokeLinecap="round"
+              style={trailStyle(trail.from, trail.to)}
+            />
+          ) : null}
+
+          {arrival === null ? null : (
+            <circle
+              className={styles.arrival}
+              data-map-arrival
+              cx={arrival.x}
+              cy={arrival.y}
+              r={10}
+              fill="none"
+              stroke={tokens.accent}
+              strokeWidth={2}
+            />
+          )}
+
           {warp === null && jumping ? (
             <g
-              className={styles.marker}
-              style={{ transform: `translate(${String(marker.x)}px, ${String(marker.y)}px)` }}
+              className={`${styles.marker ?? ""} ${
+                reduced ? styles.markerInstant ?? "" : ""
+              }`}
+              data-map-marker
+              style={markerStyle(marker)}
             >
               <circle r={6} fill={tokens.accent} />
             </g>

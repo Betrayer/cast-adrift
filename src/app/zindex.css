@@ -1,6 +1,7 @@
 :root {
   --z-hud: 10;
   --z-overlay: 20;
+  --z-vignette: 25;
   --z-toast: 30;
   --z-modal: 40;
   --z-coach: 400;

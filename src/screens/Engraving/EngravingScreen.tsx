@@ -10,6 +10,7 @@ import {
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
@@ -73,7 +74,14 @@ export const EngravingScreen = () => {
       <Stack gap="sm">
       {unlocked ? (
         <>
-          <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
+          <Paper
+            bg={tokens.surface1}
+            p="md"
+            radius="md"
+            withBorder
+            data-rise
+            style={riseStyle(0)}
+          >
             <Text size="sm" c={tokens.dim} mb={6}>
               {t("meta:engraving.pickDie")}
             </Text>
@@ -142,7 +150,7 @@ export const EngravingScreen = () => {
 
           <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
               <Stack gap={6}>
-                {ENGRAVINGS.map((def) => {
+                {ENGRAVINGS.map((def, index) => {
                   const already = fitted.includes(def.id);
                   const affordable =
                     activeDie !== null &&
@@ -155,9 +163,13 @@ export const EngravingScreen = () => {
                       justify="space-between"
                       px="xs"
                       py={4}
+                      data-rise
+                      data-press
+                      data-engraving-row={def.id}
                       style={{
                         border: `1px solid ${tokens.line}`,
                         borderRadius: 8,
+                        ...riseStyle(index),
                       }}
                     >
                       <Stack gap={2} style={{ flex: 1 }}>
