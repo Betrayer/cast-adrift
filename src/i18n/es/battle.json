@@ -88,7 +88,7 @@
     "reactor": "Reactor",
     "repairBay": "Taller de reparaciones",
     "cap": "cap ≤ d {{cap}} · Mk {{mk}}",
-    "evasion": "esq {{dodge}}% · roce {{glancing}}%",
+    "evasion": "roce {{glancing}}% · esq {{dodge}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "tope ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -199,7 +199,7 @@
     "reserve": "▣"
   },
   "projShort": {
-    "dodge": "{{n}}%",
+    "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
     "none": "—"
@@ -327,8 +327,8 @@
   "mkWhy": "Mk sube el límite de la ranura y el bono de afinidad de su escuela.",
   "resEarned": "Logrado",
   "manoeuvreTitle": "Maniobra",
-  "manoeuvreWhy": "Un dado en Motores fija una tirada de evasión para el turno: esquiva {{dodge}}% × valor (máx. {{dodgeCap}}%), roce {{glancing}}% × valor (máx. {{glancingCap}}%). La esquiva no recibe nada, el roce la mitad, lo demás entra entero. Desde valor {{intercept}} el primer golpe se intercepta del todo. El valor es el dado tras afinidad y bonos.",
-  "manoeuvreBrief": "Una tirada de evasión por turno: esquiva {{dodge}}% × valor (máx {{dodgeCap}}%), roce {{glancing}}% × valor (máx {{glancingCap}}%). La esquiva no recibe nada, el roce la mitad. Desde {{intercept}}: intercepción.",
+  "manoeuvreWhy": "Un dado en Motores fija una tirada de evasión por cada golpe entrante: roce {{glancing}}% × valor (máx. {{glancingCap}}%), esquiva {{dodge}}% × valor (máx. {{dodgeCap}}%). El roce recibe la mitad, redondeada hacia arriba, la esquiva no recibe nada, lo demás entra entero. Desde valor {{intercept}} la primera evasión lograda del turno — roce o esquiva — es una intercepción: Armas +1 el turno siguiente. El valor es el dado tras afinidad y bonos.",
+  "manoeuvreBrief": "Una tirada por golpe: roce {{glancing}}% × valor (máx {{glancingCap}}%), esquiva {{dodge}}% × valor (máx {{dodgeCap}}%). El roce recibe la mitad, la esquiva nada. Desde {{intercept}} la primera evasión da Armas +1.",
   "targetingTitle": "Designación",
   "targetingWhy": "Un dado en Sensores deja al objetivo Vulnerable +D durante el turno: D es la mitad del valor del dado redondeada hacia arriba, con tope de {{cap}}, y cada golpe de este turno hace esa cantidad de más. En la cara máxima del dado el golpe además perfora el escudo. El Mk de Sensores además revela una fila más del mapa por cada nivel sobre Mk1.",
   "targetingBrief": "Los sensores marcan al objetivo: Vulnerable +D por el turno, D es la mitad del valor del dado hacia arriba, máx {{cap}}. Cada golpe hace eso de más; la cara máxima atraviesa el escudo.",

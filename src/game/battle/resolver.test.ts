@@ -1,9 +1,16 @@
 import { describe, expect, it } from "vitest";
+import { CHART_NODES } from "@/data/chart";
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { ALL_MODULES } from "@/data/modules";
+import { ALL_PERKS } from "@/data/perks";
+import { PLAYABLE_SHIPS } from "@/data/ships";
 import {
   advanceTurn,
   CHARGE_CAP,
+  DODGE_PCT_CAP,
   evasionFor,
+  evasionTuningFor,
+  GLANCING_PCT_CAP,
   resolveEnemyPhase,
   resolvePlayerPhase,
   vulnerableFor,
@@ -146,33 +153,46 @@ const forceIntent = (state: EnemyState, intent: Intent): EnemyState => ({
 
 describe("evasion band math", () => {
   it.each([
-    [1, 6, 3],
-    [3, 18, 9],
-    [5, 30, 15],
-    [8, 48, 24],
+    [1, 2, 4],
+    [3, 5, 11],
+    [5, 8, 18],
+    [8, 10, 25],
   ])("V %i → dodge %i%% · glancing %i%%", (value, dodge, glancing) => {
     const evasion = evasionFor(value);
     expect(evasion.dodgePct).toBe(dodge);
     expect(evasion.glancingPct).toBe(glancing);
   });
 
-  it("caps dodge at 55% and glancing at 25%", () => {
+  it("glancing outruns dodge at every value", () => {
+    for (let value = 1; value <= 20; value += 1) {
+      const evasion = evasionFor(value);
+      expect(evasion.glancingPct).toBeGreaterThan(evasion.dodgePct);
+    }
+  });
+
+  it("caps dodge at 10% and glancing at 25%", () => {
     expect(evasionFor(20)).toEqual({
-      dodgePct: 55,
+      dodgePct: 10,
       glancingPct: 25,
       intercept: true,
     });
   });
 
+  it("keeps expected mitigation at the caps a tool, not a wall", () => {
+    const capped = evasionFor(20);
+    const mitigation = capped.dodgePct + capped.glancingPct / 2;
+    expect(mitigation).toBeCloseTo(22.5, 5);
+  });
+
   it("adds the evasion delta and halves it for glancing", () => {
-    expect(evasionFor(3, 6)).toEqual({
-      dodgePct: 24,
+    expect(evasionFor(3, 2)).toEqual({
+      dodgePct: 7,
       glancingPct: 12,
       intercept: false,
     });
     expect(evasionFor(3, 1)).toEqual({
-      dodgePct: 19,
-      glancingPct: 10,
+      dodgePct: 6,
+      glancingPct: 11,
       intercept: false,
     });
   });
@@ -185,6 +205,96 @@ describe("evasion band math", () => {
     });
     expect(evasionFor(7).intercept).toBe(false);
     expect(evasionFor(8).intercept).toBe(true);
+  });
+
+  it("rolls the authored rates over a pinned 200-hit sequence", () => {
+    const evasion = evasionFor(20);
+    const stream = createStream(4242);
+    let dodged = 0;
+    let glanced = 0;
+    for (let i = 0; i < 200; i += 1) {
+      const roll = stream.int(1, 100);
+      if (roll <= evasion.dodgePct) dodged += 1;
+      else if (roll <= evasion.dodgePct + evasion.glancingPct) glanced += 1;
+    }
+    expect(Math.abs((dodged / 200) * 100 - evasion.dodgePct)).toBeLessThanOrEqual(2);
+    expect(
+      Math.abs((glanced / 200) * 100 - evasion.glancingPct),
+    ).toBeLessThanOrEqual(2);
+    expect(glanced).toBeGreaterThan(dodged);
+  });
+});
+
+describe("evasion carriers", () => {
+  const CARRIERS: readonly { id: string; delta: number }[] = [
+    ...ALL_PERKS.filter((p) => (p.mods?.evasionDelta ?? 0) !== 0).map((p) => ({
+      id: `perk:${p.id}`,
+      delta: p.mods?.evasionDelta ?? 0,
+    })),
+    ...ALL_MODULES.filter((m) => (m.mods?.evasionDelta ?? 0) !== 0).map((m) => ({
+      id: `module:${m.id}`,
+      delta: m.mods?.evasionDelta ?? 0,
+    })),
+    ...CHART_NODES.filter((n) => (n.mods?.evasionDelta ?? 0) !== 0).map((n) => ({
+      id: `chart:${n.id}`,
+      delta: n.mods?.evasionDelta ?? 0,
+    })),
+  ];
+
+  it("has exactly the carriers the U2 sweep re-tuned", () => {
+    expect(CARRIERS.map((c) => `${c.id}=${String(c.delta)}`)).toEqual([
+      "perk:mirrorLattice=2",
+      "perk:rhizome=4",
+      "perk:standingWave=2",
+      "perk:afterburner=2",
+      "module:ballastModule=-2",
+      "module:hardpointClamp=2",
+      "module:bulkheadRing=-2",
+      "chart:green-s6=2",
+      "chart:green-not2=2",
+      "chart:green-s11=2",
+      "chart:green-s21=2",
+    ]);
+  });
+
+  it("leaves both bands under their cap without a die", () => {
+    for (const carrier of CARRIERS) {
+      const bare = evasionFor(0, carrier.delta);
+      expect(bare.dodgePct, carrier.id).toBeLessThan(DODGE_PCT_CAP);
+      expect(bare.glancingPct, carrier.id).toBeLessThan(GLANCING_PCT_CAP);
+    }
+  });
+
+  it("never pushes a band past its cap or under zero at any value", () => {
+    for (const carrier of CARRIERS) {
+      for (let value = 0; value <= 20; value += 1) {
+        const evasion = evasionFor(value, carrier.delta);
+        expect(evasion.dodgePct, carrier.id).toBeGreaterThanOrEqual(0);
+        expect(evasion.glancingPct, carrier.id).toBeGreaterThanOrEqual(0);
+        expect(evasion.dodgePct, carrier.id).toBeLessThanOrEqual(DODGE_PCT_CAP);
+        expect(evasion.glancingPct, carrier.id).toBeLessThanOrEqual(
+          GLANCING_PCT_CAP,
+        );
+      }
+    }
+  });
+
+  it("keeps every ship tuning inside the Hound's ceiling", () => {
+    for (const ship of PLAYABLE_SHIPS) {
+      const tuning = evasionTuningFor(ship.id);
+      for (let value = 0; value <= 24; value += 1) {
+        const evasion = evasionFor(value, 0, tuning);
+        expect(evasion.dodgePct, ship.id).toBeLessThanOrEqual(tuning.dodgeCap);
+        expect(evasion.glancingPct, ship.id).toBeLessThanOrEqual(
+          tuning.glancingCap,
+        );
+      }
+      expect(tuning.dodgeCap, ship.id).toBeLessThanOrEqual(40);
+      expect(tuning.glancingCap, ship.id).toBeLessThanOrEqual(55);
+      expect(evasionFor(20, 0, tuning).glancingPct, ship.id).toBeGreaterThan(
+        evasionFor(20, 0, tuning).dodgePct,
+      );
+    }
   });
 });
 
@@ -326,7 +436,7 @@ describe("engines", () => {
     const { next, beats } = resolveEnemyPhase(
       snap({ enemies: [attacker], evasion: evasionFor(3) }),
       enemyStream(),
-      createStream(99),
+      createStream(8),
     );
     expect(next.hull).toBe(27);
     expect(beats[0]?.glanced).toBe(1);
@@ -368,7 +478,7 @@ describe("engines", () => {
     expect(beats[0]?.glanced).toBe(2);
   });
 
-  it("intercept grants weapons +1 once per turn on the first dodge", () => {
+  it("intercept grants weapons +1 once per turn on the first evasion", () => {
     const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 3 });
     const { next } = resolveEnemyPhase(
       snap({
@@ -378,6 +488,21 @@ describe("engines", () => {
       enemyStream(),
       createStream(3),
     );
+    expect(next.nextTurnMods.weapons).toBe(1);
+  });
+
+  it("intercept fires from a glancing hit, not only a dodge", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 3 });
+    const { next, beats } = resolveEnemyPhase(
+      snap({
+        enemies: [attacker],
+        evasion: { dodgePct: 0, glancingPct: 100, intercept: true },
+      }),
+      enemyStream(),
+      createStream(3),
+    );
+    expect(beats[0]?.dodged).toBeUndefined();
+    expect(beats[0]?.glanced).toBe(3);
     expect(next.nextTurnMods.weapons).toBe(1);
   });
 
@@ -394,8 +519,8 @@ describe("engines", () => {
   it("an engines die sets the turn's evasion", () => {
     const { next, beats } = resolvePlayerPhase(withPlacements({ engines: 7 }));
     expect(next.evasion).toEqual({
-      dodgePct: 42,
-      glancingPct: 21,
+      dodgePct: 10,
+      glancingPct: 25,
       intercept: false,
     });
     expect(beats[0]?.evasion).toEqual(next.evasion);

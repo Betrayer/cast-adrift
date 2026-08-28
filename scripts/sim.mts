@@ -543,6 +543,8 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         },
       );
       state.hull = res.hullLeft;
+      state.takenBySector[sector] = (state.takenBySector[sector] ?? 0) + res.taken;
+      state.fightsBySector[sector] = (state.fightsBySector[sector] ?? 0) + 1;
       state.kills += res.kills;
       if (!res.win) return stop(false, next.row);
       state.nodes += 1;
@@ -1850,6 +1852,8 @@ interface CampaignResult {
   draftRerolls: number;
   interference: number;
   wormholes: WormholeTally;
+  takenBySector: Record<number, number>;
+  fightsBySector: Record<number, number>;
 }
 
 const CAMPAIGN_SECTORS = 5;
@@ -1925,6 +1929,8 @@ const runCampaign = (
     draftRerolls: state.draftRerolls,
     interference: state.interference,
     wormholes,
+    takenBySector: state.takenBySector,
+    fightsBySector: state.fightsBySector,
   };
 };
 
@@ -2106,6 +2112,26 @@ const campaignModeMain = (
     );
     previous = rate;
   }
+  console.log("  damage taken per act (A0, red+blue — hull+shield absorbed per fight):");
+  rows.push("");
+  rows.push("sector,fights,damageTaken,perFight");
+  for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
+    const taken = a0Runs.reduce(
+      (sum, r) => sum + (r.takenBySector[sector] ?? 0),
+      0,
+    );
+    const fights = a0Runs.reduce(
+      (sum, r) => sum + (r.fightsBySector[sector] ?? 0),
+      0,
+    );
+    if (fights === 0) continue;
+    console.log(
+      `    S${String(sector)} ${String(fights).padStart(5)} fights · ${String(taken).padStart(6)} taken · ${(taken / fights).toFixed(2)} per fight`,
+    );
+    rows.push(
+      `${String(sector)},${String(fights)},${String(taken)},${(taken / fights).toFixed(2)}`,
+    );
+  }
   console.log("  where a run dies inside its act (A0, red+blue):");
   for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
     const shape = SECTORS.find((sd) => sd.id === sector)?.shape;
@@ -2206,9 +2232,12 @@ const PRISM_SPECTRUM: Archetype = {
 const SHIP_ARCHETYPES: readonly Archetype[] = [...ARCHETYPES, PRISM_SPECTRUM];
 
 const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = getArg("ship", "");
+  const ships =
+    only === "" ? PLAYABLE_SHIPS : PLAYABLE_SHIPS.filter((s) => s.id === only);
   const rows: string[] = ["ship,deck,runs,winrate,avgSectorsCleared,hullMax"];
   console.log(
-    `sim ships: S1-S5 chained per ship, ${String(PLAYABLE_SHIPS.length)} ships x ${String(SHIP_ARCHETYPES.length)} decks x ${String(runs)} runs`,
+    `sim ships: S1-S5 chained per ship, ${String(ships.length)} ships x ${String(SHIP_ARCHETYPES.length)} decks x ${String(runs)} runs`,
   );
   console.log(
     `  the band is ${(SHIP_BAND[0] * 100).toFixed(0)}-${(SHIP_BAND[1] * 100).toFixed(0)}% on the red+blue+prism mean; black-edge is printed, never enforced.`,
@@ -2217,7 +2246,7 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
     "  it is asserted on the hulls P11 authored; the three legacy hulls are reference readings.",
   );
   let outOfBand = 0;
-  for (const ship of PLAYABLE_SHIPS) {
+  for (const ship of ships) {
     const banded: number[] = [];
     for (const archetype of SHIP_ARCHETYPES) {
       const { roll } = campaignRoll(runs, seed, archetype, 0, false, ship.id);

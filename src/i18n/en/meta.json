@@ -121,7 +121,7 @@
       "blueReserveDelta": "{{n}} blue reserve",
       "jamPowerDelta": "{{n}} jam power",
       "growthCapDelta": "{{n}} growth cap",
-      "evasionDelta": "{{n}}% dodge",
+      "evasionDelta": "{{n}}% evasion",
       "markBonusDelta": "{{n}} mark bonus",
       "battleEndHeal": "{{n}} heal / battle",
       "hullMaxPct": "{{n}}% max hull",

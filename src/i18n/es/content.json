@@ -392,7 +392,7 @@
     "corsair": {
       "name": "Sabueso",
       "passiveName": "Postcombustor",
-      "passiveDesc": "La maniobra se calienta: +10 % a la esquiva y un límite máximo de 70/30 en lugar de 55/25. Cada esquiva o impacto de refilón otorga +1 a las armas en el siguiente turno, hasta un máximo de +2 por turno."
+      "passiveDesc": "La maniobra se calienta: roce 7,5 % y esquiva 4,5 % por valor en lugar de 3,5 % y 1,5 %, +8 de evasión y un límite máximo de 55/40 en lugar de 25/10. Cada impacto de refilón o esquiva otorga +1 a las armas en el siguiente turno, hasta un máximo de +2 por turno."
     },
     "foundry": {
       "name": "Forja",

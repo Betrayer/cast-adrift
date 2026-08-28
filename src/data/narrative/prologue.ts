@@ -69,7 +69,7 @@ export const SYSTEMS_CHECK: readonly CheckStep[] = [
     moves: [move("green-d4", "engines")],
     fixedRoll: CHECK_FIXED_ROLL,
     enemyIntent: { t: "multi", n: 3, k: 3 },
-    defenseRolls: [1, 35, 99],
+    defenseRolls: [20, 1, 99],
     sayKey: "content:check.engines.say",
     failKey: "content:check.engines.fail",
   },

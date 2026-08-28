@@ -61,6 +61,8 @@ export interface RunState {
   draftRerolls: number;
   puzzleByTier: Record<number, PuzzleTally>;
   sinks: Record<string, number>;
+  takenBySector: Record<number, number>;
+  fightsBySector: Record<number, number>;
 }
 
 export const emptyPuzzleTally = (): Record<number, PuzzleTally> => ({
@@ -120,6 +122,8 @@ export const createRunState = (init: RunStateInit): RunState => ({
   draftRerolls: 0,
   puzzleByTier: emptyPuzzleTally(),
   sinks: emptySinks(),
+  takenBySector: {},
+  fightsBySector: {},
 });
 
 export const spend = (state: RunState, cost: number, sink: string): boolean => {

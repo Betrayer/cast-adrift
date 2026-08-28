@@ -2,15 +2,13 @@ import { useTranslation } from 'react-i18next';
 import { TapPopover } from '@/components/TapPopover';
 import { isSlotBlocked, isSlotShrunk } from '@/game/battle/setup';
 import {
-  DODGE_PCT_CAP,
-  DODGE_PCT_PER_VALUE,
-  GLANCING_PCT_CAP,
-  GLANCING_PCT_PER_VALUE,
+  evasionTuningFor,
   INTERCEPT_VALUE,
   VULNERABLE_CAP,
 } from '@/game/battle/resolver';
 import { goalSlotsNow, type SlotProjection } from '@/game/battle/view';
 import type { BattleState } from '@/stores/battleStore';
+import type { ShipId } from '@/data/ships';
 import type { SlotId } from '@/types/battle';
 import { SlotCard } from './SlotCard';
 import { onSlotTap } from './useDock';
@@ -22,7 +20,24 @@ export const FORMULA_SLOTS: Partial<Record<SlotId, 'manoeuvre' | 'targeting'>> =
   sensors: 'targeting',
 };
 
-export const SlotFormula = ({ slotId }: { slotId: SlotId }) => {
+export const manoeuvreVars = (shipId: ShipId | undefined) => {
+  const tuning = evasionTuningFor(shipId);
+  return {
+    dodge: tuning.dodgePerValue,
+    glancing: tuning.glancingPerValue,
+    dodgeCap: tuning.dodgeCap,
+    glancingCap: tuning.glancingCap,
+    intercept: INTERCEPT_VALUE,
+  };
+};
+
+export const SlotFormula = ({
+  slotId,
+  shipId,
+}: {
+  slotId: SlotId;
+  shipId: ShipId;
+}) => {
   const { t } = useTranslation(['battle']);
   const kind = FORMULA_SLOTS[slotId];
   if (kind === undefined) return null;
@@ -37,13 +52,7 @@ export const SlotFormula = ({ slotId }: { slotId: SlotId }) => {
           <b>{t(`battle:${kind}Title`)}</b>
           <br />
           {kind === 'manoeuvre'
-            ? t('battle:manoeuvreBrief', {
-                dodge: DODGE_PCT_PER_VALUE,
-                glancing: GLANCING_PCT_PER_VALUE,
-                dodgeCap: DODGE_PCT_CAP,
-                glancingCap: GLANCING_PCT_CAP,
-                intercept: INTERCEPT_VALUE,
-              })
+            ? t('battle:manoeuvreBrief', manoeuvreVars(shipId))
             : t('battle:targetingBrief', { cap: VULNERABLE_CAP })}
         </>
       }
@@ -88,7 +97,7 @@ export const SlotGrid = ({
             formula={FORMULA_SLOTS[slotId] !== undefined}
             onTap={onSlotTap}
           />
-          <SlotFormula slotId={slotId} />
+          <SlotFormula slotId={slotId} shipId={board.shipId} />
         </div>
       );
     })}

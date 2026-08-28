@@ -130,9 +130,9 @@ const battleMutators = (snapshot: BattleSnapshot): MutatorMods =>
 export const scaleDamage = (damage: number, multPct: number): number =>
   multPct === 0 ? damage : Math.round(damage * (1 + multPct / 100));
 
-export const DODGE_PCT_PER_VALUE = 6;
-export const GLANCING_PCT_PER_VALUE = 3;
-export const DODGE_PCT_CAP = 55;
+export const DODGE_PCT_PER_VALUE = 1.5;
+export const GLANCING_PCT_PER_VALUE = 3.5;
+export const DODGE_PCT_CAP = 10;
 export const GLANCING_PCT_CAP = 25;
 export const INTERCEPT_VALUE = 8;
 export const INTERCEPT_WEAPONS_BONUS = 1;
@@ -146,6 +146,8 @@ export const BASE_EVASION: EvasionTuning = {
   delta: 0,
   dodgeCap: DODGE_PCT_CAP,
   glancingCap: GLANCING_PCT_CAP,
+  dodgePerValue: DODGE_PCT_PER_VALUE,
+  glancingPerValue: GLANCING_PCT_PER_VALUE,
 };
 
 export const evasionFor = (
@@ -157,11 +159,11 @@ export const evasionFor = (
   const delta = evasionDelta + tuning.delta;
   return {
     dodgePct: clampPct(
-      effective * DODGE_PCT_PER_VALUE + delta,
+      effective * tuning.dodgePerValue + delta,
       tuning.dodgeCap,
     ),
     glancingPct: clampPct(
-      effective * GLANCING_PCT_PER_VALUE + delta / 2,
+      effective * tuning.glancingPerValue + delta / 2,
       tuning.glancingCap,
     ),
     intercept: effective >= INTERCEPT_VALUE,
@@ -575,7 +577,7 @@ export const resolvePlayerPhase = (
 };
 
 interface AttackContext {
-  firstDodgeSpent: boolean;
+  firstEvasionSpent: boolean;
   afterburnerGranted: number;
   defense: RngStream;
 }
@@ -599,14 +601,14 @@ const rewardEvade = (
   next.nextTurnMods.weapons = (next.nextTurnMods.weapons ?? 0) + grant;
 };
 
-const rewardDodge = (
+const rewardFirstEvasion = (
   next: BattleSnapshot,
   enemy: EnemyState,
   context: AttackContext,
   evasion: EvasionState,
 ): void => {
-  if (context.firstDodgeSpent) return;
-  context.firstDodgeSpent = true;
+  if (context.firstEvasionSpent) return;
+  context.firstEvasionSpent = true;
   if (sourceTrait(next, "reflectDodge")) {
     enemy.hp = Math.max(0, enemy.hp - REFLECT_DODGE_DAMAGE);
   }
@@ -683,13 +685,14 @@ const applyAttack = (
       const roll = context.defense.int(1, 100);
       if (roll <= evasion.dodgePct) {
         dodged += 1;
-        rewardDodge(next, enemy, context, evasion);
+        rewardFirstEvasion(next, enemy, context, evasion);
         rewardEvade(next, context);
         continue;
       }
       if (roll <= evasion.dodgePct + evasion.glancingPct) {
         glanced += 1;
         damage = Math.ceil(damage / 2);
+        rewardFirstEvasion(next, enemy, context, evasion);
         rewardEvade(next, context);
       }
     }
@@ -1127,7 +1130,7 @@ export const resolveEnemyPhase = (
     beats,
     enemyStream,
     attack: {
-      firstDodgeSpent: false,
+      firstEvasionSpent: false,
       afterburnerGranted: 0,
       defense: defenseStream,
     },

@@ -115,9 +115,11 @@ describe("ship boards", () => {
     expect(shipProfile("ark").shieldKeepPct).toBe(25);
     expect(shipProfile("corsair").afterburner).toEqual({ weapons: 1, cap: 2 });
     expect(shipProfile("corsair").evasion).toEqual({
-      delta: 10,
-      dodgeCap: 70,
-      glancingCap: 30,
+      delta: 8,
+      dodgeCap: 40,
+      glancingCap: 55,
+      dodgePerValue: 4.5,
+      glancingPerValue: 7.5,
     });
     expect(shipProfile("wanderer").evasion).toBeNull();
     expect(shipProfile("foundry").fuseTierStep).toBe(1);

@@ -14,8 +14,8 @@ export const projectionText = (
   switch (projection.kind) {
     case 'engine':
       return t('battle:slot.evasion', {
-        dodge: projection.evasion?.dodgePct ?? 0,
         glancing: projection.evasion?.glancingPct ?? 0,
+        dodge: projection.evasion?.dodgePct ?? 0,
       });
     case 'sensor':
       return projection.sensor !== null && projection.sensor.pierce > 0
@@ -68,8 +68,8 @@ export const projectionShort = (
   if (projection.jammed) return t('battle:proj.jam');
   switch (projection.kind) {
     case 'engine':
-      return t('battle:projShort.dodge', {
-        n: projection.evasion?.dodgePct ?? 0,
+      return t('battle:projShort.glance', {
+        n: projection.evasion?.glancingPct ?? 0,
       });
     case 'sensor':
       return t('battle:projShort.mark', {
