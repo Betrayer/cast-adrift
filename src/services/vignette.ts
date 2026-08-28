@@ -2,6 +2,7 @@ export type VignetteSide = "all" | "left" | "right" | "top" | "bottom";
 
 export type VignetteFlashKind =
   | "shieldGain"
+  | "shieldHold"
   | "shieldBreak"
   | "hullHit"
   | "dodge"

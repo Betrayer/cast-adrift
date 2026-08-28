@@ -1,6 +1,7 @@
 import { Button, Overlay, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAtLeast } from '@/app/breakpoints';
 import { tokens } from '@/app/theme';
 import { TapPopover } from '@/components/TapPopover';
 import { RESONANCE_BONUSES } from '@/data/resonance';
@@ -217,6 +218,7 @@ export const ResonanceChips = () => {
   const { t } = useTranslation(['battle', 'content']);
   const resonance = useBattleStore((s) => s.resonance);
   const dice = useBattleStore((s) => s.dice);
+  const roomy = useAtLeast('md');
   const [open, setOpen] = useState(false);
 
   const census = useMemo(() => {
@@ -296,7 +298,9 @@ export const ResonanceChips = () => {
               data-res-school={row.school}
             >
               {t('battle:resBoard', {
-                school: t(`battle:school.${row.school}`),
+                school: roomy
+                  ? t(`battle:school.${row.school}`)
+                  : t(`battle:schoolShort.${row.school}`),
                 placed: row.placed,
                 tray: row.tray,
               })}

@@ -18,6 +18,7 @@ import styles from './Board.module.css';
 
 export const FORMULA_SLOTS: Partial<Record<SlotId, 'manoeuvre' | 'targeting'>> = {
   engines: 'manoeuvre',
+  enginesB: 'manoeuvre',
   sensors: 'targeting',
 };
 
@@ -36,14 +37,14 @@ export const SlotFormula = ({ slotId }: { slotId: SlotId }) => {
           <b>{t(`battle:${kind}Title`)}</b>
           <br />
           {kind === 'manoeuvre'
-            ? t('battle:manoeuvreWhy', {
+            ? t('battle:manoeuvreBrief', {
                 dodge: DODGE_PCT_PER_VALUE,
                 glancing: GLANCING_PCT_PER_VALUE,
                 dodgeCap: DODGE_PCT_CAP,
                 glancingCap: GLANCING_PCT_CAP,
                 intercept: INTERCEPT_VALUE,
               })
-            : t('battle:targetingWhy', { cap: VULNERABLE_CAP })}
+            : t('battle:targetingBrief', { cap: VULNERABLE_CAP })}
         </>
       }
     >
@@ -84,6 +85,7 @@ export const SlotGrid = ({
             legal={legal.includes(slotId)}
             goal={goalSlotsNow(board).includes(slotId)}
             charge={board.charge}
+            formula={FORMULA_SLOTS[slotId] !== undefined}
             onTap={onSlotTap}
           />
           <SlotFormula slotId={slotId} />

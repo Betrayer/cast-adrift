@@ -88,7 +88,7 @@
     "reactor": "Reaktor",
     "repairBay": "Reparaturhalle",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
-    "evasion": "Ausweichen {{dodge}}% · Streifer {{glancing}}%",
+    "evasion": "aw {{dodge}}% · st {{glancing}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "Kappe ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -150,7 +150,9 @@
     "blue": "bla",
     "green": "grü",
     "grey": "gra",
-    "black": "sch"
+    "black": "sch",
+    "yellow": "gel",
+    "prismatic": "pri"
   },
   "proj": {
     "jam": "KLEMMT",
@@ -326,8 +328,10 @@
   "resEarned": "Erreicht",
   "manoeuvreTitle": "Manöver",
   "manoeuvreWhy": "Ein Würfel in den Triebwerken setzt einen Ausweichwurf für die Runde: Ausweichen {{dodge}}% × Wert (max. {{dodgeCap}}%), Streifschuss {{glancing}}% × Wert (max. {{glancingCap}}%). Ausweichen nimmt nichts, ein Streifschuss die Hälfte, alles andere trifft voll. Ab Wert {{intercept}} wird der erste Treffer ganz abgefangen. Der Wert ist der Würfel nach Affinität und Boni.",
+  "manoeuvreBrief": "Ein Ausweichwurf pro Runde: Ausweichen {{dodge}}% × Wert (max {{dodgeCap}}%), Streifen {{glancing}}% × Wert (max {{glancingCap}}%). Ausweichen nimmt nichts, Streifen die Hälfte. Ab {{intercept}}: Abfangen.",
   "targetingTitle": "Zielerfassung",
   "targetingWhy": "Ein Würfel in den Sensoren macht das Ziel für die Runde Verwundbar +D: D ist der halbe Würfelwert aufgerundet, höchstens {{cap}}, und jeder Treffer dieser Runde macht so viel mehr. Auf der Höchstseite durchschlägt der Treffer zusätzlich den Schild. Sensor-Mk deckt außerdem pro Stufe über Mk1 eine weitere Kartenzeile auf.",
+  "targetingBrief": "Sensoren markieren das Ziel: Verwundbar +D für die Runde, D ist der halbe Würfelwert aufgerundet, max {{cap}}. Jeder Treffer macht so viel mehr; die Höchstseite durchschlägt den Schild.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systeme",
   "journal": {

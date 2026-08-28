@@ -88,7 +88,7 @@
     "reactor": "Reactor",
     "repairBay": "Repair Bay",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
-    "evasion": "dodge {{dodge}}% · glancing {{glancing}}%",
+    "evasion": "dg {{dodge}}% · gl {{glancing}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "cap ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -150,7 +150,9 @@
     "blue": "blue",
     "green": "grn",
     "grey": "gry",
-    "black": "blk"
+    "black": "blk",
+    "yellow": "ylw",
+    "prismatic": "prs"
   },
   "proj": {
     "jam": "JAMS",
@@ -326,8 +328,10 @@
   "resEarned": "Earned",
   "manoeuvreTitle": "Manoeuvre",
   "manoeuvreWhy": "A die in Engines sets one evasion roll for the turn: dodge {{dodge}}% × value (max {{dodgeCap}}%), glancing {{glancing}}% × value (max {{glancingCap}}%). A dodge takes nothing, a glancing hit takes half, anything else lands in full. From value {{intercept}} the first hit is intercepted outright. Value is the die after affinity and bonuses.",
+  "manoeuvreBrief": "One evasion roll per turn: dodge {{dodge}}% × value (cap {{dodgeCap}}%), glancing {{glancing}}% × value (cap {{glancingCap}}%). A dodge takes nothing, a glance half. From value {{intercept}} the first hit is intercepted.",
   "targetingTitle": "Targeting",
   "targetingWhy": "A die in Sensors makes the target Vulnerable +D for the turn: D is half the die value rounded up, capped at {{cap}}, and every hit this turn deals that much more. On the die’s max face the hit also pierces the shield. Sensors Mk also reveals one more map row per level above Mk1.",
+  "targetingBrief": "Sensors mark the target: Vulnerable +D for the turn, D is half the die value rounded up, cap {{cap}}. Every hit this turn deals that much more; the die's max face also pierces the shield.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systems",
   "journal": {

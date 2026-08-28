@@ -88,7 +88,7 @@
     "reactor": "Réacteur",
     "repairBay": "Atelier de réparation",
     "cap": "cap ≤ d {{cap}} · Mk {{mk}}",
-    "evasion": "esquive {{dodge}}% · frôlement {{glancing}}%",
+    "evasion": "esq {{dodge}}% · eff {{glancing}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "cap ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -150,7 +150,9 @@
     "blue": "ble",
     "green": "vrt",
     "grey": "gri",
-    "black": "noi"
+    "black": "noi",
+    "yellow": "jau",
+    "prismatic": "pri"
   },
   "proj": {
     "jam": "ENRAYE",
@@ -326,8 +328,10 @@
   "resEarned": "Acquis",
   "manoeuvreTitle": "Manœuvre",
   "manoeuvreWhy": "Un dé dans les Moteurs fixe un jet d’esquive pour le tour : esquive {{dodge}}% × valeur (max. {{dodgeCap}}%), effleurement {{glancing}}% × valeur (max. {{glancingCap}}%). Une esquive ne prend rien, un effleurement la moitié, le reste passe en entier. À partir de la valeur {{intercept}}, le premier coup est intercepté d’office. La valeur est le dé après affinité et bonus.",
+  "manoeuvreBrief": "Un jet d’esquive par tour : esquive {{dodge}}% × valeur (max {{dodgeCap}}%), effleurement {{glancing}}% × valeur (max {{glancingCap}}%). L’esquive ne prend rien, l’effleurement la moitié. Dès {{intercept}} : arrêt net.",
   "targetingTitle": "Désignation",
   "targetingWhy": "Un dé dans les Capteurs rend la cible Vulnérable +D pour le tour : D vaut la moitié de la valeur du dé arrondie au supérieur, plafonnée à {{cap}}, et chaque coup de ce tour fait d’autant plus. Sur la face maximale du dé, le coup perce aussi le bouclier. Le Mk des Capteurs révèle en plus une rangée de carte par niveau au-dessus de Mk1.",
+  "targetingBrief": "Les capteurs marquent la cible : Vulnérable +D pour le tour, D = la moitié de la valeur du dé arrondie au supérieur, max {{cap}}. Chaque coup fait autant de plus ; la face max perce le bouclier.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systèmes",
   "journal": {

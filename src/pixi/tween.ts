@@ -66,6 +66,16 @@ interface ActiveTimer {
   run: () => void;
 }
 
+interface TweenTargetLifetime {
+  destroyed?: unknown;
+  _observer?: { destroyed?: unknown };
+}
+
+const targetIsDestroyed = (target: object): boolean => {
+  const node = target as TweenTargetLifetime;
+  return node.destroyed === true || node._observer?.destroyed === true;
+};
+
 const FRAME_MS = 16.7;
 
 export const rafClock = (): TweenClock & { destroy: () => void } => {
@@ -222,6 +232,10 @@ export class Tweens {
     }
     for (const tween of [...this.active]) {
       if (!this.active.has(tween)) continue;
+      if (targetIsDestroyed(tween.target)) {
+        this.active.delete(tween);
+        continue;
+      }
       const scale = this.scaleFor(tween.group);
       if (scale <= 0) continue;
       tween.elapsed += ticker.deltaMS * scale;

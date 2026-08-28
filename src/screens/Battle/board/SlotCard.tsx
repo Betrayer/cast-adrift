@@ -24,6 +24,7 @@ export interface SlotCardProps {
   goal: boolean;
   charge: number;
   onTap: (slotId: SlotId) => void;
+  formula?: boolean;
   preview?: boolean;
 }
 
@@ -66,6 +67,7 @@ export const SlotCard = ({
   goal,
   charge,
   onTap,
+  formula = false,
   preview = false,
 }: SlotCardProps) => {
   const { t } = useTranslation(['battle']);
@@ -79,6 +81,7 @@ export const SlotCard = ({
       type="button"
       {...(preview ? {} : { 'data-slot': slotId })}
       {...(preview || !goal ? {} : { 'data-goal': '1' })}
+      {...(formula ? { 'data-formula': '1' } : {})}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
       className={[
@@ -106,6 +109,9 @@ export const SlotCard = ({
       <span className={styles.cap}>
         {shrunk ? t('battle:slot.capShrunk', { cap: slot.cap, mk: slot.mk }) : cap}
       </span>
+      {blocked ? (
+        <span className={styles.blocked}>{t('battle:jam')}</span>
+      ) : null}
       {note === null ? null : (
         <span
           className={`${styles.affinity ?? ''} ${
@@ -125,7 +131,6 @@ export const SlotCard = ({
           {projectionText(t, slotId, projection)}
         </span>
       )}
-      {blocked ? <span className={styles.blocked}>{t('battle:jam')}</span> : null}
       <span className={styles.well} {...(preview ? {} : { 'data-well': '' })} />
       {slotId === 'reactor' ? (
         <span className={styles.pips} aria-hidden>

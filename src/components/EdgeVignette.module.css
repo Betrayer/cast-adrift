@@ -20,6 +20,11 @@
   will-change: opacity;
 }
 
+.rim:not([data-on='1']),
+.flash:not([data-vignette-flash]) {
+  display: none;
+}
+
 .rim[data-vignette-rim='shield'] {
   background: radial-gradient(
     ellipse 88% 74% at 50% 50%,
@@ -103,6 +108,25 @@
   animation-name: vgShatter;
 }
 
+.flash[data-vignette-flash='shieldHold'] {
+  animation-name: vgHold;
+}
+
+@keyframes vgHold {
+  0% {
+    opacity: 0;
+  }
+  12% {
+    opacity: calc(var(--vg-alpha, 0.38) * var(--vg-scale, 1));
+  }
+  62% {
+    opacity: calc(var(--vg-alpha, 0.38) * var(--vg-scale, 1));
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
 @keyframes vgFlash {
   0% {
     opacity: 0;
@@ -133,6 +157,13 @@
   }
 }
 
-:root[data-ca-motion='reduced'] .layer {
-  display: none;
+:root[data-ca-motion='reduced'] .rim[data-on='1'] {
+  transition: none;
+  animation: none;
+  opacity: calc(var(--vg-rim-alpha, 0.18) * var(--vg-scale, 1));
+}
+
+:root[data-ca-motion='reduced'] .flash[data-vignette-flash] {
+  animation: none;
+  opacity: calc(var(--vg-alpha, 0.3) * var(--vg-scale, 1));
 }

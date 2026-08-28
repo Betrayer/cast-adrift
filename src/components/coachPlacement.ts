@@ -40,3 +40,32 @@ export const coachCardPlacement = (
   );
   return { left, top };
 };
+
+export type PopoverAlign = 'center' | 'start' | 'end';
+
+export const popoverPlacement = (
+  anchor: Anchor,
+  card: Size,
+  bounds: Bounds,
+  align: PopoverAlign,
+): { left: number; top: number } => {
+  const { top } = coachCardPlacement(anchor, card, bounds);
+  const preferred =
+    align === 'start'
+      ? anchor.x
+      : align === 'end'
+        ? anchor.x + anchor.w - card.w
+        : anchor.x + anchor.w / 2 - card.w / 2;
+  const left = Math.min(
+    Math.max(bounds.left, preferred),
+    Math.max(bounds.left, bounds.right - card.w),
+  );
+  return { left, top };
+};
+
+export const viewportBounds = (margin: number): Bounds => ({
+  top: margin,
+  left: margin,
+  right: window.innerWidth - margin,
+  bottom: window.innerHeight - margin,
+});

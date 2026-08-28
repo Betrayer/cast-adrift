@@ -82,6 +82,7 @@ import {
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
+import { readFrames } from "@/pixi/perf";
 import type { BattleLayoutId, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
 
@@ -363,6 +364,7 @@ export interface TestApi {
   skipCheck: () => void;
   restartCheckStep: () => void;
   anchors: () => BattleAnchors | null;
+  frames: () => number;
   state: () => TestState;
   account: () => AccountView;
   cloudMeta: () => Promise<CloudMetaView | null>;
@@ -932,6 +934,8 @@ export const createTestApi = (): TestApi => ({
   },
 
   anchors: () => battleAnchors(),
+
+  frames: () => readFrames(),
 
   state: readState,
 

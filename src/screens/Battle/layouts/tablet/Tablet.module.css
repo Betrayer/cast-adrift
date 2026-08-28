@@ -383,71 +383,69 @@
   }
 }
 
-@media (max-height: 700px) {
-  .enemyBand {
-    min-height: 74px;
-    height: 19%;
-  }
+:root[data-ca-compact='1'] .enemyBand {
+  min-height: 74px;
+  height: 19%;
+}
 
-  .stripBreak {
-    display: none;
-  }
+:root[data-ca-compact='1'] .stripBreak {
+  display: none;
+}
 
-  .strip {
-    min-height: 22px;
-    padding: 2px 8px;
-  }
+:root[data-ca-compact='1'] .strip {
+  min-height: 22px;
+  padding: 2px 8px;
+}
 
-  .grid {
-    flex-direction: row;
-    align-items: stretch;
-  }
+:root[data-ca-compact='1'] .grid {
+  flex-direction: row;
+  align-items: stretch;
+}
 
-  .conveyor {
-    flex: 1.35 1 0;
-    gap: 3px;
-  }
+:root[data-ca-compact='1'] .conveyor {
+  flex: 1.35 1 0;
+  gap: 3px;
+}
 
-  .trayBand {
-    flex: 1 1 0;
-    width: auto;
-    min-height: 64px;
-  }
+:root[data-ca-compact='1'] .trayBand {
+  flex: 1 1 0;
+  width: auto;
+  min-height: 64px;
+}
 
-  .row {
-    padding: 2px 6px;
-    gap: 5px;
-  }
+:root[data-ca-compact='1'] .row {
+  padding: 2px 6px;
+  gap: 5px;
+}
 
-  .chip {
-    width: 18px;
-    height: 18px;
-  }
+:root[data-ca-compact='1'] .chip {
+  width: 18px;
+  height: 18px;
+}
 
-  .name {
-    font-size: 10px;
-    line-height: 12px;
-  }
+:root[data-ca-compact='1'] .name {
+  font-size: 10px;
+  line-height: 12px;
+}
 
-  .cap {
-    font-size: 8.5px;
-    line-height: 10px;
-  }
+:root[data-ca-compact='1'] .cap {
+  font-size: 8.5px;
+  line-height: 10px;
+}
 
-  .well {
-    width: 24px;
-    height: 24px;
-  }
+:root[data-ca-compact='1'] .well {
+  width: 24px;
+  height: 24px;
+}
 
-  .out {
-    min-width: 42px;
-    font-size: 11px;
-  }
+:root[data-ca-compact='1'] .out {
+  min-width: 42px;
+  font-size: 11px;
+}
 
-  .reserve {
-    min-height: 28px;
-    padding: 2px 6px;
-  }
+:root[data-ca-compact='1'] .reserve {
+  min-height: 28px;
+  padding: 2px 6px;
 }
 
 .wideConveyor {
