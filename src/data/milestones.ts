@@ -95,9 +95,9 @@ export const hangarBudget = (level: number, hubBudgetBonus = 0): number => {
     (sum, m) => sum + (m.budget ?? 0),
     0,
   );
-  return Math.min(
-    MAX_HANGAR_BUDGET,
-    BASE_HANGAR_BUDGET + granted + Math.max(0, hubBudgetBonus),
+  return Math.max(
+    1,
+    Math.min(MAX_HANGAR_BUDGET, BASE_HANGAR_BUDGET + granted + hubBudgetBonus),
   );
 };
 

@@ -16,7 +16,7 @@ import { passiveActionOf, type PassiveActionId } from "@/game/battle/passives";
 import {
   BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
-  NUDGE_COST,
+  nudgeChargeCost,
   SURGE_COST,
 } from "@/game/battle/resolver";
 import { canReserve } from "@/game/battle/view/legal";
@@ -101,11 +101,10 @@ export const nudgeCostFor = (
     !board.spentGrants.includes(`nudge:${die.uid}`);
   if (springFree || board.freeNudges > 0) return { cost: 0, free: true };
   return {
-    cost: Math.max(
-      0,
-      NUDGE_COST +
-        sourceMods(board).nudgeCostDelta +
+    cost: nudgeChargeCost(
+      sourceMods(board).nudgeCostDelta +
         computeMutatorMods(board.mutators ?? []).nudgeCostDelta,
+      sourceTrait(board, "coldLogic"),
     ),
     free: false,
   };

@@ -11,6 +11,8 @@ import {
   evasionFor,
   evasionTuningFor,
   GLANCING_PCT_CAP,
+  NUDGE_COST,
+  nudgeChargeCost,
   resolveEnemyPhase,
   resolvePlayerPhase,
   vulnerableFor,
@@ -149,6 +151,22 @@ const withPlacements = (
 const forceIntent = (state: EnemyState, intent: Intent): EnemyState => ({
   ...state,
   nextIntent: intent,
+});
+
+describe("nudge charge cost", () => {
+  it("floors at one charge for everyone but Cold Logic", () => {
+    expect(nudgeChargeCost(0, false)).toBe(NUDGE_COST);
+    expect(nudgeChargeCost(-1, false)).toBe(2);
+    expect(nudgeChargeCost(-3, false)).toBe(1);
+    expect(nudgeChargeCost(-9, false)).toBe(1);
+    expect(nudgeChargeCost(2, false)).toBe(5);
+  });
+
+  it("only Cold Logic buys a free nudge, and it pays for it in crits", () => {
+    expect(nudgeChargeCost(-3, true)).toBe(0);
+    expect(nudgeChargeCost(-9, true)).toBe(0);
+    expect(nudgeChargeCost(-2, true)).toBe(1);
+  });
 });
 
 describe("evasion band math", () => {

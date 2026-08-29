@@ -80,7 +80,7 @@
     "pathCost": "Chemin d'accès à partir d'ici : {{n}} points (vous avez {{have}})",
     "refundFree": "Remboursement (gratuit)",
     "respecConfirmTitle": "Rembourser ce nœud ?",
-    "respecConfirmBody": "« {{name}} » retourne dans la réserve et le point est rétabli. Coût : {{cost}}◈.",
+    "respecConfirmBody": "« {{name}} » retourne dans la réserve et {{points}} point(s) sont rétablis. Coût : {{cost}}◈.",
     "respecConfirmYes": "Remboursement",
     "redPowderRoom": "Salle d'eau",
     "redRangeCard": "Fiche de portée",
@@ -105,7 +105,13 @@
     "greyShimStack": "Pile de cales",
     "greyPatternBook": "Recueil de modèles",
     "greyBallastTrim": "Réglage du lest",
-    "greyTallyStick": "Bâton de comptage"
+    "greyTallyStick": "Bâton de comptage",
+    "cost": "Coût {{n}}",
+    "repriced": "Les prix des nœuds ont changé : votre sélection coûte désormais {{spent}} points sur {{total}}. Rien n’a été repris — une réattribution complète est gratuite.",
+    "freeRespec": "Réattribution gratuite",
+    "freeRespecTitle": "Vider toute la carte ?",
+    "freeRespecBody": "Les {{n}} nœuds alloués retournent dans la réserve et tous les points sont rendus. Cette remise à zéro est gratuite.",
+    "freeRespecYes": "Vider"
   },
   "chartFx": {
     "hubBudget": "+1 budget pour le hangar",

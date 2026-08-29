@@ -19,7 +19,33 @@ import { edgeMarkFor } from "../../src/game/map/types";
 import type { ShipId } from "../../src/data/ships";
 import type { MkLevels } from "../../src/stores/runStore";
 import type { SlotId } from "../../src/types/battle";
-import type { EventEffect } from "../../src/types/events";
+import type {
+  EventDef,
+  EventEffect,
+  EventKind,
+  EventOption,
+  FlagValue,
+  ForcedBattle,
+  Outcome,
+} from "../../src/types/events";
+import { ALL_EVENTS } from "../../src/data/events";
+import { SHIP_BY_ID } from "../../src/data/ships";
+import {
+  optionMet,
+  optionOutcomes,
+  pickEvent,
+  selectOutcome,
+} from "../../src/game/events/engine";
+import {
+  checkOdds,
+  checkPassed,
+  checkTotal,
+  rollCheckDice,
+  topDiceForCheck,
+  type DeckRef,
+} from "../../src/game/events/checks";
+import { AXIS_MAX, AXIS_MIN } from "../../src/game/run/axis";
+import { dieForRarity, DROP_WEIGHTS, rollDrop } from "../../src/game/economy/rewards";
 import { createStream, deriveSeed, type RngStream } from "../../src/services/rng";
 import { decideDraft, type DraftLoadout } from "./draft";
 import { resolvePuzzle, INTERFERENCE_SCRAP_VALUE } from "./puzzle";
@@ -54,6 +80,13 @@ export interface RunState {
   draftsSinceRare: number;
   anomalyStreak: number;
   interference: number;
+  vouchers: number;
+  axis: number;
+  flags: Record<string, FlagValue>;
+  seenEvents: string[];
+  eventsResolved: number;
+  eventScrap: number;
+  eventHull: number;
   solvedPuzzles: string[];
   banishUsed: boolean;
   rerollUsed: boolean;
@@ -80,6 +113,7 @@ export const emptySinks = (): Record<string, number> => ({
   mk: 0,
   puzzleStakes: 0,
   draftReroll: 0,
+  events: 0,
 });
 
 export interface RunStateInit {
@@ -108,6 +142,13 @@ export const createRunState = (init: RunStateInit): RunState => ({
   chartPicks: [...(init.chartPicks ?? [])],
   tide: 0,
   jumpsSinceTide: 0,
+  vouchers: 0,
+  axis: 0,
+  flags: {},
+  seenEvents: [],
+  eventsResolved: 0,
+  eventScrap: 0,
+  eventHull: 0,
   kills: 0,
   nodes: 0,
   fights: 0,
@@ -268,12 +309,23 @@ export const greedyShop = (
   }
 };
 
-const UPGRADE_SLOTS: readonly SlotId[] = [
+const UPGRADE_PRIORITY: readonly SlotId[] = [
   "weaponA",
   "weaponB",
+  "spinal",
   "shields",
+  "shieldsB",
   "reactor",
+  "engines",
+  "enginesB",
+  "sensors",
+  "repairBay",
 ];
+
+export const upgradeSlotsFor = (shipId: ShipId): SlotId[] => {
+  const slots = SHIP_BY_ID.get(shipId)?.slots ?? {};
+  return UPGRADE_PRIORITY.filter((slotId) => slots[slotId] !== undefined);
+};
 
 export const repairToFull = (state: RunState): void => {
   const missing = state.hullMax - state.hull;
@@ -284,7 +336,16 @@ export const repairToFull = (state: RunState): void => {
 };
 
 export const buyUpgrades = (state: RunState): void => {
-  for (const slotId of UPGRADE_SLOTS) {
+  const slots = upgradeSlotsFor(state.shipId);
+  for (const slotId of slots) {
+    while (state.vouchers > 0) {
+      const mk = state.mkLevels[slotId] ?? 1;
+      if (mk >= 3) break;
+      state.vouchers -= 1;
+      state.mkLevels = { ...state.mkLevels, [slotId]: (mk + 1) as 2 | 3 };
+    }
+  }
+  for (const slotId of slots) {
     let mk = state.mkLevels[slotId] ?? 1;
     while (mk < 3) {
       const target = (mk + 1) as 2 | 3;
@@ -311,13 +372,32 @@ export const applyEffectsToState = (
   state: RunState,
   effects: readonly EventEffect[],
   tideCap: number,
+  loot?: RngStream,
 ): void => {
   for (const effect of effects) {
-    if (effect.k === "scrap") gain(state, effect.n);
-    else if (effect.k === "hull") {
+    if (effect.k === "scrap") {
+      if (effect.n >= 0) gain(state, effect.n);
+      else spend(state, Math.min(state.scrap, -effect.n), "events");
+    } else if (effect.k === "hull") {
       state.hull = Math.max(1, Math.min(state.hullMax, state.hull + effect.n));
+    } else if (effect.k === "hullMax") {
+      state.hullMax = Math.max(1, state.hullMax + effect.n);
+      state.hull = Math.max(1, Math.min(state.hullMax, state.hull));
     } else if (effect.k === "tide") {
       state.tide = Math.max(0, Math.min(tideCap, state.tide + effect.n));
+    } else if (effect.k === "axis") {
+      state.axis = Math.max(AXIS_MIN, Math.min(AXIS_MAX, state.axis + effect.n));
+    } else if (effect.k === "flag") {
+      state.flags[effect.key] = effect.value ?? true;
+    } else if (effect.k === "loot" && loot !== undefined) {
+      const defId =
+        effect.die ??
+        (effect.rarity === undefined
+          ? rollDrop(loot, DROP_WEIGHTS.battle)
+          : dieForRarity(loot, effect.rarity));
+      takeDie(state, defId);
+    } else if (effect.k === "swapLowestDie") {
+      state.deck.sort((a, b) => ptsForDie(a) - ptsForDie(b));
     }
   }
 };
@@ -443,6 +523,147 @@ export const runDraft = (
     return;
   }
   if (verdict.pick !== undefined) takePerk(state, verdict.pick);
+};
+
+const EVENT_HULL_VALUE = 6;
+
+const deckRefs = (state: RunState): DeckRef[] =>
+  state.deck.flatMap((defId) => {
+    const def = DIE_BY_ID.get(defId);
+    return def === undefined
+      ? []
+      : [{ defId, tier: def.tier, school: def.school }];
+  });
+
+const hullValue = (state: RunState): number =>
+  EVENT_HULL_VALUE * (state.hullMax / Math.max(1, state.hull));
+
+const effectValue = (state: RunState, effect: EventEffect): number => {
+  if (effect.k === "scrap") return effect.n;
+  if (effect.k === "hull") {
+    return effect.n < 0
+      ? effect.n * hullValue(state)
+      : Math.min(effect.n, state.hullMax - state.hull) * EVENT_HULL_VALUE;
+  }
+  if (effect.k === "hullMax") return effect.n * EVENT_HULL_VALUE * 2;
+  if (effect.k === "tide") return -effect.n * hullValue(state);
+  if (effect.k === "loot") return 30;
+  return 0;
+};
+
+const outcomesValue = (
+  state: RunState,
+  outcomes: readonly Outcome[],
+): number => {
+  if (outcomes.length === 0) return 0;
+  let weight = 0;
+  let total = 0;
+  for (const outcome of outcomes) {
+    const w = outcome.weight ?? 1;
+    weight += w;
+    total +=
+      w *
+      outcome.effects.reduce((sum, e) => sum + effectValue(state, e), 0);
+  }
+  return weight === 0 ? 0 : total / weight;
+};
+
+const optionValue = (
+  state: RunState,
+  option: EventOption,
+  odds: number,
+): number =>
+  option.check === undefined
+    ? outcomesValue(state, option.outcomes ?? [])
+    : odds * outcomesValue(state, option.onPass ?? []) +
+      (1 - odds) * outcomesValue(state, option.onFail ?? []);
+
+const checkOddsFor = (state: RunState, option: EventOption): number => {
+  if (option.check === undefined) return 1;
+  const dice = topDiceForCheck(
+    deckRefs(state),
+    option.check.dice,
+    option.check,
+  );
+  return checkOdds(dice, option.check.pick, option.check.target);
+};
+
+export const runEvent = (
+  state: RunState,
+  sector: number,
+  kind: EventKind,
+  seed: number,
+  tideCap: number,
+): ForcedBattle | null => {
+  const stream = createStream(seed);
+  const def: EventDef | null = pickEvent(
+    ALL_EVENTS,
+    {
+      sector,
+      axis: state.axis,
+      flags: state.flags,
+      seenEvents: state.seenEvents,
+    },
+    kind,
+    stream,
+  );
+  if (def === null) return null;
+  state.seenEvents.push(def.id);
+
+  const ctx = {
+    scrap: state.scrap,
+    hull: state.hull,
+    axis: state.axis,
+    deck: deckRefs(state).map((d) => ({ school: d.school ?? "grey", tier: d.tier })),
+    mkLevels: state.mkLevels,
+    flags: state.flags,
+  };
+  const legal = def.options.filter((option) => optionMet(option.requires, ctx));
+  if (legal.length === 0) return null;
+
+  let best = legal[0];
+  let bestValue = Number.NEGATIVE_INFINITY;
+  let bestOdds = 1;
+  for (const option of legal) {
+    const odds = checkOddsFor(state, option);
+    const value = optionValue(state, option, odds);
+    if (value > bestValue) {
+      bestValue = value;
+      best = option;
+      bestOdds = odds;
+    }
+  }
+  if (best === undefined) return null;
+  void bestOdds;
+
+  let passed: boolean | null = null;
+  if (best.check !== undefined) {
+    const dice = topDiceForCheck(deckRefs(state), best.check.dice, best.check);
+    const values = rollCheckDice(dice, createStream(deriveSeed(seed, "check")));
+    passed = checkPassed(
+      checkTotal(values, best.check.pick),
+      best.check.pick,
+      best.check.target,
+    );
+  }
+  const outcome = selectOutcome(
+    optionOutcomes(best, passed),
+    createStream(deriveSeed(seed, "outcome")),
+  );
+  if (outcome === null) return null;
+
+  const scrapBefore = state.scrap;
+  const hullBefore = state.hull;
+  applyEffectsToState(
+    state,
+    outcome.effects,
+    tideCap,
+    createStream(deriveSeed(seed, "loot")),
+  );
+  state.eventsResolved += 1;
+  state.eventScrap += state.scrap - scrapBefore;
+  state.eventHull += state.hull - hullBefore;
+  return outcome.follow ?? null;
 };
 
 export const runAnomaly = (

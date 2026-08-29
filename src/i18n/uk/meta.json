@@ -80,7 +80,7 @@
     "pathCost": "Шлях звідси: {{n}} очок (є {{have}})",
     "refundFree": "Повернути (безкоштовно)",
     "respecConfirmTitle": "Повернути цей вузол?",
-    "respecConfirmBody": "«{{name}}» іде назад у пул, очко повертається. Вартість: {{cost}}◈.",
+    "respecConfirmBody": "«{{name}}» іде назад у пул, повертається очок: {{points}}. Вартість: {{cost}}◈.",
     "respecConfirmYes": "Повернути",
     "redPowderRoom": "Порохова",
     "redRangeCard": "Далекомірна карта",
@@ -105,7 +105,13 @@
     "greyShimStack": "Стос прокладок",
     "greyPatternBook": "Книга шаблонів",
     "greyBallastTrim": "Баластне диферентування",
-    "greyTallyStick": "Бирка"
+    "greyTallyStick": "Бирка",
+    "cost": "Ціна {{n}}",
+    "repriced": "Ціни вузлів змінилися: ваш набір коштує тепер {{spent}} із {{total}} очок. Нічого не відібрано — одне повне скидання безкоштовне.",
+    "freeRespec": "Безкоштовне скидання",
+    "freeRespecTitle": "Очистити всю карту?",
+    "freeRespecBody": "Усі взяті вузли ({{n}}) ідуть назад у пул, очки повертаються повністю. Це скидання безкоштовне.",
+    "freeRespecYes": "Очистити"
   },
   "chartFx": {
     "hubBudget": "+1 до бюджету ангара",

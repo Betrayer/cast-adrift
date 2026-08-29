@@ -1,0 +1,14 @@
+import { CHART_NODES } from "@/data/chart";
+import { chartNodeCost, branchDepth } from "@/game/chart/cost";
+const entries = CHART_NODES.filter((n) => n.entry === true);
+console.log("total nodes", CHART_NODES.length, "entries", entries.length);
+console.log("entry ids", entries.map((n) => `${n.id}:${n.constellation}:${String(chartNodeCost(n.id))}`).join(" "));
+const byCost = new Map<number, number>();
+for (const n of CHART_NODES) byCost.set(chartNodeCost(n.id), (byCost.get(chartNodeCost(n.id)) ?? 0) + 1);
+console.log("cost histogram", [...byCost.entries()].sort((a,b)=>a[0]-b[0]));
+const byKind = new Map<string, number>();
+for (const n of CHART_NODES) byKind.set(n.kind, (byKind.get(n.kind) ?? 0) + 1);
+console.log("kind histogram", [...byKind.entries()]);
+console.log("total cost", CHART_NODES.reduce((s,n)=>s+chartNodeCost(n.id),0));
+const depths = CHART_NODES.map((n)=>branchDepth(n.id));
+console.log("max depth", Math.max(...depths));

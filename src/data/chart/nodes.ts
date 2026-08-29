@@ -1130,7 +1130,7 @@ const buildHub = (): ChartNodeDef[] => {
       id,
       constellation: "hub",
       kind: "small",
-      entry: true,
+      ...(k === 0 ? { entry: true } : {}),
       pos: place(k * 30 * DEG, 48, 0),
       links: [],
       ...(HUB_SMALLS[(k * 5) % HUB_SMALLS.length] ?? {}),

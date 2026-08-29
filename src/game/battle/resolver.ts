@@ -91,6 +91,9 @@ export {
 export const CHARGE_CAP = 10;
 export const OVERFLOW_HULL_COST = 2;
 export const NUDGE_COST = 3;
+
+export const nudgeChargeCost = (delta: number, coldLogic: boolean): number =>
+  Math.max(coldLogic ? 0 : 1, NUDGE_COST + delta);
 export const BONUS_REROLL_COST = 5;
 export const SURGE_COST = 10;
 export const MIRROR_CAP = 12;

@@ -5,7 +5,7 @@ import { DIE_BY_ID } from "@/data/dice";
 import { generateSectorMap } from "@/game/map/generator";
 import { nodeById, type MapNode } from "@/game/map/types";
 import { INTERFERENCE_STREAK_THRESHOLD } from "@/game/run/interference";
-import { pointsTotal } from "@/game/chart/engine";
+import { isAllocatable, pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { createStream } from "@/services/rng";
 import { anomalyPull, greedyNext, stepCost, type RouteState } from "./map";
 import { decideDraft } from "./draft";
@@ -209,10 +209,22 @@ describe("run state", () => {
 });
 
 describe("chart policy", () => {
-  it("spends the whole mid-collection budget on a connected route", () => {
+  it("spends the mid-collection budget in points, not in nodes", () => {
     const picks = buildChartPicks(MID_COLLECTION_LEVEL);
-    expect(picks.length).toBe(pointsTotal(MID_COLLECTION_LEVEL));
+    const budget = pointsTotal(MID_COLLECTION_LEVEL);
+    expect(pointsSpent(picks)).toBeLessThanOrEqual(budget);
+    expect(pointsSpent(picks)).toBeGreaterThanOrEqual(budget - 1);
+    expect(picks.length).toBeLessThan(budget);
     expect(new Set(picks).size).toBe(picks.length);
+  });
+
+  it("only ever adds a node adjacent to what it already owns", () => {
+    const picks = buildChartPicks(MID_COLLECTION_LEVEL);
+    const owned: string[] = [];
+    for (const id of picks) {
+      expect(isAllocatable(id, owned), id).toBe(true);
+      owned.push(id);
+    }
   });
 
   it("is deterministic", () => {

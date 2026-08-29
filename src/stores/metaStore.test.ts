@@ -4,7 +4,24 @@ import {
   migrateMeta,
   useMetaStore,
 } from "@/stores/metaStore";
+import { pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { totalXpForLevel } from "@/game/xp";
+
+const V14_KEYSTONE_LINE: readonly string[] = [
+  "red-gate",
+  "red-min1",
+  "red-not1",
+  "red-min2",
+  "red-not2",
+  "red-min3",
+  "red-not3",
+  "red-min4",
+  "red-not4",
+  "red-s19",
+  "red-s22",
+  "red-s23",
+  "red-key1",
+];
 
 const resetMeta = (): void => {
   useMetaStore.setState({
@@ -12,6 +29,7 @@ const resetMeta = (): void => {
     xp: 0,
     level: 1,
     chartPicks: [],
+    chartFreeRespecs: 0,
     collection: [],
     ships: ["wanderer"],
     selectedShip: "wanderer",
@@ -42,6 +60,68 @@ describe("metaStore migration", () => {
     const values = migrateMeta({ codex: ["a", "b"], xp: totalXpForLevel(4) }, 2);
     expect(values.codex).toEqual(["a", "b"]);
     expect(values.level).toBe(4);
+  });
+
+  it("re-prices a v14 allocation, confiscates nothing, and banks one respec", () => {
+    const values = migrateMeta(
+      { xp: totalXpForLevel(13), chartPicks: [...V14_KEYSTONE_LINE] },
+      14,
+    );
+    expect(values.level).toBe(13);
+    expect(values.chartPicks).toEqual([...V14_KEYSTONE_LINE]);
+    expect(pointsSpent(values.chartPicks)).toBe(39);
+    expect(pointsTotal(values.level)).toBe(13);
+    expect(values.chartFreeRespecs).toBe(1);
+  });
+
+  it("leaves a v14 allocation that still fits alone", () => {
+    const picks = ["red-gate", "red-s1", "red-s3"];
+    const values = migrateMeta(
+      { xp: totalXpForLevel(13), chartPicks: picks },
+      14,
+    );
+    expect(pointsSpent(values.chartPicks)).toBe(4);
+    expect(values.chartFreeRespecs).toBe(0);
+  });
+
+  it("banks a respec when a v15 allocation lost its door to the hub", () => {
+    const values = migrateMeta(
+      {
+        xp: totalXpForLevel(40),
+        chartPicks: ["hub-i7", "hub-o9"],
+      },
+      15,
+    );
+    expect(values.chartPicks).toEqual(["hub-i7", "hub-o9"]);
+    expect(pointsSpent(values.chartPicks)).toBeLessThan(pointsTotal(40));
+    expect(values.chartFreeRespecs).toBe(1);
+  });
+
+  it("never hands out a second free respec on a later migration", () => {
+    const values = migrateMeta(
+      {
+        xp: totalXpForLevel(13),
+        chartPicks: [...V14_KEYSTONE_LINE],
+        chartFreeRespecs: 1,
+      },
+      16,
+    );
+    expect(values.chartFreeRespecs).toBe(1);
+  });
+});
+
+describe("free full respec", () => {
+  beforeEach(resetMeta);
+
+  it("clears every pick once, and only once", () => {
+    useMetaStore.setState({
+      chartPicks: [...V14_KEYSTONE_LINE],
+      chartFreeRespecs: 1,
+    });
+    expect(useMetaStore.getState().fullRespec()).toBe(true);
+    expect(useMetaStore.getState().chartPicks).toEqual([]);
+    expect(useMetaStore.getState().chartFreeRespecs).toBe(0);
+    expect(useMetaStore.getState().fullRespec()).toBe(false);
   });
 });
 

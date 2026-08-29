@@ -80,7 +80,7 @@
     "pathCost": "Pfad von hier aus: {{n}} Punkte (du hast {{have}})",
     "refundFree": "Rückerstattung (kostenlos)",
     "respecConfirmTitle": "Diesen Knoten zurückerstatten?",
-    "respecConfirmBody": "„{{name}}“ wird wieder in den Pool zurückgelegt, und der Punkt wird zurückgegeben. Kosten: {{cost}}◈.",
+    "respecConfirmBody": "„{{name}}“ wird wieder in den Pool zurückgelegt, und {{points}} Punkt(e) werden zurückgegeben. Kosten: {{cost}}◈.",
     "respecConfirmYes": "Rückerstattung",
     "redPowderRoom": "Gäste-WC",
     "redRangeCard": "Schusskarte",
@@ -105,7 +105,13 @@
     "greyShimStack": "Unterlegscheibenstapel",
     "greyPatternBook": "Musterbuch",
     "greyBallastTrim": "Ballasttrimmung",
-    "greyTallyStick": "Zählstab"
+    "greyTallyStick": "Zählstab",
+    "cost": "Kosten {{n}}",
+    "repriced": "Die Knotenpreise haben sich geändert: deine Auswahl kostet jetzt {{spent}} von {{total}} Punkten. Nichts wurde weggenommen — ein vollständiger Respec ist kostenlos.",
+    "freeRespec": "Kostenloser Respec",
+    "freeRespecTitle": "Die gesamte Karte leeren?",
+    "freeRespecBody": "Alle zugewiesenen Knoten ({{n}}) gehen in den Pool zurück und jeder Punkt wird erstattet. Dieses Zurücksetzen ist kostenlos.",
+    "freeRespecYes": "Leeren"
   },
   "chartFx": {
     "hubBudget": "+1 Hangar-Budget",

@@ -80,7 +80,7 @@
     "pathCost": "Path from here: {{n}} points (you have {{have}})",
     "refundFree": "Refund (free)",
     "respecConfirmTitle": "Refund this node?",
-    "respecConfirmBody": "«{{name}}» goes back into the pool and the point returns. Cost: {{cost}}◈.",
+    "respecConfirmBody": "«{{name}}» goes back into the pool and {{points}} point(s) return. Cost: {{cost}}◈.",
     "respecConfirmYes": "Refund",
     "redPowderRoom": "Powder Room",
     "redRangeCard": "Range Card",
@@ -105,7 +105,13 @@
     "greyShimStack": "Shim Stack",
     "greyPatternBook": "Pattern Book",
     "greyBallastTrim": "Ballast Trim",
-    "greyTallyStick": "Tally Stick"
+    "greyTallyStick": "Tally Stick",
+    "cost": "Cost {{n}}",
+    "repriced": "Node prices changed: your picks now cost {{spent}} of {{total}} points. Nothing was taken back — one full respec is free.",
+    "freeRespec": "Free respec",
+    "freeRespecTitle": "Clear the whole chart?",
+    "freeRespecBody": "All {{n}} allocated nodes go back into the pool and every point returns. This reset is free.",
+    "freeRespecYes": "Clear"
   },
   "chartFx": {
     "hubBudget": "+1 hangar budget",

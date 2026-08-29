@@ -23,5 +23,6 @@ jobs:
       - run: npm run sim:economy
       - run: npm run sim:puzzles
       - run: npm run sim:roster
+      - run: npm run sim:ladder
       - run: npm run build
       - run: npm run size:check

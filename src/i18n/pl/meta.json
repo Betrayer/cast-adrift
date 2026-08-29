@@ -80,7 +80,7 @@
     "pathCost": "Ścieżka stąd: {{n}} punktów (masz {{have}})",
     "refundFree": "Zwrot kosztów (bezpłatny)",
     "respecConfirmTitle": "Czy chcesz usunąć ten węzeł?",
-    "respecConfirmBody": "„{{name}}” wraca do puli, a punkt zostaje przywrócony. Koszt: {{cost}}◈.",
+    "respecConfirmBody": "„{{name}}” wraca do puli, a {{points}} punkt(ów) zostaje przywróconych. Koszt: {{cost}}◈.",
     "respecConfirmYes": "Zwrot pieniędzy",
     "redPowderRoom": "Toaleta dla kobiet",
     "redRangeCard": "Karta zasięgu",
@@ -105,7 +105,13 @@
     "greyShimStack": "Stos podkładek",
     "greyPatternBook": "Zbiór wzorów",
     "greyBallastTrim": "Regulacja balastu",
-    "greyTallyStick": "Kij do liczenia"
+    "greyTallyStick": "Kij do liczenia",
+    "cost": "Koszt {{n}}",
+    "repriced": "Ceny węzłów się zmieniły: twój wybór kosztuje teraz {{spent}} z {{total}} punktów. Nic nie zostało zabrane — jeden pełny reset jest darmowy.",
+    "freeRespec": "Darmowy reset",
+    "freeRespecTitle": "Wyczyścić całą mapę?",
+    "freeRespecBody": "Wszystkie przydzielone węzły ({{n}}) wracają do puli, a punkty są zwracane w całości. Ten reset jest darmowy.",
+    "freeRespecYes": "Wyczyść"
   },
   "chartFx": {
     "hubBudget": "+1 budżet na hangar",

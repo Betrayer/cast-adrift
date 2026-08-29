@@ -11,6 +11,7 @@ import { socketsForDie } from '@/data/engravings';
 import { isThemeId, type ThemeId } from '@/data/themes';
 import { SHIP_BY_ID, type ShipId } from '@/data/ships';
 import type { BattleLayoutId } from '@/types';
+import { isOverBudget, picksConnected } from '@/game/chart/engine';
 import { levelFromTotalXp } from '@/game/xp';
 import { scopedPersistStorage } from '@/stores/scopedStorage';
 
@@ -101,6 +102,7 @@ export interface MetaValues {
   xp: number;
   level: number;
   chartPicks: string[];
+  chartFreeRespecs: number;
   collection: CollectionEntry[];
   ships: ShipId[];
   selectedShip: ShipId;
@@ -146,6 +148,8 @@ export interface MetaState extends MetaValues {
   spendShards: (n: number) => boolean;
   allocatePick: (id: string) => void;
   deallocatePick: (id: string) => void;
+  grantChartRespec: () => void;
+  fullRespec: () => boolean;
   addToCollection: (defId: string, n?: number) => void;
   buyDie: (defId: string, price: number) => boolean;
   setDeck: (deck: readonly string[]) => void;
@@ -182,7 +186,7 @@ export interface MetaState extends MetaValues {
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 14;
+export const META_VERSION = 16;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -279,6 +283,7 @@ export const createInitialMetaValues = (): MetaValues => ({
   xp: 0,
   level: 1,
   chartPicks: [],
+  chartFreeRespecs: 0,
   collection: buildStarterCollection(),
   ships: ['wanderer'],
   selectedShip: 'wanderer',
@@ -446,6 +451,15 @@ export const migrateMeta = (
   const prev = (persisted ?? {}) as Partial<MetaValues>;
   const base = createInitialMetaValues();
   const ships = coerceShips(prev.ships, base.ships);
+  const level =
+    typeof prev.xp === 'number'
+      ? levelFromTotalXp(prev.xp)
+      : typeof prev.level === 'number'
+        ? prev.level
+        : base.level;
+  const picks = Array.isArray(prev.chartPicks)
+    ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
+    : base.chartPicks;
   const selectedShip =
     typeof prev.selectedShip === 'string' &&
     ships.includes(prev.selectedShip as ShipId)
@@ -459,15 +473,14 @@ export const migrateMeta = (
       coerceStrings(prev.voucherOffers, base.voucherOffers),
     ),
     xp: typeof prev.xp === 'number' ? prev.xp : base.xp,
-    level:
-      typeof prev.xp === 'number'
-        ? levelFromTotalXp(prev.xp)
-        : typeof prev.level === 'number'
-          ? prev.level
-          : base.level,
-    chartPicks: Array.isArray(prev.chartPicks)
-      ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
-      : base.chartPicks,
+    level,
+    chartPicks: picks,
+    chartFreeRespecs:
+      typeof prev.chartFreeRespecs === 'number' && prev.chartFreeRespecs > 0
+        ? prev.chartFreeRespecs
+        : isOverBudget(level, picks) || !picksConnected(picks)
+          ? 1
+          : base.chartFreeRespecs,
     collection: coerceCollection(prev.collection),
     ships,
     selectedShip,
@@ -621,6 +634,19 @@ export const useMetaStore = create<MetaState>()(
 
       deallocatePick: (id) => {
         set((s) => ({ chartPicks: s.chartPicks.filter((p) => p !== id) }));
+      },
+
+      grantChartRespec: () => {
+        set((s) => ({ chartFreeRespecs: s.chartFreeRespecs + 1 }));
+      },
+
+      fullRespec: () => {
+        if (get().chartFreeRespecs <= 0) return false;
+        set((s) => ({
+          chartPicks: [],
+          chartFreeRespecs: s.chartFreeRespecs - 1,
+        }));
+        return true;
       },
 
       addToCollection: (defId, n = 1) => {
@@ -948,6 +974,7 @@ export const useMetaStore = create<MetaState>()(
         xp: s.xp,
         level: s.level,
         chartPicks: s.chartPicks,
+        chartFreeRespecs: s.chartFreeRespecs,
         collection: s.collection,
         ships: s.ships,
         selectedShip: s.selectedShip,

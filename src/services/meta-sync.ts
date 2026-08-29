@@ -56,6 +56,7 @@ const metaValues = (): MetaValues => {
     xp: s.xp,
     level: s.level,
     chartPicks: s.chartPicks,
+    chartFreeRespecs: s.chartFreeRespecs,
     collection: s.collection,
     ships: s.ships,
     selectedShip: s.selectedShip,
