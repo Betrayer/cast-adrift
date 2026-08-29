@@ -392,7 +392,7 @@
     "corsair": {
       "name": "Pies myśliwski",
       "passiveName": "Dopalacz",
-      "passiveDesc": "Umiejętność „Manewr” działa na pełnych obrotach: +10% szansy na unik oraz maksymalny współczynnik 70/30 zamiast 55/25. Każdy unik lub trafienie z boku zapewnia +1 do broni w następnej turze, maksymalnie +2 na turę."
+      "passiveDesc": "Umiejętność „Manewr” działa na pełnych obrotach: muśnięcie 7,5% i unik 4,5% na wartość zamiast 3,5% i 1,5%, +8 ewazji oraz maksymalny współczynnik 55/40 zamiast 25/10. Każde trafienie z boku lub unik zapewnia +1 do broni w następnej turze, maksymalnie +2 na turę."
     },
     "foundry": {
       "name": "Kuźnia",

@@ -1,5 +1,5 @@
 import { useTranslation } from 'react-i18next';
-import { useCompactHeight } from '@/app/breakpoints';
+import { useCompactBox } from '@/app/viewportBox';
 import type { SlotProjection } from '@/game/battle/view';
 import { SlotGlyph } from '@/screens/Battle/board/SlotCard';
 import {
@@ -46,7 +46,7 @@ export const SlotRow = ({
   preview = false,
 }: SlotRowProps) => {
   const { t } = useTranslation(['battle']);
-  const compact = useCompactHeight();
+  const compact = useCompactBox();
   const school = slotSchool(slotId, slot, projection);
   const inherits = projection?.inherited ?? null;
   const note = affinityNote(t, slotId, slot, inherits);

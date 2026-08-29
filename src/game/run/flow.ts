@@ -39,7 +39,12 @@ import {
   type WormholeThrow,
 } from "@/game/map/wormhole";
 import { chaos } from "@/services/chaos";
-import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
+import {
+  DECK_CAP,
+  MINIBOSS_PACKAGE_SCRAP,
+  ptsForDie,
+  sellValue,
+} from "@/game/economy/prices";
 import { pushRunCloud } from "@/game/run/cloud";
 import {
   buildEncounterIds,
@@ -130,7 +135,6 @@ export { BASE_TIDE_CAP, tideCapFor };
 export const JUMPS_PER_TIDE = 4;
 export const WORMHOLE_REVEAL = 1;
 export const STARTING_SCRAP = 0;
-export const MINIBOSS_PACKAGE_SCRAP: readonly [number, number] = [30, 40];
 
 const STORM_SCHOOLS: readonly School[] = [
   "red",
@@ -1370,10 +1374,11 @@ const redrawDraft = (label: string): void => {
   if (pending === null) return;
   const nodeId = pending.draftNodeId ?? run.position ?? "draft";
   const stream = createStream(deriveSeed(run.seed, `${label}:${nodeId}`));
-  const choices = rollPerkChoices(
-    stream,
-    draftContext(run, pending.draftFloor),
-  );
+  const base = draftContext(run, pending.draftFloor);
+  const choices = rollPerkChoices(stream, {
+    ...base,
+    owned: [...base.owned, ...pending.perkChoices],
+  });
   useRunStore.getState().setPendingRewards({ ...pending, perkChoices: choices });
   noteDraftOffer(choices);
   autosaveRun();
@@ -1381,9 +1386,22 @@ const redrawDraft = (label: string): void => {
 
 export const banishPerkChoice = (perkId: string): void => {
   const run = useRunStore.getState();
-  if (run.pendingRewards === null) return;
+  const pending = run.pendingRewards;
+  if (pending === null) return;
+  if (!pending.perkChoices.includes(perkId)) return;
   if (!run.banishPerk(perkId)) return;
-  redrawDraft(`banish:${perkId}`);
+  const after = useRunStore.getState();
+  const kept = pending.perkChoices.filter((id) => id !== perkId);
+  const nodeId = pending.draftNodeId ?? after.position ?? "draft";
+  const base = draftContext(after, pending.draftFloor);
+  const replacement = rollPerkChoices(
+    createStream(deriveSeed(after.seed, `banish:${perkId}:${nodeId}`)),
+    { ...base, owned: [...base.owned, ...kept] },
+  ).slice(0, 1);
+  const choices = [...kept, ...replacement];
+  useRunStore.getState().setPendingRewards({ ...pending, perkChoices: choices });
+  noteDraftOffer(replacement);
+  autosaveRun();
 };
 
 export const rerollPerkDraft = (): void => {

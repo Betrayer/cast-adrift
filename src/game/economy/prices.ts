@@ -31,3 +31,5 @@ export const repairCost = (hullPoints: number): number =>
 
 export const mkUpgradeCost = (target: Exclude<MkLevel, 1>): number =>
   MK_COST[target];
+
+export const MINIBOSS_PACKAGE_SCRAP: readonly [number, number] = [30, 40];

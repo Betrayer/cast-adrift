@@ -5,21 +5,30 @@ import {
   isEntryNode,
 } from "@/data/chart";
 import { bonusChartPoints, FREE_RESPEC_LEVEL } from "@/data/milestones";
+import { chartCostOf, chartNodeCost } from "@/game/chart/cost";
 import { MAX_LEVEL } from "@/game/xp";
 import type { SlotId } from "@/types/battle";
 
 export const RESPEC_SHARD_COST = 20;
 
-export const respecCost = (level: number): number =>
-  level >= FREE_RESPEC_LEVEL ? 0 : RESPEC_SHARD_COST;
+export const respecCost = (level: number, id: string): number =>
+  level >= FREE_RESPEC_LEVEL ? 0 : RESPEC_SHARD_COST * chartNodeCost(id);
 
 export const pointsTotal = (level: number): number =>
   Math.min(MAX_LEVEL, level) + bonusChartPoints(level);
 
+export const pointsSpent = (picks: readonly string[]): number =>
+  chartCostOf(picks);
+
 export const pointsAvailable = (
   level: number,
   picks: readonly string[],
-): number => pointsTotal(level) - picks.length;
+): number => pointsTotal(level) - pointsSpent(picks);
+
+export const isOverBudget = (
+  level: number,
+  picks: readonly string[],
+): boolean => pointsAvailable(level, picks) < 0;
 
 export const isAllocatable = (
   id: string,
@@ -37,9 +46,10 @@ export const canAllocate = (
   level: number,
   picks: readonly string[],
 ): boolean =>
-  pointsAvailable(level, picks) > 0 && isAllocatable(id, picks);
+  pointsAvailable(level, picks) >= chartNodeCost(id) &&
+  isAllocatable(id, picks);
 
-const allConnectedToEntry = (picks: readonly string[]): boolean => {
+export const picksConnected = (picks: readonly string[]): boolean => {
   if (picks.length === 0) return true;
   const set = new Set(picks);
   const visited = new Set<string>();
@@ -68,7 +78,7 @@ export const canDeallocate = (
   picks: readonly string[],
 ): boolean => {
   if (!picks.includes(id)) return false;
-  return allConnectedToEntry(picks.filter((p) => p !== id));
+  return picksConnected(picks.filter((p) => p !== id));
 };
 
 export interface ChartPath {
@@ -85,35 +95,34 @@ export const pathTo = (
   if (owned.has(target)) return { ids: [], cost: 0 };
   const dist = new Map<string, number>();
   const from = new Map<string, string>();
-  const deque: string[] = [];
-  for (const id of picks) {
-    dist.set(id, 0);
-    deque.push(id);
-  }
+  const settled = new Set<string>();
+  for (const id of picks) dist.set(id, 0);
   for (const node of CHART_NODES) {
     if (node.entry !== true || owned.has(node.id)) continue;
-    dist.set(node.id, 1);
-    deque.push(node.id);
+    dist.set(node.id, chartNodeCost(node.id));
   }
-  deque.sort((a, b) => (dist.get(a) ?? 0) - (dist.get(b) ?? 0));
-  while (deque.length > 0) {
-    const current = deque.shift();
+  for (;;) {
+    let current: string | undefined;
+    let best = Infinity;
+    for (const [id, d] of dist) {
+      if (settled.has(id) || d >= best) continue;
+      best = d;
+      current = id;
+    }
     if (current === undefined) break;
-    const base = dist.get(current) ?? 0;
+    settled.add(current);
     if (current === target) break;
     for (const next of chartNeighbors(current)) {
-      const step = owned.has(next) ? 0 : 1;
-      const candidate = base + step;
+      if (settled.has(next)) continue;
+      const candidate = best + (owned.has(next) ? 0 : chartNodeCost(next));
       const known = dist.get(next);
       if (known !== undefined && known <= candidate) continue;
       dist.set(next, candidate);
       from.set(next, current);
-      if (step === 0) deque.unshift(next);
-      else deque.push(next);
     }
   }
   const cost = dist.get(target);
-  if (cost === undefined) return null;
+  if (cost === undefined || !settled.has(target)) return null;
   const ids: string[] = [];
   let cursor: string | undefined = target;
   while (cursor !== undefined) {

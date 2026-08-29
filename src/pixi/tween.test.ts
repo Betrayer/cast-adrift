@@ -182,6 +182,54 @@ describe("Tweens v2", () => {
   });
 });
 
+describe("Tweens destroyed targets", () => {
+  it("drops a tween whose target was destroyed instead of writing to it", () => {
+    const { tweens, step } = makeTweens();
+    const target = { x: 0, destroyed: false };
+    tweens.to(target, { x: 100 }, 100, linear);
+    step(50);
+    expect(target.x).toBeCloseTo(50);
+    target.destroyed = true;
+    step(50);
+    expect(target.x).toBeCloseTo(50);
+  });
+
+  it("never fires the completion of a tween whose target was destroyed", () => {
+    const { tweens, step } = makeTweens();
+    const target = { x: 0, destroyed: false };
+    let done = 0;
+    tweens.to(target, { x: 100 }, 100, linear, () => {
+      done += 1;
+    });
+    target.destroyed = true;
+    step(200);
+    expect(done).toBe(0);
+  });
+
+  it("drops a point tween once the object observing it was destroyed", () => {
+    const { tweens, step } = makeTweens();
+    const owner = { destroyed: false };
+    const scale = { x: 1, y: 1, _observer: owner };
+    tweens.to(scale, { x: 0.5 }, 100, linear);
+    step(50);
+    expect(scale.x).toBeCloseTo(0.75);
+    owner.destroyed = true;
+    step(50);
+    expect(scale.x).toBeCloseTo(0.75);
+  });
+
+  it("keeps running tweens on live targets that sit beside a destroyed one", () => {
+    const { tweens, step } = makeTweens();
+    const dead = { x: 0, destroyed: true };
+    const live = { x: 0 };
+    tweens.to(dead, { x: 100 }, 100, linear);
+    tweens.to(live, { x: 100 }, 100, linear);
+    step(50);
+    expect(dead.x).toBe(0);
+    expect(live.x).toBeCloseTo(50);
+  });
+});
+
 describe("rafClock", () => {
   it("runs only while it has listeners", () => {
     const frames: FrameRequestCallback[] = [];

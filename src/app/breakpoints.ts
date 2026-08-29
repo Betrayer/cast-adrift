@@ -30,7 +30,7 @@ export const atLeast = (width: number, bp: Breakpoint): boolean =>
   width >= BREAKPOINTS[bp];
 
 export const HEIGHTS = {
-  compact: 700,
+  compact: 780,
 } as const;
 
 export const HEIGHT_ORDER: readonly (keyof typeof HEIGHTS)[] = ['compact'];
@@ -86,12 +86,6 @@ export const useViewport = (): Viewport =>
 
 export const useAtLeast = (bp: Breakpoint): boolean =>
   atLeast(useViewport().width, bp);
-
-export const isCompactHeight = (height: number): boolean =>
-  height <= HEIGHTS.compact;
-
-export const useCompactHeight = (): boolean =>
-  isCompactHeight(useViewport().height);
 
 export const useRotateGate = (): boolean => {
   const { width, height } = useViewport();

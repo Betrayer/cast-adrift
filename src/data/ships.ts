@@ -22,6 +22,8 @@ export type ShipPassive =
       evasionDelta: number;
       dodgeCap: number;
       glancingCap: number;
+      dodgePerValue: number;
+      glancingPerValue: number;
     }
   | { kind: "annealer"; tierStep: number }
   | { kind: "refractor"; censusMult: number };
@@ -105,9 +107,11 @@ export const SHIPS: readonly ShipDef[] = [
       kind: "afterburner",
       weapons: 1,
       cap: 2,
-      evasionDelta: 10,
-      dodgeCap: 70,
-      glancingCap: 30,
+      evasionDelta: 8,
+      dodgeCap: 40,
+      glancingCap: 55,
+      dodgePerValue: 4.5,
+      glancingPerValue: 7.5,
     },
     slots: {
       weaponA: { cap: 8, mk: 1 },

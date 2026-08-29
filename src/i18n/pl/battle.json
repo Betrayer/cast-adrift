@@ -88,7 +88,7 @@
     "reactor": "Reaktor",
     "repairBay": "Stacja naprawcza",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
-    "evasion": "unik {{dodge}}% · muśnięcie {{glancing}}%",
+    "evasion": "mu {{glancing}}% · un {{dodge}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "limit ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -150,7 +150,9 @@
     "blue": "nie",
     "green": "zie",
     "grey": "sza",
-    "black": "cza"
+    "black": "cza",
+    "yellow": "żół",
+    "prismatic": "pry"
   },
   "proj": {
     "jam": "ZACINA",
@@ -197,7 +199,7 @@
     "reserve": "▣"
   },
   "projShort": {
-    "dodge": "{{n}}%",
+    "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
     "none": "—"
@@ -325,9 +327,11 @@
   "mkWhy": "Mk podnosi limit slotu i bonus powinowactwa jego szkoły.",
   "resEarned": "Zdobyte",
   "manoeuvreTitle": "Manewr",
-  "manoeuvreWhy": "Kość w Silnikach ustala jeden rzut uniku na turę: unik {{dodge}}% × wartość (maks. {{dodgeCap}}%), muśnięcie {{glancing}}% × wartość (maks. {{glancingCap}}%). Unik nie przyjmuje nic, muśnięcie połowę, reszta trafia w całości. Od wartości {{intercept}} pierwszy cios jest przechwytywany w całości. Wartość to kość po powinowactwie i bonusach.",
+  "manoeuvreWhy": "Kość w Silnikach ustala jeden rzut uniku na każdy przychodzący cios: muśnięcie {{glancing}}% × wartość (maks. {{glancingCap}}%), unik {{dodge}}% × wartość (maks. {{dodgeCap}}%). Muśnięcie przyjmuje połowę, w górę, unik nic, reszta trafia w całości. Od wartości {{intercept}} pierwsza udana ewazja tury — muśnięcie lub unik — to przechwycenie: Broń +1 w następnej turze. Wartość to kość po powinowactwie i bonusach.",
+  "manoeuvreBrief": "Jeden rzut na cios: muśnięcie {{glancing}}% × wartość (maks {{glancingCap}}%), unik {{dodge}}% × wartość (maks {{dodgeCap}}%). Muśnięcie przyjmuje połowę, unik nic. Od {{intercept}} pierwsza ewazja daje Broń +1.",
   "targetingTitle": "Naprowadzanie",
   "targetingWhy": "Kość w Sensorach czyni cel Podatnym +D na turę: D to połowa wartości kości zaokrąglona w górę, nie więcej niż {{cap}}, a każdy cios w tej turze zadaje o tyle więcej. Na najwyższej ściance kości cios dodatkowo przebija tarczę. Mk Sensorów dodatkowo odsłania jeden rząd mapy za każdy poziom powyżej Mk1.",
+  "targetingBrief": "Sensory znaczą cel: Wrażliwy +D na turę, D to połowa wartości kości w górę, maks {{cap}}. Każdy cios tej tury zadaje tyle więcej; maksymalna ścianka przebija też tarczę.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systemy",
   "journal": {

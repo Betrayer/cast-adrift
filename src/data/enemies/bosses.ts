@@ -64,7 +64,7 @@ export const BOSSES: readonly BossDef[] = [
         untilHpPct: 0,
         pattern: [
           { t: "shieldGate", n: 8 },
-          { t: "multi", n: 5, k: 2 },
+          { t: "multi", n: 4, k: 2 },
           { t: "siphonShield", n: 6 },
         ],
         onEnter: [{ t: "shieldGate", n: 10 }],
@@ -95,25 +95,25 @@ export const BOSSES: readonly BossDef[] = [
       {
         untilHpPct: 40,
         pattern: [
-          { t: "attack", n: 7 },
+          { t: "attack", n: 6 },
           { t: "stealScrap", n: 6 },
-          { t: "multi", n: 4, k: 2 },
+          { t: "multi", n: 3, k: 2 },
         ],
       },
       {
         untilHpPct: 0,
         pattern: [
-          { t: "multi", n: 4, k: 2 },
-          { t: "attack", n: 8 },
+          { t: "multi", n: 3, k: 2 },
+          { t: "attack", n: 7 },
           { t: "stealScrap", n: 6 },
         ],
         onEnter: [{ t: "charge" }],
       },
     ],
     pattern: [
-      { t: "attack", n: 7 },
+      { t: "attack", n: 6 },
       { t: "stealScrap", n: 6 },
-      { t: "multi", n: 4, k: 2 },
+      { t: "multi", n: 3, k: 2 },
     ],
   }),
   bossDef({
@@ -135,7 +135,7 @@ export const BOSSES: readonly BossDef[] = [
         untilHpPct: 45,
         pattern: [
           { t: "bargain", n: 7, heal: 4 },
-          { t: "attack", n: 10 },
+          { t: "attack", n: 11 },
           { t: "multi", n: 4, k: 2 },
         ],
       },
@@ -151,7 +151,7 @@ export const BOSSES: readonly BossDef[] = [
     ],
     pattern: [
       { t: "bargain", n: 7, heal: 4 },
-      { t: "attack", n: 10 },
+      { t: "attack", n: 11 },
       { t: "multi", n: 4, k: 2 },
     ],
   }),
@@ -247,25 +247,25 @@ export const BOSSES: readonly BossDef[] = [
       {
         untilHpPct: 55,
         pattern: [
-          { t: "multi", n: 4, k: 2 },
+          { t: "multi", n: 3, k: 2 },
           { t: "charge" },
-          { t: "attack", n: 9 },
+          { t: "attack", n: 7 },
         ],
       },
       {
         untilHpPct: 0,
         pattern: [
           { t: "charge" },
-          { t: "multi", n: 5, k: 2 },
+          { t: "multi", n: 4, k: 2 },
           { t: "healAllies", n: 6 },
         ],
         onEnter: [{ t: "shieldAll", n: 8 }],
       },
     ],
     pattern: [
-      { t: "multi", n: 4, k: 2 },
+      { t: "multi", n: 3, k: 2 },
       { t: "charge" },
-      { t: "attack", n: 9 },
+      { t: "attack", n: 7 },
     ],
   }),
   bossDef({
@@ -470,7 +470,7 @@ export const BOSSES: readonly BossDef[] = [
         pattern: [
           { t: "shieldGate", n: 10 },
           { t: "stealScrap", n: 8 },
-          { t: "multi", n: 6, k: 2 },
+          { t: "multi", n: 3, k: 2 },
           { t: "siphonShield", n: 6 },
         ],
       },
@@ -479,7 +479,7 @@ export const BOSSES: readonly BossDef[] = [
         pattern: [
           { t: "capShrink" },
           { t: "charge" },
-          { t: "multi", n: 6, k: 2 },
+          { t: "multi", n: 3, k: 2 },
         ],
         onEnter: [{ t: "shieldAll", n: 8 }],
       },
@@ -487,7 +487,7 @@ export const BOSSES: readonly BossDef[] = [
         untilHpPct: 0,
         pattern: [
           { t: "mirrorSchool" },
-          { t: "attack", n: 9 },
+          { t: "attack", n: 6 },
           { t: "echoTotal", cap: 16 },
         ],
         everyTurn: [{ t: "storm" }],

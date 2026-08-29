@@ -25,8 +25,11 @@ import {
   isAllocatable,
   pathTo,
   pointsAvailable,
+  pointsSpent,
+  pointsTotal,
   respecCost,
 } from "@/game/chart/engine";
+import { chartNodeCost } from "@/game/chart/cost";
 import { chartNodeLines, chartNodeTitle } from "@/game/chart/describe";
 import { trackEvent } from "@/services/analytics";
 import { playSfx } from "@/services/audio";
@@ -115,6 +118,8 @@ export const ChartScreen = () => {
   const allocatePick = useMetaStore((s) => s.allocatePick);
   const deallocatePick = useMetaStore((s) => s.deallocatePick);
   const spendShards = useMetaStore((s) => s.spendShards);
+  const freeRespecs = useMetaStore((s) => s.chartFreeRespecs);
+  const fullRespec = useMetaStore((s) => s.fullRespec);
   const wide = useAtLeast("lg");
 
   const [view, setView] = useState<ChartView>(IDENTITY);
@@ -122,6 +127,7 @@ export const ChartScreen = () => {
   const [hovered, setHovered] = useState<string | null>(null);
   const [respec, setRespec] = useState(false);
   const [confirmRefund, setConfirmRefund] = useState<string | null>(null);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [tagFilter, setTagFilter] = useState<string[]>([]);
   const [filterOpen, setFilterOpen] = useState(false);
   const [viewport, setViewport] = useState<Box>({ x: 0, y: 0, w: 0, h: 0 });
@@ -136,7 +142,6 @@ export const ChartScreen = () => {
 
   const pickSet = useMemo(() => new Set(picks), [picks]);
   const points = pointsAvailable(level, picks);
-  const refundCost = respecCost(level);
 
   const previewId = hovered ?? selected;
   const preview = useMemo(
@@ -311,6 +316,10 @@ export const ChartScreen = () => {
     setView((v) => zoomAt(v, CHART_BOUNDS, 1.8, anchor));
   };
 
+  const stopStagePointer = (e: React.PointerEvent): void => {
+    e.stopPropagation();
+  };
+
   const onNodeTap = (id: string): void => {
     if (dragged.current) return;
     setSelected(id);
@@ -331,7 +340,8 @@ export const ChartScreen = () => {
 
   const refund = (id: string): void => {
     if (!canDeallocate(id, picks)) return;
-    if (refundCost > 0 && !spendShards(refundCost)) return;
+    const price = respecCost(level, id);
+    if (price > 0 && !spendShards(price)) return;
     playSfx("respecConfirm");
     trackEvent({ name: "meta_purchase", params: { kind: "respec" } });
     deallocatePick(id);
@@ -342,6 +352,10 @@ export const ChartScreen = () => {
     selected !== null ? CHART_NODE_BY_ID.get(selected) : undefined;
   const refundTarget =
     confirmRefund !== null ? CHART_NODE_BY_ID.get(confirmRefund) : undefined;
+  const selectedCost =
+    selectedNode === undefined ? 0 : chartNodeCost(selectedNode.id);
+  const selectedRefund =
+    selectedNode === undefined ? 0 : respecCost(level, selectedNode.id);
   const cssPerUnit =
     viewport.w > 0
       ? Math.min(
@@ -365,21 +379,29 @@ export const ChartScreen = () => {
         radius="md"
         withBorder
         data-chart-detail
+        onPointerDown={stopStagePointer}
+        onPointerUp={stopStagePointer}
+        onPointerMove={stopStagePointer}
       >
         <Stack gap="xs">
           <Group justify="space-between">
             <Text fw={600} c={tokens.text}>
               {chartNodeTitle(selectedNode, t)}
             </Text>
-            <Badge
-              variant="light"
-              color="gray"
-              style={{
-                color: constellationColor(selectedNode.constellation).stroke,
-              }}
-            >
-              {t(`meta:constellation.${selectedNode.constellation}`)}
-            </Badge>
+            <Group gap={4}>
+              <Badge variant="light" color="gray" data-chart-cost={selectedCost}>
+                {t("meta:chart.cost", { n: selectedCost })}
+              </Badge>
+              <Badge
+                variant="light"
+                color="gray"
+                style={{
+                  color: constellationColor(selectedNode.constellation).stroke,
+                }}
+              >
+                {t(`meta:constellation.${selectedNode.constellation}`)}
+              </Badge>
+            </Group>
           </Group>
           {chartNodeLines(selectedNode, t).map((line, i) => (
             <Text
@@ -409,15 +431,15 @@ export const ChartScreen = () => {
                 data-chart-refund
                 disabled={
                   !canDeallocate(selectedNode.id, picks) ||
-                  shards < refundCost
+                  shards < selectedRefund
                 }
                 onClick={() => {
                   setConfirmRefund(selectedNode.id);
                 }}
               >
-                {refundCost === 0
+                {selectedRefund === 0
                   ? t("meta:chart.refundFree")
-                  : t("meta:chart.refundCost", { cost: refundCost })}
+                  : t("meta:chart.refundCost", { cost: selectedRefund })}
               </Button>
             ) : (
               <Badge color="teal" variant="light">
@@ -441,7 +463,7 @@ export const ChartScreen = () => {
                   allocate(selectedNode.id);
                 }}
               >
-                {points <= 0
+                {points < selectedCost
                   ? t("meta:chart.noPoints")
                   : t("meta:chart.allocate")}
               </Button>
@@ -487,6 +509,35 @@ export const ChartScreen = () => {
               </>
             }
           />
+          {freeRespecs > 0 ? (
+            <Paper
+              className={styles.banner}
+              bg={tokens.surface2}
+              p="xs"
+              radius="md"
+              withBorder
+              data-chart-repriced
+            >
+              <Group justify="space-between" gap="xs" wrap="nowrap">
+                <Text size="xs" c={tokens.dim}>
+                  {t("meta:chart.repriced", {
+                    spent: pointsSpent(picks),
+                    total: pointsTotal(level),
+                  })}
+                </Text>
+                <Button
+                  size="compact-xs"
+                  color="danger"
+                  data-chart-free-respec
+                  onClick={() => {
+                    setConfirmReset(true);
+                  }}
+                >
+                  {t("meta:chart.freeRespec")}
+                </Button>
+              </Group>
+            </Paper>
+          ) : null}
         </div>
       }
     >
@@ -646,7 +697,12 @@ export const ChartScreen = () => {
               })}
             </g>
           </svg>
-          <div className={styles.zoomControls}>
+          <div
+            className={styles.zoomControls}
+            onPointerDown={stopStagePointer}
+            onPointerUp={stopStagePointer}
+            onPointerMove={stopStagePointer}
+          >
             <ActionIcon
               variant="default"
               onClick={() => {
@@ -677,6 +733,9 @@ export const ChartScreen = () => {
               radius="md"
               withBorder
               data-chart-filter
+              onPointerDown={stopStagePointer}
+              onPointerUp={stopStagePointer}
+              onPointerMove={stopStagePointer}
             >
               <Chip.Group
                 multiple
@@ -742,7 +801,8 @@ export const ChartScreen = () => {
               ? ""
               : t("meta:chart.respecConfirmBody", {
                   name: chartNodeTitle(refundTarget, t),
-                  cost: refundCost,
+                  cost: respecCost(level, refundTarget.id),
+                  points: chartNodeCost(refundTarget.id),
                 })}
           </Text>
           <Group grow>
@@ -762,6 +822,43 @@ export const ChartScreen = () => {
               }}
             >
               {t("meta:chart.respecConfirmYes")}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
+      <Modal
+        opened={confirmReset}
+        onClose={() => {
+          setConfirmReset(false);
+        }}
+        title={t("meta:chart.freeRespecTitle")}
+        centered
+        data-full-respec-confirm
+      >
+        <Stack gap="sm">
+          <Text size="sm" c={tokens.dim}>
+            {t("meta:chart.freeRespecBody", { n: picks.length })}
+          </Text>
+          <Group grow>
+            <Button
+              variant="default"
+              onClick={() => {
+                setConfirmReset(false);
+              }}
+            >
+              {t("common:cancel")}
+            </Button>
+            <Button
+              color="danger"
+              data-full-respec-yes
+              onClick={() => {
+                playSfx("respecConfirm");
+                fullRespec();
+                setSelected(null);
+                setConfirmReset(false);
+              }}
+            >
+              {t("meta:chart.freeRespecYes")}
             </Button>
           </Group>
         </Stack>

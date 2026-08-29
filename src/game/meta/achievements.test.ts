@@ -411,7 +411,7 @@ describe("id migration", () => {
     expect(migrated.stats.kills).toBe(700);
     expect(migrated.vouchers).toEqual({ perkDraft: 0 });
     expect(migrated.voucherOffers).toEqual([]);
-    expect(META_VERSION).toBe(14);
+    expect(META_VERSION).toBe(16);
   });
 
   it("keeps a die unlock reachable through its renamed achievement", () => {

@@ -27,7 +27,7 @@ import {
   BLOOD_REACTOR_CHARGE,
   BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
-  NUDGE_COST,
+  nudgeChargeCost,
   resolveEnemyPhase,
   resolvePlayerPhase,
   SACRIFICE_DAMAGE,
@@ -1066,11 +1066,10 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         dieHasGrant(s.engravings, die.defId, "freeNudge") &&
         !s.spentGrants.includes(`nudge:${uid}`);
       const useFree = !springFree && s.freeNudges > 0;
-      const cost = Math.max(
-        0,
-        NUDGE_COST +
-          computeRunMods(s.perks, s.chartPicks, s.modules).nudgeCostDelta +
+      const cost = nudgeChargeCost(
+        computeRunMods(s.perks, s.chartPicks, s.modules).nudgeCostDelta +
           computeMutatorMods(s.mutators).nudgeCostDelta,
+        runHasTrait(s.perks, s.chartPicks, "coldLogic", s.modules),
       );
       if (!springFree && !useFree && s.charge < cost) return s;
       return {

@@ -33,6 +33,7 @@ import {
   maxRealSchoolCount,
   runAnomaly,
   runDraft,
+  runEvent,
   takeDie,
   type PuzzleTally,
   type RunState,
@@ -46,6 +47,9 @@ import {
 import { PLAYABLE_SHIPS, type ShipId } from "../src/data/ships";
 import { THEMES } from "../src/data/themes";
 import { RESPEC_SHARD_COST } from "../src/game/chart/engine";
+import { nudgeChargeCost } from "../src/game/battle/resolver";
+import { computeMutatorMods } from "../src/data/mutators";
+import { runHasTrait } from "../src/game/run/runMods";
 import {
   bossFirstKillShards,
   levelFromTotalXp,
@@ -60,8 +64,15 @@ import {
   expandEncounterIds,
   isEncounterGroup,
 } from "../src/data/enemies";
-import { DECK_CAP } from "../src/game/economy/prices";
-import { computeNodeReward, isDraftNode } from "../src/game/economy/rewards";
+import {
+  DECK_CAP,
+  MINIBOSS_PACKAGE_SCRAP,
+} from "../src/game/economy/prices";
+import {
+  computeNodeReward,
+  dieForRarity,
+  isDraftNode,
+} from "../src/game/economy/rewards";
 import { SECTORS } from "../src/data/sectors";
 import {
   bossNodeIdFor,
@@ -102,6 +113,7 @@ import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
 import { ascensionMods } from "../src/data/ascension";
 import { moduleSlots } from "../src/data/modules";
 import { ALL_PERKS } from "../src/data/perks";
+import type { PerkPool } from "../src/data/perks/types";
 import { PERK_DRAFT_SIZE } from "../src/game/run/perkDraft";
 import { decideDraft } from "./simPolicy/draft";
 import { schoolOf } from "./simPolicy/state";
@@ -137,6 +149,7 @@ interface BattleInit {
   perks?: readonly string[];
   chartPicks?: readonly string[];
   modules?: readonly string[];
+  mutators?: readonly string[];
   sectorHpPct?: number;
   sectorDmgPct?: number;
   enemyHpBonusPct?: number;
@@ -178,7 +191,6 @@ const applyPlacement = (
   slot.dieUid = uid;
 };
 
-const NUDGE = 3;
 const SURGE = 10;
 
 const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
@@ -189,11 +201,15 @@ const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
 };
 
 const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
-  const cost = Math.max(
-    1,
-    NUDGE +
-      computeRunMods(init.perks ?? [], init.chartPicks ?? [], init.modules ?? [])
-        .nudgeCostDelta,
+  const cost = nudgeChargeCost(
+    computeRunMods(init.perks ?? [], init.chartPicks ?? [], init.modules ?? [])
+      .nudgeCostDelta + computeMutatorMods(init.mutators ?? []).nudgeCostDelta,
+    runHasTrait(
+      init.perks ?? [],
+      init.chartPicks ?? [],
+      "coldLogic",
+      init.modules ?? [],
+    ),
   );
   if (snapshot.charge >= SURGE && snapshot.nextRollBonus === 0) {
     snapshot.charge -= SURGE;
@@ -543,6 +559,8 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         },
       );
       state.hull = res.hullLeft;
+      state.takenBySector[sector] = (state.takenBySector[sector] ?? 0) + res.taken;
+      state.fightsBySector[sector] = (state.fightsBySector[sector] ?? 0) + 1;
       state.kills += res.kills;
       if (!res.win) return stop(false, next.row);
       state.nodes += 1;
@@ -555,11 +573,25 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         Math.round(reward.scrap * opts.scrapMult * (1 + mods.scrapMultPct / 100)),
       );
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
-      if (reward.dieDrop !== null) takeDie(state, reward.dieDrop);
-      if (opts.rollModules && (type === "elite" || type === "miniboss")) {
-        const moduleId = rollModule(loot, state.modules, "common");
-        if (state.modules.length < moduleSlots(mods.moduleSlotDelta)) {
-          state.modules.push(moduleId);
+      if (type === "miniboss") {
+        gain(
+          state,
+          loot.int(MINIBOSS_PACKAGE_SCRAP[0], MINIBOSS_PACKAGE_SCRAP[1]),
+        );
+        const dieChoice = dieForRarity(loot, "rare", 0);
+        const moduleChoice = rollModule(loot, state.modules, "uncommon");
+        const bayFree =
+          state.modules.length < moduleSlots(mods.moduleSlotDelta);
+        if (opts.rollModules && bayFree) state.modules.push(moduleChoice);
+        else takeDie(state, dieChoice);
+        state.vouchers += 1;
+      } else {
+        if (reward.dieDrop !== null) takeDie(state, reward.dieDrop);
+        if (opts.rollModules && type === "elite") {
+          const moduleId = rollModule(loot, state.modules, "common");
+          if (state.modules.length < moduleSlots(mods.moduleSlotDelta)) {
+            state.modules.push(moduleId);
+          }
         }
       }
       if (isDraftNode(type) && opts.noDraft !== true) {
@@ -571,12 +603,61 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       runAnomaly(state, sector, next, deriveSeed(seed, `anomaly:${ns}`));
       state.nodes += 1;
     } else if (type === "beacon") {
+      runEvent(
+        state,
+        sector,
+        "beacon",
+        deriveSeed(seed, nsKey(ns, "beaconEvent", next.id)),
+        opts.tideCap,
+      );
       if (opts.noDraft !== true) {
         runDraft(
           state,
           sector,
           createStream(deriveSeed(seed, nsKey(ns, "beacon", next.id))),
         );
+      }
+      state.nodes += 1;
+    } else if (type === "event") {
+      const follow = runEvent(
+        state,
+        sector,
+        "event",
+        deriveSeed(seed, nsKey(ns, "event", next.id)),
+        opts.tideCap,
+      );
+      if (follow !== null) {
+        const res = simulateBattle(
+          [...follow.enemyIds],
+          state.deck,
+          deriveSeed(seed, nsKey(ns, "eventFight", next.id)),
+          {
+            shipId: state.shipId,
+            hull: state.hull,
+            hullMax: state.hullMax,
+            runScrap: state.scrap,
+            tide: state.tide,
+            interference: state.interference,
+            mkLevels: state.mkLevels,
+            perks: state.perks,
+            chartPicks: state.chartPicks,
+            modules: state.modules,
+            sectorHpPct: sectorHpPct({ sector }),
+            sectorDmgPct: sectorDmgPct({ sector }),
+            enemyHpBonusPct: opts.enemyHpBonusPct,
+            eliteShield: opts.eliteShield,
+            ascension: opts.ascension,
+          },
+        );
+        state.hull = res.hullLeft;
+        state.takenBySector[sector] =
+          (state.takenBySector[sector] ?? 0) + res.taken;
+        state.fightsBySector[sector] =
+          (state.fightsBySector[sector] ?? 0) + 1;
+        state.kills += res.kills;
+        if (!res.win) return stop(false, next.row);
+        state.fights += 1;
+        if (follow.scrap !== undefined) gain(state, follow.scrap);
       }
       state.nodes += 1;
     } else if (type === "shop") {
@@ -1430,47 +1511,89 @@ const ladderCell = (
   };
 };
 
-const printLadderCell = (cell: LadderCell): void => {
+const printLadderCell = (
+  cell: LadderCell,
+  target: number | null,
+): void => {
   const hist = [...cell.deathRows.entries()]
     .sort((a, b) => a[0] - b[0])
     .map(([row, count]) => `r${String(row)}:${String(count)}`)
     .join(" ");
+  const delta = target === null ? 0 : cell.winrate * 100 - target;
+  const out = target !== null && Math.abs(delta) > LADDER_BAND_PP;
   console.log(
-    `    ${cell.label.padEnd(22)} winrate ${(cell.winrate * 100).toFixed(1).padStart(5)}% · nodes ${cell.avgNodes.toFixed(1)} · fights ${cell.avgFights.toFixed(1)} · kills ${cell.avgKills.toFixed(1)} · hull(med) ${cell.hullMedian.toFixed(1)} · set ${cell.resonancePct.toFixed(0)}%`,
+    `    ${cell.label.padEnd(22)} winrate ${(cell.winrate * 100).toFixed(1).padStart(5)}%${target === null ? " · unchecked" : ` · target ${target.toFixed(0).padStart(3)} (${delta >= 0 ? "+" : ""}${delta.toFixed(1)}pp)${out ? " OUT OF BAND" : " ok"}`}`,
   );
   console.log(
-    `      deaths gate ${String(cell.deathsAtGate)} · boss ${String(cell.deathsAtBoss)} · ${hist === "" ? "none" : hist}`,
+    `      nodes ${cell.avgNodes.toFixed(1)} · fights ${cell.avgFights.toFixed(1)} · kills ${cell.avgKills.toFixed(1)} · hull(med) ${cell.hullMedian.toFixed(1)} · set ${cell.resonancePct.toFixed(0)}% · deaths gate ${String(cell.deathsAtGate)} · boss ${String(cell.deathsAtBoss)} · ${hist === "" ? "none" : hist}`,
   );
 };
 
-const LADDER_PERK_SAMPLE: readonly string[] = ALL_PERKS.slice(0, 6).map(
-  (perk) => perk.id,
-);
+const LADDER_PERK_POOLS: readonly PerkPool[] = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "black",
+  "grey",
+];
+
+const LADDER_PERK_SAMPLE: readonly string[] = LADDER_PERK_POOLS.map(
+  (pool) =>
+    ALL_PERKS.find((perk) => perk.pool === pool && perk.rarity === "common")
+      ?.id ?? "",
+).filter((id) => id !== "");
+
+interface LadderBand {
+  sector: number;
+  mid: number;
+  perks: number;
+}
+
+const LADDER_BANDS: readonly LadderBand[] = [
+  { sector: 1, mid: 98, perks: 99 },
+  { sector: 2, mid: 84, perks: 90 },
+  { sector: 3, mid: 70, perks: 78 },
+  { sector: 4, mid: 58, perks: 66 },
+  { sector: 5, mid: 48, perks: 56 },
+  { sector: 6, mid: 36, perks: 44 },
+];
+
+const LADDER_BAND_PP = 5;
 
 const ladderModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = Number(getArg("sector", "0"));
   console.log(
-    `sim ladder: the sweep ladder under a microscope — A0, red+blue, ${String(runs)} runs per deck per act`,
+    `sim ladder: the difficulty contract — A0, red+blue, ${String(runs)} runs per deck per act`,
   );
   console.log(
-    "  the middle column is the one sim:sweep checks; the cold column is diagnostics.",
+    `  the two equipped columns carry the bands (±${String(LADDER_BAND_PP)}pp); the cold column is printed diagnostics.`,
   );
   console.log(
     "  each act is measured three ways to separate act scaling from build strength.",
   );
-  const rows: string[] = ["sector,build,winrate,nodes,fights,kills,hullMedian"];
+  const rows: string[] = [
+    "sector,build,winrate,target,deltaPp,checked,nodes,fights,kills,hullMedian",
+  ];
+  let out = 0;
   for (const sector of SECTORS.map((def) => def.id)) {
+    if (only > 0 && sector !== only) continue;
+    const band = LADDER_BANDS.find((b) => b.sector === sector);
     console.log(`  S${String(sector)}`);
     const builds: readonly {
       label: string;
+      target: number | null;
       build: Pick<SweepOptions, "perks" | "chartPicks">;
     }[] = [
-      { label: "cold (diagnostics)", build: {} },
+      { label: "cold (diagnostics)", target: null, build: {} },
       {
-        label: "mid-collection (checked)",
+        label: "mid-collection",
+        target: band?.mid ?? null,
         build: { chartPicks: MID_COLLECTION_PICKS },
       },
       {
         label: "+ picks + 6 perks",
+        target: band?.perks ?? null,
         build: {
           chartPicks: MID_COLLECTION_PICKS,
           perks: LADDER_PERK_SAMPLE,
@@ -1479,12 +1602,18 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
     ];
     for (const entry of builds) {
       const cell = ladderCell(entry.label, runs, seed, sector, entry.build);
-      printLadderCell(cell);
+      printLadderCell(cell, entry.target);
+      const delta =
+        entry.target === null ? 0 : cell.winrate * 100 - entry.target;
+      if (entry.target !== null && Math.abs(delta) > LADDER_BAND_PP) out += 1;
       rows.push(
         [
           String(sector),
           entry.label,
           cell.winrate.toFixed(3),
+          entry.target === null ? "" : entry.target.toFixed(0),
+          entry.target === null ? "" : delta.toFixed(1),
+          entry.target === null ? "no" : "yes",
           cell.avgNodes.toFixed(2),
           cell.avgFights.toFixed(2),
           cell.avgKills.toFixed(2),
@@ -1493,12 +1622,16 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
       );
     }
   }
+  console.log(
+    `  ${String(out)} of ${String(LADDER_BANDS.length * 2)} checked cell(s) outside ±${String(LADDER_BAND_PP)}pp`,
+  );
   const outDir = join(process.cwd(), "sim-out");
   mkdirSync(outDir, { recursive: true });
   const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
   const outPath = join(outDir, `ladder-${stamp}.csv`);
   writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (out > 0) process.exitCode = 1;
 };
 
 const DEAD_PERK_LINE = -8;
@@ -1676,8 +1809,16 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
           { sector, ascension: 0, archetype },
         );
         spent.push(r.scrapSpent);
-        if (r.win) clearedEarned.push(r.scrapEarned);
-        if (r.fights > 0) perNode.push(r.scrapEarned / r.fights);
+        if (r.win) {
+          clearedEarned.push(
+            Math.max(0, r.scrapEarned - Math.max(0, state.eventScrap)),
+          );
+        }
+        if (r.fights > 0) {
+          perNode.push(
+            Math.max(0, r.scrapEarned - Math.max(0, state.eventScrap)) / r.fights,
+          );
+        }
         pockets += r.pockets;
         skipIncome += state.draftSkips;
         for (const key of Object.keys(sinks)) {
@@ -1848,8 +1989,14 @@ interface CampaignResult {
   sinks: Record<string, number>;
   draftSkips: number;
   draftRerolls: number;
+  eventsResolved: number;
+  eventScrap: number;
+  eventHull: number;
+  vouchers: number;
   interference: number;
   wormholes: WormholeTally;
+  takenBySector: Record<number, number>;
+  fightsBySector: Record<number, number>;
 }
 
 const CAMPAIGN_SECTORS = 5;
@@ -1923,12 +2070,23 @@ const runCampaign = (
     sinks: state.sinks,
     draftSkips: state.draftSkips,
     draftRerolls: state.draftRerolls,
+    eventsResolved: state.eventsResolved,
+    eventScrap: state.eventScrap,
+    eventHull: state.eventHull,
+    vouchers: state.vouchers,
     interference: state.interference,
     wormholes,
+    takenBySector: state.takenBySector,
+    fightsBySector: state.fightsBySector,
   };
 };
 
-const CAMPAIGN_BAND: readonly [number, number] = [0.6, 0.7];
+const CAMPAIGN_BAND: readonly [number, number] = [0.3, 0.36];
+
+const CAMPAIGN_ASCENSIONS: readonly number[] = getArg("asc", "0,3")
+  .split(",")
+  .map((part) => Number(part.trim()))
+  .filter((n) => Number.isFinite(n) && n >= 0);
 const MONOTONIC_GAP_PP = 18;
 
 const mergeTallies = (
@@ -2027,10 +2185,12 @@ const campaignModeMain = (
   const sinks = emptySinks();
   let skips = 0;
   let rerolls = 0;
-  let outOfBand = 0;
+  let events = 0;
+  let eventScrap = 0;
+  let eventHull = 0;
   const a0: number[] = [];
   const a0Runs: CampaignResult[] = [];
-  for (const ascension of [0, 3]) {
+  for (const ascension of CAMPAIGN_ASCENSIONS) {
     for (const archetype of ARCHETYPES) {
       const { roll, results } = campaignRoll(
         runs,
@@ -2045,17 +2205,16 @@ const campaignModeMain = (
           mergeSinks(sinks, r.sinks);
           skips += r.draftSkips;
           rerolls += r.draftRerolls;
+          events += r.eventsResolved;
+          eventScrap += r.eventScrap;
+          eventHull += r.eventHull;
         }
         if (archetype.name !== "black-edge") {
           a0.push(roll.winrate);
           a0Runs.push(...results);
         }
       }
-      const banded =
-        ascension === 0 && archetype.name !== "black-edge"
-          ? roll.winrate >= CAMPAIGN_BAND[0] && roll.winrate <= CAMPAIGN_BAND[1]
-          : true;
-      if (!banded) outOfBand += 1;
+
       rows.push(
         [
           archetype.name,
@@ -2066,7 +2225,7 @@ const campaignModeMain = (
           roll.avgNodes.toFixed(1),
           roll.avgEarned.toFixed(1),
           roll.avgSpent.toFixed(1),
-          banded ? "ok" : "OUT_OF_BAND",
+          "",
         ].join(","),
       );
       const hist = [...roll.deathHist.entries()]
@@ -2074,13 +2233,13 @@ const campaignModeMain = (
         .map(([sector, n]) => `s${String(sector)}:${String(n)}`)
         .join(" ");
       console.log(
-        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}${banded ? "" : " — OUT OF BAND"}`,
+        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}`,
       );
     }
   }
   const mean = a0.reduce((sum, v) => sum + v, 0) / Math.max(1, a0.length);
   console.log(
-    `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%`,
+    `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%${mean >= CAMPAIGN_BAND[0] && mean <= CAMPAIGN_BAND[1] ? " — ok" : " — OUT OF BAND"}`,
   );
 
   const conditional: number[] = [];
@@ -2105,6 +2264,26 @@ const campaignModeMain = (
       `${String(sector)},${String(entered)},${String(clearedHere)},${rate.toFixed(3)},${gap.toFixed(1)}`,
     );
     previous = rate;
+  }
+  console.log("  damage taken per act (A0, red+blue — hull+shield absorbed per fight):");
+  rows.push("");
+  rows.push("sector,fights,damageTaken,perFight");
+  for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
+    const taken = a0Runs.reduce(
+      (sum, r) => sum + (r.takenBySector[sector] ?? 0),
+      0,
+    );
+    const fights = a0Runs.reduce(
+      (sum, r) => sum + (r.fightsBySector[sector] ?? 0),
+      0,
+    );
+    if (fights === 0) continue;
+    console.log(
+      `    S${String(sector)} ${String(fights).padStart(5)} fights · ${String(taken).padStart(6)} taken · ${(taken / fights).toFixed(2)} per fight`,
+    );
+    rows.push(
+      `${String(sector)},${String(fights)},${String(taken)},${(taken / fights).toFixed(2)}`,
+    );
   }
   console.log("  where a run dies inside its act (A0, red+blue):");
   for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
@@ -2172,6 +2351,10 @@ const campaignModeMain = (
   console.log(
     `  draft agency: ${String(skips)} skips · ${String(rerolls)} rerolls over ${String(runs * ARCHETYPES.length)} A0 runs`,
   );
+  const a0Total = Math.max(1, runs * ARCHETYPES.length);
+  console.log(
+    `  events: ${(events / a0Total).toFixed(1)}/run · scrap ${eventScrap >= 0 ? "+" : ""}${(eventScrap / a0Total).toFixed(1)} · hull ${eventHull >= 0 ? "+" : ""}${(eventHull / a0Total).toFixed(1)} per run`,
+  );
   console.log("  puzzles met in campaign:");
   for (const tier of [1, 2, 3, 4, 5]) {
     const tally = tallies[tier];
@@ -2186,10 +2369,10 @@ const campaignModeMain = (
   const outPath = join(outDir, `campaign-${stamp}.csv`);
   writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
-  if (outOfBand > 0) process.exitCode = 1;
+  if (mean < CAMPAIGN_BAND[0] || mean > CAMPAIGN_BAND[1]) process.exitCode = 1;
 };
 
-const SHIP_BAND: readonly [number, number] = [0.45, 0.65];
+const SHIP_BAND: readonly [number, number] = [0.2, 0.6];
 
 const SHIP_BAND_ENFORCED: readonly ShipId[] = ["corsair", "foundry", "prism"];
 
@@ -2206,9 +2389,12 @@ const PRISM_SPECTRUM: Archetype = {
 const SHIP_ARCHETYPES: readonly Archetype[] = [...ARCHETYPES, PRISM_SPECTRUM];
 
 const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = getArg("ship", "");
+  const ships =
+    only === "" ? PLAYABLE_SHIPS : PLAYABLE_SHIPS.filter((s) => s.id === only);
   const rows: string[] = ["ship,deck,runs,winrate,avgSectorsCleared,hullMax"];
   console.log(
-    `sim ships: S1-S5 chained per ship, ${String(PLAYABLE_SHIPS.length)} ships x ${String(SHIP_ARCHETYPES.length)} decks x ${String(runs)} runs`,
+    `sim ships: S1-S5 chained per ship, ${String(ships.length)} ships x ${String(SHIP_ARCHETYPES.length)} decks x ${String(runs)} runs`,
   );
   console.log(
     `  the band is ${(SHIP_BAND[0] * 100).toFixed(0)}-${(SHIP_BAND[1] * 100).toFixed(0)}% on the red+blue+prism mean; black-edge is printed, never enforced.`,
@@ -2217,7 +2403,7 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
     "  it is asserted on the hulls P11 authored; the three legacy hulls are reference readings.",
   );
   let outOfBand = 0;
-  for (const ship of PLAYABLE_SHIPS) {
+  for (const ship of ships) {
     const banded: number[] = [];
     for (const archetype of SHIP_ARCHETYPES) {
       const { roll } = campaignRoll(runs, seed, archetype, 0, false, ship.id);

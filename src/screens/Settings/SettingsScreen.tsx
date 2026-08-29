@@ -475,7 +475,7 @@ export const SettingsScreen = () => {
           value={settings.vignette}
           onChange={(value) => {
             settings.setVignette(value as VignetteIntensity);
-            if (value !== 'off') flashVignette('shieldGain');
+            if (value !== 'off') flashVignette('hullHit', { side: 'left' });
           }}
           data={[
             { value: 'off', label: t('settings:off') },
@@ -483,6 +483,18 @@ export const SettingsScreen = () => {
             { value: 'full', label: t('settings:vignetteFull') },
           ]}
         />
+        <Button
+          variant="default"
+          size="compact-xs"
+          data-testid="settings-vignette-preview"
+          disabled={settings.vignette === 'off'}
+          onClick={() => {
+            flashVignette('shieldHold', { side: 'right' });
+            flashVignette('hullHit', { side: 'left' });
+          }}
+        >
+          {t('settings:vignettePreview')}
+        </Button>
         <Text size="xs" c={tokens.faint}>
           {t('settings:vignetteHint')}
         </Text>

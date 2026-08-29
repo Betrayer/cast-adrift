@@ -5,13 +5,17 @@ import {
   chartNeighbors,
   isEntryNode,
 } from "@/data/chart";
+import { chartNodeCost } from "@/game/chart/cost";
 import {
   canAllocate,
   canDeallocate,
   hubBudgetBonus,
   isAllocatable,
+  isOverBudget,
   pathTo,
   pointsAvailable,
+  pointsSpent,
+  pointsTotal,
   respecCost,
   RESPEC_SHARD_COST,
 } from "@/game/chart/engine";
@@ -64,8 +68,12 @@ describe("chart data", () => {
     }
   });
 
-  it("has at least one entry node per gate + hub inner ring", () => {
-    expect(CHART_NODES.filter((n) => n.entry === true).length).toBe(19);
+  it("has one door per line: seven gates and the hub core", () => {
+    const entries = CHART_NODES.filter((n) => n.entry === true).map((n) => n.id);
+    expect(entries).toHaveLength(8);
+    expect(entries).toContain("hub-i0");
+    const schools = ["red", "blue", "green", "yellow", "black", "grey", "prismatic"];
+    for (const school of schools) expect(entries).toContain(`${school}-gate`);
   });
 });
 
@@ -87,11 +95,30 @@ describe("chart allocation engine", () => {
     if (far !== undefined) expect(isAllocatable(far.id, ["red-gate"])).toBe(false);
   });
 
-  it("points accounting: available = level - picks.length", () => {
+  it("points accounting: available = level - the real cost of the picks", () => {
     expect(pointsAvailable(5, [])).toBe(5);
-    expect(pointsAvailable(5, ["a", "b"])).toBe(3);
-    expect(canAllocate("red-gate", 1, [])).toBe(true);
-    expect(canAllocate("red-gate", 0, [])).toBe(false);
+    expect(pointsSpent(["red-gate", "red-min1"])).toBe(4);
+    expect(pointsAvailable(6, ["red-gate", "red-min1"])).toBe(2);
+    expect(canAllocate("red-gate", 2, [])).toBe(true);
+    expect(canAllocate("red-gate", 1, [])).toBe(false);
+    expect(canAllocate("hub-i0", 1, [])).toBe(true);
+  });
+
+  it("refuses a node the remaining points cannot cover", () => {
+    const owned = ["red-gate", "red-min1", "red-not1", "red-min2"];
+    expect(pointsSpent(owned)).toBe(8);
+    expect(chartNodeCost("red-not2")).toBe(3);
+    expect(canAllocate("red-not2", 10, owned)).toBe(false);
+    expect(canAllocate("red-not2", 11, owned)).toBe(true);
+    expect(isAllocatable("red-not2", owned)).toBe(true);
+  });
+
+  it("flags a profile whose picks now cost more than its pool", () => {
+    const owned = ["red-gate", "red-min1", "red-not1"];
+    expect(pointsSpent(owned)).toBe(6);
+    expect(isOverBudget(6, owned)).toBe(false);
+    expect(isOverBudget(5, owned)).toBe(true);
+    expect(pointsAvailable(5, owned)).toBe(-1);
   });
 
   it("orphan guard: removing a cut vertex is forbidden, a leaf is allowed", () => {
@@ -104,18 +131,42 @@ describe("chart allocation engine", () => {
   });
 
   it("prices the cheapest path to a node the player does not own", () => {
-    expect(pathTo("red-gate", [])).toEqual({ ids: ["red-gate"], cost: 1 });
+    expect(pathTo("red-gate", [])).toEqual({ ids: ["red-gate"], cost: 2 });
     const two = pathTo("red-s1", []);
-    expect(two?.cost).toBe(2);
+    expect(two?.cost).toBe(3);
     expect(two?.ids).toEqual(["red-gate", "red-s1"]);
     expect(pathTo("red-s1", ["red-gate", "red-s1"])).toEqual({ ids: [], cost: 0 });
     expect(pathTo("red-s1", ["red-gate"])).toEqual({ ids: ["red-s1"], cost: 1 });
     expect(pathTo("__nosuchnode__", [])).toBeNull();
   });
 
-  it("charges nothing for a respec once the L50 milestone lands", () => {
-    expect(respecCost(49)).toBe(RESPEC_SHARD_COST);
-    expect(respecCost(50)).toBe(0);
+  it("sums real costs, not hops, and routes around the dear nodes", () => {
+    const spine = pathTo("red-not4", []);
+    expect(spine?.ids.length).toBe(9);
+    expect(spine?.cost).toBe(25);
+    const key = pathTo("red-key1", []);
+    expect(key?.ids.length).toBe(13);
+    expect(key?.cost).toBe(31);
+    expect(key?.ids).not.toContain("red-min1");
+    expect(pathTo("hub-o12", [])?.cost).toBe(5);
+  });
+
+  it("reaches every keystone inside the L50 pool, three of them together", () => {
+    expect(pathTo("prismatic-key1", [])?.cost).toBe(8);
+    expect(pathTo("prismatic-key2", [])?.cost).toBe(9);
+    const first = pathTo("prismatic-key1", [])?.ids ?? [];
+    const second = pathTo("prismatic-key2", first)?.ids ?? [];
+    const pair = [...first, ...second];
+    expect(pointsSpent(pair)).toBe(15);
+    const third = pathTo("red-key1", pair)?.ids ?? [];
+    expect(pointsSpent([...pair, ...third])).toBe(46);
+    expect(pointsTotal(50)).toBe(52);
+  });
+
+  it("charges the respec by the point, and nothing once L50 lands", () => {
+    expect(respecCost(49, "red-s1")).toBe(RESPEC_SHARD_COST);
+    expect(respecCost(49, "red-key1")).toBe(RESPEC_SHARD_COST * 5);
+    expect(respecCost(50, "red-key1")).toBe(0);
   });
 
   it("adds the L35 milestone points to the chart pool", () => {

@@ -21,6 +21,7 @@ import {
   type WormholeThrow,
 } from "@/game/map/wormhole";
 import { holeTollFor } from "@/game/run/motifs";
+import { pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { settleLifetimeAchievements } from "@/game/meta/achievements";
 import {
@@ -82,6 +83,7 @@ import {
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
+import { readFrames } from "@/pixi/perf";
 import type { BattleLayoutId, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
 
@@ -108,6 +110,7 @@ export interface MetaPatch {
   themes?: readonly string[];
   deck?: readonly string[];
   chartPicks?: readonly string[];
+  chartFreeRespecs?: number;
   collection?: readonly { defId: string; count?: number }[];
   codex?: readonly string[];
   achievements?: readonly string[];
@@ -321,6 +324,10 @@ export interface TestState {
     selectedShip: ShipId;
     tutorialSeen: string[];
     systemsCheckDone: boolean;
+    chartPicks: string[];
+    chartPointsSpent: number;
+    chartPointsTotal: number;
+    chartFreeRespecs: number;
   };
 }
 
@@ -363,6 +370,7 @@ export interface TestApi {
   skipCheck: () => void;
   restartCheckStep: () => void;
   anchors: () => BattleAnchors | null;
+  frames: () => number;
   state: () => TestState;
   account: () => AccountView;
   cloudMeta: () => Promise<CloudMetaView | null>;
@@ -421,6 +429,9 @@ const applyMeta = (patch: MetaPatch): void => {
   for (const id of patch.unlocks ?? []) meta.grantUnlock(id);
   for (const id of patch.themes ?? []) meta.unlockTheme(id);
   for (const id of patch.chartPicks ?? []) meta.allocatePick(id);
+  for (let i = 0; i < (patch.chartFreeRespecs ?? 0); i += 1) {
+    meta.grantChartRespec();
+  }
   for (const id of patch.codex ?? []) meta.unlockCodex(id);
   for (const id of patch.achievements ?? []) meta.unlockAchievement(id);
   for (const entry of patch.collection ?? []) {
@@ -583,6 +594,10 @@ const readState = (): TestState => {
       selectedShip: meta.selectedShip,
       tutorialSeen: [...meta.tutorialSeen],
       systemsCheckDone: meta.stats.systemsCheckDone,
+      chartPicks: [...meta.chartPicks],
+      chartPointsSpent: pointsSpent(meta.chartPicks),
+      chartPointsTotal: pointsTotal(meta.level),
+      chartFreeRespecs: meta.chartFreeRespecs,
     },
   };
 };
@@ -932,6 +947,8 @@ export const createTestApi = (): TestApi => ({
   },
 
   anchors: () => battleAnchors(),
+
+  frames: () => readFrames(),
 
   state: readState,
 

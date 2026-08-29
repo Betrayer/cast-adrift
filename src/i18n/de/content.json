@@ -392,7 +392,7 @@
     "corsair": {
       "name": "Hund",
       "passiveName": "Nachbrenner",
-      "passiveDesc": "„Manöver“ ist besonders wirkungsvoll: +10 % Ausweichen und eine Obergrenze von 70/30 statt 55/25. Jedes Ausweichen oder jeder Streiftreffer gewährt im nächsten Zug +1 auf die Waffen, bis zu +2 pro Zug."
+      "passiveDesc": "„Manöver“ ist besonders wirkungsvoll: Streifschuss 7,5 % und Ausweichen 4,5 % je Wert statt 3,5 % und 1,5 %, +8 Evasion und eine Obergrenze von 55/40 statt 25/10. Jeder Streiftreffer oder jedes Ausweichen gewährt im nächsten Zug +1 auf die Waffen, bis zu +2 pro Zug."
     },
     "foundry": {
       "name": "Schmiede",

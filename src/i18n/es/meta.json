@@ -80,7 +80,7 @@
     "pathCost": "Ruta desde aquí: {{n}} puntos (tienes {{have}})",
     "refundFree": "Reembolso (gratis)",
     "respecConfirmTitle": "¿Quieres devolver este nodo?",
-    "respecConfirmBody": "«{{name}}» vuelve al pozo y se recupera el punto. Coste: {{cost}}◈.",
+    "respecConfirmBody": "«{{name}}» vuelve al pozo y se recuperan {{points}} punto(s). Coste: {{cost}}◈.",
     "respecConfirmYes": "Reembolso",
     "redPowderRoom": "Aseo de invitados",
     "redRangeCard": "Ficha de alcance",
@@ -105,7 +105,13 @@
     "greyShimStack": "Pila de cuñas",
     "greyPatternBook": "Libro de patrones",
     "greyBallastTrim": "Ajuste del lastre",
-    "greyTallyStick": "Palo de conteo"
+    "greyTallyStick": "Palo de conteo",
+    "cost": "Coste {{n}}",
+    "repriced": "Los precios de los nodos han cambiado: tu selección cuesta ahora {{spent}} de {{total}} puntos. No se ha quitado nada: una reasignación completa es gratis.",
+    "freeRespec": "Reasignación gratis",
+    "freeRespecTitle": "¿Vaciar toda la carta?",
+    "freeRespecBody": "Los {{n}} nodos asignados vuelven al pozo y se recuperan todos los puntos. Este reinicio es gratuito.",
+    "freeRespecYes": "Vaciar"
   },
   "chartFx": {
     "hubBudget": "+1 presupuesto para hangares",
@@ -121,7 +127,7 @@
       "blueReserveDelta": "{{n}} reserva azul",
       "jamPowerDelta": "{{n}} potencia de la mermelada",
       "growthCapDelta": "{{n}} límite de crecimiento",
-      "evasionDelta": "{{n}}% de esquiva",
+      "evasionDelta": "{{n}}% de evasión",
       "markBonusDelta": "{{n}} bonificación por puntuación",
       "battleEndHeal": "{{n}} curar / luchar",
       "hullMaxPct": "{{n}} % del casco máximo",

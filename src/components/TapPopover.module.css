@@ -8,7 +8,8 @@
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 0;
+  padding: 10px;
+  margin: -10px;
   border: 0;
   background: none;
   color: inherit;
@@ -17,13 +18,13 @@
 }
 
 .bubble {
-  position: absolute;
+  position: fixed;
+  left: 0;
+  top: 0;
   z-index: var(--z-dropdown);
-  top: calc(100% + 6px);
-  left: 50%;
-  transform: translateX(-50%);
+  visibility: hidden;
   width: max-content;
-  max-width: min(260px, 70vw);
+  max-width: min(260px, calc(100vw - 24px));
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--ca-line);
@@ -34,30 +35,22 @@
   line-height: 1.35;
   text-align: left;
   white-space: normal;
+}
+
+.bubble[data-placed='1'] {
+  visibility: visible;
   animation: bubbleIn 140ms ease-out both;
-}
-
-.bubbleStart {
-  left: 0;
-  transform: none;
-}
-
-.bubbleEnd {
-  left: auto;
-  right: 0;
-  transform: none;
 }
 
 @keyframes bubbleIn {
   from {
     opacity: 0;
-    transform: translateX(-50%) translateY(-3px);
   }
   to {
     opacity: 1;
   }
 }
 
-:root[data-ca-motion='reduced'] .bubble {
+:root[data-ca-motion='reduced'] .bubble[data-placed='1'] {
   animation: none;
 }

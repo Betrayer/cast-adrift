@@ -80,7 +80,7 @@
     "pathCost": "Путь отсюда: {{n}} очков (есть {{have}})",
     "refundFree": "Вернуть (бесплатно)",
     "respecConfirmTitle": "Вернуть этот узел?",
-    "respecConfirmBody": "«{{name}}» уходит обратно в пул, очко возвращается. Стоимость: {{cost}}◈.",
+    "respecConfirmBody": "«{{name}}» уходит обратно в пул, возвращается очков: {{points}}. Стоимость: {{cost}}◈.",
     "respecConfirmYes": "Вернуть",
     "redPowderRoom": "Пороховая",
     "redRangeCard": "Дальномерная карта",
@@ -105,7 +105,13 @@
     "greyShimStack": "Стопка прокладок",
     "greyPatternBook": "Книга шаблонов",
     "greyBallastTrim": "Балластная дифферентовка",
-    "greyTallyStick": "Бирка"
+    "greyTallyStick": "Бирка",
+    "cost": "Цена {{n}}",
+    "repriced": "Цены узлов изменились: ваш набор стоит теперь {{spent}} из {{total}} очков. Ничего не отобрано — один полный сброс бесплатен.",
+    "freeRespec": "Бесплатный сброс",
+    "freeRespecTitle": "Очистить всю карту?",
+    "freeRespecBody": "Все взятые узлы ({{n}}) уходят обратно в пул, очки возвращаются полностью. Этот сброс бесплатный.",
+    "freeRespecYes": "Очистить"
   },
   "chartFx": {
     "hubBudget": "+1 к бюджету ангара",

@@ -308,47 +308,70 @@
   }
 }
 
-@media (max-height: 700px) {
-  .topBands {
-    gap: 6px;
-    padding: 6px 12px 0;
-  }
+:root[data-ca-compact='1'] .topBands {
+  gap: 6px;
+  padding: 6px 12px 0;
+}
 
-  .statusCard {
-    padding: 4px 10px;
-    gap: 8px;
-  }
+:root[data-ca-compact='1'] .statusCard {
+  padding: 4px 10px;
+  gap: 8px;
+}
 
-  .statusLeft {
-    flex-direction: row;
-    align-items: center;
-    gap: 8px;
-  }
+:root[data-ca-compact='1'] .statusLeft {
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
 
-  .statusHeadline {
-    flex: 0 0 auto;
-    gap: 6px;
-  }
+:root[data-ca-compact='1'] .statusHeadline {
+  flex: 0 0 auto;
+  gap: 6px;
+}
 
-  .hullTrack {
-    flex: 1;
-    min-width: 50px;
-  }
+:root[data-ca-compact='1'] .hullTrack {
+  flex: 1;
+  min-width: 50px;
+}
 
-  .centreColumn {
-    gap: 3px;
-    padding: 0 10px 6px;
-  }
+:root[data-ca-compact='1'] .centreColumn {
+  gap: 3px;
+  padding: 0 10px 6px;
+}
 
-  .checkBanner {
-    gap: 6px;
-  }
+:root[data-ca-compact='1'] .checkBanner {
+  gap: 6px;
+}
 
-  .checkSay {
-    font-size: 11px;
-    line-height: 14px;
-  }
+:root[data-ca-compact='1'] .checkSay {
+  font-size: 11px;
+  line-height: 14px;
+}
 
+:root[data-ca-compact='1'] .resonanceRow {
+  flex-wrap: nowrap;
+  justify-content: safe center;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+:root[data-ca-compact='1'] .resonanceRow::-webkit-scrollbar {
+  display: none;
+}
+
+:root[data-ca-compact='1'] .resChip {
+  gap: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+:root[data-ca-compact='1'] .resPips {
+  display: none;
+}
+
+@media (max-width: 767px) {
   .resonanceRow {
     flex-wrap: nowrap;
     justify-content: safe center;

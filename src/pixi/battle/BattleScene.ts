@@ -1,6 +1,7 @@
 import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Application, Ticker } from "pixi.js";
 import { subscribeBodyRect } from "@/app/bands";
+import { tapLayerOpen } from "@/app/tapLayer";
 import { flashVignette, sideForX } from "@/services/vignette";
 import { mixHex } from "@/app/color";
 import { onThemeChange, tokens } from "@/app/theme";
@@ -293,6 +294,7 @@ export class BattleScene {
   private readonly glowPool: Graphics[] = [];
   private readonly particleCancels = new Set<() => void>();
   private readonly dyingEnemies = new Set<string>();
+  private readonly deathCancels = new Map<string, () => void>();
   private readonly mirrorIntents = new Set<string>();
   private readonly unsubscribe: () => void;
   private readonly unsubscribeTheme: () => void;
@@ -399,6 +401,14 @@ export class BattleScene {
     this.beatRun = null;
     for (const id of this.beatTimeouts) window.clearTimeout(id);
     this.beatTimeouts = [];
+    this.restoreStageMotion();
+  }
+
+  private restoreStageMotion(): void {
+    this.hitStopMs = 0;
+    this.tweens.setGroupScale(FX_GROUP, 1);
+    this.shakeMs = 0;
+    this.app.stage.position.set(0, 0);
   }
 
   private readOrigin(): void {
@@ -721,13 +731,24 @@ export class BattleScene {
     const { root } = view;
     const restY = root.y;
     this.dyingEnemies.add(enemyId);
-    this.tweens.to(root, { rotation: 0.42, y: restY + 26 }, DEATH_MS, easeOutQuad);
-    this.tweens.to(root.scale, { x: 0.86, y: 0.86 }, DEATH_MS, easeOutQuad);
-    this.tweens.to(root, { alpha: 0.25 }, DEATH_MS, linear, () => {
-      root.rotation = 0;
-      root.y = restY;
-      root.scale.set(1);
-      this.dyingEnemies.delete(enemyId);
+    const cancels = [
+      this.tweens.to(
+        root,
+        { rotation: 0.42, y: restY + 26 },
+        DEATH_MS,
+        easeOutQuad,
+      ),
+      this.tweens.to(root.scale, { x: 0.86, y: 0.86 }, DEATH_MS, easeOutQuad),
+      this.tweens.to(root, { alpha: 0.25 }, DEATH_MS, linear, () => {
+        root.rotation = 0;
+        root.y = restY;
+        root.scale.set(1);
+        this.dyingEnemies.delete(enemyId);
+        this.deathCancels.delete(enemyId);
+      }),
+    ];
+    this.deathCancels.set(enemyId, () => {
+      for (const cancel of cancels) cancel();
     });
     for (let i = 0; i < 6; i += 1) {
       const shard = this.takeParticle();
@@ -915,7 +936,14 @@ export class BattleScene {
     });
   }
 
+  private clearDeathAnimations(): void {
+    for (const cancel of this.deathCancels.values()) cancel();
+    this.deathCancels.clear();
+    this.dyingEnemies.clear();
+  }
+
   private buildEnemies(state: BattleState): void {
+    this.clearDeathAnimations();
     for (const view of this.enemyViews.values()) {
       view.cancelFlash?.();
       view.root.destroy({ children: true });
@@ -1684,6 +1712,7 @@ export class BattleScene {
   }
 
   private readonly onPointerDown = (event: PointerEvent): void => {
+    if (tapLayerOpen()) return;
     const state = useBattleStore.getState();
     if (state.phase === "resolving") {
       this.stopBeats();
@@ -2267,6 +2296,7 @@ export class BattleScene {
     }
     if (run.cancelled) return;
     this.beatRun = null;
+    this.restoreStageMotion();
     useBattleStore.getState().finishResolution();
   }
 
@@ -2401,7 +2431,9 @@ export class BattleScene {
         const broken = beat.after.shield <= 0;
         playSfx(broken ? "shieldBreak" : "shieldHit");
         this.flashShip(schools.blue.stroke);
-        if (broken) flashVignette("shieldBreak");
+        flashVignette(broken ? "shieldBreak" : "shieldHold", {
+          side: sideForX(origin.x, this.app.screen.width),
+        });
         this.spawnNumber(
           playerHit.x,
           playerHit.y,
@@ -2434,8 +2466,9 @@ export class BattleScene {
     }
     if (beat.kind === "charge") {
       if (view !== undefined) {
-        this.tweens.to(view.root.scale, { x: 1.12, y: 1.12 }, 140, easeOutQuad, () => {
-          this.tweens.to(view.root.scale, { x: 1, y: 1 }, 160, easeOutQuad);
+        const { scale } = view.root;
+        this.tweens.to(scale, { x: 1.12, y: 1.12 }, 140, easeOutQuad, () => {
+          this.tweens.to(scale, { x: 1, y: 1 }, 160, easeOutQuad);
         });
       }
       return;

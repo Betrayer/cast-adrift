@@ -266,12 +266,10 @@
   }
 }
 
-@media (max-height: 700px) {
-  .card[data-die-card-size='mini'] {
-    min-height: 34px;
-  }
+:root[data-ca-compact='1'] .card[data-die-card-size='mini'] {
+  min-height: 34px;
+}
 
-  .card[data-die-card-size='mini'] .desc {
-    display: none;
-  }
+:root[data-ca-compact='1'] .card[data-die-card-size='mini'] .desc {
+  display: none;
 }

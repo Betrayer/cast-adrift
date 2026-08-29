@@ -392,7 +392,7 @@
     "corsair": {
       "name": "Hound",
       "passiveName": "Afterburner",
-      "passiveDesc": "Manoeuvre runs hot: +10% dodge and a ceiling of 70/30 instead of 55/25. Every dodge or glancing hit grants Weapons +1 next turn, up to +2 a turn."
+      "passiveDesc": "Manoeuvre runs hot: glancing 7.5% and dodge 4.5% per value instead of 3.5% and 1.5%, +8 evasion, and a ceiling of 55/40 instead of 25/10. Every glancing hit or dodge grants Weapons +1 next turn, up to +2 a turn."
     },
     "foundry": {
       "name": "Forge",
@@ -612,11 +612,11 @@
     "sacrifice": "Burn a die to pool +4 weapon damage this turn; under a third hull every weapon slot crits ×1.5.",
     "back-door": "A min-face black roll grants +6 scrap.",
     "spare": "The lowest die of each roll comes up one higher; reroll one more die at a time.",
-    "afterburner": "Dodge +6% and glancing +3%; hull −2.",
+    "afterburner": "Glancing +1% and dodge +2%; hull −2.",
     "jammer-plus": "Jam cuts the enemy attack by 2 more, but marks are worth 1 less.",
     "targeter": "Sensors mark for +1 more, but jam cuts 1 less.",
     "plating": "Hull +5, and every won battle repairs 2 hull.",
-    "tug": "The turn's first dodge also grants +1 charge.",
+    "tug": "The turn's first evasion also grants +1 charge.",
     "kindling": "+1 in weapons on 5 or more.",
     "hammerhead": "+2 in Weapons A.",
     "scorchmark": "Max face in weapons adds Burn 1.",
@@ -647,7 +647,7 @@
     "hardVacuum": "+3 in shields while hull is under half.",
     "secondSkin": "Hull +4 and 2 hull repaired after every battle, but salvage pays 10% less.",
     "glacierPact": "+4 in shields once you hold four blue dice.",
-    "mirrorLattice": "The turn's first dodge reflects damage, dodge +6% and glancing +3%, and with three Dodge items engines read +3.",
+    "mirrorLattice": "The turn's first evasion reflects damage, glancing +1% and dodge +2%, and with three Dodge items engines read +3.",
     "permafrost": "A max face in shields resolves the slot twice.",
     "rootHold": "From turn three on, every die in engines counts as two higher.",
     "secondGrowth": "+2 when a die repeats last turn's value.",
@@ -662,7 +662,7 @@
     "tideRoots": "Interference tide hits one level softer.",
     "worldTree": "Once four green dice resonate, every turn ends healing 1 hull per green item you carry.",
     "overgrowthPact": "Growth +2 and hull −4; while you carry four growth items, every die counts as 2 higher.",
-    "standingWave": "Dodge +6% and glancing +3%; 6 or more in engines carries 4 shield and 2 charge into the next turn.",
+    "standingWave": "Glancing +1% and dodge +2%; 6 or more in engines carries 4 shield and 2 charge into the next turn.",
     "pocketChange": "Entering a node pays 1 scrap for each [scrap] item in your loadout.",
     "finderFee": "+2 scrap per kill.",
     "streetPrice": "Shops −8%, but scrap gains −5%: you buy and sell at the same street price.",
@@ -740,7 +740,7 @@
     "seedBank": "Battle start: for the next three turns you raise 1 shield per growth item you carry.",
     "understory": "End of turn: if 4 or more shield is still standing, heal 1 hull.",
     "mycelium": "Once six slots have resolved this battle, every turn ends healing 2 hull and raising 3 shield.",
-    "rhizome": "Dodge +12% and glancing +6%; hull −2.",
+    "rhizome": "Glancing +2% and dodge +4%; hull −2.",
     "taproot": "Counts every node you enter; from the eighth on, each battle opens with 6 shield and 3 hull healed.",
     "perennial": "A die in engines that repeats last turn's value counts as four higher.",
     "annualRings": "Counts every die that repeats last turn's value; from the third on, every die counts as 3 higher for the rest of the battle.",
@@ -4430,7 +4430,7 @@
     },
     "ballastModule": {
       "name": "Ballast Tanks",
-      "desc": "Hull +5 and dodge −6% / glancing −3%; every node you enter repairs 1 hull."
+      "desc": "Hull +5 and glancing −1% / dodge −2%; every node you enter repairs 1 hull."
     },
     "escapePod": {
       "name": "Escape Pod",
@@ -4450,7 +4450,7 @@
     },
     "bulkheadRing": {
       "name": "Bulkhead Ring",
-      "desc": "Hull +8 and dodge −6% / glancing −3%; with Shields at Mk 2 every battle opens with 6 shield, and at Mk 3 the reserve holds one more die."
+      "desc": "Hull +8 and glancing −1% / dodge −2%; with Shields at Mk 2 every battle opens with 6 shield, and at Mk 3 the reserve holds one more die."
     },
     "dampingCoil": {
       "name": "Damping Coil",
@@ -4458,7 +4458,7 @@
     },
     "hardpointClamp": {
       "name": "Hardpoint Clamp",
-      "desc": "Dodge +6% and glancing +3%, and once the engine mount reaches Mk 2 every die in it counts +3."
+      "desc": "Glancing +1% and dodge +2%, and once the engine mount reaches Mk 2 every die in it counts +3."
     },
     "voidLiner": {
       "name": "Void Liner",

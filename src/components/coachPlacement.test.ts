@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { coachCardPlacement, type Bounds } from "@/components/coachPlacement";
+import {
+  coachCardPlacement,
+  popoverPlacement,
+  type Bounds,
+} from "@/components/coachPlacement";
 
 const PHONE: Bounds = { top: 20, left: 12, right: 378, bottom: 820 };
 const CARD = { w: 300, h: 148 };
@@ -65,5 +69,50 @@ describe("coach card placement", () => {
       PHONE,
     );
     expect(place.top + tall.h).toBeLessThanOrEqual(PHONE.bottom + 0.001);
+  });
+});
+
+describe("popover placement", () => {
+  const BUBBLE = { w: 260, h: 120 };
+
+  it("keeps an end-aligned bubble inside the left inset at phone width", () => {
+    const place = popoverPlacement(
+      { x: 250, y: 300, w: 13, h: 13 },
+      BUBBLE,
+      PHONE,
+      "end",
+    );
+    expect(place.left).toBeGreaterThanOrEqual(PHONE.left);
+    expect(place.left + BUBBLE.w).toBeLessThanOrEqual(PHONE.right);
+  });
+
+  it("keeps a start-aligned bubble inside the right inset", () => {
+    const place = popoverPlacement(
+      { x: 340, y: 300, w: 13, h: 13 },
+      BUBBLE,
+      PHONE,
+      "start",
+    );
+    expect(place.left + BUBBLE.w).toBeLessThanOrEqual(PHONE.right);
+  });
+
+  it("centres on the anchor when the bubble fits either way", () => {
+    const place = popoverPlacement(
+      { x: 180, y: 300, w: 40, h: 20 },
+      { w: 100, h: 60 },
+      PHONE,
+      "center",
+    );
+    expect(place.left).toBe(150);
+  });
+
+  it("flips a tall bubble above an anchor near the bottom", () => {
+    const place = popoverPlacement(
+      { x: 180, y: 760, w: 20, h: 20 },
+      BUBBLE,
+      PHONE,
+      "center",
+    );
+    expect(place.top + BUBBLE.h).toBeLessThanOrEqual(PHONE.bottom);
   });
 });

@@ -11,6 +11,7 @@ import {
 } from "@/game/battle/resolver";
 import type { EvasionTuning } from "@/game/battle/passives";
 import { canPlaceDie, isSlotBlocked } from "@/game/battle/setup";
+import { sourceMods } from "@/game/run/runMods";
 import type {
   BattleSnapshot,
   EnemyState,
@@ -164,8 +165,9 @@ const stormMargin = (
 export const evasionMitigation = (
   value: number,
   tuning: EvasionTuning = BASE_EVASION,
+  evasionDelta = 0,
 ): number => {
-  const evasion = evasionFor(value, 0, tuning);
+  const evasion = evasionFor(value, evasionDelta, tuning);
   return (evasion.dodgePct + evasion.glancingPct / 2) / 100;
 };
 
@@ -285,6 +287,7 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
   if (incoming > 0) {
     const survivalWorth = incoming >= snapshot.hull * 0.25 ? 2 : 1;
     const tuning = evasionTuningFor(snapshot.shipId);
+    const evasionDelta = sourceMods(snapshot).evasionDelta;
     let engineValue = 0;
     for (const slotId of ENGINE_SLOTS) {
       if (snapshot.slots[slotId] === undefined) continue;
@@ -293,8 +296,8 @@ export const decidePlacements = (snapshot: BattleSnapshot): PolicyDecision => {
       const best = bestByGain(
         available().filter((d) => d.tier <= engineCap),
         (d) =>
-          (evasionMitigation(carried + d.value, tuning) -
-            evasionMitigation(carried, tuning)) *
+          (evasionMitigation(carried + d.value, tuning, evasionDelta) -
+            evasionMitigation(carried, tuning, evasionDelta)) *
             incoming *
             survivalWorth -
           d.value,
