@@ -48,6 +48,7 @@ import {
   type PuzzleReward,
 } from "@/game/puzzles/stakes";
 import { useBackGuard } from "@/app/backGuard";
+import { grantDie } from "@/game/run/inventory";
 import { completeNode } from "@/game/run/flow";
 import { interferenceImminent } from "@/game/run/interference";
 import { LootReveal } from "@/screens/Battle/LootReveal";
@@ -614,7 +615,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     run.addScrap(reward.scrap);
     if (reward.codex !== undefined) meta.unlockCodex(reward.codex);
     if (reward.die !== undefined) {
-      run.addDie(reward.die);
+      grantDie(reward.die);
       useLootStore.getState().drop(reward.die);
       if (puzzle.tier === 5) grantDieUnlock(reward.die);
     }
@@ -630,7 +631,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     playSfx("optionTick", { rate: 1.14 });
     setClaimed(true);
     if (forced) return;
-    useRunStore.getState().addDie(reward.choice.die);
+    grantDie(reward.choice.die);
     useLootStore.getState().drop(reward.choice.die);
   };
 

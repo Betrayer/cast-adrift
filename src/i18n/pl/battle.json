@@ -96,7 +96,8 @@
     "inheritsMult": "tutaj: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Poziomy Mk",
-    "enginesB": "Silniki II"
+    "enginesB": "Silniki II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Mini-boss",

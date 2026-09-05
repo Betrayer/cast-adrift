@@ -76,10 +76,13 @@ import { useLootStore } from "@/stores/lootStore";
 import { useMetaStore, type MetaStats } from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import {
+  runModuleSlots,
   useRunStore,
   type BattleTally,
+  type PendingSwap,
   type RunMode,
 } from "@/stores/runStore";
+import { grantDie, grantModule } from "@/game/run/inventory";
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
@@ -277,6 +280,10 @@ export interface TestState {
     hullMax: number;
     scrap: number;
     deck: string[];
+    modules: string[];
+    bays: number;
+    baysPurchased: number;
+    pendingSwaps: PendingSwap[];
     visited: NodeId[];
   };
   battle: {
@@ -459,9 +466,9 @@ const applyRun = (patch: RunPatch): void => {
   }
   if (patch.hull !== undefined) run.setHull(patch.hull);
   if (patch.vouchers !== undefined) run.addVoucher(patch.vouchers);
-  for (const defId of patch.dice ?? []) run.addDie(defId);
+  for (const defId of patch.dice ?? []) grantDie(defId);
   for (const id of patch.perks ?? []) run.addPerk(id);
-  for (const id of patch.modules ?? []) run.addModule(id);
+  for (const id of patch.modules ?? []) grantModule(id);
   for (const key of patch.flags ?? []) run.setFlag(key);
   if (patch.visited !== undefined) {
     useRunStore.setState({ visited: [...patch.visited] });
@@ -523,6 +530,10 @@ const readState = (): TestState => {
       hullMax: run.hullMax,
       scrap: run.scrap,
       deck: run.deck.map((d) => d.defId),
+      modules: [...run.modules],
+      bays: runModuleSlots(run),
+      baysPurchased: run.baysPurchased,
+      pendingSwaps: run.pendingSwaps.map((swap) => ({ ...swap })),
       visited: [...run.visited],
     },
     battle: {

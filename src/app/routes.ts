@@ -52,6 +52,7 @@ export const ROUTES: Record<ScreenId, RouteDef> = {
   runSetup: { group: 'meta', backMode: 'stack', title: 'run:setup.title' },
   map: { group: 'run', backMode: 'guarded', swipeLock: true },
   journal: { group: 'run', backMode: 'stack', title: 'run:journal.title' },
+  bridge: { group: 'run', backMode: 'stack', title: 'run:bridge.title' },
   battle: { group: 'run', backMode: 'locked', swipeLock: true, enter: 'bespoke' },
   event: { group: 'node', backMode: 'guarded' },
   puzzle: {

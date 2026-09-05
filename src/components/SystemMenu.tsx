@@ -13,6 +13,7 @@ export const SystemMenu = () => {
   const opened = useAppStore((s) => s.systemMenu);
   const setSystemMenu = useAppStore((s) => s.setSystemMenu);
   const setBuildSheet = useAppStore((s) => s.setBuildSheet);
+  const screen = useAppStore((s) => s.screen);
   const go = useAppStore((s) => s.go);
   const [confirming, setConfirming] = useState(false);
 
@@ -60,10 +61,15 @@ export const SystemMenu = () => {
         </Button>
       </div>
       <div className={styles.body}>
-        {entry('build', t('run:build.open'), () => {
-          setSystemMenu(false);
-          setBuildSheet(true);
-        })}
+        {entry(
+          'build',
+          t(screen === 'battle' ? 'run:build.open' : 'run:bridge.open'),
+          () => {
+            setSystemMenu(false);
+            if (screen === 'battle') setBuildSheet(true);
+            else go('bridge');
+          },
+        )}
         {entry('journal', t('run:journal.open'), () => {
           go('journal');
         })}

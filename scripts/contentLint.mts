@@ -88,7 +88,11 @@ import {
 import { ALL_PERKS } from "../src/data/perks";
 import { PUZZLES, type PuzzleGoal } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
-import { SHIPS, shipTextIssues } from "../src/data/ships";
+import {
+  SHIPS,
+  shipBridgeIssues,
+  shipTextIssues,
+} from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
 import {
   ACTION_NAMES,
@@ -581,6 +585,7 @@ for (const ship of SHIPS) {
   checkLocKey(`ships.${ship.id}`, ship.passiveDesc);
 }
 errors.push(...shipTextIssues(SHIPS));
+errors.push(...shipBridgeIssues(SHIPS));
 
 checkUniqueIds(
   "chart",

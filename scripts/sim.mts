@@ -30,6 +30,8 @@ import {
   greedyShipyard,
   greedyShop,
   maxMk,
+  takeModule,
+  wouldTakeModule,
   maxRealSchoolCount,
   runAnomaly,
   runDraft,
@@ -111,7 +113,6 @@ import {
 import { computePerkMods } from "../src/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
 import { ascensionMods } from "../src/data/ascension";
-import { moduleSlots } from "../src/data/modules";
 import { ALL_PERKS } from "../src/data/perks";
 import type { PerkPool } from "../src/data/perks/types";
 import { PERK_DRAFT_SIZE } from "../src/game/run/perkDraft";
@@ -580,18 +581,16 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         );
         const dieChoice = dieForRarity(loot, "rare", 0);
         const moduleChoice = rollModule(loot, state.modules, "uncommon");
-        const bayFree =
-          state.modules.length < moduleSlots(mods.moduleSlotDelta);
-        if (opts.rollModules && bayFree) state.modules.push(moduleChoice);
-        else takeDie(state, dieChoice);
+        if (opts.rollModules && wouldTakeModule(state, moduleChoice)) {
+          takeModule(state, moduleChoice);
+        } else {
+          takeDie(state, dieChoice);
+        }
         state.vouchers += 1;
       } else {
         if (reward.dieDrop !== null) takeDie(state, reward.dieDrop);
         if (opts.rollModules && type === "elite") {
-          const moduleId = rollModule(loot, state.modules, "common");
-          if (state.modules.length < moduleSlots(mods.moduleSlotDelta)) {
-            state.modules.push(moduleId);
-          }
+          takeModule(state, rollModule(loot, state.modules, "common"));
         }
       }
       if (isDraftNode(type) && opts.noDraft !== true) {
@@ -667,7 +666,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       const forecast =
         fightsUntilRest(map, byId, next.id, next.row, route()) *
         EXPECTED_DMG_PER_FIGHT;
-      greedyShipyard(state, forecast > state.hull * 0.6);
+      greedyShipyard(state, forecast > state.hull * 0.6, sector);
       state.nodes += 1;
     } else {
       state.nodes += 1;
@@ -1809,16 +1808,14 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
           { sector, ascension: 0, archetype },
         );
         spent.push(r.scrapSpent);
-        if (r.win) {
-          clearedEarned.push(
-            Math.max(0, r.scrapEarned - Math.max(0, state.eventScrap)),
-          );
-        }
-        if (r.fights > 0) {
-          perNode.push(
-            Math.max(0, r.scrapEarned - Math.max(0, state.eventScrap)) / r.fights,
-          );
-        }
+        const loot = Math.max(
+          0,
+          r.scrapEarned -
+            Math.max(0, state.eventScrap) -
+            Math.max(0, state.moduleSales),
+        );
+        if (r.win) clearedEarned.push(loot);
+        if (r.fights > 0) perNode.push(loot / r.fights);
         pockets += r.pockets;
         skipIncome += state.draftSkips;
         for (const key of Object.keys(sinks)) {

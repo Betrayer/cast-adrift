@@ -96,7 +96,8 @@
     "inheritsMult": "здесь: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Уровни Mk",
-    "enginesB": "Двигатели II"
+    "enginesB": "Двигатели II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Мини-босс",

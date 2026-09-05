@@ -15,6 +15,7 @@ import { DevPanel } from '@/components/DevPanel';
 import { MemoryCeremony } from '@/components/MemoryCeremony';
 import { MergeCard } from '@/components/MergeCard';
 import { PerfOverlay } from '@/components/PerfOverlay';
+import { ReplaceHost } from '@/components/ReplaceHost';
 import { RotateGate } from '@/components/RotateGate';
 import { SystemMenu } from '@/components/SystemMenu';
 import { ToastHost } from '@/components/ToastHost';
@@ -57,6 +58,7 @@ export const App = () => {
       <MemoryCeremony />
       <VoucherCeremony />
       <MergeCard />
+      <ReplaceHost />
       <CoachMarks />
       <RotateGate />
       <DevOverlay />

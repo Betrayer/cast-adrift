@@ -2,7 +2,6 @@ import { ascensionMods, MAX_ASCENSION } from "@/data/ascension";
 import { dossierId } from "@/data/codex";
 import { contractDef } from "@/data/contracts";
 import { DIE_BY_ID } from "@/data/dice";
-import { MODULE_BY_ID } from "@/data/modules";
 import { STARTER_DECK } from "@/data/decks";
 import { computeMutatorMods } from "@/data/mutators";
 import { ENEMY_BY_ID } from "@/data/enemies";
@@ -40,12 +39,12 @@ import {
 } from "@/game/map/wormhole";
 import { chaos } from "@/services/chaos";
 import {
-  DECK_CAP,
   MINIBOSS_PACKAGE_SCRAP,
   ptsForDie,
   sellValue,
 } from "@/game/economy/prices";
 import { pushRunCloud } from "@/game/run/cloud";
+import { grantDie, grantModule } from "@/game/run/inventory";
 import {
   buildEncounterIds,
   pickBoss,
@@ -352,7 +351,7 @@ export const endRun = (win: boolean): void => {
       },
     });
   }
-  useRunStore.setState({ active: false });
+  useRunStore.setState({ active: false, pendingSwaps: [] });
   if (isScoredMode(run.mode)) void finishScoredRun();
   if (win) useAppStore.getState().go(summaryScreenFor(run.mode));
   else useAppStore.getState().go("ending", { death: "1" });
@@ -1271,8 +1270,7 @@ export const resolveEventBattle = (): void => {
         pending.lootRarity ?? "uncommon",
         computeMutatorMods(run.mutators).lootRarityStep,
       );
-    if (run.deck.length < DECK_CAP) run.addDie(defId);
-    else run.addScrap(sellValue(ptsForDie(defId)));
+    grantDie(defId);
   }
   for (const [key, value] of pending.setFlags) run.setFlag(key, value);
   for (const key of pending.clearFlags) run.clearFlag(key);
@@ -1319,11 +1317,8 @@ export const resolveDieReward = (keep: boolean): void => {
   const pending = run.pendingRewards;
   if (pending === null || pending.dieDrop === null) return;
   const dieId = pending.dieDrop;
-  if (keep && run.deck.length < DECK_CAP) {
-    run.addDie(dieId);
-  } else {
-    run.addScrap(sellValue(ptsForDie(dieId)));
-  }
+  if (keep) grantDie(dieId);
+  else run.addScrap(sellValue(ptsForDie(dieId)));
   useRunStore
     .getState()
     .setPendingRewards({ ...pending, dieDrop: null });
@@ -1334,8 +1329,7 @@ export const resolveDieChoice = (dieId: string): void => {
   const run = useRunStore.getState();
   const pending = run.pendingRewards;
   if (pending === null || (pending.dieChoices ?? []).length === 0) return;
-  if (run.deck.length < DECK_CAP) run.addDie(dieId);
-  else run.addScrap(sellValue(ptsForDie(dieId)));
+  grantDie(dieId);
   useRunStore
     .getState()
     .setPendingRewards({ ...pending, dieChoices: [], moduleChoices: [] });
@@ -1346,9 +1340,7 @@ export const resolveModuleChoice = (moduleId: string): void => {
   const run = useRunStore.getState();
   const pending = run.pendingRewards;
   if (pending === null || (pending.moduleChoices ?? []).length === 0) return;
-  if (!run.addModule(moduleId)) {
-    run.addScrap(MODULE_BY_ID.get(moduleId)?.price ?? 0);
-  }
+  grantModule(moduleId);
   useRunStore
     .getState()
     .setPendingRewards({ ...pending, dieChoices: [], moduleChoices: [] });

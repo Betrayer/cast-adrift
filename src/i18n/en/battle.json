@@ -96,7 +96,8 @@
     "inheritsMult": "here: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Mk levels",
-    "enginesB": "Engines II"
+    "enginesB": "Engines II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Mini-boss",

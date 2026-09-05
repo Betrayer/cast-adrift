@@ -5,16 +5,15 @@ import { tokens } from "@/app/theme";
 import { LOOT_SFX } from "@/data/audio";
 import { DieCard } from "@/components/DieCard";
 import { DIE_BY_ID } from "@/data/dice";
-import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
+import { MODULE_BY_ID } from "@/data/modules";
 import { schools } from "@/data/schools";
-import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
+import { DECK_CAP } from "@/game/economy/prices";
 import { resolveDieChoice, resolveModuleChoice } from "@/game/run/flow";
-import { computeRunMods } from "@/game/run/runMods";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
-import { useRunStore } from "@/stores/runStore";
+import { runModuleSlots, useRunStore } from "@/stores/runStore";
 import styles from "./Rewards.module.css";
 
 const CARD_FLIP_MS = 140;
@@ -34,17 +33,14 @@ export const PackageReward = ({
   const deckSize = useRunStore((s) => s.deck.length);
   const engravings = useMetaStore((s) => s.engravings);
   const vouchers = useRunStore((s) => s.vouchers);
-  const chartPicks = useRunStore((s) => s.chartPicks);
-  const perks = useRunStore((s) => s.perks);
   const runModules = useRunStore((s) => s.modules);
+  const cap = useRunStore(runModuleSlots);
   const packageScrap = useRunStore((s) => s.pendingRewards?.packageScrap ?? 0);
   const reduced = resolveReducedMotion(
     useSettingsStore((s) => s.reducedMotion),
   );
   const deckFull = deckSize >= DECK_CAP;
-  const bayFull =
-    runModules.length >=
-    moduleSlots(computeRunMods(perks, chartPicks).moduleSlotDelta);
+  const bayFull = runModules.length >= cap;
 
   const best = choices.reduce<(typeof RARITY_ORDER)[number]>((top, dieId) => {
     const rarity = DIE_BY_ID.get(dieId)?.rarity;
@@ -114,9 +110,7 @@ export const PackageReward = ({
                       resolveDieChoice(dieId);
                     }}
                   >
-                    {deckFull
-                      ? t("run:package.sell", { n: sellValue(ptsForDie(dieId)) })
-                      : t("run:package.take")}
+                    {deckFull ? t("run:package.replace") : t("run:package.take")}
                   </Button>
                 }
               />
@@ -159,9 +153,7 @@ export const PackageReward = ({
                   resolveModuleChoice(moduleId);
                 }}
               >
-                {bayFull
-                  ? t("run:package.sell", { n: def.price })
-                  : t("run:package.install")}
+                {bayFull ? t("run:package.replace") : t("run:package.install")}
               </Button>
             </div>
           );

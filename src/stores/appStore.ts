@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { hasBackGuard, runBackGuard } from "@/app/backGuard";
+import {
+  backBlocked,
+  hasBackGuard,
+  runBackGuard,
+} from "@/app/backGuard";
 import { fixedBackTarget, ROUTES, type NavDirection } from "@/app/routes";
 import type { MergePrompt } from "@/services/account-link";
 import type { AuthErrorCode } from "@/services/authErrors";
@@ -73,6 +77,7 @@ export const backActionFor = (state: {
   screen: ScreenId;
   stack: readonly StackEntry[];
 }): BackAction => {
+  if (backBlocked()) return { kind: "none" };
   const mode = ROUTES[state.screen].backMode;
   if (mode === "locked") return { kind: "none" };
   if (mode === "guarded") {

@@ -9,7 +9,7 @@ import { prefetchBattle } from "@/app/prefetch";
 import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
 import { ENEMY_BY_ID } from "@/data/enemies";
-import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
+import { MODULE_BY_ID } from "@/data/modules";
 import { computeMutatorMods } from "@/data/mutators";
 import { sectorDef } from "@/data/sectors";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
@@ -25,7 +25,6 @@ import {
 } from "@/game/run/flow";
 import { holeTollFor } from "@/game/run/motifs";
 import { bypassTargetFor, isGentleRide } from "@/game/map/wormhole";
-import { computeRunMods } from "@/game/run/runMods";
 import {
   areConnected,
   edgeMarkFor,
@@ -62,7 +61,7 @@ import {
 } from "./travel";
 import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
 import { useAppStore } from "@/stores/appStore";
-import { useRunStore } from "@/stores/runStore";
+import { runModuleSlots, useRunStore } from "@/stores/runStore";
 import styles from "./MapScreen.module.css";
 
 const ringFor = (
@@ -288,12 +287,13 @@ const MapShortcuts = () => {
       <Button
         size="compact-xs"
         variant="default"
-        data-open-build
+        data-open-bridge
+        data-testid="map-bridge"
         onClick={() => {
-          useAppStore.getState().setBuildSheet(true);
+          useAppStore.getState().go("bridge");
         }}
       >
-        {t("run:build.open")}
+        {t("run:bridge.open")}
       </Button>
       <Button
         size="compact-xs"
@@ -315,11 +315,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const visited = useRunStore((s) => s.visited);
   const tide = useRunStore((s) => s.tide);
   const runModules = useRunStore((s) => s.modules);
-  const chartPicks = useRunStore((s) => s.chartPicks);
-  const perks = useRunStore((s) => s.perks);
-  const moduleCap = moduleSlots(
-    computeRunMods(perks, chartPicks).moduleSlotDelta,
-  );
+  const moduleCap = useRunStore(runModuleSlots);
   const moduleNames = runModules
     .map((id) => {
       const def = MODULE_BY_ID.get(id);

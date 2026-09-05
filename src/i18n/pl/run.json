@@ -207,7 +207,7 @@
     "dieTitle": "Odzyskana matryca",
     "keep": "Zostawić na pokładzie",
     "sell": "Sprzedaj (+{{n}})",
-    "deckFull": "Pełna talia (9)"
+    "replace": "Wymiana matrycy"
   },
   "perk": {
     "title": "Wybierz opcję rozszerzenia",
@@ -227,8 +227,8 @@
     "sellTitle": "Sprzedaj kostkę do gry",
     "empty": "Wyprzedane",
     "modulesTitle": "Moduły {{used}} / {{max}}",
-    "modulesFull": "Zatoka pełna",
-    "rerollFree": "Ponowne losowanie zasobów (bezpłatne)"
+    "rerollFree": "Ponowne losowanie zasobów (bezpłatne)",
+    "owned": "Zainstalowane"
   },
   "shipyard": {
     "title": "Stocznia",
@@ -244,7 +244,12 @@
     "hull": "Kadłub {{cur}}/{{max}}",
     "voucher": "Kupon Mk ×{{n}} — jeden bezpłatny poziom",
     "voucherUse": "Bezpłatny",
-    "fuse": "Stop — {{n}}"
+    "fuse": "Stop — {{n}}",
+    "baysTitle": "Gniazda modułowe {{used}} / {{max}}",
+    "baysEmpty": "Nie zainstalowano żadnych modułów.",
+    "demount": "Demount + {{n}}",
+    "buyBay": "Kup bok — {{n}}",
+    "bayDone": "W tej serii nie ma już zatok."
   },
   "summary": {
     "victory": "Sektor oczyszczony",
@@ -320,10 +325,10 @@
     "scrap": "+ fragment z{{n}}",
     "voucher": "Kupon Mk ×{{n}} — jedno bezpłatne ulepszenie w dowolnej stoczni",
     "take": "Weź",
-    "sell": "Sprzedaj (+{{n}})",
     "hint": "Wybierz jedną opcję. Zaraz rozpocznie się wybór bonusów.",
     "module": "moduł",
-    "install": "Zainstaluj"
+    "install": "Zainstaluj",
+    "replace": "Zastąp"
   },
   "tutorial": {
     "next": "Dalej",
@@ -560,5 +565,37 @@
     "rideCost": "Przejazd: przejazd pociągiem linii „{{min}}” – stacja{{max}}, kierunek nieznany",
     "rideGentle": "Ride: rzut „{{min}}” – „{{max}}”, wyłącznie w głębszym zakresie",
     "landed": "Rzuty {{rows}} wiersze {{way}}"
+  },
+  "bridge": {
+    "title": "Most",
+    "open": "Most",
+    "tab": {
+      "overview": "Przegląd",
+      "dice": "Kości",
+      "modules": "Moduły",
+      "perks": "Korzyści"
+    },
+    "hull": "Kadłub {{cur}}/{{max}}",
+    "scrap": "Złom {{n}}",
+    "bays": "Bays {{used}} / {{max}}",
+    "bayEmpty": "pusta zatoka",
+    "bayOffer": "+1 dok — złom z {{n}} w stoczni",
+    "deckCount": "Strona internetowa: {{n}} / {{max}}",
+    "sellDiceHint": "W sklepie można kupić kostki do gry.",
+    "sellModule": "Sprzedaż + numer{{n}}",
+    "crewTitle": "Kabiny oficerskie",
+    "crewLocked": "Zapieczętowany — na pokładzie nie ma jeszcze załogi.",
+    "cargoTitle": "Luk ładunkowy",
+    "cargoLocked": "Zamknięte — na razie nie ma co wywozić."
+  },
+  "replace": {
+    "title": "Zastąp",
+    "titleDie": "Nowa matryca",
+    "titleModule": "Nowy moduł",
+    "fullDeck": "Pełna lista kart „{{used}}” / „{{max}}” — co się nadaje?",
+    "fullBay": "Bay w pełnej krasie {{used}} / {{max}} — co się dzieje?",
+    "toScrap": "→ scrap + {{n}}",
+    "sellNew": "Sprzedaj nowy egzemplarz (+ {{n}})",
+    "cancel": "Anuluj"
   }
 }

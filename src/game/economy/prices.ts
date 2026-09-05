@@ -18,10 +18,25 @@ export const diePriceBase = (pts: number): number => 35 + pts * 12;
 export const diePrice = (pts: number, jitter: number): number =>
   Math.max(1, diePriceBase(pts) + jitter);
 
+export const MAX_SHOP_DISCOUNT_PCT = 40;
+
+export const clampDiscount = (discountPct: number): number =>
+  Math.max(0, Math.min(MAX_SHOP_DISCOUNT_PCT, discountPct));
+
 export const applyDiscount = (price: number, discountPct: number): number =>
-  Math.max(1, Math.round(price * (1 - discountPct / 100)));
+  Math.max(1, Math.round(price * (1 - clampDiscount(discountPct) / 100)));
 
 export const sellValue = (pts: number): number => pts * 8;
+
+export const moduleSellValue = (price: number): number =>
+  Math.max(1, Math.floor(price * 0.5));
+
+export const BAY_PRICE_BASE = 90;
+
+export const BAY_PRICE_STEP = 30;
+
+export const bayPrice = (sector: number): number =>
+  BAY_PRICE_BASE + BAY_PRICE_STEP * (Math.max(1, sector) - 1);
 
 export const ptsForDie = (defId: string): number =>
   DIE_BY_ID.get(defId)?.pts ?? 0;

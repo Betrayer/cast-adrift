@@ -207,7 +207,7 @@
     "dieTitle": "Matrice récupérée",
     "keep": "Garder dans le paquet",
     "sell": "Vendre (+ {{n}})",
-    "deckFull": "Jeu complet (9)"
+    "replace": "Remplacer une matrice"
   },
   "perk": {
     "title": "Choisissez une mise à niveau",
@@ -227,8 +227,8 @@
     "sellTitle": "Vendre un dé",
     "empty": "Épuisé",
     "modulesTitle": "Modules {{used}} / {{max}}",
-    "modulesFull": "Baie pleine",
-    "rerollFree": "Réapprovisionnement (gratuit)"
+    "rerollFree": "Réapprovisionnement (gratuit)",
+    "owned": "Installé"
   },
   "shipyard": {
     "title": "Chantier naval",
@@ -244,7 +244,12 @@
     "hull": "Coque {{cur}}/{{max}}",
     "voucher": "Code promo Mk × {{n}} — un niveau gratuit",
     "voucherUse": "Gratuit",
-    "fuse": "Fusionner — {{n}}"
+    "fuse": "Fusionner — {{n}}",
+    "baysTitle": "Baies de modules {{used}} / {{max}}",
+    "baysEmpty": "Aucun module n'est installé.",
+    "demount": "Démontage et{{n}}",
+    "buyBay": "Achetez une box — {{n}}",
+    "bayDone": "Il n'y a plus de baies sur ce parcours."
   },
   "summary": {
     "victory": "Secteur dégagé",
@@ -320,10 +325,10 @@
     "scrap": "+ Déchet de{{n}}",
     "voucher": "Bon Mk × {{n}} — une mise à niveau gratuite dans n'importe quel chantier naval",
     "take": "Prendre",
-    "sell": "Vendre (+ {{n}})",
     "hint": "Faites votre choix. Le tirage au sort des avantages va suivre.",
     "module": "module",
-    "install": "Installer"
+    "install": "Installer",
+    "replace": "Remplacer"
   },
   "tutorial": {
     "next": "Suivant",
@@ -560,5 +565,37 @@
     "rideCost": "Trajet : un trajet d'{{min}}à{{max}}, direction inconnue",
     "rideGentle": "Ride : une variante de l’{{min}}—{{max}}e, mais plus profonde",
     "landed": "Lancé {{rows}} lignes {{way}}"
+  },
+  "bridge": {
+    "title": "Pont",
+    "open": "Pont",
+    "tab": {
+      "overview": "Présentation générale",
+      "dice": "Dés",
+      "modules": "Modules",
+      "perks": "Avantages"
+    },
+    "hull": "Coque {{cur}}/{{max}}",
+    "scrap": "Ferraille {{n}}",
+    "bays": "Bays {{used}} / {{max}}",
+    "bayEmpty": "baie vide",
+    "bayOffer": "+1 cale — débris de l'{{n}} au chantier naval",
+    "deckCount": "{{n}} de la terrasse / {{max}}",
+    "sellDiceHint": "On vend des dés à la boutique.",
+    "sellModule": "Vente + {{n}}",
+    "crewTitle": "Cabines des officiers",
+    "crewLocked": "Scellé — aucun équipage à bord pour l'instant.",
+    "cargoTitle": "Salle de chargement",
+    "cargoLocked": "Scellé — rien à transporter pour l'instant."
+  },
+  "replace": {
+    "title": "Remplacer",
+    "titleDie": "Nouvelle matrice",
+    "titleModule": "Nouveau module",
+    "fullDeck": "{{used}}s complètes sur le deck / {{max}} — qu'en pensez-vous ?",
+    "fullBay": "{{used}} complète de Bay / {{max}} — qu'est-ce qui se passe ?",
+    "toScrap": "→ « scrap » + «{{n}} »",
+    "sellNew": "Vendre le nouveau (+ {{n}})",
+    "cancel": "Annuler"
   }
 }

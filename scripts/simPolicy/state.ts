@@ -1,17 +1,26 @@
 import { DIE_BY_ID } from "../../src/data/dice";
-import { moduleSlots } from "../../src/data/modules";
+import { MODULE_BY_ID } from "../../src/data/modules";
+import { moduleTags } from "../../src/data/modules/types";
+import {
+  loadoutCensus,
+  type TagCensus,
+} from "../../src/game/effects/census";
+import { bayPurchasable, moduleSlots } from "../../src/game/run/bays";
 import { PERK_BY_ID } from "../../src/data/perks";
 import { sectorDef } from "../../src/data/sectors";
 import {
+  bayPrice,
   DECK_CAP,
   mkUpgradeCost,
+  moduleSellValue,
   ptsForDie,
   sellValue,
 } from "../../src/game/economy/prices";
 import { generateShopModules, generateShopStock } from "../../src/game/economy/shop";
 import { interferenceStacksForStreak } from "../../src/game/run/interference";
 import { computePerkMods } from "../../src/game/run/perkMods";
-import { computeRunMods } from "../../src/game/run/runMods";
+import { computeModuleMods, computeRunMods } from "../../src/game/run/runMods";
+import type { PerkMods } from "../../src/data/perks/types";
 import { rollPerkChoices, type DraftContext } from "../../src/game/run/perkDraft";
 import { puzzleForNode } from "../../src/game/puzzles/selection";
 import type { MapGraph, MapNode } from "../../src/game/map/types";
@@ -87,6 +96,8 @@ export interface RunState {
   eventsResolved: number;
   eventScrap: number;
   eventHull: number;
+  moduleSales: number;
+  baysPurchased: number;
   solvedPuzzles: string[];
   banishUsed: boolean;
   rerollUsed: boolean;
@@ -109,6 +120,7 @@ export const emptyPuzzleTally = (): Record<number, PuzzleTally> => ({
 export const emptySinks = (): Record<string, number> => ({
   dice: 0,
   modules: 0,
+  bays: 0,
   repair: 0,
   mk: 0,
   puzzleStakes: 0,
@@ -149,6 +161,8 @@ export const createRunState = (init: RunStateInit): RunState => ({
   eventsResolved: 0,
   eventScrap: 0,
   eventHull: 0,
+  moduleSales: 0,
+  baysPurchased: 0,
   kills: 0,
   nodes: 0,
   fights: 0,
@@ -179,6 +193,12 @@ export const gain = (state: RunState, amount: number): void => {
   if (amount <= 0) return;
   state.scrap += amount;
   state.scrapEarned += amount;
+};
+
+const gainModuleSale = (state: RunState, amount: number): void => {
+  if (amount <= 0) return;
+  gain(state, amount);
+  state.moduleSales += amount;
 };
 
 export const schoolOf = (defId: string): string | undefined =>
@@ -268,6 +288,134 @@ export const takeDie = (state: RunState, defId: string): void => {
   gain(state, sellValue(ptsForDie(defId)));
 };
 
+const MODULE_RARITY_VALUE: Record<string, number> = {
+  common: 1,
+  uncommon: 2,
+  rare: 3.5,
+  legendary: 5,
+};
+
+const MODULE_MOD_WEIGHTS: Partial<Record<keyof PerkMods, number>> = {
+  hullMaxDelta: 0.18,
+  hullMaxPct: 0.09,
+  battleEndHeal: 0.5,
+  scrapMultPct: 0.06,
+  chargeCapDelta: 0.15,
+  extraRerolls: 0.7,
+  reserveDelta: 0.6,
+  blueReserveDelta: 0.3,
+  markBonusDelta: 0.5,
+  jamPowerDelta: 0.3,
+  evasionDelta: 0.05,
+  growthCapDelta: 0.25,
+  scrapPerKill: 0.25,
+  setCompleteCharge: 0.2,
+  battleStartScrap: 0.1,
+  tideEffectDelta: -0.9,
+  nudgeCostDelta: -0.7,
+  moduleSlotDelta: 1.5,
+  shopDiscountPct: 0.05,
+  freeShopRerolls: 0.2,
+  rerollSizeDelta: 0.4,
+};
+
+const MODULE_TAG_VALUE = 0.9;
+
+const MODULE_TRADE_MARGIN = 1.25;
+
+const MODULE_TAG_CAP = 4;
+
+export const buildCensus = (state: RunState): TagCensus =>
+  loadoutCensus({
+    deckDefIds: state.deck,
+    perks: state.perks,
+    modules: [],
+  });
+
+export const moduleValue = (moduleId: string, census: TagCensus = {}): number => {
+  const def = MODULE_BY_ID.get(moduleId);
+  if (def === undefined) return 0;
+  const mods = computeModuleMods([moduleId]);
+  let score = MODULE_RARITY_VALUE[def.rarity] ?? 1;
+  for (const [key, weight] of Object.entries(MODULE_MOD_WEIGHTS)) {
+    score += mods[key as keyof PerkMods] * (weight ?? 0);
+  }
+  score += (def.effects?.length ?? 0) * 0.6;
+  score += (def.traits?.length ?? 0) * 1.2;
+  for (const tag of moduleTags(def)) {
+    score += MODULE_TAG_VALUE * Math.min(census[tag] ?? 0, MODULE_TAG_CAP);
+  }
+  return score;
+};
+
+const worstModuleIndex = (
+  modules: readonly string[],
+  census: TagCensus,
+): number => {
+  let index = -1;
+  let worst = Number.POSITIVE_INFINITY;
+  for (let i = 0; i < modules.length; i += 1) {
+    const moduleId = modules[i];
+    if (moduleId === undefined) continue;
+    const score = moduleValue(moduleId, census);
+    if (score < worst) {
+      worst = score;
+      index = i;
+    }
+  }
+  return index;
+};
+
+export const runBays = (state: RunState): number =>
+  moduleSlots(
+    state.shipId,
+    computeRunMods(state.perks, state.chartPicks).moduleSlotDelta,
+    state.baysPurchased,
+  );
+
+const OWNED = -2;
+
+const tradeTarget = (state: RunState, moduleId: string): number => {
+  if (state.modules.includes(moduleId)) return OWNED;
+  if (state.modules.length < runBays(state)) return state.modules.length;
+  const census = buildCensus(state);
+  const index = worstModuleIndex(state.modules, census);
+  const incumbent = index < 0 ? undefined : state.modules[index];
+  if (
+    index < 0 ||
+    incumbent === undefined ||
+    moduleValue(moduleId, census) <
+      moduleValue(incumbent, census) * MODULE_TRADE_MARGIN
+  ) {
+    return -1;
+  }
+  return index;
+};
+
+export const wouldTakeModule = (state: RunState, moduleId: string): boolean =>
+  tradeTarget(state, moduleId) >= 0;
+
+export const takeModule = (state: RunState, moduleId: string): boolean => {
+  const index = tradeTarget(state, moduleId);
+  if (index === OWNED) return false;
+  if (index < 0) {
+    gainModuleSale(
+      state,
+      moduleSellValue(MODULE_BY_ID.get(moduleId)?.price ?? 0),
+    );
+    return false;
+  }
+  const incumbent = state.modules[index];
+  state.modules[index] = moduleId;
+  if (incumbent !== undefined) {
+    gainModuleSale(
+      state,
+      moduleSellValue(MODULE_BY_ID.get(incumbent)?.price ?? 0),
+    );
+  }
+  return true;
+};
+
 export const greedyShop = (
   state: RunState,
   seed: number,
@@ -275,10 +423,10 @@ export const greedyShop = (
 ): void => {
   const discount = computeRunMods(state.perks, state.chartPicks, state.modules).shopDiscountPct;
   for (const item of generateShopModules(seed, node.id, 0, discount)) {
-    if (state.modules.length >= moduleSlots(0)) break;
-    if (state.scrap >= item.price && spend(state, item.price, "modules")) {
-      state.modules.push(item.moduleId);
-    }
+    if (state.scrap < item.price) continue;
+    if (!wouldTakeModule(state, item.moduleId)) continue;
+    if (!spend(state, item.price, "modules")) continue;
+    takeModule(state, item.moduleId);
   }
   const items = generateShopStock(seed, node.id, 0, discount);
   const target = deckTargetSchool(state.deck);
@@ -357,7 +505,27 @@ export const buyUpgrades = (state: RunState): void => {
   }
 };
 
-export const greedyShipyard = (state: RunState, repairFirst: boolean): void => {
+export const buyBay = (state: RunState, sector: number): void => {
+  if (
+    !bayPurchasable(
+      state.shipId,
+      computeRunMods(state.perks, state.chartPicks).moduleSlotDelta,
+      state.baysPurchased,
+    )
+  ) {
+    return;
+  }
+  if (state.modules.length < runBays(state)) return;
+  const cost = bayPrice(sector);
+  if (state.scrap < cost || !spend(state, cost, "bays")) return;
+  state.baysPurchased += 1;
+};
+
+export const greedyShipyard = (
+  state: RunState,
+  repairFirst: boolean,
+  sector: number,
+): void => {
   if (repairFirst) {
     repairToFull(state);
     buyUpgrades(state);
@@ -366,6 +534,7 @@ export const greedyShipyard = (state: RunState, repairFirst: boolean): void => {
     repairToFull(state);
   }
   repairToFull(state);
+  buyBay(state, sector);
 };
 
 export const applyEffectsToState = (

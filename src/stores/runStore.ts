@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { moduleSlots } from "@/data/modules";
 import type { ShipId } from "@/data/ships";
 import type { MkLevel } from "@/data/slots";
 import {
@@ -8,6 +7,7 @@ import {
   driftAllowed,
   sectorDriftDelta,
 } from "@/game/run/axis";
+import { bayPurchasable, moduleSlots } from "@/game/run/bays";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
@@ -26,6 +26,10 @@ export interface DieInstance {
   defId: string;
   growthBonus?: number;
 }
+
+export type PendingSwap =
+  | { kind: "die"; defId: string }
+  | { kind: "module"; moduleId: string };
 
 export type BattleModKind = "startCharge" | "enemyPlus";
 
@@ -163,6 +167,8 @@ export interface RunValues {
   deck: DieInstance[];
   perks: string[];
   modules: string[];
+  baysPurchased: number;
+  pendingSwaps: PendingSwap[];
   banishedPerks: string[];
   draftsSinceRare: number;
   draftRerollUsed: boolean;
@@ -223,6 +229,9 @@ export interface RunState extends RunValues {
   useDraftReroll: () => boolean;
   addModule: (moduleId: string) => boolean;
   removeModule: (moduleId: string) => void;
+  purchaseBay: () => void;
+  queueSwap: (swap: PendingSwap) => void;
+  shiftSwap: () => void;
   setFlag: (key: string, value?: FlagValue) => void;
   clearFlag: (key: string) => void;
   bumpCounter: (key: string, delta: number) => void;
@@ -315,6 +324,8 @@ export const createInitialRunValues = (): RunValues => ({
   deck: [],
   perks: [],
   modules: [],
+  baysPurchased: 0,
+  pendingSwaps: [],
   banishedPerks: [],
   draftsSinceRare: 0,
   draftRerollUsed: false,
@@ -360,6 +371,20 @@ export const createInitialRunValues = (): RunValues => ({
   encounters: [],
   startedAt: 0,
 });
+
+export const runModuleSlots = (s: RunValues): number =>
+  moduleSlots(
+    s.shipId,
+    computeRunMods(s.perks, s.chartPicks).moduleSlotDelta,
+    s.baysPurchased,
+  );
+
+export const runBayPurchasable = (s: RunValues): boolean =>
+  bayPurchasable(
+    s.shipId,
+    computeRunMods(s.perks, s.chartPicks).moduleSlotDelta,
+    s.baysPurchased,
+  );
 
 export const useRunStore = create<RunState>()((set, get) => ({
   ...createInitialRunValues(),
@@ -440,17 +465,25 @@ export const useRunStore = create<RunState>()((set, get) => ({
   addModule: (moduleId) => {
     const s = get();
     if (s.modules.includes(moduleId)) return false;
-    if (
-      s.modules.length >=
-      moduleSlots(computeRunMods(s.perks, s.chartPicks).moduleSlotDelta)
-    )
-      return false;
+    if (s.modules.length >= runModuleSlots(s)) return false;
     set({ modules: [...s.modules, moduleId] });
     return true;
   },
 
   removeModule: (moduleId) => {
     set((s) => ({ modules: s.modules.filter((m) => m !== moduleId) }));
+  },
+
+  purchaseBay: () => {
+    set((s) => ({ baysPurchased: s.baysPurchased + 1 }));
+  },
+
+  queueSwap: (swap) => {
+    set((s) => ({ pendingSwaps: [...s.pendingSwaps, swap] }));
+  },
+
+  shiftSwap: () => {
+    set((s) => ({ pendingSwaps: s.pendingSwaps.slice(1) }));
   },
 
   setFlag: (key, value = true) => {

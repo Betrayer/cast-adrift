@@ -8,10 +8,10 @@ import {
   Stack,
   Text,
 } from "@mantine/core";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ascensionMods } from "@/data/ascension";
-import { useBackGuard } from "@/app/backGuard";
+import { useBackBlock, useBackGuard } from "@/app/backGuard";
 import { POP_MS, riseStyle, useMotionFlag } from "@/app/motion";
 import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
@@ -19,7 +19,7 @@ import { tokens } from "@/app/theme";
 import { DieCard } from "@/components/DieCard";
 import { DieCardTrigger } from "@/components/DieCardModal";
 import { DIE_BY_ID } from "@/data/dice";
-import { MODULE_BY_ID, moduleSlots } from "@/data/modules";
+import { MODULE_BY_ID } from "@/data/modules";
 import { playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import {
@@ -37,9 +37,15 @@ import { keeperLinesFor } from "@/data/narrative/keeperLines";
 import { autosaveRun, completeNode } from "@/game/run/flow";
 import { enterShop } from "@/game/run/shopEntry";
 import { computeRunMods } from "@/game/run/runMods";
+import { replaceDie, replaceModule } from "@/game/run/inventory";
+import { ReplaceCard } from "@/components/ReplaceCard";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import {
+  runModuleSlots,
+  useRunStore,
+  type PendingSwap,
+} from "@/stores/runStore";
 
 export const ShopScreen = () => {
   const { t } = useTranslation(["run", "battle", "content"]);
@@ -66,11 +72,36 @@ export const ShopScreen = () => {
     flagShopDiscount(flags) -
     ascensionMods(ascension).shopPricePct;
   const nodeId = position ?? "";
-  const slots = moduleSlots(computeRunMods(perks, chartPicks).moduleSlotDelta);
+  const slots = useRunStore(runModuleSlots);
+  const [pending, setPending] = useState<{
+    swap: PendingSwap;
+    index: number;
+    price: number;
+  } | null>(null);
 
   useEffect(() => {
     if (enterShop(nodeId)) autosaveRun();
   }, [nodeId, seed]);
+
+  const markSold = (kind: "die" | "module", index: number): void => {
+    const current = useRunStore.getState().shop;
+    if (current === null) return;
+    setShop(
+      kind === "die"
+        ? {
+            ...current,
+            items: current.items.map((it, i) =>
+              i === index ? { ...it, sold: true } : it,
+            ),
+          }
+        : {
+            ...current,
+            modules: current.modules.map((it, i) =>
+              i === index ? { ...it, sold: true } : it,
+            ),
+          },
+    );
+  };
 
   const buy = (index: number): void => {
     const state = useRunStore.getState();
@@ -78,18 +109,21 @@ export const ShopScreen = () => {
     if (current === null) return;
     const item = current.items[index];
     if (item === undefined || item.sold) return;
-    if (state.deck.length >= DECK_CAP || state.scrap < item.price) return;
+    if (state.scrap < item.price) return;
+    if (state.deck.length >= DECK_CAP) {
+      setPending({
+        swap: { kind: "die", defId: item.defId },
+        index,
+        price: item.price,
+      });
+      return;
+    }
     if (!state.spendScrap(item.price)) return;
     playSfx("buy");
     haptic("purchase");
     pulseScrap();
     state.addDie(item.defId);
-    setShop({
-      ...current,
-      items: current.items.map((it, i) =>
-        i === index ? { ...it, sold: true } : it,
-      ),
-    });
+    markSold("die", index);
     autosaveRun();
   };
 
@@ -100,6 +134,15 @@ export const ShopScreen = () => {
     const item = current.modules[index];
     if (item === undefined || item.sold) return;
     if (state.scrap < item.price) return;
+    if (state.modules.includes(item.moduleId)) return;
+    if (state.modules.length >= runModuleSlots(state)) {
+      setPending({
+        swap: { kind: "module", moduleId: item.moduleId },
+        index,
+        price: item.price,
+      });
+      return;
+    }
     if (!state.spendScrap(item.price)) return;
     if (!state.addModule(item.moduleId)) {
       state.addScrap(item.price);
@@ -108,12 +151,28 @@ export const ShopScreen = () => {
     playSfx("buy");
     haptic("purchase");
     pulseScrap();
-    setShop({
-      ...current,
-      modules: current.modules.map((it, i) =>
-        i === index ? { ...it, sold: true } : it,
-      ),
-    });
+    markSold("module", index);
+    autosaveRun();
+  };
+
+  const confirmReplace = (key: string): void => {
+    if (pending === null) return;
+    const state = useRunStore.getState();
+    if (state.scrap < pending.price) return;
+    if (!state.spendScrap(pending.price)) return;
+    const done =
+      pending.swap.kind === "die"
+        ? replaceDie(key, pending.swap.defId)
+        : replaceModule(key, pending.swap.moduleId);
+    if (!done) {
+      useRunStore.getState().addScrap(pending.price);
+      return;
+    }
+    playSfx("buy");
+    haptic("purchase");
+    pulseScrap();
+    markSold(pending.swap.kind, pending.index);
+    setPending(null);
     autosaveRun();
   };
 
@@ -160,6 +219,7 @@ export const ShopScreen = () => {
   };
 
   useBackGuard("shop", leave);
+  useBackBlock(pending !== null);
 
   const greeting = createStream(deriveSeed(seed, `keeper:${nodeId}`)).pick(
     keeperLinesFor("shop", flags),
@@ -195,6 +255,25 @@ export const ShopScreen = () => {
           {t("run:shop.leave")}
         </Button>
       }
+      overlay={
+        pending === null ? null : (
+          <ReplaceCard
+            swap={pending.swap}
+            used={
+              pending.swap.kind === "die" ? deck.length : runModules.length
+            }
+            cap={pending.swap.kind === "die" ? DECK_CAP : slots}
+            footerLabel={t("run:replace.cancel")}
+            onPick={confirmReplace}
+            onFooter={() => {
+              setPending(null);
+            }}
+            onClose={() => {
+              setPending(null);
+            }}
+          />
+        )
+      }
     >
       <Stack gap="sm">
       <Text size="xs" c={tokens.dim} fs="italic">
@@ -205,8 +284,7 @@ export const ShopScreen = () => {
         {items.map((item, index) => {
           const def = DIE_BY_ID.get(item.defId);
           if (def === undefined) return null;
-          const affordable =
-            !item.sold && scrap >= item.price && deck.length < DECK_CAP;
+          const affordable = !item.sold && scrap >= item.price;
           return (
             <div
               key={index}
@@ -252,8 +330,7 @@ export const ShopScreen = () => {
           const def = MODULE_BY_ID.get(item.moduleId);
           if (def === undefined) return null;
           const owned = runModules.includes(item.moduleId);
-          const full = runModules.length >= slots;
-          const affordable = !item.sold && !owned && !full && scrap >= item.price;
+          const affordable = !item.sold && !owned && scrap >= item.price;
           return (
             <Paper
               key={item.moduleId}
@@ -282,14 +359,16 @@ export const ShopScreen = () => {
                   mt={4}
                   fullWidth
                   disabled={!affordable}
+                  data-shop-module-buy={item.moduleId}
+                  data-testid={`shop-module-buy-${String(index)}`}
                   onClick={() => {
                     buyModule(index);
                   }}
                 >
                   {item.sold
                     ? t("run:shop.empty")
-                    : full
-                      ? t("run:shop.modulesFull")
+                    : owned
+                      ? t("run:shop.owned")
                       : t("run:shop.buy", { n: item.price })}
                 </Button>
               </Stack>

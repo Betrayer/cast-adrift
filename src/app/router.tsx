@@ -67,6 +67,11 @@ const FinaleScreen = lazy(() =>
     default: m.FinaleScreen,
   })),
 );
+const BridgeScreen = lazy(() =>
+  import('@/screens/Bridge/BridgeScreen').then((m) => ({
+    default: m.BridgeScreen,
+  })),
+);
 const JournalScreen = lazy(() =>
   import('@/screens/Journal/JournalScreen').then((m) => ({
     default: m.JournalScreen,
@@ -85,6 +90,7 @@ const SCREENS: Record<ScreenId, () => ReactElement> = {
   map: () => <MapScreen />,
   event: () => <EventScreen />,
   journal: () => <JournalScreen />,
+  bridge: () => <BridgeScreen />,
   puzzle: () => <PuzzleScreen />,
   shop: () => <ShopScreen />,
   shipyard: () => <ShipyardScreen />,

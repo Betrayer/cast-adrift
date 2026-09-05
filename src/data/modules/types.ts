@@ -37,4 +37,4 @@ export const moduleTags = (def: ModuleDef): readonly ContentTag[] => [
 ];
 
 export const BASE_MODULE_SLOTS = 2;
-export const MAX_MODULE_SLOTS = 3;
+export const MAX_MODULE_SLOTS = 4;

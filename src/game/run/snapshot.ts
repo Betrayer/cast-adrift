@@ -16,7 +16,14 @@ import { useNarrativeStore } from "@/stores/narrativeStore";
 import type { JournalEntry } from "@/game/run/journal";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 10;
+const TRANSIENT_SCREENS: readonly ScreenId[] = ["bridge", "journal"];
+
+const resumeScreen = (screen: ScreenId): ScreenId =>
+  TRANSIENT_SCREENS.includes(screen) ? "map" : screen;
+
+export const RUN_SNAPSHOT_V = 11;
+
+export const RUN_SNAPSHOT_ACCEPTED: readonly number[] = [10, 11];
 
 export interface RunSnapshotV1 {
   v: number;
@@ -46,6 +53,8 @@ const pickRunValues = (s: RunState): RunValues => ({
   deck: s.deck.map((d) => ({ ...d })),
   perks: [...s.perks],
   modules: [...s.modules],
+  baysPurchased: s.baysPurchased,
+  pendingSwaps: s.pendingSwaps.map((swap) => ({ ...swap })),
   banishedPerks: [...s.banishedPerks],
   draftsSinceRare: s.draftsSinceRare,
   draftRerollUsed: s.draftRerollUsed,
@@ -139,7 +148,7 @@ const pickRunValues = (s: RunState): RunValues => ({
 
 export const captureRunSnapshot = (): RunSnapshotV1 => ({
   v: RUN_SNAPSHOT_V,
-  screen: useAppStore.getState().screen,
+  screen: resumeScreen(useAppStore.getState().screen),
   run: pickRunValues(useRunStore.getState()),
   journal: useNarrativeStore.getState().journal.map((entry) => ({ ...entry })),
   battle: serializeBattle(),
@@ -149,7 +158,8 @@ const isRunSnapshot = (data: unknown): data is RunSnapshotV1 => {
   if (typeof data !== "object" || data === null) return false;
   const snap = data as Partial<RunSnapshotV1>;
   return (
-    snap.v === RUN_SNAPSHOT_V &&
+    typeof snap.v === "number" &&
+    RUN_SNAPSHOT_ACCEPTED.includes(snap.v) &&
     typeof snap.screen === "string" &&
     typeof snap.run === "object" &&
     snap.run !== null &&

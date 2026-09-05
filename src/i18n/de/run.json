@@ -207,7 +207,7 @@
     "dieTitle": "Wiederverwertete Matrize",
     "keep": "Im Deck behalten",
     "sell": "Verkaufen (+{{n}})",
-    "deckFull": "Deck voll (9)"
+    "replace": "Eine Matrize austauschen"
   },
   "perk": {
     "title": "Wählen Sie ein Upgrade aus",
@@ -227,8 +227,8 @@
     "sellTitle": "Einen Würfel verkaufen",
     "empty": "Ausverkauft",
     "modulesTitle": "Module {{used}} / {{max}}",
-    "modulesFull": "Bucht voll",
-    "rerollFree": "Reroll-Bestand (kostenlos)"
+    "rerollFree": "Reroll-Bestand (kostenlos)",
+    "owned": "Installiert"
   },
   "shipyard": {
     "title": "Werft",
@@ -244,7 +244,12 @@
     "hull": "Hülle {{cur}}/{{max}}",
     "voucher": "Mk-Gutschein ×{{n}} – eine kostenlose Stufe",
     "voucherUse": "Kostenlos",
-    "fuse": "Verschmelzen — {{n}}"
+    "fuse": "Verschmelzen — {{n}}",
+    "baysTitle": "Modulschächte {{used}} / {{max}}",
+    "baysEmpty": "Es sind keine Module installiert.",
+    "demount": "Demount und{{n}}",
+    "buyBay": "Kaufen Sie eine Box – {{n}}",
+    "bayDone": "In dieser Runde gibt es keine Buchten mehr."
   },
   "summary": {
     "victory": "Sektor geräumt",
@@ -320,10 +325,10 @@
     "scrap": "+ „{{n}}“-Ausschnitt",
     "voucher": "Mk-Gutschein × {{n}} – ein kostenloses Upgrade in einer beliebigen Werft",
     "take": "Nimm",
-    "sell": "Verkaufen (+{{n}})",
     "hint": "Wähle eine aus. Anschließend folgt die Auswahl der Vorteile.",
     "module": "Modul",
-    "install": "Installieren"
+    "install": "Installieren",
+    "replace": "Ersetzen"
   },
   "tutorial": {
     "next": "Weiter",
@@ -560,5 +565,37 @@
     "rideCost": "Fahrt: ein Abstecher von „{{min}}“ nach „{{max}}“, Richtung unbekannt",
     "rideGentle": "Ride: Ein Mix aus „{{min}}“ und „{{max}}“, nur noch intensiver",
     "landed": "Ausgelöst{{rows}}-Zeilen {{way}}"
+  },
+  "bridge": {
+    "title": "Brücke",
+    "open": "Brücke",
+    "tab": {
+      "overview": "Übersicht",
+      "dice": "Würfel",
+      "modules": "Module",
+      "perks": "Vorteile"
+    },
+    "hull": "Hülle {{cur}}/{{max}}",
+    "scrap": "Schrott {{n}}",
+    "bays": "Bays {{used}} / {{max}}",
+    "bayEmpty": "leere Bucht",
+    "bayOffer": "+1 Liegeplatz – Schrott von „{{n}}“ auf der Werft",
+    "deckCount": "Deck-{{n}} / {{max}}",
+    "sellDiceHint": "Würfel werden im Laden verkauft.",
+    "sellModule": "Verkaufen + {{n}}",
+    "crewTitle": "Offizierskabinen",
+    "crewLocked": "Versiegelt – noch keine Besatzung an Bord.",
+    "cargoTitle": "Laderaum",
+    "cargoLocked": "Versiegelt – noch nichts zum Abtransport."
+  },
+  "replace": {
+    "title": "Ersetzen",
+    "titleDie": "Neuer Stempel",
+    "titleModule": "Neues Modul",
+    "fullDeck": "Komplettes Deck unter {{used}} / {{max}} – was passt dazu?",
+    "fullBay": "Bay full {{used}} / {{max}} – was ist los?",
+    "toScrap": "→ „scrap“ + „{{n}}“",
+    "sellNew": "Das neue Modell verkaufen (+ {{n}})",
+    "cancel": "Abbrechen"
   }
 }

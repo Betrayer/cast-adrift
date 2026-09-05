@@ -16,10 +16,21 @@ import { DieCard } from "@/components/DieCard";
 import { TapPopover } from "@/components/TapPopover";
 import { DIE_BY_ID } from "@/data/dice";
 import { fusionTarget } from "@/data/dice/fusion";
+import { MODULE_BY_ID } from "@/data/modules";
+import { moduleTags } from "@/data/modules/types";
 import { SHIP_BY_ID } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
-import { FUSION_COST, MK_TOP, mkUpgradeCost } from "@/game/economy/prices";
+import {
+  bayPrice,
+  FUSION_COST,
+  MK_TOP,
+  mkUpgradeCost,
+  moduleSellValue,
+} from "@/game/economy/prices";
+import { sellModule } from "@/game/run/inventory";
+import { rarityColor } from "@/app/rarity";
+import { TagChips } from "@/components/TagChips";
 import { noteFusion, noteMkTop } from "@/game/meta/counters";
 import { useBackGuard } from "@/app/backGuard";
 import { autosaveRun, completeNode } from "@/game/run/flow";
@@ -27,7 +38,11 @@ import { playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { createStream, deriveSeed } from "@/services/rng";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import {
+  runBayPurchasable,
+  runModuleSlots,
+  useRunStore,
+} from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
 import styles from "./ShipyardScreen.module.css";
 
@@ -41,6 +56,9 @@ export const ShipyardScreen = () => {
   const shipId = useRunStore((s) => s.shipId);
   const shipyardDiscount = useRunStore((s) => s.shipyardDiscount);
   const vouchers = useRunStore((s) => s.vouchers);
+  const modules = useRunStore((s) => s.modules);
+  const sector = useRunStore((s) => s.sector);
+  const bays = useRunStore(runModuleSlots);
   const seed = useRunStore((s) => s.seed);
   const position = useRunStore((s) => s.position);
   const flags = useRunStore((s) => s.flags);
@@ -75,6 +93,27 @@ export const ShipyardScreen = () => {
   }, [deck]);
 
   const maxRepair = Math.min(hullMax - hull, Math.floor(scrap / 2));
+
+  const bayCost = bayPrice(sector);
+  const canBuyBay = useRunStore(runBayPurchasable);
+
+  const buyBay = (): void => {
+    const state = useRunStore.getState();
+    if (state.scrap < bayCost) return;
+    if (!state.spendScrap(bayCost)) return;
+    state.purchaseBay();
+    playSfx("buy");
+    playSfx("mkSweep");
+    haptic("purchase");
+    autosaveRun();
+  };
+
+  const demount = (moduleId: string): void => {
+    if (!sellModule(moduleId)) return;
+    playSfx("buy");
+    haptic("purchase");
+    autosaveRun();
+  };
 
   const markUpgraded = (slotId: SlotId): void => {
     if ((useRunStore.getState().mkLevels[slotId] ?? 1) >= MK_TOP) noteMkTop();
@@ -247,6 +286,70 @@ export const ShipyardScreen = () => {
             );
           })}
         </Stack>
+
+      <Divider
+        color={tokens.line}
+        label={t("run:shipyard.baysTitle", { used: modules.length, max: bays })}
+      />
+      <Stack gap={6}>
+        {modules.map((moduleId) => {
+          const def = MODULE_BY_ID.get(moduleId);
+          if (def === undefined) return null;
+          return (
+            <Paper
+              key={moduleId}
+              bg={tokens.surface1}
+              p="xs"
+              radius="md"
+              withBorder
+              data-yard-module={moduleId}
+              style={{ borderLeftColor: rarityColor(def.rarity) }}
+            >
+              <Stack gap={6}>
+                <Text size="sm" c={tokens.text}>
+                  {t(def.name)}
+                </Text>
+                <Text size="xs" c={tokens.dim}>
+                  {t(def.desc)}
+                </Text>
+                <TagChips tags={moduleTags(def)} />
+                <Button
+                  size="compact-sm"
+                  variant="light"
+                  color="gray"
+                  data-testid={`yard-demount-${moduleId}`}
+                  onClick={() => {
+                    demount(moduleId);
+                  }}
+                >
+                  {t("run:shipyard.demount", {
+                    n: moduleSellValue(def.price),
+                  })}
+                </Button>
+              </Stack>
+            </Paper>
+          );
+        })}
+        {modules.length === 0 ? (
+          <Text size="xs" c={tokens.faint}>
+            {t("run:shipyard.baysEmpty")}
+          </Text>
+        ) : null}
+        {canBuyBay ? (
+          <Button
+            variant="default"
+            disabled={scrap < bayCost}
+            data-testid="yard-buy-bay"
+            onClick={buyBay}
+          >
+            {t("run:shipyard.buyBay", { n: bayCost })}
+          </Button>
+        ) : (
+          <Text size="xs" c={tokens.faint} data-yard-bay-locked>
+            {t("run:shipyard.bayDone")}
+          </Text>
+        )}
+      </Stack>
 
       <Divider color={tokens.line} label={t("run:shipyard.fusionTitle")} />
       {fusable.length === 0 ? (

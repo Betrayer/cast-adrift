@@ -207,7 +207,7 @@
     "dieTitle": "Matriz recuperada",
     "keep": "Dejar en la baraja",
     "sell": "Vender (+{{n}})",
-    "deckFull": "Baraja completa (9)"
+    "replace": "Sustituir un troquel"
   },
   "perk": {
     "title": "Elige una mejora",
@@ -227,8 +227,8 @@
     "sellTitle": "Vender un dado",
     "empty": "Agotado",
     "modulesTitle": "Módulos {{used}} / {{max}}",
-    "modulesFull": "Bahía llena",
-    "rerollFree": "Reaprovisionar existencias (gratis)"
+    "rerollFree": "Reaprovisionar existencias (gratis)",
+    "owned": "Instalado"
   },
   "shipyard": {
     "title": "Astillero",
@@ -244,7 +244,12 @@
     "hull": "Casco {{cur}}/{{max}}",
     "voucher": "Cupón Mk × {{n}}: un nivel gratuito",
     "voucherUse": "Gratis",
-    "fuse": "Fusionar — {{n}}"
+    "fuse": "Fusionar — {{n}}",
+    "baysTitle": "Compartimentos para módulos {{used}} / {{max}}",
+    "baysEmpty": "No hay módulos instalados.",
+    "demount": "Desmontaje + {{n}}",
+    "buyBay": "Compra un box — {{n}}",
+    "bayDone": "No habrá más bahías en esta ruta."
   },
   "summary": {
     "victory": "Sector despejado",
@@ -320,10 +325,10 @@
     "scrap": "+ Recorte de{{n}}",
     "voucher": "Cupón Mk × {{n}}: una mejora gratuita en cualquier astillero",
     "take": "Toma",
-    "sell": "Vender (+{{n}})",
     "hint": "Elige una. A continuación viene el draft de ventajas.",
     "module": "módulo",
-    "install": "Instalar"
+    "install": "Instalar",
+    "replace": "Sustituir"
   },
   "tutorial": {
     "next": "Siguiente",
@@ -560,5 +565,37 @@
     "rideCost": "Recorrido: un trayecto de {{min}} –{{max}}, dirección desconocida",
     "rideGentle": "Ride: una variación de «{{min}}» – «{{max}}», pero más profunda",
     "landed": "Lanzado {{rows}} filas {{way}}"
+  },
+  "bridge": {
+    "title": "Puente",
+    "open": "Puente",
+    "tab": {
+      "overview": "Resumen",
+      "dice": "Dados",
+      "modules": "Módulos",
+      "perks": "Ventajas"
+    },
+    "hull": "Casco {{cur}}/{{max}}",
+    "scrap": "Chatarra {{n}}",
+    "bays": "Bays {{used}} / {{max}}",
+    "bayEmpty": "bahía vacía",
+    "bayOffer": "+1 dique seco — Desguace de «{{n}}» en el astillero",
+    "deckCount": "Deck {{n}} / {{max}}",
+    "sellDiceHint": "En la tienda se venden dados.",
+    "sellModule": "Vender + {{n}}",
+    "crewTitle": "Cabinas de oficiales",
+    "crewLocked": "Precintado — aún no hay tripulación a bordo.",
+    "cargoTitle": "Caja de carga",
+    "cargoLocked": "Precintado: todavía no hay nada que transportar."
+  },
+  "replace": {
+    "title": "Sustituir",
+    "titleDie": "Nueva matriz",
+    "titleModule": "Nuevo módulo",
+    "fullDeck": "Baraja completa {{used}} / {{max}} — ¿qué pasa?",
+    "fullBay": "Bay está a rebosar {{used}} / {{max}} — ¿qué pasa?",
+    "toScrap": "→ eliminar{{n}}",
+    "sellNew": "Vender el nuevo (+ {{n}})",
+    "cancel": "Cancelar"
   }
 }
