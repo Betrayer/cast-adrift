@@ -323,7 +323,7 @@
   "interferenceWhy": "Skipped anomalies stack up: every stack adds another tide level for the rest of the run. Clear an anomaly to drop them all.",
   "interferenceTitle": "Interference",
   "axisWhy": "Black dice pull toward Resonance, blue toward Stability. Events and drift move it too.",
-  "chargeWhy": "Spend charge on actions: −1 nudge costs 3, +1 nudge costs 3, a bought reroll costs 5, a surge costs 10.",
+  "chargeWhy": "Spend charge on actions: −1 nudge costs {{n}}, +1 nudge costs {{n}}, a bought reroll costs 5, a surge costs 10.",
   "chargeTitle": "Charge",
   "mkWhy": "Mk raises the slot cap and the affinity bonus of its school.",
   "resEarned": "Earned",

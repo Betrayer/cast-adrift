@@ -642,7 +642,6 @@
       "name": "Auftragnehmer",
       "desc": "Verdiente Auftragssterne: {{n}}"
     },
-    "toast": "Leistung",
     "beyondTheCore": {
       "name": "Über den Kern hinaus",
       "desc": "Überquere die Schwelle und räume Sektor 6."
@@ -674,6 +673,10 @@
     "voidRider": {
       "name": "Leerenreiter",
       "desc": "Wurmlochritte: {{n}}"
+    },
+    "horizonTester": {
+      "name": "Horizontprüfer",
+      "desc": "Von einer Singularität ausgelöschte Läufe: {{n}}"
     },
     "rimRunner": {
       "name": "Randläufer",

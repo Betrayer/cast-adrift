@@ -642,7 +642,6 @@
       "name": "Sous-traitant",
       "desc": "Étoiles de contrat gagnées : {{n}}"
     },
-    "toast": "Réussite",
     "beyondTheCore": {
       "name": "Au-delà de l'essentiel",
       "desc": "Franchissez le seuil et nettoyez le Secteur 6."
@@ -674,6 +673,10 @@
     "voidRider": {
       "name": "Cavalier du vide",
       "desc": "Traversées de trou de ver : {{n}}"
+    },
+    "horizonTester": {
+      "name": "Testeur d'horizon",
+      "desc": "Parties effacées par une singularité : {{n}}"
     },
     "rimRunner": {
       "name": "Coureur de bord",

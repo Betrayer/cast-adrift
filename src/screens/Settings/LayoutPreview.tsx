@@ -38,6 +38,7 @@ const ConsolePreview = () => (
           legal={entry.legal}
           goal={false}
           charge={6}
+          chargeCap={10}
           onTap={noop}
           preview
         />

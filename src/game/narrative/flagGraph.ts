@@ -2,6 +2,7 @@ import { ACHIEVEMENTS } from "@/data/achievements";
 import { ALL_EVENTS } from "@/data/events";
 import { BEACON_FLAGS } from "@/data/events/beacons";
 import { COUNTER_FLAGS, RESERVED_FLAGS, RUNTIME_FLAGS } from "@/data/flags";
+import { BLACK_BOX_EPITAPHS } from "@/data/narrative/blackBox";
 import { CHAINS } from "@/data/narrative/chains";
 import { DEATH_LINES } from "@/data/narrative/deathLines";
 import { GATED_FRAGMENTS } from "@/data/narrative/fragments";
@@ -66,6 +67,9 @@ export const readFlags = (): Map<string, string[]> => {
   }
   for (const line of DEATH_LINES) {
     for (const key of line.reads) add(out, key, `death:${line.id}`);
+  }
+  for (const line of BLACK_BOX_EPITAPHS) {
+    for (const key of line.reads) add(out, key, `blackbox:${line.id}`);
   }
   for (const ending of ENDINGS) {
     for (const key of ending.reads) add(out, key, `ending:${ending.id}`);

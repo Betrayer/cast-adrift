@@ -642,7 +642,6 @@
       "name": "Contractor",
       "desc": "Contract stars earned: {{n}}"
     },
-    "toast": "Achievement",
     "beyondTheCore": {
       "name": "Beyond the Core",
       "desc": "Cross the threshold and clear Sector 6."
@@ -674,6 +673,10 @@
     "voidRider": {
       "name": "Void Rider",
       "desc": "Wormhole rides: {{n}}"
+    },
+    "horizonTester": {
+      "name": "Horizon Tester",
+      "desc": "Runs unmade by a singularity: {{n}}"
     },
     "rimRunner": {
       "name": "Rim Runner",

@@ -642,7 +642,6 @@
       "name": "Contratista",
       "desc": "Estrellas de contrato ganadas: {{n}}"
     },
-    "toast": "Logro",
     "beyondTheCore": {
       "name": "Más allá de lo esencial",
       "desc": "Cruza el umbral y despeja el Sector 6."
@@ -674,6 +673,10 @@
     "voidRider": {
       "name": "Jinete del vacío",
       "desc": "Viajes por agujeros de gusano: {{n}}"
+    },
+    "horizonTester": {
+      "name": "Probador del horizonte",
+      "desc": "Partidas deshechas por una singularidad: {{n}}"
     },
     "rimRunner": {
       "name": "Corredor del borde",

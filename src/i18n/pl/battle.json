@@ -323,7 +323,7 @@
   "interferenceWhy": "Pominięte anomalie się kumulują: każdy stos dokłada kolejny poziom przypływu do końca przebiegu. Rozwiązanie anomalii kasuje wszystkie.",
   "interferenceTitle": "Zakłócenia",
   "axisWhy": "Czarne kości ciągną ku Rezonansowi, niebieskie ku Stabilności. Zdarzenia i dryf też ruszają oś.",
-  "chargeWhy": "Ładunek płaci za akcje: −1 kosztuje 3, +1 kosztuje 3, kupiony przerzut 5, zryw 10.",
+  "chargeWhy": "Ładunek płaci za akcje: −1 kosztuje {{n}}, +1 kosztuje {{n}}, kupiony przerzut 5, zryw 10.",
   "chargeTitle": "Ładunek",
   "mkWhy": "Mk podnosi limit slotu i bonus powinowactwa jego szkoły.",
   "resEarned": "Zdobyte",

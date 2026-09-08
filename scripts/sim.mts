@@ -17,8 +17,13 @@ import {
   ridesWormhole,
   type RouteState,
 } from "./simPolicy/map";
-import { bypassTargetFor, rollThrow } from "../src/game/map/wormhole";
-import { holeTollFor } from "../src/game/run/motifs";
+import {
+  bypassIsLateral,
+  bypassTargetFor,
+  isGentleRide,
+  rollThrow,
+} from "../src/game/map/wormhole";
+import { disintegrationPctFor, holeTollFor } from "../src/game/run/motifs";
 import {
   applyEdgeMotifs,
   applyEffectsToState,
@@ -36,6 +41,7 @@ import {
   runAnomaly,
   runDraft,
   runEvent,
+  runSalvage,
   takeDie,
   type PuzzleTally,
   type RunState,
@@ -51,6 +57,11 @@ import { THEMES } from "../src/data/themes";
 import { RESPEC_SHARD_COST } from "../src/game/chart/engine";
 import { nudgeChargeCost } from "../src/game/battle/resolver";
 import { computeMutatorMods } from "../src/data/mutators";
+import {
+  withoutWeather,
+  withWeatherFor,
+} from "../src/game/run/weather";
+import { jumpsPerTideFor } from "../src/game/run/tide";
 import { runHasTrait } from "../src/game/run/runMods";
 import {
   bossFirstKillShards,
@@ -75,6 +86,8 @@ import {
   dieForRarity,
   isDraftNode,
 } from "../src/game/economy/rewards";
+import { isSalvageNode } from "../src/game/run/salvage";
+import { SALVAGE_FACES } from "../src/data/salvage";
 import { SECTORS } from "../src/data/sectors";
 import {
   bossNodeIdFor,
@@ -173,6 +186,14 @@ interface BattleResult {
   engineTurns: number;
 }
 
+const WEATHER_ENABLED = process.argv.includes("--weather")
+  ? process.argv[process.argv.indexOf("--weather") + 1] === "on"
+  : false;
+
+const SALVAGE_ENABLED = process.argv.includes("--salvage")
+  ? process.argv[process.argv.indexOf("--salvage") + 1] !== "off"
+  : true;
+
 const getArg = (name: string, fallback: string): string => {
   const index = process.argv.indexOf(`--${name}`);
   const value = index >= 0 ? process.argv[index + 1] : undefined;
@@ -241,6 +262,7 @@ const simulateBattle = (
 ): BattleResult => {
   const streams = createStreams(rootSeed);
   const enemyStream = createEnemyStream(streams);
+  const mut = computeMutatorMods(init.mutators ?? []);
   let snapshot = buildBattleSnapshot(
     init.shipId ?? "wanderer",
     deck,
@@ -253,14 +275,21 @@ const simulateBattle = (
       interference: init.interference,
       perks: init.perks,
       chartPicks: init.chartPicks,
+      mutators: init.mutators,
       modules: init.modules,
       hull: init.hull,
       hullMax: init.hullMax,
       runScrap: init.runScrap,
-      chargeCap: runChargeCap(
-        init.perks ?? [],
-        init.chartPicks ?? [],
-        init.modules ?? [],
+      ...(mut.sensorsTierDelta === 0
+        ? {}
+        : { slotTierDelta: { sensors: mut.sensorsTierDelta } }),
+      chargeCap: Math.max(
+        1,
+        runChargeCap(
+          init.perks ?? [],
+          init.chartPicks ?? [],
+          init.modules ?? [],
+        ) + mut.chargeCapDelta,
       ),
       sectorHpPct: init.sectorHpPct,
       sectorDmgPct: init.sectorDmgPct,
@@ -393,6 +422,7 @@ interface WalkOptions {
   stopRow: number;
   rollModules: boolean;
   guard: number;
+  mutators?: readonly string[];
   noDraft?: boolean;
   wormholes?: WormholeTally;
 }
@@ -403,6 +433,13 @@ interface WalkResult {
   rows: number;
   hullEntering: number[];
 }
+
+type HoleOutcome =
+  | { kind: "moved"; node: MapNode }
+  | { kind: "fatal" }
+  | { kind: "stuck" };
+
+const DISINTEGRATION_FACES = 100;
 
 const resolveWormhole = (
   state: RunState,
@@ -416,32 +453,43 @@ const resolveWormhole = (
   stream: RngStream,
   tally: WormholeTally,
   tideCap: number,
-): MapNode | undefined => {
+): HoleOutcome => {
   const rides = tally.rides;
   if (ridesWormhole(route, stream.next())) {
     const roll = rollThrow(
       { map, from, hole: hole.id, visited, rides },
       stream,
     );
+    const pct = disintegrationPctFor(sector);
+    if (
+      pct > 0 &&
+      !isGentleRide(rides) &&
+      stream.int(1, DISINTEGRATION_FACES) <= pct
+    ) {
+      tally.disintegrations += 1;
+      return { kind: "fatal" };
+    }
     const landing = roll.landing === null ? undefined : byId.get(roll.landing);
     if (landing !== undefined) {
       tally.rides += 1;
       tally.rowsMoved += Math.abs(roll.rows);
       if (roll.rows < 0) tally.backward += 1;
       if (roll.fallback !== "none") tally.fallbacks += 1;
-      return landing;
+      return { kind: "moved", node: landing };
     }
   }
   const target = bypassTargetFor(map, from, hole.id, visited);
   const node = target === null ? undefined : byId.get(target);
-  if (node === undefined) return undefined;
-  const toll = holeTollFor(sector, state.hull);
+  if (node === undefined) return { kind: "stuck" };
+  const toll = bypassIsLateral(map, from, hole.id, visited)
+    ? holeTollFor(sector, state.hull)
+    : 0;
   if (toll > 0) {
     applyEffectsToState(state, [{ k: "hull", n: -toll }], tideCap);
     tally.tollPaid += toll;
   }
   tally.bypasses += 1;
-  return node;
+  return { kind: "moved", node };
 };
 
 const nsKey = (ns: string, prefix: string, id: string): string =>
@@ -454,6 +502,7 @@ export interface WormholeTally {
   fallbacks: number;
   rowsMoved: number;
   tollPaid: number;
+  disintegrations: number;
 }
 
 export const emptyWormholeTally = (): WormholeTally => ({
@@ -463,14 +512,30 @@ export const emptyWormholeTally = (): WormholeTally => ({
   fallbacks: 0,
   rowsMoved: 0,
   tollPaid: 0,
+  disintegrations: 0,
 });
+
+const WEATHER_FORCED = getArg("weather-force", "");
+const SALVAGE_FORCED = getArg("salvage-force", "");
+
+const sectorMutators = (state: RunState, opts: WalkOptions): string[] => {
+  const carried = withoutWeather(opts.mutators ?? state.mutators);
+  if (!WEATHER_ENABLED) return carried;
+  if (WEATHER_FORCED !== "") {
+    return opts.sector < 2 ? carried : [...carried, WEATHER_FORCED];
+  }
+  return withWeatherFor(carried, opts.seed, opts.sector, opts.sector);
+};
 
 const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
   const { seed, sector, ns } = opts;
+  state.mutators = sectorMutators(state, opts);
+  const mut = computeMutatorMods(state.mutators);
   const streams =
     ns === "" ? createStreams(seed) : createStreams(deriveSeed(seed, `map:${ns}`));
   const map: MapGraph = generateSectorMap(streams.map, sector, {
     bossAsGate: opts.bossAsGate,
+    noShops: mut.noShops,
   });
   const bossId = bossNodeIdFor(sector);
   const byId = nodeById(map);
@@ -514,8 +579,9 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         tally,
         opts.tideCap,
       );
-      if (resolved === undefined) break;
-      next = resolved;
+      if (resolved.kind === "fatal") return stop(false, step.row);
+      if (resolved.kind === "stuck") break;
+      next = resolved.node;
     } else {
       applyEdgeMotifs(state, sector, map, position, next.id, opts.tideCap);
     }
@@ -525,7 +591,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
     if (next.pocket === true) state.pockets += 1;
     applyNodeMotifs(state, sector, next, opts.tideCap);
     state.jumpsSinceTide += 1;
-    if (state.jumpsSinceTide >= 4) {
+    if (state.jumpsSinceTide >= jumpsPerTideFor(state.mutators)) {
       state.tide = Math.min(opts.tideCap, state.tide + 1);
       state.jumpsSinceTide = 0;
     }
@@ -549,10 +615,12 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           mkLevels: state.mkLevels,
           perks: state.perks,
           chartPicks: state.chartPicks,
+          mutators: state.mutators,
           modules: state.modules,
           sectorHpPct: sectorHpPct({ sector, pocket: next.pocket === true }),
           sectorDmgPct: sectorDmgPct({ sector }),
-          enemyHpBonusPct: opts.enemyHpBonusPct,
+          enemyHpBonusPct:
+            opts.enemyHpBonusPct + mut.enemyHpPct + mut.copyHpPct,
           eliteShield: opts.eliteShield,
           ascension: opts.ascension,
           inverted: next.inverted === true,
@@ -567,11 +635,21 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       state.nodes += 1;
       state.fights += 1;
       const loot = createStream(deriveSeed(seed, nsKey(ns, "loot", next.id)));
-      const reward = computeNodeReward(type, loot, 0, next.pocket === true);
+      const reward = computeNodeReward(
+        type,
+        loot,
+        mut.lootRarityStep,
+        next.pocket === true,
+        opts.scrapMult,
+      );
       const mods = computeRunMods(state.perks, state.chartPicks, state.modules);
       gain(
         state,
-        Math.round(reward.scrap * opts.scrapMult * (1 + mods.scrapMultPct / 100)),
+        Math.round(
+          reward.scrap *
+            opts.scrapMult *
+            (1 + (mods.scrapMultPct + mut.scrapMultPct) / 100),
+        ),
       );
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
       if (type === "miniboss") {
@@ -579,7 +657,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           state,
           loot.int(MINIBOSS_PACKAGE_SCRAP[0], MINIBOSS_PACKAGE_SCRAP[1]),
         );
-        const dieChoice = dieForRarity(loot, "rare", 0);
+        const dieChoice = dieForRarity(loot, "rare", mut.lootRarityStep);
         const moduleChoice = rollModule(loot, state.modules, "uncommon");
         if (opts.rollModules && wouldTakeModule(state, moduleChoice)) {
           takeModule(state, moduleChoice);
@@ -592,6 +670,14 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         if (opts.rollModules && type === "elite") {
           takeModule(state, rollModule(loot, state.modules, "common"));
         }
+      }
+      if (isSalvageNode(type) && SALVAGE_ENABLED) {
+        runSalvage(
+          state,
+          createStream(deriveSeed(seed, nsKey(ns, "salvage", next.id))),
+          opts.tideCap,
+          SALVAGE_FORCED,
+        );
       }
       if (isDraftNode(type) && opts.noDraft !== true) {
         runDraft(state, sector, loot);
@@ -1790,6 +1876,14 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     pockets: number;
     skips: number;
   }[] = [];
+  const salvageRows: {
+    sector: number;
+    deck: string;
+    perFight: number;
+    scrap: number;
+    declines: number;
+    picks: Record<string, number>;
+  }[] = [];
   let failures = 0;
   for (const sector of [1, 3, 5, 6]) {
     const def = SECTORS.find((sd) => sd.id === sector);
@@ -1802,6 +1896,10 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       const sinks = emptySinks();
       let pockets = 0;
       let skipIncome = 0;
+      let salvageScrap = 0;
+      let salvageDeclines = 0;
+      let fightCount = 0;
+      const salvagePicks: Record<string, number> = {};
       for (let i = 0; i < runs; i += 1) {
         const { result: r, state } = runSweepSectorWithState(
           deriveSeed(seed, `eco:${String(sector)}:${archetype.name}:${String(i)}`),
@@ -1812,12 +1910,19 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
           0,
           r.scrapEarned -
             Math.max(0, state.eventScrap) -
-            Math.max(0, state.moduleSales),
+            Math.max(0, state.moduleSales) -
+            Math.max(0, state.salvageScrap),
         );
         if (r.win) clearedEarned.push(loot);
         if (r.fights > 0) perNode.push(loot / r.fights);
         pockets += r.pockets;
         skipIncome += state.draftSkips;
+        fightCount += r.fights;
+        salvageScrap += state.salvageScrap;
+        salvageDeclines += state.salvageDeclines;
+        for (const [id, n] of Object.entries(state.salvagePicks)) {
+          salvagePicks[id] = (salvagePicks[id] ?? 0) + n;
+        }
         for (const key of Object.keys(sinks)) {
           sinks[key] = (sinks[key] ?? 0) + (state.sinks[key] ?? 0);
         }
@@ -1828,6 +1933,14 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         sinks,
         pockets: pockets / Math.max(1, runs),
         skips: skipIncome / Math.max(1, runs),
+      });
+      salvageRows.push({
+        sector,
+        deck: archetype.name,
+        perFight: salvageScrap / Math.max(1, fightCount),
+        scrap: salvageScrap / Math.max(1, runs),
+        declines: salvageDeclines / Math.max(1, runs),
+        picks: salvagePicks,
       });
       const mEarnedPerNode = median(perNode);
       const clears = clearedEarned.length;
@@ -1881,6 +1994,25 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     );
     rows.push(
       `${String(row.sector)},${row.deck},${cells.join(",")},${row.pockets.toFixed(2)},${row.skips.toFixed(2)}`,
+    );
+  }
+
+  console.log(
+    "\nsim economy: salvage (per run, carved out of the earned curve above)",
+  );
+  rows.push("");
+  rows.push(
+    `sector,deck,salvageScrap,salvagePerFight,declines,${SALVAGE_FACES.map((f) => f.id).join(",")}`,
+  );
+  for (const row of salvageRows) {
+    const picks = SALVAGE_FACES.map((face) =>
+      ((row.picks[face.id] ?? 0) / Math.max(1, runs)).toFixed(2),
+    );
+    console.log(
+      `  S${String(row.sector)}     ${row.deck.padEnd(11)} scrap ${row.scrap.toFixed(1).padStart(5)} (${row.perFight.toFixed(2)}/fight) · declines ${row.declines.toFixed(2)} · ${SALVAGE_FACES.map((f, i) => `${f.id} ${picks[i] ?? "0.00"}`).join(" · ")}`,
+    );
+    rows.push(
+      `${String(row.sector)},${row.deck},${row.scrap.toFixed(2)},${row.perFight.toFixed(2)},${row.declines.toFixed(2)},${picks.join(",")}`,
     );
   }
 
@@ -2313,6 +2445,8 @@ const campaignModeMain = (
       fallbacks: into.fallbacks + run.wormholes.fallbacks,
       rowsMoved: into.rowsMoved + run.wormholes.rowsMoved,
       tollPaid: into.tollPaid + run.wormholes.tollPaid,
+      disintegrations:
+        into.disintegrations + run.wormholes.disintegrations,
     }),
     emptyWormholeTally(),
   );
@@ -2338,6 +2472,11 @@ const campaignModeMain = (
     }% fallback · ${
       holes.rides === 0 ? "0" : (holes.rowsMoved / holes.rides).toFixed(2)
     } rows avg) · bypasses ${String(holes.bypasses)} (${String(holes.tollPaid)} hull paid)`,
+  );
+  console.log(
+    `    disintegrations ${String(holes.disintegrations)} — ${(
+      (holes.disintegrations / holeRuns) * 100
+    ).toFixed(1)}% of runs ended inside the spot`,
   );
   console.log("  campaign sinks (A0, all decks):");
   for (const sink of Object.keys(sinks)) {

@@ -16,7 +16,10 @@ import {
   computeNodeReward,
   DROP_WEIGHTS,
   rollDrop,
+  SALVAGE_CARVE_SCRAP,
+  salvageCarveFor,
 } from "@/game/economy/rewards";
+import { SECTORS } from "@/data/sectors";
 import { generateShopStock } from "@/game/economy/shop";
 import { createStream, deriveSeed } from "@/services/rng";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
@@ -53,6 +56,8 @@ describe("economy prices", () => {
   });
 });
 
+const SECTOR_SCRAP_MULTS = SECTORS.map((def) => def.scrapMult);
+
 describe("loot drops", () => {
   it("always resolves to a real die of a valid rarity", () => {
     for (let seed = 1; seed <= 100; seed += 1) {
@@ -62,16 +67,69 @@ describe("loot drops", () => {
     }
   });
 
-  it("battle scrap stays in 12-20, elite 45-60 with a guaranteed drop", () => {
+  it("battle scrap stays in 12-20 and the elite table still pays 45-60 before the carve", () => {
     for (let seed = 1; seed <= 200; seed += 1) {
       const battle = computeNodeReward("battle", createStream(deriveSeed(seed, "b")));
       expect(battle.scrap).toBeGreaterThanOrEqual(12);
       expect(battle.scrap).toBeLessThanOrEqual(20);
 
-      const elite = computeNodeReward("elite", createStream(deriveSeed(seed, "e")));
-      expect(elite.scrap).toBeGreaterThanOrEqual(45);
-      expect(elite.scrap).toBeLessThanOrEqual(60);
-      expect(elite.dieDrop).not.toBeNull();
+      for (const mult of SECTOR_SCRAP_MULTS) {
+        const elite = computeNodeReward(
+          "elite",
+          createStream(deriveSeed(seed, "e")),
+          0,
+          false,
+          mult,
+        );
+        const base = elite.scrap + salvageCarveFor(mult);
+        expect(base).toBeGreaterThanOrEqual(45);
+        expect(base).toBeLessThanOrEqual(60);
+        expect(elite.dieDrop).not.toBeNull();
+      }
+    }
+  });
+
+  it("the salvage carve costs the same scrap in every sector once the multiplier lands", () => {
+    for (const mult of SECTOR_SCRAP_MULTS) {
+      for (let seed = 1; seed <= 60; seed += 1) {
+        const carved = computeNodeReward(
+          "elite",
+          createStream(deriveSeed(seed, "carve")),
+          0,
+          false,
+          mult,
+        );
+        const uncarved = computeNodeReward(
+          "elite",
+          createStream(deriveSeed(seed, "carve")),
+          0,
+          false,
+          1,
+        ).scrap + salvageCarveFor(1);
+        const paid = Math.round(uncarved * mult) - Math.round(carved.scrap * mult);
+        expect(Math.abs(paid - SALVAGE_CARVE_SCRAP)).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it("elite and miniboss are served by one branch, so the carve reaches both", () => {
+    for (let seed = 1; seed <= 60; seed += 1) {
+      const elite = computeNodeReward(
+        "elite",
+        createStream(deriveSeed(seed, "gate")),
+        0,
+        false,
+        1.25,
+      );
+      const miniboss = computeNodeReward(
+        "miniboss",
+        createStream(deriveSeed(seed, "gate")),
+        0,
+        false,
+        1.25,
+      );
+      expect(miniboss.scrap).toBe(elite.scrap);
+      expect(miniboss.dieDrop).toBe(elite.dieDrop);
     }
   });
 

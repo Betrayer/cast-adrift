@@ -11,7 +11,9 @@ import { schools } from "@/data/schools";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { MODULE_BY_ID } from "@/data/modules";
 import { computeMutatorMods } from "@/data/mutators";
+import { runModifiers } from "@/game/run/weather";
 import { sectorDef } from "@/data/sectors";
+import { emitBark } from "@/game/narrative/barks";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
@@ -23,10 +25,10 @@ import {
   resumeUnenteredNode,
   rideWormhole,
 } from "@/game/run/flow";
-import { holeTollFor } from "@/game/run/motifs";
 import { bypassTargetFor, isGentleRide } from "@/game/map/wormhole";
 import {
   areConnected,
+  edgeKey,
   edgeMarkFor,
   NODE_GLYPH,
   nodeById,
@@ -43,10 +45,20 @@ import { AbandonConfirm } from "@/components/AbandonConfirm";
 import { AxisMeter } from "@/components/AxisMeter";
 import { WarpStreaks } from "@/components/WarpStreaks";
 import { WormholeChoice } from "./WormholeChoice";
+import { SpotDefs, SpotOverlay } from "./SpotOverlay";
 import { TapPopover } from "@/components/TapPopover";
 import { TIDE_HP_PCT } from "@/game/run/encounter";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
+import {
+  bypassCopyKey,
+  bypassOfferFor,
+  isDrawableEdge,
+  spotEllipse,
+  spotEntryFor,
+  spotMembers,
+  type BypassOffer,
+} from "./spot";
 import {
   arrivalStyle,
   MAP_JUMP_MS,
@@ -270,6 +282,10 @@ const chainMemoryKey = (seed: number, sector: number): string =>
 
 const CHAIN_MARK_MS = 520;
 
+const IDLE_BARK_MS = 25000;
+
+const IDLE_BARK_WAKE: readonly string[] = ["pointerdown", "keydown", "wheel"];
+
 const MapShortcuts = () => {
   const { t } = useTranslation(["run"]);
   return (
@@ -331,6 +347,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const usedMinibosses = useRunStore((s) => s.usedMinibosses);
   const pendingDeepScan = useRunStore((s) => s.pendingDeepScan);
   const bonusReveal = useRunStore((s) => s.bonusReveal);
+  const sectorReveal = useRunStore((s) => s.sectorReveal);
   const mutators = useRunStore((s) => s.mutators);
   const sensorsMk = useRunStore((s) => s.mkLevels.sensors ?? 1);
   const reduced = resolveReducedMotion(
@@ -379,6 +396,7 @@ const MapView = ({ map, position }: MapViewProps) => {
       (sensorsMk - 1) +
       (pendingDeepScan ? 1 : 0) +
       bonusReveal +
+      sectorReveal +
       computeMutatorMods(mutators).fogRowDelta,
   );
   const visibleLimit = positionRow + visibleRows;
@@ -392,6 +410,9 @@ const MapView = ({ map, position }: MapViewProps) => {
     node.row > positionRow &&
     isVisible(node) &&
     areConnected(map, position, node.id);
+
+  const bypassOffer = (holeId: NodeId): BypassOffer =>
+    bypassOfferFor(map, position, holeId, visited, sector, hull);
 
   const arrivalFraming = useRef({ positionRow, reduced, geo });
 
@@ -549,20 +570,23 @@ const MapView = ({ map, position }: MapViewProps) => {
     haptic("bossIntro");
     playSfx("foldBeat", { gain: 0.9 });
     if (reduced) {
-      const roll = rideWormhole(holeId, false);
-      const landed = roll?.landing == null ? undefined : byId.get(roll.landing);
+      const ride = rideWormhole(holeId, false);
+      if (ride?.kind === "fatal") return;
+      const thrown = ride === null ? null : ride.throw;
+      const landed =
+        thrown?.landing == null ? undefined : byId.get(thrown.landing);
       playSfx("inversionCue");
       setWarp({
         phase: "land",
         x: landed === undefined ? geo.centerX : geo.nodeX(landed),
         y: geo.rowY(landed?.row ?? positionRow),
-        rows: Math.abs(roll?.rows ?? 0),
-        direction: roll?.direction ?? "forward",
+        rows: Math.abs(thrown?.rows ?? 0),
+        direction: thrown?.direction ?? "forward",
       });
       after(WARP_FLASH_MS, () => {
         setWarp(null);
         setJumping(false);
-        if (roll?.landing != null) enterNode(roll.landing);
+        if (thrown?.landing != null) enterNode(thrown.landing);
       });
       return;
     }
@@ -574,15 +598,18 @@ const MapView = ({ map, position }: MapViewProps) => {
       direction: "forward",
     });
     after(WARP_SUCK_MS, () => {
-      const roll = rideWormhole(holeId, false);
-      const landing = roll?.landing == null ? undefined : byId.get(roll.landing);
+      const ride = rideWormhole(holeId, false);
+      if (ride?.kind === "fatal") return;
+      const thrown = ride === null ? null : ride.throw;
+      const landing =
+        thrown?.landing == null ? undefined : byId.get(thrown.landing);
       playSfx("inversionCue");
       setWarp({
         phase: "burst",
         x: landing === undefined ? geo.centerX : geo.nodeX(landing),
         y: geo.rowY(landing?.row ?? positionRow),
-        rows: Math.abs(roll?.rows ?? 0),
-        direction: roll?.direction ?? "forward",
+        rows: Math.abs(thrown?.rows ?? 0),
+        direction: thrown?.direction ?? "forward",
       });
       after(WARP_BURST_MS, () => {
         setWarp((beat) => (beat === null ? null : { ...beat, phase: "land" }));
@@ -595,20 +622,21 @@ const MapView = ({ map, position }: MapViewProps) => {
           setWarp(null);
           setArrival(null);
           setJumping(false);
-          if (roll?.landing != null) enterNode(roll.landing);
+          if (thrown?.landing != null) enterNode(thrown.landing);
         });
       });
     });
   };
 
   const onBypass = (holeId: NodeId): void => {
-    if (jumping) return;
+    const offer = bypassOffer(holeId);
+    if (jumping || !offer.offered) return;
     const landing = bypassTargetFor(map, position, holeId, visited);
     const target = landing === null ? undefined : byId.get(landing);
     playSfx("jump");
     haptic("mapJump");
     setSelected(null);
-    if (holeTollFor(sector, hull) > 0) {
+    if (offer.toll > 0) {
       playSfx("hullHit", { gain: 0.5 });
       flashVignette("toll");
     }
@@ -653,6 +681,13 @@ const MapView = ({ map, position }: MapViewProps) => {
     });
   };
 
+  const onSpot = (entry: NodeId): void => {
+    if (jumping) return;
+    playSfx("eventOpen");
+    setSelected(entry);
+    openWormhole(entry);
+  };
+
   const visibleNodes = map.nodes.filter(isVisible);
   const visibleIds = new Set(visibleNodes.map((n) => n.id));
   const fogBottom =
@@ -663,6 +698,12 @@ const MapView = ({ map, position }: MapViewProps) => {
   const motifLegend = MOTIF_LEGEND.filter((entry) =>
     entry.present(map),
   );
+
+  const modifiers = runModifiers(mutators);
+  const modifierChipLabel =
+    modifiers.length === 1 && modifiers[0] !== undefined
+      ? t(modifiers[0].name)
+      : t("run:map.conditions", { n: modifiers.length });
 
   const selectedNode = selected === null ? null : byId.get(selected);
   const canJump =
@@ -686,9 +727,18 @@ const MapView = ({ map, position }: MapViewProps) => {
   })();
 
   const anomalyTier =
-    selectedNode === undefined || selectedNode === null
+    selectedNode === undefined ||
+    selectedNode === null ||
+    selectedNode.hole === true
       ? null
       : tierForNode(seed, selectedNode);
+
+  const selectedOffer =
+    selectedNode === undefined ||
+    selectedNode === null ||
+    selectedNode.hole !== true
+      ? null
+      : bypassOffer(selectedNode.id);
 
   const previewLines =
     selectedNode === undefined || selectedNode === null
@@ -700,14 +750,12 @@ const MapView = ({ map, position }: MapViewProps) => {
                 type: t(`run:map.node.${selectedNode.type}`),
                 risk: t(`run:map.risk.${nodeRisk(selectedNode)}`),
               }),
-          ...(selectedNode.hole === true
-            ? [
+          ...(selectedOffer === null
+            ? []
+            : [
                 t("run:map.previewHole"),
-                holeTollFor(sector, hull) > 0
-                  ? t("run:hole.bypassCost", { n: holeTollFor(sector, hull) })
-                  : t("run:hole.bypassFree"),
-              ]
-            : []),
+                t(bypassCopyKey(selectedOffer), { n: selectedOffer.toll }),
+              ]),
           ...(previewName === null ? [] : [previewName]),
           ...(selectedNode.pocket === true ? [t("run:map.previewPocket")] : []),
           ...(selectedNode.cache === true ? [t("run:motif.cache")] : []),
@@ -783,6 +831,27 @@ const MapView = ({ map, position }: MapViewProps) => {
             </span>
           </TapPopover>
         ) : null}
+        {modifiers.length === 0 ? null : (
+          <TapPopover
+            label={t("run:weather.title")}
+            testId="map-modifiers"
+            align="end"
+            content={
+              <>
+                <b>{t("run:weather.title")}</b>
+                {modifiers.map((mod) => (
+                  <span key={mod.id} className={styles.modLine}>
+                    {t(mod.name)} — {t(mod.desc)}
+                  </span>
+                ))}
+              </>
+            }
+          >
+            <span className={styles.modChip ?? ""} data-map-modifiers>
+              {modifierChipLabel}
+            </span>
+          </TapPopover>
+        )}
         {runModules.length > 0 ? (
           <TapPopover
             label={t("run:map.modules", {
@@ -872,11 +941,10 @@ const MapView = ({ map, position }: MapViewProps) => {
               setAbandoning(false);
             }}
           />
-          {pendingWormhole === null ? null : (
+          {pendingWormhole === null || jumping ? null : (
             <WormholeChoice
-              toll={holeTollFor(sector, hull)}
+              offer={bypassOffer(pendingWormhole)}
               gentle={isGentleRide(rides)}
-              busy={jumping}
               onBypass={() => {
                 onBypass(pendingWormhole);
               }}
@@ -900,22 +968,19 @@ const MapView = ({ map, position }: MapViewProps) => {
           role="img"
         >
           <defs>
-            <radialGradient id="caHoleWash">
-              <stop offset="0%" stopColor={schools.black.stroke} stopOpacity={0.42} />
-              <stop offset="70%" stopColor={schools.black.fill} stopOpacity={0.22} />
-              <stop offset="100%" stopColor={schools.black.fill} stopOpacity={0} />
-            </radialGradient>
+            <SpotDefs />
           </defs>
 
           {map.edges.map(([a, b]) => {
-            if (!visibleIds.has(a) || !visibleIds.has(b)) return null;
             const na = byId.get(a);
             const nb = byId.get(b);
             if (na === undefined || nb === undefined) return null;
+            if (!isDrawableEdge(na, nb, visibleIds)) return null;
             const mark = edgeMarkFor(map, a, b);
             return (
               <line
                 key={`${a}-${b}`}
+                data-edge={edgeKey(a, b)}
                 data-edge-mark={mark}
                 x1={geo.nodeX(na)}
                 y1={geo.rowY(na.row)}
@@ -944,6 +1009,31 @@ const MapView = ({ map, position }: MapViewProps) => {
             );
           })}
 
+          {map.spots.map((spot) => {
+            const ellipse = spotEllipse(
+              geo,
+              spotMembers(spot, byId, visibleIds),
+            );
+            if (ellipse === null) return null;
+            const entry = spotEntryFor(map, position, spot, visited);
+            return (
+              <SpotOverlay
+                key={spot.id}
+                spot={spot}
+                ellipse={ellipse}
+                reduced={reduced}
+                label={t("run:map.spotLabel")}
+                onOpen={
+                  entry === null || jumping
+                    ? null
+                    : () => {
+                        onSpot(entry);
+                      }
+                }
+              />
+            );
+          })}
+
           {visibleNodes.map((node, index) => {
             const current = node.id === position;
             const chosen = node.id === selected;
@@ -964,6 +1054,8 @@ const MapView = ({ map, position }: MapViewProps) => {
                   data-testid={`map-node-${node.id}`}
                   data-node-type="hole"
                   data-node-hole="1"
+                  data-node-ghost="1"
+                  data-spot-id={node.spot}
                   data-node-legal={legal ? '1' : '0'}
                   className={legal ? styles.nodeSelectable ?? "" : styles.node ?? ""}
                   onClick={legal ? () => { selectNode(node.id); } : undefined}
@@ -971,45 +1063,21 @@ const MapView = ({ map, position }: MapViewProps) => {
                   <circle
                     cx={geo.nodeX(node)}
                     cy={geo.rowY(node.row)}
-                    r={geo.radius(node) + 14}
-                    fill="url(#caHoleWash)"
-                  />
-                  <circle
-                    cx={geo.nodeX(node)}
-                    cy={geo.rowY(node.row)}
                     r={geo.radius(node)}
                     fill={tokens.bg}
-                    stroke={chosen ? tokens.amber : schools.black.stroke}
+                    fillOpacity={chosen ? 0.85 : 0.62}
+                    stroke={chosen ? tokens.amber : schools.black.text}
                     strokeWidth={chosen ? 2.6 : 1.4}
-                  />
-                  <circle
-                    className={reduced ? undefined : styles.vortex}
-                    cx={geo.nodeX(node)}
-                    cy={geo.rowY(node.row)}
-                    r={geo.radius(node) - 4}
-                    fill="none"
-                    stroke={schools.black.text}
-                    strokeWidth={2}
-                    strokeDasharray="3 5"
+                    strokeDasharray={chosen ? undefined : "3 4"}
+                    opacity={chosen ? 1 : 0.9}
                   />
                   <circle
                     cx={geo.nodeX(node)}
                     cy={geo.rowY(node.row)}
                     r={geo.radius(node) * 0.3}
-                    fill={tokens.bg}
-                    stroke={schools.black.stroke}
-                    strokeWidth={0.8}
-                  />
-                  <text
-                    x={geo.nodeX(node) + geo.radius(node) - 1}
-                    y={geo.rowY(node.row) - geo.radius(node) + 6}
-                    textAnchor="middle"
-                    fontSize={11}
-                    fontWeight={700}
                     fill={schools.black.text}
-                  >
-                    {MOTIF_BADGE.blackHoles}
-                  </text>
+                    opacity={0.7}
+                  />
                 </g>
               );
             }
@@ -1281,6 +1349,20 @@ const MapView = ({ map, position }: MapViewProps) => {
             </Text>
           </div>
         ))}
+        {modifiers.length === 0 ? null : (
+          <>
+            <Text size="xs" c={tokens.faint}>
+              {t("run:weather.title")}
+            </Text>
+            {modifiers.map((mod) => (
+              <div key={mod.id} className={styles.legendRow}>
+                <Text size="xs" c={tokens.dim}>
+                  {t(mod.name)} — {t(mod.desc)}
+                </Text>
+              </div>
+            ))}
+          </>
+        )}
         {motifLegend.length === 0 ? null : (
           <>
             <Text size="xs" c={tokens.faint}>
@@ -1323,6 +1405,26 @@ export const MapScreen = () => {
   useEffect(() => {
     resumeUnenteredNode();
   }, []);
+
+  useEffect(() => {
+    if (map === null || position === null) return;
+    let timer = 0;
+    const arm = (): void => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        emitBark("idleMap");
+        arm();
+      }, IDLE_BARK_MS);
+    };
+    for (const name of IDLE_BARK_WAKE) {
+      window.addEventListener(name, arm, { passive: true });
+    }
+    arm();
+    return () => {
+      window.clearTimeout(timer);
+      for (const name of IDLE_BARK_WAKE) window.removeEventListener(name, arm);
+    };
+  }, [map, position]);
 
   useEffect(() => {
     const idle = window.requestIdleCallback?.bind(window) ?? window.setTimeout;

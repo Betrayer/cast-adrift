@@ -1,4 +1,5 @@
 import type { EffectDef } from "@/game/effects/types";
+import { WEATHER_BY_ID } from "@/data/weather";
 import type { LocKey } from "@/types/content";
 
 export type MutatorId =
@@ -154,16 +155,19 @@ const NUMERIC_KEYS = [
   "copyHpPct",
 ] as const;
 
+const modsById = (id: string): Partial<MutatorMods> | undefined =>
+  MUTATOR_BY_ID.get(id)?.mods ?? WEATHER_BY_ID.get(id)?.mods;
+
 export const computeMutatorMods = (
   ids: readonly string[],
 ): MutatorMods => {
   const out: MutatorMods = { ...ZERO_MUTATOR_MODS };
   for (const id of ids) {
-    const def = MUTATOR_BY_ID.get(id);
+    const def = modsById(id);
     if (def === undefined) continue;
-    for (const key of NUMERIC_KEYS) out[key] += def.mods[key] ?? 0;
-    out.noShops = out.noShops || def.mods.noShops === true;
-    out.barksOff = out.barksOff || def.mods.barksOff === true;
+    for (const key of NUMERIC_KEYS) out[key] += def[key] ?? 0;
+    out.noShops = out.noShops || def.noShops === true;
+    out.barksOff = out.barksOff || def.barksOff === true;
   }
   out.shieldDecayPct = Math.max(0, Math.min(100, out.shieldDecayPct));
   return out;

@@ -37,7 +37,7 @@
       "beacon": "Latarnia",
       "boss": "Szef",
       "inverted": "odwrócony",
-      "hole": "Czarna dziura"
+      "hole": "Czarna dziura: plama pochłonęła tę komórkę"
     },
     "previewNode": "{{type}} · ryzyko: {{risk}}",
     "previewPocket": "Objazd: lepsze łupy, trudniejsza walka",
@@ -48,7 +48,9 @@
     },
     "hull": "Kadłub {{cur}}/{{max}}",
     "scrap": "Złom {{n}}",
-    "previewHole": "Czarna dziura: obejść ją czy przejechać przez tunel czasoprzestrzenny"
+    "previewHole": "Krawędź odpowiada za całą plamę: obejść ją albo wlecieć w tunel",
+    "spotLabel": "Czarna dziura — cała plama to jeden wybór",
+    "conditions": "Warunki ×{{n}}"
   },
   "event": {
     "title": "Sygnał",
@@ -202,7 +204,6 @@
     "prologueReplay": "Powtórka",
     "badgeLegend": "Odznaki kości"
   },
-  "consequenceToast": "Wynik: {{text}}",
   "rewards": {
     "dieTitle": "Odzyskana matryca",
     "keep": "Zostawić na pokładzie",
@@ -271,7 +272,9 @@
     "dicePlaced": "Postawione kości",
     "pct": "{{n}}%",
     "wormholeRides": "Przejażdżki przez tunele czasoprzestrzenne",
-    "holesBypassed": "Pominięte dziury"
+    "holesBypassed": "Pominięte dziury",
+    "causeSingularity": "Osobliwość",
+    "cause": "Przyczyna śmierci"
   },
   "prologue": {
     "title": "Prolog",
@@ -300,6 +303,8 @@
     "tally": "To, co po sobie zostawiłeś",
     "continue": "Zamknij dziennik",
     "deathTitle": "Tutaj kończy się bieg",
+    "singularityTitle": "Nie będzie wraku",
+    "blackBox": "Ostatnia rzecz, co do której przyrządy zdążyły się zgodzić",
     "deathWhere": "Sektor{{sector}} · głębokość{{depth}}"
   },
   "setup": {
@@ -325,7 +330,7 @@
     "scrap": "+ fragment z{{n}}",
     "voucher": "Kupon Mk ×{{n}} — jedno bezpłatne ulepszenie w dowolnej stoczni",
     "take": "Weź",
-    "hint": "Wybierz jedną opcję. Zaraz rozpocznie się wybór bonusów.",
+    "hint": "Z paczki wychodzi tylko to, co weźmiesz.",
     "module": "moduł",
     "install": "Zainstaluj",
     "replace": "Zastąp"
@@ -393,10 +398,11 @@
     "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie",
     "inversion": "Podciąganie odwrócone: systemy są rozpatrywane od ostatniego do pierwszego",
     "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania",
-    "blackHoles": "Czarna dziura: komórka zniknęła; jej ścieżka tworzy tunel czasoprzestrzenny",
+    "blackHoles": "Czarna dziura: jedna plama pochłania kilka komórek; jej krawędź daje tunel czasoprzestrzenny",
     "wormhole": "Krawędź tunelu czasoprzestrzennego: na jej skraju czeka wybór",
     "bypass": "Ominął krawędź: fala musnęła kadłub",
-    "holeScorch": "Kadłub zbyt mało pieniędzy na opłatę za przejazd — bariera cię przepuściła"
+    "holeScorch": "Kadłub zbyt mało pieniędzy na opłatę za przejazd — bariera cię przepuściła",
+    "holeDrift": "Bariera nic nie wzięła — ten pas i tak był dla ciebie otwarty"
   },
   "tag": {
     "red": "Czerwony",
@@ -489,7 +495,13 @@
       "forward": "głębiej",
       "backward": "wstecz"
     },
-    "achievement": "Osiągnięcie: {{name}}"
+    "singularity": "Kadłub pochłonięty przez osobliwość — brak zapisu wyjścia",
+    "achievement": "Osiągnięcie: {{name}}",
+    "tabStory": "Historia",
+    "tabBattle": "Walka",
+    "openBattle": "Dziennik walki",
+    "battleLive": "Ta walka, najnowsza tura na górze.",
+    "battleLast": "Ostatnia walka, najnowsza tura na górze."
   },
   "memory": {
     "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",
@@ -555,12 +567,14 @@
   },
   "hole": {
     "title": "Czarna dziura",
-    "body": "Komórka zniknęła. Jej krawędź albo pozwoli ci ją ominąć, albo zabierze cię tam, gdzie sama wybierze.",
+    "body": "Plama zabrała te komórki. Jej krawędź albo przepuści cię obok, albo cisnie cię tam, gdzie sama zechce.",
     "gentle": "Stabilna tunelowa dziura",
     "gentleWhy": "Pierwsze dwa zjazdy w serii są krótkie i zawsze prowadzą coraz głębiej.",
     "bypass": "Obejść",
     "bypassCost": "Objazd: − kadłub typu{{n}}",
     "bypassFree": "Objazd: bezpłatny — kadłub nie może za to zapłacić",
+    "bypassDrift": "Objazd: bezpłatny — pas, który już miałeś",
+    "bypassNone": "Nie da się objechać: każdy pas za barierą masz już za sobą",
     "ride": "Wsiadaj i jedź",
     "rideCost": "Przejazd: przejazd pociągiem linii „{{min}}” – stacja{{max}}, kierunek nieznany",
     "rideGentle": "Ride: rzut „{{min}}” – „{{max}}”, wyłącznie w głębszym zakresie",
@@ -597,5 +611,25 @@
     "toScrap": "→ scrap + {{n}}",
     "sellNew": "Sprzedaj nowy egzemplarz (+ {{n}})",
     "cancel": "Anuluj"
+  },
+  "feed": {
+    "source": {
+      "echo": "ECHO",
+      "consequence": "SKUTEK",
+      "achievement": "OSIĄGNIĘCIE",
+      "system": "SYSTEM"
+    },
+    "dismiss": "Ukryj",
+    "open": "Otwórz w dzienniku"
+  },
+  "weather": {
+    "title": "Warunki sektora"
+  },
+  "salvage": {
+    "title": "Rozebrać wrak",
+    "take": "Weź",
+    "decline": "Zostaw",
+    "hint": "Jedno z trzech. Reszta spłonie razem z wrakiem.",
+    "declined": "Rozbiórka: nic na pokładzie nie było warte czasu palnika."
   }
 }

@@ -642,7 +642,6 @@
       "name": "Wykonawca",
       "desc": "Zdobyte gwiazdki kontraktów: {{n}}"
     },
-    "toast": "Osiągnięcie",
     "beyondTheCore": {
       "name": "Poza podstawami",
       "desc": "Przekrocz próg i oczyść Sektor 6."
@@ -674,6 +673,10 @@
     "voidRider": {
       "name": "Jeździec pustki",
       "desc": "Przeloty przez tunel czasoprzestrzenny: {{n}}"
+    },
+    "horizonTester": {
+      "name": "Tester horyzontu",
+      "desc": "Przebiegi unicestwione przez osobliwość: {{n}}"
     },
     "rimRunner": {
       "name": "Biegacz krawędzi",

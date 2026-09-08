@@ -37,7 +37,7 @@
       "beacon": "Baliza",
       "boss": "Jefe",
       "inverted": "invertido",
-      "hole": "Agujero negro"
+      "hole": "Agujero negro: la mancha se tragó esta celda"
     },
     "previewNode": "{{type}} · riesgo: {{risk}}",
     "previewPocket": "Desvío: mejor botín, combate más duro",
@@ -48,7 +48,9 @@
     },
     "hull": "Casco {{cur}}/{{max}}",
     "scrap": "Chatarra {{n}}",
-    "previewHole": "Agujero negro: rodearlo o atravesar el agujero de gusano"
+    "previewHole": "El borde responde por toda la mancha: rodéala o cruza el agujero de gusano",
+    "spotLabel": "Agujero negro: toda la mancha es una sola decisión",
+    "conditions": "Condiciones ×{{n}}"
   },
   "event": {
     "title": "Señal",
@@ -202,7 +204,6 @@
     "prologueReplay": "Repetición",
     "badgeLegend": "Distintivos de dados"
   },
-  "consequenceToast": "Consecuencia: {{text}}",
   "rewards": {
     "dieTitle": "Matriz recuperada",
     "keep": "Dejar en la baraja",
@@ -271,7 +272,9 @@
     "dicePlaced": "Dados colocados",
     "pct": "{{n}}%",
     "wormholeRides": "Atracciones de agujeros de gusano",
-    "holesBypassed": "Agujeros omitidos"
+    "holesBypassed": "Agujeros omitidos",
+    "causeSingularity": "Singularidad",
+    "cause": "Causa de la muerte"
   },
   "prologue": {
     "title": "Prólogo",
@@ -300,6 +303,8 @@
     "tally": "Lo que dejaste atrás",
     "continue": "Cerrar el registro",
     "deathTitle": "La carrera termina aquí",
+    "singularityTitle": "No habrá restos",
+    "blackBox": "Lo último en lo que los instrumentos llegaron a coincidir",
     "deathWhere": "Sector{{sector}} · profundidad{{depth}}"
   },
   "setup": {
@@ -325,7 +330,7 @@
     "scrap": "+ Recorte de{{n}}",
     "voucher": "Cupón Mk × {{n}}: una mejora gratuita en cualquier astillero",
     "take": "Toma",
-    "hint": "Elige una. A continuación viene el draft de ventajas.",
+    "hint": "Solo lo que tomes sale del paquete.",
     "module": "módulo",
     "install": "Instalar",
     "replace": "Sustituir"
@@ -393,10 +398,11 @@
     "riftSplit": "La división de la grieta: las ramas solo se unen en la puerta",
     "inversion": "Remada invertida: los sistemas se resuelven de último a primero",
     "storm": "Tormenta de probabilidad: se vuelve a lanzar un dado colocado en su posición durante la resolución",
-    "blackHoles": "Agujero negro: la célula ha desaparecido; su trayectoria ofrece un agujero de gusano",
+    "blackHoles": "Agujero negro: una mancha se traga varias celdas; su borde ofrece un agujero de gusano",
     "wormhole": "El borde del agujero de gusano: una decisión nos espera en el límite",
     "bypass": "Rozó el borde: la marea rozó el casco",
-    "holeScorch": "Casco demasiado delgado para pagar el peaje: la llanta te dejó pasar"
+    "holeScorch": "Casco demasiado delgado para pagar el peaje: la llanta te dejó pasar",
+    "holeDrift": "La llanta no cobró nada: ese carril ya estaba abierto para ti"
   },
   "tag": {
     "red": "Rojo",
@@ -489,7 +495,13 @@
       "forward": "más profundo",
       "backward": "atrás"
     },
-    "achievement": "Logro: {{name}}"
+    "singularity": "Casco absorbido por la singularidad: ninguna salida registrada",
+    "achievement": "Logro: {{name}}",
+    "tabStory": "Historia",
+    "tabBattle": "Combate",
+    "openBattle": "Registro de combate",
+    "battleLive": "Este combate, el turno más reciente primero.",
+    "battleLast": "El último combate, el turno más reciente primero."
   },
   "memory": {
     "kicker": "Echo recuerda · fragmento {{n}} de {{max}}",
@@ -555,12 +567,14 @@
   },
   "hole": {
     "title": "Agujero negro",
-    "body": "La celda ha desaparecido. Su borde o bien te dejará pasar, o bien te llevará a donde ella elija.",
+    "body": "La mancha se llevó estas celdas. Su borde te dejará rodearla o te lanzará adonde él decida.",
     "gentle": "Agujero de gusano estable",
     "gentleWhy": "Los dos primeros tramos de un recorrido son cortos y siempre se adentran más en el terreno.",
     "bypass": "Dar una vuelta",
     "bypassCost": "Derivación: casco «{{n}}»",
     "bypassFree": "Exención: gratuita — el buque no puede pagar",
+    "bypassDrift": "Derivación: gratuita — un carril que ya tenías",
+    "bypassNone": "No hay rodeo: todos los carriles tras la llanta ya quedaron atrás",
     "ride": "¡A por ello!",
     "rideCost": "Recorrido: un trayecto de {{min}} –{{max}}, dirección desconocida",
     "rideGentle": "Ride: una variación de «{{min}}» – «{{max}}», pero más profunda",
@@ -597,5 +611,25 @@
     "toScrap": "→ eliminar{{n}}",
     "sellNew": "Vender el nuevo (+ {{n}})",
     "cancel": "Cancelar"
+  },
+  "feed": {
+    "source": {
+      "echo": "ECO",
+      "consequence": "CONSECUENCIA",
+      "achievement": "LOGRO",
+      "system": "SISTEMA"
+    },
+    "dismiss": "Descartar",
+    "open": "Abrir en el diario"
+  },
+  "weather": {
+    "title": "Condiciones del sector"
+  },
+  "salvage": {
+    "title": "Desguazar el pecio",
+    "take": "Tomar",
+    "decline": "Dejarlo",
+    "hint": "Una de las tres. El resto arde con el casco.",
+    "declined": "Desguace: nada a bordo valía el tiempo de corte."
   }
 }

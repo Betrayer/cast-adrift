@@ -3654,7 +3654,8 @@
     "sectorEnter1": {
       "1": "The Hush Rim. The name is honest.",
       "2": "Forty years of silence, and we brought the noise.",
-      "3": "The Rim. Where the fleet stopped answering."
+      "3": "The Rim. Where the fleet stopped answering.",
+      "4": "The Rim is the shallow end, captain. It still drowned a fleet."
     },
     "lowHull": {
       "1": "The hull is complaining. So am I, just quieter.",
@@ -3742,7 +3743,9 @@
       "3": "Take your time. The sector is patient and so am I.",
       "4": "Every route from here is a different kind of expensive.",
       "5": "Fog's thick ahead. Sensors would help with that.",
-      "6": "I've charted worse. Not recently, but I have."
+      "6": "I've charted worse. Not recently, but I have.",
+      "7": "I have run every branch twice. The answers do not improve.",
+      "8": "Still holding position. I will say nothing else about it."
     },
     "setComplete": {
       "1": "Resonance caught. Don't ask how it works.",
@@ -3751,61 +3754,42 @@
       "4": "Resonance holding. You'll feel that next roll.",
       "5": "Four of a school. The cores like company.",
       "6": "That's a proper build now, captain.",
-      "7": "The whole tray hums. That's the good hum."
-    },
-    "killJammer": {
-      "1": "The jammer's quiet. I can finally hear myself think.",
-      "2": "No more static from that one. Small mercies."
-    },
-    "killLeech": {
-      "1": "It let go. I hate when things touch the dice.",
-      "2": "Detached. My cores are mine again."
-    },
-    "killRaider": {
-      "1": "One raider fewer. The Rim keeps score.",
-      "2": "That one won't be salvaging us today."
-    },
-    "killChoir": {
-      "1": "The hymn stopped. I don't miss it.",
-      "2": "One less voice in the choir. Good."
-    },
-    "killWasp": {
-      "1": "The wasp's gone. Watch your weapon mount anyway.",
-      "2": "Swatted. The rift breeds more, though."
-    },
-    "killWarden": {
-      "1": "Its shields are somebody else's problem now.",
-      "2": "Warden down. The wall comes with us."
-    },
-    "killScav": {
-      "1": "Drone's slag. It wanted our dice too.",
-      "2": "One less drone picking at the wreck."
+      "7": "The whole tray hums. That's the good hum.",
+      "8": "They found each other. I had nothing to do with it.",
+      "9": "That is the sound the fleet used to make. Carry on."
     },
     "memory": {
       "1": "Something just came back. Give me a second, captain.",
       "2": "That's another piece of me. Filed under 'unpleasant, useful'.",
       "3": "I remember more of them now. That's not entirely a gift.",
-      "4": "Another piece of me came back. I'm not sure I wanted this one."
+      "4": "Another piece of me came back. I'm not sure I wanted this one.",
+      "5": "I have a face for that name now. I would rather I did not.",
+      "6": "Another piece back. The seams are still visible, captain.",
+      "7": "I knew that. I did not know that I knew it."
     },
     "sectorEnter2": {
       "1": "Drift Fields. Everything here is somebody's salvage, including us.",
       "2": "Watch the mines. They've had forty years to get bored.",
-      "3": "Drift Fields. Mind the lanes and mind the clans."
+      "3": "Drift Fields. Mind the lanes and mind the clans.",
+      "4": "Every hull out here belongs to somebody. Usually to two, and they disagree."
     },
     "sectorEnter3": {
       "1": "The Rift. My sensors are voting and they disagree.",
       "2": "Don't trust the readings. Don't trust the dice either, honestly.",
-      "3": "The Rift. Trust the resolver, not the instruments."
+      "3": "The Rift. Trust the resolver, not the instruments.",
+      "4": "The Rift. I will keep reporting numbers. Please treat them as opinions."
     },
     "sectorEnter4": {
       "1": "Choir space. They'll be polite. That's the worrying part.",
       "2": "If they start singing numbers at you, captain, do not sing back.",
-      "3": "The Choir. They'll be polite. That's the unsettling part."
+      "3": "The Choir. They'll be polite. That's the unsettling part.",
+      "4": "The Choir is not praying for us to lose. It is praying for fewer options."
     },
     "sectorEnter5": {
       "1": "The Core. I have been pointed at this place for forty years.",
       "2": "Whatever happens here, thank you for the lift.",
-      "3": "The Core. Everything from here is a first draft."
+      "3": "The Core. Everything from here is a first draft.",
+      "4": "The Core. This is the address on every order I still carry."
     },
     "bossPhase": {
       "1": "It just changed its mind about how this goes. Adjust.",
@@ -3828,69 +3812,110 @@
       "6": "Whatever it does first, it will do again. Learn it."
     },
     "kill-raider": {
-      "1": "Clan colours. There will be more of those."
+      "1": "Clan colours. There will be more of those.",
+      "2": "One raider fewer. The Rim keeps score.",
+      "3": "That one won't be salvaging us today."
     },
     "kill-scavDrone": {
-      "1": "Somebody's loader. It didn't choose this."
+      "1": "Somebody's loader. It didn't choose this.",
+      "2": "Drone's slag. It wanted our dice too.",
+      "3": "One less drone picking at the wreck."
     },
     "kill-shieldWarden": {
-      "1": "Fleet escort doctrine. Forty years too late."
+      "1": "Fleet escort doctrine. Forty years too late.",
+      "2": "Its shields are somebody else's problem now.",
+      "3": "Warden down. The wall comes with us."
     },
     "kill-jammerCorvette": {
-      "1": "Slot's free again. I hated that."
+      "1": "Slot's free again. I hated that.",
+      "2": "The jammer's quiet. I can finally hear myself think.",
+      "3": "No more static from that one. Small mercies."
     },
     "kill-leechSkiff": {
-      "1": "The dice move again. Thank you."
+      "1": "The dice move again. Thank you.",
+      "2": "It let go. I hate when things touch the dice.",
+      "3": "Detached. My cores are mine again."
     },
     "kill-choirZealot": {
-      "1": "It sang until it didn't. Log the channel."
+      "1": "It sang until it didn't. Log the channel.",
+      "2": "The hymn stopped. I don't miss it.",
+      "3": "One less voice in the choir. Good."
     },
     "kill-riftWasp": {
-      "1": "Loud to the end. Check the weapon mount."
+      "1": "Loud to the end. Check the weapon mount.",
+      "2": "The wasp's gone. Watch your weapon mount anyway.",
+      "3": "Swatted. The rift breeds more, though."
     },
     "kill-breakerDrone": {
-      "1": "Salvage tooling with opinions. Not any more."
+      "1": "Salvage tooling with opinions. Not any more.",
+      "2": "Somebody filed the safeties off that one. Somebody always does.",
+      "3": "It cut hulls for a living. Ours declined."
     },
     "kill-magnetTug": {
-      "1": "It only wanted to hold us. It was very good at it."
+      "1": "It only wanted to hold us. It was very good at it.",
+      "2": "It never fired once. I logged it as a fight anyway.",
+      "3": "The grip is off. The engines are ours again."
     },
     "kill-minelayer": {
-      "1": "Field's still out there. The layer isn't."
+      "1": "Field's still out there. The layer isn't.",
+      "2": "It stopped laying. What it already laid did not stop.",
+      "3": "The least interesting thing in the sector, right to the end."
     },
     "kill-hookTug": {
-      "1": "No invoice this time."
+      "1": "No invoice this time.",
+      "2": "It towed people who never asked. Consider the debt cleared.",
+      "3": "The hook is loose. Nothing to sign."
     },
     "kill-riftling": {
-      "1": "The Rift will draw another. It always does."
+      "1": "The Rift will draw another. It always does.",
+      "2": "That was a draft. The Rift keeps the sketchbook.",
+      "3": "Gone. It did not look surprised."
     },
     "kill-echoShade": {
-      "1": "It stopped repeating us. Small mercy."
+      "1": "It stopped repeating us. Small mercy.",
+      "2": "It only ever heard the loud half of us. Now it hears nothing.",
+      "3": "I would rather not discuss what it sounded like."
     },
     "kill-foldWorm": {
-      "1": "The numbers feel solid again."
+      "1": "The numbers feel solid again.",
+      "2": "It was eating the certainty out of our numbers. The numbers are whole again.",
+      "3": "Down. I trust my own arithmetic again."
     },
     "kill-choirAcolyte": {
-      "1": "That one volunteered, captain."
+      "1": "That one volunteered, captain.",
+      "2": "It was very calm about all of this. That is the part I keep.",
+      "3": "One fewer name on their list. They keep the list regardless."
     },
     "kill-hymnTurret": {
-      "1": "Off-key at last."
+      "1": "Off-key at last.",
+      "2": "It fired on the downbeat. There is no downbeat now.",
+      "3": "The chord broke and the gun went with it."
     },
     "kill-hymnCantor": {
-      "1": "The tempo's gone. The rest will scatter."
+      "1": "The tempo's gone. The rest will scatter.",
+      "2": "You killed the tempo first. I would have suggested it eventually.",
+      "3": "Nobody is counting them in any more."
     },
     "kill-coreFragment": {
-      "1": "A piece of the Core, and it bled like a ship."
+      "1": "A piece of the Core, and it bled like a ship.",
+      "2": "It thought it was the whole thing. It was off by most of it.",
+      "3": "That was a splinter, captain. Remember the size of the rest."
     },
     "kill-probabilityKnot": {
-      "1": "Untied. Two futures, both over."
+      "1": "Untied. Two futures, both over.",
+      "2": "Two outcomes were tied together. Neither of them is ours.",
+      "3": "It came apart cleanly. I expected more from a knot."
     },
     "kill-causalityLoop": {
-      "1": "It stopped swapping. I'd almost gotten used to it."
+      "1": "It stopped swapping. I'd almost gotten used to it.",
+      "2": "Our numbers stay where we put them now. I had stopped expecting that.",
+      "3": "I almost had its pattern. Now I will never know if I was right."
     },
     "sectorEnter6": {
       "1": "Captain. Nothing out here is charted. Including us.",
       "2": "I am reading our own hull ahead of us. Twice.",
-      "3": "Whatever the Core was keeping out, we just walked around it."
+      "3": "Whatever the Core was keeping out, we just walked around it.",
+      "4": "Beyond the Core. I have no orders for this. It is oddly restful."
     },
     "threshold": {
       "1": "You could have ended it. I logged that you didn't.",
@@ -3898,16 +3923,31 @@
       "3": "The tide does not stop at three past this line. Nothing does.",
       "4": "Ending it was the answer. You wanted the question."
     },
-    "wormhole": {
+    "holeBypass": {
       "1": "Cell gone. Not destroyed — subtracted.",
       "2": "The rim reads as a door that opens onto whichever room it likes.",
       "3": "I can chart the way around. I cannot chart the way through.",
       "4": "Whatever is on the far side of that, it is not on my map.",
-      "5": "We came out somewhere. I am working on where.",
-      "6": "The instruments agree on nothing. That is data too.",
-      "7": "Distance stopped being a promise about a minute ago.",
-      "8": "Log it as a jump. The log will be lying."
+      "5": "We went around it. The long way is still a way, captain."
+    },
+    "wormholeRide": {
+      "1": "We came out somewhere. I am working on where.",
+      "2": "The instruments agree on nothing. That is data too.",
+      "3": "Distance stopped being a promise about a minute ago.",
+      "4": "Log it as a jump. The log will be lying.",
+      "5": "We went in, and then we were here. I have no middle to report."
     }
+  },
+  "blackbox": {
+    "firstRun": "«Your first run. Most captains find this out later. You saved time.»",
+    "beyond": "«You had already finished once. You came back for the part with no chart. This was the part.»",
+    "veteran": "«Every throw before this one came out somewhere. I was holding that as a pattern. I am not any more.»",
+    "pact": "«Your page in the Choir's ledger is still there. It is now the largest surviving part of you.»",
+    "cautious": "«Three of them you went around. This one you did not. It did not notice the difference.»",
+    "resonant": "«You leaned into the Resonance the whole way down. Formally, you arrived.»",
+    "thin": "«There was almost no hull left and you rode it anyway. I am logging that as decisiveness.»",
+    "whole": "«Hull intact. All systems nominal. None of those turned out to be the number that mattered.»",
+    "quiet": "«What did you expect? It is a black hole.»"
   },
   "mutators": {
     "brittleShields": {
@@ -5222,6 +5262,70 @@
     },
     "free": {
       "say": "Check complete. Free turn — the board is yours."
+    }
+  },
+  "weather": {
+    "nebula": {
+      "name": "Nebula",
+      "desc": "Sensors reach 1 row less on the map; cleared battle nodes pay 20% more scrap.",
+      "line": "Nebula. A row less of sight — but the wrecks inside it pay 20% better."
+    },
+    "ionStorm": {
+      "name": "Ion Storm",
+      "desc": "Static costs the sensors 1 row of map sight; nudging a die costs 1 charge less.",
+      "line": "Ion storm. The static eats a row of sight — and the dice ride the current for 1 less."
+    },
+    "debrisField": {
+      "name": "Debris Field",
+      "desc": "Cleared battle nodes pay 40% more scrap; enemies carry 5% more hull.",
+      "line": "Debris field. Salvage everywhere — and 5% more hull hiding behind it."
+    },
+    "solarWind": {
+      "name": "Solar Wind",
+      "desc": "The reactor caps 2 charge higher; nudging a die costs 1 charge more.",
+      "line": "Solar wind. The collectors drink it — 2 more charge — and the actuators fight it for 1 more."
+    },
+    "magneticStorm": {
+      "name": "Magnetic Storm",
+      "desc": "Nudging a die costs 1 charge more; drops come one rarity higher.",
+      "line": "Magnetic storm. The actuators take an extra charge — the wrecks give a rarity back."
+    },
+    "radioBurst": {
+      "name": "Radio Burst",
+      "desc": "Sensors reach 1 row further on the map; cleared battle nodes pay 20% less scrap.",
+      "line": "Radio burst. The lanes light up a row further out, and every salvage beacon in the act is screaming static."
+    },
+    "gravityRipple": {
+      "name": "Gravity Ripple",
+      "desc": "Enemies carry 5% less hull; nudging a die costs 2 charge more.",
+      "line": "Gravity ripple. The shear thins their hulls by 5% — and your actuators pay 2 more to fight the drift."
+    },
+    "stillWatch": {
+      "name": "Still Watch",
+      "desc": "The reactor caps 1 charge higher; cleared battle nodes pay 15% more scrap.",
+      "line": "Still watch. Nothing out there. The reactor idles a charge deeper and the salvage comes up 15% clean."
+    }
+  },
+  "salvage": {
+    "scrap": {
+      "name": "Scrap Haul",
+      "desc": "Strip the hulk for 18 scrap.",
+      "line": "Salvage: cut the hulk down to 18 scrap and left the rest."
+    },
+    "repair": {
+      "name": "Patch Plating",
+      "desc": "Weld its plating onto ours: +3 hull.",
+      "line": "Salvage: three plates off the wreck, welded on warm."
+    },
+    "recon": {
+      "name": "Charted Lane",
+      "desc": "Read its logs: +1 row of map sight for the rest of the act.",
+      "line": "Salvage: its flight log holds. One row further out for the rest of the act."
+    },
+    "discount": {
+      "name": "Spare Parts",
+      "desc": "Trade its parts on: 25 scrap off one shipyard upgrade.",
+      "line": "Salvage: a crate of clean parts. The next dock will knock 25 scrap off an upgrade for them."
     }
   }
 }

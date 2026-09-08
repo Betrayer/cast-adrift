@@ -41,6 +41,7 @@ export interface MetaStats {
   bestNoDeathStreak: number;
   wormholeRides: number;
   holesBypassed: number;
+  disintegrations: number;
   eventsResolved: number;
   checksWon: number;
   fusions: number;
@@ -186,7 +187,7 @@ export interface MetaState extends MetaValues {
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 16;
+export const META_VERSION = 17;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -224,6 +225,7 @@ export const createInitialMetaStats = (): MetaStats => ({
   bestNoDeathStreak: 0,
   wormholeRides: 0,
   holesBypassed: 0,
+  disintegrations: 0,
   eventsResolved: 0,
   checksWon: 0,
   fusions: 0,
@@ -255,6 +257,7 @@ const LIFETIME_KEYS = [
   "deepClears",
   "wormholeRides",
   "holesBypassed",
+  "disintegrations",
   "eventsResolved",
   "checksWon",
   "fusions",

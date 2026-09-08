@@ -323,7 +323,7 @@
   "interferenceWhy": "Les anomalies évitées s’empilent : chaque pile ajoute un niveau de marée pour le reste de la partie. Résoudre une anomalie les efface toutes.",
   "interferenceTitle": "Interférence",
   "axisWhy": "Les dés noirs tirent vers la Résonance, les bleus vers la Stabilité. Les événements et la dérive déplacent aussi l’axe.",
-  "chargeWhy": "La charge paie les actions : −1 coûte 3, +1 coûte 3, une relance achetée 5, une surtension 10.",
+  "chargeWhy": "La charge paie les actions : −1 coûte {{n}}, +1 coûte {{n}}, une relance achetée 5, une surtension 10.",
   "chargeTitle": "Charge",
   "mkWhy": "Mk relève le plafond de l’emplacement et le bonus d’affinité de son école.",
   "resEarned": "Acquis",

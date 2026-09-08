@@ -8,11 +8,13 @@ import {
   START_NODE_ID,
   START_ROW,
   type EdgeMark,
+  type HoleSpot,
   type MapGraph,
   type MapNode,
   type MapShape,
   type NodeId,
   type NodeType,
+  type SpotId,
   type WormholeEdge,
 } from "@/game/map/types";
 
@@ -24,9 +26,11 @@ const FIRST_ELITE_ROW = 3;
 const FIRST_REST_ROW = 4;
 const BEACON_START_FRACTION = 0.33;
 const BEACON_END_FRACTION = 0.73;
-const HOLE_FIRST_ROW = 4;
-const HOLE_GATE_MARGIN = 3;
-const HOLE_ROW_GAP = 3;
+const HOLE_FIRST_ROW = 3;
+const HOLE_LAST_ROW_MARGIN = 2;
+const HOLE_SPAN_ROWS = 3;
+const HOLE_SPAN_LANES = 2;
+const MIN_SPOT_NODES = 2;
 const MAX_HOLE_ATTEMPTS = 20;
 
 export interface MapGenOptions {
@@ -229,7 +233,7 @@ const tryAssignTypes = (
   const assigned = new Map<NodeId, NodeType>();
   const adj = buildAdjacency(skeleton.edges);
   const candidates = [...skeleton.nodes.values()].filter(
-    (node) => node.type === "battle",
+    (node) => node.type === "battle" && node.hole !== true,
   );
   const slots = buildQuota(rng, shape, options);
 
@@ -266,7 +270,12 @@ const applyCache = (
   motif: Extract<SectorMotif, { m: "cache" }>,
 ): void => {
   const pool = rng
-    .shuffle(nodes.filter((node) => node.type === "battle" && node.row > 1))
+    .shuffle(
+      nodes.filter(
+        (node) =>
+          node.type === "battle" && node.hole !== true && node.row > 1,
+      ),
+    )
     .slice(0, motif.count);
   for (const node of pool) node.cache = true;
 };
@@ -387,10 +396,12 @@ const applyMineEdges = (
   rng: RngStream,
   motif: Extract<SectorMotif, { m: "mineEdges" }>,
   shape: SectorShape,
+  reserved: ReadonlySet<string>,
 ): Record<string, EdgeMark> => {
   const marks: Record<string, EdgeMark> = {};
   const freeExits = new Map<NodeId, number>();
-  for (const [from] of edges) {
+  for (const [from, to] of edges) {
+    if (byId.get(to)?.hole === true) continue;
     freeExits.set(from, (freeExits.get(from) ?? 0) + 1);
   }
   const crossing = edges.filter(([a, b]) => {
@@ -399,9 +410,11 @@ const applyMineEdges = (
     return (
       na !== undefined &&
       nb !== undefined &&
+      nb.hole !== true &&
       na.lane !== nb.lane &&
       nb.row !== shape.gateRow &&
-      nb.row !== shape.bossRow
+      nb.row !== shape.bossRow &&
+      !reserved.has(edgeKey(a, b))
     );
   });
   let placed = 0;
@@ -500,7 +513,7 @@ const buildPockets = (
 interface HoleBuild {
   marks: Record<string, EdgeMark>;
   wormholes: Record<string, WormholeEdge>;
-  placed: number;
+  spots: HoleSpot[];
 }
 
 const linkTable = (
@@ -515,86 +528,175 @@ const linkTable = (
   return { incoming, outgoing };
 };
 
+const spotIdFor = (seed: NodeId): SpotId => `spot:${seed}`;
+
 const applyBlackHoles = (
-  nodes: MapNode[],
+  nodes: readonly MapNode[],
   edges: readonly [NodeId, NodeId][],
   rng: RngStream,
   motif: Extract<SectorMotif, { m: "blackHoles" }>,
   shape: SectorShape,
-  marks: Readonly<Record<string, EdgeMark>>,
 ): HoleBuild => {
   const byId = new Map(nodes.map((node) => [node.id, node]));
   const { incoming, outgoing } = linkTable(edges);
-  const build: HoleBuild = { marks: {}, wormholes: {}, placed: 0 };
-  const holes = new Set<NodeId>();
-  const lastRow = Math.min(shape.bossRow - 2, shape.gateRow + HOLE_GATE_MARGIN);
+  const adjacent = buildAdjacency(edges);
+  const build: HoleBuild = { marks: {}, wormholes: {}, spots: [] };
+  const bossId = nodeId(shape.bossRow, bossLaneFor(shape));
   const eligible = nodes.filter(
     (node) =>
-      node.type === "battle" &&
       node.pocket !== true &&
       node.cache !== true &&
       node.row >= HOLE_FIRST_ROW &&
-      node.row <= lastRow &&
-      node.row !== shape.gateRow,
+      node.row <= shape.bossRow - HOLE_LAST_ROW_MARGIN &&
+      node.row !== shape.gateRow &&
+      node.row !== shape.bossRow &&
+      node.id !== START_NODE_ID &&
+      node.id !== bossId,
   );
   if (eligible.length === 0) return build;
+  const eligibleIds = new Set(eligible.map((node) => node.id));
+  const rowMembers = new Map<number, MapNode[]>();
+  for (const node of nodes) {
+    rowMembers.set(node.row, [...(rowMembers.get(node.row) ?? []), node]);
+  }
 
-  const openExits = (from: NodeId, without: NodeId): NodeId[] =>
-    (outgoing.get(from) ?? []).filter(
-      (to) =>
-        to !== without &&
-        !holes.has(to) &&
-        marks[edgeKey(from, to)] === undefined,
-    );
+  const openExits = (from: NodeId, cluster: ReadonlySet<NodeId>): NodeId[] =>
+    (outgoing.get(from) ?? []).filter((to) => !cluster.has(to));
 
-  const accepts = (node: MapNode): boolean => {
-    if (holes.has(node.id)) return false;
-    for (const id of holes) {
-      const other = byId.get(id);
-      if (other === undefined) continue;
-      if (Math.abs(other.row - node.row) < HOLE_ROW_GAP) return false;
+  const guardsHold = (cluster: ReadonlySet<NodeId>): boolean => {
+    let entries = 0;
+    for (const [from, to] of edges) {
+      if (cluster.has(to) && !cluster.has(from)) {
+        entries += 1;
+        if (openExits(from, cluster).length === 0) return false;
+      }
+      if (cluster.has(from) && !cluster.has(to)) {
+        const feeders = (incoming.get(to) ?? []).filter(
+          (prev) => !cluster.has(prev),
+        );
+        if (feeders.length === 0) return false;
+      }
     }
-    const ins = incoming.get(node.id) ?? [];
-    if (ins.length === 0) return false;
-    for (const from of ins) {
-      if (openExits(from, node.id).length === 0) return false;
-    }
-    for (const to of outgoing.get(node.id) ?? []) {
-      const feeds = (incoming.get(to) ?? []).filter(
-        (from) => from !== node.id && !holes.has(from),
-      );
-      if (feeds.length === 0) return false;
+    if (entries === 0) return false;
+    for (const members of rowMembers.values()) {
+      if (members.every((node) => cluster.has(node.id))) return false;
     }
     return true;
   };
 
-  for (let placed = 0; placed < motif.count; placed += 1) {
-    let chosen: MapNode | undefined;
-    for (
-      let attempt = 0;
-      attempt < MAX_HOLE_ATTEMPTS && chosen === undefined;
-      attempt += 1
-    ) {
-      const candidate = rng.pick(eligible);
-      if (accepts(candidate)) chosen = candidate;
+  const frontierOf = (cluster: ReadonlySet<NodeId>): MapNode[] => {
+    const frontier = new Set<NodeId>();
+    for (const id of cluster) {
+      for (const next of adjacent.get(id) ?? []) {
+        if (!cluster.has(next) && eligibleIds.has(next)) frontier.add(next);
+      }
     }
-    if (chosen === undefined) break;
-    holes.add(chosen.id);
-    chosen.hole = true;
-    build.placed += 1;
-  }
+    return [...frontier]
+      .map((id) => byId.get(id))
+      .filter((node): node is MapNode => node !== undefined)
+      .sort(
+        (a, b) =>
+          a.row - b.row ||
+          a.lane - b.lane ||
+          (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+      );
+  };
 
-  for (const id of holes) {
-    for (const from of incoming.get(id) ?? []) {
-      const alternates = openExits(from, id);
-      if (alternates.length === 0) continue;
-      build.marks[edgeKey(from, id)] = "wormhole";
-      build.wormholes[edgeKey(from, id)] = {
-        from,
-        hole: id,
-        bypass: rng.pick(alternates),
-      };
+  const growFrom = (seed: MapNode): Set<NodeId> => {
+    let best = new Set<NodeId>();
+    const seen = new Set<string>();
+    const cluster = new Set<NodeId>([seed.id]);
+    const walk = (
+      rowLo: number,
+      rowHi: number,
+      laneLo: number,
+      laneHi: number,
+    ): boolean => {
+      if (
+        cluster.size > best.size &&
+        cluster.size >= MIN_SPOT_NODES &&
+        guardsHold(cluster)
+      ) {
+        best = new Set(cluster);
+        if (best.size >= motif.span[1]) return true;
+      }
+      if (cluster.size >= motif.span[1]) return false;
+      for (const candidate of frontierOf(cluster)) {
+        const nextRowLo = Math.min(rowLo, candidate.row);
+        const nextRowHi = Math.max(rowHi, candidate.row);
+        const nextLaneLo = Math.min(laneLo, candidate.lane);
+        const nextLaneHi = Math.max(laneHi, candidate.lane);
+        if (nextRowHi - nextRowLo + 1 > HOLE_SPAN_ROWS) continue;
+        if (nextLaneHi - nextLaneLo + 1 > HOLE_SPAN_LANES) continue;
+        cluster.add(candidate.id);
+        const key = [...cluster].sort().join(",");
+        let capped = false;
+        if (!seen.has(key)) {
+          seen.add(key);
+          capped = walk(nextRowLo, nextRowHi, nextLaneLo, nextLaneHi);
+        }
+        cluster.delete(candidate.id);
+        if (capped) return true;
+      }
+      return false;
+    };
+    walk(seed.row, seed.row, seed.lane, seed.lane);
+    return best;
+  };
+
+  let cluster = new Set<NodeId>();
+  let seedId: NodeId | null = null;
+  const seeds = rng.shuffle(eligible).slice(0, MAX_HOLE_ATTEMPTS);
+  for (const seed of seeds) {
+    const grown = growFrom(seed);
+    if (grown.size > cluster.size) {
+      cluster = grown;
+      seedId = seed.id;
     }
+    if (cluster.size >= motif.span[0]) break;
+  }
+  if (seedId === null || cluster.size < MIN_SPOT_NODES) return build;
+
+  const members = nodes.filter((node) => cluster.has(node.id));
+  const spot = spotIdFor(seedId);
+  for (const node of members) {
+    node.hole = true;
+    node.spot = spot;
+  }
+  const rows = members.map((node) => node.row);
+  const lanes = members.map((node) => node.lane);
+  build.spots.push({
+    id: spot,
+    nodes: members.map((node) => node.id),
+    rows: [Math.min(...rows), Math.max(...rows)],
+    lanes: [Math.min(...lanes), Math.max(...lanes)],
+  });
+
+  const lateralFor = (from: NodeId, hole: MapNode): NodeId[] => {
+    const reached = new Set(outgoing.get(from) ?? []);
+    return nodes
+      .filter(
+        (node) =>
+          node.row === hole.row &&
+          node.id !== from &&
+          !cluster.has(node.id) &&
+          !reached.has(node.id),
+      )
+      .map((node) => node.id);
+  };
+
+  for (const [from, to] of edges) {
+    if (!cluster.has(to) || cluster.has(from)) continue;
+    const alternates = openExits(from, cluster);
+    if (alternates.length === 0) throw new Error(`${spot} sealed ${from}`);
+    const hole = byId.get(to);
+    const lateral = hole === undefined ? [] : lateralFor(from, hole);
+    build.marks[edgeKey(from, to)] = "wormhole";
+    build.wormholes[edgeKey(from, to)] = {
+      from,
+      hole: to,
+      bypass: rng.pick(lateral.length > 0 ? lateral : alternates),
+    };
   }
   return build;
 };
@@ -626,25 +728,14 @@ export const bossReachOf = (
   return [...seen].sort();
 };
 
-interface MotifBuild {
-  marks: Record<string, EdgeMark>;
-  wormholes: Record<string, WormholeEdge>;
-  holesPlaced: number;
-  holesWanted: number;
-}
-
 const applyMotifs = (
   nodes: MapNode[],
   edges: readonly [NodeId, NodeId][],
   rng: RngStream,
   shape: SectorShape,
-): MotifBuild => {
-  const build: MotifBuild = {
-    marks: {},
-    wormholes: {},
-    holesPlaced: 0,
-    holesWanted: 0,
-  };
+  reserved: ReadonlySet<string>,
+): Record<string, EdgeMark> => {
+  let marks: Record<string, EdgeMark> = {};
   const byId = new Map(nodes.map((node) => [node.id, node]));
   for (const motif of shape.motifs) {
     switch (motif.m) {
@@ -658,9 +749,9 @@ const applyMotifs = (
         applyCollapse(nodes, rng, shape, motif);
         break;
       case "mineEdges":
-        build.marks = {
-          ...build.marks,
-          ...applyMineEdges(edges, byId, rng, motif, shape),
+        marks = {
+          ...marks,
+          ...applyMineEdges(edges, byId, rng, motif, shape, reserved),
         };
         break;
       case "inversion":
@@ -669,26 +760,12 @@ const applyMotifs = (
       case "storm":
         applyStorm(nodes, rng, shape, motif);
         break;
-      case "blackHoles": {
-        const holes = applyBlackHoles(
-          nodes,
-          edges,
-          rng,
-          motif,
-          shape,
-          build.marks,
-        );
-        build.marks = { ...build.marks, ...holes.marks };
-        build.wormholes = { ...build.wormholes, ...holes.wormholes };
-        build.holesPlaced += holes.placed;
-        build.holesWanted += motif.count;
-        break;
-      }
+      case "blackHoles":
       case "riftSplit":
         break;
     }
   }
-  return build;
+  return marks;
 };
 
 export const generateSectorMap = (
@@ -698,6 +775,17 @@ export const generateSectorMap = (
 ): MapGraph => {
   const shape = shapeOf(sector);
   const skeleton = buildSkeleton(rng, shape, options);
+  const holeMotif = motifOf(shape, "blackHoles");
+  const holes: HoleBuild =
+    holeMotif === undefined
+      ? { marks: {}, wormholes: {}, spots: [] }
+      : applyBlackHoles(
+          [...skeleton.nodes.values()],
+          skeleton.edges,
+          rng,
+          holeMotif,
+          shape,
+        );
 
   let assignment: Map<NodeId, NodeType> | null = null;
   for (let attempt = 0; attempt < MAX_TYPE_ATTEMPTS; attempt += 1) {
@@ -715,7 +803,12 @@ export const generateSectorMap = (
     })
     .sort((a, b) => a.row - b.row || a.lane - b.lane);
 
-  const motifs = applyMotifs(nodes, skeleton.edges, rng, shape);
+  const reserved = new Set(
+    Object.values(holes.wormholes).map((record) =>
+      edgeKey(record.from, record.bypass),
+    ),
+  );
+  const marks = applyMotifs(nodes, skeleton.edges, rng, shape, reserved);
   const pockets = buildPockets(nodes, rng, shape, options);
 
   const allNodes = [...nodes, ...pockets.nodes].sort(
@@ -727,8 +820,9 @@ export const generateSectorMap = (
     nodes: allNodes,
     edges: allEdges,
     shape: mapShapeOf(sector),
-    edgeMarks: { ...motifs.marks, ...pockets.marks },
-    wormholes: motifs.wormholes,
+    edgeMarks: { ...marks, ...holes.marks, ...pockets.marks },
+    wormholes: holes.wormholes,
+    spots: holes.spots,
     bossReach: bossReachOf(allNodes, allEdges, skeleton.bossId),
   };
 };

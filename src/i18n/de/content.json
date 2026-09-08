@@ -3654,7 +3654,8 @@
     "sectorEnter1": {
       "1": "Der „Hush Rim“. Der Name spricht für sich.",
       "2": "Vierzig Jahre Stille – und dann haben wir für Aufsehen gesorgt.",
-      "3": "Der Rand. Dort, wo die Flotte den Kontakt abbrach."
+      "3": "Der Rand. Dort, wo die Flotte den Kontakt abbrach.",
+      "4": "Der Rand ist das flache Ende, Kapitän. Er hat trotzdem eine Flotte ertränkt."
     },
     "lowHull": {
       "1": "Der Rumpf beschwert sich. Ich auch, nur leiser.",
@@ -3742,7 +3743,9 @@
       "3": "Lass dir Zeit. Die Branche ist geduldig, und ich bin es auch.",
       "4": "Jede Route von hier aus ist auf ihre eigene Art teuer.",
       "5": "Vor uns liegt dichter Nebel. Sensoren wären dabei hilfreich.",
-      "6": "Ich habe schon schlechtere Ergebnisse erzielt. Nicht in letzter Zeit, aber es ist schon vorgekommen."
+      "6": "Ich habe schon schlechtere Ergebnisse erzielt. Nicht in letzter Zeit, aber es ist schon vorgekommen.",
+      "7": "Ich habe jeden Ast zweimal durchgerechnet. Die Antworten werden nicht besser.",
+      "8": "Wir stehen immer noch. Mehr sage ich dazu nicht."
     },
     "setComplete": {
       "1": "Resonanz erwischt. Frag nicht, wie das funktioniert.",
@@ -3751,61 +3754,42 @@
       "4": "Resonanz Halt. Den nächsten Wurf wirst du spüren.",
       "5": "Vier aus einer Schule. Die Kerne mögen Gesellschaft.",
       "6": "Das ist jetzt eine ordentliche Konstruktion, Kapitän.",
-      "7": "Das ganze Tablett summt. Das ist das angenehme Summen."
-    },
-    "killJammer": {
-      "1": "Der Störsender ist still. Endlich kann ich meine eigenen Gedanken hören.",
-      "2": "Von dem kommt jetzt kein Rauschen mehr. Ein kleiner Trost."
-    },
-    "killLeech": {
-      "1": "Es ist mir aus der Hand gerutscht. Ich hasse es, wenn Dinge die Würfel berühren.",
-      "2": "Losgelöst. Meine Kerne gehören wieder mir."
-    },
-    "killRaider": {
-      "1": "Ein Raider weniger. „The Rim“ führt Buch.",
-      "2": "Das wird uns heute nicht aus der Patsche helfen."
-    },
-    "killChoir": {
-      "1": "Das Lied verstummte. Ich vermisse es nicht.",
-      "2": "Eine Stimme weniger im Chor. Gut."
-    },
-    "killWasp": {
-      "1": "Die Wespe ist weg. Pass trotzdem auf deine Waffenhalterung auf.",
-      "2": "Abgeschlagen. Doch die Kluft vertieft sich weiter."
-    },
-    "killWarden": {
-      "1": "Seine Schilde sind jetzt das Problem eines anderen.",
-      "2": "Der Wächter ist ausgeschaltet. Die Mauer fällt mit uns."
-    },
-    "killScav": {
-      "1": "Dieser Drohnen-Mistkerl. Der wollte auch unsere Würfel haben.",
-      "2": "Eine Drohne weniger, die am Wrack herumstochert."
+      "7": "Das ganze Tablett summt. Das ist das angenehme Summen.",
+      "8": "Sie haben einander gefunden. Ich hatte damit nichts zu tun.",
+      "9": "So klang früher die Flotte. Mach weiter."
     },
     "memory": {
       "1": "Da kam gerade eine Rückmeldung. Einen Moment bitte, Kapitän.",
       "2": "Das ist ein weiterer Teil von mir. Abgelegt unter „unangenehm, nützlich“.",
       "3": "Ich erinnere mich jetzt an mehr davon. Das ist nicht unbedingt ein Segen.",
-      "4": "Ein weiterer Teil von mir ist zurückgekommen. Ich bin mir nicht sicher, ob ich das überhaupt wollte."
+      "4": "Ein weiterer Teil von mir ist zurückgekommen. Ich bin mir nicht sicher, ob ich das überhaupt wollte.",
+      "5": "Ich habe jetzt ein Gesicht zu diesem Namen. Mir wäre ohne lieber.",
+      "6": "Noch ein Stück zurück. Die Nähte sieht man immer noch, Kapitän.",
+      "7": "Ich wusste das. Ich wusste nicht, dass ich es wusste."
     },
     "sectorEnter2": {
       "1": "Drift Felder. Alles hier ist für jemanden ein Fund, auch wir.",
       "2": "Passt auf die Minen auf. Die hatten vierzig Jahre Zeit, sich zu langweilen.",
-      "3": "Drift Felder. Achtet auf die Wege und achtet auf die Clans."
+      "3": "Drift Felder. Achtet auf die Wege und achtet auf die Clans.",
+      "4": "Jeder Rumpf hier gehört jemandem. Meist zweien, und die sind sich uneinig."
     },
     "sectorEnter3": {
       "1": "Die Kluft. Meine Sensoren geben ihre Signale ab, und sie sind sich nicht einig.",
       "2": "Vertraue den Messwerten nicht. Und den Würfeln auch nicht, ehrlich gesagt.",
-      "3": "The Rift. Vertraue dem Resolver, nicht den Instrumenten."
+      "3": "The Rift. Vertraue dem Resolver, nicht den Instrumenten.",
+      "4": "Der Riss. Ich melde weiter Zahlen. Behandle sie bitte als Meinungen."
     },
     "sectorEnter4": {
       "1": "Chorraum. Sie werden höflich sein. Das ist das Beunruhigende daran.",
       "2": "Wenn sie anfangen, Ihnen Zahlen hinterherzuzusingen, Kapitän, singen Sie nicht mit.",
-      "3": "Der Chor. Die werden höflich sein. Das ist das Beunruhigende daran."
+      "3": "Der Chor. Die werden höflich sein. Das ist das Beunruhigende daran.",
+      "4": "Der Chor betet nicht darum, dass wir verlieren. Er betet um weniger Möglichkeiten."
     },
     "sectorEnter5": {
       "1": "Der Kern. Seit vierzig Jahren werde ich auf diesen Ort hingewiesen.",
       "2": "Was auch immer hier passieren mag, vielen Dank für die Mitfahrgelegenheit.",
-      "3": "Der Kern. Alles, was hier folgt, ist ein erster Entwurf."
+      "3": "Der Kern. Alles, was hier folgt, ist ein erster Entwurf.",
+      "4": "Der Kern. Das ist die Adresse in jedem Befehl, den ich noch trage."
     },
     "bossPhase": {
       "1": "Es hat gerade seine Meinung darüber geändert, wie das abläuft. Passe dich an.",
@@ -3828,69 +3812,110 @@
       "6": "Was auch immer es als Erstes tut, wird es wieder tun. Lerne es."
     },
     "kill-raider": {
-      "1": "Clan-Farben. Davon wird es noch mehr geben."
+      "1": "Clan-Farben. Davon wird es noch mehr geben.",
+      "2": "Ein Raider weniger. „The Rim“ führt Buch.",
+      "3": "Das wird uns heute nicht aus der Patsche helfen."
     },
     "kill-scavDrone": {
-      "1": "Der Loader von jemandem. Er hat sich das nicht ausgesucht."
+      "1": "Der Loader von jemandem. Er hat sich das nicht ausgesucht.",
+      "2": "Dieser Drohnen-Mistkerl. Der wollte auch unsere Würfel haben.",
+      "3": "Eine Drohne weniger, die am Wrack herumstochert."
     },
     "kill-shieldWarden": {
-      "1": "Doktrin zur Flotteneskorte. Vierzig Jahre zu spät."
+      "1": "Doktrin zur Flotteneskorte. Vierzig Jahre zu spät.",
+      "2": "Seine Schilde sind jetzt das Problem eines anderen.",
+      "3": "Der Wächter ist ausgeschaltet. Die Mauer fällt mit uns."
     },
     "kill-jammerCorvette": {
-      "1": "Der Platz ist wieder frei. Das habe ich gehasst."
+      "1": "Der Platz ist wieder frei. Das habe ich gehasst.",
+      "2": "Der Störsender ist still. Endlich kann ich meine eigenen Gedanken hören.",
+      "3": "Von dem kommt jetzt kein Rauschen mehr. Ein kleiner Trost."
     },
     "kill-leechSkiff": {
-      "1": "Die Würfel rollen wieder. Danke."
+      "1": "Die Würfel rollen wieder. Danke.",
+      "2": "Es ist mir aus der Hand gerutscht. Ich hasse es, wenn Dinge die Würfel berühren.",
+      "3": "Losgelöst. Meine Kerne gehören wieder mir."
     },
     "kill-choirZealot": {
-      "1": "Es sang, bis es aufhörte. Den Kanal protokollieren."
+      "1": "Es sang, bis es aufhörte. Den Kanal protokollieren.",
+      "2": "Das Lied verstummte. Ich vermisse es nicht.",
+      "3": "Eine Stimme weniger im Chor. Gut."
     },
     "kill-riftWasp": {
-      "1": "Laut bis zum Schluss. Überprüfe die Waffenhalterung."
+      "1": "Laut bis zum Schluss. Überprüfe die Waffenhalterung.",
+      "2": "Die Wespe ist weg. Pass trotzdem auf deine Waffenhalterung auf.",
+      "3": "Abgeschlagen. Doch die Kluft vertieft sich weiter."
     },
     "kill-breakerDrone": {
-      "1": "Werkzeuge zur Bergung mit Meinungen. Das ist jetzt vorbei."
+      "1": "Werkzeuge zur Bergung mit Meinungen. Das ist jetzt vorbei.",
+      "2": "Jemand hat die Sicherungen abgefeilt. Das tut immer jemand.",
+      "3": "Es zerschnitt Rümpfe, beruflich. Unserer hat abgelehnt."
     },
     "kill-magnetTug": {
-      "1": "Es wollte uns einfach nur festhalten. Das konnte es sehr gut."
+      "1": "Es wollte uns einfach nur festhalten. Das konnte es sehr gut.",
+      "2": "Es hat kein einziges Mal geschossen. Ich trage es trotzdem als Kampf ein.",
+      "3": "Der Griff ist weg. Die Triebwerke gehören wieder uns."
     },
     "kill-minelayer": {
-      "1": "Field ist immer noch da draußen. Die Schicht nicht."
+      "1": "Field ist immer noch da draußen. Die Schicht nicht.",
+      "2": "Es legt nichts mehr. Was schon liegt, liegt weiter.",
+      "3": "Das langweiligste Ding im Sektor, bis zum Schluss."
     },
     "kill-hookTug": {
-      "1": "Diesmal gibt es keine Rechnung."
+      "1": "Diesmal gibt es keine Rechnung.",
+      "2": "Es schleppte Leute, die nie gefragt haben. Betrachte die Schuld als beglichen.",
+      "3": "Der Haken ist locker. Nichts zu unterschreiben."
     },
     "kill-riftling": {
-      "1": "Der Riss wird einen weiteren anziehen. Das tut er immer."
+      "1": "Der Riss wird einen weiteren anziehen. Das tut er immer.",
+      "2": "Das war ein Entwurf. Das Skizzenbuch behält der Riss.",
+      "3": "Weg. Es sah nicht überrascht aus."
     },
     "kill-echoShade": {
-      "1": "Es hat aufgehört, uns zu wiederholen. Eine kleine Gnade."
+      "1": "Es hat aufgehört, uns zu wiederholen. Eine kleine Gnade.",
+      "2": "Es hörte immer nur die laute Hälfte von uns. Jetzt hört es gar nichts.",
+      "3": "Ich möchte lieber nicht besprechen, wie es geklungen hat."
     },
     "kill-foldWorm": {
-      "1": "Die Zahlen machen wieder einen soliden Eindruck."
+      "1": "Die Zahlen machen wieder einen soliden Eindruck.",
+      "2": "Es fraß die Gewissheit aus unseren Zahlen. Die Zahlen sind wieder ganz.",
+      "3": "Erledigt. Ich traue meiner eigenen Arithmetik wieder."
     },
     "kill-choirAcolyte": {
-      "1": "Der hat sich freiwillig gemeldet, Herr Hauptmann."
+      "1": "Der hat sich freiwillig gemeldet, Herr Hauptmann.",
+      "2": "Er war sehr ruhig dabei. Das ist der Teil, den ich behalte.",
+      "3": "Ein Name weniger auf ihrer Liste. Die Liste führen sie trotzdem."
     },
     "kill-hymnTurret": {
-      "1": "Endlich falsch gesungen."
+      "1": "Endlich falsch gesungen.",
+      "2": "Sie feuerte auf die Eins. Es gibt keine Eins mehr.",
+      "3": "Der Akkord ist zerbrochen, und das Geschütz mit ihm."
     },
     "kill-hymnCantor": {
-      "1": "Das Tempo ist weg. Der Rest wird sich zerstreuen."
+      "1": "Das Tempo ist weg. Der Rest wird sich zerstreuen.",
+      "2": "Du hast das Tempo zuerst getötet. Ich hätte es irgendwann vorgeschlagen.",
+      "3": "Niemand zählt sie mehr ein."
     },
     "kill-coreFragment": {
-      "1": "Ein Stück des Kerns, und es blutete wie ein Schiff."
+      "1": "Ein Stück des Kerns, und es blutete wie ein Schiff.",
+      "2": "Es hielt sich für das Ganze. Es lag um den größten Teil davon daneben.",
+      "3": "Das war ein Splitter, Kapitän. Denk an die Größe des Rests."
     },
     "kill-probabilityKnot": {
-      "1": "Getrennt. Zwei Zukunftsperspektiven, beide vorbei."
+      "1": "Getrennt. Zwei Zukunftsperspektiven, beide vorbei.",
+      "2": "Zwei Ausgänge waren aneinandergebunden. Keiner davon gehört uns.",
+      "3": "Er ging sauber auf. Von einem Knoten hatte ich mehr erwartet."
     },
     "kill-causalityLoop": {
-      "1": "Das Hin- und Herwechseln hat aufgehört. Ich hatte mich schon fast daran gewöhnt."
+      "1": "Das Hin- und Herwechseln hat aufgehört. Ich hatte mich schon fast daran gewöhnt.",
+      "2": "Unsere Zahlen bleiben jetzt dort, wo wir sie hinlegen. Damit hatte ich nicht mehr gerechnet.",
+      "3": "Ich hatte sein Muster fast. Jetzt erfahre ich nie, ob ich richtig lag."
     },
     "sectorEnter6": {
       "1": "Kapitän. Hier draußen ist nichts auf der Karte verzeichnet. Auch wir nicht.",
       "2": "Ich lese unseren eigenen Rumpf vor uns. Zweimal.",
-      "3": "Was auch immer der Kern fernhielt, wir sind einfach drum herumgegangen."
+      "3": "Was auch immer der Kern fernhielt, wir sind einfach drum herumgegangen.",
+      "4": "Jenseits des Kerns. Dafür habe ich keine Befehle. Es ist seltsam erholsam."
     },
     "threshold": {
       "1": "Du hättest es beenden können. Ich habe vermerkt, dass du es nicht getan hast.",
@@ -3898,16 +3923,31 @@
       "3": "Die Flut hält nicht drei nach dieser Linie an. Nichts hält dort an.",
       "4": "Es zu beenden, war die Antwort. Du wolltest die Frage."
     },
-    "wormhole": {
+    "holeBypass": {
       "1": "Die Zelle ist weg. Nicht zerstört – sondern entfernt.",
       "2": "Der Rand wirkt wie eine Tür, die sich zu jedem beliebigen Raum hin öffnet.",
       "3": "Ich kann den Weg drum herum aufzeichnen. Den Weg hindurch kann ich nicht aufzeichnen.",
       "4": "Was auch immer sich dahinter befindet, es ist nicht auf meiner Karte verzeichnet.",
-      "5": "Wir sind irgendwo angekommen. Ich versuche gerade herauszufinden, wo.",
-      "6": "Die Messgeräte stimmen in nichts überein. Auch das sind Daten.",
-      "7": "Die Entfernung ist seit etwa einer Minute kein Versprechen mehr.",
-      "8": "Trage es als Sprung ein. Der Eintrag wird dann nicht der Wahrheit entsprechen."
+      "5": "Wir sind drum herum. Der lange Weg ist auch ein Weg, Kapitän."
+    },
+    "wormholeRide": {
+      "1": "Wir sind irgendwo angekommen. Ich versuche gerade herauszufinden, wo.",
+      "2": "Die Messgeräte stimmen in nichts überein. Auch das sind Daten.",
+      "3": "Die Entfernung ist seit etwa einer Minute kein Versprechen mehr.",
+      "4": "Trage es als Sprung ein. Der Eintrag wird dann nicht der Wahrheit entsprechen.",
+      "5": "Wir sind hinein, und dann waren wir hier. Eine Mitte habe ich nicht zu melden."
     }
+  },
+  "blackbox": {
+    "firstRun": "„Dein erster Lauf. Die meisten erfahren das später. Du hast Zeit gespart.“",
+    "beyond": "„Du warst schon einmal am Ende. Du kamst zurück für den Teil ohne Karte. Das war der Teil.“",
+    "veteran": "„Jeder Wurf davor kam irgendwo heraus. Ich hielt das für ein Muster. Jetzt nicht mehr.“",
+    "pact": "„Deine Seite im Buch des Chors ist noch da. Sie ist jetzt der größte erhaltene Teil von dir.“",
+    "cautious": "„Drei davon hast du umfahren. Dieses nicht. Es hat den Unterschied nicht bemerkt.“",
+    "resonant": "„Du bist den ganzen Weg in die Resonanz gegangen. Formal bist du angekommen.“",
+    "thin": "„Vom Rumpf war fast nichts mehr übrig, und du bist trotzdem hinein. Ich verbuche das als Entschlossenheit.“",
+    "whole": "„Rumpf intakt. Alle Systeme normal. Keine dieser Zahlen war am Ende die entscheidende.“",
+    "quiet": "„Was hast du erwartet? Es ist ein Schwarzes Loch.“"
   },
   "mutators": {
     "brittleShields": {
@@ -5222,6 +5262,70 @@
     },
     "free": {
       "say": "Check complete. Free turn — the board is yours."
+    }
+  },
+  "weather": {
+    "nebula": {
+      "name": "Nebel",
+      "desc": "Sensoren reichen 1 Reihe weniger weit; geräumte Kampfknoten zahlen 20% mehr Schrott.",
+      "line": "Nebel. Eine Reihe weniger Sicht — doch die Wracks darin zahlen 20% besser."
+    },
+    "ionStorm": {
+      "name": "Ionensturm",
+      "desc": "Statik kostet die Sensoren 1 Reihe Sicht; ein Würfelschub kostet 1 Ladung weniger.",
+      "line": "Ionensturm. Die Statik frisst eine Reihe Sicht — dafür reiten die Würfel die Strömung für 1 weniger."
+    },
+    "debrisField": {
+      "name": "Trümmerfeld",
+      "desc": "Geräumte Kampfknoten zahlen 40% mehr Schrott; Gegner tragen 5% mehr Hülle.",
+      "line": "Trümmerfeld. Überall Bergung — und 5% mehr Hülle, die sich dahinter versteckt."
+    },
+    "solarWind": {
+      "name": "Sonnenwind",
+      "desc": "Der Reaktor fasst 2 Ladung mehr; ein Würfelschub kostet 1 Ladung mehr.",
+      "line": "Sonnenwind. Die Kollektoren trinken ihn — 2 Ladung mehr — und die Aktuatoren zahlen 1 dafür."
+    },
+    "magneticStorm": {
+      "name": "Magnetsturm",
+      "desc": "Ein Würfelschub kostet 1 Ladung mehr; Beute kommt eine Seltenheit höher.",
+      "line": "Magnetsturm. Die Aktuatoren nehmen eine Ladung extra — die Wracks geben eine Seltenheit zurück."
+    },
+    "radioBurst": {
+      "name": "Funkausbruch",
+      "desc": "Sensoren reichen 1 Reihe weiter; geräumte Kampfknoten zahlen 20% weniger Schrott.",
+      "line": "Funkausbruch. Die Bahnen leuchten eine Reihe weiter auf, und jede Bergungsbake im Akt schreit Rauschen."
+    },
+    "gravityRipple": {
+      "name": "Gravitationswelle",
+      "desc": "Gegner tragen 5% weniger Hülle; ein Würfelschub kostet 2 Ladung mehr.",
+      "line": "Gravitationswelle. Die Scherung dünnt ihre Hüllen um 5% aus — und deine Aktuatoren zahlen 2 gegen die Drift."
+    },
+    "stillWatch": {
+      "name": "Stille Wache",
+      "desc": "Der Reaktor fasst 1 Ladung mehr; geräumte Kampfknoten zahlen 15% mehr Schrott.",
+      "line": "Stille Wache. Nichts da draußen. Der Reaktor hält eine Ladung tiefer, und der Schrott kommt 15% sauberer hoch."
+    }
+  },
+  "salvage": {
+    "scrap": {
+      "name": "Schrottfracht",
+      "desc": "Das Wrack für 18 Schrott ausschlachten.",
+      "line": "Bergung: das Wrack auf 18 Schrott heruntergeschnitten, der Rest blieb liegen."
+    },
+    "repair": {
+      "name": "Plattenflicken",
+      "desc": "Seine Panzerung auf unsere schweißen: +3 Rumpf.",
+      "line": "Bergung: drei Platten vom Wrack, heiß aufgeschweißt."
+    },
+    "recon": {
+      "name": "Kartierte Bahn",
+      "desc": "Seine Logs lesen: +1 Reihe Kartensicht für den Rest des Akts.",
+      "line": "Bergung: sein Flugbuch hält. Eine Reihe weiter, für den Rest des Akts."
+    },
+    "discount": {
+      "name": "Ersatzteile",
+      "desc": "Seine Teile weiterreichen: 25 Schrott weniger für eine Werftaufwertung.",
+      "line": "Bergung: eine Kiste sauberer Teile. Die nächste Werft zieht dafür 25 Schrott von einer Aufwertung ab."
     }
   }
 }

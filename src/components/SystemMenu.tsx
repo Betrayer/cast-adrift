@@ -71,8 +71,13 @@ export const SystemMenu = () => {
           },
         )}
         {entry('journal', t('run:journal.open'), () => {
-          go('journal');
+          go('journal', { tab: 'story' });
         })}
+        {screen === 'battle'
+          ? entry('battlelog', t('run:journal.openBattle'), () => {
+              go('journal', { tab: 'battle' });
+            })
+          : null}
         {entry('codex', t('run:codex.title'), () => {
           go('codex');
         })}

@@ -37,7 +37,7 @@
       "beacon": "Balise",
       "boss": "Patron",
       "inverted": "inversé",
-      "hole": "Trou noir"
+      "hole": "Trou noir : la tache a avalé cette cellule"
     },
     "previewNode": "{{type}} · risque : {{risk}}",
     "previewPocket": "Détour : un butin plus intéressant, un combat plus difficile",
@@ -48,7 +48,9 @@
     },
     "hull": "Coque {{cur}}/{{max}}",
     "scrap": "Ferraille {{n}}",
-    "previewHole": "Trou noir : le contourner ou emprunter le trou de ver"
+    "previewHole": "La lisière répond pour toute la tache : la contourner, ou traverser le trou de ver",
+    "spotLabel": "Trou noir — toute la tache est un seul choix",
+    "conditions": "Conditions ×{{n}}"
   },
   "event": {
     "title": "Signal",
@@ -202,7 +204,6 @@
     "prologueReplay": "Rediffusion",
     "badgeLegend": "Badges des dés"
   },
-  "consequenceToast": "Conséquence : {{text}}",
   "rewards": {
     "dieTitle": "Matrice récupérée",
     "keep": "Garder dans le paquet",
@@ -271,7 +272,9 @@
     "dicePlaced": "Dés placés",
     "pct": "{{n}}%",
     "wormholeRides": "Manèges « Wormhole »",
-    "holesBypassed": "Trous contournés"
+    "holesBypassed": "Trous contournés",
+    "causeSingularity": "Singularité",
+    "cause": "Cause de la mort"
   },
   "prologue": {
     "title": "Prologue",
@@ -300,6 +303,8 @@
     "tally": "Ce que tu as laissé derrière toi",
     "continue": "Fermer le journal",
     "deathTitle": "C'est ici que s'achève la course",
+    "singularityTitle": "Il n’y aura pas d’épave",
+    "blackBox": "La dernière chose sur laquelle les instruments ont pu s'accorder",
     "deathWhere": "Secteur {{sector}} · profondeur {{depth}}"
   },
   "setup": {
@@ -325,7 +330,7 @@
     "scrap": "+ Déchet de{{n}}",
     "voucher": "Bon Mk × {{n}} — une mise à niveau gratuite dans n'importe quel chantier naval",
     "take": "Prendre",
-    "hint": "Faites votre choix. Le tirage au sort des avantages va suivre.",
+    "hint": "Seul ce que vous prenez sort du paquet.",
     "module": "module",
     "install": "Installer",
     "replace": "Remplacer"
@@ -393,10 +398,11 @@
     "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte",
     "inversion": "Série inversée : les systèmes sont traités du dernier au premier",
     "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution",
-    "blackHoles": "Trou noir : la cellule a disparu ; son sillon forme un trou de ver",
+    "blackHoles": "Trou noir : une tache avale plusieurs cellules ; sa lisière ouvre un trou de ver",
     "wormhole": "Le bord du trou de ver : un choix s'impose à la lisière",
     "bypass": "A frôlé le rebord : la coque a été éraflée par la marée",
-    "holeScorch": "Coque trop mince pour payer le péage — la jante t'a laissé passer"
+    "holeScorch": "Coque trop mince pour payer le péage — la jante t'a laissé passer",
+    "holeDrift": "La jante n'a rien pris — cette voie t'était déjà ouverte"
   },
   "tag": {
     "red": "Rouge",
@@ -489,7 +495,13 @@
       "forward": "plus profond",
       "backward": "retour"
     },
-    "achievement": "Réussite : {{name}}"
+    "singularity": "Coque avalée par la singularité — aucune sortie enregistrée",
+    "achievement": "Réussite : {{name}}",
+    "tabStory": "Histoire",
+    "tabBattle": "Combat",
+    "openBattle": "Journal de combat",
+    "battleLive": "Ce combat, tour le plus récent en premier.",
+    "battleLast": "Le dernier combat, tour le plus récent en premier."
   },
   "memory": {
     "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",
@@ -555,12 +567,14 @@
   },
   "hole": {
     "title": "Trou noir",
-    "body": "La cellule a disparu. Son pourtour te laissera passer, ou t'emmènera là où il le décidera.",
+    "body": "La tache a pris ces cellules. Sa lisière te laissera passer autour, ou te jettera là où elle voudra.",
     "gentle": "Trou de ver stable",
     "gentleWhy": "Les deux premières descentes d'une série sont courtes et mènent toujours plus loin.",
     "bypass": "Faire le tour",
     "bypassCost": "Contournement : coque « {{n}} »",
     "bypassFree": "Contournement : gratuit — la coque ne peut pas payer",
+    "bypassDrift": "Contournement : gratuit — une voie que tu avais déjà",
+    "bypassNone": "Aucun contournement : toutes les voies au-delà de la jante sont déjà derrière toi",
     "ride": "Fais-le !",
     "rideCost": "Trajet : un trajet d'{{min}}à{{max}}, direction inconnue",
     "rideGentle": "Ride : une variante de l’{{min}}—{{max}}e, mais plus profonde",
@@ -597,5 +611,25 @@
     "toScrap": "→ « scrap » + «{{n}} »",
     "sellNew": "Vendre le nouveau (+ {{n}})",
     "cancel": "Annuler"
+  },
+  "feed": {
+    "source": {
+      "echo": "ÉCHO",
+      "consequence": "CONSÉQUENCE",
+      "achievement": "SUCCÈS",
+      "system": "SYSTÈME"
+    },
+    "dismiss": "Masquer",
+    "open": "Ouvrir dans le journal"
+  },
+  "weather": {
+    "title": "Conditions du secteur"
+  },
+  "salvage": {
+    "title": "Dépecer l'épave",
+    "take": "Prendre",
+    "decline": "Laisser",
+    "hint": "Une des trois. Le reste brûle avec l'épave.",
+    "declined": "Récupération : rien à bord ne valait le temps de découpe."
   }
 }

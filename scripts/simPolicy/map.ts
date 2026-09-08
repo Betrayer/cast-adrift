@@ -43,6 +43,7 @@ export const ANOMALY_STREAK_PULL = 1.2;
 export const HOLE_PENALTY = 0.5;
 export const HOLE_PULL = 0.3;
 export const HOLE_GENTLE_PULL = 1.2;
+export const HOLE_CHAOTIC_PENALTY = 0.5;
 export const RIDE_HULL_FLOOR_PCT = 25;
 export const POCKET_BONUS = 0.35;
 export const FIGHT_TYPES: ReadonlySet<NodeType> = new Set([
@@ -92,7 +93,8 @@ export const holeStandIn = (
 
 export const holeBias = (state: RouteState): number => {
   if (isGentleRide(state.wormholeRides)) return -HOLE_GENTLE_PULL;
-  return state.hullPct >= RIDE_HULL_FLOOR_PCT ? -HOLE_PULL : HOLE_PENALTY;
+  const ride = state.hullPct >= RIDE_HULL_FLOOR_PCT ? -HOLE_PULL : HOLE_PENALTY;
+  return ride + HOLE_CHAOTIC_PENALTY;
 };
 
 export const ridesWormhole = (state: RouteState, roll: number): boolean => {

@@ -323,7 +323,7 @@
   "interferenceWhy": "Ausgelassene Anomalien stapeln sich: Jeder Stapel gibt für den Rest des Laufs eine weitere Flutstufe. Eine Anomalie zu lösen räumt alle ab.",
   "interferenceTitle": "Störung",
   "axisWhy": "Schwarze Würfel ziehen zur Resonanz, blaue zur Stabilität. Ereignisse und Drift bewegen die Achse ebenfalls.",
-  "chargeWhy": "Ladung zahlt Aktionen: −1 kostet 3, +1 kostet 3, ein gekaufter Neuwurf 5, ein Schub 10.",
+  "chargeWhy": "Ladung zahlt Aktionen: −1 kostet {{n}}, +1 kostet {{n}}, ein gekaufter Neuwurf 5, ein Schub 10.",
   "chargeTitle": "Ladung",
   "mkWhy": "Mk hebt die Slot-Obergrenze und den Affinitätsbonus seiner Schule.",
   "resEarned": "Erreicht",

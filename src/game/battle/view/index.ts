@@ -11,6 +11,7 @@ export {
   consoleActions,
   consoleShape,
   fateMaxUses,
+  nudgeChargePrice,
   nudgeCostFor,
   selectedDie,
 } from "@/game/battle/view/actions";

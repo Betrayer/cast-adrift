@@ -2,11 +2,17 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { sectorDef } from "@/data/sectors";
 import { generateSectorMap } from "@/game/map/generator";
 import { nodeRisk } from "@/game/map/risk";
-import { edgeKey, type MapGraph, type MapNode } from "@/game/map/types";
+import {
+  edgeKey,
+  type MapGraph,
+  type MapNode,
+  type NodeId,
+} from "@/game/map/types";
 import {
   applyEdgeMotifs,
   applyHoleToll,
   applyNodeMotifs,
+  disintegrationPctFor,
   holeTollFor,
 } from "@/game/run/motifs";
 import { createStreams } from "@/services/rng";
@@ -15,6 +21,16 @@ import { MAX_SHIPYARD_DISCOUNT, useRunStore } from "@/stores/runStore";
 
 const map = (sector: number, seed = 3): MapGraph =>
   generateSectorMap(createStreams(seed).map, sector);
+
+const lastConsequence = (): string | null =>
+  useNarrativeStore.getState().feed.find((m) => m.source === "consequence")
+    ?.key ?? null;
+
+const consequenceEntries = (): string[] =>
+  useNarrativeStore
+    .getState()
+    .journal.filter((entry) => entry.k === "consequence")
+    .map((entry) => (entry.k === "consequence" ? entry.origin : ""));
 
 const node = (over: Partial<MapNode>): MapNode => ({
   id: "r2l1",
@@ -28,15 +44,13 @@ describe("sector motifs", () => {
   beforeEach(() => {
     useRunStore.getState().reset();
     useRunStore.setState({ hull: 30, hullMax: 30, scrap: 0, tide: 0, seed: 11 });
-    useNarrativeStore.setState({ consequence: null, consequenceQueue: [] });
+    useNarrativeStore.getState().reset();
   });
 
   it("pays a cache and surfaces it as a consequence", () => {
     applyNodeMotifs(node({ cache: true }), 1);
     expect(useRunStore.getState().scrap).toBe(10);
-    expect(useNarrativeStore.getState().consequence?.origin).toBe(
-      "run:motif.cache",
-    );
+    expect(lastConsequence()).toBe("run:motif.cache");
   });
 
   it("ignores a cache marker in a sector without the motif", () => {
@@ -89,6 +103,17 @@ describe("sector motifs", () => {
     expect(useRunStore.getState().shipyardDiscount).toBe(MAX_SHIPYARD_DISCOUNT);
   });
 
+  it("journals every motif consequence, not just the toast", () => {
+    applyNodeMotifs(node({ cache: true }), 1);
+    applyNodeMotifs(node({ blessing: "blessed" }), 4);
+    applyNodeMotifs(node({ blessing: "cursed" }), 4);
+    expect(consequenceEntries()).toEqual([
+      "run:motif.cache",
+      "run:motif.blessed",
+      "run:motif.cursed",
+    ]);
+  });
+
   it("keeps every motif payload inside the sector that declares it", () => {
     for (const def of [1, 2, 3, 4, 5]) {
       const kinds = sectorDef(def).shape.motifs.map((m) => m.m);
@@ -110,11 +135,31 @@ describe("node risk", () => {
   });
 });
 
+describe("the disintegration percentage", () => {
+  it("rides the motif on every sector that carries a hole", () => {
+    for (const sector of [2, 3, 4, 5, 6]) {
+      const motif = sectorDef(sector).shape.motifs.find(
+        (m) => m.m === "blackHoles",
+      );
+      expect(motif).toBeDefined();
+      expect(disintegrationPctFor(sector)).toBe(
+        motif?.m === "blackHoles" ? motif.disintegrationPct : 0,
+      );
+      expect(disintegrationPctFor(sector)).toBeGreaterThan(0);
+      expect(disintegrationPctFor(sector)).toBeLessThan(100);
+    }
+  });
+
+  it("is zero where no hole is declared", () => {
+    expect(disintegrationPctFor(1)).toBe(0);
+  });
+});
+
 describe("the black-hole bypass toll", () => {
   beforeEach(() => {
     useRunStore.getState().reset();
     useRunStore.setState({ hull: 30, hullMax: 30, seed: 11 });
-    useNarrativeStore.setState({ consequence: null, consequenceQueue: [] });
+    useNarrativeStore.getState().reset();
   });
 
   it("scales with the sector", () => {
@@ -136,22 +181,63 @@ describe("the black-hole bypass toll", () => {
   it("charges the hull and names the motif", () => {
     expect(applyHoleToll(4, "r5l1", "r6l1")).toBe(2);
     expect(useRunStore.getState().hull).toBe(28);
-    expect(useNarrativeStore.getState().consequence?.origin).toBe(
-      "run:motif.bypass",
-    );
+    expect(lastConsequence()).toBe("run:motif.bypass");
   });
 
   it("scorches instead of charging when the hull is at the toll", () => {
     useRunStore.setState({ hull: 2 });
     expect(applyHoleToll(4, "r5l1", "r6l1")).toBe(0);
     expect(useRunStore.getState().hull).toBe(2);
-    expect(useNarrativeStore.getState().consequence?.origin).toBe(
-      "run:motif.holeScorch",
-    );
+    expect(lastConsequence()).toBe("run:motif.holeScorch");
   });
 
   it("does nothing in a sector without the motif", () => {
     expect(applyHoleToll(1, "r5l1", "r6l1")).toBe(0);
     expect(useRunStore.getState().hull).toBe(30);
+  });
+
+  const tollMap = (links: readonly [NodeId, NodeId][]): MapGraph => {
+    const nodes: MapNode[] = [
+      { id: "r0l1", row: 0, lane: 1, type: "start" },
+      { id: "r1l1", row: 1, lane: 1, type: "battle" },
+      { id: "r2l0", row: 2, lane: 0, type: "battle" },
+      { id: "r2l1", row: 2, lane: 1, type: "battle", hole: true, spot: "s" },
+      { id: "r2l2", row: 2, lane: 2, type: "battle" },
+      { id: "r3l1", row: 3, lane: 1, type: "boss" },
+    ];
+    return {
+      nodes,
+      edges: [...links],
+      shape: { bossRow: 3, gateRow: 1, lanes: 3 },
+      edgeMarks: { [edgeKey("r1l1", "r2l1")]: "wormhole" },
+      wormholes: {},
+      spots: [{ id: "s", nodes: ["r2l1"], rows: [2, 2], lanes: [1, 1] }],
+      bossReach: nodes.filter((n) => n.hole !== true).map((n) => n.id),
+    };
+  };
+
+  const LINKS: readonly [NodeId, NodeId][] = [
+    ["r0l1", "r1l1"],
+    ["r1l1", "r2l0"],
+    ["r1l1", "r2l1"],
+    ["r2l0", "r3l1"],
+    ["r2l2", "r3l1"],
+  ];
+
+  it("charges when the bypass buys a lane the graph withheld", () => {
+    useRunStore.setState({ map: tollMap(LINKS), visited: ["r0l1", "r1l1"] });
+    expect(applyHoleToll(4, "r1l1", "r2l1")).toBe(2);
+    expect(useRunStore.getState().hull).toBe(28);
+    expect(lastConsequence()).toBe("run:motif.bypass");
+  });
+
+  it("waives the toll when the bypass only walks an open lane", () => {
+    useRunStore.setState({
+      map: tollMap([...LINKS, ["r1l1", "r2l2"]]),
+      visited: ["r0l1", "r1l1"],
+    });
+    expect(applyHoleToll(4, "r1l1", "r2l1")).toBe(0);
+    expect(useRunStore.getState().hull).toBe(30);
+    expect(lastConsequence()).toBe("run:motif.holeDrift");
   });
 });

@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   createInitialMetaStats,
+  META_VERSION,
   migrateMeta,
   useMetaStore,
 } from "@/stores/metaStore";
@@ -22,6 +23,8 @@ const V14_KEYSTONE_LINE: readonly string[] = [
   "red-s23",
   "red-key1",
 ];
+
+const STATS_WITHOUT_DISINTEGRATIONS = 16;
 
 const resetMeta = (): void => {
   useMetaStore.setState({
@@ -95,6 +98,24 @@ describe("metaStore migration", () => {
     expect(values.chartPicks).toEqual(["hub-i7", "hub-o9"]);
     expect(pointsSpent(values.chartPicks)).toBeLessThan(pointsTotal(40));
     expect(values.chartFreeRespecs).toBe(1);
+  });
+
+  it("migrates a profile stored before the disintegrations counter existed", () => {
+    expect(META_VERSION).toBeGreaterThan(STATS_WITHOUT_DISINTEGRATIONS);
+    const stored: Record<string, unknown> = {
+      ...createInitialMetaStats(),
+      kills: 700,
+      elites: 12,
+    };
+    delete stored.disintegrations;
+    const values = migrateMeta(
+      { shards: 40, stats: stored },
+      STATS_WITHOUT_DISINTEGRATIONS,
+    );
+    expect(values.stats.disintegrations).toBe(0);
+    expect(values.stats.kills).toBe(700);
+    expect(values.stats.elites).toBe(12);
+    expect(values.shards).toBe(40);
   });
 
   it("never hands out a second free respec on a later migration", () => {

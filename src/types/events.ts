@@ -50,6 +50,7 @@ export interface CheckDef {
 export type BattleModKind = "startCharge" | "enemyPlus";
 export type NodeModKind =
   | "revealRows"
+  | "sectorReveal"
   | "shipyardDiscount"
   | "endHeal"
   | "rerollSize";

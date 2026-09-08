@@ -12,15 +12,18 @@ import {
   edgeKey,
   nodeById,
   type NodeId,
+  type SpotId,
 } from "@/game/map/types";
 import {
   budgetCapFor,
+  canBypass,
   isGentleRide,
   landingCandidates,
   type ThrowDirection,
   type WormholeThrow,
 } from "@/game/map/wormhole";
-import { holeTollFor } from "@/game/run/motifs";
+import { clearSfxLog, recentSfx, type SfxCall } from "@/services/audio";
+import { holeTollFor, holeTollWaived } from "@/game/run/motifs";
 import { pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { settleLifetimeAchievements } from "@/game/meta/achievements";
@@ -55,6 +58,7 @@ import {
   startRunMode,
 } from "@/game/run/flow";
 import { isoWeekKey } from "@/game/run/modes";
+import { weatherIn } from "@/game/run/weather";
 import { totalXpForLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { DRIFT_ALLTIME_BOARD, submit, top } from "@/services/leaderboards";
 import { profileSummary, readMetaDocFromServer } from "@/services/metaDoc";
@@ -74,7 +78,12 @@ import {
 } from "@/stores/battleStore";
 import { useLootStore } from "@/stores/lootStore";
 import { useMetaStore, type MetaStats } from "@/stores/metaStore";
-import { useNarrativeStore } from "@/stores/narrativeStore";
+import {
+  useNarrativeStore,
+  type FeedSource,
+} from "@/stores/narrativeStore";
+import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
+import type { JournalEntry } from "@/game/run/journal";
 import {
   runModuleSlots,
   useRunStore,
@@ -184,6 +193,7 @@ export interface MapNodeView {
   visited: boolean;
   reachable: boolean;
   hole: boolean;
+  spot: SpotId | null;
   wormhole: boolean;
   bypass: NodeId | null;
 }
@@ -192,6 +202,14 @@ export interface WormholeEdgeView {
   from: NodeId;
   hole: NodeId;
   bypass: NodeId;
+}
+
+export type RideOutcome = "landed" | "fatal" | "refused";
+
+export interface HoleSpotView {
+  id: SpotId;
+  nodes: NodeId[];
+  entries: string[];
 }
 
 export interface AchievementsView {
@@ -217,6 +235,21 @@ export interface WormholeView {
   toll: number;
   mocked: boolean;
   last: WormholeThrow | null;
+}
+
+export interface FeedView {
+  id: number;
+  source: FeedSource;
+  key: string;
+  journalId: number | null;
+  compressed: boolean;
+}
+
+export interface JournalView {
+  id: number;
+  kind: JournalEntry["k"];
+  sector: number;
+  line: string | null;
 }
 
 export interface DieView {
@@ -285,6 +318,11 @@ export interface TestState {
     baysPurchased: number;
     pendingSwaps: PendingSwap[];
     visited: NodeId[];
+    mutators: string[];
+    weather: string | null;
+    salvage: string[];
+    sectorReveal: number;
+    shipyardDiscount: number;
   };
   battle: {
     phase: string;
@@ -346,8 +384,10 @@ export interface TestApi {
   skipToNode: (nodeId: NodeId) => boolean;
   standAt: (nodeId: NodeId) => boolean;
   holes: () => WormholeEdgeView[];
+  spots: () => HoleSpotView[];
   landings: (budget: number, direction: ThrowDirection) => NodeId[];
   ride: (holeId: NodeId) => WormholeThrow | null;
+  rideOutcome: (holeId: NodeId) => RideOutcome;
   wormhole: () => WormholeView;
   achievements: () => AchievementsView;
   settleAchievements: () => string[];
@@ -365,6 +405,12 @@ export interface TestApi {
   back: () => void;
   deepLink: (param: string) => boolean;
   showMemory: (order: number) => void;
+  feed: () => FeedView[];
+  journal: () => JournalView[];
+  bark: (trigger: string) => void;
+  resetBarks: () => void;
+  sfx: () => readonly SfxCall[];
+  resetSfx: () => void;
   mapNodes: () => MapNodeView[];
   slotsFor: (uid: string) => SlotId[];
   dieCard: (defId: string) => DieCardView | null;
@@ -401,12 +447,29 @@ const EMPTY_RUN_RESULT: RunResult = {
   fromLevel: 1,
   toLevel: 1,
   win: true,
+  cause: null,
   milestones: [],
   mode: "campaign",
   score: null,
   contractId: null,
   contractStars: 0,
   rotation: [],
+};
+
+const journalLineOf = (entry: JournalEntry): string | null => {
+  switch (entry.k) {
+    case "bark":
+    case "system":
+      return entry.line;
+    case "consequence":
+      return entry.origin;
+    case "choice":
+      return entry.text;
+    case "achievement":
+      return entry.achievement;
+    default:
+      return null;
+  }
 };
 
 const STARTER_ENEMY = "raider";
@@ -535,6 +598,11 @@ const readState = (): TestState => {
       baysPurchased: run.baysPurchased,
       pendingSwaps: run.pendingSwaps.map((swap) => ({ ...swap })),
       visited: [...run.visited],
+      mutators: [...run.mutators],
+      weather: weatherIn(run.mutators)?.id ?? null,
+      salvage: [...(run.pendingRewards?.salvage ?? [])],
+      sectorReveal: run.sectorReveal,
+      shipyardDiscount: run.shipyardDiscount,
     },
     battle: {
       phase: battle.phase,
@@ -750,6 +818,37 @@ export const createTestApi = (): TestApi => ({
     useNarrativeStore.getState().pushMemory(order);
   },
 
+  feed: () =>
+    useNarrativeStore.getState().feed.map((message, index) => ({
+      id: message.id,
+      source: message.source,
+      key: message.key,
+      journalId: message.journalId,
+      compressed: index > 0,
+    })),
+
+  journal: () =>
+    useNarrativeStore.getState().journal.map((entry) => ({
+      id: entry.id,
+      kind: entry.k,
+      sector: entry.sector,
+      line: journalLineOf(entry),
+    })),
+
+  bark: (trigger) => {
+    emitBark(trigger);
+  },
+
+  resetBarks: () => {
+    resetBarkMemory();
+  },
+
+  sfx: () => recentSfx(),
+
+  resetSfx: () => {
+    clearSfxLog();
+  },
+
   mapNodes: () => {
     const run = useRunStore.getState();
     const map = run.map;
@@ -772,6 +871,7 @@ export const createTestApi = (): TestApi => ({
         visited: run.visited.includes(node.id),
         reachable: outgoing.has(node.id) && !run.visited.includes(node.id),
         hole: node.hole === true,
+        spot: node.spot ?? null,
         wormhole: record !== undefined,
         bypass: record?.bypass ?? null,
       };
@@ -797,6 +897,18 @@ export const createTestApi = (): TestApi => ({
     return Object.values(map.wormholes).map((record) => ({ ...record }));
   },
 
+  spots: () => {
+    const map = useRunStore.getState().map;
+    if (map === null) return [];
+    return map.spots.map((spot) => ({
+      id: spot.id,
+      nodes: [...spot.nodes],
+      entries: Object.entries(map.wormholes)
+        .filter(([, record]) => spot.nodes.includes(record.hole))
+        .map(([key]) => key),
+    }));
+  },
+
   landings: (budget, direction) => {
     const run = useRunStore.getState();
     if (run.map === null || run.position === null) return [];
@@ -811,18 +923,32 @@ export const createTestApi = (): TestApi => ({
 
   ride: (holeId) => {
     openWormhole(holeId);
-    return rideWormhole(holeId, false);
+    const ride = rideWormhole(holeId, false);
+    return ride === null || ride.kind === "fatal" ? null : ride.throw;
+  },
+
+  rideOutcome: (holeId) => {
+    openWormhole(holeId);
+    const ride = rideWormhole(holeId, false);
+    return ride === null ? "refused" : ride.kind;
   },
 
   wormhole: () => {
     const run = useRunStore.getState();
+    const hole = run.pendingWormhole;
+    const waived =
+      run.map !== null &&
+      run.position !== null &&
+      hole !== null &&
+      canBypass(run.map, run.position, hole, run.visited) &&
+      holeTollWaived(run.map, run.position, hole, run.visited);
     return {
       pending: run.pendingWormhole,
       rides: run.stats.wormholeRides,
       bypassed: run.stats.holesBypassed,
       gentle: isGentleRide(run.stats.wormholeRides),
       budgetCap: budgetCapFor(run.stats.wormholeRides),
-      toll: holeTollFor(run.sector, run.hull),
+      toll: waived ? 0 : holeTollFor(run.sector, run.hull),
       mocked: chaosMocked(),
       last: run.lastWormhole === null ? null : { ...run.lastWormhole },
     };

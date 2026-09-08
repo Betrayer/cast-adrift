@@ -178,6 +178,12 @@
   color: var(--ca-school-yellow-text);
 }
 
+.pillCondition {
+  background: var(--ca-surface2);
+  border-color: var(--ca-line);
+  color: var(--ca-dim);
+}
+
 .pillDanger {
   background: var(--ca-danger-a12);
   border-color: var(--ca-danger);

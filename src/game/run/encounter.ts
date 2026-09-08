@@ -192,6 +192,6 @@ export const scaleEnemyHp = (baseHp: number, scale: EnemyScale = {}): number =>
       baseHp *
         (1 + (TIDE_HP_PCT / 100) * Math.max(0, scale.tide ?? 0)) *
         (1 + Math.max(0, scale.sectorHpPct ?? 0) / 100) *
-        (1 + Math.max(0, scale.hpBonusPct ?? 0) / 100),
+        Math.max(0, 1 + (scale.hpBonusPct ?? 0) / 100),
     ),
   );

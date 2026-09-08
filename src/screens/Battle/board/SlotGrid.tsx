@@ -94,6 +94,7 @@ export const SlotGrid = ({
             legal={legal.includes(slotId)}
             goal={goalSlotsNow(board).includes(slotId)}
             charge={board.charge}
+            chargeCap={board.chargeCap}
             formula={FORMULA_SLOTS[slotId] !== undefined}
             onTap={onSlotTap}
           />

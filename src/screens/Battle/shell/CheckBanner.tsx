@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
-import { useNarrativeStore } from '@/stores/narrativeStore';
+import { logSystemLine } from '@/game/run/journal';
 import styles from '@/screens/Battle/BattleScreen.module.css';
 
 export const CheckBanner = () => {
@@ -16,7 +16,7 @@ export const CheckBanner = () => {
 
   useEffect(() => {
     if (freeLine === null) return;
-    useNarrativeStore.getState().pushHint(freeLine);
+    logSystemLine(freeLine);
   }, [freeLine]);
 
   if (steps === null || step === undefined || step.moves === null) return null;

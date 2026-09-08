@@ -323,7 +323,7 @@
   "interferenceWhy": "Las anomalías omitidas se acumulan: cada acumulación añade otro nivel de marea el resto de la partida. Resolver una anomalía las borra todas.",
   "interferenceTitle": "Interferencia",
   "axisWhy": "Los dados negros tiran hacia Resonancia, los azules hacia Estabilidad. Los eventos y la deriva también mueven el eje.",
-  "chargeWhy": "La carga paga acciones: −1 cuesta 3, +1 cuesta 3, una retirada comprada 5, una sobrecarga 10.",
+  "chargeWhy": "La carga paga acciones: −1 cuesta {{n}}, +1 cuesta {{n}}, una retirada comprada 5, una sobrecarga 10.",
   "chargeTitle": "Carga",
   "mkWhy": "Mk sube el límite de la ranura y el bono de afinidad de su escuela.",
   "resEarned": "Logrado",

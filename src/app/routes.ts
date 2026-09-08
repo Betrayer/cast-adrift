@@ -6,6 +6,8 @@ export type BackMode = 'stack' | 'locked' | 'guarded' | `fixed:${ScreenId}`;
 
 export type EnterMode = 'slide' | 'bespoke';
 
+export type FeedAnchor = 'top' | 'bottom' | 'none';
+
 export type NavDirection = 'forward' | 'back';
 
 export interface RouteDef {
@@ -15,6 +17,7 @@ export interface RouteDef {
   swipeLock?: true;
   keepAlive?: true;
   enter?: 'bespoke';
+  feedAnchor?: 'bottom' | 'none';
 }
 
 export const ROUTES: Record<ScreenId, RouteDef> = {
@@ -51,9 +54,20 @@ export const ROUTES: Record<ScreenId, RouteDef> = {
   leaderboard: { group: 'meta', backMode: 'stack', title: 'meta:board.title' },
   runSetup: { group: 'meta', backMode: 'stack', title: 'run:setup.title' },
   map: { group: 'run', backMode: 'guarded', swipeLock: true },
-  journal: { group: 'run', backMode: 'stack', title: 'run:journal.title' },
+  journal: {
+    group: 'run',
+    backMode: 'stack',
+    title: 'run:journal.title',
+    feedAnchor: 'none',
+  },
   bridge: { group: 'run', backMode: 'stack', title: 'run:bridge.title' },
-  battle: { group: 'run', backMode: 'locked', swipeLock: true, enter: 'bespoke' },
+  battle: {
+    group: 'run',
+    backMode: 'locked',
+    swipeLock: true,
+    enter: 'bespoke',
+    feedAnchor: 'bottom',
+  },
   event: { group: 'node', backMode: 'guarded' },
   puzzle: {
     group: 'node',
@@ -93,6 +107,18 @@ export const navAttrFor = (
 
 export const screenTitleKey = (screen: ScreenId): string | undefined =>
   ROUTES[screen].title;
+
+export const feedAnchorFor = (screen: ScreenId): FeedAnchor =>
+  ROUTES[screen].feedAnchor ?? 'top';
+
+const RUN_GROUPS: ReadonlySet<RouteGroup> = new Set<RouteGroup>([
+  'run',
+  'node',
+  'ceremony',
+]);
+
+export const isRunScreen = (screen: ScreenId): boolean =>
+  RUN_GROUPS.has(ROUTES[screen].group);
 
 export const KEEP_ALIVE_SCREENS: readonly ScreenId[] = (
   Object.keys(ROUTES) as ScreenId[]

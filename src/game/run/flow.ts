@@ -34,6 +34,7 @@ import {
 } from "@/game/map/types";
 import {
   bypassTargetFor,
+  isGentleRide,
   rollThrow,
   type WormholeThrow,
 } from "@/game/map/wormhole";
@@ -55,8 +56,26 @@ import {
   applyEdgeMotifs,
   applyHoleToll,
   applyNodeMotifs,
+  disintegrationPctFor,
 } from "@/game/run/motifs";
-import { logJournal, settleSectorDrift } from "@/game/run/journal";
+import {
+  logConsequence,
+  logJournal,
+  settleSectorDrift,
+} from "@/game/run/journal";
+import {
+  ACT_SCOPED_FACES,
+  applySalvageFace,
+  isSalvageNode,
+  rollSalvageOffer,
+  salvageStreamFor,
+  SALVAGE_DECLINED,
+} from "@/game/run/salvage";
+import {
+  weatherIn,
+  withoutWeather,
+  withWeatherFor,
+} from "@/game/run/weather";
 import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
 import { computePerkMods } from "@/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
@@ -99,7 +118,7 @@ import {
   metaHasFeature,
   unlockContextOf,
 } from "@/game/meta/unlockState";
-import { useSummaryStore } from "@/stores/summaryStore";
+import { useSummaryStore, type DeathCause } from "@/stores/summaryStore";
 import { captureRunSnapshot } from "@/game/run/snapshot";
 import { trackEvent } from "@/services/analytics";
 import { now } from "@/services/clock";
@@ -127,11 +146,15 @@ import type { SlotId } from "@/types/battle";
 import type { School } from "@/types/content";
 import type { FlagValue, ForcedBattle } from "@/types/events";
 
-import { BASE_TIDE_CAP, tideCapFor } from "@/game/run/tide";
+import {
+  BASE_TIDE_CAP,
+  JUMPS_PER_TIDE,
+  jumpsPerTideFor,
+  tideCapFor,
+} from "@/game/run/tide";
 
-export { BASE_TIDE_CAP, tideCapFor };
+export { BASE_TIDE_CAP, JUMPS_PER_TIDE, jumpsPerTideFor, tideCapFor };
 
-export const JUMPS_PER_TIDE = 4;
 export const WORMHOLE_REVEAL = 1;
 export const STARTING_SCRAP = 0;
 
@@ -213,9 +236,6 @@ export interface NodeResult {
   deepScan?: boolean;
 }
 
-export const jumpsPerTideFor = (mutators: readonly string[]): number =>
-  Math.max(1, JUMPS_PER_TIDE + computeMutatorMods(mutators).jumpsPerTideDelta);
-
 const sectorsClearedCount = (): number => {
   const run = useRunStore.getState();
   return Math.max(0, Math.min(SECTOR_COUNT, run.stats.bosses));
@@ -256,9 +276,15 @@ const settleContract = (win: boolean): { stars: number; newStars: number } => {
   return { stars: countStars(mask), newStars: gained };
 };
 
-export const endRun = (win: boolean): void => {
+const deathParams = (cause: DeathCause): Record<string, string> =>
+  cause === "singularity" ? { death: "1", cause } : { death: "1" };
+
+export const endRun = (win: boolean, cause?: DeathCause): void => {
   syncActionStats();
+  useNarrativeStore.getState().dropRunFeed();
   const run = useRunStore.getState();
+  const deathCause: DeathCause =
+    cause ?? (run.hull <= 0 ? "hull" : "abandon");
   const meta = useMetaStore.getState();
   const contract = run.mode === "contract" ? settleContract(win) : null;
   const counts = {
@@ -334,6 +360,7 @@ export const endRun = (win: boolean): void => {
     fromLevel: award.fromLevel,
     toLevel: award.toLevel,
     win,
+    cause: win ? null : deathCause,
     milestones,
     mode: run.mode,
     score: isScoredMode(run.mode) ? scoreBreakdown(run.stats) : null,
@@ -347,14 +374,14 @@ export const endRun = (win: boolean): void => {
       params: {
         sector: run.sector,
         depth: depthFor(run.sectorIndex, run.depthRow),
-        cause: run.hull <= 0 ? "hull" : "abandon",
+        cause: deathCause,
       },
     });
   }
   useRunStore.setState({ active: false, pendingSwaps: [] });
   if (isScoredMode(run.mode)) void finishScoredRun();
   if (win) useAppStore.getState().go(summaryScreenFor(run.mode));
-  else useAppStore.getState().go("ending", { death: "1" });
+  else useAppStore.getState().go("ending", deathParams(deathCause));
   autosaveRun();
 };
 
@@ -726,14 +753,19 @@ export const advanceSector = (): void => {
     ? s.sectorIndex + 1
     : Math.min(lastIndex, s.sectorIndex + 1);
   const nextSector = endless ? contentSector(nextIndex) : nextIndex;
+  const mutators =
+    s.mode === "campaign"
+      ? withWeatherFor(s.mutators, s.seed, nextIndex, nextSector)
+      : withoutWeather(s.mutators);
   const map = generateSectorMap(
     createStream(deriveSeed(s.seed, `map:${String(nextIndex)}`)),
     nextSector,
-    mapOptionsFor(s.mutators, s.mode),
+    mapOptionsFor(mutators, s.mode),
   );
   useRunStore.setState({
     sector: nextSector,
     sectorIndex: nextIndex,
+    mutators,
     map,
     position: START_NODE_ID,
     depthRow: 0,
@@ -747,9 +779,12 @@ export const advanceSector = (): void => {
     lastWormhole: null,
     pendingDeepScan: false,
     bonusReveal: 0,
+    sectorReveal: 0,
   });
   useRunStore.getState().noteDepth(depthFor(nextIndex, 0));
   useAppStore.getState().go("interstitial");
+  const weather = weatherIn(mutators);
+  if (weather !== null) logConsequence(weather.line);
   emitBark(`sectorEnter:${String(nextSector)}`);
   autosaveRun();
   pushRunCloud();
@@ -771,12 +806,12 @@ const stepTide = (s: RunValues): TideStep => {
   return { tide, jumpsSinceTide: 0, raised: tide > s.tide };
 };
 
-export const jumpTo = (toNodeId: NodeId): boolean => {
+const stepInto = (toNodeId: NodeId, alongEdge: boolean): boolean => {
   const s = useRunStore.getState();
   if (!s.active || s.map === null || s.position === null) return false;
   if (s.position === toNodeId) return false;
   if (s.visited.includes(toNodeId)) return false;
-  if (!areConnected(s.map, s.position, toNodeId)) return false;
+  if (alongEdge && !areConnected(s.map, s.position, toNodeId)) return false;
   const node = nodeById(s.map).get(toNodeId);
   if (node === undefined) return false;
   if (node.hole === true) return false;
@@ -801,6 +836,8 @@ export const jumpTo = (toNodeId: NodeId): boolean => {
   autosaveRun();
   return true;
 };
+
+export const jumpTo = (toNodeId: NodeId): boolean => stepInto(toNodeId, true);
 
 export const openWormhole = (holeId: NodeId): boolean => {
   const s = useRunStore.getState();
@@ -848,8 +885,8 @@ export const bypassHole = (holeId: NodeId): boolean => {
     rows: (to?.row ?? 0) - (nodeById(gate.map).get(gate.from)?.row ?? 0),
     direction: "forward",
   });
-  emitBark("wormhole");
-  return jumpTo(target);
+  emitBark("holeBypass");
+  return stepInto(target, false);
 };
 
 export const enterNode = (nodeId: NodeId): boolean => {
@@ -870,10 +907,21 @@ export const resumeUnenteredNode = (): boolean => {
   return enterNode(s.position);
 };
 
+export type WormholeRide =
+  | { kind: "landed"; throw: WormholeThrow }
+  | { kind: "fatal" };
+
+const disintegrate = (): void => {
+  useRunStore.setState({ pendingWormhole: null });
+  useMetaStore.getState().bumpLifetime({ disintegrations: 1 });
+  logJournal({ k: "singularity" });
+  endRun(false, "singularity");
+};
+
 export const rideWormhole = (
   holeId: NodeId,
   route = true,
-): WormholeThrow | null => {
+): WormholeRide | null => {
   const gate = wormholeGate(holeId);
   if (gate === null) return null;
   const s = gate.run;
@@ -887,6 +935,15 @@ export const rideWormhole = (
     },
     chaos,
   );
+  const unmadePct = disintegrationPctFor(s.sector);
+  if (
+    unmadePct > 0 &&
+    !isGentleRide(s.stats.wormholeRides) &&
+    chaos.roll(unmadePct)
+  ) {
+    disintegrate();
+    return { kind: "fatal" };
+  }
   const landingId =
     roll.landing ??
     bypassTargetFor(gate.map, gate.from, holeId, s.visited);
@@ -894,7 +951,7 @@ export const rideWormhole = (
   if (node === undefined || landingId === null) {
     useRunStore.setState({ pendingWormhole: null, lastWormhole: roll });
     autosaveRun();
-    return roll;
+    return { kind: "landed", throw: roll };
   }
 
   const settled: WormholeThrow = { ...roll, landing: landingId };
@@ -921,11 +978,11 @@ export const rideWormhole = (
     rows: settled.rows,
     direction: settled.direction,
   });
-  emitBark("wormhole");
+  emitBark("wormholeRide");
   if (step.raised) emitBark("tideUp");
   autosaveRun();
   if (route) enterNode(landingId);
-  return settled;
+  return { kind: "landed", throw: settled };
 };
 
 const afterBossVictory = (): void => {
@@ -1004,7 +1061,9 @@ const finalizeNode = (
     pendingRewards !== null &&
     (pendingRewards.dieDrop !== null ||
       pendingRewards.perkChoices.length > 0 ||
-      (pendingRewards.dieChoices ?? []).length > 0);
+      (pendingRewards.dieChoices ?? []).length > 0 ||
+      (pendingRewards.moduleChoices ?? []).length > 0 ||
+      (pendingRewards.salvage ?? []).length > 0);
   run.setPendingRewards(hasRewards ? pendingRewards : null);
 
   if (
@@ -1118,6 +1177,11 @@ const minibossPackage = (
 const takeBattleTally = (): BattleTally =>
   battleTally(useBattleStore.getState());
 
+const endBattleStore = (): void => {
+  useRunStore.getState().keepBattleLog(useBattleStore.getState().log);
+  useBattleStore.getState().reset();
+};
+
 export const resolveRunBattle = (): void => {
   const b = useBattleStore.getState();
   if (b.outcome === undefined) return;
@@ -1134,7 +1198,7 @@ export const resolveRunBattle = (): void => {
     const lost = takeBattleTally();
     run.noteBattleTally(lost);
     noteBattleLifetime(lost, false);
-    useBattleStore.getState().reset();
+    endBattleStore();
     endRun(false);
     return;
   }
@@ -1150,7 +1214,7 @@ export const resolveRunBattle = (): void => {
   const enemyDefIds = b.enemies.map((e) => e.defId);
   const tally = takeBattleTally();
   const survivedLethal = b.survivedLethal;
-  useBattleStore.getState().reset();
+  endBattleStore();
   run.noteBattleTally(tally);
   noteBattleLifetime(
     tally,
@@ -1170,6 +1234,7 @@ export const resolveRunBattle = (): void => {
     lootStream,
     mut.lootRarityStep,
     node.pocket === true,
+    sectorScrapMult,
   );
   const rewardScrap = Math.round(
     reward.scrap *
@@ -1177,7 +1242,7 @@ export const resolveRunBattle = (): void => {
       (1 + (mods.scrapMultPct + mut.scrapMultPct) / 100),
   );
 
-  const pending: NonNullable<RunValues["pendingRewards"]> =
+  const base: NonNullable<RunValues["pendingRewards"]> =
     node.type === "miniboss"
       ? minibossPackage(lootStream, run, mut.lootRarityStep, node.id)
       : {
@@ -1191,6 +1256,18 @@ export const resolveRunBattle = (): void => {
             ? { moduleChoices: [rollModule(lootStream, run.modules, "common")] }
             : {}),
         };
+  const pending: NonNullable<RunValues["pendingRewards"]> = isSalvageNode(
+    node.type,
+  )
+    ? {
+        ...base,
+        salvage: rollSalvageOffer(
+          run.seed,
+          node.id,
+          isSectorExit(node) ? ACT_SCOPED_FACES : [],
+        ),
+      }
+    : base;
 
   noteDraftOffer(pending.perkChoices);
 
@@ -1234,7 +1311,7 @@ export const resolveEventBattle = (): void => {
     const lost = takeBattleTally();
     run.noteBattleTally(lost);
     noteBattleLifetime(lost, false);
-    useBattleStore.getState().reset();
+    endBattleStore();
     endRun(false);
     return;
   }
@@ -1250,7 +1327,7 @@ export const resolveEventBattle = (): void => {
   const enemyDefIds = b.enemies.map((e) => e.defId);
   const tally = takeBattleTally();
   const survivedLethal = b.survivedLethal;
-  useBattleStore.getState().reset();
+  endBattleStore();
   run.noteBattleTally(tally);
   noteBattleLifetime(tally, false);
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
@@ -1322,6 +1399,21 @@ export const resolveDieReward = (keep: boolean): void => {
   useRunStore
     .getState()
     .setPendingRewards({ ...pending, dieDrop: null });
+  autosaveRun();
+};
+
+export const resolveSalvagePick = (faceId: string | null): void => {
+  const run = useRunStore.getState();
+  const pending = run.pendingRewards;
+  if (pending === null || (pending.salvage ?? []).length === 0) return;
+  if (faceId === null) {
+    logConsequence(SALVAGE_DECLINED);
+  } else {
+    if (!(pending.salvage ?? []).includes(faceId)) return;
+    const nodeId = pending.draftNodeId ?? run.position ?? "salvage";
+    if (!applySalvageFace(faceId, salvageStreamFor(run.seed, nodeId))) return;
+  }
+  useRunStore.getState().setPendingRewards({ ...pending, salvage: [] });
   autosaveRun();
 };
 

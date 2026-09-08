@@ -3654,7 +3654,8 @@
     "sectorEnter1": {
       "1": "Le Hush Rim. Un nom qui ne trompe pas.",
       "2": "Quarante ans de silence, et nous avons fait du bruit.",
-      "3": "La Bordure. Là où la flotte a cessé de répondre."
+      "3": "La Bordure. Là où la flotte a cessé de répondre.",
+      "4": "La Bordure, c'est le petit bain, capitaine. Elle a quand même noyé une flotte."
     },
     "lowHull": {
       "1": "La coque râle. Moi aussi, mais plus discrètement.",
@@ -3742,7 +3743,9 @@
       "3": "Prenez votre temps. Le secteur est patient, et moi aussi.",
       "4": "Tous les itinéraires au départ d'ici ont chacun leur propre coût.",
       "5": "Il y a un épais brouillard devant nous. Des capteurs seraient utiles dans ce cas-là.",
-      "6": "J'ai connu pire. Pas récemment, mais ça m'est déjà arrivé."
+      "6": "J'ai connu pire. Pas récemment, mais ça m'est déjà arrivé.",
+      "7": "J'ai passé chaque branche deux fois. Les réponses ne s'améliorent pas.",
+      "8": "Toujours à l'arrêt. Je n'en dirai pas plus."
     },
     "setComplete": {
       "1": "Résonance pris sur le fait. Ne me demandez pas comment ça marche.",
@@ -3751,61 +3754,42 @@
       "4": "Résonance Tenez bon. Vous allez sentir le prochain coup.",
       "5": "Ils vivent en groupe de quatre. Les « cores » aiment la compagnie.",
       "6": "Ça, c'est une belle construction, capitaine.",
-      "7": "Tout le plateau vibre. C'est un bon bourdonnement."
-    },
-    "killJammer": {
-      "1": "Le brouilleur ne fait plus de bruit. Je peux enfin entendre le bruit de mes propres pensées.",
-      "2": "Plus aucun bruit parasite de ce côté-là. C'est déjà ça."
-    },
-    "killLeech": {
-      "1": "Il s'est détaché. Je déteste quand des objets touchent les dés.",
-      "2": "Détaché. Mes cœurs m'appartiennent à nouveau."
-    },
-    "killRaider": {
-      "1": "Un pillard de moins. Le Rim tient le compte.",
-      "2": "Celui-là ne va pas nous sauver aujourd'hui."
-    },
-    "killChoir": {
-      "1": "L'hymne s'est arrêté. Ça ne me manque pas.",
-      "2": "Une voix de moins dans le chœur. Tant mieux."
-    },
-    "killWasp": {
-      "1": "La guêpe est partie. Fais quand même attention à ton support d'arme.",
-      "2": "Il s'est fait descendre. Mais la fracture ne fait que s'aggraver."
-    },
-    "killWarden": {
-      "1": "Désormais, ses boucliers, c'est le problème de quelqu'un d'autre.",
-      "2": "Le gardien est à terre. On emporte le mur avec nous."
-    },
-    "killScav": {
-      "1": "Ce drone, quel salaud. Il en avait aussi après nos dés.",
-      "2": "Un drone de moins à fouiner autour de l'épave."
+      "7": "Tout le plateau vibre. C'est un bon bourdonnement.",
+      "8": "Ils se sont trouvés tout seuls. Je n'y suis pour rien.",
+      "9": "C'est le son que faisait la flotte. Continue."
     },
     "memory": {
       "1": "Je viens de recevoir une réponse. Donnez-moi une seconde, capitaine.",
       "2": "C'est une autre facette de ma personnalité. À classer dans la catégorie « désagréable, mais utile ».",
       "3": "Je m'en souviens mieux maintenant. Ce n'est pas vraiment un cadeau.",
-      "4": "Une autre partie de moi est revenue. Je ne suis pas sûr d'avoir voulu celle-là."
+      "4": "Une autre partie de moi est revenue. Je ne suis pas sûr d'avoir voulu celle-là.",
+      "5": "J'ai un visage pour ce nom, maintenant. J'aurais préféré que non.",
+      "6": "Encore un morceau revenu. Les coutures se voient toujours, capitaine.",
+      "7": "Je le savais. Je ne savais pas que je le savais."
     },
     "sectorEnter2": {
       "1": "Dérive Les champs. Ici, tout ce qui se trouve ici, c'est ce que quelqu'un a récupéré, y compris nous.",
       "2": "Faites attention aux mines. Elles ont eu quarante ans pour s'ennuyer.",
-      "3": "Dérive Les champs. Attention aux chemins et attention aux clans."
+      "3": "Dérive Les champs. Attention aux chemins et attention aux clans.",
+      "4": "Chaque coque ici appartient à quelqu'un. À deux, en général, et ils ne sont pas d'accord."
     },
     "sectorEnter3": {
       "1": "La Faille. Mes capteurs sont en train de voter et leurs résultats divergent.",
       "2": "Ne te fie pas aux résultats. Et ne te fie pas non plus aux dés, franchement.",
-      "3": "The Rift. Faites confiance au résolveur, pas aux instruments."
+      "3": "The Rift. Faites confiance au résolveur, pas aux instruments.",
+      "4": "La Faille. Je continuerai à donner des chiffres. Traite-les comme des avis."
     },
     "sectorEnter4": {
       "1": "La salle de chorale. Ils seront polis. C'est justement ce qui m'inquiète.",
       "2": "S'ils se mettent à vous chanter des chiffres, capitaine, ne leur répondez pas en chantant.",
-      "3": "La chorale. Ils seront polis. C'est justement ce qui est inquiétant."
+      "3": "La chorale. Ils seront polis. C'est justement ce qui est inquiétant.",
+      "4": "Le Chœur ne prie pas pour qu'on perde. Il prie pour qu'il reste moins d'options."
     },
     "sectorEnter5": {
       "1": "Le Cœur. On m'a guidé vers cet endroit depuis quarante ans.",
       "2": "Quoi qu'il arrive ici, merci de m'avoir pris en voiture.",
-      "3": "L'essentiel. Tout ce qui suit n'est qu'une première ébauche."
+      "3": "L'essentiel. Tout ce qui suit n'est qu'une première ébauche.",
+      "4": "Le Cœur. C'est l'adresse inscrite sur tous les ordres qu'il me reste."
     },
     "bossPhase": {
       "1": "Le système vient de changer d'avis sur la manière dont cela se passe. Adaptez-vous.",
@@ -3828,69 +3812,110 @@
       "6": "Quoi qu'il fasse en premier, il le refera. Apprenez-le."
     },
     "kill-raider": {
-      "1": "Les couleurs du clan. Il y en aura d'autres."
+      "1": "Les couleurs du clan. Il y en aura d'autres.",
+      "2": "Un pillard de moins. Le Rim tient le compte.",
+      "3": "Celui-là ne va pas nous sauver aujourd'hui."
     },
     "kill-scavDrone": {
-      "1": "Le chargeur de quelqu'un. Ce n'est pas lui qui l'a choisi."
+      "1": "Le chargeur de quelqu'un. Ce n'est pas lui qui l'a choisi.",
+      "2": "Ce drone, quel salaud. Il en avait aussi après nos dés.",
+      "3": "Un drone de moins à fouiner autour de l'épave."
     },
     "kill-shieldWarden": {
-      "1": "La doctrine d'escorte des flottes. Avec quarante ans de retard."
+      "1": "La doctrine d'escorte des flottes. Avec quarante ans de retard.",
+      "2": "Désormais, ses boucliers, c'est le problème de quelqu'un d'autre.",
+      "3": "Le gardien est à terre. On emporte le mur avec nous."
     },
     "kill-jammerCorvette": {
-      "1": "La machine à sous est à nouveau libre. Je détestais ça."
+      "1": "La machine à sous est à nouveau libre. Je détestais ça.",
+      "2": "Le brouilleur ne fait plus de bruit. Je peux enfin entendre le bruit de mes propres pensées.",
+      "3": "Plus aucun bruit parasite de ce côté-là. C'est déjà ça."
     },
     "kill-leechSkiff": {
-      "1": "Les dés sont à nouveau lancés. Merci."
+      "1": "Les dés sont à nouveau lancés. Merci.",
+      "2": "Il s'est détaché. Je déteste quand des objets touchent les dés.",
+      "3": "Détaché. Mes cœurs m'appartiennent à nouveau."
     },
     "kill-choirZealot": {
-      "1": "Ça chantait, jusqu'à ce que ça s'arrête. Enregistre la chaîne."
+      "1": "Ça chantait, jusqu'à ce que ça s'arrête. Enregistre la chaîne.",
+      "2": "L'hymne s'est arrêté. Ça ne me manque pas.",
+      "3": "Une voix de moins dans le chœur. Tant mieux."
     },
     "kill-riftWasp": {
-      "1": "À fond jusqu'au bout. Vérifie le support de l'arme."
+      "1": "À fond jusqu'au bout. Vérifie le support de l'arme.",
+      "2": "La guêpe est partie. Fais quand même attention à ton support d'arme.",
+      "3": "Il s'est fait descendre. Mais la fracture ne fait que s'aggraver."
     },
     "kill-breakerDrone": {
-      "1": "Des outils de récupération accompagnés d'avis. Ce n'est plus le cas."
+      "1": "Des outils de récupération accompagnés d'avis. Ce n'est plus le cas.",
+      "2": "Quelqu'un a limé les sécurités. Il y a toujours quelqu'un.",
+      "3": "Il découpait des coques pour vivre. La nôtre a refusé."
     },
     "kill-magnetTug": {
-      "1": "Tout ce qu'il voulait, c'était nous serrer dans ses bras. Il le faisait très bien."
+      "1": "Tout ce qu'il voulait, c'était nous serrer dans ses bras. Il le faisait très bien.",
+      "2": "Il n'a pas tiré une seule fois. Je l'inscris quand même comme un combat.",
+      "3": "La prise a lâché. Les moteurs sont de nouveau à nous."
     },
     "kill-minelayer": {
-      "1": "Field est toujours là-bas. La couche, elle, n'y est plus."
+      "1": "Field est toujours là-bas. La couche, elle, n'y est plus.",
+      "2": "Il a cessé de poser. Ce qui est déjà posé n'a pas cessé.",
+      "3": "La chose la moins intéressante du secteur, jusqu'au bout."
     },
     "kill-hookTug": {
-      "1": "Pas de facture cette fois-ci."
+      "1": "Pas de facture cette fois-ci.",
+      "2": "Il remorquait des gens qui n'avaient rien demandé. Considère la dette réglée.",
+      "3": "Le crochet a lâché. Rien à signer."
     },
     "kill-riftling": {
-      "1": "La Faille en attirera un autre. C'est toujours comme ça."
+      "1": "La Faille en attirera un autre. C'est toujours comme ça.",
+      "2": "C'était une ébauche. La Faille garde le carnet.",
+      "3": "Disparu. Il n'avait pas l'air surpris."
     },
     "kill-echoShade": {
-      "1": "Ça a arrêté de nous répéter. C'est déjà ça."
+      "1": "Ça a arrêté de nous répéter. C'est déjà ça.",
+      "2": "Il n'entendait que la moitié bruyante de nous. Maintenant il n'entend rien.",
+      "3": "Je préférerais ne pas discuter de ce que ça donnait."
     },
     "kill-foldWorm": {
-      "1": "Les chiffres semblent à nouveau solides."
+      "1": "Les chiffres semblent à nouveau solides.",
+      "2": "Il mangeait la certitude dans nos chiffres. Les chiffres sont entiers de nouveau.",
+      "3": "Abattu. Je refais confiance à ma propre arithmétique."
     },
     "kill-choirAcolyte": {
-      "1": "C'est lui qui s'est porté volontaire, capitaine."
+      "1": "C'est lui qui s'est porté volontaire, capitaine.",
+      "2": "Il était très calme à ce sujet. C'est la partie que je garde.",
+      "3": "Un nom de moins sur leur liste. Ils tiennent la liste quand même."
     },
     "kill-hymnTurret": {
-      "1": "Enfin faux."
+      "1": "Enfin faux.",
+      "2": "Elle tirait sur le temps fort. Il n'y a plus de temps fort.",
+      "3": "L'accord s'est cassé, et le canon avec."
     },
     "kill-hymnCantor": {
-      "1": "Le rythme est rompu. Les autres vont se disperser."
+      "1": "Le rythme est rompu. Les autres vont se disperser.",
+      "2": "Tu as tué le tempo en premier. Je l'aurais suggéré tôt ou tard.",
+      "3": "Plus personne ne leur donne le départ."
     },
     "kill-coreFragment": {
-      "1": "Un morceau du Noyau, et il saignait comme un navire."
+      "1": "Un morceau du Noyau, et il saignait comme un navire.",
+      "2": "Il se prenait pour le tout. Il se trompait de presque tout.",
+      "3": "C'était un éclat, capitaine. Retiens la taille du reste."
     },
     "kill-probabilityKnot": {
-      "1": "Désunis. Deux avenirs, tous deux révolus."
+      "1": "Désunis. Deux avenirs, tous deux révolus.",
+      "2": "Deux issues étaient nouées ensemble. Aucune des deux n'est la nôtre.",
+      "3": "Il s'est défait proprement. J'attendais mieux d'un nœud."
     },
     "kill-causalityLoop": {
-      "1": "Ça a arrêté de basculer. J'avais presque fini de m'y habituer."
+      "1": "Ça a arrêté de basculer. J'avais presque fini de m'y habituer.",
+      "2": "Nos chiffres restent désormais là où on les pose. Je n'y comptais plus.",
+      "3": "J'avais presque son motif. Je ne saurai jamais si j'avais raison."
     },
     "sectorEnter6": {
       "1": "Capitaine. Rien ici n'est répertorié sur les cartes. Y compris nous.",
       "2": "Je suis en train de lire notre propre coque devant nous. Deux fois.",
-      "3": "Quoi que ce soit que le « Core » empêchait de passer, nous l'avons simplement contourné."
+      "3": "Quoi que ce soit que le « Core » empêchait de passer, nous l'avons simplement contourné.",
+      "4": "Au-delà du Cœur. Je n'ai aucun ordre pour ça. C'est étrangement reposant."
     },
     "threshold": {
       "1": "Tu aurais pu y mettre fin. J'ai noté que tu ne l'as pas fait.",
@@ -3898,16 +3923,31 @@
       "3": "La marée ne s'arrête pas à trois minutes après cette ligne. Rien ne s'arrête.",
       "4": "Y mettre un terme, c'était la réponse. Toi, tu voulais la question."
     },
-    "wormhole": {
+    "holeBypass": {
       "1": "La cellule a disparu. Elle n’a pas été détruite, mais supprimée.",
       "2": "Le rebord donne l'impression d'être une porte qui s'ouvre sur n'importe quelle pièce.",
       "3": "Je peux tracer la route qui contourne l'obstacle. Je ne peux pas tracer la route qui le traverse.",
       "4": "Quoi qu'il y ait de l'autre côté, ça ne figure pas sur ma carte.",
-      "5": "On est sortis quelque part. J'essaie de me rappeler où.",
-      "6": "Les instruments ne s'accordent sur rien. Ça aussi, ce sont des données.",
-      "7": "La distance a cessé d'être une promesse il y a environ une minute.",
-      "8": "Enregistre-le comme un saut. Le journal de bord ne dira pas la vérité."
+      "5": "On a contourné. Le chemin long reste un chemin, capitaine."
+    },
+    "wormholeRide": {
+      "1": "On est sortis quelque part. J'essaie de me rappeler où.",
+      "2": "Les instruments ne s'accordent sur rien. Ça aussi, ce sont des données.",
+      "3": "La distance a cessé d'être une promesse il y a environ une minute.",
+      "4": "Enregistre-le comme un saut. Le journal de bord ne dira pas la vérité.",
+      "5": "On est entrés, et ensuite on était ici. Je n'ai pas de milieu à rapporter."
     }
+  },
+  "blackbox": {
+    "firstRun": "« Ta première partie. La plupart l'apprennent plus tard. Tu as gagné du temps. »",
+    "beyond": "« Tu étais déjà allé jusqu'au bout. Tu es revenu pour la partie sans carte. C'était celle-là. »",
+    "veteran": "« Tous les jets d'avant ressortaient quelque part. Je tenais ça pour une régularité. Plus maintenant. »",
+    "pact": "« Ta page dans le registre du Chœur est toujours là. C'est désormais la plus grande part de toi qui subsiste. »",
+    "cautious": "« Tu en as contourné trois. Pas celui-ci. Il n'a pas remarqué la différence. »",
+    "resonant": "« Tu es allé vers la Résonance tout du long. Formellement, tu es arrivé. »",
+    "thin": "« Il ne restait presque plus de coque et tu y es allé quand même. Je note ça comme de la décision. »",
+    "whole": "« Coque intacte. Tous les systèmes nominaux. Aucun de ces chiffres n'était celui qui comptait. »",
+    "quiet": "« À quoi t'attendais-tu ? C'est un trou noir. »"
   },
   "mutators": {
     "brittleShields": {
@@ -5222,6 +5262,70 @@
     },
     "free": {
       "say": "Check complete. Free turn — the board is yours."
+    }
+  },
+  "weather": {
+    "nebula": {
+      "name": "Nébuleuse",
+      "desc": "Les capteurs portent 1 rangée de moins ; les nœuds de combat nettoyés paient 20% de ferraille en plus.",
+      "line": "Nébuleuse. Une rangée de vue en moins — mais les épaves qu’elle cache paient 20% mieux."
+    },
+    "ionStorm": {
+      "name": "Tempête ionique",
+      "desc": "La statique coûte 1 rangée de portée aux capteurs ; pousser un dé coûte 1 charge de moins.",
+      "line": "Tempête ionique. La statique dévore une rangée de vue — les dés suivent le courant pour 1 de moins."
+    },
+    "debrisField": {
+      "name": "Champ de débris",
+      "desc": "Les nœuds de combat nettoyés paient 40% de ferraille en plus ; les ennemis portent 5% de coque en plus.",
+      "line": "Champ de débris. De la récupération partout — et 5% de coque en plus qui s’y cache."
+    },
+    "solarWind": {
+      "name": "Vent solaire",
+      "desc": "Le réacteur plafonne 2 charges plus haut ; pousser un dé coûte 1 charge de plus.",
+      "line": "Vent solaire. Les collecteurs le boivent — 2 charges de plus — et les actionneurs en paient 1."
+    },
+    "magneticStorm": {
+      "name": "Tempête magnétique",
+      "desc": "Pousser un dé coûte 1 charge de plus ; le butin monte d’une rareté.",
+      "line": "Tempête magnétique. Les actionneurs prennent une charge de plus — les épaves rendent une rareté."
+    },
+    "radioBurst": {
+      "name": "Salve radio",
+      "desc": "Les capteurs portent 1 rangée de plus ; les nœuds de combat nettoyés paient 20% de ferraille en moins.",
+      "line": "Salve radio. Les voies s’éclairent une rangée plus loin, et chaque balise de récupération de l’acte hurle de la friture."
+    },
+    "gravityRipple": {
+      "name": "Ondulation gravitationnelle",
+      "desc": "Les ennemis portent 5% de coque en moins ; pousser un dé coûte 2 charges de plus.",
+      "line": "Ondulation gravitationnelle. Le cisaillement amincit leurs coques de 5% — et tes actionneurs paient 2 pour lutter contre la dérive."
+    },
+    "stillWatch": {
+      "name": "Veille calme",
+      "desc": "Le réacteur plafonne 1 charge plus haut ; les nœuds de combat nettoyés paient 15% de ferraille en plus.",
+      "line": "Veille calme. Rien dehors. Le réacteur tient une charge de plus, et la ferraille remonte 15% plus propre."
+    }
+  },
+  "salvage": {
+    "scrap": {
+      "name": "Cargaison de ferraille",
+      "desc": "Découper l'épave pour 18 de ferraille.",
+      "line": "Récupération : l'épave a rendu 18 de ferraille, le reste est resté là."
+    },
+    "repair": {
+      "name": "Rustine de blindage",
+      "desc": "Souder son blindage au nôtre : +3 de coque.",
+      "line": "Récupération : trois plaques de l'épave, soudées à chaud."
+    },
+    "recon": {
+      "name": "Route relevée",
+      "desc": "Lire ses journaux : +1 rangée de vue sur la carte jusqu'à la fin de l'acte.",
+      "line": "Récupération : son journal de bord tient. Une rangée plus loin jusqu'à la fin de l'acte."
+    },
+    "discount": {
+      "name": "Pièces détachées",
+      "desc": "Revendre ses pièces : 25 de ferraille en moins sur une amélioration au chantier.",
+      "line": "Récupération : une caisse de pièces propres. Le prochain dock en retirera 25 de ferraille sur une amélioration."
     }
   }
 }

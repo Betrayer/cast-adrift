@@ -103,6 +103,7 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
       return;
     case "nodeMod":
       if (effect.mod === "revealRows") run.addBonusReveal(effect.n ?? 2);
+      else if (effect.mod === "sectorReveal") run.addSectorReveal(effect.n ?? 1);
       else if (effect.mod === "shipyardDiscount")
         run.addShipyardDiscount(effect.n ?? 30);
       else if (effect.mod === "endHeal") run.addBattleEndHeal(effect.n ?? 1);

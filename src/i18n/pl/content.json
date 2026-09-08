@@ -3654,7 +3654,8 @@
     "sectorEnter1": {
       "1": "Hush Rim. Nazwa mówi sama za siebie.",
       "2": "Czterdzieści lat ciszy, a my zrobiliśmy niezły hałas.",
-      "3": "Krawędź. Miejsce, w którym flota przestała odpowiadać."
+      "3": "Krawędź. Miejsce, w którym flota przestała odpowiadać.",
+      "4": "Krawędź to płytki koniec, kapitanie. A i tak utopiła flotę."
     },
     "lowHull": {
       "1": "Kadłub narzeka. Ja też, tylko cichiej.",
@@ -3742,7 +3743,9 @@
       "3": "Nie spiesz się. Branża jest cierpliwa, ja też.",
       "4": "Każda trasa stąd jest kosztowna na swój sposób.",
       "5": "Przed nami gęsta mgła. Czujniki byłyby tu pomocne.",
-      "6": "Bywało już gorzej. Nie ostatnio, ale zdarzało się."
+      "6": "Bywało już gorzej. Nie ostatnio, ale zdarzało się.",
+      "7": "Przeliczyłam każdą gałąź dwa razy. Odpowiedzi się nie poprawiają.",
+      "8": "Wciąż stoimy. Nic więcej na ten temat nie powiem."
     },
     "setComplete": {
       "1": "Rezonans złapany. Nie pytaj, jak to działa.",
@@ -3751,61 +3754,42 @@
       "4": "Rezonans trzymaj się. Następny ruch na pewno poczujesz.",
       "5": "Czwórka ze szkoły. Rdzenie lubią towarzystwo.",
       "6": "To się nazywa porządna konstrukcja, kapitanie.",
-      "7": "Cała taca buczy. To ten przyjemny buczenie."
-    },
-    "killJammer": {
-      "1": "Urządzenie zakłócające milczy. W końcu słyszę własne myśli.",
-      "2": "Z tego już nie będzie żadnych zakłóceń. To mała pociecha."
-    },
-    "killLeech": {
-      "1": "Odpuściło. Nie znoszę, jak coś dotyka kości.",
-      "2": "Odłączone. Moje rdzenie znów należą do mnie."
-    },
-    "killRaider": {
-      "1": "Jeden najeźdźca mniej. Rim prowadzi statystyki.",
-      "2": "To nam dzisiaj nie pomoże."
-    },
-    "killChoir": {
-      "1": "Hymn ucichł. Nie tęsknię za nim.",
-      "2": "Jeden głos mniej w chórze. Świetnie."
-    },
-    "killWasp": {
-      "1": "Osy już nie ma. I tak uważaj na uchwyt broni.",
-      "2": "Został załatwiony. Rozłam jednak się pogłębia."
-    },
-    "killWarden": {
-      "1": "Jego osłony to teraz problem kogoś innego.",
-      "2": "Naczelnik nie żyje. Ściana pójdzie z nami."
-    },
-    "killScav": {
-      "1": "Ten dron to prawdziwy łajdak. On też chciał nasze kości.",
-      "2": "Jeden dron mniej, który grzebie w wraku."
+      "7": "Cała taca buczy. To ten przyjemny buczenie.",
+      "8": "Same się odnalazły. Nie mam z tym nic wspólnego.",
+      "9": "Tak brzmiała kiedyś flota. Kontynuuj."
     },
     "memory": {
       "1": "Właśnie coś się pojawiło. Proszę mi dać chwilę, kapitanie.",
       "2": "To kolejna część mnie. Zaklasyfikowana jako „nieprzyjemna, ale przydatna”.",
       "3": "Teraz pamiętam ich więcej. Nie jest to do końca dar.",
-      "4": "Kolejna część mnie powróciła. Nie jestem pewien, czy tego właśnie chciałem."
+      "4": "Kolejna część mnie powróciła. Nie jestem pewien, czy tego właśnie chciałem.",
+      "5": "Mam już twarz do tego imienia. Wolałabym nie mieć.",
+      "6": "Kolejny kawałek na miejscu. Szwy nadal widać, kapitanie.",
+      "7": "Wiedziałam to. Nie wiedziałam, że to wiem."
     },
     "sectorEnter2": {
       "1": "Dryf Pola. Wszystko tutaj to czyjeś znalezisko, łącznie z nami.",
       "2": "Uważajcie na miny. Mieli czterdzieści lat, żeby się znudzić.",
-      "3": "Dryf Pola. Uważaj na drogi i na klany."
+      "3": "Dryf Pola. Uważaj na drogi i na klany.",
+      "4": "Każdy kadłub tutaj do kogoś należy. Zwykle do dwóch osób, i one się nie zgadzają."
     },
     "sectorEnter3": {
       "1": "The Rift. Moje czujniki przekazują sygnały, ale nie są zgodne.",
       "2": "Nie wierz w te wyniki. I szczerze mówiąc, nie wierz też w kości.",
-      "3": "The Rift. Zaufaj systemowi rozstrzygania, a nie przyrządom."
+      "3": "The Rift. Zaufaj systemowi rozstrzygania, a nie przyrządom.",
+      "4": "The Rift. Będę dalej podawać liczby. Traktuj je jak opinie."
     },
     "sectorEnter4": {
       "1": "Miejsce dla chóru. Będą uprzejmi. I właśnie to budzi obawy.",
       "2": "Jeśli zaczną ci śpiewać piosenki o liczbach, kapitanie, nie odpowiadaj im śpiewem.",
-      "3": "Chór. Będą uprzejmi. I właśnie to jest niepokojące."
+      "3": "Chór. Będą uprzejmi. I właśnie to jest niepokojące.",
+      "4": "Chór nie modli się o naszą przegraną. Modli się o mniej możliwości."
     },
     "sectorEnter5": {
       "1": "Rdzeń. Od czterdziestu lat kierują mnie do tego miejsca.",
       "2": "Cokolwiek by się tu nie wydarzyło, dziękuję za podwiezienie.",
-      "3": "Podstawa. Wszystko, co tu jest, to pierwszy szkic."
+      "3": "Podstawa. Wszystko, co tu jest, to pierwszy szkic.",
+      "4": "Rdzeń. To adres w każdym rozkazie, jaki mi jeszcze został."
     },
     "bossPhase": {
       "1": "Po prostu zmieniło zdanie co do tego, jak to ma wyglądać. Trzeba się dostosować.",
@@ -3828,69 +3812,110 @@
       "6": "Cokolwiek zrobi najpierw, zrobi to ponownie. Naucz się tego."
     },
     "kill-raider": {
-      "1": "Barwy klanu. Będzie ich więcej."
+      "1": "Barwy klanu. Będzie ich więcej.",
+      "2": "Jeden najeźdźca mniej. Rim prowadzi statystyki.",
+      "3": "To nam dzisiaj nie pomoże."
     },
     "kill-scavDrone": {
-      "1": "Czyjś program ładujący. To nie on to wybrał."
+      "1": "Czyjś program ładujący. To nie on to wybrał.",
+      "2": "Ten dron to prawdziwy łajdak. On też chciał nasze kości.",
+      "3": "Jeden dron mniej, który grzebie w wraku."
     },
     "kill-shieldWarden": {
-      "1": "Doktryna eskorty floty. Czterdzieści lat za późno."
+      "1": "Doktryna eskorty floty. Czterdzieści lat za późno.",
+      "2": "Jego osłony to teraz problem kogoś innego.",
+      "3": "Naczelnik nie żyje. Ściana pójdzie z nami."
     },
     "kill-jammerCorvette": {
-      "1": "Slot znów jest wolny. Nie znosiłem tego."
+      "1": "Slot znów jest wolny. Nie znosiłem tego.",
+      "2": "Urządzenie zakłócające milczy. W końcu słyszę własne myśli.",
+      "3": "Z tego już nie będzie żadnych zakłóceń. To mała pociecha."
     },
     "kill-leechSkiff": {
-      "1": "Kości znów się poruszają. Dziękuję."
+      "1": "Kości znów się poruszają. Dziękuję.",
+      "2": "Odpuściło. Nie znoszę, jak coś dotyka kości.",
+      "3": "Odłączone. Moje rdzenie znów należą do mnie."
     },
     "kill-choirZealot": {
-      "1": "Śpiewało, aż przestało. Zapisz kanał."
+      "1": "Śpiewało, aż przestało. Zapisz kanał.",
+      "2": "Hymn ucichł. Nie tęsknię za nim.",
+      "3": "Jeden głos mniej w chórze. Świetnie."
     },
     "kill-riftWasp": {
-      "1": "Na pełną moc do samego końca. Sprawdź mocowanie broni."
+      "1": "Na pełną moc do samego końca. Sprawdź mocowanie broni.",
+      "2": "Osy już nie ma. I tak uważaj na uchwyt broni.",
+      "3": "Został załatwiony. Rozłam jednak się pogłębia."
     },
     "kill-breakerDrone": {
-      "1": "Oprzyrządowanie do odzyskiwania z opiniami. Już nie."
+      "1": "Oprzyrządowanie do odzyskiwania z opiniami. Już nie.",
+      "2": "Ktoś spiłował z niego bezpieczniki. Zawsze ktoś to robi.",
+      "3": "Ciął kadłuby na życie. Nasz odmówił."
     },
     "kill-magnetTug": {
-      "1": "Chciało nas tylko przytulić. Bardzo dobrze mu to wychodziło."
+      "1": "Chciało nas tylko przytulić. Bardzo dobrze mu to wychodziło.",
+      "2": "Ani razu nie wystrzelił. I tak zapisuję to jako walkę.",
+      "3": "Uchwyt puścił. Silniki znowu są nasze."
     },
     "kill-minelayer": {
-      "1": "Field wciąż tam jest. Warstwa już nie."
+      "1": "Field wciąż tam jest. Warstwa już nie.",
+      "2": "Przestał stawiać. To, co już postawił, nie przestało.",
+      "3": "Najmniej ciekawa rzecz w sektorze, do samego końca."
     },
     "kill-hookTug": {
-      "1": "Tym razem nie ma faktury."
+      "1": "Tym razem nie ma faktury.",
+      "2": "Holował tych, którzy o to nie prosili. Uznaj dług za spłacony.",
+      "3": "Hak puścił. Nie ma czego podpisywać."
     },
     "kill-riftling": {
-      "1": "Rift przyciągnie kolejną osobę. Tak jest zawsze."
+      "1": "Rift przyciągnie kolejną osobę. Tak jest zawsze.",
+      "2": "To był szkic. Szkicownik zostaje u Riftu.",
+      "3": "Nie ma go. Wcale nie wyglądał na zaskoczonego."
     },
     "kill-echoShade": {
-      "1": "Przestało nas powtarzać. To mała ulga."
+      "1": "Przestało nas powtarzać. To mała ulga.",
+      "2": "Słyszało tylko głośną połowę nas. Teraz nie słyszy nic.",
+      "3": "Wolałabym nie omawiać, jak to brzmiało."
     },
     "kill-foldWorm": {
-      "1": "Wyniki znów wydają się solidne."
+      "1": "Wyniki znów wydają się solidne.",
+      "2": "Wyjadał pewność z naszych liczb. Liczby znowu są całe.",
+      "3": "Zdjęty. Znowu ufam własnej arytmetyce."
     },
     "kill-choirAcolyte": {
-      "1": "To on zgłosił się na ochotnika, kapitanie."
+      "1": "To on zgłosił się na ochotnika, kapitanie.",
+      "2": "Był przy tym bardzo spokojny. To właśnie zapamiętam.",
+      "3": "O jedno nazwisko mniej na ich liście. Listę i tak prowadzą dalej."
     },
     "kill-hymnTurret": {
-      "1": "W końcu fałszuję."
+      "1": "W końcu fałszuję.",
+      "2": "Strzelała na mocną część taktu. Mocnej części już nie ma.",
+      "3": "Akord pękł, a działo razem z nim."
     },
     "kill-hymnCantor": {
-      "1": "Tempo zniknęło. Reszta się rozbiegnie."
+      "1": "Tempo zniknęło. Reszta się rozbiegnie.",
+      "2": "Najpierw zabiłeś tempo. Prędzej czy później sama bym to zaproponowała.",
+      "3": "Nikt im już nie odlicza wejścia."
     },
     "kill-coreFragment": {
-      "1": "Kawałek Rdzenia, a krwawił jak statek."
+      "1": "Kawałek Rdzenia, a krwawił jak statek.",
+      "2": "Uważał się za całość. Pomylił się o większość tej całości.",
+      "3": "To była drzazga, kapitanie. Pamiętaj o rozmiarze reszty."
     },
     "kill-probabilityKnot": {
-      "1": "Rozwiązane. Dwie przyszłości – obie się skończyły."
+      "1": "Rozwiązane. Dwie przyszłości – obie się skończyły.",
+      "2": "Dwa zakończenia były związane razem. Żadne z nich nie jest nasze.",
+      "3": "Rozszedł się czysto. Po węźle spodziewałam się więcej."
     },
     "kill-causalityLoop": {
-      "1": "Przestało się przełączać. Już prawie się do tego przyzwyczaiłem."
+      "1": "Przestało się przełączać. Już prawie się do tego przyzwyczaiłem.",
+      "2": "Nasze liczby zostają teraz tam, gdzie je położymy. Już przestałam na to liczyć.",
+      "3": "Prawie miałam jego wzór. Teraz już się nie dowiem, czy miałam rację."
     },
     "sectorEnter6": {
       "1": "Kapitanie. Nic tutaj nie jest zaznaczone na mapie. Łącznie z nami.",
       "2": "Analizuję nasz własny kadłub przed nami. Dwukrotnie.",
-      "3": "Cokolwiek to było, co „Core” nas od tego odgradzało, po prostu to ominęliśmy."
+      "3": "Cokolwiek to było, co „Core” nas od tego odgradzało, po prostu to ominęliśmy.",
+      "4": "Za Rdzeniem. Nie mam na to żadnych rozkazów. Dziwnie spokojnie."
     },
     "threshold": {
       "1": "Mogłeś to zakończyć. Odnotowałem, że tego nie zrobiłeś.",
@@ -3898,16 +3923,31 @@
       "3": "Fala nie zatrzymuje się trzy minuty po przekroczeniu tej linii. Nic się nie zatrzymuje.",
       "4": "Rozwiązaniem było zakończenie tego. Ty chciałeś zadać pytanie."
     },
-    "wormhole": {
+    "holeBypass": {
       "1": "Komórka zniknęła. Nie została zniszczona — została odjęta.",
       "2": "Obręcz sprawia wrażenie drzwi, które otwierają się do dowolnego pomieszczenia.",
       "3": "Potrafię wytyczyć trasę dookoła. Nie potrafię jednak wytyczyć trasy przez to.",
       "4": "Cokolwiek się tam za tym kryje, nie ma tego na mojej mapie.",
-      "5": "Wyszliśmy gdzieś. Próbuję ustalić, gdzie dokładnie.",
-      "6": "Wyniki pomiarów w ogóle się nie pokrywają. To też są dane.",
-      "7": "Odległość przestała być obietnicą mniej więcej minutę temu.",
-      "8": "Zapisz to jako skok. W dzienniku pojawi się nieprawdziwa informacja."
+      "5": "Obeszliśmy. Dłuższa droga też jest drogą, kapitanie."
+    },
+    "wormholeRide": {
+      "1": "Wyszliśmy gdzieś. Próbuję ustalić, gdzie dokładnie.",
+      "2": "Wyniki pomiarów w ogóle się nie pokrywają. To też są dane.",
+      "3": "Odległość przestała być obietnicą mniej więcej minutę temu.",
+      "4": "Zapisz to jako skok. W dzienniku pojawi się nieprawdziwa informacja.",
+      "5": "Weszliśmy i od razu byliśmy tutaj. Środka nie mam czego zameldować."
     }
+  },
+  "blackbox": {
+    "firstRun": "„Twój pierwszy przebieg. Zwykle dowiadują się o tym później. Zaoszczędziłeś czas.”",
+    "beyond": "„Raz już doszedłeś do końca. Wróciłeś po tę część, której nie ma na mapie. To była ta część.”",
+    "veteran": "„Każdy wcześniejszy rzut gdzieś wyprowadzał. Uznawałam to za prawidłowość. Już nie.”",
+    "pact": "„Twoja strona w księdze Chóru wciąż tam jest. To teraz największa ocalała część ciebie.”",
+    "cautious": "„Trzy ominąłeś. Tej nie. Nie zauważyła różnicy.”",
+    "resonant": "„Całą drogę szedłeś w Rezonans. Formalnie doszedłeś.”",
+    "thin": "„Kadłuba prawie nie zostało, a i tak wleciałeś. Zapiszę to jako zdecydowanie.”",
+    "whole": "„Kadłub cały. Wszystkie systemy w normie. Żadna z tych liczb nie okazała się tą ważną.”",
+    "quiet": "„A czego się spodziewałeś? To czarna dziura.”"
   },
   "mutators": {
     "brittleShields": {
@@ -5222,6 +5262,70 @@
     },
     "free": {
       "say": "Check complete. Free turn — the board is yours."
+    }
+  },
+  "weather": {
+    "nebula": {
+      "name": "Mgławica",
+      "desc": "Sensory sięgają o 1 rząd mniej; oczyszczone węzły bojowe płacą 20% więcej złomu.",
+      "line": "Mgławica. O rząd mniej widoku — ale wraki w niej płacą 20% lepiej."
+    },
+    "ionStorm": {
+      "name": "Burza jonowa",
+      "desc": "Statyka kosztuje sensory 1 rząd widoku; podbicie kości kosztuje 1 ładunek mniej.",
+      "line": "Burza jonowa. Statyka zjada rząd widoku — za to kości płyną z prądem o 1 taniej."
+    },
+    "debrisField": {
+      "name": "Pole szczątków",
+      "desc": "Oczyszczone węzły bojowe płacą 40% więcej złomu; wrogowie mają 5% więcej kadłuba.",
+      "line": "Pole szczątków. Wszędzie złom — i 5% więcej kadłuba, który się za nim chowa."
+    },
+    "solarWind": {
+      "name": "Wiatr słoneczny",
+      "desc": "Reaktor mieści 2 ładunki więcej; podbicie kości kosztuje 1 ładunek więcej.",
+      "line": "Wiatr słoneczny. Kolektory go piją — 2 ładunki więcej — a siłowniki płacą za to jeden."
+    },
+    "magneticStorm": {
+      "name": "Burza magnetyczna",
+      "desc": "Podbicie kości kosztuje 1 ładunek więcej; łup wpada o rzadkość wyżej.",
+      "line": "Burza magnetyczna. Siłowniki biorą dodatkowy ładunek — wraki oddają o rzadkość więcej."
+    },
+    "radioBurst": {
+      "name": "Rozbłysk radiowy",
+      "desc": "Sensory sięgają o 1 rząd dalej; oczyszczone węzły bojowe płacą 20% mniej złomu.",
+      "line": "Rozbłysk radiowy. Trasy świecą o rząd dalej, a każda boja złomu w akcie wyje szumem."
+    },
+    "gravityRipple": {
+      "name": "Zmarszczka grawitacyjna",
+      "desc": "Wrogowie mają 5% mniej kadłuba; podbicie kości kosztuje 2 ładunki więcej.",
+      "line": "Zmarszczka grawitacyjna. Ścinanie ścieńcza ich kadłuby o 5% — a twoje siłowniki płacą 2 za walkę z dryfem."
+    },
+    "stillWatch": {
+      "name": "Cicha warta",
+      "desc": "Reaktor mieści 1 ładunek więcej; oczyszczone węzły bojowe płacą 15% więcej złomu.",
+      "line": "Cicha warta. Nic tam nie ma. Reaktor trzyma o ładunek głębiej, a złom wychodzi 15% czystszy."
+    }
+  },
+  "salvage": {
+    "scrap": {
+      "name": "Ładunek złomu",
+      "desc": "Rozebrać wrak na 18 złomu.",
+      "line": "Rozbiórka: wrak dał 18 złomu, resztę zostawiono."
+    },
+    "repair": {
+      "name": "Łata pancerza",
+      "desc": "Przyspawać jego pancerz do naszego: +3 kadłuba.",
+      "line": "Rozbiórka: trzy płyty z wraku, przyspawane na gorąco."
+    },
+    "recon": {
+      "name": "Wytyczony kurs",
+      "desc": "Odczytać jego dzienniki: +1 rząd widoczności mapy do końca aktu.",
+      "line": "Rozbiórka: dziennik pokładowy trzyma. O rząd dalej do końca aktu."
+    },
+    "discount": {
+      "name": "Części zamienne",
+      "desc": "Opchnąć jego części: 25 złomu mniej za jedno ulepszenie w stoczni.",
+      "line": "Rozbiórka: skrzynia czystych części. Następny dok zejdzie za nie o 25 złomu z ulepszenia."
     }
   }
 }

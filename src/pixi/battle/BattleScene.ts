@@ -12,6 +12,7 @@ import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
 import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
 import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
+import { emitBark } from "@/game/narrative/barks";
 import { boardSlotIds, legalTargets } from "@/game/battle/view";
 import type { StatusKey } from "@/game/battle/statuses";
 import { duckMusic, playSfx } from "@/services/audio";
@@ -338,6 +339,7 @@ export class BattleScene {
     this.maybeTumble(initial);
     if (initial.phase === "placement") playSfx("rollTumble");
     this.announceElites(initial);
+    this.announceResonance(initial);
     this.unsubscribe = useBattleStore.subscribe(this.onStoreChange);
     this.unsubscribeTheme = onThemeChange(this.onThemeSwitch);
     this.unsubscribeBands = subscribeBodyRect(this.onResize);
@@ -649,6 +651,21 @@ export class BattleScene {
     if (!elite || state.introPending) return;
     playSfx("eliteIntro");
     this.sceneGlowPulse(tokens.amber, 0.14, 320);
+  }
+
+  private announceResonance(state: BattleState): void {
+    if (state.turn !== 1 || state.introPending) return;
+    const floor = RESONANCE_THRESHOLDS[0];
+    if (floor === undefined) return;
+    let top: School | null = null;
+    for (const school of SCHOOL_ORDER) {
+      const count = state.resonance.counts[school];
+      if (count < floor) continue;
+      if (top === null || count > state.resonance.counts[top]) top = school;
+    }
+    if (top === null) return;
+    emitBark("setComplete");
+    this.resonanceBurst(top);
   }
 
   private bossShockwave(): void {
@@ -1407,9 +1424,6 @@ export class BattleScene {
     ) {
       this.startResolution(state);
     }
-    if (state.resonance !== prev.resonance) {
-      this.checkResonanceMilestones(state, prev);
-    }
     if (state.enemies !== prev.enemies) {
       this.checkKills(state, prev);
     }
@@ -1434,24 +1448,6 @@ export class BattleScene {
       if (state.outcome === "defeat") this.shake();
     }
   };
-
-  private checkResonanceMilestones(
-    state: BattleState,
-    prev: BattleState,
-  ): void {
-    for (const school of SCHOOL_ORDER) {
-      const before = prev.resonance.counts[school];
-      const after = state.resonance.counts[school];
-      if (after <= before) continue;
-      const crossed = RESONANCE_THRESHOLDS.some(
-        (th) => before < th && after >= th,
-      );
-      if (crossed) {
-        this.resonanceBurst(school);
-        return;
-      }
-    }
-  }
 
   private checkKills(state: BattleState, prev: BattleState): void {
     for (const enemy of state.enemies) {

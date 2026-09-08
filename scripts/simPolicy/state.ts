@@ -7,6 +7,11 @@ import {
 } from "../../src/game/effects/census";
 import { bayPurchasable, moduleSlots } from "../../src/game/run/bays";
 import { PERK_BY_ID } from "../../src/data/perks";
+import {
+  drawSalvageOffer,
+  SALVAGE_BY_ID,
+  type SalvageFace,
+} from "../../src/data/salvage";
 import { sectorDef } from "../../src/data/sectors";
 import {
   bayPrice,
@@ -80,6 +85,7 @@ export interface RunState {
   modules: string[];
   banished: string[];
   chartPicks: string[];
+  mutators: string[];
   tide: number;
   jumpsSinceTide: number;
   kills: number;
@@ -96,6 +102,9 @@ export interface RunState {
   eventsResolved: number;
   eventScrap: number;
   eventHull: number;
+  salvageScrap: number;
+  salvagePicks: Record<string, number>;
+  salvageDeclines: number;
   moduleSales: number;
   baysPurchased: number;
   solvedPuzzles: string[];
@@ -137,6 +146,7 @@ export interface RunStateInit {
   perks?: readonly string[];
   modules?: readonly string[];
   chartPicks?: readonly string[];
+  mutators?: readonly string[];
 }
 
 export const createRunState = (init: RunStateInit): RunState => ({
@@ -152,6 +162,7 @@ export const createRunState = (init: RunStateInit): RunState => ({
   modules: [...(init.modules ?? [])],
   banished: [],
   chartPicks: [...(init.chartPicks ?? [])],
+  mutators: [...(init.mutators ?? [])],
   tide: 0,
   jumpsSinceTide: 0,
   vouchers: 0,
@@ -160,6 +171,9 @@ export const createRunState = (init: RunStateInit): RunState => ({
   seenEvents: [],
   eventsResolved: 0,
   eventScrap: 0,
+  salvageScrap: 0,
+  salvagePicks: {},
+  salvageDeclines: 0,
   eventHull: 0,
   moduleSales: 0,
   baysPurchased: 0,
@@ -569,6 +583,66 @@ export const applyEffectsToState = (
       state.deck.sort((a, b) => ptsForDie(a) - ptsForDie(b));
     }
   }
+};
+
+export const SALVAGE_REVEAL_VALUE = 0;
+export const SALVAGE_DISCOUNT_VALUE = 0;
+
+const salvageValue = (state: RunState, face: SalvageFace): number =>
+  face.effects.reduce((sum, effect) => {
+    if (effect.k === "scrap") return sum + effect.n;
+    if (effect.k === "hull") {
+      return (
+        sum +
+        Math.min(effect.n, state.hullMax - state.hull) * EVENT_HULL_VALUE
+      );
+    }
+    if (effect.k === "nodeMod") {
+      return (
+        sum +
+        (effect.mod === "sectorReveal"
+          ? SALVAGE_REVEAL_VALUE
+          : SALVAGE_DISCOUNT_VALUE)
+      );
+    }
+    return sum;
+  }, 0);
+
+export const runSalvage = (
+  state: RunState,
+  stream: RngStream,
+  tideCap: number,
+  forced = "",
+): void => {
+  const offer = drawSalvageOffer(stream);
+  if (forced !== "") {
+    const face = SALVAGE_BY_ID.get(forced);
+    if (face === undefined) return;
+    const before = state.scrap;
+    applyEffectsToState(state, face.effects, tideCap);
+    state.salvageScrap += state.scrap - before;
+    state.salvagePicks[face.id] = (state.salvagePicks[face.id] ?? 0) + 1;
+    return;
+  }
+  let best: SalvageFace | null = null;
+  let bestValue = 0;
+  for (const id of offer) {
+    const face = SALVAGE_BY_ID.get(id);
+    if (face === undefined) continue;
+    const value = salvageValue(state, face);
+    if (best === null || value > bestValue) {
+      best = face;
+      bestValue = value;
+    }
+  }
+  if (best === null || bestValue <= 0) {
+    state.salvageDeclines += 1;
+    return;
+  }
+  const before = state.scrap;
+  applyEffectsToState(state, best.effects, tideCap);
+  state.salvageScrap += state.scrap - before;
+  state.salvagePicks[best.id] = (state.salvagePicks[best.id] ?? 0) + 1;
 };
 
 export const applyNodeMotifs = (

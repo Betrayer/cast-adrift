@@ -37,7 +37,7 @@
       "beacon": "Bake",
       "boss": "Chef",
       "inverted": "umgekehrt",
-      "hole": "Schwarzes Loch"
+      "hole": "Schwarzes Loch: Der Fleck hat diese Zelle verschlungen"
     },
     "previewNode": "{{type}} · Risiko: {{risk}}",
     "previewPocket": "Umweg: bessere Beute, härterer Kampf",
@@ -48,7 +48,9 @@
     },
     "hull": "Hülle {{cur}}/{{max}}",
     "scrap": "Schrott {{n}}",
-    "previewHole": "Schwarzes Loch: Umfliegen oder durch das Wurmloch fahren"
+    "previewHole": "Der Rand entscheidet für den ganzen Fleck: umgehen oder durch das Wurmloch fliegen",
+    "spotLabel": "Schwarzes Loch — der ganze Fleck ist eine einzige Entscheidung",
+    "conditions": "Bedingungen ×{{n}}"
   },
   "event": {
     "title": "Signal",
@@ -202,7 +204,6 @@
     "prologueReplay": "Wiederholung",
     "badgeLegend": "Würfelabzeichen"
   },
-  "consequenceToast": "Folge: {{text}}",
   "rewards": {
     "dieTitle": "Wiederverwertete Matrize",
     "keep": "Im Deck behalten",
@@ -271,7 +272,9 @@
     "dicePlaced": "Würfel gesetzt",
     "pct": "{{n}}%",
     "wormholeRides": "Wurmloch-Fahrten",
-    "holesBypassed": "Übersprungene Löcher"
+    "holesBypassed": "Übersprungene Löcher",
+    "causeSingularity": "Singularität",
+    "cause": "Todesursache"
   },
   "prologue": {
     "title": "Prolog",
@@ -300,6 +303,8 @@
     "tally": "Was du zurückgelassen hast",
     "continue": "Protokoll schließen",
     "deathTitle": "Hier endet der Lauf",
+    "singularityTitle": "Es wird kein Wrack geben",
+    "blackBox": "Das Letzte, worauf die Instrumente sich einigen konnten",
     "deathWhere": "Sektor{{sector}} · Tiefe{{depth}}"
   },
   "setup": {
@@ -325,7 +330,7 @@
     "scrap": "+ „{{n}}“-Ausschnitt",
     "voucher": "Mk-Gutschein × {{n}} – ein kostenloses Upgrade in einer beliebigen Werft",
     "take": "Nimm",
-    "hint": "Wähle eine aus. Anschließend folgt die Auswahl der Vorteile.",
+    "hint": "Nur was du nimmst, verlässt das Paket.",
     "module": "Modul",
     "install": "Installieren",
     "replace": "Ersetzen"
@@ -393,10 +398,11 @@
     "riftSplit": "Spaltung: Die Zweige treffen sich erst am Tor",
     "inversion": "Inverted Row: Systeme werden von hinten nach vorne abgearbeitet",
     "storm": "Wahrscheinlichkeitssturm: Ein platzierter Würfel wird bei der Auswertung erneut gewürfelt",
-    "blackHoles": "Schwarzes Loch: Die Zelle ist verschwunden; ihre Bahn bildet ein Wurmloch",
+    "blackHoles": "Schwarzes Loch: Ein Fleck verschlingt mehrere Zellen; sein Rand bildet ein Wurmloch",
     "wormhole": "Rand des Wurmlochs: Am Rand wartet eine Entscheidung",
     "bypass": "Den Rand gestreift: Der Rumpf wurde von der Flut gestreift",
-    "holeScorch": "Hülle zu dünn, um die Maut zu bezahlen – der Felgenrand ließ dich durch"
+    "holeScorch": "Hülle zu dünn, um die Maut zu bezahlen – der Felgenrand ließ dich durch",
+    "holeDrift": "Der Rand nahm nichts — diese Spur stand dir ohnehin offen"
   },
   "tag": {
     "red": "Rot",
@@ -489,7 +495,13 @@
       "forward": "tiefer",
       "backward": "zurück"
     },
-    "achievement": "Erfolg: {{name}}"
+    "singularity": "Rumpf von der Singularität verschluckt — kein Ausgang verzeichnet",
+    "achievement": "Erfolg: {{name}}",
+    "tabStory": "Geschichte",
+    "tabBattle": "Kampf",
+    "openBattle": "Kampfprotokoll",
+    "battleLive": "Dieser Kampf, neueste Runde zuerst.",
+    "battleLast": "Der letzte Kampf, neueste Runde zuerst."
   },
   "memory": {
     "kicker": "Echo erinnert sich · Auszug {{n}} von {{max}}",
@@ -555,12 +567,14 @@
   },
   "hole": {
     "title": "Schwarzes Loch",
-    "body": "Die Zelle ist verschwunden. Ihr Rand lässt dich entweder vorbeigehen oder bringt dich an einen Ort, den er selbst bestimmt.",
+    "body": "Der Fleck hat diese Zellen genommen. Sein Rand lässt dich entweder herum oder wirft dich dorthin, wohin er will.",
     "gentle": "Stabiles Wurmloch",
     "gentleWhy": "Die ersten beiden Abfahrten einer Abfahrtsserie sind kurz und führen immer tiefer hinab.",
     "bypass": "Umgehen",
     "bypassCost": "Bypass: −Rumpf vom Typ „{{n}}“",
     "bypassFree": "Umgehung: kostenlos – der Rumpf kann nicht bezahlen",
+    "bypassDrift": "Umgehung: kostenlos — eine Spur, die du schon hattest",
+    "bypassNone": "Kein Weg daran vorbei: Jede Spur hinter dem Rand liegt bereits hinter dir",
     "ride": "Probier’s aus!",
     "rideCost": "Fahrt: ein Abstecher von „{{min}}“ nach „{{max}}“, Richtung unbekannt",
     "rideGentle": "Ride: Ein Mix aus „{{min}}“ und „{{max}}“, nur noch intensiver",
@@ -597,5 +611,25 @@
     "toScrap": "→ „scrap“ + „{{n}}“",
     "sellNew": "Das neue Modell verkaufen (+ {{n}})",
     "cancel": "Abbrechen"
+  },
+  "feed": {
+    "source": {
+      "echo": "ECHO",
+      "consequence": "FOLGE",
+      "achievement": "ERFOLG",
+      "system": "SYSTEM"
+    },
+    "dismiss": "Ausblenden",
+    "open": "Im Logbuch öffnen"
+  },
+  "weather": {
+    "title": "Sektorbedingungen"
+  },
+  "salvage": {
+    "title": "Das Wrack bergen",
+    "take": "Nehmen",
+    "decline": "Liegen lassen",
+    "hint": "Eines von dreien. Der Rest verbrennt mit dem Wrack.",
+    "declined": "Bergung: nichts an Bord war die Schneidzeit wert."
   }
 }

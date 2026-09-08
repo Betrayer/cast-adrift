@@ -31,7 +31,12 @@ export type SectorMotif =
   | { m: "collapse"; rows: number; chance: number }
   | { m: "inversion"; rows: number }
   | { m: "storm"; rows: number }
-  | { m: "blackHoles"; count: number; toll: readonly EventEffect[] };
+  | {
+      m: "blackHoles";
+      span: readonly [number, number];
+      disintegrationPct: number;
+      toll: readonly EventEffect[];
+    };
 
 export interface EncounterMix {
   bespokeWeight: number;
@@ -107,7 +112,12 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     },
     motifs: [
       { m: "mineEdges", count: 4, toll: [{ k: "hull", n: -2 }] },
-      { m: "blackHoles", count: 1, toll: [{ k: "hull", n: -1 }] },
+      {
+        m: "blackHoles",
+        span: [3, 4],
+        disintegrationPct: 5,
+        toll: [{ k: "hull", n: -1 }],
+      },
     ],
     pockets: [2, 2],
     pocketTable: [
@@ -132,7 +142,12 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     },
     motifs: [
       { m: "riftSplit", from: 3, to: 6 },
-      { m: "blackHoles", count: 1, toll: [{ k: "hull", n: -1 }] },
+      {
+        m: "blackHoles",
+        span: [3, 4],
+        disintegrationPct: 5,
+        toll: [{ k: "hull", n: -1 }],
+      },
     ],
     pockets: [1, 1],
     pocketTable: [
@@ -161,7 +176,12 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
         blessed: [{ k: "nodeMod", mod: "shipyardDiscount", n: 12 }],
         cursed: [{ k: "tide", n: 1 }],
       },
-      { m: "blackHoles", count: 2, toll: [{ k: "hull", n: -2 }] },
+      {
+        m: "blackHoles",
+        span: [3, 5],
+        disintegrationPct: 5,
+        toll: [{ k: "hull", n: -2 }],
+      },
     ],
     pockets: [2, 2],
     pocketTable: [
@@ -186,7 +206,12 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     },
     motifs: [
       { m: "collapse", rows: 2, chance: 0.5 },
-      { m: "blackHoles", count: 1, toll: [{ k: "hull", n: -2 }] },
+      {
+        m: "blackHoles",
+        span: [3, 4],
+        disintegrationPct: 5,
+        toll: [{ k: "hull", n: -2 }],
+      },
     ],
     pockets: [1, 1],
     pocketTable: [
@@ -212,7 +237,12 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     motifs: [
       { m: "inversion", rows: 3 },
       { m: "storm", rows: 3 },
-      { m: "blackHoles", count: 2, toll: [{ k: "hull", n: -2 }] },
+      {
+        m: "blackHoles",
+        span: [3, 5],
+        disintegrationPct: 5,
+        toll: [{ k: "hull", n: -2 }],
+      },
     ],
     pockets: [2, 2],
     pocketTable: [

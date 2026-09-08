@@ -233,13 +233,15 @@
 .pips {
   position: absolute;
   left: 7px;
+  right: 7px;
   bottom: 4px;
   display: flex;
   gap: 2px;
 }
 
 .pip {
-  width: 4px;
+  flex: 0 1 4px;
+  min-width: 2px;
   height: 4px;
   border-radius: 50%;
   border: 0.75px solid var(--ca-faint);

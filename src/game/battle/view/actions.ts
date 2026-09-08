@@ -91,6 +91,13 @@ export interface NudgeCost {
   free: boolean;
 }
 
+export const nudgeChargePrice = (board: BattleBoard): number =>
+  nudgeChargeCost(
+    sourceMods(board).nudgeCostDelta +
+      computeMutatorMods(board.mutators ?? []).nudgeCostDelta,
+    sourceTrait(board, "coldLogic"),
+  );
+
 export const nudgeCostFor = (
   board: BattleBoard,
   die?: Pick<RolledDie, "uid" | "defId">,
@@ -100,14 +107,7 @@ export const nudgeCostFor = (
     dieHasGrant(board.engravings, die.defId, "freeNudge") &&
     !board.spentGrants.includes(`nudge:${die.uid}`);
   if (springFree || board.freeNudges > 0) return { cost: 0, free: true };
-  return {
-    cost: nudgeChargeCost(
-      sourceMods(board).nudgeCostDelta +
-        computeMutatorMods(board.mutators ?? []).nudgeCostDelta,
-      sourceTrait(board, "coldLogic"),
-    ),
-    free: false,
-  };
+  return { cost: nudgeChargePrice(board), free: false };
 };
 
 export const fateMaxUses = (board: BattleBoard): number =>

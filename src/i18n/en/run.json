@@ -37,7 +37,7 @@
       "beacon": "Beacon",
       "boss": "Boss",
       "inverted": "inverted",
-      "hole": "Black hole"
+      "hole": "Black hole: the spot swallowed this cell"
     },
     "previewNode": "{{type}} · risk: {{risk}}",
     "previewPocket": "Detour: better loot, tougher fight",
@@ -48,7 +48,9 @@
     },
     "hull": "Hull {{cur}}/{{max}}",
     "scrap": "Scrap {{n}}",
-    "previewHole": "Black hole: go around, or ride the wormhole"
+    "previewHole": "The rim answers for the whole spot: go around it, or ride the wormhole through",
+    "spotLabel": "Black hole — the whole spot is one choice",
+    "conditions": "Conditions ×{{n}}"
   },
   "event": {
     "title": "Signal",
@@ -202,7 +204,6 @@
     "prologueReplay": "Replay",
     "badgeLegend": "Die badges"
   },
-  "consequenceToast": "Consequence: {{text}}",
   "rewards": {
     "dieTitle": "Salvaged die",
     "keep": "Keep in deck",
@@ -271,7 +272,9 @@
     "dicePlaced": "Dice placed",
     "pct": "{{n}}%",
     "wormholeRides": "Wormhole rides",
-    "holesBypassed": "Holes bypassed"
+    "holesBypassed": "Holes bypassed",
+    "causeSingularity": "Singularity",
+    "cause": "Cause of death"
   },
   "prologue": {
     "title": "Prologue",
@@ -300,6 +303,8 @@
     "tally": "What you left behind",
     "continue": "Close the log",
     "deathTitle": "The run ends here",
+    "singularityTitle": "There will be no wreck",
+    "blackBox": "The last thing the instruments managed to agree on",
     "deathWhere": "Sector {{sector}} · depth {{depth}}"
   },
   "setup": {
@@ -325,7 +330,7 @@
     "scrap": "+{{n}} scrap",
     "voucher": "Mk-voucher ×{{n}} — one free upgrade at any shipyard",
     "take": "Take",
-    "hint": "Pick one. The perk draft follows.",
+    "hint": "Only what you take leaves the package.",
     "module": "module",
     "install": "Install",
     "replace": "Replace"
@@ -393,10 +398,11 @@
     "riftSplit": "Rift split: the branches only meet at the gate",
     "inversion": "Inverted row: systems resolve last to first",
     "storm": "Probability storm: one placed die re-rolls at resolution",
-    "blackHoles": "Black hole: the cell is gone; its lane offers a wormhole",
+    "blackHoles": "Black hole: one spot swallows several cells; its rim offers a wormhole",
     "wormhole": "Wormhole edge: a choice waits at the rim",
     "bypass": "Skirted the rim: hull scraped by the tide",
-    "holeScorch": "Hull too thin to pay the toll — the rim let you past"
+    "holeScorch": "Hull too thin to pay the toll — the rim let you past",
+    "holeDrift": "The rim took nothing — that lane was already open to you"
   },
   "tag": {
     "red": "Red",
@@ -489,7 +495,13 @@
       "forward": "deeper",
       "backward": "back"
     },
-    "achievement": "Achievement: {{name}}"
+    "singularity": "Hull taken by the singularity — no exit recorded",
+    "achievement": "Achievement: {{name}}",
+    "tabStory": "Story",
+    "tabBattle": "Battle",
+    "openBattle": "Battle log",
+    "battleLive": "This fight, newest turn first.",
+    "battleLast": "The last fight, newest turn first."
   },
   "memory": {
     "kicker": "Echo remembers · fragment {{n}} of {{max}}",
@@ -555,12 +567,14 @@
   },
   "hole": {
     "title": "Black hole",
-    "body": "The cell is gone. Its rim will either let you around, or take you somewhere it picks.",
+    "body": "The spot has taken these cells. Its rim will either let you around, or throw you somewhere it picks.",
     "gentle": "Stable wormhole",
     "gentleWhy": "The first two rides of a run are short and always go deeper.",
     "bypass": "Go around",
     "bypassCost": "Bypass: −{{n}} hull",
     "bypassFree": "Bypass: free — the hull cannot pay",
+    "bypassDrift": "Bypass: free — a lane you already had",
+    "bypassNone": "No way around: every lane past the rim is already behind you",
     "ride": "Ride it",
     "rideCost": "Ride: a throw of {{min}}–{{max}}, direction unknown",
     "rideGentle": "Ride: a throw of {{min}}–{{max}}, deeper only",
@@ -597,5 +611,25 @@
     "toScrap": "→ scrap +{{n}}",
     "sellNew": "Sell the new one (+{{n}})",
     "cancel": "Cancel"
+  },
+  "feed": {
+    "source": {
+      "echo": "ECHO",
+      "consequence": "CONSEQUENCE",
+      "achievement": "ACHIEVEMENT",
+      "system": "SYSTEM"
+    },
+    "dismiss": "Dismiss",
+    "open": "Open in the journal"
+  },
+  "weather": {
+    "title": "Sector conditions"
+  },
+  "salvage": {
+    "title": "Salvage the wreck",
+    "take": "Take",
+    "decline": "Leave it",
+    "hint": "One of the three. The rest burns with the hulk.",
+    "declined": "Salvage: nothing aboard was worth the cutting time."
   }
 }

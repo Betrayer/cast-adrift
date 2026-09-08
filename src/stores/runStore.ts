@@ -13,9 +13,11 @@ import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
 import type { WormholeThrow } from "@/game/map/wormhole";
-import type { SlotId } from "@/types/battle";
+import type { BattleLogEntry, SlotId } from "@/types/battle";
 import type { Rarity } from "@/types/content";
 import type { FlagValue } from "@/types/events";
+
+export const LAST_BATTLE_LOG_CAP = 60;
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
 
@@ -136,6 +138,7 @@ export interface PendingRewards {
   perkChoices: string[];
   dieChoices?: string[];
   moduleChoices?: string[];
+  salvage?: string[];
   voucher?: boolean;
   packageScrap?: number;
   draftNodeId?: NodeId;
@@ -193,6 +196,7 @@ export interface RunValues {
   battleEndHealRun: number;
   rerollSizeRun: number;
   bonusReveal: number;
+  sectorReveal: number;
   shipyardDiscount: number;
   pendingBattle: PendingBattle | null;
   pendingWormhole: NodeId | null;
@@ -200,6 +204,7 @@ export interface RunValues {
   pendingDeepScan: boolean;
   pendingRewards: PendingRewards | null;
   lastTally: BattleTally | null;
+  lastBattleLog: BattleLogEntry[];
   shop: ShopState | null;
   deckSeq: number;
   stats: RunStats;
@@ -250,6 +255,7 @@ export interface RunState extends RunValues {
   addBattleEndHeal: (n: number) => void;
   addRerollSizeRun: (n: number) => void;
   addBonusReveal: (n: number) => void;
+  addSectorReveal: (n: number) => void;
   addShipyardDiscount: (n: number) => void;
   setPendingBattle: (pending: PendingBattle | null) => void;
   bumpStats: (delta: Partial<RunStats>) => void;
@@ -257,6 +263,7 @@ export interface RunState extends RunValues {
   noteHullPct: (pct: number) => void;
   noteBattleTally: (tally: BattleTally) => void;
   clearBattleTally: () => void;
+  keepBattleLog: (log: readonly BattleLogEntry[]) => void;
   clearPendingDeepScan: () => void;
   setPendingDeepScan: (value: boolean) => void;
   setPendingRewards: (rewards: PendingRewards | null) => void;
@@ -350,6 +357,7 @@ export const createInitialRunValues = (): RunValues => ({
   battleEndHealRun: 0,
   rerollSizeRun: 0,
   bonusReveal: 0,
+  sectorReveal: 0,
   shipyardDiscount: 0,
   pendingBattle: null,
   pendingWormhole: null,
@@ -357,6 +365,7 @@ export const createInitialRunValues = (): RunValues => ({
   pendingDeepScan: false,
   pendingRewards: null,
   lastTally: null,
+  lastBattleLog: [],
   shop: null,
   deckSeq: 0,
   stats: createInitialRunStats(),
@@ -620,6 +629,10 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set((s) => ({ bonusReveal: Math.max(0, s.bonusReveal + n) }));
   },
 
+  addSectorReveal: (n) => {
+    set((s) => ({ sectorReveal: Math.max(0, s.sectorReveal + n) }));
+  },
+
   addShipyardDiscount: (n) => {
     set((s) => ({
       shipyardDiscount: Math.max(
@@ -693,6 +706,14 @@ export const useRunStore = create<RunState>()((set, get) => ({
 
   clearBattleTally: () => {
     set({ lastTally: null });
+  },
+
+  keepBattleLog: (log) => {
+    set({
+      lastBattleLog: log
+        .slice(Math.max(0, log.length - LAST_BATTLE_LOG_CAP))
+        .map((entry) => ({ ...entry })),
+    });
   },
 
   clearPendingDeepScan: () => {
