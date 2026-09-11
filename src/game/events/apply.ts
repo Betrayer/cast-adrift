@@ -6,7 +6,7 @@ import { dieForRarity } from "@/game/economy/rewards";
 import { settleAchievements } from "@/game/meta/achievements";
 import { noteEventResolved } from "@/game/meta/counters";
 import { ptsForDie } from "@/game/economy/prices";
-import { grantDie } from "@/game/run/inventory";
+import { grantCargo, grantDie, grantOfficer } from "@/game/run/inventory";
 import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
 import { emitRunHook } from "@/game/run/runEffects";
 import { playSfx } from "@/services/audio";
@@ -93,6 +93,12 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
       return;
     case "swapLowestDie":
       applySwapLowest(stream);
+      return;
+    case "officer":
+      grantOfficer(effect.id);
+      return;
+    case "cargo":
+      grantCargo(effect.id);
       return;
     case "battleMod":
       run.addBattleMod({

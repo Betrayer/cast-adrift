@@ -10,6 +10,7 @@ const stub = (body: Partial<ShipDef>): ShipDef => ({
   id: "ram-proto",
   name: "content:ships.ram-proto.name",
   hullMax: 30,
+  cargoHold: 1,
   slots: {},
   bridgeTheme: { tint: "grey", frame: "raw", pins: {} },
   price: 0,

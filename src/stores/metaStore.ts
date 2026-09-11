@@ -6,6 +6,13 @@ import { CHART_NODE_BY_ID } from '@/data/chart';
 import { DEFAULT_DIE_SKIN, isDieSkinId } from '@/data/cosmetics';
 import { STARTER_DECK } from '@/data/decks';
 import { DIE_BY_ID } from '@/data/dice';
+import {
+  echoNodeDef,
+  echoUnlocked,
+  isEchoNodeId,
+  type EchoNodeId,
+} from '@/data/echo';
+import { memoryFragmentCount } from '@/data/narrative/memories';
 import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
 import { isThemeId, type ThemeId } from '@/data/themes';
@@ -107,6 +114,7 @@ export interface MetaValues {
   collection: CollectionEntry[];
   ships: ShipId[];
   selectedShip: ShipId;
+  selectedEcho: EchoNodeId | null;
   hangar: { deck: string[] };
   themes: string[];
   tutorialSeen: string[];
@@ -182,12 +190,13 @@ export interface MetaState extends MetaValues {
   grantUnlock: (id: string) => boolean;
   markUnlocksSeen: (ids: readonly string[]) => void;
   recordEncounters: (list: readonly RunEncounter[]) => EncounterResult;
+  selectEcho: (id: EchoNodeId | null) => void;
   setDieSkin: (id: string) => void;
   setPrefs: (patch: AccountPrefs) => void;
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 17;
+export const META_VERSION = 18;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -290,6 +299,7 @@ export const createInitialMetaValues = (): MetaValues => ({
   collection: buildStarterCollection(),
   ships: ['wanderer'],
   selectedShip: 'wanderer',
+  selectedEcho: null,
   hangar: { deck: [...STARTER_DECK] },
   themes: ['deepSpace'],
   tutorialSeen: [],
@@ -487,6 +497,9 @@ export const migrateMeta = (
     collection: coerceCollection(prev.collection),
     ships,
     selectedShip,
+    selectedEcho: isEchoNodeId(prev.selectedEcho)
+      ? prev.selectedEcho
+      : base.selectedEcho,
     hangar:
       typeof prev.hangar === 'object' &&
       prev.hangar !== null &&
@@ -680,6 +693,17 @@ export const useMetaStore = create<MetaState>()(
       selectShip: (id) => {
         if (!get().ships.includes(id)) return;
         set({ selectedShip: id });
+      },
+
+      selectEcho: (id) => {
+        if (id === null) {
+          set({ selectedEcho: null });
+          return;
+        }
+        const def = echoNodeDef(id);
+        if (def === undefined) return;
+        if (!echoUnlocked(def, memoryFragmentCount(get().codex))) return;
+        set({ selectedEcho: def.id });
       },
 
       buyShip: (id, price) => {
@@ -981,6 +1005,7 @@ export const useMetaStore = create<MetaState>()(
         collection: s.collection,
         ships: s.ships,
         selectedShip: s.selectedShip,
+        selectedEcho: s.selectedEcho,
         hangar: s.hangar,
         themes: s.themes,
         tutorialSeen: s.tutorialSeen,

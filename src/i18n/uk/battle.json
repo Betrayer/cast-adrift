@@ -167,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} шкоди · {{split}}"
   },
   "block": {
     "resolving": "Зачекай, поки хід розв’яжеться",
@@ -181,7 +183,13 @@
     "reserveFull": "Резерв заповнено",
     "used": "Уже використано цього ходу",
     "hullLow": "Замало корпусу",
+    "notAllowed": "Зараз так не можна",
+    "occupied": "У слоті вже є кість",
+    "tierCap": "Кість завелика для слота",
+    "slotBlocked": "Слот заблоковано цього ходу",
+    "dieLocked": "Ця кість заблокована",
     "noPartner": "Для відпалу потрібна друга кость того самого значення в лотку.",
+    "needsTwoEnemies": "Режиму вогню потрібні дві живі цілі",
     "spent": "Корабель може зробити це один раз за бій."
   },
   "resPrism": "призматична кість рахується за цю школу",
@@ -203,6 +211,7 @@
     "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -381,5 +390,15 @@
       "fold": "складає порядок",
       "devour": "пожирає кубик"
     }
+  },
+  "mode": {
+    "title": "Режим вогню",
+    "label": "Режим вогню: {{mode}}"
+  },
+  "echo": {
+    "after": "Далі",
+    "fork": "{{cond}} — {{then}}. Інакше — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Тягнеться з патерну — не задано."
   }
 }

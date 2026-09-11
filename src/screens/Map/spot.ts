@@ -1,4 +1,5 @@
 import {
+  areConnected,
   wormholeFor,
   type HoleSpot,
   type MapGraph,
@@ -98,6 +99,18 @@ export const bypassOfferFor = (
   const waived = offered && holeTollWaived(map, from, hole, visited);
   return { offered, waived, toll: waived ? 0 : holeTollFor(sector, hull) };
 };
+
+export const adjacentBypassOffer = (
+  map: MapGraph,
+  from: NodeId,
+  node: MapNode,
+  visited: readonly NodeId[],
+  sector: number,
+  hull: number,
+): BypassOffer | null =>
+  node.hole !== true || !areConnected(map, from, node.id)
+    ? null
+    : bypassOfferFor(map, from, node.id, visited, sector, hull);
 
 export const bypassCopyKey = (offer: BypassOffer): LocKey => {
   if (!offer.offered) return "run:hole.bypassNone";

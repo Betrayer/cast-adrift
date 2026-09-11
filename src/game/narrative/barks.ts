@@ -20,6 +20,7 @@ const MAJOR_TRIGGERS: ReadonlySet<string> = new Set([
   "levelUp",
   "wormholeRide",
   "holeBypass",
+  "officerRescued",
 ]);
 
 const MAJOR_PREFIXES: readonly string[] = ["sectorEnter:"];
@@ -39,6 +40,9 @@ const rng = (): RngStream => {
 };
 
 const clock = (): number => Date.now();
+
+export const barkBudgetWaitMs = (): number =>
+  Math.max(0, GLOBAL_MS - (clock() - lastBarkAt));
 
 export const resetBarkMemory = (): void => {
   recent = [];

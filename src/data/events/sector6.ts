@@ -107,6 +107,18 @@ export const SECTOR6_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "haul",
+        label: "content:events.retroSalvage.haul",
+        requires: { req: "cargo", id: "keeperArchive" },
+        outcomes: [
+          {
+            text: "content:events.retroSalvage.haulOut",
+            effects: [{ k: "cargo", id: "keeperArchive" }],
+            consequence: "content:consequence.cargoTaken",
+          },
+        ],
+      },
     ],
   },
   {

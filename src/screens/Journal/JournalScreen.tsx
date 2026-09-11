@@ -7,6 +7,7 @@ import { tokens } from "@/app/theme";
 import { useScreenParam } from "@/app/useScreenParam";
 import { AxisMeter, axisTone } from "@/components/AxisMeter";
 import { beaconsResolved, BEACON_FLAGS } from "@/data/events/beacons";
+import { cargoName } from "@/data/cargo";
 import { chainViews } from "@/data/narrative/chains";
 import { achievementTitleById } from "@/game/meta/achievements";
 import { SPEAKER_TONE } from "@/data/speakers";
@@ -28,6 +29,7 @@ const MARKER: Record<JournalEntry["k"], string> = {
   achievement: "✧",
   axis: "±",
   wormhole: "◉",
+  cargo: "▣",
   singularity: "●",
   bark: "◆",
   system: "▪",
@@ -105,6 +107,11 @@ const EntryRow = ({ entry }: { entry: JournalEntry }) => {
         return t(`run:journal.wormhole.${entry.branch}`, {
           rows: Math.abs(entry.rows),
           way: t(`run:journal.wormholeWay.${entry.direction}`),
+        });
+      case "cargo":
+        return t(`run:journal.cargo.${entry.step}`, {
+          name: t(cargoName(entry.cargo)),
+          n: entry.n,
         });
       case "singularity":
         return t("run:journal.singularity");

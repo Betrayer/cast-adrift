@@ -1046,7 +1046,8 @@
     "remainderReturned": "The remainder is back in its gap.",
     "thresholdHeard": "The needle did not move.",
     "thresholdCommitted": "You gave the marker a side.",
-    "thresholdWalked": "You left the needle alone."
+    "thresholdWalked": "You left the needle alone.",
+    "cargoTaken": "you took risk cargo aboard and marked the drop"
   },
   "events": {
     "driftingPod": {
@@ -1548,12 +1549,14 @@
       "opt": {
         "buy": "Buy the reroll rig (35)",
         "swap": "Trade in your worst die",
-        "pass": "Sell her your junk instead"
+        "pass": "Sell her your junk instead",
+        "haul": "Take the crate she keeps under the counter"
       },
       "out": {
         "buy": "She bolts a scavenged sorting rig into your tray. It rattles. It also works.",
         "swap": "She takes your worst die without comment and hands back something with a different kind of wrong in it.",
-        "pass": "She buys the lot at a fair price, which from Mara is practically a compliment."
+        "pass": "She buys the lot at a fair price, which from Mara is practically a compliment.",
+        "haul": "Choir plate, ground down past its numbers. She does not ask where you are taking it, and that silence is part of the price."
       }
     },
     "clanToll": {
@@ -1727,11 +1730,13 @@
       "text": "A vein of Rift shards, growing out of nothing, cut clean by something that isn't there.",
       "opt": {
         "cutShards": "Cut a shard",
-        "mapVein": "Map the vein"
+        "mapVein": "Map the vein",
+        "haul": "Cut the core loose and haul it"
       },
       "out": {
         "cutShards": "It comes away as a prismatic chip. The recoil takes a bite out of the hull.",
-        "mapVein": "You sell the survey ahead and read two rows of lane off the same data."
+        "mapVein": "You sell the survey ahead and read two rows of lane off the same data.",
+        "haul": "It comes out of the vein and keeps humming. Somebody down the lane pays for humming, and your reactor will have to make room."
       }
     },
     "relayEcho": {
@@ -1891,12 +1896,14 @@
       "opt": {
         "raidIt": "Take the reliquary",
         "trade": "Trade for it",
-        "catalogue": "Catalogue it properly"
+        "catalogue": "Catalogue it properly",
+        "haul": "Carry the reliquary to its station"
       },
       "out": {
         "raidIt": "You commit. The cantor stops singing and starts firing.",
         "trade": "They accept a yellow core as tribute and swap you something stranger.",
-        "catalogue": "You inventory the reliquary instead of stripping it. The Choir's own quartermasters buy the list, and a yard three jumps on honours the paperwork."
+        "catalogue": "You inventory the reliquary instead of stripping it. The Choir's own quartermasters buy the list, and a yard three jumps on honours the paperwork.",
+        "haul": "Sealed, listed and expected somewhere ahead. It rides against the shield emitters the whole way, and they do not like it."
       }
     },
     "choirTithe": {
@@ -2055,12 +2062,14 @@
       "opt": {
         "buyOut": "Buy her out",
         "sellShip": "Sell her your plating",
-        "walkPast": "Walk past"
+        "walkPast": "Walk past",
+        "haul": "Take the crate under her counter"
       },
       "out": {
         "buyOut": "She hands over the good crate without haggling, which is how you know it's the end.",
         "sellShip": "She pays honestly for the armour. You will feel this later.",
-        "walkPast": "«Suit yourself.» She still slips you a repair kit on the way out."
+        "walkPast": "«Suit yourself.» She still slips you a repair kit on the way out.",
+        "haul": "«Sleepers. Paid for, not mine.» She does not say whose they are. They cost air, and out here air is paid in hull."
       }
     },
     "maraLedger": {
@@ -2401,13 +2410,15 @@
       "opt": {
         "bidHigh": "Outbid them all",
         "backScript": "Back the fleet bidder",
-        "jamAuction": "Jam the auction"
+        "jamAuction": "Jam the auction",
+        "haul": "Take the unsold lot on consignment"
       },
       "out": {
         "bidHigh": "The manifest is real. Half of it is already salvaged, and the other half is worth the whole bid.",
         "bidHighDud": "The cargo is gone. The routes on the manifest are not, and routes out here are almost cargo.",
         "backScript": "You vouch for the script on an open channel. Somebody's grandmother's pay finally buys something.",
-        "jamAuction": "Nobody wins it. You collect the lot at the reserve price two hours later, from a very annoyed clerk."
+        "jamAuction": "Nobody wins it. You collect the lot at the reserve price two hours later, from a very annoyed clerk.",
+        "haul": "Nobody bought the coils. The clerk hands them over with a delivery address and no warranty, and the first gun runs a size smaller beside them."
       }
     },
     "wardenPatrolBoat": {
@@ -2985,14 +2996,16 @@
       "opt": {
         "splitIt": "Offer to split it",
         "raceThem": "Race them for it",
-        "giveWay": "Give them the wreck"
+        "giveWay": "Give them the wreck",
+        "haul": "Take his live hold off him"
       },
       "out": {
         "splitIt": "Half each and both of you out before the tide. It goes better than either of you expected.",
         "splitItBetter": "They know the hull class and you know the wiring. Together you get to something neither would have found.",
         "raceThem": "You are faster. They are still cutting when you undock, and they say nothing at all.",
         "raceThemLose": "They are faster. You take a torch burn across the arm proving otherwise.",
-        "giveWay": "You undock and leave the cut open for them. They log your registry as one of the good ones."
+        "giveWay": "You undock and leave the cut open for them. They log your registry as one of the good ones.",
+        "haul": "He is out of air for them and says so without dressing it up. A hold of sleepers, a station that will take them, and a hull that pays at every node."
       }
     },
     "frozenBroadcast": {
@@ -3109,13 +3122,15 @@
       "opt": {
         "readIt": "Read the top layer",
         "postYours": "Post your own",
-        "stripBoard": "Strip the whole board"
+        "stripBoard": "Strip the whole board",
+        "haul": "Take the ballast run"
       },
       "out": {
         "readIt": "Two salvage tips, one warning about a lane, and a name you will hear again before the sector is out.",
         "readItOld": "Under this week there is a salvage claim nobody ever filed. It is still valid, technically.",
         "postYours": "You write your registry, your heading and one line about what you are looking for. It is the first honest thing you have done all week.",
-        "stripBoard": "Forty years of paper, one plate of good alloy underneath. You take the plate."
+        "stripBoard": "Forty years of paper, one plate of good alloy underneath. You take the plate.",
+        "haul": "A shielding-ballast haul: four crates and an address a few rows on. The engines will feel every kilo of it."
       }
     },
     "hushAntechamber": {
@@ -3135,7 +3150,9 @@
       "log": "File it and sell the coordinates",
       "logOut": "Somebody in the Rim will pay for a buoy that files itself. You let them find out the rest on their own time.",
       "leave": "Leave it sealed",
-      "leaveOut": "You log the position and move on. Four hours later Echo notes, without comment, that the buoy is gone."
+      "leaveOut": "You log the position and move on. Four hours later Echo notes, without comment, that the buoy is gone.",
+      "haul": "Take the archive drum",
+      "haulOut": "A keeper's log no keeper has written yet, addressed to a station you have not reached. Carrying it pulls the needle toward order, and it does not ask first."
     },
     "foldedYard": {
       "text": "Mara's stall is here. It should not be — you left her nineteen jumps and one act behind. She is restocking, badly, from crates that keep arriving before she orders them.",
@@ -3936,6 +3953,16 @@
       "3": "Distance stopped being a promise about a minute ago.",
       "4": "Log it as a jump. The log will be lying.",
       "5": "We went in, and then we were here. I have no middle to report."
+    },
+    "cargoDelivered": {
+      "1": "Hold's empty and the ledger isn't. I'll take that trade.",
+      "2": "Signed for, paid for, gone. The ship rides lighter.",
+      "3": "They took it without opening it. Wise of them."
+    },
+    "officerRescued": {
+      "1": "A cabin is taken. I had stopped counting more than one living soul aboard.",
+      "2": "You did not sail past. Logged — this journal does not see that often.",
+      "3": "Someone took a bunk. The crew is no longer just you and me."
     }
   },
   "blackbox": {
@@ -4510,11 +4537,11 @@
     },
     "piercer": {
       "name": "Piercer",
-      "desc": "The first hit each battle ignores shields, and the Spinal Mount deals 2 extra damage for each Pierce item you carry."
+      "desc": "The first hit each battle ignores shields, and the Spinal Mount deals 2 extra damage for each Pierce item you carry. Weapons learn the Shaped Charge mode."
     },
     "emberInjector": {
       "name": "Ember Injector",
-      "desc": "Every die that resolves in Weapons B applies Burn 2."
+      "desc": "Every die that resolves in Weapons B applies Burn 2. Weapons learn the Incendiary mode."
     },
     "railCradle": {
       "name": "Rail Cradle",
@@ -4522,7 +4549,7 @@
     },
     "targetingMesh": {
       "name": "Targeting Mesh",
-      "desc": "Marks are worth +1, and resolving Sensors adds +2 to the die waiting in Weapons A."
+      "desc": "Marks are worth +1, and resolving Sensors adds +2 to the die waiting in Weapons A. Weapons learn the Linked Fire mode."
     },
     "overpressure": {
       "name": "Overpressure",
@@ -4538,7 +4565,7 @@
     },
     "lanceCapacitor": {
       "name": "Lance Capacitor",
-      "desc": "Each weapon die that resolves with 6 or more charge banked spends 6 of it for +5."
+      "desc": "Each weapon die that resolves with 6 or more charge banked spends 6 of it for +5. Weapons learn the Shunt mode."
     },
     "executioner": {
       "name": "Executioner",
@@ -4646,7 +4673,7 @@
     },
     "autoloader": {
       "name": "Autoloader Array",
-      "desc": "An extra red d6 joins your tray every battle, and every third weapon slot resolved racks another one for the next turn."
+      "desc": "An extra red d6 joins your tray every battle, and every third weapon slot resolved racks another one for the next turn. Weapons learn the Doublet mode."
     },
     "prophecyMount": {
       "name": "Prophecy Mount",
@@ -4663,6 +4690,43 @@
     "nonEuclidRack": {
       "name": "Non-Euclidean Rack",
       "desc": "Every slot accepts a die of any tier at 1 hull each time it resolves; charge cap −3."
+    }
+  },
+  "fireModes": {
+    "direct": {
+      "name": "Direct",
+      "desc": "Deal the die's damage to the chosen target — the baseline.",
+      "short": "DIR"
+    },
+    "scatter": {
+      "name": "Scatter",
+      "desc": "Damage splits across every living enemy, +{{fragmentBonus}} per fragment. Needs {{minEnemies}} living targets.",
+      "short": "SCT"
+    },
+    "doublet": {
+      "name": "Doublet",
+      "desc": "{{hits}} hits of half the damage each, rounded up, on the chosen target.",
+      "short": "DUO"
+    },
+    "shaped": {
+      "name": "Shaped Charge",
+      "desc": "On a max face, strip shield up to the die value before damage; on any other face, −{{offFacePenalty}} damage.",
+      "short": "SHP"
+    },
+    "incendiary": {
+      "name": "Incendiary",
+      "desc": "−{{damagePenalty}} damage; the target takes Burn {{burn}}.",
+      "short": "INC"
+    },
+    "linked": {
+      "name": "Linked Fire",
+      "desc": "+{{perDie}} damage per other die of the same school placed this turn, up to +{{cap}}.",
+      "short": "LNK"
+    },
+    "shunt": {
+      "name": "Shunt",
+      "desc": "−{{damagePenalty}} damage; +{{charge}} charge.",
+      "short": "SHU"
     }
   },
   "engravings": {
@@ -5326,6 +5390,145 @@
       "name": "Spare Parts",
       "desc": "Trade its parts on: 25 scrap off one shipyard upgrade.",
       "line": "Salvage: a crate of clean parts. The next dock will knock 25 scrap off an upgrade for them."
+    }
+  },
+  "officers": {
+    "scrapper": {
+      "name": "the Scrapper",
+      "role": "hull hand",
+      "desc": "Came out of a survivor pod with a torch and a grudge against holes. Welds plating mid-fight; sorts the salvage the rest of the time.",
+      "origin": "Rescued: Sector 1, survivor pod",
+      "short": "Scrapper +{{n}}♥ · −{{c}}⚡"
+    },
+    "mechanic": {
+      "name": "the Mechanic",
+      "role": "engineer",
+      "desc": "Ran from something worse and stayed to earn her keep. Reroutes the racks for one more throw, and patches the hull after every fight.",
+      "origin": "Rescued: Sector 1, aft crawlspace",
+      "short": "Mechanic +{{n}}↻"
+    },
+    "defector": {
+      "name": "the Defector",
+      "role": "navigator",
+      "desc": "Reads Choir routing like a map. Calls the shot before you take it, and the sensors bite a little deeper with her on the board.",
+      "origin": "Rescued: Sector 4, stolen skiff",
+      "short": "Defector · mark {{n}}"
+    },
+    "welder": {
+      "name": "the Welder",
+      "role": "hull tech",
+      "desc": "One of the four off the petition, and one of the two who can weld. Throws a plate up when it is needed; the hull rides lighter with her aboard.",
+      "origin": "Rescued: taken aboard off the petition",
+      "short": "Welder +{{n}} shield"
+    },
+    "breaker": {
+      "name": "the Breaker",
+      "role": "crew chief",
+      "desc": "Eleven came aboard and she runs them. They crank the reactor when it matters and strip every kill down to the bolts.",
+      "origin": "Rescued: the breaker crew, eleven hours of air",
+      "short": "Breaker +{{n}}⚡"
+    },
+    "chorister": {
+      "name": "the Chorister",
+      "role": "signals",
+      "desc": "Nine walked out of that class. This one found the frequency the hymn rides on and learned to sit on it.",
+      "origin": "Rescued: Sector 4, the Choir's school",
+      "short": "Chorister · jam"
+    }
+  },
+  "cargo": {
+    "unstableCore": {
+      "name": "Unstable Core",
+      "desc": "The reactor slot runs {{n}} tier smaller for as long as it is aboard."
+    },
+    "liveHold": {
+      "name": "Live Cargo",
+      "desc": "Costs {{n}} hull at every node you clear while it is aboard."
+    },
+    "overwoundCoils": {
+      "name": "Overwound Coils",
+      "desc": "The first weapon slot runs {{n}} tier smaller for as long as it is aboard."
+    },
+    "saintsReliquary": {
+      "name": "Saint's Reliquary",
+      "desc": "The shield slot runs {{n}} tier smaller for as long as it is aboard."
+    },
+    "leadBallast": {
+      "name": "Lead Ballast",
+      "desc": "The engine slot runs {{n}} tier smaller for as long as it is aboard."
+    },
+    "stasisPods": {
+      "name": "Stasis Pods",
+      "desc": "Costs {{n}} hull at every node you clear while it is aboard."
+    },
+    "choirContraband": {
+      "name": "Choir Contraband",
+      "desc": "Taking it moves the axis {{n}} toward Resonance, once."
+    },
+    "keeperArchive": {
+      "name": "Keeper's Archive",
+      "desc": "Taking it moves the axis {{n}} toward Stability, once."
+    }
+  },
+  "echo": {
+    "branch": {
+      "tactician": "Tactician",
+      "navigator": "Navigator",
+      "keeper": "Keeper"
+    },
+    "cond": {
+      "selfHpPctLt": "if it is under {{n}}% hull",
+      "selfShielded": "if its shield holds",
+      "playerShielded": "if your shield holds",
+      "playerChargeAtLeast": "if you hold {{n}} charge or more",
+      "playerHullPctLt": "if you are under {{n}}% hull",
+      "alliesAtLeast": "if {{n}} of them are still standing",
+      "turnGte": "from turn {{n}} on"
+    },
+    "secondLook": {
+      "name": "Second Look",
+      "desc": "Once per battle: the {{n}} lowest dice in the tray roll again and keep the better face. No reroll is spent.",
+      "short": "Second Look · {{n}} dice"
+    },
+    "readout": {
+      "name": "Readout",
+      "desc": "When an enemy's next move forks, its card names the fork: the condition, and both answers.",
+      "short": "Readout · forks named"
+    },
+    "calculus": {
+      "name": "Firing Solution",
+      "desc": "Once per battle: every weapon strike in the next volley lands for +{{n}}.",
+      "short": "Firing Solution +{{n}}"
+    },
+    "echolocation": {
+      "name": "Echolocation",
+      "desc": "+{{n}} row of map sight, for the whole run.",
+      "short": "Echolocation +{{n}} row"
+    },
+    "pathGhost": {
+      "name": "Ghost Path",
+      "desc": "The preview reads a node {{n}} row past the one you can jump to. It does not become jumpable.",
+      "short": "Ghost Path +{{n}} row"
+    },
+    "softLanding": {
+      "name": "Soft Landing",
+      "desc": "Once per run: a wormhole sets you down on the nearest open node ahead. Nothing is rolled.",
+      "short": "Soft Landing · 1/run"
+    },
+    "reserve": {
+      "name": "Power Reserve",
+      "desc": "Every battle opens with +{{n}} charge.",
+      "short": "Reserve +{{n}}⚡"
+    },
+    "shieldEcho": {
+      "name": "Shield Echo",
+      "desc": "A hit the shield swallows whole returns +{{n}} charge.",
+      "short": "Shield Echo +{{n}}⚡"
+    },
+    "veto": {
+      "name": "Veto",
+      "desc": "Once per run: a Fate roll or an event outcome that would take the hull to zero leaves it at {{n}}.",
+      "short": "Veto · 1/run"
     }
   }
 }

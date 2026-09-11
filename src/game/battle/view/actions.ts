@@ -1,7 +1,20 @@
 import { DIE_BY_ID } from "@/data/dice";
+import {
+  echoIsBattleActive,
+  echoNodeDef,
+  echoToken,
+  type EchoNodeDef,
+} from "@/data/echo";
 import { dieHasGrant } from "@/data/engravings";
 import { FATE_DIE_ID } from "@/data/fate";
 import { computeMutatorMods } from "@/data/mutators";
+import {
+  officerActiveDead,
+  officerChargeCost,
+  officerDef,
+  officerToken,
+  type OfficerDef,
+} from "@/data/officers";
 import {
   canBank,
   canCopy,
@@ -13,6 +26,7 @@ import {
   isFuseTarget,
 } from "@/game/battle/actives";
 import { passiveActionOf, type PassiveActionId } from "@/game/battle/passives";
+import { aimedEnemy } from "@/game/battle/target";
 import {
   BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
@@ -35,7 +49,14 @@ export const ACTIVE_IDS = [
 
 export type ActiveActionId = (typeof ACTIVE_IDS)[number];
 
+export const CABIN_IDS = ["cabinA", "cabinB"] as const;
+
+export type CabinActionId = (typeof CABIN_IDS)[number];
+
+export const ECHO_ACTION_ID = "echo" as const;
+
 export type ConsoleActionId =
+  | "echo"
   | "reroll"
   | "nudgeMinus"
   | "nudgePlus"
@@ -46,7 +67,8 @@ export type ConsoleActionId =
   | "bloodReactor"
   | "sacrifice"
   | PassiveActionId
-  | ActiveActionId;
+  | ActiveActionId
+  | CabinActionId;
 
 export type ConsoleBlock =
   | "resolving"
@@ -66,6 +88,7 @@ export type ConsoleBlock =
   | "slotBlocked"
   | "dieLocked"
   | "noPartner"
+  | "needsTwoEnemies"
   | "spent";
 
 export interface ConsoleAction {
@@ -84,7 +107,38 @@ export interface ConsoleShape {
   sacrifice: boolean;
   passive: PassiveActionId | null;
   actives: ActiveActionId[];
+  cabins: (OfficerDef | null)[];
+  echo: EchoNodeDef | null;
 }
+
+export const cabinOfficer = (
+  board: BattleBoard,
+  cabin: CabinActionId,
+): OfficerDef | undefined => {
+  const id = (board.officers ?? [])[CABIN_IDS.indexOf(cabin)];
+  return id === undefined ? undefined : officerDef(id);
+};
+
+export const echoBattleNode = (
+  board: BattleBoard,
+): EchoNodeDef | undefined =>
+  echoIsBattleActive(board.echo) ? echoNodeDef(board.echo) : undefined;
+
+export const echoActionDead = (
+  board: BattleBoard,
+  def: EchoNodeDef,
+): boolean =>
+  def.id === "secondLook" && !board.dice.some((die) => die.state === "tray");
+
+export const officerMarkDead = (
+  board: BattleBoard,
+  def: OfficerDef,
+): boolean => {
+  if (def.active.id !== "designate") return false;
+  const enemy = aimedEnemy(board.enemies, board.targetId);
+  if (enemy === undefined) return true;
+  return officerActiveDead(def.active, enemy.statuses.mark);
+};
 
 export interface NudgeCost {
   cost: number;
@@ -135,6 +189,38 @@ const activeBlock = (
   return ready ? null : "used";
 };
 
+export const cabinAction = (
+  board: BattleBoard,
+  cabin: CabinActionId,
+): ConsoleAction => {
+  const def = cabinOfficer(board, cabin);
+  if (def === undefined) return action(cabin, "notAllowed");
+  const cost = officerChargeCost(def.active);
+  const block: ConsoleBlock | null = board.spentGrants.includes(
+    officerToken(def.id),
+  )
+    ? "spent"
+    : board.charge < cost
+      ? "noCharge"
+      : officerMarkDead(board, def)
+        ? "notAllowed"
+        : null;
+  return action(cabin, block, cost);
+};
+
+export const echoAction = (board: BattleBoard): ConsoleAction => {
+  const def = echoBattleNode(board);
+  if (def === undefined) return action(ECHO_ACTION_ID, "notAllowed");
+  const block: ConsoleBlock | null = board.spentGrants.includes(
+    echoToken(def.id),
+  )
+    ? "spent"
+    : echoActionDead(board, def)
+      ? "notAllowed"
+      : null;
+  return action(ECHO_ACTION_ID, block);
+};
+
 export const consoleActions = (board: BattleBoard): ConsoleActions => {
   const idle = board.phase !== "placement";
   const die = selectedDie(board);
@@ -151,6 +237,8 @@ export const consoleActions = (board: BattleBoard): ConsoleActions => {
   };
   const gate = (block: ConsoleBlock | null): ConsoleBlock | null =>
     idle ? "resolving" : board.rerollMode ? "rerollMode" : block;
+  const withGate = (entry: ConsoleAction): ConsoleAction =>
+    action(entry.id, gate(entry.block), entry.cost, entry.free);
 
   const reserveBlock = idle
     ? "resolving"
@@ -274,6 +362,9 @@ export const consoleActions = (board: BattleBoard): ConsoleActions => {
       "split",
       gate(activeBlock(die, die !== undefined && canSplit(die), true)),
     ),
+    cabinA: withGate(cabinAction(board, "cabinA")),
+    cabinB: withGate(cabinAction(board, "cabinB")),
+    echo: withGate(echoAction(board)),
   };
 };
 
@@ -290,5 +381,7 @@ export const consoleShape = (board: BattleBoard): ConsoleShape => {
     sacrifice: sourceTrait(board, "sacrifice"),
     passive: passiveActionOf(board.shipId),
     actives: ACTIVE_IDS.filter((id) => actives.has(id)),
+    cabins: CABIN_IDS.map((cabin) => cabinOfficer(board, cabin) ?? null),
+    echo: echoBattleNode(board) ?? null,
   };
 };

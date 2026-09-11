@@ -3,6 +3,7 @@ import {
   earnedMemoryOrders,
   finalMemoryCodexId,
   memoryAt,
+  memoryFragmentCount,
   FINAL_MEMORY_IDS,
   MEMORY_CODEX_IDS,
   MEMORY_TOTAL,
@@ -39,13 +40,11 @@ export const syncMemoryArc = (): number[] => {
   return fresh;
 };
 
-export const echoArcComplete = (): boolean => {
-  const codex = new Set(useMetaStore.getState().codex);
-  return (
-    NUMBERED_MEMORIES.every((m) => codex.has(m.codexId)) &&
-    FINAL_MEMORY_IDS.some((id) => codex.has(id))
-  );
-};
+export const lifetimeFragments = (): number =>
+  memoryFragmentCount(useMetaStore.getState().codex);
+
+export const echoArcComplete = (): boolean =>
+  memoryFragmentCount(useMetaStore.getState().codex) === MEMORY_TOTAL;
 
 export const sealFinalMemory = (endingId: string): void => {
   useRunStore.getState().unlockMemory(MEMORY_TOTAL);

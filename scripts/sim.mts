@@ -10,6 +10,7 @@ import {
   MID_COLLECTION_LEVEL,
 } from "./simPolicy/chart";
 import {
+  deliveryReachOf,
   EXPECTED_DMG_PER_FIGHT,
   FIGHT_TYPES,
   fightsUntilRest,
@@ -21,7 +22,9 @@ import {
   bypassIsLateral,
   bypassTargetFor,
   isGentleRide,
+  openLandings,
   rollThrow,
+  throwCost,
 } from "../src/game/map/wormhole";
 import { disintegrationPctFor, holeTollFor } from "../src/game/run/motifs";
 import {
@@ -45,14 +48,48 @@ import {
   takeDie,
   type PuzzleTally,
   type RunState,
+  type RunStateInit,
+  type SimCargo,
 } from "./simPolicy/state";
 import { ENGRAVINGS } from "../src/data/engravings";
+import {
+  CARGO_BY_ID,
+  CARGO_IDS,
+  CARGO_PREFER_ROWS,
+  cargoAxisShift,
+  cargoChargeCapDelta,
+  cargoHullPerNode,
+  cargoPayout,
+  cargoSlotTierDelta,
+  type CargoDef,
+} from "../src/data/cargo";
+import { OFFICER_IDS, officerDef } from "../src/data/officers";
+import {
+  ECHO_NODE_IDS,
+  echoIsBattleActive,
+  echoNodeDef,
+  echoSoftLands,
+  echoStartCharge,
+  echoToken,
+  type EchoNodeId,
+} from "../src/data/echo";
+import { forwardReach, forwardStations } from "../src/game/map/reach";
+import { economyFailureLines } from "./simPolicy/verdict";
+import { shipCargoHold } from "../src/game/run/hold";
+import {
+  DIRECT,
+  FIRE_MODE_IDS,
+  FIRE_MODE_SLOTS,
+  fireModeAllowed,
+  MODULE_FIRE_MODE,
+  type FireModeId,
+} from "../src/data/fireModes";
 import {
   ENCOUNTER_DISCOUNT_PCT,
   FIRST_FIND_SHARDS,
   META_DIE_PRICE,
 } from "../src/data/metaShop";
-import { PLAYABLE_SHIPS, type ShipId } from "../src/data/ships";
+import { PLAYABLE_SHIPS, SHIP_BY_ID, type ShipId } from "../src/data/ships";
 import { THEMES } from "../src/data/themes";
 import { RESPEC_SHARD_COST } from "../src/game/chart/engine";
 import { nudgeChargeCost } from "../src/game/battle/resolver";
@@ -104,8 +141,13 @@ import {
   sectorDepth,
 } from "../src/game/run/modes";
 import {
+  applyEchoActive,
+  applyOfficerActive,
   decidePlacements,
   decideReroll,
+  echoLookUids,
+  readyEcho,
+  readyOfficers,
 } from "../src/game/battle/policy";
 import {
   advanceTurn,
@@ -171,7 +213,14 @@ interface BattleInit {
   ascension?: number;
   inverted?: boolean;
   nodeStorm?: boolean;
+  officers?: readonly string[];
+  cargo?: readonly string[];
+  echo?: EchoNodeId;
 }
+
+type ModeTally = Partial<Record<FireModeId, number>>;
+
+type ActiveTally = Record<string, number>;
 
 interface BattleResult {
   win: boolean;
@@ -184,7 +233,37 @@ interface BattleResult {
   turnsPlayed: number;
   sensorTurns: number;
   engineTurns: number;
+  modeArmed: ModeTally;
+  modeOffered: ModeTally;
+  activeFired: ActiveTally;
+  activeReady: ActiveTally;
 }
+
+const bump = (tally: ModeTally, mode: FireModeId): void => {
+  tally[mode] = (tally[mode] ?? 0) + 1;
+};
+
+const bumpActive = (tally: ActiveTally, id: string): void => {
+  tally[id] = (tally[id] ?? 0) + 1;
+};
+
+const tallyFireModes = (
+  snapshot: BattleSnapshot,
+  armed: ModeTally,
+  offered: ModeTally,
+): void => {
+  const alive = snapshot.enemies.filter((e) => e.hp > 0).length;
+  for (const slotId of FIRE_MODE_SLOTS) {
+    const slot = snapshot.slots[slotId];
+    if (slot?.dieUid === undefined) continue;
+    const legal = (slot.modes ?? []).filter((mode) =>
+      fireModeAllowed(mode, alive),
+    );
+    if (legal.length < 2) continue;
+    for (const mode of legal) bump(offered, mode);
+    bump(armed, slot.mode ?? DIRECT.id);
+  }
+};
 
 const WEATHER_ENABLED = process.argv.includes("--weather")
   ? process.argv[process.argv.indexOf("--weather") + 1] === "on"
@@ -193,6 +272,59 @@ const WEATHER_ENABLED = process.argv.includes("--weather")
 const SALVAGE_ENABLED = process.argv.includes("--salvage")
   ? process.argv[process.argv.indexOf("--salvage") + 1] !== "off"
   : true;
+
+const CARGO_ENABLED = process.argv.includes("--cargo")
+  ? process.argv[process.argv.indexOf("--cargo") + 1] !== "off"
+  : true;
+
+const OFFICERS_ENABLED = process.argv.includes("--officers")
+  ? process.argv[process.argv.indexOf("--officers") + 1] !== "off"
+  : true;
+
+const OFFICER_FORCED: string | undefined = process.argv.includes(
+  "--officer-force",
+)
+  ? OFFICER_IDS.find(
+      (id) => id === process.argv[process.argv.indexOf("--officer-force") + 1],
+    )
+  : undefined;
+
+const ECHO_FORCED: EchoNodeId | undefined = process.argv.includes("--echo-force")
+  ? ECHO_NODE_IDS.find(
+      (id) => id === process.argv[process.argv.indexOf("--echo-force") + 1],
+    )
+  : undefined;
+
+const runStateInit = (init: RunStateInit): RunStateInit => ({
+  ...init,
+  officers:
+    init.officers ?? (OFFICER_FORCED === undefined ? [] : [OFFICER_FORCED]),
+  officerLock:
+    init.officerLock === true ||
+    OFFICER_FORCED !== undefined ||
+    !OFFICERS_ENABLED,
+  echo: init.echo === undefined ? (ECHO_FORCED ?? null) : init.echo,
+});
+
+const FIRE_FORCED: FireModeId | undefined = process.argv.includes("--fire-force")
+  ? FIRE_MODE_IDS.find(
+      (id) => id === process.argv[process.argv.indexOf("--fire-force") + 1],
+    )
+  : undefined;
+
+const forceFireModes = (snapshot: BattleSnapshot): void => {
+  if (FIRE_FORCED === undefined) return;
+  const alive = snapshot.enemies.filter((e) => e.hp > 0).length;
+  for (const slotId of FIRE_MODE_SLOTS) {
+    const slot = snapshot.slots[slotId];
+    if (slot?.dieUid === undefined) continue;
+    const granted = slot.modes ?? [];
+    slot.mode =
+      granted.includes(FIRE_FORCED) && fireModeAllowed(FIRE_FORCED, alive)
+        ? FIRE_FORCED
+        : DIRECT.id;
+  }
+};
 
 const getArg = (name: string, fallback: string): string => {
   const index = process.argv.indexOf(`--${name}`);
@@ -204,6 +336,7 @@ const applyPlacement = (
   snapshot: BattleSnapshot,
   uid: string,
   slotId: SlotId,
+  mode?: FireModeId,
 ): void => {
   const die = snapshot.dice.find((d) => d.uid === uid);
   const slot = snapshot.slots[slotId];
@@ -211,6 +344,7 @@ const applyPlacement = (
   die.state = "placed";
   die.slot = slotId;
   slot.dieUid = uid;
+  if (mode !== undefined) slot.mode = mode;
 };
 
 const SURGE = 10;
@@ -224,8 +358,12 @@ const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
 
 const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
   const cost = nudgeChargeCost(
-    computeRunMods(init.perks ?? [], init.chartPicks ?? [], init.modules ?? [])
-      .nudgeCostDelta + computeMutatorMods(init.mutators ?? []).nudgeCostDelta,
+    computeRunMods(
+      init.perks ?? [],
+      init.chartPicks ?? [],
+      init.modules ?? [],
+      init.officers ?? [],
+    ).nudgeCostDelta + computeMutatorMods(init.mutators ?? []).nudgeCostDelta,
     runHasTrait(
       init.perks ?? [],
       init.chartPicks ?? [],
@@ -263,6 +401,25 @@ const simulateBattle = (
   const streams = createStreams(rootSeed);
   const enemyStream = createEnemyStream(streams);
   const mut = computeMutatorMods(init.mutators ?? []);
+  const officers = init.officers ?? [];
+  const holdDefs = (init.cargo ?? []).flatMap((id) => {
+    const def = CARGO_BY_ID.get(id);
+    return def === undefined ? [] : [def];
+  });
+  const tierDelta: Partial<Record<SlotId, number>> = {};
+  for (const def of holdDefs) {
+    for (const [slot, delta] of Object.entries(cargoSlotTierDelta(def))) {
+      const key = slot as SlotId;
+      tierDelta[key] = (tierDelta[key] ?? 0) + delta;
+    }
+  }
+  if (mut.sensorsTierDelta !== 0) {
+    tierDelta.sensors = (tierDelta.sensors ?? 0) + mut.sensorsTierDelta;
+  }
+  const holdChargeCap = holdDefs.reduce(
+    (sum, def) => sum + cargoChargeCapDelta(def),
+    0,
+  );
   let snapshot = buildBattleSnapshot(
     init.shipId ?? "wanderer",
     deck,
@@ -280,16 +437,19 @@ const simulateBattle = (
       hull: init.hull,
       hullMax: init.hullMax,
       runScrap: init.runScrap,
-      ...(mut.sensorsTierDelta === 0
+      ...(Object.keys(tierDelta).length === 0
         ? {}
-        : { slotTierDelta: { sensors: mut.sensorsTierDelta } }),
+        : { slotTierDelta: tierDelta }),
       chargeCap: Math.max(
         1,
         runChargeCap(
           init.perks ?? [],
           init.chartPicks ?? [],
           init.modules ?? [],
-        ) + mut.chargeCapDelta,
+          officers,
+        ) +
+          mut.chargeCapDelta +
+          holdChargeCap,
       ),
       sectorHpPct: init.sectorHpPct,
       sectorDmgPct: init.sectorDmgPct,
@@ -300,11 +460,27 @@ const simulateBattle = (
       nodeStorm: init.nodeStorm,
     },
   );
+  if (officers.length > 0) snapshot.officers = [...officers];
+  if (init.echo !== undefined) {
+    snapshot.echo = init.echo;
+    const opening = echoStartCharge(init.echo);
+    if (opening > 0) {
+      snapshot.charge = Math.max(
+        0,
+        Math.min(snapshot.chargeCap, snapshot.charge + opening),
+      );
+    }
+  }
   let dealt = 0;
   let taken = 0;
   let turnsPlayed = 0;
   let sensorTurns = 0;
   let engineTurns = 0;
+  const modeArmed: ModeTally = {};
+  const modeOffered: ModeTally = {};
+  const activeFired: ActiveTally = {};
+  const activeReady: ActiveTally = {};
+  const spent: string[] = [];
 
   for (let round = 0; round < TURN_CAP; round += 1) {
     const rerollUids = decideReroll(snapshot);
@@ -320,25 +496,61 @@ const simulateBattle = (
         live.statuses = { ...live.statuses, charge: 1 };
       }
     }
-    const decision = decidePlacements(snapshot);
+    if (snapshot.echo !== undefined) {
+      const ready = readyEcho(snapshot, spent);
+      if (ready !== undefined) bumpActive(activeReady, echoToken(ready));
+      const look = echoLookUids(snapshot, spent);
+      if (look.length > 0 && ready !== undefined) {
+        snapshot.dice = snapshot.dice.map((d) =>
+          look.includes(d.uid) && d.state === "tray"
+            ? { ...d, value: Math.max(d.value, streams.dice.int(1, d.tier)) }
+            : d,
+        );
+        spent.push(echoToken(ready));
+        bumpActive(activeFired, echoToken(ready));
+      }
+    }
+    if (officers.length > 0) {
+      for (const def of readyOfficers(snapshot, spent)) {
+        bumpActive(activeReady, def.id);
+      }
+    }
+    const decision = decidePlacements(snapshot, spent);
     if (decision.targetId !== null) snapshot.targetId = decision.targetId;
     for (const placement of decision.placements) {
       if (placement.slot === "reactor" && overflows(snapshot, placement.uid)) {
         continue;
       }
       if (canPlaceDie(snapshot, placement.uid, placement.slot)) {
-        applyPlacement(snapshot, placement.uid, placement.slot);
+        applyPlacement(
+          snapshot,
+          placement.uid,
+          placement.slot,
+          placement.mode,
+        );
       }
     }
     if (decision.reserveUid !== undefined) {
       const die = snapshot.dice.find((d) => d.uid === decision.reserveUid);
       if (die?.state === "tray") die.state = "reserved";
     }
+    if (decision.active !== undefined) {
+      snapshot = applyOfficerActive(snapshot, decision.active);
+      spent.push(decision.active);
+      bumpActive(activeFired, decision.active);
+    }
+    if (decision.echo !== undefined) {
+      snapshot = applyEchoActive(snapshot, decision.echo);
+      spent.push(echoToken(decision.echo));
+      bumpActive(activeFired, echoToken(decision.echo));
+    }
     spendCharge(snapshot, init);
 
     turnsPlayed += 1;
     if (snapshot.slots.sensors?.dieUid !== undefined) sensorTurns += 1;
     if (snapshot.slots.engines?.dieUid !== undefined) engineTurns += 1;
+    forceFireModes(snapshot);
+    tallyFireModes(snapshot, modeArmed, modeOffered);
 
     const player = resolvePlayerPhase(snapshot, streams.dice);
     dealt += player.beats
@@ -370,6 +582,10 @@ const simulateBattle = (
     turnsPlayed,
     sensorTurns,
     engineTurns,
+    modeArmed,
+    modeOffered,
+    activeFired,
+    activeReady,
   };
 };
 
@@ -441,6 +657,29 @@ type HoleOutcome =
 
 const DISINTEGRATION_FACES = 100;
 
+interface SoftLanding {
+  node: MapNode;
+  rows: number;
+}
+
+const softLandingFor = (
+  map: MapGraph,
+  byId: ReadonlyMap<string, MapNode>,
+  from: string,
+  visited: readonly string[],
+): SoftLanding | undefined => {
+  const origin = byId.get(from);
+  if (origin === undefined) return undefined;
+  const node = openLandings(map, from, visited)
+    .filter((candidate) => candidate.row > origin.row)
+    .sort(
+      (a, b) =>
+        throwCost(origin, a) - throwCost(origin, b) ||
+        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    )[0];
+  return node === undefined ? undefined : { node, rows: node.row - origin.row };
+};
+
 const resolveWormhole = (
   state: RunState,
   sector: number,
@@ -456,6 +695,16 @@ const resolveWormhole = (
 ): HoleOutcome => {
   const rides = tally.rides;
   if (ridesWormhole(route, stream.next())) {
+    if (echoSoftLands(state.echo) && !state.echoUsed) {
+      const gentle = softLandingFor(map, byId, from, visited);
+      if (gentle !== undefined) {
+        state.echoUsed = true;
+        tally.rides += 1;
+        tally.softLandings += 1;
+        tally.rowsMoved += Math.abs(gentle.rows);
+        return { kind: "moved", node: gentle.node };
+      }
+    }
     const roll = rollThrow(
       { map, from, hole: hole.id, visited, rides },
       stream,
@@ -492,6 +741,15 @@ const resolveWormhole = (
   return { kind: "moved", node };
 };
 
+const mergeActiveTally = (state: RunState, res: BattleResult): void => {
+  for (const [id, n] of Object.entries(res.activeFired)) {
+    state.activeFired[id] = (state.activeFired[id] ?? 0) + n;
+  }
+  for (const [id, n] of Object.entries(res.activeReady)) {
+    state.activeReady[id] = (state.activeReady[id] ?? 0) + n;
+  }
+};
+
 const nsKey = (ns: string, prefix: string, id: string): string =>
   ns === "" ? `${prefix}:${id}` : `${prefix}:${ns}:${id}`;
 
@@ -503,6 +761,7 @@ export interface WormholeTally {
   rowsMoved: number;
   tollPaid: number;
   disintegrations: number;
+  softLandings: number;
 }
 
 export const emptyWormholeTally = (): WormholeTally => ({
@@ -513,10 +772,125 @@ export const emptyWormholeTally = (): WormholeTally => ({
   rowsMoved: 0,
   tollPaid: 0,
   disintegrations: 0,
+  softLandings: 0,
 });
 
 const WEATHER_FORCED = getArg("weather-force", "");
 const SALVAGE_FORCED = getArg("salvage-force", "");
+const CARGO_FORCED = getArg("cargo-force", "");
+
+interface CargoSite {
+  map: MapGraph;
+  position: string;
+  visited: readonly string[];
+  scrapMult: number;
+  tideCap: number;
+}
+
+const cargoTargetIds = (state: RunState): string[] =>
+  state.cargo.map((held) => held.nodeId);
+
+const takenCargoIds = (state: RunState): string[] =>
+  state.cargo.map((held) => held.defId);
+
+const openStations = (site: CargoSite, taken: readonly string[]) =>
+  forwardStations(site.map, site.position, site.visited).filter(
+    (step) => !taken.includes(step.node.id),
+  );
+
+const pickCargoTarget = (
+  site: CargoSite,
+  taken: readonly string[],
+): string | null => {
+  const open = openStations(site, taken);
+  const pool = open.length > 0 ? open : forwardStations(site.map, site.position, site.visited);
+  const preferred = pool.find(
+    (step) =>
+      step.rows >= CARGO_PREFER_ROWS[0] && step.rows <= CARGO_PREFER_ROWS[1],
+  );
+  return (preferred ?? pool[0])?.node.id ?? null;
+};
+
+const simDrawbackLands = (def: CargoDef, shipId: ShipId): boolean => {
+  const ship = SHIP_BY_ID.get(shipId);
+  return Object.keys(cargoSlotTierDelta(def)).every(
+    (slot) => ship?.slots[slot as SlotId] !== undefined,
+  );
+};
+
+const takeSimCargo = (
+  state: RunState,
+  site: CargoSite,
+  cargoId: string,
+): void => {
+  if (!CARGO_ENABLED) return;
+  if (state.cargo.length >= shipCargoHold(state.shipId)) return;
+  const def = CARGO_BY_ID.get(cargoId);
+  if (def === undefined || takenCargoIds(state).includes(def.id)) return;
+  if (!simDrawbackLands(def, state.shipId)) return;
+  const target = pickCargoTarget(site, cargoTargetIds(state));
+  if (target === null) return;
+  state.cargo.push({ defId: def.id, nodeId: target });
+  state.cargoTaken += 1;
+  applyEffectsToState(
+    state,
+    [{ k: "axis", n: cargoAxisShift(def) }],
+    site.tideCap,
+  );
+};
+
+const reanchorSimCargo = (state: RunState, site: CargoSite): void => {
+  if (state.cargo.length === 0) return;
+  const reach = forwardReach(site.map, site.position, site.visited);
+  const kept: SimCargo[] = [];
+  for (const entry of state.cargo) {
+    if (entry.nodeId === site.position || reach.has(entry.nodeId)) {
+      kept.push(entry);
+      continue;
+    }
+    const target = pickCargoTarget(
+      site,
+      kept.map((held) => held.nodeId),
+    );
+    if (target === null) {
+      state.cargoLapsed += 1;
+      continue;
+    }
+    kept.push({ ...entry, nodeId: target });
+  }
+  state.cargo = kept;
+};
+
+const deliverSimCargo = (state: RunState, site: CargoSite): void => {
+  if (state.cargo.length === 0) return;
+  const kept: SimCargo[] = [];
+  for (const entry of state.cargo) {
+    const def = CARGO_BY_ID.get(entry.defId);
+    if (entry.nodeId !== site.position || def === undefined) {
+      kept.push(entry);
+      continue;
+    }
+    const paid = cargoPayout(def, site.scrapMult);
+    gain(state, paid);
+    state.cargoScrap += paid;
+    state.cargoDelivered += 1;
+  }
+  state.cargo = kept;
+};
+
+const payCargoToll = (state: RunState, tideCap: number): void => {
+  const cost = state.cargo.reduce((sum, held) => {
+    const def = CARGO_BY_ID.get(held.defId);
+    return sum + (def === undefined ? 0 : cargoHullPerNode(def));
+  }, 0);
+  if (cost <= 0) return;
+  applyEffectsToState(state, [{ k: "hull", n: -cost }], tideCap);
+};
+
+const lapseSimCargo = (state: RunState): void => {
+  state.cargoLapsed += state.cargo.length;
+  state.cargo = [];
+};
 
 const sectorMutators = (state: RunState, opts: WalkOptions): string[] => {
   const carried = withoutWeather(opts.mutators ?? state.mutators);
@@ -546,19 +920,50 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
   let position = START_NODE_ID;
   let posRow = 0;
 
+  let deliveryReach: ReadonlySet<string> | undefined;
+  const refreshDelivery = (): void => {
+    const entry = state.cargo[0];
+    deliveryReach =
+      entry === undefined
+        ? undefined
+        : deliveryReachOf(map, entry.nodeId, visited);
+  };
+
   const route = (): RouteState => ({
     hullPct: (state.hull / Math.max(1, state.hullMax)) * 100,
     anomalyStreak: state.anomalyStreak,
     scrap: state.scrap,
     wormholeRides: tally.rides,
+    ...(deliveryReach === undefined ? {} : { deliveryReach }),
   });
 
-  const stop = (cleared: boolean, deathRow: number): WalkResult => ({
-    cleared,
-    deathRow,
-    rows: posRow,
-    hullEntering,
+  const site = (): CargoSite => ({
+    map,
+    position,
+    visited,
+    scrapMult: opts.scrapMult,
+    tideCap: opts.tideCap,
   });
+
+  const offerableCargo = (): string[] => {
+    if (!CARGO_ENABLED) return [];
+    if (state.cargo.length >= shipCargoHold(state.shipId)) return [];
+    if (forwardStations(map, position, visited).length === 0) return [];
+    const held = takenCargoIds(state);
+    return CARGO_IDS.filter((id) => {
+      const def = CARGO_BY_ID.get(id);
+      return (
+        def !== undefined &&
+        !held.includes(id) &&
+        simDrawbackLands(def, state.shipId)
+      );
+    });
+  };
+
+  const stop = (cleared: boolean, deathRow: number): WalkResult => {
+    lapseSimCargo(state);
+    return { cleared, deathRow, rows: posRow, hullEntering };
+  };
 
   for (let guard = 0; guard < opts.guard; guard += 1) {
     if (position === bossId) break;
@@ -589,6 +994,12 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
     posRow = next.row;
     visited.push(next.id);
     if (next.pocket === true) state.pockets += 1;
+    if (CARGO_ENABLED && state.cargo.length > 0) {
+      deliverSimCargo(state, site());
+      reanchorSimCargo(state, site());
+      payCargoToll(state, opts.tideCap);
+      refreshDelivery();
+    }
     applyNodeMotifs(state, sector, next, opts.tideCap);
     state.jumpsSinceTide += 1;
     if (state.jumpsSinceTide >= jumpsPerTideFor(state.mutators)) {
@@ -617,6 +1028,9 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           chartPicks: state.chartPicks,
           mutators: state.mutators,
           modules: state.modules,
+          officers: state.officers,
+          cargo: takenCargoIds(state),
+          ...(state.echo === null ? {} : { echo: state.echo }),
           sectorHpPct: sectorHpPct({ sector, pocket: next.pocket === true }),
           sectorDmgPct: sectorDmgPct({ sector }),
           enemyHpBonusPct:
@@ -628,6 +1042,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         },
       );
       state.hull = res.hullLeft;
+      mergeActiveTally(state, res);
       state.takenBySector[sector] = (state.takenBySector[sector] ?? 0) + res.taken;
       state.fightsBySector[sector] = (state.fightsBySector[sector] ?? 0) + 1;
       state.kills += res.kills;
@@ -642,7 +1057,12 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         next.pocket === true,
         opts.scrapMult,
       );
-      const mods = computeRunMods(state.perks, state.chartPicks, state.modules);
+      const mods = computeRunMods(
+        state.perks,
+        state.chartPicks,
+        state.modules,
+        state.officers,
+      );
       gain(
         state,
         Math.round(
@@ -694,6 +1114,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         "beacon",
         deriveSeed(seed, nsKey(ns, "beaconEvent", next.id)),
         opts.tideCap,
+        offerableCargo(),
       );
       if (opts.noDraft !== true) {
         runDraft(
@@ -710,6 +1131,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         "event",
         deriveSeed(seed, nsKey(ns, "event", next.id)),
         opts.tideCap,
+        offerableCargo(),
       );
       if (follow !== null) {
         const res = simulateBattle(
@@ -727,6 +1149,9 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
             perks: state.perks,
             chartPicks: state.chartPicks,
             modules: state.modules,
+            officers: state.officers,
+            cargo: takenCargoIds(state),
+            ...(state.echo === null ? {} : { echo: state.echo }),
             sectorHpPct: sectorHpPct({ sector }),
             sectorDmgPct: sectorDmgPct({ sector }),
             enemyHpBonusPct: opts.enemyHpBonusPct,
@@ -735,6 +1160,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           },
         );
         state.hull = res.hullLeft;
+        mergeActiveTally(state, res);
         state.takenBySector[sector] =
           (state.takenBySector[sector] ?? 0) + res.taken;
         state.fightsBySector[sector] =
@@ -756,6 +1182,13 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       state.nodes += 1;
     } else {
       state.nodes += 1;
+    }
+    if (CARGO_ENABLED) {
+      const pending = state.pendingCargo;
+      state.pendingCargo = null;
+      if (pending !== null) takeSimCargo(state, site(), pending);
+      else if (CARGO_FORCED !== "") takeSimCargo(state, site(), CARGO_FORCED);
+      refreshDelivery();
     }
   }
   return stop(position === bossId, -1);
@@ -784,7 +1217,9 @@ const sectorResultOf = (
 });
 
 const runSector = (seed: number): SectorResult => {
-  const state = createRunState({ hull: 30, hullMax: 30, deck: STARTER_DECK });
+  const state = createRunState(
+    runStateInit({ hull: 30, hullMax: 30, deck: STARTER_DECK }),
+  );
   const walk = walkSector(state, {
     sector: 1,
     seed,
@@ -855,12 +1290,14 @@ const DRIFT_MID_MK: MkLevels = {
 };
 
 const runDrift = (seed: number, mid: boolean): DriftResult => {
-  const state = createRunState({
-    hull: 30,
-    hullMax: 30,
-    deck: mid ? DRIFT_MID_DECK : STARTER_DECK,
-    mkLevels: mid ? { ...DRIFT_MID_MK } : {},
-  });
+  const state = createRunState(
+    runStateInit({
+      hull: 30,
+      hullMax: 30,
+      deck: mid ? DRIFT_MID_DECK : STARTER_DECK,
+      mkLevels: mid ? { ...DRIFT_MID_MK } : {},
+    }),
+  );
 
   let sectorIndex = 1;
   let depth = 0;
@@ -1346,6 +1783,9 @@ interface SweepOptions {
   chartPicks?: readonly string[];
   deckExtra?: readonly string[];
   mkLevels?: MkLevels;
+  officers?: readonly string[];
+  officerLock?: boolean;
+  echo?: EchoNodeId | null;
 }
 
 const sweepState = (opts: SweepOptions): RunState => {
@@ -1358,16 +1798,24 @@ const sweepState = (opts: SweepOptions): RunState => {
     Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)) +
       computePerkMods(carried).hullMaxDelta,
   );
-  return createRunState({
-    shipId,
-    hull: hullMax,
-    hullMax,
-    deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(0, DECK_CAP),
-    mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
-    perks: carried,
-    modules: [...opts.archetype.modules],
-    chartPicks: [...(opts.chartPicks ?? [])],
-  });
+  return createRunState(
+    runStateInit({
+      shipId,
+      hull: hullMax,
+      hullMax,
+      deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(
+        0,
+        DECK_CAP,
+      ),
+      mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
+      perks: carried,
+      modules: [...opts.archetype.modules],
+      chartPicks: [...(opts.chartPicks ?? [])],
+      ...(opts.officers === undefined ? {} : { officers: opts.officers }),
+      officerLock: opts.officerLock === true,
+      ...(opts.echo === undefined ? {} : { echo: opts.echo }),
+    }),
+  );
 };
 
 const sweepWalkOptions = (opts: SweepOptions): WalkOptions => {
@@ -1636,12 +2084,12 @@ interface LadderBand {
 }
 
 const LADDER_BANDS: readonly LadderBand[] = [
-  { sector: 1, mid: 98, perks: 99 },
-  { sector: 2, mid: 84, perks: 90 },
-  { sector: 3, mid: 70, perks: 78 },
-  { sector: 4, mid: 58, perks: 66 },
-  { sector: 5, mid: 48, perks: 56 },
-  { sector: 6, mid: 36, perks: 44 },
+  { sector: 1, mid: 99, perks: 99 },
+  { sector: 2, mid: 88, perks: 91 },
+  { sector: 3, mid: 76, perks: 79 },
+  { sector: 4, mid: 61, perks: 65 },
+  { sector: 5, mid: 54, perks: 58 },
+  { sector: 6, mid: 42, perks: 47 },
 ];
 
 const LADDER_BAND_PP = 5;
@@ -1859,6 +2307,8 @@ const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
   );
 };
 
+const CARGO_INCOME_SHARE_PCT = 8;
+
 const ECONOMY_PER_NODE_MIN = 12;
 const ECONOMY_PER_NODE_MAX = 60;
 const ECONOMY_SECTOR_MIN = 130;
@@ -1869,6 +2319,17 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   const rows: string[] = [
     "sector,deck,runs,clears,medianEarnedPerFight,medianEarned,basis,medianSpent,spendShare,verdict",
   ];
+  const cargoRows: {
+    sector: number;
+    deck: string;
+    taken: number;
+    delivered: number;
+    lapsed: number;
+    cargoScrap: number;
+    baseIncome: number;
+    sharePct: number;
+    ok: boolean;
+  }[] = [];
   const sectorSinks: {
     sector: number;
     deck: string;
@@ -1884,7 +2345,8 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     declines: number;
     picks: Record<string, number>;
   }[] = [];
-  let failures = 0;
+  let envelopeFailures = 0;
+  let shareFailures = 0;
   for (const sector of [1, 3, 5, 6]) {
     const def = SECTORS.find((sd) => sd.id === sector);
     const mult = def?.scrapMult ?? 1;
@@ -1899,6 +2361,11 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       let salvageScrap = 0;
       let salvageDeclines = 0;
       let fightCount = 0;
+      let cargoScrap = 0;
+      let cargoTaken = 0;
+      let cargoDelivered = 0;
+      let cargoLapsed = 0;
+      let totalEarned = 0;
       const salvagePicks: Record<string, number> = {};
       for (let i = 0; i < runs; i += 1) {
         const { result: r, state } = runSweepSectorWithState(
@@ -1911,8 +2378,14 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
           r.scrapEarned -
             Math.max(0, state.eventScrap) -
             Math.max(0, state.moduleSales) -
-            Math.max(0, state.salvageScrap),
+            Math.max(0, state.salvageScrap) -
+            Math.max(0, state.cargoScrap),
         );
+        totalEarned += r.scrapEarned;
+        cargoScrap += state.cargoScrap;
+        cargoTaken += state.cargoTaken;
+        cargoDelivered += state.cargoDelivered;
+        cargoLapsed += state.cargoLapsed;
         if (r.win) clearedEarned.push(loot);
         if (r.fights > 0) perNode.push(loot / r.fights);
         pockets += r.pockets;
@@ -1942,6 +2415,21 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         declines: salvageDeclines / Math.max(1, runs),
         picks: salvagePicks,
       });
+      const baseIncome = Math.max(1, totalEarned - cargoScrap);
+      const sharePct = (cargoScrap / baseIncome) * 100;
+      const shareOk = sharePct <= CARGO_INCOME_SHARE_PCT;
+      if (!shareOk) shareFailures += 1;
+      cargoRows.push({
+        sector,
+        deck: archetype.name,
+        taken: cargoTaken / Math.max(1, runs),
+        delivered: cargoDelivered / Math.max(1, runs),
+        lapsed: cargoLapsed / Math.max(1, runs),
+        cargoScrap: cargoScrap / Math.max(1, runs),
+        baseIncome: baseIncome / Math.max(1, runs),
+        sharePct,
+        ok: shareOk,
+      });
       const mEarnedPerNode = median(perNode);
       const clears = clearedEarned.length;
       const projected = clears >= ECONOMY_MIN_CLEARS;
@@ -1958,7 +2446,7 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         mEarnedPerNode <= hi &&
         mEarned >= ECONOMY_SECTOR_MIN &&
         mEarned <= ECONOMY_SECTOR_MAX;
-      if (!ok) failures += 1;
+      if (!ok) envelopeFailures += 1;
       rows.push(
         [
           String(sector),
@@ -1998,6 +2486,22 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   }
 
   console.log(
+    `\nsim economy: risk cargo (per run, carved out of the earned curve above) — bound ${String(CARGO_INCOME_SHARE_PCT)}% of the act income earned without it`,
+  );
+  rows.push("");
+  rows.push(
+    "sector,deck,cargoTaken,cargoDelivered,cargoLapsed,cargoScrap,incomeWithoutCargo,sharePct,verdict",
+  );
+  for (const row of cargoRows) {
+    console.log(
+      `  S${String(row.sector)}     ${row.deck.padEnd(11)} taken ${row.taken.toFixed(2)} · delivered ${row.delivered.toFixed(2)} · lapsed ${row.lapsed.toFixed(2)} · scrap ${row.cargoScrap.toFixed(1).padStart(5)} of ${row.baseIncome.toFixed(0).padStart(4)} · ${row.sharePct.toFixed(1).padStart(5)}% — ${row.ok ? "ok" : "OVER SHARE"}`,
+    );
+    rows.push(
+      `${String(row.sector)},${row.deck},${row.taken.toFixed(2)},${row.delivered.toFixed(2)},${row.lapsed.toFixed(2)},${row.cargoScrap.toFixed(2)},${row.baseIncome.toFixed(1)},${row.sharePct.toFixed(2)},${row.ok ? "ok" : "OVER_SHARE"}`,
+    );
+  }
+
+  console.log(
     "\nsim economy: salvage (per run, carved out of the earned curve above)",
   );
   rows.push("");
@@ -2022,10 +2526,12 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   const outPath = join(outDir, `economy-${stamp}.csv`);
   writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
-  if (failures > 0) {
-    console.error(`sim economy: ${String(failures)} row(s) outside the §9.3 envelope`);
-    process.exit(1);
-  }
+  const verdict = economyFailureLines(
+    { envelopeRows: envelopeFailures, cargoShareRows: shareFailures },
+    CARGO_INCOME_SHARE_PCT,
+  );
+  for (const line of verdict) console.error(line);
+  if (verdict.length > 0) process.exit(1);
 };
 
 const DEAD_DIE_LINE = -8;
@@ -2142,13 +2648,15 @@ const runCampaign = (
     1,
     Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)),
   );
-  const state = createRunState({
-    shipId,
-    hull: hullMax,
-    hullMax,
-    deck: archetype.deck,
-    chartPicks: MID_COLLECTION_PICKS,
-  });
+  const state = createRunState(
+    runStateInit({
+      shipId,
+      hull: hullMax,
+      hullMax,
+      deck: archetype.deck,
+      chartPicks: MID_COLLECTION_PICKS,
+    }),
+  );
   if (startDraft) {
     runDraft(state, 1, createStream(deriveSeed(seed, "voucherDraft")));
   }
@@ -2447,6 +2955,7 @@ const campaignModeMain = (
       tollPaid: into.tollPaid + run.wormholes.tollPaid,
       disintegrations:
         into.disintegrations + run.wormholes.disintegrations,
+      softLandings: into.softLandings + run.wormholes.softLandings,
     }),
     emptyWormholeTally(),
   );
@@ -3263,6 +3772,446 @@ const metaModeMain = (_runs: number, _seed: number, startedAt: number): void => 
   if (outOfBand) process.exitCode = 1;
 };
 
+const FIRE_MODE_CARRIERS: readonly string[] = Object.keys(MODULE_FIRE_MODE);
+
+const FIRE_MODE_WEAPON_MK: MkLevels = { weaponA: 3, weaponB: 3 };
+
+const FIRE_DOMINANT_PCT = DOMINANT_PICK_PCT;
+
+interface FireCell {
+  armed: ModeTally;
+  offered: ModeTally;
+}
+
+const emptyFireCell = (): FireCell => ({ armed: {}, offered: {} });
+
+const mergeTally = (into: ModeTally, from: ModeTally): void => {
+  for (const id of FIRE_MODE_IDS) {
+    const n = from[id];
+    if (n !== undefined) into[id] = (into[id] ?? 0) + n;
+  }
+};
+
+const shareOf = (cell: FireCell, mode: FireModeId): number => {
+  const offers = cell.offered[mode] ?? 0;
+  return offers === 0 ? 0 : (cell.armed[mode] ?? 0) / offers;
+};
+
+const fireModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const bySector = new Map<number, string[]>();
+  for (const def of ALL_ENEMIES) {
+    if (def.env === true) continue;
+    const sector = homeSectorOf(def.id);
+    bySector.set(sector, [...(bySector.get(sector) ?? []), def.id]);
+  }
+  const hullMax = shipHullMax("wanderer");
+  const total = emptyFireCell();
+  const sectorCells = new Map<number, FireCell>();
+  let battles = 0;
+
+  for (const [sector, ids] of [...bySector.entries()].sort(
+    (a, b) => a[0] - b[0],
+  )) {
+    const cell = emptyFireCell();
+    for (const [index, id] of ids.entries()) {
+      const partner = ids[(index + 1) % ids.length];
+      const encounters: string[][] = [[id]];
+      if (partner !== undefined && partner !== id) encounters.push([id, partner]);
+      const tier = rosterTierOf(id);
+      const entry = ROSTER_ENTRY[tier] ?? { hullPct: 100, tide: 0, scrap: 20 };
+      for (const enemyIds of encounters) {
+        for (const archetype of ARCHETYPES) {
+          for (let i = 0; i < runs; i += 1) {
+            const result = simulateBattle(
+              enemyIds,
+              archetype.deck,
+              deriveSeed(
+                seed,
+                `fire:${enemyIds.join("+")}:${archetype.name}:${String(i)}`,
+              ),
+              {
+                mkLevels: FIRE_MODE_WEAPON_MK,
+                modules: [...FIRE_MODE_CARRIERS],
+                sectorHpPct: sectorHpPct({ sector }),
+                sectorDmgPct: sectorDmgPct({ sector }),
+                hull: Math.round((hullMax * entry.hullPct) / 100),
+                hullMax,
+                runScrap: entry.scrap,
+                tide: entry.tide,
+              },
+            );
+            battles += 1;
+            mergeTally(cell.armed, result.modeArmed);
+            mergeTally(cell.offered, result.modeOffered);
+          }
+        }
+      }
+    }
+    sectorCells.set(sector, cell);
+    mergeTally(total.armed, cell.armed);
+    mergeTally(total.offered, cell.offered);
+  }
+
+  const acquired = FIRE_MODE_IDS.filter((id) => id !== DIRECT.id);
+  const observations = total.offered[DIRECT.id] ?? 0;
+  console.log(
+    `sim fire: mode arming share over ${String(battles)} battles — every mode unlocked (weapons Mk3 + the ${String(FIRE_MODE_CARRIERS.length)} carriers)`,
+  );
+  console.log(
+    `  the denominator is one weapon slot on one turn with two or more legal modes: ${String(observations)} such slot-turns`,
+  );
+  console.log(
+    `  bound: no acquired mode armed on more than ${String(FIRE_DOMINANT_PCT)}% of the turns where it is available and legal (DESIGN 6.7, band 16)`,
+  );
+  for (const mode of FIRE_MODE_IDS) {
+    const offers = total.offered[mode] ?? 0;
+    const arms = total.armed[mode] ?? 0;
+    const pct = shareOf(total, mode) * 100;
+    const verdict =
+      mode === DIRECT.id
+        ? "baseline, unchecked"
+        : offers === 0
+          ? "never offered"
+          : pct > FIRE_DOMINANT_PCT
+            ? `DOMINANT (>${String(FIRE_DOMINANT_PCT)}%)`
+            : "ok";
+    console.log(
+      `  ${mode.padEnd(11)} armed ${String(arms).padStart(6)} of ${String(offers).padStart(6)} offers · ${pct.toFixed(1).padStart(5)}% · ${verdict}`,
+    );
+  }
+
+  console.log("  per act (acquired modes only)");
+  for (const [sector, cell] of [...sectorCells.entries()].sort(
+    (a, b) => a[0] - b[0],
+  )) {
+    console.log(
+      `    S${String(sector)} ${acquired
+        .map((mode) => `${mode} ${(shareOf(cell, mode) * 100).toFixed(0)}%`)
+        .join(" · ")}`,
+    );
+  }
+
+  const rows = ["mode,offered,armed,share"];
+  for (const mode of FIRE_MODE_IDS) {
+    rows.push(
+      `${mode},${String(total.offered[mode] ?? 0)},${String(total.armed[mode] ?? 0)},${shareOf(total, mode).toFixed(3)}`,
+    );
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `fire-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+
+  const dominant = acquired.filter(
+    (mode) =>
+      (total.offered[mode] ?? 0) > 0 &&
+      shareOf(total, mode) * 100 > FIRE_DOMINANT_PCT,
+  );
+  const unreached = acquired.filter((mode) => (total.offered[mode] ?? 0) === 0);
+  console.log(
+    dominant.length === 0
+      ? `  no acquired mode is armed on more than ${String(FIRE_DOMINANT_PCT)}% of the turns where it is legal`
+      : `  DOMINANT: ${dominant.map((mode) => `${mode} ${(shareOf(total, mode) * 100).toFixed(1)}%`).join(" · ")}`,
+  );
+  if (unreached.length > 0) {
+    console.log(`  NEVER OFFERED: ${unreached.join(" · ")}`);
+  }
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (dominant.length > 0 || unreached.length > 0) process.exitCode = 1;
+};
+
+const CREW_BAND_PP = 8;
+
+interface CrewArm {
+  winrate: number;
+  fired: number;
+  ready: number;
+}
+
+const crewArm = (
+  sector: number,
+  runs: number,
+  seed: number,
+  officers: readonly string[],
+): CrewArm => {
+  let wins = 0;
+  let total = 0;
+  let fired = 0;
+  let ready = 0;
+  for (const archetype of LADDER_DECKS) {
+    for (let i = 0; i < runs; i += 1) {
+      const { result, state } = runSweepSectorWithState(
+        deriveSeed(
+          seed,
+          `crew:${String(sector)}:${archetype.name}:${String(i)}`,
+        ),
+        {
+          sector,
+          ascension: 0,
+          archetype,
+          chartPicks: MID_COLLECTION_PICKS,
+          officers,
+          officerLock: true,
+        },
+      );
+      total += 1;
+      if (result.win) wins += 1;
+      for (const id of officers) {
+        fired += state.activeFired[id] ?? 0;
+        ready += state.activeReady[id] ?? 0;
+      }
+    }
+  }
+  return {
+    winrate: wins / Math.max(1, total),
+    fired,
+    ready,
+  };
+};
+
+const crewModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = Number(getArg('sector', '0'));
+  const roster =
+    OFFICER_FORCED === undefined ? OFFICER_IDS : [OFFICER_FORCED];
+  console.log(
+    `sim crew: best officer against an empty cabin — mid collection, red+blue, ${String(runs)} runs per deck per arm per act`,
+  );
+  console.log(
+    `  bound: no officer is worth more than +${String(CREW_BAND_PP)}pp of act winrate against an empty cabin (DESIGN 9.10, band 16)`,
+  );
+  const rows: string[] = [
+    'sector,officer,active,winrate,baseline,deltaPp,firedPerRun,readyPerRun,verdict',
+  ];
+  let over = 0;
+  for (const sector of SECTORS.map((def) => def.id)) {
+    if (only > 0 && sector !== only) continue;
+    const base = crewArm(sector, runs, seed, []);
+    console.log(
+      `  S${String(sector)} empty cabin ${(base.winrate * 100).toFixed(1).padStart(5)}%`,
+    );
+    for (const id of roster) {
+      const arm = crewArm(sector, runs, seed, [id]);
+      const delta = Number(((arm.winrate - base.winrate) * 100).toFixed(1));
+      const runsInCell = runs * LADDER_DECKS.length;
+      const firedPerRun = arm.fired / Math.max(1, runsInCell);
+      const readyPerRun = arm.ready / Math.max(1, runsInCell);
+      const bad = delta > CREW_BAND_PP;
+      if (bad) over += 1;
+      const active = officerDef(id)?.active.id ?? '?';
+      console.log(
+        `    ${id.padEnd(10)} ${active.padEnd(10)} ${(arm.winrate * 100).toFixed(1).padStart(5)}% · ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}pp · fired ${firedPerRun.toFixed(2)}/run of ${readyPerRun.toFixed(2)} ready — ${bad ? `OVER +${String(CREW_BAND_PP)}pp` : 'ok'}`,
+      );
+      rows.push(
+        [
+          String(sector),
+          id,
+          active,
+          arm.winrate.toFixed(3),
+          base.winrate.toFixed(3),
+          delta.toFixed(1),
+          firedPerRun.toFixed(3),
+          readyPerRun.toFixed(3),
+          bad ? 'OVER_BAND' : 'ok',
+        ].join(','),
+      );
+    }
+  }
+  const outDir = join(process.cwd(), 'sim-out');
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, '-');
+  const outPath = join(outDir, `crew-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join('\n')}\n`, 'utf8');
+  console.log(
+    over === 0
+      ? `  no officer is worth more than +${String(CREW_BAND_PP)}pp of act winrate`
+      : `  OVER BAND: ${String(over)} officer-act cell(s) above +${String(CREW_BAND_PP)}pp`,
+  );
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (over > 0) process.exitCode = 1;
+};
+
+const ECHO_BAND_PP = 8;
+
+const ECHO_PROBE_RUNS = 40;
+
+const ECHO_UNPRICEABLE: ReadonlyMap<string, string> = new Map([
+  ["readout", "information only — nothing in this harness reads an enemy card"],
+  ["echolocation", "information only — the walk has no fog or reveal term"],
+  ["pathGhost", "information only — the walk has no preview term"],
+  ["veto", "no lethal Fate or event channel — event hull is floored at 1 here"],
+]);
+
+interface EchoArm {
+  winrate: number;
+  fired: number;
+  ready: number;
+  digest: number;
+  passive: boolean;
+}
+
+const foldResult = (acc: number, result: SectorResult): number => {
+  const value =
+    (result.win ? 1 : 0) * 7 +
+    result.deathRow * 13 +
+    result.nodes * 17 +
+    result.kills * 23 +
+    Math.round(result.scrapEarned) * 29 +
+    Math.round(result.hullMedian * 10) * 31;
+  return (acc * 31 + value) % 2147483647;
+};
+
+const echoArm = (
+  sector: number,
+  runs: number,
+  seed: number,
+  echo: EchoNodeId | null,
+): EchoArm => {
+  let wins = 0;
+  let total = 0;
+  let fired = 0;
+  let ready = 0;
+  let digest = 0;
+  const runScoped = echo !== null && echoSoftLands(echo);
+  const passive =
+    echo !== null && !runScoped && !echoIsBattleActive(echo);
+  for (const archetype of LADDER_DECKS) {
+    for (let i = 0; i < runs; i += 1) {
+      const { result, state } = runSweepSectorWithState(
+        deriveSeed(
+          seed,
+          `echo:${String(sector)}:${archetype.name}:${String(i)}`,
+        ),
+        {
+          sector,
+          ascension: 0,
+          archetype,
+          chartPicks: MID_COLLECTION_PICKS,
+          echo,
+          officers: [],
+          officerLock: true,
+        },
+      );
+      total += 1;
+      if (result.win) wins += 1;
+      digest = foldResult(digest, result);
+      if (echo === null || passive) continue;
+      if (runScoped) {
+        ready += 1;
+        if (state.echoUsed) fired += 1;
+        continue;
+      }
+      fired += state.activeFired[echoToken(echo)] ?? 0;
+      ready += state.activeReady[echoToken(echo)] ?? 0;
+    }
+  }
+  return {
+    winrate: wins / Math.max(1, total),
+    fired,
+    ready,
+    digest,
+    passive,
+  };
+};
+
+const echoModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = Number(getArg("sector", "0"));
+  const roster = ECHO_FORCED === undefined ? ECHO_NODE_IDS : [ECHO_FORCED];
+  console.log(
+    `sim echo: best equipped node against an empty slot — mid collection, red+blue, no officers, ${String(runs)} runs per deck per arm per act`,
+  );
+  console.log(
+    `  bound: no equipped Echo node is worth more than +${String(ECHO_BAND_PP)}pp of act winrate against an empty slot (DESIGN 12.9, band 16)`,
+  );
+  console.log(
+    `  ${String(ECHO_UNPRICEABLE.size)} node(s) have no reader in this harness at all: their cells are printed UNCHECKED, never as a pass, and are instead proven inert over ${String(ECHO_PROBE_RUNS)} runs per deck`,
+  );
+  const rows: string[] = [
+    "sector,node,branch,winrate,baseline,deltaPp,firedPerRun,readyPerRun,verdict,note",
+  ];
+  let over = 0;
+  let leaks = 0;
+  for (const sector of SECTORS.map((def) => def.id)) {
+    if (only > 0 && sector !== only) continue;
+    const base = echoArm(sector, runs, seed, null);
+    const probeBase = echoArm(sector, ECHO_PROBE_RUNS, seed, null);
+    console.log(
+      `  S${String(sector)} empty slot ${(base.winrate * 100).toFixed(1).padStart(5)}%`,
+    );
+    for (const id of roster) {
+      const branch = echoNodeDef(id)?.branch ?? "?";
+      const reason = ECHO_UNPRICEABLE.get(id);
+      if (reason !== undefined) {
+        const probe = echoArm(sector, ECHO_PROBE_RUNS, seed, id);
+        const inert = probe.digest === probeBase.digest;
+        if (!inert) leaks += 1;
+        console.log(
+          `    ${id.padEnd(12)} ${branch.padEnd(10)}      — · UNCHECKED: ${reason}${inert ? "" : " — LEAK: this node now moves the walk and must be measured"}`,
+        );
+        rows.push(
+          [
+            String(sector),
+            id,
+            branch,
+            "",
+            "",
+            "",
+            "",
+            "",
+            inert ? "unchecked" : "LEAK",
+            reason,
+          ].join(","),
+        );
+        continue;
+      }
+      const arm = echoArm(sector, runs, seed, id);
+      const delta = Number(((arm.winrate - base.winrate) * 100).toFixed(1));
+      const runsInCell = runs * LADDER_DECKS.length;
+      const firedPerRun = arm.fired / Math.max(1, runsInCell);
+      const readyPerRun = arm.ready / Math.max(1, runsInCell);
+      const bad = delta > ECHO_BAND_PP;
+      if (bad) over += 1;
+      const use = arm.passive
+        ? "passive, always on"
+        : `fired ${firedPerRun.toFixed(2)}/run of ${readyPerRun.toFixed(2)} ready`;
+      console.log(
+        `    ${id.padEnd(12)} ${branch.padEnd(10)} ${(arm.winrate * 100).toFixed(1).padStart(5)}% · ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}pp · ${use} — ${bad ? `OVER +${String(ECHO_BAND_PP)}pp` : "ok"}`,
+      );
+      rows.push(
+        [
+          String(sector),
+          id,
+          branch,
+          arm.winrate.toFixed(3),
+          base.winrate.toFixed(3),
+          delta.toFixed(1),
+          arm.passive ? "" : firedPerRun.toFixed(3),
+          arm.passive ? "" : readyPerRun.toFixed(3),
+          bad ? "OVER_BAND" : "ok",
+          "",
+        ].join(","),
+      );
+    }
+  }
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+  const outPath = join(outDir, `echo-${stamp}.csv`);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(
+    over === 0
+      ? `  no measured node is worth more than +${String(ECHO_BAND_PP)}pp of act winrate`
+      : `  OVER BAND: ${String(over)} node-act cell(s) above +${String(ECHO_BAND_PP)}pp`,
+  );
+  console.log(
+    leaks === 0
+      ? "  every unchecked node is still provably inert in this harness"
+      : `  LEAK: ${String(leaks)} unchecked node-act cell(s) now move the walk`,
+  );
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (over > 0 || leaks > 0) process.exitCode = 1;
+};
+
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
@@ -3289,7 +4238,11 @@ const main = (): void => {
                       ? "60"
                       : mode === "dice"
                         ? "200"
-                        : "1000";
+                        : mode === "fire"
+                          ? "20"
+                          : mode === "crew" || mode === "echo"
+                            ? "200"
+                            : "1000";
   const runs = Number(getArg("runs", defaultRuns));
   const seed = Number(getArg("seed", "7"));
   if (!Number.isFinite(runs) || runs <= 0) {
@@ -3346,6 +4299,18 @@ const main = (): void => {
   }
   if (mode === "dice") {
     diceModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "fire") {
+    fireModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "crew") {
+    crewModeMain(runs, seed, startedAt);
+    return;
+  }
+  if (mode === "echo") {
+    echoModeMain(runs, seed, startedAt);
     return;
   }
   if (mode === "axis") {

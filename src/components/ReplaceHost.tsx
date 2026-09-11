@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ReplaceCard } from "@/components/ReplaceCard";
+import { CABIN_CAP } from "@/data/officers";
 import { DECK_CAP } from "@/game/economy/prices";
 import { autosaveRun } from "@/game/run/flow";
 import {
@@ -20,6 +21,7 @@ export const ReplaceHost = () => {
   );
   const deck = useRunStore((s) => s.deck);
   const modules = useRunStore((s) => s.modules);
+  const officers = useRunStore((s) => s.officers);
   const cap = useRunStore(runModuleSlots);
 
   useBackBlock(swap !== undefined);
@@ -32,12 +34,25 @@ export const ReplaceHost = () => {
 
   if (swap === undefined) return null;
 
+  const used =
+    swap.kind === "die"
+      ? deck.length
+      : swap.kind === "module"
+        ? modules.length
+        : officers.length;
+  const max =
+    swap.kind === "die" ? DECK_CAP : swap.kind === "module" ? cap : CABIN_CAP;
+
   return (
     <ReplaceCard
       swap={swap}
-      used={swap.kind === "die" ? deck.length : modules.length}
-      cap={swap.kind === "die" ? DECK_CAP : cap}
-      footerLabel={t("run:replace.sellNew", { n: swapValue(swap) })}
+      used={used}
+      cap={max}
+      footerLabel={
+        swap.kind === "officer"
+          ? t("run:replace.declineOfficer")
+          : t("run:replace.sellNew", { n: swapValue(swap) })
+      }
       onPick={(key) => {
         playSfx("buy");
         resolveSwapReplace(key);

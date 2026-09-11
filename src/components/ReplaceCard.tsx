@@ -7,6 +7,7 @@ import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID } from "@/data/modules";
 import { moduleTags } from "@/data/modules/types";
+import { OFFICER_BY_ID } from "@/data/officers";
 import { schools } from "@/data/schools";
 import { moduleSellValue, ptsForDie, sellValue } from "@/game/economy/prices";
 import { TagChips } from "@/components/TagChips";
@@ -18,7 +19,7 @@ export interface ReplaceCandidate {
   key: string;
   name: string;
   detail: string;
-  value: number;
+  note: string;
   accent: string;
 }
 
@@ -28,6 +29,22 @@ export const useReplaceCandidates = (
   const { t } = useTranslation(["run", "content", "battle"]);
   const deck = useRunStore((s) => s.deck);
   const modules = useRunStore((s) => s.modules);
+  const officers = useRunStore((s) => s.officers);
+  if (swap.kind === "officer") {
+    return officers.flatMap((officerId) => {
+      const def = OFFICER_BY_ID.get(officerId);
+      if (def === undefined) return [];
+      return [
+        {
+          key: officerId,
+          name: t(def.name),
+          detail: t(def.role),
+          note: t("run:replace.disembark"),
+          accent: tokens.dim,
+        },
+      ];
+    });
+  }
   if (swap.kind === "die") {
     return deck.flatMap((die) => {
       const def = DIE_BY_ID.get(die.defId);
@@ -37,7 +54,9 @@ export const useReplaceCandidates = (
           key: die.uid,
           name: t(def.name),
           detail: t(`battle:school.${def.school}`),
-          value: sellValue(ptsForDie(die.defId)),
+          note: t("run:replace.toScrap", {
+            n: sellValue(ptsForDie(die.defId)),
+          }),
           accent: schools[def.school].stroke,
         },
       ];
@@ -51,11 +70,23 @@ export const useReplaceCandidates = (
         key: moduleId,
         name: t(def.name),
         detail: t(def.desc),
-        value: moduleSellValue(def.price),
+        note: t("run:replace.toScrap", { n: moduleSellValue(def.price) }),
         accent: rarityColor(def.rarity),
       },
     ];
   });
+};
+
+const TITLE_KEY: Readonly<Record<PendingSwap["kind"], string>> = {
+  die: "run:replace.titleDie",
+  module: "run:replace.titleModule",
+  officer: "run:replace.titleOfficer",
+};
+
+const FULL_KEY: Readonly<Record<PendingSwap["kind"], string>> = {
+  die: "run:replace.fullDeck",
+  module: "run:replace.fullBay",
+  officer: "run:replace.fullCabins",
 };
 
 interface ReplaceCardProps {
@@ -71,6 +102,26 @@ interface ReplaceCardProps {
 const Incoming = ({ swap }: { swap: PendingSwap }) => {
   const { t } = useTranslation(["run", "content", "battle"]);
   const engravings = useMetaStore((s) => s.engravings);
+  if (swap.kind === "officer") {
+    const officer = OFFICER_BY_ID.get(swap.officerId);
+    if (officer === undefined) return null;
+    return (
+      <div
+        className={styles.incomingModule}
+        style={{ borderLeftColor: tokens.dim }}
+      >
+        <Text size="sm" fw={700} c={tokens.text}>
+          {t(officer.name)}
+        </Text>
+        <Text size="xs" c={tokens.dim}>
+          {t(officer.desc)}
+        </Text>
+        <Text size="xs" c={tokens.faint}>
+          {t(officer.origin)}
+        </Text>
+      </div>
+    );
+  }
   if (swap.kind === "die") {
     const def = DIE_BY_ID.get(swap.defId);
     if (def === undefined) return null;
@@ -114,11 +165,7 @@ export const ReplaceCard = ({
     >
       <div className={styles.head} data-replace-kind={swap.kind}>
         <Text size="xs" c={tokens.faint}>
-          {t(
-            swap.kind === "die"
-              ? "run:replace.titleDie"
-              : "run:replace.titleModule",
-          )}
+          {t(TITLE_KEY[swap.kind])}
         </Text>
       </div>
 
@@ -127,10 +174,7 @@ export const ReplaceCard = ({
       </div>
 
       <Text size="sm" c={tokens.amber} className={styles.prompt}>
-        {t(
-          swap.kind === "die" ? "run:replace.fullDeck" : "run:replace.fullBay",
-          { used, max: cap },
-        )}
+        {t(FULL_KEY[swap.kind], { used, max: cap })}
       </Text>
 
       <div className={styles.list}>
@@ -149,9 +193,7 @@ export const ReplaceCard = ({
               <span className={styles.rowName}>{candidate.name}</span>
               <span className={styles.rowDetail}>{candidate.detail}</span>
             </span>
-            <span className={styles.rowValue}>
-              {t("run:replace.toScrap", { n: candidate.value })}
-            </span>
+            <span className={styles.rowValue}>{candidate.note}</span>
           </button>
         ))}
       </div>

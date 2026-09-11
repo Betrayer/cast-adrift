@@ -8,24 +8,39 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import {
+  popoverMaxHeight,
   popoverPlacement,
   viewportBounds,
   type PopoverAlign,
 } from '@/components/coachPlacement';
-import { useEscapeKey, useOutsidePointer } from '@/components/dismiss';
+import {
+  cancelSwallow,
+  swallowNextClick,
+  useEscapeKey,
+  useOutsidePointer,
+  type TapPoint,
+} from '@/components/dismiss';
 import styles from './TapPopover.module.css';
 
 export type { PopoverAlign };
+
+export type PopoverDismiss = (at?: TapPoint) => void;
+
+export const tapPointOf = (event: {
+  clientX: number;
+  clientY: number;
+}): TapPoint => ({ x: event.clientX, y: event.clientY });
 
 const EDGE = 12;
 
 interface TapPopoverProps {
   children: ReactNode;
-  content: ReactNode;
+  content: ReactNode | ((close: PopoverDismiss) => ReactNode);
   label: string;
   align?: PopoverAlign;
   testId?: string;
   className?: string;
+  role?: 'tooltip' | 'menu';
 }
 
 export const TapPopover = ({
@@ -35,6 +50,7 @@ export const TapPopover = ({
   align = 'center',
   testId,
   className,
+  role = 'tooltip',
 }: TapPopoverProps) => {
   const [open, setOpen] = useState(false);
   const anchorRef = useRef<HTMLSpanElement | null>(null);
@@ -43,6 +59,11 @@ export const TapPopover = ({
 
   const close = useCallback(() => {
     setOpen(false);
+  }, []);
+
+  const closeFromContent = useCallback<PopoverDismiss>((at) => {
+    setOpen(false);
+    swallowNextClick(at);
   }, []);
 
   useEscapeKey(open, close);
@@ -55,10 +76,12 @@ export const TapPopover = ({
     if (bubble === null || anchor === null) return;
     const place = (): void => {
       const rect = anchor.getBoundingClientRect();
+      const bounds = viewportBounds(EDGE);
+      bubble.style.maxHeight = `${String(popoverMaxHeight(bounds))}px`;
       const { left, top } = popoverPlacement(
         { x: rect.left, y: rect.top, w: rect.width, h: rect.height },
         { w: bubble.offsetWidth, h: bubble.offsetHeight },
-        viewportBounds(EDGE),
+        bounds,
         align,
       );
       bubble.style.left = `${String(left)}px`;
@@ -88,8 +111,10 @@ export const TapPopover = ({
         aria-label={label}
         aria-expanded={open}
         aria-controls={open ? bubbleId : undefined}
+        aria-haspopup={role === 'menu' ? 'menu' : undefined}
         data-testid={testId}
         onClick={() => {
+          cancelSwallow();
           setOpen((value) => !value);
         }}
       >
@@ -100,11 +125,11 @@ export const TapPopover = ({
             <span
               ref={bubbleRef}
               id={bubbleId}
-              role="tooltip"
+              role={role}
               data-tap-popover={testId ?? label}
               className={styles.bubble}
             >
-              {content}
+              {typeof content === 'function' ? content(closeFromContent) : content}
             </span>,
             document.body,
           )

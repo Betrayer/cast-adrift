@@ -167,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} dégâts · {{split}}"
   },
   "block": {
     "resolving": "Attends la résolution du tour",
@@ -181,7 +183,13 @@
     "reserveFull": "Réserve pleine",
     "used": "Déjà utilisé ce tour",
     "hullLow": "Coque trop faible",
+    "notAllowed": "Impossible pour l’instant",
+    "occupied": "Cet emplacement contient déjà un dé",
+    "tierCap": "Le dé est trop grand pour cet emplacement",
+    "slotBlocked": "Cet emplacement est bloqué ce tour",
+    "dieLocked": "Ce dé est verrouillé",
     "noPartner": "Le recuit nécessite une deuxième matrice de même valeur.",
+    "needsTwoEnemies": "Ce mode de tir exige deux cibles vivantes",
     "spent": "Le navire peut effectuer cette action une fois par combat."
   },
   "resPrism": "un dé prismatique compte pour cette école",
@@ -203,6 +211,7 @@
     "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -381,5 +390,15 @@
       "fold": "traite la commande",
       "devour": "dévorer un dé"
     }
+  },
+  "mode": {
+    "title": "Mode de tir",
+    "label": "Mode de tir : {{mode}}"
+  },
+  "echo": {
+    "after": "Ensuite",
+    "fork": "{{cond}} — {{then}}. Sinon — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Tiré de son motif — rien n’est fixé."
   }
 }

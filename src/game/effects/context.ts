@@ -10,6 +10,7 @@ import { createStream, fnv1a, type RngStream } from "@/services/rng";
 import type { ContentTag } from "@/data/tags";
 import { resonanceAtLeast } from "@/game/battle/resonance";
 import { isInverted } from "@/game/battle/order";
+import { aimedEnemy } from "@/game/battle/target";
 import { applyStatus, type StatusKey } from "@/game/battle/statuses";
 import { sourceTrait } from "@/game/run/runMods";
 import type { EffectCtx } from "@/game/effects/ctx";
@@ -277,16 +278,7 @@ export class BattleCtx implements EffectCtx {
   }
 
   private currentTargetEnemy(): EnemyState | undefined {
-    const alive = aliveEnemies(this.snapshot);
-    const targetId = this.snapshot.targetId;
-    if (targetId !== null) {
-      const direct = alive.find((e) => e.id === targetId);
-      if (direct !== undefined) return direct;
-      const parentId = targetId.split(":")[0] ?? targetId;
-      const parent = alive.find((e) => e.id === parentId);
-      if (parent !== undefined) return parent;
-    }
-    return alive[0];
+    return aimedEnemy(aliveEnemies(this.snapshot), this.snapshot.targetId);
   }
 
   dmg(n: number, target: EffectTarget = "target"): void {

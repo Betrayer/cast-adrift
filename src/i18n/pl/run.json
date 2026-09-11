@@ -50,7 +50,10 @@
     "scrap": "Złom {{n}}",
     "previewHole": "Krawędź odpowiada za całą plamę: obejść ją albo wlecieć w tunel",
     "spotLabel": "Czarna dziura — cała plama to jeden wybór",
-    "conditions": "Warunki ×{{n}}"
+    "conditions": "Warunki ×{{n}}",
+    "cargo": "Ładunek ▸{{n}}",
+    "cargoMany": "Ładunek ×{{n}}",
+    "previewDelivery": "Dostawa: {{n}} złomu po przybyciu"
   },
   "event": {
     "title": "Sygnał",
@@ -81,7 +84,9 @@
     "checkTierMax": "tylko pliki o rozmiarze {{tier}} i mniejsze",
     "outcomeOdds": "kursy {{odds}}",
     "beaconTitle": "Latarnia",
-    "beaconCounter": "Latarnia {{n}} z {{max}}"
+    "beaconCounter": "Latarnia {{n}} z {{max}}",
+    "reqCargo": "wymaga wolnej ładowni i stacji przed nami",
+    "cargoTerms": "{{drawback}} · dostawa płaci {{n}}"
   },
   "anomaly": {
     "title": "Anomalia",
@@ -501,7 +506,14 @@
     "tabBattle": "Walka",
     "openBattle": "Dziennik walki",
     "battleLive": "Ta walka, najnowsza tura na górze.",
-    "battleLast": "Ostatnia walka, najnowsza tura na górze."
+    "battleLast": "Ostatnia walka, najnowsza tura na górze.",
+    "cargo": {
+      "taken": "zabrał {{name}} na pokład, {{n}} rzędów do zrzutu",
+      "moved": "znacznik dostawy {{name}} przeszedł na bliższą stację",
+      "delivered": "dostarczył {{name}} za {{n}} złomu",
+      "dropped": "wyrzucił {{name}} i stracił zapłatę",
+      "lapsed": "kontrakt na {{name}} wygasł"
+    }
   },
   "memory": {
     "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",
@@ -578,7 +590,10 @@
     "ride": "Wsiadaj i jedź",
     "rideCost": "Przejazd: przejazd pociągiem linii „{{min}}” – stacja{{max}}, kierunek nieznany",
     "rideGentle": "Ride: rzut „{{min}}” – „{{max}}”, wyłącznie w głębszym zakresie",
-    "landed": "Rzuty {{rows}} wiersze {{way}}"
+    "landed": "Rzuty {{rows}} wiersze {{way}}",
+    "softLand": "Wyląduj miękko",
+    "softLandWhy": "Raz na kurs: bez rzutu — najbliższy wolny węzeł z przodu",
+    "softLandSpent": "Ładunek Echa został już zużyty w tym kursie"
   },
   "bridge": {
     "title": "Most",
@@ -597,10 +612,28 @@
     "deckCount": "Strona internetowa: {{n}} / {{max}}",
     "sellDiceHint": "W sklepie można kupić kostki do gry.",
     "sellModule": "Sprzedaż + numer{{n}}",
-    "crewTitle": "Kabiny oficerskie",
-    "crewLocked": "Zapieczętowany — na pokładzie nie ma jeszcze załogi.",
-    "cargoTitle": "Luk ładunkowy",
-    "cargoLocked": "Zamknięte — na razie nie ma co wywozić."
+    "crewTitle": "Kabiny oficerskie {{used}}/{{max}}",
+    "cargoTitle": "Ładownia {{used}}/{{max}}",
+    "cabinEmpty": "pusta kabina — uratuj kogoś",
+    "cabinWho": "{{role}} · {{origin}}",
+    "cabinActive": "aktywna · {{text}}",
+    "cabinPassive": "pasywna · {{text}}",
+    "passive": {
+      "scrapMultPct": "+{{n}}% złomu",
+      "scrapPerKill": "+{{n}} złomu za zabitego",
+      "battleEndHeal": "koniec walki: leczy {{n}} kadłuba",
+      "markBonusDelta": "znaczniki dają +{{n}} obrażeń",
+      "evasionDelta": "unik +{{n}}%",
+      "rerollSizeDelta": "kości na przerzut: +{{n}}"
+    },
+    "cargoEmpty": "pusta ładownia",
+    "cargoTerms": "dostawa: stacja · {{rows}} rzędów · płaci {{n}}",
+    "dropCargo": "Wyrzuć",
+    "dropTitle": "Wyrzucić ładunek?",
+    "dropBody": "{{name}} idzie przez śluzę. Obciążenie znika teraz, a {{n}} złomu za dostawę przepada.",
+    "dropBodyAxis": "{{name}} idzie przez śluzę. Oś zostaje tam, gdzie ją przesunął, a {{n}} złomu za dostawę przepada.",
+    "dropNo": "Wieźć dalej",
+    "dropYes": "Wyrzuć"
   },
   "replace": {
     "title": "Zastąp",
@@ -610,7 +643,11 @@
     "fullBay": "Bay w pełnej krasie {{used}} / {{max}} — co się dzieje?",
     "toScrap": "→ scrap + {{n}}",
     "sellNew": "Sprzedaj nowy egzemplarz (+ {{n}})",
-    "cancel": "Anuluj"
+    "cancel": "Anuluj",
+    "titleOfficer": "Nowy oficer",
+    "fullCabins": "Kajuty pełne {{used}}/{{max}} — kto schodzi?",
+    "disembark": "→ schodzi ze statku",
+    "declineOfficer": "Zostawić ich"
   },
   "feed": {
     "source": {
@@ -631,5 +668,43 @@
     "decline": "Zostaw",
     "hint": "Jedno z trzech. Reszta spłonie razem z wrakiem.",
     "declined": "Rozbiórka: nic na pokładzie nie było warte czasu palnika."
+  },
+  "cargo": {
+    "title": "Ryzykowny ładunek",
+    "rows": "jeszcze {{n}} rzędów",
+    "payout": "płaci {{n}} złomu",
+    "delivered": "Ładunek dostarczony — ładownia pusta, zapłata zapisana",
+    "dropped": "Ładunek wyrzucony — obciążenie znika, zapłata przepada",
+    "droppedAxis": "Ładunek wyrzucony — oś pozostaje przesunięta, zapłata przepada",
+    "lapsed": "Kontrakt wygasł wraz z aktem — ładownia pusta, zapłaty nie będzie",
+    "moved": "Dostawa przekierowana — znacznik przeszedł na najbliższą stację przed nami",
+    "stranded": "Nikt przed nami nie przyjmie ładunku — kontrakt jest nieważny"
+  },
+  "echo": {
+    "title": "Rdzeń Echa",
+    "close": "Zamknij",
+    "count": "Odzyskane fragmenty: {{n}} z {{max}}",
+    "rule": "Jeden węzeł leci z tobą. Nic się nie wydaje i nie przenosi.",
+    "tier": "od {{n}}",
+    "locked": "Otwiera się przy {{n}} odzyskanych fragmentach",
+    "equipped": "Wyposażony",
+    "none": "Bez węzła",
+    "noneBody": "Rusz w kurs z pustym rdzeniem.",
+    "open": "Rdzeń Echa",
+    "setup": "Echo",
+    "setupNone": "Nie wybrano węzła",
+    "codexTitle": "Rdzeń Echa",
+    "codexBody": "Odzyskane fragmenty otwierają węzły. Jeden leci z tobą w każdym kursie.",
+    "opened": {
+      "secondLook": "Rdzeń Echa: Drugie spojrzenie jest otwarty.",
+      "readout": "Rdzeń Echa: Rozbiór jest otwarty.",
+      "calculus": "Rdzeń Echa: Rozwiązanie ogniowe jest otwarty.",
+      "echolocation": "Rdzeń Echa: Echolokacja jest otwarty.",
+      "pathGhost": "Rdzeń Echa: Widmo szlaku jest otwarty.",
+      "softLanding": "Rdzeń Echa: Miękkie lądowanie jest otwarty.",
+      "reserve": "Rdzeń Echa: Rezerwa mocy jest otwarty.",
+      "shieldEcho": "Rdzeń Echa: Echo tarczy jest otwarty.",
+      "veto": "Rdzeń Echa: Weto jest otwarty."
+    }
   }
 }

@@ -241,6 +241,7 @@ const TagGlossary = () => {
 export const CodexScreen = () => {
   const { t } = useTranslation(["run", "content"]);
   const go = useAppStore((s) => s.go);
+  const setEchoCore = useAppStore((s) => s.setEchoCore);
 
   return (
     <Screen
@@ -264,7 +265,7 @@ export const CodexScreen = () => {
             style={riseStyle(2)}
           >
             <Group justify="space-between" wrap="nowrap">
-              <Stack gap={2}>
+              <Stack gap={2} style={{ minWidth: 0 }}>
                 <Text size="sm" fw={600} c={tokens.text}>
                   {t("run:codex.prologueTitle")}
                 </Text>
@@ -275,12 +276,45 @@ export const CodexScreen = () => {
               <Button
                 size="compact-sm"
                 variant="default"
+                style={{ flex: "0 0 auto" }}
                 data-replay-prologue
                 onClick={() => {
                   go("prologue", { replay: "1" });
                 }}
               >
                 {t("run:codex.prologueReplay")}
+              </Button>
+            </Group>
+          </Paper>
+          <Paper
+            bg={tokens.surface1}
+            p="sm"
+            radius="sm"
+            withBorder
+            data-rise
+            data-press
+            data-testid="codex-echo"
+            style={riseStyle(2)}
+          >
+            <Group justify="space-between" wrap="nowrap">
+              <Stack gap={2} style={{ minWidth: 0 }}>
+                <Text size="sm" fw={600} c={tokens.text}>
+                  {t("run:echo.codexTitle")}
+                </Text>
+                <Text size="xs" c={tokens.faint}>
+                  {t("run:echo.codexBody")}
+                </Text>
+              </Stack>
+              <Button
+                size="compact-sm"
+                variant="default"
+                style={{ flex: "0 0 auto" }}
+                data-testid="codex-echo-open"
+                onClick={() => {
+                  setEchoCore(true);
+                }}
+              >
+                {t("run:echo.open")}
               </Button>
             </Group>
           </Paper>

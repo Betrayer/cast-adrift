@@ -312,6 +312,18 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "haul",
+        label: "content:events.reliquaryRun.opt.haul",
+        requires: { req: "cargo", id: "saintsReliquary" },
+        outcomes: [
+          {
+            text: "content:events.reliquaryRun.out.haul",
+            effects: [{ k: "cargo", id: "saintsReliquary" }],
+            consequence: "content:consequence.cargoTaken",
+          },
+        ],
+      },
     ],
   },
   {
@@ -426,6 +438,7 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
               { k: "axis", n: 2 },
               { k: "nodeMod", mod: "revealRows", n: 3 },
               { k: "flag", key: "defectorSaved" },
+              { k: "officer", id: "defector" },
             ],
           },
         ],
@@ -975,7 +988,8 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "flag", key: "hymnSchoolBroken" },
               { k: "flag", key: "choirEnemy" },
-              { k: "axis", n: 3 }
+              { k: "axis", n: 3 },
+              { k: "officer", id: "chorister" }
             ],
             consequence: "content:consequence.hymnSchoolBroken",
           },

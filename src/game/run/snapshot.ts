@@ -30,9 +30,11 @@ const resumeScreen = (screen: ScreenId, battleLive: boolean): ScreenId => {
   return useRunStore.getState().pendingRewards === null ? "map" : "rewards";
 };
 
-export const RUN_SNAPSHOT_V = 13;
+export const RUN_SNAPSHOT_V = 15;
 
-export const RUN_SNAPSHOT_ACCEPTED: readonly number[] = [10, 11, 12, 13];
+export const RUN_SNAPSHOT_ACCEPTED: readonly number[] = [
+  10, 11, 12, 13, 14, 15,
+];
 
 export interface RunSnapshotV1 {
   v: number;
@@ -62,6 +64,12 @@ const pickRunValues = (s: RunState): RunValues => ({
   deck: s.deck.map((d) => ({ ...d })),
   perks: [...s.perks],
   modules: [...s.modules],
+  officers: [...s.officers],
+  echo: s.echo,
+  echoUsed: s.echoUsed,
+  cargo: s.cargo.map((held) => ({ ...held })),
+  pendingCargoBark: s.pendingCargoBark,
+  pendingOfficerBark: s.pendingOfficerBark,
   baysPurchased: s.baysPurchased,
   pendingSwaps: s.pendingSwaps.map((swap) => ({ ...swap })),
   banishedPerks: [...s.banishedPerks],

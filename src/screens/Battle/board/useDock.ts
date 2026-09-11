@@ -27,6 +27,7 @@ import { battleSnapshot, useBattleStore } from '@/stores/battleStore';
 import type { BattleState } from '@/stores/battleStore';
 import type { RolledDie, SlotId } from '@/types/battle';
 import { rectOf, useMeasured } from './measure';
+import { slotModeModels, type SlotModeModels } from './slotModes';
 
 const NO_TARGETS: LegalTargets = { slots: [], reserve: false };
 const NO_PROJECTIONS: Partial<Record<SlotId, SlotProjection>> = {};
@@ -91,6 +92,7 @@ export interface DockModel {
   ordered: SlotId[];
   legal: LegalTargets;
   projections: Partial<Record<SlotId, SlotProjection>>;
+  modes: SlotModeModels;
   reserved: RolledDie[];
   reserveMax: number;
 }
@@ -106,6 +108,7 @@ export const useDockModel = (): DockModel => {
     () => projectionsFor(board, subject, legal),
     [board, subject, legal],
   );
+  const modes = useMemo(() => slotModeModels(board), [board]);
   const reserved = useMemo(
     () => board.dice.filter((d) => d.state === 'reserved'),
     [board],
@@ -115,7 +118,7 @@ export const useDockModel = (): DockModel => {
     return reserveCapacity(board, selected?.school);
   }, [board]);
 
-  return { board, ordered, legal, projections, reserved, reserveMax };
+  return { board, ordered, legal, projections, modes, reserved, reserveMax };
 };
 
 export interface DockAnchors {

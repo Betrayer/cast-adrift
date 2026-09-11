@@ -1,6 +1,16 @@
+import {
+  CARGO_BY_ID,
+  cargoHullPerNode,
+  cargoPayout,
+  cargoSlotTierDelta,
+  type CargoDef,
+} from "../../src/data/cargo";
 import { DIE_BY_ID } from "../../src/data/dice";
+import type { EchoNodeId } from "../../src/data/echo";
+import { CABIN_CAP } from "../../src/data/officers";
 import { MODULE_BY_ID } from "../../src/data/modules";
 import { moduleTags } from "../../src/data/modules/types";
+import { MODULE_FIRE_MODE } from "../../src/data/fireModes";
 import {
   loadoutCensus,
   type TagCensus,
@@ -26,7 +36,11 @@ import { interferenceStacksForStreak } from "../../src/game/run/interference";
 import { computePerkMods } from "../../src/game/run/perkMods";
 import { computeModuleMods, computeRunMods } from "../../src/game/run/runMods";
 import type { PerkMods } from "../../src/data/perks/types";
-import { rollPerkChoices, type DraftContext } from "../../src/game/run/perkDraft";
+import {
+  rollPerkChoices,
+  skipScrapFor,
+  type DraftContext,
+} from "../../src/game/run/perkDraft";
 import { puzzleForNode } from "../../src/game/puzzles/selection";
 import type { MapGraph, MapNode } from "../../src/game/map/types";
 import { edgeMarkFor } from "../../src/game/map/types";
@@ -70,6 +84,11 @@ export interface PuzzleTally {
   solved: number;
   attempts: number;
   paid: number;
+}
+
+export interface SimCargo {
+  defId: string;
+  nodeId: string;
 }
 
 export interface RunState {
@@ -116,6 +135,18 @@ export interface RunState {
   sinks: Record<string, number>;
   takenBySector: Record<number, number>;
   fightsBySector: Record<number, number>;
+  officers: string[];
+  officerLock: boolean;
+  echo: EchoNodeId | null;
+  echoUsed: boolean;
+  cargo: SimCargo[];
+  pendingCargo: string | null;
+  cargoScrap: number;
+  cargoTaken: number;
+  cargoDelivered: number;
+  cargoLapsed: number;
+  activeFired: Record<string, number>;
+  activeReady: Record<string, number>;
 }
 
 export const emptyPuzzleTally = (): Record<number, PuzzleTally> => ({
@@ -147,6 +178,9 @@ export interface RunStateInit {
   modules?: readonly string[];
   chartPicks?: readonly string[];
   mutators?: readonly string[];
+  officers?: readonly string[];
+  officerLock?: boolean;
+  echo?: EchoNodeId | null;
 }
 
 export const createRunState = (init: RunStateInit): RunState => ({
@@ -193,6 +227,18 @@ export const createRunState = (init: RunStateInit): RunState => ({
   sinks: emptySinks(),
   takenBySector: {},
   fightsBySector: {},
+  officers: [...(init.officers ?? [])],
+  officerLock: init.officerLock ?? false,
+  echo: init.echo ?? null,
+  echoUsed: false,
+  cargo: [],
+  pendingCargo: null,
+  cargoScrap: 0,
+  cargoTaken: 0,
+  cargoDelivered: 0,
+  cargoLapsed: 0,
+  activeFired: {},
+  activeReady: {},
 });
 
 export const spend = (state: RunState, cost: number, sink: string): boolean => {
@@ -339,6 +385,8 @@ const MODULE_TRADE_MARGIN = 1.25;
 
 const MODULE_TAG_CAP = 4;
 
+const MODULE_FIRE_MODE_VALUE = 1.2;
+
 export const buildCensus = (state: RunState): TagCensus =>
   loadoutCensus({
     deckDefIds: state.deck,
@@ -356,6 +404,7 @@ export const moduleValue = (moduleId: string, census: TagCensus = {}): number =>
   }
   score += (def.effects?.length ?? 0) * 0.6;
   score += (def.traits?.length ?? 0) * 1.2;
+  if (MODULE_FIRE_MODE[moduleId] !== undefined) score += MODULE_FIRE_MODE_VALUE;
   for (const tag of moduleTags(def)) {
     score += MODULE_TAG_VALUE * Math.min(census[tag] ?? 0, MODULE_TAG_CAP);
   }
@@ -551,6 +600,14 @@ export const greedyShipyard = (
   buyBay(state, sector);
 };
 
+export const grantSimOfficer = (state: RunState, officerId: string): boolean => {
+  if (state.officerLock) return false;
+  if (state.officers.includes(officerId)) return false;
+  if (state.officers.length >= CABIN_CAP) return false;
+  state.officers.push(officerId);
+  return true;
+};
+
 export const applyEffectsToState = (
   state: RunState,
   effects: readonly EventEffect[],
@@ -581,6 +638,10 @@ export const applyEffectsToState = (
       takeDie(state, defId);
     } else if (effect.k === "swapLowestDie") {
       state.deck.sort((a, b) => ptsForDie(a) - ptsForDie(b));
+    } else if (effect.k === "officer") {
+      grantSimOfficer(state, effect.id);
+    } else if (effect.k === "cargo") {
+      state.pendingCargo = effect.id;
     }
   }
 };
@@ -781,7 +842,45 @@ const deckRefs = (state: RunState): DeckRef[] =>
 const hullValue = (state: RunState): number =>
   EVENT_HULL_VALUE * (state.hullMax / Math.max(1, state.hull));
 
-const effectValue = (state: RunState, effect: EventEffect): number => {
+export const CARGO_HULL_HORIZON = 5;
+
+export const CARGO_TIER_COST = 12;
+
+export const cargoValue = (
+  state: RunState,
+  def: CargoDef,
+  scrapMult: number,
+): number =>
+  cargoPayout(def, scrapMult) -
+  cargoHullPerNode(def) * CARGO_HULL_HORIZON * hullValue(state) -
+  Object.keys(cargoSlotTierDelta(def)).length * CARGO_TIER_COST;
+
+export const officerOfferValue = (
+  state: RunState,
+  officerId: string,
+  sector: number,
+): number =>
+  state.officerLock ||
+  state.officers.includes(officerId) ||
+  state.officers.length >= CABIN_CAP
+    ? 0
+    : skipScrapFor(sector);
+
+const cargoEventValue = (
+  state: RunState,
+  cargoId: string,
+  sector: number,
+): number => {
+  const def = CARGO_BY_ID.get(cargoId);
+  if (def === undefined) return 0;
+  return Math.max(0, cargoValue(state, def, sectorDef(sector).scrapMult));
+};
+
+const effectValue = (
+  state: RunState,
+  effect: EventEffect,
+  sector: number,
+): number => {
   if (effect.k === "scrap") return effect.n;
   if (effect.k === "hull") {
     return effect.n < 0
@@ -791,12 +890,15 @@ const effectValue = (state: RunState, effect: EventEffect): number => {
   if (effect.k === "hullMax") return effect.n * EVENT_HULL_VALUE * 2;
   if (effect.k === "tide") return -effect.n * hullValue(state);
   if (effect.k === "loot") return 30;
+  if (effect.k === "officer") return officerOfferValue(state, effect.id, sector);
+  if (effect.k === "cargo") return cargoEventValue(state, effect.id, sector);
   return 0;
 };
 
 const outcomesValue = (
   state: RunState,
   outcomes: readonly Outcome[],
+  sector: number,
 ): number => {
   if (outcomes.length === 0) return 0;
   let weight = 0;
@@ -806,7 +908,7 @@ const outcomesValue = (
     weight += w;
     total +=
       w *
-      outcome.effects.reduce((sum, e) => sum + effectValue(state, e), 0);
+      outcome.effects.reduce((sum, e) => sum + effectValue(state, e, sector), 0);
   }
   return weight === 0 ? 0 : total / weight;
 };
@@ -815,11 +917,12 @@ const optionValue = (
   state: RunState,
   option: EventOption,
   odds: number,
+  sector: number,
 ): number =>
   option.check === undefined
-    ? outcomesValue(state, option.outcomes ?? [])
-    : odds * outcomesValue(state, option.onPass ?? []) +
-      (1 - odds) * outcomesValue(state, option.onFail ?? []);
+    ? outcomesValue(state, option.outcomes ?? [], sector)
+    : odds * outcomesValue(state, option.onPass ?? [], sector) +
+      (1 - odds) * outcomesValue(state, option.onFail ?? [], sector);
 
 const checkOddsFor = (state: RunState, option: EventOption): number => {
   if (option.check === undefined) return 1;
@@ -837,6 +940,7 @@ export const runEvent = (
   kind: EventKind,
   seed: number,
   tideCap: number,
+  offerableCargo: readonly string[] = [],
 ): ForcedBattle | null => {
   const stream = createStream(seed);
   const def: EventDef | null = pickEvent(
@@ -860,6 +964,7 @@ export const runEvent = (
     deck: deckRefs(state).map((d) => ({ school: d.school ?? "grey", tier: d.tier })),
     mkLevels: state.mkLevels,
     flags: state.flags,
+    offerableCargo,
   };
   const legal = def.options.filter((option) => optionMet(option.requires, ctx));
   if (legal.length === 0) return null;
@@ -869,7 +974,7 @@ export const runEvent = (
   let bestOdds = 1;
   for (const option of legal) {
     const odds = checkOddsFor(state, option);
-    const value = optionValue(state, option, odds);
+    const value = optionValue(state, option, odds, sector);
     if (value > bestValue) {
       bestValue = value;
       best = option;

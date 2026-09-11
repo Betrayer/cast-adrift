@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   coachCardPlacement,
+  popoverMaxHeight,
   popoverPlacement,
   type Bounds,
 } from "@/components/coachPlacement";
@@ -114,5 +115,29 @@ describe("popover placement", () => {
       "center",
     );
     expect(place.top + BUBBLE.h).toBeLessThanOrEqual(PHONE.bottom);
+  });
+
+  it("caps a bubble taller than the bounds instead of running past the fold", () => {
+    const SHORT: Bounds = { top: 12, left: 12, right: 888, bottom: 388 };
+    const CONTENT = 429;
+    const capped = popoverMaxHeight(SHORT);
+    const uncapped = popoverPlacement(
+      { x: 441, y: 208, w: 35, h: 21 },
+      { w: 260, h: CONTENT },
+      SHORT,
+      "end",
+    );
+    expect(uncapped.top + CONTENT).toBeGreaterThan(SHORT.bottom);
+
+    const place = popoverPlacement(
+      { x: 441, y: 208, w: 35, h: 21 },
+      { w: 260, h: Math.min(CONTENT, capped) },
+      SHORT,
+      "end",
+    );
+    expect(place.top).toBeGreaterThanOrEqual(SHORT.top);
+    expect(place.top + Math.min(CONTENT, capped)).toBeLessThanOrEqual(
+      SHORT.bottom,
+    );
   });
 });

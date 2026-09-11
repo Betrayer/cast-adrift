@@ -1046,7 +1046,8 @@
     "remainderReturned": "Le reste est de nouveau dans son emplacement.",
     "thresholdHeard": "L'aiguille n'a pas bougé.",
     "thresholdCommitted": "Tu as donné un côté au marqueur.",
-    "thresholdWalked": "Tu n'as pas touché à l'aiguille."
+    "thresholdWalked": "Tu n'as pas touché à l'aiguille.",
+    "cargoTaken": "tu as pris du fret à risque à bord et marqué la livraison"
   },
   "events": {
     "driftingPod": {
@@ -1548,12 +1549,14 @@
       "opt": {
         "buy": "Acheter le kit de reroll (35)",
         "swap": "Échangez votre dé le plus nul",
-        "pass": "Vends-lui plutôt tes vieilleries"
+        "pass": "Vends-lui plutôt tes vieilleries",
+        "haul": "Prendre la caisse qu'elle garde sous le comptoir"
       },
       "out": {
         "buy": "Elle fixe un dispositif de tri récupéré sur ton plateau. Ça cliquette. Mais ça marche.",
         "swap": "Elle accepte sans broncher ton pire lancer de dé et te rend quelque chose qui comporte un autre genre de problème.",
-        "pass": "Elle achète le lot à un prix raisonnable, ce qui, venant de Mara, tient pratiquement du compliment."
+        "pass": "Elle achète le lot à un prix raisonnable, ce qui, venant de Mara, tient pratiquement du compliment.",
+        "haul": "Des plaques du Chœur, limées sous leurs numéros. Elle ne demande pas où tu les emportes, et ce silence fait partie du prix."
       }
     },
     "clanToll": {
@@ -1727,11 +1730,13 @@
       "text": "Un filon de fragments de la Faille, surgissant de nulle part, net et précis, comme taillé par quelque chose qui n'existe pas.",
       "opt": {
         "cutShards": "Couper un éclat",
-        "mapVein": "Localiser la veine"
+        "mapVein": "Localiser la veine",
+        "haul": "Découper le cœur et l'embarquer"
       },
       "out": {
         "cutShards": "Cela se détache sous la forme d'un éclat prismatique. Le recul entaille la coque.",
-        "mapVein": "Vous vendez le relevé à l'avance et vous lisez deux lignes de données issues du même relevé."
+        "mapVein": "Vous vendez le relevé à l'avance et vous lisez deux lignes de données issues du même relevé.",
+        "haul": "Il sort de la veine et continue de bourdonner. Plus loin, quelqu'un paie pour ce qui bourdonne, et ton réacteur devra lui faire de la place."
       }
     },
     "relayEcho": {
@@ -1891,12 +1896,14 @@
       "opt": {
         "raidIt": "Prends le reliquaire",
         "trade": "Échangez-le",
-        "catalogue": "Le répertorier correctement"
+        "catalogue": "Le répertorier correctement",
+        "haul": "Porter le reliquaire jusqu'à sa station"
       },
       "out": {
         "raidIt": "Vous vous engagez. Le chantre cesse de chanter et se met à tirer.",
         "trade": "Ils acceptent un noyau jaune en guise de tribut et vous donnent en échange quelque chose d'encore plus étrange.",
-        "catalogue": "Vous dressez l'inventaire du reliquaire au lieu de le dépouiller. Les intendants du Chœur achètent la liste, et un « yard three jumps » se charge des formalités administratives."
+        "catalogue": "Vous dressez l'inventaire du reliquaire au lieu de le dépouiller. Les intendants du Chœur achètent la liste, et un « yard three jumps » se charge des formalités administratives.",
+        "haul": "Scellé, inventorié et attendu quelque part devant. Il reste tout le trajet contre les émetteurs de bouclier, et ça ne leur plaît pas."
       }
     },
     "choirTithe": {
@@ -2055,12 +2062,14 @@
       "opt": {
         "buyOut": "Racheter ses parts",
         "sellShip": "Vends-lui ta plaque",
-        "walkPast": "Passer devant"
+        "walkPast": "Passer devant",
+        "haul": "Prendre la caisse sous son comptoir"
       },
       "out": {
         "buyOut": "Elle te remet la caisse de bonne qualité sans marchander, et c'est à ça qu'on sait que c'est fini.",
         "sellShip": "Elle paie honnêtement pour cette armure. Tu t'en rendras compte plus tard.",
-        "walkPast": "« Comme tu veux. » Elle te glisse quand même un kit de réparation en sortant."
+        "walkPast": "« Comme tu veux. » Elle te glisse quand même un kit de réparation en sortant.",
+        "haul": "«Des dormeurs. Payés, pas les miens.» Elle ne dit pas à qui. Ils coûtent de l'air, et ici l'air se paie en coque."
       }
     },
     "maraLedger": {
@@ -2401,13 +2410,15 @@
       "opt": {
         "bidHigh": "Surenchéris sur eux tous",
         "backScript": "Soutenir le soumissionnaire de la flotte",
-        "jamAuction": "Bloquer la vente aux enchères"
+        "jamAuction": "Bloquer la vente aux enchères",
+        "haul": "Prendre le lot invendu en consignation"
       },
       "out": {
         "bidHigh": "Le manifeste est authentique. La moitié a déjà été récupérée, et l'autre moitié vaut à elle seule le montant total de l'offre.",
         "bidHighDud": "La cargaison a disparu. Les itinéraires figurant sur le manifeste, eux, sont toujours là, et par ici, les itinéraires, c'est presque de la cargaison.",
         "backScript": "Tu garantis le script sur une chaîne en clair. L'argent de la grand-mère de quelqu'un sert enfin à quelque chose.",
-        "jamAuction": "Personne ne remporte l'enchère. Deux heures plus tard, vous récupérez l'ensemble des articles au prix de réserve auprès d'un employé très agacé."
+        "jamAuction": "Personne ne remporte l'enchère. Deux heures plus tard, vous récupérez l'ensemble des articles au prix de réserve auprès d'un employé très agacé.",
+        "haul": "Personne n'a acheté les bobines. Le commis les remet avec une adresse de livraison et sans garantie, et à côté d'elles le premier canon tourne d'un calibre en dessous."
       }
     },
     "wardenPatrolBoat": {
@@ -2985,14 +2996,16 @@
       "opt": {
         "splitIt": "Proposer de partager les frais",
         "raceThem": "Fais-leur la course pour l'avoir",
-        "giveWay": "Donnez-leur l'épave"
+        "giveWay": "Donnez-leur l'épave",
+        "haul": "Lui reprendre sa cargaison vivante"
       },
       "out": {
         "splitIt": "Partagez-vous la moitié chacun et sortez tous les deux avant la marée. Ça se passe mieux que vous ne l'aviez imaginé.",
         "splitItBetter": "Eux connaissent la classe de la coque et vous, le câblage. Ensemble, vous parvenez à découvrir quelque chose qu’aucun de vous n’aurait trouvé seul.",
         "raceThem": "Tu es plus rapide. Ils continuent à couper quand tu te désamarras, et ils ne disent absolument rien.",
         "raceThemLose": "Ils sont plus rapides. Si tu veux la preuve du contraire, essaie de te brûler le bras avec un chalumeau.",
-        "giveWay": "Vous vous désamarriez et leur laissez la voie libre. Ils vous classent alors parmi les « bons »."
+        "giveWay": "Vous vous désamarriez et leur laissez la voie libre. Ils vous classent alors parmi les « bons ».",
+        "haul": "Il n'a plus d'air pour eux et le dit sans détour. Une soute de dormeurs, une station qui les prendra, et une coque qui paie à chaque nœud."
       }
     },
     "frozenBroadcast": {
@@ -3109,13 +3122,15 @@
       "opt": {
         "readIt": "Lire la couche supérieure",
         "postYours": "Publiez le vôtre",
-        "stripBoard": "Démonter l'ensemble de la carte"
+        "stripBoard": "Démonter l'ensemble de la carte",
+        "haul": "Prendre le convoyage de lest"
       },
       "out": {
         "readIt": "Deux conseils pour récupérer des objets, un avertissement concernant une voie, et un nom que vous entendrez à nouveau avant la fin du secteur.",
         "readItOld": "Dans le cadre de cette affaire, il existe une demande de récupération que personne n'a jamais déposée. Techniquement, elle est toujours valable.",
         "postYours": "Tu rédiges ton annonce, ton titre et une ligne pour expliquer ce que tu recherches. C'est la première chose honnête que tu aies faite de toute la semaine.",
-        "stripBoard": "Quarante ans de papier, avec une plaque en alliage de bonne qualité en dessous. Vous prenez la plaque."
+        "stripBoard": "Quarante ans de papier, avec une plaque en alliage de bonne qualité en dessous. Vous prenez la plaque.",
+        "haul": "Un convoyage de lest de blindage : quatre caisses et une adresse quelques rangées plus loin. Les moteurs sentiront chaque kilo."
       }
     },
     "hushAntechamber": {
@@ -3135,7 +3150,9 @@
       "log": "Enregistrez-le et vendez les coordonnées",
       "logOut": "Quelqu'un dans le Rim va payer pour une bouée qui s'enregistre toute seule. Laisse-les découvrir le reste par eux-mêmes.",
       "leave": "Ne l'ouvrez pas",
-      "leaveOut": "Vous enregistrez la position et passez à autre chose. Quatre heures plus tard, Echo signale, sans autre commentaire, que la bouée a disparu."
+      "leaveOut": "Vous enregistrez la position et passez à autre chose. Quatre heures plus tard, Echo signale, sans autre commentaire, que la bouée a disparu.",
+      "haul": "Emporter le tambour d'archives",
+      "haulOut": "Un journal de gardien qu'aucun gardien n'a encore écrit, adressé à une station que tu n'as pas atteinte. Le porter tire l'aiguille vers l'ordre, et sans demander."
     },
     "foldedYard": {
       "text": "Le stand de Mara est là. Il ne devrait pas être là : tu l'as laissée loin derrière, avec dix-neuf sauts et un numéro de retard. Elle est en train de réapprovisionner son stock, tant bien que mal, à partir de caisses qui ne cessent d'arriver avant même qu'elle ne les ait commandées.",
@@ -3936,6 +3953,16 @@
       "3": "La distance a cessé d'être une promesse il y a environ une minute.",
       "4": "Enregistre-le comme un saut. Le journal de bord ne dira pas la vérité.",
       "5": "On est entrés, et ensuite on était ici. Je n'ai pas de milieu à rapporter."
+    },
+    "cargoDelivered": {
+      "1": "La soute est vide, le registre non. J'accepte l'échange.",
+      "2": "Réceptionné, payé, parti. Le vaisseau file plus léger.",
+      "3": "Ils l'ont pris sans l'ouvrir. Sages."
+    },
+    "officerRescued": {
+      "1": "Une cabine est occupée. J'avais cessé de compter plus d'une âme vivante à bord.",
+      "2": "Tu n'es pas passé au large. Consigné — ce journal voit rarement ça.",
+      "3": "Quelqu'un a pris une couchette. L'équipage, ce n'est plus seulement toi et moi."
     }
   },
   "blackbox": {
@@ -4510,11 +4537,11 @@
     },
     "piercer": {
       "name": "Pierceur",
-      "desc": "Le premier coup porté à chaque combat ignore les boucliers, et la technique « Spinal Mount » inflige 2 points de dégâts supplémentaires pour chaque objet « Pierce » que vous portez."
+      "desc": "Le premier coup porté à chaque combat ignore les boucliers, et la technique « Spinal Mount » inflige 2 points de dégâts supplémentaires pour chaque objet « Pierce » que vous portez. Les armes apprennent le mode « Charge creuse »."
     },
     "emberInjector": {
       "name": "Injecteur Ember",
-      "desc": "Chaque dé dont le résultat est déterminé dans la section « Armes B » inflige 2 points de brûlure."
+      "desc": "Chaque dé dont le résultat est déterminé dans la section « Armes B » inflige 2 points de brûlure. Les armes apprennent le mode « Incendiaire »."
     },
     "railCradle": {
       "name": "Support de rail",
@@ -4522,7 +4549,7 @@
     },
     "targetingMesh": {
       "name": "Maillage de ciblage",
-      "desc": "Les points rapportent +1, et la résolution des capteurs ajoute +2 au dé en attente dans la catégorie « Armes A »."
+      "desc": "Les points rapportent +1, et la résolution des capteurs ajoute +2 au dé en attente dans la catégorie « Armes A ». Les armes apprennent le mode « Tir lié »."
     },
     "overpressure": {
       "name": "Surpression",
@@ -4538,7 +4565,7 @@
     },
     "lanceCapacitor": {
       "name": "Condensateur Lance",
-      "desc": "Chaque dé d'arme dont le résultat est de 6 ou plus et qui dispose d'une réserve de charge utilise 6 points de cette réserve pour obtenir un bonus de +5."
+      "desc": "Chaque dé d'arme dont le résultat est de 6 ou plus et qui dispose d'une réserve de charge utilise 6 points de cette réserve pour obtenir un bonus de +5. Les armes apprennent le mode « Dérivation »."
     },
     "executioner": {
       "name": "Bourreau",
@@ -4646,7 +4673,7 @@
     },
     "autoloader": {
       "name": "Tableau d'autochargeurs",
-      "desc": "À chaque combat, un dé6 rouge supplémentaire vient s'ajouter à votre plateau, et chaque troisième emplacement d'arme résolu vous en rapporte un autre pour le tour suivant."
+      "desc": "À chaque combat, un dé6 rouge supplémentaire vient s'ajouter à votre plateau, et chaque troisième emplacement d'arme résolu vous en rapporte un autre pour le tour suivant. Les armes apprennent le mode « Doublé »."
     },
     "prophecyMount": {
       "name": "Le Mont de la Prophétie",
@@ -4663,6 +4690,43 @@
     "nonEuclidRack": {
       "name": "Rack non euclidien",
       "desc": "Chaque emplacement accepte un dé de n'importe quel niveau, à raison d'un point de coque à chaque fois qu'il est résolu ; limite de charge : −3."
+    }
+  },
+  "fireModes": {
+    "direct": {
+      "name": "Direct",
+      "desc": "Inflige les dégâts du dé à la cible choisie — la référence.",
+      "short": "DIR"
+    },
+    "scatter": {
+      "name": "Dispersion",
+      "desc": "Les dégâts se répartissent entre tous les ennemis vivants, +{{fragmentBonus}} par fragment. Exige {{minEnemies}} cibles vivantes.",
+      "short": "DIS"
+    },
+    "doublet": {
+      "name": "Doublé",
+      "desc": "{{hits}} touches de la moitié des dégâts chacune, arrondie au supérieur, sur la cible choisie.",
+      "short": "DBL"
+    },
+    "shaped": {
+      "name": "Charge creuse",
+      "desc": "Sur une face maximale, retire du bouclier à hauteur de la valeur du dé avant les dégâts ; sur toute autre face, −{{offFacePenalty}} dégât.",
+      "short": "CRE"
+    },
+    "incendiary": {
+      "name": "Incendiaire",
+      "desc": "−{{damagePenalty}} dégâts ; la cible subit Brûlure {{burn}}.",
+      "short": "INC"
+    },
+    "linked": {
+      "name": "Tir lié",
+      "desc": "+{{perDie}} dégât par autre dé de la même école posé ce tour, jusqu'à +{{cap}}.",
+      "short": "LIE"
+    },
+    "shunt": {
+      "name": "Dérivation",
+      "desc": "−{{damagePenalty}} dégâts ; +{{charge}} de charge.",
+      "short": "DER"
     }
   },
   "engravings": {
@@ -5326,6 +5390,145 @@
       "name": "Pièces détachées",
       "desc": "Revendre ses pièces : 25 de ferraille en moins sur une amélioration au chantier.",
       "line": "Récupération : une caisse de pièces propres. Le prochain dock en retirera 25 de ferraille sur une amélioration."
+    }
+  },
+  "officers": {
+    "scrapper": {
+      "name": "le Ferrailleur",
+      "role": "main de coque",
+      "desc": "Sorti d'une capsule de survie avec un chalumeau et une rancune contre les trous. Il soude des plaques en plein combat ; le reste du temps, il trie la ferraille.",
+      "origin": "Sauvé : secteur 1, capsule de survie",
+      "short": "Ferrailleur +{{n}}♥ · −{{c}}⚡"
+    },
+    "mechanic": {
+      "name": "la Mécanicienne",
+      "role": "ingénieure",
+      "desc": "Elle fuyait pire que vous et est restée pour payer sa place. Elle dérive l'énergie vers les râteliers pour un jet de plus et rafistole la coque après chaque combat.",
+      "origin": "Sauvée : secteur 1, coursive arrière",
+      "short": "Mécanicienne +{{n}}↻"
+    },
+    "defector": {
+      "name": "la Transfuge",
+      "role": "navigatrice",
+      "desc": "Elle lit les routes du Chœur comme une carte. Elle désigne la cible avant vous, et les capteurs mordent un peu plus profond avec elle au tableau.",
+      "origin": "Sauvée : secteur 4, esquif volé",
+      "short": "Transfuge · marque {{n}}"
+    },
+    "welder": {
+      "name": "la Soudeuse",
+      "role": "technicienne de coque",
+      "desc": "L'une des quatre de la pétition, et l'une des deux qui savent souder. Elle pose une plaque là où il faut ; avec elle à bord, la coque esquive plus léger.",
+      "origin": "Sauvée : montée à bord par la pétition",
+      "short": "Soudeuse +{{n}} bouclier"
+    },
+    "breaker": {
+      "name": "la Démolisseuse",
+      "role": "chef d'équipage",
+      "desc": "Onze sont montés à bord, et c'est elle qui les mène. Ils relancent le réacteur quand il le faut et démontent chaque carcasse jusqu'aux boulons.",
+      "origin": "Sauvée : l'équipe de démolition, onze heures d'air",
+      "short": "Démolisseuse +{{n}}⚡"
+    },
+    "chorister": {
+      "name": "le Choriste",
+      "role": "transmissions",
+      "desc": "Neuf sont sortis de cette classe. Celui-ci a trouvé la fréquence sur laquelle passe l'hymne et a appris à s'y asseoir.",
+      "origin": "Sauvé : secteur 4, l'école du Chœur",
+      "short": "Choriste · brouillage"
+    }
+  },
+  "cargo": {
+    "unstableCore": {
+      "name": "Cœur instable",
+      "desc": "L'emplacement réacteur descend de {{n}} palier tant que le fret est à bord."
+    },
+    "liveHold": {
+      "name": "Cargaison vivante",
+      "desc": "Coûte {{n}} de coque à chaque nœud franchi tant que le fret est à bord."
+    },
+    "overwoundCoils": {
+      "name": "Bobines surtendues",
+      "desc": "L'emplacement arme A descend de {{n}} palier tant que le fret est à bord."
+    },
+    "saintsReliquary": {
+      "name": "Reliquaire du saint",
+      "desc": "L'emplacement boucliers descend de {{n}} palier tant que le fret est à bord."
+    },
+    "leadBallast": {
+      "name": "Lest de plomb",
+      "desc": "L'emplacement moteurs descend de {{n}} palier tant que le fret est à bord."
+    },
+    "stasisPods": {
+      "name": "Capsules de stase",
+      "desc": "Coûte {{n}} de coque à chaque nœud franchi tant que le fret est à bord."
+    },
+    "choirContraband": {
+      "name": "Contrebande du Chœur",
+      "desc": "L'accepter déplace l'axe de {{n}} vers la Résonance, une seule fois."
+    },
+    "keeperArchive": {
+      "name": "Archives du gardien",
+      "desc": "L'accepter déplace l'axe de {{n}} vers la Stabilité, une seule fois."
+    }
+  },
+  "echo": {
+    "branch": {
+      "tactician": "Tacticien",
+      "navigator": "Navigateur",
+      "keeper": "Gardien"
+    },
+    "cond": {
+      "selfHpPctLt": "s'il est sous {{n}} % de coque",
+      "selfShielded": "si son bouclier tient",
+      "playerShielded": "si votre bouclier tient",
+      "playerChargeAtLeast": "si vous avez {{n}} de charge ou plus",
+      "playerHullPctLt": "si vous êtes sous {{n}} % de coque",
+      "alliesAtLeast": "s'il en reste {{n}} debout",
+      "turnGte": "à partir du tour {{n}}"
+    },
+    "secondLook": {
+      "name": "Second regard",
+      "desc": "Une fois par combat : les {{n}} dés les plus bas du plateau sont relancés et gardent la meilleure face. Aucune relance n'est dépensée.",
+      "short": "Second regard · {{n}} dés"
+    },
+    "readout": {
+      "name": "Décomposition",
+      "desc": "Quand le prochain coup d'un ennemi bifurque, sa fiche nomme la bifurcation : la condition et les deux réponses.",
+      "short": "Décomposition · bifurcation nommée"
+    },
+    "calculus": {
+      "name": "Solution de tir",
+      "desc": "Une fois par combat : chaque frappe d'arme de la prochaine salve porte à +{{n}}.",
+      "short": "Solution de tir +{{n}}"
+    },
+    "echolocation": {
+      "name": "Écholocation",
+      "desc": "+{{n}} rangée de vue sur la carte, pour toute la session.",
+      "short": "Écholocation +{{n}} rangée"
+    },
+    "pathGhost": {
+      "name": "Chemin fantôme",
+      "desc": "L'aperçu lit un nœud {{n}} rangée au-delà de celui où vous pouvez sauter. Il ne devient pas atteignable pour autant.",
+      "short": "Chemin fantôme +{{n}} rangée"
+    },
+    "softLanding": {
+      "name": "Atterrissage en douceur",
+      "desc": "Une fois par session : un trou de ver vous dépose sur le nœud libre le plus proche devant vous. Rien n'est lancé.",
+      "short": "Atterrissage · 1/session"
+    },
+    "reserve": {
+      "name": "Réserve de puissance",
+      "desc": "Chaque combat s'ouvre avec +{{n}} de charge.",
+      "short": "Réserve +{{n}}⚡"
+    },
+    "shieldEcho": {
+      "name": "Écho du bouclier",
+      "desc": "Un coup que le bouclier absorbe entièrement rend +{{n}} de charge.",
+      "short": "Écho du bouclier +{{n}}⚡"
+    },
+    "veto": {
+      "name": "Veto",
+      "desc": "Une fois par session : un lancer du destin ou une issue d'événement qui réduirait la coque à zéro la laisse à {{n}}.",
+      "short": "Veto · 1/session"
     }
   }
 }

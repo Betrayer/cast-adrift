@@ -74,6 +74,8 @@ export const BARKS: readonly BarkDef[] = [
   { id: "setComplete", trigger: "setComplete", lines: lines("setComplete", 9), weight: 1, cooldownSec: 90 },
   { id: "wormholeRide", trigger: "wormholeRide", lines: lines("wormholeRide", 5), weight: 1, cooldownSec: 45 },
   { id: "holeBypass", trigger: "holeBypass", lines: lines("holeBypass", 5), weight: 1, cooldownSec: 45 },
+  { id: "cargoDelivered", trigger: "cargoDelivered", lines: lines("cargoDelivered", 3), weight: 1, cooldownSec: 60 },
+  { id: "officerRescued", trigger: "officerRescued", lines: lines("officerRescued", 3), weight: 1, cooldownSec: 300 },
   ...firstKillBarks,
 ];
 
@@ -97,10 +99,10 @@ export const BARK_QUOTA: Readonly<Record<string, number>> = {
   threshold: 4,
   wormholeRide: 5,
   holeBypass: 5,
+  cargoDelivered: 3,
+  officerRescued: 3,
 };
 
 export const BARK_RESERVATIONS: readonly BarkReservation[] = [
   { trigger: "bossPartDown", phase: "U7", lines: 3 },
-  { trigger: "officerRescued", phase: "U10", lines: 3 },
-  { trigger: "cargoDelivered", phase: "U10", lines: 3 },
 ];

@@ -167,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} dmg · {{split}}"
   },
   "block": {
     "resolving": "Wait for the turn to resolve",
@@ -181,7 +183,13 @@
     "reserveFull": "Reserve is full",
     "used": "Already used this turn",
     "hullLow": "Hull is too low",
+    "notAllowed": "That move is not allowed right now",
+    "occupied": "That slot already holds a die",
+    "tierCap": "The die is too big for that slot",
+    "slotBlocked": "That slot is blocked this turn",
+    "dieLocked": "That die is locked",
     "noPartner": "Annealing needs a second tray die of the same value.",
+    "needsTwoEnemies": "This fire mode needs two living targets",
     "spent": "The ship may do this once per battle."
   },
   "resPrism": "a prismatic die counts toward this school",
@@ -203,6 +211,7 @@
     "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -381,5 +390,15 @@
       "fold": "folds the order",
       "devour": "devours a die"
     }
+  },
+  "mode": {
+    "title": "Fire mode",
+    "label": "Fire mode: {{mode}}"
+  },
+  "echo": {
+    "after": "After that",
+    "fork": "{{cond}} — {{then}}. Otherwise — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Drawn from its pattern — it is not fixed."
   }
 }

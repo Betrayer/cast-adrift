@@ -60,6 +60,7 @@ const metaValues = (): MetaValues => {
     collection: s.collection,
     ships: s.ships,
     selectedShip: s.selectedShip,
+    selectedEcho: s.selectedEcho,
     hangar: s.hangar,
     themes: s.themes,
     tutorialSeen: s.tutorialSeen,

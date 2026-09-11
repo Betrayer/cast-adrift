@@ -6,7 +6,18 @@ import { STARTER_DECK } from "@/data/decks";
 import { computeMutatorMods } from "@/data/mutators";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { beaconsResolved } from "@/data/events/beacons";
-import { sealFinalMemory, syncMemoryArc } from "@/game/narrative/memoryArc";
+import {
+  echoNodesCrossed,
+  echoSoftLands,
+  echoEquipped,
+  echoStartCharge,
+} from "@/data/echo";
+import { memoryFragmentCount } from "@/data/narrative/memories";
+import {
+  lifetimeFragments,
+  sealFinalMemory,
+  syncMemoryArc,
+} from "@/game/narrative/memoryArc";
 import {
   CHECK_DECK,
   CHECK_ENEMY_HP_PCT,
@@ -29,13 +40,16 @@ import {
   areConnected,
   nodeById,
   wormholeFor,
+  type MapGraph,
   type MapNode,
   type NodeId,
 } from "@/game/map/types";
 import {
   bypassTargetFor,
   isGentleRide,
+  openLandings,
   rollThrow,
+  throwCost,
   type WormholeThrow,
 } from "@/game/map/wormhole";
 import { chaos } from "@/services/chaos";
@@ -44,6 +58,17 @@ import {
   ptsForDie,
   sellValue,
 } from "@/game/economy/prices";
+import {
+  announceReanchor,
+  cargoChargeCap,
+  cargoNodeToll,
+  cargoSlotTier,
+  deliverCargo,
+  lapseCargo,
+  reanchorCargo,
+  releaseCargo,
+  spendCargoBark,
+} from "@/game/run/cargo";
 import { pushRunCloud } from "@/game/run/cloud";
 import { grantDie, grantModule } from "@/game/run/inventory";
 import {
@@ -297,7 +322,8 @@ export const endRun = (win: boolean, cause?: DeathCause): void => {
   const cleared = sectorsClearedCount();
   const xpMult =
     1 +
-    computeRunMods(run.perks, run.chartPicks, run.modules).xpMultPct / 100;
+    computeRunMods(run.perks, run.chartPicks, run.modules, run.officers)
+      .xpMultPct / 100;
   const xpGain = Math.round(runXp(counts, run.ascension) * xpMult);
   const beacons = beaconsResolved(run.flags);
   const hullPct = run.hullMax <= 0 ? 0 : (run.hull / run.hullMax) * 100;
@@ -378,7 +404,14 @@ export const endRun = (win: boolean, cause?: DeathCause): void => {
       },
     });
   }
-  useRunStore.setState({ active: false, pendingSwaps: [] });
+  useRunStore.setState({
+    active: false,
+    pendingSwaps: [],
+    officers: [],
+    pendingOfficerBark: false,
+    echoUsed: false,
+  });
+  releaseCargo();
   if (isScoredMode(run.mode)) void finishScoredRun();
   if (win) useAppStore.getState().go(summaryScreenFor(run.mode));
   else useAppStore.getState().go("ending", deathParams(deathCause));
@@ -420,8 +453,17 @@ const announceVictory = (
   else emitBark("battleWin");
 };
 
+const announceEchoCrossings = (before: number): void => {
+  for (const def of echoNodesCrossed(before, lifetimeFragments())) {
+    logConsequence(`run:echo.opened.${def.id}`);
+  }
+};
+
 export const unlockNextMemory = (): void => {
-  if (syncMemoryArc().length > 0) emitBark("memory");
+  const before = lifetimeFragments();
+  const fresh = syncMemoryArc().length > 0;
+  announceEchoCrossings(before);
+  if (fresh) emitBark("memory");
 };
 
 const encounterInit = (pocket: boolean) => {
@@ -456,6 +498,10 @@ const runBattleInit = (
     slotTierDelta.sensors =
       (slotTierDelta.sensors ?? 0) + mut.sensorsTierDelta;
   }
+  for (const [slot, delta] of Object.entries(cargoSlotTier(s.cargo))) {
+    const key = slot as SlotId;
+    slotTierDelta[key] = (slotTierDelta[key] ?? 0) + delta;
+  }
   const disabledSlots: SlotId[] = [
     ...(setup.sensorsDisabled === true ? (["sensors"] as SlotId[]) : []),
     ...(setup.shieldsDisabled === true
@@ -479,6 +525,8 @@ const runBattleInit = (
     chartPicks: s.chartPicks,
     mutators: s.mutators,
     modules: s.modules,
+    officers: s.officers,
+    echo: s.echo ?? undefined,
     engravings: useMetaStore.getState().engravings,
     flags: Object.keys(s.flags),
     runCounters: s.counters,
@@ -487,7 +535,9 @@ const runBattleInit = (
     runScrap: s.scrap,
     chargeCap: Math.max(
       1,
-      runChargeCap(s.perks, s.chartPicks, s.modules) + mut.chargeCapDelta,
+      runChargeCap(s.perks, s.chartPicks, s.modules, s.officers) +
+        mut.chargeCapDelta +
+        cargoChargeCap(s.cargo),
     ),
     rerollSizeBonus: s.rerollSizeRun,
     forcedTraits: setup.forcedTraits,
@@ -528,7 +578,7 @@ const startBattleNode = (node: MapNode): void => {
   useBattleStore.getState().startBattle(
     {
       enemyIds: withEnemyCopies(enemyIds),
-      startCharge: mods.startCharge,
+      startCharge: mods.startCharge + echoStartCharge(s.echo),
       ...runBattleInit(node.id, node.pocket === true, {
         inverted: node.inverted,
         storm: node.storm,
@@ -561,7 +611,7 @@ export const startEventBattle = (follow: ForcedBattle): void => {
   useBattleStore.getState().startBattle(
     {
       enemyIds: withEnemyCopies(enemyIds),
-      startCharge: mods.startCharge,
+      startCharge: mods.startCharge + echoStartCharge(s.echo),
       ...runBattleInit(
         `ev:${s.position}`,
         nodeById(s.map).get(s.position)?.pocket === true,
@@ -581,6 +631,7 @@ export const startEventBattle = (follow: ForcedBattle): void => {
 const routeToNode = (node: MapNode): void => {
   const go = useAppStore.getState().go;
   applyNodeMotifs(node, useRunStore.getState().sector);
+  deliverCargo(node);
   emitRunHook("nodeEnter", {
     node: {
       nodeId: node.id,
@@ -669,6 +720,10 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   const meta = useMetaStore.getState();
   const shipId = setup.ship ?? meta.selectedShip;
   const chartPicks = setup.chartDisabled === true ? [] : [...meta.chartPicks];
+  const echo = echoEquipped(
+    meta.selectedEcho,
+    memoryFragmentCount(meta.codex),
+  );
   const deckIds =
     setup.deckPreset ??
     (meta.hangar.deck.length >= 3 ? meta.hangar.deck : STARTER_DECK);
@@ -699,6 +754,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     scrap: STARTING_SCRAP,
     shipId,
     chartPicks,
+    echo,
     tide: Math.max(0, setup.tideStart ?? 0),
     ascension,
     startedAt: now(),
@@ -746,6 +802,7 @@ export const startDailyRun = (date: string): void => {
 
 export const advanceSector = (): void => {
   settleSectorDrift();
+  lapseCargo();
   const s = useRunStore.getState();
   const endless = s.mode === "drift";
   const lastIndex = s.crossedThreshold ? SECTORS.length : SECTOR_COUNT;
@@ -817,6 +874,13 @@ const stepInto = (toNodeId: NodeId, alongEdge: boolean): boolean => {
   if (node.hole === true) return false;
 
   const step = stepTide(s);
+  const settled = reanchorCargo(
+    s.cargo,
+    s.map,
+    toNodeId,
+    s.visited,
+    s.sectorIndex,
+  );
 
   recordAction(`jump:${toNodeId}`);
   applyEdgeMotifs(s.map, s.position, toNodeId, s.sector);
@@ -828,7 +892,9 @@ const stepInto = (toNodeId: NodeId, alongEdge: boolean): boolean => {
     pendingWormhole: null,
     pendingDeepScan: false,
     bonusReveal: 0,
+    cargo: settled.cargo,
   });
+  announceReanchor(settled);
   useRunStore.getState().bumpStats({ jumps: 1 });
   useRunStore.getState().noteDepth(depthFor(s.sectorIndex, node.row));
   if (step.raised) emitBark("tideUp");
@@ -918,25 +984,75 @@ const disintegrate = (): void => {
   endRun(false, "singularity");
 };
 
+const echoSoftLandThrow = (
+  map: MapGraph,
+  from: NodeId,
+  hole: NodeId,
+  visited: readonly NodeId[],
+): WormholeThrow => {
+  const origin = nodeById(map).get(from);
+  const ahead =
+    origin === undefined
+      ? []
+      : openLandings(map, from, visited)
+          .filter((node) => node.row > origin.row)
+          .sort(
+            (a, b) =>
+              throwCost(origin, a) - throwCost(origin, b) ||
+              (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+          );
+  const landing = ahead[0];
+  const cost =
+    landing === undefined || origin === undefined
+      ? 0
+      : throwCost(origin, landing);
+  return {
+    from,
+    hole,
+    landing: landing?.id ?? null,
+    budget: Math.ceil(cost),
+    direction: "forward",
+    cost,
+    rows:
+      landing === undefined || origin === undefined
+        ? 0
+        : landing.row - origin.row,
+    gentle: true,
+    fallback: landing === undefined ? "stalled" : "none",
+  };
+};
+
+export const canSoftLandWormhole = (): boolean => {
+  const s = useRunStore.getState();
+  return echoSoftLands(s.echo) && !s.echoUsed;
+};
+
 export const rideWormhole = (
   holeId: NodeId,
   route = true,
+  softLand = false,
 ): WormholeRide | null => {
   const gate = wormholeGate(holeId);
   if (gate === null) return null;
   const s = gate.run;
-  const roll = rollThrow(
-    {
-      map: gate.map,
-      from: gate.from,
-      hole: holeId,
-      visited: s.visited,
-      rides: s.stats.wormholeRides,
-    },
-    chaos,
-  );
+  const softLanded = softLand && echoSoftLands(s.echo) && !s.echoUsed;
+  const roll = softLanded
+    ? echoSoftLandThrow(gate.map, gate.from, holeId, s.visited)
+    : rollThrow(
+        {
+          map: gate.map,
+          from: gate.from,
+          hole: holeId,
+          visited: s.visited,
+          rides: s.stats.wormholeRides,
+        },
+        chaos,
+      );
+  const gentleLanded = softLanded && roll.landing !== null;
+  if (gentleLanded) useRunStore.getState().spendEcho();
   const unmadePct = disintegrationPctFor(s.sector);
   if (
+    !softLanded &&
     unmadePct > 0 &&
     !isGentleRide(s.stats.wormholeRides) &&
     chaos.roll(unmadePct)
@@ -946,7 +1062,9 @@ export const rideWormhole = (
   }
   const landingId =
     roll.landing ??
-    bypassTargetFor(gate.map, gate.from, holeId, s.visited);
+    (softLanded
+      ? null
+      : bypassTargetFor(gate.map, gate.from, holeId, s.visited));
   const node = landingId === null ? undefined : nodeById(gate.map).get(landingId);
   if (node === undefined || landingId === null) {
     useRunStore.setState({ pendingWormhole: null, lastWormhole: roll });
@@ -956,6 +1074,13 @@ export const rideWormhole = (
 
   const settled: WormholeThrow = { ...roll, landing: landingId };
   const step = stepTide(s);
+  const hold = reanchorCargo(
+    s.cargo,
+    gate.map,
+    landingId,
+    s.visited,
+    s.sectorIndex,
+  );
   recordAction(`warp:${landingId}`);
   useRunStore.setState({
     position: landingId,
@@ -966,7 +1091,9 @@ export const rideWormhole = (
     lastWormhole: settled,
     pendingDeepScan: false,
     bonusReveal: WORMHOLE_REVEAL,
+    cargo: hold.cargo,
   });
+  announceReanchor(hold);
   useRunStore.getState().bumpStats({ jumps: 1, wormholeRides: 1 });
   useMetaStore.getState().bumpLifetime({ wormholeRides: 1 });
   settleLifetimeAchievements();
@@ -1020,10 +1147,12 @@ const finalizeNode = (
   result: NodeResult,
   pendingRewards: RunValues["pendingRewards"],
 ): void => {
+  if (spendCargoBark()) emitBark("cargoDelivered");
   const run = useRunStore.getState();
 
   if (result.scrap !== undefined && result.scrap > 0) run.addScrap(result.scrap);
   if (result.setHull !== undefined) run.setHull(result.setHull);
+  cargoNodeToll(node);
   if (result.deepScan === true) run.setPendingDeepScan(true);
   const typeDelta =
     node.type === "elite"
@@ -1226,7 +1355,12 @@ export const resolveRunBattle = (): void => {
   announceVictory(enemyDefIds, battleHull);
 
   const lootStream = createStream(deriveSeed(run.seed, `loot:${node.id}`));
-  const mods = computeRunMods(run.perks, run.chartPicks, run.modules);
+  const mods = computeRunMods(
+    run.perks,
+    run.chartPicks,
+    run.modules,
+    run.officers,
+  );
   const mut = computeMutatorMods(run.mutators);
   const sectorScrapMult = sectorDef(run.sector).scrapMult;
   const reward = computeNodeReward(
@@ -1335,7 +1469,12 @@ export const resolveEventBattle = (): void => {
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
 
-  const mods = computeRunMods(run.perks, run.chartPicks, run.modules);
+  const mods = computeRunMods(
+    run.perks,
+    run.chartPicks,
+    run.modules,
+    run.officers,
+  );
   if (pending.lootDie !== null || pending.lootRarity !== null) {
     const lootStream = createStream(
       deriveSeed(run.seed, `evloot:${pending.originNodeId}`),
@@ -1577,7 +1716,9 @@ export const crossThreshold = (): void => {
 
 export const chooseEnding = (endingId: string): void => {
   const run = useRunStore.getState();
+  const fragmentsBeforeSeal = lifetimeFragments();
   sealFinalMemory(endingId);
+  announceEchoCrossings(fragmentsBeforeSeal);
   run.setEnding(endingId, useMetaStore.getState().recordEnding(endingId));
   trackEvent({
     name: "ending",

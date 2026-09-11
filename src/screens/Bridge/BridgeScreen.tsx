@@ -32,6 +32,8 @@ import {
 } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
 import type { School } from "@/types/content";
+import { CabinsSection } from "./CabinsSection";
+import { CargoSection } from "./CargoSection";
 import styles from "./BridgeScreen.module.css";
 
 const TABS = ["overview", "dice", "modules", "perks"] as const;
@@ -101,37 +103,9 @@ const Overview = () => {
         )}
       </Paper>
 
-      <Paper
-        bg={tokens.surface1}
-        p="sm"
-        radius="md"
-        withBorder
-        className={styles.reserved}
-        data-bridge-reserved="crew"
-      >
-        <Text size="sm" fw={600} c={tokens.faint}>
-          {t("run:bridge.crewTitle")}
-        </Text>
-        <Text size="xs" c={tokens.faint}>
-          {t("run:bridge.crewLocked")}
-        </Text>
-      </Paper>
+      <CabinsSection />
 
-      <Paper
-        bg={tokens.surface1}
-        p="sm"
-        radius="md"
-        withBorder
-        className={styles.reserved}
-        data-bridge-reserved="cargo"
-      >
-        <Text size="sm" fw={600} c={tokens.faint}>
-          {t("run:bridge.cargoTitle")}
-        </Text>
-        <Text size="xs" c={tokens.faint}>
-          {t("run:bridge.cargoLocked")}
-        </Text>
-      </Paper>
+      <CargoSection />
     </Stack>
   );
 };

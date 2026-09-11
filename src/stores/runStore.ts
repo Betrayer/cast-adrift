@@ -1,4 +1,7 @@
 import { create } from "zustand";
+import { CARGO_BY_ID } from "@/data/cargo";
+import { echoVetoHull, type EchoNodeId } from "@/data/echo";
+import { CABIN_CAP, OFFICER_BY_ID } from "@/data/officers";
 import type { ShipId } from "@/data/ships";
 import type { MkLevel } from "@/data/slots";
 import {
@@ -8,6 +11,7 @@ import {
   sectorDriftDelta,
 } from "@/game/run/axis";
 import { bayPurchasable, moduleSlots } from "@/game/run/bays";
+import { shipCargoHold } from "@/game/run/hold";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
@@ -31,7 +35,15 @@ export interface DieInstance {
 
 export type PendingSwap =
   | { kind: "die"; defId: string }
-  | { kind: "module"; moduleId: string };
+  | { kind: "module"; moduleId: string }
+  | { kind: "officer"; officerId: string };
+
+export interface RunCargo {
+  defId: string;
+  nodeId: NodeId;
+  sectorIndex: number;
+  takenRow: number;
+}
 
 export type BattleModKind = "startCharge" | "enemyPlus";
 
@@ -170,6 +182,12 @@ export interface RunValues {
   deck: DieInstance[];
   perks: string[];
   modules: string[];
+  officers: string[];
+  echo: EchoNodeId | null;
+  echoUsed: boolean;
+  cargo: RunCargo[];
+  pendingCargoBark: boolean;
+  pendingOfficerBark: boolean;
   baysPurchased: number;
   pendingSwaps: PendingSwap[];
   banishedPerks: string[];
@@ -234,6 +252,13 @@ export interface RunState extends RunValues {
   useDraftReroll: () => boolean;
   addModule: (moduleId: string) => boolean;
   removeModule: (moduleId: string) => void;
+  addOfficer: (officerId: string) => boolean;
+  removeOfficer: (officerId: string) => void;
+  spendEcho: () => boolean;
+  addCargo: (entry: RunCargo) => boolean;
+  removeCargo: (defId: string) => void;
+  setCargoBark: (value: boolean) => void;
+  setOfficerBark: (value: boolean) => void;
   purchaseBay: () => void;
   queueSwap: (swap: PendingSwap) => void;
   shiftSwap: () => void;
@@ -331,6 +356,12 @@ export const createInitialRunValues = (): RunValues => ({
   deck: [],
   perks: [],
   modules: [],
+  officers: [],
+  echo: null,
+  echoUsed: false,
+  cargo: [],
+  pendingCargoBark: false,
+  pendingOfficerBark: false,
   baysPurchased: 0,
   pendingSwaps: [],
   banishedPerks: [],
@@ -387,6 +418,8 @@ export const runModuleSlots = (s: RunValues): number =>
     computeRunMods(s.perks, s.chartPicks).moduleSlotDelta,
     s.baysPurchased,
   );
+
+export const runCargoHold = (s: RunValues): number => shipCargoHold(s.shipId);
 
 export const runBayPurchasable = (s: RunValues): boolean =>
   bayPurchasable(
@@ -445,7 +478,12 @@ export const useRunStore = create<RunState>()((set, get) => ({
   },
 
   setHull: (n) => {
-    set((s) => ({ hull: Math.max(0, Math.min(s.hullMax, n)) }));
+    set((s) => {
+      const veto = echoVetoHull(s.echo);
+      const vetoes = veto > 0 && !s.echoUsed && s.hull > 0 && n <= 0;
+      const hull = Math.max(0, Math.min(s.hullMax, vetoes ? veto : n));
+      return vetoes ? { hull, echoUsed: true } : { hull };
+    });
   },
 
   addPerk: (perkId) => {
@@ -481,6 +519,46 @@ export const useRunStore = create<RunState>()((set, get) => ({
 
   removeModule: (moduleId) => {
     set((s) => ({ modules: s.modules.filter((m) => m !== moduleId) }));
+  },
+
+  addOfficer: (officerId) => {
+    const s = get();
+    if (OFFICER_BY_ID.get(officerId) === undefined) return false;
+    if (s.officers.includes(officerId)) return false;
+    if (s.officers.length >= CABIN_CAP) return false;
+    set({ officers: [...s.officers, officerId], pendingOfficerBark: true });
+    return true;
+  },
+
+  removeOfficer: (officerId) => {
+    set((s) => ({ officers: s.officers.filter((o) => o !== officerId) }));
+  },
+
+  spendEcho: () => {
+    if (get().echoUsed) return false;
+    set({ echoUsed: true });
+    return true;
+  },
+
+  addCargo: (entry) => {
+    const s = get();
+    if (CARGO_BY_ID.get(entry.defId) === undefined) return false;
+    if (s.cargo.some((held) => held.defId === entry.defId)) return false;
+    if (s.cargo.length >= runCargoHold(s)) return false;
+    set({ cargo: [...s.cargo, { ...entry }] });
+    return true;
+  },
+
+  removeCargo: (defId) => {
+    set((s) => ({ cargo: s.cargo.filter((held) => held.defId !== defId) }));
+  },
+
+  setCargoBark: (value) => {
+    set({ pendingCargoBark: value });
+  },
+
+  setOfficerBark: (value) => {
+    set({ pendingOfficerBark: value });
   },
 
   purchaseBay: () => {

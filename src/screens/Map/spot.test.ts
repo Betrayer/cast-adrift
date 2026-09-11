@@ -12,6 +12,7 @@ import {
 import { createStreams } from "@/services/rng";
 import { mapGeometry } from "./mapGeometry";
 import {
+  adjacentBypassOffer,
   bypassCopyKey,
   bypassOfferFor,
   isDrawableEdge,
@@ -266,6 +267,34 @@ describe("the bypass offer the card and the preview both read", () => {
     const offer = bypassOfferFor(rimMap(), "r1l1", "r2l0", [], 4, 20);
     expect(offer.offered).toBe(false);
     expect(bypassCopyKey(offer)).toBe("run:hole.bypassNone");
+  });
+});
+
+const rimHole = node(2, 1, { hole: true, spot: RIM_SPOT });
+
+describe("the verdict the preview card is allowed to state", () => {
+  it("reads the offer for a hole on an edge out of the node the ship stands on", () => {
+    const offer = adjacentBypassOffer(rimMap(), "r1l1", rimHole, [], 4, 20);
+    expect(offer).not.toBeNull();
+    if (offer === null) return;
+    expect(offer.offered).toBe(true);
+    expect(bypassCopyKey(offer)).toBe("run:hole.bypassCost");
+  });
+
+  it("refuses one for a hole the ghost row shows but the ship cannot act on", () => {
+    expect(adjacentBypassOffer(rimMap(), "r0l1", rimHole, [], 4, 20)).toBeNull();
+  });
+
+  it("keeps the ghost preview from asserting the opposite of one jump later", () => {
+    const far = bypassOfferFor(rimMap(), "r0l1", "r2l1", [], 4, 20);
+    const near = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, 20);
+    expect(bypassCopyKey(far)).toBe("run:hole.bypassNone");
+    expect(bypassCopyKey(near)).toBe("run:hole.bypassCost");
+    expect(adjacentBypassOffer(rimMap(), "r0l1", rimHole, [], 4, 20)).toBeNull();
+  });
+
+  it("has no verdict for a node the rim never swallowed", () => {
+    expect(adjacentBypassOffer(rimMap(), "r1l1", node(2, 0), [], 4, 20)).toBeNull();
   });
 });
 

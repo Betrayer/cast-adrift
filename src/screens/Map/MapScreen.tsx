@@ -10,10 +10,17 @@ import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { MODULE_BY_ID } from "@/data/modules";
+import { echoPreviewRows, echoRevealRows, echoSoftLands } from "@/data/echo";
 import { computeMutatorMods } from "@/data/mutators";
+import { cargoDef, cargoDescVars, cargoPayout } from "@/data/cargo";
+import { cargoRowsLeft } from "@/game/run/cargo";
 import { runModifiers } from "@/game/run/weather";
 import { sectorDef } from "@/data/sectors";
 import { emitBark } from "@/game/narrative/barks";
+import {
+  officerBarkWaitMs,
+  spendOfficerBark,
+} from "@/game/narrative/officerBark";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import { playSfx } from "@/services/audio";
 import { createStream, deriveSeed } from "@/services/rng";
@@ -51,6 +58,7 @@ import { TIDE_HP_PCT } from "@/game/run/encounter";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
 import { mapGeometry, ROW_GAP } from "./mapGeometry";
 import {
+  adjacentBypassOffer,
   bypassCopyKey,
   bypassOfferFor,
   isDrawableEdge,
@@ -349,7 +357,11 @@ const MapView = ({ map, position }: MapViewProps) => {
   const bonusReveal = useRunStore((s) => s.bonusReveal);
   const sectorReveal = useRunStore((s) => s.sectorReveal);
   const mutators = useRunStore((s) => s.mutators);
+  const heldCargo = useRunStore((s) => s.cargo);
+  const sectorIndex = useRunStore((s) => s.sectorIndex);
   const sensorsMk = useRunStore((s) => s.mkLevels.sensors ?? 1);
+  const echo = useRunStore((s) => s.echo);
+  const echoUsed = useRunStore((s) => s.echoUsed);
   const reduced = resolveReducedMotion(
     useSettingsStore((s) => s.reducedMotion),
   );
@@ -397,12 +409,29 @@ const MapView = ({ map, position }: MapViewProps) => {
       (pendingDeepScan ? 1 : 0) +
       bonusReveal +
       sectorReveal +
+      echoRevealRows(echo) +
       computeMutatorMods(mutators).fogRowDelta,
   );
   const visibleLimit = positionRow + visibleRows;
+  const ghostRows = echoPreviewRows(echo);
+
+  const deliveries = heldCargo.filter(
+    (held) => held.sectorIndex === sectorIndex,
+  );
+  const deliveryIds = new Set(deliveries.map((held) => held.nodeId));
+  const deliveryPayout = (nodeId: NodeId): number =>
+    deliveries
+      .filter((held) => held.nodeId === nodeId)
+      .reduce((sum, held) => {
+        const def = cargoDef(held.defId);
+        return def === undefined
+          ? sum
+          : sum + cargoPayout(def, sectorDef(sector).scrapMult);
+      }, 0);
 
   const isVisible = (node: MapNode): boolean =>
     node.type === "boss" ||
+    deliveryIds.has(node.id) ||
     visited.includes(node.id) ||
     node.row <= visibleLimit;
   const isLegal = (node: MapNode): boolean =>
@@ -410,6 +439,16 @@ const MapView = ({ map, position }: MapViewProps) => {
     node.row > positionRow &&
     isVisible(node) &&
     areConnected(map, position, node.id);
+  const isPreviewable = (node: MapNode): boolean => {
+    if (isLegal(node)) return true;
+    if (ghostRows <= 0) return false;
+    if (visited.includes(node.id)) return false;
+    if (node.row !== positionRow + 1 + ghostRows) return false;
+    if (!isVisible(node)) return false;
+    return map.nodes.some(
+      (ahead) => isLegal(ahead) && areConnected(map, ahead.id, node.id),
+    );
+  };
 
   const bypassOffer = (holeId: NodeId): BypassOffer =>
     bypassOfferFor(map, position, holeId, visited, sector, hull);
@@ -562,7 +601,7 @@ const MapView = ({ map, position }: MapViewProps) => {
     });
   };
 
-  const onRide = (holeId: NodeId): void => {
+  const onRide = (holeId: NodeId, softLand = false): void => {
     if (jumping) return;
     const hole = byId.get(holeId);
     setJumping(true);
@@ -570,7 +609,7 @@ const MapView = ({ map, position }: MapViewProps) => {
     haptic("bossIntro");
     playSfx("foldBeat", { gain: 0.9 });
     if (reduced) {
-      const ride = rideWormhole(holeId, false);
+      const ride = rideWormhole(holeId, false, softLand);
       if (ride?.kind === "fatal") return;
       const thrown = ride === null ? null : ride.throw;
       const landed =
@@ -598,7 +637,7 @@ const MapView = ({ map, position }: MapViewProps) => {
       direction: "forward",
     });
     after(WARP_SUCK_MS, () => {
-      const ride = rideWormhole(holeId, false);
+      const ride = rideWormhole(holeId, false, softLand);
       if (ride?.kind === "fatal") return;
       const thrown = ride === null ? null : ride.throw;
       const landing =
@@ -705,6 +744,14 @@ const MapView = ({ map, position }: MapViewProps) => {
       ? t(modifiers[0].name)
       : t("run:map.conditions", { n: modifiers.length });
 
+  const firstDelivery = deliveries[0];
+  const cargoChipLabel =
+    deliveries.length === 1 && firstDelivery !== undefined
+      ? t("run:map.cargo", {
+          n: cargoRowsLeft(map, firstDelivery, positionRow),
+        })
+      : t("run:map.cargoMany", { n: deliveries.length });
+
   const selectedNode = selected === null ? null : byId.get(selected);
   const canJump =
     !jumping && selectedNode !== undefined && selectedNode !== null && isLegal(selectedNode);
@@ -734,11 +781,16 @@ const MapView = ({ map, position }: MapViewProps) => {
       : tierForNode(seed, selectedNode);
 
   const selectedOffer =
-    selectedNode === undefined ||
-    selectedNode === null ||
-    selectedNode.hole !== true
+    selectedNode === undefined || selectedNode === null
       ? null
-      : bypassOffer(selectedNode.id);
+      : adjacentBypassOffer(
+          map,
+          position,
+          selectedNode,
+          visited,
+          sector,
+          hull,
+        );
 
   const previewLines =
     selectedNode === undefined || selectedNode === null
@@ -770,6 +822,13 @@ const MapView = ({ map, position }: MapViewProps) => {
             : []),
           ...(edgeMarkFor(map, position, selectedNode.id) === "wormhole"
             ? [t("run:motif.wormhole")]
+            : []),
+          ...(deliveryIds.has(selectedNode.id)
+            ? [
+                t("run:map.previewDelivery", {
+                  n: deliveryPayout(selectedNode.id),
+                }),
+              ]
             : []),
         ];
 
@@ -849,6 +908,37 @@ const MapView = ({ map, position }: MapViewProps) => {
           >
             <span className={styles.modChip ?? ""} data-map-modifiers>
               {modifierChipLabel}
+            </span>
+          </TapPopover>
+        )}
+        {deliveries.length === 0 ? null : (
+          <TapPopover
+            label={t("run:cargo.title")}
+            testId="map-cargo"
+            align="end"
+            content={
+              <>
+                <b>{t("run:cargo.title")}</b>
+                {deliveries.map((held) => {
+                  const def = cargoDef(held.defId);
+                  return def === undefined ? null : (
+                    <span key={held.defId} className={styles.modLine}>
+                      {t(def.name)} — {t(def.desc, cargoDescVars(def))} ·{" "}
+                      {t("run:cargo.rows", {
+                        n: cargoRowsLeft(map, held, positionRow),
+                      })}
+                      {" · "}
+                      {t("run:cargo.payout", {
+                        n: cargoPayout(def, sectorDef(sector).scrapMult),
+                      })}
+                    </span>
+                  );
+                })}
+              </>
+            }
+          >
+            <span className={styles.modChip ?? ""} data-map-cargo>
+              {cargoChipLabel}
             </span>
           </TapPopover>
         )}
@@ -945,11 +1035,16 @@ const MapView = ({ map, position }: MapViewProps) => {
             <WormholeChoice
               offer={bypassOffer(pendingWormhole)}
               gentle={isGentleRide(rides)}
+              softLand={echoSoftLands(echo)}
+              softLandSpent={echoUsed}
               onBypass={() => {
                 onBypass(pendingWormhole);
               }}
               onRide={() => {
                 onRide(pendingWormhole);
+              }}
+              onSoftLand={() => {
+                onRide(pendingWormhole, true);
               }}
             />
           )}
@@ -1038,6 +1133,7 @@ const MapView = ({ map, position }: MapViewProps) => {
             const current = node.id === position;
             const chosen = node.id === selected;
             const legal = isLegal(node);
+            const previewable = isPreviewable(node);
             const ring = ringFor(node, current, chosen);
             const done = visited.includes(node.id) && !current;
             const stamp = nodeStamp(
@@ -1057,8 +1153,9 @@ const MapView = ({ map, position }: MapViewProps) => {
                   data-node-ghost="1"
                   data-spot-id={node.spot}
                   data-node-legal={legal ? '1' : '0'}
+                  data-node-preview={previewable && !legal ? '1' : undefined}
                   className={legal ? styles.nodeSelectable ?? "" : styles.node ?? ""}
-                  onClick={legal ? () => { selectNode(node.id); } : undefined}
+                  onClick={previewable ? () => { selectNode(node.id); } : undefined}
                 >
                   <circle
                     cx={geo.nodeX(node)}
@@ -1088,6 +1185,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 data-testid={`map-node-${node.id}`}
                 data-node-type={node.type}
                 data-node-legal={legal ? '1' : '0'}
+                data-node-preview={previewable && !legal ? '1' : undefined}
                 data-causality={
                   node.inverted === true
                     ? "inverted"
@@ -1100,7 +1198,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 }`}
                 style={reduced ? undefined : { animationDelay: `${String(Math.min(index, 24) * 45)}ms` }}
                 opacity={done ? 0.5 : 1}
-                onClick={legal ? () => { selectNode(node.id); } : undefined}
+                onClick={previewable ? () => { selectNode(node.id); } : undefined}
               >
                 {legal && !chosen && !reduced ? (
                   <circle
@@ -1166,6 +1264,19 @@ const MapView = ({ map, position }: MapViewProps) => {
                     {motifBadge(node)}
                   </text>
                 )}
+                {deliveryIds.has(node.id) ? (
+                  <text
+                    data-cargo-marker={node.id}
+                    x={geo.nodeX(node) + geo.radius(node) - 1}
+                    y={geo.rowY(node.row) + geo.radius(node) + 7}
+                    textAnchor="middle"
+                    fontSize={11}
+                    fontWeight={700}
+                    fill={tokens.amber}
+                  >
+                    ▣
+                  </text>
+                ) : null}
                 {current ? (
                   <text
                     x={geo.nodeX(node)}
@@ -1391,6 +1502,7 @@ const MapView = ({ map, position }: MapViewProps) => {
 export const MapScreen = () => {
   const map = useRunStore((s) => s.map);
   const position = useRunStore((s) => s.position);
+  const rescued = useRunStore((s) => s.pendingOfficerBark);
   const go = useAppStore((s) => s.go);
   const setSystemMenu = useAppStore((s) => s.setSystemMenu);
 
@@ -1405,6 +1517,21 @@ export const MapScreen = () => {
   useEffect(() => {
     resumeUnenteredNode();
   }, []);
+
+  useEffect(() => {
+    if (!rescued) return;
+    const wait = officerBarkWaitMs();
+    if (wait === 0) {
+      spendOfficerBark();
+      return;
+    }
+    const timer = window.setTimeout(() => {
+      spendOfficerBark();
+    }, wait);
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [rescued]);
 
   useEffect(() => {
     if (map === null || position === null) return;

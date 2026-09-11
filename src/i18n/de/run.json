@@ -50,7 +50,10 @@
     "scrap": "Schrott {{n}}",
     "previewHole": "Der Rand entscheidet für den ganzen Fleck: umgehen oder durch das Wurmloch fliegen",
     "spotLabel": "Schwarzes Loch — der ganze Fleck ist eine einzige Entscheidung",
-    "conditions": "Bedingungen ×{{n}}"
+    "conditions": "Bedingungen ×{{n}}",
+    "cargo": "Fracht ▸{{n}}",
+    "cargoMany": "Fracht ×{{n}}",
+    "previewDelivery": "Ablieferung: {{n}} Schrott bei Ankunft"
   },
   "event": {
     "title": "Signal",
@@ -81,7 +84,9 @@
     "checkTierMax": "d nur {{tier}} und kleiner",
     "outcomeOdds": "Quoten {{odds}}",
     "beaconTitle": "Bake",
-    "beaconCounter": "Bake {{n}} von „{{max}}“"
+    "beaconCounter": "Bake {{n}} von „{{max}}“",
+    "reqCargo": "braucht freien Laderaum und eine Station voraus",
+    "cargoTerms": "{{drawback}} · Ablieferung zahlt {{n}}"
   },
   "anomaly": {
     "title": "Anomalie",
@@ -501,7 +506,14 @@
     "tabBattle": "Kampf",
     "openBattle": "Kampfprotokoll",
     "battleLive": "Dieser Kampf, neueste Runde zuerst.",
-    "battleLast": "Der letzte Kampf, neueste Runde zuerst."
+    "battleLast": "Der letzte Kampf, neueste Runde zuerst.",
+    "cargo": {
+      "taken": "{{name}} an Bord genommen, noch {{n}} Reihen bis zur Abgabe",
+      "moved": "die Abgabemarke für {{name}} rückte auf eine nähere Station",
+      "delivered": "{{name}} für {{n}} Schrott abgeliefert",
+      "dropped": "{{name}} abgestoßen und die Zahlung verwirkt",
+      "lapsed": "der Vertrag über {{name}} ist verfallen"
+    }
   },
   "memory": {
     "kicker": "Echo erinnert sich · Auszug {{n}} von {{max}}",
@@ -578,7 +590,10 @@
     "ride": "Probier’s aus!",
     "rideCost": "Fahrt: ein Abstecher von „{{min}}“ nach „{{max}}“, Richtung unbekannt",
     "rideGentle": "Ride: Ein Mix aus „{{min}}“ und „{{max}}“, nur noch intensiver",
-    "landed": "Ausgelöst{{rows}}-Zeilen {{way}}"
+    "landed": "Ausgelöst{{rows}}-Zeilen {{way}}",
+    "softLand": "Sanft aufsetzen",
+    "softLandWhy": "Einmal pro Lauf: kein Wurf — der nächste offene Knoten voraus",
+    "softLandSpent": "Die Echo-Ladung ist in diesem Lauf schon verbraucht"
   },
   "bridge": {
     "title": "Brücke",
@@ -597,10 +612,28 @@
     "deckCount": "Deck-{{n}} / {{max}}",
     "sellDiceHint": "Würfel werden im Laden verkauft.",
     "sellModule": "Verkaufen + {{n}}",
-    "crewTitle": "Offizierskabinen",
-    "crewLocked": "Versiegelt – noch keine Besatzung an Bord.",
-    "cargoTitle": "Laderaum",
-    "cargoLocked": "Versiegelt – noch nichts zum Abtransport."
+    "crewTitle": "Offizierskabinen {{used}}/{{max}}",
+    "cargoTitle": "Laderaum {{used}}/{{max}}",
+    "cabinEmpty": "leere Kabine — rette jemanden",
+    "cabinWho": "{{role}} · {{origin}}",
+    "cabinActive": "aktiv · {{text}}",
+    "cabinPassive": "passiv · {{text}}",
+    "passive": {
+      "scrapMultPct": "+{{n}} % Schrott",
+      "scrapPerKill": "+{{n}} Schrott pro Abschuss",
+      "battleEndHeal": "Kampfende: heilt {{n}} Hülle",
+      "markBonusDelta": "Markierungen bringen +{{n}} Schaden",
+      "evasionDelta": "Ausweichen +{{n}} %",
+      "rerollSizeDelta": "{{n}} Würfel mehr pro Neuwurf"
+    },
+    "cargoEmpty": "leerer Laderaum",
+    "cargoTerms": "Ablieferung: Station · {{rows}} Reihen · zahlt {{n}}",
+    "dropCargo": "Abstoßen",
+    "dropTitle": "Fracht abstoßen?",
+    "dropBody": "{{name}} geht durch die Schleuse. Der Nachteil endet sofort, und die {{n}} Schrott bei Ablieferung sind fort.",
+    "dropBodyAxis": "{{name}} geht durch die Schleuse. Die Achse bleibt, wohin sie verschoben wurde, und die {{n}} Schrott bei Ablieferung sind fort.",
+    "dropNo": "Weiter mitnehmen",
+    "dropYes": "Abstoßen"
   },
   "replace": {
     "title": "Ersetzen",
@@ -610,7 +643,11 @@
     "fullBay": "Bay full {{used}} / {{max}} – was ist los?",
     "toScrap": "→ „scrap“ + „{{n}}“",
     "sellNew": "Das neue Modell verkaufen (+ {{n}})",
-    "cancel": "Abbrechen"
+    "cancel": "Abbrechen",
+    "titleOfficer": "Neuer Offizier",
+    "fullCabins": "Kabinen belegt {{used}}/{{max}} — wer geht von Bord?",
+    "disembark": "→ verlässt das Schiff",
+    "declineOfficer": "Zurücklassen"
   },
   "feed": {
     "source": {
@@ -631,5 +668,43 @@
     "decline": "Liegen lassen",
     "hint": "Eines von dreien. Der Rest verbrennt mit dem Wrack.",
     "declined": "Bergung: nichts an Bord war die Schneidzeit wert."
+  },
+  "cargo": {
+    "title": "Risikofracht",
+    "rows": "noch {{n}} Reihen",
+    "payout": "zahlt {{n}} Schrott",
+    "delivered": "Fracht abgeliefert — der Laderaum ist leer, die Zahlung ist verbucht",
+    "dropped": "Fracht abgestoßen — der Nachteil endet, die Zahlung ist verwirkt",
+    "droppedAxis": "Fracht abgestoßen — die Achse bleibt verschoben, die Zahlung ist verwirkt",
+    "lapsed": "Der Vertrag ist mit dem Akt verfallen — der Laderaum ist leer, die Zahlung fort",
+    "moved": "Ablieferung umgeleitet — die Marke ging zur nächsten Station voraus",
+    "stranded": "Voraus nimmt niemand die Fracht — der Vertrag ist nichtig"
+  },
+  "echo": {
+    "title": "Echo-Kern",
+    "close": "Schließen",
+    "count": "{{n}} von {{max}} Fragmenten geborgen",
+    "rule": "Ein Knoten fliegt mit. Nichts wird ausgegeben, nichts umverteilt.",
+    "tier": "ab {{n}}",
+    "locked": "Öffnet sich bei {{n}} geborgenen Fragmenten",
+    "equipped": "Ausgerüstet",
+    "none": "Kein Knoten",
+    "noneBody": "Mit leerem Kern in den Lauf gehen.",
+    "open": "Echo-Kern",
+    "setup": "Echo",
+    "setupNone": "Kein Knoten ausgerüstet",
+    "codexTitle": "Echo-Kern",
+    "codexBody": "Geborgene Fragmente öffnen Knoten. Einer fliegt in jedem Lauf mit.",
+    "opened": {
+      "secondLook": "Echo-Kern: Zweiter Blick ist offen.",
+      "readout": "Echo-Kern: Auswertung ist offen.",
+      "calculus": "Echo-Kern: Feuerlösung ist offen.",
+      "echolocation": "Echo-Kern: Echolot ist offen.",
+      "pathGhost": "Echo-Kern: Pfadgeist ist offen.",
+      "softLanding": "Echo-Kern: Sanfte Landung ist offen.",
+      "reserve": "Echo-Kern: Leistungsreserve ist offen.",
+      "shieldEcho": "Echo-Kern: Schildecho ist offen.",
+      "veto": "Echo-Kern: Veto ist offen."
+    }
   }
 }

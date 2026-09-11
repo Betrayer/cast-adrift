@@ -50,7 +50,10 @@
     "scrap": "Scrap {{n}}",
     "previewHole": "The rim answers for the whole spot: go around it, or ride the wormhole through",
     "spotLabel": "Black hole — the whole spot is one choice",
-    "conditions": "Conditions ×{{n}}"
+    "conditions": "Conditions ×{{n}}",
+    "cargo": "Cargo ▸{{n}}",
+    "cargoMany": "Cargo ×{{n}}",
+    "previewDelivery": "Delivery: {{n}} scrap on arrival"
   },
   "event": {
     "title": "Signal",
@@ -81,7 +84,9 @@
     "checkTierMax": "d{{tier}} and smaller only",
     "outcomeOdds": "odds {{odds}}",
     "beaconTitle": "Beacon",
-    "beaconCounter": "Beacon {{n}} of {{max}}"
+    "beaconCounter": "Beacon {{n}} of {{max}}",
+    "reqCargo": "needs a free hold and a station ahead",
+    "cargoTerms": "{{drawback}} · delivery pays {{n}}"
   },
   "anomaly": {
     "title": "Anomaly",
@@ -501,7 +506,14 @@
     "tabBattle": "Battle",
     "openBattle": "Battle log",
     "battleLive": "This fight, newest turn first.",
-    "battleLast": "The last fight, newest turn first."
+    "battleLast": "The last fight, newest turn first.",
+    "cargo": {
+      "taken": "took {{name}} aboard, {{n}} rows to the drop",
+      "moved": "the delivery mark for {{name}} moved to a nearer station",
+      "delivered": "delivered {{name}} for {{n}} scrap",
+      "dropped": "vented {{name}} and forfeited the payout",
+      "lapsed": "the contract on {{name}} lapsed"
+    }
   },
   "memory": {
     "kicker": "Echo remembers · fragment {{n}} of {{max}}",
@@ -578,7 +590,10 @@
     "ride": "Ride it",
     "rideCost": "Ride: a throw of {{min}}–{{max}}, direction unknown",
     "rideGentle": "Ride: a throw of {{min}}–{{max}}, deeper only",
-    "landed": "Thrown {{rows}} rows {{way}}"
+    "landed": "Thrown {{rows}} rows {{way}}",
+    "softLand": "Set down gently",
+    "softLandWhy": "Once per run: no throw at all — the nearest open node ahead",
+    "softLandSpent": "The Echo charge is already spent this run"
   },
   "bridge": {
     "title": "Bridge",
@@ -597,10 +612,28 @@
     "deckCount": "Deck {{n}}/{{max}}",
     "sellDiceHint": "Dice are sold at the shop.",
     "sellModule": "Sell +{{n}}",
-    "crewTitle": "Officer cabins",
-    "crewLocked": "Sealed — no crew aboard yet.",
-    "cargoTitle": "Cargo hold",
-    "cargoLocked": "Sealed — nothing to haul yet."
+    "crewTitle": "Officer cabins {{used}}/{{max}}",
+    "cargoTitle": "Cargo hold {{used}}/{{max}}",
+    "cabinEmpty": "empty cabin — rescue someone",
+    "cabinWho": "{{role}} · {{origin}}",
+    "cabinActive": "active · {{text}}",
+    "cabinPassive": "passive · {{text}}",
+    "passive": {
+      "scrapMultPct": "+{{n}}% scrap",
+      "scrapPerKill": "+{{n}} scrap per kill",
+      "battleEndHeal": "battle end: heal {{n}} hull",
+      "markBonusDelta": "marks are worth +{{n}} damage",
+      "evasionDelta": "dodge +{{n}}%",
+      "rerollSizeDelta": "reroll {{n}} more die at a time"
+    },
+    "cargoEmpty": "empty hold",
+    "cargoTerms": "delivery: station · {{rows}} rows · pays {{n}}",
+    "dropCargo": "Vent it",
+    "dropTitle": "Vent the cargo?",
+    "dropBody": "{{name}} goes out the lock. The drawback ends now, and the {{n}} scrap on delivery is gone.",
+    "dropBodyAxis": "{{name}} goes out the lock. The axis it moved stays where it is, and the {{n}} scrap on delivery is gone.",
+    "dropNo": "Keep hauling",
+    "dropYes": "Vent"
   },
   "replace": {
     "title": "Replace",
@@ -610,7 +643,11 @@
     "fullBay": "Bay full {{used}}/{{max}} — what goes?",
     "toScrap": "→ scrap +{{n}}",
     "sellNew": "Sell the new one (+{{n}})",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+    "titleOfficer": "New officer",
+    "fullCabins": "Cabins full {{used}}/{{max}} — who stands down?",
+    "disembark": "→ leaves the ship",
+    "declineOfficer": "Leave them behind"
   },
   "feed": {
     "source": {
@@ -631,5 +668,43 @@
     "decline": "Leave it",
     "hint": "One of the three. The rest burns with the hulk.",
     "declined": "Salvage: nothing aboard was worth the cutting time."
+  },
+  "cargo": {
+    "title": "Risk cargo",
+    "rows": "{{n}} rows to go",
+    "payout": "pays {{n}} scrap",
+    "delivered": "Cargo delivered — the hold is clear and the payment is logged",
+    "dropped": "Cargo vented — the drawback ends, the payout is forfeit",
+    "droppedAxis": "Cargo vented — the axis stays where it moved, the payout is forfeit",
+    "lapsed": "The contract lapsed with the act — the hold is clear, the payout is gone",
+    "moved": "Delivery re-routed — the mark moved to the nearest station still ahead",
+    "stranded": "Nothing ahead will take the cargo — the contract is void"
+  },
+  "echo": {
+    "title": "Echo core",
+    "close": "Close",
+    "count": "{{n}} of {{max}} fragments recovered",
+    "rule": "One node rides with you. Nothing is spent, nothing is respecced.",
+    "tier": "at {{n}}",
+    "locked": "Opens at {{n}} recovered fragments",
+    "equipped": "Equipped",
+    "none": "No node",
+    "noneBody": "Fly the run with the core empty.",
+    "open": "Echo core",
+    "setup": "Echo",
+    "setupNone": "No node equipped",
+    "codexTitle": "Echo core",
+    "codexBody": "Recovered fragments open nodes. One rides with you each run.",
+    "opened": {
+      "secondLook": "Echo core: Second Look is open.",
+      "readout": "Echo core: Readout is open.",
+      "calculus": "Echo core: Firing Solution is open.",
+      "echolocation": "Echo core: Echolocation is open.",
+      "pathGhost": "Echo core: Ghost Path is open.",
+      "softLanding": "Echo core: Soft Landing is open.",
+      "reserve": "Echo core: Power Reserve is open.",
+      "shieldEcho": "Echo core: Shield Echo is open.",
+      "veto": "Echo core: Veto is open."
+    }
   }
 }

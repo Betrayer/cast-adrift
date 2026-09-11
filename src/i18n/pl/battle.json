@@ -167,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} obrażeń · {{split}}"
   },
   "block": {
     "resolving": "Poczekaj na rozliczenie tury",
@@ -181,7 +183,13 @@
     "reserveFull": "Rezerwa pełna",
     "used": "Już użyte w tej turze",
     "hullLow": "Za mało kadłuba",
+    "notAllowed": "Teraz się nie da",
+    "occupied": "W tym slocie leży już kość",
+    "tierCap": "Kość jest za duża na ten slot",
+    "slotBlocked": "Ten slot jest zablokowany w tej turze",
+    "dieLocked": "Ta kość jest zablokowana",
     "noPartner": "Do wyżarzania potrzebna jest druga matryca tacowa o tej samej wartości.",
+    "needsTwoEnemies": "Ten tryb ognia wymaga dwóch żywych celów",
     "spent": "Statek może wykonać tę akcję raz na bitwę."
   },
   "resPrism": "kość pryzmatyczna liczy się do tej szkoły",
@@ -203,6 +211,7 @@
     "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -381,5 +390,15 @@
       "fold": "realizuje zamówienie",
       "devour": "pożera kostkę"
     }
+  },
+  "mode": {
+    "title": "Tryb ognia",
+    "label": "Tryb ognia: {{mode}}"
+  },
+  "echo": {
+    "after": "Potem",
+    "fork": "{{cond}} — {{then}}. W przeciwnym razie — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Losowane z jego wzoru — nie jest ustalone."
   }
 }

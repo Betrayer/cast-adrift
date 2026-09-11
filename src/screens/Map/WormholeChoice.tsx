@@ -10,15 +10,21 @@ import styles from "./WormholeChoice.module.css";
 interface Props {
   offer: BypassOffer;
   gentle: boolean;
+  softLand: boolean;
+  softLandSpent: boolean;
   onBypass: () => void;
   onRide: () => void;
+  onSoftLand: () => void;
 }
 
 export const WormholeChoice = ({
   offer,
   gentle,
+  softLand,
+  softLandSpent,
   onBypass,
   onRide,
+  onSoftLand,
 }: Props) => {
   const { t } = useTranslation(["run", "common"]);
   return (
@@ -85,6 +91,27 @@ export const WormholeChoice = ({
               : t("run:hole.rideCost", { min: 1, max: MAX_BUDGET })}
           </Text>
         </div>
+        {softLand ? (
+          <div className={styles.option} data-testid="wormhole-soft">
+            <Button
+              fullWidth
+              variant="default"
+              disabled={softLandSpent}
+              data-testid="wormhole-soft-land"
+              onClick={onSoftLand}
+            >
+              {t("run:hole.softLand")}
+            </Button>
+            <Text
+              size="xs"
+              c={softLandSpent ? tokens.faint : schools.blue.text}
+              ta="center"
+              data-testid="wormhole-soft-why"
+            >
+              {t(softLandSpent ? "run:hole.softLandSpent" : "run:hole.softLandWhy")}
+            </Text>
+          </div>
+        ) : null}
       </div>
     </AppModal>
   );

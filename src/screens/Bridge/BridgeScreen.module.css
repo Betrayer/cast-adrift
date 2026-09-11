@@ -41,3 +41,26 @@
   border-style: dashed;
   text-align: center;
 }
+
+.cabin,
+.cargoRow {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface2);
+}
+
+.cabinEmpty,
+.cargoEmpty {
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px dashed var(--ca-line);
+  text-align: center;
+}
+
+.cargoRow button {
+  align-self: flex-start;
+}

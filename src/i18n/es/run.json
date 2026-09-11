@@ -50,7 +50,10 @@
     "scrap": "Chatarra {{n}}",
     "previewHole": "El borde responde por toda la mancha: rodéala o cruza el agujero de gusano",
     "spotLabel": "Agujero negro: toda la mancha es una sola decisión",
-    "conditions": "Condiciones ×{{n}}"
+    "conditions": "Condiciones ×{{n}}",
+    "cargo": "Carga ▸{{n}}",
+    "cargoMany": "Carga ×{{n}}",
+    "previewDelivery": "Entrega: {{n}} de chatarra al llegar"
   },
   "event": {
     "title": "Señal",
@@ -81,7 +84,9 @@
     "checkTierMax": "Solo para modelos «{{tier}}» y más pequeños",
     "outcomeOdds": "cuotas {{odds}}",
     "beaconTitle": "Baliza",
-    "beaconCounter": "Baliza {{n}} de {{max}}"
+    "beaconCounter": "Baliza {{n}} de {{max}}",
+    "reqCargo": "necesita bodega libre y una estación por delante",
+    "cargoTerms": "{{drawback}} · la entrega paga {{n}}"
   },
   "anomaly": {
     "title": "Anomalía",
@@ -501,7 +506,14 @@
     "tabBattle": "Combate",
     "openBattle": "Registro de combate",
     "battleLive": "Este combate, el turno más reciente primero.",
-    "battleLast": "El último combate, el turno más reciente primero."
+    "battleLast": "El último combate, el turno más reciente primero.",
+    "cargo": {
+      "taken": "cargó {{name}} a bordo, {{n}} filas hasta la entrega",
+      "moved": "la marca de entrega de {{name}} pasó a una estación más cercana",
+      "delivered": "entregó {{name}} por {{n}} de chatarra",
+      "dropped": "expulsó {{name}} y perdió el pago",
+      "lapsed": "el contrato de {{name}} venció"
+    }
   },
   "memory": {
     "kicker": "Echo recuerda · fragmento {{n}} de {{max}}",
@@ -578,7 +590,10 @@
     "ride": "¡A por ello!",
     "rideCost": "Recorrido: un trayecto de {{min}} –{{max}}, dirección desconocida",
     "rideGentle": "Ride: una variación de «{{min}}» – «{{max}}», pero más profunda",
-    "landed": "Lanzado {{rows}} filas {{way}}"
+    "landed": "Lanzado {{rows}} filas {{way}}",
+    "softLand": "Posarse con suavidad",
+    "softLandWhy": "Una vez por partida: sin tirada — el nodo libre más cercano por delante",
+    "softLandSpent": "La carga del Eco ya se gastó en esta partida"
   },
   "bridge": {
     "title": "Puente",
@@ -597,10 +612,28 @@
     "deckCount": "Deck {{n}} / {{max}}",
     "sellDiceHint": "En la tienda se venden dados.",
     "sellModule": "Vender + {{n}}",
-    "crewTitle": "Cabinas de oficiales",
-    "crewLocked": "Precintado — aún no hay tripulación a bordo.",
-    "cargoTitle": "Caja de carga",
-    "cargoLocked": "Precintado: todavía no hay nada que transportar."
+    "crewTitle": "Cabinas de oficiales {{used}}/{{max}}",
+    "cargoTitle": "Bodega {{used}}/{{max}}",
+    "cabinEmpty": "cabina vacía — rescata a alguien",
+    "cabinWho": "{{role}} · {{origin}}",
+    "cabinActive": "activa · {{text}}",
+    "cabinPassive": "pasiva · {{text}}",
+    "passive": {
+      "scrapMultPct": "+{{n}} % de chatarra",
+      "scrapPerKill": "+{{n}} de chatarra por baja",
+      "battleEndHeal": "fin del combate: cura {{n}} de casco",
+      "markBonusDelta": "las marcas dan +{{n}} de daño",
+      "evasionDelta": "evasión +{{n}} %",
+      "rerollSizeDelta": "dados por relanzamiento: +{{n}}"
+    },
+    "cargoEmpty": "bodega vacía",
+    "cargoTerms": "entrega: estación · {{rows}} filas · paga {{n}}",
+    "dropCargo": "Expulsar",
+    "dropTitle": "¿Expulsar la carga?",
+    "dropBody": "{{name}} sale por la esclusa. El lastre termina ahora y los {{n}} de chatarra de la entrega se pierden.",
+    "dropBodyAxis": "{{name}} sale por la esclusa. El eje se queda donde lo movió y los {{n}} de chatarra de la entrega se pierden.",
+    "dropNo": "Seguir transportando",
+    "dropYes": "Expulsar"
   },
   "replace": {
     "title": "Sustituir",
@@ -610,7 +643,11 @@
     "fullBay": "Bay está a rebosar {{used}} / {{max}} — ¿qué pasa?",
     "toScrap": "→ eliminar{{n}}",
     "sellNew": "Vender el nuevo (+ {{n}})",
-    "cancel": "Cancelar"
+    "cancel": "Cancelar",
+    "titleOfficer": "Nuevo oficial",
+    "fullCabins": "Camarotes llenos {{used}}/{{max}} — ¿quién desembarca?",
+    "disembark": "→ deja la nave",
+    "declineOfficer": "Dejarlos atrás"
   },
   "feed": {
     "source": {
@@ -631,5 +668,43 @@
     "decline": "Dejarlo",
     "hint": "Una de las tres. El resto arde con el casco.",
     "declined": "Desguace: nada a bordo valía el tiempo de corte."
+  },
+  "cargo": {
+    "title": "Carga de riesgo",
+    "rows": "quedan {{n}} filas",
+    "payout": "paga {{n}} de chatarra",
+    "delivered": "Carga entregada: la bodega está vacía y el pago queda registrado",
+    "dropped": "Carga expulsada: el lastre termina, el pago se pierde",
+    "droppedAxis": "Carga expulsada: el eje sigue movido, el pago se pierde",
+    "lapsed": "El contrato venció con el acto: la bodega está vacía y el pago se ha ido",
+    "moved": "Entrega desviada: la marca pasó a la estación más cercana por delante",
+    "stranded": "Nadie por delante aceptará la carga: el contrato queda anulado"
+  },
+  "echo": {
+    "title": "Núcleo Eco",
+    "close": "Cerrar",
+    "count": "{{n}} de {{max}} fragmentos recuperados",
+    "rule": "Un nodo te acompaña. Nada se gasta ni se reasigna.",
+    "tier": "desde {{n}}",
+    "locked": "Se abre con {{n}} fragmentos recuperados",
+    "equipped": "Equipado",
+    "none": "Sin nodo",
+    "noneBody": "Sal a la partida con el núcleo vacío.",
+    "open": "Núcleo Eco",
+    "setup": "Eco",
+    "setupNone": "Ningún nodo equipado",
+    "codexTitle": "Núcleo Eco",
+    "codexBody": "Los fragmentos recuperados abren nodos. Uno te acompaña en cada partida.",
+    "opened": {
+      "secondLook": "Núcleo Eco: Segunda mirada está abierto.",
+      "readout": "Núcleo Eco: Desglose está abierto.",
+      "calculus": "Núcleo Eco: Solución de tiro está abierto.",
+      "echolocation": "Núcleo Eco: Ecolocalización está abierto.",
+      "pathGhost": "Núcleo Eco: Senda fantasma está abierto.",
+      "softLanding": "Núcleo Eco: Aterrizaje suave está abierto.",
+      "reserve": "Núcleo Eco: Reserva de potencia está abierto.",
+      "shieldEcho": "Núcleo Eco: Eco del escudo está abierto.",
+      "veto": "Núcleo Eco: Veto está abierto."
+    }
   }
 }

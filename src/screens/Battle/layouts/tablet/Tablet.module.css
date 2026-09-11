@@ -77,6 +77,16 @@
   min-height: 72px;
 }
 
+.rowCell {
+  position: relative;
+  min-width: 0;
+  display: flex;
+}
+
+.rowCellMode {
+  padding-right: 27px;
+}
+
 .row {
   position: relative;
   display: flex;
@@ -415,7 +425,7 @@
 
 :root[data-ca-compact='1'] .row {
   padding: 2px 6px;
-  gap: 5px;
+  gap: 4px;
 }
 
 :root[data-ca-compact='1'] .chip {

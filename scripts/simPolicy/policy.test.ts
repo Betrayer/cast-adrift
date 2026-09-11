@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { PUZZLES } from "@/data/puzzles";
 import { ALL_PERKS } from "@/data/perks";
-import { ALL_MODULES } from "@/data/modules";
+import { ALL_MODULES, MODULE_BY_ID } from "@/data/modules";
+import { MODULE_FIRE_MODE } from "@/data/fireModes";
 import { bayPrice, moduleSellValue } from "@/game/economy/prices";
 import { DIE_BY_ID } from "@/data/dice";
 import { generateSectorMap } from "@/game/map/generator";
@@ -9,13 +10,25 @@ import { nodeById, type MapNode } from "@/game/map/types";
 import { INTERFERENCE_STREAK_THRESHOLD } from "@/game/run/interference";
 import { isAllocatable, pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { createStream } from "@/services/rng";
-import { anomalyPull, greedyNext, stepCost, type RouteState } from "./map";
+import { CARGO, cargoPayout } from "@/data/cargo";
+import { skipScrapFor } from "@/game/run/perkDraft";
+import {
+  anomalyPull,
+  CARGO_PULL,
+  deliveryReachOf,
+  greedyNext,
+  stepCost,
+  type RouteState,
+} from "./map";
 import { decideDraft } from "./draft";
 import { decideEnter, expectedValue, resolvePuzzle } from "./puzzle";
 import {
   buyBay,
+  cargoValue,
   createRunState,
+  grantSimOfficer,
   moduleValue,
+  officerOfferValue,
   runAnomaly,
   runBays,
   takeDie,
@@ -259,6 +272,21 @@ describe("run state", () => {
     expect(refuser.moduleSales).toBe(moduleSellValue(worst.price));
   });
 
+  it("prices a fire-mode grant, so a mode carrier survives the trade margin", () => {
+    for (const moduleId of Object.keys(MODULE_FIRE_MODE)) {
+      const peers = ALL_MODULES.filter(
+        (def) =>
+          def.id !== moduleId &&
+          def.rarity === MODULE_BY_ID.get(moduleId)?.rarity &&
+          MODULE_FIRE_MODE[def.id] === undefined,
+      );
+      const beaten = peers.filter(
+        (def) => moduleValue(moduleId) > moduleValue(def.id),
+      );
+      expect(beaten.length).toBeGreaterThan(peers.length / 2);
+    }
+  });
+
   it("pays nothing for a duplicate, where a refused trade sells the offer", () => {
     const state = createRunState({
       hull: 30,
@@ -303,6 +331,21 @@ describe("run state", () => {
     buyBay(state, 3);
     expect(state.baysPurchased).toBe(1);
   });
+
+  it("carries no Echo node unless one is injected as a build parameter", () => {
+    const bare = createRunState({ hull: 30, hullMax: 30, deck: ["red-d6"] });
+    expect(bare.echo).toBeNull();
+    expect(bare.echoUsed).toBe(false);
+
+    const armed = createRunState({
+      hull: 30,
+      hullMax: 30,
+      deck: ["red-d6"],
+      echo: "softLanding",
+    });
+    expect(armed.echo).toBe("softLanding");
+    expect(armed.echoUsed).toBe(false);
+  });
 });
 
 describe("chart policy", () => {
@@ -328,5 +371,93 @@ describe("chart policy", () => {
     expect(buildChartPicks(MID_COLLECTION_LEVEL)).toEqual(
       buildChartPicks(MID_COLLECTION_LEVEL),
     );
+  });
+});
+
+describe("cargo routing", () => {
+  const map = generateSectorMap(createStream(4), 2);
+  const byId = nodeById(map);
+
+  it("costs a node nothing extra until a delivery marker exists", () => {
+    const plain: MapNode = { id: "x", row: 1, lane: 1, type: "event" };
+    expect(stepCost(map, byId, "r0l1", plain, route())).toBe(
+      stepCost(map, byId, "r0l1", plain, {
+        ...route(),
+        deliveryReach: new Set<string>(),
+      }),
+    );
+  });
+
+  it("discounts a node exactly one pull when it still reaches the marker", () => {
+    const plain: MapNode = { id: "x", row: 1, lane: 1, type: "event" };
+    const pulled = stepCost(map, byId, "r0l1", plain, {
+      ...route(),
+      deliveryReach: new Set(["x"]),
+    });
+    expect(stepCost(map, byId, "r0l1", plain, route()) - pulled).toBeCloseTo(
+      CARGO_PULL,
+    );
+  });
+
+  it("walks the marker backwards over hole-free edges and stops at the visited", () => {
+    const station = map.nodes.find(
+      (n) => n.type === "shop" || n.type === "shipyard" || n.type === "beacon",
+    );
+    if (station === undefined) throw new Error("sector 2 has no station");
+    const reach = deliveryReachOf(map, station.id, []);
+    expect(reach.has(station.id)).toBe(true);
+    const parents = map.edges
+      .filter(([, to]) => to === station.id)
+      .map(([from]) => from)
+      .filter((id) => byId.get(id)?.hole !== true);
+    expect(parents.length).toBeGreaterThan(0);
+    for (const id of parents) expect(reach.has(id)).toBe(true);
+    expect(deliveryReachOf(map, station.id, parents).size).toBe(1);
+    for (const id of reach) {
+      expect(byId.get(id)?.row ?? 0).toBeLessThanOrEqual(station.row);
+    }
+  });
+});
+
+describe("crew and cargo value", () => {
+  it("fills both cabins, refuses a third, and honours the lock", () => {
+    const state = createRunState({ hull: 30, hullMax: 30, deck: ["red-d6"] });
+    expect(grantSimOfficer(state, "scrapper")).toBe(true);
+    expect(grantSimOfficer(state, "scrapper")).toBe(false);
+    expect(grantSimOfficer(state, "mechanic")).toBe(true);
+    expect(grantSimOfficer(state, "defector")).toBe(false);
+    expect(state.officers).toEqual(["scrapper", "mechanic"]);
+
+    const locked = createRunState({
+      hull: 30,
+      hullMax: 30,
+      deck: ["red-d6"],
+      officerLock: true,
+    });
+    expect(grantSimOfficer(locked, "scrapper")).toBe(false);
+    expect(locked.officers).toEqual([]);
+  });
+
+  it("prices a rescue at the scrap the draft itself pays for one perk", () => {
+    const state = createRunState({ hull: 30, hullMax: 30, deck: ["red-d6"] });
+    expect(officerOfferValue(state, "scrapper", 1)).toBe(skipScrapFor(1));
+    expect(officerOfferValue(state, "scrapper", 4)).toBe(skipScrapFor(4));
+    grantSimOfficer(state, "scrapper");
+    expect(officerOfferValue(state, "scrapper", 1)).toBe(0);
+    grantSimOfficer(state, "mechanic");
+    expect(officerOfferValue(state, "defector", 1)).toBe(0);
+  });
+
+  it("pays for a cargo drawback out of the payout it is offered for", () => {
+    const state = createRunState({ hull: 30, hullMax: 30, deck: ["red-d6"] });
+    const tiered = CARGO.find((def) => def.drawback === "slotTier");
+    const hulled = CARGO.find((def) => def.drawback === "hullPerNode");
+    if (tiered === undefined || hulled === undefined) {
+      throw new Error("cargo roster lost a drawback");
+    }
+    expect(cargoValue(state, tiered, 1)).toBeLessThan(cargoPayout(tiered, 1));
+    expect(cargoValue(state, hulled, 1)).toBeLessThan(cargoPayout(hulled, 1));
+    const hurt = createRunState({ hull: 4, hullMax: 30, deck: ["red-d6"] });
+    expect(cargoValue(hurt, hulled, 1)).toBeLessThan(cargoValue(state, hulled, 1));
   });
 });

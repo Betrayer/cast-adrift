@@ -1,14 +1,19 @@
+import type { EchoNodeId } from "@/data/echo";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk } from "@/data/slots";
 import {
   enemyForecast,
   legalTargets,
   mitigationOf,
+  projectBoard,
+  projectSlot,
   type Mitigation,
+  type SlotProjection,
   type TurnForecast,
 } from "@/game/battle/view";
 import { ALL_COACH_MARK_IDS, HINT_IDS, nextCoachMark } from "@/game/tutorial";
 import {
+  areConnected,
   edgeKey,
   nodeById,
   type NodeId,
@@ -72,6 +77,7 @@ import { seedStackFor, startTargetFor } from "@/services/start-param";
 import { canGoBack, useAppStore } from "@/stores/appStore";
 import {
   battleSnapshot,
+  echoActiveSpent,
   hydrateBattle,
   useBattleStore,
   type BattleSaveState,
@@ -83,15 +89,22 @@ import {
   type FeedSource,
 } from "@/stores/narrativeStore";
 import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
+import { cargoRowsLeft } from "@/game/run/cargo";
 import type { JournalEntry } from "@/game/run/journal";
 import {
   runModuleSlots,
   useRunStore,
   type BattleTally,
+  type MkLevels,
   type PendingSwap,
   type RunMode,
 } from "@/stores/runStore";
-import { grantDie, grantModule } from "@/game/run/inventory";
+import {
+  grantCargo,
+  grantDie,
+  grantModule,
+  grantOfficer,
+} from "@/game/run/inventory";
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
@@ -130,6 +143,7 @@ export interface MetaPatch {
   systemsCheckDone?: boolean;
   tutorialSeen?: "all" | readonly string[];
   stats?: Partial<MetaStats>;
+  echo?: EchoNodeId | null;
 }
 
 export interface RunPatch {
@@ -140,6 +154,9 @@ export interface RunPatch {
   perks?: readonly string[];
   modules?: readonly string[];
   flags?: readonly string[];
+  officers?: readonly string[];
+  cargo?: readonly string[];
+  echo?: EchoNodeId | null;
   visited?: readonly NodeId[];
   wormholeRides?: number;
   usedMinibosses?: readonly string[];
@@ -156,10 +173,13 @@ export interface BattlePatch {
   interference?: number;
   perks?: readonly string[];
   modules?: readonly string[];
+  mkLevels?: MkLevels;
   chargeCap?: number;
   startCharge?: number;
   ascension?: number;
   inverted?: boolean;
+  officers?: readonly string[];
+  echo?: EchoNodeId;
   snapshot?: BattleSaveState;
 }
 
@@ -302,6 +322,7 @@ export interface TestState {
     stack: { screen: ScreenId; params: Record<string, string> | null }[];
     canBack: boolean;
     systemMenu: boolean;
+    echoCore: boolean;
   };
   run: {
     active: boolean;
@@ -321,8 +342,12 @@ export interface TestState {
     mutators: string[];
     weather: string | null;
     salvage: string[];
+    officers: string[];
+    cargo: string[];
     sectorReveal: number;
     shipyardDiscount: number;
+    echo: string | null;
+    echoUsed: boolean;
   };
   battle: {
     phase: string;
@@ -333,6 +358,8 @@ export interface TestState {
     shipId: ShipId;
     passiveUsed: boolean;
     nextWeapons: number;
+    echo: string | null;
+    echoSpent: boolean;
     selectedDieUid: string | null;
     dice: DieView[];
     slots: { id: SlotId; dieUid: string | null }[];
@@ -376,6 +403,13 @@ export interface TestState {
   };
 }
 
+export interface CargoHoldView {
+  defId: string;
+  nodeId: NodeId;
+  sectorIndex: number;
+  rows: number;
+}
+
 export interface TestApi {
   seedRun: (config?: SeedRunConfig) => void;
   grantMeta: (patch: MetaPatch) => void;
@@ -383,6 +417,9 @@ export interface TestApi {
   setBattle: (patch: BattlePatch) => void;
   skipToNode: (nodeId: NodeId) => boolean;
   standAt: (nodeId: NodeId) => boolean;
+  advanceAct: () => void;
+  cargo: () => CargoHoldView[];
+  deliveryApproach: (nodeId: NodeId) => NodeId | null;
   holes: () => WormholeEdgeView[];
   spots: () => HoleSpotView[];
   landings: (budget: number, direction: ThrowDirection) => NodeId[];
@@ -400,6 +437,7 @@ export interface TestApi {
   settings: (patch: Partial<SettingsValues>) => void;
   layout: (id: BattleLayoutId) => void;
   forecast: () => TurnForecast | null;
+  projection: (slotId: SlotId) => SlotProjection | null;
   now: (at?: number | null) => number;
   go: (screen: ScreenId, params?: Record<string, string>) => void;
   back: () => void;
@@ -467,6 +505,8 @@ const journalLineOf = (entry: JournalEntry): string | null => {
       return entry.text;
     case "achievement":
       return entry.achievement;
+    case "cargo":
+      return `run:journal.cargo.${entry.step}`;
     default:
       return null;
   }
@@ -518,6 +558,7 @@ const applyMeta = (patch: MetaPatch): void => {
     for (const id of ids) meta.markTutorialSeen(id);
   }
   if (patch.stats !== undefined) meta.bumpLifetime(patch.stats);
+  if (patch.echo !== undefined) meta.selectEcho(patch.echo);
 };
 
 const applyRun = (patch: RunPatch): void => {
@@ -533,6 +574,8 @@ const applyRun = (patch: RunPatch): void => {
   for (const id of patch.perks ?? []) run.addPerk(id);
   for (const id of patch.modules ?? []) grantModule(id);
   for (const key of patch.flags ?? []) run.setFlag(key);
+  for (const id of patch.officers ?? []) grantOfficer(id);
+  for (const id of patch.cargo ?? []) grantCargo(id);
   if (patch.visited !== undefined) {
     useRunStore.setState({ visited: [...patch.visited] });
   }
@@ -542,6 +585,9 @@ const applyRun = (patch: RunPatch): void => {
     }));
   }
   for (const defId of patch.usedMinibosses ?? []) run.markMinibossUsed(defId);
+  if (patch.echo !== undefined) {
+    useRunStore.setState({ echo: patch.echo, echoUsed: false });
+  }
 };
 
 const applySettings = (patch: Partial<SettingsValues>): void => {
@@ -582,6 +628,7 @@ const readState = (): TestState => {
       })),
       canBack: canGoBack(app),
       systemMenu: app.systemMenu,
+      echoCore: app.echoCore,
     },
     run: {
       active: run.active,
@@ -601,8 +648,12 @@ const readState = (): TestState => {
       mutators: [...run.mutators],
       weather: weatherIn(run.mutators)?.id ?? null,
       salvage: [...(run.pendingRewards?.salvage ?? [])],
+      officers: [...run.officers],
+      cargo: run.cargo.map((entry) => entry.defId),
       sectorReveal: run.sectorReveal,
       shipyardDiscount: run.shipyardDiscount,
+      echo: run.echo,
+      echoUsed: run.echoUsed,
     },
     battle: {
       phase: battle.phase,
@@ -613,6 +664,8 @@ const readState = (): TestState => {
       shipId: battle.shipId,
       passiveUsed: battle.passiveUsed,
       nextWeapons: battle.nextTurnMods.weapons ?? 0,
+      echo: battle.echo ?? null,
+      echoSpent: echoActiveSpent(battle),
       selectedDieUid: battle.selectedDieUid,
       dice: battle.dice.map((d) => ({
         uid: d.uid,
@@ -750,6 +803,9 @@ export const createTestApi = (): TestApi => ({
       return;
     }
     const run = useRunStore.getState();
+    for (const [slotId, mk] of Object.entries(patch.mkLevels ?? {})) {
+      if (mk !== undefined) run.setMk(slotId as SlotId, mk);
+    }
     const deck =
       patch.deck ?? (run.deck.length > 0 ? run.deck.map((d) => d.defId) : null);
     if (deck === null) return;
@@ -772,6 +828,10 @@ export const createTestApi = (): TestApi => ({
           : { startCharge: patch.startCharge }),
         ...(patch.ascension === undefined ? {} : { ascension: patch.ascension }),
         ...(patch.inverted === undefined ? {} : { inverted: patch.inverted }),
+        ...(patch.officers === undefined
+          ? {}
+          : { officers: [...patch.officers] }),
+        ...(patch.echo === undefined ? {} : { echo: patch.echo }),
       },
       deck,
       createStreams(patch.seed ?? DEFAULT_SEED),
@@ -781,6 +841,10 @@ export const createTestApi = (): TestApi => ({
 
   skipToNode: (nodeId) => jumpTo(nodeId),
 
+  advanceAct: () => {
+    advanceSector();
+  },
+
   settings: applySettings,
 
   layout: chooseBattleLayout,
@@ -789,6 +853,18 @@ export const createTestApi = (): TestApi => ({
     const battle = useBattleStore.getState();
     if (battle.phase !== "placement") return null;
     return enemyForecast(battleSnapshot(battle));
+  },
+
+  projection: (slotId) => {
+    const battle = useBattleStore.getState();
+    if (battle.phase !== "placement") return null;
+    const snapshot = battleSnapshot(battle);
+    if (snapshot.slots[slotId]?.dieUid !== undefined) {
+      return projectBoard(snapshot)[slotId] ?? null;
+    }
+    const subject = battle.selectedDieUid;
+    if (subject === null) return null;
+    return projectSlot(snapshot, subject, slotId);
   },
 
   now: (at) => {
@@ -889,6 +965,35 @@ export const createTestApi = (): TestApi => ({
     });
     useAppStore.getState().go("map");
     return true;
+  },
+
+  cargo: () => {
+    const run = useRunStore.getState();
+    if (run.map === null) return [];
+    const map = run.map;
+    const row =
+      run.position === null
+        ? run.depthRow
+        : (nodeById(map).get(run.position)?.row ?? run.depthRow);
+    return run.cargo.map((entry) => ({
+      defId: entry.defId,
+      nodeId: entry.nodeId,
+      sectorIndex: entry.sectorIndex,
+      rows: cargoRowsLeft(map, entry, row),
+    }));
+  },
+
+  deliveryApproach: (nodeId) => {
+    const run = useRunStore.getState();
+    if (run.map === null) return null;
+    const map = run.map;
+    const from = map.nodes.find(
+      (node) =>
+        !run.visited.includes(node.id) &&
+        node.hole !== true &&
+        areConnected(map, node.id, nodeId),
+    );
+    return from?.id ?? null;
   },
 
   holes: () => {

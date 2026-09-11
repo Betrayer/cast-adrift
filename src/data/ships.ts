@@ -53,6 +53,7 @@ export interface ShipDef {
   hullMax: number;
   slots: Partial<Record<SlotId, Omit<SlotState, "dieUid">>>;
   moduleSlots?: number;
+  cargoHold: number;
   bridgeTheme: BridgeTheme;
   passive?: ShipPassive;
   price: number;
@@ -63,6 +64,7 @@ export interface ShipDef {
 export const SHIPS: readonly ShipDef[] = [
   {
     id: "wanderer",
+    cargoHold: 1,
     name: "content:ships.wanderer.name",
     passiveName: "content:ships.wanderer.passiveName",
     passiveDesc: "content:ships.wanderer.passiveDesc",
@@ -92,6 +94,7 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "ram",
+    cargoHold: 1,
     name: "content:ships.ram.name",
     passiveName: "content:ships.ram.passiveName",
     passiveDesc: "content:ships.ram.passiveDesc",
@@ -122,6 +125,7 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "ark",
+    cargoHold: 2,
     name: "content:ships.ark.name",
     passiveName: "content:ships.ark.passiveName",
     passiveDesc: "content:ships.ark.passiveDesc",
@@ -153,6 +157,7 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "corsair",
+    cargoHold: 1,
     name: "content:ships.corsair.name",
     passiveName: "content:ships.corsair.passiveName",
     passiveDesc: "content:ships.corsair.passiveDesc",
@@ -192,6 +197,7 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "foundry",
+    cargoHold: 2,
     name: "content:ships.foundry.name",
     passiveName: "content:ships.foundry.passiveName",
     passiveDesc: "content:ships.foundry.passiveDesc",
@@ -221,6 +227,7 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "prism",
+    cargoHold: 1,
     name: "content:ships.prism.name",
     passiveName: "content:ships.prism.passiveName",
     passiveDesc: "content:ships.prism.passiveDesc",
@@ -251,6 +258,7 @@ export const SHIPS: readonly ShipDef[] = [
   },
   {
     id: "ram-proto",
+    cargoHold: 1,
     name: "content:ships.ram-proto.name",
     hullMax: 30,
     price: 0,

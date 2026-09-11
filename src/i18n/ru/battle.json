@@ -167,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} урона · {{split}}"
   },
   "block": {
     "resolving": "Дождись, пока ход разрешится",
@@ -181,7 +183,13 @@
     "reserveFull": "Резерв заполнен",
     "used": "Уже использовано в этом ходу",
     "hullLow": "Слишком мало корпуса",
+    "notAllowed": "Сейчас так нельзя",
+    "occupied": "В слоте уже есть кость",
+    "tierCap": "Кость слишком крупная для слота",
+    "slotBlocked": "Слот заблокирован в этом ходу",
+    "dieLocked": "Эта кость заблокирована",
     "noPartner": "Для отжига нужна вторая кость того же значения в лотке.",
+    "needsTwoEnemies": "Режиму огня нужны две живые цели",
     "spent": "Корабль может сделать это один раз за бой."
   },
   "resPrism": "призматическая кость считается за эту школу",
@@ -203,6 +211,7 @@
     "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -381,5 +390,15 @@
       "fold": "складывает порядок",
       "devour": "пожирает куб"
     }
+  },
+  "mode": {
+    "title": "Режим огня",
+    "label": "Режим огня: {{mode}}"
+  },
+  "echo": {
+    "after": "Дальше",
+    "fork": "{{cond}} — {{then}}. Иначе — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Тянется из паттерна — не задано."
   }
 }

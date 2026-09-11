@@ -11,6 +11,8 @@ import type { BattleState } from '@/stores/battleStore';
 import type { ShipId } from '@/data/ships';
 import type { SlotId } from '@/types/battle';
 import { SlotCard } from './SlotCard';
+import { SlotModeBadge } from './SlotModeBadge';
+import type { SlotModeModels } from './slotModes';
 import { onSlotTap } from './useDock';
 import styles from './Board.module.css';
 
@@ -69,6 +71,7 @@ export interface SlotGridProps {
   ordered: readonly SlotId[];
   legal: readonly SlotId[];
   projections: Partial<Record<SlotId, SlotProjection>>;
+  modes: SlotModeModels;
 }
 
 export const SlotGrid = ({
@@ -76,6 +79,7 @@ export const SlotGrid = ({
   ordered,
   legal,
   projections,
+  modes,
 }: SlotGridProps) => (
   <div className={styles.grid}>
     {ordered.map((slotId, index) => {
@@ -99,6 +103,7 @@ export const SlotGrid = ({
             onTap={onSlotTap}
           />
           <SlotFormula slotId={slotId} shipId={board.shipId} />
+          <SlotModeBadge model={modes[slotId]} place="card" />
         </div>
       );
     })}

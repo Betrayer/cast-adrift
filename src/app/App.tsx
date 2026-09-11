@@ -13,6 +13,7 @@ import { CoachMarks } from '@/components/CoachMarks';
 import { CommsFeed } from '@/components/CommsFeed';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
+import { EchoCoreHost } from '@/components/EchoCoreHost';
 import { MemoryCeremony } from '@/components/MemoryCeremony';
 import { MergeCard } from '@/components/MergeCard';
 import { PerfOverlay } from '@/components/PerfOverlay';
@@ -54,6 +55,7 @@ export const App = () => {
       <AudioDirector />
       <SystemMenu />
       <BuildSheetHost />
+      <EchoCoreHost />
       <CommsFeed />
       <MemoryCeremony />
       <VoucherCeremony />

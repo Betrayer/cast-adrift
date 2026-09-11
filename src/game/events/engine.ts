@@ -36,6 +36,7 @@ export interface OptionContext {
   deck: readonly DeckDie[];
   mkLevels: Partial<Record<SlotId, MkLevel>>;
   flags: Record<string, FlagValue>;
+  offerableCargo?: readonly string[];
 }
 
 export const flagPresent = (
@@ -138,6 +139,8 @@ export const optionMet = (
         (req.min === undefined || ctx.axis >= req.min) &&
         (req.max === undefined || ctx.axis <= req.max)
       );
+    case "cargo":
+      return (ctx.offerableCargo ?? []).includes(req.id);
   }
 };
 

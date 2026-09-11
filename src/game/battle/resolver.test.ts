@@ -18,6 +18,7 @@ import {
   vulnerableFor,
 } from "@/game/battle/resolver";
 import {
+  buildBattleSnapshot,
   buildEnemies,
   canPlaceDie,
   drawIntent,
@@ -31,8 +32,11 @@ import {
   restoreStreams,
   serializeStreams,
 } from "@/services/rng";
+import { modeBlockFor } from "@/game/battle/view";
+import { splitDamage, type FireModeId } from "@/data/fireModes";
 import type {
   BattleSnapshot,
+  Beat,
   EnemyState,
   RolledDie,
   SlotId,
@@ -147,6 +151,24 @@ const withPlacements = (
   }
   return base;
 };
+
+const armed = (
+  mode: FireModeId,
+  placements: PlacementSlots,
+  over: Partial<BattleSnapshot> = {},
+  slotId: "weaponA" | "weaponB" = "weaponA",
+): BattleSnapshot => {
+  const base = withPlacements(placements, over);
+  const slot = base.slots[slotId];
+  if (slot !== undefined) {
+    slot.modes = ["direct", mode];
+    slot.mode = mode;
+  }
+  return base;
+};
+
+const damageBeats = (beats: readonly Beat[]): readonly Beat[] =>
+  beats.filter((b) => b.kind === "damage");
 
 const forceIntent = (state: EnemyState, intent: Intent): EnemyState => ({
   ...state,
@@ -431,6 +453,25 @@ describe("sensors", () => {
     expect(next.hull).toBe(27);
     expect(next.enemies[0]?.statuses.jam).toBeUndefined();
   });
+
+  it("marks the aimed subsystem's parent, not the first living enemy", () => {
+    const plain = enemy("raider", { id: "enemy-0" });
+    const elite = enemy("raiderAlpha", { id: "enemy-1" });
+    const part = elite.subsystems[0];
+    expect(part).toBeDefined();
+    if (part === undefined) return;
+
+    const { next } = resolvePlayerPhase(
+      withPlacements(
+        { sensors: 1 },
+        { enemies: [plain, elite], targetId: part.id },
+      ),
+    );
+
+    expect(next.enemies[1]?.statuses.mark).toBe(1);
+    expect(next.enemies[0]?.statuses.mark).toBeUndefined();
+  });
+
 });
 
 describe("engines", () => {
@@ -648,6 +689,349 @@ describe("weapons and targeting", () => {
     );
     expect(next.enemies[1]?.hp).toBe(5);
     expect(beats[0]?.targetId).toBe("enemy-1");
+  });
+});
+
+describe("fire modes", () => {
+  it("splits a total across n fragments without losing or inventing a point", () => {
+    for (let total = 0; total <= 24; total += 1) {
+      for (let parts = 1; parts <= 3; parts += 1) {
+        const shares = splitDamage(total, parts);
+        expect(shares).toHaveLength(parts);
+        expect(shares.reduce((sum, n) => sum + n, 0)).toBe(total);
+        expect(Math.max(...shares) - Math.min(...shares)).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it("derives the slot's modes at battle start from Mk and modules", () => {
+    const snapshot = buildBattleSnapshot(
+      "wanderer",
+      ["grey-d4", "grey-d4"],
+      ["raider"],
+      createStreams(5),
+      createStream(5),
+      { weaponA: 3 },
+      { modules: ["autoloader"] },
+    );
+    expect(snapshot.slots.weaponA?.modes).toEqual([
+      "direct",
+      "scatter",
+      "doublet",
+    ]);
+    expect(snapshot.slots.weaponA?.mode).toBe("direct");
+    expect(snapshot.slots.weaponB?.modes).toEqual(["direct", "doublet"]);
+    expect(snapshot.slots.shields?.modes).toBeUndefined();
+    expect(snapshot.slots.sensors?.mode).toBeUndefined();
+  });
+
+  it("leaves a bare weapon slot without a mode field at all", () => {
+    const snapshot = buildBattleSnapshot(
+      "wanderer",
+      ["grey-d4"],
+      ["raider"],
+      createStreams(5),
+      createStream(5),
+    );
+    expect(snapshot.slots.weaponA).toEqual({ cap: 8, mk: 1 });
+  });
+
+  it("keeps the armed mode across a turn boundary and drops only the die", () => {
+    const snapshot = buildBattleSnapshot(
+      "wanderer",
+      ["grey-d4", "grey-d4"],
+      ["raider"],
+      createStreams(5),
+      createStream(5),
+      { weaponA: 3 },
+      { modules: ["autoloader"] },
+    );
+    const slot = snapshot.slots.weaponA;
+    if (slot !== undefined) {
+      slot.mode = "doublet";
+      slot.dieUid = snapshot.dice[0]?.uid;
+    }
+    const later = advanceTurn(snapshot, createStreams(9));
+    expect(later.slots.weaponA?.mode).toBe("doublet");
+    expect(later.slots.weaponA?.modes).toEqual(["direct", "scatter", "doublet"]);
+    expect(later.slots.weaponA?.dieUid).toBeUndefined();
+  });
+
+  it("direct is the unchanged baseline: one beat, one absorb", () => {
+    const target = mkEnemy({ hp: 20, hpMax: 20, shield: 3 });
+    const { next, beats } = resolvePlayerPhase(
+      armed("direct", { weaponA: 8 }, { enemies: [target] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([8]);
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(15);
+  });
+
+  it("a slot with no mode resolves exactly like an armed direct", () => {
+    const plain = resolvePlayerPhase(
+      withPlacements({ weaponA: 8 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    const explicit = resolvePlayerPhase(
+      armed("direct", { weaponA: 8 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(plain.beats).map((b) => b.amount)).toEqual(
+      damageBeats(explicit.beats).map((b) => b.amount),
+    );
+    expect(plain.next.enemies[0]?.hp).toBe(explicit.next.enemies[0]?.hp);
+  });
+
+  it("doublet lands two hits of half the value, rounded up", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([4, 4]);
+    expect(next.enemies[0]?.hp).toBe(12);
+  });
+
+  it("doublet feeds an existing Vulnerable mark to both hits", () => {
+    const marked = mkEnemy({ hp: 20, hpMax: 20, statuses: { mark: 2 } });
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [marked] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([6, 6]);
+    expect(next.enemies[0]?.hp).toBe(8);
+  });
+
+  it("doublet lets the shield absorb once per hit", () => {
+    const walled = mkEnemy({ hp: 20, hpMax: 20, shield: 5 });
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [walled] }),
+    );
+    expect(
+      damageBeats(beats).map((b) => b.after.enemies[0]?.shield),
+    ).toEqual([1, 0]);
+    expect(next.enemies[0]?.hp).toBe(17);
+  });
+
+  it("doublet stops at one hit when the first one kills", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 3, hpMax: 3 })] }),
+    );
+    expect(damageBeats(beats)).toHaveLength(1);
+    expect(next.enemies[0]?.hp).toBe(0);
+  });
+
+  it("scatter gives every living enemy a fragment plus one", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 20, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+        },
+      ),
+    );
+    const hits = damageBeats(beats);
+    expect(hits.map((b) => b.amount)).toEqual([5, 4]);
+    expect(hits.map((b) => b.targetId)).toEqual(["enemy-0", "enemy-1"]);
+    expect(hits.reduce((sum, b) => sum + b.amount, 0)).toBe(7 + hits.length);
+    expect(next.enemies[0]?.hp).toBe(15);
+    expect(next.enemies[1]?.hp).toBe(16);
+  });
+
+  it("scatter splits across three enemies and still totals V plus one each", () => {
+    const { beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 20, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+            mkEnemy({ id: "enemy-2", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+        },
+      ),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([4, 3, 3]);
+  });
+
+  it("scatter still pays every other enemy when one dies to its own fragment", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 3, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+        },
+      ),
+    );
+    const hits = damageBeats(beats);
+    expect(hits.map((b) => b.targetId)).toEqual(["enemy-0", "enemy-1"]);
+    expect(next.enemies[0]?.hp).toBe(0);
+    expect(next.enemies[1]?.hp).toBe(16);
+    expect(next.targetId).toBe("enemy-1");
+  });
+
+  it("scatter never spills overkill through ricochet on top of its own fragments", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 2, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+          modules: ["ricochetHousing"],
+        },
+      ),
+    );
+    expect(damageBeats(beats)).toHaveLength(2);
+    expect(next.enemies[1]?.hp).toBe(16);
+  });
+
+  it("scatter falls back to direct when only one enemy is left alive", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("scatter", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([7]);
+    expect(next.enemies[0]?.hp).toBe(13);
+  });
+
+  it("scatter is blocked below two living enemies and legal above", () => {
+    const solo = armed("scatter", { weaponA: 7 }, { enemies: [mkEnemy()] });
+    expect(modeBlockFor(solo, "weaponA", "scatter")).toBe("needsTwoEnemies");
+    const pair = armed(
+      "scatter",
+      { weaponA: 7 },
+      { enemies: [mkEnemy(), mkEnemy({ id: "enemy-1" })] },
+    );
+    expect(modeBlockFor(pair, "weaponA", "scatter")).toBeNull();
+    expect(modeBlockFor(pair, "weaponA", "doublet")).toBe("notAllowed");
+    expect(modeBlockFor(pair, "weaponA", "direct")).toBeNull();
+  });
+
+  it("shaped strips shield up to the die value on a max face", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next, beats } = resolvePlayerPhase(
+      armed("shaped", { weaponA: 20 }, { enemies: [walled] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([20]);
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(20);
+  });
+
+  it("shaped pays a point on every other face and leaves the shield standing", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next } = resolvePlayerPhase(
+      armed("shaped", { weaponA: 7 }, { enemies: [walled] }),
+    );
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(40);
+  });
+
+  it("shaped does not spend the once-per-battle pierce on a max face", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next } = resolvePlayerPhase(
+      armed(
+        "shaped",
+        { weaponA: 20 },
+        { enemies: [walled], modules: ["piercer"] },
+      ),
+    );
+    expect(next.pierceUsed).not.toBe(true);
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(20);
+  });
+
+  it("shaped still spends the pierce on a face that does not strip", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next } = resolvePlayerPhase(
+      armed(
+        "shaped",
+        { weaponA: 7 },
+        { enemies: [walled], modules: ["piercer"] },
+      ),
+    );
+    expect(next.pierceUsed).toBe(true);
+    expect(next.enemies[0]?.shield).toBe(6);
+    expect(next.enemies[0]?.hp).toBe(34);
+  });
+
+  it("incendiary trades two damage for Burn 2", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("incendiary", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([5]);
+    expect(next.enemies[0]?.hp).toBe(15);
+    expect(next.enemies[0]?.statuses.burn).toBe(2);
+  });
+
+  it("incendiary lets the once-per-battle burn double fire exactly once", () => {
+    const board = armed(
+      "incendiary",
+      { weaponA: 7, weaponB: 7 },
+      { enemies: [mkEnemy({ hp: 40, hpMax: 40 })], perks: ["double-fuse"] },
+    );
+    const slotB = board.slots.weaponB;
+    if (slotB !== undefined) {
+      slotB.modes = ["direct", "incendiary"];
+      slotB.mode = "incendiary";
+    }
+    const { next } = resolvePlayerPhase(board);
+    expect(next.enemies[0]?.statuses.burn).toBe(6);
+    expect(next.burnDoubleUsed).toBe(true);
+  });
+
+  it("linked counts other same-school dice on the board, capped", () => {
+    const two = resolvePlayerPhase(
+      armed(
+        "linked",
+        { weaponA: 5, shields: 3, engines: 3 },
+        { enemies: [mkEnemy({ hp: 40, hpMax: 40 })] },
+      ),
+    );
+    expect(damageBeats(two.beats).map((b) => b.amount)).toEqual([7]);
+    const capped = resolvePlayerPhase(
+      armed(
+        "linked",
+        { weaponA: 5, weaponB: 3, shields: 3, engines: 3, reactor: 3 },
+        { enemies: [mkEnemy({ hp: 40, hpMax: 40 })] },
+      ),
+    );
+    expect(
+      damageBeats(capped.beats)
+        .filter((b) => b.slot === "weaponA")
+        .map((b) => b.amount),
+    ).toEqual([8]);
+  });
+
+  it("shunt trades two damage for two charge and pushes no charge beat", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("shunt", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([5]);
+    expect(beats.some((b) => b.kind === "charge")).toBe(false);
+    expect(next.charge).toBe(2);
+  });
+
+  it("shunt clamps at the charge cap and never costs hull", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "shunt",
+        { weaponA: 7 },
+        { enemies: [mkEnemy({ hp: 20, hpMax: 20 })], charge: 9, hull: 30 },
+      ),
+    );
+    expect(next.charge).toBe(10);
+    expect(next.hull).toBe(30);
+    expect(beats.every((b) => b.overflowHull === undefined)).toBe(true);
   });
 });
 

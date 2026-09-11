@@ -1046,7 +1046,8 @@
     "remainderReturned": "Der Rest befindet sich wieder in seiner Lücke.",
     "thresholdHeard": "Die Nadel bewegte sich nicht.",
     "thresholdCommitted": "Du hast dem Marker eine Seite zugewiesen.",
-    "thresholdWalked": "Du hast die Nadel in Ruhe gelassen."
+    "thresholdWalked": "Du hast die Nadel in Ruhe gelassen.",
+    "cargoTaken": "du hast Risikofracht an Bord genommen und die Abgabe markiert"
   },
   "events": {
     "driftingPod": {
@@ -1548,12 +1549,14 @@
       "opt": {
         "buy": "Kaufe das Reroll-Rig (35)",
         "swap": "Tauschen Sie Ihren schlechtesten Würfel ein",
-        "pass": "Verkauf ihr stattdessen deinen Plunder"
+        "pass": "Verkauf ihr stattdessen deinen Plunder",
+        "haul": "Die Kiste unter dem Tresen nehmen"
       },
       "out": {
         "buy": "Sie montiert eine aus Schrott zusammengesetzte Sortieranlage an deinem Tablett. Es klappert. Aber es funktioniert auch.",
         "swap": "Sie nimmt deinen schlechtesten Würfelwurf ohne ein Wort hin und gibt dir etwas zurück, das auf eine ganz andere Art falsch ist.",
-        "pass": "Sie kauft das Ganze zu einem fairen Preis, was bei Mara praktisch schon ein Kompliment ist."
+        "pass": "Sie kauft das Ganze zu einem fairen Preis, was bei Mara praktisch schon ein Kompliment ist.",
+        "haul": "Chorplatten, unter ihre Nummern heruntergeschliffen. Sie fragt nicht, wohin du sie bringst, und dieses Schweigen gehört zum Preis."
       }
     },
     "clanToll": {
@@ -1727,11 +1730,13 @@
       "text": "Eine Ader aus Rift-Splittern, die aus dem Nichts emporwächst, sauber durchgeschnitten von etwas, das nicht da ist.",
       "opt": {
         "cutShards": "Eine Scheibe abschneiden",
-        "mapVein": "Die Ader kartieren"
+        "mapVein": "Die Ader kartieren",
+        "haul": "Den Kern herausschneiden und mitnehmen"
       },
       "out": {
         "cutShards": "Es löst sich als prismatischer Splitter ab. Der Rückstoß reißt ein Stück aus dem Rumpf heraus.",
-        "mapVein": "Man verkauft die Vermessungsdaten im Voraus und liest zwei Zeilen mit Fahrspurangaben aus denselben Daten aus."
+        "mapVein": "Man verkauft die Vermessungsdaten im Voraus und liest zwei Zeilen mit Fahrspurangaben aus denselben Daten aus.",
+        "haul": "Er kommt aus der Ader und summt weiter. Weiter vorn zahlt jemand für Summendes, und dein Reaktor wird Platz machen müssen."
       }
     },
     "relayEcho": {
@@ -1891,12 +1896,14 @@
       "opt": {
         "raidIt": "Nimm das Reliquiar",
         "trade": "Tausch es ein",
-        "catalogue": "Ordne es ordnungsgemäß ein"
+        "catalogue": "Ordne es ordnungsgemäß ein",
+        "haul": "Das Reliquiar zu seiner Station bringen"
       },
       "out": {
         "raidIt": "Du gibst das Zeichen. Der Kantor hört auf zu singen und beginnt zu schießen.",
         "trade": "Sie nehmen einen gelben Kern als Tribut entgegen und geben dir dafür etwas Seltsames im Tausch.",
-        "catalogue": "Du erstellst ein Inventar des Reliquiar, anstatt es zu plündern. Die Quartiermeister des Chors kaufen die Liste, und ein Yard drei Sprünge weiter erledigt den Papierkram."
+        "catalogue": "Du erstellst ein Inventar des Reliquiar, anstatt es zu plündern. Die Quartiermeister des Chors kaufen die Liste, und ein Yard drei Sprünge weiter erledigt den Papierkram.",
+        "haul": "Versiegelt, verzeichnet und irgendwo voraus erwartet. Es liegt den ganzen Weg an den Schildemittern, und die mögen das nicht."
       }
     },
     "choirTithe": {
@@ -2055,12 +2062,14 @@
       "opt": {
         "buyOut": "Sie aus dem Geschäft kaufen",
         "sellShip": "Verkauf ihr deine Beschichtung",
-        "walkPast": "Vorbei gehen"
+        "walkPast": "Vorbei gehen",
+        "haul": "Die Kiste unter ihrem Tresen nehmen"
       },
       "out": {
         "buyOut": "Sie übergibt die Kiste mit den guten Sachen, ohne zu feilschen – daran erkennt man, dass es vorbei ist.",
         "sellShip": "Sie bezahlt die Rüstung ehrlich. Das wirst du später noch merken.",
-        "walkPast": "„Wie du willst.“ Auf dem Weg nach draußen schiebt sie dir trotzdem noch ein Reparaturset unter."
+        "walkPast": "„Wie du willst.“ Auf dem Weg nach draußen schiebt sie dir trotzdem noch ein Reparaturset unter.",
+        "haul": "«Schläfer. Bezahlt, nicht meine.» Wessen, sagt sie nicht. Sie kosten Luft, und hier draußen wird Luft in Hülle bezahlt."
       }
     },
     "maraLedger": {
@@ -2401,13 +2410,15 @@
       "opt": {
         "bidHigh": "Überbiete sie alle",
         "backScript": "Unterstützen Sie den Flottenbieter",
-        "jamAuction": "Die Auktion blockieren"
+        "jamAuction": "Die Auktion blockieren",
+        "haul": "Das unverkaufte Los in Kommission nehmen"
       },
       "out": {
         "bidHigh": "Das Ladungsverzeichnis ist echt. Die Hälfte davon ist bereits geborgen, und die andere Hälfte ist den gesamten Gebotsbetrag wert.",
         "bidHighDud": "Die Fracht ist weg. Die Routen auf dem Frachtbrief sind es nicht, und die Routen hier draußen sind fast schon selbst Fracht.",
         "backScript": "Du bürgst für das Drehbuch auf einem frei empfangbaren Sender. Das Geld, das die Großmutter von irgendjemandem verdient hat, bringt endlich etwas ein.",
-        "jamAuction": "Niemand ersteigert es. Zwei Stunden später holst du das gesamte Los zum Mindestpreis bei einem sichtlich verärgerten Angestellten ab."
+        "jamAuction": "Niemand ersteigert es. Zwei Stunden später holst du das gesamte Los zum Mindestpreis bei einem sichtlich verärgerten Angestellten ab.",
+        "haul": "Die Spulen hat niemand gekauft. Der Schreiber übergibt sie mit einer Lieferadresse und ohne Garantie, und daneben läuft das erste Geschütz eine Nummer kleiner."
       }
     },
     "wardenPatrolBoat": {
@@ -2985,14 +2996,16 @@
       "opt": {
         "splitIt": "Vorschlag, die Kosten zu teilen",
         "raceThem": "Tritt gegen sie an, um es zu gewinnen",
-        "giveWay": "Gebt ihnen das Wrack"
+        "giveWay": "Gebt ihnen das Wrack",
+        "haul": "Ihm seine lebende Fracht abnehmen"
       },
       "out": {
         "splitIt": "Jede Hälfte für euch, und ihr seid beide noch vor der Flut wieder draußen. Es läuft besser, als ihr beide erwartet hattet.",
         "splitItBetter": "Sie kennen die Rumpfklasse, und du kennst die Verkabelung. Gemeinsam kommt ihr auf etwas, das keiner von euch allein gefunden hätte.",
         "raceThem": "Du bist schneller. Sie schneiden noch immer, als du ablegst, und sagen kein Wort.",
         "raceThemLose": "Sie sind schneller. Wenn du dir mit einem Brenner eine Brandwunde am Arm zufügst, beweist das das Gegenteil.",
-        "giveWay": "Du koppelst ab und lässt den Durchgang für sie offen. Sie tragen dich in ihr Register als einen der Guten ein."
+        "giveWay": "Du koppelst ab und lässt den Durchgang für sie offen. Sie tragen dich in ihr Register als einen der Guten ein.",
+        "haul": "Ihm ist die Luft für sie ausgegangen, und er sagt es ohne Umschweife. Ein Laderaum voller Schläfer, eine Station, die sie nimmt, und eine Hülle, die an jedem Knoten zahlt."
       }
     },
     "frozenBroadcast": {
@@ -3109,13 +3122,15 @@
       "opt": {
         "readIt": "Die oberste Ebene lesen",
         "postYours": "Veröffentliche deinen eigenen Beitrag",
-        "stripBoard": "Das gesamte Brett abziehen"
+        "stripBoard": "Das gesamte Brett abziehen",
+        "haul": "Den Ballast-Auftrag nehmen"
       },
       "out": {
         "readIt": "Zwei Tipps zur Bergung, eine Warnung bezüglich einer Fahrspur und ein Name, den Sie noch einmal hören werden, bevor dieser Abschnitt endet.",
         "readItOld": "Unter dieser Woche gibt es einen Bergungsanspruch, den niemand jemals geltend gemacht hat. Technisch gesehen ist er immer noch gültig.",
         "postYours": "Du füllst deine Wunschliste aus, gibst eine Überschrift ein und schreibst einen Satz darüber, wonach du suchst. Das ist das Erste, was du diese Woche getan hast, das wirklich ehrlich ist.",
-        "stripBoard": "Vierzig Jahre Papier, darunter eine Platte aus einer guten Legierung. Man nimmt die Platte."
+        "stripBoard": "Vierzig Jahre Papier, darunter eine Platte aus einer guten Legierung. Man nimmt die Platte.",
+        "haul": "Ein Auftrag über Abschirmballast: vier Kisten und eine Adresse ein paar Reihen weiter. Die Triebwerke spüren jedes Kilo davon."
       }
     },
     "hushAntechamber": {
@@ -3135,7 +3150,9 @@
       "log": "Speichere die Datei und verkaufe die Koordinaten",
       "logOut": "Irgendjemand im Rim wird für eine Boje bezahlen, die sich selbst meldet. Den Rest sollen sie in ihrer Freizeit selbst herausfinden.",
       "leave": "Lassen Sie es verschlossen",
-      "leaveOut": "Man notiert die Position und fährt weiter. Vier Stunden später stellt „Echo“ ohne weiteren Kommentar fest, dass die Boje verschwunden ist."
+      "leaveOut": "Man notiert die Position und fährt weiter. Vier Stunden später stellt „Echo“ ohne weiteren Kommentar fest, dass die Boje verschwunden ist.",
+      "haul": "Die Archivtrommel mitnehmen",
+      "haulOut": "Ein Wächterlogbuch, das noch kein Wächter geschrieben hat, adressiert an eine Station, die du nicht erreicht hast. Es zieht die Nadel zur Ordnung und fragt nicht vorher."
     },
     "foldedYard": {
       "text": "Maras Stand ist hier. Das sollte eigentlich nicht sein – du hast sie um neunzehn Sprünge und eine Darbietung zurückgelassen. Sie füllt ihren Vorrat wieder auf, und zwar ziemlich chaotisch, aus Kisten, die immer wieder ankommen, bevor sie sie überhaupt bestellt hat.",
@@ -3936,6 +3953,16 @@
       "3": "Die Entfernung ist seit etwa einer Minute kein Versprechen mehr.",
       "4": "Trage es als Sprung ein. Der Eintrag wird dann nicht der Wahrheit entsprechen.",
       "5": "Wir sind hinein, und dann waren wir hier. Eine Mitte habe ich nicht zu melden."
+    },
+    "cargoDelivered": {
+      "1": "Der Laderaum ist leer, das Buch nicht. Auf den Tausch lasse ich mich ein.",
+      "2": "Angenommen, bezahlt, fort. Das Schiff läuft leichter.",
+      "3": "Sie haben es genommen, ohne es zu öffnen. Klug von ihnen."
+    },
+    "officerRescued": {
+      "1": "Eine Kabine ist belegt. Ich hatte aufgehört, an Bord mehr als eine lebende Seele zu zählen.",
+      "2": "Du bist nicht vorbeigeflogen. Notiert — dieses Logbuch sieht so etwas selten.",
+      "3": "Jemand hat eine Koje bezogen. Die Besatzung sind nicht mehr nur du und ich."
     }
   },
   "blackbox": {
@@ -4510,11 +4537,11 @@
     },
     "piercer": {
       "name": "Piercer",
-      "desc": "Der erste Treffer in jedem Kampf ignoriert Schilde, und „Spinal Mount“ verursacht für jeden „Pierce“-Gegenstand, den du bei dir trägst, 2 zusätzliche Schadenspunkte."
+      "desc": "Der erste Treffer in jedem Kampf ignoriert Schilde, und „Spinal Mount“ verursacht für jeden „Pierce“-Gegenstand, den du bei dir trägst, 2 zusätzliche Schadenspunkte. Die Waffen lernen den Modus „Hohlladung“."
     },
     "emberInjector": {
       "name": "Ember-Injektor",
-      "desc": "Jeder Würfel, der in „Waffen B“ ausgewertet wird, verursacht 2 Brandschaden."
+      "desc": "Jeder Würfel, der in „Waffen B“ ausgewertet wird, verursacht 2 Brandschaden. Die Waffen lernen den Modus „Brandsatz“."
     },
     "railCradle": {
       "name": "Schienenhalterung",
@@ -4522,7 +4549,7 @@
     },
     "targetingMesh": {
       "name": "Zielnetz",
-      "desc": "Marken sind +1 wert, und das Auswerten von Sensoren erhöht den Würfelwert in „Waffen A“ um +2."
+      "desc": "Marken sind +1 wert, und das Auswerten von Sensoren erhöht den Würfelwert in „Waffen A“ um +2. Die Waffen lernen den Modus „Verbundfeuer“."
     },
     "overpressure": {
       "name": "Überdruck",
@@ -4538,7 +4565,7 @@
     },
     "lanceCapacitor": {
       "name": "Lance-Kondensator",
-      "desc": "Jeder Waffenwürfel, der mit 6 oder mehr gesammelten Ladepunkten ausgewertet wird, verbraucht 6 davon für +5."
+      "desc": "Jeder Waffenwürfel, der mit 6 oder mehr gesammelten Ladepunkten ausgewertet wird, verbraucht 6 davon für +5. Die Waffen lernen den Modus „Shunt“."
     },
     "executioner": {
       "name": "Henker",
@@ -4646,7 +4673,7 @@
     },
     "autoloader": {
       "name": "Autoloader-Array",
-      "desc": "In jeder Schlacht kommt ein zusätzlicher roter W6 auf dein Tablett, und bei jedem dritten abgearbeiteten Waffenplatz wird ein weiterer für den nächsten Zug hinzugefügt."
+      "desc": "In jeder Schlacht kommt ein zusätzlicher roter W6 auf dein Tablett, und bei jedem dritten abgearbeiteten Waffenplatz wird ein weiterer für den nächsten Zug hinzugefügt. Die Waffen lernen den Modus „Dublette“."
     },
     "prophecyMount": {
       "name": "Berg der Prophezeiung",
@@ -4663,6 +4690,43 @@
     "nonEuclidRack": {
       "name": "Nicht-euklidisches Gestell",
       "desc": "Jeder Slot nimmt bei jeder Auswertung einen Würfel beliebiger Stufe mit jeweils 1 Rumpf auf; Ladungslimit −3."
+    }
+  },
+  "fireModes": {
+    "direct": {
+      "name": "Direkt",
+      "desc": "Richtet den Schaden des Würfels am gewählten Ziel an — die Grundlinie.",
+      "short": "DIR"
+    },
+    "scatter": {
+      "name": "Streuung",
+      "desc": "Der Schaden verteilt sich auf alle lebenden Gegner, +{{fragmentBonus}} je Splitter. Braucht {{minEnemies}} lebende Ziele.",
+      "short": "STR"
+    },
+    "doublet": {
+      "name": "Dublette",
+      "desc": "{{hits}} Treffer mit je der Hälfte des Schadens, aufgerundet, am gewählten Ziel.",
+      "short": "DUB"
+    },
+    "shaped": {
+      "name": "Hohlladung",
+      "desc": "Auf der höchsten Seite wird Schild bis zum Würfelwert vor dem Schaden abgetragen; auf jeder anderen Seite −{{offFacePenalty}} Schaden.",
+      "short": "HOH"
+    },
+    "incendiary": {
+      "name": "Brandsatz",
+      "desc": "−{{damagePenalty}} Schaden; das Ziel erhält Brand {{burn}}.",
+      "short": "BRA"
+    },
+    "linked": {
+      "name": "Verbundfeuer",
+      "desc": "+{{perDie}} Schaden je weiterem Würfel derselben Schule, der in dieser Runde gesetzt wurde, bis +{{cap}}.",
+      "short": "VER"
+    },
+    "shunt": {
+      "name": "Shunt",
+      "desc": "−{{damagePenalty}} Schaden; +{{charge}} Ladung.",
+      "short": "SHU"
     }
   },
   "engravings": {
@@ -5326,6 +5390,145 @@
       "name": "Ersatzteile",
       "desc": "Seine Teile weiterreichen: 25 Schrott weniger für eine Werftaufwertung.",
       "line": "Bergung: eine Kiste sauberer Teile. Die nächste Werft zieht dafür 25 Schrott von einer Aufwertung ab."
+    }
+  },
+  "officers": {
+    "scrapper": {
+      "name": "der Sammler",
+      "role": "Rumpfhand",
+      "desc": "Kam mit Schneidbrenner und einem Groll gegen Löcher aus einer Rettungskapsel. Schweißt Platten mitten im Gefecht; sortiert sonst den Schrott.",
+      "origin": "Gerettet: Sektor 1, Rettungskapsel",
+      "short": "Sammler +{{n}}♥ · −{{c}}⚡"
+    },
+    "mechanic": {
+      "name": "die Mechanikerin",
+      "role": "Ingenieurin",
+      "desc": "Lief vor etwas Schlimmerem davon und blieb, um sich ihren Platz zu verdienen. Legt die Gestelle für einen weiteren Wurf um und flickt den Rumpf nach jedem Kampf.",
+      "origin": "Gerettet: Sektor 1, achterer Kriechgang",
+      "short": "Mechanikerin +{{n}}↻"
+    },
+    "defector": {
+      "name": "die Überläuferin",
+      "role": "Navigatorin",
+      "desc": "Liest die Routen des Chors wie eine Karte. Benennt das Ziel, bevor du es wählst, und die Sensoren beißen mit ihr am Brett etwas tiefer.",
+      "origin": "Gerettet: Sektor 4, gestohlener Skiff",
+      "short": "Überläuferin · Marke {{n}}"
+    },
+    "welder": {
+      "name": "die Schweißerin",
+      "role": "Rumpftechnikerin",
+      "desc": "Eine der vier aus der Petition, und eine der beiden, die schweißen können. Setzt eine Platte, wo es nötig ist; mit ihr an Bord weicht der Rumpf leichter aus.",
+      "origin": "Gerettet: an Bord genommen aus der Petition",
+      "short": "Schweißerin +{{n}} Schild"
+    },
+    "breaker": {
+      "name": "die Abwrackerin",
+      "role": "Crewchefin",
+      "desc": "Elf kamen an Bord, und sie führt sie. Sie kurbeln den Reaktor hoch, wenn es darauf ankommt, und zerlegen jeden Abschuss bis auf die Schrauben.",
+      "origin": "Gerettet: die Abwrackcrew, elf Stunden Luft",
+      "short": "Abwrackerin +{{n}}⚡"
+    },
+    "chorister": {
+      "name": "der Chorknabe",
+      "role": "Funker",
+      "desc": "Neun kamen aus dieser Klasse heraus. Dieser fand die Frequenz, auf der die Hymne läuft, und lernte, darauf zu sitzen.",
+      "origin": "Gerettet: Sektor 4, die Schule des Chors",
+      "short": "Chorknabe · Störung"
+    }
+  },
+  "cargo": {
+    "unstableCore": {
+      "name": "Instabiler Kern",
+      "desc": "Der Slot Reaktor läuft {{n}} Stufe kleiner, solange die Fracht an Bord ist."
+    },
+    "liveHold": {
+      "name": "Lebendfracht",
+      "desc": "Kostet {{n}} Rumpf an jedem abgeschlossenen Knoten, solange die Fracht an Bord ist."
+    },
+    "overwoundCoils": {
+      "name": "Überspannte Spulen",
+      "desc": "Der Slot Waffe A läuft {{n}} Stufe kleiner, solange die Fracht an Bord ist."
+    },
+    "saintsReliquary": {
+      "name": "Heiligenschrein",
+      "desc": "Der Slot Schilde läuft {{n}} Stufe kleiner, solange die Fracht an Bord ist."
+    },
+    "leadBallast": {
+      "name": "Bleiballast",
+      "desc": "Der Slot Triebwerke läuft {{n}} Stufe kleiner, solange die Fracht an Bord ist."
+    },
+    "stasisPods": {
+      "name": "Stasiskapseln",
+      "desc": "Kostet {{n}} Rumpf an jedem abgeschlossenen Knoten, solange die Fracht an Bord ist."
+    },
+    "choirContraband": {
+      "name": "Chor-Schmuggelware",
+      "desc": "Die Annahme verschiebt die Achse einmalig um {{n}} zur Resonanz."
+    },
+    "keeperArchive": {
+      "name": "Archiv des Hüters",
+      "desc": "Die Annahme verschiebt die Achse einmalig um {{n}} zur Stabilität."
+    }
+  },
+  "echo": {
+    "branch": {
+      "tactician": "Taktiker",
+      "navigator": "Navigator",
+      "keeper": "Bewahrer"
+    },
+    "cond": {
+      "selfHpPctLt": "wenn er unter {{n}} % Rumpf liegt",
+      "selfShielded": "wenn sein Schild hält",
+      "playerShielded": "wenn dein Schild hält",
+      "playerChargeAtLeast": "wenn du {{n}} Ladung oder mehr hältst",
+      "playerHullPctLt": "wenn du unter {{n}} % Rumpf liegst",
+      "alliesAtLeast": "wenn noch {{n}} von ihnen stehen",
+      "turnGte": "ab Zug {{n}}"
+    },
+    "secondLook": {
+      "name": "Zweiter Blick",
+      "desc": "Einmal pro Kampf: die {{n}} niedrigsten Würfel in der Ablage werden neu gewürfelt und behalten die bessere Seite. Es wird kein Reroll verbraucht.",
+      "short": "Zweiter Blick · {{n}} Würfel"
+    },
+    "readout": {
+      "name": "Auswertung",
+      "desc": "Verzweigt sich der nächste Zug eines Gegners, nennt seine Karte die Verzweigung: die Bedingung und beide Antworten.",
+      "short": "Auswertung · Verzweigung genannt"
+    },
+    "calculus": {
+      "name": "Feuerlösung",
+      "desc": "Einmal pro Kampf: jeder Waffentreffer der nächsten Salve schlägt für +{{n}} ein.",
+      "short": "Feuerlösung +{{n}}"
+    },
+    "echolocation": {
+      "name": "Echolot",
+      "desc": "+{{n}} Reihe Kartensicht, für die ganze Spielrunde.",
+      "short": "Echolot +{{n}} Reihe"
+    },
+    "pathGhost": {
+      "name": "Pfadgeist",
+      "desc": "Die Vorschau liest einen Knoten {{n}} Reihe hinter dem, zu dem du springen kannst. Anspringbar wird er dadurch nicht.",
+      "short": "Pfadgeist +{{n}} Reihe"
+    },
+    "softLanding": {
+      "name": "Sanfte Landung",
+      "desc": "Einmal pro Spielrunde: ein Wurmloch setzt dich auf dem nächsten offenen Knoten voraus ab. Es wird nichts gewürfelt.",
+      "short": "Sanfte Landung · 1/Lauf"
+    },
+    "reserve": {
+      "name": "Leistungsreserve",
+      "desc": "Jeder Kampf beginnt mit +{{n}} Ladung.",
+      "short": "Reserve +{{n}}⚡"
+    },
+    "shieldEcho": {
+      "name": "Schildecho",
+      "desc": "Ein Treffer, den der Schild ganz schluckt, gibt +{{n}} Ladung zurück.",
+      "short": "Schildecho +{{n}}⚡"
+    },
+    "veto": {
+      "name": "Veto",
+      "desc": "Einmal pro Spielrunde: ein Schicksalswurf oder ein Ereignisausgang, der den Rumpf auf null brächte, lässt ihn bei {{n}}.",
+      "short": "Veto · 1/Lauf"
     }
   }
 }

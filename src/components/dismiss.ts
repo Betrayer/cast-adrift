@@ -5,18 +5,44 @@ export type DismissPolicy = 'scrim' | 'escape' | 'none';
 
 const CLICK_WINDOW_MS = 400;
 
-const swallowNextClick = (): void => {
+const SAME_TAP_PX = 24;
+
+export interface TapPoint {
+  x: number;
+  y: number;
+}
+
+let pendingSwallow: (() => void) | null = null;
+
+export const cancelSwallow = (): void => {
+  const stop = pendingSwallow;
+  pendingSwallow = null;
+  stop?.();
+};
+
+export const swallowNextClick = (near?: TapPoint): void => {
+  cancelSwallow();
   let timer = 0;
-  const swallow = (event: MouseEvent): void => {
-    event.preventDefault();
-    event.stopPropagation();
+  const stop = (): void => {
     window.removeEventListener('click', swallow, true);
     window.clearTimeout(timer);
+    pendingSwallow = null;
+  };
+  const swallow = (event: MouseEvent): void => {
+    if (
+      near !== undefined &&
+      (Math.abs(event.clientX - near.x) > SAME_TAP_PX ||
+        Math.abs(event.clientY - near.y) > SAME_TAP_PX)
+    ) {
+      return;
+    }
+    event.preventDefault();
+    event.stopPropagation();
+    stop();
   };
   window.addEventListener('click', swallow, true);
-  timer = window.setTimeout(() => {
-    window.removeEventListener('click', swallow, true);
-  }, CLICK_WINDOW_MS);
+  timer = window.setTimeout(stop, CLICK_WINDOW_MS);
+  pendingSwallow = stop;
 };
 
 export const useEscapeKey = (active: boolean, onEscape: () => void): void => {

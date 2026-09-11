@@ -24,6 +24,8 @@ const projection = (
   sensor: null,
   overflowHull: 0,
   jammed: false,
+  hits: 0,
+  fragments: [],
   ...patch,
 });
 

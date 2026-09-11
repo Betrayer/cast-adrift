@@ -167,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} de daño · {{split}}"
   },
   "block": {
     "resolving": "Espera a que se resuelva el turno",
@@ -181,7 +183,13 @@
     "reserveFull": "La reserva está llena",
     "used": "Ya usado este turno",
     "hullLow": "Casco demasiado bajo",
+    "notAllowed": "Ahora mismo no se puede",
+    "occupied": "Esa ranura ya tiene un dado",
+    "tierCap": "El dado es demasiado grande para esa ranura",
+    "slotBlocked": "Esa ranura está bloqueada este turno",
+    "dieLocked": "Ese dado está bloqueado",
     "noPartner": "El recocido requiere una segunda matriz de bandeja del mismo valor.",
+    "needsTwoEnemies": "Este modo de fuego necesita dos objetivos vivos",
     "spent": "La nave puede hacer esto una vez por combate."
   },
   "resPrism": "un dado prismático cuenta para esta escuela",
@@ -203,6 +211,7 @@
     "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -381,5 +390,15 @@
       "fold": "procesa el pedido",
       "devour": "se traga un dado"
     }
+  },
+  "mode": {
+    "title": "Modo de fuego",
+    "label": "Modo de fuego: {{mode}}"
+  },
+  "echo": {
+    "after": "Después",
+    "fork": "{{cond}} — {{then}}. Si no — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Se extrae de su patrón — no está fijado."
   }
 }

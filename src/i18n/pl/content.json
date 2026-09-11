@@ -1046,7 +1046,8 @@
     "remainderReturned": "Reszta wróciła na swoje miejsce.",
     "thresholdHeard": "Wskazówka nie drgnęła.",
     "thresholdCommitted": "Przypisałeś znacznikowi stronę.",
-    "thresholdWalked": "Nie ruszałeś igły."
+    "thresholdWalked": "Nie ruszałeś igły.",
+    "cargoTaken": "wziąłeś ryzykowny ładunek na pokład i oznaczyłeś zrzut"
   },
   "events": {
     "driftingPod": {
@@ -1548,12 +1549,14 @@
       "opt": {
         "buy": "Kup zestaw do ponownego rzutu (35)",
         "swap": "Wymień swoją najgorszą kostkę",
-        "pass": "Zamiast tego sprzedaj jej swoje śmieci"
+        "pass": "Zamiast tego sprzedaj jej swoje śmieci",
+        "haul": "Wziąć skrzynię, którą trzyma pod ladą"
       },
       "out": {
         "buy": "Przymocowała do twojej tacy znaleziony w śmieciach zestaw do sortowania. Grzechocze. Ale działa.",
         "swap": "Bez słowa przyjmuje twoją najgorszą kostkę i oddaje ci coś, w czym tkwi inny rodzaj zła.",
-        "pass": "Kupuje to wszystko za uczciwą cenę, co w ustach Mary jest praktycznie komplementem."
+        "pass": "Kupuje to wszystko za uczciwą cenę, co w ustach Mary jest praktycznie komplementem.",
+        "haul": "Płyty Chóru, zeszlifowane poniżej numerów. Nie pyta, dokąd je wieziesz, i to milczenie jest częścią ceny."
       }
     },
     "clanToll": {
@@ -1727,11 +1730,13 @@
       "text": "Żyła odłamków Szczeliny, wyrastająca z niczego, precyzyjnie przecięta przez coś, czego tam nie ma.",
       "opt": {
         "cutShards": "Odciąć odłamek",
-        "mapVein": "Zaznacz żyłę"
+        "mapVein": "Zaznacz żyłę",
+        "haul": "Wyciąć rdzeń i zabrać na pokład"
       },
       "out": {
         "cutShards": "Wylatuje jako pryzmatyczny odłamek. Odrzut wyrywa kawałek kadłuba.",
-        "mapVein": "Najpierw sprzedajesz wyniki badania, a potem odczytujesz dwa wiersze danych dotyczących pasa ruchu na podstawie tych samych danych."
+        "mapVein": "Najpierw sprzedajesz wyniki badania, a potem odczytujesz dwa wiersze danych dotyczących pasa ruchu na podstawie tych samych danych.",
+        "haul": "Wychodzi z żyły i dalej brzęczy. Dalej na trasie ktoś płaci za brzęczące, a reaktor będzie musiał zrobić mu miejsce."
       }
     },
     "relayEcho": {
@@ -1891,12 +1896,14 @@
       "opt": {
         "raidIt": "Weź relikwiarz",
         "trade": "Wymień to",
-        "catalogue": "Wprowadź to do katalogu w odpowiedni sposób"
+        "catalogue": "Wprowadź to do katalogu w odpowiedni sposób",
+        "haul": "Zawieźć relikwiarz na jego stację"
       },
       "out": {
         "raidIt": "Decydujesz się. Kantor przestaje śpiewać i zaczyna strzelać.",
         "trade": "Przyjmują żółty rdzeń jako daninę i w zamian dają ci coś jeszcze dziwniejszego.",
-        "catalogue": "Zamiast go rozebrać, sporządzasz spis zawartości relikwiarza. Lista trafia do kwatermistrzów samego Chóru, a „yard three jumps” na honor ureguluje formalności."
+        "catalogue": "Zamiast go rozebrać, sporządzasz spis zawartości relikwiarza. Lista trafia do kwatermistrzów samego Chóru, a „yard three jumps” na honor ureguluje formalności.",
+        "haul": "Zapieczętowany, spisany i gdzieś przed nami oczekiwany. Przez całą drogę leży przy emiterach tarczy, a tym się to nie podoba."
       }
     },
     "choirTithe": {
@@ -2055,12 +2062,14 @@
       "opt": {
         "buyOut": "Wykupić jej udziały",
         "sellShip": "Sprzedaj jej swoją powłokę",
-        "walkPast": "Przejść obok"
+        "walkPast": "Przejść obok",
+        "haul": "Wziąć skrzynię spod jej lady"
       },
       "out": {
         "buyOut": "Bez targowania się wręcza skrzynię z dobrym towarem – i właśnie po tym poznajesz, że to już koniec.",
         "sellShip": "Płaci za zbroję uczciwie. Przekonasz się o tym później.",
-        "walkPast": "„Jak chcesz.” A jednak, wychodząc, podsuwa ci zestaw naprawczy."
+        "walkPast": "„Jak chcesz.” A jednak, wychodząc, podsuwa ci zestaw naprawczy.",
+        "haul": "«Śpiący. Opłaceni, nie moi.» Czyi — nie mówi. Kosztują powietrze, a tutaj powietrze płaci się kadłubem."
       }
     },
     "maraLedger": {
@@ -2401,13 +2410,15 @@
       "opt": {
         "bidHigh": "Przebij ich wszystkich",
         "backScript": "Poprzyj oferenta flotowego",
-        "jamAuction": "Zablokuj aukcję"
+        "jamAuction": "Zablokuj aukcję",
+        "haul": "Wziąć niesprzedany lot w komis"
       },
       "out": {
         "bidHigh": "Lista ładunku jest prawdziwa. Połowa ładunku została już odzyskana, a druga połowa jest warta całej kwoty oferty.",
         "bidHighDud": "Ładunek zniknął. Trasy wymienione w manifeście pozostały, a trasy w tej okolicy to niemal sam ładunek.",
         "backScript": "Gwarantujesz za scenariusz na otwartym kanale. W końcu pieniądze babci kogoś się do czegoś przydały.",
-        "jamAuction": "Nikt tego nie wygrywa. Dwie godziny później odbierasz całą partię po cenie wywoławczej od bardzo zirytowanego sprzedawcy."
+        "jamAuction": "Nikt tego nie wygrywa. Dwie godziny później odbierasz całą partię po cenie wywoławczej od bardzo zirytowanego sprzedawcy.",
+        "haul": "Nikt nie kupił cewek. Urzędnik oddaje je z adresem dostawy i bez gwarancji, a obok nich pierwsze działo schodzi o kaliber niżej."
       }
     },
     "wardenPatrolBoat": {
@@ -2985,14 +2996,16 @@
       "opt": {
         "splitIt": "Zaproponuj, żeby to podzielić",
         "raceThem": "Zmierz się z nimi o to",
-        "giveWay": "Dajcie im ten wrak"
+        "giveWay": "Dajcie im ten wrak",
+        "haul": "Odebrać mu żywy ładunek"
       },
       "out": {
         "splitIt": "Po połowie dla każdego i oboje wyruszacie przed przypływem. Idzie wam lepiej, niż się spodziewaliście.",
         "splitItBetter": "Oni znają klasę kadłuba, a ty znasz się na okablowaniu. Razem dochodzicie do czegoś, czego żadne z was nie odkryłoby samodzielnie.",
         "raceThem": "Jesteś szybszy. Oni wciąż tną, kiedy się odłączasz, i nic nie mówią.",
         "raceThemLose": "Są szybsze. Jeśli chcesz się przekonać, że to nieprawda, spróbuj przypalić sobie ramię pochodnią.",
-        "giveWay": "Odłączasz się i pozostawiasz im otwartą drogę. Wpisują cię do rejestru jako jednego z tych „dobrych”."
+        "giveWay": "Odłączasz się i pozostawiasz im otwartą drogę. Wpisują cię do rejestru jako jednego z tych „dobrych”.",
+        "haul": "Skończyło mu się dla nich powietrze i mówi to wprost. Ładownia śpiących, stacja, która ich przyjmie, i kadłub, który płaci w każdym węźle."
       }
     },
     "frozenBroadcast": {
@@ -3109,13 +3122,15 @@
       "opt": {
         "readIt": "Odczytaj górną warstwę",
         "postYours": "Opublikuj własny wpis",
-        "stripBoard": "Oczyść całą płytkę"
+        "stripBoard": "Oczyść całą płytkę",
+        "haul": "Wziąć zlecenie na balast"
       },
       "out": {
         "readIt": "Dwie wskazówki dotyczące odzyskiwania, jedno ostrzeżenie dotyczące pasa ruchu oraz imię, które jeszcze usłyszysz, zanim ten sektor się skończy.",
         "readItOld": "W ramach tego tygodnia istnieje roszczenie z tytułu odzyskania mienia, którego nikt nigdy nie zgłosił. Technicznie rzecz biorąc, nadal jest ono ważne.",
         "postYours": "Wpisujesz swoje dane, nagłówek i jedno zdanie o tym, czego szukasz. To pierwsza szczera rzecz, jaką zrobiłeś w całym tygodniu.",
-        "stripBoard": "Czterdzieści lat papieru, a pod spodem jedna blacha z dobrego stopu. Bierz tę blachę."
+        "stripBoard": "Czterdzieści lat papieru, a pod spodem jedna blacha z dobrego stopu. Bierz tę blachę.",
+        "haul": "Zlecenie na balast osłonowy: cztery skrzynie i adres kilka rzędów dalej. Silniki poczują każdy kilogram."
       }
     },
     "hushAntechamber": {
@@ -3135,7 +3150,9 @@
       "log": "Zapisz to i sprzedaj współrzędne",
       "logOut": "Ktoś z Rim zapłaci za boję, która sama się rejestruje. Niech resztę odkryją sami, kiedy będą mieli czas.",
       "leave": "Nie otwieraj opakowania",
-      "leaveOut": "Rejestrujesz pozycję i płyniesz dalej. Cztery godziny później serwis „Echo” odnotowuje bez komentarza, że boja zniknęła."
+      "leaveOut": "Rejestrujesz pozycję i płyniesz dalej. Cztery godziny później serwis „Echo” odnotowuje bez komentarza, że boja zniknęła.",
+      "haul": "Zabrać bęben archiwum",
+      "haulOut": "Dziennik strażnika, którego żaden strażnik jeszcze nie napisał, zaadresowany do stacji, do której nie dotarłeś. Wiezienie go ciągnie wskazówkę ku porządkowi i nie pyta o zgodę."
     },
     "foldedYard": {
       "text": "Stoisko Mary znajduje się tutaj. Nie powinno tu być — zostawiłeś ją dziewiętnaście skoków i jeden numer za sobą. Uzupełnia zapasy, i to w sposób chaotyczny, z skrzyń, które wciąż docierają, zanim zdąży je zamówić.",
@@ -3936,6 +3953,16 @@
       "3": "Odległość przestała być obietnicą mniej więcej minutę temu.",
       "4": "Zapisz to jako skok. W dzienniku pojawi się nieprawdziwa informacja.",
       "5": "Weszliśmy i od razu byliśmy tutaj. Środka nie mam czego zameldować."
+    },
+    "cargoDelivered": {
+      "1": "Ładownia pusta, księga nie. Na taką wymianę się zgadzam.",
+      "2": "Przyjęte, zapłacone, zniknęło. Statek idzie lżej.",
+      "3": "Wzięli, nie otwierając. Rozsądnie z ich strony."
+    },
+    "officerRescued": {
+      "1": "Kajuta zajęta. Odzwyczaiłam się liczyć na pokładzie więcej niż jedną żywą duszę.",
+      "2": "Nie przeleciałeś obok. Zapisane — ten dziennik rzadko to widuje.",
+      "3": "Ktoś zajął koję. Załoga to już nie tylko ty i ja."
     }
   },
   "blackbox": {
@@ -4510,11 +4537,11 @@
     },
     "piercer": {
       "name": "Piercer",
-      "desc": "Pierwsze trafienie w każdej walce ignoruje tarcze, a umiejętność „Spinal Mount” zadaje 2 dodatkowe punkty obrażeń za każdy przedmiot z efektem „Przebicie”, który masz przy sobie."
+      "desc": "Pierwsze trafienie w każdej walce ignoruje tarcze, a umiejętność „Spinal Mount” zadaje 2 dodatkowe punkty obrażeń za każdy przedmiot z efektem „Przebicie”, który masz przy sobie. Broń uczy się trybu „Ładunek kumulacyjny”."
     },
     "emberInjector": {
       "name": "Wtryskiwacz Ember",
-      "desc": "Każda kostka, której wynik jest rozpatrywany w sekcji „Broń B”, powoduje zadanie 2 punktów obrażeń od ognia."
+      "desc": "Każda kostka, której wynik jest rozpatrywany w sekcji „Broń B”, powoduje zadanie 2 punktów obrażeń od ognia. Broń uczy się trybu „Zapalający”."
     },
     "railCradle": {
       "name": "Podstawa szynowa",
@@ -4522,7 +4549,7 @@
     },
     "targetingMesh": {
       "name": "Siatka docelowa",
-      "desc": "Znaki dają +1, a rozegranie karty „Czujniki” dodaje +2 do wyniku rzutu kostką w puli „Broń A”."
+      "desc": "Znaki dają +1, a rozegranie karty „Czujniki” dodaje +2 do wyniku rzutu kostką w puli „Broń A”. Broń uczy się trybu „Ogień sprzężony”."
     },
     "overpressure": {
       "name": "Nadciśnienie",
@@ -4538,7 +4565,7 @@
     },
     "lanceCapacitor": {
       "name": "Kondensator Lance’a",
-      "desc": "Każda kostka broni, której wynik wynosi 6 lub więcej zgromadzonych punktów szarży, zużywa 6 z nich, zapewniając +5."
+      "desc": "Każda kostka broni, której wynik wynosi 6 lub więcej zgromadzonych punktów szarży, zużywa 6 z nich, zapewniając +5. Broń uczy się trybu „Bocznik”."
     },
     "executioner": {
       "name": "Kat",
@@ -4646,7 +4673,7 @@
     },
     "autoloader": {
       "name": "Tablica modułów automatycznego ładowania",
-      "desc": "W każdej bitwie do twojej tacy trafia dodatkowa czerwona kostka d6, a co trzecie rozstrzygnięcie miejsca na broń zapewnia kolejną na następną turę."
+      "desc": "W każdej bitwie do twojej tacy trafia dodatkowa czerwona kostka d6, a co trzecie rozstrzygnięcie miejsca na broń zapewnia kolejną na następną turę. Broń uczy się trybu „Dublet”."
     },
     "prophecyMount": {
       "name": "Góra Proroctwa",
@@ -4663,6 +4690,43 @@
     "nonEuclidRack": {
       "name": "Stojak nieeuklidesowy",
       "desc": "Każde miejsce przyjmuje kostkę dowolnego poziomu, przy czym za każdym razem, gdy następuje rozstrzygnięcie, zużywa się 1 punkt wytrzymałości; limit ładunku zmniejsza się o −3."
+    }
+  },
+  "fireModes": {
+    "direct": {
+      "name": "Bezpośredni",
+      "desc": "Zadaje obrażenia kości wybranemu celowi — poziom bazowy.",
+      "short": "BEZ"
+    },
+    "scatter": {
+      "name": "Rozprysk",
+      "desc": "Obrażenia dzielą się między wszystkich żywych wrogów, +{{fragmentBonus}} do każdego odłamka. Wymaga {{minEnemies}} żywych celów.",
+      "short": "ROZ"
+    },
+    "doublet": {
+      "name": "Dublet",
+      "desc": "{{hits}} trafienia po połowie obrażeń każde, zaokrąglone w górę, w wybrany cel.",
+      "short": "DUB"
+    },
+    "shaped": {
+      "name": "Ładunek kumulacyjny",
+      "desc": "Na najwyższej ścianie zdejmuje tarczę do wartości kości przed obrażeniami; na każdej innej ścianie −{{offFacePenalty}} obrażeń.",
+      "short": "KUM"
+    },
+    "incendiary": {
+      "name": "Zapalający",
+      "desc": "−{{damagePenalty}} obrażeń; cel dostaje Poparzenie {{burn}}.",
+      "short": "ZAP"
+    },
+    "linked": {
+      "name": "Ogień sprzężony",
+      "desc": "+{{perDie}} obrażeń za każdą inną kość tej samej szkoły wystawioną w tej turze, do +{{cap}}.",
+      "short": "SPR"
+    },
+    "shunt": {
+      "name": "Bocznik",
+      "desc": "−{{damagePenalty}} obrażeń; +{{charge}} ładunku.",
+      "short": "BOC"
     }
   },
   "engravings": {
@@ -5326,6 +5390,145 @@
       "name": "Części zamienne",
       "desc": "Opchnąć jego części: 25 złomu mniej za jedno ulepszenie w stoczni.",
       "line": "Rozbiórka: skrzynia czystych części. Następny dok zejdzie za nie o 25 złomu z ulepszenia."
+    }
+  },
+  "officers": {
+    "scrapper": {
+      "name": "Zbieracz",
+      "role": "ręka od kadłuba",
+      "desc": "Wyszedł z kapsuły ratunkowej z palnikiem i urazą do dziur. Spawa poszycie w środku walki; poza tym sortuje złom.",
+      "origin": "Uratowany: sektor 1, kapsuła ratunkowa",
+      "short": "Zbieracz +{{n}}♥ · −{{c}}⚡"
+    },
+    "mechanic": {
+      "name": "Mechaniczka",
+      "role": "inżynierka",
+      "desc": "Uciekała przed czymś gorszym i została, by odpracować miejsce. Przerzuca zasilanie na stojaki dla jeszcze jednego rzutu i łata kadłub po każdej walce.",
+      "origin": "Uratowana: sektor 1, rufowy właz",
+      "short": "Mechaniczka +{{n}}↻"
+    },
+    "defector": {
+      "name": "Zbiegła",
+      "role": "nawigatorka",
+      "desc": "Czyta trasy Chóru jak mapę. Wskazuje cel, zanim go wybierzesz, a czujniki gryzą z nią przy stole nieco głębiej.",
+      "origin": "Uratowana: sektor 4, skradziony skif",
+      "short": "Zbiegła · znacznik {{n}}"
+    },
+    "welder": {
+      "name": "Spawaczka",
+      "role": "technik kadłuba",
+      "desc": "Jedna z czworga z petycji — jedna z dwóch, które umieją spawać. Kładzie blachę tam, gdzie trzeba; z nią na pokładzie kadłub lżej schodzi z ciosu.",
+      "origin": "Uratowana: wzięta na pokład z petycji",
+      "short": "Spawaczka +{{n}} tarczy"
+    },
+    "breaker": {
+      "name": "Rozbierarka",
+      "role": "starsza załogi",
+      "desc": "Na pokład weszło jedenaścioro, a dowodzi nimi ona. Rozkręcają reaktor, kiedy trzeba, i rozbierają każdy wrak do śruby.",
+      "origin": "Uratowana: brygada rozbiórkowa, jedenaście godzin powietrza",
+      "short": "Rozbierarka +{{n}}⚡"
+    },
+    "chorister": {
+      "name": "Chórzysta",
+      "role": "łącznościowiec",
+      "desc": "Z tamtej klasy wyszło dziewięcioro. Ten znalazł częstotliwość, na której idzie hymn, i nauczył się na niej siedzieć.",
+      "origin": "Uratowany: sektor 4, szkoła Chóru",
+      "short": "Chórzysta · zakłócenie"
+    }
+  },
+  "cargo": {
+    "unstableCore": {
+      "name": "Niestabilny rdzeń",
+      "desc": "Gniazdo reaktora pracuje o {{n}} poziom niżej, dopóki ładunek jest na pokładzie."
+    },
+    "liveHold": {
+      "name": "Żywy ładunek",
+      "desc": "Kosztuje {{n}} kadłuba na każdym ukończonym węźle, dopóki ładunek jest na pokładzie."
+    },
+    "overwoundCoils": {
+      "name": "Przeciążone cewki",
+      "desc": "Gniazdo broni A pracuje o {{n}} poziom niżej, dopóki ładunek jest na pokładzie."
+    },
+    "saintsReliquary": {
+      "name": "Relikwiarz świętego",
+      "desc": "Gniazdo tarcz pracuje o {{n}} poziom niżej, dopóki ładunek jest na pokładzie."
+    },
+    "leadBallast": {
+      "name": "Ołowiany balast",
+      "desc": "Gniazdo silników pracuje o {{n}} poziom niżej, dopóki ładunek jest na pokładzie."
+    },
+    "stasisPods": {
+      "name": "Kapsuły stazy",
+      "desc": "Kosztuje {{n}} kadłuba na każdym ukończonym węźle, dopóki ładunek jest na pokładzie."
+    },
+    "choirContraband": {
+      "name": "Kontrabanda Chóru",
+      "desc": "Przyjęcie przesuwa oś o {{n}} ku Rezonansowi, jednorazowo."
+    },
+    "keeperArchive": {
+      "name": "Archiwum strażnika",
+      "desc": "Przyjęcie przesuwa oś o {{n}} ku Stabilności, jednorazowo."
+    }
+  },
+  "echo": {
+    "branch": {
+      "tactician": "Taktyk",
+      "navigator": "Nawigator",
+      "keeper": "Strażnik"
+    },
+    "cond": {
+      "selfHpPctLt": "jeśli ma poniżej {{n}}% kadłuba",
+      "selfShielded": "jeśli jego tarcza trzyma",
+      "playerShielded": "jeśli twoja tarcza trzyma",
+      "playerChargeAtLeast": "jeśli masz {{n}} ładunku lub więcej",
+      "playerHullPctLt": "jeśli masz poniżej {{n}}% kadłuba",
+      "alliesAtLeast": "jeśli zostało ich {{n}} lub więcej",
+      "turnGte": "od tury {{n}}"
+    },
+    "secondLook": {
+      "name": "Drugie spojrzenie",
+      "desc": "Raz na bitwę: {{n}} najniższe kości na tacy są rzucane ponownie i zachowują lepszą stronę. Nie zużywa przerzutu.",
+      "short": "Drugie spojrzenie · {{n}} kości"
+    },
+    "readout": {
+      "name": "Rozbiór",
+      "desc": "Gdy następny ruch wroga się rozgałęzia, jego karta nazywa rozgałęzienie: warunek i obie odpowiedzi.",
+      "short": "Rozbiór · gałęzie nazwane"
+    },
+    "calculus": {
+      "name": "Rozwiązanie ogniowe",
+      "desc": "Raz na bitwę: każde trafienie bronią w najbliższej salwie bije za +{{n}}.",
+      "short": "Rozwiązanie ogniowe +{{n}}"
+    },
+    "echolocation": {
+      "name": "Echolokacja",
+      "desc": "+{{n}} rząd widoczności mapy, na całą sesję.",
+      "short": "Echolokacja +{{n}} rząd"
+    },
+    "pathGhost": {
+      "name": "Widmo szlaku",
+      "desc": "Podgląd czyta węzeł {{n}} rząd dalej niż ten, do którego możesz skoczyć. Nie staje się przez to osiągalny.",
+      "short": "Widmo szlaku +{{n}} rząd"
+    },
+    "softLanding": {
+      "name": "Miękkie lądowanie",
+      "desc": "Raz na sesję: tunel czasoprzestrzenny stawia cię na najbliższym wolnym węźle przed tobą. Nic nie jest losowane.",
+      "short": "Miękkie lądowanie · 1/sesję"
+    },
+    "reserve": {
+      "name": "Rezerwa mocy",
+      "desc": "Każda bitwa zaczyna się z +{{n}} ładunku.",
+      "short": "Rezerwa +{{n}}⚡"
+    },
+    "shieldEcho": {
+      "name": "Echo tarczy",
+      "desc": "Trafienie w całości pochłonięte przez tarczę zwraca +{{n}} ładunku.",
+      "short": "Echo tarczy +{{n}}⚡"
+    },
+    "veto": {
+      "name": "Weto",
+      "desc": "Raz na sesję: rzut Losu albo wynik zdarzenia, który sprowadziłby kadłub do zera, zostawia go na {{n}}.",
+      "short": "Weto · 1/sesję"
     }
   }
 }

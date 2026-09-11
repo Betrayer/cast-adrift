@@ -963,6 +963,18 @@ export const SECTOR2_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "haul",
+        label: "content:events.manifestAuction.opt.haul",
+        requires: { req: "cargo", id: "overwoundCoils" },
+        outcomes: [
+          {
+            text: "content:events.manifestAuction.out.haul",
+            effects: [{ k: "cargo", id: "overwoundCoils" }],
+            consequence: "content:consequence.cargoTaken",
+          },
+        ],
+      },
     ],
   },
   {

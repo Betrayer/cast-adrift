@@ -1,9 +1,11 @@
 import {
+  Fragment,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
+  type CSSProperties,
   type RefObject,
 } from 'react';
 import { isSlotBlocked } from '@/game/battle/setup';
@@ -12,6 +14,7 @@ import { publishRegion } from '@/pixi/battle/anchors';
 import { rectOf, useRegion } from '@/screens/Battle/board/measure';
 import { ReserveButton } from '@/screens/Battle/board/SlotDock';
 import { SlotGrid } from '@/screens/Battle/board/SlotGrid';
+import { SlotModeBadge } from '@/screens/Battle/board/SlotModeBadge';
 import {
   onSlotTap,
   useDockAnchors,
@@ -32,7 +35,7 @@ import {
 } from '@/screens/Battle/layouts/wide/WideStage';
 import wideStyles from '@/screens/Battle/layouts/wide/Wide.module.css';
 import { CheckBanner } from '@/screens/Battle/shell/CheckBanner';
-import { solveArc } from './arc';
+import { solveArc, type ArcPod } from './arc';
 import { RadialMenu } from './RadialMenu';
 import { SlotPod } from './SlotPod';
 import boardStyles from '@/screens/Battle/board/Board.module.css';
@@ -40,6 +43,12 @@ import screenStyles from '@/screens/Battle/BattleScreen.module.css';
 import styles from './Orbit.module.css';
 
 const RESERVE_ROW = 46;
+const POD_BADGE_LIFT = 3;
+
+const podBadgeStyle = (pod: ArcPod, size: number): CSSProperties => ({
+  left: `${String(pod.x - size / 2)}px`,
+  top: `${String(pod.y - size / 2 - POD_BADGE_LIFT)}px`,
+});
 
 interface Box {
   w: number;
@@ -74,7 +83,7 @@ const useBox = (ref: RefObject<HTMLElement | null>): Box => {
 };
 
 const OrbitDock = () => {
-  const { board, ordered, legal, projections, reserved, reserveMax } =
+  const { board, ordered, legal, projections, modes, reserved, reserveMax } =
     useDockModel();
   const shipRef = useRef<HTMLDivElement | null>(null);
 
@@ -124,21 +133,27 @@ const OrbitDock = () => {
             const pod = solution.pods[index];
             if (slot === undefined || pod === undefined) return null;
             return (
-              <SlotPod
-                key={slotId}
-                slotId={slotId}
-                slot={slot}
-                order={index + 1}
-                projection={projections[slotId]}
-                occupiedBy={slot.dieUid}
-                blocked={isSlotBlocked(board, slotId)}
-                legal={legal.slots.includes(slotId)}
-                goal={goalSlotsNow(board).includes(slotId)}
-                size={solution.podSize}
-                x={pod.x}
-                y={pod.y}
-                onTap={onSlotTap}
-              />
+              <Fragment key={slotId}>
+                <SlotPod
+                  slotId={slotId}
+                  slot={slot}
+                  order={index + 1}
+                  projection={projections[slotId]}
+                  occupiedBy={slot.dieUid}
+                  blocked={isSlotBlocked(board, slotId)}
+                  legal={legal.slots.includes(slotId)}
+                  goal={goalSlotsNow(board).includes(slotId)}
+                  size={solution.podSize}
+                  x={pod.x}
+                  y={pod.y}
+                  onTap={onSlotTap}
+                />
+                <SlotModeBadge
+                  model={modes[slotId]}
+                  place="pod"
+                  style={podBadgeStyle(pod, solution.podSize)}
+                />
+              </Fragment>
             );
           })}
           <div
@@ -159,6 +174,7 @@ const OrbitDock = () => {
           ordered={ordered}
           legal={legal.slots}
           projections={projections}
+          modes={modes}
         />
       )}
       <ReserveButton

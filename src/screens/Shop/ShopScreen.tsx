@@ -74,7 +74,7 @@ export const ShopScreen = () => {
   const nodeId = position ?? "";
   const slots = useRunStore(runModuleSlots);
   const [pending, setPending] = useState<{
-    swap: PendingSwap;
+    swap: Extract<PendingSwap, { kind: "die" | "module" }>;
     index: number;
     price: number;
   } | null>(null);

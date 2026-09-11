@@ -8,6 +8,13 @@ export type AxisSource = "choice" | "drift" | "beacon";
 
 export type WormholeBranch = "ride" | "bypass";
 
+export type CargoStep =
+  | "taken"
+  | "moved"
+  | "delivered"
+  | "dropped"
+  | "lapsed";
+
 export type JournalBody =
   | { k: "choice"; event: string; option: string; text: LocKey; consequence?: LocKey }
   | { k: "consequence"; origin: LocKey }
@@ -23,6 +30,7 @@ export type JournalBody =
       rows: number;
       direction: ThrowDirection;
     }
+  | { k: "cargo"; step: CargoStep; cargo: string; n: number }
   | { k: "singularity" }
   | { k: "bark"; line: LocKey }
   | { k: "system"; line: LocKey };

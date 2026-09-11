@@ -63,6 +63,9 @@ export const popoverPlacement = (
   return { left, top };
 };
 
+export const popoverMaxHeight = (bounds: Bounds): number =>
+  Math.max(0, bounds.bottom - bounds.top);
+
 export const viewportBounds = (margin: number): Bounds => ({
   top: margin,
   left: margin,

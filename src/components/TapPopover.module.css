@@ -25,6 +25,8 @@
   visibility: hidden;
   width: max-content;
   max-width: min(260px, calc(100vw - 24px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
   padding: 8px 10px;
   border-radius: 10px;
   border: 1px solid var(--ca-line);

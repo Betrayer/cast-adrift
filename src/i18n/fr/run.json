@@ -50,7 +50,10 @@
     "scrap": "Ferraille {{n}}",
     "previewHole": "La lisière répond pour toute la tache : la contourner, ou traverser le trou de ver",
     "spotLabel": "Trou noir — toute la tache est un seul choix",
-    "conditions": "Conditions ×{{n}}"
+    "conditions": "Conditions ×{{n}}",
+    "cargo": "Fret ▸{{n}}",
+    "cargoMany": "Fret ×{{n}}",
+    "previewDelivery": "Livraison : {{n}} de ferraille à l'arrivée"
   },
   "event": {
     "title": "Signal",
@@ -81,7 +84,9 @@
     "checkTierMax": "{{tier}}s et moins uniquement",
     "outcomeOdds": "cotes {{odds}}",
     "beaconTitle": "Balise",
-    "beaconCounter": "Balise {{n}} de {{max}}"
+    "beaconCounter": "Balise {{n}} de {{max}}",
+    "reqCargo": "nécessite une soute libre et une station devant",
+    "cargoTerms": "{{drawback}} · la livraison rapporte {{n}}"
   },
   "anomaly": {
     "title": "Anomalie",
@@ -501,7 +506,14 @@
     "tabBattle": "Combat",
     "openBattle": "Journal de combat",
     "battleLive": "Ce combat, tour le plus récent en premier.",
-    "battleLast": "Le dernier combat, tour le plus récent en premier."
+    "battleLast": "Le dernier combat, tour le plus récent en premier.",
+    "cargo": {
+      "taken": "a pris {{name}} à bord, {{n}} rangées avant la livraison",
+      "moved": "la marque de livraison de {{name}} est passée à une station plus proche",
+      "delivered": "a livré {{name}} pour {{n}} de ferraille",
+      "dropped": "a largué {{name}} et perdu le paiement",
+      "lapsed": "le contrat sur {{name}} a expiré"
+    }
   },
   "memory": {
     "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",
@@ -578,7 +590,10 @@
     "ride": "Fais-le !",
     "rideCost": "Trajet : un trajet d'{{min}}à{{max}}, direction inconnue",
     "rideGentle": "Ride : une variante de l’{{min}}—{{max}}e, mais plus profonde",
-    "landed": "Lancé {{rows}} lignes {{way}}"
+    "landed": "Lancé {{rows}} lignes {{way}}",
+    "softLand": "Se poser en douceur",
+    "softLandWhy": "Une fois par partie : aucun jet — le nœud libre le plus proche devant",
+    "softLandSpent": "La charge d’Écho est déjà dépensée pour cette partie"
   },
   "bridge": {
     "title": "Pont",
@@ -597,10 +612,28 @@
     "deckCount": "{{n}} de la terrasse / {{max}}",
     "sellDiceHint": "On vend des dés à la boutique.",
     "sellModule": "Vente + {{n}}",
-    "crewTitle": "Cabines des officiers",
-    "crewLocked": "Scellé — aucun équipage à bord pour l'instant.",
-    "cargoTitle": "Salle de chargement",
-    "cargoLocked": "Scellé — rien à transporter pour l'instant."
+    "crewTitle": "Cabines des officiers {{used}}/{{max}}",
+    "cargoTitle": "Soute {{used}}/{{max}}",
+    "cabinEmpty": "cabine vide — sauve quelqu'un",
+    "cabinWho": "{{role}} · {{origin}}",
+    "cabinActive": "active · {{text}}",
+    "cabinPassive": "passive · {{text}}",
+    "passive": {
+      "scrapMultPct": "+{{n}} % de ferraille",
+      "scrapPerKill": "+{{n}} de ferraille par victime",
+      "battleEndHeal": "fin de combat : soigne {{n}} de coque",
+      "markBonusDelta": "les marques valent +{{n}} de dégâts",
+      "evasionDelta": "esquive +{{n}} %",
+      "rerollSizeDelta": "dés par relance : +{{n}}"
+    },
+    "cargoEmpty": "soute vide",
+    "cargoTerms": "livraison : station · {{rows}} rangées · rapporte {{n}}",
+    "dropCargo": "Larguer",
+    "dropTitle": "Larguer le fret ?",
+    "dropBody": "{{name}} passe par le sas. Le handicap cesse maintenant et les {{n}} de ferraille de la livraison sont perdus.",
+    "dropBodyAxis": "{{name}} passe par le sas. L'axe reste où il l'a déplacé et les {{n}} de ferraille de la livraison sont perdus.",
+    "dropNo": "Continuer à le porter",
+    "dropYes": "Larguer"
   },
   "replace": {
     "title": "Remplacer",
@@ -610,7 +643,11 @@
     "fullBay": "{{used}} complète de Bay / {{max}} — qu'est-ce qui se passe ?",
     "toScrap": "→ « scrap » + «{{n}} »",
     "sellNew": "Vendre le nouveau (+ {{n}})",
-    "cancel": "Annuler"
+    "cancel": "Annuler",
+    "titleOfficer": "Nouvel officier",
+    "fullCabins": "Cabines pleines {{used}}/{{max}} — qui débarque ?",
+    "disembark": "→ quitte le vaisseau",
+    "declineOfficer": "Les laisser là"
   },
   "feed": {
     "source": {
@@ -631,5 +668,43 @@
     "decline": "Laisser",
     "hint": "Une des trois. Le reste brûle avec l'épave.",
     "declined": "Récupération : rien à bord ne valait le temps de découpe."
+  },
+  "cargo": {
+    "title": "Fret à risque",
+    "rows": "encore {{n}} rangées",
+    "payout": "rapporte {{n}} de ferraille",
+    "delivered": "Fret livré — la soute est vide et le paiement est consigné",
+    "dropped": "Fret largué — le handicap cesse, le paiement est perdu",
+    "droppedAxis": "Fret largué — l'axe reste déplacé, le paiement est perdu",
+    "lapsed": "Le contrat a expiré avec l'acte — la soute est vide, le paiement envolé",
+    "moved": "Livraison réacheminée — la marque est passée à la station la plus proche devant",
+    "stranded": "Personne devant ne prendra le fret — le contrat est nul"
+  },
+  "echo": {
+    "title": "Cœur d’Écho",
+    "close": "Fermer",
+    "count": "{{n}} fragments récupérés sur {{max}}",
+    "rule": "Un nœud vous accompagne. Rien ne se dépense, rien ne se réattribue.",
+    "tier": "dès {{n}}",
+    "locked": "S’ouvre à {{n}} fragments récupérés",
+    "equipped": "Équipé",
+    "none": "Aucun nœud",
+    "noneBody": "Partir avec le cœur vide.",
+    "open": "Cœur d’Écho",
+    "setup": "Écho",
+    "setupNone": "Aucun nœud équipé",
+    "codexTitle": "Cœur d’Écho",
+    "codexBody": "Les fragments récupérés ouvrent des nœuds. Un seul vous accompagne à chaque partie.",
+    "opened": {
+      "secondLook": "Cœur d’Écho : Second regard est ouvert.",
+      "readout": "Cœur d’Écho : Décomposition est ouvert.",
+      "calculus": "Cœur d’Écho : Solution de tir est ouvert.",
+      "echolocation": "Cœur d’Écho : Écholocation est ouvert.",
+      "pathGhost": "Cœur d’Écho : Chemin fantôme est ouvert.",
+      "softLanding": "Cœur d’Écho : Atterrissage en douceur est ouvert.",
+      "reserve": "Cœur d’Écho : Réserve de puissance est ouvert.",
+      "shieldEcho": "Cœur d’Écho : Écho du bouclier est ouvert.",
+      "veto": "Cœur d’Écho : Veto est ouvert."
+    }
   }
 }

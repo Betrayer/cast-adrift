@@ -1,5 +1,20 @@
 import { create } from "zustand";
 import { ENEMY_BY_ID } from "@/data/enemies";
+import {
+  echoLabelVars,
+  echoNodeDef,
+  echoSecondLookDice,
+  echoToken,
+  echoVetoHull,
+  type EchoNodeId,
+} from "@/data/echo";
+import {
+  officerActions,
+  officerActiveDead,
+  officerChargeCost,
+  officerDef,
+  officerToken,
+} from "@/data/officers";
 import type { ShipId } from "@/data/ships";
 import {
   adjacentCopyValue,
@@ -21,6 +36,7 @@ import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { passiveActionOf, shipProfile } from "@/game/battle/passives";
 import { appendLog, logEntriesFrom } from "@/game/battle/log";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
+import { aimedEnemy } from "@/game/battle/target";
 import {
   advanceTurn,
   BASE_REROLL_SIZE,
@@ -40,6 +56,7 @@ import {
   type ResonanceBoost,
 } from "@/game/battle/setup";
 import { computeMutatorMods } from "@/data/mutators";
+import type { FireModeId } from "@/data/fireModes";
 import { dieHasGrant, type EngravingMap } from "@/data/engravings";
 import { FATE_DIE_ID, fateOutcomeFor, type FateOutcome } from "@/data/fate";
 import type { PerkTrait } from "@/data/perks/types";
@@ -56,7 +73,9 @@ import {
   checkEndTurnBlocked,
   checkMovesNow,
   currentCheckStep,
+  modeBlockFor,
   placeBlockFor,
+  slotFireModes,
 } from "@/game/battle/view";
 import {
   noteCheckFinished,
@@ -102,6 +121,8 @@ export interface BattleEncounter {
   chartPicks?: readonly string[];
   mutators?: readonly string[];
   modules?: readonly string[];
+  officers?: readonly string[];
+  echo?: EchoNodeId;
   engravings?: EngravingMap;
   flags?: readonly string[];
   runCounters?: Readonly<Record<string, number>>;
@@ -146,6 +167,8 @@ export interface BattleValues {
   chartPicks: string[];
   mutators: string[];
   modules: string[];
+  officers: string[];
+  echo: EchoNodeId | undefined;
   engravings: EngravingMap;
   flags: string[];
   counters: Record<string, number>;
@@ -234,6 +257,7 @@ export interface BattleState extends BattleValues {
     streams: RngStreams,
   ) => void;
   placeDie: (uid: string, slotId: SlotId) => void;
+  setSlotMode: (slotId: SlotId, mode: FireModeId) => void;
   noteBlock: (key: string | null) => void;
   skipCheck: () => void;
   restartCheckStep: () => void;
@@ -258,6 +282,8 @@ export interface BattleState extends BattleValues {
   fuseDice: (uid: string) => void;
   reschoolDie: (uid: string) => void;
   rollFate: () => void;
+  useOfficerActive: (officerId: string) => void;
+  useEchoActive: () => void;
   clearFateResult: () => void;
   toggleRerollMode: () => void;
   toggleRerollDie: (uid: string) => void;
@@ -285,6 +311,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   chartPicks: [],
   mutators: [],
   modules: [],
+  officers: [],
+  echo: undefined,
   engravings: {},
   flags: [],
   counters: {},
@@ -383,6 +411,8 @@ export const battleSnapshot = (s: BattleSnapshot): BattleSnapshot => ({
   chartPicks: s.chartPicks,
   mutators: s.mutators,
   modules: s.modules,
+  officers: s.officers,
+  echo: s.echo,
   engravings: s.engravings,
   flags: s.flags,
   counters: s.counters,
@@ -427,6 +457,31 @@ export const battleSnapshot = (s: BattleSnapshot): BattleSnapshot => ({
   outcome: s.outcome,
 });
 
+const secondLookTargets = (
+  dice: readonly RolledDie[],
+  n: number,
+): readonly string[] =>
+  dice
+    .filter((d) => d.state === "tray")
+    .slice()
+    .sort((a, b) => a.value - b.value)
+    .slice(0, n)
+    .map((d) => d.uid);
+
+export const echoActiveSpent = (s: BattleValues): boolean =>
+  s.echo !== undefined && s.spentGrants.includes(echoToken(s.echo));
+
+export const echoActiveDead = (s: BattleValues): boolean =>
+  s.echo === "secondLook" &&
+  secondLookTargets(s.dice, echoSecondLookDice(s.echo)).length === 0;
+
+export const echoActiveVars = (
+  s: BattleValues,
+): Readonly<Record<string, number>> => {
+  const def = echoNodeDef(s.echo);
+  return def === undefined ? {} : echoLabelVars(def);
+};
+
 const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   turn: snap.turn,
   hull: snap.hull,
@@ -442,6 +497,8 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   chartPicks: snap.chartPicks ?? [],
   mutators: snap.mutators ?? [],
   modules: snap.modules ?? [],
+  officers: snap.officers ?? [],
+  echo: snap.echo,
   engravings: snap.engravings ?? {},
   flags: snap.flags ?? [],
   counters: snap.counters ?? {},
@@ -691,11 +748,13 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         nodeStorm: encounter.nodeStorm,
       },
     );
+    snapshot.echo = encounter.echo;
     const perks = encounter.perks ?? [];
     const chartPicks = encounter.chartPicks ?? [];
     const modules = encounter.modules ?? [];
+    const officers = encounter.officers ?? [];
     const forcedTraits = encounter.forcedTraits ?? [];
-    const mods = computeRunMods(perks, chartPicks, modules);
+    const mods = computeRunMods(perks, chartPicks, modules, officers);
     const scrapperScrap = shipProfile(shipId).battleStartScrap;
     const singleCast =
       runHasTrait(perks, chartPicks, "singleCast", modules) ||
@@ -744,6 +803,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       chartPicks: [...chartPicks],
       mutators: [...(encounter.mutators ?? [])],
       modules: [...modules],
+      officers: [...officers],
       engravings: encounter.engravings ?? {},
       forcedTraits: [...forcedTraits],
       rerollsLeft: singleCast
@@ -800,6 +860,24 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     });
   },
 
+  setSlotMode: (slotId, mode) => {
+    set((s) => {
+      if (s.phase !== "placement") return s;
+      const slot = s.slots[slotId];
+      if (slot === undefined) return s;
+      const block = slotFireModes(s, slotId).includes(mode)
+        ? modeBlockFor(s, slotId, mode)
+        : "notAllowed";
+      if (block !== null) {
+        return {
+          lastBlock: noticeOf(s.lastBlock, `battle:block.${block}`, slotId),
+        };
+      }
+      if (slot.mode === mode) return s;
+      return { slots: { ...s.slots, [slotId]: { ...slot, mode } } };
+    });
+  },
+
   noteBlock: (key) => {
     set((s) => {
       if (key === null) return s.lastBlock === null ? s : { lastBlock: null };
@@ -853,7 +931,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const reserved = s.dice.filter((d) => d.state === "reserved").length;
       const blueExtra =
         die.school === "blue" || die.school === "prismatic"
-          ? computeRunMods(s.perks, s.chartPicks, s.modules).blueReserveDelta
+          ? computeRunMods(s.perks, s.chartPicks, s.modules, s.officers)
+              .blueReserveDelta
           : 0;
       if (reserved >= s.reserveCap + blueExtra) return s;
       return {
@@ -1067,7 +1146,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         !s.spentGrants.includes(`nudge:${uid}`);
       const useFree = !springFree && s.freeNudges > 0;
       const cost = nudgeChargeCost(
-        computeRunMods(s.perks, s.chartPicks, s.modules).nudgeCostDelta +
+        computeRunMods(s.perks, s.chartPicks, s.modules, s.officers)
+          .nudgeCostDelta +
           computeMutatorMods(s.mutators).nudgeCostDelta,
         runHasTrait(s.perks, s.chartPicks, "coldLogic", s.modules),
       );
@@ -1187,6 +1267,15 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     syncSnapshotFlags(snapshot, ctx);
     snapshot.charge = Math.max(0, Math.min(snapshot.chargeCap, snapshot.charge));
     snapshot.scrap = Math.max(0, snapshot.scrap);
+    const veto = echoVetoHull(s.echo);
+    if (
+      veto > 0 &&
+      s.hull > 0 &&
+      snapshot.hull <= 0 &&
+      useRunStore.getState().spendEcho()
+    ) {
+      snapshot.hull = veto;
+    }
     set({
       ...fromSnapshot(snapshot),
       fateUses: s.fateUses + 1,
@@ -1194,6 +1283,75 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       fateOutcomeId: outcome.id,
     });
     recordAction(`fate:${String(roll)}`);
+  },
+
+  useOfficerActive: (officerId) => {
+    const s = get();
+    if (s.phase !== "placement" || s.rerollMode) return;
+    if (!s.officers.includes(officerId)) return;
+    const def = officerDef(officerId);
+    if (def === undefined) return;
+    const token = officerToken(officerId);
+    if (s.spentGrants.includes(token)) return;
+    if (s.charge < officerChargeCost(def.active)) return;
+    const aimed = aimedEnemy(s.enemies, s.targetId);
+    if (officerActiveDead(def.active, aimed?.statuses.mark)) return;
+    if (def.active.id === "restart") {
+      set({
+        rerollsLeft: s.rerollsLeft + def.active.rerolls,
+        spentGrants: [...s.spentGrants, token],
+      });
+      recordAction(`officer:${officerId}`);
+      return;
+    }
+    const snapshot = battleSnapshot(s);
+    snapshot.enemies = structuredClone(s.enemies);
+    snapshot.blockedSlots = [...s.blockedSlots];
+    const ctx = new BattleCtx(snapshot, snapshot.flags);
+    applyActions(officerActions(def.active), ctx);
+    syncSnapshotFlags(snapshot, ctx);
+    snapshot.charge = Math.max(0, Math.min(snapshot.chargeCap, snapshot.charge));
+    snapshot.scrap = Math.max(0, snapshot.scrap);
+    set({
+      ...fromSnapshot(snapshot),
+      spentGrants: [...s.spentGrants, token],
+    });
+    recordAction(`officer:${officerId}`);
+  },
+
+  useEchoActive: () => {
+    const s = get();
+    if (s.phase !== "placement" || s.rerollMode) return;
+    const def = echoNodeDef(s.echo);
+    if (def === undefined) return;
+    const token = echoToken(def.id);
+    if (s.spentGrants.includes(token)) return;
+    if (def.id === "calculus") {
+      set({
+        nextTurnMods: {
+          ...s.nextTurnMods,
+          weapons: (s.nextTurnMods.weapons ?? 0) + def.weapons,
+        },
+        spentGrants: [...s.spentGrants, token],
+      });
+      recordAction(`echo:${def.id}`);
+      return;
+    }
+    if (def.id !== "secondLook" || s.streams === null) return;
+    const chosen = new Set(secondLookTargets(s.dice, def.dice));
+    if (chosen.size === 0) return;
+    const streams = s.streams;
+    const blueFloor = resonanceAtLeast(s.resonance, "blue", 2);
+    set({
+      dice: s.dice.map((d) => {
+        if (!chosen.has(d.uid)) return d;
+        let rolled = streams.dice.int(1, d.tier) + (d.growth ?? 0);
+        if (blueFloor && d.school === "blue") rolled = Math.max(rolled, 2);
+        return { ...d, value: Math.max(d.value, rolled) };
+      }),
+      spentGrants: [...s.spentGrants, token],
+    });
+    recordAction(`echo:${def.id}`);
   },
 
   clearFateResult: () => {
@@ -1385,7 +1543,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       !s.forcedTraits.includes("singleCast");
     const extra = Math.max(
       0,
-      computeRunMods(s.perks, s.chartPicks, s.modules).extraRerolls,
+      computeRunMods(s.perks, s.chartPicks, s.modules, s.officers)
+        .extraRerolls,
     );
     const steps = s.checkSteps;
     const advanced =
@@ -1451,6 +1610,8 @@ const pickBattleValues = (s: BattleState): BattleSaveValues => ({
   chartPicks: s.chartPicks,
   mutators: s.mutators,
   modules: s.modules,
+  officers: s.officers,
+  echo: s.echo,
   engravings: s.engravings,
   flags: s.flags,
   counters: s.counters,

@@ -1,21 +1,17 @@
 import type { TFunction } from 'i18next';
-import type {
-  ActiveActionId,
-  ConsoleActionId,
-  ConsoleActions,
+import { echoLabelVars, type EchoNodeDef } from '@/data/echo';
+import { officerLabelVars, type OfficerDef } from '@/data/officers';
+import {
+  CABIN_IDS,
+  type ActiveActionId,
+  type CabinActionId,
+  type ConsoleActionId,
+  type ConsoleActions,
 } from '@/game/battle/view';
 import { playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { flashVignette } from '@/services/vignette';
 import { useBattleStore, type BattleState } from '@/stores/battleStore';
-
-export const ACTIVE_ORDER: readonly ActiveActionId[] = [
-  'flip',
-  'copy',
-  'swap',
-  'bank',
-  'split',
-];
 
 const activeEffect = (id: ActiveActionId): void => {
   const live = useBattleStore.getState();
@@ -52,10 +48,43 @@ export const ARMING_ACTIONS: ReadonlySet<ConsoleActionId> = new Set<ConsoleActio
   'fuse',
 ]);
 
+const cabinEffect = (id: CabinActionId): void => {
+  const live = useBattleStore.getState();
+  const officerId = live.officers[CABIN_IDS.indexOf(id)];
+  if (officerId === undefined) return;
+  playSfx('place');
+  haptic('place');
+  live.useOfficerActive(officerId);
+};
+
+const echoEffect = (): void => {
+  const live = useBattleStore.getState();
+  playSfx(live.echo === 'secondLook' ? 'reroll' : 'surge');
+  haptic('place');
+  live.useEchoActive();
+};
+
+export const echoLabel = (
+  t: TFunction<['battle', 'content']>,
+  def: EchoNodeDef,
+): string => t(def.short, echoLabelVars(def));
+
+export const cabinLabel = (
+  t: TFunction<['battle', 'content']>,
+  def: OfficerDef,
+): string => t(def.short, officerLabelVars(def.active));
+
 export const runActionEffect = (id: ConsoleActionId): void => {
   const live = useBattleStore.getState();
   const uid = live.selectedDieUid;
   switch (id) {
+    case 'cabinA':
+    case 'cabinB':
+      cabinEffect(id);
+      return;
+    case 'echo':
+      echoEffect();
+      return;
     case 'reroll':
       live.toggleRerollMode();
       return;

@@ -1,10 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import type { EchoNodeId } from "@/data/echo";
 import { createStreams } from "@/services/rng";
 import { generateSectorMap } from "@/game/map/generator";
 import { nodeById, type MapGraph, type WormholeEdge } from "@/game/map/types";
 import { GENTLE_RIDES, throwCost, type WormholeThrow } from "@/game/map/wormhole";
 import {
   bypassHole,
+  canSoftLandWormhole,
   endRun,
   jumpTo,
   openWormhole,
@@ -408,5 +410,149 @@ describe("the chaos source the ride reaches for without a mock in the way", () =
     for (const rides of [0, 1]) {
       expect(countedRide(rides).pcts).toEqual([]);
     }
+  });
+});
+
+
+interface EchoCountedChaos {
+  ints: number;
+  picks: number;
+  rolls: number;
+  source: ChaosSource;
+}
+
+const echoCountingChaos = (): EchoCountedChaos => {
+  const tape = scriptedChaos(RIDE_TAPE);
+  const counted: EchoCountedChaos = {
+    ints: 0,
+    picks: 0,
+    rolls: 0,
+    source: {
+      int: (min, max) => {
+        counted.ints += 1;
+        return tape.int(min, max);
+      },
+      pick: (arr) => {
+        counted.picks += 1;
+        return tape.pick(arr);
+      },
+      roll: (pct) => {
+        counted.rolls += 1;
+        return tape.roll(pct);
+      },
+    },
+  };
+  return counted;
+};
+
+const seatEcho = (echo: EchoNodeId | null, rides = GENTLE_RIDES + 7): void => {
+  seat();
+  useRunStore.setState({ echo });
+  chaotic(rides);
+};
+
+describe("Soft Landing rides a wormhole without touching chaos", () => {
+  it("asks the chaos source for nothing at all", () => {
+    seatEcho("softLanding");
+    const counted = echoCountingChaos();
+    setChaosSource(counted.source);
+    expect(canSoftLandWormhole()).toBe(true);
+    openWormhole(fixture.record.hole);
+    const ride = rideWormhole(fixture.record.hole, false, true);
+    expect(ride?.kind).toBe("landed");
+    expect({
+      ints: counted.ints,
+      picks: counted.picks,
+      rolls: counted.rolls,
+    }).toEqual({ ints: 0, picks: 0, rolls: 0 });
+    expect(useRunStore.getState().echoUsed).toBe(true);
+    expect(canSoftLandWormhole()).toBe(false);
+  });
+
+  it("lands forward, gently, on an open node ahead", () => {
+    seatEcho("softLanding");
+    setChaosSource(echoCountingChaos().source);
+    openWormhole(fixture.record.hole);
+    const landed = landedThrow(rideWormhole(fixture.record.hole, false, true));
+    expect(landed.gentle).toBe(true);
+    expect(landed.direction).toBe("forward");
+    expect(landed.rows).toBeGreaterThan(0);
+    expect(useRunStore.getState().position).toBe(landed.landing);
+  });
+
+  it("still consumes chaos on an ordinary ride of the same hole", () => {
+    seatEcho("softLanding");
+    const counted = echoCountingChaos();
+    setChaosSource(counted.source);
+    openWormhole(fixture.record.hole);
+    rideWormhole(fixture.record.hole, false, false);
+    expect(counted.ints).toBeGreaterThan(0);
+    expect(counted.rolls).toBeGreaterThan(0);
+    expect(useRunStore.getState().echoUsed).toBe(false);
+  });
+
+  it("refuses the soft landing once the run charge is spent", () => {
+    seatEcho("softLanding");
+    useRunStore.getState().spendEcho();
+    const counted = echoCountingChaos();
+    setChaosSource(counted.source);
+    openWormhole(fixture.record.hole);
+    rideWormhole(fixture.record.hole, false, true);
+    expect(counted.ints).toBeGreaterThan(0);
+  });
+
+  it("refuses the soft landing when a different node is equipped", () => {
+    seatEcho("veto");
+    expect(canSoftLandWormhole()).toBe(false);
+    const counted = echoCountingChaos();
+    setChaosSource(counted.source);
+    openWormhole(fixture.record.hole);
+    rideWormhole(fixture.record.hole, false, true);
+    expect(counted.ints).toBeGreaterThan(0);
+    expect(useRunStore.getState().echoUsed).toBe(false);
+  });
+
+  it("never spends Veto on the hole that ends a run without reducing hull", () => {
+    seatEcho("veto");
+    setChaosSource(scriptedChaos({ ints: [2, 0], picks: [0], rolls: [true] }));
+    openWormhole(fixture.record.hole);
+    expect(rideWormhole(fixture.record.hole, false, false)?.kind).toBe("fatal");
+    expect(useRunStore.getState().active).toBe(false);
+    expect(useRunStore.getState().hull).toBe(30);
+  });
+});
+
+describe("Soft Landing keeps its charge when it cannot keep its promise", () => {
+  const blockEverythingAhead = (): void => {
+    const origin = nodeById(fixture.map).get(fixture.record.from);
+    if (origin === undefined) throw new Error("the fixture has no origin node");
+    const ahead = fixture.map.nodes
+      .filter((node) => node.row > origin.row)
+      .map((node) => node.id);
+    useRunStore.setState((s) => ({ visited: [...s.visited, ...ahead] }));
+  };
+
+  it("does not spend the run charge on a stalled landing", () => {
+    seatEcho("softLanding");
+    blockEverythingAhead();
+    setChaosSource(echoCountingChaos().source);
+    openWormhole(fixture.record.hole);
+
+    const ride = rideWormhole(fixture.record.hole, false, true);
+
+    expect(landedThrow(ride).landing).toBeNull();
+    expect(useRunStore.getState().echoUsed).toBe(false);
+    expect(canSoftLandWormhole()).toBe(true);
+  });
+
+  it("leaves the ship where it stood rather than taking a bypass it did not choose", () => {
+    seatEcho("softLanding");
+    blockEverythingAhead();
+    setChaosSource(echoCountingChaos().source);
+    openWormhole(fixture.record.hole);
+
+    rideWormhole(fixture.record.hole, false, true);
+
+    expect(useRunStore.getState().position).toBe(fixture.record.from);
   });
 });

@@ -24,7 +24,7 @@ const motifOf = <K extends SectorMotif["m"]>(
     (motif): motif is Extract<SectorMotif, { m: K }> => motif.m === kind,
   );
 
-const survivable = (
+export const survivable = (
   effects: readonly EventEffect[],
   hull: number,
 ): readonly EventEffect[] =>

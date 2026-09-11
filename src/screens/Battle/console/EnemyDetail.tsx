@@ -1,12 +1,14 @@
 import { useCallback, useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useEscapeKey } from '@/components/dismiss';
+import { echoReadsIntents } from '@/data/echo';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { STATUS_KEYS } from '@/game/battle/statuses';
 import { schools } from '@/data/schools';
 import { mitigationOf } from '@/game/battle/view';
 import { focusEnemy, focusedEnemy, subscribeEnemyFocus } from '@/pixi/battle/enemyFocus';
 import { battleSnapshot, useBattleStore } from '@/stores/battleStore';
+import { echoReadoutFor } from './echoReadout';
 import { auraExplain, intentExplain } from './intentExplain';
 import { intentLabel } from './intentLabel';
 import styles from './Console.module.css';
@@ -31,6 +33,9 @@ export const EnemyDetail = () => {
 
   const snapshot = battleSnapshot(useBattleStore.getState());
   const mitigation = mitigationOf(snapshot, enemy);
+  const readout = echoReadsIntents(snapshot.echo)
+    ? echoReadoutFor(def, enemy, snapshot.ascension)
+    : null;
 
   return (
     <div className={styles.sheet} data-enemy-detail={enemy.id}>
@@ -73,6 +78,23 @@ export const EnemyDetail = () => {
       <div className={styles.sheetWhy} data-intent-why={enemy.nextIntent.t}>
         {intentExplain(t, enemy.nextIntent)}
       </div>
+      {readout === null ? null : (
+        <div className={styles.sheetWhy} data-echo-readout={readout.kind}>
+          {`${t('battle:echo.after')} — ${
+            readout.kind === 'fork'
+              ? t('battle:echo.fork', {
+                  cond: t(readout.fork.cond, readout.fork.values),
+                  then: intentLabel(t, readout.fork.then),
+                  else: intentLabel(t, readout.fork.else),
+                })
+              : readout.kind === 'fixed'
+                ? t('battle:echo.fixed', {
+                    intent: intentLabel(t, readout.intent),
+                  })
+                : t('battle:echo.open')
+          }`}
+        </div>
+      )}
       <div className={styles.sheetMath} data-enemy-math>
         {mitigation.raw === 0
           ? t('battle:mitigationNone')

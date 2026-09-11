@@ -167,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} Schaden · {{split}}"
   },
   "block": {
     "resolving": "Warte auf die Auflösung",
@@ -181,7 +183,13 @@
     "reserveFull": "Reserve ist voll",
     "used": "Diese Runde schon benutzt",
     "hullLow": "Rumpf zu niedrig",
+    "notAllowed": "Das geht gerade nicht",
+    "occupied": "In diesem Slot liegt schon ein Würfel",
+    "tierCap": "Der Würfel ist zu groß für diesen Slot",
+    "slotBlocked": "Dieser Slot ist in dieser Runde blockiert",
+    "dieLocked": "Dieser Würfel ist gesperrt",
     "noPartner": "Für das Glühen wird eine zweite Schalenform mit demselben Wert benötigt.",
+    "needsTwoEnemies": "Dieser Feuermodus braucht zwei lebende Ziele",
     "spent": "Das Schiff kann dies einmal pro Gefecht tun."
   },
   "resPrism": "ein prismatischer Würfel zählt für diese Schule",
@@ -203,6 +211,7 @@
     "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -381,5 +390,15 @@
       "fold": "bearbeitet die Bestellung",
       "devour": "verschlingt einen Würfel"
     }
+  },
+  "mode": {
+    "title": "Feuermodus",
+    "label": "Feuermodus: {{mode}}"
+  },
+  "echo": {
+    "after": "Danach",
+    "fork": "{{cond}} — {{then}}. Sonst — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Wird aus dem Muster gezogen — nicht festgelegt."
   }
 }
