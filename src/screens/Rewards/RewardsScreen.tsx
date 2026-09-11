@@ -7,6 +7,7 @@ import { BattleTallyPanel } from "./BattleTallyPanel";
 import { DieReward } from "./DieReward";
 import { PackageReward } from "./PackageReward";
 import { PerkDraft } from "./PerkDraft";
+import { SalvagePick } from "./SalvagePick";
 
 export const RewardsScreen = () => {
   const pending = useRunStore((s) => s.pendingRewards);
@@ -18,7 +19,8 @@ export const RewardsScreen = () => {
     (pending.dieDrop === null &&
       pending.perkChoices.length === 0 &&
       (pending.dieChoices ?? []).length === 0 &&
-      (pending.moduleChoices ?? []).length === 0);
+      (pending.moduleChoices ?? []).length === 0 &&
+      (pending.salvage ?? []).length === 0);
   const done = noRewards && !showTally;
 
   useEffect(() => {
@@ -47,7 +49,9 @@ export const RewardsScreen = () => {
             : {})}
         />
       ) : null}
-      {pending === null ? null : packaged ? (
+      {pending === null ? null : (pending.salvage ?? []).length > 0 ? (
+        <SalvagePick faces={pending.salvage ?? []} />
+      ) : packaged ? (
         <PackageReward
           choices={pending.dieChoices ?? []}
           moduleChoices={pending.moduleChoices ?? []}

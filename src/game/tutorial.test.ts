@@ -138,6 +138,7 @@ describe("coach mark gating", () => {
         shape: DEFAULT_SHAPE,
         edgeMarks: {},
         wormholes: {},
+        spots: [],
         bossReach: [],
       },
     });

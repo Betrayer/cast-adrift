@@ -1,6 +1,5 @@
 import { useTranslation } from 'react-i18next';
 import { schoolGlyphPath } from '@/data/glyphs';
-import { CHARGE_CAP } from '@/game/battle/resolver';
 import type { SlotProjection } from '@/game/battle/view';
 import {
   affinityNote,
@@ -23,11 +22,11 @@ export interface SlotCardProps {
   legal: boolean;
   goal: boolean;
   charge: number;
+  chargeCap: number;
   onTap: (slotId: SlotId) => void;
+  formula?: boolean;
   preview?: boolean;
 }
-
-const CHARGE_PIPS = 10;
 
 export const SlotGlyph = ({ school }: { school: School }) => {
   const glyph = schoolGlyphPath(school, 6, 6, 4.4);
@@ -65,7 +64,9 @@ export const SlotCard = ({
   legal,
   goal,
   charge,
+  chargeCap,
   onTap,
+  formula = false,
   preview = false,
 }: SlotCardProps) => {
   const { t } = useTranslation(['battle']);
@@ -79,6 +80,7 @@ export const SlotCard = ({
       type="button"
       {...(preview ? {} : { 'data-slot': slotId })}
       {...(preview || !goal ? {} : { 'data-goal': '1' })}
+      {...(formula ? { 'data-formula': '1' } : {})}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
       className={[
@@ -106,6 +108,9 @@ export const SlotCard = ({
       <span className={styles.cap}>
         {shrunk ? t('battle:slot.capShrunk', { cap: slot.cap, mk: slot.mk }) : cap}
       </span>
+      {blocked ? (
+        <span className={styles.blocked}>{t('battle:jam')}</span>
+      ) : null}
       {note === null ? null : (
         <span
           className={`${styles.affinity ?? ''} ${
@@ -125,16 +130,20 @@ export const SlotCard = ({
           {projectionText(t, slotId, projection)}
         </span>
       )}
-      {blocked ? <span className={styles.blocked}>{t('battle:jam')}</span> : null}
       <span className={styles.well} {...(preview ? {} : { 'data-well': '' })} />
       {slotId === 'reactor' ? (
-        <span className={styles.pips} aria-hidden>
-          {Array.from({ length: CHARGE_PIPS }, (_, i) => (
+        <span
+          className={styles.pips}
+          aria-hidden
+          {...(preview ? {} : { 'data-charge-pips': String(chargeCap) })}
+        >
+          {Array.from({ length: chargeCap }, (_, i) => (
             <span
               key={i}
               className={`${styles.pip ?? ''} ${
-                i < Math.min(charge, CHARGE_CAP) ? styles.pipOn ?? '' : ''
+                i < Math.min(charge, chargeCap) ? styles.pipOn ?? '' : ''
               }`}
+              data-pip={i < Math.min(charge, chargeCap) ? 'on' : 'off'}
             />
           ))}
         </span>

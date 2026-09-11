@@ -35,6 +35,22 @@
   animation: plateUp 520ms 220ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
 }
 
+.weather {
+  position: relative;
+  padding: 8px 16px;
+  border: 1px solid var(--ca-line);
+  border-radius: 12px;
+  background: var(--ca-surface2);
+  animation: plateUp 520ms 140ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
+}
+
+.weatherName {
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
 .cta {
   position: relative;
   animation: plateUp 520ms 420ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
@@ -51,6 +67,6 @@
   }
 }
 
-:root[data-ca-motion='reduced'] .wash, :root[data-ca-motion='reduced'] .plate, :root[data-ca-motion='reduced'] .fragment, :root[data-ca-motion='reduced'] .cta {
+:root[data-ca-motion='reduced'] .wash, :root[data-ca-motion='reduced'] .plate, :root[data-ca-motion='reduced'] .fragment, :root[data-ca-motion='reduced'] .weather, :root[data-ca-motion='reduced'] .cta {
   animation: none;
 }

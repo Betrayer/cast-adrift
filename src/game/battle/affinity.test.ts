@@ -68,8 +68,8 @@ describe("green → Engines affinity", () => {
     const snap = harnessSnap([die]);
     place(snap, "d0", "engines");
     expect(resolvePlayerPhase(snap).next.evasion).toEqual({
-      dodgePct: 42,
-      glancingPct: 21,
+      dodgePct: 10,
+      glancingPct: 25,
       intercept: false,
     });
   });

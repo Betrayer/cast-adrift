@@ -122,6 +122,23 @@ export const resolveWeaponTarget = (
   return { enemy: fallback };
 };
 
+export const scatterTargets = (next: BattleSnapshot): EnemyState[] => {
+  const chosen = resolveWeaponTarget(next);
+  const alive = aliveEnemies(next);
+  if (chosen === undefined) return alive;
+  const headId = chosen.enemy.id;
+  return [
+    ...alive.filter((e) => e.id === headId),
+    ...alive.filter((e) => e.id !== headId),
+  ];
+};
+
+export const stripShield = (enemy: EnemyState, n: number): number => {
+  const stripped = Math.max(0, Math.min(n, enemy.shield));
+  enemy.shield -= stripped;
+  return stripped;
+};
+
 export const applyWeaponDamage = (
   next: BattleSnapshot,
   target: WeaponTarget,

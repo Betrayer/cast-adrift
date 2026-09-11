@@ -23,6 +23,8 @@ export interface SlotProjection {
   sensor: SensorResult | null;
   overflowHull: number;
   jammed: boolean;
+  hits: number;
+  fragments: readonly number[];
 }
 
 const EMPTY: Omit<SlotProjection, "slotId" | "base" | "inherited"> = {
@@ -34,6 +36,8 @@ const EMPTY: Omit<SlotProjection, "slotId" | "base" | "inherited"> = {
   sensor: null,
   overflowHull: 0,
   jammed: false,
+  hits: 0,
+  fragments: [],
 };
 
 export const boardWithDie = (
@@ -88,6 +92,7 @@ const collect = (
     return { slotId, base, inherited, ...EMPTY };
   }
   const value = head.value ?? base;
+  const landed = own.filter((b) => b.kind === "damage");
   return {
     slotId,
     base,
@@ -100,6 +105,8 @@ const collect = (
     sensor: head.sensor ?? null,
     overflowHull: own.reduce((sum, b) => sum + (b.overflowHull ?? 0), 0),
     jammed: own.some((b) => b.kind === "spinalJam"),
+    hits: landed.length,
+    fragments: landed.map((b) => b.amount),
   };
 };
 

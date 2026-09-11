@@ -13,37 +13,28 @@ import { PERK_BY_ID } from "@/data/perks";
 import { RESONANCE_BONUSES } from "@/data/resonance";
 import { MECHANIC_TAGS, SYSTEM_TAGS, type ContentTag } from "@/data/tags";
 import { computeCensus } from "@/game/battle/resonance";
-import {
-  DODGE_PCT_CAP,
-  DODGE_PCT_PER_VALUE,
-  GLANCING_PCT_CAP,
-  GLANCING_PCT_PER_VALUE,
-  INTERCEPT_VALUE,
-  VULNERABLE_CAP,
-} from "@/game/battle/resolver";
+import { VULNERABLE_CAP } from "@/game/battle/resolver";
+import { manoeuvreVars } from "@/screens/Battle/board/SlotGrid";
 import { loadoutCensus } from "@/game/effects/census";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
+import type { ShipId } from "@/data/ships";
 import type { School } from "@/types/content";
 import styles from "./BuildSheet.module.css";
 
-const SYSTEM_NOTES: readonly {
+interface SystemNote {
   id: string;
   title: string;
   body: string;
   vars?: Record<string, number>;
-}[] = [
+}
+
+const systemNotes = (shipId: ShipId): readonly SystemNote[] => [
   {
     id: "manoeuvre",
     title: "battle:manoeuvreTitle",
     body: "battle:manoeuvreWhy",
-    vars: {
-      dodge: DODGE_PCT_PER_VALUE,
-      glancing: GLANCING_PCT_PER_VALUE,
-      dodgeCap: DODGE_PCT_CAP,
-      glancingCap: GLANCING_PCT_CAP,
-      intercept: INTERCEPT_VALUE,
-    },
+    vars: manoeuvreVars(shipId),
   },
   {
     id: "targeting",
@@ -70,6 +61,7 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
   const deck = useRunStore((s) => s.deck);
   const perks = useRunStore((s) => s.perks);
   const modules = useRunStore((s) => s.modules);
+  const shipId = useRunStore((s) => s.shipId);
   const banished = useRunStore((s) => s.banishedPerks);
   const engravings = useMetaStore((s) => s.engravings);
 
@@ -146,7 +138,7 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
           <Text size="xs" c={tokens.faint} className={styles.sectionTitle}>
             {t("battle:systemsTitle")}
           </Text>
-          {SYSTEM_NOTES.map((note) => (
+          {systemNotes(shipId).map((note) => (
             <div key={note.id} className={styles.entry} data-system-note={note.id}>
               <Text size="sm" fw={600} c={tokens.text}>
                 {t(note.title)}

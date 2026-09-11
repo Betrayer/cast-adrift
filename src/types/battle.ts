@@ -6,6 +6,8 @@ import type {
   SlotId,
   SubsystemAura,
 } from "@/types/content";
+import type { EchoNodeId } from "@/data/echo";
+import type { FireModeId } from "@/data/fireModes";
 import type { ShipId } from "@/data/ships";
 import type { Statuses } from "@/game/battle/statuses";
 import type {
@@ -42,6 +44,8 @@ export interface SlotState {
   mk: 1 | 2 | 3;
   jamOn?: number;
   dieUid?: string;
+  modes?: readonly FireModeId[];
+  mode?: FireModeId;
 }
 
 export interface SubsystemState {
@@ -121,6 +125,8 @@ export interface BattleSnapshot {
   chartPicks?: string[];
   mutators?: string[];
   modules?: string[];
+  officers?: string[];
+  echo?: EchoNodeId;
   engravings?: Readonly<Record<string, readonly string[]>>;
   flags?: string[];
   counters?: Record<string, number>;

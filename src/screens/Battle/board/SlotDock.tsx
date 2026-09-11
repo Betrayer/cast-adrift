@@ -46,7 +46,7 @@ export const ReserveButton = ({
 };
 
 export const SlotDock = () => {
-  const { board, ordered, legal, projections, reserved, reserveMax } =
+  const { board, ordered, legal, projections, modes, reserved, reserveMax } =
     useDockModel();
   const { root } = useDockAnchors(ordered.length);
 
@@ -57,6 +57,7 @@ export const SlotDock = () => {
         ordered={ordered}
         legal={legal.slots}
         projections={projections}
+        modes={modes}
       />
       <ReserveButton
         legal={legal.reserve}

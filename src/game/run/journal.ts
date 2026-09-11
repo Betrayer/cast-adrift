@@ -8,6 +8,13 @@ export type AxisSource = "choice" | "drift" | "beacon";
 
 export type WormholeBranch = "ride" | "bypass";
 
+export type CargoStep =
+  | "taken"
+  | "moved"
+  | "delivered"
+  | "dropped"
+  | "lapsed";
+
 export type JournalBody =
   | { k: "choice"; event: string; option: string; text: LocKey; consequence?: LocKey }
   | { k: "consequence"; origin: LocKey }
@@ -22,22 +29,61 @@ export type JournalBody =
       to: NodeId;
       rows: number;
       direction: ThrowDirection;
-    };
+    }
+  | { k: "cargo"; step: CargoStep; cargo: string; n: number }
+  | { k: "singularity" }
+  | { k: "bark"; line: LocKey }
+  | { k: "system"; line: LocKey };
 
 export type JournalEntry = JournalBody & {
   id: number;
   sector: number;
 };
 
-export const logJournal = (body: JournalBody): void => {
+export const AUTH_ERROR_PREFIX = "settings:account.error.";
+
+export const logJournal = (body: JournalBody): number =>
   useNarrativeStore
     .getState()
     .pushJournal({ ...body, sector: useRunStore.getState().sector });
-};
+
+const inRun = (): boolean => useRunStore.getState().active;
 
 export const logConsequence = (origin: LocKey): void => {
-  useNarrativeStore.getState().pushConsequence(origin);
-  logJournal({ k: "consequence", origin });
+  const journalId = logJournal({ k: "consequence", origin });
+  useNarrativeStore
+    .getState()
+    .pushFeed({ source: "consequence", key: origin, journalId });
+};
+
+export const logBark = (line: LocKey): void => {
+  const journalId = inRun() ? logJournal({ k: "bark", line }) : null;
+  useNarrativeStore.getState().pushFeed({ source: "bark", key: line, journalId });
+};
+
+export const logSystemLine = (line: LocKey): void => {
+  const journalId = inRun() ? logJournal({ k: "system", line }) : null;
+  useNarrativeStore
+    .getState()
+    .pushFeed({ source: "system", key: line, journalId });
+};
+
+export const logAuthError = (code: string): void => {
+  useNarrativeStore.getState().pushFeed({
+    source: "system",
+    key: `${AUTH_ERROR_PREFIX}${code}`,
+    journalId: null,
+    tone: "alert",
+    scope: "app",
+    interactive: false,
+  });
+};
+
+export const logAchievement = (achievement: string): void => {
+  const journalId = inRun() ? logJournal({ k: "achievement", achievement }) : null;
+  useNarrativeStore
+    .getState()
+    .pushFeed({ source: "achievement", key: achievement, journalId });
 };
 
 export const applyAxisDelta = (n: number, source: AxisSource): void => {

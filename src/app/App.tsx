@@ -10,14 +10,16 @@ import {
 import { AudioDirector } from '@/components/AudioDirector';
 import { BuildSheetHost } from '@/components/BuildSheetHost';
 import { CoachMarks } from '@/components/CoachMarks';
+import { CommsFeed } from '@/components/CommsFeed';
 import { DevOverlay } from '@/components/DevOverlay';
 import { DevPanel } from '@/components/DevPanel';
+import { EchoCoreHost } from '@/components/EchoCoreHost';
 import { MemoryCeremony } from '@/components/MemoryCeremony';
 import { MergeCard } from '@/components/MergeCard';
 import { PerfOverlay } from '@/components/PerfOverlay';
+import { ReplaceHost } from '@/components/ReplaceHost';
 import { RotateGate } from '@/components/RotateGate';
 import { SystemMenu } from '@/components/SystemMenu';
-import { ToastHost } from '@/components/ToastHost';
 import { VoucherCeremony } from '@/components/VoucherCeremony';
 import {
   resolveReducedMotion,
@@ -53,10 +55,12 @@ export const App = () => {
       <AudioDirector />
       <SystemMenu />
       <BuildSheetHost />
-      <ToastHost />
+      <EchoCoreHost />
+      <CommsFeed />
       <MemoryCeremony />
       <VoucherCeremony />
       <MergeCard />
+      <ReplaceHost />
       <CoachMarks />
       <RotateGate />
       <DevOverlay />

@@ -1,6 +1,13 @@
 import { describe, expect, it } from "vitest";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
-import { decidePlacements, decideReroll } from "@/game/battle/policy";
+import {
+  applyEchoActive,
+  applyOfficerActive,
+  decidePlacements,
+  decideReroll,
+  echoLookUids,
+  readyEcho,
+} from "@/game/battle/policy";
 import {
   advanceTurn,
   resolveEnemyPhase,
@@ -12,7 +19,9 @@ import {
   createEnemyStream,
   type MkLevels,
 } from "@/game/battle/setup";
+import { echoToken } from "@/data/echo";
 import { createStreams, deriveSeed } from "@/services/rng";
+import type { FireModeId } from "@/data/fireModes";
 import type { BattleSnapshot, SlotId } from "@/types/battle";
 
 const INTENDED_DECK: readonly string[] = [
@@ -33,6 +42,7 @@ const applyPlacement = (
   snap: BattleSnapshot,
   uid: string,
   slotId: SlotId,
+  mode?: FireModeId,
 ): void => {
   const die = snap.dice.find((d) => d.uid === uid);
   const slot = snap.slots[slotId];
@@ -40,6 +50,7 @@ const applyPlacement = (
   die.state = "placed";
   die.slot = slotId;
   slot.dieUid = uid;
+  if (mode !== undefined) slot.mode = mode;
 };
 
 const simulateGate = (rootSeed: number): boolean => {
@@ -55,6 +66,7 @@ const simulateGate = (rootSeed: number): boolean => {
     { tide: 2, hull: 30, hullMax: 30, chargeCap: 10 },
   );
 
+  const spent: string[] = [];
   for (let round = 0; round < 30; round += 1) {
     const rerolls = decideReroll(snap);
     if (rerolls.length > 0) {
@@ -64,14 +76,34 @@ const simulateGate = (rootSeed: number): boolean => {
           : d,
       );
     }
-    const decision = decidePlacements(snap);
+    const ready = readyEcho(snap, spent);
+    const look = echoLookUids(snap, spent);
+    if (ready !== undefined && look.length > 0) {
+      snap.dice = snap.dice.map((d) =>
+        look.includes(d.uid) && d.state === "tray"
+          ? { ...d, value: Math.max(d.value, streams.dice.int(1, d.tier)) }
+          : d,
+      );
+      spent.push(echoToken(ready));
+    }
+    const decision = decidePlacements(snap, spent);
     if (decision.targetId !== null) snap.targetId = decision.targetId;
     for (const p of decision.placements) {
-      if (canPlaceDie(snap, p.uid, p.slot)) applyPlacement(snap, p.uid, p.slot);
+      if (canPlaceDie(snap, p.uid, p.slot)) {
+        applyPlacement(snap, p.uid, p.slot, p.mode);
+      }
     }
     if (decision.reserveUid !== undefined) {
       const die = snap.dice.find((d) => d.uid === decision.reserveUid);
       if (die?.state === "tray") die.state = "reserved";
+    }
+    if (decision.active !== undefined) {
+      snap = applyOfficerActive(snap, decision.active);
+      spent.push(decision.active);
+    }
+    if (decision.echo !== undefined) {
+      snap = applyEchoActive(snap, decision.echo);
+      spent.push(echoToken(decision.echo));
     }
     snap = resolvePlayerPhase(snap).next;
     if (snap.outcome !== undefined) break;

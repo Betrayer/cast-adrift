@@ -8,14 +8,24 @@ export { mitigationOf } from "@/game/battle/view/forecast";
 export type { Mitigation } from "@/game/battle/view/forecast";
 export {
   ACTIVE_IDS,
+  CABIN_IDS,
+  cabinAction,
+  cabinOfficer,
   consoleActions,
   consoleShape,
+  echoAction,
+  echoActionDead,
+  echoBattleNode,
+  ECHO_ACTION_ID,
   fateMaxUses,
+  nudgeChargePrice,
   nudgeCostFor,
+  officerMarkDead,
   selectedDie,
 } from "@/game/battle/view/actions";
 export type {
   ActiveActionId,
+  CabinActionId,
   ConsoleAction,
   ConsoleActionId,
   ConsoleActions,
@@ -34,14 +44,21 @@ export {
   goalDiceNow,
   goalSlotsNow,
   legalTargets,
+  livingEnemyCount,
+  modeBlockFor,
   moveAllowedNow,
   pendingCheckMoves,
   placeBlockFor,
   reserveCapacity,
   reservedCount,
   slotAllowedNow,
+  slotFireModes,
 } from "@/game/battle/view/legal";
-export type { LegalTargets, PlaceBlock } from "@/game/battle/view/legal";
+export type {
+  LegalTargets,
+  ModeBlock,
+  PlaceBlock,
+} from "@/game/battle/view/legal";
 export {
   orderBadgeFor,
   orderInverted,

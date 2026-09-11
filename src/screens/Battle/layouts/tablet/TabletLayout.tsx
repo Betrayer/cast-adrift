@@ -2,6 +2,7 @@ import { isSlotBlocked, isSlotShrunk } from '@/game/battle/setup';
 import { goalSlotsNow } from '@/game/battle/view';
 import { useRegion } from '@/screens/Battle/board/measure';
 import { ReserveButton } from '@/screens/Battle/board/SlotDock';
+import { SlotModeBadge } from '@/screens/Battle/board/SlotModeBadge';
 import {
   onSlotTap,
   useDockAnchors,
@@ -28,7 +29,7 @@ import screenStyles from '@/screens/Battle/BattleScreen.module.css';
 import styles from './Tablet.module.css';
 
 export const Conveyor = () => {
-  const { board, ordered, legal, projections, reserved, reserveMax } =
+  const { board, ordered, legal, projections, modes, reserved, reserveMax } =
     useDockModel();
   const { root } = useDockAnchors(ordered.length);
 
@@ -37,20 +38,28 @@ export const Conveyor = () => {
       {ordered.map((slotId, index) => {
         const slot = board.slots[slotId];
         if (slot === undefined) return null;
+        const mode = modes[slotId];
         return (
-          <SlotRow
+          <div
             key={slotId}
-            slotId={slotId}
-            slot={slot}
-            order={index + 1}
-            projection={projections[slotId]}
-            occupiedBy={slot.dieUid}
-            blocked={isSlotBlocked(board, slotId)}
-            shrunk={isSlotShrunk(board, slotId)}
-            legal={legal.slots.includes(slotId)}
-            goal={goalSlotsNow(board).includes(slotId)}
-            onTap={onSlotTap}
-          />
+            className={`${styles.rowCell ?? ''} ${
+              mode === undefined ? '' : styles.rowCellMode ?? ''
+            }`}
+          >
+            <SlotRow
+              slotId={slotId}
+              slot={slot}
+              order={index + 1}
+              projection={projections[slotId]}
+              occupiedBy={slot.dieUid}
+              blocked={isSlotBlocked(board, slotId)}
+              shrunk={isSlotShrunk(board, slotId)}
+              legal={legal.slots.includes(slotId)}
+              goal={goalSlotsNow(board).includes(slotId)}
+              onTap={onSlotTap}
+            />
+            <SlotModeBadge model={mode} place="row" />
+          </div>
         );
       })}
       <ReserveButton

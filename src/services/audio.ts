@@ -170,8 +170,27 @@ export interface SfxOptions {
   gain?: number;
 }
 
+export interface SfxCall {
+  id: SfxId;
+  gain: number;
+}
+
+const SFX_LOG_CAP = 32;
+
+const sfxCalls: SfxCall[] = [];
+
+export const recentSfx = (): readonly SfxCall[] => [...sfxCalls];
+
+export const clearSfxLog = (): void => {
+  sfxCalls.length = 0;
+};
+
 export const playSfx = (id: SfxId, options?: SfxOptions): void => {
   if (typeof window === "undefined") return;
+  if (import.meta.env.VITE_E2E === "1") {
+    sfxCalls.push({ id, gain: options?.gain ?? 1 });
+    if (sfxCalls.length > SFX_LOG_CAP) sfxCalls.shift();
+  }
   if (!initialized) initAudio();
   if (bed.suspended) return;
   const volume = sfxVolume();

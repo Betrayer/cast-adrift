@@ -5,6 +5,8 @@ import {
   applyAxisDelta,
   journalAxisHistory,
   journalBySector,
+  logAuthError,
+  logBark,
   logJournal,
   settleSectorDrift,
 } from "@/game/run/journal";
@@ -16,6 +18,9 @@ import { useRunStore } from "@/stores/runStore";
 
 const journal = () => useNarrativeStore.getState().journal;
 
+const story = () =>
+  journal().filter((e) => e.k !== "bark" && e.k !== "system");
+
 describe("run journal", () => {
   beforeEach(() => {
     abandonRun();
@@ -24,7 +29,7 @@ describe("run journal", () => {
 
   it("starts empty and records the choice an outcome came from", () => {
     startRun(42);
-    expect(journal()).toHaveLength(0);
+    expect(story()).toHaveLength(0);
     applyOutcome(
       {
         text: "content:events.probe.out.take",
@@ -33,7 +38,7 @@ describe("run journal", () => {
       createStream(1),
       { eventId: "probe", optionId: "take", optionIndex: 0 },
     );
-    const entries = journal();
+    const entries = story();
     expect(entries).toHaveLength(1);
     const first = entries[0];
     expect(first?.k).toBe("choice");
@@ -55,11 +60,12 @@ describe("run journal", () => {
       createStream(1),
       { eventId: "probe", optionId: "take", optionIndex: 0 },
     );
-    const kinds = journal().map((e) => e.k);
+    const kinds = story().map((e) => e.k);
     expect(kinds).toEqual(["choice", "chain", "consequence"]);
-    expect(useNarrativeStore.getState().consequence?.origin).toBe(
-      "content:consequence.maraFriend",
-    );
+    expect(
+      useNarrativeStore.getState().feed.find((m) => m.source === "consequence")
+        ?.key,
+    ).toBe("content:consequence.maraFriend");
   });
 
   it("records an axis shift with its source and builds a history", () => {
@@ -101,7 +107,7 @@ describe("run journal", () => {
     logJournal({ k: "memory", order: 1 });
     useRunStore.setState({ sector: 3 });
     logJournal({ k: "memory", order: 2 });
-    const bySector = journalBySector(journal());
+    const bySector = journalBySector(story());
     expect(bySector.get(1)).toHaveLength(1);
     expect(bySector.get(3)).toHaveLength(1);
   });
@@ -114,14 +120,14 @@ describe("run journal", () => {
     abandonRun();
     expect(journal()).toHaveLength(0);
     expect(restoreRunSnapshot(snapshot)).toBe(true);
-    expect(journal().map((e) => e.k)).toEqual(["beacon", "axis"]);
+    expect(story().map((e) => e.k)).toEqual(["beacon", "axis"]);
   });
 
   it("a new run does not inherit the previous run's journal", () => {
     startRun(42);
     logJournal({ k: "memory", order: 1 });
     startRun(43);
-    expect(journal()).toHaveLength(0);
+    expect(story()).toHaveLength(0);
   });
 });
 
@@ -142,5 +148,23 @@ describe("death closure", () => {
     startRun(42);
     endRun(true);
     expect(useAppStore.getState().screen).toBe("summary");
+  });
+
+  it("leaves the run's chatter behind and lets the ceremony's own rows through", () => {
+    startRun(42);
+    useNarrativeStore.getState().clearFeed();
+    logBark("content:bark.resume.a");
+    logAuthError("network");
+    expect(useNarrativeStore.getState().feed).toHaveLength(2);
+
+    endRun(true);
+    const sources = useNarrativeStore.getState().feed.map((m) => m.source);
+    expect(sources).not.toContain("bark");
+    expect(sources).toContain("system");
+    for (const message of useNarrativeStore.getState().feed) {
+      expect(message.scope === "app" || message.source === "achievement").toBe(
+        true,
+      );
+    }
   });
 });

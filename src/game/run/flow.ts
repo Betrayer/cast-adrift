@@ -2,12 +2,22 @@ import { ascensionMods, MAX_ASCENSION } from "@/data/ascension";
 import { dossierId } from "@/data/codex";
 import { contractDef } from "@/data/contracts";
 import { DIE_BY_ID } from "@/data/dice";
-import { MODULE_BY_ID } from "@/data/modules";
 import { STARTER_DECK } from "@/data/decks";
 import { computeMutatorMods } from "@/data/mutators";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { beaconsResolved } from "@/data/events/beacons";
-import { sealFinalMemory, syncMemoryArc } from "@/game/narrative/memoryArc";
+import {
+  echoNodesCrossed,
+  echoSoftLands,
+  echoEquipped,
+  echoStartCharge,
+} from "@/data/echo";
+import { memoryFragmentCount } from "@/data/narrative/memories";
+import {
+  lifetimeFragments,
+  sealFinalMemory,
+  syncMemoryArc,
+} from "@/game/narrative/memoryArc";
 import {
   CHECK_DECK,
   CHECK_ENEMY_HP_PCT,
@@ -30,17 +40,37 @@ import {
   areConnected,
   nodeById,
   wormholeFor,
+  type MapGraph,
   type MapNode,
   type NodeId,
 } from "@/game/map/types";
 import {
   bypassTargetFor,
+  isGentleRide,
+  openLandings,
   rollThrow,
+  throwCost,
   type WormholeThrow,
 } from "@/game/map/wormhole";
 import { chaos } from "@/services/chaos";
-import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
+import {
+  MINIBOSS_PACKAGE_SCRAP,
+  ptsForDie,
+  sellValue,
+} from "@/game/economy/prices";
+import {
+  announceReanchor,
+  cargoChargeCap,
+  cargoNodeToll,
+  cargoSlotTier,
+  deliverCargo,
+  lapseCargo,
+  reanchorCargo,
+  releaseCargo,
+  spendCargoBark,
+} from "@/game/run/cargo";
 import { pushRunCloud } from "@/game/run/cloud";
+import { grantDie, grantModule } from "@/game/run/inventory";
 import {
   buildEncounterIds,
   pickBoss,
@@ -51,8 +81,26 @@ import {
   applyEdgeMotifs,
   applyHoleToll,
   applyNodeMotifs,
+  disintegrationPctFor,
 } from "@/game/run/motifs";
-import { logJournal, settleSectorDrift } from "@/game/run/journal";
+import {
+  logConsequence,
+  logJournal,
+  settleSectorDrift,
+} from "@/game/run/journal";
+import {
+  ACT_SCOPED_FACES,
+  applySalvageFace,
+  isSalvageNode,
+  rollSalvageOffer,
+  salvageStreamFor,
+  SALVAGE_DECLINED,
+} from "@/game/run/salvage";
+import {
+  weatherIn,
+  withoutWeather,
+  withWeatherFor,
+} from "@/game/run/weather";
 import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
 import { computePerkMods } from "@/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
@@ -95,7 +143,7 @@ import {
   metaHasFeature,
   unlockContextOf,
 } from "@/game/meta/unlockState";
-import { useSummaryStore } from "@/stores/summaryStore";
+import { useSummaryStore, type DeathCause } from "@/stores/summaryStore";
 import { captureRunSnapshot } from "@/game/run/snapshot";
 import { trackEvent } from "@/services/analytics";
 import { now } from "@/services/clock";
@@ -123,14 +171,17 @@ import type { SlotId } from "@/types/battle";
 import type { School } from "@/types/content";
 import type { FlagValue, ForcedBattle } from "@/types/events";
 
-import { BASE_TIDE_CAP, tideCapFor } from "@/game/run/tide";
+import {
+  BASE_TIDE_CAP,
+  JUMPS_PER_TIDE,
+  jumpsPerTideFor,
+  tideCapFor,
+} from "@/game/run/tide";
 
-export { BASE_TIDE_CAP, tideCapFor };
+export { BASE_TIDE_CAP, JUMPS_PER_TIDE, jumpsPerTideFor, tideCapFor };
 
-export const JUMPS_PER_TIDE = 4;
 export const WORMHOLE_REVEAL = 1;
 export const STARTING_SCRAP = 0;
-export const MINIBOSS_PACKAGE_SCRAP: readonly [number, number] = [30, 40];
 
 const STORM_SCHOOLS: readonly School[] = [
   "red",
@@ -210,9 +261,6 @@ export interface NodeResult {
   deepScan?: boolean;
 }
 
-export const jumpsPerTideFor = (mutators: readonly string[]): number =>
-  Math.max(1, JUMPS_PER_TIDE + computeMutatorMods(mutators).jumpsPerTideDelta);
-
 const sectorsClearedCount = (): number => {
   const run = useRunStore.getState();
   return Math.max(0, Math.min(SECTOR_COUNT, run.stats.bosses));
@@ -253,9 +301,15 @@ const settleContract = (win: boolean): { stars: number; newStars: number } => {
   return { stars: countStars(mask), newStars: gained };
 };
 
-export const endRun = (win: boolean): void => {
+const deathParams = (cause: DeathCause): Record<string, string> =>
+  cause === "singularity" ? { death: "1", cause } : { death: "1" };
+
+export const endRun = (win: boolean, cause?: DeathCause): void => {
   syncActionStats();
+  useNarrativeStore.getState().dropRunFeed();
   const run = useRunStore.getState();
+  const deathCause: DeathCause =
+    cause ?? (run.hull <= 0 ? "hull" : "abandon");
   const meta = useMetaStore.getState();
   const contract = run.mode === "contract" ? settleContract(win) : null;
   const counts = {
@@ -268,7 +322,8 @@ export const endRun = (win: boolean): void => {
   const cleared = sectorsClearedCount();
   const xpMult =
     1 +
-    computeRunMods(run.perks, run.chartPicks, run.modules).xpMultPct / 100;
+    computeRunMods(run.perks, run.chartPicks, run.modules, run.officers)
+      .xpMultPct / 100;
   const xpGain = Math.round(runXp(counts, run.ascension) * xpMult);
   const beacons = beaconsResolved(run.flags);
   const hullPct = run.hullMax <= 0 ? 0 : (run.hull / run.hullMax) * 100;
@@ -331,6 +386,7 @@ export const endRun = (win: boolean): void => {
     fromLevel: award.fromLevel,
     toLevel: award.toLevel,
     win,
+    cause: win ? null : deathCause,
     milestones,
     mode: run.mode,
     score: isScoredMode(run.mode) ? scoreBreakdown(run.stats) : null,
@@ -344,14 +400,21 @@ export const endRun = (win: boolean): void => {
       params: {
         sector: run.sector,
         depth: depthFor(run.sectorIndex, run.depthRow),
-        cause: run.hull <= 0 ? "hull" : "abandon",
+        cause: deathCause,
       },
     });
   }
-  useRunStore.setState({ active: false });
+  useRunStore.setState({
+    active: false,
+    pendingSwaps: [],
+    officers: [],
+    pendingOfficerBark: false,
+    echoUsed: false,
+  });
+  releaseCargo();
   if (isScoredMode(run.mode)) void finishScoredRun();
   if (win) useAppStore.getState().go(summaryScreenFor(run.mode));
-  else useAppStore.getState().go("ending", { death: "1" });
+  else useAppStore.getState().go("ending", deathParams(deathCause));
   autosaveRun();
 };
 
@@ -390,8 +453,17 @@ const announceVictory = (
   else emitBark("battleWin");
 };
 
+const announceEchoCrossings = (before: number): void => {
+  for (const def of echoNodesCrossed(before, lifetimeFragments())) {
+    logConsequence(`run:echo.opened.${def.id}`);
+  }
+};
+
 export const unlockNextMemory = (): void => {
-  if (syncMemoryArc().length > 0) emitBark("memory");
+  const before = lifetimeFragments();
+  const fresh = syncMemoryArc().length > 0;
+  announceEchoCrossings(before);
+  if (fresh) emitBark("memory");
 };
 
 const encounterInit = (pocket: boolean) => {
@@ -426,6 +498,10 @@ const runBattleInit = (
     slotTierDelta.sensors =
       (slotTierDelta.sensors ?? 0) + mut.sensorsTierDelta;
   }
+  for (const [slot, delta] of Object.entries(cargoSlotTier(s.cargo))) {
+    const key = slot as SlotId;
+    slotTierDelta[key] = (slotTierDelta[key] ?? 0) + delta;
+  }
   const disabledSlots: SlotId[] = [
     ...(setup.sensorsDisabled === true ? (["sensors"] as SlotId[]) : []),
     ...(setup.shieldsDisabled === true
@@ -449,6 +525,8 @@ const runBattleInit = (
     chartPicks: s.chartPicks,
     mutators: s.mutators,
     modules: s.modules,
+    officers: s.officers,
+    echo: s.echo ?? undefined,
     engravings: useMetaStore.getState().engravings,
     flags: Object.keys(s.flags),
     runCounters: s.counters,
@@ -457,7 +535,9 @@ const runBattleInit = (
     runScrap: s.scrap,
     chargeCap: Math.max(
       1,
-      runChargeCap(s.perks, s.chartPicks, s.modules) + mut.chargeCapDelta,
+      runChargeCap(s.perks, s.chartPicks, s.modules, s.officers) +
+        mut.chargeCapDelta +
+        cargoChargeCap(s.cargo),
     ),
     rerollSizeBonus: s.rerollSizeRun,
     forcedTraits: setup.forcedTraits,
@@ -498,7 +578,7 @@ const startBattleNode = (node: MapNode): void => {
   useBattleStore.getState().startBattle(
     {
       enemyIds: withEnemyCopies(enemyIds),
-      startCharge: mods.startCharge,
+      startCharge: mods.startCharge + echoStartCharge(s.echo),
       ...runBattleInit(node.id, node.pocket === true, {
         inverted: node.inverted,
         storm: node.storm,
@@ -531,7 +611,7 @@ export const startEventBattle = (follow: ForcedBattle): void => {
   useBattleStore.getState().startBattle(
     {
       enemyIds: withEnemyCopies(enemyIds),
-      startCharge: mods.startCharge,
+      startCharge: mods.startCharge + echoStartCharge(s.echo),
       ...runBattleInit(
         `ev:${s.position}`,
         nodeById(s.map).get(s.position)?.pocket === true,
@@ -551,6 +631,7 @@ export const startEventBattle = (follow: ForcedBattle): void => {
 const routeToNode = (node: MapNode): void => {
   const go = useAppStore.getState().go;
   applyNodeMotifs(node, useRunStore.getState().sector);
+  deliverCargo(node);
   emitRunHook("nodeEnter", {
     node: {
       nodeId: node.id,
@@ -639,6 +720,10 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   const meta = useMetaStore.getState();
   const shipId = setup.ship ?? meta.selectedShip;
   const chartPicks = setup.chartDisabled === true ? [] : [...meta.chartPicks];
+  const echo = echoEquipped(
+    meta.selectedEcho,
+    memoryFragmentCount(meta.codex),
+  );
   const deckIds =
     setup.deckPreset ??
     (meta.hangar.deck.length >= 3 ? meta.hangar.deck : STARTER_DECK);
@@ -669,6 +754,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     scrap: STARTING_SCRAP,
     shipId,
     chartPicks,
+    echo,
     tide: Math.max(0, setup.tideStart ?? 0),
     ascension,
     startedAt: now(),
@@ -716,6 +802,7 @@ export const startDailyRun = (date: string): void => {
 
 export const advanceSector = (): void => {
   settleSectorDrift();
+  lapseCargo();
   const s = useRunStore.getState();
   const endless = s.mode === "drift";
   const lastIndex = s.crossedThreshold ? SECTORS.length : SECTOR_COUNT;
@@ -723,14 +810,19 @@ export const advanceSector = (): void => {
     ? s.sectorIndex + 1
     : Math.min(lastIndex, s.sectorIndex + 1);
   const nextSector = endless ? contentSector(nextIndex) : nextIndex;
+  const mutators =
+    s.mode === "campaign"
+      ? withWeatherFor(s.mutators, s.seed, nextIndex, nextSector)
+      : withoutWeather(s.mutators);
   const map = generateSectorMap(
     createStream(deriveSeed(s.seed, `map:${String(nextIndex)}`)),
     nextSector,
-    mapOptionsFor(s.mutators, s.mode),
+    mapOptionsFor(mutators, s.mode),
   );
   useRunStore.setState({
     sector: nextSector,
     sectorIndex: nextIndex,
+    mutators,
     map,
     position: START_NODE_ID,
     depthRow: 0,
@@ -744,9 +836,12 @@ export const advanceSector = (): void => {
     lastWormhole: null,
     pendingDeepScan: false,
     bonusReveal: 0,
+    sectorReveal: 0,
   });
   useRunStore.getState().noteDepth(depthFor(nextIndex, 0));
   useAppStore.getState().go("interstitial");
+  const weather = weatherIn(mutators);
+  if (weather !== null) logConsequence(weather.line);
   emitBark(`sectorEnter:${String(nextSector)}`);
   autosaveRun();
   pushRunCloud();
@@ -768,17 +863,24 @@ const stepTide = (s: RunValues): TideStep => {
   return { tide, jumpsSinceTide: 0, raised: tide > s.tide };
 };
 
-export const jumpTo = (toNodeId: NodeId): boolean => {
+const stepInto = (toNodeId: NodeId, alongEdge: boolean): boolean => {
   const s = useRunStore.getState();
   if (!s.active || s.map === null || s.position === null) return false;
   if (s.position === toNodeId) return false;
   if (s.visited.includes(toNodeId)) return false;
-  if (!areConnected(s.map, s.position, toNodeId)) return false;
+  if (alongEdge && !areConnected(s.map, s.position, toNodeId)) return false;
   const node = nodeById(s.map).get(toNodeId);
   if (node === undefined) return false;
   if (node.hole === true) return false;
 
   const step = stepTide(s);
+  const settled = reanchorCargo(
+    s.cargo,
+    s.map,
+    toNodeId,
+    s.visited,
+    s.sectorIndex,
+  );
 
   recordAction(`jump:${toNodeId}`);
   applyEdgeMotifs(s.map, s.position, toNodeId, s.sector);
@@ -790,7 +892,9 @@ export const jumpTo = (toNodeId: NodeId): boolean => {
     pendingWormhole: null,
     pendingDeepScan: false,
     bonusReveal: 0,
+    cargo: settled.cargo,
   });
+  announceReanchor(settled);
   useRunStore.getState().bumpStats({ jumps: 1 });
   useRunStore.getState().noteDepth(depthFor(s.sectorIndex, node.row));
   if (step.raised) emitBark("tideUp");
@@ -798,6 +902,8 @@ export const jumpTo = (toNodeId: NodeId): boolean => {
   autosaveRun();
   return true;
 };
+
+export const jumpTo = (toNodeId: NodeId): boolean => stepInto(toNodeId, true);
 
 export const openWormhole = (holeId: NodeId): boolean => {
   const s = useRunStore.getState();
@@ -845,8 +951,8 @@ export const bypassHole = (holeId: NodeId): boolean => {
     rows: (to?.row ?? 0) - (nodeById(gate.map).get(gate.from)?.row ?? 0),
     direction: "forward",
   });
-  emitBark("wormhole");
-  return jumpTo(target);
+  emitBark("holeBypass");
+  return stepInto(target, false);
 };
 
 export const enterNode = (nodeId: NodeId): boolean => {
@@ -867,35 +973,114 @@ export const resumeUnenteredNode = (): boolean => {
   return enterNode(s.position);
 };
 
+export type WormholeRide =
+  | { kind: "landed"; throw: WormholeThrow }
+  | { kind: "fatal" };
+
+const disintegrate = (): void => {
+  useRunStore.setState({ pendingWormhole: null });
+  useMetaStore.getState().bumpLifetime({ disintegrations: 1 });
+  logJournal({ k: "singularity" });
+  endRun(false, "singularity");
+};
+
+const echoSoftLandThrow = (
+  map: MapGraph,
+  from: NodeId,
+  hole: NodeId,
+  visited: readonly NodeId[],
+): WormholeThrow => {
+  const origin = nodeById(map).get(from);
+  const ahead =
+    origin === undefined
+      ? []
+      : openLandings(map, from, visited)
+          .filter((node) => node.row > origin.row)
+          .sort(
+            (a, b) =>
+              throwCost(origin, a) - throwCost(origin, b) ||
+              (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+          );
+  const landing = ahead[0];
+  const cost =
+    landing === undefined || origin === undefined
+      ? 0
+      : throwCost(origin, landing);
+  return {
+    from,
+    hole,
+    landing: landing?.id ?? null,
+    budget: Math.ceil(cost),
+    direction: "forward",
+    cost,
+    rows:
+      landing === undefined || origin === undefined
+        ? 0
+        : landing.row - origin.row,
+    gentle: true,
+    fallback: landing === undefined ? "stalled" : "none",
+  };
+};
+
+export const canSoftLandWormhole = (): boolean => {
+  const s = useRunStore.getState();
+  return echoSoftLands(s.echo) && !s.echoUsed;
+};
+
 export const rideWormhole = (
   holeId: NodeId,
   route = true,
-): WormholeThrow | null => {
+  softLand = false,
+): WormholeRide | null => {
   const gate = wormholeGate(holeId);
   if (gate === null) return null;
   const s = gate.run;
-  const roll = rollThrow(
-    {
-      map: gate.map,
-      from: gate.from,
-      hole: holeId,
-      visited: s.visited,
-      rides: s.stats.wormholeRides,
-    },
-    chaos,
-  );
+  const softLanded = softLand && echoSoftLands(s.echo) && !s.echoUsed;
+  const roll = softLanded
+    ? echoSoftLandThrow(gate.map, gate.from, holeId, s.visited)
+    : rollThrow(
+        {
+          map: gate.map,
+          from: gate.from,
+          hole: holeId,
+          visited: s.visited,
+          rides: s.stats.wormholeRides,
+        },
+        chaos,
+      );
+  const gentleLanded = softLanded && roll.landing !== null;
+  if (gentleLanded) useRunStore.getState().spendEcho();
+  const unmadePct = disintegrationPctFor(s.sector);
+  if (
+    !softLanded &&
+    unmadePct > 0 &&
+    !isGentleRide(s.stats.wormholeRides) &&
+    chaos.roll(unmadePct)
+  ) {
+    disintegrate();
+    return { kind: "fatal" };
+  }
   const landingId =
     roll.landing ??
-    bypassTargetFor(gate.map, gate.from, holeId, s.visited);
+    (softLanded
+      ? null
+      : bypassTargetFor(gate.map, gate.from, holeId, s.visited));
   const node = landingId === null ? undefined : nodeById(gate.map).get(landingId);
   if (node === undefined || landingId === null) {
     useRunStore.setState({ pendingWormhole: null, lastWormhole: roll });
     autosaveRun();
-    return roll;
+    return { kind: "landed", throw: roll };
   }
 
   const settled: WormholeThrow = { ...roll, landing: landingId };
   const step = stepTide(s);
+  const hold = reanchorCargo(
+    s.cargo,
+    gate.map,
+    landingId,
+    s.visited,
+    s.sectorIndex,
+  );
   recordAction(`warp:${landingId}`);
   useRunStore.setState({
     position: landingId,
@@ -906,7 +1091,9 @@ export const rideWormhole = (
     lastWormhole: settled,
     pendingDeepScan: false,
     bonusReveal: WORMHOLE_REVEAL,
+    cargo: hold.cargo,
   });
+  announceReanchor(hold);
   useRunStore.getState().bumpStats({ jumps: 1, wormholeRides: 1 });
   useMetaStore.getState().bumpLifetime({ wormholeRides: 1 });
   settleLifetimeAchievements();
@@ -918,11 +1105,11 @@ export const rideWormhole = (
     rows: settled.rows,
     direction: settled.direction,
   });
-  emitBark("wormhole");
+  emitBark("wormholeRide");
   if (step.raised) emitBark("tideUp");
   autosaveRun();
   if (route) enterNode(landingId);
-  return settled;
+  return { kind: "landed", throw: settled };
 };
 
 const afterBossVictory = (): void => {
@@ -960,10 +1147,12 @@ const finalizeNode = (
   result: NodeResult,
   pendingRewards: RunValues["pendingRewards"],
 ): void => {
+  if (spendCargoBark()) emitBark("cargoDelivered");
   const run = useRunStore.getState();
 
   if (result.scrap !== undefined && result.scrap > 0) run.addScrap(result.scrap);
   if (result.setHull !== undefined) run.setHull(result.setHull);
+  cargoNodeToll(node);
   if (result.deepScan === true) run.setPendingDeepScan(true);
   const typeDelta =
     node.type === "elite"
@@ -1001,7 +1190,9 @@ const finalizeNode = (
     pendingRewards !== null &&
     (pendingRewards.dieDrop !== null ||
       pendingRewards.perkChoices.length > 0 ||
-      (pendingRewards.dieChoices ?? []).length > 0);
+      (pendingRewards.dieChoices ?? []).length > 0 ||
+      (pendingRewards.moduleChoices ?? []).length > 0 ||
+      (pendingRewards.salvage ?? []).length > 0);
   run.setPendingRewards(hasRewards ? pendingRewards : null);
 
   if (
@@ -1115,6 +1306,11 @@ const minibossPackage = (
 const takeBattleTally = (): BattleTally =>
   battleTally(useBattleStore.getState());
 
+const endBattleStore = (): void => {
+  useRunStore.getState().keepBattleLog(useBattleStore.getState().log);
+  useBattleStore.getState().reset();
+};
+
 export const resolveRunBattle = (): void => {
   const b = useBattleStore.getState();
   if (b.outcome === undefined) return;
@@ -1131,7 +1327,7 @@ export const resolveRunBattle = (): void => {
     const lost = takeBattleTally();
     run.noteBattleTally(lost);
     noteBattleLifetime(lost, false);
-    useBattleStore.getState().reset();
+    endBattleStore();
     endRun(false);
     return;
   }
@@ -1147,7 +1343,7 @@ export const resolveRunBattle = (): void => {
   const enemyDefIds = b.enemies.map((e) => e.defId);
   const tally = takeBattleTally();
   const survivedLethal = b.survivedLethal;
-  useBattleStore.getState().reset();
+  endBattleStore();
   run.noteBattleTally(tally);
   noteBattleLifetime(
     tally,
@@ -1159,7 +1355,12 @@ export const resolveRunBattle = (): void => {
   announceVictory(enemyDefIds, battleHull);
 
   const lootStream = createStream(deriveSeed(run.seed, `loot:${node.id}`));
-  const mods = computeRunMods(run.perks, run.chartPicks, run.modules);
+  const mods = computeRunMods(
+    run.perks,
+    run.chartPicks,
+    run.modules,
+    run.officers,
+  );
   const mut = computeMutatorMods(run.mutators);
   const sectorScrapMult = sectorDef(run.sector).scrapMult;
   const reward = computeNodeReward(
@@ -1167,6 +1368,7 @@ export const resolveRunBattle = (): void => {
     lootStream,
     mut.lootRarityStep,
     node.pocket === true,
+    sectorScrapMult,
   );
   const rewardScrap = Math.round(
     reward.scrap *
@@ -1174,7 +1376,7 @@ export const resolveRunBattle = (): void => {
       (1 + (mods.scrapMultPct + mut.scrapMultPct) / 100),
   );
 
-  const pending: NonNullable<RunValues["pendingRewards"]> =
+  const base: NonNullable<RunValues["pendingRewards"]> =
     node.type === "miniboss"
       ? minibossPackage(lootStream, run, mut.lootRarityStep, node.id)
       : {
@@ -1188,6 +1390,18 @@ export const resolveRunBattle = (): void => {
             ? { moduleChoices: [rollModule(lootStream, run.modules, "common")] }
             : {}),
         };
+  const pending: NonNullable<RunValues["pendingRewards"]> = isSalvageNode(
+    node.type,
+  )
+    ? {
+        ...base,
+        salvage: rollSalvageOffer(
+          run.seed,
+          node.id,
+          isSectorExit(node) ? ACT_SCOPED_FACES : [],
+        ),
+      }
+    : base;
 
   noteDraftOffer(pending.perkChoices);
 
@@ -1231,7 +1445,7 @@ export const resolveEventBattle = (): void => {
     const lost = takeBattleTally();
     run.noteBattleTally(lost);
     noteBattleLifetime(lost, false);
-    useBattleStore.getState().reset();
+    endBattleStore();
     endRun(false);
     return;
   }
@@ -1247,7 +1461,7 @@ export const resolveEventBattle = (): void => {
   const enemyDefIds = b.enemies.map((e) => e.defId);
   const tally = takeBattleTally();
   const survivedLethal = b.survivedLethal;
-  useBattleStore.getState().reset();
+  endBattleStore();
   run.noteBattleTally(tally);
   noteBattleLifetime(tally, false);
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
@@ -1255,7 +1469,12 @@ export const resolveEventBattle = (): void => {
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
 
-  const mods = computeRunMods(run.perks, run.chartPicks, run.modules);
+  const mods = computeRunMods(
+    run.perks,
+    run.chartPicks,
+    run.modules,
+    run.officers,
+  );
   if (pending.lootDie !== null || pending.lootRarity !== null) {
     const lootStream = createStream(
       deriveSeed(run.seed, `evloot:${pending.originNodeId}`),
@@ -1267,8 +1486,7 @@ export const resolveEventBattle = (): void => {
         pending.lootRarity ?? "uncommon",
         computeMutatorMods(run.mutators).lootRarityStep,
       );
-    if (run.deck.length < DECK_CAP) run.addDie(defId);
-    else run.addScrap(sellValue(ptsForDie(defId)));
+    grantDie(defId);
   }
   for (const [key, value] of pending.setFlags) run.setFlag(key, value);
   for (const key of pending.clearFlags) run.clearFlag(key);
@@ -1315,14 +1533,26 @@ export const resolveDieReward = (keep: boolean): void => {
   const pending = run.pendingRewards;
   if (pending === null || pending.dieDrop === null) return;
   const dieId = pending.dieDrop;
-  if (keep && run.deck.length < DECK_CAP) {
-    run.addDie(dieId);
-  } else {
-    run.addScrap(sellValue(ptsForDie(dieId)));
-  }
+  if (keep) grantDie(dieId);
+  else run.addScrap(sellValue(ptsForDie(dieId)));
   useRunStore
     .getState()
     .setPendingRewards({ ...pending, dieDrop: null });
+  autosaveRun();
+};
+
+export const resolveSalvagePick = (faceId: string | null): void => {
+  const run = useRunStore.getState();
+  const pending = run.pendingRewards;
+  if (pending === null || (pending.salvage ?? []).length === 0) return;
+  if (faceId === null) {
+    logConsequence(SALVAGE_DECLINED);
+  } else {
+    if (!(pending.salvage ?? []).includes(faceId)) return;
+    const nodeId = pending.draftNodeId ?? run.position ?? "salvage";
+    if (!applySalvageFace(faceId, salvageStreamFor(run.seed, nodeId))) return;
+  }
+  useRunStore.getState().setPendingRewards({ ...pending, salvage: [] });
   autosaveRun();
 };
 
@@ -1330,8 +1560,7 @@ export const resolveDieChoice = (dieId: string): void => {
   const run = useRunStore.getState();
   const pending = run.pendingRewards;
   if (pending === null || (pending.dieChoices ?? []).length === 0) return;
-  if (run.deck.length < DECK_CAP) run.addDie(dieId);
-  else run.addScrap(sellValue(ptsForDie(dieId)));
+  grantDie(dieId);
   useRunStore
     .getState()
     .setPendingRewards({ ...pending, dieChoices: [], moduleChoices: [] });
@@ -1342,9 +1571,7 @@ export const resolveModuleChoice = (moduleId: string): void => {
   const run = useRunStore.getState();
   const pending = run.pendingRewards;
   if (pending === null || (pending.moduleChoices ?? []).length === 0) return;
-  if (!run.addModule(moduleId)) {
-    run.addScrap(MODULE_BY_ID.get(moduleId)?.price ?? 0);
-  }
+  grantModule(moduleId);
   useRunStore
     .getState()
     .setPendingRewards({ ...pending, dieChoices: [], moduleChoices: [] });
@@ -1370,10 +1597,11 @@ const redrawDraft = (label: string): void => {
   if (pending === null) return;
   const nodeId = pending.draftNodeId ?? run.position ?? "draft";
   const stream = createStream(deriveSeed(run.seed, `${label}:${nodeId}`));
-  const choices = rollPerkChoices(
-    stream,
-    draftContext(run, pending.draftFloor),
-  );
+  const base = draftContext(run, pending.draftFloor);
+  const choices = rollPerkChoices(stream, {
+    ...base,
+    owned: [...base.owned, ...pending.perkChoices],
+  });
   useRunStore.getState().setPendingRewards({ ...pending, perkChoices: choices });
   noteDraftOffer(choices);
   autosaveRun();
@@ -1381,9 +1609,22 @@ const redrawDraft = (label: string): void => {
 
 export const banishPerkChoice = (perkId: string): void => {
   const run = useRunStore.getState();
-  if (run.pendingRewards === null) return;
+  const pending = run.pendingRewards;
+  if (pending === null) return;
+  if (!pending.perkChoices.includes(perkId)) return;
   if (!run.banishPerk(perkId)) return;
-  redrawDraft(`banish:${perkId}`);
+  const after = useRunStore.getState();
+  const kept = pending.perkChoices.filter((id) => id !== perkId);
+  const nodeId = pending.draftNodeId ?? after.position ?? "draft";
+  const base = draftContext(after, pending.draftFloor);
+  const replacement = rollPerkChoices(
+    createStream(deriveSeed(after.seed, `banish:${perkId}:${nodeId}`)),
+    { ...base, owned: [...base.owned, ...kept] },
+  ).slice(0, 1);
+  const choices = [...kept, ...replacement];
+  useRunStore.getState().setPendingRewards({ ...pending, perkChoices: choices });
+  noteDraftOffer(replacement);
+  autosaveRun();
 };
 
 export const rerollPerkDraft = (): void => {
@@ -1475,7 +1716,9 @@ export const crossThreshold = (): void => {
 
 export const chooseEnding = (endingId: string): void => {
   const run = useRunStore.getState();
+  const fragmentsBeforeSeal = lifetimeFragments();
   sealFinalMemory(endingId);
+  announceEchoCrossings(fragmentsBeforeSeal);
   run.setEnding(endingId, useMetaStore.getState().recordEnding(endingId));
   trackEvent({
     name: "ending",

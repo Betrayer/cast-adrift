@@ -14,8 +14,8 @@ import {
   type MetaStats,
   type VoucherKind,
 } from "@/stores/metaStore";
-import { useNarrativeStore } from "@/stores/narrativeStore";
-import { useRunStore, type RunStats } from "@/stores/runStore";
+import { logAchievement } from "@/game/run/journal";
+import type { RunStats } from "@/stores/runStore";
 import type { School } from "@/types/content";
 import type { FlagValue } from "@/types/events";
 
@@ -241,15 +241,7 @@ const grantRewards = (defs: readonly AchievementDef[]): AchievementSettlement =>
   for (const def of defs) {
     if (!meta.unlockAchievement(def.id)) continue;
     unlocked.push(def);
-    useNarrativeStore.getState().pushAchievement(def.id);
-    const run = useRunStore.getState();
-    if (run.active) {
-      useNarrativeStore.getState().pushJournal({
-        k: "achievement",
-        achievement: def.id,
-        sector: run.sector,
-      });
-    }
+    logAchievement(def.id);
     const reward = def.reward;
     if (reward === undefined) continue;
     if (reward.shards !== undefined && reward.shards > 0) {

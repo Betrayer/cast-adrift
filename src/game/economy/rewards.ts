@@ -107,11 +107,17 @@ export const dieForRarity = (
 export const POCKET_SCRAP_MULT = 1.5;
 export const POCKET_RARITY_STEP = 1;
 
+export const SALVAGE_CARVE_SCRAP = 8;
+
+export const salvageCarveFor = (sectorScrapMult: number): number =>
+  Math.round(SALVAGE_CARVE_SCRAP / Math.max(0.5, sectorScrapMult));
+
 export const computeNodeReward = (
   type: NodeType,
   rng: RngStream,
   rarityStep = 0,
   pocket = false,
+  sectorScrapMult = 1,
 ): NodeReward => {
   const step = rarityStep + (pocket ? POCKET_RARITY_STEP : 0);
   const scrap = (n: number): number =>
@@ -126,11 +132,13 @@ export const computeNodeReward = (
             : null,
       };
     case "elite":
-    case "miniboss":
+    case "miniboss": {
+      const base = rng.int(45, 60);
       return {
-        scrap: scrap(rng.int(45, 60)),
+        scrap: scrap(Math.max(0, base - salvageCarveFor(sectorScrapMult))),
         dieDrop: rollDrop(rng, DROP_WEIGHTS.elite, step),
       };
+    }
     case "boss":
       return {
         scrap: 80,

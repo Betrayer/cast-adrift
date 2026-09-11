@@ -6,6 +6,7 @@ import { tokens } from '@/app/theme';
 import { WarpStreaks } from '@/components/WarpStreaks';
 import { pickFragment } from '@/data/narrative/fragments';
 import { sectorDef } from '@/data/sectors';
+import { weatherIn } from '@/game/run/weather';
 import { playSfx } from '@/services/audio';
 import { createStream, deriveSeed } from '@/services/rng';
 import { useAppStore } from '@/stores/appStore';
@@ -19,6 +20,8 @@ export const InterstitialScreen = () => {
   const sector = useRunStore((s) => s.sector);
   const seed = useRunStore((s) => s.seed);
   const flags = useRunStore((s) => s.flags);
+  const mutators = useRunStore((s) => s.mutators);
+  const weather = weatherIn(mutators);
   const [seenOnArrival] = useState(() => useMetaStore.getState().seenFragments);
   const go = useAppStore((s) => s.go);
   const def = sectorDef(sector);
@@ -58,6 +61,22 @@ export const InterstitialScreen = () => {
           {t(def.name)}
         </Title>
       </Stack>
+      {weather === null ? null : (
+        <Stack
+          align="center"
+          gap={2}
+          className={styles.weather}
+          data-weather={weather.id}
+          data-testid="interstitial-weather"
+        >
+          <Text className={styles.weatherName} style={{ color: def.accent }}>
+            {t(weather.name)}
+          </Text>
+          <Text size="xs" c={tokens.dim} ta="center" maw={420}>
+            {t(weather.desc)}
+          </Text>
+        </Stack>
+      )}
       {fragment === null ? null : (
         <Text
           size="sm"

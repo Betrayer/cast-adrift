@@ -4,8 +4,15 @@ import { useTranslation } from "react-i18next";
 import type { TFunction } from "i18next";
 import { Screen } from "@/app/Screen";
 import { tokens } from "@/app/theme";
+import {
+  cargoDef,
+  cargoDescVars,
+  cargoPayout,
+  CARGO_IDS,
+} from "@/data/cargo";
 import { DIE_BY_ID } from "@/data/dice";
 import { ALL_EVENTS, EVENT_BY_ID } from "@/data/events";
+import { sectorDef } from "@/data/sectors";
 import { beaconsResolved, BEACON_FLAGS } from "@/data/events/beacons";
 import { schools } from "@/data/schools";
 import { SPEAKER_GLYPH, SPEAKER_TONE } from "@/data/speakers";
@@ -33,6 +40,7 @@ import { AxisMeter } from "@/components/AxisMeter";
 import { DieCard } from "@/components/DieCard";
 import { TapPopover } from "@/components/TapPopover";
 import { clampAxis } from "@/game/run/axis";
+import { cargoOfferable } from "@/game/run/cargo";
 import { emitEventOutcome } from "@/game/narrative/barks";
 import { useBackGuard } from "@/app/backGuard";
 import { completeNode, startEventBattle } from "@/game/run/flow";
@@ -130,7 +138,23 @@ const requirementLabel = (
       return req.min !== undefined
         ? t("run:event.reqAxisMin", { n: req.min })
         : t("run:event.reqAxisMax", { n: req.max ?? 0 });
+    case "cargo":
+      return t("run:event.reqCargo");
   }
+};
+
+const cargoTerms = (
+  option: EventOption,
+  sector: number,
+  t: TFunction<["run", "battle", "content"]>,
+): string | null => {
+  if (option.requires?.req !== "cargo") return null;
+  const def = cargoDef(option.requires.id);
+  if (def === undefined) return null;
+  return t("run:event.cargoTerms", {
+    drawback: t(def.desc, cargoDescVars(def)),
+    n: cargoPayout(def, sectorDef(sector).scrapMult),
+  });
 };
 
 interface CheckFace extends FaceDie {
@@ -346,6 +370,7 @@ const EventRunner = ({
   const flags = useRunStore((s) => s.flags);
   const deck = useRunStore((s) => s.deck);
   const mkLevels = useRunStore((s) => s.mkLevels);
+  const sector = useRunStore((s) => s.sector);
 
   const [checkOption, setCheckOption] = useState<EventOption | null>(null);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
@@ -360,6 +385,8 @@ const EventRunner = ({
     [deck],
   );
 
+  const offerableCargo = CARGO_IDS.filter((id) => cargoOfferable(id));
+
   const optionCtx: OptionContext = {
     scrap,
     hull,
@@ -367,6 +394,7 @@ const EventRunner = ({
     deck: deckRefs,
     mkLevels,
     flags,
+    offerableCargo,
   };
 
   const commit = (chosen: Outcome | null, optionIndex = -1): void => {
@@ -550,6 +578,16 @@ const EventRunner = ({
                         {requirementLabel(option.requires, t)}
                       </Text>
                     ) : null}
+                    {cargoTerms(option, sector, t) === null ? null : (
+                      <Text
+                        size="xs"
+                        c={tokens.faint}
+                        ta="center"
+                        data-event-cargo={option.id}
+                      >
+                        {cargoTerms(option, sector, t)}
+                      </Text>
+                    )}
                     {outcomeRatio(option) === null ? null : (
                       <Text size="xs" c={tokens.faint} ta="center">
                         {t("run:event.outcomeOdds", {

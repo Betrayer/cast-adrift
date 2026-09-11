@@ -5,6 +5,8 @@ import type { RunMode } from "@/stores/runStore";
 
 export type SubmitState = "idle" | "pending" | "sent" | "failed" | "offline";
 
+export type DeathCause = "hull" | "abandon" | "singularity";
+
 export interface RunResult {
   xpGain: number;
   shardGain: number;
@@ -18,6 +20,7 @@ export interface RunResult {
   fromLevel: number;
   toLevel: number;
   win: boolean;
+  cause: DeathCause | null;
   milestones: string[];
   mode: RunMode;
   score: ScoreBreakdown | null;

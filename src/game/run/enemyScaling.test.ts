@@ -239,3 +239,35 @@ describe("enemy scaling", () => {
     );
   });
 });
+
+describe("a negative hull bonus", () => {
+  it("thins the spawn instead of being clamped away", () => {
+    const base = ENEMY_BY_ID.get("raider")?.hp;
+    expect(base).toBeDefined();
+    if (base === undefined) return;
+    const clear = spawnEnemy("raider", "e", stream(), { hpBonusPct: 0 }).hpMax;
+    const thinned = spawnEnemy("raider", "e", stream(), {
+      hpBonusPct: -5,
+    }).hpMax;
+    expect(clear).toBe(base);
+    expect(thinned).toBe(Math.round(base * 0.95));
+    expect(thinned).toBeLessThan(clear);
+  });
+
+  it("multiplies with the sector curve and the tide, like the positive one", () => {
+    const pct = sectorHpPct({ sector: 5 });
+    expect(
+      scaleEnemyHp(100, { tide: 2, sectorHpPct: pct, hpBonusPct: -30 }),
+    ).toBe(Math.round(100 * 1.2 * (1 + pct / 100) * 0.7));
+  });
+
+  it("floors the hull at one rather than passing through zero", () => {
+    expect(scaleEnemyHp(40, { hpBonusPct: -100 })).toBe(1);
+    expect(scaleEnemyHp(40, { hpBonusPct: -250 })).toBe(1);
+  });
+
+  it("still discards a negative tide or sector curve", () => {
+    expect(scaleEnemyHp(40, { tide: -3 })).toBe(40);
+    expect(scaleEnemyHp(40, { sectorHpPct: -50 })).toBe(40);
+  });
+});

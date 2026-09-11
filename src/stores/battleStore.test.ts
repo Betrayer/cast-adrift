@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { STARTER_DECK } from "@/data/decks";
 import { createStreams } from "@/services/rng";
 import {
@@ -6,6 +6,7 @@ import {
   useBattleStore,
   type BattleValues,
 } from "@/stores/battleStore";
+import { useRunStore } from "@/stores/runStore";
 import type { RolledDie } from "@/types/battle";
 
 const start = (seed = 42, enemyIds: string[] = ["raider"]) => {
@@ -427,5 +428,102 @@ describe("resolution flow", () => {
     const kept = useBattleStore.getState().dice.find((d) => d.uid === uid);
     expect(kept?.state).toBe("tray");
     expect(kept?.value).toBe(6);
+  });
+});
+
+describe("setSlotMode", () => {
+  const startWithModes = (
+    modules: readonly string[] = ["autoloader"],
+    enemyIds: string[] = ["raider"],
+  ) => {
+    useBattleStore
+      .getState()
+      .startBattle(
+        { enemyIds, modules },
+        STARTER_DECK,
+        createStreams(42),
+      );
+  };
+
+  afterEach(() => {
+    useRunStore.getState().resetMk();
+  });
+
+  it("derives the module mode on both weapon slots and arms direct", () => {
+    startWithModes();
+    const { slots } = useBattleStore.getState();
+    expect(slots.weaponA?.modes).toEqual(["direct", "doublet"]);
+    expect(slots.weaponA?.mode).toBe("direct");
+    expect(slots.shields?.modes).toBeUndefined();
+  });
+
+  it("replaces the slots object by identity so projections re-run", () => {
+    startWithModes();
+    const before = useBattleStore.getState().slots;
+    useBattleStore.getState().setSlotMode("weaponA", "doublet");
+    const after = useBattleStore.getState().slots;
+    expect(after).not.toBe(before);
+    expect(after.weaponA?.mode).toBe("doublet");
+    expect(after.weaponB?.mode).toBe("direct");
+  });
+
+  it("refuses a mode the slot does not carry and notes the block", () => {
+    startWithModes();
+    useBattleStore.getState().setSlotMode("weaponA", "shunt");
+    const s = useBattleStore.getState();
+    expect(s.slots.weaponA?.mode).toBe("direct");
+    expect(s.lastBlock?.key).toBe("battle:block.notAllowed");
+    expect(s.lastBlock?.slotId).toBe("weaponA");
+  });
+
+  it("refuses a mode on a slot that carries none", () => {
+    startWithModes();
+    useBattleStore.getState().setSlotMode("shields", "direct");
+    const s = useBattleStore.getState();
+    expect(s.slots.shields?.mode).toBeUndefined();
+    expect(s.lastBlock?.key).toBe("battle:block.notAllowed");
+  });
+
+  it("refuses scatter against one living enemy and notes the reason", () => {
+    useRunStore.getState().setMk("weaponA", 3);
+    startWithModes([], ["raider"]);
+    expect(useBattleStore.getState().slots.weaponA?.modes).toEqual([
+      "direct",
+      "scatter",
+    ]);
+    useBattleStore.getState().setSlotMode("weaponA", "scatter");
+    const s = useBattleStore.getState();
+    expect(s.slots.weaponA?.mode).toBe("direct");
+    expect(s.lastBlock?.key).toBe("battle:block.needsTwoEnemies");
+  });
+
+  it("arms scatter once two enemies are alive", () => {
+    useRunStore.getState().setMk("weaponA", 3);
+    startWithModes([], ["raider", "raider"]);
+    useBattleStore.getState().setSlotMode("weaponA", "scatter");
+    expect(useBattleStore.getState().slots.weaponA?.mode).toBe("scatter");
+  });
+
+  it("keeps the armed mode across advanceTurn", () => {
+    startWithModes();
+    useBattleStore.getState().setSlotMode("weaponA", "doublet");
+    useBattleStore.getState().endTurn();
+    finish();
+    expect(useBattleStore.getState().slots.weaponA?.mode).toBe("doublet");
+  });
+
+  it("resets to direct when a new battle starts", () => {
+    startWithModes();
+    useBattleStore.getState().setSlotMode("weaponA", "doublet");
+    startWithModes();
+    expect(useBattleStore.getState().slots.weaponA?.mode).toBe("direct");
+  });
+
+  it("refuses to arm outside placement", () => {
+    startWithModes();
+    useBattleStore.getState().endTurn();
+    useBattleStore.getState().setSlotMode("weaponA", "doublet");
+    expect(useBattleStore.getState().slots.weaponA?.mode).toBe("direct");
+    finish();
   });
 });

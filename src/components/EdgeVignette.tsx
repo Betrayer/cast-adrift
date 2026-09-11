@@ -19,18 +19,19 @@ interface FlashStyle {
 }
 
 const FLASH_STYLE: Record<VignetteFlashKind, FlashStyle> = {
-  shieldGain: { color: 'var(--ca-school-blue-stroke)', alpha: 0.3, ms: 400 },
-  shieldBreak: { color: 'var(--ca-school-blue-stroke)', alpha: 0.38, ms: 520 },
-  hullHit: { color: 'var(--ca-danger)', alpha: 0.42, ms: 360 },
-  dodge: { color: 'var(--ca-school-green-stroke)', alpha: 0.3, ms: 240 },
-  glancing: { color: 'var(--ca-school-green-stroke)', alpha: 0.15, ms: 240 },
-  surge: { color: 'var(--ca-school-black-stroke)', alpha: 0.32, ms: 460 },
-  toll: { color: 'var(--ca-danger)', alpha: 0.34, ms: 320 },
+  shieldGain: { color: 'var(--ca-school-blue-stroke)', alpha: 0.4, ms: 400 },
+  shieldHold: { color: 'var(--ca-school-blue-stroke)', alpha: 0.38, ms: 300 },
+  shieldBreak: { color: 'var(--ca-school-blue-stroke)', alpha: 0.5, ms: 520 },
+  hullHit: { color: 'var(--ca-danger)', alpha: 0.55, ms: 360 },
+  dodge: { color: 'var(--ca-school-green-stroke)', alpha: 0.4, ms: 240 },
+  glancing: { color: 'var(--ca-school-green-stroke)', alpha: 0.22, ms: 240 },
+  surge: { color: 'var(--ca-school-black-stroke)', alpha: 0.42, ms: 460 },
+  toll: { color: 'var(--ca-danger)', alpha: 0.44, ms: 320 },
 };
 
 const RIM_ALPHA: Record<keyof VignetteRims, number> = {
-  shield: 0.16,
-  lowHull: 0.24,
+  shield: 0.22,
+  lowHull: 0.3,
 };
 
 const INTENSITY_SCALE: Record<VignetteIntensity, number> = {
@@ -38,9 +39,6 @@ const INTENSITY_SCALE: Record<VignetteIntensity, number> = {
   subtle: 0.5,
   full: 1,
 };
-
-const motionReduced = (): boolean =>
-  document.documentElement.dataset.caMotion === 'reduced';
 
 export const EdgeVignette = () => {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -111,7 +109,6 @@ export const EdgeVignette = () => {
         paintRims(event.rims);
         return;
       }
-      if (motionReduced()) return;
       if (useSettingsStore.getState().vignette === 'off') return;
       if (parked()) return;
       paintFlash(event.flash);

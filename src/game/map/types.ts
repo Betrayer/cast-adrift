@@ -18,6 +18,8 @@ export type LaneBlessing = "blessed" | "cursed";
 
 export type EdgeMark = "mine" | "pocket" | "wormhole";
 
+export type SpotId = string;
+
 export interface MapNode {
   id: NodeId;
   row: number;
@@ -29,6 +31,7 @@ export interface MapNode {
   inverted?: true;
   storm?: true;
   hole?: true;
+  spot?: SpotId;
   blessing?: LaneBlessing;
   tierWindow?: readonly [number, number];
 }
@@ -45,12 +48,20 @@ export interface WormholeEdge {
   bypass: NodeId;
 }
 
+export interface HoleSpot {
+  id: SpotId;
+  nodes: readonly NodeId[];
+  rows: readonly [number, number];
+  lanes: readonly [number, number];
+}
+
 export interface MapGraph {
   nodes: MapNode[];
   edges: [NodeId, NodeId][];
   shape: MapShape;
   edgeMarks: Record<string, EdgeMark>;
   wormholes: Record<string, WormholeEdge>;
+  spots: readonly HoleSpot[];
   bossReach: NodeId[];
 }
 
@@ -111,3 +122,13 @@ export const wormholeFor = (
   from: NodeId,
   to: NodeId,
 ): WormholeEdge | undefined => map.wormholes[edgeKey(from, to)];
+
+export const spotById = (
+  map: MapGraph,
+  spotId: SpotId,
+): HoleSpot | undefined => map.spots.find((spot) => spot.id === spotId);
+
+export const spotOf = (
+  map: MapGraph,
+  id: NodeId,
+): HoleSpot | undefined => map.spots.find((spot) => spot.nodes.includes(id));

@@ -10,10 +10,10 @@ import {
 import { fateOutcomeFor, FATE_TABLE } from "@/data/fate";
 import {
   ALL_MODULES,
-  moduleSlots,
   MODULE_BY_ID,
   MODULE_POOL,
 } from "@/data/modules";
+import { bayPurchasable, moduleSlots, shipBays } from "@/game/run/bays";
 import { moduleTags } from "@/data/modules/types";
 import { ALL_PERKS } from "@/data/perks";
 import type { ContentTag } from "@/data/tags";
@@ -40,10 +40,33 @@ describe("modules", () => {
     expect(moduleHasTrait(["ballastModule"], "escapePod")).toBe(false);
   });
 
-  it("caps the bay at two slots, three with the hub notable", () => {
-    expect(moduleSlots(0)).toBe(2);
-    expect(moduleSlots(1)).toBe(3);
-    expect(moduleSlots(9)).toBe(3);
+  it("reads the bay base off the ship", () => {
+    expect(shipBays("wanderer")).toBe(2);
+    expect(shipBays("ram")).toBe(2);
+    expect(shipBays("corsair")).toBe(2);
+    expect(shipBays("prism")).toBe(2);
+    expect(shipBays("ram-proto")).toBe(2);
+    expect(shipBays("ark")).toBe(3);
+    expect(shipBays("foundry")).toBe(3);
+  });
+
+  it("composes ship base, chart delta and the purchased bay under a cap of four", () => {
+    expect(moduleSlots("wanderer", 0, 0)).toBe(2);
+    expect(moduleSlots("wanderer", 1, 0)).toBe(3);
+    expect(moduleSlots("wanderer", 0, 1)).toBe(3);
+    expect(moduleSlots("wanderer", 1, 1)).toBe(4);
+    expect(moduleSlots("wanderer", 9, 1)).toBe(4);
+    expect(moduleSlots("ark", 0, 0)).toBe(3);
+    expect(moduleSlots("ark", 1, 0)).toBe(4);
+    expect(moduleSlots("ark", 1, 1)).toBe(4);
+    expect(moduleSlots("foundry", 2, 1)).toBe(4);
+  });
+
+  it("offers the shipyard bay once, and never past the cap", () => {
+    expect(bayPurchasable("wanderer", 0, 0)).toBe(true);
+    expect(bayPurchasable("wanderer", 0, 1)).toBe(false);
+    expect(bayPurchasable("ark", 1, 0)).toBe(false);
+    expect(bayPurchasable("ark", 0, 0)).toBe(true);
   });
 
   it("prices every module inside its DESIGN §9.3 band", () => {

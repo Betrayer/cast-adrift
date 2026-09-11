@@ -77,6 +77,14 @@ export const MEMORY_CODEX_IDS: readonly string[] = [
   ...FINAL_MEMORY_IDS,
 ];
 
+export const memoryFragmentCount = (codex: readonly string[]): number => {
+  const held = new Set(codex);
+  return (
+    NUMBERED_MEMORIES.filter((m) => held.has(m.codexId)).length +
+    (FINAL_MEMORY_IDS.some((id) => held.has(id)) ? 1 : 0)
+  );
+};
+
 export const memoryAt = (order: number): MemoryDef | undefined =>
   MEMORY_BY_ORDER.get(order);
 

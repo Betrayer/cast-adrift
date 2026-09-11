@@ -207,6 +207,18 @@ export const SECTOR3_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "haul",
+        label: "content:events.riftHarvest.opt.haul",
+        requires: { req: "cargo", id: "unstableCore" },
+        outcomes: [
+          {
+            text: "content:events.riftHarvest.out.haul",
+            effects: [{ k: "cargo", id: "unstableCore" }],
+            consequence: "content:consequence.cargoTaken",
+          },
+        ],
+      },
     ],
   },
   {

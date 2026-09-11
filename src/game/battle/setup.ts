@@ -2,6 +2,7 @@ import { A6_ELITE_SUBSYSTEM, ascensionMods } from "@/data/ascension";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
 import { dieHasGrant, type EngravingMap } from "@/data/engravings";
 import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies";
+import { DIRECT, fireModesForSlot } from "@/data/fireModes";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { overCapAllowed, shipProfile } from "@/game/battle/passives";
@@ -116,6 +117,19 @@ export const buildShipSlots = (
     slots[slotId] = { ...def, mk, cap: slotCapForMk(slotId, mk) };
   }
   return slots;
+};
+
+export const applyFireModes = (
+  slots: Partial<Record<SlotId, SlotState>>,
+  modules: readonly string[] = [],
+): Partial<Record<SlotId, SlotState>> => {
+  const out: Partial<Record<SlotId, SlotState>> = {};
+  for (const [key, slot] of Object.entries(slots) as [SlotId, SlotState][]) {
+    const modes = fireModesForSlot(key, slot.mk, modules);
+    out[key] =
+      modes.length > 1 ? { ...slot, modes, mode: DIRECT.id } : { ...slot };
+  }
+  return out;
 };
 
 export const applySlotOverrides = (
@@ -421,10 +435,13 @@ export const buildBattleSnapshot = (
     exceedCap: [],
     shipId,
     dice,
-    slots: applySlotOverrides(
-      buildShipSlots(shipId, mkLevels),
-      init.slotTierDelta,
-      init.disabledSlots,
+    slots: applyFireModes(
+      applySlotOverrides(
+        buildShipSlots(shipId, mkLevels),
+        init.slotTierDelta,
+        init.disabledSlots,
+      ),
+      init.modules ?? [],
     ),
     enemies,
     targetId: enemies[0]?.id ?? null,

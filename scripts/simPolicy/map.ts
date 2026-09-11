@@ -2,6 +2,7 @@ import { sectorDef } from "../../src/data/sectors";
 import {
   edgeKey,
   edgeMarkFor,
+  nodeById,
   outgoingEdges,
   type MapGraph,
   type MapNode,
@@ -43,8 +44,10 @@ export const ANOMALY_STREAK_PULL = 1.2;
 export const HOLE_PENALTY = 0.5;
 export const HOLE_PULL = 0.3;
 export const HOLE_GENTLE_PULL = 1.2;
+export const HOLE_CHAOTIC_PENALTY = 0.5;
 export const RIDE_HULL_FLOOR_PCT = 25;
 export const POCKET_BONUS = 0.35;
+export const CARGO_PULL = 1;
 export const FIGHT_TYPES: ReadonlySet<NodeType> = new Set([
   "battle",
   "elite",
@@ -58,7 +61,37 @@ export interface RouteState {
   anomalyStreak: number;
   scrap: number;
   wormholeRides: number;
+  deliveryReach?: ReadonlySet<string>;
 }
+
+export const deliveryReachOf = (
+  map: MapGraph,
+  targetId: string,
+  visited: readonly string[],
+): ReadonlySet<string> => {
+  const byId = nodeById(map);
+  const cleared = new Set(visited);
+  const reach = new Set<string>([targetId]);
+  const parents = new Map<string, string[]>();
+  for (const [from, to] of map.edges) {
+    const list = parents.get(to);
+    if (list === undefined) parents.set(to, [from]);
+    else list.push(from);
+  }
+  const queue: string[] = [targetId];
+  for (let head = 0; head < queue.length; head += 1) {
+    const id = queue[head];
+    if (id === undefined) continue;
+    for (const from of parents.get(id) ?? []) {
+      if (reach.has(from)) continue;
+      if (cleared.has(from)) continue;
+      if (byId.get(from)?.hole === true) continue;
+      reach.add(from);
+      queue.push(from);
+    }
+  }
+  return reach;
+};
 
 const causalityPenalty = (node: MapNode): number =>
   (node.unstable === true ? UNSTABLE_PENALTY : 0) +
@@ -92,7 +125,8 @@ export const holeStandIn = (
 
 export const holeBias = (state: RouteState): number => {
   if (isGentleRide(state.wormholeRides)) return -HOLE_GENTLE_PULL;
-  return state.hullPct >= RIDE_HULL_FLOOR_PCT ? -HOLE_PULL : HOLE_PENALTY;
+  const ride = state.hullPct >= RIDE_HULL_FLOOR_PCT ? -HOLE_PULL : HOLE_PENALTY;
+  return ride + HOLE_CHAOTIC_PENALTY;
 };
 
 export const ridesWormhole = (state: RouteState, roll: number): boolean => {
@@ -129,6 +163,7 @@ export const stepCost = (
     (node.cache === true ? -CACHE_BONUS : 0) +
     (node.pocket === true ? -POCKET_BONUS : 0) +
     (payoff === "anomaly" ? -anomalyPull(state) : 0) +
+    (state.deliveryReach?.has(node.id) === true ? -CARGO_PULL : 0) +
     (edgeMarkFor(map, from, node.id) === "mine" ? MINE_PENALTY : 0)
   );
 };

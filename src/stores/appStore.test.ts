@@ -15,6 +15,7 @@ const reset = (): void => {
     params: undefined,
     stack: [],
     systemMenu: false,
+    echoCore: false,
   });
 };
 
@@ -162,6 +163,27 @@ describe("appStore back semantics", () => {
     useAppStore.getState().setSystemMenu(true);
     useAppStore.getState().back();
     expect(useAppStore.getState().systemMenu).toBe(false);
+  });
+
+  it("closes the Echo core on go, on back and on a seeded stack", () => {
+    useAppStore.getState().go("runSetup");
+    useAppStore.getState().setEchoCore(true);
+    useAppStore.getState().go("hangar");
+    expect(useAppStore.getState().echoCore).toBe(false);
+
+    useAppStore.getState().setEchoCore(true);
+    useAppStore.getState().back();
+    expect(useAppStore.getState().echoCore).toBe(false);
+
+    useAppStore.getState().setEchoCore(true);
+    useAppStore.getState().go("runSetup");
+    expect(useAppStore.getState().echoCore).toBe(false);
+
+    useAppStore.getState().setEchoCore(true);
+    useAppStore
+      .getState()
+      .seed([{ screen: "menu", params: undefined }], "codex");
+    expect(useAppStore.getState().echoCore).toBe(false);
   });
 
   it("seeds a stack for a deep link so back always exists", () => {

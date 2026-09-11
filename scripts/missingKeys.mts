@@ -13,6 +13,8 @@ import { ALL_EVENTS } from "../src/data/events";
 import { FATE_TABLE } from "../src/data/fate";
 import { ALL_MODULES } from "../src/data/modules";
 import { MUTATORS } from "../src/data/mutators";
+import { SALVAGE_FACES } from "../src/data/salvage";
+import { WEATHER } from "../src/data/weather";
 import { FRAGMENTS } from "../src/data/narrative/fragments";
 import { KEEPER_LINES } from "../src/data/narrative/keeperLines";
 import {
@@ -96,6 +98,16 @@ for (const a of ASCENSIONS) {
 for (const m of MUTATORS) {
   add(m.name);
   add(m.desc);
+}
+for (const w of WEATHER) {
+  add(w.name);
+  add(w.desc);
+  add(w.line);
+}
+for (const f of SALVAGE_FACES) {
+  add(f.name);
+  add(f.desc);
+  add(f.line);
 }
 for (const r of RESONANCE_BONUSES) add(r.desc);
 for (const s of SHIPS) {

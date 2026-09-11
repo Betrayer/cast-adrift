@@ -12,6 +12,7 @@ import { Screen } from '@/app/Screen';
 import { tokens } from '@/app/theme';
 import { beaconsResolved } from '@/data/events/beacons';
 import { deathLineFor } from '@/data/narrative/deathLines';
+import { epitaphFor, type BlackBoxContext } from '@/data/narrative/blackBox';
 import { ENDING_SFX } from '@/data/audio';
 import {
   endingBeats,
@@ -98,6 +99,107 @@ const DeathEpilogue = () => {
           </Title>
           <Text c={tokens.accent} fw={600}>
             {t(deathLineFor(ctx))}
+          </Text>
+          <Text size="sm" c={tokens.faint}>
+            {t('run:ending.deathWhere', { sector: ctx.sector, depth: ctx.depth })}
+          </Text>
+          <Divider color={tokens.line} label={t('run:ending.tally')} />
+          <Stack gap={6}>
+            {tally.map((line, index) => (
+              <Text
+                key={line.id}
+                size="sm"
+                c={tokens.dim}
+                data-epilogue-line
+                className={styles.tallyLine}
+                style={{ animationDelay: `${String(index * 130)}ms` }}
+              >
+                {t(line.text, line.values)}
+              </Text>
+            ))}
+          </Stack>
+          <Button
+            size="md"
+            fullWidth
+            data-epilogue-continue
+            onClick={leaveDeathEpilogue}
+          >
+            {t('run:ending.continue')}
+          </Button>
+        </Stack>
+      </Paper>
+    </Screen>
+  );
+};
+
+const useBlackBoxContext = (): BlackBoxContext => {
+  const base = useEpilogueContext(true);
+  const rides = useRunStore((s) => s.stats.wormholeRides);
+  const bypassed = useRunStore((s) => s.stats.holesBypassed);
+  const hull = useRunStore((s) => s.hull);
+  const hullMax = useRunStore((s) => s.hullMax);
+  return useMemo(
+    () => ({ ...base, rides, bypassed, hull, hullMax }),
+    [base, rides, bypassed, hull, hullMax],
+  );
+};
+
+const BlackBoxEpilogue = () => {
+  const { t } = useTranslation(['run', 'content']);
+  const ctx = useBlackBoxContext();
+  const tally = useMemo(() => buildEpilogue(ctx, DEATH_TALLY_LINES), [ctx]);
+
+  useEffect(() => {
+    playSfx('epilogueSting');
+    duckMusic(2200);
+    haptic('ending');
+  }, []);
+
+  useEffect(() => {
+    const timers = tally.map((_, index) =>
+      window.setTimeout(
+        () => {
+          playSfx('journalStamp', { gain: 1.8 });
+        },
+        TALLY_DELAY_MS + index * DEATH_TALLY_STAGGER_MS,
+      ),
+    );
+    return () => {
+      for (const id of timers) window.clearTimeout(id);
+    };
+  }, [tally]);
+
+  return (
+    <Screen
+      centered
+      width="wide"
+      className={styles.blackBox}
+      background={
+        <div className={styles.horizon} data-blackbox-horizon>
+          <div className={styles.horizonCore} data-blackbox-core />
+        </div>
+      }
+    >
+      <Paper
+        bg="transparent"
+        p="xl"
+        radius="md"
+        w="100%"
+        className={styles.blackBoxCard}
+        data-testid="blackbox"
+      >
+        <Stack gap="md">
+          <Title order={3} c={tokens.danger}>
+            {t('run:ending.singularityTitle')}
+          </Title>
+          <Divider color={tokens.line} label={t('run:ending.blackBox')} />
+          <Text
+            c={tokens.accent}
+            fw={600}
+            data-blackbox-epitaph
+            className={styles.epitaph}
+          >
+            {t(epitaphFor(ctx))}
           </Text>
           <Text size="sm" c={tokens.faint}>
             {t('run:ending.deathWhere', { sector: ctx.sector, depth: ctx.depth })}
@@ -255,7 +357,9 @@ const VictoryEnding = ({ endingId }: { endingId: string }) => {
 
 export const EndingScreen = () => {
   const death = useAppStore((s) => s.params?.death) === '1';
+  const singularity = useAppStore((s) => s.params?.cause) === 'singularity';
   const endingId = useRunStore((s) => s.endingId);
+  if (death && singularity) return <BlackBoxEpilogue />;
   if (death || endingId === null) return <DeathEpilogue />;
   return <VictoryEnding endingId={endingId} />;
 };

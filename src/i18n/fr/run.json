@@ -37,7 +37,7 @@
       "beacon": "Balise",
       "boss": "Patron",
       "inverted": "inversé",
-      "hole": "Trou noir"
+      "hole": "Trou noir : la tache a avalé cette cellule"
     },
     "previewNode": "{{type}} · risque : {{risk}}",
     "previewPocket": "Détour : un butin plus intéressant, un combat plus difficile",
@@ -48,7 +48,12 @@
     },
     "hull": "Coque {{cur}}/{{max}}",
     "scrap": "Ferraille {{n}}",
-    "previewHole": "Trou noir : le contourner ou emprunter le trou de ver"
+    "previewHole": "La lisière répond pour toute la tache : la contourner, ou traverser le trou de ver",
+    "spotLabel": "Trou noir — toute la tache est un seul choix",
+    "conditions": "Conditions ×{{n}}",
+    "cargo": "Fret ▸{{n}}",
+    "cargoMany": "Fret ×{{n}}",
+    "previewDelivery": "Livraison : {{n}} de ferraille à l'arrivée"
   },
   "event": {
     "title": "Signal",
@@ -79,7 +84,9 @@
     "checkTierMax": "{{tier}}s et moins uniquement",
     "outcomeOdds": "cotes {{odds}}",
     "beaconTitle": "Balise",
-    "beaconCounter": "Balise {{n}} de {{max}}"
+    "beaconCounter": "Balise {{n}} de {{max}}",
+    "reqCargo": "nécessite une soute libre et une station devant",
+    "cargoTerms": "{{drawback}} · la livraison rapporte {{n}}"
   },
   "anomaly": {
     "title": "Anomalie",
@@ -202,12 +209,11 @@
     "prologueReplay": "Rediffusion",
     "badgeLegend": "Badges des dés"
   },
-  "consequenceToast": "Conséquence : {{text}}",
   "rewards": {
     "dieTitle": "Matrice récupérée",
     "keep": "Garder dans le paquet",
     "sell": "Vendre (+ {{n}})",
-    "deckFull": "Jeu complet (9)"
+    "replace": "Remplacer une matrice"
   },
   "perk": {
     "title": "Choisissez une mise à niveau",
@@ -227,8 +233,8 @@
     "sellTitle": "Vendre un dé",
     "empty": "Épuisé",
     "modulesTitle": "Modules {{used}} / {{max}}",
-    "modulesFull": "Baie pleine",
-    "rerollFree": "Réapprovisionnement (gratuit)"
+    "rerollFree": "Réapprovisionnement (gratuit)",
+    "owned": "Installé"
   },
   "shipyard": {
     "title": "Chantier naval",
@@ -244,7 +250,12 @@
     "hull": "Coque {{cur}}/{{max}}",
     "voucher": "Code promo Mk × {{n}} — un niveau gratuit",
     "voucherUse": "Gratuit",
-    "fuse": "Fusionner — {{n}}"
+    "fuse": "Fusionner — {{n}}",
+    "baysTitle": "Baies de modules {{used}} / {{max}}",
+    "baysEmpty": "Aucun module n'est installé.",
+    "demount": "Démontage et{{n}}",
+    "buyBay": "Achetez une box — {{n}}",
+    "bayDone": "Il n'y a plus de baies sur ce parcours."
   },
   "summary": {
     "victory": "Secteur dégagé",
@@ -266,7 +277,9 @@
     "dicePlaced": "Dés placés",
     "pct": "{{n}}%",
     "wormholeRides": "Manèges « Wormhole »",
-    "holesBypassed": "Trous contournés"
+    "holesBypassed": "Trous contournés",
+    "causeSingularity": "Singularité",
+    "cause": "Cause de la mort"
   },
   "prologue": {
     "title": "Prologue",
@@ -295,6 +308,8 @@
     "tally": "Ce que tu as laissé derrière toi",
     "continue": "Fermer le journal",
     "deathTitle": "C'est ici que s'achève la course",
+    "singularityTitle": "Il n’y aura pas d’épave",
+    "blackBox": "La dernière chose sur laquelle les instruments ont pu s'accorder",
     "deathWhere": "Secteur {{sector}} · profondeur {{depth}}"
   },
   "setup": {
@@ -320,10 +335,10 @@
     "scrap": "+ Déchet de{{n}}",
     "voucher": "Bon Mk × {{n}} — une mise à niveau gratuite dans n'importe quel chantier naval",
     "take": "Prendre",
-    "sell": "Vendre (+ {{n}})",
-    "hint": "Faites votre choix. Le tirage au sort des avantages va suivre.",
+    "hint": "Seul ce que vous prenez sort du paquet.",
     "module": "module",
-    "install": "Installer"
+    "install": "Installer",
+    "replace": "Remplacer"
   },
   "tutorial": {
     "next": "Suivant",
@@ -388,10 +403,11 @@
     "riftSplit": "Faille : les branches ne se rejoignent qu'au niveau de la porte",
     "inversion": "Série inversée : les systèmes sont traités du dernier au premier",
     "storm": "Tempête de probabilités : relance d'un dé placé lors de la résolution",
-    "blackHoles": "Trou noir : la cellule a disparu ; son sillon forme un trou de ver",
+    "blackHoles": "Trou noir : une tache avale plusieurs cellules ; sa lisière ouvre un trou de ver",
     "wormhole": "Le bord du trou de ver : un choix s'impose à la lisière",
     "bypass": "A frôlé le rebord : la coque a été éraflée par la marée",
-    "holeScorch": "Coque trop mince pour payer le péage — la jante t'a laissé passer"
+    "holeScorch": "Coque trop mince pour payer le péage — la jante t'a laissé passer",
+    "holeDrift": "La jante n'a rien pris — cette voie t'était déjà ouverte"
   },
   "tag": {
     "red": "Rouge",
@@ -484,7 +500,20 @@
       "forward": "plus profond",
       "backward": "retour"
     },
-    "achievement": "Réussite : {{name}}"
+    "singularity": "Coque avalée par la singularité — aucune sortie enregistrée",
+    "achievement": "Réussite : {{name}}",
+    "tabStory": "Histoire",
+    "tabBattle": "Combat",
+    "openBattle": "Journal de combat",
+    "battleLive": "Ce combat, tour le plus récent en premier.",
+    "battleLast": "Le dernier combat, tour le plus récent en premier.",
+    "cargo": {
+      "taken": "a pris {{name}} à bord, {{n}} rangées avant la livraison",
+      "moved": "la marque de livraison de {{name}} est passée à une station plus proche",
+      "delivered": "a livré {{name}} pour {{n}} de ferraille",
+      "dropped": "a largué {{name}} et perdu le paiement",
+      "lapsed": "le contrat sur {{name}} a expiré"
+    }
   },
   "memory": {
     "kicker": "Echo se souvient · extrait de {{n}} sur {{max}}",
@@ -550,15 +579,132 @@
   },
   "hole": {
     "title": "Trou noir",
-    "body": "La cellule a disparu. Son pourtour te laissera passer, ou t'emmènera là où il le décidera.",
+    "body": "La tache a pris ces cellules. Sa lisière te laissera passer autour, ou te jettera là où elle voudra.",
     "gentle": "Trou de ver stable",
     "gentleWhy": "Les deux premières descentes d'une série sont courtes et mènent toujours plus loin.",
     "bypass": "Faire le tour",
     "bypassCost": "Contournement : coque « {{n}} »",
     "bypassFree": "Contournement : gratuit — la coque ne peut pas payer",
+    "bypassDrift": "Contournement : gratuit — une voie que tu avais déjà",
+    "bypassNone": "Aucun contournement : toutes les voies au-delà de la jante sont déjà derrière toi",
     "ride": "Fais-le !",
     "rideCost": "Trajet : un trajet d'{{min}}à{{max}}, direction inconnue",
     "rideGentle": "Ride : une variante de l’{{min}}—{{max}}e, mais plus profonde",
-    "landed": "Lancé {{rows}} lignes {{way}}"
+    "landed": "Lancé {{rows}} lignes {{way}}",
+    "softLand": "Se poser en douceur",
+    "softLandWhy": "Une fois par partie : aucun jet — le nœud libre le plus proche devant",
+    "softLandSpent": "La charge d’Écho est déjà dépensée pour cette partie"
+  },
+  "bridge": {
+    "title": "Pont",
+    "open": "Pont",
+    "tab": {
+      "overview": "Présentation générale",
+      "dice": "Dés",
+      "modules": "Modules",
+      "perks": "Avantages"
+    },
+    "hull": "Coque {{cur}}/{{max}}",
+    "scrap": "Ferraille {{n}}",
+    "bays": "Bays {{used}} / {{max}}",
+    "bayEmpty": "baie vide",
+    "bayOffer": "+1 cale — débris de l'{{n}} au chantier naval",
+    "deckCount": "{{n}} de la terrasse / {{max}}",
+    "sellDiceHint": "On vend des dés à la boutique.",
+    "sellModule": "Vente + {{n}}",
+    "crewTitle": "Cabines des officiers {{used}}/{{max}}",
+    "cargoTitle": "Soute {{used}}/{{max}}",
+    "cabinEmpty": "cabine vide — sauve quelqu'un",
+    "cabinWho": "{{role}} · {{origin}}",
+    "cabinActive": "active · {{text}}",
+    "cabinPassive": "passive · {{text}}",
+    "passive": {
+      "scrapMultPct": "+{{n}} % de ferraille",
+      "scrapPerKill": "+{{n}} de ferraille par victime",
+      "battleEndHeal": "fin de combat : soigne {{n}} de coque",
+      "markBonusDelta": "les marques valent +{{n}} de dégâts",
+      "evasionDelta": "esquive +{{n}} %",
+      "rerollSizeDelta": "dés par relance : +{{n}}"
+    },
+    "cargoEmpty": "soute vide",
+    "cargoTerms": "livraison : station · {{rows}} rangées · rapporte {{n}}",
+    "dropCargo": "Larguer",
+    "dropTitle": "Larguer le fret ?",
+    "dropBody": "{{name}} passe par le sas. Le handicap cesse maintenant et les {{n}} de ferraille de la livraison sont perdus.",
+    "dropBodyAxis": "{{name}} passe par le sas. L'axe reste où il l'a déplacé et les {{n}} de ferraille de la livraison sont perdus.",
+    "dropNo": "Continuer à le porter",
+    "dropYes": "Larguer"
+  },
+  "replace": {
+    "title": "Remplacer",
+    "titleDie": "Nouvelle matrice",
+    "titleModule": "Nouveau module",
+    "fullDeck": "{{used}}s complètes sur le deck / {{max}} — qu'en pensez-vous ?",
+    "fullBay": "{{used}} complète de Bay / {{max}} — qu'est-ce qui se passe ?",
+    "toScrap": "→ « scrap » + «{{n}} »",
+    "sellNew": "Vendre le nouveau (+ {{n}})",
+    "cancel": "Annuler",
+    "titleOfficer": "Nouvel officier",
+    "fullCabins": "Cabines pleines {{used}}/{{max}} — qui débarque ?",
+    "disembark": "→ quitte le vaisseau",
+    "declineOfficer": "Les laisser là"
+  },
+  "feed": {
+    "source": {
+      "echo": "ÉCHO",
+      "consequence": "CONSÉQUENCE",
+      "achievement": "SUCCÈS",
+      "system": "SYSTÈME"
+    },
+    "dismiss": "Masquer",
+    "open": "Ouvrir dans le journal"
+  },
+  "weather": {
+    "title": "Conditions du secteur"
+  },
+  "salvage": {
+    "title": "Dépecer l'épave",
+    "take": "Prendre",
+    "decline": "Laisser",
+    "hint": "Une des trois. Le reste brûle avec l'épave.",
+    "declined": "Récupération : rien à bord ne valait le temps de découpe."
+  },
+  "cargo": {
+    "title": "Fret à risque",
+    "rows": "encore {{n}} rangées",
+    "payout": "rapporte {{n}} de ferraille",
+    "delivered": "Fret livré — la soute est vide et le paiement est consigné",
+    "dropped": "Fret largué — le handicap cesse, le paiement est perdu",
+    "droppedAxis": "Fret largué — l'axe reste déplacé, le paiement est perdu",
+    "lapsed": "Le contrat a expiré avec l'acte — la soute est vide, le paiement envolé",
+    "moved": "Livraison réacheminée — la marque est passée à la station la plus proche devant",
+    "stranded": "Personne devant ne prendra le fret — le contrat est nul"
+  },
+  "echo": {
+    "title": "Cœur d’Écho",
+    "close": "Fermer",
+    "count": "{{n}} fragments récupérés sur {{max}}",
+    "rule": "Un nœud vous accompagne. Rien ne se dépense, rien ne se réattribue.",
+    "tier": "dès {{n}}",
+    "locked": "S’ouvre à {{n}} fragments récupérés",
+    "equipped": "Équipé",
+    "none": "Aucun nœud",
+    "noneBody": "Partir avec le cœur vide.",
+    "open": "Cœur d’Écho",
+    "setup": "Écho",
+    "setupNone": "Aucun nœud équipé",
+    "codexTitle": "Cœur d’Écho",
+    "codexBody": "Les fragments récupérés ouvrent des nœuds. Un seul vous accompagne à chaque partie.",
+    "opened": {
+      "secondLook": "Cœur d’Écho : Second regard est ouvert.",
+      "readout": "Cœur d’Écho : Décomposition est ouvert.",
+      "calculus": "Cœur d’Écho : Solution de tir est ouvert.",
+      "echolocation": "Cœur d’Écho : Écholocation est ouvert.",
+      "pathGhost": "Cœur d’Écho : Chemin fantôme est ouvert.",
+      "softLanding": "Cœur d’Écho : Atterrissage en douceur est ouvert.",
+      "reserve": "Cœur d’Écho : Réserve de puissance est ouvert.",
+      "shieldEcho": "Cœur d’Écho : Écho du bouclier est ouvert.",
+      "veto": "Cœur d’Écho : Veto est ouvert."
+    }
   }
 }

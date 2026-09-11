@@ -35,6 +35,8 @@ import { LevelUpCeremony } from "./LevelUpCeremony";
 
 const FIND_STAGGER_MS = 180;
 
+const CAUSE_ROW_ID = "cause";
+
 const DETAIL_ROWS: readonly {
   id: string;
   label: string;
@@ -227,6 +229,16 @@ export const SummaryScreen = () => {
                   </Text>
                 </Group>
               ))}
+              {result?.cause === "singularity" ? (
+                <Group justify="space-between" data-summary-row={CAUSE_ROW_ID}>
+                  <Text size="xs" c={tokens.faint}>
+                    {t("run:summary.cause")}
+                  </Text>
+                  <Text size="xs" c={tokens.danger} data-summary-value={CAUSE_ROW_ID}>
+                    {t("run:summary.causeSingularity")}
+                  </Text>
+                </Group>
+              ) : null}
             </SimpleGrid>
           ) : null}
           {detailed && tally !== null ? (
@@ -324,6 +336,7 @@ export const SummaryScreen = () => {
             size="md"
             fullWidth
             mt="sm"
+            data-testid="summary-menu"
             onClick={() => {
               useSummaryStore.getState().clear();
               abandonRun();

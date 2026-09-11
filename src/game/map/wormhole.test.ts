@@ -10,7 +10,9 @@ import {
 } from "@/game/map/types";
 import {
   budgetCapFor,
+  bypassIsLateral,
   bypassTargetFor,
+  canBypass,
   GENTLE_BUDGET,
   GENTLE_RIDES,
   isGentleRide,
@@ -77,6 +79,7 @@ const gridMap = (overrides: Partial<MapGraph> = {}): MapGraph => {
     shape: { bossRow: BOSS_ROW, gateRow: 3, lanes: LANES },
     edgeMarks: {},
     wormholes: {},
+    spots: [],
     bossReach: nodes.map((n) => n.id),
     ...overrides,
   };
@@ -380,6 +383,110 @@ describe("bypass target", () => {
       },
     };
     expect(bypassTargetFor(mined, "r2l1", "r3l1", ["r3l0"])).toBe("r3l2");
+  });
+});
+
+const SLIP_SPOT = "spot:r2l1";
+
+const slipMap = (links: readonly [NodeId, NodeId][]): MapGraph => {
+  const nodes: MapNode[] = [
+    node(0, 1, { type: "start" }),
+    node(1, 1),
+    node(2, 0),
+    node(2, 1, { hole: true, spot: SLIP_SPOT }),
+    node(2, 2),
+    node(3, 1, { type: "boss" }),
+  ];
+  return {
+    nodes,
+    edges: [...links],
+    shape: { bossRow: 3, gateRow: 1, lanes: 3 },
+    edgeMarks: { [edgeKey("r1l1", "r2l1")]: "wormhole" },
+    wormholes: {},
+    spots: [
+      { id: SLIP_SPOT, nodes: ["r2l1"], rows: [2, 2], lanes: [1, 1] },
+    ],
+    bossReach: nodes.filter((n) => n.hole !== true).map((n) => n.id),
+  };
+};
+
+const WITH_SLIP: readonly [NodeId, NodeId][] = [
+  ["r0l1", "r1l1"],
+  ["r1l1", "r2l0"],
+  ["r1l1", "r2l1"],
+  ["r2l0", "r3l1"],
+  ["r2l2", "r3l1"],
+];
+
+const WITHOUT_SLIP: readonly [NodeId, NodeId][] = [
+  ...WITH_SLIP,
+  ["r1l1", "r2l2"],
+];
+
+describe("the lateral bypass", () => {
+  it("prefers a same-row node the graph does not otherwise offer", () => {
+    const map = slipMap(WITH_SLIP);
+    expect(bypassTargetFor(map, "r1l1", "r2l1", [])).toBe("r2l2");
+    expect(bypassIsLateral(map, "r1l1", "r2l1", [])).toBe(true);
+  });
+
+  it("falls back to a connected alternate when no slip exists", () => {
+    const map = slipMap(WITHOUT_SLIP);
+    expect(bypassTargetFor(map, "r1l1", "r2l1", [])).toBe("r2l0");
+    expect(bypassIsLateral(map, "r1l1", "r2l1", [])).toBe(false);
+  });
+
+  it("keeps the precomputed target ahead of a fresh slip", () => {
+    const base = slipMap(WITH_SLIP);
+    const declared: MapGraph = {
+      ...base,
+      wormholes: {
+        [edgeKey("r1l1", "r2l1")]: {
+          from: "r1l1",
+          hole: "r2l1",
+          bypass: "r2l0",
+        },
+      },
+    };
+    expect(bypassTargetFor(declared, "r1l1", "r2l1", [])).toBe("r2l0");
+    expect(bypassIsLateral(declared, "r1l1", "r2l1", [])).toBe(false);
+  });
+
+  it("never slips into a visited node or a spot node", () => {
+    const map = slipMap(WITH_SLIP);
+    expect(bypassTargetFor(map, "r1l1", "r2l1", ["r2l2"])).toBe("r2l0");
+    expect(bypassIsLateral(map, "r1l1", "r2l1", ["r2l2"])).toBe(false);
+  });
+});
+
+describe("a bypass with nowhere to go", () => {
+  const record = (map: MapGraph): MapGraph => ({
+    ...map,
+    wormholes: {
+      [edgeKey("r1l1", "r2l1")]: {
+        from: "r1l1",
+        hole: "r2l1",
+        bypass: "r2l0",
+      },
+    },
+  });
+
+  it("reports no offer once every legal target is cleared", () => {
+    const map = record(slipMap(WITHOUT_SLIP));
+    expect(canBypass(map, "r1l1", "r2l1", [])).toBe(true);
+    expect(bypassTargetFor(map, "r1l1", "r2l1", ["r2l0", "r2l2"])).toBeNull();
+    expect(canBypass(map, "r1l1", "r2l1", ["r2l0", "r2l2"])).toBe(false);
+  });
+
+  it("reports no offer on an edge that is not a wormhole", () => {
+    const map = record(slipMap(WITHOUT_SLIP));
+    expect(canBypass(map, "r1l1", "r2l0", [])).toBe(false);
+  });
+
+  it("holds for the shipped grid once the whole row is cleared", () => {
+    const map = holed("r3l1", "r2l1", "r3l0");
+    expect(canBypass(map, "r2l1", "r3l1", [])).toBe(true);
+    expect(canBypass(map, "r2l1", "r3l1", ["r3l0", "r3l2"])).toBe(false);
   });
 });
 

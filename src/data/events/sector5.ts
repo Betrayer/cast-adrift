@@ -398,6 +398,18 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "haul",
+        label: "content:events.lastMarket.opt.haul",
+        requires: { req: "cargo", id: "stasisPods" },
+        outcomes: [
+          {
+            text: "content:events.lastMarket.out.haul",
+            effects: [{ k: "cargo", id: "stasisPods" }],
+            consequence: "content:consequence.cargoTaken",
+          },
+        ],
+      },
     ],
   },
   {

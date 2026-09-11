@@ -88,7 +88,7 @@
     "reactor": "Reactor",
     "repairBay": "Repair Bay",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
-    "evasion": "dodge {{dodge}}% · glancing {{glancing}}%",
+    "evasion": "gl {{glancing}}% · dg {{dodge}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "cap ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -96,7 +96,8 @@
     "inheritsMult": "here: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Mk levels",
-    "enginesB": "Engines II"
+    "enginesB": "Engines II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -150,7 +151,9 @@
     "blue": "blue",
     "green": "grn",
     "grey": "gry",
-    "black": "blk"
+    "black": "blk",
+    "yellow": "ylw",
+    "prismatic": "prs"
   },
   "proj": {
     "jam": "JAMS",
@@ -164,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} dmg · {{split}}"
   },
   "block": {
     "resolving": "Wait for the turn to resolve",
@@ -178,7 +183,13 @@
     "reserveFull": "Reserve is full",
     "used": "Already used this turn",
     "hullLow": "Hull is too low",
+    "notAllowed": "That move is not allowed right now",
+    "occupied": "That slot already holds a die",
+    "tierCap": "The die is too big for that slot",
+    "slotBlocked": "That slot is blocked this turn",
+    "dieLocked": "That die is locked",
     "noPartner": "Annealing needs a second tray die of the same value.",
+    "needsTwoEnemies": "This fire mode needs two living targets",
     "spent": "The ship may do this once per battle."
   },
   "resPrism": "a prismatic die counts toward this school",
@@ -197,9 +208,10 @@
     "reserve": "▣"
   },
   "projShort": {
-    "dodge": "{{n}}%",
+    "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -320,14 +332,16 @@
   "interferenceWhy": "Skipped anomalies stack up: every stack adds another tide level for the rest of the run. Clear an anomaly to drop them all.",
   "interferenceTitle": "Interference",
   "axisWhy": "Black dice pull toward Resonance, blue toward Stability. Events and drift move it too.",
-  "chargeWhy": "Spend charge on actions: −1 nudge costs 3, +1 nudge costs 3, a bought reroll costs 5, a surge costs 10.",
+  "chargeWhy": "Spend charge on actions: −1 nudge costs {{n}}, +1 nudge costs {{n}}, a bought reroll costs 5, a surge costs 10.",
   "chargeTitle": "Charge",
   "mkWhy": "Mk raises the slot cap and the affinity bonus of its school.",
   "resEarned": "Earned",
   "manoeuvreTitle": "Manoeuvre",
-  "manoeuvreWhy": "A die in Engines sets one evasion roll for the turn: dodge {{dodge}}% × value (max {{dodgeCap}}%), glancing {{glancing}}% × value (max {{glancingCap}}%). A dodge takes nothing, a glancing hit takes half, anything else lands in full. From value {{intercept}} the first hit is intercepted outright. Value is the die after affinity and bonuses.",
+  "manoeuvreWhy": "A die in Engines sets one evasion roll per incoming hit: glancing {{glancing}}% × value (max {{glancingCap}}%), dodge {{dodge}}% × value (max {{dodgeCap}}%). A glancing hit takes half, rounded up, a dodge takes nothing, anything else lands in full. From value {{intercept}} the turn's first successful evasion — glancing or dodge — is an intercept: Weapons +1 next turn. Value is the die after affinity and bonuses.",
+  "manoeuvreBrief": "One evasion roll per hit: glancing {{glancing}}% × value (cap {{glancingCap}}%), dodge {{dodge}}% × value (cap {{dodgeCap}}%). A glance halves it, a dodge negates it. From {{intercept}} the first evasion pays Weapons +1.",
   "targetingTitle": "Targeting",
   "targetingWhy": "A die in Sensors makes the target Vulnerable +D for the turn: D is half the die value rounded up, capped at {{cap}}, and every hit this turn deals that much more. On the die’s max face the hit also pierces the shield. Sensors Mk also reveals one more map row per level above Mk1.",
+  "targetingBrief": "Sensors mark the target: Vulnerable +D for the turn, D is half the die value rounded up, cap {{cap}}. Every hit this turn deals that much more; the die's max face also pierces the shield.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systems",
   "journal": {
@@ -376,5 +390,15 @@
       "fold": "folds the order",
       "devour": "devours a die"
     }
+  },
+  "mode": {
+    "title": "Fire mode",
+    "label": "Fire mode: {{mode}}"
+  },
+  "echo": {
+    "after": "After that",
+    "fork": "{{cond}} — {{then}}. Otherwise — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Drawn from its pattern — it is not fixed."
   }
 }

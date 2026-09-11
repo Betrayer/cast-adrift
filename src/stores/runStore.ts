@@ -1,5 +1,7 @@
 import { create } from "zustand";
-import { moduleSlots } from "@/data/modules";
+import { CARGO_BY_ID } from "@/data/cargo";
+import { echoVetoHull, type EchoNodeId } from "@/data/echo";
+import { CABIN_CAP, OFFICER_BY_ID } from "@/data/officers";
 import type { ShipId } from "@/data/ships";
 import type { MkLevel } from "@/data/slots";
 import {
@@ -8,14 +10,18 @@ import {
   driftAllowed,
   sectorDriftDelta,
 } from "@/game/run/axis";
+import { bayPurchasable, moduleSlots } from "@/game/run/bays";
+import { shipCargoHold } from "@/game/run/hold";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
 import type { WormholeThrow } from "@/game/map/wormhole";
-import type { SlotId } from "@/types/battle";
+import type { BattleLogEntry, SlotId } from "@/types/battle";
 import type { Rarity } from "@/types/content";
 import type { FlagValue } from "@/types/events";
+
+export const LAST_BATTLE_LOG_CAP = 60;
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
 
@@ -25,6 +31,18 @@ export interface DieInstance {
   uid: string;
   defId: string;
   growthBonus?: number;
+}
+
+export type PendingSwap =
+  | { kind: "die"; defId: string }
+  | { kind: "module"; moduleId: string }
+  | { kind: "officer"; officerId: string };
+
+export interface RunCargo {
+  defId: string;
+  nodeId: NodeId;
+  sectorIndex: number;
+  takenRow: number;
 }
 
 export type BattleModKind = "startCharge" | "enemyPlus";
@@ -132,6 +150,7 @@ export interface PendingRewards {
   perkChoices: string[];
   dieChoices?: string[];
   moduleChoices?: string[];
+  salvage?: string[];
   voucher?: boolean;
   packageScrap?: number;
   draftNodeId?: NodeId;
@@ -163,6 +182,14 @@ export interface RunValues {
   deck: DieInstance[];
   perks: string[];
   modules: string[];
+  officers: string[];
+  echo: EchoNodeId | null;
+  echoUsed: boolean;
+  cargo: RunCargo[];
+  pendingCargoBark: boolean;
+  pendingOfficerBark: boolean;
+  baysPurchased: number;
+  pendingSwaps: PendingSwap[];
   banishedPerks: string[];
   draftsSinceRare: number;
   draftRerollUsed: boolean;
@@ -187,6 +214,7 @@ export interface RunValues {
   battleEndHealRun: number;
   rerollSizeRun: number;
   bonusReveal: number;
+  sectorReveal: number;
   shipyardDiscount: number;
   pendingBattle: PendingBattle | null;
   pendingWormhole: NodeId | null;
@@ -194,6 +222,7 @@ export interface RunValues {
   pendingDeepScan: boolean;
   pendingRewards: PendingRewards | null;
   lastTally: BattleTally | null;
+  lastBattleLog: BattleLogEntry[];
   shop: ShopState | null;
   deckSeq: number;
   stats: RunStats;
@@ -223,6 +252,16 @@ export interface RunState extends RunValues {
   useDraftReroll: () => boolean;
   addModule: (moduleId: string) => boolean;
   removeModule: (moduleId: string) => void;
+  addOfficer: (officerId: string) => boolean;
+  removeOfficer: (officerId: string) => void;
+  spendEcho: () => boolean;
+  addCargo: (entry: RunCargo) => boolean;
+  removeCargo: (defId: string) => void;
+  setCargoBark: (value: boolean) => void;
+  setOfficerBark: (value: boolean) => void;
+  purchaseBay: () => void;
+  queueSwap: (swap: PendingSwap) => void;
+  shiftSwap: () => void;
   setFlag: (key: string, value?: FlagValue) => void;
   clearFlag: (key: string) => void;
   bumpCounter: (key: string, delta: number) => void;
@@ -241,6 +280,7 @@ export interface RunState extends RunValues {
   addBattleEndHeal: (n: number) => void;
   addRerollSizeRun: (n: number) => void;
   addBonusReveal: (n: number) => void;
+  addSectorReveal: (n: number) => void;
   addShipyardDiscount: (n: number) => void;
   setPendingBattle: (pending: PendingBattle | null) => void;
   bumpStats: (delta: Partial<RunStats>) => void;
@@ -248,6 +288,7 @@ export interface RunState extends RunValues {
   noteHullPct: (pct: number) => void;
   noteBattleTally: (tally: BattleTally) => void;
   clearBattleTally: () => void;
+  keepBattleLog: (log: readonly BattleLogEntry[]) => void;
   clearPendingDeepScan: () => void;
   setPendingDeepScan: (value: boolean) => void;
   setPendingRewards: (rewards: PendingRewards | null) => void;
@@ -315,6 +356,14 @@ export const createInitialRunValues = (): RunValues => ({
   deck: [],
   perks: [],
   modules: [],
+  officers: [],
+  echo: null,
+  echoUsed: false,
+  cargo: [],
+  pendingCargoBark: false,
+  pendingOfficerBark: false,
+  baysPurchased: 0,
+  pendingSwaps: [],
   banishedPerks: [],
   draftsSinceRare: 0,
   draftRerollUsed: false,
@@ -339,6 +388,7 @@ export const createInitialRunValues = (): RunValues => ({
   battleEndHealRun: 0,
   rerollSizeRun: 0,
   bonusReveal: 0,
+  sectorReveal: 0,
   shipyardDiscount: 0,
   pendingBattle: null,
   pendingWormhole: null,
@@ -346,6 +396,7 @@ export const createInitialRunValues = (): RunValues => ({
   pendingDeepScan: false,
   pendingRewards: null,
   lastTally: null,
+  lastBattleLog: [],
   shop: null,
   deckSeq: 0,
   stats: createInitialRunStats(),
@@ -360,6 +411,22 @@ export const createInitialRunValues = (): RunValues => ({
   encounters: [],
   startedAt: 0,
 });
+
+export const runModuleSlots = (s: RunValues): number =>
+  moduleSlots(
+    s.shipId,
+    computeRunMods(s.perks, s.chartPicks).moduleSlotDelta,
+    s.baysPurchased,
+  );
+
+export const runCargoHold = (s: RunValues): number => shipCargoHold(s.shipId);
+
+export const runBayPurchasable = (s: RunValues): boolean =>
+  bayPurchasable(
+    s.shipId,
+    computeRunMods(s.perks, s.chartPicks).moduleSlotDelta,
+    s.baysPurchased,
+  );
 
 export const useRunStore = create<RunState>()((set, get) => ({
   ...createInitialRunValues(),
@@ -411,7 +478,12 @@ export const useRunStore = create<RunState>()((set, get) => ({
   },
 
   setHull: (n) => {
-    set((s) => ({ hull: Math.max(0, Math.min(s.hullMax, n)) }));
+    set((s) => {
+      const veto = echoVetoHull(s.echo);
+      const vetoes = veto > 0 && !s.echoUsed && s.hull > 0 && n <= 0;
+      const hull = Math.max(0, Math.min(s.hullMax, vetoes ? veto : n));
+      return vetoes ? { hull, echoUsed: true } : { hull };
+    });
   },
 
   addPerk: (perkId) => {
@@ -440,17 +512,65 @@ export const useRunStore = create<RunState>()((set, get) => ({
   addModule: (moduleId) => {
     const s = get();
     if (s.modules.includes(moduleId)) return false;
-    if (
-      s.modules.length >=
-      moduleSlots(computeRunMods(s.perks, s.chartPicks).moduleSlotDelta)
-    )
-      return false;
+    if (s.modules.length >= runModuleSlots(s)) return false;
     set({ modules: [...s.modules, moduleId] });
     return true;
   },
 
   removeModule: (moduleId) => {
     set((s) => ({ modules: s.modules.filter((m) => m !== moduleId) }));
+  },
+
+  addOfficer: (officerId) => {
+    const s = get();
+    if (OFFICER_BY_ID.get(officerId) === undefined) return false;
+    if (s.officers.includes(officerId)) return false;
+    if (s.officers.length >= CABIN_CAP) return false;
+    set({ officers: [...s.officers, officerId], pendingOfficerBark: true });
+    return true;
+  },
+
+  removeOfficer: (officerId) => {
+    set((s) => ({ officers: s.officers.filter((o) => o !== officerId) }));
+  },
+
+  spendEcho: () => {
+    if (get().echoUsed) return false;
+    set({ echoUsed: true });
+    return true;
+  },
+
+  addCargo: (entry) => {
+    const s = get();
+    if (CARGO_BY_ID.get(entry.defId) === undefined) return false;
+    if (s.cargo.some((held) => held.defId === entry.defId)) return false;
+    if (s.cargo.length >= runCargoHold(s)) return false;
+    set({ cargo: [...s.cargo, { ...entry }] });
+    return true;
+  },
+
+  removeCargo: (defId) => {
+    set((s) => ({ cargo: s.cargo.filter((held) => held.defId !== defId) }));
+  },
+
+  setCargoBark: (value) => {
+    set({ pendingCargoBark: value });
+  },
+
+  setOfficerBark: (value) => {
+    set({ pendingOfficerBark: value });
+  },
+
+  purchaseBay: () => {
+    set((s) => ({ baysPurchased: s.baysPurchased + 1 }));
+  },
+
+  queueSwap: (swap) => {
+    set((s) => ({ pendingSwaps: [...s.pendingSwaps, swap] }));
+  },
+
+  shiftSwap: () => {
+    set((s) => ({ pendingSwaps: s.pendingSwaps.slice(1) }));
   },
 
   setFlag: (key, value = true) => {
@@ -587,6 +707,10 @@ export const useRunStore = create<RunState>()((set, get) => ({
     set((s) => ({ bonusReveal: Math.max(0, s.bonusReveal + n) }));
   },
 
+  addSectorReveal: (n) => {
+    set((s) => ({ sectorReveal: Math.max(0, s.sectorReveal + n) }));
+  },
+
   addShipyardDiscount: (n) => {
     set((s) => ({
       shipyardDiscount: Math.max(
@@ -660,6 +784,14 @@ export const useRunStore = create<RunState>()((set, get) => ({
 
   clearBattleTally: () => {
     set({ lastTally: null });
+  },
+
+  keepBattleLog: (log) => {
+    set({
+      lastBattleLog: log
+        .slice(Math.max(0, log.length - LAST_BATTLE_LOG_CAP))
+        .map((entry) => ({ ...entry })),
+    });
   },
 
   clearPendingDeepScan: () => {

@@ -1,6 +1,7 @@
 import { Button, Overlay, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAtLeast } from '@/app/breakpoints';
 import { tokens } from '@/app/theme';
 import { TapPopover } from '@/components/TapPopover';
 import { RESONANCE_BONUSES } from '@/data/resonance';
@@ -11,8 +12,8 @@ import {
   RESONANCE_THRESHOLDS,
   SCHOOL_ORDER,
 } from '@/game/battle/resonance';
-import { CHARGE_CAP } from '@/game/battle/resolver';
-import { checkEndTurnBlocked } from '@/game/battle/view';
+import { runModifiers } from '@/game/run/weather';
+import { checkEndTurnBlocked, nudgeChargePrice } from '@/game/battle/view';
 import { playSfx } from '@/services/audio';
 import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
@@ -20,15 +21,17 @@ import { useLootStore } from '@/stores/lootStore';
 import styles from '@/screens/Battle/BattleScreen.module.css';
 
 export const CausalityBanner = () => {
-  const { t } = useTranslation(['battle']);
+  const { t } = useTranslation(['battle', 'run', 'content']);
   const inverted = useBattleStore((s) => isInverted(s));
   const storm = useBattleStore((s) => s.nodeStorm);
+  const mutators = useBattleStore((s) => s.mutators);
+  const modifiers = runModifiers(mutators);
 
   useEffect(() => {
     if (inverted) playSfx('inversionCue');
   }, [inverted]);
 
-  if (!inverted && !storm) return null;
+  if (!inverted && !storm && modifiers.length === 0) return null;
   return (
     <div
       className={`${styles.causalityBanner ?? ''} ${inverted ? styles.causalitySlide ?? '' : ''}`}
@@ -64,6 +67,28 @@ export const CausalityBanner = () => {
           </span>
         </TapPopover>
       ) : null}
+      {modifiers.map((mod) => (
+        <TapPopover
+          key={mod.id}
+          className={styles.clickable}
+          label={t(mod.name)}
+          testId={`causality-mod-${mod.id}`}
+          content={
+            <>
+              <b>{t(mod.name)}</b>
+              <br />
+              {t(mod.desc)}
+            </>
+          }
+        >
+          <span
+            className={`${styles.pill ?? ''} ${styles.pillCondition ?? ''}`}
+            data-causality={mod.weather ? 'weather' : 'mutator'}
+          >
+            {t(mod.name)}
+          </span>
+        </TapPopover>
+      ))}
     </div>
   );
 };
@@ -110,6 +135,8 @@ export const StatusBar = ({ wide = false }: { wide?: boolean }) => {
   const hullMax = useBattleStore((s) => s.hullMax);
   const shield = useBattleStore((s) => s.shield);
   const charge = useBattleStore((s) => s.charge);
+  const chargeCap = useBattleStore((s) => s.chargeCap);
+  const nudgeCost = useBattleStore(nudgeChargePrice);
   const scrap = useBattleStore((s) => s.scrap);
   const interference = useBattleStore((s) => s.interference);
   const turn = useBattleStore((s) => s.turn);
@@ -192,12 +219,12 @@ export const StatusBar = ({ wide = false }: { wide?: boolean }) => {
             <>
               <b>{t('battle:chargeTitle')}</b>
               <br />
-              {t('battle:chargeWhy')}
+              {t('battle:chargeWhy', { n: nudgeCost })}
             </>
           }
         >
           <span className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}>
-            {t('battle:charge', { n: charge, max: CHARGE_CAP })}
+            {t('battle:charge', { n: charge, max: chargeCap })}
           </span>
         </TapPopover>
         {wide ? null : <RunActions />}
@@ -217,6 +244,7 @@ export const ResonanceChips = () => {
   const { t } = useTranslation(['battle', 'content']);
   const resonance = useBattleStore((s) => s.resonance);
   const dice = useBattleStore((s) => s.dice);
+  const roomy = useAtLeast('md');
   const [open, setOpen] = useState(false);
 
   const census = useMemo(() => {
@@ -296,7 +324,9 @@ export const ResonanceChips = () => {
               data-res-school={row.school}
             >
               {t('battle:resBoard', {
-                school: t(`battle:school.${row.school}`),
+                school: roomy
+                  ? t(`battle:school.${row.school}`)
+                  : t(`battle:schoolShort.${row.school}`),
                 placed: row.placed,
                 tray: row.tray,
               })}

@@ -224,6 +224,18 @@ export const ACHIEVEMENT_FAMILIES: readonly AchievementFamilyDef[] = [
     ],
   },
   {
+    id: "horizonTester",
+    group: "combat",
+    name: "meta:ach.horizonTester.name",
+    desc: "meta:ach.horizonTester.desc",
+    cond: { c: "lifetime", stat: "disintegrations" },
+    tiers: [
+      { need: 1, shards: 40 },
+      { need: 3, shards: 90 },
+      { need: 7, shards: 180 },
+    ],
+  },
+  {
     id: "rimRunner",
     group: "combat",
     name: "meta:ach.rimRunner.name",

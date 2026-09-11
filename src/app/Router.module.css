@@ -1,5 +1,5 @@
 .screen {
-  animation: screenIn 180ms ease-out both;
+  animation: screenIn 180ms ease-out backwards;
   padding: var(--ca-safe-top) var(--ca-safe-right) var(--ca-safe-bottom)
     var(--ca-safe-left);
 }

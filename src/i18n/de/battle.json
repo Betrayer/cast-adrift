@@ -88,7 +88,7 @@
     "reactor": "Reaktor",
     "repairBay": "Reparaturhalle",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
-    "evasion": "Ausweichen {{dodge}}% · Streifer {{glancing}}%",
+    "evasion": "st {{glancing}}% · aw {{dodge}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "Kappe ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -96,7 +96,8 @@
     "inheritsMult": "hier: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Mk-Stufen",
-    "enginesB": "Motoren II"
+    "enginesB": "Motoren II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Mini-Boss",
@@ -150,7 +151,9 @@
     "blue": "bla",
     "green": "grü",
     "grey": "gra",
-    "black": "sch"
+    "black": "sch",
+    "yellow": "gel",
+    "prismatic": "pri"
   },
   "proj": {
     "jam": "KLEMMT",
@@ -164,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} Schaden · {{split}}"
   },
   "block": {
     "resolving": "Warte auf die Auflösung",
@@ -178,7 +183,13 @@
     "reserveFull": "Reserve ist voll",
     "used": "Diese Runde schon benutzt",
     "hullLow": "Rumpf zu niedrig",
+    "notAllowed": "Das geht gerade nicht",
+    "occupied": "In diesem Slot liegt schon ein Würfel",
+    "tierCap": "Der Würfel ist zu groß für diesen Slot",
+    "slotBlocked": "Dieser Slot ist in dieser Runde blockiert",
+    "dieLocked": "Dieser Würfel ist gesperrt",
     "noPartner": "Für das Glühen wird eine zweite Schalenform mit demselben Wert benötigt.",
+    "needsTwoEnemies": "Dieser Feuermodus braucht zwei lebende Ziele",
     "spent": "Das Schiff kann dies einmal pro Gefecht tun."
   },
   "resPrism": "ein prismatischer Würfel zählt für diese Schule",
@@ -197,9 +208,10 @@
     "reserve": "▣"
   },
   "projShort": {
-    "dodge": "{{n}}%",
+    "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -320,14 +332,16 @@
   "interferenceWhy": "Ausgelassene Anomalien stapeln sich: Jeder Stapel gibt für den Rest des Laufs eine weitere Flutstufe. Eine Anomalie zu lösen räumt alle ab.",
   "interferenceTitle": "Störung",
   "axisWhy": "Schwarze Würfel ziehen zur Resonanz, blaue zur Stabilität. Ereignisse und Drift bewegen die Achse ebenfalls.",
-  "chargeWhy": "Ladung zahlt Aktionen: −1 kostet 3, +1 kostet 3, ein gekaufter Neuwurf 5, ein Schub 10.",
+  "chargeWhy": "Ladung zahlt Aktionen: −1 kostet {{n}}, +1 kostet {{n}}, ein gekaufter Neuwurf 5, ein Schub 10.",
   "chargeTitle": "Ladung",
   "mkWhy": "Mk hebt die Slot-Obergrenze und den Affinitätsbonus seiner Schule.",
   "resEarned": "Erreicht",
   "manoeuvreTitle": "Manöver",
-  "manoeuvreWhy": "Ein Würfel in den Triebwerken setzt einen Ausweichwurf für die Runde: Ausweichen {{dodge}}% × Wert (max. {{dodgeCap}}%), Streifschuss {{glancing}}% × Wert (max. {{glancingCap}}%). Ausweichen nimmt nichts, ein Streifschuss die Hälfte, alles andere trifft voll. Ab Wert {{intercept}} wird der erste Treffer ganz abgefangen. Der Wert ist der Würfel nach Affinität und Boni.",
+  "manoeuvreWhy": "Ein Würfel in den Triebwerken setzt einen Ausweichwurf pro eingehendem Treffer: Streifschuss {{glancing}}% × Wert (max. {{glancingCap}}%), Ausweichen {{dodge}}% × Wert (max. {{dodgeCap}}%). Ein Streifschuss nimmt die Hälfte, aufgerundet, Ausweichen nimmt nichts, alles andere trifft voll. Ab Wert {{intercept}} ist das erste gelungene Ausweichen der Runde — Streifschuss oder Ausweichen — ein Abfangen: Waffen +1 in der nächsten Runde. Der Wert ist der Würfel nach Affinität und Boni.",
+  "manoeuvreBrief": "Ein Wurf pro Treffer: Streifschuss {{glancing}}% × Wert (max {{glancingCap}}%), Ausweichen {{dodge}}% × Wert (max {{dodgeCap}}%). Streifen nimmt die Hälfte, Ausweichen nichts. Ab {{intercept}}: erste Evasion, Waffen +1.",
   "targetingTitle": "Zielerfassung",
   "targetingWhy": "Ein Würfel in den Sensoren macht das Ziel für die Runde Verwundbar +D: D ist der halbe Würfelwert aufgerundet, höchstens {{cap}}, und jeder Treffer dieser Runde macht so viel mehr. Auf der Höchstseite durchschlägt der Treffer zusätzlich den Schild. Sensor-Mk deckt außerdem pro Stufe über Mk1 eine weitere Kartenzeile auf.",
+  "targetingBrief": "Sensoren markieren das Ziel: Verwundbar +D für die Runde, D ist der halbe Würfelwert aufgerundet, max {{cap}}. Jeder Treffer macht so viel mehr; die Höchstseite durchschlägt den Schild.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systeme",
   "journal": {
@@ -376,5 +390,15 @@
       "fold": "bearbeitet die Bestellung",
       "devour": "verschlingt einen Würfel"
     }
+  },
+  "mode": {
+    "title": "Feuermodus",
+    "label": "Feuermodus: {{mode}}"
+  },
+  "echo": {
+    "after": "Danach",
+    "fork": "{{cond}} — {{then}}. Sonst — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Wird aus dem Muster gezogen — nicht festgelegt."
   }
 }

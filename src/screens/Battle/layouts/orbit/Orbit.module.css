@@ -308,17 +308,15 @@
   min-width: 16px;
 }
 
-@media (max-height: 700px) {
-  .enemyBand {
-    min-height: 76px;
-    height: 20%;
-  }
+:root[data-ca-compact='1'] .enemyBand {
+  min-height: 76px;
+  height: 20%;
+}
 
-  .trayBand {
-    min-height: 56px;
-  }
+:root[data-ca-compact='1'] .trayBand {
+  min-height: 56px;
+}
 
-  .dock {
-    min-height: 150px;
-  }
+:root[data-ca-compact='1'] .dock {
+  min-height: 150px;
 }

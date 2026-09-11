@@ -3,11 +3,7 @@ import { DICE_MODULES } from "@/data/modules/dice";
 import { ECONOMY_MODULES } from "@/data/modules/economy";
 import { OFFENSE_MODULES } from "@/data/modules/offense";
 import { WEIRD_MODULES } from "@/data/modules/weird";
-import {
-  BASE_MODULE_SLOTS,
-  MAX_MODULE_SLOTS,
-  type ModuleDef,
-} from "@/data/modules/types";
+import type { ModuleDef } from "@/data/modules/types";
 import type { Rarity } from "@/types/content";
 
 export const ALL_MODULES: readonly ModuleDef[] = [
@@ -42,9 +38,3 @@ export { DEFENSE_MODULES } from "@/data/modules/defense";
 export { OFFENSE_MODULES } from "@/data/modules/offense";
 export { DICE_MODULES } from "@/data/modules/dice";
 export { WEIRD_MODULES } from "@/data/modules/weird";
-
-export const moduleSlots = (moduleSlotDelta: number): number =>
-  Math.max(
-    BASE_MODULE_SLOTS,
-    Math.min(MAX_MODULE_SLOTS, BASE_MODULE_SLOTS + Math.max(0, moduleSlotDelta)),
-  );

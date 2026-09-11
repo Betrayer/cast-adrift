@@ -1,7 +1,7 @@
 import { trackEvent } from "@/services/analytics";
 import { now } from "@/services/clock";
 import { useMetaStore } from "@/stores/metaStore";
-import { useNarrativeStore } from "@/stores/narrativeStore";
+import { logSystemLine } from "@/game/run/journal";
 
 export const BATTLE_LAYOUT_HINT = "battleLayouts";
 
@@ -32,7 +32,7 @@ export const offerLayoutHint = (): void => {
   const meta = useMetaStore.getState();
   if (meta.tutorialSeen.includes(BATTLE_LAYOUT_HINT)) return;
   meta.markTutorialSeen(BATTLE_LAYOUT_HINT);
-  useNarrativeStore.getState().pushHint("battle:layoutHint");
+  logSystemLine("battle:layoutHint");
 };
 
 export const noteCheckFinished = (sandbox: boolean, skipped: boolean): void => {

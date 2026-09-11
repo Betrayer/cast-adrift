@@ -88,7 +88,7 @@
     "reactor": "Reactor",
     "repairBay": "Taller de reparaciones",
     "cap": "cap ≤ d {{cap}} · Mk {{mk}}",
-    "evasion": "esquiva {{dodge}}% · roce {{glancing}}%",
+    "evasion": "roce {{glancing}}% · esq {{dodge}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "tope ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -96,7 +96,8 @@
     "inheritsMult": "aquí: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Niveles Mk",
-    "enginesB": "Motores II"
+    "enginesB": "Motores II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Minijefazo",
@@ -150,7 +151,9 @@
     "blue": "azu",
     "green": "ver",
     "grey": "gri",
-    "black": "neg"
+    "black": "neg",
+    "yellow": "ama",
+    "prismatic": "pri"
   },
   "proj": {
     "jam": "ATASCA",
@@ -164,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} de daño · {{split}}"
   },
   "block": {
     "resolving": "Espera a que se resuelva el turno",
@@ -178,7 +183,13 @@
     "reserveFull": "La reserva está llena",
     "used": "Ya usado este turno",
     "hullLow": "Casco demasiado bajo",
+    "notAllowed": "Ahora mismo no se puede",
+    "occupied": "Esa ranura ya tiene un dado",
+    "tierCap": "El dado es demasiado grande para esa ranura",
+    "slotBlocked": "Esa ranura está bloqueada este turno",
+    "dieLocked": "Ese dado está bloqueado",
     "noPartner": "El recocido requiere una segunda matriz de bandeja del mismo valor.",
+    "needsTwoEnemies": "Este modo de fuego necesita dos objetivos vivos",
     "spent": "La nave puede hacer esto una vez por combate."
   },
   "resPrism": "un dado prismático cuenta para esta escuela",
@@ -197,9 +208,10 @@
     "reserve": "▣"
   },
   "projShort": {
-    "dodge": "{{n}}%",
+    "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -320,14 +332,16 @@
   "interferenceWhy": "Las anomalías omitidas se acumulan: cada acumulación añade otro nivel de marea el resto de la partida. Resolver una anomalía las borra todas.",
   "interferenceTitle": "Interferencia",
   "axisWhy": "Los dados negros tiran hacia Resonancia, los azules hacia Estabilidad. Los eventos y la deriva también mueven el eje.",
-  "chargeWhy": "La carga paga acciones: −1 cuesta 3, +1 cuesta 3, una retirada comprada 5, una sobrecarga 10.",
+  "chargeWhy": "La carga paga acciones: −1 cuesta {{n}}, +1 cuesta {{n}}, una retirada comprada 5, una sobrecarga 10.",
   "chargeTitle": "Carga",
   "mkWhy": "Mk sube el límite de la ranura y el bono de afinidad de su escuela.",
   "resEarned": "Logrado",
   "manoeuvreTitle": "Maniobra",
-  "manoeuvreWhy": "Un dado en Motores fija una tirada de evasión para el turno: esquiva {{dodge}}% × valor (máx. {{dodgeCap}}%), roce {{glancing}}% × valor (máx. {{glancingCap}}%). La esquiva no recibe nada, el roce la mitad, lo demás entra entero. Desde valor {{intercept}} el primer golpe se intercepta del todo. El valor es el dado tras afinidad y bonos.",
+  "manoeuvreWhy": "Un dado en Motores fija una tirada de evasión por cada golpe entrante: roce {{glancing}}% × valor (máx. {{glancingCap}}%), esquiva {{dodge}}% × valor (máx. {{dodgeCap}}%). El roce recibe la mitad, redondeada hacia arriba, la esquiva no recibe nada, lo demás entra entero. Desde valor {{intercept}} la primera evasión lograda del turno — roce o esquiva — es una intercepción: Armas +1 el turno siguiente. El valor es el dado tras afinidad y bonos.",
+  "manoeuvreBrief": "Una tirada por golpe: roce {{glancing}}% × valor (máx {{glancingCap}}%), esquiva {{dodge}}% × valor (máx {{dodgeCap}}%). El roce recibe la mitad, la esquiva nada. Desde {{intercept}} la primera evasión da Armas +1.",
   "targetingTitle": "Designación",
   "targetingWhy": "Un dado en Sensores deja al objetivo Vulnerable +D durante el turno: D es la mitad del valor del dado redondeada hacia arriba, con tope de {{cap}}, y cada golpe de este turno hace esa cantidad de más. En la cara máxima del dado el golpe además perfora el escudo. El Mk de Sensores además revela una fila más del mapa por cada nivel sobre Mk1.",
+  "targetingBrief": "Los sensores marcan al objetivo: Vulnerable +D por el turno, D es la mitad del valor del dado hacia arriba, máx {{cap}}. Cada golpe hace eso de más; la cara máxima atraviesa el escudo.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Sistemas",
   "journal": {
@@ -376,5 +390,15 @@
       "fold": "procesa el pedido",
       "devour": "se traga un dado"
     }
+  },
+  "mode": {
+    "title": "Modo de fuego",
+    "label": "Modo de fuego: {{mode}}"
+  },
+  "echo": {
+    "after": "Después",
+    "fork": "{{cond}} — {{then}}. Si no — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Se extrae de su patrón — no está fijado."
   }
 }

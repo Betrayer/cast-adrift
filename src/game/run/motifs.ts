@@ -1,8 +1,9 @@
 import { sectorDef, type SectorMotif } from "@/data/sectors";
 import { applyEventEffects } from "@/game/events/apply";
 import { edgeMarkFor, type MapGraph, type MapNode, type NodeId } from "@/game/map/types";
+import { bypassIsLateral } from "@/game/map/wormhole";
 import { createStream, deriveSeed } from "@/services/rng";
-import { useNarrativeStore } from "@/stores/narrativeStore";
+import { logConsequence } from "@/game/run/journal";
 import { useRunStore } from "@/stores/runStore";
 import type { LocKey } from "@/types/content";
 import type { EventEffect } from "@/types/events";
@@ -23,7 +24,7 @@ const motifOf = <K extends SectorMotif["m"]>(
     (motif): motif is Extract<SectorMotif, { m: K }> => motif.m === kind,
   );
 
-const survivable = (
+export const survivable = (
   effects: readonly EventEffect[],
   hull: number,
 ): readonly EventEffect[] =>
@@ -45,7 +46,7 @@ const fire = (
     createStream(deriveSeed(run.seed, streamKey)),
   );
   const line = MOTIF_CONSEQUENCE[key];
-  if (line !== undefined) useNarrativeStore.getState().pushConsequence(line);
+  if (line !== undefined) logConsequence(line);
 };
 
 export const applyEdgeMotifs = (
@@ -70,15 +71,29 @@ export const holeTollFor = (sector: number, hull: number): number => {
   return hull <= toll ? 0 : toll;
 };
 
+export const disintegrationPctFor = (sector: number): number =>
+  motifOf(sector, "blackHoles")?.disintegrationPct ?? 0;
+
+export const holeTollWaived = (
+  map: MapGraph | null,
+  from: NodeId,
+  hole: NodeId,
+  visited: readonly NodeId[],
+): boolean => map !== null && !bypassIsLateral(map, from, hole, visited);
+
 export const applyHoleToll = (
   sector: number,
   from: NodeId,
   hole: NodeId,
 ): number => {
-  const hull = useRunStore.getState().hull;
-  const cost = holeTollFor(sector, hull);
+  const run = useRunStore.getState();
+  if (holeTollWaived(run.map, from, hole, run.visited)) {
+    logConsequence("run:motif.holeDrift");
+    return 0;
+  }
+  const cost = holeTollFor(sector, run.hull);
   if (cost <= 0) {
-    useNarrativeStore.getState().pushConsequence("run:motif.holeScorch");
+    logConsequence("run:motif.holeScorch");
     return 0;
   }
   fire([{ k: "hull", n: -cost }], "bypass", `bypass:${from}:${hole}`);

@@ -88,7 +88,7 @@
     "reactor": "Réacteur",
     "repairBay": "Atelier de réparation",
     "cap": "cap ≤ d {{cap}} · Mk {{mk}}",
-    "evasion": "esquive {{dodge}}% · frôlement {{glancing}}%",
+    "evasion": "eff {{glancing}}% · esq {{dodge}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "cap ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -96,7 +96,8 @@
     "inheritsMult": "ici : {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Niveaux Mk",
-    "enginesB": "Moteurs II"
+    "enginesB": "Moteurs II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -150,7 +151,9 @@
     "blue": "ble",
     "green": "vrt",
     "grey": "gri",
-    "black": "noi"
+    "black": "noi",
+    "yellow": "jau",
+    "prismatic": "pri"
   },
   "proj": {
     "jam": "ENRAYE",
@@ -164,7 +167,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} dégâts · {{split}}"
   },
   "block": {
     "resolving": "Attends la résolution du tour",
@@ -178,7 +183,13 @@
     "reserveFull": "Réserve pleine",
     "used": "Déjà utilisé ce tour",
     "hullLow": "Coque trop faible",
+    "notAllowed": "Impossible pour l’instant",
+    "occupied": "Cet emplacement contient déjà un dé",
+    "tierCap": "Le dé est trop grand pour cet emplacement",
+    "slotBlocked": "Cet emplacement est bloqué ce tour",
+    "dieLocked": "Ce dé est verrouillé",
     "noPartner": "Le recuit nécessite une deuxième matrice de même valeur.",
+    "needsTwoEnemies": "Ce mode de tir exige deux cibles vivantes",
     "spent": "Le navire peut effectuer cette action une fois par combat."
   },
   "resPrism": "un dé prismatique compte pour cette école",
@@ -197,9 +208,10 @@
     "reserve": "▣"
   },
   "projShort": {
-    "dodge": "{{n}}%",
+    "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -320,14 +332,16 @@
   "interferenceWhy": "Les anomalies évitées s’empilent : chaque pile ajoute un niveau de marée pour le reste de la partie. Résoudre une anomalie les efface toutes.",
   "interferenceTitle": "Interférence",
   "axisWhy": "Les dés noirs tirent vers la Résonance, les bleus vers la Stabilité. Les événements et la dérive déplacent aussi l’axe.",
-  "chargeWhy": "La charge paie les actions : −1 coûte 3, +1 coûte 3, une relance achetée 5, une surtension 10.",
+  "chargeWhy": "La charge paie les actions : −1 coûte {{n}}, +1 coûte {{n}}, une relance achetée 5, une surtension 10.",
   "chargeTitle": "Charge",
   "mkWhy": "Mk relève le plafond de l’emplacement et le bonus d’affinité de son école.",
   "resEarned": "Acquis",
   "manoeuvreTitle": "Manœuvre",
-  "manoeuvreWhy": "Un dé dans les Moteurs fixe un jet d’esquive pour le tour : esquive {{dodge}}% × valeur (max. {{dodgeCap}}%), effleurement {{glancing}}% × valeur (max. {{glancingCap}}%). Une esquive ne prend rien, un effleurement la moitié, le reste passe en entier. À partir de la valeur {{intercept}}, le premier coup est intercepté d’office. La valeur est le dé après affinité et bonus.",
+  "manoeuvreWhy": "Un dé dans les Moteurs fixe un jet d’esquive par coup reçu : effleurement {{glancing}}% × valeur (max. {{glancingCap}}%), esquive {{dodge}}% × valeur (max. {{dodgeCap}}%). Un effleurement prend la moitié, arrondie au supérieur, une esquive ne prend rien, le reste passe en entier. À partir de la valeur {{intercept}}, la première évasion réussie du tour — effleurement ou esquive — est une interception : Armes +1 au tour suivant. La valeur est le dé après affinité et bonus.",
+  "manoeuvreBrief": "Un jet par coup : effleurement {{glancing}}% × valeur (max {{glancingCap}}%), esquive {{dodge}}% × valeur (max {{dodgeCap}}%). Effleurement : moitié ; esquive : rien. Dès {{intercept}} : première évasion, Armes +1.",
   "targetingTitle": "Désignation",
   "targetingWhy": "Un dé dans les Capteurs rend la cible Vulnérable +D pour le tour : D vaut la moitié de la valeur du dé arrondie au supérieur, plafonnée à {{cap}}, et chaque coup de ce tour fait d’autant plus. Sur la face maximale du dé, le coup perce aussi le bouclier. Le Mk des Capteurs révèle en plus une rangée de carte par niveau au-dessus de Mk1.",
+  "targetingBrief": "Les capteurs marquent la cible : Vulnérable +D pour le tour, D = la moitié de la valeur du dé arrondie au supérieur, max {{cap}}. Chaque coup fait autant de plus ; la face max perce le bouclier.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systèmes",
   "journal": {
@@ -376,5 +390,15 @@
       "fold": "traite la commande",
       "devour": "dévorer un dé"
     }
+  },
+  "mode": {
+    "title": "Mode de tir",
+    "label": "Mode de tir : {{mode}}"
+  },
+  "echo": {
+    "after": "Ensuite",
+    "fork": "{{cond}} — {{then}}. Sinon — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Tiré de son motif — rien n’est fixé."
   }
 }

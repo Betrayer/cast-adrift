@@ -37,6 +37,26 @@ describe("chaos entropy", () => {
     expect(() => chaos.pick([])).toThrow("chaos.pick: empty array");
   });
 
+  it("never rolls under a zero percentage and always rolls under a hundred", () => {
+    for (let i = 0; i < 500; i += 1) {
+      expect(chaos.roll(0)).toBe(false);
+      expect(chaos.roll(100)).toBe(true);
+    }
+  });
+
+  it("rolls both ways on an even chance", () => {
+    const seen = new Set<boolean>();
+    for (let i = 0; i < 500; i += 1) seen.add(chaos.roll(50));
+    expect([...seen].sort()).toEqual([false, true]);
+  });
+
+  it("keeps a five percent chance rare", () => {
+    let hits = 0;
+    for (let i = 0; i < 4000; i += 1) if (chaos.roll(5)) hits += 1;
+    expect(hits).toBeGreaterThan(0);
+    expect(hits).toBeLessThan(400);
+  });
+
   it("reports whether it is mocked", () => {
     expect(chaosMocked()).toBe(false);
     setChaosSource(scriptedChaos({ ints: [1] }));
@@ -70,6 +90,34 @@ describe("scripted chaos", () => {
     setChaosSource(scriptedChaos({ picks: [2, 5] }));
     expect(chaos.pick(["a", "b", "c"])).toBe("c");
     expect(chaos.pick(["a", "b", "c"])).toBe("c");
+  });
+
+  it("hands back the scripted rolls in order", () => {
+    setChaosSource(scriptedChaos({ rolls: [false, true, false] }));
+    expect(chaos.roll(5)).toBe(false);
+    expect(chaos.roll(5)).toBe(true);
+    expect(chaos.roll(5)).toBe(false);
+  });
+
+  it("survives an exhausted roll tape instead of firing", () => {
+    setChaosSource(scriptedChaos({ rolls: [true] }));
+    expect(chaos.roll(5)).toBe(true);
+    expect(chaos.roll(5)).toBe(false);
+    expect(chaos.roll(100)).toBe(false);
+  });
+
+  it("ignores the percentage a scripted roll is asked about", () => {
+    setChaosSource(scriptedChaos({ rolls: [true, false] }));
+    expect(chaos.roll(0)).toBe(true);
+    expect(chaos.roll(100)).toBe(false);
+  });
+
+  it("keeps the roll tape positionally independent of the int tape", () => {
+    setChaosSource(scriptedChaos({ ints: [4, 1], rolls: [true] }));
+    expect(chaos.int(1, 5)).toBe(4);
+    expect(chaos.roll(5)).toBe(true);
+    expect(chaos.int(1, 5)).toBe(1);
+    expect(chaos.roll(5)).toBe(false);
   });
 
   it("is deterministic across identical scripts", () => {

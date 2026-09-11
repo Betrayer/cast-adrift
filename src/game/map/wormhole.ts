@@ -1,4 +1,5 @@
 import {
+  areConnected,
   edgeKey,
   nodeById,
   outgoingEdges,
@@ -36,7 +37,7 @@ export interface WormholeThrow {
   gentle: boolean;
   fallback: ThrowFallback;
 }
-
+ 
 export const GENTLE_RIDES = 2;
 export const MAX_BUDGET = 5;
 export const GENTLE_BUDGET = 2;
@@ -95,6 +96,35 @@ export const landingCandidates = (
 const flip = (direction: ThrowDirection): ThrowDirection =>
   direction === "forward" ? "backward" : "forward";
 
+export const lateralBypassCandidates = (
+  map: MapGraph,
+  from: NodeId,
+  hole: NodeId,
+  visited: readonly NodeId[],
+): MapNode[] => {
+  const byId = nodeById(map);
+  const origin = byId.get(from);
+  const swallowed = byId.get(hole);
+  if (origin === undefined || swallowed === undefined) return [];
+  const cleared = new Set(visited);
+  const reached = new Set(outgoingEdges(map, from));
+  return map.nodes
+    .filter(
+      (node) =>
+        node.row === swallowed.row &&
+        node.id !== from &&
+        node.hole !== true &&
+        node.pocket !== true &&
+        !cleared.has(node.id) &&
+        !reached.has(node.id),
+    )
+    .sort(
+      (a, b) =>
+        Math.abs(a.lane - origin.lane) - Math.abs(b.lane - origin.lane) ||
+        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    );
+};
+
 export const bypassTargetFor = (
   map: MapGraph,
   from: NodeId,
@@ -107,6 +137,8 @@ export const bypassTargetFor = (
     !cleared.has(id) && byId.get(id)?.hole !== true;
   const declared = wormholeFor(map, from, hole)?.bypass;
   if (declared !== undefined && legal(declared)) return declared;
+  const slip = lateralBypassCandidates(map, from, hole, visited)[0];
+  if (slip !== undefined) return slip.id;
   const spare = outgoingEdges(map, from)
     .filter((id) => id !== hole && legal(id))
     .sort((a, b) => {
@@ -115,6 +147,25 @@ export const bypassTargetFor = (
       return marked(a) - marked(b) || (a < b ? -1 : a > b ? 1 : 0);
     });
   return spare[0] ?? null;
+};
+
+export const canBypass = (
+  map: MapGraph,
+  from: NodeId,
+  hole: NodeId,
+  visited: readonly NodeId[],
+): boolean =>
+  wormholeFor(map, from, hole) !== undefined &&
+  bypassTargetFor(map, from, hole, visited) !== null;
+
+export const bypassIsLateral = (
+  map: MapGraph,
+  from: NodeId,
+  hole: NodeId,
+  visited: readonly NodeId[],
+): boolean => {
+  const target = bypassTargetFor(map, from, hole, visited);
+  return target !== null && !areConnected(map, from, target);
 };
 
 export const rollThrow = (

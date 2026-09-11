@@ -16,7 +16,10 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         onPass: [
           {
             text: "content:events.driftingPod.out.openAlly",
-            effects: [{ k: "scrap", n: 22 }],
+            effects: [
+              { k: "scrap", n: 22 },
+              { k: "officer", id: "scrapper" },
+            ],
           },
         ],
         onFail: [
@@ -521,6 +524,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "hullMax", n: -2 },
               { k: "nodeMod", mod: "endHeal", n: 1 },
+              { k: "officer", id: "mechanic" },
             ],
           },
         ],
@@ -1215,6 +1219,18 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
               { k: "flag", key: "boardTaken" }
             ],
             consequence: "content:consequence.rimBoardTaken",
+          },
+        ],
+      },
+      {
+        id: "haul",
+        label: "content:events.rimNoticeboard.opt.haul",
+        requires: { req: "cargo", id: "leadBallast" },
+        outcomes: [
+          {
+            text: "content:events.rimNoticeboard.out.haul",
+            effects: [{ k: "cargo", id: "leadBallast" }],
+            consequence: "content:consequence.cargoTaken",
           },
         ],
       },

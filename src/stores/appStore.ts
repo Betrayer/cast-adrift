@@ -1,5 +1,9 @@
 import { create } from "zustand";
-import { hasBackGuard, runBackGuard } from "@/app/backGuard";
+import {
+  backBlocked,
+  hasBackGuard,
+  runBackGuard,
+} from "@/app/backGuard";
 import { fixedBackTarget, ROUTES, type NavDirection } from "@/app/routes";
 import type { MergePrompt } from "@/services/account-link";
 import type { AuthErrorCode } from "@/services/authErrors";
@@ -38,6 +42,7 @@ export interface AppState {
   cloudResume: boolean;
   systemMenu: boolean;
   buildSheet: boolean;
+  echoCore: boolean;
   go: (
     screen: ScreenId,
     params?: Record<string, string>,
@@ -48,6 +53,7 @@ export interface AppState {
   setParams: (params: ScreenParams) => void;
   setSystemMenu: (systemMenu: boolean) => void;
   setBuildSheet: (buildSheet: boolean) => void;
+  setEchoCore: (echoCore: boolean) => void;
   setTgUserId: (tgUserId: number | null) => void;
   setTgName: (tgName: string | null) => void;
   setIsTelegram: (isTelegram: boolean) => void;
@@ -73,6 +79,7 @@ export const backActionFor = (state: {
   screen: ScreenId;
   stack: readonly StackEntry[];
 }): BackAction => {
+  if (backBlocked()) return { kind: "none" };
   const mode = ROUTES[state.screen].backMode;
   if (mode === "locked") return { kind: "none" };
   if (mode === "guarded") {
@@ -119,16 +126,18 @@ export const useAppStore = create<AppState>()((set, get) => ({
   cloudResume: false,
   systemMenu: false,
   buildSheet: false,
+  echoCore: false,
   go: (screen, params, direction = "forward") =>
     set((s) =>
       s.screen === screen
-        ? { params, systemMenu: false, buildSheet: false }
+        ? { params, systemMenu: false, buildSheet: false, echoCore: false }
         : {
             screen,
             params,
             navDir: direction,
             systemMenu: false,
             buildSheet: false,
+            echoCore: false,
             stack: nextStack(s.stack, { screen: s.screen, params: s.params }, screen),
           },
     ),
@@ -147,6 +156,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
       navDir: "back",
       systemMenu: false,
       buildSheet: false,
+      echoCore: false,
     });
   },
   seed: (stack, screen, params) =>
@@ -157,10 +167,12 @@ export const useAppStore = create<AppState>()((set, get) => ({
       navDir: "forward",
       systemMenu: false,
       buildSheet: false,
+      echoCore: false,
     }),
   setParams: (params) => set({ params }),
   setSystemMenu: (systemMenu) => set({ systemMenu }),
   setBuildSheet: (buildSheet) => set({ buildSheet }),
+  setEchoCore: (echoCore) => set({ echoCore }),
   setTgUserId: (tgUserId) => set({ tgUserId }),
   setTgName: (tgName) => set({ tgName }),
   setIsTelegram: (isTelegram) => set({ isTelegram }),

@@ -1,112 +1,127 @@
 import { create } from "zustand";
 import type { JournalBody, JournalEntry } from "@/game/run/journal";
-import type { LocKey } from "@/types/content";
 
-export const TOAST_QUEUE_CAP = 3;
 export const JOURNAL_CAP = 160;
+export const JOURNAL_CHATTER_CAP = 60;
+export const FEED_CAP = 3;
+export const FEED_MS = 8000;
+export const FEED_CONSEQUENCE_MS = 10000;
 
-export interface ConsequenceToast {
+export type FeedSource = "bark" | "consequence" | "achievement" | "system";
+
+export type FeedTone = "normal" | "alert";
+
+export type FeedScope = "run" | "app";
+
+export interface FeedMessage {
   id: number;
-  origin: LocKey;
+  source: FeedSource;
+  key: string;
+  journalId: number | null;
+  ttlMs: number;
+  tone: FeedTone;
+  scope: FeedScope;
+  interactive: boolean;
 }
 
-export interface BarkToast {
-  id: number;
-  line: LocKey;
+export interface FeedPush {
+  source: FeedSource;
+  key: string;
+  journalId?: number | null;
+  tone?: FeedTone;
+  scope?: FeedScope;
+  interactive?: boolean;
 }
 
-export interface AchievementToast {
-  id: number;
-  achievement: string;
-}
+export const feedTtl = (source: FeedSource): number =>
+  source === "consequence" ? FEED_CONSEQUENCE_MS : FEED_MS;
 
-export interface HintToast {
-  id: number;
-  line: LocKey;
-}
+export const isChatterEntry = (entry: JournalEntry): boolean =>
+  entry.k === "bark" || entry.k === "system";
+
+export const capJournal = (
+  entries: readonly JournalEntry[],
+): JournalEntry[] => {
+  let chatter = 0;
+  let narrative = 0;
+  const dropped = new Set<number>();
+  for (let i = entries.length - 1; i >= 0; i -= 1) {
+    const entry = entries[i];
+    if (entry === undefined) continue;
+    if (isChatterEntry(entry)) {
+      chatter += 1;
+      if (chatter > JOURNAL_CHATTER_CAP) dropped.add(i);
+    } else {
+      narrative += 1;
+      if (narrative > JOURNAL_CAP) dropped.add(i);
+    }
+  }
+  if (dropped.size === 0) return [...entries];
+  return entries.filter((_, i) => !dropped.has(i));
+};
 
 export interface NarrativeState {
-  consequence: ConsequenceToast | null;
-  consequenceQueue: ConsequenceToast[];
-  bark: BarkToast | null;
-  barkQueue: BarkToast[];
-  achievement: AchievementToast | null;
-  achievementQueue: AchievementToast[];
-  hint: HintToast | null;
+  feed: FeedMessage[];
   journal: JournalEntry[];
   memoryQueue: number[];
   seq: number;
-  pushConsequence: (origin: LocKey) => void;
-  pushBark: (line: LocKey) => void;
-  pushAchievement: (achievement: string) => void;
-  pushHint: (line: LocKey) => void;
-  pushJournal: (entry: JournalBody & { sector: number }) => void;
+  pushFeed: (push: FeedPush) => number;
+  dismissFeed: (id: number) => void;
+  clearFeed: () => void;
+  dropRunFeed: () => void;
+  pushJournal: (entry: JournalBody & { sector: number }) => number;
   pushMemory: (order: number) => void;
   dismissMemory: () => void;
   setJournal: (entries: readonly JournalEntry[]) => void;
-  dismissConsequence: () => void;
-  dismissBark: () => void;
-  dismissAchievement: () => void;
-  dismissHint: () => void;
   reset: () => void;
 }
 
-export const useNarrativeStore = create<NarrativeState>()((set) => ({
-  consequence: null,
-  consequenceQueue: [],
-  bark: null,
-  barkQueue: [],
-  achievement: null,
-  achievementQueue: [],
-  hint: null,
+export const useNarrativeStore = create<NarrativeState>()((set, get) => ({
+  feed: [],
   journal: [],
   memoryQueue: [],
   seq: 0,
 
-  pushConsequence: (origin) => {
-    set((s) => {
-      const toast = { id: s.seq + 1, origin };
-      if (s.consequence === null) return { consequence: toast, seq: toast.id };
-      if (s.consequenceQueue.length >= TOAST_QUEUE_CAP) return s;
-      return { consequenceQueue: [...s.consequenceQueue, toast], seq: toast.id };
-    });
+  pushFeed: (push) => {
+    const id = get().seq + 1;
+    set((s) => ({
+      feed: [
+        {
+          id,
+          source: push.source,
+          key: push.key,
+          journalId: push.journalId ?? null,
+          ttlMs: feedTtl(push.source),
+          tone: push.tone ?? "normal",
+          scope: push.scope ?? "run",
+          interactive: push.interactive ?? true,
+        },
+        ...s.feed,
+      ].slice(0, FEED_CAP),
+      seq: id,
+    }));
+    return id;
   },
 
-  pushBark: (line) => {
-    set((s) => {
-      const toast = { id: s.seq + 1, line };
-      if (s.bark === null) return { bark: toast, seq: toast.id };
-      if (s.barkQueue.length >= TOAST_QUEUE_CAP) return s;
-      return { barkQueue: [...s.barkQueue, toast], seq: toast.id };
-    });
+  dismissFeed: (id) => {
+    set((s) => ({ feed: s.feed.filter((message) => message.id !== id) }));
   },
 
-  pushAchievement: (achievement) => {
-    set((s) => {
-      const toast = { id: s.seq + 1, achievement };
-      if (s.achievement === null) return { achievement: toast, seq: toast.id };
-      if (s.achievementQueue.length >= TOAST_QUEUE_CAP) return s;
-      return {
-        achievementQueue: [...s.achievementQueue, toast],
-        seq: toast.id,
-      };
-    });
+  clearFeed: () => {
+    set({ feed: [] });
   },
 
-  pushHint: (line) => {
-    set((s) =>
-      s.hint === null ? { hint: { id: s.seq + 1, line }, seq: s.seq + 1 } : s,
-    );
+  dropRunFeed: () => {
+    set((s) => ({ feed: s.feed.filter((message) => message.scope === "app") }));
   },
 
   pushJournal: (entry) => {
-    set((s) => {
-      const id = s.seq + 1;
-      return {
-        journal: [...s.journal, { ...entry, id }].slice(-JOURNAL_CAP),
-        seq: id,
-      };
-    });
+    const id = get().seq + 1;
+    set((s) => ({
+      journal: capJournal([...s.journal, { ...entry, id }]),
+      seq: id,
+    }));
+    return id;
   },
 
   pushMemory: (order) => {
@@ -123,47 +138,12 @@ export const useNarrativeStore = create<NarrativeState>()((set) => ({
 
   setJournal: (entries) => {
     set((s) => ({
-      journal: [...entries].slice(-JOURNAL_CAP),
+      journal: capJournal(entries),
       seq: Math.max(s.seq, ...entries.map((e) => e.id), 0),
     }));
   },
 
-  dismissHint: () => {
-    set({ hint: null });
-  },
-
-  dismissConsequence: () => {
-    set((s) => ({
-      consequence: s.consequenceQueue[0] ?? null,
-      consequenceQueue: s.consequenceQueue.slice(1),
-    }));
-  },
-
-  dismissBark: () => {
-    set((s) => ({
-      bark: s.barkQueue[0] ?? null,
-      barkQueue: s.barkQueue.slice(1),
-    }));
-  },
-
-  dismissAchievement: () => {
-    set((s) => ({
-      achievement: s.achievementQueue[0] ?? null,
-      achievementQueue: s.achievementQueue.slice(1),
-    }));
-  },
-
   reset: () => {
-    set({
-      consequence: null,
-      consequenceQueue: [],
-      bark: null,
-      barkQueue: [],
-      achievement: null,
-      achievementQueue: [],
-      hint: null,
-      journal: [],
-      memoryQueue: [],
-    });
+    set({ feed: [], journal: [], memoryQueue: [] });
   },
 }));

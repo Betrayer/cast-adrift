@@ -6,6 +6,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from '@/app/App';
 import { applyFontScale, applyMotion, applyTheme } from '@/app/theme';
+import { measureViewportBox } from '@/app/viewportBox';
 import { setupAutosave } from '@/game/run/autosave';
 import { initI18n } from '@/i18n';
 import {
@@ -36,6 +37,7 @@ import {
 applyTheme(useSettingsStore.getState().theme);
 applyFontScale(useSettingsStore.getState().fontScale);
 applyMotion(resolveReducedMotion(useSettingsStore.getState().reducedMotion));
+measureViewportBox();
 
 setupErrorReporting();
 setupAutosave();

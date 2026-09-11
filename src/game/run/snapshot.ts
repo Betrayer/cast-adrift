@@ -14,9 +14,27 @@ import { restoreActionLog } from "@/game/run/actionLog";
 import { useAppStore } from "@/stores/appStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import type { JournalEntry } from "@/game/run/journal";
+import type { HoleSpot, MapGraph } from "@/game/map/types";
 import type { ScreenId } from "@/types";
 
-export const RUN_SNAPSHOT_V = 10;
+const TRANSIENT_SCREENS: readonly ScreenId[] = [
+  "bridge",
+  "journal",
+  "codex",
+  "settings",
+];
+
+const resumeScreen = (screen: ScreenId, battleLive: boolean): ScreenId => {
+  if (!TRANSIENT_SCREENS.includes(screen)) return screen;
+  if (battleLive) return "battle";
+  return useRunStore.getState().pendingRewards === null ? "map" : "rewards";
+};
+
+export const RUN_SNAPSHOT_V = 15;
+
+export const RUN_SNAPSHOT_ACCEPTED: readonly number[] = [
+  10, 11, 12, 13, 14, 15,
+];
 
 export interface RunSnapshotV1 {
   v: number;
@@ -46,6 +64,14 @@ const pickRunValues = (s: RunState): RunValues => ({
   deck: s.deck.map((d) => ({ ...d })),
   perks: [...s.perks],
   modules: [...s.modules],
+  officers: [...s.officers],
+  echo: s.echo,
+  echoUsed: s.echoUsed,
+  cargo: s.cargo.map((held) => ({ ...held })),
+  pendingCargoBark: s.pendingCargoBark,
+  pendingOfficerBark: s.pendingOfficerBark,
+  baysPurchased: s.baysPurchased,
+  pendingSwaps: s.pendingSwaps.map((swap) => ({ ...swap })),
   banishedPerks: [...s.banishedPerks],
   draftsSinceRare: s.draftsSinceRare,
   draftRerollUsed: s.draftRerollUsed,
@@ -72,6 +98,7 @@ const pickRunValues = (s: RunState): RunValues => ({
   battleEndHealRun: s.battleEndHealRun,
   rerollSizeRun: s.rerollSizeRun,
   bonusReveal: s.bonusReveal,
+  sectorReveal: s.sectorReveal,
   shipyardDiscount: s.shipyardDiscount,
   pendingBattle:
     s.pendingBattle === null
@@ -89,6 +116,7 @@ const pickRunValues = (s: RunState): RunValues => ({
   lastWormhole: s.lastWormhole === null ? null : { ...s.lastWormhole },
   pendingDeepScan: s.pendingDeepScan,
   lastTally: s.lastTally === null ? null : { ...s.lastTally },
+  lastBattleLog: s.lastBattleLog.map((entry) => ({ ...entry })),
   pendingRewards:
     s.pendingRewards === null
       ? null
@@ -100,6 +128,9 @@ const pickRunValues = (s: RunState): RunValues => ({
             : {}),
           ...(s.pendingRewards.moduleChoices !== undefined
             ? { moduleChoices: [...s.pendingRewards.moduleChoices] }
+            : {}),
+          ...(s.pendingRewards.salvage !== undefined
+            ? { salvage: [...s.pendingRewards.salvage] }
             : {}),
           ...(s.pendingRewards.voucher !== undefined
             ? { voucher: s.pendingRewards.voucher }
@@ -137,19 +168,23 @@ const pickRunValues = (s: RunState): RunValues => ({
   startedAt: s.startedAt,
 });
 
-export const captureRunSnapshot = (): RunSnapshotV1 => ({
-  v: RUN_SNAPSHOT_V,
-  screen: useAppStore.getState().screen,
-  run: pickRunValues(useRunStore.getState()),
-  journal: useNarrativeStore.getState().journal.map((entry) => ({ ...entry })),
-  battle: serializeBattle(),
-});
+export const captureRunSnapshot = (): RunSnapshotV1 => {
+  const battle = serializeBattle();
+  return {
+    v: RUN_SNAPSHOT_V,
+    screen: resumeScreen(useAppStore.getState().screen, battle !== null),
+    run: pickRunValues(useRunStore.getState()),
+    journal: useNarrativeStore.getState().journal.map((entry) => ({ ...entry })),
+    battle,
+  };
+};
 
 const isRunSnapshot = (data: unknown): data is RunSnapshotV1 => {
   if (typeof data !== "object" || data === null) return false;
   const snap = data as Partial<RunSnapshotV1>;
   return (
-    snap.v === RUN_SNAPSHOT_V &&
+    typeof snap.v === "number" &&
+    RUN_SNAPSHOT_ACCEPTED.includes(snap.v) &&
     typeof snap.screen === "string" &&
     typeof snap.run === "object" &&
     snap.run !== null &&
@@ -157,9 +192,31 @@ const isRunSnapshot = (data: unknown): data is RunSnapshotV1 => {
   );
 };
 
+const withSynthesisedSpots = (map: MapGraph): MapGraph => {
+  const declared: unknown = (map as { spots?: unknown }).spots;
+  if (Array.isArray(declared)) return map;
+  const spots: HoleSpot[] = [];
+  const nodes = map.nodes.map((node) => {
+    if (node.hole !== true) return node;
+    const id = `spot:${node.id}`;
+    spots.push({
+      id,
+      nodes: [node.id],
+      rows: [node.row, node.row],
+      lanes: [node.lane, node.lane],
+    });
+    return { ...node, spot: id };
+  });
+  return { ...map, nodes, spots };
+};
+
 export const restoreRunSnapshot = (data: unknown): boolean => {
   if (!isRunSnapshot(data)) return false;
-  const values = { ...createInitialRunValues(), ...data.run };
+  const restored = { ...createInitialRunValues(), ...data.run };
+  const values =
+    restored.map === null
+      ? restored
+      : { ...restored, map: withSynthesisedSpots(restored.map) };
   useRunStore.getState().hydrate(values);
   useNarrativeStore.getState().reset();
   useNarrativeStore.getState().setJournal(data.journal);
