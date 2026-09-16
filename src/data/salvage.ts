@@ -20,41 +20,36 @@ export const SALVAGE_DISCOUNT_SCRAP = 25;
 
 export const SALVAGE_OFFER_SIZE = 3;
 
+const salvageFace = (
+  id: SalvageFaceId,
+  body: Omit<SalvageFace, "id" | "name" | "desc" | "line">,
+): SalvageFace => ({
+  id,
+  name: `content:salvage.${id}.name`,
+  desc: `content:salvage.${id}.desc`,
+  line: `content:salvage.${id}.line`,
+  ...body,
+});
+
 export const SALVAGE_FACES: readonly SalvageFace[] = [
-  {
-    id: "scrap",
-    name: "content:salvage.scrap.name",
-    desc: "content:salvage.scrap.desc",
-    line: "content:salvage.scrap.line",
+  salvageFace("scrap", {
     weight: 3,
     effects: [{ k: "scrap", n: SALVAGE_SCRAP }],
-  },
-  {
-    id: "repair",
-    name: "content:salvage.repair.name",
-    desc: "content:salvage.repair.desc",
-    line: "content:salvage.repair.line",
+  }),
+  salvageFace("repair", {
     weight: 3,
     effects: [{ k: "hull", n: SALVAGE_REPAIR }],
-  },
-  {
-    id: "recon",
-    name: "content:salvage.recon.name",
-    desc: "content:salvage.recon.desc",
-    line: "content:salvage.recon.line",
+  }),
+  salvageFace("recon", {
     weight: 2,
     effects: [{ k: "nodeMod", mod: "sectorReveal", n: SALVAGE_RECON_ROWS }],
-  },
-  {
-    id: "discount",
-    name: "content:salvage.discount.name",
-    desc: "content:salvage.discount.desc",
-    line: "content:salvage.discount.line",
+  }),
+  salvageFace("discount", {
     weight: 2,
     effects: [
       { k: "nodeMod", mod: "shipyardDiscount", n: SALVAGE_DISCOUNT_SCRAP },
     ],
-  },
+  }),
 ];
 
 export const SALVAGE_BY_ID: ReadonlyMap<string, SalvageFace> = new Map(

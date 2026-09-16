@@ -42,6 +42,8 @@ export const BattleLogList = ({ log }: { log: readonly BattleLogEntry[] }) => {
               <span className={styles.what}>
                 {t(`battle:journal.${entry.side}.${entry.kind}`, {
                   n: entry.amount,
+                  name:
+                    entry.targetName === undefined ? '' : t(entry.targetName),
                 })}
               </span>
               {entry.hull > 0 ? (

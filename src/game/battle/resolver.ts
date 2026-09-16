@@ -4,9 +4,13 @@ import { echoShieldCharge } from "@/data/echo";
 import {
   aliveEnemies,
   applyWeaponDamage,
+  coreLocked,
   handleDeath,
+  partDefOf,
+  reaimOffLockedCore,
   resolveWeaponTarget,
   scatterTargets,
+  silencePartsOnBodyDeath,
   stripShield,
   type WeaponTarget,
 } from "@/game/battle/damage";
@@ -36,6 +40,7 @@ import {
   curseOn,
   dieFitsSlot,
   drawIntent,
+  drawPartIntent,
   effectiveCap,
   everyTurnFor,
   exceedCapGrantFor,
@@ -123,6 +128,9 @@ export const BLOOD_REACTOR_CHARGE = 3;
 const clone = (snapshot: BattleSnapshot): BattleSnapshot =>
   structuredClone(snapshot);
 
+export const dieValueCeiling = (die: RolledDie): number =>
+  die.tier + (die.growth ?? 0);
+
 export const applyNodeStorm = (
   next: BattleSnapshot,
   rng: RngStream,
@@ -134,7 +142,7 @@ export const applyNodeStorm = (
   if (placed.length === 0) return null;
   const die = rng.pick(placed);
   const rolled = rng.int(1, die.tier) + (die.growth ?? 0);
-  die.value = Math.min(die.tier, Math.max(1, rolled));
+  die.value = Math.min(dieValueCeiling(die), Math.max(1, rolled));
   return {
     slot: die.slot ?? "reactor",
     kind: "storm",
@@ -204,6 +212,11 @@ const hasAliveAura = (
   enemy: EnemyState,
   aura: SubsystemState["aura"],
 ): boolean => enemy.subsystems.some((s) => s.hp > 0 && s.aura === aura);
+
+export const enemyAuraAttack = (enemy: EnemyState): number =>
+  (hasAliveAura(enemy, "atk+2") ? 2 : 0) +
+  (hasAliveAura(enemy, "atk+3") ? 3 : 0) +
+  (enemy.rage ?? 0);
 
 const countAliveAura = (
   enemy: EnemyState,
@@ -630,6 +643,24 @@ const emitBattleEnd = (
   ctx.payload = {};
 };
 
+const pushPartDownBeats = (next: BattleSnapshot, beats: Beat[]): void => {
+  const downed = next.partsDowned ?? [];
+  if (downed.length === 0) return;
+  next.partsDowned = [];
+  for (const partId of downed) {
+    const killing = [...beats]
+      .reverse()
+      .find((b) => b.kind === "damage" && b.targetId === partId);
+    beats.push({
+      slot: killing?.slot ?? "weaponA",
+      kind: "partDown",
+      amount: 0,
+      targetId: partId,
+      after: clone(next),
+    });
+  }
+};
+
 export const resolvePlayerPhase = (
   snapshot: BattleSnapshot,
   diceStream?: RngStream,
@@ -682,6 +713,7 @@ export const resolvePlayerPhase = (
 
   runScheduled(next, ctx);
   emit(sources, "turnEnd", ctx);
+  pushPartDownBeats(next, beats);
 
   next.lastPlayerDamage = beats
     .filter((b) => b.kind === "damage")
@@ -745,10 +777,7 @@ export const incomingHits = (
   hits: number,
 ): number[] => {
   const def = ENEMY_BY_ID.get(enemy.defId);
-  const aura =
-    (hasAliveAura(enemy, "atk+2") ? 2 : 0) +
-    (hasAliveAura(enemy, "atk+3") ? 3 : 0) +
-    (enemy.rage ?? 0);
+  const aura = enemyAuraAttack(enemy);
   const perkMods = sourceMods(next);
   const tide = Math.max(
     0,
@@ -866,7 +895,7 @@ const curseTrayDie = (
 export const MIRROR_SCHOOL_MULT = 1;
 export const MIRROR_SCHOOL_CAP = 10;
 
-const largestSchoolCount = (next: BattleSnapshot): number =>
+export const largestSchoolCount = (next: BattleSnapshot): number =>
   Math.max(0, ...Object.values(next.resonance.counts));
 
 export const stealScrap = (next: BattleSnapshot, n: number): number => {
@@ -891,41 +920,59 @@ const shrinkRandomSlot = (
   return slot;
 };
 
+export interface IntentThreat {
+  perHit: number;
+  hits: number;
+}
+
+export const intentMagnitude = (
+  next: BattleSnapshot,
+  intent: Intent,
+): IntentThreat | null => {
+  switch (intent.t) {
+    case "attack":
+      return { perHit: intent.n, hits: 1 };
+    case "multi":
+      return { perHit: intent.n, hits: intent.k };
+    case "mirrorHalf":
+      return {
+        perHit: Math.min(
+          MIRROR_CAP,
+          Math.ceil(Math.max(0, next.lastPlayerDamage) / 2),
+        ),
+        hits: 1,
+      };
+    case "mirrorSchool":
+      return {
+        perHit: Math.min(
+          MIRROR_SCHOOL_CAP,
+          largestSchoolCount(next) * MIRROR_SCHOOL_MULT,
+        ),
+        hits: 1,
+      };
+    case "echoTotal":
+      return {
+        perHit: Math.min(intent.cap, Math.max(0, next.lastPlayerDamage)),
+        hits: 1,
+      };
+    case "bargain":
+      return next.scrap + next.runScrap >= intent.n
+        ? null
+        : { perHit: intent.n, hits: 1 };
+    default:
+      return null;
+  }
+};
+
 export const intentHits = (
   next: BattleSnapshot,
   enemy: EnemyState,
   intent: Intent,
 ): number[] => {
-  switch (intent.t) {
-    case "attack":
-      return incomingHits(next, enemy, intent.n, 1);
-    case "multi":
-      return incomingHits(next, enemy, intent.n, intent.k);
-    case "mirrorHalf":
-      return incomingHits(
-        next,
-        enemy,
-        Math.min(MIRROR_CAP, Math.ceil(Math.max(0, next.lastPlayerDamage) / 2)),
-        1,
-      );
-    case "mirrorSchool":
-      return incomingHits(
-        next,
-        enemy,
-        Math.min(MIRROR_SCHOOL_CAP, largestSchoolCount(next) * MIRROR_SCHOOL_MULT),
-        1,
-      );
-    case "echoTotal": {
-      const echoed = Math.min(intent.cap, Math.max(0, next.lastPlayerDamage));
-      return echoed <= 0 ? [] : incomingHits(next, enemy, echoed, 1);
-    }
-    case "bargain":
-      return next.scrap + next.runScrap >= intent.n
-        ? []
-        : incomingHits(next, enemy, intent.n, 1);
-    default:
-      return [];
-  }
+  const magnitude = intentMagnitude(next, intent);
+  if (magnitude === null) return [];
+  if (intent.t === "echoTotal" && magnitude.perHit <= 0) return [];
+  return incomingHits(next, enemy, magnitude.perHit, magnitude.hits);
 };
 
 interface EnemyPhaseCtx {
@@ -933,7 +980,11 @@ interface EnemyPhaseCtx {
   beats: EnemyBeat[];
   enemyStream: RngStream;
   attack: AttackContext;
+  actingPartId?: string;
 }
+
+const actingPart = (ctx: EnemyPhaseCtx): Partial<EnemyBeat> =>
+  ctx.actingPartId === undefined ? {} : { partId: ctx.actingPartId };
 
 const pushBeat = (
   ctx: EnemyPhaseCtx,
@@ -944,6 +995,7 @@ const pushBeat = (
 ): void => {
   ctx.beats.push({
     enemyId,
+    ...actingPart(ctx),
     kind,
     amount,
     hullDamage: 0,
@@ -960,6 +1012,7 @@ const pushAttackBeat = (
 ): void => {
   ctx.beats.push({
     enemyId: enemy.id,
+    ...actingPart(ctx),
     kind: "attack",
     amount: result.dealt,
     hullDamage: result.hullDamage,
@@ -996,7 +1049,7 @@ const resolveIntent = (
       if (intent.t === "attack" && (intent.self ?? 0) > 0) {
         enemy.hp = Math.max(0, enemy.hp - (intent.self ?? 0));
         if (enemy.hp === 0) {
-          for (const sub of enemy.subsystems) sub.hp = 0;
+          silencePartsOnBodyDeath(enemy);
           handleDeath(next, enemy);
           if (enemy.id === next.targetId) {
             next.targetId = aliveEnemies(next)[0]?.id ?? null;
@@ -1126,6 +1179,8 @@ const resolveIntent = (
       next.foldedTurns = (next.foldedTurns ?? 0) + 2;
       pushBeat(ctx, enemy.id, "fold");
       return;
+    case "idle":
+      return;
     case "devourDie": {
       const tray = next.dice.filter((d) => d.state === "tray");
       if (tray.length === 0) {
@@ -1166,6 +1221,71 @@ const resolveIntent = (
   }
 };
 
+const drainPendingAdds = (ctx: EnemyPhaseCtx): void => {
+  const queued = ctx.next.pendingAdds ?? [];
+  if (queued.length === 0) return;
+  ctx.next.pendingAdds = [];
+  for (const defId of queued) {
+    if (aliveEnemies(ctx.next).length >= MAX_ENEMIES) continue;
+    const spawned = spawnEnemy(
+      defId,
+      `enemy-${String(ctx.next.enemies.length)}`,
+      ctx.enemyStream,
+      enemySpawnInit(ctx.next),
+    );
+    ctx.next.enemies.push(spawned);
+    pushBeat(ctx, spawned.id, "summon");
+  }
+};
+
+const resolveParts = (
+  ctx: EnemyPhaseCtx,
+  enemy: EnemyState,
+  def: EnemyDef,
+): void => {
+  const { next, enemyStream } = ctx;
+  for (const part of enemy.subsystems) {
+    if (enemy.hp <= 0) return;
+    if (part.hp <= 0 || part.nextIntent === undefined) continue;
+    const partDef = partDefOf(def, part);
+    if (partDef === undefined) continue;
+    ctx.actingPartId = part.id;
+    resolveIntent(ctx, enemy, def, part.nextIntent);
+    ctx.actingPartId = undefined;
+    if (part.hp <= 0) continue;
+    const steps = (partDef.intents ?? []).length;
+    if (steps === 0) continue;
+    part.intentIndex = ((part.intentIndex ?? 0) + 1) % steps;
+    part.nextIntent = drawPartIntent(
+      partDef,
+      part.intentIndex,
+      enemyStream,
+      stepContextFor(next, enemy),
+    );
+  }
+};
+
+const rewindParts = (
+  ctx: EnemyPhaseCtx,
+  enemy: EnemyState,
+  def: EnemyDef,
+): void => {
+  for (const part of enemy.subsystems) {
+    if (part.hp <= 0) continue;
+    const partDef = partDefOf(def, part);
+    if (partDef === undefined) continue;
+    const opening = drawPartIntent(
+      partDef,
+      0,
+      ctx.enemyStream,
+      stepContextFor(ctx.next, enemy),
+    );
+    if (opening === undefined) continue;
+    part.intentIndex = 0;
+    part.nextIntent = opening;
+  }
+};
+
 const syncPhases = (ctx: EnemyPhaseCtx): void => {
   for (const enemy of aliveEnemies(ctx.next)) {
     const def = ENEMY_BY_ID.get(enemy.defId);
@@ -1187,11 +1307,21 @@ const syncPhases = (ctx: EnemyPhaseCtx): void => {
       ctx.next.ascension,
       stepContextFor(ctx.next, enemy),
     );
+    rewindParts(ctx, enemy, def);
     pushBeat(ctx, enemy.id, "phase", target);
     for (const intent of def.phases[target]?.onEnter ?? []) {
       resolveIntent(ctx, enemy, def, intent);
     }
   }
+};
+
+export const chargeAuraActive = (next: BattleSnapshot): boolean =>
+  next.turn % 3 === 0 &&
+  aliveEnemies(next).some((enemy) => hasAliveAura(enemy, "chargeAllies"));
+
+export const applyChargeAuras = (next: BattleSnapshot): void => {
+  if (!chargeAuraActive(next)) return;
+  for (const ally of aliveEnemies(next)) applyStatus(ally.statuses, "charge");
 };
 
 const resolveAuras = (ctx: EnemyPhaseCtx): void => {
@@ -1206,7 +1336,7 @@ const resolveAuras = (ctx: EnemyPhaseCtx): void => {
       pushBeat(ctx, enemy.id, "shield", 6);
     }
     if (hasAliveAura(enemy, "chargeAllies") && next.turn % 3 === 0) {
-      for (const ally of aliveEnemies(next)) applyStatus(ally.statuses, "charge");
+      applyChargeAuras(next);
       pushBeat(ctx, enemy.id, "charge");
     }
     const twists = countAliveAura(enemy, "twistEachTurn");
@@ -1262,6 +1392,7 @@ export const resolveEnemyPhase = (
     next.shield = Math.floor((next.shield * (100 - decayPct)) / 100);
   }
 
+  drainPendingAdds(ctx);
   syncPhases(ctx);
   resolveAuras(ctx);
 
@@ -1291,14 +1422,16 @@ export const resolveEnemyPhase = (
       enemy.ward = rotateWard(enemy.ward, enemyStream);
       pushBeat(ctx, enemy.id, "ward");
     }
+    resolveParts(ctx, enemy, def);
   }
 
   for (const enemy of aliveEnemies(next)) {
     const burnDamage = tickBurn(enemy.statuses);
     if (burnDamage <= 0) continue;
+    if (coreLocked(next, enemy)) continue;
     enemy.hp = Math.max(0, enemy.hp - burnDamage);
     if (enemy.hp === 0) {
-      for (const sub of enemy.subsystems) sub.hp = 0;
+      silencePartsOnBodyDeath(enemy);
       handleDeath(next, enemy);
       if (enemy.id === next.targetId) {
         next.targetId = aliveEnemies(next)[0]?.id ?? null;
@@ -1334,7 +1467,7 @@ export const resolveEnemyPhase = (
 };
 
 const clampToTier = (die: RolledDie, value: number): number =>
-  Math.min(die.tier, Math.max(1, value));
+  Math.min(dieValueCeiling(die), Math.max(1, value));
 
 export const applyPendingTwists = (
   next: BattleSnapshot,
@@ -1405,6 +1538,7 @@ export const advanceTurn = (
   next.cursedDice = (next.cursedDice ?? []).filter(
     (c) => c.untilTurn >= next.turn,
   );
+  reaimOffLockedCore(next);
   next.dice = next.dice.filter(
     (die) => die.expiresTurn === undefined || die.expiresTurn >= next.turn,
   );

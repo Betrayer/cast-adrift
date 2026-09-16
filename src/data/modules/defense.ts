@@ -1,21 +1,16 @@
+import { moduleDef } from "@/data/modules/types";
 import type { ModuleDef } from "@/data/modules/types";
 
 export const DEFENSE_MODULES: readonly ModuleDef[] = [
-  {
-    id: "ballastModule",
-    name: "content:modules.ballastModule.name",
-    desc: "content:modules.ballastModule.desc",
+  moduleDef("ballastModule", {
     rarity: "common",
     price: 45,
     tag: "defense",
     tags: ["survival"],
     mods: { hullMaxDelta: 5, evasionDelta: -2 },
     effects: [{ on: "nodeEnter", do: [{ a: "heal", n: 1 }] }],
-  },
-  {
-    id: "hardpointClamp",
-    name: "content:modules.hardpointClamp.name",
-    desc: "content:modules.hardpointClamp.desc",
+  }),
+  moduleDef("hardpointClamp", {
     rarity: "common",
     price: 50,
     tag: "defense",
@@ -31,11 +26,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "modDieValue", n: 3 }],
       },
     ],
-  },
-  {
-    id: "heatsink",
-    name: "content:modules.heatsink.name",
-    desc: "content:modules.heatsink.desc",
+  }),
+  moduleDef("heatsink", {
     rarity: "common",
     price: 50,
     tag: "defense",
@@ -51,22 +43,16 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "shield", n: 3 }],
       },
     ],
-  },
-  {
-    id: "bufferCells",
-    name: "content:modules.bufferCells.name",
-    desc: "content:modules.bufferCells.desc",
+  }),
+  moduleDef("bufferCells", {
     rarity: "common",
     price: 45,
     tag: "defense",
     tags: ["shieldwall", "risk"],
     mods: { hullMaxDelta: -3 },
     effects: [{ on: "battleStart", do: [{ a: "shield", n: 6 }] }],
-  },
-  {
-    id: "dampingCoil",
-    name: "content:modules.dampingCoil.name",
-    desc: "content:modules.dampingCoil.desc",
+  }),
+  moduleDef("dampingCoil", {
     rarity: "common",
     price: 50,
     tag: "defense",
@@ -84,11 +70,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "ablativeWeave",
-    name: "content:modules.ablativeWeave.name",
-    desc: "content:modules.ablativeWeave.desc",
+  }),
+  moduleDef("ablativeWeave", {
     rarity: "uncommon",
     price: 60,
     tag: "defense",
@@ -109,11 +92,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "mirrorPlate",
-    name: "content:modules.mirrorPlate.name",
-    desc: "content:modules.mirrorPlate.desc",
+  }),
+  moduleDef("mirrorPlate", {
     rarity: "uncommon",
     price: 70,
     tag: "defense",
@@ -143,11 +123,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "voidLiner",
-    name: "content:modules.voidLiner.name",
-    desc: "content:modules.voidLiner.desc",
+  }),
+  moduleDef("voidLiner", {
     rarity: "uncommon",
     price: 70,
     tag: "defense",
@@ -164,11 +141,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "shield", n: 4 }],
       },
     ],
-  },
-  {
-    id: "fieldStabilizer",
-    name: "content:modules.fieldStabilizer.name",
-    desc: "content:modules.fieldStabilizer.desc",
+  }),
+  moduleDef("fieldStabilizer", {
     rarity: "uncommon",
     price: 70,
     tag: "defense",
@@ -184,11 +158,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "escapePod",
-    name: "content:modules.escapePod.name",
-    desc: "content:modules.escapePod.desc",
+  }),
+  moduleDef("escapePod", {
     rarity: "rare",
     price: 90,
     tag: "defense",
@@ -204,11 +175,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "bulkheadRing",
-    name: "content:modules.bulkheadRing.name",
-    desc: "content:modules.bulkheadRing.desc",
+  }),
+  moduleDef("bulkheadRing", {
     rarity: "rare",
     price: 85,
     tag: "defense",
@@ -226,11 +194,8 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "grant", what: "reserve", n: 1 }],
       },
     ],
-  },
-  {
-    id: "citadelCore",
-    name: "content:modules.citadelCore.name",
-    desc: "content:modules.citadelCore.desc",
+  }),
+  moduleDef("citadelCore", {
     rarity: "legendary",
     price: 120,
     tag: "defense",
@@ -259,5 +224,5 @@ export const DEFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "heal", n: 3 }],
       },
     ],
-  },
+  }),
 ];

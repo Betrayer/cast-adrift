@@ -130,6 +130,9 @@
   box-shadow: 0 10px 30px var(--ca-shadow);
   max-width: 480px;
   margin: 0 auto;
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sheetHead {
@@ -192,6 +195,7 @@
   border: 1px solid var(--ca-line);
   border-radius: 8px;
   padding: 5px 8px;
+  min-height: 24px;
   cursor: pointer;
 }
 
@@ -202,6 +206,13 @@
 
 .targetRowOn {
   border-color: var(--ca-accent);
+}
+
+.targetRow.targetRowSealed:disabled {
+  opacity: 1;
+  color: var(--ca-dim);
+  border-style: dashed;
+  border-color: var(--ca-amber);
 }
 
 @media (min-width: 768px) {

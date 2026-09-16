@@ -14,6 +14,7 @@ const MAJOR_TRIGGERS: ReadonlySet<string> = new Set([
   "threshold",
   "memory",
   "bossPhase",
+  "bossPartDown",
   "minibossIntro",
   "lowHull",
   "nearDeathWin",

@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import { createPortal } from 'react-dom';
+import { cx } from '@/app/cx';
 import {
   popoverMaxHeight,
   popoverPlacement,
@@ -101,10 +102,7 @@ export const TapPopover = ({
   }, [open, align]);
 
   return (
-    <span
-      ref={anchorRef}
-      className={[styles.anchor, className].filter((n) => n !== undefined).join(' ')}
-    >
+    <span ref={anchorRef} className={cx(styles.anchor, className)}>
       <button
         type="button"
         className={styles.trigger}

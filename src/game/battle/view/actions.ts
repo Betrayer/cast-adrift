@@ -30,6 +30,7 @@ import { aimedEnemy } from "@/game/battle/target";
 import {
   BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
+  dieValueCeiling,
   nudgeChargeCost,
   SURGE_COST,
 } from "@/game/battle/resolver";
@@ -231,7 +232,7 @@ export const consoleActions = (board: BattleBoard): ConsoleActions => {
     if (die === undefined) return "noSelection";
     if (die.state !== "tray" && die.state !== "placed") return "notInTray";
     if (dir === -1 && die.value <= 1) return "atFloor";
-    if (dir === 1 && die.value >= die.tier) return "atCeiling";
+    if (dir === 1 && die.value >= dieValueCeiling(die)) return "atCeiling";
     if (!nudge.free && board.charge < nudge.cost) return "noCharge";
     return null;
   };
@@ -240,17 +241,15 @@ export const consoleActions = (board: BattleBoard): ConsoleActions => {
   const withGate = (entry: ConsoleAction): ConsoleAction =>
     action(entry.id, gate(entry.block), entry.cost, entry.free);
 
-  const reserveBlock = idle
-    ? "resolving"
-    : board.rerollMode
-      ? "rerollMode"
-      : die === undefined
-        ? "noSelection"
-        : die.state !== "tray"
-          ? "notInTray"
-          : canReserve(board, die.uid)
-            ? null
-            : "reserveFull";
+  const reserveBlock = gate(
+    die === undefined
+      ? "noSelection"
+      : die.state !== "tray"
+        ? "notInTray"
+        : canReserve(board, die.uid)
+          ? null
+          : "reserveFull",
+  );
 
   return {
     reroll: action(
@@ -266,26 +265,18 @@ export const consoleActions = (board: BattleBoard): ConsoleActions => {
     ),
     buyReroll: action(
       "buyReroll",
-      idle
-        ? "resolving"
-        : board.rerollMode
-          ? "rerollMode"
-          : board.rerollsLeft <= 0
-            ? "noRerolls"
-            : board.charge < BONUS_REROLL_COST
-              ? "noCharge"
-              : null,
+      gate(
+        board.rerollsLeft <= 0
+          ? "noRerolls"
+          : board.charge < BONUS_REROLL_COST
+            ? "noCharge"
+            : null,
+      ),
       BONUS_REROLL_COST,
     ),
     surge: action(
       "surge",
-      idle
-        ? "resolving"
-        : board.rerollMode
-          ? "rerollMode"
-          : board.charge < SURGE_COST
-            ? "noCharge"
-            : null,
+      gate(board.charge < SURGE_COST ? "noCharge" : null),
       SURGE_COST,
     ),
     bloodReactor: action(

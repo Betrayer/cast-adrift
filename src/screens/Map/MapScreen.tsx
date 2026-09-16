@@ -5,6 +5,7 @@ import { useBackGuard } from "@/app/backGuard";
 import { useAtLeast } from "@/app/breakpoints";
 import { Screen } from "@/app/Screen";
 import { mixHex } from "@/app/color";
+import { cx } from "@/app/cx";
 import { prefetchBattle } from "@/app/prefetch";
 import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
@@ -79,7 +80,7 @@ import {
   WARP_SUCK_MS,
   type Point,
 } from "./travel";
-import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import { useAppStore } from "@/stores/appStore";
 import { runModuleSlots, useRunStore } from "@/stores/runStore";
 import styles from "./MapScreen.module.css";
@@ -362,9 +363,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const sensorsMk = useRunStore((s) => s.mkLevels.sensors ?? 1);
   const echo = useRunStore((s) => s.echo);
   const echoUsed = useRunStore((s) => s.echoUsed);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
 
   const flags = useRunStore((s) => s.flags);
   const seenEvents = useRunStore((s) => s.seenEvents);
@@ -866,9 +865,7 @@ const MapView = ({ map, position }: MapViewProps) => {
             </>
           }
         >
-          <span
-            className={`${styles.tideChip ?? ""} ${tidePulse ? styles.tidePulse ?? "" : ""}`}
-          >
+          <span className={cx(styles.tideChip, tidePulse && styles.tidePulse)}>
             {t("run:map.tide", { n: tide })}
           </span>
         </TapPopover>
@@ -1193,9 +1190,10 @@ const MapView = ({ map, position }: MapViewProps) => {
                       ? "storm"
                       : undefined
                 }
-                className={`${legal ? styles.nodeSelectable ?? "" : styles.node ?? ""} ${
-                  reduced ? "" : styles.nodeStagger ?? ""
-                }`}
+                className={cx(
+                  legal ? styles.nodeSelectable : styles.node,
+                  !reduced && styles.nodeStagger,
+                )}
                 style={reduced ? undefined : { animationDelay: `${String(Math.min(index, 24) * 45)}ms` }}
                 opacity={done ? 0.5 : 1}
                 onClick={previewable ? () => { selectNode(node.id); } : undefined}
@@ -1266,6 +1264,7 @@ const MapView = ({ map, position }: MapViewProps) => {
                 )}
                 {deliveryIds.has(node.id) ? (
                   <text
+                    className={styles.cargoMark}
                     data-cargo-marker={node.id}
                     x={geo.nodeX(node) + geo.radius(node) - 1}
                     y={geo.rowY(node.row) + geo.radius(node) + 7}
@@ -1378,9 +1377,7 @@ const MapView = ({ map, position }: MapViewProps) => {
 
           {warp === null && jumping ? (
             <g
-              className={`${styles.marker ?? ""} ${
-                reduced ? styles.markerInstant ?? "" : ""
-              }`}
+              className={cx(styles.marker, reduced && styles.markerInstant)}
               data-map-marker
               style={markerStyle(marker)}
             >

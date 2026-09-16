@@ -6,6 +6,8 @@ import { ALL_PERKS } from "@/data/perks";
 import { PLAYABLE_SHIPS } from "@/data/ships";
 import {
   advanceTurn,
+  applyNodeStorm,
+  applyPendingTwists,
   CHARGE_CAP,
   DODGE_PCT_CAP,
   evasionFor,
@@ -24,7 +26,7 @@ import {
   drawIntent,
   spawnEnemy,
 } from "@/game/battle/setup";
-import { computeCensus } from "@/game/battle/resonance";
+import { harnessEnemy, harnessSnap } from "@/game/battle/battleHarness";
 import {
   createStream,
   createStreamFromState,
@@ -51,19 +53,8 @@ const enemy = (defId: string, over: Partial<EnemyState> = {}): EnemyState => ({
   ...over,
 });
 
-const mkEnemy = (over: Partial<EnemyState> = {}): EnemyState => ({
-  id: "enemy-0",
-  defId: "raider",
-  hp: 18,
-  hpMax: 18,
-  shield: 0,
-  intentIndex: 0,
-  nextIntent: { t: "attack", n: 5 },
-  statuses: {},
-  subsystems: [],
-  phase: 0,
-  ...over,
-});
+const mkEnemy = (over: Partial<EnemyState> = {}): EnemyState =>
+  harnessEnemy({ hp: 18, hpMax: 18, ...over });
 
 const die = (
   uid: string,
@@ -80,53 +71,8 @@ const die = (
   slot,
 });
 
-const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
-  turn: 1,
-  hull: 30,
-  hullMax: 30,
-  shield: 0,
-  shieldPersist: 0,
-  charge: 0,
-  scrap: 0,
-  runScrap: 0,
-  tide: 0,
-  interference: 0,
-  perks: [],
-  dice: [],
-  slots: {
-    weaponA: { cap: 8, mk: 1 },
-    weaponB: { cap: 8, mk: 1 },
-    shields: { cap: 8, mk: 1 },
-    engines: { cap: 6, mk: 1 },
-    sensors: { cap: 6, mk: 1 },
-    reactor: { cap: 10, mk: 1 },
-  },
-  enemies: [enemy("raider")],
-  targetId: "enemy-0",
-  evasion: null,
-  nextTurnMods: {},
-  nextRollBonus: 0,
-  chargeCap: 10,
-  sacrificePool: 0,
-  bloodReactorUsed: false,
-  burnDoubleUsed: false,
-  blockedSlots: [],
-  shrunkSlots: [],
-  lockedDice: [],
-  resonance: computeCensus([]),
-  survivedLethal: false,
-  lastPlayerDamage: 0,
-  stolenScrap: 0,
-  pendingTwist: 0,
-  pendingSwap: 0,
-  pendingStorm: 0,
-  ascension: 0,
-  exceedCap: [],
-  sectorHpPct: 0,
-  sectorDmgPct: 0,
-  enemyHpPct: 0,
-  ...over,
-});
+const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot =>
+  harnessSnap([], { enemies: [enemy("raider")], ...over });
 
 type PlacementSlots = Partial<
   Record<
@@ -1374,5 +1320,59 @@ describe("enemy phase basics", () => {
     if (step !== undefined) {
       expect(intentsOfStep(step)).toContainEqual(next.enemies[0]?.nextIntent);
     }
+  });
+});
+
+describe("grown dice keep their growth above tier", () => {
+  const grownEvergreen = (
+    uid: string,
+    value: number,
+    slot?: SlotId,
+  ): RolledDie => ({
+    uid,
+    defId: "evergreen",
+    tier: 12,
+    school: "green",
+    value,
+    state: slot === undefined ? "tray" : "placed",
+    slot,
+    growth: 4,
+  });
+
+  it("a storm nudges a grown die by a pip instead of shearing it back to tier", () => {
+    const dice = [grownEvergreen("grown", 16)];
+    applyPendingTwists(snap({ dice, pendingStorm: 1 }), dice, createStream(7));
+    expect(dice[0]?.value).toBeGreaterThanOrEqual(14);
+  });
+
+  it("a swap can hand a grown die a value above its tier", () => {
+    const dice = [grownEvergreen("low", 3), grownEvergreen("high", 16)];
+    applyPendingTwists(snap({ dice, pendingSwap: 1 }), dice, createStream(7));
+    expect(dice[0]?.value).toBe(16);
+    expect(dice[1]?.value).toBe(3);
+  });
+
+  it("a twist can leave a grown die reading above its tier", () => {
+    const seen: number[] = [];
+    for (let seed = 0; seed < 64; seed += 1) {
+      const dice = [grownEvergreen("grown", 16)];
+      applyPendingTwists(
+        snap({ dice, pendingTwist: 1 }),
+        dice,
+        createStream(seed),
+      );
+      seen.push(dice[0]?.value ?? 0);
+    }
+    expect(Math.max(...seen)).toBeGreaterThan(12);
+  });
+
+  it("a node storm can leave a grown die reading above its tier", () => {
+    const seen: number[] = [];
+    for (let seed = 0; seed < 64; seed += 1) {
+      const dice = [grownEvergreen("grown", 16, "weaponA")];
+      applyNodeStorm(snap({ dice, nodeStorm: true }), createStream(seed));
+      seen.push(dice[0]?.value ?? 0);
+    }
+    expect(Math.max(...seen)).toBeGreaterThan(12);
   });
 });

@@ -75,7 +75,8 @@
     "hijack": "Entführt deinen besten Würfel",
     "echoTotal": "gibt deinen letzten Zug wieder (maximal {{n}})",
     "foldOrder": "bearbeitet die Bestellung",
-    "devourDie": "verschlingt deinen besten Ersatzwürfel"
+    "devourDie": "verschlingt deinen besten Ersatzwürfel",
+    "idle": "Hält"
   },
   "slot": {
     "weaponA": "Waffe A",
@@ -140,8 +141,8 @@
   "dieMeta": "d{{tier}} · {{school}} · {{faces}} · Ø {{ev}}",
   "targetBody": "Rumpf anvisieren",
   "targetSub": "{{name}} {{hp}}/{{max}}",
-  "mitigation": "roh {{raw}} → ~{{expected}} · Schild {{shield}} · Rumpf {{hull}}",
-  "mitigationNone": "Diese Absicht verursacht keinen Schaden",
+  "mitigation": "eingehend roh {{raw}} → ~{{expected}} · Schild {{shield}} · Rumpf {{hull}}",
+  "mitigationNone": "Dieser Gegner verursacht in dieser Runde keinen Schaden",
   "forecast": "du machst {{out}} · du nimmst ~{{inc}} (Schild hält {{shield}})",
   "forecastClear": "{{out}} Schaden räumt das Feld",
   "resBoard": "{{school}} {{placed}}+{{tray}}",
@@ -299,7 +300,8 @@
     "hijack": "Greift deinen höchsten Fachwürfel und heftet ihn in einen Slot seiner Wahl.",
     "echoTotal": "Wirft deinen letzten Rundenschaden zurück, höchstens {{n}}.",
     "foldOrder": "Faltet die Auflösungsreihenfolge für zwei Runden.",
-    "devourDie": "Frisst deinen höchsten Fachwürfel: Er fällt auf 1, der Gegner gewinnt so viel Schild."
+    "devourDie": "Frisst deinen höchsten Fachwürfel: Er fällt auf 1, der Gegner gewinnt so viel Schild.",
+    "idle": "Tut in dieser Runde nichts."
   },
   "aura": {
     "atk+2": "+2 auf jeden Treffer dieses Gegners.",
@@ -313,6 +315,16 @@
     "summonEvery4": "Jede vierte Runde: ruft einen Akolythen herbei.",
     "stealOnHit6": "Jeder gelandete Treffer nimmt 6 Schrott."
   },
+  "partDeath": {
+    "explodePart": "Ihre Zerstörung trifft dich für {{n}}.",
+    "enrageCore": "Ihre Zerstörung erzürnt den Kern: +{{n}} auf jeden späteren Treffer.",
+    "openCore": "Ihre Zerstörung öffnet den Kern für {{turns}} Runden.",
+    "shieldCore": "Ihre Zerstörung gibt dem Kern {{n}} Schild.",
+    "spawnAdds": "Ihre Zerstörung ruft ein weiteres Schiff herbei."
+  },
+  "coreSealed": "Kern versiegelt",
+  "coreSealedWhy": "Der Rumpf bleibt zu, bis {{n}} weitere seiner Teile brechen.",
+  "coreOpenWhy": "Der Rumpf bleibt bis zum Ende von Runde {{n}} offen.",
   "statusName": {
     "burn": "Brand",
     "mark": "Verwundbar",
@@ -360,7 +372,8 @@
       "sensor": "vulnerable + {{n}}",
       "charge": "+{{n}} Ladung",
       "repair": "+{{n}} Hülle",
-      "storm": "Sturm-Nudge"
+      "storm": "Sturm-Nudge",
+      "partDown": "Teil «{{name}}» zerstört"
     },
     "foe": {
       "attack": "Angriffe auf {{n}}",

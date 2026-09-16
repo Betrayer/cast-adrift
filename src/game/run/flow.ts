@@ -28,7 +28,7 @@ import { SECTOR_COUNT, SECTORS, sectorDef } from "@/data/sectors";
 import { shipHullMax } from "@/game/battle/setup";
 import type { ShipId } from "@/data/ships";
 import { beginCheckFunnel } from "@/game/onboarding";
-import { chartSlotTierDelta } from "@/game/chart/engine";
+import { chartSlotTierDelta, hubBudgetBonus } from "@/game/chart/engine";
 import {
   computeNodeReward,
   dieForRarity,
@@ -132,12 +132,19 @@ import {
   shardBreakdown,
   ZERO_SHARD_BREAKDOWN,
 } from "@/game/xp";
-import { milestonesBetween } from "@/data/milestones";
+import {
+  hangarBudget,
+  milestoneLabel,
+  milestonesBetween,
+} from "@/data/milestones";
+import { DECK_MIN, deckPoints, diePoints } from "@/data/metaShop";
+import { validateDeck } from "@/game/meta/deck";
 import {
   settleAchievements,
   settleLifetimeAchievements,
 } from "@/game/meta/achievements";
 import {
+  ceremonyRetiredIds,
   freshUnlocks,
   grantDieUnlock,
   metaHasFeature,
@@ -327,7 +334,7 @@ export const endRun = (win: boolean, cause?: DeathCause): void => {
   const xpGain = Math.round(runXp(counts, run.ascension) * xpMult);
   const beacons = beaconsResolved(run.flags);
   const hullPct = run.hullMax <= 0 ? 0 : (run.hull / run.hullMax) * 100;
-  meta.recordStreak(win && run.mode === "campaign");
+  if (run.mode === "campaign") meta.recordStreak(win);
   const streak = useMetaStore.getState().stats.noDeathStreak;
   const shards =
     run.mode === "campaign"
@@ -369,10 +376,13 @@ export const endRun = (win: boolean, cause?: DeathCause): void => {
     stats: run.stats,
   });
   const milestones = milestonesBetween(award.fromLevel, award.toLevel).map(
-    (m) => m.label,
+    milestoneLabel,
   );
   const after = useMetaStore.getState();
   const unlocks = freshUnlocks(unlockContextOf(after), after.unlocksSeen);
+  if (award.toLevel > award.fromLevel && !isScoredMode(run.mode)) {
+    after.markUnlocksSeen(ceremonyRetiredIds(unlocks));
+  }
   useSummaryStore.getState().setResult({
     xpGain,
     shardGain: shards.total + finds.shards + settled.shards,
@@ -704,6 +714,24 @@ const openStartDraft = (rootSeed: number): void => {
   noteDraftOffer(choices);
 };
 
+const withinHangarBudget = (
+  deck: readonly string[],
+  budget: number,
+): readonly string[] => {
+  if (validateDeck(deck, budget).valid) return deck;
+  const trimmed = [...deck];
+  while (trimmed.length > DECK_MIN && deckPoints(trimmed) > budget) {
+    let worst = 0;
+    for (let i = 1; i < trimmed.length; i += 1) {
+      if (diePoints(trimmed[i] ?? "") > diePoints(trimmed[worst] ?? "")) {
+        worst = i;
+      }
+    }
+    trimmed.splice(worst, 1);
+  }
+  return validateDeck(trimmed, budget).valid ? trimmed : STARTER_DECK;
+};
+
 export const startRunMode = (options: StartRunOptions = {}): void => {
   const mode = options.mode ?? "campaign";
   const rootSeed = (options.seed ?? now()) >>> 0;
@@ -724,9 +752,17 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     meta.selectedEcho,
     memoryFragmentCount(meta.codex),
   );
+  const savedDeck =
+    meta.hangar.deck.length >= DECK_MIN ? meta.hangar.deck : STARTER_DECK;
   const deckIds =
     setup.deckPreset ??
-    (meta.hangar.deck.length >= 3 ? meta.hangar.deck : STARTER_DECK);
+    withinHangarBudget(
+      savedDeck,
+      hangarBudget(meta.level, hubBudgetBonus(meta.chartPicks)),
+    );
+  if (deckIds !== savedDeck && setup.deckPreset === undefined) {
+    useMetaStore.getState().setDeck(deckIds);
+  }
   const chartMods = computeRunMods([], chartPicks);
   const ascension = Math.max(0, options.ascension ?? 0);
   const hullPct = ascensionMods(ascension).hullPct + chartMods.hullMaxPct;
@@ -1328,7 +1364,7 @@ export const resolveRunBattle = (): void => {
     run.noteBattleTally(lost);
     noteBattleLifetime(lost, false);
     endBattleStore();
-    endRun(false);
+    endRun(false, "hull");
     return;
   }
 
@@ -1446,7 +1482,7 @@ export const resolveEventBattle = (): void => {
     run.noteBattleTally(lost);
     noteBattleLifetime(lost, false);
     endBattleStore();
-    endRun(false);
+    endRun(false, "hull");
     return;
   }
 
@@ -1518,14 +1554,19 @@ export const resolveActiveBattle = (): void => {
   else resolveRunBattle();
 };
 
-export const applyPerkPick = (perkId: string): void => {
+const applyHullMaxDelta = (delta: number): void => {
+  if (delta === 0) return;
   const run = useRunStore.getState();
-  run.addPerk(perkId);
-  const mods = computePerkMods([perkId]);
-  if (mods.hullMaxDelta > 0) {
-    useRunStore.setState({ hullMax: run.hullMax + mods.hullMaxDelta });
-    useRunStore.getState().healHull(mods.hullMaxDelta);
-  }
+  const hullMax = Math.max(1, run.hullMax + delta);
+  useRunStore.setState({
+    hullMax,
+    hull: Math.min(hullMax, delta > 0 ? run.hull + delta : run.hull),
+  });
+};
+
+export const applyPerkPick = (perkId: string): void => {
+  useRunStore.getState().addPerk(perkId);
+  applyHullMaxDelta(computePerkMods([perkId]).hullMaxDelta);
 };
 
 export const resolveDieReward = (keep: boolean): void => {

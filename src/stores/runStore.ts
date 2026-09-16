@@ -13,13 +13,13 @@ import {
 import { bayPurchasable, moduleSlots } from "@/game/run/bays";
 import { shipCargoHold } from "@/game/run/hold";
 import { interferenceStacksForStreak } from "@/game/run/interference";
-import { computeRunMods } from "@/game/run/runMods";
+import { computeModuleMods, computeRunMods } from "@/game/run/runMods";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
 import type { WormholeThrow } from "@/game/map/wormhole";
 import type { BattleLogEntry, SlotId } from "@/types/battle";
 import type { Rarity } from "@/types/content";
-import type { FlagValue } from "@/types/events";
+import type { FlagValue, ForcedBattle } from "@/types/events";
 
 export const LAST_BATTLE_LOG_CAP = 60;
 
@@ -162,6 +162,12 @@ export interface PuzzleRunState {
   attempts: number;
 }
 
+export interface EventRunState {
+  eventId: string;
+  outcomeText: string | null;
+  follow: ForcedBattle | null;
+}
+
 export interface RunValues {
   active: boolean;
   seed: number;
@@ -207,6 +213,7 @@ export interface RunValues {
   seenEvents: string[];
   solvedPuzzles: string[];
   puzzleRuns: Record<NodeId, PuzzleRunState>;
+  eventRuns?: Record<NodeId, EventRunState>;
   anomalyStreak: number;
   interferenceStacks: number;
   killedTypes: string[];
@@ -272,6 +279,13 @@ export interface RunState extends RunValues {
   markPuzzleSolved: (id: string) => void;
   beginPuzzle: (nodeId: NodeId, puzzleId: string) => PuzzleRunState;
   spendPuzzleAttempt: (nodeId: NodeId) => number;
+  beginEventNode: (nodeId: NodeId, eventId: string) => void;
+  recordEventOutcome: (
+    nodeId: NodeId,
+    eventId: string,
+    outcomeText: string,
+    follow: ForcedBattle | null,
+  ) => void;
   recordAnomalySolved: () => void;
   recordAnomalyUnsolved: () => void;
   markKilledType: (defId: string) => boolean;
@@ -381,6 +395,7 @@ export const createInitialRunValues = (): RunValues => ({
   seenEvents: [],
   solvedPuzzles: [],
   puzzleRuns: {},
+  eventRuns: {},
   anomalyStreak: 0,
   interferenceStacks: 0,
   killedTypes: [],
@@ -427,6 +442,18 @@ export const runBayPurchasable = (s: RunValues): boolean =>
     computeRunMods(s.perks, s.chartPicks).moduleSlotDelta,
     s.baysPurchased,
   );
+
+const withHullMaxDelta = (
+  s: Pick<RunValues, "hull" | "hullMax">,
+  delta: number,
+): Pick<RunValues, "hull" | "hullMax"> => {
+  if (delta === 0) return { hull: s.hull, hullMax: s.hullMax };
+  const hullMax = Math.max(1, s.hullMax + delta);
+  return {
+    hullMax,
+    hull: Math.min(hullMax, delta > 0 ? s.hull + delta : s.hull),
+  };
+};
 
 export const useRunStore = create<RunState>()((set, get) => ({
   ...createInitialRunValues(),
@@ -513,12 +540,21 @@ export const useRunStore = create<RunState>()((set, get) => ({
     const s = get();
     if (s.modules.includes(moduleId)) return false;
     if (s.modules.length >= runModuleSlots(s)) return false;
-    set({ modules: [...s.modules, moduleId] });
+    set({
+      modules: [...s.modules, moduleId],
+      ...withHullMaxDelta(s, computeModuleMods([moduleId]).hullMaxDelta),
+    });
     return true;
   },
 
   removeModule: (moduleId) => {
-    set((s) => ({ modules: s.modules.filter((m) => m !== moduleId) }));
+    set((s) => {
+      if (!s.modules.includes(moduleId)) return s;
+      return {
+        modules: s.modules.filter((m) => m !== moduleId),
+        ...withHullMaxDelta(s, -computeModuleMods([moduleId]).hullMaxDelta),
+      };
+    });
   },
 
   addOfficer: (officerId) => {
@@ -653,6 +689,26 @@ export const useRunStore = create<RunState>()((set, get) => ({
     const next = { ...current, attempts: current.attempts + 1 };
     set((s) => ({ puzzleRuns: { ...s.puzzleRuns, [nodeId]: next } }));
     return next.attempts;
+  },
+
+  beginEventNode: (nodeId, eventId) => {
+    const existing = get().eventRuns?.[nodeId];
+    if (existing !== undefined && existing.eventId === eventId) return;
+    set((s) => ({
+      eventRuns: {
+        ...s.eventRuns,
+        [nodeId]: { eventId, outcomeText: null, follow: null },
+      },
+    }));
+  },
+
+  recordEventOutcome: (nodeId, eventId, outcomeText, follow) => {
+    set((s) => ({
+      eventRuns: {
+        ...s.eventRuns,
+        [nodeId]: { eventId, outcomeText, follow },
+      },
+    }));
   },
 
   recordAnomalySolved: () => {

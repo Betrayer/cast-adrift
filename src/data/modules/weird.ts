@@ -1,10 +1,8 @@
+import { moduleDef } from "@/data/modules/types";
 import type { ModuleDef } from "@/data/modules/types";
 
 export const WEIRD_MODULES: readonly ModuleDef[] = [
-  {
-    id: "jamBreaker",
-    name: "content:modules.jamBreaker.name",
-    desc: "content:modules.jamBreaker.desc",
+  moduleDef("jamBreaker", {
     rarity: "common",
     price: 50,
     tag: "weird",
@@ -17,11 +15,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "grant", what: "reserve", n: 1 }],
       },
     ],
-  },
-  {
-    id: "hushAntenna",
-    name: "content:modules.hushAntenna.name",
-    desc: "content:modules.hushAntenna.desc",
+  }),
+  moduleDef("hushAntenna", {
     rarity: "common",
     price: 45,
     tag: "weird",
@@ -33,11 +28,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "charge", n: 3 }],
       },
     ],
-  },
-  {
-    id: "prismLens",
-    name: "content:modules.prismLens.name",
-    desc: "content:modules.prismLens.desc",
+  }),
+  moduleDef("prismLens", {
     rarity: "common",
     price: 50,
     tag: "weird",
@@ -49,11 +41,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "rerollDie" }],
       },
     ],
-  },
-  {
-    id: "gamblersChip",
-    name: "content:modules.gamblersChip.name",
-    desc: "content:modules.gamblersChip.desc",
+  }),
+  moduleDef("gamblersChip", {
     rarity: "common",
     price: 50,
     tag: "weird",
@@ -68,11 +57,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "prophecyMount",
-    name: "content:modules.prophecyMount.name",
-    desc: "content:modules.prophecyMount.desc",
+  }),
+  moduleDef("prophecyMount", {
     rarity: "common",
     price: 55,
     tag: "weird",
@@ -84,11 +70,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "primeSchool", school: "grey", max: true }],
       },
     ],
-  },
-  {
-    id: "entropySink",
-    name: "content:modules.entropySink.name",
-    desc: "content:modules.entropySink.desc",
+  }),
+  moduleDef("entropySink", {
     rarity: "uncommon",
     price: 60,
     tag: "weird",
@@ -101,11 +84,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "charge", n: 3 }],
       },
     ],
-  },
-  {
-    id: "blackLedger",
-    name: "content:modules.blackLedger.name",
-    desc: "content:modules.blackLedger.desc",
+  }),
+  moduleDef("blackLedger", {
     rarity: "uncommon",
     price: 65,
     tag: "weird",
@@ -127,11 +107,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "phantomBay",
-    name: "content:modules.phantomBay.name",
-    desc: "content:modules.phantomBay.desc",
+  }),
+  moduleDef("phantomBay", {
     rarity: "uncommon",
     price: 70,
     tag: "weird",
@@ -142,11 +119,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "addTempDie", defId: "grey-d4", turns: 1 }],
       },
     ],
-  },
-  {
-    id: "delayLine",
-    name: "content:modules.delayLine.name",
-    desc: "content:modules.delayLine.desc",
+  }),
+  moduleDef("delayLine", {
     rarity: "uncommon",
     price: 70,
     tag: "weird",
@@ -164,11 +138,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "paradoxLoop",
-    name: "content:modules.paradoxLoop.name",
-    desc: "content:modules.paradoxLoop.desc",
+  }),
+  moduleDef("paradoxLoop", {
     rarity: "rare",
     price: 90,
     tag: "weird",
@@ -185,11 +156,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "repeatSlot" }],
       },
     ],
-  },
-  {
-    id: "coldLogicCore",
-    name: "content:modules.coldLogicCore.name",
-    desc: "content:modules.coldLogicCore.desc",
+  }),
+  moduleDef("coldLogicCore", {
     rarity: "rare",
     price: 85,
     tag: "weird",
@@ -202,11 +170,8 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "grant", what: "nudge", n: 2 }],
       },
     ],
-  },
-  {
-    id: "nonEuclidRack",
-    name: "content:modules.nonEuclidRack.name",
-    desc: "content:modules.nonEuclidRack.desc",
+  }),
+  moduleDef("nonEuclidRack", {
     rarity: "legendary",
     price: 120,
     tag: "weird",
@@ -218,5 +183,5 @@ export const WEIRD_MODULES: readonly ModuleDef[] = [
         do: [{ a: "allowExceedCap", hullCost: 1 }],
       },
     ],
-  },
+  }),
 ];

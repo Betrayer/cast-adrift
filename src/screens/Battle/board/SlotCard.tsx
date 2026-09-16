@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { cx } from '@/app/cx';
 import { schoolGlyphPath } from '@/data/glyphs';
 import type { SlotProjection } from '@/game/battle/view';
 import {
@@ -6,26 +7,16 @@ import {
   projectionText,
   projectionTone,
   slotSchool,
+  type SlotViewProps,
 } from '@/screens/Battle/board/slotText';
-import type { SlotId, SlotState } from '@/types/battle';
 import type { School } from '@/types/content';
 import styles from './Board.module.css';
 
-export interface SlotCardProps {
-  slotId: SlotId;
-  slot: SlotState;
-  order: number;
-  projection: SlotProjection | undefined;
-  occupiedBy: string | undefined;
-  blocked: boolean;
+export interface SlotCardProps extends SlotViewProps {
   shrunk: boolean;
-  legal: boolean;
-  goal: boolean;
   charge: number;
   chargeCap: number;
-  onTap: (slotId: SlotId) => void;
   formula?: boolean;
-  preview?: boolean;
 }
 
 export const SlotGlyph = ({ school }: { school: School }) => {
@@ -83,14 +74,12 @@ export const SlotCard = ({
       {...(formula ? { 'data-formula': '1' } : {})}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
-      className={[
-        styles.card ?? '',
-        legal ? styles.cardLegal ?? '' : '',
-        occupiedBy === undefined ? '' : styles.cardOccupied ?? '',
-        blocked ? styles.cardBlocked ?? '' : '',
-      ]
-        .filter((name) => name !== '')
-        .join(' ')}
+      className={cx(
+        styles.card,
+        legal && styles.cardLegal,
+        occupiedBy !== undefined && styles.cardOccupied,
+        blocked && styles.cardBlocked,
+      )}
       aria-label={t(`battle:slot.${slotId}`)}
       aria-hidden={preview}
       tabIndex={preview ? -1 : undefined}
@@ -113,9 +102,7 @@ export const SlotCard = ({
       ) : null}
       {note === null ? null : (
         <span
-          className={`${styles.affinity ?? ''} ${
-            inherits === null ? '' : styles.affinityInherited ?? ''
-          }`}
+          className={cx(styles.affinity, inherits !== null && styles.affinityInherited)}
           data-inherits={inherits ?? undefined}
         >
           {note}
@@ -123,7 +110,8 @@ export const SlotCard = ({
       )}
       {projection === undefined ? null : (
         <span
-          className={`${styles.proj ?? ''} ${toneClass(projection)}`}
+          key={projectionText(t, slotId, projection)}
+          className={cx(styles.proj, toneClass(projection))}
           data-proj={preview ? undefined : slotId}
           data-tone={preview ? undefined : projectionTone(projection)}
         >
@@ -140,9 +128,7 @@ export const SlotCard = ({
           {Array.from({ length: chargeCap }, (_, i) => (
             <span
               key={i}
-              className={`${styles.pip ?? ''} ${
-                i < Math.min(charge, chargeCap) ? styles.pipOn ?? '' : ''
-              }`}
+              className={cx(styles.pip, i < Math.min(charge, chargeCap) && styles.pipOn)}
               data-pip={i < Math.min(charge, chargeCap) ? 'on' : 'off'}
             />
           ))}

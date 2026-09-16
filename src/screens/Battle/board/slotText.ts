@@ -5,6 +5,19 @@ import type { School } from '@/types/content';
 
 export type ProjectionTone = 'danger' | 'bonus' | 'plain';
 
+export interface SlotViewProps {
+  slotId: SlotId;
+  slot: SlotState;
+  order: number;
+  projection: SlotProjection | undefined;
+  occupiedBy: string | undefined;
+  blocked: boolean;
+  legal: boolean;
+  goal: boolean;
+  onTap: (slotId: SlotId) => void;
+  preview?: boolean;
+}
+
 const splitOf = (projection: SlotProjection): string =>
   projection.fragments.join('+');
 

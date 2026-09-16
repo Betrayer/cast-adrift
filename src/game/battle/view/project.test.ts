@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { harnessEnemy, harnessSnap } from "@/game/battle/battleHarness";
 import type { MkLevels } from "@/game/battle/setup";
 import { resolveEnemyPhase, resolvePlayerPhase } from "@/game/battle/resolver";
 import {
@@ -19,7 +20,7 @@ import {
 import { useRunStore } from "@/stores/runStore";
 import type { EngravingMap } from "@/data/engravings";
 import type { ShipId } from "@/data/ships";
-import type { SlotId } from "@/types/battle";
+import type { BattleSnapshot, SlotId } from "@/types/battle";
 
 const DECKS: readonly (readonly string[])[] = [
   ["ember", "frostplate", "sprout", "grey-d4", "ashen", "coreshard"],
@@ -389,5 +390,51 @@ describe("enemy forecast", () => {
     expect(
       expectedHit(10, { dodgePct: 0, glancingPct: 100, intercept: false }),
     ).toBe(5);
+  });
+});
+
+describe("enemy forecast and the charge aura", () => {
+  const wraith = (turn: number): BattleSnapshot =>
+    harnessSnap([], {
+      turn,
+      hull: 40,
+      hullMax: 40,
+      shield: 0,
+      evasion: null,
+      enemies: [
+        harnessEnemy({
+          nextIntent: { t: "attack", n: 9 },
+          subsystems: [
+            {
+              id: "enemy-0:coil",
+              key: "coil",
+              hp: 9,
+              hpMax: 9,
+              aura: "chargeAllies",
+            },
+          ],
+        }),
+      ],
+    });
+
+  it("reports the doubled hit on the turn the aura fires", () => {
+    expect(enemyForecast(wraith(2)).raw).toBe(9);
+    expect(enemyForecast(wraith(3)).raw).toBe(18);
+  });
+
+  it("still equals the damage the enemy phase deals on the aura turn", () => {
+    const snapshot = wraith(3);
+    const forecast = enemyForecast(snapshot);
+    const { next } = resolveEnemyPhase(snapshot, createStream(11));
+    expect(snapshot.hull - next.hull).toBe(forecast.toHull);
+    expect(forecast.lethal).toBe(false);
+  });
+
+  it("drops the doubling once the aura part is dead", () => {
+    const snapshot = wraith(3);
+    const part = snapshot.enemies[0]?.subsystems[0];
+    if (part === undefined) throw new Error("no aura part");
+    part.hp = 0;
+    expect(enemyForecast(snapshot).raw).toBe(9);
   });
 });

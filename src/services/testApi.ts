@@ -88,6 +88,7 @@ import {
   useNarrativeStore,
   type FeedSource,
 } from "@/stores/narrativeStore";
+import { coreLocked } from "@/game/battle/damage";
 import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
 import { cargoRowsLeft } from "@/game/run/cargo";
 import type { JournalEntry } from "@/game/run/journal";
@@ -108,9 +109,11 @@ import {
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
-import { readFrames } from "@/pixi/perf";
+import { capturedTarget, draggedDie } from "@/pixi/battle/dragState";
+import { readFrames, readPerf, type PerfSnapshot } from "@/pixi/perf";
 import type { BattleLayoutId, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
+import type { Intent } from "@/types/content";
 
 export interface SeedRunConfig {
   mode?: RunMode;
@@ -370,6 +373,15 @@ export interface TestState {
       hpMax: number;
       shield: number;
       vulnerable: number;
+      coreLocked: boolean;
+      parts: {
+        id: string;
+        key: string;
+        hp: number;
+        hpMax: number;
+        alive: boolean;
+        intent: Intent | null;
+      }[];
     }[];
     evasion: { dodgePct: number; glancingPct: number; intercept: boolean } | null;
     freeNudges: number;
@@ -453,6 +465,7 @@ export interface TestApi {
   slotsFor: (uid: string) => SlotId[];
   dieCard: (defId: string) => DieCardView | null;
   shipCard: (shipId: ShipId) => ShipCardView | null;
+  setTarget: (targetId: string) => void;
   mitigation: (enemyId: string) => Mitigation | null;
   tally: () => BattleTally | null;
   coach: () => { active: string | null; seen: string[] };
@@ -461,7 +474,9 @@ export interface TestApi {
   skipCheck: () => void;
   restartCheckStep: () => void;
   anchors: () => BattleAnchors | null;
+  drag: () => { uid: string | null; captured: string | null };
   frames: () => number;
+  perf: () => PerfSnapshot;
   state: () => TestState;
   account: () => AccountView;
   cloudMeta: () => Promise<CloudMetaView | null>;
@@ -688,6 +703,15 @@ const readState = (): TestState => {
         hpMax: e.hpMax,
         shield: e.shield,
         vulnerable: e.statuses.mark ?? 0,
+        coreLocked: coreLocked(battleSnapshot(battle), e),
+        parts: e.subsystems.map((part) => ({
+          id: part.id,
+          key: part.key,
+          hp: part.hp,
+          hpMax: part.hpMax,
+          alive: part.hp > 0,
+          intent: part.nextIntent ?? null,
+        })),
       })),
       evasion: battle.evasion,
       freeNudges: battle.freeNudges,
@@ -1154,6 +1178,10 @@ export const createTestApi = (): TestApi => ({
     };
   },
 
+  setTarget: (targetId) => {
+    useBattleStore.getState().setTarget(targetId);
+  },
+
   mitigation: (enemyId) => {
     const battle = useBattleStore.getState();
     const enemy = battle.enemies.find((e) => e.id === enemyId);
@@ -1190,7 +1218,11 @@ export const createTestApi = (): TestApi => ({
 
   anchors: () => battleAnchors(),
 
+  drag: () => ({ uid: draggedDie(), captured: capturedTarget() }),
+
   frames: () => readFrames(),
+
+  perf: () => readPerf(),
 
   state: readState,
 

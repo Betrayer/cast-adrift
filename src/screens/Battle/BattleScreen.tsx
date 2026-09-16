@@ -12,13 +12,14 @@ import { resolveActiveBattle } from '@/game/run/flow';
 import { emitBark } from '@/game/narrative/barks';
 import { offerLayoutHint } from '@/game/onboarding';
 import { mountBattleScene } from '@/pixi/battle/BattleScene';
+import { focusEnemy } from '@/pixi/battle/enemyFocus';
 import { PixiCanvas } from '@/pixi/PixiCanvas';
 import { initAudio } from '@/services/audio';
 import { now } from '@/services/clock';
 import { haptic } from '@/services/tma';
 import { useBattleLayoutId } from '@/services/prefs';
 import { createStreams } from '@/services/rng';
-import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
+import { useReducedMotion } from '@/stores/settingsStore';
 import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
 import { useRunStore } from '@/stores/runStore';
@@ -53,6 +54,7 @@ export const BattleScreen = () => {
   const hullMax = useBattleStore((s) => s.hullMax);
   const dropLoot = useLootStore((s) => s.drop);
   const introEnemyId = useBattleStore((s) => s.introEnemyId);
+  const beats = useBattleStore((s) => s.beats);
   const enemyBeats = useBattleStore((s) => s.enemyBeats);
   const beatSeq = useBattleStore((s) => s.beatSeq);
   const preferredLayout = useBattleLayoutId();
@@ -60,9 +62,7 @@ export const BattleScreen = () => {
   const checkActive = useBattleStore((s) => s.checkSteps !== null);
   const layoutId = checkActive ? 'console' : preferredLayout;
   const bossFight = introEnemyId !== null;
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
   const bossFall =
     bossFight && phase === 'ended' && outcome === 'victory' && !reduced;
   const droppedRef = useRef(false);
@@ -87,6 +87,13 @@ export const BattleScreen = () => {
   }, []);
 
   useEffect(() => {
+    focusEnemy(null);
+    return () => {
+      focusEnemy(null);
+    };
+  }, []);
+
+  useEffect(() => {
     if (reduced) return;
     const id = window.setTimeout(() => {
       setWarping(false);
@@ -100,6 +107,11 @@ export const BattleScreen = () => {
     if (!bossFight || beatSeq === 0) return;
     if (enemyBeats.some((b) => b.kind === 'phase')) emitBark('bossPhase');
   }, [beatSeq, enemyBeats, bossFight]);
+
+  useEffect(() => {
+    if (!bossFight || beatSeq === 0) return;
+    if (beats.some((b) => b.kind === 'partDown')) emitBark('bossPartDown');
+  }, [beatSeq, beats, bossFight]);
 
   useEffect(() => {
     if (runActive) return;

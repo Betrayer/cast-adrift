@@ -11,6 +11,11 @@ import { ENEMY_BY_ID } from "@/data/enemies";
 import { engravingsForDie } from "@/data/engravings";
 import { schools } from "@/data/schools";
 import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
+import {
+  aliveCoreParts,
+  coreLocked,
+  preferredPart,
+} from "@/game/battle/damage";
 import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
 import { emitBark } from "@/game/narrative/barks";
 import { boardSlotIds, legalTargets } from "@/game/battle/view";
@@ -24,7 +29,10 @@ import {
   releaseDieTextures,
 } from "@/pixi/textures";
 import { clearPool, reportPool } from "@/pixi/perf";
-import { setDraggedDie } from "@/pixi/battle/dragState";
+import {
+  setCapturedTarget,
+  setDraggedDie,
+} from "@/pixi/battle/dragState";
 import { focusEnemy } from "@/pixi/battle/enemyFocus";
 import {
   boardRegion,
@@ -47,14 +55,16 @@ import {
   linear,
   Tweens,
   UI_GROUP,
+  type Ease,
   type TweenChannel,
+  type TweenProps,
 } from "@/pixi/tween";
 import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
 import {
   resolveReducedMotion,
   useSettingsStore,
 } from "@/stores/settingsStore";
-import { useBattleStore } from "@/stores/battleStore";
+import { battleSnapshot, useBattleStore } from "@/stores/battleStore";
 import type { BattleState } from "@/stores/battleStore";
 import type {
   Beat,
@@ -65,7 +75,12 @@ import type {
   RolledDie,
   SlotId,
 } from "@/types/battle";
-import type { Intent, School } from "@/types/content";
+import type {
+  EnemyDef,
+  EnemyRole,
+  Intent,
+  School,
+} from "@/types/content";
 
 export interface BattleSceneLabels {
   statusGlyph: (key: StatusKey) => string;
@@ -106,6 +121,12 @@ const beatGapMs = (): number =>
 const emptySlotFill = (): string => mixHex(tokens.surface1, tokens.bg, 0.45);
 const enemyFill = (): string => tokens.surface2;
 
+const label = (text: string, fontSize: number, fill: string): Text =>
+  new Text({
+    text,
+    style: { fontFamily: PIXI_FONT_FAMILY, fontSize, fontWeight: "700", fill },
+  });
+
 const WARD_RATE: Record<School, number> = {
   red: 0.82,
   blue: 1.24,
@@ -117,6 +138,7 @@ const WARD_RATE: Record<School, number> = {
 };
 
 const INTENT_GLYPH: Record<Intent["t"], string> = {
+  idle: "…",
   attack: "⚔",
   multi: "⚔",
   mirrorHalf: "⚔",
@@ -169,6 +191,18 @@ const intentLabelFor = (intent: Intent): string => {
 const intentTint = (intent: Intent): string =>
   ATTACK_INTENTS.has(intent.t) ? schools.red.text : tokens.dim;
 
+const LOCK_GLYPH = "⊠";
+
+const LOCK_INTENT_GAP = 3;
+
+const partIntentsDeclared = (def: EnemyDef | undefined, key: string): boolean =>
+  (def?.subsystems ?? []).some(
+    (part) => part.id === key && (part.intents ?? []).length > 0,
+  );
+
+const coreLockDeclared = (def: EnemyDef | undefined): boolean =>
+  def?.shell === true && (def.subsystems ?? []).length > 0;
+
 const statusTint = (key: StatusKey): string => {
   switch (key) {
     case "burn":
@@ -182,6 +216,13 @@ const statusTint = (key: StatusKey): string => {
   }
 };
 
+interface SubsystemView {
+  chip: Container;
+  ring: Graphics;
+  hp: Text;
+  intent?: Text;
+}
+
 interface EnemyView {
   root: Container;
   body: Graphics;
@@ -189,8 +230,9 @@ interface EnemyView {
   targetRing: Graphics;
   hpRing: Graphics;
   intent: Text;
+  lock?: Text;
   statusTexts: Map<StatusKey, Text>;
-  subsystemViews: Map<string, { chip: Container; ring: Graphics; hp: Text }>;
+  subsystemViews: Map<string, SubsystemView>;
   cancelFlash?: () => void;
 }
 
@@ -209,6 +251,8 @@ interface DragState {
   offsetY: number;
   targets: DropTarget[];
   over: DropTarget | null;
+  pointerX: number;
+  pointerY: number;
 }
 
 interface PooledNumber {
@@ -235,6 +279,88 @@ const overlapArea = (
 const contains = (rect: Rect, x: number, y: number): boolean =>
   x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 
+export interface BurstAccent {
+  count: number;
+  size: number;
+  reach: number;
+  ms: number;
+  spread: number;
+  bias: number;
+  drop: number;
+  inward: boolean;
+}
+
+const FULL_TURN = Math.PI * 2;
+
+export const DEFAULT_BURST: BurstAccent = {
+  count: 8,
+  size: 2.5,
+  reach: 54,
+  ms: 420,
+  spread: FULL_TURN,
+  bias: 0.4,
+  drop: 0,
+  inward: false,
+};
+
+export const BURST_ACCENTS: Partial<Record<EnemyRole, BurstAccent>> = {
+  swarm: {
+    count: 14,
+    size: 1.8,
+    reach: 38,
+    ms: 300,
+    spread: FULL_TURN,
+    bias: 0,
+    drop: 0,
+    inward: false,
+  },
+  bruiser: {
+    count: 5,
+    size: 5,
+    reach: 46,
+    ms: 620,
+    spread: 2.4,
+    bias: Math.PI / 2,
+    drop: 26,
+    inward: false,
+  },
+  anchor: {
+    count: 10,
+    size: 3,
+    reach: 58,
+    ms: 380,
+    spread: FULL_TURN,
+    bias: 0,
+    drop: 0,
+    inward: true,
+  },
+};
+
+export const PART_BURST: BurstAccent = {
+  count: 6,
+  size: 2.2,
+  reach: 34,
+  ms: 340,
+  spread: 0.9,
+  bias: 0,
+  drop: 0,
+  inward: false,
+};
+
+export const burstAngle = (accent: BurstAccent, index: number): number => {
+  if (accent.spread >= FULL_TURN) {
+    return accent.bias + (index / Math.max(1, accent.count)) * FULL_TURN;
+  }
+  const step = accent.count <= 1 ? 0.5 : index / (accent.count - 1);
+  return accent.bias + (step - 0.5) * accent.spread;
+};
+
+const CAPTURE_RADIUS_FACTOR = 0.75;
+const CAPTURE_PULL = 0.3;
+const PULL_EASE = 0.3;
+const CAPTURE_TICK_GAP_MS = 150;
+const FRAME_MS = 1000 / 60;
+
 const activeSlotIds = (state: BattleState): SlotId[] =>
   Object.keys(state.slots) as SlotId[];
 
@@ -253,6 +379,83 @@ const cardElement = (target: DropTarget): HTMLElement | null =>
   document.querySelector<HTMLElement>(
     target === "reserve" ? "[data-reserve]" : `[data-slot="${target}"]`,
   );
+
+export class FxPool {
+  private readonly dots: Graphics[] = [];
+  private readonly glows: Graphics[] = [];
+  private readonly cancels = new Map<Graphics, (() => void)[]>();
+
+  constructor(layer: Container, dots: number, glows: number) {
+    for (let i = 0; i < dots; i += 1) this.dots.push(this.build(layer));
+    for (let i = 0; i < glows; i += 1) this.glows.push(this.build(layer));
+  }
+
+  takeDot(): Graphics | undefined {
+    return this.take(this.dots);
+  }
+
+  takeGlow(): Graphics | undefined {
+    return this.take(this.glows);
+  }
+
+  track(owner: Graphics, cancel: () => void): void {
+    const handles = this.cancels.get(owner);
+    if (handles === undefined) this.cancels.set(owner, [cancel]);
+    else handles.push(cancel);
+  }
+
+  release(owner: Graphics): void {
+    const handles = this.cancels.get(owner);
+    if (handles === undefined) return;
+    this.cancels.delete(owner);
+    for (const cancel of handles) cancel();
+  }
+
+  reset(): void {
+    for (const fx of this.all()) {
+      this.release(fx);
+      fx.clear();
+      fx.visible = false;
+    }
+  }
+
+  liveCount(): number {
+    return this.all().filter((fx) => fx.visible).length;
+  }
+
+  totalCount(): number {
+    return this.dots.length + this.glows.length;
+  }
+
+  handleCount(): number {
+    let total = 0;
+    for (const handles of this.cancels.values()) total += handles.length;
+    return total;
+  }
+
+  private all(): Graphics[] {
+    return [...this.dots, ...this.glows];
+  }
+
+  private build(layer: Container): Graphics {
+    const fx = new Graphics();
+    fx.visible = false;
+    fx.eventMode = "none";
+    layer.addChild(fx);
+    return fx;
+  }
+
+  private take(pool: readonly Graphics[]): Graphics | undefined {
+    const free = pool.find((fx) => !fx.visible);
+    if (free === undefined) return undefined;
+    this.release(free);
+    free.clear();
+    free.alpha = 1;
+    free.scale.set(1);
+    free.visible = true;
+    return free;
+  }
+}
 
 export class BattleScene {
   private readonly app: Application;
@@ -291,9 +494,12 @@ export class BattleScene {
   private shakeMs = 0;
   private hitStopMs = 0;
   private elapsedMs = 0;
-  private readonly particlePool: Graphics[] = [];
-  private readonly glowPool: Graphics[] = [];
-  private readonly particleCancels = new Set<() => void>();
+  private lastCaptureMs = -CAPTURE_TICK_GAP_MS;
+  private readonly fx = new FxPool(
+    this.fxLayer,
+    PARTICLE_POOL_SIZE,
+    GLOW_POOL_SIZE,
+  );
   private readonly dyingEnemies = new Set<string>();
   private readonly deathCancels = new Map<string, () => void>();
   private readonly mirrorIntents = new Set<string>();
@@ -333,7 +539,6 @@ export class BattleScene {
     window.addEventListener("pointercancel", this.onPointerCancel, true);
 
     this.buildNumberPool();
-    this.buildParticlePool();
     const initial = useBattleStore.getState();
     this.rebuild(initial);
     this.maybeTumble(initial);
@@ -488,36 +693,11 @@ export class BattleScene {
 
   private buildNumberPool(): void {
     for (let i = 0; i < DAMAGE_POOL_SIZE; i += 1) {
-      const text = new Text({
-        text: "",
-        style: {
-          fontFamily: PIXI_FONT_FAMILY,
-          fontSize: 20,
-          fontWeight: "700",
-          fill: tokens.text,
-        },
-      });
+      const text = label("", 20, tokens.text);
       text.anchor.set(0.5);
       text.visible = false;
       this.fxLayer.addChild(text);
       this.numberPool.push({ text, cancels: [], x: 0, y: 0, at: -Infinity });
-    }
-  }
-
-  private buildParticlePool(): void {
-    for (let i = 0; i < PARTICLE_POOL_SIZE; i += 1) {
-      const dot = new Graphics();
-      dot.visible = false;
-      dot.eventMode = "none";
-      this.fxLayer.addChild(dot);
-      this.particlePool.push(dot);
-    }
-    for (let i = 0; i < GLOW_POOL_SIZE; i += 1) {
-      const glow = new Graphics();
-      glow.visible = false;
-      glow.eventMode = "none";
-      this.fxLayer.addChild(glow);
-      this.glowPool.push(glow);
     }
   }
 
@@ -538,12 +718,7 @@ export class BattleScene {
     for (const cancel of this.dieCancels.values()) cancel();
     this.dieCancels.clear();
     this.animating.clear();
-    for (const cancel of this.particleCancels) cancel();
-    this.particleCancels.clear();
-    for (const dot of this.particlePool) {
-      dot.clear();
-      dot.visible = false;
-    }
+    this.fx.reset();
     clearDieTextureCache(this.app);
     this.rebuild(useBattleStore.getState());
   };
@@ -579,17 +754,37 @@ export class BattleScene {
   }
 
   private takeParticle(): Graphics | undefined {
-    const free = this.particlePool.find((dot) => !dot.visible);
-    if (free === undefined) return undefined;
-    free.clear();
-    free.alpha = 1;
-    free.scale.set(1);
-    free.visible = true;
-    return free;
+    return this.fx.takeDot();
   }
 
-  private trackParticle(cancel: () => void): void {
-    this.particleCancels.add(cancel);
+  private trackParticle(owner: Graphics, cancel: () => void): void {
+    this.fx.track(owner, cancel);
+  }
+
+  private fxMove(
+    node: Graphics,
+    props: TweenProps<Graphics>,
+    ms: number,
+    ease: Ease,
+    onComplete?: () => void,
+  ): void {
+    this.trackParticle(node, this.tweens.to(node, props, ms, ease, onComplete));
+  }
+
+  private fxScale(node: Graphics, to: number, ms: number, ease: Ease): void {
+    this.trackParticle(
+      node,
+      this.tweens.to(node.scale, { x: to, y: to }, ms, ease),
+    );
+  }
+
+  private fxFade(node: Graphics, ms: number, ease: Ease): void {
+    this.trackParticle(
+      node,
+      this.tweens.to(node, { alpha: 0 }, ms, ease, () => {
+        node.visible = false;
+      }),
+    );
   }
 
   private resonanceBurst(school: School): void {
@@ -610,7 +805,7 @@ export class BattleScene {
       const angle = (i / 12) * Math.PI * 2;
       dot.circle(0, 0, 3.5).fill(colors.stroke);
       dot.position.set(cx, cy);
-      const cancelMove = this.tweens.to(
+      this.fxMove(
         dot,
         {
           x: cx + Math.cos(angle) * 78,
@@ -619,29 +814,19 @@ export class BattleScene {
         520,
         easeOutQuad,
       );
-      const cancelFade = this.tweens.to(dot, { alpha: 0 }, 520, linear, () => {
-        dot.visible = false;
-      });
-      this.trackParticle(cancelMove);
-      this.trackParticle(cancelFade);
+      this.fxFade(dot, 520, linear);
     }
     this.sceneGlowPulse(colors.stroke, 0.22, 420);
   }
 
   private sceneGlowPulse(color: string, alpha: number, ms: number): void {
-    const glow = this.glowPool.find((g) => !g.visible);
+    const glow = this.fx.takeGlow();
     if (glow === undefined) return;
-    glow.clear();
     glow
       .rect(0, 0, this.app.screen.width, this.app.screen.height)
       .fill({ color, alpha: 1 });
     glow.alpha = alpha;
-    glow.visible = true;
-    this.trackParticle(
-      this.tweens.to(glow, { alpha: 0 }, ms, easeOutQuad, () => {
-        glow.visible = false;
-      }),
-    );
+    this.fxFade(glow, ms, easeOutQuad);
   }
 
   private announceElites(state: BattleState): void {
@@ -680,12 +865,8 @@ export class BattleScene {
     if (ring !== undefined) {
       ring.circle(0, 0, 28).stroke({ color: tokens.danger, width: 3 });
       ring.position.set(anchor.x, anchor.y);
-      this.trackParticle(this.tweens.to(ring.scale, { x: 7, y: 7 }, 620, easeOutQuad));
-      this.trackParticle(
-        this.tweens.to(ring, { alpha: 0 }, 620, linear, () => {
-          ring.visible = false;
-        }),
-      );
+      this.fxScale(ring, 7, 620, easeOutQuad);
+      this.fxFade(ring, 620, linear);
     }
     this.shake();
   }
@@ -704,14 +885,8 @@ export class BattleScene {
       .closePath()
       .fill({ color: "#FFFFFF", alpha: 0.5 });
     sheen.position.set(view.root.x - size * 0.7, view.root.y);
-    this.trackParticle(
-      this.tweens.to(sheen, { x: view.root.x + size * 0.9 }, 560, easeOutQuad),
-    );
-    this.trackParticle(
-      this.tweens.to(sheen, { alpha: 0 }, 560, linear, () => {
-        sheen.visible = false;
-      }),
-    );
+    this.fxMove(sheen, { x: view.root.x + size * 0.9 }, 560, easeOutQuad);
+    this.fxFade(sheen, 560, linear);
   }
 
   private corePulse(enemyId: string): void {
@@ -730,14 +905,8 @@ export class BattleScene {
       if (ring === undefined) break;
       ring.circle(0, 0, 20).stroke({ color: tokens.danger, width: 4 - i });
       ring.position.set(anchor.x, anchor.y);
-      this.trackParticle(
-        this.tweens.to(ring.scale, { x: 5 + i, y: 5 + i }, 520 + i * 160, easeOutQuad),
-      );
-      this.trackParticle(
-        this.tweens.to(ring, { alpha: 0 }, 520 + i * 160, linear, () => {
-          ring.visible = false;
-        }),
-      );
+      this.fxScale(ring, 5 + i, 520 + i * 160, easeOutQuad);
+      this.fxFade(ring, 520 + i * 160, linear);
     }
     this.shake();
   }
@@ -777,23 +946,62 @@ export class BattleScene {
         .stroke({ color: tokens.line, width: 1 });
       shard.position.set(root.x, root.y);
       const angle = (i / 6) * Math.PI + Math.PI * 0.15;
-      this.trackParticle(
-        this.tweens.to(
-          shard,
-          {
-            x: root.x + Math.cos(angle) * size * 0.7,
-            y: root.y + Math.abs(Math.sin(angle)) * size * 0.6 + 20,
-          },
-          DEATH_MS,
-          easeOutQuad,
-        ),
+      this.fxMove(
+        shard,
+        {
+          x: root.x + Math.cos(angle) * size * 0.7,
+          y: root.y + Math.abs(Math.sin(angle)) * size * 0.6 + 20,
+        },
+        DEATH_MS,
+        easeOutQuad,
       );
-      this.trackParticle(
-        this.tweens.to(shard, { alpha: 0 }, DEATH_MS, linear, () => {
-          shard.visible = false;
-        }),
-      );
+      this.fxFade(shard, DEATH_MS, linear);
     }
+  }
+
+  private burstAt(
+    at: { x: number; y: number },
+    accent: BurstAccent,
+    color: string,
+  ): void {
+    for (let i = 0; i < accent.count; i += 1) {
+      const dot = this.takeParticle();
+      if (dot === undefined) break;
+      const angle = burstAngle(accent, i);
+      const half = accent.size;
+      dot.rect(-half, -half, half * 2, half * 2).fill(color);
+      const away = {
+        x: at.x + Math.cos(angle) * accent.reach,
+        y: at.y + Math.sin(angle) * accent.reach + accent.drop,
+      };
+      const from = accent.inward ? away : at;
+      const to = accent.inward ? at : away;
+      dot.position.set(from.x, from.y);
+      this.fxMove(dot, { x: to.x, y: to.y }, accent.ms, easeOutQuad);
+      this.fxFade(dot, accent.ms, linear);
+    }
+  }
+
+  private shearPart(partId: string): void {
+    const at = this.enemyAnchor(partId);
+    if (at === undefined) return;
+    playSfx("bossDown", { gain: 0.5, rate: 1.2 });
+    flashVignette("bossPartDown", {
+      side: sideForX(this.origin.left + at.x, window.innerWidth),
+      strength: 0.85,
+    });
+    if (this.reduced()) return;
+    this.burstAt(at, PART_BURST, tokens.amber);
+  }
+
+  private burstAccentFor(enemyId: string): BurstAccent {
+    const defId = useBattleStore
+      .getState()
+      .enemies.find((e) => e.id === enemyId)?.defId;
+    const role =
+      defId === undefined ? undefined : ENEMY_BY_ID.get(defId)?.role;
+    return (role === undefined ? undefined : BURST_ACCENTS[role]) ??
+      DEFAULT_BURST;
   }
 
   private killBurst(enemyId: string, scrap: number): void {
@@ -804,37 +1012,16 @@ export class BattleScene {
       if (scrap > 0) this.spawnNumber(at.x, at.y, `+${String(scrap)}`, tokens.amber);
       return;
     }
-    for (let i = 0; i < 8; i += 1) {
-      const dot = this.takeParticle();
-      if (dot === undefined) break;
-      const angle = (i / 8) * Math.PI * 2 + 0.4;
-      dot.rect(-2.5, -2.5, 5, 5).fill(tokens.danger);
-      dot.position.set(at.x, at.y);
-      this.trackParticle(
-        this.tweens.to(
-          dot,
-          { x: at.x + Math.cos(angle) * 54, y: at.y + Math.sin(angle) * 54 },
-          420,
-          easeOutQuad,
-        ),
-      );
-      this.trackParticle(
-        this.tweens.to(dot, { alpha: 0 }, 420, linear, () => {
-          dot.visible = false;
-        }),
-      );
-    }
+    this.burstAt(at, this.burstAccentFor(enemyId), tokens.danger);
     if (scrap <= 0) return;
     const coin = this.takeParticle();
     if (coin === undefined) return;
     coin.circle(0, 0, 4).fill(tokens.amber);
     coin.position.set(at.x, at.y);
     const counter = { x: this.app.screen.width - 44, y: 46 };
-    this.trackParticle(
-      this.tweens.to(coin, { x: counter.x, y: counter.y }, 520, easeOutQuad, () => {
-        coin.visible = false;
-      }),
-    );
+    this.fxMove(coin, { x: counter.x, y: counter.y }, 520, easeOutQuad, () => {
+      coin.visible = false;
+    });
   }
 
   private shake(): void {
@@ -991,39 +1178,29 @@ export class BattleScene {
         .stroke({ color: tokens.accent, width: 2.5 });
       targetRing.visible = false;
       const hpRing = new Graphics();
-      const intent = new Text({
-        text: "",
-        style: {
-          fontFamily: PIXI_FONT_FAMILY,
-          fontSize: 12,
-          fontWeight: "700",
-          fill: tokens.dim,
-        },
-      });
+      const intent = label("", 12, tokens.dim);
       intent.anchor.set(0.5, 1);
       root.addChild(hpRing, body, targetRing, flash, intent);
 
       const statusTexts = new Map<StatusKey, Text>();
       (["burn", "mark", "jam", "charge"] as const).forEach((key) => {
-        const text = new Text({
-          text: this.labels.statusGlyph(key),
-          style: {
-            fontFamily: PIXI_FONT_FAMILY,
-            fontSize: 12,
-            fontWeight: "700",
-            fill: statusTint(key),
-          },
-        });
+        const text = label(this.labels.statusGlyph(key), 12, statusTint(key));
         text.anchor.set(0.5, 0);
         text.visible = false;
         root.addChild(text);
         statusTexts.set(key, text);
       });
 
-      const subsystemViews = new Map<
-        string,
-        { chip: Container; ring: Graphics; hp: Text }
-      >();
+      const def = ENEMY_BY_ID.get(enemy.defId);
+      let lock: Text | undefined;
+      if (coreLockDeclared(def)) {
+        lock = label(LOCK_GLYPH, 12, tokens.amber);
+        lock.anchor.set(1, 1);
+        lock.visible = false;
+        root.addChild(lock);
+      }
+
+      const subsystemViews = new Map<string, SubsystemView>();
       const chips = this.layout.subsystems;
       enemy.subsystems.forEach((sub, subIndex) => {
         const chip = new Container();
@@ -1036,19 +1213,19 @@ export class BattleScene {
           .circle(0, 0, chips.radius)
           .stroke({ color: tokens.accent, width: 2 });
         ring.visible = false;
-        const hp = new Text({
-          text: String(sub.hp),
-          style: {
-            fontFamily: PIXI_FONT_FAMILY,
-            fontSize: 11,
-            fontWeight: "700",
-            fill: tokens.text,
-          },
-        });
+        const hp = label(String(sub.hp), 11, tokens.text);
         hp.anchor.set(0.5);
         chip.addChild(circle, ring, hp);
+        let partIntent: Text | undefined;
+        if (partIntentsDeclared(def, sub.key)) {
+          partIntent = label("", 10, tokens.dim);
+          partIntent.anchor.set(0, 0.5);
+          partIntent.position.set(this.layout.partLabel.x, 0);
+          partIntent.visible = false;
+          chip.addChild(partIntent);
+        }
         root.addChild(chip);
-        subsystemViews.set(sub.id, { chip, ring, hp });
+        subsystemViews.set(sub.id, { chip, ring, hp, intent: partIntent });
       });
 
       this.enemiesLayer.addChild(root);
@@ -1059,6 +1236,7 @@ export class BattleScene {
         targetRing,
         hpRing,
         intent,
+        lock,
         statusTexts,
         subsystemViews,
       });
@@ -1080,13 +1258,34 @@ export class BattleScene {
 
       const size = this.layout.enemySize;
       this.drawHpRing(view, enemy, size);
+      const intentY = -size * 0.72 - 8;
+      if (view.lock !== undefined) {
+        const def = ENEMY_BY_ID.get(enemy.defId);
+        if (alive && def !== undefined && coreLocked(state, enemy)) {
+          const toBreak = aliveCoreParts(enemy) - (def.coreLockAt ?? 0);
+          view.lock.text = `${LOCK_GLYPH}${String(toBreak)}`;
+          view.lock.visible = true;
+        } else {
+          view.lock.visible = false;
+        }
+      }
       if (alive) {
         view.intent.text = intentLabelFor(enemy.nextIntent);
         view.intent.style.fill = intentTint(enemy.nextIntent);
-        view.intent.position.set(0, -size * 0.72 - 8);
         view.intent.visible = true;
       } else {
         view.intent.visible = false;
+      }
+      const lockShift =
+        view.lock !== undefined && view.lock.visible
+          ? (view.lock.width + LOCK_INTENT_GAP) / 2
+          : 0;
+      view.intent.position.set(lockShift, intentY);
+      if (view.lock !== undefined && view.lock.visible) {
+        view.lock.position.set(
+          lockShift - view.intent.width / 2 - LOCK_INTENT_GAP,
+          intentY,
+        );
       }
       let statusX = 0;
       const active = (["burn", "mark", "jam", "charge"] as const).filter(
@@ -1116,6 +1315,16 @@ export class BattleScene {
         subView.chip.alpha = sub.hp > 0 ? 1 : 0.25;
         subView.hp.text = String(sub.hp);
         subView.ring.visible = sub.hp > 0 && state.targetId === sub.id;
+        if (subView.intent === undefined) continue;
+        const partIntent = sub.nextIntent;
+        if (alive && sub.hp > 0 && partIntent !== undefined) {
+          subView.intent.text = intentLabelFor(partIntent);
+          subView.intent.style.fill = intentTint(partIntent);
+          subView.intent.visible =
+            subView.intent.width <= this.layout.partLabel.reach;
+        } else {
+          subView.intent.visible = false;
+        }
       }
     }
   }
@@ -1203,14 +1412,32 @@ export class BattleScene {
     });
   }
 
-  private syncPrismRim(uid: string, x: number, y: number, size: number): void {
-    let rim = this.prismRims.get(uid);
-    if (rim === undefined) {
-      rim = new Graphics();
-      this.overlayLayer.addChild(rim);
-      this.prismRims.set(uid, rim);
+  private overlayFor(map: Map<string, Graphics>, uid: string): Graphics {
+    let node = map.get(uid);
+    if (node === undefined) {
+      node = new Graphics();
+      this.overlayLayer.addChild(node);
+      map.set(uid, node);
     }
-    rim.clear();
+    node.clear();
+    return node;
+  }
+
+  private sweepOverlays(
+    map: Map<string, Graphics>,
+    visible: ReadonlySet<string>,
+    seen: ReadonlySet<string>,
+  ): void {
+    for (const [uid, node] of map) {
+      if (!visible.has(uid)) node.visible = false;
+      if (seen.has(uid)) continue;
+      node.destroy();
+      map.delete(uid);
+    }
+  }
+
+  private syncPrismRim(uid: string, x: number, y: number, size: number): void {
+    const rim = this.overlayFor(this.prismRims, uid);
     const half = size / 2 + 3;
     const radius = size * 0.26;
     rim
@@ -1234,13 +1461,7 @@ export class BattleScene {
   }
 
   private syncSelectionRing(uid: string, x: number, y: number, size: number): void {
-    let ring = this.selectionRings.get(uid);
-    if (ring === undefined) {
-      ring = new Graphics();
-      this.overlayLayer.addChild(ring);
-      this.selectionRings.set(uid, ring);
-    }
-    ring.clear();
+    const ring = this.overlayFor(this.selectionRings, uid);
     ring
       .roundRect(x - size / 2 - 3, y - size / 2 - 3, size + 6, size + 6, size * 0.26)
       .stroke({ color: tokens.accent, width: 2 });
@@ -1248,13 +1469,7 @@ export class BattleScene {
   }
 
   private syncLockOverlay(uid: string, x: number, y: number, size: number): void {
-    let overlay = this.lockOverlays.get(uid);
-    if (overlay === undefined) {
-      overlay = new Graphics();
-      this.overlayLayer.addChild(overlay);
-      this.lockOverlays.set(uid, overlay);
-    }
-    overlay.clear();
+    const overlay = this.overlayFor(this.lockOverlays, uid);
     overlay
       .roundRect(x - size / 2, y - size / 2, size, size, size * 0.23)
       .fill({ color: "#000000", alpha: 0.5 });
@@ -1359,27 +1574,9 @@ export class BattleScene {
         this.dieSprites.delete(uid);
       }
     }
-    for (const [uid, ring] of this.selectionRings) {
-      if (!visibleRings.has(uid)) ring.visible = false;
-      if (!seen.has(uid)) {
-        ring.destroy();
-        this.selectionRings.delete(uid);
-      }
-    }
-    for (const [uid, overlay] of this.lockOverlays) {
-      if (!visibleLocks.has(uid)) overlay.visible = false;
-      if (!seen.has(uid)) {
-        overlay.destroy();
-        this.lockOverlays.delete(uid);
-      }
-    }
-    for (const [uid, rim] of this.prismRims) {
-      if (!visibleRims.has(uid)) rim.visible = false;
-      if (!seen.has(uid)) {
-        rim.destroy();
-        this.prismRims.delete(uid);
-      }
-    }
+    this.sweepOverlays(this.selectionRings, visibleRings, seen);
+    this.sweepOverlays(this.lockOverlays, visibleLocks, seen);
+    this.sweepOverlays(this.prismRims, visibleRims, seen);
     this.publishSelection(state);
     this.publishAnchors(state);
   }
@@ -1450,6 +1647,7 @@ export class BattleScene {
   };
 
   private checkKills(state: BattleState, prev: BattleState): void {
+    let scrapLeft = Math.max(0, state.scrap - prev.scrap);
     for (const enemy of state.enemies) {
       if (enemy.hp > 0) continue;
       const before = prev.enemies.find((e) => e.id === enemy.id);
@@ -1457,7 +1655,8 @@ export class BattleScene {
       const def = ENEMY_BY_ID.get(enemy.defId);
       const headline = def?.boss === true || def?.miniboss === true;
       this.deathFall(enemy.id);
-      this.killBurst(enemy.id, Math.max(0, state.scrap - prev.scrap));
+      this.killBurst(enemy.id, scrapLeft);
+      scrapLeft = 0;
       if (headline) {
         playSfx("bossDown");
         duckMusic(2200);
@@ -1513,14 +1712,8 @@ export class BattleScene {
     });
     ring.position.set(anchor.x, anchor.y);
     ring.scale.set(1.25);
-    this.trackParticle(
-      this.tweens.to(ring.scale, { x: 1, y: 1 }, 220, easeOutQuad),
-    );
-    this.trackParticle(
-      this.tweens.to(ring, { alpha: 0 }, 260, linear, () => {
-        ring.visible = false;
-      }),
-    );
+    this.fxScale(ring, 1, 220, easeOutQuad);
+    this.fxFade(ring, 260, linear);
   }
 
   private checkMirrorIntents(state: BattleState): void {
@@ -1571,6 +1764,7 @@ export class BattleScene {
 
   private readonly tick = (ticker: Ticker): void => {
     this.elapsedMs += ticker.deltaMS;
+    if (this.drag !== null) this.applyDragPull(ticker.deltaMS);
     if (this.prismRims.size > 0 && !this.reduced()) {
       this.prismPhase =
         0.5 + 0.5 * Math.sin((this.elapsedMs / 1000) * PRISM_HZ * Math.PI * 2);
@@ -1580,10 +1774,8 @@ export class BattleScene {
     }
     reportPool(
       "battleFx",
-      this.numberPool.filter((p) => p.text.visible).length +
-        this.particlePool.filter((p) => p.visible).length +
-        this.glowPool.filter((p) => p.visible).length,
-      this.numberPool.length + this.particlePool.length + this.glowPool.length,
+      this.numberPool.filter((p) => p.text.visible).length + this.fx.liveCount(),
+      this.numberPool.length + this.fx.totalCount(),
     );
     if (this.hitStopMs > 0) {
       this.hitStopMs = Math.max(0, this.hitStopMs - ticker.deltaMS);
@@ -1744,7 +1936,7 @@ export class BattleScene {
     if (target !== null) {
       event.preventDefault();
       event.stopPropagation();
-      useBattleStore.getState().setTarget(target);
+      useBattleStore.getState().setTarget(this.reachableTarget(target));
       if (!target.includes(":")) focusEnemy(target);
     }
   };
@@ -1762,11 +1954,9 @@ export class BattleScene {
     if (event.pointerId !== this.drag.pointerId) return;
     event.preventDefault();
     event.stopPropagation();
-    this.drag.sprite.position.set(
-      point.x + this.drag.offsetX,
-      point.y + this.drag.offsetY,
-    );
-    this.updateDropTarget();
+    this.drag.pointerX = point.x;
+    this.drag.pointerY = point.y;
+    this.updateDropTarget(true);
   };
 
   private readonly onPointerUp = (event: PointerEvent): void => {
@@ -1837,35 +2027,73 @@ export class BattleScene {
       offsetY: sprite.y - point.y,
       targets,
       over: null,
+      pointerX: point.x,
+      pointerY: point.y,
     };
     setDraggedDie(press.uid);
-    this.updateDropTarget();
+    this.updateDropTarget(false);
+  }
+
+  private freeDragPoint(): { x: number; y: number } {
+    const drag = this.drag;
+    if (drag === null) return { x: 0, y: 0 };
+    return {
+      x: drag.pointerX + drag.offsetX,
+      y: drag.pointerY + drag.offsetY,
+    };
   }
 
   private bestDropTarget(): DropTarget | null {
     if (this.drag === null) return null;
-    const { sprite, targets } = this.drag;
+    const { targets } = this.drag;
+    const size = this.layout.dieSize;
+    const at = this.freeDragPoint();
+    const radius = size * CAPTURE_RADIUS_FACTOR;
+    const dieArea = size * size;
     let best: DropTarget | null = null;
-    let bestArea = 0;
+    let bestOverlap = -1;
+    let bestDistance = Number.POSITIVE_INFINITY;
     for (const target of targets) {
       const rect = this.dropRect(target);
       if (rect === undefined) continue;
-      const area = overlapArea(rect, sprite.x, sprite.y, this.layout.dieSize);
-      if (area > bestArea) {
-        bestArea = area;
+      const distance = Math.hypot(
+        Math.max(rect.x - at.x, 0, at.x - (rect.x + rect.w)),
+        Math.max(rect.y - at.y, 0, at.y - (rect.y + rect.h)),
+      );
+      if (distance > radius) continue;
+      const overlap =
+        dieArea > 0 ? overlapArea(rect, at.x, at.y, size) / dieArea : 0;
+      if (
+        overlap > bestOverlap ||
+        (overlap === bestOverlap && distance < bestDistance)
+      ) {
         best = target;
+        bestOverlap = overlap;
+        bestDistance = distance;
       }
     }
-    if (best !== null) return best;
-    return (
-      targets.find((target) => {
-        const rect = this.dropRect(target);
-        return rect !== undefined && contains(rect, sprite.x, sprite.y);
-      }) ?? null
+    return best;
+  }
+
+  private applyDragPull(deltaMs: number): void {
+    const drag = this.drag;
+    if (drag === null) return;
+    const at = this.freeDragPoint();
+    const rect = drag.over === null ? undefined : this.dropRect(drag.over);
+    if (rect === undefined || this.reduced()) {
+      drag.sprite.position.set(at.x, at.y);
+      return;
+    }
+    const toX = at.x + (rect.x + rect.w / 2 - at.x) * CAPTURE_PULL;
+    const toY = at.y + (rect.y + rect.h / 2 - at.y) * CAPTURE_PULL;
+    const step = 1 - Math.pow(1 - PULL_EASE, Math.max(deltaMs, 1) / FRAME_MS);
+    drag.sprite.position.set(
+      drag.sprite.x + (toX - drag.sprite.x) * step,
+      drag.sprite.y + (toY - drag.sprite.y) * step,
     );
   }
 
-  private updateDropTarget(): void {
+  private updateDropTarget(announce: boolean): void {
     if (this.drag === null) return;
     const next = this.bestDropTarget();
     if (next === this.drag.over) return;
@@ -1873,7 +2101,14 @@ export class BattleScene {
       this.setCardFlag(this.drag.over, "data-over", false);
     }
     this.drag.over = next;
-    if (next !== null) this.setCardFlag(next, "data-over", true);
+    setCapturedTarget(next);
+    if (next === null) return;
+    this.setCardFlag(next, "data-over", true);
+    if (!announce) return;
+    if (this.elapsedMs - this.lastCaptureMs < CAPTURE_TICK_GAP_MS) return;
+    this.lastCaptureMs = this.elapsedMs;
+    playSfx("place", { gain: 0.3, rate: 1.3 });
+    haptic("resolveTick");
   }
 
   private dropDrag(): void {
@@ -1903,6 +2138,33 @@ export class BattleScene {
       .selectDie(state.selectedDieUid === uid ? null : uid);
   }
 
+  private glideDie(
+    uid: string,
+    sprite: Sprite,
+    to: { x: number; y: number },
+    scale: number,
+    ms: number,
+    done: () => void,
+  ): void {
+    const cancelScale = this.uiTweens.to(
+      sprite.scale,
+      { x: scale, y: scale },
+      ms,
+      easeOutQuad,
+    );
+    const cancelMove = this.uiTweens.to(
+      sprite,
+      { x: to.x, y: to.y },
+      ms,
+      easeOutQuad,
+      done,
+    );
+    this.dieCancels.set(uid, () => {
+      cancelScale();
+      cancelMove();
+    });
+  }
+
   private animatePlace(uid: string, slotId: SlotId, sprite: Sprite): void {
     useBattleStore.getState().placeDie(uid, slotId);
     const state = useBattleStore.getState();
@@ -1921,26 +2183,9 @@ export class BattleScene {
     haptic("place");
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
-    const scale = anchor.size / MINI_DIE_SIZE;
-    const cancelScale = this.uiTweens.to(
-      sprite.scale,
-      { x: scale, y: scale },
-      120,
-      easeOutQuad,
-    );
-    const cancelMove = this.uiTweens.to(
-      sprite,
-      { x: anchor.x, y: anchor.y },
-      120,
-      easeOutQuad,
-      () => {
-        this.finishDieAnimation(uid);
-        this.pulseCard(slotId);
-      },
-    );
-    this.dieCancels.set(uid, () => {
-      cancelScale();
-      cancelMove();
+    this.glideDie(uid, sprite, anchor, anchor.size / MINI_DIE_SIZE, 120, () => {
+      this.finishDieAnimation(uid);
+      this.pulseCard(slotId);
     });
   }
 
@@ -1963,26 +2208,9 @@ export class BattleScene {
     this.animating.add(uid);
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
     sprite.scale.set(this.layout.dieSize / MINI_DIE_SIZE);
-    const scale = anchor.size / MINI_DIE_SIZE;
-    const cancelScale = this.uiTweens.to(
-      sprite.scale,
-      { x: scale, y: scale },
-      120,
-      easeOutQuad,
-    );
-    const cancelMove = this.uiTweens.to(
-      sprite,
-      { x: anchor.x, y: anchor.y },
-      120,
-      easeOutQuad,
-      () => {
-        this.finishDieAnimation(uid);
-        this.pulseCard("reserve");
-      },
-    );
-    this.dieCancels.set(uid, () => {
-      cancelScale();
-      cancelMove();
+    this.glideDie(uid, sprite, anchor, anchor.size / MINI_DIE_SIZE, 120, () => {
+      this.finishDieAnimation(uid);
+      this.pulseCard("reserve");
     });
   }
 
@@ -1991,24 +2219,8 @@ export class BattleScene {
     const anchor = this.trayAnchor(uid, state);
     this.animating.add(uid);
     const goBack = (): void => {
-      const cancelScale = this.uiTweens.to(
-        sprite.scale,
-        { x: 1, y: 1 },
-        150,
-        easeOutQuad,
-      );
-      const cancelMove = this.uiTweens.to(
-        sprite,
-        { x: anchor.x, y: anchor.y },
-        150,
-        easeOutQuad,
-        () => {
-          this.finishDieAnimation(uid);
-        },
-      );
-      this.dieCancels.set(uid, () => {
-        cancelScale();
-        cancelMove();
+      this.glideDie(uid, sprite, anchor, 1, 150, () => {
+        this.finishDieAnimation(uid);
       });
     };
     if (!withShake) {
@@ -2111,14 +2323,8 @@ export class BattleScene {
       .roundRect(-size / 2 - 3, -size / 2 - 3, size + 6, size + 6, size * 0.26)
       .stroke({ color, width: 3 });
     flash.position.set(at.x, at.y);
-    this.trackParticle(
-      this.tweens.to(flash.scale, { x: 1.3, y: 1.3 }, 280, easeOutQuad),
-    );
-    this.trackParticle(
-      this.tweens.to(flash, { alpha: 0 }, 280, linear, () => {
-        flash.visible = false;
-      }),
-    );
+    this.fxScale(flash, 1.3, 280, easeOutQuad);
+    this.fxFade(flash, 280, linear);
   }
 
   private flashEnemy(enemyId: string): void {
@@ -2127,6 +2333,14 @@ export class BattleScene {
     view.cancelFlash?.();
     view.flash.alpha = 0.9;
     view.cancelFlash = this.tweens.to(view.flash, { alpha: 0 }, 160, linear);
+  }
+
+  private reachableTarget(targetId: string): string {
+    if (targetId.includes(":")) return targetId;
+    const snapshot = battleSnapshot(useBattleStore.getState());
+    const body = snapshot.enemies.find((e) => e.id === targetId);
+    if (body === undefined || !coreLocked(snapshot, body)) return targetId;
+    return preferredPart(body)?.id ?? targetId;
   }
 
   private enemyAnchor(targetId: string): { x: number; y: number } | undefined {
@@ -2158,14 +2372,8 @@ export class BattleScene {
       if (ring === undefined) return;
       ring.circle(0, 0, 6).stroke({ color, width: 2 });
       ring.position.set(to.x, to.y);
-      this.trackParticle(
-        this.tweens.to(ring.scale, { x: 2.2, y: 2.2 }, 240, easeOutQuad),
-      );
-      this.trackParticle(
-        this.tweens.to(ring, { alpha: 0 }, 240, linear, () => {
-          ring.visible = false;
-        }),
-      );
+      this.fxScale(ring, 2.2, 240, easeOutQuad);
+      this.fxFade(ring, 240, linear);
     };
     const bolt = this.takeParticle();
     if (bolt === undefined || length < 1 || this.reduced()) {
@@ -2180,12 +2388,10 @@ export class BattleScene {
       .lineTo(-ux * trail, -uy * trail)
       .stroke({ color, width: 2 });
     bolt.position.set(from.x, from.y);
-    this.trackParticle(
-      this.tweens.to(bolt, { x: to.x, y: to.y }, PROJECTILE_MS, linear, () => {
-        bolt.visible = false;
-        impactRing();
-      }),
-    );
+    this.fxMove(bolt, { x: to.x, y: to.y }, PROJECTILE_MS, linear, () => {
+      bolt.visible = false;
+      impactRing();
+    });
   }
 
   private shieldShimmer(): void {
@@ -2197,11 +2403,7 @@ export class BattleScene {
       .stroke({ color: schools.blue.stroke, width: 3 });
     arc.position.set(playerHit.x, playerHit.y + 10);
     arc.alpha = 0.95;
-    this.trackParticle(
-      this.tweens.to(arc, { alpha: 0 }, 320, linear, () => {
-        arc.visible = false;
-      }),
-    );
+    this.fxFade(arc, 320, linear);
   }
 
   private thrusterPuff(): void {
@@ -2213,14 +2415,8 @@ export class BattleScene {
       if (puff === undefined) return;
       puff.circle(0, 0, 5).fill({ color: schools.green.stroke, alpha: 0.7 });
       puff.position.set(cx - 14 + i * 14, cy);
-      this.trackParticle(
-        this.tweens.to(puff.scale, { x: 2, y: 2 }, 260 + i * 40, easeOutQuad),
-      );
-      this.trackParticle(
-        this.tweens.to(puff, { alpha: 0 }, 260 + i * 40, linear, () => {
-          puff.visible = false;
-        }),
-      );
+      this.fxScale(puff, 2, 260 + i * 40, easeOutQuad);
+      this.fxFade(puff, 260 + i * 40, linear);
     }
   }
 
@@ -2236,14 +2432,8 @@ export class BattleScene {
       .stroke({ color: schools.prismatic.stroke, width: 2 });
     sweep.position.set(anchor.x, anchor.y - size / 2);
     sweep.alpha = 0.9;
-    this.trackParticle(
-      this.tweens.to(sweep, { y: anchor.y + size / 2 }, 280, linear),
-    );
-    this.trackParticle(
-      this.tweens.to(sweep, { alpha: 0 }, 320, linear, () => {
-        sweep.visible = false;
-      }),
-    );
+    this.fxMove(sweep, { y: anchor.y + size / 2 }, 280, linear);
+    this.fxFade(sweep, 320, linear);
   }
 
   private startResolution(state: BattleState): void {
@@ -2323,6 +2513,10 @@ export class BattleScene {
       }
       return;
     }
+    if (beat.kind === "partDown" && beat.targetId !== undefined) {
+      this.shearPart(beat.targetId);
+      return;
+    }
     if (beat.kind === "spinalJam") {
       playSfx("spinalJam");
       this.spawnNumber(
@@ -2399,11 +2593,8 @@ export class BattleScene {
   }
 
   private playEnemyBeat(beat: EnemyBeat): void {
-    const view = this.enemyViews.get(beat.enemyId);
     const origin =
-      view === undefined
-        ? this.layout.playerHit
-        : { x: view.root.x, y: view.root.y };
+      this.enemyAnchor(beat.partId ?? beat.enemyId) ?? this.layout.playerHit;
     if (beat.kind === "attack") {
       this.flashEnemy(beat.enemyId);
       this.fireProjectile(origin, this.layout.playerHit);
@@ -2461,8 +2652,9 @@ export class BattleScene {
       return;
     }
     if (beat.kind === "charge") {
-      if (view !== undefined) {
-        const { scale } = view.root;
+      const charging = this.enemyViews.get(beat.enemyId);
+      if (charging !== undefined) {
+        const { scale } = charging.root;
         this.tweens.to(scale, { x: 1.12, y: 1.12 }, 140, easeOutQuad, () => {
           this.tweens.to(scale, { x: 1, y: 1 }, 160, easeOutQuad);
         });

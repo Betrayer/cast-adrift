@@ -1,5 +1,6 @@
-import { Button, Text } from '@mantine/core';
+import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
+import { cx } from '@/app/cx';
 import { tokens } from '@/app/theme';
 import { AppSheet } from '@/components/AppModal';
 import {
@@ -26,9 +27,11 @@ const NodeCard = ({
   return (
     <button
       type="button"
-      className={`${styles.node ?? ''} ${
-        node.equipped ? styles.nodeOn ?? '' : ''
-      } ${node.unlocked ? '' : styles.nodeOff ?? ''}`}
+      className={cx(
+        styles.node,
+        node.equipped && styles.nodeOn,
+        !node.unlocked && styles.nodeOff,
+      )}
       data-echo-node={node.def.id}
       data-echo-state={
         node.equipped ? 'equipped' : node.unlocked ? 'open' : 'locked'
@@ -77,22 +80,10 @@ export const EchoCore = ({ onClose }: { onClose: () => void }) => {
     <AppSheet
       label={t('run:echo.title')}
       testId="echo-core"
+      closeLabel={t('run:echo.close')}
+      closeTestId="echo-close"
       onClose={onClose}
     >
-      <div className={styles.head}>
-        <Text fw={700} c={tokens.text}>
-          {t('run:echo.title')}
-        </Text>
-        <Button
-          size="compact-sm"
-          variant="subtle"
-          color="gray"
-          data-testid="echo-close"
-          onClick={onClose}
-        >
-          {t('run:echo.close')}
-        </Button>
-      </div>
       <div className={styles.body}>
         <div className={styles.core} data-echo-count={fragments}>
           <Text size="sm" fw={700} c={tokens.accent}>
@@ -104,9 +95,7 @@ export const EchoCore = ({ onClose }: { onClose: () => void }) => {
         </div>
         <button
           type="button"
-          className={`${styles.node ?? ''} ${
-            selected === null ? styles.nodeOn ?? '' : ''
-          }`}
+          className={cx(styles.node, selected === null && styles.nodeOn)}
           data-echo-node="none"
           data-echo-state={selected === null ? 'equipped' : 'open'}
           onClick={() => {

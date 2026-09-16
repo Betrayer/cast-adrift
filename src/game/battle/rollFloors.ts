@@ -1,4 +1,5 @@
 import { resonanceGrantActive } from "@/data/resonance";
+import { dieValueCeiling } from "@/game/battle/resolver";
 import type { ResonanceCensus, RolledDie } from "@/types/battle";
 
 export const applyRollFloors = (
@@ -31,5 +32,6 @@ export const applySpareLowest = (dice: readonly RolledDie[]): void => {
     if (die.state !== "tray") continue;
     if (lowest === undefined || die.value < lowest.value) lowest = die;
   }
-  if (lowest !== undefined) lowest.value = Math.min(lowest.tier, lowest.value + 1);
+  if (lowest !== undefined)
+    lowest.value = Math.min(dieValueCeiling(lowest), lowest.value + 1);
 };

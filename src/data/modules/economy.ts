@@ -1,10 +1,8 @@
+import { moduleDef } from "@/data/modules/types";
 import type { ModuleDef } from "@/data/modules/types";
 
 export const ECONOMY_MODULES: readonly ModuleDef[] = [
-  {
-    id: "magnetScoop",
-    name: "content:modules.magnetScoop.name",
-    desc: "content:modules.magnetScoop.desc",
+  moduleDef("magnetScoop", {
     rarity: "common",
     price: 45,
     tag: "economy",
@@ -17,11 +15,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         do: [{ a: "scrap", n: 3 }],
       },
     ],
-  },
-  {
-    id: "assayRig",
-    name: "content:modules.assayRig.name",
-    desc: "content:modules.assayRig.desc",
+  }),
+  moduleDef("assayRig", {
     rarity: "common",
     price: 50,
     tag: "economy",
@@ -33,11 +28,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         do: [{ a: "scrap", n: 5 }],
       },
     ],
-  },
-  {
-    id: "slagPress",
-    name: "content:modules.slagPress.name",
-    desc: "content:modules.slagPress.desc",
+  }),
+  moduleDef("slagPress", {
     rarity: "common",
     price: 45,
     tag: "economy",
@@ -52,11 +44,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "lotteryBlock",
-    name: "content:modules.lotteryBlock.name",
-    desc: "content:modules.lotteryBlock.desc",
+  }),
+  moduleDef("lotteryBlock", {
     rarity: "common",
     price: 55,
     tag: "economy",
@@ -78,11 +67,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "salvageArm",
-    name: "content:modules.salvageArm.name",
-    desc: "content:modules.salvageArm.desc",
+  }),
+  moduleDef("salvageArm", {
     rarity: "common",
     price: 50,
     tag: "economy",
@@ -101,11 +87,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         do: [{ a: "scrap", n: 4 }],
       },
     ],
-  },
-  {
-    id: "grapple",
-    name: "content:modules.grapple.name",
-    desc: "content:modules.grapple.desc",
+  }),
+  moduleDef("grapple", {
     rarity: "uncommon",
     price: 60,
     tag: "economy",
@@ -118,21 +101,15 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         do: [{ a: "scrap", n: 8 }],
       },
     ],
-  },
-  {
-    id: "brokerLink",
-    name: "content:modules.brokerLink.name",
-    desc: "content:modules.brokerLink.desc",
+  }),
+  moduleDef("brokerLink", {
     rarity: "uncommon",
     price: 65,
     tag: "economy",
     tags: ["sensors", "risk"],
     mods: { shopDiscountPct: 16, hullMaxDelta: -3 },
-  },
-  {
-    id: "trainingModule",
-    name: "content:modules.trainingModule.name",
-    desc: "content:modules.trainingModule.desc",
+  }),
+  moduleDef("trainingModule", {
     rarity: "uncommon",
     price: 60,
     tag: "economy",
@@ -158,11 +135,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         do: [{ a: "grant", what: "rerollUses", n: 1 }],
       },
     ],
-  },
-  {
-    id: "auditCore",
-    name: "content:modules.auditCore.name",
-    desc: "content:modules.auditCore.desc",
+  }),
+  moduleDef("auditCore", {
     rarity: "uncommon",
     price: 70,
     tag: "economy",
@@ -175,11 +149,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         do: [{ a: "scrap", n: 8 }],
       },
     ],
-  },
-  {
-    id: "tithePlate",
-    name: "content:modules.tithePlate.name",
-    desc: "content:modules.tithePlate.desc",
+  }),
+  moduleDef("tithePlate", {
     rarity: "rare",
     price: 85,
     tag: "economy",
@@ -188,11 +159,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
     effects: [
       { on: "battleStart", do: [{ a: "scrap", n: 2, perTag: "scrap" }] },
     ],
-  },
-  {
-    id: "bondedVault",
-    name: "content:modules.bondedVault.name",
-    desc: "content:modules.bondedVault.desc",
+  }),
+  moduleDef("bondedVault", {
     rarity: "rare",
     price: 80,
     tag: "economy",
@@ -201,11 +169,8 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
     effects: [
       { on: "battleStart", do: [{ a: "charge", n: 1, perTag: "scrap" }] },
     ],
-  },
-  {
-    id: "foundryCore",
-    name: "content:modules.foundryCore.name",
-    desc: "content:modules.foundryCore.desc",
+  }),
+  moduleDef("foundryCore", {
     rarity: "legendary",
     price: 125,
     tag: "economy",
@@ -222,5 +187,5 @@ export const ECONOMY_MODULES: readonly ModuleDef[] = [
         do: [{ a: "addTempDie", defId: "yellow-d6", turns: 3 }],
       },
     ],
-  },
+  }),
 ];

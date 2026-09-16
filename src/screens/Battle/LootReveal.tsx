@@ -10,7 +10,7 @@ import { DIE_BY_ID } from '@/data/dice';
 import { LOOT_SFX } from '@/data/audio';
 import { duckMusic, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
-import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
+import { useReducedMotion } from '@/stores/settingsStore';
 import { useLootStore } from '@/stores/lootStore';
 import styles from './LootReveal.module.css';
 
@@ -139,9 +139,7 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
 export const LootReveal = () => {
   const pending = useLootStore((s) => s.pending);
   const clear = useLootStore((s) => s.clear);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
   if (pending === null) return null;
   return (
     <LootCard key={pending} dieId={pending} reduced={reduced} onClose={clear} />

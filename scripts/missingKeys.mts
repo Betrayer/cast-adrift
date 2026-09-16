@@ -15,6 +15,9 @@ import { ALL_MODULES } from "../src/data/modules";
 import { MUTATORS } from "../src/data/mutators";
 import { SALVAGE_FACES } from "../src/data/salvage";
 import { WEATHER } from "../src/data/weather";
+import { BLACK_BOX_EPITAPHS } from "../src/data/narrative/blackBox";
+import { DEATH_LINES } from "../src/data/narrative/deathLines";
+import { EPILOGUE_ENTRIES } from "../src/data/narrative/epilogue";
 import { FRAGMENTS } from "../src/data/narrative/fragments";
 import { KEEPER_LINES } from "../src/data/narrative/keeperLines";
 import {
@@ -73,6 +76,9 @@ for (const c of CODEX) {
 }
 for (const f of FATE_TABLE) add(f.text);
 for (const f of FRAGMENTS) add(f.text);
+for (const e of EPILOGUE_ENTRIES) add(e.text);
+for (const d of DEATH_LINES) add(d.text);
+for (const e of BLACK_BOX_EPITAPHS) add(e.text);
 for (const k of KEEPER_LINES) add(k.text);
 for (const step of SYSTEMS_CHECK) {
   add(step.sayKey);

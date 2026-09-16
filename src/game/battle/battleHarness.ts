@@ -1,5 +1,6 @@
 import { DIE_BY_ID } from "@/data/dice";
 import { computeCensus } from "@/game/battle/resonance";
+import { battleSnapshotDefaults } from "@/game/battle/setup";
 import { BattleCtx, buildSources, emit } from "@/game/effects";
 import type {
   BattleSnapshot,
@@ -55,45 +56,28 @@ export const harnessSnap = (
   dice: RolledDie[],
   over: Partial<BattleSnapshot> = {},
 ): BattleSnapshot => ({
-  turn: 1,
+  ...battleSnapshotDefaults(),
   hull: 30,
   hullMax: 30,
-  shield: 0,
-  shieldPersist: 0,
-  charge: 0,
-  scrap: 0,
-  runScrap: 0,
-  tide: 0,
-  interference: 0,
-  perks: [],
   dice,
   slots: defaultSlots(),
   enemies: [harnessEnemy()],
   targetId: "enemy-0",
-  evasion: null,
-  nextTurnMods: {},
-  nextRollBonus: 0,
   chargeCap: 10,
-  sacrificePool: 0,
-  bloodReactorUsed: false,
-  burnDoubleUsed: false,
-  blockedSlots: [],
-  shrunkSlots: [],
-  lockedDice: [],
   resonance: computeCensus(dice),
-  survivedLethal: false,
-  lastPlayerDamage: 0,
-  stolenScrap: 0,
-  pendingTwist: 0,
-  pendingSwap: 0,
-  pendingStorm: 0,
-  ascension: 0,
-  exceedCap: [],
-  sectorHpPct: 0,
-  sectorDmgPct: 0,
-  enemyHpPct: 0,
   ...over,
 });
+
+export const harnessBoard = (
+  enemies: EnemyState[],
+  dice: RolledDie[] = [],
+  over: Partial<BattleSnapshot> = {},
+): BattleSnapshot =>
+  harnessSnap(dice, {
+    enemies,
+    targetId: enemies[0]?.id ?? null,
+    ...over,
+  });
 
 export const startedSnap = (
   dice: RolledDie[],

@@ -10,6 +10,7 @@ import {
   emptyCarry,
   enumeratePlacements,
   evalOrderStep,
+  innerGoal,
   lockedCountForTurn,
   resolveFaces,
   scorePlacement,
@@ -114,14 +115,11 @@ export const midBoard = (puzzle: PuzzleDef): number[] =>
         (faces) => faces[Math.floor((faces.length - 1) / 2)] ?? 1,
       );
 
-const targetGoal = (goal: PuzzleGoal): SingleTurnGoal | null =>
-  goal.g === "deduction" ? goal.inner : goal.g === "multiTurn" ? null : goal;
-
 export const solutionsOnBoard = (
   puzzle: PuzzleDef,
   values: readonly number[],
 ): number => {
-  const goal = targetGoal(puzzle.goal);
+  const goal = innerGoal(puzzle.goal);
   if (goal === null) return 0;
   let count = 0;
   for (const placement of enumeratePlacements(puzzle)) {
@@ -457,7 +455,7 @@ const computeDifficulty = (puzzle: PuzzleDef): PuzzleDifficulty => {
     };
   }
 
-  const target = targetGoal(goal);
+  const target = innerGoal(goal);
   if (target === null) throw new Error(`puzzle "${puzzle.id}" has no goal`);
 
   if (goal.g === "deduction") {

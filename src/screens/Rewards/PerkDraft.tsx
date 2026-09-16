@@ -18,7 +18,7 @@ import {
 } from "@/game/run/flow";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
-import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import { useRunStore } from "@/stores/runStore";
 import styles from "./Rewards.module.css";
 
@@ -26,9 +26,7 @@ const CARD_FLIP_MS = 90;
 
 export const PerkDraft = ({ choices }: { choices: readonly string[] }) => {
   const { t } = useTranslation(["run", "content"]);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
   const sector = useRunStore((s) => s.sector);
   const scrap = useRunStore((s) => s.scrap);
   const deck = useRunStore((s) => s.deck);

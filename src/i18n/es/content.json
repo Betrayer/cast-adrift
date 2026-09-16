@@ -371,7 +371,24 @@
     "theHush-bell": "Campana",
     "echoFleet": "La flota de «Echo»",
     "echoFleet-wake": "Vigilia",
-    "echoFleet-chorus": "Estribillo"
+    "echoFleet-chorus": "Estribillo",
+    "quarantineWarden-siren": "Sirena",
+    "beaconTrap-prism": "Prisma trampa",
+    "breakerBarge-maw": "Fauces de admisión",
+    "auctionCorvette-podium": "Podio",
+    "riftMaw-gullet": "Gaznate",
+    "riftBranch-thorn": "Espina",
+    "choirFlagship-censer": "Incensario",
+    "cantorColossus-diaphragm": "Diafragma",
+    "coreHeart-vent": "Respiradero de tormenta",
+    "mirrorHeart-pane": "Panel del censo",
+    "theHush-muffler": "Sordina",
+    "echoFleet-ghost": "Fantasma",
+    "usurer-writ": "Pagaré",
+    "resonator-chord": "Acorde",
+    "silencer-damper": "Amortiguador",
+    "coreSliver-edge": "Filo",
+    "hushWarden-gag": "Mordaza"
   },
   "ships": {
     "wanderer": {
@@ -612,11 +629,11 @@
     "sacrifice": "Gasta un dado para sumar +4 al daño de las armas este turno; si el casco está por debajo de un tercio, todos los disparos críticos de las armas se multiplican por 1,5.",
     "back-door": "Un rollo negro de «min-face» otorga +6 de chatarra.",
     "spare": "El resultado más bajo de cada tirada se incrementa en uno; vuelve a tirar un dado más cada vez.",
-    "afterburner": "Los umbrales del motor son un paso más sencillos; casco −2.",
+    "afterburner": "Roce +1% y esquiva +2%; casco −2.",
     "jammer-plus": "Jam reduce el ataque del enemigo en 2 puntos más, pero las marcas valen 1 punto menos.",
     "targeter": "Las marcas aportan +1 de daño adicional, pero el atasco reduce 1 menos.",
     "plating": "Casco +5, y cada batalla ganada repara 2 puntos de casco.",
-    "tug": "Una esquiva también otorga +1 de carga.",
+    "tug": "La primera evasión del turno también otorga +1 de carga.",
     "kindling": "+1 en armas con un resultado de 5 o más.",
     "hammerhead": "+2 en Armas A.",
     "scorchmark": "El valor máximo de «face» en las armas añade «Burn 1».",
@@ -647,7 +664,7 @@
     "hardVacuum": "+3 en escudos mientras el casco esté por debajo de la mitad.",
     "secondSkin": "Casco Se reparan +4 y 2 puntos de casco tras cada batalla, pero el rescate se paga un 10 % menos.",
     "glacierPact": "+4 en escudos cuando tengas cuatro dados azules.",
-    "mirrorLattice": "Las esquivas reflejan el daño, los umbrales de los motores son un nivel más fáciles y, con tres objetos de esquiva, los motores se leen como +3.",
+    "mirrorLattice": "La primera evasión del turno refleja el daño, roce +1% y esquiva +2%, y con tres objetos de esquiva los motores se leen como +3.",
     "permafrost": "Una cara máxima en los escudos resuelve la ranura dos veces.",
     "rootHold": "A partir del tercer turno, cada dado de los motores cuenta como dos más.",
     "secondGrowth": "+2 cuando un dado muestra el mismo resultado que en el turno anterior.",
@@ -662,7 +679,7 @@
     "tideRoots": "La marea de interferencia tiene una intensidad ligeramente menor.",
     "worldTree": "Cuando los cuatro dados verdes entren en resonancia, al final de cada turno se recuperará 1 punto de casco por cada objeto verde que lleves contigo.",
     "overgrowthPact": "Crecimiento +2 y casco −4; mientras lleves cuatro objetos de crecimiento, cada dado cuenta como si tuviera un valor 2 puntos mayor.",
-    "standingWave": "Los umbrales de los motores son ahora un poco más fáciles; si un motor tiene 6 o más, pasa 4 de escudo y 2 de carga al siguiente turno.",
+    "standingWave": "Roce +1% y esquiva +2%; 6 o más en motores pasa 4 de escudo y 2 de carga al siguiente turno.",
     "pocketChange": "Al entrar en un nodo, se obtiene 1 chatarra por cada objeto [chatarra] que tengas en tu equipamiento.",
     "finderFee": "+2 de chatarra por cada enemigo eliminado.",
     "streetPrice": "Las tiendas bajan un −8 %, pero la chatarra sube un −5 %: se compra y se vende al mismo precio de mercado.",
@@ -740,7 +757,7 @@
     "seedBank": "Inicio de la batalla: durante los tres siguientes turnos, aumentarás tu escudo en 1 por cada objeto de crecimiento que lleves.",
     "understory": "Fin del turno: si quedan 4 o más puntos de escudo, recupera 1 punto de casco.",
     "mycelium": "Una vez que las seis casillas hayan resuelto esta batalla, cada turno termina curando 2 de casco y aumentando 3 de escudo.",
-    "rhizome": "Los umbrales del motor son dos niveles más fáciles; el casco, −2.",
+    "rhizome": "Roce +2% y esquiva +4%; casco −2.",
     "taproot": "Cuenta cada nodo por el que pasas; a partir del octavo, cada batalla comienza con 6 puntos de escudo y 3 de casco recuperados.",
     "perennial": "En los motores, un dado que repita el valor de la última tirada cuenta como cuatro más.",
     "annualRings": "Cuenta cada dado que repita el valor del turno anterior; a partir del tercero, cada dado cuenta como 3 más durante el resto de la batalla.",
@@ -3820,6 +3837,14 @@
       "9": "Esa era la versión educada.",
       "10": "Hay más que decir al respecto. Por desgracia."
     },
+    "bossPartDown": {
+      "1": "Un nodo fuera. Todavía no se ha dado cuenta.",
+      "2": "Una costumbre menos. Conserva las demás.",
+      "3": "Esa pieza ya no discute.",
+      "4": "Tachada una línea de la lista de lo que sabe hacer.",
+      "5": "Seguirá. Solo que con un brazo menos.",
+      "6": "El casco está entero. El diseño ya no."
+    },
     "minibossIntro": {
       "1": "Pelea en la puerta. Esta ha sido para el recuerdo.",
       "2": "Eso no es una patrulla. Es toda una declaración de intenciones.",
@@ -4497,7 +4522,7 @@
     },
     "ballastModule": {
       "name": "Tanques de lastre",
-      "desc": "Casco +5 y los umbrales del motor son un nivel más difíciles; cada nodo al que entres repara 1 punto de casco."
+      "desc": "Casco +5 y roce −1% / esquiva −2%; cada nodo al que entres repara 1 punto de casco."
     },
     "escapePod": {
       "name": "Cápsula de rescate",
@@ -4517,7 +4542,7 @@
     },
     "bulkheadRing": {
       "name": "Anillo de mamparo",
-      "desc": "Casco +8 y los umbrales del motor son un nivel más difíciles; con los escudos en Mk 2, cada batalla comienza con 6 de escudo, y en Mk 3 la reserva cuenta con un dado más."
+      "desc": "Casco +8 y roce −1% / esquiva −2%; con los escudos en Mk 2, cada batalla comienza con 6 de escudo, y en Mk 3 la reserva cuenta con un dado más."
     },
     "dampingCoil": {
       "name": "Bobina amortiguadora",
@@ -4525,7 +4550,7 @@
     },
     "hardpointClamp": {
       "name": "Abrazadera para punto de fijación",
-      "desc": "Los umbrales del motor son un poco más fáciles, y una vez que el soporte del motor alcanza el nivel Mk 2, cada dado que se lance cuenta como +3."
+      "desc": "Roce +1% y esquiva +2%, y una vez que el soporte del motor alcanza el nivel Mk 2, cada dado que haya en él cuenta como +3."
     },
     "voidLiner": {
       "name": "Revestimiento de vacío",
@@ -5220,21 +5245,21 @@
     "choirHerald": "Un himno de cinco tiempos: dos embestidas, un bloqueo en la ranura y una descarga, siempre en ese orden.",
     "mirrorHull": "Devuelve la mitad de tu último turno dos veces por ciclo, con un límite de 12.",
     "dragnet": "Arrastra tu dado con la puntuación más alta a una ranura de su elección y lo fija allí, y el cabrestante bloquea otro cada tres turnos.",
-    "resonator": "Se activa dos veces por ciclo por cada tamaño de tu banco más profundo, y la bobina se recarga con 6 por cada vuelta.",
+    "resonator": "Golpea dos veces por ciclo según el tamaño de tu escuela más profunda, y la bobina repone 6 de escudo al casco cada turno. El núcleo no recibe nada mientras las dos piezas aguanten.",
     "quarantineTwin": "Dos cascos sincronizados sobre un cuerpo intocable: si golpeas el mismo casco dos veces seguidas, el segundo golpe se anula.",
-    "usurer": "Ofrece la misma opción dos veces por ciclo —6 de chatarra u 8 de daño— y la cámara acorazada recibe 6 puntos más de daño con cada impacto.",
-    "silencer": "Pasa de un bloque de ranuras a dos cuando el casco está por debajo del 55 %, y una interferencia en los sensores desactiva todos los bloques que tenga.",
-    "coreSliver": "Elimina una escuela cada vez —los dados de la escuela protegida infligen la mitad de daño— y te indica cuál es antes de hacerlo. La faceta gira un dado cada turno.",
-    "quarantineWarden": "Proporciona 6 de escudo cada turno mientras la égida siga activa, y añade un bloque de ranura por debajo de la mitad del casco.",
-    "beaconTrap": "Una puerta que no se puede forzar: los golpes que la alcanzan por debajo se absorben por completo, se traga el escudo que levantes y, cuando baja de la mitad, se reajusta a 10 en cada fase.",
-    "breakerBarge": "Cada golpe que conecta cuesta 6 chatarra; la grúa bloquea un dado cada tres turnos y, por debajo del 40 %, se activa de forma automática.",
-    "auctionCorvette": "Las pujas por tu carrera en cada ciclo —paga o quédatelo— te restan 5 puntos por cada golpe que acierte y duplican la puja si está por debajo del 45 %.",
-    "riftMaw": "Dos ojos, cada uno de los cuales gira un dado en cada turno; en la mitad inferior, además, se reduce una tapa de ranura en cada turno.",
-    "riftBranch": "Reduce el límite de una ranura y maldice un dado en cada ciclo; por debajo del 55 %, el límite se reduce en cada turno.",
-    "choirFlagship": "La aguja recarga a todo el coro cada tres turnos y la voz convoca a un nuevo acólito cada cuatro.",
-    "cantorColossus": "Añade 2 a cada impacto futuro en cada turno, para siempre; lo único que borra la pila es una interferencia en el sensor.",
-    "coreHeart": "Una coraza de válvulas sobre una tormenta: el cuerpo no absorbe nada mientras la válvula está activa, y la tormenta se activa en cada turno a partir de la fase 2.",
-    "mirrorHeart": "Lucha con las cartas de tu propio mazo —cuanto más puro sea el mazo, más fuerte será el golpe— tras una fachada de caras.",
+    "usurer": "Ofrece el mismo trato dos veces por ciclo — 6 de chatarra o 6 de daño — y la cámara se lleva 6 más en cada golpe. El núcleo no recibe nada mientras las dos piezas aguanten.",
+    "silencer": "El amortiguador bloquea una ranura cada tres turnos y, por debajo del 55 %, el cuerpo bloquea dos más por ciclo. Una interferencia en los sensores borra todos sus bloques, y el núcleo no recibe nada mientras las dos piezas aguanten.",
+    "coreSliver": "Elimina una escuela cada vez —los dados de la escuela protegida infligen la mitad de daño— y te indica cuál es antes de hacerlo. El núcleo no recibe nada mientras las dos piezas aguanten: la faceta gira un dado cada turno y el filo le repone 6 de escudo cada tres.",
+    "quarantineWarden": "Proporciona 6 de escudo cada turno mientras la égida siga activa, y añade un bloque de ranura por debajo de la mitad del casco. El núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "beaconTrap": "Una puerta que no se puede forzar: los golpes que la alcanzan por debajo se absorben por completo, se traga el escudo que levantes y, cuando baja de la mitad, se reajusta a 10 en cada fase. El núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "breakerBarge": "Cada golpe que acierta se lleva 3 de chatarra, y 6 mientras viva la trituradora; la grúa bloquea un dado cada tres turnos. El núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "auctionCorvette": "Cada ciclo puja 7 por tu carrera —paga o aguántalo—, cada golpe que acierta se lleva 5 de chatarra, y 6 mientras viva el mazo; por debajo del 45 % la puja sube a 8. El núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "riftMaw": "Los dos ojos giran un dado cada turno y, por debajo de la mitad, además reduce el límite de una ranura cada turno. El núcleo no recibe nada hasta que caen dos de sus tres piezas, y el gaznate estalla por 5 al caer.",
+    "riftBranch": "Reduce el límite de una ranura y maldice un dado en cada ciclo; por debajo del 55 %, el límite se reduce en cada turno. El núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "choirFlagship": "La aguja recarga a todo el coro cada tres turnos y la voz convoca a un nuevo acólito cada cuatro. El núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "cantorColossus": "El diafragma añade +2 a cada impacto posterior cada tres turnos, y por debajo del 45 % el cuerpo añade +1 cada turno. Lo único que borra la pila es una interferencia en el sensor, y el núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "coreHeart": "El núcleo no recibe nada hasta que dos de sus tres piezas caen, y la tormenta se activa en cada turno a partir de la fase 2.",
+    "mirrorHeart": "El casco golpea cada tres turnos según el tamaño de tu escuela más profunda, y el panel le repone 8 de escudo. El núcleo no recibe nada hasta que caen dos de sus tres piezas.",
     "retroEcho": "Responde con el daño que infligiste en el último turno, hasta un máximo de 14.",
     "foldWraith": "Reduce el orden de resolución en un turno; a veces, dos veces seguidas.",
     "slowStrider": "No puede recibir golpes mientras haya algún aliado vivo, y activa su escudo a partir del turno 4.",
@@ -5243,10 +5268,10 @@
     "preEcho": "Comienza con una tormenta y, a continuación, cura a la manada si aún le queda alguna.",
     "hushHerald": "Cierra dos ranuras a la vez y agota la reserva si acumulas cargas.",
     "paradoxLoom": "Su lanzadera gira un dado en cada turno y reproduce tu color más intenso.",
-    "foldTyrant": "Dobla el pedido en cada ciclo y se come un dado en cuanto se rompe el pliegue.",
-    "hushWarden": "Cierra las ranuras, y un atasco de su propio emisor las abre todas.",
-    "theHush": "Silencia una ranura cada turno a partir de la segunda fase; utilízalo para volver a abrirlas todas.",
-    "echoFleet": "Cada ventana de fase toma prestado el movimiento característico de un jefe de sector diferente."
+    "foldTyrant": "Pliega el pedido en cada ciclo, el pliegue gira un dado cada turno y, por debajo de la mitad, te quita tu mejor dado de reserva en cada ciclo.",
+    "hushWarden": "La mordaza bloquea una ranura cada tres turnos y, por debajo del 55 %, el cuerpo cierra dos más por ciclo. Una interferencia en los sensores borra todos sus bloques, y el núcleo no recibe nada mientras las dos piezas aguanten.",
+    "theHush": "La sordina bloquea una ranura cada tres turnos y, en su segunda fase, el cuerpo bloquea una cada turno. Una interferencia las abre todas, y el núcleo no recibe nada hasta que caen dos de sus tres piezas.",
+    "echoFleet": "Cada ventana de fase toma prestado el movimiento característico de un jefe de sector diferente. El núcleo no recibe nada hasta que caen dos de sus tres piezas."
   },
   "death": {
     "pact": "«De todas formas, cobrarán. A un contrato no le importa quién de los dos siga vivo».",

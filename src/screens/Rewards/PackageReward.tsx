@@ -12,7 +12,7 @@ import { resolveDieChoice, resolveModuleChoice } from "@/game/run/flow";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
-import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import { runModuleSlots, useRunStore } from "@/stores/runStore";
 import styles from "./Rewards.module.css";
 
@@ -36,9 +36,7 @@ export const PackageReward = ({
   const runModules = useRunStore((s) => s.modules);
   const cap = useRunStore(runModuleSlots);
   const packageScrap = useRunStore((s) => s.pendingRewards?.packageScrap ?? 0);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
   const deckFull = deckSize >= DECK_CAP;
   const bayFull = runModules.length >= cap;
 

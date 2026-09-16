@@ -37,46 +37,11 @@
 }
 
 .card {
+  composes: tinted from '../schoolTint.module.css';
   --tint: var(--ca-line);
   --wash: var(--ca-surface2);
   --tone: var(--ca-dim);
   min-height: 68px;
-}
-
-.card[data-school='red'] {
-  --tint: var(--ca-school-red-stroke);
-  --wash: var(--ca-school-red-fill);
-  --tone: var(--ca-school-red-text);
-}
-
-.card[data-school='blue'] {
-  --tint: var(--ca-school-blue-stroke);
-  --wash: var(--ca-school-blue-fill);
-  --tone: var(--ca-school-blue-text);
-}
-
-.card[data-school='green'] {
-  --tint: var(--ca-school-green-stroke);
-  --wash: var(--ca-school-green-fill);
-  --tone: var(--ca-school-green-text);
-}
-
-.card[data-school='grey'] {
-  --tint: var(--ca-school-grey-stroke);
-  --wash: var(--ca-school-grey-fill);
-  --tone: var(--ca-school-grey-text);
-}
-
-.card[data-school='black'] {
-  --tint: var(--ca-school-black-stroke);
-  --wash: var(--ca-school-black-fill);
-  --tone: var(--ca-school-black-text);
-}
-
-.card[data-school='yellow'] {
-  --tint: var(--ca-school-yellow-stroke);
-  --wash: var(--ca-school-yellow-fill);
-  --tone: var(--ca-school-yellow-text);
 }
 
 .reserve {
@@ -173,6 +138,7 @@
   line-height: 11px;
   font-weight: 700;
   color: var(--ca-dim);
+  animation: proj-settle 90ms ease-out;
 }
 
 .projBonus {
@@ -282,6 +248,17 @@
   background: linear-gradient(160deg, var(--wash), var(--ca-surface2));
 }
 
+@keyframes proj-settle {
+  0% {
+    opacity: 0.35;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 @keyframes slot-breathe {
   0%,
   100% {
@@ -301,6 +278,7 @@
   }
 }
 
+:root[data-ca-motion='reduced'] .proj,
 :root[data-ca-motion='reduced'] .cardLegal,
 :root[data-ca-motion='reduced'] .card[data-pulse='1'],
 :root[data-ca-motion='reduced'] .reserve[data-pulse='1'] {

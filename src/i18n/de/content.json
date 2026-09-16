@@ -371,7 +371,24 @@
     "theHush-bell": "Glocke",
     "echoFleet": "Die Flotte der „Echo“",
     "echoFleet-wake": "Wachen",
-    "echoFleet-chorus": "Refrain"
+    "echoFleet-chorus": "Refrain",
+    "quarantineWarden-siren": "Sirene",
+    "beaconTrap-prism": "Fangprisma",
+    "breakerBarge-maw": "Einlassmaul",
+    "auctionCorvette-podium": "Podium",
+    "riftMaw-gullet": "Schlund",
+    "riftBranch-thorn": "Dorn",
+    "choirFlagship-censer": "Weihrauchfass",
+    "cantorColossus-diaphragm": "Zwerchfell",
+    "coreHeart-vent": "Sturmschlot",
+    "mirrorHeart-pane": "Zensusscheibe",
+    "theHush-muffler": "Sordine",
+    "echoFleet-ghost": "Geist",
+    "usurer-writ": "Schuldschein",
+    "resonator-chord": "Akkord",
+    "silencer-damper": "Dämpfer",
+    "coreSliver-edge": "Schneide",
+    "hushWarden-gag": "Knebel"
   },
   "ships": {
     "wanderer": {
@@ -612,11 +629,11 @@
     "sacrifice": "Wirf in diesem Zug einen Würfel, um +4 Waffenschaden zu sammeln; bei weniger als einem Drittel der Rumpfpunkte verursacht jeder Waffenslot einen kritischen Treffer mit ×1,5.",
     "back-door": "Eine schwarze „Min-Face“-Rolle bringt +6 Schrott.",
     "spare": "Der niedrigste Würfelwert jedes Wurfs wird um eins erhöht; würfle jeweils einen weiteren Würfel neu.",
-    "afterburner": "Die Schwellenwerte für den Motor sind einen Schritt einfacher; Rumpf −2.",
+    "afterburner": "Streifschuss +1% und Ausweichen +2%; Rumpf −2.",
     "jammer-plus": "„Jam“ verringert den Angriff des Gegners um weitere 2, aber die Markierungen sind 1 Punkt weniger wert.",
     "targeter": "Markierungen verursachen +1 Schaden mehr, aber eine Ladehemmung verringert den Schaden um 1 weniger.",
     "plating": "Hülle +5, und jede gewonnene Schlacht repariert 2 Rumpfpunkte.",
-    "tug": "Ein Ausweichmanöver gewährt zudem +1 Ladung.",
+    "tug": "Die erste Evasion der Runde gewährt zudem +1 Ladung.",
     "kindling": "+1 auf Waffen bei einer Augenzahl von 5 oder mehr.",
     "hammerhead": "+2 in „Waffen A“.",
     "scorchmark": "Max. Wert bei Waffen erhöht „Verbrennung“ um 1.",
@@ -647,7 +664,7 @@
     "hardVacuum": "+3 auf die Schilde, solange der Rumpf weniger als die Hälfte seiner Lebenspunkte hat.",
     "secondSkin": "Hülle Nach jedem Gefecht werden +4 und 2 Rumpfschaden repariert, aber die Bergungsprämie ist um 10 % geringer.",
     "glacierPact": "+4 auf die Schilde, sobald du vier blaue Würfel hast.",
-    "mirrorLattice": "Ausweichmanöver wehren Schaden ab, die Motorschwellen sind eine Stufe niedriger, und mit drei Ausweich-Gegenständen erhalten Motoren einen Bonus von +3.",
+    "mirrorLattice": "Die erste Evasion der Runde wirft Schaden zurück, Streifschuss +1% und Ausweichen +2%, und mit drei Ausweich-Gegenständen zählen die Motoren +3.",
     "permafrost": "Bei „Max Face“ in „Shields“ wird der Slot zweimal ausgewertet.",
     "rootHold": "Ab Runde drei zählt jeder Würfel bei den Motoren als zwei Würfel höher.",
     "secondGrowth": "+2, wenn der Würfel denselben Wert wie im letzten Zug zeigt.",
@@ -662,7 +679,7 @@
     "tideRoots": "Die Interferenzflut ist um eine Stufe schwächer.",
     "worldTree": "Sobald vier grüne Würfel im Einklang stehen, heilt du am Ende jedes Zuges 1 Rumpfpunkt pro grünem Gegenstand, den du bei dir trägst.",
     "overgrowthPact": "Wachstum +2 und Rumpf −4; solange du vier Wachstumsgegenstände bei dir trägst, zählt jeder Würfel als um 2 höher.",
-    "standingWave": "Die Schwellenwerte für Motoren sind nun einen Schritt einfacher; bei 6 oder mehr Motoren werden 4 Schilde und 2 Ladungen in den nächsten Zug übertragen.",
+    "standingWave": "Streifschuss +1% und Ausweichen +2%; 6 oder mehr in den Motoren nimmt 4 Schild und 2 Ladung in den nächsten Zug mit.",
     "pocketChange": "Beim Betreten eines Knotens erhältst du 1 Schrott für jeden [Schrott]-Gegenstand in deiner Ausrüstung.",
     "finderFee": "+2 Schrott pro Kill.",
     "streetPrice": "Geschäfte −8 %, Schrott jedoch +5 %: Man kauft und verkauft zum gleichen Straßenpreis.",
@@ -740,7 +757,7 @@
     "seedBank": "Kampfbeginn: In den nächsten drei Runden erhöht sich dein Schildwert um 1 pro Wachstumsgegenstand, den du bei dir trägst.",
     "understory": "Ende des Zuges: Wenn noch 4 oder mehr Schildpunkte vorhanden sind, heile 1 Rumpfpunkt.",
     "mycelium": "Sobald sechs Slots diesen Kampf entschieden haben, werden am Ende jedes Zuges 2 Rumpfpunkte geheilt und der Schild um 3 erhöht.",
-    "rhizome": "Motor-Schwellenwerte zwei Stufen niedriger; Rumpf −2.",
+    "rhizome": "Streifschuss +2% und Ausweichen +4%; Rumpf −2.",
     "taproot": "Zählt jeden Knoten, den du betrittst; ab dem achten beginnt jeder Kampf mit 6 Schild- und 3 Rumpf-Heilpunkten.",
     "perennial": "Ein Würfel in Motoren, der den Wert des letzten Zuges wiederholt, zählt als vier höher.",
     "annualRings": "Zählt jeden Würfel, dessen Wert dem des letzten Zuges entspricht; ab dem dritten Würfel zählt jeder weitere Würfel für den Rest des Kampfes als um 3 höher.",
@@ -3820,6 +3837,14 @@
       "9": "Das war die höfliche Variante.",
       "10": "Es gibt noch mehr dazu zu sagen. Leider."
     },
+    "bossPartDown": {
+      "1": "Ein Knoten ist ab. Es hat es noch nicht gemerkt.",
+      "2": "Eine Gewohnheit weniger. Den Rest behält es.",
+      "3": "Dieser Teil widerspricht nicht mehr.",
+      "4": "Eine Zeile von der Liste gestrichen, was es kann.",
+      "5": "Es macht weiter. Nur mit einem Arm weniger.",
+      "6": "Der Rumpf ist heil. Der Entwurf nicht mehr."
+    },
     "minibossIntro": {
       "1": "Kampf am Tor. Dieser Kampf war ein echtes Highlight.",
       "2": "Das ist keine Streife. Das ist ein Statement.",
@@ -4497,7 +4522,7 @@
     },
     "ballastModule": {
       "name": "Ballasttanks",
-      "desc": "Hülle +5 und die Motor-Schwellenwerte sind um eine Stufe höher; jeder Knoten, den du betrittst, repariert 1 Rumpf."
+      "desc": "Hülle +5 und Streifschuss −1% / Ausweichen −2%; jeder Knoten, den du betrittst, repariert 1 Rumpf."
     },
     "escapePod": {
       "name": "Rettungskapsel",
@@ -4517,7 +4542,7 @@
     },
     "bulkheadRing": {
       "name": "Schott-Ring",
-      "desc": "Hülle +8 und die Motor-Schwellenwerte sind eine Stufe schwieriger; bei Schildern der Stufe Mk 2 beginnt jeder Kampf mit 6 Schildpunkten, und bei Mk 3 enthält die Reserve einen zusätzlichen Würfel."
+      "desc": "Hülle +8 und Streifschuss −1% / Ausweichen −2%; bei Schildern der Stufe Mk 2 beginnt jeder Kampf mit 6 Schildpunkten, und bei Mk 3 enthält die Reserve einen zusätzlichen Würfel."
     },
     "dampingCoil": {
       "name": "Dämpfungsspule",
@@ -4525,7 +4550,7 @@
     },
     "hardpointClamp": {
       "name": "Befestigungsklemme",
-      "desc": "Die Motor-Schwellenwerte sind nun einen Schritt einfacher, und sobald die Motorhalterung Mk 2 erreicht, zählt jeder Würfel darin +3."
+      "desc": "Streifschuss +1% und Ausweichen +2%, und sobald die Motorhalterung Mk 2 erreicht, zählt jeder Würfel darin +3."
     },
     "voidLiner": {
       "name": "Void-Liner",
@@ -5220,21 +5245,21 @@
     "choirHerald": "Eine Hymne aus fünf Takten: zwei Angriffe, ein Slot-Block und eine Salve, immer in dieser Reihenfolge.",
     "mirrorHull": "Gibt zweimal pro Zyklus die Hälfte deiner letzten Runde zurück, maximal 12.",
     "dragnet": "Zieht deinen höchsten Würfel in einen Slot deiner Wahl und fixiert ihn dort; außerdem arretiert die Winde alle drei Züge einen weiteren Würfel.",
-    "resonator": "Pro Zyklus werden zweimal so viele Treffer erzielt wie die Größe deiner tiefsten Schule beträgt, und die Spule lädt sich bei jeder Umdrehung um 6 auf.",
+    "resonator": "Schlägt zweimal pro Zyklus nach der Größe deiner tiefsten Schule zu, und die Spule panzert den Rumpf jede Runde um 6. Der Kern nimmt nichts, solange beide Teile stehen.",
     "quarantineTwin": "Zwei synchronisierte Hüllen über einem unantastbaren Körper: Trifft man dieselbe Hülle zweimal hintereinander, wird der zweite Treffer absorbiert.",
-    "usurer": "Bietet zweimal pro Zyklus dasselbe Angebot – 6 Schrott oder 8 Schaden – und der Tresor nimmt bei jedem Treffer 6 weitere Schadenpunkte hin.",
-    "silencer": "Bei einem Rumpfschaden von unter 55 % eskaliert der Angriff von einem Slot-Block auf zwei – und eine Sensorstörung hebt alle von ihm gehaltenen Blöcke auf.",
-    "coreSliver": "Hält jeweils eine Schule fern – die Würfel der abgeschirmten Schule verursachen nur halben Schaden – und teilt dir vorher mit, welche das ist. Die Facette dreht in jedem Zug einen Würfel.",
-    "quarantineWarden": "Gewährt in jeder Runde 6 Schutzpunkte, solange die Aegis aktiv ist, und fügt unterhalb der Hälfte der Rumpfstärke einen Slot-Block hinzu.",
-    "beaconTrap": "Ein Tor, das man nicht mit Brute-Force überwinden kann: Treffer darunter werden vollständig absorbiert, es zehrt den von dir errichteten Schild auf, und wenn die Lebenspunkte unter die Hälfte sinken, erscheint es in jeder Phase erneut bei 10.",
-    "breakerBarge": "Jeder Treffer kostet 6 Schrott, der Kran sperrt alle drei Runden einen Würfel, und unterhalb von 40 % wird er geladen geöffnet.",
-    "auctionCorvette": "Bei jedem Zyklus werden Gebote auf deinen Lauf abgegeben – entweder zahlst du oder trägst die Folgen: Bei jedem gelandeten Treffer werden 5 Punkte abgezogen, und das Gebot unter 45 % wird verdoppelt.",
-    "riftMaw": "Zwei Augen, von denen jedes in jeder Runde einen Würfel dreht; unterhalb der Hälfte wird zudem in jeder Runde eine Schlitzkappe verkleinert.",
-    "riftBranch": "Verringert bei jedem Zyklus die Obergrenze eines Slots und verflucht einen Würfel; unter 55 % verringert sich die Obergrenze in jedem einzelnen Zug.",
-    "choirFlagship": "Die Turmspitze lädt den gesamten Chor alle drei Runden auf, und die Stimme ruft alle vier Runden einen neuen Akolythen herbei.",
-    "cantorColossus": "In jedem Zug werden 2 auf jeden zukünftigen Treffer gestapelt, und zwar für immer – nur eine Sensorstörung kann den Stapel leeren.",
-    "coreHeart": "Eine Hülle aus Ventilen über einem Sturm: Der Körper nimmt nichts auf, solange ein Ventil lebt, und der Sturm läuft in jeder Runde ab Phase 2.",
-    "mirrorHeart": "Kämpft mit der Zusammensetzung des eigenen Decks – je reiner der Deckbau, desto härter trifft es – hinter einer Fassade aus Gesichtern.",
+    "usurer": "Bietet zweimal pro Zyklus denselben Handel — 6 Schrott oder 6 Schaden — und der Tresor nimmt bei jedem Treffer 6 mehr. Der Kern nimmt nichts, solange beide Teile stehen.",
+    "silencer": "Der Dämpfer blockiert alle drei Runden einen Slot, und unterhalb von 55 % blockiert der Rumpf pro Zyklus zwei weitere. Eine Sensorstörung hebt alle seine Blöcke auf, und der Kern nimmt nichts, solange beide Teile stehen.",
+    "coreSliver": "Hält jeweils eine Schule fern – die Würfel der abgeschirmten Schule verursachen nur halben Schaden – und teilt dir vorher mit, welche das ist. Der Kern nimmt nichts, solange beide Teile stehen: Die Facette dreht in jedem Zug einen Würfel, die Schneide panzert ihn alle drei Runden um 6.",
+    "quarantineWarden": "Gewährt in jeder Runde 6 Schutzpunkte, solange die Aegis aktiv ist, und fügt unterhalb der Hälfte der Rumpfstärke einen Slot-Block hinzu. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "beaconTrap": "Ein Tor, das man nicht mit Brute-Force überwinden kann: Treffer darunter werden vollständig absorbiert, es zehrt den von dir errichteten Schild auf, und wenn die Lebenspunkte unter die Hälfte sinken, erscheint es in jeder Phase erneut bei 10. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "breakerBarge": "Jeder Treffer nimmt 3 Schrott, und 6 solange der Mahlwerk lebt; der Kran sperrt alle drei Runden einen Würfel. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "auctionCorvette": "Bietet jeden Zyklus 7 auf deinen Lauf — zahlen oder einstecken —, jeder Treffer nimmt 5 Schrott, und 6 solange der Hammer lebt; unter 45 % steigt das Gebot auf 8. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "riftMaw": "Beide Augen drehen in jeder Runde je einen Würfel, und unterhalb der Hälfte verkleinert es zudem in jeder Runde eine Slot-Obergrenze. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind, und der Schlund platzt beim Bersten für 5.",
+    "riftBranch": "Verringert bei jedem Zyklus die Obergrenze eines Slots und verflucht einen Würfel; unter 55 % verringert sich die Obergrenze in jedem einzelnen Zug. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "choirFlagship": "Die Turmspitze lädt den gesamten Chor alle drei Runden auf, und die Stimme ruft alle vier Runden einen neuen Akolythen herbei. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "cantorColossus": "Das Zwerchfell addiert alle drei Runden +2 auf jeden späteren Treffer, und unterhalb von 45 % addiert der Rumpf in jeder Runde +1. Nur eine Sensorstörung leert den Stapel, und der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "coreHeart": "Der Kern nimmt nichts, solange nicht zwei seiner drei Teile zerstört sind, und der Sturm läuft in jeder Runde ab Phase 2.",
+    "mirrorHeart": "Der Rumpf schlägt alle drei Runden nach der Größe deiner tiefsten Schule zu, und die Scheibe panzert ihn um 8. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
     "retroEcho": "Antwortet mit dem Schaden, den du in der letzten Runde verursacht hast, bis zu 14.",
     "foldWraith": "Reduziert die Reihenfolge der Auflösung um eine Runde – manchmal sogar zweimal hintereinander.",
     "slowStrider": "Kann nicht getroffen werden, solange ein Verbündeter lebt, und aktiviert ab Runde 4 seinen Schild.",
@@ -5243,10 +5268,10 @@
     "preEcho": "Beginnt mit einem Sturm und heilt anschließend das Rudel, sofern noch eines vorhanden ist.",
     "hushHerald": "Schließt zwei Slots gleichzeitig und leert die Bank, wenn man Ladung hortet.",
     "paradoxLoom": "Sein Shuttle dreht in jeder Runde einen Würfel und spiegelt deine hellste Farbe wider.",
-    "foldTyrant": "Faltet die Bestellung in jedem Zyklus und verbraucht einen Würfel, sobald die Falte nachlässt.",
-    "hushWarden": "Es verschließt die Schlitze, und ein Stau an seinem eigenen Emitter öffnet jeden einzelnen davon.",
-    "theHush": "Ab der zweiten Phase wird in jedem Zug ein Slot deaktiviert; setze den Jam ein, um alle wieder zu aktivieren.",
-    "echoFleet": "Jedes Phasenfenster übernimmt die charakteristische Attacke eines anderen Sektor-Bosses."
+    "foldTyrant": "Faltet die Bestellung in jedem Zyklus, die Falte dreht jede Runde einen Würfel, und unterhalb der Hälfte verschlingt sie pro Zyklus deinen besten Ersatzwürfel.",
+    "hushWarden": "Der Knebel blockiert alle drei Runden einen Slot, und unterhalb von 55 % verschließt der Rumpf pro Zyklus zwei weitere. Eine Sensorstörung hebt alle seine Blöcke auf, und der Kern nimmt nichts, solange beide Teile stehen.",
+    "theHush": "Die Sordine blockiert alle drei Runden einen Slot, und in ihrer zweiten Phase blockiert der Rumpf in jeder Runde einen. Eine Störung öffnet sie alle, und der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind.",
+    "echoFleet": "Jedes Phasenfenster übernimmt die charakteristische Attacke eines anderen Sektor-Bosses. Der Kern nimmt nichts, bis zwei seiner drei Teile zerstört sind."
   },
   "death": {
     "pact": "„Sie werden das Geld sowieso einziehen. Einem Vertrag ist es egal, wer von uns noch atmet.“",

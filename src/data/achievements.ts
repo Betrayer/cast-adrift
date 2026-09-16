@@ -135,12 +135,37 @@ export const compileFamily = (
 
 export const LEGENDARY_ALT_SHARDS = 250;
 
+const legendaryTier = (need: number, shards: number): TierDef => ({
+  need,
+  shards,
+  voucher: "perkDraft",
+  altShards: LEGENDARY_ALT_SHARDS,
+  legendary: true,
+});
+
+const family = (
+  id: string,
+  body: Omit<AchievementFamilyDef, "id" | "name" | "desc">,
+): AchievementFamilyDef => ({
+  id,
+  name: `meta:ach.${id}.name`,
+  desc: `meta:ach.${id}.desc`,
+  ...body,
+});
+
+const single = (
+  id: string,
+  body: Omit<AchievementDef, "id" | "name" | "desc">,
+): AchievementDef => ({
+  id,
+  name: `meta:ach.${id}.name`,
+  desc: `meta:ach.${id}.desc`,
+  ...body,
+});
+
 export const ACHIEVEMENT_FAMILIES: readonly AchievementFamilyDef[] = [
-  {
-    id: "bounty",
+  family("bounty", {
     group: "combat",
-    name: "meta:ach.bounty.name",
-    desc: "meta:ach.bounty.desc",
     cond: { c: "lifetime", stat: "kills" },
     tiers: [
       { need: 5, shards: 15 },
@@ -148,424 +173,283 @@ export const ACHIEVEMENT_FAMILIES: readonly AchievementFamilyDef[] = [
       { need: 25, shards: 40 },
       { need: 50, shards: 70 },
       { need: 100, shards: 120 },
-      {
-        need: 500,
-        shards: 220,
-        voucher: "perkDraft",
-        altShards: LEGENDARY_ALT_SHARDS,
-        legendary: true,
-      },
+      legendaryTier(500, 220),
     ],
-  },
-  {
-    id: "eliteHunt",
+  }),
+  family("eliteHunt", {
     group: "combat",
-    name: "meta:ach.eliteHunt.name",
-    desc: "meta:ach.eliteHunt.desc",
     cond: { c: "lifetime", stat: "elites" },
     tiers: [
       { need: 5, shards: 30 },
       { need: 25, shards: 70, unlockId: "contractsAchGauntlet" },
       { need: 100, shards: 150 },
     ],
-  },
-  {
-    id: "deathless",
+  }),
+  family("deathless", {
     group: "combat",
-    name: "meta:ach.deathless.name",
-    desc: "meta:ach.deathless.desc",
     cond: { c: "streak" },
     tiers: [
       { need: 1, shards: 25 },
       { need: 3, shards: 55, unlockId: "diceAchSurvivor" },
       { need: 5, shards: 100 },
-      {
-        need: 10,
-        shards: 180,
-        voucher: "perkDraft",
-        altShards: LEGENDARY_ALT_SHARDS,
-        legendary: true,
-      },
+      legendaryTier(10, 180),
     ],
-  },
-  {
-    id: "flawlessBoss",
+  }),
+  family("flawlessBoss", {
     group: "combat",
-    name: "meta:ach.flawlessBoss.name",
-    desc: "meta:ach.flawlessBoss.desc",
     cond: { c: "lifetime", stat: "flawlessBosses" },
     tiers: [
       { need: 1, shards: 40 },
       { need: 5, shards: 110 },
     ],
-  },
-  {
-    id: "resonant",
+  }),
+  family("resonant", {
     group: "combat",
-    name: "meta:ach.resonant.name",
-    desc: "meta:ach.resonant.desc",
     cond: { c: "lifetime", stat: "resonance6" },
     tiers: [
       { need: 1, shards: 30 },
       { need: 10, shards: 70 },
       { need: 50, shards: 150 },
     ],
-  },
-  {
-    id: "voidRider",
+  }),
+  family("voidRider", {
     group: "combat",
-    name: "meta:ach.voidRider.name",
-    desc: "meta:ach.voidRider.desc",
     cond: { c: "lifetime", stat: "wormholeRides" },
     tiers: [
       { need: 1, shards: 30 },
       { need: 10, shards: 70 },
       { need: 50, shards: 150 },
     ],
-  },
-  {
-    id: "horizonTester",
+  }),
+  family("horizonTester", {
     group: "combat",
-    name: "meta:ach.horizonTester.name",
-    desc: "meta:ach.horizonTester.desc",
     cond: { c: "lifetime", stat: "disintegrations" },
     tiers: [
       { need: 1, shards: 40 },
       { need: 3, shards: 90 },
       { need: 7, shards: 180 },
     ],
-  },
-  {
-    id: "rimRunner",
+  }),
+  family("rimRunner", {
     group: "combat",
-    name: "meta:ach.rimRunner.name",
-    desc: "meta:ach.rimRunner.desc",
     cond: { c: "lifetime", stat: "holesBypassed" },
     tiers: [
       { need: 5, shards: 40 },
       { need: 25, shards: 110 },
     ],
-  },
-  {
-    id: "scrapBaron",
+  }),
+  family("scrapBaron", {
     group: "economy",
-    name: "meta:ach.scrapBaron.name",
-    desc: "meta:ach.scrapBaron.desc",
     cond: { c: "lifetime", stat: "scrapEarned" },
     tiers: [
       { need: 5000, shards: 30 },
       { need: 25000, shards: 70 },
       { need: 100000, shards: 150 },
     ],
-  },
-  {
-    id: "machinist",
+  }),
+  family("machinist", {
     group: "economy",
-    name: "meta:ach.machinist.name",
-    desc: "meta:ach.machinist.desc",
     cond: { c: "lifetime", stat: "fusions" },
     tiers: [
       { need: 5, shards: 40 },
       { need: 25, shards: 110 },
     ],
-  },
-  {
-    id: "engraver",
+  }),
+  family("engraver", {
     group: "economy",
-    name: "meta:ach.engraver.name",
-    desc: "meta:ach.engraver.desc",
     cond: { c: "lifetime", stat: "engravingsFitted" },
     tiers: [
       { need: 5, shards: 40 },
       { need: 25, shards: 110 },
     ],
-  },
-  {
-    id: "refit",
+  }),
+  family("refit", {
     group: "economy",
-    name: "meta:ach.refit.name",
-    desc: "meta:ach.refit.desc",
     cond: { c: "lifetime", stat: "mk3Built" },
     tiers: [
       { need: 1, shards: 40 },
       { need: 10, shards: 110 },
     ],
-  },
-  {
-    id: "outfitter",
+  }),
+  family("outfitter", {
     group: "economy",
-    name: "meta:ach.outfitter.name",
-    desc: "meta:ach.outfitter.desc",
     cond: { c: "collectionOwned" },
     tiers: [
       { need: 30, shards: 30 },
       { need: 60, shards: 70 },
       { need: 94, shards: 150 },
     ],
-  },
-  {
-    id: "tierFive",
+  }),
+  family("tierFive", {
     group: "puzzles",
-    name: "meta:ach.tierFive.name",
-    desc: "meta:ach.tierFive.desc",
     cond: { c: "lifetime", stat: "t5Solved" },
     tiers: [
       { need: 1, shards: 25, unlockId: "diceAchPuzzler" },
       { need: 5, shards: 55 },
       { need: 10, shards: 100, unlockId: "diceL30" },
-      {
-        need: 25,
-        shards: 180,
-        voucher: "perkDraft",
-        altShards: LEGENDARY_ALT_SHARDS,
-        legendary: true,
-      },
+      legendaryTier(25, 180),
     ],
-  },
-  {
-    id: "puzzleBreadth",
+  }),
+  family("puzzleBreadth", {
     group: "puzzles",
-    name: "meta:ach.puzzleBreadth.name",
-    desc: "meta:ach.puzzleBreadth.desc",
     cond: { c: "seenPuzzles" },
     tiers: [
       { need: 10, shards: 30 },
       { need: 25, shards: 70 },
       { need: 40, shards: 150 },
     ],
-  },
-  {
-    id: "eventful",
+  }),
+  family("eventful", {
     group: "story",
-    name: "meta:ach.eventful.name",
-    desc: "meta:ach.eventful.desc",
     cond: { c: "lifetime", stat: "eventsResolved" },
     tiers: [
       { need: 25, shards: 30 },
       { need: 100, shards: 70 },
       { need: 400, shards: 150 },
     ],
-  },
-  {
-    id: "gambler",
+  }),
+  family("gambler", {
     group: "story",
-    name: "meta:ach.gambler.name",
-    desc: "meta:ach.gambler.desc",
     cond: { c: "lifetime", stat: "checksWon" },
     tiers: [
       { need: 10, shards: 40 },
       { need: 50, shards: 110 },
     ],
-  },
-  {
-    id: "fiftyFound",
+  }),
+  family("fiftyFound", {
     group: "collection",
-    name: "meta:ach.fiftyFound.name",
-    desc: "meta:ach.fiftyFound.desc",
     cond: { c: "encountered" },
     tiers: [
       { need: 25, shards: 25 },
       { need: 50, shards: 55, unlockId: "diceAchCollector" },
       { need: 75, shards: 100 },
-      {
-        need: 94,
-        shards: 180,
-        voucher: "perkDraft",
-        altShards: LEGENDARY_ALT_SHARDS,
-        legendary: true,
-      },
+      legendaryTier(94, 180),
     ],
-  },
-  {
-    id: "archivist",
+  }),
+  family("archivist", {
     group: "collection",
-    name: "meta:ach.archivist.name",
-    desc: "meta:ach.archivist.desc",
     cond: { c: "codex" },
     tiers: [
       { need: 30, shards: 30 },
       { need: 60, shards: 70, unlockId: "contractsL28", badge: "archivist" },
       { need: 120, shards: 150 },
     ],
-  },
-  {
-    id: "contractor",
+  }),
+  family("contractor", {
     group: "modes",
-    name: "meta:ach.contractor.name",
-    desc: "meta:ach.contractor.desc",
     cond: { c: "contractStars" },
     tiers: [
       { need: 15, shards: 30 },
       { need: 30, shards: 70 },
       { need: 42, shards: 150 },
     ],
-  },
-  {
-    id: "dailyRunner",
+  }),
+  family("dailyRunner", {
     group: "modes",
-    name: "meta:ach.dailyRunner.name",
-    desc: "meta:ach.dailyRunner.desc",
     cond: { c: "lifetime", stat: "dailyRuns" },
     tiers: [
       { need: 5, shards: 40 },
       { need: 25, shards: 110 },
     ],
-  },
-  {
-    id: "driftDeep",
+  }),
+  family("driftDeep", {
     group: "modes",
-    name: "meta:ach.driftDeep.name",
-    desc: "meta:ach.driftDeep.desc",
     cond: { c: "lifetime", stat: "deepestDrift" },
     tiers: [
       { need: 25, shards: 30 },
       { need: 50, shards: 70 },
       { need: 100, shards: 150 },
     ],
-  },
+  }),
 ];
 
 export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
-  {
-    id: "sectorFive",
-    name: "meta:ach.sectorFive.name",
-    desc: "meta:ach.sectorFive.desc",
+  single("sectorFive", {
     group: "combat",
     cond: { c: "bossFirstKills", n: 5 },
     reward: { unlockId: "diceAchFirstClear", shards: 120 },
-  },
-  {
-    id: "flawless",
-    name: "meta:ach.flawless.name",
-    desc: "meta:ach.flawless.desc",
+  }),
+  single("flawless", {
     group: "combat",
     cond: { c: "runHullPct", n: 90 },
     reward: { shards: 70 },
-  },
-  {
-    id: "ascendant",
-    name: "meta:ach.ascendant.name",
-    desc: "meta:ach.ascendant.desc",
+  }),
+  single("ascendant", {
     group: "combat",
     cond: { c: "clearAtAscension", n: 10 },
     reward: { shards: 250, badge: "ascendant" },
-  },
-  {
-    id: "quickWork",
-    name: "meta:ach.quickWork.name",
-    desc: "meta:ach.quickWork.desc",
+  }),
+  single("quickWork", {
     group: "combat",
     cond: { c: "runStatAtMost", stat: "jumps", n: 11 },
     reward: { shards: 60 },
-  },
-  {
-    id: "beyondTheCore",
-    name: "meta:ach.beyondTheCore.name",
-    desc: "meta:ach.beyondTheCore.desc",
+  }),
+  single("beyondTheCore", {
     group: "combat",
     cond: { c: "lifetime", stat: "deepClears", n: 1 },
     reward: { unlockId: "diceS6", shards: 150 },
-  },
-  {
-    id: "frugal",
-    name: "meta:ach.frugal.name",
-    desc: "meta:ach.frugal.desc",
+  }),
+  single("frugal", {
     group: "economy",
     cond: { c: "runStatAtMost", stat: "scrapSpent", n: 0 },
     reward: { shards: 65 },
-  },
-  {
-    id: "anomalist",
-    name: "meta:ach.anomalist.name",
-    desc: "meta:ach.anomalist.desc",
+  }),
+  single("anomalist", {
     group: "puzzles",
     cond: { c: "runPuzzles", n: 4 },
     reward: { shards: 55 },
-  },
-  {
-    id: "chainMara",
-    name: "meta:ach.chainMara.name",
-    desc: "meta:ach.chainMara.desc",
+  }),
+  single("chainMara", {
     group: "story",
     cond: { c: "chainDone", id: "mara" },
     reward: { shards: 60 },
-  },
-  {
-    id: "chainYusuf",
-    name: "meta:ach.chainYusuf.name",
-    desc: "meta:ach.chainYusuf.desc",
+  }),
+  single("chainYusuf", {
     group: "story",
     cond: { c: "chainDone", id: "yusuf" },
     reward: { shards: 60 },
-  },
-  {
-    id: "chainChoir",
-    name: "meta:ach.chainChoir.name",
-    desc: "meta:ach.chainChoir.desc",
+  }),
+  single("chainChoir", {
     group: "story",
     cond: { c: "chainDone", id: "choir" },
     reward: { shards: 60 },
-  },
-  {
-    id: "chainKeeper",
-    name: "meta:ach.chainKeeper.name",
-    desc: "meta:ach.chainKeeper.desc",
+  }),
+  single("chainKeeper", {
     group: "story",
     cond: { c: "chainDone", id: "keeper" },
     reward: { shards: 60 },
-  },
-  {
-    id: "allChains",
-    name: "meta:ach.allChains.name",
-    desc: "meta:ach.allChains.desc",
+  }),
+  single("allChains", {
     group: "story",
     cond: { c: "chainsDone", n: 4 },
     reward: { shards: 200 },
-  },
-  {
-    id: "maraSquared",
-    name: "meta:ach.maraSquared.name",
-    desc: "meta:ach.maraSquared.desc",
+  }),
+  single("maraSquared", {
     group: "story",
     cond: { c: "flags", keys: ["maraDebt", "favorHeld"], mode: "all" },
     reward: { shards: 50 },
-  },
-  {
-    id: "keeperFriend",
-    name: "meta:ach.keeperFriend.name",
-    desc: "meta:ach.keeperFriend.desc",
+  }),
+  single("keeperFriend", {
     group: "story",
     cond: { c: "flags", keys: ["keeperRepaid", "beaconRebuilt"], mode: "all" },
     reward: { shards: 50 },
-  },
-  {
-    id: "fleetKept",
-    name: "meta:ach.fleetKept.name",
-    desc: "meta:ach.fleetKept.desc",
+  }),
+  single("fleetKept", {
     group: "story",
     cond: { c: "flags", keys: ["fleetTruthKept"], mode: "any" },
     reward: { shards: 40 },
-  },
-  {
-    id: "apostate",
-    name: "meta:ach.apostate.name",
-    desc: "meta:ach.apostate.desc",
+  }),
+  single("apostate", {
     group: "story",
     cond: { c: "flags", keys: ["pactBroken", "choirBetrayed"], mode: "any" },
     reward: { shards: 40 },
-  },
-  {
-    id: "bothMirrors",
-    name: "meta:ach.bothMirrors.name",
-    desc: "meta:ach.bothMirrors.desc",
+  }),
+  single("bothMirrors", {
     group: "story",
     cond: { c: "flags", keys: ["mirrorBound", "mirrorBroken"], mode: "all" },
     reward: { shards: 80 },
-  },
-  {
-    id: "coreTrilogy",
-    name: "meta:ach.coreTrilogy.name",
-    desc: "meta:ach.coreTrilogy.desc",
+  }),
+  single("coreTrilogy", {
     group: "story",
     cond: {
       c: "flags",
@@ -573,111 +457,72 @@ export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
       mode: "all",
     },
     reward: { shards: 150 },
-  },
-  {
-    id: "lighthouse",
-    name: "meta:ach.lighthouse.name",
-    desc: "meta:ach.lighthouse.desc",
+  }),
+  single("lighthouse", {
     group: "story",
     cond: { c: "flags", keys: ["lighthouseLit"], mode: "any" },
     reward: { shards: 45 },
-  },
-  {
-    id: "beaconkeeper",
-    name: "meta:ach.beaconkeeper.name",
-    desc: "meta:ach.beaconkeeper.desc",
+  }),
+  single("beaconkeeper", {
     group: "story",
     cond: { c: "runBeacons", n: 4 },
     reward: { shards: 100 },
-  },
-  {
-    id: "allEndings",
-    name: "meta:ach.allEndings.name",
-    desc: "meta:ach.allEndings.desc",
+  }),
+  single("allEndings", {
     group: "story",
     cond: { c: "endings", n: 4 },
     reward: { shards: 200 },
-  },
-  {
-    id: "theAnswer",
-    name: "meta:ach.theAnswer.name",
-    desc: "meta:ach.theAnswer.desc",
+  }),
+  single("theAnswer", {
     group: "story",
     cond: { c: "endingReached", id: "answer" },
     reward: { unlockId: "skinThreshold", shards: 200, badge: "answer" },
-  },
-  {
-    id: "everyColour",
-    name: "meta:ach.everyColour.name",
-    desc: "meta:ach.everyColour.desc",
+  }),
+  single("everyColour", {
     group: "collection",
     cond: { c: "collectionSchools", n: 7 },
     reward: { unlockId: "diceL22", shards: 60 },
-  },
-  {
-    id: "keystoneThree",
-    name: "meta:ach.keystoneThree.name",
-    desc: "meta:ach.keystoneThree.desc",
+  }),
+  single("keystoneThree", {
     group: "modes",
     cond: { c: "keystones", n: 3 },
     reward: { unlockId: "skinChartwright", shards: 70, badge: "chartwright" },
-  },
-  {
-    id: "wandererClear",
-    name: "meta:ach.wandererClear.name",
-    desc: "meta:ach.wandererClear.desc",
+  }),
+  single("wandererClear", {
     group: "modes",
     cond: { c: "lifetime", stat: "clearsWanderer", n: 1 },
     reward: { shards: 60 },
-  },
-  {
-    id: "ramClear",
-    name: "meta:ach.ramClear.name",
-    desc: "meta:ach.ramClear.desc",
+  }),
+  single("ramClear", {
     group: "modes",
     cond: { c: "lifetime", stat: "clearsRam", n: 1 },
     reward: { shards: 60 },
-  },
-  {
-    id: "arkClear",
-    name: "meta:ach.arkClear.name",
-    desc: "meta:ach.arkClear.desc",
+  }),
+  single("arkClear", {
     group: "modes",
     cond: { c: "lifetime", stat: "clearsArk", n: 1 },
     reward: { shards: 60 },
-  },
-  {
-    id: "corsairClear",
-    name: "meta:ach.corsairClear.name",
-    desc: "meta:ach.corsairClear.desc",
+  }),
+  single("corsairClear", {
     group: "modes",
     cond: { c: "lifetime", stat: "clearsCorsair", n: 1 },
     reward: { shards: 60 },
-  },
-  {
-    id: "foundryClear",
-    name: "meta:ach.foundryClear.name",
-    desc: "meta:ach.foundryClear.desc",
+  }),
+  single("foundryClear", {
     group: "modes",
     cond: { c: "lifetime", stat: "clearsFoundry", n: 1 },
     reward: { shards: 60 },
-  },
-  {
-    id: "prismClear",
-    name: "meta:ach.prismClear.name",
-    desc: "meta:ach.prismClear.desc",
+  }),
+  single("prismClear", {
     group: "modes",
     cond: { c: "lifetime", stat: "clearsPrism", n: 1 },
     reward: { shards: 60 },
-  },
-  {
-    id: "spectrumClear",
-    name: "meta:ach.spectrumClear.name",
-    desc: "meta:ach.spectrumClear.desc",
+  }),
+  single("spectrumClear", {
     group: "modes",
     cond: { c: "runDeckSchools", n: 6 },
     reward: { shards: 90 },
-  },
+  }),
 ];
 
 export const ACHIEVEMENT_GROUPS: readonly AchievementGroup[] = [
@@ -688,28 +533,6 @@ export const ACHIEVEMENT_GROUPS: readonly AchievementGroup[] = [
   "collection",
   "modes",
 ];
-
-const buildCatalogue = (): AchievementDef[] => {
-  const out: AchievementDef[] = [];
-  for (const group of ACHIEVEMENT_GROUPS) {
-    for (const family of ACHIEVEMENT_FAMILIES) {
-      if (family.group === group) out.push(...compileFamily(family));
-    }
-    for (const single of SINGLE_ACHIEVEMENTS) {
-      if (single.group === group) out.push(single);
-    }
-  }
-  return out;
-};
-
-export const ACHIEVEMENTS: readonly AchievementDef[] = buildCatalogue();
-
-export const ACHIEVEMENT_BY_ID: ReadonlyMap<string, AchievementDef> = new Map(
-  ACHIEVEMENTS.map((def) => [def.id, def]),
-);
-
-export const familyTiers = (familyId: string): readonly AchievementDef[] =>
-  ACHIEVEMENTS.filter((def) => def.family === familyId);
 
 export type AchievementRow =
   | { kind: "family"; id: string; group: AchievementGroup; tiers: readonly AchievementDef[] }
@@ -724,7 +547,7 @@ const buildRows = (): AchievementRow[] => {
         kind: "family",
         id: family.id,
         group,
-        tiers: familyTiers(family.id),
+        tiers: compileFamily(family),
       });
     }
     for (const single of SINGLE_ACHIEVEMENTS) {
@@ -736,6 +559,17 @@ const buildRows = (): AchievementRow[] => {
 };
 
 export const ACHIEVEMENT_ROWS: readonly AchievementRow[] = buildRows();
+
+export const ACHIEVEMENTS: readonly AchievementDef[] = ACHIEVEMENT_ROWS.flatMap(
+  (row) => (row.kind === "family" ? row.tiers : [row.def]),
+);
+
+export const ACHIEVEMENT_BY_ID: ReadonlyMap<string, AchievementDef> = new Map(
+  ACHIEVEMENTS.map((def) => [def.id, def]),
+);
+
+export const familyTiers = (familyId: string): readonly AchievementDef[] =>
+  ACHIEVEMENTS.filter((def) => def.family === familyId);
 
 export const ACHIEVEMENT_ALIASES: Readonly<Record<string, string>> = {
   firstBlood: "bounty-3",

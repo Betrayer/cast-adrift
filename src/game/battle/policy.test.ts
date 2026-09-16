@@ -110,6 +110,32 @@ describe("decidePlacements", () => {
     expect(decision.targetId).toBe("enemy-0:turret");
   });
 
+  it("does not spend the kill on a shelled body its parts still close", () => {
+    const snapshot = makeSnapshot(["echoOfTheHeart"]);
+    const body = snapshot.enemies[0];
+    if (body === undefined) throw new Error("missing enemy");
+    body.hp = 4;
+    body.shield = 0;
+    setValues(snapshot, [6, 6, 6, 4, 4]);
+    const decision = decidePlacements(snapshot);
+    expect(decision.targetId).toBe("enemy-0:valve");
+  });
+
+  it("passes over a guarded body while the enemy guarding it lives", () => {
+    const snapshot = makeSnapshot(["coreFragment", "raider"]);
+    const guarded = snapshot.enemies[0];
+    const guard = snapshot.enemies[1];
+    if (guarded === undefined || guard === undefined)
+      throw new Error("missing enemy");
+    guarded.hp = 5;
+    guarded.shield = 0;
+    guard.hp = 30;
+    guard.shield = 0;
+    setValues(snapshot, [2, 2, 1, 1, 1]);
+    const decision = decidePlacements(snapshot);
+    expect(decision.targetId).toBe("enemy-1");
+  });
+
   it("never places into blocked slots or with locked dice", () => {
     const snapshot = makeSnapshot();
     snapshot.blockedSlots = [{ slot: "weaponA", untilTurn: snapshot.turn }];

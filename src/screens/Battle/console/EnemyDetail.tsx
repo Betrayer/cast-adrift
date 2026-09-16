@@ -1,20 +1,30 @@
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useSyncExternalStore, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useEscapeKey } from '@/components/dismiss';
+import { swallowNextClick, useEscapeKey } from '@/components/dismiss';
 import { echoReadsIntents } from '@/data/echo';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { STATUS_KEYS } from '@/game/battle/statuses';
 import { schools } from '@/data/schools';
+import { aliveCoreParts, coreLocked, partDefOf } from '@/game/battle/damage';
 import { mitigationOf } from '@/game/battle/view';
 import { focusEnemy, focusedEnemy, subscribeEnemyFocus } from '@/pixi/battle/enemyFocus';
 import { battleSnapshot, useBattleStore } from '@/stores/battleStore';
+import type { EnemyState } from '@/types/battle';
 import { echoReadoutFor } from './echoReadout';
-import { auraExplain, intentExplain } from './intentExplain';
+import { auraExplain, intentExplain, partDeathExplain } from './intentExplain';
 import { intentLabel } from './intentLabel';
 import styles from './Console.module.css';
 
 const useFocusedEnemy = (): string | null =>
   useSyncExternalStore(subscribeEnemyFocus, focusedEnemy, focusedEnemy);
+
+export const focusedEnemyIn = (
+  enemies: readonly EnemyState[],
+  focused: string | null,
+): EnemyState | null =>
+  focused === null
+    ? null
+    : (enemies.find((e) => e.id === focused && e.hp > 0) ?? null);
 
 export const EnemyDetail = () => {
   const { t } = useTranslation(['battle', 'content']);
@@ -25,14 +35,26 @@ export const EnemyDetail = () => {
   const close = useCallback(() => {
     focusEnemy(null);
   }, []);
-  useEscapeKey(focused !== null, close);
-  const enemy = enemies.find((e) => e.id === focused);
-  if (focused === null || enemy === undefined) return null;
+  const closeFromTap = useCallback((event: MouseEvent<HTMLButtonElement>) => {
+    swallowNextClick({ x: event.clientX, y: event.clientY });
+    focusEnemy(null);
+  }, []);
+  const enemy = focusedEnemyIn(enemies, focused);
+  useEscapeKey(enemy !== null, close);
+  if (enemy === null) return null;
   const def = ENEMY_BY_ID.get(enemy.defId);
   if (def === undefined) return null;
 
   const snapshot = battleSnapshot(useBattleStore.getState());
   const mitigation = mitigationOf(snapshot, enemy);
+  const sealed = coreLocked(snapshot, enemy);
+  const partsToBreak = Math.max(
+    0,
+    aliveCoreParts(enemy) - (def.coreLockAt ?? 0),
+  );
+  const openUntil = enemy.coreOpenUntilTurn ?? 0;
+  const heldOpenByWindow =
+    def.shell === true && partsToBreak > 0 && snapshot.turn <= openUntil;
   const readout = echoReadsIntents(snapshot.echo)
     ? echoReadoutFor(def, enemy, snapshot.ascension)
     : null;
@@ -135,19 +157,31 @@ export const EnemyDetail = () => {
       <div className={styles.sheetTargets}>
         <button
           type="button"
+          disabled={sealed}
           className={`${styles.targetRow ?? ''} ${
             targetId === enemy.id ? styles.targetRowOn ?? '' : ''
-          }`}
+          } ${sealed ? styles.targetRowSealed ?? '' : ''}`}
           data-testid={`target-${enemy.id}`}
-          onClick={() => {
+          data-core-sealed={sealed ? '1' : undefined}
+          onClick={(event) => {
             setTarget(enemy.id);
-            close();
+            closeFromTap(event);
           }}
         >
-          {t('battle:targetBody')}
+          <span>{sealed ? t('battle:coreSealed') : t('battle:targetBody')}</span>
+          {sealed ? (
+            <span className={styles.subAura} data-core-why>
+              {t('battle:coreSealedWhy', { n: partsToBreak })}
+            </span>
+          ) : null}
+          {heldOpenByWindow ? (
+            <span className={styles.subAura} data-core-why>
+              {t('battle:coreOpenWhy', { n: openUntil })}
+            </span>
+          ) : null}
         </button>
         {enemy.subsystems.map((sub) => {
-          const subDef = def.subsystems?.find((s) => s.id === sub.key);
+          const subDef = partDefOf(def, sub);
           return (
             <button
               key={sub.id}
@@ -157,9 +191,9 @@ export const EnemyDetail = () => {
                 targetId === sub.id ? styles.targetRowOn ?? '' : ''
               }`}
               data-testid={`target-${sub.id}`}
-              onClick={() => {
+              onClick={(event) => {
                 setTarget(sub.id);
-                close();
+                closeFromTap(event);
               }}
             >
               <span>
@@ -169,9 +203,25 @@ export const EnemyDetail = () => {
                   max: sub.hpMax,
                 })}
               </span>
-              {subDef === undefined ? null : (
+              {subDef?.aura === undefined ? null : (
                 <span className={styles.subAura} data-sub-aura={subDef.aura}>
                   {auraExplain(t, subDef.aura)}
+                </span>
+              )}
+              {sub.nextIntent === undefined || sub.hp <= 0 ? null : (
+                <span
+                  className={styles.subAura}
+                  data-sub-intent={sub.nextIntent.t}
+                >
+                  {intentExplain(t, sub.nextIntent)}
+                </span>
+              )}
+              {subDef?.onDeath === undefined ? null : (
+                <span
+                  className={styles.subAura}
+                  data-sub-death={subDef.onDeath.t}
+                >
+                  {partDeathExplain(t, subDef.onDeath)}
                 </span>
               )}
             </button>

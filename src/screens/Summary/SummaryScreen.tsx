@@ -26,10 +26,7 @@ import { abandonRun } from "@/game/run/flow";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore, type RunStats } from "@/stores/runStore";
-import {
-  resolveReducedMotion,
-  useSettingsStore,
-} from "@/stores/settingsStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
 import { LevelUpCeremony } from "./LevelUpCeremony";
 
@@ -107,9 +104,7 @@ export const SummaryScreen = () => {
   const result = useSummaryStore((s) => s.result);
   const level = useMetaStore((s) => s.level);
   const xp = useMetaStore((s) => s.xp);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
 
   const win = result?.win ?? false;
   const xpShown = useCountUp(result?.xpGain ?? 0, reduced);

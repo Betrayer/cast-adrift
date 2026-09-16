@@ -510,6 +510,13 @@ const EntryCard = ({
   );
 };
 
+export const choiceAlreadySettled = (
+  reward: PuzzleReward,
+  solvedPuzzles: readonly string[],
+  puzzleId: string,
+): boolean =>
+  reward.choice === undefined || solvedPuzzles.includes(puzzleId);
+
 const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
   const { t } = useTranslation(["run", "battle", "content"]);
   const seed = useRunStore((s) => s.seed);
@@ -547,7 +554,13 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
   const [rerollMode, setRerollMode] = useState(false);
   const [rerollPick, setRerollPick] = useState<number[]>([]);
   const [checked, setChecked] = useState<boolean | null>(null);
-  const [claimed, setClaimed] = useState(reward.choice === undefined);
+  const [claimed, setClaimed] = useState(() =>
+    choiceAlreadySettled(
+      reward,
+      useRunStore.getState().solvedPuzzles,
+      puzzle.id,
+    ),
+  );
 
   const rerollSize = puzzle.rerollSize ?? DEFAULT_REROLL_SIZE;
   const blocked = new Set<SlotId>(puzzle.blocked ?? []);

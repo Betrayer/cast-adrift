@@ -371,7 +371,24 @@
     "theHush-bell": "Dzwonek",
     "echoFleet": "Flota „Echo”",
     "echoFleet-wake": "Wake",
-    "echoFleet-chorus": "Refren"
+    "echoFleet-chorus": "Refren",
+    "quarantineWarden-siren": "Syrena",
+    "beaconTrap-prism": "Pryzmat-pułapka",
+    "breakerBarge-maw": "Paszcza wlotowa",
+    "auctionCorvette-podium": "Podium",
+    "riftMaw-gullet": "Przełyk",
+    "riftBranch-thorn": "Cierń",
+    "choirFlagship-censer": "Kadzielnica",
+    "cantorColossus-diaphragm": "Przepona",
+    "coreHeart-vent": "Wylot burzowy",
+    "mirrorHeart-pane": "Tafla spisu",
+    "theHush-muffler": "Surdyna",
+    "echoFleet-ghost": "Widmo",
+    "usurer-writ": "Skrypt dłużny",
+    "resonator-chord": "Akord",
+    "silencer-damper": "Wygłuszacz",
+    "coreSliver-edge": "Krawędź",
+    "hushWarden-gag": "Knebel"
   },
   "ships": {
     "wanderer": {
@@ -612,11 +629,11 @@
     "sacrifice": "W tej turze poświęć kostkę, aby uzyskać +4 do obrażeń zadawanych bronią; przy mniej niż jednej trzeciej wytrzymałości kadłuba każda broń zadaje obrażenia krytyczne pomnożone przez 1,5.",
     "back-door": "Czarna rolka typu „min-face” zapewnia +6 złomu.",
     "spare": "Najniższy wynik z każdego rzutu zwiększa się o jeden; należy ponownie rzucać po jednej kostce na raz.",
-    "afterburner": "Progi silnika są o jeden stopień łatwiejsze; kadłub −2.",
+    "afterburner": "Muśnięcie +1% i unik +2%; kadłub −2.",
     "jammer-plus": "Jam zmniejsza siłę ataku wroga o kolejne 2 punkty, ale wartość znaków jest o 1 mniejsza.",
     "targeter": "Oznaczenia zwiększają obrażenia o +1, ale zacięcie zmniejsza je o 1 mniej.",
     "plating": "Kadłub +5, a każda wygrana bitwa naprawia 2 punkty kadłuba.",
-    "tug": "Unik zapewnia również +1 ładunek.",
+    "tug": "Pierwsza ewazja w turze zapewnia również +1 ładunek.",
     "kindling": "+1 do broni przy wyniku 5 lub więcej.",
     "hammerhead": "+2 w kategorii „Broń A”.",
     "scorchmark": "Maksymalna wartość parametru „Face” w broni zwiększa wartość „Burn” o 1.",
@@ -647,7 +664,7 @@
     "hardVacuum": "+3 do osłon, gdy poziom wytrzymałości kadłuba spadnie poniżej połowy.",
     "secondSkin": "Kadłub Po każdej bitwie kadłub odzyskuje +4 i 2 punkty wytrzymałości, ale zysk z odzysku jest o 10% niższy.",
     "glacierPact": "+4 do tarcz, gdy masz cztery niebieskie kości.",
-    "mirrorLattice": "Uniki zmniejszają otrzymywane obrażenia, progi silników są o jeden stopień łatwiejsze do osiągnięcia, a przy trzech przedmiotach zwiększających uniki silniki dają +3.",
+    "mirrorLattice": "Pierwsza ewazja w turze odbija obrażenia, muśnięcie +1% i unik +2%, a przy trzech przedmiotach zwiększających uniki silniki liczą się jako +3.",
     "permafrost": "Karta „Max Face” w talii „Shields” jest rozpatrywana dwukrotnie w danym slocie.",
     "rootHold": "Począwszy od trzeciego zakrętu, każda kostka w silnikach liczy się jako o dwa wyższa.",
     "secondGrowth": "+2, gdy wynik rzutu kostką jest taki sam jak w poprzedniej turze.",
@@ -662,7 +679,7 @@
     "tideRoots": "Fala zakłóceń uderza o jeden poziom słabiej.",
     "worldTree": "Gdy cztery zielone kostki zrezonują, na koniec każdej tury odzyskujesz 1 punkt wytrzymałości za każdy zielony przedmiot, który masz przy sobie.",
     "overgrowthPact": "Wzrost +2 i kadłub −4; dopóki masz przy sobie cztery przedmioty zwiększające wzrost, każda kostka liczy się jako o 2 wyższa.",
-    "standingWave": "Progi silników są o jeden stopień łatwiejsze; 6 lub więcej silników zapewnia 4 punkty osłony i 2 punkty ładunku na następną turę.",
+    "standingWave": "Muśnięcie +1% i unik +2%; 6 lub więcej w silnikach przenosi 4 punkty osłony i 2 punkty ładunku na następną turę.",
     "pocketChange": "Za wejście do węzła otrzymujesz 1 złom za każdy przedmiot typu [złom] znajdujący się w twoim ekwipunku.",
     "finderFee": "+2 złomu za każde zabicie.",
     "streetPrice": "Sklepy −8%, ale zysk ze złomu −5%: kupujesz i sprzedajesz po tej samej cenie rynkowej.",
@@ -740,7 +757,7 @@
     "seedBank": "Początek bitwy: przez kolejne trzy tury zyskujesz 1 tarczę za każdy przedmiot zwiększający siłę, który masz przy sobie.",
     "understory": "Koniec tury: jeśli pozostały jeszcze 4 lub więcej punktów osłony, przywróć 1 punkt wytrzymałości kadłuba.",
     "mycelium": "Gdy sześć slotów rozstrzygnie tę bitwę, na koniec każdej tury kadłub zostanie wyleczony o 2 punkty, a osłona wzrośnie o 3 punkty.",
-    "rhizome": "Progi silnika o dwa stopnie niższe; kadłub −2.",
+    "rhizome": "Muśnięcie +2% i unik +4%; kadłub −2.",
     "taproot": "Zlicza każdy wchodzony węzeł; począwszy od ósmego, każda bitwa rozpoczyna się z 6 punktami zdrowia tarczy i 3 punktami zdrowia kadłuba.",
     "perennial": "W silnikach wynik rzutu kostką, który jest taki sam jak w poprzedniej turze, liczy się jako wynik o cztery wyższy.",
     "annualRings": "Zlicza każdą kostkę, której wynik pokrywa się z wynikiem z poprzedniej tury; począwszy od trzeciej, każda taka kostka liczy się jako o 3 wyższa do końca bitwy.",
@@ -3820,6 +3837,14 @@
       "9": "To była wersja uprzejma.",
       "10": "Ma jeszcze więcej do powiedzenia. Niestety."
     },
+    "bossPartDown": {
+      "1": "Węzeł zdjęty. Jeszcze tego nie zauważyło.",
+      "2": "O jeden nawyk mniej. Resztę zachowuje.",
+      "3": "Ta część już się nie spiera.",
+      "4": "Skreśliłam linijkę z listy tego, co potrafi.",
+      "5": "Będzie szło dalej. Tylko o jedno ramię mniej.",
+      "6": "Kadłub cały. Zamysł już nie."
+    },
     "minibossIntro": {
       "1": "Walka przy bramie. Ta walka zapadnie w pamięci.",
       "2": "To nie jest patrol. To jest oświadczenie.",
@@ -4497,7 +4522,7 @@
     },
     "ballastModule": {
       "name": "Zbiorniki balastowe",
-      "desc": "Kadłub +5 oraz progi silnika są o jeden poziom trudniejsze; każdy węzeł, do którego wejdziesz, naprawia 1 punkt kadłuba."
+      "desc": "Kadłub +5 oraz muśnięcie −1% / unik −2%; każdy węzeł, do którego wejdziesz, naprawia 1 punkt kadłuba."
     },
     "escapePod": {
       "name": "Kapsuła ratunkowa",
@@ -4517,7 +4542,7 @@
     },
     "bulkheadRing": {
       "name": "Pierścień przegrody",
-      "desc": "Kadłub +8 oraz progi silnika są o jeden stopień trudniejsze; przy osłonach na poziomie Mk 2 każda bitwa rozpoczyna się z 6 punktami osłony, a na poziomie Mk 3 rezerwa zawiera o jedną kostkę więcej."
+      "desc": "Kadłub +8 oraz muśnięcie −1% / unik −2%; przy osłonach na poziomie Mk 2 każda bitwa rozpoczyna się z 6 punktami osłony, a na poziomie Mk 3 rezerwa zawiera o jedną kostkę więcej."
     },
     "dampingCoil": {
       "name": "Cewka tłumiąca",
@@ -4525,7 +4550,7 @@
     },
     "hardpointClamp": {
       "name": "Zacisk mocujący",
-      "desc": "Progi silnika są o jeden stopień łatwiejsze, a gdy mocowanie silnika osiągnie poziom Mk 2, każda kostka w rzucie liczy się jako +3."
+      "desc": "Muśnięcie +1% i unik +2%, a gdy mocowanie silnika osiągnie poziom Mk 2, każda kostka w nim liczy się jako +3."
     },
     "voidLiner": {
       "name": "Wkładka Void",
@@ -5220,21 +5245,21 @@
     "choirHerald": "Hymn pięciotaktowy: dwa ataki, blok szczelinowy i salwa – zawsze w tej kolejności.",
     "mirrorHull": "Dwa razy w każdym cyklu przywraca połowę wartości z ostatniej tury, maksymalnie do 12.",
     "dragnet": "Przesuwa twoją kostkę o najwyższym wyniku do wybranego przez siebie pola i unieruchamia ją tam, a wciągarka blokuje kolejną kostkę co trzecią turę.",
-    "resonator": "W każdym cyklu wykonuje dwa uderzenia odpowiadające wielkości największego ławicy, a cewka odnawia się, zapewniając 6 uderzeń na każdy obrót.",
+    "resonator": "Dwa razy na cykl uderza wedle wielkości twojej najgłębszej szkoły, a cewka co turę dokłada kadłubowi 6 pancerza. Rdzeń nie przyjmuje nic, dopóki stoją obie części.",
     "quarantineTwin": "Dwa zsynchronizowane kadłuby nad nietykalnym ciałem: jeśli trafisz ten sam kadłub dwa razy z rzędu, drugie trafienie zostanie zignorowane.",
-    "usurer": "W każdym cyklu proponuje tę samą opcję — 6 złomu lub 8 punktów obrażeń — a skarbiec otrzymuje dodatkowe 6 punktów przy każdym trafieniu.",
-    "silencer": "Gdy stan kadłuba spadnie poniżej 55%, liczba bloków slotów zwiększa się z jednego do dwóch — a zakłócenie czujników usuwa wszystkie bloki, które zajmuje.",
-    "coreSliver": "Zatrzymuje po jednej szkole na raz — kości chronionej szkoły zadają połowę obrażeń — i informuje cię, która to będzie, zanim to nastąpi. Ta właściwość obraca jedną kość w każdej turze.",
-    "quarantineWarden": "Zapewnia osłonę na 6 punktów w każdej turze, dopóki egida pozostaje aktywna, oraz dodaje blokadę slotu poniżej połowy wytrzymałości kadłuba.",
-    "beaconTrap": "Brama, której nie da się sforsować metodą brute force: wszelkie uderzenia pod nią są w całości pochłaniane, pochłania ona tarczę, którą podnosisz, a gdy jej poziom spadnie poniżej połowy, w każdej fazie odnawia się do wartości 10.",
-    "breakerBarge": "Każde trafienie kosztuje 6 złomu, dźwig blokuje jedną kostkę co trzecią turę, a poniżej 40% otwiera się w trybie naładowanym.",
-    "auctionCorvette": "W każdym cyklu pojawiają się oferty na twoją serię — zapłać albo poniesiesz konsekwencje — zabiera 5 punktów za każde trafienie, a podwaja ofertę poniżej 45%.",
-    "riftMaw": "Dwa oczy, z których każde w każdej turze obraca kostką; poniżej połowy w każdej turze zmniejsza się również nakładkę na szczelinę.",
-    "riftBranch": "W każdym cyklu zmniejsza limit miejsca w ekwipunku i rzuca klątwę na kostkę; poniżej 55% limit zmniejsza się w każdej turze.",
-    "choirFlagship": "Iglica ładuje cały chór co trzecią turę, a głos przywołuje nowego akolitę co czwartą.",
-    "cantorColossus": "W każdej turze dodaje 2 elementy do stosu przy każdym przyszłym trafieniu, i tak w nieskończoność — jedyną rzeczą, która usuwa zawartość stosu, jest zakłócenie czujnika.",
-    "coreHeart": "Powłoka zaworów nad burzą: ciało nic nie pobiera, dopóki zawór funkcjonuje, a burza przebiega w każdej turze od fazy 2.",
-    "mirrorHeart": "Walczy z własną talią — im czystsza konstrukcja, tym mocniejsze uderzenie — kryjąc się za maską twarzy.",
+    "usurer": "Dwa razy na cykl proponuje ten sam układ — 6 złomu albo 6 obrażeń — a skarbiec zabiera 6 więcej z każdego trafienia. Rdzeń nie przyjmuje nic, dopóki stoją obie części.",
+    "silencer": "Wygłuszacz blokuje slot co trzecią turę, a poniżej 55% korpus blokuje kolejne dwa na cykl. Zakłócenie czujników usuwa wszystkie jego blokady, a rdzeń nie przyjmuje nic, dopóki stoją obie części.",
+    "coreSliver": "Zatrzymuje po jednej szkole na raz — kości chronionej szkoły zadają połowę obrażeń — i informuje cię, która to będzie, zanim to nastąpi. Rdzeń nie przyjmuje nic, dopóki stoją obie części: aspekt obraca kość w każdej turze, a krawędź co trzecią turę dokłada mu 6 pancerza.",
+    "quarantineWarden": "Zapewnia osłonę na 6 punktów w każdej turze, dopóki egida pozostaje aktywna, oraz dodaje blokadę slotu poniżej połowy wytrzymałości kadłuba. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "beaconTrap": "Brama, której nie da się sforsować metodą brute force: wszelkie uderzenia pod nią są w całości pochłaniane, pochłania ona tarczę, którą podnosisz, a gdy jej poziom spadnie poniżej połowy, w każdej fazie odnawia się do wartości 10. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "breakerBarge": "Każde trafienie zabiera 3 złomu, a 6 dopóki żyje młyn; dźwig blokuje kość co trzecią turę. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "auctionCorvette": "Co cykl licytuje 7 za twoją serię — zapłać albo przyjmij — każde trafienie zabiera 5 złomu, a 6 dopóki żyje młotek; poniżej 45% oferta rośnie do 8. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "riftMaw": "Oba oczy obracają kostkę w każdej turze, a poniżej połowy zmniejsza też limit slotu w każdej turze. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części, a przełyk wybucha za 5, gdy padnie.",
+    "riftBranch": "W każdym cyklu zmniejsza limit miejsca w ekwipunku i rzuca klątwę na kostkę; poniżej 55% limit zmniejsza się w każdej turze. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "choirFlagship": "Iglica ładuje cały chór co trzecią turę, a głos przywołuje nowego akolitę co czwartą. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "cantorColossus": "Przepona co trzecią turę dodaje +2 do każdego późniejszego trafienia, a poniżej 45% korpus dodaje +1 w każdej turze. Jedynie zakłócenie czujnika czyści stos, a rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "coreHeart": "Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części, a burza przebiega w każdej turze od fazy 2.",
+    "mirrorHeart": "Kadłub co trzecią turę uderza wedle wielkości twojej najgłębszej szkoły, a tafla dokłada mu 8 pancerza. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
     "retroEcho": "Odpowiada, podając wartość obrażeń, które zadałeś w ostatniej turze, maksymalnie do 14.",
     "foldWraith": "Zmniejsza rozdzielczość o jeden poziom — czasami nawet dwa razy z rzędu.",
     "slowStrider": "Nie można go trafić, dopóki żyje którykolwiek z sojuszników, a od 4. tury aktywuje swoją tarczę.",
@@ -5243,10 +5268,10 @@
     "preEcho": "Rozpoczyna się burzą, a następnie leczy stado, jeśli takie nadal istnieje.",
     "hushHerald": "Blokuje dwa sloty naraz i wyczerpuje zasoby, jeśli gromadzisz ładunki.",
     "paradoxLoom": "Jego wahadło obraca kostkę w każdej turze i odzwierciedla twój najszerszy kolor.",
-    "foldTyrant": "W każdym cyklu fałduje zamówienie, a gdy fałda się rozprostuje, zużywa jeden kość.",
-    "hushWarden": "Zamykają szczeliny, a zablokowanie jego własnego emiteru otwiera każdą z nich.",
-    "theHush": "Od drugiej fazy blokuje jeden slot w każdej turze; użyj tej umiejętności, aby je wszystkie ponownie odblokować.",
-    "echoFleet": "Każde okno fazowe wykorzystuje charakterystyczny atak innego bossa sektorowego."
+    "foldTyrant": "W każdym cyklu fałduje zamówienie, plisa co turę obraca kość, a poniżej połowy co cykl pożera twoją najlepszą zapasową kostkę.",
+    "hushWarden": "Knebel blokuje slot co trzecią turę, a poniżej 55% korpus zamyka kolejne dwa na cykl. Zakłócenie czujników usuwa wszystkie jego blokady, a rdzeń nie przyjmuje nic, dopóki stoją obie części.",
+    "theHush": "Surdyna blokuje slot co trzecią turę, a w drugiej fazie korpus blokuje jeden w każdej turze. Zakłócenie otwiera je wszystkie, a rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części.",
+    "echoFleet": "Każde okno fazowe wykorzystuje charakterystyczny atak innego bossa sektorowego. Rdzeń nie przyjmuje nic, dopóki nie padną dwie z trzech części."
   },
   "death": {
     "pact": "„I tak będą ściągać długi. Umowa nie bierze pod uwagę, który z nas jeszcze żyje.”",

@@ -17,11 +17,19 @@ export interface ResonanceBonus {
   grant?: ResonanceGrant;
 }
 
+const res = (
+  school: School,
+  threshold: ResonanceThreshold,
+  body: Omit<ResonanceBonus, "school" | "threshold" | "desc">,
+): ResonanceBonus => ({
+  school,
+  threshold,
+  desc: `content:resonance.${school}-${String(threshold)}`,
+  ...body,
+});
+
 export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
-  {
-    school: "red",
-    threshold: 2,
-    desc: "content:resonance.red-2",
+  res("red", 2, {
     effects: [
       {
         on: "beforeResolveSlot",
@@ -29,11 +37,8 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "modDieValue", n: 1 }],
       },
     ],
-  },
-  {
-    school: "red",
-    threshold: 4,
-    desc: "content:resonance.red-4",
+  }),
+  res("red", 4, {
     effects: [
       {
         on: "afterResolveSlot",
@@ -41,11 +46,8 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "addStatus", s: "burn", n: 2, target: "target" }],
       },
     ],
-  },
-  {
-    school: "red",
-    threshold: 6,
-    desc: "content:resonance.red-6",
+  }),
+  res("red", 6, {
     effects: [
       {
         on: "afterResolveSlot",
@@ -53,29 +55,17 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "repeatSlot" }],
       },
     ],
-  },
-  {
-    school: "blue",
-    threshold: 2,
-    desc: "content:resonance.blue-2",
+  }),
+  res("blue", 2, {
     grant: "blueRollFloor",
-  },
-  {
-    school: "blue",
-    threshold: 4,
-    desc: "content:resonance.blue-4",
+  }),
+  res("blue", 4, {
     grant: "shieldPersist",
-  },
-  {
-    school: "blue",
-    threshold: 6,
-    desc: "content:resonance.blue-6",
+  }),
+  res("blue", 6, {
     grant: "blueAverageFloor",
-  },
-  {
-    school: "green",
-    threshold: 2,
-    desc: "content:resonance.green-2",
+  }),
+  res("green", 2, {
     effects: [
       {
         on: "rolled",
@@ -83,11 +73,8 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "modDieValue", n: 2 }],
       },
     ],
-  },
-  {
-    school: "green",
-    threshold: 4,
-    desc: "content:resonance.green-4",
+  }),
+  res("green", 4, {
     effects: [
       {
         on: "battleEnd",
@@ -95,11 +82,8 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "heal", n: 1, perTag: "green" }],
       },
     ],
-  },
-  {
-    school: "green",
-    threshold: 6,
-    desc: "content:resonance.green-6",
+  }),
+  res("green", 6, {
     effects: [
       {
         on: "afterResolveSlot",
@@ -110,11 +94,8 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "grow", n: 1, cap: 3 }],
       },
     ],
-  },
-  {
-    school: "yellow",
-    threshold: 2,
-    desc: "content:resonance.yellow-2",
+  }),
+  res("yellow", 2, {
     effects: [
       {
         on: "afterResolveSlot",
@@ -122,11 +103,8 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "scrap", n: 4 }],
       },
     ],
-  },
-  {
-    school: "yellow",
-    threshold: 4,
-    desc: "content:resonance.yellow-4",
+  }),
+  res("yellow", 4, {
     effects: [
       {
         on: "beforeResolveSlot",
@@ -134,33 +112,24 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "crit" }],
       },
     ],
-  },
-  {
-    school: "yellow",
-    threshold: 6,
-    desc: "content:resonance.yellow-6",
+  }),
+  res("yellow", 6, {
     effects: [
       {
         on: "battleStart",
         do: [{ a: "grant", what: "rerollSize", n: 1 }],
       },
     ],
-  },
-  {
-    school: "black",
-    threshold: 2,
-    desc: "content:resonance.black-2",
+  }),
+  res("black", 2, {
     effects: [
       {
         on: "battleStart",
         do: [{ a: "allowExceedCap", school: "black", hullCost: 1 }],
       },
     ],
-  },
-  {
-    school: "black",
-    threshold: 4,
-    desc: "content:resonance.black-4",
+  }),
+  res("black", 4, {
     effects: [
       {
         on: "afterResolveSlot",
@@ -168,52 +137,37 @@ export const RESONANCE_BONUSES: readonly ResonanceBonus[] = [
         do: [{ a: "primeSchool", school: "black", max: true }],
       },
     ],
-  },
-  {
-    school: "black",
-    threshold: 6,
-    desc: "content:resonance.black-6",
+  }),
+  res("black", 6, {
     grant: "surviveLethal",
-  },
-  {
-    school: "grey",
-    threshold: 2,
-    desc: "content:resonance.grey-2",
+  }),
+  res("grey", 2, {
     effects: [
       {
         on: "battleStart",
         do: [{ a: "grant", what: "rerollSize", n: 1 }],
       },
     ],
-  },
-  {
-    school: "grey",
-    threshold: 4,
-    desc: "content:resonance.grey-4",
+  }),
+  res("grey", 4, {
     grant: "copyAdjacent",
-  },
-  {
-    school: "grey",
-    threshold: 6,
-    desc: "content:resonance.grey-6",
+  }),
+  res("grey", 6, {
     effects: [
       {
         on: "battleStart",
         do: [{ a: "grant", what: "reserve", n: 1 }],
       },
     ],
-  },
-  {
-    school: "prismatic",
-    threshold: 2,
-    desc: "content:resonance.prismatic-2",
+  }),
+  res("prismatic", 2, {
     effects: [
       {
         on: "battleStart",
         do: [{ a: "grant", what: "nudge", n: 1 }],
       },
     ],
-  },
+  }),
 ];
 
 export const resonanceGrantActive = (

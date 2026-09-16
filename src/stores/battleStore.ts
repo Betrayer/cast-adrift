@@ -43,6 +43,7 @@ import {
   BLOOD_REACTOR_CHARGE,
   BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
+  dieValueCeiling,
   nudgeChargeCost,
   resolveEnemyPhase,
   resolvePlayerPhase,
@@ -90,6 +91,7 @@ import type {
 } from "@/game/effects/types";
 import { recordAction } from "@/game/run/actionLog";
 import { useRunStore, type BattleTally } from "@/stores/runStore";
+import { pickShape } from "@/stores/shape";
 import type { School } from "@/types/content";
 import type {
   BattleLogEntry,
@@ -211,6 +213,8 @@ export interface BattleValues {
   pendingTwist: number;
   pendingSwap: number;
   pendingStorm: number;
+  pendingAdds: string[];
+  partsDowned: string[];
   ascension: number;
   inverted: boolean;
   nodeStorm: boolean;
@@ -356,6 +360,8 @@ export const createInitialBattleValues = (): BattleValues => ({
   pendingTwist: 0,
   pendingSwap: 0,
   pendingStorm: 0,
+  pendingAdds: [],
+  partsDowned: [],
   swapSourceUid: null,
   fuseSourceUid: null,
   ascension: 0,
@@ -396,66 +402,38 @@ export const createInitialBattleValues = (): BattleValues => ({
   debugNextRoll: null,
 });
 
-export const battleSnapshot = (s: BattleSnapshot): BattleSnapshot => ({
-  turn: s.turn,
-  hull: s.hull,
-  hullMax: s.hullMax,
-  shield: s.shield,
-  shieldPersist: s.shieldPersist,
-  charge: s.charge,
-  scrap: s.scrap,
-  runScrap: s.runScrap,
-  tide: s.tide,
-  interference: s.interference,
-  perks: s.perks,
-  chartPicks: s.chartPicks,
-  mutators: s.mutators,
-  modules: s.modules,
-  officers: s.officers,
-  echo: s.echo,
-  engravings: s.engravings,
-  flags: s.flags,
-  counters: s.counters,
-  runCounters: s.runCounters,
-  exceedCap: s.exceedCap,
-  scheduled: s.scheduled,
-  grants: s.grants,
-  shipId: s.shipId,
-  chargeCap: s.chargeCap,
-  sacrificePool: s.sacrificePool,
-  bloodReactorUsed: s.bloodReactorUsed,
-  passiveUsed: s.passiveUsed,
-  burnDoubleUsed: s.burnDoubleUsed,
-  dice: s.dice,
-  slots: s.slots,
-  enemies: s.enemies,
-  targetId: s.targetId,
-  evasion: s.evasion,
-  nextTurnMods: s.nextTurnMods,
-  nextRollBonus: s.nextRollBonus,
-  blockedSlots: s.blockedSlots,
-  shrunkSlots: s.shrunkSlots,
-  lockedDice: s.lockedDice,
-  cursedDice: s.cursedDice,
-  pendingHijack: s.pendingHijack,
-  resonance: s.resonance,
-  survivedLethal: s.survivedLethal,
-  lastPlayerDamage: s.lastPlayerDamage,
-  stolenScrap: s.stolenScrap,
-  pendingTwist: s.pendingTwist,
-  pendingSwap: s.pendingSwap,
-  pendingStorm: s.pendingStorm,
-  ascension: s.ascension,
-  sectorHpPct: s.sectorHpPct,
-  sectorDmgPct: s.sectorDmgPct,
-  enemyHpPct: s.enemyHpPct,
-  inverted: s.inverted,
-  nodeStorm: s.nodeStorm,
-  foldedTurns: s.foldedTurns,
-  overflowShieldUsed: s.overflowShieldUsed,
-  pierceUsed: s.pierceUsed,
-  outcome: s.outcome,
-});
+const BATTLE_SNAPSHOT_KEYS = [
+  "turn", "hull", "hullMax", "shield", "shieldPersist", "charge", "scrap",
+  "runScrap", "tide", "interference", "perks", "chartPicks", "mutators",
+  "modules", "officers", "echo", "engravings", "flags", "counters",
+  "runCounters", "exceedCap", "scheduled", "grants", "shipId", "chargeCap",
+  "sacrificePool", "bloodReactorUsed", "passiveUsed", "burnDoubleUsed",
+  "dice", "slots", "enemies", "targetId", "evasion", "nextTurnMods",
+  "nextRollBonus", "blockedSlots", "shrunkSlots", "lockedDice", "cursedDice",
+  "pendingHijack", "resonance", "survivedLethal", "lastPlayerDamage",
+  "stolenScrap", "pendingTwist", "pendingSwap", "pendingStorm", "pendingAdds",
+  "partsDowned", "ascension", "sectorHpPct", "sectorDmgPct", "enemyHpPct",
+  "inverted", "nodeStorm", "foldedTurns", "overflowShieldUsed", "pierceUsed",
+  "outcome",
+] as const satisfies readonly (keyof BattleSnapshot)[];
+
+type NoUncoveredKeys<T extends never> = T;
+
+export type UncoveredSnapshotKey = Exclude<
+  keyof BattleSnapshot,
+  (typeof BATTLE_SNAPSHOT_KEYS)[number]
+>;
+
+export type AssertSnapshotComplete = NoUncoveredKeys<UncoveredSnapshotKey>;
+
+export const battleSnapshot = (s: BattleSnapshot): BattleSnapshot =>
+  pickShape(BATTLE_SNAPSHOT_KEYS, s);
+
+const patchDie = (
+  dice: readonly RolledDie[],
+  uid: string,
+  patch: Partial<RolledDie>,
+): RolledDie[] => dice.map((d) => (d.uid === uid ? { ...d, ...patch } : d));
 
 const secondLookTargets = (
   dice: readonly RolledDie[],
@@ -530,6 +508,8 @@ const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pendingTwist: snap.pendingTwist,
   pendingSwap: snap.pendingSwap,
   pendingStorm: snap.pendingStorm,
+  pendingAdds: snap.pendingAdds ?? [],
+  partsDowned: snap.partsDowned ?? [],
   ascension: snap.ascension,
   sectorHpPct: snap.sectorHpPct,
   sectorDmgPct: snap.sectorDmgPct,
@@ -914,9 +894,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const slot = s.slots[die.slot];
       if (slot === undefined) return s;
       return {
-        dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, state: "tray" as const, slot: undefined } : d,
-        ),
+        dice: patchDie(s.dice, uid, { state: "tray", slot: undefined }),
         slots: { ...s.slots, [die.slot]: { ...slot, dieUid: undefined } },
       };
     });
@@ -936,11 +914,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
           : 0;
       if (reserved >= s.reserveCap + blueExtra) return s;
       return {
-        dice: s.dice.map((d) =>
-          d.uid === uid
-            ? { ...d, state: "reserved" as const, slot: undefined }
-            : d,
-        ),
+        dice: patchDie(s.dice, uid, { state: "reserved", slot: undefined }),
         selectedDieUid: null,
       };
     });
@@ -952,9 +926,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const die = s.dice.find((d) => d.uid === uid);
       if (die?.state !== "reserved") return s;
       return {
-        dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, state: "tray" as const } : d,
-        ),
+        dice: patchDie(s.dice, uid, { state: "tray" }),
       };
     });
   },
@@ -1016,9 +988,10 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const die = s.dice.find((d) => d.uid === uid);
       if (die === undefined || !canBank(die)) return s;
       return {
-        dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, bankedValue: d.value, activeUsed: true } : d,
-        ),
+        dice: patchDie(s.dice, uid, {
+          bankedValue: die.value,
+          activeUsed: true,
+        }),
       };
     });
   },
@@ -1110,11 +1083,10 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (die === undefined || !canReschool(die)) return s;
       return {
         passiveUsed: true,
-        dice: s.dice.map((d) =>
-          d.uid === uid
-            ? { ...d, school: "prismatic" as const, reschooled: true }
-            : d,
-        ),
+        dice: patchDie(s.dice, uid, {
+          school: "prismatic",
+          reschooled: true,
+        }),
       };
     });
   },
@@ -1139,7 +1111,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const die = s.dice.find((d) => d.uid === uid);
       if (die === undefined) return s;
       if (die.state !== "tray" && die.state !== "placed") return s;
-      const value = Math.min(die.tier, Math.max(1, die.value + dir));
+      const value = Math.min(dieValueCeiling(die), Math.max(1, die.value + dir));
       if (value === die.value) return s;
       const springFree =
         dieHasGrant(s.engravings, die.defId, "freeNudge") &&
@@ -1158,7 +1130,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         spentGrants: springFree
           ? [...s.spentGrants, `nudge:${uid}`]
           : s.spentGrants,
-        dice: s.dice.map((d) => (d.uid === uid ? { ...d, value } : d)),
+        dice: patchDie(s.dice, uid, { value }),
       };
     });
   },
@@ -1207,11 +1179,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const die = s.dice.find((d) => d.uid === uid);
       if (die?.state !== "tray") return s;
       return {
-        dice: s.dice.map((d) =>
-          d.uid === uid
-            ? { ...d, state: "burned" as const, slot: undefined }
-            : d,
-        ),
+        dice: patchDie(s.dice, uid, { state: "burned", slot: undefined }),
         sacrificePool: s.sacrificePool + SACRIFICE_DAMAGE,
         selectedDieUid: null,
       };
@@ -1226,9 +1194,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (die.state !== "tray" && die.state !== "placed") return s;
       const value = flippedValue(die);
       return {
-        dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, value, activeUsed: true } : d,
-        ),
+        dice: patchDie(s.dice, uid, { value, activeUsed: true }),
       };
     });
   },
@@ -1241,9 +1207,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const value = adjacentCopyValue(s.dice, uid);
       if (value === undefined) return s;
       return {
-        dice: s.dice.map((d) =>
-          d.uid === uid ? { ...d, value, activeUsed: true } : d,
-        ),
+        dice: patchDie(s.dice, uid, { value, activeUsed: true }),
       };
     });
   },
@@ -1593,103 +1557,21 @@ export interface BattleSaveState {
   enemyStreamState: number;
 }
 
-const pickBattleValues = (s: BattleState): BattleSaveValues => ({
-  phase: s.phase,
-  shipId: s.shipId,
-  turn: s.turn,
-  hull: s.hull,
-  hullMax: s.hullMax,
-  shield: s.shield,
-  shieldPersist: s.shieldPersist,
-  charge: s.charge,
-  scrap: s.scrap,
-  runScrap: s.runScrap,
-  tide: s.tide,
-  interference: s.interference,
-  perks: s.perks,
-  chartPicks: s.chartPicks,
-  mutators: s.mutators,
-  modules: s.modules,
-  officers: s.officers,
-  echo: s.echo,
-  engravings: s.engravings,
-  flags: s.flags,
-  counters: s.counters,
-  runCounters: s.runCounters,
-  exceedCap: s.exceedCap,
-  scheduled: s.scheduled,
-  grants: s.grants,
-  forcedTraits: s.forcedTraits,
-  chargeCap: s.chargeCap,
-  sacrificePool: s.sacrificePool,
-  bloodReactorUsed: s.bloodReactorUsed,
-  passiveUsed: s.passiveUsed,
-  burnDoubleUsed: s.burnDoubleUsed,
-  dice: s.dice,
-  slots: s.slots,
-  rerollsLeft: s.rerollsLeft,
-  rerollSize: s.rerollSize,
-  rerollBase: s.rerollBase,
-  rerollMode: s.rerollMode,
-  rerollSelection: s.rerollSelection,
-  reserveCap: s.reserveCap,
-  freeNudges: s.freeNudges,
-  selectedDieUid: s.selectedDieUid,
-  enemies: s.enemies,
-  targetId: s.targetId,
-  evasion: s.evasion,
-  nextTurnMods: s.nextTurnMods,
-  nextRollBonus: s.nextRollBonus,
-  blockedSlots: s.blockedSlots,
-  shrunkSlots: s.shrunkSlots,
-  lockedDice: s.lockedDice,
-  cursedDice: s.cursedDice,
-  pendingHijack: s.pendingHijack,
-  resonance: s.resonance,
-  survivedLethal: s.survivedLethal,
-  lastPlayerDamage: s.lastPlayerDamage,
-  stolenScrap: s.stolenScrap,
-  pendingTwist: s.pendingTwist,
-  pendingSwap: s.pendingSwap,
-  pendingStorm: s.pendingStorm,
-  swapSourceUid: s.swapSourceUid,
-  fuseSourceUid: s.fuseSourceUid,
-  ascension: s.ascension,
-  sectorHpPct: s.sectorHpPct,
-  sectorDmgPct: s.sectorDmgPct,
-  enemyHpPct: s.enemyHpPct,
-  inverted: s.inverted,
-  nodeStorm: s.nodeStorm,
-  foldedTurns: s.foldedTurns,
-  overflowShieldUsed: s.overflowShieldUsed,
-  pierceUsed: s.pierceUsed,
-  fateUses: s.fateUses,
-  fateRoll: s.fateRoll,
-  fateOutcomeId: s.fateOutcomeId,
-  spentGrants: s.spentGrants,
-  introPending: s.introPending,
-  introEnemyId: s.introEnemyId,
-  checkSteps: s.checkSteps,
-  checkIndex: s.checkIndex,
-  checkSandbox: s.checkSandbox,
-  outcome: s.outcome,
-  resolution: s.resolution,
-  beats: s.beats,
-  enemyBeats: s.enemyBeats,
-  beatSeq: s.beatSeq,
-  log: s.log,
-  blackUsed: s.blackUsed,
-  blueUsed: s.blueUsed,
-  shieldAbsorbed: s.shieldAbsorbed,
-  damageDealt: s.damageDealt,
-  damageTaken: s.damageTaken,
-  spinalMaxHit: s.spinalMaxHit,
-  rerollsUsed: s.rerollsUsed,
-  repairBayHealed: s.repairBayHealed,
-  dicePlaced: s.dicePlaced,
-  maxResonance: s.maxResonance,
-  burnKilledElite: s.burnKilledElite,
-});
+const BATTLE_SAVE_OMITTED: readonly (keyof BattleValues)[] = [
+  "streams",
+  "enemyStream",
+  "debugNextRoll",
+  "lastBlock",
+];
+
+const BATTLE_SAVE_KEYS = (
+  Object.keys(createInitialBattleValues()) as (keyof BattleValues)[]
+).filter(
+  (key): key is keyof BattleSaveValues => !BATTLE_SAVE_OMITTED.includes(key),
+);
+
+const pickBattleValues = (s: BattleState): BattleSaveValues =>
+  pickShape<BattleSaveValues>(BATTLE_SAVE_KEYS, s);
 
 export const serializeBattle = (): BattleSaveState | null => {
   const s = useBattleStore.getState();

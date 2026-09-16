@@ -1,4 +1,5 @@
 import type { EnemyState } from "@/types/battle";
+import type { Intent } from "@/types/content";
 
 export const aimedEnemy = (
   enemies: readonly EnemyState[],
@@ -14,3 +15,9 @@ export const aimedEnemy = (
   }
   return alive[0];
 };
+
+export const livingPartIntents = (enemy: EnemyState): Intent[] =>
+  enemy.subsystems
+    .filter((part) => part.hp > 0)
+    .map((part) => part.nextIntent)
+    .filter((intent): intent is Intent => intent !== undefined);

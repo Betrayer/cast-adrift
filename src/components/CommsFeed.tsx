@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { useAtLeast } from '@/app/breakpoints';
+import { cx } from '@/app/cx';
 import { feedAnchorFor, isRunScreen } from '@/app/routes';
 import { achievementTitleById } from '@/game/meta/achievements';
 import { logAuthError } from '@/game/run/journal';
@@ -71,14 +72,12 @@ const FeedRow = ({
     go('journal', { entry: String(journalId) });
   };
 
-  const classes = [
-    styles.row ?? '',
-    styles[SOURCE_CLASS[message.source]] ?? '',
-    message.tone === 'alert' ? styles.alert ?? '' : '',
-    compressed ? styles.compressed ?? '' : '',
-  ]
-    .filter((name) => name !== '')
-    .join(' ');
+  const classes = cx(
+    styles.row,
+    styles[SOURCE_CLASS[message.source]],
+    message.tone === 'alert' && styles.alert,
+    compressed && styles.compressed,
+  );
 
   return (
     <div
@@ -93,7 +92,7 @@ const FeedRow = ({
       {linkable ? (
         <button
           type="button"
-          className={`${styles.tag ?? ''} ${styles.tagOpen ?? ''}`}
+          className={cx(styles.tag, styles.tagOpen)}
           data-feed-open
           title={t('run:feed.open')}
           onClick={open}
@@ -194,9 +193,7 @@ export const CommsFeed = () => {
   if (typeof document === 'undefined') return null;
   return createPortal(
     <div
-      className={`${styles.host ?? ''} ${
-        anchor === 'bottom' ? styles.anchorBottom ?? '' : ''
-      }`}
+      className={cx(styles.host, anchor === 'bottom' && styles.anchorBottom)}
       data-toast-host
       data-comms-feed
       data-feed-anchor={anchor}

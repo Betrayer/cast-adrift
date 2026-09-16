@@ -15,9 +15,9 @@ import {
 import {
   META_PERSIST_KEY,
   META_VERSION,
+  metaValues,
   migrateMeta,
   useMetaStore,
-  type MetaValues,
 } from "@/stores/metaStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 
@@ -47,53 +47,12 @@ const setLocalAt = (at: number): void => {
   deviceStorage.setItem(localAtKey(), String(at));
 };
 
-const metaValues = (): MetaValues => {
-  const s = useMetaStore.getState();
-  return {
-    shards: s.shards,
-    vouchers: s.vouchers,
-    voucherOffers: s.voucherOffers,
-    xp: s.xp,
-    level: s.level,
-    chartPicks: s.chartPicks,
-    chartFreeRespecs: s.chartFreeRespecs,
-    collection: s.collection,
-    ships: s.ships,
-    selectedShip: s.selectedShip,
-    selectedEcho: s.selectedEcho,
-    hangar: s.hangar,
-    themes: s.themes,
-    tutorialSeen: s.tutorialSeen,
-    engravings: s.engravings,
-    badges: s.badges,
-    codex: s.codex,
-    codexRead: s.codexRead,
-    seenPuzzles: s.seenPuzzles,
-    seenFragments: s.seenFragments,
-    contracts: s.contracts,
-    dailyPlayed: s.dailyPlayed,
-    best: s.best,
-    ascension: s.ascension,
-    flagsArchive: s.flagsArchive,
-    bossFirstKills: s.bossFirstKills,
-    endings: s.endings,
-    achievements: s.achievements,
-    achievementsSeen: s.achievementsSeen,
-    encountered: s.encountered,
-    unlocksGranted: s.unlocksGranted,
-    unlocksSeen: s.unlocksSeen,
-    dieSkin: s.dieSkin,
-    prefs: s.prefs,
-    stats: s.stats,
-  };
-};
-
 export const metaDocSnapshot = (): MetaDoc => {
   const at = localMetaAt();
   return {
     v: META_DOC_V,
     updatedAt: at > 0 ? at : now(),
-    data: JSON.stringify(metaValues()),
+    data: JSON.stringify(metaValues(useMetaStore.getState())),
   };
 };
 
@@ -137,7 +96,7 @@ const pushMeta = async (): Promise<void> => {
     await firestoreMetaDocs.write(uid, {
       v: META_DOC_V,
       updatedAt: at,
-      data: JSON.stringify(metaValues()),
+      data: JSON.stringify(metaValues(useMetaStore.getState())),
     });
     if (activeUid() !== uid) return;
     setLocalAt(at);

@@ -337,36 +337,38 @@ export const BridgeScreen = () => {
     <Screen
       width="wide"
       header={
-        <AppHeader
-          actions={
-            def === undefined ? null : (
-              <Text size="sm" c={tokens.dim}>
-                {t(def.name)}
-              </Text>
-            )
-          }
-        />
+        <div className={styles.head}>
+          <AppHeader
+            actions={
+              def === undefined ? null : (
+                <Text size="sm" c={tokens.dim}>
+                  {t(def.name)}
+                </Text>
+              )
+            }
+          />
+          <Group gap={6} wrap="wrap" data-bridge-tabs>
+            {TABS.map((id) => (
+              <Button
+                key={id}
+                size="compact-sm"
+                variant={id === tab ? "filled" : "default"}
+                data-testid={`bridge-tab-${id}`}
+                data-active={id === tab ? "1" : "0"}
+                onClick={() => {
+                  setTab(id);
+                }}
+              >
+                {t(`run:bridge.tab.${id}`)}
+              </Button>
+            ))}
+          </Group>
+        </div>
       }
     >
-      <Stack gap="sm">
-        <Group gap={6} wrap="wrap" data-bridge-tabs>
-          {TABS.map((id) => (
-            <Button
-              key={id}
-              size="compact-sm"
-              variant={id === tab ? "filled" : "default"}
-              data-testid={`bridge-tab-${id}`}
-              data-active={id === tab ? "1" : "0"}
-              onClick={() => {
-                setTab(id);
-              }}
-            >
-              {t(`run:bridge.tab.${id}`)}
-            </Button>
-          ))}
-        </Group>
+      <div key={tab} className={styles.panel}>
         <Panel />
-      </Stack>
+      </div>
     </Screen>
   );
 };

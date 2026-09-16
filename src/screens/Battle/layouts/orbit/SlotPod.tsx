@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { cx } from '@/app/cx';
 import type { SlotProjection } from '@/game/battle/view';
 import { SlotGlyph } from '@/screens/Battle/board/SlotCard';
 import {
@@ -6,24 +7,14 @@ import {
   projectionShort,
   projectionTone,
   slotSchool,
+  type SlotViewProps,
 } from '@/screens/Battle/board/slotText';
-import type { SlotId, SlotState } from '@/types/battle';
 import styles from './Orbit.module.css';
 
-export interface SlotPodProps {
-  slotId: SlotId;
-  slot: SlotState;
-  order: number;
-  projection: SlotProjection | undefined;
-  occupiedBy: string | undefined;
-  blocked: boolean;
-  legal: boolean;
-  goal: boolean;
+export interface SlotPodProps extends SlotViewProps {
   size: number;
   x: number;
   y: number;
-  onTap: (slotId: SlotId) => void;
-  preview?: boolean;
 }
 
 const WIDE_POD = 72;
@@ -63,14 +54,12 @@ export const SlotPod = ({
       data-school={school}
       {...(size >= WIDE_POD ? { 'data-wide': '1' } : {})}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
-      className={[
-        styles.pod ?? '',
-        legal ? styles.podLegal ?? '' : '',
-        occupied ? styles.podOccupied ?? '' : '',
-        blocked ? styles.podBlocked ?? '' : '',
-      ]
-        .filter((name) => name !== '')
-        .join(' ')}
+      className={cx(
+        styles.pod,
+        legal && styles.podLegal,
+        occupied && styles.podOccupied,
+        blocked && styles.podBlocked,
+      )}
       style={{
         width: `${String(size)}px`,
         height: `${String(size)}px`,
@@ -94,7 +83,7 @@ export const SlotPod = ({
           <span className={styles.podName}>{t(`battle:slot.${slotId}`)}</span>
           {projection === undefined ? null : (
             <span
-              className={`${styles.podValue ?? ''} ${toneClass(projection)}`}
+              className={cx(styles.podValue, toneClass(projection))}
               data-proj={preview ? undefined : slotId}
               data-tone={preview ? undefined : projectionTone(projection)}
             >

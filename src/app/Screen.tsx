@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode, type RefObject } from 'react';
 import { publishBodyRect } from '@/app/bands';
+import { cx } from '@/app/cx';
 import { EdgeVignette } from '@/components/EdgeVignette';
 import styles from './Screen.module.css';
 
@@ -73,24 +74,20 @@ export const Screen = ({
     };
   }, []);
 
-  const frameClasses = [
-    styles.frame ?? '',
+  const frameClasses = cx(
+    styles.frame,
     widthClass(width),
-    pad ? styles.padded ?? '' : '',
-    centered ? styles.centered ?? '' : '',
-    passThrough ? styles.passThrough ?? '' : '',
-    className ?? '',
-  ]
-    .filter((name) => name !== '')
-    .join(' ');
+    pad && styles.padded,
+    centered && styles.centered,
+    passThrough && styles.passThrough,
+    className,
+  );
 
-  const bodyClasses = [
-    styles.body ?? '',
-    scroll ? styles.scroll ?? '' : styles.clip ?? '',
-    bodyClassName ?? '',
-  ]
-    .filter((name) => name !== '')
-    .join(' ');
+  const bodyClasses = cx(
+    styles.body,
+    scroll ? styles.scroll : styles.clip,
+    bodyClassName,
+  );
 
   return (
     <div className={styles.screen} data-screen-shell>
@@ -110,7 +107,7 @@ export const Screen = ({
           }}
         >
           <div
-            className={`${styles.inner ?? ''} ${innerClassName ?? ''}`}
+            className={cx(styles.inner, innerClassName)}
             data-screen-inner
           >
             {children}

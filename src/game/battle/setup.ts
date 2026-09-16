@@ -10,6 +10,7 @@ import { computeCensus } from "@/game/battle/resonance";
 import { BattleCtx, buildSources, emit } from "@/game/effects";
 import { slotMatches } from "@/game/effects/evaluate";
 import type { ExceedCapGrant } from "@/game/effects/types";
+import { reaimOffLockedCore } from "@/game/battle/damage";
 import { applyRollFloors, applySpareLowest } from "@/game/battle/rollFloors";
 import { scaleEnemyHp } from "@/game/run/encounter";
 import { runHasTrait } from "@/game/run/runMods";
@@ -28,6 +29,7 @@ import type {
   PatternStep,
   School,
   StepCond,
+  SubsystemDef,
 } from "@/types/content";
 
 export const TIER_LADDER: readonly DieTier[] = [4, 6, 8, 10, 12, 20, 100];
@@ -174,7 +176,7 @@ export const rollDeck = (
   });
 
 export const phaseFloor = (ascension: number): number =>
-  ascension >= 5 ? 1 : 0;
+  ascensionMods(ascension).bossPhaseShift ? 1 : 0;
 
 export const phaseIndexForHp = (
   def: EnemyDef,
@@ -278,6 +280,17 @@ export const patternFor = (
 export const everyTurnFor = (def: EnemyDef, phase: number): readonly Intent[] =>
   def.phases?.[phase]?.everyTurn ?? [];
 
+const resolveStep = (
+  step: PatternStep,
+  enemyStream: RngStream,
+  ctx: StepContext,
+): Intent => {
+  if ("pick" in step) return enemyStream.weighted(step.pick);
+  if ("when" in step)
+    return stepCondHolds(step.when, ctx) ? step.then : step.else;
+  return step;
+};
+
 export const drawIntent = (
   def: EnemyDef,
   intentIndex: number,
@@ -290,9 +303,20 @@ export const drawIntent = (
   const step = pattern[intentIndex % pattern.length];
   if (step === undefined)
     throw new Error(`drawIntent: "${def.id}" empty pattern`);
-  if ("pick" in step) return enemyStream.weighted(step.pick);
-  if ("when" in step) return stepCondHolds(step.when, ctx) ? step.then : step.else;
-  return step;
+  return resolveStep(step, enemyStream, ctx);
+};
+
+export const drawPartIntent = (
+  part: SubsystemDef,
+  intentIndex: number,
+  enemyStream: RngStream,
+  parentContext: StepContext = NEUTRAL_STEP_CONTEXT,
+): Intent | undefined => {
+  const pattern = part.intents ?? [];
+  if (pattern.length === 0) return undefined;
+  const step = pattern[intentIndex % pattern.length];
+  if (step === undefined) return undefined;
+  return resolveStep(step, enemyStream, parentContext);
 };
 
 export interface SpawnInit {
@@ -354,13 +378,19 @@ export const spawnEnemy = (
     nextIntent: drawIntent(def, 0, enemyStream, phase, ascension),
     statuses: {},
     ...(def.ward === true ? { ward: rotateWard(undefined, enemyStream) } : {}),
-    subsystems: subs.map((sub) => ({
-      id: `${id}:${sub.id}`,
-      key: sub.id,
-      hp: scale(sub.hp),
-      hpMax: scale(sub.hp),
-      aura: sub.aura,
-    })),
+    subsystems: subs.map((sub) => {
+      const partIntent = drawPartIntent(sub, 0, enemyStream);
+      return {
+        id: `${id}:${sub.id}`,
+        key: sub.id,
+        hp: scale(sub.hp),
+        hpMax: scale(sub.hp),
+        aura: sub.aura,
+        ...(partIntent === undefined
+          ? {}
+          : { intentIndex: 0, nextIntent: partIntent }),
+      };
+    }),
     phase,
   };
 };
@@ -375,6 +405,39 @@ export const buildEnemies = (
     .map((defId, index) =>
       spawnEnemy(defId, `enemy-${String(index)}`, enemyStream, init),
     );
+
+export const battleSnapshotDefaults = () =>
+  ({
+    turn: 1,
+    shield: 0,
+    shieldPersist: 0,
+    charge: 0,
+    scrap: 0,
+    runScrap: 0,
+    tide: 0,
+    interference: 0,
+    perks: [],
+    exceedCap: [],
+    evasion: null,
+    nextTurnMods: {},
+    nextRollBonus: 0,
+    sacrificePool: 0,
+    bloodReactorUsed: false,
+    burnDoubleUsed: false,
+    blockedSlots: [],
+    shrunkSlots: [],
+    lockedDice: [],
+    survivedLethal: false,
+    lastPlayerDamage: 0,
+    stolenScrap: 0,
+    pendingTwist: 0,
+    pendingSwap: 0,
+    pendingStorm: 0,
+    ascension: 0,
+    sectorHpPct: 0,
+    sectorDmgPct: 0,
+    enemyHpPct: 0,
+  }) satisfies Partial<BattleSnapshot>;
 
 export const buildBattleSnapshot = (
   shipId: ShipId,
@@ -414,13 +477,9 @@ export const buildBattleSnapshot = (
     resonance.counts[init.resonanceBoost.school] += init.resonanceBoost.n;
   }
   const snapshot: BattleSnapshot = {
-    turn: 1,
+    ...battleSnapshotDefaults(),
     hull: Math.max(1, Math.min(hullMax, init.hull ?? hullMax)),
     hullMax,
-    shield: 0,
-    shieldPersist: 0,
-    charge: 0,
-    scrap: 0,
     runScrap: Math.max(0, init.runScrap ?? 0),
     tide,
     interference: Math.max(0, init.interference ?? 0),
@@ -432,7 +491,6 @@ export const buildBattleSnapshot = (
     flags: [...(init.flags ?? [])],
     counters: {},
     runCounters: { ...(init.runCounters ?? {}) },
-    exceedCap: [],
     shipId,
     dice,
     slots: applyFireModes(
@@ -445,25 +503,10 @@ export const buildBattleSnapshot = (
     ),
     enemies,
     targetId: enemies[0]?.id ?? null,
-    evasion: null,
-    nextTurnMods: {},
-    nextRollBonus: 0,
     chargeCap: init.chargeCap ?? DEFAULT_CHARGE_CAP,
-    sacrificePool: 0,
-    bloodReactorUsed: false,
-    burnDoubleUsed: false,
-    blockedSlots: [],
-    shrunkSlots: [],
-    lockedDice: [],
     cursedDice: [],
     pendingHijack: 0,
     resonance,
-    survivedLethal: false,
-    lastPlayerDamage: 0,
-    stolenScrap: 0,
-    pendingTwist: 0,
-    pendingSwap: 0,
-    pendingStorm: 0,
     ascension,
     sectorHpPct: init.sectorHpPct ?? 0,
     sectorDmgPct: init.sectorDmgPct ?? 0,
@@ -486,6 +529,7 @@ export const buildBattleSnapshot = (
   const ctx = new BattleCtx(snapshot, snapshot.flags);
   emit(buildSources(snapshot), "battleStart", ctx);
   snapshot.flags = [...ctx.flags];
+  reaimOffLockedCore(snapshot);
   return snapshot;
 };
 

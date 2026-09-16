@@ -2,6 +2,7 @@ import { Button, Overlay, Stack, Text, Title } from '@mantine/core';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtLeast } from '@/app/breakpoints';
+import { cx } from '@/app/cx';
 import { tokens } from '@/app/theme';
 import { TapPopover } from '@/components/TapPopover';
 import { RESONANCE_BONUSES } from '@/data/resonance';
@@ -34,7 +35,7 @@ export const CausalityBanner = () => {
   if (!inverted && !storm && modifiers.length === 0) return null;
   return (
     <div
-      className={`${styles.causalityBanner ?? ''} ${inverted ? styles.causalitySlide ?? '' : ''}`}
+      className={cx(styles.causalityBanner, inverted && styles.causalitySlide)}
       data-band="causality"
     >
       {inverted ? (
@@ -44,10 +45,7 @@ export const CausalityBanner = () => {
           testId="causality-inverted"
           content={t('battle:invertedHint')}
         >
-          <span
-            className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}
-            data-causality="inverted"
-          >
+          <span className={cx(styles.pill, styles.pillDanger)} data-causality="inverted">
             {t('battle:inverted')}
           </span>
         </TapPopover>
@@ -59,10 +57,7 @@ export const CausalityBanner = () => {
           testId="causality-storm"
           content={t('battle:stormHint')}
         >
-          <span
-            className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}
-            data-causality="storm"
-          >
+          <span className={cx(styles.pill, styles.pillCharge)} data-causality="storm">
             {t('battle:storm')}
           </span>
         </TapPopover>
@@ -82,7 +77,7 @@ export const CausalityBanner = () => {
           }
         >
           <span
-            className={`${styles.pill ?? ''} ${styles.pillCondition ?? ''}`}
+            className={cx(styles.pill, styles.pillCondition)}
             data-causality={mod.weather ? 'weather' : 'mutator'}
           >
             {t(mod.name)}
@@ -158,9 +153,7 @@ export const StatusBar = ({ wide = false }: { wide?: boolean }) => {
 
   return (
     <div
-      className={`${styles.statusCard ?? ''} ${
-        wide ? styles.statusCardWide ?? '' : ''
-      }`}
+      className={cx(styles.statusCard, wide && styles.statusCardWide)}
       data-band="status"
     >
       <div className={styles.statusLeft}>
@@ -182,7 +175,7 @@ export const StatusBar = ({ wide = false }: { wide?: boolean }) => {
       </div>
       <div className={styles.statusRight}>
         {shield > 0 ? (
-          <span className={`${styles.pill ?? ''} ${styles.pillShield ?? ''}`}>
+          <span className={cx(styles.pill, styles.pillShield)}>
             {t('battle:shield', { n: shield })}
           </span>
         ) : null}
@@ -200,13 +193,13 @@ export const StatusBar = ({ wide = false }: { wide?: boolean }) => {
               </>
             }
           >
-            <span className={`${styles.pill ?? ''} ${styles.pillDanger ?? ''}`}>
+            <span className={cx(styles.pill, styles.pillDanger)}>
               {t('battle:interference', { n: interference })}
             </span>
           </TapPopover>
         ) : null}
         {scrap > 0 ? (
-          <span className={`${styles.pill ?? ''} ${styles.pillScrap ?? ''}`}>
+          <span className={cx(styles.pill, styles.pillScrap)}>
             {t('battle:scrap', { n: scrap })}
           </span>
         ) : null}
@@ -223,7 +216,7 @@ export const StatusBar = ({ wide = false }: { wide?: boolean }) => {
             </>
           }
         >
-          <span className={`${styles.pill ?? ''} ${styles.pillCharge ?? ''}`}>
+          <span className={cx(styles.pill, styles.pillCharge)}>
             {t('battle:charge', { n: charge, max: chargeCap })}
           </span>
         </TapPopover>
@@ -317,9 +310,7 @@ export const ResonanceChips = () => {
           return (
             <span
               key={row.school}
-              className={`${styles.resChip ?? ''} ${
-                active.length > 0 ? styles.resChipActive ?? '' : ''
-              }`}
+              className={cx(styles.resChip, active.length > 0 && styles.resChipActive)}
               style={{ borderColor: colors.stroke, color: colors.text }}
               data-res-school={row.school}
             >
@@ -341,9 +332,7 @@ export const ResonanceChips = () => {
                 {RESONANCE_THRESHOLDS.map((th) => (
                   <span
                     key={th}
-                    className={`${styles.resPip ?? ''} ${
-                      active.includes(th) ? styles.resPipOn ?? '' : ''
-                    }`}
+                    className={cx(styles.resPip, active.includes(th) && styles.resPipOn)}
                   />
                 ))}
               </span>

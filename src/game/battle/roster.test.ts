@@ -8,9 +8,11 @@ import {
   SECTOR_ROSTERS,
 } from "@/data/enemies";
 import { SECTORS, sectorDef } from "@/data/sectors";
-import { ascensionMods } from "@/data/ascension";
+import { A6_ELITE_SUBSYSTEM, ascensionMods } from "@/data/ascension";
+import { partDefOf } from "@/game/battle/damage";
 import {
   patternFor,
+  phaseFloor,
   phaseIndexForHp,
   spawnEnemy,
 } from "@/game/battle/setup";
@@ -28,6 +30,14 @@ import enContent from "@/i18n/en/content.json";
 const stream = () => createStream(31337);
 
 const content = enContent as unknown as Record<string, Record<string, string>>;
+
+const FLAGSHIP_MINIBOSSES: readonly string[] = [
+  "usurer",
+  "resonator",
+  "silencer",
+  "coreSliver",
+  "hushWarden",
+];
 
 describe("roster counts", () => {
   it("holds 63 base, 14 elites, 14 mini-bosses and 12 bosses", () => {
@@ -118,20 +128,67 @@ describe("pattern variety", () => {
       );
     }
   });
+
+  it("names the A6 part and states its aura wherever a part def is read", () => {
+    for (const def of ELITE_ENEMIES) {
+      const ascended = spawnEnemy(def.id, "e", stream(), { ascension: 6 });
+      const part = ascended.subsystems.find(
+        (sub) => sub.key === A6_ELITE_SUBSYSTEM.id,
+      );
+      expect(part, `${def.id} carries the overclock part`).toBeDefined();
+      if (part === undefined) continue;
+      const resolved = partDefOf(def, part);
+      expect(resolved?.name, `${def.id} overclock name`).toBe(
+        A6_ELITE_SUBSYSTEM.name,
+      );
+      expect(resolved?.name.includes(":"), `${def.id} name is a key`).toBe(true);
+      expect(resolved?.aura, `${def.id} overclock aura`).toBe(
+        A6_ELITE_SUBSYSTEM.aura,
+      );
+    }
+  });
 });
 
 describe("boss layer", () => {
-  it("gives all ten bosses two subsystems and at least two phases", () => {
+  it("gives all twelve bosses three parts and at least two phases", () => {
     for (const def of BOSSES) {
-      expect(def.subsystems.length, `${def.id} subsystems`).toBeGreaterThanOrEqual(2);
+      expect(def.subsystems.length, `${def.id} subsystems`).toBe(3);
       expect(def.phases.length, `${def.id} phases`).toBeGreaterThanOrEqual(2);
     }
+  });
+
+  it("locks every boss core behind three parts and every flagship gate behind two", () => {
+    for (const def of BOSSES) {
+      expect(def.shell, `${def.id} shell`).toBe(true);
+      expect(def.coreLockAt, `${def.id} coreLockAt`).toBe(1);
+      expect(def.subsystems.length, `${def.id} parts`).toBe(3);
+    }
+    for (const id of FLAGSHIP_MINIBOSSES) {
+      const def = MINIBOSSES.find((entry) => entry.id === id);
+      expect(def, `${id} is in the mini-boss roster`).toBeDefined();
+      if (def === undefined) continue;
+      expect(def.shell, `${id} shell`).toBe(true);
+      expect(def.coreLockAt, `${id} coreLockAt`).toBe(1);
+      expect(def.subsystems?.length ?? 0, `${id} parts`).toBe(2);
+    }
+    const locked = MINIBOSSES.filter((def) => def.coreLockAt !== undefined);
+    expect(locked.map((def) => def.id).sort()).toEqual(
+      [...FLAGSHIP_MINIBOSSES].sort(),
+    );
   });
 
   it("A5 opens every boss in its later phase", () => {
     for (const def of BOSSES) {
       expect(phaseIndexForHp(def, def.hp, def.hp, 0), `${def.id} A0`).toBe(0);
       expect(phaseIndexForHp(def, def.hp, def.hp, 5), `${def.id} A5`).toBe(1);
+    }
+  });
+
+  it("takes the phase floor from the declared flag at every level", () => {
+    for (let level = 0; level <= 10; level += 1) {
+      expect(phaseFloor(level), `A${String(level)} floor`).toBe(
+        ascensionMods(level).bossPhaseShift ? 1 : 0,
+      );
     }
   });
 

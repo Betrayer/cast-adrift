@@ -7,6 +7,7 @@ import {
   decideReroll,
   echoLookUids,
   readyEcho,
+  rerollValue,
 } from "@/game/battle/policy";
 import {
   advanceTurn,
@@ -20,9 +21,10 @@ import {
   type MkLevels,
 } from "@/game/battle/setup";
 import { echoToken } from "@/data/echo";
-import { createStreams, deriveSeed } from "@/services/rng";
+import { createStream, createStreams, deriveSeed } from "@/services/rng";
+import type { RngStream } from "@/services/rng";
 import type { FireModeId } from "@/data/fireModes";
-import type { BattleSnapshot, SlotId } from "@/types/battle";
+import type { BattleSnapshot, RolledDie, SlotId } from "@/types/battle";
 
 const INTENDED_DECK: readonly string[] = [
   "slug",
@@ -53,6 +55,28 @@ const applyPlacement = (
   if (mode !== undefined) slot.mode = mode;
 };
 
+const rerollTray = (
+  snap: BattleSnapshot,
+  uids: readonly string[],
+  rng: RngStream,
+): RolledDie[] =>
+  snap.dice.map((d) =>
+    uids.includes(d.uid) && d.state === "tray"
+      ? { ...d, value: rerollValue(d, snap, rng) }
+      : d,
+  );
+
+const secondLookTray = (
+  snap: BattleSnapshot,
+  uids: readonly string[],
+  rng: RngStream,
+): RolledDie[] =>
+  snap.dice.map((d) =>
+    uids.includes(d.uid) && d.state === "tray"
+      ? { ...d, value: Math.max(d.value, rerollValue(d, snap, rng)) }
+      : d,
+  );
+
 const simulateGate = (rootSeed: number): boolean => {
   const streams = createStreams(rootSeed);
   const enemyStream = createEnemyStream(streams);
@@ -70,20 +94,12 @@ const simulateGate = (rootSeed: number): boolean => {
   for (let round = 0; round < 30; round += 1) {
     const rerolls = decideReroll(snap);
     if (rerolls.length > 0) {
-      snap.dice = snap.dice.map((d) =>
-        rerolls.includes(d.uid) && d.state === "tray"
-          ? { ...d, value: streams.dice.int(1, d.tier) }
-          : d,
-      );
+      snap.dice = rerollTray(snap, rerolls, streams.dice);
     }
     const ready = readyEcho(snap, spent);
     const look = echoLookUids(snap, spent);
     if (ready !== undefined && look.length > 0) {
-      snap.dice = snap.dice.map((d) =>
-        look.includes(d.uid) && d.state === "tray"
-          ? { ...d, value: Math.max(d.value, streams.dice.int(1, d.tier)) }
-          : d,
-      );
+      snap.dice = secondLookTray(snap, look, streams.dice);
       spent.push(echoToken(ready));
     }
     const decision = decidePlacements(snap, spent);
@@ -113,6 +129,74 @@ const simulateGate = (rootSeed: number): boolean => {
   }
   return snap.outcome === "victory";
 };
+
+const gateSnapshot = (): BattleSnapshot => {
+  const streams = createStreams(deriveSeed(20240706, "gate-fixture"));
+  return buildBattleSnapshot(
+    "wanderer",
+    INTENDED_DECK,
+    ["raiderAlpha"],
+    streams,
+    createEnemyStream(streams),
+    MK2_WEAPONS,
+    { tide: 2, hull: 30, hullMax: 30, chargeCap: 10 },
+  );
+};
+
+const uidOf = (snap: BattleSnapshot, defId: string): string => {
+  const die = snap.dice.find((d) => d.defId === defId);
+  if (die === undefined) throw new Error(`missing die ${defId}`);
+  return die.uid;
+};
+
+const valueOf = (dice: readonly RolledDie[], uid: string): number => {
+  const die = dice.find((d) => d.uid === uid);
+  if (die === undefined) throw new Error(`missing die ${uid}`);
+  return die.value;
+};
+
+const withDie = (
+  snap: BattleSnapshot,
+  uid: string,
+  over: Partial<RolledDie>,
+): BattleSnapshot => ({
+  ...snap,
+  dice: snap.dice.map((d) => (d.uid === uid ? { ...d, ...over } : d)),
+});
+
+describe("the guardrail harness rerolls the way the shipped store does", () => {
+  it("holds a rerolled blue die at the resonance floor", () => {
+    const snap = gateSnapshot();
+    const uid = uidOf(snap, "frostplate");
+    const rng = createStream(11);
+    const values = Array.from({ length: 200 }, () =>
+      valueOf(rerollTray(snap, [uid], rng), uid),
+    );
+    expect(Math.min(...values)).toBe(2);
+  });
+
+  it("keeps the growth bonus a bare reroll would drop", () => {
+    const snap = gateSnapshot();
+    const uid = uidOf(snap, "ember");
+    expect(
+      valueOf(
+        rerollTray(withDie(snap, uid, { growth: 2 }), [uid], createStream(5)),
+        uid,
+      ),
+    ).toBe(valueOf(rerollTray(snap, [uid], createStream(5)), uid) + 2);
+  });
+
+  it("keeps the growth bonus through the Echo second look", () => {
+    const snap = gateSnapshot();
+    const uid = uidOf(snap, "ember");
+    const seeded = withDie(snap, uid, { value: 1, growth: 3 });
+    const rng = createStream(11);
+    const values = Array.from({ length: 200 }, () =>
+      valueOf(secondLookTray(seeded, [uid], rng), uid),
+    );
+    expect(Math.min(...values)).toBe(4);
+  });
+});
 
 describe("gate guardrail", () => {
   it("the intended red-6 deck actually reaches the red set", () => {

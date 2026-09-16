@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { cx } from '@/app/cx';
 import { SlotGrid } from './SlotGrid';
 import { onReserveTap, useDockAnchors, useDockModel } from './useDock';
 import styles from './Board.module.css';
@@ -23,13 +24,11 @@ export const ReserveButton = ({
       data-reserve
       data-coach="reserve"
       data-testid="slot-reserve"
-      className={[
-        className ?? styles.reserve ?? '',
-        legal ? styles.cardLegal ?? '' : '',
-        held > 0 ? styles.cardOccupied ?? '' : '',
-      ]
-        .filter((name) => name !== '')
-        .join(' ')}
+      className={cx(
+        className ?? styles.reserve,
+        legal && styles.cardLegal,
+        held > 0 && styles.cardOccupied,
+      )}
       onClick={onReserveTap}
     >
       <span className={styles.name}>{t('battle:reserve')}</span>

@@ -1,3 +1,4 @@
+import { aimedEnemy, livingPartIntents } from "@/game/battle/target";
 import {
   echoCalculusWeapons,
   echoIsBattleActive,
@@ -6,6 +7,7 @@ import {
   type EchoNodeId,
 } from "@/data/echo";
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { resonanceGrantActive } from "@/data/resonance";
 import {
   DIRECT,
   FIRE_MODE_SLOTS,
@@ -20,22 +22,25 @@ import {
   officerDef,
   type OfficerDef,
 } from "@/data/officers";
+import { computeMutatorMods } from "@/data/mutators";
 import { applyActions, BattleCtx } from "@/game/effects";
+import { isBodyImmune } from "@/game/battle/damage";
 import { isInverted } from "@/game/battle/order";
 import {
   BASE_EVASION,
+  enemyAuraAttack,
   evasionFor,
   evasionTuningFor,
-  MIRROR_CAP,
-  MIRROR_SCHOOL_CAP,
-  MIRROR_SCHOOL_MULT,
+  intentMagnitude,
   nudgeChargeCost,
   resolvePlayerPhase,
+  scaleDamage,
   vulnerableFor,
 } from "@/game/battle/resolver";
 import type { EvasionTuning } from "@/game/battle/passives";
 import { canPlaceDie, isSlotBlocked } from "@/game/battle/setup";
 import { sourceMods, sourceTrait } from "@/game/run/runMods";
+import type { RngStream } from "@/services/rng";
 import type {
   BattleSnapshot,
   EnemyState,
@@ -69,68 +74,43 @@ const trayDice = (snapshot: BattleSnapshot): RolledDie[] =>
 export const expectedSum = (dice: readonly RolledDie[]): number =>
   dice.reduce((sum, d) => sum + (d.tier + 1) / 2, 0);
 
-const auraAttackBonus = (enemy: EnemyState): number =>
-  (enemy.subsystems.some((s) => s.hp > 0 && s.aura === "atk+2") ? 2 : 0) +
-  (enemy.subsystems.some((s) => s.hp > 0 && s.aura === "atk+3") ? 3 : 0) +
-  (enemy.rage ?? 0);
-
-const largestSchoolCount = (snapshot: BattleSnapshot): number =>
-  Math.max(0, ...Object.values(snapshot.resonance.counts));
-
-interface IntentThreat {
-  perHit: number;
-  hits: number;
-}
-
-const intentThreat = (
-  snapshot: BattleSnapshot,
-  intent: Intent,
-): IntentThreat | null => {
-  switch (intent.t) {
-    case "attack":
-      return { perHit: intent.n, hits: 1 };
-    case "multi":
-      return { perHit: intent.n, hits: intent.k };
-    case "mirrorHalf":
-      return {
-        perHit: Math.min(
-          MIRROR_CAP,
-          Math.ceil(Math.max(0, snapshot.lastPlayerDamage) / 2),
-        ),
-        hits: 1,
-      };
-    case "mirrorSchool":
-      return {
-        perHit: Math.min(
-          MIRROR_SCHOOL_CAP,
-          largestSchoolCount(snapshot) * MIRROR_SCHOOL_MULT,
-        ),
-        hits: 1,
-      };
-    case "echoTotal":
-      return {
-        perHit: Math.min(intent.cap, Math.max(0, snapshot.lastPlayerDamage)),
-        hits: 1,
-      };
-    case "bargain":
-      return snapshot.scrap + snapshot.runScrap >= intent.n
-        ? null
-        : { perHit: intent.n, hits: 1 };
-    default:
-      return null;
-  }
-};
+const actingIntents = (enemy: EnemyState): Intent[] => [
+  enemy.nextIntent,
+  ...livingPartIntents(enemy),
+];
 
 export const incomingEstimate = (snapshot: BattleSnapshot): number => {
-  const pressure = Math.max(0, snapshot.tide) + Math.max(0, snapshot.interference);
+  const pressure = Math.max(
+    0,
+    Math.max(0, snapshot.tide) +
+      Math.max(0, snapshot.interference) +
+      sourceMods(snapshot).tideEffectDelta,
+  );
+  const mutatorDmgPct = computeMutatorMods(snapshot.mutators ?? []).damageMultPct;
   let total = 0;
   for (const enemy of snapshot.enemies) {
     if (enemy.hp <= 0) continue;
-    const threat = intentThreat(snapshot, enemy.nextIntent);
-    if (threat === null) continue;
-    const mult = enemy.statuses.charge !== undefined ? 2 : 1;
-    total +=
-      (threat.perHit + auraAttackBonus(enemy) + pressure) * mult * threat.hits;
+    const def = ENEMY_BY_ID.get(enemy.defId);
+    const authored =
+      def?.boss === true || def?.miniboss === true || def?.elite === true;
+    const damageMultPct =
+      mutatorDmgPct + (authored ? 0 : Math.max(0, snapshot.sectorDmgPct));
+    let charged = enemy.statuses.charge !== undefined;
+    for (const intent of actingIntents(enemy)) {
+      const threat = intentMagnitude(snapshot, intent);
+      if (threat === null) continue;
+      const mult = charged ? 2 : 1;
+      charged = false;
+      total +=
+        threat.hits *
+        Math.max(
+          0,
+          scaleDamage(
+            (threat.perHit + enemyAuraAttack(enemy) + pressure) * mult,
+            damageMultPct,
+          ),
+        );
+    }
   }
   return total;
 };
@@ -139,7 +119,9 @@ const enemiesIntending = (
   snapshot: BattleSnapshot,
   kind: Intent["t"],
 ): EnemyState[] =>
-  snapshot.enemies.filter((e) => e.hp > 0 && e.nextIntent.t === kind);
+  snapshot.enemies.filter(
+    (e) => e.hp > 0 && actingIntents(e).some((intent) => intent.t === kind),
+  );
 
 export const shieldsWasted = (snapshot: BattleSnapshot): boolean =>
   enemiesIntending(snapshot, "siphonShield").length > 0;
@@ -159,6 +141,18 @@ export const decideReroll = (snapshot: BattleSnapshot): string[] => {
     .sort((a, b) => a.value - b.value)
     .slice(0, 2)
     .map((d) => d.uid);
+};
+
+export const rerollValue = (
+  die: RolledDie,
+  snapshot: BattleSnapshot,
+  rng: RngStream,
+): number => {
+  const rolled = rng.int(1, die.tier) + (die.growth ?? 0);
+  return die.school === "blue" &&
+    resonanceGrantActive(snapshot.resonance.counts, "blueRollFloor")
+    ? Math.max(rolled, 2)
+    : rolled;
 };
 
 const freeWeaponSlots = (
@@ -382,10 +376,6 @@ export const applyOfficerActive = (
   return next;
 };
 
-const aimedEnemy = (snapshot: BattleSnapshot): EnemyState | undefined =>
-  snapshot.enemies.find((e) => e.id === snapshot.targetId && e.hp > 0) ??
-  snapshot.enemies.find((e) => e.hp > 0);
-
 export const readyOfficers = (
   snapshot: BattleSnapshot,
   spent: readonly string[],
@@ -397,7 +387,7 @@ export const readyOfficers = (
     const def = officerDef(id);
     if (def === undefined) continue;
     if (snapshot.charge < officerChargeCost(def.active)) continue;
-    if (officerActiveDead(def.active, aimedEnemy(snapshot)?.statuses.mark)) {
+    if (officerActiveDead(def.active, aimedEnemy(snapshot.enemies, snapshot.targetId)?.statuses.mark)) {
       continue;
     }
     out.push(def);
@@ -526,16 +516,32 @@ const chooseEchoActive = (
     : undefined;
 };
 
+export const forcedTargetId = (
+  snapshot: BattleSnapshot,
+  order: readonly string[],
+): string | undefined => {
+  for (const key of order) {
+    for (const enemy of snapshot.enemies) {
+      if (enemy.hp <= 0) continue;
+      const part = enemy.subsystems.find((s) => s.key === key && s.hp > 0);
+      if (part !== undefined) return part.id;
+    }
+  }
+  return undefined;
+};
+
 export const decidePlacements = (
   snapshot: BattleSnapshot,
   spent: readonly string[] = [],
+  forced?: string,
 ): PolicyDecision => {
   const placements: PolicyPlacement[] = [];
   const usedDice = new Set<string>();
   const usedSlots = new Set<SlotId>();
 
   const alive = snapshot.enemies.filter((e) => e.hp > 0);
-  const lowest = [...alive].sort(
+  const reachable = alive.filter((e) => !isBodyImmune(snapshot, e));
+  const lowest = [...reachable].sort(
     (a, b) => a.hp + a.shield - (b.hp + b.shield),
   )[0];
   const auraSubsystems = alive
@@ -545,7 +551,8 @@ export const decidePlacements = (
         .filter(
           (s) =>
             ENEMY_BY_ID.get(e.defId)?.alternating !== true ||
-            e.lastHitKey !== s.key,
+            e.lastHitKey !== s.key ||
+            e.subsystems.filter((other) => other.hp > 0).length <= 1,
         ),
     )
     .sort((a, b) => a.hp - b.hp);
@@ -584,26 +591,29 @@ export const decidePlacements = (
   const lowestGate = gateOf(lowest);
   const killSum = gatedKillSum(killCandidates, lowestGate);
   const lethal =
+    reachable.length === alive.length &&
     killSum - stormMargin(snapshot, killCandidates) >= totalEnemyHp &&
     totalEnemyHp > 0;
 
   const targetSub = auraSubsystems[0];
   const healer =
     alive.length > 1
-      ? alive.find((e) => ENEMY_BY_ID.get(e.defId)?.role === "support")
+      ? reachable.find((e) => ENEMY_BY_ID.get(e.defId)?.role === "support")
       : undefined;
   const bestValue = [...available()].reduce((best, d) => Math.max(best, d.value), 0);
   const gateWall =
     lowestGate > bestValue
-      ? alive.find((e) => e.id !== lowest?.id && gateOf(e) <= bestValue)
+      ? reachable.find((e) => e.id !== lowest?.id && gateOf(e) <= bestValue)
       : undefined;
-  const targetId = lethal
+  const chosen = lethal
     ? (lowest?.id ?? snapshot.targetId)
     : (gateWall?.id ??
       targetSub?.id ??
       healer?.id ??
       lowest?.id ??
+      alive[0]?.id ??
       snapshot.targetId);
+  const targetId = forced ?? chosen;
 
   if (lethal) {
     placeWeapons(killCandidates);

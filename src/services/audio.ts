@@ -15,6 +15,7 @@ import { useSettingsStore } from "@/stores/settingsStore";
 
 const howls = new Map<string, Howl>();
 const beds = new Map<MusicId, Howl>();
+const startingBeds = new Set<MusicId>();
 let initialized = false;
 let unsubscribe: (() => void) | null = null;
 let visibilityBound = false;
@@ -57,16 +58,21 @@ const sfxVolume = (): number => useSettingsStore.getState().sfxVol;
 const musicVolume = (): number => useSettingsStore.getState().musicVol;
 
 const bedHowl = (id: MusicId): Howl => {
-  let howl = beds.get(id);
-  if (howl === undefined) {
-    howl = new Howl({
-      src: [...musicSources(id)],
-      loop: true,
-      volume: 0,
-      html5: false,
-    });
-    beds.set(id, howl);
-  }
+  const existing = beds.get(id);
+  if (existing !== undefined) return existing;
+  const howl: Howl = new Howl({
+    src: [...musicSources(id)],
+    loop: true,
+    volume: 0,
+    html5: false,
+    onplay: () => {
+      startingBeds.delete(id);
+      if (beds.get(id) === howl) return;
+      howl.stop();
+      howl.unload();
+    },
+  });
+  beds.set(id, howl);
   return howl;
 };
 
@@ -77,9 +83,19 @@ const targetGain = (id: MusicId): number => {
   return id === bed.track ? base : 0;
 };
 
+const abandonStartingBed = (id: MusicId, howl: Howl): void => {
+  startingBeds.delete(id);
+  beds.delete(id);
+  howl.stop();
+};
+
 const retune = (fadeMs: number): void => {
-  for (const [id, howl] of beds) {
+  for (const [id, howl] of [...beds]) {
     const target = targetGain(id);
+    if (startingBeds.has(id) && !howl.playing()) {
+      if (target <= 0.0001) abandonStartingBed(id, howl);
+      continue;
+    }
     const current = howl.volume();
     if (target <= 0.0001) {
       if (howl.playing()) {
@@ -92,6 +108,7 @@ const retune = (fadeMs: number): void => {
     }
     if (!howl.playing()) {
       howl.volume(0);
+      startingBeds.add(id);
       howl.play();
     }
     howl.fade(typeof current === "number" ? current : 0, target, fadeMs);
@@ -265,6 +282,7 @@ const disposeAudio = (): void => {
   howls.clear();
   for (const howl of beds.values()) howl.unload();
   beds.clear();
+  startingBeds.clear();
   bed.track = null;
   bed.layer = null;
   bed.layerGain = DEFAULT_LAYER_GAIN;

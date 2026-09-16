@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { EVENT_BY_ID } from "@/data/events";
 import { CABIN_CAP, OFFICER_BY_ID } from "@/data/officers";
 import { applyOutcome } from "@/game/events/apply";
+import { must, optionById } from "@/game/events/eventFixtures";
 import { abandonRun, endRun, startRun } from "@/game/run/flow";
 import {
   grantOfficer,
@@ -18,20 +18,7 @@ import {
 } from "@/game/run/snapshot";
 import { createStream } from "@/services/rng";
 import { useRunStore } from "@/stores/runStore";
-import type { EventOption, Outcome } from "@/types/events";
-
-const must = <T>(value: T | undefined | null, msg: string): T => {
-  if (value === undefined || value === null) throw new Error(msg);
-  return value;
-};
-
-const optionById = (eventId: string, optionId: string): EventOption => {
-  const event = must(EVENT_BY_ID.get(eventId), `event ${eventId}`);
-  return must(
-    event.options.find((o) => o.id === optionId),
-    `${eventId}.${optionId}`,
-  );
-};
+import type { Outcome } from "@/types/events";
 
 const rescueOutcome = (officerId: string): Outcome => {
   const def = must(OFFICER_BY_ID.get(officerId), `officer ${officerId}`);
@@ -188,9 +175,9 @@ describe("the crew snapshot", () => {
     startRun(23);
   });
 
-  it("bumps to v15 and still accepts every version the build has written", () => {
-    expect(RUN_SNAPSHOT_V).toBe(15);
-    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15]);
+  it("bumps to v16 and still accepts every version the build has written", () => {
+    expect(RUN_SNAPSHOT_V).toBe(16);
+    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16]);
   });
 
   it("round-trips the aboard roster", () => {

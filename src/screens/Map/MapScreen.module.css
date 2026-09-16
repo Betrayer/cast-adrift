@@ -155,6 +155,20 @@
   animation: nodeIn 260ms ease-out both;
 }
 
+@keyframes cargoPulse {
+  0%,
+  100% {
+    opacity: 0.62;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.cargoMark {
+  animation: cargoPulse 2.6s ease-in-out infinite;
+}
+
 @keyframes nodeIn {
   from {
     opacity: 0;
@@ -294,6 +308,7 @@
   transition: none;
 }
 
+:root[data-ca-motion='reduced'] .cargoMark,
 :root[data-ca-motion='reduced'] .chainMark,
 :root[data-ca-motion='reduced'] .trail,
 :root[data-ca-motion='reduced'] .arrival,

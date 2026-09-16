@@ -6,16 +6,14 @@ import { SALVAGE_BY_ID } from "@/data/salvage";
 import { resolveSalvagePick } from "@/game/run/flow";
 import { playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
-import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import styles from "./Rewards.module.css";
 
 const CARD_FLIP_MS = 110;
 
 export const SalvagePick = ({ faces }: { faces: readonly string[] }) => {
   const { t } = useTranslation(["run", "content"]);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
 
   useEffect(() => {
     haptic("reveal");

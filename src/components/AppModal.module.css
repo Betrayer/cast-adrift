@@ -59,6 +59,16 @@
   animation: sheetIn 200ms cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
+.sheetHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--ca-line);
+  flex: 0 0 auto;
+}
+
 @keyframes scrimIn {
   from {
     opacity: 0;

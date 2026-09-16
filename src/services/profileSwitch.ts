@@ -1,4 +1,5 @@
 import { forgetParkedScreens } from "@/app/router";
+import { cancelAutosave } from "@/game/run/autosave";
 import { bootCloud, cancelRunCloud, dismissCloudRun } from "@/game/run/cloud";
 import { readClaim } from "@/services/account-link";
 import {
@@ -58,11 +59,13 @@ export const switchProfile = async (uid: string): Promise<void> => {
   switches += 1;
   const hadRun = useRunStore.getState().active;
   pauseMetaSync();
+  cancelAutosave();
   cancelRunCloud();
   dismissCloudRun();
-  setActiveUid(uid);
   useBattleStore.getState().reset();
   useRunStore.getState().reset();
+  cancelAutosave();
+  setActiveUid(uid);
   if (hasScopedValue(META_PERSIST_KEY)) {
     await useMetaStore.persist.rehydrate();
   } else {

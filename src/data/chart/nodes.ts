@@ -948,7 +948,7 @@ const SCHOOL_ORDER: readonly School[] = [
   "prismatic",
 ];
 
-const namedContent = (n: Named): Content => ({
+const namedContent = (n: Content): Content => ({
   effects: n.effects,
   mods: n.mods,
   traits: n.traits,
@@ -1069,11 +1069,7 @@ const buildCluster = (school: School, angleDeg: number): ChartNodeDef[] => {
         kind: spec.role,
         pos: place(angle, rad, lats[j] ?? 0),
         links: [parent],
-        effects: spec.effects,
-        mods: spec.mods,
-        traits: spec.traits,
-        tags: spec.tags,
-        fx: spec.fx,
+        ...namedContent(spec),
         ...(spec.role === "notable" || spec.role === "minor"
           ? { name: `meta:chart.${spec.key ?? id}` }
           : {}),
@@ -1094,13 +1090,7 @@ const buildCluster = (school: School, angleDeg: number): ChartNodeDef[] => {
       kind: "keystone",
       pos: place(angle, rad, keystones.length === 1 ? 0 : i === 0 ? -42 : 42),
       links: [parent],
-      effects: content.effects,
-      mods: content.mods,
-      traits: content.traits,
-      tags: content.tags,
-      fx: content.fx,
-      budgetDelta: content.budgetDelta,
-      slotTierDelta: content.slotTierDelta,
+      ...content,
       name: `meta:chart.${keystone.key}`,
     });
   });

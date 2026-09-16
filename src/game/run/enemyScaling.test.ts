@@ -112,9 +112,14 @@ const NO_INTEGER_PREIMAGE: readonly string[] = [
 
 const RETUNED_SINCE_REBASE: Readonly<Record<string, string>> = {
   leechQueen: "R6 raised the gate-fight floor: 44 → 50",
-  breakerBarge: "R11 softened the act-2 wall: 73 → 59",
-  riftMaw: "R11 raised the act-3 boss off the ceiling: 68 → 78",
-  choirFlagship: "R11 closed the act-4 twin spread: 77 → 81",
+  breakerBarge:
+    "R11 softened the act-2 wall: 73 → 59; U7 paid for the core lock and a third part: 59 → 36",
+  riftMaw:
+    "R11 raised the act-3 boss off the ceiling: 68 → 78; U7 paid for the core lock and a third part: 78 → 44",
+  choirFlagship:
+    "R11 closed the act-4 twin spread: 77 → 81; U7 paid for the core lock and a third part: 81 → 57",
+  quarantineWarden: "U7 paid for the core lock and a third part: 66 → 42",
+  coreHeart: "U7 paid for the core lock and a third part: 82 → 73",
 };
 
 const LEGACY_CURVE_PCT: Readonly<Record<number, number>> = {

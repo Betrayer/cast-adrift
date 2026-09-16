@@ -361,32 +361,17 @@ const markedRows = (
   return out;
 };
 
-const applyInversion = (
+const applyCausality = (
   nodes: MapNode[],
   rng: RngStream,
   shape: SectorShape,
-  motif: Extract<SectorMotif, { m: "inversion" }>,
+  count: number,
+  key: "inverted" | "storm",
+  taken: ReadonlySet<number>,
 ): void => {
-  const rows = causalityRows(rng, shape, motif.rows, new Set());
+  const rows = causalityRows(rng, shape, count, taken);
   for (const node of nodes) {
-    if (rows.includes(node.row)) node.inverted = true;
-  }
-};
-
-const applyStorm = (
-  nodes: MapNode[],
-  rng: RngStream,
-  shape: SectorShape,
-  motif: Extract<SectorMotif, { m: "storm" }>,
-): void => {
-  const rows = causalityRows(
-    rng,
-    shape,
-    motif.rows,
-    markedRows(nodes, "inverted"),
-  );
-  for (const node of nodes) {
-    if (rows.includes(node.row)) node.storm = true;
+    if (rows.includes(node.row)) node[key] = true;
   }
 };
 
@@ -755,10 +740,17 @@ const applyMotifs = (
         };
         break;
       case "inversion":
-        applyInversion(nodes, rng, shape, motif);
+        applyCausality(nodes, rng, shape, motif.rows, "inverted", new Set());
         break;
       case "storm":
-        applyStorm(nodes, rng, shape, motif);
+        applyCausality(
+          nodes,
+          rng,
+          shape,
+          motif.rows,
+          "storm",
+          markedRows(nodes, "inverted"),
+        );
         break;
       case "blackHoles":
       case "riftSplit":

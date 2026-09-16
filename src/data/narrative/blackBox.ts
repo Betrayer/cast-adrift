@@ -1,4 +1,4 @@
-import type { EpilogueContext } from "@/data/narrative/epilogue";
+import { flag, type EpilogueContext } from "@/data/narrative/epilogue";
 import type { LocKey } from "@/types/content";
 
 export interface BlackBoxContext extends EpilogueContext {
@@ -15,8 +15,14 @@ export interface BlackBoxEpitaph {
   applies: (ctx: BlackBoxContext) => boolean;
 }
 
-const flag = (ctx: BlackBoxContext, key: string): boolean =>
-  ctx.flags[key] !== undefined;
+const epitaph = (
+  id: string,
+  body: Omit<BlackBoxEpitaph, "id" | "text">,
+): BlackBoxEpitaph => ({
+  id,
+  text: `content:blackbox.${id}`,
+  ...body,
+});
 
 export const VETERAN_RIDES = 5;
 export const CAUTIOUS_BYPASSES = 3;
@@ -25,60 +31,42 @@ export const BEYOND_SECTOR = 6;
 export const RESONANT_AXIS = -5;
 
 export const BLACK_BOX_EPITAPHS: readonly BlackBoxEpitaph[] = [
-  {
-    id: "firstRun",
-    text: "content:blackbox.firstRun",
+  epitaph("firstRun", {
     reads: ["prologueRun"],
     applies: (ctx) => flag(ctx, "prologueRun"),
-  },
-  {
-    id: "beyond",
-    text: "content:blackbox.beyond",
+  }),
+  epitaph("beyond", {
     reads: [],
     applies: (ctx) => ctx.sector >= BEYOND_SECTOR,
-  },
-  {
-    id: "veteran",
-    text: "content:blackbox.veteran",
+  }),
+  epitaph("veteran", {
     reads: [],
     applies: (ctx) => ctx.rides >= VETERAN_RIDES,
-  },
-  {
-    id: "pact",
-    text: "content:blackbox.pact",
+  }),
+  epitaph("pact", {
     reads: ["pactSealed", "choirEnemy"],
     applies: (ctx) => flag(ctx, "pactSealed") || flag(ctx, "choirEnemy"),
-  },
-  {
-    id: "cautious",
-    text: "content:blackbox.cautious",
+  }),
+  epitaph("cautious", {
     reads: [],
     applies: (ctx) => ctx.bypassed >= CAUTIOUS_BYPASSES,
-  },
-  {
-    id: "resonant",
-    text: "content:blackbox.resonant",
+  }),
+  epitaph("resonant", {
     reads: [],
     applies: (ctx) => ctx.axis <= RESONANT_AXIS,
-  },
-  {
-    id: "thin",
-    text: "content:blackbox.thin",
+  }),
+  epitaph("thin", {
     reads: [],
     applies: (ctx) => ctx.hull * THIN_HULL_PARTS <= ctx.hullMax,
-  },
-  {
-    id: "whole",
-    text: "content:blackbox.whole",
+  }),
+  epitaph("whole", {
     reads: [],
     applies: (ctx) => ctx.hull >= ctx.hullMax,
-  },
-  {
-    id: "quiet",
-    text: "content:blackbox.quiet",
+  }),
+  epitaph("quiet", {
     reads: [],
     applies: () => true,
-  },
+  }),
 ];
 
 export const epitaphFor = (ctx: BlackBoxContext): LocKey =>

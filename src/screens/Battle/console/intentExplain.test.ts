@@ -1,8 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import type { TFunction } from 'i18next';
 import en from '@/i18n/en/battle.json';
-import { INTENT_KINDS, type Intent, type IntentKind } from '@/types/content';
-import { intentExplain } from './intentExplain';
+import {
+  INTENT_KINDS,
+  PART_DEATH_KINDS,
+  type Intent,
+  type IntentKind,
+  type PartDeathEffect,
+} from '@/types/content';
+import { intentExplain, partDeathExplain } from './intentExplain';
 import { intentLabel } from './intentLabel';
 
 type Tree = { [key: string]: string | Tree };
@@ -25,6 +31,7 @@ const t = ((key: string, vars?: Record<string, unknown>): string => {
 }) as unknown as TFunction<['battle', 'content']>;
 
 const SAMPLE: Record<IntentKind, Intent> = {
+  idle: { t: 'idle' },
   attack: { t: 'attack', n: 5 },
   shield: { t: 'shield', n: 4 },
   shieldAll: { t: 'shieldAll', n: 3 },
@@ -96,5 +103,37 @@ describe('intent explainers', () => {
     }
     expect(intentExplain(t, VARIANTS[0] as Intent)).toContain('3');
     expect(intentExplain(t, VARIANTS[2] as Intent)).toContain('2');
+  });
+});
+
+const PART_DEATH_SAMPLE: Record<PartDeathEffect['t'], PartDeathEffect> = {
+  explodePart: { t: 'explodePart', n: 7 },
+  enrageCore: { t: 'enrageCore', n: 3 },
+  openCore: { t: 'openCore', turns: 2 },
+  shieldCore: { t: 'shieldCore', n: 9 },
+  spawnAdds: { t: 'spawnAdds', id: 'choirAcolyte' },
+};
+
+describe('part death previews', () => {
+  it('covers every effect kind in the union', () => {
+    expect(Object.keys(PART_DEATH_SAMPLE).sort()).toEqual(
+      [...PART_DEATH_KINDS].sort(),
+    );
+  });
+
+  it('renders a real sentence for every kind', () => {
+    for (const kind of PART_DEATH_KINDS) {
+      const line = partDeathExplain(t, PART_DEATH_SAMPLE[kind]);
+      expect(line, kind).not.toContain('MISSING');
+      expect(line.length, kind).toBeGreaterThan(12);
+      expect(line, kind).toMatch(/[.!]$/);
+    }
+  });
+
+  it('interpolates the number the effect carries', () => {
+    expect(partDeathExplain(t, PART_DEATH_SAMPLE.explodePart)).toContain('7');
+    expect(partDeathExplain(t, PART_DEATH_SAMPLE.enrageCore)).toContain('3');
+    expect(partDeathExplain(t, PART_DEATH_SAMPLE.openCore)).toContain('2');
+    expect(partDeathExplain(t, PART_DEATH_SAMPLE.shieldCore)).toContain('9');
   });
 });

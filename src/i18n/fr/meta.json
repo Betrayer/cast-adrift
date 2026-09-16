@@ -377,7 +377,7 @@
     "scrap": "Ferraille gagné",
     "total": "Score",
     "newBest": "Nouveau record personnel — l'ancien était de {{n}}",
-    "best": "Record personnel {{n}} · {{diff}} short",
+    "best": "Record personnel {{n}} · il manquait {{diff}}",
     "submitIdle": "Non soumis",
     "submitPending": "Envoi en cours…",
     "submitSent": "Soumis au conseil d'administration",

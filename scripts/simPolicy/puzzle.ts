@@ -92,17 +92,19 @@ export const resolvePuzzle = (
   const attempts = maxAttempts(puzzle);
   let purse = scrap;
   let paid = 0;
+  let tried = 0;
   for (let used = 0; used < attempts; used += 1) {
     const cost = attemptCost(puzzle, used);
     if (cost > purse) break;
     purse -= cost;
     paid += cost;
+    tried += 1;
     if (roll.next() < perAttempt) {
       const reward = rewardScrapValue(puzzle, rewardStream);
       return {
         entered: true,
         solved: true,
-        attempts: used + 1,
+        attempts: tried,
         paid,
         scrap: reward.scrap,
         dieDrop: reward.dieDrop,
@@ -112,7 +114,7 @@ export const resolvePuzzle = (
   return {
     entered: true,
     solved: false,
-    attempts,
+    attempts: tried,
     paid,
     scrap: 0,
     dieDrop: null,

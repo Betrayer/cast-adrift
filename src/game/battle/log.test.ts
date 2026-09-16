@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { A6_ELITE_SUBSYSTEM } from "@/data/ascension";
 import { harnessEnemy, harnessSnap } from "@/game/battle/battleHarness";
+import {
+  enemyFixture,
+  registerEnemyFixtures,
+} from "@/game/battle/enemyFixtures";
 import {
   appendLog,
   BATTLE_LOG_CAP,
@@ -131,5 +136,83 @@ describe("battle log accumulation", () => {
     ]);
     expect(groups.map((group) => group.turn)).toEqual([1, 2, 3]);
     expect(groups.map((group) => group.entries.length)).toEqual([2, 1, 2]);
+  });
+});
+
+registerEnemyFixtures([
+  enemyFixture({
+    id: "logHarnessBoss",
+    shell: true,
+    coreLockAt: 1,
+    subsystems: [
+      { id: "valveA", name: "content:enemies.logHarnessBoss-valveA", hp: 8 },
+    ],
+  }),
+]);
+
+describe("a downed part in the journal", () => {
+  const downedSnap = (partKey: string) => {
+    const enemy = harnessEnemy({
+      defId: "logHarnessBoss",
+      subsystems: [
+        {
+          id: `enemy-0:${partKey}`,
+          key: partKey,
+          hp: 0,
+          hpMax: 8,
+        },
+      ],
+    });
+    return { ...snap, enemies: [enemy] };
+  };
+
+  it("names the part the break belonged to", () => {
+    const after = downedSnap("valveA");
+    const entries = logEntriesFrom(
+      bundle({
+        beats: [
+          {
+            slot: "weaponA",
+            kind: "partDown",
+            amount: 0,
+            targetId: "enemy-0:valveA",
+            after,
+          },
+        ],
+      }),
+      { turn: 2, seq: 5, enemies: after.enemies },
+    );
+    expect(entries[0]?.targetName).toBe(
+      "content:enemies.logHarnessBoss-valveA",
+    );
+  });
+
+  it("names the ascension part that no enemy def declares", () => {
+    const after = downedSnap(A6_ELITE_SUBSYSTEM.id);
+    const entries = logEntriesFrom(
+      bundle({
+        beats: [
+          {
+            slot: "weaponB",
+            kind: "partDown",
+            amount: 0,
+            targetId: `enemy-0:${A6_ELITE_SUBSYSTEM.id}`,
+            after,
+          },
+        ],
+      }),
+      { turn: 2, seq: 6, enemies: [] },
+    );
+    expect(entries[0]?.targetName).toBe(A6_ELITE_SUBSYSTEM.name);
+  });
+
+  it("leaves an ordinary beat without a target name", () => {
+    const entries = logEntriesFrom(
+      bundle({
+        beats: [{ slot: "weaponA", kind: "damage", amount: 4, after: snap }],
+      }),
+      ctx(),
+    );
+    expect(entries[0]?.targetName).toBeUndefined();
   });
 });

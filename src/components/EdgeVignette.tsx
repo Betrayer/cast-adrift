@@ -27,6 +27,8 @@ const FLASH_STYLE: Record<VignetteFlashKind, FlashStyle> = {
   glancing: { color: 'var(--ca-school-green-stroke)', alpha: 0.22, ms: 240 },
   surge: { color: 'var(--ca-school-black-stroke)', alpha: 0.42, ms: 460 },
   toll: { color: 'var(--ca-danger)', alpha: 0.44, ms: 320 },
+  bossPartDown: { color: 'var(--ca-amber)', alpha: 0.46, ms: 300 },
+  weatherEntry: { color: 'var(--ca-accent)', alpha: 0.3, ms: 520 },
 };
 
 const RIM_ALPHA: Record<keyof VignetteRims, number> = {
@@ -72,7 +74,7 @@ export const EdgeVignette = () => {
       node.removeAttribute('data-vignette-flash');
       void node.offsetWidth;
       node.dataset.vignetteSide = flash.side;
-      node.style.setProperty('--vg-color', style.color);
+      node.style.setProperty('--vg-color', flash.color ?? style.color);
       node.style.setProperty('--vg-alpha', String(style.alpha * flash.strength));
       node.style.setProperty('--vg-ms', `${String(style.ms)}ms`);
       node.dataset.vignetteFlash = flash.kind;

@@ -190,6 +190,24 @@ describe("reactor spends", () => {
     expect(useBattleStore.getState().charge).toBe(1);
   });
 
+  it("nudges a grown die against tier plus growth", () => {
+    start();
+    useBattleStore.setState({ charge: 9 });
+    const uid =
+      useBattleStore.getState().dice.find((d) => d.tier === 6)?.uid ?? "";
+    const valueOf = () =>
+      useBattleStore.getState().dice.find((d) => d.uid === uid)?.value;
+    useBattleStore.setState((s) => ({
+      dice: s.dice.map((d) =>
+        d.uid === uid ? { ...d, value: 8, growth: 3 } : d,
+      ),
+    }));
+    useBattleStore.getState().spendNudge(uid, 1);
+    expect(valueOf()).toBe(9);
+    useBattleStore.getState().spendNudge(uid, -1);
+    expect(valueOf()).toBe(8);
+  });
+
   it("bonus reroll raises the selection size for this turn only", () => {
     start();
     useBattleStore.setState({ charge: 5 });
@@ -268,6 +286,28 @@ describe("reroll flow", () => {
       return useBattleStore.getState().dice.map((d) => d.value);
     };
     expect(run()).toEqual(run());
+  });
+
+  it("charges the Tollmaster on every reroll", () => {
+    start(3, ["tollmaster"]);
+    const charge = () => useBattleStore.getState().enemies[0]?.statuses.charge;
+    expect(charge()).toBeUndefined();
+    const first = useBattleStore.getState().dice[0];
+    useBattleStore.getState().toggleRerollMode();
+    useBattleStore.getState().toggleRerollDie(first?.uid ?? "");
+    useBattleStore.getState().confirmReroll();
+    expect(charge()).toBe(1);
+  });
+
+  it("leaves an enemy without the toll uncharged by a reroll", () => {
+    start(3);
+    const first = useBattleStore.getState().dice[0];
+    useBattleStore.getState().toggleRerollMode();
+    useBattleStore.getState().toggleRerollDie(first?.uid ?? "");
+    useBattleStore.getState().confirmReroll();
+    expect(
+      useBattleStore.getState().enemies[0]?.statuses.charge,
+    ).toBeUndefined();
   });
 });
 

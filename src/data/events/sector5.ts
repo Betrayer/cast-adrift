@@ -110,7 +110,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
         ],
       },
       {
-        id: "leadThem",
+        id: "rideWithThem",
         label: "content:events.hereticFleet.opt.leadThem",
         outcomes: [
           {

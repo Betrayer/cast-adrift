@@ -144,10 +144,12 @@ import {
   applyEchoActive,
   applyOfficerActive,
   decidePlacements,
+  forcedTargetId,
   decideReroll,
   echoLookUids,
   readyEcho,
   readyOfficers,
+  rerollValue,
 } from "../src/game/battle/policy";
 import {
   advanceTurn,
@@ -216,6 +218,7 @@ interface BattleInit {
   officers?: readonly string[];
   cargo?: readonly string[];
   echo?: EchoNodeId;
+  killOrder?: readonly string[];
 }
 
 type ModeTally = Partial<Record<FireModeId, number>>;
@@ -265,35 +268,34 @@ const tallyFireModes = (
   }
 };
 
-const WEATHER_ENABLED = process.argv.includes("--weather")
-  ? process.argv[process.argv.indexOf("--weather") + 1] === "on"
-  : false;
+const getArg = (name: string, fallback: string): string => {
+  const index = process.argv.indexOf(`--${name}`);
+  const value = index >= 0 ? process.argv[index + 1] : undefined;
+  return value ?? fallback;
+};
 
-const SALVAGE_ENABLED = process.argv.includes("--salvage")
-  ? process.argv[process.argv.indexOf("--salvage") + 1] !== "off"
-  : true;
+const forcedId = <T extends string>(
+  name: string,
+  ids: readonly T[],
+): T | undefined => ids.find((id) => id === getArg(name, ""));
 
-const CARGO_ENABLED = process.argv.includes("--cargo")
-  ? process.argv[process.argv.indexOf("--cargo") + 1] !== "off"
-  : true;
+const WEATHER_ENABLED = getArg("weather", "") === "on";
 
-const OFFICERS_ENABLED = process.argv.includes("--officers")
-  ? process.argv[process.argv.indexOf("--officers") + 1] !== "off"
-  : true;
+const SALVAGE_ENABLED = getArg("salvage", "") !== "off";
 
-const OFFICER_FORCED: string | undefined = process.argv.includes(
-  "--officer-force",
-)
-  ? OFFICER_IDS.find(
-      (id) => id === process.argv[process.argv.indexOf("--officer-force") + 1],
-    )
-  : undefined;
+const CARGO_ENABLED = getArg("cargo", "") !== "off";
 
-const ECHO_FORCED: EchoNodeId | undefined = process.argv.includes("--echo-force")
-  ? ECHO_NODE_IDS.find(
-      (id) => id === process.argv[process.argv.indexOf("--echo-force") + 1],
-    )
-  : undefined;
+const OFFICERS_ENABLED = getArg("officers", "") !== "off";
+
+const OFFICER_FORCED: string | undefined = forcedId(
+  "officer-force",
+  OFFICER_IDS,
+);
+
+const ECHO_FORCED: EchoNodeId | undefined = forcedId(
+  "echo-force",
+  ECHO_NODE_IDS,
+);
 
 const runStateInit = (init: RunStateInit): RunStateInit => ({
   ...init,
@@ -306,11 +308,15 @@ const runStateInit = (init: RunStateInit): RunStateInit => ({
   echo: init.echo === undefined ? (ECHO_FORCED ?? null) : init.echo,
 });
 
-const FIRE_FORCED: FireModeId | undefined = process.argv.includes("--fire-force")
-  ? FIRE_MODE_IDS.find(
-      (id) => id === process.argv[process.argv.indexOf("--fire-force") + 1],
-    )
-  : undefined;
+const KILL_ORDER: readonly string[] = getArg("kill-order", "")
+  .split(",")
+  .map((key) => key.trim())
+  .filter((key) => key.length > 0);
+
+const FIRE_FORCED: FireModeId | undefined = forcedId(
+  "fire-force",
+  FIRE_MODE_IDS,
+);
 
 const forceFireModes = (snapshot: BattleSnapshot): void => {
   if (FIRE_FORCED === undefined) return;
@@ -326,11 +332,22 @@ const forceFireModes = (snapshot: BattleSnapshot): void => {
   }
 };
 
-const getArg = (name: string, fallback: string): string => {
-  const index = process.argv.indexOf(`--${name}`);
-  const value = index >= 0 ? process.argv[index + 1] : undefined;
-  return value ?? fallback;
+const simStamp = (startedAt: number): string =>
+  new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+
+const writeSimCsvAs = (fileName: string, rows: readonly string[]): string => {
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, fileName);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  return outPath;
 };
+
+const writeSimCsv = (
+  name: string,
+  rows: readonly string[],
+  startedAt: number,
+): string => writeSimCsvAs(`${name}-${simStamp(startedAt)}.csv`, rows);
 
 const applyPlacement = (
   snapshot: BattleSnapshot,
@@ -487,7 +504,7 @@ const simulateBattle = (
     if (rerollUids.length > 0) {
       snapshot.dice = snapshot.dice.map((d) =>
         rerollUids.includes(d.uid) && d.state === "tray"
-          ? { ...d, value: streams.dice.int(1, d.tier) }
+          ? { ...d, value: rerollValue(d, snapshot, streams.dice) }
           : d,
       );
       for (const live of snapshot.enemies) {
@@ -503,7 +520,10 @@ const simulateBattle = (
       if (look.length > 0 && ready !== undefined) {
         snapshot.dice = snapshot.dice.map((d) =>
           look.includes(d.uid) && d.state === "tray"
-            ? { ...d, value: Math.max(d.value, streams.dice.int(1, d.tier)) }
+            ? {
+                ...d,
+                value: Math.max(d.value, rerollValue(d, snapshot, streams.dice)),
+              }
             : d,
         );
         spent.push(echoToken(ready));
@@ -515,7 +535,12 @@ const simulateBattle = (
         bumpActive(activeReady, def.id);
       }
     }
-    const decision = decidePlacements(snapshot, spent);
+    const order = init.killOrder ?? KILL_ORDER;
+    const decision = decidePlacements(
+      snapshot,
+      spent,
+      order.length === 0 ? undefined : forcedTargetId(snapshot, order),
+    );
     if (decision.targetId !== null) snapshot.targetId = decision.targetId;
     for (const placement of decision.placements) {
       if (placement.slot === "reactor" && overflows(snapshot, placement.uid)) {
@@ -1380,11 +1405,7 @@ const driftModeMain = (runs: number, seed: number, startedAt: number): void => {
       .map(([s, n]) => `${String(s)},${String(n)}`),
   ];
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `drift-${deckName}-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv(`drift-${deckName}`, rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms (${String(runs)} drift runs, seed ${String(seed)})`,
   );
@@ -1486,11 +1507,7 @@ const runModeMain = (runs: number, seed: number, startedAt: number): void => {
     toRow("resonance_false", sF),
   ].join("\n");
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `run-${stamp}.csv`);
-  writeFileSync(outPath, `${csv}\n${histCsv}\n`, "utf8");
+  const outPath = writeSimCsv("run", [csv, histCsv], startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms (${String(runs)} sector runs, seed ${String(seed)})`,
   );
@@ -1596,11 +1613,7 @@ const battleModeMain = (
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsvAs(`${simStamp(startedAt)}.csv`, rows);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms (${String(runs)} runs × ${String(encounters.length)} config(s), seed ${String(seed)})`,
   );
@@ -1723,11 +1736,7 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
       );
     }
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `gate-${kind}-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv(`gate-${kind}`, rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
 };
 
@@ -1974,11 +1983,7 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
     `  ${String(cliffs)} gap(s) over ${String(LADDER_GAP_PP)}pp | ${String(rises)} act(s) easier than the one before`,
   );
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `sweep-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("sweep", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (cliffs > 0 || rises > 0) process.exitCode = 1;
 };
@@ -2158,11 +2163,7 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
   console.log(
     `  ${String(out)} of ${String(LADDER_BANDS.length * 2)} checked cell(s) outside ±${String(LADDER_BAND_PP)}pp`,
   );
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `ladder-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("ladder", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (out > 0) process.exitCode = 1;
 };
@@ -2297,11 +2298,7 @@ const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
     rows.push(`${row.tag},${String(row.n)},${row.mean.toFixed(2)}`);
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `perks-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("perks", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(dead.length)} dead, ${String(dominant.length)} dominant`,
   );
@@ -2520,11 +2517,7 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `economy-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("economy", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   const verdict = economyFailureLines(
     { envelopeRows: envelopeFailures, cargoShareRows: shareFailures },
@@ -2598,11 +2591,7 @@ const diceModeMain = (runs: number, seed: number, startedAt: number): void => {
       ? `  no die below the ${String(DEAD_DIE_LINE)}% dead-weight line`
       : `  BELOW ${String(DEAD_DIE_LINE)}%: ${dead.map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
   );
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `dice-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("dice", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(dead.length)} dead of ${String(ALL_DICE.length)}`,
   );
@@ -3008,11 +2997,7 @@ const campaignModeMain = (
       `    T${String(tier)} entered ${String(tally.entered)} · solved ${((tally.solved / tally.entered) * 100).toFixed(1)}% · ${(tally.attempts / tally.entered).toFixed(2)} attempts · ${(tally.paid / tally.entered).toFixed(1)} scrap staked`,
     );
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `campaign-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("campaign", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (mean < CAMPAIGN_BAND[0] || mean > CAMPAIGN_BAND[1]) process.exitCode = 1;
 };
@@ -3076,11 +3061,7 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
     );
     rows.push(`${ship.id},banded mean,,${mean.toFixed(3)},,`);
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `ships-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("ships", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (outOfBand > 0) process.exitCode = 1;
 };
@@ -3158,11 +3139,7 @@ const puzzleModeMain = (runs: number, seed: number, startedAt: number): void => 
       ? "  no puzzle is a guaranteed solve inside its budget"
       : `  guaranteed inside budget: ${maxed.map((p) => p.id).join(" ")}`,
   );
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `puzzles-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("puzzles", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(failures)} tier(s) off the bell`,
   );
@@ -3256,11 +3233,7 @@ const deepModeMain = (runs: number, seed: number, startedAt: number): void => {
       }
     }
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `deep-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("deep", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   console.log(
     outOfBand === 0
@@ -3415,11 +3388,7 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `roster-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("roster", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(failures)} out of band, ${String(unfair)} unfair pair(s)`,
   );
@@ -3539,10 +3508,7 @@ const axisModeMain = (runs: number, seed: number, startedAt: number): void => {
       `${row.policy},${mean.toFixed(2)},${String(min)},${String(max)},${reach.toFixed(0)},${perRun.toFixed(2)},${driftPerRun.toFixed(2)}`,
     );
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const outPath = join(outDir, `axis-${String(seed)}.csv`);
-  writeFileSync(outPath, `${csv.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsvAs(`axis-${String(seed)}.csv`, csv);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`,
   );
@@ -3758,16 +3724,13 @@ const metaModeMain = (_runs: number, _seed: number, startedAt: number): void => 
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
   const csv = ["profile,runsToL50,xpPerRun,shardsAtL50,shardsPerRun"];
   for (const row of rows) {
     csv.push(
       `${row.profile},${String(row.tally.runs)},${(row.tally.xp / row.tally.runs).toFixed(0)},${String(row.tally.shards)},${(row.tally.shards / row.tally.runs).toFixed(0)}`,
     );
   }
-  const outPath = join(outDir, "meta-curve.csv");
-  writeFileSync(outPath, `${csv.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsvAs("meta-curve.csv", csv);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (outOfBand) process.exitCode = 1;
 };
@@ -3897,11 +3860,7 @@ const fireModeMain = (runs: number, seed: number, startedAt: number): void => {
       `${mode},${String(total.offered[mode] ?? 0)},${String(total.armed[mode] ?? 0)},${shareOf(total, mode).toFixed(3)}`,
     );
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `fire-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("fire", rows, startedAt);
 
   const dominant = acquired.filter(
     (mode) =>
@@ -4017,11 +3976,7 @@ const crewModeMain = (runs: number, seed: number, startedAt: number): void => {
       );
     }
   }
-  const outDir = join(process.cwd(), 'sim-out');
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, '-');
-  const outPath = join(outDir, `crew-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join('\n')}\n`, 'utf8');
+  const outPath = writeSimCsv("crew", rows, startedAt);
   console.log(
     over === 0
       ? `  no officer is worth more than +${String(CREW_BAND_PP)}pp of act winrate`
@@ -4193,11 +4148,7 @@ const echoModeMain = (runs: number, seed: number, startedAt: number): void => {
       );
     }
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `echo-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("echo", rows, startedAt);
   console.log(
     over === 0
       ? `  no measured node is worth more than +${String(ECHO_BAND_PP)}pp of act winrate`
@@ -4212,116 +4163,47 @@ const echoModeMain = (runs: number, seed: number, startedAt: number): void => {
   if (over > 0 || leaks > 0) process.exitCode = 1;
 };
 
+interface SimMode {
+  readonly runs: number;
+  readonly main: (runs: number, seed: number, startedAt: number) => void;
+}
+
+const BATTLE_MODE: SimMode = { runs: 1000, main: battleModeMain };
+
+const MODES: Readonly<Record<string, SimMode>> = {
+  run: { runs: 300, main: runModeMain },
+  drift: { runs: 1000, main: driftModeMain },
+  gate: { runs: 1000, main: gateModeMain },
+  sweep: { runs: 500, main: sweepModeMain },
+  ladder: { runs: 200, main: ladderModeMain },
+  perks: { runs: 60, main: perkModeMain },
+  economy: { runs: 200, main: economyModeMain },
+  roster: { runs: 40, main: rosterModeMain },
+  deep: { runs: 300, main: deepModeMain },
+  s6: { runs: 300, main: deepModeMain },
+  campaign: { runs: 200, main: campaignModeMain },
+  ships: { runs: 200, main: shipsModeMain },
+  puzzles: { runs: 60, main: puzzleModeMain },
+  dice: { runs: 200, main: diceModeMain },
+  fire: { runs: 20, main: fireModeMain },
+  crew: { runs: 200, main: crewModeMain },
+  echo: { runs: 200, main: echoModeMain },
+  axis: { runs: 200, main: axisModeMain },
+  meta: { runs: 1000, main: metaModeMain },
+  battle: BATTLE_MODE,
+};
+
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
-  const defaultRuns =
-    mode === "run"
-      ? "300"
-      : mode === "ladder"
-        ? "200"
-      : mode === "sweep"
-        ? "500"
-        : mode === "perks"
-          ? "60"
-          : mode === "economy"
-            ? "200"
-            : mode === "roster"
-              ? "40"
-              : mode === "deep" || mode === "s6"
-                ? "300"
-                : mode === "axis"
-                  ? "200"
-                  : mode === "campaign" || mode === "ships"
-                    ? "200"
-                    : mode === "puzzles"
-                      ? "60"
-                      : mode === "dice"
-                        ? "200"
-                        : mode === "fire"
-                          ? "20"
-                          : mode === "crew" || mode === "echo"
-                            ? "200"
-                            : "1000";
-  const runs = Number(getArg("runs", defaultRuns));
+  const entry = MODES[mode] ?? BATTLE_MODE;
+  const runs = Number(getArg("runs", String(entry.runs)));
   const seed = Number(getArg("seed", "7"));
   if (!Number.isFinite(runs) || runs <= 0) {
     console.error(`sim: invalid --runs "${getArg("runs", "1000")}"`);
     process.exit(1);
   }
-  if (mode === "run") {
-    runModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "drift") {
-    driftModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "gate") {
-    gateModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "sweep") {
-    sweepModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "ladder") {
-    ladderModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "perks") {
-    perkModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "economy") {
-    economyModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "roster") {
-    rosterModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "deep" || mode === "s6") {
-    deepModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "campaign") {
-    campaignModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "ships") {
-    shipsModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "puzzles") {
-    puzzleModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "dice") {
-    diceModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "fire") {
-    fireModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "crew") {
-    crewModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "echo") {
-    echoModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "axis") {
-    axisModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "meta") {
-    metaModeMain(runs, seed, startedAt);
-    return;
-  }
-  battleModeMain(runs, seed, startedAt);
+  entry.main(runs, seed, startedAt);
 };
 
 main();

@@ -1,19 +1,28 @@
-import { bossDef, sub } from "@/data/enemies/builder";
+import { bossDef, PART_HP, partCycle, sub } from "@/data/enemies/builder";
 import type { BossDef } from "@/types/content";
 
 export const BOSSES: readonly BossDef[] = [
   bossDef({
     id: "quarantineWarden",
-    hp: 66,
-    boss: true,
+    hp: 42,
+    shell: true,
+    coreLockAt: 1,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "aura", is: "shieldSelf6" },
       { k: "intent", t: "jamSlot" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("quarantineWarden", "lance", 14, "atk+3"),
-      sub("quarantineWarden", "aegis", 14, "shieldSelf6"),
+      sub("quarantineWarden", "lance", PART_HP, "atk+3", {
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+      sub("quarantineWarden", "aegis", PART_HP, "shieldSelf6", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("quarantineWarden", "siren", PART_HP, undefined, {
+        intents: partCycle({ t: "shield", n: 6 }),
+      }),
     ],
     phases: [
       {
@@ -33,30 +42,36 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "shield", n: 8 }],
       },
     ],
-    pattern: [
-      { t: "shield", n: 6 },
-      { t: "attack", n: 8 },
-    ],
   }),
   bossDef({
     id: "beaconTrap",
-    hp: 70,
-    boss: true,
+    hp: 50,
+    shell: true,
+    coreLockAt: 1,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "intent", t: "shieldGate" },
       { k: "intent", t: "siphonShield" },
+      { k: "partIntent", t: "siphonShield" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("beaconTrap", "lensA", 14, "shieldSelf6"),
-      sub("beaconTrap", "lensB", 14, "shieldAllies3"),
+      sub("beaconTrap", "lensA", PART_HP, "shieldSelf6", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("beaconTrap", "lensB", PART_HP, undefined, {
+        intents: partCycle({ t: "siphonShield", n: 5 }),
+      }),
+      sub("beaconTrap", "prism", PART_HP, "lockEvery3", {
+        onDeath: { t: "explodePart", n: 5 },
+      }),
     ],
     phases: [
       {
         untilHpPct: 50,
         pattern: [
           { t: "shieldGate", n: 6 },
-          { t: "siphonShield", n: 5 },
+          { t: "idle" },
           { t: "attack", n: 7 },
         ],
       },
@@ -71,32 +86,35 @@ export const BOSSES: readonly BossDef[] = [
         everyTurn: [{ t: "siphonShield", n: 3 }],
       },
     ],
-    pattern: [
-      { t: "shieldGate", n: 6 },
-      { t: "siphonShield", n: 5 },
-      { t: "attack", n: 7 },
-    ],
   }),
   bossDef({
     id: "breakerBarge",
-    hp: 59,
-    boss: true,
-    stealOnHit: 6,
+    hp: 36,
+    shell: true,
+    coreLockAt: 1,
+    stealOnHit: 3,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "stealOnHit" },
       { k: "aura", is: "lockEvery3" },
-      { k: "trait", is: "phases" },
+      { k: "intent", t: "stealScrap" },
     ],
     subsystems: [
-      sub("breakerBarge", "grinder", 14, "stealOnHit6"),
-      sub("breakerBarge", "crane", 14, "lockEvery3"),
+      sub("breakerBarge", "grinder", PART_HP, "stealOnHit6"),
+      sub("breakerBarge", "crane", PART_HP, "lockEvery3", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("breakerBarge", "maw", PART_HP, undefined, {
+        intents: partCycle({ t: "stealScrap", n: 6 }),
+        onDeath: { t: "explodePart", n: 4 },
+      }),
     ],
     phases: [
       {
         untilHpPct: 40,
         pattern: [
           { t: "attack", n: 6 },
-          { t: "stealScrap", n: 6 },
+          { t: "idle" },
           { t: "multi", n: 3, k: 2 },
         ],
       },
@@ -110,25 +128,29 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "charge" }],
       },
     ],
-    pattern: [
-      { t: "attack", n: 6 },
-      { t: "stealScrap", n: 6 },
-      { t: "multi", n: 3, k: 2 },
-    ],
   }),
   bossDef({
     id: "auctionCorvette",
-    hp: 104,
-    boss: true,
+    hp: 93,
+    shell: true,
+    coreLockAt: 1,
     stealOnHit: 5,
     claims: [
       { k: "intent", t: "bargain" },
       { k: "trait", is: "stealOnHit" },
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("auctionCorvette", "gavel", 14, "stealOnHit6"),
-      sub("auctionCorvette", "ledger", 14, "atk+2"),
+      sub("auctionCorvette", "gavel", PART_HP, "stealOnHit6", {
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+      sub("auctionCorvette", "ledger", PART_HP, "atk+2", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("auctionCorvette", "podium", PART_HP, undefined, {
+        onDeath: { t: "shieldCore", n: 8 },
+      }),
     ],
     phases: [
       {
@@ -149,24 +171,26 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "charge" }],
       },
     ],
-    pattern: [
-      { t: "bargain", n: 7, heal: 4 },
-      { t: "attack", n: 11 },
-      { t: "multi", n: 4, k: 2 },
-    ],
   }),
   bossDef({
     id: "riftMaw",
-    hp: 78,
-    boss: true,
+    hp: 44,
+    shell: true,
+    coreLockAt: 1,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "aura", is: "twistEachTurn" },
       { k: "intent", t: "capShrink" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("riftMaw", "eyeA", 12, "twistEachTurn"),
-      sub("riftMaw", "eyeB", 12, "twistEachTurn"),
+      sub("riftMaw", "eyeA", PART_HP, "twistEachTurn", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("riftMaw", "eyeB", PART_HP, "twistEachTurn"),
+      sub("riftMaw", "gullet", PART_HP, undefined, {
+        onDeath: { t: "explodePart", n: 5 },
+      }),
     ],
     phases: [
       {
@@ -186,23 +210,28 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "capShrink" }],
       },
     ],
-    pattern: [
-      { t: "multi", n: 4, k: 2 },
-      { t: "attack", n: 5 },
-    ],
   }),
   bossDef({
     id: "riftBranch",
-    hp: 68,
-    boss: true,
+    hp: 55,
+    shell: true,
+    coreLockAt: 1,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "intent", t: "capShrink" },
       { k: "intent", t: "curseDie" },
+      { k: "partIntent", t: "curseDie" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("riftBranch", "budA", 12, "twistEachTurn"),
-      sub("riftBranch", "budB", 12, "shieldSelf6"),
+      sub("riftBranch", "budA", PART_HP, "twistEachTurn", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("riftBranch", "budB", PART_HP, "shieldSelf6"),
+      sub("riftBranch", "thorn", PART_HP, undefined, {
+        intents: partCycle({ t: "curseDie", n: 3 }),
+        onDeath: { t: "spawnAdds", id: "riftling" },
+      }),
     ],
     phases: [
       {
@@ -210,7 +239,7 @@ export const BOSSES: readonly BossDef[] = [
         pattern: [
           { t: "capShrink" },
           { t: "multi", n: 5, k: 3 },
-          { t: "curseDie", n: 3 },
+          { t: "idle" },
         ],
       },
       {
@@ -224,31 +253,33 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "curseDie", n: 3 }],
       },
     ],
-    pattern: [
-      { t: "capShrink" },
-      { t: "multi", n: 5, k: 3 },
-      { t: "curseDie", n: 3 },
-    ],
   }),
   bossDef({
     id: "choirFlagship",
-    hp: 81,
-    boss: true,
+    hp: 57,
+    shell: true,
+    coreLockAt: 1,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "aura", is: "chargeAllies" },
       { k: "aura", is: "summonEvery4" },
-      { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("choirFlagship", "spire", 14, "chargeAllies"),
-      sub("choirFlagship", "voice", 14, "summonEvery4"),
+      sub("choirFlagship", "spire", PART_HP, "chargeAllies", {
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+      sub("choirFlagship", "voice", PART_HP, "summonEvery4"),
+      sub("choirFlagship", "censer", PART_HP, undefined, {
+        intents: partCycle({ t: "charge" }),
+        onDeath: { t: "openCore", turns: 2 },
+      }),
     ],
     phases: [
       {
         untilHpPct: 55,
         pattern: [
           { t: "multi", n: 3, k: 2 },
-          { t: "charge" },
+          { t: "idle" },
           { t: "attack", n: 7 },
         ],
       },
@@ -262,31 +293,36 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "shieldAll", n: 8 }],
       },
     ],
-    pattern: [
-      { t: "multi", n: 3, k: 2 },
-      { t: "charge" },
-      { t: "attack", n: 7 },
-    ],
   }),
   bossDef({
     id: "cantorColossus",
-    hp: 45,
-    boss: true,
+    hp: 42,
+    shell: true,
+    coreLockAt: 1,
     jamClearsRage: true,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "jamClearsRage" },
       { k: "intent", t: "enrage" },
+      { k: "partIntent", t: "enrage" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("cantorColossus", "lungA", 16, "atk+3"),
-      sub("cantorColossus", "lungB", 16, "shieldSelf6"),
+      sub("cantorColossus", "lungA", PART_HP, "atk+3", {
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+      sub("cantorColossus", "lungB", PART_HP, "shieldSelf6", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("cantorColossus", "diaphragm", PART_HP, undefined, {
+        intents: partCycle({ t: "enrage", n: 2 }),
+      }),
     ],
     phases: [
       {
         untilHpPct: 45,
         pattern: [
-          { t: "enrage", n: 2 },
+          { t: "idle" },
           { t: "attack", n: 7 },
           { t: "shield", n: 7 },
         ],
@@ -301,25 +337,27 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "shield", n: 8 }],
       },
     ],
-    pattern: [
-      { t: "enrage", n: 2 },
-      { t: "attack", n: 7 },
-      { t: "shield", n: 7 },
-    ],
   }),
   bossDef({
     id: "coreHeart",
-    hp: 82,
-    boss: true,
+    hp: 73,
     shell: true,
+    coreLockAt: 1,
     claims: [
-      { k: "trait", is: "shell" },
+      { k: "trait", is: "coreLock" },
       { k: "intent", t: "storm" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("coreHeart", "valveA", 12, "shieldSelf6"),
-      sub("coreHeart", "valveB", 12, "twistEachTurn"),
+      sub("coreHeart", "valveA", PART_HP, "shieldSelf6", {
+        onDeath: { t: "shieldCore", n: 8 },
+      }),
+      sub("coreHeart", "valveB", PART_HP, "twistEachTurn", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("coreHeart", "vent", PART_HP, undefined, {
+        intents: partCycle({ t: "shield", n: 8 }),
+      }),
     ],
     phases: [
       {
@@ -348,24 +386,26 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "shield", n: 10 }],
       },
     ],
-    pattern: [
-      { t: "shield", n: 8 },
-      { t: "multi", n: 5, k: 2 },
-    ],
   }),
   bossDef({
     id: "mirrorHeart",
-    hp: 76,
-    boss: true,
+    hp: 46,
     shell: true,
+    coreLockAt: 1,
     claims: [
       { k: "intent", t: "mirrorSchool" },
-      { k: "trait", is: "shell" },
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "phases" },
     ],
     subsystems: [
-      sub("mirrorHeart", "faceA", 12, "twistEachTurn"),
-      sub("mirrorHeart", "faceB", 12, "shieldSelf6"),
+      sub("mirrorHeart", "faceA", PART_HP, "twistEachTurn", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("mirrorHeart", "faceB", PART_HP, "shieldSelf6"),
+      sub("mirrorHeart", "pane", PART_HP, undefined, {
+        intents: partCycle({ t: "shield", n: 8 }),
+        onDeath: { t: "explodePart", n: 6 },
+      }),
     ],
     phases: [
       {
@@ -396,31 +436,36 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "shield", n: 10 }],
       },
     ],
-    pattern: [
-      { t: "shield", n: 8 },
-      { t: "mirrorSchool" },
-      { t: "multi", n: 5, k: 2 },
-    ],
   }),
   bossDef({
     id: "theHush",
-    hp: 51,
-    boss: true,
+    hp: 30,
+    shell: true,
+    coreLockAt: 1,
     jamReleasesBlocks: true,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "intent", t: "jamSlot" },
+      { k: "partIntent", t: "jamSlot" },
       { k: "trait", is: "phases" },
       { k: "trait", is: "jamReleasesBlocks" },
     ],
     subsystems: [
-      sub("theHush", "throat", 16, "shieldSelf6"),
-      sub("theHush", "bell", 16, "atk+3"),
+      sub("theHush", "throat", PART_HP, "shieldSelf6", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("theHush", "bell", PART_HP, "atk+3", {
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+      sub("theHush", "muffler", PART_HP, undefined, {
+        intents: partCycle({ t: "jamSlot" }),
+      }),
     ],
     phases: [
       {
         untilHpPct: 66,
         pattern: [
-          { t: "jamSlot" },
+          { t: "idle" },
           { t: "shield", n: 8 },
           { t: "attack", n: 10 },
         ],
@@ -445,24 +490,26 @@ export const BOSSES: readonly BossDef[] = [
         onEnter: [{ t: "shield", n: 10 }],
       },
     ],
-    pattern: [
-      { t: "jamSlot" },
-      { t: "shield", n: 8 },
-      { t: "attack", n: 10 },
-    ],
   }),
   bossDef({
     id: "echoFleet",
-    hp: 126,
-    boss: true,
+    hp: 86,
+    shell: true,
+    coreLockAt: 1,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "phases" },
-      { k: "aura", is: "twistEachTurn" },
       { k: "aura", is: "lockEvery3" },
     ],
     subsystems: [
-      sub("echoFleet", "wake", 14, "twistEachTurn"),
-      sub("echoFleet", "chorus", 14, "lockEvery3"),
+      sub("echoFleet", "wake", PART_HP, "twistEachTurn", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("echoFleet", "chorus", PART_HP, "lockEvery3"),
+      sub("echoFleet", "ghost", PART_HP, undefined, {
+        intents: partCycle({ t: "siphonShield", n: 6 }),
+        onDeath: { t: "explodePart", n: 6 },
+      }),
     ],
     phases: [
       {
@@ -471,7 +518,7 @@ export const BOSSES: readonly BossDef[] = [
           { t: "shieldGate", n: 10 },
           { t: "stealScrap", n: 8 },
           { t: "multi", n: 3, k: 2 },
-          { t: "siphonShield", n: 6 },
+          { t: "idle" },
         ],
       },
       {
@@ -497,7 +544,7 @@ export const BOSSES: readonly BossDef[] = [
     pattern: [
       { t: "shieldGate", n: 8 },
       { t: "stealScrap", n: 8 },
-      { t: "siphonShield", n: 6 },
+      { t: "idle" },
     ],
   }),
 ];

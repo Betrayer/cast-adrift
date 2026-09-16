@@ -11,7 +11,7 @@ import { resolveDieReward } from "@/game/run/flow";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
-import { resolveReducedMotion, useSettingsStore } from "@/stores/settingsStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import { useRunStore } from "@/stores/runStore";
 import styles from "./Rewards.module.css";
 
@@ -19,9 +19,7 @@ export const DieReward = ({ dieId }: { dieId: string }) => {
   const { t } = useTranslation(["run", "battle", "content"]);
   const deckSize = useRunStore((s) => s.deck.length);
   const engravings = useMetaStore((s) => s.engravings);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
   const rarity = DIE_BY_ID.get(dieId)?.rarity;
 
   useEffect(() => {

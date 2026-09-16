@@ -44,22 +44,10 @@ export const SystemMenu = () => {
     <AppSheet
       label={t('run:system.title')}
       testId="system-menu"
+      closeLabel={t('run:system.resume')}
+      closeTestId="system-resume"
       onClose={close}
     >
-      <div className={styles.head}>
-        <Text fw={700} c={tokens.text}>
-          {t('run:system.title')}
-        </Text>
-        <Button
-          size="compact-sm"
-          variant="subtle"
-          color="gray"
-          data-testid="system-resume"
-          onClick={close}
-        >
-          {t('run:system.resume')}
-        </Button>
-      </div>
       <div className={styles.body}>
         {entry(
           'build',

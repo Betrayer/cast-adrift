@@ -6,6 +6,7 @@ import { createStream } from "@/services/rng";
 import { INTENT_KINDS, type Intent } from "@/types/content";
 
 const SAMPLES: readonly Intent[] = [
+  { t: "idle" },
   { t: "attack", n: 5 },
   { t: "attack", n: 9, self: 2 },
   { t: "multi", n: 3, k: 2 },
@@ -96,5 +97,122 @@ describe("mitigation view", () => {
     const enemy = snapshot.enemies[0];
     if (enemy === undefined) throw new Error("no enemy");
     expect(mitigationOf(snapshot, enemy).raw).toBe(0);
+  });
+});
+
+describe("mitigation across a conglomerate", () => {
+  const conglomerate = () =>
+    harnessSnap([], {
+      hull: 30,
+      hullMax: 30,
+      shield: 0,
+      evasion: null,
+      enemies: [
+        harnessEnemy({
+          nextIntent: { t: "drainCharge", n: 3 },
+          subsystems: [
+            {
+              id: "enemy-0:lance",
+              key: "lance",
+              hp: 8,
+              hpMax: 8,
+              intentIndex: 0,
+              nextIntent: { t: "attack", n: 7 },
+            },
+            {
+              id: "enemy-0:aegis",
+              key: "aegis",
+              hp: 0,
+              hpMax: 8,
+              intentIndex: 0,
+              nextIntent: { t: "attack", n: 9 },
+            },
+          ],
+        }),
+      ],
+    });
+
+  it("counts a living part's attack behind a core intent that lands nothing", () => {
+    const snapshot = conglomerate();
+    const enemy = snapshot.enemies[0];
+    if (enemy === undefined) throw new Error("no enemy");
+    const view = mitigationOf(snapshot, enemy);
+    expect(view.raw).toBe(7);
+    expect(view.hull).toBeGreaterThan(0);
+  });
+
+  it("ignores a downed part's queued intent", () => {
+    const snapshot = conglomerate();
+    const enemy = snapshot.enemies[0];
+    if (enemy === undefined) throw new Error("no enemy");
+    expect(mitigationOf(snapshot, enemy).raw).toBe(7);
+  });
+
+  it("leaves the enemy's statuses untouched", () => {
+    const snapshot = conglomerate();
+    const enemy = snapshot.enemies[0];
+    if (enemy === undefined) throw new Error("no enemy");
+    enemy.statuses.charge = 1;
+    mitigationOf(snapshot, enemy);
+    expect(enemy.statuses.charge).toBe(1);
+  });
+
+  it("spends charge once across the chain, as the enemy phase does", () => {
+    const snapshot = conglomerate();
+    const enemy = snapshot.enemies[0];
+    if (enemy === undefined) throw new Error("no enemy");
+    enemy.nextIntent = { t: "attack", n: 4 };
+    enemy.statuses.charge = 1;
+    expect(mitigationOf(snapshot, enemy).raw).toBe(15);
+  });
+});
+
+describe("mitigation and the charge aura", () => {
+  const board = (turn: number) =>
+    harnessSnap([], {
+      turn,
+      hull: 30,
+      hullMax: 30,
+      shield: 0,
+      evasion: null,
+      enemies: [
+        harnessEnemy({ id: "enemy-0", nextIntent: { t: "attack", n: 6 } }),
+        harnessEnemy({
+          id: "enemy-1",
+          nextIntent: { t: "idle" },
+          subsystems: [
+            {
+              id: "enemy-1:hymn",
+              key: "hymn",
+              hp: 5,
+              hpMax: 5,
+              aura: "chargeAllies",
+            },
+          ],
+        }),
+      ],
+    });
+
+  it("doubles a neighbour's sheet on the turn the aura fires", () => {
+    const quiet = board(2);
+    const quietEnemy = quiet.enemies[0];
+    if (quietEnemy === undefined) throw new Error("no enemy");
+    expect(mitigationOf(quiet, quietEnemy).raw).toBe(6);
+
+    const charged = board(3);
+    const chargedEnemy = charged.enemies[0];
+    if (chargedEnemy === undefined) throw new Error("no enemy");
+    expect(mitigationOf(charged, chargedEnemy).raw).toBe(12);
+    expect(chargedEnemy.statuses.charge).toBeUndefined();
+  });
+
+  it("leaves the sheet alone once the aura part is dead", () => {
+    const charged = board(3);
+    const part = charged.enemies[1]?.subsystems[0];
+    if (part === undefined) throw new Error("no aura part");
+    part.hp = 0;
+    const enemy = charged.enemies[0];
+    if (enemy === undefined) throw new Error("no enemy");
+    expect(mitigationOf(charged, enemy).raw).toBe(6);
   });
 });

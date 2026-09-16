@@ -75,7 +75,8 @@
     "hijack": "Il s'empare de ton meilleur dé",
     "echoTotal": "reprend votre dernier tour ({{n}} maximum)",
     "foldOrder": "traite la commande",
-    "devourDie": "utilise ton meilleur dé de réserve"
+    "devourDie": "utilise ton meilleur dé de réserve",
+    "idle": "Tient"
   },
   "slot": {
     "weaponA": "Arme A",
@@ -140,8 +141,8 @@
   "dieMeta": "d{{tier}} · {{school}} · {{faces}} · moy. {{ev}}",
   "targetBody": "Viser la coque",
   "targetSub": "{{name}} {{hp}}/{{max}}",
-  "mitigation": "brut {{raw}} → ~{{expected}} · bouclier {{shield}} · coque {{hull}}",
-  "mitigationNone": "Cette intention ne fait aucun dégât",
+  "mitigation": "entrant brut {{raw}} → ~{{expected}} · bouclier {{shield}} · coque {{hull}}",
+  "mitigationNone": "Cet ennemi ne fait aucun dégât ce tour-ci",
   "forecast": "tu infliges {{out}} · tu encaisses ~{{inc}} (le bouclier tient {{shield}})",
   "forecastClear": "{{out}} de dégâts nettoient le terrain",
   "resBoard": "{{school}} {{placed}}+{{tray}}",
@@ -299,7 +300,8 @@
     "hijack": "Attrape ton dé le plus haut et le cloue dans un emplacement de son choix.",
     "echoTotal": "Renvoie les dégâts du tour précédent, plafonnés à {{n}}.",
     "foldOrder": "Replie l’ordre de résolution pendant deux tours.",
-    "devourDie": "Dévore ton dé le plus haut : il tombe à 1 et l’ennemi gagne autant de bouclier."
+    "devourDie": "Dévore ton dé le plus haut : il tombe à 1 et l’ennemi gagne autant de bouclier.",
+    "idle": "Ne fait rien ce tour-ci."
   },
   "aura": {
     "atk+2": "+2 à chaque coup de cet ennemi.",
@@ -313,6 +315,16 @@
     "summonEvery4": "Tous les quatre tours : appelle un acolyte.",
     "stealOnHit6": "Chaque coup qui passe prélève 6 ferraille."
   },
+  "partDeath": {
+    "explodePart": "La briser te frappe pour {{n}}.",
+    "enrageCore": "La briser enrage le cœur : +{{n}} à chaque coup suivant.",
+    "openCore": "La briser ouvre le cœur pour {{turns}} tours.",
+    "shieldCore": "La briser donne {{n}} bouclier au cœur.",
+    "spawnAdds": "La briser appelle un autre vaisseau."
+  },
+  "coreSealed": "Cœur scellé",
+  "coreSealedWhy": "La coque reste fermée tant que {{n}} pièces de plus ne sont pas brisées.",
+  "coreOpenWhy": "La coque reste ouverte jusqu’à la fin du tour {{n}}.",
   "statusName": {
     "burn": "Brûlure",
     "mark": "Vulnérable",
@@ -360,7 +372,8 @@
       "sensor": "vulnérable + {{n}}",
       "charge": "+{{n}} Charge",
       "repair": "+{{n}} Coque",
-      "storm": "léger déplacement de la tempête"
+      "storm": "léger déplacement de la tempête",
+      "partDown": "pièce « {{name}} » détruite"
     },
     "foe": {
       "attack": "attaques visant {{n}}",

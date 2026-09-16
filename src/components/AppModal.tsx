@@ -1,5 +1,7 @@
-import { FocusTrap } from '@mantine/core';
+import { Button, FocusTrap, Text, type ButtonProps } from '@mantine/core';
 import type { ReactNode } from 'react';
+import { cx } from '@/app/cx';
+import { tokens } from '@/app/theme';
 import { useEscapeKey, type DismissPolicy } from '@/components/dismiss';
 import styles from './AppModal.module.css';
 
@@ -15,6 +17,12 @@ interface SurfaceProps {
   className?: string;
 }
 
+interface SheetProps extends SurfaceProps {
+  closeLabel?: string;
+  closeTestId?: string;
+  closeSize?: ButtonProps['size'];
+}
+
 const useSurface = (
   dismiss: DismissPolicy,
   onClose: () => void,
@@ -26,9 +34,6 @@ const useSurface = (
     onClose();
   };
 };
-
-const classes = (...names: (string | undefined)[]): string =>
-  names.filter((name) => name !== undefined && name !== '').join(' ');
 
 export const AppModal = ({
   children,
@@ -44,11 +49,11 @@ export const AppModal = ({
   const onScrimClick = useSurface(dismiss, onClose);
   return (
     <div
-      className={classes(
+      className={cx(
         styles.scrim,
         styles.center,
-        ceremony ? styles.scrimCeremony : undefined,
-        blur ? styles.blurred : undefined,
+        ceremony && styles.scrimCeremony,
+        blur && styles.blurred,
       )}
       data-app-modal={testId ?? label}
       onClick={onScrimClick}
@@ -60,10 +65,7 @@ export const AppModal = ({
           aria-label={label}
           tabIndex={-1}
           data-testid={testId}
-          className={classes(
-            plain ? styles.panelModalPlain : styles.panelModal,
-            className,
-          )}
+          className={cx(plain ? styles.panelModalPlain : styles.panelModal, className)}
         >
           {children}
         </div>
@@ -81,15 +83,14 @@ export const AppSheet = ({
   plain = false,
   blur = false,
   className,
-}: SurfaceProps) => {
+  closeLabel,
+  closeTestId,
+  closeSize = 'compact-sm',
+}: SheetProps) => {
   const onScrimClick = useSurface(dismiss, onClose);
   return (
     <div
-      className={classes(
-        styles.scrim,
-        styles.sheetFrame,
-        blur ? styles.blurred : undefined,
-      )}
+      className={cx(styles.scrim, styles.sheetFrame, blur && styles.blurred)}
       data-app-sheet={testId ?? label}
       onClick={onScrimClick}
     >
@@ -100,11 +101,22 @@ export const AppSheet = ({
           aria-label={label}
           tabIndex={-1}
           data-testid={testId}
-          className={classes(
-            plain ? styles.panelSheetPlain : styles.panelSheet,
-            className,
-          )}
+          className={cx(plain ? styles.panelSheetPlain : styles.panelSheet, className)}
         >
+          {closeLabel === undefined ? null : (
+            <div className={styles.sheetHead}>
+              <Text fw={700} c={tokens.text}>{label}</Text>
+              <Button
+                size={closeSize}
+                variant="subtle"
+                color="gray"
+                data-testid={closeTestId}
+                onClick={onClose}
+              >
+                {closeLabel}
+              </Button>
+            </div>
+          )}
           {children}
         </div>
       </FocusTrap>

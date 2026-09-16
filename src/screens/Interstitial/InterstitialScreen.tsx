@@ -8,9 +8,10 @@ import { pickFragment } from '@/data/narrative/fragments';
 import { sectorDef } from '@/data/sectors';
 import { weatherIn } from '@/game/run/weather';
 import { playSfx } from '@/services/audio';
+import { flashVignette } from '@/services/vignette';
 import { createStream, deriveSeed } from '@/services/rng';
 import { useAppStore } from '@/stores/appStore';
-import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
+import { useReducedMotion } from '@/stores/settingsStore';
 import { useMetaStore } from '@/stores/metaStore';
 import { useRunStore } from '@/stores/runStore';
 import styles from './InterstitialScreen.module.css';
@@ -25,13 +26,18 @@ export const InterstitialScreen = () => {
   const [seenOnArrival] = useState(() => useMetaStore.getState().seenFragments);
   const go = useAppStore((s) => s.go);
   const def = sectorDef(sector);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
+
+  const weatherTint = weather?.tint;
 
   useEffect(() => {
     playSfx('jump');
   }, []);
+
+  useEffect(() => {
+    if (weatherTint === undefined) return;
+    flashVignette('weatherEntry', { color: weatherTint });
+  }, [weatherTint]);
 
   const fragment = useMemo(() => {
     const stream = createStream(deriveSeed(seed, `jump:${String(sector)}`));

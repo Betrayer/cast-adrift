@@ -75,7 +75,8 @@
     "hijack": "Te quita tu mejor dado",
     "echoTotal": "repite tu último turno (máx. {{n}})",
     "foldOrder": "pliega el pedido",
-    "devourDie": "te quita tu mejor dado de reserva"
+    "devourDie": "te quita tu mejor dado de reserva",
+    "idle": "Aguanta"
   },
   "slot": {
     "weaponA": "Arma A",
@@ -140,8 +141,8 @@
   "dieMeta": "d{{tier}} · {{school}} · {{faces}} · med. {{ev}}",
   "targetBody": "Apuntar al casco",
   "targetSub": "{{name}} {{hp}}/{{max}}",
-  "mitigation": "bruto {{raw}} → ~{{expected}} · escudo {{shield}} · casco {{hull}}",
-  "mitigationNone": "Esta intención no hace daño",
+  "mitigation": "entrante bruto {{raw}} → ~{{expected}} · escudo {{shield}} · casco {{hull}}",
+  "mitigationNone": "Este enemigo no hace daño en este turno",
   "forecast": "harás {{out}} · recibirás ~{{inc}} (el escudo aguanta {{shield}})",
   "forecastClear": "{{out}} de daño despeja el campo",
   "resBoard": "{{school}} {{placed}}+{{tray}}",
@@ -299,7 +300,8 @@
     "hijack": "Agarra tu dado más alto de la bandeja y lo clava en una ranura a su elección.",
     "echoTotal": "Repite el daño que hiciste el turno pasado, con tope de {{n}}.",
     "foldOrder": "Pliega el orden de resolución durante dos turnos.",
-    "devourDie": "Se come tu dado más alto: baja a 1 y el enemigo gana ese escudo."
+    "devourDie": "Se come tu dado más alto: baja a 1 y el enemigo gana ese escudo.",
+    "idle": "No hace nada este turno."
   },
   "aura": {
     "atk+2": "+2 a cada golpe de este enemigo.",
@@ -313,6 +315,16 @@
     "summonEvery4": "Cada cuatro turnos: llama a un acólito.",
     "stealOnHit6": "Cada golpe que entra se lleva 6 de chatarra."
   },
+  "partDeath": {
+    "explodePart": "Al romperla te golpea por {{n}}.",
+    "enrageCore": "Al romperla el núcleo se enfurece: +{{n}} a cada golpe posterior.",
+    "openCore": "Al romperla el núcleo queda abierto {{turns}} turnos.",
+    "shieldCore": "Al romperla entrega {{n}} de escudo al núcleo.",
+    "spawnAdds": "Al romperla llama a otra nave."
+  },
+  "coreSealed": "Núcleo sellado",
+  "coreSealedWhy": "El casco sigue cerrado hasta que se rompan {{n}} piezas más.",
+  "coreOpenWhy": "El casco permanece abierto hasta el final del turno {{n}}.",
   "statusName": {
     "burn": "Quemadura",
     "mark": "Vulnerable",
@@ -360,7 +372,8 @@
       "sensor": "vulnerable + {{n}}",
       "charge": "+{{n}} Carga",
       "repair": "+{{n}} Casco",
-      "storm": "empujón de tormenta"
+      "storm": "empujón de tormenta",
+      "partDown": "pieza «{{name}}» destruida"
     },
     "foe": {
       "attack": "ataques contra {{n}}",

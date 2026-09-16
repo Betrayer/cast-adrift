@@ -36,6 +36,15 @@ export interface UnlockDef {
   feature?: FeatureId;
 }
 
+const unlock = (
+  id: string,
+  body: Omit<UnlockDef, "id" | "label">,
+): UnlockDef => ({
+  id,
+  label: `meta:unlock.${id}`,
+  ...body,
+});
+
 export const OPEN_DICE: readonly string[] = [
   "red-d6",
   "blue-d6",
@@ -89,17 +98,13 @@ export const OPEN_CONTRACTS: readonly string[] = [
 ];
 
 export const UNLOCKS: readonly UnlockDef[] = [
-  {
-    id: "diceL8",
+  unlock("diceL8", {
     kind: "diceWave",
-    label: "meta:unlock.diceL8",
     source: { level: 8 },
     dice: ["crucible", "floodgate", "taproot", "bonanza", "nadir", "pivot"],
-  },
-  {
-    id: "diceL15",
+  }),
+  unlock("diceL15", {
     kind: "diceWave",
-    label: "meta:unlock.diceL15",
     source: { level: 15 },
     dice: [
       "fused-emberforge",
@@ -109,25 +114,19 @@ export const UNLOCKS: readonly UnlockDef[] = [
       "fused-voidcore",
       "fused-counterweight",
     ],
-  },
-  {
-    id: "diceL22",
+  }),
+  unlock("diceL22", {
     kind: "diceWave",
-    label: "meta:unlock.diceL22",
     source: { level: 22 },
     dice: ["magma", "aegis", "heartwood", "vulture", "obsidian", "chaff"],
-  },
-  {
-    id: "diceL30",
+  }),
+  unlock("diceL30", {
     kind: "diceWave",
-    label: "meta:unlock.diceL30",
     source: { level: 30 },
     dice: ["facet", "prismCore", "spectra", "gamut", "beaconChip", "fissure"],
-  },
-  {
-    id: "diceL38",
+  }),
+  unlock("diceL38", {
     kind: "diceWave",
-    label: "meta:unlock.diceL38",
     source: { level: 38 },
     dice: [
       "bombard",
@@ -137,11 +136,9 @@ export const UNLOCKS: readonly UnlockDef[] = [
       "anthracite",
       "undertow",
     ],
-  },
-  {
-    id: "diceL46",
+  }),
+  unlock("diceL46", {
     kind: "diceWave",
-    label: "meta:unlock.diceL46",
     source: { level: 46 },
     dice: [
       "lancehead",
@@ -151,175 +148,127 @@ export const UNLOCKS: readonly UnlockDef[] = [
       "voidmaw",
       "lodestar",
     ],
-  },
-  {
-    id: "diceAchFirstClear",
+  }),
+  unlock("diceAchFirstClear", {
     kind: "diceWave",
-    label: "meta:unlock.diceAchFirstClear",
     source: { achievement: "sectorFive" },
     dice: ["coreshard", "aurora", "thermite", "abyss"],
-  },
-  {
-    id: "diceAchPuzzler",
+  }),
+  unlock("diceAchPuzzler", {
     kind: "diceWave",
-    label: "meta:unlock.diceAchPuzzler",
     source: { achievement: "tierFive-1" },
     dice: ["fused-railslug", "fused-rampart", "fused-bloom", "fused-keel"],
-  },
-  {
-    id: "diceAchCollector",
+  }),
+  unlock("diceAchCollector", {
     kind: "diceWave",
-    label: "meta:unlock.diceAchCollector",
     source: { achievement: "fiftyFound-2" },
     dice: ["fused-pyroclast", "fused-glacier", "fused-tendril"],
-  },
-  {
-    id: "diceAchSurvivor",
+  }),
+  unlock("diceAchSurvivor", {
     kind: "diceWave",
-    label: "meta:unlock.diceAchSurvivor",
     source: { achievement: "deathless-2" },
     dice: ["eclipse", "seedpod", "fused-windfall"],
-  },
-  {
-    id: "contractsL5",
+  }),
+  unlock("contractsL5", {
     kind: "contractWave",
-    label: "meta:unlock.contractsL5",
     source: { level: 5 },
     contracts: ["storm", "bareArmor", "blindJump"],
-  },
-  {
-    id: "contractsL12",
+  }),
+  unlock("contractsL12", {
     kind: "contractWave",
-    label: "meta:unlock.contractsL12",
     source: { level: 12 },
     contracts: ["batteringRam", "singleCast", "deadReckoning"],
-  },
-  {
-    id: "contractsL20",
+  }),
+  unlock("contractsL20", {
     kind: "contractWave",
-    label: "meta:unlock.contractsL20",
     source: { level: 20 },
     contracts: ["ark", "keeper", "ironTide"],
-  },
-  {
-    id: "contractsL28",
+  }),
+  unlock("contractsL28", {
     kind: "contractWave",
-    label: "meta:unlock.contractsL28",
     source: { level: 28 },
     contracts: ["choirShadow", "prismWork", "ghostLane"],
-  },
-  {
-    id: "contractsA5",
+  }),
+  unlock("contractsA5", {
     kind: "contractWave",
-    label: "meta:unlock.contractsA5",
     source: { ascension: 5 },
     contracts: ["voidTithe"],
-  },
-  {
-    id: "contractsAchGauntlet",
+  }),
+  unlock("contractsAchGauntlet", {
     kind: "contractWave",
-    label: "meta:unlock.contractsAchGauntlet",
     source: { achievement: "eliteHunt-2" },
     contracts: ["gauntlet"],
-  },
-  {
-    id: "skinAshen",
+  }),
+  unlock("skinAshen", {
     kind: "cosmetic",
-    label: "meta:unlock.skinAshen",
     source: { ascension: 3 },
     cosmetic: "ashenSkin",
-  },
-  {
-    id: "skinVoidglass",
+  }),
+  unlock("skinVoidglass", {
     kind: "cosmetic",
-    label: "meta:unlock.skinVoidglass",
     source: { ascension: 6 },
     cosmetic: "voidglassSkin",
-  },
-  {
-    id: "skinEmberglass",
+  }),
+  unlock("skinEmberglass", {
     kind: "cosmetic",
-    label: "meta:unlock.skinEmberglass",
     source: { ascension: 9 },
     cosmetic: "emberglassSkin",
-  },
-  {
-    id: "prestigeTheme",
+  }),
+  unlock("prestigeTheme", {
     kind: "cosmetic",
-    label: "meta:unlock.prestigeTheme",
     source: { ascension: 10 },
     cosmetic: "ascendant",
-  },
-  {
-    id: "skinPrestige50",
+  }),
+  unlock("skinPrestige50", {
     kind: "cosmetic",
-    label: "meta:unlock.skinPrestige50",
     source: { level: 50 },
     cosmetic: "prestige50Skin",
-  },
-  {
-    id: "skinChartwright",
+  }),
+  unlock("skinChartwright", {
     kind: "cosmetic",
-    label: "meta:unlock.skinChartwright",
     source: { achievement: "keystoneThree" },
     cosmetic: "chartwrightSkin",
-  },
-  {
-    id: "featureShipRam",
+  }),
+  unlock("featureShipRam", {
     kind: "feature",
-    label: "meta:unlock.featureShipRam",
     source: { level: 10 },
     feature: "shipRam",
-  },
-  {
-    id: "featureShipArk",
+  }),
+  unlock("featureShipArk", {
     kind: "feature",
-    label: "meta:unlock.featureShipArk",
     source: { level: 25 },
     feature: "shipArk",
-  },
-  {
-    id: "featureShipCorsair",
+  }),
+  unlock("featureShipCorsair", {
     kind: "feature",
-    label: "meta:unlock.featureShipCorsair",
     source: { level: 35 },
     feature: "shipCorsair",
-  },
-  {
-    id: "featureShipFoundry",
+  }),
+  unlock("featureShipFoundry", {
     kind: "feature",
-    label: "meta:unlock.featureShipFoundry",
     source: { level: 40 },
     feature: "shipFoundry",
-  },
-  {
-    id: "featureShipPrism",
+  }),
+  unlock("featureShipPrism", {
     kind: "feature",
-    label: "meta:unlock.featureShipPrism",
     source: { achievement: "spectrumClear" },
     feature: "shipPrism",
-  },
-  {
-    id: "featureEngraving",
+  }),
+  unlock("featureEngraving", {
     kind: "feature",
-    label: "meta:unlock.featureEngraving",
     source: { level: 30 },
     feature: "engravingStation",
-  },
-  {
-    id: "featureDailyPreview",
+  }),
+  unlock("featureDailyPreview", {
     kind: "feature",
-    label: "meta:unlock.featureDailyPreview",
     source: { level: 40 },
     feature: "dailyPreview",
-  },
-  {
-    id: "featureFreeRespec",
+  }),
+  unlock("featureFreeRespec", {
     kind: "feature",
-    label: "meta:unlock.featureFreeRespec",
     source: { level: 50 },
     feature: "freeRespec",
-  },
+  }),
   {
     id: "s6-threshold",
     kind: "feature",
@@ -327,20 +276,16 @@ export const UNLOCKS: readonly UnlockDef[] = [
     source: { clears: 1 },
     feature: "sectorSix",
   },
-  {
-    id: "diceS6",
+  unlock("diceS6", {
     kind: "diceWave",
-    label: "meta:unlock.diceS6",
     source: { achievement: "beyondTheCore" },
     dice: ["retrograde", "hushlight", "foldline", "answerchip"],
-  },
-  {
-    id: "skinThreshold",
+  }),
+  unlock("skinThreshold", {
     kind: "cosmetic",
-    label: "meta:unlock.skinThreshold",
     source: { achievement: "theAnswer" },
     cosmetic: "thresholdSkin",
-  },
+  }),
 ];
 
 export const UNLOCK_BY_ID: ReadonlyMap<string, UnlockDef> = new Map(

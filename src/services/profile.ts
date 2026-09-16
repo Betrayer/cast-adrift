@@ -96,8 +96,15 @@ export const createProfileNamespace = (
   return { activeUid: () => active, setActiveUid, scopedKey, adopted, adoptLegacyProfile };
 };
 
-const browserStorage = (): KeyValueStorage =>
-  typeof localStorage === "undefined" ? createMemoryStorage() : localStorage;
+export const browserStorage = (): KeyValueStorage => {
+  try {
+    return typeof localStorage === "undefined"
+      ? createMemoryStorage()
+      : localStorage;
+  } catch {
+    return createMemoryStorage();
+  }
+};
 
 export const deviceStorage = guarded(browserStorage());
 

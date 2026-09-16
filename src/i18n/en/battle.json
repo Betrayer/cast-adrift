@@ -75,7 +75,8 @@
     "hijack": "Hijacks your best die",
     "echoTotal": "echoes your last turn (max {{n}})",
     "foldOrder": "folds the order",
-    "devourDie": "eats your best spare die"
+    "devourDie": "eats your best spare die",
+    "idle": "Holds"
   },
   "slot": {
     "weaponA": "Weapon A",
@@ -140,8 +141,8 @@
   "dieMeta": "d{{tier}} · {{school}} · {{faces}} · avg {{ev}}",
   "targetBody": "Target the hull",
   "targetSub": "{{name}} {{hp}}/{{max}}",
-  "mitigation": "raw {{raw}} → ~{{expected}} · shield {{shield}} · hull {{hull}}",
-  "mitigationNone": "No damage from this intent",
+  "mitigation": "incoming raw {{raw}} → ~{{expected}} · shield {{shield}} · hull {{hull}}",
+  "mitigationNone": "No damage from this enemy this turn",
   "forecast": "you deal {{out}} · you take ~{{inc}} (shield holds {{shield}})",
   "forecastClear": "{{out}} damage clears the field",
   "resBoard": "{{school}} {{placed}}+{{tray}}",
@@ -299,7 +300,8 @@
     "hijack": "Grabs your highest tray die and pins it into a slot of its choosing.",
     "echoTotal": "Echoes the damage you dealt last turn, capped at {{n}}.",
     "foldOrder": "Folds the resolution order for two turns.",
-    "devourDie": "Eats your highest tray die: it drops to 1 and the enemy gains that much shield."
+    "devourDie": "Eats your highest tray die: it drops to 1 and the enemy gains that much shield.",
+    "idle": "Does nothing this turn."
   },
   "aura": {
     "atk+2": "+2 to every hit this enemy lands.",
@@ -313,6 +315,16 @@
     "summonEvery4": "Every fourth turn: calls in an acolyte.",
     "stealOnHit6": "Every landed hit lifts 6 scrap."
   },
+  "partDeath": {
+    "explodePart": "Breaking it blasts you for {{n}}.",
+    "enrageCore": "Breaking it enrages the core: +{{n}} to every later hit.",
+    "openCore": "Breaking it opens the core for {{turns}} turns.",
+    "shieldCore": "Breaking it feeds the core {{n}} shield.",
+    "spawnAdds": "Breaking it calls in another ship."
+  },
+  "coreSealed": "Core sealed",
+  "coreSealedWhy": "The hull stays shut until {{n}} more of its parts break.",
+  "coreOpenWhy": "The hull stays open until the end of turn {{n}}.",
   "statusName": {
     "burn": "Burn",
     "mark": "Vulnerable",
@@ -360,7 +372,8 @@
       "sensor": "vulnerable +{{n}}",
       "charge": "+{{n}} Charge",
       "repair": "+{{n}} Hull",
-      "storm": "storm nudge"
+      "storm": "storm nudge",
+      "partDown": "{{name}} down"
     },
     "foe": {
       "attack": "attacks for {{n}}",

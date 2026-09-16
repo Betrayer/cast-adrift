@@ -16,7 +16,7 @@ import {
   SINGLE_ACHIEVEMENTS,
 } from "../src/data/achievements";
 import { BADGES, BADGE_BY_ID, DIE_SKINS } from "../src/data/cosmetics";
-import { MILESTONES } from "../src/data/milestones";
+import { MILESTONES, milestoneLabel } from "../src/data/milestones";
 import { THEMES } from "../src/data/themes";
 import {
   OPEN_CONTRACTS,
@@ -145,6 +145,7 @@ import type { GoalSpec } from "../src/game/run/goals";
 import type { EventOption, Outcome } from "../src/types/events";
 import {
   INTENT_KINDS,
+  PART_DEATH_KINDS,
   SUBSYSTEM_AURAS,
   claimKey,
   intentsOfStep,
@@ -206,6 +207,19 @@ const checkUniqueIds = (kind: string, ids: readonly string[]): void => {
     if (seen.has(id)) errors.push(`${kind}: duplicate id "${id}"`);
     seen.add(id);
   }
+};
+
+const expectCount = (
+  kind: string,
+  found: number,
+  want: number,
+  noun = "",
+): void => {
+  if (found === want) return;
+  const what = noun === "" ? "" : ` ${noun}`;
+  errors.push(
+    `${kind}: expected ${String(want)}${what}, found ${String(found)}`,
+  );
 };
 
 const resolveIn = (root: ContentNode, path: string): boolean => {
@@ -420,6 +434,7 @@ for (const enemy of ALL_ENEMIES) {
   const allSteps = [
     ...enemy.pattern,
     ...(enemy.phases ?? []).flatMap((phase) => [...phase.pattern]),
+    ...(enemy.subsystems ?? []).flatMap((sub) => [...(sub.intents ?? [])]),
   ];
   for (const step of allSteps) {
     if ("pick" in step) {
@@ -442,6 +457,11 @@ for (const enemy of ALL_ENEMIES) {
   for (const phase of enemy.phases ?? []) {
     for (const intent of [...(phase.onEnter ?? []), ...(phase.everyTurn ?? [])]) {
       usedIntents.add(intent.t);
+      if (intent.t === "summon" && !enemyIds.has(intent.id)) {
+        errors.push(
+          `enemies: "${enemy.id}" summons unknown enemy "${intent.id}"`,
+        );
+      }
     }
   }
   for (const sub of enemy.subsystems ?? []) {
@@ -450,6 +470,22 @@ for (const enemy of ALL_ENEMIES) {
         `enemies: "${enemy.id}" subsystem "${sub.id}" hp must be positive`,
       );
     checkLocKey(`enemies.${enemy.id}.${sub.id}`, sub.name);
+    if (sub.onDeath?.t === "spawnAdds" && !enemyIds.has(sub.onDeath.id)) {
+      errors.push(
+        `enemies: "${enemy.id}" part "${sub.id}" spawns unknown enemy "${sub.onDeath.id}"`,
+      );
+    }
+  }
+  if (enemy.shell === true) {
+    const partCount = (enemy.subsystems ?? []).length;
+    if ((enemy.coreLockAt ?? 0) >= partCount)
+      errors.push(
+        `enemies: "${enemy.id}" is a shell with coreLockAt ${String(enemy.coreLockAt ?? 0)} over ${String(partCount)} parts, so its core never seals`,
+      );
+  } else if (enemy.coreLockAt !== undefined) {
+    errors.push(
+      `enemies: "${enemy.id}" authors coreLockAt ${String(enemy.coreLockAt)} without shell, where it does nothing`,
+    );
   }
 }
 
@@ -545,11 +581,19 @@ for (const member of Object.values(ENCOUNTER_GROUPS).flat()) reachable.add(membe
 for (const enemy of ALL_ENEMIES) {
   for (const step of [
     ...enemy.pattern,
-    ...(enemy.phases ?? []).flatMap((p) => [...p.pattern, ...(p.everyTurn ?? [])]),
+    ...(enemy.phases ?? []).flatMap((p) => [
+      ...p.pattern,
+      ...(p.onEnter ?? []),
+      ...(p.everyTurn ?? []),
+    ]),
+    ...(enemy.subsystems ?? []).flatMap((sub) => [...(sub.intents ?? [])]),
   ]) {
     for (const intent of flattenStep(step)) {
       if (intent.t === "summon") reachable.add(intent.id);
     }
+  }
+  for (const sub of enemy.subsystems ?? []) {
+    if (sub.onDeath?.t === "spawnAdds") reachable.add(sub.onDeath.id);
   }
 }
 for (const enemy of ALL_ENEMIES) {
@@ -571,6 +615,9 @@ for (const kind of INTENT_KINDS) {
 for (const aura of SUBSYSTEM_AURAS) {
   needsBattleKey("subsystems", `aura.${aura}`);
 }
+for (const kind of PART_DEATH_KINDS) {
+  needsBattleKey("parts", `partDeath.${kind}`);
+}
 for (const status of STATUS_KEYS) {
   needsBattleKey("statuses", `status.${status}`);
   needsBattleKey("statuses", `statusName.${status}`);
@@ -582,7 +629,11 @@ for (const tag of CONTENT_TAGS) {
   }
 }
 const usedAuras = new Set(
-  ALL_ENEMIES.flatMap((def) => (def.subsystems ?? []).map((sub) => sub.aura)),
+  ALL_ENEMIES.flatMap((def) =>
+    (def.subsystems ?? []).flatMap((sub) =>
+      sub.aura === undefined ? [] : [sub.aura],
+    ),
+  ),
 );
 for (const aura of usedAuras) {
   if (!SUBSYSTEM_AURAS.includes(aura)) {
@@ -608,20 +659,11 @@ const CHART_NOTABLES = 32;
 const CHART_KEYSTONES = 8;
 const CHART_DISTINCT_SMALLS = 100;
 const minorCount = CHART_NODES.filter((n) => n.kind === "minor").length;
-if (minorCount !== CHART_MINORS)
-  errors.push(
-    `chart: expected ${String(CHART_MINORS)} minor notables, found ${String(minorCount)}`,
-  );
+expectCount("chart", minorCount, CHART_MINORS, "minor notables");
 const notableCount = CHART_NODES.filter((n) => n.kind === "notable").length;
-if (notableCount !== CHART_NOTABLES)
-  errors.push(
-    `chart: expected ${String(CHART_NOTABLES)} notables, found ${String(notableCount)}`,
-  );
+expectCount("chart", notableCount, CHART_NOTABLES, "notables");
 const keystoneCount = CHART_NODES.filter((n) => n.kind === "keystone").length;
-if (keystoneCount !== CHART_KEYSTONES)
-  errors.push(
-    `chart: expected ${String(CHART_KEYSTONES)} keystones, found ${String(keystoneCount)}`,
-  );
+expectCount("chart", keystoneCount, CHART_KEYSTONES, "keystones");
 
 const chartPayloadKey = (node: (typeof CHART_NODES)[number]): string =>
   JSON.stringify([
@@ -1010,10 +1052,7 @@ const CLEAR_BEACONS = 5;
 const CLEAR_ELITES = 5;
 const ONE_CLEAR_FLOOR = 12;
 
-if (MEMORIES.length !== MEMORY_TOTAL)
-  errors.push(
-    `memories: expected ${String(MEMORY_TOTAL)} fragments, found ${String(MEMORIES.length)}`,
-  );
+expectCount("memories", MEMORIES.length, MEMORY_TOTAL, "fragments");
 
 const afterOneClear = earnedMemoryOrders({
   gateKills: CLEAR_GATES,
@@ -1044,10 +1083,7 @@ for (const id of MEMORY_CODEX_IDS) {
 const CHAIN_TARGET = 4;
 const CHAIN_MIN_STEPS = 3;
 const eventById = new Map(ALL_EVENTS.map((e) => [e.id, e]));
-if (CHAINS.length !== CHAIN_TARGET)
-  errors.push(
-    `chains: expected ${String(CHAIN_TARGET)} NPC chains, found ${String(CHAINS.length)}`,
-  );
+expectCount("chains", CHAINS.length, CHAIN_TARGET, "NPC chains");
 for (const chain of CHAINS) {
   checkLocKey(`chain.${chain.id}`, chain.name);
   checkLocKey(`chain.${chain.id}`, chain.payoff);
@@ -1360,18 +1396,9 @@ checkUniqueIds("engravings", ENGRAVINGS.map((e) => e.id));
 checkUniqueIds("keeperLines", KEEPER_LINES.map((k) => k.id));
 checkUniqueIds("fragments", FRAGMENTS.map((f) => f.id));
 
-if (ALL_MODULES.length !== MODULE_TOTAL)
-  errors.push(
-    `modules: expected ${String(MODULE_TOTAL)}, found ${String(ALL_MODULES.length)}`,
-  );
-if (ENGRAVINGS.length !== ENGRAVING_TOTAL)
-  errors.push(
-    `engravings: expected ${String(ENGRAVING_TOTAL)}, found ${String(ENGRAVINGS.length)}`,
-  );
-if (FRAGMENTS.length !== FRAGMENT_TOTAL)
-  errors.push(
-    `fragments: expected ${String(FRAGMENT_TOTAL)}, found ${String(FRAGMENTS.length)}`,
-  );
+expectCount("modules", ALL_MODULES.length, MODULE_TOTAL);
+expectCount("engravings", ENGRAVINGS.length, ENGRAVING_TOTAL);
+expectCount("fragments", FRAGMENTS.length, FRAGMENT_TOTAL);
 if (GATED_FRAGMENTS.length < GATED_FRAGMENT_TARGET)
   errors.push(
     `fragments: ${String(GATED_FRAGMENTS.length)} are state-gated, target ${String(GATED_FRAGMENT_TARGET)}`,
@@ -1383,10 +1410,7 @@ for (const frag of GATED_FRAGMENTS) {
       errors.push(`fragments: "${frag.id}" waits on flag "${key}" that nothing sets`);
   }
 }
-if (KEEPER_LINES.length !== KEEPER_TOTAL)
-  errors.push(
-    `keeperLines: expected ${String(KEEPER_TOTAL)}, found ${String(KEEPER_LINES.length)}`,
-  );
+expectCount("keeperLines", KEEPER_LINES.length, KEEPER_TOTAL);
 if (REACTIVE_KEEPER_LINES.length < KEEPER_REACTIVE_TARGET)
   errors.push(
     `keeperLines: ${String(REACTIVE_KEEPER_LINES.length)} react to a flag, target ${String(KEEPER_REACTIVE_TARGET)}`,
@@ -1400,10 +1424,7 @@ for (const keeperLine of REACTIVE_KEEPER_LINES) {
       );
   }
 }
-if (ALL_DICE.length !== DICE_TOTAL)
-  errors.push(
-    `dice: expected ${String(DICE_TOTAL)}, found ${String(ALL_DICE.length)}`,
-  );
+expectCount("dice", ALL_DICE.length, DICE_TOTAL);
 
 for (const def of ALL_MODULES) {
   checkLocKey(`modules.${def.id}`, def.name);
@@ -1497,10 +1518,7 @@ for (const beat of PROLOGUE_BEATS) {
 for (const f of FRAGMENTS) checkLocKey(`fragment.${f.id}`, f.text);
 for (const k of KEEPER_LINES) checkLocKey(`keeper.${k.id}`, k.text);
 
-if (ASCENSIONS.length !== MAX_ASCENSION)
-  errors.push(
-    `ascension: expected ${String(MAX_ASCENSION)} levels, found ${String(ASCENSIONS.length)}`,
-  );
+expectCount("ascension", ASCENSIONS.length, MAX_ASCENSION, "levels");
 for (const def of ASCENSIONS) {
   checkLocKey(`ascension.${String(def.level)}`, def.name);
   checkLocKey(`ascension.${String(def.level)}`, def.desc);
@@ -1509,10 +1527,7 @@ for (const def of ASCENSIONS) {
 }
 
 const dossierCount = CODEX.filter((e) => e.group === "dossier").length;
-if (dossierCount !== DOSSIER_TOTAL)
-  errors.push(
-    `codex: expected ${String(DOSSIER_TOTAL)} dossiers, found ${String(dossierCount)}`,
-  );
+expectCount("codex", dossierCount, DOSSIER_TOTAL, "dossiers");
 
 const MUTATOR_COUNT = 12;
 const CONTRACT_COUNT = 20;
@@ -1922,7 +1937,7 @@ for (const def of UNLOCKS) {
   }
 }
 for (const milestone of MILESTONES) {
-  if (!resolveMetaKey(milestone.label.replace("meta:", "")))
+  if (!resolveMetaKey(milestoneLabel(milestone).replace("meta:", "")))
     errors.push(`milestones: L${String(milestone.level)} has no en label`);
   const payload =
     (milestone.budget ?? 0) > 0 || (milestone.chartPoints ?? 0) > 0;

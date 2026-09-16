@@ -55,6 +55,7 @@ export const BARKS: readonly BarkDef[] = [
   { id: "resume", trigger: "resume", lines: lines("resume", 10), weight: 1, cooldownSec: 120 },
   { id: "memory", trigger: "memory", lines: lines("memory", 7), weight: 1, cooldownSec: 20 },
   { id: "bossPhase", trigger: "bossPhase", lines: lines("bossPhase", 10), weight: 1, cooldownSec: 15 },
+  { id: "bossPartDown", trigger: "bossPartDown", lines: lines("bossPartDown", 6), weight: 1, cooldownSec: 20 },
   { id: "minibossIntro", trigger: "minibossIntro", lines: lines("minibossIntro", 6), weight: 1, cooldownSec: 20 },
   { id: "sectorEnter1", trigger: "sectorEnter:1", lines: lines("sectorEnter1", 4), weight: 1, cooldownSec: 300 },
   { id: "sectorEnter2", trigger: "sectorEnter:2", lines: lines("sectorEnter2", 4), weight: 1, cooldownSec: 300 },
@@ -85,6 +86,7 @@ export const BARK_QUOTA: Readonly<Record<string, number>> = {
   lowHull: 10,
   firstKill: 60,
   bossPhase: 10,
+  bossPartDown: 6,
   minibossIntro: 6,
   setComplete: 9,
   rareLoot: 12,
@@ -103,6 +105,4 @@ export const BARK_QUOTA: Readonly<Record<string, number>> = {
   officerRescued: 3,
 };
 
-export const BARK_RESERVATIONS: readonly BarkReservation[] = [
-  { trigger: "bossPartDown", phase: "U7", lines: 3 },
-];
+export const BARK_RESERVATIONS: readonly BarkReservation[] = [];

@@ -17,66 +17,54 @@ export interface WeatherDef {
   name: LocKey;
   desc: LocKey;
   line: LocKey;
+  tint: string;
   mods: Partial<MutatorMods>;
 }
 
+const weatherDef = (
+  id: WeatherId,
+  body: Omit<WeatherDef, "id" | "name" | "desc" | "line">,
+): WeatherDef => ({
+  id,
+  name: `content:weather.${id}.name`,
+  desc: `content:weather.${id}.desc`,
+  line: `content:weather.${id}.line`,
+  ...body,
+});
+
 export const WEATHER: readonly WeatherDef[] = [
-  {
-    id: "nebula",
-    name: "content:weather.nebula.name",
-    desc: "content:weather.nebula.desc",
-    line: "content:weather.nebula.line",
+  weatherDef("nebula", {
+    tint: "var(--ca-school-green-stroke)",
     mods: { fogRowDelta: -1, scrapMultPct: 20 },
-  },
-  {
-    id: "ionStorm",
-    name: "content:weather.ionStorm.name",
-    desc: "content:weather.ionStorm.desc",
-    line: "content:weather.ionStorm.line",
+  }),
+  weatherDef("ionStorm", {
+    tint: "var(--ca-school-blue-stroke)",
     mods: { fogRowDelta: -1, nudgeCostDelta: -1 },
-  },
-  {
-    id: "debrisField",
-    name: "content:weather.debrisField.name",
-    desc: "content:weather.debrisField.desc",
-    line: "content:weather.debrisField.line",
+  }),
+  weatherDef("debrisField", {
+    tint: "var(--ca-school-grey-stroke)",
     mods: { scrapMultPct: 40, enemyHpPct: 5 },
-  },
-  {
-    id: "solarWind",
-    name: "content:weather.solarWind.name",
-    desc: "content:weather.solarWind.desc",
-    line: "content:weather.solarWind.line",
+  }),
+  weatherDef("solarWind", {
+    tint: "var(--ca-amber)",
     mods: { chargeCapDelta: 2, nudgeCostDelta: 1 },
-  },
-  {
-    id: "magneticStorm",
-    name: "content:weather.magneticStorm.name",
-    desc: "content:weather.magneticStorm.desc",
-    line: "content:weather.magneticStorm.line",
+  }),
+  weatherDef("magneticStorm", {
+    tint: "var(--ca-school-black-stroke)",
     mods: { nudgeCostDelta: 1, lootRarityStep: 1 },
-  },
-  {
-    id: "radioBurst",
-    name: "content:weather.radioBurst.name",
-    desc: "content:weather.radioBurst.desc",
-    line: "content:weather.radioBurst.line",
+  }),
+  weatherDef("radioBurst", {
+    tint: "var(--ca-accent)",
     mods: { fogRowDelta: 1, scrapMultPct: -20 },
-  },
-  {
-    id: "gravityRipple",
-    name: "content:weather.gravityRipple.name",
-    desc: "content:weather.gravityRipple.desc",
-    line: "content:weather.gravityRipple.line",
+  }),
+  weatherDef("gravityRipple", {
+    tint: "var(--ca-school-prismatic-stroke)",
     mods: { enemyHpPct: -5, nudgeCostDelta: 2 },
-  },
-  {
-    id: "stillWatch",
-    name: "content:weather.stillWatch.name",
-    desc: "content:weather.stillWatch.desc",
-    line: "content:weather.stillWatch.line",
+  }),
+  weatherDef("stillWatch", {
+    tint: "var(--ca-dim)",
     mods: { chargeCapDelta: 1, scrapMultPct: 15 },
-  },
+  }),
 ];
 
 export const WEATHER_BY_ID: ReadonlyMap<string, WeatherDef> = new Map(

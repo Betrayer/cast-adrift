@@ -1,4 +1,5 @@
 import { useTranslation } from 'react-i18next';
+import { cx } from '@/app/cx';
 import { useCompactBox } from '@/app/viewportBox';
 import type { SlotProjection } from '@/game/battle/view';
 import { SlotGlyph } from '@/screens/Battle/board/SlotCard';
@@ -7,22 +8,12 @@ import {
   projectionShort,
   projectionTone,
   slotSchool,
+  type SlotViewProps,
 } from '@/screens/Battle/board/slotText';
-import type { SlotId, SlotState } from '@/types/battle';
 import styles from './Tablet.module.css';
 
-export interface SlotRowProps {
-  slotId: SlotId;
-  slot: SlotState;
-  order: number;
-  projection: SlotProjection | undefined;
-  occupiedBy: string | undefined;
-  blocked: boolean;
+export interface SlotRowProps extends SlotViewProps {
   shrunk: boolean;
-  legal: boolean;
-  goal: boolean;
-  onTap: (slotId: SlotId) => void;
-  preview?: boolean;
 }
 
 const toneClass = (projection: SlotProjection): string => {
@@ -63,14 +54,12 @@ export const SlotRow = ({
       {...(preview || !goal ? {} : { 'data-goal': '1' })}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
-      className={[
-        styles.row ?? '',
-        legal ? styles.rowLegal ?? '' : '',
-        occupiedBy === undefined ? '' : styles.rowOccupied ?? '',
-        blocked ? styles.rowBlocked ?? '' : '',
-      ]
-        .filter((name) => name !== '')
-        .join(' ')}
+      className={cx(
+        styles.row,
+        legal && styles.rowLegal,
+        occupiedBy !== undefined && styles.rowOccupied,
+        blocked && styles.rowBlocked,
+      )}
       aria-label={t(`battle:slot.${slotId}`)}
       aria-hidden={preview}
       tabIndex={preview ? -1 : undefined}
@@ -87,9 +76,7 @@ export const SlotRow = ({
       <span className={styles.meta}>
         <span className={styles.name}>{t(`battle:slot.${slotId}`)}</span>
         <span
-          className={`${styles.cap ?? ''} ${
-            inherits === null ? '' : styles.capInherited ?? ''
-          }`}
+          className={cx(styles.cap, inherits !== null && styles.capInherited)}
           data-inherits={inherits ?? undefined}
         >
           {note === null ? cap : `${cap} · ${note}`}
@@ -97,9 +84,10 @@ export const SlotRow = ({
       </span>
       <span className={styles.well} {...(preview ? {} : { 'data-well': '' })} />
       <span
-        className={`${styles.out ?? ''} ${
-          projection === undefined ? styles.outIdle ?? '' : toneClass(projection)
-        }`}
+        className={cx(
+          styles.out,
+          projection === undefined ? styles.outIdle : toneClass(projection),
+        )}
         data-proj={preview ? undefined : slotId}
         data-tone={
           preview || projection === undefined

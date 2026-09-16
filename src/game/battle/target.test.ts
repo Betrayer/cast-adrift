@@ -1,20 +1,10 @@
 import { describe, expect, it } from "vitest";
+import { harnessEnemy } from "@/game/battle/battleHarness";
 import { aimedEnemy } from "@/game/battle/target";
 import type { EnemyState } from "@/types/battle";
 
-const mkEnemy = (over: Partial<EnemyState> = {}): EnemyState => ({
-  id: "enemy-0",
-  defId: "raider",
-  hp: 18,
-  hpMax: 18,
-  shield: 0,
-  intentIndex: 0,
-  nextIntent: { t: "attack", n: 5 },
-  statuses: {},
-  subsystems: [],
-  phase: 0,
-  ...over,
-});
+const mkEnemy = (over: Partial<EnemyState> = {}): EnemyState =>
+  harnessEnemy({ hp: 18, hpMax: 18, ...over });
 
 const first = mkEnemy({ id: "enemy-0", statuses: { mark: 4 } });
 const second = mkEnemy({ id: "enemy-1" });

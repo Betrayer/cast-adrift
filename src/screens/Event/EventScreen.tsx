@@ -43,8 +43,8 @@ import { clampAxis } from "@/game/run/axis";
 import { cargoOfferable } from "@/game/run/cargo";
 import { emitEventOutcome } from "@/game/narrative/barks";
 import { useBackGuard } from "@/app/backGuard";
-import { completeNode, startEventBattle } from "@/game/run/flow";
-import { nodeById } from "@/game/map/types";
+import { completeNode, endRun, startEventBattle } from "@/game/run/flow";
+import { nodeById, type NodeId } from "@/game/map/types";
 import { eventPickSeed } from "@/game/narrative/chainMarkers";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
@@ -52,7 +52,7 @@ import { createStream, deriveSeed } from "@/services/rng";
 import { useAppStore } from "@/stores/appStore";
 import { noteCheckWon } from "@/game/meta/counters";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import { useRunStore, type EventRunState } from "@/stores/runStore";
 import type { School } from "@/types/content";
 import styles from "./EventScreen.module.css";
 import type {
@@ -75,6 +75,7 @@ interface Resolved {
   nodeId: string;
   event: EventDef | null;
   streams: EventStreams;
+  replay: EventRunState | null;
 }
 
 const buildStreams = (seed: number, key: string): EventStreams => ({
@@ -83,7 +84,7 @@ const buildStreams = (seed: number, key: string): EventStreams => ({
   loot: createStream(deriveSeed(seed, `evloot:${key}`)),
 });
 
-const resolveEventForNode = (
+export const resolveEventForNode = (
   nodeId: string,
   kind: EventKind,
   forcedId?: string,
@@ -94,6 +95,16 @@ const resolveEventForNode = (
       nodeId: `dbg:${forcedId}`,
       event: EVENT_BY_ID.get(forcedId) ?? null,
       streams: buildStreams(s.seed, `dbg:${forcedId}`),
+      replay: null,
+    };
+  }
+  const replay = s.eventRuns?.[nodeId] ?? null;
+  if (replay !== null) {
+    return {
+      nodeId,
+      event: EVENT_BY_ID.get(replay.eventId) ?? null,
+      streams: buildStreams(s.seed, nodeId),
+      replay,
     };
   }
   const pickStream = createStream(eventPickSeed(s.seed, nodeId));
@@ -104,7 +115,7 @@ const resolveEventForNode = (
     seenEvents: s.seenEvents,
   };
   const event = pickEvent(ALL_EVENTS, ctx, kind, pickStream);
-  return { nodeId, event, streams: buildStreams(s.seed, nodeId) };
+  return { nodeId, event, streams: buildStreams(s.seed, nodeId), replay: null };
 };
 
 const requirementLabel = (
@@ -232,6 +243,29 @@ const DieChip = ({
 const CHECK_STING_MS = 340;
 const AXIS_THRESHOLD = 3;
 
+interface CheckRoll {
+  values: number[];
+  total: number;
+  success: boolean;
+}
+
+interface CheckDismiss {
+  onClose: () => void;
+  closeOnEscape: boolean;
+  closeOnClickOutside: boolean;
+}
+
+export const checkDismissGuard = (
+  rolled: CheckRoll | null,
+  cancel: () => void,
+): CheckDismiss => ({
+  onClose: () => {
+    if (rolled === null) cancel();
+  },
+  closeOnEscape: rolled === null,
+  closeOnClickOutside: rolled === null,
+});
+
 interface CheckModalProps {
   option: EventOption;
   faces: CheckFace[];
@@ -249,11 +283,7 @@ const CheckModal = ({
 }: CheckModalProps) => {
   const { t } = useTranslation(["run", "battle", "common"]);
   const check = option.check;
-  const [rolled, setRolled] = useState<{
-    values: number[];
-    total: number;
-    success: boolean;
-  } | null>(null);
+  const [rolled, setRolled] = useState<CheckRoll | null>(null);
 
   if (check === undefined) return null;
   const odds = oddsPercent(checkOdds(faces, check.pick, check.target));
@@ -279,7 +309,7 @@ const CheckModal = ({
   return (
     <Modal
       opened
-      onClose={onCancel}
+      {...checkDismissGuard(rolled, onCancel)}
       centered
       withCloseButton={false}
       title={
@@ -354,14 +384,31 @@ const announceAxisShift = (before: number, after: number): void => {
   });
 };
 
+export type EventExit = "death" | "battle" | "map" | "complete";
+
+export const eventExit = (
+  hull: number,
+  follow: ForcedBattle | null,
+  forced: boolean,
+): EventExit => {
+  if (hull <= 0) return "death";
+  if (follow !== null) return "battle";
+  if (forced) return "map";
+  return "complete";
+};
+
 const EventRunner = ({
   event,
   streams,
   forced,
+  nodeId,
+  replay,
 }: {
   event: EventDef;
   streams: EventStreams;
   forced: boolean;
+  nodeId: NodeId | null;
+  replay: EventRunState | null;
 }) => {
   const { t } = useTranslation(["run", "battle", "content"]);
   const scrap = useRunStore((s) => s.scrap);
@@ -373,8 +420,12 @@ const EventRunner = ({
   const sector = useRunStore((s) => s.sector);
 
   const [checkOption, setCheckOption] = useState<EventOption | null>(null);
-  const [outcome, setOutcome] = useState<Outcome | null>(null);
-  const [follow, setFollow] = useState<ForcedBattle | null>(null);
+  const [outcomeText, setOutcomeText] = useState<string | null>(
+    replay?.outcomeText ?? null,
+  );
+  const [follow, setFollow] = useState<ForcedBattle | null>(
+    replay?.follow ?? null,
+  );
 
   const deckRefs = useMemo(
     () =>
@@ -412,7 +463,12 @@ const EventRunner = ({
     emitEventOutcome(chosen);
     playSfx("consequenceChime");
     announceAxisShift(axisBefore, useRunStore.getState().axis);
-    setOutcome(chosen);
+    if (nodeId !== null) {
+      useRunStore
+        .getState()
+        .recordEventOutcome(nodeId, event.id, chosen.text, result.follow);
+    }
+    setOutcomeText(chosen.text);
     setFollow(result.follow);
     setCheckOption(null);
   };
@@ -433,18 +489,22 @@ const EventRunner = ({
   };
 
   const onContinue = (): void => {
-    if (follow !== null) {
-      startEventBattle(follow);
-      return;
+    switch (eventExit(useRunStore.getState().hull, follow, forced)) {
+      case "death":
+        endRun(false, "hull");
+        return;
+      case "battle":
+        if (follow !== null) startEventBattle(follow);
+        return;
+      case "map":
+        useAppStore.getState().go("map");
+        return;
+      case "complete":
+        completeNode({ outcome: "cleared" });
     }
-    if (forced) {
-      useAppStore.getState().go("map");
-      return;
-    }
-    completeNode({ outcome: "cleared" });
   };
 
-  useBackGuard("event", outcome === null ? null : onContinue);
+  useBackGuard("event", outcomeText === null ? null : onContinue);
 
   const axisPreview = (option: EventOption): number | null => {
     const range = optionAxisRange(option);
@@ -553,7 +613,7 @@ const EventRunner = ({
           ) : null}
           <Text c={tokens.dim}>{t(event.text)}</Text>
 
-          {outcome === null ? (
+          {outcomeText === null ? (
             <Stack gap="xs">
               {event.options.map((option) => {
                 const met = optionMet(option.requires, optionCtx);
@@ -628,7 +688,7 @@ const EventRunner = ({
           ) : (
             <Stack gap="md">
               <Paper bg={tokens.surface2} p="md" radius="sm">
-                <Text c={tokens.text}>{t(outcome.text)}</Text>
+                <Text c={tokens.text}>{t(outcomeText)}</Text>
               </Paper>
               <Button fullWidth onClick={onContinue}>
                 {follow !== null
@@ -705,10 +765,13 @@ export const EventScreen = () => {
   useEffect(() => {
     if (event === null || forced) return;
     useRunStore.getState().markEventSeen(event.id);
+    if (position !== null) {
+      useRunStore.getState().beginEventNode(position, event.id);
+    }
     if (event.codex !== undefined) {
       useMetaStore.getState().unlockCodex(event.codex);
     }
-  }, [event, forced]);
+  }, [event, forced, position]);
 
   if (position === null || map === null) return <Screen />;
   if (!forced && nodeById(map).get(position) === undefined) return <Screen />;
@@ -716,6 +779,12 @@ export const EventScreen = () => {
     return <EventFallback />;
   }
   return (
-    <EventRunner event={event} streams={resolved.streams} forced={forced} />
+    <EventRunner
+      event={event}
+      streams={resolved.streams}
+      forced={forced}
+      nodeId={forced ? null : position}
+      replay={resolved.replay}
+    />
   );
 };

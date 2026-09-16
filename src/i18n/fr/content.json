@@ -371,7 +371,24 @@
     "theHush-bell": "Bell",
     "echoFleet": "La flotte de l'Echo",
     "echoFleet-wake": "Réveil",
-    "echoFleet-chorus": "Refrain"
+    "echoFleet-chorus": "Refrain",
+    "quarantineWarden-siren": "Sirène",
+    "beaconTrap-prism": "Prisme piège",
+    "breakerBarge-maw": "Gueule d'admission",
+    "auctionCorvette-podium": "Podium",
+    "riftMaw-gullet": "Gosier",
+    "riftBranch-thorn": "Épine",
+    "choirFlagship-censer": "Encensoir",
+    "cantorColossus-diaphragm": "Diaphragme",
+    "coreHeart-vent": "Évent de tempête",
+    "mirrorHeart-pane": "Vitre du recensement",
+    "theHush-muffler": "Sourdine",
+    "echoFleet-ghost": "Spectre",
+    "usurer-writ": "Titre de créance",
+    "resonator-chord": "Accord",
+    "silencer-damper": "Amortisseur",
+    "coreSliver-edge": "Tranchant",
+    "hushWarden-gag": "Bâillon"
   },
   "ships": {
     "wanderer": {
@@ -612,11 +629,11 @@
     "sacrifice": "Lancez un dé pour accumuler +4 points de dégâts d'arme ce tour-ci ; lorsque la coque est inférieure à un tiers, chaque emplacement d'arme inflige des dégâts critiques multipliés par 1,5.",
     "back-door": "Un rouleau noir « min-face » rapporte +6 ferraille.",
     "spare": "Le dé ayant obtenu le résultat le plus bas à chaque lancer gagne un point ; relancez un dé à la fois.",
-    "afterburner": "Les seuils des moteurs sont un peu plus faciles ; coque −2.",
+    "afterburner": "Effleurement +1% et esquive +2% ; coque −2.",
     "jammer-plus": "Jam réduit l'attaque ennemie de 2 points supplémentaires, mais les points marqués valent 1 point de moins.",
     "targeter": "Les marques infligent +1 point de dégâts supplémentaire, mais les enrayages en réduisent de 1 de moins.",
     "plating": "Coque +5, et chaque combat remporté répare 2 points de coque.",
-    "tug": "Une esquive confère également +1 charge.",
+    "tug": "La première évasion du tour confère également +1 charge.",
     "kindling": "+1 en armes à partir d'un résultat de 5 ou plus.",
     "hammerhead": "+2 en Armes A.",
     "scorchmark": "La valeur maximale de « face » dans les armes ajoute « Brûlure 1 ».",
@@ -647,7 +664,7 @@
     "hardVacuum": "+3 en boucliers tant que la santé de la coque est inférieure à la moitié.",
     "secondSkin": "Coque +4 et 2 points de coque réparés après chaque combat, mais les gains de récupération sont réduits de 10 %.",
     "glacierPact": "+4 en boucliers dès que vous avez quatre dés bleus en main.",
-    "mirrorLattice": "Les esquives réduisent les dégâts, les seuils des moteurs sont abaissés d'un niveau, et avec trois objets d'esquive, les moteurs affichent +3.",
+    "mirrorLattice": "La première évasion du tour renvoie les dégâts, effleurement +1% et esquive +2%, et avec trois objets d'esquive, les moteurs affichent +3.",
     "permafrost": "Un « max face » dans les boucliers se résout deux fois par emplacement.",
     "rootHold": "À partir du troisième tour, chaque dé attribué aux moteurs compte pour deux dés supplémentaires.",
     "secondGrowth": "+2 lorsque le dé affiche le même résultat que lors du tour précédent.",
@@ -662,7 +679,7 @@
     "tideRoots": "La marée d'interférence est légèrement moins forte.",
     "worldTree": "Dès que quatre dés verts sont alignés, à la fin de chaque tour, vous récupérez 1 point de coque par objet vert que vous transportez.",
     "overgrowthPact": "Croissance +2 et coque −4 ; tant que vous portez quatre objets de croissance, chaque dé compte pour 2 de plus.",
-    "standingWave": "Les seuils des moteurs sont désormais un peu plus faciles à atteindre ; si un moteur affiche une valeur de 6 ou plus, il conserve 4 points de bouclier et 2 points de charge pour le tour suivant.",
+    "standingWave": "Effleurement +1% et esquive +2% ; 6 ou plus dans les moteurs reporte 4 points de bouclier et 2 points de charge sur le tour suivant.",
     "pocketChange": "Lorsque vous entrez dans un nœud, vous gagnez 1 déchet pour chaque objet [déchet] présent dans votre équipement.",
     "finderFee": "+2 ferraille par victime.",
     "streetPrice": "Magasins : −8 %, mais la ferraille affiche une hausse de −5 % : vous achetez et vendez au même prix du marché.",
@@ -740,7 +757,7 @@
     "seedBank": "Début du combat : pendant les trois tours suivants, vous gagnez 1 bouclier par objet de croissance que vous portez.",
     "understory": "Fin du tour : s'il reste au moins 4 points de bouclier, soigne 1 point de coque.",
     "mycelium": "Une fois que six emplacements ont réglé ce combat, chaque tour se termine par la restauration de 2 points de coque et l'augmentation de 3 points de bouclier.",
-    "rhizome": "Seuils du moteur : deux niveaux plus faciles ; coque : −2.",
+    "rhizome": "Effleurement +2% et esquive +4% ; coque −2.",
     "taproot": "Compte chaque nœud que vous franchissez ; à partir du huitième, chaque combat commence avec 6 points de bouclier et 3 points de coque restaurés.",
     "perennial": "Dans les moteurs, un dé dont le résultat correspond à celui du tour précédent compte pour quatre de plus.",
     "annualRings": "Compte chaque dé dont la valeur correspond à celle du tour précédent ; à partir du troisième, chaque dé compte pour 3 de plus jusqu'à la fin du combat.",
@@ -3820,6 +3837,14 @@
       "9": "C'était la version polie.",
       "10": "Il y a encore beaucoup à dire. Malheureusement."
     },
+    "bossPartDown": {
+      "1": "Un nœud est tombé. Il ne l'a pas encore remarqué.",
+      "2": "Une habitude en moins. Il garde les autres.",
+      "3": "Cette pièce ne discute plus.",
+      "4": "Une ligne rayée de la liste de ce qu'il sait faire.",
+      "5": "Il continuera. Avec un bras de moins.",
+      "6": "La coque est intacte. Le projet ne l'est plus."
+    },
     "minibossIntro": {
       "1": "Une bataille acharnée. Celle-ci restera dans les mémoires.",
       "2": "Ce n'est pas une patrouille. C'est un message fort.",
@@ -4497,7 +4522,7 @@
     },
     "ballastModule": {
       "name": "Réservoirs de ballast",
-      "desc": "Coque +5 et des seuils de moteur un cran plus élevés ; chaque nœud que vous franchissez répare 1 point de coque."
+      "desc": "Coque +5 et effleurement −1% / esquive −2% ; chaque nœud que vous franchissez répare 1 point de coque."
     },
     "escapePod": {
       "name": "Capsule de sauvetage",
@@ -4517,7 +4542,7 @@
     },
     "bulkheadRing": {
       "name": "Anneau de cloison",
-      "desc": "Coque +8 et des seuils de moteur plus élevés d'un cran ; avec des boucliers de niveau Mk 2, chaque combat commence avec 6 points de bouclier, et au niveau Mk 3, la réserve contient un dé supplémentaire."
+      "desc": "Coque +8 et effleurement −1% / esquive −2% ; avec des boucliers de niveau Mk 2, chaque combat commence avec 6 points de bouclier, et au niveau Mk 3, la réserve contient un dé supplémentaire."
     },
     "dampingCoil": {
       "name": "Bobine d'amortissement",
@@ -4525,7 +4550,7 @@
     },
     "hardpointClamp": {
       "name": "Pince de fixation Hardpoint",
-      "desc": "Les seuils du moteur sont un peu plus faciles à atteindre, et dès que le support moteur atteint le niveau Mk 2, chaque dé lancé compte pour +3."
+      "desc": "Effleurement +1% et esquive +2%, et dès que le support moteur atteint le niveau Mk 2, chaque dé qui s'y trouve compte pour +3."
     },
     "voidLiner": {
       "name": "Void Liner",
@@ -5220,21 +5245,21 @@
     "choirHerald": "Un hymne en cinq temps : deux charges, un blocage en fente et une salve, toujours dans cet ordre.",
     "mirrorHull": "Restitue la moitié de votre dernier tour deux fois par cycle, dans la limite de 12.",
     "dragnet": "Déplace votre dé le plus élevé vers une case de son choix et l'y immobilise ; de plus, le treuil en immobilise un autre tous les trois tours.",
-    "resonator": "Il se déclenche deux fois par cycle pour la taille de votre banc le plus profond, et la bobine se recharge pour 6 à chaque tour.",
+    "resonator": "Frappe deux fois par cycle selon la taille de votre école la plus profonde, et la bobine blinde la coque de 6 chaque tour. Le cœur ne prend rien tant que les deux pièces tiennent.",
     "quarantineTwin": "Deux coques synchronisées recouvrant un corps intouchable : si vous touchez deux fois de suite la même coque, le deuxième coup est ignoré.",
-    "usurer": "Propose deux fois la même option par cycle — 6 points de ferraille ou 8 points de dégâts — et le coffre-fort subit 6 points de dégâts supplémentaires à chaque coup.",
-    "silencer": "Passe d'un bloc d'emplacement à deux lorsque la coque est inférieure à 55 % — et un brouillage des capteurs efface tous les blocs qu'il contient.",
-    "coreSliver": "Il met une école à l'écart à la fois — les dés de l'école protégée infligent la moitié des dégâts — et vous indique laquelle avant de le faire. La facette fait tourner un dé à chaque tour.",
-    "quarantineWarden": "Offre une protection de 6 à chaque tour tant que l'égide est active, et ajoute un bloc d'emplacement lorsque la coque passe en dessous de la moitié de sa résistance.",
-    "beaconTrap": "Une porte impossible à forcer : les coups portés en dessous sont entièrement absorbés, elle épuise le bouclier que vous déployez, et lorsqu’elle passe en dessous de la moitié de sa jauge, elle se régénère à raison de 10 points à chaque phase.",
-    "breakerBarge": "Chaque coup porté coûte 6 ferrailles ; la grue verrouille un dé tous les trois tours, et lorsqu’elle passe sous la barre des 40 %, elle s’ouvre en mode chargé.",
-    "auctionCorvette": "Les enchères sur votre course à chaque cycle — que vous payiez ou que vous le portiez — vous font gagner 5 points à chaque coup porté, et doublent l'enchère si celle-ci est inférieure à 45 %.",
-    "riftMaw": "Deux yeux, qui font chacun tourner un dé à chaque tour ; en dessous, la moitié d'un bouchon de fente rétrécit également à chaque tour.",
-    "riftBranch": "Réduit la limite d'un emplacement et jette un sort maléfique sur un dé à chaque cycle ; en dessous de 55 %, la limite diminue à chaque tour.",
-    "choirFlagship": "La flèche recharge l'ensemble du chœur tous les trois tours, et la voix invoque un nouvel acolyte tous les quatre tours.",
-    "cantorColossus": "Ajoute 2 éléments à la pile à chaque coup, pour toujours — seul un brouillage de capteurs permet de vider la pile.",
-    "coreHeart": "Une coque de valves au-dessus d'une tempête : le corps ne reçoit rien tant qu'une valve est active, et la tempête se déclenche à chaque tour à partir de la phase 2.",
-    "mirrorHeart": "Il se bat avec les cartes de son propre paquet — plus la composition est pure, plus les coups sont puissants — derrière un masque de visages.",
+    "usurer": "Propose deux fois par cycle le même marché — 6 ferraille ou 6 dégâts — et le coffre prend 6 de plus à chaque coup porté. Le cœur ne prend rien tant que les deux pièces tiennent.",
+    "silencer": "L'amortisseur bloque un emplacement tous les trois tours, et sous 55 % le corps en bloque deux de plus par cycle. Un brouillage des capteurs efface tous ses blocs, et le cœur ne prend rien tant que les deux pièces tiennent.",
+    "coreSliver": "Il met une école à l'écart à la fois — les dés de l'école protégée infligent la moitié des dégâts — et vous indique laquelle avant de le faire. Le cœur ne prend rien tant que les deux pièces tiennent : la facette fait tourner un dé à chaque tour, le tranchant le blinde de 6 tous les trois tours.",
+    "quarantineWarden": "Offre une protection de 6 à chaque tour tant que l'égide est active, et ajoute un bloc d'emplacement lorsque la coque passe en dessous de la moitié de sa résistance. Le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "beaconTrap": "Une porte impossible à forcer : les coups portés en dessous sont entièrement absorbés, elle épuise le bouclier que vous déployez, et lorsqu’elle passe en dessous de la moitié de sa jauge, elle se régénère à raison de 10 points à chaque phase. Le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "breakerBarge": "Chaque coup porté prend 3 ferraille, et 6 tant que le broyeur tient ; la grue bloque un dé tous les trois tours. Le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "auctionCorvette": "Mise 7 sur votre course à chaque cycle — payez ou encaissez —, chaque coup porté prend 5 ferraille, et 6 tant que le marteau de justice tient ; sous 45 % la mise monte à 8. Le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "riftMaw": "Les deux yeux font tourner un dé à chaque tour, et sous la moitié il réduit en plus la limite d'un emplacement à chaque tour. Le cœur ne prend rien tant que deux de ses trois pièces tiennent, et le gosier éclate pour 5 en tombant.",
+    "riftBranch": "Réduit la limite d'un emplacement et jette un sort maléfique sur un dé à chaque cycle ; en dessous de 55 %, la limite diminue à chaque tour. Le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "choirFlagship": "La flèche recharge l'ensemble du chœur tous les trois tours, et la voix invoque un nouvel acolyte tous les quatre tours. Le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "cantorColossus": "Le diaphragme ajoute +2 à chaque coup suivant tous les trois tours, et sous 45 % le corps en ajoute +1 à chaque tour. Seul un brouillage de capteurs vide la pile, et le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "coreHeart": "Le cœur ne prend rien tant que deux de ses trois pièces tiennent, et la tempête se déclenche à chaque tour à partir de la phase 2.",
+    "mirrorHeart": "La coque frappe tous les trois tours selon la taille de votre école la plus profonde, et le panneau la blinde de 8. Le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
     "retroEcho": "Réponse : les dégâts que vous avez infligés au tour précédent, dans la limite de 14.",
     "foldWraith": "Annule l'ordre de résolution pendant un tour — parfois deux fois de suite.",
     "slowStrider": "Il ne peut pas être touché tant qu'un allié est en vie, et son bouclier est verrouillé à partir du tour 4.",
@@ -5243,10 +5268,10 @@
     "preEcho": "Commence par déclencher une tempête, puis soigne la meute si celle-ci en a encore une.",
     "hushHerald": "Il bloque deux emplacements à la fois et vide votre compte si vous accumulez des charges.",
     "paradoxLoom": "Sa navette fait tourner un dé à chaque tour et reproduit votre couleur la plus vive.",
-    "foldTyrant": "Plie la commande à chaque cycle et consomme un dé dès que le pli cède.",
-    "hushWarden": "Il ferme les fentes, et un blocage de son propre émetteur les ouvre toutes.",
-    "theHush": "Bloque un emplacement à chaque tour à partir de la deuxième phase ; activez-le pour les débloquer tous.",
-    "echoFleet": "Chaque fenêtre de phase reprend la technique emblématique d'un boss de secteur différent."
+    "foldTyrant": "Plie la commande à chaque cycle, le pli fait tourner un dé à chaque tour, et sous la moitié il dévore votre meilleur dé de réserve à chaque cycle.",
+    "hushWarden": "Le bâillon bloque un emplacement tous les trois tours, et sous 55 % le corps en ferme deux de plus par cycle. Un brouillage des capteurs efface tous ses blocs, et le cœur ne prend rien tant que les deux pièces tiennent.",
+    "theHush": "La sourdine bloque un emplacement tous les trois tours, et dans sa deuxième phase le corps en bloque un à chaque tour. Un brouillage les rouvre tous, et le cœur ne prend rien tant que deux de ses trois pièces tiennent.",
+    "echoFleet": "Chaque fenêtre de phase reprend la technique emblématique d'un boss de secteur différent. Le cœur ne prend rien tant que deux de ses trois pièces tiennent."
   },
   "death": {
     "pact": "« Ils encaisseront de toute façon. Un contrat se fiche bien de savoir lequel d’entre nous est encore en vie. »",

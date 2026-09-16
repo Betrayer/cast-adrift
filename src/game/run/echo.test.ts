@@ -197,9 +197,9 @@ describe("Veto clamps an event outcome at one hull", () => {
 });
 
 describe("the two version bumps the equip cost", () => {
-  it("moves the run snapshot to v15 and keeps every older blob readable", () => {
-    expect(RUN_SNAPSHOT_V).toBe(15);
-    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15]);
+  it("moves the run snapshot to v16 and keeps every older blob readable", () => {
+    expect(RUN_SNAPSHOT_V).toBe(16);
+    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16]);
   });
 
   it("round-trips the equipped node and its spent charge", () => {

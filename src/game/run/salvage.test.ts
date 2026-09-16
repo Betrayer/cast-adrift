@@ -48,6 +48,18 @@ const seatRun = (): void => {
   });
 };
 
+const offerSalvage = (
+  salvage: readonly string[],
+  dieDrop: string | null = null,
+): void => {
+  useRunStore.getState().setPendingRewards({
+    dieDrop,
+    perkChoices: [],
+    salvage: [...salvage],
+    draftNodeId: "n-1",
+  });
+};
+
 describe("salvage offer", () => {
   beforeEach(() => {
     useNarrativeStore.getState().reset();
@@ -153,12 +165,7 @@ describe("salvage pick resolution", () => {
   });
 
   it("takes the picked face and clears the offer", () => {
-    useRunStore.getState().setPendingRewards({
-      dieDrop: null,
-      perkChoices: [],
-      salvage: ["scrap", "repair", "recon"],
-      draftNodeId: "n-1",
-    });
+    offerSalvage(["scrap", "repair", "recon"]);
     const before = useRunStore.getState().scrap;
     resolveSalvagePick("scrap");
     expect(useRunStore.getState().scrap).toBe(before + SALVAGE_SCRAP);
@@ -166,12 +173,7 @@ describe("salvage pick resolution", () => {
   });
 
   it("declining takes nothing but still closes the card", () => {
-    useRunStore.getState().setPendingRewards({
-      dieDrop: null,
-      perkChoices: [],
-      salvage: ["scrap", "repair", "recon"],
-      draftNodeId: "n-1",
-    });
+    offerSalvage(["scrap", "repair", "recon"]);
     const before = useRunStore.getState();
     resolveSalvagePick(null);
     const after = useRunStore.getState();
@@ -183,12 +185,7 @@ describe("salvage pick resolution", () => {
   });
 
   it("refuses a face that was not offered", () => {
-    useRunStore.getState().setPendingRewards({
-      dieDrop: null,
-      perkChoices: [],
-      salvage: ["repair", "recon", "discount"],
-      draftNodeId: "n-1",
-    });
+    offerSalvage(["repair", "recon", "discount"]);
     const before = useRunStore.getState().scrap;
     resolveSalvagePick("scrap");
     expect(useRunStore.getState().scrap).toBe(before);
@@ -200,12 +197,7 @@ describe("salvage pick resolution", () => {
   });
 
   it("cannot be taken twice", () => {
-    useRunStore.getState().setPendingRewards({
-      dieDrop: null,
-      perkChoices: [],
-      salvage: ["scrap", "repair", "recon"],
-      draftNodeId: "n-1",
-    });
+    offerSalvage(["scrap", "repair", "recon"]);
     resolveSalvagePick("scrap");
     const after = useRunStore.getState().scrap;
     resolveSalvagePick("scrap");
@@ -221,12 +213,7 @@ describe("salvage persistence", () => {
   });
 
   it("parks a stacked screen on the offer, so a pending pick survives a reload", () => {
-    useRunStore.getState().setPendingRewards({
-      dieDrop: null,
-      perkChoices: [],
-      salvage: ["scrap", "repair", "discount"],
-      draftNodeId: "n-1",
-    });
+    offerSalvage(["scrap", "repair", "discount"]);
     for (const parked of ["journal", "codex", "settings", "bridge"] as const) {
       useAppStore.setState({ screen: parked });
       expect(captureRunSnapshot().screen).toBe("rewards");
@@ -256,12 +243,7 @@ describe("salvage persistence", () => {
 
   it("keeps an untaken offer and the reveal row across a reload", () => {
     useRunStore.getState().addSectorReveal(SALVAGE_RECON_ROWS);
-    useRunStore.getState().setPendingRewards({
-      dieDrop: "red-d6",
-      perkChoices: [],
-      salvage: ["scrap", "repair", "discount"],
-      draftNodeId: "n-1",
-    });
+    offerSalvage(["scrap", "repair", "discount"], "red-d6");
     const snapshot = captureRunSnapshot();
     useRunStore.getState().hydrate(createInitialRunValues());
 
@@ -277,12 +259,7 @@ describe("salvage persistence", () => {
   });
 
   it("carries a taken pick's empty offer, so the card does not come back", () => {
-    useRunStore.getState().setPendingRewards({
-      dieDrop: "red-d6",
-      perkChoices: [],
-      salvage: ["scrap", "repair", "discount"],
-      draftNodeId: "n-1",
-    });
+    offerSalvage(["scrap", "repair", "discount"], "red-d6");
     resolveSalvagePick("repair");
     const snapshot = captureRunSnapshot();
     useRunStore.getState().hydrate(createInitialRunValues());

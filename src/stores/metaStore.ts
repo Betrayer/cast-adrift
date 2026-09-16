@@ -21,6 +21,7 @@ import type { BattleLayoutId } from '@/types';
 import { isOverBudget, picksConnected } from '@/game/chart/engine';
 import { levelFromTotalXp } from '@/game/xp';
 import { scopedPersistStorage } from '@/stores/scopedStorage';
+import { pickShape, shapeKeys } from '@/stores/shape';
 
 export interface CollectionEntry {
   defId: string;
@@ -331,6 +332,11 @@ export const createInitialMetaValues = (): MetaValues => ({
   prefs: {},
   stats: createInitialMetaStats(),
 });
+
+const META_KEYS = shapeKeys(createInitialMetaValues());
+
+export const metaValues = (s: MetaValues): MetaValues =>
+  pickShape(META_KEYS, s);
 
 const coerceEncountered = (value: unknown): Record<string, EncounterRecord> => {
   if (typeof value !== "object" || value === null) return {};
@@ -994,43 +1000,7 @@ export const useMetaStore = create<MetaState>()(
       storage: scopedPersistStorage<MetaValues>(),
       version: META_VERSION,
       migrate: migrateMeta,
-      partialize: (s): MetaValues => ({
-        shards: s.shards,
-        vouchers: s.vouchers,
-        voucherOffers: s.voucherOffers,
-        xp: s.xp,
-        level: s.level,
-        chartPicks: s.chartPicks,
-        chartFreeRespecs: s.chartFreeRespecs,
-        collection: s.collection,
-        ships: s.ships,
-        selectedShip: s.selectedShip,
-        selectedEcho: s.selectedEcho,
-        hangar: s.hangar,
-        themes: s.themes,
-        tutorialSeen: s.tutorialSeen,
-        engravings: s.engravings,
-        badges: s.badges,
-        codex: s.codex,
-        codexRead: s.codexRead,
-        seenPuzzles: s.seenPuzzles,
-        seenFragments: s.seenFragments,
-        contracts: s.contracts,
-        dailyPlayed: s.dailyPlayed,
-        best: s.best,
-        ascension: s.ascension,
-        flagsArchive: s.flagsArchive,
-        bossFirstKills: s.bossFirstKills,
-        endings: s.endings,
-        achievements: s.achievements,
-        achievementsSeen: s.achievementsSeen,
-        encountered: s.encountered,
-        unlocksGranted: s.unlocksGranted,
-        unlocksSeen: s.unlocksSeen,
-        dieSkin: s.dieSkin,
-        prefs: s.prefs,
-        stats: s.stats,
-      }),
+      partialize: (s): MetaValues => metaValues(s),
     },
   ),
 );

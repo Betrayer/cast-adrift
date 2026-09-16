@@ -6,6 +6,7 @@ import {
   autosaveRun,
   jumpTo,
   resumeUnenteredNode,
+  startEventBattle,
   startRun,
 } from "@/game/run/flow";
 import { readLocalResume, resumeLocalRun } from "@/game/run/resume";
@@ -28,6 +29,15 @@ const findStartAdjacent = (type: NodeType): string | null => {
     if (node?.type === type) return id;
   }
   return null;
+};
+
+const startAtBattleNode = (): string => {
+  for (let seed = 1; seed < 60; seed += 1) {
+    startRun(seed);
+    const node = findStartAdjacent("battle");
+    if (node !== null) return node;
+  }
+  throw new Error("no seed under 60 starts next to a battle node");
 };
 
 describe("save / resume", () => {
@@ -56,15 +66,7 @@ describe("save / resume", () => {
   });
 
   it("restores a mid-battle placement exactly", () => {
-    let seed = 1;
-    let battleNode: string | null = null;
-    while (battleNode === null && seed < 60) {
-      startRun(seed);
-      battleNode = findStartAdjacent("battle");
-      if (battleNode === null) seed += 1;
-    }
-    expect(battleNode).not.toBeNull();
-    if (battleNode === null) return;
+    const battleNode = startAtBattleNode();
 
     jumpTo(battleNode);
     expect(useAppStore.getState().screen).toBe("battle");
@@ -142,15 +144,7 @@ describe("save / resume", () => {
   });
 
   it("parks a mid-fight journal visit on the fight, not on the map", () => {
-    let seed = 1;
-    let battleNode: string | null = null;
-    while (battleNode === null && seed < 60) {
-      startRun(seed);
-      battleNode = findStartAdjacent("battle");
-      if (battleNode === null) seed += 1;
-    }
-    expect(battleNode).not.toBeNull();
-    if (battleNode === null) return;
+    const battleNode = startAtBattleNode();
     const map = useRunStore.getState().map;
     expect(map).not.toBeNull();
     if (map === null) return;
@@ -203,6 +197,72 @@ describe("save / resume", () => {
         .getState()
         .dice.map((d) => `${d.uid}:${d.state}:${String(d.value)}`),
     ).toEqual(beforeDice);
+  });
+
+  it("drops a mid-fight blob written before the part rework and keeps the run", () => {
+    const battleNode = startAtBattleNode();
+    jumpTo(battleNode);
+    const snap = captureRunSnapshot();
+    expect(snap.battle).not.toBeNull();
+    expect(snap.screen).toBe("battle");
+    const scrap = useRunStore.getState().scrap;
+
+    useRunStore.getState().reset();
+    useBattleStore.getState().reset();
+    useAppStore.setState({ screen: "menu" });
+    expect(restoreRunSnapshot({ ...snap, v: RUN_SNAPSHOT_V - 1 })).toBe(true);
+
+    expect(useAppStore.getState().screen).toBe("map");
+    expect(useBattleStore.getState().phase).toBe("idle");
+    expect(useRunStore.getState().active).toBe(true);
+    expect(useRunStore.getState().scrap).toBe(scrap);
+    expect(useRunStore.getState().position).toBe(battleNode);
+    expect(useRunStore.getState().visited).not.toContain(battleNode);
+
+    expect(resumeUnenteredNode()).toBe(true);
+    expect(useAppStore.getState().screen).toBe("battle");
+    expect(useBattleStore.getState().phase).toBe("placement");
+    expect(useBattleStore.getState().turn).toBe(1);
+  });
+
+  it("drops the pending event fight with a blob written before the part rework", () => {
+    startRun(1);
+    startEventBattle({
+      enemyIds: ["scavDrone"],
+      scrap: 15,
+      loot: { rarity: "rare" },
+      setFlags: [["prologueRun", true]],
+    });
+    expect(useAppStore.getState().screen).toBe("battle");
+    expect(useRunStore.getState().pendingBattle).not.toBeNull();
+
+    const snap = captureRunSnapshot();
+    expect(snap.battle).not.toBeNull();
+    expect(snap.run.pendingBattle).not.toBeNull();
+
+    useRunStore.getState().reset();
+    useBattleStore.getState().reset();
+    useAppStore.setState({ screen: "menu" });
+    expect(restoreRunSnapshot({ ...snap, v: RUN_SNAPSHOT_V - 1 })).toBe(true);
+
+    expect(useAppStore.getState().screen).toBe("map");
+    expect(useBattleStore.getState().phase).toBe("idle");
+    expect(useRunStore.getState().active).toBe(true);
+    expect(useRunStore.getState().pendingBattle).toBeNull();
+  });
+
+  it("still carries a mid-fight blob written by this build", () => {
+    const battleNode = startAtBattleNode();
+    jumpTo(battleNode);
+    const snap = captureRunSnapshot();
+
+    useRunStore.getState().reset();
+    useBattleStore.getState().reset();
+    useAppStore.setState({ screen: "menu" });
+    expect(restoreRunSnapshot(snap)).toBe(true);
+
+    expect(useAppStore.getState().screen).toBe("battle");
+    expect(useBattleStore.getState().phase).toBe("placement");
   });
 
   it("still parks every stacked run-context screen on the map with no fight running", () => {

@@ -3,6 +3,7 @@ import {
   computeBattleLayout,
   dieCeilingFor,
   enemyCeilingFor,
+  ENEMY_MIN,
   type BattleLayout,
   type BattleLayoutInput,
   type Rect,
@@ -56,7 +57,10 @@ const FIGHTS = [
   { enemies: 2, subs: 1 },
   { enemies: 3, subs: 0 },
   { enemies: 3, subs: 2 },
+  { enemies: 3, subs: 3 },
 ];
+
+const RING_REACH = 0.72;
 
 const inputFor = (frame: Frame, dice: number, fight: (typeof FIGHTS)[number]): BattleLayoutInput => ({
   enemyBand: frame.enemyBand,
@@ -70,6 +74,7 @@ const inputFor = (frame: Frame, dice: number, fight: (typeof FIGHTS)[number]): B
 interface Entry {
   name: string;
   frame: Frame;
+  fight: (typeof FIGHTS)[number];
   layout: BattleLayout;
 }
 
@@ -78,6 +83,7 @@ const MATRIX: Entry[] = FRAMES.flatMap((frame) =>
     FIGHTS.map((fight) => ({
       name: `${frame.name} · ${String(dice)} dice · ${String(fight.enemies)}x${String(fight.subs)} subs`,
       frame,
+      fight,
       layout: computeBattleLayout(inputFor(frame, dice, fight)),
     })),
   ),
@@ -280,6 +286,87 @@ describe("enemy hit geometry", () => {
   it("keeps subsystem chips at a 24px minimum tap diameter", () => {
     for (const entry of MATRIX) {
       expect(entry.layout.subsystems.radius * 2).toBeGreaterThanOrEqual(24);
+    }
+  });
+
+  it("fits a conglomerate of one body and three chips at 360x640", () => {
+    const frame = FRAMES[0];
+    expect(frame).toBeDefined();
+    if (frame === undefined) return;
+    const layout = computeBattleLayout(
+      inputFor(frame, 9, { enemies: 1, subs: 3 }),
+    );
+    const anchor = layout.enemies[0];
+    expect(anchor).toBeDefined();
+    if (anchor === undefined) return;
+    const { subsystems } = layout;
+    const column = {
+      top: anchor.y + subsystems.y0 - subsystems.radius,
+      bottom: anchor.y + subsystems.y0 + 2 * subsystems.pitch + subsystems.radius,
+      right: anchor.x + subsystems.x + subsystems.radius,
+    };
+    expect(column.top).toBeGreaterThanOrEqual(frame.enemyBand.y - 0.5);
+    expect(column.bottom).toBeLessThanOrEqual(
+      frame.enemyBand.y + frame.enemyBand.h + 0.5,
+    );
+    expect(column.right).toBeLessThanOrEqual(
+      frame.enemyBand.x + frame.enemyBand.w + 0.5,
+    );
+    expect(column.bottom).toBeLessThanOrEqual(frame.trayBand.y + 0.5);
+    expect(layout.enemySize).toBeGreaterThanOrEqual(ENEMY_MIN);
+    expect(subsystems.radius * 2).toBeGreaterThanOrEqual(24);
+  });
+
+  it("keeps the subsystem column out of the dice tray on every matrix board", () => {
+    const offenders: string[] = [];
+    for (const frame of FRAMES) {
+      for (const fight of FIGHTS) {
+        if (fight.subs === 0) continue;
+        for (const dice of DECKS) {
+          const layout = computeBattleLayout(inputFor(frame, dice, fight));
+          const anchor = layout.enemies[0];
+          if (anchor === undefined) continue;
+          const { subsystems } = layout;
+          const bottom =
+            anchor.y +
+            subsystems.y0 +
+            (fight.subs - 1) * subsystems.pitch +
+            subsystems.radius;
+          if (bottom > frame.trayBand.y + 0.5) {
+            offenders.push(
+              `${frame.name} ${String(fight.enemies)}x${String(fight.subs)} ${String(dice)} dice`,
+            );
+          }
+        }
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it("never lets a part-intent label reach a neighbour's hull ring", () => {
+    const offenders: string[] = [];
+    for (const entry of MATRIX) {
+      if (entry.layout.enemies.length < 2 || entry.fight.subs === 0) continue;
+      const { subsystems, partLabel, enemyPitch, enemySize } = entry.layout;
+      const labelRight = subsystems.x + partLabel.x + partLabel.reach;
+      if (labelRight > enemyPitch - enemySize * RING_REACH + 0.5) {
+        offenders.push(entry.name);
+      }
+    }
+    expect(offenders).toEqual([]);
+  });
+
+  it("keeps a solo body's label inside the enemy band", () => {
+    for (const entry of MATRIX) {
+      if (entry.layout.enemies.length !== 1 || entry.fight.subs === 0) continue;
+      const anchor = entry.layout.enemies[0];
+      if (anchor === undefined) continue;
+      const { subsystems, partLabel } = entry.layout;
+      const labelRight =
+        anchor.x + subsystems.x + partLabel.x + partLabel.reach;
+      expect(labelRight).toBeLessThanOrEqual(
+        entry.frame.enemyBand.x + entry.frame.enemyBand.w + 0.5,
+      );
     }
   });
 

@@ -1,6 +1,7 @@
 import {
   hydrateBattle,
   serializeBattle,
+  useBattleStore,
   type BattleSaveState,
 } from "@/stores/battleStore";
 import {
@@ -30,10 +31,10 @@ const resumeScreen = (screen: ScreenId, battleLive: boolean): ScreenId => {
   return useRunStore.getState().pendingRewards === null ? "map" : "rewards";
 };
 
-export const RUN_SNAPSHOT_V = 15;
+export const RUN_SNAPSHOT_V = 16;
 
 export const RUN_SNAPSHOT_ACCEPTED: readonly number[] = [
-  10, 11, 12, 13, 14, 15,
+  10, 11, 12, 13, 14, 15, 16,
 ];
 
 export interface RunSnapshotV1 {
@@ -90,6 +91,12 @@ const pickRunValues = (s: RunState): RunValues => ({
   solvedPuzzles: [...s.solvedPuzzles],
   puzzleRuns: Object.fromEntries(
     Object.entries(s.puzzleRuns).map(([nodeId, state]) => [nodeId, { ...state }]),
+  ),
+  eventRuns: Object.fromEntries(
+    Object.entries(s.eventRuns ?? {}).map(([nodeId, state]) => [
+      nodeId,
+      { ...state },
+    ]),
   ),
   anomalyStreak: s.anomalyStreak,
   interferenceStacks: s.interferenceStacks,
@@ -179,6 +186,12 @@ export const captureRunSnapshot = (): RunSnapshotV1 => {
   };
 };
 
+const battleBlobIsCurrent = (snap: RunSnapshotV1): boolean =>
+  snap.battle === null || snap.v === RUN_SNAPSHOT_V;
+
+const screenWithoutBattle = (values: RunValues): ScreenId =>
+  values.pendingRewards === null ? "map" : "rewards";
+
 const isRunSnapshot = (data: unknown): data is RunSnapshotV1 => {
   if (typeof data !== "object" || data === null) return false;
   const snap = data as Partial<RunSnapshotV1>;
@@ -224,8 +237,16 @@ export const restoreRunSnapshot = (data: unknown): boolean => {
     hash: values.stats.actionHash,
     count: values.stats.actionCount,
   });
-  if (data.battle !== null) hydrateBattle(data.battle);
-  useAppStore.getState().go(data.screen);
+  const battleSurvives = battleBlobIsCurrent(data);
+  if (battleSurvives) {
+    if (data.battle !== null) hydrateBattle(data.battle);
+  } else {
+    useBattleStore.getState().reset();
+    useRunStore.getState().setPendingBattle(null);
+  }
+  useAppStore
+    .getState()
+    .go(battleSurvives ? data.screen : screenWithoutBattle(values));
   resetBarkMemory();
   if (data.run.active) emitBark("resume");
   return true;

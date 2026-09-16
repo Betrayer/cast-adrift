@@ -75,7 +75,8 @@
     "hijack": "Przejmuje twoją najlepszą kostkę",
     "echoTotal": "powtarza twoją ostatnią turę (maksymalnie {{n}})",
     "foldOrder": "realizuje zamówienie",
-    "devourDie": "zużywa twoją najlepszą zapasową kostkę"
+    "devourDie": "zużywa twoją najlepszą zapasową kostkę",
+    "idle": "Trzyma"
   },
   "slot": {
     "weaponA": "Broń A",
@@ -140,8 +141,8 @@
   "dieMeta": "d{{tier}} · {{school}} · {{faces}} · śr. {{ev}}",
   "targetBody": "Celuj w kadłub",
   "targetSub": "{{name}} {{hp}}/{{max}}",
-  "mitigation": "surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
-  "mitigationNone": "Ten zamiar nie zadaje obrażeń",
+  "mitigation": "przychodzące surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
+  "mitigationNone": "Ten przeciwnik nie zada obrażeń w tej turze",
   "forecast": "zadasz {{out}} · przyjmiesz ~{{inc}} (tarcza trzyma {{shield}})",
   "forecastClear": "{{out}} obrażeń czyści pole",
   "resBoard": "{{school}} {{placed}}+{{tray}}",
@@ -299,7 +300,8 @@
     "hijack": "Chwyta twoją najwyższą kość i przybija ją w wybranym slocie.",
     "echoTotal": "Odbija obrażenia z twojej poprzedniej tury, do {{n}}.",
     "foldOrder": "Składa kolejność rozstrzygania na dwie tury.",
-    "devourDie": "Zjada twoją najwyższą kość: spada do 1, a wróg zyskuje tyle tarczy."
+    "devourDie": "Zjada twoją najwyższą kość: spada do 1, a wróg zyskuje tyle tarczy.",
+    "idle": "W tej turze nic nie robi."
   },
   "aura": {
     "atk+2": "+2 do każdego ciosu tego wroga.",
@@ -313,6 +315,16 @@
     "summonEvery4": "Co czwartą turę: wzywa akolitę.",
     "stealOnHit6": "Każdy trafiony cios zabiera 6 złomu."
   },
+  "partDeath": {
+    "explodePart": "Jej zniszczenie uderza w ciebie za {{n}}.",
+    "enrageCore": "Jej zniszczenie wścieka rdzeń: +{{n}} do każdego kolejnego ciosu.",
+    "openCore": "Jej zniszczenie otwiera rdzeń na {{turns}} tury.",
+    "shieldCore": "Jej zniszczenie oddaje rdzeniowi {{n}} tarczy.",
+    "spawnAdds": "Jej zniszczenie wzywa kolejny statek."
+  },
+  "coreSealed": "Rdzeń zapieczętowany",
+  "coreSealedWhy": "Kadłub pozostaje zamknięty, dopóki nie zniszczysz jeszcze {{n}} jego części.",
+  "coreOpenWhy": "Kadłub pozostaje otwarty do końca tury {{n}}.",
   "statusName": {
     "burn": "Płomień",
     "mark": "Podatność",
@@ -360,7 +372,8 @@
       "sensor": "osoby w trudnej sytuacji + {{n}}",
       "charge": "+{{n}} Ładunek",
       "repair": "+{{n}} Kadłub",
-      "storm": "lekki podmuch wiatru"
+      "storm": "lekki podmuch wiatru",
+      "partDown": "część «{{name}}» zniszczona"
     },
     "foe": {
       "attack": "ataki na stronę {{n}}",

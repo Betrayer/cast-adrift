@@ -64,3 +64,26 @@
 .cargoRow button {
   align-self: flex-start;
 }
+
+@keyframes bridgePanelIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.panel {
+  animation: bridgePanelIn 140ms ease-out;
+}
+
+:root[data-ca-motion='reduced'] .panel {
+  animation: none;
+}
+
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mantine-spacing-sm);
+}
