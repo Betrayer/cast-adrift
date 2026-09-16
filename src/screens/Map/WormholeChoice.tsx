@@ -4,22 +4,27 @@ import { AppModal } from "@/components/AppModal";
 import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
 import { GENTLE_BUDGET, MAX_BUDGET } from "@/game/map/wormhole";
+import { bypassCopyKey, type BypassOffer } from "./spot";
 import styles from "./WormholeChoice.module.css";
 
 interface Props {
-  toll: number;
+  offer: BypassOffer;
   gentle: boolean;
-  busy: boolean;
+  softLand: boolean;
+  softLandSpent: boolean;
   onBypass: () => void;
   onRide: () => void;
+  onSoftLand: () => void;
 }
 
 export const WormholeChoice = ({
-  toll,
+  offer,
   gentle,
-  busy,
+  softLand,
+  softLandSpent,
   onBypass,
   onRide,
+  onSoftLand,
 }: Props) => {
   const { t } = useTranslation(["run", "common"]);
   return (
@@ -54,7 +59,7 @@ export const WormholeChoice = ({
           <Button
             fullWidth
             variant="default"
-            disabled={busy}
+            disabled={!offer.offered}
             data-testid="wormhole-bypass"
             onClick={onBypass}
           >
@@ -62,20 +67,19 @@ export const WormholeChoice = ({
           </Button>
           <Text
             size="xs"
-            c={toll > 0 ? schools.red.text : tokens.faint}
+            c={
+              offer.offered && offer.toll > 0 ? schools.red.text : tokens.faint
+            }
             ta="center"
             data-testid="wormhole-toll"
-            data-toll={String(toll)}
+            data-toll={String(offer.offered ? offer.toll : -1)}
           >
-            {toll > 0
-              ? t("run:hole.bypassCost", { n: toll })
-              : t("run:hole.bypassFree")}
+            {t(bypassCopyKey(offer), { n: offer.toll })}
           </Text>
         </div>
         <div className={styles.option}>
           <Button
             fullWidth
-            disabled={busy}
             data-testid="wormhole-ride"
             onClick={onRide}
           >
@@ -87,6 +91,27 @@ export const WormholeChoice = ({
               : t("run:hole.rideCost", { min: 1, max: MAX_BUDGET })}
           </Text>
         </div>
+        {softLand ? (
+          <div className={styles.option} data-testid="wormhole-soft">
+            <Button
+              fullWidth
+              variant="default"
+              disabled={softLandSpent}
+              data-testid="wormhole-soft-land"
+              onClick={onSoftLand}
+            >
+              {t("run:hole.softLand")}
+            </Button>
+            <Text
+              size="xs"
+              c={softLandSpent ? tokens.faint : schools.blue.text}
+              ta="center"
+              data-testid="wormhole-soft-why"
+            >
+              {t(softLandSpent ? "run:hole.softLandSpent" : "run:hole.softLandWhy")}
+            </Text>
+          </div>
+        ) : null}
       </div>
     </AppModal>
   );

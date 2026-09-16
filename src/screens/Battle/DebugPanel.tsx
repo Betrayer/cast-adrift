@@ -39,61 +39,27 @@ const MK_SLOTS: readonly SlotId[] = [
   'spinal',
 ];
 
+const INTENT_SHORT: Partial<Record<Intent['t'], string>> = {
+  healAllies: 'heal',
+  mirrorHalf: 'mirror',
+  stealScrap: 'steal',
+  twistDie: 'twist',
+  swapValues: 'swap',
+  curseDie: 'curse',
+  shieldGate: 'gate',
+  drainCharge: 'drain',
+  siphonShield: 'siphon',
+};
+
 const intentSummary = (intent: Intent): string => {
-  switch (intent.t) {
-    case 'attack':
-      return `attack ${String(intent.n)}`;
-    case 'shield':
-      return `shield ${String(intent.n)}`;
-    case 'shieldAll':
-      return `shieldAll ${String(intent.n)}`;
-    case 'multi':
-      return `multi ${String(intent.n)}x${String(intent.k)}`;
-    case 'charge':
-      return 'charge';
-    case 'jamSlot':
-      return 'jamSlot';
-    case 'lockDie':
-      return 'lockDie';
-    case 'summon':
-      return `summon ${intent.id}`;
-    case 'healAllies':
-      return `heal ${String(intent.n)}`;
-    case 'mirrorHalf':
-      return 'mirror';
-    case 'stealScrap':
-      return `steal ${String(intent.n)}`;
-    case 'capShrink':
-      return 'capShrink';
-    case 'twistDie':
-      return 'twist';
-    case 'swapValues':
-      return 'swap';
-    case 'storm':
-      return 'storm';
-    case 'curseDie':
-      return `curse ${String(intent.n)}`;
-    case 'shieldGate':
-      return `gate ${String(intent.n)}`;
-    case 'mirrorSchool':
-      return 'mirrorSchool';
-    case 'drainCharge':
-      return `drain ${String(intent.n)}`;
-    case 'siphonShield':
-      return `siphon ${String(intent.n)}`;
-    case 'bargain':
-      return `bargain ${String(intent.n)}/${String(intent.heal)}`;
-    case 'enrage':
-      return `enrage ${String(intent.n)}`;
-    case 'hijack':
-      return 'hijack';
-    case 'echoTotal':
-      return `echoTotal ${String(intent.cap)}`;
-    case 'foldOrder':
-      return 'foldOrder';
-    case 'devourDie':
-      return 'devourDie';
-  }
+  if (intent.t === 'multi')
+    return `multi ${String(intent.n)}x${String(intent.k)}`;
+  if (intent.t === 'summon') return `summon ${intent.id}`;
+  if (intent.t === 'bargain')
+    return `bargain ${String(intent.n)}/${String(intent.heal)}`;
+  if (intent.t === 'echoTotal') return `echoTotal ${String(intent.cap)}`;
+  const name = INTENT_SHORT[intent.t] ?? intent.t;
+  return 'n' in intent ? `${name} ${String(intent.n)}` : name;
 };
 
 const encounterOptions = [

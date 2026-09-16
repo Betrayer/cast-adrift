@@ -3,26 +3,14 @@ import { EVENT_BY_ID } from "@/data/events";
 import { flagShopDiscount } from "@/game/economy/shop";
 import { applyOutcome } from "@/game/events/apply";
 import { eventEligible, type EventContext } from "@/game/events/engine";
+import { must, optionById } from "@/game/events/eventFixtures";
 import { buildEncounterIds, shouldInjectBounty } from "@/game/run/encounter";
 import { createStream } from "@/services/rng";
 import { useRunStore } from "@/stores/runStore";
 import type { EventOption } from "@/types/events";
 
-const must = <T>(value: T | undefined | null, msg: string): T => {
-  if (value === undefined || value === null) throw new Error(msg);
-  return value;
-};
-
 const firstOutcome = (option: EventOption) =>
   must(option.outcomes?.[0], `${option.id}: no outcome`);
-
-const optionById = (eventId: string, optionId: string): EventOption => {
-  const event = must(EVENT_BY_ID.get(eventId), `event ${eventId}`);
-  return must(
-    event.options.find((o) => o.id === optionId),
-    `${eventId}.${optionId}`,
-  );
-};
 
 const runCtx = (): EventContext => {
   const s = useRunStore.getState();

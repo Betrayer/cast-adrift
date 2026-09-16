@@ -22,6 +22,13 @@ describe("milestones", () => {
     expect(hangarBudget(50)).toBe(16);
   });
 
+  it("a negative hub delta bites, because the card says it does", () => {
+    expect(hangarBudget(1, -2)).toBe(BASE_HANGAR_BUDGET - 2);
+    expect(hangarBudget(45, -2)).toBe(14);
+    expect(hangarBudget(45, 1)).toBe(MAX_HANGAR_BUDGET);
+    expect(hangarBudget(1, -99)).toBe(1);
+  });
+
   it("hub budget notable cannot push past the cap", () => {
     expect(hangarBudget(45, 1)).toBe(MAX_HANGAR_BUDGET);
     expect(hangarBudget(24, 1)).toBe(13);

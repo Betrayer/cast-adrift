@@ -1,3 +1,5 @@
+import { ENEMY_BY_ID } from "@/data/enemies";
+import { partDefOf } from "@/game/battle/damage";
 import type {
   Beat,
   BattleLogEntry,
@@ -23,6 +25,30 @@ const defIdOf = (
   fallback.find((enemy) => enemy.id === id)?.defId ??
   id;
 
+const partNameKeyIn = (
+  enemies: readonly EnemyState[],
+  partId: string,
+): string | undefined => {
+  for (const enemy of enemies) {
+    const part = enemy.subsystems.find((sub) => sub.id === partId);
+    if (part === undefined) continue;
+    const def = ENEMY_BY_ID.get(enemy.defId);
+    return def === undefined ? undefined : partDefOf(def, part)?.name;
+  }
+  return undefined;
+};
+
+const partNameKeyFor = (
+  beat: Beat,
+  ctx: LogContext,
+): string | undefined => {
+  if (beat.kind !== "partDown" || beat.targetId === undefined) return undefined;
+  return (
+    partNameKeyIn(beat.after.enemies, beat.targetId) ??
+    partNameKeyIn(ctx.enemies, beat.targetId)
+  );
+};
+
 const playerEntry = (
   beat: Beat,
   ctx: LogContext,
@@ -33,6 +59,7 @@ const playerEntry = (
   side: "you",
   kind: beat.kind,
   actor: beat.slot,
+  targetName: partNameKeyFor(beat, ctx),
   amount: beat.amount,
   hull: beat.overflowHull ?? 0,
   shield: 0,
@@ -50,6 +77,11 @@ const enemyEntry = (
   side: "foe",
   kind: beat.kind,
   actor: defIdOf(ctx.enemies, beat.enemyId, beat.after.enemies),
+  targetName:
+    beat.partId === undefined
+      ? undefined
+      : partNameKeyIn(beat.after.enemies, beat.partId) ??
+        partNameKeyIn(ctx.enemies, beat.partId),
   amount: beat.amount,
   hull: beat.hullDamage,
   shield: beat.shieldDamage,

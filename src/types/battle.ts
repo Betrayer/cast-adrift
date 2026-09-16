@@ -6,6 +6,8 @@ import type {
   SlotId,
   SubsystemAura,
 } from "@/types/content";
+import type { EchoNodeId } from "@/data/echo";
+import type { FireModeId } from "@/data/fireModes";
 import type { ShipId } from "@/data/ships";
 import type { Statuses } from "@/game/battle/statuses";
 import type {
@@ -42,6 +44,8 @@ export interface SlotState {
   mk: 1 | 2 | 3;
   jamOn?: number;
   dieUid?: string;
+  modes?: readonly FireModeId[];
+  mode?: FireModeId;
 }
 
 export interface SubsystemState {
@@ -49,7 +53,9 @@ export interface SubsystemState {
   key: string;
   hp: number;
   hpMax: number;
-  aura: SubsystemAura;
+  aura?: SubsystemAura;
+  intentIndex?: number;
+  nextIntent?: Intent;
 }
 
 export interface EnemyState {
@@ -67,6 +73,7 @@ export interface EnemyState {
   rage?: number;
   ward?: School;
   lastHitKey?: string;
+  coreOpenUntilTurn?: number;
 }
 
 export type ResonanceThreshold = 2 | 4 | 6;
@@ -121,6 +128,8 @@ export interface BattleSnapshot {
   chartPicks?: string[];
   mutators?: string[];
   modules?: string[];
+  officers?: string[];
+  echo?: EchoNodeId;
   engravings?: Readonly<Record<string, readonly string[]>>;
   flags?: string[];
   counters?: Record<string, number>;
@@ -153,6 +162,8 @@ export interface BattleSnapshot {
   pendingTwist: number;
   pendingSwap: number;
   pendingStorm: number;
+  pendingAdds?: string[];
+  partsDowned?: string[];
   ascension: number;
   sectorHpPct: number;
   sectorDmgPct: number;
@@ -173,7 +184,8 @@ export type BeatKind =
   | "sensor"
   | "charge"
   | "repair"
-  | "storm";
+  | "storm"
+  | "partDown";
 
 export interface SensorResult {
   vulnerable: number;
@@ -222,6 +234,7 @@ export type EnemyBeatKind =
 
 export interface EnemyBeat {
   enemyId: string;
+  partId?: string;
   kind: EnemyBeatKind;
   amount: number;
   hullDamage: number;
@@ -239,6 +252,7 @@ export interface BattleLogEntry {
   side: "you" | "foe";
   kind: BeatKind | EnemyBeatKind;
   actor: string;
+  targetName?: string;
   amount: number;
   hull: number;
   shield: number;

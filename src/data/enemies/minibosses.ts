@@ -1,4 +1,10 @@
-import { enemy, sub } from "@/data/enemies/builder";
+import {
+  enemy,
+  PART_HP,
+  partCycle,
+  phasedEnemy,
+  sub,
+} from "@/data/enemies/builder";
 import type { EnemyDef } from "@/types/content";
 
 export const MINIBOSSES: readonly EnemyDef[] = [
@@ -38,7 +44,7 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { t: "attack", n: 8 },
     ],
   }),
-  enemy({
+  phasedEnemy({
     id: "leechQueen",
     hp: 50,
     miniboss: true,
@@ -66,12 +72,8 @@ export const MINIBOSSES: readonly EnemyDef[] = [
         everyTurn: [{ t: "lockDie" }],
       },
     ],
-    pattern: [
-      { t: "attack", n: 7 },
-      { t: "multi", n: 4, k: 2 },
-    ],
   }),
-  enemy({
+  phasedEnemy({
     id: "mineTyrant",
     hp: 48,
     miniboss: true,
@@ -88,10 +90,6 @@ export const MINIBOSSES: readonly EnemyDef[] = [
         ],
         everyTurn: [{ t: "summon", id: "mine" }],
       },
-    ],
-    pattern: [
-      { t: "attack", n: 9 },
-      { t: "multi", n: 5, k: 2 },
     ],
   }),
   enemy({
@@ -140,13 +138,23 @@ export const MINIBOSSES: readonly EnemyDef[] = [
   }),
   enemy({
     id: "resonator",
-    hp: 58,
+    hp: 32,
     miniboss: true,
+    shell: true,
+    coreLockAt: 1,
     claims: [
       { k: "intent", t: "mirrorSchool" },
       { k: "aura", is: "shieldSelf6" },
+      { k: "trait", is: "coreLock" },
     ],
-    subsystems: [sub("resonator", "coil", 14, "shieldSelf6")],
+    subsystems: [
+      sub("resonator", "coil", PART_HP, "shieldSelf6", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("resonator", "chord", PART_HP, undefined, {
+        onDeath: { t: "explodePart", n: 4 },
+      }),
+    ],
     pattern: [
       { t: "mirrorSchool" },
       { t: "multi", n: 5, k: 3 },
@@ -156,7 +164,7 @@ export const MINIBOSSES: readonly EnemyDef[] = [
   }),
   enemy({
     id: "quarantineTwin",
-    hp: 38,
+    hp: 47,
     miniboss: true,
     shell: true,
     alternating: true,
@@ -176,13 +184,23 @@ export const MINIBOSSES: readonly EnemyDef[] = [
   }),
   enemy({
     id: "usurer",
-    hp: 64,
+    hp: 48,
     miniboss: true,
+    shell: true,
+    coreLockAt: 1,
     claims: [
       { k: "intent", t: "bargain" },
       { k: "aura", is: "stealOnHit6" },
+      { k: "trait", is: "coreLock" },
     ],
-    subsystems: [sub("usurer", "vault", 14, "stealOnHit6")],
+    subsystems: [
+      sub("usurer", "vault", PART_HP, "stealOnHit6", {
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+      sub("usurer", "writ", PART_HP, undefined, {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+    ],
     pattern: [
       { t: "bargain", n: 6, heal: 4 },
       { t: "multi", n: 5, k: 3 },
@@ -190,22 +208,34 @@ export const MINIBOSSES: readonly EnemyDef[] = [
       { t: "attack", n: 10 },
     ],
   }),
-  enemy({
+  phasedEnemy({
     id: "silencer",
-    hp: 50,
+    hp: 34,
     miniboss: true,
+    shell: true,
+    coreLockAt: 1,
     jamReleasesBlocks: true,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "jamReleasesBlocks" },
       { k: "intent", t: "jamSlot" },
+      { k: "partIntent", t: "jamSlot" },
       { k: "trait", is: "phases" },
     ],
-    subsystems: [sub("silencer", "emitter", 14, "atk+2")],
+    subsystems: [
+      sub("silencer", "emitter", PART_HP, "atk+2", {
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+      sub("silencer", "damper", PART_HP, undefined, {
+        intents: partCycle({ t: "jamSlot" }),
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+    ],
     phases: [
       {
         untilHpPct: 55,
         pattern: [
-          { t: "jamSlot" },
+          { t: "idle" },
           { t: "multi", n: 4, k: 3 },
           { t: "attack", n: 8 },
         ],
@@ -220,29 +250,35 @@ export const MINIBOSSES: readonly EnemyDef[] = [
         onEnter: [{ t: "jamSlot", k: 2 }],
       },
     ],
-    pattern: [
-      { t: "jamSlot" },
-      { t: "multi", n: 4, k: 3 },
-      { t: "attack", n: 8 },
-    ],
   }),
   enemy({
     id: "coreSliver",
-    hp: 56,
+    hp: 40,
     miniboss: true,
+    shell: true,
+    coreLockAt: 1,
     ward: true,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "ward" },
       { k: "aura", is: "twistEachTurn" },
     ],
-    subsystems: [sub("coreSliver", "facet", 12, "twistEachTurn")],
+    subsystems: [
+      sub("coreSliver", "facet", PART_HP, "twistEachTurn", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("coreSliver", "edge", PART_HP, undefined, {
+        intents: partCycle({ t: "shield", n: 6 }),
+        onDeath: { t: "explodePart", n: 4 },
+      }),
+    ],
     pattern: [
       { t: "multi", n: 5, k: 3 },
       { t: "shield", n: 6 },
       { t: "attack", n: 11 },
     ],
   }),
-  enemy({
+  phasedEnemy({
     id: "foldTyrant",
     hp: 62,
     miniboss: true,
@@ -271,28 +307,35 @@ export const MINIBOSSES: readonly EnemyDef[] = [
         onEnter: [{ t: "foldOrder" }],
       },
     ],
-    pattern: [
-      { t: "foldOrder" },
-      { t: "multi", n: 5, k: 3 },
-      { t: "attack", n: 10 },
-    ],
   }),
-  enemy({
+  phasedEnemy({
     id: "hushWarden",
-    hp: 78,
+    hp: 54,
     miniboss: true,
+    shell: true,
+    coreLockAt: 1,
     jamReleasesBlocks: true,
     claims: [
+      { k: "trait", is: "coreLock" },
       { k: "trait", is: "jamReleasesBlocks" },
       { k: "intent", t: "jamSlot" },
+      { k: "partIntent", t: "jamSlot" },
       { k: "trait", is: "phases" },
     ],
-    subsystems: [sub("hushWarden", "muffle", 16, "shieldSelf6")],
+    subsystems: [
+      sub("hushWarden", "muffle", PART_HP, "shieldSelf6", {
+        onDeath: { t: "openCore", turns: 2 },
+      }),
+      sub("hushWarden", "gag", PART_HP, undefined, {
+        intents: partCycle({ t: "jamSlot" }),
+        onDeath: { t: "enrageCore", n: 2 },
+      }),
+    ],
     phases: [
       {
         untilHpPct: 55,
         pattern: [
-          { t: "jamSlot" },
+          { t: "idle" },
           { t: "shield", n: 8 },
           { t: "attack", n: 10 },
         ],
@@ -306,11 +349,6 @@ export const MINIBOSSES: readonly EnemyDef[] = [
         ],
         onEnter: [{ t: "jamSlot", k: 2 }],
       },
-    ],
-    pattern: [
-      { t: "jamSlot" },
-      { t: "shield", n: 8 },
-      { t: "attack", n: 10 },
     ],
   }),
 ];

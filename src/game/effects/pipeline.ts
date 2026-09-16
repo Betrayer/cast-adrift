@@ -1,12 +1,14 @@
 import { DIE_BY_ID } from "@/data/dice";
 import { engravingEffects, type EngravingMap } from "@/data/engravings";
 import { buildAffinitySource } from "@/game/effects/affinity";
-import { buildChartSource } from "@/game/effects/chartSource";
 import type { EffectCtx } from "@/game/effects/ctx";
 import { applyDefs } from "@/game/effects/evaluate";
-import { buildModuleSource } from "@/game/effects/moduleSource";
-import { buildPerkSource } from "@/game/effects/perkSource";
-import { buildResonanceSource } from "@/game/effects/resonanceSource";
+import {
+  buildChartSource,
+  buildModuleSource,
+  buildPerkSource,
+  buildResonanceSource,
+} from "@/game/effects/sources";
 import {
   SUBJECT_HOOKS,
   type EffectDef,

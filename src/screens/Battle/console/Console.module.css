@@ -14,7 +14,8 @@
   padding: 4px 6px;
 }
 
-.consoleCompact .btn {
+.consoleCompact .btn,
+.consoleCompact .row .cabin > button {
   font-size: 10.5px;
   padding: 6px 2px;
 }
@@ -36,7 +37,8 @@
   gap: 5px;
 }
 
-.btn {
+.btn,
+.row .cabin > button {
   flex: 1 1 0;
   min-width: 0;
   appearance: none;
@@ -128,6 +130,9 @@
   box-shadow: 0 10px 30px var(--ca-shadow);
   max-width: 480px;
   margin: 0 auto;
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .sheetHead {
@@ -190,6 +195,7 @@
   border: 1px solid var(--ca-line);
   border-radius: 8px;
   padding: 5px 8px;
+  min-height: 24px;
   cursor: pointer;
 }
 
@@ -202,33 +208,40 @@
   border-color: var(--ca-accent);
 }
 
+.targetRow.targetRowSealed:disabled {
+  opacity: 1;
+  color: var(--ca-dim);
+  border-style: dashed;
+  border-color: var(--ca-amber);
+}
+
 @media (min-width: 768px) {
-  .btn {
+  .btn,
+  .row .cabin > button {
     font-size: 12px;
     padding: 8px 4px;
   }
 }
 
-@media (max-height: 700px) {
-  .mini {
-    min-height: 34px;
-  }
+:root[data-ca-compact='1'] .mini {
+  min-height: 34px;
+}
 
-  .console {
-    gap: 4px;
-    padding: 4px 6px;
-  }
+:root[data-ca-compact='1'] .console {
+  gap: 4px;
+  padding: 4px 6px;
+}
 
-  .btn {
-    font-size: 10.5px;
-    padding: 6px 2px;
-  }
+:root[data-ca-compact='1'] .btn,
+:root[data-ca-compact='1'] .row .cabin > button {
+  font-size: 10.5px;
+  padding: 6px 2px;
+}
 
-  .reason {
-    min-height: 12px;
-    font-size: 9px;
-    line-height: 12px;
-  }
+:root[data-ca-compact='1'] .reason {
+  min-height: 12px;
+  font-size: 9px;
+  line-height: 12px;
 }
 
 .sheetWhy {
@@ -288,4 +301,75 @@
   font-size: 9.5px;
   line-height: 13px;
   color: var(--ca-faint);
+}
+
+.row .cabin {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.row .cabin > button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  gap: 0;
+}
+
+.row .cabin > button[aria-expanded='true'] {
+  border-color: var(--ca-accent);
+  box-shadow: 0 0 0 1px var(--ca-accent) inset;
+}
+
+.cabinOff > button {
+  opacity: 0.38;
+}
+
+.cabinCard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 168px;
+}
+
+.cabinWho {
+  font-size: 12px;
+  line-height: 15px;
+  font-weight: 700;
+  color: var(--ca-text);
+}
+
+.cabinRole {
+  font-size: 9.5px;
+  line-height: 12px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ca-faint);
+}
+
+.cabinUse {
+  appearance: none;
+  width: 100%;
+  font: inherit;
+  font-size: 11px;
+  line-height: 14px;
+  font-weight: 700;
+  text-align: center;
+  color: var(--ca-text);
+  background: var(--ca-surface2);
+  border: 1px solid var(--ca-line);
+  border-radius: 8px;
+  padding: 6px 8px;
+  cursor: pointer;
+}
+
+.cabinUse[aria-disabled='true'] {
+  opacity: 0.38;
+  cursor: default;
+}
+
+.echoWhy {
+  font-size: 10.5px;
+  line-height: 14px;
+  color: var(--ca-dim);
+  white-space: normal;
 }

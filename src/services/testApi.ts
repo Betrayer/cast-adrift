@@ -1,26 +1,35 @@
+import type { EchoNodeId } from "@/data/echo";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk } from "@/data/slots";
 import {
   enemyForecast,
   legalTargets,
   mitigationOf,
+  projectBoard,
+  projectSlot,
   type Mitigation,
+  type SlotProjection,
   type TurnForecast,
 } from "@/game/battle/view";
 import { ALL_COACH_MARK_IDS, HINT_IDS, nextCoachMark } from "@/game/tutorial";
 import {
+  areConnected,
   edgeKey,
   nodeById,
   type NodeId,
+  type SpotId,
 } from "@/game/map/types";
 import {
   budgetCapFor,
+  canBypass,
   isGentleRide,
   landingCandidates,
   type ThrowDirection,
   type WormholeThrow,
 } from "@/game/map/wormhole";
-import { holeTollFor } from "@/game/run/motifs";
+import { clearSfxLog, recentSfx, type SfxCall } from "@/services/audio";
+import { holeTollFor, holeTollWaived } from "@/game/run/motifs";
+import { pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { settleLifetimeAchievements } from "@/game/meta/achievements";
 import {
@@ -54,6 +63,7 @@ import {
   startRunMode,
 } from "@/game/run/flow";
 import { isoWeekKey } from "@/game/run/modes";
+import { weatherIn } from "@/game/run/weather";
 import { totalXpForLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { DRIFT_ALLTIME_BOARD, submit, top } from "@/services/leaderboards";
 import { profileSummary, readMetaDocFromServer } from "@/services/metaDoc";
@@ -67,23 +77,43 @@ import { seedStackFor, startTargetFor } from "@/services/start-param";
 import { canGoBack, useAppStore } from "@/stores/appStore";
 import {
   battleSnapshot,
+  echoActiveSpent,
   hydrateBattle,
   useBattleStore,
   type BattleSaveState,
 } from "@/stores/battleStore";
 import { useLootStore } from "@/stores/lootStore";
 import { useMetaStore, type MetaStats } from "@/stores/metaStore";
-import { useNarrativeStore } from "@/stores/narrativeStore";
 import {
+  useNarrativeStore,
+  type FeedSource,
+} from "@/stores/narrativeStore";
+import { coreLocked } from "@/game/battle/damage";
+import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
+import { cargoRowsLeft } from "@/game/run/cargo";
+import type { JournalEntry } from "@/game/run/journal";
+import {
+  runModuleSlots,
   useRunStore,
   type BattleTally,
+  type MkLevels,
+  type PendingSwap,
   type RunMode,
 } from "@/stores/runStore";
+import {
+  grantCargo,
+  grantDie,
+  grantModule,
+  grantOfficer,
+} from "@/game/run/inventory";
 import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
 import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
+import { capturedTarget, draggedDie } from "@/pixi/battle/dragState";
+import { readFrames, readPerf, type PerfSnapshot } from "@/pixi/perf";
 import type { BattleLayoutId, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
+import type { Intent } from "@/types/content";
 
 export interface SeedRunConfig {
   mode?: RunMode;
@@ -108,6 +138,7 @@ export interface MetaPatch {
   themes?: readonly string[];
   deck?: readonly string[];
   chartPicks?: readonly string[];
+  chartFreeRespecs?: number;
   collection?: readonly { defId: string; count?: number }[];
   codex?: readonly string[];
   achievements?: readonly string[];
@@ -115,6 +146,7 @@ export interface MetaPatch {
   systemsCheckDone?: boolean;
   tutorialSeen?: "all" | readonly string[];
   stats?: Partial<MetaStats>;
+  echo?: EchoNodeId | null;
 }
 
 export interface RunPatch {
@@ -125,6 +157,9 @@ export interface RunPatch {
   perks?: readonly string[];
   modules?: readonly string[];
   flags?: readonly string[];
+  officers?: readonly string[];
+  cargo?: readonly string[];
+  echo?: EchoNodeId | null;
   visited?: readonly NodeId[];
   wormholeRides?: number;
   usedMinibosses?: readonly string[];
@@ -141,10 +176,13 @@ export interface BattlePatch {
   interference?: number;
   perks?: readonly string[];
   modules?: readonly string[];
+  mkLevels?: MkLevels;
   chargeCap?: number;
   startCharge?: number;
   ascension?: number;
   inverted?: boolean;
+  officers?: readonly string[];
+  echo?: EchoNodeId;
   snapshot?: BattleSaveState;
 }
 
@@ -178,6 +216,7 @@ export interface MapNodeView {
   visited: boolean;
   reachable: boolean;
   hole: boolean;
+  spot: SpotId | null;
   wormhole: boolean;
   bypass: NodeId | null;
 }
@@ -186,6 +225,14 @@ export interface WormholeEdgeView {
   from: NodeId;
   hole: NodeId;
   bypass: NodeId;
+}
+
+export type RideOutcome = "landed" | "fatal" | "refused";
+
+export interface HoleSpotView {
+  id: SpotId;
+  nodes: NodeId[];
+  entries: string[];
 }
 
 export interface AchievementsView {
@@ -211,6 +258,21 @@ export interface WormholeView {
   toll: number;
   mocked: boolean;
   last: WormholeThrow | null;
+}
+
+export interface FeedView {
+  id: number;
+  source: FeedSource;
+  key: string;
+  journalId: number | null;
+  compressed: boolean;
+}
+
+export interface JournalView {
+  id: number;
+  kind: JournalEntry["k"];
+  sector: number;
+  line: string | null;
 }
 
 export interface DieView {
@@ -263,6 +325,7 @@ export interface TestState {
     stack: { screen: ScreenId; params: Record<string, string> | null }[];
     canBack: boolean;
     systemMenu: boolean;
+    echoCore: boolean;
   };
   run: {
     active: boolean;
@@ -274,7 +337,20 @@ export interface TestState {
     hullMax: number;
     scrap: number;
     deck: string[];
+    modules: string[];
+    bays: number;
+    baysPurchased: number;
+    pendingSwaps: PendingSwap[];
     visited: NodeId[];
+    mutators: string[];
+    weather: string | null;
+    salvage: string[];
+    officers: string[];
+    cargo: string[];
+    sectorReveal: number;
+    shipyardDiscount: number;
+    echo: string | null;
+    echoUsed: boolean;
   };
   battle: {
     phase: string;
@@ -285,6 +361,8 @@ export interface TestState {
     shipId: ShipId;
     passiveUsed: boolean;
     nextWeapons: number;
+    echo: string | null;
+    echoSpent: boolean;
     selectedDieUid: string | null;
     dice: DieView[];
     slots: { id: SlotId; dieUid: string | null }[];
@@ -295,6 +373,15 @@ export interface TestState {
       hpMax: number;
       shield: number;
       vulnerable: number;
+      coreLocked: boolean;
+      parts: {
+        id: string;
+        key: string;
+        hp: number;
+        hpMax: number;
+        alive: boolean;
+        intent: Intent | null;
+      }[];
     }[];
     evasion: { dodgePct: number; glancingPct: number; intercept: boolean } | null;
     freeNudges: number;
@@ -321,7 +408,18 @@ export interface TestState {
     selectedShip: ShipId;
     tutorialSeen: string[];
     systemsCheckDone: boolean;
+    chartPicks: string[];
+    chartPointsSpent: number;
+    chartPointsTotal: number;
+    chartFreeRespecs: number;
   };
+}
+
+export interface CargoHoldView {
+  defId: string;
+  nodeId: NodeId;
+  sectorIndex: number;
+  rows: number;
 }
 
 export interface TestApi {
@@ -331,9 +429,14 @@ export interface TestApi {
   setBattle: (patch: BattlePatch) => void;
   skipToNode: (nodeId: NodeId) => boolean;
   standAt: (nodeId: NodeId) => boolean;
+  advanceAct: () => void;
+  cargo: () => CargoHoldView[];
+  deliveryApproach: (nodeId: NodeId) => NodeId | null;
   holes: () => WormholeEdgeView[];
+  spots: () => HoleSpotView[];
   landings: (budget: number, direction: ThrowDirection) => NodeId[];
   ride: (holeId: NodeId) => WormholeThrow | null;
+  rideOutcome: (holeId: NodeId) => RideOutcome;
   wormhole: () => WormholeView;
   achievements: () => AchievementsView;
   settleAchievements: () => string[];
@@ -346,15 +449,23 @@ export interface TestApi {
   settings: (patch: Partial<SettingsValues>) => void;
   layout: (id: BattleLayoutId) => void;
   forecast: () => TurnForecast | null;
+  projection: (slotId: SlotId) => SlotProjection | null;
   now: (at?: number | null) => number;
   go: (screen: ScreenId, params?: Record<string, string>) => void;
   back: () => void;
   deepLink: (param: string) => boolean;
   showMemory: (order: number) => void;
+  feed: () => FeedView[];
+  journal: () => JournalView[];
+  bark: (trigger: string) => void;
+  resetBarks: () => void;
+  sfx: () => readonly SfxCall[];
+  resetSfx: () => void;
   mapNodes: () => MapNodeView[];
   slotsFor: (uid: string) => SlotId[];
   dieCard: (defId: string) => DieCardView | null;
   shipCard: (shipId: ShipId) => ShipCardView | null;
+  setTarget: (targetId: string) => void;
   mitigation: (enemyId: string) => Mitigation | null;
   tally: () => BattleTally | null;
   coach: () => { active: string | null; seen: string[] };
@@ -363,6 +474,9 @@ export interface TestApi {
   skipCheck: () => void;
   restartCheckStep: () => void;
   anchors: () => BattleAnchors | null;
+  drag: () => { uid: string | null; captured: string | null };
+  frames: () => number;
+  perf: () => PerfSnapshot;
   state: () => TestState;
   account: () => AccountView;
   cloudMeta: () => Promise<CloudMetaView | null>;
@@ -386,12 +500,31 @@ const EMPTY_RUN_RESULT: RunResult = {
   fromLevel: 1,
   toLevel: 1,
   win: true,
+  cause: null,
   milestones: [],
   mode: "campaign",
   score: null,
   contractId: null,
   contractStars: 0,
   rotation: [],
+};
+
+const journalLineOf = (entry: JournalEntry): string | null => {
+  switch (entry.k) {
+    case "bark":
+    case "system":
+      return entry.line;
+    case "consequence":
+      return entry.origin;
+    case "choice":
+      return entry.text;
+    case "achievement":
+      return entry.achievement;
+    case "cargo":
+      return `run:journal.cargo.${entry.step}`;
+    default:
+      return null;
+  }
 };
 
 const STARTER_ENEMY = "raider";
@@ -421,6 +554,9 @@ const applyMeta = (patch: MetaPatch): void => {
   for (const id of patch.unlocks ?? []) meta.grantUnlock(id);
   for (const id of patch.themes ?? []) meta.unlockTheme(id);
   for (const id of patch.chartPicks ?? []) meta.allocatePick(id);
+  for (let i = 0; i < (patch.chartFreeRespecs ?? 0); i += 1) {
+    meta.grantChartRespec();
+  }
   for (const id of patch.codex ?? []) meta.unlockCodex(id);
   for (const id of patch.achievements ?? []) meta.unlockAchievement(id);
   for (const entry of patch.collection ?? []) {
@@ -437,6 +573,7 @@ const applyMeta = (patch: MetaPatch): void => {
     for (const id of ids) meta.markTutorialSeen(id);
   }
   if (patch.stats !== undefined) meta.bumpLifetime(patch.stats);
+  if (patch.echo !== undefined) meta.selectEcho(patch.echo);
 };
 
 const applyRun = (patch: RunPatch): void => {
@@ -448,10 +585,12 @@ const applyRun = (patch: RunPatch): void => {
   }
   if (patch.hull !== undefined) run.setHull(patch.hull);
   if (patch.vouchers !== undefined) run.addVoucher(patch.vouchers);
-  for (const defId of patch.dice ?? []) run.addDie(defId);
+  for (const defId of patch.dice ?? []) grantDie(defId);
   for (const id of patch.perks ?? []) run.addPerk(id);
-  for (const id of patch.modules ?? []) run.addModule(id);
+  for (const id of patch.modules ?? []) grantModule(id);
   for (const key of patch.flags ?? []) run.setFlag(key);
+  for (const id of patch.officers ?? []) grantOfficer(id);
+  for (const id of patch.cargo ?? []) grantCargo(id);
   if (patch.visited !== undefined) {
     useRunStore.setState({ visited: [...patch.visited] });
   }
@@ -461,6 +600,9 @@ const applyRun = (patch: RunPatch): void => {
     }));
   }
   for (const defId of patch.usedMinibosses ?? []) run.markMinibossUsed(defId);
+  if (patch.echo !== undefined) {
+    useRunStore.setState({ echo: patch.echo, echoUsed: false });
+  }
 };
 
 const applySettings = (patch: Partial<SettingsValues>): void => {
@@ -501,6 +643,7 @@ const readState = (): TestState => {
       })),
       canBack: canGoBack(app),
       systemMenu: app.systemMenu,
+      echoCore: app.echoCore,
     },
     run: {
       active: run.active,
@@ -512,7 +655,20 @@ const readState = (): TestState => {
       hullMax: run.hullMax,
       scrap: run.scrap,
       deck: run.deck.map((d) => d.defId),
+      modules: [...run.modules],
+      bays: runModuleSlots(run),
+      baysPurchased: run.baysPurchased,
+      pendingSwaps: run.pendingSwaps.map((swap) => ({ ...swap })),
       visited: [...run.visited],
+      mutators: [...run.mutators],
+      weather: weatherIn(run.mutators)?.id ?? null,
+      salvage: [...(run.pendingRewards?.salvage ?? [])],
+      officers: [...run.officers],
+      cargo: run.cargo.map((entry) => entry.defId),
+      sectorReveal: run.sectorReveal,
+      shipyardDiscount: run.shipyardDiscount,
+      echo: run.echo,
+      echoUsed: run.echoUsed,
     },
     battle: {
       phase: battle.phase,
@@ -523,6 +679,8 @@ const readState = (): TestState => {
       shipId: battle.shipId,
       passiveUsed: battle.passiveUsed,
       nextWeapons: battle.nextTurnMods.weapons ?? 0,
+      echo: battle.echo ?? null,
+      echoSpent: echoActiveSpent(battle),
       selectedDieUid: battle.selectedDieUid,
       dice: battle.dice.map((d) => ({
         uid: d.uid,
@@ -545,6 +703,15 @@ const readState = (): TestState => {
         hpMax: e.hpMax,
         shield: e.shield,
         vulnerable: e.statuses.mark ?? 0,
+        coreLocked: coreLocked(battleSnapshot(battle), e),
+        parts: e.subsystems.map((part) => ({
+          id: part.id,
+          key: part.key,
+          hp: part.hp,
+          hpMax: part.hpMax,
+          alive: part.hp > 0,
+          intent: part.nextIntent ?? null,
+        })),
       })),
       evasion: battle.evasion,
       freeNudges: battle.freeNudges,
@@ -583,6 +750,10 @@ const readState = (): TestState => {
       selectedShip: meta.selectedShip,
       tutorialSeen: [...meta.tutorialSeen],
       systemsCheckDone: meta.stats.systemsCheckDone,
+      chartPicks: [...meta.chartPicks],
+      chartPointsSpent: pointsSpent(meta.chartPicks),
+      chartPointsTotal: pointsTotal(meta.level),
+      chartFreeRespecs: meta.chartFreeRespecs,
     },
   };
 };
@@ -656,6 +827,9 @@ export const createTestApi = (): TestApi => ({
       return;
     }
     const run = useRunStore.getState();
+    for (const [slotId, mk] of Object.entries(patch.mkLevels ?? {})) {
+      if (mk !== undefined) run.setMk(slotId as SlotId, mk);
+    }
     const deck =
       patch.deck ?? (run.deck.length > 0 ? run.deck.map((d) => d.defId) : null);
     if (deck === null) return;
@@ -678,6 +852,10 @@ export const createTestApi = (): TestApi => ({
           : { startCharge: patch.startCharge }),
         ...(patch.ascension === undefined ? {} : { ascension: patch.ascension }),
         ...(patch.inverted === undefined ? {} : { inverted: patch.inverted }),
+        ...(patch.officers === undefined
+          ? {}
+          : { officers: [...patch.officers] }),
+        ...(patch.echo === undefined ? {} : { echo: patch.echo }),
       },
       deck,
       createStreams(patch.seed ?? DEFAULT_SEED),
@@ -687,6 +865,10 @@ export const createTestApi = (): TestApi => ({
 
   skipToNode: (nodeId) => jumpTo(nodeId),
 
+  advanceAct: () => {
+    advanceSector();
+  },
+
   settings: applySettings,
 
   layout: chooseBattleLayout,
@@ -695,6 +877,18 @@ export const createTestApi = (): TestApi => ({
     const battle = useBattleStore.getState();
     if (battle.phase !== "placement") return null;
     return enemyForecast(battleSnapshot(battle));
+  },
+
+  projection: (slotId) => {
+    const battle = useBattleStore.getState();
+    if (battle.phase !== "placement") return null;
+    const snapshot = battleSnapshot(battle);
+    if (snapshot.slots[slotId]?.dieUid !== undefined) {
+      return projectBoard(snapshot)[slotId] ?? null;
+    }
+    const subject = battle.selectedDieUid;
+    if (subject === null) return null;
+    return projectSlot(snapshot, subject, slotId);
   },
 
   now: (at) => {
@@ -724,6 +918,37 @@ export const createTestApi = (): TestApi => ({
     useNarrativeStore.getState().pushMemory(order);
   },
 
+  feed: () =>
+    useNarrativeStore.getState().feed.map((message, index) => ({
+      id: message.id,
+      source: message.source,
+      key: message.key,
+      journalId: message.journalId,
+      compressed: index > 0,
+    })),
+
+  journal: () =>
+    useNarrativeStore.getState().journal.map((entry) => ({
+      id: entry.id,
+      kind: entry.k,
+      sector: entry.sector,
+      line: journalLineOf(entry),
+    })),
+
+  bark: (trigger) => {
+    emitBark(trigger);
+  },
+
+  resetBarks: () => {
+    resetBarkMemory();
+  },
+
+  sfx: () => recentSfx(),
+
+  resetSfx: () => {
+    clearSfxLog();
+  },
+
   mapNodes: () => {
     const run = useRunStore.getState();
     const map = run.map;
@@ -746,6 +971,7 @@ export const createTestApi = (): TestApi => ({
         visited: run.visited.includes(node.id),
         reachable: outgoing.has(node.id) && !run.visited.includes(node.id),
         hole: node.hole === true,
+        spot: node.spot ?? null,
         wormhole: record !== undefined,
         bypass: record?.bypass ?? null,
       };
@@ -765,10 +991,51 @@ export const createTestApi = (): TestApi => ({
     return true;
   },
 
+  cargo: () => {
+    const run = useRunStore.getState();
+    if (run.map === null) return [];
+    const map = run.map;
+    const row =
+      run.position === null
+        ? run.depthRow
+        : (nodeById(map).get(run.position)?.row ?? run.depthRow);
+    return run.cargo.map((entry) => ({
+      defId: entry.defId,
+      nodeId: entry.nodeId,
+      sectorIndex: entry.sectorIndex,
+      rows: cargoRowsLeft(map, entry, row),
+    }));
+  },
+
+  deliveryApproach: (nodeId) => {
+    const run = useRunStore.getState();
+    if (run.map === null) return null;
+    const map = run.map;
+    const from = map.nodes.find(
+      (node) =>
+        !run.visited.includes(node.id) &&
+        node.hole !== true &&
+        areConnected(map, node.id, nodeId),
+    );
+    return from?.id ?? null;
+  },
+
   holes: () => {
     const map = useRunStore.getState().map;
     if (map === null) return [];
     return Object.values(map.wormholes).map((record) => ({ ...record }));
+  },
+
+  spots: () => {
+    const map = useRunStore.getState().map;
+    if (map === null) return [];
+    return map.spots.map((spot) => ({
+      id: spot.id,
+      nodes: [...spot.nodes],
+      entries: Object.entries(map.wormholes)
+        .filter(([, record]) => spot.nodes.includes(record.hole))
+        .map(([key]) => key),
+    }));
   },
 
   landings: (budget, direction) => {
@@ -785,18 +1052,32 @@ export const createTestApi = (): TestApi => ({
 
   ride: (holeId) => {
     openWormhole(holeId);
-    return rideWormhole(holeId, false);
+    const ride = rideWormhole(holeId, false);
+    return ride === null || ride.kind === "fatal" ? null : ride.throw;
+  },
+
+  rideOutcome: (holeId) => {
+    openWormhole(holeId);
+    const ride = rideWormhole(holeId, false);
+    return ride === null ? "refused" : ride.kind;
   },
 
   wormhole: () => {
     const run = useRunStore.getState();
+    const hole = run.pendingWormhole;
+    const waived =
+      run.map !== null &&
+      run.position !== null &&
+      hole !== null &&
+      canBypass(run.map, run.position, hole, run.visited) &&
+      holeTollWaived(run.map, run.position, hole, run.visited);
     return {
       pending: run.pendingWormhole,
       rides: run.stats.wormholeRides,
       bypassed: run.stats.holesBypassed,
       gentle: isGentleRide(run.stats.wormholeRides),
       budgetCap: budgetCapFor(run.stats.wormholeRides),
-      toll: holeTollFor(run.sector, run.hull),
+      toll: waived ? 0 : holeTollFor(run.sector, run.hull),
       mocked: chaosMocked(),
       last: run.lastWormhole === null ? null : { ...run.lastWormhole },
     };
@@ -897,6 +1178,10 @@ export const createTestApi = (): TestApi => ({
     };
   },
 
+  setTarget: (targetId) => {
+    useBattleStore.getState().setTarget(targetId);
+  },
+
   mitigation: (enemyId) => {
     const battle = useBattleStore.getState();
     const enemy = battle.enemies.find((e) => e.id === enemyId);
@@ -932,6 +1217,12 @@ export const createTestApi = (): TestApi => ({
   },
 
   anchors: () => battleAnchors(),
+
+  drag: () => ({ uid: draggedDie(), captured: capturedTarget() }),
+
+  frames: () => readFrames(),
+
+  perf: () => readPerf(),
 
   state: readState,
 

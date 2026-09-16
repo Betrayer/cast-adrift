@@ -42,3 +42,109 @@
 :root[data-ca-motion='reduced'] .rain {
   display: none;
 }
+
+.blackBox {
+  isolation: isolate;
+}
+
+.horizon {
+  --horizon-span: min(720px, 190vw, 130vh);
+  --horizon-well: min(320px, 46vh);
+  --horizon-ink: var(--ca-school-black-text, #d9cbff);
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(
+      circle var(--horizon-well) at 50% 50%,
+      rgb(0 0 0 / 94%) 0%,
+      rgb(0 0 0 / 88%) 30%,
+      rgb(0 0 0 / 46%) 64%,
+      rgb(0 0 0 / 0%) 100%
+    ),
+    var(--ca-bg, #05070c);
+}
+
+.horizonCore {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--horizon-span);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--horizon-ink) 34%, transparent);
+  box-shadow:
+    0 0 40px -8px color-mix(in srgb, var(--horizon-ink) 22%, transparent),
+    0 0 40px -8px color-mix(in srgb, var(--horizon-ink) 14%, transparent) inset;
+  animation:
+    horizonDrift 90s linear infinite,
+    horizonCollapse 17s ease-in-out infinite;
+}
+
+.horizonCore::before,
+.horizonCore::after {
+  content: '';
+  position: absolute;
+  inset: 8.5%;
+  border-radius: 50%;
+  border: 2px dashed color-mix(in srgb, var(--horizon-ink) 46%, transparent);
+  box-shadow: 0 0 30px -8px color-mix(in srgb, var(--horizon-ink) 20%, transparent);
+  animation: horizonDrift 58s linear infinite reverse;
+}
+
+.horizonCore::after {
+  inset: 16.5%;
+  border-style: dotted;
+  border-width: 2.5px;
+  border-color: color-mix(in srgb, var(--horizon-ink) 62%, transparent);
+  animation-duration: 38s;
+  animation-direction: normal;
+}
+
+@keyframes horizonDrift {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+@keyframes horizonCollapse {
+  0%,
+  100% {
+    scale: 1;
+  }
+  50% {
+    scale: 0.955;
+  }
+}
+
+.blackBoxCard {
+  border: 1px solid rgb(255 255 255 / 10%);
+  background: rgb(0 0 0 / 46%);
+  backdrop-filter: blur(3px);
+}
+
+.epitaph {
+  animation: beatIn 620ms ease-out both;
+}
+
+:root[data-ca-motion='reduced'] .horizonCore,
+:root[data-ca-motion='reduced'] .horizonCore::before,
+:root[data-ca-motion='reduced'] .horizonCore::after,
+:root[data-ca-motion='reduced'] .epitaph {
+  animation: none;
+}
+
+:root[data-ca-motion='reduced'] .horizonCore {
+  rotate: 9deg;
+}
+
+:root[data-ca-motion='reduced'] .horizonCore::before {
+  rotate: -21deg;
+}
+
+:root[data-ca-motion='reduced'] .horizonCore::after {
+  rotate: 36deg;
+}

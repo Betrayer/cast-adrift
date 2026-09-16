@@ -48,6 +48,7 @@ export class Tumble {
   private elapsed = 0;
   private running = false;
   private cancelled = false;
+  private generation = 0;
   private onDone: (() => void) | null = null;
   private readonly tickerFn: (ticker: Ticker) => void;
 
@@ -72,16 +73,17 @@ export class Tumble {
       this.finish();
       return;
     }
-    void this.begin(dice, box, size);
+    void this.begin(dice, box, size, this.generation);
   }
 
   private async begin(
     dice: readonly TumbleDie[],
     box: TumbleRect,
     size: number,
+    generation: number,
   ): Promise<void> {
     const Matter = await loadMatter();
-    if (this.cancelled) return;
+    if (this.cancelled || generation !== this.generation) return;
     this.matter = Matter;
     this.dieList = [...dice];
     const engine = Matter.Engine.create();
@@ -186,15 +188,16 @@ export class Tumble {
   }
 
   private reset(): void {
+    this.generation += 1;
     this.cancelled = false;
     this.clearWorld();
   }
 
   cancel(): void {
-    if (this.bodies.length === 0 && !this.running) return;
+    this.generation += 1;
     this.cancelled = true;
-    this.clearWorld();
     this.onDone = null;
+    this.clearWorld();
   }
 
   destroy(): void {

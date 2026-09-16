@@ -63,6 +63,42 @@ describe("turn forecast memo", () => {
     expect(forecastComputations()).toBe(before + 2);
   });
 
+  it("recomputes when the player re-aims at another body", () => {
+    useBattleStore.getState().reset();
+    useBattleStore
+      .getState()
+      .startBattle({ enemyIds: ["raider", "raider"] }, DECK, createStreams(42));
+    read();
+    const before = forecastComputations();
+    const other = useBattleStore.getState().enemies[1];
+    expect(other).toBeDefined();
+    if (other === undefined) return;
+    useBattleStore.getState().setTarget(other.id);
+    read();
+    read();
+    expect(forecastComputations()).toBe(before + 1);
+  });
+
+  it("recomputes when the player re-aims at a subsystem", () => {
+    useBattleStore.getState().reset();
+    useBattleStore
+      .getState()
+      .startBattle(
+        { enemyIds: ["capacitorWraith"] },
+        DECK,
+        createStreams(42),
+      );
+    read();
+    const before = forecastComputations();
+    const part = useBattleStore.getState().enemies[0]?.subsystems[0];
+    expect(part).toBeDefined();
+    if (part === undefined) return;
+    useBattleStore.getState().setTarget(part.id);
+    read();
+    read();
+    expect(forecastComputations()).toBe(before + 1);
+  });
+
   it("shares one computation between the console line and the tablet strip", () => {
     const board = useBattleStore.getState();
     const consoleDeps = forecastDeps(board);

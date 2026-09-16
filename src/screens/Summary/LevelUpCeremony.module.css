@@ -5,11 +5,23 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 18px;
   padding: 24px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: var(--ca-bg-a86);
   animation: fadeIn 240ms ease-out;
+}
+
+.overlay > *:first-child:not(.rain),
+.overlay > .rain + * {
+  margin-block-start: auto;
+}
+
+.overlay > *:last-child {
+  margin-block-end: auto;
 }
 
 .ring {

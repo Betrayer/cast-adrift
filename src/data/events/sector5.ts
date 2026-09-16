@@ -110,7 +110,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
         ],
       },
       {
-        id: "leadThem",
+        id: "rideWithThem",
         label: "content:events.hereticFleet.opt.leadThem",
         outcomes: [
           {
@@ -395,6 +395,18 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
               { k: "axis", n: 1 },
               { k: "nodeMod", mod: "endHeal", n: 2 },
             ],
+          },
+        ],
+      },
+      {
+        id: "haul",
+        label: "content:events.lastMarket.opt.haul",
+        requires: { req: "cargo", id: "stasisPods" },
+        outcomes: [
+          {
+            text: "content:events.lastMarket.out.haul",
+            effects: [{ k: "cargo", id: "stasisPods" }],
+            consequence: "content:consequence.cargoTaken",
           },
         ],
       },

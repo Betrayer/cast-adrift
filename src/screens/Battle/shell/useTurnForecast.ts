@@ -12,6 +12,7 @@ export const forecastDeps = (board: BattleState): readonly unknown[] => [
   board.dice,
   board.slots,
   board.enemies,
+  board.targetId,
   board.hull,
   board.shield,
   board.charge,

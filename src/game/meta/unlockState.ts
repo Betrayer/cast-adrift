@@ -20,7 +20,7 @@ export type UnlockSourceValues = Pick<
 export const unlockContextOf = (meta: UnlockSourceValues): UnlockContext => ({
   level: meta.level,
   achievements: meta.achievements,
-  ascension: meta.ascension.campaign,
+  ascension: Math.max(0, meta.ascension.campaign - 1),
   clears: meta.stats.campaignClears,
   granted: meta.unlocksGranted,
 });
@@ -60,6 +60,15 @@ export const freshUnlocks = (
     .filter((def): def is UnlockDef => def !== undefined);
   return { ids, defs };
 };
+
+const CEREMONY_RETIRED_KINDS: ReadonlySet<UnlockDef["kind"]> = new Set<
+  UnlockDef["kind"]
+>(["cosmetic", "feature"]);
+
+export const ceremonyRetiredIds = (fresh: FreshUnlocks): string[] =>
+  fresh.defs
+    .filter((def) => CEREMONY_RETIRED_KINDS.has(def.kind))
+    .map((def) => def.id);
 
 export const freshUnlockIdsOfKind = (
   ctx: UnlockContext,

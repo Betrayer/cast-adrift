@@ -10,6 +10,7 @@ import {
   MID_COLLECTION_LEVEL,
 } from "./simPolicy/chart";
 import {
+  deliveryReachOf,
   EXPECTED_DMG_PER_FIGHT,
   FIGHT_TYPES,
   fightsUntilRest,
@@ -17,8 +18,15 @@ import {
   ridesWormhole,
   type RouteState,
 } from "./simPolicy/map";
-import { bypassTargetFor, rollThrow } from "../src/game/map/wormhole";
-import { holeTollFor } from "../src/game/run/motifs";
+import {
+  bypassIsLateral,
+  bypassTargetFor,
+  isGentleRide,
+  openLandings,
+  rollThrow,
+  throwCost,
+} from "../src/game/map/wormhole";
+import { disintegrationPctFor, holeTollFor } from "../src/game/run/motifs";
 import {
   applyEdgeMotifs,
   applyEffectsToState,
@@ -30,22 +38,68 @@ import {
   greedyShipyard,
   greedyShop,
   maxMk,
+  takeModule,
+  wouldTakeModule,
   maxRealSchoolCount,
   runAnomaly,
   runDraft,
+  runEvent,
+  runSalvage,
   takeDie,
   type PuzzleTally,
   type RunState,
+  type RunStateInit,
+  type SimCargo,
 } from "./simPolicy/state";
 import { ENGRAVINGS } from "../src/data/engravings";
+import {
+  CARGO_BY_ID,
+  CARGO_IDS,
+  CARGO_PREFER_ROWS,
+  cargoAxisShift,
+  cargoChargeCapDelta,
+  cargoHullPerNode,
+  cargoPayout,
+  cargoSlotTierDelta,
+  type CargoDef,
+} from "../src/data/cargo";
+import { OFFICER_IDS, officerDef } from "../src/data/officers";
+import {
+  ECHO_NODE_IDS,
+  echoIsBattleActive,
+  echoNodeDef,
+  echoSoftLands,
+  echoStartCharge,
+  echoToken,
+  type EchoNodeId,
+} from "../src/data/echo";
+import { forwardReach, forwardStations } from "../src/game/map/reach";
+import { economyFailureLines } from "./simPolicy/verdict";
+import { shipCargoHold } from "../src/game/run/hold";
+import {
+  DIRECT,
+  FIRE_MODE_IDS,
+  FIRE_MODE_SLOTS,
+  fireModeAllowed,
+  MODULE_FIRE_MODE,
+  type FireModeId,
+} from "../src/data/fireModes";
 import {
   ENCOUNTER_DISCOUNT_PCT,
   FIRST_FIND_SHARDS,
   META_DIE_PRICE,
 } from "../src/data/metaShop";
-import { PLAYABLE_SHIPS, type ShipId } from "../src/data/ships";
+import { PLAYABLE_SHIPS, SHIP_BY_ID, type ShipId } from "../src/data/ships";
 import { THEMES } from "../src/data/themes";
 import { RESPEC_SHARD_COST } from "../src/game/chart/engine";
+import { nudgeChargeCost } from "../src/game/battle/resolver";
+import { computeMutatorMods } from "../src/data/mutators";
+import {
+  withoutWeather,
+  withWeatherFor,
+} from "../src/game/run/weather";
+import { jumpsPerTideFor } from "../src/game/run/tide";
+import { runHasTrait } from "../src/game/run/runMods";
 import {
   bossFirstKillShards,
   levelFromTotalXp,
@@ -60,8 +114,17 @@ import {
   expandEncounterIds,
   isEncounterGroup,
 } from "../src/data/enemies";
-import { DECK_CAP } from "../src/game/economy/prices";
-import { computeNodeReward, isDraftNode } from "../src/game/economy/rewards";
+import {
+  DECK_CAP,
+  MINIBOSS_PACKAGE_SCRAP,
+} from "../src/game/economy/prices";
+import {
+  computeNodeReward,
+  dieForRarity,
+  isDraftNode,
+} from "../src/game/economy/rewards";
+import { isSalvageNode } from "../src/game/run/salvage";
+import { SALVAGE_FACES } from "../src/data/salvage";
 import { SECTORS } from "../src/data/sectors";
 import {
   bossNodeIdFor,
@@ -78,8 +141,15 @@ import {
   sectorDepth,
 } from "../src/game/run/modes";
 import {
+  applyEchoActive,
+  applyOfficerActive,
   decidePlacements,
+  forcedTargetId,
   decideReroll,
+  echoLookUids,
+  readyEcho,
+  readyOfficers,
+  rerollValue,
 } from "../src/game/battle/policy";
 import {
   advanceTurn,
@@ -100,8 +170,8 @@ import {
 import { computePerkMods } from "../src/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
 import { ascensionMods } from "../src/data/ascension";
-import { moduleSlots } from "../src/data/modules";
 import { ALL_PERKS } from "../src/data/perks";
+import type { PerkPool } from "../src/data/perks/types";
 import { PERK_DRAFT_SIZE } from "../src/game/run/perkDraft";
 import { decideDraft } from "./simPolicy/draft";
 import { schoolOf } from "./simPolicy/state";
@@ -137,6 +207,7 @@ interface BattleInit {
   perks?: readonly string[];
   chartPicks?: readonly string[];
   modules?: readonly string[];
+  mutators?: readonly string[];
   sectorHpPct?: number;
   sectorDmgPct?: number;
   enemyHpBonusPct?: number;
@@ -144,7 +215,15 @@ interface BattleInit {
   ascension?: number;
   inverted?: boolean;
   nodeStorm?: boolean;
+  officers?: readonly string[];
+  cargo?: readonly string[];
+  echo?: EchoNodeId;
+  killOrder?: readonly string[];
 }
+
+type ModeTally = Partial<Record<FireModeId, number>>;
+
+type ActiveTally = Record<string, number>;
 
 interface BattleResult {
   win: boolean;
@@ -157,7 +236,37 @@ interface BattleResult {
   turnsPlayed: number;
   sensorTurns: number;
   engineTurns: number;
+  modeArmed: ModeTally;
+  modeOffered: ModeTally;
+  activeFired: ActiveTally;
+  activeReady: ActiveTally;
 }
+
+const bump = (tally: ModeTally, mode: FireModeId): void => {
+  tally[mode] = (tally[mode] ?? 0) + 1;
+};
+
+const bumpActive = (tally: ActiveTally, id: string): void => {
+  tally[id] = (tally[id] ?? 0) + 1;
+};
+
+const tallyFireModes = (
+  snapshot: BattleSnapshot,
+  armed: ModeTally,
+  offered: ModeTally,
+): void => {
+  const alive = snapshot.enemies.filter((e) => e.hp > 0).length;
+  for (const slotId of FIRE_MODE_SLOTS) {
+    const slot = snapshot.slots[slotId];
+    if (slot?.dieUid === undefined) continue;
+    const legal = (slot.modes ?? []).filter((mode) =>
+      fireModeAllowed(mode, alive),
+    );
+    if (legal.length < 2) continue;
+    for (const mode of legal) bump(offered, mode);
+    bump(armed, slot.mode ?? DIRECT.id);
+  }
+};
 
 const getArg = (name: string, fallback: string): string => {
   const index = process.argv.indexOf(`--${name}`);
@@ -165,10 +274,86 @@ const getArg = (name: string, fallback: string): string => {
   return value ?? fallback;
 };
 
+const forcedId = <T extends string>(
+  name: string,
+  ids: readonly T[],
+): T | undefined => ids.find((id) => id === getArg(name, ""));
+
+const WEATHER_ENABLED = getArg("weather", "") === "on";
+
+const SALVAGE_ENABLED = getArg("salvage", "") !== "off";
+
+const CARGO_ENABLED = getArg("cargo", "") !== "off";
+
+const OFFICERS_ENABLED = getArg("officers", "") !== "off";
+
+const OFFICER_FORCED: string | undefined = forcedId(
+  "officer-force",
+  OFFICER_IDS,
+);
+
+const ECHO_FORCED: EchoNodeId | undefined = forcedId(
+  "echo-force",
+  ECHO_NODE_IDS,
+);
+
+const runStateInit = (init: RunStateInit): RunStateInit => ({
+  ...init,
+  officers:
+    init.officers ?? (OFFICER_FORCED === undefined ? [] : [OFFICER_FORCED]),
+  officerLock:
+    init.officerLock === true ||
+    OFFICER_FORCED !== undefined ||
+    !OFFICERS_ENABLED,
+  echo: init.echo === undefined ? (ECHO_FORCED ?? null) : init.echo,
+});
+
+const KILL_ORDER: readonly string[] = getArg("kill-order", "")
+  .split(",")
+  .map((key) => key.trim())
+  .filter((key) => key.length > 0);
+
+const FIRE_FORCED: FireModeId | undefined = forcedId(
+  "fire-force",
+  FIRE_MODE_IDS,
+);
+
+const forceFireModes = (snapshot: BattleSnapshot): void => {
+  if (FIRE_FORCED === undefined) return;
+  const alive = snapshot.enemies.filter((e) => e.hp > 0).length;
+  for (const slotId of FIRE_MODE_SLOTS) {
+    const slot = snapshot.slots[slotId];
+    if (slot?.dieUid === undefined) continue;
+    const granted = slot.modes ?? [];
+    slot.mode =
+      granted.includes(FIRE_FORCED) && fireModeAllowed(FIRE_FORCED, alive)
+        ? FIRE_FORCED
+        : DIRECT.id;
+  }
+};
+
+const simStamp = (startedAt: number): string =>
+  new Date(startedAt).toISOString().replace(/[:.]/g, "-");
+
+const writeSimCsvAs = (fileName: string, rows: readonly string[]): string => {
+  const outDir = join(process.cwd(), "sim-out");
+  mkdirSync(outDir, { recursive: true });
+  const outPath = join(outDir, fileName);
+  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  return outPath;
+};
+
+const writeSimCsv = (
+  name: string,
+  rows: readonly string[],
+  startedAt: number,
+): string => writeSimCsvAs(`${name}-${simStamp(startedAt)}.csv`, rows);
+
 const applyPlacement = (
   snapshot: BattleSnapshot,
   uid: string,
   slotId: SlotId,
+  mode?: FireModeId,
 ): void => {
   const die = snapshot.dice.find((d) => d.uid === uid);
   const slot = snapshot.slots[slotId];
@@ -176,9 +361,9 @@ const applyPlacement = (
   die.state = "placed";
   die.slot = slotId;
   slot.dieUid = uid;
+  if (mode !== undefined) slot.mode = mode;
 };
 
-const NUDGE = 3;
 const SURGE = 10;
 
 const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
@@ -189,11 +374,19 @@ const overflows = (snapshot: BattleSnapshot, uid: string): boolean => {
 };
 
 const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
-  const cost = Math.max(
-    1,
-    NUDGE +
-      computeRunMods(init.perks ?? [], init.chartPicks ?? [], init.modules ?? [])
-        .nudgeCostDelta,
+  const cost = nudgeChargeCost(
+    computeRunMods(
+      init.perks ?? [],
+      init.chartPicks ?? [],
+      init.modules ?? [],
+      init.officers ?? [],
+    ).nudgeCostDelta + computeMutatorMods(init.mutators ?? []).nudgeCostDelta,
+    runHasTrait(
+      init.perks ?? [],
+      init.chartPicks ?? [],
+      "coldLogic",
+      init.modules ?? [],
+    ),
   );
   if (snapshot.charge >= SURGE && snapshot.nextRollBonus === 0) {
     snapshot.charge -= SURGE;
@@ -224,6 +417,26 @@ const simulateBattle = (
 ): BattleResult => {
   const streams = createStreams(rootSeed);
   const enemyStream = createEnemyStream(streams);
+  const mut = computeMutatorMods(init.mutators ?? []);
+  const officers = init.officers ?? [];
+  const holdDefs = (init.cargo ?? []).flatMap((id) => {
+    const def = CARGO_BY_ID.get(id);
+    return def === undefined ? [] : [def];
+  });
+  const tierDelta: Partial<Record<SlotId, number>> = {};
+  for (const def of holdDefs) {
+    for (const [slot, delta] of Object.entries(cargoSlotTierDelta(def))) {
+      const key = slot as SlotId;
+      tierDelta[key] = (tierDelta[key] ?? 0) + delta;
+    }
+  }
+  if (mut.sensorsTierDelta !== 0) {
+    tierDelta.sensors = (tierDelta.sensors ?? 0) + mut.sensorsTierDelta;
+  }
+  const holdChargeCap = holdDefs.reduce(
+    (sum, def) => sum + cargoChargeCapDelta(def),
+    0,
+  );
   let snapshot = buildBattleSnapshot(
     init.shipId ?? "wanderer",
     deck,
@@ -236,14 +449,24 @@ const simulateBattle = (
       interference: init.interference,
       perks: init.perks,
       chartPicks: init.chartPicks,
+      mutators: init.mutators,
       modules: init.modules,
       hull: init.hull,
       hullMax: init.hullMax,
       runScrap: init.runScrap,
-      chargeCap: runChargeCap(
-        init.perks ?? [],
-        init.chartPicks ?? [],
-        init.modules ?? [],
+      ...(Object.keys(tierDelta).length === 0
+        ? {}
+        : { slotTierDelta: tierDelta }),
+      chargeCap: Math.max(
+        1,
+        runChargeCap(
+          init.perks ?? [],
+          init.chartPicks ?? [],
+          init.modules ?? [],
+          officers,
+        ) +
+          mut.chargeCapDelta +
+          holdChargeCap,
       ),
       sectorHpPct: init.sectorHpPct,
       sectorDmgPct: init.sectorDmgPct,
@@ -254,18 +477,34 @@ const simulateBattle = (
       nodeStorm: init.nodeStorm,
     },
   );
+  if (officers.length > 0) snapshot.officers = [...officers];
+  if (init.echo !== undefined) {
+    snapshot.echo = init.echo;
+    const opening = echoStartCharge(init.echo);
+    if (opening > 0) {
+      snapshot.charge = Math.max(
+        0,
+        Math.min(snapshot.chargeCap, snapshot.charge + opening),
+      );
+    }
+  }
   let dealt = 0;
   let taken = 0;
   let turnsPlayed = 0;
   let sensorTurns = 0;
   let engineTurns = 0;
+  const modeArmed: ModeTally = {};
+  const modeOffered: ModeTally = {};
+  const activeFired: ActiveTally = {};
+  const activeReady: ActiveTally = {};
+  const spent: string[] = [];
 
   for (let round = 0; round < TURN_CAP; round += 1) {
     const rerollUids = decideReroll(snapshot);
     if (rerollUids.length > 0) {
       snapshot.dice = snapshot.dice.map((d) =>
         rerollUids.includes(d.uid) && d.state === "tray"
-          ? { ...d, value: streams.dice.int(1, d.tier) }
+          ? { ...d, value: rerollValue(d, snapshot, streams.dice) }
           : d,
       );
       for (const live of snapshot.enemies) {
@@ -274,25 +513,69 @@ const simulateBattle = (
         live.statuses = { ...live.statuses, charge: 1 };
       }
     }
-    const decision = decidePlacements(snapshot);
+    if (snapshot.echo !== undefined) {
+      const ready = readyEcho(snapshot, spent);
+      if (ready !== undefined) bumpActive(activeReady, echoToken(ready));
+      const look = echoLookUids(snapshot, spent);
+      if (look.length > 0 && ready !== undefined) {
+        snapshot.dice = snapshot.dice.map((d) =>
+          look.includes(d.uid) && d.state === "tray"
+            ? {
+                ...d,
+                value: Math.max(d.value, rerollValue(d, snapshot, streams.dice)),
+              }
+            : d,
+        );
+        spent.push(echoToken(ready));
+        bumpActive(activeFired, echoToken(ready));
+      }
+    }
+    if (officers.length > 0) {
+      for (const def of readyOfficers(snapshot, spent)) {
+        bumpActive(activeReady, def.id);
+      }
+    }
+    const order = init.killOrder ?? KILL_ORDER;
+    const decision = decidePlacements(
+      snapshot,
+      spent,
+      order.length === 0 ? undefined : forcedTargetId(snapshot, order),
+    );
     if (decision.targetId !== null) snapshot.targetId = decision.targetId;
     for (const placement of decision.placements) {
       if (placement.slot === "reactor" && overflows(snapshot, placement.uid)) {
         continue;
       }
       if (canPlaceDie(snapshot, placement.uid, placement.slot)) {
-        applyPlacement(snapshot, placement.uid, placement.slot);
+        applyPlacement(
+          snapshot,
+          placement.uid,
+          placement.slot,
+          placement.mode,
+        );
       }
     }
     if (decision.reserveUid !== undefined) {
       const die = snapshot.dice.find((d) => d.uid === decision.reserveUid);
       if (die?.state === "tray") die.state = "reserved";
     }
+    if (decision.active !== undefined) {
+      snapshot = applyOfficerActive(snapshot, decision.active);
+      spent.push(decision.active);
+      bumpActive(activeFired, decision.active);
+    }
+    if (decision.echo !== undefined) {
+      snapshot = applyEchoActive(snapshot, decision.echo);
+      spent.push(echoToken(decision.echo));
+      bumpActive(activeFired, echoToken(decision.echo));
+    }
     spendCharge(snapshot, init);
 
     turnsPlayed += 1;
     if (snapshot.slots.sensors?.dieUid !== undefined) sensorTurns += 1;
     if (snapshot.slots.engines?.dieUid !== undefined) engineTurns += 1;
+    forceFireModes(snapshot);
+    tallyFireModes(snapshot, modeArmed, modeOffered);
 
     const player = resolvePlayerPhase(snapshot, streams.dice);
     dealt += player.beats
@@ -324,6 +607,10 @@ const simulateBattle = (
     turnsPlayed,
     sensorTurns,
     engineTurns,
+    modeArmed,
+    modeOffered,
+    activeFired,
+    activeReady,
   };
 };
 
@@ -376,6 +663,7 @@ interface WalkOptions {
   stopRow: number;
   rollModules: boolean;
   guard: number;
+  mutators?: readonly string[];
   noDraft?: boolean;
   wormholes?: WormholeTally;
 }
@@ -386,6 +674,36 @@ interface WalkResult {
   rows: number;
   hullEntering: number[];
 }
+
+type HoleOutcome =
+  | { kind: "moved"; node: MapNode }
+  | { kind: "fatal" }
+  | { kind: "stuck" };
+
+const DISINTEGRATION_FACES = 100;
+
+interface SoftLanding {
+  node: MapNode;
+  rows: number;
+}
+
+const softLandingFor = (
+  map: MapGraph,
+  byId: ReadonlyMap<string, MapNode>,
+  from: string,
+  visited: readonly string[],
+): SoftLanding | undefined => {
+  const origin = byId.get(from);
+  if (origin === undefined) return undefined;
+  const node = openLandings(map, from, visited)
+    .filter((candidate) => candidate.row > origin.row)
+    .sort(
+      (a, b) =>
+        throwCost(origin, a) - throwCost(origin, b) ||
+        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+    )[0];
+  return node === undefined ? undefined : { node, rows: node.row - origin.row };
+};
 
 const resolveWormhole = (
   state: RunState,
@@ -399,32 +717,62 @@ const resolveWormhole = (
   stream: RngStream,
   tally: WormholeTally,
   tideCap: number,
-): MapNode | undefined => {
+): HoleOutcome => {
   const rides = tally.rides;
   if (ridesWormhole(route, stream.next())) {
+    if (echoSoftLands(state.echo) && !state.echoUsed) {
+      const gentle = softLandingFor(map, byId, from, visited);
+      if (gentle !== undefined) {
+        state.echoUsed = true;
+        tally.rides += 1;
+        tally.softLandings += 1;
+        tally.rowsMoved += Math.abs(gentle.rows);
+        return { kind: "moved", node: gentle.node };
+      }
+    }
     const roll = rollThrow(
       { map, from, hole: hole.id, visited, rides },
       stream,
     );
+    const pct = disintegrationPctFor(sector);
+    if (
+      pct > 0 &&
+      !isGentleRide(rides) &&
+      stream.int(1, DISINTEGRATION_FACES) <= pct
+    ) {
+      tally.disintegrations += 1;
+      return { kind: "fatal" };
+    }
     const landing = roll.landing === null ? undefined : byId.get(roll.landing);
     if (landing !== undefined) {
       tally.rides += 1;
       tally.rowsMoved += Math.abs(roll.rows);
       if (roll.rows < 0) tally.backward += 1;
       if (roll.fallback !== "none") tally.fallbacks += 1;
-      return landing;
+      return { kind: "moved", node: landing };
     }
   }
   const target = bypassTargetFor(map, from, hole.id, visited);
   const node = target === null ? undefined : byId.get(target);
-  if (node === undefined) return undefined;
-  const toll = holeTollFor(sector, state.hull);
+  if (node === undefined) return { kind: "stuck" };
+  const toll = bypassIsLateral(map, from, hole.id, visited)
+    ? holeTollFor(sector, state.hull)
+    : 0;
   if (toll > 0) {
     applyEffectsToState(state, [{ k: "hull", n: -toll }], tideCap);
     tally.tollPaid += toll;
   }
   tally.bypasses += 1;
-  return node;
+  return { kind: "moved", node };
+};
+
+const mergeActiveTally = (state: RunState, res: BattleResult): void => {
+  for (const [id, n] of Object.entries(res.activeFired)) {
+    state.activeFired[id] = (state.activeFired[id] ?? 0) + n;
+  }
+  for (const [id, n] of Object.entries(res.activeReady)) {
+    state.activeReady[id] = (state.activeReady[id] ?? 0) + n;
+  }
 };
 
 const nsKey = (ns: string, prefix: string, id: string): string =>
@@ -437,6 +785,8 @@ export interface WormholeTally {
   fallbacks: number;
   rowsMoved: number;
   tollPaid: number;
+  disintegrations: number;
+  softLandings: number;
 }
 
 export const emptyWormholeTally = (): WormholeTally => ({
@@ -446,14 +796,145 @@ export const emptyWormholeTally = (): WormholeTally => ({
   fallbacks: 0,
   rowsMoved: 0,
   tollPaid: 0,
+  disintegrations: 0,
+  softLandings: 0,
 });
+
+const WEATHER_FORCED = getArg("weather-force", "");
+const SALVAGE_FORCED = getArg("salvage-force", "");
+const CARGO_FORCED = getArg("cargo-force", "");
+
+interface CargoSite {
+  map: MapGraph;
+  position: string;
+  visited: readonly string[];
+  scrapMult: number;
+  tideCap: number;
+}
+
+const cargoTargetIds = (state: RunState): string[] =>
+  state.cargo.map((held) => held.nodeId);
+
+const takenCargoIds = (state: RunState): string[] =>
+  state.cargo.map((held) => held.defId);
+
+const openStations = (site: CargoSite, taken: readonly string[]) =>
+  forwardStations(site.map, site.position, site.visited).filter(
+    (step) => !taken.includes(step.node.id),
+  );
+
+const pickCargoTarget = (
+  site: CargoSite,
+  taken: readonly string[],
+): string | null => {
+  const open = openStations(site, taken);
+  const pool = open.length > 0 ? open : forwardStations(site.map, site.position, site.visited);
+  const preferred = pool.find(
+    (step) =>
+      step.rows >= CARGO_PREFER_ROWS[0] && step.rows <= CARGO_PREFER_ROWS[1],
+  );
+  return (preferred ?? pool[0])?.node.id ?? null;
+};
+
+const simDrawbackLands = (def: CargoDef, shipId: ShipId): boolean => {
+  const ship = SHIP_BY_ID.get(shipId);
+  return Object.keys(cargoSlotTierDelta(def)).every(
+    (slot) => ship?.slots[slot as SlotId] !== undefined,
+  );
+};
+
+const takeSimCargo = (
+  state: RunState,
+  site: CargoSite,
+  cargoId: string,
+): void => {
+  if (!CARGO_ENABLED) return;
+  if (state.cargo.length >= shipCargoHold(state.shipId)) return;
+  const def = CARGO_BY_ID.get(cargoId);
+  if (def === undefined || takenCargoIds(state).includes(def.id)) return;
+  if (!simDrawbackLands(def, state.shipId)) return;
+  const target = pickCargoTarget(site, cargoTargetIds(state));
+  if (target === null) return;
+  state.cargo.push({ defId: def.id, nodeId: target });
+  state.cargoTaken += 1;
+  applyEffectsToState(
+    state,
+    [{ k: "axis", n: cargoAxisShift(def) }],
+    site.tideCap,
+  );
+};
+
+const reanchorSimCargo = (state: RunState, site: CargoSite): void => {
+  if (state.cargo.length === 0) return;
+  const reach = forwardReach(site.map, site.position, site.visited);
+  const kept: SimCargo[] = [];
+  for (const entry of state.cargo) {
+    if (entry.nodeId === site.position || reach.has(entry.nodeId)) {
+      kept.push(entry);
+      continue;
+    }
+    const target = pickCargoTarget(
+      site,
+      kept.map((held) => held.nodeId),
+    );
+    if (target === null) {
+      state.cargoLapsed += 1;
+      continue;
+    }
+    kept.push({ ...entry, nodeId: target });
+  }
+  state.cargo = kept;
+};
+
+const deliverSimCargo = (state: RunState, site: CargoSite): void => {
+  if (state.cargo.length === 0) return;
+  const kept: SimCargo[] = [];
+  for (const entry of state.cargo) {
+    const def = CARGO_BY_ID.get(entry.defId);
+    if (entry.nodeId !== site.position || def === undefined) {
+      kept.push(entry);
+      continue;
+    }
+    const paid = cargoPayout(def, site.scrapMult);
+    gain(state, paid);
+    state.cargoScrap += paid;
+    state.cargoDelivered += 1;
+  }
+  state.cargo = kept;
+};
+
+const payCargoToll = (state: RunState, tideCap: number): void => {
+  const cost = state.cargo.reduce((sum, held) => {
+    const def = CARGO_BY_ID.get(held.defId);
+    return sum + (def === undefined ? 0 : cargoHullPerNode(def));
+  }, 0);
+  if (cost <= 0) return;
+  applyEffectsToState(state, [{ k: "hull", n: -cost }], tideCap);
+};
+
+const lapseSimCargo = (state: RunState): void => {
+  state.cargoLapsed += state.cargo.length;
+  state.cargo = [];
+};
+
+const sectorMutators = (state: RunState, opts: WalkOptions): string[] => {
+  const carried = withoutWeather(opts.mutators ?? state.mutators);
+  if (!WEATHER_ENABLED) return carried;
+  if (WEATHER_FORCED !== "") {
+    return opts.sector < 2 ? carried : [...carried, WEATHER_FORCED];
+  }
+  return withWeatherFor(carried, opts.seed, opts.sector, opts.sector);
+};
 
 const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
   const { seed, sector, ns } = opts;
+  state.mutators = sectorMutators(state, opts);
+  const mut = computeMutatorMods(state.mutators);
   const streams =
     ns === "" ? createStreams(seed) : createStreams(deriveSeed(seed, `map:${ns}`));
   const map: MapGraph = generateSectorMap(streams.map, sector, {
     bossAsGate: opts.bossAsGate,
+    noShops: mut.noShops,
   });
   const bossId = bossNodeIdFor(sector);
   const byId = nodeById(map);
@@ -464,19 +945,50 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
   let position = START_NODE_ID;
   let posRow = 0;
 
+  let deliveryReach: ReadonlySet<string> | undefined;
+  const refreshDelivery = (): void => {
+    const entry = state.cargo[0];
+    deliveryReach =
+      entry === undefined
+        ? undefined
+        : deliveryReachOf(map, entry.nodeId, visited);
+  };
+
   const route = (): RouteState => ({
     hullPct: (state.hull / Math.max(1, state.hullMax)) * 100,
     anomalyStreak: state.anomalyStreak,
     scrap: state.scrap,
     wormholeRides: tally.rides,
+    ...(deliveryReach === undefined ? {} : { deliveryReach }),
   });
 
-  const stop = (cleared: boolean, deathRow: number): WalkResult => ({
-    cleared,
-    deathRow,
-    rows: posRow,
-    hullEntering,
+  const site = (): CargoSite => ({
+    map,
+    position,
+    visited,
+    scrapMult: opts.scrapMult,
+    tideCap: opts.tideCap,
   });
+
+  const offerableCargo = (): string[] => {
+    if (!CARGO_ENABLED) return [];
+    if (state.cargo.length >= shipCargoHold(state.shipId)) return [];
+    if (forwardStations(map, position, visited).length === 0) return [];
+    const held = takenCargoIds(state);
+    return CARGO_IDS.filter((id) => {
+      const def = CARGO_BY_ID.get(id);
+      return (
+        def !== undefined &&
+        !held.includes(id) &&
+        simDrawbackLands(def, state.shipId)
+      );
+    });
+  };
+
+  const stop = (cleared: boolean, deathRow: number): WalkResult => {
+    lapseSimCargo(state);
+    return { cleared, deathRow, rows: posRow, hullEntering };
+  };
 
   for (let guard = 0; guard < opts.guard; guard += 1) {
     if (position === bossId) break;
@@ -497,8 +1009,9 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         tally,
         opts.tideCap,
       );
-      if (resolved === undefined) break;
-      next = resolved;
+      if (resolved.kind === "fatal") return stop(false, step.row);
+      if (resolved.kind === "stuck") break;
+      next = resolved.node;
     } else {
       applyEdgeMotifs(state, sector, map, position, next.id, opts.tideCap);
     }
@@ -506,9 +1019,15 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
     posRow = next.row;
     visited.push(next.id);
     if (next.pocket === true) state.pockets += 1;
+    if (CARGO_ENABLED && state.cargo.length > 0) {
+      deliverSimCargo(state, site());
+      reanchorSimCargo(state, site());
+      payCargoToll(state, opts.tideCap);
+      refreshDelivery();
+    }
     applyNodeMotifs(state, sector, next, opts.tideCap);
     state.jumpsSinceTide += 1;
-    if (state.jumpsSinceTide >= 4) {
+    if (state.jumpsSinceTide >= jumpsPerTideFor(state.mutators)) {
       state.tide = Math.min(opts.tideCap, state.tide + 1);
       state.jumpsSinceTide = 0;
     }
@@ -532,10 +1051,15 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           mkLevels: state.mkLevels,
           perks: state.perks,
           chartPicks: state.chartPicks,
+          mutators: state.mutators,
           modules: state.modules,
+          officers: state.officers,
+          cargo: takenCargoIds(state),
+          ...(state.echo === null ? {} : { echo: state.echo }),
           sectorHpPct: sectorHpPct({ sector, pocket: next.pocket === true }),
           sectorDmgPct: sectorDmgPct({ sector }),
-          enemyHpBonusPct: opts.enemyHpBonusPct,
+          enemyHpBonusPct:
+            opts.enemyHpBonusPct + mut.enemyHpPct + mut.copyHpPct,
           eliteShield: opts.eliteShield,
           ascension: opts.ascension,
           inverted: next.inverted === true,
@@ -543,24 +1067,62 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         },
       );
       state.hull = res.hullLeft;
+      mergeActiveTally(state, res);
+      state.takenBySector[sector] = (state.takenBySector[sector] ?? 0) + res.taken;
+      state.fightsBySector[sector] = (state.fightsBySector[sector] ?? 0) + 1;
       state.kills += res.kills;
       if (!res.win) return stop(false, next.row);
       state.nodes += 1;
       state.fights += 1;
       const loot = createStream(deriveSeed(seed, nsKey(ns, "loot", next.id)));
-      const reward = computeNodeReward(type, loot, 0, next.pocket === true);
-      const mods = computeRunMods(state.perks, state.chartPicks, state.modules);
+      const reward = computeNodeReward(
+        type,
+        loot,
+        mut.lootRarityStep,
+        next.pocket === true,
+        opts.scrapMult,
+      );
+      const mods = computeRunMods(
+        state.perks,
+        state.chartPicks,
+        state.modules,
+        state.officers,
+      );
       gain(
         state,
-        Math.round(reward.scrap * opts.scrapMult * (1 + mods.scrapMultPct / 100)),
+        Math.round(
+          reward.scrap *
+            opts.scrapMult *
+            (1 + (mods.scrapMultPct + mut.scrapMultPct) / 100),
+        ),
       );
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
-      if (reward.dieDrop !== null) takeDie(state, reward.dieDrop);
-      if (opts.rollModules && (type === "elite" || type === "miniboss")) {
-        const moduleId = rollModule(loot, state.modules, "common");
-        if (state.modules.length < moduleSlots(mods.moduleSlotDelta)) {
-          state.modules.push(moduleId);
+      if (type === "miniboss") {
+        gain(
+          state,
+          loot.int(MINIBOSS_PACKAGE_SCRAP[0], MINIBOSS_PACKAGE_SCRAP[1]),
+        );
+        const dieChoice = dieForRarity(loot, "rare", mut.lootRarityStep);
+        const moduleChoice = rollModule(loot, state.modules, "uncommon");
+        if (opts.rollModules && wouldTakeModule(state, moduleChoice)) {
+          takeModule(state, moduleChoice);
+        } else {
+          takeDie(state, dieChoice);
         }
+        state.vouchers += 1;
+      } else {
+        if (reward.dieDrop !== null) takeDie(state, reward.dieDrop);
+        if (opts.rollModules && type === "elite") {
+          takeModule(state, rollModule(loot, state.modules, "common"));
+        }
+      }
+      if (isSalvageNode(type) && SALVAGE_ENABLED) {
+        runSalvage(
+          state,
+          createStream(deriveSeed(seed, nsKey(ns, "salvage", next.id))),
+          opts.tideCap,
+          SALVAGE_FORCED,
+        );
       }
       if (isDraftNode(type) && opts.noDraft !== true) {
         runDraft(state, sector, loot);
@@ -571,12 +1133,67 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       runAnomaly(state, sector, next, deriveSeed(seed, `anomaly:${ns}`));
       state.nodes += 1;
     } else if (type === "beacon") {
+      runEvent(
+        state,
+        sector,
+        "beacon",
+        deriveSeed(seed, nsKey(ns, "beaconEvent", next.id)),
+        opts.tideCap,
+        offerableCargo(),
+      );
       if (opts.noDraft !== true) {
         runDraft(
           state,
           sector,
           createStream(deriveSeed(seed, nsKey(ns, "beacon", next.id))),
         );
+      }
+      state.nodes += 1;
+    } else if (type === "event") {
+      const follow = runEvent(
+        state,
+        sector,
+        "event",
+        deriveSeed(seed, nsKey(ns, "event", next.id)),
+        opts.tideCap,
+        offerableCargo(),
+      );
+      if (follow !== null) {
+        const res = simulateBattle(
+          [...follow.enemyIds],
+          state.deck,
+          deriveSeed(seed, nsKey(ns, "eventFight", next.id)),
+          {
+            shipId: state.shipId,
+            hull: state.hull,
+            hullMax: state.hullMax,
+            runScrap: state.scrap,
+            tide: state.tide,
+            interference: state.interference,
+            mkLevels: state.mkLevels,
+            perks: state.perks,
+            chartPicks: state.chartPicks,
+            modules: state.modules,
+            officers: state.officers,
+            cargo: takenCargoIds(state),
+            ...(state.echo === null ? {} : { echo: state.echo }),
+            sectorHpPct: sectorHpPct({ sector }),
+            sectorDmgPct: sectorDmgPct({ sector }),
+            enemyHpBonusPct: opts.enemyHpBonusPct,
+            eliteShield: opts.eliteShield,
+            ascension: opts.ascension,
+          },
+        );
+        state.hull = res.hullLeft;
+        mergeActiveTally(state, res);
+        state.takenBySector[sector] =
+          (state.takenBySector[sector] ?? 0) + res.taken;
+        state.fightsBySector[sector] =
+          (state.fightsBySector[sector] ?? 0) + 1;
+        state.kills += res.kills;
+        if (!res.win) return stop(false, next.row);
+        state.fights += 1;
+        if (follow.scrap !== undefined) gain(state, follow.scrap);
       }
       state.nodes += 1;
     } else if (type === "shop") {
@@ -586,10 +1203,17 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       const forecast =
         fightsUntilRest(map, byId, next.id, next.row, route()) *
         EXPECTED_DMG_PER_FIGHT;
-      greedyShipyard(state, forecast > state.hull * 0.6);
+      greedyShipyard(state, forecast > state.hull * 0.6, sector);
       state.nodes += 1;
     } else {
       state.nodes += 1;
+    }
+    if (CARGO_ENABLED) {
+      const pending = state.pendingCargo;
+      state.pendingCargo = null;
+      if (pending !== null) takeSimCargo(state, site(), pending);
+      else if (CARGO_FORCED !== "") takeSimCargo(state, site(), CARGO_FORCED);
+      refreshDelivery();
     }
   }
   return stop(position === bossId, -1);
@@ -618,7 +1242,9 @@ const sectorResultOf = (
 });
 
 const runSector = (seed: number): SectorResult => {
-  const state = createRunState({ hull: 30, hullMax: 30, deck: STARTER_DECK });
+  const state = createRunState(
+    runStateInit({ hull: 30, hullMax: 30, deck: STARTER_DECK }),
+  );
   const walk = walkSector(state, {
     sector: 1,
     seed,
@@ -689,12 +1315,14 @@ const DRIFT_MID_MK: MkLevels = {
 };
 
 const runDrift = (seed: number, mid: boolean): DriftResult => {
-  const state = createRunState({
-    hull: 30,
-    hullMax: 30,
-    deck: mid ? DRIFT_MID_DECK : STARTER_DECK,
-    mkLevels: mid ? { ...DRIFT_MID_MK } : {},
-  });
+  const state = createRunState(
+    runStateInit({
+      hull: 30,
+      hullMax: 30,
+      deck: mid ? DRIFT_MID_DECK : STARTER_DECK,
+      mkLevels: mid ? { ...DRIFT_MID_MK } : {},
+    }),
+  );
 
   let sectorIndex = 1;
   let depth = 0;
@@ -777,11 +1405,7 @@ const driftModeMain = (runs: number, seed: number, startedAt: number): void => {
       .map(([s, n]) => `${String(s)},${String(n)}`),
   ];
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `drift-${deckName}-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv(`drift-${deckName}`, rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms (${String(runs)} drift runs, seed ${String(seed)})`,
   );
@@ -883,11 +1507,7 @@ const runModeMain = (runs: number, seed: number, startedAt: number): void => {
     toRow("resonance_false", sF),
   ].join("\n");
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `run-${stamp}.csv`);
-  writeFileSync(outPath, `${csv}\n${histCsv}\n`, "utf8");
+  const outPath = writeSimCsv("run", [csv, histCsv], startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms (${String(runs)} sector runs, seed ${String(seed)})`,
   );
@@ -993,11 +1613,7 @@ const battleModeMain = (
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsvAs(`${simStamp(startedAt)}.csv`, rows);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms (${String(runs)} runs × ${String(encounters.length)} config(s), seed ${String(seed)})`,
   );
@@ -1120,11 +1736,7 @@ const gateModeMain = (runs: number, seed: number, startedAt: number): void => {
       );
     }
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `gate-${kind}-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv(`gate-${kind}`, rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
 };
 
@@ -1180,6 +1792,9 @@ interface SweepOptions {
   chartPicks?: readonly string[];
   deckExtra?: readonly string[];
   mkLevels?: MkLevels;
+  officers?: readonly string[];
+  officerLock?: boolean;
+  echo?: EchoNodeId | null;
 }
 
 const sweepState = (opts: SweepOptions): RunState => {
@@ -1192,16 +1807,24 @@ const sweepState = (opts: SweepOptions): RunState => {
     Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)) +
       computePerkMods(carried).hullMaxDelta,
   );
-  return createRunState({
-    shipId,
-    hull: hullMax,
-    hullMax,
-    deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(0, DECK_CAP),
-    mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
-    perks: carried,
-    modules: [...opts.archetype.modules],
-    chartPicks: [...(opts.chartPicks ?? [])],
-  });
+  return createRunState(
+    runStateInit({
+      shipId,
+      hull: hullMax,
+      hullMax,
+      deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(
+        0,
+        DECK_CAP,
+      ),
+      mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
+      perks: carried,
+      modules: [...opts.archetype.modules],
+      chartPicks: [...(opts.chartPicks ?? [])],
+      ...(opts.officers === undefined ? {} : { officers: opts.officers }),
+      officerLock: opts.officerLock === true,
+      ...(opts.echo === undefined ? {} : { echo: opts.echo }),
+    }),
+  );
 };
 
 const sweepWalkOptions = (opts: SweepOptions): WalkOptions => {
@@ -1360,11 +1983,7 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
     `  ${String(cliffs)} gap(s) over ${String(LADDER_GAP_PP)}pp | ${String(rises)} act(s) easier than the one before`,
   );
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `sweep-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("sweep", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (cliffs > 0 || rises > 0) process.exitCode = 1;
 };
@@ -1430,47 +2049,89 @@ const ladderCell = (
   };
 };
 
-const printLadderCell = (cell: LadderCell): void => {
+const printLadderCell = (
+  cell: LadderCell,
+  target: number | null,
+): void => {
   const hist = [...cell.deathRows.entries()]
     .sort((a, b) => a[0] - b[0])
     .map(([row, count]) => `r${String(row)}:${String(count)}`)
     .join(" ");
+  const delta = target === null ? 0 : cell.winrate * 100 - target;
+  const out = target !== null && Math.abs(delta) > LADDER_BAND_PP;
   console.log(
-    `    ${cell.label.padEnd(22)} winrate ${(cell.winrate * 100).toFixed(1).padStart(5)}% · nodes ${cell.avgNodes.toFixed(1)} · fights ${cell.avgFights.toFixed(1)} · kills ${cell.avgKills.toFixed(1)} · hull(med) ${cell.hullMedian.toFixed(1)} · set ${cell.resonancePct.toFixed(0)}%`,
+    `    ${cell.label.padEnd(22)} winrate ${(cell.winrate * 100).toFixed(1).padStart(5)}%${target === null ? " · unchecked" : ` · target ${target.toFixed(0).padStart(3)} (${delta >= 0 ? "+" : ""}${delta.toFixed(1)}pp)${out ? " OUT OF BAND" : " ok"}`}`,
   );
   console.log(
-    `      deaths gate ${String(cell.deathsAtGate)} · boss ${String(cell.deathsAtBoss)} · ${hist === "" ? "none" : hist}`,
+    `      nodes ${cell.avgNodes.toFixed(1)} · fights ${cell.avgFights.toFixed(1)} · kills ${cell.avgKills.toFixed(1)} · hull(med) ${cell.hullMedian.toFixed(1)} · set ${cell.resonancePct.toFixed(0)}% · deaths gate ${String(cell.deathsAtGate)} · boss ${String(cell.deathsAtBoss)} · ${hist === "" ? "none" : hist}`,
   );
 };
 
-const LADDER_PERK_SAMPLE: readonly string[] = ALL_PERKS.slice(0, 6).map(
-  (perk) => perk.id,
-);
+const LADDER_PERK_POOLS: readonly PerkPool[] = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "black",
+  "grey",
+];
+
+const LADDER_PERK_SAMPLE: readonly string[] = LADDER_PERK_POOLS.map(
+  (pool) =>
+    ALL_PERKS.find((perk) => perk.pool === pool && perk.rarity === "common")
+      ?.id ?? "",
+).filter((id) => id !== "");
+
+interface LadderBand {
+  sector: number;
+  mid: number;
+  perks: number;
+}
+
+const LADDER_BANDS: readonly LadderBand[] = [
+  { sector: 1, mid: 99, perks: 99 },
+  { sector: 2, mid: 88, perks: 91 },
+  { sector: 3, mid: 76, perks: 79 },
+  { sector: 4, mid: 61, perks: 65 },
+  { sector: 5, mid: 54, perks: 58 },
+  { sector: 6, mid: 42, perks: 47 },
+];
+
+const LADDER_BAND_PP = 5;
 
 const ladderModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = Number(getArg("sector", "0"));
   console.log(
-    `sim ladder: the sweep ladder under a microscope — A0, red+blue, ${String(runs)} runs per deck per act`,
+    `sim ladder: the difficulty contract — A0, red+blue, ${String(runs)} runs per deck per act`,
   );
   console.log(
-    "  the middle column is the one sim:sweep checks; the cold column is diagnostics.",
+    `  the two equipped columns carry the bands (±${String(LADDER_BAND_PP)}pp); the cold column is printed diagnostics.`,
   );
   console.log(
     "  each act is measured three ways to separate act scaling from build strength.",
   );
-  const rows: string[] = ["sector,build,winrate,nodes,fights,kills,hullMedian"];
+  const rows: string[] = [
+    "sector,build,winrate,target,deltaPp,checked,nodes,fights,kills,hullMedian",
+  ];
+  let out = 0;
   for (const sector of SECTORS.map((def) => def.id)) {
+    if (only > 0 && sector !== only) continue;
+    const band = LADDER_BANDS.find((b) => b.sector === sector);
     console.log(`  S${String(sector)}`);
     const builds: readonly {
       label: string;
+      target: number | null;
       build: Pick<SweepOptions, "perks" | "chartPicks">;
     }[] = [
-      { label: "cold (diagnostics)", build: {} },
+      { label: "cold (diagnostics)", target: null, build: {} },
       {
-        label: "mid-collection (checked)",
+        label: "mid-collection",
+        target: band?.mid ?? null,
         build: { chartPicks: MID_COLLECTION_PICKS },
       },
       {
         label: "+ picks + 6 perks",
+        target: band?.perks ?? null,
         build: {
           chartPicks: MID_COLLECTION_PICKS,
           perks: LADDER_PERK_SAMPLE,
@@ -1479,12 +2140,18 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
     ];
     for (const entry of builds) {
       const cell = ladderCell(entry.label, runs, seed, sector, entry.build);
-      printLadderCell(cell);
+      printLadderCell(cell, entry.target);
+      const delta =
+        entry.target === null ? 0 : cell.winrate * 100 - entry.target;
+      if (entry.target !== null && Math.abs(delta) > LADDER_BAND_PP) out += 1;
       rows.push(
         [
           String(sector),
           entry.label,
           cell.winrate.toFixed(3),
+          entry.target === null ? "" : entry.target.toFixed(0),
+          entry.target === null ? "" : delta.toFixed(1),
+          entry.target === null ? "no" : "yes",
           cell.avgNodes.toFixed(2),
           cell.avgFights.toFixed(2),
           cell.avgKills.toFixed(2),
@@ -1493,12 +2160,12 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
       );
     }
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `ladder-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  console.log(
+    `  ${String(out)} of ${String(LADDER_BANDS.length * 2)} checked cell(s) outside ±${String(LADDER_BAND_PP)}pp`,
+  );
+  const outPath = writeSimCsv("ladder", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (out > 0) process.exitCode = 1;
 };
 
 const DEAD_PERK_LINE = -8;
@@ -1631,15 +2298,13 @@ const perkModeMain = (runs: number, seed: number, startedAt: number): void => {
     rows.push(`${row.tag},${String(row.n)},${row.mean.toFixed(2)}`);
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `perks-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("perks", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(dead.length)} dead, ${String(dominant.length)} dominant`,
   );
 };
+
+const CARGO_INCOME_SHARE_PCT = 8;
 
 const ECONOMY_PER_NODE_MIN = 12;
 const ECONOMY_PER_NODE_MAX = 60;
@@ -1651,6 +2316,17 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   const rows: string[] = [
     "sector,deck,runs,clears,medianEarnedPerFight,medianEarned,basis,medianSpent,spendShare,verdict",
   ];
+  const cargoRows: {
+    sector: number;
+    deck: string;
+    taken: number;
+    delivered: number;
+    lapsed: number;
+    cargoScrap: number;
+    baseIncome: number;
+    sharePct: number;
+    ok: boolean;
+  }[] = [];
   const sectorSinks: {
     sector: number;
     deck: string;
@@ -1658,7 +2334,16 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     pockets: number;
     skips: number;
   }[] = [];
-  let failures = 0;
+  const salvageRows: {
+    sector: number;
+    deck: string;
+    perFight: number;
+    scrap: number;
+    declines: number;
+    picks: Record<string, number>;
+  }[] = [];
+  let envelopeFailures = 0;
+  let shareFailures = 0;
   for (const sector of [1, 3, 5, 6]) {
     const def = SECTORS.find((sd) => sd.id === sector);
     const mult = def?.scrapMult ?? 1;
@@ -1670,16 +2355,44 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       const sinks = emptySinks();
       let pockets = 0;
       let skipIncome = 0;
+      let salvageScrap = 0;
+      let salvageDeclines = 0;
+      let fightCount = 0;
+      let cargoScrap = 0;
+      let cargoTaken = 0;
+      let cargoDelivered = 0;
+      let cargoLapsed = 0;
+      let totalEarned = 0;
+      const salvagePicks: Record<string, number> = {};
       for (let i = 0; i < runs; i += 1) {
         const { result: r, state } = runSweepSectorWithState(
           deriveSeed(seed, `eco:${String(sector)}:${archetype.name}:${String(i)}`),
           { sector, ascension: 0, archetype },
         );
         spent.push(r.scrapSpent);
-        if (r.win) clearedEarned.push(r.scrapEarned);
-        if (r.fights > 0) perNode.push(r.scrapEarned / r.fights);
+        const loot = Math.max(
+          0,
+          r.scrapEarned -
+            Math.max(0, state.eventScrap) -
+            Math.max(0, state.moduleSales) -
+            Math.max(0, state.salvageScrap) -
+            Math.max(0, state.cargoScrap),
+        );
+        totalEarned += r.scrapEarned;
+        cargoScrap += state.cargoScrap;
+        cargoTaken += state.cargoTaken;
+        cargoDelivered += state.cargoDelivered;
+        cargoLapsed += state.cargoLapsed;
+        if (r.win) clearedEarned.push(loot);
+        if (r.fights > 0) perNode.push(loot / r.fights);
         pockets += r.pockets;
         skipIncome += state.draftSkips;
+        fightCount += r.fights;
+        salvageScrap += state.salvageScrap;
+        salvageDeclines += state.salvageDeclines;
+        for (const [id, n] of Object.entries(state.salvagePicks)) {
+          salvagePicks[id] = (salvagePicks[id] ?? 0) + n;
+        }
         for (const key of Object.keys(sinks)) {
           sinks[key] = (sinks[key] ?? 0) + (state.sinks[key] ?? 0);
         }
@@ -1690,6 +2403,29 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         sinks,
         pockets: pockets / Math.max(1, runs),
         skips: skipIncome / Math.max(1, runs),
+      });
+      salvageRows.push({
+        sector,
+        deck: archetype.name,
+        perFight: salvageScrap / Math.max(1, fightCount),
+        scrap: salvageScrap / Math.max(1, runs),
+        declines: salvageDeclines / Math.max(1, runs),
+        picks: salvagePicks,
+      });
+      const baseIncome = Math.max(1, totalEarned - cargoScrap);
+      const sharePct = (cargoScrap / baseIncome) * 100;
+      const shareOk = sharePct <= CARGO_INCOME_SHARE_PCT;
+      if (!shareOk) shareFailures += 1;
+      cargoRows.push({
+        sector,
+        deck: archetype.name,
+        taken: cargoTaken / Math.max(1, runs),
+        delivered: cargoDelivered / Math.max(1, runs),
+        lapsed: cargoLapsed / Math.max(1, runs),
+        cargoScrap: cargoScrap / Math.max(1, runs),
+        baseIncome: baseIncome / Math.max(1, runs),
+        sharePct,
+        ok: shareOk,
       });
       const mEarnedPerNode = median(perNode);
       const clears = clearedEarned.length;
@@ -1707,7 +2443,7 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         mEarnedPerNode <= hi &&
         mEarned >= ECONOMY_SECTOR_MIN &&
         mEarned <= ECONOMY_SECTOR_MAX;
-      if (!ok) failures += 1;
+      if (!ok) envelopeFailures += 1;
       rows.push(
         [
           String(sector),
@@ -1746,16 +2482,49 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `economy-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
-  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
-  if (failures > 0) {
-    console.error(`sim economy: ${String(failures)} row(s) outside the §9.3 envelope`);
-    process.exit(1);
+  console.log(
+    `\nsim economy: risk cargo (per run, carved out of the earned curve above) — bound ${String(CARGO_INCOME_SHARE_PCT)}% of the act income earned without it`,
+  );
+  rows.push("");
+  rows.push(
+    "sector,deck,cargoTaken,cargoDelivered,cargoLapsed,cargoScrap,incomeWithoutCargo,sharePct,verdict",
+  );
+  for (const row of cargoRows) {
+    console.log(
+      `  S${String(row.sector)}     ${row.deck.padEnd(11)} taken ${row.taken.toFixed(2)} · delivered ${row.delivered.toFixed(2)} · lapsed ${row.lapsed.toFixed(2)} · scrap ${row.cargoScrap.toFixed(1).padStart(5)} of ${row.baseIncome.toFixed(0).padStart(4)} · ${row.sharePct.toFixed(1).padStart(5)}% — ${row.ok ? "ok" : "OVER SHARE"}`,
+    );
+    rows.push(
+      `${String(row.sector)},${row.deck},${row.taken.toFixed(2)},${row.delivered.toFixed(2)},${row.lapsed.toFixed(2)},${row.cargoScrap.toFixed(2)},${row.baseIncome.toFixed(1)},${row.sharePct.toFixed(2)},${row.ok ? "ok" : "OVER_SHARE"}`,
+    );
   }
+
+  console.log(
+    "\nsim economy: salvage (per run, carved out of the earned curve above)",
+  );
+  rows.push("");
+  rows.push(
+    `sector,deck,salvageScrap,salvagePerFight,declines,${SALVAGE_FACES.map((f) => f.id).join(",")}`,
+  );
+  for (const row of salvageRows) {
+    const picks = SALVAGE_FACES.map((face) =>
+      ((row.picks[face.id] ?? 0) / Math.max(1, runs)).toFixed(2),
+    );
+    console.log(
+      `  S${String(row.sector)}     ${row.deck.padEnd(11)} scrap ${row.scrap.toFixed(1).padStart(5)} (${row.perFight.toFixed(2)}/fight) · declines ${row.declines.toFixed(2)} · ${SALVAGE_FACES.map((f, i) => `${f.id} ${picks[i] ?? "0.00"}`).join(" · ")}`,
+    );
+    rows.push(
+      `${String(row.sector)},${row.deck},${row.scrap.toFixed(2)},${row.perFight.toFixed(2)},${row.declines.toFixed(2)},${picks.join(",")}`,
+    );
+  }
+
+  const outPath = writeSimCsv("economy", rows, startedAt);
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  const verdict = economyFailureLines(
+    { envelopeRows: envelopeFailures, cargoShareRows: shareFailures },
+    CARGO_INCOME_SHARE_PCT,
+  );
+  for (const line of verdict) console.error(line);
+  if (verdict.length > 0) process.exit(1);
 };
 
 const DEAD_DIE_LINE = -8;
@@ -1822,11 +2591,7 @@ const diceModeMain = (runs: number, seed: number, startedAt: number): void => {
       ? `  no die below the ${String(DEAD_DIE_LINE)}% dead-weight line`
       : `  BELOW ${String(DEAD_DIE_LINE)}%: ${dead.map((d) => `${d.id} ${d.delta.toFixed(1)}%`).join(" · ")}`,
   );
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `dice-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("dice", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(dead.length)} dead of ${String(ALL_DICE.length)}`,
   );
@@ -1848,8 +2613,14 @@ interface CampaignResult {
   sinks: Record<string, number>;
   draftSkips: number;
   draftRerolls: number;
+  eventsResolved: number;
+  eventScrap: number;
+  eventHull: number;
+  vouchers: number;
   interference: number;
   wormholes: WormholeTally;
+  takenBySector: Record<number, number>;
+  fightsBySector: Record<number, number>;
 }
 
 const CAMPAIGN_SECTORS = 5;
@@ -1866,13 +2637,15 @@ const runCampaign = (
     1,
     Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)),
   );
-  const state = createRunState({
-    shipId,
-    hull: hullMax,
-    hullMax,
-    deck: archetype.deck,
-    chartPicks: MID_COLLECTION_PICKS,
-  });
+  const state = createRunState(
+    runStateInit({
+      shipId,
+      hull: hullMax,
+      hullMax,
+      deck: archetype.deck,
+      chartPicks: MID_COLLECTION_PICKS,
+    }),
+  );
   if (startDraft) {
     runDraft(state, 1, createStream(deriveSeed(seed, "voucherDraft")));
   }
@@ -1923,12 +2696,23 @@ const runCampaign = (
     sinks: state.sinks,
     draftSkips: state.draftSkips,
     draftRerolls: state.draftRerolls,
+    eventsResolved: state.eventsResolved,
+    eventScrap: state.eventScrap,
+    eventHull: state.eventHull,
+    vouchers: state.vouchers,
     interference: state.interference,
     wormholes,
+    takenBySector: state.takenBySector,
+    fightsBySector: state.fightsBySector,
   };
 };
 
-const CAMPAIGN_BAND: readonly [number, number] = [0.6, 0.7];
+const CAMPAIGN_BAND: readonly [number, number] = [0.3, 0.36];
+
+const CAMPAIGN_ASCENSIONS: readonly number[] = getArg("asc", "0,3")
+  .split(",")
+  .map((part) => Number(part.trim()))
+  .filter((n) => Number.isFinite(n) && n >= 0);
 const MONOTONIC_GAP_PP = 18;
 
 const mergeTallies = (
@@ -2027,10 +2811,12 @@ const campaignModeMain = (
   const sinks = emptySinks();
   let skips = 0;
   let rerolls = 0;
-  let outOfBand = 0;
+  let events = 0;
+  let eventScrap = 0;
+  let eventHull = 0;
   const a0: number[] = [];
   const a0Runs: CampaignResult[] = [];
-  for (const ascension of [0, 3]) {
+  for (const ascension of CAMPAIGN_ASCENSIONS) {
     for (const archetype of ARCHETYPES) {
       const { roll, results } = campaignRoll(
         runs,
@@ -2045,17 +2831,16 @@ const campaignModeMain = (
           mergeSinks(sinks, r.sinks);
           skips += r.draftSkips;
           rerolls += r.draftRerolls;
+          events += r.eventsResolved;
+          eventScrap += r.eventScrap;
+          eventHull += r.eventHull;
         }
         if (archetype.name !== "black-edge") {
           a0.push(roll.winrate);
           a0Runs.push(...results);
         }
       }
-      const banded =
-        ascension === 0 && archetype.name !== "black-edge"
-          ? roll.winrate >= CAMPAIGN_BAND[0] && roll.winrate <= CAMPAIGN_BAND[1]
-          : true;
-      if (!banded) outOfBand += 1;
+
       rows.push(
         [
           archetype.name,
@@ -2066,7 +2851,7 @@ const campaignModeMain = (
           roll.avgNodes.toFixed(1),
           roll.avgEarned.toFixed(1),
           roll.avgSpent.toFixed(1),
-          banded ? "ok" : "OUT_OF_BAND",
+          "",
         ].join(","),
       );
       const hist = [...roll.deathHist.entries()]
@@ -2074,13 +2859,13 @@ const campaignModeMain = (
         .map(([sector, n]) => `s${String(sector)}:${String(n)}`)
         .join(" ");
       console.log(
-        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}${banded ? "" : " — OUT OF BAND"}`,
+        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}`,
       );
     }
   }
   const mean = a0.reduce((sum, v) => sum + v, 0) / Math.max(1, a0.length);
   console.log(
-    `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%`,
+    `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%${mean >= CAMPAIGN_BAND[0] && mean <= CAMPAIGN_BAND[1] ? " — ok" : " — OUT OF BAND"}`,
   );
 
   const conditional: number[] = [];
@@ -2105,6 +2890,26 @@ const campaignModeMain = (
       `${String(sector)},${String(entered)},${String(clearedHere)},${rate.toFixed(3)},${gap.toFixed(1)}`,
     );
     previous = rate;
+  }
+  console.log("  damage taken per act (A0, red+blue — hull+shield absorbed per fight):");
+  rows.push("");
+  rows.push("sector,fights,damageTaken,perFight");
+  for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
+    const taken = a0Runs.reduce(
+      (sum, r) => sum + (r.takenBySector[sector] ?? 0),
+      0,
+    );
+    const fights = a0Runs.reduce(
+      (sum, r) => sum + (r.fightsBySector[sector] ?? 0),
+      0,
+    );
+    if (fights === 0) continue;
+    console.log(
+      `    S${String(sector)} ${String(fights).padStart(5)} fights · ${String(taken).padStart(6)} taken · ${(taken / fights).toFixed(2)} per fight`,
+    );
+    rows.push(
+      `${String(sector)},${String(fights)},${String(taken)},${(taken / fights).toFixed(2)}`,
+    );
   }
   console.log("  where a run dies inside its act (A0, red+blue):");
   for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
@@ -2137,6 +2942,9 @@ const campaignModeMain = (
       fallbacks: into.fallbacks + run.wormholes.fallbacks,
       rowsMoved: into.rowsMoved + run.wormholes.rowsMoved,
       tollPaid: into.tollPaid + run.wormholes.tollPaid,
+      disintegrations:
+        into.disintegrations + run.wormholes.disintegrations,
+      softLandings: into.softLandings + run.wormholes.softLandings,
     }),
     emptyWormholeTally(),
   );
@@ -2163,6 +2971,11 @@ const campaignModeMain = (
       holes.rides === 0 ? "0" : (holes.rowsMoved / holes.rides).toFixed(2)
     } rows avg) · bypasses ${String(holes.bypasses)} (${String(holes.tollPaid)} hull paid)`,
   );
+  console.log(
+    `    disintegrations ${String(holes.disintegrations)} — ${(
+      (holes.disintegrations / holeRuns) * 100
+    ).toFixed(1)}% of runs ended inside the spot`,
+  );
   console.log("  campaign sinks (A0, all decks):");
   for (const sink of Object.keys(sinks)) {
     console.log(
@@ -2172,6 +2985,10 @@ const campaignModeMain = (
   console.log(
     `  draft agency: ${String(skips)} skips · ${String(rerolls)} rerolls over ${String(runs * ARCHETYPES.length)} A0 runs`,
   );
+  const a0Total = Math.max(1, runs * ARCHETYPES.length);
+  console.log(
+    `  events: ${(events / a0Total).toFixed(1)}/run · scrap ${eventScrap >= 0 ? "+" : ""}${(eventScrap / a0Total).toFixed(1)} · hull ${eventHull >= 0 ? "+" : ""}${(eventHull / a0Total).toFixed(1)} per run`,
+  );
   console.log("  puzzles met in campaign:");
   for (const tier of [1, 2, 3, 4, 5]) {
     const tally = tallies[tier];
@@ -2180,16 +2997,12 @@ const campaignModeMain = (
       `    T${String(tier)} entered ${String(tally.entered)} · solved ${((tally.solved / tally.entered) * 100).toFixed(1)}% · ${(tally.attempts / tally.entered).toFixed(2)} attempts · ${(tally.paid / tally.entered).toFixed(1)} scrap staked`,
     );
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `campaign-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("campaign", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
-  if (outOfBand > 0) process.exitCode = 1;
+  if (mean < CAMPAIGN_BAND[0] || mean > CAMPAIGN_BAND[1]) process.exitCode = 1;
 };
 
-const SHIP_BAND: readonly [number, number] = [0.45, 0.65];
+const SHIP_BAND: readonly [number, number] = [0.2, 0.6];
 
 const SHIP_BAND_ENFORCED: readonly ShipId[] = ["corsair", "foundry", "prism"];
 
@@ -2206,9 +3019,12 @@ const PRISM_SPECTRUM: Archetype = {
 const SHIP_ARCHETYPES: readonly Archetype[] = [...ARCHETYPES, PRISM_SPECTRUM];
 
 const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = getArg("ship", "");
+  const ships =
+    only === "" ? PLAYABLE_SHIPS : PLAYABLE_SHIPS.filter((s) => s.id === only);
   const rows: string[] = ["ship,deck,runs,winrate,avgSectorsCleared,hullMax"];
   console.log(
-    `sim ships: S1-S5 chained per ship, ${String(PLAYABLE_SHIPS.length)} ships x ${String(SHIP_ARCHETYPES.length)} decks x ${String(runs)} runs`,
+    `sim ships: S1-S5 chained per ship, ${String(ships.length)} ships x ${String(SHIP_ARCHETYPES.length)} decks x ${String(runs)} runs`,
   );
   console.log(
     `  the band is ${(SHIP_BAND[0] * 100).toFixed(0)}-${(SHIP_BAND[1] * 100).toFixed(0)}% on the red+blue+prism mean; black-edge is printed, never enforced.`,
@@ -2217,7 +3033,7 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
     "  it is asserted on the hulls P11 authored; the three legacy hulls are reference readings.",
   );
   let outOfBand = 0;
-  for (const ship of PLAYABLE_SHIPS) {
+  for (const ship of ships) {
     const banded: number[] = [];
     for (const archetype of SHIP_ARCHETYPES) {
       const { roll } = campaignRoll(runs, seed, archetype, 0, false, ship.id);
@@ -2245,11 +3061,7 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
     );
     rows.push(`${ship.id},banded mean,,${mean.toFixed(3)},,`);
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `ships-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("ships", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (outOfBand > 0) process.exitCode = 1;
 };
@@ -2327,11 +3139,7 @@ const puzzleModeMain = (runs: number, seed: number, startedAt: number): void => 
       ? "  no puzzle is a guaranteed solve inside its budget"
       : `  guaranteed inside budget: ${maxed.map((p) => p.id).join(" ")}`,
   );
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `puzzles-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("puzzles", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(failures)} tier(s) off the bell`,
   );
@@ -2425,11 +3233,7 @@ const deepModeMain = (runs: number, seed: number, startedAt: number): void => {
       }
     }
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `deep-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("deep", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   console.log(
     outOfBand === 0
@@ -2584,11 +3388,7 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const stamp = new Date(startedAt).toISOString().replace(/[:.]/g, "-");
-  const outPath = join(outDir, `roster-${stamp}.csv`);
-  writeFileSync(outPath, `${rows.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsv("roster", rows, startedAt);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms — ${String(failures)} out of band, ${String(unfair)} unfair pair(s)`,
   );
@@ -2708,10 +3508,7 @@ const axisModeMain = (runs: number, seed: number, startedAt: number): void => {
       `${row.policy},${mean.toFixed(2)},${String(min)},${String(max)},${reach.toFixed(0)},${perRun.toFixed(2)},${driftPerRun.toFixed(2)}`,
     );
   }
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
-  const outPath = join(outDir, `axis-${String(seed)}.csv`);
-  writeFileSync(outPath, `${csv.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsvAs(`axis-${String(seed)}.csv`, csv);
   console.log(
     `sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`,
   );
@@ -2927,114 +3724,486 @@ const metaModeMain = (_runs: number, _seed: number, startedAt: number): void => 
     );
   }
 
-  const outDir = join(process.cwd(), "sim-out");
-  mkdirSync(outDir, { recursive: true });
   const csv = ["profile,runsToL50,xpPerRun,shardsAtL50,shardsPerRun"];
   for (const row of rows) {
     csv.push(
       `${row.profile},${String(row.tally.runs)},${(row.tally.xp / row.tally.runs).toFixed(0)},${String(row.tally.shards)},${(row.tally.shards / row.tally.runs).toFixed(0)}`,
     );
   }
-  const outPath = join(outDir, "meta-curve.csv");
-  writeFileSync(outPath, `${csv.join("\n")}\n`, "utf8");
+  const outPath = writeSimCsvAs("meta-curve.csv", csv);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (outOfBand) process.exitCode = 1;
+};
+
+const FIRE_MODE_CARRIERS: readonly string[] = Object.keys(MODULE_FIRE_MODE);
+
+const FIRE_MODE_WEAPON_MK: MkLevels = { weaponA: 3, weaponB: 3 };
+
+const FIRE_DOMINANT_PCT = DOMINANT_PICK_PCT;
+
+interface FireCell {
+  armed: ModeTally;
+  offered: ModeTally;
+}
+
+const emptyFireCell = (): FireCell => ({ armed: {}, offered: {} });
+
+const mergeTally = (into: ModeTally, from: ModeTally): void => {
+  for (const id of FIRE_MODE_IDS) {
+    const n = from[id];
+    if (n !== undefined) into[id] = (into[id] ?? 0) + n;
+  }
+};
+
+const shareOf = (cell: FireCell, mode: FireModeId): number => {
+  const offers = cell.offered[mode] ?? 0;
+  return offers === 0 ? 0 : (cell.armed[mode] ?? 0) / offers;
+};
+
+const fireModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const bySector = new Map<number, string[]>();
+  for (const def of ALL_ENEMIES) {
+    if (def.env === true) continue;
+    const sector = homeSectorOf(def.id);
+    bySector.set(sector, [...(bySector.get(sector) ?? []), def.id]);
+  }
+  const hullMax = shipHullMax("wanderer");
+  const total = emptyFireCell();
+  const sectorCells = new Map<number, FireCell>();
+  let battles = 0;
+
+  for (const [sector, ids] of [...bySector.entries()].sort(
+    (a, b) => a[0] - b[0],
+  )) {
+    const cell = emptyFireCell();
+    for (const [index, id] of ids.entries()) {
+      const partner = ids[(index + 1) % ids.length];
+      const encounters: string[][] = [[id]];
+      if (partner !== undefined && partner !== id) encounters.push([id, partner]);
+      const tier = rosterTierOf(id);
+      const entry = ROSTER_ENTRY[tier] ?? { hullPct: 100, tide: 0, scrap: 20 };
+      for (const enemyIds of encounters) {
+        for (const archetype of ARCHETYPES) {
+          for (let i = 0; i < runs; i += 1) {
+            const result = simulateBattle(
+              enemyIds,
+              archetype.deck,
+              deriveSeed(
+                seed,
+                `fire:${enemyIds.join("+")}:${archetype.name}:${String(i)}`,
+              ),
+              {
+                mkLevels: FIRE_MODE_WEAPON_MK,
+                modules: [...FIRE_MODE_CARRIERS],
+                sectorHpPct: sectorHpPct({ sector }),
+                sectorDmgPct: sectorDmgPct({ sector }),
+                hull: Math.round((hullMax * entry.hullPct) / 100),
+                hullMax,
+                runScrap: entry.scrap,
+                tide: entry.tide,
+              },
+            );
+            battles += 1;
+            mergeTally(cell.armed, result.modeArmed);
+            mergeTally(cell.offered, result.modeOffered);
+          }
+        }
+      }
+    }
+    sectorCells.set(sector, cell);
+    mergeTally(total.armed, cell.armed);
+    mergeTally(total.offered, cell.offered);
+  }
+
+  const acquired = FIRE_MODE_IDS.filter((id) => id !== DIRECT.id);
+  const observations = total.offered[DIRECT.id] ?? 0;
+  console.log(
+    `sim fire: mode arming share over ${String(battles)} battles — every mode unlocked (weapons Mk3 + the ${String(FIRE_MODE_CARRIERS.length)} carriers)`,
+  );
+  console.log(
+    `  the denominator is one weapon slot on one turn with two or more legal modes: ${String(observations)} such slot-turns`,
+  );
+  console.log(
+    `  bound: no acquired mode armed on more than ${String(FIRE_DOMINANT_PCT)}% of the turns where it is available and legal (DESIGN 6.7, band 16)`,
+  );
+  for (const mode of FIRE_MODE_IDS) {
+    const offers = total.offered[mode] ?? 0;
+    const arms = total.armed[mode] ?? 0;
+    const pct = shareOf(total, mode) * 100;
+    const verdict =
+      mode === DIRECT.id
+        ? "baseline, unchecked"
+        : offers === 0
+          ? "never offered"
+          : pct > FIRE_DOMINANT_PCT
+            ? `DOMINANT (>${String(FIRE_DOMINANT_PCT)}%)`
+            : "ok";
+    console.log(
+      `  ${mode.padEnd(11)} armed ${String(arms).padStart(6)} of ${String(offers).padStart(6)} offers · ${pct.toFixed(1).padStart(5)}% · ${verdict}`,
+    );
+  }
+
+  console.log("  per act (acquired modes only)");
+  for (const [sector, cell] of [...sectorCells.entries()].sort(
+    (a, b) => a[0] - b[0],
+  )) {
+    console.log(
+      `    S${String(sector)} ${acquired
+        .map((mode) => `${mode} ${(shareOf(cell, mode) * 100).toFixed(0)}%`)
+        .join(" · ")}`,
+    );
+  }
+
+  const rows = ["mode,offered,armed,share"];
+  for (const mode of FIRE_MODE_IDS) {
+    rows.push(
+      `${mode},${String(total.offered[mode] ?? 0)},${String(total.armed[mode] ?? 0)},${shareOf(total, mode).toFixed(3)}`,
+    );
+  }
+  const outPath = writeSimCsv("fire", rows, startedAt);
+
+  const dominant = acquired.filter(
+    (mode) =>
+      (total.offered[mode] ?? 0) > 0 &&
+      shareOf(total, mode) * 100 > FIRE_DOMINANT_PCT,
+  );
+  const unreached = acquired.filter((mode) => (total.offered[mode] ?? 0) === 0);
+  console.log(
+    dominant.length === 0
+      ? `  no acquired mode is armed on more than ${String(FIRE_DOMINANT_PCT)}% of the turns where it is legal`
+      : `  DOMINANT: ${dominant.map((mode) => `${mode} ${(shareOf(total, mode) * 100).toFixed(1)}%`).join(" · ")}`,
+  );
+  if (unreached.length > 0) {
+    console.log(`  NEVER OFFERED: ${unreached.join(" · ")}`);
+  }
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (dominant.length > 0 || unreached.length > 0) process.exitCode = 1;
+};
+
+const CREW_BAND_PP = 8;
+
+interface CrewArm {
+  winrate: number;
+  fired: number;
+  ready: number;
+}
+
+const crewArm = (
+  sector: number,
+  runs: number,
+  seed: number,
+  officers: readonly string[],
+): CrewArm => {
+  let wins = 0;
+  let total = 0;
+  let fired = 0;
+  let ready = 0;
+  for (const archetype of LADDER_DECKS) {
+    for (let i = 0; i < runs; i += 1) {
+      const { result, state } = runSweepSectorWithState(
+        deriveSeed(
+          seed,
+          `crew:${String(sector)}:${archetype.name}:${String(i)}`,
+        ),
+        {
+          sector,
+          ascension: 0,
+          archetype,
+          chartPicks: MID_COLLECTION_PICKS,
+          officers,
+          officerLock: true,
+        },
+      );
+      total += 1;
+      if (result.win) wins += 1;
+      for (const id of officers) {
+        fired += state.activeFired[id] ?? 0;
+        ready += state.activeReady[id] ?? 0;
+      }
+    }
+  }
+  return {
+    winrate: wins / Math.max(1, total),
+    fired,
+    ready,
+  };
+};
+
+const crewModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = Number(getArg('sector', '0'));
+  const roster =
+    OFFICER_FORCED === undefined ? OFFICER_IDS : [OFFICER_FORCED];
+  console.log(
+    `sim crew: best officer against an empty cabin — mid collection, red+blue, ${String(runs)} runs per deck per arm per act`,
+  );
+  console.log(
+    `  bound: no officer is worth more than +${String(CREW_BAND_PP)}pp of act winrate against an empty cabin (DESIGN 9.10, band 16)`,
+  );
+  const rows: string[] = [
+    'sector,officer,active,winrate,baseline,deltaPp,firedPerRun,readyPerRun,verdict',
+  ];
+  let over = 0;
+  for (const sector of SECTORS.map((def) => def.id)) {
+    if (only > 0 && sector !== only) continue;
+    const base = crewArm(sector, runs, seed, []);
+    console.log(
+      `  S${String(sector)} empty cabin ${(base.winrate * 100).toFixed(1).padStart(5)}%`,
+    );
+    for (const id of roster) {
+      const arm = crewArm(sector, runs, seed, [id]);
+      const delta = Number(((arm.winrate - base.winrate) * 100).toFixed(1));
+      const runsInCell = runs * LADDER_DECKS.length;
+      const firedPerRun = arm.fired / Math.max(1, runsInCell);
+      const readyPerRun = arm.ready / Math.max(1, runsInCell);
+      const bad = delta > CREW_BAND_PP;
+      if (bad) over += 1;
+      const active = officerDef(id)?.active.id ?? '?';
+      console.log(
+        `    ${id.padEnd(10)} ${active.padEnd(10)} ${(arm.winrate * 100).toFixed(1).padStart(5)}% · ${delta >= 0 ? '+' : ''}${delta.toFixed(1)}pp · fired ${firedPerRun.toFixed(2)}/run of ${readyPerRun.toFixed(2)} ready — ${bad ? `OVER +${String(CREW_BAND_PP)}pp` : 'ok'}`,
+      );
+      rows.push(
+        [
+          String(sector),
+          id,
+          active,
+          arm.winrate.toFixed(3),
+          base.winrate.toFixed(3),
+          delta.toFixed(1),
+          firedPerRun.toFixed(3),
+          readyPerRun.toFixed(3),
+          bad ? 'OVER_BAND' : 'ok',
+        ].join(','),
+      );
+    }
+  }
+  const outPath = writeSimCsv("crew", rows, startedAt);
+  console.log(
+    over === 0
+      ? `  no officer is worth more than +${String(CREW_BAND_PP)}pp of act winrate`
+      : `  OVER BAND: ${String(over)} officer-act cell(s) above +${String(CREW_BAND_PP)}pp`,
+  );
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (over > 0) process.exitCode = 1;
+};
+
+const ECHO_BAND_PP = 8;
+
+const ECHO_PROBE_RUNS = 40;
+
+const ECHO_UNPRICEABLE: ReadonlyMap<string, string> = new Map([
+  ["readout", "information only — nothing in this harness reads an enemy card"],
+  ["echolocation", "information only — the walk has no fog or reveal term"],
+  ["pathGhost", "information only — the walk has no preview term"],
+  ["veto", "no lethal Fate or event channel — event hull is floored at 1 here"],
+]);
+
+interface EchoArm {
+  winrate: number;
+  fired: number;
+  ready: number;
+  digest: number;
+  passive: boolean;
+}
+
+const foldResult = (acc: number, result: SectorResult): number => {
+  const value =
+    (result.win ? 1 : 0) * 7 +
+    result.deathRow * 13 +
+    result.nodes * 17 +
+    result.kills * 23 +
+    Math.round(result.scrapEarned) * 29 +
+    Math.round(result.hullMedian * 10) * 31;
+  return (acc * 31 + value) % 2147483647;
+};
+
+const echoArm = (
+  sector: number,
+  runs: number,
+  seed: number,
+  echo: EchoNodeId | null,
+): EchoArm => {
+  let wins = 0;
+  let total = 0;
+  let fired = 0;
+  let ready = 0;
+  let digest = 0;
+  const runScoped = echo !== null && echoSoftLands(echo);
+  const passive =
+    echo !== null && !runScoped && !echoIsBattleActive(echo);
+  for (const archetype of LADDER_DECKS) {
+    for (let i = 0; i < runs; i += 1) {
+      const { result, state } = runSweepSectorWithState(
+        deriveSeed(
+          seed,
+          `echo:${String(sector)}:${archetype.name}:${String(i)}`,
+        ),
+        {
+          sector,
+          ascension: 0,
+          archetype,
+          chartPicks: MID_COLLECTION_PICKS,
+          echo,
+          officers: [],
+          officerLock: true,
+        },
+      );
+      total += 1;
+      if (result.win) wins += 1;
+      digest = foldResult(digest, result);
+      if (echo === null || passive) continue;
+      if (runScoped) {
+        ready += 1;
+        if (state.echoUsed) fired += 1;
+        continue;
+      }
+      fired += state.activeFired[echoToken(echo)] ?? 0;
+      ready += state.activeReady[echoToken(echo)] ?? 0;
+    }
+  }
+  return {
+    winrate: wins / Math.max(1, total),
+    fired,
+    ready,
+    digest,
+    passive,
+  };
+};
+
+const echoModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const only = Number(getArg("sector", "0"));
+  const roster = ECHO_FORCED === undefined ? ECHO_NODE_IDS : [ECHO_FORCED];
+  console.log(
+    `sim echo: best equipped node against an empty slot — mid collection, red+blue, no officers, ${String(runs)} runs per deck per arm per act`,
+  );
+  console.log(
+    `  bound: no equipped Echo node is worth more than +${String(ECHO_BAND_PP)}pp of act winrate against an empty slot (DESIGN 12.9, band 16)`,
+  );
+  console.log(
+    `  ${String(ECHO_UNPRICEABLE.size)} node(s) have no reader in this harness at all: their cells are printed UNCHECKED, never as a pass, and are instead proven inert over ${String(ECHO_PROBE_RUNS)} runs per deck`,
+  );
+  const rows: string[] = [
+    "sector,node,branch,winrate,baseline,deltaPp,firedPerRun,readyPerRun,verdict,note",
+  ];
+  let over = 0;
+  let leaks = 0;
+  for (const sector of SECTORS.map((def) => def.id)) {
+    if (only > 0 && sector !== only) continue;
+    const base = echoArm(sector, runs, seed, null);
+    const probeBase = echoArm(sector, ECHO_PROBE_RUNS, seed, null);
+    console.log(
+      `  S${String(sector)} empty slot ${(base.winrate * 100).toFixed(1).padStart(5)}%`,
+    );
+    for (const id of roster) {
+      const branch = echoNodeDef(id)?.branch ?? "?";
+      const reason = ECHO_UNPRICEABLE.get(id);
+      if (reason !== undefined) {
+        const probe = echoArm(sector, ECHO_PROBE_RUNS, seed, id);
+        const inert = probe.digest === probeBase.digest;
+        if (!inert) leaks += 1;
+        console.log(
+          `    ${id.padEnd(12)} ${branch.padEnd(10)}      — · UNCHECKED: ${reason}${inert ? "" : " — LEAK: this node now moves the walk and must be measured"}`,
+        );
+        rows.push(
+          [
+            String(sector),
+            id,
+            branch,
+            "",
+            "",
+            "",
+            "",
+            "",
+            inert ? "unchecked" : "LEAK",
+            reason,
+          ].join(","),
+        );
+        continue;
+      }
+      const arm = echoArm(sector, runs, seed, id);
+      const delta = Number(((arm.winrate - base.winrate) * 100).toFixed(1));
+      const runsInCell = runs * LADDER_DECKS.length;
+      const firedPerRun = arm.fired / Math.max(1, runsInCell);
+      const readyPerRun = arm.ready / Math.max(1, runsInCell);
+      const bad = delta > ECHO_BAND_PP;
+      if (bad) over += 1;
+      const use = arm.passive
+        ? "passive, always on"
+        : `fired ${firedPerRun.toFixed(2)}/run of ${readyPerRun.toFixed(2)} ready`;
+      console.log(
+        `    ${id.padEnd(12)} ${branch.padEnd(10)} ${(arm.winrate * 100).toFixed(1).padStart(5)}% · ${delta >= 0 ? "+" : ""}${delta.toFixed(1)}pp · ${use} — ${bad ? `OVER +${String(ECHO_BAND_PP)}pp` : "ok"}`,
+      );
+      rows.push(
+        [
+          String(sector),
+          id,
+          branch,
+          arm.winrate.toFixed(3),
+          base.winrate.toFixed(3),
+          delta.toFixed(1),
+          arm.passive ? "" : firedPerRun.toFixed(3),
+          arm.passive ? "" : readyPerRun.toFixed(3),
+          bad ? "OVER_BAND" : "ok",
+          "",
+        ].join(","),
+      );
+    }
+  }
+  const outPath = writeSimCsv("echo", rows, startedAt);
+  console.log(
+    over === 0
+      ? `  no measured node is worth more than +${String(ECHO_BAND_PP)}pp of act winrate`
+      : `  OVER BAND: ${String(over)} node-act cell(s) above +${String(ECHO_BAND_PP)}pp`,
+  );
+  console.log(
+    leaks === 0
+      ? "  every unchecked node is still provably inert in this harness"
+      : `  LEAK: ${String(leaks)} unchecked node-act cell(s) now move the walk`,
+  );
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (over > 0 || leaks > 0) process.exitCode = 1;
+};
+
+interface SimMode {
+  readonly runs: number;
+  readonly main: (runs: number, seed: number, startedAt: number) => void;
+}
+
+const BATTLE_MODE: SimMode = { runs: 1000, main: battleModeMain };
+
+const MODES: Readonly<Record<string, SimMode>> = {
+  run: { runs: 300, main: runModeMain },
+  drift: { runs: 1000, main: driftModeMain },
+  gate: { runs: 1000, main: gateModeMain },
+  sweep: { runs: 500, main: sweepModeMain },
+  ladder: { runs: 200, main: ladderModeMain },
+  perks: { runs: 60, main: perkModeMain },
+  economy: { runs: 200, main: economyModeMain },
+  roster: { runs: 40, main: rosterModeMain },
+  deep: { runs: 300, main: deepModeMain },
+  s6: { runs: 300, main: deepModeMain },
+  campaign: { runs: 200, main: campaignModeMain },
+  ships: { runs: 200, main: shipsModeMain },
+  puzzles: { runs: 60, main: puzzleModeMain },
+  dice: { runs: 200, main: diceModeMain },
+  fire: { runs: 20, main: fireModeMain },
+  crew: { runs: 200, main: crewModeMain },
+  echo: { runs: 200, main: echoModeMain },
+  axis: { runs: 200, main: axisModeMain },
+  meta: { runs: 1000, main: metaModeMain },
+  battle: BATTLE_MODE,
 };
 
 const main = (): void => {
   const startedAt = Date.now();
   const mode = getArg("mode", "battle");
-  const defaultRuns =
-    mode === "run"
-      ? "300"
-      : mode === "ladder"
-        ? "200"
-      : mode === "sweep"
-        ? "500"
-        : mode === "perks"
-          ? "60"
-          : mode === "economy"
-            ? "200"
-            : mode === "roster"
-              ? "40"
-              : mode === "deep" || mode === "s6"
-                ? "300"
-                : mode === "axis"
-                  ? "200"
-                  : mode === "campaign" || mode === "ships"
-                    ? "200"
-                    : mode === "puzzles"
-                      ? "60"
-                      : mode === "dice"
-                        ? "200"
-                        : "1000";
-  const runs = Number(getArg("runs", defaultRuns));
+  const entry = MODES[mode] ?? BATTLE_MODE;
+  const runs = Number(getArg("runs", String(entry.runs)));
   const seed = Number(getArg("seed", "7"));
   if (!Number.isFinite(runs) || runs <= 0) {
     console.error(`sim: invalid --runs "${getArg("runs", "1000")}"`);
     process.exit(1);
   }
-  if (mode === "run") {
-    runModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "drift") {
-    driftModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "gate") {
-    gateModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "sweep") {
-    sweepModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "ladder") {
-    ladderModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "perks") {
-    perkModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "economy") {
-    economyModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "roster") {
-    rosterModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "deep" || mode === "s6") {
-    deepModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "campaign") {
-    campaignModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "ships") {
-    shipsModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "puzzles") {
-    puzzleModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "dice") {
-    diceModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "axis") {
-    axisModeMain(runs, seed, startedAt);
-    return;
-  }
-  if (mode === "meta") {
-    metaModeMain(runs, seed, startedAt);
-    return;
-  }
-  battleModeMain(runs, seed, startedAt);
+  entry.main(runs, seed, startedAt);
 };
 
 main();

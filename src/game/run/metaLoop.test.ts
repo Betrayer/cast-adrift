@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { CHART_NODE_BY_ID, chartNeighbors } from "@/data/chart";
+import { chartNodeCost } from "@/game/chart/cost";
 import {
   canAllocate,
   canDeallocate,
   pointsAvailable,
+  respecCost,
   RESPEC_SHARD_COST,
 } from "@/game/chart/engine";
 import { hangarBudget } from "@/data/milestones";
@@ -98,9 +100,11 @@ describe("meta loop (real flow/store/engine, end-to-end)", () => {
     expect(canDeallocate(cutVertexPick, picks2)).toBe(false);
     expect(canDeallocate(leafPick, picks2)).toBe(true);
     const before = useMetaStore.getState().shards;
-    expect(useMetaStore.getState().spendShards(RESPEC_SHARD_COST)).toBe(true);
+    const price = respecCost(level, leafPick);
+    expect(price).toBe(RESPEC_SHARD_COST * chartNodeCost(leafPick));
+    expect(useMetaStore.getState().spendShards(price)).toBe(true);
     useMetaStore.getState().deallocatePick(neighbor as string);
-    expect(useMetaStore.getState().shards).toBe(before - RESPEC_SHARD_COST);
+    expect(useMetaStore.getState().shards).toBe(before - price);
     expect(useMetaStore.getState().chartPicks).not.toContain(neighbor);
 
     const budget = hangarBudget(useMetaStore.getState().level);

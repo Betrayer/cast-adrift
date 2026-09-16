@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   ENDING_SFX,
   HOT_SFX,
@@ -120,5 +120,142 @@ describe("music ducking", () => {
     expect(musicDuckDepth()).toBe(1);
     vi.advanceTimersByTime(1400);
     expect(musicDuckDepth()).toBe(0);
+  });
+});
+
+const music = vi.hoisted(() => {
+  class FakeHowl {
+    readonly src: string;
+    playCalls = 0;
+    private readonly onplay: (() => void) | undefined;
+    private level: number;
+    private started = false;
+    private loaded = false;
+    private unloaded = false;
+    private queue: (() => void)[] = [];
+
+    constructor(options: {
+      src: string[];
+      volume?: number;
+      onplay?: () => void;
+    }) {
+      this.src = options.src[0] ?? "";
+      this.level = options.volume ?? 1;
+      this.onplay = options.onplay;
+      instances.push(this);
+    }
+
+    playing(): boolean {
+      return this.started;
+    }
+
+    volume(next?: number): number {
+      if (next === undefined) return this.level;
+      if (!this.loaded) this.queue.push(() => void this.volume(next));
+      else this.level = next;
+      return this.level;
+    }
+
+    play(): number {
+      this.playCalls += 1;
+      if (!this.loaded) this.queue.push(() => this.begin());
+      else this.begin();
+      return 0;
+    }
+
+    fade(from: number, to: number, fadeMs: number): this {
+      if (!this.loaded) this.queue.push(() => void this.fade(from, to, fadeMs));
+      else this.level = to;
+      return this;
+    }
+
+    stop(): this {
+      this.started = false;
+      return this;
+    }
+
+    unload(): this {
+      this.unloaded = true;
+      this.started = false;
+      this.loaded = false;
+      this.queue = [];
+      return this;
+    }
+
+    finishLoading(): void {
+      if (this.unloaded) return;
+      this.loaded = true;
+      const pending = this.queue;
+      this.queue = [];
+      for (const task of pending) task();
+    }
+
+    private begin(): void {
+      this.started = true;
+      this.onplay?.();
+    }
+  }
+
+  const instances: FakeHowl[] = [];
+  return { instances, FakeHowl };
+});
+
+vi.mock("howler", () => ({ Howl: music.FakeHowl }));
+
+describe("music bed handoff", () => {
+  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    Object.defineProperty(globalThis, "window", {
+      configurable: true,
+      value: { addEventListener: () => {}, removeEventListener: () => {} },
+    });
+    music.instances.length = 0;
+    vi.resetModules();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+    if (originalWindow === undefined) Reflect.deleteProperty(globalThis, "window");
+    else Object.defineProperty(globalThis, "window", originalWindow);
+  });
+
+  const bedsFor = (id: string): (typeof music.instances)[number][] =>
+    music.instances.filter((howl) => howl.src === `/audio/music/${id}.webm`);
+
+  it("drops a bed whose play is still queued instead of letting it start under the next one", async () => {
+    const audio = await import("@/services/audio");
+    audio.playMusic("menu");
+    const menu = bedsFor("menu")[0];
+    expect(menu?.playing()).toBe(false);
+
+    audio.playMusic("map");
+    menu?.finishLoading();
+
+    expect(menu?.playing()).toBe(false);
+    expect(menu?.volume()).toBe(0);
+  });
+
+  it("builds a fresh bed when an abandoned track is asked for again", async () => {
+    const audio = await import("@/services/audio");
+    audio.playMusic("menu");
+    audio.playMusic("map");
+    audio.playMusic("menu");
+
+    const menuBeds = bedsFor("menu");
+    expect(menuBeds).toHaveLength(2);
+    const revived = menuBeds[1];
+    revived?.finishLoading();
+    expect(revived?.playing()).toBe(true);
+    expect(revived?.volume()).toBeCloseTo(0.6, 5);
+  });
+
+  it("does not stack a second play on a bed that is still loading", async () => {
+    const audio = await import("@/services/audio");
+    audio.playMusic("menu");
+    audio.duckMusic(1000);
+
+    expect(bedsFor("menu")[0]?.playCalls).toBe(1);
   });
 });

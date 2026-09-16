@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
+  CABIN_IDS,
   checkMovesNow,
   consoleActions,
   consoleShape,
@@ -12,35 +13,17 @@ import { playSfx } from '@/services/audio';
 import { useBattleStore } from '@/stores/battleStore';
 import { fireMotionFlag, POP_MS } from '@/app/motion';
 import {
-  ACTIVE_ORDER,
   ARMING_ACTIONS,
   nudgeLabel,
   pressReroll,
   rerollLabel,
   runActionEffect,
 } from './commands';
+import { growShape } from './shape';
+import { CabinButton } from './CabinButton';
+import { EchoButton } from './EchoButton';
 import { DieMiniCard } from './DieMiniCard';
 import styles from './Console.module.css';
-
-const grow = (prev: ConsoleShape, next: ConsoleShape): ConsoleShape => {
-  const actives = ACTIVE_ORDER.filter(
-    (id) => prev.actives.includes(id) || next.actives.includes(id),
-  );
-  const fate = prev.fate || next.fate;
-  const bloodReactor = prev.bloodReactor || next.bloodReactor;
-  const sacrifice = prev.sacrifice || next.sacrifice;
-  const passive = prev.passive ?? next.passive;
-  if (
-    fate === prev.fate &&
-    bloodReactor === prev.bloodReactor &&
-    sacrifice === prev.sacrifice &&
-    passive === prev.passive &&
-    actives.length === prev.actives.length
-  ) {
-    return prev;
-  }
-  return { fate, bloodReactor, sacrifice, passive, actives };
-};
 
 export const Console = ({ compact = false }: { compact?: boolean }) => {
   const { t } = useTranslation(['battle', 'content']);
@@ -52,7 +35,7 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
   );
 
   useEffect(() => {
-    setShape((prev) => grow(prev, consoleShape(useBattleStore.getState())));
+    setShape((prev) => growShape(prev, consoleShape(useBattleStore.getState())));
   }, [board]);
 
   const actions = useMemo(() => consoleActions(board), [board]);
@@ -154,6 +137,33 @@ export const Console = ({ compact = false }: { compact?: boolean }) => {
                   ? styles.btnActive ?? ''
                   : '',
               )}
+          {shape.echo === null ? null : (
+            <EchoButton
+              def={shape.echo}
+              action={actions.echo}
+              onUse={() => {
+                run(actions.echo, () => {
+                  runActionEffect('echo');
+                });
+              }}
+            />
+          )}
+          {CABIN_IDS.map((cabin, index) => {
+            const def = shape.cabins[index] ?? null;
+            return def === null ? null : (
+              <CabinButton
+                key={cabin}
+                id={cabin}
+                def={def}
+                action={actions[cabin]}
+                onUse={() => {
+                  run(actions[cabin], () => {
+                    runActionEffect(cabin);
+                  });
+                }}
+              />
+            );
+          })}
         </div>
       )}
       {scripted || shape.actives.length === 0 ? null : (

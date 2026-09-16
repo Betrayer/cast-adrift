@@ -48,6 +48,7 @@ import {
   type PuzzleReward,
 } from "@/game/puzzles/stakes";
 import { useBackGuard } from "@/app/backGuard";
+import { grantDie } from "@/game/run/inventory";
 import { completeNode } from "@/game/run/flow";
 import { interferenceImminent } from "@/game/run/interference";
 import { LootReveal } from "@/screens/Battle/LootReveal";
@@ -509,6 +510,13 @@ const EntryCard = ({
   );
 };
 
+export const choiceAlreadySettled = (
+  reward: PuzzleReward,
+  solvedPuzzles: readonly string[],
+  puzzleId: string,
+): boolean =>
+  reward.choice === undefined || solvedPuzzles.includes(puzzleId);
+
 const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
   const { t } = useTranslation(["run", "battle", "content"]);
   const seed = useRunStore((s) => s.seed);
@@ -546,7 +554,13 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
   const [rerollMode, setRerollMode] = useState(false);
   const [rerollPick, setRerollPick] = useState<number[]>([]);
   const [checked, setChecked] = useState<boolean | null>(null);
-  const [claimed, setClaimed] = useState(reward.choice === undefined);
+  const [claimed, setClaimed] = useState(() =>
+    choiceAlreadySettled(
+      reward,
+      useRunStore.getState().solvedPuzzles,
+      puzzle.id,
+    ),
+  );
 
   const rerollSize = puzzle.rerollSize ?? DEFAULT_REROLL_SIZE;
   const blocked = new Set<SlotId>(puzzle.blocked ?? []);
@@ -614,7 +628,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     run.addScrap(reward.scrap);
     if (reward.codex !== undefined) meta.unlockCodex(reward.codex);
     if (reward.die !== undefined) {
-      run.addDie(reward.die);
+      grantDie(reward.die);
       useLootStore.getState().drop(reward.die);
       if (puzzle.tier === 5) grantDieUnlock(reward.die);
     }
@@ -630,7 +644,7 @@ const PuzzleRunner = ({ puzzle, nodeId, forced }: FlowProps) => {
     playSfx("optionTick", { rate: 1.14 });
     setClaimed(true);
     if (forced) return;
-    useRunStore.getState().addDie(reward.choice.die);
+    grantDie(reward.choice.die);
     useLootStore.getState().drop(reward.choice.die);
   };
 

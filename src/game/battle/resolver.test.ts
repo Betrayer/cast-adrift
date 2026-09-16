@@ -1,20 +1,32 @@
 import { describe, expect, it } from "vitest";
+import { CHART_NODES } from "@/data/chart";
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { ALL_MODULES } from "@/data/modules";
+import { ALL_PERKS } from "@/data/perks";
+import { PLAYABLE_SHIPS } from "@/data/ships";
 import {
   advanceTurn,
+  applyNodeStorm,
+  applyPendingTwists,
   CHARGE_CAP,
+  DODGE_PCT_CAP,
   evasionFor,
+  evasionTuningFor,
+  GLANCING_PCT_CAP,
+  NUDGE_COST,
+  nudgeChargeCost,
   resolveEnemyPhase,
   resolvePlayerPhase,
   vulnerableFor,
 } from "@/game/battle/resolver";
 import {
+  buildBattleSnapshot,
   buildEnemies,
   canPlaceDie,
   drawIntent,
   spawnEnemy,
 } from "@/game/battle/setup";
-import { computeCensus } from "@/game/battle/resonance";
+import { harnessEnemy, harnessSnap } from "@/game/battle/battleHarness";
 import {
   createStream,
   createStreamFromState,
@@ -22,8 +34,11 @@ import {
   restoreStreams,
   serializeStreams,
 } from "@/services/rng";
+import { modeBlockFor } from "@/game/battle/view";
+import { splitDamage, type FireModeId } from "@/data/fireModes";
 import type {
   BattleSnapshot,
+  Beat,
   EnemyState,
   RolledDie,
   SlotId,
@@ -38,19 +53,8 @@ const enemy = (defId: string, over: Partial<EnemyState> = {}): EnemyState => ({
   ...over,
 });
 
-const mkEnemy = (over: Partial<EnemyState> = {}): EnemyState => ({
-  id: "enemy-0",
-  defId: "raider",
-  hp: 18,
-  hpMax: 18,
-  shield: 0,
-  intentIndex: 0,
-  nextIntent: { t: "attack", n: 5 },
-  statuses: {},
-  subsystems: [],
-  phase: 0,
-  ...over,
-});
+const mkEnemy = (over: Partial<EnemyState> = {}): EnemyState =>
+  harnessEnemy({ hp: 18, hpMax: 18, ...over });
 
 const die = (
   uid: string,
@@ -67,53 +71,8 @@ const die = (
   slot,
 });
 
-const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot => ({
-  turn: 1,
-  hull: 30,
-  hullMax: 30,
-  shield: 0,
-  shieldPersist: 0,
-  charge: 0,
-  scrap: 0,
-  runScrap: 0,
-  tide: 0,
-  interference: 0,
-  perks: [],
-  dice: [],
-  slots: {
-    weaponA: { cap: 8, mk: 1 },
-    weaponB: { cap: 8, mk: 1 },
-    shields: { cap: 8, mk: 1 },
-    engines: { cap: 6, mk: 1 },
-    sensors: { cap: 6, mk: 1 },
-    reactor: { cap: 10, mk: 1 },
-  },
-  enemies: [enemy("raider")],
-  targetId: "enemy-0",
-  evasion: null,
-  nextTurnMods: {},
-  nextRollBonus: 0,
-  chargeCap: 10,
-  sacrificePool: 0,
-  bloodReactorUsed: false,
-  burnDoubleUsed: false,
-  blockedSlots: [],
-  shrunkSlots: [],
-  lockedDice: [],
-  resonance: computeCensus([]),
-  survivedLethal: false,
-  lastPlayerDamage: 0,
-  stolenScrap: 0,
-  pendingTwist: 0,
-  pendingSwap: 0,
-  pendingStorm: 0,
-  ascension: 0,
-  exceedCap: [],
-  sectorHpPct: 0,
-  sectorDmgPct: 0,
-  enemyHpPct: 0,
-  ...over,
-});
+const snap = (over: Partial<BattleSnapshot> = {}): BattleSnapshot =>
+  harnessSnap([], { enemies: [enemy("raider")], ...over });
 
 type PlacementSlots = Partial<
   Record<
@@ -139,40 +98,87 @@ const withPlacements = (
   return base;
 };
 
+const armed = (
+  mode: FireModeId,
+  placements: PlacementSlots,
+  over: Partial<BattleSnapshot> = {},
+  slotId: "weaponA" | "weaponB" = "weaponA",
+): BattleSnapshot => {
+  const base = withPlacements(placements, over);
+  const slot = base.slots[slotId];
+  if (slot !== undefined) {
+    slot.modes = ["direct", mode];
+    slot.mode = mode;
+  }
+  return base;
+};
+
+const damageBeats = (beats: readonly Beat[]): readonly Beat[] =>
+  beats.filter((b) => b.kind === "damage");
+
 const forceIntent = (state: EnemyState, intent: Intent): EnemyState => ({
   ...state,
   nextIntent: intent,
 });
 
+describe("nudge charge cost", () => {
+  it("floors at one charge for everyone but Cold Logic", () => {
+    expect(nudgeChargeCost(0, false)).toBe(NUDGE_COST);
+    expect(nudgeChargeCost(-1, false)).toBe(2);
+    expect(nudgeChargeCost(-3, false)).toBe(1);
+    expect(nudgeChargeCost(-9, false)).toBe(1);
+    expect(nudgeChargeCost(2, false)).toBe(5);
+  });
+
+  it("only Cold Logic buys a free nudge, and it pays for it in crits", () => {
+    expect(nudgeChargeCost(-3, true)).toBe(0);
+    expect(nudgeChargeCost(-9, true)).toBe(0);
+    expect(nudgeChargeCost(-2, true)).toBe(1);
+  });
+});
+
 describe("evasion band math", () => {
   it.each([
-    [1, 6, 3],
-    [3, 18, 9],
-    [5, 30, 15],
-    [8, 48, 24],
+    [1, 2, 4],
+    [3, 5, 11],
+    [5, 8, 18],
+    [8, 10, 25],
   ])("V %i → dodge %i%% · glancing %i%%", (value, dodge, glancing) => {
     const evasion = evasionFor(value);
     expect(evasion.dodgePct).toBe(dodge);
     expect(evasion.glancingPct).toBe(glancing);
   });
 
-  it("caps dodge at 55% and glancing at 25%", () => {
+  it("glancing outruns dodge at every value", () => {
+    for (let value = 1; value <= 20; value += 1) {
+      const evasion = evasionFor(value);
+      expect(evasion.glancingPct).toBeGreaterThan(evasion.dodgePct);
+    }
+  });
+
+  it("caps dodge at 10% and glancing at 25%", () => {
     expect(evasionFor(20)).toEqual({
-      dodgePct: 55,
+      dodgePct: 10,
       glancingPct: 25,
       intercept: true,
     });
   });
 
+  it("keeps expected mitigation at the caps a tool, not a wall", () => {
+    const capped = evasionFor(20);
+    const mitigation = capped.dodgePct + capped.glancingPct / 2;
+    expect(mitigation).toBeCloseTo(22.5, 5);
+  });
+
   it("adds the evasion delta and halves it for glancing", () => {
-    expect(evasionFor(3, 6)).toEqual({
-      dodgePct: 24,
+    expect(evasionFor(3, 2)).toEqual({
+      dodgePct: 7,
       glancingPct: 12,
       intercept: false,
     });
     expect(evasionFor(3, 1)).toEqual({
-      dodgePct: 19,
-      glancingPct: 10,
+      dodgePct: 6,
+      glancingPct: 11,
       intercept: false,
     });
   });
@@ -185,6 +191,96 @@ describe("evasion band math", () => {
     });
     expect(evasionFor(7).intercept).toBe(false);
     expect(evasionFor(8).intercept).toBe(true);
+  });
+
+  it("rolls the authored rates over a pinned 200-hit sequence", () => {
+    const evasion = evasionFor(20);
+    const stream = createStream(4242);
+    let dodged = 0;
+    let glanced = 0;
+    for (let i = 0; i < 200; i += 1) {
+      const roll = stream.int(1, 100);
+      if (roll <= evasion.dodgePct) dodged += 1;
+      else if (roll <= evasion.dodgePct + evasion.glancingPct) glanced += 1;
+    }
+    expect(Math.abs((dodged / 200) * 100 - evasion.dodgePct)).toBeLessThanOrEqual(2);
+    expect(
+      Math.abs((glanced / 200) * 100 - evasion.glancingPct),
+    ).toBeLessThanOrEqual(2);
+    expect(glanced).toBeGreaterThan(dodged);
+  });
+});
+
+describe("evasion carriers", () => {
+  const CARRIERS: readonly { id: string; delta: number }[] = [
+    ...ALL_PERKS.filter((p) => (p.mods?.evasionDelta ?? 0) !== 0).map((p) => ({
+      id: `perk:${p.id}`,
+      delta: p.mods?.evasionDelta ?? 0,
+    })),
+    ...ALL_MODULES.filter((m) => (m.mods?.evasionDelta ?? 0) !== 0).map((m) => ({
+      id: `module:${m.id}`,
+      delta: m.mods?.evasionDelta ?? 0,
+    })),
+    ...CHART_NODES.filter((n) => (n.mods?.evasionDelta ?? 0) !== 0).map((n) => ({
+      id: `chart:${n.id}`,
+      delta: n.mods?.evasionDelta ?? 0,
+    })),
+  ];
+
+  it("has exactly the carriers the U2 sweep re-tuned", () => {
+    expect(CARRIERS.map((c) => `${c.id}=${String(c.delta)}`)).toEqual([
+      "perk:mirrorLattice=2",
+      "perk:rhizome=4",
+      "perk:standingWave=2",
+      "perk:afterburner=2",
+      "module:ballastModule=-2",
+      "module:hardpointClamp=2",
+      "module:bulkheadRing=-2",
+      "chart:green-s6=2",
+      "chart:green-not2=2",
+      "chart:green-s11=2",
+      "chart:green-s21=2",
+    ]);
+  });
+
+  it("leaves both bands under their cap without a die", () => {
+    for (const carrier of CARRIERS) {
+      const bare = evasionFor(0, carrier.delta);
+      expect(bare.dodgePct, carrier.id).toBeLessThan(DODGE_PCT_CAP);
+      expect(bare.glancingPct, carrier.id).toBeLessThan(GLANCING_PCT_CAP);
+    }
+  });
+
+  it("never pushes a band past its cap or under zero at any value", () => {
+    for (const carrier of CARRIERS) {
+      for (let value = 0; value <= 20; value += 1) {
+        const evasion = evasionFor(value, carrier.delta);
+        expect(evasion.dodgePct, carrier.id).toBeGreaterThanOrEqual(0);
+        expect(evasion.glancingPct, carrier.id).toBeGreaterThanOrEqual(0);
+        expect(evasion.dodgePct, carrier.id).toBeLessThanOrEqual(DODGE_PCT_CAP);
+        expect(evasion.glancingPct, carrier.id).toBeLessThanOrEqual(
+          GLANCING_PCT_CAP,
+        );
+      }
+    }
+  });
+
+  it("keeps every ship tuning inside the Hound's ceiling", () => {
+    for (const ship of PLAYABLE_SHIPS) {
+      const tuning = evasionTuningFor(ship.id);
+      for (let value = 0; value <= 24; value += 1) {
+        const evasion = evasionFor(value, 0, tuning);
+        expect(evasion.dodgePct, ship.id).toBeLessThanOrEqual(tuning.dodgeCap);
+        expect(evasion.glancingPct, ship.id).toBeLessThanOrEqual(
+          tuning.glancingCap,
+        );
+      }
+      expect(tuning.dodgeCap, ship.id).toBeLessThanOrEqual(40);
+      expect(tuning.glancingCap, ship.id).toBeLessThanOrEqual(55);
+      expect(evasionFor(20, 0, tuning).glancingPct, ship.id).toBeGreaterThan(
+        evasionFor(20, 0, tuning).dodgePct,
+      );
+    }
   });
 });
 
@@ -303,6 +399,25 @@ describe("sensors", () => {
     expect(next.hull).toBe(27);
     expect(next.enemies[0]?.statuses.jam).toBeUndefined();
   });
+
+  it("marks the aimed subsystem's parent, not the first living enemy", () => {
+    const plain = enemy("raider", { id: "enemy-0" });
+    const elite = enemy("raiderAlpha", { id: "enemy-1" });
+    const part = elite.subsystems[0];
+    expect(part).toBeDefined();
+    if (part === undefined) return;
+
+    const { next } = resolvePlayerPhase(
+      withPlacements(
+        { sensors: 1 },
+        { enemies: [plain, elite], targetId: part.id },
+      ),
+    );
+
+    expect(next.enemies[1]?.statuses.mark).toBe(1);
+    expect(next.enemies[0]?.statuses.mark).toBeUndefined();
+  });
+
 });
 
 describe("engines", () => {
@@ -326,7 +441,7 @@ describe("engines", () => {
     const { next, beats } = resolveEnemyPhase(
       snap({ enemies: [attacker], evasion: evasionFor(3) }),
       enemyStream(),
-      createStream(99),
+      createStream(8),
     );
     expect(next.hull).toBe(27);
     expect(beats[0]?.glanced).toBe(1);
@@ -368,7 +483,7 @@ describe("engines", () => {
     expect(beats[0]?.glanced).toBe(2);
   });
 
-  it("intercept grants weapons +1 once per turn on the first dodge", () => {
+  it("intercept grants weapons +1 once per turn on the first evasion", () => {
     const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 3 });
     const { next } = resolveEnemyPhase(
       snap({
@@ -378,6 +493,21 @@ describe("engines", () => {
       enemyStream(),
       createStream(3),
     );
+    expect(next.nextTurnMods.weapons).toBe(1);
+  });
+
+  it("intercept fires from a glancing hit, not only a dodge", () => {
+    const attacker = forceIntent(enemy("raider"), { t: "multi", n: 3, k: 3 });
+    const { next, beats } = resolveEnemyPhase(
+      snap({
+        enemies: [attacker],
+        evasion: { dodgePct: 0, glancingPct: 100, intercept: true },
+      }),
+      enemyStream(),
+      createStream(3),
+    );
+    expect(beats[0]?.dodged).toBeUndefined();
+    expect(beats[0]?.glanced).toBe(3);
     expect(next.nextTurnMods.weapons).toBe(1);
   });
 
@@ -394,8 +524,8 @@ describe("engines", () => {
   it("an engines die sets the turn's evasion", () => {
     const { next, beats } = resolvePlayerPhase(withPlacements({ engines: 7 }));
     expect(next.evasion).toEqual({
-      dodgePct: 42,
-      glancingPct: 21,
+      dodgePct: 10,
+      glancingPct: 25,
       intercept: false,
     });
     expect(beats[0]?.evasion).toEqual(next.evasion);
@@ -505,6 +635,349 @@ describe("weapons and targeting", () => {
     );
     expect(next.enemies[1]?.hp).toBe(5);
     expect(beats[0]?.targetId).toBe("enemy-1");
+  });
+});
+
+describe("fire modes", () => {
+  it("splits a total across n fragments without losing or inventing a point", () => {
+    for (let total = 0; total <= 24; total += 1) {
+      for (let parts = 1; parts <= 3; parts += 1) {
+        const shares = splitDamage(total, parts);
+        expect(shares).toHaveLength(parts);
+        expect(shares.reduce((sum, n) => sum + n, 0)).toBe(total);
+        expect(Math.max(...shares) - Math.min(...shares)).toBeLessThanOrEqual(1);
+      }
+    }
+  });
+
+  it("derives the slot's modes at battle start from Mk and modules", () => {
+    const snapshot = buildBattleSnapshot(
+      "wanderer",
+      ["grey-d4", "grey-d4"],
+      ["raider"],
+      createStreams(5),
+      createStream(5),
+      { weaponA: 3 },
+      { modules: ["autoloader"] },
+    );
+    expect(snapshot.slots.weaponA?.modes).toEqual([
+      "direct",
+      "scatter",
+      "doublet",
+    ]);
+    expect(snapshot.slots.weaponA?.mode).toBe("direct");
+    expect(snapshot.slots.weaponB?.modes).toEqual(["direct", "doublet"]);
+    expect(snapshot.slots.shields?.modes).toBeUndefined();
+    expect(snapshot.slots.sensors?.mode).toBeUndefined();
+  });
+
+  it("leaves a bare weapon slot without a mode field at all", () => {
+    const snapshot = buildBattleSnapshot(
+      "wanderer",
+      ["grey-d4"],
+      ["raider"],
+      createStreams(5),
+      createStream(5),
+    );
+    expect(snapshot.slots.weaponA).toEqual({ cap: 8, mk: 1 });
+  });
+
+  it("keeps the armed mode across a turn boundary and drops only the die", () => {
+    const snapshot = buildBattleSnapshot(
+      "wanderer",
+      ["grey-d4", "grey-d4"],
+      ["raider"],
+      createStreams(5),
+      createStream(5),
+      { weaponA: 3 },
+      { modules: ["autoloader"] },
+    );
+    const slot = snapshot.slots.weaponA;
+    if (slot !== undefined) {
+      slot.mode = "doublet";
+      slot.dieUid = snapshot.dice[0]?.uid;
+    }
+    const later = advanceTurn(snapshot, createStreams(9));
+    expect(later.slots.weaponA?.mode).toBe("doublet");
+    expect(later.slots.weaponA?.modes).toEqual(["direct", "scatter", "doublet"]);
+    expect(later.slots.weaponA?.dieUid).toBeUndefined();
+  });
+
+  it("direct is the unchanged baseline: one beat, one absorb", () => {
+    const target = mkEnemy({ hp: 20, hpMax: 20, shield: 3 });
+    const { next, beats } = resolvePlayerPhase(
+      armed("direct", { weaponA: 8 }, { enemies: [target] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([8]);
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(15);
+  });
+
+  it("a slot with no mode resolves exactly like an armed direct", () => {
+    const plain = resolvePlayerPhase(
+      withPlacements({ weaponA: 8 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    const explicit = resolvePlayerPhase(
+      armed("direct", { weaponA: 8 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(plain.beats).map((b) => b.amount)).toEqual(
+      damageBeats(explicit.beats).map((b) => b.amount),
+    );
+    expect(plain.next.enemies[0]?.hp).toBe(explicit.next.enemies[0]?.hp);
+  });
+
+  it("doublet lands two hits of half the value, rounded up", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([4, 4]);
+    expect(next.enemies[0]?.hp).toBe(12);
+  });
+
+  it("doublet feeds an existing Vulnerable mark to both hits", () => {
+    const marked = mkEnemy({ hp: 20, hpMax: 20, statuses: { mark: 2 } });
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [marked] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([6, 6]);
+    expect(next.enemies[0]?.hp).toBe(8);
+  });
+
+  it("doublet lets the shield absorb once per hit", () => {
+    const walled = mkEnemy({ hp: 20, hpMax: 20, shield: 5 });
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [walled] }),
+    );
+    expect(
+      damageBeats(beats).map((b) => b.after.enemies[0]?.shield),
+    ).toEqual([1, 0]);
+    expect(next.enemies[0]?.hp).toBe(17);
+  });
+
+  it("doublet stops at one hit when the first one kills", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("doublet", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 3, hpMax: 3 })] }),
+    );
+    expect(damageBeats(beats)).toHaveLength(1);
+    expect(next.enemies[0]?.hp).toBe(0);
+  });
+
+  it("scatter gives every living enemy a fragment plus one", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 20, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+        },
+      ),
+    );
+    const hits = damageBeats(beats);
+    expect(hits.map((b) => b.amount)).toEqual([5, 4]);
+    expect(hits.map((b) => b.targetId)).toEqual(["enemy-0", "enemy-1"]);
+    expect(hits.reduce((sum, b) => sum + b.amount, 0)).toBe(7 + hits.length);
+    expect(next.enemies[0]?.hp).toBe(15);
+    expect(next.enemies[1]?.hp).toBe(16);
+  });
+
+  it("scatter splits across three enemies and still totals V plus one each", () => {
+    const { beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 20, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+            mkEnemy({ id: "enemy-2", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+        },
+      ),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([4, 3, 3]);
+  });
+
+  it("scatter still pays every other enemy when one dies to its own fragment", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 3, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+        },
+      ),
+    );
+    const hits = damageBeats(beats);
+    expect(hits.map((b) => b.targetId)).toEqual(["enemy-0", "enemy-1"]);
+    expect(next.enemies[0]?.hp).toBe(0);
+    expect(next.enemies[1]?.hp).toBe(16);
+    expect(next.targetId).toBe("enemy-1");
+  });
+
+  it("scatter never spills overkill through ricochet on top of its own fragments", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "scatter",
+        { weaponA: 7 },
+        {
+          enemies: [
+            mkEnemy({ hp: 2, hpMax: 20 }),
+            mkEnemy({ id: "enemy-1", hp: 20, hpMax: 20 }),
+          ],
+          targetId: "enemy-0",
+          modules: ["ricochetHousing"],
+        },
+      ),
+    );
+    expect(damageBeats(beats)).toHaveLength(2);
+    expect(next.enemies[1]?.hp).toBe(16);
+  });
+
+  it("scatter falls back to direct when only one enemy is left alive", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("scatter", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([7]);
+    expect(next.enemies[0]?.hp).toBe(13);
+  });
+
+  it("scatter is blocked below two living enemies and legal above", () => {
+    const solo = armed("scatter", { weaponA: 7 }, { enemies: [mkEnemy()] });
+    expect(modeBlockFor(solo, "weaponA", "scatter")).toBe("needsTwoEnemies");
+    const pair = armed(
+      "scatter",
+      { weaponA: 7 },
+      { enemies: [mkEnemy(), mkEnemy({ id: "enemy-1" })] },
+    );
+    expect(modeBlockFor(pair, "weaponA", "scatter")).toBeNull();
+    expect(modeBlockFor(pair, "weaponA", "doublet")).toBe("notAllowed");
+    expect(modeBlockFor(pair, "weaponA", "direct")).toBeNull();
+  });
+
+  it("shaped strips shield up to the die value on a max face", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next, beats } = resolvePlayerPhase(
+      armed("shaped", { weaponA: 20 }, { enemies: [walled] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([20]);
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(20);
+  });
+
+  it("shaped pays a point on every other face and leaves the shield standing", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next } = resolvePlayerPhase(
+      armed("shaped", { weaponA: 7 }, { enemies: [walled] }),
+    );
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(40);
+  });
+
+  it("shaped does not spend the once-per-battle pierce on a max face", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next } = resolvePlayerPhase(
+      armed(
+        "shaped",
+        { weaponA: 20 },
+        { enemies: [walled], modules: ["piercer"] },
+      ),
+    );
+    expect(next.pierceUsed).not.toBe(true);
+    expect(next.enemies[0]?.shield).toBe(0);
+    expect(next.enemies[0]?.hp).toBe(20);
+  });
+
+  it("shaped still spends the pierce on a face that does not strip", () => {
+    const walled = mkEnemy({ hp: 40, hpMax: 40, shield: 6 });
+    const { next } = resolvePlayerPhase(
+      armed(
+        "shaped",
+        { weaponA: 7 },
+        { enemies: [walled], modules: ["piercer"] },
+      ),
+    );
+    expect(next.pierceUsed).toBe(true);
+    expect(next.enemies[0]?.shield).toBe(6);
+    expect(next.enemies[0]?.hp).toBe(34);
+  });
+
+  it("incendiary trades two damage for Burn 2", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("incendiary", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([5]);
+    expect(next.enemies[0]?.hp).toBe(15);
+    expect(next.enemies[0]?.statuses.burn).toBe(2);
+  });
+
+  it("incendiary lets the once-per-battle burn double fire exactly once", () => {
+    const board = armed(
+      "incendiary",
+      { weaponA: 7, weaponB: 7 },
+      { enemies: [mkEnemy({ hp: 40, hpMax: 40 })], perks: ["double-fuse"] },
+    );
+    const slotB = board.slots.weaponB;
+    if (slotB !== undefined) {
+      slotB.modes = ["direct", "incendiary"];
+      slotB.mode = "incendiary";
+    }
+    const { next } = resolvePlayerPhase(board);
+    expect(next.enemies[0]?.statuses.burn).toBe(6);
+    expect(next.burnDoubleUsed).toBe(true);
+  });
+
+  it("linked counts other same-school dice on the board, capped", () => {
+    const two = resolvePlayerPhase(
+      armed(
+        "linked",
+        { weaponA: 5, shields: 3, engines: 3 },
+        { enemies: [mkEnemy({ hp: 40, hpMax: 40 })] },
+      ),
+    );
+    expect(damageBeats(two.beats).map((b) => b.amount)).toEqual([7]);
+    const capped = resolvePlayerPhase(
+      armed(
+        "linked",
+        { weaponA: 5, weaponB: 3, shields: 3, engines: 3, reactor: 3 },
+        { enemies: [mkEnemy({ hp: 40, hpMax: 40 })] },
+      ),
+    );
+    expect(
+      damageBeats(capped.beats)
+        .filter((b) => b.slot === "weaponA")
+        .map((b) => b.amount),
+    ).toEqual([8]);
+  });
+
+  it("shunt trades two damage for two charge and pushes no charge beat", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed("shunt", { weaponA: 7 }, { enemies: [mkEnemy({ hp: 20, hpMax: 20 })] }),
+    );
+    expect(damageBeats(beats).map((b) => b.amount)).toEqual([5]);
+    expect(beats.some((b) => b.kind === "charge")).toBe(false);
+    expect(next.charge).toBe(2);
+  });
+
+  it("shunt clamps at the charge cap and never costs hull", () => {
+    const { next, beats } = resolvePlayerPhase(
+      armed(
+        "shunt",
+        { weaponA: 7 },
+        { enemies: [mkEnemy({ hp: 20, hpMax: 20 })], charge: 9, hull: 30 },
+      ),
+    );
+    expect(next.charge).toBe(10);
+    expect(next.hull).toBe(30);
+    expect(beats.every((b) => b.overflowHull === undefined)).toBe(true);
   });
 });
 
@@ -847,5 +1320,59 @@ describe("enemy phase basics", () => {
     if (step !== undefined) {
       expect(intentsOfStep(step)).toContainEqual(next.enemies[0]?.nextIntent);
     }
+  });
+});
+
+describe("grown dice keep their growth above tier", () => {
+  const grownEvergreen = (
+    uid: string,
+    value: number,
+    slot?: SlotId,
+  ): RolledDie => ({
+    uid,
+    defId: "evergreen",
+    tier: 12,
+    school: "green",
+    value,
+    state: slot === undefined ? "tray" : "placed",
+    slot,
+    growth: 4,
+  });
+
+  it("a storm nudges a grown die by a pip instead of shearing it back to tier", () => {
+    const dice = [grownEvergreen("grown", 16)];
+    applyPendingTwists(snap({ dice, pendingStorm: 1 }), dice, createStream(7));
+    expect(dice[0]?.value).toBeGreaterThanOrEqual(14);
+  });
+
+  it("a swap can hand a grown die a value above its tier", () => {
+    const dice = [grownEvergreen("low", 3), grownEvergreen("high", 16)];
+    applyPendingTwists(snap({ dice, pendingSwap: 1 }), dice, createStream(7));
+    expect(dice[0]?.value).toBe(16);
+    expect(dice[1]?.value).toBe(3);
+  });
+
+  it("a twist can leave a grown die reading above its tier", () => {
+    const seen: number[] = [];
+    for (let seed = 0; seed < 64; seed += 1) {
+      const dice = [grownEvergreen("grown", 16)];
+      applyPendingTwists(
+        snap({ dice, pendingTwist: 1 }),
+        dice,
+        createStream(seed),
+      );
+      seen.push(dice[0]?.value ?? 0);
+    }
+    expect(Math.max(...seen)).toBeGreaterThan(12);
+  });
+
+  it("a node storm can leave a grown die reading above its tier", () => {
+    const seen: number[] = [];
+    for (let seed = 0; seed < 64; seed += 1) {
+      const dice = [grownEvergreen("grown", 16, "weaponA")];
+      applyNodeStorm(snap({ dice, nodeStorm: true }), createStream(seed));
+      seen.push(dice[0]?.value ?? 0);
+    }
+    expect(Math.max(...seen)).toBeGreaterThan(12);
   });
 });

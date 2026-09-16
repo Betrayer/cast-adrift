@@ -1,4 +1,5 @@
 import type { EffectDef } from "@/game/effects/types";
+import { WEATHER_BY_ID } from "@/data/weather";
 import type { LocKey } from "@/types/content";
 
 export type MutatorId =
@@ -59,79 +60,29 @@ export const ZERO_MUTATOR_MODS: MutatorMods = {
   copyHpPct: 0,
 };
 
+const mutator = (
+  id: MutatorId,
+  body: Omit<MutatorDef, "id" | "name" | "desc">,
+): MutatorDef => ({
+  id,
+  name: `content:mutators.${id}.name`,
+  desc: `content:mutators.${id}.desc`,
+  ...body,
+});
+
 export const MUTATORS: readonly MutatorDef[] = [
-  {
-    id: "brittleShields",
-    name: "content:mutators.brittleShields.name",
-    desc: "content:mutators.brittleShields.desc",
-    mods: { shieldDecayPct: 50 },
-  },
-  {
-    id: "fatLoot",
-    name: "content:mutators.fatLoot.name",
-    desc: "content:mutators.fatLoot.desc",
-    mods: { lootRarityStep: 1, enemyHpPct: 15 },
-  },
-  {
-    id: "fog",
-    name: "content:mutators.fog.name",
-    desc: "content:mutators.fog.desc",
-    mods: { fogRowDelta: -1 },
-  },
-  {
-    id: "overheat",
-    name: "content:mutators.overheat.name",
-    desc: "content:mutators.overheat.desc",
-    mods: { chargeCapDelta: -2 },
-  },
-  {
-    id: "richVein",
-    name: "content:mutators.richVein.name",
-    desc: "content:mutators.richVein.desc",
-    mods: { scrapMultPct: 50 },
-  },
-  {
-    id: "wilds",
-    name: "content:mutators.wilds.name",
-    desc: "content:mutators.wilds.desc",
-    mods: { noShops: true },
-  },
-  {
-    id: "resonantStorm",
-    name: "content:mutators.resonantStorm.name",
-    desc: "content:mutators.resonantStorm.desc",
-    mods: { resonanceBonus: 2 },
-  },
-  {
-    id: "heavyDice",
-    name: "content:mutators.heavyDice.name",
-    desc: "content:mutators.heavyDice.desc",
-    mods: { nudgeCostDelta: 2 },
-  },
-  {
-    id: "glassFleet",
-    name: "content:mutators.glassFleet.name",
-    desc: "content:mutators.glassFleet.desc",
-    mods: { damageMultPct: 50 },
-  },
-  {
-    id: "risingTide",
-    name: "content:mutators.risingTide.name",
-    desc: "content:mutators.risingTide.desc",
-    mods: { jumpsPerTideDelta: -1 },
-  },
-  {
-    id: "radioSilence",
-    name: "content:mutators.radioSilence.name",
-    desc: "content:mutators.radioSilence.desc",
-    mods: { sensorsTierDelta: -1, barksOff: true },
-  },
-  {
-    id: "doubles",
-    name: "content:mutators.doubles.name",
-    desc: "content:mutators.doubles.desc",
-    mods: { enemyCopies: 1, copyHpPct: -30 },
-  },
+  mutator("brittleShields", { mods: { shieldDecayPct: 50 } }),
+  mutator("fatLoot", { mods: { lootRarityStep: 1, enemyHpPct: 15 } }),
+  mutator("fog", { mods: { fogRowDelta: -1 } }),
+  mutator("overheat", { mods: { chargeCapDelta: -2 } }),
+  mutator("richVein", { mods: { scrapMultPct: 50 } }),
+  mutator("wilds", { mods: { noShops: true } }),
+  mutator("resonantStorm", { mods: { resonanceBonus: 2 } }),
+  mutator("heavyDice", { mods: { nudgeCostDelta: 2 } }),
+  mutator("glassFleet", { mods: { damageMultPct: 50 } }),
+  mutator("risingTide", { mods: { jumpsPerTideDelta: -1 } }),
+  mutator("radioSilence", { mods: { sensorsTierDelta: -1, barksOff: true } }),
+  mutator("doubles", { mods: { enemyCopies: 1, copyHpPct: -30 } }),
 ];
 
 export const MUTATOR_BY_ID: ReadonlyMap<string, MutatorDef> = new Map(
@@ -154,16 +105,19 @@ const NUMERIC_KEYS = [
   "copyHpPct",
 ] as const;
 
+const modsById = (id: string): Partial<MutatorMods> | undefined =>
+  MUTATOR_BY_ID.get(id)?.mods ?? WEATHER_BY_ID.get(id)?.mods;
+
 export const computeMutatorMods = (
   ids: readonly string[],
 ): MutatorMods => {
   const out: MutatorMods = { ...ZERO_MUTATOR_MODS };
   for (const id of ids) {
-    const def = MUTATOR_BY_ID.get(id);
+    const def = modsById(id);
     if (def === undefined) continue;
-    for (const key of NUMERIC_KEYS) out[key] += def.mods[key] ?? 0;
-    out.noShops = out.noShops || def.mods.noShops === true;
-    out.barksOff = out.barksOff || def.mods.barksOff === true;
+    for (const key of NUMERIC_KEYS) out[key] += def[key] ?? 0;
+    out.noShops = out.noShops || def.noShops === true;
+    out.barksOff = out.barksOff || def.barksOff === true;
   }
   out.shieldDecayPct = Math.max(0, Math.min(100, out.shieldDecayPct));
   return out;

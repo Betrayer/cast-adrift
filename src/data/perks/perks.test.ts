@@ -287,12 +287,12 @@ describe("trait perks", () => {
       build(["afterburner"], [harnessDie("e", "frostplate", 3)], { engines: "e" }),
     );
     expect(base.next.evasion).toEqual({
-      dodgePct: 18,
-      glancingPct: 9,
+      dodgePct: 5,
+      glancingPct: 11,
       intercept: false,
     });
     expect(boosted.next.evasion).toEqual({
-      dodgePct: 24,
+      dodgePct: 7,
       glancingPct: 12,
       intercept: false,
     });

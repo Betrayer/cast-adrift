@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
+import { cx } from "@/app/cx";
 import { TagChips } from "@/components/TagChips";
 import { schools } from "@/data/schools";
 import type { ContentTag } from "@/data/tags";
@@ -28,9 +29,6 @@ interface DieCardProps {
   footer?: ReactNode;
   className?: string;
 }
-
-const classes = (...names: (string | undefined | false)[]): string =>
-  names.filter((name): name is string => typeof name === "string" && name !== "").join(" ");
 
 export const DieCard = ({
   defId,
@@ -94,12 +92,7 @@ export const DieCard = ({
 
   return (
     <div
-      className={classes(
-        styles.card,
-        plain && styles.plain,
-        dense && styles.dense,
-        className,
-      )}
+      className={cx(styles.card, plain && styles.plain, dense && styles.dense, className)}
       data-die-card={def.id}
       data-die-card-size={size}
       data-die-tier={def.tier}

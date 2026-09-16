@@ -6,13 +6,22 @@ import { CHART_NODE_BY_ID } from '@/data/chart';
 import { DEFAULT_DIE_SKIN, isDieSkinId } from '@/data/cosmetics';
 import { STARTER_DECK } from '@/data/decks';
 import { DIE_BY_ID } from '@/data/dice';
+import {
+  echoNodeDef,
+  echoUnlocked,
+  isEchoNodeId,
+  type EchoNodeId,
+} from '@/data/echo';
+import { memoryFragmentCount } from '@/data/narrative/memories';
 import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
 import { isThemeId, type ThemeId } from '@/data/themes';
 import { SHIP_BY_ID, type ShipId } from '@/data/ships';
 import type { BattleLayoutId } from '@/types';
+import { isOverBudget, picksConnected } from '@/game/chart/engine';
 import { levelFromTotalXp } from '@/game/xp';
 import { scopedPersistStorage } from '@/stores/scopedStorage';
+import { pickShape, shapeKeys } from '@/stores/shape';
 
 export interface CollectionEntry {
   defId: string;
@@ -40,6 +49,7 @@ export interface MetaStats {
   bestNoDeathStreak: number;
   wormholeRides: number;
   holesBypassed: number;
+  disintegrations: number;
   eventsResolved: number;
   checksWon: number;
   fusions: number;
@@ -101,9 +111,11 @@ export interface MetaValues {
   xp: number;
   level: number;
   chartPicks: string[];
+  chartFreeRespecs: number;
   collection: CollectionEntry[];
   ships: ShipId[];
   selectedShip: ShipId;
+  selectedEcho: EchoNodeId | null;
   hangar: { deck: string[] };
   themes: string[];
   tutorialSeen: string[];
@@ -146,6 +158,8 @@ export interface MetaState extends MetaValues {
   spendShards: (n: number) => boolean;
   allocatePick: (id: string) => void;
   deallocatePick: (id: string) => void;
+  grantChartRespec: () => void;
+  fullRespec: () => boolean;
   addToCollection: (defId: string, n?: number) => void;
   buyDie: (defId: string, price: number) => boolean;
   setDeck: (deck: readonly string[]) => void;
@@ -177,12 +191,13 @@ export interface MetaState extends MetaValues {
   grantUnlock: (id: string) => boolean;
   markUnlocksSeen: (ids: readonly string[]) => void;
   recordEncounters: (list: readonly RunEncounter[]) => EncounterResult;
+  selectEcho: (id: EchoNodeId | null) => void;
   setDieSkin: (id: string) => void;
   setPrefs: (patch: AccountPrefs) => void;
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 14;
+export const META_VERSION = 18;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -220,6 +235,7 @@ export const createInitialMetaStats = (): MetaStats => ({
   bestNoDeathStreak: 0,
   wormholeRides: 0,
   holesBypassed: 0,
+  disintegrations: 0,
   eventsResolved: 0,
   checksWon: 0,
   fusions: 0,
@@ -251,6 +267,7 @@ const LIFETIME_KEYS = [
   "deepClears",
   "wormholeRides",
   "holesBypassed",
+  "disintegrations",
   "eventsResolved",
   "checksWon",
   "fusions",
@@ -279,9 +296,11 @@ export const createInitialMetaValues = (): MetaValues => ({
   xp: 0,
   level: 1,
   chartPicks: [],
+  chartFreeRespecs: 0,
   collection: buildStarterCollection(),
   ships: ['wanderer'],
   selectedShip: 'wanderer',
+  selectedEcho: null,
   hangar: { deck: [...STARTER_DECK] },
   themes: ['deepSpace'],
   tutorialSeen: [],
@@ -313,6 +332,11 @@ export const createInitialMetaValues = (): MetaValues => ({
   prefs: {},
   stats: createInitialMetaStats(),
 });
+
+const META_KEYS = shapeKeys(createInitialMetaValues());
+
+export const metaValues = (s: MetaValues): MetaValues =>
+  pickShape(META_KEYS, s);
 
 const coerceEncountered = (value: unknown): Record<string, EncounterRecord> => {
   if (typeof value !== "object" || value === null) return {};
@@ -446,6 +470,15 @@ export const migrateMeta = (
   const prev = (persisted ?? {}) as Partial<MetaValues>;
   const base = createInitialMetaValues();
   const ships = coerceShips(prev.ships, base.ships);
+  const level =
+    typeof prev.xp === 'number'
+      ? levelFromTotalXp(prev.xp)
+      : typeof prev.level === 'number'
+        ? prev.level
+        : base.level;
+  const picks = Array.isArray(prev.chartPicks)
+    ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
+    : base.chartPicks;
   const selectedShip =
     typeof prev.selectedShip === 'string' &&
     ships.includes(prev.selectedShip as ShipId)
@@ -459,18 +492,20 @@ export const migrateMeta = (
       coerceStrings(prev.voucherOffers, base.voucherOffers),
     ),
     xp: typeof prev.xp === 'number' ? prev.xp : base.xp,
-    level:
-      typeof prev.xp === 'number'
-        ? levelFromTotalXp(prev.xp)
-        : typeof prev.level === 'number'
-          ? prev.level
-          : base.level,
-    chartPicks: Array.isArray(prev.chartPicks)
-      ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
-      : base.chartPicks,
+    level,
+    chartPicks: picks,
+    chartFreeRespecs:
+      typeof prev.chartFreeRespecs === 'number' && prev.chartFreeRespecs > 0
+        ? prev.chartFreeRespecs
+        : isOverBudget(level, picks) || !picksConnected(picks)
+          ? 1
+          : base.chartFreeRespecs,
     collection: coerceCollection(prev.collection),
     ships,
     selectedShip,
+    selectedEcho: isEchoNodeId(prev.selectedEcho)
+      ? prev.selectedEcho
+      : base.selectedEcho,
     hangar:
       typeof prev.hangar === 'object' &&
       prev.hangar !== null &&
@@ -623,6 +658,19 @@ export const useMetaStore = create<MetaState>()(
         set((s) => ({ chartPicks: s.chartPicks.filter((p) => p !== id) }));
       },
 
+      grantChartRespec: () => {
+        set((s) => ({ chartFreeRespecs: s.chartFreeRespecs + 1 }));
+      },
+
+      fullRespec: () => {
+        if (get().chartFreeRespecs <= 0) return false;
+        set((s) => ({
+          chartPicks: [],
+          chartFreeRespecs: s.chartFreeRespecs - 1,
+        }));
+        return true;
+      },
+
       addToCollection: (defId, n = 1) => {
         if (n <= 0) return;
         set((s) => {
@@ -651,6 +699,17 @@ export const useMetaStore = create<MetaState>()(
       selectShip: (id) => {
         if (!get().ships.includes(id)) return;
         set({ selectedShip: id });
+      },
+
+      selectEcho: (id) => {
+        if (id === null) {
+          set({ selectedEcho: null });
+          return;
+        }
+        const def = echoNodeDef(id);
+        if (def === undefined) return;
+        if (!echoUnlocked(def, memoryFragmentCount(get().codex))) return;
+        set({ selectedEcho: def.id });
       },
 
       buyShip: (id, price) => {
@@ -941,41 +1000,7 @@ export const useMetaStore = create<MetaState>()(
       storage: scopedPersistStorage<MetaValues>(),
       version: META_VERSION,
       migrate: migrateMeta,
-      partialize: (s): MetaValues => ({
-        shards: s.shards,
-        vouchers: s.vouchers,
-        voucherOffers: s.voucherOffers,
-        xp: s.xp,
-        level: s.level,
-        chartPicks: s.chartPicks,
-        collection: s.collection,
-        ships: s.ships,
-        selectedShip: s.selectedShip,
-        hangar: s.hangar,
-        themes: s.themes,
-        tutorialSeen: s.tutorialSeen,
-        engravings: s.engravings,
-        badges: s.badges,
-        codex: s.codex,
-        codexRead: s.codexRead,
-        seenPuzzles: s.seenPuzzles,
-        seenFragments: s.seenFragments,
-        contracts: s.contracts,
-        dailyPlayed: s.dailyPlayed,
-        best: s.best,
-        ascension: s.ascension,
-        flagsArchive: s.flagsArchive,
-        bossFirstKills: s.bossFirstKills,
-        endings: s.endings,
-        achievements: s.achievements,
-        achievementsSeen: s.achievementsSeen,
-        encountered: s.encountered,
-        unlocksGranted: s.unlocksGranted,
-        unlocksSeen: s.unlocksSeen,
-        dieSkin: s.dieSkin,
-        prefs: s.prefs,
-        stats: s.stats,
-      }),
+      partialize: (s): MetaValues => metaValues(s),
     },
   ),
 );

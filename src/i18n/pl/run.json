@@ -37,7 +37,7 @@
       "beacon": "Latarnia",
       "boss": "Szef",
       "inverted": "odwrócony",
-      "hole": "Czarna dziura"
+      "hole": "Czarna dziura: plama pochłonęła tę komórkę"
     },
     "previewNode": "{{type}} · ryzyko: {{risk}}",
     "previewPocket": "Objazd: lepsze łupy, trudniejsza walka",
@@ -48,7 +48,12 @@
     },
     "hull": "Kadłub {{cur}}/{{max}}",
     "scrap": "Złom {{n}}",
-    "previewHole": "Czarna dziura: obejść ją czy przejechać przez tunel czasoprzestrzenny"
+    "previewHole": "Krawędź odpowiada za całą plamę: obejść ją albo wlecieć w tunel",
+    "spotLabel": "Czarna dziura — cała plama to jeden wybór",
+    "conditions": "Warunki ×{{n}}",
+    "cargo": "Ładunek ▸{{n}}",
+    "cargoMany": "Ładunek ×{{n}}",
+    "previewDelivery": "Dostawa: {{n}} złomu po przybyciu"
   },
   "event": {
     "title": "Sygnał",
@@ -79,7 +84,9 @@
     "checkTierMax": "tylko pliki o rozmiarze {{tier}} i mniejsze",
     "outcomeOdds": "kursy {{odds}}",
     "beaconTitle": "Latarnia",
-    "beaconCounter": "Latarnia {{n}} z {{max}}"
+    "beaconCounter": "Latarnia {{n}} z {{max}}",
+    "reqCargo": "wymaga wolnej ładowni i stacji przed nami",
+    "cargoTerms": "{{drawback}} · dostawa płaci {{n}}"
   },
   "anomaly": {
     "title": "Anomalia",
@@ -202,12 +209,11 @@
     "prologueReplay": "Powtórka",
     "badgeLegend": "Odznaki kości"
   },
-  "consequenceToast": "Wynik: {{text}}",
   "rewards": {
     "dieTitle": "Odzyskana matryca",
     "keep": "Zostawić na pokładzie",
     "sell": "Sprzedaj (+{{n}})",
-    "deckFull": "Pełna talia (9)"
+    "replace": "Wymiana matrycy"
   },
   "perk": {
     "title": "Wybierz opcję rozszerzenia",
@@ -227,8 +233,8 @@
     "sellTitle": "Sprzedaj kostkę do gry",
     "empty": "Wyprzedane",
     "modulesTitle": "Moduły {{used}} / {{max}}",
-    "modulesFull": "Zatoka pełna",
-    "rerollFree": "Ponowne losowanie zasobów (bezpłatne)"
+    "rerollFree": "Ponowne losowanie zasobów (bezpłatne)",
+    "owned": "Zainstalowane"
   },
   "shipyard": {
     "title": "Stocznia",
@@ -244,7 +250,12 @@
     "hull": "Kadłub {{cur}}/{{max}}",
     "voucher": "Kupon Mk ×{{n}} — jeden bezpłatny poziom",
     "voucherUse": "Bezpłatny",
-    "fuse": "Stop — {{n}}"
+    "fuse": "Stop — {{n}}",
+    "baysTitle": "Gniazda modułowe {{used}} / {{max}}",
+    "baysEmpty": "Nie zainstalowano żadnych modułów.",
+    "demount": "Demount + {{n}}",
+    "buyBay": "Kup bok — {{n}}",
+    "bayDone": "W tej serii nie ma już zatok."
   },
   "summary": {
     "victory": "Sektor oczyszczony",
@@ -266,7 +277,9 @@
     "dicePlaced": "Postawione kości",
     "pct": "{{n}}%",
     "wormholeRides": "Przejażdżki przez tunele czasoprzestrzenne",
-    "holesBypassed": "Pominięte dziury"
+    "holesBypassed": "Pominięte dziury",
+    "causeSingularity": "Osobliwość",
+    "cause": "Przyczyna śmierci"
   },
   "prologue": {
     "title": "Prolog",
@@ -295,6 +308,8 @@
     "tally": "To, co po sobie zostawiłeś",
     "continue": "Zamknij dziennik",
     "deathTitle": "Tutaj kończy się bieg",
+    "singularityTitle": "Nie będzie wraku",
+    "blackBox": "Ostatnia rzecz, co do której przyrządy zdążyły się zgodzić",
     "deathWhere": "Sektor{{sector}} · głębokość{{depth}}"
   },
   "setup": {
@@ -320,10 +335,10 @@
     "scrap": "+ fragment z{{n}}",
     "voucher": "Kupon Mk ×{{n}} — jedno bezpłatne ulepszenie w dowolnej stoczni",
     "take": "Weź",
-    "sell": "Sprzedaj (+{{n}})",
-    "hint": "Wybierz jedną opcję. Zaraz rozpocznie się wybór bonusów.",
+    "hint": "Z paczki wychodzi tylko to, co weźmiesz.",
     "module": "moduł",
-    "install": "Zainstaluj"
+    "install": "Zainstaluj",
+    "replace": "Zastąp"
   },
   "tutorial": {
     "next": "Dalej",
@@ -388,10 +403,11 @@
     "riftSplit": "Rozłam: gałęzie krzyżują się tylko przy bramie",
     "inversion": "Podciąganie odwrócone: systemy są rozpatrywane od ostatniego do pierwszego",
     "storm": "Burza prawdopodobieństwa: ponowne rzuty jedną wyrzuconą kostką podczas rozstrzygania",
-    "blackHoles": "Czarna dziura: komórka zniknęła; jej ścieżka tworzy tunel czasoprzestrzenny",
+    "blackHoles": "Czarna dziura: jedna plama pochłania kilka komórek; jej krawędź daje tunel czasoprzestrzenny",
     "wormhole": "Krawędź tunelu czasoprzestrzennego: na jej skraju czeka wybór",
     "bypass": "Ominął krawędź: fala musnęła kadłub",
-    "holeScorch": "Kadłub zbyt mało pieniędzy na opłatę za przejazd — bariera cię przepuściła"
+    "holeScorch": "Kadłub zbyt mało pieniędzy na opłatę za przejazd — bariera cię przepuściła",
+    "holeDrift": "Bariera nic nie wzięła — ten pas i tak był dla ciebie otwarty"
   },
   "tag": {
     "red": "Czerwony",
@@ -484,7 +500,20 @@
       "forward": "głębiej",
       "backward": "wstecz"
     },
-    "achievement": "Osiągnięcie: {{name}}"
+    "singularity": "Kadłub pochłonięty przez osobliwość — brak zapisu wyjścia",
+    "achievement": "Osiągnięcie: {{name}}",
+    "tabStory": "Historia",
+    "tabBattle": "Walka",
+    "openBattle": "Dziennik walki",
+    "battleLive": "Ta walka, najnowsza tura na górze.",
+    "battleLast": "Ostatnia walka, najnowsza tura na górze.",
+    "cargo": {
+      "taken": "zabrał {{name}} na pokład, {{n}} rzędów do zrzutu",
+      "moved": "znacznik dostawy {{name}} przeszedł na bliższą stację",
+      "delivered": "dostarczył {{name}} za {{n}} złomu",
+      "dropped": "wyrzucił {{name}} i stracił zapłatę",
+      "lapsed": "kontrakt na {{name}} wygasł"
+    }
   },
   "memory": {
     "kicker": "Echo pamięta · fragment {{n}} ze strony {{max}}",
@@ -550,15 +579,132 @@
   },
   "hole": {
     "title": "Czarna dziura",
-    "body": "Komórka zniknęła. Jej krawędź albo pozwoli ci ją ominąć, albo zabierze cię tam, gdzie sama wybierze.",
+    "body": "Plama zabrała te komórki. Jej krawędź albo przepuści cię obok, albo cisnie cię tam, gdzie sama zechce.",
     "gentle": "Stabilna tunelowa dziura",
     "gentleWhy": "Pierwsze dwa zjazdy w serii są krótkie i zawsze prowadzą coraz głębiej.",
     "bypass": "Obejść",
     "bypassCost": "Objazd: − kadłub typu{{n}}",
     "bypassFree": "Objazd: bezpłatny — kadłub nie może za to zapłacić",
+    "bypassDrift": "Objazd: bezpłatny — pas, który już miałeś",
+    "bypassNone": "Nie da się objechać: każdy pas za barierą masz już za sobą",
     "ride": "Wsiadaj i jedź",
     "rideCost": "Przejazd: przejazd pociągiem linii „{{min}}” – stacja{{max}}, kierunek nieznany",
     "rideGentle": "Ride: rzut „{{min}}” – „{{max}}”, wyłącznie w głębszym zakresie",
-    "landed": "Rzuty {{rows}} wiersze {{way}}"
+    "landed": "Rzuty {{rows}} wiersze {{way}}",
+    "softLand": "Wyląduj miękko",
+    "softLandWhy": "Raz na kurs: bez rzutu — najbliższy wolny węzeł z przodu",
+    "softLandSpent": "Ładunek Echa został już zużyty w tym kursie"
+  },
+  "bridge": {
+    "title": "Most",
+    "open": "Most",
+    "tab": {
+      "overview": "Przegląd",
+      "dice": "Kości",
+      "modules": "Moduły",
+      "perks": "Korzyści"
+    },
+    "hull": "Kadłub {{cur}}/{{max}}",
+    "scrap": "Złom {{n}}",
+    "bays": "Bays {{used}} / {{max}}",
+    "bayEmpty": "pusta zatoka",
+    "bayOffer": "+1 dok — złom z {{n}} w stoczni",
+    "deckCount": "Strona internetowa: {{n}} / {{max}}",
+    "sellDiceHint": "W sklepie można kupić kostki do gry.",
+    "sellModule": "Sprzedaż + numer{{n}}",
+    "crewTitle": "Kabiny oficerskie {{used}}/{{max}}",
+    "cargoTitle": "Ładownia {{used}}/{{max}}",
+    "cabinEmpty": "pusta kabina — uratuj kogoś",
+    "cabinWho": "{{role}} · {{origin}}",
+    "cabinActive": "aktywna · {{text}}",
+    "cabinPassive": "pasywna · {{text}}",
+    "passive": {
+      "scrapMultPct": "+{{n}}% złomu",
+      "scrapPerKill": "+{{n}} złomu za zabitego",
+      "battleEndHeal": "koniec walki: leczy {{n}} kadłuba",
+      "markBonusDelta": "znaczniki dają +{{n}} obrażeń",
+      "evasionDelta": "unik +{{n}}%",
+      "rerollSizeDelta": "kości na przerzut: +{{n}}"
+    },
+    "cargoEmpty": "pusta ładownia",
+    "cargoTerms": "dostawa: stacja · {{rows}} rzędów · płaci {{n}}",
+    "dropCargo": "Wyrzuć",
+    "dropTitle": "Wyrzucić ładunek?",
+    "dropBody": "{{name}} idzie przez śluzę. Obciążenie znika teraz, a {{n}} złomu za dostawę przepada.",
+    "dropBodyAxis": "{{name}} idzie przez śluzę. Oś zostaje tam, gdzie ją przesunął, a {{n}} złomu za dostawę przepada.",
+    "dropNo": "Wieźć dalej",
+    "dropYes": "Wyrzuć"
+  },
+  "replace": {
+    "title": "Zastąp",
+    "titleDie": "Nowa matryca",
+    "titleModule": "Nowy moduł",
+    "fullDeck": "Pełna lista kart „{{used}}” / „{{max}}” — co się nadaje?",
+    "fullBay": "Bay w pełnej krasie {{used}} / {{max}} — co się dzieje?",
+    "toScrap": "→ scrap + {{n}}",
+    "sellNew": "Sprzedaj nowy egzemplarz (+ {{n}})",
+    "cancel": "Anuluj",
+    "titleOfficer": "Nowy oficer",
+    "fullCabins": "Kajuty pełne {{used}}/{{max}} — kto schodzi?",
+    "disembark": "→ schodzi ze statku",
+    "declineOfficer": "Zostawić ich"
+  },
+  "feed": {
+    "source": {
+      "echo": "ECHO",
+      "consequence": "SKUTEK",
+      "achievement": "OSIĄGNIĘCIE",
+      "system": "SYSTEM"
+    },
+    "dismiss": "Ukryj",
+    "open": "Otwórz w dzienniku"
+  },
+  "weather": {
+    "title": "Warunki sektora"
+  },
+  "salvage": {
+    "title": "Rozebrać wrak",
+    "take": "Weź",
+    "decline": "Zostaw",
+    "hint": "Jedno z trzech. Reszta spłonie razem z wrakiem.",
+    "declined": "Rozbiórka: nic na pokładzie nie było warte czasu palnika."
+  },
+  "cargo": {
+    "title": "Ryzykowny ładunek",
+    "rows": "jeszcze {{n}} rzędów",
+    "payout": "płaci {{n}} złomu",
+    "delivered": "Ładunek dostarczony — ładownia pusta, zapłata zapisana",
+    "dropped": "Ładunek wyrzucony — obciążenie znika, zapłata przepada",
+    "droppedAxis": "Ładunek wyrzucony — oś pozostaje przesunięta, zapłata przepada",
+    "lapsed": "Kontrakt wygasł wraz z aktem — ładownia pusta, zapłaty nie będzie",
+    "moved": "Dostawa przekierowana — znacznik przeszedł na najbliższą stację przed nami",
+    "stranded": "Nikt przed nami nie przyjmie ładunku — kontrakt jest nieważny"
+  },
+  "echo": {
+    "title": "Rdzeń Echa",
+    "close": "Zamknij",
+    "count": "Odzyskane fragmenty: {{n}} z {{max}}",
+    "rule": "Jeden węzeł leci z tobą. Nic się nie wydaje i nie przenosi.",
+    "tier": "od {{n}}",
+    "locked": "Otwiera się przy {{n}} odzyskanych fragmentach",
+    "equipped": "Wyposażony",
+    "none": "Bez węzła",
+    "noneBody": "Rusz w kurs z pustym rdzeniem.",
+    "open": "Rdzeń Echa",
+    "setup": "Echo",
+    "setupNone": "Nie wybrano węzła",
+    "codexTitle": "Rdzeń Echa",
+    "codexBody": "Odzyskane fragmenty otwierają węzły. Jeden leci z tobą w każdym kursie.",
+    "opened": {
+      "secondLook": "Rdzeń Echa: Drugie spojrzenie jest otwarty.",
+      "readout": "Rdzeń Echa: Rozbiór jest otwarty.",
+      "calculus": "Rdzeń Echa: Rozwiązanie ogniowe jest otwarty.",
+      "echolocation": "Rdzeń Echa: Echolokacja jest otwarty.",
+      "pathGhost": "Rdzeń Echa: Widmo szlaku jest otwarty.",
+      "softLanding": "Rdzeń Echa: Miękkie lądowanie jest otwarty.",
+      "reserve": "Rdzeń Echa: Rezerwa mocy jest otwarty.",
+      "shieldEcho": "Rdzeń Echa: Echo tarczy jest otwarty.",
+      "veto": "Rdzeń Echa: Weto jest otwarty."
+    }
   }
 }

@@ -1,11 +1,14 @@
 import { describe, expect, it } from "vitest";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
+import { BEACON_FLAGS } from "@/data/events/beacons";
 import {
   countStars,
   goalMet,
   goalStarsMask,
+  LOSS_SCORED,
   newStars,
   type GoalContext,
+  type GoalKind,
   type GoalSpec,
 } from "@/game/run/goals";
 import { createInitialRunStats, type RunStats } from "@/stores/runStore";
@@ -28,6 +31,60 @@ const stats = (patch: Partial<RunStats>): RunStats => ({
   ...createInitialRunStats(),
   ...patch,
 });
+
+const SATISFIED_SPECS: Record<GoalKind, GoalSpec> = {
+  win: { g: "win" },
+  hullPctAtLeast: { g: "hullPctAtLeast", n: 100 },
+  hullNeverBelowPct: { g: "hullNeverBelowPct", n: 100 },
+  noShipyardVisits: { g: "noShipyardVisits" },
+  burnKillElite: { g: "burnKillElite" },
+  jumpsAtMost: { g: "jumpsAtMost", n: 99 },
+  shieldAbsorbedAtLeast: { g: "shieldAbsorbedAtLeast", n: 1 },
+  scrapAtLeast: { g: "scrapAtLeast", n: 1 },
+  boughtNothing: { g: "boughtNothing" },
+  spinalHitAtLeast: { g: "spinalHitAtLeast", n: 1 },
+  fastBattleTurnsAtMost: { g: "fastBattleTurnsAtMost", n: 9 },
+  repairBayHealAtLeast: { g: "repairBayHealAtLeast", n: 1 },
+  fullHullBattleEndsAtLeast: { g: "fullHullBattleEndsAtLeast", n: 1 },
+  minibossKilled: { g: "minibossKilled" },
+  noRerolls: { g: "noRerolls" },
+  elitesAtLeast: { g: "elitesAtLeast", n: 1 },
+  depthWithDeckAtLeast: { g: "depthWithDeckAtLeast", depth: 1, deck: 1 },
+  beaconResolved: { g: "beaconResolved" },
+  anomaliesSolvedAtLeast: { g: "anomaliesSolvedAtLeast", n: 1 },
+  blackPlacedInWinAtLeast: { g: "blackPlacedInWinAtLeast", n: 1 },
+  axisAtMost: { g: "axisAtMost", n: 0 },
+  allBeaconsResolved: { g: "allBeaconsResolved" },
+  deckSchoolsAtLeast: { g: "deckSchoolsAtLeast", n: 1 },
+  dicePlacedAtMost: { g: "dicePlacedAtMost", n: 999 },
+  axisAtLeast: { g: "axisAtLeast", n: 0 },
+  elitesAtMost: { g: "elitesAtMost", n: 9 },
+};
+
+const satisfyingCtx = (win: boolean): GoalContext =>
+  ctx({
+    win,
+    hull: 30,
+    hullMax: 30,
+    scrap: 999,
+    deckSize: 9,
+    deckSchools: 6,
+    axis: 0,
+    solvedPuzzles: ["oreVein", "driftLattice"],
+    flags: Object.fromEntries(BEACON_FLAGS.map((key) => [key, true])),
+    stats: stats({
+      burnKillElites: 1,
+      shieldAbsorbed: 99,
+      spinalMaxHit: 99,
+      minBattleTurns: 1,
+      repairBayHealed: 99,
+      fullHullBattleEnds: 99,
+      minibosses: 1,
+      elites: 9,
+      depth: 99,
+      maxBlackPlacedWin: 9,
+    }),
+  });
 
 describe("goal predicates", () => {
   it("reads the win flag", () => {
@@ -124,6 +181,24 @@ describe("goal predicates", () => {
     const lost = ctx({ win: false, stats: stats({ elites: 3 }) });
     expect(goalMet({ g: "elitesAtLeast", n: 2 }, lost)).toBe(true);
   });
+
+  it("denies absence goals on a lost run whose counters never moved", () => {
+    const lost = ctx({ win: false });
+    expect(goalMet({ g: "jumpsAtMost", n: 13 }, lost)).toBe(false);
+    expect(goalMet({ g: "noShipyardVisits" }, lost)).toBe(false);
+    expect(goalMet({ g: "boughtNothing" }, lost)).toBe(false);
+    expect(goalMet({ g: "noRerolls" }, lost)).toBe(false);
+    expect(goalMet({ g: "hullNeverBelowPct", n: 50 }, lost)).toBe(false);
+  });
+
+  it("scores a lost run only on goals the player demonstrably earned", () => {
+    for (const [kind, spec] of Object.entries(SATISFIED_SPECS)) {
+      expect(goalMet(spec, satisfyingCtx(true))).toBe(true);
+      expect(goalMet(spec, satisfyingCtx(false))).toBe(
+        LOSS_SCORED.has(kind as GoalKind),
+      );
+    }
+  });
 });
 
 describe("star masks", () => {
@@ -163,7 +238,7 @@ describe("contract catalogue", () => {
   it("awards no stars at all for a contract abandoned at the start", () => {
     for (const def of CONTRACTS) {
       const mask = goalStarsMask(def.goals, ctx({ win: false, hull: 0 }));
-      expect(mask & 1).toBe(0);
+      expect(mask).toBe(0);
     }
   });
 });

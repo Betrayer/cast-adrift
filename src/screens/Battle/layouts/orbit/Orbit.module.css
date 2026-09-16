@@ -41,6 +41,7 @@
 }
 
 .pod {
+  composes: tinted from '../../schoolTint.module.css';
   position: absolute;
   pointer-events: auto;
   appearance: none;
@@ -62,42 +63,6 @@
   --tint: var(--ca-line);
   --wash: var(--ca-surface2);
   --tone: var(--ca-dim);
-}
-
-.pod[data-school='red'] {
-  --tint: var(--ca-school-red-stroke);
-  --wash: var(--ca-school-red-fill);
-  --tone: var(--ca-school-red-text);
-}
-
-.pod[data-school='blue'] {
-  --tint: var(--ca-school-blue-stroke);
-  --wash: var(--ca-school-blue-fill);
-  --tone: var(--ca-school-blue-text);
-}
-
-.pod[data-school='green'] {
-  --tint: var(--ca-school-green-stroke);
-  --wash: var(--ca-school-green-fill);
-  --tone: var(--ca-school-green-text);
-}
-
-.pod[data-school='grey'] {
-  --tint: var(--ca-school-grey-stroke);
-  --wash: var(--ca-school-grey-fill);
-  --tone: var(--ca-school-grey-text);
-}
-
-.pod[data-school='black'] {
-  --tint: var(--ca-school-black-stroke);
-  --wash: var(--ca-school-black-fill);
-  --tone: var(--ca-school-black-text);
-}
-
-.pod[data-school='yellow'] {
-  --tint: var(--ca-school-yellow-stroke);
-  --wash: var(--ca-school-yellow-fill);
-  --tone: var(--ca-school-yellow-text);
 }
 
 .podOrder {
@@ -308,17 +273,15 @@
   min-width: 16px;
 }
 
-@media (max-height: 700px) {
-  .enemyBand {
-    min-height: 76px;
-    height: 20%;
-  }
+:root[data-ca-compact='1'] .enemyBand {
+  min-height: 76px;
+  height: 20%;
+}
 
-  .trayBand {
-    min-height: 56px;
-  }
+:root[data-ca-compact='1'] .trayBand {
+  min-height: 56px;
+}
 
-  .dock {
-    min-height: 150px;
-  }
+:root[data-ca-compact='1'] .dock {
+  min-height: 150px;
 }

@@ -5,6 +5,7 @@ import {
   isSlotBlocked,
 } from "@/game/battle/setup";
 import { dieHasGrant } from "@/data/engravings";
+import { DIRECT, fireModeAllowed, type FireModeId } from "@/data/fireModes";
 import { sourceMods } from "@/game/run/runMods";
 import type { BattleBoard } from "@/game/battle/view/types";
 import type { CheckMove, CheckStep, SlotId } from "@/types/battle";
@@ -21,6 +22,8 @@ export type PlaceBlock =
   | "tierCap"
   | "slotBlocked"
   | "dieLocked";
+
+export type ModeBlock = "notAllowed" | "needsTwoEnemies";
 
 type CheckBoard = Pick<BattleBoard, "checkSteps" | "checkIndex">;
 
@@ -110,6 +113,25 @@ export const placeBlockFor = (
     return "slotBlocked";
   }
   if (!dieFitsSlot(board, die, slot, slotId)) return "tierCap";
+  return null;
+};
+
+export const slotFireModes = (
+  board: Pick<BattleBoard, "slots">,
+  slotId: SlotId,
+): readonly FireModeId[] => board.slots[slotId]?.modes ?? [];
+
+export const livingEnemyCount = (board: Pick<BattleBoard, "enemies">): number =>
+  board.enemies.filter((e) => e.hp > 0).length;
+
+export const modeBlockFor = (
+  board: Pick<BattleBoard, "slots" | "enemies">,
+  slotId: SlotId,
+  mode: FireModeId,
+): ModeBlock | null => {
+  const modes = slotFireModes(board, slotId);
+  if (mode !== DIRECT.id && !modes.includes(mode)) return "notAllowed";
+  if (!fireModeAllowed(mode, livingEnemyCount(board))) return "needsTwoEnemies";
   return null;
 };
 

@@ -23,7 +23,10 @@ import {
   ascensionRewardsUpTo,
   maxSelectableAscension,
 } from '@/data/ascension';
+import { echoRowDef } from '@/components/echoCoreView';
 import { ShipCard } from '@/components/ShipCard';
+import { echoLabelVars } from '@/data/echo';
+import { memoryFragmentCount } from '@/data/narrative/memories';
 import { ascensionShardMult } from '@/game/xp';
 import { startRun } from '@/game/run/flow';
 import { useAppStore } from '@/stores/appStore';
@@ -36,6 +39,10 @@ export const RunSetupScreen = () => {
   const deck = useMetaStore((s) => s.hangar.deck);
   const cleared = useMetaStore((s) => s.ascension.campaign);
   const vouchers = useMetaStore((s) => s.vouchers.perkDraft);
+  const selectedEcho = useMetaStore((s) => s.selectedEcho);
+  const codex = useMetaStore((s) => s.codex);
+  const setEchoCore = useAppStore((s) => s.setEchoCore);
+  const echo = echoRowDef(selectedEcho, memoryFragmentCount(codex));
   const maxAscension = maxSelectableAscension(cleared);
   const [ascension, setAscension] = useState(0);
   const [useVoucher, setUseVoucher] = useState(false);
@@ -75,6 +82,29 @@ export const RunSetupScreen = () => {
             }
           />
           </div>
+          <Group
+            justify="space-between"
+            wrap="nowrap"
+            gap="xs"
+            data-testid="setup-echo"
+            data-echo-equipped={echo === null ? 'none' : echo.id}
+          >
+            <Text size="xs" c={tokens.dim} truncate>
+              {echo === null
+                ? `${t('run:echo.setup')} · ${t('run:echo.setupNone')}`
+                : `${t('run:echo.setup')} · ${t(echo.short, echoLabelVars(echo))}`}
+            </Text>
+            <Button
+              size="compact-xs"
+              variant="default"
+              data-testid="setup-echo-open"
+              onClick={() => {
+                setEchoCore(true);
+              }}
+            >
+              {t('run:echo.open')}
+            </Button>
+          </Group>
           <Divider color={tokens.line} label={t('run:setup.ascension')} />
           {maxAscension === 0 ? (
             <Text size="xs" c={tokens.faint}>

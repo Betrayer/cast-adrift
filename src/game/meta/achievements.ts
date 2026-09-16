@@ -14,8 +14,9 @@ import {
   type MetaStats,
   type VoucherKind,
 } from "@/stores/metaStore";
-import { useNarrativeStore } from "@/stores/narrativeStore";
-import { useRunStore, type RunStats } from "@/stores/runStore";
+import { countStars } from "@/game/run/goals";
+import { logAchievement } from "@/game/run/journal";
+import type { RunStats } from "@/stores/runStore";
 import type { School } from "@/types/content";
 import type { FlagValue } from "@/types/events";
 
@@ -48,14 +49,6 @@ export interface AchievementProgress {
   need: number;
   done: boolean;
 }
-
-const countStarBits = (mask: number): number => {
-  let n = 0;
-  for (let bit = 0; bit < 3; bit += 1) {
-    if ((mask & (1 << bit)) !== 0) n += 1;
-  }
-  return n;
-};
 
 const ownedDistinct = (collection: readonly CollectionEntry[]): number =>
   collection.filter((e) => e.count > 0).length;
@@ -155,7 +148,7 @@ export const achievementProgress = (
     case "contractStars":
       return of(
         Object.values(ctx.contracts).reduce(
-          (sum, mask) => sum + countStarBits(mask),
+          (sum, mask) => sum + countStars(mask),
           0,
         ),
         cond.n,
@@ -241,15 +234,7 @@ const grantRewards = (defs: readonly AchievementDef[]): AchievementSettlement =>
   for (const def of defs) {
     if (!meta.unlockAchievement(def.id)) continue;
     unlocked.push(def);
-    useNarrativeStore.getState().pushAchievement(def.id);
-    const run = useRunStore.getState();
-    if (run.active) {
-      useNarrativeStore.getState().pushJournal({
-        k: "achievement",
-        achievement: def.id,
-        sector: run.sector,
-      });
-    }
+    logAchievement(def.id);
     const reward = def.reward;
     if (reward === undefined) continue;
     if (reward.shards !== undefined && reward.shards > 0) {

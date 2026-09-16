@@ -26,14 +26,13 @@ import { abandonRun } from "@/game/run/flow";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore, type RunStats } from "@/stores/runStore";
-import {
-  resolveReducedMotion,
-  useSettingsStore,
-} from "@/stores/settingsStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
 import { LevelUpCeremony } from "./LevelUpCeremony";
 
 const FIND_STAGGER_MS = 180;
+
+const CAUSE_ROW_ID = "cause";
 
 const DETAIL_ROWS: readonly {
   id: string;
@@ -105,9 +104,7 @@ export const SummaryScreen = () => {
   const result = useSummaryStore((s) => s.result);
   const level = useMetaStore((s) => s.level);
   const xp = useMetaStore((s) => s.xp);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
 
   const win = result?.win ?? false;
   const xpShown = useCountUp(result?.xpGain ?? 0, reduced);
@@ -227,6 +224,16 @@ export const SummaryScreen = () => {
                   </Text>
                 </Group>
               ))}
+              {result?.cause === "singularity" ? (
+                <Group justify="space-between" data-summary-row={CAUSE_ROW_ID}>
+                  <Text size="xs" c={tokens.faint}>
+                    {t("run:summary.cause")}
+                  </Text>
+                  <Text size="xs" c={tokens.danger} data-summary-value={CAUSE_ROW_ID}>
+                    {t("run:summary.causeSingularity")}
+                  </Text>
+                </Group>
+              ) : null}
             </SimpleGrid>
           ) : null}
           {detailed && tally !== null ? (
@@ -324,6 +331,7 @@ export const SummaryScreen = () => {
             size="md"
             fullWidth
             mt="sm"
+            data-testid="summary-menu"
             onClick={() => {
               useSummaryStore.getState().clear();
               abandonRun();

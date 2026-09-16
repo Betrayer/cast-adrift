@@ -19,6 +19,13 @@ const NO_TEXTURES: TextureUsage = { live: 0, bytes: 0 };
 let app: Application | null = null;
 let readTextures: () => TextureUsage = () => NO_TEXTURES;
 const pools = new Map<string, { used: number; size: number }>();
+let frames = 0;
+
+const countFrame = (): void => {
+  frames += 1;
+};
+
+export const readFrames = (): number => frames;
 
 export const registerTextureUsage = (read: () => TextureUsage): void => {
   readTextures = read;
@@ -26,7 +33,9 @@ export const registerTextureUsage = (read: () => TextureUsage): void => {
 
 export const registerPerfApp = (next: Application): (() => void) => {
   app = next;
+  next.ticker.add(countFrame);
   return () => {
+    next.ticker.remove(countFrame);
     if (app === next) app = null;
   };
 };

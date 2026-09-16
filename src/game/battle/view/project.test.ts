@@ -1,13 +1,16 @@
 import { beforeEach, describe, expect, it } from "vitest";
+import { harnessEnemy, harnessSnap } from "@/game/battle/battleHarness";
 import type { MkLevels } from "@/game/battle/setup";
 import { resolveEnemyPhase, resolvePlayerPhase } from "@/game/battle/resolver";
 import {
   enemyForecast,
   expectedHit,
   legalTargets,
+  modeBlockFor,
   projectSlot,
   type SlotProjection,
 } from "@/game/battle/view";
+import { FIRE_MODE_IDS, type FireModeId } from "@/data/fireModes";
 import { createStream, createStreams, type RngStream } from "@/services/rng";
 import {
   battleSnapshot,
@@ -17,7 +20,7 @@ import {
 import { useRunStore } from "@/stores/runStore";
 import type { EngravingMap } from "@/data/engravings";
 import type { ShipId } from "@/data/ships";
-import type { SlotId } from "@/types/battle";
+import type { BattleSnapshot, SlotId } from "@/types/battle";
 
 const DECKS: readonly (readonly string[])[] = [
   ["ember", "frostplate", "sprout", "grey-d4", "ashen", "coreshard"],
@@ -60,6 +63,15 @@ const ENEMIES: readonly (readonly string[])[] = [
   ["anchorHulk"],
 ];
 
+const MODULE_SETS: readonly (readonly string[])[] = [
+  [],
+  ["autoloader"],
+  ["piercer"],
+  ["emberInjector"],
+  ["targetingMesh"],
+  ["lanceCapacitor"],
+];
+
 interface CaseSpec {
   deck: readonly string[];
   perks: readonly string[];
@@ -67,6 +79,7 @@ interface CaseSpec {
   mk: MkLevels;
   engravings: EngravingMap;
   enemyIds: readonly string[];
+  modules: readonly string[];
   inverted: boolean;
   seed: number;
 }
@@ -78,6 +91,7 @@ const specFor = (index: number): CaseSpec => ({
   mk: MK_SETS[index % MK_SETS.length] ?? {},
   engravings: ENGRAVING_SETS[index % ENGRAVING_SETS.length] ?? {},
   enemyIds: ENEMIES[index % ENEMIES.length] ?? ["raider"],
+  modules: MODULE_SETS[index % MODULE_SETS.length] ?? [],
   inverted: index % 7 === 0,
   seed: 1000 + index * 37,
 });
@@ -89,6 +103,7 @@ const startCase = (spec: CaseSpec): void => {
     shipId: spec.ship,
     perks: spec.perks,
     engravings: spec.engravings,
+    modules: spec.modules,
     hull: 24,
     hullMax: 30,
     startCharge: 4,
@@ -118,6 +133,26 @@ const choose = (stream: RngStream): Chosen | null => {
   return null;
 };
 
+const WEAPON_SLOTS: readonly SlotId[] = ["weaponA", "weaponB"];
+
+const armModes = (stream: RngStream): FireModeId[] => {
+  const board = useBattleStore.getState();
+  const slots = { ...board.slots };
+  const armed: FireModeId[] = [];
+  for (const slotId of WEAPON_SLOTS) {
+    const slot = slots[slotId];
+    if (slot === undefined) continue;
+    const options = (slot.modes ?? ["direct"]).filter(
+      (mode) => modeBlockFor(board, slotId, mode) === null,
+    );
+    const mode = stream.pick(options);
+    slots[slotId] = { ...slot, mode };
+    armed.push(mode);
+  }
+  useBattleStore.setState({ slots });
+  return armed;
+};
+
 const resolvedFor = (slotId: SlotId): SlotProjection => {
   const beats = useBattleStore
     .getState()
@@ -135,6 +170,8 @@ const resolvedFor = (slotId: SlotId): SlotProjection => {
     sensor: head?.sensor ?? null,
     overflowHull: beats.reduce((sum, b) => sum + (b.overflowHull ?? 0), 0),
     jammed: beats.some((b) => b.kind === "spinalJam"),
+    hits: beats.filter((b) => b.kind === "damage").length,
+    fragments: beats.filter((b) => b.kind === "damage").map((b) => b.amount),
   };
 };
 
@@ -151,12 +188,18 @@ describe("projection matches the resolution it predicts", () => {
     let exceeded = 0;
     let engraved = 0;
     let affinity = 0;
+    let moded = 0;
+    let multi = 0;
+    const armedModes = new Set<FireModeId>();
     for (let index = 0; index < CASES; index += 1) {
       const spec = specFor(index);
       startCase(spec);
       const picker = createStream(spec.seed ^ 0x5f5f);
+      for (const mode of armModes(picker)) armedModes.add(mode);
       const chosen = choose(picker);
       if (chosen === null) continue;
+      const armed = useBattleStore.getState().slots[chosen.slotId]?.mode;
+      if (armed !== undefined && armed !== "direct") moded += 1;
 
       const before = useBattleStore.getState();
       const die = before.dice.find((d) => d.uid === chosen.uid);
@@ -174,6 +217,12 @@ describe("projection matches the resolution it predicts", () => {
       expect(projection).not.toBeNull();
       if (projection === null) continue;
       if (projection.bonus !== 0) affinity += 1;
+      if (projection.hits > 1) {
+        multi += 1;
+        expect(projection.fragments.reduce((sum, n) => sum + n, 0)).toBe(
+          projection.amount,
+        );
+      }
 
       useBattleStore.getState().placeDie(chosen.uid, chosen.slotId);
       expect(useBattleStore.getState().slots[chosen.slotId]?.dieUid).toBe(
@@ -191,6 +240,8 @@ describe("projection matches the resolution it predicts", () => {
         sensor: projection.sensor,
         overflowHull: projection.overflowHull,
         jammed: projection.jammed,
+        hits: projection.hits,
+        fragments: projection.fragments,
       }).toEqual({
         case: index,
         kind: actual.kind,
@@ -200,6 +251,8 @@ describe("projection matches the resolution it predicts", () => {
         sensor: actual.sensor,
         overflowHull: actual.overflowHull,
         jammed: actual.jammed,
+        hits: actual.hits,
+        fragments: actual.fragments,
       });
       checked += 1;
     }
@@ -209,12 +262,17 @@ describe("projection matches the resolution it predicts", () => {
       exceeded: exceeded > 0,
       engraved: engraved > 0,
       affinity: affinity > 0,
+      moded: moded > 0,
+      multi: multi > 0,
     }).toEqual({
       inverted: true,
       exceeded: true,
       engraved: true,
       affinity: true,
+      moded: true,
+      multi: true,
     });
+    expect([...armedModes].sort()).toEqual([...FIRE_MODE_IDS].sort());
   });
 
   it("reports the affinity bonus as the difference from the face", () => {
@@ -253,7 +311,11 @@ describe("enemy forecast", () => {
   it("equals the damage actually taken when nothing dodges", () => {
     let checked = 0;
     for (let index = 0; index < 140; index += 1) {
-      const spec = { ...specFor(index), enemyIds: ["raider"] as const };
+      const spec = {
+        ...specFor(index),
+        enemyIds: ["raider"] as const,
+        modules: [],
+      };
       startCase(spec);
       const board = useBattleStore.getState();
       const snapshot = battleSnapshot(board);
@@ -280,7 +342,12 @@ describe("enemy forecast", () => {
   });
 
   it("reads evasion as the mean over the whole defense stream", () => {
-    startCase({ ...specFor(2), deck: ["sprout", "sprout", "sprout"], enemyIds: ["raider"] });
+    startCase({
+      ...specFor(2),
+      deck: ["sprout", "sprout", "sprout"],
+      enemyIds: ["raider"],
+      modules: [],
+    });
     const board = useBattleStore.getState();
     const die = board.dice.find((d) => d.state === "tray");
     if (die === undefined) return;
@@ -323,5 +390,51 @@ describe("enemy forecast", () => {
     expect(
       expectedHit(10, { dodgePct: 0, glancingPct: 100, intercept: false }),
     ).toBe(5);
+  });
+});
+
+describe("enemy forecast and the charge aura", () => {
+  const wraith = (turn: number): BattleSnapshot =>
+    harnessSnap([], {
+      turn,
+      hull: 40,
+      hullMax: 40,
+      shield: 0,
+      evasion: null,
+      enemies: [
+        harnessEnemy({
+          nextIntent: { t: "attack", n: 9 },
+          subsystems: [
+            {
+              id: "enemy-0:coil",
+              key: "coil",
+              hp: 9,
+              hpMax: 9,
+              aura: "chargeAllies",
+            },
+          ],
+        }),
+      ],
+    });
+
+  it("reports the doubled hit on the turn the aura fires", () => {
+    expect(enemyForecast(wraith(2)).raw).toBe(9);
+    expect(enemyForecast(wraith(3)).raw).toBe(18);
+  });
+
+  it("still equals the damage the enemy phase deals on the aura turn", () => {
+    const snapshot = wraith(3);
+    const forecast = enemyForecast(snapshot);
+    const { next } = resolveEnemyPhase(snapshot, createStream(11));
+    expect(snapshot.hull - next.hull).toBe(forecast.toHull);
+    expect(forecast.lethal).toBe(false);
+  });
+
+  it("drops the doubling once the aura part is dead", () => {
+    const snapshot = wraith(3);
+    const part = snapshot.enemies[0]?.subsystems[0];
+    if (part === undefined) throw new Error("no aura part");
+    part.hp = 0;
+    expect(enemyForecast(snapshot).raw).toBe(9);
   });
 });

@@ -80,7 +80,7 @@
     "pathCost": "Pfad von hier aus: {{n}} Punkte (du hast {{have}})",
     "refundFree": "Rückerstattung (kostenlos)",
     "respecConfirmTitle": "Diesen Knoten zurückerstatten?",
-    "respecConfirmBody": "„{{name}}“ wird wieder in den Pool zurückgelegt, und der Punkt wird zurückgegeben. Kosten: {{cost}}◈.",
+    "respecConfirmBody": "„{{name}}“ wird wieder in den Pool zurückgelegt, und {{points}} Punkt(e) werden zurückgegeben. Kosten: {{cost}}◈.",
     "respecConfirmYes": "Rückerstattung",
     "redPowderRoom": "Gäste-WC",
     "redRangeCard": "Schusskarte",
@@ -105,7 +105,13 @@
     "greyShimStack": "Unterlegscheibenstapel",
     "greyPatternBook": "Musterbuch",
     "greyBallastTrim": "Ballasttrimmung",
-    "greyTallyStick": "Zählstab"
+    "greyTallyStick": "Zählstab",
+    "cost": "Kosten {{n}}",
+    "repriced": "Die Knotenpreise haben sich geändert: deine Auswahl kostet jetzt {{spent}} von {{total}} Punkten. Nichts wurde weggenommen — ein vollständiger Respec ist kostenlos.",
+    "freeRespec": "Kostenloser Respec",
+    "freeRespecTitle": "Die gesamte Karte leeren?",
+    "freeRespecBody": "Alle zugewiesenen Knoten ({{n}}) gehen in den Pool zurück und jeder Punkt wird erstattet. Dieses Zurücksetzen ist kostenlos.",
+    "freeRespecYes": "Leeren"
   },
   "chartFx": {
     "hubBudget": "+1 Hangar-Budget",
@@ -121,7 +127,7 @@
       "blueReserveDelta": "{{n}} blaue Reserve",
       "jamPowerDelta": "{{n}} Jam-Power",
       "growthCapDelta": "{{n}} Wachstumsgrenze",
-      "evasionDelta": "{{n}}% Ausweichen",
+      "evasionDelta": "{{n}}% Evasion",
       "markBonusDelta": "{{n}} Markenbonus",
       "battleEndHeal": "{{n}} heilen / kämpfen",
       "hullMaxPct": "{{n}} % der maximalen Rumpfstärke",
@@ -366,12 +372,12 @@
   "drift": {
     "title": "Drift über",
     "dailyTitle": "Täglich über",
-    "depth": "Tiefe{{n}} × 50",
+    "depth": "Tiefe {{n}} × 50",
     "kills": "{{n}}-Kills × 5",
     "scrap": "Schrott verdient",
     "total": "Ergebnis",
     "newBest": "Neue persönliche Bestleistung – die alte lag bei {{n}}",
-    "best": "Persönliche Bestleistung {{n}} · {{diff}} short",
+    "best": "Persönliche Bestleistung {{n}} · {{diff}} fehlten",
     "submitIdle": "Nicht eingereicht",
     "submitPending": "Wird gesendet…",
     "submitSent": "Dem Vorstand vorgelegt",
@@ -636,7 +642,6 @@
       "name": "Auftragnehmer",
       "desc": "Verdiente Auftragssterne: {{n}}"
     },
-    "toast": "Leistung",
     "beyondTheCore": {
       "name": "Über den Kern hinaus",
       "desc": "Überquere die Schwelle und räume Sektor 6."
@@ -668,6 +673,10 @@
     "voidRider": {
       "name": "Leerenreiter",
       "desc": "Wurmlochritte: {{n}}"
+    },
+    "horizonTester": {
+      "name": "Horizontprüfer",
+      "desc": "Von einer Singularität ausgelöschte Läufe: {{n}}"
     },
     "rimRunner": {
       "name": "Randläufer",

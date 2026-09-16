@@ -14,6 +14,7 @@ import type {
   ReducedMotionSetting,
   VignetteIntensity,
 } from '@/types';
+import { pickShape, shapeKeys } from '@/stores/shape';
 
 export interface SettingsValues {
   locale: Locale;
@@ -61,6 +62,8 @@ const DEFAULTS: SettingsValues = {
   battleLayout: DEFAULT_BATTLE_LAYOUT,
   skipTally: false,
 };
+
+const SETTINGS_KEYS = shapeKeys(DEFAULTS);
 
 const isFontScale = (value: unknown): value is FontScale =>
   value === 's' || value === 'm' || value === 'l';
@@ -113,20 +116,7 @@ export const useSettingsStore = create<SettingsState>()(
       name: 'ca.settings',
       version: SETTINGS_VERSION,
       migrate: migrateSettings,
-      partialize: (s): SettingsValues => ({
-        locale: s.locale,
-        sfxVol: s.sfxVol,
-        musicVol: s.musicVol,
-        reducedMotion: s.reducedMotion,
-        echoVerbosity: s.echoVerbosity,
-        screenShake: s.screenShake,
-        vignette: s.vignette,
-        theme: s.theme,
-        fontScale: s.fontScale,
-        battleSpeed: s.battleSpeed,
-        battleLayout: s.battleLayout,
-        skipTally: s.skipTally,
-      }),
+      partialize: (s): SettingsValues => pickShape(SETTINGS_KEYS, s),
     },
   ),
 );
@@ -139,3 +129,6 @@ export const resolveReducedMotion = (setting: ReducedMotionSetting): boolean => 
     window.matchMedia('(prefers-reduced-motion: reduce)').matches
   );
 };
+
+export const useReducedMotion = (): boolean =>
+  resolveReducedMotion(useSettingsStore((s) => s.reducedMotion));

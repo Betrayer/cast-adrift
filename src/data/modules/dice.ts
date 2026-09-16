@@ -1,10 +1,8 @@
+import { moduleDef } from "@/data/modules/types";
 import type { ModuleDef } from "@/data/modules/types";
 
 export const DICE_MODULES: readonly ModuleDef[] = [
-  {
-    id: "wideGrip",
-    name: "content:modules.wideGrip.name",
-    desc: "content:modules.wideGrip.desc",
+  moduleDef("wideGrip", {
     rarity: "common",
     price: 50,
     tag: "dice",
@@ -20,21 +18,15 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "nudgeGovernor",
-    name: "content:modules.nudgeGovernor.name",
-    desc: "content:modules.nudgeGovernor.desc",
+  }),
+  moduleDef("nudgeGovernor", {
     rarity: "common",
     price: 45,
     tag: "dice",
     tags: ["precision", "charge"],
     mods: { nudgeCostDelta: -1, chargeCapDelta: -1 },
-  },
-  {
-    id: "primerCoil",
-    name: "content:modules.primerCoil.name",
-    desc: "content:modules.primerCoil.desc",
+  }),
+  moduleDef("primerCoil", {
     rarity: "common",
     price: 50,
     tag: "dice",
@@ -46,11 +38,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "primeSchool", school: "red", n: 3 }],
       },
     ],
-  },
-  {
-    id: "growthTrellis",
-    name: "content:modules.growthTrellis.name",
-    desc: "content:modules.growthTrellis.desc",
+  }),
+  moduleDef("growthTrellis", {
     rarity: "common",
     price: 45,
     tag: "dice",
@@ -63,11 +52,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "grow", n: 1, cap: 3 }],
       },
     ],
-  },
-  {
-    id: "ratchetFeed",
-    name: "content:modules.ratchetFeed.name",
-    desc: "content:modules.ratchetFeed.desc",
+  }),
+  moduleDef("ratchetFeed", {
     rarity: "common",
     price: 45,
     tag: "dice",
@@ -79,11 +65,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "setDieValue", n: 3 }],
       },
     ],
-  },
-  {
-    id: "solenoid",
-    name: "content:modules.solenoid.name",
-    desc: "content:modules.solenoid.desc",
+  }),
+  moduleDef("solenoid", {
     rarity: "uncommon",
     price: 60,
     tag: "dice",
@@ -96,11 +79,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "rerollDie" }],
       },
     ],
-  },
-  {
-    id: "gyroStabilizer",
-    name: "content:modules.gyroStabilizer.name",
-    desc: "content:modules.gyroStabilizer.desc",
+  }),
+  moduleDef("gyroStabilizer", {
     rarity: "uncommon",
     price: 65,
     tag: "dice",
@@ -113,11 +93,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "grant", what: "reserve", n: 1 }],
       },
     ],
-  },
-  {
-    id: "seedVault",
-    name: "content:modules.seedVault.name",
-    desc: "content:modules.seedVault.desc",
+  }),
+  moduleDef("seedVault", {
     rarity: "uncommon",
     price: 70,
     tag: "dice",
@@ -131,11 +108,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "echoBuffer",
-    name: "content:modules.echoBuffer.name",
-    desc: "content:modules.echoBuffer.desc",
+  }),
+  moduleDef("echoBuffer", {
     rarity: "uncommon",
     price: 60,
     tag: "dice",
@@ -152,11 +126,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "schedule", on: "nextTurn", do: [{ a: "charge", n: 3 }] }],
       },
     ],
-  },
-  {
-    id: "capacitorBank",
-    name: "content:modules.capacitorBank.name",
-    desc: "content:modules.capacitorBank.desc",
+  }),
+  moduleDef("capacitorBank", {
     rarity: "rare",
     price: 85,
     tag: "dice",
@@ -177,11 +148,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "resonator",
-    name: "content:modules.resonator.name",
-    desc: "content:modules.resonator.desc",
+  }),
+  moduleDef("resonator", {
     rarity: "rare",
     price: 80,
     tag: "dice",
@@ -205,11 +173,8 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "modDieValue", n: 2 }],
       },
     ],
-  },
-  {
-    id: "recycler",
-    name: "content:modules.recycler.name",
-    desc: "content:modules.recycler.desc",
+  }),
+  moduleDef("recycler", {
     rarity: "rare",
     price: 85,
     tag: "dice",
@@ -224,5 +189,5 @@ export const DICE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
+  }),
 ];

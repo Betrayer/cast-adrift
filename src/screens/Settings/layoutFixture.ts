@@ -24,6 +24,8 @@ const projection = (
   sensor: null,
   overflowHull: 0,
   jammed: false,
+  hits: 0,
+  fragments: [],
   ...patch,
 });
 
@@ -76,7 +78,7 @@ export const PREVIEW_SLOTS: readonly FixtureSlot[] = [
     legal: false,
     projection: projection('engines', {
       kind: 'engine',
-      evasion: { dodgePct: 25, glancingPct: 25, intercept: false },
+      evasion: { dodgePct: 6, glancingPct: 14, intercept: false },
     }),
   },
   {

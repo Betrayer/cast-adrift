@@ -13,6 +13,7 @@ export const SystemMenu = () => {
   const opened = useAppStore((s) => s.systemMenu);
   const setSystemMenu = useAppStore((s) => s.setSystemMenu);
   const setBuildSheet = useAppStore((s) => s.setBuildSheet);
+  const screen = useAppStore((s) => s.screen);
   const go = useAppStore((s) => s.go);
   const [confirming, setConfirming] = useState(false);
 
@@ -43,30 +44,28 @@ export const SystemMenu = () => {
     <AppSheet
       label={t('run:system.title')}
       testId="system-menu"
+      closeLabel={t('run:system.resume')}
+      closeTestId="system-resume"
       onClose={close}
     >
-      <div className={styles.head}>
-        <Text fw={700} c={tokens.text}>
-          {t('run:system.title')}
-        </Text>
-        <Button
-          size="compact-sm"
-          variant="subtle"
-          color="gray"
-          data-testid="system-resume"
-          onClick={close}
-        >
-          {t('run:system.resume')}
-        </Button>
-      </div>
       <div className={styles.body}>
-        {entry('build', t('run:build.open'), () => {
-          setSystemMenu(false);
-          setBuildSheet(true);
-        })}
+        {entry(
+          'build',
+          t(screen === 'battle' ? 'run:build.open' : 'run:bridge.open'),
+          () => {
+            setSystemMenu(false);
+            if (screen === 'battle') setBuildSheet(true);
+            else go('bridge');
+          },
+        )}
         {entry('journal', t('run:journal.open'), () => {
-          go('journal');
+          go('journal', { tab: 'story' });
         })}
+        {screen === 'battle'
+          ? entry('battlelog', t('run:journal.openBattle'), () => {
+              go('journal', { tab: 'battle' });
+            })
+          : null}
         {entry('codex', t('run:codex.title'), () => {
           go('codex');
         })}

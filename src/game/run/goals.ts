@@ -108,21 +108,22 @@ export const evaluateGoal = (spec: GoalSpec, ctx: GoalContext): boolean => {
   }
 };
 
-const WIN_ONLY: ReadonlySet<GoalKind> = new Set<GoalKind>([
-  "win",
-  "hullPctAtLeast",
-  "scrapAtLeast",
-  "axisAtMost",
-  "axisAtLeast",
-  "depthWithDeckAtLeast",
-  "allBeaconsResolved",
-  "deckSchoolsAtLeast",
-  "dicePlacedAtMost",
-  "elitesAtMost",
+export const LOSS_SCORED: ReadonlySet<GoalKind> = new Set<GoalKind>([
+  "burnKillElite",
+  "shieldAbsorbedAtLeast",
+  "spinalHitAtLeast",
+  "fastBattleTurnsAtMost",
+  "repairBayHealAtLeast",
+  "fullHullBattleEndsAtLeast",
+  "minibossKilled",
+  "elitesAtLeast",
+  "beaconResolved",
+  "anomaliesSolvedAtLeast",
+  "blackPlacedInWinAtLeast",
 ]);
 
 export const goalMet = (spec: GoalSpec, ctx: GoalContext): boolean => {
-  if (WIN_ONLY.has(spec.g) && !ctx.win) return false;
+  if (!ctx.win && !LOSS_SCORED.has(spec.g)) return false;
   return evaluateGoal(spec, ctx);
 };
 

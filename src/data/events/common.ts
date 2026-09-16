@@ -175,6 +175,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
               { k: "axis", n: 2 },
               { k: "flag", key: "crewSaved" },
               { k: "flag", key: "yusufFriend" },
+              { k: "officer", id: "breaker" },
             ],
           },
         ],
@@ -351,6 +352,18 @@ export const COMMON_EVENTS: readonly EventDef[] = [
           {
             text: "content:events.scavRefit.out.pass",
             effects: [{ k: "scrap", n: 18 }],
+          },
+        ],
+      },
+      {
+        id: "haul",
+        label: "content:events.scavRefit.opt.haul",
+        requires: { req: "cargo", id: "choirContraband" },
+        outcomes: [
+          {
+            text: "content:events.scavRefit.out.haul",
+            effects: [{ k: "cargo", id: "choirContraband" }],
+            consequence: "content:consequence.cargoTaken",
           },
         ],
       },
@@ -901,6 +914,18 @@ export const COMMON_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "haul",
+        label: "content:events.theOtherSalvager.opt.haul",
+        requires: { req: "cargo", id: "liveHold" },
+        outcomes: [
+          {
+            text: "content:events.theOtherSalvager.out.haul",
+            effects: [{ k: "cargo", id: "liveHold" }],
+            consequence: "content:consequence.cargoTaken",
+          },
+        ],
+      },
     ],
   },
   {
@@ -1102,6 +1127,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "hullMax", n: 12 },
               { k: "hull", n: -6 },
+              { k: "officer", id: "welder" },
             ],
             consequence: "content:consequence.petitionAccepted",
           },

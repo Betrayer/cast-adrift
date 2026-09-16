@@ -46,6 +46,10 @@
   border-bottom: 1px solid var(--ca-line);
 }
 
+.banner {
+  margin-top: 6px;
+}
+
 .zoomControls {
   position: absolute;
   left: 12px;

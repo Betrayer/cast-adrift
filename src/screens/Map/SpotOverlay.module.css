@@ -1,0 +1,87 @@
+.spot {
+  pointer-events: none;
+}
+
+.spotOpen {
+  cursor: pointer;
+}
+
+.outer,
+.mid,
+.inner,
+.far,
+.near,
+.core {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.outer {
+  animation: spotSpin 26s linear infinite;
+}
+
+.mid {
+  animation: spotSpinBack 15s linear infinite;
+}
+
+.inner {
+  animation: spotSpin 8s linear infinite;
+}
+
+.far {
+  animation: spotSpinBack 19s linear infinite;
+}
+
+.near {
+  animation: spotSpin 11s linear infinite;
+}
+
+.core {
+  animation: spotBreathe 6s ease-in-out infinite;
+}
+
+.mote {
+  animation: spotTwinkle 3.2s ease-in-out infinite;
+}
+
+@keyframes spotSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spotSpinBack {
+  to {
+    transform: rotate(-360deg);
+  }
+}
+
+@keyframes spotBreathe {
+  0%,
+  100% {
+    opacity: 0.86;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes spotTwinkle {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.92;
+  }
+}
+
+:root[data-ca-motion='reduced'] .outer,
+:root[data-ca-motion='reduced'] .mid,
+:root[data-ca-motion='reduced'] .inner,
+:root[data-ca-motion='reduced'] .far,
+:root[data-ca-motion='reduced'] .near,
+:root[data-ca-motion='reduced'] .core,
+:root[data-ca-motion='reduced'] .mote {
+  animation: none;
+}

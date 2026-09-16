@@ -1,4 +1,4 @@
-import type { EpilogueContext } from "@/data/narrative/epilogue";
+import { flag, type EpilogueContext } from "@/data/narrative/epilogue";
 import type { LocKey } from "@/types/content";
 
 export interface DeathLine {
@@ -8,65 +8,53 @@ export interface DeathLine {
   applies: (ctx: EpilogueContext) => boolean;
 }
 
-const flag = (ctx: EpilogueContext, key: string): boolean =>
-  ctx.flags[key] !== undefined;
+const death = (
+  id: string,
+  body: Omit<DeathLine, "id" | "text">,
+): DeathLine => ({
+  id,
+  text: `content:death.${id}`,
+  ...body,
+});
 
 export const DEATH_LINES: readonly DeathLine[] = [
-  {
-    id: "pact",
-    text: "content:death.pact",
+  death("pact", {
     reads: ["pactSealed", "pactStep1"],
     applies: (ctx) => flag(ctx, "pactSealed") || flag(ctx, "pactStep1"),
-  },
-  {
-    id: "beacons",
-    text: "content:death.beacons",
+  }),
+  death("beacons", {
     reads: [],
     applies: (ctx) => ctx.beaconsResolved >= 3,
-  },
-  {
-    id: "resonant",
-    text: "content:death.resonant",
+  }),
+  death("resonant", {
     reads: [],
     applies: (ctx) => ctx.axis <= -5,
-  },
-  {
-    id: "stable",
-    text: "content:death.stable",
+  }),
+  death("stable", {
     reads: [],
     applies: (ctx) => ctx.axis >= 5,
-  },
-  {
-    id: "alone",
-    text: "content:death.alone",
+  }),
+  death("alone", {
     reads: ["maraGrudge", "yusufGrudge", "choirEnemy"],
     applies: (ctx) =>
       flag(ctx, "maraGrudge") || flag(ctx, "yusufGrudge") || flag(ctx, "choirEnemy"),
-  },
-  {
-    id: "friends",
-    text: "content:death.friends",
+  }),
+  death("friends", {
     reads: ["maraFriend", "yusufFriend"],
     applies: (ctx) => flag(ctx, "maraFriend") || flag(ctx, "yusufFriend"),
-  },
-  {
-    id: "deep",
-    text: "content:death.deep",
+  }),
+  death("deep", {
     reads: [],
     applies: (ctx) => ctx.sector >= 4,
-  },
-  {
-    id: "firstRun",
-    text: "content:death.firstRun",
+  }),
+  death("firstRun", {
     reads: ["prologueRun"],
     applies: (ctx) => flag(ctx, "prologueRun"),
-  },
-  {
-    id: "quiet",
-    text: "content:death.quiet",
+  }),
+  death("quiet", {
     reads: [],
     applies: () => true,
-  },
+  }),
 ];
 
 export const deathLineFor = (ctx: EpilogueContext): LocKey =>

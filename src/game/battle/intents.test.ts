@@ -1,7 +1,11 @@
 import { describe, expect, it } from "vitest";
 import { ENEMY_BY_ID } from "@/data/enemies";
-import { harnessDie, harnessSnap } from "@/game/battle/battleHarness";
+import { harnessBoard, harnessDie } from "@/game/battle/battleHarness";
 import { applyJam, applyWeaponDamage } from "@/game/battle/damage";
+import {
+  enemyFixture,
+  registerEnemyFixtures,
+} from "@/game/battle/enemyFixtures";
 import { advanceTurn, resolveEnemyPhase } from "@/game/battle/resolver";
 import {
   drawIntent,
@@ -11,10 +15,18 @@ import {
   stepContextFor,
 } from "@/game/battle/setup";
 import { createStream, createStreams } from "@/services/rng";
-import type { BattleSnapshot, EnemyState } from "@/types/battle";
-import type { Intent } from "@/types/content";
+import type { BattleSnapshot, EnemyState, RolledDie } from "@/types/battle";
+import type { EnemyDef, Intent } from "@/types/content";
 
 const stream = () => createStream(9090);
+
+const FIXTURES: readonly EnemyDef[] = [
+  enemyFixture({ id: "fxBroker", hp: 60 }),
+  enemyFixture({ id: "fxRager", hp: 40 }),
+  enemyFixture({ id: "fxWarded", hp: 40, ward: true }),
+];
+
+registerEnemyFixtures(FIXTURES);
 
 const armed = (defId: string, intent: Intent): EnemyState => ({
   ...spawnEnemy(defId, "enemy-0", stream()),
@@ -23,25 +35,15 @@ const armed = (defId: string, intent: Intent): EnemyState => ({
 
 const withEnemy = (
   enemy: EnemyState,
+  dice: RolledDie[] = [],
   over: Partial<BattleSnapshot> = {},
 ): BattleSnapshot =>
-  harnessSnap([], {
-    enemies: [enemy],
-    targetId: enemy.id,
-    hull: 60,
-    hullMax: 60,
-    ...over,
-  });
+  harnessBoard([enemy], dice, { hull: 60, hullMax: 60, ...over });
 
 describe("curseDie", () => {
   it("cuts the cursed die's roll for two turns and then lets go", () => {
     const enemy = armed("capWraith", { t: "curseDie", n: 3 });
-    const snap = harnessSnap([harnessDie("d0", "red-d6", 6)], {
-      enemies: [enemy],
-      targetId: enemy.id,
-      hull: 60,
-      hullMax: 60,
-    });
+    const snap = withEnemy(enemy, [harnessDie("d0", "red-d6", 6)]);
     const cursed = resolveEnemyPhase(snap, stream());
     expect(cursed.next.cursedDice).toHaveLength(1);
     expect(cursed.beats.some((b) => b.kind === "curse")).toBe(true);
@@ -54,12 +56,7 @@ describe("curseDie", () => {
 
   it("never drives a face below 1", () => {
     const enemy = armed("capWraith", { t: "curseDie", n: 9 });
-    const snap = harnessSnap([harnessDie("d0", "red-d6", 2)], {
-      enemies: [enemy],
-      targetId: enemy.id,
-      hull: 60,
-      hullMax: 60,
-    });
+    const snap = withEnemy(enemy, [harnessDie("d0", "red-d6", 2)]);
     const cursed = resolveEnemyPhase(snap, stream());
     const rolled = advanceTurn(cursed.next, createStreams(11));
     expect(rolled.dice[0]?.value).toBe(1);
@@ -102,12 +99,7 @@ describe("mirrorSchool", () => {
       harnessDie("d3", "blue-d6", 4),
     ];
     const enemy = armed("slotMirror", { t: "mirrorSchool" });
-    const snap = harnessSnap(dice, {
-      enemies: [enemy],
-      targetId: enemy.id,
-      hull: 60,
-      hullMax: 60,
-    });
+    const snap = withEnemy(enemy, dice);
     const result = resolveEnemyPhase(snap, stream());
     expect(60 - result.next.hull).toBe(3);
   });
@@ -117,14 +109,14 @@ describe("drainCharge", () => {
   it("takes the charge and charges itself only when the player was holding it", () => {
     const hoarding = armed("capacitorWraith", { t: "drainCharge", n: 5 });
     const drained = resolveEnemyPhase(
-      withEnemy(hoarding, { charge: 8 }),
+      withEnemy(hoarding, [], { charge: 8 }),
       stream(),
     );
     expect(drained.next.charge).toBe(3);
     expect(drained.next.enemies[0]?.statuses.charge).toBe(1);
 
     const empty = armed("capacitorWraith", { t: "drainCharge", n: 5 });
-    const nothing = resolveEnemyPhase(withEnemy(empty, { charge: 2 }), stream());
+    const nothing = resolveEnemyPhase(withEnemy(empty, [], { charge: 2 }), stream());
     expect(nothing.next.charge).toBe(0);
     expect(nothing.next.enemies[0]?.statuses.charge).toBeUndefined();
   });
@@ -133,7 +125,7 @@ describe("drainCharge", () => {
 describe("siphonShield", () => {
   it("moves the player's shield onto the enemy and never takes more than there is", () => {
     const enemy = armed("causalWard", { t: "siphonShield", n: 8 });
-    const result = resolveEnemyPhase(withEnemy(enemy, { shield: 5 }), stream());
+    const result = resolveEnemyPhase(withEnemy(enemy, [], { shield: 5 }), stream());
     expect(result.next.shield).toBe(0);
     expect(result.next.enemies[0]?.shield).toBe(5);
   });
@@ -141,26 +133,26 @@ describe("siphonShield", () => {
 
 describe("bargain", () => {
   it("takes the scrap and heals when the player can pay", () => {
-    const enemy = armed("usurer", { t: "bargain", n: 6, heal: 4 });
+    const enemy = armed("fxBroker", { t: "bargain", n: 6, heal: 4 });
     enemy.hp = enemy.hpMax - 10;
-    const paid = resolveEnemyPhase(withEnemy(enemy, { scrap: 9 }), stream());
+    const paid = resolveEnemyPhase(withEnemy(enemy, [], { scrap: 9 }), stream());
     expect(paid.next.scrap).toBe(3);
     expect(paid.next.enemies[0]?.hp).toBe(enemy.hpMax - 6);
     expect(paid.next.hull).toBe(60);
   });
 
   it("bills the refusal for exactly what paying would have cost", () => {
-    const enemy = armed("usurer", { t: "bargain", n: 6, heal: 4 });
-    const unpaid = resolveEnemyPhase(withEnemy(enemy, { scrap: 1 }), stream());
+    const enemy = armed("fxBroker", { t: "bargain", n: 6, heal: 4 });
+    const unpaid = resolveEnemyPhase(withEnemy(enemy, [], { scrap: 1 }), stream());
     expect(unpaid.next.scrap).toBe(1);
     expect(60 - unpaid.next.hull).toBe(6);
   });
 
   it("pays out of the run purse when the battle pot is empty", () => {
-    const enemy = armed("usurer", { t: "bargain", n: 6, heal: 4 });
+    const enemy = armed("fxBroker", { t: "bargain", n: 6, heal: 4 });
     enemy.hp = enemy.hpMax - 10;
     const paid = resolveEnemyPhase(
-      withEnemy(enemy, { scrap: 0, runScrap: 20 }),
+      withEnemy(enemy, [], { scrap: 0, runScrap: 20 }),
       stream(),
     );
     expect(paid.next.runScrap).toBe(14);
@@ -170,8 +162,8 @@ describe("bargain", () => {
 });
 
 describe("enrage", () => {
-  it("stacks onto every later hit, and a sensor jam clears it on the Colossus", () => {
-    const enemy = armed("cantorColossus", { t: "enrage", n: 2 });
+  it("stacks onto every later hit", () => {
+    const enemy = armed("fxRager", { t: "enrage", n: 2 });
     const raging = resolveEnemyPhase(withEnemy(enemy), stream());
     const live = raging.next.enemies[0];
     expect(live?.rage).toBe(2);
@@ -184,15 +176,27 @@ describe("enrage", () => {
     );
     expect(60 - hit.next.hull).toBeGreaterThanOrEqual(12);
   });
+
+  it("a sensor jam clears the whole stack on the Colossus", () => {
+    const enemy = armed("cantorColossus", { t: "enrage", n: 2 });
+    const raging = resolveEnemyPhase(withEnemy(enemy), stream());
+    const snap = raging.next;
+    const live = snap.enemies[0];
+    if (live === undefined) throw new Error("no enemy");
+    expect(live.rage ?? 0).toBeGreaterThan(0);
+
+    applyJam(snap, live);
+    expect(live.rage).toBe(0);
+  });
 });
 
 describe("hijack", () => {
   it("pins the highest tray die into a slot on the next roll", () => {
     const enemy = armed("dragnet", { t: "hijack" });
-    const snap = harnessSnap(
-      [harnessDie("d0", "red-d6", 2), harnessDie("d1", "red-d6", 6)],
-      { enemies: [enemy], targetId: enemy.id, hull: 60, hullMax: 60 },
-    );
+    const snap = withEnemy(enemy, [
+      harnessDie("d0", "red-d6", 2),
+      harnessDie("d1", "red-d6", 6),
+    ]);
     const grabbed = resolveEnemyPhase(snap, stream());
     expect(grabbed.next.pendingHijack).toBe(1);
 
@@ -219,10 +223,10 @@ describe("jamSlot with a count", () => {
 describe("lockDie targeting", () => {
   it("takes the highest tray face when the intent asks for it", () => {
     const enemy = armed("leechSkiff", { t: "lockDie", target: "highest" });
-    const snap = harnessSnap(
-      [harnessDie("d0", "red-d6", 2), harnessDie("d1", "red-d6", 6)],
-      { enemies: [enemy], targetId: enemy.id, hull: 60, hullMax: 60 },
-    );
+    const snap = withEnemy(enemy, [
+      harnessDie("d0", "red-d6", 2),
+      harnessDie("d1", "red-d6", 6),
+    ]);
     const result = resolveEnemyPhase(snap, stream());
     expect(result.next.lockedDice[0]?.uid).toBe("d1");
   });
@@ -249,11 +253,11 @@ describe("enemy traits", () => {
   });
 
   it("the ward halves the school it is holding out and nothing else", () => {
-    const sliver = spawnEnemy("coreSliver", "enemy-0", stream());
-    sliver.ward = "red";
-    const snap = withEnemy(sliver);
-    expect(applyWeaponDamage(snap, { enemy: sliver }, 8, false, false, "red")).toBe(4);
-    expect(applyWeaponDamage(snap, { enemy: sliver }, 8, false, false, "blue")).toBe(8);
+    const warded = spawnEnemy("fxWarded", "enemy-0", stream());
+    warded.ward = "red";
+    const snap = withEnemy(warded);
+    expect(applyWeaponDamage(snap, { enemy: warded }, 8, false, false, "red")).toBe(4);
+    expect(applyWeaponDamage(snap, { enemy: warded }, 8, false, false, "blue")).toBe(8);
   });
 
   it("the ward rotates to a different school on the enemy turn", () => {
@@ -275,11 +279,6 @@ describe("enemy traits", () => {
     applyJam(snap, live);
     expect(snap.blockedSlots).toHaveLength(0);
   });
-
-  it("every reroll charges the Tollmaster", () => {
-    const def = ENEMY_BY_ID.get("tollmaster");
-    expect(def?.feedsOnReroll).toBe(true);
-  });
 });
 
 describe("on-death effects", () => {
@@ -287,9 +286,7 @@ describe("on-death effects", () => {
     const dying = spawnEnemy(defId, "enemy-0", stream());
     const ally = spawnEnemy("scavDrone", "enemy-1", stream());
     ally.hp = 1;
-    const snap = harnessSnap([harnessDie("d0", "red-d6", 6)], {
-      enemies: [dying, ally],
-      targetId: dying.id,
+    const snap = harnessBoard([dying, ally], [harnessDie("d0", "red-d6", 6)], {
       hull: 60,
       hullMax: 60,
       ...over,

@@ -5,7 +5,8 @@ import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
 import { settleAchievements } from "@/game/meta/achievements";
 import { noteEventResolved } from "@/game/meta/counters";
-import { DECK_CAP, ptsForDie, sellValue } from "@/game/economy/prices";
+import { ptsForDie } from "@/game/economy/prices";
+import { grantCargo, grantDie, grantOfficer } from "@/game/run/inventory";
 import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
 import { emitRunHook } from "@/game/run/runEffects";
 import { playSfx } from "@/services/audio";
@@ -35,17 +36,12 @@ const applyLoot = (
   rarity: string | undefined,
   stream: RngStream,
 ): void => {
-  const run = useRunStore.getState();
   const defId =
     die ??
     (rarity !== undefined
       ? dieForRarity(stream, rarity as never)
       : dieForRarity(stream, "common"));
-  if (run.deck.length < DECK_CAP) {
-    run.addDie(defId);
-  } else {
-    run.addScrap(sellValue(ptsForDie(defId)));
-  }
+  grantDie(defId);
 };
 
 const applySwapLowest = (stream: RngStream): void => {
@@ -98,6 +94,12 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
     case "swapLowestDie":
       applySwapLowest(stream);
       return;
+    case "officer":
+      grantOfficer(effect.id);
+      return;
+    case "cargo":
+      grantCargo(effect.id);
+      return;
     case "battleMod":
       run.addBattleMod({
         kind: effect.mod,
@@ -107,6 +109,7 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
       return;
     case "nodeMod":
       if (effect.mod === "revealRows") run.addBonusReveal(effect.n ?? 2);
+      else if (effect.mod === "sectorReveal") run.addSectorReveal(effect.n ?? 1);
       else if (effect.mod === "shipyardDiscount")
         run.addShipyardDiscount(effect.n ?? 30);
       else if (effect.mod === "endHeal") run.addBattleEndHeal(effect.n ?? 1);

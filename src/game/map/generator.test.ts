@@ -11,11 +11,13 @@ import {
   areConnected,
   edgeKey,
   outgoingEdges,
+  type HoleSpot,
   type MapGraph,
   type MapNode,
   type NodeId,
   type NodeType,
 } from "@/game/map/types";
+import { bypassIsLateral } from "@/game/map/wormhole";
 
 const generate = (seed: number, sector = 1): MapGraph =>
   generateSectorMap(createStreams(seed).map, sector);
@@ -162,6 +164,7 @@ describe("map generator", () => {
   it("marks mine edges in sector 2 without sealing a node's only exit", () => {
     for (let seed = 1; seed <= 20; seed += 1) {
       const map = generate(seed, 2);
+      const byId = new Map(map.nodes.map((n) => [n.id, n]));
       const marks = Object.entries(map.edgeMarks);
       const mines = marks.filter(([, mark]) => mark === "mine");
       expect(mines.length, `seed ${String(seed)}`).toBeGreaterThan(0);
@@ -169,11 +172,21 @@ describe("map generator", () => {
         const hit = map.edges.find(([a, b]) => edgeKey(a, b) === key);
         expect(hit, `${key} must be a real edge`).toBeDefined();
       }
+      for (const [key, mark] of mines) {
+        const to = key.split("->")[1];
+        expect(mark, key).toBe("mine");
+        expect(byId.get(to ?? "")?.hole, `${key} never mines into a spot`).not.toBe(
+          true,
+        );
+      }
       for (const node of map.nodes) {
+        if (node.hole === true) continue;
         const outs = outgoingEdges(map, node.id);
         if (outs.length === 0) continue;
         const clean = outs.filter(
-          (to) => map.edgeMarks[edgeKey(node.id, to)] !== "mine",
+          (to) =>
+            byId.get(to)?.hole !== true &&
+            map.edgeMarks[edgeKey(node.id, to)] !== "mine",
         );
         expect(clean.length, `${node.id} keeps a free exit`).toBeGreaterThan(0);
       }
@@ -337,12 +350,15 @@ describe("map generator", () => {
 
 const HOLE_SECTORS: readonly number[] = [2, 3, 4, 5, 6];
 const HOLE_SWEEP = 200;
+const SPOT_SPAN_ROWS = 3;
+const SPOT_SPAN_LANES = 2;
+const MIN_SPOT_NODES = 2;
 
-const holeCountFor = (sector: number): number => {
+const holeSpanFor = (sector: number): readonly [number, number] => {
   const motif = sectorDef(sector).shape.motifs.find(
     (m) => m.m === "blackHoles",
   );
-  return motif?.m === "blackHoles" ? motif.count : 0;
+  return motif?.m === "blackHoles" ? motif.span : [0, 0];
 };
 
 const playReachable = (map: MapGraph): Set<NodeId> => {
@@ -363,12 +379,37 @@ const playReachable = (map: MapGraph): Set<NodeId> => {
   return seen;
 };
 
+const spotIsConnected = (map: MapGraph, spot: HoleSpot): boolean => {
+  const members = new Set(spot.nodes);
+  const first = spot.nodes[0];
+  if (first === undefined) return false;
+  const linked = new Map<NodeId, NodeId[]>();
+  for (const [a, b] of map.edges) {
+    if (!members.has(a) || !members.has(b)) continue;
+    linked.set(a, [...(linked.get(a) ?? []), b]);
+    linked.set(b, [...(linked.get(b) ?? []), a]);
+  }
+  const seen = new Set<NodeId>([first]);
+  const queue: NodeId[] = [first];
+  while (queue.length > 0) {
+    const cur = queue.shift();
+    if (cur === undefined) break;
+    for (const next of linked.get(cur) ?? []) {
+      if (seen.has(next)) continue;
+      seen.add(next);
+      queue.push(next);
+    }
+  }
+  return seen.size === members.size;
+};
+
 describe("black holes", () => {
   it("never places a hole in sector 1", () => {
     for (let seed = 1; seed <= 40; seed += 1) {
       const map = generate(seed, 1);
       expect(map.nodes.some((n) => n.hole === true)).toBe(false);
       expect(Object.keys(map.wormholes)).toHaveLength(0);
+      expect(map.spots).toHaveLength(0);
     }
   });
 
@@ -376,47 +417,125 @@ describe("black holes", () => {
     const degraded: Record<number, number> = {};
     for (const sector of HOLE_SECTORS) {
       const shape = sectorDef(sector).shape;
-      const want = holeCountFor(sector);
-      const lastRow = Math.min(shape.bossRow - 2, shape.gateRow + 3);
+      const span = holeSpanFor(sector);
       let short = 0;
       for (let seed = 1; seed <= HOLE_SWEEP; seed += 1) {
         const map = generate(seed, sector);
         const label = `S${String(sector)} seed ${String(seed)}`;
         const byId = new Map(map.nodes.map((n) => [n.id, n]));
         const holes = map.nodes.filter((n) => n.hole === true);
-        expect(holes.length, label).toBeLessThanOrEqual(want);
-        if (holes.length < want) short += 1;
+        expect(map.spots.length, label).toBeLessThanOrEqual(1);
+        expect(holes.length, label).toBeLessThanOrEqual(span[1]);
+        expect(holes.length, label).toBeGreaterThanOrEqual(MIN_SPOT_NODES);
+        if (holes.length < span[0]) short += 1;
 
-        const rows = holes.map((n) => n.row).sort((a, b) => a - b);
-        rows.forEach((row, index) => {
-          expect(row, label).toBeGreaterThanOrEqual(4);
-          expect(row, label).toBeLessThanOrEqual(lastRow);
+        const spot = map.spots[0];
+        expect(spot, `${label} ships one spot`).toBeDefined();
+        if (spot === undefined) continue;
+        expect([...spot.nodes].sort()).toEqual(holes.map((n) => n.id).sort());
+        for (const node of holes) {
+          expect(node.spot, `${label} ${node.id} carries the spot id`).toBe(
+            spot.id,
+          );
+          expect(
+            map.spots.filter((s) => s.nodes.includes(node.id)).length,
+            `${label} ${node.id} belongs to one spot`,
+          ).toBe(1);
+        }
+        expect(spotIsConnected(map, spot), `${label} spot is connected`).toBe(
+          true,
+        );
+        for (const node of holes) {
+          expect(node.pocket, label).toBeUndefined();
+          expect(node.cache, label).toBeUndefined();
+          expect(
+            node.type,
+            `${label} ${node.id} was never populated`,
+          ).toBe("battle");
+        }
+
+        const live = map.nodes.filter(
+          (n) => n.hole !== true && n.pocket !== true,
+        );
+        const liveOf = (type: NodeType): number =>
+          live.filter((n) => n.type === type).length;
+        expect(liveOf("shipyard"), `${label} reachable shipyards`).toBe(
+          shape.quotas.shipyards,
+        );
+        expect(liveOf("shop"), `${label} reachable shops`).toBe(
+          shape.quotas.shops,
+        );
+        expect(liveOf("beacon"), `${label} reachable beacons`).toBe(
+          shape.quotas.beacons,
+        );
+        expect(liveOf("elite"), label).toBeGreaterThanOrEqual(
+          shape.quotas.elites[0],
+        );
+        expect(liveOf("elite"), label).toBeLessThanOrEqual(
+          shape.quotas.elites[1],
+        );
+        expect(liveOf("event"), label).toBeGreaterThanOrEqual(1);
+        expect(liveOf("anomaly"), label).toBeGreaterThanOrEqual(1);
+
+        const rows = holes.map((n) => n.row);
+        const lanes = holes.map((n) => n.lane);
+        expect(spot.rows, label).toEqual([
+          Math.min(...rows),
+          Math.max(...rows),
+        ]);
+        expect(spot.lanes, label).toEqual([
+          Math.min(...lanes),
+          Math.max(...lanes),
+        ]);
+        expect(spot.rows[1] - spot.rows[0] + 1, label).toBeLessThanOrEqual(
+          SPOT_SPAN_ROWS,
+        );
+        expect(spot.lanes[1] - spot.lanes[0] + 1, label).toBeLessThanOrEqual(
+          SPOT_SPAN_LANES,
+        );
+        for (const row of rows) {
+          expect(row, label).toBeGreaterThanOrEqual(3);
+          expect(row, label).toBeLessThanOrEqual(shape.bossRow - 2);
           expect(row, label).not.toBe(shape.gateRow);
-          const prev = rows[index - 1];
-          if (prev !== undefined) expect(row - prev, label).toBeGreaterThanOrEqual(3);
-        });
+        }
 
-        for (const hole of holes) {
-          expect(hole.pocket, label).toBeUndefined();
-          expect(hole.type, label).toBe("battle");
-          const feeders = map.edges.filter(([, b]) => b === hole.id);
-          expect(feeders.length, `${label} ${hole.id} has a feeder`).toBeGreaterThan(0);
-          for (const [from] of feeders) {
-            const key = edgeKey(from, hole.id);
-            expect(map.edgeMarks[key], `${label} ${key} is a wormhole`).toBe(
-              "wormhole",
-            );
-            const record = map.wormholes[key];
-            expect(record, `${label} ${key} carries a record`).toBeDefined();
-            if (record === undefined) continue;
-            expect(record.from, label).toBe(from);
-            expect(record.hole, label).toBe(hole.id);
-            const bypass = byId.get(record.bypass);
-            expect(bypass, `${label} bypass exists`).toBeDefined();
-            expect(bypass?.hole, label).toBeUndefined();
-            expect(bypass?.row, label).toBe(hole.row);
-            expect(areConnected(map, from, record.bypass), label).toBe(true);
+        for (const row of new Set(map.nodes.map((n) => n.row))) {
+          const live = map.nodes.filter(
+            (n) => n.row === row && n.hole !== true,
+          );
+          expect(live.length, `${label} row ${String(row)} keeps a node`).toBeGreaterThan(
+            0,
+          );
+        }
+
+        const entries = map.edges.filter(
+          ([a, b]) => byId.get(b)?.hole === true && byId.get(a)?.hole !== true,
+        );
+        expect(entries.length, `${label} the spot has an entry`).toBeGreaterThan(
+          0,
+        );
+        expect(Object.keys(map.wormholes).length, label).toBe(entries.length);
+        for (const [from, into] of entries) {
+          const key = edgeKey(from, into);
+          expect(map.edgeMarks[key], `${label} ${key} is a wormhole`).toBe(
+            "wormhole",
+          );
+          const record = map.wormholes[key];
+          expect(record, `${label} ${key} carries a record`).toBeDefined();
+          if (record === undefined) continue;
+          expect(record.from, label).toBe(from);
+          expect(record.hole, label).toBe(into);
+          const bypass = byId.get(record.bypass);
+          expect(bypass, `${label} bypass exists`).toBeDefined();
+          expect(bypass?.hole, label).toBeUndefined();
+          expect(bypass?.row, label).toBe(byId.get(into)?.row);
+          if (areConnected(map, from, record.bypass)) {
             expect(map.edgeMarks[edgeKey(from, record.bypass)], label).toBeUndefined();
+          } else {
+            expect(
+              bypassIsLateral(map, from, into, [START_NODE_ID]),
+              `${label} ${key} slips sideways`,
+            ).toBe(true);
           }
         }
 

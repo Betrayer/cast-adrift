@@ -75,7 +75,8 @@
     "hijack": "Przejmuje twoją najlepszą kostkę",
     "echoTotal": "powtarza twoją ostatnią turę (maksymalnie {{n}})",
     "foldOrder": "realizuje zamówienie",
-    "devourDie": "zużywa twoją najlepszą zapasową kostkę"
+    "devourDie": "zużywa twoją najlepszą zapasową kostkę",
+    "idle": "Trzyma"
   },
   "slot": {
     "weaponA": "Broń A",
@@ -88,7 +89,7 @@
     "reactor": "Reaktor",
     "repairBay": "Stacja naprawcza",
     "cap": "cap ≤ d{{cap}} · Mk{{mk}}",
-    "evasion": "unik {{dodge}}% · muśnięcie {{glancing}}%",
+    "evasion": "mu {{glancing}}% · un {{dodge}}%",
     "affinity": "{{school}} +{{n}}",
     "affinityMult": "{{school}} ×{{n}}",
     "capShrunk": "limit ≤ d{{cap}} ▽ · Mk{{mk}}",
@@ -96,7 +97,8 @@
     "inheritsMult": "tutaj: {{school}} ×{{n}}",
     "capShort": "≤d{{cap}}",
     "mkTitle": "Poziomy Mk",
-    "enginesB": "Silniki II"
+    "enginesB": "Silniki II",
+    "pin": "≤d{{cap}} · Mk{{mk}}"
   },
   "intro": {
     "miniboss": "Mini-boss",
@@ -139,8 +141,8 @@
   "dieMeta": "d{{tier}} · {{school}} · {{faces}} · śr. {{ev}}",
   "targetBody": "Celuj w kadłub",
   "targetSub": "{{name}} {{hp}}/{{max}}",
-  "mitigation": "surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
-  "mitigationNone": "Ten zamiar nie zadaje obrażeń",
+  "mitigation": "przychodzące surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
+  "mitigationNone": "Ten przeciwnik nie zada obrażeń w tej turze",
   "forecast": "zadasz {{out}} · przyjmiesz ~{{inc}} (tarcza trzyma {{shield}})",
   "forecastClear": "{{out}} obrażeń czyści pole",
   "resBoard": "{{school}} {{placed}}+{{tray}}",
@@ -150,7 +152,9 @@
     "blue": "nie",
     "green": "zie",
     "grey": "sza",
-    "black": "cza"
+    "black": "cza",
+    "yellow": "żół",
+    "prismatic": "pry"
   },
   "proj": {
     "jam": "ZACINA",
@@ -164,7 +168,9 @@
     "damageSum": "{{value}} = {{base}}+{{bonus}}",
     "none": "—",
     "chargeOverflow": "+{{n}}⚡ · −{{hull}}♥",
-    "damageMark": "{{amount}} = {{value}}+{{mark}}"
+    "damageMark": "{{amount}} = {{value}}+{{mark}}",
+    "damageCost": "{{amount}} = {{value}}−{{cost}}",
+    "damageSplit": "{{amount}} obrażeń · {{split}}"
   },
   "block": {
     "resolving": "Poczekaj na rozliczenie tury",
@@ -178,7 +184,13 @@
     "reserveFull": "Rezerwa pełna",
     "used": "Już użyte w tej turze",
     "hullLow": "Za mało kadłuba",
+    "notAllowed": "Teraz się nie da",
+    "occupied": "W tym slocie leży już kość",
+    "tierCap": "Kość jest za duża na ten slot",
+    "slotBlocked": "Ten slot jest zablokowany w tej turze",
+    "dieLocked": "Ta kość jest zablokowana",
     "noPartner": "Do wyżarzania potrzebna jest druga matryca tacowa o tej samej wartości.",
+    "needsTwoEnemies": "Ten tryb ognia wymaga dwóch żywych celów",
     "spent": "Statek może wykonać tę akcję raz na bitwę."
   },
   "resPrism": "kość pryzmatyczna liczy się do tej szkoły",
@@ -197,9 +209,10 @@
     "reserve": "▣"
   },
   "projShort": {
-    "dodge": "{{n}}%",
+    "glance": "{{n}}%",
     "mark": "+{{n}}",
     "value": "{{n}}",
+    "split": "{{split}}",
     "none": "—"
   },
   "conveyor": {
@@ -287,7 +300,8 @@
     "hijack": "Chwyta twoją najwyższą kość i przybija ją w wybranym slocie.",
     "echoTotal": "Odbija obrażenia z twojej poprzedniej tury, do {{n}}.",
     "foldOrder": "Składa kolejność rozstrzygania na dwie tury.",
-    "devourDie": "Zjada twoją najwyższą kość: spada do 1, a wróg zyskuje tyle tarczy."
+    "devourDie": "Zjada twoją najwyższą kość: spada do 1, a wróg zyskuje tyle tarczy.",
+    "idle": "W tej turze nic nie robi."
   },
   "aura": {
     "atk+2": "+2 do każdego ciosu tego wroga.",
@@ -301,6 +315,16 @@
     "summonEvery4": "Co czwartą turę: wzywa akolitę.",
     "stealOnHit6": "Każdy trafiony cios zabiera 6 złomu."
   },
+  "partDeath": {
+    "explodePart": "Jej zniszczenie uderza w ciebie za {{n}}.",
+    "enrageCore": "Jej zniszczenie wścieka rdzeń: +{{n}} do każdego kolejnego ciosu.",
+    "openCore": "Jej zniszczenie otwiera rdzeń na {{turns}} tury.",
+    "shieldCore": "Jej zniszczenie oddaje rdzeniowi {{n}} tarczy.",
+    "spawnAdds": "Jej zniszczenie wzywa kolejny statek."
+  },
+  "coreSealed": "Rdzeń zapieczętowany",
+  "coreSealedWhy": "Kadłub pozostaje zamknięty, dopóki nie zniszczysz jeszcze {{n}} jego części.",
+  "coreOpenWhy": "Kadłub pozostaje otwarty do końca tury {{n}}.",
   "statusName": {
     "burn": "Płomień",
     "mark": "Podatność",
@@ -320,14 +344,16 @@
   "interferenceWhy": "Pominięte anomalie się kumulują: każdy stos dokłada kolejny poziom przypływu do końca przebiegu. Rozwiązanie anomalii kasuje wszystkie.",
   "interferenceTitle": "Zakłócenia",
   "axisWhy": "Czarne kości ciągną ku Rezonansowi, niebieskie ku Stabilności. Zdarzenia i dryf też ruszają oś.",
-  "chargeWhy": "Ładunek płaci za akcje: −1 kosztuje 3, +1 kosztuje 3, kupiony przerzut 5, zryw 10.",
+  "chargeWhy": "Ładunek płaci za akcje: −1 kosztuje {{n}}, +1 kosztuje {{n}}, kupiony przerzut 5, zryw 10.",
   "chargeTitle": "Ładunek",
   "mkWhy": "Mk podnosi limit slotu i bonus powinowactwa jego szkoły.",
   "resEarned": "Zdobyte",
   "manoeuvreTitle": "Manewr",
-  "manoeuvreWhy": "Kość w Silnikach ustala jeden rzut uniku na turę: unik {{dodge}}% × wartość (maks. {{dodgeCap}}%), muśnięcie {{glancing}}% × wartość (maks. {{glancingCap}}%). Unik nie przyjmuje nic, muśnięcie połowę, reszta trafia w całości. Od wartości {{intercept}} pierwszy cios jest przechwytywany w całości. Wartość to kość po powinowactwie i bonusach.",
+  "manoeuvreWhy": "Kość w Silnikach ustala jeden rzut uniku na każdy przychodzący cios: muśnięcie {{glancing}}% × wartość (maks. {{glancingCap}}%), unik {{dodge}}% × wartość (maks. {{dodgeCap}}%). Muśnięcie przyjmuje połowę, w górę, unik nic, reszta trafia w całości. Od wartości {{intercept}} pierwsza udana ewazja tury — muśnięcie lub unik — to przechwycenie: Broń +1 w następnej turze. Wartość to kość po powinowactwie i bonusach.",
+  "manoeuvreBrief": "Jeden rzut na cios: muśnięcie {{glancing}}% × wartość (maks {{glancingCap}}%), unik {{dodge}}% × wartość (maks {{dodgeCap}}%). Muśnięcie przyjmuje połowę, unik nic. Od {{intercept}} pierwsza ewazja daje Broń +1.",
   "targetingTitle": "Naprowadzanie",
   "targetingWhy": "Kość w Sensorach czyni cel Podatnym +D na turę: D to połowa wartości kości zaokrąglona w górę, nie więcej niż {{cap}}, a każdy cios w tej turze zadaje o tyle więcej. Na najwyższej ściance kości cios dodatkowo przebija tarczę. Mk Sensorów dodatkowo odsłania jeden rząd mapy za każdy poziom powyżej Mk1.",
+  "targetingBrief": "Sensory znaczą cel: Wrażliwy +D na turę, D to połowa wartości kości w górę, maks {{cap}}. Każdy cios tej tury zadaje tyle więcej; maksymalna ścianka przebija też tarczę.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systemy",
   "journal": {
@@ -346,7 +372,8 @@
       "sensor": "osoby w trudnej sytuacji + {{n}}",
       "charge": "+{{n}} Ładunek",
       "repair": "+{{n}} Kadłub",
-      "storm": "lekki podmuch wiatru"
+      "storm": "lekki podmuch wiatru",
+      "partDown": "część «{{name}}» zniszczona"
     },
     "foe": {
       "attack": "ataki na stronę {{n}}",
@@ -376,5 +403,15 @@
       "fold": "realizuje zamówienie",
       "devour": "pożera kostkę"
     }
+  },
+  "mode": {
+    "title": "Tryb ognia",
+    "label": "Tryb ognia: {{mode}}"
+  },
+  "echo": {
+    "after": "Potem",
+    "fork": "{{cond}} — {{then}}. W przeciwnym razie — {{else}}.",
+    "fixed": "{{intent}}.",
+    "open": "Losowane z jego wzoru — nie jest ustalone."
   }
 }

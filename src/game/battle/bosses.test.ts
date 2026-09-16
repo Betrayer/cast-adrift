@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { harnessDie, harnessSnap } from "@/game/battle/battleHarness";
+import { harnessBoard, harnessDie } from "@/game/battle/battleHarness";
 import {
   advanceTurn,
   resolveEnemyPhase,
@@ -13,6 +13,7 @@ import {
 import { BOSS_BY_ID } from "@/data/enemies";
 import { createStream, createStreams } from "@/services/rng";
 import type { BattleSnapshot, EnemyState } from "@/types/battle";
+import type { Intent } from "@/types/content";
 
 const stream = () => createStream(4242);
 
@@ -22,8 +23,7 @@ const boss = (id: string, init: SpawnInit = {}): EnemyState =>
 const withEnemy = (
   enemy: EnemyState,
   over: Partial<BattleSnapshot> = {},
-): BattleSnapshot =>
-  harnessSnap([], { enemies: [enemy], targetId: enemy.id, ...over });
+): BattleSnapshot => harnessBoard([enemy], [], over);
 
 const killSubsystem = (enemy: EnemyState, key: string): void => {
   const sub = enemy.subsystems.find((s) => s.key === key);
@@ -57,13 +57,24 @@ describe("Quarantine Warden", () => {
   });
 
   it("Aegis aura shields the boss every enemy turn", () => {
-    const enemy = boss("quarantineWarden");
-    enemy.nextIntent = { t: "charge" };
-    const result = resolveEnemyPhase(
-      withEnemy(enemy, { hull: 60, hullMax: 60 }),
+    const armed = boss("quarantineWarden");
+    armed.nextIntent = { t: "charge" };
+    const withAegis = resolveEnemyPhase(
+      withEnemy(armed, { hull: 60, hullMax: 60 }),
       stream(),
     );
-    expect(result.next.enemies[0]?.shield).toBe(6);
+
+    const stripped = boss("quarantineWarden");
+    stripped.nextIntent = { t: "charge" };
+    killSubsystem(stripped, "aegis");
+    const withoutAegis = resolveEnemyPhase(
+      withEnemy(stripped, { hull: 60, hullMax: 60 }),
+      stream(),
+    );
+
+    const shieldOf = (snap: BattleSnapshot): number =>
+      snap.enemies[0]?.shield ?? 0;
+    expect(shieldOf(withAegis.next) - shieldOf(withoutAegis.next)).toBe(6);
   });
 
   it("drops into the jam phase below 50% hp and shields on entry", () => {
@@ -84,16 +95,36 @@ describe("Quarantine Warden", () => {
   });
 });
 
+const armPart = (enemy: EnemyState, key: string, intent: Intent): void => {
+  const part = enemy.subsystems.find((s) => s.key === key);
+  if (part === undefined) throw new Error(`armPart: no "${key}"`);
+  part.nextIntent = intent;
+};
+
 describe("Breaker Barge", () => {
-  it("Grinder aura steals scrap when its attack lands", () => {
+  it("Grinder aura steals scrap when its attack lands, and the maw takes 6 more", () => {
     const enemy = boss("breakerBarge");
     enemy.nextIntent = { t: "attack", n: 8 };
+    armPart(enemy, "maw", { t: "stealScrap", n: 6 });
     const result = resolveEnemyPhase(
       withEnemy(enemy, { hull: 60, hullMax: 60, scrap: 2 }),
       stream(),
     );
-    expect(result.beats.some((b) => b.kind === "steal")).toBe(true);
+    expect(result.beats.filter((b) => b.kind === "steal")).toHaveLength(2);
     expect(result.next.scrap).toBe(0);
+    expect(result.next.stolenScrap).toBe(10);
+  });
+
+  it("stops the maw's theft when the maw dies, and keeps the grinder's", () => {
+    const enemy = boss("breakerBarge");
+    enemy.nextIntent = { t: "attack", n: 8 };
+    armPart(enemy, "maw", { t: "stealScrap", n: 6 });
+    killSubsystem(enemy, "maw");
+    const result = resolveEnemyPhase(
+      withEnemy(enemy, { hull: 60, hullMax: 60, scrap: 2 }),
+      stream(),
+    );
+    expect(result.beats.filter((b) => b.kind === "steal")).toHaveLength(1);
     expect(result.next.stolenScrap).toBe(4);
   });
 
@@ -102,7 +133,7 @@ describe("Breaker Barge", () => {
     enemy.nextIntent = { t: "charge" };
     const dice = [harnessDie("d0", "red-d6", 4)];
     const quiet = resolveEnemyPhase(
-      harnessSnap(dice, { turn: 2, enemies: [enemy], targetId: enemy.id }),
+      harnessBoard([enemy], dice, { turn: 2 }),
       stream(),
     );
     expect(quiet.next.lockedDice).toHaveLength(0);
@@ -110,11 +141,7 @@ describe("Breaker Barge", () => {
     const enemy3 = boss("breakerBarge");
     enemy3.nextIntent = { t: "charge" };
     const locked = resolveEnemyPhase(
-      harnessSnap([harnessDie("d0", "red-d6", 4)], {
-        turn: 3,
-        enemies: [enemy3],
-        targetId: enemy3.id,
-      }),
+      harnessBoard([enemy3], [harnessDie("d0", "red-d6", 4)], { turn: 3 }),
       stream(),
     );
     expect(locked.next.lockedDice).toHaveLength(1);
@@ -125,10 +152,7 @@ describe("Rift Maw", () => {
   it("both Maw-Eyes queue a twist each turn, and the twist keeps the worse roll", () => {
     const enemy = boss("riftMaw");
     enemy.nextIntent = { t: "charge" };
-    const snap = harnessSnap([harnessDie("d0", "red-d6", 6)], {
-      enemies: [enemy],
-      targetId: enemy.id,
-    });
+    const snap = harnessBoard([enemy], [harnessDie("d0", "red-d6", 6)]);
     const result = resolveEnemyPhase(snap, stream());
     expect(result.next.pendingTwist).toBe(2);
 
@@ -160,7 +184,7 @@ describe("Choir Flagship", () => {
     const enemy = boss("choirFlagship");
     enemy.nextIntent = { t: "charge" };
     const result = resolveEnemyPhase(
-      harnessSnap([], { turn: 4, enemies: [enemy], targetId: enemy.id }),
+      harnessBoard([enemy], [], { turn: 4 }),
       stream(),
     );
     expect(result.next.enemies.some((e) => e.defId === "choirAcolyte")).toBe(
@@ -172,14 +196,14 @@ describe("Choir Flagship", () => {
     const quietEnemy = boss("choirFlagship");
     quietEnemy.nextIntent = { t: "attack", n: 9 };
     const quiet = resolveEnemyPhase(
-      harnessSnap([], { turn: 2, enemies: [quietEnemy], targetId: quietEnemy.id, hull: 60, hullMax: 60 }),
+      harnessBoard([quietEnemy], [], { turn: 2, hull: 60, hullMax: 60 }),
       stream(),
     );
 
     const hymnEnemy = boss("choirFlagship");
     hymnEnemy.nextIntent = { t: "attack", n: 9 };
     const hymn = resolveEnemyPhase(
-      harnessSnap([], { turn: 3, enemies: [hymnEnemy], targetId: hymnEnemy.id, hull: 60, hullMax: 60 }),
+      harnessBoard([hymnEnemy], [], { turn: 3, hull: 60, hullMax: 60 }),
       stream(),
     );
     expect(60 - hymn.next.hull).toBeGreaterThan(60 - quiet.next.hull);

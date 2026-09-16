@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { duckMusic, playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
-import { resolveReducedMotion, useSettingsStore } from '@/stores/settingsStore';
+import { useReducedMotion } from '@/stores/settingsStore';
 import { useBattleStore } from '@/stores/battleStore';
 import styles from './FateInvocation.module.css';
 
@@ -11,9 +11,7 @@ const ORBIT_RADIUS = 72;
 
 export const FateInvocation = () => {
   const fateUses = useBattleStore((s) => s.fateUses);
-  const reduced = resolveReducedMotion(
-    useSettingsStore((s) => s.reducedMotion),
-  );
+  const reduced = useReducedMotion();
   const [visible, setVisible] = useState(false);
   const prevUses = useRef(fateUses);
 

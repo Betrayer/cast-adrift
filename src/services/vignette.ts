@@ -2,12 +2,15 @@ export type VignetteSide = "all" | "left" | "right" | "top" | "bottom";
 
 export type VignetteFlashKind =
   | "shieldGain"
+  | "shieldHold"
   | "shieldBreak"
   | "hullHit"
   | "dodge"
   | "glancing"
   | "surge"
-  | "toll";
+  | "toll"
+  | "bossPartDown"
+  | "weatherEntry";
 
 export type VignetteRimKind = "shield" | "lowHull";
 
@@ -16,6 +19,7 @@ export interface VignetteFlash {
   kind: VignetteFlashKind;
   side: VignetteSide;
   strength: number;
+  color?: string;
 }
 
 export type VignetteRims = Record<VignetteRimKind, boolean>;
@@ -23,6 +27,7 @@ export type VignetteRims = Record<VignetteRimKind, boolean>;
 export interface VignetteFlashOptions {
   side?: VignetteSide;
   strength?: number;
+  color?: string;
 }
 
 export type VignetteEvent =
@@ -60,6 +65,7 @@ export const flashVignette = (
     kind,
     side: options.side ?? "all",
     strength: Math.max(0, Math.min(1, options.strength ?? 1)),
+    ...(options.color === undefined ? {} : { color: options.color }),
   };
   lastFlash = flash;
   emit({ k: "flash", flash });

@@ -1,13 +1,34 @@
 import { BARKS, type BarkDef } from "@/data/barks";
 import { computeMutatorMods } from "@/data/mutators";
+import { logBark } from "@/game/run/journal";
 import { createStream, type RngStream } from "@/services/rng";
-import { useNarrativeStore } from "@/stores/narrativeStore";
 import { useRunStore } from "@/stores/runStore";
 import { useSettingsStore } from "@/stores/settingsStore";
 import type { Outcome } from "@/types/events";
 
 const RING = 20;
 const GLOBAL_MS = 20000;
+
+const MAJOR_TRIGGERS: ReadonlySet<string> = new Set([
+  "resume",
+  "threshold",
+  "memory",
+  "bossPhase",
+  "bossPartDown",
+  "minibossIntro",
+  "lowHull",
+  "nearDeathWin",
+  "levelUp",
+  "wormholeRide",
+  "holeBypass",
+  "officerRescued",
+]);
+
+const MAJOR_PREFIXES: readonly string[] = ["sectorEnter:"];
+
+export const isMajorBarkTrigger = (trigger: string): boolean =>
+  MAJOR_TRIGGERS.has(trigger) ||
+  MAJOR_PREFIXES.some((prefix) => trigger.startsWith(prefix));
 
 let recent: string[] = [];
 let lastBarkAt = 0;
@@ -20,6 +41,9 @@ const rng = (): RngStream => {
 };
 
 const clock = (): number => Date.now();
+
+export const barkBudgetWaitMs = (): number =>
+  Math.max(0, GLOBAL_MS - (clock() - lastBarkAt));
 
 export const resetBarkMemory = (): void => {
   recent = [];
@@ -41,12 +65,12 @@ const eligible = (
 export const emitBark = (trigger: string): void => {
   const verbosity = useSettingsStore.getState().echoVerbosity;
   if (verbosity === "off") return;
+  if (verbosity === "less" && !isMajorBarkTrigger(trigger)) return;
   if (computeMutatorMods(useRunStore.getState().mutators).barksOff) return;
   const now = clock();
   if (now - lastBarkAt < GLOBAL_MS) return;
 
   const cooldownMult = verbosity === "less" ? 2 : 1;
-  const weightMult = verbosity === "less" ? 0.5 : 1;
 
   const candidates = BARKS.filter(
     (b) => b.trigger === trigger && eligible(b, now, cooldownMult),
@@ -57,9 +81,7 @@ export const emitBark = (trigger: string): void => {
     candidates.length === 1
       ? candidates[0]
       : rng().weighted(
-          candidates.map(
-            (b) => [b, Math.max(1, b.weight * weightMult)] as const,
-          ),
+          candidates.map((b) => [b, Math.max(1, b.weight)] as const),
         );
   if (chosen === undefined) return;
 
@@ -72,7 +94,7 @@ export const emitBark = (trigger: string): void => {
   if (recent.length > RING) recent = recent.slice(recent.length - RING);
   triggerLast.set(chosen.id, now);
   lastBarkAt = now;
-  useNarrativeStore.getState().pushBark(line);
+  logBark(line);
 };
 
 const outcomeNegative = (outcome: Outcome): boolean =>

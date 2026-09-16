@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import {
   ACTIVE_UID_KEY,
   ADOPTED_KEY,
@@ -110,5 +110,53 @@ describe("uid-scoped storage namespace", () => {
     ns.setActiveUid("uid-a");
     expect(ns.activeUid()).toBe("uid-a");
     expect(ns.scopedKey("meta")).toBe("ca.uid-a.meta");
+  });
+});
+
+describe("device storage probe", () => {
+  const withGlobalLocalStorage = async (
+    get: () => unknown,
+    body: (module: typeof import("@/services/profile")) => void | Promise<void>,
+  ): Promise<void> => {
+    const original = Object.getOwnPropertyDescriptor(globalThis, "localStorage");
+    Object.defineProperty(globalThis, "localStorage", { configurable: true, get });
+    try {
+      vi.resetModules();
+      await body(await import("@/services/profile"));
+    } finally {
+      if (original === undefined) Reflect.deleteProperty(globalThis, "localStorage");
+      else Object.defineProperty(globalThis, "localStorage", original);
+      vi.resetModules();
+    }
+  };
+
+  it("boots on a storage whose getter itself throws", async () => {
+    await withGlobalLocalStorage(
+      () => {
+        throw new Error("Access is denied for this document.");
+      },
+      (module) => {
+        const storage = module.browserStorage();
+        storage.setItem(ACTIVE_UID_KEY, "uid-a");
+        expect(storage.getItem(ACTIVE_UID_KEY)).toBe("uid-a");
+        expect(module.deviceKeys()).toEqual([]);
+        expect(module.scopedKey("meta")).toBe("ca.meta");
+        module.setActiveUid("uid-a");
+        expect(module.scopedKey("meta")).toBe("ca.uid-a.meta");
+      },
+    );
+  });
+
+  it("keeps using a storage that works instead of falling back to memory", async () => {
+    const real = createMemoryStorage();
+    real.setItem(ACTIVE_UID_KEY, "uid-real");
+    await withGlobalLocalStorage(
+      () => real,
+      (module) => {
+        expect(module.activeUid()).toBe("uid-real");
+        module.deviceStorage.setItem("ca.uid-real.meta", "payload");
+        expect(real.getItem("ca.uid-real.meta")).toBe("payload");
+      },
+    );
   });
 });

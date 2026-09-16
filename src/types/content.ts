@@ -64,7 +64,8 @@ export type Intent =
   | { t: "hijack" }
   | { t: "echoTotal"; cap: number }
   | { t: "foldOrder" }
-  | { t: "devourDie" };
+  | { t: "devourDie" }
+  | { t: "idle" };
 
 export type IntentKind = Intent["t"];
 
@@ -95,6 +96,7 @@ export const INTENT_KINDS: readonly IntentKind[] = [
   "echoTotal",
   "foldOrder",
   "devourDie",
+  "idle",
 ];
 
 export type StepCond =
@@ -136,11 +138,28 @@ export const SUBSYSTEM_AURAS: readonly SubsystemAura[] = [
   "stealOnHit6",
 ];
 
+export type PartDeathEffect =
+  | { t: "explodePart"; n: number }
+  | { t: "enrageCore"; n: number }
+  | { t: "openCore"; turns: number }
+  | { t: "shieldCore"; n: number }
+  | { t: "spawnAdds"; id: string };
+
+export const PART_DEATH_KINDS: readonly PartDeathEffect["t"][] = [
+  "explodePart",
+  "enrageCore",
+  "openCore",
+  "shieldCore",
+  "spawnAdds",
+];
+
 export interface SubsystemDef {
   id: string;
   name: LocKey;
   hp: number;
-  aura: SubsystemAura;
+  aura?: SubsystemAura;
+  intents?: PatternStep[];
+  onDeath?: PartDeathEffect;
 }
 
 export type SlotId =
@@ -192,12 +211,16 @@ export type EnemyTrait =
   | "feedsOnReroll"
   | "ward"
   | "jamReleasesBlocks"
-  | "jamClearsRage";
+  | "jamClearsRage"
+  | "partIntents"
+  | "coreLock";
 
 export type SignatureClaim =
   | { k: "intent"; t: IntentKind }
   | { k: "aura"; is: SubsystemAura }
   | { k: "onDeath"; t: OnDeathEffect["t"] }
+  | { k: "partIntent"; t: IntentKind }
+  | { k: "partDeath"; t: PartDeathEffect["t"] }
   | { k: "trait"; is: EnemyTrait };
 
 export interface EnemyDef {
@@ -224,6 +247,7 @@ export interface EnemyDef {
   jamClearsRage?: boolean;
   onDeath?: OnDeathEffect;
   subsystems?: SubsystemDef[];
+  coreLockAt?: number;
   phases?: readonly PhaseScript[];
 }
 
@@ -250,6 +274,14 @@ const stepClaims = (step: PatternStep, out: Set<string>): void => {
   if ("when" in step) out.add(JSON.stringify({ k: "trait", is: "conditional" }));
   for (const intent of intentsOfStep(step)) {
     out.add(JSON.stringify({ k: "intent", t: intent.t }));
+  }
+};
+
+const partStepClaims = (step: PatternStep, out: Set<string>): void => {
+  if ("pick" in step) out.add(JSON.stringify({ k: "trait", is: "pick" }));
+  if ("when" in step) out.add(JSON.stringify({ k: "trait", is: "conditional" }));
+  for (const intent of intentsOfStep(step)) {
+    out.add(JSON.stringify({ k: "partIntent", t: intent.t }));
   }
 };
 
@@ -290,8 +322,20 @@ export const trueClaimsOf = (def: EnemyDef): ReadonlySet<string> => {
   if ((def.subsystems ?? []).length > 0) {
     out.add(JSON.stringify({ k: "trait", is: "subsystems" }));
     for (const sub of def.subsystems ?? []) {
-      out.add(JSON.stringify({ k: "aura", is: sub.aura }));
+      if (sub.aura !== undefined) {
+        out.add(JSON.stringify({ k: "aura", is: sub.aura }));
+      }
+      for (const step of sub.intents ?? []) partStepClaims(step, out);
+      if ((sub.intents ?? []).length > 0) {
+        out.add(JSON.stringify({ k: "trait", is: "partIntents" }));
+      }
+      if (sub.onDeath !== undefined) {
+        out.add(JSON.stringify({ k: "partDeath", t: sub.onDeath.t }));
+      }
     }
+  }
+  if (def.shell === true && def.coreLockAt !== undefined) {
+    out.add(JSON.stringify({ k: "trait", is: "coreLock" }));
   }
   if ((def.stealOnHit ?? 0) > 0) out.add(JSON.stringify({ k: "trait", is: "stealOnHit" }));
   for (const trait of FLAG_TRAITS) {
@@ -308,4 +352,4 @@ export const trueClaimsOf = (def: EnemyDef): ReadonlySet<string> => {
 export const claimKey = (claim: SignatureClaim): string => JSON.stringify(claim);
 
 export const specialClaimCount = (def: EnemyDef): number =>
-  def.claims.filter((c) => c.k !== "intent").length;
+  def.claims.filter((c) => c.k !== "intent" && c.k !== "partIntent").length;

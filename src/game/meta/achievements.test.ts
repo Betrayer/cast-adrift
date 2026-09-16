@@ -84,9 +84,9 @@ const chainFlags = (chainId: string): string[] => {
 };
 
 describe("achievement catalogue", () => {
-  it("compiles ninety-three definitions with unique ids", () => {
-    expect(ACHIEVEMENTS).toHaveLength(93);
-    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(93);
+  it("compiles ninety-six definitions with unique ids", () => {
+    expect(ACHIEVEMENTS).toHaveLength(96);
+    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(96);
   });
 
   it("gates eleven of them on content and reads flags in seven", () => {
@@ -411,7 +411,7 @@ describe("id migration", () => {
     expect(migrated.stats.kills).toBe(700);
     expect(migrated.vouchers).toEqual({ perkDraft: 0 });
     expect(migrated.voucherOffers).toEqual([]);
-    expect(META_VERSION).toBe(14);
+    expect(META_VERSION).toBe(18);
   });
 
   it("keeps a die unlock reachable through its renamed achievement", () => {
@@ -463,12 +463,13 @@ describe("settlement", () => {
     expect(meta.achievements).toContain("sectorFive");
     expect(meta.shards).toBe(settled.shards);
     expect(meta.unlocksGranted).toContain("diceAchFirstClear");
-    expect(useNarrativeStore.getState().achievement?.achievement).toBe(
-      "sectorFive",
-    );
+    expect(
+      useNarrativeStore.getState().feed.find((m) => m.source === "achievement")
+        ?.key,
+    ).toBe("sectorFive");
     const dice = unlockedDice(unlockContextOf(useMetaStore.getState()));
     expect(dice.has("aurora")).toBe(true);
-    useNarrativeStore.getState().dismissAchievement();
+    useNarrativeStore.getState().clearFeed();
     const again = settleAchievements();
     expect(again.unlocked).toHaveLength(0);
     expect(again.shards).toBe(0);

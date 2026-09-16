@@ -1,33 +1,23 @@
 import { useTranslation } from 'react-i18next';
+import { cx } from '@/app/cx';
 import { schoolGlyphPath } from '@/data/glyphs';
-import { CHARGE_CAP } from '@/game/battle/resolver';
 import type { SlotProjection } from '@/game/battle/view';
 import {
   affinityNote,
   projectionText,
   projectionTone,
   slotSchool,
+  type SlotViewProps,
 } from '@/screens/Battle/board/slotText';
-import type { SlotId, SlotState } from '@/types/battle';
 import type { School } from '@/types/content';
 import styles from './Board.module.css';
 
-export interface SlotCardProps {
-  slotId: SlotId;
-  slot: SlotState;
-  order: number;
-  projection: SlotProjection | undefined;
-  occupiedBy: string | undefined;
-  blocked: boolean;
+export interface SlotCardProps extends SlotViewProps {
   shrunk: boolean;
-  legal: boolean;
-  goal: boolean;
   charge: number;
-  onTap: (slotId: SlotId) => void;
-  preview?: boolean;
+  chargeCap: number;
+  formula?: boolean;
 }
-
-const CHARGE_PIPS = 10;
 
 export const SlotGlyph = ({ school }: { school: School }) => {
   const glyph = schoolGlyphPath(school, 6, 6, 4.4);
@@ -65,7 +55,9 @@ export const SlotCard = ({
   legal,
   goal,
   charge,
+  chargeCap,
   onTap,
+  formula = false,
   preview = false,
 }: SlotCardProps) => {
   const { t } = useTranslation(['battle']);
@@ -79,16 +71,15 @@ export const SlotCard = ({
       type="button"
       {...(preview ? {} : { 'data-slot': slotId })}
       {...(preview || !goal ? {} : { 'data-goal': '1' })}
+      {...(formula ? { 'data-formula': '1' } : {})}
       data-school={school}
       {...(preview ? {} : { 'data-testid': `slot-${slotId}` })}
-      className={[
-        styles.card ?? '',
-        legal ? styles.cardLegal ?? '' : '',
-        occupiedBy === undefined ? '' : styles.cardOccupied ?? '',
-        blocked ? styles.cardBlocked ?? '' : '',
-      ]
-        .filter((name) => name !== '')
-        .join(' ')}
+      className={cx(
+        styles.card,
+        legal && styles.cardLegal,
+        occupiedBy !== undefined && styles.cardOccupied,
+        blocked && styles.cardBlocked,
+      )}
       aria-label={t(`battle:slot.${slotId}`)}
       aria-hidden={preview}
       tabIndex={preview ? -1 : undefined}
@@ -106,11 +97,12 @@ export const SlotCard = ({
       <span className={styles.cap}>
         {shrunk ? t('battle:slot.capShrunk', { cap: slot.cap, mk: slot.mk }) : cap}
       </span>
+      {blocked ? (
+        <span className={styles.blocked}>{t('battle:jam')}</span>
+      ) : null}
       {note === null ? null : (
         <span
-          className={`${styles.affinity ?? ''} ${
-            inherits === null ? '' : styles.affinityInherited ?? ''
-          }`}
+          className={cx(styles.affinity, inherits !== null && styles.affinityInherited)}
           data-inherits={inherits ?? undefined}
         >
           {note}
@@ -118,23 +110,26 @@ export const SlotCard = ({
       )}
       {projection === undefined ? null : (
         <span
-          className={`${styles.proj ?? ''} ${toneClass(projection)}`}
+          key={projectionText(t, slotId, projection)}
+          className={cx(styles.proj, toneClass(projection))}
           data-proj={preview ? undefined : slotId}
           data-tone={preview ? undefined : projectionTone(projection)}
         >
           {projectionText(t, slotId, projection)}
         </span>
       )}
-      {blocked ? <span className={styles.blocked}>{t('battle:jam')}</span> : null}
       <span className={styles.well} {...(preview ? {} : { 'data-well': '' })} />
       {slotId === 'reactor' ? (
-        <span className={styles.pips} aria-hidden>
-          {Array.from({ length: CHARGE_PIPS }, (_, i) => (
+        <span
+          className={styles.pips}
+          aria-hidden
+          {...(preview ? {} : { 'data-charge-pips': String(chargeCap) })}
+        >
+          {Array.from({ length: chargeCap }, (_, i) => (
             <span
               key={i}
-              className={`${styles.pip ?? ''} ${
-                i < Math.min(charge, CHARGE_CAP) ? styles.pipOn ?? '' : ''
-              }`}
+              className={cx(styles.pip, i < Math.min(charge, chargeCap) && styles.pipOn)}
+              data-pip={i < Math.min(charge, chargeCap) ? 'on' : 'off'}
             />
           ))}
         </span>

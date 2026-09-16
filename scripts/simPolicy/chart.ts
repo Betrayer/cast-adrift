@@ -1,7 +1,8 @@
 import { CHART_NODES } from "../../src/data/chart";
 import type { ChartNodeDef } from "../../src/data/chart/types";
 import type { PerkMods } from "../../src/data/perks/types";
-import { canAllocate, pointsTotal } from "../../src/game/chart/engine";
+import { chartNodeCost } from "../../src/game/chart/cost";
+import { canAllocate, pointsSpent, pointsTotal } from "../../src/game/chart/engine";
 import { computeChartMods } from "../../src/game/run/runMods";
 
 const MOD_WEIGHTS: Partial<Record<keyof PerkMods, number>> = {
@@ -56,11 +57,12 @@ export const buildChartPicks = (level: number): string[] => {
   const budget = pointsTotal(level);
   const picks: string[] = [];
   for (let step = 0; step < budget; step += 1) {
+    if (pointsSpent(picks) >= budget) break;
     let best: ChartNodeDef | undefined;
     let bestScore = Number.NEGATIVE_INFINITY;
     for (const def of CHART_NODES) {
       if (!canAllocate(def.id, level, picks)) continue;
-      const score = nodeValue(def);
+      const score = nodeValue(def) / Math.max(1, chartNodeCost(def.id));
       if (score > bestScore) {
         bestScore = score;
         best = def;

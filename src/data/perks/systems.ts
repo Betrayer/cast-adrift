@@ -19,7 +19,7 @@ export const SYSTEM_PERKS: readonly PerkDef[] = [
   }),
   perk("afterburner", "systems", "common", {
     tags: ["engines", "dodge"],
-    mods: { evasionDelta: 6, hullMaxDelta: -2 },
+    mods: { evasionDelta: 2, hullMaxDelta: -2 },
   }),
   perk("hullWeld", "systems", "common", {
     tags: ["repairBay"],

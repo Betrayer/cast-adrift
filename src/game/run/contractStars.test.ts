@@ -3,6 +3,7 @@ import { CONTRACTS, type ContractDef } from "@/data/contracts";
 import { BEACON_FLAGS } from "@/data/events/beacons";
 import {
   goalStarsMask,
+  LOSS_SCORED,
   type GoalContext,
   type GoalSpec,
 } from "@/game/run/goals";
@@ -165,6 +166,20 @@ describe("contract stars are reachable", () => {
       expect(goalStarsMask(def.goals, scriptRun(def.goals))).toBe(ALL_STARS);
     });
   }
+
+  it("banks no star a lost run did not demonstrably earn", () => {
+    for (const def of CONTRACTS) {
+      let expected = 0;
+      def.goals.forEach((spec, index) => {
+        if (LOSS_SCORED.has(spec.g)) expected |= 1 << index;
+      });
+      const mask = goalStarsMask(def.goals, {
+        ...scriptRun(def.goals),
+        win: false,
+      });
+      expect(mask).toBe(expected);
+    }
+  });
 
   it("awards only the clear for a bare win", () => {
     const bare = (def: ContractDef): number =>

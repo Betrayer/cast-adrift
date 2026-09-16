@@ -40,3 +40,13 @@
     align-items: start;
   }
 }
+
+.entry[data-journal-focus] {
+  background: var(--ca-surface2);
+  box-shadow: inset 3px 0 0 var(--ca-amber);
+  transition: background 240ms ease-out;
+}
+
+:root[data-ca-motion='reduced'] .entry[data-journal-focus] {
+  transition: none;
+}

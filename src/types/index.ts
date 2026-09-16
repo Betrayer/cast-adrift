@@ -15,6 +15,7 @@ export type ScreenId =
   | 'runSetup'
   | 'map'
   | 'journal'
+  | 'bridge'
   | 'battle'
   | 'event'
   | 'puzzle'

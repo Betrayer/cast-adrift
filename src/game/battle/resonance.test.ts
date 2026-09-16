@@ -212,8 +212,8 @@ describe("black resonance", () => {
     const { next } = resolvePlayerPhase(snap);
     expect(next.hull).toBe(29);
     expect(next.evasion).toEqual({
-      dodgePct: 48,
-      glancingPct: 24,
+      dodgePct: 10,
+      glancingPct: 25,
       intercept: true,
     });
   });

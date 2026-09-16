@@ -28,6 +28,20 @@ export const clearBackGuards = (): void => {
   guards.clear();
 };
 
+let blockers = 0;
+
+export const backBlocked = (): boolean => blockers > 0;
+
+export const useBackBlock = (active: boolean): void => {
+  useEffect(() => {
+    if (!active) return;
+    blockers += 1;
+    return () => {
+      blockers -= 1;
+    };
+  }, [active]);
+};
+
 export const useBackGuard = (
   screen: ScreenId,
   guard: BackGuard | null,

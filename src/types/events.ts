@@ -34,7 +34,8 @@ export type OptionRequirement =
   | { req: "dieSchool"; school: School }
   | { req: "mk"; slot: SlotId; mk: MkLevel }
   | { req: "flag"; key: string }
-  | { req: "axis"; min?: number; max?: number };
+  | { req: "axis"; min?: number; max?: number }
+  | { req: "cargo"; id: string };
 
 export type CheckPick = "sum" | "highest" | "lowest";
 
@@ -50,6 +51,7 @@ export interface CheckDef {
 export type BattleModKind = "startCharge" | "enemyPlus";
 export type NodeModKind =
   | "revealRows"
+  | "sectorReveal"
   | "shipyardDiscount"
   | "endHeal"
   | "rerollSize";
@@ -63,6 +65,8 @@ export type EventEffect =
   | { k: "flag"; key: string; value?: FlagValue }
   | { k: "loot"; die?: string; rarity?: Rarity }
   | { k: "swapLowestDie" }
+  | { k: "officer"; id: string }
+  | { k: "cargo"; id: string }
   | { k: "battleMod"; mod: BattleModKind; n?: number; battles?: number }
   | { k: "nodeMod"; mod: NodeModKind; n?: number };
 

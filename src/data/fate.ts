@@ -17,115 +17,102 @@ export interface FateOutcome {
   do: readonly Action[];
 }
 
+const fate = (
+  id: string,
+  body: Omit<FateOutcome, "id" | "text">,
+): FateOutcome => ({
+  id,
+  text: `content:fate.${id}`,
+  ...body,
+});
+
 export const FATE_TABLE: readonly FateOutcome[] = [
-  {
-    id: "severance",
+  fate("severance", {
     min: 1,
     max: 1,
     band: "catastrophe",
-    text: "content:fate.severance",
     do: [{ a: "hull", n: -8 }],
-  },
-  {
-    id: "misfire",
+  }),
+  fate("misfire", {
     min: 2,
     max: 10,
     band: "setback",
-    text: "content:fate.misfire",
     do: [{ a: "hull", n: -4 }],
-  },
-  {
-    id: "interference",
+  }),
+  fate("interference", {
     min: 11,
     max: 20,
     band: "setback",
-    text: "content:fate.interference",
     do: [
       { a: "scrap", n: -10 },
       { a: "charge", n: -3 },
     ],
-  },
-  {
-    id: "trade",
+  }),
+  fate("trade", {
     min: 21,
     max: 35,
     band: "mixed",
-    text: "content:fate.trade",
     do: [
       { a: "hull", n: -2 },
       { a: "charge", n: 5 },
     ],
-  },
-  {
-    id: "wash",
+  }),
+  fate("wash", {
     min: 36,
     max: 48,
     band: "mixed",
-    text: "content:fate.wash",
     do: [{ a: "scrap", n: 8 }],
-  },
-  {
-    id: "ripple",
+  }),
+  fate("ripple", {
     min: 49,
     max: 60,
     band: "mixed",
-    text: "content:fate.ripple",
     do: [{ a: "shield", n: 4 }],
-  },
-  {
-    id: "tailwind",
+  }),
+  fate("tailwind", {
     min: 61,
     max: 75,
     band: "boon",
-    text: "content:fate.tailwind",
     do: [
       { a: "charge", n: 5 },
       { a: "shield", n: 3 },
     ],
-  },
-  {
-    id: "cache",
+  }),
+  fate("cache", {
     min: 76,
     max: 88,
     band: "boon",
-    text: "content:fate.cache",
     do: [{ a: "scrap", n: 25 }],
-  },
-  {
-    id: "volley",
+  }),
+  fate("volley", {
     min: 89,
     max: 95,
     band: "boon",
-    text: "content:fate.volley",
     do: [
       { a: "dmg", n: 12, target: "target" },
       { a: "addStatus", s: "burn", n: 2, target: "target" },
     ],
-  },
-  {
-    id: "mercy",
+  }),
+  fate("mercy", {
     min: 96,
     max: 99,
     band: "miracle",
-    text: "content:fate.mercy",
     do: [
       { a: "heal", n: 10 },
       { a: "shield", n: 10 },
       { a: "charge", n: 5 },
     ],
-  },
-  {
-    id: "miracle",
+  }),
+  fate("miracle", {
     min: 100,
     max: 100,
     band: "miracle",
-    text: "content:fate.miracle",
     do: [
       { a: "dmg", n: 30, target: "target" },
       { a: "heal", n: 15 },
       { a: "scrap", n: 40 },
     ],
-  },
+  }),
 ];
 
 export const FATE_DIE_ID = "fate-d100";

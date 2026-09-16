@@ -1,4 +1,4 @@
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
 import {
@@ -16,7 +16,7 @@ import {
   SINGLE_ACHIEVEMENTS,
 } from "../src/data/achievements";
 import { BADGES, BADGE_BY_ID, DIE_SKINS } from "../src/data/cosmetics";
-import { MILESTONES } from "../src/data/milestones";
+import { MILESTONES, milestoneLabel } from "../src/data/milestones";
 import { THEMES } from "../src/data/themes";
 import {
   OPEN_CONTRACTS,
@@ -24,7 +24,7 @@ import {
   UNLOCKS,
   UNLOCK_BY_ID,
 } from "../src/data/unlocks";
-import { BARKS, BARK_QUOTA } from "../src/data/barks";
+import { BARKS, BARK_QUOTA, BARK_RESERVATIONS } from "../src/data/barks";
 import {
   ENGRAVINGS,
   ENGRAVING_BY_ID,
@@ -56,6 +56,16 @@ import {
 } from "../src/game/chart/describe";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "../src/data/contracts";
 import { MUTATORS, MUTATOR_BY_ID, ZERO_MUTATOR_MODS } from "../src/data/mutators";
+import {
+  SALVAGE_FACES,
+  SALVAGE_OFFER_SIZE,
+} from "../src/data/salvage";
+import {
+  WEATHER,
+  WEATHER_BY_ID,
+  WEATHER_POOLS,
+  weatherPoolFor,
+} from "../src/data/weather";
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
 import { ALL_DICE, BASIC_DICE, DIE_BY_ID } from "../src/data/dice";
@@ -88,7 +98,11 @@ import {
 import { ALL_PERKS } from "../src/data/perks";
 import { PUZZLES, type PuzzleGoal } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
-import { SHIPS, shipTextIssues } from "../src/data/ships";
+import {
+  SHIPS,
+  shipBridgeIssues,
+  shipTextIssues,
+} from "../src/data/ships";
 import { DIE_PTS } from "../src/data/tiers";
 import {
   ACTION_NAMES,
@@ -131,6 +145,7 @@ import type { GoalSpec } from "../src/game/run/goals";
 import type { EventOption, Outcome } from "../src/types/events";
 import {
   INTENT_KINDS,
+  PART_DEATH_KINDS,
   SUBSYSTEM_AURAS,
   claimKey,
   intentsOfStep,
@@ -146,6 +161,7 @@ const errors: string[] = [];
 
 import { RUNTIME_FLAGS } from "../src/data/flags";
 import { deadFlags, unwritableFlags } from "../src/game/narrative/flagGraph";
+import { BLACK_BOX_EPITAPHS } from "../src/data/narrative/blackBox";
 import { DEATH_LINES } from "../src/data/narrative/deathLines";
 import { EPILOGUE_ENTRIES } from "../src/data/narrative/epilogue";
 const hooks = new Set<string>(HOOKS);
@@ -191,6 +207,19 @@ const checkUniqueIds = (kind: string, ids: readonly string[]): void => {
     if (seen.has(id)) errors.push(`${kind}: duplicate id "${id}"`);
     seen.add(id);
   }
+};
+
+const expectCount = (
+  kind: string,
+  found: number,
+  want: number,
+  noun = "",
+): void => {
+  if (found === want) return;
+  const what = noun === "" ? "" : ` ${noun}`;
+  errors.push(
+    `${kind}: expected ${String(want)}${what}, found ${String(found)}`,
+  );
 };
 
 const resolveIn = (root: ContentNode, path: string): boolean => {
@@ -405,6 +434,7 @@ for (const enemy of ALL_ENEMIES) {
   const allSteps = [
     ...enemy.pattern,
     ...(enemy.phases ?? []).flatMap((phase) => [...phase.pattern]),
+    ...(enemy.subsystems ?? []).flatMap((sub) => [...(sub.intents ?? [])]),
   ];
   for (const step of allSteps) {
     if ("pick" in step) {
@@ -427,6 +457,11 @@ for (const enemy of ALL_ENEMIES) {
   for (const phase of enemy.phases ?? []) {
     for (const intent of [...(phase.onEnter ?? []), ...(phase.everyTurn ?? [])]) {
       usedIntents.add(intent.t);
+      if (intent.t === "summon" && !enemyIds.has(intent.id)) {
+        errors.push(
+          `enemies: "${enemy.id}" summons unknown enemy "${intent.id}"`,
+        );
+      }
     }
   }
   for (const sub of enemy.subsystems ?? []) {
@@ -435,6 +470,22 @@ for (const enemy of ALL_ENEMIES) {
         `enemies: "${enemy.id}" subsystem "${sub.id}" hp must be positive`,
       );
     checkLocKey(`enemies.${enemy.id}.${sub.id}`, sub.name);
+    if (sub.onDeath?.t === "spawnAdds" && !enemyIds.has(sub.onDeath.id)) {
+      errors.push(
+        `enemies: "${enemy.id}" part "${sub.id}" spawns unknown enemy "${sub.onDeath.id}"`,
+      );
+    }
+  }
+  if (enemy.shell === true) {
+    const partCount = (enemy.subsystems ?? []).length;
+    if ((enemy.coreLockAt ?? 0) >= partCount)
+      errors.push(
+        `enemies: "${enemy.id}" is a shell with coreLockAt ${String(enemy.coreLockAt ?? 0)} over ${String(partCount)} parts, so its core never seals`,
+      );
+  } else if (enemy.coreLockAt !== undefined) {
+    errors.push(
+      `enemies: "${enemy.id}" authors coreLockAt ${String(enemy.coreLockAt)} without shell, where it does nothing`,
+    );
   }
 }
 
@@ -530,11 +581,19 @@ for (const member of Object.values(ENCOUNTER_GROUPS).flat()) reachable.add(membe
 for (const enemy of ALL_ENEMIES) {
   for (const step of [
     ...enemy.pattern,
-    ...(enemy.phases ?? []).flatMap((p) => [...p.pattern, ...(p.everyTurn ?? [])]),
+    ...(enemy.phases ?? []).flatMap((p) => [
+      ...p.pattern,
+      ...(p.onEnter ?? []),
+      ...(p.everyTurn ?? []),
+    ]),
+    ...(enemy.subsystems ?? []).flatMap((sub) => [...(sub.intents ?? [])]),
   ]) {
     for (const intent of flattenStep(step)) {
       if (intent.t === "summon") reachable.add(intent.id);
     }
+  }
+  for (const sub of enemy.subsystems ?? []) {
+    if (sub.onDeath?.t === "spawnAdds") reachable.add(sub.onDeath.id);
   }
 }
 for (const enemy of ALL_ENEMIES) {
@@ -556,6 +615,9 @@ for (const kind of INTENT_KINDS) {
 for (const aura of SUBSYSTEM_AURAS) {
   needsBattleKey("subsystems", `aura.${aura}`);
 }
+for (const kind of PART_DEATH_KINDS) {
+  needsBattleKey("parts", `partDeath.${kind}`);
+}
 for (const status of STATUS_KEYS) {
   needsBattleKey("statuses", `status.${status}`);
   needsBattleKey("statuses", `statusName.${status}`);
@@ -567,7 +629,11 @@ for (const tag of CONTENT_TAGS) {
   }
 }
 const usedAuras = new Set(
-  ALL_ENEMIES.flatMap((def) => (def.subsystems ?? []).map((sub) => sub.aura)),
+  ALL_ENEMIES.flatMap((def) =>
+    (def.subsystems ?? []).flatMap((sub) =>
+      sub.aura === undefined ? [] : [sub.aura],
+    ),
+  ),
 );
 for (const aura of usedAuras) {
   if (!SUBSYSTEM_AURAS.includes(aura)) {
@@ -581,6 +647,7 @@ for (const ship of SHIPS) {
   checkLocKey(`ships.${ship.id}`, ship.passiveDesc);
 }
 errors.push(...shipTextIssues(SHIPS));
+errors.push(...shipBridgeIssues(SHIPS));
 
 checkUniqueIds(
   "chart",
@@ -592,20 +659,11 @@ const CHART_NOTABLES = 32;
 const CHART_KEYSTONES = 8;
 const CHART_DISTINCT_SMALLS = 100;
 const minorCount = CHART_NODES.filter((n) => n.kind === "minor").length;
-if (minorCount !== CHART_MINORS)
-  errors.push(
-    `chart: expected ${String(CHART_MINORS)} minor notables, found ${String(minorCount)}`,
-  );
+expectCount("chart", minorCount, CHART_MINORS, "minor notables");
 const notableCount = CHART_NODES.filter((n) => n.kind === "notable").length;
-if (notableCount !== CHART_NOTABLES)
-  errors.push(
-    `chart: expected ${String(CHART_NOTABLES)} notables, found ${String(notableCount)}`,
-  );
+expectCount("chart", notableCount, CHART_NOTABLES, "notables");
 const keystoneCount = CHART_NODES.filter((n) => n.kind === "keystone").length;
-if (keystoneCount !== CHART_KEYSTONES)
-  errors.push(
-    `chart: expected ${String(CHART_KEYSTONES)} keystones, found ${String(keystoneCount)}`,
-  );
+expectCount("chart", keystoneCount, CHART_KEYSTONES, "keystones");
 
 const chartPayloadKey = (node: (typeof CHART_NODES)[number]): string =>
   JSON.stringify([
@@ -994,10 +1052,7 @@ const CLEAR_BEACONS = 5;
 const CLEAR_ELITES = 5;
 const ONE_CLEAR_FLOOR = 12;
 
-if (MEMORIES.length !== MEMORY_TOTAL)
-  errors.push(
-    `memories: expected ${String(MEMORY_TOTAL)} fragments, found ${String(MEMORIES.length)}`,
-  );
+expectCount("memories", MEMORIES.length, MEMORY_TOTAL, "fragments");
 
 const afterOneClear = earnedMemoryOrders({
   gateKills: CLEAR_GATES,
@@ -1028,10 +1083,7 @@ for (const id of MEMORY_CODEX_IDS) {
 const CHAIN_TARGET = 4;
 const CHAIN_MIN_STEPS = 3;
 const eventById = new Map(ALL_EVENTS.map((e) => [e.id, e]));
-if (CHAINS.length !== CHAIN_TARGET)
-  errors.push(
-    `chains: expected ${String(CHAIN_TARGET)} NPC chains, found ${String(CHAINS.length)}`,
-  );
+expectCount("chains", CHAINS.length, CHAIN_TARGET, "NPC chains");
 for (const chain of CHAINS) {
   checkLocKey(`chain.${chain.id}`, chain.name);
   checkLocKey(`chain.${chain.id}`, chain.payoff);
@@ -1079,6 +1131,15 @@ if (EPILOGUE_ENTRIES.length < EPILOGUE_TARGET)
   );
 for (const entry of EPILOGUE_ENTRIES) checkLocKey(`epilogue.${entry.id}`, entry.text);
 for (const line of DEATH_LINES) checkLocKey(`death.${line.id}`, line.text);
+const BLACK_BOX_TARGET = 6;
+if (BLACK_BOX_EPITAPHS.length < BLACK_BOX_TARGET)
+  errors.push(
+    `blackbox: expected at least ${String(BLACK_BOX_TARGET)} epitaphs, found ${String(BLACK_BOX_EPITAPHS.length)}`,
+  );
+if (BLACK_BOX_EPITAPHS[BLACK_BOX_EPITAPHS.length - 1]?.id !== "quiet")
+  errors.push("blackbox: the last epitaph must be the unconditional fallback");
+for (const line of BLACK_BOX_EPITAPHS)
+  checkLocKey(`blackbox.${line.id}`, line.text);
 for (const ending of ENDINGS) {
   for (const beat of ending.beats) checkLocKey(`ending.${ending.id}`, beat);
   for (const beat of ending.deepBeats ?? [])
@@ -1213,11 +1274,24 @@ PUZZLE_BELL.forEach((want, index) => {
     );
 });
 
+const BARK_MIN_LINES = 3;
+const BARK_SINGLETON_WHITELIST: ReadonlySet<string> = new Set<string>();
+
 let barkLines = 0;
 const barkByQuota = new Map<string, number>();
+const barkTriggers = new Set<string>();
+const referencedBarkKeys = new Set<string>();
 for (const bark of BARKS) {
-  if (bark.lines.length === 0)
-    errors.push(`barks: "${bark.id}" has no lines`);
+  if (
+    bark.lines.length < BARK_MIN_LINES &&
+    !BARK_SINGLETON_WHITELIST.has(bark.id)
+  ) {
+    errors.push(
+      `barks: "${bark.id}" has ${String(bark.lines.length)} lines, under the ${String(BARK_MIN_LINES)}-line floor and not on the singleton whitelist`,
+    );
+  }
+  barkTriggers.add(bark.trigger);
+  for (const line of bark.lines) referencedBarkKeys.add(line);
   for (const line of bark.lines) checkLocKey(`bark.${bark.id}`, line);
   barkLines += bark.lines.length;
   const quotaKey = bark.trigger.startsWith("firstKill:")
@@ -1237,6 +1311,76 @@ for (const [trigger, quota] of Object.entries(BARK_QUOTA)) {
       `barks: trigger "${trigger}" has ${String(have)} lines, quota ${String(quota)}`,
     );
 }
+for (const quotaKey of barkByQuota.keys()) {
+  if (BARK_QUOTA[quotaKey] === undefined)
+    errors.push(`barks: trigger "${quotaKey}" ships lines with no quota row`);
+}
+
+const emitterSources: string[] = [];
+const walkSources = (dir: string): void => {
+  for (const entry of readdirSync(dir)) {
+    const child = join(dir, entry);
+    if (statSync(child).isDirectory()) walkSources(child);
+    else if (/\.tsx?$/.test(child) && !/\.test\.tsx?$/.test(child))
+      emitterSources.push(child);
+  }
+};
+walkSources(join("src"));
+
+const CALL = "emitBark(";
+const argumentTextAt = (text: string, start: number): string => {
+  let depth = 0;
+  for (let i = start; i < text.length; i += 1) {
+    const ch = text[i];
+    if (ch === "(") depth += 1;
+    if (ch === ")") {
+      depth -= 1;
+      if (depth === 0) return text.slice(start + CALL.length, i);
+    }
+  }
+  return "";
+};
+
+const emittedTriggers = new Set<string>();
+const emittedPrefixes = new Set<string>();
+for (const file of emitterSources) {
+  const text = readFileSync(file, "utf8");
+  let at = text.indexOf(CALL);
+  while (at !== -1) {
+    const args = argumentTextAt(text, at);
+    for (const m of args.matchAll(/["']([A-Za-z0-9_:]+)["']/g))
+      emittedTriggers.add(m[1] ?? "");
+    for (const m of args.matchAll(/`([A-Za-z0-9_:]*)\$\{/g))
+      emittedPrefixes.add(m[1] ?? "");
+    at = text.indexOf(CALL, at + 1);
+  }
+}
+const emitted = (trigger: string): boolean =>
+  emittedTriggers.has(trigger) ||
+  [...emittedPrefixes].some(
+    (prefix) => prefix !== "" && trigger.startsWith(prefix),
+  );
+for (const bark of BARKS) {
+  if (!emitted(bark.trigger))
+    errors.push(
+      `barks: trigger "${bark.trigger}" ships ${String(bark.lines.length)} lines and no emitBark call site reaches it`,
+    );
+}
+
+const reservedTriggers = new Set<string>();
+for (const reservation of BARK_RESERVATIONS) {
+  if (reservedTriggers.has(reservation.trigger))
+    errors.push(`barks: duplicate reservation "${reservation.trigger}"`);
+  reservedTriggers.add(reservation.trigger);
+  if (reservation.lines < BARK_MIN_LINES)
+    errors.push(
+      `barks: reservation "${reservation.trigger}" promises ${String(reservation.lines)} lines, under the ${String(BARK_MIN_LINES)}-line floor`,
+    );
+  if (barkTriggers.has(reservation.trigger) || BARK_QUOTA[reservation.trigger] !== undefined)
+    errors.push(
+      `barks: reservation "${reservation.trigger}" is filled — drop it from BARK_RESERVATIONS now that ${reservation.phase} authored it`,
+    );
+}
 
 const MODULE_TOTAL = 60;
 const ENGRAVING_TOTAL = 50;
@@ -1252,18 +1396,9 @@ checkUniqueIds("engravings", ENGRAVINGS.map((e) => e.id));
 checkUniqueIds("keeperLines", KEEPER_LINES.map((k) => k.id));
 checkUniqueIds("fragments", FRAGMENTS.map((f) => f.id));
 
-if (ALL_MODULES.length !== MODULE_TOTAL)
-  errors.push(
-    `modules: expected ${String(MODULE_TOTAL)}, found ${String(ALL_MODULES.length)}`,
-  );
-if (ENGRAVINGS.length !== ENGRAVING_TOTAL)
-  errors.push(
-    `engravings: expected ${String(ENGRAVING_TOTAL)}, found ${String(ENGRAVINGS.length)}`,
-  );
-if (FRAGMENTS.length !== FRAGMENT_TOTAL)
-  errors.push(
-    `fragments: expected ${String(FRAGMENT_TOTAL)}, found ${String(FRAGMENTS.length)}`,
-  );
+expectCount("modules", ALL_MODULES.length, MODULE_TOTAL);
+expectCount("engravings", ENGRAVINGS.length, ENGRAVING_TOTAL);
+expectCount("fragments", FRAGMENTS.length, FRAGMENT_TOTAL);
 if (GATED_FRAGMENTS.length < GATED_FRAGMENT_TARGET)
   errors.push(
     `fragments: ${String(GATED_FRAGMENTS.length)} are state-gated, target ${String(GATED_FRAGMENT_TARGET)}`,
@@ -1275,10 +1410,7 @@ for (const frag of GATED_FRAGMENTS) {
       errors.push(`fragments: "${frag.id}" waits on flag "${key}" that nothing sets`);
   }
 }
-if (KEEPER_LINES.length !== KEEPER_TOTAL)
-  errors.push(
-    `keeperLines: expected ${String(KEEPER_TOTAL)}, found ${String(KEEPER_LINES.length)}`,
-  );
+expectCount("keeperLines", KEEPER_LINES.length, KEEPER_TOTAL);
 if (REACTIVE_KEEPER_LINES.length < KEEPER_REACTIVE_TARGET)
   errors.push(
     `keeperLines: ${String(REACTIVE_KEEPER_LINES.length)} react to a flag, target ${String(KEEPER_REACTIVE_TARGET)}`,
@@ -1292,10 +1424,7 @@ for (const keeperLine of REACTIVE_KEEPER_LINES) {
       );
   }
 }
-if (ALL_DICE.length !== DICE_TOTAL)
-  errors.push(
-    `dice: expected ${String(DICE_TOTAL)}, found ${String(ALL_DICE.length)}`,
-  );
+expectCount("dice", ALL_DICE.length, DICE_TOTAL);
 
 for (const def of ALL_MODULES) {
   checkLocKey(`modules.${def.id}`, def.name);
@@ -1389,10 +1518,7 @@ for (const beat of PROLOGUE_BEATS) {
 for (const f of FRAGMENTS) checkLocKey(`fragment.${f.id}`, f.text);
 for (const k of KEEPER_LINES) checkLocKey(`keeper.${k.id}`, k.text);
 
-if (ASCENSIONS.length !== MAX_ASCENSION)
-  errors.push(
-    `ascension: expected ${String(MAX_ASCENSION)} levels, found ${String(ASCENSIONS.length)}`,
-  );
+expectCount("ascension", ASCENSIONS.length, MAX_ASCENSION, "levels");
 for (const def of ASCENSIONS) {
   checkLocKey(`ascension.${String(def.level)}`, def.name);
   checkLocKey(`ascension.${String(def.level)}`, def.desc);
@@ -1401,10 +1527,7 @@ for (const def of ASCENSIONS) {
 }
 
 const dossierCount = CODEX.filter((e) => e.group === "dossier").length;
-if (dossierCount !== DOSSIER_TOTAL)
-  errors.push(
-    `codex: expected ${String(DOSSIER_TOTAL)} dossiers, found ${String(dossierCount)}`,
-  );
+expectCount("codex", dossierCount, DOSSIER_TOTAL, "dossiers");
 
 const MUTATOR_COUNT = 12;
 const CONTRACT_COUNT = 20;
@@ -1431,6 +1554,110 @@ for (const def of MUTATORS) {
     if (!MUTATOR_MOD_KEYS.has(key)) {
       errors.push(`mutators: "${def.id}" sets unknown mod "${key}"`);
     }
+  }
+}
+
+const WEATHER_COUNT = 8;
+const WEATHER_FIRST_SECTOR = 2;
+const WEATHER_POOL_MIN = 4;
+const WEATHER_APPEARANCES_MIN = 2;
+
+checkUniqueIds(
+  "weather",
+  WEATHER.map((def) => def.id),
+);
+if (WEATHER.length !== WEATHER_COUNT) {
+  errors.push(
+    `weather: expected exactly ${String(WEATHER_COUNT)}, found ${String(WEATHER.length)}`,
+  );
+}
+for (const def of WEATHER) {
+  checkLocKey(`weather.${def.id}`, def.name);
+  checkLocKey(`weather.${def.id}`, def.desc);
+  checkLocKey(`weather.${def.id}`, def.line);
+  const keys = Object.keys(def.mods);
+  if (keys.length === 0) {
+    errors.push(`weather: "${def.id}" is a no-op (no mods)`);
+  }
+  for (const key of keys) {
+    if (!MUTATOR_MOD_KEYS.has(key)) {
+      errors.push(`weather: "${def.id}" sets unknown mod "${key}"`);
+    }
+  }
+  if (MUTATOR_BY_ID.has(def.id)) {
+    errors.push(`weather: "${def.id}" collides with a mutator id`);
+  }
+  const desc = stringAt(content, def.desc.replace("content:", ""));
+  if (desc !== undefined && !/\d/.test(desc)) {
+    errors.push(`weather: "${def.id}" desc states no number`);
+  }
+  const appearances = Object.values(WEATHER_POOLS).filter((pool) =>
+    pool.some((entry) => entry.id === def.id),
+  ).length;
+  if (appearances < WEATHER_APPEARANCES_MIN) {
+    errors.push(
+      `weather: "${def.id}" appears in ${String(appearances)} sector pool(s), need ${String(WEATHER_APPEARANCES_MIN)}`,
+    );
+  }
+}
+for (const sector of SECTORS.map((def) => def.id)) {
+  const pool = weatherPoolFor(sector);
+  if (sector < WEATHER_FIRST_SECTOR) {
+    if (pool.length > 0) {
+      errors.push(`weather: sector ${String(sector)} must have no pool`);
+    }
+    continue;
+  }
+  if (pool.length < WEATHER_POOL_MIN) {
+    errors.push(
+      `weather: sector ${String(sector)} pool has ${String(pool.length)} entries, need ${String(WEATHER_POOL_MIN)}`,
+    );
+  }
+  const seen = new Set<string>();
+  for (const entry of pool) {
+    if (!WEATHER_BY_ID.has(entry.id)) {
+      errors.push(
+        `weather: sector ${String(sector)} pool names unknown condition "${entry.id}"`,
+      );
+    }
+    if (seen.has(entry.id)) {
+      errors.push(
+        `weather: sector ${String(sector)} pool repeats "${entry.id}"`,
+      );
+    }
+    seen.add(entry.id);
+    if (entry.weight <= 0) {
+      errors.push(
+        `weather: sector ${String(sector)} weights "${entry.id}" at ${String(entry.weight)}`,
+      );
+    }
+  }
+}
+
+const SALVAGE_FACE_MIN = SALVAGE_OFFER_SIZE + 1;
+
+checkUniqueIds(
+  "salvage",
+  SALVAGE_FACES.map((face) => face.id),
+);
+if (SALVAGE_FACES.length < SALVAGE_FACE_MIN) {
+  errors.push(
+    `salvage: ${String(SALVAGE_FACES.length)} faces cannot fill an offer of ${String(SALVAGE_OFFER_SIZE)} with anything left out`,
+  );
+}
+for (const face of SALVAGE_FACES) {
+  checkLocKey(`salvage.${face.id}`, face.name);
+  checkLocKey(`salvage.${face.id}`, face.desc);
+  checkLocKey(`salvage.${face.id}`, face.line);
+  if (face.weight <= 0) {
+    errors.push(`salvage: "${face.id}" weighs ${String(face.weight)}`);
+  }
+  if (face.effects.length === 0) {
+    errors.push(`salvage: "${face.id}" is a no-op (no effects)`);
+  }
+  const desc = stringAt(content, face.desc.replace("content:", ""));
+  if (desc !== undefined && !/\d/.test(desc)) {
+    errors.push(`salvage: "${face.id}" desc states no number`);
   }
 }
 
@@ -1497,7 +1724,7 @@ for (const def of CONTRACTS) {
   }
 }
 
-const ACHIEVEMENT_COUNT = 93;
+const ACHIEVEMENT_COUNT = 96;
 const ACHIEVEMENT_GATES = 8;
 const ACHIEVEMENT_FLAG_READERS = 6;
 const ACHIEVEMENT_FAMILY_TARGET = 20;
@@ -1710,7 +1937,7 @@ for (const def of UNLOCKS) {
   }
 }
 for (const milestone of MILESTONES) {
-  if (!resolveMetaKey(milestone.label.replace("meta:", "")))
+  if (!resolveMetaKey(milestoneLabel(milestone).replace("meta:", "")))
     errors.push(`milestones: L${String(milestone.level)} has no en label`);
   const payload =
     (milestone.budget ?? 0) > 0 || (milestone.chartPoints ?? 0) > 0;
@@ -1795,6 +2022,11 @@ for (const [ns, en, uk, ru] of NAMESPACES) {
 
 const MACHINE_LOCALES = ["de", "es", "fr", "pl"] as const;
 const I18N_DIR = join(process.cwd(), "src", "i18n");
+const localeContent = new Map<string, unknown>([
+  ["en", enContent],
+  ["uk", ukContent],
+  ["ru", ruContent],
+]);
 
 for (const locale of MACHINE_LOCALES) {
   const dir = join(I18N_DIR, locale);
@@ -1813,10 +2045,35 @@ for (const locale of MACHINE_LOCALES) {
       continue;
     }
     checkParity(ns, en, parsed, locale);
+    if (ns === "content") localeContent.set(locale, parsed);
     for (const [key, value] of Object.entries(flatValues(parsed))) {
       if (value.trim() === "")
         errors.push(`i18n: ${locale}/${ns} has an empty string at "${key}"`);
     }
+  }
+}
+
+const barkKeysIn = (root: unknown): string[] => {
+  const groups = (root as Record<string, unknown> | null)?.["bark"];
+  if (typeof groups !== "object" || groups === null) return [];
+  return Object.entries(groups as Record<string, unknown>).flatMap(
+    ([group, group_lines]) =>
+      typeof group_lines === "object" && group_lines !== null
+        ? Object.keys(group_lines as Record<string, unknown>).map(
+            (index) => `content:bark.${group}.${index}`,
+          )
+        : [],
+  );
+};
+
+let barkOrphans = 0;
+for (const [locale, root] of localeContent) {
+  for (const key of barkKeysIn(root)) {
+    if (referencedBarkKeys.has(key)) continue;
+    barkOrphans += 1;
+    errors.push(
+      `barks: ${locale} authors "${key}" and no BarkDef references it`,
+    );
   }
 }
 
@@ -2044,7 +2301,6 @@ interface TotalsRow {
   label: string;
   have: number;
   target: number;
-  shortfall?: string;
 }
 
 const REVISION_3_TOTALS: readonly TotalsRow[] = [
@@ -2059,12 +2315,7 @@ const REVISION_3_TOTALS: readonly TotalsRow[] = [
   { label: "enemies", have: ALL_ENEMIES.length, target: 91 },
   { label: "dossiers", have: dossierCount, target: 91 },
   { label: "chains", have: CHAINS.length, target: CHAIN_TARGET },
-  {
-    label: "barkLines",
-    have: barkLines,
-    target: 220,
-    shortfall: `the 150->220 budget was handed from R6 to R7 and never entered R7's Definition of Done, so no phase ever owned it; the ${String(220 - barkLines)} missing lines are trigger coverage for the R3-R9 systems (puzzle tier, interference, detour, storm, inversion, banish, achievement, chain step) and are an R7 amendment, not an R11 tuning number`,
-  },
+  { label: "barkLines", have: barkLines, target: 220 },
   { label: "keeperLines", have: KEEPER_LINES.length, target: 80 },
   { label: "memories", have: MEMORIES.length, target: 16 },
   { label: "fragments", have: FRAGMENTS.length, target: 100 },
@@ -2076,7 +2327,6 @@ const REVISION_3_TOTALS: readonly TotalsRow[] = [
 
 for (const row of REVISION_3_TOTALS) {
   if (row.have >= row.target) continue;
-  if (row.shortfall !== undefined) continue;
   errors.push(
     `totals: ${row.label} is ${String(row.have)}, under the Revision-3 target of ${String(row.target)}`,
   );
@@ -2153,11 +2403,21 @@ for (const row of REVISION_3_TOTALS) {
     `  ${row.label.padEnd(13)} ${String(row.have).padStart(4)}/${String(row.target).padEnd(4)} ${mark}`,
   );
 }
-for (const row of REVISION_3_TOTALS) {
-  if (row.shortfall === undefined || row.have >= row.target) continue;
-  console.log(`lint:content: TRACKED SHORTFALL — ${row.label}: ${row.shortfall}`);
-}
+
+console.log("lint:content: bark census");
+console.log(
+  `  lines   ${String(barkLines)}/220 · ${String(BARKS.length)} defs · floor ${String(BARK_MIN_LINES)} · thinnest ${String(Math.min(...BARKS.map((b) => b.lines.length)))} · whitelisted ${String(BARK_SINGLETON_WHITELIST.size)}`,
+);
+console.log(
+  `  keys    ${String(referencedBarkKeys.size)} referenced · orphans ${String(barkOrphans)} across ${String(localeContent.size)} locales`,
+);
+console.log(
+  `  emitters ${String(BARKS.length)}/${String(BARKS.length)} triggers reached · ${String(emitterSources.length)} source files scanned`,
+);
+console.log(
+  `  reserved ${BARK_RESERVATIONS.map((r) => `${r.trigger}(${r.phase}, ${String(r.lines)})`).join(" · ")}`,
+);
 
 console.log(
-  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(ALL_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks, ${String(MUTATORS.length)} mutators, ${String(CONTRACTS.length)} contracts`,
+  `lint:content: ok — ${String(ALL_DICE.length)} dice, ${String(RESONANCE_BONUSES.length)} resonance bonuses, ${String(ALL_ENEMIES.length)} enemies, ${String(SHIPS.length)} ships, ${String(CHART_NODES.length)} chart nodes, ${String(ALL_PERKS.length)} perks, ${String(ALL_EVENTS.length)} events (${String(callbackCount)} callbacks), ${String(PUZZLES.length)} puzzles, ${String(CODEX.length)} codex, ${String(BARKS.length)} barks, ${String(MUTATORS.length)} mutators, ${String(WEATHER.length)} weather, ${String(SALVAGE_FACES.length)} salvage faces, ${String(CONTRACTS.length)} contracts`,
 );

@@ -1,7 +1,14 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { computeMutatorMods } from "@/data/mutators";
-import { intentHits, resolvePlayerPhase } from "@/game/battle/resolver";
+import {
+  applyChargeAuras,
+  chargeAuraActive,
+  intentHits,
+  resolvePlayerPhase,
+} from "@/game/battle/resolver";
 import { everyTurnFor } from "@/game/battle/setup";
+import { livingPartIntents } from "@/game/battle/target";
+import { applyStatus } from "@/game/battle/statuses";
 import type {
   BattleOutcome,
   BattleSnapshot,
@@ -53,6 +60,8 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
     };
   }
 
+  applyChargeAuras(next);
+
   const decayPct = computeMutatorMods(next.mutators ?? []).shieldDecayPct;
   let shield =
     decayPct > 0 && next.shield > 0
@@ -67,7 +76,11 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
     if (enemy.hp <= 0) continue;
     const def = ENEMY_BY_ID.get(enemy.defId);
     if (def === undefined) continue;
-    for (const intent of [...everyTurnFor(def, enemy.phase), enemy.nextIntent]) {
+    for (const intent of [
+      ...everyTurnFor(def, enemy.phase),
+      enemy.nextIntent,
+      ...livingPartIntents(enemy),
+    ]) {
       const raws = intentHits(next, enemy, intent);
       if (raws.length > 0) {
         delete enemy.statuses.charge;
@@ -110,14 +123,24 @@ export const mitigationOf = (
   snapshot: BattleSnapshot,
   enemy: EnemyState,
 ): Mitigation => {
-  const hits = intentHits(snapshot, enemy, enemy.nextIntent);
-  const expected = hits.reduce(
-    (sum, hit) => sum + expectedHit(hit, snapshot.evasion),
-    0,
-  );
+  const actor: EnemyState = { ...enemy, statuses: { ...enemy.statuses } };
+  if (chargeAuraActive(snapshot)) applyStatus(actor.statuses, "charge");
+  let raw = 0;
+  let expected = 0;
+  for (const intent of [enemy.nextIntent, ...livingPartIntents(enemy)]) {
+    const hits = intentHits(snapshot, actor, intent);
+    if (hits.length > 0) {
+      delete actor.statuses.charge;
+      delete actor.statuses.jam;
+    }
+    for (const hit of hits) {
+      raw += hit;
+      expected += expectedHit(hit, snapshot.evasion);
+    }
+  }
   const absorbed = Math.min(snapshot.shield, expected);
   return {
-    raw: hits.reduce((sum, hit) => sum + hit, 0),
+    raw,
     expected: Math.round(expected),
     shield: Math.round(absorbed),
     hull: Math.round(expected - absorbed),

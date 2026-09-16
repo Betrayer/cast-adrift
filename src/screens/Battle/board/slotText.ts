@@ -5,6 +5,22 @@ import type { School } from '@/types/content';
 
 export type ProjectionTone = 'danger' | 'bonus' | 'plain';
 
+export interface SlotViewProps {
+  slotId: SlotId;
+  slot: SlotState;
+  order: number;
+  projection: SlotProjection | undefined;
+  occupiedBy: string | undefined;
+  blocked: boolean;
+  legal: boolean;
+  goal: boolean;
+  onTap: (slotId: SlotId) => void;
+  preview?: boolean;
+}
+
+const splitOf = (projection: SlotProjection): string =>
+  projection.fragments.join('+');
+
 export const projectionText = (
   t: TFunction<['battle']>,
   slotId: SlotId,
@@ -14,8 +30,8 @@ export const projectionText = (
   switch (projection.kind) {
     case 'engine':
       return t('battle:slot.evasion', {
-        dodge: projection.evasion?.dodgePct ?? 0,
         glancing: projection.evasion?.glancingPct ?? 0,
+        dodge: projection.evasion?.dodgePct ?? 0,
       });
     case 'sensor':
       return projection.sensor !== null && projection.sensor.pierce > 0
@@ -39,12 +55,25 @@ export const projectionText = (
             bonus: projection.bonus,
           });
     case 'damage': {
+      if (projection.hits > 1) {
+        return t('battle:proj.damageSplit', {
+          amount: projection.amount,
+          split: splitOf(projection),
+        });
+      }
       const mark = projection.amount - projection.value;
       if (mark > 0) {
         return t('battle:proj.damageMark', {
           amount: projection.amount,
           value: projection.value,
           mark,
+        });
+      }
+      if (mark < 0) {
+        return t('battle:proj.damageCost', {
+          amount: projection.amount,
+          value: projection.value,
+          cost: -mark,
         });
       }
       return projection.bonus === 0
@@ -68,8 +97,8 @@ export const projectionShort = (
   if (projection.jammed) return t('battle:proj.jam');
   switch (projection.kind) {
     case 'engine':
-      return t('battle:projShort.dodge', {
-        n: projection.evasion?.dodgePct ?? 0,
+      return t('battle:projShort.glance', {
+        n: projection.evasion?.glancingPct ?? 0,
       });
     case 'sensor':
       return t('battle:projShort.mark', {
@@ -79,8 +108,11 @@ export const projectionShort = (
       return t('battle:proj.charge', { n: projection.amount });
     case 'repair':
       return t('battle:proj.heal', { n: projection.amount });
-    case 'shield':
     case 'damage':
+      return projection.hits > 1
+        ? t('battle:projShort.split', { split: splitOf(projection) })
+        : t('battle:projShort.value', { n: projection.amount });
+    case 'shield':
       return t('battle:projShort.value', { n: projection.value });
     default:
       return slotId === 'spinal'

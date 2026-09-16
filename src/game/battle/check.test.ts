@@ -97,17 +97,17 @@ describe("systems check", () => {
     }
   });
 
-  it("step 1 reads dodge 30 percent and glancing 15 percent", () => {
+  it("step 1 reads glancing 18 percent and dodge 8 percent", () => {
     start();
     const projection = projectSlot(battleSnapshot(board()), GREEN, "engines");
     expect(projection?.evasion).toEqual({
-      dodgePct: 30,
-      glancingPct: 15,
+      dodgePct: 8,
+      glancingPct: 18,
       intercept: false,
     });
   });
 
-  it("step 1 pins one dodge, one glance and one full hit", () => {
+  it("step 1 pins one glance, one dodge and one full hit", () => {
     start();
     place(GREEN, "engines");
     turn();

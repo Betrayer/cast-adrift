@@ -1,6 +1,7 @@
 import { Badge, Group, Progress, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { cx } from "@/app/cx";
 import { tokens } from "@/app/theme";
 import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
 import { now } from "@/services/clock";
@@ -62,13 +63,11 @@ const Pips = ({
         key={tier.id}
         data-pip={tier.id}
         data-pip-state={earned.has(tier.id) ? "done" : "open"}
-        className={[
+        className={cx(
           styles.pip,
-          earned.has(tier.id) ? styles.pipDone : "",
-          tier.legendary === true ? styles.pipLegendary : "",
-        ]
-          .filter((name) => name !== "")
-          .join(" ")}
+          earned.has(tier.id) && styles.pipDone,
+          tier.legendary === true && styles.pipLegendary,
+        )}
       />
     ))}
   </div>
@@ -100,13 +99,11 @@ const FamilyRow = ({
       data-achievement={head.family ?? head.id}
       data-achievement-state={complete ? "unlocked" : "locked"}
       data-press={legendary ? "" : undefined}
-      className={[
+      className={cx(
         styles.row,
-        complete ? styles.rowEarned : "",
-        legendary ? styles.rowLegendary : "",
-      ]
-        .filter((name) => name !== "")
-        .join(" ")}
+        complete && styles.rowEarned,
+        legendary && styles.rowLegendary,
+      )}
       onClick={(event) => {
         if (!legendary) return;
         const rect = event.currentTarget.getBoundingClientRect();
@@ -178,9 +175,7 @@ const SingleRow = ({
     <div
       data-achievement={def.id}
       data-achievement-state={unlocked ? "unlocked" : "locked"}
-      className={[styles.row, unlocked ? styles.rowEarned : ""]
-        .filter((name) => name !== "")
-        .join(" ")}
+      className={cx(styles.row, unlocked && styles.rowEarned)}
     >
       <div className={styles.head}>
         <Text size="sm" fw={600} c={unlocked ? tokens.amber : tokens.text}>

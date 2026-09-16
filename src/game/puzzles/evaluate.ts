@@ -10,6 +10,7 @@ import type {
 import { affinitySchoolForSlot, slotCapForMk } from "@/data/slots";
 import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
 import { resolveEnemyPhase, resolvePlayerPhase } from "@/game/battle/resolver";
+import { battleSnapshotDefaults } from "@/game/battle/setup";
 import { createStream } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -141,47 +142,20 @@ const buildSnapshot = (
     slots[slot] = { ...slotState, dieUid: die.uid };
   }
   return {
-    turn: 1,
+    ...battleSnapshotDefaults(),
     hull: puzzle.hull ?? PUZZLE_HULL_DEFAULT,
     hullMax: PUZZLE_HULL_DEFAULT,
-    shield: 0,
-    shieldPersist: 0,
     charge: carry.charge,
-    scrap: 0,
-  runScrap: 0,
-    tide: 0,
-    interference: 0,
-    perks: [],
     dice,
     slots,
     enemies: [dummyEnemy(puzzle.incoming, carry.burn)],
     targetId: "dummy",
-    evasion: null,
-    nextTurnMods: {},
-    nextRollBonus: 0,
     chargeCap: puzzle.chargeCap ?? DEFAULT_PUZZLE_CHARGE_CAP,
-    sacrificePool: 0,
-    bloodReactorUsed: false,
-    burnDoubleUsed: false,
-    exceedCap: [],
-    sectorHpPct: 0,
-    sectorDmgPct: 0,
-    enemyHpPct: 0,
-    blockedSlots: [],
-    shrunkSlots: [],
-    lockedDice: [],
     resonance: computeCensus(dice),
-    survivedLethal: false,
-    lastPlayerDamage: 0,
-    stolenScrap: 0,
-    pendingTwist: 0,
-    pendingSwap: 0,
-    pendingStorm: 0,
-    ascension: 0,
   };
 };
 
-const innerGoal = (goal: PuzzleGoal): SingleTurnGoal | null =>
+export const innerGoal = (goal: PuzzleGoal): SingleTurnGoal | null =>
   goal.g === "deduction" ? goal.inner : goal.g === "multiTurn" ? null : goal;
 
 const needsEnemyPhase = (puzzle: PuzzleDef): boolean => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { harnessDie, harnessSnap } from "@/game/battle/battleHarness";
+import { harnessBoard, harnessDie } from "@/game/battle/battleHarness";
 import { applyWeaponDamage } from "@/game/battle/damage";
 import { advanceTurn, resolveEnemyPhase } from "@/game/battle/resolver";
 import {
@@ -18,8 +18,7 @@ const gate = (id: string): EnemyState => spawnEnemy(id, "enemy-0", stream());
 const withEnemy = (
   enemy: EnemyState,
   over: Partial<BattleSnapshot> = {},
-): BattleSnapshot =>
-  harnessSnap([], { enemies: [enemy], targetId: enemy.id, ...over });
+): BattleSnapshot => harnessBoard([enemy], [], over);
 
 describe("Convoy Alpha — kill order", () => {
   it("the flagship is immune until every escort is dead", () => {
@@ -55,10 +54,8 @@ describe("Warden Fragment — weak to mark", () => {
 describe("Leech Queen — mass die-lock", () => {
   it("locks a tray die every turn on top of its pattern", () => {
     const enemy = gate("leechQueen");
-    const snap = harnessSnap(
-      [harnessDie("d0", "red-d6", 5), harnessDie("d1", "blue-d6", 3)],
-      { enemies: [enemy], targetId: enemy.id, hull: 60, hullMax: 60 },
-    );
+    const dice = [harnessDie("d0", "red-d6", 5), harnessDie("d1", "blue-d6", 3)];
+    const snap = harnessBoard([enemy], dice, { hull: 60, hullMax: 60 });
     const result = resolveEnemyPhase(snap, stream());
     expect(result.next.lockedDice.length).toBeGreaterThanOrEqual(1);
   });
@@ -175,10 +172,7 @@ describe("sector-5 signatures", () => {
   it("Core Fragment is immune while another enemy lives", () => {
     const fragment = spawnEnemy("coreFragment", "enemy-0", stream());
     const escort = spawnEnemy("nullDrone", "enemy-1", stream());
-    const snap = harnessSnap([], {
-      enemies: [fragment, escort],
-      targetId: fragment.id,
-    });
+    const snap = harnessBoard([fragment, escort]);
     expect(applyWeaponDamage(snap, { enemy: fragment }, 15)).toBe(0);
     escort.hp = 0;
     expect(applyWeaponDamage(snap, { enemy: fragment }, 15)).toBe(15);
@@ -187,10 +181,8 @@ describe("sector-5 signatures", () => {
   it("Probability Knot swaps the tray's highest and lowest values", () => {
     const enemy = spawnEnemy("probabilityKnot", "enemy-0", stream());
     enemy.nextIntent = { t: "swapValues" };
-    const snap = harnessSnap(
-      [harnessDie("d0", "red-d6", 6), harnessDie("d1", "blue-d6", 1)],
-      { enemies: [enemy], targetId: enemy.id, hull: 60, hullMax: 60 },
-    );
+    const dice = [harnessDie("d0", "red-d6", 6), harnessDie("d1", "blue-d6", 1)];
+    const snap = harnessBoard([enemy], dice, { hull: 60, hullMax: 60 });
     const result = resolveEnemyPhase(snap, stream());
     expect(result.next.pendingSwap).toBe(1);
   });

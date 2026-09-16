@@ -1,0 +1,89 @@
+.head {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 6px;
+}
+
+.incoming {
+  display: flex;
+  justify-content: center;
+  padding-bottom: 8px;
+}
+
+.incomingModule {
+  border-left: 3px solid var(--ca-accent);
+  padding: 4px 0 4px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-width: 280px;
+}
+
+.prompt {
+  display: block;
+  text-align: center;
+  padding-bottom: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-bottom: 10px;
+  max-height: 46vh;
+  overflow-y: auto;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  text-align: left;
+  background: var(--ca-surface1);
+  border: 1px solid var(--ca-line);
+  border-left: 3px solid var(--ca-line);
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+  transition: background 120ms ease;
+}
+
+.row:hover,
+.row:focus-visible {
+  background: var(--ca-surface2);
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.rowName {
+  color: var(--ca-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.rowDetail {
+  color: var(--ca-dim);
+  font-size: 11px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowValue {
+  color: var(--ca-amber);
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+:root[data-ca-motion='reduced'] .row {
+  transition: none;
+}

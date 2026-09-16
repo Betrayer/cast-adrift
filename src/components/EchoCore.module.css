@@ -1,0 +1,136 @@
+.body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 12px 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.body > * {
+  max-width: 720px;
+  width: 100%;
+  margin-inline: auto;
+}
+
+.core {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 12px;
+  border: 1px solid var(--ca-accent);
+  border-radius: 12px;
+  background: var(--ca-surface2);
+  text-align: center;
+}
+
+.branches {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+@media (min-width: 768px) {
+  .branches {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.branch {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.branchName {
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ca-faint);
+}
+
+.node {
+  appearance: none;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  color: var(--ca-text);
+  background: var(--ca-surface1);
+  border: 1px solid var(--ca-line);
+  border-radius: 10px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.nodeOn {
+  border-color: var(--ca-accent);
+  box-shadow: 0 0 0 1px var(--ca-accent) inset;
+}
+
+.nodeOff {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.nodeHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.nodeName {
+  font-size: 13px;
+  line-height: 17px;
+  font-weight: 700;
+  min-width: 0;
+}
+
+.nodeTier {
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--ca-faint);
+  flex: 0 0 auto;
+}
+
+.nodeBody {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ca-dim);
+}
+
+.nodeLock {
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--ca-amber);
+}
+
+.nodeMark {
+  font-size: 10px;
+  line-height: 14px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ca-accent);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.rowText {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+

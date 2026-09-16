@@ -1,10 +1,8 @@
+import { moduleDef } from "@/data/modules/types";
 import type { ModuleDef } from "@/data/modules/types";
 
 export const OFFENSE_MODULES: readonly ModuleDef[] = [
-  {
-    id: "siegeMount",
-    name: "content:modules.siegeMount.name",
-    desc: "content:modules.siegeMount.desc",
+  moduleDef("siegeMount", {
     rarity: "common",
     price: 55,
     tag: "offense",
@@ -19,11 +17,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "modDieValue", n: 4 }],
       },
     ],
-  },
-  {
-    id: "splinterHead",
-    name: "content:modules.splinterHead.name",
-    desc: "content:modules.splinterHead.desc",
+  }),
+  moduleDef("splinterHead", {
     rarity: "common",
     price: 45,
     tag: "offense",
@@ -35,11 +30,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "dmg", n: 1, perTag: "swarm" }],
       },
     ],
-  },
-  {
-    id: "emberInjector",
-    name: "content:modules.emberInjector.name",
-    desc: "content:modules.emberInjector.desc",
+  }),
+  moduleDef("emberInjector", {
     rarity: "common",
     price: 50,
     tag: "offense",
@@ -51,11 +43,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "addStatus", s: "burn", n: 2, target: "target" }],
       },
     ],
-  },
-  {
-    id: "targetingMesh",
-    name: "content:modules.targetingMesh.name",
-    desc: "content:modules.targetingMesh.desc",
+  }),
+  moduleDef("targetingMesh", {
     rarity: "common",
     price: 50,
     tag: "offense",
@@ -70,11 +59,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "overpressure",
-    name: "content:modules.overpressure.name",
-    desc: "content:modules.overpressure.desc",
+  }),
+  moduleDef("overpressure", {
     rarity: "common",
     price: 50,
     tag: "offense",
@@ -87,11 +73,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "modDieValue", n: 4 }],
       },
     ],
-  },
-  {
-    id: "piercer",
-    name: "content:modules.piercer.name",
-    desc: "content:modules.piercer.desc",
+  }),
+  moduleDef("piercer", {
     rarity: "uncommon",
     price: 70,
     tag: "offense",
@@ -104,11 +87,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "dmg", n: 2, perTag: "pierce" }],
       },
     ],
-  },
-  {
-    id: "railCradle",
-    name: "content:modules.railCradle.name",
-    desc: "content:modules.railCradle.desc",
+  }),
+  moduleDef("railCradle", {
     rarity: "uncommon",
     price: 65,
     tag: "offense",
@@ -128,11 +108,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "modDieValue", n: 4 }],
       },
     ],
-  },
-  {
-    id: "lanceCapacitor",
-    name: "content:modules.lanceCapacitor.name",
-    desc: "content:modules.lanceCapacitor.desc",
+  }),
+  moduleDef("lanceCapacitor", {
     rarity: "uncommon",
     price: 70,
     tag: "offense",
@@ -147,11 +124,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "gunCamera",
-    name: "content:modules.gunCamera.name",
-    desc: "content:modules.gunCamera.desc",
+  }),
+  moduleDef("gunCamera", {
     rarity: "uncommon",
     price: 60,
     tag: "offense",
@@ -178,11 +152,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "modDieValue", n: 2 }],
       },
     ],
-  },
-  {
-    id: "ricochetHousing",
-    name: "content:modules.ricochetHousing.name",
-    desc: "content:modules.ricochetHousing.desc",
+  }),
+  moduleDef("ricochetHousing", {
     rarity: "rare",
     price: 85,
     tag: "offense",
@@ -197,11 +168,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
-  {
-    id: "executioner",
-    name: "content:modules.executioner.name",
-    desc: "content:modules.executioner.desc",
+  }),
+  moduleDef("executioner", {
     rarity: "rare",
     price: 85,
     tag: "offense",
@@ -225,11 +193,8 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         do: [{ a: "dmg", n: 4 }],
       },
     ],
-  },
-  {
-    id: "autoloader",
-    name: "content:modules.autoloader.name",
-    desc: "content:modules.autoloader.desc",
+  }),
+  moduleDef("autoloader", {
     rarity: "legendary",
     price: 120,
     tag: "offense",
@@ -255,5 +220,5 @@ export const OFFENSE_MODULES: readonly ModuleDef[] = [
         ],
       },
     ],
-  },
+  }),
 ];

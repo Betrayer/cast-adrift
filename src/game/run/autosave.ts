@@ -8,11 +8,15 @@ const BATTLE_DEBOUNCE = 800;
 let timer: ReturnType<typeof setTimeout> | null = null;
 let installed = false;
 
-const flush = (): void => {
+export const cancelAutosave = (): void => {
   if (timer !== null) {
     clearTimeout(timer);
     timer = null;
   }
+};
+
+const flush = (): void => {
+  cancelAutosave();
   autosaveRun();
 };
 

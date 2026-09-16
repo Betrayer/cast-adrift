@@ -31,10 +31,20 @@ export interface ModuleDef {
   tags?: readonly ContentTag[];
 }
 
+export const moduleDef = (
+  id: string,
+  body: Omit<ModuleDef, "id" | "name" | "desc">,
+): ModuleDef => ({
+  id,
+  name: `content:modules.${id}.name`,
+  desc: `content:modules.${id}.desc`,
+  ...body,
+});
+
 export const moduleTags = (def: ModuleDef): readonly ContentTag[] => [
   ...MODULE_CATEGORY_TAGS[def.tag],
   ...(def.tags ?? []),
 ];
 
 export const BASE_MODULE_SLOTS = 2;
-export const MAX_MODULE_SLOTS = 3;
+export const MAX_MODULE_SLOTS = 4;

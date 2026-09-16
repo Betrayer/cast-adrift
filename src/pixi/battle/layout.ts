@@ -17,6 +17,11 @@ export interface SubsystemPlacement {
   radius: number;
 }
 
+export interface PartLabelPlacement {
+  x: number;
+  reach: number;
+}
+
 export interface BattleLayout {
   ship: Rect | null;
   dieSize: number;
@@ -28,6 +33,7 @@ export interface BattleLayout {
   enemyPitch: number;
   enemyHit: Rect;
   subsystems: SubsystemPlacement;
+  partLabel: PartLabelPlacement;
   tumble: Rect;
   playerHit: Point;
 }
@@ -47,7 +53,7 @@ const TRAY_MAX_ROWS = 3;
 const DIE_TAPPABLE = 40;
 const DIE_MAX = 56;
 const DIE_FLOOR = 26;
-const ENEMY_MIN = 30;
+export const ENEMY_MIN = 30;
 const ENEMY_MAX = 60;
 const WIDE_BAND = 480;
 const DIE_MAX_WIDE = 68;
@@ -56,7 +62,10 @@ const ENEMY_HIT_PAD = 6;
 const RING_REACH = 0.72;
 const ENEMY_GAP = 10;
 const SUB_CHIP_GAP = 20;
+const SUB_CHIP_GAP_MIN = 10;
+const PART_LABEL_GAP = 3;
 const INTENT_HEADROOM = 16;
+const ENEMY_SHRINK_PASSES = 8;
 
 const clamp = (value: number, min: number, max: number): number =>
   Math.min(max, Math.max(min, value));
@@ -74,42 +83,80 @@ interface EnemyBlock {
   subsystems: SubsystemPlacement;
 }
 
-const enemyBlockFor = (
+const sideRoomFor = (
+  enemySize: number,
+  pitch: number,
+  radius: number,
+): number => pitch - 2 * enemySize * RING_REACH - radius - ENEMY_GAP;
+
+const blockOf = (
   enemySize: number,
   subs: number,
-  pitch: number,
+  subsystems: SubsystemPlacement,
 ): EnemyBlock => {
-  const radius = clamp(enemySize * 0.34, 12, 18);
-  const chipPitch = Math.max(2 * radius + 2, enemySize * 0.7);
-  const sideReach = enemySize * RING_REACH + SUB_CHIP_GAP + radius;
-  const sideFits =
-    subs === 0 || pitch >= sideReach + enemySize * RING_REACH + ENEMY_GAP;
-  const subsystems: SubsystemPlacement = sideFits
-    ? {
-        x: enemySize * RING_REACH + SUB_CHIP_GAP,
-        y0: -enemySize / 4,
-        pitch: chipPitch,
-        radius,
-      }
-    : {
-        x: 0,
-        y0: enemySize * RING_REACH + radius + 4,
-        pitch: chipPitch,
-        radius,
-      };
   const lastChipY =
     subs === 0 ? 0 : subsystems.y0 + (subs - 1) * subsystems.pitch;
   const extentUp = enemySize * RING_REACH + INTENT_HEADROOM;
   const extentDown =
     subs === 0
       ? enemySize * RING_REACH
-      : Math.max(enemySize * RING_REACH, lastChipY + radius);
+      : Math.max(enemySize * RING_REACH, lastChipY + subsystems.radius);
   return {
     extentUp,
     extentDown,
     height: extentUp + extentDown,
     subsystems,
   };
+};
+
+const chipRadiusFor = (enemySize: number): number =>
+  clamp(enemySize * 0.34, 12, 18);
+
+const chipPitchFor = (enemySize: number, radius: number): number =>
+  Math.max(2 * radius + 2, enemySize * 0.7);
+
+const besidePlacement = (
+  enemySize: number,
+  gap: number,
+  radius: number,
+): SubsystemPlacement => ({
+  x: enemySize * RING_REACH + gap,
+  y0: -enemySize / 4,
+  pitch: chipPitchFor(enemySize, radius),
+  radius,
+});
+
+const enemyBlockFor = (
+  enemySize: number,
+  subs: number,
+  pitch: number,
+): EnemyBlock => {
+  const radius = chipRadiusFor(enemySize);
+  const sideRoom = sideRoomFor(enemySize, pitch, radius);
+  if (subs === 0 || sideRoom >= SUB_CHIP_GAP) {
+    return blockOf(enemySize, subs, besidePlacement(enemySize, SUB_CHIP_GAP, radius));
+  }
+  return blockOf(enemySize, subs, {
+    x: 0,
+    y0: enemySize * RING_REACH + radius + 4,
+    pitch: chipPitchFor(enemySize, radius),
+    radius,
+  });
+};
+
+const tightSideBlockFor = (
+  enemySize: number,
+  subs: number,
+  pitch: number,
+): EnemyBlock | null => {
+  const radius = chipRadiusFor(enemySize);
+  const sideRoom = sideRoomFor(enemySize, pitch, radius);
+  if (subs === 0 || sideRoom < SUB_CHIP_GAP_MIN) return null;
+  return blockOf(
+    enemySize,
+    subs,
+    besidePlacement(enemySize, Math.min(sideRoom, SUB_CHIP_GAP), radius),
+  );
 };
 
 const rowCountsFor = (diceCount: number, rows: number): number[] => {
@@ -198,10 +245,29 @@ export const computeBattleLayout = (
     enemyCeilingFor(enemyBand.w),
   );
   let block = enemyBlockFor(enemySize, subs, enemyPitch);
-  if (block.height > enemyBand.h && block.height > 0) {
-    enemySize = Math.max(16, enemySize * (enemyBand.h / block.height));
+  for (let pass = 0; pass < ENEMY_SHRINK_PASSES; pass += 1) {
+    if (block.height <= enemyBand.h || block.height <= 0) break;
+    const shrunk = Math.max(
+      ENEMY_MIN,
+      enemySize * (enemyBand.h / block.height),
+    );
+    if (shrunk >= enemySize) break;
+    enemySize = shrunk;
     block = enemyBlockFor(enemySize, subs, enemyPitch);
   }
+  if (block.height > enemyBand.h) {
+    const tight = tightSideBlockFor(enemySize, subs, enemyPitch);
+    if (tight !== null && tight.height < block.height) block = tight;
+  }
+
+  const labelX = block.subsystems.radius + PART_LABEL_GAP;
+  const labelLeft = block.subsystems.x + labelX;
+  const labelReach = Math.max(
+    0,
+    (enemyCount <= 1
+      ? enemyBand.w / 2
+      : enemyPitch - enemySize * RING_REACH) - labelLeft,
+  );
   const enemyCenterY =
     enemyBand.y +
     Math.max(0, (enemyBand.h - block.height) / 2) +
@@ -234,6 +300,7 @@ export const computeBattleLayout = (
       h: enemySize + 2 * ENEMY_HIT_PAD,
     },
     subsystems: block.subsystems,
+    partLabel: { x: labelX, reach: labelReach },
     tumble: {
       x: trayBand.x,
       y: Math.min(tumbleTop, trayBottom - dieSize),

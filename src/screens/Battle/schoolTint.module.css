@@ -1,0 +1,35 @@
+.tinted[data-school='red'] {
+  --tint: var(--ca-school-red-stroke);
+  --wash: var(--ca-school-red-fill);
+  --tone: var(--ca-school-red-text);
+}
+
+.tinted[data-school='blue'] {
+  --tint: var(--ca-school-blue-stroke);
+  --wash: var(--ca-school-blue-fill);
+  --tone: var(--ca-school-blue-text);
+}
+
+.tinted[data-school='green'] {
+  --tint: var(--ca-school-green-stroke);
+  --wash: var(--ca-school-green-fill);
+  --tone: var(--ca-school-green-text);
+}
+
+.tinted[data-school='grey'] {
+  --tint: var(--ca-school-grey-stroke);
+  --wash: var(--ca-school-grey-fill);
+  --tone: var(--ca-school-grey-text);
+}
+
+.tinted[data-school='black'] {
+  --tint: var(--ca-school-black-stroke);
+  --wash: var(--ca-school-black-fill);
+  --tone: var(--ca-school-black-text);
+}
+
+.tinted[data-school='yellow'] {
+  --tint: var(--ca-school-yellow-stroke);
+  --wash: var(--ca-school-yellow-fill);
+  --tone: var(--ca-school-yellow-text);
+}

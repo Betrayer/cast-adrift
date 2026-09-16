@@ -19,6 +19,8 @@ export interface EvasionTuning {
   delta: number;
   dodgeCap: number;
   glancingCap: number;
+  dodgePerValue: number;
+  glancingPerValue: number;
 }
 
 export interface PassiveProfile {
@@ -66,6 +68,8 @@ const HANDLERS: { [K in PassiveHandlerId]: PassiveHandler<K> } = {
       delta: passive.evasionDelta,
       dodgeCap: passive.dodgeCap,
       glancingCap: passive.glancingCap,
+      dodgePerValue: passive.dodgePerValue,
+      glancingPerValue: passive.glancingPerValue,
     },
     afterburner: { weapons: passive.weapons, cap: passive.cap },
   }),
