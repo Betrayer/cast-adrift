@@ -11,6 +11,7 @@ import {
   swipeBehavior,
   viewport,
 } from "@tma.js/sdk";
+import { onBackGuardsChange } from "@/app/backGuard";
 import { isSwipeLocked } from "@/app/routes";
 import { tokens } from "@/app/theme";
 import { canGoBack, useAppStore } from "@/stores/appStore";
@@ -192,6 +193,7 @@ export const bindTelegramChrome = (hasRun: () => boolean): void => {
 
   sync();
   useAppStore.subscribe(sync);
+  onBackGuardsChange(sync);
 };
 
 export const openExternalLink = (url: string): boolean => {

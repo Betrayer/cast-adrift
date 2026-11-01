@@ -27,6 +27,9 @@ export type PerkTrait =
   | "coldLogic"
   | "obsidianPact"
   | "overflowShield"
+  | "overflowCharge"
+  | "houseEdge"
+  | "greyIsBlack"
   | "firstHitPierce"
   | "escapePod"
   | "recycler"
@@ -43,6 +46,7 @@ export interface PerkMods {
   chargeCapDelta: number;
   hullMaxDelta: number;
   hullMaxPct: number;
+  shieldKeepPct: number;
   evasionDelta: number;
   markBonusDelta: number;
   jamPowerDelta: number;
@@ -52,6 +56,7 @@ export interface PerkMods {
   extraRerolls: number;
   scrapPerKill: number;
   setCompleteCharge: number;
+  resonanceCountDelta: number;
   freeShopRerolls: number;
   xpMultPct: number;
   tideEffectDelta: number;
@@ -73,6 +78,10 @@ export interface PerkDef {
   tags?: readonly ContentTag[];
 }
 
+export const perkTags = (def: PerkDef): readonly ContentTag[] => [
+  ...new Set([...(def.synergy ?? []), ...(def.tags ?? [])]),
+];
+
 export const ZERO_PERK_MODS: PerkMods = {
   rerollSizeDelta: 0,
   reserveDelta: 0,
@@ -83,6 +92,7 @@ export const ZERO_PERK_MODS: PerkMods = {
   chargeCapDelta: 0,
   hullMaxDelta: 0,
   hullMaxPct: 0,
+  shieldKeepPct: 0,
   evasionDelta: 0,
   markBonusDelta: 0,
   jamPowerDelta: 0,
@@ -92,6 +102,7 @@ export const ZERO_PERK_MODS: PerkMods = {
   extraRerolls: 0,
   scrapPerKill: 0,
   setCompleteCharge: 0,
+  resonanceCountDelta: 0,
   freeShopRerolls: 0,
   xpMultPct: 0,
   tideEffectDelta: 0,

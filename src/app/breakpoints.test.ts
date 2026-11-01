@@ -1,5 +1,4 @@
-import { readdirSync, readFileSync } from "node:fs";
-import { join } from "node:path";
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   atLeast,
@@ -11,13 +10,7 @@ import {
   needsRotateGate,
   ROTATE_GATE_MAX_HEIGHT,
 } from "@/app/breakpoints";
-
-const SRC = join(process.cwd(), "src");
-
-const cssFiles = (): string[] =>
-  readdirSync(SRC, { recursive: true, encoding: "utf8" })
-    .filter((entry) => entry.endsWith(".css"))
-    .map((entry) => join(SRC, entry));
+import { sourceFiles } from "@/app/sourceFiles";
 
 describe("breakpoint scale", () => {
   it("rises monotonically in declaration order", () => {
@@ -89,7 +82,7 @@ describe("stylesheets share the one breakpoint scale", () => {
       declared.add(HEIGHTS[name] - 1);
     }
     const offenders: string[] = [];
-    for (const file of cssFiles()) {
+    for (const file of sourceFiles(".css")) {
       const css = readFileSync(file, "utf8");
       for (const match of css.matchAll(
         /\(\s*(?:min|max)-(?:width|height):\s*(\d+)px/g,

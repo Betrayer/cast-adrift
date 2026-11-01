@@ -1,5 +1,6 @@
 import { useCallback, useSyncExternalStore, type MouseEvent } from 'react';
 import { useTranslation } from 'react-i18next';
+import { riseStyle } from '@/app/motion';
 import { swallowNextClick, useEscapeKey } from '@/components/dismiss';
 import { echoReadsIntents } from '@/data/echo';
 import { ENEMY_BY_ID } from '@/data/enemies';
@@ -158,6 +159,8 @@ export const EnemyDetail = () => {
         <button
           type="button"
           disabled={sealed}
+          data-rise
+          style={riseStyle(0)}
           className={`${styles.targetRow ?? ''} ${
             targetId === enemy.id ? styles.targetRowOn ?? '' : ''
           } ${sealed ? styles.targetRowSealed ?? '' : ''}`}
@@ -180,13 +183,15 @@ export const EnemyDetail = () => {
             </span>
           ) : null}
         </button>
-        {enemy.subsystems.map((sub) => {
+        {enemy.subsystems.map((sub, index) => {
           const subDef = partDefOf(def, sub);
           return (
             <button
               key={sub.id}
               type="button"
               disabled={sub.hp <= 0}
+              data-rise
+              style={riseStyle(index + 1)}
               className={`${styles.targetRow ?? ''} ${
                 targetId === sub.id ? styles.targetRowOn ?? '' : ''
               }`}

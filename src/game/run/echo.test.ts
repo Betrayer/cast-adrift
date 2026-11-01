@@ -237,8 +237,8 @@ describe("the two version bumps the equip cost", () => {
     expect(useRunStore.getState().scrap).toBe(77);
   });
 
-  it("moves the meta store to v18 and carries a v17 profile across", () => {
-    expect(META_VERSION).toBe(18);
+  it("moves the meta store to v20 and carries a v17 profile across", () => {
+    expect(META_VERSION).toBe(20);
     const migrated = migrateMeta(
       { shards: 250, codex: ["memory-1", "memory-2"], selectedShip: "wanderer" },
       17,

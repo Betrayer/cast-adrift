@@ -1,7 +1,9 @@
 import { DIE_BY_ID } from "@/data/dice";
+import { FATE_DIE_ID } from "@/data/fate";
 import { resonanceGrantActive } from "@/data/resonance";
-import { TIER_LADDER } from "@/game/battle/setup";
-import type { DieActive, DieTier } from "@/types/content";
+import { tableSeats } from "@/game/battle/table";
+import { FORGE_TIER_CEILING, stepTier } from "@/game/dice/tier";
+import type { DieActive } from "@/types/content";
 import type { ResonanceCensus, RolledDie } from "@/types/battle";
 
 export const SPLIT_DIE_DEF = "grey-d4";
@@ -37,15 +39,24 @@ export const canCopy = (
 
 export const flippedValue = (die: RolledDie): number => die.tier + 1 - die.value;
 
+const lendsValue = (die: RolledDie): boolean => die.defId !== FATE_DIE_ID;
+
 export const adjacentCopyValue = (
   dice: readonly RolledDie[],
   uid: string,
 ): number | undefined => {
-  const index = dice.findIndex((d) => d.uid === uid);
-  if (index < 0) return undefined;
-  const neighbors = [dice[index - 1], dice[index + 1]].filter(
-    (d): d is RolledDie => d !== undefined && d.state === "tray",
-  );
+  const seats = tableSeats(dice);
+  const own = seats.get(uid);
+  if (own === undefined) return undefined;
+  const neighbors = dice.filter((d) => {
+    const seat = seats.get(d.uid);
+    return (
+      seat !== undefined &&
+      Math.abs(seat - own) === 1 &&
+      d.state === "tray" &&
+      lendsValue(d)
+    );
+  });
   if (neighbors.length === 0) return undefined;
   return Math.max(...neighbors.map((d) => d.value));
 };
@@ -55,20 +66,11 @@ export const isSwapTarget = (
   candidate: RolledDie,
 ): boolean =>
   candidate.uid !== source.uid &&
+  lendsValue(candidate) &&
   (candidate.state === "tray" || candidate.state === "placed");
 
-export const FUSE_TIER_CEILING: DieTier = 20;
-
-export const growTier = (tier: DieTier, steps: number): DieTier => {
-  const index = TIER_LADDER.indexOf(tier);
-  const ceiling = TIER_LADDER.indexOf(FUSE_TIER_CEILING);
-  if (index < 0) return tier;
-  const capped = Math.min(ceiling, index + Math.max(0, steps));
-  return TIER_LADDER[capped] ?? tier;
-};
-
 export const canFuse = (die: RolledDie): boolean =>
-  die.state === "tray" && die.tier <= FUSE_TIER_CEILING;
+  die.state === "tray" && die.tier <= FORGE_TIER_CEILING;
 
 export const isFuseTarget = (
   source: RolledDie,
@@ -76,7 +78,7 @@ export const isFuseTarget = (
 ): boolean =>
   candidate.uid !== source.uid &&
   candidate.state === "tray" &&
-  candidate.tier <= FUSE_TIER_CEILING &&
+  candidate.tier <= FORGE_TIER_CEILING &&
   candidate.value === source.value;
 
 export const fusedDie = (
@@ -84,7 +86,7 @@ export const fusedDie = (
   target: RolledDie,
   tierStep: number,
 ): RolledDie => {
-  const tier = growTier(
+  const tier = stepTier(
     source.tier >= target.tier ? source.tier : target.tier,
     tierStep,
   );

@@ -7,12 +7,14 @@ import {
   statSync,
   writeFileSync,
 } from "node:fs";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 import process from "node:process";
+import { filesUnder } from "./files";
 
 const MAIN_BUDGET = 600 * 1024;
 const INITIAL_BUDGET = 1200 * 1024;
 const AUDIO_BUDGET = 400 * 1024;
+const LANDING_BUDGET = 60 * 1024;
 
 const DIST = join(process.cwd(), "dist");
 const APP_DIST = existsSync(join(DIST, "play")) ? join(DIST, "play") : DIST;
@@ -32,43 +34,34 @@ const AUDIO_DIR = existsSync(join(APP_DIST, "audio"))
   ? join(APP_DIST, "audio")
   : join(process.cwd(), "public", "audio");
 
-const audioBytes = (ext: string): number => {
-  let total = 0;
-  const walk = (dir: string): void => {
-    if (!existsSync(dir)) return;
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const path = join(dir, entry.name);
-      if (entry.isDirectory()) walk(path);
-      else if (entry.name.endsWith(ext)) total += statSync(path).size;
-    }
-  };
-  walk(AUDIO_DIR);
-  return total;
-};
+const audioBytes = (ext: string): number =>
+  filesUnder(AUDIO_DIR, (path) => path.endsWith(ext)).reduce((total, path) => total + statSync(path).size, 0);
 
 const shippedAudio = audioBytes(".webm");
 const fallbackAudio = audioBytes(".wav");
+
+const landingBytes = (): number => {
+  const page = join(DIST, "index.html");
+  if (!existsSync(page)) return 0;
+  let total = statSync(page).size;
+  const ships = join(DIST, "ships");
+  if (!existsSync(ships)) return total;
+  for (const entry of readdirSync(ships, { withFileTypes: true })) {
+    if (entry.isFile()) total += statSync(join(ships, entry.name)).size;
+  }
+  return total;
+};
+
+const landing = landingBytes();
 
 const E2E_MARKERS: readonly string[] = ["caTest", "ca-test-api"];
 
 const e2eLeaks = (): string[] => {
   const hits: string[] = [];
-  const walk = (dir: string): void => {
-    if (!existsSync(dir)) return;
-    for (const entry of readdirSync(dir, { withFileTypes: true })) {
-      const path = join(dir, entry.name);
-      if (entry.isDirectory()) {
-        walk(path);
-        continue;
-      }
-      if (!entry.name.endsWith(".js")) continue;
-      const source = readFileSync(path, "utf8");
-      for (const marker of E2E_MARKERS) {
-        if (source.includes(marker)) hits.push(`${entry.name} → ${marker}`);
-      }
-    }
-  };
-  walk(join(DIST, "assets"));
+  for (const path of filesUnder(join(DIST, "assets"), (file) => file.endsWith(".js"))) {
+    const source = readFileSync(path, "utf8");
+    for (const marker of E2E_MARKERS) if (source.includes(marker)) hits.push(`${basename(path)} → ${marker}`);
+  }
   return hits;
 };
 
@@ -135,6 +128,7 @@ for (const row of rows) {
 console.log(`  main chunk   ${kb(mainGz)} / ${kb(MAIN_BUDGET)}`);
 console.log(`  initial total ${kb(initialGz)} / ${kb(INITIAL_BUDGET)}`);
 console.log(`  audio (opus)  ${kb(shippedAudio)} / ${kb(AUDIO_BUDGET)}`);
+console.log(`  landing       ${kb(landing)} / ${kb(LANDING_BUDGET)}`);
 console.log(`  audio (wav fallback, unbudgeted) ${kb(fallbackAudio)}`);
 
 if (report) {
@@ -143,7 +137,7 @@ if (report) {
   writeFileSync(
     join(out, "size.json"),
     `${JSON.stringify(
-      { mainGz, initialGz, shippedAudio, fallbackAudio, rows },
+      { mainGz, initialGz, shippedAudio, fallbackAudio, landing, rows },
       null,
       2,
     )}\n`,
@@ -164,6 +158,12 @@ if (shippedAudio === 0)
   failures.push("no encoded audio found in public/audio — see docs/audio-credits.md");
 if (shippedAudio > AUDIO_BUDGET)
   failures.push(`audio ${kb(shippedAudio)} exceeds ${kb(AUDIO_BUDGET)}`);
+if (landing === 0)
+  failures.push("no landing at dist/index.html — run the build first");
+if (landing > LANDING_BUDGET)
+  failures.push(
+    `landing ${kb(landing)} exceeds ${kb(LANDING_BUDGET)} — it is one request plus six ship svgs`,
+  );
 
 if (failures.length > 0) {
   for (const failure of failures) console.error(`size-check: ${failure}`);

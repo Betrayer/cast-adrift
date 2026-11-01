@@ -86,6 +86,33 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "haggle",
+        label: "content:events.coreBargain.opt.haggle",
+        check: { dice: 3, pick: "sum", target: 15 },
+        onPass: [
+          {
+            text: "content:events.coreBargain.out.hagglePass",
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "loot", rarity: "rare" },
+              { k: "flag", key: "bargainReady" },
+            ],
+            consequence: "content:consequence.pactSigned",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.coreBargain.out.haggleFail",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hull", n: -8 },
+              { k: "flag", key: "pactBroken" },
+            ],
+            consequence: "content:consequence.pactSigned",
+          },
+        ],
+      },
     ],
   },
   {
@@ -172,6 +199,30 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "axis", n: -1 },
               { k: "loot", rarity: "legendary" },
+            ],
+            consequence: "content:consequence.silentReady",
+          },
+        ],
+      },
+      {
+        id: "carryIt",
+        label: "content:events.silentSignal.opt.carryIt",
+        outcomes: [
+          {
+            text: "content:events.silentSignal.out.carryIt",
+            weight: 2,
+            effects: [
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 2 },
+              { k: "axis", n: 1 },
+            ],
+            consequence: "content:consequence.silentReady",
+          },
+          {
+            text: "content:events.silentSignal.out.carryItStatic",
+            weight: 1,
+            effects: [
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 2 },
+              { k: "tide", n: 1 },
             ],
             consequence: "content:consequence.silentReady",
           },
@@ -267,6 +318,31 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "reactorLight",
+        label: "content:events.brokenLighthouse.opt.reactorLight",
+        check: { dice: 2, pick: "sum", target: 9, school: "black" },
+        onPass: [
+          {
+            text: "content:events.brokenLighthouse.out.reactorPass",
+            effects: [
+              { k: "hull", n: -4 },
+              { k: "axis", n: 2 },
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "flag", key: "lighthouseLit" },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.brokenLighthouse.out.reactorFail",
+            effects: [
+              { k: "hull", n: -10 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -311,6 +387,29 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "writeSmall",
+        label: "content:events.unwrittenTurn.opt.writeSmall",
+        outcomes: [
+          {
+            text: "content:events.unwrittenTurn.out.writeSmall",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "turnWritten" },
+              { k: "loot", rarity: "uncommon" },
+              { k: "axis", n: -1 },
+            ],
+          },
+          {
+            text: "content:events.unwrittenTurn.out.writeSmallTorn",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "turnWritten" },
+              { k: "hull", n: -5 },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -345,6 +444,31 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
               { k: "nodeMod", mod: "endHeal", n: 3 },
             ],
             codex: "coreThreshold",
+          },
+        ],
+      },
+      {
+        id: "stripQuietly",
+        label: "content:events.coreChoirWreck.opt.stripQuietly",
+        check: { dice: 2, pick: "lowest", target: 5 },
+        onPass: [
+          {
+            text: "content:events.coreChoirWreck.out.quietPass",
+            effects: [
+              { k: "scrap", n: 45 },
+              { k: "hullMax", n: 4 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.coreChoirWreck.out.quietFail",
+            effects: [{ k: "scrap", n: 20 }],
+            follow: {
+              enemyIds: ["coreSentinel"],
+              scrap: 50,
+              loot: { rarity: "rare" },
+            },
           },
         ],
       },
@@ -1029,6 +1153,1135 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
               { k: "nodeMod", mod: "endHeal", n: 2 }
             ],
             consequence: "content:consequence.thresholdStocked",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "courierAtTheCore",
+    weight: 15,
+    requires: {
+      sector: [5],
+      flags: { all: ["courierFreed"], not: ["courierNetted"] },
+    },
+    text: "content:events.courierAtTheCore.text",
+    dialogue: [
+      { who: "narration", line: "content:events.courierAtTheCore.dia.l1" },
+      { who: "echo", line: "content:events.courierAtTheCore.dia.l2" },
+    ],
+    options: [
+      {
+        id: "readManifest",
+        label: "content:events.courierAtTheCore.opt.readManifest",
+        check: { dice: 2, pick: "sum", target: 10 },
+        onPass: [
+          {
+            text: "content:events.courierAtTheCore.out.readPass",
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "scrap", n: 40 },
+            ],
+            consequence: "content:consequence.courierFreed",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.courierAtTheCore.out.readFail",
+            effects: [
+              { k: "tide", n: 1 },
+              { k: "hull", n: -6 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "followIt",
+        label: "content:events.courierAtTheCore.opt.followIt",
+        outcomes: [
+          {
+            text: "content:events.courierAtTheCore.out.followIt",
+            weight: 3,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 4 },
+              { k: "nodeMod", mod: "endHeal", n: 1 },
+            ],
+            consequence: "content:consequence.courierFreed",
+          },
+          {
+            text: "content:events.courierAtTheCore.out.followItShort",
+            weight: 1,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 4 },
+              { k: "hull", n: -8 },
+            ],
+            consequence: "content:consequence.courierFreed",
+          },
+        ],
+      },
+      {
+        id: "sendIn",
+        label: "content:events.courierAtTheCore.opt.sendIn",
+        outcomes: [
+          {
+            text: "content:events.courierAtTheCore.out.sendIn",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "courierSentIn" },
+              { k: "axis", n: 2 },
+            ],
+            consequence: "content:consequence.courierSentIn",
+          },
+          {
+            text: "content:events.courierAtTheCore.out.sendInGift",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "courierSentIn" },
+              { k: "axis", n: 2 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+            consequence: "content:consequence.courierSentIn",
+          },
+        ],
+      },
+      {
+        id: "stripIt",
+        label: "content:events.courierAtTheCore.opt.stripIt",
+        outcomes: [
+          {
+            text: "content:events.courierAtTheCore.out.stripIt",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 55 },
+              { k: "axis", n: -2 },
+            ],
+            consequence: "content:consequence.courierStripped",
+          },
+          {
+            text: "content:events.courierAtTheCore.out.stripItCalled",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 55 },
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
+            consequence: "content:consequence.courierStripped",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "mirrorAtTheCore",
+    weight: 15,
+    requires: { sector: [5], flags: { any: ["mirrorBound", "mirrorBroken"] } },
+    text: "content:events.mirrorAtTheCore.text",
+    options: [
+      {
+        id: "takeItsLane",
+        label: "content:events.mirrorAtTheCore.opt.takeItsLane",
+        outcomes: [
+          {
+            text: "content:events.mirrorAtTheCore.out.takeItsLane",
+            weight: 2,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "axis", n: -1 },
+            ],
+          },
+          {
+            text: "content:events.mirrorAtTheCore.out.takeItsLaneHurt",
+            weight: 1,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "hull", n: -10 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "fireOnIt",
+        label: "content:events.mirrorAtTheCore.opt.fireOnIt",
+        check: { dice: 3, pick: "highest", target: 7 },
+        onPass: [
+          {
+            text: "content:events.mirrorAtTheCore.out.firePass",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "loot", rarity: "rare" },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.mirrorAtTheCore.out.fireFail",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hull", n: -12 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "letItGo",
+        label: "content:events.mirrorAtTheCore.opt.letItGo",
+        requires: { req: "flag", key: "mirrorBound" },
+        outcomes: [
+          {
+            text: "content:events.mirrorAtTheCore.out.letItGo",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "mirrorSentHome" },
+              { k: "hullMax", n: 5 },
+              { k: "axis", n: 2 },
+            ],
+            consequence: "content:consequence.mirrorBound",
+          },
+          {
+            text: "content:events.mirrorAtTheCore.out.letItGoTrade",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "mirrorSentHome" },
+              { k: "hullMax", n: 5 },
+              { k: "swapLowestDie" },
+            ],
+            consequence: "content:consequence.mirrorBound",
+          },
+        ],
+      },
+      {
+        id: "gatherPieces",
+        label: "content:events.mirrorAtTheCore.opt.gatherPieces",
+        requires: { req: "flag", key: "mirrorBroken" },
+        outcomes: [
+          {
+            text: "content:events.mirrorAtTheCore.out.gatherPieces",
+            weight: 2,
+            effects: [
+              { k: "loot", rarity: "rare" },
+              { k: "axis", n: 1 },
+            ],
+            consequence: "content:consequence.mirrorPieces",
+          },
+          {
+            text: "content:events.mirrorAtTheCore.out.gatherPiecesAwake",
+            weight: 1,
+            effects: [{ k: "axis", n: 1 }],
+            consequence: "content:consequence.mirrorPieces",
+            follow: { enemyIds: ["causalWard"], scrap: 45 },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "yusufAtTheCore",
+    weight: 16,
+    speaker: "yusuf",
+    requires: { sector: [5], flags: { any: ["fleetLaneOpen", "fleetLaneClosed"] } },
+    text: "content:events.yusufAtTheCore.text",
+    dialogue: [
+      { who: "yusuf", line: "content:events.yusufAtTheCore.dia.l1" },
+      { who: "yusuf", line: "content:events.yusufAtTheCore.dia.l2" },
+      { who: "echo", line: "content:events.yusufAtTheCore.dia.l3" },
+    ],
+    options: [
+      {
+        id: "sendHome",
+        label: "content:events.yusufAtTheCore.opt.sendHome",
+        outcomes: [
+          {
+            text: "content:events.yusufAtTheCore.out.sendHome",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hullMax", n: 4 },
+            ],
+          },
+          {
+            text: "content:events.yusufAtTheCore.out.sendHomeFuel",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "scrap", n: -30 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "holdEdge",
+        label: "content:events.yusufAtTheCore.opt.holdEdge",
+        outcomes: [
+          {
+            text: "content:events.yusufAtTheCore.out.holdEdge",
+            weight: 2,
+            effects: [
+              { k: "nodeMod", mod: "endHeal", n: 2 },
+              { k: "axis", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.yusufAtTheCore.out.holdEdgeClipped",
+            weight: 1,
+            effects: [
+              { k: "nodeMod", mod: "endHeal", n: 2 },
+              { k: "hull", n: -6 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "takeGunners",
+        label: "content:events.yusufAtTheCore.opt.takeGunners",
+        outcomes: [
+          {
+            text: "content:events.yusufAtTheCore.out.takeGunners",
+            weight: 2,
+            effects: [{ k: "battleMod", mod: "startCharge", n: 6, battles: 3 }],
+          },
+          {
+            text: "content:events.yusufAtTheCore.out.takeGunnersOne",
+            weight: 1,
+            effects: [
+              { k: "battleMod", mod: "startCharge", n: 4, battles: 3 },
+              { k: "hullMax", n: 3 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "collectLane",
+        label: "content:events.yusufAtTheCore.opt.collectLane",
+        requires: { req: "flag", key: "fleetLaneOpen" },
+        outcomes: [
+          {
+            text: "content:events.yusufAtTheCore.out.collectLane",
+            weight: 2,
+            effects: [{ k: "loot", rarity: "rare" }],
+            consequence: "content:consequence.fleetLaneOpen",
+          },
+          {
+            text: "content:events.yusufAtTheCore.out.collectLaneWelded",
+            weight: 1,
+            effects: [
+              { k: "loot", rarity: "rare" },
+              { k: "hullMax", n: 4 },
+            ],
+            consequence: "content:consequence.fleetLaneOpen",
+          },
+        ],
+      },
+      {
+        id: "squarePinch",
+        label: "content:events.yusufAtTheCore.opt.squarePinch",
+        requires: { req: "flag", key: "fleetLaneClosed" },
+        outcomes: [
+          {
+            text: "content:events.yusufAtTheCore.out.squarePinch",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -50 },
+              { k: "axis", n: 3 },
+            ],
+            consequence: "content:consequence.pinchSquared",
+          },
+          {
+            text: "content:events.yusufAtTheCore.out.squarePinchMedic",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -50 },
+              { k: "axis", n: 3 },
+              { k: "nodeMod", mod: "endHeal", n: 1 },
+            ],
+            consequence: "content:consequence.pinchSquared",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "huntressAtTheCore",
+    weight: 15,
+    speaker: "bountyHuntress",
+    requires: {
+      sector: [5],
+      flags: { all: ["hunterEngaged"], not: ["hunterSquared"] },
+    },
+    text: "content:events.huntressAtTheCore.text",
+    dialogue: [
+      { who: "echo", line: "content:events.huntressAtTheCore.dia.l1" },
+      { who: "bountyHuntress", line: "content:events.huntressAtTheCore.dia.l2" },
+    ],
+    options: [
+      {
+        id: "payIt",
+        label: "content:events.huntressAtTheCore.opt.payIt",
+        outcomes: [
+          {
+            text: "content:events.huntressAtTheCore.out.payIt",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -60 },
+              { k: "axis", n: 1 },
+            ],
+            consequence: "content:consequence.huntressAtCore",
+          },
+          {
+            text: "content:events.huntressAtTheCore.out.payItCrate",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -60 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+            consequence: "content:consequence.huntressAtCore",
+          },
+        ],
+      },
+      {
+        id: "settleIt",
+        label: "content:events.huntressAtTheCore.opt.settleIt",
+        outcomes: [
+          {
+            text: "content:events.huntressAtTheCore.out.settleIt",
+            weight: 2,
+            effects: [{ k: "battleMod", mod: "startCharge", n: 4, battles: 1 }],
+            consequence: "content:consequence.huntressAtCore",
+            follow: {
+              enemyIds: ["bountyHuntress"],
+              scrap: 60,
+              loot: { rarity: "rare" },
+            },
+          },
+          {
+            text: "content:events.huntressAtTheCore.out.settleItHers",
+            weight: 1,
+            effects: [{ k: "hull", n: -6 }],
+            consequence: "content:consequence.huntressAtCore",
+            follow: {
+              enemyIds: ["bountyHuntress"],
+              scrap: 60,
+              loot: { rarity: "rare" },
+            },
+          },
+        ],
+      },
+      {
+        id: "hireHer",
+        label: "content:events.huntressAtTheCore.opt.hireHer",
+        requires: { req: "flag", key: "hunterAllied" },
+        outcomes: [
+          {
+            text: "content:events.huntressAtTheCore.out.hireHer",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -30 },
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 4 },
+            ],
+            consequence: "content:consequence.huntressAtCore",
+          },
+          {
+            text: "content:events.huntressAtTheCore.out.hireHerShort",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -30 },
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 2 },
+              { k: "loot", rarity: "rare" },
+            ],
+            consequence: "content:consequence.huntressAtCore",
+          },
+        ],
+      },
+      {
+        id: "counterBounty",
+        label: "content:events.huntressAtTheCore.opt.counterBounty",
+        check: { dice: 3, pick: "sum", target: 14 },
+        onPass: [
+          {
+            text: "content:events.huntressAtTheCore.out.counterPass",
+            effects: [
+              { k: "scrap", n: 60 },
+              { k: "axis", n: -2 },
+            ],
+            consequence: "content:consequence.huntressAtCore",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.huntressAtTheCore.out.counterFail",
+            effects: [
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+              { k: "axis", n: -2 },
+            ],
+            consequence: "content:consequence.huntressAtCore",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "echoLastOrders",
+    weight: 16,
+    requires: { sector: [5] },
+    text: "content:events.echoLastOrders.text",
+    dialogue: [
+      { who: "echo", line: "content:events.echoLastOrders.dia.l1" },
+      { who: "echo", line: "content:events.echoLastOrders.dia.l2" },
+      { who: "echo", line: "content:events.echoLastOrders.dia.l3" },
+    ],
+    options: [
+      {
+        id: "sendReport",
+        label: "content:events.echoLastOrders.opt.sendReport",
+        outcomes: [
+          {
+            text: "content:events.echoLastOrders.out.sendReport",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "echoReportSent" },
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "startCharge", n: 5, battles: 2 },
+            ],
+            consequence: "content:consequence.echoReportSent",
+          },
+          {
+            text: "content:events.echoLastOrders.out.sendReportLoud",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "echoReportSent" },
+              { k: "axis", n: -2 },
+              { k: "tide", n: 1 },
+            ],
+            consequence: "content:consequence.echoReportSent",
+          },
+        ],
+      },
+      {
+        id: "burnOrders",
+        label: "content:events.echoLastOrders.opt.burnOrders",
+        outcomes: [
+          {
+            text: "content:events.echoLastOrders.out.burnOrders",
+            weight: 3,
+            effects: [
+              { k: "axis", n: 3 },
+              { k: "nodeMod", mod: "rerollSize", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.echoLastOrders.out.burnOrdersShot",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 3 },
+              { k: "hull", n: -6 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "readRest",
+        label: "content:events.echoLastOrders.opt.readRest",
+        check: { dice: 2, pick: "sum", target: 9 },
+        onPass: [
+          {
+            text: "content:events.echoLastOrders.out.readPass",
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+            codex: "echoFleetLog",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.echoLastOrders.out.readFail",
+            effects: [
+              { k: "hull", n: -6 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "fakeScuttle",
+        label: "content:events.echoLastOrders.opt.fakeScuttle",
+        outcomes: [
+          {
+            text: "content:events.echoLastOrders.out.fakeScuttle",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 60 },
+              { k: "axis", n: -1 },
+            ],
+          },
+          {
+            text: "content:events.echoLastOrders.out.fakeScuttleChecked",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 60 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "askEcho",
+        label: "content:events.echoLastOrders.opt.askEcho",
+        outcomes: [
+          {
+            text: "content:events.echoLastOrders.out.askEcho",
+            weight: 2,
+            effects: [
+              { k: "hullMax", n: 5 },
+              { k: "axis", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.echoLastOrders.out.askEchoCurious",
+            weight: 1,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+              { k: "axis", n: -1 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "unhappeningFight",
+    weight: 15,
+    requires: { sector: [5] },
+    text: "content:events.unhappeningFight.text",
+    dialogue: [
+      { who: "echo", line: "content:events.unhappeningFight.dia.l1" },
+      { who: "narration", line: "content:events.unhappeningFight.dia.l2" },
+    ],
+    options: [
+      {
+        id: "strikeNow",
+        label: "content:events.unhappeningFight.opt.strikeNow",
+        check: { dice: 2, pick: "highest", target: 7 },
+        onPass: [
+          {
+            text: "content:events.unhappeningFight.out.strikePass",
+            effects: [
+              { k: "scrap", n: 55 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.unhappeningFight.out.strikeFail",
+            effects: [{ k: "hull", n: -6 }],
+            follow: { enemyIds: ["causalityLoop", "retrocausalMote"], scrap: 40 },
+          },
+        ],
+      },
+      {
+        id: "readResult",
+        label: "content:events.unhappeningFight.opt.readResult",
+        outcomes: [
+          {
+            text: "content:events.unhappeningFight.out.readResult",
+            weight: 2,
+            effects: [{ k: "battleMod", mod: "startCharge", n: 8, battles: 1 }],
+            follow: { enemyIds: ["causalityLoop", "retrocausalMote"], scrap: 50 },
+          },
+          {
+            text: "content:events.unhappeningFight.out.readResultTide",
+            weight: 1,
+            effects: [
+              { k: "battleMod", mod: "startCharge", n: 8, battles: 1 },
+              { k: "tide", n: 1 },
+            ],
+            follow: { enemyIds: ["causalityLoop", "retrocausalMote"], scrap: 50 },
+          },
+        ],
+      },
+      {
+        id: "keepItDone",
+        label: "content:events.unhappeningFight.opt.keepItDone",
+        check: { dice: 3, pick: "sum", target: 15 },
+        onPass: [
+          {
+            text: "content:events.unhappeningFight.out.keepPass",
+            effects: [
+              { k: "flag", key: "turnWritten" },
+              { k: "loot", rarity: "rare" },
+              { k: "scrap", n: 30 },
+            ],
+            consequence: "content:consequence.resultKept",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.unhappeningFight.out.keepFail",
+            effects: [{ k: "hull", n: -8 }],
+            follow: { enemyIds: ["causalityLoop"], scrap: 35 },
+          },
+        ],
+      },
+      {
+        id: "slipPast",
+        label: "content:events.unhappeningFight.opt.slipPast",
+        outcomes: [
+          {
+            text: "content:events.unhappeningFight.out.slipPast",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+            ],
+          },
+          {
+            text: "content:events.unhappeningFight.out.slipPastTide",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "probabilityOrchard",
+    weight: 16,
+    requires: { sector: [5] },
+    text: "content:events.probabilityOrchard.text",
+    options: [
+      {
+        id: "pickRipe",
+        label: "content:events.probabilityOrchard.opt.pickRipe",
+        check: { dice: 2, pick: "highest", target: 7, tierAtLeast: 8 },
+        onPass: [
+          {
+            text: "content:events.probabilityOrchard.out.pickPass",
+            effects: [{ k: "loot", rarity: "rare" }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.probabilityOrchard.out.pickFail",
+            effects: [
+              { k: "hull", n: -6 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "graft",
+        label: "content:events.probabilityOrchard.opt.graft",
+        outcomes: [
+          {
+            text: "content:events.probabilityOrchard.out.graft",
+            weight: 2,
+            effects: [
+              { k: "swapLowestDie" },
+              { k: "axis", n: -1 },
+            ],
+          },
+          {
+            text: "content:events.probabilityOrchard.out.graftTwo",
+            weight: 1,
+            effects: [
+              { k: "swapLowestDie" },
+              { k: "loot", rarity: "uncommon" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "carrySeeds",
+        label: "content:events.probabilityOrchard.opt.carrySeeds",
+        outcomes: [
+          {
+            text: "content:events.probabilityOrchard.out.carrySeeds",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "orchardSeeded" },
+              { k: "axis", n: 2 },
+            ],
+            consequence: "content:consequence.orchardSeeded",
+          },
+          {
+            text: "content:events.probabilityOrchard.out.carrySeedsSprout",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "orchardSeeded" },
+              { k: "axis", n: 2 },
+              { k: "tide", n: 1 },
+            ],
+            consequence: "content:consequence.orchardSeeded",
+          },
+        ],
+      },
+      {
+        id: "stripBare",
+        label: "content:events.probabilityOrchard.opt.stripBare",
+        outcomes: [
+          {
+            text: "content:events.probabilityOrchard.out.stripBare",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 65 },
+              { k: "axis", n: -2 },
+            ],
+          },
+          {
+            text: "content:events.probabilityOrchard.out.stripBareGardener",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 30 },
+              { k: "axis", n: -2 },
+            ],
+            follow: { enemyIds: ["quietEngine"], scrap: 40 },
+          },
+        ],
+      },
+      {
+        id: "moorUnder",
+        label: "content:events.probabilityOrchard.opt.moorUnder",
+        outcomes: [
+          {
+            text: "content:events.probabilityOrchard.out.moorUnder",
+            weight: 3,
+            effects: [{ k: "hull", n: 8 }],
+          },
+          {
+            text: "content:events.probabilityOrchard.out.moorUnderFruit",
+            weight: 1,
+            effects: [
+              { k: "hull", n: 8 },
+              { k: "nodeMod", mod: "rerollSize", n: 1 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "rimSurveyor",
+    weight: 15,
+    requires: { sector: [5] },
+    text: "content:events.rimSurveyor.text",
+    dialogue: [
+      { who: "narration", line: "content:events.rimSurveyor.dia.l1" },
+      { who: "echo", line: "content:events.rimSurveyor.dia.l2" },
+    ],
+    options: [
+      {
+        id: "buyLog",
+        label: "content:events.rimSurveyor.opt.buyLog",
+        outcomes: [
+          {
+            text: "content:events.rimSurveyor.out.buyLog",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -40 },
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+            ],
+          },
+          {
+            text: "content:events.rimSurveyor.out.buyLogGovernor",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -40 },
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "nodeMod", mod: "rerollSize", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "throwProbe",
+        label: "content:events.rimSurveyor.opt.throwProbe",
+        outcomes: [
+          {
+            text: "content:events.rimSurveyor.out.throwProbe",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "probeThrown" },
+              { k: "scrap", n: 30 },
+            ],
+            consequence: "content:consequence.probeThrown",
+          },
+          {
+            text: "content:events.rimSurveyor.out.throwProbeBitten",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "probeThrown" },
+              { k: "hull", n: -6 },
+            ],
+            consequence: "content:consequence.probeThrown",
+          },
+        ],
+      },
+      {
+        id: "fishShards",
+        label: "content:events.rimSurveyor.opt.fishShards",
+        check: { dice: 2, pick: "sum", target: 10 },
+        onPass: [
+          {
+            text: "content:events.rimSurveyor.out.fishPass",
+            effects: [
+              { k: "shards", n: 12 },
+              { k: "axis", n: -1 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.rimSurveyor.out.fishFail",
+            effects: [{ k: "hull", n: -10 }],
+          },
+        ],
+      },
+      {
+        id: "warnHer",
+        label: "content:events.rimSurveyor.opt.warnHer",
+        outcomes: [
+          {
+            text: "content:events.rimSurveyor.out.warnHer",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hullMax", n: 4 },
+            ],
+          },
+          {
+            text: "content:events.rimSurveyor.out.warnHerQuiet",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "tide", n: -1 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "collapsedStall",
+    weight: 14,
+    requires: { sector: [5] },
+    text: "content:events.collapsedStall.text",
+    options: [
+      {
+        id: "cutHerOut",
+        label: "content:events.collapsedStall.opt.cutHerOut",
+        outcomes: [
+          {
+            text: "content:events.collapsedStall.out.cutHerOut",
+            weight: 2,
+            effects: [{ k: "axis", n: 2 }],
+            consequence: "content:consequence.stallCutOut",
+            follow: {
+              enemyIds: ["stormChanter"],
+              scrap: 45,
+              loot: { rarity: "rare" },
+            },
+          },
+          {
+            text: "content:events.collapsedStall.out.cutHerOutWorse",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hull", n: -6 },
+            ],
+            consequence: "content:consequence.stallCutOut",
+            follow: {
+              enemyIds: ["stormChanter", "nullDrone"],
+              scrap: 55,
+              loot: { rarity: "rare" },
+            },
+          },
+        ],
+      },
+      {
+        id: "tradeThroughHatch",
+        label: "content:events.collapsedStall.opt.tradeThroughHatch",
+        requires: { req: "scrap", n: 30 },
+        check: { dice: 2, pick: "sum", target: 9 },
+        onPass: [
+          {
+            text: "content:events.collapsedStall.out.tradePass",
+            effects: [
+              { k: "scrap", n: -30 },
+              { k: "loot", rarity: "rare" },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.collapsedStall.out.tradeFail",
+            effects: [
+              { k: "scrap", n: -30 },
+              { k: "hull", n: -8 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "leaveHer",
+        label: "content:events.collapsedStall.opt.leaveHer",
+        outcomes: [
+          {
+            text: "content:events.collapsedStall.out.leaveHer",
+            weight: 2,
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "scrap", n: 35 },
+            ],
+          },
+          {
+            text: "content:events.collapsedStall.out.leaveHerFollowed",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "scrap", n: 35 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "whatCameBack",
+    weight: 15,
+    requires: {
+      sector: [5, 6],
+      flags: {
+        any: ["courierSentIn", "echoReportSent", "orchardSeeded", "probeThrown", "mirrorSentHome"],
+      },
+    },
+    text: "content:events.whatCameBack.text",
+    dialogue: [
+      { who: "echo", line: "content:events.whatCameBack.dia.l1" },
+      { who: "narration", line: "content:events.whatCameBack.dia.l2" },
+    ],
+    options: [
+      {
+        id: "signForCourier",
+        label: "content:events.whatCameBack.opt.signForCourier",
+        requires: { req: "flag", key: "courierSentIn" },
+        outcomes: [
+          {
+            text: "content:events.whatCameBack.out.signForCourier",
+            weight: 2,
+            effects: [
+              { k: "loot", rarity: "rare" },
+              { k: "axis", n: 1 },
+            ],
+            consequence: "content:consequence.courierSentIn",
+          },
+          {
+            text: "content:events.whatCameBack.out.signForCourierBroken",
+            weight: 1,
+            effects: [
+              { k: "loot", rarity: "legendary" },
+              { k: "hull", n: -8 },
+            ],
+            consequence: "content:consequence.courierSentIn",
+          },
+        ],
+      },
+      {
+        id: "readReply",
+        label: "content:events.whatCameBack.opt.readReply",
+        requires: { req: "flag", key: "echoReportSent" },
+        outcomes: [
+          {
+            text: "content:events.whatCameBack.out.readReply",
+            weight: 2,
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 3 },
+            ],
+            consequence: "content:consequence.echoReportSent",
+          },
+          {
+            text: "content:events.whatCameBack.out.readReplyShort",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "hullMax", n: 6 },
+            ],
+            consequence: "content:consequence.echoReportSent",
+          },
+        ],
+      },
+      {
+        id: "readProbe",
+        label: "content:events.whatCameBack.opt.readProbe",
+        requires: { req: "flag", key: "probeThrown" },
+        outcomes: [
+          {
+            text: "content:events.whatCameBack.out.readProbe",
+            weight: 2,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "scrap", n: 40 },
+            ],
+            consequence: "content:consequence.probeThrown",
+          },
+          {
+            text: "content:events.whatCameBack.out.readProbeFast",
+            weight: 1,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 5 },
+              { k: "hull", n: -6 },
+            ],
+            consequence: "content:consequence.probeThrown",
+          },
+        ],
+      },
+      {
+        id: "openIt",
+        label: "content:events.whatCameBack.opt.openIt",
+        check: { dice: 3, pick: "sum", target: 14 },
+        onPass: [
+          {
+            text: "content:events.whatCameBack.out.openPass",
+            effects: [
+              { k: "loot", rarity: "rare" },
+              { k: "hullMax", n: 5 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.whatCameBack.out.openFail",
+            effects: [
+              { k: "hull", n: -10 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "sendBack",
+        label: "content:events.whatCameBack.opt.sendBack",
+        outcomes: [
+          {
+            text: "content:events.whatCameBack.out.sendBack",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 3 },
+              { k: "nodeMod", mod: "endHeal", n: 2 },
+            ],
+          },
+          {
+            text: "content:events.whatCameBack.out.sendBackThrust",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 3 },
+              { k: "scrap", n: -30 },
+            ],
           },
         ],
       },

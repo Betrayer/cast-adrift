@@ -3,7 +3,12 @@ import { ENGRAVING_BY_ID, type EngravingMap } from "@/data/engravings";
 import { MODULE_BY_ID } from "@/data/modules";
 import { moduleTags } from "@/data/modules/types";
 import { PERK_BY_ID } from "@/data/perks";
-import type { ContentTag } from "@/data/tags";
+import type { ShipId } from "@/data/ships";
+import { MECHANIC_TAGS, SYSTEM_TAGS, type ContentTag } from "@/data/tags";
+import { shipProfile } from "@/game/battle/passives";
+import { computeCensus } from "@/game/battle/resonance";
+import { runHasTrait, sourceMods } from "@/game/run/runMods";
+import type { ResonanceCensus, RolledDie } from "@/types/battle";
 
 export type TagCensus = Partial<Record<ContentTag, number>>;
 
@@ -37,3 +42,49 @@ export const loadoutCensus = (loadout: LoadoutRef): TagCensus => {
   }
   return census;
 };
+
+export const activeCensusTags = (census: TagCensus): readonly ContentTag[] =>
+  [...SYSTEM_TAGS, ...MECHANIC_TAGS].filter((tag) => (census[tag] ?? 0) > 0);
+
+export interface ResonanceSource {
+  shipId: ShipId;
+  perks: readonly string[];
+  chartPicks: readonly string[];
+  modules: readonly string[];
+}
+
+export const loadoutResonance = (
+  dice: readonly Pick<RolledDie, "school">[],
+  source: ResonanceSource,
+): ResonanceCensus =>
+  computeCensus(
+    dice,
+    Math.max(
+      shipProfile(source.shipId).prismaticCensusMult,
+      runHasTrait(
+        source.perks,
+        source.chartPicks,
+        "prismDouble",
+        source.modules,
+      )
+        ? 2
+        : 1,
+    ),
+    sourceMods({
+      perks: source.perks,
+      chartPicks: source.chartPicks,
+      modules: source.modules,
+    }).resonanceCountDelta,
+  );
+
+export const deckResonance = (
+  deck: readonly { defId: string }[],
+  source: ResonanceSource,
+): ResonanceCensus =>
+  loadoutResonance(
+    deck.flatMap((die) => {
+      const school = DIE_BY_ID.get(die.defId)?.school;
+      return school === undefined ? [] : [{ school }];
+    }),
+    source,
+  );

@@ -5,6 +5,7 @@ import type {
   PuzzleTier,
   SingleTurnGoal,
 } from "@/data/puzzles";
+import { resolveFaces } from "@/game/dice/tier";
 import {
   applyTurn,
   emptyCarry,
@@ -12,7 +13,6 @@ import {
   evalOrderStep,
   innerGoal,
   lockedCountForTurn,
-  resolveFaces,
   scorePlacement,
   singleTurnSatisfied,
   type CarryState,

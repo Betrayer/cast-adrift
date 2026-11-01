@@ -1,10 +1,13 @@
 import { DIE_BY_ID } from "@/data/dice";
+import { DIE_PTS } from "@/data/tiers";
+import { dieTier, forgeLevel, type HandDie } from "@/game/dice/tier";
 import type { MkLevel } from "@/data/slots";
 
 export const SHOP_REROLL_COST = 10;
 export const FUSION_COST = 40;
 export const REPAIR_PER_HULL = 2;
-export const DECK_CAP = 9;
+export const HAND_CAP = 15;
+export const TABLE_SIZE = 7;
 
 export const MK_TOP: MkLevel = 3;
 
@@ -41,10 +44,23 @@ export const bayPrice = (sector: number): number =>
 export const ptsForDie = (defId: string): number =>
   DIE_BY_ID.get(defId)?.pts ?? 0;
 
+export const ptsForInstance = (die: HandDie): number =>
+  forgeLevel(die) === 0 ? ptsForDie(die.defId) : DIE_PTS[dieTier(die)];
+
+export const instanceSellValue = (die: HandDie): number =>
+  sellValue(ptsForInstance(die));
+
 export const repairCost = (hullPoints: number): number =>
   Math.max(0, hullPoints) * REPAIR_PER_HULL;
 
 export const mkUpgradeCost = (target: Exclude<MkLevel, 1>): number =>
   MK_COST[target];
+
+export const MK_COST_FLOOR = 1;
+
+export const discountedMkCost = (
+  target: Exclude<MkLevel, 1>,
+  discount: number,
+): number => Math.max(MK_COST_FLOOR, mkUpgradeCost(target) - discount);
 
 export const MINIBOSS_PACKAGE_SCRAP: readonly [number, number] = [30, 40];

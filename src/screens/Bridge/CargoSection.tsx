@@ -1,6 +1,7 @@
 import { Button, Paper, Stack, Text } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
 import { ConfirmDialog } from "@/components/ConfirmDialog";
 import { cargoDef, cargoDescVars, cargoPayout } from "@/data/cargo";
@@ -54,11 +55,13 @@ export const CargoSection = () => {
         <Text size="sm" fw={600} c={tokens.text}>
           {t("run:bridge.cargoTitle", { used: rows.length, max: hold })}
         </Text>
-        {rows.map((row) => (
+        {rows.map((row, index) => (
           <div
             key={row.def.id}
             className={styles.cargoRow}
             data-bridge-cargo={row.def.id}
+            data-rise
+            style={riseStyle(index)}
           >
             <Text size="sm" fw={600} c={tokens.text}>
               {t(row.def.name)}
@@ -87,6 +90,8 @@ export const CargoSection = () => {
             key={`hold-${String(index)}`}
             className={styles.cargoEmpty}
             data-bridge-cargo-empty={index}
+            data-rise
+            style={riseStyle(rows.length + index)}
           >
             <Text size="xs" c={tokens.faint}>
               {t("run:bridge.cargoEmpty")}

@@ -1,5 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { FX_GROUP, linear, rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
+import {
+  easeOutCubic,
+  FX_GROUP,
+  linear,
+  rafClock,
+  spring,
+  Tweens,
+  UI_GROUP,
+} from "@/pixi/tween";
 
 interface FakeTicker {
   deltaMS: number;
@@ -289,5 +297,167 @@ describe("Tweens re-entrancy", () => {
     target.x = 90;
     step(50);
     expect(target.x).toBeCloseTo(50);
+  });
+});
+
+describe("motion primitives", () => {
+  it("ends the cubic and the spring exactly on their endpoints", () => {
+    expect(easeOutCubic(0)).toBe(0);
+    expect(easeOutCubic(1)).toBe(1);
+    expect(spring(0)).toBe(0);
+    expect(spring(1)).toBe(1);
+    expect(easeOutCubic(0.5)).toBeCloseTo(0.875);
+  });
+
+  it("gives the spring one visible overshoot and a settle", () => {
+    const samples = Array.from({ length: 1001 }, (_, i) => spring(i / 1000));
+    const peaks = samples.filter(
+      (value, i) =>
+        i > 0 &&
+        i < samples.length - 1 &&
+        value > (samples[i - 1] ?? 0) &&
+        value >= (samples[i + 1] ?? 0) &&
+        value > 1.01,
+    );
+    expect(peaks).toHaveLength(1);
+    expect(Math.max(...samples)).toBeGreaterThan(1.08);
+    expect(Math.max(...samples)).toBeLessThan(1.2);
+    expect(Math.min(...samples.slice(500))).toBeGreaterThan(0.97);
+  });
+
+  it("calls onUpdate every frame and once more at the end", () => {
+    const { tweens, step } = makeTweens();
+    const target = { x: 0 };
+    const progress: number[] = [];
+    tweens.to(target, { x: 10 }, 100, linear, undefined, {
+      onUpdate: (t) => progress.push(t),
+    });
+    step(40);
+    step(40);
+    step(40);
+    expect(progress).toEqual([0.4, 0.8, 1]);
+    expect(target.x).toBe(10);
+  });
+
+  it("skips onComplete when onUpdate cancels its own tween", () => {
+    const { tweens, step } = makeTweens();
+    const target = { x: 0 };
+    let done = 0;
+    let cancel: () => void = () => undefined;
+    cancel = tweens.to(
+      target,
+      { x: 10 },
+      10,
+      linear,
+      () => {
+        done += 1;
+      },
+      { onUpdate: () => cancel() },
+    );
+    step(20);
+    expect(done).toBe(0);
+  });
+
+  it("staggers each target by the gap and completes once after the last", () => {
+    const { tweens, step } = makeTweens();
+    const targets = [{ y: 0 }, { y: 0 }, { y: 0 }];
+    let done = 0;
+    tweens.stagger(targets, { y: 10 }, 100, linear, 50, {
+      onComplete: () => {
+        done += 1;
+      },
+    });
+    step(50);
+    expect(targets.map((t) => t.y)).toEqual([5, 0, 0]);
+    step(50);
+    expect(targets.map((t) => t.y)).toEqual([10, 5, 0]);
+    step(50);
+    expect(targets.map((t) => t.y)).toEqual([10, 10, 5]);
+    expect(done).toBe(0);
+    step(50);
+    expect(done).toBe(1);
+    expect(targets.map((t) => t.y)).toEqual([10, 10, 10]);
+  });
+
+  it("staggers per-index props and completes at once on an empty list", () => {
+    const { tweens, step } = makeTweens();
+    const targets = [{ y: 0 }, { y: 0 }];
+    tweens.stagger(targets, (index) => ({ y: index + 1 }), 10, linear, 0);
+    step(20);
+    expect(targets.map((t) => t.y)).toEqual([1, 2]);
+    let empty = 0;
+    tweens.stagger([], { y: 1 }, 10, linear, 5, {
+      onComplete: () => {
+        empty += 1;
+      },
+    });
+    expect(empty).toBe(1);
+  });
+
+  it("still completes a stagger when one of its targets is destroyed mid-flight", () => {
+    const { tweens, step } = makeTweens();
+    const targets = [
+      { y: 0, destroyed: false },
+      { y: 0, destroyed: false },
+      { y: 0, destroyed: false },
+    ];
+    let done = 0;
+    tweens.stagger(targets, { y: 10 }, 100, linear, 20, {
+      onComplete: () => {
+        done += 1;
+      },
+    });
+    step(50);
+    const second = targets[1];
+    if (second === undefined) throw new Error("no second target");
+    second.destroyed = true;
+    step(200);
+    expect(done).toBe(1);
+    expect(targets[0]?.y).toBe(10);
+    expect(targets[2]?.y).toBe(10);
+  });
+
+  it("counts in whole numbers, writes only on change and lands exactly on the target", () => {
+    const { tweens, step } = makeTweens();
+    const written: number[] = [];
+    tweens.count(0, 7, 100, (value) => written.push(value), { ease: linear });
+    for (let i = 0; i < 12; i += 1) step(10);
+    expect(written[0]).toBe(0);
+    expect(written.at(-1)).toBe(7);
+    expect(new Set(written).size).toBe(written.length);
+    expect(written).toEqual([...written].sort((a, b) => a - b));
+  });
+
+  it("writes the final count synchronously under reduced motion", () => {
+    const { tweens, attached } = makeTweens();
+    const written: number[] = [];
+    let done = 0;
+    tweens.count(3, 12, 400, (value) => written.push(value), {
+      reduced: true,
+      onComplete: () => {
+        done += 1;
+      },
+    });
+    expect(written).toEqual([12]);
+    expect(done).toBe(1);
+    expect(attached()).toBe(false);
+  });
+
+  it("attaches to its clock only while it has work", () => {
+    const { tweens, step, attached } = makeTweens();
+    expect(attached()).toBe(false);
+    const target = { x: 0 };
+    tweens.to(target, { x: 1 }, 20, linear);
+    expect(attached()).toBe(true);
+    step(30);
+    expect(attached()).toBe(false);
+    tweens.after(10, () => {
+      tweens.to(target, { x: 2 }, 40, linear);
+    });
+    step(10);
+    expect(attached()).toBe(true);
+    step(40);
+    expect(target.x).toBe(2);
+    expect(attached()).toBe(false);
   });
 });

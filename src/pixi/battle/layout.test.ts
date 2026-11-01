@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   computeBattleLayout,
   dieCeilingFor,
+  enemyBandNeed,
   enemyCeilingFor,
   ENEMY_MIN,
   type BattleLayout,
@@ -381,5 +382,82 @@ describe("enemy hit geometry", () => {
     });
     expect(layout.subsystems.x).toBe(0);
     expect(layout.subsystems.y0).toBeGreaterThan(0);
+  });
+});
+
+describe("enemy band need", () => {
+  const NEED_CASES = [
+    { name: "two raiders at 390", width: 390, enemies: 2, subs: 0 },
+    { name: "one body with three chips at 390", width: 390, enemies: 1, subs: 3 },
+    { name: "two raiders at 560", width: 560, enemies: 2, subs: 0 },
+    { name: "three bodies with two chips at 366", width: 366, enemies: 3, subs: 2 },
+  ];
+
+  const needFor = (width: number, enemies: number, subs: number): number =>
+    enemyBandNeed({ bandWidth: width, enemyCount: enemies, maxSubsystems: subs });
+
+  const layoutIn = (
+    width: number,
+    height: number,
+    enemies: number,
+    subs: number,
+  ): BattleLayout =>
+    computeBattleLayout({
+      enemyBand: band(12, 172, width, height),
+      trayBand: band(12, 172 + height, width, 80),
+      dockBand: band(12, 252 + height, width, 190),
+      diceCount: 7,
+      enemyCount: enemies,
+      maxSubsystems: subs,
+    });
+
+  it("gives 102.4 px for two raiders at 390", () => {
+    expect(needFor(390, 2, 0)).toBeCloseTo(102.4, 1);
+  });
+
+  it("gives 146.2 px for one body with three chips at 390", () => {
+    expect(needFor(390, 1, 3)).toBeCloseTo(146.2, 1);
+  });
+
+  it("gives 128.3 px for two raiders at 560", () => {
+    expect(needFor(560, 2, 0)).toBeCloseTo(128.3, 1);
+  });
+
+  it("treats an empty fight as one enemy with no chips", () => {
+    expect(needFor(390, 0, -1)).toBe(needFor(390, 1, 0));
+  });
+
+  it("keeps the unbounded enemy size and ends the chip column inside a band of exactly that height", () => {
+    for (const fight of NEED_CASES) {
+      const need = needFor(fight.width, fight.enemies, fight.subs);
+      const unbounded = layoutIn(fight.width, 1000, fight.enemies, fight.subs);
+      const fitted = layoutIn(fight.width, need, fight.enemies, fight.subs);
+      expect(fitted.enemySize, fight.name).toBe(unbounded.enemySize);
+      const anchor = fitted.enemies[0];
+      expect(anchor, fight.name).toBeDefined();
+      if (anchor === undefined) continue;
+      const { subsystems, enemySize } = fitted;
+      const bottom =
+        fight.subs === 0
+          ? anchor.y + enemySize * RING_REACH
+          : anchor.y +
+            subsystems.y0 +
+            (fight.subs - 1) * subsystems.pitch +
+            subsystems.radius;
+      expect(bottom, fight.name).toBeLessThanOrEqual(172 + need + 0.5);
+      expect(anchor.y - enemySize * RING_REACH, fight.name).toBeGreaterThanOrEqual(
+        172 - 0.5,
+      );
+    }
+  });
+
+  it("is the least height that keeps the enemies at full size", () => {
+    for (const fight of NEED_CASES) {
+      const need = needFor(fight.width, fight.enemies, fight.subs);
+      const unbounded = layoutIn(fight.width, 1000, fight.enemies, fight.subs);
+      const short = layoutIn(fight.width, need - 1, fight.enemies, fight.subs);
+      expect(unbounded.enemySize, fight.name).toBeGreaterThan(ENEMY_MIN);
+      expect(short.enemySize, fight.name).toBeLessThan(unbounded.enemySize);
+    }
   });
 });

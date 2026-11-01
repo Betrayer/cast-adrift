@@ -13,7 +13,13 @@ import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { continueWithGoogle, leaveAccount } from "@/services/account";
 import { SUPPORT_EMAIL } from "@/services/support";
-import { isGuestAccount, supportId, type AuthProviderId } from "@/services/uid";
+import type { TgAuthFailure } from "@/services/tgAuth";
+import {
+  isGuestAccount,
+  supportId,
+  type AccountInfo,
+  type AuthProviderId,
+} from "@/services/uid";
 import { useAppStore } from "@/stores/appStore";
 import { EmailAuthModal, type EmailAuthMode } from "./EmailAuthModal";
 
@@ -23,6 +29,23 @@ const PROVIDER_ORDER: readonly AuthProviderId[] = [
   "password",
 ];
 
+export type TelegramLine =
+  | { kind: "signedIn" }
+  | { kind: "guest"; reason: TgAuthFailure };
+
+export const telegramLineFor = (
+  isTelegram: boolean,
+  account: AccountInfo | null,
+  tgAuthFailure: TgAuthFailure | null,
+): TelegramLine | null => {
+  if (!isTelegram) return null;
+  if (account?.providers.includes("telegram") === true) return { kind: "signedIn" };
+  if (isGuestAccount(account) && tgAuthFailure !== null) {
+    return { kind: "guest", reason: tgAuthFailure };
+  }
+  return null;
+};
+
 export const AccountSection = () => {
   const { t } = useTranslation(["settings", "common"]);
   const account = useAppStore((s) => s.account);
@@ -30,6 +53,8 @@ export const AccountSection = () => {
   const busy = useAppStore((s) => s.authBusy);
   const error = useAppStore((s) => s.authError);
   const isTelegram = useAppStore((s) => s.isTelegram);
+  const tgName = useAppStore((s) => s.tgName);
+  const tgAuthFailure = useAppStore((s) => s.tgAuthFailure);
   const [emailMode, setEmailMode] = useState<EmailAuthMode | null>(null);
   const [emailSession, setEmailSession] = useState(0);
   const [leaving, setLeaving] = useState(false);
@@ -39,6 +64,7 @@ export const AccountSection = () => {
   const hasGoogle = providers.includes("google");
   const hasPassword = providers.includes("password");
   const telegramOnly = providers.length === 1 && providers[0] === "telegram";
+  const telegramLine = telegramLineFor(isTelegram, account, tgAuthFailure);
 
   const heading = guest
     ? t("settings:account.guest")
@@ -84,6 +110,18 @@ export const AccountSection = () => {
               {t("settings:account.telegramHint")}
             </Text>
           ) : null}
+
+          {telegramLine === null ? null : (
+            <Text size="xs" c={tokens.faint} data-testid="account-telegram">
+              {telegramLine.kind === "signedIn"
+                ? t("settings:account.tg.signedIn", {
+                    name: tgName ?? t("settings:account.tg.unnamed"),
+                  })
+                : t("settings:account.tg.guest", {
+                    reason: t(`settings:account.tg.reason.${telegramLine.reason}`),
+                  })}
+            </Text>
+          )}
 
           {isTelegram ? (
             <Text size="xs" c={tokens.faint}>

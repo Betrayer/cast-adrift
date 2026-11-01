@@ -1,0 +1,17 @@
+.panel {
+  min-width: 0;
+  animation: tabPanelIn var(--ca-motion-xs) var(--ca-ease-out);
+}
+
+@keyframes tabPanelIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:root[data-ca-motion='reduced'] .panel {
+  animation: none;
+}

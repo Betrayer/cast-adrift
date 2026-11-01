@@ -1,4 +1,5 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { SLOT_FAMILY } from "@/data/slots";
 import { dieFaceMax, dieFaceMin } from "@/game/effects/context";
 import type { EffectCtx } from "@/game/effects/ctx";
 import type { ContentTag } from "@/data/tags";
@@ -12,11 +13,9 @@ import type {
 } from "@/game/effects/types";
 import type { EnemyState, RolledDie, SlotId } from "@/types/battle";
 
-const SLOT_FAMILIES: Readonly<Record<string, readonly SlotId[]>> = {
-  weapons: ["weaponA", "weaponB", "spinal"],
-  shields: ["shields", "shieldsB"],
-  engines: ["engines", "enginesB"],
-};
+export const DEFAULT_EXCEED_HULL_COST = 1;
+
+const SLOT_FAMILIES: Readonly<Record<string, readonly SlotId[]>> = SLOT_FAMILY;
 
 export const slotMatches = (
   slotId: SlotId | undefined,
@@ -43,6 +42,7 @@ const condMatches = (
     case "school":
       if (subject === null) return false;
       if (subject.school === cond.is) return true;
+      if (ctx.schoolCountsAs?.(subject.school, cond.is) === true) return true;
       return cond.exact !== true && subject.school === "prismatic";
     case "slot":
       return slotMatches(ctx.currentSlot?.(), cond.is);
@@ -202,7 +202,15 @@ const applyAction = (
       return;
     case "setDieValue":
       for (const die of selectDice(action.sel, ctx, subject)) {
-        ctx.setDieValue?.(die, action.n);
+        ctx.setDieValue?.(
+          die,
+          action.max === true ? dieFaceMax(die) : (action.n ?? die.value),
+        );
+      }
+      return;
+    case "setDieSchool":
+      for (const die of selectDice(action.sel, ctx, subject)) {
+        ctx.setDieSchool?.(die, action.school);
       }
       return;
     case "rerollDie":
@@ -226,7 +234,7 @@ const applyAction = (
       ctx.allowExceedCap?.({
         ...(action.school === undefined ? {} : { school: action.school }),
         ...(action.slot === undefined ? {} : { slot: action.slot }),
-        hullCost: action.hullCost ?? 1,
+        hullCost: action.hullCost ?? DEFAULT_EXCEED_HULL_COST,
       });
       return;
     case "repeatSlot":

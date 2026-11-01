@@ -7,12 +7,17 @@ export const TOP_PAD = 42;
 export const BOTTOM_PAD = 42;
 export const NODE_RADIUS = 16;
 export const BOSS_RADIUS = 22;
+export const NODE_HIT_RADIUS = 23;
+
+export interface Point {
+  x: number;
+  y: number;
+}
 
 export interface MapGeometry {
   viewW: number;
   viewH: number;
   centerX: number;
-  columns: number;
   laneX: (lane: number) => number;
   rowY: (row: number) => number;
   nodeX: (node: MapNode) => number;
@@ -33,7 +38,6 @@ export const mapGeometry = (shape: MapShape): MapGeometry => {
     viewW,
     viewH,
     centerX,
-    columns,
     laneX,
     rowY,
     nodeX: (node) =>
@@ -42,3 +46,8 @@ export const mapGeometry = (shape: MapShape): MapGeometry => {
     radius: (node) => (node.type === "boss" ? BOSS_RADIUS : NODE_RADIUS),
   };
 };
+
+export const nodePoint = (geo: MapGeometry, node: MapNode): Point => ({
+  x: geo.nodeX(node),
+  y: geo.nodeY(node),
+});

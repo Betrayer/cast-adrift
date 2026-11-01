@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { CABIN_CAP, OFFICER_BY_ID } from "@/data/officers";
 import { applyOutcome } from "@/game/events/apply";
+import { allOutcomes } from "@/game/events/engine";
 import { must, optionById } from "@/game/events/eventFixtures";
 import { abandonRun, endRun, startRun } from "@/game/run/flow";
 import {
@@ -23,11 +24,7 @@ import type { Outcome } from "@/types/events";
 const rescueOutcome = (officerId: string): Outcome => {
   const def = must(OFFICER_BY_ID.get(officerId), `officer ${officerId}`);
   const option = optionById(def.event, def.option);
-  const outcomes = [
-    ...(option.outcomes ?? []),
-    ...(option.onPass ?? []),
-    ...(option.onFail ?? []),
-  ];
+  const outcomes = allOutcomes(option);
   return must(
     outcomes.find((out) =>
       out.effects.some((eff) => eff.k === "officer" && eff.id === officerId),

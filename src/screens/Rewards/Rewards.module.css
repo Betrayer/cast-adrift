@@ -32,6 +32,7 @@
 }
 
 .salvageOptions {
+  --ca-fan-deg: 10deg;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -62,6 +63,7 @@
 
 @media (min-width: 768px) {
   .salvageOptions {
+    --ca-fan-deg: 12deg;
     flex-direction: row;
     justify-content: center;
     gap: 16px;
@@ -88,19 +90,123 @@
   }
 }
 
-.reveal {
-  animation: cardIn 320ms cubic-bezier(0.2, 0.9, 0.3, 1.3) both;
+.cardRow {
+  display: flex;
+  justify-content: center;
 }
 
-@keyframes cardIn {
+.entryCard {
+  animation-duration: var(--ca-motion-l);
+  animation-timing-function: var(--ca-ease-back);
+  animation-fill-mode: backwards;
+  animation-delay: calc(var(--ca-stagger-card) * var(--ca-card-index, 0));
+}
+
+[data-entrance='fan'] .entryCard {
+  animation-name: rewardFan;
+  transform-origin: 50% 100%;
+}
+
+[data-entrance='flip'] .entryCard {
+  animation-name: rewardFlip;
+}
+
+[data-entrance='slide'] .entryCard {
+  animation-name: rewardSlide;
+}
+
+[data-entrance='spin'] .entryCard {
+  animation-name: rewardSpin;
+}
+
+[data-entrance='pop'] .entryCard {
+  animation-name: rewardPop;
+}
+
+@supports (animation-timing-function: linear(0, 1)) {
+  .entryCard[data-spring] {
+    animation-timing-function: var(--ca-card-spring);
+  }
+}
+
+@keyframes rewardFan {
   from {
     opacity: 0;
-    transform: scale(0.7) translateY(10px);
+    transform: translate3d(0, 24px, 0)
+      rotate(calc(var(--ca-fan-deg, 12deg) * var(--ca-card-fan, 0)));
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translate3d(0, 0, 0) rotate(0deg);
   }
+}
+
+@keyframes rewardFlip {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateY(72deg) translate3d(0, 8px, 0);
+  }
+  45% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: perspective(800px) rotateY(0deg) translate3d(0, 0, 0);
+  }
+}
+
+@keyframes rewardSlide {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 28px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes rewardSpin {
+  from {
+    opacity: 0;
+    transform: rotate(-8deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes rewardPop {
+  from {
+    opacity: 0;
+    transform: translate3d(
+        var(--ca-pop-from-x, 0px),
+        var(--ca-pop-from-y, 0px),
+        0
+      )
+      scale(0.4);
+  }
+  35% {
+    opacity: 1;
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes rewardFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:root[data-ca-motion='reduced'] [data-entrance] .entryCard {
+  animation: rewardFade var(--ca-motion-reduced) var(--ca-ease-out) backwards;
 }
 
 .dieName {
@@ -151,23 +257,30 @@
   border-radius: 12px;
   border: 1px solid var(--ca-line);
   background: var(--ca-surface1);
-  animation: perkFlip 360ms ease-out both;
+  transition:
+    transform var(--ca-motion-m) var(--ca-ease-out),
+    opacity var(--ca-motion-m) var(--ca-ease-out),
+    box-shadow var(--ca-motion-m) var(--ca-ease-out);
 }
 
-@keyframes perkFlip {
-  from {
-    opacity: 0;
-    transform: rotateY(28deg) translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: rotateY(0) translateY(0);
-  }
+.perkCard[data-picked] {
+  z-index: var(--z-raise);
+  transform: translate3d(0, -10px, 0) scale(1.04);
+  transform-origin: 50% 50%;
+  box-shadow:
+    0 0 0 1px var(--ca-pick-glow, var(--ca-accent)),
+    0 0 22px 3px
+      color-mix(in srgb, var(--ca-pick-glow, var(--ca-accent)) 55%, transparent);
+  pointer-events: none;
 }
 
-:root[data-ca-motion='reduced'] .reveal,
+.perkCard[data-dismissed] {
+  transform: translate3d(0, 8px, 0);
+  opacity: 0.35;
+}
+
 :root[data-ca-motion='reduced'] .perkCard {
-  animation: none;
+  transition: none;
 }
 
 .tally {

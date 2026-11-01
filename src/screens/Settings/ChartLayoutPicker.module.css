@@ -1,0 +1,91 @@
+.list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 8px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.card,
+.tile {
+  appearance: none;
+  font: inherit;
+  color: var(--ca-text);
+  background: var(--ca-surface1);
+  border: 1px solid var(--ca-line);
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.card {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+}
+
+.tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+}
+
+.active {
+  border-color: var(--ca-accent);
+}
+
+.stage {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-bg);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.head {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.name {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ca-text);
+}
+
+.badge {
+  font-size: 10px;
+  line-height: 15px;
+  padding: 0 7px;
+  border-radius: 8px;
+  border: 1px solid var(--ca-accent);
+  color: var(--ca-accent);
+}
+
+.desc {
+  font-size: 11px;
+  line-height: 14px;
+  color: var(--ca-faint);
+}

@@ -1,5 +1,5 @@
 .screen {
-  animation: screenIn 180ms ease-out backwards;
+  animation: screenIn var(--ca-enter-ms) var(--ca-ease-out) backwards;
   padding: var(--ca-safe-top) var(--ca-safe-right) var(--ca-safe-bottom)
     var(--ca-safe-left);
 }
@@ -15,6 +15,39 @@
 
 :root[data-ca-motion='reduced'] .screen {
   animation: none;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.loadingDie {
+  display: block;
+  color: var(--ca-faint);
+  animation:
+    loadingAppear var(--ca-motion-s) var(--ca-ease-out) 200ms backwards,
+    loadingBob var(--ca-motion-xl) ease-in-out 200ms infinite alternate;
+}
+
+@keyframes loadingAppear {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes loadingBob {
+  from {
+    transform: translate3d(0, -4px, 0) rotate(-6deg);
+  }
+  to {
+    transform: translate3d(0, 4px, 0) rotate(6deg);
+  }
+}
+
+:root[data-ca-motion='reduced'] .loadingDie {
+  animation: loadingAppear var(--ca-motion-reduced) linear 200ms backwards;
 }
 
 .parked {

@@ -15,7 +15,7 @@ export const tideCapFor = (
     ? DRIFT_TIDE_CAP
     : sectorDef(sector).tideCap + ascensionMods(ascension).tideCapDelta;
 
-export const JUMPS_PER_TIDE = 4;
+export const JUMPS_PER_TIDE = 5;
 
 export const jumpsPerTideFor = (mutators: readonly string[]): number =>
   Math.max(1, JUMPS_PER_TIDE + computeMutatorMods(mutators).jumpsPerTideDelta);

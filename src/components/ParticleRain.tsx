@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { hexToRgb } from '@/app/color';
+import { reducedNow } from '@/app/motion';
 import { createStream, deriveSeed } from '@/services/rng';
 
 interface Particle {
@@ -31,7 +32,7 @@ export const ParticleRain = ({
   const ref = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    if (document.documentElement.dataset.caMotion === 'reduced') return;
+    if (reducedNow()) return;
     const canvas = ref.current;
     if (canvas === null) return;
     const ctx = canvas.getContext('2d');

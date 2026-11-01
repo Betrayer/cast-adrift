@@ -6,7 +6,8 @@ import {
   noteFusion,
   noteMkTop,
 } from "@/game/meta/counters";
-import { largestResonance, useBattleStore } from "@/stores/battleStore";
+import { largestResonance } from "@/game/battle/tally";
+import { useBattleStore } from "@/stores/battleStore";
 import { computeCensus } from "@/game/battle/resonance";
 import {
   createInitialMetaStats,

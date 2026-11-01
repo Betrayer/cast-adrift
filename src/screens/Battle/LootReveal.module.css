@@ -9,7 +9,7 @@
   gap: 20px;
   background: var(--ca-bg-a86);
   cursor: pointer;
-  animation: fade-in 240ms ease-out;
+  animation: fade-in 240ms var(--ca-ease-out);
 }
 
 .title {
@@ -36,7 +36,7 @@
   height: 100%;
   transform-style: preserve-3d;
   transform: rotateY(0deg);
-  transition: transform 400ms ease-out;
+  transition: transform 400ms var(--ca-ease-out);
 }
 
 .cardRevealed {
@@ -78,6 +78,19 @@
   background: var(--ca-surface1);
 }
 
+.frontLegendary {
+  background: none;
+}
+
+.frontLegendary::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-recede);
+  border-radius: 13px;
+  background: var(--ca-surface1);
+}
+
 .frontGlow {
   box-shadow: 0 0 28px 2px currentColor;
 }
@@ -101,7 +114,7 @@
   height: 8px;
   margin: -4px 0 0 -4px;
   border-radius: 50%;
-  animation: burst 620ms ease-out forwards;
+  animation: burst 620ms var(--ca-ease-out) forwards;
 }
 
 @keyframes burst {
@@ -140,7 +153,7 @@
     transparent
   );
   opacity: 0;
-  animation: beam 900ms ease-out both;
+  animation: beam 900ms var(--ca-ease-out) both;
 }
 
 @keyframes beam {

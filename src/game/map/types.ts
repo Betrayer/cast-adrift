@@ -68,12 +68,6 @@ export interface MapGraph {
 export const START_ROW = 0;
 export const START_LANE = 1;
 
-export const DEFAULT_SHAPE: MapShape = {
-  bossRow: 15,
-  gateRow: 8,
-  lanes: 4,
-};
-
 export const nodeId = (row: number, lane: number): NodeId =>
   `r${String(row)}l${String(lane)}`;
 
@@ -123,12 +117,65 @@ export const wormholeFor = (
   to: NodeId,
 ): WormholeEdge | undefined => map.wormholes[edgeKey(from, to)];
 
-export const spotById = (
-  map: MapGraph,
-  spotId: SpotId,
-): HoleSpot | undefined => map.spots.find((spot) => spot.id === spotId);
-
 export const spotOf = (
   map: MapGraph,
   id: NodeId,
 ): HoleSpot | undefined => map.spots.find((spot) => spot.nodes.includes(id));
+
+export interface HoleBand {
+  spot: HoleSpot;
+  rows: readonly [number, number];
+  rim: readonly NodeId[];
+  farRim: readonly NodeId[];
+}
+
+const byLane = (a: MapNode, b: MapNode): number => a.lane - b.lane;
+
+export const byLaneThenId = (a: MapNode, b: MapNode): number =>
+  a.lane - b.lane || (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+
+export const nearestInLane = (
+  candidates: readonly MapNode[],
+  lane: number,
+): MapNode | undefined =>
+  [...candidates].sort(
+    (a, b) =>
+      Math.abs(a.lane - lane) - Math.abs(b.lane - lane) || byLaneThenId(a, b),
+  )[0];
+
+const mainRowIds = (nodes: readonly MapNode[], row: number): NodeId[] =>
+  nodes
+    .filter((node) => node.pocket !== true && node.row === row)
+    .sort(byLane)
+    .map((node) => node.id);
+
+export const bandBridges = (
+  nodes: readonly MapNode[],
+  rows: readonly [number, number] | null,
+): [NodeId, NodeId][] => {
+  if (rows === null) return [];
+  const far = mainRowIds(nodes, rows[1] + 1);
+  return mainRowIds(nodes, rows[0] - 1).flatMap((a) =>
+    far.map((b): [NodeId, NodeId] => [a, b]),
+  );
+};
+
+export const bandOf = (map: MapGraph): HoleBand | null => {
+  for (const spot of map.spots) {
+    const [lo, hi] = spot.rows;
+    const inRows = map.nodes.filter(
+      (node) => node.pocket !== true && node.row >= lo && node.row <= hi,
+    );
+    if (inRows.length === 0) continue;
+    if (!inRows.every((node) => node.hole === true && node.spot === spot.id)) {
+      continue;
+    }
+    return {
+      spot,
+      rows: [lo, hi],
+      rim: mainRowIds(map.nodes, lo - 1),
+      farRim: mainRowIds(map.nodes, hi + 1),
+    };
+  }
+  return null;
+};

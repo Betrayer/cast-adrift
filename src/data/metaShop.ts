@@ -19,6 +19,7 @@ export const deckPoints = (deck: readonly string[]): number =>
 
 export const FATE_TIER = 100;
 export const DECK_MIN = 3;
+export const HANGAR_DECK_CAP = 9;
 
 export const FIRST_FIND_SHARDS: Record<Rarity, number> = {
   common: 8,

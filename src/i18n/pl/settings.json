@@ -61,6 +61,16 @@
     "signOutConfirm": "Wyloguj i tak",
     "telegramHint": "Podłącz e-mail do tego profilu Telegrama i to samo konto otworzy się w przeglądarce.",
     "telegramGoogleHint": "Google wymaga prawdziwego okna przeglądarki. Przycisk otworzy Cast Adrift poza Telegramem.",
+    "tg": {
+      "signedIn": "Telegram: {{name}}",
+      "unnamed": "zalogowano",
+      "guest": "Gość — logowanie przez Telegram jest niedostępne: {{reason}}",
+      "reason": {
+        "missingConfig": "serwer nie jest skonfigurowany",
+        "badSignature": "Telegram nie potwierdził tej sesji",
+        "network": "serwer nie odpowiedział"
+      }
+    },
     "provider": {
       "google": "Google",
       "password": "E-mail",
@@ -128,6 +138,43 @@
       "name": "Tablet",
       "tag": "Taśma slotów z żywym wynikiem · prognoza tury",
       "desc": "Wszystkie liczby w jednej kolumnie, cała tura policzona, zanim ją zakończysz."
+    }
+  },
+  "chartLayout": {
+    "title": "Mapa gwiazd",
+    "hint": "Cztery sposoby narysowania tej samej mapy. Węzły, połączenia i ceny się nie zmieniają.",
+    "open": "Otwórz mapę",
+    "spiral": {
+      "name": "Spirala",
+      "desc": "Siedem ramion wijących się od rdzenia. Widok domyślny."
+    },
+    "rings": {
+      "name": "Orbity",
+      "desc": "Każdy pierścień to próg ceny: im dalej węzeł, tym drożej."
+    },
+    "constellations": {
+      "name": "Gwiazdozbiory",
+      "desc": "Każda szkoła to figura z gwiazd, narysowana raz na zawsze."
+    },
+    "nebulae": {
+      "name": "Mgławice",
+      "desc": "Każda szkoła to obłok, który gęstnieje z każdym punktem."
+    }
+  },
+  "rollStyle": {
+    "title": "Rzut kością",
+    "hint": "Jak pokazywany jest rzut kości, która o czymś decyduje. Stuknij kartę, by rzucić ponownie.",
+    "flip": {
+      "name": "Przewrót",
+      "desc": "Prawdziwa kość wiruje i ląduje na ściance. Domyślnie."
+    },
+    "reel": {
+      "name": "Bęben",
+      "desc": "Ścianka przewija liczby i zwalnia aż do zatrzymania."
+    },
+    "blur": {
+      "name": "Rozmycie",
+      "desc": "Liczby migają w rozmyciu i wskakują w ostrość."
     }
   },
   "skipTally": "Pomijaj podsumowanie walki"

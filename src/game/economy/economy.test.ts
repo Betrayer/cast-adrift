@@ -4,7 +4,8 @@ import { fusionTarget, FUSED_DICE } from "@/data/dice/fusion";
 import { DIE_PTS } from "@/data/tiers";
 import {
   applyDiscount,
-  DECK_CAP,
+  HAND_CAP,
+  TABLE_SIZE,
   diePrice,
   diePriceBase,
   FUSION_COST,
@@ -216,7 +217,8 @@ describe("run store guards", () => {
     run.reset();
   });
 
-  it("deck cap is nine", () => {
-    expect(DECK_CAP).toBe(9);
+  it("a hand holds fifteen dice and puts seven on the table", () => {
+    expect(HAND_CAP).toBe(15);
+    expect(TABLE_SIZE).toBe(7);
   });
 });

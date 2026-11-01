@@ -93,6 +93,32 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "readCoreCopy",
+        label: "content:events.pactSealing.opt.readCoreCopy",
+        check: { dice: 3, pick: "sum", target: 14 },
+        onPass: [
+          {
+            text: "content:events.pactSealing.out.readPass",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+            ],
+            consequence: "content:consequence.pactOpened",
+            codex: "pactLedger",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.pactSealing.out.readFail",
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "hullMax", n: -2 },
+            ],
+            consequence: "content:consequence.pactOpened",
+          },
+        ],
+      },
     ],
   },
   {
@@ -129,6 +155,30 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
               { k: "axis", n: -3 },
             ],
             consequence: "content:consequence.refusedChoir",
+          },
+        ],
+      },
+      {
+        id: "escortThem",
+        label: "content:events.heretics.opt.escortThem",
+        check: { dice: 2, pick: "sum", target: 11 },
+        onPass: [
+          {
+            text: "content:events.heretics.out.escortPass",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "scrap", n: 30 },
+              { k: "flag", key: "hereticsEscorted" },
+            ],
+            consequence: "content:consequence.refusedChoir",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.heretics.out.escortFail",
+            effects: [{ k: "axis", n: 1 }],
+            consequence: "content:consequence.refusedChoir",
+            follow: { enemyIds: ["zealotRam", "choirAcolyte"], scrap: 35 },
           },
         ],
       },
@@ -214,7 +264,10 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
     id: "huntressFavor",
     weight: 14,
     speaker: "bountyHuntress",
-    requires: { sector: [4, 5], flags: { all: ["hunterAllied"] } },
+    requires: {
+      sector: [4, 5],
+      flags: { any: ["hunterAllied", "hunterWarned"] },
+    },
     text: "content:events.huntressFavor.text",
     options: [
       {
@@ -227,6 +280,7 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "scrap", n: 55 },
               { k: "battleMod", mod: "startCharge", n: 3, battles: 2 },
+              { k: "flag", key: "hunterSquared" },
             ],
             consequence: "content:consequence.hunterPaid",
           },
@@ -241,6 +295,7 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "loot", rarity: "rare" },
               { k: "scrap", n: 40 },
+              { k: "flag", key: "hunterSquared" },
             ],
             consequence: "content:consequence.hunterAllied",
           },
@@ -254,7 +309,8 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
             text: "content:events.huntressFavor.out.saveFavor",
             effects: [
               { k: "battleMod", mod: "startCharge", n: 8, battles: 4 },
-              { k: "flag", key: "favorHeld" },
+              { k: "flag", key: "hunterFavorHeld" },
+              { k: "flag", key: "hunterSquared" },
             ],
             consequence: "content:consequence.hunterAllied",
           },
@@ -420,6 +476,29 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "stripPipes",
+        label: "content:events.organShip.opt.stripPipes",
+        outcomes: [
+          {
+            text: "content:events.organShip.out.stripPipes",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 45 },
+              { k: "axis", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.organShip.out.stripPipesBad",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 25 },
+              { k: "hull", n: -6 },
+              { k: "axis", n: 1 },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -454,6 +533,33 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
               { k: "axis", n: -3 },
               { k: "flag", key: "defectorSold" },
             ],
+          },
+        ],
+      },
+      {
+        id: "giveFuel",
+        label: "content:events.acolyteDefector.opt.giveFuel",
+        requires: { req: "scrap", n: 20 },
+        outcomes: [
+          {
+            text: "content:events.acolyteDefector.out.giveFuel",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+            ],
+            consequence: "content:consequence.defectorFuelled",
+          },
+          {
+            text: "content:events.acolyteDefector.out.giveFuelTracked",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+            consequence: "content:consequence.defectorFuelled",
           },
         ],
       },
@@ -494,6 +600,31 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "letEchoAnswer",
+        label: "content:events.voiceInTheHull.opt.letEchoAnswer",
+        check: { dice: 2, pick: "highest", target: 7 },
+        onPass: [
+          {
+            text: "content:events.voiceInTheHull.out.echoAnswerPass",
+            consequence: "content:consequence.voiceHandled",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.voiceInTheHull.out.echoAnswerFail",
+            consequence: "content:consequence.voiceHandled",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "hull", n: -6 },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -527,6 +658,30 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
               { k: "axis", n: 3 },
               { k: "flag", key: "choirEnemy" },
               { k: "scrap", n: 30 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "findManifest",
+        label: "content:events.hymnArchive.opt.findManifest",
+        check: { dice: 2, pick: "sum", target: 10 },
+        onPass: [
+          {
+            text: "content:events.hymnArchive.out.manifestPass",
+            effects: [
+              { k: "flag", key: "fleetHymnKept" },
+              { k: "scrap", n: 30 },
+            ],
+            consequence: "content:consequence.fleetHymnKept",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.hymnArchive.out.manifestFail",
+            effects: [
+              { k: "hull", n: -7 },
+              { k: "scrap", n: 15 },
             ],
           },
         ],
@@ -1190,6 +1345,1106 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
               { k: "axis", n: 1 }
             ],
             consequence: "content:consequence.tribunalSeated",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "antiphonDuel",
+    weight: 18,
+    requires: { sector: [4] },
+    text: "content:events.antiphonDuel.text",
+    dialogue: [
+      { who: "echo", line: "content:events.antiphonDuel.dia.l1" },
+      { who: "narration", line: "content:events.antiphonDuel.dia.l2" },
+    ],
+    options: [
+      {
+        id: "singFirst",
+        label: "content:events.antiphonDuel.opt.singFirst",
+        outcomes: [
+          {
+            text: "content:events.antiphonDuel.out.singFirst",
+            weight: 2,
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "startCharge", n: 4, battles: 2 },
+            ],
+            consequence: "content:consequence.antiphonSettled",
+          },
+          {
+            text: "content:events.antiphonDuel.out.singFirstBad",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "hull", n: -6 },
+            ],
+            consequence: "content:consequence.antiphonSettled",
+          },
+        ],
+      },
+      {
+        id: "singAnswer",
+        label: "content:events.antiphonDuel.opt.singAnswer",
+        check: { dice: 2, pick: "sum", target: 10 },
+        onPass: [
+          {
+            text: "content:events.antiphonDuel.out.singAnswerPass",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "nodeMod", mod: "revealRows", n: 3 },
+            ],
+            consequence: "content:consequence.antiphonSettled",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.antiphonDuel.out.singAnswerFail",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "recordBoth",
+        label: "content:events.antiphonDuel.opt.recordBoth",
+        outcomes: [
+          {
+            text: "content:events.antiphonDuel.out.recordBoth",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "hymnCopied" },
+              { k: "nodeMod", mod: "endHeal", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.antiphonDuel.out.recordBothBad",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "hymnCopied" },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "cutThrough",
+        label: "content:events.antiphonDuel.opt.cutThrough",
+        check: { dice: 1, pick: "highest", target: 6 },
+        onPass: [
+          {
+            text: "content:events.antiphonDuel.out.cutThroughPass",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "scrap", n: 35 },
+            ],
+            consequence: "content:consequence.antiphonBroken",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.antiphonDuel.out.cutThroughFail",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hull", n: -9 },
+            ],
+            consequence: "content:consequence.antiphonBroken",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "pyreOfSurplus",
+    weight: 17,
+    requires: { sector: [4] },
+    text: "content:events.pyreOfSurplus.text",
+    options: [
+      {
+        id: "pullFromFire",
+        label: "content:events.pyreOfSurplus.opt.pullFromFire",
+        check: { dice: 3, pick: "highest", target: 8 },
+        onPass: [
+          {
+            text: "content:events.pyreOfSurplus.out.pullPass",
+            effects: [
+              { k: "loot", rarity: "rare" },
+              { k: "axis", n: 1 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.pyreOfSurplus.out.pullFail",
+            effects: [
+              { k: "hull", n: -9 },
+              { k: "axis", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "feedPyre",
+        label: "content:events.pyreOfSurplus.opt.feedPyre",
+        outcomes: [
+          {
+            text: "content:events.pyreOfSurplus.out.feedPyre",
+            weight: 3,
+            effects: [
+              { k: "swapLowestDie" },
+              { k: "axis", n: -1 },
+            ],
+            consequence: "content:consequence.pyreFed",
+          },
+          {
+            text: "content:events.pyreOfSurplus.out.feedPyreBlessed",
+            weight: 1,
+            effects: [
+              { k: "swapLowestDie" },
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "startCharge", n: 4, battles: 2 },
+            ],
+            consequence: "content:consequence.pyreFed",
+          },
+        ],
+      },
+      {
+        id: "buyAsh",
+        label: "content:events.pyreOfSurplus.opt.buyAsh",
+        requires: { req: "scrap", n: 35 },
+        outcomes: [
+          {
+            text: "content:events.pyreOfSurplus.out.buyAsh",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -35 },
+              { k: "nodeMod", mod: "rerollSize", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.pyreOfSurplus.out.buyAshQuiet",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -35 },
+              { k: "tide", n: -1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "dousePyre",
+        label: "content:events.pyreOfSurplus.opt.dousePyre",
+        outcomes: [
+          {
+            text: "content:events.pyreOfSurplus.out.dousePyre",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "flag", key: "pyreDoused" },
+            ],
+            consequence: "content:consequence.pyreDoused",
+            follow: {
+              enemyIds: ["pyreDeacon", "censerDrone"],
+              scrap: 40,
+              loot: { rarity: "uncommon" },
+            },
+          },
+          {
+            text: "content:events.pyreOfSurplus.out.douseQuiet",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "flag", key: "pyreDoused" },
+              { k: "scrap", n: 30 },
+            ],
+            consequence: "content:consequence.pyreDoused",
+          },
+        ],
+      },
+      {
+        id: "leaveIt",
+        label: "content:events.pyreOfSurplus.opt.leaveIt",
+        outcomes: [
+          {
+            text: "content:events.pyreOfSurplus.out.leaveIt",
+            weight: 2,
+            effects: [{ k: "scrap", n: 15 }],
+          },
+          {
+            text: "content:events.pyreOfSurplus.out.leaveItSmoke",
+            weight: 1,
+            effects: [{ k: "tide", n: 1 }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "numberedSister",
+    weight: 15,
+    requires: { sector: [4], flags: { all: ["defectorSaved"] } },
+    text: "content:events.numberedSister.text",
+    dialogue: [
+      { who: "narration", line: "content:events.numberedSister.dia.l1" },
+      { who: "echo", line: "content:events.numberedSister.dia.l2" },
+    ],
+    options: [
+      {
+        id: "buyHerName",
+        label: "content:events.numberedSister.opt.buyHerName",
+        requires: { req: "scrap", n: 50 },
+        outcomes: [
+          {
+            text: "content:events.numberedSister.out.buyHerName",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -50 },
+              { k: "axis", n: 1 },
+              { k: "flag", key: "sisterFreed" },
+            ],
+            consequence: "content:consequence.sisterFreed",
+          },
+          {
+            text: "content:events.numberedSister.out.buyHerNameStays",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -50 },
+              { k: "axis", n: -1 },
+              { k: "hullMax", n: 4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "pullHerOut",
+        label: "content:events.numberedSister.opt.pullHerOut",
+        check: { dice: 2, pick: "sum", target: 11 },
+        onPass: [
+          {
+            text: "content:events.numberedSister.out.pullHerOutPass",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "flag", key: "sisterFreed" },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
+            consequence: "content:consequence.sisterFreed",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.numberedSister.out.pullHerOutFail",
+            effects: [{ k: "axis", n: 1 }],
+            follow: { enemyIds: ["choirAcolyte", "choirAcolyte"], scrap: 30 },
+          },
+        ],
+      },
+      {
+        id: "oneMessage",
+        label: "content:events.numberedSister.opt.oneMessage",
+        outcomes: [
+          {
+            text: "content:events.numberedSister.out.oneMessage",
+            weight: 2,
+            effects: [{ k: "nodeMod", mod: "revealRows", n: 3 }],
+          },
+          {
+            text: "content:events.numberedSister.out.oneMessageHeard",
+            weight: 1,
+            effects: [{ k: "tide", n: 1 }],
+          },
+        ],
+      },
+      {
+        id: "turnAway",
+        label: "content:events.numberedSister.opt.turnAway",
+        outcomes: [
+          {
+            text: "content:events.numberedSister.out.turnAway",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "nodeMod", mod: "endHeal", n: 1 },
+            ],
+            consequence: "content:consequence.sisterLeft",
+          },
+          {
+            text: "content:events.numberedSister.out.turnAwayCold",
+            weight: 1,
+            effects: [{ k: "axis", n: -2 }],
+            consequence: "content:consequence.sisterLeft",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "fleetHymn",
+    weight: 15,
+    requires: {
+      sector: [4],
+      flags: {
+        any: ["hymnCopied", "hymnJoined", "archiveCatalogued"],
+        not: ["fleetHymnKept"],
+      },
+    },
+    text: "content:events.fleetHymn.text",
+    dialogue: [
+      { who: "echo", line: "content:events.fleetHymn.dia.l1" },
+      { who: "narration", line: "content:events.fleetHymn.dia.l2" },
+      { who: "echo", line: "content:events.fleetHymn.dia.l3" },
+    ],
+    options: [
+      {
+        id: "recordIt",
+        label: "content:events.fleetHymn.opt.recordIt",
+        outcomes: [
+          {
+            text: "content:events.fleetHymn.out.recordIt",
+            weight: 2,
+            effects: [
+              { k: "flag", key: "fleetHymnKept" },
+              { k: "shards", n: 10 },
+            ],
+            consequence: "content:consequence.fleetHymnKept",
+          },
+          {
+            text: "content:events.fleetHymn.out.recordItHot",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "fleetHymnKept" },
+              { k: "tide", n: 1 },
+            ],
+            consequence: "content:consequence.fleetHymnKept",
+          },
+        ],
+      },
+      {
+        id: "singLineNine",
+        label: "content:events.fleetHymn.opt.singLineNine",
+        check: { dice: 2, pick: "highest", target: 7 },
+        onPass: [
+          {
+            text: "content:events.fleetHymn.out.singLinePass",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "battleMod", mod: "startCharge", n: 5, battles: 2 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.fleetHymn.out.singLineFail",
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "hull", n: -7 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "eraseIt",
+        label: "content:events.fleetHymn.opt.eraseIt",
+        outcomes: [
+          {
+            text: "content:events.fleetHymn.out.eraseIt",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "nodeMod", mod: "endHeal", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.fleetHymn.out.eraseItKept",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "flag", key: "fleetHymnKept" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "sellIt",
+        label: "content:events.fleetHymn.opt.sellIt",
+        outcomes: [
+          {
+            text: "content:events.fleetHymn.out.sellIt",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 50 },
+              { k: "axis", n: -1 },
+            ],
+            consequence: "content:consequence.fleetHymnSold",
+          },
+          {
+            text: "content:events.fleetHymn.out.sellItShort",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 25 },
+              { k: "axis", n: -1 },
+              { k: "nodeMod", mod: "shipyardDiscount", n: 25 },
+            ],
+            consequence: "content:consequence.fleetHymnSold",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "preacherCounsel",
+    weight: 16,
+    speaker: "choirPreacher",
+    requires: {
+      sector: [4],
+      flags: { any: ["heardChoir", "choirCurious", "pactStep1"] },
+    },
+    text: "content:events.preacherCounsel.text",
+    dialogue: [
+      { who: "choirPreacher", line: "content:events.preacherCounsel.dia.l1" },
+      { who: "echo", line: "content:events.preacherCounsel.dia.l2" },
+    ],
+    options: [
+      {
+        id: "countWithHim",
+        label: "content:events.preacherCounsel.opt.countWithHim",
+        check: { dice: 3, pick: "sum", target: 15 },
+        onPass: [
+          {
+            text: "content:events.preacherCounsel.out.countPass",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "nodeMod", mod: "revealRows", n: 4 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.preacherCounsel.out.countFail",
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "readTheList",
+        label: "content:events.preacherCounsel.opt.readTheList",
+        requires: { req: "flag", key: "fleetHymnKept" },
+        outcomes: [
+          {
+            text: "content:events.preacherCounsel.out.readTheList",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "loot", rarity: "rare" },
+            ],
+            consequence: "content:consequence.preacherListRead",
+          },
+          {
+            text: "content:events.preacherCounsel.out.readTheListWept",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "startCharge", n: 6, battles: 3 },
+            ],
+            consequence: "content:consequence.preacherListRead",
+          },
+        ],
+      },
+      {
+        id: "disputeTables",
+        label: "content:events.preacherCounsel.opt.disputeTables",
+        check: { dice: 2, pick: "sum", target: 11 },
+        onPass: [
+          {
+            text: "content:events.preacherCounsel.out.disputePass",
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "flag", key: "refusedChoir" },
+            ],
+            consequence: "content:consequence.preacherRefuted",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.preacherCounsel.out.disputeFail",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "hull", n: -6 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "leaveADie",
+        label: "content:events.preacherCounsel.opt.leaveADie",
+        outcomes: [
+          {
+            text: "content:events.preacherCounsel.out.leaveADie",
+            weight: 2,
+            effects: [
+              { k: "swapLowestDie" },
+              { k: "axis", n: -1 },
+            ],
+          },
+          {
+            text: "content:events.preacherCounsel.out.leaveADieNote",
+            weight: 1,
+            effects: [
+              { k: "swapLowestDie" },
+              { k: "axis", n: -1 },
+              { k: "nodeMod", mod: "shipyardDiscount", n: 30 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "stayStanding",
+        label: "content:events.preacherCounsel.opt.stayStanding",
+        outcomes: [
+          {
+            text: "content:events.preacherCounsel.out.stayStanding",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "scrap", n: 30 },
+            ],
+          },
+          {
+            text: "content:events.preacherCounsel.out.stayStandingCold",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "litanyCheckpoint",
+    weight: 17,
+    requires: { sector: [4] },
+    text: "content:events.litanyCheckpoint.text",
+    options: [
+      {
+        id: "reciteLine",
+        label: "content:events.litanyCheckpoint.opt.reciteLine",
+        requires: { req: "flag", key: "hymnCopied" },
+        outcomes: [
+          {
+            text: "content:events.litanyCheckpoint.out.reciteLine",
+            weight: 3,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "battleMod", mod: "startCharge", n: 3, battles: 2 },
+            ],
+          },
+          {
+            text: "content:events.litanyCheckpoint.out.reciteLineStale",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "hull", n: -6 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "sisterRecites",
+        label: "content:events.litanyCheckpoint.opt.sisterRecites",
+        requires: { req: "flag", key: "sisterFreed" },
+        outcomes: [
+          {
+            text: "content:events.litanyCheckpoint.out.sisterRecites",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "shipyardDiscount", n: 35 },
+            ],
+          },
+          {
+            text: "content:events.litanyCheckpoint.out.sisterRecitesKnown",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "bluffIt",
+        label: "content:events.litanyCheckpoint.opt.bluffIt",
+        check: { dice: 2, pick: "sum", target: 10 },
+        onPass: [
+          {
+            text: "content:events.litanyCheckpoint.out.bluffPass",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "scrap", n: 30 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.litanyCheckpoint.out.bluffFail",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "hull", n: -8 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "payToll",
+        label: "content:events.litanyCheckpoint.opt.payToll",
+        requires: { req: "scrap", n: 40 },
+        outcomes: [
+          {
+            text: "content:events.litanyCheckpoint.out.payToll",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -40 },
+              { k: "tide", n: -1 },
+            ],
+          },
+          {
+            text: "content:events.litanyCheckpoint.out.payTollRoute",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -40 },
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "forceGate",
+        label: "content:events.litanyCheckpoint.opt.forceGate",
+        outcomes: [
+          {
+            text: "content:events.litanyCheckpoint.out.forceGate",
+            weight: 2,
+            effects: [{ k: "axis", n: 2 }],
+            consequence: "content:consequence.litanyForced",
+            follow: {
+              enemyIds: ["litanyWarden", "censerDrone"],
+              scrap: 45,
+              loot: { rarity: "uncommon" },
+            },
+          },
+          {
+            text: "content:events.litanyCheckpoint.out.forceGateScrape",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hull", n: -7 },
+            ],
+            consequence: "content:consequence.litanyForced",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "vowOfSilence",
+    weight: 16,
+    requires: { sector: [4] },
+    text: "content:events.vowOfSilence.text",
+    dialogue: [
+      { who: "narration", line: "content:events.vowOfSilence.dia.l1" },
+      { who: "echo", line: "content:events.vowOfSilence.dia.l2" },
+    ],
+    options: [
+      {
+        id: "rollForHer",
+        label: "content:events.vowOfSilence.opt.rollForHer",
+        outcomes: [
+          {
+            text: "content:events.vowOfSilence.out.rollForHer",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "loot", rarity: "rare" },
+            ],
+          },
+          {
+            text: "content:events.vowOfSilence.out.rollForHerLow",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "battleMod", mod: "startCharge", n: 4, battles: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "matchTheVow",
+        label: "content:events.vowOfSilence.opt.matchTheVow",
+        check: { dice: 1, pick: "lowest", target: 4 },
+        onPass: [
+          {
+            text: "content:events.vowOfSilence.out.matchPass",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "nodeMod", mod: "endHeal", n: 1 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.vowOfSilence.out.matchFail",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "takeTheDice",
+        label: "content:events.vowOfSilence.opt.takeTheDice",
+        outcomes: [
+          {
+            text: "content:events.vowOfSilence.out.takeTheDice",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 60 },
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
+            consequence: "content:consequence.vowBroken",
+          },
+          {
+            text: "content:events.vowOfSilence.out.takeTheDiceCracked",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 35 },
+              { k: "axis", n: -2 },
+              { k: "tide", n: 1 },
+            ],
+            consequence: "content:consequence.vowBroken",
+          },
+        ],
+      },
+      {
+        id: "leaveTheVow",
+        label: "content:events.vowOfSilence.opt.leaveTheVow",
+        outcomes: [
+          {
+            text: "content:events.vowOfSilence.out.leaveTheVow",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "hullMax", n: 4 },
+            ],
+            consequence: "content:consequence.vowKept",
+          },
+          {
+            text: "content:events.vowOfSilence.out.leaveTheVowChart",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+            ],
+            consequence: "content:consequence.vowKept",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "hereticsReturn",
+    weight: 15,
+    requires: {
+      sector: [4],
+      flags: { any: ["hereticsArmed", "hereticsEscorted"] },
+    },
+    text: "content:events.hereticsReturn.text",
+    options: [
+      {
+        id: "ransomCantor",
+        label: "content:events.hereticsReturn.opt.ransomCantor",
+        outcomes: [
+          {
+            text: "content:events.hereticsReturn.out.ransomCantor",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 55 },
+              { k: "axis", n: -2 },
+            ],
+            consequence: "content:consequence.cantorRansomed",
+          },
+          {
+            text: "content:events.hereticsReturn.out.ransomCantorTrailed",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 30 },
+              { k: "axis", n: -2 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
+            consequence: "content:consequence.cantorRansomed",
+          },
+        ],
+      },
+      {
+        id: "questionCantor",
+        label: "content:events.hereticsReturn.opt.questionCantor",
+        check: { dice: 2, pick: "sum", target: 9 },
+        onPass: [
+          {
+            text: "content:events.hereticsReturn.out.questionPass",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "sectorReveal", n: 1 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.hereticsReturn.out.questionFail",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "cutHerLoose",
+        label: "content:events.hereticsReturn.opt.cutHerLoose",
+        outcomes: [
+          {
+            text: "content:events.hereticsReturn.out.cutHerLoose",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "endHeal", n: 1 },
+            ],
+            consequence: "content:consequence.cantorFreed",
+          },
+          {
+            text: "content:events.hereticsReturn.out.cutHerLooseAngry",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "hull", n: -7 },
+            ],
+            consequence: "content:consequence.cantorFreed",
+          },
+        ],
+      },
+      {
+        id: "leadTheirRaid",
+        label: "content:events.hereticsReturn.opt.leadTheirRaid",
+        outcomes: [
+          {
+            text: "content:events.hereticsReturn.out.leadTheirRaid",
+            weight: 2,
+            effects: [{ k: "axis", n: 2 }],
+            follow: {
+              enemyIds: ["hymnCantor", "censerDrone"],
+              scrap: 50,
+              loot: { rarity: "rare" },
+            },
+          },
+          {
+            text: "content:events.hereticsReturn.out.leadTheirRaidEmpty",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 2 },
+              { k: "scrap", n: 35 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "maraIndulgences",
+    weight: 14,
+    speaker: "mara",
+    requires: { sector: [4], flags: { any: ["maraFriend", "maraGrudge"] } },
+    text: "content:events.maraIndulgences.text",
+    dialogue: [
+      { who: "mara", line: "content:events.maraIndulgences.dia.l1" },
+      { who: "echo", line: "content:events.maraIndulgences.dia.l2" },
+    ],
+    options: [
+      {
+        id: "buyIndulgence",
+        label: "content:events.maraIndulgences.opt.buyIndulgence",
+        requires: { req: "scrap", n: 45 },
+        outcomes: [
+          {
+            text: "content:events.maraIndulgences.out.buyIndulgence",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -45 },
+              { k: "tide", n: -1 },
+              { k: "axis", n: -1 },
+            ],
+            consequence: "content:consequence.indulgenceBought",
+          },
+          {
+            text: "content:events.maraIndulgences.out.buyIndulgenceStale",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -45 },
+              { k: "hullMax", n: 4 },
+            ],
+            consequence: "content:consequence.indulgenceBought",
+          },
+        ],
+      },
+      {
+        id: "friendPrice",
+        label: "content:events.maraIndulgences.opt.friendPrice",
+        requires: { req: "flag", key: "maraFriend" },
+        outcomes: [
+          {
+            text: "content:events.maraIndulgences.out.friendPrice",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -15 },
+              { k: "tide", n: -1 },
+              { k: "nodeMod", mod: "shipyardDiscount", n: 30 },
+            ],
+          },
+          {
+            text: "content:events.maraIndulgences.out.friendPriceTip",
+            weight: 1,
+            effects: [{ k: "nodeMod", mod: "revealRows", n: 3 }],
+          },
+        ],
+      },
+      {
+        id: "settleOld",
+        label: "content:events.maraIndulgences.opt.settleOld",
+        requires: { req: "flag", key: "maraGrudge" },
+        outcomes: [
+          {
+            text: "content:events.maraIndulgences.out.settleOld",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -30 },
+              { k: "hullMax", n: 5 },
+            ],
+          },
+          {
+            text: "content:events.maraIndulgences.out.settleOldSquare",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -30 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "reportHer",
+        label: "content:events.maraIndulgences.opt.reportHer",
+        outcomes: [
+          {
+            text: "content:events.maraIndulgences.out.reportHer",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 40 },
+              { k: "axis", n: -2 },
+            ],
+            consequence: "content:consequence.maraReported",
+          },
+          {
+            text: "content:events.maraIndulgences.out.reportHerEmpty",
+            weight: 1,
+            effects: [{ k: "axis", n: -2 }],
+            consequence: "content:consequence.maraReported",
+            follow: { enemyIds: ["choirAcolyte", "zealotRam"], scrap: 45 },
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "blessedLane",
+    weight: 16,
+    requires: { sector: [4] },
+    text: "content:events.blessedLane.text",
+    options: [
+      {
+        id: "payBlessing",
+        label: "content:events.blessedLane.opt.payBlessing",
+        requires: { req: "scrap", n: 40 },
+        outcomes: [
+          {
+            text: "content:events.blessedLane.out.payBlessing",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -40 },
+              { k: "nodeMod", mod: "shipyardDiscount", n: 35 },
+            ],
+          },
+          {
+            text: "content:events.blessedLane.out.payBlessingSmudged",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -40 },
+              { k: "tide", n: -1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "takeCursed",
+        label: "content:events.blessedLane.opt.takeCursed",
+        outcomes: [
+          {
+            text: "content:events.blessedLane.out.takeCursed",
+            weight: 2,
+            effects: [
+              { k: "tide", n: 1 },
+              { k: "loot", rarity: "rare" },
+            ],
+            consequence: "content:consequence.laneCursed",
+          },
+          {
+            text: "content:events.blessedLane.out.takeCursedCost",
+            weight: 1,
+            effects: [
+              { k: "tide", n: 1 },
+              { k: "hull", n: -8 },
+              { k: "scrap", n: 30 },
+            ],
+            consequence: "content:consequence.laneCursed",
+          },
+        ],
+      },
+      {
+        id: "writeItYourself",
+        label: "content:events.blessedLane.opt.writeItYourself",
+        check: { dice: 2, pick: "highest", target: 7 },
+        onPass: [
+          {
+            text: "content:events.blessedLane.out.writePass",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "shipyardDiscount", n: 30 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.blessedLane.out.writeFail",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 2 },
+            ],
           },
         ],
       },

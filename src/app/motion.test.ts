@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fireMotionFlag, riseStyle, RISE_STEPS } from '@/app/motion';
+import { fireMotionFlag, riseStyle, RISE_STEPS, scrollIntoFocus } from '@/app/motion';
 
 describe('riseStyle', () => {
   it('maps an index onto the stagger variable', () => {
@@ -61,5 +61,39 @@ describe('fireMotionFlag', () => {
     for (const run of [...timers.values()]) run();
     expect(attrs.has('data-pop')).toBe(false);
     globals.window = before;
+  });
+});
+
+describe('scrollIntoFocus', () => {
+  const scrollWith = (motion: string | undefined): ScrollIntoViewOptions[] => {
+    const calls: ScrollIntoViewOptions[] = [];
+    const element = {
+      scrollIntoView: (options: ScrollIntoViewOptions) => {
+        calls.push(options);
+      },
+    } as unknown as Element;
+    const globals = globalThis as unknown as { document?: unknown };
+    const before = globals.document;
+    if (motion === undefined) delete globals.document;
+    else globals.document = { documentElement: { dataset: { caMotion: motion } } };
+    scrollIntoFocus(element);
+    if (before === undefined) delete globals.document;
+    else globals.document = before;
+    return calls;
+  };
+
+  it('jumps without animation when motion is reduced', () => {
+    expect(scrollWith('reduced')).toEqual([{ block: 'center', behavior: 'auto' }]);
+  });
+
+  it('scrolls smoothly otherwise', () => {
+    expect(scrollWith('full')).toEqual([{ block: 'center', behavior: 'smooth' }]);
+    expect(scrollWith(undefined)).toEqual([{ block: 'center', behavior: 'smooth' }]);
+  });
+
+  it('ignores a missing element', () => {
+    expect(() => {
+      scrollIntoFocus(null);
+    }).not.toThrow();
   });
 });

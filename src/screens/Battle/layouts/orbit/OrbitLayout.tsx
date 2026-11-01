@@ -12,6 +12,8 @@ import { isSlotBlocked } from '@/game/battle/setup';
 import { goalSlotsNow } from '@/game/battle/view';
 import { publishRegion } from '@/pixi/battle/anchors';
 import { rectOf, useRegion } from '@/screens/Battle/board/measure';
+import { CommsBand } from '@/components/CommsBand';
+import { BoardColumn, type BoardComposition } from '@/screens/Battle/layouts/BoardColumn';
 import { ReserveButton } from '@/screens/Battle/board/SlotDock';
 import { SlotGrid } from '@/screens/Battle/board/SlotGrid';
 import { SlotModeBadge } from '@/screens/Battle/board/SlotModeBadge';
@@ -23,12 +25,10 @@ import {
 import { Console } from '@/screens/Battle/console/Console';
 import { Forecast } from '@/screens/Battle/console/Forecast';
 import { BattleJournal } from '@/screens/Battle/journal/BattleJournal';
-import {
-  EndTurnButton,
-  ResonanceChips,
-  RunActions,
-  TopBands,
-} from '@/screens/Battle/shell/BattleShell';
+import { TopBands } from '@/screens/Battle/shell/BattleShell';
+import { EndTurnButton } from '@/screens/Battle/shell/EndTurnButton';
+import { ResonanceChips } from '@/screens/Battle/shell/ResonanceChips';
+import { RunActions } from '@/screens/Battle/shell/RunActions';
 import {
   WideCentre,
   WideStage,
@@ -187,15 +187,15 @@ const OrbitDock = () => {
   );
 };
 
-export const OrbitBody = () => {
+export const OrbitBody = ({ composition }: { composition: BoardComposition }) => {
   const enemyRef = useRegion('enemies');
   const trayRef = useRegion('tray');
   return (
-    <div className={boardStyles.column} data-layout="orbit">
+    <BoardColumn layout="orbit" composition={composition}>
       <div ref={enemyRef} className={styles.enemyBand} data-band="enemies" />
-      <div ref={trayRef} className={styles.trayBand} data-band="tray" />
+      <div ref={trayRef} className={boardStyles.trayBand} data-band="tray" />
       <OrbitDock />
-    </div>
+    </BoardColumn>
   );
 };
 
@@ -214,12 +214,13 @@ export const OrbitWide = () => (
   <WideStage
     arena="wide"
     left={<TopBands wide />}
-    centre={<WideCentre body={<OrbitBody />} foot={<OrbitFooter />} />}
+    centre={<WideCentre body={<OrbitBody composition="wide" />} foot={<OrbitFooter />} />}
     right={
       <>
         <div className={wideStyles.railActions}>
           <RunActions />
         </div>
+        <CommsBand placement="gutter" />
         <BattleJournal />
       </>
     }

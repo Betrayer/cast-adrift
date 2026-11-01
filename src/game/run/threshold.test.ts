@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { SECTOR_COUNT, SECTORS } from "@/data/sectors";
+import { SECTOR_COUNT, SECTORS, sectorDef } from "@/data/sectors";
 import { earnedEndings, ENDINGS } from "@/data/narrative/endings";
 import { FINAL_MEMORY_BY_ENDING, NUMBERED_MEMORIES } from "@/data/narrative/memories";
 import { echoArcComplete } from "@/game/narrative/memoryArc";
@@ -79,7 +79,7 @@ describe("the threshold", () => {
     expect(run.sector).toBe(SECTORS.length);
     expect(run.sectorIndex).toBe(SECTORS.length);
     expect(run.tide).toBe(0);
-    expect(run.map?.shape.bossRow).toBe(16);
+    expect(run.map?.shape.bossRow).toBe(sectorDef(SECTORS.length).shape.bossRow);
     expect(useAppStore.getState().screen).toBe("interstitial");
   });
 

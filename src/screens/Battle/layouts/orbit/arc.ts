@@ -1,3 +1,5 @@
+import { clamp } from '@/app/math';
+
 export interface ArcInput {
   width: number;
   maxHeight: number;
@@ -46,9 +48,6 @@ const NO_FIT: ArcSolution = {
   shipSize: 0,
   pods: [],
 };
-
-const clamp = (value: number, min: number, max: number): number =>
-  Math.min(max, Math.max(min, value));
 
 const toRad = (deg: number): number => (deg * Math.PI) / 180;
 

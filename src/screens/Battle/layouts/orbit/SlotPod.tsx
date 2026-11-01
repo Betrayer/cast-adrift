@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { cx } from '@/app/cx';
-import type { SlotProjection } from '@/game/battle/view';
 import { SlotGlyph } from '@/screens/Battle/board/SlotCard';
 import {
   affinityNote,
   projectionShort,
   projectionTone,
+  projectionToneClass,
   slotSchool,
   type SlotViewProps,
 } from '@/screens/Battle/board/slotText';
@@ -19,11 +19,10 @@ export interface SlotPodProps extends SlotViewProps {
 
 const WIDE_POD = 72;
 
-const toneClass = (projection: SlotProjection): string => {
-  const tone = projectionTone(projection);
-  if (tone === 'danger') return styles.podValueDanger ?? '';
-  if (tone === 'bonus') return styles.podValueBonus ?? '';
-  return styles.podValuePlain ?? '';
+const TONE_CLASSES = {
+  danger: styles.podValueDanger,
+  bonus: styles.podValueBonus,
+  plain: styles.podValuePlain,
 };
 
 export const SlotPod = ({
@@ -83,7 +82,10 @@ export const SlotPod = ({
           <span className={styles.podName}>{t(`battle:slot.${slotId}`)}</span>
           {projection === undefined ? null : (
             <span
-              className={cx(styles.podValue, toneClass(projection))}
+              className={cx(
+                styles.podValue,
+                projectionToneClass(projection, TONE_CLASSES),
+              )}
               data-proj={preview ? undefined : slotId}
               data-tone={preview ? undefined : projectionTone(projection)}
             >

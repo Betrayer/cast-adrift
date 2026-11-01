@@ -2,16 +2,13 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { sectorDef } from "@/data/sectors";
 import { generateSectorMap } from "@/game/map/generator";
 import { nodeRisk } from "@/game/map/risk";
-import {
-  edgeKey,
-  type MapGraph,
-  type MapNode,
-  type NodeId,
-} from "@/game/map/types";
+import { edgeKey, type MapGraph, type MapNode } from "@/game/map/types";
 import {
   applyEdgeMotifs,
   applyHoleToll,
   applyNodeMotifs,
+  bypassLethal,
+  bypassPctFor,
   disintegrationPctFor,
   holeTollFor,
 } from "@/game/run/motifs";
@@ -162,82 +159,92 @@ describe("the black-hole bypass toll", () => {
     useNarrativeStore.getState().reset();
   });
 
-  it("scales with the sector", () => {
-    expect(holeTollFor(1, 30)).toBe(0);
-    expect(holeTollFor(2, 30)).toBe(1);
-    expect(holeTollFor(3, 30)).toBe(1);
-    expect(holeTollFor(4, 30)).toBe(2);
-    expect(holeTollFor(5, 30)).toBe(2);
-    expect(holeTollFor(6, 30)).toBe(2);
+  const BYPASS_PCT: Readonly<Record<number, number>> = {
+    1: 0,
+    2: 0.2,
+    3: 0.21,
+    4: 0.22,
+    5: 0.24,
+    6: 0.25,
+  };
+
+  it("declares a share of max hull per sector", () => {
+    for (const sector of [1, 2, 3, 4, 5, 6]) {
+      expect(bypassPctFor(sector), `S${String(sector)}`).toBe(BYPASS_PCT[sector]);
+    }
   });
 
-  it("waives itself once the hull cannot pay", () => {
-    expect(holeTollFor(4, 3)).toBe(2);
-    expect(holeTollFor(4, 2)).toBe(0);
-    expect(holeTollFor(4, 1)).toBe(0);
-    expect(holeTollFor(2, 1)).toBe(0);
+  it("charges the ceiling of that share of max hull", () => {
+    expect(holeTollFor(1, 30)).toBe(0);
+    expect(holeTollFor(2, 30)).toBe(6);
+    expect(holeTollFor(3, 30)).toBe(7);
+    expect(holeTollFor(4, 30)).toBe(7);
+    expect(holeTollFor(5, 30)).toBe(8);
+    expect(holeTollFor(6, 30)).toBe(8);
+    for (const sector of [2, 3, 4, 5, 6]) {
+      for (let hullMax = 1; hullMax <= 80; hullMax += 1) {
+        expect(holeTollFor(sector, hullMax), `S${String(sector)} ${String(hullMax)}`).toBe(
+          Math.ceil(hullMax * (BYPASS_PCT[sector] ?? 0)),
+        );
+      }
+    }
+  });
+
+  it("never waives itself on a thin hull", () => {
+    expect(holeTollFor(4, 3)).toBe(1);
+    expect(holeTollFor(4, 1)).toBe(1);
+    expect(holeTollFor(2, 1)).toBe(1);
+    expect(holeTollFor(2, 0)).toBe(0);
+  });
+
+  it("is lethal exactly when the hull is at or under the toll", () => {
+    expect(bypassLethal(7, 7)).toBe(true);
+    expect(bypassLethal(6, 7)).toBe(true);
+    expect(bypassLethal(1, 7)).toBe(true);
+    expect(bypassLethal(8, 7)).toBe(false);
+    expect(bypassLethal(1, 0)).toBe(false);
+    expect(bypassLethal(0, 0)).toBe(false);
   });
 
   it("charges the hull and names the motif", () => {
-    expect(applyHoleToll(4, "r5l1", "r6l1")).toBe(2);
-    expect(useRunStore.getState().hull).toBe(28);
+    const toll = holeTollFor(4, 30);
+    expect(applyHoleToll(4, "r5l1", "r6l1")).toBe(toll);
+    expect(useRunStore.getState().hull).toBe(30 - toll);
     expect(lastConsequence()).toBe("run:motif.bypass");
+    expect(consequenceEntries()).toEqual(["run:motif.bypass"]);
   });
 
-  it("scorches instead of charging when the hull is at the toll", () => {
-    useRunStore.setState({ hull: 2 });
-    expect(applyHoleToll(4, "r5l1", "r6l1")).toBe(0);
-    expect(useRunStore.getState().hull).toBe(2);
-    expect(lastConsequence()).toBe("run:motif.holeScorch");
+  it("reads max hull, not the hull left", () => {
+    useRunStore.setState({ hull: 20, hullMax: 40 });
+    expect(applyHoleToll(6, "r5l1", "r6l1")).toBe(10);
+    expect(useRunStore.getState().hull).toBe(10);
   });
 
-  it("does nothing in a sector without the motif", () => {
+  it("refuses to charge a lethal toll and leaves no trace", () => {
+    for (const sector of [2, 3, 4, 5, 6]) {
+      useNarrativeStore.getState().reset();
+      const toll = holeTollFor(sector, 30);
+      for (const hull of [toll, toll - 1, 1]) {
+        useRunStore.setState({ hull });
+        expect(applyHoleToll(sector, "r5l1", "r6l1"), `S${String(sector)} ${String(hull)}`).toBeNull();
+        expect(useRunStore.getState().hull).toBe(hull);
+      }
+      expect(lastConsequence()).toBeNull();
+      expect(consequenceEntries()).toEqual([]);
+    }
+  });
+
+  it("charges the last point it can without killing", () => {
+    const toll = holeTollFor(5, 30);
+    useRunStore.setState({ hull: toll + 1 });
+    expect(applyHoleToll(5, "r5l1", "r6l1")).toBe(toll);
+    expect(useRunStore.getState().hull).toBe(1);
+  });
+
+  it("does nothing to the hull in a sector without the motif", () => {
+    const before = consequenceEntries();
     expect(applyHoleToll(1, "r5l1", "r6l1")).toBe(0);
     expect(useRunStore.getState().hull).toBe(30);
-  });
-
-  const tollMap = (links: readonly [NodeId, NodeId][]): MapGraph => {
-    const nodes: MapNode[] = [
-      { id: "r0l1", row: 0, lane: 1, type: "start" },
-      { id: "r1l1", row: 1, lane: 1, type: "battle" },
-      { id: "r2l0", row: 2, lane: 0, type: "battle" },
-      { id: "r2l1", row: 2, lane: 1, type: "battle", hole: true, spot: "s" },
-      { id: "r2l2", row: 2, lane: 2, type: "battle" },
-      { id: "r3l1", row: 3, lane: 1, type: "boss" },
-    ];
-    return {
-      nodes,
-      edges: [...links],
-      shape: { bossRow: 3, gateRow: 1, lanes: 3 },
-      edgeMarks: { [edgeKey("r1l1", "r2l1")]: "wormhole" },
-      wormholes: {},
-      spots: [{ id: "s", nodes: ["r2l1"], rows: [2, 2], lanes: [1, 1] }],
-      bossReach: nodes.filter((n) => n.hole !== true).map((n) => n.id),
-    };
-  };
-
-  const LINKS: readonly [NodeId, NodeId][] = [
-    ["r0l1", "r1l1"],
-    ["r1l1", "r2l0"],
-    ["r1l1", "r2l1"],
-    ["r2l0", "r3l1"],
-    ["r2l2", "r3l1"],
-  ];
-
-  it("charges when the bypass buys a lane the graph withheld", () => {
-    useRunStore.setState({ map: tollMap(LINKS), visited: ["r0l1", "r1l1"] });
-    expect(applyHoleToll(4, "r1l1", "r2l1")).toBe(2);
-    expect(useRunStore.getState().hull).toBe(28);
-    expect(lastConsequence()).toBe("run:motif.bypass");
-  });
-
-  it("waives the toll when the bypass only walks an open lane", () => {
-    useRunStore.setState({
-      map: tollMap([...LINKS, ["r1l1", "r2l2"]]),
-      visited: ["r0l1", "r1l1"],
-    });
-    expect(applyHoleToll(4, "r1l1", "r2l1")).toBe(0);
-    expect(useRunStore.getState().hull).toBe(30);
-    expect(lastConsequence()).toBe("run:motif.holeDrift");
+    expect(consequenceEntries()).toEqual(before);
   });
 });

@@ -1,16 +1,13 @@
-import { ascensionMods, MAX_ASCENSION } from "@/data/ascension";
+import { ascensionMods } from "@/data/ascension";
 import { dossierId } from "@/data/codex";
 import { contractDef } from "@/data/contracts";
 import { DIE_BY_ID } from "@/data/dice";
 import { STARTER_DECK } from "@/data/decks";
 import { computeMutatorMods } from "@/data/mutators";
-import { ENEMY_BY_ID } from "@/data/enemies";
-import { beaconsResolved } from "@/data/events/beacons";
 import {
   echoNodesCrossed,
   echoSoftLands,
   echoEquipped,
-  echoStartCharge,
 } from "@/data/echo";
 import { memoryFragmentCount } from "@/data/narrative/memories";
 import {
@@ -26,9 +23,8 @@ import {
 } from "@/data/narrative/prologue";
 import { SECTOR_COUNT, SECTORS, sectorDef } from "@/data/sectors";
 import { shipHullMax } from "@/game/battle/setup";
-import type { ShipId } from "@/data/ships";
 import { beginCheckFunnel } from "@/game/onboarding";
-import { chartSlotTierDelta, hubBudgetBonus } from "@/game/chart/engine";
+import { hubBudgetBonus } from "@/game/chart/engine";
 import {
   computeNodeReward,
   dieForRarity,
@@ -40,43 +36,29 @@ import {
   areConnected,
   nodeById,
   wormholeFor,
-  type MapGraph,
   type MapNode,
   type NodeId,
 } from "@/game/map/types";
 import {
   bypassTargetFor,
   isGentleRide,
-  openLandings,
   rollThrow,
-  throwCost,
+  softLandThrow,
   type WormholeThrow,
 } from "@/game/map/wormhole";
 import { chaos } from "@/services/chaos";
-import {
-  MINIBOSS_PACKAGE_SCRAP,
-  ptsForDie,
-  sellValue,
-} from "@/game/economy/prices";
+import { MINIBOSS_PACKAGE_SCRAP } from "@/game/economy/prices";
 import {
   announceReanchor,
-  cargoChargeCap,
   cargoNodeToll,
-  cargoSlotTier,
   deliverCargo,
   lapseCargo,
   reanchorCargo,
-  releaseCargo,
   spendCargoBark,
 } from "@/game/run/cargo";
 import { pushRunCloud } from "@/game/run/cloud";
-import { grantDie, grantModule } from "@/game/run/inventory";
-import {
-  buildEncounterIds,
-  pickBoss,
-  sectorDmgPct,
-  sectorHpPct,
-} from "@/game/run/encounter";
+import { grantDie } from "@/game/run/inventory";
+import { pickBoss } from "@/game/run/encounter";
 import {
   applyEdgeMotifs,
   applyHoleToll,
@@ -90,11 +72,8 @@ import {
 } from "@/game/run/journal";
 import {
   ACT_SCOPED_FACES,
-  applySalvageFace,
   isSalvageNode,
   rollSalvageOffer,
-  salvageStreamFor,
-  SALVAGE_DECLINED,
 } from "@/game/run/salvage";
 import {
   weatherIn,
@@ -102,67 +81,40 @@ import {
   withWeatherFor,
 } from "@/game/run/weather";
 import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
-import { computePerkMods } from "@/game/run/perkMods";
+import { contractSectorOf, mapOptionsFor } from "@/game/run/mapOptions";
 import { computeRunMods, runChargeCap } from "@/game/run/runMods";
-import {
-  DRAFT_REROLL_COST,
-  rollPerkChoices,
-  skipScrapFor,
-  type DraftContext,
-} from "@/game/run/perkDraft";
+import { rollPerkChoices } from "@/game/run/perkDraft";
 import { recordAction, resetActionLog, syncActionStats } from "@/game/run/actionLog";
 import { emitRunHook } from "@/game/run/runEffects";
-import { finishScoredRun } from "@/game/run/boards";
-import { countStars, goalStarsMask, type GoalContext } from "@/game/run/goals";
 import {
   contentSector,
   dailyMutators,
   dailySeed,
   depthFor,
-  driftLoop,
-  driftLoopHpPct,
-  isScoredMode,
   isSectorExitRow,
-  scoreBreakdown,
   setupForRun,
 } from "@/game/run/modes";
-import {
-  bossFirstKillShards,
-  runXp,
-  shardBreakdown,
-  ZERO_SHARD_BREAKDOWN,
-} from "@/game/xp";
-import {
-  hangarBudget,
-  milestoneLabel,
-  milestonesBetween,
-} from "@/data/milestones";
+import { bossFirstKillShards } from "@/game/xp";
+import { hangarBudget } from "@/data/milestones";
 import { DECK_MIN, deckPoints, diePoints } from "@/data/metaShop";
 import { validateDeck } from "@/game/meta/deck";
 import {
   settleAchievements,
   settleLifetimeAchievements,
 } from "@/game/meta/achievements";
-import {
-  ceremonyRetiredIds,
-  freshUnlocks,
-  grantDieUnlock,
-  metaHasFeature,
-  unlockContextOf,
-} from "@/game/meta/unlockState";
-import { useSummaryStore, type DeathCause } from "@/stores/summaryStore";
-import { captureRunSnapshot } from "@/game/run/snapshot";
+import { grantDieUnlock, metaHasFeature } from "@/game/meta/unlockState";
+import { useSummaryStore } from "@/stores/summaryStore";
 import { trackEvent } from "@/services/analytics";
 import { now } from "@/services/clock";
 import { createStream, createStreams, deriveSeed } from "@/services/rng";
-import { clearRun, saveRunSnapshot } from "@/services/save";
+import { clearRun } from "@/services/save";
 import { useAppStore } from "@/stores/appStore";
-import { battleTally, useBattleStore } from "@/stores/battleStore";
 import {
-  SMOTRITEL_BADGE,
-  useMetaStore,
-  type MetaStats,
-} from "@/stores/metaStore";
+  battleTally,
+  useBattleStore,
+  type BattleState,
+} from "@/stores/battleStore";
+import { useMetaStore, type MetaStats } from "@/stores/metaStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
 import { useSettingsStore } from "@/stores/settingsStore";
@@ -172,11 +124,6 @@ import type {
   RunState,
   RunValues,
 } from "@/stores/runStore";
-import { PERK_BY_ID } from "@/data/perks";
-import type { RunSnapshot, ScreenId } from "@/types";
-import type { SlotId } from "@/types/battle";
-import type { School } from "@/types/content";
-import type { FlagValue, ForcedBattle } from "@/types/events";
 
 import {
   BASE_TIDE_CAP,
@@ -184,66 +131,42 @@ import {
   jumpsPerTideFor,
   tideCapFor,
 } from "@/game/run/tide";
+import { autosaveRun } from "@/game/run/snapshot";
+import { endRun, leaveDeathEpilogue } from "@/game/run/runEnd";
+import { startBattleNode, startEventBattle } from "@/game/run/battleLaunch";
+import {
+  applyPerkPick,
+  banishPerkChoice,
+  draftContext,
+  noteDraftOffer,
+  rerollPerkDraft,
+  resolveDieChoice,
+  resolveDieReward,
+  resolveModuleChoice,
+  resolvePerkChoice,
+  resolveSalvagePick,
+} from "@/game/run/rewardPicks";
 
 export { BASE_TIDE_CAP, JUMPS_PER_TIDE, jumpsPerTideFor, tideCapFor };
+export {
+  applyPerkPick,
+  autosaveRun,
+  banishPerkChoice,
+  endRun,
+  leaveDeathEpilogue,
+  rerollPerkDraft,
+  resolveDieChoice,
+  resolveDieReward,
+  resolveModuleChoice,
+  resolvePerkChoice,
+  resolveSalvagePick,
+  startEventBattle,
+};
 
 export const WORMHOLE_REVEAL = 1;
 export const STARTING_SCRAP = 0;
 
-const STORM_SCHOOLS: readonly School[] = [
-  "red",
-  "blue",
-  "green",
-  "yellow",
-  "black",
-  "grey",
-];
-
-const runRotation = (run: RunValues): string[] => {
-  const faced = [
-    ...run.usedMinibosses,
-    ...(run.stats.bosses > 0 ? [pickBoss(run.sector, run.seed)] : []),
-  ];
-  return faced
-    .map((id) => ENEMY_BY_ID.get(id)?.name)
-    .filter((name): name is string => name !== undefined);
-};
-
-const runDeckSchools = (run: RunValues): number =>
-  new Set(
-    run.deck
-      .map((d) => DIE_BY_ID.get(d.defId)?.school)
-      .filter(
-        (school): school is School =>
-          school !== undefined && school !== "prismatic",
-      ),
-  ).size;
-
 export const FULL_RESONANCE = 6;
-
-const shipClearDelta = (
-  shipId: ShipId,
-  win: boolean,
-  mode: RunMode,
-): Partial<MetaStats> => {
-  if (!win || mode !== "campaign") return {};
-  switch (shipId) {
-    case "wanderer":
-      return { clearsWanderer: 1 };
-    case "ram":
-      return { clearsRam: 1 };
-    case "ark":
-      return { clearsArk: 1 };
-    case "corsair":
-      return { clearsCorsair: 1 };
-    case "foundry":
-      return { clearsFoundry: 1 };
-    case "prism":
-      return { clearsPrism: 1 };
-    default:
-      return {};
-  }
-};
 
 const noteBattleLifetime = (
   tally: BattleTally,
@@ -267,183 +190,6 @@ export interface NodeResult {
   kills?: number;
   deepScan?: boolean;
 }
-
-const sectorsClearedCount = (): number => {
-  const run = useRunStore.getState();
-  return Math.max(0, Math.min(SECTOR_COUNT, run.stats.bosses));
-};
-
-const goalContextFor = (win: boolean): GoalContext => {
-  const run = useRunStore.getState();
-  return {
-    win,
-    stats: run.stats,
-    hull: run.hull,
-    hullMax: run.hullMax,
-    scrap: run.scrap,
-    deckSize: run.deck.length,
-    deckSchools: new Set(
-      run.deck
-        .map((d) => DIE_BY_ID.get(d.defId)?.school)
-        .filter((school): school is School => school !== undefined),
-    ).size,
-    axis: run.axis,
-    solvedPuzzles: run.solvedPuzzles,
-    flags: run.flags,
-  };
-};
-
-const settleContract = (win: boolean): { stars: number; newStars: number } => {
-  const run = useRunStore.getState();
-  const def = contractDef(run.contractId);
-  if (def === undefined) return { stars: 0, newStars: 0 };
-  const mask = goalStarsMask(def.goals, goalContextFor(win));
-  const gained = useMetaStore.getState().recordContractStars(def.id, mask);
-  if (gained > 0) {
-    trackEvent({
-      name: "contract_star",
-      params: { contract: def.id, stars: countStars(mask) },
-    });
-  }
-  return { stars: countStars(mask), newStars: gained };
-};
-
-const deathParams = (cause: DeathCause): Record<string, string> =>
-  cause === "singularity" ? { death: "1", cause } : { death: "1" };
-
-export const endRun = (win: boolean, cause?: DeathCause): void => {
-  syncActionStats();
-  useNarrativeStore.getState().dropRunFeed();
-  const run = useRunStore.getState();
-  const deathCause: DeathCause =
-    cause ?? (run.hull <= 0 ? "hull" : "abandon");
-  const meta = useMetaStore.getState();
-  const contract = run.mode === "contract" ? settleContract(win) : null;
-  const counts = {
-    nodes: run.stats.nodesCleared,
-    elites: run.stats.elites,
-    minibosses: run.stats.minibosses,
-    bosses: run.stats.bosses,
-    contractStars: contract?.newStars ?? 0,
-  };
-  const cleared = sectorsClearedCount();
-  const xpMult =
-    1 +
-    computeRunMods(run.perks, run.chartPicks, run.modules, run.officers)
-      .xpMultPct / 100;
-  const xpGain = Math.round(runXp(counts, run.ascension) * xpMult);
-  const beacons = beaconsResolved(run.flags);
-  const hullPct = run.hullMax <= 0 ? 0 : (run.hull / run.hullMax) * 100;
-  if (run.mode === "campaign") meta.recordStreak(win);
-  const streak = useMetaStore.getState().stats.noDeathStreak;
-  const shards =
-    run.mode === "campaign"
-      ? shardBreakdown({
-          win,
-          sectorsCleared: cleared,
-          beacons,
-          hullPct,
-          firstEnding: run.endingFirstTime,
-          streak,
-          ascension: run.ascension,
-          deepClear: run.crossedThreshold,
-        })
-      : ZERO_SHARD_BREAKDOWN;
-  const award = meta.awardRun(xpGain, shards.total, win);
-  meta.archiveRunFlags(Object.keys(run.flags));
-  if (win && run.mode === "campaign") {
-    meta.recordCampaignClear(run.ascension);
-    if (run.ascension >= MAX_ASCENSION) meta.awardBadge(SMOTRITEL_BADGE);
-  }
-  meta.bumpLifetime({
-    scrapEarned: run.stats.scrapEarned,
-    beacons,
-    ...shipClearDelta(run.shipId, win, run.mode),
-    driftRuns: run.mode === "drift" ? 1 : 0,
-    dailyRuns: run.mode === "daily" ? 1 : 0,
-    contractRuns: run.mode === "contract" ? 1 : 0,
-    deepClears: win && run.crossedThreshold ? 1 : 0,
-    ...(run.mode === "drift" ? { deepestDrift: run.stats.depth } : {}),
-  });
-  const finds = meta.recordEncounters(run.encounters);
-  const settled = settleAchievements({
-    win,
-    hullPct,
-    beacons,
-    puzzles: run.solvedPuzzles.length,
-    ascension: run.ascension,
-    deckSchools: runDeckSchools(run),
-    stats: run.stats,
-  });
-  const milestones = milestonesBetween(award.fromLevel, award.toLevel).map(
-    milestoneLabel,
-  );
-  const after = useMetaStore.getState();
-  const unlocks = freshUnlocks(unlockContextOf(after), after.unlocksSeen);
-  if (award.toLevel > award.fromLevel && !isScoredMode(run.mode)) {
-    after.markUnlocksSeen(ceremonyRetiredIds(unlocks));
-  }
-  useSummaryStore.getState().setResult({
-    xpGain,
-    shardGain: shards.total + finds.shards + settled.shards,
-    shards,
-    findShards: finds.shards,
-    firstFinds: finds.firstFinds,
-    achievements: settled.unlocked.map((def) => def.id),
-    achievementShards: settled.shards,
-    unlocks: unlocks.defs.map((def) => def.label),
-    unlockIds: unlocks.ids,
-    fromLevel: award.fromLevel,
-    toLevel: award.toLevel,
-    win,
-    cause: win ? null : deathCause,
-    milestones,
-    mode: run.mode,
-    score: isScoredMode(run.mode) ? scoreBreakdown(run.stats) : null,
-    contractId: run.contractId,
-    contractStars: contract?.stars ?? 0,
-    rotation: runRotation(run),
-  });
-  if (!win) {
-    trackEvent({
-      name: "death",
-      params: {
-        sector: run.sector,
-        depth: depthFor(run.sectorIndex, run.depthRow),
-        cause: deathCause,
-      },
-    });
-  }
-  useRunStore.setState({
-    active: false,
-    pendingSwaps: [],
-    officers: [],
-    pendingOfficerBark: false,
-    echoUsed: false,
-  });
-  releaseCargo();
-  if (isScoredMode(run.mode)) void finishScoredRun();
-  if (win) useAppStore.getState().go(summaryScreenFor(run.mode));
-  else useAppStore.getState().go("ending", deathParams(deathCause));
-  autosaveRun();
-};
-
-export const summaryScreenFor = (mode: RunMode): ScreenId =>
-  isScoredMode(mode) ? "driftSummary" : "summary";
-
-export const leaveDeathEpilogue = (): void => {
-  useAppStore
-    .getState()
-    .go(summaryScreenFor(useRunStore.getState().mode));
-};
-
-export const autosaveRun = (): void => {
-  try {
-    saveRunSnapshot(captureRunSnapshot() as unknown as RunSnapshot);
-  } catch (error) {
-    console.error("flow: autosave failed", error);
-  }
-};
 
 const RARE_RARITIES: ReadonlySet<string> = new Set(["rare", "legendary"]);
 
@@ -474,168 +220,6 @@ export const unlockNextMemory = (): void => {
   const fresh = syncMemoryArc().length > 0;
   announceEchoCrossings(before);
   if (fresh) emitBark("memory");
-};
-
-const encounterInit = (pocket: boolean) => {
-  const s = useRunStore.getState();
-  const mods = ascensionMods(s.ascension);
-  const mut = computeMutatorMods(s.mutators);
-  return {
-    ascension: s.ascension,
-    sectorHpPct: sectorHpPct({ sector: s.sector, pocket }),
-    sectorDmgPct: sectorDmgPct({ sector: s.sector }),
-    enemyHpBonusPct:
-      mods.enemyHpPct +
-      mut.enemyHpPct +
-      mut.copyHpPct +
-      driftLoopHpPct(driftLoop(s.sectorIndex)),
-    eliteShield: mods.eliteShield,
-  };
-};
-
-const runBattleInit = (
-  nodeKey: string,
-  pocket = false,
-  causality: { inverted?: boolean; storm?: boolean } = {},
-) => {
-  const s = useRunStore.getState();
-  const setup = setupForRun(s);
-  const mut = computeMutatorMods(s.mutators);
-  const slotTierDelta: Partial<Record<SlotId, number>> = {
-    ...chartSlotTierDelta(s.chartPicks),
-  };
-  if (mut.sensorsTierDelta !== 0) {
-    slotTierDelta.sensors =
-      (slotTierDelta.sensors ?? 0) + mut.sensorsTierDelta;
-  }
-  for (const [slot, delta] of Object.entries(cargoSlotTier(s.cargo))) {
-    const key = slot as SlotId;
-    slotTierDelta[key] = (slotTierDelta[key] ?? 0) + delta;
-  }
-  const disabledSlots: SlotId[] = [
-    ...(setup.sensorsDisabled === true ? (["sensors"] as SlotId[]) : []),
-    ...(setup.shieldsDisabled === true
-      ? (["shields", "shieldsB"] as SlotId[])
-      : []),
-  ];
-  const resonanceBoost =
-    mut.resonanceBonus > 0
-      ? {
-          school: createStream(
-            deriveSeed(s.seed, `storm:${nodeKey}`),
-          ).pick(STORM_SCHOOLS),
-          n: mut.resonanceBonus,
-        }
-      : undefined;
-  return {
-    shipId: s.shipId,
-    tide: s.tide,
-    interference: s.interferenceStacks,
-    perks: s.perks,
-    chartPicks: s.chartPicks,
-    mutators: s.mutators,
-    modules: s.modules,
-    officers: s.officers,
-    echo: s.echo ?? undefined,
-    engravings: useMetaStore.getState().engravings,
-    flags: Object.keys(s.flags),
-    runCounters: s.counters,
-    hull: s.hull,
-    hullMax: s.hullMax,
-    runScrap: s.scrap,
-    chargeCap: Math.max(
-      1,
-      runChargeCap(s.perks, s.chartPicks, s.modules, s.officers) +
-        mut.chargeCapDelta +
-        cargoChargeCap(s.cargo),
-    ),
-    rerollSizeBonus: s.rerollSizeRun,
-    forcedTraits: setup.forcedTraits,
-    slotTierDelta,
-    disabledSlots,
-    resonanceBoost,
-    inverted: causality.inverted === true,
-    nodeStorm: causality.storm === true,
-    ...encounterInit(pocket),
-  };
-};
-
-const withEnemyCopies = (enemyIds: string[]): string[] => {
-  const copies = computeMutatorMods(useRunStore.getState().mutators).enemyCopies;
-  if (copies <= 0) return enemyIds;
-  const first = enemyIds[0];
-  if (first === undefined) return enemyIds;
-  return [...enemyIds, ...Array.from({ length: copies }, () => first)];
-};
-
-const startBattleNode = (node: MapNode): void => {
-  const s = useRunStore.getState();
-  const mods = s.consumeBattleMods();
-  const streams = createStreams(deriveSeed(s.seed, `node:${node.id}`));
-  const encStream = createStream(deriveSeed(s.seed, `enc:${node.id}`));
-  const enemyIds = buildEncounterIds(node.type, encStream, {
-    sector: s.sector,
-    flags: s.flags,
-    usedMinibosses: s.usedMinibosses,
-    seed: s.seed,
-  });
-  if (enemyIds.includes("bountyHuntress")) s.setFlag("hunterEngaged");
-  if (node.type === "miniboss" && enemyIds[0] !== undefined) {
-    s.markMinibossUsed(enemyIds[0]);
-    emitBark("minibossIntro");
-  }
-  for (let i = 0; i < mods.enemyPlus; i += 1) enemyIds.push("scavDrone");
-  useBattleStore.getState().startBattle(
-    {
-      enemyIds: withEnemyCopies(enemyIds),
-      startCharge: mods.startCharge + echoStartCharge(s.echo),
-      ...runBattleInit(node.id, node.pocket === true, {
-        inverted: node.inverted,
-        storm: node.storm,
-      }),
-    },
-    s.deck.map((d) => d.defId),
-    streams,
-  );
-  useAppStore.getState().go("battle");
-};
-
-export const startEventBattle = (follow: ForcedBattle): void => {
-  const s = useRunStore.getState();
-  if (s.map === null || s.position === null) return;
-  const mods = s.consumeBattleMods();
-  const enemyIds = [...follow.enemyIds];
-  for (let i = 0; i < mods.enemyPlus; i += 1) enemyIds.push("scavDrone");
-  const streams = createStreams(deriveSeed(s.seed, `evbattle:${s.position}`));
-  s.setPendingBattle({
-    enemyIds: [...follow.enemyIds],
-    originNodeId: s.position,
-    scrap: follow.scrap ?? 0,
-    lootDie: follow.loot?.die ?? null,
-    lootRarity: follow.loot?.rarity ?? null,
-    setFlags: (follow.setFlags ?? []).map(
-      ([k, v]) => [k, v] as [string, FlagValue],
-    ),
-    clearFlags: [...(follow.clearFlags ?? [])],
-  });
-  useBattleStore.getState().startBattle(
-    {
-      enemyIds: withEnemyCopies(enemyIds),
-      startCharge: mods.startCharge + echoStartCharge(s.echo),
-      ...runBattleInit(
-        `ev:${s.position}`,
-        nodeById(s.map).get(s.position)?.pocket === true,
-        {
-          inverted: nodeById(s.map).get(s.position)?.inverted,
-          storm: nodeById(s.map).get(s.position)?.storm,
-        },
-      ),
-    },
-    s.deck.map((d) => d.defId),
-    streams,
-  );
-  useAppStore.getState().go("battle");
-  autosaveRun();
 };
 
 const routeToNode = (node: MapNode): void => {
@@ -688,11 +272,6 @@ export interface StartRunOptions {
   startDraft?: boolean;
 }
 
-const mapOptionsFor = (mutators: readonly string[], mode: RunMode) => ({
-  bossAsGate: mode === "drift",
-  noShops: computeMutatorMods(mutators).noShops,
-});
-
 export const startRun = (
   seed = now() >>> 0,
   ascension = 0,
@@ -739,11 +318,12 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   const setup = contract?.setup ?? {};
   const mutators = [...(options.mutators ?? setup.mutators ?? [])];
   const sectorIndex = Math.max(1, setup.sector ?? 1);
+  const sector = contractSectorOf(contract);
   const streams = createStreams(rootSeed);
   const map = generateSectorMap(
     streams.map,
-    contentSector(sectorIndex),
-    mapOptionsFor(mutators, mode),
+    sector,
+    mapOptionsFor(mutators, mode, contract),
   );
   const meta = useMetaStore.getState();
   const shipId = setup.ship ?? meta.selectedShip;
@@ -779,7 +359,7 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     mutators,
     contractId: options.contractId ?? null,
     dailyDate: options.dailyDate ?? null,
-    sector: contentSector(sectorIndex),
+    sector,
     sectorIndex,
     depthRow: 0,
     position: START_NODE_ID,
@@ -970,12 +550,13 @@ export const bypassHole = (holeId: NodeId): boolean => {
     holeId,
     gate.run.visited,
   );
-  useRunStore.setState({ pendingWormhole: null });
   if (target === null) {
+    useRunStore.setState({ pendingWormhole: null });
     autosaveRun();
     return false;
   }
-  applyHoleToll(gate.run.sector, gate.from, holeId);
+  if (applyHoleToll(gate.run.sector, gate.from, holeId) === null) return false;
+  useRunStore.setState({ pendingWormhole: null });
   useRunStore.getState().bumpStats({ holesBypassed: 1 });
   useMetaStore.getState().bumpLifetime({ holesBypassed: 1 });
   settleLifetimeAchievements();
@@ -1020,48 +601,9 @@ const disintegrate = (): void => {
   endRun(false, "singularity");
 };
 
-const echoSoftLandThrow = (
-  map: MapGraph,
-  from: NodeId,
-  hole: NodeId,
-  visited: readonly NodeId[],
-): WormholeThrow => {
-  const origin = nodeById(map).get(from);
-  const ahead =
-    origin === undefined
-      ? []
-      : openLandings(map, from, visited)
-          .filter((node) => node.row > origin.row)
-          .sort(
-            (a, b) =>
-              throwCost(origin, a) - throwCost(origin, b) ||
-              (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
-          );
-  const landing = ahead[0];
-  const cost =
-    landing === undefined || origin === undefined
-      ? 0
-      : throwCost(origin, landing);
-  return {
-    from,
-    hole,
-    landing: landing?.id ?? null,
-    budget: Math.ceil(cost),
-    direction: "forward",
-    cost,
-    rows:
-      landing === undefined || origin === undefined
-        ? 0
-        : landing.row - origin.row,
-    gentle: true,
-    fallback: landing === undefined ? "stalled" : "none",
-  };
-};
-
-export const canSoftLandWormhole = (): boolean => {
-  const s = useRunStore.getState();
-  return echoSoftLands(s.echo) && !s.echoUsed;
-};
+export const canSoftLandWormhole = (
+  s: Pick<RunValues, "echo" | "echoUsed"> = useRunStore.getState(),
+): boolean => echoSoftLands(s.echo) && !s.echoUsed;
 
 export const rideWormhole = (
   holeId: NodeId,
@@ -1071,9 +613,9 @@ export const rideWormhole = (
   const gate = wormholeGate(holeId);
   if (gate === null) return null;
   const s = gate.run;
-  const softLanded = softLand && echoSoftLands(s.echo) && !s.echoUsed;
+  const softLanded = softLand && canSoftLandWormhole(s);
   const roll = softLanded
-    ? echoSoftLandThrow(gate.map, gate.from, holeId, s.visited)
+    ? softLandThrow(gate.map, gate.from, holeId, s.visited)
     : rollThrow(
         {
           map: gate.map,
@@ -1173,9 +715,10 @@ const afterBossVictory = (): void => {
 
 const isSectorExit = (node: MapNode): boolean => {
   const run = useRunStore.getState();
-  return run.mode === "drift"
+  if (run.mode !== "drift") return node.type === "boss";
+  return run.map === null
     ? isSectorExitRow(run.sectorIndex, node.row)
-    : node.type === "boss";
+    : node.row === run.map.shape.bossRow;
 };
 
 const finalizeNode = (
@@ -1297,29 +840,6 @@ export const finishRewards = (): void => {
   }
 };
 
-export const draftContext = (
-  run: RunState,
-  floor?: DraftContext["floor"],
-): DraftContext => ({
-  owned: run.perks,
-  banished: run.banishedPerks,
-  sector: run.sector,
-  deckDefIds: run.deck.map((d) => d.defId),
-  modules: run.modules,
-  shipId: run.shipId,
-  draftsSinceRare: run.draftsSinceRare,
-  ...(floor === undefined ? {} : { floor }),
-});
-
-const noteDraftOffer = (choices: readonly string[]): void => {
-  if (choices.length === 0) return;
-  useRunStore
-    .getState()
-    .noteDraftOffer(
-      choices.some((id) => PERK_BY_ID.get(id)?.rarity === "rare"),
-    );
-};
-
 const minibossPackage = (
   lootStream: ReturnType<typeof createStream>,
   run: RunState,
@@ -1347,27 +867,29 @@ const endBattleStore = (): void => {
   useBattleStore.getState().reset();
 };
 
-export const resolveRunBattle = (): void => {
-  const b = useBattleStore.getState();
-  if (b.outcome === undefined) return;
-  const run = useRunStore.getState();
-  if (run.map === null || run.position === null) return;
-  const node = nodeById(run.map).get(run.position);
-  if (node === undefined) return;
+const settleLostBattle = (b: BattleState, run: RunState): void => {
+  trackEvent({
+    name: "battle_result",
+    params: { win: false, turns: b.turn, sector: run.sector },
+  });
+  const lost = takeBattleTally();
+  run.noteBattleTally(lost);
+  noteBattleLifetime(lost, false);
+  endBattleStore();
+  endRun(false, "hull");
+};
 
-  if (b.outcome === "defeat") {
-    trackEvent({
-      name: "battle_result",
-      params: { win: false, turns: b.turn, sector: run.sector },
-    });
-    const lost = takeBattleTally();
-    run.noteBattleTally(lost);
-    noteBattleLifetime(lost, false);
-    endBattleStore();
-    endRun(false, "hull");
-    return;
-  }
+interface WonBattle {
+  kills: number;
+  battleScrap: number;
+  setHull: number;
+}
 
+const settleWonBattle = (
+  b: BattleState,
+  run: RunState,
+  bossFight: boolean,
+): WonBattle => {
   trackEvent({
     name: "battle_result",
     params: { win: true, turns: b.turn, sector: run.sector },
@@ -1383,12 +905,42 @@ export const resolveRunBattle = (): void => {
   run.noteBattleTally(tally);
   noteBattleLifetime(
     tally,
-    node.type === "boss" && tally.damageTaken === 0 && battleHull >= run.hull,
+    bossFight && tally.damageTaken === 0 && battleHull >= run.hull,
   );
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
   if (survivedLethal) run.setFlag("survivedLethal");
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
+  const mods = computeRunMods(
+    run.perks,
+    run.chartPicks,
+    run.modules,
+    run.officers,
+  );
+  return {
+    kills,
+    battleScrap,
+    setHull: Math.min(
+      run.hullMax,
+      battleHull + mods.battleEndHeal + run.battleEndHealRun,
+    ),
+  };
+};
+
+export const resolveRunBattle = (): void => {
+  const b = useBattleStore.getState();
+  if (b.outcome === undefined) return;
+  const run = useRunStore.getState();
+  if (run.map === null || run.position === null) return;
+  const node = nodeById(run.map).get(run.position);
+  if (node === undefined) return;
+
+  if (b.outcome === "defeat") {
+    settleLostBattle(b, run);
+    return;
+  }
+
+  const won = settleWonBattle(b, run, node.type === "boss");
 
   const lootStream = createStream(deriveSeed(run.seed, `loot:${node.id}`));
   const mods = computeRunMods(
@@ -1447,12 +999,9 @@ export const resolveRunBattle = (): void => {
     node,
     {
       outcome: "cleared",
-      scrap: rewardScrap + battleScrap + packageScrap,
-      setHull: Math.min(
-        run.hullMax,
-        battleHull + mods.battleEndHeal + run.battleEndHealRun,
-      ),
-      kills,
+      scrap: rewardScrap + won.battleScrap + packageScrap,
+      setHull: won.setHull,
+      kills: won.kills,
     },
     pending,
   );
@@ -1474,43 +1023,12 @@ export const resolveEventBattle = (): void => {
   }
 
   if (b.outcome === "defeat") {
-    trackEvent({
-      name: "battle_result",
-      params: { win: false, turns: b.turn, sector: run.sector },
-    });
-    const lost = takeBattleTally();
-    run.noteBattleTally(lost);
-    noteBattleLifetime(lost, false);
-    endBattleStore();
-    endRun(false, "hull");
+    settleLostBattle(b, run);
     return;
   }
 
-  trackEvent({
-    name: "battle_result",
-    params: { win: true, turns: b.turn, sector: run.sector },
-  });
-  const kills = b.enemies.length;
-  const battleScrap = b.scrap;
-  const stolen = b.stolenScrap;
-  const battleHull = b.hull;
-  const enemyDefIds = b.enemies.map((e) => e.defId);
-  const tally = takeBattleTally();
-  const survivedLethal = b.survivedLethal;
-  endBattleStore();
-  run.noteBattleTally(tally);
-  noteBattleLifetime(tally, false);
-  run.noteDriftUsage(b.blackUsed, b.blueUsed);
-  if (survivedLethal) run.setFlag("survivedLethal");
-  if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
-  announceVictory(enemyDefIds, battleHull);
+  const won = settleWonBattle(b, run, false);
 
-  const mods = computeRunMods(
-    run.perks,
-    run.chartPicks,
-    run.modules,
-    run.officers,
-  );
   if (pending.lootDie !== null || pending.lootRarity !== null) {
     const lootStream = createStream(
       deriveSeed(run.seed, `evloot:${pending.originNodeId}`),
@@ -1538,12 +1056,9 @@ export const resolveEventBattle = (): void => {
     node,
     {
       outcome: "cleared",
-      scrap: battleScrap + pending.scrap,
-      setHull: Math.min(
-        run.hullMax,
-        battleHull + mods.battleEndHeal + run.battleEndHealRun,
-      ),
-      kills,
+      scrap: won.battleScrap + pending.scrap,
+      setHull: won.setHull,
+      kills: won.kills,
     },
     null,
   );
@@ -1552,130 +1067,6 @@ export const resolveEventBattle = (): void => {
 export const resolveActiveBattle = (): void => {
   if (useRunStore.getState().pendingBattle !== null) resolveEventBattle();
   else resolveRunBattle();
-};
-
-const applyHullMaxDelta = (delta: number): void => {
-  if (delta === 0) return;
-  const run = useRunStore.getState();
-  const hullMax = Math.max(1, run.hullMax + delta);
-  useRunStore.setState({
-    hullMax,
-    hull: Math.min(hullMax, delta > 0 ? run.hull + delta : run.hull),
-  });
-};
-
-export const applyPerkPick = (perkId: string): void => {
-  useRunStore.getState().addPerk(perkId);
-  applyHullMaxDelta(computePerkMods([perkId]).hullMaxDelta);
-};
-
-export const resolveDieReward = (keep: boolean): void => {
-  const run = useRunStore.getState();
-  const pending = run.pendingRewards;
-  if (pending === null || pending.dieDrop === null) return;
-  const dieId = pending.dieDrop;
-  if (keep) grantDie(dieId);
-  else run.addScrap(sellValue(ptsForDie(dieId)));
-  useRunStore
-    .getState()
-    .setPendingRewards({ ...pending, dieDrop: null });
-  autosaveRun();
-};
-
-export const resolveSalvagePick = (faceId: string | null): void => {
-  const run = useRunStore.getState();
-  const pending = run.pendingRewards;
-  if (pending === null || (pending.salvage ?? []).length === 0) return;
-  if (faceId === null) {
-    logConsequence(SALVAGE_DECLINED);
-  } else {
-    if (!(pending.salvage ?? []).includes(faceId)) return;
-    const nodeId = pending.draftNodeId ?? run.position ?? "salvage";
-    if (!applySalvageFace(faceId, salvageStreamFor(run.seed, nodeId))) return;
-  }
-  useRunStore.getState().setPendingRewards({ ...pending, salvage: [] });
-  autosaveRun();
-};
-
-export const resolveDieChoice = (dieId: string): void => {
-  const run = useRunStore.getState();
-  const pending = run.pendingRewards;
-  if (pending === null || (pending.dieChoices ?? []).length === 0) return;
-  grantDie(dieId);
-  useRunStore
-    .getState()
-    .setPendingRewards({ ...pending, dieChoices: [], moduleChoices: [] });
-  autosaveRun();
-};
-
-export const resolveModuleChoice = (moduleId: string): void => {
-  const run = useRunStore.getState();
-  const pending = run.pendingRewards;
-  if (pending === null || (pending.moduleChoices ?? []).length === 0) return;
-  grantModule(moduleId);
-  useRunStore
-    .getState()
-    .setPendingRewards({ ...pending, dieChoices: [], moduleChoices: [] });
-  autosaveRun();
-};
-
-export const resolvePerkChoice = (perkId: string | null): void => {
-  const run = useRunStore.getState();
-  const pending = run.pendingRewards;
-  if (pending === null) return;
-  if (perkId === null) {
-    run.addScrap(skipScrapFor(run.sector));
-  } else {
-    applyPerkPick(perkId);
-  }
-  useRunStore.getState().setPendingRewards({ ...pending, perkChoices: [] });
-  autosaveRun();
-};
-
-const redrawDraft = (label: string): void => {
-  const run = useRunStore.getState();
-  const pending = run.pendingRewards;
-  if (pending === null) return;
-  const nodeId = pending.draftNodeId ?? run.position ?? "draft";
-  const stream = createStream(deriveSeed(run.seed, `${label}:${nodeId}`));
-  const base = draftContext(run, pending.draftFloor);
-  const choices = rollPerkChoices(stream, {
-    ...base,
-    owned: [...base.owned, ...pending.perkChoices],
-  });
-  useRunStore.getState().setPendingRewards({ ...pending, perkChoices: choices });
-  noteDraftOffer(choices);
-  autosaveRun();
-};
-
-export const banishPerkChoice = (perkId: string): void => {
-  const run = useRunStore.getState();
-  const pending = run.pendingRewards;
-  if (pending === null) return;
-  if (!pending.perkChoices.includes(perkId)) return;
-  if (!run.banishPerk(perkId)) return;
-  const after = useRunStore.getState();
-  const kept = pending.perkChoices.filter((id) => id !== perkId);
-  const nodeId = pending.draftNodeId ?? after.position ?? "draft";
-  const base = draftContext(after, pending.draftFloor);
-  const replacement = rollPerkChoices(
-    createStream(deriveSeed(after.seed, `banish:${perkId}:${nodeId}`)),
-    { ...base, owned: [...base.owned, ...kept] },
-  ).slice(0, 1);
-  const choices = [...kept, ...replacement];
-  useRunStore.getState().setPendingRewards({ ...pending, perkChoices: choices });
-  noteDraftOffer(replacement);
-  autosaveRun();
-};
-
-export const rerollPerkDraft = (): void => {
-  const run = useRunStore.getState();
-  if (run.pendingRewards === null) return;
-  if (run.draftRerollUsed) return;
-  if (run.scrap < DRAFT_REROLL_COST) return;
-  if (!run.spendScrap(DRAFT_REROLL_COST)) return;
-  if (!useRunStore.getState().useDraftReroll()) return;
-  redrawDraft("draftReroll");
 };
 
 export const startPrologueBattle = (seed = now() >>> 0): void => {
@@ -1774,11 +1165,7 @@ export const finishEnding = (): void => {
 };
 
 export const abandonRun = (): void => {
-  useRunStore.getState().reset();
-  useBattleStore.getState().reset();
-  useNarrativeStore.getState().reset();
-  resetActionLog();
-  clearRun();
+  discardActiveRun();
   useAppStore.getState().go("menu");
 };
 
@@ -1791,4 +1178,3 @@ export const discardActiveRun = (): void => {
 };
 
 export const hasActiveRun = (): boolean => useRunStore.getState().active;
-;

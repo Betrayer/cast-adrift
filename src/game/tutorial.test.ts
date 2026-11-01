@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from "vitest";
-import { ALL_COACH_MARK_IDS, nextCoachMark } from "@/game/tutorial";
-import { DEFAULT_SHAPE } from "@/game/map/types";
+import { ALL_COACH_MARK_IDS, clampCoachRect, nextCoachMark } from "@/game/tutorial";
+import { mapShapeOf } from "@/game/map/generator";
 import { useBattleStore } from "@/stores/battleStore";
 import { useRunStore } from "@/stores/runStore";
 import type { CheckStep, RolledDie } from "@/types/battle";
@@ -40,6 +40,32 @@ const placement = (over: Partial<{
 
 const seenExcept = (id: string): string[] =>
   ALL_COACH_MARK_IDS.filter((mark) => mark !== id);
+
+describe("the coach ring stays on screen", () => {
+  it("pulls a padded full-width anchor inside the viewport with room for its ring", () => {
+    expect(clampCoachRect({ x: -6, y: 128, w: 372, h: 57 }, 360, 640)).toEqual({
+      x: 2,
+      y: 128,
+      w: 356,
+      h: 57,
+    });
+  });
+
+  it("leaves an anchor that already fits untouched", () => {
+    const rect = { x: 40, y: 200, w: 100, h: 60 };
+    expect(clampCoachRect(rect, 360, 640)).toEqual(rect);
+  });
+
+  it("clamps the bottom edge and never returns a negative size", () => {
+    expect(clampCoachRect({ x: 10, y: 600, w: 50, h: 80 }, 360, 640)).toEqual({
+      x: 10,
+      y: 600,
+      w: 50,
+      h: 38,
+    });
+    expect(clampCoachRect({ x: 400, y: 10, w: 20, h: 20 }, 360, 640).w).toBe(0);
+  });
+});
 
 describe("coach mark gating", () => {
   beforeEach(() => {
@@ -135,7 +161,7 @@ describe("coach mark gating", () => {
       map: {
         nodes: [],
         edges: [],
-        shape: DEFAULT_SHAPE,
+        shape: mapShapeOf(1),
         edgeMarks: {},
         wormholes: {},
         spots: [],

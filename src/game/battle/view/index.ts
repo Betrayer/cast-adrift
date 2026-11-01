@@ -22,6 +22,7 @@ export {
   nudgeCostFor,
   officerMarkDead,
   selectedDie,
+  springFreeFor,
 } from "@/game/battle/view/actions";
 export type {
   ActiveActionId,
@@ -43,6 +44,7 @@ export {
   currentCheckStep,
   goalDiceNow,
   goalSlotsNow,
+  isTableSpent,
   legalTargets,
   livingEnemyCount,
   modeBlockFor,

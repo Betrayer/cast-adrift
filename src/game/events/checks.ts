@@ -1,5 +1,12 @@
 import { DIE_BY_ID } from "@/data/dice";
-import type { RngStream } from "@/services/rng";
+import {
+  dieTier,
+  facesIfForged,
+  forgeLevel,
+  resolveFaces,
+  type HandDie,
+} from "@/game/dice/tier";
+import { deriveSeed, type RngStream } from "@/services/rng";
 import type { CheckDef, CheckPick } from "@/types/events";
 import type { DieTier, School } from "@/types/content";
 
@@ -7,19 +14,28 @@ export interface FaceDie {
   defId: string;
   tier: DieTier;
   faces: readonly number[];
+  fusion?: number;
 }
-
-export const resolveFaces = (defId: string, tier: DieTier): number[] => {
-  const faces = DIE_BY_ID.get(defId)?.faces;
-  if (faces !== undefined && faces.length > 0) return [...faces];
-  return Array.from({ length: tier }, (_, i) => i + 1);
-};
 
 export interface DeckRef {
   defId: string;
   tier: DieTier;
   school?: School;
+  faces?: readonly number[];
+  fusion?: number;
 }
+
+export const deckRefFor = (die: HandDie): DeckRef & { school: School } => {
+  const level = forgeLevel(die);
+  const faces = facesIfForged(die);
+  return {
+    defId: die.defId,
+    tier: dieTier(die),
+    school: DIE_BY_ID.get(die.defId)?.school ?? "grey",
+    ...(faces === undefined ? {} : { faces }),
+    ...(level > 0 ? { fusion: level } : {}),
+  };
+};
 
 export const eligibleForCheck = (
   deck: readonly DeckRef[],
@@ -45,7 +61,12 @@ export const topDiceForCheck = (
   [...(narrow === undefined ? deck : eligibleForCheck(deck, narrow))]
     .sort((a, b) => b.tier - a.tier)
     .slice(0, count)
-    .map((d) => ({ defId: d.defId, tier: d.tier, faces: resolveFaces(d.defId, d.tier) }));
+    .map((d) => ({
+      defId: d.defId,
+      tier: d.tier,
+      faces: d.faces === undefined ? resolveFaces(d.defId, d.tier) : [...d.faces],
+      ...(d.fusion === undefined ? {} : { fusion: d.fusion }),
+    }));
 
 const sumDistribution = (dice: readonly FaceDie[]): Map<number, number> => {
   let dist = new Map<number, number>([[0, 1]]);
@@ -113,6 +134,12 @@ export const checkOdds = (
   return Math.max(0, Math.min(1, raw));
 };
 
+export const deckCheckOdds = (
+  deck: readonly DeckRef[],
+  check: CheckDef,
+): number =>
+  checkOdds(topDiceForCheck(deck, check.dice, check), check.pick, check.target);
+
 export const oddsPercent = (odds: number): number => Math.round(odds * 100);
 
 export const rollCheckDice = (
@@ -123,12 +150,43 @@ export const rollCheckDice = (
 export const checkTotal = (values: readonly number[], pick: CheckPick): number =>
   pick === "sum"
     ? values.reduce((a, b) => a + b, 0)
-    : pick === "lowest"
-      ? values.reduce((a, b) => Math.max(a, b), 0)
-      : values.reduce((a, b) => Math.max(a, b), 0);
+    : values.reduce((a, b) => Math.max(a, b), 0);
 
 export const checkPassed = (
   total: number,
   pick: CheckPick,
   target: number,
-): boolean => (pick === "lowest" ? total <= target : total >= target);
+  rolled = 1,
+): boolean =>
+  rolled > 0 && (pick === "lowest" ? total <= target : total >= target);
+
+export interface CheckOutcome {
+  values: number[];
+  total: number;
+  success: boolean;
+}
+
+export interface CheckRoll extends CheckOutcome {
+  seed: number;
+}
+
+export const checkRollOutcome = (
+  values: readonly number[],
+  check: Pick<CheckDef, "pick" | "target">,
+): CheckOutcome => {
+  const total = checkTotal(values, check.pick);
+  return {
+    values: [...values],
+    total,
+    success: checkPassed(total, check.pick, check.target, values.length),
+  };
+};
+
+export const rollCheck = (
+  faces: readonly FaceDie[],
+  check: Pick<CheckDef, "pick" | "target">,
+  stream: RngStream,
+): CheckRoll => {
+  const seed = deriveSeed(stream.state(), "check:present");
+  return { ...checkRollOutcome(rollCheckDice(faces, stream), check), seed };
+};

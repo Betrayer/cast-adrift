@@ -4,11 +4,14 @@ import { chartNodeCost } from "@/game/chart/cost";
 import {
   canAllocate,
   canDeallocate,
+  pathTo,
   pointsAvailable,
+  pointsTotal,
   respecCost,
   RESPEC_SHARD_COST,
 } from "@/game/chart/engine";
 import { hangarBudget } from "@/data/milestones";
+import { computeChartMods } from "@/game/run/runMods";
 import { validateDeck } from "@/game/meta/deck";
 import {
   campaignShards,
@@ -84,9 +87,11 @@ describe("meta loop (real flow/store/engine, end-to-end)", () => {
     expect(meta1.flagsArchive).toContain("metCartographer");
 
     const level = meta1.level;
-    expect(pointsAvailable(level, meta1.chartPicks)).toBe(level);
-    expect(canAllocate("red-gate", level, [])).toBe(true);
-    useMetaStore.getState().allocatePick("red-gate");
+    expect(pointsAvailable(level, meta1.chartPicks)).toBe(pointsTotal(level));
+    expect(canAllocate("red-gate", level, [])).toBe(false);
+    for (const id of pathTo("red-gate", meta1.chartPicks)?.ids ?? []) {
+      useMetaStore.getState().allocatePick(id);
+    }
     const neighbor = chartNeighbors("red-gate").find(
       (id) => CHART_NODE_BY_ID.get(id)?.constellation === "red",
     );
@@ -96,11 +101,12 @@ describe("meta loop (real flow/store/engine, end-to-end)", () => {
     const picks2 = useMetaStore.getState().chartPicks;
     const cutVertexPick = "red-gate";
     const leafPick = neighbor as string;
-    expect(picks2.length).toBe(2);
+    expect(picks2).toContain(cutVertexPick);
+    expect(picks2).toContain(leafPick);
     expect(canDeallocate(cutVertexPick, picks2)).toBe(false);
     expect(canDeallocate(leafPick, picks2)).toBe(true);
     const before = useMetaStore.getState().shards;
-    const price = respecCost(level, leafPick);
+    const price = respecCost(leafPick);
     expect(price).toBe(RESPEC_SHARD_COST * chartNodeCost(leafPick));
     expect(useMetaStore.getState().spendShards(price)).toBe(true);
     useMetaStore.getState().deallocatePick(neighbor as string);
@@ -119,7 +125,10 @@ describe("meta loop (real flow/store/engine, end-to-end)", () => {
     startRun(12345);
     const run = useRunStore.getState();
     expect(run.shipId).toBe("ram");
-    expect(run.hullMax).toBe(34);
+    const chartMods = computeChartMods(run.chartPicks);
+    expect(run.hullMax).toBe(
+      Math.round(34 * (1 + chartMods.hullMaxPct / 100)) + chartMods.hullMaxDelta,
+    );
     expect(run.deck.map((d) => d.defId)).toEqual(newDeck);
     expect(run.deckSeq).toBe(newDeck.length);
     expect(run.chartPicks).toContain("red-gate");

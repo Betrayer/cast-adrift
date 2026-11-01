@@ -15,7 +15,7 @@
   height: 12px;
   border-radius: 2px;
   background: var(--ca-notch-off);
-  transition: background 220ms ease;
+  transition: background 220ms var(--ca-ease-out);
 }
 
 .notch[data-on='true'] {
@@ -42,8 +42,6 @@
   height: 13px;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .notch {
-    transition: none;
-  }
+:root[data-ca-motion='reduced'] .notch {
+  transition: none;
 }

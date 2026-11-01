@@ -11,7 +11,7 @@
   height: 5px;
   margin: -2.5px 0 0 -2.5px;
   border-radius: 50%;
-  animation: sparkOut 620ms ease-out forwards;
+  animation: sparkOut 620ms var(--ca-ease-out) forwards;
 }
 
 @keyframes sparkOut {

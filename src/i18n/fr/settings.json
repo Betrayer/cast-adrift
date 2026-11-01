@@ -61,6 +61,16 @@
     "signOutConfirm": "Se déconnecter quand même",
     "telegramHint": "Associe une adresse e-mail à ce profil Telegram et le même compte s’ouvrira sur le web.",
     "telegramGoogleHint": "Google exige une vraie fenêtre de navigateur. Le bouton ouvre Cast Adrift en dehors de Telegram.",
+    "tg": {
+      "signedIn": "Telegram: {{name}}",
+      "unnamed": "connecté",
+      "guest": "Invité — la connexion Telegram est indisponible : {{reason}}",
+      "reason": {
+        "missingConfig": "le serveur n'est pas configuré",
+        "badSignature": "Telegram n'a pas confirmé cette session",
+        "network": "le serveur n'a pas répondu"
+      }
+    },
     "provider": {
       "google": "Google",
       "password": "E-mail",
@@ -128,6 +138,43 @@
       "name": "Tablette",
       "tag": "Convoyeur de slots avec sortie en direct · prévision du tour",
       "desc": "Tous les chiffres dans une colonne, le tour entier chiffré avant de le finir."
+    }
+  },
+  "chartLayout": {
+    "title": "Carte stellaire",
+    "hint": "Quatre façons de dessiner la même carte. Nœuds, liens et prix ne changent pas.",
+    "open": "Ouvrir la carte",
+    "spiral": {
+      "name": "Spirale",
+      "desc": "Sept bras qui s’enroulent depuis le noyau. La vue par défaut."
+    },
+    "rings": {
+      "name": "Orbites",
+      "desc": "Chaque anneau est un palier de prix : plus un nœud est loin, plus il coûte."
+    },
+    "constellations": {
+      "name": "Constellations",
+      "desc": "Chaque école, une figure d’étoiles tracée une fois pour toutes."
+    },
+    "nebulae": {
+      "name": "Nébuleuses",
+      "desc": "Chaque école, un nuage qui s’épaissit à chaque point investi."
+    }
+  },
+  "rollStyle": {
+    "title": "Lancer de dés",
+    "hint": "Comment s’affiche le lancer d’un dé qui décide de quelque chose. Touchez une carte pour relancer.",
+    "flip": {
+      "name": "Culbute",
+      "desc": "Un vrai dé tourne et retombe sur sa face. Par défaut."
+    },
+    "reel": {
+      "name": "Rouleau",
+      "desc": "La face fait défiler les nombres puis ralentit jusqu’à l’arrêt."
+    },
+    "blur": {
+      "name": "Flou",
+      "desc": "Les nombres défilent dans le flou puis deviennent nets."
     }
   },
   "skipTally": "Passer le bilan du combat"

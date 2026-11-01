@@ -1,0 +1,76 @@
+.chip {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  font-size: 12px;
+  line-height: 18px;
+  min-height: 28px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--ca-line);
+  background: var(--ca-surface2);
+  color: var(--ca-dim);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.chipShort {
+  display: none;
+}
+
+@media (max-width: 479px) {
+  .chip {
+    gap: 2px;
+    padding: 1px 4px;
+  }
+
+  .chipLong {
+    display: none;
+  }
+
+  .chipShort {
+    display: inline;
+  }
+}
+
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.groupTitle {
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+
+.card {
+  animation: hand-flip var(--ca-motion-m) var(--ca-ease-out) backwards;
+  animation-delay: calc(var(--ca-stagger-list) * var(--ca-card-index, 0));
+}
+
+.card[data-dim='1'] {
+  opacity: 0.5;
+}
+
+@keyframes hand-flip {
+  from {
+    opacity: 0;
+    transform: perspective(800px) rotateY(-75deg);
+  }
+  to {
+    transform: perspective(800px) rotateY(0deg);
+  }
+}
+
+:root[data-ca-motion='reduced'] .card {
+  animation: none;
+}

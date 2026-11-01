@@ -38,6 +38,7 @@ import {
   vulnerableFor,
 } from "@/game/battle/resolver";
 import type { EvasionTuning } from "@/game/battle/passives";
+import { rerollFace } from "@/game/battle/rollFloors";
 import { canPlaceDie, isSlotBlocked } from "@/game/battle/setup";
 import { sourceMods, sourceTrait } from "@/game/run/runMods";
 import type { RngStream } from "@/services/rng";
@@ -147,13 +148,12 @@ export const rerollValue = (
   die: RolledDie,
   snapshot: BattleSnapshot,
   rng: RngStream,
-): number => {
-  const rolled = rng.int(1, die.tier) + (die.growth ?? 0);
-  return die.school === "blue" &&
-    resonanceGrantActive(snapshot.resonance.counts, "blueRollFloor")
-    ? Math.max(rolled, 2)
-    : rolled;
-};
+): number =>
+  rerollFace(
+    die,
+    rng,
+    resonanceGrantActive(snapshot.resonance.counts, "blueRollFloor"),
+  );
 
 const freeWeaponSlots = (
   snapshot: BattleSnapshot,

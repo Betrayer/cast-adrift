@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { riseStyle } from "@/app/motion";
+import { useUnlockContext } from "@/app/useUnlockContext";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
@@ -12,7 +13,6 @@ import { contractRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
 import {
   freshContractIds,
   freshUnlockIdsOfKind,
-  unlockContextOf,
 } from "@/game/meta/unlockState";
 import { hasActiveRun, startContractRun } from "@/game/run/flow";
 import { goalAmount, goalSecondary, type GoalSpec } from "@/game/run/goals";
@@ -25,25 +25,10 @@ const STAR_EMPTY = "☆";
 export const ContractsScreen = () => {
   const { t } = useTranslation(["meta", "common", "content"]);
   const contracts = useMetaStore((s) => s.contracts);
-  const level = useMetaStore((s) => s.level);
-  const achievements = useMetaStore((s) => s.achievements);
-  const ascension = useMetaStore((s) => s.ascension);
-  const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
   const unlocksSeen = useMetaStore((s) => s.unlocksSeen);
-  const clears = useMetaStore((s) => s.stats.campaignClears);
   const [pending, setPending] = useState<string | null>(null);
 
-  const unlockCtx = useMemo(
-    () =>
-      unlockContextOf({
-        level,
-        achievements,
-        ascension,
-        unlocksGranted,
-        stats: { campaignClears: clears },
-      }),
-    [level, achievements, ascension, unlocksGranted, clears],
-  );
+  const unlockCtx = useUnlockContext();
   const open = useMemo(() => unlockedContracts(unlockCtx), [unlockCtx]);
 
   const [freshAtMount] = useState(() => ({

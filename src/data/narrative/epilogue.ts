@@ -81,7 +81,10 @@ export const EPILOGUE_ENTRIES: readonly EpilogueEntry[] = [
   whenFlag("fleetTruthLost"),
   whenFlag("fleetAnswered"),
   whenFlag("crewSaved"),
-  whenFlag("courierFreed"),
+  epi("courierFreed", {
+    reads: ["courierFreed", "courierNetted"],
+    applies: (ctx) => flag(ctx, "courierFreed") && !flag(ctx, "courierNetted"),
+  }),
   whenFlag("defectorSold"),
   epi("hunterCleared", {
     reads: ["hunterEngaged", "hunterMark"],
@@ -94,6 +97,7 @@ export const EPILOGUE_ENTRIES: readonly EpilogueEntry[] = [
   }),
   whenFlag("pactBroken"),
   whenFlag("choirEnemy"),
+  whenFlag("pyreDoused"),
   whenFlag("hereticFleetLed"),
   whenFlag("keeperRepaid"),
   epi("keeperSlighted", {

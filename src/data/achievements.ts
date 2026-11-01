@@ -1,3 +1,4 @@
+import { CHAINS } from "@/data/narrative/chains";
 import type { MetaStats } from "@/stores/metaStore";
 import type { RunStats } from "@/stores/runStore";
 import type { LocKey } from "@/types/content";
@@ -381,7 +382,7 @@ export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
   }),
   single("quickWork", {
     group: "combat",
-    cond: { c: "runStatAtMost", stat: "jumps", n: 11 },
+    cond: { c: "runStatAtMost", stat: "jumps", n: 85 },
     reward: { shards: 60 },
   }),
   single("beyondTheCore", {
@@ -421,7 +422,7 @@ export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
   }),
   single("allChains", {
     group: "story",
-    cond: { c: "chainsDone", n: 4 },
+    cond: { c: "chainsDone", n: CHAINS.length },
     reward: { shards: 200 },
   }),
   single("maraSquared", {
@@ -567,9 +568,6 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = ACHIEVEMENT_ROWS.flatMap(
 export const ACHIEVEMENT_BY_ID: ReadonlyMap<string, AchievementDef> = new Map(
   ACHIEVEMENTS.map((def) => [def.id, def]),
 );
-
-export const familyTiers = (familyId: string): readonly AchievementDef[] =>
-  ACHIEVEMENTS.filter((def) => def.family === familyId);
 
 export const ACHIEVEMENT_ALIASES: Readonly<Record<string, string>> = {
   firstBlood: "bounty-3",

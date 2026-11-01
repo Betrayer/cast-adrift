@@ -84,7 +84,7 @@ describe("drift depth and looping", () => {
 
   it("shortens the tide clock under «Прилив»", () => {
     expect(jumpsPerTideFor([])).toBe(JUMPS_PER_TIDE);
-    expect(jumpsPerTideFor(["risingTide"])).toBe(3);
+    expect(jumpsPerTideFor(["risingTide"])).toBe(JUMPS_PER_TIDE - 1);
   });
 });
 

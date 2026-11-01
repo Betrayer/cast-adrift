@@ -27,6 +27,7 @@ export const DieMiniCard = ({ compact = false }: { compact?: boolean }) => {
       size="mini"
       dense={compact}
       growthBonus={die.growth ?? 0}
+      fusion={die.fusion}
       engravings={engravings}
     />
   );

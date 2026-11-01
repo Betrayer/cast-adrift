@@ -7,6 +7,7 @@ import {
 import { fixedBackTarget, ROUTES, type NavDirection } from "@/app/routes";
 import type { MergePrompt } from "@/services/account-link";
 import type { AuthErrorCode } from "@/services/authErrors";
+import type { TgAuthFailure } from "@/services/tgAuth";
 import type { AccountInfo } from "@/services/uid";
 import type { ScreenId } from "@/types";
 
@@ -34,6 +35,7 @@ export interface AppState {
   tgUserId: number | null;
   tgName: string | null;
   isTelegram: boolean;
+  tgAuthFailure: TgAuthFailure | null;
   uid: string | null;
   account: AccountInfo | null;
   authError: AuthErrorCode | null;
@@ -57,6 +59,7 @@ export interface AppState {
   setTgUserId: (tgUserId: number | null) => void;
   setTgName: (tgName: string | null) => void;
   setIsTelegram: (isTelegram: boolean) => void;
+  setTgAuthFailure: (tgAuthFailure: TgAuthFailure | null) => void;
   setUid: (uid: string | null) => void;
   setAccount: (account: AccountInfo | null) => void;
   setAuthError: (authError: AuthErrorCode | null) => void;
@@ -85,6 +88,7 @@ export const backActionFor = (state: {
   if (mode === "guarded") {
     return hasBackGuard(state.screen) ? { kind: "guard" } : { kind: "none" };
   }
+  if (hasBackGuard(state.screen)) return { kind: "guard" };
   const fixed = fixedBackTarget(mode);
   if (fixed !== null) {
     const at = state.stack.findIndex((entry) => entry.screen === fixed);
@@ -105,6 +109,17 @@ export const backActionFor = (state: {
   return { kind: "to", entry: previous, stack: state.stack.slice(0, -1) };
 };
 
+export const headerBackTarget = (state: {
+  screen: ScreenId;
+  stack: readonly StackEntry[];
+}): boolean => {
+  if (backBlocked()) return false;
+  const mode = ROUTES[state.screen].backMode;
+  if (mode === "locked" || mode === "guarded") return false;
+  if (fixedBackTarget(mode) !== null) return true;
+  return state.stack.length > 0;
+};
+
 export const canGoBack = (state: {
   screen: ScreenId;
   stack: readonly StackEntry[];
@@ -118,6 +133,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   tgUserId: null,
   tgName: null,
   isTelegram: false,
+  tgAuthFailure: null,
   uid: null,
   account: null,
   authError: null,
@@ -176,6 +192,7 @@ export const useAppStore = create<AppState>()((set, get) => ({
   setTgUserId: (tgUserId) => set({ tgUserId }),
   setTgName: (tgName) => set({ tgName }),
   setIsTelegram: (isTelegram) => set({ isTelegram }),
+  setTgAuthFailure: (tgAuthFailure) => set({ tgAuthFailure }),
   setUid: (uid) => set({ uid }),
   setAccount: (account) => set({ account, uid: account?.uid ?? null }),
   setAuthError: (authError) => set({ authError }),

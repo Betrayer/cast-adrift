@@ -2,9 +2,8 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { STARTER_DECK } from "@/data/decks";
-import { FIRE_MODES } from "@/data/fireModes";
+import { FIRE_MODES, fireModeVars } from "@/data/fireModes";
 import {
-  fireModeVars,
   slotModeModel,
   slotModeModels,
 } from "@/screens/Battle/board/slotModes";

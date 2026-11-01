@@ -1,4 +1,7 @@
 :root {
+  --z-recede-deep: -2;
+  --z-recede: -1;
+  --z-raise: 1;
   --z-hud: 10;
   --z-overlay: 20;
   --z-vignette: 25;

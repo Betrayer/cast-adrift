@@ -21,7 +21,7 @@ const chain = (id: string) => {
 
 describe("chain definitions", () => {
   it("names four threads whose every step points at a real event", () => {
-    expect(CHAINS).toHaveLength(4);
+    expect(CHAINS).toHaveLength(8);
     for (const def of CHAINS) {
       for (const step of def.steps) {
         expect(step.events.length).toBeGreaterThan(0);

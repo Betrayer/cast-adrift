@@ -2,8 +2,18 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import type { EchoNodeId } from "@/data/echo";
 import { createStreams } from "@/services/rng";
 import { generateSectorMap } from "@/game/map/generator";
-import { nodeById, type MapGraph, type WormholeEdge } from "@/game/map/types";
-import { GENTLE_RIDES, throwCost, type WormholeThrow } from "@/game/map/wormhole";
+import {
+  bandOf,
+  nodeById,
+  type HoleBand,
+  type MapGraph,
+  type WormholeEdge,
+} from "@/game/map/types";
+import {
+  GENTLE_RIDES,
+  softLandThrow,
+  type WormholeThrow,
+} from "@/game/map/wormhole";
 import {
   bypassHole,
   canSoftLandWormhole,
@@ -13,7 +23,11 @@ import {
   rideWormhole,
   type WormholeRide,
 } from "@/game/run/flow";
-import { disintegrationPctFor, holeTollFor } from "@/game/run/motifs";
+import {
+  bypassPctFor,
+  disintegrationPctFor,
+  holeTollFor,
+} from "@/game/run/motifs";
 import { readLocalResume } from "@/game/run/resume";
 import { captureRunSnapshot, restoreRunSnapshot } from "@/game/run/snapshot";
 import {
@@ -47,6 +61,24 @@ const findWormhole = (): Fixture => {
 };
 
 const fixture = findWormhole();
+
+const bandOrThrow = (): HoleBand => {
+  const band = bandOf(fixture.map);
+  if (band === null) throw new Error("the fixture carries no band");
+  return band;
+};
+
+const band = bandOrThrow();
+
+const FAR_ROW = band.rows[1] + 1;
+
+const rowOf = (id: string | null): number =>
+  id === null ? -1 : (nodeById(fixture.map).get(id)?.row ?? -1);
+
+const laneOf = (id: string | null): number =>
+  id === null ? -1 : (nodeById(fixture.map).get(id)?.lane ?? -1);
+
+const HULL_MAX = 30;
 
 const landedThrow = (ride: WormholeRide | null): WormholeThrow => {
   if (ride === null) throw new Error("the gate refused the ride");
@@ -117,34 +149,67 @@ describe("the wormhole choice", () => {
 });
 
 describe("bypassing a hole", () => {
-  it("charges the sector toll and reroutes to the alternate", () => {
-    const toll = holeTollFor(fixture.sector, 30);
+  it("pays the ceiling of the sector's share of max hull and lands on the far rim", () => {
+    const toll = holeTollFor(fixture.sector, HULL_MAX);
+    expect(toll).toBe(Math.ceil(HULL_MAX * bypassPctFor(fixture.sector)));
     expect(toll).toBeGreaterThan(0);
     openWormhole(fixture.record.hole);
-    bypassHole(fixture.record.hole);
+    expect(bypassHole(fixture.record.hole)).toBe(true);
     const run = useRunStore.getState();
-    expect(run.hull).toBe(30 - toll);
+    expect(run.hull).toBe(HULL_MAX - toll);
+    expect(run.position).toBe(fixture.record.bypass);
+    expect(rowOf(run.position)).toBe(FAR_ROW);
     expect(run.pendingWormhole).toBeNull();
     expect(run.stats.holesBypassed).toBe(1);
     expect(useMetaStore.getState().stats.holesBypassed).toBe(1);
     expect(run.stats.jumps).toBe(1);
+    expect(run.stats.wormholeRides).toBe(0);
   });
 
-  it("is free and scorches when the hull cannot pay", () => {
-    const toll = holeTollFor(fixture.sector, 30);
-    seat(toll);
-    expect(holeTollFor(fixture.sector, toll)).toBe(0);
+  it("charges max hull's share even on a worn hull", () => {
+    const toll = holeTollFor(fixture.sector, HULL_MAX);
+    seat(toll + 2);
     openWormhole(fixture.record.hole);
-    bypassHole(fixture.record.hole);
-    expect(useRunStore.getState().hull).toBe(toll);
-    expect(
-      useNarrativeStore.getState().feed.find((m) => m.source === "consequence")
-        ?.key,
-    ).toBe("run:motif.holeScorch");
+    expect(bypassHole(fixture.record.hole)).toBe(true);
+    expect(useRunStore.getState().hull).toBe(2);
+  });
+
+  it("refuses a lethal bypass and changes nothing", () => {
+    const toll = holeTollFor(fixture.sector, HULL_MAX);
+    for (const hull of [toll, toll - 1, 1]) {
+      seat(hull);
+      useNarrativeStore.getState().reset();
+      openWormhole(fixture.record.hole);
+      const before = useRunStore.getState();
+      expect(bypassHole(fixture.record.hole), `hull ${String(hull)}`).toBe(false);
+      const after = useRunStore.getState();
+      expect(after.hull).toBe(hull);
+      expect(after.position).toBe(before.position);
+      expect(after.depthRow).toBe(before.depthRow);
+      expect(after.visited).toEqual(before.visited);
+      expect(after.pendingWormhole).toBe(fixture.record.hole);
+      expect(after.stats.holesBypassed).toBe(0);
+      expect(after.stats.jumps).toBe(0);
+      expect(useMetaStore.getState().stats.holesBypassed).toBe(0);
+      expect(
+        useNarrativeStore.getState().journal.some((row) => row.k === "wormhole"),
+      ).toBe(false);
+    }
+  });
+
+  it("leaves the ride open after a refused bypass", () => {
+    seat(holeTollFor(fixture.sector, HULL_MAX));
+    openWormhole(fixture.record.hole);
+    expect(bypassHole(fixture.record.hole)).toBe(false);
+    setChaosSource(scriptedChaos({ ints: [1, 1], picks: [0] }));
+    const roll = landedThrow(rideWormhole(fixture.record.hole));
+    expect(roll.landing).toBe(fixture.record.bypass);
+    expect(useRunStore.getState().position).toBe(fixture.record.bypass);
   });
 
   it("never leaves the hull at zero", () => {
-    for (const hull of [1, 2, 3, 4]) {
+    const toll = holeTollFor(fixture.sector, HULL_MAX);
+    for (let hull = 1; hull <= toll + 1; hull += 1) {
       seat(hull);
       openWormhole(fixture.record.hole);
       bypassHole(fixture.record.hole);
@@ -165,61 +230,103 @@ describe("bypassing a hole", () => {
 });
 
 describe("riding a wormhole", () => {
-  it("lands inside the rolled budget and counts one jump", () => {
+  it("lands past the band and counts one jump", () => {
     setChaosSource(scriptedChaos({ ints: [2, 0], picks: [0] }));
     openWormhole(fixture.record.hole);
     const roll = landedThrow(rideWormhole(fixture.record.hole));
     const run = useRunStore.getState();
     expect(run.position).toBe(roll.landing);
+    expect(rowOf(roll.landing)).toBeGreaterThan(band.rows[1]);
+    expect(run.depthRow).toBe(rowOf(roll.landing));
     expect(run.stats.wormholeRides).toBe(1);
     expect(useMetaStore.getState().stats.wormholeRides).toBe(1);
     expect(run.stats.jumps).toBe(1);
+    expect(run.stats.holesBypassed).toBe(0);
+    expect(run.hull).toBe(HULL_MAX);
     expect(run.pendingWormhole).toBeNull();
-    const origin = nodeById(fixture.map).get(fixture.record.from);
-    const landed =
-      roll.landing === null ? undefined : nodeById(fixture.map).get(roll.landing);
-    expect(origin).toBeDefined();
-    expect(landed).toBeDefined();
-    if (origin === undefined || landed === undefined) return;
-    if (roll.fallback === "none") {
-      expect(throwCost(origin, landed)).toBeLessThanOrEqual(roll.budget);
-    }
   });
 
   it("stays gentle for the first two rides and opens up after", () => {
-    setChaosSource(scriptedChaos({ ints: [5, 1], picks: [0] }));
     for (let ride = 0; ride < GENTLE_RIDES; ride += 1) {
       seat();
       useRunStore.setState((s) => ({
         stats: { ...s.stats, wormholeRides: ride },
       }));
+      setChaosSource(scriptedChaos({ ints: [6, 9], picks: [0] }));
       openWormhole(fixture.record.hole);
       const roll = landedThrow(rideWormhole(fixture.record.hole));
       expect(roll.gentle).toBe(true);
       expect(roll.direction).toBe("forward");
-      expect(roll.budget).toBeLessThanOrEqual(2);
+      expect(roll.extra).toBe(0);
+      expect(roll.laneShift).toBe(0);
+      expect(roll.landing).toBe(fixture.record.bypass);
+      expect(rowOf(roll.landing)).toBe(FAR_ROW);
     }
     seat();
     chaotic(GENTLE_RIDES);
-    setChaosSource(scriptedChaos({ ints: [5, 1], picks: [0] }));
+    setChaosSource(scriptedChaos({ ints: [6, 9], picks: [0] }));
     openWormhole(fixture.record.hole);
     const wild = landedThrow(rideWormhole(fixture.record.hole));
     expect(wild.gentle).toBe(false);
-    expect(wild.budget).toBe(5);
+    expect(wild.extra).toBe(2);
+    expect(wild.laneShift).toBe(2);
+    expect(rowOf(wild.landing)).toBe(FAR_ROW + 2);
+    expect(wild.rows).toBe(FAR_ROW + 2 - rowOf(fixture.record.from));
+  });
+
+  it("never reads the tape on a gentle ride", () => {
+    for (let ride = 0; ride < GENTLE_RIDES; ride += 1) {
+      seat();
+      useRunStore.setState((s) => ({
+        stats: { ...s.stats, wormholeRides: ride },
+      }));
+      const counted = echoCountingChaos();
+      setChaosSource(counted.source);
+      openWormhole(fixture.record.hole);
+      expect(rideWormhole(fixture.record.hole, false)?.kind).toBe("landed");
+      expect({ ints: counted.ints, picks: counted.picks, rolls: counted.rolls }).toEqual({
+        ints: 0,
+        picks: 0,
+        rolls: 0,
+      });
+    }
+  });
+
+  it("lands a chaotic ride one to three rows past the band on the shifted lane", () => {
+    const origin = laneOf(fixture.record.from);
+    for (let e = 1; e <= 6; e += 1) {
+      for (const s of [1, 4, 6, 8, 9]) {
+        seat();
+        chaotic();
+        setChaosSource(scriptedChaos({ ints: [e, s], picks: [0], rolls: [false] }));
+        openWormhole(fixture.record.hole);
+        const roll = landedThrow(rideWormhole(fixture.record.hole, false));
+        const label = `faces ${String(e)}/${String(s)}`;
+        const past = rowOf(roll.landing) - band.rows[1];
+        expect(past, label).toBeGreaterThanOrEqual(1);
+        expect(past, label).toBeLessThanOrEqual(3);
+        if (roll.fallback === "none") {
+          expect(rowOf(roll.landing), label).toBe(FAR_ROW + roll.extra);
+          const aim = origin + roll.laneShift;
+          const lanes = fixture.map.nodes
+            .filter((n) => n.row === FAR_ROW + roll.extra && n.pocket !== true)
+            .map((n) => Math.abs(n.lane - aim));
+          expect(Math.abs(laneOf(roll.landing) - aim), label).toBe(Math.min(...lanes));
+        }
+      }
+    }
   });
 
   it("never lands on a node the run has already cleared", () => {
-    const cleared = fixture.map.nodes
-      .filter((n) => n.hole !== true && n.row > 0 && n.row < 20)
-      .slice(0, 6)
-      .map((n) => n.id)
-      .filter((id) => id !== fixture.record.from);
+    const cleared = [...band.farRim];
     seat();
     useRunStore.setState({ visited: ["r0l1", ...cleared] });
-    setChaosSource(scriptedChaos({ ints: [4, 0], picks: [0] }));
+    setChaosSource(scriptedChaos({ ints: [1, 1], picks: [0] }));
     openWormhole(fixture.record.hole);
     const roll = landedThrow(rideWormhole(fixture.record.hole));
     expect(cleared).not.toContain(roll.landing);
+    expect(rowOf(roll.landing)).toBe(FAR_ROW + 1);
+    expect(roll.fallback).toBe("nearest");
   });
 
   it("grants one fog row on landing", () => {
@@ -469,7 +576,7 @@ describe("Soft Landing rides a wormhole without touching chaos", () => {
     expect(canSoftLandWormhole()).toBe(false);
   });
 
-  it("lands forward, gently, on an open node ahead", () => {
+  it("lands forward, gently, on the far rim in its own lane", () => {
     seatEcho("softLanding");
     setChaosSource(echoCountingChaos().source);
     openWormhole(fixture.record.hole);
@@ -477,7 +584,22 @@ describe("Soft Landing rides a wormhole without touching chaos", () => {
     expect(landed.gentle).toBe(true);
     expect(landed.direction).toBe("forward");
     expect(landed.rows).toBeGreaterThan(0);
+    expect(landed).toEqual(
+      softLandThrow(fixture.map, fixture.record.from, fixture.record.hole, [
+        "r0l1",
+      ]),
+    );
+    expect(landed.landing).toBe(fixture.record.bypass);
     expect(useRunStore.getState().position).toBe(landed.landing);
+  });
+
+  it("never disintegrates, even past the gentle window", () => {
+    seatEcho("softLanding");
+    setChaosSource(scriptedChaos({ ints: [6, 9], picks: [0], rolls: [true] }));
+    openWormhole(fixture.record.hole);
+    expect(rideWormhole(fixture.record.hole, false, true)?.kind).toBe("landed");
+    expect(useRunStore.getState().active).toBe(true);
+    expect(useRunStore.getState().position).toBe(fixture.record.bypass);
   });
 
   it("still consumes chaos on an ordinary ride of the same hole", () => {

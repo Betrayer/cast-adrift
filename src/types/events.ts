@@ -22,7 +22,9 @@ export type SpeakerId =
   | "choirPreacher"
   | "beaconKeeper"
   | "bountyHuntress"
-  | "warden";
+  | "warden"
+  | "coreCutter"
+  | "ines";
 
 export type EventKind = "event" | "anomaly" | "beacon";
 
@@ -36,6 +38,8 @@ export type OptionRequirement =
   | { req: "flag"; key: string }
   | { req: "axis"; min?: number; max?: number }
   | { req: "cargo"; id: string };
+
+export type OptionRequires = OptionRequirement | readonly OptionRequirement[];
 
 export type CheckPick = "sum" | "highest" | "lowest";
 
@@ -68,7 +72,8 @@ export type EventEffect =
   | { k: "officer"; id: string }
   | { k: "cargo"; id: string }
   | { k: "battleMod"; mod: BattleModKind; n?: number; battles?: number }
-  | { k: "nodeMod"; mod: NodeModKind; n?: number };
+  | { k: "nodeMod"; mod: NodeModKind; n?: number }
+  | { k: "shards"; n: number };
 
 export interface ForcedBattle {
   enemyIds: readonly string[];
@@ -90,11 +95,18 @@ export interface Outcome {
 export interface EventOption {
   id: string;
   label: LocKey;
-  requires?: OptionRequirement;
+  requires?: OptionRequires;
   check?: CheckDef;
   outcomes?: readonly Outcome[];
   onPass?: readonly Outcome[];
   onFail?: readonly Outcome[];
+}
+
+export type DialogueVoice = "echo" | "narration" | SpeakerId;
+
+export interface DialogueLine {
+  who: DialogueVoice;
+  line: LocKey;
 }
 
 export interface EventDef {
@@ -104,6 +116,7 @@ export interface EventDef {
   speaker?: SpeakerId;
   requires?: EventRequires;
   text: LocKey;
+  dialogue?: readonly DialogueLine[];
   codex?: string;
   options: readonly EventOption[];
 }

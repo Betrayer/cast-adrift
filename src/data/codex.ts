@@ -1,8 +1,9 @@
 import { ALL_ENEMIES } from "@/data/enemies";
 import { MEMORY_CODEX_IDS } from "@/data/narrative/memories";
-import type { LocKey } from "@/types/content";
+import { SCHOOL_ORDER } from "@/data/schools";
+import type { LocKey, School } from "@/types/content";
 
-export type CodexGroup = "world" | "dossier" | "memory";
+export type CodexGroup = "world" | "dossier" | "forge" | "memory";
 
 export interface CodexEntry {
   id: string;
@@ -15,6 +16,7 @@ export interface CodexEntry {
 export const CODEX_GROUP_ORDER: readonly CodexGroup[] = [
   "world",
   "dossier",
+  "forge",
   "memory",
 ];
 
@@ -37,6 +39,15 @@ const MEMORY_ENTRIES: readonly CodexEntry[] = MEMORY_CODEX_IDS.map((id) =>
 );
 
 export const dossierId = (enemyId: string): string => `dossier-${enemyId}`;
+
+export const forgeCodexId = (school: School): string => `forge-${school}`;
+
+const FORGE_ENTRIES: readonly CodexEntry[] = SCHOOL_ORDER.map((school) => ({
+  id: forgeCodexId(school),
+  group: "forge" as const,
+  title: `content:codex.${forgeCodexId(school)}.title`,
+  body: `content:codex.${forgeCodexId(school)}.body`,
+}));
 
 const DOSSIER_ENTRIES: readonly CodexEntry[] = ALL_ENEMIES.map((enemy) => ({
   id: dossierId(enemy.id),
@@ -64,6 +75,7 @@ export const CODEX: readonly CodexEntry[] = [
   world("keeperBeyond"),
   world("coreRemainder"),
   world("thresholdBeacon"),
+  ...FORGE_ENTRIES,
   ...MEMORY_ENTRIES,
 ];
 

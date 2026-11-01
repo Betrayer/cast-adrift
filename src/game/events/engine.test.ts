@@ -5,8 +5,10 @@ import {
   eventEligible,
   matchesFlagQuery,
   optionMet,
+  optionRequirements,
   pickEvent,
   selectOutcome,
+  unmetRequirement,
   type EventContext,
   type OptionContext,
 } from "@/game/events/engine";
@@ -149,5 +151,45 @@ describe("optionMet requirements", () => {
     };
     expect(optionMet({ req: "school", school: "blue", n: 1 }, prism)).toBe(true);
     expect(optionMet({ req: "dieSchool", school: "green" }, prism)).toBe(true);
+  });
+
+  it("holds a requirement list to every member", () => {
+    const flagAndPrice = [
+      { req: "flag", key: "maraFriend" },
+      { req: "scrap", n: 45 },
+    ] as const;
+    expect(optionMet(flagAndPrice, base)).toBe(false);
+    expect(optionMet(flagAndPrice, { ...base, scrap: 45 })).toBe(true);
+    expect(optionMet(flagAndPrice, { ...base, scrap: 45, flags: {} })).toBe(false);
+    expect(optionMet([], base)).toBe(true);
+  });
+
+  it("names the first requirement a list still misses", () => {
+    const flagAndPrice = [
+      { req: "flag", key: "maraFriend" },
+      { req: "scrap", n: 45 },
+    ] as const;
+    expect(unmetRequirement(flagAndPrice, base)).toEqual({ req: "scrap", n: 45 });
+    expect(unmetRequirement(flagAndPrice, { ...base, flags: {} })).toEqual({
+      req: "flag",
+      key: "maraFriend",
+    });
+    expect(unmetRequirement(flagAndPrice, { ...base, scrap: 45 })).toBeNull();
+    expect(unmetRequirement(undefined, base)).toBeNull();
+    expect(unmetRequirement({ req: "scrap", n: 25 }, base)).toEqual({
+      req: "scrap",
+      n: 25,
+    });
+  });
+
+  it("reads a single requirement as a list of one", () => {
+    expect(optionRequirements(undefined)).toEqual([]);
+    expect(optionRequirements({ req: "hull", n: 3 })).toEqual([{ req: "hull", n: 3 }]);
+    expect(
+      optionRequirements([
+        { req: "hull", n: 3 },
+        { req: "axis", min: 1 },
+      ]),
+    ).toHaveLength(2);
   });
 });

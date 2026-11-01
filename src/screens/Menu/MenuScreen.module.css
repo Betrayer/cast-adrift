@@ -16,6 +16,35 @@
   text-align: center;
 }
 
+.titleText {
+  transform-origin: center;
+}
+
+.titleText[data-menu-title='settle'] {
+  animation: titleSettle var(--ca-motion-xl) var(--ca-ease-out) backwards;
+}
+
+@keyframes titleSettle {
+  from {
+    opacity: 0;
+    transform: scaleX(1.08);
+  }
+}
+
+.resumeCard {
+  animation: resumeBreath 3200ms ease-in-out infinite;
+}
+
+@keyframes resumeBreath {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+  }
+  50% {
+    box-shadow: 0 0 22px -6px var(--ca-accent);
+  }
+}
+
 .actions {
   display: flex;
   flex-direction: column;
@@ -47,7 +76,16 @@
     max-width: 420px;
   }
 
+  .titleText {
+    transform-origin: left center;
+  }
+
   .actions {
     width: 320px;
   }
+}
+
+:root[data-ca-motion='reduced'] .titleText[data-menu-title='settle'],
+:root[data-ca-motion='reduced'] .resumeCard {
+  animation: none;
 }

@@ -10,7 +10,6 @@ export type FeatureId =
   | "shipPrism"
   | "engravingStation"
   | "dailyPreview"
-  | "freeRespec"
   | "sectorSix";
 
 export interface UnlockSource {
@@ -263,11 +262,6 @@ export const UNLOCKS: readonly UnlockDef[] = [
     kind: "feature",
     source: { level: 40 },
     feature: "dailyPreview",
-  }),
-  unlock("featureFreeRespec", {
-    kind: "feature",
-    source: { level: 50 },
-    feature: "freeRespec",
   }),
   {
     id: "s6-threshold",

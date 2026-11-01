@@ -3,7 +3,7 @@ import { PUZZLES } from "@/data/puzzles";
 import { ALL_PERKS } from "@/data/perks";
 import { ALL_MODULES, MODULE_BY_ID } from "@/data/modules";
 import { MODULE_FIRE_MODE } from "@/data/fireModes";
-import { bayPrice, moduleSellValue } from "@/game/economy/prices";
+import { bayPrice, HAND_CAP, moduleSellValue, TABLE_SIZE } from "@/game/economy/prices";
 import { DIE_BY_ID } from "@/data/dice";
 import { generateSectorMap } from "@/game/map/generator";
 import { nodeById, type MapNode } from "@/game/map/types";
@@ -12,11 +12,15 @@ import { isAllocatable, pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { createStream } from "@/services/rng";
 import { CARGO, cargoPayout } from "@/data/cargo";
 import { skipScrapFor } from "@/game/run/perkDraft";
+import { GENTLE_RIDES } from "@/game/map/wormhole";
+import { bypassLethal, bypassPctFor, holeTollFor } from "@/game/run/motifs";
 import {
   anomalyPull,
+  BYPASS_HULL_FLOOR_PCT,
   CARGO_PULL,
   deliveryReachOf,
   greedyNext,
+  ridesWormhole,
   stepCost,
   type RouteState,
 } from "./map";
@@ -31,6 +35,7 @@ import {
   officerOfferValue,
   runAnomaly,
   runBays,
+  forgeWeakest,
   takeDie,
   takeModule,
 } from "./state";
@@ -112,6 +117,59 @@ describe("map policy", () => {
       expect(
         greedyNext(map, byId, from, parent.row, route({ hullPct: 5 })),
       ).toBeDefined();
+    }
+  });
+});
+
+const HOLE_SECTORS: readonly number[] = [2, 3, 4, 5, 6];
+
+describe("band policy", () => {
+  it("always rides while the ride is still gentle", () => {
+    for (const sector of HOLE_SECTORS) {
+      for (let rides = 0; rides < GENTLE_RIDES; rides += 1) {
+        expect(
+          ridesWormhole(route({ hullPct: 100, wormholeRides: rides }), bypassPctFor(sector)),
+        ).toBe(true);
+      }
+    }
+  });
+
+  it("pays the bypass on a chaotic ride only while the hull stays above the floor", () => {
+    for (const sector of HOLE_SECTORS) {
+      const pct = bypassPctFor(sector);
+      const chaotic = (hullPct: number): RouteState =>
+        route({ hullPct, wormholeRides: GENTLE_RIDES });
+      expect(ridesWormhole(chaotic(100), pct), `S${String(sector)} full`).toBe(false);
+      expect(
+        ridesWormhole(chaotic(BYPASS_HULL_FLOOR_PCT + pct * 100 + 1), pct),
+        `S${String(sector)} above`,
+      ).toBe(false);
+      expect(
+        ridesWormhole(chaotic(BYPASS_HULL_FLOOR_PCT + pct * 100 - 1), pct),
+        `S${String(sector)} below`,
+      ).toBe(true);
+      expect(ridesWormhole(chaotic(pct * 100), pct), `S${String(sector)} thin`).toBe(true);
+    }
+  });
+
+  it("never takes a lethal bypass", () => {
+    for (const sector of HOLE_SECTORS) {
+      const pct = bypassPctFor(sector);
+      for (let hullMax = 5; hullMax <= 60; hullMax += 1) {
+        const toll = holeTollFor(sector, hullMax);
+        for (let hull = 1; hull <= hullMax; hull += 1) {
+          const rides = ridesWormhole(
+            route({ hullPct: (hull / hullMax) * 100, wormholeRides: GENTLE_RIDES }),
+            pct,
+          );
+          if (!rides) {
+            expect(
+              bypassLethal(hull, toll),
+              `S${String(sector)} ${String(hull)}/${String(hullMax)}`,
+            ).toBe(false);
+          }
+        }
+      }
     }
   });
 });
@@ -208,26 +266,68 @@ describe("puzzle policy", () => {
 });
 
 describe("run state", () => {
-  it("swaps the worst die out of a full deck and banks the sale", () => {
+  it("swaps the worst die out of a full hand and banks the sale", () => {
     const state = createRunState({
       hull: 30,
       hullMax: 30,
-      deck: [
-        "red-d6",
-        "red-d6",
-        "red-d6",
-        "red-d6",
-        "red-d6",
-        "red-d6",
-        "red-d6",
-        "red-d6",
-        "grey-d4",
-      ],
+      deck: [...Array.from({ length: HAND_CAP - 1 }, () => "red-d6"), "grey-d4"],
     });
     const before = state.deck.length;
     takeDie(state, "voidmaw");
     expect(state.deck.length).toBe(before);
     expect(state.scrapEarned).toBeGreaterThan(0);
+  });
+
+  it("takes any die while the hand is below the table", () => {
+    const state = createRunState({ hull: 30, hullMax: 30, deck: ["red-d6", "red-d6"] });
+    takeDie(state, "grey-d4");
+    expect(state.deck.map((die) => die.defId)).toEqual(["red-d6", "red-d6", "grey-d4"]);
+  });
+
+  it("declines a die that would thin the draws once the table is full", () => {
+    const state = createRunState({
+      hull: 30,
+      hullMax: 30,
+      deck: Array.from({ length: TABLE_SIZE }, () => "slug"),
+    });
+    takeDie(state, "grey-d4");
+    expect(state.deck).toHaveLength(TABLE_SIZE);
+    expect(state.scrapEarned).toBeGreaterThan(0);
+    takeDie(state, "magma");
+    expect(state.deck).toHaveLength(TABLE_SIZE + 1);
+  });
+
+  it("forges the two weakest dice of one school when the hand is past the table", () => {
+    const state = createRunState({
+      hull: 30,
+      hullMax: 30,
+      deck: [
+        "slug",
+        "slug",
+        "slug",
+        "magma",
+        "magma",
+        "bombard",
+        "cinder",
+        "flare",
+      ],
+    });
+    state.scrap = 200;
+    expect(forgeWeakest(state)).toBeGreaterThan(0);
+    expect(state.forges).toBeGreaterThan(0);
+    expect(state.deck.length).toBeLessThan(8);
+    expect(state.deck.some((die) => (die.fusion?.level ?? 0) > 0)).toBe(true);
+    expect(state.sinks.forge).toBeGreaterThan(0);
+  });
+
+  it("leaves a hand of seven alone at the forge", () => {
+    const state = createRunState({
+      hull: 30,
+      hullMax: 30,
+      deck: ["cinder", "flare", "slug", "slug", "magma", "ember", "salvo"],
+    });
+    state.scrap = 500;
+    expect(forgeWeakest(state)).toBe(0);
   });
 
   it("fills a free bay before it starts trading modules", () => {

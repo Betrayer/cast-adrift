@@ -20,6 +20,20 @@ export const BASE_SCHOOLS: Record<School, SchoolColors> = {
 
 export const SCHOOL_IDS = Object.keys(BASE_SCHOOLS) as School[];
 
+export const SCHOOL_ORDER: readonly School[] = [
+  "red",
+  "blue",
+  "green",
+  "yellow",
+  "black",
+  "grey",
+  "prismatic",
+];
+
+export const REAL_SCHOOL_ORDER: readonly School[] = SCHOOL_ORDER.filter(
+  (school) => school !== "prismatic",
+);
+
 export const schools: Record<School, SchoolColors> = {
   red: { ...BASE_SCHOOLS.red },
   blue: { ...BASE_SCHOOLS.blue },

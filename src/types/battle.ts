@@ -18,7 +18,14 @@ import type {
 
 export type { SlotId };
 
-export type DieState = "tray" | "placed" | "reserved" | "locked" | "burned";
+export type DieState =
+  | "tray"
+  | "placed"
+  | "reserved"
+  | "locked"
+  | "burned"
+  | "bag"
+  | "discard";
 
 export interface RolledDie {
   uid: string;
@@ -37,6 +44,9 @@ export interface RolledDie {
   bankedValue?: number;
   pinned?: boolean;
   reschooled?: boolean;
+  seat?: number;
+  fusion?: number;
+  faces?: readonly number[];
 }
 
 export interface SlotState {

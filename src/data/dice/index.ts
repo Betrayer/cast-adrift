@@ -38,8 +38,9 @@ export const rollBaseValue = (
   defId: string,
   tier: number,
   stream: RngStream,
+  instanceFaces?: readonly number[],
 ): number => {
-  const faces = DIE_BY_ID.get(defId)?.faces;
+  const faces = instanceFaces ?? DIE_BY_ID.get(defId)?.faces;
   if (faces !== undefined && faces.length > 0) return stream.pick(faces);
   return stream.int(1, tier);
 };

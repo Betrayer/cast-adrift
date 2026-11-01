@@ -1,20 +1,14 @@
-.enemyBand,
-.trayBand {
+.enemyBand {
   pointer-events: none;
   width: 100%;
   min-width: 0;
-  touch-action: none;
-}
-
-.enemyBand {
   flex: 0 0 auto;
   min-height: 92px;
   height: 22%;
 }
 
-.trayBand {
-  flex: 1 1 0;
-  min-height: 72px;
+[data-composition='phone'] .dock {
+  flex-basis: 212px;
 }
 
 .dock {
@@ -58,8 +52,8 @@
   color: var(--ca-text);
   cursor: pointer;
   transition:
-    box-shadow 140ms ease,
-    border-color 140ms ease;
+    box-shadow 140ms var(--ca-ease-out),
+    border-color 140ms var(--ca-ease-out);
   --tint: var(--ca-line);
   --wash: var(--ca-surface2);
   --tone: var(--ca-dim);
@@ -142,7 +136,7 @@
 }
 
 .pod[data-pulse='1'] {
-  animation: pod-pulse 320ms ease-out;
+  animation: pod-pulse 320ms var(--ca-ease-out);
 }
 
 .podBlocked {
@@ -184,6 +178,7 @@
 }
 
 .reserve {
+  position: relative;
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -226,7 +221,7 @@
   border: 1.5px solid var(--ca-accent);
   box-shadow: 0 0 10px var(--ca-shadow);
   cursor: pointer;
-  animation: radial-in 140ms ease-out both;
+  animation: radial-in 140ms var(--ca-ease-out) backwards;
 }
 
 .radialBtn[aria-disabled='true'] {
@@ -246,7 +241,6 @@
     transform: scale(0.7);
   }
   to {
-    opacity: 1;
     transform: scale(1);
   }
 }
@@ -274,14 +268,20 @@
 }
 
 :root[data-ca-compact='1'] .enemyBand {
-  min-height: 76px;
+  min-height: 60px;
   height: 20%;
 }
 
-:root[data-ca-compact='1'] .trayBand {
-  min-height: 56px;
+:root[data-ca-compact='1'] .dock {
+  min-height: 170px;
 }
 
-:root[data-ca-compact='1'] .dock {
-  min-height: 150px;
+:root[data-ca-tight='1'] .enemyBand {
+  min-height: 48px;
+  height: 16%;
+}
+
+:root[data-ca-tight='1'] .dock {
+  min-height: 128px;
+  gap: 2px;
 }

@@ -9,7 +9,7 @@ import {
   NUMBERED_MEMORIES,
 } from "@/data/narrative/memories";
 import { sealFinalMemory } from "@/game/narrative/memoryArc";
-import { SECTOR_COUNT, SECTORS } from "@/data/sectors";
+import { SECTOR_COUNT, SECTORS, sectorDef } from "@/data/sectors";
 import { pickBoss, pickMiniboss } from "@/game/run/encounter";
 import {
   advanceSector,
@@ -21,7 +21,8 @@ import { bossFirstKillShards, campaignShards } from "@/game/xp";
 import { createStream } from "@/services/rng";
 import { useAppStore } from "@/stores/appStore";
 import { createInitialMetaStats, useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import { useNarrativeStore } from "@/stores/narrativeStore";
+import { createInitialRunValues, useRunStore } from "@/stores/runStore";
 
 const resetMeta = (): void => {
   useMetaStore.setState({
@@ -82,7 +83,9 @@ describe("campaign progression", () => {
     useRunStore.getState().crossThreshold();
     advanceSector();
     expect(useRunStore.getState().sector).toBe(SECTORS.length);
-    expect(useRunStore.getState().map?.shape.bossRow).toBe(16);
+    expect(useRunStore.getState().map?.shape.bossRow).toBe(
+      sectorDef(SECTORS.length).shape.bossRow,
+    );
     advanceSector();
     expect(useRunStore.getState().sector).toBe(SECTORS.length);
   });
@@ -169,6 +172,23 @@ describe("Echo memory arc", () => {
     expect(orders).not.toContain(13);
     expect(orders).toContain(14);
     expect(orders).not.toContain(15);
+  });
+
+  it("says nothing a second run owes, although the elite counter is lifetime", () => {
+    useNarrativeStore.getState().reset();
+    useMetaStore.getState().bumpLifetime({ elites: 9 });
+    unlockNextMemory();
+    expect(
+      useNarrativeStore.getState().journal.filter((e) => e.k === "memory"),
+    ).toHaveLength(3);
+
+    useRunStore.setState(createInitialRunValues());
+    useNarrativeStore.getState().reset();
+    unlockNextMemory();
+    expect(
+      useNarrativeStore.getState().journal.filter((e) => e.k === "memory"),
+    ).toHaveLength(0);
+    expect(useNarrativeStore.getState().memoryQueue).toEqual([]);
   });
 
   it("reaches every fragment across a full clear", () => {

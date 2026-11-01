@@ -10,6 +10,7 @@ import {
 } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
+import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
 import { MUTATOR_BY_ID } from "@/data/mutators";
 import { abandonRun } from "@/game/run/flow";
@@ -24,6 +25,28 @@ const SUBMIT_KEY = {
   failed: "meta:drift.submitFailed",
   offline: "meta:drift.submitOffline",
 } as const;
+
+const DriftRow = ({
+  id,
+  index,
+  label,
+  value,
+}: {
+  id: string;
+  index: number;
+  label: string;
+  value: number;
+}) => (
+  <Group
+    justify="space-between"
+    data-drift-row={id}
+    data-rise
+    style={riseStyle(index)}
+  >
+    <Text c={tokens.dim}>{label}</Text>
+    <Text c={tokens.text}>{value}</Text>
+  </Group>
+);
 
 export const DriftSummaryScreen = () => {
   const { t } = useTranslation(["meta", "run", "content"]);
@@ -53,24 +76,31 @@ export const DriftSummaryScreen = () => {
             </Group>
           ) : null}
           <Divider color={tokens.line} />
-          <Group justify="space-between">
-            <Text c={tokens.dim}>
-              {t("meta:drift.depth", { n: score?.depth ?? 0 })}
-            </Text>
-            <Text c={tokens.text}>{score?.depthPoints ?? 0}</Text>
-          </Group>
-          <Group justify="space-between">
-            <Text c={tokens.dim}>
-              {t("meta:drift.kills", { n: score?.kills ?? 0 })}
-            </Text>
-            <Text c={tokens.text}>{score?.killPoints ?? 0}</Text>
-          </Group>
-          <Group justify="space-between">
-            <Text c={tokens.dim}>{t("meta:drift.scrap")}</Text>
-            <Text c={tokens.text}>{score?.scrap ?? 0}</Text>
-          </Group>
+          <DriftRow
+            id="depth"
+            index={0}
+            label={t("meta:drift.depth", { n: score?.depth ?? 0 })}
+            value={score?.depthPoints ?? 0}
+          />
+          <DriftRow
+            id="kills"
+            index={1}
+            label={t("meta:drift.kills", { n: score?.kills ?? 0 })}
+            value={score?.killPoints ?? 0}
+          />
+          <DriftRow
+            id="scrap"
+            index={2}
+            label={t("meta:drift.scrap")}
+            value={score?.scrap ?? 0}
+          />
           <Divider color={tokens.line} />
-          <Group justify="space-between">
+          <Group
+            justify="space-between"
+            data-drift-row="total"
+            data-rise
+            style={riseStyle(3)}
+          >
             <Text c={tokens.amber} fw={700}>
               {t("meta:drift.total")}
             </Text>
@@ -91,7 +121,12 @@ export const DriftSummaryScreen = () => {
           <Text size="xs" c={tokens.faint}>
             {t(SUBMIT_KEY[submit])}
           </Text>
-          <Group justify="space-between">
+          <Group
+            justify="space-between"
+            data-drift-row="xp"
+            data-rise
+            style={riseStyle(3)}
+          >
             <Text size="xs" c={tokens.dim}>
               {t("meta:summary.xp")}
             </Text>

@@ -335,3 +335,11 @@ export const achievementTitleById = (
   return def === undefined ? id : achievementTitle(def, translate);
 };
 
+export const unseenAchievementIds = (
+  unlocked: readonly string[],
+  seen: readonly string[],
+): string[] => {
+  const seenSet = new Set(seen);
+  return unlocked.filter((id) => !seenSet.has(id));
+};
+

@@ -9,10 +9,16 @@ export type MemorySource =
 export interface MemoryDef {
   id: string;
   order: number;
+  source: MemorySource;
+  codexId?: string;
+  title?: LocKey;
+  body?: LocKey;
+}
+
+export interface NumberedMemoryDef extends MemoryDef {
   codexId: string;
   title: LocKey;
   body: LocKey;
-  source: MemorySource;
 }
 
 export const MEMORY_TOTAL = 16;
@@ -45,14 +51,11 @@ export const MEMORIES: readonly MemoryDef[] = [
   {
     id: "echo-16",
     order: MEMORY_TOTAL,
-    codexId: "memory-16",
-    title: "content:codex.memory-16.title",
-    body: "content:codex.memory-16.body",
     source: { s: "ending" },
   },
 ];
 
-export const MEMORY_BY_ORDER: ReadonlyMap<number, MemoryDef> = new Map(
+const MEMORY_BY_ORDER: ReadonlyMap<number, MemoryDef> = new Map(
   MEMORIES.map((m) => [m.order, m]),
 );
 
@@ -68,9 +71,11 @@ export const FINAL_MEMORY_IDS: readonly string[] = Object.values(
   FINAL_MEMORY_BY_ENDING,
 );
 
-export const NUMBERED_MEMORIES: readonly MemoryDef[] = MEMORIES.filter(
-  (m) => m.source.s !== "ending",
-);
+const isNumbered = (m: MemoryDef): m is NumberedMemoryDef =>
+  m.source.s !== "ending";
+
+export const NUMBERED_MEMORIES: readonly NumberedMemoryDef[] =
+  MEMORIES.filter(isNumbered);
 
 export const MEMORY_CODEX_IDS: readonly string[] = [
   ...NUMBERED_MEMORIES.map((m) => m.codexId),
@@ -85,8 +90,12 @@ export const memoryFragmentCount = (codex: readonly string[]): number => {
   );
 };
 
-export const memoryAt = (order: number): MemoryDef | undefined =>
-  MEMORY_BY_ORDER.get(order);
+export const numberedMemoryAt = (
+  order: number,
+): NumberedMemoryDef | undefined => {
+  const memory = MEMORY_BY_ORDER.get(order);
+  return memory !== undefined && isNumbered(memory) ? memory : undefined;
+};
 
 export const finalMemoryCodexId = (endingId: string): string =>
   FINAL_MEMORY_BY_ENDING[endingId] ?? "memory-16-seal";

@@ -6,6 +6,7 @@ export const JOURNAL_CHATTER_CAP = 60;
 export const FEED_CAP = 3;
 export const FEED_MS = 8000;
 export const FEED_CONSEQUENCE_MS = 10000;
+export const FEED_MIN_RETURN_MS = 1000;
 
 export type FeedSource = "bark" | "consequence" | "achievement" | "system";
 
@@ -19,6 +20,7 @@ export interface FeedMessage {
   key: string;
   journalId: number | null;
   ttlMs: number;
+  shownMs: number;
   tone: FeedTone;
   scope: FeedScope;
   interactive: boolean;
@@ -67,6 +69,7 @@ export interface NarrativeState {
   seq: number;
   pushFeed: (push: FeedPush) => number;
   dismissFeed: (id: number) => void;
+  creditFeed: (id: number, ms: number) => void;
   clearFeed: () => void;
   dropRunFeed: () => void;
   pushJournal: (entry: JournalBody & { sector: number }) => number;
@@ -92,6 +95,7 @@ export const useNarrativeStore = create<NarrativeState>()((set, get) => ({
           key: push.key,
           journalId: push.journalId ?? null,
           ttlMs: feedTtl(push.source),
+          shownMs: 0,
           tone: push.tone ?? "normal",
           scope: push.scope ?? "run",
           interactive: push.interactive ?? true,
@@ -105,6 +109,21 @@ export const useNarrativeStore = create<NarrativeState>()((set, get) => ({
 
   dismissFeed: (id) => {
     set((s) => ({ feed: s.feed.filter((message) => message.id !== id) }));
+  },
+
+  creditFeed: (id, ms) => {
+    set((s) => {
+      if (!(ms > 0)) return s;
+      const message = s.feed.find((row) => row.id === id);
+      if (message === undefined) return s;
+      const shownMs = message.shownMs + ms;
+      if (message.ttlMs - shownMs < FEED_MIN_RETURN_MS) {
+        return { feed: s.feed.filter((row) => row.id !== id) };
+      }
+      return {
+        feed: s.feed.map((row) => (row.id === id ? { ...row, shownMs } : row)),
+      };
+    });
   },
 
   clearFeed: () => {

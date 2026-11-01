@@ -3,8 +3,8 @@
   "hull": "Coque {{hp}}/{{max}}",
   "shield": "Bouclier {{n}}",
   "scrap": "Ferraille {{n}}",
-  "charge": "{{n}} / {{max}}",
-  "interference": "Interférence × {{n}}",
+  "charge": "Charge {{n}}/{{max}}",
+  "interference": "Interférence ×{{n}}",
   "endTurn": "Fin de virage",
   "burnHint": "Les dés qui ne sont pas placés dans des emplacements sont éliminés à la fin du tour",
   "victory": "Victoire",
@@ -30,7 +30,7 @@
   "fusePick": "Choisis le jumeau",
   "fuse": "Recuit",
   "collect": "Collecter",
-  "lootNew": "Nouvelle matrice",
+  "lootNew": "Nouveau dé",
   "jam": "JAM",
   "pierce": "BRÈCHE {{n}}",
   "school": {
@@ -56,7 +56,7 @@
     "multi": "Attaque {{n}} × {{k}}",
     "charge": "En cours de recharge",
     "jamSlot": "Bloque une fente",
-    "lockDie": "Verrouille une matrice",
+    "lockDie": "Verrouille un dé",
     "summon": "Citation à comparaître",
     "healAllies": "Soigne les alliés de{{n}}",
     "mirrorHalf": "Reproduit votre dernier tour",
@@ -66,7 +66,7 @@
     "swapValues": "Inverse vos valeurs maximales et minimales",
     "storm": "Tempête de probabilités",
     "curseDie": "« Curses a die » − {{n}}",
-    "shieldGate": "Affiche une fenêtre contextuelle «{{n}} »",
+    "shieldGate": "Dresse une porte {{n}}",
     "mirrorSchool": "Reflète votre recensement",
     "drainCharge": "Frais de «{{n}} » des canalisations",
     "siphonShield": "Bouclier «{{n}} » de Siphons",
@@ -109,7 +109,7 @@
     "minibossAlt": "Mini-boss · signature inédite"
   },
   "fate": "Lancer de dés du destin",
-  "fateResult": "Fate {{roll}} — {{text}}",
+  "fateResult": "Destin {{roll}} — {{text}}",
   "swap": "Échange",
   "swapPick": "Choisis un dé…",
   "bank": "Face de la banque",
@@ -189,7 +189,7 @@
     "tierCap": "Le dé est trop grand pour cet emplacement",
     "slotBlocked": "Cet emplacement est bloqué ce tour",
     "dieLocked": "Ce dé est verrouillé",
-    "noPartner": "Le recuit nécessite une deuxième matrice de même valeur.",
+    "noPartner": "Le recuit nécessite un deuxième dé du plateau de même valeur.",
     "needsTwoEnemies": "Ce mode de tir exige deux cibles vivantes",
     "spent": "Le navire peut effectuer cette action une fois par combat."
   },
@@ -199,7 +199,8 @@
     "active": "Possède une active",
     "engraved": "Gravé",
     "growth": "Grandit sur la face max",
-    "faces": "Faces non standard"
+    "faces": "Faces non standard",
+    "forged": "Forgé"
   },
   "layoutHint": "Une autre présentation du combat ? Réglages → Interface de combat.",
   "radial": {
@@ -244,7 +245,9 @@
       "faces": "Faces non standard — {{list}}",
       "growth": "Croissance — +{{per}} sur une face maximale, jusqu’à +{{cap}}",
       "growthField": "Croissance — +{{n}} accumulé sur le terrain",
-      "prismatic": "Prisme — compte comme n’importe quelle école et hérite de l’affinité de l’emplacement"
+      "prismatic": "Prisme — compte comme n’importe quelle école et hérite de l’affinité de l’emplacement",
+      "legendary": "Légendaire — une aura aux couleurs de son école",
+      "forged": "Forgé ×{{n}} — d{{from}} → d{{to}}"
     },
     "active": {
       "flip": "une fois par combat, retourne le dé sur la face opposée",
@@ -344,18 +347,69 @@
   "interferenceWhy": "Les anomalies évitées s’empilent : chaque pile ajoute un niveau de marée pour le reste de la partie. Résoudre une anomalie les efface toutes.",
   "interferenceTitle": "Interférence",
   "axisWhy": "Les dés noirs tirent vers la Résonance, les bleus vers la Stabilité. Les événements et la dérive déplacent aussi l’axe.",
-  "chargeWhy": "La charge paie les actions : −1 coûte {{n}}, +1 coûte {{n}}, une relance achetée 5, une surtension 10.",
+  "chargeWhy": "La charge se dépense en actions : un coup de pouce d’une face vers le haut ou vers le bas coûte {{n}}, une relance achetée coûte {{reroll}}, une surtension coûte {{surge}}.",
   "chargeTitle": "Charge",
   "mkWhy": "Mk relève le plafond de l’emplacement et le bonus d’affinité de son école.",
   "resEarned": "Acquis",
   "manoeuvreTitle": "Manœuvre",
-  "manoeuvreWhy": "Un dé dans les Moteurs fixe un jet d’esquive par coup reçu : effleurement {{glancing}}% × valeur (max. {{glancingCap}}%), esquive {{dodge}}% × valeur (max. {{dodgeCap}}%). Un effleurement prend la moitié, arrondie au supérieur, une esquive ne prend rien, le reste passe en entier. À partir de la valeur {{intercept}}, la première évasion réussie du tour — effleurement ou esquive — est une interception : Armes +1 au tour suivant. La valeur est le dé après affinité et bonus.",
-  "manoeuvreBrief": "Un jet par coup : effleurement {{glancing}}% × valeur (max {{glancingCap}}%), esquive {{dodge}}% × valeur (max {{dodgeCap}}%). Effleurement : moitié ; esquive : rien. Dès {{intercept}} : première évasion, Armes +1.",
+  "manoeuvreWhy": "Un dé dans les Moteurs fixe un jet d’évitement par coup reçu : effleurement {{glancing}}% × valeur (max {{glancingCap}}%), esquive {{dodge}}% × valeur (max {{dodgeCap}}%). Un coup effleuré n’inflige que la moitié, arrondie au supérieur, une esquive n’inflige rien, tout le reste passe en entier. À partir de la valeur {{intercept}}, le premier évitement réussi du tour — effleurement ou esquive — est une interception : Armes +{{interceptBonus}} au tour suivant. La valeur est celle du dé après affinité et bonus.",
+  "manoeuvreBrief": "Un jet d’évitement par coup : effleurement {{glancing}}% × valeur (max {{glancingCap}}%), esquive {{dodge}}% × valeur (max {{dodgeCap}}%). L’effleurement divise le coup par deux, l’esquive l’annule. À partir de {{intercept}}, le premier évitement rapporte Armes +{{interceptBonus}}.",
   "targetingTitle": "Désignation",
-  "targetingWhy": "Un dé dans les Capteurs rend la cible Vulnérable +D pour le tour : D vaut la moitié de la valeur du dé arrondie au supérieur, plafonnée à {{cap}}, et chaque coup de ce tour fait d’autant plus. Sur la face maximale du dé, le coup perce aussi le bouclier. Le Mk des Capteurs révèle en plus une rangée de carte par niveau au-dessus de Mk1.",
+  "targetingWhy": "Un dé dans les Capteurs rend la cible Vulnérable +D pour le tour : D vaut la moitié de la valeur du dé, arrondie au supérieur, plafonnée à {{cap}}, et chaque coup de ce tour inflige autant de plus. Sur la face max du dé, le coup perce aussi le bouclier.",
   "targetingBrief": "Les capteurs marquent la cible : Vulnérable +D pour le tour, D = la moitié de la valeur du dé arrondie au supérieur, max {{cap}}. Chaque coup fait autant de plus ; la face max perce le bouclier.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systèmes",
+  "system": {
+    "weaponA": {
+      "what": "Ton canon principal : la valeur du dé devient des dégâts sur la cible choisie. Il tire juste après les Capteurs, avant toute autre arme."
+    },
+    "weaponB": {
+      "what": "Ton second canon, conçu comme l’Arme A : la valeur du dé devient des dégâts. Il tire juste après l’Arme A, sur ce que ce tir a laissé debout."
+    },
+    "spinal": {
+      "what": "Un canon long comme la quille, qui accepte les plus gros dés du vaisseau. Un jet faible le coince ; un tir net enfonce toute la valeur dans la cible.",
+      "jam": "Le canon dorsal se coince sur une valeur de {{jamOn}} ou moins, bonus compris : il ne tire rien ce tour-ci et son prochain tir gagne +{{carry}}, un bonus qui continue de s’accumuler tant qu’il se coince. Au-dessus, il frappe pour la valeur plus les bonus, avec la Vulnérabilité de la cible en plus et ×{{crit}} sur un coup critique. Il n’a pas de modes de tir.",
+      "mk": "Mk ne relève jamais le plafond du canon dorsal — il accepte jusqu’à d{{cap}} à tous les niveaux — mais il augmente bien ici le bonus d’affinité du rouge."
+    },
+    "weapons": {
+      "damage": "Les dégâts valent la valeur du dé plus ses bonus, modulés par le mode de tir choisi. Chaque coup ajoute la Vulnérabilité de la cible, un coup critique multiplie le total par ×{{crit}}, arrondi à l’inférieur, et le bouclier ennemi absorbe les dégâts avant sa coque.",
+      "affinity": "Ici, les dés rouges ajoutent +{{mk1}} à leur valeur en Mk1, +{{mk2}} en Mk2 et +{{mk3}} en Mk3. Un dé prismatique compte comme rouge dans cet emplacement."
+    },
+    "shields": {
+      "what": "Ton générateur de bouclier : la valeur du dé devient du bouclier pour ce tour. Les coups ennemis le consomment avant d’atteindre la coque.",
+      "gain": "Un dé dans les Boucliers ajoute sa valeur, plus les bonus, à ton bouclier. Chaque emplacement de bouclier alimente le même bouclier.",
+      "keep": "Le bouclier ne dure que jusqu’à la fin du tour ennemi : ce qu’il en reste à la fin de ce tour est perdu, sauf si quelque chose en conserve une part ou si la résonance bleue a posé une couche durable.",
+      "affinity": "Ici, les dés bleus ajoutent +{{mk1}} en Mk1, +{{mk2}} en Mk2 et +{{mk3}} en Mk3. Un dé prismatique compte comme bleu dans cet emplacement."
+    },
+    "shieldsB": {
+      "what": "Un second générateur de bouclier. Il se cumule avec le premier : les deux se déversent dans le même bouclier."
+    },
+    "engines": {
+      "what": "Ton moteur : la valeur du dé fixe les chances d’effleurement et d’esquive contre chaque coup ennemi ce tour-ci. Une valeur élevée peut aussi intercepter.",
+      "affinity": "Ici, les dés verts ajoutent +{{mk1}} en Mk1, +{{mk2}} en Mk2 et +{{mk3}} en Mk3. Un dé prismatique compte comme vert dans cet emplacement.",
+      "flat": "Ce vaisseau et cette configuration décalent l'esquive de {{n}} % et l'effleurement de la moitié, avant les plafonds."
+    },
+    "enginesB": {
+      "what": "Un second moteur. Sa valeur s’ajoute à celle du premier, et la somme fixe un seul évitement pour le tour."
+    },
+    "sensors": {
+      "what": "Ton système de visée : il marque la cible Vulnérable avant que la moindre arme ne tire, si bien que chaque coup de ce tour porte la marque en plus.",
+      "fog": "Les Capteurs éclairent aussi la carte : tu vois {{base}} rangées devant toi en Mk1, et {{perMk}} de plus pour chaque Mk au-delà.",
+      "affinity": "Ici, les dés gris ajoutent +{{mk1}} en Mk1, +{{mk2}} en Mk2 et +{{mk3}} en Mk3. Un dé prismatique compte comme gris dans cet emplacement."
+    },
+    "reactor": {
+      "what": "Ta centrale d’énergie : la valeur du dé devient de la charge. La charge paie les coups de pouce, les relances, les surtensions et certaines actions d’officier.",
+      "store": "Un dé dans le Réacteur stocke sa valeur en charge, après un éventuel multiplicateur, arrondie à l’inférieur. La charge s’arrête au plafond ({{cap}}) ; un stockage qui le dépasse perd le surplus et coûte {{overflow}} de coque.",
+      "affinity": "Ici, les dés noirs stockent ×{{mult}} de charge à tous les niveaux de Mk. Un dé prismatique compte comme noir dans cet emplacement.",
+      "mk": "Mk relève le plafond du réacteur ; le ×{{mult}} de charge du noir reste le même à tous les niveaux."
+    },
+    "repairBay": {
+      "what": "Un atelier de bord : le dé rafistole ta coque. Il agit en dernier pendant ton tour, après tous les autres systèmes.",
+      "repair": "Un dé dans l’Atelier de réparation répare autant de coque que sa valeur ÷ {{divisor}}, arrondie au supérieur, sans jamais dépasser ton maximum.",
+      "mk": "Mk relève le plafond de l’atelier de réparation. Aucune école n’a d’affinité ici, le plafond est donc tout ce qu’il apporte."
+    },
+    "fit": "Un dé entre dans un emplacement quand sa taille est inférieure ou égale au plafond de celui-ci. Un dé plus grand n’y entre que grâce à une règle qui lève le plafond — un passif de vaisseau, un atout, un module ou un nœud de la Carte stellaire — et la plupart le font payer en coque."
+  },
   "journal": {
     "title": "Journal de combat",
     "empty": "Rien n'a encore été résolu.",
@@ -413,5 +467,20 @@
     "fork": "{{cond}} — {{then}}. Sinon — {{else}}.",
     "fixed": "{{intent}}.",
     "open": "Tiré de son motif — rien n’est fixé."
-  }
+  },
+  "bag": {
+    "chip": "Sac {{bag}} · Défausse {{discard}}",
+    "chipShort": "{{bag}}·{{discard}}",
+    "label": "Main : {{bag}} dans le sac, {{discard}} défaussés",
+    "title": "Main — {{n}} dés",
+    "hint": "Chaque tour, sept dés sortent du sac sur la table. Les dés posés et inutilisés vont à la défausse ; quand le sac est vide, la défausse y est remélangée.",
+    "empty": "Vide",
+    "group": {
+      "table": "Sur la table · {{n}}",
+      "reserve": "Réserve · {{n}}",
+      "bag": "Dans le sac · {{n}}",
+      "discard": "Défausse · {{n}}"
+    }
+  },
+  "fogTitle": "Portée des capteurs"
 }

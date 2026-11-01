@@ -13,30 +13,28 @@ import { CARD_COLUMNS } from "@/app/grids";
 import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
 import { useScreenParam } from "@/app/useScreenParam";
+import { useUnlockContext } from "@/app/useUnlockContext";
 import { tokens } from "@/app/theme";
 import { DieCardTrigger } from "@/components/DieCardModal";
+import { auraHostClass, LegendaryAura } from "@/components/LegendaryAura";
 import { DieFilterChips } from "@/components/DieFilterChips";
+import { DieSchoolSelect } from "@/components/DieSchoolSelect";
 import { ALL_DICE } from "@/data/dice";
-import { DIE_FILTERS, dieHasFeature, type DieFeature } from "@/game/dice/card";
+import {
+  DIE_FILTERS,
+  dieHasFeature,
+  SCHOOL_FILTERS,
+  type DieFeature,
+} from "@/game/dice/card";
+import { TIER_LADDER } from "@/game/dice/tier";
 import { schools } from "@/data/schools";
 import { diePoints, ENCOUNTER_DISCOUNT_PCT } from "@/data/metaShop";
 import { unlockedDice } from "@/data/unlocks";
 import { dieRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
-import { unlockContextOf } from "@/game/meta/unlockState";
 import { useMetaStore } from "@/stores/metaStore";
 import type { DieTier, School } from "@/types/content";
 
-const SCHOOLS: readonly (School | "all")[] = [
-  "all",
-  "red",
-  "blue",
-  "green",
-  "yellow",
-  "black",
-  "grey",
-  "prismatic",
-];
-const TIERS: readonly (DieTier | 0)[] = [0, 4, 6, 8, 10, 12, 20, 100];
+const TIERS: readonly (DieTier | 0)[] = [0, ...TIER_LADDER];
 
 const TIER_PARAMS: readonly string[] = TIERS.map((tier) => String(tier));
 
@@ -51,14 +49,10 @@ export const CollectionScreen = () => {
   const collection = useMetaStore((s) => s.collection);
   const engravings = useMetaStore((s) => s.engravings);
   const encountered = useMetaStore((s) => s.encountered);
-  const level = useMetaStore((s) => s.level);
-  const achievements = useMetaStore((s) => s.achievements);
-  const ascension = useMetaStore((s) => s.ascension);
-  const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
-  const clears = useMetaStore((s) => s.stats.campaignClears);
+  const unlockCtx = useUnlockContext();
   const [schoolFilter, setSchoolFilter] = useScreenParam<School | "all">(
     "school",
-    SCHOOLS,
+    SCHOOL_FILTERS,
     "all",
   );
   const [tierParam, setTierParam] = useScreenParam("tier", TIER_PARAMS, "0");
@@ -82,19 +76,7 @@ export const CollectionScreen = () => {
     return map;
   }, [collection]);
 
-  const openDice = useMemo(
-    () =>
-      unlockedDice(
-        unlockContextOf({
-          level,
-          achievements,
-          ascension,
-          unlocksGranted,
-          stats: { campaignClears: clears },
-        }),
-      ),
-    [level, achievements, ascension, unlocksGranted, clears],
-  );
+  const openDice = useMemo(() => unlockedDice(unlockCtx), [unlockCtx]);
 
   const rows = useMemo(
     () =>
@@ -138,19 +120,10 @@ export const CollectionScreen = () => {
           })}
         </Text>
         <Group gap="xs" grow wrap="wrap">
-          <Select
-            size="xs"
-            miw={120}
+          <DieSchoolSelect
             value={schoolFilter}
-            data-testid="collection-school"
-            onChange={(v) => { setSchoolFilter((v as School | "all") ?? "all"); }}
-            data={SCHOOLS.map((s) => ({
-              value: s,
-              label:
-                s === "all"
-                  ? t("meta:hangar.filterAll")
-                  : t(`meta:constellation.${s}`),
-            }))}
+            onChange={setSchoolFilter}
+            testId="collection-school"
           />
           <Select
             size="xs"
@@ -205,6 +178,9 @@ export const CollectionScreen = () => {
                   withBorder
                   data-collection-entry={def.id}
                   data-collection-state={row.state}
+                  data-rarity={def.rarity}
+                  data-school={def.school}
+                  className={!unknown && def.rarity === "legendary" ? auraHostClass : undefined}
                   data-rise
                   bg={unknown ? tokens.bg : schools[def.school].fill}
                   style={
@@ -213,6 +189,9 @@ export const CollectionScreen = () => {
                       : riseStyle(index)
                   }
                 >
+                  {!unknown && def.rarity === "legendary" ? (
+                    <LegendaryAura defId={def.id} school={def.school} />
+                  ) : null}
                   <Group justify="space-between">
                     {unknown ? (
                       <Text size="sm" style={{ color: tokens.faint }}>

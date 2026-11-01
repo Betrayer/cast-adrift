@@ -120,17 +120,3 @@
   color: var(--ca-accent);
 }
 
-.row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
-}
-
-.rowText {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-

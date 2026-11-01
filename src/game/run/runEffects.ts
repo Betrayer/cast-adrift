@@ -1,18 +1,8 @@
-import { DIE_BY_ID } from "@/data/dice";
-import { computeCensus } from "@/game/battle/resonance";
 import { buildRunSources, emit, RunCtx } from "@/game/effects";
 import type { Hook, HookPayload } from "@/game/effects";
+import { deckResonance } from "@/game/effects/census";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore, type RunValues } from "@/stores/runStore";
-import type { School } from "@/types/content";
-
-const deckSchools = (
-  deck: RunValues["deck"],
-): readonly { school: School }[] =>
-  deck.flatMap((die) => {
-    const school = DIE_BY_ID.get(die.defId)?.school;
-    return school === undefined ? [] : [{ school }];
-  });
+import { useRunStore } from "@/stores/runStore";
 
 const commitDeltas = (ctx: RunCtx): void => {
   const { scrap, hull, flags, counters } = ctx.deltas;
@@ -42,7 +32,7 @@ export const emitRunHook = (hook: Hook, payload: HookPayload = {}): RunCtx => {
     interference: s.interferenceStacks,
     flagKeys: Object.keys(s.flags),
     counters: s.counters,
-    resonance: computeCensus(deckSchools(s.deck)),
+    resonance: deckResonance(s.deck, s),
     loadout,
   });
   ctx.payload = payload;

@@ -33,9 +33,9 @@ export type SectorMotif =
   | { m: "storm"; rows: number }
   | {
       m: "blackHoles";
-      span: readonly [number, number];
+      deepChance: number;
       disintegrationPct: number;
-      toll: readonly EventEffect[];
+      bypassPct: number;
     };
 
 export interface EncounterMix {
@@ -76,20 +76,20 @@ export interface SectorDef {
 
 const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
   1: {
-    bossRow: 15,
-    gateRow: 8,
+    bossRow: 20,
+    gateRow: 10,
     lanes: 3,
     branchiness: 0.35,
     quotas: {
-      elites: [2, 2],
-      events: [5, 6],
-      shops: 2,
-      shipyards: 3,
-      anomalies: 2,
+      elites: [3, 3],
+      events: [7, 8],
+      shops: 3,
+      shipyards: 4,
+      anomalies: 3,
       beacons: 1,
     },
-    motifs: [{ m: "cache", count: 2, gain: [{ k: "scrap", n: 10 }] }],
-    pockets: [1, 1],
+    motifs: [{ m: "cache", count: 3, gain: [{ k: "scrap", n: 10 }] }],
+    pockets: [2, 2],
     pocketTable: [
       ["event", 3],
       ["anomaly", 2],
@@ -98,28 +98,28 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     anomalyTiers: [1, 2],
   },
   2: {
-    bossRow: 15,
-    gateRow: 8,
+    bossRow: 20,
+    gateRow: 10,
     lanes: 4,
     branchiness: 0.7,
     quotas: {
-      elites: [2, 3],
-      events: [4, 5],
-      shops: 3,
-      shipyards: 2,
-      anomalies: 2,
+      elites: [3, 4],
+      events: [5, 7],
+      shops: 4,
+      shipyards: 3,
+      anomalies: 3,
       beacons: 1,
     },
     motifs: [
-      { m: "mineEdges", count: 4, toll: [{ k: "hull", n: -2 }] },
+      { m: "mineEdges", count: 5, toll: [{ k: "hull", n: -2 }] },
       {
         m: "blackHoles",
-        span: [3, 4],
+        deepChance: 0.2,
         disintegrationPct: 5,
-        toll: [{ k: "hull", n: -1 }],
+        bypassPct: 0.2,
       },
     ],
-    pockets: [2, 2],
+    pockets: [3, 3],
     pocketTable: [
       ["shop", 3],
       ["event", 2],
@@ -128,25 +128,25 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     anomalyTiers: [1, 3],
   },
   3: {
-    bossRow: 14,
-    gateRow: 7,
+    bossRow: 18,
+    gateRow: 9,
     lanes: 4,
     branchiness: 0.55,
     quotas: {
-      elites: [2, 3],
-      events: [4, 4],
-      shops: 2,
-      shipyards: 2,
-      anomalies: 2,
+      elites: [3, 4],
+      events: [5, 5],
+      shops: 3,
+      shipyards: 3,
+      anomalies: 3,
       beacons: 1,
     },
     motifs: [
-      { m: "riftSplit", from: 3, to: 6 },
+      { m: "riftSplit", from: 3, to: 8 },
       {
         m: "blackHoles",
-        span: [3, 4],
+        deepChance: 0.2,
         disintegrationPct: 5,
-        toll: [{ k: "hull", n: -1 }],
+        bypassPct: 0.21,
       },
     ],
     pockets: [1, 1],
@@ -158,16 +158,16 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     anomalyTiers: [2, 4],
   },
   4: {
-    bossRow: 15,
-    gateRow: 9,
+    bossRow: 20,
+    gateRow: 11,
     lanes: 4,
     branchiness: 0.6,
     quotas: {
-      elites: [2, 3],
-      events: [5, 6],
-      shops: 2,
-      shipyards: 2,
-      anomalies: 2,
+      elites: [3, 4],
+      events: [7, 8],
+      shops: 3,
+      shipyards: 3,
+      anomalies: 3,
       beacons: 1,
     },
     motifs: [
@@ -178,12 +178,12 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
       },
       {
         m: "blackHoles",
-        span: [3, 5],
+        deepChance: 0.4,
         disintegrationPct: 5,
-        toll: [{ k: "hull", n: -2 }],
+        bypassPct: 0.22,
       },
     ],
-    pockets: [2, 2],
+    pockets: [3, 3],
     pocketTable: [
       ["event", 3],
       ["anomaly", 2],
@@ -192,28 +192,28 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     anomalyTiers: [2, 4],
   },
   5: {
-    bossRow: 14,
-    gateRow: 7,
+    bossRow: 18,
+    gateRow: 9,
     lanes: 3,
     branchiness: 0.45,
     quotas: {
-      elites: [3, 3],
-      events: [3, 4],
-      shops: 2,
-      shipyards: 2,
-      anomalies: 2,
+      elites: [4, 4],
+      events: [4, 5],
+      shops: 3,
+      shipyards: 3,
+      anomalies: 3,
       beacons: 1,
     },
     motifs: [
-      { m: "collapse", rows: 2, chance: 0.5 },
+      { m: "collapse", rows: 3, chance: 0.5 },
       {
         m: "blackHoles",
-        span: [3, 4],
+        deepChance: 0.2,
         disintegrationPct: 5,
-        toll: [{ k: "hull", n: -2 }],
+        bypassPct: 0.24,
       },
     ],
-    pockets: [1, 1],
+    pockets: [2, 2],
     pocketTable: [
       ["anomaly", 3],
       ["event", 2],
@@ -222,29 +222,29 @@ const SHAPES: Readonly<Record<SectorId, SectorShape>> = {
     anomalyTiers: [3, 5],
   },
   6: {
-    bossRow: 16,
-    gateRow: 9,
+    bossRow: 21,
+    gateRow: 12,
     lanes: 3,
     branchiness: 0.65,
     quotas: {
-      elites: [2, 2],
-      events: [10, 12],
+      elites: [3, 3],
+      events: [12, 15],
       shops: 1,
       shipyards: 1,
-      anomalies: 2,
+      anomalies: 3,
       beacons: 1,
     },
     motifs: [
-      { m: "inversion", rows: 3 },
-      { m: "storm", rows: 3 },
+      { m: "inversion", rows: 4 },
+      { m: "storm", rows: 4 },
       {
         m: "blackHoles",
-        span: [3, 5],
+        deepChance: 0.4,
         disintegrationPct: 5,
-        toll: [{ k: "hull", n: -2 }],
+        bypassPct: 0.25,
       },
     ],
-    pockets: [2, 2],
+    pockets: [3, 3],
     pocketTable: [
       ["anomaly", 3],
       ["event", 3],
@@ -564,3 +564,17 @@ export const sectorDef = (sector: number): SectorDef => {
   if (def === undefined) throw new Error(`sectorDef: unknown sector ${String(sector)}`);
   return def;
 };
+
+export const motifIn = <K extends SectorMotif["m"]>(
+  shape: Pick<SectorShape, "motifs">,
+  kind: K,
+): Extract<SectorMotif, { m: K }> | undefined =>
+  shape.motifs.find((motif): motif is Extract<SectorMotif, { m: K }> =>
+    motif.m === kind,
+  );
+
+export const sectorMotif = <K extends SectorMotif["m"]>(
+  sector: number,
+  kind: K,
+): Extract<SectorMotif, { m: K }> | undefined =>
+  motifIn(sectorDef(sector).shape, kind);

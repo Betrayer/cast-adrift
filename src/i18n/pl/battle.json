@@ -1,10 +1,10 @@
 {
-  "turn": "Turn {{n}}",
+  "turn": "Tura {{n}}",
   "hull": "Kadłub {{hp}}/{{max}}",
   "shield": "Tarcza {{n}}",
   "scrap": "Złom {{n}}",
-  "charge": "Kontakt: {{n}} / {{max}}",
-  "interference": "Interference × {{n}}",
+  "charge": "Ładunek {{n}}/{{max}}",
+  "interference": "Zakłócenia ×{{n}}",
   "endTurn": "Koniec zakrętu",
   "burnHint": "Kości pozostawione poza polami spalają się pod koniec tury",
   "victory": "Zwycięstwo",
@@ -109,7 +109,7 @@
     "minibossAlt": "Miniboss · nowa sygnatura"
   },
   "fate": "Rzuć kostką losu",
-  "fateResult": "Fate {{roll}} — {{text}}",
+  "fateResult": "Los {{roll}} — {{text}}",
   "swap": "Zamień",
   "swapPick": "Wybierz kostkę…",
   "bank": "Fasada banku",
@@ -199,7 +199,8 @@
     "active": "Ma aktywną",
     "engraved": "Grawerowana",
     "growth": "Rośnie na maksymalnej ścianie",
-    "faces": "Niestandardowe ściany"
+    "faces": "Niestandardowe ściany",
+    "forged": "Przekuta"
   },
   "layoutHint": "Wolisz inny układ walki? Ustawienia → Interfejs walki.",
   "radial": {
@@ -244,7 +245,9 @@
       "faces": "Niestandardowe ścianki — {{list}}",
       "growth": "Wzrost — +{{per}} na najwyższej ściance, do +{{cap}}",
       "growthField": "Wzrost — +{{n}} zebrane w polu",
-      "prismatic": "Pryzmat — liczy się jako dowolna szkoła i dziedziczy powinowactwo slotu"
+      "prismatic": "Pryzmat — liczy się jako dowolna szkoła i dziedziczy powinowactwo slotu",
+      "legendary": "Legendarny — aura w kolorze swojej szkoły",
+      "forged": "Przekuta ×{{n}} — d{{from}} → d{{to}}"
     },
     "active": {
       "flip": "raz na walkę obraca kość na przeciwną ściankę",
@@ -344,18 +347,69 @@
   "interferenceWhy": "Pominięte anomalie się kumulują: każdy stos dokłada kolejny poziom przypływu do końca przebiegu. Rozwiązanie anomalii kasuje wszystkie.",
   "interferenceTitle": "Zakłócenia",
   "axisWhy": "Czarne kości ciągną ku Rezonansowi, niebieskie ku Stabilności. Zdarzenia i dryf też ruszają oś.",
-  "chargeWhy": "Ładunek płaci za akcje: −1 kosztuje {{n}}, +1 kosztuje {{n}}, kupiony przerzut 5, zryw 10.",
+  "chargeWhy": "Ładunek idzie na akcje: przesunięcie o jedną ściankę w górę lub w dół kosztuje {{n}}, kupiony przerzut — {{reroll}}, skok — {{surge}}.",
   "chargeTitle": "Ładunek",
   "mkWhy": "Mk podnosi limit slotu i bonus powinowactwa jego szkoły.",
   "resEarned": "Zdobyte",
   "manoeuvreTitle": "Manewr",
-  "manoeuvreWhy": "Kość w Silnikach ustala jeden rzut uniku na każdy przychodzący cios: muśnięcie {{glancing}}% × wartość (maks. {{glancingCap}}%), unik {{dodge}}% × wartość (maks. {{dodgeCap}}%). Muśnięcie przyjmuje połowę, w górę, unik nic, reszta trafia w całości. Od wartości {{intercept}} pierwsza udana ewazja tury — muśnięcie lub unik — to przechwycenie: Broń +1 w następnej turze. Wartość to kość po powinowactwie i bonusach.",
-  "manoeuvreBrief": "Jeden rzut na cios: muśnięcie {{glancing}}% × wartość (maks {{glancingCap}}%), unik {{dodge}}% × wartość (maks {{dodgeCap}}%). Muśnięcie przyjmuje połowę, unik nic. Od {{intercept}} pierwsza ewazja daje Broń +1.",
+  "manoeuvreWhy": "Kość w Silnikach ustawia jeden rzut obronny na każde nadchodzące trafienie: muśnięcie {{glancing}}% × wartość (maks. {{glancingCap}}%), unik {{dodge}}% × wartość (maks. {{dodgeCap}}%). Muśnięcie przepuszcza połowę, zaokrągloną w górę, unik — nic, reszta trafia w pełni. Od wartości {{intercept}} pierwszy udany rzut obronny w turze — muśnięcie albo unik — to przechwyt: Broń +{{interceptBonus}} w następnej turze. Wartość to kość po powinowactwie i bonusach.",
+  "manoeuvreBrief": "Jeden rzut obronny na trafienie: muśnięcie {{glancing}}% × wartość (maks {{glancingCap}}%), unik {{dodge}}% × wartość (maks {{dodgeCap}}%). Muśnięcie tnie cios o połowę, unik kasuje go do zera. Od {{intercept}} pierwszy udany rzut daje Broni +{{interceptBonus}}.",
   "targetingTitle": "Naprowadzanie",
-  "targetingWhy": "Kość w Sensorach czyni cel Podatnym +D na turę: D to połowa wartości kości zaokrąglona w górę, nie więcej niż {{cap}}, a każdy cios w tej turze zadaje o tyle więcej. Na najwyższej ściance kości cios dodatkowo przebija tarczę. Mk Sensorów dodatkowo odsłania jeden rząd mapy za każdy poziom powyżej Mk1.",
+  "targetingWhy": "Kość w Czujnikach czyni cel Wrażliwym +D na turę: D to połowa wartości kości zaokrąglona w górę, nie więcej niż {{cap}}, i każdy cios tej tury zadaje o tyle więcej. Na maksymalnej ściance kości cios przebija też tarczę.",
   "targetingBrief": "Sensory znaczą cel: Wrażliwy +D na turę, D to połowa wartości kości w górę, maks {{cap}}. Każdy cios tej tury zadaje tyle więcej; maksymalna ścianka przebija też tarczę.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systemy",
+  "system": {
+    "weaponA": {
+      "what": "Twoje główne działo: wartość kości staje się obrażeniami zadanymi wybranemu celowi. Strzela zaraz po Czujnikach, przed każdą inną bronią."
+    },
+    "weaponB": {
+      "what": "Twoje drugie działo, zbudowane jak Broń A: wartość kości staje się obrażeniami. Strzela zaraz za Bronią A — w to, co po niej zostało."
+    },
+    "spinal": {
+      "what": "Działo na całą długość stępki, bierze największe kości na statku. Niski rzut je klinuje; czysty strzał wbija w cel całą wartość.",
+      "jam": "Działo spinalne klinuje się przy wartości {{jamOn}} lub niższej, razem z bonusami: w tej turze nie strzela, a jego następny strzał dostaje +{{carry}} — i to się kumuluje, dopóki dalej się klinuje. Powyżej bije za wartość z bonusami, plus Wrażliwość celu i ×{{crit}} przy trafieniu krytycznym. Trybów ognia nie ma.",
+      "mk": "Mk nigdy nie podnosi limitu działa spinalnego — na każdym poziomie bierze do d{{cap}} — ale podnosi tu bonus powinowactwa czerwonych."
+    },
+    "weapons": {
+      "damage": "Obrażenia to wartość kości z bonusami, w uzbrojonym trybie ognia. Każdy cios dolicza Wrażliwość celu, trafienie krytyczne mnoży sumę przez ×{{crit}} z zaokrągleniem w dół, a tarcza wroga chłonie obrażenia przed jego kadłubem.",
+      "affinity": "Czerwone kości dodają tu +{{mk1}} do swojej wartości na Mk1, +{{mk2}} na Mk2 i +{{mk3}} na Mk3. Kość pryzmatyczna liczy się w tym slocie jako czerwona."
+    },
+    "shields": {
+      "what": "Twój generator tarczy: wartość kości staje się tarczą na tę turę. Trafienia wroga zużywają ją, zanim dosięgną kadłuba.",
+      "gain": "Kość w Tarczach dokłada do tarczy swoją wartość z bonusami. Każdy slot tarczy zasila tę samą tarczę.",
+      "keep": "Tarcza trzyma tylko do końca tury wroga: co zostaje na jej koniec, przepada — chyba że coś zachowuje część tarczy albo niebieski rezonans położył trwałą warstwę.",
+      "affinity": "Niebieskie kości dodają tu +{{mk1}} na Mk1, +{{mk2}} na Mk2 i +{{mk3}} na Mk3. Kość pryzmatyczna liczy się w tym slocie jako niebieska."
+    },
+    "shieldsB": {
+      "what": "Drugi generator tarczy. Sumuje się z pierwszym: oba leją do tej samej tarczy."
+    },
+    "engines": {
+      "what": "Twój napęd: wartość kości ustala szansę na muśnięcie lub unik przy każdym trafieniu wroga w tej turze. Wysoka wartość daje jeszcze przechwyt.",
+      "affinity": "Zielone kości dodają tu +{{mk1}} na Mk1, +{{mk2}} na Mk2 i +{{mk3}} na Mk3. Kość pryzmatyczna liczy się w tym slocie jako zielona.",
+      "flat": "Ten statek i ta konfiguracja przesuwają unik o {{n}}% i muśnięcie o połowę tego, przed limitami."
+    },
+    "enginesB": {
+      "what": "Drugi napęd. Jego wartość dolicza się do pierwszego silnika, a suma ustala jeden rzut obronny na turę."
+    },
+    "sensors": {
+      "what": "Twój zestaw celowniczy: znaczy cel Wrażliwością, zanim wystrzeli jakakolwiek broń, więc każdy cios tej tury bije z tą metką na wierzchu.",
+      "fog": "Czujniki oświetlają też mapę: rzędów w przód na Mk1 — {{base}}, i jeszcze +{{perMk}} za każdy Mk wyżej.",
+      "affinity": "Szare kości dodają tu +{{mk1}} na Mk1, +{{mk2}} na Mk2 i +{{mk3}} na Mk3. Kość pryzmatyczna liczy się w tym slocie jako szara."
+    },
+    "reactor": {
+      "what": "Twoja siłownia: wartość kości staje się ładunkiem. Ładunek płaci za przesunięcia, przerzuty, skoki i część akcji oficerów.",
+      "store": "Kość w Reaktorze zapisuje swoją wartość jako ładunek — po mnożniku i z zaokrągleniem w dół. Ładunek zatrzymuje się na limicie ({{cap}}); nadmiar spala się i kosztuje {{overflow}} kadłuba.",
+      "affinity": "Czarne kości zapisują tu ×{{mult}} ładunku na każdym Mk. Kość pryzmatyczna liczy się w tym slocie jako czarna.",
+      "mk": "Mk podnosi limit reaktora; ×{{mult}} ładunku u czarnych zostaje takie samo na każdym poziomie."
+    },
+    "repairBay": {
+      "what": "Warsztat na pokładzie: kość łata kadłub. Pracuje ostatnia w twojej turze, po wszystkich innych systemach.",
+      "repair": "Kość w Stacji naprawczej naprawia kadłub o swoją wartość ÷ {{divisor}} z zaokrągleniem w górę, ale nigdy ponad twoje maksimum.",
+      "mk": "Mk podnosi limit stacji naprawczej. Żadna szkoła nie ma tu powinowactwa, więc limit to wszystko, co on daje."
+    },
+    "fit": "Kość pasuje do slotu, jeśli jej rozmiar nie przekracza limitu. Większa wejdzie tylko przez regułę, która ten limit zdejmuje — pasywkę statku, atut, moduł albo węzeł Mapy gwiazd — i prawie każda z nich każe za to zapłacić kadłubem."
+  },
   "journal": {
     "title": "Dziennik bitew",
     "empty": "Na razie nic się nie wyjaśniło.",
@@ -413,5 +467,20 @@
     "fork": "{{cond}} — {{then}}. W przeciwnym razie — {{else}}.",
     "fixed": "{{intent}}.",
     "open": "Losowane z jego wzoru — nie jest ustalone."
-  }
+  },
+  "bag": {
+    "chip": "Worek {{bag}} · Odrzucone {{discard}}",
+    "chipShort": "{{bag}}·{{discard}}",
+    "label": "Ręka: {{bag}} w worku, {{discard}} odrzuconych",
+    "title": "Ręka — kości: {{n}}",
+    "hint": "Co turę na stół trafia siedem kości z worka. Postawione i nieużyte idą do odrzuconych; gdy worek jest pusty, odrzucone wracają do niego.",
+    "empty": "Pusto",
+    "group": {
+      "table": "Na stole · {{n}}",
+      "reserve": "Rezerwa · {{n}}",
+      "bag": "W worku · {{n}}",
+      "discard": "Odrzucone · {{n}}"
+    }
+  },
+  "fogTitle": "Zasięg sensorów"
 }

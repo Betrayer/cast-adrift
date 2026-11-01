@@ -1,418 +1,91 @@
-import {
-  Button,
-  Divider,
-  Group,
-  Paper,
-  Slider,
-  Stack,
-  Text,
-} from "@mantine/core";
-import { useMemo, useRef, useState } from "react";
+import { Button, Divider, Stack, Text } from "@mantine/core";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
-import { DieCard } from "@/components/DieCard";
-import { TapPopover } from "@/components/TapPopover";
-import { DIE_BY_ID } from "@/data/dice";
-import { fusionTarget } from "@/data/dice/fusion";
-import { MODULE_BY_ID } from "@/data/modules";
-import { moduleTags } from "@/data/modules/types";
-import { SHIP_BY_ID } from "@/data/ships";
-import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { keeperLinesFor } from "@/data/narrative/keeperLines";
-import {
-  bayPrice,
-  FUSION_COST,
-  MK_TOP,
-  mkUpgradeCost,
-  moduleSellValue,
-} from "@/game/economy/prices";
-import { sellModule } from "@/game/run/inventory";
-import { rarityColor } from "@/app/rarity";
-import { TagChips } from "@/components/TagChips";
-import { noteFusion, noteMkTop } from "@/game/meta/counters";
 import { useBackGuard } from "@/app/backGuard";
-import { autosaveRun, completeNode } from "@/game/run/flow";
-import { playSfx } from "@/services/audio";
-import { haptic } from "@/services/tma";
+import { completeNode } from "@/game/run/flow";
 import { createStream, deriveSeed } from "@/services/rng";
-import { useMetaStore } from "@/stores/metaStore";
-import {
-  runBayPurchasable,
-  runModuleSlots,
-  useRunStore,
-} from "@/stores/runStore";
-import type { SlotId } from "@/types/battle";
-import styles from "./ShipyardScreen.module.css";
+import { useRunStore } from "@/stores/runStore";
+import { BaysSection } from "./BaysSection";
+import { ForgeSheet } from "./ForgeSheet";
+import { RepairSection } from "./RepairSection";
+import { SystemsSection } from "./SystemsSection";
 
 export const ShipyardScreen = () => {
   const { t } = useTranslation(["run", "battle", "content"]);
   const scrap = useRunStore((s) => s.scrap);
   const hull = useRunStore((s) => s.hull);
   const hullMax = useRunStore((s) => s.hullMax);
-  const mkLevels = useRunStore((s) => s.mkLevels);
-  const deck = useRunStore((s) => s.deck);
-  const shipId = useRunStore((s) => s.shipId);
-  const shipyardDiscount = useRunStore((s) => s.shipyardDiscount);
   const vouchers = useRunStore((s) => s.vouchers);
-  const modules = useRunStore((s) => s.modules);
-  const sector = useRunStore((s) => s.sector);
-  const bays = useRunStore(runModuleSlots);
   const seed = useRunStore((s) => s.seed);
   const position = useRunStore((s) => s.position);
   const flags = useRunStore((s) => s.flags);
-  const engravings = useMetaStore((s) => s.engravings);
-  const [repair, setRepair] = useState(0);
-  const [swept, setSwept] = useState<{ slotId: SlotId; key: number } | null>(
-    null,
-  );
-  const sweepKey = useRef(0);
+  const [forgeOpen, setForgeOpen] = useState(false);
 
   const greeting = createStream(
     deriveSeed(seed, `keeper:${position ?? "yard"}`),
   ).pick(keeperLinesFor("shipyard", flags));
 
-  const discountedMk = (target: Exclude<MkLevel, 1>): number =>
-    Math.max(1, mkUpgradeCost(target) - shipyardDiscount);
-
-  const ship = SHIP_BY_ID.get(shipId);
-  const slotIds = useMemo(
-    () => (ship ? (Object.keys(ship.slots) as SlotId[]) : []),
-    [ship],
-  );
-
-  const fusable = useMemo(() => {
-    const groups = new Map<string, number>();
-    for (const die of deck) {
-      if (fusionTarget(die.defId) !== undefined) {
-        groups.set(die.defId, (groups.get(die.defId) ?? 0) + 1);
-      }
-    }
-    return [...groups.entries()].filter(([, count]) => count >= 2);
-  }, [deck]);
-
-  const maxRepair = Math.min(hullMax - hull, Math.floor(scrap / 2));
-
-  const bayCost = bayPrice(sector);
-  const canBuyBay = useRunStore(runBayPurchasable);
-
-  const buyBay = (): void => {
-    const state = useRunStore.getState();
-    if (state.scrap < bayCost) return;
-    if (!state.spendScrap(bayCost)) return;
-    state.purchaseBay();
-    playSfx("buy");
-    playSfx("mkSweep");
-    haptic("purchase");
-    autosaveRun();
-  };
-
-  const demount = (moduleId: string): void => {
-    if (!sellModule(moduleId)) return;
-    playSfx("buy");
-    haptic("purchase");
-    autosaveRun();
-  };
-
-  const markUpgraded = (slotId: SlotId): void => {
-    if ((useRunStore.getState().mkLevels[slotId] ?? 1) >= MK_TOP) noteMkTop();
-    playSfx("buy");
-    playSfx("mkSweep");
-    haptic("purchase");
-    setSwept({ slotId, key: sweepKey.current + 1 });
-    sweepKey.current += 1;
-  };
-
-  const buyMk = (slotId: SlotId): void => {
-    const state = useRunStore.getState();
-    const current = state.mkLevels[slotId] ?? 1;
-    if (current >= 3) return;
-    const target = (current + 1) as Exclude<MkLevel, 1>;
-    const cost = Math.max(1, mkUpgradeCost(target) - state.shipyardDiscount);
-    if (state.scrap < cost) return;
-    if (!state.spendScrap(cost)) return;
-    state.bumpMk(slotId);
-    if (state.shipyardDiscount > 0) useRunStore.setState({ shipyardDiscount: 0 });
-    markUpgraded(slotId);
-    autosaveRun();
-  };
-
-  const redeemVoucher = (slotId: SlotId): void => {
-    const state = useRunStore.getState();
-    if ((state.mkLevels[slotId] ?? 1) >= 3) return;
-    if (!state.spendVoucher()) return;
-    state.bumpMk(slotId);
-    markUpgraded(slotId);
-    autosaveRun();
-  };
-
-  const fuse = (defId: string): void => {
-    const state = useRunStore.getState();
-    const target = fusionTarget(defId);
-    if (target === undefined || state.scrap < FUSION_COST) return;
-    const [first, second] = state.deck.filter((d) => d.defId === defId);
-    if (first === undefined || second === undefined) return;
-    if (!state.spendScrap(FUSION_COST)) return;
-    state.removeDie(first.uid);
-    state.removeDie(second.uid);
-    state.addDie(target);
-    noteFusion();
-    autosaveRun();
-  };
-
   const leave = (): void => {
     completeNode({ outcome: "cleared" });
   };
 
-  useBackGuard("shipyard", leave);
-
-  const doRepair = (): void => {
-    const state = useRunStore.getState();
-    if (repair <= 0 || state.scrap < repair * 2) return;
-    if (!state.spendScrap(repair * 2)) return;
-    state.healHull(repair);
-    autosaveRun();
-    setRepair(0);
+  const closeForge = (): void => {
+    setForgeOpen(false);
   };
 
-  return (
-    <Screen
-      width="wide"
-      header={
-        <AppHeader
-          actions={
-            <>
-              <Text size="sm" c={tokens.amber}>
-                {t("run:shipyard.scrap", { n: scrap })}
-              </Text>
-              <Text size="sm" c={tokens.dim}>
-                {t("run:shipyard.hull", { cur: hull, max: hullMax })}
-              </Text>
-            </>
-          }
-        />
+  useBackGuard("shipyard", forgeOpen ? closeForge : leave);
+
+  const header = (
+    <AppHeader
+      actions={
+        <>
+          <Text size="sm" c={tokens.amber}>
+            {t("run:shipyard.scrap", { n: scrap })}
+          </Text>
+          <Text size="sm" c={tokens.dim}>
+            {t("run:shipyard.hull", { cur: hull, max: hullMax })}
+          </Text>
+        </>
       }
-      footer={
-        <Button
-          size="md"
-          fullWidth
-          data-testid="shipyard-leave"
-          onClick={leave}
-        >
-          {t("run:shipyard.leave")}
-        </Button>
-      }
+    />
+  );
+
+  const footer = (
+    <Button
+      size="md"
+      fullWidth
+      data-testid="shipyard-leave"
+      onClick={leave}
     >
+      {t("run:shipyard.leave")}
+    </Button>
+  );
+
+  return (
+    <Screen width="wide" header={header} footer={footer}>
       <Stack gap="sm">
-      <Text size="xs" c={tokens.dim} fs="italic">
-        {t(greeting.text)}
-      </Text>
-
-      {vouchers > 0 ? (
-        <Text size="xs" c={tokens.accent}>
-          {t("run:shipyard.voucher", { n: vouchers })}
+        <Text size="xs" c={tokens.dim} fs="italic">
+          {t(greeting.text)}
         </Text>
-      ) : null}
 
-      <Divider color={tokens.line} label={t("run:shipyard.systems")} />
-        <Stack gap={6}>
-          {slotIds.map((slotId) => {
-            const mk = mkLevels[slotId] ?? 1;
-            const maxed = mk >= 3;
-            const target = maxed ? 3 : ((mk + 1) as Exclude<MkLevel, 1>);
-            const cost = maxed ? 0 : discountedMk(target);
-            return (
-              <Paper
-                key={slotId}
-                bg={tokens.surface1}
-                p="xs"
-                radius="md"
-                withBorder
-                className={styles.slot}
-              >
-                {swept?.slotId === slotId ? (
-                  <span key={swept.key} className={styles.sweep} />
-                ) : null}
-                <Group justify="space-between" wrap="nowrap">
-                  <Stack gap={0}>
-                    <Text size="sm" c={tokens.text}>
-                      {t(`battle:slot.${slotId}`)}
-                    </Text>
-                    <TapPopover
-                      label={t("battle:slot.cap", {
-                        cap: slotCapForMk(slotId, mk),
-                        mk,
-                      })}
-                      testId={`shipyard-mk-${slotId}`}
-                      align="start"
-                      content={t("battle:mkWhy")}
-                    >
-                      <Text size="xs" c={tokens.faint}>
-                        {t("battle:slot.cap", {
-                          cap: slotCapForMk(slotId, mk),
-                          mk,
-                        })}
-                      </Text>
-                    </TapPopover>
-                  </Stack>
-                  <Group gap={6} wrap="nowrap">
-                    {vouchers > 0 && !maxed ? (
-                      <Button
-                        size="compact-sm"
-                        variant="light"
-                        color="accent"
-                        onClick={() => {
-                          redeemVoucher(slotId);
-                        }}
-                      >
-                        {t("run:shipyard.voucherUse")}
-                      </Button>
-                    ) : null}
-                    <Button
-                      size="compact-sm"
-                      disabled={maxed || scrap < cost}
-                      onClick={() => {
-                        buyMk(slotId);
-                      }}
-                    >
-                      {maxed
-                        ? t("run:shipyard.mkMax")
-                        : t("run:shipyard.mk", { mk: target, cost })}
-                    </Button>
-                  </Group>
-                </Group>
-              </Paper>
-            );
-          })}
-        </Stack>
-
-      <Divider
-        color={tokens.line}
-        label={t("run:shipyard.baysTitle", { used: modules.length, max: bays })}
-      />
-      <Stack gap={6}>
-        {modules.map((moduleId) => {
-          const def = MODULE_BY_ID.get(moduleId);
-          if (def === undefined) return null;
-          return (
-            <Paper
-              key={moduleId}
-              bg={tokens.surface1}
-              p="xs"
-              radius="md"
-              withBorder
-              data-yard-module={moduleId}
-              style={{ borderLeftColor: rarityColor(def.rarity) }}
-            >
-              <Stack gap={6}>
-                <Text size="sm" c={tokens.text}>
-                  {t(def.name)}
-                </Text>
-                <Text size="xs" c={tokens.dim}>
-                  {t(def.desc)}
-                </Text>
-                <TagChips tags={moduleTags(def)} />
-                <Button
-                  size="compact-sm"
-                  variant="light"
-                  color="gray"
-                  data-testid={`yard-demount-${moduleId}`}
-                  onClick={() => {
-                    demount(moduleId);
-                  }}
-                >
-                  {t("run:shipyard.demount", {
-                    n: moduleSellValue(def.price),
-                  })}
-                </Button>
-              </Stack>
-            </Paper>
-          );
-        })}
-        {modules.length === 0 ? (
-          <Text size="xs" c={tokens.faint}>
-            {t("run:shipyard.baysEmpty")}
+        {vouchers > 0 ? (
+          <Text size="xs" c={tokens.accent}>
+            {t("run:shipyard.voucher", { n: vouchers })}
           </Text>
         ) : null}
-        {canBuyBay ? (
-          <Button
-            variant="default"
-            disabled={scrap < bayCost}
-            data-testid="yard-buy-bay"
-            onClick={buyBay}
-          >
-            {t("run:shipyard.buyBay", { n: bayCost })}
-          </Button>
-        ) : (
-          <Text size="xs" c={tokens.faint} data-yard-bay-locked>
-            {t("run:shipyard.bayDone")}
-          </Text>
-        )}
-      </Stack>
 
-      <Divider color={tokens.line} label={t("run:shipyard.fusionTitle")} />
-      {fusable.length === 0 ? (
-        <Text size="xs" c={tokens.faint}>
-          {t("run:shipyard.fusionHint")}
-        </Text>
-      ) : (
-        <Group gap="sm" align="stretch" wrap="wrap">
-          {fusable.map(([defId]) => {
-            const def = DIE_BY_ID.get(defId);
-            const target = fusionTarget(defId);
-            const targetDef = target === undefined ? undefined : DIE_BY_ID.get(target);
-            if (def === undefined || targetDef === undefined) return null;
-            return (
-              <Paper
-                key={defId}
-                bg={tokens.surface1}
-                p="xs"
-                radius="md"
-                withBorder
-                className={styles.fusePair}
-                data-fusion-pair={defId}
-              >
-                <DieCard defId={defId} engravings={engravings} />
-                <span className={styles.fuseArrow}>→</span>
-                <DieCard defId={targetDef.id} engravings={engravings} />
-                <Button
-                  size="compact-sm"
-                  variant="light"
-                  fullWidth
-                  disabled={scrap < FUSION_COST}
-                  data-testid={`fuse-${defId}`}
-                  onClick={() => {
-                    fuse(defId);
-                  }}
-                >
-                  {t("run:shipyard.fuse", { n: FUSION_COST })}
-                </Button>
-              </Paper>
-            );
-          })}
-        </Group>
-      )}
+        <SystemsSection />
 
-      <Divider color={tokens.line} label={t("run:shipyard.repair")} />
-      <Text size="xs" c={tokens.faint}>
-        {t("run:shipyard.repairHint")}
-      </Text>
-      <Slider
-        min={0}
-        max={Math.max(0, maxRepair)}
-        value={Math.min(repair, Math.max(0, maxRepair))}
-        onChange={setRepair}
-        disabled={maxRepair <= 0}
-        label={(v) => `+${String(v)} · ${String(v * 2)}`}
-      />
-      <Button
-        variant="default"
-        disabled={repair <= 0 || repair > maxRepair}
-        onClick={doRepair}
-      >
-        {`${t("run:shipyard.repair")} +${String(repair)} (${String(repair * 2)})`}
-      </Button>
+        <BaysSection />
+
+        <Divider color={tokens.line} label={t("run:shipyard.forgeTitle")} />
+        <ForgeSheet open={forgeOpen} onOpenChange={setForgeOpen} />
+
+        <RepairSection />
       </Stack>
     </Screen>
   );

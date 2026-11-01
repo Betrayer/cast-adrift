@@ -8,6 +8,7 @@ import {
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { debugRequested } from "@/app/debug";
 import { tokens } from "@/app/theme";
 import { boardUid } from "@/game/run/boards";
 import { isoWeekKey, utcDateKey } from "@/game/run/modes";
@@ -25,6 +26,7 @@ import {
 import { Screen } from "@/app/Screen";
 import { riseStyle } from "@/app/motion";
 import { AppHeader } from "@/components/AppHeader";
+import { TabPanel } from "@/components/TabPanel";
 import { useScreenParam } from "@/app/useScreenParam";
 
 const TABS = ["daily", "drift", "week"] as const;
@@ -46,16 +48,11 @@ interface LoadedBoard {
   offline: boolean;
 }
 
-const debugBoards = (): boolean => {
-  if (typeof window === "undefined") return false;
-  return new URLSearchParams(window.location.search).get("debug") === "1";
-};
-
 export const LeaderboardScreen = () => {
   const { t } = useTranslation(["meta", "common"]);
   const [tab, setTab] = useScreenParam<Tab>("tab", TABS, "drift");
   const [view, setView] = useState<View>("top");
-  const [showFlagged] = useState(debugBoards);
+  const [showFlagged] = useState(debugRequested);
   const [now] = useState(() => Date.now());
   const [loaded, setLoaded] = useState<LoadedBoard | null>(null);
 
@@ -148,7 +145,7 @@ export const LeaderboardScreen = () => {
         </>
       }
     >
-      <>
+      <TabPanel id={tab}>
         {rows === null ? (
           <Group justify="center" py="xl">
             <Loader size="sm" color="accent" />
@@ -213,7 +210,7 @@ export const LeaderboardScreen = () => {
             })}
           </Stack>
         )}
-      </>
+      </TabPanel>
     </Screen>
   );
 };

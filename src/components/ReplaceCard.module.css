@@ -49,7 +49,10 @@
   cursor: pointer;
   color: inherit;
   font: inherit;
-  transition: background 120ms ease;
+  transition:
+    background 120ms var(--ca-ease-out),
+    transform var(--ca-press-ms) var(--ca-ease-out),
+    filter var(--ca-press-ms) var(--ca-ease-out);
 }
 
 .row:hover,

@@ -1,7 +1,7 @@
 import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
 import type { HoleSpot } from "@/game/map/types";
-import { SPOT_UNIT, type SpotEllipse } from "./spot";
+import { SPOT_UNIT, type SpotEllipse, type SpotHorizon } from "./spot";
 import styles from "./SpotOverlay.module.css";
 
 export const SPOT_WASH_ID = "caSpotWash";
@@ -63,9 +63,17 @@ interface Props {
   reduced: boolean;
   label: string;
   onOpen: (() => void) | null;
+  horizons: readonly SpotHorizon[];
 }
 
-export const SpotOverlay = ({ spot, ellipse, reduced, label, onOpen }: Props) => {
+export const SpotOverlay = ({
+  spot,
+  ellipse,
+  reduced,
+  label,
+  onOpen,
+  horizons,
+}: Props) => {
   const disc = `translate(${String(ellipse.cx)} ${String(ellipse.cy)}) scale(${String(
     ellipse.rx / SPOT_UNIT,
   )} ${String(ellipse.ry / SPOT_UNIT)})`;
@@ -88,6 +96,22 @@ export const SpotOverlay = ({ spot, ellipse, reduced, label, onOpen }: Props) =>
         ry={ellipse.ry}
         fill={`url(#${SPOT_WASH_ID})`}
       />
+      {horizons.map((line) => (
+        <line
+          key={line.side}
+          data-spot-horizon={line.side}
+          className={styles.horizon ?? ""}
+          x1={line.x1}
+          x2={line.x2}
+          y1={line.y}
+          y2={line.y}
+          stroke={schools.black.text}
+          strokeWidth={1.6}
+          strokeDasharray="2 6"
+          strokeLinecap="round"
+          opacity={0.7}
+        />
+      ))}
       <g transform={disc}>
         {RINGS.map((ring) => (
           <circle

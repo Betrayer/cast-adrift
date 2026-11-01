@@ -3,13 +3,24 @@ import { useTranslation } from "react-i18next";
 import { AppModal } from "@/components/AppModal";
 import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
-import { GENTLE_BUDGET, MAX_BUDGET } from "@/game/map/wormhole";
-import { bypassCopyKey, type BypassOffer } from "./spot";
+import {
+  GENTLE_RIDES,
+  isGentleRide,
+  MAX_EXTRA_ROWS,
+  MAX_LANE_SHIFT,
+} from "@/game/map/wormhole";
+import {
+  bypassCopyKey,
+  bypassCopyVars,
+  bypassState,
+  bypassTollMark,
+  type BypassOffer,
+} from "./spot";
 import styles from "./WormholeChoice.module.css";
 
 interface Props {
   offer: BypassOffer;
-  gentle: boolean;
+  rides: number;
   softLand: boolean;
   softLandSpent: boolean;
   onBypass: () => void;
@@ -19,7 +30,7 @@ interface Props {
 
 export const WormholeChoice = ({
   offer,
-  gentle,
+  rides,
   softLand,
   softLandSpent,
   onBypass,
@@ -27,6 +38,8 @@ export const WormholeChoice = ({
   onSoftLand,
 }: Props) => {
   const { t } = useTranslation(["run", "common"]);
+  const gentle = isGentleRide(rides);
+  const state = bypassState(offer);
   return (
     <AppModal
       label={t("run:hole.title")}
@@ -47,7 +60,10 @@ export const WormholeChoice = ({
       {gentle ? (
         <div className={styles.gentle} data-testid="wormhole-gentle">
           <Text size="xs" fw={700} c={schools.blue.text}>
-            {t("run:hole.gentle")}
+            {t("run:hole.gentle", {
+              n: Math.min(GENTLE_RIDES, rides + 1),
+              max: GENTLE_RIDES,
+            })}
           </Text>
           <Text size="xs" c={tokens.dim}>
             {t("run:hole.gentleWhy")}
@@ -59,22 +75,21 @@ export const WormholeChoice = ({
           <Button
             fullWidth
             variant="default"
-            disabled={!offer.offered}
+            disabled={state !== "cost"}
             data-testid="wormhole-bypass"
+            data-lethal={offer.lethal ? "1" : "0"}
             onClick={onBypass}
           >
             {t("run:hole.bypass")}
           </Button>
           <Text
             size="xs"
-            c={
-              offer.offered && offer.toll > 0 ? schools.red.text : tokens.faint
-            }
+            c={state === "cost" ? schools.red.text : tokens.faint}
             ta="center"
             data-testid="wormhole-toll"
-            data-toll={String(offer.offered ? offer.toll : -1)}
+            data-toll={bypassTollMark(offer)}
           >
-            {t(bypassCopyKey(offer), { n: offer.toll })}
+            {t(bypassCopyKey(offer), bypassCopyVars(offer))}
           </Text>
         </div>
         <div className={styles.option}>
@@ -87,8 +102,12 @@ export const WormholeChoice = ({
           </Button>
           <Text size="xs" c={schools.black.text} ta="center">
             {gentle
-              ? t("run:hole.rideGentle", { min: 1, max: GENTLE_BUDGET })
-              : t("run:hole.rideCost", { min: 1, max: MAX_BUDGET })}
+              ? t("run:hole.rideGentle")
+              : t("run:hole.rideChaotic", {
+                  min: 1,
+                  max: MAX_EXTRA_ROWS + 1,
+                  lanes: MAX_LANE_SHIFT,
+                })}
           </Text>
         </div>
         {softLand ? (

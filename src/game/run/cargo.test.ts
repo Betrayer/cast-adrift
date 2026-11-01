@@ -318,7 +318,7 @@ describe("the re-anchor", () => {
     expect(feedKeys()).toContain("run:cargo.moved");
   });
 
-  it("moves the mark on a bypass slip", () => {
+  it("moves the mark on a bypass across the band", () => {
     seatAtHole();
     const stranded = must(
       strandedStation(hole.map, hole.record.from),

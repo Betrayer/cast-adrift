@@ -1,4 +1,5 @@
-import type { EchoNodeId } from "@/data/echo";
+import { forgeOptions } from "@/game/dice/forge";
+import { forgeInRun } from "@/game/run/forge";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk } from "@/data/slots";
 import {
@@ -11,25 +12,15 @@ import {
   type SlotProjection,
   type TurnForecast,
 } from "@/game/battle/view";
-import { ALL_COACH_MARK_IDS, HINT_IDS, nextCoachMark } from "@/game/tutorial";
-import {
-  areConnected,
-  edgeKey,
-  nodeById,
-  type NodeId,
-  type SpotId,
-} from "@/game/map/types";
-import {
-  budgetCapFor,
-  canBypass,
-  isGentleRide,
-  landingCandidates,
-  type ThrowDirection,
-  type WormholeThrow,
-} from "@/game/map/wormhole";
+import { nextCoachMark } from "@/game/tutorial";
+import type { NodeId } from "@/game/map/types";
+import { isGentleRide, type WormholeThrow } from "@/game/map/wormhole";
 import { clearSfxLog, recentSfx, type SfxCall } from "@/services/audio";
-import { holeTollFor, holeTollWaived } from "@/game/run/motifs";
-import { pointsSpent, pointsTotal } from "@/game/chart/engine";
+import {
+  bypassLethal,
+  bypassPctFor,
+  holeTollFor,
+} from "@/game/run/motifs";
 import { ACHIEVEMENTS } from "@/data/achievements";
 import { settleLifetimeAchievements } from "@/game/meta/achievements";
 import {
@@ -39,7 +30,6 @@ import {
   vignetteRims,
   type VignetteFlashKind,
   type VignetteRimKind,
-  type VignetteRims,
   type VignetteSide,
 } from "@/services/vignette";
 import {
@@ -48,9 +38,7 @@ import {
   setChaosSource,
   type ChaosScript,
 } from "@/services/chaos";
-import { lastClaimOutcome } from "@/services/account";
 import { trackedEvents } from "@/services/analytics";
-import { readClaim } from "@/services/account-link";
 import i18n from "i18next";
 import { captainName } from "@/game/run/boards";
 import { dieCardModel, evLabel } from "@/game/dice/card";
@@ -58,369 +46,106 @@ import {
   advanceSector,
   discardActiveRun,
   jumpTo,
-  openWormhole,
-  rideWormhole,
   startRunMode,
 } from "@/game/run/flow";
 import { isoWeekKey } from "@/game/run/modes";
-import { weatherIn } from "@/game/run/weather";
-import { totalXpForLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
+import { ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { DRIFT_ALLTIME_BOARD, submit, top } from "@/services/leaderboards";
 import { profileSummary, readMetaDocFromServer } from "@/services/metaDoc";
 import { now as clockNow, setClockSource } from "@/services/clock";
-import { activeUid, deviceKeys, scopedKey } from "@/services/profile";
-import { profileSwitches } from "@/services/profileSwitch";
-import { battleLayoutId, chooseBattleLayout } from "@/services/prefs";
+import { activeUid } from "@/services/profile";
+import {
+  chooseBattleLayout,
+  chooseChartLayout,
+  chooseRollStyle,
+} from "@/services/prefs";
+import {
+  readChartBackdrop,
+  type ChartBackdropStats,
+} from "@/screens/Chart/backdropStats";
 import { createStreams } from "@/services/rng";
 import { clearRun } from "@/services/save";
 import { seedStackFor, startTargetFor } from "@/services/start-param";
-import { canGoBack, useAppStore } from "@/stores/appStore";
+import { useAppStore } from "@/stores/appStore";
 import {
   battleSnapshot,
-  echoActiveSpent,
   hydrateBattle,
   useBattleStore,
-  type BattleSaveState,
 } from "@/stores/battleStore";
 import { useLootStore } from "@/stores/lootStore";
-import { useMetaStore, type MetaStats } from "@/stores/metaStore";
-import {
-  useNarrativeStore,
-  type FeedSource,
-} from "@/stores/narrativeStore";
-import { coreLocked } from "@/game/battle/damage";
+import { useMetaStore } from "@/stores/metaStore";
+import { useNarrativeStore } from "@/stores/narrativeStore";
 import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
-import { cargoRowsLeft } from "@/game/run/cargo";
 import type { JournalEntry } from "@/game/run/journal";
 import {
-  runModuleSlots,
   useRunStore,
   type BattleTally,
-  type MkLevels,
-  type PendingSwap,
-  type RunMode,
+  type PendingRewards,
 } from "@/stores/runStore";
-import {
-  grantCargo,
-  grantDie,
-  grantModule,
-  grantOfficer,
-} from "@/game/run/inventory";
-import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
+import type { SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
-import { battleAnchors, type BattleAnchors } from "@/pixi/battle/anchors";
+import { battleAnchors, dieAtClient, type BattleAnchors } from "@/pixi/battle/anchors";
 import { capturedTarget, draggedDie } from "@/pixi/battle/dragState";
 import { readFrames, readPerf, type PerfSnapshot } from "@/pixi/perf";
-import type { BattleLayoutId, ScreenId } from "@/types";
+import { faceOf } from "@/dice3d/faceLog";
+import type { BattleLayoutId, ChartLayoutId, RollStyle, ScreenId } from "@/types";
 import type { SlotId } from "@/types/battle";
-import type { Intent } from "@/types/content";
+import type {
+  AccountView,
+  AchievementsView,
+  BattlePatch,
+  CargoHoldView,
+  CloudMetaView,
+  DieCardView,
+  FeedView,
+  HoleBandView,
+  HoleSpotView,
+  InsetProfile,
+  JournalView,
+  MapNodeView,
+  MetaPatch,
+  RideOutcome,
+  RunPatch,
+  SeedRunConfig,
+  ShipCardView,
+  SummaryPatch,
+  TestState,
+  VignetteView,
+  WormholeEdgeView,
+  WormholeView,
+} from "@/services/testApiTypes";
+import { readAccount, readState } from "@/services/testApiState";
+import { applyMeta, applyRun, applySettings } from "@/services/testApiPatches";
+import { mapProbes } from "@/services/testApiMap";
 
-export interface SeedRunConfig {
-  mode?: RunMode;
-  seed?: number;
-  ascension?: number;
-  contractId?: string | null;
-  dailyDate?: string | null;
-  mutators?: readonly string[];
-  ship?: ShipId;
-  deck?: readonly string[];
-  land?: "interstitial" | "map";
-  node?: NodeId;
-  sector?: number;
-}
+export type {
+  SeedRunConfig,
+  RunPatch,
+  BattlePatch,
+  DieCardView,
+  ShipCardView,
+  MapNodeView,
+  WormholeEdgeView,
+  InsetProfile,
+  AchievementsView,
+  VignetteView,
+  WormholeView,
+  FeedView,
+  JournalView,
+  AccountView,
+  CloudMetaView,
+  TestState,
+  CargoHoldView,
+} from "@/services/testApiTypes";
 
-export interface MetaPatch {
-  level?: number;
-  shards?: number;
-  unlocks?: readonly string[];
-  ships?: readonly ShipId[];
-  selectedShip?: ShipId;
-  themes?: readonly string[];
-  deck?: readonly string[];
-  chartPicks?: readonly string[];
-  chartFreeRespecs?: number;
-  collection?: readonly { defId: string; count?: number }[];
-  codex?: readonly string[];
-  achievements?: readonly string[];
-  prologueDone?: boolean;
-  systemsCheckDone?: boolean;
-  tutorialSeen?: "all" | readonly string[];
-  stats?: Partial<MetaStats>;
-  echo?: EchoNodeId | null;
-}
-
-export interface RunPatch {
-  scrap?: number;
-  hull?: number;
-  vouchers?: number;
-  dice?: readonly string[];
-  perks?: readonly string[];
-  modules?: readonly string[];
-  flags?: readonly string[];
-  officers?: readonly string[];
-  cargo?: readonly string[];
-  echo?: EchoNodeId | null;
-  visited?: readonly NodeId[];
-  wormholeRides?: number;
-  usedMinibosses?: readonly string[];
-}
-
-export interface BattlePatch {
-  enemyIds?: readonly string[];
-  deck?: readonly string[];
-  shipId?: ShipId;
-  seed?: number;
-  hull?: number;
-  hullMax?: number;
-  tide?: number;
-  interference?: number;
-  perks?: readonly string[];
-  modules?: readonly string[];
-  mkLevels?: MkLevels;
-  chargeCap?: number;
-  startCharge?: number;
-  ascension?: number;
-  inverted?: boolean;
-  officers?: readonly string[];
-  echo?: EchoNodeId;
-  snapshot?: BattleSaveState;
-}
-
-export interface DieCardView {
-  defId: string;
-  tier: number;
-  school: string;
-  rarity: string;
-  pts: number;
-  faces: string;
-  custom: boolean;
-  ev: string;
-  badges: string[];
-  features: string[];
-}
-
-export interface ShipCardView {
-  shipId: string;
-  hull: number;
-  slots: string[];
-  caps: number[];
-  passive: string | null;
-  hasPassiveText: boolean;
-}
-
-export interface MapNodeView {
-  id: NodeId;
-  type: string;
-  row: number;
-  lane: number;
-  visited: boolean;
-  reachable: boolean;
-  hole: boolean;
-  spot: SpotId | null;
-  wormhole: boolean;
-  bypass: NodeId | null;
-}
-
-export interface WormholeEdgeView {
-  from: NodeId;
-  hole: NodeId;
-  bypass: NodeId;
-}
-
-export type RideOutcome = "landed" | "fatal" | "refused";
-
-export interface HoleSpotView {
-  id: SpotId;
-  nodes: NodeId[];
-  entries: string[];
-}
-
-export interface AchievementsView {
-  total: number;
-  earned: string[];
-  unseen: number;
-  vouchers: number;
-  offers: string[];
-}
-
-export interface VignetteView {
-  last: VignetteFlashKind | null;
-  seq: number;
-  rims: VignetteRims;
-}
-
-export interface WormholeView {
-  pending: NodeId | null;
-  rides: number;
-  bypassed: number;
-  gentle: boolean;
-  budgetCap: number;
-  toll: number;
-  mocked: boolean;
-  last: WormholeThrow | null;
-}
-
-export interface FeedView {
-  id: number;
-  source: FeedSource;
-  key: string;
-  journalId: number | null;
-  compressed: boolean;
-}
-
-export interface JournalView {
-  id: number;
-  kind: JournalEntry["k"];
-  sector: number;
-  line: string | null;
-}
-
-export interface DieView {
-  uid: string;
-  defId: string;
-  school: string;
-  value: number;
-  tier: number;
-  state: string;
-  slot: SlotId | null;
-  temp: boolean;
-}
-
-export interface AccountView {
-  uid: string | null;
-  isAnonymous: boolean;
-  providers: string[];
-  email: string | null;
-  namespace: string;
-  activeUid: string | null;
-  switches: number;
-  authError: string | null;
-  authBusy: boolean;
-  claimOutcome: string | null;
-  claimSource: string | null;
-  merge: {
-    sourceUid: string;
-    targetUid: string;
-    recommended: string;
-    sourceLevel: number;
-    targetLevel: number;
-  } | null;
-  keys: string[];
-}
-
-export interface CloudMetaView {
-  updatedAt: number;
-  level: number;
-  shards: number;
-  runs: number;
-  linkedFrom: string | null;
-}
-
-export interface TestState {
-  screen: ScreenId;
-  layout: BattleLayoutId;
-  params: Record<string, string> | null;
-  uid: string | null;
-  nav: {
-    stack: { screen: ScreenId; params: Record<string, string> | null }[];
-    canBack: boolean;
-    systemMenu: boolean;
-    echoCore: boolean;
-  };
-  run: {
-    active: boolean;
-    mode: RunMode;
-    seed: number;
-    sector: number;
-    position: NodeId | null;
-    hull: number;
-    hullMax: number;
-    scrap: number;
-    deck: string[];
-    modules: string[];
-    bays: number;
-    baysPurchased: number;
-    pendingSwaps: PendingSwap[];
-    visited: NodeId[];
-    mutators: string[];
-    weather: string | null;
-    salvage: string[];
-    officers: string[];
-    cargo: string[];
-    sectorReveal: number;
-    shipyardDiscount: number;
-    echo: string | null;
-    echoUsed: boolean;
-  };
-  battle: {
-    phase: string;
-    turn: number;
-    hull: number;
-    charge: number;
-    outcome: string | null;
-    shipId: ShipId;
-    passiveUsed: boolean;
-    nextWeapons: number;
-    echo: string | null;
-    echoSpent: boolean;
-    selectedDieUid: string | null;
-    dice: DieView[];
-    slots: { id: SlotId; dieUid: string | null }[];
-    enemies: {
-      id: string;
-      defId: string;
-      hp: number;
-      hpMax: number;
-      shield: number;
-      vulnerable: number;
-      coreLocked: boolean;
-      parts: {
-        id: string;
-        key: string;
-        hp: number;
-        hpMax: number;
-        alive: boolean;
-        intent: Intent | null;
-      }[];
-    }[];
-    evasion: { dodgePct: number; glancingPct: number; intercept: boolean } | null;
-    freeNudges: number;
-    lastBlock: string | null;
-    check: {
-      stepId: string;
-      stepIndex: number;
-      stepCount: number;
-      moves: { uid: string; slot: SlotId }[] | null;
-      sandbox: boolean;
-    } | null;
-    sensorBeats: { vulnerable: number; pierce: number }[];
-    attackBeats: {
-      amount: number;
-      hullDamage: number;
-      dodged: number;
-      glanced: number;
-    }[];
-  };
-  meta: {
-    level: number;
-    xp: number;
-    shards: number;
-    selectedShip: ShipId;
-    tutorialSeen: string[];
-    systemsCheckDone: boolean;
-    chartPicks: string[];
-    chartPointsSpent: number;
-    chartPointsTotal: number;
-    chartFreeRespecs: number;
-  };
-}
-
-export interface CargoHoldView {
-  defId: string;
-  nodeId: NodeId;
-  sectorIndex: number;
-  rows: number;
-}
+const TG_INSET_VARS = [
+  ["--tg-viewport-safe-area-inset-top", "top"],
+  ["--tg-viewport-safe-area-inset-bottom", "bottom"],
+  ["--tg-viewport-safe-area-inset-left", "left"],
+  ["--tg-viewport-safe-area-inset-right", "right"],
+  ["--tg-viewport-content-safe-area-inset-top", "contentTop"],
+  ["--tg-viewport-content-safe-area-inset-bottom", "contentBottom"],
+] as const;
 
 export interface TestApi {
   seedRun: (config?: SeedRunConfig) => void;
@@ -434,7 +159,8 @@ export interface TestApi {
   deliveryApproach: (nodeId: NodeId) => NodeId | null;
   holes: () => WormholeEdgeView[];
   spots: () => HoleSpotView[];
-  landings: (budget: number, direction: ThrowDirection) => NodeId[];
+  band: () => HoleBandView | null;
+  landings: (hole: NodeId) => NodeId[];
   ride: (holeId: NodeId) => WormholeThrow | null;
   rideOutcome: (holeId: NodeId) => RideOutcome;
   wormhole: () => WormholeView;
@@ -446,8 +172,16 @@ export interface TestApi {
   vignetteRim: (kind: VignetteRimKind, on: boolean) => void;
   dropLoot: (defId: string | null) => void;
   summaryFinds: (defIds: readonly string[], shards: number) => void;
+  rewards: (bundle: PendingRewards, options?: { tally?: BattleTally | null }) => void;
+  summary: (patch: SummaryPatch) => void;
+  insets: (profile: InsetProfile | null) => void;
   settings: (patch: Partial<SettingsValues>) => void;
   layout: (id: BattleLayoutId) => void;
+  chartLayout: (id: ChartLayoutId) => void;
+  chartBackdrop: () => ChartBackdropStats;
+  dieFace: (uid: string) => number | null;
+  rollStyle: (id: RollStyle) => void;
+  forge: (a: string, b: string, signature: string) => boolean;
   forecast: () => TurnForecast | null;
   projection: (slotId: SlotId) => SlotProjection | null;
   now: (at?: number | null) => number;
@@ -474,6 +208,7 @@ export interface TestApi {
   skipCheck: () => void;
   restartCheckStep: () => void;
   anchors: () => BattleAnchors | null;
+  dieAt: (clientX: number, clientY: number) => string | null;
   drag: () => { uid: string | null; captured: string | null };
   frames: () => number;
   perf: () => PerfSnapshot;
@@ -531,264 +266,6 @@ const STARTER_ENEMY = "raider";
 const DEFAULT_SEED = 7;
 const BOARD_PROBE_DEPTH = 60;
 
-const applyMeta = (patch: MetaPatch): void => {
-  const meta = useMetaStore.getState();
-  for (const id of patch.ships ?? []) meta.buyShip(id, 0);
-  if (patch.selectedShip !== undefined) {
-    meta.buyShip(patch.selectedShip, 0);
-    meta.selectShip(patch.selectedShip);
-  }
-  if (patch.shards !== undefined) {
-    const delta = patch.shards - useMetaStore.getState().shards;
-    if (delta > 0) meta.addShards(delta);
-    else if (delta < 0) meta.spendShards(-delta);
-  }
-  if (patch.level !== undefined) {
-    const target = totalXpForLevel(patch.level);
-    const delta = target - useMetaStore.getState().xp;
-    if (delta > 0) {
-      meta.awardRun(delta, 0, false);
-      meta.bumpLifetime({ runs: -1 });
-    }
-  }
-  for (const id of patch.unlocks ?? []) meta.grantUnlock(id);
-  for (const id of patch.themes ?? []) meta.unlockTheme(id);
-  for (const id of patch.chartPicks ?? []) meta.allocatePick(id);
-  for (let i = 0; i < (patch.chartFreeRespecs ?? 0); i += 1) {
-    meta.grantChartRespec();
-  }
-  for (const id of patch.codex ?? []) meta.unlockCodex(id);
-  for (const id of patch.achievements ?? []) meta.unlockAchievement(id);
-  for (const entry of patch.collection ?? []) {
-    meta.addToCollection(entry.defId, entry.count ?? 1);
-  }
-  if (patch.deck !== undefined) meta.setDeck(patch.deck);
-  if (patch.prologueDone === true) meta.markPrologueDone();
-  if (patch.systemsCheckDone === true) meta.markSystemsCheckDone();
-  if (patch.tutorialSeen !== undefined) {
-    const ids =
-      patch.tutorialSeen === "all"
-        ? [...ALL_COACH_MARK_IDS, ...HINT_IDS]
-        : patch.tutorialSeen;
-    for (const id of ids) meta.markTutorialSeen(id);
-  }
-  if (patch.stats !== undefined) meta.bumpLifetime(patch.stats);
-  if (patch.echo !== undefined) meta.selectEcho(patch.echo);
-};
-
-const applyRun = (patch: RunPatch): void => {
-  const run = useRunStore.getState();
-  if (patch.scrap !== undefined) {
-    const delta = patch.scrap - useRunStore.getState().scrap;
-    if (delta > 0) run.addScrap(delta);
-    else if (delta < 0) run.spendScrap(-delta);
-  }
-  if (patch.hull !== undefined) run.setHull(patch.hull);
-  if (patch.vouchers !== undefined) run.addVoucher(patch.vouchers);
-  for (const defId of patch.dice ?? []) grantDie(defId);
-  for (const id of patch.perks ?? []) run.addPerk(id);
-  for (const id of patch.modules ?? []) grantModule(id);
-  for (const key of patch.flags ?? []) run.setFlag(key);
-  for (const id of patch.officers ?? []) grantOfficer(id);
-  for (const id of patch.cargo ?? []) grantCargo(id);
-  if (patch.visited !== undefined) {
-    useRunStore.setState({ visited: [...patch.visited] });
-  }
-  if (patch.wormholeRides !== undefined) {
-    useRunStore.setState((s) => ({
-      stats: { ...s.stats, wormholeRides: patch.wormholeRides ?? 0 },
-    }));
-  }
-  for (const defId of patch.usedMinibosses ?? []) run.markMinibossUsed(defId);
-  if (patch.echo !== undefined) {
-    useRunStore.setState({ echo: patch.echo, echoUsed: false });
-  }
-};
-
-const applySettings = (patch: Partial<SettingsValues>): void => {
-  const settings = useSettingsStore.getState();
-  if (patch.locale !== undefined) settings.setLocale(patch.locale);
-  if (patch.sfxVol !== undefined) settings.setSfxVol(patch.sfxVol);
-  if (patch.musicVol !== undefined) settings.setMusicVol(patch.musicVol);
-  if (patch.reducedMotion !== undefined) {
-    settings.setReducedMotion(patch.reducedMotion);
-  }
-  if (patch.echoVerbosity !== undefined) {
-    settings.setEchoVerbosity(patch.echoVerbosity);
-  }
-  if (patch.screenShake !== undefined) settings.setScreenShake(patch.screenShake);
-  if (patch.vignette !== undefined) settings.setVignette(patch.vignette);
-  if (patch.theme !== undefined) settings.setTheme(patch.theme);
-  if (patch.fontScale !== undefined) settings.setFontScale(patch.fontScale);
-  if (patch.battleSpeed !== undefined) settings.setBattleSpeed(patch.battleSpeed);
-  if (patch.skipTally !== undefined) settings.setSkipTally(patch.skipTally);
-  if (patch.battleLayout !== undefined) chooseBattleLayout(patch.battleLayout);
-};
-
-const readState = (): TestState => {
-  const app = useAppStore.getState();
-  const run = useRunStore.getState();
-  const battle = useBattleStore.getState();
-  const meta = useMetaStore.getState();
-  const checkStep = battle.checkSteps?.[battle.checkIndex];
-  return {
-    screen: app.screen,
-    layout: battleLayoutId(),
-    params: app.params ?? null,
-    uid: app.uid,
-    nav: {
-      stack: app.stack.map((entry) => ({
-        screen: entry.screen,
-        params: entry.params ?? null,
-      })),
-      canBack: canGoBack(app),
-      systemMenu: app.systemMenu,
-      echoCore: app.echoCore,
-    },
-    run: {
-      active: run.active,
-      mode: run.mode,
-      seed: run.seed,
-      sector: run.sector,
-      position: run.position,
-      hull: run.hull,
-      hullMax: run.hullMax,
-      scrap: run.scrap,
-      deck: run.deck.map((d) => d.defId),
-      modules: [...run.modules],
-      bays: runModuleSlots(run),
-      baysPurchased: run.baysPurchased,
-      pendingSwaps: run.pendingSwaps.map((swap) => ({ ...swap })),
-      visited: [...run.visited],
-      mutators: [...run.mutators],
-      weather: weatherIn(run.mutators)?.id ?? null,
-      salvage: [...(run.pendingRewards?.salvage ?? [])],
-      officers: [...run.officers],
-      cargo: run.cargo.map((entry) => entry.defId),
-      sectorReveal: run.sectorReveal,
-      shipyardDiscount: run.shipyardDiscount,
-      echo: run.echo,
-      echoUsed: run.echoUsed,
-    },
-    battle: {
-      phase: battle.phase,
-      turn: battle.turn,
-      hull: battle.hull,
-      charge: battle.charge,
-      outcome: battle.outcome ?? null,
-      shipId: battle.shipId,
-      passiveUsed: battle.passiveUsed,
-      nextWeapons: battle.nextTurnMods.weapons ?? 0,
-      echo: battle.echo ?? null,
-      echoSpent: echoActiveSpent(battle),
-      selectedDieUid: battle.selectedDieUid,
-      dice: battle.dice.map((d) => ({
-        uid: d.uid,
-        defId: d.defId,
-        school: d.school,
-        value: d.value,
-        tier: d.tier,
-        state: d.state,
-        slot: d.slot ?? null,
-        temp: d.temp === true,
-      })),
-      slots: Object.entries(battle.slots).map(([id, slot]) => ({
-        id: id as SlotId,
-        dieUid: slot?.dieUid ?? null,
-      })),
-      enemies: battle.enemies.map((e) => ({
-        id: e.id,
-        defId: e.defId,
-        hp: e.hp,
-        hpMax: e.hpMax,
-        shield: e.shield,
-        vulnerable: e.statuses.mark ?? 0,
-        coreLocked: coreLocked(battleSnapshot(battle), e),
-        parts: e.subsystems.map((part) => ({
-          id: part.id,
-          key: part.key,
-          hp: part.hp,
-          hpMax: part.hpMax,
-          alive: part.hp > 0,
-          intent: part.nextIntent ?? null,
-        })),
-      })),
-      evasion: battle.evasion,
-      freeNudges: battle.freeNudges,
-      lastBlock: battle.lastBlock?.key ?? null,
-      check: checkStep === undefined
-        ? null
-        : {
-            stepId: checkStep.id,
-            stepIndex: battle.checkIndex,
-            stepCount: battle.checkSteps?.length ?? 0,
-            moves:
-              checkStep.moves == null
-                ? null
-                : checkStep.moves.map((m) => ({ uid: m.uid, slot: m.slot })),
-            sandbox: battle.checkSandbox,
-          },
-      sensorBeats: battle.beats
-        .filter((b) => b.kind === "sensor" && b.sensor !== undefined)
-        .map((b) => ({
-          vulnerable: b.sensor?.vulnerable ?? 0,
-          pierce: b.sensor?.pierce ?? 0,
-        })),
-      attackBeats: battle.enemyBeats
-        .filter((b) => b.kind === "attack")
-        .map((b) => ({
-          amount: b.amount,
-          hullDamage: b.hullDamage,
-          dodged: b.dodged ?? 0,
-          glanced: b.glanced ?? 0,
-        })),
-    },
-    meta: {
-      level: meta.level,
-      xp: meta.xp,
-      shards: meta.shards,
-      selectedShip: meta.selectedShip,
-      tutorialSeen: [...meta.tutorialSeen],
-      systemsCheckDone: meta.stats.systemsCheckDone,
-      chartPicks: [...meta.chartPicks],
-      chartPointsSpent: pointsSpent(meta.chartPicks),
-      chartPointsTotal: pointsTotal(meta.level),
-      chartFreeRespecs: meta.chartFreeRespecs,
-    },
-  };
-};
-
-const readAccount = (): AccountView => {
-  const app = useAppStore.getState();
-  const merge = app.merge;
-  return {
-    uid: app.uid,
-    isAnonymous: app.account?.isAnonymous ?? true,
-    providers: [...(app.account?.providers ?? [])],
-    email: app.account?.email ?? null,
-    namespace: scopedKey("meta"),
-    activeUid: activeUid(),
-    switches: profileSwitches(),
-    authError: app.authError,
-    authBusy: app.authBusy,
-    claimOutcome: lastClaimOutcome(),
-    claimSource: readClaim()?.sourceUid ?? null,
-    merge:
-      merge === null
-        ? null
-        : {
-            sourceUid: merge.sourceUid,
-            targetUid: merge.targetUid,
-            recommended: merge.recommended,
-            sourceLevel: merge.source.level,
-            targetLevel: merge.target.level,
-          },
-    keys: deviceKeys()
-      .filter((key) => key.startsWith("ca."))
-      .sort(),
-  };
-};
-
 export const createTestApi = (): TestApi => ({
   seedRun: (config = {}) => {
     const meta = useMetaStore.getState();
@@ -830,8 +307,7 @@ export const createTestApi = (): TestApi => ({
     for (const [slotId, mk] of Object.entries(patch.mkLevels ?? {})) {
       if (mk !== undefined) run.setMk(slotId as SlotId, mk);
     }
-    const deck =
-      patch.deck ?? (run.deck.length > 0 ? run.deck.map((d) => d.defId) : null);
+    const deck = patch.deck ?? (run.deck.length > 0 ? run.deck : null);
     if (deck === null) return;
     useBattleStore.getState().reset();
     useBattleStore.getState().startBattle(
@@ -860,6 +336,8 @@ export const createTestApi = (): TestApi => ({
       deck,
       createStreams(patch.seed ?? DEFAULT_SEED),
     );
+    if (patch.shield !== undefined) useBattleStore.setState({ shield: patch.shield });
+    if (patch.scrap !== undefined) useBattleStore.setState({ scrap: patch.scrap });
     useAppStore.getState().go("battle");
   },
 
@@ -872,6 +350,22 @@ export const createTestApi = (): TestApi => ({
   settings: applySettings,
 
   layout: chooseBattleLayout,
+  chartLayout: chooseChartLayout,
+  chartBackdrop: () => readChartBackdrop(),
+  dieFace: faceOf,
+  rollStyle: chooseRollStyle,
+  forge: (a, b, signature) => {
+    const deck = useRunStore.getState().deck;
+    const first = deck.find((die) => die.uid === a);
+    const second = deck.find((die) => die.uid === b);
+    if (first === undefined || second === undefined) return false;
+    const option = forgeOptions(first, second).find((candidate) =>
+      candidate.kind === "recipe"
+        ? signature === "recipe"
+        : candidate.signature === signature,
+    );
+    return option === undefined ? false : forgeInRun(option);
+  },
 
   forecast: () => {
     const battle = useBattleStore.getState();
@@ -925,6 +419,7 @@ export const createTestApi = (): TestApi => ({
       key: message.key,
       journalId: message.journalId,
       compressed: index > 0,
+      shownMs: message.shownMs,
     })),
 
   journal: () =>
@@ -949,135 +444,19 @@ export const createTestApi = (): TestApi => ({
     clearSfxLog();
   },
 
-  mapNodes: () => {
-    const run = useRunStore.getState();
-    const map = run.map;
-    if (map === null) return [];
-    const outgoing = new Set(
-      map.edges
-        .filter(([a]) => a === run.position)
-        .map(([, b]) => b),
-    );
-    return map.nodes.map((node) => {
-      const record =
-        run.position === null
-          ? undefined
-          : map.wormholes[edgeKey(run.position, node.id)];
-      return {
-        id: node.id,
-        type: node.type,
-        row: node.row,
-        lane: node.lane,
-        visited: run.visited.includes(node.id),
-        reachable: outgoing.has(node.id) && !run.visited.includes(node.id),
-        hole: node.hole === true,
-        spot: node.spot ?? null,
-        wormhole: record !== undefined,
-        bypass: record?.bypass ?? null,
-      };
-    });
-  },
-
-  standAt: (nodeId) => {
-    const run = useRunStore.getState();
-    const node = run.map === null ? undefined : nodeById(run.map).get(nodeId);
-    if (node === undefined) return false;
-    useRunStore.setState({
-      position: nodeId,
-      depthRow: node.row,
-      pendingWormhole: null,
-    });
-    useAppStore.getState().go("map");
-    return true;
-  },
-
-  cargo: () => {
-    const run = useRunStore.getState();
-    if (run.map === null) return [];
-    const map = run.map;
-    const row =
-      run.position === null
-        ? run.depthRow
-        : (nodeById(map).get(run.position)?.row ?? run.depthRow);
-    return run.cargo.map((entry) => ({
-      defId: entry.defId,
-      nodeId: entry.nodeId,
-      sectorIndex: entry.sectorIndex,
-      rows: cargoRowsLeft(map, entry, row),
-    }));
-  },
-
-  deliveryApproach: (nodeId) => {
-    const run = useRunStore.getState();
-    if (run.map === null) return null;
-    const map = run.map;
-    const from = map.nodes.find(
-      (node) =>
-        !run.visited.includes(node.id) &&
-        node.hole !== true &&
-        areConnected(map, node.id, nodeId),
-    );
-    return from?.id ?? null;
-  },
-
-  holes: () => {
-    const map = useRunStore.getState().map;
-    if (map === null) return [];
-    return Object.values(map.wormholes).map((record) => ({ ...record }));
-  },
-
-  spots: () => {
-    const map = useRunStore.getState().map;
-    if (map === null) return [];
-    return map.spots.map((spot) => ({
-      id: spot.id,
-      nodes: [...spot.nodes],
-      entries: Object.entries(map.wormholes)
-        .filter(([, record]) => spot.nodes.includes(record.hole))
-        .map(([key]) => key),
-    }));
-  },
-
-  landings: (budget, direction) => {
-    const run = useRunStore.getState();
-    if (run.map === null || run.position === null) return [];
-    return landingCandidates(
-      run.map,
-      run.position,
-      run.visited,
-      budget,
-      direction,
-    ).map((node) => node.id);
-  },
-
-  ride: (holeId) => {
-    openWormhole(holeId);
-    const ride = rideWormhole(holeId, false);
-    return ride === null || ride.kind === "fatal" ? null : ride.throw;
-  },
-
-  rideOutcome: (holeId) => {
-    openWormhole(holeId);
-    const ride = rideWormhole(holeId, false);
-    return ride === null ? "refused" : ride.kind;
-  },
+  ...mapProbes(),
 
   wormhole: () => {
     const run = useRunStore.getState();
-    const hole = run.pendingWormhole;
-    const waived =
-      run.map !== null &&
-      run.position !== null &&
-      hole !== null &&
-      canBypass(run.map, run.position, hole, run.visited) &&
-      holeTollWaived(run.map, run.position, hole, run.visited);
+    const toll = holeTollFor(run.sector, run.hullMax);
     return {
       pending: run.pendingWormhole,
       rides: run.stats.wormholeRides,
       bypassed: run.stats.holesBypassed,
       gentle: isGentleRide(run.stats.wormholeRides),
-      budgetCap: budgetCapFor(run.stats.wormholeRides),
-      toll: waived ? 0 : holeTollFor(run.sector, run.hull),
+      toll,
+      pct: bypassPctFor(run.sector),
+      lethal: bypassLethal(run.hull, toll),
       mocked: chaosMocked(),
       last: run.lastWormhole === null ? null : { ...run.lastWormhole },
     };
@@ -1122,6 +501,36 @@ export const createTestApi = (): TestApi => ({
   dropLoot: (defId) => {
     if (defId === null) useLootStore.getState().clear();
     else useLootStore.getState().drop(defId);
+  },
+
+  rewards: (bundle, options) => {
+    const run = useRunStore.getState();
+    run.setPendingRewards(null);
+    run.setPendingRewards({ ...bundle });
+    useRunStore.setState({ lastTally: options?.tally ?? null });
+    useAppStore.getState().go("rewards");
+  },
+
+  insets: (profile) => {
+    const style = document.documentElement.style;
+    for (const [variable, field] of TG_INSET_VARS) {
+      const value = profile?.[field];
+      if (value === undefined || profile === null) style.removeProperty(variable);
+      else style.setProperty(variable, `${String(value)}px`);
+    }
+    window.dispatchEvent(new Event("resize"));
+  },
+
+  summary: (patch) => {
+    const store = useSummaryStore.getState();
+    if (patch.result !== undefined) {
+      store.setResult({ ...(store.result ?? EMPTY_RUN_RESULT), ...patch.result });
+    }
+    const run = useRunStore.getState();
+    useRunStore.setState({
+      ...(patch.run ?? {}),
+      stats: { ...run.stats, ...(patch.stats ?? {}) },
+    });
   },
 
   summaryFinds: (defIds, shards) => {
@@ -1217,6 +626,8 @@ export const createTestApi = (): TestApi => ({
   },
 
   anchors: () => battleAnchors(),
+
+  dieAt: (clientX, clientY) => dieAtClient(clientX, clientY),
 
   drag: () => ({ uid: draggedDie(), captured: capturedTarget() }),
 

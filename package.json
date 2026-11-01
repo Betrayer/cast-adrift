@@ -16,6 +16,7 @@
     "sim": "tsx scripts/sim.mts",
     "sim:smoke": "tsx scripts/sim.mts --enemy raider --runs 100 --seed 7",
     "lint:content": "tsx scripts/contentLint.mts",
+    "motion:audit": "tsx scripts/motionAudit.ts",
     "lint:roadmap": "tsx scripts/roadmapLint.mts",
     "sim:sweep": "tsx scripts/sim.mts --mode sweep --runs 500 --seed 11",
     "sim:ladder": "tsx scripts/sim.mts --mode ladder --runs 600 --seed 11",
@@ -43,7 +44,10 @@
     "e2e:serve": "vite preview --host 127.0.0.1 --port 4173 --strictPort",
     "e2e:emu": "npx -y firebase-tools@14 emulators:exec --only auth,firestore --project cast-adrift-e2e \"playwright test -c playwright.emu.config.ts\"",
     "e2e:emu:auth": "npx -y firebase-tools@14 emulators:exec --only auth --project cast-adrift-e2e \"playwright test -c playwright.emu.config.ts --grep-invert @firestore\"",
-    "test:rules": "npx -y firebase-tools@14 emulators:exec --only auth,firestore --project cast-adrift-rules \"vitest run --config vitest.rules.config.ts\""
+    "test:rules": "npx -y firebase-tools@14 emulators:exec --only auth,firestore --project cast-adrift-rules \"vitest run --config vitest.rules.config.ts\"",
+    "landing:render": "tsx scripts/renderLanding.mts",
+    "chart:budget": "tsx scripts/chartBudget.mts",
+    "layout:sheet": "tsx scripts/layoutSheet.mts"
   },
   "dependencies": {
     "@mantine/core": "^9.4.1",

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import type { MilestoneCard } from "@/data/milestones";
 import type { ScoreBreakdown } from "@/game/run/modes";
 import type { ShardBreakdown } from "@/game/xp";
 import type { RunMode } from "@/stores/runStore";
@@ -21,7 +22,7 @@ export interface RunResult {
   toLevel: number;
   win: boolean;
   cause: DeathCause | null;
-  milestones: string[];
+  milestones: readonly MilestoneCard[];
   mode: RunMode;
   score: ScoreBreakdown | null;
   contractId: string | null;

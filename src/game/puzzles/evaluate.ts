@@ -72,12 +72,6 @@ export const dieIsLocked = (
   turnIndex: number,
 ): boolean => dieIndex < lockedCountForTurn(puzzle, turnIndex);
 
-export const resolveFaces = (defId: string, tier: DieTier): number[] => {
-  const faces = DIE_BY_ID.get(defId)?.faces;
-  if (faces !== undefined && faces.length > 0) return [...faces];
-  return Array.from({ length: tier }, (_, i) => i + 1);
-};
-
 const capFor = (puzzle: PuzzleDef, slot: SlotId): number =>
   slotCapForMk(slot, puzzle.mk?.[slot] ?? 1);
 

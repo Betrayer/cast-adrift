@@ -2,6 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
+    <script>
+      (function () {
+        var hash = location.hash || '';
+        var search = location.search || '';
+        var fromTelegram =
+          hash.indexOf('tgWebAppData=') >= 0 ||
+          hash.indexOf('tgWebAppPlatform=') >= 0 ||
+          search.indexOf('tgWebAppStartParam=') >= 0;
+        if (fromTelegram) location.replace('/play' + search + hash);
+      })();
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <title>Cast Adrift — a dice-built salvage run through a dead sector</title>
     <meta
@@ -35,14 +46,11 @@
     <style>
       :root {
         --bg: #0b0f1a;
-        --surface1: #10182a;
-        --surface2: #182238;
         --line: #2a3853;
         --text: #e8edf7;
         --dim: #9aa8c0;
         --faint: #6c7c99;
         --accent: #7c5cff;
-        --amber: #e8b23a;
         --sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
           'Helvetica Neue', Arial, sans-serif;
       }
@@ -53,384 +61,1012 @@
 
       html {
         color-scheme: dark;
+        height: 100%;
       }
 
       body {
         margin: 0;
-        background: var(--bg);
+        min-height: 100%;
+        background: #070a12;
         color: var(--text);
         font-family: var(--sans);
-        line-height: 1.55;
+        line-height: 1.5;
         -webkit-font-smoothing: antialiased;
+        overflow: hidden;
       }
 
-      .wrap {
-        max-width: 980px;
-        margin: 0 auto;
-        padding: 0 20px;
-      }
-
-      header {
+      .scene {
+        position: relative;
+        min-height: 100svh;
         display: flex;
+        flex-direction: column;
         align-items: center;
-        justify-content: space-between;
-        gap: 16px;
-        padding: 20px 0;
+        text-align: center;
+        overflow: hidden;
+        padding: calc(64px + env(safe-area-inset-top)) 22px
+          calc(28px + env(safe-area-inset-bottom));
+        background: var(--bg);
       }
 
-      .brand {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        font-weight: 700;
-        letter-spacing: 0.2px;
+      .scene canvas {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
       }
 
-      .brand img {
-        width: 34px;
-        height: 34px;
+      canvas.dice {
+        z-index: 1;
+      }
+
+      .neb {
+        position: absolute;
+        inset: -20%;
+        background: radial-gradient(
+            ellipse at 25% 20%,
+            rgba(124, 92, 255, 0.3),
+            transparent 45%
+          ),
+          radial-gradient(
+            ellipse at 80% 75%,
+            rgba(74, 144, 226, 0.22),
+            transparent 45%
+          ),
+          radial-gradient(
+            ellipse at 60% 40%,
+            rgba(228, 87, 78, 0.1),
+            transparent 40%
+          );
+        animation: nebDrift 24s ease-in-out infinite alternate;
+      }
+
+      @keyframes nebDrift {
+        from {
+          transform: translate(-2%, -1%) rotate(0);
+        }
+        to {
+          transform: translate(2%, 2%) rotate(2deg);
+        }
+      }
+
+      .vign {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse at 50% 62%,
+          transparent 45%,
+          rgba(7, 10, 18, 0.85) 100%
+        );
+        z-index: 2;
+        pointer-events: none;
+      }
+
+      .ship {
+        position: absolute;
+        width: 150px;
+        height: 56px;
+        z-index: 1;
+        left: -170px;
+        opacity: 0.95;
+        will-change: transform;
+        pointer-events: none;
+      }
+
+      .ship img {
         display: block;
+        width: 150px;
+        height: 56px;
+      }
+
+      .ship span {
+        position: absolute;
+        top: -13px;
+        left: 40px;
+        font-size: 9px;
+        letter-spacing: 1.5px;
+        color: var(--faint);
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+
+      .ship.ltr {
+        animation: flyR var(--fd, 9s) linear 1 forwards;
+      }
+
+      .ship.rtl {
+        animation: flyL var(--fd, 9s) linear 1 forwards;
+      }
+
+      @keyframes flyR {
+        0% {
+          transform: translateX(0) rotate(-3deg);
+        }
+        50% {
+          transform: translateX(calc(50vw + 85px)) translateY(-10px) rotate(2deg);
+        }
+        100% {
+          transform: translateX(calc(100vw + 180px)) rotate(-3deg);
+        }
+      }
+
+      @keyframes flyL {
+        0% {
+          transform: translateX(calc(100vw + 180px)) scaleX(-1) rotate(3deg);
+        }
+        50% {
+          transform: translateX(calc(50vw + 85px)) translateY(-10px) scaleX(-1)
+            rotate(-2deg);
+        }
+        100% {
+          transform: translateX(0) scaleX(-1) rotate(3deg);
+        }
+      }
+
+      .fg {
+        position: relative;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: auto;
+        min-height: 300px;
+        justify-content: flex-end;
       }
 
       .langs {
+        position: absolute;
+        top: calc(14px + env(safe-area-inset-top));
+        right: 14px;
         display: flex;
         gap: 4px;
+        z-index: 5;
       }
 
       .langs button {
         appearance: none;
-        border: 1px solid var(--line);
-        background: var(--surface1);
-        color: var(--dim);
         font: inherit;
-        font-size: 13px;
-        padding: 5px 10px;
-        border-radius: 8px;
+        font-size: 11px;
+        font-weight: 600;
+        padding: 4px 8px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        color: var(--dim);
+        background: rgba(16, 24, 42, 0.7);
         cursor: pointer;
       }
 
       .langs button[aria-pressed='true'] {
-        color: var(--text);
+        color: #fff;
         border-color: var(--accent);
+        background: rgba(124, 92, 255, 0.25);
       }
 
-      .hero {
-        position: relative;
-        padding: 48px 0 40px;
-        text-align: center;
-        overflow: hidden;
+      .langs button:focus-visible,
+      .btn:focus-visible,
+      .legal a:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
       }
 
-      .hero::before {
-        content: '';
-        position: absolute;
-        inset: -40% 10% auto 10%;
-        height: 420px;
-        background: radial-gradient(
-          closest-side,
-          rgba(124, 92, 255, 0.28),
-          rgba(124, 92, 255, 0)
-        );
-        pointer-events: none;
+      .title {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: 4px;
+        margin: 10px 0 4px;
+        text-transform: uppercase;
+        text-shadow: 0 2px 24px rgba(124, 92, 255, 0.35);
       }
 
-      h1 {
-        position: relative;
-        margin: 0 0 10px;
-        font-size: clamp(38px, 8vw, 68px);
-        line-height: 1.05;
-        letter-spacing: -1.2px;
-      }
-
-      .hook {
-        position: relative;
-        margin: 0 auto 26px;
-        max-width: 640px;
-        font-size: clamp(17px, 3.4vw, 22px);
+      .tag {
         color: var(--dim);
+        font-size: 14px;
+        margin: 0 0 20px;
+        max-width: 320px;
       }
 
       .cta {
-        position: relative;
         display: flex;
-        flex-wrap: wrap;
-        gap: 12px;
-        justify-content: center;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        max-width: 340px;
       }
 
       .btn {
-        display: inline-block;
-        padding: 13px 24px;
-        border-radius: 12px;
-        font-weight: 650;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        height: 52px;
+        border-radius: 14px;
+        font-weight: 700;
         font-size: 16px;
         text-decoration: none;
+        color: #fff;
         border: 1px solid transparent;
+        cursor: pointer;
       }
 
-      .btn-primary {
-        background: var(--accent);
-        color: #0b0f1a;
+      .btn.web {
+        background: linear-gradient(180deg, #8d70ff, #6a4be6);
+        box-shadow: 0 8px 24px rgba(124, 92, 255, 0.35),
+          inset 0 1px 0 rgba(255, 255, 255, 0.2);
       }
 
-      .btn-secondary {
-        background: var(--surface1);
-        border-color: var(--line);
-        color: var(--text);
+      .btn.tg {
+        background: rgba(42, 171, 238, 0.12);
+        border-color: rgba(42, 171, 238, 0.6);
+        color: #bfe6ff;
       }
 
-      .shots {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        padding: 8px 0 44px;
+      .btn svg {
+        width: 20px;
+        height: 20px;
+        flex: 0 0 auto;
       }
 
-      .shots figure {
-        margin: 0;
-      }
-
-      .shots img {
-        width: 100%;
-        height: auto;
-        display: block;
-        border-radius: 14px;
-        border: 1px solid var(--line);
-        background: var(--surface1);
-      }
-
-      .shots figcaption {
-        margin-top: 8px;
-        font-size: 13px;
+      .trust {
         color: var(--faint);
-        text-align: center;
-      }
-
-      .features {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        padding-bottom: 48px;
-      }
-
-      .card {
-        background: var(--surface1);
-        border: 1px solid var(--line);
-        border-radius: 14px;
-        padding: 18px;
-      }
-
-      .card h2 {
-        margin: 0 0 6px;
-        font-size: 17px;
-      }
-
-      .card p {
-        margin: 0;
-        color: var(--dim);
-        font-size: 15px;
-      }
-
-      .facts {
+        font-size: 11.5px;
+        margin: 14px 0 0;
         display: flex;
+        gap: 12px;
         flex-wrap: wrap;
-        gap: 8px 18px;
         justify-content: center;
-        padding-bottom: 44px;
+      }
+
+      .trust span::before {
+        content: '✓ ';
+        color: #8fe07a;
+      }
+
+      .legal {
         color: var(--faint);
-        font-size: 14px;
+        font-size: 11px;
+        margin: 10px 0 0;
       }
 
-      .facts b {
-        color: var(--amber);
-        font-weight: 650;
-      }
-
-      footer {
-        border-top: 1px solid var(--line);
-        padding: 22px 0 40px;
+      .legal a {
         color: var(--faint);
-        font-size: 13px;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 6px 18px;
-        justify-content: space-between;
       }
 
-      footer a {
-        color: var(--dim);
-      }
+      @media (min-width: 700px) {
+        .scene {
+          flex-direction: row;
+          text-align: left;
+          padding: 60px 80px;
+          align-items: center;
+          justify-content: space-between;
+        }
 
-      @media (max-width: 720px) {
-        .shots,
-        .features {
-          grid-template-columns: 1fr;
+        .fg {
+          margin: 0;
+          align-items: flex-start;
+          max-width: 520px;
+        }
+
+        .tag {
+          max-width: 460px;
+        }
+
+        .cta {
+          flex-direction: row;
+          max-width: none;
+        }
+
+        .btn {
+          padding: 0 26px;
+        }
+
+        .trust {
+          justify-content: flex-start;
         }
       }
 
       @media (prefers-reduced-motion: reduce) {
-        * {
+        .neb,
+        .ship {
           animation: none !important;
-          transition: none !important;
         }
       }
     </style>
   </head>
-  <body>
-    <div class="wrap">
-      <header>
-        <div class="brand">
-          <img src="/brand/mark.svg" width="34" height="34" alt="" />
-          <span>Cast Adrift</span>
-        </div>
-        <nav class="langs" aria-label="Language">
-          <button type="button" data-lang="en" aria-pressed="true">EN</button>
-          <button type="button" data-lang="uk" aria-pressed="false">UK</button>
-          <button type="button" data-lang="ru" aria-pressed="false">RU</button>
-        </nav>
-      </header>
 
-      <section class="hero">
-        <h1>Cast Adrift</h1>
-        <p class="hook" data-t="hook">
-          Build a hand out of dice. Break through a dead sector.
+  <body>
+    <div class="scene" id="scene">
+      <div class="neb" aria-hidden="true"></div>
+      <canvas class="bg" aria-hidden="true"></canvas>
+      <canvas class="dice" aria-hidden="true"></canvas>
+      <div class="vign" aria-hidden="true"></div>
+
+      <nav class="langs" aria-label="Language">
+        <button type="button" data-lang="en" data-testid="landing-lang-en" aria-pressed="true">
+          EN
+        </button>
+        <button type="button" data-lang="uk" data-testid="landing-lang-uk" aria-pressed="false">
+          UK
+        </button>
+        <button type="button" data-lang="ru" data-testid="landing-lang-ru" aria-pressed="false">
+          RU
+        </button>
+      </nav>
+
+      <div class="fg">
+        <h1 class="title">Cast Adrift</h1>
+        <p class="tag" data-t="hook">
+          A dice roguelike in open space. Build a deck of dice, survive five
+          sectors, come back for the next one.
         </p>
         <div class="cta">
-          <a class="btn btn-primary" id="play-web" href="/play" data-t="playWeb">
-            Play in the browser
+          <a
+            class="btn web"
+            id="play-web"
+            href="/play"
+            data-t="playWeb"
+            data-testid="landing-play-web"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M3 12h18M12 3c3 3.5 3 14.5 0 18M12 3c-3 3.5-3 14.5 0 18" />
+            </svg>
+            <span data-t-slot>Play in the browser</span>
           </a>
           <a
-            class="btn btn-secondary"
+            class="btn tg"
             id="play-tg"
             href="https://t.me/castadrift_bot/castadrift"
             rel="noopener"
             data-t="playTg"
+            data-testid="landing-play-tg"
           >
-            Open in Telegram
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                d="M9.04 15.47 8.8 19.1c.37 0 .53-.16.72-.35l1.73-1.66 3.58 2.62c.66.36 1.13.17 1.3-.61l2.36-11.07c.21-.97-.35-1.35-.99-1.11L3.6 12.25c-.95.37-.94.9-.16 1.14l3.55 1.11 8.24-5.2c.39-.24.74-.11.45.13"
+              />
+            </svg>
+            <span data-t-slot>Open in Telegram</span>
           </a>
         </div>
-      </section>
-
-      <section class="shots">
-        <figure>
-          <img
-            src="/shots/menu.png"
-            width="390"
-            height="780"
-            alt="The Cast Adrift main menu with the captain level ring"
-            loading="lazy"
-          />
-          <figcaption data-t="shotMenu">The bridge</figcaption>
-        </figure>
-        <figure>
-          <img
-            src="/shots/battle.png"
-            width="390"
-            height="780"
-            alt="A battle: dice in the tray, ship system slots above"
-            loading="lazy"
-          />
-          <figcaption data-t="shotBattle">A resolution turn</figcaption>
-        </figure>
-        <figure>
-          <img
-            src="/shots/map.png"
-            width="390"
-            height="780"
-            alt="The sector map with branching nodes and fog"
-            loading="lazy"
-          />
-          <figcaption data-t="shotMap">The sector map</figcaption>
-        </figure>
-      </section>
-
-      <section class="features">
-        <article class="card">
-          <h2 data-t="f1t">Builds made of dice</h2>
-          <p data-t="f1b">
-            Seventy dice across seven schools, resonance sets, engravings and
-            modules. Your deck is your build.
-          </p>
-        </article>
-        <article class="card">
-          <h2 data-t="f2t">Choices that come back</h2>
-          <p data-t="f2b">
-            A hundred events with real consequences, thirty of them calling back
-            to something you did sectors ago.
-          </p>
-        </article>
-        <article class="card">
-          <h2 data-t="f3t">A 2.5-hour campaign</h2>
-          <p data-t="f3b">
-            Five sectors, five bosses, four endings — plus Drift, a daily seed
-            and fourteen contracts.
-          </p>
-        </article>
-      </section>
-
-      <p class="facts">
-        <span><b>70</b> <span data-t="factDice">dice</span></span>
-        <span><b>150</b> <span data-t="factPerks">perks</span></span>
-        <span><b>100</b> <span data-t="factEvents">events</span></span>
-        <span><b>220</b> <span data-t="factChart">star chart nodes</span></span>
-        <span><b>4</b> <span data-t="factEndings">endings</span></span>
-      </p>
-
-      <footer>
-        <span data-t="credits">Made by Bohdan Illiakov · MIT licensed</span>
-        <span>
-          <a href="/play" data-t="playWeb">Play in the browser</a>
-          ·
-          <a href="/privacy.html" data-t="privacy">Privacy</a>
-        </span>
-      </footer>
+        <p class="trust">
+          <span data-t="trustInstall">no install</span>
+          <span data-t="trustSync">progress syncs</span>
+          <span>RU · EN · UK</span>
+        </p>
+        <p class="legal">
+          <a href="/privacy.html" data-t="privacy">Privacy</a> ·
+          <span data-t="credits">Made by Bohdan Illiakov · MIT licensed</span>
+        </p>
+      </div>
     </div>
 
     <script>
       var TG_APP_URL = 'https://t.me/castadrift_bot/castadrift';
+
+      var PARAMS = new URLSearchParams(location.search);
+      var SEED = Number(PARAMS.get('seed'));
+      var STILL = PARAMS.get('still') === '1';
+
+      var rndState = Number.isFinite(SEED) && SEED > 0 ? SEED >>> 0 : 0;
+      if (rndState === 0) {
+        rndState = (new Date().getTime() ^ 0x9e3779b9) >>> 0;
+      }
+
+      function rnd() {
+        rndState = (rndState + 0x6d2b79f5) >>> 0;
+        var t = rndState;
+        t = Math.imul(t ^ (t >>> 15), t | 1);
+        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      }
+
+      var PHI = (1 + Math.sqrt(5)) / 2;
+
+      function norm(v) {
+        var l = Math.hypot(v[0], v[1], v[2]);
+        return [v[0] / l, v[1] / l, v[2] / l];
+      }
+
+      function cross(a, b) {
+        return [
+          a[1] * b[2] - a[2] * b[1],
+          a[2] * b[0] - a[0] * b[2],
+          a[0] * b[1] - a[1] * b[0],
+        ];
+      }
+
+      function dot(a, b) {
+        return a[0] * b[0] + a[1] * b[1] + a[2] * b[2];
+      }
+
+      function sub(a, b) {
+        return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
+      }
+
+      function faceSum(points, face) {
+        var s = [0, 0, 0];
+        face.forEach(function (i) {
+          s[0] += points[i][0];
+          s[1] += points[i][1];
+          s[2] += points[i][2];
+        });
+        return s;
+      }
+
+      function tetra() {
+        var v = [
+          [1, 1, 1],
+          [1, -1, -1],
+          [-1, 1, -1],
+          [-1, -1, 1],
+        ].map(norm);
+        return {
+          v: v,
+          f: [
+            [0, 1, 2],
+            [0, 3, 1],
+            [0, 2, 3],
+            [1, 3, 2],
+          ],
+        };
+      }
+
+      function cube() {
+        var v = [];
+        [-1, 1].forEach(function (x) {
+          [-1, 1].forEach(function (y) {
+            [-1, 1].forEach(function (z) {
+              v.push(norm([x, y, z]));
+            });
+          });
+        });
+        return {
+          v: v,
+          f: [
+            [0, 1, 3, 2],
+            [4, 6, 7, 5],
+            [0, 4, 5, 1],
+            [2, 3, 7, 6],
+            [0, 2, 6, 4],
+            [1, 5, 7, 3],
+          ],
+        };
+      }
+
+      function octa() {
+        var v = [
+          [1, 0, 0],
+          [-1, 0, 0],
+          [0, 1, 0],
+          [0, -1, 0],
+          [0, 0, 1],
+          [0, 0, -1],
+        ];
+        return {
+          v: v,
+          f: [
+            [0, 2, 4],
+            [2, 1, 4],
+            [1, 3, 4],
+            [3, 0, 4],
+            [2, 0, 5],
+            [1, 2, 5],
+            [3, 1, 5],
+            [0, 3, 5],
+          ],
+        };
+      }
+
+      function icosa() {
+        var v = [
+          [-1, PHI, 0],
+          [1, PHI, 0],
+          [-1, -PHI, 0],
+          [1, -PHI, 0],
+          [0, -1, PHI],
+          [0, 1, PHI],
+          [0, -1, -PHI],
+          [0, 1, -PHI],
+          [PHI, 0, -1],
+          [PHI, 0, 1],
+          [-PHI, 0, -1],
+          [-PHI, 0, 1],
+        ].map(norm);
+        var f = [
+          [0, 11, 5],
+          [0, 5, 1],
+          [0, 1, 7],
+          [0, 7, 10],
+          [0, 10, 11],
+          [1, 5, 9],
+          [5, 11, 4],
+          [11, 10, 2],
+          [10, 7, 6],
+          [7, 1, 8],
+          [3, 9, 4],
+          [3, 4, 2],
+          [3, 2, 6],
+          [3, 6, 8],
+          [3, 8, 9],
+          [4, 9, 5],
+          [2, 4, 11],
+          [6, 2, 10],
+          [8, 6, 7],
+          [9, 8, 1],
+        ];
+        return { v: v, f: f };
+      }
+
+      function trapezo() {
+        var v = [
+          [0, 1, 0],
+          [0, -1, 0],
+        ];
+        var i;
+        for (i = 0; i < 10; i++) {
+          var a = (i * Math.PI) / 5;
+          v.push(norm([Math.cos(a), i % 2 ? 0.105 : -0.105, Math.sin(a)]));
+        }
+        var f = [];
+        for (i = 0; i < 10; i++) {
+          f.push([
+            i % 2 ? 1 : 0,
+            2 + ((i + 9) % 10),
+            2 + i,
+            2 + ((i + 1) % 10),
+          ]);
+        }
+        return { v: v, f: f };
+      }
+
+      function dual(p) {
+        var v = p.f.map(function (f) {
+          return norm(faceSum(p.v, f));
+        });
+        var f = p.v.map(function (vert, vi) {
+          var ring = p.f
+            .map(function (face, fi) {
+              return face.indexOf(vi) >= 0 ? fi : -1;
+            })
+            .filter(function (i) {
+              return i >= 0;
+            });
+          var n = norm(vert);
+          var a = norm(Math.abs(n[0]) < 0.9 ? [1, 0, 0] : [0, 1, 0]);
+          var t = norm(cross(n, a));
+          var b = cross(n, t);
+          ring.sort(function (i, j) {
+            return (
+              Math.atan2(dot(v[i], b), dot(v[i], t)) -
+              Math.atan2(dot(v[j], b), dot(v[j], t))
+            );
+          });
+          return ring;
+        });
+        return { v: v, f: f };
+      }
+
+      function fixWinding(p) {
+        p.f = p.f.map(function (f) {
+          var a = p.v[f[0]];
+          var b = p.v[f[1]];
+          var c = p.v[f[2]];
+          var n = cross(sub(b, a), sub(c, a));
+          return dot(n, faceSum(p.v, f)) < 0 ? f.slice().reverse() : f;
+        });
+        return p;
+      }
+
+      var SHAPES = {
+        4: fixWinding(tetra()),
+        6: fixWinding(cube()),
+        8: fixWinding(octa()),
+        10: fixWinding(trapezo()),
+        12: fixWinding(dual(icosa())),
+        20: fixWinding(icosa()),
+      };
+
+      var SCHOOL = {
+        red: ['#E4574E', '#2B1214', '#F0A09A'],
+        blue: ['#4A90E2', '#10233A', '#9CC4F2'],
+        green: ['#6FBF4B', '#14260F', '#A8DF8E'],
+        yellow: ['#E8B23A', '#2E2412', '#F0CE7E'],
+        black: ['#B08CFF', '#171126', '#D9CBFF'],
+        grey: ['#8A93A6', '#1C2230', '#C3CBDA'],
+        prism: ['#8FD0FF', '#1E2340', '#CFEBFF'],
+      };
+
+      function rotX(v, a) {
+        var c = Math.cos(a);
+        var s = Math.sin(a);
+        return [v[0], v[1] * c - v[2] * s, v[1] * s + v[2] * c];
+      }
+
+      function rotY(v, a) {
+        var c = Math.cos(a);
+        var s = Math.sin(a);
+        return [v[0] * c + v[2] * s, v[1], -v[0] * s + v[2] * c];
+      }
+
+      function rotZ(v, a) {
+        var c = Math.cos(a);
+        var s = Math.sin(a);
+        return [v[0] * c - v[1] * s, v[0] * s + v[1] * c, v[2]];
+      }
+
+      function mix(h1, h2, t) {
+        var a = parseInt(h1.slice(1), 16);
+        var b = parseInt(h2.slice(1), 16);
+        var r = [16, 8, 0].map(function (s) {
+          return Math.round(((a >> s) & 255) * (1 - t) + ((b >> s) & 255) * t);
+        });
+        return 'rgb(' + r.join(',') + ')';
+      }
+
+      function drawDie(ctx, d, t) {
+        var sh = SHAPES[d.sides];
+        var palette = SCHOOL[d.school];
+        var stroke = palette[0];
+        var fill = palette[1];
+        var txt = palette[2];
+        var R = d.r;
+        var pts = sh.v.map(function (v) {
+          return rotZ(rotY(rotX(v, d.ax), d.ay), d.az);
+        });
+        var faces = sh.f
+          .map(function (f, i) {
+            var n = norm(
+              cross(sub(pts[f[1]], pts[f[0]]), sub(pts[f[2]], pts[f[0]])),
+            );
+            var s = faceSum(pts, f);
+            return { f: f, i: i, n: n, z: s[2] / f.length, s: s };
+          })
+          .filter(function (x) {
+            return x.n[2] > 0;
+          })
+          .sort(function (a, b) {
+            return a.z - b.z;
+          });
+
+        if (d.aura) {
+          var g = ctx.createRadialGradient(d.x, d.y, R * 0.6, d.x, d.y, R * 2.1);
+          var hue = (t * 40) % 360;
+          g.addColorStop(
+            0,
+            d.school === 'prism' ? 'hsla(' + hue + ',100%,70%,.5)' : stroke + '88',
+          );
+          g.addColorStop(1, 'rgba(0,0,0,0)');
+          ctx.fillStyle = g;
+          ctx.beginPath();
+          ctx.arc(d.x, d.y, R * 2.1, 0, 7);
+          ctx.fill();
+        }
+
+        var light = norm([-0.4, -0.6, 1]);
+        faces.forEach(function (fc) {
+          var lit = 0.35 + 0.65 * Math.max(0, dot(fc.n, light));
+          ctx.beginPath();
+          fc.f.forEach(function (vi, k) {
+            var p = pts[vi];
+            var X = d.x + p[0] * R;
+            var Y = d.y + p[1] * R;
+            if (k) ctx.lineTo(X, Y);
+            else ctx.moveTo(X, Y);
+          });
+          ctx.closePath();
+          var prism = d.school === 'prism';
+          var spin = (t * 40 + fc.i * 30) % 360;
+          ctx.fillStyle = prism
+            ? 'hsl(' + spin + ',60%,' + (18 + lit * 22) + '%)'
+            : mix(fill, stroke, lit * 0.42);
+          ctx.fill();
+          ctx.strokeStyle = prism ? 'hsl(' + spin + ',90%,75%)' : stroke;
+          ctx.lineWidth = 1.4;
+          ctx.lineJoin = 'round';
+          ctx.stroke();
+
+          var cx = fc.s[0] / fc.f.length;
+          var cy = fc.s[1] / fc.f.length;
+          var size =
+            R *
+            (fc.f.length === 3 ? 0.42 : fc.f.length === 4 ? 0.62 : 0.5) *
+            fc.n[2];
+          if (size > 4) {
+            ctx.save();
+            ctx.globalAlpha = Math.min(1, fc.n[2] * 1.4);
+            ctx.fillStyle = txt;
+            ctx.font =
+              '800 ' + size.toFixed(1) + 'px -apple-system,Segoe UI,Roboto,Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(
+              String(fc.i + 1),
+              d.x + cx * R,
+              d.y + cy * R + size * 0.06,
+            );
+            ctx.restore();
+          }
+        });
+      }
+
+      var DICE_PHONE = [
+        { sides: 20, school: 'prism', r: 40, px: 0.5, py: 0.22, aura: true },
+        { sides: 12, school: 'green', r: 28, px: 0.2, py: 0.34 },
+        { sides: 8, school: 'blue', r: 26, px: 0.8, py: 0.32 },
+        { sides: 6, school: 'red', r: 24, px: 0.24, py: 0.12 },
+        { sides: 4, school: 'yellow', r: 22, px: 0.78, py: 0.12 },
+      ];
+
+      var DICE_DESK = [
+        { sides: 20, school: 'prism', r: 54, px: 0.74, py: 0.4, aura: true },
+        { sides: 12, school: 'green', r: 38, px: 0.58, py: 0.68 },
+        { sides: 8, school: 'blue', r: 35, px: 0.9, py: 0.66 },
+        { sides: 6, school: 'red', r: 32, px: 0.62, py: 0.2 },
+        { sides: 10, school: 'grey', r: 30, px: 0.9, py: 0.22 },
+      ];
+
+      var SHIPS = ['wanderer', 'ram', 'ark', 'corsair', 'foundry', 'prism'];
+
+      var SHIP_EVERY_MS = 13000;
+      var CAST_FIRST = 3;
+      var CAST_EVERY = 15;
+      var CAST_JITTER = 2;
+      var DESK_MIN = 700;
+
+      var scene = document.getElementById('scene');
+      var bgCanvas = scene.querySelector('canvas.bg');
+      var diceCanvas = scene.querySelector('canvas.dice');
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      var still = STILL || reduced;
+
+      var view = { w: 0, h: 0, desk: false };
+      var stars = [];
+      var dice = [];
+      var parallax = { x: 0, y: 0 };
+      var raf = 0;
+      var nextCast = CAST_FIRST;
+      var lang = 'en';
+      var shipIndex = 0;
+
+      function dpr() {
+        return Math.min(window.devicePixelRatio || 1, 2);
+      }
+
+      function sizeCanvas(canvas) {
+        var ratio = dpr();
+        canvas.width = Math.round(view.w * ratio);
+        canvas.height = Math.round(view.h * ratio);
+      }
+
+      function buildStars() {
+        var count = view.desk ? 260 : 150;
+        stars = [];
+        for (var i = 0; i < count; i++) {
+          stars.push({
+            x: rnd() * view.w,
+            y: rnd() * view.h,
+            z: rnd() + 0.3,
+            o: rnd() * 6,
+          });
+        }
+      }
+
+      function buildDice() {
+        dice = (view.desk ? DICE_DESK : DICE_PHONE).map(function (d) {
+          return {
+            sides: d.sides,
+            school: d.school,
+            aura: d.aura === true,
+            r: d.r,
+            px: d.px,
+            py: d.py,
+            x: d.px * view.w,
+            y: d.py * view.h,
+            ax: rnd() * 6,
+            ay: rnd() * 6,
+            az: rnd() * 6,
+            vx: (rnd() - 0.5) * 0.06,
+            vy: (rnd() - 0.5) * 0.06,
+            wx: (rnd() - 0.5) * 0.006,
+            wy: (rnd() - 0.5) * 0.006,
+            wz: (rnd() - 0.5) * 0.004,
+          };
+        });
+      }
+
+      function cast() {
+        dice.forEach(function (d) {
+          d.vx += (rnd() - 0.5) * 3.2;
+          d.vy += (rnd() - 0.5) * 3.2;
+          d.wx += (rnd() - 0.5) * 0.5;
+          d.wy += (rnd() - 0.5) * 0.5;
+          d.wz += (rnd() - 0.5) * 0.3;
+        });
+      }
+
+      function paintStars(t) {
+        var ctx = bgCanvas.getContext('2d');
+        ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        ctx.save();
+        ctx.scale(dpr(), dpr());
+        stars.forEach(function (s) {
+          if (!still) {
+            s.y += 0.05 * s.z;
+            if (s.y > view.h) s.y = 0;
+          }
+          ctx.globalAlpha = 0.3 + 0.6 * Math.abs(Math.sin(s.o + t * 1.2));
+          ctx.fillStyle = '#dfe6f5';
+          ctx.beginPath();
+          ctx.arc(s.x, s.y, s.z, 0, 7);
+          ctx.fill();
+        });
+        ctx.restore();
+      }
+
+      function paintDice(t) {
+        var ctx = diceCanvas.getContext('2d');
+        ctx.clearRect(0, 0, diceCanvas.width, diceCanvas.height);
+        ctx.save();
+        ctx.scale(dpr(), dpr());
+        dice.forEach(function (d) {
+          if (!still) {
+            d.ax += d.wx;
+            d.ay += d.wy;
+            d.az += d.wz;
+            d.x += d.vx;
+            d.y += d.vy;
+            d.vx *= 0.985;
+            d.vy *= 0.985;
+            d.wx = d.wx * 0.975 + (rnd() - 0.5) * 0.0002;
+            d.wy *= 0.975;
+            d.wz *= 0.975;
+            if (Math.abs(d.wx) < 0.004) d.wx += (rnd() - 0.5) * 0.001;
+            d.vx += (d.px * view.w - d.x) * 0.0006;
+            d.vy += (d.py * view.h - d.y) * 0.0006;
+          }
+          drawDie(
+            ctx,
+            {
+              sides: d.sides,
+              school: d.school,
+              aura: d.aura,
+              r: d.r,
+              ax: d.ax,
+              ay: d.ay,
+              az: d.az,
+              x:
+                d.x +
+                parallax.x * d.r * 0.6 +
+                (still ? 0 : Math.sin(t * 0.7 + d.r) * 3),
+              y:
+                d.y +
+                parallax.y * d.r * 0.6 +
+                (still ? 0 : Math.cos(t * 0.5 + d.r) * 3),
+            },
+            t,
+          );
+        });
+        ctx.restore();
+      }
+
+      function frame(ms) {
+        var t = ms / 1000;
+        if (t > nextCast) {
+          nextCast = t + CAST_EVERY + (rnd() - 0.5) * 2 * CAST_JITTER;
+          cast();
+        }
+        paintStars(t);
+        paintDice(t);
+        raf = requestAnimationFrame(frame);
+      }
+
+      function repaintStill() {
+        paintStars(0);
+        paintDice(0);
+      }
+
+      function start() {
+        if (still) {
+          repaintStill();
+          return;
+        }
+        if (raf !== 0) return;
+        raf = requestAnimationFrame(frame);
+      }
+
+      function stop() {
+        if (raf === 0) return;
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+
+      function measure() {
+        var rect = scene.getBoundingClientRect();
+        var wasDesk = view.desk;
+        var first = view.w === 0;
+        view.w = Math.max(1, Math.round(rect.width));
+        view.h = Math.max(1, Math.round(rect.height));
+        view.desk = view.w >= DESK_MIN;
+        sizeCanvas(bgCanvas);
+        sizeCanvas(diceCanvas);
+        if (first || wasDesk !== view.desk) {
+          buildStars();
+          buildDice();
+          return;
+        }
+        stars.forEach(function (s) {
+          s.x = Math.min(s.x, view.w);
+          s.y = Math.min(s.y, view.h);
+        });
+        dice.forEach(function (d) {
+          d.x = d.px * view.w;
+          d.y = d.py * view.h;
+        });
+      }
+
+      var resizeTimer = 0;
+      window.addEventListener('resize', function () {
+        window.clearTimeout(resizeTimer);
+        resizeTimer = window.setTimeout(function () {
+          measure();
+          if (still) repaintStill();
+        }, 150);
+      });
+
+      document.addEventListener('visibilitychange', function () {
+        if (document.hidden) stop();
+        else start();
+      });
+
+      scene.addEventListener('pointerdown', function (event) {
+        if (still) return;
+        var target = event.target;
+        if (target && target.closest && target.closest('a,button')) return;
+        cast();
+      });
+
+      scene.addEventListener('pointermove', function (event) {
+        if (!view.desk || still) return;
+        parallax.x = event.clientX / view.w - 0.5;
+        parallax.y = event.clientY / view.h - 0.5;
+      });
+
       var STRINGS = {
         en: {},
         uk: {
-          hook: 'Збери руку з кубів. Прорвись крізь мертвий сектор.',
+          hook: 'Кубиковий роуглайк у відкритому космосі. Збери колоду кубів, виживи у п’яти секторах, повернися за наступним.',
           playWeb: 'Грати у браузері',
+          continueWeb: 'Продовжити',
           playTg: 'Відкрити в Telegram',
-          shotMenu: 'Місток',
-          shotBattle: 'Хід розрахунку',
-          shotMap: 'Карта сектора',
-          f1t: 'Білди з кубів',
-          f1b: 'Сімдесят кубів семи шкіл, резонансні сети, гравіювання та модулі. Твоя колода — це твій білд.',
-          f2t: 'Наслідки повертаються',
-          f2b: 'Сто подій зі справжніми наслідками, тридцять із них згадують те, що ти зробив сектори тому.',
-          f3t: 'Кампанія на 2,5 години',
-          f3b: "П'ять секторів, п'ять босів, чотири фінали — плюс Дрейф, щоденний сід і чотирнадцять контрактів.",
-          factDice: 'кубів',
-          factPerks: 'перків',
-          factEvents: 'подій',
-          factChart: 'вузлів зоряної карти',
-          factEndings: 'фінали',
+          trustInstall: 'без встановлення',
+          trustSync: 'прогрес синхронізується',
           credits: 'Зроблено Богданом Ілляковим · ліцензія MIT',
           privacy: 'Приватність',
+          ships: {
+            wanderer: 'Мандрівник',
+            ram: 'Таран',
+            ark: 'Ковчег',
+            corsair: 'Гончак',
+            foundry: 'Кузня',
+            prism: 'Призма',
+          },
         },
         ru: {
-          hook: 'Собери руку из кубов. Прорвись через мёртвый сектор.',
+          hook: 'Кубический рогалик в открытом космосе. Собери колоду кубов, выживи в пяти секторах, вернись за следующим.',
           playWeb: 'Играть в браузере',
+          continueWeb: 'Продолжить',
           playTg: 'Открыть в Telegram',
-          shotMenu: 'Мостик',
-          shotBattle: 'Ход расчёта',
-          shotMap: 'Карта сектора',
-          f1t: 'Билды из кубов',
-          f1b: 'Семьдесят кубов семи школ, резонансные сеты, гравировки и модули. Твоя колода — это твой билд.',
-          f2t: 'Последствия возвращаются',
-          f2b: 'Сто событий с настоящими последствиями, тридцать из них ссылаются на то, что ты сделал секторы назад.',
-          f3t: 'Кампания на 2,5 часа',
-          f3b: 'Пять секторов, пять боссов, четыре финала — плюс Дрейф, ежедневный сид и четырнадцать контрактов.',
-          factDice: 'кубов',
-          factPerks: 'перков',
-          factEvents: 'событий',
-          factChart: 'узлов звёздной карты',
-          factEndings: 'финала',
+          trustInstall: 'без установки',
+          trustSync: 'прогресс синхронизируется',
           credits: 'Сделано Богданом Илляковым · лицензия MIT',
           privacy: 'Приватность',
+          ships: {
+            wanderer: 'Скиталец',
+            ram: 'Таран',
+            ark: 'Ковчег',
+            corsair: 'Гончая',
+            foundry: 'Кузница',
+            prism: 'Призма',
+          },
         },
       };
 
@@ -438,23 +1074,79 @@
       document.querySelectorAll('[data-t]').forEach(function (node) {
         defaults[node.dataset.t] = node.textContent.trim();
       });
+      defaults.continueWeb = 'Continue';
+      defaults.ships = {
+        wanderer: 'Wanderer',
+        ram: 'Ram',
+        ark: 'Ark',
+        corsair: 'Hound',
+        foundry: 'Forge',
+        prism: 'Prism',
+      };
       STRINGS.en = defaults;
 
-      function apply(lang) {
+      function shipName(id) {
         var dict = STRINGS[lang] || STRINGS.en;
+        var names = dict.ships || STRINGS.en.ships;
+        return names[id] || id;
+      }
+
+      function spawnShip() {
+        var old = scene.querySelector('.ship');
+        if (old) old.remove();
+        var id = SHIPS[shipIndex % SHIPS.length];
+        var el = document.createElement('div');
+        el.className = 'ship ' + (shipIndex % 2 ? 'rtl' : 'ltr');
+        el.style.top = (view.desk ? 10 : 9) + rnd() * (view.desk ? 20 : 37) + '%';
+        el.style.setProperty('--fd', 8 + rnd() * 4 + 's');
+        var img = document.createElement('img');
+        img.src = 'ships/' + id + '.svg';
+        img.alt = '';
+        img.width = 150;
+        img.height = 56;
+        var label = document.createElement('span');
+        label.dataset.ship = id;
+        label.textContent = shipName(id);
+        el.appendChild(img);
+        el.appendChild(label);
+        scene.appendChild(el);
+        shipIndex++;
+        window.setTimeout(spawnShip, SHIP_EVERY_MS);
+      }
+
+      function hasSavedRun() {
+        try {
+          return Object.keys(localStorage).some(function (key) {
+            return /^ca\.(.+\.)?run\.(a|b)$/.test(key);
+          });
+        } catch (error) {
+          void error;
+          return false;
+        }
+      }
+
+      function setText(node, value) {
+        var slot = node.querySelector('[data-t-slot]');
+        if (slot) slot.textContent = value;
+        else node.textContent = value;
+      }
+
+      function apply(next) {
+        lang = next;
+        var dict = STRINGS[next] || STRINGS.en;
         document.querySelectorAll('[data-t]').forEach(function (node) {
-          var value = dict[node.dataset.t];
-          if (value) node.textContent = value;
+          var value = dict[node.dataset.t] || STRINGS.en[node.dataset.t];
+          if (value) setText(node, value);
         });
-        document.documentElement.lang = lang;
+        document.querySelectorAll('[data-ship]').forEach(function (node) {
+          node.textContent = shipName(node.dataset.ship);
+        });
+        document.documentElement.lang = next;
         document.querySelectorAll('.langs button').forEach(function (button) {
-          button.setAttribute(
-            'aria-pressed',
-            String(button.dataset.lang === lang),
-          );
+          button.setAttribute('aria-pressed', String(button.dataset.lang === next));
         });
         try {
-          localStorage.setItem('ca.landing.lang', lang);
+          localStorage.setItem('ca.landing.lang', next);
         } catch (error) {
           void error;
         }
@@ -467,6 +1159,9 @@
       });
 
       document.getElementById('play-tg').href = TG_APP_URL;
+      if (hasSavedRun()) {
+        document.getElementById('play-web').dataset.t = 'continueWeb';
+      }
 
       var stored = null;
       try {
@@ -474,8 +1169,17 @@
       } catch (error) {
         void error;
       }
+      var forced = PARAMS.get('lang');
       var guess = (navigator.language || 'en').slice(0, 2);
-      apply(stored || (STRINGS[guess] ? guess : 'en'));
+      apply(
+        (forced && STRINGS[forced] ? forced : null) ||
+          stored ||
+          (STRINGS[guess] ? guess : 'en'),
+      );
+
+      measure();
+      start();
+      if (!still) window.setTimeout(spawnShip, 600);
     </script>
   </body>
 </html>

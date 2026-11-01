@@ -6,7 +6,7 @@
   position: absolute;
   inset: 0;
   pointer-events: none;
-  animation: washIn 900ms ease-out both;
+  animation: washIn 900ms var(--ca-ease-out) backwards;
 }
 
 @keyframes washIn {
@@ -20,7 +20,19 @@
 
 .plate {
   position: relative;
-  animation: plateUp 520ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
+  animation: plateUp 520ms cubic-bezier(0.2, 0.9, 0.3, 1.05) backwards;
+}
+
+.sectorName {
+  transform-origin: center;
+  animation: nameTrack var(--ca-motion-xl) var(--ca-ease-out) backwards;
+}
+
+@keyframes nameTrack {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0) scaleX(1.16);
+  }
 }
 
 .kicker {
@@ -32,7 +44,7 @@
 
 .fragment {
   position: relative;
-  animation: plateUp 520ms 220ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
+  animation: plateUp 520ms 220ms cubic-bezier(0.2, 0.9, 0.3, 1.05) backwards;
 }
 
 .weather {
@@ -41,7 +53,7 @@
   border: 1px solid var(--ca-line);
   border-radius: 12px;
   background: var(--ca-surface2);
-  animation: plateUp 520ms 140ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
+  animation: plateUp 520ms 140ms cubic-bezier(0.2, 0.9, 0.3, 1.05) backwards;
 }
 
 .weatherName {
@@ -53,7 +65,7 @@
 
 .cta {
   position: relative;
-  animation: plateUp 520ms 420ms cubic-bezier(0.2, 0.9, 0.3, 1.05) both;
+  animation: plateUp 520ms 420ms cubic-bezier(0.2, 0.9, 0.3, 1.05) backwards;
 }
 
 @keyframes plateUp {
@@ -67,6 +79,6 @@
   }
 }
 
-:root[data-ca-motion='reduced'] .wash, :root[data-ca-motion='reduced'] .plate, :root[data-ca-motion='reduced'] .fragment, :root[data-ca-motion='reduced'] .weather, :root[data-ca-motion='reduced'] .cta {
+:root[data-ca-motion='reduced'] .wash, :root[data-ca-motion='reduced'] .plate, :root[data-ca-motion='reduced'] .sectorName, :root[data-ca-motion='reduced'] .fragment, :root[data-ca-motion='reduced'] .weather, :root[data-ca-motion='reduced'] .cta {
   animation: none;
 }

@@ -1,22 +1,25 @@
-import { Container, Graphics, Sprite, Text } from "pixi.js";
+import { DEATH_MS, HEAVY_HIT_STOP_MS } from "@/pixi/battle/timing";
+import { Container, Graphics, Sprite, Text, UPDATE_PRIORITY } from "pixi.js";
 import type { Application, Ticker } from "pixi.js";
-import { subscribeBodyRect } from "@/app/bands";
+import { publishEnemyNeed, subscribeBodyRect } from "@/app/bands";
+import { fireMotionFlag } from "@/app/motion";
 import { tapLayerOpen } from "@/app/tapLayer";
 import { flashVignette, sideForX } from "@/services/vignette";
 import { mixHex } from "@/app/color";
 import { onThemeChange, tokens } from "@/app/theme";
+import { seatCount, tableSeats } from "@/game/battle/table";
 import { DIE_BY_ID } from "@/data/dice";
 import { FATE_DIE_ID } from "@/data/fate";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { engravingsForDie } from "@/data/engravings";
-import { schools } from "@/data/schools";
+import { schools, SCHOOL_ORDER } from "@/data/schools";
 import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
 import {
   aliveCoreParts,
   coreLocked,
   preferredPart,
 } from "@/game/battle/damage";
-import { RESONANCE_THRESHOLDS, SCHOOL_ORDER } from "@/game/battle/resonance";
+import { RESONANCE_THRESHOLDS } from "@/game/battle/resonance";
 import { emitBark } from "@/game/narrative/barks";
 import { boardSlotIds, legalTargets } from "@/game/battle/view";
 import type { StatusKey } from "@/game/battle/statuses";
@@ -36,17 +39,36 @@ import {
 import { focusEnemy } from "@/pixi/battle/enemyFocus";
 import {
   boardRegion,
+  dropTargetSelector,
   publishBattleAnchors,
+  publishDieHitTest,
   publishSelectionAnchor,
   reserveAnchor,
   reserveWellAt,
   slotAnchor,
   subscribeAnchors,
   type AnchorRect,
+  type DieAnchor,
 } from "@/pixi/battle/anchors";
 import {
+  BURST_ACCENTS,
+  burstAngle,
+  DEFAULT_BURST,
+  FxPool,
+  PART_BURST,
+  type BurstAccent,
+} from "@/pixi/battle/fx";
+import {
+  pickDropTarget,
+  pulledPoint,
+  type DropTarget,
+} from "@/pixi/battle/dropTarget";
+import { rolledBetween } from "@/pixi/battle/rolls";
+import {
   computeBattleLayout,
+  enemyBandNeed,
   type BattleLayout,
+  type EnemyBandNeedInput,
   type Rect,
 } from "@/pixi/battle/layout";
 import {
@@ -60,6 +82,13 @@ import {
   type TweenProps,
 } from "@/pixi/tween";
 import { Tumble, type TumbleDie } from "@/pixi/battle/tumble";
+import { HaloLayer, type HaloTarget } from "@/pixi/battle/legendaryHalo";
+import { isLegendaryDie, legendaryFx } from "@/app/legendaryFx";
+import { deviceTier } from "@/app/deviceTier";
+import { rollParts } from "@/dice3d/dieRoll";
+import { clearFaces, recordFace } from "@/dice3d/faceLog";
+import { rollSettingsNow } from "@/app/rollSettings";
+import { rollSfxRate } from "@/data/rollStyles";
 import {
   resolveReducedMotion,
   useSettingsStore,
@@ -77,7 +106,6 @@ import type {
 } from "@/types/battle";
 import type {
   EnemyDef,
-  EnemyRole,
   Intent,
   School,
 } from "@/types/content";
@@ -89,26 +117,30 @@ export interface BattleSceneLabels {
   beatGlyph: (kind: EnemyBeatKind) => string;
 }
 
-export type DropTarget = SlotId | "reserve";
-
 const MINI_DIE_SIZE = 40;
+const POLY_DIE_RADIUS = 0.56;
 const BEAT_GAP_NORMAL_MS = 180;
 const BEAT_GAP_FAST_MS = 90;
 const DAMAGE_POOL_SIZE = 12;
 const PARTICLE_POOL_SIZE = 40;
 const GLOW_POOL_SIZE = 3;
 const DRAG_THRESHOLD = 6;
+const TOUCH_LISTENER: AddEventListenerOptions = {
+  passive: false,
+  capture: true,
+};
 const REROLL_LIFT = 4;
 const SHAKE_AMPLITUDE = 6;
 const SHAKE_MS = 180;
 const BIG_HIT_DAMAGE = 10;
 const HIT_STOP_MS = 70;
-const HEAVY_HIT_STOP_MS = 90;
 const PROJECTILE_MS = 120;
-const DEATH_MS = 560;
 const NUMBER_STACK_OFFSET = 22;
 const NUMBER_STACK_WINDOW_MS = 420;
 const DIE_HIT_PAD = 4;
+
+const INPUT_SHIELDS =
+  "[data-app-sheet], [data-app-modal], .mantine-Modal-root";
 const CARD_PULSE_MS = 340;
 const PRISM_HZ = 0.28;
 const FALLBACK_BAND: AnchorRect = { x: 0, y: 0, w: 0, h: 0 };
@@ -253,6 +285,7 @@ interface DragState {
   over: DropTarget | null;
   pointerX: number;
   pointerY: number;
+  home: { x: number; y: number } | null;
 }
 
 interface PooledNumber {
@@ -263,109 +296,24 @@ interface PooledNumber {
   at: number;
 }
 
-const overlapArea = (
-  rect: Rect,
-  cx: number,
-  cy: number,
-  size: number,
-): number => {
-  const w =
-    Math.min(rect.x + rect.w, cx + size / 2) - Math.max(rect.x, cx - size / 2);
-  const h =
-    Math.min(rect.y + rect.h, cy + size / 2) - Math.max(rect.y, cy - size / 2);
-  return w > 0 && h > 0 ? w * h : 0;
-};
-
 const contains = (rect: Rect, x: number, y: number): boolean =>
   x >= rect.x && x <= rect.x + rect.w && y >= rect.y && y <= rect.y + rect.h;
 
-export interface BurstAccent {
-  count: number;
-  size: number;
-  reach: number;
-  ms: number;
-  spread: number;
-  bias: number;
-  drop: number;
-  inward: boolean;
-}
+const wellCentre = (well: Rect | undefined): DieAnchor | undefined =>
+  well === undefined
+    ? undefined
+    : { x: well.x + well.w / 2, y: well.y + well.h / 2, size: Math.min(well.w, well.h) };
 
-const FULL_TURN = Math.PI * 2;
-
-export const DEFAULT_BURST: BurstAccent = {
-  count: 8,
-  size: 2.5,
-  reach: 54,
-  ms: 420,
-  spread: FULL_TURN,
-  bias: 0.4,
-  drop: 0,
-  inward: false,
-};
-
-export const BURST_ACCENTS: Partial<Record<EnemyRole, BurstAccent>> = {
-  swarm: {
-    count: 14,
-    size: 1.8,
-    reach: 38,
-    ms: 300,
-    spread: FULL_TURN,
-    bias: 0,
-    drop: 0,
-    inward: false,
-  },
-  bruiser: {
-    count: 5,
-    size: 5,
-    reach: 46,
-    ms: 620,
-    spread: 2.4,
-    bias: Math.PI / 2,
-    drop: 26,
-    inward: false,
-  },
-  anchor: {
-    count: 10,
-    size: 3,
-    reach: 58,
-    ms: 380,
-    spread: FULL_TURN,
-    bias: 0,
-    drop: 0,
-    inward: true,
-  },
-};
-
-export const PART_BURST: BurstAccent = {
-  count: 6,
-  size: 2.2,
-  reach: 34,
-  ms: 340,
-  spread: 0.9,
-  bias: 0,
-  drop: 0,
-  inward: false,
-};
-
-export const burstAngle = (accent: BurstAccent, index: number): number => {
-  if (accent.spread >= FULL_TURN) {
-    return accent.bias + (index / Math.max(1, accent.count)) * FULL_TURN;
-  }
-  const step = accent.count <= 1 ? 0.5 : index / (accent.count - 1);
-  return accent.bias + (step - 0.5) * accent.spread;
-};
-
-const CAPTURE_RADIUS_FACTOR = 0.75;
-const CAPTURE_PULL = 0.3;
-const PULL_EASE = 0.3;
 const CAPTURE_TICK_GAP_MS = 150;
-const FRAME_MS = 1000 / 60;
-
-const activeSlotIds = (state: BattleState): SlotId[] =>
-  Object.keys(state.slots) as SlotId[];
 
 const isDieLockedNow = (state: BattleState, uid: string): boolean =>
   state.lockedDice.some((l) => l.uid === uid && l.untilTurn >= state.turn);
+
+const maxSubsystemsOf = (state: BattleState): number =>
+  state.enemies.reduce(
+    (most, enemy) => Math.max(most, enemy.subsystems.length),
+    0,
+  );
 
 const sameShipRect = (a: Rect | null, b: Rect | null): boolean =>
   a !== null &&
@@ -376,86 +324,7 @@ const sameShipRect = (a: Rect | null, b: Rect | null): boolean =>
   a.h === b.h;
 
 const cardElement = (target: DropTarget): HTMLElement | null =>
-  document.querySelector<HTMLElement>(
-    target === "reserve" ? "[data-reserve]" : `[data-slot="${target}"]`,
-  );
-
-export class FxPool {
-  private readonly dots: Graphics[] = [];
-  private readonly glows: Graphics[] = [];
-  private readonly cancels = new Map<Graphics, (() => void)[]>();
-
-  constructor(layer: Container, dots: number, glows: number) {
-    for (let i = 0; i < dots; i += 1) this.dots.push(this.build(layer));
-    for (let i = 0; i < glows; i += 1) this.glows.push(this.build(layer));
-  }
-
-  takeDot(): Graphics | undefined {
-    return this.take(this.dots);
-  }
-
-  takeGlow(): Graphics | undefined {
-    return this.take(this.glows);
-  }
-
-  track(owner: Graphics, cancel: () => void): void {
-    const handles = this.cancels.get(owner);
-    if (handles === undefined) this.cancels.set(owner, [cancel]);
-    else handles.push(cancel);
-  }
-
-  release(owner: Graphics): void {
-    const handles = this.cancels.get(owner);
-    if (handles === undefined) return;
-    this.cancels.delete(owner);
-    for (const cancel of handles) cancel();
-  }
-
-  reset(): void {
-    for (const fx of this.all()) {
-      this.release(fx);
-      fx.clear();
-      fx.visible = false;
-    }
-  }
-
-  liveCount(): number {
-    return this.all().filter((fx) => fx.visible).length;
-  }
-
-  totalCount(): number {
-    return this.dots.length + this.glows.length;
-  }
-
-  handleCount(): number {
-    let total = 0;
-    for (const handles of this.cancels.values()) total += handles.length;
-    return total;
-  }
-
-  private all(): Graphics[] {
-    return [...this.dots, ...this.glows];
-  }
-
-  private build(layer: Container): Graphics {
-    const fx = new Graphics();
-    fx.visible = false;
-    fx.eventMode = "none";
-    layer.addChild(fx);
-    return fx;
-  }
-
-  private take(pool: readonly Graphics[]): Graphics | undefined {
-    const free = pool.find((fx) => !fx.visible);
-    if (free === undefined) return undefined;
-    this.release(free);
-    free.clear();
-    free.alpha = 1;
-    free.scale.set(1);
-    free.visible = true;
-    return free;
-  }
-}
+  document.querySelector<HTMLElement>(dropTargetSelector(target));
 
 export class BattleScene {
   private readonly app: Application;
@@ -465,6 +334,10 @@ export class BattleScene {
 
   private readonly bg = new Container();
   private readonly enemiesLayer = new Container();
+  private readonly seatLayer = new Container();
+  private readonly seatMarks = new Graphics();
+  private seatKey = "";
+  private readonly haloLayer = new HaloLayer();
   private readonly trayLayer = new Container();
   private readonly overlayLayer = new Container();
   private readonly dragLayer = new Container();
@@ -472,6 +345,10 @@ export class BattleScene {
 
   private layout: BattleLayout;
   private origin = { left: 0, top: 0 };
+  private needShape: Omit<EnemyBandNeedInput, "bandWidth"> = {
+    enemyCount: 0,
+    maxSubsystems: 0,
+  };
   private readonly enemyViews = new Map<string, EnemyView>();
   private readonly dieSprites = new Map<string, Sprite>();
   private readonly lockOverlays = new Map<string, Graphics>();
@@ -523,9 +400,13 @@ export class BattleScene {
     this.readOrigin();
     this.layout = this.computeLayout();
 
+    this.seatLayer.addChild(this.seatMarks);
+    this.seatMarks.eventMode = "none";
     app.stage.addChild(
       this.bg,
       this.enemiesLayer,
+      this.seatLayer,
+      this.haloLayer.root,
       this.trayLayer,
       this.overlayLayer,
       this.dragLayer,
@@ -537,12 +418,14 @@ export class BattleScene {
     window.addEventListener("pointermove", this.onPointerMove, true);
     window.addEventListener("pointerup", this.onPointerUp, true);
     window.addEventListener("pointercancel", this.onPointerCancel, true);
+    window.addEventListener("touchmove", this.onTouchMove, TOUCH_LISTENER);
 
+    clearFaces();
     this.buildNumberPool();
     const initial = useBattleStore.getState();
     this.rebuild(initial);
+    this.publishNeed(initial);
     this.maybeTumble(initial);
-    if (initial.phase === "placement") playSfx("rollTumble");
     this.announceElites(initial);
     this.announceResonance(initial);
     this.unsubscribe = useBattleStore.subscribe(this.onStoreChange);
@@ -553,6 +436,7 @@ export class BattleScene {
     this.motionQuery.addEventListener("change", this.onMotionChange);
     this.app.renderer.on("resize", this.onResize);
     this.app.ticker.add(this.tick);
+    this.app.ticker.add(this.followHalos, undefined, UPDATE_PRIORITY.LOW + 1);
     const seated = useBattleStore.getState();
     if (seated.phase === "resolving") {
       this.startResolution(seated);
@@ -575,21 +459,27 @@ export class BattleScene {
     this.unsubscribe();
     this.unsubscribeTheme();
     this.unsubscribeBands();
+    publishEnemyNeed(null);
     this.unsubscribeAnchors();
     this.unsubscribeSettings();
     this.motionQuery.removeEventListener("change", this.onMotionChange);
     this.app.stage.position.set(0, 0);
     this.app.renderer.off("resize", this.onResize);
     this.app.ticker.remove(this.tick);
+    this.app.ticker.remove(this.followHalos);
     window.removeEventListener("pointerdown", this.onPointerDown, true);
     window.removeEventListener("pointermove", this.onPointerMove, true);
     window.removeEventListener("pointerup", this.onPointerUp, true);
     window.removeEventListener("pointercancel", this.onPointerCancel, true);
+    window.removeEventListener("touchmove", this.onTouchMove, TOUCH_LISTENER);
     this.tweens.destroy();
+    this.haloLayer.clear();
     this.app.stage.removeChildren();
+    this.haloLayer.destroy();
     for (const layer of [
       this.bg,
       this.enemiesLayer,
+      this.seatLayer,
       this.trayLayer,
       this.overlayLayer,
       this.dragLayer,
@@ -598,6 +488,7 @@ export class BattleScene {
       layer.destroy({ children: true });
     }
     publishBattleAnchors(null);
+    publishDieHitTest(null);
     publishSelectionAnchor(null);
     clearPool("battleFx");
     releaseDieTextures(this.app);
@@ -682,12 +573,9 @@ export class BattleScene {
       trayBand: this.band("tray"),
       dockBand: this.band("dock"),
       shipBand: this.shipBand(),
-      diceCount: state.dice.length,
+      diceCount: seatCount(state.dice),
       enemyCount: state.enemies.length,
-      maxSubsystems: state.enemies.reduce(
-        (most, enemy) => Math.max(most, enemy.subsystems.length),
-        0,
-      ),
+      maxSubsystems: maxSubsystemsOf(state),
     });
   }
 
@@ -720,6 +608,8 @@ export class BattleScene {
     this.animating.clear();
     this.fx.reset();
     clearDieTextureCache(this.app);
+    this.seatKey = "";
+    this.haloLayer.clear();
     this.rebuild(useBattleStore.getState());
   };
 
@@ -743,14 +633,7 @@ export class BattleScene {
   }
 
   private pulseCard(target: DropTarget): void {
-    const el = cardElement(target);
-    if (el === null) return;
-    el.removeAttribute("data-pulse");
-    void el.offsetWidth;
-    el.setAttribute("data-pulse", "1");
-    window.setTimeout(() => {
-      el.removeAttribute("data-pulse");
-    }, CARD_PULSE_MS);
+    fireMotionFlag(cardElement(target), "data-pulse", CARD_PULSE_MS);
   }
 
   private takeParticle(): Graphics | undefined {
@@ -1034,6 +917,10 @@ export class BattleScene {
     if (import.meta.env.VITE_E2E !== "1") return;
     const band = this.layout.trayBand;
     const reserve = reserveAnchor();
+    publishDieHitTest((clientX, clientY) => {
+      const at = this.toStagePoint(clientX, clientY);
+      return this.dieAt(at.x, at.y);
+    });
     publishBattleAnchors({
       dice: state.dice.flatMap((die) => {
         const sprite = this.dieSprites.get(die.uid);
@@ -1047,7 +934,7 @@ export class BattleScene {
           },
         ];
       }),
-      slots: activeSlotIds(state).flatMap((id) => {
+      slots: boardSlotIds(state).flatMap((id) => {
         const anchor = slotAnchor(id);
         return anchor === undefined ? [] : [{ id, ...anchor.rect }];
       }),
@@ -1058,6 +945,12 @@ export class BattleScene {
         w: band.w,
         h: band.h,
       },
+      seats: this.layout.tray.map((point) => ({
+        x: this.origin.left + point.x - this.layout.dieSize / 2,
+        y: this.origin.top + point.y - this.layout.dieSize / 2,
+        w: this.layout.dieSize,
+        h: this.layout.dieSize,
+      })),
     });
   }
 
@@ -1356,36 +1249,20 @@ export class BattleScene {
     }
   }
 
-  private slotDieAnchor(
-    slotId: SlotId,
-  ): { x: number; y: number; size: number } | undefined {
-    const well = this.slotWell(slotId);
-    if (well === undefined) return undefined;
-    return {
-      x: well.x + well.w / 2,
-      y: well.y + well.h / 2,
-      size: Math.min(well.w, well.h),
-    };
+  private slotDieAnchor(slotId: SlotId): DieAnchor | undefined {
+    return wellCentre(this.slotWell(slotId));
   }
 
-  private reserveDieAnchor(
-    index: number,
-  ): { x: number; y: number; size: number } | undefined {
-    const well = this.reserveWell(index);
-    if (well === undefined) return undefined;
-    return {
-      x: well.x + well.w / 2,
-      y: well.y + well.h / 2,
-      size: Math.min(well.w, well.h),
-    };
+  private reserveDieAnchor(index: number): DieAnchor | undefined {
+    return wellCentre(this.reserveWell(index));
   }
 
   private trayAnchor(
     uid: string,
     state: BattleState,
   ): { x: number; y: number } {
-    const index = state.dice.findIndex((d) => d.uid === uid);
-    const base = this.layout.tray[index] ?? {
+    const seat = tableSeats(state.dice).get(uid) ?? -1;
+    const base = this.layout.tray[seat] ?? {
       x: this.layout.trayBand.x + this.layout.trayBand.w / 2,
       y: this.layout.trayBand.y + this.layout.trayBand.h / 2,
     };
@@ -1489,7 +1366,32 @@ export class BattleScene {
     overlay.visible = true;
   }
 
+  private drawSeats(): void {
+    const size = this.layout.dieSize;
+    const key = `${String(size)}:${this.layout.tray
+      .map((point) => `${point.x.toFixed(1)},${point.y.toFixed(1)}`)
+      .join(";")}`;
+    if (key === this.seatKey) return;
+    this.seatKey = key;
+    const marks = this.seatMarks;
+    marks.clear();
+    const inset = size * 0.06;
+    const radius = size * 0.18;
+    for (const point of this.layout.tray) {
+      marks.roundRect(
+        point.x - size / 2 + inset,
+        point.y - size / 2 + inset,
+        size - inset * 2,
+        size - inset * 2,
+        radius,
+      );
+    }
+    marks.stroke({ color: tokens.line, width: 1.5, alpha: 0.55 });
+    marks.fill({ color: tokens.surface2, alpha: 0.18 });
+  }
+
   private syncBoard(state: BattleState): void {
+    this.drawSeats();
     const seen = new Set<string>();
     const visibleRings = new Set<string>();
     const visibleLocks = new Set<string>();
@@ -1577,8 +1479,21 @@ export class BattleScene {
     this.sweepOverlays(this.selectionRings, visibleRings, seen);
     this.sweepOverlays(this.lockOverlays, visibleLocks, seen);
     this.sweepOverlays(this.prismRims, visibleRims, seen);
+    this.syncHalos(state);
     this.publishSelection(state);
     this.publishAnchors(state);
+  }
+
+  private syncHalos(state: BattleState): void {
+    const targets: HaloTarget[] = state.dice
+      .filter(
+        (die) =>
+          (die.state === "tray" || die.state === "locked" || die.state === "placed" || die.state === "reserved") &&
+          isLegendaryDie(die.defId),
+      )
+      .map((die) => ({ uid: die.uid, defId: die.defId, school: die.school }));
+    const fx = legendaryFx({ reduced: this.reduced(), tier: deviceTier(), surface: "pixi" });
+    this.haloLayer.sync(targets, this.layout.dieSize, fx.particles);
   }
 
   private readonly onStoreChange = (
@@ -1593,11 +1508,13 @@ export class BattleScene {
       if (state.turn !== prev.turn) this.clearDieAnimations();
       this.cancelDrag(state);
       this.rebuild(state);
-      if (state.turn !== prev.turn) {
-        this.maybeTumble(state);
-        if (state.phase === "placement") playSfx("rollTumble");
-      }
+      if (state.turn === 1 && prev.turn !== 1) this.publishNeed(state);
+      if (state.turn !== prev.turn) this.maybeTumble(state);
     } else {
+      if (state.dice !== prev.dice && seatCount(state.dice) !== seatCount(prev.dice)) {
+        this.cancelDrag(state);
+        this.relayout();
+      }
       if (
         state.dice !== prev.dice ||
         state.slots !== prev.slots ||
@@ -1626,10 +1543,14 @@ export class BattleScene {
     }
     if (prev.introPending && !state.introPending) this.bossShockwave();
     if (state.enemies !== prev.enemies) this.checkMirrorIntents(state);
-    if (state.dice !== prev.dice) this.checkTempDice(state, prev);
+    const { rolled, summoned } = rolledBetween(state, prev);
+    summoned.forEach(() => {
+      playSfx("summon", { gain: 0.45, rate: 1.18 });
+    });
     if (state.dice !== prev.dice && state.turn === prev.turn) {
-      this.checkTrayRerolls(state, prev);
+      this.checkTrayRerolls(state, prev, rolled);
     }
+    if (rolled.size > 0) this.maybeTumble(state, rolled);
     if (
       state.phase === "placement" &&
       prev.phase === "placement" &&
@@ -1669,25 +1590,15 @@ export class BattleScene {
     }
   }
 
-  private checkTempDice(state: BattleState, prev: BattleState): void {
-    const known = new Set(prev.dice.map((die) => die.uid));
-    for (const die of state.dice) {
-      if (die.temp !== true || known.has(die.uid)) continue;
-      playSfx("summon", { gain: 0.45, rate: 1.18 });
-      if (this.reduced()) continue;
-      this.dieFlash(
-        this.trayAnchor(die.uid, state),
-        schools.prismatic.stroke,
-        this.layout.dieSize,
-      );
-    }
-  }
-
-  private checkTrayRerolls(state: BattleState, prev: BattleState): void {
+  private checkTrayRerolls(
+    state: BattleState,
+    prev: BattleState,
+    rolled: ReadonlySet<string>,
+  ): void {
     if (this.reduced()) return;
     const before = new Map(prev.dice.map((die) => [die.uid, die]));
     for (const die of state.dice) {
-      if (die.state !== "tray") continue;
+      if (die.state !== "tray" || rolled.has(die.uid)) continue;
       const was = before.get(die.uid);
       if (was === undefined || was.state !== "tray") continue;
       if (was.value === die.value) continue;
@@ -1731,9 +1642,29 @@ export class BattleScene {
   private readonly onResize = (): void => {
     this.cancelDrag(useBattleStore.getState());
     this.rebuild(useBattleStore.getState());
+    this.refreshNeed();
   };
 
+  private publishNeed(state: BattleState): void {
+    this.needShape = {
+      enemyCount: state.enemies.length,
+      maxSubsystems: maxSubsystemsOf(state),
+    };
+    this.refreshNeed();
+  }
+
+  private refreshNeed(): void {
+    publishEnemyNeed(
+      enemyBandNeed({ bandWidth: this.band("enemies").w, ...this.needShape }),
+    );
+  }
+
   private readonly onAnchorsChange = (): void => {
+    this.relayout();
+    this.syncBoard(useBattleStore.getState());
+  };
+
+  private relayout(): void {
     this.readOrigin();
     const before = this.layout.ship;
     this.layout = this.computeLayout();
@@ -1742,8 +1673,7 @@ export class BattleScene {
       this.syncShip(useBattleStore.getState());
     }
     this.repositionEnemies();
-    this.syncBoard(useBattleStore.getState());
-  };
+  }
 
   private repositionEnemies(): void {
     const state = useBattleStore.getState();
@@ -1794,37 +1724,75 @@ export class BattleScene {
     }
   };
 
-  private maybeTumble(state: BattleState): void {
+  private readonly followHalos = (): void => {
+    if (this.haloLayer.count === 0) return;
+    this.haloLayer.follow(this.dieSprites, this.dragLayer, this.elapsedMs, !this.reduced());
+  };
+
+  private maybeTumble(state: BattleState, only?: ReadonlySet<string>): void {
     if (state.phase !== "placement") return;
-    if (this.reduced()) return;
-    const vfx = useBattleStore.getState().streams?.vfx;
-    if (vfx === undefined) return;
     const trayDice = state.dice.filter(
-      (d) => d.state === "tray" && !isDieLockedNow(state, d.uid),
+      (d) =>
+        d.state === "tray" &&
+        !isDieLockedNow(state, d.uid) &&
+        (only === undefined || only.has(d.uid)),
     );
     if (trayDice.length === 0) return;
+    const roll = rollSettingsNow();
+    playSfx("rollTumble", { rate: rollSfxRate(roll.style) });
+    const vfx = useBattleStore.getState().streams?.vfx;
+    if (this.reduced() || vfx === undefined) {
+      for (const die of trayDice) recordFace(die.uid, String(die.value));
+      return;
+    }
     if (this.tumbleFx === null) {
       this.tumbleFx = new Tumble(this.app, this.trayLayer, this.tweens, vfx);
     } else {
+      this.releaseTumbling(state);
       this.tumbleFx.cancel();
     }
     this.tumblingUids.clear();
     const dice: TumbleDie[] = trayDice.map((d) => {
       this.tumblingUids.add(d.uid);
+      const grid = this.trayAnchor(d.uid, state);
       return {
         uid: d.uid,
         texture: this.dieTextureFor(d, this.layout.dieSize),
-        grid: this.trayAnchor(d.uid, state),
+        grid,
+        ...(only === undefined ? {} : { from: grid }),
+        parts: rollParts(d, {
+          style: roll.style,
+          durationMs: roll.durationMs,
+          reduced: false,
+          radius: this.layout.dieSize * POLY_DIE_RADIUS,
+          seed: vfx.int(0, 0x7fffffff),
+        }),
+        palette: schools[d.school],
       };
     });
     this.syncBoard(state);
-    this.tumbleFx.run(dice, this.layout.tumble, this.layout.dieSize, () => {
-      this.tumblingUids.clear();
-      this.syncBoard(useBattleStore.getState());
-    });
+    this.tumbleFx.run(
+      dice,
+      this.layout.tumble,
+      this.layout.dieSize,
+      () => {
+        this.tumblingUids.clear();
+        haptic("resolveTick");
+        this.syncBoard(useBattleStore.getState());
+      },
+      recordFace,
+    );
+  }
+
+  private releaseTumbling(state: BattleState): void {
+    for (const uid of this.tumblingUids) {
+      const die = state.dice.find((d) => d.uid === uid);
+      if (die !== undefined) recordFace(uid, String(die.value));
+    }
   }
 
   private cancelTumble(): void {
+    this.releaseTumbling(useBattleStore.getState());
     this.tumbleFx?.cancel();
     if (this.tumblingUids.size > 0) {
       this.tumblingUids.clear();
@@ -1901,6 +1869,9 @@ export class BattleScene {
 
   private readonly onPointerDown = (event: PointerEvent): void => {
     if (tapLayerOpen()) return;
+    if (event.target instanceof Element && event.target.closest(INPUT_SHIELDS) !== null) {
+      return;
+    }
     const state = useBattleStore.getState();
     if (state.phase === "resolving") {
       this.stopBeats();
@@ -1979,9 +1950,15 @@ export class BattleScene {
     if (this.drag !== null) this.cancelDrag(useBattleStore.getState());
   };
 
+  private readonly onTouchMove = (event: TouchEvent): void => {
+    if (this.pendingPress === null && this.drag === null) return;
+    if (event.cancelable) event.preventDefault();
+  };
+
   private beginDrag(point: { x: number; y: number }): void {
     const press = this.pendingPress;
     if (press === null) return;
+    this.readOrigin();
     this.pendingPress = null;
     this.cancelTumble();
     if (useBattleStore.getState().rerollMode) {
@@ -1998,6 +1975,7 @@ export class BattleScene {
     this.dieCancels.delete(press.uid);
     this.animating.delete(press.uid);
     const grab = sprite.getGlobalPosition();
+    const fromTable = die.state === "tray";
 
     if (die.state === "placed") {
       useBattleStore.getState().unplaceDie(press.uid);
@@ -2029,6 +2007,7 @@ export class BattleScene {
       over: null,
       pointerX: point.x,
       pointerY: point.y,
+      home: fromTable ? { x: grab.x, y: grab.y } : null,
     };
     setDraggedDie(press.uid);
     this.updateDropTarget(false);
@@ -2045,34 +2024,15 @@ export class BattleScene {
 
   private bestDropTarget(): DropTarget | null {
     if (this.drag === null) return null;
-    const { targets } = this.drag;
-    const size = this.layout.dieSize;
-    const at = this.freeDragPoint();
-    const radius = size * CAPTURE_RADIUS_FACTOR;
-    const dieArea = size * size;
-    let best: DropTarget | null = null;
-    let bestOverlap = -1;
-    let bestDistance = Number.POSITIVE_INFINITY;
-    for (const target of targets) {
-      const rect = this.dropRect(target);
-      if (rect === undefined) continue;
-      const distance = Math.hypot(
-        Math.max(rect.x - at.x, 0, at.x - (rect.x + rect.w)),
-        Math.max(rect.y - at.y, 0, at.y - (rect.y + rect.h)),
-      );
-      if (distance > radius) continue;
-      const overlap =
-        dieArea > 0 ? overlapArea(rect, at.x, at.y, size) / dieArea : 0;
-      if (
-        overlap > bestOverlap ||
-        (overlap === bestOverlap && distance < bestDistance)
-      ) {
-        best = target;
-        bestOverlap = overlap;
-        bestDistance = distance;
-      }
-    }
-    return best;
+    return pickDropTarget(
+      this.freeDragPoint(),
+      this.drag.home,
+      this.layout.dieSize,
+      this.drag.targets.flatMap((target) => {
+        const rect = this.dropRect(target);
+        return rect === undefined ? [] : [{ target, rect }];
+      }),
+    );
   }
 
   private applyDragPull(deltaMs: number): void {
@@ -2084,13 +2044,8 @@ export class BattleScene {
       drag.sprite.position.set(at.x, at.y);
       return;
     }
-    const toX = at.x + (rect.x + rect.w / 2 - at.x) * CAPTURE_PULL;
-    const toY = at.y + (rect.y + rect.h / 2 - at.y) * CAPTURE_PULL;
-    const step = 1 - Math.pow(1 - PULL_EASE, Math.max(deltaMs, 1) / FRAME_MS);
-    drag.sprite.position.set(
-      drag.sprite.x + (toX - drag.sprite.x) * step,
-      drag.sprite.y + (toY - drag.sprite.y) * step,
-    );
+    const next = pulledPoint(drag.sprite, at, rect, deltaMs);
+    drag.sprite.position.set(next.x, next.y);
   }
 
   private updateDropTarget(announce: boolean): void {

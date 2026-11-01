@@ -1,11 +1,12 @@
 import type { CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
+import { riseStyle } from '@/app/motion';
 import { TapPopover, tapPointOf } from '@/components/TapPopover';
-import { DIRECT, fireModeDef, type FireModeId } from '@/data/fireModes';
+import { DIRECT, fireModeDef, fireModeVars, type FireModeId } from '@/data/fireModes';
 import { playSfx } from '@/services/audio';
 import { useBattleStore } from '@/stores/battleStore';
 import type { SlotId } from '@/types/battle';
-import { fireModeVars, type SlotModeModel } from './slotModes';
+import type { SlotModeModel } from './slotModes';
 import styles from './SlotModeBadge.module.css';
 
 export type SlotModePlace = 'card' | 'row' | 'pod';
@@ -44,13 +45,15 @@ export const SlotModeBadge = ({ model, place, style }: SlotModeBadgeProps) => {
             <span className={styles.menuTitle} aria-hidden>
               {`${t(`battle:slot.${slotId}`)} · ${t('battle:mode.title')}`}
             </span>
-            {model.options.map((option) => {
+            {model.options.map((option, index) => {
               const def = fireModeDef(option.id);
               return (
                 <button
                   key={option.id}
                   type="button"
                   role="menuitemradio"
+                  data-rise
+                  style={riseStyle(index)}
                   className={styles.item}
                   data-testid={`slot-mode-${slotId}-${option.id}`}
                   data-on={option.armed ? '1' : undefined}

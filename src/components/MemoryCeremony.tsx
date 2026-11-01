@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { AppModal } from "@/components/AppModal";
 import { tokens } from "@/app/theme";
 import { CODEX_BY_ID } from "@/data/codex";
-import { memoryAt, MEMORY_TOTAL } from "@/data/narrative/memories";
+import { numberedMemoryAt, MEMORY_TOTAL } from "@/data/narrative/memories";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { useNarrativeStore } from "@/stores/narrativeStore";
@@ -28,7 +28,7 @@ export const MemoryCeremony = () => {
   };
 
   if (order === undefined) return null;
-  const memory = memoryAt(order);
+  const memory = numberedMemoryAt(order);
   if (memory === undefined) return null;
   const entry = CODEX_BY_ID.get(memory.codexId);
 

@@ -12,7 +12,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   background: var(--ca-bg-a86);
-  animation: fadeIn 240ms ease-out;
+  animation: fadeIn 240ms var(--ca-ease-out);
 }
 
 .overlay > *:first-child:not(.rain),
@@ -25,19 +25,19 @@
 }
 
 .ring {
-  animation: ringPop 520ms cubic-bezier(0.2, 0.9, 0.3, 1.4) both;
+  animation: ringPop 520ms cubic-bezier(0.2, 0.9, 0.3, 1.4) backwards;
 }
 
 .level {
-  animation: slam 420ms cubic-bezier(0.2, 0.8, 0.2, 1.2) both;
+  animation: slam 420ms cubic-bezier(0.2, 0.8, 0.2, 1.2) backwards;
 }
 
 .chip {
-  animation: rise 500ms ease-out 220ms both;
+  animation: rise 500ms var(--ca-ease-out) 220ms backwards;
 }
 
 .card {
-  animation: rise 500ms ease-out backwards;
+  animation: rise 500ms var(--ca-ease-out) backwards;
 }
 
 @keyframes fadeIn {

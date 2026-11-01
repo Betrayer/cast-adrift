@@ -1,9 +1,14 @@
 import { describe, expect, it } from "vitest";
+import { CHART_NODES } from "@/data/chart";
+import type { ShipId } from "@/data/ships";
 import { harnessDie, harnessSnap, place } from "@/game/battle/battleHarness";
-import { loadoutCensus } from "@/game/effects/census";
+import { buildBattleSnapshot, createEnemyStream } from "@/game/battle/setup";
+import { chartPointsIn } from "@/game/chart/engine";
+import { deckResonance, loadoutCensus } from "@/game/effects/census";
 import { BattleCtx } from "@/game/effects/context";
 import { applyDefs } from "@/game/effects/evaluate";
 import type { EffectDef } from "@/game/effects/types";
+import { createStreams } from "@/services/rng";
 
 describe("loadout census", () => {
   it("counts a die's school implicitly", () => {
@@ -51,6 +56,71 @@ describe("loadout census", () => {
       modules: [],
     });
     expect(census.repairBay).toBe(1);
+  });
+});
+
+describe("the deck resonance outside a fight is the fight's census", () => {
+  const fightCensus = (
+    shipId: ShipId,
+    deck: readonly string[],
+    chartPicks: readonly string[],
+  ) => {
+    const streams = createStreams(7);
+    return buildBattleSnapshot(
+      shipId,
+      deck,
+      ["raider"],
+      streams,
+      createEnemyStream(streams),
+      {},
+      { perks: [], chartPicks, modules: [] },
+    ).resonance;
+  };
+  const shown = (
+    shipId: ShipId,
+    deck: readonly string[],
+    chartPicks: readonly string[],
+  ) =>
+    deckResonance(
+      deck.map((defId) => ({ defId })),
+      { shipId, perks: [], chartPicks, modules: [] },
+    );
+
+  it("adds the confluence lead bonus the fight adds", () => {
+    const refraction = CHART_NODES.find(
+      (node) => (node.mods?.resonanceCountDelta ?? 0) > 0,
+    );
+    const partner = refraction?.scaledBy?.school;
+    expect(refraction).toBeDefined();
+    expect(partner).toBeDefined();
+    if (refraction === undefined || partner === undefined) return;
+    const picks = [refraction.id];
+    for (const node of CHART_NODES) {
+      if (chartPointsIn(picks, partner) >= 5) break;
+      if (node.constellation === partner) picks.push(node.id);
+    }
+    expect(Math.floor(chartPointsIn(picks, partner) / 5)).toBe(1);
+    const deck = ["red-d6", "red-d6", "red-d6", "blue-d6", "blue-d6"];
+    const census = shown("wanderer", deck, picks);
+    expect(census.counts.red).toBe(4);
+    expect(census.counts.blue).toBe(2);
+    expect(census).toEqual(fightCensus("wanderer", deck, picks));
+  });
+
+  it("doubles prismatic dice for the prism hull and for prismDouble", () => {
+    const cascade = CHART_NODES.find((node) =>
+      (node.traits ?? []).includes("prismDouble"),
+    );
+    expect(cascade).toBeDefined();
+    if (cascade === undefined) return;
+    const deck = ["glimmer", "glimmer", "red-d6"];
+    expect(shown("wanderer", deck, []).counts.red).toBe(3);
+    expect(shown("prism", deck, []).counts.red).toBe(5);
+    expect(shown("wanderer", deck, [cascade.id]).counts.red).toBe(5);
+    expect(shown("prism", deck, [])).toEqual(fightCensus("prism", deck, []));
+    expect(shown("wanderer", deck, [cascade.id])).toEqual(
+      fightCensus("wanderer", deck, [cascade.id]),
+    );
   });
 });
 

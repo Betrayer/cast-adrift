@@ -4,7 +4,7 @@ import { ALL_MODULES, MODULE_BY_ID } from "@/data/modules";
 import { applyEventEffects } from "@/game/events/apply";
 import {
   applyDiscount,
-  DECK_CAP,
+  HAND_CAP,
   diePrice,
   MAX_SHOP_DISCOUNT_PCT,
   moduleSellValue,
@@ -30,7 +30,7 @@ const BETTER = "red-d6";
 
 const fillDeck = (): void => {
   const run = useRunStore.getState();
-  while (useRunStore.getState().deck.length < DECK_CAP) run.addDie(FILLER);
+  while (useRunStore.getState().deck.length < HAND_CAP) run.addDie(FILLER);
 };
 
 const fillBay = (ids: readonly string[]): void => {
@@ -47,9 +47,9 @@ describe("inventory grants", () => {
   it("adds a die while the deck has room and queues a swap at the cap", () => {
     expect(grantDie(BETTER)).toBe("added");
     fillDeck();
-    expect(useRunStore.getState().deck).toHaveLength(DECK_CAP);
+    expect(useRunStore.getState().deck).toHaveLength(HAND_CAP);
     expect(grantDie(BETTER)).toBe("queued");
-    expect(useRunStore.getState().deck).toHaveLength(DECK_CAP);
+    expect(useRunStore.getState().deck).toHaveLength(HAND_CAP);
     expect(useRunStore.getState().scrap).toBe(0);
     expect(useRunStore.getState().pendingSwaps).toEqual([
       { kind: "die", defId: BETTER },
@@ -96,7 +96,7 @@ describe("swap resolution", () => {
     grantDie(BETTER);
     resolveSwapReplace(outgoing?.uid ?? "");
     const after = useRunStore.getState();
-    expect(after.deck).toHaveLength(DECK_CAP);
+    expect(after.deck).toHaveLength(HAND_CAP);
     expect(after.deck.some((d) => d.defId === BETTER)).toBe(true);
     expect(after.deck.some((d) => d.uid === outgoing?.uid)).toBe(false);
     expect(after.scrap).toBe(sellValue(ptsForDie(FILLER)));
@@ -247,7 +247,7 @@ describe("selling and replacing outside a queue", () => {
   it("refuses a die replacement whose target uid is not in the deck", () => {
     fillDeck();
     expect(replaceDie("nope", BETTER)).toBe(false);
-    expect(useRunStore.getState().deck).toHaveLength(DECK_CAP);
+    expect(useRunStore.getState().deck).toHaveLength(HAND_CAP);
   });
 });
 
@@ -279,7 +279,7 @@ describe("the old silent conversions are gone", () => {
     applyEventEffects([{ k: "loot", die: BETTER }], createStream(11));
     const after = useRunStore.getState();
     expect(after.scrap).toBe(0);
-    expect(after.deck).toHaveLength(DECK_CAP);
+    expect(after.deck).toHaveLength(HAND_CAP);
     expect(after.pendingSwaps).toEqual([{ kind: "die", defId: BETTER }]);
   });
 });

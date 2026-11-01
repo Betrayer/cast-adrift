@@ -7,6 +7,7 @@ import {
 } from "@/data/echo";
 import { dieHasGrant } from "@/data/engravings";
 import { FATE_DIE_ID } from "@/data/fate";
+import { tableDice } from "@/game/battle/table";
 import { computeMutatorMods } from "@/data/mutators";
 import {
   officerActiveDead,
@@ -30,10 +31,10 @@ import { aimedEnemy } from "@/game/battle/target";
 import {
   BLOOD_REACTOR_HULL,
   BONUS_REROLL_COST,
-  dieValueCeiling,
   nudgeChargeCost,
   SURGE_COST,
 } from "@/game/battle/resolver";
+import { dieValueCeiling } from "@/game/battle/rollFloors";
 import { canReserve } from "@/game/battle/view/legal";
 import { sourceMods, sourceTrait } from "@/game/run/runMods";
 import type { BattleBoard } from "@/game/battle/view/types";
@@ -146,7 +147,16 @@ export interface NudgeCost {
   free: boolean;
 }
 
-export const nudgeChargePrice = (board: BattleBoard): number =>
+export const springFreeFor = (
+  board: Pick<BattleBoard, "engravings" | "spentGrants">,
+  die: Pick<RolledDie, "uid" | "defId">,
+): boolean =>
+  dieHasGrant(board.engravings, die.defId, "freeNudge") &&
+  !board.spentGrants.includes(`nudge:${die.uid}`);
+
+export const nudgeChargePrice = (
+  board: Pick<BattleBoard, "perks" | "chartPicks" | "modules" | "officers" | "mutators">,
+): number =>
   nudgeChargeCost(
     sourceMods(board).nudgeCostDelta +
       computeMutatorMods(board.mutators ?? []).nudgeCostDelta,
@@ -157,10 +167,7 @@ export const nudgeCostFor = (
   board: BattleBoard,
   die?: Pick<RolledDie, "uid" | "defId">,
 ): NudgeCost => {
-  const springFree =
-    die !== undefined &&
-    dieHasGrant(board.engravings, die.defId, "freeNudge") &&
-    !board.spentGrants.includes(`nudge:${die.uid}`);
+  const springFree = die !== undefined && springFreeFor(board, die);
   if (springFree || board.freeNudges > 0) return { cost: 0, free: true };
   return { cost: nudgeChargePrice(board), free: false };
 };
@@ -361,7 +368,7 @@ export const consoleActions = (board: BattleBoard): ConsoleActions => {
 
 export const consoleShape = (board: BattleBoard): ConsoleShape => {
   const actives = new Set<ActiveActionId>();
-  for (const die of board.dice) {
+  for (const die of tableDice(board.dice)) {
     const kind = DIE_BY_ID.get(die.defId)?.active;
     if (kind !== undefined) actives.add(kind);
     if (die.school === "grey") actives.add("copy");

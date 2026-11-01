@@ -4,6 +4,12 @@ import { ENDING_BY_ID, endingBeats } from "@/data/narrative/endings";
 import { buildEpilogue } from "@/data/narrative/epilogue";
 import { deathLineFor } from "@/data/narrative/deathLines";
 import { flagShopDiscount } from "@/game/economy/shop";
+import {
+  allOutcomes,
+  optionMet,
+  optionRequirements,
+  type OptionContext,
+} from "@/game/events/engine";
 import { deadFlags, unwritableFlags } from "@/game/narrative/flagGraph";
 import type { FlagValue } from "@/types/events";
 
@@ -20,9 +26,20 @@ const epilogueIds = (flags: Record<string, FlagValue>): string[] =>
   }).map((line) => line.id);
 
 const optionGatedBy = (eventId: string, key: string): boolean =>
-  EVENT_BY_ID.get(eventId)?.options.some(
-    (o) => o.requires?.req === "flag" && o.requires.key === key,
+  EVENT_BY_ID.get(eventId)?.options.some((o) =>
+    optionRequirements(o.requires).some(
+      (req) => req.req === "flag" && req.key === key,
+    ),
   ) === true;
+
+const captain = (scrap: number, flags: Record<string, FlagValue>): OptionContext => ({
+  scrap,
+  hull: 20,
+  axis: 0,
+  deck: [],
+  mkLevels: {},
+  flags,
+});
 
 describe("flag graph", () => {
   it("has no flag written by content that nothing reads", () => {
@@ -37,11 +54,7 @@ describe("flag graph", () => {
     const written = new Set<string>();
     for (const event of ALL_EVENTS) {
       for (const option of event.options) {
-        for (const outcome of [
-          ...(option.outcomes ?? []),
-          ...(option.onPass ?? []),
-          ...(option.onFail ?? []),
-        ]) {
+        for (const outcome of allOutcomes(option)) {
           for (const effect of outcome.effects) {
             if (effect.k === "flag") written.add(effect.key);
           }
@@ -87,6 +100,23 @@ describe("flag consumers end to end", () => {
 
   it("beaconKey1 unlocks the relay repair the Keeper's key was made for", () => {
     expect(optionGatedBy("beaconRelay", "beaconKey1")).toBe(true);
+  });
+
+  it("cutterRobbed opens the pay-back only for a captain who can pay its 45", () => {
+    const payBack = EVENT_BY_ID.get("cutterReturns")?.options.find(
+      (o) => o.id === "payBack",
+    );
+    expect(payBack).toBeDefined();
+    expect(optionGatedBy("cutterReturns", "cutterRobbed")).toBe(true);
+    expect(optionMet(payBack?.requires, captain(44, { cutterRobbed: true }))).toBe(
+      false,
+    );
+    expect(optionMet(payBack?.requires, captain(45, { cutterRobbed: true }))).toBe(
+      true,
+    );
+    expect(optionMet(payBack?.requires, captain(45, { cutterTrusted: true }))).toBe(
+      false,
+    );
   });
 
   it("pactBroken rewrites the Bargain and adds its own tally line", () => {

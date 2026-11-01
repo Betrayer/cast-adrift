@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
-import { createStream } from "@/services/rng";
+import { createStream, deriveSeed } from "@/services/rng";
 import {
   checkOdds,
   checkPassed,
+  checkRollOutcome,
   checkTotal,
+  deckRefFor,
   eligibleForCheck,
+  rollCheck,
   rollCheckDice,
   topDiceForCheck,
   type FaceDie,
@@ -74,6 +77,23 @@ describe("check rolls", () => {
     expect(top.map((x) => x.tier)).toEqual([10, 6]);
   });
 
+  it("topDiceForCheck keeps the forge level of a forged die", () => {
+    const deck = [
+      { defId: "grey-d4", tier: 4 as const },
+      {
+        defId: "stillwater",
+        tier: 8 as const,
+        faces: [3, 3, 4, 4, 5, 5, 6, 6],
+        fusion: 1,
+      },
+    ];
+    const [forged, plain] = topDiceForCheck(deck, 2);
+    expect(forged?.fusion).toBe(1);
+    expect(forged?.faces).toEqual([3, 3, 4, 4, 5, 5, 6, 6]);
+    expect(plain?.defId).toBe("grey-d4");
+    expect(plain).not.toHaveProperty("fusion");
+  });
+
   it("rolled values fall within face bounds", () => {
     const dice = [d(8, [1, 8])];
     const stream = createStream(3);
@@ -81,6 +101,29 @@ describe("check rolls", () => {
       const [value] = rollCheckDice(dice, stream);
       expect(value === 1 || value === 8).toBe(true);
     }
+  });
+});
+
+describe("deckRefFor", () => {
+  it("carries a forged die's level, size and faces into the check", () => {
+    const ref = deckRefFor({ defId: "cinderblack", fusion: { level: 1, consumed: ["x"] } });
+    expect(ref.fusion).toBe(1);
+    expect(ref.tier).toBe(6);
+    expect(ref.faces).toEqual([1, 1, 4, 4, 5, 5]);
+  });
+
+  it("marks a forged standard die by its level and size alone", () => {
+    const ref = deckRefFor({ defId: "ember", fusion: { level: 1, consumed: ["cinder"] } });
+    expect(ref.fusion).toBe(1);
+    expect(ref.tier).toBe(8);
+    expect(ref).not.toHaveProperty("faces");
+  });
+
+  it("leaves an unforged die without a forge level or a face list of its own", () => {
+    const ref = deckRefFor({ defId: "ember" });
+    expect(ref).not.toHaveProperty("fusion");
+    expect(ref).not.toHaveProperty("faces");
+    expect(ref.tier).toBe(6);
   });
 });
 
@@ -118,5 +161,47 @@ describe("narrowed checks (R7)", () => {
     expect(checkPassed(2, "lowest", 3)).toBe(true);
     expect(checkPassed(5, "lowest", 3)).toBe(false);
     expect(checkPassed(5, "sum", 3)).toBe(true);
+  });
+});
+
+describe("checkRollOutcome", () => {
+  it("fails a narrowed check that no die could take, even on a lowest pick", () => {
+    const empty = checkRollOutcome([], { pick: "lowest", target: 3 });
+    expect(empty.success).toBe(false);
+    expect(empty.total).toBe(0);
+    expect(empty.values).toEqual([]);
+  });
+
+  it("fails an empty roll on every pick", () => {
+    expect(checkRollOutcome([], { pick: "highest", target: 0 }).success).toBe(false);
+    expect(checkRollOutcome([], { pick: "sum", target: 0 }).success).toBe(false);
+  });
+
+  it("passes a lowest pick when every die stays at or under the target", () => {
+    const roll = checkRollOutcome([2, 3], { pick: "lowest", target: 3 });
+    expect(roll.total).toBe(3);
+    expect(roll.success).toBe(true);
+  });
+
+  it("reports the sum it judged", () => {
+    const roll = checkRollOutcome([4, 5], { pick: "sum", target: 10 });
+    expect(roll.total).toBe(9);
+    expect(roll.success).toBe(false);
+  });
+});
+
+describe("rollCheck", () => {
+  it("draws exactly what rollCheckDice draws and seeds the presentation from the state before the draw", () => {
+    const faces = [d(6), d(8)];
+    const check = { pick: "sum" as const, target: 9 };
+    const reference = createStream(4242);
+    const seed = deriveSeed(reference.state(), "check:present");
+    const values = rollCheckDice(faces, reference);
+    const stream = createStream(4242);
+    expect(rollCheck(faces, check, stream)).toEqual({
+      ...checkRollOutcome(values, check),
+      seed,
+    });
+    expect(stream.state()).toBe(reference.state());
   });
 });

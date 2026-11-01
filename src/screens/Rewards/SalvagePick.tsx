@@ -6,46 +6,44 @@ import { SALVAGE_BY_ID } from "@/data/salvage";
 import { resolveSalvagePick } from "@/game/run/flow";
 import { playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
-import { useReducedMotion } from "@/stores/settingsStore";
+import {
+  entranceCardStyle,
+  useCardRevealSfx,
+  useEntranceRow,
+} from "./entrance";
 import styles from "./Rewards.module.css";
-
-const CARD_FLIP_MS = 110;
 
 export const SalvagePick = ({ faces }: { faces: readonly string[] }) => {
   const { t } = useTranslation(["run", "content"]);
-  const reduced = useReducedMotion();
+  const { entrance, row } = useEntranceRow(faces.join("|"));
 
   useEffect(() => {
     haptic("reveal");
-    const timers = faces.map((_, index) =>
-      window.setTimeout(() => {
-        playSfx("unlockCard", { rate: 1 + index * 0.05 });
-      }, index * CARD_FLIP_MS),
-    );
-    return () => {
-      for (const id of timers) window.clearTimeout(id);
-    };
   }, [faces]);
+  useCardRevealSfx(faces, 0.05);
 
   return (
     <div className={styles.overlay} data-salvage-pick>
       <Text className={styles.title} c={tokens.dim}>
         {t("run:salvage.title")}
       </Text>
-      <div className={styles.salvageOptions}>
+      <div
+        ref={row}
+        className={styles.salvageOptions}
+        data-entrance={entrance}
+      >
         {faces.map((id, index) => {
           const face = SALVAGE_BY_ID.get(id);
           if (face === undefined) return null;
           return (
             <div
               key={id}
-              className={`${styles.card ?? ""} ${styles.salvageCard ?? ""} ${reduced ? "" : styles.reveal ?? ""}`}
+              className={`${styles.card ?? ""} ${styles.salvageCard ?? ""} ${styles.entryCard ?? ""}`}
               data-salvage={id}
+              data-entrance-card={index}
               style={{
                 borderColor: tokens.accent,
-                animationDelay: reduced
-                  ? undefined
-                  : `${String(index * CARD_FLIP_MS)}ms`,
+                ...entranceCardStyle(index, faces.length),
               }}
             >
               <div className={styles.salvageText}>

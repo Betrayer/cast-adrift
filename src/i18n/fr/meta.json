@@ -7,7 +7,8 @@
     "yellow": "Jaune",
     "black": "Noir",
     "grey": "Gris",
-    "prismatic": "Prismatique"
+    "prismatic": "Prismatique",
+    "nexus": "Nexus"
   },
   "chart": {
     "title": "Carte stellaire",
@@ -53,21 +54,14 @@
     "keySingleCast": "Moulage en une seule pièce",
     "redSpotter": "Observateur",
     "redFirestorm": "Tempête de feu",
-    "redSpine": "Colonne vertébrale",
     "blueBarrier": "Barrière",
     "blueJammer": "Brouilleur",
-    "blueTideBreak": "Tidebreak",
     "greenCanopy": "Auvent",
-    "greenPerennial": "Vivace",
     "yellowTally": "Total",
-    "yellowBounty": "Prime",
     "blackVent": "Évent",
-    "blackWell": "Bon,",
     "greyToolkit": "Boîte à outils",
-    "greyLedger": "Grand livre",
     "prismLattice": "Treillis",
     "prismFacet": "Facette",
-    "prismWell": "Puits Prism",
     "hubEngineering": "Baie d'ingénierie",
     "keyStormChaser": "Chasseur de tempêtes",
     "keyIronDoctrine": "La doctrine de fer",
@@ -82,36 +76,42 @@
     "respecConfirmTitle": "Rembourser ce nœud ?",
     "respecConfirmBody": "« {{name}} » retourne dans la réserve et {{points}} point(s) sont rétablis. Coût : {{cost}}◈.",
     "respecConfirmYes": "Remboursement",
-    "redPowderRoom": "Salle d'eau",
-    "redRangeCard": "Fiche de portée",
-    "redHairTrigger": "Déclencheur ultra-sensible",
-    "redCoreBreach": "Brèche dans le noyau",
-    "blueStormAnchor": "Ancre de tempête",
-    "blueSpillway": "Déversoir",
-    "blueLongLens": "Objectif à longue focale",
-    "blueKeelPlate": "Plaque de quille",
-    "greenGraftBench": "Banc de greffe",
-    "greenSapline": "Sapline",
-    "greenLoam": "Terreau",
-    "greenHollow": "Le Creux",
-    "yellowTollhouse": "Tollhouse",
-    "yellowFinderFee": "Commission d'intermédiaire",
-    "yellowShortWeight": "Poids insuffisant",
-    "yellowMintMark": "Marque d'atelier",
-    "blackAshBed": "Lit de cendres",
-    "blackDeadMansSwitch": "Le « Dead Man's Switch »",
-    "blackTithe": "La dîme",
-    "blackSlagHeap": "Terril",
-    "greyShimStack": "Pile de cales",
-    "greyPatternBook": "Recueil de modèles",
-    "greyBallastTrim": "Réglage du lest",
-    "greyTallyStick": "Bâton de comptage",
     "cost": "Coût {{n}}",
     "repriced": "Les prix des nœuds ont changé : votre sélection coûte désormais {{spent}} points sur {{total}}. Rien n’a été repris — une réattribution complète est gratuite.",
     "freeRespec": "Réattribution gratuite",
     "freeRespecTitle": "Vider toute la carte ?",
     "freeRespecBody": "Les {{n}} nœuds alloués retournent dans la réserve et tous les points sont rendus. Cette remise à zéro est gratuite.",
-    "freeRespecYes": "Vider"
+    "freeRespecYes": "Vider",
+    "redCorona": "Couronne",
+    "redCinderFrost": "Givre de cendre",
+    "blueTidalWall": "Mur de marée",
+    "bluePermafrost": "Pergélisol",
+    "greenHoarfrost": "Floraison de givre",
+    "greenGoldenGrove": "Bosquet doré",
+    "yellowHarvest": "Moisson",
+    "yellowLoadedDice": "Dés pipés",
+    "blackGamblersVoid": "Vide du joueur",
+    "blackNullForge": "Forge nulle",
+    "greyBallast": "Lest",
+    "greyFacetGrinder": "Tailleur de facettes",
+    "prismRefraction": "Réfraction",
+    "prismSolarWind": "Vent solaire",
+    "nexusSteamLance": "Lance à vapeur",
+    "nexusFrostbloom": "Fleur de givre",
+    "nexusGoldenCanopy": "Canopée dorée",
+    "nexusHouseEdge": "Avantage de la maison",
+    "nexusNullAnvil": "Enclume nulle",
+    "nexusFacetEngine": "Machine à facettes",
+    "nexusNova": "Nova",
+    "resetAll": "Tout effacer",
+    "resetTitle": "Effacer toute la carte ?",
+    "resetBody": "{{n}} nœuds reviennent en points. Le cœur reste. Cela coûte {{price}} éclats.",
+    "resetBodyFree": "{{n}} nœuds reviennent en points. Le cœur reste. Celui-ci est gratuit.",
+    "resetYes": "Effacer pour {{price}}",
+    "requiresPoints": "Exige {{n}} points en {{school}}",
+    "requiresMet": "{{n}} en {{school}} — rempli",
+    "scaledBy": "Évolue avec {{school}} : {{steps}} paliers sur 5 ({{points}} points investis)",
+    "layout": "Vue de la carte"
   },
   "chartFx": {
     "hubBudget": "+1 budget pour le hangar",
@@ -137,7 +137,9 @@
       "freeShopRerolls": "{{n}} re-lancer gratuit du compteur",
       "xpMultPct": "{{n}} % d'XP",
       "tideEffectDelta": "{{n}} sous l'emprise de la marée",
-      "moduleSlotDelta": "{{n}} baie de modules"
+      "moduleSlotDelta": "{{n}} baie de modules",
+      "shieldKeepPct": "{{n}} % du bouclier survit au tour ennemi",
+      "resonanceCountDelta": "{{n}} à la résonance de l'école dominante"
     },
     "fx": {
       "weaponsMaxFace": "Armes +1 sur un dé à face maximale",
@@ -150,7 +152,6 @@
       "redSalvo": "Armes +3 au tour 1",
       "blueGlacier": "+2 bouclier par jet de résolution « Boucliers »",
       "blackEdge": "Tous les dés +2 tant que la coque est en état critique",
-      "allDice1": "Tous les dés +1",
       "weaponsBurn": "La valeur maximale de « face » dans les armes ajoute « Brûlure 1 »",
       "enginesBonus": "+1 dans la catégorie « Moteurs »",
       "reactorBonus": "+1 dans le réacteur",
@@ -198,7 +199,7 @@
       "yellowGleaner": "Un dé jaune dont la face la plus basse est visible rapporte 4 ferrailles.",
       "yellowWager": "Un dé sur l'une ou l'autre des faces extrêmes rapporte 3 ferrailles.",
       "yellowTollhouse": "Lorsque vous arrivez à un comptoir, vous recevez 14 ferrailles.",
-      "yellowMintMark": "Une matrice de réacteur rapporte 4 ferraille.",
+      "yellowMintMark": "Un dé de réacteur rapporte 4 ferrailles.",
       "blackBleedCharge": "+1 pour les dés noirs lorsque la coque est en dessous de 60 %.",
       "blackOvercap": "Les dés noirs peuvent dépasser la limite d'un emplacement pour 2 coques.",
       "blackPactTithe": "Commencez chaque combat avec 2 points de charge et −2 points de coque.",
@@ -217,7 +218,35 @@
       "greyMirror": "Un dé gris qui reproduit la dernière valeur augmente le nombre de relances de 1.",
       "greyLedgerKeep": "Se rendre à un comptoir rapporte 10 ferrailles.",
       "greyPatternBook": "Un dé qui affiche à nouveau la dernière valeur permet de relancer le dé.",
-      "greyTallyStick": "Dès que le deuxième capteur tombe en panne, +2 à chaque jet de dé."
+      "greyTallyStick": "À partir du deuxième dé de capteurs, +2 sur chaque dé.",
+      "prismWildEdge": "Un dé prismatique gagne +1 dans n'importe quel emplacement.",
+      "prismCarry": "Un dé prismatique qui se résout donne +2 au dé prismatique suivant.",
+      "prismDichroic": "Un dé prismatique prend la couleur de l'emplacement : +2 bouclier dans les boucliers, brûlure 2 dans les armes.",
+      "prismOvercap": "Les dés prismatiques peuvent dépasser la limite d'un emplacement pour 1 coque.",
+      "prismKindling": "Deux prismatiques au recensement : chaque combat commence avec 3 charges.",
+      "prismDeepWell": "Quatre prismatiques au recensement : chaque tour se termine avec 1 charge et soigne 1.",
+      "prismOpenHand": "Le premier dé du tour, quelle que soit sa couleur, gagne +1.",
+      "prismDividend": "Deux prismatiques au recensement : une bataille remportée rapporte 6 ferrailles et soigne 1.",
+      "redCinderFrost": "Armes +1 tant qu'un bouclier tient · par tranche de 5 points en Bleu",
+      "blueTidalWall": "+1 bouclier à chaque résolution d'arme · par tranche de 5 points en Rouge",
+      "greenHoarfrost": "Soigne 1 en fin de tour tant qu'un bouclier tient · par tranche de 5 points en Bleu",
+      "greenGoldenGrove": "Les trois premières faces maximales vertes d'une bataille rapportent 1 ferraille · par tranche de 5 points en Jaune",
+      "yellowLoadedDice": "Un dé noir sur sa face la plus basse gagne +1 · par tranche de 5 points en Noir",
+      "blackGamblersVoid": "Les deux premières faces maximales noires d'une bataille réparent 1 point de coque · par tranche de 5 points en Jaune",
+      "blackNullForge": "Un dé gris dans le réacteur donne 1 point de charge · par tranche de 5 points en Gris",
+      "greyFacetGrinder": "À partir du troisième dé gris d'une bataille, les dés gris gagnent +1 · par tranche de 5 points en Prismatique",
+      "prismSolarWind": "Le premier dé d'arme du tour gagne +1 · par tranche de 5 points en Rouge",
+      "stormSurge": "Armes +1 pour chaque palier de montée de la marée, jusqu'à +3.",
+      "coldLogicMaxDie": "Au début du combat, le dé le plus bas est placé sur sa face maximale.",
+      "greySingleCast": "Dés gris +1 ; tous les autres dés +1 tant qu'il y a au moins trois dés gris à bord.",
+      "prismCascade": "Avec trois dés prismatiques à bord, n'importe quel dé entre dans n'importe quel emplacement sans coût de coque.",
+      "nexusSteamLance": "À partir du deuxième dé de boucliers d'un combat, +2 en armes.",
+      "nexusFrostbloom": "Terminez un tour avec 3 · 7 · 12 points de bouclier pour regagner 1 · 2 · 3.",
+      "nexusGoldenCanopy": "Chacun des cinq premiers dés verts d'un combat soigne 1 et rapporte 3 ferrailles.",
+      "nexusHouseEdge": "Un coup de pouce gratuit à chaque jet · les dés noirs peuvent dépasser la limite d'un emplacement pour 2 coques.",
+      "nexusNullAnvil": "Les dés gris peuvent dépasser la limite d'un emplacement gratuitement.",
+      "nexusFacetEngine": "Un dé gris sur trois que vous placez devient prismatique.",
+      "nexusNova": "Avec deux prismatiques au recensement, un tir d’arme éclabousse 4 sur chaque autre ennemi."
     },
     "trait": {
       "obsidianPact": "Les dés noirs n'affichent que leur valeur minimale ou maximale.",
@@ -225,7 +254,12 @@
       "coldLogic": "Les « nudges » sont gratuits · les coups critiques sont désactivés",
       "overflowShield": "La charge dépassant le plafond se transforme en bouclier.",
       "fateTwice": "Le dé du Destin peut être utilisé deux fois par combat.",
-      "prismDouble": "Les dés prismatiques comptent double pour la résonance."
+      "prismDouble": "Les dés prismatiques comptent double pour la résonance.",
+      "overflowCharge": "Un dé placé au-delà de la limite d'un emplacement stocke 1 point de charge.",
+      "houseEdge": "Un dé noir sur sa face maximale dépasse la limite sans coût de coque.",
+      "greyIsBlack": "Les dés gris comptent comme noirs.",
+      "facetEngine": "Un dé gris sur trois placé au cours d'un combat devient prismatique.",
+      "novaSplash": "Avec deux dés prismatiques sur la table, le premier tir du tour inflige 4 à chaque autre ennemi."
     },
     "budgetDelta": "{{n}} point d'amarrage",
     "slotTier": "{{slot}} : {{n}} die-size step"
@@ -236,15 +270,14 @@
     "shipArk": "L'Arche déverrouillée",
     "engraving": "Gravure gare ouverte",
     "dailyPreview": "Le « Daily » de demain est disponible",
-    "respecPrestige": "Réattribution gratuite des points de caractéristiques + skin Prestige",
+    "respecPrestige": "Réinitialisation de la carte à moitié prix + skin de prestige",
     "diceWave": "Les dés Fusion sur l'étagère",
     "contractWave": "Ouverture de la vague de contrats",
-    "chartPoints": "Deux points d'Carte stellaire"
+    "chartPoints": "Bonus : +{{n}} points de Carte stellaire"
   },
   "levelup": {
     "level": "Niveau de capitaine {{level}}",
-    "point": "+1 point «Carte stellaire »",
-    "points": "+{{n}} Carte stellaire points",
+    "points": "+{{n}} points de Carte stellaire",
     "continue": "Continuer"
   },
   "summary": {
@@ -261,7 +294,7 @@
     "fromFinds": "Premières découvertes",
     "fromAchievements": "Réalisations",
     "firstFinds": "Première publication : {{names}}",
-    "fromDeep": "Au-delà de l'essentiel"
+    "fromDeep": "Au-delà du Noyau"
   },
   "menu": {
     "level": "Niv.{{level}}"
@@ -276,7 +309,7 @@
     "save": "Enregistrer le jeu de cartes",
     "saved": "Enregistré",
     "invalidOver": "Dépassement du budget",
-    "invalidCap": "9 dés au maximum",
+    "invalidCap": "{{n}} dés au maximum",
     "invalidMin": "Au moins 3 dés",
     "invalidFate": "1 dé du Destin au maximum",
     "valid": "Prêt",
@@ -455,7 +488,7 @@
     "title": "Gravure Gare",
     "hint": "Choisissez un dé, puis une rune. En retirer un le détruit — aucun remboursement.",
     "locked": "Se débloque au niveau « capitaine » {{level}}.",
-    "pickDie": "Mourir",
+    "pickDie": "Dé",
     "sockets": "Sockets {{used}} / {{max}}",
     "empty": "Aucune gravure n'a été apposée.",
     "remove": "supprimer",
@@ -493,7 +526,7 @@
     "diceAchSurvivor": "Trois dés de survivants",
     "contractsL5": "Trois contrats : « Storm », « Bare Armor » et « Blind Jump »",
     "contractsL12": "Trois contrats : Ram, Single Cast, Dead Reckoning",
-    "contractsL20": "Trois contrats : Ark, Keeper, Iron Marée",
+    "contractsL20": "Trois contrats : Arche, Gardien, Marée de fer",
     "contractsL28": "Trois contrats : Choir, Prismwork, Ghost Lane",
     "contractsA5": "Contrat : La dîme du Vide",
     "contractsAchGauntlet": "Contrat : « The Gauntlet »",
@@ -507,8 +540,7 @@
     "featureShipArk": "L'Arche",
     "featureEngraving": "Gravure gare",
     "featureDailyPreview": "Aperçu quotidien",
-    "featureFreeRespec": "Réattribution gratuite des points de caractéristiques « Keystone »",
-    "sectorSix": "Secteur 6 « Au-delà du centre »",
+    "sectorSix": "Secteur 6 « Au-delà du Noyau »",
     "diceS6": "Quatre dés de causalité",
     "skinThreshold": "Le skin « Threshold »",
     "featureShipCorsair": "« The Hound » est désormais disponible à la vente",
@@ -564,7 +596,7 @@
     },
     "quickWork": {
       "name": "Travail rapide",
-      "desc": "Terminez une campagne en 11 sauts ou moins."
+      "desc": "Terminez une campagne en 85 sauts ou moins."
     },
     "frugal": {
       "name": "Économique",
@@ -615,7 +647,7 @@
       "desc": "Allumez le phare."
     },
     "beaconkeeper": {
-      "name": "Gardien du phare",
+      "name": "Gardien de balise",
       "desc": "Passez quatre balises en un seul passage."
     },
     "allEndings": {
@@ -643,7 +675,7 @@
       "desc": "Étoiles de contrat gagnées : {{n}}"
     },
     "beyondTheCore": {
-      "name": "Au-delà de l'essentiel",
+      "name": "Au-delà du Noyau",
       "desc": "Franchissez le seuil et nettoyez le Secteur 6."
     },
     "theAnswer": {
@@ -731,8 +763,8 @@
       "desc": "Menez l'histoire du Gardien jusqu'à sa dernière page."
     },
     "allChains": {
-      "name": "Quatre fils",
-      "desc": "Terminez les quatre histoires de l'équipage."
+      "name": "Tous les fils",
+      "desc": "Terminez toutes les histoires des personnages."
     },
     "wandererClear": {
       "name": "La route du Vagabond",

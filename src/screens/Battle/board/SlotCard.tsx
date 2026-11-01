@@ -1,11 +1,11 @@
 import { useTranslation } from 'react-i18next';
 import { cx } from '@/app/cx';
 import { schoolGlyphPath } from '@/data/glyphs';
-import type { SlotProjection } from '@/game/battle/view';
 import {
   affinityNote,
   projectionText,
   projectionTone,
+  projectionToneClass,
   slotSchool,
   type SlotViewProps,
 } from '@/screens/Battle/board/slotText';
@@ -37,11 +37,10 @@ export const SlotGlyph = ({ school }: { school: School }) => {
   );
 };
 
-const toneClass = (projection: SlotProjection): string => {
-  const tone = projectionTone(projection);
-  if (tone === 'danger') return styles.projDanger ?? '';
-  if (tone === 'bonus') return styles.projBonus ?? '';
-  return styles.projPlain ?? '';
+const TONE_CLASSES = {
+  danger: styles.projDanger,
+  bonus: styles.projBonus,
+  plain: styles.projPlain,
 };
 
 export const SlotCard = ({
@@ -111,7 +110,7 @@ export const SlotCard = ({
       {projection === undefined ? null : (
         <span
           key={projectionText(t, slotId, projection)}
-          className={cx(styles.proj, toneClass(projection))}
+          className={cx(styles.proj, projectionToneClass(projection, TONE_CLASSES))}
           data-proj={preview ? undefined : slotId}
           data-tone={preview ? undefined : projectionTone(projection)}
         >

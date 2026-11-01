@@ -27,7 +27,7 @@
 .sectorHead {
   position: sticky;
   top: 0;
-  z-index: 1;
+  z-index: var(--z-raise);
   padding: 4px 0;
   background: var(--ca-journal-bg);
 }
@@ -44,7 +44,7 @@
 .entry[data-journal-focus] {
   background: var(--ca-surface2);
   box-shadow: inset 3px 0 0 var(--ca-amber);
-  transition: background 240ms ease-out;
+  transition: background 240ms var(--ca-ease-out);
 }
 
 :root[data-ca-motion='reduced'] .entry[data-journal-focus] {

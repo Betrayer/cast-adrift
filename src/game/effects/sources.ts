@@ -1,4 +1,4 @@
-import { CHART_NODE_BY_ID } from "@/data/chart";
+import { chartEffectsOf } from "@/game/run/runMods";
 import { MODULE_BY_ID } from "@/data/modules";
 import { PERK_BY_ID } from "@/data/perks";
 import { RESONANCE_BONUSES } from "@/data/resonance";
@@ -30,7 +30,7 @@ export const activePerkEffects = (perks: readonly string[]): EffectDef[] =>
   collect(perks, (id) => PERK_BY_ID.get(id)?.effects);
 
 export const activeChartEffects = (picks: readonly string[]): EffectDef[] =>
-  collect(picks, (id) => CHART_NODE_BY_ID.get(id)?.effects);
+  collect(picks, (id) => chartEffectsOf(picks, id));
 
 export const activeModuleEffects = (modules: readonly string[]): EffectDef[] =>
   collect(modules, (id) => MODULE_BY_ID.get(id)?.effects);

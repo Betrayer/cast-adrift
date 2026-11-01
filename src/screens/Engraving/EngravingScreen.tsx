@@ -85,7 +85,7 @@ export const EngravingScreen = () => {
             <Text size="sm" c={tokens.dim} mb={6}>
               {t("meta:engraving.pickDie")}
             </Text>
-              <Group gap={4}>
+              <Group gap={8}>
                 {owned.map((entry) => {
                   const def = DIE_BY_ID.get(entry.defId);
                   if (def === undefined) return null;
@@ -93,6 +93,9 @@ export const EngravingScreen = () => {
                   return (
                     <Badge
                       key={entry.defId}
+                      data-press
+                      data-tap-slop
+                      h={36}
                       variant={activeDie === entry.defId ? "filled" : "outline"}
                       style={{
                         color:

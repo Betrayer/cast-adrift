@@ -13,6 +13,8 @@ import type {
   SubsystemDef,
 } from "@/types/content";
 
+export const CRIT_MULT = 1.5;
+
 export const aliveEnemies = (snapshot: BattleSnapshot): EnemyState[] =>
   snapshot.enemies.filter((e) => e.hp > 0);
 
@@ -271,7 +273,7 @@ export const applyWeaponDamage = (
   }
   if (target.subsystem !== undefined) {
     if (lockedOutByAlternating(target.enemy, target.subsystem)) return 0;
-    if (crit) damage = Math.floor(damage * 1.5);
+    if (crit) damage = Math.floor(damage * CRIT_MULT);
     if (def?.alternating === true) target.enemy.lastHitKey = target.subsystem.key;
     const partAlive = target.subsystem.hp > 0;
     target.subsystem.hp = Math.max(0, target.subsystem.hp - damage);
@@ -287,7 +289,7 @@ export const applyWeaponDamage = (
   if (marked) {
     damage += def?.markVulnerable === true ? vulnerable * 2 : vulnerable;
   }
-  if (crit) damage = Math.floor(damage * 1.5);
+  if (crit) damage = Math.floor(damage * CRIT_MULT);
   const gate = target.enemy.gate ?? 0;
   if (gate > 0 && !marked) {
     if (damage < gate) return 0;

@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { cx } from "@/app/cx";
+import { auraHostClass, LegendaryAura } from "@/components/LegendaryAura";
 import { TagChips } from "@/components/TagChips";
 import { schools } from "@/data/schools";
 import type { ContentTag } from "@/data/tags";
@@ -10,7 +11,6 @@ import {
   dieCardModel,
   evLabel,
   type DieBadgeKind,
-  type DieCardModel,
   type DieFeature,
 } from "@/game/dice/card";
 import styles from "./DieCard.module.css";
@@ -23,11 +23,13 @@ interface DieCardProps {
   dense?: boolean;
   plain?: boolean;
   growthBonus?: number;
+  fusion?: number;
   engravings?: EngravingMap;
   engravingIds?: readonly string[];
   tagCounts?: Partial<Record<ContentTag, number>>;
   footer?: ReactNode;
   className?: string;
+  aura?: boolean;
 }
 
 export const DieCard = ({
@@ -36,14 +38,16 @@ export const DieCard = ({
   dense = false,
   plain = false,
   growthBonus,
+  fusion,
   engravings,
   engravingIds,
   tagCounts,
   footer,
   className,
+  aura: withAura = true,
 }: DieCardProps) => {
   const { t } = useTranslation(["battle", "run", "content"]);
-  const model = dieCardModel({ defId, engravings, engravingIds, growthBonus });
+  const model = dieCardModel({ defId, engravings, engravingIds, growthBonus, fusion });
   if (model === null) return null;
 
   const { def, faces } = model;
@@ -53,11 +57,14 @@ export const DieCard = ({
     : t("battle:dieFaces", { min: faces.min, max: faces.max });
   const ev = evLabel(faces.ev);
   const full = size === "full";
+  const aura = def.rarity === "legendary" && withAura;
 
   const badgeLabel = (badge: DieBadgeKind): string =>
     badge === "growth"
       ? `${DIE_BADGE_GLYPH.growth}${String(model.growthBonus)}`
-      : DIE_BADGE_GLYPH[badge];
+      : badge === "forged"
+        ? `${DIE_BADGE_GLYPH.forged}${String(model.fusion)}`
+        : DIE_BADGE_GLYPH[badge];
 
   const featureLine = (feature: DieFeature): string => {
     if (feature === "active") {
@@ -82,6 +89,13 @@ export const DieCard = ({
           });
     }
     if (feature === "fate") return t("battle:die.feature.fate");
+    if (feature === "forged") {
+      return t("battle:die.feature.forged", {
+        n: model.fusion,
+        from: def.tier,
+        to: model.tier,
+      });
+    }
     return t("battle:die.feature.prismatic");
   };
 
@@ -92,13 +106,17 @@ export const DieCard = ({
 
   return (
     <div
-      className={cx(styles.card, plain && styles.plain, dense && styles.dense, className)}
+      className={cx(styles.card, plain && styles.plain, dense && styles.dense, aura && auraHostClass, className)}
       data-die-card={def.id}
+      data-rarity={def.rarity}
+      data-school={def.school}
       data-die-card-size={size}
-      data-die-tier={def.tier}
+      data-die-tier={model.tier}
+      data-die-fusion={model.fusion > 0 ? model.fusion : undefined}
       data-die-faces={facesText}
       data-die-ev={ev}
     >
+      {aura ? <LegendaryAura defId={def.id} school={def.school} /> : null}
       <div className={styles.head}>
         <span className={styles.name} style={{ color: colors.text }}>
           {t(def.name)}
@@ -117,7 +135,7 @@ export const DieCard = ({
       {size === "mini" ? (
         <span className={styles.meta} data-die-meta>
           {t("battle:dieMeta", {
-            tier: def.tier,
+            tier: model.tier,
             school: t(`battle:school.${def.school}`),
             faces: facesText,
             ev,
@@ -127,9 +145,9 @@ export const DieCard = ({
         <>
           <span className={styles.meta} data-die-meta>
             {t("battle:die.stats", {
-              tier: def.tier,
+              tier: model.tier,
               rarity: t(`battle:die.rarity.${def.rarity}`),
-              pts: def.pts,
+              pts: model.pts,
             })}
           </span>
           <div className={styles.faces}>
@@ -218,5 +236,3 @@ export const DieCard = ({
     </div>
   );
 };
-
-export type { DieCardModel };

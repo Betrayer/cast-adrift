@@ -1,5 +1,6 @@
 import { useEffect, type RefObject } from 'react';
-import { openTapLayer } from '@/app/tapLayer';
+import { openTapLayer, tapLayerOpen } from '@/app/tapLayer';
+import { useLatest } from '@/app/useLatest';
 
 export type DismissPolicy = 'scrim' | 'escape' | 'none';
 
@@ -58,6 +59,38 @@ export const useEscapeKey = (active: boolean, onEscape: () => void): void => {
       window.removeEventListener('keydown', onKeyDown);
     };
   }, [active, onEscape]);
+};
+
+const surfaceLayers: symbol[] = [];
+
+const topSurface = (): symbol | undefined => surfaceLayers[surfaceLayers.length - 1];
+
+export const useLayeredEscape = (
+  dismiss: DismissPolicy,
+  onClose: () => void,
+  parked: boolean,
+): void => {
+  const latest = useLatest(onClose);
+  const closable = dismiss !== 'none';
+  useEffect(() => {
+    if (parked) return;
+    const layer = Symbol('surface');
+    surfaceLayers.push(layer);
+    const onKeyDown = (event: KeyboardEvent): void => {
+      if (event.key !== 'Escape') return;
+      if (topSurface() !== layer) return;
+      if (tapLayerOpen()) return;
+      if (!closable) return;
+      event.stopImmediatePropagation();
+      latest.current();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+      const at = surfaceLayers.lastIndexOf(layer);
+      if (at >= 0) surfaceLayers.splice(at, 1);
+    };
+  }, [closable, parked, latest]);
 };
 
 export const useOutsidePointer = (

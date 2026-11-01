@@ -31,11 +31,13 @@ export const WarpStreaks = ({ color, count = 18, durationMs }: Props) => {
         <span
           key={streak.angle}
           className={styles.streak}
-          style={{
-            background: color,
-            transform: `rotate(${String(streak.angle)}deg)`,
-            animationDelay: `${String(streak.delay)}ms`,
-          }}
+          style={
+            {
+              background: color,
+              '--ca-streak-angle': `${String(streak.angle)}deg`,
+              animationDelay: `${String(streak.delay)}ms`,
+            } as React.CSSProperties
+          }
         />
       ))}
     </div>

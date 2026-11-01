@@ -1,9 +1,7 @@
-export interface Box {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
+import { boundsOf as layoutBoundsOf } from "@/game/chart/layouts/geometry";
+import type { Box, Point } from "@/game/chart/layouts/types";
+
+export type { Box };
 
 export interface ChartView {
   scale: number;
@@ -23,18 +21,31 @@ export const fitScale = (bounds: Box, viewport: Box): number =>
     ? 1
     : Math.min(viewport.w / bounds.w, viewport.h / bounds.h);
 
+export const letterbox = (
+  bounds: Box,
+  viewport: Box,
+): { fit: number; offsetX: number; offsetY: number } => {
+  const fit = fitScale(bounds, viewport);
+  return {
+    fit,
+    offsetX: (viewport.w - bounds.w * fit) / 2,
+    offsetY: (viewport.h - bounds.h * fit) / 2,
+  };
+};
+
+export const cssPerUnit = (bounds: Box, viewport: Box, scale: number): number =>
+  fitScale(bounds, viewport) * scale;
+
 export const clientToUser = (
   bounds: Box,
   viewport: Box,
   clientX: number,
   clientY: number,
 ): { x: number; y: number } => {
-  const scale = fitScale(bounds, viewport);
-  const offsetX = (viewport.w - bounds.w * scale) / 2;
-  const offsetY = (viewport.h - bounds.h * scale) / 2;
+  const { fit, offsetX, offsetY } = letterbox(bounds, viewport);
   return {
-    x: (clientX - viewport.x - offsetX) / scale + bounds.x,
-    y: (clientY - viewport.y - offsetY) / scale + bounds.y,
+    x: (clientX - viewport.x - offsetX) / fit + bounds.x,
+    y: (clientY - viewport.y - offsetY) / fit + bounds.y,
   };
 };
 
@@ -106,28 +117,8 @@ export const frameRegion = (
   );
 };
 
-export const boundsOf = (
-  points: readonly { x: number; y: number }[],
-  pad: number,
-): Box | null => {
-  if (points.length === 0) return null;
-  let minX = Infinity;
-  let minY = Infinity;
-  let maxX = -Infinity;
-  let maxY = -Infinity;
-  for (const point of points) {
-    minX = Math.min(minX, point.x);
-    minY = Math.min(minY, point.y);
-    maxX = Math.max(maxX, point.x);
-    maxY = Math.max(maxY, point.y);
-  }
-  return {
-    x: minX - pad,
-    y: minY - pad,
-    w: maxX - minX + pad * 2,
-    h: maxY - minY + pad * 2,
-  };
-};
+export const boundsOf = (points: readonly Point[], pad: number): Box | null =>
+  points.length === 0 ? null : layoutBoundsOf(points, pad);
 
 export const MIN_TAP_PX = 32;
 
@@ -137,7 +128,7 @@ export const hitRadiusFor = (
   viewport: Box,
   scale: number,
 ): number => {
-  const cssPerUnit = fitScale(bounds, viewport) * scale;
-  if (cssPerUnit <= 0) return drawnRadius;
-  return Math.max(drawnRadius, MIN_TAP_PX / 2 / cssPerUnit);
+  const perUnit = cssPerUnit(bounds, viewport, scale);
+  if (perUnit <= 0) return drawnRadius;
+  return Math.max(drawnRadius, MIN_TAP_PX / 2 / perUnit);
 };

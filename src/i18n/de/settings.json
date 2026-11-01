@@ -61,6 +61,16 @@
     "signOutConfirm": "Trotzdem abmelden",
     "telegramHint": "Verknüpfe eine E-Mail mit diesem Telegram-Profil, und dasselbe Konto öffnet sich im Web.",
     "telegramGoogleHint": "Google braucht ein echtes Browserfenster. Die Schaltfläche öffnet Cast Adrift außerhalb von Telegram.",
+    "tg": {
+      "signedIn": "Telegram: {{name}}",
+      "unnamed": "angemeldet",
+      "guest": "Gast — Telegram-Anmeldung nicht verfügbar: {{reason}}",
+      "reason": {
+        "missingConfig": "der Server ist nicht konfiguriert",
+        "badSignature": "Telegram hat diese Sitzung nicht bestätigt",
+        "network": "der Server hat nicht geantwortet"
+      }
+    },
     "provider": {
       "google": "Google",
       "password": "E-Mail",
@@ -128,6 +138,43 @@
       "name": "Tablet",
       "tag": "Slot-Förderband mit Live-Ausgabe · Zugvorhersage",
       "desc": "Alle Zahlen in einer Spalte, der ganze Zug ausgerechnet, bevor du ihn beendest."
+    }
+  },
+  "chartLayout": {
+    "title": "Sternenkarte",
+    "hint": "Vier Arten, dieselbe Karte zu zeichnen. Knoten, Verbindungen und Preise bleiben gleich.",
+    "open": "Karte öffnen",
+    "spiral": {
+      "name": "Spirale",
+      "desc": "Sieben Arme, die sich aus dem Kern winden. Standardansicht."
+    },
+    "rings": {
+      "name": "Umlaufbahnen",
+      "desc": "Jeder Ring ist eine Preisstufe: Je weiter außen ein Knoten, desto teurer."
+    },
+    "constellations": {
+      "name": "Sternbilder",
+      "desc": "Jede Schule eine Figur aus Sternen, einmal gezeichnet und beibehalten."
+    },
+    "nebulae": {
+      "name": "Nebel",
+      "desc": "Jede Schule eine Wolke, die mit jedem investierten Punkt dichter wird."
+    }
+  },
+  "rollStyle": {
+    "title": "Würfelwurf",
+    "hint": "Wie ein Würfel, der etwas entscheidet, beim Rollen gezeigt wird. Tippe eine Karte an, um erneut zu würfeln.",
+    "flip": {
+      "name": "Überschlag",
+      "desc": "Ein echter Würfel dreht sich und landet auf seiner Seite. Standard."
+    },
+    "reel": {
+      "name": "Walze",
+      "desc": "Die Seite blättert durch Zahlen und kommt langsam zum Stehen."
+    },
+    "blur": {
+      "name": "Unschärfe",
+      "desc": "Die Zahlen verschwimmen und werden scharf."
     }
   },
   "skipTally": "Kampfbilanz überspringen"

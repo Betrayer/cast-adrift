@@ -13,6 +13,7 @@ import {
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Screen } from '@/app/Screen';
+import { SPLIT_COLUMNS } from '@/app/grids';
 import { riseStyle } from '@/app/motion';
 import { AppHeader } from '@/components/AppHeader';
 import { tokens } from '@/app/theme';
@@ -127,7 +128,7 @@ export const RunSetupScreen = () => {
             </Group>
           )}
           <SimpleGrid
-            cols={{ base: 1, xs: 2 }}
+            cols={SPLIT_COLUMNS}
             spacing="xs"
             data-rise
             style={riseStyle(2)}

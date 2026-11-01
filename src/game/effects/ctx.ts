@@ -39,6 +39,8 @@ export interface EffectCtx {
   counter?: (scope: CounterScope, key: string) => number;
   bumpCounter?: (scope: CounterScope, key: string, delta: number) => void;
   tagCount?: (tag: ContentTag) => number;
+  schoolCountsAs?: (school: School, is: School) => boolean;
+  setDieSchool?: (die: RolledDie, school: School) => void;
   targetEnemy?: () => EnemyState | undefined;
   aliveEnemyCount?: () => number;
   allDice?: () => readonly RolledDie[];

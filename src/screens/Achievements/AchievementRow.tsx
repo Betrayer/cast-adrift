@@ -1,7 +1,9 @@
 import { Badge, Group, Progress, Stack, Text } from "@mantine/core";
 import { useState } from "react";
+import { createPortal } from "react-dom";
 import { useTranslation } from "react-i18next";
 import { cx } from "@/app/cx";
+import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
 import { Sparkle, type SparkleBurst } from "@/components/Sparkle";
 import { now } from "@/services/clock";
@@ -77,10 +79,12 @@ const FamilyRow = ({
   tiers,
   ctx,
   earned,
+  fresh,
 }: {
   tiers: readonly AchievementDef[];
   ctx: AchievementCtx;
   earned: ReadonlySet<string>;
+  fresh: boolean;
 }) => {
   const { t } = useTranslation(["meta"]);
   const [burst, setBurst] = useState<SparkleBurst | null>(null);
@@ -99,10 +103,12 @@ const FamilyRow = ({
       data-achievement={head.family ?? head.id}
       data-achievement-state={complete ? "unlocked" : "locked"}
       data-press={legendary ? "" : undefined}
+      data-fresh={fresh ? "1" : undefined}
       className={cx(
         styles.row,
         complete && styles.rowEarned,
         legendary && styles.rowLegendary,
+        fresh && styles.fresh,
       )}
       onClick={(event) => {
         if (!legendary) return;
@@ -116,7 +122,7 @@ const FamilyRow = ({
         });
       }}
     >
-      <Sparkle burst={burst} />
+      {burst === null ? null : createPortal(<Sparkle burst={burst} />, document.body)}
       <div className={styles.head}>
         <div className={styles.title}>
           <Text size="sm" fw={600} c={complete ? tokens.amber : tokens.text}>
@@ -163,10 +169,12 @@ const SingleRow = ({
   def,
   ctx,
   earned,
+  fresh,
 }: {
   def: AchievementDef;
   ctx: AchievementCtx;
   earned: ReadonlySet<string>;
+  fresh: boolean;
 }) => {
   const { t } = useTranslation(["meta"]);
   const unlocked = earned.has(def.id);
@@ -175,7 +183,8 @@ const SingleRow = ({
     <div
       data-achievement={def.id}
       data-achievement-state={unlocked ? "unlocked" : "locked"}
-      className={cx(styles.row, unlocked && styles.rowEarned)}
+      data-fresh={fresh ? "1" : undefined}
+      className={cx(styles.row, unlocked && styles.rowEarned, fresh && styles.fresh)}
     >
       <div className={styles.head}>
         <Text size="sm" fw={600} c={unlocked ? tokens.amber : tokens.text}>
@@ -212,16 +221,20 @@ export const AchievementRow = ({
   row,
   ctx,
   earned,
+  fresh = false,
+  riseIndex = 0,
 }: {
   row: RowModel;
   ctx: AchievementCtx;
   earned: ReadonlySet<string>;
+  fresh?: boolean;
+  riseIndex?: number;
 }) => (
-  <Stack gap={0}>
+  <Stack gap={0} data-rise style={riseStyle(riseIndex)}>
     {row.kind === "family" ? (
-      <FamilyRow tiers={row.tiers} ctx={ctx} earned={earned} />
+      <FamilyRow tiers={row.tiers} ctx={ctx} earned={earned} fresh={fresh} />
     ) : (
-      <SingleRow def={row.def} ctx={ctx} earned={earned} />
+      <SingleRow def={row.def} ctx={ctx} earned={earned} fresh={fresh} />
     )}
   </Stack>
 );

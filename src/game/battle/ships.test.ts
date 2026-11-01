@@ -4,7 +4,6 @@ import {
   canFuse,
   canReschool,
   fusedDie,
-  growTier,
   isFuseTarget,
 } from "@/game/battle/actives";
 import { passiveActionOf, shipProfile } from "@/game/battle/passives";
@@ -342,7 +341,7 @@ describe("Anneal (Forge)", () => {
     expect(isFuseTarget(die(3, 6), die(4, 6))).toBe(false);
     expect(isFuseTarget(die(3, 6), die(3, 6))).toBe(false);
     expect(canFuse({ ...die(3, 6), state: "placed" })).toBe(false);
-    expect(growTier(20, 1)).toBe(20);
+    expect(fusedDie(die(20, 20), { ...die(20, 20), uid: "other" }, 1).tier).toBe(20);
     expect(fusedDie(die(6, 6), { ...die(6, 6), uid: "other" }, 1).value).toBe(8);
   });
 });

@@ -1,3 +1,4 @@
+import type { DeckEntry } from "@/game/dice/tier";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { STARTER_DECK } from "../src/data/decks";
@@ -19,14 +20,17 @@ import {
   type RouteState,
 } from "./simPolicy/map";
 import {
-  bypassIsLateral,
   bypassTargetFor,
   isGentleRide,
-  openLandings,
   rollThrow,
-  throwCost,
+  softLandThrow,
 } from "../src/game/map/wormhole";
-import { disintegrationPctFor, holeTollFor } from "../src/game/run/motifs";
+import {
+  bypassLethal,
+  bypassPctFor,
+  disintegrationPctFor,
+  holeTollFor,
+} from "../src/game/run/motifs";
 import {
   applyEdgeMotifs,
   applyEffectsToState,
@@ -40,6 +44,7 @@ import {
   maxMk,
   takeModule,
   wouldTakeModule,
+  handIds,
   maxRealSchoolCount,
   runAnomaly,
   runDraft,
@@ -115,7 +120,7 @@ import {
   isEncounterGroup,
 } from "../src/data/enemies";
 import {
-  DECK_CAP,
+  HAND_CAP,
   MINIBOSS_PACKAGE_SCRAP,
 } from "../src/game/economy/prices";
 import {
@@ -187,7 +192,7 @@ import {
 import type { BattleSnapshot, SlotId } from "../src/types/battle";
 import type { EventDef, EventOption } from "../src/types/events";
 import { ALL_EVENTS } from "../src/data/events";
-import { pickEvent, type EventContext } from "../src/game/events/engine";
+import { allOutcomes, pickEvent, type EventContext } from "../src/game/events/engine";
 import {
   driftAllowed,
   sectorDriftDelta,
@@ -411,7 +416,7 @@ const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
 
 const simulateBattle = (
   enemyIds: readonly string[],
-  deck: readonly string[],
+  deck: readonly DeckEntry[],
   rootSeed: number,
   init: BattleInit = {},
 ): BattleResult => {
@@ -691,18 +696,12 @@ const softLandingFor = (
   map: MapGraph,
   byId: ReadonlyMap<string, MapNode>,
   from: string,
+  hole: string,
   visited: readonly string[],
 ): SoftLanding | undefined => {
-  const origin = byId.get(from);
-  if (origin === undefined) return undefined;
-  const node = openLandings(map, from, visited)
-    .filter((candidate) => candidate.row > origin.row)
-    .sort(
-      (a, b) =>
-        throwCost(origin, a) - throwCost(origin, b) ||
-        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
-    )[0];
-  return node === undefined ? undefined : { node, rows: node.row - origin.row };
+  const roll = softLandThrow(map, from, hole, visited);
+  const node = roll.landing === null ? undefined : byId.get(roll.landing);
+  return node === undefined ? undefined : { node, rows: roll.rows };
 };
 
 const resolveWormhole = (
@@ -719,9 +718,11 @@ const resolveWormhole = (
   tideCap: number,
 ): HoleOutcome => {
   const rides = tally.rides;
-  if (ridesWormhole(route, stream.next())) {
+  const toll = holeTollFor(sector, state.hullMax);
+  const lethal = bypassLethal(state.hull, toll);
+  if (lethal || ridesWormhole(route, bypassPctFor(sector))) {
     if (echoSoftLands(state.echo) && !state.echoUsed) {
-      const gentle = softLandingFor(map, byId, from, visited);
+      const gentle = softLandingFor(map, byId, from, hole.id, visited);
       if (gentle !== undefined) {
         state.echoUsed = true;
         tally.rides += 1;
@@ -747,7 +748,6 @@ const resolveWormhole = (
     if (landing !== undefined) {
       tally.rides += 1;
       tally.rowsMoved += Math.abs(roll.rows);
-      if (roll.rows < 0) tally.backward += 1;
       if (roll.fallback !== "none") tally.fallbacks += 1;
       return { kind: "moved", node: landing };
     }
@@ -755,9 +755,7 @@ const resolveWormhole = (
   const target = bypassTargetFor(map, from, hole.id, visited);
   const node = target === null ? undefined : byId.get(target);
   if (node === undefined) return { kind: "stuck" };
-  const toll = bypassIsLateral(map, from, hole.id, visited)
-    ? holeTollFor(sector, state.hull)
-    : 0;
+  if (lethal) return { kind: "stuck" };
   if (toll > 0) {
     applyEffectsToState(state, [{ k: "hull", n: -toll }], tideCap);
     tally.tollPaid += toll;
@@ -781,7 +779,6 @@ const nsKey = (ns: string, prefix: string, id: string): string =>
 export interface WormholeTally {
   rides: number;
   bypasses: number;
-  backward: number;
   fallbacks: number;
   rowsMoved: number;
   tollPaid: number;
@@ -792,7 +789,6 @@ export interface WormholeTally {
 export const emptyWormholeTally = (): WormholeTally => ({
   rides: 0,
   bypasses: 0,
-  backward: 0,
   fallbacks: 0,
   rowsMoved: 0,
   tollPaid: 0,
@@ -1236,7 +1232,7 @@ const sectorResultOf = (
   hullMedian: median(
     walk.hullEntering.length > 0 ? walk.hullEntering : [state.hull],
   ),
-  resonanceSet: maxRealSchoolCount(state.deck) >= 4,
+  resonanceSet: maxRealSchoolCount(handIds(state.deck)) >= 4,
   mkReached: maxMk(state.mkLevels),
   pockets: state.pockets,
 });
@@ -1447,7 +1443,8 @@ const runModeMain = (runs: number, seed: number, startedAt: number): void => {
   for (const r of results) {
     if (!r.win) deathHist.set(r.deathRow, (deathHist.get(r.deathRow) ?? 0) + 1);
   }
-  const histLine = Array.from({ length: 16 }, (_, row) => row)
+  const histRows = Math.max(...SECTORS.map((sd) => sd.shape.bossRow)) + 1;
+  const histLine = Array.from({ length: histRows }, (_, row) => row)
     .filter((row) => (deathHist.get(row) ?? 0) > 0)
     .map((row) => `r${String(row)}:${String(deathHist.get(row) ?? 0)}`)
     .join(" ");
@@ -1494,7 +1491,7 @@ const runModeMain = (runs: number, seed: number, startedAt: number): void => {
 
   const histCsv = ["", "death_row,count"]
     .concat(
-      Array.from({ length: 16 }, (_, row) => row)
+      Array.from({ length: histRows }, (_, row) => row)
         .filter((row) => (deathHist.get(row) ?? 0) > 0)
         .map((row) => `${String(row)},${String(deathHist.get(row) ?? 0)}`),
     )
@@ -1814,7 +1811,7 @@ const sweepState = (opts: SweepOptions): RunState => {
       hullMax,
       deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(
         0,
-        DECK_CAP,
+        HAND_CAP,
       ),
       mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
       perks: carried,
@@ -2358,6 +2355,8 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       let salvageScrap = 0;
       let salvageDeclines = 0;
       let fightCount = 0;
+      let walkedFights = 0;
+      let walkedNodes = 0;
       let cargoScrap = 0;
       let cargoTaken = 0;
       let cargoDelivered = 0;
@@ -2385,6 +2384,8 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         cargoLapsed += state.cargoLapsed;
         if (r.win) clearedEarned.push(loot);
         if (r.fights > 0) perNode.push(loot / r.fights);
+        walkedFights += r.fights;
+        walkedNodes += Math.max(1, r.nodes);
         pockets += r.pockets;
         skipIncome += state.draftSkips;
         fightCount += r.fights;
@@ -2430,9 +2431,10 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       const mEarnedPerNode = median(perNode);
       const clears = clearedEarned.length;
       const projected = clears >= ECONOMY_MIN_CLEARS;
+      const fightsPerAct = (walkedFights / Math.max(1, walkedNodes)) * depth;
       const mEarned = projected
         ? median(clearedEarned)
-        : mEarnedPerNode * depth;
+        : mEarnedPerNode * fightsPerAct;
       const basis = projected ? "cleared" : "projected";
       const mSpent = median(spent);
       const share = mEarned > 0 ? mSpent / mEarned : 0;
@@ -2613,6 +2615,8 @@ interface CampaignResult {
   sinks: Record<string, number>;
   draftSkips: number;
   draftRerolls: number;
+  forges: number;
+  handEnd: number;
   eventsResolved: number;
   eventScrap: number;
   eventHull: number;
@@ -2696,6 +2700,8 @@ const runCampaign = (
     sinks: state.sinks,
     draftSkips: state.draftSkips,
     draftRerolls: state.draftRerolls,
+    forges: state.forges,
+    handEnd: state.deck.length,
     eventsResolved: state.eventsResolved,
     eventScrap: state.eventScrap,
     eventHull: state.eventHull,
@@ -2811,6 +2817,9 @@ const campaignModeMain = (
   const sinks = emptySinks();
   let skips = 0;
   let rerolls = 0;
+  let forges = 0;
+  let hands = 0;
+  let forgeRuns = 0;
   let events = 0;
   let eventScrap = 0;
   let eventHull = 0;
@@ -2831,6 +2840,9 @@ const campaignModeMain = (
           mergeSinks(sinks, r.sinks);
           skips += r.draftSkips;
           rerolls += r.draftRerolls;
+          forges += r.forges;
+          hands += r.handEnd;
+          forgeRuns += 1;
           events += r.eventsResolved;
           eventScrap += r.eventScrap;
           eventHull += r.eventHull;
@@ -2859,11 +2871,14 @@ const campaignModeMain = (
         .map(([sector, n]) => `s${String(sector)}:${String(n)}`)
         .join(" ");
       console.log(
-        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}`,
+        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · nodes ${roll.avgNodes.toFixed(1)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}`,
       );
     }
   }
   const mean = a0.reduce((sum, v) => sum + v, 0) / Math.max(1, a0.length);
+  console.log(
+    `  A0 hand and forge — forges/run ${(forges / Math.max(1, forgeRuns)).toFixed(2)} · hand at the end ${(hands / Math.max(1, forgeRuns)).toFixed(1)} dice`,
+  );
   console.log(
     `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%${mean >= CAMPAIGN_BAND[0] && mean <= CAMPAIGN_BAND[1] ? " — ok" : " — OUT OF BAND"}`,
   );
@@ -2938,7 +2953,6 @@ const campaignModeMain = (
     (into: WormholeTally, run: CampaignResult) => ({
       rides: into.rides + run.wormholes.rides,
       bypasses: into.bypasses + run.wormholes.bypasses,
-      backward: into.backward + run.wormholes.backward,
       fallbacks: into.fallbacks + run.wormholes.fallbacks,
       rowsMoved: into.rowsMoved + run.wormholes.rowsMoved,
       tollPaid: into.tollPaid + run.wormholes.tollPaid,
@@ -2960,10 +2974,6 @@ const campaignModeMain = (
   );
   console.log(
     `    rides ${String(holes.rides)} (${
-      holes.rides === 0
-        ? "0"
-        : ((holes.backward / holes.rides) * 100).toFixed(0)
-    }% backward · ${
       holes.rides === 0
         ? "0"
         : ((holes.fallbacks / holes.rides) * 100).toFixed(0)
@@ -3398,11 +3408,7 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
 type AxisPolicy = "stability" | "resonance" | "greedy";
 
 const optionAxisSum = (option: EventOption): number => {
-  const lists = [
-    ...(option.outcomes ?? []),
-    ...(option.onPass ?? []),
-    ...(option.onFail ?? []),
-  ];
+  const lists = allOutcomes(option);
   if (lists.length === 0) return 0;
   const total = lists.reduce(
     (sum, outcome) =>

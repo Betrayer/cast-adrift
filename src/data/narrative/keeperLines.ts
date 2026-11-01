@@ -46,7 +46,10 @@ const MARA_REACTIVE: readonly KeeperLine[] = [
   line("mFavor1", "mara", "shop", { all: ["favorHeld"] }),
   line("mVault1", "mara", "shop", { all: ["maraVaultOpened"] }),
   line("mCourt1", "mara", "shop", { all: ["courtFair"] }),
-  line("mCourier1", "mara", "shop", { all: ["courierFreed"] }),
+  line("mCourier1", "mara", "shop", {
+    all: ["courierFreed"],
+    not: ["courierNetted"],
+  }),
 ];
 
 const YUSUF_REACTIVE: readonly KeeperLine[] = [

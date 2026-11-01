@@ -1,7 +1,7 @@
 import { CHART_NODES } from "../../src/data/chart";
-import type { ChartNodeDef } from "../../src/data/chart/types";
+import type { ChartNodeDef, ChartNodeKind } from "../../src/data/chart/types";
 import type { PerkMods } from "../../src/data/perks/types";
-import { chartNodeCost } from "../../src/game/chart/cost";
+import { chartNodeCost, CORE_NODE_ID } from "../../src/game/chart/cost";
 import { canAllocate, pointsSpent, pointsTotal } from "../../src/game/chart/engine";
 import { computeChartMods } from "../../src/game/run/runMods";
 
@@ -30,16 +30,18 @@ const MOD_WEIGHTS: Partial<Record<keyof PerkMods, number>> = {
   xpMultPct: 0,
 };
 
-const KIND_VALUE: Record<string, number> = {
+const KIND_VALUE: Readonly<Record<ChartNodeKind, number>> = {
   small: 0.2,
-  minor: 0.6,
+  gate: 0.4,
+  confluence: 1.2,
   notable: 1.4,
+  nexus: 3,
   keystone: 3,
 };
 
 const nodeValue = (def: ChartNodeDef): number => {
   const mods = computeChartMods([def.id]);
-  let score = KIND_VALUE[def.kind] ?? 0.2;
+  let score = KIND_VALUE[def.kind];
   for (const [key, weight] of Object.entries(MOD_WEIGHTS)) {
     score += mods[key as keyof PerkMods] * (weight ?? 0);
   }
@@ -55,7 +57,7 @@ export const MID_COLLECTION_LEVEL = 25;
 
 export const buildChartPicks = (level: number): string[] => {
   const budget = pointsTotal(level);
-  const picks: string[] = [];
+  const picks: string[] = [CORE_NODE_ID];
   for (let step = 0; step < budget; step += 1) {
     if (pointsSpent(picks) >= budget) break;
     let best: ChartNodeDef | undefined;

@@ -1,7 +1,9 @@
 {
   "rewrites": [
     { "source": "/play", "destination": "/play/index.html" },
-    { "source": "/play/(.*)", "destination": "/play/index.html" }
+    { "source": "/play/(.*)", "destination": "/play/index.html" },
+    { "source": "/tma", "destination": "/play/index.html" },
+    { "source": "/tma/(.*)", "destination": "/play/index.html" }
   ],
   "headers": [
     {

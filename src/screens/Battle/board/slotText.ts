@@ -124,6 +124,11 @@ export const projectionShort = (
 export const projectionTone = (projection: SlotProjection): ProjectionTone =>
   projection.jammed ? 'danger' : projection.bonus > 0 ? 'bonus' : 'plain';
 
+export const projectionToneClass = (
+  projection: SlotProjection,
+  classes: Readonly<Record<ProjectionTone, string | undefined>>,
+): string => classes[projectionTone(projection)] ?? '';
+
 export const slotSchool = (
   slotId: SlotId,
   slot: Pick<SlotState, 'mk'>,

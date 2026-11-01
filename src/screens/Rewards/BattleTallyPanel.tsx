@@ -1,7 +1,11 @@
-import { Button, Text } from "@mantine/core";
+import { Button, Text, VisuallyHidden } from "@mantine/core";
+import { useLayoutEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
+import { MOTION_MS, riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
+import { rafTweens } from "@/pixi/tween";
 import type { BattleTally } from "@/stores/runStore";
+import { useReducedMotion } from "@/stores/settingsStore";
 import styles from "./Rewards.module.css";
 
 interface TallyRow {
@@ -10,6 +14,12 @@ interface TallyRow {
   value: number;
   tone?: "amber" | "danger";
 }
+
+const TALLY_COUNT_DELAY_MS = MOTION_MS.m;
+
+const TALLY_COUNT_MS = MOTION_MS.xl;
+
+const COUNTED_ROWS: ReadonlySet<string> = new Set(["scrap"]);
 
 export const tallyRows = (tally: BattleTally): readonly TallyRow[] =>
   [
@@ -33,6 +43,35 @@ export const tallyRows = (tally: BattleTally): readonly TallyRow[] =>
     },
   ].filter((row) => row.id === "turns" || row.value > 0);
 
+const TallyCount = ({ value }: { value: number }) => {
+  const reduced = useReducedMotion();
+  const node = useRef<HTMLSpanElement | null>(null);
+
+  useLayoutEffect(() => {
+    const element = node.current;
+    if (element === null) return;
+    const { tweens, destroy } = rafTweens();
+    const write = (shown: number): void => {
+      element.textContent = String(shown);
+    };
+    element.dataset.count = "running";
+    tweens.count(0, value, TALLY_COUNT_MS, write, {
+      reduced,
+      delay: TALLY_COUNT_DELAY_MS,
+      onComplete: () => {
+        element.dataset.count = "done";
+      },
+    });
+    return () => {
+      destroy();
+      write(value);
+      element.dataset.count = "done";
+    };
+  }, [value, reduced]);
+
+  return <span ref={node} aria-hidden />;
+};
+
 interface BattleTallyPanelProps {
   tally: BattleTally;
   onContinue?: () => void;
@@ -49,8 +88,14 @@ export const BattleTallyPanel = ({
         {t(tally.won ? "run:tally.title" : "run:tally.titleLoss")}
       </Text>
       <div className={styles.tallyGrid}>
-        {tallyRows(tally).map((row) => (
-          <div key={row.id} className={styles.tallyRow} data-tally-row={row.id}>
+        {tallyRows(tally).map((row, index) => (
+          <div
+            key={row.id}
+            className={styles.tallyRow}
+            data-tally-row={row.id}
+            data-rise
+            style={riseStyle(index)}
+          >
             <Text size="xs" c={tokens.faint}>
               {t(row.label)}
             </Text>
@@ -66,8 +111,17 @@ export const BattleTallyPanel = ({
               }
               data-tally-value={row.id}
             >
-              {row.value}
+              {COUNTED_ROWS.has(row.id) ? (
+                <TallyCount value={row.value} />
+              ) : (
+                row.value
+              )}
             </Text>
+            {COUNTED_ROWS.has(row.id) ? (
+              <VisuallyHidden data-tally-spoken={row.id}>
+                {row.value}
+              </VisuallyHidden>
+            ) : null}
           </div>
         ))}
       </div>

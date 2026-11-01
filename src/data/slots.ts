@@ -3,6 +3,9 @@ import type { SlotId } from "@/types/battle";
 
 export type MkLevel = 1 | 2 | 3;
 
+export const nextMkLevel = (mk: MkLevel): Exclude<MkLevel, 1> | null =>
+  mk === 1 ? 2 : mk === 2 ? 3 : null;
+
 export const SLOT_MK: Record<SlotId, readonly [DieTier, DieTier, DieTier]> = {
   weaponA: [8, 10, 12],
   weaponB: [8, 10, 12],
@@ -14,6 +17,14 @@ export const SLOT_MK: Record<SlotId, readonly [DieTier, DieTier, DieTier]> = {
   sensors: [6, 8, 10],
   reactor: [10, 12, 20],
   repairBay: [6, 8, 10],
+};
+
+export const SLOT_IDS: readonly SlotId[] = Object.keys(SLOT_MK) as SlotId[];
+
+export const SLOT_FAMILY: Readonly<Record<"weapons" | "shields" | "engines", readonly SlotId[]>> = {
+  weapons: ["weaponA", "weaponB", "spinal"],
+  shields: ["shields", "shieldsB"],
+  engines: ["engines", "enginesB"],
 };
 
 export const slotCapForMk = (slotId: SlotId, mk: MkLevel): DieTier => {
@@ -44,18 +55,11 @@ export const AFFINITY: Partial<Record<School, AffinityDef>> = {
   black: { slot: "reactor", kind: "chargeMult", mult: 1.5 },
 };
 
-const WEAPON_SLOTS: ReadonlySet<SlotId> = new Set([
-  "weaponA",
-  "weaponB",
-  "spinal",
-]);
+const WEAPON_SLOTS: ReadonlySet<SlotId> = new Set(SLOT_FAMILY.weapons);
 
-const SHIELD_SLOTS: ReadonlySet<SlotId> = new Set(["shields", "shieldsB"]);
+const SHIELD_SLOTS: ReadonlySet<SlotId> = new Set(SLOT_FAMILY.shields);
 
-export const ENGINE_SLOTS: ReadonlySet<SlotId> = new Set([
-  "engines",
-  "enginesB",
-]);
+export const ENGINE_SLOTS: ReadonlySet<SlotId> = new Set(SLOT_FAMILY.engines);
 
 export const slotInAffinity = (slotId: SlotId, affSlot: AffinitySlot): boolean =>
   affSlot === "weapons"

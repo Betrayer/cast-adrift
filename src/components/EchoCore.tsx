@@ -1,6 +1,7 @@
 import { Text } from '@mantine/core';
 import { useTranslation } from 'react-i18next';
 import { cx } from '@/app/cx';
+import { riseStyle } from '@/app/motion';
 import { tokens } from '@/app/theme';
 import { AppSheet } from '@/components/AppModal';
 import {
@@ -36,6 +37,7 @@ const NodeCard = ({
       data-echo-state={
         node.equipped ? 'equipped' : node.unlocked ? 'open' : 'locked'
       }
+      data-press={node.unlocked ? true : undefined}
       aria-disabled={!node.unlocked}
       onClick={() => {
         if (!node.unlocked) return;
@@ -98,6 +100,7 @@ export const EchoCore = ({ onClose }: { onClose: () => void }) => {
           className={cx(styles.node, selected === null && styles.nodeOn)}
           data-echo-node="none"
           data-echo-state={selected === null ? 'equipped' : 'open'}
+          data-press
           onClick={() => {
             playSfx('nudge', { rate: 0.9 });
             selectEcho(null);
@@ -109,11 +112,13 @@ export const EchoCore = ({ onClose }: { onClose: () => void }) => {
           <span className={styles.nodeBody}>{t('run:echo.noneBody')}</span>
         </button>
         <div className={styles.branches}>
-          {branches.map((branch) => (
+          {branches.map((branch, index) => (
             <div
               key={branch.branch}
               className={styles.branch}
               data-echo-branch={branch.branch}
+              data-rise
+              style={riseStyle(index)}
             >
               <span className={styles.branchName}>{t(branch.name)}</span>
               {branch.nodes.map((node) => (

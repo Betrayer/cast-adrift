@@ -52,6 +52,20 @@ export const publishBodyRect = (rect: BodyRect): void => {
   for (const listener of [...listeners]) listener(rect);
 };
 
+const ENEMY_NEED_PROPERTY = '--ca-enemy-need';
+
+export const publishEnemyNeed = (px: number | null): void => {
+  if (typeof document === 'undefined') return;
+  const root = document.documentElement.style;
+  const value =
+    px === null || !Number.isFinite(px)
+      ? ''
+      : `${String(Math.round(px * 10) / 10)}px`;
+  if (root.getPropertyValue(ENEMY_NEED_PROPERTY) === value) return;
+  if (value === '') root.removeProperty(ENEMY_NEED_PROPERTY);
+  else root.setProperty(ENEMY_NEED_PROPERTY, value);
+};
+
 export const subscribeBodyRect = (
   listener: (rect: BodyRect) => void,
 ): (() => void) => {

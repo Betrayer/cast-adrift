@@ -1,26 +1,53 @@
 import { describe, expect, it } from "vitest";
 import { SECTORS } from "@/data/sectors";
-import { generateSectorMap, START_NODE_ID } from "@/game/map/generator";
+import {
+  bossNodeIdFor,
+  generateSectorMap,
+  START_NODE_ID,
+} from "@/game/map/generator";
 import {
   forwardReach,
   forwardStations,
   isStationNode,
   STATION_TYPES,
 } from "@/game/map/reach";
-import { nodeById, outgoingEdges, type MapGraph } from "@/game/map/types";
+import {
+  bandOf,
+  nodeById,
+  outgoingEdges,
+  type HoleBand,
+  type MapGraph,
+} from "@/game/map/types";
 import { createStreams } from "@/services/rng";
 
 const SEEDS = 60;
+
+const must = <T>(value: T | undefined): T => {
+  if (value === undefined) throw new Error("missing fixture value");
+  return value;
+};
+
+const firstFarRim = (band: HoleBand): string => must(band.farRim[0]);
 
 const mapsFor = (sector: number): MapGraph[] =>
   Array.from({ length: SEEDS }, (_, i) =>
     generateSectorMap(createStreams(i + 1).map, sector),
   );
 
-const walkOne = (map: MapGraph, from: string): string[] =>
-  outgoingEdges(map, from).filter(
+const HOLE_SECTORS: readonly number[] = [2, 3, 4, 5, 6];
+
+const walkOne = (map: MapGraph, from: string): string[] => [
+  ...outgoingEdges(map, from).filter(
     (id) => nodeById(map).get(id)?.hole !== true,
-  );
+  ),
+  ...(bandOf(map)?.rim.includes(from) === true ? (bandOf(map)?.farRim ?? []) : []),
+];
+
+const bandOrThrow = (map: MapGraph): HoleBand => {
+  const band = bandOf(map);
+  if (band === null) throw new Error("the map carries no band");
+  return band;
+};
 
 describe("the forward reach", () => {
   it("counts depth in rows, because every edge advances exactly one", () => {
@@ -59,7 +86,7 @@ describe("the forward reach", () => {
     }
   });
 
-  it("reaches only nodes a legal walk can actually reach", () => {
+  it("reaches only nodes a legal walk, a ride or a bypass can actually reach", () => {
     for (const sector of SECTORS) {
       for (const map of mapsFor(sector.id)) {
         const reach = forwardReach(map, START_NODE_ID);
@@ -92,6 +119,79 @@ describe("the forward reach", () => {
           expect(step.rows).toBeGreaterThanOrEqual(1);
           expect(step.rows).toBeGreaterThanOrEqual(previous);
           previous = step.rows;
+        }
+      }
+    }
+  });
+
+  it("crosses the band from every rim node to every far-rim node", () => {
+    for (const sector of HOLE_SECTORS) {
+      for (const map of mapsFor(sector)) {
+        const band = bandOrThrow(map);
+        const byId = nodeById(map);
+        for (const rim of band.rim) {
+          const reach = forwardReach(map, rim);
+          const origin = byId.get(rim);
+          for (const far of band.farRim) {
+            expect(reach.get(far), `S${String(sector)} ${rim}->${far}`).toBe(
+              (byId.get(far)?.row ?? 0) - (origin?.row ?? 0),
+            );
+          }
+          expect(reach.get(firstFarRim(band)), `S${String(sector)} ${rim}`).toBe(
+            band.rows[1] - band.rows[0] + 2,
+          );
+        }
+      }
+    }
+  });
+
+  it("reaches the boss from the start of every hole sector without entering a hole", () => {
+    for (const sector of HOLE_SECTORS) {
+      for (const map of mapsFor(sector)) {
+        const byId = nodeById(map);
+        const reach = forwardReach(map, START_NODE_ID);
+        expect(reach.get(bossNodeIdFor(sector))).toBe(map.shape.bossRow);
+        for (const id of reach.keys()) expect(byId.get(id)?.hole).not.toBe(true);
+        for (const node of map.nodes) {
+          if (node.hole === true) continue;
+          expect(reach.has(node.id), `S${String(sector)} ${node.id}`).toBe(true);
+        }
+      }
+    }
+  });
+
+  it("drops a cleared far-rim node from the crossing and keeps the rest", () => {
+    const map = must(mapsFor(2)[0]);
+    const band = bandOrThrow(map);
+    const rim = must(band.rim[0]);
+    const cleared = firstFarRim(band);
+    const reach = forwardReach(map, rim, [cleared]);
+    expect(reach.has(cleared)).toBe(false);
+    for (const far of band.farRim) {
+      if (far !== cleared) expect(reach.has(far)).toBe(true);
+    }
+  });
+
+  it("offers the stations past the band from the rim", () => {
+    for (const sector of HOLE_SECTORS) {
+      for (const map of mapsFor(sector)) {
+        const band = bandOrThrow(map);
+        const rim = must(band.rim[0]);
+        const byId = nodeById(map);
+        const beyond = map.nodes.filter(
+          (node) =>
+            node.row > band.rows[1] &&
+            node.row < map.shape.bossRow &&
+            isStationNode(node),
+        );
+        const offered = new Set(
+          forwardStations(map, rim).map((step) => step.node.id),
+        );
+        for (const node of beyond) {
+          expect(offered.has(node.id), `S${String(sector)} ${node.id}`).toBe(true);
+        }
+        for (const step of forwardStations(map, rim)) {
+          expect(step.rows).toBe(step.node.row - (byId.get(rim)?.row ?? 0));
         }
       }
     }

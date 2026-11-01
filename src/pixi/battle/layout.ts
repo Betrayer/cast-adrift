@@ -1,3 +1,5 @@
+import { clamp } from "@/app/math";
+
 export interface Rect {
   x: number;
   y: number;
@@ -48,6 +50,12 @@ export interface BattleLayoutInput {
   maxSubsystems: number;
 }
 
+export interface EnemyBandNeedInput {
+  bandWidth: number;
+  enemyCount: number;
+  maxSubsystems: number;
+}
+
 const TRAY_GAP = 8;
 const TRAY_MAX_ROWS = 3;
 const DIE_TAPPABLE = 40;
@@ -66,9 +74,6 @@ const SUB_CHIP_GAP_MIN = 10;
 const PART_LABEL_GAP = 3;
 const INTENT_HEADROOM = 16;
 const ENEMY_SHRINK_PASSES = 8;
-
-const clamp = (value: number, min: number, max: number): number =>
-  Math.min(max, Math.max(min, value));
 
 export const dieCeilingFor = (bandWidth: number): number =>
   bandWidth >= WIDE_BAND ? DIE_MAX_WIDE : DIE_MAX;
@@ -159,6 +164,29 @@ const tightSideBlockFor = (
   );
 };
 
+const fullSizeEnemyBlock = (
+  bandWidth: number,
+  enemyCount: number,
+  subs: number,
+): { pitch: number; size: number; block: EnemyBlock } => {
+  const pitch = bandWidth / (enemyCount + 1);
+  const chipReach = subs > 0 ? SUB_CHIP_GAP + 18 : 0;
+  const size = clamp(
+    pitch - chipReach - ENEMY_GAP,
+    ENEMY_MIN,
+    enemyCeilingFor(bandWidth),
+  );
+  return { pitch, size, block: enemyBlockFor(size, subs, pitch) };
+};
+
+export const enemyBandNeed = ({
+  bandWidth,
+  enemyCount,
+  maxSubsystems,
+}: EnemyBandNeedInput): number =>
+  fullSizeEnemyBlock(bandWidth, Math.max(enemyCount, 1), Math.max(maxSubsystems, 0))
+    .block.height;
+
 const rowCountsFor = (diceCount: number, rows: number): number[] => {
   const perRow = Math.ceil(diceCount / rows);
   const counts: number[] = [];
@@ -237,14 +265,10 @@ export const computeBattleLayout = (
     }
   });
 
-  const enemyPitch = enemyBand.w / (enemyCount + 1);
-  const chipReach = subs > 0 ? SUB_CHIP_GAP + 18 : 0;
-  let enemySize = clamp(
-    enemyPitch - chipReach - ENEMY_GAP,
-    ENEMY_MIN,
-    enemyCeilingFor(enemyBand.w),
-  );
-  let block = enemyBlockFor(enemySize, subs, enemyPitch);
+  const start = fullSizeEnemyBlock(enemyBand.w, enemyCount, subs);
+  const enemyPitch = start.pitch;
+  let enemySize = start.size;
+  let block = start.block;
   for (let pass = 0; pass < ENEMY_SHRINK_PASSES; pass += 1) {
     if (block.height <= enemyBand.h || block.height <= 0) break;
     const shrunk = Math.max(

@@ -7,7 +7,11 @@ import {
   startedSnap,
 } from "@/game/battle/battleHarness";
 import { canCopy } from "@/game/battle/actives";
-import { computeCensus, resonanceAtLeast } from "@/game/battle/resonance";
+import {
+  computeCensus,
+  resonanceAtLeast,
+  resonanceBoardRows,
+} from "@/game/battle/resonance";
 import { resolveEnemyPhase, resolvePlayerPhase } from "@/game/battle/resolver";
 import { applyRollFloors } from "@/game/battle/rollFloors";
 import { BattleCtx } from "@/game/effects/context";
@@ -52,6 +56,52 @@ describe("census", () => {
     const census = computeCensus(dice);
     expect(census.counts.red).toBe(2);
     expect(census.counts.blue).toBe(1);
+  });
+});
+
+describe("resonance board rows", () => {
+  it("tallies each school's dice by state, flags prism lift and keeps school order", () => {
+    const dice: Pick<RolledDie, "school" | "state">[] = [
+      { school: "grey", state: "tray" },
+      { school: "prismatic", state: "placed" },
+      { school: "red", state: "reserved" },
+      { school: "yellow", state: "discard" },
+      { school: "blue", state: "tray" },
+      { school: "red", state: "placed" },
+      { school: "red", state: "bag" },
+      { school: "blue", state: "tray" },
+      { school: "red", state: "tray" },
+    ];
+    const census = {
+      counts: {
+        red: 5,
+        blue: 2,
+        green: 0,
+        yellow: 0,
+        black: 3,
+        grey: 0,
+        prismatic: 1,
+      },
+    };
+    expect(resonanceBoardRows(dice, census)).toEqual([
+      { school: "red", deck: 5, prism: true, placed: 1, tray: 1, reserved: 1 },
+      { school: "blue", deck: 2, prism: false, placed: 0, tray: 2, reserved: 0 },
+      { school: "black", deck: 3, prism: true, placed: 0, tray: 0, reserved: 0 },
+      { school: "grey", deck: 0, prism: false, placed: 0, tray: 1, reserved: 0 },
+      { school: "prismatic", deck: 1, prism: false, placed: 1, tray: 0, reserved: 0 },
+    ]);
+  });
+
+  it("marks the school a prismatic die lifts in a computed census", () => {
+    const dice: Pick<RolledDie, "school" | "state">[] = [
+      { school: "red", state: "placed" },
+      { school: "red", state: "tray" },
+      { school: "prismatic", state: "tray" },
+    ];
+    expect(resonanceBoardRows(dice, computeCensus(dice))).toEqual([
+      { school: "red", deck: 3, prism: true, placed: 1, tray: 1, reserved: 0 },
+      { school: "prismatic", deck: 1, prism: false, placed: 0, tray: 1, reserved: 0 },
+    ]);
   });
 });
 

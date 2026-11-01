@@ -7,6 +7,7 @@ import {
   banishPerkChoice,
   completeNode,
   endRun,
+  JUMPS_PER_TIDE,
   jumpTo,
   rerollPerkDraft,
   resolveRunBattle,
@@ -16,7 +17,7 @@ import { ALL_PERKS } from "@/data/perks";
 import { STARTER_DECK } from "@/data/decks";
 import { deckPoints } from "@/data/metaShop";
 import { hangarBudget } from "@/data/milestones";
-import { DECK_CAP } from "@/game/economy/prices";
+import { HANGAR_DECK_CAP } from "@/data/metaShop";
 import { totalXpForLevel } from "@/game/xp";
 import { useAppStore } from "@/stores/appStore";
 import { useBattleStore } from "@/stores/battleStore";
@@ -73,17 +74,19 @@ describe("run flow", () => {
     expect(useRunStore.getState().position).toBe(before);
   });
 
-  it("raises tide on the 4th jump", () => {
+  it("raises tide on the 5th jump", () => {
+    expect(JUMPS_PER_TIDE).toBe(5);
     startRun(7);
     const map = useRunStore.getState().map;
     if (map === null) throw new Error("map missing");
-    const path = pathFrom(map, START_NODE_ID, 4);
-    expect(path.length).toBe(4);
-    for (let i = 0; i < 3; i += 1) {
+    const path = pathFrom(map, START_NODE_ID, JUMPS_PER_TIDE);
+    expect(path.length).toBe(JUMPS_PER_TIDE);
+    for (let i = 0; i < JUMPS_PER_TIDE - 1; i += 1) {
       expect(jumpTo(path[i] as NodeId)).toBe(true);
       expect(useRunStore.getState().tide).toBe(0);
+      expect(useRunStore.getState().jumpsSinceTide).toBe(i + 1);
     }
-    expect(jumpTo(path[3] as NodeId)).toBe(true);
+    expect(jumpTo(path[JUMPS_PER_TIDE - 1] as NodeId)).toBe(true);
     expect(useRunStore.getState().tide).toBe(1);
     expect(useRunStore.getState().jumpsSinceTide).toBe(0);
   });
@@ -223,7 +226,7 @@ describe("hangar budget at run start", () => {
 
   it("trims a saved deck that no longer fits the live budget", () => {
     const budget = hangarBudget(1);
-    const overBudget = Array.from<string>({ length: DECK_CAP }).fill("red-d6");
+    const overBudget = Array.from<string>({ length: HANGAR_DECK_CAP }).fill("red-d6");
     expect(deckPoints(overBudget)).toBeGreaterThan(budget);
     seedProfile({ hangar: { deck: overBudget } });
 

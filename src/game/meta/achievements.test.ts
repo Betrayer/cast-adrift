@@ -275,7 +275,7 @@ describe("achievement conditions", () => {
     const threeOnly = CHAINS.slice(0, 3).flatMap((chain) => chainFlags(chain.id));
     expect(
       achievementProgress(def("allChains"), ctx({ flagsArchive: threeOnly })),
-    ).toEqual({ have: 3, need: 4, done: false });
+    ).toEqual({ have: 3, need: CHAINS.length, done: false });
   });
 
   it("requires every flag for an «all» story achievement", () => {
@@ -411,7 +411,7 @@ describe("id migration", () => {
     expect(migrated.stats.kills).toBe(700);
     expect(migrated.vouchers).toEqual({ perkDraft: 0 });
     expect(migrated.voucherOffers).toEqual([]);
-    expect(META_VERSION).toBe(18);
+    expect(META_VERSION).toBe(20);
   });
 
   it("keeps a die unlock reachable through its renamed achievement", () => {

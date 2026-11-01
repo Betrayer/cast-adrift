@@ -1,9 +1,15 @@
 import { Button, FocusTrap, Text, type ButtonProps } from '@mantine/core';
-import type { ReactNode } from 'react';
+import { useContext, useLayoutEffect, type ReactNode } from 'react';
+import { createPortal } from 'react-dom';
 import { cx } from '@/app/cx';
+import { ParkedContext } from '@/app/parked';
 import { tokens } from '@/app/theme';
-import { useEscapeKey, type DismissPolicy } from '@/components/dismiss';
+import { useLayeredEscape, type DismissPolicy } from '@/components/dismiss';
 import styles from './AppModal.module.css';
+
+export type SheetPlacement = 'bottom' | 'side';
+
+export type PanelData = Readonly<Record<`data-${string}`, string>>;
 
 interface SurfaceProps {
   children: ReactNode;
@@ -21,18 +27,33 @@ interface SheetProps extends SurfaceProps {
   closeLabel?: string;
   closeTestId?: string;
   closeSize?: ButtonProps['size'];
+  placement?: SheetPlacement;
+  panelData?: PanelData;
 }
 
 const useSurface = (
   dismiss: DismissPolicy,
   onClose: () => void,
+  parked: boolean,
 ): ((event: { target: EventTarget | null; currentTarget: EventTarget }) => void) => {
-  useEscapeKey(dismiss !== 'none', onClose);
+  useLayeredEscape(dismiss, onClose, parked);
   return (event) => {
     if (dismiss !== 'scrim') return;
     if (event.target !== event.currentTarget) return;
     onClose();
   };
+};
+
+const useReturnFocus = (active: boolean): void => {
+  useLayoutEffect(() => {
+    if (!active) return;
+    const opener = document.activeElement;
+    return () => {
+      if (opener instanceof HTMLElement && opener.isConnected) {
+        opener.focus({ preventScroll: true });
+      }
+    };
+  }, [active]);
 };
 
 export const AppModal = ({
@@ -46,7 +67,8 @@ export const AppModal = ({
   blur = false,
   className,
 }: SurfaceProps) => {
-  const onScrimClick = useSurface(dismiss, onClose);
+  const parked = useContext(ParkedContext);
+  const onScrimClick = useSurface(dismiss, onClose, parked);
   return (
     <div
       className={cx(
@@ -58,7 +80,7 @@ export const AppModal = ({
       data-app-modal={testId ?? label}
       onClick={onScrimClick}
     >
-      <FocusTrap active>
+      <FocusTrap active={!parked}>
         <div
           role="dialog"
           aria-modal="true"
@@ -74,6 +96,11 @@ export const AppModal = ({
   );
 };
 
+const panelClass = (placement: SheetPlacement | undefined, plain: boolean): string | undefined => {
+  if (placement !== undefined) return styles.panelDock;
+  return plain ? styles.panelSheetPlain : styles.panelSheet;
+};
+
 export const AppSheet = ({
   children,
   onClose,
@@ -86,26 +113,36 @@ export const AppSheet = ({
   closeLabel,
   closeTestId,
   closeSize = 'compact-sm',
+  placement,
+  panelData,
 }: SheetProps) => {
-  const onScrimClick = useSurface(dismiss, onClose);
-  return (
+  const parked = useContext(ParkedContext);
+  const onScrimClick = useSurface(dismiss, onClose, parked);
+  const docked = placement !== undefined;
+  useReturnFocus(docked);
+  const frame = (
     <div
       className={cx(styles.scrim, styles.sheetFrame, blur && styles.blurred)}
       data-app-sheet={testId ?? label}
+      data-sheet-placement={placement}
       onClick={onScrimClick}
     >
-      <FocusTrap active>
+      <FocusTrap active={!parked}>
         <div
           role="dialog"
           aria-modal="true"
           aria-label={label}
           tabIndex={-1}
           data-testid={testId}
-          className={cx(plain ? styles.panelSheetPlain : styles.panelSheet, className)}
+          data-sheet-placement={placement}
+          {...panelData}
+          className={cx(panelClass(placement, plain), className)}
         >
           {closeLabel === undefined ? null : (
             <div className={styles.sheetHead}>
-              <Text fw={700} c={tokens.text}>{label}</Text>
+              <Text fw={700} c={tokens.text} className={styles.sheetTitle}>
+                {label}
+              </Text>
               <Button
                 size={closeSize}
                 variant="subtle"
@@ -117,9 +154,10 @@ export const AppSheet = ({
               </Button>
             </div>
           )}
-          {children}
+          {docked ? <div className={styles.dockBody}>{children}</div> : children}
         </div>
       </FocusTrap>
     </div>
   );
+  return docked ? createPortal(frame, document.body) : frame;
 };
