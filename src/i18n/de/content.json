@@ -289,7 +289,8 @@
     "mineBaron": "Bergwerksbaron",
     "mineBaron-rack": "Bergwerksregal",
     "subsystem": {
-      "overclock": "Übertaktungsmodul"
+      "overclock": "Übertaktungsmodul",
+      "singularity": "Singularitätslinse"
     },
     "anchorHulk": "Anker-Hulk",
     "tetherDrone": "Tether-Drohne",
@@ -3316,12 +3317,15 @@
       "opt": {
         "clearOne": "Ein Pfandrecht aufheben",
         "buyTheHull": "Den Rumpf direkt kaufen",
-        "buyTheDebt": "Kaufen Sie stattdessen die Schuld"
+        "buyTheDebt": "Kaufen Sie stattdessen die Schuld",
+        "walkOn": "Die Pfandrechte liegen lassen"
       },
       "out": {
         "clearOne": "Einer ist geschafft, zwei stehen noch aus – und ein Besitzer, der nun genau weiß, wohin du gehst.",
         "buyTheHull": "Drei Pfandrechte, eine Unterschrift, ein Rumpf, den du auseinandernehmen wirst, um an das eine Teil zu kommen, das du eigentlich haben wolltest.",
-        "buyTheDebt": "Jetzt gehören die Pfandrechte dir. Der Eigentümer arbeitet für dich, bis er es nicht mehr tut – das ist eine andere Art von Freundlichkeit."
+        "buyTheDebt": "Jetzt gehören die Pfandrechte dir. Der Eigentümer arbeitet für dich, bis er es nicht mehr tut – das ist eine andere Art von Freundlichkeit.",
+        "walkOn": "Du wünschst dem Besitzer Glück und meinst es ernst. Die Pfandrechte bleiben am Rumpf, und sein Blick bleibt an deinem Heck.",
+        "walkOnTender": "Du lässt sie damit allein. Ein Tender der Gläubiger nimmt deinen Kurs auf, und hinter dir wird die Bahn lauter."
       }
     },
     "noSignalDrift": {
@@ -6292,6 +6296,10 @@
     "gauntlet": {
       "name": "Der Gauntlet",
       "desc": "Keine Perks, keine Sternenkarte, dafür der Obsidian-Pakt fest verbaut. Drei Eliten und ein Viertel der Hülle."
+    },
+    "deepVacuum": {
+      "name": "Tiefes Vakuum",
+      "desc": "Sektor vier, die Flut steigt einen Sprung früher, und die Barriere ist dort oft drei Reihen tief. Halte die Hülle über drei Zehnteln und geh mit Schrott daraus hervor."
     }
   },
   "sectors": {
@@ -6337,11 +6345,31 @@
     },
     "9": {
       "name": "High-Flut",
-      "desc": "Die Interferenzflut steigt auf 4."
+      "desc": "Die Interferenzflut erreicht ihren Höchststand noch eine Stufe höher."
     },
     "10": {
       "name": "Die Prüfung des Wächters",
       "desc": "Hülle −15 %. Schaffe das, und der Rim merkt sich deinen Namen."
+    },
+    "11": {
+      "name": "Hunger",
+      "desc": "Jeden Zug kommen sechs statt sieben Würfel auf den Tisch."
+    },
+    "12": {
+      "name": "Schweres Vakuum",
+      "desc": "Schwarze Löcher beißen fester zu: Die Umgehung kostet 10 % mehr Hülle, und ein chaotischer Durchflug löscht ein Schiff öfter aus."
+    },
+    "13": {
+      "name": "Blinde Sensoren",
+      "desc": "Der hinterste Gegner verbirgt seine Absicht, und die Sensoren lassen sich nur bis Mk2 ausbauen."
+    },
+    "14": {
+      "name": "Schulden",
+      "desc": "Die Ladenpreise steigen um weitere 40 %, und Eliten, Minibosse und Bosse beginnen den Kampf mit 6 Schild mehr."
+    },
+    "15": {
+      "name": "Singularität",
+      "desc": "Jeder Boss erhält ein weiteres Teil. Die Flut erreicht ihren Höchststand eine Stufe tiefer, und kein Durchflug durch ein Schwarzes Loch ist mehr stabil."
     }
   },
   "prologue": {

@@ -35,7 +35,8 @@
     "owned": "Открыта",
     "unlock": "Открыть",
     "price": "{{n}} осколков",
-    "ascendant": "Восшедший"
+    "ascendant": "Восшедший",
+    "eventHorizon": "Горизонт событий"
   },
   "diagnostics": {
     "version": "Сборка {{version}}",

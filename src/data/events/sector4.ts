@@ -737,6 +737,7 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
       {
         id: "armThem",
         label: "content:events.processionEscort.opt.armThem",
+        requires: { req: "scrap", n: 50 },
         outcomes: [
           {
             text: "content:events.processionEscort.out.armThem",
@@ -775,6 +776,7 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
       {
         id: "buyBackName",
         label: "content:events.brokerInTheChoir.opt.buyBackName",
+        requires: { req: "scrap", n: 60 },
         outcomes: [
           {
             text: "content:events.brokerInTheChoir.out.buyBackName",
@@ -1203,6 +1205,7 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
       {
         id: "buyCount",
         label: "content:events.processionCensus.opt.buyCount",
+        requires: { req: "scrap", n: 45 },
         outcomes: [
           {
             text: "content:events.processionCensus.out.buyCount",
@@ -1257,6 +1260,7 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
       {
         id: "buyHull",
         label: "content:events.acolyteFerry.opt.buyHull",
+        requires: { req: "scrap", n: 40 },
         outcomes: [
           {
             text: "content:events.acolyteFerry.out.buyHull",
@@ -2306,7 +2310,10 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
       {
         id: "friendPrice",
         label: "content:events.maraIndulgences.opt.friendPrice",
-        requires: { req: "flag", key: "maraFriend" },
+        requires: [
+          { req: "flag", key: "maraFriend" },
+          { req: "scrap", n: 15 },
+        ],
         outcomes: [
           {
             text: "content:events.maraIndulgences.out.friendPrice",
@@ -2327,7 +2334,10 @@ export const SECTOR4_EVENTS: readonly EventDef[] = [
       {
         id: "settleOld",
         label: "content:events.maraIndulgences.opt.settleOld",
-        requires: { req: "flag", key: "maraGrudge" },
+        requires: [
+          { req: "flag", key: "maraGrudge" },
+          { req: "scrap", n: 30 },
+        ],
         outcomes: [
           {
             text: "content:events.maraIndulgences.out.settleOld",

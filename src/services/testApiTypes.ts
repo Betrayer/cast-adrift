@@ -51,6 +51,7 @@ export interface MetaPatch {
   tutorialSeen?: "all" | readonly string[];
   stats?: Partial<MetaStats>;
   echo?: EchoNodeId | null;
+  ascensionCleared?: number;
 }
 
 export interface RunPatch {
@@ -288,6 +289,7 @@ export interface TestState {
     shipyardDiscount: number;
     echo: string | null;
     echoUsed: boolean;
+    ascension: number;
   };
   battle: {
     phase: string;

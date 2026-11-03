@@ -5,8 +5,8 @@ import { flourishStyle, MOTION_MS, riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
 import { TapPopover } from "@/components/TapPopover";
 import { SHIP_BY_ID } from "@/data/ships";
-import { nextMkLevel, slotCapForMk, type MkLevel } from "@/data/slots";
-import { discountedMkCost, MK_TOP } from "@/game/economy/prices";
+import { slotCapForMk, type MkLevel } from "@/data/slots";
+import { discountedMkCost, MK_TOP, mkTopFor, nextMkFor } from "@/game/economy/prices";
 import { mkFactFor } from "@/game/battle/systemFacts";
 import { noteMkTop } from "@/game/meta/counters";
 import { autosaveRun } from "@/game/run/flow";
@@ -23,6 +23,7 @@ export const SystemsSection = () => {
   const shipId = useRunStore((s) => s.shipId);
   const shipyardDiscount = useRunStore((s) => s.shipyardDiscount);
   const vouchers = useRunStore((s) => s.vouchers);
+  const ascension = useRunStore((s) => s.ascension);
   const [swept, setSwept] = useState<{ slotId: SlotId; key: number } | null>(
     null,
   );
@@ -53,7 +54,7 @@ export const SystemsSection = () => {
 
   const buyMk = (slotId: SlotId): void => {
     const state = useRunStore.getState();
-    const target = nextMkLevel(state.mkLevels[slotId] ?? 1);
+    const target = nextMkFor(slotId, state.mkLevels[slotId] ?? 1, state.ascension);
     if (target === null) return;
     const cost = discountedMkCost(target, state.shipyardDiscount);
     if (!state.spendScrap(cost)) return;
@@ -65,7 +66,7 @@ export const SystemsSection = () => {
 
   const redeemVoucher = (slotId: SlotId): void => {
     const state = useRunStore.getState();
-    if (nextMkLevel(state.mkLevels[slotId] ?? 1) === null) return;
+    if (nextMkFor(slotId, state.mkLevels[slotId] ?? 1, state.ascension) === null) return;
     if (!state.spendVoucher()) return;
     state.bumpMk(slotId);
     markUpgraded(slotId);
@@ -78,7 +79,7 @@ export const SystemsSection = () => {
       <Stack gap={6}>
         {slotIds.map((slotId, index) => {
           const mk = mkLevels[slotId] ?? 1;
-          const target = nextMkLevel(mk);
+          const target = nextMkFor(slotId, mk, ascension);
           const maxed = target === null;
           const cost = target === null ? 0 : discountedMk(target);
           const capLabel = t("battle:slot.cap", {
@@ -146,7 +147,7 @@ export const SystemsSection = () => {
                     }}
                   >
                     {target === null
-                      ? t("run:shipyard.mkMax")
+                      ? t("run:shipyard.mkMax", { mk: mkTopFor(slotId, ascension) })
                       : t("run:shipyard.mk", { mk: target, cost })}
                   </Button>
                 </Group>

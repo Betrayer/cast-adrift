@@ -289,7 +289,8 @@
     "mineBaron": "Le baron des mines",
     "mineBaron-rack": "Rack minier",
     "subsystem": {
-      "overclock": "Module d'overclocking"
+      "overclock": "Module d'overclocking",
+      "singularity": "Lentille de singularité"
     },
     "anchorHulk": "Ancre Hulk",
     "tetherDrone": "Drone Tether",
@@ -3316,12 +3317,15 @@
       "opt": {
         "clearOne": "Levée d'un privilège",
         "buyTheHull": "Acheter la coque en pleine propriété",
-        "buyTheDebt": "Achetez plutôt la dette"
+        "buyTheDebt": "Achetez plutôt la dette",
+        "walkOn": "Laisser les privilèges où ils sont"
       },
       "out": {
         "clearOne": "Un de moins, plus que deux, et un propriétaire qui sait désormais exactement où vous allez.",
         "buyTheHull": "Trois gages, une signature, une coque que vous allez démonter pour récupérer la seule pièce qui vous intéressait vraiment.",
-        "buyTheDebt": "Désormais, ces privilèges vous appartiennent. Le propriétaire travaille pour vous jusqu’à ce que ce ne soit plus le cas, ce qui est une forme de bienveillance d’un autre genre."
+        "buyTheDebt": "Désormais, ces privilèges vous appartiennent. Le propriétaire travaille pour vous jusqu’à ce que ce ne soit plus le cas, ce qui est une forme de bienveillance d’un autre genre.",
+        "walkOn": "Tu souhaites bonne chance au propriétaire, et tu le penses. Les privilèges restent sur la coque, et son regard reste sur ta poupe.",
+        "walkOnTender": "Tu les laisses à leurs affaires. Une navette des créanciers prend ton cap, et la voie gronde plus fort derrière toi."
       }
     },
     "noSignalDrift": {
@@ -6292,6 +6296,10 @@
     "gauntlet": {
       "name": "Le Gauntlet",
       "desc": "Ni atouts ni carte, et le Pacte d'Obsidienne boulonné dessus. Trois élites et un quart de la coque."
+    },
+    "deepVacuum": {
+      "name": "Vide profond",
+      "desc": "Secteur quatre, la marée monte un saut plus tôt et la barrière y fait souvent trois rangées d'épaisseur. Garde la coque au-dessus de trois dixièmes et ressors avec de la ferraille."
     }
   },
   "sectors": {
@@ -6337,11 +6345,31 @@
     },
     "9": {
       "name": "Marée de haut niveau",
-      "desc": "La marée d'interférence atteint le niveau 4."
+      "desc": "La marée d'interférence culmine encore un niveau plus haut."
     },
     "10": {
       "name": "L'épreuve du Gardien",
       "desc": "Coque −15 %. Si tu réussis, le Rim se souviendra de ton nom."
+    },
+    "11": {
+      "name": "Faim",
+      "desc": "Chaque tour, six dés sortent sur la table au lieu de sept."
+    },
+    "12": {
+      "name": "Vide pesant",
+      "desc": "Les trous noirs mordent plus fort : le contournement coûte 10 % de coque en plus, et une traversée chaotique efface un vaisseau plus souvent."
+    },
+    "13": {
+      "name": "Capteurs aveugles",
+      "desc": "L'ennemi le plus en retrait cache son intention, et les améliorations des Capteurs s'arrêtent à Mk2."
+    },
+    "14": {
+      "name": "Dette",
+      "desc": "Les prix en magasin augmentent encore de 40 %, et les élites, les mini-boss et les boss commencent avec 6 points de bouclier en plus."
+    },
+    "15": {
+      "name": "Singularité",
+      "desc": "Chaque boss gagne une pièce de plus. La marée culmine un niveau plus bas, et plus aucune traversée d'un trou noir n'est stable."
     }
   },
   "prologue": {

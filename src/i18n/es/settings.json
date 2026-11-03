@@ -35,7 +35,8 @@
     "owned": "Desbloqueado",
     "unlock": "Desbloquear",
     "price": "{{n}} fragmentos",
-    "ascendant": "Ascendente"
+    "ascendant": "Ascendente",
+    "eventHorizon": "Horizonte de sucesos"
   },
   "diagnostics": {
     "version": "Compilar {{version}}",

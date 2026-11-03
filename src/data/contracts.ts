@@ -225,6 +225,14 @@ export const CONTRACTS: readonly ContractDef[] = [
       { g: "scrapAtLeast", n: 120 },
     ],
   }),
+  contract("deepVacuum", {
+    setup: { sector: 4, mutators: ["risingTide"] },
+    goals: [
+      { g: "win" },
+      { g: "hullNeverBelowPct", n: 30 },
+      { g: "scrapAtLeast", n: 100 },
+    ],
+  }),
   contract("gauntlet", {
     setup: {
       forcedTraits: ["obsidianPact"],

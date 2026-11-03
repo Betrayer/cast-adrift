@@ -76,7 +76,8 @@
     "echoTotal": "echoes your last turn (max {{n}})",
     "foldOrder": "folds the order",
     "devourDie": "eats your best spare die",
-    "idle": "Holds"
+    "idle": "Holds",
+    "hidden": "Intent hidden"
   },
   "slot": {
     "weaponA": "Weapon A",
@@ -142,6 +143,7 @@
   "targetBody": "Target the hull",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "incoming raw {{raw}} → ~{{expected}} · shield {{shield}} · hull {{hull}}",
+  "mitigationHidden": "worst case raw {{raw}} → ~{{expected}} · shield {{shield}} · hull {{hull}}",
   "mitigationNone": "No damage from this enemy this turn",
   "forecast": "you deal {{out}} · you take ~{{inc}} (shield holds {{shield}})",
   "forecastClear": "{{out}} damage clears the field",

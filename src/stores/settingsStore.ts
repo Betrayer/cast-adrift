@@ -5,6 +5,11 @@ import {
   DEFAULT_BATTLE_LAYOUT,
   isBattleLayoutId,
 } from '@/data/battleLayouts';
+import {
+  DEFAULT_BRIDGE_FRAME,
+  isBridgeFrameChoice,
+  type BridgeFrameChoice,
+} from '@/data/bridgeFrames';
 import { DEFAULT_CHART_LAYOUT, isChartLayoutId } from '@/data/chartLayouts';
 import { DEFAULT_ROLL_STYLE, isRollStyle } from '@/data/rollStyles';
 import { DEFAULT_THEME_ID, isThemeId, type ThemeId } from '@/data/themes';
@@ -35,6 +40,7 @@ export interface SettingsValues {
   battleLayout: BattleLayoutId;
   chartLayout: ChartLayoutId;
   rollStyle: RollStyle;
+  bridgeFrame: BridgeFrameChoice;
   skipTally: boolean;
 }
 
@@ -52,10 +58,11 @@ export interface SettingsState extends SettingsValues {
   setBattleLayout: (battleLayout: BattleLayoutId) => void;
   setChartLayout: (chartLayout: ChartLayoutId) => void;
   setRollStyle: (rollStyle: RollStyle) => void;
+  setBridgeFrame: (bridgeFrame: BridgeFrameChoice) => void;
   setSkipTally: (skipTally: boolean) => void;
 }
 
-export const SETTINGS_VERSION = 7;
+export const SETTINGS_VERSION = 8;
 
 const DEFAULTS: SettingsValues = {
   locale: 'en',
@@ -71,6 +78,7 @@ const DEFAULTS: SettingsValues = {
   battleLayout: DEFAULT_BATTLE_LAYOUT,
   chartLayout: DEFAULT_CHART_LAYOUT,
   rollStyle: DEFAULT_ROLL_STYLE,
+  bridgeFrame: DEFAULT_BRIDGE_FRAME,
   skipTally: false,
 };
 
@@ -105,6 +113,9 @@ export const migrateSettings = (
       ? prev.chartLayout
       : DEFAULTS.chartLayout,
     rollStyle: isRollStyle(prev.rollStyle) ? prev.rollStyle : DEFAULTS.rollStyle,
+    bridgeFrame: isBridgeFrameChoice(prev.bridgeFrame)
+      ? prev.bridgeFrame
+      : DEFAULTS.bridgeFrame,
     skipTally: prev.skipTally === true,
     vignette: isVignette(prev.vignette) ? prev.vignette : DEFAULTS.vignette,
   };
@@ -127,6 +138,7 @@ export const useSettingsStore = create<SettingsState>()(
       setBattleLayout: (battleLayout) => set({ battleLayout }),
       setChartLayout: (chartLayout) => set({ chartLayout }),
       setRollStyle: (rollStyle) => set({ rollStyle }),
+      setBridgeFrame: (bridgeFrame) => set({ bridgeFrame }),
       setSkipTally: (skipTally) => set({ skipTally }),
     }),
     {

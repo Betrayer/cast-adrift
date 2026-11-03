@@ -76,7 +76,8 @@
     "echoTotal": "reprend votre dernier tour ({{n}} maximum)",
     "foldOrder": "traite la commande",
     "devourDie": "utilise ton meilleur dé de réserve",
-    "idle": "Tient"
+    "idle": "Tient",
+    "hidden": "Intention masquée"
   },
   "slot": {
     "weaponA": "Arme A",
@@ -142,6 +143,7 @@
   "targetBody": "Viser la coque",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "entrant brut {{raw}} → ~{{expected}} · bouclier {{shield}} · coque {{hull}}",
+  "mitigationHidden": "au pire brut {{raw}} → ~{{expected}} · bouclier {{shield}} · coque {{hull}}",
   "mitigationNone": "Cet ennemi ne fait aucun dégât ce tour-ci",
   "forecast": "tu infliges {{out}} · tu encaisses ~{{inc}} (le bouclier tient {{shield}})",
   "forecastClear": "{{out}} de dégâts nettoient le terrain",

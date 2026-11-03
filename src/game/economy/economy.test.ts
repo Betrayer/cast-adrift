@@ -9,11 +9,14 @@ import {
   diePrice,
   diePriceBase,
   FUSION_COST,
+  MAX_SHOP_DISCOUNT_PCT,
+  MAX_SHOP_MARKUP_PCT,
   mkUpgradeCost,
   repairCost,
   sellValue,
 } from "@/game/economy/prices";
 import {
+  BATTLE_SCRAP,
   computeNodeReward,
   DROP_WEIGHTS,
   rollDrop,
@@ -49,6 +52,16 @@ describe("economy prices", () => {
     expect(applyDiscount(1, 100)).toBe(1);
   });
 
+  it("a negative discount is a markup the clamp keeps", () => {
+    expect(applyDiscount(100, -20)).toBe(120);
+    expect(applyDiscount(50, -45)).toBe(73);
+  });
+
+  it("caps the discount at 40 and the markup at a doubled price", () => {
+    expect(applyDiscount(100, 70)).toBe(100 - MAX_SHOP_DISCOUNT_PCT);
+    expect(applyDiscount(100, -117)).toBe(100 + MAX_SHOP_MARKUP_PCT);
+  });
+
   it("mk and repair costs match the design", () => {
     expect(mkUpgradeCost(2)).toBe(60);
     expect(mkUpgradeCost(3)).toBe(130);
@@ -68,11 +81,13 @@ describe("loot drops", () => {
     }
   });
 
-  it("battle scrap stays in 12-20 and the elite table still pays 45-60 before the carve", () => {
+  it("battle scrap stays in 7-11 and the elite table still pays 45-60 before the carve", () => {
+    const seen = new Set<number>();
     for (let seed = 1; seed <= 200; seed += 1) {
       const battle = computeNodeReward("battle", createStream(deriveSeed(seed, "b")));
-      expect(battle.scrap).toBeGreaterThanOrEqual(12);
-      expect(battle.scrap).toBeLessThanOrEqual(20);
+      seen.add(battle.scrap);
+      expect(battle.scrap).toBeGreaterThanOrEqual(BATTLE_SCRAP[0]);
+      expect(battle.scrap).toBeLessThanOrEqual(BATTLE_SCRAP[1]);
 
       for (const mult of SECTOR_SCRAP_MULTS) {
         const elite = computeNodeReward(
@@ -88,6 +103,7 @@ describe("loot drops", () => {
         expect(elite.dieDrop).not.toBeNull();
       }
     }
+    expect([...seen].sort((a, b) => a - b)).toEqual([7, 8, 9, 10, 11]);
   });
 
   it("the salvage carve costs the same scrap in every sector once the multiplier lands", () => {

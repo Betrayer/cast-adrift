@@ -1,4 +1,4 @@
-import { ascensionMods } from "@/data/ascension";
+import { ascensionMods, ascensionScrapBonusPct } from "@/data/ascension";
 import { dossierId } from "@/data/codex";
 import { contractDef } from "@/data/contracts";
 import { DIE_BY_ID } from "@/data/dice";
@@ -64,6 +64,7 @@ import {
   applyHoleToll,
   applyNodeMotifs,
   disintegrationPctFor,
+  ridesStayGentle,
 } from "@/game/run/motifs";
 import {
   logConsequence,
@@ -399,8 +400,8 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   autosaveRun();
 };
 
-export const startDriftRun = (seed = now() >>> 0): void => {
-  startRunMode({ mode: "drift", seed });
+export const startDriftRun = (seed = now() >>> 0, ascension = 0): void => {
+  startRunMode({ mode: "drift", seed, ascension });
 };
 
 export const startContractRun = (contractId: string): void => {
@@ -628,11 +629,11 @@ export const rideWormhole = (
       );
   const gentleLanded = softLanded && roll.landing !== null;
   if (gentleLanded) useRunStore.getState().spendEcho();
-  const unmadePct = disintegrationPctFor(s.sector);
+  const unmadePct = disintegrationPctFor(s.sector, s.ascension);
   if (
     !softLanded &&
     unmadePct > 0 &&
-    !isGentleRide(s.stats.wormholeRides) &&
+    (!isGentleRide(s.stats.wormholeRides) || !ridesStayGentle(s.ascension)) &&
     chaos.roll(unmadePct)
   ) {
     disintegrate();
@@ -961,7 +962,11 @@ export const resolveRunBattle = (): void => {
   const rewardScrap = Math.round(
     reward.scrap *
       sectorScrapMult *
-      (1 + (mods.scrapMultPct + mut.scrapMultPct) / 100),
+      (1 +
+        (mods.scrapMultPct +
+          mut.scrapMultPct +
+          ascensionScrapBonusPct(run.ascension)) /
+          100),
   );
 
   const base: NonNullable<RunValues["pendingRewards"]> =

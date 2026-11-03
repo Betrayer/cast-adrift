@@ -76,7 +76,8 @@
     "echoTotal": "эхо прошлого хода (макс. {{n}})",
     "foldOrder": "переворачивает порядок",
     "devourDie": "съедает лучшую свободную кость",
-    "idle": "Держится"
+    "idle": "Держится",
+    "hidden": "Намерение скрыто"
   },
   "slot": {
     "weaponA": "Орудие А",
@@ -142,6 +143,7 @@
   "targetBody": "Цель — корпус",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "входящий сырой {{raw}} → ~{{expected}} · щит {{shield}} · корпус {{hull}}",
+  "mitigationHidden": "в худшем случае сырой {{raw}} → ~{{expected}} · щит {{shield}} · корпус {{hull}}",
   "mitigationNone": "Этот враг не нанесёт урона в этом ходу",
   "forecast": "нанесёшь {{out}} · получишь ~{{inc}} (щит держит {{shield}})",
   "forecastClear": "{{out}} урона — поле чистое",

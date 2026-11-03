@@ -135,14 +135,15 @@ export const bypassOfferFor = (
   sector: number,
   hull: number,
   hullMax: number = hull,
+  ascension = 0,
 ): BypassOffer => {
   const offered = canBypass(map, from, hole, visited);
-  const toll = holeTollFor(sector, hullMax);
+  const toll = holeTollFor(sector, hullMax, ascension);
   return {
     offered,
     lethal: offered && bypassLethal(hull, toll),
     toll,
-    pct: Math.round(bypassPctFor(sector) * 100),
+    pct: Math.round(bypassPctFor(sector, ascension) * 100),
   };
 };
 
@@ -154,10 +155,11 @@ export const adjacentBypassOffer = (
   sector: number,
   hull: number,
   hullMax: number = hull,
+  ascension = 0,
 ): BypassOffer | null =>
   node.hole !== true || !areConnected(map, from, node.id)
     ? null
-    : bypassOfferFor(map, from, node.id, visited, sector, hull, hullMax);
+    : bypassOfferFor(map, from, node.id, visited, sector, hull, hullMax, ascension);
 
 export type BypassState = "none" | "lethal" | "cost";
 

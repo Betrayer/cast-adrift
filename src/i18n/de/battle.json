@@ -76,7 +76,8 @@
     "echoTotal": "gibt deinen letzten Zug wieder (maximal {{n}})",
     "foldOrder": "bearbeitet die Bestellung",
     "devourDie": "verschlingt deinen besten Ersatzwürfel",
-    "idle": "Hält"
+    "idle": "Hält",
+    "hidden": "Absicht verborgen"
   },
   "slot": {
     "weaponA": "Waffe A",
@@ -142,6 +143,7 @@
   "targetBody": "Rumpf anvisieren",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "eingehend roh {{raw}} → ~{{expected}} · Schild {{shield}} · Rumpf {{hull}}",
+  "mitigationHidden": "schlimmstenfalls roh {{raw}} → ~{{expected}} · Schild {{shield}} · Rumpf {{hull}}",
   "mitigationNone": "Dieser Gegner verursacht in dieser Runde keinen Schaden",
   "forecast": "du machst {{out}} · du nimmst ~{{inc}} (Schild hält {{shield}})",
   "forecastClear": "{{out}} Schaden räumt das Feld",

@@ -35,7 +35,8 @@
     "owned": "Відкрита",
     "unlock": "Відкрити",
     "price": "{{n}} уламків",
-    "ascendant": "Вознесений"
+    "ascendant": "Вознесений",
+    "eventHorizon": "Горизонт подій"
   },
   "diagnostics": {
     "version": "Збірка {{version}}",

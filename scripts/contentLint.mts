@@ -18,6 +18,7 @@ import {
 import { BADGES, BADGE_BY_ID, DIE_SKINS } from "../src/data/cosmetics";
 import { MILESTONES, milestoneLabel } from "../src/data/milestones";
 import { THEMES } from "../src/data/themes";
+import { BRIDGE_FRAMES } from "../src/data/bridgeFrames";
 import {
   OPEN_CONTRACTS,
   OPEN_DICE,
@@ -1618,7 +1619,7 @@ const dossierCount = CODEX.filter((e) => e.group === "dossier").length;
 expectCount("codex", dossierCount, DOSSIER_TOTAL, "dossiers");
 
 const MUTATOR_COUNT = 12;
-const CONTRACT_COUNT = 20;
+const CONTRACT_COUNT = 21;
 const MUTATOR_MOD_KEYS = new Set(Object.keys(ZERO_MUTATOR_MODS));
 
 checkUniqueIds(
@@ -2019,7 +2020,8 @@ for (const def of UNLOCKS) {
   if (def.cosmetic !== undefined) {
     const known =
       DIE_SKINS.some((skin) => skin.cosmetic === def.cosmetic) ||
-      THEMES.some((theme) => theme.unlock === def.cosmetic);
+      THEMES.some((theme) => theme.unlock === def.cosmetic) ||
+      BRIDGE_FRAMES.some((frame) => frame.cosmetic === def.cosmetic);
     if (!known)
       errors.push(`unlocks: "${def.id}" grants unknown cosmetic "${def.cosmetic}"`);
   }

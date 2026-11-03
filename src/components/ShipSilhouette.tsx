@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { schools } from "@/data/schools";
 import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
 import { SHIP_BY_ID, type BridgePin, type ShipId } from "@/data/ships";
+import { useBridgeFrame } from "@/services/prefs";
 import styles from "./ShipSilhouette.module.css";
 
 const VIEW = 1.6;
@@ -25,6 +26,7 @@ interface ShipSilhouetteProps {
 
 export const ShipSilhouette = ({ shipId, children }: ShipSilhouetteProps) => {
   const def = SHIP_BY_ID.get(shipId);
+  const frame = useBridgeFrame();
   if (def === undefined) return null;
   const glyph = shipGlyphFor(shipId);
   const colors = schools[def.bridgeTheme.tint];
@@ -32,7 +34,7 @@ export const ShipSilhouette = ({ shipId, children }: ShipSilhouetteProps) => {
     <div
       className={styles.stage}
       data-ship-silhouette={shipId}
-      data-bridge-frame={def.bridgeTheme.frame}
+      data-bridge-frame={frame === "hull" ? def.bridgeTheme.frame : frame}
       style={{
         ["--bridge-accent" as string]: colors.stroke,
         ["--bridge-wash" as string]: colors.fill,

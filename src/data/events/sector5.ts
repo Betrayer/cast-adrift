@@ -575,6 +575,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "armThemAgain",
         label: "content:events.haulersAtTheCore.opt.armThemAgain",
+        requires: { req: "scrap", n: 60 },
         outcomes: [
           {
             text: "content:events.haulersAtTheCore.out.armThemAgain",
@@ -917,6 +918,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "giveThemEngines",
         label: "content:events.hymnAtTheEdge.opt.giveThemEngines",
+        requires: { req: "scrap", n: 70 },
         outcomes: [
           {
             text: "content:events.hymnAtTheEdge.out.giveThemEngines",
@@ -1048,6 +1050,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "refitHere",
         label: "content:events.lastYard.opt.refitHere",
+        requires: { req: "scrap", n: 50 },
         outcomes: [
           {
             text: "content:events.lastYard.out.refitHere",
@@ -1078,6 +1081,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "hireCrew",
         label: "content:events.lastYard.opt.hireCrew",
+        requires: { req: "scrap", n: 35 },
         outcomes: [
           {
             text: "content:events.lastYard.out.hireCrew",
@@ -1113,6 +1117,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "buyEverything",
         label: "content:events.thresholdMarket.opt.buyEverything",
+        requires: { req: "scrap", n: 85 },
         outcomes: [
           {
             text: "content:events.thresholdMarket.out.buyEverything",
@@ -1143,6 +1148,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "leaveStock",
         label: "content:events.thresholdMarket.opt.leaveStock",
+        requires: { req: "scrap", n: 30 },
         outcomes: [
           {
             text: "content:events.thresholdMarket.out.leaveStock",
@@ -1474,7 +1480,10 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "squarePinch",
         label: "content:events.yusufAtTheCore.opt.squarePinch",
-        requires: { req: "flag", key: "fleetLaneClosed" },
+        requires: [
+          { req: "flag", key: "fleetLaneClosed" },
+          { req: "scrap", n: 50 },
+        ],
         outcomes: [
           {
             text: "content:events.yusufAtTheCore.out.squarePinch",
@@ -1516,6 +1525,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "payIt",
         label: "content:events.huntressAtTheCore.opt.payIt",
+        requires: { req: "scrap", n: 60 },
         outcomes: [
           {
             text: "content:events.huntressAtTheCore.out.payIt",
@@ -1568,7 +1578,10 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "hireHer",
         label: "content:events.huntressAtTheCore.opt.hireHer",
-        requires: { req: "flag", key: "hunterAllied" },
+        requires: [
+          { req: "flag", key: "hunterAllied" },
+          { req: "scrap", n: 30 },
+        ],
         outcomes: [
           {
             text: "content:events.huntressAtTheCore.out.hireHer",
@@ -1976,6 +1989,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
       {
         id: "buyLog",
         label: "content:events.rimSurveyor.opt.buyLog",
+        requires: { req: "scrap", n: 40 },
         outcomes: [
           {
             text: "content:events.rimSurveyor.out.buyLog",

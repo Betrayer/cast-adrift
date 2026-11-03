@@ -218,6 +218,26 @@ export const UNLOCKS: readonly UnlockDef[] = [
     source: { ascension: 10 },
     cosmetic: "ascendant",
   }),
+  unlock("skinSingularity", {
+    kind: "cosmetic",
+    source: { ascension: 11 },
+    cosmetic: "singularitySkin",
+  }),
+  unlock("contractsA12", {
+    kind: "contractWave",
+    source: { ascension: 12 },
+    contracts: ["deepVacuum"],
+  }),
+  unlock("frameObsidian", {
+    kind: "cosmetic",
+    source: { ascension: 13 },
+    cosmetic: "obsidianFrame",
+  }),
+  unlock("prestigeThemeTwo", {
+    kind: "cosmetic",
+    source: { ascension: 15 },
+    cosmetic: "eventHorizon",
+  }),
   unlock("skinPrestige50", {
     kind: "cosmetic",
     source: { level: 50 },

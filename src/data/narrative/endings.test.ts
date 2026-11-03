@@ -226,10 +226,10 @@ describe("epilogue tally", () => {
   });
 });
 
-describe("ascension A1–A10", () => {
-  it("defines exactly ten levels", () => {
+describe("ascension A1-A15", () => {
+  it("defines fifteen levels in order", () => {
     expect(ASCENSIONS.map((a) => a.level)).toEqual([
-      1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+      1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15,
     ]);
   });
 
@@ -243,6 +243,13 @@ describe("ascension A1–A10", () => {
       eliteSubsystem: false,
       bossPatternInsert: false,
       hullPct: 0,
+      tableDelta: 0,
+      bypassPctDelta: 0,
+      disintegrationPctDelta: 0,
+      hiddenIntents: 0,
+      sensorsMkCapDelta: 0,
+      bossExtraPart: false,
+      gentleRidesUnmake: false,
     });
     expect(ascensionMods(5)).toEqual({
       enemyHpPct: 10,
@@ -253,6 +260,13 @@ describe("ascension A1–A10", () => {
       eliteSubsystem: false,
       bossPatternInsert: false,
       hullPct: 0,
+      tableDelta: 0,
+      bypassPctDelta: 0,
+      disintegrationPctDelta: 0,
+      hiddenIntents: 0,
+      sensorsMkCapDelta: 0,
+      bossExtraPart: false,
+      gentleRidesUnmake: false,
     });
     expect(ascensionMods(2).shopPricePct).toBe(0);
     expect(ascensionMods(10)).toEqual({
@@ -264,12 +278,19 @@ describe("ascension A1–A10", () => {
       eliteSubsystem: true,
       bossPatternInsert: true,
       hullPct: -15,
+      tableDelta: 0,
+      bypassPctDelta: 0,
+      disintegrationPctDelta: 0,
+      hiddenIntents: 0,
+      sensorsMkCapDelta: 0,
+      bossExtraPart: false,
+      gentleRidesUnmake: false,
     });
   });
 
-  it("unlocks one level per clear, capped at A10", () => {
+  it("unlocks one level per clear, capped at A15", () => {
     expect(maxSelectableAscension(0)).toBe(0);
     expect(maxSelectableAscension(1)).toBe(1);
-    expect(maxSelectableAscension(99)).toBe(10);
+    expect(maxSelectableAscension(99)).toBe(15);
   });
 });

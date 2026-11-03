@@ -1,5 +1,7 @@
 import type { LocKey, School } from "@/types/content";
-import { mapEffectMagnitudes, mapModValues } from "@/data/chart/scale";
+import { mapEffectMagnitudes } from "@/data/chart/scale";
+import type { PerkMods } from "@/data/perks/types";
+import type { EffectDef } from "@/game/effects/types";
 import { smallTier } from "@/data/chart/types";
 import type { ChartRequirement, ChartScaling } from "@/data/chart/types";
 import type { ChartNodeDef } from "@/data/chart/types";
@@ -58,6 +60,14 @@ const nexusRequirement = (
 
 const TIER_MULT: readonly number[] = [1, 1.5, 2.25, 3];
 
+const SURVIVAL_RAMP = 0.5;
+
+const SURVIVAL_SCHOOLS: ReadonlySet<School> = new Set<School>(["green", "blue"]);
+
+const SURVIVAL_MODS: ReadonlySet<string> = new Set(["battleEndHeal", "shieldKeepPct"]);
+
+const SURVIVAL_ACTIONS: ReadonlySet<string> = new Set(["heal", "shield"]);
+
 const scaleNumber = (base: number, tier: number): number => {
   if (tier <= 1) return base;
   const mult = TIER_MULT[tier - 1] ?? 1;
@@ -66,16 +76,47 @@ const scaleNumber = (base: number, tier: number): number => {
   return base < 0 ? -grown : grown;
 };
 
-const scaleContent = (content: Content, tier: number): Content => {
+const scaleSurvival = (base: number, tier: number): number => {
+  const mult = (TIER_MULT[tier - 1] ?? 1) * SURVIVAL_RAMP;
+  const size = Math.abs(base);
+  const grown = Math.max(1, Math.round(size * mult));
+  return base < 0 ? -grown : grown;
+};
+
+const mapModEntries = (
+  mods: Partial<PerkMods>,
+  f: (key: string, value: number) => number,
+): Partial<PerkMods> => {
+  const out: Partial<Record<keyof PerkMods, number>> = {};
+  for (const [key, value] of Object.entries(mods)) {
+    out[key as keyof PerkMods] = typeof value === "number" ? f(key, value) : 0;
+  }
+  return out;
+};
+
+const survivalPayload = (effect: EffectDef): boolean =>
+  effect.do.length > 0 && effect.do.every((action) => SURVIVAL_ACTIONS.has(action.a));
+
+const scaleContent = (content: Content, tier: number, school: School): Content => {
   const grow = (n: number): number => scaleNumber(n, tier);
+  const survives = SURVIVAL_SCHOOLS.has(school);
+  const sustain = (n: number): number => scaleSurvival(n, tier);
+  const mods =
+    content.mods === undefined
+      ? undefined
+      : mapModEntries(content.mods, (key, value) =>
+          survives && SURVIVAL_MODS.has(key) ? sustain(value) : grow(value),
+        );
   return {
     ...content,
-    ...(content.mods === undefined
-      ? {}
-      : { mods: mapModValues(content.mods, grow) }),
+    ...(mods === undefined ? {} : { mods }),
     ...(content.effects === undefined
       ? {}
-      : { effects: content.effects.map((e) => mapEffectMagnitudes(e, grow)) }),
+      : {
+          effects: content.effects.map((e) =>
+            mapEffectMagnitudes(e, survives && survivalPayload(e) ? sustain : grow),
+          ),
+        }),
   };
 };
 
@@ -138,14 +179,18 @@ const buildCluster = (school: School, angleDeg: number): ChartNodeDef[] => {
   });
 
   const pool = basePool(school);
-  const seen = new Set<string>([payloadKey(GATE_CONTENT[school])]);
+  const dedupeKey = (content: Content, tier: number): string =>
+    SURVIVAL_SCHOOLS.has(school)
+      ? `${payloadKey(content)}|${String(tier)}`
+      : payloadKey(content);
+  const seen = new Set<string>([dedupeKey(GATE_CONTENT[school], 1)]);
   let cursor = 0;
   const nextSmall = (tier: number): Content => {
     for (let step = 0; step < pool.length; step += 1) {
       const base = pool[(cursor + step) % pool.length];
       if (base === undefined) continue;
-      const scaled = scaleContent(base, tier);
-      const key = payloadKey(scaled);
+      const scaled = scaleContent(base, tier, school);
+      const key = dedupeKey(scaled, tier);
       if (seen.has(key)) continue;
       seen.add(key);
       cursor = (cursor + step + 1) % pool.length;

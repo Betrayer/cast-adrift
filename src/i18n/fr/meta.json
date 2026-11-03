@@ -368,7 +368,9 @@
     "guardBody": "Il n'y a qu'un seul emplacement de partie. Le lancement de ce mode efface la partie en cours, tant localement que dans le cloud.",
     "guardYes": "Effacer et démarrer",
     "dailyPreview": "Demain ({{date}})",
-    "dailyPreviewLocked": "Les mutateurs de demain au niveau{{n}}"
+    "dailyPreviewLocked": "Les mutateurs de demain au niveau{{n}}",
+    "driftAscension": "Ascension pour cette dérive",
+    "driftScoreMult": "Score ×{{mult}}"
   },
   "contracts": {
     "title": "Contrats",
@@ -416,7 +418,8 @@
     "submitSent": "Soumis au conseil d'administration",
     "submitFailed": "Échec de l'envoi — le score est enregistré localement",
     "submitOffline": "Hors ligne — la partie est enregistrée localement",
-    "toBoard": "Ouvrir le tableau"
+    "toBoard": "Ouvrir le tableau",
+    "ascension": "Ascension A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Classements",
@@ -501,7 +504,8 @@
     "ascendant": "Ascendant",
     "chartwright": "Chartwright",
     "archivist": "Archiviste",
-    "answer": "La réponse"
+    "answer": "La réponse",
+    "singularity": "Singularité"
   },
   "unlock": {
     "opened": "Déverrouillé",
@@ -545,7 +549,11 @@
     "skinThreshold": "Le skin « Threshold »",
     "featureShipCorsair": "« The Hound » est désormais disponible à la vente",
     "featureShipFoundry": "La Forge est à vendre",
-    "featureShipPrism": "Le Prism est désormais disponible sur le marché"
+    "featureShipPrism": "Le Prism est désormais disponible sur le marché",
+    "skinSingularity": "Skin de dé : Singularité",
+    "contractsA12": "Contrat : Vide profond",
+    "frameObsidian": "Cadre du pont : Obsidienne",
+    "prestigeThemeTwo": "Thème : Horizon des événements"
   },
   "skin": {
     "title": "Les skins",
@@ -579,6 +587,10 @@
     "threshold": {
       "name": "Seuil",
       "desc": "Ronde, éteinte, bordée de gris clair. Portée par le seul capitaine qui ne se soit jamais penché."
+    },
+    "singularity": {
+      "name": "Singularité",
+      "desc": "Verre noir, un liseré blanc, une lumière qui se courbe autour du glyphe."
     }
   },
   "ach": {
@@ -840,7 +852,13 @@
       "skinVoidglass": "la peau « Voidglass »",
       "skinEmberglass": "la peau « Emberglass »",
       "prestigeTheme": "thème « Ascendant »",
-      "badge": "le badge « Ascendant »"
+      "badge": "le badge « Ascendant »",
+      "scrapBonus": "+5 % de ferraille des combats pour chaque niveau au-delà d'A10",
+      "skinSingularity": "le skin de dé « Singularité »",
+      "contractA12": "contrat « Vide profond »",
+      "frameObsidian": "cadre du pont « Obsidienne »",
+      "prestigeThemeTwo": "thème « Horizon des événements »",
+      "badgeSingularity": "le badge « Singularité »"
     }
   },
   "voucher": {
@@ -851,5 +869,17 @@
     "shards": "Prendre {{n}} ◈",
     "bank": "En réserve : {{n}} / {{max}}",
     "full": "Votre réserve de bons est pleine ({{max}}). Prenez les fragments."
+  },
+  "frame": {
+    "title": "Cadre du pont",
+    "hint": "Purement cosmétique. Un cadre ne change jamais un vaisseau.",
+    "hull": {
+      "name": "Cadre propre à la coque",
+      "desc": "Chaque coque porte le cadre avec lequel elle a été construite."
+    },
+    "obsidian": {
+      "name": "Obsidienne",
+      "desc": "Verre volcanique noir, bordé d'une ligne blanche et froide."
+    }
   }
 }

@@ -3,6 +3,11 @@ import {
   DEFAULT_BATTLE_LAYOUT,
   isBattleLayoutId,
 } from "@/data/battleLayouts";
+import {
+  DEFAULT_BRIDGE_FRAME,
+  isBridgeFrameChoice,
+  type BridgeFrameChoice,
+} from "@/data/bridgeFrames";
 import { DEFAULT_CHART_LAYOUT, isChartLayoutId } from "@/data/chartLayouts";
 import { DEFAULT_ROLL_STYLE, isRollStyle } from "@/data/rollStyles";
 import type { ThemeId } from "@/data/themes";
@@ -88,4 +93,23 @@ export const chooseRollStyle = (id: RollStyle): void => {
 export const chooseTheme = (id: ThemeId): void => {
   useSettingsStore.getState().setTheme(id);
   useMetaStore.getState().setPrefs({ theme: id });
+};
+
+export const resolveBridgeFrame = resolveWith<BridgeFrameChoice>(
+  isBridgeFrameChoice,
+  DEFAULT_BRIDGE_FRAME,
+);
+
+export const bridgeFrameId = (): BridgeFrameChoice =>
+  resolveBridgeFrame(
+    useMetaStore.getState().prefs.bridgeFrame,
+    useSettingsStore.getState().bridgeFrame,
+  );
+
+export const useBridgeFrame = (): BridgeFrameChoice =>
+  useSyncExternalStore(subscribePrefs, bridgeFrameId, bridgeFrameId);
+
+export const chooseBridgeFrame = (id: BridgeFrameChoice): void => {
+  useSettingsStore.getState().setBridgeFrame(id);
+  useMetaStore.getState().setPrefs({ bridgeFrame: id });
 };

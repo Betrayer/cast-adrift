@@ -22,8 +22,8 @@ import {
   isOnTable,
   isTableExtra,
   keptSeats,
+  tableSizeFor,
 } from "@/game/battle/table";
-import { TABLE_SIZE } from "@/game/economy/prices";
 import { BattleCtx, buildSources, emit } from "@/game/effects";
 import { sourceTrait } from "@/game/run/runMods";
 import type { RngStream, RngStreams } from "@/services/rng";
@@ -149,7 +149,7 @@ export const advanceTurn = (
     }
     return die;
   });
-  const draw = drawFromBag(cleared, TABLE_SIZE - keptSeats(cleared), () =>
+  const draw = drawFromBag(cleared, tableSizeFor(next.ascension) - keptSeats(cleared), () =>
     drawStream(streams.dice, next.turn),
   );
   for (const uid of draw.drawn) rolling.add(uid);
@@ -175,7 +175,7 @@ export const advanceTurn = (
       activeUsed: banked === undefined ? die.activeUsed : false,
     };
   });
-  next.dice = assignSeats(next.dice);
+  next.dice = assignSeats(next.dice, tableSizeFor(next.ascension));
   for (const slot of Object.values(next.slots)) {
     slot.dieUid = undefined;
   }

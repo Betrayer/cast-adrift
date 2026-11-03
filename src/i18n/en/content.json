@@ -289,7 +289,8 @@
     "mineBaron": "Mine Baron",
     "mineBaron-rack": "Mine Rack",
     "subsystem": {
-      "overclock": "Overclock Module"
+      "overclock": "Overclock Module",
+      "singularity": "Singularity Lens"
     },
     "anchorHulk": "Anchor Hulk",
     "tetherDrone": "Tether Drone",
@@ -3316,12 +3317,15 @@
       "opt": {
         "clearOne": "Clear one lien",
         "buyTheHull": "Buy the hull outright",
-        "buyTheDebt": "Buy the debt instead"
+        "buyTheDebt": "Buy the debt instead",
+        "walkOn": "Leave the liens where they lie"
       },
       "out": {
         "clearOne": "One down, two to go, and one owner who now knows exactly where you are going.",
         "buyTheHull": "Three liens, one signature, one hull you will strip for the one part you actually wanted.",
-        "buyTheDebt": "Now the liens are yours. The owner works for you until they are not, which is a different kind of kindness."
+        "buyTheDebt": "Now the liens are yours. The owner works for you until they are not, which is a different kind of kindness.",
+        "walkOn": "You wish the owner luck and mean it. The liens stay on the hull, and the owner's eyes stay on your stern.",
+        "walkOnTender": "You leave them to it. A creditor's tender takes your heading, and the lane grows louder behind you."
       }
     },
     "noSignalDrift": {
@@ -6292,6 +6296,10 @@
     "gauntlet": {
       "name": "The Gauntlet",
       "desc": "No perks, no chart, the Obsidian Pact bolted on. Three elites and a quarter of the hull."
+    },
+    "deepVacuum": {
+      "name": "Deep Vacuum",
+      "desc": "Sector four with the tide rising a jump sooner, where the barrier often runs three rows deep. Keep the hull above three tenths and come out with scrap."
     }
   },
   "sectors": {
@@ -6337,11 +6345,31 @@
     },
     "9": {
       "name": "High Tide",
-      "desc": "Interference tide climbs to 4."
+      "desc": "The interference tide caps one level higher again."
     },
     "10": {
       "name": "The Keeper's Trial",
       "desc": "Hull −15%. Clear it and the Rim remembers your name."
+    },
+    "11": {
+      "name": "Hunger",
+      "desc": "Six dice reach the table each turn instead of seven."
+    },
+    "12": {
+      "name": "Heavy Vacuum",
+      "desc": "Black holes bite harder: going around costs 10% more hull, and a chaotic ride unmakes a ship more often."
+    },
+    "13": {
+      "name": "Blind Sensors",
+      "desc": "The rearmost enemy hides its intent, and Sensors upgrades stop at Mk2."
+    },
+    "14": {
+      "name": "Debt",
+      "desc": "Shop prices rise another 40%, and elites, mini-bosses and bosses open behind 6 more shield."
+    },
+    "15": {
+      "name": "Singularity",
+      "desc": "Every boss gains one more part. The tide caps one level lower, and no ride through a black hole is stable any more."
     }
   },
   "prologue": {

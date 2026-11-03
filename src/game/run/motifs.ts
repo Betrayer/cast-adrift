@@ -1,3 +1,4 @@
+import { ascensionMods } from "@/data/ascension";
 import { sectorMotif } from "@/data/sectors";
 import { applyEventEffects } from "@/game/events/apply";
 import { edgeMarkFor, type MapGraph, type MapNode, type NodeId } from "@/game/map/types";
@@ -52,19 +53,32 @@ export const applyEdgeMotifs = (
   fire(motif.toll, "mine", `mine:${from}:${to}`);
 };
 
-export const bypassPctFor = (sector: number): number =>
-  sectorMotif(sector, "blackHoles")?.bypassPct ?? 0;
+export const bypassPctFor = (sector: number, ascension = 0): number => {
+  const base = sectorMotif(sector, "blackHoles")?.bypassPct ?? 0;
+  return base > 0
+    ? Math.round((base + ascensionMods(ascension).bypassPctDelta) * 100) / 100
+    : 0;
+};
 
-export const holeTollFor = (sector: number, hullMax: number): number => {
-  const pct = bypassPctFor(sector);
+export const holeTollFor = (
+  sector: number,
+  hullMax: number,
+  ascension = 0,
+): number => {
+  const pct = bypassPctFor(sector, ascension);
   return pct <= 0 ? 0 : Math.ceil(Math.max(0, hullMax) * pct);
 };
 
 export const bypassLethal = (hull: number, toll: number): boolean =>
   toll > 0 && hull <= toll;
 
-export const disintegrationPctFor = (sector: number): number =>
-  sectorMotif(sector, "blackHoles")?.disintegrationPct ?? 0;
+export const disintegrationPctFor = (sector: number, ascension = 0): number => {
+  const base = sectorMotif(sector, "blackHoles")?.disintegrationPct ?? 0;
+  return base > 0 ? base + ascensionMods(ascension).disintegrationPctDelta : 0;
+};
+
+export const ridesStayGentle = (ascension: number): boolean =>
+  !ascensionMods(ascension).gentleRidesUnmake;
 
 export const applyHoleToll = (
   sector: number,
@@ -72,7 +86,7 @@ export const applyHoleToll = (
   hole: NodeId,
 ): number | null => {
   const run = useRunStore.getState();
-  const cost = holeTollFor(sector, run.hullMax);
+  const cost = holeTollFor(sector, run.hullMax, run.ascension);
   if (bypassLethal(run.hull, cost)) return null;
   if (cost <= 0) return 0;
   fire([{ k: "hull", n: -cost }], "bypass", `bypass:${from}:${hole}`);

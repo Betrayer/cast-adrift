@@ -289,7 +289,8 @@
     "mineBaron": "El barón de las minas",
     "mineBaron-rack": "Estantería para minas",
     "subsystem": {
-      "overclock": "Módulo de overclocking"
+      "overclock": "Módulo de overclocking",
+      "singularity": "Lente de singularidad"
     },
     "anchorHulk": "Ancla Hulk",
     "tetherDrone": "Dron Tether",
@@ -3316,12 +3317,15 @@
       "opt": {
         "clearOne": "Eliminar un gravamen",
         "buyTheHull": "Comprar el casco al contado",
-        "buyTheDebt": "Compra la deuda en su lugar"
+        "buyTheDebt": "Compra la deuda en su lugar",
+        "walkOn": "Dejar los gravámenes donde están"
       },
       "out": {
         "clearOne": "Uno menos, quedan dos, y un propietario que ahora sabe exactamente adónde te diriges.",
         "buyTheHull": "Tres embargos, una firma, un casco que desmontarás para conseguir la única pieza que realmente querías.",
-        "buyTheDebt": "Ahora los derechos de retención son tuyos. El propietario trabaja para ti hasta que deja de hacerlo, lo cual es una forma diferente de amabilidad."
+        "buyTheDebt": "Ahora los derechos de retención son tuyos. El propietario trabaja para ti hasta que deja de hacerlo, lo cual es una forma diferente de amabilidad.",
+        "walkOn": "Le deseas suerte al propietario, y lo dices en serio. Los gravámenes siguen en el casco y su mirada sigue en tu popa.",
+        "walkOnTender": "Los dejas con lo suyo. Una lancha de los acreedores toma tu rumbo, y la ruta suena más fuerte a tu espalda."
       }
     },
     "noSignalDrift": {
@@ -6292,6 +6296,10 @@
     "gauntlet": {
       "name": "El Gauntlet",
       "desc": "Sin ventajas, sin Carta estelar y con el Pacto de Obsidiana atornillado. Tres élites y una cuarta parte del casco."
+    },
+    "deepVacuum": {
+      "name": "Vacío profundo",
+      "desc": "Sector cuatro, con la marea subiendo un salto antes y una barrera que a menudo tiene tres filas de fondo. Mantén el casco por encima de tres décimas y sal con chatarra."
     }
   },
   "sectors": {
@@ -6337,11 +6345,31 @@
     },
     "9": {
       "name": "HighMarea",
-      "desc": "La marea de interferencia sube hasta el nivel 4."
+      "desc": "El tope de la marea de interferencia sube un nivel más."
     },
     "10": {
       "name": "La prueba del guardián",
       "desc": "Casco −15 %. Si lo superas, el Borde recordará tu nombre."
+    },
+    "11": {
+      "name": "Hambre",
+      "desc": "Cada turno salen a la mesa seis dados en lugar de siete."
+    },
+    "12": {
+      "name": "Vacío pesado",
+      "desc": "Los agujeros negros muerden más fuerte: el rodeo cuesta un 10 % más de casco y una travesía caótica deshace una nave con más frecuencia."
+    },
+    "13": {
+      "name": "Sensores ciegos",
+      "desc": "El enemigo más alejado oculta su intención, y las mejoras de Sensores no pasan de Mk2."
+    },
+    "14": {
+      "name": "Deuda",
+      "desc": "Los precios en las tiendas suben otro 40 %, y los enemigos de élite, los minijefes y los jefes empiezan con 6 de escudo más."
+    },
+    "15": {
+      "name": "Singularidad",
+      "desc": "Cada jefe gana una pieza más. El tope de la marea baja un nivel y ya ninguna travesía por un agujero negro es estable."
     }
   },
   "prologue": {

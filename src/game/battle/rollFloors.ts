@@ -1,3 +1,4 @@
+import { rollBaseValue } from "@/data/dice";
 import { resonanceGrantActive } from "@/data/resonance";
 import type { RngStream } from "@/services/rng";
 import type { ResonanceCensus, RolledDie } from "@/types/battle";
@@ -6,11 +7,12 @@ export const dieValueCeiling = (die: RolledDie): number =>
   die.tier + (die.growth ?? 0);
 
 export const rerollFace = (
-  die: Pick<RolledDie, "tier" | "growth" | "school">,
+  die: Pick<RolledDie, "defId" | "tier" | "growth" | "school" | "faces">,
   rng: RngStream,
   blueFloor = false,
 ): number => {
-  const face = rng.int(1, die.tier) + (die.growth ?? 0);
+  const base = rollBaseValue(die.defId, die.tier, rng, die.faces);
+  const face = Math.min(die.tier, Math.max(1, base)) + (die.growth ?? 0);
   return blueFloor && die.school === "blue" ? Math.max(face, 2) : face;
 };
 

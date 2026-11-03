@@ -242,7 +242,7 @@
   "shipyard": {
     "title": "Astillero",
     "mk": "Mk {{mk}} — {{cost}}",
-    "mkMax": "Mk3 · al máximo",
+    "mkMax": "Mk{{mk}} · al máximo",
     "systems": "Sistemas",
     "repair": "Reparación",
     "repairHint": "2 piezas de chatarra por casco",
@@ -332,7 +332,7 @@
     "deck": "Baraja: Dados «{{n}}»",
     "ascension": "Ascensión",
     "ascensionLocked": "Supera la campaña una vez para desbloquear la ascensión.",
-    "aLevel": "Un e{{n}}",
+    "aLevel": "A{{n}}",
     "tideCap": "Máximos de las mareas de interferencia en {{n}}",
     "launch": "Inicio",
     "ascensionCost": "Te cuesta",
@@ -341,7 +341,9 @@
     "changeShip": "Cambiar de nave",
     "voucher": "Vale: ventaja inicial",
     "voucherCount": "{{n}} en reserva",
-    "voucherHint": "Gasta un vale para elegir una ventaja antes del primer salto."
+    "voucherHint": "Gasta un vale para elegir una ventaja antes del primer salto.",
+    "aLocked": "Supera A{{prev}} para desbloquear A{{n}}.",
+    "aAllOpen": "Todos los niveles están desbloqueados."
   },
   "package": {
     "title": "Paquete «Gate»",
@@ -603,7 +605,10 @@
     "landed": "Lanzado {{rows}} filas {{way}}",
     "softLand": "Posarse con suavidad",
     "softLandWhy": "Una vez por partida: sin tirada ni riesgo — aterriza justo tras el borde opuesto, en tu carril",
-    "softLandSpent": "La carga del Eco ya se gastó en esta partida"
+    "softLandSpent": "La carga del Eco ya se gastó en esta partida",
+    "gentleUnstable": "Lanzamiento corto {{n}}/{{max}}",
+    "gentleUnstableWhy": "Las dos primeras travesías de una partida siguen aterrizando justo tras el borde opuesto, en tu carril. En A15 ninguna es estable.",
+    "rideGentleUnstable": "Travesía: un lanzamiento corto justo tras el borde opuesto, en tu carril. En A15 no es estable"
   },
   "bridge": {
     "title": "Puente",

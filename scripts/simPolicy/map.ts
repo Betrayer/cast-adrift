@@ -62,6 +62,7 @@ export interface RouteState {
   anomalyStreak: number;
   scrap: number;
   wormholeRides: number;
+  gentleSafe?: boolean;
   deliveryReach?: ReadonlySet<string>;
 }
 
@@ -125,7 +126,7 @@ export const holeStandIn = (
 };
 
 export const holeBias = (state: RouteState): number => {
-  if (isGentleRide(state.wormholeRides)) return -HOLE_GENTLE_PULL;
+  if (state.gentleSafe !== false && isGentleRide(state.wormholeRides)) return -HOLE_GENTLE_PULL;
   const ride = state.hullPct >= RIDE_HULL_FLOOR_PCT ? -HOLE_PULL : HOLE_PENALTY;
   return ride + HOLE_CHAOTIC_PENALTY;
 };
@@ -134,7 +135,7 @@ export const ridesWormhole = (
   state: RouteState,
   bypassPct: number,
 ): boolean => {
-  if (isGentleRide(state.wormholeRides)) return true;
+  if (state.gentleSafe !== false && isGentleRide(state.wormholeRides)) return true;
   return state.hullPct - bypassPct * 100 < BYPASS_HULL_FLOOR_PCT;
 };
 

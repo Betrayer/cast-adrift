@@ -35,6 +35,7 @@ import {
   bayPrice,
   HAND_CAP,
   instanceSellValue,
+  mkTopFor,
   mkUpgradeCost,
   moduleSellValue,
   ptsForDie,
@@ -43,6 +44,7 @@ import {
   TABLE_SIZE,
 } from "../../src/game/economy/prices";
 import { generateShopModules, generateShopStock } from "../../src/game/economy/shop";
+import { shopPricePct } from "../../src/game/run/shopPrice";
 import { interferenceStacksForStreak } from "../../src/game/run/interference";
 import { computePerkMods } from "../../src/game/run/perkMods";
 import { computeModuleMods, computeRunMods } from "../../src/game/run/runMods";
@@ -159,6 +161,7 @@ export interface RunState {
   cargoLapsed: number;
   activeFired: Record<string, number>;
   activeReady: Record<string, number>;
+  nodeScrap: Record<string, number>;
 }
 
 export const emptyPuzzleTally = (): Record<number, PuzzleTally> => ({
@@ -253,6 +256,7 @@ export const createRunState = (init: RunStateInit): RunState => ({
   cargoLapsed: 0,
   activeFired: {},
   activeReady: {},
+  nodeScrap: {},
 });
 
 export const spend = (state: RunState, cost: number, sink: string): boolean => {
@@ -585,8 +589,16 @@ export const greedyShop = (
   state: RunState,
   seed: number,
   node: MapNode,
+  ascension: number,
 ): void => {
-  const discount = computeRunMods(state.perks, state.chartPicks, state.modules).shopDiscountPct;
+  const discount = shopPricePct({
+    perks: state.perks,
+    chartPicks: state.chartPicks,
+    modules: state.modules,
+    flags: state.flags,
+    ascension,
+    contractId: null,
+  });
   for (const item of generateShopModules(seed, node.id, 0, discount)) {
     if (state.scrap < item.price) continue;
     if (!wouldTakeModule(state, item.moduleId)) continue;
@@ -639,19 +651,19 @@ export const repairToFull = (state: RunState): void => {
   }
 };
 
-export const buyUpgrades = (state: RunState): void => {
+export const buyUpgrades = (state: RunState, ascension = 0): void => {
   const slots = upgradeSlotsFor(state.shipId);
   for (const slotId of slots) {
     while (state.vouchers > 0) {
       const mk = state.mkLevels[slotId] ?? 1;
-      if (mk >= 3) break;
+      if (mk >= mkTopFor(slotId, ascension)) break;
       state.vouchers -= 1;
       state.mkLevels = { ...state.mkLevels, [slotId]: (mk + 1) as 2 | 3 };
     }
   }
   for (const slotId of slots) {
     let mk = state.mkLevels[slotId] ?? 1;
-    while (mk < 3) {
+    while (mk < mkTopFor(slotId, ascension)) {
       const target = (mk + 1) as 2 | 3;
       const cost = mkUpgradeCost(target);
       if (state.scrap < cost || !spend(state, cost, "mk")) break;
@@ -681,12 +693,13 @@ export const greedyShipyard = (
   state: RunState,
   repairFirst: boolean,
   sector: number,
+  ascension = 0,
 ): void => {
   if (repairFirst) {
     repairToFull(state);
-    buyUpgrades(state);
+    buyUpgrades(state, ascension);
   } else {
-    buyUpgrades(state);
+    buyUpgrades(state, ascension);
     repairToFull(state);
   }
   repairToFull(state);

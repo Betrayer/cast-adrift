@@ -50,7 +50,7 @@ import { slotAffinity, type SlotAffinity } from "@/game/battle/view/affinity";
 import type { PlaceBlock } from "@/game/battle/view/legal";
 import { projectSlot, type SlotProjection } from "@/game/battle/view/project";
 import { dieTier } from "@/game/dice/tier";
-import { discountedMkCost } from "@/game/economy/prices";
+import { discountedMkCost, nextMkFor } from "@/game/economy/prices";
 import {
   battleInitFromRun,
   runDisabledSlots,
@@ -68,7 +68,7 @@ import type {
 import type { DieTier, LocKey, School } from "@/types/content";
 
 export type SlotSheetRun = RunInitSource &
-  Pick<RunValues, "mkLevels" | "deck" | "shipyardDiscount">;
+  Pick<RunValues, "mkLevels" | "deck" | "shipyardDiscount" | "ascension">;
 
 const PROBE_ENEMY_HP = 999;
 const PROBE_SEED = 0x5107;
@@ -564,14 +564,14 @@ const slotPassiveNote = (
   return { passive: passive.kind, name: ship.passiveName, desc: ship.passiveDesc };
 };
 
-const nextMkFor = (
+const nextMkRow = (
   run: SlotSheetRun,
   slotId: SlotId,
   mk: MkLevel,
   sources: readonly SlotSource[],
 ): SlotSheetNextMk | null => {
-  if (mk >= 3) return null;
-  const next: Exclude<MkLevel, 1> = mk === 1 ? 2 : 3;
+  const next = nextMkFor(slotId, mk, run.ascension);
+  if (next === null) return null;
   const before = fireModesForSlot(slotId, mk, run.modules);
   return {
     mk: next,
@@ -656,7 +656,7 @@ export const slotSheetModel = (
     placement: disabled ? [] : slotPlacementRules(run.shipId, slotId),
     modes: disabled ? [] : slotSheetModes(slotId, mk, run.modules),
     sources,
-    nextMk: disabled ? null : nextMkFor(run, slotId, mk, sources),
+    nextMk: disabled ? null : nextMkRow(run, slotId, mk, sources),
     chartAdvice: disabled ? [] : chartAdviceFor(slotId, run.chartPicks),
   };
 };

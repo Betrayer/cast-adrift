@@ -35,7 +35,8 @@
     "owned": "Freigeschaltet",
     "unlock": "Entsperren",
     "price": "{{n}} Splitter",
-    "ascendant": "Aszendent"
+    "ascendant": "Aszendent",
+    "eventHorizon": "Ereignishorizont"
   },
   "diagnostics": {
     "version": "Build-{{version}}",

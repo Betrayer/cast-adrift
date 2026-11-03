@@ -1,4 +1,8 @@
-import { SCORE_PER_DEPTH, SCORE_PER_KILL } from "@/game/run/modes";
+import {
+  ascensionScoreMult,
+  SCORE_PER_DEPTH,
+  SCORE_PER_KILL,
+} from "@/game/run/modes";
 
 export const MAX_KILLS_PER_DEPTH = 4;
 export const MAX_SCRAP_PER_DEPTH = 80;
@@ -11,6 +15,7 @@ export interface PlausibilityInput {
   depth: number;
   kills: number;
   scrap: number;
+  ascension?: number;
   hash?: number;
   requiresHash?: boolean;
 }
@@ -43,7 +48,8 @@ export const plausibility = (
     reasons.push("negative");
   }
   if (input.score > MAX_BOARD_SCORE) reasons.push("scoreOverCap");
-  if (input.score > depth * MAX_SCORE_PER_DEPTH) reasons.push("scorePerDepth");
+  if (input.score > Math.round(depth * MAX_SCORE_PER_DEPTH * ascensionScoreMult(input.ascension)))
+    reasons.push("scorePerDepth");
   if (input.kills > depth * MAX_KILLS_PER_DEPTH) reasons.push("killsPerDepth");
   if (input.scrap > depth * MAX_SCRAP_PER_DEPTH) reasons.push("scrapPerDepth");
   if (

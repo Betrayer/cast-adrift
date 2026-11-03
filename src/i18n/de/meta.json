@@ -368,7 +368,9 @@
     "guardBody": "Es gibt einen Lauf-Slot. Beim Starten dieses Modus wird der aktuelle Lauf sowohl lokal als auch in der Cloud gelöscht.",
     "guardYes": "Löschen und starten",
     "dailyPreview": "Morgen ({{date}})",
-    "dailyPreviewLocked": "Die Mutatoren von morgen auf Level {{n}}"
+    "dailyPreviewLocked": "Die Mutatoren von morgen auf Level {{n}}",
+    "driftAscension": "Aufstieg für diese Drift",
+    "driftScoreMult": "Ergebnis ×{{mult}}"
   },
   "contracts": {
     "title": "Verträge",
@@ -416,7 +418,8 @@
     "submitSent": "Dem Vorstand vorgelegt",
     "submitFailed": "Die Übermittlung ist fehlgeschlagen – die Punktzahl wird lokal gespeichert",
     "submitOffline": "Offline – die Partitur wird lokal gespeichert",
-    "toBoard": "Das Spielbrett öffnen"
+    "toBoard": "Das Spielbrett öffnen",
+    "ascension": "Aufstieg A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Ranglisten",
@@ -501,7 +504,8 @@
     "ascendant": "Aszendent",
     "chartwright": "Chartwright",
     "archivist": "Archivar",
-    "answer": "Die Antwort"
+    "answer": "Die Antwort",
+    "singularity": "Singularität"
   },
   "unlock": {
     "opened": "Freigeschaltet",
@@ -545,7 +549,11 @@
     "skinThreshold": "Die Skin „Threshold“",
     "featureShipCorsair": "Der Hound ist auf dem Markt",
     "featureShipFoundry": "„The Forge“ ist auf dem Markt",
-    "featureShipPrism": "Das Prism ist auf dem Markt"
+    "featureShipPrism": "Das Prism ist auf dem Markt",
+    "skinSingularity": "Würfel-Skin: Singularität",
+    "contractsA12": "Vertrag: Tiefes Vakuum",
+    "frameObsidian": "Brückenrahmen: Obsidian",
+    "prestigeThemeTwo": "Thema: Ereignishorizont"
   },
   "skin": {
     "title": "Die Skins",
@@ -579,6 +587,10 @@
     "threshold": {
       "name": "Schwellenwert",
       "desc": "Rund, unbeleuchtet, mit einem Rand in Flottengrau. Getragen von dem einen Kapitän, der sich nie zurücklehnte."
+    },
+    "singularity": {
+      "name": "Singularität",
+      "desc": "Schwarzes Glas, ein weißer Rand, ein Licht, das sich um die Glyphe krümmt."
     }
   },
   "ach": {
@@ -840,7 +852,13 @@
       "skinVoidglass": "die Haut „Voidglass“",
       "skinEmberglass": "Die Haut „Emberglass“",
       "prestigeTheme": "Thema „Ascendant“",
-      "badge": "das „Ascendant“-Abzeichen"
+      "badge": "das „Ascendant“-Abzeichen",
+      "scrapBonus": "+5 % Schrott aus Kämpfen für jedes Level über A10",
+      "skinSingularity": "Würfel-Skin „Singularität“",
+      "contractA12": "Vertrag „Tiefes Vakuum“",
+      "frameObsidian": "Brückenrahmen „Obsidian“",
+      "prestigeThemeTwo": "Thema „Ereignishorizont“",
+      "badgeSingularity": "das „Singularität“-Abzeichen"
     }
   },
   "voucher": {
@@ -851,5 +869,17 @@
     "shards": "{{n}} ◈ nehmen",
     "bank": "Im Depot: {{n}} / {{max}}",
     "full": "Dein Gutscheindepot ist voll ({{max}}). Nimm die Splitter."
+  },
+  "frame": {
+    "title": "Brückenrahmen",
+    "hint": "Nur kosmetisch. Ein Rahmen verändert niemals ein Schiff.",
+    "hull": {
+      "name": "Eigener Rahmen des Rumpfs",
+      "desc": "Jeder Rumpf trägt den Rahmen, mit dem er gebaut wurde."
+    },
+    "obsidian": {
+      "name": "Obsidian",
+      "desc": "Schwarzes Vulkanglas, gesäumt von einer kalten weißen Linie."
+    }
   }
 }

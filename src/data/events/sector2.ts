@@ -1388,6 +1388,7 @@ export const SECTOR2_EVENTS: readonly EventDef[] = [
       {
         id: "loadIt",
         label: "content:events.iceLighter.opt.loadIt",
+        requires: { req: "scrap", n: 20 },
         outcomes: [
           {
             text: "content:events.iceLighter.out.loadIt",

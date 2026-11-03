@@ -76,7 +76,8 @@
     "echoTotal": "powtarza twoją ostatnią turę (maksymalnie {{n}})",
     "foldOrder": "realizuje zamówienie",
     "devourDie": "zużywa twoją najlepszą zapasową kostkę",
-    "idle": "Trzyma"
+    "idle": "Trzyma",
+    "hidden": "Intencja ukryta"
   },
   "slot": {
     "weaponA": "Broń A",
@@ -142,6 +143,7 @@
   "targetBody": "Celuj w kadłub",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "przychodzące surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
+  "mitigationHidden": "w najgorszym razie surowe {{raw}} → ~{{expected}} · tarcza {{shield}} · kadłub {{hull}}",
   "mitigationNone": "Ten przeciwnik nie zada obrażeń w tej turze",
   "forecast": "zadasz {{out}} · przyjmiesz ~{{inc}} (tarcza trzyma {{shield}})",
   "forecastClear": "{{out}} obrażeń czyści pole",

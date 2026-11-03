@@ -59,6 +59,9 @@ export const applyMeta = (patch: MetaPatch): void => {
   }
   if (patch.stats !== undefined) meta.bumpLifetime(patch.stats);
   if (patch.echo !== undefined) meta.selectEcho(patch.echo);
+  if (patch.ascensionCleared !== undefined && patch.ascensionCleared > 0) {
+    meta.recordCampaignClear(patch.ascensionCleared - 1);
+  }
 };
 
 export const applyRun = (patch: RunPatch): void => {

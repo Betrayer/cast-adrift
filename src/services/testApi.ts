@@ -448,14 +448,14 @@ export const createTestApi = (): TestApi => ({
 
   wormhole: () => {
     const run = useRunStore.getState();
-    const toll = holeTollFor(run.sector, run.hullMax);
+    const toll = holeTollFor(run.sector, run.hullMax, run.ascension);
     return {
       pending: run.pendingWormhole,
       rides: run.stats.wormholeRides,
       bypassed: run.stats.holesBypassed,
       gentle: isGentleRide(run.stats.wormholeRides),
       toll,
-      pct: bypassPctFor(run.sector),
+      pct: bypassPctFor(run.sector, run.ascension),
       lethal: bypassLethal(run.hull, toll),
       mocked: chaosMocked(),
       last: run.lastWormhole === null ? null : { ...run.lastWormhole },

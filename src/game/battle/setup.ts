@@ -11,6 +11,7 @@ import {
   drawStream,
   isTableExtra,
   tableDice,
+  tableSizeFor,
 } from "@/game/battle/table";
 import { TABLE_SIZE } from "@/game/economy/prices";
 import { DIE_BY_ID, rollBaseValue } from "@/data/dice";
@@ -174,6 +175,7 @@ export const shipHullMax = (shipId: ShipId): number => {
 export const dealHand = (
   hand: readonly DeckEntry[],
   streams: RngStreams,
+  tableSize = TABLE_SIZE,
 ): RolledDie[] => {
   const created = hand.map((entry, index): RolledDie => {
     const die = handDie(entry);
@@ -194,7 +196,7 @@ export const dealHand = (
     };
     return isTableExtra(dealt) ? { ...dealt, state: "tray" } : dealt;
   });
-  const { dice } = drawFromBag(created, TABLE_SIZE, () =>
+  const { dice } = drawFromBag(created, tableSize, () =>
     drawStream(streams.dice, 0),
   );
   return assignSeats(
@@ -206,6 +208,7 @@ export const dealHand = (
           }
         : die,
     ),
+    tableSize,
   );
 };
 
@@ -260,7 +263,7 @@ export const buildBattleSnapshot = (
     eliteShield: init.eliteShield ?? 0,
     ascension,
   });
-  const dice = dealHand(hand, streams);
+  const dice = dealHand(hand, streams, tableSizeFor(ascension));
   const onTable = tableDice(dice);
   const hullMax = init.hullMax ?? shipHullMax(shipId);
   const resonance = loadoutResonance(dice, {

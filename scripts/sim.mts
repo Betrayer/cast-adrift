@@ -1,5 +1,5 @@
 import type { DeckEntry } from "@/game/dice/tier";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { STARTER_DECK } from "../src/data/decks";
 import { ALL_DICE } from "../src/data/dice";
@@ -7,9 +7,21 @@ import { PUZZLES, type PuzzleTier } from "../src/data/puzzles";
 import { difficultyOf, TIER_BANDS } from "../src/game/puzzles/difficulty";
 import { maxAttempts, TIER_STAKES } from "../src/game/puzzles/stakes";
 import {
+  ARCHETYPE_LEVEL,
   buildChartPicks,
+  CHART_SCHOOLS,
+  dualChart,
+  halfBranchChart,
+  hubHeavyChart,
   MID_COLLECTION_LEVEL,
+  monoChart,
+  nexusIds,
+  nexusReachable,
+  spreadChart,
 } from "./simPolicy/chart";
+import { CHART_NODE_BY_ID } from "../src/data/chart";
+import { pointsSpent, pointsTotal } from "../src/game/chart/engine";
+import type { School } from "../src/types/content";
 import {
   deliveryReachOf,
   EXPECTED_DMG_PER_FIGHT,
@@ -30,6 +42,7 @@ import {
   bypassPctFor,
   disintegrationPctFor,
   holeTollFor,
+  ridesStayGentle,
 } from "../src/game/run/motifs";
 import {
   applyEdgeMotifs,
@@ -174,7 +187,11 @@ import {
 } from "../src/game/run/encounter";
 import { computePerkMods } from "../src/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
-import { ascensionMods } from "../src/data/ascension";
+import {
+  ascensionMods,
+  ascensionScrapBonusPct,
+  MAX_ASCENSION,
+} from "../src/data/ascension";
 import { ALL_PERKS } from "../src/data/perks";
 import type { PerkPool } from "../src/data/perks/types";
 import { PERK_DRAFT_SIZE } from "../src/game/run/perkDraft";
@@ -671,6 +688,7 @@ interface WalkOptions {
   mutators?: readonly string[];
   noDraft?: boolean;
   wormholes?: WormholeTally;
+  battleSalt?: number;
 }
 
 interface WalkResult {
@@ -716,11 +734,12 @@ const resolveWormhole = (
   stream: RngStream,
   tally: WormholeTally,
   tideCap: number,
+  ascension: number,
 ): HoleOutcome => {
   const rides = tally.rides;
-  const toll = holeTollFor(sector, state.hullMax);
+  const toll = holeTollFor(sector, state.hullMax, ascension);
   const lethal = bypassLethal(state.hull, toll);
-  if (lethal || ridesWormhole(route, bypassPctFor(sector))) {
+  if (lethal || ridesWormhole(route, bypassPctFor(sector, ascension))) {
     if (echoSoftLands(state.echo) && !state.echoUsed) {
       const gentle = softLandingFor(map, byId, from, hole.id, visited);
       if (gentle !== undefined) {
@@ -735,10 +754,10 @@ const resolveWormhole = (
       { map, from, hole: hole.id, visited, rides },
       stream,
     );
-    const pct = disintegrationPctFor(sector);
+    const pct = disintegrationPctFor(sector, ascension);
     if (
       pct > 0 &&
-      !isGentleRide(rides) &&
+      (!isGentleRide(rides) || !ridesStayGentle(ascension)) &&
       stream.int(1, DISINTEGRATION_FACES) <= pct
     ) {
       tally.disintegrations += 1;
@@ -772,6 +791,9 @@ const mergeActiveTally = (state: RunState, res: BattleResult): void => {
     state.activeReady[id] = (state.activeReady[id] ?? 0) + n;
   }
 };
+
+const fightPrefix = (prefix: string, salt: number | undefined): string =>
+  salt === undefined || salt === 0 ? prefix : `${prefix}~${String(salt)}`;
 
 const nsKey = (ns: string, prefix: string, id: string): string =>
   ns === "" ? `${prefix}:${id}` : `${prefix}:${ns}:${id}`;
@@ -955,6 +977,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
     anomalyStreak: state.anomalyStreak,
     scrap: state.scrap,
     wormholeRides: tally.rides,
+    gentleSafe: ridesStayGentle(opts.ascension),
     ...(deliveryReach === undefined ? {} : { deliveryReach }),
   });
 
@@ -1004,6 +1027,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         chaosStream,
         tally,
         opts.tideCap,
+        opts.ascension,
       );
       if (resolved.kind === "fatal") return stop(false, step.row);
       if (resolved.kind === "stuck") break;
@@ -1036,7 +1060,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       const res = simulateBattle(
         enemyIds,
         state.deck,
-        deriveSeed(seed, nsKey(ns, "node", next.id)),
+        deriveSeed(seed, nsKey(ns, fightPrefix("node", opts.battleSalt), next.id)),
         {
           shipId: state.shipId,
           hull: state.hull,
@@ -1084,20 +1108,25 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         state.modules,
         state.officers,
       );
-      gain(
-        state,
-        Math.round(
-          reward.scrap *
-            opts.scrapMult *
-            (1 + (mods.scrapMultPct + mut.scrapMultPct) / 100),
-        ),
+      const nodeIncome = Math.round(
+        reward.scrap *
+          opts.scrapMult *
+          (1 +
+            (mods.scrapMultPct +
+              mut.scrapMultPct +
+              ascensionScrapBonusPct(opts.ascension)) /
+              100),
       );
+      gain(state, nodeIncome);
+      state.nodeScrap[type] = (state.nodeScrap[type] ?? 0) + nodeIncome;
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
       if (type === "miniboss") {
-        gain(
-          state,
-          loot.int(MINIBOSS_PACKAGE_SCRAP[0], MINIBOSS_PACKAGE_SCRAP[1]),
+        const packageScrap = loot.int(
+          MINIBOSS_PACKAGE_SCRAP[0],
+          MINIBOSS_PACKAGE_SCRAP[1],
         );
+        gain(state, packageScrap);
+        state.nodeScrap.package = (state.nodeScrap.package ?? 0) + packageScrap;
         const dieChoice = dieForRarity(loot, "rare", mut.lootRarityStep);
         const moduleChoice = rollModule(loot, state.modules, "uncommon");
         if (opts.rollModules && wouldTakeModule(state, moduleChoice)) {
@@ -1158,7 +1187,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         const res = simulateBattle(
           [...follow.enemyIds],
           state.deck,
-          deriveSeed(seed, nsKey(ns, "eventFight", next.id)),
+          deriveSeed(seed, nsKey(ns, fightPrefix("eventFight", opts.battleSalt), next.id)),
           {
             shipId: state.shipId,
             hull: state.hull,
@@ -1193,13 +1222,18 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       }
       state.nodes += 1;
     } else if (type === "shop") {
-      greedyShop(state, ns === "" ? seed : deriveSeed(seed, `shop:${ns}`), next);
+      greedyShop(
+        state,
+        ns === "" ? seed : deriveSeed(seed, `shop:${ns}`),
+        next,
+        opts.ascension,
+      );
       state.nodes += 1;
     } else if (type === "shipyard") {
       const forecast =
         fightsUntilRest(map, byId, next.id, next.row, route()) *
         EXPECTED_DMG_PER_FIGHT;
-      greedyShipyard(state, forecast > state.hull * 0.6, sector);
+      greedyShipyard(state, forecast > state.hull * 0.6, sector, opts.ascension);
       state.nodes += 1;
     } else {
       state.nodes += 1;
@@ -1787,6 +1821,7 @@ interface SweepOptions {
   noDraft?: boolean;
   perks?: readonly string[];
   chartPicks?: readonly string[];
+  deck?: readonly string[];
   deckExtra?: readonly string[];
   mkLevels?: MkLevels;
   officers?: readonly string[];
@@ -1794,22 +1829,34 @@ interface SweepOptions {
   echo?: EchoNodeId | null;
 }
 
+const startingHullMax = (
+  shipId: ShipId,
+  ascension: number,
+  chartPicks: readonly string[],
+): number => {
+  const chartMods = computeRunMods([], chartPicks);
+  return Math.max(
+    1,
+    Math.round(
+      shipHullMax(shipId) *
+        (1 + (ascensionMods(ascension).hullPct + chartMods.hullMaxPct) / 100),
+    ) + chartMods.hullMaxDelta,
+  );
+};
+
 const sweepState = (opts: SweepOptions): RunState => {
-  const aMods = ascensionMods(opts.ascension);
   const shipId = opts.shipId ?? "wanderer";
   const carried =
     opts.forcedPerk !== undefined ? [opts.forcedPerk] : [...(opts.perks ?? [])];
-  const hullMax = Math.max(
-    1,
-    Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)) +
-      computePerkMods(carried).hullMaxDelta,
-  );
+  const hullMax =
+    startingHullMax(shipId, opts.ascension, opts.chartPicks ?? []) +
+    computePerkMods(carried).hullMaxDelta;
   return createRunState(
     runStateInit({
       shipId,
       hull: hullMax,
       hullMax,
-      deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(
+      deck: [...(opts.deck ?? opts.archetype.deck), ...(opts.deckExtra ?? [])].slice(
         0,
         HAND_CAP,
       ),
@@ -2003,7 +2050,7 @@ const ladderCell = (
   runs: number,
   seed: number,
   sector: number,
-  build: Pick<SweepOptions, "perks" | "chartPicks">,
+  build: Pick<SweepOptions, "perks" | "chartPicks" | "deck">,
 ): LadderCell => {
   const shape = SECTORS.find((def) => def.id === sector)?.shape;
   const results: SectorResult[] = [];
@@ -2087,17 +2134,63 @@ interface LadderBand {
 
 const LADDER_BANDS: readonly LadderBand[] = [
   { sector: 1, mid: 99, perks: 99 },
-  { sector: 2, mid: 88, perks: 91 },
-  { sector: 3, mid: 76, perks: 79 },
-  { sector: 4, mid: 61, perks: 65 },
-  { sector: 5, mid: 54, perks: 58 },
-  { sector: 6, mid: 42, perks: 47 },
+  { sector: 2, mid: 97, perks: 97 },
+  { sector: 3, mid: 75, perks: 76 },
+  { sector: 4, mid: 15, perks: 17 },
+  { sector: 5, mid: 8, perks: 10 },
+  { sector: 6, mid: 88, perks: 89 },
 ];
 
 const LADDER_BAND_PP = 5;
 
+const MATTERS_GAP_PP: readonly [number, number] = [12, 20];
+
+const COLD_GAP_MIN_PP = 25;
+
+const MATTERS_FIRST_ACT = 3;
+
+const NAKED_CHART_LEVEL = 50;
+
+const NAKED_CHART_PICKS: readonly string[] = buildChartPicks(NAKED_CHART_LEVEL);
+
+interface MattersRead {
+  sector: number;
+  cold: number;
+  full: number;
+  nakedChart: number;
+  nakedDeck: number;
+}
+
+const printMatters = (reads: readonly MattersRead[], rows: string[]): number => {
+  console.log(
+    `  meta and deck matter (S${String(MATTERS_FIRST_ACT)}+): naked-chart and naked-deck ${String(MATTERS_GAP_PP[0])}-${String(MATTERS_GAP_PP[1])}pp under full-power, full-power at least ${String(COLD_GAP_MIN_PP)}pp over cold`,
+  );
+  rows.push("");
+  rows.push("sector,fullMinusNakedChartPp,fullMinusNakedDeckPp,fullMinusColdPp,verdict");
+  let out = 0;
+  for (const read of reads) {
+    const chartGap = (read.full - read.nakedChart) * 100;
+    const deckGap = (read.full - read.nakedDeck) * 100;
+    const coldGap = (read.full - read.cold) * 100;
+    const inGap = (gap: number): boolean =>
+      gap >= MATTERS_GAP_PP[0] && gap <= MATTERS_GAP_PP[1];
+    const checked = read.sector >= MATTERS_FIRST_ACT;
+    const ok = !checked || (inGap(chartGap) && inGap(deckGap) && coldGap >= COLD_GAP_MIN_PP);
+    if (!ok) out += 1;
+    console.log(
+      `    S${String(read.sector)} deck matters ${chartGap.toFixed(1)}pp · meta matters ${deckGap.toFixed(1)}pp · over cold ${coldGap.toFixed(1)}pp${checked ? (ok ? " · ok" : " · OUT") : " · unchecked"}`,
+    );
+    rows.push(
+      `${String(read.sector)},${chartGap.toFixed(1)},${deckGap.toFixed(1)},${coldGap.toFixed(1)},${checked ? (ok ? "ok" : "OUT") : "unchecked"}`,
+    );
+  }
+  return out;
+};
+
 const ladderModeMain = (runs: number, seed: number, startedAt: number): void => {
   const only = Number(getArg("sector", "0"));
+  const matters = process.argv.includes("--matters");
+  const mattersReads: MattersRead[] = [];
   console.log(
     `sim ladder: the difficulty contract — A0, red+blue, ${String(runs)} runs per deck per act`,
   );
@@ -2118,7 +2211,7 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
     const builds: readonly {
       label: string;
       target: number | null;
-      build: Pick<SweepOptions, "perks" | "chartPicks">;
+      build: Pick<SweepOptions, "perks" | "chartPicks" | "deck">;
     }[] = [
       { label: "cold (diagnostics)", target: null, build: {} },
       {
@@ -2134,9 +2227,29 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
           perks: LADDER_PERK_SAMPLE,
         },
       },
+      ...(matters
+        ? [
+            {
+              label: "naked-deck",
+              target: null,
+              build: { perks: LADDER_PERK_SAMPLE },
+            },
+            {
+              label: "naked-chart",
+              target: null,
+              build: {
+                chartPicks: NAKED_CHART_PICKS,
+                perks: LADDER_PERK_SAMPLE,
+                deck: STARTER_DECK,
+              },
+            },
+          ]
+        : []),
     ];
+    const winrates = new Map<string, number>();
     for (const entry of builds) {
       const cell = ladderCell(entry.label, runs, seed, sector, entry.build);
+      winrates.set(entry.label, cell.winrate);
       printLadderCell(cell, entry.target);
       const delta =
         entry.target === null ? 0 : cell.winrate * 100 - entry.target;
@@ -2156,13 +2269,23 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
         ].join(","),
       );
     }
+    if (matters) {
+      mattersReads.push({
+        sector,
+        cold: winrates.get("cold (diagnostics)") ?? 0,
+        full: winrates.get("+ picks + 6 perks") ?? 0,
+        nakedChart: winrates.get("naked-chart") ?? 0,
+        nakedDeck: winrates.get("naked-deck") ?? 0,
+      });
+    }
   }
   console.log(
     `  ${String(out)} of ${String(LADDER_BANDS.length * 2)} checked cell(s) outside ±${String(LADDER_BAND_PP)}pp`,
   );
+  const mattersOut = matters ? printMatters(mattersReads, rows) : 0;
   const outPath = writeSimCsv("ladder", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
-  if (out > 0) process.exitCode = 1;
+  if (out > 0 || mattersOut > 0) process.exitCode = 1;
 };
 
 const DEAD_PERK_LINE = -8;
@@ -2366,7 +2489,7 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       for (let i = 0; i < runs; i += 1) {
         const { result: r, state } = runSweepSectorWithState(
           deriveSeed(seed, `eco:${String(sector)}:${archetype.name}:${String(i)}`),
-          { sector, ascension: 0, archetype },
+          { sector, ascension: 0, archetype, chartPicks: MID_COLLECTION_PICKS },
         );
         spent.push(r.scrapSpent);
         const loot = Math.max(
@@ -2625,21 +2748,45 @@ interface CampaignResult {
   wormholes: WormholeTally;
   takenBySector: Record<number, number>;
   fightsBySector: Record<number, number>;
+  income: Record<string, number>;
 }
 
 const CAMPAIGN_SECTORS = 5;
+
+interface CampaignOptions {
+  startDraft?: boolean;
+  shipId?: ShipId;
+  chartPicks?: readonly string[];
+  battleSalt?: number;
+}
+
+const incomeBySource = (state: RunState): Record<string, number> => {
+  const named: Record<string, number> = {
+    battle: state.nodeScrap.battle ?? 0,
+    elite: state.nodeScrap.elite ?? 0,
+    miniboss: (state.nodeScrap.miniboss ?? 0) + (state.nodeScrap.package ?? 0),
+    boss: state.nodeScrap.boss ?? 0,
+    events: Math.max(0, state.eventScrap),
+    salvage: Math.max(0, state.salvageScrap),
+    cargo: Math.max(0, state.cargoScrap),
+    sales: Math.max(0, state.moduleSales),
+  };
+  const counted = Object.values(named).reduce((sum, v) => sum + v, 0);
+  return { ...named, other: Math.max(0, state.scrapEarned - counted) };
+};
 
 const runCampaign = (
   seed: number,
   archetype: Archetype,
   ascension: number,
-  startDraft = false,
-  shipId: ShipId = "wanderer",
+  options: CampaignOptions = {},
 ): CampaignResult => {
+  const shipId = options.shipId ?? "wanderer";
   const aMods = ascensionMods(ascension);
-  const hullMax = Math.max(
-    1,
-    Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)),
+  const hullMax = startingHullMax(
+    shipId,
+    ascension,
+    options.chartPicks ?? MID_COLLECTION_PICKS,
   );
   const state = createRunState(
     runStateInit({
@@ -2647,10 +2794,10 @@ const runCampaign = (
       hull: hullMax,
       hullMax,
       deck: archetype.deck,
-      chartPicks: MID_COLLECTION_PICKS,
+      chartPicks: options.chartPicks ?? MID_COLLECTION_PICKS,
     }),
   );
-  if (startDraft) {
+  if (options.startDraft === true) {
     runDraft(state, 1, createStream(deriveSeed(seed, "voucherDraft")));
   }
   const wormholes = emptyWormholeTally();
@@ -2676,6 +2823,7 @@ const runCampaign = (
       rollModules: true,
       guard: 64,
       wormholes,
+      battleSalt: options.battleSalt ?? 0,
     });
     if (!walk.cleared) {
       deathSector = sector;
@@ -2710,16 +2858,121 @@ const runCampaign = (
     wormholes,
     takenBySector: state.takenBySector,
     fightsBySector: state.fightsBySector,
+    income: incomeBySource(state),
   };
 };
 
-const CAMPAIGN_BAND: readonly [number, number] = [0.3, 0.36];
+const CAMPAIGN_BAND: readonly [number, number] = [0.28, 0.34];
 
 const CAMPAIGN_ASCENSIONS: readonly number[] = getArg("asc", "0,3")
   .split(",")
   .map((part) => Number(part.trim()))
   .filter((n) => Number.isFinite(n) && n >= 0);
 const MONOTONIC_GAP_PP = 18;
+
+const OWNER_EDGE_PP = 13;
+
+const AXIS_MEAN_DROP_PP = 1.5;
+
+const AXIS_TOP_BAND: readonly [number, number] = [0.05, 0.12];
+
+const AXIS_RISE_SE = 2;
+
+const pairedStep = (
+  before: readonly boolean[],
+  after: readonly boolean[],
+): { mean: number; se: number } => {
+  const n = Math.min(before.length, after.length);
+  if (n === 0) return { mean: 0, se: 0 };
+  const diffs = Array.from(
+    { length: n },
+    (_, i) => (after[i] === true ? 1 : 0) - (before[i] === true ? 1 : 0),
+  );
+  const mean = diffs.reduce((sum, d) => sum + d, 0) / n;
+  const variance = diffs.reduce((sum, d) => sum + (d - mean) ** 2, 0) / Math.max(1, n - 1);
+  return { mean, se: Math.sqrt(variance / n) };
+};
+
+const printAscensionAxis = (
+  axis: ReadonlyMap<number, readonly boolean[]>,
+  rows: string[],
+): number => {
+  const levels = [...axis.keys()].sort((a, b) => a - b);
+  if (levels.length < 2) return 0;
+  const means = levels.map((level) => {
+    const cells = axis.get(level) ?? [];
+    return cells.filter(Boolean).length / Math.max(1, cells.length);
+  });
+  const contract =
+    levels.length === MAX_ASCENSION + 1 &&
+    levels.every((level, index) => level === index);
+  console.log(
+    `  ascension axis (red+blue mean, paired worlds; a rise counts above ${String(AXIS_RISE_SE)} standard errors of the paired step)${contract ? "" : " · partial, printed unchecked"}:`,
+  );
+  rows.push("");
+  rows.push("ascension,meanWinrate,stepPp,stepSePp,verdict");
+  let rises = 0;
+  let flatRises = 0;
+  levels.forEach((level, index) => {
+    const value = means[index] ?? 0;
+    const previous = index === 0 ? undefined : levels[index - 1];
+    const step =
+      previous === undefined
+        ? { mean: 0, se: 0 }
+        : pairedStep(axis.get(previous) ?? [], axis.get(level) ?? []);
+    const significant = step.mean > AXIS_RISE_SE * step.se;
+    if (previous !== undefined && step.mean > 0) flatRises += 1;
+    if (previous !== undefined && significant) rises += 1;
+    console.log(
+      `    A${String(level).padEnd(2)} ${(value * 100).toFixed(1).padStart(5)}%${previous === undefined ? "" : `  step ${step.mean >= 0 ? "+" : ""}${(step.mean * 100).toFixed(1)}pp ±${(step.se * 100).toFixed(1)}${significant ? " RISE" : step.mean > 0 ? " rise inside the noise" : ""}`}`,
+    );
+    rows.push(
+      `${String(level)},${value.toFixed(3)},${(step.mean * 100).toFixed(1)},${(step.se * 100).toFixed(1)},${significant ? "RISE" : "ok"}`,
+    );
+  });
+  console.log(`    ${String(flatRises)} raw rise(s), ${String(rises)} above the noise`);
+  const first = means[0] ?? 0;
+  const last = means[means.length - 1] ?? 0;
+  const meanDrop = ((first - last) * 100) / Math.max(1, levels.length - 1);
+  const top = last >= AXIS_TOP_BAND[0] && last <= AXIS_TOP_BAND[1];
+  console.log(
+    `    ${String(rises)} rise(s) · mean drop ${meanDrop.toFixed(2)}pp per level (floor ${String(AXIS_MEAN_DROP_PP)}) · A${String(levels[levels.length - 1] ?? 0)} ${(last * 100).toFixed(1)}%${contract ? ` (band ${(AXIS_TOP_BAND[0] * 100).toFixed(0)}-${(AXIS_TOP_BAND[1] * 100).toFixed(0)}%)` : ""}`,
+  );
+  if (!contract) return 0;
+  return (rises > 0 ? 1 : 0) + (meanDrop < AXIS_MEAN_DROP_PP ? 1 : 0) + (top ? 0 : 1);
+};
+
+const INCOME_SOURCES: readonly string[] = [
+  "battle",
+  "elite",
+  "miniboss",
+  "boss",
+  "events",
+  "salvage",
+  "cargo",
+  "sales",
+  "other",
+];
+
+const printIncome = (runs: readonly CampaignResult[], rows: string[]): void => {
+  const n = Math.max(1, runs.length);
+  const nodes = runs.reduce((sum, r) => sum + r.nodes, 0) / n;
+  const earned = runs.reduce((sum, r) => sum + r.scrapEarned, 0) / n;
+  const parts = INCOME_SOURCES.map(
+    (source) => runs.reduce((sum, r) => sum + (r.income[source] ?? 0), 0) / n,
+  );
+  console.log(
+    `  income per run (A0, red+blue): ${earned.toFixed(0)} over ${nodes.toFixed(1)} nodes cleared · ${(earned / Math.max(1, nodes)).toFixed(1)} per node`,
+  );
+  console.log(
+    `    ${INCOME_SOURCES.map((source, index) => `${source} ${(parts[index] ?? 0).toFixed(0)}`).join(" · ")}`,
+  );
+  rows.push("");
+  rows.push(`earned,nodes,perNode,${INCOME_SOURCES.join(",")}`);
+  rows.push(
+    `${earned.toFixed(1)},${nodes.toFixed(2)},${(earned / Math.max(1, nodes)).toFixed(2)},${parts.map((p) => p.toFixed(1)).join(",")}`,
+  );
+};
 
 const mergeTallies = (
   into: Record<number, PuzzleTally>,
@@ -2757,24 +3010,20 @@ interface CampaignRoll {
   deathHist: Map<number, number>;
 }
 
+const campaignWorld = (seed: number, index: number): number =>
+  deriveSeed(seed, `campaign:${String(index)}`);
+
 const campaignRoll = (
   runs: number,
   seed: number,
   archetype: Archetype,
   ascension: number,
-  startDraft = false,
-  shipId: ShipId = "wanderer",
+  options: CampaignOptions = {},
 ): { roll: CampaignRoll; results: CampaignResult[] } => {
   const results: CampaignResult[] = [];
   for (let i = 0; i < runs; i += 1) {
     results.push(
-      runCampaign(
-        deriveSeed(seed, `campaign:${archetype.name}:${String(i)}`),
-        archetype,
-        ascension,
-        startDraft,
-        shipId,
-      ),
+      runCampaign(campaignWorld(seed, i), archetype, ascension, options),
     );
   }
   const n = Math.max(1, results.length);
@@ -2801,12 +3050,22 @@ const campaignRoll = (
   };
 };
 
+const chartFilePicks = (): readonly string[] | undefined => {
+  const path = getArg("chart-file", "");
+  if (path === "") return undefined;
+  const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
+  if (!Array.isArray(parsed) || !parsed.every((id) => typeof id === "string"))
+    throw new Error(`sim: --chart-file ${path} is not a list of node ids`);
+  return parsed;
+};
+
 const campaignModeMain = (
   runs: number,
   seed: number,
   startedAt: number,
 ): void => {
   const startDraft = process.argv.includes("--start-draft");
+  const chartPicks = chartFilePicks();
   const rows: string[] = [
     "deck,ascension,runs,winrate,avgSectorsCleared,avgNodes,avgScrapEarned,avgScrapSpent,verdict",
   ];
@@ -2825,6 +3084,7 @@ const campaignModeMain = (
   let eventHull = 0;
   const a0: number[] = [];
   const a0Runs: CampaignResult[] = [];
+  const axis = new Map<number, boolean[]>();
   for (const ascension of CAMPAIGN_ASCENSIONS) {
     for (const archetype of ARCHETYPES) {
       const { roll, results } = campaignRoll(
@@ -2832,7 +3092,7 @@ const campaignModeMain = (
         seed,
         archetype,
         ascension,
-        startDraft,
+        { startDraft, ...(chartPicks === undefined ? {} : { chartPicks }) },
       );
       if (ascension === 0) {
         for (const r of results) {
@@ -2851,6 +3111,12 @@ const campaignModeMain = (
           a0.push(roll.winrate);
           a0Runs.push(...results);
         }
+      }
+      if (archetype.name !== "black-edge") {
+        axis.set(ascension, [
+          ...(axis.get(ascension) ?? []),
+          ...results.map((r) => r.cleared),
+        ]);
       }
 
       rows.push(
@@ -2882,6 +3148,11 @@ const campaignModeMain = (
   console.log(
     `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%${mean >= CAMPAIGN_BAND[0] && mean <= CAMPAIGN_BAND[1] ? " — ok" : " — OUT OF BAND"}`,
   );
+  console.log(
+    `  owner at A0 ≈ ${(mean * 100 + OWNER_EDGE_PP).toFixed(1)}% (bot + OWNER_EDGE_PP ${String(OWNER_EDGE_PP)})`,
+  );
+  const axisFailures = printAscensionAxis(axis, rows);
+  printIncome(a0Runs, rows);
 
   const conditional: number[] = [];
   console.log(
@@ -3010,6 +3281,199 @@ const campaignModeMain = (
   const outPath = writeSimCsv("campaign", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (mean < CAMPAIGN_BAND[0] || mean > CAMPAIGN_BAND[1]) process.exitCode = 1;
+  if (axisFailures > 0) process.exitCode = 1;
+};
+
+const CHART_SPREAD_PP = 8;
+
+const CHART_PARITY_PP = 3;
+
+interface ChartRead {
+  name: string;
+  winrate: number;
+  spent: number;
+  keystones: number;
+  nexus: number;
+}
+
+const chartModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const decks = ARCHETYPES.filter((a) => CONTRACT_DECKS.includes(a.name));
+  console.log(
+    `sim chart: campaign A0 per chart archetype at L${String(ARCHETYPE_LEVEL)} (${String(pointsTotal(ARCHETYPE_LEVEL))} points), red+blue x ${String(runs)} runs`,
+  );
+  const read = (name: string, picks: readonly string[]): ChartRead => {
+    const rates = decks.map(
+      (deck) =>
+        campaignRoll(runs, seed, deck, 0, { chartPicks: picks }).roll.winrate,
+    );
+    const kinds = picks.map((id) => CHART_NODE_BY_ID.get(id)?.kind);
+    const result: ChartRead = {
+      name,
+      winrate: rates.reduce((sum, v) => sum + v, 0) / Math.max(1, rates.length),
+      spent: pointsSpent(picks),
+      keystones: kinds.filter((k) => k === "keystone").length,
+      nexus: kinds.filter((k) => k === "nexus").length,
+    };
+    console.log(
+      `  ${name.padEnd(18)} ${(result.winrate * 100).toFixed(1).padStart(5)}% · ${String(result.spent).padStart(3)} pts · keystones ${String(result.keystones)} · nexus ${String(result.nexus)}`,
+    );
+    return result;
+  };
+  const baseline = read("no chart", []);
+  const archetypes: ChartRead[] = [
+    ...CHART_SCHOOLS.map((school) => read(`mono-${school}`, monoChart(school))),
+    read("dual red+blue", dualChart("red", "blue")),
+    read("spread red/blue+green", spreadChart(["red", "blue"], "green")),
+    read("hub-heavy", hubHeavyChart()),
+  ];
+  const halves = CHART_SCHOOLS.map((school) =>
+    read(`half-${school}`, halfBranchChart(school)),
+  );
+  const rates = archetypes.map((a) => a.winrate);
+  const mean = rates.reduce((sum, v) => sum + v, 0) / Math.max(1, rates.length);
+  const spread = (Math.max(...rates) - Math.min(...rates)) * 100;
+  const below = archetypes.filter((a) => a.winrate < baseline.winrate);
+  const green = archetypes.find((a) => a.name === "mono-green");
+  const greenEdge = ((green?.winrate ?? 0) - mean) * 100;
+  const unreachable = nexusIds().filter((id) => !nexusReachable(id));
+  const parity = (school: School): number => {
+    const own = halves.find((h) => h.name === `half-${school}`)?.winrate ?? 0;
+    const others = halves.filter((h) => h.name !== `half-${school}`);
+    const othersMean =
+      others.reduce((sum, h) => sum + h.winrate, 0) / Math.max(1, others.length);
+    return (own - othersMean) * 100;
+  };
+  const greenParity = parity("green");
+  const blueParity = parity("blue");
+  const checks: readonly [string, boolean][] = [
+    [`archetype spread ${spread.toFixed(1)}pp (gate ${String(CHART_SPREAD_PP)})`, spread <= CHART_SPREAD_PP],
+    [`archetypes below the no-chart baseline: ${below.length === 0 ? "none" : below.map((a) => a.name).join(", ")}`, below.length === 0],
+    [`mono-green over the archetype mean ${greenEdge >= 0 ? "+" : ""}${greenEdge.toFixed(1)}pp (gate +${String(CHART_PARITY_PP)})`, greenEdge <= CHART_PARITY_PP],
+    [`nexus reachable at L${String(ARCHETYPE_LEVEL)}: ${unreachable.length === 0 ? "all" : `missing ${unreachable.join(", ")}`}`, unreachable.length === 0],
+    [`half-green against the other halves ${greenParity >= 0 ? "+" : ""}${greenParity.toFixed(1)}pp (±${String(CHART_PARITY_PP)})`, Math.abs(greenParity) <= CHART_PARITY_PP],
+    [`half-blue against the other halves ${blueParity >= 0 ? "+" : ""}${blueParity.toFixed(1)}pp (±${String(CHART_PARITY_PP)})`, Math.abs(blueParity) <= CHART_PARITY_PP],
+  ];
+  console.log(`  archetype mean ${(mean * 100).toFixed(1)}%`);
+  for (const [label, ok] of checks) {
+    console.log(`  ${ok ? "ok " : "OUT"} ${label}`);
+  }
+  const rows: string[] = ["archetype,winrate,points,keystones,nexus"];
+  for (const row of [baseline, ...archetypes, ...halves]) {
+    rows.push(
+      `${row.name},${row.winrate.toFixed(3)},${String(row.spent)},${String(row.keystones)},${String(row.nexus)}`,
+    );
+  }
+  const outPath = writeSimCsv("chart", rows, startedAt);
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (checks.some(([, ok]) => !ok)) process.exitCode = 1;
+};
+
+const PROGRESSION_LEVELS: readonly number[] = [1, 5, 10, 15, 20, 25, 30, 40, 50];
+
+const levelsModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const decks = ARCHETYPES.filter((a) => CONTRACT_DECKS.includes(a.name));
+  console.log(
+    `sim levels: campaign A0 by captain level, the greedy chart at each level, red+blue x ${String(runs)} runs`,
+  );
+  const rows: string[] = ["level,points,winrate,ownerEstimate"];
+  for (const level of PROGRESSION_LEVELS) {
+    const picks = buildChartPicks(level);
+    const rates = decks.map(
+      (deck) =>
+        campaignRoll(runs, seed, deck, 0, { chartPicks: picks }).roll.winrate,
+    );
+    const mean = rates.reduce((sum, v) => sum + v, 0) / Math.max(1, rates.length);
+    console.log(
+      `  L${String(level).padEnd(3)} ${String(pointsSpent(picks)).padStart(3)} pts · bot ${(mean * 100).toFixed(1).padStart(5)}% · owner ≈ ${Math.min(100, mean * 100 + OWNER_EDGE_PP).toFixed(1)}%`,
+    );
+    rows.push(
+      `${String(level)},${String(pointsSpent(picks))},${mean.toFixed(3)},${Math.min(1, mean + OWNER_EDGE_PP / 100).toFixed(3)}`,
+    );
+  }
+  const outPath = writeSimCsv("levels", rows, startedAt);
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+};
+
+const UNWINNABLE_BAND: readonly [number, number] = [0.08, 0.15];
+
+const UNWINNABLE_CEILING = 0.2;
+
+const UNWINNABLE_READS: readonly number[] = [1, 2, 4, 8];
+
+const CONTRACT_DECKS: readonly string[] = ["red-burn", "blue-wall"];
+
+interface WorldRead {
+  world: number;
+  firstContract: number;
+  firstAny: number;
+  deaths: string[];
+}
+
+const unwinnableModeMain = (
+  runs: number,
+  seed: number,
+  startedAt: number,
+): void => {
+  const replays = Math.max(1, Number(getArg("replays", "8")));
+  console.log(
+    `sim unwinnable: ${String(runs)} worlds at A0 · columns = ${String(ARCHETYPES.length)} decks x up to ${String(replays)} fight-stream replays (map, events, shops and loot fixed per world)`,
+  );
+  const reads: WorldRead[] = [];
+  for (let i = 0; i < runs; i += 1) {
+    const world = campaignWorld(seed, i);
+    let firstContract = Number.POSITIVE_INFINITY;
+    let firstAny = Number.POSITIVE_INFINITY;
+    const deaths: string[] = [];
+    for (let r = 0; r < replays && firstContract === Number.POSITIVE_INFINITY; r += 1) {
+      for (const archetype of ARCHETYPES) {
+        const result = runCampaign(world, archetype, 0, { battleSalt: r });
+        if (r === 0) {
+          deaths.push(
+            result.cleared
+              ? `${archetype.name} won`
+              : `${archetype.name} s${String(result.deathSector)}r${String(result.deathRow)}`,
+          );
+        }
+        if (!result.cleared) continue;
+        firstAny = Math.min(firstAny, r + 1);
+        if (CONTRACT_DECKS.includes(archetype.name)) {
+          firstContract = Math.min(firstContract, r + 1);
+        }
+      }
+    }
+    reads.push({ world: i, firstContract, firstAny, deaths });
+  }
+  const rows: string[] = ["replays,unwinnableAllDecks,unwinnableRedBlue"];
+  for (const read of UNWINNABLE_READS.filter((n) => n <= replays)) {
+    const all = reads.filter((w) => w.firstAny > read).length / Math.max(1, runs);
+    const contract =
+      reads.filter((w) => w.firstContract > read).length / Math.max(1, runs);
+    console.log(
+      `  R=${String(read)}: no column wins ${(all * 100).toFixed(1)}% of worlds · no red or blue column ${(contract * 100).toFixed(1)}%`,
+    );
+    rows.push(`${String(read)},${all.toFixed(3)},${contract.toFixed(3)}`);
+  }
+  const final =
+    reads.filter((w) => w.firstAny > replays).length / Math.max(1, runs);
+  const ok = final >= UNWINNABLE_BAND[0] && final <= UNWINNABLE_BAND[1];
+  console.log(
+    `  unwinnable at R=${String(replays)}: ${(final * 100).toFixed(1)}% · band ${(UNWINNABLE_BAND[0] * 100).toFixed(0)}-${(UNWINNABLE_BAND[1] * 100).toFixed(0)}%, ceiling ${(UNWINNABLE_CEILING * 100).toFixed(0)}%${ok ? " · ok" : final > UNWINNABLE_CEILING ? " · OVER THE CEILING" : " · OUT OF BAND"}`,
+  );
+  const lost = reads.filter((w) => w.firstAny > replays);
+  console.log(`  unwinnable worlds (index: replay-0 outcome per deck):`);
+  for (const read of lost.slice(0, 12)) {
+    console.log(`    world ${String(read.world)}: ${read.deaths.join(" · ")}`);
+  }
+  rows.push("");
+  rows.push("world,firstContract,firstAny,replay0");
+  for (const read of reads) {
+    rows.push(
+      `${String(read.world)},${Number.isFinite(read.firstContract) ? String(read.firstContract) : "none"},${Number.isFinite(read.firstAny) ? String(read.firstAny) : "none"},${read.deaths.join(" | ")}`,
+    );
+  }
+  const outPath = writeSimCsv("unwinnable", rows, startedAt);
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (final > UNWINNABLE_CEILING || !ok) process.exitCode = 1;
 };
 
 const SHIP_BAND: readonly [number, number] = [0.2, 0.6];
@@ -3046,7 +3510,7 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
   for (const ship of ships) {
     const banded: number[] = [];
     for (const archetype of SHIP_ARCHETYPES) {
-      const { roll } = campaignRoll(runs, seed, archetype, 0, false, ship.id);
+      const { roll } = campaignRoll(runs, seed, archetype, 0, { shipId: ship.id });
       if (archetype.name !== "black-edge") banded.push(roll.winrate);
       rows.push(
         [
@@ -4188,6 +4652,9 @@ const MODES: Readonly<Record<string, SimMode>> = {
   deep: { runs: 300, main: deepModeMain },
   s6: { runs: 300, main: deepModeMain },
   campaign: { runs: 200, main: campaignModeMain },
+  unwinnable: { runs: 300, main: unwinnableModeMain },
+  chart: { runs: 300, main: chartModeMain },
+  levels: { runs: 200, main: levelsModeMain },
   ships: { runs: 200, main: shipsModeMain },
   puzzles: { runs: 60, main: puzzleModeMain },
   dice: { runs: 200, main: diceModeMain },

@@ -242,7 +242,7 @@
   "shipyard": {
     "title": "Chantier naval",
     "mk": "Mk {{mk}} — {{cost}}",
-    "mkMax": "Mk3 · à fond",
+    "mkMax": "Mk{{mk}} · à fond",
     "systems": "Systèmes",
     "repair": "Réparation",
     "repairHint": "2 pièces de ferraille par coque",
@@ -332,7 +332,7 @@
     "deck": "Jeu de cartes : dés « {{n}} »",
     "ascension": "Ascension",
     "ascensionLocked": "Terminez la campagne une fois pour débloquer l'ascension.",
-    "aLevel": "Un «{{n}} »",
+    "aLevel": "A{{n}}",
     "tideCap": "Niveaux maximaux des marées d'interférence à l'{{n}}",
     "launch": "Lancement",
     "ascensionCost": "Cela vous coûte",
@@ -341,7 +341,9 @@
     "changeShip": "Changer de vaisseau",
     "voucher": "Bon : atout de départ",
     "voucherCount": "{{n}} en réserve",
-    "voucherHint": "Dépensez un bon pour choisir un atout avant le premier saut."
+    "voucherHint": "Dépensez un bon pour choisir un atout avant le premier saut.",
+    "aLocked": "Terminez A{{prev}} pour débloquer A{{n}}.",
+    "aAllOpen": "Tous les niveaux sont débloqués."
   },
   "package": {
     "title": "Boîtier de porte",
@@ -603,7 +605,10 @@
     "landed": "Lancé {{rows}} lignes {{way}}",
     "softLand": "Se poser en douceur",
     "softLandWhy": "Une fois par partie : aucun jet, aucun risque — atterrissage juste après le bord opposé, dans ta voie",
-    "softLandSpent": "La charge d’Écho est déjà dépensée pour cette partie"
+    "softLandSpent": "La charge d’Écho est déjà dépensée pour cette partie",
+    "gentleUnstable": "Projection courte {{n}}/{{max}}",
+    "gentleUnstableWhy": "Les deux premières traversées d'une partie atterrissent toujours juste après le bord opposé, dans ta voie. En A15, aucune n'est stable.",
+    "rideGentleUnstable": "Traversée : une projection courte juste après le bord opposé, dans ta voie. Non stable en A15"
   },
   "bridge": {
     "title": "Pont",

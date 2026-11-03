@@ -1318,6 +1318,7 @@ export const SECTOR3_EVENTS: readonly EventDef[] = [
       {
         id: "hirePilot",
         label: "content:events.riftPilotage.opt.hirePilot",
+        requires: { req: "scrap", n: 35 },
         outcomes: [
           {
             text: "content:events.riftPilotage.out.hirePilot",
@@ -2267,7 +2268,10 @@ export const SECTOR3_EVENTS: readonly EventDef[] = [
       {
         id: "settleUp",
         label: "content:events.surveyorsReturn.opt.settleUp",
-        requires: { req: "flag", key: "surveyorsFleeced" },
+        requires: [
+          { req: "flag", key: "surveyorsFleeced" },
+          { req: "scrap", n: 40 },
+        ],
         outcomes: [
           {
             text: "content:events.surveyorsReturn.out.settleUp",

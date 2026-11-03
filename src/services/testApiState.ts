@@ -69,6 +69,7 @@ export const readState = (): TestState => {
       shipyardDiscount: run.shipyardDiscount,
       echo: run.echo,
       echoUsed: run.echoUsed,
+      ascension: run.ascension,
     },
     battle: {
       phase: battle.phase,

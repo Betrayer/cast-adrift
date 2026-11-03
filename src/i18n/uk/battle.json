@@ -76,7 +76,8 @@
     "echoTotal": "луна минулого ходу (макс. {{n}})",
     "foldOrder": "перевертає порядок",
     "devourDie": "зʼїдає найкращу вільну кістку",
-    "idle": "Тримається"
+    "idle": "Тримається",
+    "hidden": "Намір приховано"
   },
   "slot": {
     "weaponA": "Гармата А",
@@ -142,6 +143,7 @@
   "targetBody": "Ціль — корпус",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "вхідний сирий {{raw}} → ~{{expected}} · щит {{shield}} · корпус {{hull}}",
+  "mitigationHidden": "у гіршому разі сирий {{raw}} → ~{{expected}} · щит {{shield}} · корпус {{hull}}",
   "mitigationNone": "Цей ворог не завдасть шкоди цього ходу",
   "forecast": "завдаси {{out}} · отримаєш ~{{inc}} (щит тримає {{shield}})",
   "forecastClear": "{{out}} шкоди — поле чисте",

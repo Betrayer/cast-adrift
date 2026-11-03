@@ -32,6 +32,8 @@ describe("drift score", () => {
       kills: 31,
       killPoints: 31 * SCORE_PER_KILL,
       scrap: 418,
+      ascension: 0,
+      ascensionPoints: 0,
       total: 22 * 50 + 31 * 5 + 418,
     });
     expect(runScore(stats)).toBe(1673);

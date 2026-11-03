@@ -1,4 +1,4 @@
-import { MAX_ASCENSION } from "@/data/ascension";
+import { KEEPER_BADGE_ASCENSION, MAX_ASCENSION } from "@/data/ascension";
 import { contractDef } from "@/data/contracts";
 import { DIE_BY_ID } from "@/data/dice";
 import { ENEMY_BY_ID } from "@/data/enemies";
@@ -24,6 +24,7 @@ import { runXp, shardBreakdown, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
 import { trackEvent } from "@/services/analytics";
 import { useAppStore } from "@/stores/appStore";
 import {
+  SINGULARITY_BADGE,
   SMOTRITEL_BADGE,
   useMetaStore,
   type MetaStats,
@@ -167,7 +168,8 @@ export const endRun = (win: boolean, cause?: DeathCause): void => {
   meta.archiveRunFlags(Object.keys(run.flags));
   if (win && run.mode === "campaign") {
     meta.recordCampaignClear(run.ascension);
-    if (run.ascension >= MAX_ASCENSION) meta.awardBadge(SMOTRITEL_BADGE);
+    if (run.ascension >= KEEPER_BADGE_ASCENSION) meta.awardBadge(SMOTRITEL_BADGE);
+    if (run.ascension >= MAX_ASCENSION) meta.awardBadge(SINGULARITY_BADGE);
   }
   meta.bumpLifetime({
     scrapEarned: run.stats.scrapEarned,
@@ -213,7 +215,9 @@ export const endRun = (win: boolean, cause?: DeathCause): void => {
     cause: win ? null : deathCause,
     milestones,
     mode: run.mode,
-    score: isScoredMode(run.mode) ? scoreBreakdown(run.stats) : null,
+    score: isScoredMode(run.mode)
+      ? scoreBreakdown(run.stats, run.ascension)
+      : null,
     contractId: run.contractId,
     contractStars: contract?.stars ?? 0,
     rotation: runRotation(run),

@@ -13,7 +13,7 @@ import {
 
 describe('settings migrations', () => {
   it('current version is wired', () => {
-    expect(SETTINGS_VERSION).toBe(7);
+    expect(SETTINGS_VERSION).toBe(8);
   });
 
   it('v1 blobs keep their values and gain the later defaults', () => {
@@ -33,6 +33,7 @@ describe('settings migrations', () => {
       battleLayout: 'console',
       chartLayout: 'spiral',
       rollStyle: 'flip',
+      bridgeFrame: 'hull',
       skipTally: false,
       vignette: 'full',
     });
@@ -54,6 +55,22 @@ describe('settings migrations', () => {
     expect(v6.rollStyle).toBe('flip');
     expect(v6.chartLayout).toBe('rings');
     expect(v6.battleSpeed).toBe('fast');
+  });
+
+  it('a v7 blob gains the hull frame and keeps everything it had', () => {
+    const v7 = migrateSettings({ rollStyle: 'reel', chartLayout: 'rings' }, 7);
+    expect(v7.bridgeFrame).toBe('hull');
+    expect(v7.rollStyle).toBe('reel');
+    expect(v7.chartLayout).toBe('rings');
+  });
+
+  it('keeps a known bridge frame and drops an unknown one', () => {
+    expect(migrateSettings({ bridgeFrame: 'obsidian' }, 8).bridgeFrame).toBe(
+      'obsidian',
+    );
+    expect(migrateSettings({ bridgeFrame: 'marble' }, 8).bridgeFrame).toBe(
+      'hull',
+    );
   });
 
   it('keeps a known roll style and drops an unknown one', () => {

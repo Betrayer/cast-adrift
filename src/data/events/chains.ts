@@ -809,7 +809,10 @@ export const CHAIN_EVENTS: readonly EventDef[] = [
       {
         id: "callTheTow",
         label: "content:events.velaCommission.opt.callTheTow",
-        requires: { req: "flag", key: "velaTowed" },
+        requires: [
+          { req: "flag", key: "velaTowed" },
+          { req: "scrap", n: 20 },
+        ],
         outcomes: [
           {
             text: "content:events.velaCommission.out.callTheTow",

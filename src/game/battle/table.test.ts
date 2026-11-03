@@ -17,6 +17,7 @@ import {
   seatCount,
   tableDice,
   tableSeats,
+  tableSizeFor,
 } from "@/game/battle/table";
 import { adjacentCopyValue, isSwapTarget } from "@/game/battle/actives";
 import { BattleCtx, dieFaceMax, dieFaceMin } from "@/game/effects/context";
@@ -324,6 +325,17 @@ describe("seats", () => {
     value,
     state: "tray",
     seat,
+  });
+
+  it("finds a die split beside the sixth seat at A11, where the board draws it", () => {
+    const dice: RolledDie[] = [
+      ...[0, 1, 2, 3].map((seat) => seated(`die-${String(seat)}`, 2, seat)),
+      { ...seated("die-4", 3, 4), state: "placed" },
+      seated("copier", 1, 5),
+      { uid: "split", defId: "red-d6", tier: 6, school: "red", value: 5, state: "tray", temp: true },
+    ];
+    expect(adjacentCopyValue(dice, "copier", tableSizeFor(11))).toBe(5);
+    expect(adjacentCopyValue(dice, "copier", tableSizeFor(10))).toBeUndefined();
   });
 
   it("never copies the Fate die's face onto the last seat of a full table", () => {

@@ -21,6 +21,7 @@ import styles from "./WormholeChoice.module.css";
 interface Props {
   offer: BypassOffer;
   rides: number;
+  unstable: boolean;
   softLand: boolean;
   softLandSpent: boolean;
   onBypass: () => void;
@@ -31,6 +32,7 @@ interface Props {
 export const WormholeChoice = ({
   offer,
   rides,
+  unstable,
   softLand,
   softLandSpent,
   onBypass,
@@ -60,13 +62,13 @@ export const WormholeChoice = ({
       {gentle ? (
         <div className={styles.gentle} data-testid="wormhole-gentle">
           <Text size="xs" fw={700} c={schools.blue.text}>
-            {t("run:hole.gentle", {
+            {t(unstable ? "run:hole.gentleUnstable" : "run:hole.gentle", {
               n: Math.min(GENTLE_RIDES, rides + 1),
               max: GENTLE_RIDES,
             })}
           </Text>
           <Text size="xs" c={tokens.dim}>
-            {t("run:hole.gentleWhy")}
+            {t(unstable ? "run:hole.gentleUnstableWhy" : "run:hole.gentleWhy")}
           </Text>
         </div>
       ) : null}
@@ -102,7 +104,7 @@ export const WormholeChoice = ({
           </Button>
           <Text size="xs" c={schools.black.text} ta="center">
             {gentle
-              ? t("run:hole.rideGentle")
+              ? t(unstable ? "run:hole.rideGentleUnstable" : "run:hole.rideGentle")
               : t("run:hole.rideChaotic", {
                   min: 1,
                   max: MAX_EXTRA_ROWS + 1,

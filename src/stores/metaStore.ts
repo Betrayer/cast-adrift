@@ -40,6 +40,7 @@ export {
   META_PERSIST_KEY,
   META_VERSION,
   metaValues,
+  SINGULARITY_BADGE,
   SMOTRITEL_BADGE,
   VOUCHER_CAP,
 } from '@/stores/metaValues';

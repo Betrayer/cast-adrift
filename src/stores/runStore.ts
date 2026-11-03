@@ -15,6 +15,7 @@ import { bayPurchasable, moduleSlots } from "@/game/run/bays";
 import { shipCargoHold } from "@/game/run/hold";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeModuleMods, computeRunMods } from "@/game/run/runMods";
+import { mkTopFor } from "@/game/economy/prices";
 import {
   entranceKey,
   pickEntrance,
@@ -886,7 +887,8 @@ export const useRunStore = create<RunState>()((set, get) => ({
   bumpMk: (slotId) => {
     set((s) => {
       const current = s.mkLevels[slotId] ?? 1;
-      const next: MkLevel = current >= 3 ? 3 : ((current + 1) as MkLevel);
+      const top = mkTopFor(slotId, s.ascension);
+      const next: MkLevel = current >= top ? current : ((current + 1) as MkLevel);
       return { mkLevels: { ...s.mkLevels, [slotId]: next } };
     });
   },

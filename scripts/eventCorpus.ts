@@ -7,7 +7,7 @@ import { mostElitesOnMap } from "../src/game/map/elitePath";
 import { contractSectorOf, mapOptionsFor } from "../src/game/run/mapOptions";
 import { createStreams } from "../src/services/rng";
 import { MAX_EXTRA_ROWS } from "../src/game/map/wormhole";
-import { allOutcomes } from "../src/game/events/engine";
+import { allOutcomes, optionRequirements } from "../src/game/events/engine";
 import type { EventDef, EventOption } from "../src/types/events";
 
 export const OPTIONS_PER_EVENT_MIN = 3.2;
@@ -64,6 +64,18 @@ export const corpusStats = (
   })),
 });
 
+export const purchasePrice = (option: EventOption): number => {
+  const debits = allOutcomes(option).map((outcome) =>
+    outcome.effects.reduce(
+      (sum, effect) =>
+        effect.k === "scrap" && effect.n < 0 ? sum - effect.n : sum,
+      0,
+    ),
+  );
+  if (debits.length === 0 || debits.some((debit) => debit <= 0)) return 0;
+  return Math.max(...debits);
+};
+
 export const eventCorpusErrors = (
   events: readonly EventDef[],
   chainEventIds: ReadonlySet<string>,
@@ -115,6 +127,17 @@ export const eventCorpusErrors = (
             `events: "${where}" has an outcome weight of ${String(weight)} — weights are positive integers and every outcome is reachable`,
           );
         }
+      }
+      const price = purchasePrice(option);
+      if (
+        price > 0 &&
+        !optionRequirements(option.requires).some(
+          (req) => req.req === "scrap" && req.n >= price,
+        )
+      ) {
+        errors.push(
+          `events: "${where}" charges ${String(price)} scrap on every outcome and does not require it, so a short purse pays less than the price`,
+        );
       }
       for (const outcome of allOutcomes(option)) {
         for (const effect of outcome.effects) {

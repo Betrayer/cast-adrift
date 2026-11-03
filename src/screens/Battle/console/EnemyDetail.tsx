@@ -7,6 +7,7 @@ import { ENEMY_BY_ID } from '@/data/enemies';
 import { STATUS_KEYS } from '@/game/battle/statuses';
 import { schools } from '@/data/schools';
 import { aliveCoreParts, coreLocked, partDefOf } from '@/game/battle/damage';
+import { intentHidden } from '@/game/battle/intentVisibility';
 import { mitigationOf } from '@/game/battle/view';
 import { focusEnemy, focusedEnemy, subscribeEnemyFocus } from '@/pixi/battle/enemyFocus';
 import { battleSnapshot, useBattleStore } from '@/stores/battleStore';
@@ -56,9 +57,11 @@ export const EnemyDetail = () => {
   const openUntil = enemy.coreOpenUntilTurn ?? 0;
   const heldOpenByWindow =
     def.shell === true && partsToBreak > 0 && snapshot.turn <= openUntil;
-  const readout = echoReadsIntents(snapshot.echo)
-    ? echoReadoutFor(def, enemy, snapshot.ascension)
-    : null;
+  const hidden = intentHidden(snapshot, enemy.id);
+  const readout =
+    !hidden && echoReadsIntents(snapshot.echo)
+      ? echoReadoutFor(def, enemy, snapshot.ascension)
+      : null;
 
   return (
     <div className={styles.sheet} data-enemy-detail={enemy.id}>
@@ -95,12 +98,14 @@ export const EnemyDetail = () => {
           <span>{t('battle:enemyVulnerable', { n: enemy.statuses.mark })}</span>
         ) : null}
       </div>
-      <div className={styles.sheetIntent}>
-        {intentLabel(t, enemy.nextIntent)}
+      <div className={styles.sheetIntent} data-intent-hidden={hidden}>
+        {hidden ? t('battle:intent.hidden') : intentLabel(t, enemy.nextIntent)}
       </div>
-      <div className={styles.sheetWhy} data-intent-why={enemy.nextIntent.t}>
-        {intentExplain(t, enemy.nextIntent)}
-      </div>
+      {hidden ? null : (
+        <div className={styles.sheetWhy} data-intent-why={enemy.nextIntent.t}>
+          {intentExplain(t, enemy.nextIntent)}
+        </div>
+      )}
       {readout === null ? null : (
         <div className={styles.sheetWhy} data-echo-readout={readout.kind}>
           {`${t('battle:echo.after')} — ${
@@ -121,7 +126,7 @@ export const EnemyDetail = () => {
       <div className={styles.sheetMath} data-enemy-math>
         {mitigation.raw === 0
           ? t('battle:mitigationNone')
-          : t('battle:mitigation', {
+          : t(hidden ? 'battle:mitigationHidden' : 'battle:mitigation', {
               raw: mitigation.raw,
               expected: mitigation.expected,
               shield: mitigation.shield,

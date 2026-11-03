@@ -43,7 +43,7 @@ import {
 } from "@/game/battle/resolver";
 import { dieValueCeiling, rerollFace } from "@/game/battle/rollFloors";
 import { buildBattleSnapshot, createEnemyStream } from "@/game/battle/setup";
-import { assignSeats } from "@/game/battle/table";
+import { assignSeats, tableSizeFor } from "@/game/battle/table";
 import {
   applyCheckStep,
   applyDebugRoll,
@@ -664,7 +664,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       if (s.phase !== "placement" || s.rerollMode) return s;
       const die = s.dice.find((d) => d.uid === uid);
       if (die?.state !== "tray" || !canCopy(die, s.resonance)) return s;
-      const value = adjacentCopyValue(s.dice, uid);
+      const value = adjacentCopyValue(s.dice, uid, tableSizeFor(s.ascension));
       if (value === undefined) return s;
       return {
         dice: patchDie(s.dice, uid, { value, activeUsed: true }),
@@ -1046,7 +1046,7 @@ export const hydrateBattle = (save: BattleSaveState): void => {
   useBattleStore.setState({
     ...createInitialBattleValues(),
     ...save.values,
-    dice: assignSeats(save.values.dice),
+    dice: assignSeats(save.values.dice, tableSizeFor(save.values.ascension)),
     streams: restoreStreams(save.streamStates),
     enemyStream: createStreamFromState(save.enemyStreamState),
     debugNextRoll: null,

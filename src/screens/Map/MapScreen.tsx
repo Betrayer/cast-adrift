@@ -42,6 +42,7 @@ import { flashVignette } from "@/services/vignette";
 import { tierForNode } from "@/game/puzzles/selection";
 import { AbandonConfirm } from "@/components/AbandonConfirm";
 import { WarpStreaks } from "@/components/WarpStreaks";
+import { ridesStayGentle } from "@/game/run/motifs";
 import { WormholeChoice } from "./WormholeChoice";
 import { SpotDefs, SpotOverlay } from "./SpotOverlay";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
@@ -113,6 +114,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   const scrap = useRunStore((s) => s.scrap);
   const axis = useRunStore((s) => s.axis);
   const sector = useRunStore((s) => s.sector);
+  const ascension = useRunStore((s) => s.ascension);
   const seed = useRunStore((s) => s.seed);
   const usedMinibosses = useRunStore((s) => s.usedMinibosses);
   const pendingDeepScan = useRunStore((s) => s.pendingDeepScan);
@@ -200,7 +202,7 @@ const MapView = ({ map, position }: MapViewProps) => {
   };
 
   const bypassOffer = (holeId: NodeId): BypassOffer =>
-    bypassOfferFor(map, position, holeId, visited, sector, hull, hullMax);
+    bypassOfferFor(map, position, holeId, visited, sector, hull, hullMax, ascension);
 
   const arrivalFraming = useRef({ positionRow, reduced, geo });
 
@@ -380,6 +382,7 @@ const MapView = ({ map, position }: MapViewProps) => {
           sector,
           hull,
           hullMax,
+          ascension,
         );
 
   const bypassPreview =
@@ -478,6 +481,7 @@ const MapView = ({ map, position }: MapViewProps) => {
             <WormholeChoice
               offer={bypassOffer(pendingWormhole)}
               rides={rides}
+              unstable={!ridesStayGentle(ascension)}
               softLand={echoSoftLands(echo)}
               softLandSpent={echoUsed}
               onBypass={() => {

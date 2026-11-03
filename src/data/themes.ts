@@ -5,7 +5,8 @@ export type ThemeId =
   | "terminal"
   | "blueprint"
   | "aurora"
-  | "ascendant";
+  | "ascendant"
+  | "eventHorizon";
 
 export interface ThemeTokens {
   bg: string;
@@ -261,12 +262,55 @@ const ascendant: ThemeDef = {
   price: 0,
 };
 
+const eventHorizon: ThemeDef = {
+  id: "eventHorizon",
+  name: "settings:theme.eventHorizon",
+  unlock: "eventHorizon",
+  palette: {
+    bg: "#05060A",
+    surface1: "#0C0F16",
+    surface2: "#141925",
+    line: "#2A3245",
+    text: "#EEF3FF",
+    dim: "#B3BED6",
+    faint: "#8590AB",
+    accent: "#A6E6FF",
+    danger: "#FF6B7A",
+    amber: "#FFC86B",
+  },
+  schoolTint: {
+    hue: 214,
+    hueMix: 0.16,
+    satScale: 0.94,
+    lightShift: {
+      red: 0.05,
+      yellow: 0.04,
+      prismatic: 0.07,
+      blue: 0.04,
+      green: 0.04,
+      grey: 0.03,
+      black: 0.06,
+    },
+  },
+  dieStyle: {
+    radius: 0.46,
+    strokeW: 1.6,
+    glyphFont: SANS,
+    noise: 0,
+    gradient: 0.5,
+  },
+  slotStyle: { dashed: false, innerShadow: 0.32, etching: true },
+  bgStyle: { starDensity: 0.7, hue: 214 },
+  price: 0,
+};
+
 export const THEMES: readonly ThemeDef[] = [
   deepSpace,
   terminal,
   blueprint,
   aurora,
   ascendant,
+  eventHorizon,
 ];
 
 export const THEME_BY_ID: Record<ThemeId, ThemeDef> = {
@@ -275,6 +319,7 @@ export const THEME_BY_ID: Record<ThemeId, ThemeDef> = {
   blueprint,
   aurora,
   ascendant,
+  eventHorizon,
 };
 
 export const DEFAULT_THEME_ID: ThemeId = "deepSpace";

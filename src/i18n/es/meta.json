@@ -368,7 +368,9 @@
     "guardBody": "Hay una ranura de partida. Al iniciar este modo, se borra la partida actual, tanto localmente como en la nube.",
     "guardYes": "Borrar e iniciar",
     "dailyPreview": "Mañana ({{date}})",
-    "dailyPreviewLocked": "Los mutadores de mañana en el nivel{{n}}"
+    "dailyPreviewLocked": "Los mutadores de mañana en el nivel{{n}}",
+    "driftAscension": "Ascensión para esta deriva",
+    "driftScoreMult": "Puntuación ×{{mult}}"
   },
   "contracts": {
     "title": "Contratos",
@@ -416,7 +418,8 @@
     "submitSent": "Presentado a la junta directiva",
     "submitFailed": "Error al enviar: la puntuación se guarda localmente",
     "submitOffline": "Sin conexión: la partida se guarda localmente",
-    "toBoard": "Abre el tablero"
+    "toBoard": "Abre el tablero",
+    "ascension": "Ascensión A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Clasificaciones",
@@ -501,7 +504,8 @@
     "ascendant": "Ascendente",
     "chartwright": "Chartwright",
     "archivist": "Archivero",
-    "answer": "La respuesta"
+    "answer": "La respuesta",
+    "singularity": "Singularidad"
   },
   "unlock": {
     "opened": "Desbloqueado",
@@ -545,7 +549,11 @@
     "skinThreshold": "La piel de «Threshold»",
     "featureShipCorsair": "El Sabueso está a la venta",
     "featureShipFoundry": "The Forge está a la venta",
-    "featureShipPrism": "El Prism ya está a la venta"
+    "featureShipPrism": "El Prism ya está a la venta",
+    "skinSingularity": "Piel de dado: Singularidad",
+    "contractsA12": "Contrato: Vacío profundo",
+    "frameObsidian": "Marco del puente: Obsidiana",
+    "prestigeThemeTwo": "Tema: Horizonte de sucesos"
   },
   "skin": {
     "title": "Las pieles",
@@ -579,6 +587,10 @@
     "threshold": {
       "name": "Umbral",
       "desc": "Redonda, apagada, con un borde de color gris claro. La llevaba el único capitán que nunca se inclinó."
+    },
+    "singularity": {
+      "name": "Singularidad",
+      "desc": "Vidrio negro, un borde blanco, una luz que se curva en torno al glifo."
     }
   },
   "ach": {
@@ -840,7 +852,13 @@
       "skinVoidglass": "la piel «Voidglass»",
       "skinEmberglass": "la piel «Emberglass»",
       "prestigeTheme": "tema «Ascendente»",
-      "badge": "la insignia «Ascendant»"
+      "badge": "la insignia «Ascendant»",
+      "scrapBonus": "+5 % de chatarra de los combates por cada nivel por encima de A10",
+      "skinSingularity": "la piel de dado «Singularidad»",
+      "contractA12": "contrato «Vacío profundo»",
+      "frameObsidian": "marco del puente «Obsidiana»",
+      "prestigeThemeTwo": "tema «Horizonte de sucesos»",
+      "badgeSingularity": "la insignia «Singularidad»"
     }
   },
   "voucher": {
@@ -851,5 +869,17 @@
     "shards": "Tomar {{n}} ◈",
     "bank": "En reserva: {{n}} / {{max}}",
     "full": "Tu reserva de vales está llena ({{max}}). Llévate los fragmentos."
+  },
+  "frame": {
+    "title": "Marco del puente",
+    "hint": "Solo estético. Un marco nunca cambia una nave.",
+    "hull": {
+      "name": "Marco propio del casco",
+      "desc": "Cada casco lleva el marco con el que fue construido."
+    },
+    "obsidian": {
+      "name": "Obsidiana",
+      "desc": "Vidrio volcánico negro, ribeteado por una fría línea blanca."
+    }
   }
 }

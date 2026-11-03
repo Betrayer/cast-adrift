@@ -368,7 +368,9 @@
     "guardBody": "There is one run slot. Starting this mode erases the current run, locally and in the cloud.",
     "guardYes": "Erase and launch",
     "dailyPreview": "Tomorrow ({{date}})",
-    "dailyPreviewLocked": "Tomorrow's mutators at level {{n}}"
+    "dailyPreviewLocked": "Tomorrow's mutators at level {{n}}",
+    "driftAscension": "Ascension for this drift",
+    "driftScoreMult": "Score ×{{mult}}"
   },
   "contracts": {
     "title": "Contracts",
@@ -416,7 +418,8 @@
     "submitSent": "Submitted to the board",
     "submitFailed": "Submission failed — the score is saved locally",
     "submitOffline": "Offline — the score is saved locally",
-    "toBoard": "Open the board"
+    "toBoard": "Open the board",
+    "ascension": "Ascension A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Leaderboards",
@@ -501,7 +504,8 @@
     "ascendant": "Ascendant",
     "chartwright": "Chartwright",
     "archivist": "Archivist",
-    "answer": "The Answer"
+    "answer": "The Answer",
+    "singularity": "Singularity"
   },
   "unlock": {
     "opened": "Unlocked",
@@ -545,7 +549,11 @@
     "skinThreshold": "Die skin «Threshold»",
     "featureShipCorsair": "The Hound is on the market",
     "featureShipFoundry": "The Forge is on the market",
-    "featureShipPrism": "The Prism is on the market"
+    "featureShipPrism": "The Prism is on the market",
+    "skinSingularity": "Die skin: Singularity",
+    "contractsA12": "Contract: Deep Vacuum",
+    "frameObsidian": "Bridge frame: Obsidian",
+    "prestigeThemeTwo": "Theme: Event Horizon"
   },
   "skin": {
     "title": "Die skins",
@@ -579,6 +587,10 @@
     "threshold": {
       "name": "Threshold",
       "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
+    },
+    "singularity": {
+      "name": "Singularity",
+      "desc": "Black glass, a white rim, a light that bends round the glyph."
     }
   },
   "ach": {
@@ -840,7 +852,13 @@
       "skinVoidglass": "die skin «Voidglass»",
       "skinEmberglass": "die skin «Emberglass»",
       "prestigeTheme": "theme «Ascendant»",
-      "badge": "the Ascendant badge"
+      "badge": "the Ascendant badge",
+      "scrapBonus": "+5% scrap from fights for every level above A10",
+      "skinSingularity": "die skin «Singularity»",
+      "contractA12": "contract «Deep Vacuum»",
+      "frameObsidian": "bridge frame «Obsidian»",
+      "prestigeThemeTwo": "theme «Event Horizon»",
+      "badgeSingularity": "the Singularity badge"
     }
   },
   "voucher": {
@@ -851,5 +869,17 @@
     "shards": "Take {{n}} ◈",
     "bank": "Banked: {{n}} / {{max}}",
     "full": "Your voucher bank is full ({{max}}). Take the shards."
+  },
+  "frame": {
+    "title": "Bridge frame",
+    "hint": "Cosmetic only. A frame never changes a ship.",
+    "hull": {
+      "name": "The hull's own",
+      "desc": "Each hull wears the frame it was built with."
+    },
+    "obsidian": {
+      "name": "Obsidian",
+      "desc": "Black volcanic glass, edged in a cold white line."
+    }
   }
 }

@@ -1,3 +1,4 @@
+import { MAX_ASCENSION } from "@/data/ascension";
 import { contractDef, type ContractSetup } from "@/data/contracts";
 import {
   pickDailyMutators,
@@ -62,27 +63,43 @@ export interface ScoreBreakdown {
   kills: number;
   killPoints: number;
   scrap: number;
+  ascension: number;
+  ascensionPoints: number;
   total: number;
 }
 
 export const SCORE_PER_DEPTH = 50;
 export const SCORE_PER_KILL = 5;
+export const ASCENSION_SCORE_PCT = 5;
 
-export const scoreBreakdown = (stats: RunStats): ScoreBreakdown => {
+export const scoreAscension = (ascension: number | undefined): number =>
+  Math.max(0, Math.min(MAX_ASCENSION, Math.trunc(ascension ?? 0)));
+
+export const ascensionScoreMult = (ascension: number | undefined): number =>
+  1 + (ASCENSION_SCORE_PCT / 100) * scoreAscension(ascension);
+
+export const scoreBreakdown = (
+  stats: RunStats,
+  ascension = 0,
+): ScoreBreakdown => {
   const depthPoints = stats.depth * SCORE_PER_DEPTH;
   const killPoints = stats.kills * SCORE_PER_KILL;
+  const base = depthPoints + killPoints + stats.scrapEarned;
+  const total = Math.round(base * ascensionScoreMult(ascension));
   return {
     depth: stats.depth,
     depthPoints,
     kills: stats.kills,
     killPoints,
     scrap: stats.scrapEarned,
-    total: depthPoints + killPoints + stats.scrapEarned,
+    ascension: scoreAscension(ascension),
+    ascensionPoints: total - base,
+    total,
   };
 };
 
-export const runScore = (stats: RunStats): number =>
-  scoreBreakdown(stats).total;
+export const runScore = (stats: RunStats, ascension = 0): number =>
+  scoreBreakdown(stats, ascension).total;
 
 export const scoredModes: readonly RunMode[] = ["drift", "daily"];
 

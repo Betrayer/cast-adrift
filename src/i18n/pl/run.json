@@ -242,7 +242,7 @@
   "shipyard": {
     "title": "Stocznia",
     "mk": "Mk {{mk}} — {{cost}}",
-    "mkMax": "Mk3 · na maksa",
+    "mkMax": "Mk{{mk}} · na maksa",
     "systems": "Systemy",
     "repair": "Naprawa",
     "repairHint": "2 sztuki złomu na kadłub",
@@ -332,7 +332,7 @@
     "deck": "Talia: Kości „{{n}}”",
     "ascension": "Wniebowstąpienie",
     "ascensionLocked": "Ukończ kampanię raz, aby odblokować ascendencję.",
-    "aLevel": "A {{n}}",
+    "aLevel": "A{{n}}",
     "tideCap": "Szczyty pływów interferencyjnych na stronie {{n}}",
     "launch": "Uruchomienie",
     "ascensionCost": "To cię kosztuje",
@@ -341,7 +341,9 @@
     "changeShip": "Zmień statek",
     "voucher": "Kupon: startowy atut",
     "voucherCount": "{{n}} w banku",
-    "voucherHint": "Wydaj kupon, aby wybrać atut przed pierwszym skokiem."
+    "voucherHint": "Wydaj kupon, aby wybrać atut przed pierwszym skokiem.",
+    "aLocked": "Ukończ A{{prev}}, aby odblokować A{{n}}.",
+    "aAllOpen": "Wszystkie poziomy są odblokowane."
   },
   "package": {
     "title": "Opakowanie typu Gate",
@@ -603,7 +605,10 @@
     "landed": "Rzuty {{rows}} wiersze {{way}}",
     "softLand": "Wyląduj miękko",
     "softLandWhy": "Raz na kurs: bez rzutu i bez ryzyka — lądowanie tuż za dalszą krawędzią, w twoim pasie",
-    "softLandSpent": "Ładunek Echa został już zużyty w tym kursie"
+    "softLandSpent": "Ładunek Echa został już zużyty w tym kursie",
+    "gentleUnstable": "Krótki rzut {{n}}/{{max}}",
+    "gentleUnstableWhy": "Pierwsze dwa wloty w kursie nadal sadzają cię tuż za dalszą krawędzią, w twoim pasie. Na A15 żaden z nich nie jest stabilny.",
+    "rideGentleUnstable": "Wlot: krótki rzut tuż za dalszą krawędź, w twój pas. Na A15 nie jest stabilny"
   },
   "bridge": {
     "title": "Most",

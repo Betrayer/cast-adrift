@@ -1,4 +1,5 @@
 import { isBattleLayoutId } from '@/data/battleLayouts';
+import { isBridgeFrameChoice, type BridgeFrameChoice } from '@/data/bridgeFrames';
 import { isChartLayoutId } from '@/data/chartLayouts';
 import { isRollStyle } from '@/data/rollStyles';
 import { DEFAULT_DIE_SKIN } from '@/data/cosmetics';
@@ -84,6 +85,7 @@ export interface BestScores {
 
 export interface AccountPrefs {
   battleLayout?: BattleLayoutId;
+  bridgeFrame?: BridgeFrameChoice;
   chartLayout?: ChartLayoutId;
   rollStyle?: RollStyle;
   theme?: ThemeId;
@@ -99,6 +101,7 @@ export const ACCOUNT_PREF_GUARDS: {
   [K in AccountPrefKey]: AccountPrefGuard<K>;
 } = {
   battleLayout: isBattleLayoutId,
+  bridgeFrame: isBridgeFrameChoice,
   chartLayout: isChartLayoutId,
   rollStyle: isRollStyle,
   theme: isThemeId,
@@ -156,6 +159,8 @@ export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
 
 export const SMOTRITEL_BADGE = 'keeper';
+
+export const SINGULARITY_BADGE = 'singularity';
 
 const STARTER_SPARE = 'yellow-d6';
 

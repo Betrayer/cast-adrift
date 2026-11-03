@@ -24,6 +24,7 @@ import { Diagnostics } from './Diagnostics';
 import { LayoutPicker } from './LayoutPicker';
 import { RollStylePicker } from './RollStylePicker';
 import { SegmentSetting } from './SegmentSetting';
+import { FramePicker } from './FramePicker';
 import { SkinPicker } from './SkinPicker';
 import { ThemePicker } from './ThemePicker';
 
@@ -95,6 +96,7 @@ export const SettingsScreen = () => {
 
       <div data-rise data-settings-section="skin" style={riseStyle(3)}>
         <SkinPicker />
+        <FramePicker />
       </div>
 
       <SegmentSetting

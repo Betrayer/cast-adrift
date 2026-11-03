@@ -35,7 +35,8 @@
     "owned": "Unlocked",
     "unlock": "Unlock",
     "price": "{{n}} shards",
-    "ascendant": "Ascendant"
+    "ascendant": "Ascendant",
+    "eventHorizon": "Event Horizon"
   },
   "diagnostics": {
     "version": "Build {{version}}",

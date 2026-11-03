@@ -1,4 +1,8 @@
-import { A6_ELITE_SUBSYSTEM, ascensionMods } from "@/data/ascension";
+import {
+  A15_BOSS_PART,
+  A6_ELITE_SUBSYSTEM,
+  ascensionMods,
+} from "@/data/ascension";
 import { ENEMY_BY_ID, expandEncounterIds } from "@/data/enemies";
 import { REAL_SCHOOL_ORDER } from "@/data/schools";
 import { scaleEnemyHp } from "@/game/run/encounter";
@@ -199,6 +203,9 @@ export const spawnEnemy = (
     ...(def.subsystems ?? []),
     ...(def.elite === true && ascensionMods(ascension).eliteSubsystem
       ? [A6_ELITE_SUBSYSTEM]
+      : []),
+    ...(def.boss === true && ascensionMods(ascension).bossExtraPart
+      ? [A15_BOSS_PART]
       : []),
   ];
   return {

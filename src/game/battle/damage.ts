@@ -1,4 +1,4 @@
-import { A6_ELITE_SUBSYSTEM } from "@/data/ascension";
+import { A15_BOSS_PART, A6_ELITE_SUBSYSTEM } from "@/data/ascension";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { applyStatus, markMagnitude } from "@/game/battle/statuses";
 import type {
@@ -26,7 +26,11 @@ export const partDefOf = (
   part: SubsystemState,
 ): SubsystemDef | undefined =>
   (def.subsystems ?? []).find((s) => s.id === part.key) ??
-  (part.key === A6_ELITE_SUBSYSTEM.id ? A6_ELITE_SUBSYSTEM : undefined);
+  (part.key === A6_ELITE_SUBSYSTEM.id
+    ? A6_ELITE_SUBSYSTEM
+    : part.key === A15_BOSS_PART.id
+      ? A15_BOSS_PART
+      : undefined);
 
 export const aliveCoreParts = (enemy: EnemyState): number =>
   aliveSubsystems(enemy).length;

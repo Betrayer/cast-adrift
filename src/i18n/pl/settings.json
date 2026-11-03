@@ -35,7 +35,8 @@
     "owned": "Odblokowane",
     "unlock": "Odblokuj",
     "price": "{{n}} odłamki",
-    "ascendant": "Ascendent"
+    "ascendant": "Ascendent",
+    "eventHorizon": "Horyzont zdarzeń"
   },
   "diagnostics": {
     "version": "Zbuduj wersję „{{version}}”",

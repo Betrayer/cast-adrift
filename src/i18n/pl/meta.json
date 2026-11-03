@@ -368,7 +368,9 @@
     "guardBody": "Dostępne jest jedno miejsce na przebieg. Uruchomienie tego trybu powoduje usunięcie bieżącego przebiegu zarówno lokalnie, jak i w chmurze.",
     "guardYes": "Usuń i uruchom",
     "dailyPreview": "Jutro ({{date}})",
-    "dailyPreviewLocked": "Jutrzejsze mutatory na poziomie{{n}}"
+    "dailyPreviewLocked": "Jutrzejsze mutatory na poziomie{{n}}",
+    "driftAscension": "Wniebowstąpienie dla tego dryfu",
+    "driftScoreMult": "Wynik ×{{mult}}"
   },
   "contracts": {
     "title": "Umowy",
@@ -416,7 +418,8 @@
     "submitSent": "Przedłożone zarządowi",
     "submitFailed": "Przesłanie nie powiodło się — wynik został zapisany lokalnie",
     "submitOffline": "Tryb offline — wynik jest zapisywany lokalnie",
-    "toBoard": "Otwórz tablicę"
+    "toBoard": "Otwórz tablicę",
+    "ascension": "Wniebowstąpienie A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Tabele wyników",
@@ -501,7 +504,8 @@
     "ascendant": "Ascendent",
     "chartwright": "Chartwright",
     "archivist": "Archiwista",
-    "answer": "Odpowiedź"
+    "answer": "Odpowiedź",
+    "singularity": "Osobliwość"
   },
   "unlock": {
     "opened": "Odblokowane",
@@ -545,7 +549,11 @@
     "skinThreshold": "Okładka albumu „Threshold”",
     "featureShipCorsair": "„Hound” jest już w sprzedaży",
     "featureShipFoundry": "Obiekt „The Forge” jest na sprzedaż",
-    "featureShipPrism": "Urządzenie Prism jest już dostępne w sprzedaży"
+    "featureShipPrism": "Urządzenie Prism jest już dostępne w sprzedaży",
+    "skinSingularity": "Skórka kości: Osobliwość",
+    "contractsA12": "Umowa: Głęboka próżnia",
+    "frameObsidian": "Ramka mostka: Obsydian",
+    "prestigeThemeTwo": "Temat: Horyzont zdarzeń"
   },
   "skin": {
     "title": "Skórki",
@@ -579,6 +587,10 @@
     "threshold": {
       "name": "Próg",
       "desc": "Okrągły, nieoświetlony, otoczony obramowaniem w kolorze jasnoszarym. Nosił go ten jedyny kapitan, który nigdy się nie poddawał."
+    },
+    "singularity": {
+      "name": "Osobliwość",
+      "desc": "Czarne szkło, biała obwódka, światło zakrzywiające się wokół znaku."
     }
   },
   "ach": {
@@ -840,7 +852,13 @@
       "skinVoidglass": "okładka „Voidglass”",
       "skinEmberglass": "skórka „Emberglass”",
       "prestigeTheme": "motyw „Ascendant”",
-      "badge": "odznaka Ascendant"
+      "badge": "odznaka Ascendant",
+      "scrapBonus": "+5% złomu z walk za każdy poziom powyżej A10",
+      "skinSingularity": "skórka kości „Osobliwość”",
+      "contractA12": "umowa „Głęboka próżnia”",
+      "frameObsidian": "ramka mostka „Obsydian”",
+      "prestigeThemeTwo": "motyw „Horyzont zdarzeń”",
+      "badgeSingularity": "odznaka „Osobliwość”"
     }
   },
   "voucher": {
@@ -851,5 +869,17 @@
     "shards": "Weź {{n}} ◈",
     "bank": "W banku: {{n}} / {{max}}",
     "full": "Bank kuponów jest pełny ({{max}}). Weź odłamki."
+  },
+  "frame": {
+    "title": "Ramka mostka",
+    "hint": "Tylko kosmetycznie. Ramka nigdy nie zmienia statku.",
+    "hull": {
+      "name": "Własna ramka kadłuba",
+      "desc": "Każdy kadłub nosi ramkę, z którą go zbudowano."
+    },
+    "obsidian": {
+      "name": "Obsydian",
+      "desc": "Czarne szkło wulkaniczne obrzeżone zimną białą linią."
+    }
   }
 }

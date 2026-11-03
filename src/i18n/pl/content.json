@@ -289,7 +289,8 @@
     "mineBaron": "Baron kopalni",
     "mineBaron-rack": "Stojak na miny",
     "subsystem": {
-      "overclock": "Moduł podkręcania"
+      "overclock": "Moduł podkręcania",
+      "singularity": "Soczewka osobliwości"
     },
     "anchorHulk": "Hulk kotwiczny",
     "tetherDrone": "Dron Tether",
@@ -3316,12 +3317,15 @@
       "opt": {
         "clearOne": "Usunąć jedno zastawne prawo",
         "buyTheHull": "Kup kadłub za gotówkę",
-        "buyTheDebt": "Zamiast tego kup ten dług"
+        "buyTheDebt": "Zamiast tego kup ten dług",
+        "walkOn": "Zostawić zastawy tam, gdzie są"
       },
       "out": {
         "clearOne": "Jeden za nami, dwa przed nami, a właściciel już dokładnie wie, dokąd zmierzasz.",
         "buyTheHull": "Trzy zastawy, jeden podpis, jeden kadłub, który rozbierzesz na części, by zdobyć tę jedną część, której naprawdę potrzebujesz.",
-        "buyTheDebt": "Teraz te zastawy należą do ciebie. Właściciel pracuje dla ciebie, dopóki tak nie jest – a to już inny rodzaj życzliwości."
+        "buyTheDebt": "Teraz te zastawy należą do ciebie. Właściciel pracuje dla ciebie, dopóki tak nie jest – a to już inny rodzaj życzliwości.",
+        "walkOn": "Życzysz właścicielowi szczęścia i mówisz to szczerze. Zastawy zostają na kadłubie, a jego wzrok zostaje na twojej rufie.",
+        "walkOnTender": "Zostawiasz ich z tym samych. Łódź wierzycieli bierze twój kurs, a szlak za tobą robi się głośniejszy."
       }
     },
     "noSignalDrift": {
@@ -6292,6 +6296,10 @@
     "gauntlet": {
       "name": "Gauntlet",
       "desc": "Bez atutów, bez mapy, z przyspawanym Paktem Obsydianowym. Trzy elity i ćwierć kadłuba."
+    },
+    "deepVacuum": {
+      "name": "Głęboka próżnia",
+      "desc": "Sektor czwarty, fala zakłóceń rośnie o skok wcześniej, a bariera często ma tam trzy rzędy głębokości. Utrzymaj kadłub powyżej trzech dziesiątych i wyjdź z tego ze złomem."
     }
   },
   "sectors": {
@@ -6337,11 +6345,31 @@
     },
     "9": {
       "name": "HighPrzypływ",
-      "desc": "Poziom fali interferencyjnej wzrasta do 4."
+      "desc": "Fala zakłóceń sięga o kolejny poziom wyżej."
     },
     "10": {
       "name": "Próba Strażnika",
       "desc": "Kadłub −15%. Ukończ to, a Krawędź zapamięta twoje imię."
+    },
+    "11": {
+      "name": "Głód",
+      "desc": "Co turę na stół trafia sześć kości zamiast siedmiu."
+    },
+    "12": {
+      "name": "Ciężka próżnia",
+      "desc": "Czarne dziury gryzą mocniej: obejście kosztuje o 10% więcej kadłuba, a chaotyczny wlot częściej unicestwia statek."
+    },
+    "13": {
+      "name": "Ślepe czujniki",
+      "desc": "Najdalszy wróg ukrywa swoją intencję, a ulepszenia Czujników kończą się na Mk2."
+    },
+    "14": {
+      "name": "Dług",
+      "desc": "Ceny w sklepach rosną o kolejne 40%, a elity, minibossowie i bossowie zaczynają z tarczą większą o 6."
+    },
+    "15": {
+      "name": "Osobliwość",
+      "desc": "Każdy boss zyskuje jeszcze jedną część. Fala zakłóceń sięga o jeden poziom niżej, a żaden wlot w czarną dziurę nie jest już stabilny."
     }
   },
   "prologue": {

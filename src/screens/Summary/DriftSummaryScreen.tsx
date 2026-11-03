@@ -14,6 +14,7 @@ import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
 import { MUTATOR_BY_ID } from "@/data/mutators";
 import { abandonRun } from "@/game/run/flow";
+import { ascensionScoreMult } from "@/game/run/modes";
 import { useAppStore } from "@/stores/appStore";
 import { useRunStore } from "@/stores/runStore";
 import { useSummaryStore } from "@/stores/summaryStore";
@@ -94,6 +95,17 @@ export const DriftSummaryScreen = () => {
             label={t("meta:drift.scrap")}
             value={score?.scrap ?? 0}
           />
+          {score !== null && score.ascension > 0 ? (
+            <DriftRow
+              id="ascension"
+              index={3}
+              label={t("meta:drift.ascension", {
+                n: score.ascension,
+                mult: ascensionScoreMult(score.ascension).toFixed(2),
+              })}
+              value={score.ascensionPoints}
+            />
+          ) : null}
           <Divider color={tokens.line} />
           <Group
             justify="space-between"

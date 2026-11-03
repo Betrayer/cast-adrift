@@ -1,4 +1,5 @@
 import { FATE_DIE_ID } from "@/data/fate";
+import { ascensionMods } from "@/data/ascension";
 import { TABLE_SIZE } from "@/game/economy/prices";
 import { createStream, deriveSeed, type RngStream } from "@/services/rng";
 import type { DieState, RolledDie } from "@/types/battle";
@@ -18,8 +19,12 @@ export const tableDice = <T extends Pick<RolledDie, "state">>(
   dice: readonly T[],
 ): T[] => dice.filter(isOnTable);
 
+export const tableSizeFor = (ascension: number): number =>
+  Math.max(1, TABLE_SIZE + ascensionMods(ascension).tableDelta);
+
 export const tableSeats = (
   dice: readonly Pick<RolledDie, "uid" | "state" | "seat" | "temp" | "defId">[],
+  tableSize = TABLE_SIZE,
 ): Map<string, number> => {
   const seats = new Map<string, number>();
   const taken = new Set<number>();
@@ -34,7 +39,7 @@ export const tableSeats = (
     }
   }
   for (const die of pending) {
-    let seat = isTableExtra(die) ? TABLE_SIZE : 0;
+    let seat = isTableExtra(die) ? tableSize : 0;
     while (taken.has(seat)) seat += 1;
     seats.set(die.uid, seat);
     taken.add(seat);
@@ -44,14 +49,18 @@ export const tableSeats = (
 
 export const seatCount = (
   dice: readonly Pick<RolledDie, "uid" | "state" | "seat" | "temp" | "defId">[],
+  tableSize = TABLE_SIZE,
 ): number => {
-  let highest = TABLE_SIZE - 1;
-  for (const seat of tableSeats(dice).values()) highest = Math.max(highest, seat);
+  let highest = tableSize - 1;
+  for (const seat of tableSeats(dice, tableSize).values()) highest = Math.max(highest, seat);
   return highest + 1;
 };
 
-export const assignSeats = (dice: readonly RolledDie[]): RolledDie[] => {
-  const seats = tableSeats(dice);
+export const assignSeats = (
+  dice: readonly RolledDie[],
+  tableSize = TABLE_SIZE,
+): RolledDie[] => {
+  const seats = tableSeats(dice, tableSize);
   return dice.map((die) => {
     const seat = seats.get(die.uid);
     if (seat === undefined) return die.seat === undefined ? die : { ...die, seat: undefined };

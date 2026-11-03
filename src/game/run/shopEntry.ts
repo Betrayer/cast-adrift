@@ -1,21 +1,13 @@
-import { ascensionMods } from "@/data/ascension";
 import {
   flagShopConsequence,
-  flagShopDiscount,
   generateShopModules,
   generateShopStock,
 } from "@/game/economy/shop";
-import { computeRunMods } from "@/game/run/runMods";
 import { emitRunHook } from "@/game/run/runEffects";
 import { logConsequence } from "@/game/run/journal";
-import { useRunStore, type RunValues } from "@/stores/runStore";
+import { shopPricePct } from "@/game/run/shopPrice";
+import { useRunStore } from "@/stores/runStore";
 import type { NodeId } from "@/game/map/types";
-
-export const shopPricePct = (state: RunValues): number =>
-  computeRunMods(state.perks, state.chartPicks, state.modules)
-    .shopDiscountPct +
-  flagShopDiscount(state.flags) -
-  ascensionMods(state.ascension).shopPricePct;
 
 export const enterShop = (nodeId: NodeId): boolean => {
   if (nodeId === "") return false;

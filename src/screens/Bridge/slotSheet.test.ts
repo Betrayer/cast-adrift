@@ -342,6 +342,12 @@ describe("the rest of the slot sheet", () => {
     expect(sheet({ ...run, mkLevels: { weaponA: 3 } }, "weaponA").nextMk).toBeNull();
   });
 
+  it("stops Sensors at Mk2 from A13 on, as the shipyard does", () => {
+    const run = runFor("wanderer", { ascension: 13, mkLevels: { sensors: 2 } });
+    expect(sheet(run, "sensors").nextMk).toBeNull();
+    expect(sheet({ ...run, ascension: 12 }, "sensors").nextMk?.mk).toBe(3);
+  });
+
   it("names the slotMk-gated content the next Mk switches on", () => {
     const run = runFor("wanderer", { modules: ["executioner", "hardpointClamp"] });
     const unlocks = (mk: MkLevel): string[] =>

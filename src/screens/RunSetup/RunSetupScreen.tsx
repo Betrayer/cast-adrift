@@ -22,6 +22,7 @@ import {
   ASCENSIONS,
   ascensionMods,
   ascensionRewardsUpTo,
+  MAX_ASCENSION,
   maxSelectableAscension,
 } from '@/data/ascension';
 import { echoRowDef } from '@/components/echoCoreView';
@@ -107,26 +108,38 @@ export const RunSetupScreen = () => {
             </Button>
           </Group>
           <Divider color={tokens.line} label={t('run:setup.ascension')} />
-          {maxAscension === 0 ? (
-            <Text size="xs" c={tokens.faint}>
-              {t('run:setup.ascensionLocked')}
-            </Text>
-          ) : (
-            <Group gap="xs">
-              {Array.from({ length: maxAscension + 1 }, (_, level) => (
-                <Button
-                  key={level}
-                  size="compact-sm"
-                  variant={level === ascension ? 'filled' : 'default'}
-                  onClick={() => {
-                    setAscension(level);
-                  }}
-                >
-                  {t('run:setup.aLevel', { n: level })}
-                </Button>
-              ))}
-            </Group>
-          )}
+          <Group gap="xs" data-testid="setup-ascension">
+            {Array.from({ length: MAX_ASCENSION + 1 }, (_, level) => (
+              <Button
+                key={level}
+                size="compact-sm"
+                variant={level === ascension ? 'filled' : 'default'}
+                disabled={level > maxAscension}
+                data-ascension-level={level}
+                data-locked={level > maxAscension}
+                title={
+                  level > maxAscension
+                    ? t('run:setup.aLocked', { n: level, prev: level - 1 })
+                    : undefined
+                }
+                onClick={() => {
+                  setAscension(level);
+                }}
+              >
+                {t('run:setup.aLevel', { n: level })}
+              </Button>
+            ))}
+          </Group>
+          <Text size="xs" c={tokens.faint} data-testid="setup-ascension-next">
+            {maxAscension === 0
+              ? t('run:setup.ascensionLocked')
+              : maxAscension < MAX_ASCENSION
+                ? t('run:setup.aLocked', {
+                    n: maxAscension + 1,
+                    prev: maxAscension,
+                  })
+                : t('run:setup.aAllOpen')}
+          </Text>
           <SimpleGrid
             cols={SPLIT_COLUMNS}
             spacing="xs"

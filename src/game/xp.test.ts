@@ -71,7 +71,7 @@ describe("run rewards", () => {
     expect(runsToMax).toBeLessThanOrEqual(35);
   });
 
-  it("ascension multiplies XP by 1 + 0.1A", () => {
+  it("ascension multiplies XP by 1 + 0.12A", () => {
     const counts = {
       nodes: 10,
       elites: 0,
@@ -80,7 +80,8 @@ describe("run rewards", () => {
       contractStars: 0,
     };
     expect(runXp(counts, 0)).toBe(20);
-    expect(runXp(counts, 5)).toBe(30);
+    expect(runXp(counts, 5)).toBe(32);
+    expect(runXp(counts, 15)).toBe(56);
   });
 
   it("campaign shards follow the DESIGN 12.3 sector table", () => {

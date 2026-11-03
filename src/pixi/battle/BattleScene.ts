@@ -7,7 +7,8 @@ import { tapLayerOpen } from "@/app/tapLayer";
 import { flashVignette, sideForX } from "@/services/vignette";
 import { mixHex } from "@/app/color";
 import { onThemeChange, tokens } from "@/app/theme";
-import { seatCount, tableSeats } from "@/game/battle/table";
+import { seatCount, tableSeats, tableSizeFor } from "@/game/battle/table";
+import { hiddenIntentIds } from "@/game/battle/intentVisibility";
 import { DIE_BY_ID } from "@/data/dice";
 import { FATE_DIE_ID } from "@/data/fate";
 import { ENEMY_BY_ID } from "@/data/enemies";
@@ -222,6 +223,8 @@ const intentLabelFor = (intent: Intent): string => {
 
 const intentTint = (intent: Intent): string =>
   ATTACK_INTENTS.has(intent.t) ? schools.red.text : tokens.dim;
+
+const HIDDEN_INTENT_GLYPH = "?";
 
 const LOCK_GLYPH = "⊠";
 
@@ -573,7 +576,7 @@ export class BattleScene {
       trayBand: this.band("tray"),
       dockBand: this.band("dock"),
       shipBand: this.shipBand(),
-      diceCount: seatCount(state.dice),
+      diceCount: seatCount(state.dice, tableSizeFor(state.ascension)),
       enemyCount: state.enemies.length,
       maxSubsystems: maxSubsystemsOf(state),
     });
@@ -1163,8 +1166,11 @@ export class BattleScene {
         }
       }
       if (alive) {
-        view.intent.text = intentLabelFor(enemy.nextIntent);
-        view.intent.style.fill = intentTint(enemy.nextIntent);
+        const hidden = hiddenIntentIds(state).has(enemy.id);
+        view.intent.text = hidden
+          ? HIDDEN_INTENT_GLYPH
+          : intentLabelFor(enemy.nextIntent);
+        view.intent.style.fill = hidden ? tokens.dim : intentTint(enemy.nextIntent);
         view.intent.visible = true;
       } else {
         view.intent.visible = false;
@@ -1261,7 +1267,7 @@ export class BattleScene {
     uid: string,
     state: BattleState,
   ): { x: number; y: number } {
-    const seat = tableSeats(state.dice).get(uid) ?? -1;
+    const seat = tableSeats(state.dice, tableSizeFor(state.ascension)).get(uid) ?? -1;
     const base = this.layout.tray[seat] ?? {
       x: this.layout.trayBand.x + this.layout.trayBand.w / 2,
       y: this.layout.trayBand.y + this.layout.trayBand.h / 2,
@@ -1511,7 +1517,7 @@ export class BattleScene {
       if (state.turn === 1 && prev.turn !== 1) this.publishNeed(state);
       if (state.turn !== prev.turn) this.maybeTumble(state);
     } else {
-      if (state.dice !== prev.dice && seatCount(state.dice) !== seatCount(prev.dice)) {
+      if (state.dice !== prev.dice && seatCount(state.dice, tableSizeFor(state.ascension)) !== seatCount(prev.dice, tableSizeFor(prev.ascension))) {
         this.cancelDrag(state);
         this.relayout();
       }
@@ -1628,8 +1634,10 @@ export class BattleScene {
   }
 
   private checkMirrorIntents(state: BattleState): void {
+    const hidden = hiddenIntentIds(state);
     for (const enemy of state.enemies) {
-      const mirroring = enemy.hp > 0 && enemy.nextIntent.t === "mirrorHalf";
+      const mirroring =
+        enemy.hp > 0 && !hidden.has(enemy.id) && enemy.nextIntent.t === "mirrorHalf";
       if (mirroring && !this.mirrorIntents.has(enemy.id)) {
         this.mirrorIntents.add(enemy.id);
         this.mirrorShimmer(enemy.id);

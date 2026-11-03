@@ -35,7 +35,8 @@
     "owned": "Déverrouillé",
     "unlock": "Déverrouiller",
     "price": "{{n}} éclats",
-    "ascendant": "Ascendant"
+    "ascendant": "Ascendant",
+    "eventHorizon": "Horizon des événements"
   },
   "diagnostics": {
     "version": "{{version}} de compilation",

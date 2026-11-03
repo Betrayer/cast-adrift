@@ -5,7 +5,7 @@ import {
   generateShopStock,
 } from "@/game/economy/shop";
 import { autosaveRun, completeNode } from "@/game/run/flow";
-import { shopPricePct } from "@/game/run/shopEntry";
+import { shopPricePct } from "@/game/run/shopPrice";
 import { computeRunMods } from "@/game/run/runMods";
 import { replaceDie, replaceModule, sellDie } from "@/game/run/inventory";
 import { playSfx } from "@/services/audio";

@@ -1190,6 +1190,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
       {
         id: "clearOne",
         label: "content:events.debtorsHull.opt.clearOne",
+        requires: { req: "scrap", n: 35 },
         outcomes: [
           {
             text: "content:events.debtorsHull.out.clearOne",
@@ -1220,6 +1221,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
       {
         id: "buyTheDebt",
         label: "content:events.debtorsHull.opt.buyTheDebt",
+        requires: { req: "scrap", n: 25 },
         outcomes: [
           {
             text: "content:events.debtorsHull.out.buyTheDebt",
@@ -1228,6 +1230,25 @@ export const COMMON_EVENTS: readonly EventDef[] = [
               { k: "battleMod", mod: "startCharge", n: 3, battles: 3 }
             ],
             consequence: "content:consequence.debtHeld",
+          },
+        ],
+      },
+      {
+        id: "walkOn",
+        label: "content:events.debtorsHull.opt.walkOn",
+        outcomes: [
+          {
+            text: "content:events.debtorsHull.out.walkOn",
+            weight: 2,
+            effects: [{ k: "axis", n: -1 }],
+          },
+          {
+            text: "content:events.debtorsHull.out.walkOnTender",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "tide", n: 1 },
+            ],
           },
         ],
       },
@@ -1330,6 +1351,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
       {
         id: "sendThemOn",
         label: "content:events.crewPetition.opt.sendThemOn",
+        requires: { req: "scrap", n: 30 },
         outcomes: [
           {
             text: "content:events.crewPetition.out.sendThemOn",
@@ -1382,6 +1404,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
       {
         id: "boostIt",
         label: "content:events.beaconWake.opt.boostIt",
+        requires: { req: "scrap", n: 30 },
         outcomes: [
           {
             text: "content:events.beaconWake.out.boostIt",
@@ -1430,6 +1453,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
       {
         id: "waitItOut",
         label: "content:events.interferenceBloom.opt.waitItOut",
+        requires: { req: "scrap", n: 20 },
         outcomes: [
           {
             text: "content:events.interferenceBloom.out.waitItOut",
@@ -1562,6 +1586,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
       {
         id: "takeTheHull",
         label: "content:events.scavengerWake.opt.takeTheHull",
+        requires: { req: "scrap", n: 40 },
         outcomes: [
           {
             text: "content:events.scavengerWake.out.takeTheHull",

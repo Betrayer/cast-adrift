@@ -1,6 +1,7 @@
 import { DIE_BY_ID } from "@/data/dice";
 import { FATE_DIE_ID } from "@/data/fate";
 import { resonanceGrantActive } from "@/data/resonance";
+import { TABLE_SIZE } from "@/game/economy/prices";
 import { tableSeats } from "@/game/battle/table";
 import { FORGE_TIER_CEILING, stepTier } from "@/game/dice/tier";
 import type { DieActive } from "@/types/content";
@@ -44,8 +45,9 @@ const lendsValue = (die: RolledDie): boolean => die.defId !== FATE_DIE_ID;
 export const adjacentCopyValue = (
   dice: readonly RolledDie[],
   uid: string,
+  tableSize = TABLE_SIZE,
 ): number | undefined => {
-  const seats = tableSeats(dice);
+  const seats = tableSeats(dice, tableSize);
   const own = seats.get(uid);
   if (own === undefined) return undefined;
   const neighbors = dice.filter((d) => {

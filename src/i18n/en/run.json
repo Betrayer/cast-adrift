@@ -242,7 +242,7 @@
   "shipyard": {
     "title": "Shipyard",
     "mk": "Mk{{mk}} — {{cost}}",
-    "mkMax": "Mk3 · maxed",
+    "mkMax": "Mk{{mk}} · maxed",
     "systems": "Systems",
     "repair": "Repair",
     "repairHint": "2 scrap per hull",
@@ -341,7 +341,9 @@
     "changeShip": "Change ship",
     "voucher": "Voucher: starting perk",
     "voucherCount": "{{n}} banked",
-    "voucherHint": "Spend one voucher to draft a perk before the first jump."
+    "voucherHint": "Spend one voucher to draft a perk before the first jump.",
+    "aLocked": "Clear A{{prev}} to open A{{n}}.",
+    "aAllOpen": "Every level is open."
   },
   "package": {
     "title": "Gate package",
@@ -603,7 +605,10 @@
     "landed": "Thrown {{rows}} rows {{way}}",
     "softLand": "Set down gently",
     "softLandWhy": "Once per run: no throw, no risk — set down just past the far rim, in your lane",
-    "softLandSpent": "The Echo charge is already spent this run"
+    "softLandSpent": "The Echo charge is already spent this run",
+    "gentleUnstable": "Short throw {{n}}/{{max}}",
+    "gentleUnstableWhy": "The first two rides of a run still land just past the far rim, in your lane. At A15 none of them is stable.",
+    "rideGentleUnstable": "Ride: a short throw just past the far rim, in your lane. Not stable at A15"
   },
   "bridge": {
     "title": "Bridge",
