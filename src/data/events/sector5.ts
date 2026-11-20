@@ -330,6 +330,7 @@ export const SECTOR5_EVENTS: readonly EventDef[] = [
               { k: "axis", n: 2 },
               { k: "nodeMod", mod: "revealRows", n: 5 },
               { k: "flag", key: "lighthouseLit" },
+              { k: "shipRank", n: 1 },
             ],
           },
         ],

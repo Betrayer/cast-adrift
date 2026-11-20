@@ -8,7 +8,7 @@ import {
   Text,
   Title,
 } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { riseStyle } from "@/app/motion";
@@ -17,9 +17,12 @@ import { playSfx } from "@/services/audio";
 import { tokens } from "@/app/theme";
 import { achievementTitleById } from "@/game/meta/achievements";
 import { ShipCard } from "@/components/ShipCard";
+import { ShipSilhouette } from "@/components/ShipSilhouette";
+import { SHIP_RANK_MAX, shipRankOf } from "@/data/shipRanks";
 import { BattleTallyPanel } from "@/screens/Rewards/BattleTallyPanel";
 import { DIE_BY_ID } from "@/data/dice";
 import { PERK_BY_ID } from "@/data/perks";
+import { draftedPerks } from "@/data/perks/ship";
 import { progressWithinLevel } from "@/game/xp";
 import { abandonRun } from "@/game/run/flow";
 import { useAppStore } from "@/stores/appStore";
@@ -30,6 +33,7 @@ import { useSummaryStore } from "@/stores/summaryStore";
 import { CountLine, CountSlot } from "./CountLine";
 import { COUNT_MARK } from "./countSequence";
 import { LevelUpCeremony } from "./LevelUpCeremony";
+import { RecapShareButton } from "./RecapShareButton";
 import { SectorLadder, summaryRoute } from "./SectorLadder";
 import { ShardBreakdownList } from "./ShardBreakdownList";
 import { SummaryDetail } from "./SummaryDetail";
@@ -44,6 +48,8 @@ export const SummaryScreen = () => {
   const mkLevels = useRunStore((s) => s.mkLevels);
   const tally = useRunStore((s) => s.lastTally);
   const perks = useRunStore((s) => s.perks);
+  const masteryRank = useRunStore((s) => s.masteryRank);
+  const shipRankXp = useRunStore((s) => s.shipRankXp);
   const sectorIndex = useRunStore((s) => s.sectorIndex);
   const crossedThreshold = useRunStore((s) => s.crossedThreshold);
   const mode = useRunStore((s) => s.mode);
@@ -52,6 +58,7 @@ export const SummaryScreen = () => {
   const level = useMetaStore((s) => s.level);
   const xp = useMetaStore((s) => s.xp);
   const reduced = useReducedMotion();
+  const modelRef = useRef<HTMLDivElement | null>(null);
 
   const win = result?.win ?? false;
   const route = summaryRoute(
@@ -100,7 +107,7 @@ export const SummaryScreen = () => {
   }, [firstFinds]);
 
   const progress = progressWithinLevel(xp);
-  const perkNames = perks
+  const perkNames = draftedPerks(perks)
     .map((id) => PERK_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
 
@@ -136,7 +143,21 @@ export const SummaryScreen = () => {
           <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">
             {t(win ? "run:summary.victory" : "run:summary.defeat")}
           </Title>
-          <ShipCard shipId={shipId} size="compact" mkLevels={mkLevels} />
+          <div ref={modelRef}>
+            <ShipSilhouette
+              shipId={shipId}
+              masteryRank={masteryRank}
+              perks={perks}
+              size="summary"
+            />
+          </div>
+          <Text size="sm" c={tokens.dim} ta="center" data-testid="summary-ship-rank">
+            {t("run:summary.shipRank", {
+              rank: shipRankOf(shipRankXp),
+              max: SHIP_RANK_MAX,
+            })}
+          </Text>
+          <ShipCard shipId={shipId} size="compact" mkLevels={mkLevels} masteryRank={masteryRank} />
           <SectorLadder
             route={route}
             label={t("run:summary.route", { n: route.to, max: route.total })}
@@ -251,6 +272,7 @@ export const SummaryScreen = () => {
               ? t("run:summary.perksNone")
               : perkNames.map((name) => t(name)).join(" · ")}
           </Text>
+          <Group grow gap="xs" align="flex-start" wrap="nowrap">
           <Button
             size="compact-sm"
             variant="default"
@@ -261,6 +283,8 @@ export const SummaryScreen = () => {
           >
             {t("run:build.open")}
           </Button>
+          <RecapShareButton modelRef={modelRef} win={win} sector={route.to} sectorMax={route.total} />
+          </Group>
           <Button
             size="md"
             fullWidth

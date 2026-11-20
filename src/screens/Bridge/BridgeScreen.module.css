@@ -54,6 +54,11 @@
 }
 
 .pinName {
+  max-width: 60px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  text-align: center;
+  line-height: 1.15;
   font-size: 9px;
   color: var(--ca-dim);
   text-transform: uppercase;
@@ -61,7 +66,7 @@
 }
 
 .pinCap {
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--ca-text);
 }

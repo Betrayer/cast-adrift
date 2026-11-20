@@ -20,6 +20,7 @@ import {
   clone,
   emitBattleEnd,
   finalizeOutcome,
+  guardLethal,
   scaleDamage,
   syncCtxFlags,
 } from "@/game/battle/resolveShared";
@@ -42,6 +43,7 @@ import {
 } from "@/game/battle/statuses";
 import { BattleCtx, buildSources, emit } from "@/game/effects";
 import { sourceMods, sourceTrait } from "@/game/run/runMods";
+import { aliveOnBoard, nextEnemySeat } from "@/game/battle/seats";
 import type { RngStream } from "@/services/rng";
 import type {
   BattleSnapshot,
@@ -53,6 +55,10 @@ import type {
   SubsystemState,
 } from "@/types/battle";
 import type { EnemyDef, Intent } from "@/types/content";
+
+const joinBoard = (next: BattleSnapshot, spawned: EnemyState): void => {
+  next.enemies.push({ ...spawned, seat: nextEnemySeat(next.enemies) });
+};
 
 const enemySpawnInit = (next: BattleSnapshot): SpawnInit => ({
   tide: next.tide,
@@ -97,7 +103,7 @@ const rewardEvade = (
   next: BattleSnapshot,
   context: AttackContext,
 ): void => {
-  const rule = shipProfile(next.shipId).afterburner;
+  const rule = shipProfile(next.shipId, next.passiveTier).afterburner;
   if (rule === null || context.afterburnerGranted >= rule.cap) return;
   const grant = Math.min(rule.weapons, rule.cap - context.afterburnerGranted);
   context.afterburnerGranted += grant;
@@ -124,13 +130,20 @@ const rewardFirstEvasion = (
   }
 };
 
+const FIRST_HIT_REDUCE_CAP_PCT = 60;
+
+export const isAuthoredEnemy = (defId: string): boolean => {
+  const def = ENEMY_BY_ID.get(defId);
+  return def?.boss === true || def?.miniboss === true || def?.elite === true;
+};
+
 export const incomingHits = (
   next: BattleSnapshot,
   enemy: EnemyState,
   perHit: number,
   hits: number,
+  withFirstHitCut = true,
 ): number[] => {
-  const def = ENEMY_BY_ID.get(enemy.defId);
   const aura = enemyAuraAttack(enemy);
   const perkMods = sourceMods(next);
   const tide = Math.max(
@@ -139,25 +152,31 @@ export const incomingHits = (
       Math.max(0, next.interference) +
       perkMods.tideEffectDelta,
   );
-  const authored =
-    def?.boss === true || def?.miniboss === true || def?.elite === true;
+  const authored = isAuthoredEnemy(enemy.defId);
   const damageMultPct =
     battleMutators(next).damageMultPct +
     (authored ? 0 : Math.max(0, next.sectorDmgPct));
   const chargeMult = enemy.statuses.charge === undefined ? 1 : 2;
   const jamPenalty =
     enemy.statuses.jam === undefined ? 0 : 2 + perkMods.jamPowerDelta;
+  const firstHitCut =
+    !withFirstHitCut || next.firstHitSpent === true || !authored
+      ? 0
+      : Math.min(FIRST_HIT_REDUCE_CAP_PCT, perkMods.firstHitReducePct);
   const out: number[] = [];
   for (let i = 0; i < hits; i += 1) {
-    out.push(
-      Math.max(
-        0,
-        scaleDamage(
-          (perHit + aura + tide) * chargeMult - (i === 0 ? jamPenalty : 0),
-          damageMultPct,
-        ),
+    const hit = Math.max(
+      0,
+      scaleDamage(
+        (perHit + aura + tide) * chargeMult - (i === 0 ? jamPenalty : 0),
+        damageMultPct,
       ),
     );
+    out.push(hit);
+  }
+  const first = out.findIndex((hit) => hit > 0);
+  if (firstHitCut > 0 && first >= 0) {
+    out[first] = Math.ceil((out[first] ?? 0) * (1 - firstHitCut / 100));
   }
   return out;
 };
@@ -169,7 +188,11 @@ const applyAttack = (
   hits: number,
   context: AttackContext,
 ): AttackResult => {
-  const raw = incomingHits(next, enemy, perHit, hits);
+  const raw = incomingHits(next, enemy, perHit, hits, false);
+  const authored = isAuthoredEnemy(enemy.defId);
+  const cutPct = authored
+    ? Math.min(FIRST_HIT_REDUCE_CAP_PCT, sourceMods(next).firstHitReducePct)
+    : 0;
   consumeStatus(enemy.statuses, "charge");
   consumeStatus(enemy.statuses, "jam");
   const evasion = next.evasion;
@@ -195,6 +218,10 @@ const applyAttack = (
         rewardFirstEvasion(next, enemy, context, evasion);
         rewardEvade(next, context);
       }
+    }
+    if (damage > 0 && authored && next.firstHitSpent !== true) {
+      if (cutPct > 0) damage = Math.ceil(damage * (1 - cutPct / 100));
+      next.firstHitSpent = true;
     }
     const absorbed = Math.min(next.shield, damage);
     next.shield -= absorbed;
@@ -406,7 +433,7 @@ const resolveIntent = (
           silencePartsOnBodyDeath(enemy);
           handleDeath(next, enemy);
           if (enemy.id === next.targetId) {
-            next.targetId = aliveEnemies(next)[0]?.id ?? null;
+            next.targetId = aliveOnBoard(next.enemies)[0]?.id ?? null;
           }
         }
       }
@@ -568,7 +595,7 @@ const resolveIntent = (
         enemyStream,
         enemySpawnInit(next),
       );
-      next.enemies.push(spawned);
+      joinBoard(next, spawned);
       pushBeat(ctx, enemy.id, "summon");
       return;
     }
@@ -587,8 +614,28 @@ const drainPendingAdds = (ctx: EnemyPhaseCtx): void => {
       ctx.enemyStream,
       enemySpawnInit(ctx.next),
     );
-    ctx.next.enemies.push(spawned);
+    joinBoard(ctx.next, spawned);
     pushBeat(ctx, spawned.id, "summon");
+  }
+};
+
+const drainReinforcements = (ctx: EnemyPhaseCtx): void => {
+  const waiting = ctx.next.reinforcements ?? [];
+  const seats = Math.max(0, MAX_ENEMIES - aliveEnemies(ctx.next).length);
+  if (waiting.length === 0 || seats === 0 || ctx.next.hull <= 0) return;
+  ctx.next.reinforcements = waiting.slice(seats);
+  for (const defId of waiting.slice(0, seats)) {
+    const spawned = spawnEnemy(
+      defId,
+      `enemy-${String(ctx.next.enemies.length)}`,
+      ctx.enemyStream,
+      enemySpawnInit(ctx.next),
+    );
+    joinBoard(ctx.next, spawned);
+    pushBeat(ctx, spawned.id, "summon");
+  }
+  if (ctx.next.targetId === null) {
+    ctx.next.targetId = aliveOnBoard(ctx.next.enemies)[0]?.id ?? null;
   }
 };
 
@@ -710,7 +757,8 @@ const resolveAuras = (ctx: EnemyPhaseCtx): void => {
       next.turn % 4 === 0 &&
       aliveEnemies(next).length < MAX_ENEMIES
     ) {
-      next.enemies.push(
+      joinBoard(
+        next,
         spawnEnemy(
           "choirAcolyte",
           `enemy-${String(next.enemies.length)}`,
@@ -788,7 +836,7 @@ export const resolveEnemyPhase = (
       silencePartsOnBodyDeath(enemy);
       handleDeath(next, enemy);
       if (enemy.id === next.targetId) {
-        next.targetId = aliveEnemies(next)[0]?.id ?? null;
+        next.targetId = aliveOnBoard(next.enemies)[0]?.id ?? null;
       }
     }
     beats.push({
@@ -806,7 +854,8 @@ export const resolveEnemyPhase = (
   emit(sources, "enemyTurnEnd", effectCtx);
 
   const keepPct =
-    shipProfile(next.shipId).shieldKeepPct + sourceMods(next).shieldKeepPct;
+    shipProfile(next.shipId, next.passiveTier).shieldKeepPct +
+    sourceMods(next).shieldKeepPct;
   const bulwarkFloor =
     keepPct > 0 && next.shield > 0
       ? Math.floor(next.shield * (keepPct / 100))
@@ -815,6 +864,8 @@ export const resolveEnemyPhase = (
     next.shield,
     Math.max(next.shieldPersist, bulwarkFloor),
   );
+  guardLethal(next);
+  drainReinforcements(ctx);
   finalizeOutcome(next);
   emitBattleEnd(sources, effectCtx, next, 0);
   syncCtxFlags(next, effectCtx);

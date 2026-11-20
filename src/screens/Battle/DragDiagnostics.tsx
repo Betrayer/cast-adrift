@@ -1,6 +1,7 @@
 import { Button, Paper, Stack, Text } from '@mantine/core';
 import { useEffect, useState } from 'react';
-import { capturedTarget, draggedDie, subscribeDrag } from '@/pixi/battle/dragState';
+import { capturedTarget, draggedDie, dragTally, subscribeDrag } from '@/pixi/battle/dragState';
+import { useMetaStore } from '@/stores/metaStore';
 
 const RING = 12;
 
@@ -58,6 +59,12 @@ const chainUnder = (x: number, y: number): string[] =>
       return `${name} touch-action=${style.touchAction} pointer-events=${style.pointerEvents}`;
     });
 
+const tallyLine = (): string => {
+  const battle = dragTally();
+  const { dragDrops, dragCancels } = useMetaStore.getState().stats;
+  return `drops ${String(battle.drops)} · cancels ${String(battle.cancels)} this battle · ${String(dragDrops)} / ${String(dragCancels)} lifetime`;
+};
+
 const rowLine = (row: PointerRow): string =>
   `${row.type} ${row.pointerType} id=${String(row.pointerId)} buttons=${String(row.buttons)} at ${String(row.x)},${String(row.y)} cancelable=${String(row.cancelable)} prevented=${String(row.prevented)}`;
 
@@ -110,6 +117,7 @@ export const DragDiagnostics = () => {
       `canvas ${canvasRect()}`,
       `dragged ${drag.uid ?? 'null'} · captured ${drag.captured ?? 'null'}`,
       `pointercancel seen: ${cancelSeen ? 'yes' : 'no'}`,
+      tallyLine(),
       ...(last === undefined
         ? []
         : ['chain under last point:', ...chainUnder(last.x, last.y)]),
@@ -163,6 +171,9 @@ export const DragDiagnostics = () => {
         </Text>
         <Text size="xs" ff="monospace">
           {`cancel ${cancelSeen ? 'yes' : 'no'} · dpr ${String(window.devicePixelRatio)} · touch ${String(navigator.maxTouchPoints)}`}
+        </Text>
+        <Text size="xs" ff="monospace" data-testid="drag-diagnostics-tally">
+          {tallyLine()}
         </Text>
         <Text size="xs" ff="monospace">
           {viewportLine()}

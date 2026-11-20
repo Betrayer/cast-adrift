@@ -1,3 +1,4 @@
+import { aliveOnBoard } from "@/game/battle/seats";
 import type { EnemyState } from "@/types/battle";
 import type { Intent } from "@/types/content";
 
@@ -5,7 +6,7 @@ export const aimedEnemy = (
   enemies: readonly EnemyState[],
   targetId: string | null,
 ): EnemyState | undefined => {
-  const alive = enemies.filter((enemy) => enemy.hp > 0);
+  const alive = aliveOnBoard(enemies);
   if (targetId !== null) {
     const direct = alive.find((enemy) => enemy.id === targetId);
     if (direct !== undefined) return direct;

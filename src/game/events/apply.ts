@@ -3,6 +3,7 @@ import { beaconsResolved } from "@/data/events/beacons";
 import { chainViews, type ChainView } from "@/data/narrative/chains";
 import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
+import { gainShipRankXp } from "@/game/run/shipRanks";
 import { settleAchievements } from "@/game/meta/achievements";
 import { noteEventResolved } from "@/game/meta/counters";
 import { ptsForInstance } from "@/game/economy/prices";
@@ -106,6 +107,9 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
       return;
     case "shards":
       useMetaStore.getState().addShards(Math.max(0, effect.n));
+      return;
+    case "shipRank":
+      gainShipRankXp(effect.n);
       return;
     case "nodeMod":
       if (effect.mod === "revealRows") run.addBonusReveal(effect.n ?? 2);

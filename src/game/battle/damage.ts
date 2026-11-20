@@ -1,5 +1,6 @@
 import { A15_BOSS_PART, A6_ELITE_SUBSYSTEM } from "@/data/ascension";
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { aliveOnBoard } from "@/game/battle/seats";
 import { applyStatus, markMagnitude } from "@/game/battle/statuses";
 import type {
   BattleSnapshot,
@@ -191,7 +192,7 @@ export const reaimOffLockedCore = (next: BattleSnapshot): void => {
   if (next.targetId === null) return;
   const owner = next.targetId.split(":")[0] ?? next.targetId;
   const alive = next.enemies.find((e) => e.id === owner)?.hp ?? 0;
-  if (alive <= 0) next.targetId = aliveEnemies(next)[0]?.id ?? null;
+  if (alive <= 0) next.targetId = aliveOnBoard(next.enemies)[0]?.id ?? null;
   if (next.targetId === null) return;
   const body = next.enemies.find((e) => e.id === next.targetId);
   if (body === undefined) return;
@@ -201,7 +202,7 @@ export const reaimOffLockedCore = (next: BattleSnapshot): void => {
     return;
   }
   if (!isBodyImmune(next, body)) return;
-  const reachable = aliveEnemies(next).find((e) => !isBodyImmune(next, e));
+  const reachable = aliveOnBoard(next.enemies).find((e) => !isBodyImmune(next, e));
   if (reachable !== undefined) next.targetId = reachable.id;
 };
 
@@ -217,7 +218,7 @@ const retargetAfterKill = (
     next.targetId = survivor?.id ?? parent.id;
     return;
   }
-  next.targetId = aliveEnemies(next)[0]?.id ?? null;
+  next.targetId = aliveOnBoard(next.enemies)[0]?.id ?? null;
   reaimOffLockedCore(next);
 };
 
@@ -239,7 +240,7 @@ export const resolveWeaponTarget = (
     const enemy = next.enemies.find((e) => e.id === next.targetId && e.hp > 0);
     if (enemy !== undefined) return { enemy };
   }
-  const fallback = aliveEnemies(next)[0];
+  const fallback = aliveOnBoard(next.enemies)[0];
   if (fallback === undefined) return undefined;
   next.targetId = fallback.id;
   return { enemy: fallback };
@@ -247,7 +248,7 @@ export const resolveWeaponTarget = (
 
 export const scatterTargets = (next: BattleSnapshot): EnemyState[] => {
   const chosen = resolveWeaponTarget(next);
-  const alive = aliveEnemies(next);
+  const alive = aliveOnBoard(next.enemies);
   if (chosen === undefined) return alive;
   const headId = chosen.enemy.id;
   return [

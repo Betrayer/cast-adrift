@@ -35,6 +35,8 @@ import { EndOverlay, TopBands } from '@/screens/Battle/shell/BattleShell';
 import { endHoldMs } from '@/screens/Battle/shell/endHold';
 import bossStyles from './BossIntro.module.css';
 import styles from './BattleScreen.module.css';
+import { noteDragTally } from '@/game/meta/counters';
+import { takeDragTally } from '@/pixi/battle/dragState';
 
 const DragDiagnostics = lazy(() =>
   import('@/screens/Battle/DragDiagnostics').then((m) => ({
@@ -103,6 +105,8 @@ export const BattleScreen = () => {
     focusEnemy(null);
     return () => {
       focusEnemy(null);
+      const tally = takeDragTally();
+      noteDragTally(tally.drops, tally.cancels);
     };
   }, []);
 

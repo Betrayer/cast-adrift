@@ -32,12 +32,12 @@ import {
 import {
   cargoOfferable,
   cargoRowsLeft,
-  cargoSlotTier,
   dropCargo,
   offeredCargo,
   pickDeliveryTarget,
   takeCargo,
 } from "@/game/run/cargo";
+import { runSlotTierDelta } from "@/game/run/battleInit";
 import { resetBarkMemory } from "@/game/narrative/barks";
 import {
   captureRunSnapshot,
@@ -438,11 +438,11 @@ describe("the contract", () => {
 
   it("drops from the hold, forfeits the payout and ends the drawback", () => {
     expect(takeCargo("unstableCore")).toBe(true);
-    expect(cargoSlotTier(held()).reactor).toBe(-1);
+    expect(runSlotTierDelta(run()).reactor).toBe(-1);
     const before = run().scrap;
     expect(dropCargo("unstableCore")).toBe(true);
     expect(held()).toHaveLength(0);
-    expect(cargoSlotTier(held()).reactor).toBeUndefined();
+    expect(runSlotTierDelta(run()).reactor).toBeUndefined();
     expect(run().scrap).toBe(before);
     expect(cargoSteps()).toContain("dropped");
     expect(feedKeys()).toContain("run:cargo.dropped");

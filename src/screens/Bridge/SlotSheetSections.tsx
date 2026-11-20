@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { cx } from "@/app/cx";
 import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
+import { isMasteryPerk } from "@/data/perks/ship";
 import type { SlotSource } from "@/game/battle/slotRelevance";
 import { projectionTone } from "@/screens/Battle/board/slotText";
 import type { BridgeFocus, BridgeFocusKind } from "./bridgeFocus";
@@ -45,8 +46,10 @@ const TONE_CLASS = {
   plain: styles.tonePlain,
 } as const;
 
-const focusKind = (source: SlotSource): BridgeFocusKind | null =>
-  source.kind === "module" || source.kind === "perk" ? source.kind : null;
+const focusKind = (source: SlotSource): BridgeFocusKind | null => {
+  if (source.kind === "perk" && isMasteryPerk(source.id)) return null;
+  return source.kind === "module" || source.kind === "perk" ? source.kind : null;
+};
 
 export const SheetSection = ({
   id,

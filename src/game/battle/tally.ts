@@ -1,7 +1,7 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
 import type { ResolutionBundle, ResonanceCensus } from "@/types/battle";
 
-export interface TurnTally {
+interface TurnTally {
   shieldAbsorbed: number;
   damageDealt: number;
   damageTaken: number;

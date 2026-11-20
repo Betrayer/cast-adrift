@@ -1,3 +1,5 @@
+import { MOTION_MS, REDUCED_MS } from "../src/app/motion";
+
 const MOTION_LAYOUT_PROPERTY =
   /^(?:top|left|right|bottom|inset(?:-[a-z]+)*|width|height|block-size|inline-size|(?:min|max)-[a-z]+(?:-[a-z]+)*|margin(?:-[a-z]+)*|padding(?:-[a-z]+)*|letter-spacing)$/;
 const MOTION_TRANSITION_DECLARATION = /^(?:-webkit-)?transition(?:-property)?$/;
@@ -10,7 +12,11 @@ export interface CssDeclaration {
   keyframes: string | null;
 }
 
-export const cssDeclarations = (source: string): CssDeclaration[] => {
+interface ScopedDeclaration extends CssDeclaration {
+  preludes: readonly string[];
+}
+
+const scopedDeclarations = (source: string): ScopedDeclaration[] => {
   const css = source.replace(/\/\*[\s\S]*?\*\//g, (block) => block.replace(/[^\n]/g, " "));
   const lineStarts = [0];
   for (let i = 0; i < css.length; i += 1) if (css[i] === "\n") lineStarts.push(i + 1);
@@ -19,7 +25,7 @@ export const cssDeclarations = (source: string): CssDeclaration[] => {
     while (line + 1 < lineStarts.length && (lineStarts[line + 1] ?? 0) <= offset) line += 1;
     return line + 1;
   };
-  const out: CssDeclaration[] = [];
+  const out: ScopedDeclaration[] = [];
   const preludes: string[] = [];
   let start = 0;
   let quote: string | null = null;
@@ -36,6 +42,7 @@ export const cssDeclarations = (source: string): CssDeclaration[] => {
       value: chunk.slice(colon + 1).trim(),
       line: lineAt(start + chunk.length - chunk.trimStart().length),
       keyframes: keyframes ?? null,
+      preludes: [...preludes],
     });
   };
   for (let i = 0; i < css.length; i += 1) {
@@ -65,6 +72,9 @@ export const cssDeclarations = (source: string): CssDeclaration[] => {
   }
   return out;
 };
+
+export const cssDeclarations = (source: string): CssDeclaration[] =>
+  scopedDeclarations(source).map(({ property, value, line, keyframes }) => ({ property, value, line, keyframes }));
 
 const withoutParens = (value: string): string => {
   let flat = value;
@@ -125,9 +135,71 @@ const transitionedLayoutMessage = (token: string): string =>
       ? 'an item that names no property, which means "all" and includes every layout property'
       : `the layout property "${token}"`;
 
+const REDUCED_SCOPE = /data-ca-motion=['"]?reduced['"]?/;
+const DURATION_PROPERTY = /^(?:-webkit-)?(animation|transition)(-duration)?$/;
+const PLAIN_TIME = /^([+-]?(?:\d+\.?\d*|\.\d+))(m?s)$/;
+const VARIABLE = /^var\(\s*(--[\w-]+)\s*(?:,[\s\S]*)?\)$/;
+const COMPUTED_TIME = /^(?:calc|min|max|clamp)\(/;
+const EASING_VARIABLE = /^--ca-ease/;
+
+const MOTION_TOKEN_MS: Readonly<Record<string, number>> = {
+  ...Object.fromEntries(Object.entries(MOTION_MS).map(([step, ms]) => [`--ca-motion-${step}`, ms])),
+  "--ca-motion-reduced": REDUCED_MS,
+};
+
+const splitTop = (value: string, separator: string): string[] => {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const ch of value) {
+    if (ch === "(") depth += 1;
+    else if (ch === ")") depth = Math.max(0, depth - 1);
+    if (depth === 0 && (separator === " " ? /\s/.test(ch) : ch === separator)) {
+      if (current.trim() !== "") parts.push(current.trim());
+      current = "";
+      continue;
+    }
+    current += ch;
+  }
+  if (current.trim() !== "") parts.push(current.trim());
+  return parts;
+};
+
+const timeOf = (token: string): number | "unknown" | null => {
+  const plain = PLAIN_TIME.exec(token);
+  if (plain !== null) return Number(plain[1]) * (plain[2] === "s" ? 1000 : 1);
+  if (COMPUTED_TIME.test(token)) return "unknown";
+  const name = VARIABLE.exec(token)?.[1];
+  if (name === undefined || EASING_VARIABLE.test(name)) return null;
+  return MOTION_TOKEN_MS[name] ?? "unknown";
+};
+
+const reducedDurations = (property: string, value: string): (number | "unknown")[] => {
+  const kind = DURATION_PROPERTY.exec(property);
+  if (kind === null) return [];
+  const items = splitTop(value.replace(/!important\s*$/i, ""), ",");
+  if (kind[2] !== undefined) return items.map((item) => timeOf(item) ?? "unknown");
+  return items.flatMap((item) => {
+    const time = splitTop(item, " ").map(timeOf).find((each) => each !== null);
+    return time === undefined ? [] : [time];
+  });
+};
+
 export const motionBudgetErrors = (path: string, source: string): string[] => {
   const errors: string[] = [];
-  for (const declaration of cssDeclarations(source)) {
+  for (const declaration of scopedDeclarations(source)) {
+    if (declaration.keyframes === null && declaration.preludes.some((prelude) => REDUCED_SCOPE.test(prelude))) {
+      for (const duration of reducedDurations(declaration.property, declaration.value)) {
+        if (duration === "unknown")
+          errors.push(
+            `motion: ${path}:${String(declaration.line)} sets a reduced-motion duration the budget cannot read (${declaration.value}); use var(--ca-motion-reduced), a time, or none`,
+          );
+        else if (duration > REDUCED_MS)
+          errors.push(
+            `motion: ${path}:${String(declaration.line)} runs ${String(duration)} ms under reduced motion, over REDUCED_MS ${String(REDUCED_MS)}; use var(--ca-motion-reduced) or none`,
+          );
+      }
+    }
     if (declaration.property.startsWith("--")) continue;
     if (declaration.keyframes !== null) {
       if (MOTION_LAYOUT_PROPERTY.test(declaration.property))

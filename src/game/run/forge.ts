@@ -1,5 +1,5 @@
 import { DIE_BY_ID } from "@/data/dice";
-import { forgeCodexId } from "@/data/codex";
+import { forgeCodexId, fusionCodexId } from "@/data/codex";
 import {
   forgeOptions,
   forgedDie,
@@ -56,5 +56,6 @@ export const forgeInRun = (option: ForgeOption): boolean => {
   }
   noteFusion();
   if (school !== undefined) useMetaStore.getState().unlockCodex(forgeCodexId(school));
+  if (legal.kind === "recipe") useMetaStore.getState().unlockCodex(fusionCodexId(legal.result));
   return true;
 };

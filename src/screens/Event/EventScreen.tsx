@@ -12,6 +12,7 @@ import { applyOutcome } from "@/game/events/apply";
 import { deckCheckOdds, deckRefFor, oddsPercent } from "@/game/events/checks";
 import {
   eventKind,
+  outcomeShipRank,
   selectOutcome,
   unmetRequirement,
   type OptionContext,
@@ -19,7 +20,10 @@ import {
 import { AxisMeter } from "@/components/AxisMeter";
 import { Typewriter } from "@/components/Typewriter";
 import { cargoOfferable } from "@/game/run/cargo";
+import { setupForRun } from "@/game/run/modes";
+import { rankXpCounts } from "@/game/run/shipRules";
 import { emitEventOutcome } from "@/game/narrative/barks";
+import { keeperGreeting } from "@/game/narrative/keeperGreeting";
 import { useBackGuard } from "@/app/backGuard";
 import { completeNode, endRun, startEventBattle } from "@/game/run/flow";
 import { nodeById, type NodeId } from "@/game/map/types";
@@ -76,9 +80,13 @@ const EventRunner = ({
   const hull = useRunStore((s) => s.hull);
   const axis = useRunStore((s) => s.axis);
   const flags = useRunStore((s) => s.flags);
+  const seed = useRunStore((s) => s.seed);
   const deck = useRunStore((s) => s.deck);
   const mkLevels = useRunStore((s) => s.mkLevels);
   const sector = useRunStore((s) => s.sector);
+  const shipRankXp = useRunStore((s) => s.shipRankXp);
+  const pendingRankUps = useRunStore((s) => s.pendingRankUps);
+  const contractId = useRunStore((s) => s.contractId);
 
   const [checkOption, setCheckOption] = useState<EventOption | null>(null);
   const [outcomeText, setOutcomeText] = useState<string | null>(
@@ -91,6 +99,12 @@ const EventRunner = ({
   const deckRefs = useMemo(() => deck.map((die) => deckRefFor(die)), [deck]);
 
   const offerableCargo = CARGO_IDS.filter((id) => cargoOfferable(id));
+
+  const rankGain =
+    outcomeText !== null &&
+    rankXpCounts(shipRankXp, pendingRankUps, setupForRun({ contractId }).perksDisabled === true)
+      ? outcomeShipRank(event, outcomeText)
+      : 0;
 
   const optionCtx: OptionContext = {
     scrap,
@@ -161,6 +175,9 @@ const EventRunner = ({
   useBackGuard("event", outcomeText === null ? null : onContinue);
 
   const beacon = eventKind(event) === "beacon";
+  const [keeperLine] = useState(() =>
+    beacon ? keeperGreeting("beacon", seed, nodeId ?? event.id, flags) : null,
+  );
   const resolvedBeacons = beaconsResolved(flags);
   const beaconIndex = Math.min(BEACON_FLAGS.length, resolvedBeacons + 1);
 
@@ -238,6 +255,30 @@ const EventRunner = ({
               </span>
             </Group>
           ) : null}
+          {keeperLine === null ? null : (
+            <Stack gap={2}>
+              {event.speaker === "beaconKeeper" ? null : (
+                <Group gap={6} align="center" data-keeper-speaker="beaconKeeper">
+                  <span
+                    aria-hidden
+                    style={{
+                      color: speakerTone("beaconKeeper"),
+                      fontSize: 14,
+                      lineHeight: 1,
+                    }}
+                  >
+                    {SPEAKER_GLYPH.beaconKeeper}
+                  </span>
+                  <Text size="xs" c={speakerTone("beaconKeeper")} fw={600}>
+                    {t("content:speaker.beaconKeeper")}
+                  </Text>
+                </Group>
+              )}
+              <Text size="xs" c={tokens.dim} fs="italic" data-keeper-line={keeperLine.id}>
+                {t(keeperLine.text)}
+              </Text>
+            </Stack>
+          )}
           {event.speaker !== undefined ? (
             <Group gap={8} align="center" data-speaker={event.speaker}>
               <span
@@ -293,6 +334,11 @@ const EventRunner = ({
                     instant={outcomeText === (replay?.outcomeText ?? null)}
                   />
                 </Text>
+                {rankGain > 0 ? (
+                  <Text size="sm" c={tokens.amber} mt="xs" data-testid="event-ship-rank">
+                    {t("run:event.shipRankGain", { n: rankGain })}
+                  </Text>
+                ) : null}
               </Paper>
               <Button fullWidth onClick={onContinue}>
                 {follow !== null

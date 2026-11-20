@@ -3,6 +3,7 @@ import { BLUE_PERKS } from "@/data/perks/blue";
 import { GREEN_PERKS } from "@/data/perks/green";
 import { GREY_PERKS } from "@/data/perks/grey";
 import { RED_PERKS } from "@/data/perks/red";
+import { MASTERY_PERKS, SHIP_PERKS } from "@/data/perks/ship";
 import { SYSTEM_PERKS } from "@/data/perks/systems";
 import { YELLOW_PERKS } from "@/data/perks/yellow";
 import type { PerkDef } from "@/data/perks/types";
@@ -18,7 +19,7 @@ export const ALL_PERKS: readonly PerkDef[] = [
 ];
 
 export const PERK_BY_ID: ReadonlyMap<string, PerkDef> = new Map(
-  ALL_PERKS.map((def) => [def.id, def]),
+  [...ALL_PERKS, ...MASTERY_PERKS, ...SHIP_PERKS].map((def) => [def.id, def]),
 );
 
 export type {

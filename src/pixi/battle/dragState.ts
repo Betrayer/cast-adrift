@@ -1,4 +1,10 @@
+export interface DragTally {
+  drops: number;
+  cancels: number;
+}
+
 let dragged: string | null = null;
+let tally: DragTally = { drops: 0, cancels: 0 };
 let captured: string | null = null;
 const listeners = new Set<() => void>();
 
@@ -28,4 +34,20 @@ export const subscribeDrag = (listener: () => void): (() => void) => {
   return () => {
     listeners.delete(listener);
   };
+};
+
+export const noteDragDrop = (): void => {
+  tally = { ...tally, drops: tally.drops + 1 };
+};
+
+export const noteDragCancel = (): void => {
+  tally = { ...tally, cancels: tally.cancels + 1 };
+};
+
+export const dragTally = (): DragTally => tally;
+
+export const takeDragTally = (): DragTally => {
+  const taken = tally;
+  tally = { drops: 0, cancels: 0 };
+  return taken;
 };

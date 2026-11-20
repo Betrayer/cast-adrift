@@ -395,32 +395,44 @@
     "wanderer": {
       "name": "Wędrowiec",
       "passiveName": "Osprzęt złomiarski",
-      "passiveDesc": "Każda walka zaczyna się z +2 złomu."
+      "passiveDesc": "Każda walka zaczyna się z +2 złomu.",
+      "passiveIIName": "Osprzęt złomiarski II",
+      "passiveIIDesc": "Każda walka zaczyna się z +3 złomu."
     },
     "ram": {
       "name": "Taran",
       "passiveName": "Przeciążenie",
-      "passiveDesc": "Slot broni przyjmuje kość powyżej limitu; każde takie umieszczenie kosztuje 2 kadłuba."
+      "passiveDesc": "Slot broni przyjmuje kość powyżej limitu; każde takie umieszczenie kosztuje 2 kadłuba.",
+      "passiveIIName": "Przeciążenie II",
+      "passiveIIDesc": "Slot broni przyjmuje kość powyżej limitu; każde takie umieszczenie kosztuje 1 kadłuba."
     },
     "ark": {
       "name": "Arka",
       "passiveName": "Bastion",
-      "passiveDesc": "Ćwierć stojącej tarczy przechodzi na następną turę."
+      "passiveDesc": "Ćwierć stojącej tarczy przechodzi na następną turę.",
+      "passiveIIName": "Bastion II",
+      "passiveIIDesc": "Dwie piąte stojącej tarczy przechodzą na następną turę."
     },
     "corsair": {
       "name": "Pies myśliwski",
       "passiveName": "Dopalacz",
-      "passiveDesc": "Umiejętność „Manewr” działa na pełnych obrotach: muśnięcie 7,5% i unik 4,5% na wartość zamiast 3,5% i 1,5%, +8 ewazji oraz maksymalny współczynnik 55/40 zamiast 25/10. Każde trafienie z boku lub unik zapewnia +1 do broni w następnej turze, maksymalnie +2 na turę."
+      "passiveDesc": "Umiejętność „Manewr” działa na pełnych obrotach: muśnięcie 7,5% i unik 4,5% na wartość zamiast 3,5% i 1,5%, +8 ewazji oraz maksymalny współczynnik 38/22 zamiast 25/10. Każde trafienie z boku lub unik zapewnia +1 do broni w następnej turze, maksymalnie +2 na turę.",
+      "passiveIIName": "Dopalacz II",
+      "passiveIIDesc": "Manewr działa na pełnych obrotach jak przy Dopalaczu, a każde muśnięcie lub unik zapewnia +1 do broni w następnej turze, maksymalnie +3 na turę."
     },
     "foundry": {
       "name": "Kuźnia",
       "passiveName": "Wyżarzanie",
-      "passiveDesc": "Raz na bitwę dwie kostki z tacy o tej samej wartości łączą się w jedną kostkę o jeden stopień większą, zachowując obie wartości."
+      "passiveDesc": "Raz na bitwę dwie kostki z tacy o tej samej wartości łączą się w jedną kostkę o jeden stopień większą, zachowując obie wartości.",
+      "passiveIIName": "Wyżarzanie II",
+      "passiveIIDesc": "Raz na bitwę dwie kostki z tacy o tej samej wartości łączą się w jedną kostkę o dwa stopnie większą, zachowując obie wartości."
     },
     "prism": {
       "name": "Pryzmat",
       "passiveName": "Refraktor",
-      "passiveDesc": "Kostki pryzmatyczne liczą się podwójnie w liczeniu rezonansu. Raz na bitwę jedna kostka staje się pryzmatyczna na tę turę."
+      "passiveDesc": "Kostki pryzmatyczne liczą się podwójnie w liczeniu rezonansu. Raz na bitwę jedna kostka staje się pryzmatyczna na tę turę.",
+      "passiveIIName": "Refraktor II",
+      "passiveIIDesc": "Kostki pryzmatyczne liczą się potrójnie w liczeniu rezonansu. Raz na bitwę jedna kostka staje się pryzmatyczna na tę turę."
     },
     "ram-proto": {
       "name": "Prototyp Taran"
@@ -1774,9 +1786,9 @@
     "clanToll": {
       "text": "Łódź klanu przecina szlak i zatrzymuje się na pozycji. „Opłata wynosi trzydzieści. W tym cyklu szlak należy do nas”.",
       "opt": {
-        "pay": "Uiść opłatę za przejazd",
+        "pay": "Uiść opłatę za przejazd (30)",
         "run": "Przebiegnij tor",
-        "haggle": "Wytargój niższą opłatę"
+        "haggle": "Wytargój niższą opłatę (30)"
       },
       "out": {
         "pay": "Pozwalają ci przejechać i oznaczają twój kadłub jako opłacony. Pas ruchu rozszerza się o dwa rzędy.",
@@ -1804,7 +1816,7 @@
     "yusufDebt": {
       "text": "Głos Yusufa, monotonny i zmęczony: „Jesteś winien mojej ekipie kadłub. Sześćdziesiąt, albo rozliczymy się inaczej”.",
       "opt": {
-        "settle": "Rozliczenie w złomie",
+        "settle": "Rozliczenie w złomie (60)",
         "refuse": "Odrzuć go",
         "workItOff": "Odpracuj dług na jego szlaku"
       },
@@ -1844,7 +1856,7 @@
     "hunterTrail": {
       "text": "Wąskopasmowa wiadomość typu „hail”, niezaszyfrowana. Huntress odczytuje ci zawartość rejestru, cyfra po cyfrze.",
       "opt": {
-        "buyOff": "Przekup ją",
+        "buyOff": "Przekup ją (50)",
         "ambushHer": "Odwróć się i spotkaj się z nią"
       },
       "out": {
@@ -1882,7 +1894,7 @@
     "beaconRelay": {
       "text": "Mast przekaźnikowy, z którego połowa konstrukcji została zerwana. Nadal próbuje nadawać co godzinę.",
       "opt": {
-        "repairIt": "Napraw tablicę",
+        "repairIt": "Napraw tablicę (25)",
         "stripIt": "Oczyść tablicę",
         "useKey": "Użyj klucza Strażnika"
       },
@@ -1952,7 +1964,7 @@
       "text": "Trzy statki klanu, brak nawiązania łączności. Czekają w tej kolumnie już od momentu wjechania na pas ruchu.",
       "opt": {
         "standGround": "Nie ustępuj",
-        "payLate": "Spłata z opóźnieniem, wraz z odsetkami",
+        "payLate": "Spłata z opóźnieniem, wraz z odsetkami (55)",
         "runForFold": "Uciekaj do najbliższej fałdy"
       },
       "out": {
@@ -2000,7 +2012,7 @@
     "hunterRespect": {
       "text": "Tym razem Łowczyni zwraca się do ciebie bez ogródek. „Przez ciebie straciłam skrzydło. Mów, co chcesz.”",
       "opt": {
-        "hireHer": "Zatrudnij ją",
+        "hireHer": "Zatrudnij ją (40)",
         "warnHer": "Ostrzeż ją, żeby trzymała się z dala od Rdzenia"
       },
       "out": {
@@ -2041,7 +2053,7 @@
     "warpedShipyard": {
       "text": "Podwórko, które samo się wybudowało po odejściu ekipy. Narzędzia wciąż działają.",
       "opt": {
-        "refit": "Zapłacić za remont",
+        "refit": "Zapłacić za remont (35)",
         "swapPart": "Niech wymieni tę część",
         "letItFinish": "Pozwól jej dokończyć własny projekt"
       },
@@ -2096,7 +2108,7 @@
     "heretics": {
       "text": "Kilka kadłubów, z których zeskrobano tekst hymnu. Słyszeli, że ty też odmówiłeś.",
       "opt": {
-        "armThem": "Uzbrój ich",
+        "armThem": "Uzbrój ich (45)",
         "reportThem": "Zgłoś je",
         "escortThem": "Przeprowadź ich przez kordon"
       },
@@ -2160,7 +2172,7 @@
     "choirTithe": {
       "text": "Stacja dziesięciny. Chór przyjmuje złom, kadłub albo nic — i uczciwie wycenia wszystkie trzy.",
       "opt": {
-        "tithe": "Dziesięcina w postaci złomu",
+        "tithe": "Dziesięcina w postaci złomu (50)",
         "bleed": "Dziesięcina w Hull",
         "declineTithe": "Spadek"
       },
@@ -2190,7 +2202,7 @@
       "opt": {
         "shelter": "Zadbaj o nią",
         "handOver": "Oddaj ją",
-        "giveFuel": "Daj jej paliwo i kurs"
+        "giveFuel": "Daj jej paliwo i kurs (20)"
       },
       "out": {
         "shelter": "W ciągu godziny odpracowuje swoje miejsce na pokładzie, a trasy Chóru czyta jak mapę.",
@@ -2295,7 +2307,7 @@
     "brokenLighthouse": {
       "text": "Latarnia morska, której nikt nie zbudował, po raz pierwszy od czterdziestu lat pogrążona w ciemności.",
       "opt": {
-        "relight": "Zapal to ponownie",
+        "relight": "Zapal to ponownie (60)",
         "harvestLens": "Weź obiektyw",
         "reactorLight": "Zapal ją od własnego reaktora"
       },
@@ -2338,7 +2350,7 @@
     "lastMarket": {
       "text": "Mara zadomowiła się na wraku statku na skraju Rdzenia. „Ostatni zapas w tym sektorze, kapitanie”.",
       "opt": {
-        "buyOut": "Wykupić jej udziały",
+        "buyOut": "Wykupić jej udziały (90)",
         "sellShip": "Sprzedaj jej swoją powłokę",
         "walkPast": "Przejść obok",
         "haul": "Wziąć skrzynię spod jej lady"
@@ -2364,7 +2376,7 @@
     "maraCollector": {
       "text": "Nie Mara — tylko jej kolekcjoner. Ma stronę z twoim imieniem i nie ma ochoty na rozmowę.",
       "opt": {
-        "settleDebt": "Rozliczyć się",
+        "settleDebt": "Rozliczyć się (45)",
         "outrun": "Wyprzedź go",
         "callFavour": "Poproś ją o spłatę długu wdzięczności"
       },
@@ -2439,7 +2451,7 @@
     "coldEngine": {
       "text": "Zespół napędowy, od dziesięcioleci zimny, wciąż przykręcony do połowy kadłuba.",
       "opt": {
-        "warmIt": "Podgrzej to",
+        "warmIt": "Podgrzej to (20)",
         "gutIt": "Wypatroszyć to",
         "coax": "Rozrusz go małymi kośćmi"
       },
@@ -2493,8 +2505,8 @@
     "driftAuction": {
       "text": "Aukcja u Mary, organizowana na rampie barki. Dwie partie towaru, jedna grupa ludzi, żadnych paragonów.",
       "opt": {
-        "bidHigh": "Złóż wysoką ofertę",
-        "bidLow": "Złóż niską ofertę",
+        "bidHigh": "Złóż wysoką ofertę (70)",
+        "bidLow": "Złóż niską ofertę (25)",
         "heckle": "Przeszkadzać w licytacji"
       },
       "out": {
@@ -2533,7 +2545,7 @@
     "maraUsurer": {
       "text": "W miejscu, gdzie powinien znajdować się ladę Mary, wisi zawiadomienie o zastawie i kadłub wielkości kaplicy. Jej długami zajmuje się teraz Lichwiarz — sprzedała książkę, by pokryć koszty, jakie jej spowodowałeś. „Kapitał, odsetki i niedogodności” — tak tam jest napisane.",
       "opt": {
-        "payInFull": "Spłać całość",
+        "payInFull": "Spłać całość (90)",
         "fightIt": "Odmowa i utrzymanie pozycji",
         "runTheLane": "Przebiegnij tor"
       },
@@ -2600,7 +2612,7 @@
     "keeperThread": {
       "text": "Przekaźnik Strażnika namierzył cię między dwoma nadajnikami. „Wykonywałeś moją pracę. Nie wiem, czy mam ci podziękować, czy wystawić rachunek. A skoro o tym mowa — czego chcesz w zamian?”",
       "opt": {
-        "repayHim": "Spłać mu to, co jesteś mu winien",
+        "repayHim": "Spłać mu to, co jesteś mu winien (40)",
         "askMore": "Poproś go o więcej",
         "handTheLog": "Przekaż mu swój dziennik sygnałów nawigacyjnych"
       },
@@ -2630,7 +2642,7 @@
     "tugStrike": {
       "text": "Jedenaście holowników utrzymywało pozycję w poprzek toru żeglugowego, z wyłączonymi silnikami, a ich transpondery wyświetlały te same trzy słowa: „NOT UNTIL PAID”.",
       "opt": {
-        "payThem": "Wpłać składkę na fundusz strajkowy",
+        "payThem": "Wpłać składkę na fundusz strajkowy (40)",
         "crossPicket": "Przekrocz linię",
         "haulForThem": "Zrób dla nich jeden kurs"
       },
@@ -2657,7 +2669,7 @@
     "driftSchool": {
       "text": "Ktoś prowadzi szkołę w wygospodarowanym z wnętrza wygospodarowanym frachtowcu. Dziewięcioro dzieci, jedna bardzo zmęczona osoba dorosła oraz program nauczania, który w większości polega na tym, by nie zginąć na polu dryfującym.",
       "opt": {
-        "donate": "Zostaw im zapasy",
+        "donate": "Zostaw im zapasy (25)",
         "teachThem": "Przeprowadź jedną lekcję",
         "takeTheFreighter": "Zdobądź rdzeń frachtowca"
       },
@@ -2698,7 +2710,7 @@
     "manifestAuction": {
       "text": "Aukcja otwarta dotycząca listu ładunkowego, którego nikt nie widział. Trzech oferentów, a jeden z nich składa ofertę w walucie floty, która przestała być środkiem płatniczym czterdzieści lat temu.",
       "opt": {
-        "bidHigh": "Przebij ich wszystkich",
+        "bidHigh": "Przebij ich wszystkich (55)",
         "backScript": "Poprzyj oferenta flotowego",
         "jamAuction": "Zablokuj aukcję",
         "haul": "Wziąć niesprzedany lot w komis"
@@ -2742,7 +2754,7 @@
       "text": "Dwóch przewoźników rozciągnęło linę nad przepaścią i obstawiają, kto szybciej ją pokona, nie przecinając jej. Jest jeszcze miejsce dla trzeciego.",
       "opt": {
         "race": "Zajmij trzecie miejsce",
-        "bet": "Postaw na starszy samochód ciężarowy",
+        "bet": "Postaw na starszy samochód ciężarowy (20)",
         "cutTether": "Odetnij linkę i ruszaj"
       },
       "out": {
@@ -2756,7 +2768,7 @@
     "yusufApprentice": {
       "text": "Uczeń Yusufa zwraca się do ciebie na osobności. „On sam nie zapyta, więc pytam w jego imieniu. Potrzebuje pewnej części, a sklep nie chce mu jej sprzedać”.",
       "opt": {
-        "buyIt": "Kup to z listy prezentów",
+        "buyIt": "Kup to z listy prezentów (45)",
         "stealIt": "Zabierz to z podwórka",
         "tellHim": "Powiedz Yusufowi, że zapytał o to jego praktykant"
       },
@@ -2770,7 +2782,7 @@
     "iceLighter": {
       "text": "Lodowy statek transportowy, wciąż napędzany silnikiem, wciąż pusty. Jego autopilot wykonuje tę samą trasę dostawczą już od czasów przed „Cięciem” i ani razu nie otrzymał polecenia, by się zatrzymać.",
       "opt": {
-        "loadIt": "Uruchom program i pozwól mu działać",
+        "loadIt": "Uruchom program i pozwól mu działać (20)",
         "boardIt": "Obróbka i skrawanie",
         "stopIt": "Wydaj polecenie zatrzymania"
       },
@@ -2947,7 +2959,7 @@
     "riftPilotage": {
       "text": "Tablica cechu pilotów, na wpół spalona, wciąż zawierająca cennik tras, których trasy co roku ulegają zmianom. Ktoś ręcznie aktualizował te informacje.",
       "opt": {
-        "hirePilot": "Zatrudnij pilota",
+        "hirePilot": "Zatrudnij pilota (35)",
         "readBoard": "Wystarczy przeczytać forum",
         "takeBoard": "Weź planszę"
       },
@@ -2976,7 +2988,7 @@
       "opt": {
         "sendBack": "Zleć ich zwrot",
         "useThem": "Zatrudnij ich",
-        "armThem": "Uzbrój ich i utrzymaj pozycję na linii"
+        "armThem": "Uzbrój ich i utrzymaj pozycję na linii (50)"
       },
       "out": {
         "sendBack": "Kłócą się przez cztery minuty, a potem odchodzą. Ktoś po drodze zostawia na twoim pomostu zapasową pompę.",
@@ -2989,7 +3001,7 @@
       "text": "Kupujący przyjął zamówienia. Ma teraz na sobie szary strój chóralny, a na grzbiecie dłoni wciąż widnieje lista prezentów ślubnych.",
       "opt": {
         "dealAnyway": "Zajmij się nim mimo wszystko",
-        "buyBackName": "Odzyskaj swoją listę prezentów",
+        "buyBackName": "Odzyskaj swoją listę prezentów (60)",
         "readOrders": "Zapoznaj się z jego rozkazami"
       },
       "out": {
@@ -3085,7 +3097,7 @@
       "text": "Ktoś od jedenastu lat liczy statki z „Procesji”, jeden po drugim. Brakuje czterystu, ale nie chcą powiedzieć, których.",
       "opt": {
         "helpCount": "Pomoc przy liczeniu",
-        "buyCount": "Kup zestaw liczący",
+        "buyCount": "Kup zestaw liczący (45)",
         "tellTruth": "Powiedz im, gdzie podziało się te czterysta"
       },
       "out": {
@@ -3098,7 +3110,7 @@
       "text": "Akolita przewozi pielgrzymów przez strefę śmierci w statku, który nie przetrwa tej podróży tam i z powrotem, i doskonale o tym wie.",
       "opt": {
         "takeThemOver": "Przewieź ich samodzielnie",
-        "buyHull": "Kup od niego ten kadłub",
+        "buyHull": "Kup od niego ten kadłub (40)",
         "letItGo": "Niech przejdzie na drugą stronę"
       },
       "out": {
@@ -3126,7 +3138,7 @@
       "opt": {
         "thankThem": "Podziękuj im i wejdź do środka",
         "sendThemOff": "Wycofaj je z linii produkcyjnej",
-        "armThemAgain": "Daj im wszystko, co możesz im przeznaczyć"
+        "armThemAgain": "Daj im wszystko, co możesz im przeznaczyć (60)"
       },
       "out": {
         "thankThem": "Będą się trzymać tak długo, jak tylko będą w stanie. Wszyscy zaangażowani rozumieją, co to oznacza.",
@@ -3206,7 +3218,7 @@
       "opt": {
         "takeThemHome": "Wyjmij je",
         "singWithThem": "Śpiewajcie razem z nimi",
-        "giveThemEngines": "Dajcie im silniki"
+        "giveThemEngines": "Dajcie im silniki (70)"
       },
       "out": {
         "takeThemHome": "Jeśli przetniesz otwór na pół, zmieści się ich dziewięć. Przetnij otwór na pół.",
@@ -3243,9 +3255,9 @@
     "lastYard": {
       "text": "W cieniu Core powstała osada, prowadzona przez ludzi, którzy przybyli tu do pracy i nie znaleźli powodu, by stąd wyjeżdżać.",
       "opt": {
-        "refitHere": "Przeprowadź remont tutaj",
+        "refitHere": "Przeprowadź remont tutaj (50)",
         "warnThem": "Powiedz im, żeby wyszli",
-        "hireCrew": "Zatrudnij u nich ekipę"
+        "hireCrew": "Zatrudnij u nich ekipę (35)"
       },
       "out": {
         "refitHere": "Pracują szybko i sprawnie, a nikt nie pyta, po co tam wchodzisz.",
@@ -3257,9 +3269,9 @@
     "thresholdMarket": {
       "text": "Ktoś prowadzi stragan tuż przy progu. To nie Mara — ale ceny są jej, podobnie jak pismo na tablicy.",
       "opt": {
-        "buyEverything": "Kup całe stoisko",
+        "buyEverything": "Kup całe stoisko (85)",
         "askWhose": "Zapytaj, czyje to pismo",
-        "leaveStock": "Dodaj własny asortyment"
+        "leaveStock": "Dodaj własny asortyment (30)"
       },
       "out": {
         "buyEverything": "To nie jest zbyt obszerny stragan. To, co na nim leży, to ostatnie zapasy, jakie ktokolwiek stąd zabierze.",
@@ -3315,9 +3327,9 @@
     "debtorsHull": {
       "text": "Kadłub obciążony trzema zastawami i jeden bardzo zmęczony właściciel, który słyszał, że rozliczasz się z długami.",
       "opt": {
-        "clearOne": "Usunąć jedno zastawne prawo",
-        "buyTheHull": "Kup kadłub za gotówkę",
-        "buyTheDebt": "Zamiast tego kup ten dług",
+        "clearOne": "Usunąć jedno zastawne prawo (35)",
+        "buyTheHull": "Kup kadłub za gotówkę (60)",
+        "buyTheDebt": "Zamiast tego kup ten dług (25)",
         "walkOn": "Zostawić zastawy tam, gdzie są"
       },
       "out": {
@@ -3347,7 +3359,7 @@
       "opt": {
         "readIt": "Przeczytaj petycję",
         "takeThem": "Zabierz ich na pokład",
-        "sendThemOn": "Wyślij ich w bezpieczniejsze miejsce"
+        "sendThemOn": "Wyślij ich w bezpieczniejsze miejsce (30)"
       },
       "out": {
         "readIt": "Chcą pojechać z tobą. Cała czwórka. W dokumencie na dwóch stronach wymieniono powody.",
@@ -3360,7 +3372,7 @@
       "opt": {
         "letItSing": "Niech to się przekaże",
         "scrubName": "Wyczyść rejestr",
-        "boostIt": "Zwiększ moc nadajnika"
+        "boostIt": "Zwiększ moc nadajnika (30)"
       },
       "out": {
         "letItSing": "Każdy statek w tym sektorze wie teraz, gdzie szlak jest bezpieczny i kto o to zadbał.",
@@ -3372,7 +3384,7 @@
       "text": "Fala przypływowa pojawia się tu wcześniej i przepływa przez pole wraków, przez co cały obszar wygląda jak jedna ogromna, niestabilna kostka.",
       "opt": {
         "rideSmall": "Zagraj w to na małych kostkach",
-        "waitItOut": "Poczekaj, aż to minie",
+        "waitItOut": "Poczekaj, aż to minie (20)",
         "pushThrough": "Przejdź prosto na wprost"
       },
       "out": {
@@ -3401,7 +3413,7 @@
       "opt": {
         "nameThem": "Nadaj ciału imię",
         "joinWake": "Zostań na czuwaniu",
-        "takeTheHull": "Kup od nich kadłub"
+        "takeTheHull": "Kup od nich kadłub (40)"
       },
       "out": {
         "nameThem": "Zdejmujesz tabliczkę rejestracyjną z kadłuba i odczytujesz jej treść. Dziewięć osób natychmiast i z wdzięcznością to przyjmuje.",
@@ -3449,7 +3461,7 @@
     },
     "foldedYard": {
       "text": "Stoisko Mary znajduje się tutaj. Nie powinno tu być — zostawiłeś ją dziewiętnaście skoków i jeden numer za sobą. Uzupełnia zapasy, i to w sposób chaotyczny, z skrzyń, które wciąż docierają, zanim zdąży je zamówić.",
-      "trade": "Kup prace związane z kadłubem (60 złomu)",
+      "trade": "Kup prace związane z kadłubem (60)",
       "tradeOut": "Spawa blachę, którą, jak twierdzi, kupiła od ciebie w zeszłym tygodniu. Blacha jest w porządku. Płacisz i nie kłócisz się o datę.",
       "ask": "Zapytaj ją, jak się tu znalazła",
       "askOut": "„Tak samo jak ty. Ktoś poprosił mnie, żebym została, a ja się zgodziłam”. Naprawia ci to za darmo i zaznacza w twoim rejestrze, że masz otwarty rachunek na każdym kolejnym stacjonarnym punkcie za tym.",
@@ -3789,10 +3801,10 @@
       },
       "opt": {
         "swapRail": "Połóż najgorszy rdzeń na szynie wymiany",
-        "buyChart": "Kup mapę szlaku",
+        "buyChart": "Kup mapę szlaku (30)",
         "tellStory": "Sprzedaj opowieść o ostatniej walce",
         "liftCrate": "Zwiń skrzynię, póki stragany są zajęte",
-        "standRound": "Postaw kolejkę całemu targowi"
+        "standRound": "Postaw kolejkę całemu targowi (20)"
       },
       "out": {
         "swapRail": "Szyna zabiera twój najgorszy rdzeń i oddaje cudzy, plus dziesięć za różnicę w masie.",
@@ -3811,7 +3823,7 @@
       "text": "Holownik klanu zrównuje się z twoim dryfem i proponuje najstarszą umowę na Polach: jeśli twoje silniki tu padną, odholują cię do domu. W zamian, gdy wezwą, przylecisz. Nikt nigdy nie spisał warunków. Nikt nigdy nie musiał.",
       "opt": {
         "pledge": "Złóż obietnicę",
-        "payDeposit": "Zamiast tego zapłać za holowanie",
+        "payDeposit": "Zamiast tego zapłać za holowanie (35)",
         "inspectTug": "Najpierw obejrzyj ich holownik",
         "stripTug": "Zabierz im linę i uciekaj"
       },
@@ -3835,7 +3847,7 @@
       },
       "opt": {
         "comeWhenCalled": "Przybądź na wezwanie",
-        "sendScrap": "Wyślij złom zamiast siebie",
+        "sendScrap": "Wyślij złom zamiast siebie (40)",
         "passToYusuf": "Przekaż wezwanie konwojowi Yusufa",
         "letItGo": "Zignoruj wezwanie"
       },
@@ -3853,7 +3865,7 @@
     "mineShepherd": {
       "text": "Staruszka w twardym skafandrze pasie miny. Popycha każdą bosakiem, woła ją imieniem nadanym jeszcze przez swoją babkę i pilnuje, żeby stado dryfowało z dala od szlaku. Zauważyła, że jesteś na szlaku.",
       "opt": {
-        "hireHer": "Zapłać jej, żeby cię przeprowadziła",
+        "hireHer": "Zapłać jej, żeby cię przeprowadziła (25)",
         "learnNames": "Naucz się imion i leć powoli",
         "cullFlock": "Przetrzeb stado na obudowy",
         "waitOut": "Wyłącz silniki i przepuść stado"
@@ -3896,9 +3908,9 @@
     "inheritedLedger": {
       "text": "Zadbany mały kuter na klanowym cumowisku, wyceniony na jedną trzecią swojej wartości. Sprzedawcy się spieszy i wciąż zerka na szlak. Haczyk jest przykręcony do fotela pilota: to księga statku. Na Polach księga idzie w parze z kadłubem, a ta jest dłużna trzem klanom.",
       "opt": {
-        "honourLedger": "Kup go i spłać długi z księgi",
-        "burnLedger": "Kup kadłub, spal księgę",
-        "readLedger": "Przeczytaj księgę przed zakupem",
+        "honourLedger": "Kup go i spłać długi z księgi (50)",
+        "burnLedger": "Kup kadłub, spal księgę (25)",
+        "readLedger": "Przeczytaj księgę przed zakupem (15)",
         "tipClans": "Powiedz klanom, kto sprzedaje"
       },
       "out": {
@@ -3923,7 +3935,7 @@
         "echoName": "Podaj mu imię Echo",
         "fleetName": "Podaj mu imię z czarnej skrzynki",
         "falseName": "Podaj mu fałszywe",
-        "offerScrap": "Mimo to zaproponuj złom"
+        "offerScrap": "Mimo to zaproponuj złom (30)"
       },
       "out": {
         "ownName": "Zapisuje je na tablicy konwoju kredą, która się nie ściera. Trasa, którą daje ci w zamian, starcza na trzy rzędy.",
@@ -3946,7 +3958,7 @@
         "l3": "Nie powiem ci, co masz zrobić, kapitanie. Będę po prostu bardzo cicho, dopóki tego nie zrobisz."
       },
       "opt": {
-        "buyMind": "Wykup umysł z maszyny",
+        "buyMind": "Wykup umysł z maszyny (45)",
         "echoTalks": "Pozwól Echo z nim porozmawiać",
         "pullCore": "Wyjmij jego rdzeń dla siebie",
         "letItRest": "Pozwól mu spokojnie odejść",
@@ -4012,8 +4024,8 @@
         "l3": "Słyszałam to. Tak głęboko słyszę wszystko dwa razy."
       },
       "opt": {
-        "buyNow": "Kup od tej Mary",
-        "waitForSale": "Zaczekaj na wyprzedaż likwidacyjną",
+        "buyNow": "Kup od tej Mary (40)",
+        "waitForSale": "Zaczekaj na wyprzedaż likwidacyjną (20)",
         "playBoth": "Napuść jedną Marę na drugą",
         "warnHer": "Pokaż jej tabliczkę",
         "robLater": "Okradnij późniejszy stragan"
@@ -4039,7 +4051,7 @@
       },
       "opt": {
         "joinRing": "Przepuść pierścień przez swój transponder",
-        "buyPacket": "Kup pakiet, którego pilnują",
+        "buyPacket": "Kup pakiet, którego pilnują (30)",
         "askLane": "Poproś o czysty korytarz",
         "netRing": "Złap pierścień w sieć i sprzedaj drony"
       },
@@ -4104,7 +4116,7 @@
       },
       "opt": {
         "foldSignals": "Złóż oba sygnały w jeden",
-        "payUpkeep": "Opłać utrzymanie boi",
+        "payUpkeep": "Opłać utrzymanie boi (35)",
         "recordEcho": "Nagraj kanał echa",
         "cutBuoy": "Odetnij boję i ją sprzedaj"
       },
@@ -4147,7 +4159,7 @@
       "text": "Ekipa pomiarowa zakotwiczyła trzy boje wzdłuż brzegu czarnej dziury i mierzy ją z cierpliwością łudząco podobną do strachu. Ich szefowa macha, żebyś podszedł burta w burtę. „Każdy, kto tędy przelatuje, albo wlatuje do środka, albo ją omija. Chcielibyśmy wiedzieć, co kto wybiera i dlaczego”.",
       "opt": {
         "lendSensors": "Użycz im czasu swoich czujników",
-        "buyTables": "Kup kopię ich pomiarów",
+        "buyTables": "Kup kopię ich pomiarów (30)",
         "doctorReading": "Sprzedaj im spreparowany odczyt",
         "shareLog": "Pokaż im jutrzejszy dziennik",
         "warnThemOff": "Każ im podnieść kotwice"
@@ -4169,7 +4181,7 @@
       "text": "Ekipa pomiarowa znad brzegu czarnej dziury znów cię znalazła. Wszystkie trzy boje się wydostały, szefowa też, z kopią tego, co zmierzyli, i opinią o tobie.",
       "opt": {
         "claimShare": "Upomnij się o swój udział w pomiarach",
-        "settleUp": "Zwróć, ile kosztował ich twój odczyt",
+        "settleUp": "Zwróć, ile kosztował ich twój odczyt (40)",
         "tradeCharts": "Wymień się mapami i nic poza tym",
         "askHorizon": "Zapytaj, co pokazał im horyzont"
       },
@@ -4214,7 +4226,7 @@
         "sweepCores": "Zbierz gładkie rdzenie",
         "studyBite": "Zbadaj wzór ugryzień",
         "baitIt": "Zwab to, co tu żeruje",
-        "leaveOffering": "Zostaw ofiarę w kręgu",
+        "leaveOffering": "Zostaw ofiarę w kręgu (25)",
         "checkTheLog": "Sprawdź jutrzejszy dziennik"
       },
       "out": {
@@ -4258,7 +4270,7 @@
       "opt": {
         "pullFromFire": "Wyciągnij kości z ognia",
         "feedPyre": "Oddaj mu swoją najsłabszą kość",
-        "buyAsh": "Kup worek popiołu",
+        "buyAsh": "Kup worek popiołu (35)",
         "dousePyre": "Zgaś stos",
         "leaveIt": "Niech płonie"
       },
@@ -4282,7 +4294,7 @@
         "l2": "Mogę utrzymać nas w jego kilwaterze przez jakieś dziewięćdziesiąt sekund, zanim zauważy, kapitanie. Potem zrobi się z tego rozmowa."
       },
       "opt": {
-        "buyHerName": "Odkup numer od jego Pierwszego Głosu",
+        "buyHerName": "Odkup numer od jego Pierwszego Głosu (50)",
         "pullHerOut": "Wejdź i ją zabierz",
         "oneMessage": "Pozwól jej wysłać jedną wiadomość",
         "turnAway": "Wyłącz skaner"
@@ -4354,7 +4366,7 @@
         "reciteLine": "Wyrecytuj następną linijkę",
         "sisterRecites": "Niech odpowie Cztery-jeden-dwa",
         "bluffIt": "Wymyśl linijkę",
-        "payToll": "Zapłać myto za ciszę",
+        "payToll": "Zapłać myto za ciszę (40)",
         "forceGate": "Przełamać bramę"
       },
       "out": {
@@ -4419,9 +4431,9 @@
         "l2": "Pieczęcie są prawdziwe, kapitanie. Sprawdziłam. Nie wiem, skąd je ma, i wolałabym, żeby tak zostało."
       },
       "opt": {
-        "buyIndulgence": "Kup odpust",
-        "friendPrice": "Poproś o cenę dla swoich",
-        "settleOld": "Wyrównaj to, co między wami",
+        "buyIndulgence": "Kup odpust (45)",
+        "friendPrice": "Poproś o cenę dla swoich (15)",
+        "settleOld": "Wyrównaj to, co między wami (30)",
         "reportHer": "Donieś na nią Chórowi"
       },
       "out": {
@@ -4438,7 +4450,7 @@
     "blessedLane": {
       "text": "Porządkowa Procesji zatrzymuje cię na rozwidleniu. Jeden szlak jest błogosławiony, drugi przeklęty, a ona za opłatą wpisze twój rejestr na ten, który wybierzesz.",
       "opt": {
-        "payBlessing": "Zapłać za wpis na błogosławiony szlak",
+        "payBlessing": "Zapłać za wpis na błogosławiony szlak (40)",
         "takeCursed": "Poproś o przeklęty szlak",
         "writeItYourself": "Wpisz się sam"
       },
@@ -4505,7 +4517,7 @@
         "holdEdge": "Poproś, żeby trzymał światło na krawędzi",
         "takeGunners": "Weź na pokład dwóch jego najlepszych kanonierów",
         "collectLane": "Zapytaj, co zostawiła ci procesja",
-        "squarePinch": "Zwróć to, co kosztowało ich przewężenie"
+        "squarePinch": "Zwróć to, co kosztowało ich przewężenie (50)"
       },
       "out": {
         "sendHome": "Spiera się dokładnie minutę, potem zawraca ku Krawędzi i zostawia na twoim zacisku swoje zapasowe poszycie.",
@@ -4527,9 +4539,9 @@
         "l2": "Twój statek ma zdanie. To dopłata."
       },
       "opt": {
-        "payIt": "Zapłać nagrodę za własną głowę",
+        "payIt": "Zapłać nagrodę za własną głowę (60)",
         "settleIt": "Załatw to po staremu",
-        "hireHer": "Najmij ją na ostatni kurs",
+        "hireHer": "Najmij ją na ostatni kurs (30)",
         "counterBounty": "Wystaw zamiast tego nagrodę za Rdzeń"
       },
       "out": {
@@ -4622,7 +4634,7 @@
         "l2": "Ma o tej dziurze lepsze dane niż ja. Osobiście mnie to dotyka."
       },
       "opt": {
-        "buyLog": "Kup kopię jej dziennika",
+        "buyLog": "Kup kopię jej dziennika (40)",
         "throwProbe": "Wrzuć tam sondę ze swoim rejestrem",
         "fishShards": "Pomóż jej wyławiać z krawędzi odłamki rdzenia",
         "warnHer": "Powiedz jej, żeby uciekała, póki może"
@@ -4642,7 +4654,7 @@
       "text": "Stragan z twojej mapy zapadł się godzinę przed twoim przybyciem. Tam, gdzie stał, wciąż trwa walka, a handlarka jest w samym jej środku — zamknięta we własnym kontenerze ładunkowym, na otwartym paśmie wystawia ofertę dla każdego, kto ją stamtąd wyciągnie.",
       "opt": {
         "cutHerOut": "Wyciągnij ją",
-        "tradeThroughHatch": "Handluj przez właz, w środku walki",
+        "tradeThroughHatch": "Handluj przez właz, w środku walki (30)",
         "leaveHer": "Zostaw ją samą sobie"
       },
       "out": {
@@ -4688,7 +4700,7 @@
         "l3": "No więc. Płać, uciekaj albo powiedz mi coś, czego nie wiem."
       },
       "opt": {
-        "buyOut": "Wykup nagrodę za własną głowę (50 złomu)",
+        "buyOut": "Wykup nagrodę za własną głowę (50)",
         "countersign": "Kontrasygnuj list na jego wystawcę",
         "callFavor": "Odbierz przysługę, którą jest ci winna",
         "outrun": "Uciekaj, zanim rozgrzeje silniki"
@@ -5224,7 +5236,7 @@
         "commission": "Zamów arcydzieło (45)",
         "steadyCore": "Przytrzymaj surowy rdzeń, kiedy ona szlifuje",
         "quickCut": "Kup szlif na dziś (30)",
-        "callTheTow": "Przypomnij jej, kto ją odholował"
+        "callTheTow": "Przypomnij jej, kto ją odholował (20)"
       },
       "out": {
         "commission": "Wypisuje kredą twój rejestr na warsztacie, nad wszystkimi innymi. „Dwa sektory. Nie zgiń”.",
@@ -6369,7 +6381,7 @@
     },
     "15": {
       "name": "Osobliwość",
-      "desc": "Każdy boss zyskuje jeszcze jedną część. Fala zakłóceń sięga o jeden poziom niżej, a żaden wlot w czarną dziurę nie jest już stabilny."
+      "desc": "Każdy boss zyskuje jeszcze jedną część. Fala zakłóceń sięga o kolejny poziom wyżej, a żaden wlot w czarną dziurę nie jest już stabilny."
     }
   },
   "prologue": {
@@ -7295,16 +7307,16 @@
     "yusuf12": "Yusuf: „Odpoczywaj tu, jak długo chcesz. Krawędź nigdzie nie ucieknie”.",
     "yusuf13": "Yusuf: „Tanie naprawy wychodzą dwa razy drożej. Kiedyś się o tym przekonasz”.",
     "yusuf14": "Yusuf: „No to dawaj. Nie każ mi znowu patrzeć na ten kadłub.”",
-    "keeper1": "Strażnik: „To już trzeci statek w tym cyklu. Pozostałe dwa nie zatrzymały się”.",
-    "keeper2": "Strażnik: „Dbam o światła. Ktoś musi wskazać, gdzie są granice”.",
-    "keeper3": "Strażnik: „Flota przepłynęła tędy, śpiewając. Tak jest zapisane w dzienniku pokładowym”.",
-    "keeper4": "Strażnik: „Latarnie nie wskazują drogi. One są świadkami”.",
-    "keeper5": "Strażnik: „Przestałem liczyć lata. Liczę, ile razy zapalam papierosa od nowa”.",
-    "keeper6": "Strażnik: „Odpowiedz na sygnały nawigacyjne, a sektor odpowie. W końcu.”",
-    "keeper7": "Strażnik: „Weź odczyt. Nie bierz lampy”.",
-    "keeper8": "Strażnik: „Wszystko, co pochłania Krawędź, najpierw dostrzegła latarnia”.",
-    "keeper9": "Strażnik: „Kiedyś byłem członkiem załogi. Technicznie rzecz biorąc, statek wciąż tam gdzieś jest”.",
-    "keeper10": "Strażnik: „Jeśli dotrzesz do Rdzenia, powiedz mu, że ktoś zadbał o to, by światła nie zgasły”.",
+    "keeper1": "„To już trzeci statek w tym cyklu. Pozostałe dwa nie zatrzymały się”.",
+    "keeper2": "„Dbam o światła. Ktoś musi wskazać, gdzie są granice”.",
+    "keeper3": "„Flota przepłynęła tędy, śpiewając. Tak jest zapisane w dzienniku pokładowym”.",
+    "keeper4": "„Latarnie nie wskazują drogi. One są świadkami”.",
+    "keeper5": "„Przestałem liczyć lata. Liczę, ile razy zapalam papierosa od nowa”.",
+    "keeper6": "„Odpowiedz na sygnały nawigacyjne, a sektor odpowie. W końcu.”",
+    "keeper7": "„Weź odczyt. Nie bierz lampy”.",
+    "keeper8": "„Wszystko, co pochłania Krawędź, najpierw dostrzegła latarnia”.",
+    "keeper9": "„Kiedyś byłem członkiem załogi. Technicznie rzecz biorąc, statek wciąż tam gdzieś jest”.",
+    "keeper10": "„Jeśli dotrzesz do Rdzenia, powiedz mu, że ktoś zadbał o to, by światła nie zgasły”.",
     "mara17": "„Wszystko po tej stronie lady ma wycenę. Wszystko po mojej stronie nie jest na sprzedaż.”",
     "mara18": "„Nie mów mi, jak to działa. Powiedz mi, co zrobiło z ostatnim statkiem, na którym to zainstalowano.”",
     "mFriend1": "„Znowu ty. Świetnie. Nie znoszę wyjaśniać nieznajomym po raz drugi, czym się zajmuję.”",
@@ -7789,6 +7801,86 @@
       "name": "Weto",
       "desc": "Raz na sesję: rzut Losu albo wynik zdarzenia, który sprowadziłby kadłub do zera, zostawia go na {{n}}.",
       "short": "Weto · 1/sesję"
+    }
+  },
+  "shipPerks": {
+    "shipTurret": {
+      "name": "Kapsuły wieżyczek",
+      "desc": "Kość broni z najwyższą ścianką liczy się o 1 wyżej."
+    },
+    "shipPlates": {
+      "name": "Płyty pancerza",
+      "desc": "Pierwsze trafienie elity, minibossa lub bossa w każdej walce jest o 30% słabsze."
+    },
+    "shipAfterburner": {
+      "name": "Dysza dopalacza",
+      "desc": "+6 ewazji, a każda walka zaczyna się z kadłubem niższym o 2."
+    },
+    "shipBay": {
+      "name": "Dodatkowe gniazdo",
+      "desc": "+1 gniazdo modułowe."
+    },
+    "shipTargeting": {
+      "name": "Zestaw celowniczy",
+      "desc": "Czujniki od razu zyskują jeden Mk."
+    },
+    "shipCapacitor": {
+      "name": "Kondensator tarczy",
+      "desc": "Od drugiej tury każda tura zaczyna się z 1 tarczy."
+    },
+    "shipCoil": {
+      "name": "Cewka reaktora",
+      "desc": "+1 do limitu ładunku."
+    },
+    "shipMagnet": {
+      "name": "Magnes na złom",
+      "desc": "Każda walka zaczyna się z +2 złomu."
+    },
+    "shipBallast": {
+      "name": "Balast",
+      "desc": "+1 maks. kadłuba."
+    },
+    "shipOverdrive": {
+      "name": "Nadbieg",
+      "desc": "Przerzuty obejmują 2 kości więcej."
+    },
+    "shipHardpoint": {
+      "name": "Punkt mocowania",
+      "desc": "Sloty broni przyjmują kości o rozmiar większe."
+    },
+    "shipCargoWeb": {
+      "name": "Sieć ładowni",
+      "desc": "+1 do rezerwy."
+    },
+    "shipLattice": {
+      "name": "Zimna siatka",
+      "desc": "15% tarczy przetrwa turę wroga."
+    },
+    "shipPrism": {
+      "name": "Soczewka pryzmatyczna",
+      "desc": "+1 do rezonansu wiodącej szkoły."
+    },
+    "shipDrones": {
+      "name": "Drony naprawcze",
+      "desc": "Naprawia 1 kadłuba po każdej walce."
+    },
+    "shipBlackBox": {
+      "name": "Czarna skrzynka",
+      "desc": "Raz na wyprawę śmiertelne trafienie w walce z bossem lub minibossem zostawia ci 1 kadłuba."
+    }
+  },
+  "shipMastery": {
+    "hull": {
+      "name": "Mistrzostwo: wzmocniony kadłub",
+      "desc": "Dodatkowy kadłub z mistrzostwa tego statku."
+    },
+    "reserve": {
+      "name": "Mistrzostwo: stojak rezerwy",
+      "desc": "Dodatkowa rezerwa z mistrzostwa tego statku."
+    },
+    "firstHit": {
+      "name": "Mistrzostwo: usztywniona rama",
+      "desc": "Pierwsze trafienie elity, minibossa lub bossa w każdej walce jest słabsze."
     }
   }
 }

@@ -25,6 +25,16 @@ import {
 } from "../../src/game/effects/census";
 import { bayPurchasable, moduleSlots } from "../../src/game/run/bays";
 import { PERK_BY_ID } from "../../src/data/perks";
+import { isShipPerk, ordinaryPerks, SHIP_PERK_MK } from "../../src/data/perks/ship";
+import { shipRankOf } from "../../src/data/shipRanks";
+import {
+  firstMkDiscount,
+  rollShipDraft,
+  shipDraftRerollAllowed,
+  shipDraftSize,
+  shipPerkAvailable,
+  type ShipDraftContext,
+} from "../../src/game/run/shipRules";
 import {
   drawSalvageOffer,
   SALVAGE_BY_ID,
@@ -115,6 +125,14 @@ export interface RunState {
   forges: number;
   mkLevels: MkLevels;
   perks: string[];
+  masteryRank: number;
+  shipRanksOn: boolean;
+  shipPerkOnly: readonly string[];
+  blackBoxSpent: boolean;
+  shipRankXp: number;
+  rankSeed: number;
+  rankAscension: number;
+  firstMkDiscount: number;
   modules: string[];
   banished: string[];
   chartPicks: string[];
@@ -191,6 +209,11 @@ export interface RunStateInit {
   deck: readonly DeckEntry[];
   mkLevels?: MkLevels;
   perks?: readonly string[];
+  masteryRank?: number;
+  shipRanksOn?: boolean;
+  shipPerkOnly?: readonly string[];
+  rankSeed?: number;
+  rankAscension?: number;
   modules?: readonly string[];
   chartPicks?: readonly string[];
   mutators?: readonly string[];
@@ -210,6 +233,14 @@ export const createRunState = (init: RunStateInit): RunState => ({
   forges: 0,
   mkLevels: { ...(init.mkLevels ?? {}) },
   perks: [...(init.perks ?? [])],
+  masteryRank: init.masteryRank ?? 0,
+  shipRanksOn: init.shipRanksOn ?? false,
+  shipPerkOnly: init.shipPerkOnly ?? [],
+  blackBoxSpent: false,
+  shipRankXp: 0,
+  rankSeed: init.rankSeed ?? 0,
+  rankAscension: init.rankAscension ?? 0,
+  firstMkDiscount: firstMkDiscount(init.shipId ?? "wanderer", init.masteryRank ?? 0),
   modules: [...(init.modules ?? [])],
   banished: [],
   chartPicks: [...(init.chartPicks ?? [])],
@@ -665,8 +696,9 @@ export const buyUpgrades = (state: RunState, ascension = 0): void => {
     let mk = state.mkLevels[slotId] ?? 1;
     while (mk < mkTopFor(slotId, ascension)) {
       const target = (mk + 1) as 2 | 3;
-      const cost = mkUpgradeCost(target);
+      const cost = Math.max(1, mkUpgradeCost(target) - state.firstMkDiscount);
       if (state.scrap < cost || !spend(state, cost, "mk")) break;
+      state.firstMkDiscount = 0;
       mk = target;
       state.mkLevels = { ...state.mkLevels, [slotId]: mk };
     }
@@ -749,6 +781,8 @@ export const applyEffectsToState = (
       grantSimOfficer(state, effect.id);
     } else if (effect.k === "cargo") {
       state.pendingCargo = effect.id;
+    } else if (effect.k === "shipRank") {
+      gainSimShipRank(state, effect.n);
     }
   }
 };
@@ -851,7 +885,7 @@ export const draftContext = (
   state: RunState,
   sector: number,
 ): DraftContext => ({
-  owned: state.perks,
+  owned: ordinaryPerks(state.perks),
   banished: state.banished,
   sector,
   deckDefIds: handIds(state.deck),
@@ -865,6 +899,79 @@ const loadoutOf = (state: RunState): DraftLoadout => ({
   perks: state.perks,
   modules: state.modules,
 });
+
+const SHIP_PERK_PRIORITY: readonly string[] = [
+  "shipBay",
+  "shipHardpoint",
+  "shipCapacitor",
+  "shipDrones",
+  "shipPrism",
+  "shipBallast",
+  "shipTurret",
+  "shipPlates",
+  "shipBlackBox",
+  "shipLattice",
+  "shipMagnet",
+  "shipCoil",
+  "shipCargoWeb",
+  "shipOverdrive",
+  "shipTargeting",
+  "shipAfterburner",
+];
+
+const SIM_REDRAW_FROM = 6;
+
+const bestShipPerk = (cards: readonly string[]): string | undefined =>
+  [...cards].sort(
+    (a, b) => SHIP_PERK_PRIORITY.indexOf(a) - SHIP_PERK_PRIORITY.indexOf(b),
+  )[0];
+
+const simDraftContext = (state: RunState): ShipDraftContext => ({
+  shipId: state.shipId,
+  mkLevels: state.mkLevels,
+  ascension: state.rankAscension,
+  disabledSlots: [],
+});
+
+const simShipDraft = (state: RunState, rank: number): string[] => {
+  const ctx = simDraftContext(state);
+  if (state.shipPerkOnly.length > 0) {
+    return state.shipPerkOnly.filter(
+      (id) => isShipPerk(id) && !state.perks.includes(id) && shipPerkAvailable(ctx, id),
+    );
+  }
+  const size = shipDraftSize(state.masteryRank);
+  const cards = rollShipDraft(ctx, state.perks, size, deriveSeed(state.rankSeed, `shipDraft:${String(rank)}:0`));
+  const best = bestShipPerk(cards);
+  const weak = best === undefined || SHIP_PERK_PRIORITY.indexOf(best) >= SIM_REDRAW_FROM;
+  if (!weak || !shipDraftRerollAllowed(state.masteryRank)) return cards;
+  const redrawn = rollShipDraft(
+    ctx,
+    [...state.perks, ...cards],
+    size,
+    deriveSeed(state.rankSeed, `shipDraft:${String(rank)}:1`),
+  );
+  return redrawn.length > 0 ? redrawn : cards;
+};
+
+export const gainSimShipRank = (state: RunState, n: number): void => {
+  if (!state.shipRanksOn || n <= 0) return;
+  const before = shipRankOf(state.shipRankXp);
+  state.shipRankXp += n;
+  const after = shipRankOf(state.shipRankXp);
+  for (let rank = before + 1; rank <= after; rank += 1) {
+    const pick = bestShipPerk(simShipDraft(state, rank));
+    if (pick === undefined) continue;
+    takePerk(state, pick);
+    const slot = SHIP_PERK_MK[pick];
+    if (slot !== undefined) {
+      const mk = state.mkLevels[slot] ?? 1;
+      if (mk < mkTopFor(slot, state.rankAscension)) {
+        state.mkLevels = { ...state.mkLevels, [slot]: (mk + 1) as 2 | 3 };
+      }
+    }
+  }
+};
 
 const takePerk = (state: RunState, perkId: string): void => {
   state.perks.push(perkId);

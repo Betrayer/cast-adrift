@@ -178,5 +178,12 @@
       "desc": "Los números pasan borrosos y se enfocan de golpe."
     }
   },
-  "skipTally": "Saltar el resumen de combate"
+  "skipTally": "Saltar el resumen de combate",
+  "voice": "Voz del ordenador de a bordo",
+  "voiceTest": "Probar",
+  "voiceSample": "Capitán, aquí Eco. El canal está despejado.",
+  "voiceUnavailable": "No disponible en este dispositivo",
+  "voiceNoLanguage": "Este dispositivo no tiene voz para este idioma",
+  "voiceMuted": "Los efectos de sonido están silenciados",
+  "haptics": "Vibración"
 }

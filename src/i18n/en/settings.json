@@ -178,5 +178,12 @@
       "desc": "The numbers blur past and snap into focus."
     }
   },
-  "skipTally": "Skip the battle tally"
+  "skipTally": "Skip the battle tally",
+  "voice": "Ship computer voice",
+  "voiceTest": "Test",
+  "voiceSample": "Captain, Echo here. Comms are clear.",
+  "voiceUnavailable": "Not available on this device",
+  "voiceNoLanguage": "This device has no voice for this language",
+  "voiceMuted": "Sound effects are muted",
+  "haptics": "Vibration"
 }

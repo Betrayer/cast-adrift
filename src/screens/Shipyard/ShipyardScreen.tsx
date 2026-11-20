@@ -4,10 +4,9 @@ import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
-import { keeperLinesFor } from "@/data/narrative/keeperLines";
+import { keeperGreeting } from "@/game/narrative/keeperGreeting";
 import { useBackGuard } from "@/app/backGuard";
 import { completeNode } from "@/game/run/flow";
-import { createStream, deriveSeed } from "@/services/rng";
 import { useRunStore } from "@/stores/runStore";
 import { BaysSection } from "./BaysSection";
 import { ForgeSheet } from "./ForgeSheet";
@@ -25,9 +24,7 @@ export const ShipyardScreen = () => {
   const flags = useRunStore((s) => s.flags);
   const [forgeOpen, setForgeOpen] = useState(false);
 
-  const greeting = createStream(
-    deriveSeed(seed, `keeper:${position ?? "yard"}`),
-  ).pick(keeperLinesFor("shipyard", flags));
+  const greeting = keeperGreeting("shipyard", seed, position ?? "yard", flags);
 
   const leave = (): void => {
     completeNode({ outcome: "cleared" });

@@ -9,6 +9,7 @@ import {
   pickBoss,
   pickMiniboss,
   sectorHpPct,
+  TEMPLATES,
 } from "@/game/run/encounter";
 import { createStream } from "@/services/rng";
 
@@ -109,6 +110,53 @@ describe("encounter composer", () => {
       if (!pairs.has(ids.join("+"))) composed += 1;
     }
     expect(composed).toBeGreaterThan(30);
+  });
+
+  it("builds triplets from three different roles, every two of which form a pair template", () => {
+    const pairKeys = new Set(
+      TEMPLATES.filter(([roles]) => roles.length === 2).map(([roles]) =>
+        [...roles].sort().join("+"),
+      ),
+    );
+    const triplets = TEMPLATES.filter(([roles]) => roles.length === 3);
+    const mixed = triplets.filter(([roles]) => new Set(roles).size === 3);
+    for (const [roles] of triplets) {
+      const isSwarmTriplet = roles.every((role) => role === "swarm");
+      expect(isSwarmTriplet || new Set(roles).size === 3, roles.join("+")).toBe(true);
+    }
+    expect(mixed.length).toBeGreaterThanOrEqual(3);
+    for (const [roles] of mixed) {
+      for (let a = 0; a < roles.length; a += 1) {
+        for (let b = a + 1; b < roles.length; b += 1) {
+          const key = [roles[a], roles[b]].sort().join("+");
+          expect(pairKeys.has(key), `${roles.join("+")} needs ${key}`).toBe(true);
+        }
+      }
+    }
+    const swarm = triplets.find(([roles]) => roles.every((role) => role === "swarm"));
+    expect(swarm).toBeDefined();
+    for (const [, weight] of mixed) {
+      expect(swarm?.[1] ?? Infinity).toBeLessThanOrEqual(weight);
+    }
+  });
+
+  it("keeps one enemy three times rare in acts 2 to 5", () => {
+    for (const sector of [2, 3, 4, 5]) {
+      let fights = 0;
+      let triplets = 0;
+      let mixed = 0;
+      let sameEnemy = 0;
+      for (let seed = 1; seed <= 3000; seed += 1) {
+        const ids = composeEncounter(sector, stream(seed));
+        fights += 1;
+        if (ids.length !== 3) continue;
+        triplets += 1;
+        if (new Set(ids.map((id) => ENEMY_BY_ID.get(id)?.role)).size === 3) mixed += 1;
+        if (new Set(ids).size === 1) sameEnemy += 1;
+      }
+      expect(mixed / triplets, `S${String(sector)} mixed triplets`).toBeGreaterThan(0.85);
+      expect(sameEnemy / fights, `S${String(sector)} one enemy three times`).toBeLessThan(0.05);
+    }
   });
 
   it("gives every base enemy a role so no template falls back blindly", () => {

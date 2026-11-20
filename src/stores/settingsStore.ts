@@ -42,6 +42,8 @@ export interface SettingsValues {
   rollStyle: RollStyle;
   bridgeFrame: BridgeFrameChoice;
   skipTally: boolean;
+  voice: boolean;
+  haptics: boolean;
 }
 
 export interface SettingsState extends SettingsValues {
@@ -60,9 +62,11 @@ export interface SettingsState extends SettingsValues {
   setRollStyle: (rollStyle: RollStyle) => void;
   setBridgeFrame: (bridgeFrame: BridgeFrameChoice) => void;
   setSkipTally: (skipTally: boolean) => void;
+  setVoice: (voice: boolean) => void;
+  setHaptics: (haptics: boolean) => void;
 }
 
-export const SETTINGS_VERSION = 8;
+export const SETTINGS_VERSION = 9;
 
 const DEFAULTS: SettingsValues = {
   locale: 'en',
@@ -80,6 +84,8 @@ const DEFAULTS: SettingsValues = {
   rollStyle: DEFAULT_ROLL_STYLE,
   bridgeFrame: DEFAULT_BRIDGE_FRAME,
   skipTally: false,
+  voice: false,
+  haptics: true,
 };
 
 const SETTINGS_KEYS = shapeKeys(DEFAULTS);
@@ -117,6 +123,8 @@ export const migrateSettings = (
       ? prev.bridgeFrame
       : DEFAULTS.bridgeFrame,
     skipTally: prev.skipTally === true,
+    voice: prev.voice === true,
+    haptics: prev.haptics !== false,
     vignette: isVignette(prev.vignette) ? prev.vignette : DEFAULTS.vignette,
   };
 };
@@ -140,6 +148,8 @@ export const useSettingsStore = create<SettingsState>()(
       setRollStyle: (rollStyle) => set({ rollStyle }),
       setBridgeFrame: (bridgeFrame) => set({ bridgeFrame }),
       setSkipTally: (skipTally) => set({ skipTally }),
+      setVoice: (voice) => set({ voice }),
+      setHaptics: (haptics) => set({ haptics }),
     }),
     {
       name: 'ca.settings',

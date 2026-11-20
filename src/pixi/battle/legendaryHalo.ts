@@ -191,13 +191,13 @@ const placeParticle = (kind: ParticleKind, seed: ParticleSeed, ms: number, size:
 export class LegendaryHalo {
   readonly root = new Container();
   readonly baseSize: number;
-  private readonly school: School;
+  readonly school: School;
   private readonly glow: Sprite;
   private readonly accent = new Graphics();
   private readonly swarm: ParticleContainer | null;
   private readonly particles: HaloParticle[] = [];
   private readonly kind: ParticleKind;
-  private readonly tint: number;
+  readonly tint: number;
 
   constructor(defId: string, school: School, size: number, particles: number) {
     const textures = haloTextures();
@@ -273,6 +273,12 @@ export interface HaloTarget {
   school: School;
 }
 
+export interface HaloRead {
+  uid: string;
+  school: School;
+  tint: number;
+}
+
 export class HaloLayer {
   readonly root = new Container();
   private readonly halos = new Map<string, LegendaryHalo>();
@@ -322,6 +328,10 @@ export class HaloLayer {
       halo.root.alpha = sprite.alpha;
       halo.update(ms, motion);
     }
+  }
+
+  read(): HaloRead[] {
+    return [...this.halos].map(([uid, halo]) => ({ uid, school: halo.school, tint: halo.tint }));
   }
 
   clear(): void {

@@ -10,6 +10,7 @@ import {
 import { memoryFragmentCount } from '@/data/narrative/memories';
 import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
+import { masteryTableOf } from '@/data/shipMastery';
 import type { ShipId } from '@/data/ships';
 import { CORE_NODE_ID } from '@/game/chart/cost';
 import { chartResetCost } from '@/game/chart/engine';
@@ -78,6 +79,7 @@ export interface MetaState extends MetaValues {
   setDeck: (deck: readonly string[]) => void;
   selectShip: (id: ShipId) => void;
   buyShip: (id: ShipId, price: number) => boolean;
+  addShipMasteryXp: (id: ShipId, xp: number) => void;
   unlockTheme: (id: string) => void;
   markTutorialSeen: (id: string) => void;
   resetTutorial: () => void;
@@ -140,6 +142,8 @@ const LIFETIME_KEYS = [
   "clearsCorsair",
   "clearsFoundry",
   "clearsPrism",
+  "dragDrops",
+  "dragCancels",
 ] as const;
 
 export const useMetaStore = create<MetaState>()(
@@ -298,6 +302,16 @@ export const useMetaStore = create<MetaState>()(
         if (def === undefined) return;
         if (!echoUnlocked(def, memoryFragmentCount(get().codex))) return;
         set({ selectedEcho: def.id });
+      },
+
+      addShipMasteryXp: (id, xp) => {
+        if (masteryTableOf(id) === undefined || xp <= 0) return;
+        set((s) => ({
+          shipMastery: {
+            ...s.shipMastery,
+            [id]: { xp: (s.shipMastery[id]?.xp ?? 0) + xp },
+          },
+        }));
       },
 
       buyShip: (id, price) => {

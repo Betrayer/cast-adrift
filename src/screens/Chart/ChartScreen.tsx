@@ -1,4 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { ParkedContext } from "@/app/parked";
 import { Screen } from "@/app/Screen";
 import { useAtLeast } from "@/app/breakpoints";
 import { backdropMode, deviceTier } from "@/app/deviceTier";
@@ -14,10 +16,12 @@ import {
   respecCost,
 } from "@/game/chart/engine";
 import { CORE_NODE_ID } from "@/game/chart/cost";
+import { chartNodeTitle } from "@/game/chart/describe";
 import { layoutChart, type Point } from "@/game/chart/layouts";
 import { chartGlow } from "@/game/chart/layouts/glow";
 import { trackEvent } from "@/services/analytics";
 import { playSfx } from "@/services/audio";
+import { haptic } from "@/services/tma";
 import { useChartLayoutId } from "@/services/prefs";
 import { useMetaStore } from "@/stores/metaStore";
 import { useReducedMotion, useSettingsStore } from "@/stores/settingsStore";
@@ -25,6 +29,7 @@ import { ChartBackdrop } from "./ChartBackdrop";
 import { RefundConfirmModal, ResetConfirmModal } from "./ChartConfirmModals";
 import { ChartDecorLayer } from "./ChartDecorLayer";
 import { ChartFilterBar } from "./ChartFilterBar";
+import { chartFilterCount, EMPTY_CHART_FILTER, matchesChartFilter, type ChartFilter } from "./chartFilter";
 import {
   ChartLinks,
   ChartNodes,
@@ -43,6 +48,8 @@ import styles from "./ChartScreen.module.css";
 const PATH_TICK_MS = 45;
 
 export const ChartScreen = () => {
+  const { t } = useTranslation(["meta"]);
+  const parked = useContext(ParkedContext);
   const picks = useMetaStore((s) => s.chartPicks);
   const level = useMetaStore((s) => s.level);
   const shards = useMetaStore((s) => s.shards);
@@ -68,7 +75,7 @@ export const ChartScreen = () => {
   const [respec, setRespec] = useState(false);
   const [confirmRefund, setConfirmRefund] = useState<string | null>(null);
   const [confirmReset, setConfirmReset] = useState(false);
-  const [tagFilter, setTagFilter] = useState<string[]>([]);
+  const [filter, setFilter] = useState<ChartFilter>(EMPTY_CHART_FILTER);
   const [filterOpen, setFilterOpen] = useState(false);
   const [pulse, setPulse] = useState<ChartPulse | null>(null);
 
@@ -117,12 +124,15 @@ export const ChartScreen = () => {
     () => new Set(preview?.ids ?? []),
     [preview],
   );
-  const filterSet = useMemo(() => new Set(tagFilter), [tagFilter]);
+  const filterCount = chartFilterCount(filter);
   const matchesFilter = useCallback(
     (node: ChartNodeDef): boolean =>
-      filterSet.size === 0 ||
-      (node.tags ?? []).some((tag) => filterSet.has(tag)),
-    [filterSet],
+      filterCount === 0 ||
+      matchesChartFilter(node, filter, {
+        title: (each) => chartNodeTitle(each, t),
+        available: (id) => canAllocate(id, level, picks),
+      }),
+    [filter, filterCount, level, picks, t],
   );
 
   const [viewLayout, setViewLayout] = useState(layoutId);
@@ -135,6 +145,7 @@ export const ChartScreen = () => {
   const allocate = (id: string): void => {
     if (!canAllocate(id, level, picks)) return;
     playSfx("chartAllocate");
+    haptic("purchase");
     allocatePick(id);
     pulseCount.current += 1;
     setPulse({ key: pulseCount.current, node: id, chain: pickedChain(id, picks) });
@@ -185,7 +196,7 @@ export const ChartScreen = () => {
           picks={picks}
           resettable={resettable}
           filterOpen={filterOpen}
-          filterCount={tagFilter.length}
+          filterCount={filterCount}
           respec={respec}
           freeRespecs={freeRespecs}
           onToggleFilter={() => {
@@ -271,15 +282,15 @@ export const ChartScreen = () => {
             onZoom={zoomCentre}
             onReset={resetView}
           />
-          {filterOpen ? (
-            <ChartFilterBar value={tagFilter} onChange={setTagFilter} />
-          ) : null}
           {wide || selectedNode === undefined ? null : detail}
+          {filterOpen ? (
+            <ChartFilterBar value={filter} onChange={setFilter} />
+          ) : null}
         </div>
         {wide ? detail : null}
       </div>
       <RefundConfirmModal
-        opened={confirmRefund !== null}
+        opened={confirmRefund !== null && !parked}
         target={refundTarget}
         onCancel={() => {
           setConfirmRefund(null);
@@ -289,7 +300,7 @@ export const ChartScreen = () => {
         }}
       />
       <ResetConfirmModal
-        opened={confirmReset}
+        opened={confirmReset && !parked}
         count={resettable}
         freeRespecs={freeRespecs}
         shards={shards}

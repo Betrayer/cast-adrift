@@ -273,6 +273,7 @@ describe("evasion carriers", () => {
   });
 
   it("keeps every ship tuning inside the Hound's ceiling", () => {
+    const hound = evasionTuningFor("corsair");
     for (const ship of PLAYABLE_SHIPS) {
       const tuning = evasionTuningFor(ship.id);
       for (let value = 0; value <= 24; value += 1) {
@@ -282,8 +283,8 @@ describe("evasion carriers", () => {
           tuning.glancingCap,
         );
       }
-      expect(tuning.dodgeCap, ship.id).toBeLessThanOrEqual(40);
-      expect(tuning.glancingCap, ship.id).toBeLessThanOrEqual(55);
+      expect(tuning.dodgeCap, ship.id).toBeLessThanOrEqual(hound.dodgeCap);
+      expect(tuning.glancingCap, ship.id).toBeLessThanOrEqual(hound.glancingCap);
       expect(evasionFor(20, 0, tuning).glancingPct, ship.id).toBeGreaterThan(
         evasionFor(20, 0, tuning).dodgePct,
       );

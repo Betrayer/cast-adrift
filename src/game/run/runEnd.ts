@@ -15,6 +15,7 @@ import {
 import { syncActionStats } from "@/game/run/actionLog";
 import { finishScoredRun } from "@/game/run/boards";
 import { releaseCargo } from "@/game/run/cargo";
+import { noteShipEvent } from "@/game/run/shipProgress";
 import { pickBoss } from "@/game/run/encounter";
 import { countStars, goalStarsMask, type GoalContext } from "@/game/run/goals";
 import { depthFor, isScoredMode, scoreBreakdown } from "@/game/run/modes";
@@ -166,7 +167,9 @@ export const endRun = (win: boolean, cause?: DeathCause): void => {
       : ZERO_SHARD_BREAKDOWN;
   const award = meta.awardRun(xpGain, shards.total, win);
   meta.archiveRunFlags(Object.keys(run.flags));
+  noteShipEvent("runEnded");
   if (win && run.mode === "campaign") {
+    noteShipEvent("campaignWon");
     meta.recordCampaignClear(run.ascension);
     if (run.ascension >= KEEPER_BADGE_ASCENSION) meta.awardBadge(SMOTRITEL_BADGE);
     if (run.ascension >= MAX_ASCENSION) meta.awardBadge(SINGULARITY_BADGE);

@@ -9,11 +9,10 @@ import { useCountedText } from "@/components/CountNumber";
 import { tokens } from "@/app/theme";
 import { useFlyToAnchor } from "@/components/FlyToAnchor";
 import { HAND_CAP } from "@/game/economy/prices";
-import { keeperLinesFor } from "@/data/narrative/keeperLines";
+import { keeperGreeting } from "@/game/narrative/keeperGreeting";
 import { autosaveRun } from "@/game/run/flow";
 import { enterShop } from "@/game/run/shopEntry";
 import { ReplaceCard } from "@/components/ReplaceCard";
-import { createStream, deriveSeed } from "@/services/rng";
 import { useMetaStore } from "@/stores/metaStore";
 import { runModuleSlots, useRunStore } from "@/stores/runStore";
 import { ShopDieGrid } from "./ShopDieGrid";
@@ -88,9 +87,7 @@ export const ShopScreen = () => {
   useBackGuard("shop", trade.leave);
   useBackBlock(trade.pending !== null);
 
-  const greeting = createStream(deriveSeed(seed, `keeper:${nodeId}`)).pick(
-    keeperLinesFor("shop", flags),
-  );
+  const greeting = keeperGreeting("shop", seed, nodeId, flags);
   const items = shop?.items ?? [];
   const moduleItems = shop?.modules ?? [];
   const nextRerollCost = trade.rerollCost(shop?.rerolls ?? 0);

@@ -3,11 +3,12 @@ import type { EchoNodeId } from "@/data/echo";
 import type { EngravingMap } from "@/data/engravings";
 import type { PerkTrait } from "@/data/perks/types";
 import type { ShipId } from "@/data/ships";
+import { passiveTierFor, type PassiveTier } from "@/game/battle/passives";
 import { applySlotOverrides, buildShipSlots } from "@/game/battle/setup";
-import { chartSlotTierDelta } from "@/game/chart/engine";
-import { cargoChargeCap, cargoSlotTier } from "@/game/run/cargo";
+import { cargoChargeCap, heldCargoDefs } from "@/game/run/cargo";
 import { setupForRun } from "@/game/run/modes";
 import { runChargeCap } from "@/game/run/runMods";
+import { slotTierDeltaFrom } from "@/game/run/slotTier";
 import type { RunValues } from "@/stores/runStore";
 import type { SlotId, SlotState } from "@/types/battle";
 import type { DieTier } from "@/types/content";
@@ -15,6 +16,7 @@ import type { DieTier } from "@/types/content";
 export type RunInitSource = Pick<
   RunValues,
   | "shipId"
+  | "masteryRank"
   | "tide"
   | "interferenceStacks"
   | "perks"
@@ -24,6 +26,7 @@ export type RunInitSource = Pick<
   | "officers"
   | "echo"
   | "flags"
+  | "blackBoxSpent"
   | "counters"
   | "hull"
   | "hullMax"
@@ -35,11 +38,13 @@ export type RunInitSource = Pick<
 
 export type RunSlotSource = Pick<
   RunValues,
-  "shipId" | "mkLevels" | "chartPicks" | "mutators" | "cargo" | "contractId"
+  "shipId" | "mkLevels" | "chartPicks" | "mutators" | "cargo" | "contractId" | "perks"
 >;
 
 export interface RunBattleInit {
   shipId: ShipId;
+  passiveTier: PassiveTier;
+  blackBoxSpent: boolean;
   tide: number;
   interference: number;
   perks: readonly string[];
@@ -62,22 +67,14 @@ export interface RunBattleInit {
 }
 
 export const runSlotTierDelta = (
-  run: Pick<RunValues, "chartPicks" | "mutators" | "cargo">,
-): Partial<Record<SlotId, number>> => {
-  const mut = computeMutatorMods(run.mutators);
-  const slotTierDelta: Partial<Record<SlotId, number>> = {
-    ...chartSlotTierDelta(run.chartPicks),
-  };
-  if (mut.sensorsTierDelta !== 0) {
-    slotTierDelta.sensors =
-      (slotTierDelta.sensors ?? 0) + mut.sensorsTierDelta;
-  }
-  for (const [slot, delta] of Object.entries(cargoSlotTier(run.cargo))) {
-    const key = slot as SlotId;
-    slotTierDelta[key] = (slotTierDelta[key] ?? 0) + delta;
-  }
-  return slotTierDelta;
-};
+  run: Pick<RunValues, "chartPicks" | "mutators" | "cargo" | "perks">,
+): Partial<Record<SlotId, number>> =>
+  slotTierDeltaFrom({
+    chartPicks: run.chartPicks,
+    perks: run.perks,
+    mutators: run.mutators,
+    cargoDefs: heldCargoDefs(run.cargo),
+  });
 
 export const runDisabledSlots = (
   run: Pick<RunValues, "contractId">,
@@ -106,6 +103,8 @@ export const battleInitFromRun = (
   engravings: EngravingMap,
 ): RunBattleInit => ({
   shipId: run.shipId,
+  passiveTier: passiveTierFor(run.masteryRank),
+  blackBoxSpent: run.blackBoxSpent,
   tide: run.tide,
   interference: run.interferenceStacks,
   perks: run.perks,

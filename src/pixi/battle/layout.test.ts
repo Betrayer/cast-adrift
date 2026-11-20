@@ -1,6 +1,8 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import {
   computeBattleLayout,
+  stageOrigin,
+  toStageRect,
   dieCeilingFor,
   enemyBandNeed,
   enemyCeilingFor,
@@ -459,5 +461,20 @@ describe("enemy band need", () => {
       expect(unbounded.enemySize, fight.name).toBeGreaterThan(ENEMY_MIN);
       expect(short.enemySize, fight.name).toBeLessThan(unbounded.enemySize);
     }
+  });
+});
+
+describe("stageOrigin", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("takes the canvas rect as it is, whatever the visual viewport is scrolled or pinched to", () => {
+    vi.stubGlobal("visualViewport", { offsetLeft: 40, offsetTop: 120, pageLeft: 40, pageTop: 120, scale: 1.5 });
+    expect(stageOrigin({ left: 12, top: 300 })).toEqual({ left: 12, top: 300 });
+  });
+
+  it("moves an anchor rect into stage space by the origin alone", () => {
+    expect(toStageRect({ x: 50, y: 420, w: 64, h: 32 }, { left: 12, top: 300 })).toEqual({ x: 38, y: 120, w: 64, h: 32 });
   });
 });

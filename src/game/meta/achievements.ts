@@ -8,6 +8,8 @@ import {
 import { CHART_NODE_BY_ID } from "@/data/chart";
 import { DIE_BY_ID } from "@/data/dice";
 import { CHAINS, nextStep } from "@/data/narrative/chains";
+import { MASTERY_MAX_RANK, masteryRankOf } from "@/data/shipMastery";
+import type { ShipMasteryXp } from "@/stores/metaValues";
 import {
   useMetaStore,
   type CollectionEntry,
@@ -41,6 +43,7 @@ export interface AchievementCtx {
   codex: readonly string[];
   seenPuzzles: readonly string[];
   flagsArchive: readonly string[];
+  shipMastery: ShipMasteryXp;
   run: AchievementRunCtx | null;
 }
 
@@ -89,6 +92,11 @@ const chainProgress = (
   ).length;
   return { have, need: chain.steps.length, done: have >= chain.steps.length };
 };
+
+const shipsMasteredCount = (mastery: ShipMasteryXp): number =>
+  Object.values(mastery).filter(
+    (entry) => masteryRankOf(entry.xp) >= MASTERY_MAX_RANK,
+  ).length;
 
 const chainsDoneCount = (archive: readonly string[]): number => {
   const flags = archiveFlags(archive);
@@ -165,6 +173,10 @@ export const achievementProgress = (
       return chainProgress(cond.id, ctx.flagsArchive);
     case "chainsDone":
       return of(chainsDoneCount(ctx.flagsArchive), cond.n);
+    case "shipMastered":
+      return of(masteryRankOf(ctx.shipMastery[cond.ship]?.xp ?? 0), MASTERY_MAX_RANK);
+    case "shipsMastered":
+      return of(shipsMasteredCount(ctx.shipMastery), cond.n);
     case "flags":
       return cond.mode === "all"
         ? of(flagsHave(cond, ctx.flagsArchive), cond.keys.length)
@@ -216,6 +228,7 @@ export const metaAchievementCtx = (
     codex: meta.codex,
     seenPuzzles: meta.seenPuzzles,
     flagsArchive: meta.flagsArchive,
+    shipMastery: meta.shipMastery,
     run,
   };
 };

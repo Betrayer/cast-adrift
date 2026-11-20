@@ -178,5 +178,12 @@
       "desc": "Die Zahlen verschwimmen und werden scharf."
     }
   },
-  "skipTally": "Kampfbilanz überspringen"
+  "skipTally": "Kampfbilanz überspringen",
+  "voice": "Stimme des Bordcomputers",
+  "voiceTest": "Testen",
+  "voiceSample": "Kapitän, hier spricht Echo. Die Verbindung ist klar.",
+  "voiceUnavailable": "Auf diesem Gerät nicht verfügbar",
+  "voiceNoLanguage": "Dieses Gerät hat keine Stimme für diese Sprache",
+  "voiceMuted": "Soundeffekte sind stummgeschaltet",
+  "haptics": "Vibration"
 }

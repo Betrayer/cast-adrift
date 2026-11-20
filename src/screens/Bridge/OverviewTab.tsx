@@ -3,8 +3,10 @@ import { useMemo, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
-import { pinStyle, ShipSilhouette } from "@/components/ShipSilhouette";
-import { SHIP_BY_ID } from "@/data/ships";
+import { ShipSilhouette } from "@/components/ShipSilhouette";
+import { shipModelPins, useShipModel } from "@/components/shipModel";
+import { SHIP_BY_ID, shipPassiveText } from "@/data/ships";
+import { passiveTierFor } from "@/game/battle/passives";
 import { runSlotStates } from "@/game/run/battleInit";
 import { runModuleSlots, useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
@@ -27,18 +29,22 @@ export const OverviewTab = ({ onOpenSlot }: BridgePanelProps) => {
   const mutators = useRunStore((s) => s.mutators);
   const cargo = useRunStore((s) => s.cargo);
   const contractId = useRunStore((s) => s.contractId);
+  const perks = useRunStore((s) => s.perks);
   const hull = useRunStore((s) => s.hull);
   const hullMax = useRunStore((s) => s.hullMax);
   const scrap = useRunStore((s) => s.scrap);
   const modules = useRunStore((s) => s.modules);
   const bays = useRunStore(runModuleSlots);
+  const masteryRank = useRunStore((s) => s.masteryRank);
+  const model = useShipModel(shipId);
   const def = SHIP_BY_ID.get(shipId);
   const fightSlots = useMemo(
     () =>
-      runSlotStates({ shipId, mkLevels, chartPicks, mutators, cargo, contractId }),
-    [shipId, mkLevels, chartPicks, mutators, cargo, contractId],
+      runSlotStates({ shipId, mkLevels, chartPicks, mutators, cargo, contractId, perks }),
+    [shipId, mkLevels, chartPicks, mutators, cargo, contractId, perks],
   );
   if (def === undefined) return null;
+  const passiveText = shipPassiveText(def, passiveTierFor(masteryRank));
   const slotIds = Object.keys(def.slots) as SlotId[];
   const systems = slotIds.map((slotId) => {
     const mk = mkLevels[slotId] ?? def.slots[slotId]?.mk ?? 1;
@@ -54,18 +60,19 @@ export const OverviewTab = ({ onOpenSlot }: BridgePanelProps) => {
           : t("battle:slot.pin", { cap, mk }),
     };
   });
+  const anchors = model === null ? {} : shipModelPins(model);
   const pins = systems.flatMap((system) => {
-    const point = def.bridgeTheme.pins[system.slotId];
+    const point = anchors[system.slotId];
     return point === undefined ? [] : [{ ...system, point }];
   });
   return (
     <Stack gap="sm">
-      <ShipSilhouette shipId={shipId}>
+      <ShipSilhouette shipId={shipId} masteryRank={masteryRank} perks={perks} pinned>
         {pins.map((pin, index) => (
           <span
             key={pin.slotId}
             className={styles.pinAnchor}
-            style={pinStyle(pin.point)}
+            style={pin.point}
           >
             <button
               type="button"
@@ -128,13 +135,13 @@ export const OverviewTab = ({ onOpenSlot }: BridgePanelProps) => {
 
       <Paper bg={tokens.surface1} p="sm" radius="md" withBorder>
         <Text size="sm" fw={600} c={tokens.text}>
-          {def.passiveName === undefined
+          {passiveText.name === undefined
             ? t("battle:ship.passiveNone")
-            : t(def.passiveName)}
+            : t(passiveText.name)}
         </Text>
-        {def.passiveDesc === undefined ? null : (
+        {passiveText.desc === undefined ? null : (
           <Text size="xs" c={tokens.dim}>
-            {t(def.passiveDesc)}
+            {t(passiveText.desc)}
           </Text>
         )}
       </Paper>

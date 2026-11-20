@@ -39,6 +39,7 @@ export default tseslint.config(
     ignores: [
       'dist',
       'dist-e2e',
+      'dist-novoice',
       'node_modules',
       'coverage',
       '.claude',

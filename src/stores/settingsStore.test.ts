@@ -13,7 +13,7 @@ import {
 
 describe('settings migrations', () => {
   it('current version is wired', () => {
-    expect(SETTINGS_VERSION).toBe(8);
+    expect(SETTINGS_VERSION).toBe(9);
   });
 
   it('v1 blobs keep their values and gain the later defaults', () => {
@@ -36,7 +36,22 @@ describe('settings migrations', () => {
       bridgeFrame: 'hull',
       skipTally: false,
       vignette: 'full',
+      voice: false,
+      haptics: true,
     });
+  });
+
+  it('a fresh device starts with the voice off and the haptics on', () => {
+    expect(useSettingsStore.getInitialState()).toMatchObject({ voice: false, haptics: true });
+  });
+
+  it('a v8 blob gains the voice off and the haptics on, and keeps a choice it had', () => {
+    const v8 = migrateSettings({ skipTally: true }, 8);
+    expect(v8.voice).toBe(false);
+    expect(v8.haptics).toBe(true);
+    expect(v8.skipTally).toBe(true);
+    expect(migrateSettings({ voice: true, haptics: false }, 9)).toMatchObject({ voice: true, haptics: false });
+    expect(migrateSettings({ voice: 'yes', haptics: 0 }, 9)).toMatchObject({ voice: false, haptics: true });
   });
 
   it('a v5 blob gains the spiral chart and keeps everything it had', () => {

@@ -1,11 +1,13 @@
 import type { ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { schools } from "@/data/schools";
-import { SHIP_BY_ID, type ShipId } from "@/data/ships";
+import { SHIP_BY_ID, shipPassiveText, type ShipId } from "@/data/ships";
+import { passiveTierFor } from "@/game/battle/passives";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
 import { slotAffinity } from "@/game/battle/view";
 import { featureRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
 import type { SlotId } from "@/types/battle";
+import { MasteryPips } from "./MasteryPips";
 import styles from "./ShipCard.module.css";
 
 export type ShipCardSize = "full" | "compact";
@@ -16,6 +18,7 @@ interface ShipCardProps {
   plain?: boolean;
   mkLevels?: Partial<Record<SlotId, MkLevel>>;
   showPrice?: boolean;
+  masteryRank?: number;
   footer?: ReactNode;
   className?: string;
 }
@@ -31,6 +34,7 @@ export const ShipCard = ({
   plain = false,
   mkLevels,
   showPrice = false,
+  masteryRank,
   footer,
   className,
 }: ShipCardProps) => {
@@ -38,6 +42,8 @@ export const ShipCard = ({
   const def = SHIP_BY_ID.get(shipId);
   if (def === undefined) return null;
 
+  const tier = passiveTierFor(masteryRank ?? 0);
+  const passiveText = shipPassiveText(def, tier);
   const slotIds = Object.keys(def.slots) as SlotId[];
   const route =
     def.unlock === undefined
@@ -55,20 +61,25 @@ export const ShipCard = ({
     >
       <div className={styles.head}>
         <span className={styles.name}>{t(def.name)}</span>
+        {masteryRank === undefined ? null : <MasteryPips rank={masteryRank} />}
         <span className={styles.hull} data-ship-hull-label>
           ♥ {t("battle:ship.hull", { n: def.hullMax })}
         </span>
       </div>
 
-      <div className={styles.passive} data-ship-passive={def.passive?.kind}>
-        {def.passiveName === undefined || def.passiveDesc === undefined ? (
+      <div
+        className={styles.passive}
+        data-ship-passive={def.passive?.kind}
+        data-passive-tier={tier}
+      >
+        {passiveText.name === undefined || passiveText.desc === undefined ? (
           <span className={styles.passiveDesc}>
             {t("battle:ship.passiveNone")}
           </span>
         ) : (
           <>
-            <span className={styles.passiveName}>{t(def.passiveName)}</span>
-            <span className={styles.passiveDesc}>{t(def.passiveDesc)}</span>
+            <span className={styles.passiveName}>{t(passiveText.name)}</span>
+            <span className={styles.passiveDesc}>{t(passiveText.desc)}</span>
           </>
         )}
       </div>

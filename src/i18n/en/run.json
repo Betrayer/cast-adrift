@@ -87,7 +87,8 @@
     "beaconCounter": "Beacon {{n}} of {{max}}",
     "reqCargo": "needs a free hold and a station ahead",
     "cargoTerms": "{{drawback}} · delivery pays {{n}}",
-    "checkNoDice": "No die in your deck fits this check — it can only fail."
+    "checkNoDice": "No die in your deck fits this check — it can only fail.",
+    "shipRankGain": "Ship rank +{{n}} toward the next refit."
   },
   "anomaly": {
     "title": "Anomaly",
@@ -209,7 +210,9 @@
     "prologueBody": "Replay the opening beats. Nothing is started, nothing is lost.",
     "prologueReplay": "Replay",
     "badgeLegend": "Die badges",
-    "forge": "Forge"
+    "forge": "Forge",
+    "fusion": "Fusions",
+    "fusionHint": "Forge two {{die}} at a shipyard to see what they become"
   },
   "rewards": {
     "dieTitle": "Salvaged die",
@@ -292,7 +295,8 @@
     "holesBypassed": "Holes bypassed",
     "causeSingularity": "Singularity",
     "cause": "Cause of death",
-    "route": "Route: sector {{n}} of {{max}}"
+    "route": "Route: sector {{n}} of {{max}}",
+    "shipRank": "Ship rank reached: {{rank}}/{{max}}"
   },
   "prologue": {
     "title": "Prologue",
@@ -722,7 +726,9 @@
       "chartMore": "…and {{n}} more on the Star Chart",
       "pinOff": "offline",
       "grantConditional": "only while its own condition holds"
-    }
+    },
+    "shipRank": "Rank {{rank}}/{{max}}",
+    "mastery": "Mastery {{rank}}"
   },
   "replace": {
     "title": "Replace",
@@ -798,5 +804,18 @@
       "shieldEcho": "Echo core: Shield Echo is open.",
       "veto": "Echo core: Veto is open."
     }
+  },
+  "shipRank": {
+    "title": "Ship rank {{rank}} of {{max}}",
+    "body": "The crew earned a refit. Pick one.",
+    "reroll": "Redraw, free (mastery V)"
+  },
+  "recap": {
+    "share": "Share",
+    "title": "My Cast Adrift run",
+    "ascension": "Ascension A{{n}}",
+    "topDie": "Top die: {{die}}, d{{tier}}",
+    "failed": "The card could not be drawn",
+    "topDieName": "Top die: {{die}}"
   }
 }

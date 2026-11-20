@@ -20,7 +20,8 @@ export const DiceTab = () => {
   const chartPicks = useRunStore((s) => s.chartPicks);
   const modules = useRunStore((s) => s.modules);
   const engravings = useMetaStore((s) => s.engravings);
-  const resonance = deckResonance(deck, { shipId, perks, chartPicks, modules });
+  const masteryRank = useRunStore((s) => s.masteryRank);
+  const resonance = deckResonance(deck, { shipId, masteryRank, perks, chartPicks, modules });
   return (
     <Stack gap="sm">
       <Text size="xs" c={tokens.faint}>

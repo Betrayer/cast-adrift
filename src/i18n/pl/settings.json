@@ -178,5 +178,12 @@
       "desc": "Liczby migają w rozmyciu i wskakują w ostrość."
     }
   },
-  "skipTally": "Pomijaj podsumowanie walki"
+  "skipTally": "Pomijaj podsumowanie walki",
+  "voice": "Głos komputera pokładowego",
+  "voiceTest": "Wypróbuj",
+  "voiceSample": "Kapitanie, tu Echo. Kanał jest czysty.",
+  "voiceUnavailable": "Niedostępne na tym urządzeniu",
+  "voiceNoLanguage": "To urządzenie nie ma głosu w tym języku",
+  "voiceMuted": "Efekty dźwiękowe są wyciszone",
+  "haptics": "Wibracje"
 }

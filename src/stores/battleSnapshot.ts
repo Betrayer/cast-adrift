@@ -13,9 +13,9 @@ const BATTLE_SNAPSHOT_KEYS = [
   "nextRollBonus", "blockedSlots", "shrunkSlots", "lockedDice", "cursedDice",
   "pendingHijack", "resonance", "survivedLethal", "lastPlayerDamage",
   "stolenScrap", "pendingTwist", "pendingSwap", "pendingStorm", "pendingAdds",
-  "partsDowned", "ascension", "sectorHpPct", "sectorDmgPct", "enemyHpPct",
+  "reinforcements", "partsDowned", "ascension", "sectorHpPct", "sectorDmgPct", "enemyHpPct",
   "inverted", "nodeStorm", "foldedTurns", "overflowShieldUsed", "pierceUsed",
-  "outcome",
+  "outcome", "passiveTier", "firstHitSpent", "blackBoxSpent",
 ] as const satisfies readonly (keyof BattleSnapshot)[];
 
 type NoUncoveredKeys<T extends never> = T;
@@ -58,6 +58,9 @@ export const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   sacrificePool: snap.sacrificePool,
   bloodReactorUsed: snap.bloodReactorUsed,
   passiveUsed: snap.passiveUsed === true,
+  passiveTier: snap.passiveTier === 2 ? 2 : 1,
+  firstHitSpent: snap.firstHitSpent === true,
+  blackBoxSpent: snap.blackBoxSpent === true,
   burnDoubleUsed: snap.burnDoubleUsed,
   dice: snap.dice,
   slots: snap.slots,
@@ -79,6 +82,7 @@ export const fromSnapshot = (snap: BattleSnapshot): Partial<BattleValues> => ({
   pendingSwap: snap.pendingSwap,
   pendingStorm: snap.pendingStorm,
   pendingAdds: snap.pendingAdds ?? [],
+  reinforcements: snap.reinforcements ?? [],
   partsDowned: snap.partsDowned ?? [],
   ascension: snap.ascension,
   sectorHpPct: snap.sectorHpPct,

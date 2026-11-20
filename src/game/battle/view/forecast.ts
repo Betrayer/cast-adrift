@@ -1,4 +1,5 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { isAuthoredEnemy } from "@/game/battle/enemyPhase";
 import { computeMutatorMods } from "@/data/mutators";
 import {
   applyChargeAuras,
@@ -87,6 +88,9 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
       if (raws.length > 0) {
         delete enemy.statuses.charge;
         delete enemy.statuses.jam;
+      }
+      if (raws.some((raw) => raw > 0) && isAuthoredEnemy(enemy.defId)) {
+        next.firstHitSpent = true;
       }
       for (const raw of raws) {
         rawTotal += raw;

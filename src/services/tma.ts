@@ -15,6 +15,7 @@ import { onBackGuardsChange } from "@/app/backGuard";
 import { isSwipeLocked } from "@/app/routes";
 import { tokens } from "@/app/theme";
 import { canGoBack, useAppStore } from "@/stores/appStore";
+import { useSettingsStore } from "@/stores/settingsStore";
 import type { ScreenId } from "@/types";
 
 export type HapticEvent =
@@ -53,6 +54,7 @@ const IMPACTS: Partial<
 const ENDING_ECHO_MS = 160;
 
 export const haptic = (event: HapticEvent): void => {
+  if (!useSettingsStore.getState().haptics) return;
   try {
     const impact = IMPACTS[event];
     if (impact !== undefined) {

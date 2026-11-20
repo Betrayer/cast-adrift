@@ -182,6 +182,8 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         tide: encounter.tide,
         interference: encounter.interference,
         perks: encounter.perks,
+        passiveTier: encounter.passiveTier,
+        blackBoxSpent: encounter.blackBoxSpent,
         chartPicks: encounter.chartPicks,
         mutators: encounter.mutators,
         modules: encounter.modules,
@@ -202,6 +204,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
         disabledSlots: encounter.disabledSlots,
         inverted: encounter.inverted,
         nodeStorm: encounter.nodeStorm,
+        reinforcements: encounter.reinforcements,
       },
     );
     snapshot.echo = encounter.echo;
@@ -211,7 +214,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
     const officers = encounter.officers ?? [];
     const forcedTraits = encounter.forcedTraits ?? [];
     const mods = computeRunMods(perks, chartPicks, modules, officers);
-    const scrapperScrap = shipProfile(shipId).battleStartScrap;
+    const scrapperScrap = shipProfile(shipId, encounter.passiveTier).battleStartScrap;
     const singleCast =
       runHasTrait(perks, chartPicks, "singleCast", modules) ||
       forcedTraits.includes("singleCast");
@@ -525,7 +528,7 @@ export const useBattleStore = create<BattleState>()((set, get) => ({
       const spawned = fusedDie(
         source,
         target,
-        shipProfile(s.shipId).fuseTierStep,
+        shipProfile(s.shipId, s.passiveTier).fuseTierStep,
       );
       return {
         passiveUsed: true,

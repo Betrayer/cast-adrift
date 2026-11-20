@@ -1,4 +1,5 @@
 import type { DropTarget } from "@/pixi/battle/dropTarget";
+import type { HaloRead } from "@/pixi/battle/legendaryHalo";
 import type { SlotId } from "@/types/battle";
 
 export interface AnchorRect {
@@ -46,6 +47,7 @@ let selection: DieAnchor | null = null;
 let reserveWells: AnchorRect[] = [];
 let battle: BattleAnchors | null = null;
 let dieHitTest: ((clientX: number, clientY: number) => string | null) | null = null;
+let haloRead: (() => readonly HaloRead[]) | null = null;
 let scheduled = false;
 
 const sameRect = (a: AnchorRect | undefined, b: AnchorRect): boolean =>
@@ -161,5 +163,11 @@ export const publishDieHitTest = (
 
 export const dieAtClient = (clientX: number, clientY: number): string | null =>
   dieHitTest === null ? null : dieHitTest(clientX, clientY);
+
+export const publishHaloRead = (read: (() => readonly HaloRead[]) | null): void => {
+  haloRead = read;
+};
+
+export const readHalos = (): readonly HaloRead[] => (haloRead === null ? [] : haloRead());
 
 export const battleAnchors = (): BattleAnchors | null => battle;

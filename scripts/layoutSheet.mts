@@ -6,6 +6,7 @@ import { pathToFileURL } from "node:url";
 import { chromium, type Browser } from "@playwright/test";
 import { CLIP_TOLERANCE, measure, MIN_TARGET, NAME_SHIM, type Measure } from "./layoutSheet/measure";
 import { OVERLAYS, PHONES, READY_MS, RECIPES, VIEWPORTS, type Recipe, type Viewport } from "./layoutSheet/recipes";
+import { layoutVerdict } from "./layoutSheet/verdict";
 
 const BASE_URL = "http://127.0.0.1:4173";
 const FROZEN_NOW = 1_760_000_000_000;
@@ -170,11 +171,9 @@ const main = async (): Promise<void> => {
       : [];
   const merged = [...kept, ...shots].sort((a, b) => order.indexOf(a.recipe) - order.indexOf(b.recipe));
   writeFileSync(sidecar, `${JSON.stringify(merged, null, 1)}\n`, "utf8");
-  const errors = shots.filter((shot) => shot.error !== null).length;
-  console.log(
-    `layoutSheet: ${String(shots.length)} shots taken, ${String(errors)} errors, ${String(merged.length)} in the sidecar → ${OUT}`,
-  );
-  if (errors > 0) process.exitCode = 1;
+  const verdict = layoutVerdict(shots, merged.length, OUT);
+  console.log(verdict.line);
+  if (verdict.exitCode !== 0) process.exitCode = verdict.exitCode;
 };
 
 await main();

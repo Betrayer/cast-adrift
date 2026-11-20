@@ -5,6 +5,7 @@ import { rarityColor } from "@/app/rarity";
 import { tokens } from "@/app/theme";
 import { TagChips } from "@/components/TagChips";
 import { PERK_BY_ID } from "@/data/perks";
+import { draftedPerks } from "@/data/perks/ship";
 import { perkTags } from "@/data/perks/types";
 import { activeCensusTags, loadoutCensus } from "@/game/effects/census";
 import { useMetaStore } from "@/stores/metaStore";
@@ -17,7 +18,7 @@ export const PerksTab = ({ focus }: BridgePanelProps) => {
   const focusId = focus?.kind === "perk" ? focus.id : null;
   const focusRef = useFocusScroll<HTMLDivElement>(focusId);
   const deck = useRunStore((s) => s.deck);
-  const perks = useRunStore((s) => s.perks);
+  const perks = draftedPerks(useRunStore((s) => s.perks));
   const modules = useRunStore((s) => s.modules);
   const banished = useRunStore((s) => s.banishedPerks);
   const engravings = useMetaStore((s) => s.engravings);

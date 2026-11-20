@@ -173,8 +173,8 @@ describe("the crew snapshot", () => {
   });
 
   it("bumps to v16 and still accepts every version the build has written", () => {
-    expect(RUN_SNAPSHOT_V).toBe(16);
-    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16]);
+    expect(RUN_SNAPSHOT_V).toBe(17);
+    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16, 17]);
   });
 
   it("round-trips the aboard roster", () => {

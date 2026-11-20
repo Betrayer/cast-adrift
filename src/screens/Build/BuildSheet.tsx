@@ -11,6 +11,7 @@ import { ENGRAVING_BY_ID } from "@/data/engravings";
 import { MODULE_BY_ID } from "@/data/modules";
 import { moduleTags } from "@/data/modules/types";
 import { PERK_BY_ID } from "@/data/perks";
+import { draftedPerks } from "@/data/perks/ship";
 import { perkTags } from "@/data/perks/types";
 import { RESONANCE_BONUSES } from "@/data/resonance";
 import { nextThreshold } from "@/game/battle/resonance";
@@ -66,7 +67,9 @@ const tierDesc = (school: School, threshold: number): string | undefined =>
 export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation(["run", "content", "battle"]);
   const deck = useRunStore((s) => s.deck);
-  const perks = useRunStore((s) => s.perks);
+  const allPerks = useRunStore((s) => s.perks);
+  const perks = draftedPerks(allPerks);
+  const masteryRank = useRunStore((s) => s.masteryRank);
   const modules = useRunStore((s) => s.modules);
   const shipId = useRunStore((s) => s.shipId);
   const chartPicks = useRunStore((s) => s.chartPicks);
@@ -91,7 +94,7 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
   const census = loadoutCensus({ deckDefIds, perks, modules, engravings });
   const resonance = inBattle
     ? battleResonance
-    : deckResonance(deck, { shipId, perks, chartPicks, modules });
+    : deckResonance(deck, { shipId, masteryRank, perks: allPerks, chartPicks, modules });
 
   const activeTags = activeCensusTags(census);
 

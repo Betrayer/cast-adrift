@@ -1,6 +1,7 @@
 import { ascensionMods } from "@/data/ascension";
 import { ENEMY_BY_ID } from "@/data/enemies";
 import { intentHits } from "@/game/battle/enemyPhase";
+import { aliveOnBoard } from "@/game/battle/seats";
 import { patternFor } from "@/game/battle/spawn";
 import type { BattleSnapshot, EnemyState } from "@/types/battle";
 import type { Intent, PatternStep } from "@/types/content";
@@ -10,8 +11,7 @@ type VisibilityInput = Pick<BattleSnapshot, "ascension" | "enemies">;
 export const hiddenIntentIds = (snapshot: VisibilityInput): ReadonlySet<string> => {
   const hidden = ascensionMods(snapshot.ascension).hiddenIntents;
   if (hidden <= 0) return new Set();
-  const living = snapshot.enemies.filter((enemy) => enemy.hp > 0);
-  return new Set(living.slice(-hidden).map((enemy) => enemy.id));
+  return new Set(aliveOnBoard(snapshot.enemies).slice(-hidden).map((enemy) => enemy.id));
 };
 
 export const intentHidden = (snapshot: VisibilityInput, enemyId: string): boolean =>

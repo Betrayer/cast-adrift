@@ -51,6 +51,8 @@ export interface MetaStats {
   clearsCorsair: number;
   clearsFoundry: number;
   clearsPrism: number;
+  dragDrops: number;
+  dragCancels: number;
 }
 
 export interface EncounterRecord {
@@ -151,9 +153,12 @@ export interface MetaValues {
   dieSkin: string;
   prefs: AccountPrefs;
   stats: MetaStats;
+  shipMastery: ShipMasteryXp;
 }
 
-export const META_VERSION = 20;
+export type ShipMasteryXp = Partial<Record<ShipId, { xp: number }>>;
+
+export const META_VERSION = 22;
 
 export const SEEN_PUZZLE_MEMORY = 40;
 export const SEEN_FRAGMENT_MEMORY = 60;
@@ -207,6 +212,8 @@ export const createInitialMetaStats = (): MetaStats => ({
   clearsCorsair: 0,
   clearsFoundry: 0,
   clearsPrism: 0,
+  dragDrops: 0,
+  dragCancels: 0,
 });
 
 export const META_PERSIST_KEY = 'meta';
@@ -230,6 +237,7 @@ export const createInitialMetaValues = (): MetaValues => ({
   hangar: { deck: [...STARTER_DECK] },
   themes: ['deepSpace'],
   tutorialSeen: [],
+  shipMastery: {},
   engravings: {},
   badges: [],
   codex: [],

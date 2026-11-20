@@ -288,6 +288,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "scrap", n: 50 },
               { k: "flag", key: "crewSaved" },
+              { k: "shipRank", n: 1 },
             ],
           },
         ],
@@ -2655,6 +2656,7 @@ export const COMMON_EVENTS: readonly EventDef[] = [
               { k: "flag", key: "yusufFriend" },
               { k: "axis", n: 1 },
               { k: "nodeMod", mod: "shipyardDiscount", n: 30 },
+              { k: "shipRank", n: 1 },
             ],
             consequence: "content:consequence.haulerTowed",
           },

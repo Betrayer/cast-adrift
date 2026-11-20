@@ -54,6 +54,7 @@ const ctx = (patch: Partial<AchievementCtx> = {}): AchievementCtx => ({
   codex: [],
   seenPuzzles: [],
   flagsArchive: [],
+  shipMastery: {},
   run: null,
   ...patch,
 });
@@ -84,9 +85,9 @@ const chainFlags = (chainId: string): string[] => {
 };
 
 describe("achievement catalogue", () => {
-  it("compiles ninety-six definitions with unique ids", () => {
-    expect(ACHIEVEMENTS).toHaveLength(96);
-    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(96);
+  it("compiles a hundred and three definitions with unique ids", () => {
+    expect(ACHIEVEMENTS).toHaveLength(103);
+    expect(new Set(ACHIEVEMENTS.map((a) => a.id)).size).toBe(103);
   });
 
   it("gates eleven of them on content and reads flags in seven", () => {
@@ -411,7 +412,7 @@ describe("id migration", () => {
     expect(migrated.stats.kills).toBe(700);
     expect(migrated.vouchers).toEqual({ perkDraft: 0 });
     expect(migrated.voucherOffers).toEqual([]);
-    expect(META_VERSION).toBe(20);
+    expect(META_VERSION).toBe(22);
   });
 
   it("keeps a die unlock reachable through its renamed achievement", () => {
@@ -593,5 +594,34 @@ describe("titles", () => {
       "meta:ach.flawless.name",
     );
     expect(achievementTitleById("nope", translate)).toBe("nope");
+  });
+});
+
+describe("ship mastery achievements", () => {
+  it("reads one ship's mastery rank against five", () => {
+    expect(
+      achievementProgress(def("masterRam"), ctx({ shipMastery: { ram: { xp: 320 } } })),
+    ).toEqual({ have: 3, need: 5, done: false });
+    expect(
+      achievementMet(def("masterRam"), ctx({ shipMastery: { ram: { xp: 900 } } })),
+    ).toBe(true);
+    expect(
+      achievementMet(def("masterRam"), ctx({ shipMastery: { ark: { xp: 900 } } })),
+    ).toBe(false);
+  });
+
+  it("counts the admiral's ships at rank five only", () => {
+    const two = { wanderer: { xp: 900 }, ram: { xp: 900 }, ark: { xp: 899 } };
+    expect(achievementProgress(def("admiral"), ctx({ shipMastery: two }))).toEqual({
+      have: 2,
+      need: 3,
+      done: false,
+    });
+    expect(
+      achievementMet(
+        def("admiral"),
+        ctx({ shipMastery: { ...two, ark: { xp: 900 } } }),
+      ),
+    ).toBe(true);
   });
 });

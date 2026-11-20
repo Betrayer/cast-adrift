@@ -5,6 +5,7 @@ import { SHIP_COLUMNS } from "@/app/grids";
 import { tokens } from "@/app/theme";
 import { ShipCard } from "@/components/ShipCard";
 import { fireMotionFlag, riseStyle, SWEEP_MS } from "@/app/motion";
+import { masteryRankOf } from "@/data/shipMastery";
 import { PLAYABLE_SHIPS } from "@/data/ships";
 import { featureRoutes, unlockHintsLine } from "@/game/meta/describeUnlock";
 import { hasFeature, type UnlockContext } from "@/data/unlocks";
@@ -24,6 +25,7 @@ export const HangarShips = ({ unlockCtx, tab, onTab }: HangarShipsProps) => {
   const selectedShip = useMetaStore((s) => s.selectedShip);
   const buyShip = useMetaStore((s) => s.buyShip);
   const selectShip = useMetaStore((s) => s.selectShip);
+  const mastery = useMetaStore((s) => s.shipMastery);
 
   return (
     <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
@@ -48,6 +50,7 @@ export const HangarShips = ({ unlockCtx, tab, onTab }: HangarShipsProps) => {
             >
               <ShipCard
                 shipId={ship.id}
+                masteryRank={masteryRankOf(mastery[ship.id]?.xp ?? 0)}
                 showPrice={!isOwned}
                 className={equipped ? undefined : styles.shipDim}
                 footer={

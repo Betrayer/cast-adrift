@@ -19,6 +19,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "scrap", n: 22 },
               { k: "officer", id: "scrapper" },
+              { k: "shipRank", n: 1 },
             ],
           },
         ],

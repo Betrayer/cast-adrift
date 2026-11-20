@@ -97,7 +97,9 @@ export const runActionEffect = (id: ConsoleActionId): void => {
       if (uid !== null) live.spendNudge(uid, 1);
       return;
     case 'reserve':
-      if (uid !== null) live.reserveDie(uid);
+      if (uid === null) return;
+      live.reserveDie(uid);
+      if (useBattleStore.getState().dice.some((die) => die.uid === uid && die.state === 'reserved')) haptic('place');
       return;
     case 'fate':
       live.rollFate();

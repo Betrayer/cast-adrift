@@ -191,6 +191,12 @@ export interface RunValues {
   hullMax: number;
   scrap: number;
   shipId: ShipId;
+  masteryRank: number;
+  shipRankXp: number;
+  pendingRankUps: number;
+  pendingShipDraft: string[];
+  shipDraftRerollUsed: boolean;
+  blackBoxSpent: boolean;
   deck: DieInstance[];
   perks: string[];
   modules: string[];
@@ -359,6 +365,12 @@ export const MAX_SHIPYARD_DISCOUNT = 60;
 
 export const createInitialRunValues = (): RunValues => ({
   active: false,
+  masteryRank: 0,
+  shipRankXp: 0,
+  pendingRankUps: 0,
+  pendingShipDraft: [],
+  shipDraftRerollUsed: false,
+  blackBoxSpent: false,
   seed: 0,
   mode: "campaign",
   mutators: [],

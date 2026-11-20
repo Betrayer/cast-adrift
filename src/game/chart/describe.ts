@@ -1,4 +1,5 @@
 import type { ChartNodeDef } from "@/data/chart";
+import { actionMagnitudes } from "@/data/chart/scale";
 import { ZERO_PERK_MODS, type PerkMods } from "@/data/perks/types";
 import { SLOT_IDS } from "@/data/slots";
 import { chartPointsIn, confluenceSteps } from "@/game/chart/engine";
@@ -15,6 +16,7 @@ const MOD_ORDER: readonly (keyof PerkMods)[] = [
   "hullMaxDelta",
   "hullMaxPct",
   "battleEndHeal",
+  "firstHitReducePct",
   "shieldKeepPct",
   "chargeCapDelta",
   "setCompleteCharge",
@@ -50,6 +52,11 @@ const LOWER_IS_BETTER: ReadonlySet<keyof PerkMods> = new Set([
 ]);
 
 const signed = (n: number): string => (n > 0 ? `+${String(n)}` : String(n));
+
+export const chartFxParams = (node: ChartNodeDef): { n: number; m: number } => {
+  const values = (node.effects ?? []).flatMap((effect) => actionMagnitudes(effect.do)).map((value) => Math.abs(value));
+  return { n: values[0] ?? 0, m: values[1] ?? 0 };
+};
 
 export const chartNodeTitle = (node: ChartNodeDef, t: Translate): string => {
   if (node.name !== undefined) return t(node.name);
@@ -105,7 +112,7 @@ export const chartNodeLines = (
       });
     }
   }
-  if (node.fx !== undefined) lines.push({ text: t(node.fx), drawback: false });
+  if (node.fx !== undefined) lines.push({ text: t(node.fx, chartFxParams(node)), drawback: false });
   if (node.traits !== undefined) {
     for (const trait of node.traits) {
       lines.push({

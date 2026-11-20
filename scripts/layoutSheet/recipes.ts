@@ -190,6 +190,17 @@ export const OVERLAYS: readonly Recipe[] = [
     overlay: { open: tap('[data-testid="bridge-pin-weaponA"]'), shown: '[data-testid="bridge-slot-sheet"]' },
   },
   {
+    id: "overlay-ship-rank-draft",
+    screen: "map",
+    prepare: seedThen("map"),
+    overlay: {
+      open: async (page) => {
+        await page.evaluate(() => window.caTest?.grantRun({ shipRankXp: 2 } as never));
+      },
+      shown: '[data-testid="ship-rank-draft"]',
+    },
+  },
+  {
     id: "overlay-check-modal",
     screen: "event",
     prepare: seedThen("event", { eventId: "driftSalvageCrew" }),
@@ -223,6 +234,12 @@ export const OVERLAYS: readonly Recipe[] = [
     screen: "battle",
     prepare: (page) => fight(page, { enemyIds: ["raider"], deck: EXPLAIN_DECK, seed: 42, hull: 30, hullMax: 30 }),
     overlay: { open: tap('[data-testid="slot-why-engines"]'), shown: '[data-tap-popover="slot-why-engines"]' },
+  },
+  {
+    id: "overlay-chart-filter",
+    screen: "chart",
+    prepare: metaThen("chart"),
+    overlay: { open: tap("[data-chart-filter-toggle]"), shown: "[data-chart-filter]" },
   },
 ];
 

@@ -7,6 +7,7 @@ import {
   stripShield,
   type WeaponTarget,
 } from "@/game/battle/damage";
+import { aliveOnBoard } from "@/game/battle/seats";
 import {
   DIRECT,
   DOUBLET,
@@ -319,7 +320,7 @@ const applySlotEffect = (
     ) {
       const overkill = dealt - preHp;
       if (overkill > 0) {
-        const nextEnemy = aliveEnemies(next).find(
+        const nextEnemy = aliveOnBoard(next.enemies).find(
           (e) => e.id !== target.enemy.id,
         );
         if (nextEnemy !== undefined) {
@@ -465,7 +466,7 @@ const resolveSlot = (
     slotId === "weaponA" || slotId === "weaponB" || slotId === "spinal";
 
   if (die.tier > effectiveCap(next, slotId, slot)) {
-    const overload = overCapAllowed(next.shipId, slotId);
+    const overload = overCapAllowed(next.shipId, slotId, next.passiveTier);
     const grant = exceedCapGrantFor(next, die, slotId);
     const onMaxFace = die.value >= dieFaceMax(die);
     const edged =

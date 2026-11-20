@@ -1,4 +1,6 @@
+import { existsSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
+import { schools } from "@/data/schools";
 import {
   SHIPS,
   shipBridgeIssues,
@@ -12,7 +14,7 @@ const stub = (body: Partial<ShipDef>): ShipDef => ({
   hullMax: 30,
   cargoHold: 1,
   slots: {},
-  bridgeTheme: { tint: "grey", frame: "raw", pins: {} },
+  bridgeTheme: { tint: "grey", frame: "raw" },
   price: 0,
   ...body,
 });
@@ -59,28 +61,30 @@ describe("bridge themes", () => {
     );
   });
 
-  it("fails a ship whose pin set does not match its hull", () => {
-    const issues = shipBridgeIssues([
-      stub({
-        slots: { weaponA: { cap: 8, mk: 1 } },
-        bridgeTheme: { tint: "grey", frame: "raw", pins: { engines: [0, 0] } },
-      }),
-    ]);
-    expect(issues).toHaveLength(2);
-    expect(issues.join(" ")).toContain("no bridge pin for slot");
-    expect(issues.join(" ")).toContain("the hull does not carry");
-  });
-
   it("fails two ships that share a look", () => {
     const theme = {
       tint: "grey",
       frame: "raw",
-      pins: {},
     } as ShipDef["bridgeTheme"];
     const issues = shipBridgeIssues([
       stub({ id: "wanderer", bridgeTheme: theme }),
       stub({ id: "ram", bridgeTheme: theme }),
     ]);
     expect(issues).toHaveLength(2);
+  });
+});
+
+describe("the landing parade", () => {
+  it("draws every parade hull in its ship's in-game tint", () => {
+    const parade = SHIPS.filter((ship) => existsSync(new URL(`../../landing/ships/${ship.id}.svg`, import.meta.url)));
+    expect(parade.map((ship) => ship.id).sort()).toEqual(["ark", "corsair", "foundry", "prism", "ram", "wanderer"]);
+    for (const ship of parade) {
+      const svg = readFileSync(new URL(`../../landing/ships/${ship.id}.svg`, import.meta.url), "utf8");
+      const strokes = new Set([...svg.matchAll(/stroke="(#[0-9A-Fa-f]{6})"/g)].map((m) => (m[1] ?? "").toUpperCase()));
+      expect({ ship: ship.id, strokes: [...strokes] }).toEqual({
+        ship: ship.id,
+        strokes: [schools[ship.bridgeTheme.tint].stroke.toUpperCase()],
+      });
+    }
   });
 });

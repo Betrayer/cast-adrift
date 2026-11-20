@@ -198,8 +198,8 @@ describe("Veto clamps an event outcome at one hull", () => {
 
 describe("the two version bumps the equip cost", () => {
   it("moves the run snapshot to v16 and keeps every older blob readable", () => {
-    expect(RUN_SNAPSHOT_V).toBe(16);
-    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16]);
+    expect(RUN_SNAPSHOT_V).toBe(17);
+    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16, 17]);
   });
 
   it("round-trips the equipped node and its spent charge", () => {
@@ -237,8 +237,8 @@ describe("the two version bumps the equip cost", () => {
     expect(useRunStore.getState().scrap).toBe(77);
   });
 
-  it("moves the meta store to v20 and carries a v17 profile across", () => {
-    expect(META_VERSION).toBe(20);
+  it("moves the meta store to the current version and carries a v17 profile across", () => {
+    expect(META_VERSION).toBe(22);
     const migrated = migrateMeta(
       { shards: 250, codex: ["memory-1", "memory-2"], selectedShip: "wanderer" },
       17,

@@ -64,6 +64,7 @@ export const readState = (): TestState => {
       weather: weatherIn(run.mutators)?.id ?? null,
       salvage: [...(run.pendingRewards?.salvage ?? [])],
       officers: [...run.officers],
+      perks: [...run.perks],
       cargo: run.cargo.map((entry) => entry.defId),
       sectorReveal: run.sectorReveal,
       shipyardDiscount: run.shipyardDiscount,
@@ -120,6 +121,7 @@ export const readState = (): TestState => {
       })),
       evasion: battle.evasion,
       freeNudges: battle.freeNudges,
+      reinforcements: [...battle.reinforcements],
       lastBlock: battle.lastBlock?.key ?? null,
       check: checkStep === undefined
         ? null

@@ -189,9 +189,11 @@ describe("A15 Singularity", () => {
     expect(at(15)).toHaveLength(at(14).length + 1);
   });
 
-  it("lowers the tide cap by one after A4 and A9 raised it by two", () => {
+  it("raises the tide cap a third time, after A4 and A9", () => {
+    expect(tideCapFor(3, "campaign", 2)).toBe(3);
     expect(tideCapFor(14, "campaign", 2)).toBe(5);
-    expect(tideCapFor(15, "campaign", 2)).toBe(4);
+    expect(tideCapFor(15, "campaign", 2)).toBe(6);
+    expect(tideCapFor(15, "campaign", 6)).toBe(8);
   });
 
   it("withdraws the stable ride", () => {

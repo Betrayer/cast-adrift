@@ -27,7 +27,9 @@ import {
 } from '@/data/ascension';
 import { echoRowDef } from '@/components/echoCoreView';
 import { ShipCard } from '@/components/ShipCard';
+import { ShipSilhouette } from '@/components/ShipSilhouette';
 import { echoLabelVars } from '@/data/echo';
+import { masteryRankOf } from '@/data/shipMastery';
 import { memoryFragmentCount } from '@/data/narrative/memories';
 import { ascensionShardMult } from '@/game/xp';
 import { startRun } from '@/game/run/flow';
@@ -39,6 +41,9 @@ export const RunSetupScreen = () => {
   const go = useAppStore((s) => s.go);
   const shipId = useMetaStore((s) => s.selectedShip);
   const deck = useMetaStore((s) => s.hangar.deck);
+  const masteryRank = masteryRankOf(
+    useMetaStore((s) => s.shipMastery[shipId]?.xp ?? 0),
+  );
   const cleared = useMetaStore((s) => s.ascension.campaign);
   const vouchers = useMetaStore((s) => s.vouchers.perkDraft);
   const selectedEcho = useMetaStore((s) => s.selectedEcho);
@@ -63,8 +68,10 @@ export const RunSetupScreen = () => {
           </Text>
           <Divider color={tokens.line} label={t('run:setup.ship')} />
           <div data-rise data-press style={riseStyle(1)}>
+          <ShipSilhouette shipId={shipId} masteryRank={masteryRank} size="card" />
           <ShipCard
             shipId={shipId}
+            masteryRank={masteryRank}
             footer={
               <Group justify="space-between" wrap="nowrap">
                 <Text size="sm" c={tokens.faint}>

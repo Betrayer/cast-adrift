@@ -10,7 +10,7 @@ import {
   respecCost,
   RESPEC_SHARD_COST,
 } from "@/game/chart/engine";
-import { hangarBudget } from "@/data/milestones";
+import { hangarBudget, milestoneCard, milestonesBetween } from "@/data/milestones";
 import { computeChartMods } from "@/game/run/runMods";
 import { validateDeck } from "@/game/meta/deck";
 import {
@@ -83,6 +83,9 @@ describe("meta loop (real flow/store/engine, end-to-end)", () => {
     expect(result?.fromLevel).toBe(1);
     expect(result?.toLevel).toBeGreaterThan(1);
     expect(result?.milestones.length).toBeGreaterThan(0);
+    expect(result?.milestones).toEqual(
+      milestonesBetween(1, result?.toLevel ?? 1).map(milestoneCard),
+    );
     expect(useRunStore.getState().active).toBe(false);
     expect(meta1.flagsArchive).toContain("metCartographer");
 

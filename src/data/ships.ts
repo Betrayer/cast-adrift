@@ -37,12 +37,9 @@ export type BridgeFrame =
   | "prism"
   | "raw";
 
-export type BridgePin = readonly [number, number];
-
 export interface BridgeTheme {
   tint: School;
   frame: BridgeFrame;
-  pins: Partial<Record<SlotId, BridgePin>>;
 }
 
 export interface ShipDef {
@@ -56,6 +53,9 @@ export interface ShipDef {
   cargoHold: number;
   bridgeTheme: BridgeTheme;
   passive?: ShipPassive;
+  passiveII?: ShipPassive;
+  passiveIIName?: LocKey;
+  passiveIIDesc?: LocKey;
   price: number;
   unlock?: FeatureId;
   debug?: boolean;
@@ -71,6 +71,9 @@ export const SHIPS: readonly ShipDef[] = [
     hullMax: 30,
     price: 0,
     passive: { kind: "scrapper", scrap: 2 },
+    passiveII: { kind: "scrapper", scrap: 3 },
+    passiveIIName: "content:ships.wanderer.passiveIIName",
+    passiveIIDesc: "content:ships.wanderer.passiveIIDesc",
     slots: {
       weaponA: { cap: 8, mk: 1 },
       weaponB: { cap: 8, mk: 1 },
@@ -82,14 +85,6 @@ export const SHIPS: readonly ShipDef[] = [
     bridgeTheme: {
       tint: "blue",
       frame: "hard",
-      pins: {
-        sensors: [0, -0.6],
-        weaponA: [-0.42, -0.12],
-        weaponB: [0.42, -0.12],
-        shields: [-0.56, 0.32],
-        reactor: [0.56, 0.32],
-        engines: [0, 0.44],
-      },
     },
   },
   {
@@ -102,6 +97,9 @@ export const SHIPS: readonly ShipDef[] = [
     price: 800,
     unlock: "shipRam",
     passive: { kind: "overload", hullCost: 2 },
+    passiveII: { kind: "overload", hullCost: 1 },
+    passiveIIName: "content:ships.ram.passiveIIName",
+    passiveIIDesc: "content:ships.ram.passiveIIDesc",
     slots: {
       weaponA: { cap: 8, mk: 1 },
       weaponB: { cap: 8, mk: 1 },
@@ -113,14 +111,6 @@ export const SHIPS: readonly ShipDef[] = [
     bridgeTheme: {
       tint: "red",
       frame: "chevron",
-      pins: {
-        spinal: [0, -0.62],
-        weaponA: [-0.48, -0.18],
-        weaponB: [0.48, -0.18],
-        shields: [-0.6, 0.24],
-        reactor: [0.6, 0.24],
-        engines: [0, 0.56],
-      },
     },
   },
   {
@@ -133,6 +123,9 @@ export const SHIPS: readonly ShipDef[] = [
     price: 1500,
     unlock: "shipArk",
     passive: { kind: "bulwark", keepPct: 25 },
+    passiveII: { kind: "bulwark", keepPct: 40 },
+    passiveIIName: "content:ships.ark.passiveIIName",
+    passiveIIDesc: "content:ships.ark.passiveIIDesc",
     slots: {
       weaponA: { cap: 8, mk: 1 },
       shields: { cap: 8, mk: 1 },
@@ -145,14 +138,6 @@ export const SHIPS: readonly ShipDef[] = [
     bridgeTheme: {
       tint: "green",
       frame: "round",
-      pins: {
-        weaponA: [0, -0.56],
-        shields: [-0.6, -0.08],
-        shieldsB: [0.6, -0.08],
-        repairBay: [-0.44, 0.5],
-        reactor: [0.44, 0.5],
-        engines: [0, 0.6],
-      },
     },
   },
   {
@@ -169,11 +154,23 @@ export const SHIPS: readonly ShipDef[] = [
       weapons: 1,
       cap: 2,
       evasionDelta: 8,
-      dodgeCap: 40,
-      glancingCap: 55,
+      dodgeCap: 22,
+      glancingCap: 38,
       dodgePerValue: 4.5,
       glancingPerValue: 7.5,
     },
+    passiveII: {
+      kind: "afterburner",
+      weapons: 1,
+      cap: 3,
+      evasionDelta: 8,
+      dodgeCap: 22,
+      glancingCap: 38,
+      dodgePerValue: 4.5,
+      glancingPerValue: 7.5,
+    },
+    passiveIIName: "content:ships.corsair.passiveIIName",
+    passiveIIDesc: "content:ships.corsair.passiveIIDesc",
     slots: {
       weaponA: { cap: 8, mk: 1 },
       weaponB: { cap: 8, mk: 1 },
@@ -185,14 +182,6 @@ export const SHIPS: readonly ShipDef[] = [
     bridgeTheme: {
       tint: "grey",
       frame: "sleek",
-      pins: {
-        sensors: [0, -0.62],
-        weaponA: [-0.32, -0.2],
-        weaponB: [0.32, -0.2],
-        engines: [-0.58, 0.34],
-        enginesB: [0.58, 0.34],
-        reactor: [0, 0.44],
-      },
     },
   },
   {
@@ -205,6 +194,9 @@ export const SHIPS: readonly ShipDef[] = [
     price: 2600,
     unlock: "shipFoundry",
     passive: { kind: "annealer", tierStep: 1 },
+    passiveII: { kind: "annealer", tierStep: 2 },
+    passiveIIName: "content:ships.foundry.passiveIIName",
+    passiveIIDesc: "content:ships.foundry.passiveIIDesc",
     slots: {
       weaponA: { cap: 8, mk: 1 },
       weaponB: { cap: 8, mk: 1 },
@@ -216,13 +208,6 @@ export const SHIPS: readonly ShipDef[] = [
     bridgeTheme: {
       tint: "yellow",
       frame: "forge",
-      pins: {
-        weaponA: [-0.46, -0.36],
-        weaponB: [0.46, -0.36],
-        shields: [-0.62, 0.14],
-        reactor: [0.62, 0.14],
-        engines: [0, 0.58],
-      },
     },
   },
   {
@@ -235,6 +220,9 @@ export const SHIPS: readonly ShipDef[] = [
     price: 2400,
     unlock: "shipPrism",
     passive: { kind: "refractor", censusMult: 2 },
+    passiveII: { kind: "refractor", censusMult: 3 },
+    passiveIIName: "content:ships.prism.passiveIIName",
+    passiveIIDesc: "content:ships.prism.passiveIIDesc",
     slots: {
       weaponA: { cap: 8, mk: 1 },
       weaponB: { cap: 8, mk: 1 },
@@ -246,14 +234,6 @@ export const SHIPS: readonly ShipDef[] = [
     bridgeTheme: {
       tint: "prismatic",
       frame: "prism",
-      pins: {
-        sensors: [0, -0.62],
-        weaponA: [-0.54, -0.14],
-        weaponB: [0.54, -0.14],
-        shields: [-0.5, 0.34],
-        reactor: [0.5, 0.34],
-        engines: [0, 0.62],
-      },
     },
   },
   {
@@ -271,14 +251,19 @@ export const SHIPS: readonly ShipDef[] = [
     bridgeTheme: {
       tint: "black",
       frame: "raw",
-      pins: {
-        spinal: [0, -0.56],
-        shields: [-0.44, 0.4],
-        reactor: [0.44, 0.4],
-      },
     },
   },
 ];
+
+export interface ShipPassiveText {
+  name: LocKey | undefined;
+  desc: LocKey | undefined;
+}
+
+export const shipPassiveText = (def: ShipDef, tier: 1 | 2): ShipPassiveText =>
+  tier === 2 && def.passiveIIName !== undefined && def.passiveIIDesc !== undefined
+    ? { name: def.passiveIIName, desc: def.passiveIIDesc }
+    : { name: def.passiveName, desc: def.passiveDesc };
 
 export const SHIP_BY_ID: ReadonlyMap<ShipId, ShipDef> = new Map(
   SHIPS.map((def) => [def.id, def]),
@@ -293,20 +278,7 @@ export const shipBridgeIssues = (defs: readonly ShipDef[]): string[] => {
   const tints = new Map<School, ShipId>();
   const frames = new Map<BridgeFrame, ShipId>();
   for (const def of defs) {
-    const { tint, frame, pins } = def.bridgeTheme;
-    const slotIds = Object.keys(def.slots) as SlotId[];
-    for (const slotId of slotIds) {
-      if (pins[slotId] === undefined) {
-        out.push(`ships: "${def.id}" has no bridge pin for slot "${slotId}"`);
-      }
-    }
-    for (const pinned of Object.keys(pins) as SlotId[]) {
-      if (def.slots[pinned] === undefined) {
-        out.push(
-          `ships: "${def.id}" pins slot "${pinned}" the hull does not carry`,
-        );
-      }
-    }
+    const { tint, frame } = def.bridgeTheme;
     const tintOwner = tints.get(tint);
     if (tintOwner !== undefined) {
       out.push(

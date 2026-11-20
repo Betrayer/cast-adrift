@@ -1,4 +1,5 @@
 import { CHAINS } from "@/data/narrative/chains";
+import type { ShipId } from "@/data/ships";
 import type { MetaStats } from "@/stores/metaStore";
 import type { RunStats } from "@/stores/runStore";
 import type { LocKey } from "@/types/content";
@@ -39,6 +40,8 @@ export type AchievementCond =
   | { c: "streak"; n: number }
   | { c: "chainDone"; id: string }
   | { c: "chainsDone"; n: number }
+  | { c: "shipMastered"; ship: ShipId }
+  | { c: "shipsMastered"; n: number }
   | { c: "flags"; keys: readonly string[]; mode: "all" | "any" };
 
 export type VoucherKind = "perkDraft";
@@ -364,6 +367,21 @@ export const ACHIEVEMENT_FAMILIES: readonly AchievementFamilyDef[] = [
   }),
 ];
 
+const SHIP_MASTER_SHARDS = 120;
+
+const ADMIRAL_SHIPS = 3;
+
+const ADMIRAL_SHARDS = 300;
+
+const SHIP_MASTER_ACHIEVEMENTS: readonly { id: string; ship: ShipId }[] = [
+  { id: "masterWanderer", ship: "wanderer" },
+  { id: "masterRam", ship: "ram" },
+  { id: "masterArk", ship: "ark" },
+  { id: "masterCorsair", ship: "corsair" },
+  { id: "masterFoundry", ship: "foundry" },
+  { id: "masterPrism", ship: "prism" },
+];
+
 export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
   single("sectorFive", {
     group: "combat",
@@ -523,6 +541,18 @@ export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
     group: "modes",
     cond: { c: "runDeckSchools", n: 6 },
     reward: { shards: 90 },
+  }),
+  ...SHIP_MASTER_ACHIEVEMENTS.map(({ id, ship }) =>
+    single(id, {
+      group: "modes",
+      cond: { c: "shipMastered", ship },
+      reward: { shards: SHIP_MASTER_SHARDS },
+    }),
+  ),
+  single("admiral", {
+    group: "modes",
+    cond: { c: "shipsMastered", n: ADMIRAL_SHIPS },
+    reward: { shards: ADMIRAL_SHARDS },
   }),
 ];
 

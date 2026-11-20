@@ -165,6 +165,13 @@ export const allOutcomes = (option: EventOption): readonly Outcome[] => [
   ...(option.onFail ?? []),
 ];
 
+export const outcomeShipRank = (event: EventDef, text: string): number =>
+  event.options
+    .flatMap((option) => allOutcomes(option))
+    .filter((outcome) => outcome.text === text)
+    .flatMap((outcome) => outcome.effects)
+    .reduce((sum, effect) => (effect.k === "shipRank" ? sum + effect.n : sum), 0);
+
 export const optionAxisRange = (option: EventOption): AxisRange | null => {
   const deltas = allOutcomes(option).map((outcome) =>
     outcome.effects.reduce(

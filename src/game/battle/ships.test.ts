@@ -1,16 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { PLAYABLE_SHIPS, SHIP_BY_ID } from "@/data/ships";
+import { PLAYABLE_SHIPS, SHIP_BY_ID, shipPassiveText } from "@/data/ships";
 import {
   canFuse,
   canReschool,
   fusedDie,
   isFuseTarget,
 } from "@/game/battle/actives";
-import { passiveActionOf, shipProfile } from "@/game/battle/passives";
+import { passiveActionOf, passiveTierFor, shipProfile } from "@/game/battle/passives";
 import { RESOLUTION_ORDER } from "@/game/battle/order";
 import { featureRoutes } from "@/game/meta/describeUnlock";
 import type { SlotId } from "@/types/battle";
 import {
+  applySlotOverrides,
   buildBattleSnapshot,
   createEnemyStream,
   dieFitsSlot,
@@ -115,8 +116,8 @@ describe("ship boards", () => {
     expect(shipProfile("corsair").afterburner).toEqual({ weapons: 1, cap: 2 });
     expect(shipProfile("corsair").evasion).toEqual({
       delta: 8,
-      dodgeCap: 40,
-      glancingCap: 55,
+      dodgeCap: 22,
+      glancingCap: 38,
       dodgePerValue: 4.5,
       glancingPerValue: 7.5,
     });
@@ -461,5 +462,67 @@ describe("Scrapper (Wanderer)", () => {
     );
     expect(useBattleStore.getState().scrap).toBe(2);
     useBattleStore.getState().reset();
+  });
+});
+
+describe("passive II", () => {
+  it("switches on at mastery five and not before", () => {
+    expect([0, 4, 5].map(passiveTierFor)).toEqual([1, 1, 2]);
+  });
+
+  it("compiles the second form of every ship's passive", () => {
+    expect(shipProfile("wanderer", 2).battleStartScrap).toBe(3);
+    expect(shipProfile("ram", 2).overCap?.hullCost).toBe(1);
+    expect(shipProfile("ark", 2).shieldKeepPct).toBe(40);
+    expect(shipProfile("corsair", 2).afterburner).toEqual({ weapons: 1, cap: 3 });
+    expect(shipProfile("corsair", 2).evasion).toEqual(shipProfile("corsair").evasion);
+    expect(shipProfile("foundry", 2).fuseTierStep).toBe(2);
+    expect(shipProfile("prism", 2).prismaticCensusMult).toBe(3);
+  });
+
+  it("gives every playable ship a second form and its text", () => {
+    for (const ship of PLAYABLE_SHIPS) {
+      expect(ship.passiveII?.kind, ship.id).toBe(ship.passive?.kind);
+      expect(ship.passiveIIName, ship.id).toBeDefined();
+      expect(ship.passiveIIDesc, ship.id).toBeDefined();
+    }
+  });
+});
+
+describe("ship perks at the battle's edges", () => {
+  it("grows a weapon slot one die size with the hardpoint, and never past d20", () => {
+    const grown = applySlotOverrides(
+      { weaponA: { cap: 8, mk: 1 }, weaponB: { cap: 20, mk: 3 } },
+      { weaponA: 1, weaponB: 1 },
+    );
+    expect(grown.weaponA?.cap).toBe(10);
+    expect(grown.weaponB?.cap).toBe(20);
+  });
+
+  it("gives the capacitor's shield from the second turn, not the first", () => {
+    const streams = createStreams(3);
+    const snapshot = buildBattleSnapshot("ark", ["green-d4"], ["raider"], streams, createEnemyStream(streams), {}, {
+      perks: ["shipCapacitor"],
+    });
+    expect(snapshot.shield).toBe(0);
+    expect(advanceTurn(snapshot, createStreams(4)).shield).toBe(1);
+  });
+
+  it("never opens a battle below one hull", () => {
+    const streams = createStreams(3);
+    const snapshot = buildBattleSnapshot("wanderer", ["red-d6"], ["raider"], streams, createEnemyStream(streams), {}, {
+      perks: ["shipAfterburner"],
+      hull: 2,
+    });
+    expect(snapshot.hull).toBe(1);
+    expect(snapshot.outcome).toBeUndefined();
+  });
+
+  it("shows the passive's second form once the run plays it", () => {
+    const ram = SHIP_BY_ID.get("ram");
+    if (ram === undefined) throw new Error("no ram");
+    expect(shipPassiveText(ram, 1).name).toBe("content:ships.ram.passiveName");
+    expect(shipPassiveText(ram, 2).name).toBe("content:ships.ram.passiveIIName");
+    expect(shipPassiveText(ram, 2).desc).toBe("content:ships.ram.passiveIIDesc");
   });
 });

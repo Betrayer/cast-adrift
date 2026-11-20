@@ -147,6 +147,7 @@ export const ChartNodes = ({
             key={flashing ? `${node.id}:${String(pulse.key)}` : node.id}
             className={flashing ? styles.flash : undefined}
             data-chart-flash={flashing ? "1" : undefined}
+            data-chart-dimmed={dimmed ? "1" : undefined}
           >
             {node.kind === "keystone" ? (
               <rect

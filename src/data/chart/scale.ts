@@ -23,6 +23,17 @@ export const mapMagnitudes = (
   }
 };
 
+export const actionMagnitudes = (actions: readonly Action[]): number[] => {
+  const seen: number[] = [];
+  for (const action of actions) {
+    mapMagnitudes(action, (n) => {
+      seen.push(n);
+      return n;
+    });
+  }
+  return seen;
+};
+
 export const mapEffectMagnitudes = (
   effect: EffectDef,
   f: (n: number) => number,

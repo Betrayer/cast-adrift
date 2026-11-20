@@ -32,6 +32,7 @@ export type PerkTrait =
   | "greyIsBlack"
   | "firstHitPierce"
   | "escapePod"
+  | "blackBox"
   | "recycler"
   | "fateTwice"
   | "prismDouble";
@@ -61,6 +62,7 @@ export interface PerkMods {
   xpMultPct: number;
   tideEffectDelta: number;
   moduleSlotDelta: number;
+  firstHitReducePct: number;
 }
 
 export type PerkSynergy = readonly ContentTag[];
@@ -107,4 +109,5 @@ export const ZERO_PERK_MODS: PerkMods = {
   xpMultPct: 0,
   tideEffectDelta: 0,
   moduleSlotDelta: 0,
+  firstHitReducePct: 0,
 };

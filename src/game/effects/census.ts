@@ -5,7 +5,7 @@ import { moduleTags } from "@/data/modules/types";
 import { PERK_BY_ID } from "@/data/perks";
 import type { ShipId } from "@/data/ships";
 import { MECHANIC_TAGS, SYSTEM_TAGS, type ContentTag } from "@/data/tags";
-import { shipProfile } from "@/game/battle/passives";
+import { passiveTierFor, shipProfile, type PassiveTier } from "@/game/battle/passives";
 import { computeCensus } from "@/game/battle/resonance";
 import { runHasTrait, sourceMods } from "@/game/run/runMods";
 import type { ResonanceCensus, RolledDie } from "@/types/battle";
@@ -46,8 +46,10 @@ export const loadoutCensus = (loadout: LoadoutRef): TagCensus => {
 export const activeCensusTags = (census: TagCensus): readonly ContentTag[] =>
   [...SYSTEM_TAGS, ...MECHANIC_TAGS].filter((tag) => (census[tag] ?? 0) > 0);
 
-export interface ResonanceSource {
+interface ResonanceSource {
   shipId: ShipId;
+  passiveTier?: PassiveTier;
+  masteryRank?: number;
   perks: readonly string[];
   chartPicks: readonly string[];
   modules: readonly string[];
@@ -60,7 +62,10 @@ export const loadoutResonance = (
   computeCensus(
     dice,
     Math.max(
-      shipProfile(source.shipId).prismaticCensusMult,
+      shipProfile(
+        source.shipId,
+        source.passiveTier ?? passiveTierFor(source.masteryRank ?? 0),
+      ).prismaticCensusMult,
       runHasTrait(
         source.perks,
         source.chartPicks,

@@ -87,7 +87,8 @@
     "beaconCounter": "Latarnia {{n}} z {{max}}",
     "reqCargo": "wymaga wolnej ładowni i stacji przed nami",
     "cargoTerms": "{{drawback}} · dostawa płaci {{n}}",
-    "checkNoDice": "Żadna kość z twojej talii nie pasuje do tej próby — może się tylko nie udać."
+    "checkNoDice": "Żadna kość z twojej talii nie pasuje do tej próby — może się tylko nie udać.",
+    "shipRankGain": "Ranga statku: +{{n}} do następnego przezbrojenia."
   },
   "anomaly": {
     "title": "Anomalia",
@@ -209,7 +210,9 @@
     "prologueBody": "Odtwórz początkowe takty. Nic się nie zaczęło, nic nie zostało utracone.",
     "prologueReplay": "Powtórka",
     "badgeLegend": "Odznaki kości",
-    "forge": "Kuźnia"
+    "forge": "Kuźnia",
+    "fusion": "Fuzje",
+    "fusionHint": "Przekuj dwie kości „{{die}}” w stoczni, aby zobaczyć, czym się staną"
   },
   "rewards": {
     "dieTitle": "Odzyskana kość",
@@ -292,7 +295,8 @@
     "holesBypassed": "Pominięte dziury",
     "causeSingularity": "Osobliwość",
     "cause": "Przyczyna śmierci",
-    "route": "Trasa: sektor {{n}} z {{max}}"
+    "route": "Trasa: sektor {{n}} z {{max}}",
+    "shipRank": "Osiągnięta ranga statku: {{rank}}/{{max}}"
   },
   "prologue": {
     "title": "Prolog",
@@ -722,7 +726,9 @@
       "chartMore": "…i {{n}} więcej na Mapie gwiazd",
       "pinOff": "wyłączone",
       "grantConditional": "tylko dopóki jego własny warunek jest spełniony"
-    }
+    },
+    "shipRank": "Ranga {{rank}}/{{max}}",
+    "mastery": "Mistrzostwo {{rank}}"
   },
   "replace": {
     "title": "Zastąp",
@@ -798,5 +804,18 @@
       "shieldEcho": "Rdzeń Echa: Echo tarczy jest otwarty.",
       "veto": "Rdzeń Echa: Weto jest otwarty."
     }
+  },
+  "shipRank": {
+    "title": "Ranga statku {{rank}} z {{max}}",
+    "body": "Załoga zasłużyła na przezbrojenie. Wybierz jedno.",
+    "reroll": "Losuj ponownie, za darmo (mistrzostwo V)"
+  },
+  "recap": {
+    "share": "Udostępnij",
+    "title": "Mój przebieg w Cast Adrift",
+    "ascension": "Wniebowstąpienie A{{n}}",
+    "topDie": "Najsilniejsza kość: {{die}}, d{{tier}}",
+    "failed": "Nie udało się narysować karty",
+    "topDieName": "Najsilniejsza kość: {{die}}"
   }
 }

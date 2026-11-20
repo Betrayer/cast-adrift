@@ -1344,6 +1344,7 @@ export const CHAIN_EVENTS: readonly EventDef[] = [
               { k: "flag", key: "inesPulled" },
               { k: "hull", n: -4 },
               { k: "axis", n: 2 },
+              { k: "shipRank", n: 1 },
             ],
             consequence: "content:consequence.inesPulled",
           },

@@ -15,6 +15,7 @@ import { useMetaStore } from "@/stores/metaStore";
 import { HangarDiceList } from "./HangarDiceList";
 import { HangarDraft } from "./HangarDraft";
 import { HangarShips } from "./HangarShips";
+import { ShipMasteryPanel } from "./ShipMasteryPanel";
 
 export const HangarScreen = () => {
   const savedDeck = useMetaStore((s) => s.hangar.deck);
@@ -24,6 +25,7 @@ export const HangarScreen = () => {
   const shards = useMetaStore((s) => s.shards);
   const unlocksSeen = useMetaStore((s) => s.unlocksSeen);
   const setDeck = useMetaStore((s) => s.setDeck);
+  const selectedShip = useMetaStore((s) => s.selectedShip);
 
   const unlockCtx = useUnlockContext();
 
@@ -88,6 +90,7 @@ export const HangarScreen = () => {
       }
     >
       <Stack gap="sm">
+        <ShipMasteryPanel shipId={selectedShip} />
         <HangarShips unlockCtx={unlockCtx} tab={tab} onTab={setTab} />
         <HangarDraft
           draft={draft}

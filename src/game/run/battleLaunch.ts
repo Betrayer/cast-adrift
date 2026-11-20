@@ -1,6 +1,7 @@
 import { ascensionMods } from "@/data/ascension";
 import { computeMutatorMods } from "@/data/mutators";
 import { echoStartCharge } from "@/data/echo";
+import { expandEncounterIds } from "@/data/enemies";
 import { REAL_SCHOOL_ORDER } from "@/data/schools";
 import { battleInitFromRun } from "@/game/run/battleInit";
 import {
@@ -73,12 +74,11 @@ const runBattleInit = (
   };
 };
 
-const withEnemyCopies = (enemyIds: string[]): string[] => {
+const enemyCopiesOf = (enemyIds: readonly string[]): string[] => {
   const copies = computeMutatorMods(useRunStore.getState().mutators).enemyCopies;
-  if (copies <= 0) return enemyIds;
-  const first = enemyIds[0];
-  if (first === undefined) return enemyIds;
-  return [...enemyIds, ...Array.from({ length: copies }, () => first)];
+  const first = expandEncounterIds(enemyIds)[0];
+  if (copies <= 0 || first === undefined) return [];
+  return Array.from({ length: copies }, () => first);
 };
 
 const launchRunBattle = (
@@ -89,10 +89,14 @@ const launchRunBattle = (
   nodeKey: string,
   node: MapNode | undefined,
 ): void => {
-  for (let i = 0; i < mods.enemyPlus; i += 1) enemyIds.push("scavDrone");
+  const reinforcements = [
+    ...Array.from({ length: mods.enemyPlus }, () => "scavDrone"),
+    ...enemyCopiesOf(enemyIds),
+  ];
   useBattleStore.getState().startBattle(
     {
-      enemyIds: withEnemyCopies(enemyIds),
+      enemyIds,
+      reinforcements,
       startCharge: mods.startCharge + echoStartCharge(s.echo),
       ...runBattleInit(nodeKey, node?.pocket === true, {
         inverted: node?.inverted,

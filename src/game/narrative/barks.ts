@@ -95,6 +95,9 @@ export const emitBark = (trigger: string): void => {
   triggerLast.set(chosen.id, now);
   lastBarkAt = now;
   logBark(line);
+  if (import.meta.env.VITE_VOICE === "1" && useSettingsStore.getState().voice) {
+    void import("@/services/voice").then((voice) => voice.sayBark(trigger, line));
+  }
 };
 
 const outcomeNegative = (outcome: Outcome): boolean =>

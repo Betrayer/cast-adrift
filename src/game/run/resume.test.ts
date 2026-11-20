@@ -199,7 +199,7 @@ describe("save / resume", () => {
     ).toEqual(beforeDice);
   });
 
-  it("drops a mid-fight blob written before the part rework and keeps the run", () => {
+  it("drops a mid-fight blob written one snapshot version back and keeps the run", () => {
     const battleNode = startAtBattleNode();
     jumpTo(battleNode);
     const snap = captureRunSnapshot();
@@ -225,7 +225,7 @@ describe("save / resume", () => {
     expect(useBattleStore.getState().turn).toBe(1);
   });
 
-  it("drops the pending event fight with a blob written before the part rework", () => {
+  it("drops the pending event fight with a blob written one snapshot version back", () => {
     startRun(1);
     startEventBattle({
       enemyIds: ["scavDrone"],

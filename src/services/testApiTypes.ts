@@ -39,6 +39,7 @@ export interface MetaPatch {
   unlocks?: readonly string[];
   ships?: readonly ShipId[];
   selectedShip?: ShipId;
+  shipMasteryXp?: Partial<Record<ShipId, number>>;
   themes?: readonly string[];
   deck?: readonly string[];
   chartPicks?: readonly string[];
@@ -68,6 +69,7 @@ export interface RunPatch {
   visited?: readonly NodeId[];
   wormholeRides?: number;
   usedMinibosses?: readonly string[];
+  shipRankXp?: number;
 }
 
 export interface BattlePatch {
@@ -90,6 +92,7 @@ export interface BattlePatch {
   inverted?: boolean;
   officers?: readonly string[];
   echo?: EchoNodeId;
+  reinforcements?: readonly string[];
   snapshot?: BattleSaveState;
 }
 
@@ -284,6 +287,7 @@ export interface TestState {
     weather: string | null;
     salvage: string[];
     officers: string[];
+    perks: string[];
     cargo: string[];
     sectorReveal: number;
     shipyardDiscount: number;
@@ -326,6 +330,7 @@ export interface TestState {
     }[];
     evasion: { dodgePct: number; glancingPct: number; intercept: boolean } | null;
     freeNudges: number;
+    reinforcements: string[];
     lastBlock: string | null;
     check: {
       stepId: string;

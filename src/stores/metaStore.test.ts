@@ -191,3 +191,29 @@ describe("metaStore accumulation", () => {
     expect(useMetaStore.getState().buyShip("ark", 1500)).toBe(false);
   });
 });
+
+describe("ship mastery persistence", () => {
+  it("starts every ship at no mastery", () => {
+    expect(migrateMeta({}, 1).shipMastery).toEqual({});
+  });
+
+  it("keeps known ships with positive xp, floored, and drops the rest", () => {
+    const values = migrateMeta(
+      {
+        shipMastery: {
+          wanderer: { xp: 61.7 },
+          ram: { xp: -5 },
+          ark: { xp: "lots" },
+          ghost: { xp: 400 },
+          prism: null,
+        },
+      },
+      META_VERSION,
+    );
+    expect(values.shipMastery).toEqual({ wanderer: { xp: 61 } });
+  });
+
+  it("drops a mastery record that is not an object", () => {
+    expect(migrateMeta({ shipMastery: 12 }, META_VERSION).shipMastery).toEqual({});
+  });
+});

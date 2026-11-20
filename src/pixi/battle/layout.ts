@@ -7,6 +7,23 @@ export interface Rect {
   h: number;
 }
 
+export interface StageOrigin {
+  left: number;
+  top: number;
+}
+
+export const stageOrigin = (canvasRect: Pick<DOMRect, "left" | "top">): StageOrigin => ({
+  left: canvasRect.left,
+  top: canvasRect.top,
+});
+
+export const toStageRect = (rect: Rect, origin: StageOrigin): Rect => ({
+  x: rect.x - origin.left,
+  y: rect.y - origin.top,
+  w: rect.w,
+  h: rect.h,
+});
+
 export interface Point {
   x: number;
   y: number;

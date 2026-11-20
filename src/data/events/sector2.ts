@@ -244,6 +244,7 @@ export const SECTOR2_EVENTS: readonly EventDef[] = [
               { k: "hull", n: -4 },
               { k: "axis", n: 1 },
               { k: "flag", key: "yusufFriend" },
+              { k: "shipRank", n: 1 },
             ],
             consequence: "content:consequence.yusufOwed",
           },

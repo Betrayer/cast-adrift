@@ -8,7 +8,8 @@ import {
   runSlotStates,
   type RunBattleInit,
 } from "@/game/run/battleInit";
-import { cargoChargeCap, cargoSlotTier } from "@/game/run/cargo";
+import { cargoSlotTierDelta } from "@/data/cargo";
+import { cargoChargeCap, heldCargoDefs } from "@/game/run/cargo";
 import { abandonRun, startEventBattle, startRun } from "@/game/run/flow";
 import { setupForRun } from "@/game/run/modes";
 import { runChargeCap } from "@/game/run/runMods";
@@ -31,9 +32,11 @@ const legacyInit = (s: RunValues, engravings: EngravingMap): RunBattleInit => {
   if (mut.sensorsTierDelta !== 0) {
     slotTierDelta.sensors = (slotTierDelta.sensors ?? 0) + mut.sensorsTierDelta;
   }
-  for (const [slot, delta] of Object.entries(cargoSlotTier(s.cargo))) {
-    const key = slot as SlotId;
-    slotTierDelta[key] = (slotTierDelta[key] ?? 0) + delta;
+  for (const def of heldCargoDefs(s.cargo)) {
+    for (const [slot, delta] of Object.entries(cargoSlotTierDelta(def))) {
+      const key = slot as SlotId;
+      slotTierDelta[key] = (slotTierDelta[key] ?? 0) + delta;
+    }
   }
   const disabledSlots: SlotId[] = [
     ...(setup.sensorsDisabled === true ? (["sensors"] as SlotId[]) : []),
@@ -43,6 +46,8 @@ const legacyInit = (s: RunValues, engravings: EngravingMap): RunBattleInit => {
   ];
   return {
     shipId: s.shipId,
+    passiveTier: 1,
+    blackBoxSpent: false,
     tide: s.tide,
     interference: s.interferenceStacks,
     perks: s.perks,

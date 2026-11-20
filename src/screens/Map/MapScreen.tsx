@@ -43,6 +43,7 @@ import { tierForNode } from "@/game/puzzles/selection";
 import { AbandonConfirm } from "@/components/AbandonConfirm";
 import { WarpStreaks } from "@/components/WarpStreaks";
 import { ridesStayGentle } from "@/game/run/motifs";
+import { ShipRankDraft } from "./ShipRankDraft";
 import { WormholeChoice } from "./WormholeChoice";
 import { SpotDefs, SpotOverlay } from "./SpotOverlay";
 import { chainMarkedNodes } from "@/game/narrative/chainMarkers";
@@ -498,6 +499,7 @@ const MapView = ({ map, position }: MapViewProps) => {
           {warp?.phase === "burst" ? (
             <WarpStreaks color={schools.black.text} durationMs={WARP_BURST_MS} />
           ) : null}
+          <ShipRankDraft />
         </>
       }
     >

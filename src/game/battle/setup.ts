@@ -19,8 +19,10 @@ import type { EngravingMap } from "@/data/engravings";
 import { DIRECT, fireModesForSlot } from "@/data/fireModes";
 import { SHIP_BY_ID, type ShipId } from "@/data/ships";
 import { slotCapForMk, type MkLevel } from "@/data/slots";
-import { shrinkTier } from "@/game/battle/placement";
-import { buildEnemies } from "@/game/battle/spawn";
+import type { PassiveTier } from "@/game/battle/passives";
+import { growTier, shrinkTier } from "@/game/battle/placement";
+import { expandEncounterIds } from "@/data/enemies";
+import { buildEnemies, MAX_ENEMIES, spawnEnemy } from "@/game/battle/spawn";
 import {
   BattleCtx,
   buildSources,
@@ -111,6 +113,9 @@ export interface BattleInit {
   disabledSlots?: readonly SlotId[];
   inverted?: boolean;
   nodeStorm?: boolean;
+  passiveTier?: PassiveTier;
+  blackBoxSpent?: boolean;
+  reinforcements?: readonly string[];
 }
 
 export type MkLevels = Partial<Record<SlotId, MkLevel>>;
@@ -160,6 +165,7 @@ export const applySlotOverrides = (
     let cap = slot.cap;
     const steps = tierDelta[key] ?? 0;
     for (let i = 0; i < -steps; i += 1) cap = shrinkTier(cap);
+    for (let i = 0; i < steps; i += 1) cap = growTier(cap);
     out[key] = { ...slot, cap };
   }
   return out;
@@ -256,18 +262,30 @@ export const buildBattleSnapshot = (
 ): BattleSnapshot => {
   const tide = init.tide ?? 0;
   const ascension = init.ascension ?? 0;
-  const enemies = buildEnemies(enemyIds, enemyStream, {
+  const spawnInit = {
     tide,
     sectorHpPct: init.sectorHpPct ?? 0,
     hpBonusPct: init.enemyHpBonusPct ?? 0,
     eliteShield: init.eliteShield ?? 0,
     ascension,
-  });
+  };
+  const composed = buildEnemies(enemyIds, enemyStream, spawnInit);
+  const extra = expandEncounterIds(init.reinforcements ?? []);
+  const seats = Math.max(0, MAX_ENEMIES - composed.length);
+  const enemies = [
+    ...composed,
+    ...extra
+      .slice(0, seats)
+      .map((defId, index) =>
+        spawnEnemy(defId, `enemy-${String(composed.length + index)}`, enemyStream, spawnInit),
+      ),
+  ];
   const dice = dealHand(hand, streams, tableSizeFor(ascension));
   const onTable = tableDice(dice);
   const hullMax = init.hullMax ?? shipHullMax(shipId);
   const resonance = loadoutResonance(dice, {
     shipId,
+    passiveTier: init.passiveTier,
     perks: init.perks ?? [],
     chartPicks: init.chartPicks ?? [],
     modules: init.modules ?? [],
@@ -280,6 +298,8 @@ export const buildBattleSnapshot = (
     hull: Math.max(1, Math.min(hullMax, init.hull ?? hullMax)),
     hullMax,
     runScrap: Math.max(0, init.runScrap ?? 0),
+    passiveTier: init.passiveTier ?? 1,
+    blackBoxSpent: init.blackBoxSpent === true,
     tide,
     interference: Math.max(0, init.interference ?? 0),
     perks: [...(init.perks ?? [])],
@@ -302,6 +322,7 @@ export const buildBattleSnapshot = (
     ),
     enemies,
     targetId: enemies[0]?.id ?? null,
+    reinforcements: extra.slice(seats),
     chargeCap: init.chargeCap ?? BASE_CHARGE_CAP,
     cursedDice: [],
     pendingHijack: 0,
@@ -328,6 +349,7 @@ export const buildBattleSnapshot = (
   const ctx = new BattleCtx(snapshot, snapshot.flags);
   emit(buildSources(snapshot), "battleStart", ctx);
   snapshot.flags = [...ctx.flags];
+  snapshot.hull = Math.max(1, snapshot.hull);
   reaimOffLockedCore(snapshot);
   return snapshot;
 };

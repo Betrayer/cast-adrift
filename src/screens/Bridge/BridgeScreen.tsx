@@ -1,4 +1,4 @@
-import { Button, Group, Text } from "@mantine/core";
+import { Badge, Button, Group, Text } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useBackGuard } from "@/app/backGuard";
@@ -7,6 +7,8 @@ import { Screen } from "@/app/Screen";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
 import { TabPanel } from "@/components/TabPanel";
+import { masteryNumeral } from "@/components/shipModel";
+import { SHIP_RANK_MAX, shipRankOf } from "@/data/shipRanks";
 import { SHIP_BY_ID } from "@/data/ships";
 import { useRunStore } from "@/stores/runStore";
 import type { SlotId } from "@/types/battle";
@@ -37,6 +39,9 @@ const PANELS: Record<BridgeTab, (props: BridgePanelProps) => React.ReactElement 
 export const BridgeScreen = () => {
   const { t } = useTranslation(["run", "battle", "content"]);
   const shipId = useRunStore((s) => s.shipId);
+  const masteryRank = useRunStore((s) => s.masteryRank);
+  const shipRankXp = useRunStore((s) => s.shipRankXp);
+  const pendingRankUps = useRunStore((s) => s.pendingRankUps);
   const [tab, setTab] = useState<BridgeTab>("overview");
   const [sheetSlot, setSheetSlot] = useState<SlotId | null>(null);
   const [focus, setFocus] = useState<BridgeFocus | null>(null);
@@ -93,6 +98,15 @@ export const BridgeScreen = () => {
             {t(`run:bridge.tab.${id}`)}
           </Button>
         ))}
+        <Badge variant="light" color="yellow" data-testid="bridge-mastery">
+          {t("run:bridge.mastery", { rank: masteryNumeral(masteryRank) })}
+        </Badge>
+        <Badge variant="light" color="accent" data-testid="bridge-ship-rank">
+          {t("run:bridge.shipRank", {
+            rank: shipRankOf(shipRankXp) - pendingRankUps,
+            max: SHIP_RANK_MAX,
+          })}
+        </Badge>
       </Group>
     </div>
   );

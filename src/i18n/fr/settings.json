@@ -178,5 +178,12 @@
       "desc": "Les nombres défilent dans le flou puis deviennent nets."
     }
   },
-  "skipTally": "Passer le bilan du combat"
+  "skipTally": "Passer le bilan du combat",
+  "voice": "Voix de l’ordinateur de bord",
+  "voiceTest": "Tester",
+  "voiceSample": "Capitaine, ici Écho. Le canal est dégagé.",
+  "voiceUnavailable": "Indisponible sur cet appareil",
+  "voiceNoLanguage": "Cet appareil n’a pas de voix pour cette langue",
+  "voiceMuted": "Les effets sonores sont coupés",
+  "haptics": "Vibreur"
 }

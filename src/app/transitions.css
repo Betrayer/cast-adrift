@@ -226,6 +226,12 @@
   filter: none;
 }
 
+:root[data-ca-motion='reduced'] .mantine-Loader-root,
+:root[data-ca-motion='reduced'] .mantine-Loader-root::after,
+:root[data-ca-motion='reduced'] .mantine-Loader-root * {
+  animation: none;
+}
+
 :root[data-ca-motion='reduced'] .mantine-SegmentedControl-root {
   --sc-transition-duration: 0ms;
 }

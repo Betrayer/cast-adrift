@@ -1,3 +1,4 @@
+import { seatCount, tableSizeFor } from "@/game/battle/table";
 import type { RolledDie } from "@/types/battle";
 
 export interface RollMarks {
@@ -25,4 +26,30 @@ export const rolledBetween = (state: RollMarks, prev: RollMarks): RolledChange =
     rolled.add(die.uid);
   }
   return { rolled, summoned };
+};
+
+export type SceneChange = "rebuild" | "relayout" | "sync";
+
+export interface SceneMarks {
+  turn: number;
+  ascension: number;
+  enemies: readonly unknown[];
+  slots: Readonly<Record<string, unknown>>;
+  dice: readonly Pick<RolledDie, "uid" | "state" | "seat" | "temp" | "defId">[];
+}
+
+export const sceneChange = (state: SceneMarks, prev: SceneMarks): SceneChange => {
+  if (
+    state.turn !== prev.turn ||
+    state.enemies.length !== prev.enemies.length ||
+    Object.keys(state.slots).length !== Object.keys(prev.slots).length
+  )
+    return "rebuild";
+  if (
+    state.dice !== prev.dice &&
+    seatCount(state.dice, tableSizeFor(state.ascension)) !==
+      seatCount(prev.dice, tableSizeFor(prev.ascension))
+  )
+    return "relayout";
+  return "sync";
 };

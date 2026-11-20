@@ -13,6 +13,7 @@ export const useAchievementCtx = (): AchievementCtx => {
   const codex = useMetaStore((s) => s.codex);
   const seenPuzzles = useMetaStore((s) => s.seenPuzzles);
   const flagsArchive = useMetaStore((s) => s.flagsArchive);
+  const shipMastery = useMetaStore((s) => s.shipMastery);
 
   return useMemo(
     () => ({
@@ -26,6 +27,7 @@ export const useAchievementCtx = (): AchievementCtx => {
       codex,
       seenPuzzles,
       flagsArchive,
+      shipMastery,
       run: null,
     }),
     [
@@ -39,6 +41,7 @@ export const useAchievementCtx = (): AchievementCtx => {
       codex,
       seenPuzzles,
       flagsArchive,
+      shipMastery,
     ],
   );
 };

@@ -7,6 +7,9 @@ export const STAGGER_MS = { list: 45, card: 70 } as const;
 
 export const REDUCED_MS = 160;
 
+export const reducedFade = (ms: number, reduced: boolean): number =>
+  reduced ? Math.min(ms, REDUCED_MS) : ms;
+
 export const MOTION_EASE_CSS = {
   out: 'cubic-bezier(0.33, 1, 0.68, 1)',
   back: 'cubic-bezier(0.34, 1.56, 0.64, 1)',

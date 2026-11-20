@@ -15,6 +15,7 @@ import { MODULE_BY_ID } from "@/data/modules";
 import { MUTATOR_BY_ID, type MutatorMods } from "@/data/mutators";
 import { OFFICER_BY_ID, type OfficerActiveId } from "@/data/officers";
 import { PERK_BY_ID } from "@/data/perks";
+import { SHIP_PERK_SLOT_TIER } from "@/data/perks/ship";
 import type { PerkMods, PerkTrait } from "@/data/perks/types";
 import { RESONANCE_BONUSES, type ResonanceGrant } from "@/data/resonance";
 import { SLOT_FAMILY } from "@/data/slots";
@@ -62,6 +63,7 @@ export const MOD_SLOT: Record<keyof PerkMods, readonly SlotId[]> = {
   xpMultPct: NONE,
   tideEffectDelta: NONE,
   moduleSlotDelta: NONE,
+  firstHitReducePct: SHIELDS,
 };
 
 export const TRAIT_SLOT: Record<PerkTrait, readonly SlotId[]> = {
@@ -83,6 +85,7 @@ export const TRAIT_SLOT: Record<PerkTrait, readonly SlotId[]> = {
   greyIsBlack: NONE,
   firstHitPierce: BATTERIES,
   escapePod: NONE,
+  blackBox: NONE,
   recycler: REACTOR,
   fateTwice: NONE,
   prismDouble: NONE,
@@ -373,7 +376,13 @@ export const sourcesForSlot = (
     const def = PERK_BY_ID.get(id);
     return def === undefined
       ? []
-      : source("perk", id, def.name, true, contentReasons(def, slotId));
+      : source(
+          "perk",
+          id,
+          def.name,
+          true,
+          contentReasons({ ...def, slotTierDelta: SHIP_PERK_SLOT_TIER[id] }, slotId),
+        );
   }),
   ...loadout.chartPicks.flatMap((id) => {
     const node = CHART_NODE_BY_ID.get(id);

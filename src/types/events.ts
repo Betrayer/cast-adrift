@@ -73,7 +73,8 @@ export type EventEffect =
   | { k: "cargo"; id: string }
   | { k: "battleMod"; mod: BattleModKind; n?: number; battles?: number }
   | { k: "nodeMod"; mod: NodeModKind; n?: number }
-  | { k: "shards"; n: number };
+  | { k: "shards"; n: number }
+  | { k: "shipRank"; n: number };
 
 export interface ForcedBattle {
   enemyIds: readonly string[];

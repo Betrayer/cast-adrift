@@ -20,6 +20,7 @@ import {
   type AccountPrefs,
   type BestScores,
   type CollectionEntry,
+  type ShipMasteryXp,
   type DailyRecord,
   type EncounterRecord,
   type MetaStats,
@@ -154,6 +155,19 @@ const coerceShips = (value: unknown, base: readonly ShipId[]): ShipId[] =>
       ]
     : [...base];
 
+const coerceShipMastery = (value: unknown): ShipMasteryXp => {
+  if (typeof value !== 'object' || value === null) return {};
+  const out: ShipMasteryXp = {};
+  for (const [id, entry] of Object.entries(value)) {
+    if (!SHIP_BY_ID.has(id as ShipId)) continue;
+    const xp = (entry as { xp?: unknown } | null)?.xp;
+    if (typeof xp === 'number' && Number.isFinite(xp) && xp > 0) {
+      out[id as ShipId] = { xp: Math.floor(xp) };
+    }
+  }
+  return out;
+};
+
 export const migrateMeta = (
   persisted: unknown,
   fromVersion: number,
@@ -253,6 +267,7 @@ export const migrateMeta = (
     unlocksSeen: coerceStrings(prev.unlocksSeen, base.unlocksSeen),
     dieSkin: isDieSkinId(prev.dieSkin) ? prev.dieSkin : base.dieSkin,
     prefs: coercePrefs(prev.prefs),
+    shipMastery: coerceShipMastery(prev.shipMastery),
     stats:
       typeof prev.stats === 'object' && prev.stats !== null
         ? { ...base.stats, ...(prev.stats as Partial<MetaStats>) }

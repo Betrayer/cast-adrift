@@ -1,9 +1,15 @@
+import { MASTERY_PASSIVE_RANK } from "@/data/shipMastery";
 import { SHIP_BY_ID, type ShipId, type ShipPassive } from "@/data/ships";
 import type { SlotId } from "@/types/battle";
 
 export type PassiveHandlerId = ShipPassive["kind"];
 
 export type PassiveActionId = "fuse" | "reschool";
+
+export type PassiveTier = 1 | 2;
+
+export const passiveTierFor = (masteryRank: number): PassiveTier =>
+  masteryRank >= MASTERY_PASSIVE_RANK ? 2 : 1;
 
 export interface OverCapRule {
   hullCost: number;
@@ -92,14 +98,27 @@ const PROFILES: ReadonlyMap<ShipId, PassiveProfile> = new Map(
   [...SHIP_BY_ID].map(([id, def]) => [id, passiveProfileOf(def.passive)]),
 );
 
-export const shipProfile = (shipId: ShipId | undefined): PassiveProfile =>
-  shipId === undefined ? NONE : (PROFILES.get(shipId) ?? NONE);
+const PROFILES_II: ReadonlyMap<ShipId, PassiveProfile> = new Map(
+  [...SHIP_BY_ID].map(([id, def]) => [
+    id,
+    passiveProfileOf(def.passiveII ?? def.passive),
+  ]),
+);
+
+export const shipProfile = (
+  shipId: ShipId | undefined,
+  tier: PassiveTier = 1,
+): PassiveProfile =>
+  shipId === undefined
+    ? NONE
+    : ((tier === 2 ? PROFILES_II : PROFILES).get(shipId) ?? NONE);
 
 export const overCapAllowed = (
   shipId: ShipId | undefined,
   slotId: SlotId,
+  tier: PassiveTier = 1,
 ): OverCapRule | null => {
-  const rule = shipProfile(shipId).overCap;
+  const rule = shipProfile(shipId, tier).overCap;
   return rule !== null && rule.slots.has(slotId) ? rule : null;
 };
 

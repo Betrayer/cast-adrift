@@ -26,6 +26,7 @@ const groupLabel: Record<CodexGroup, string> = {
   world: "run:codex.world",
   dossier: "run:codex.dossiers",
   forge: "run:codex.forge",
+  fusion: "run:codex.fusion",
   memory: "run:codex.memory",
 };
 

@@ -90,6 +90,10 @@
   z-index: var(--z-hud);
 }
 
+:root[data-ca-compact='1'] .filterBar {
+  max-height: calc(100% - 16px);
+}
+
 .pulse {
   animation: pulse 1.6s ease-in-out infinite;
   transform-box: fill-box;
@@ -240,7 +244,7 @@
 }
 
 .flash {
-  animation: nodeFlash 240ms var(--ca-ease-out) 1;
+  animation: nodeFlash var(--ca-motion-reduced) var(--ca-ease-out) 1;
 }
 
 @keyframes nodeFlash {

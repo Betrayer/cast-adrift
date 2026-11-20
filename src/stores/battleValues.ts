@@ -1,5 +1,6 @@
 import type { EchoNodeId } from "@/data/echo";
 import type { ShipId } from "@/data/ships";
+import type { PassiveTier } from "@/game/battle/passives";
 import { computeCensus } from "@/game/battle/resonance";
 import { BASE_REROLL_SIZE } from "@/game/battle/resolver";
 import type { BattleInit } from "@/game/battle/setup";
@@ -81,6 +82,9 @@ export interface BattleValues {
   sacrificePool: number;
   bloodReactorUsed: boolean;
   passiveUsed: boolean;
+  passiveTier: PassiveTier;
+  firstHitSpent: boolean;
+  blackBoxSpent: boolean;
   burnDoubleUsed: boolean;
   dice: RolledDie[];
   slots: Partial<Record<SlotId, SlotState>>;
@@ -112,6 +116,7 @@ export interface BattleValues {
   pendingSwap: number;
   pendingStorm: number;
   pendingAdds: string[];
+  reinforcements: string[];
   partsDowned: string[];
   ascension: number;
   inverted: boolean;
@@ -232,6 +237,9 @@ export const createInitialBattleValues = (): BattleValues => ({
   sacrificePool: 0,
   bloodReactorUsed: false,
   passiveUsed: false,
+  passiveTier: 1,
+  firstHitSpent: false,
+  blackBoxSpent: false,
   burnDoubleUsed: false,
   dice: [],
   slots: {},
@@ -261,6 +269,7 @@ export const createInitialBattleValues = (): BattleValues => ({
   pendingSwap: 0,
   pendingStorm: 0,
   pendingAdds: [],
+  reinforcements: [],
   partsDowned: [],
   swapSourceUid: null,
   fuseSourceUid: null,

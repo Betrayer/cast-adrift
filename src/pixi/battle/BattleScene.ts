@@ -1,14 +1,15 @@
 import { DEATH_MS, HEAVY_HIT_STOP_MS } from "@/pixi/battle/timing";
-import { Container, Graphics, Sprite, Text, UPDATE_PRIORITY } from "pixi.js";
+import { Container, Graphics, Sprite, Text } from "pixi.js";
 import type { Application, Ticker } from "pixi.js";
 import { publishEnemyNeed, subscribeBodyRect } from "@/app/bands";
-import { fireMotionFlag } from "@/app/motion";
+import { fireMotionFlag, reducedFade } from "@/app/motion";
 import { tapLayerOpen } from "@/app/tapLayer";
 import { flashVignette, sideForX } from "@/services/vignette";
 import { mixHex } from "@/app/color";
 import { onThemeChange, tokens } from "@/app/theme";
 import { seatCount, tableSeats, tableSizeFor } from "@/game/battle/table";
 import { hiddenIntentIds } from "@/game/battle/intentVisibility";
+import { enemySeatCount, enemySeatOf, seatOccupants } from "@/game/battle/seats";
 import { DIE_BY_ID } from "@/data/dice";
 import { FATE_DIE_ID } from "@/data/fate";
 import { ENEMY_BY_ID } from "@/data/enemies";
@@ -34,6 +35,8 @@ import {
 } from "@/pixi/textures";
 import { clearPool, reportPool } from "@/pixi/perf";
 import {
+  noteDragCancel,
+  noteDragDrop,
   setCapturedTarget,
   setDraggedDie,
 } from "@/pixi/battle/dragState";
@@ -43,6 +46,7 @@ import {
   dropTargetSelector,
   publishBattleAnchors,
   publishDieHitTest,
+  publishHaloRead,
   publishSelectionAnchor,
   reserveAnchor,
   reserveWellAt,
@@ -64,13 +68,17 @@ import {
   pulledPoint,
   type DropTarget,
 } from "@/pixi/battle/dropTarget";
-import { rolledBetween } from "@/pixi/battle/rolls";
+import { rolledBetween, sceneChange } from "@/pixi/battle/rolls";
+import { attachSceneTicker } from "@/pixi/battle/sceneTicker";
 import {
   computeBattleLayout,
   enemyBandNeed,
+  stageOrigin,
+  toStageRect,
   type BattleLayout,
   type EnemyBandNeedInput,
   type Rect,
+  type StageOrigin,
 } from "@/pixi/battle/layout";
 import {
   easeOutQuad,
@@ -313,8 +321,8 @@ const isDieLockedNow = (state: BattleState, uid: string): boolean =>
   state.lockedDice.some((l) => l.uid === uid && l.untilTurn >= state.turn);
 
 const maxSubsystemsOf = (state: BattleState): number =>
-  state.enemies.reduce(
-    (most, enemy) => Math.max(most, enemy.subsystems.length),
+  seatOccupants(state.enemies).reduce(
+    (most, index) => Math.max(most, state.enemies[index]?.subsystems.length ?? 0),
     0,
   );
 
@@ -347,7 +355,7 @@ export class BattleScene {
   private readonly fxLayer = new Container();
 
   private layout: BattleLayout;
-  private origin = { left: 0, top: 0 };
+  private origin: StageOrigin = { left: 0, top: 0 };
   private needShape: Omit<EnemyBandNeedInput, "bandWidth"> = {
     enemyCount: 0,
     maxSubsystems: 0,
@@ -387,6 +395,7 @@ export class BattleScene {
   private readonly unsubscribeTheme: () => void;
   private readonly unsubscribeBands: () => void;
   private readonly unsubscribeAnchors: () => void;
+  private readonly detachTicker: () => void;
   private readonly unsubscribeSettings: () => void;
   private readonly motionQuery: MediaQueryList;
   private motionReduced = false;
@@ -438,8 +447,7 @@ export class BattleScene {
     this.unsubscribeSettings = useSettingsStore.subscribe(this.onMotionChange);
     this.motionQuery.addEventListener("change", this.onMotionChange);
     this.app.renderer.on("resize", this.onResize);
-    this.app.ticker.add(this.tick);
-    this.app.ticker.add(this.followHalos, undefined, UPDATE_PRIORITY.LOW + 1);
+    this.detachTicker = attachSceneTicker(this.app.ticker, this.tick, this.followHalos);
     const seated = useBattleStore.getState();
     if (seated.phase === "resolving") {
       this.startResolution(seated);
@@ -468,8 +476,7 @@ export class BattleScene {
     this.motionQuery.removeEventListener("change", this.onMotionChange);
     this.app.stage.position.set(0, 0);
     this.app.renderer.off("resize", this.onResize);
-    this.app.ticker.remove(this.tick);
-    this.app.ticker.remove(this.followHalos);
+    this.detachTicker();
     window.removeEventListener("pointerdown", this.onPointerDown, true);
     window.removeEventListener("pointermove", this.onPointerMove, true);
     window.removeEventListener("pointerup", this.onPointerUp, true);
@@ -492,6 +499,7 @@ export class BattleScene {
     }
     publishBattleAnchors(null);
     publishDieHitTest(null);
+    publishHaloRead(null);
     publishSelectionAnchor(null);
     clearPool("battleFx");
     releaseDieTextures(this.app);
@@ -513,17 +521,11 @@ export class BattleScene {
   }
 
   private readOrigin(): void {
-    const rect = this.app.canvas.getBoundingClientRect();
-    this.origin = { left: rect.left, top: rect.top };
+    this.origin = stageOrigin(this.app.canvas.getBoundingClientRect());
   }
 
   private toStageRect(rect: AnchorRect): Rect {
-    return {
-      x: rect.x - this.origin.left,
-      y: rect.y - this.origin.top,
-      w: rect.w,
-      h: rect.h,
-    };
+    return toStageRect(rect, this.origin);
   }
 
   private shipBand(): Rect | null {
@@ -577,7 +579,7 @@ export class BattleScene {
       dockBand: this.band("dock"),
       shipBand: this.shipBand(),
       diceCount: seatCount(state.dice, tableSizeFor(state.ascension)),
-      enemyCount: state.enemies.length,
+      enemyCount: enemySeatCount(state.enemies),
       maxSubsystems: maxSubsystemsOf(state),
     });
   }
@@ -712,7 +714,7 @@ export class BattleScene {
       .rect(0, 0, this.app.screen.width, this.app.screen.height)
       .fill({ color, alpha: 1 });
     glow.alpha = alpha;
-    this.fxFade(glow, ms, easeOutQuad);
+    this.fxFade(glow, reducedFade(ms, this.reduced()), easeOutQuad);
   }
 
   private announceElites(state: BattleState): void {
@@ -890,10 +892,17 @@ export class BattleScene {
       DEFAULT_BURST;
   }
 
+  private seatPoint(enemyId: string): { x: number; y: number } | undefined {
+    const enemies = useBattleStore.getState().enemies;
+    const index = enemies.findIndex((enemy) => enemy.id === enemyId);
+    const enemy = enemies[index];
+    return enemy === undefined ? undefined : this.layout.enemies[enemySeatOf(enemy, index)];
+  }
+
   private killBurst(enemyId: string, scrap: number): void {
     const view = this.enemyViews.get(enemyId);
-    if (view === undefined) return;
-    const at = { x: view.root.x, y: view.root.y };
+    const at = view === undefined ? this.seatPoint(enemyId) : { x: view.root.x, y: view.root.y };
+    if (at === undefined) return;
     if (this.reduced()) {
       if (scrap > 0) this.spawnNumber(at.x, at.y, `+${String(scrap)}`, tokens.amber);
       return;
@@ -924,6 +933,7 @@ export class BattleScene {
       const at = this.toStagePoint(clientX, clientY);
       return this.dieAt(at.x, at.y);
     });
+    publishHaloRead(() => this.haloLayer.read());
     publishBattleAnchors({
       dice: state.dice.flatMap((die) => {
         const sprite = this.dieSprites.get(die.uid);
@@ -1049,8 +1059,10 @@ export class BattleScene {
       view.root.destroy({ children: true });
     }
     this.enemyViews.clear();
-    state.enemies.forEach((enemy, index) => {
-      const anchor = this.layout.enemies[index];
+    seatOccupants(state.enemies).forEach((index) => {
+      const enemy = state.enemies[index];
+      if (enemy === undefined) return;
+      const anchor = this.layout.enemies[enemySeatOf(enemy, index)];
       if (anchor === undefined) return;
       const size = this.layout.enemySize;
       const root = new Container();
@@ -1506,18 +1518,15 @@ export class BattleScene {
     state: BattleState,
     prev: BattleState,
   ): void => {
-    if (
-      state.turn !== prev.turn ||
-      state.enemies.length !== prev.enemies.length ||
-      Object.keys(state.slots).length !== Object.keys(prev.slots).length
-    ) {
+    const change = sceneChange(state, prev);
+    if (change === "rebuild") {
       if (state.turn !== prev.turn) this.clearDieAnimations();
       this.cancelDrag(state);
       this.rebuild(state);
       if (state.turn === 1 && prev.turn !== 1) this.publishNeed(state);
       if (state.turn !== prev.turn) this.maybeTumble(state);
     } else {
-      if (state.dice !== prev.dice && seatCount(state.dice, tableSizeFor(state.ascension)) !== seatCount(prev.dice, tableSizeFor(prev.ascension))) {
+      if (change === "relayout") {
         this.cancelDrag(state);
         this.relayout();
       }
@@ -1655,7 +1664,7 @@ export class BattleScene {
 
   private publishNeed(state: BattleState): void {
     this.needShape = {
-      enemyCount: state.enemies.length,
+      enemyCount: enemySeatCount(state.enemies),
       maxSubsystems: maxSubsystemsOf(state),
     };
     this.refreshNeed();
@@ -1685,8 +1694,10 @@ export class BattleScene {
 
   private repositionEnemies(): void {
     const state = useBattleStore.getState();
-    state.enemies.forEach((enemy, index) => {
-      const anchor = this.layout.enemies[index];
+    seatOccupants(state.enemies).forEach((index) => {
+      const enemy = state.enemies[index];
+      if (enemy === undefined) return;
+      const anchor = this.layout.enemies[enemySeatOf(enemy, index)];
       const view = this.enemyViews.get(enemy.id);
       if (anchor === undefined || view === undefined) return;
       if (this.dyingEnemies.has(enemy.id)) return;
@@ -1955,7 +1966,9 @@ export class BattleScene {
 
   private readonly onPointerCancel = (): void => {
     this.pendingPress = null;
-    if (this.drag !== null) this.cancelDrag(useBattleStore.getState());
+    if (this.drag === null) return;
+    noteDragCancel();
+    this.cancelDrag(useBattleStore.getState());
   };
 
   private readonly onTouchMove = (event: TouchEvent): void => {
@@ -2142,6 +2155,7 @@ export class BattleScene {
       return;
     }
     this.animating.add(uid);
+    noteDragDrop();
     playSfx("place");
     haptic("place");
     sprite.texture = this.dieTextureFor(die, MINI_DIE_SIZE);
@@ -2160,6 +2174,8 @@ export class BattleScene {
       this.animateReturn(uid, sprite, true);
       return;
     }
+    noteDragDrop();
+    haptic("place");
     const index = state.dice
       .filter((d) => d.state === "reserved")
       .findIndex((d) => d.uid === uid);

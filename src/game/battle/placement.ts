@@ -1,6 +1,6 @@
 import { dieHasGrant } from "@/data/engravings";
 import { overCapAllowed } from "@/game/battle/passives";
-import { TIER_LADDER } from "@/game/dice/tier";
+import { stepTier, TIER_LADDER } from "@/game/dice/tier";
 import { slotMatches } from "@/game/effects/evaluate";
 import type { ExceedCapGrant } from "@/game/effects/types";
 import type {
@@ -10,6 +10,8 @@ import type {
   SlotState,
 } from "@/types/battle";
 import type { DieTier } from "@/types/content";
+
+export const growTier = (tier: DieTier): DieTier => stepTier(tier, 1);
 
 export const shrinkTier = (tier: DieTier): DieTier => {
   const index = TIER_LADDER.indexOf(tier);

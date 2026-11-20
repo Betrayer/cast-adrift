@@ -183,6 +183,7 @@ describe("forging in a run", () => {
     expect(deck[0]?.fusion).toEqual({ level: 1, consumed: ["slug"] });
     expect(useRunStore.getState().scrap).toBe(60);
     expect(useMetaStore.getState().codex).toContain("forge-red");
+    expect(useMetaStore.getState().codex.some((id) => id.startsWith("fusion-"))).toBe(false);
   });
 
   it("refuses a forge the rules do not allow, and one the player cannot pay for", () => {
@@ -207,5 +208,6 @@ describe("forging in a run", () => {
     ).toBe(true);
     expect(useRunStore.getState().deck.map((d) => d.defId)).toEqual(["fused-emberforge"]);
     expect(useRunStore.getState().scrap).toBe(10);
+    expect(useMetaStore.getState().codex).toContain("fusion-fused-emberforge");
   });
 });

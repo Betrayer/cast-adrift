@@ -395,32 +395,44 @@
     "wanderer": {
       "name": "Wanderer",
       "passiveName": "Bergungsgeschirr",
-      "passiveDesc": "Jeder Kampf beginnt mit +2 Schrott."
+      "passiveDesc": "Jeder Kampf beginnt mit +2 Schrott.",
+      "passiveIIName": "Bergungsgeschirr II",
+      "passiveIIDesc": "Jeder Kampf beginnt mit +3 Schrott."
     },
     "ram": {
       "name": "Ramme",
       "passiveName": "Überlast",
-      "passiveDesc": "Ein Waffenslot nimmt einen Würfel über seiner Obergrenze an; jede solche Platzierung kostet 2 Hülle."
+      "passiveDesc": "Ein Waffenslot nimmt einen Würfel über seiner Obergrenze an; jede solche Platzierung kostet 2 Hülle.",
+      "passiveIIName": "Überlast II",
+      "passiveIIDesc": "Ein Waffenslot nimmt einen Würfel über seiner Obergrenze an; jede solche Platzierung kostet 1 Hülle."
     },
     "ark": {
       "name": "Arche",
       "passiveName": "Bollwerk",
-      "passiveDesc": "Ein Viertel des stehenden Schilds wird in die nächste Runde übernommen."
+      "passiveDesc": "Ein Viertel des stehenden Schilds wird in die nächste Runde übernommen.",
+      "passiveIIName": "Bollwerk II",
+      "passiveIIDesc": "Zwei Fünftel des stehenden Schilds werden in die nächste Runde übernommen."
     },
     "corsair": {
       "name": "Hund",
       "passiveName": "Nachbrenner",
-      "passiveDesc": "„Manöver“ ist besonders wirkungsvoll: Streifschuss 7,5 % und Ausweichen 4,5 % je Wert statt 3,5 % und 1,5 %, +8 Evasion und eine Obergrenze von 55/40 statt 25/10. Jeder Streiftreffer oder jedes Ausweichen gewährt im nächsten Zug +1 auf die Waffen, bis zu +2 pro Zug."
+      "passiveDesc": "„Manöver“ ist besonders wirkungsvoll: Streifschuss 7,5 % und Ausweichen 4,5 % je Wert statt 3,5 % und 1,5 %, +8 Evasion und eine Obergrenze von 38/22 statt 25/10. Jeder Streiftreffer oder jedes Ausweichen gewährt im nächsten Zug +1 auf die Waffen, bis zu +2 pro Zug.",
+      "passiveIIName": "Nachbrenner II",
+      "passiveIIDesc": "„Manöver“ läuft so heiß wie bei Nachbrenner, und jeder Streiftreffer oder jedes Ausweichen gewährt im nächsten Zug +1 auf die Waffen, bis zu +3 pro Zug."
     },
     "foundry": {
       "name": "Schmiede",
       "passiveName": "Glühen",
-      "passiveDesc": "Einmal pro Kampf verschmelzen zwei Würfel mit gleichem Wert zu einem Würfel einer höheren Stufe, der beide Werte aufweist."
+      "passiveDesc": "Einmal pro Kampf verschmelzen zwei Würfel mit gleichem Wert zu einem Würfel einer höheren Stufe, der beide Werte aufweist.",
+      "passiveIIName": "Glühen II",
+      "passiveIIDesc": "Einmal pro Kampf verschmelzen zwei Würfel aus der Ablage mit gleichem Wert zu einem Würfel zwei Stufen höher, der beide Werte aufweist."
     },
     "prism": {
       "name": "Prisma",
       "passiveName": "Refraktor",
-      "passiveDesc": "Prismatische Würfel zählen bei der Resonanzzählung doppelt. Einmal pro Kampf wird ein Würfel für diesen Zug prismatisch."
+      "passiveDesc": "Prismatische Würfel zählen bei der Resonanzzählung doppelt. Einmal pro Kampf wird ein Würfel für diesen Zug prismatisch.",
+      "passiveIIName": "Refraktor II",
+      "passiveIIDesc": "Prismatische Würfel zählen bei der Resonanzzählung dreifach. Einmal pro Kampf wird ein Würfel für diesen Zug prismatisch."
     },
     "ram-proto": {
       "name": "Rammen-Prototyp"
@@ -1562,7 +1574,7 @@
       "opt": {
         "race": "Lass sie gegeneinander antreten (Motoren Mk2)",
         "decline": "Winkt ihnen zum Abschied",
-        "bet": "Auf einen Teilnehmer (15) wetten"
+        "bet": "Auf einen Teilnehmer wetten (15)"
       },
       "out": {
         "race": "Deine Motoren fressen die Fahrspur regelrecht auf. Du holst dir den Gewinn und ihren widerwilligen Respekt.",
@@ -1774,9 +1786,9 @@
     "clanToll": {
       "text": "Ein Clan-Ruderboot quert die Fahrspur und bleibt dort stehen. „Die Maut beträgt dreißig. Die Fahrspur gehört in diesem Zyklus uns.“",
       "opt": {
-        "pay": "Die Maut bezahlen",
+        "pay": "Die Maut bezahlen (30)",
         "run": "Lauf die Bahn entlang",
-        "haggle": "Die Maut herunterhandeln"
+        "haggle": "Die Maut herunterhandeln (30)"
       },
       "out": {
         "pay": "Man winkt dich durch und kennzeichnet deinen Rumpf als bezahlt. Die Spur öffnet sich um zwei Reihen weiter hinten.",
@@ -1804,7 +1816,7 @@
     "yusufDebt": {
       "text": "Yusufs Stimme klang monoton und müde: „Du schuldest meiner Bande einen Rumpf. Sechzig, oder wir regeln das auf andere Weise.“",
       "opt": {
-        "settle": "In Schrott verwerten",
+        "settle": "In Schrott verwerten (60)",
         "refuse": "Lehne ihn ab",
         "workItOff": "Die Schulden auf seiner Bahn abarbeiten"
       },
@@ -1844,7 +1856,7 @@
     "hunterTrail": {
       "text": "Eine unverschlüsselte Schmalband-Hagel-Nachricht. Die Huntress liest dir deine Registrierungsdaten Ziffer für Ziffer vor.",
       "opt": {
-        "buyOff": "Sie bestechen",
+        "buyOff": "Sie bestechen (50)",
         "ambushHer": "Dreh dich um und triff sie"
       },
       "out": {
@@ -1882,7 +1894,7 @@
     "beaconRelay": {
       "text": "Ein Relaismast, dessen Antennenanlage zur Hälfte abgerissen ist. Er versucht immer noch, zur vollen Stunde ein Signal auszusenden.",
       "opt": {
-        "repairIt": "Das Array reparieren",
+        "repairIt": "Das Array reparieren (25)",
         "stripIt": "Das Array bereinigen",
         "useKey": "Benutze den Schlüssel des Wächters"
       },
@@ -1952,7 +1964,7 @@
       "text": "Drei Clan-Schiffe, kein Funksignal. Sie warten schon seit der Fahrspur auf dieser Reihe.",
       "opt": {
         "standGround": "Bleib standhaft",
-        "payLate": "Verspätete Zahlung, mit Zinsen",
+        "payLate": "Verspätete Zahlung, mit Zinsen (55)",
         "runForFold": "Lauf zur nächsten Biegung"
       },
       "out": {
@@ -2000,7 +2012,7 @@
     "hunterRespect": {
       "text": "Die Jägerin spricht dich diesmal offen an. „Du hast mich einen Flügel gekostet. Sag, was du willst.“",
       "opt": {
-        "hireHer": "Stell sie ein",
+        "hireHer": "Stell sie ein (40)",
         "warnHer": "Warne sie vor dem Kern"
       },
       "out": {
@@ -2041,7 +2053,7 @@
     "warpedShipyard": {
       "text": "Ein Hof, der sich von selbst fertiggestellt hat, nachdem die Arbeiter gegangen waren. Die Maschinen laufen noch immer.",
       "opt": {
-        "refit": "Für eine Überholung bezahlen",
+        "refit": "Für eine Überholung bezahlen (35)",
         "swapPart": "Lass es ein Teil austauschen",
         "letItFinish": "Lass es sein eigenes Design zu Ende bringen"
       },
@@ -2096,7 +2108,7 @@
     "heretics": {
       "text": "Eine Handvoll Schiffe, bei denen die Hymne von der Außenhaut abgekratzt wurde. Sie haben gehört, dass du dich ebenfalls geweigert hast.",
       "opt": {
-        "armThem": "Rüstet sie aus",
+        "armThem": "Rüstet sie aus (45)",
         "reportThem": "Melde sie",
         "escortThem": "Begleite sie am Wachposten vorbei"
       },
@@ -2160,7 +2172,7 @@
     "choirTithe": {
       "text": "Eine Abgabestelle. Der Chor nimmt Schrott, Rümpfe oder gar nichts an – und bewertet alle drei Optionen fair.",
       "opt": {
-        "tithe": "Zehnte in Altmetall",
+        "tithe": "Zehnte in Altmetall (50)",
         "bleed": "Zehnte in Hull",
         "declineTithe": "Rückgang"
       },
@@ -2190,7 +2202,7 @@
       "opt": {
         "shelter": "Gib ihr Unterschlupf",
         "handOver": "Gib sie her",
-        "giveFuel": "Gib ihr Treibstoff und einen Kurs"
+        "giveFuel": "Gib ihr Treibstoff und einen Kurs (20)"
       },
       "out": {
         "shelter": "Innerhalb einer Stunde hat sie sich den Weg nach drinnen verdient und liest die Routenführung des Chors wie eine Landkarte.",
@@ -2295,7 +2307,7 @@
     "brokenLighthouse": {
       "text": "Ein Leuchtturm, den niemand gebaut hat, und der zum ersten Mal seit vierzig Jahren im Dunkeln steht.",
       "opt": {
-        "relight": "Zünde es wieder an",
+        "relight": "Zünde es wieder an (60)",
         "harvestLens": "Nimm das Objektiv",
         "reactorLight": "Zünde es mit deinem eigenen Reaktor an"
       },
@@ -2338,7 +2350,7 @@
     "lastMarket": {
       "text": "Mara hat sich auf einem Wrack am Rande des Kerns niedergelassen. „Der letzte Vorrat in diesem Sektor, Captain.“",
       "opt": {
-        "buyOut": "Sie aus dem Geschäft kaufen",
+        "buyOut": "Sie aus dem Geschäft kaufen (90)",
         "sellShip": "Verkauf ihr deine Beschichtung",
         "walkPast": "Vorbei gehen",
         "haul": "Die Kiste unter ihrem Tresen nehmen"
@@ -2364,7 +2376,7 @@
     "maraCollector": {
       "text": "Nicht Mara – ihr Inkassobeauftragter. Er hat die Seite mit deinem Namen und kein Interesse an einem Gespräch.",
       "opt": {
-        "settleDebt": "Bezahlen",
+        "settleDebt": "Bezahlen (45)",
         "outrun": "Ihm davonlaufen",
         "callFavour": "Lass sie den Gefallen einlösen, den sie dir schuldet"
       },
@@ -2439,7 +2451,7 @@
     "coldEngine": {
       "text": "Eine Antriebseinheit, die seit Jahrzehnten kalt ist und immer noch an einem halben Rumpf verschraubt ist.",
       "opt": {
-        "warmIt": "Wärme es auf",
+        "warmIt": "Wärme es auf (20)",
         "gutIt": "Ausweiden",
         "coax": "Bring ihn mit kleinen Würfeln in Gang"
       },
@@ -2493,8 +2505,8 @@
     "driftAuction": {
       "text": "Mara’s Auktion, die von einer Lastkahnrampe aus stattfindet. Zwei Lose, eine Menschenmenge, keine Quittungen.",
       "opt": {
-        "bidHigh": "Hoch bieten",
-        "bidLow": "Biete niedrig",
+        "bidHigh": "Hoch bieten (70)",
+        "bidLow": "Biete niedrig (25)",
         "heckle": "Die Auktion stören"
       },
       "out": {
@@ -2533,7 +2545,7 @@
     "maraUsurer": {
       "text": "Dort, wo eigentlich Maras Ladentheke stehen sollte, hängen eine Pfandrechtsanzeige und ein Rumpf von der Größe einer Kapelle. Der Wucherer verwaltet nun ihre Schulden – sie hat das Buch verkauft, um die Kosten zu decken, die du ihr verursacht hast. „Kapital, Zinsen und die Unannehmlichkeiten“, steht dort.",
       "opt": {
-        "payInFull": "Bezahlen Sie den gesamten Betrag",
+        "payInFull": "Bezahlen Sie den gesamten Betrag (90)",
         "fightIt": "Ablehnen und Position halten",
         "runTheLane": "Lauf die Bahn entlang"
       },
@@ -2600,7 +2612,7 @@
     "keeperThread": {
       "text": "Die Nachricht des Wächters erreicht dich zwischen zwei Leuchtfeuern. „Du hast meine Arbeit erledigt. Ich weiß nicht, ob ich dir danken oder dir eine Rechnung stellen soll. Apropos – was willst du damit erreichen?“",
       "opt": {
-        "repayHim": "Bezahle ihm, was du ihm schuldest",
+        "repayHim": "Bezahle ihm, was du ihm schuldest (40)",
         "askMore": "Frag ihn nach mehr",
         "handTheLog": "Gib ihm dein Beacon-Protokoll"
       },
@@ -2630,7 +2642,7 @@
     "tugStrike": {
       "text": "Elf Schlepper hielten quer über die Fahrbahn ihre Position, die Motoren waren kalt, und die Transponder zeigten immer dieselben drei Worte an: NOT UNTIL PAID.",
       "opt": {
-        "payThem": "Zahlt in den Streikfonds ein",
+        "payThem": "Zahlt in den Streikfonds ein (40)",
         "crossPicket": "Die Grenze überschreiten",
         "haulForThem": "Fahre eine Ladung für sie"
       },
@@ -2657,7 +2669,7 @@
     "driftSchool": {
       "text": "Jemand hat in einem ausgebrannten Frachter eine Schule betrieben. Neun Kinder, ein sehr erschöpfter Erwachsener und ein Lehrplan, bei dem es hauptsächlich darum geht, in einem Driftfeld nicht ums Leben zu kommen.",
       "opt": {
-        "donate": "Gebt ihnen Vorräte",
+        "donate": "Gebt ihnen Vorräte (25)",
         "teachThem": "Eine Unterrichtsstunde halten",
         "takeTheFreighter": "Erobert den Kern des Frachters"
       },
@@ -2698,7 +2710,7 @@
     "manifestAuction": {
       "text": "Eine öffentliche Auktion für eine Frachtliste, die noch niemand gesehen hat. Drei Bieter, und einer von ihnen bietet in einer Flottenskrip-Währung, die seit vierzig Jahren kein Zahlungsmittel mehr ist.",
       "opt": {
-        "bidHigh": "Überbiete sie alle",
+        "bidHigh": "Überbiete sie alle (55)",
         "backScript": "Unterstützen Sie den Flottenbieter",
         "jamAuction": "Die Auktion blockieren",
         "haul": "Das unverkaufte Los in Kommission nehmen"
@@ -2742,7 +2754,7 @@
       "text": "Zwei Seilzieher haben ein Seil über eine Lücke gespannt und wetten darauf, wer es schneller überqueren kann, ohne es zu durchtrennen. Es ist noch Platz für einen Dritten.",
       "opt": {
         "race": "Nimm den dritten Platz ein",
-        "bet": "Setzen Sie auf den älteren Lkw",
+        "bet": "Setzen Sie auf den älteren Lkw (20)",
         "cutTether": "Schneide die Leine durch und los geht’s"
       },
       "out": {
@@ -2756,7 +2768,7 @@
     "yusufApprentice": {
       "text": "Yusufs Lehrling spricht dich unter vier Augen an. „Er wird nicht fragen, also frage ich. Es gibt ein Teil, das er braucht, und einen Hof, der es ihm nicht verkaufen will.“",
       "opt": {
-        "buyIt": "Kauf es über deine Wunschliste",
+        "buyIt": "Kauf es über deine Wunschliste (45)",
         "stealIt": "Nimm es vom Hof",
         "tellHim": "Sag Yusuf, dass sein Lehrling gefragt hat"
       },
@@ -2770,7 +2782,7 @@
     "iceLighter": {
       "text": "Ein Eisbrecher, der immer noch unter Antrieb steht und noch leer ist. Sein Autopilot fährt seit der Zeit vor dem „Cut“ dieselbe Lieferroute und wurde noch nie angewiesen, anzuhalten.",
       "opt": {
-        "loadIt": "Lade es und lass es laufen",
+        "loadIt": "Lade es und lass es laufen (20)",
         "boardIt": "Abbeizen und abschleifen",
         "stopIt": "Gib den Stoppbefehl"
       },
@@ -2947,7 +2959,7 @@
     "riftPilotage": {
       "text": "Eine halb verbrannte Tafel der Pilotenvereinigung, auf der immer noch die Tarife für Flugstrecken aufgeführt sind, die sich jedes Jahr anders gestalten. Jemand hat sie von Hand auf dem neuesten Stand gehalten.",
       "opt": {
-        "hirePilot": "Einen Piloten engagieren",
+        "hirePilot": "Einen Piloten engagieren (35)",
         "readBoard": "Lies einfach das Forum",
         "takeBoard": "Nimm das Brett"
       },
@@ -2976,7 +2988,7 @@
       "opt": {
         "sendBack": "Bestell sie zurück",
         "useThem": "Setzt sie ein",
-        "armThem": "Rüstet sie aus und haltet die Spur"
+        "armThem": "Rüstet sie aus und haltet die Spur (50)"
       },
       "out": {
         "sendBack": "Sie streiten sich vier Minuten lang und gehen dann. Beim Weggehen lässt jemand eine Ersatzpumpe auf deinem Steg zurück.",
@@ -2989,7 +3001,7 @@
       "text": "Der Käufer hat die Bestellungen entgegengenommen. Er trägt jetzt „Choir Grey“ und hat deine Geschenkeliste immer noch auf dem Handrücken notiert.",
       "opt": {
         "dealAnyway": "Kümmere dich trotzdem um ihn",
-        "buyBackName": "Kaufen Sie Ihre Registrierung zurück",
+        "buyBackName": "Kaufen Sie Ihre Registrierung zurück (60)",
         "readOrders": "Lies seine Anweisungen"
       },
       "out": {
@@ -3085,7 +3097,7 @@
       "text": "Jemand zählt die Schiffe der Flotte, ein Schiff nach dem anderen, und das schon seit elf Jahren. Es fehlen vierhundert, und man will nicht sagen, welche.",
       "opt": {
         "helpCount": "Hilfe beim Zählen",
-        "buyCount": "Die Zählung kaufen",
+        "buyCount": "Die Zählung kaufen (45)",
         "tellTruth": "Sag ihnen, wohin die vierhundert verschwunden sind"
       },
       "out": {
@@ -3098,7 +3110,7 @@
       "text": "Ein Akolyth befördert Pilger in einem Schiff, das die Hin- und Rückfahrt nicht überstehen wird, durch eine tote Zone – und er weiß das.",
       "opt": {
         "takeThemOver": "Bringen Sie sie selbst mit der Fähre hin",
-        "buyHull": "Kauf ihm den Rumpf ab",
+        "buyHull": "Kauf ihm den Rumpf ab (40)",
         "letItGo": "Er soll die Überfahrt wagen"
       },
       "out": {
@@ -3126,7 +3138,7 @@
       "opt": {
         "thankThem": "Bedanke dich bei ihnen und geh hinein",
         "sendThemOff": "Sie aus der Reihe weisen",
-        "armThemAgain": "Gib ihnen alles, was du entbehren kannst"
+        "armThemAgain": "Gib ihnen alles, was du entbehren kannst (60)"
       },
       "out": {
         "thankThem": "Sie werden so lange durchhalten, wie sie können. Alle Beteiligten wissen, was das bedeutet.",
@@ -3206,7 +3218,7 @@
       "opt": {
         "takeThemHome": "Nimm sie heraus",
         "singWithThem": "Singt mit ihnen mit",
-        "giveThemEngines": "Gebt ihnen Motoren"
+        "giveThemEngines": "Gebt ihnen Motoren (70)"
       },
       "out": {
         "takeThemHome": "Neun davon passen hinein, wenn man die Aussparung halbiert. Man halbiert die Aussparung.",
@@ -3243,9 +3255,9 @@
     "lastYard": {
       "text": "Im Schatten des Core hat sich ein Hof angesiedelt, der von Menschen betrieben wird, die hierhergekommen sind, um zu arbeiten, und keinen Grund fanden, wieder wegzugehen.",
       "opt": {
-        "refitHere": "Hier umrüsten",
+        "refitHere": "Hier umrüsten (50)",
         "warnThem": "Sag ihnen, sie sollen gehen",
-        "hireCrew": "Stell bei denen eine Crew ein"
+        "hireCrew": "Stell bei denen eine Crew ein (35)"
       },
       "out": {
         "refitHere": "Sie arbeiten schnell und gut, und niemand fragt, was man dort drinnen vorhat.",
@@ -3257,9 +3269,9 @@
     "thresholdMarket": {
       "text": "Direkt an der Schwelle betreibt jemand einen Stand. Nicht Mara – aber die Preise stammen von ihr, ebenso wie die Handschrift auf der Tafel.",
       "opt": {
-        "buyEverything": "Den gesamten Stand kaufen",
+        "buyEverything": "Den gesamten Stand kaufen (85)",
         "askWhose": "Frag, wessen Handschrift das ist",
-        "leaveStock": "Hinterlassen Sie Ihren eigenen Beitrag"
+        "leaveStock": "Hinterlassen Sie Ihren eigenen Beitrag (30)"
       },
       "out": {
         "buyEverything": "Das ist kein richtiger Verkaufsstand. Was dort ausgestellt ist, ist der letzte Lagerbestand, den hier noch jemand abholen wird.",
@@ -3315,9 +3327,9 @@
     "debtorsHull": {
       "text": "Ein Schiff, auf dem drei Pfandrechte lasten, und ein sehr erschöpfter Eigner, der gehört hat, dass Sie die Schulden begleichen.",
       "opt": {
-        "clearOne": "Ein Pfandrecht aufheben",
-        "buyTheHull": "Den Rumpf direkt kaufen",
-        "buyTheDebt": "Kaufen Sie stattdessen die Schuld",
+        "clearOne": "Ein Pfandrecht aufheben (35)",
+        "buyTheHull": "Den Rumpf direkt kaufen (60)",
+        "buyTheDebt": "Kaufen Sie stattdessen die Schuld (25)",
         "walkOn": "Die Pfandrechte liegen lassen"
       },
       "out": {
@@ -3347,7 +3359,7 @@
       "opt": {
         "readIt": "Lies die Petition",
         "takeThem": "Nehmt sie an Bord",
-        "sendThemOn": "Schickt sie an einen sichereren Ort"
+        "sendThemOn": "Schickt sie an einen sichereren Ort (30)"
       },
       "out": {
         "readIt": "Sie wollen mit dir kommen. Alle vier. In dem Dokument werden auf zwei Seiten die Gründe dafür aufgeführt.",
@@ -3360,7 +3372,7 @@
       "opt": {
         "letItSing": "Lass es übertragen",
         "scrubName": "Bereinige deine Registrierungsdatenbank",
-        "boostIt": "Den Sender verstärken"
+        "boostIt": "Den Sender verstärken (30)"
       },
       "out": {
         "letItSing": "Jedes Raumschiff in diesem Sektor weiß nun, wo die Route sicher ist und wer dafür gesorgt hat.",
@@ -3372,7 +3384,7 @@
       "text": "Die Flut setzt hier früh ein und fließt durch ein Wrackfeld, wodurch das gesamte Gebiet wie ein einziger riesiger, instabiler Würfel wirkt.",
       "opt": {
         "rideSmall": "Probier’s mal mit kleinen Würfeln aus",
-        "waitItOut": "Abwarten",
+        "waitItOut": "Abwarten (20)",
         "pushThrough": "Einfach geradeaus weiterfahren"
       },
       "out": {
@@ -3401,7 +3413,7 @@
       "opt": {
         "nameThem": "Gib dem Körper einen Namen",
         "joinWake": "Bleibt zur Totenwache",
-        "takeTheHull": "Kauf ihnen den Rumpf ab"
+        "takeTheHull": "Kauf ihnen den Rumpf ab (40)"
       },
       "out": {
         "nameThem": "Du nimmst eine Registrierungsnummer von der Rumpfplatte ab und liest sie vor. Neun Personen nehmen sie sofort und dankbar entgegen.",
@@ -3449,7 +3461,7 @@
     },
     "foldedYard": {
       "text": "Maras Stand ist hier. Das sollte eigentlich nicht sein – du hast sie um neunzehn Sprünge und eine Darbietung zurückgelassen. Sie füllt ihren Vorrat wieder auf, und zwar ziemlich chaotisch, aus Kisten, die immer wieder ankommen, bevor sie sie überhaupt bestellt hat.",
-      "trade": "Rumpf-Arbeit kaufen (60 Schrott)",
+      "trade": "Rumpf-Arbeit kaufen (60)",
       "tradeOut": "Sie schweißt eine Platte, die sie, wie sie sagt, letzte Woche bei dir gekauft hat. Die Platte ist in Ordnung. Du bezahlst und stellst den Kalender nicht in Frage.",
       "ask": "Frag sie, wie sie hierhergekommen ist",
       "askOut": "„Genauso wie du. Jemand hat mich gebeten, zu bleiben, und ich habe zugesagt.“ Sie flickt dich kostenlos und vermerkt in deinem Kontobuch jede weitere Meile ab hier als offen.",
@@ -3789,10 +3801,10 @@
       },
       "opt": {
         "swapRail": "Leg dein schlechtestes Teil auf die Tauschleiste",
-        "buyChart": "Eine Fahrspurübersicht kaufen",
+        "buyChart": "Eine Fahrspurübersicht kaufen (30)",
         "tellStory": "Verkaufe die Geschichte deines letzten Kampfes",
         "liftCrate": "Eine Kiste mitgehen lassen, während die Stände beschäftigt sind",
-        "standRound": "Dem ganzen Markt eine Runde ausgeben"
+        "standRound": "Dem ganzen Markt eine Runde ausgeben (20)"
       },
       "out": {
         "swapRail": "Die Schiene nimmt deinen schlimmsten Kern und gibt dir den eines Fremden zurück – plus zehn für den Massenunterschied.",
@@ -3811,7 +3823,7 @@
       "text": "Ein Clan-Schlepper passt sich deiner Drift an und bietet den ältesten Vertrag in den Drift-Feldern an: Wenn deine Motoren hier ausfallen, schleppen sie dich nach Hause. Im Gegenzug kommst du, wenn sie dich rufen. Niemand hat die Bedingungen jemals schriftlich festgehalten. Niemand musste das jemals tun.",
       "opt": {
         "pledge": "Gib das Versprechen ab",
-        "payDeposit": "Bezahl stattdessen fürs Abschleppen",
+        "payDeposit": "Bezahl stattdessen fürs Abschleppen (35)",
         "inspectTug": "Schau dir zuerst ihren Schlepper an",
         "stripTug": "Nimm ihr Kabel und hau ab"
       },
@@ -3835,7 +3847,7 @@
       },
       "opt": {
         "comeWhenCalled": "Komm, wenn du gerufen wirst",
-        "sendScrap": "Schick lieber Schrott statt dich selbst",
+        "sendScrap": "Schick lieber Schrott statt dich selbst (40)",
         "passToYusuf": "Leite den Anruf an Yusufs Konvoi weiter",
         "letItGo": "Lass den Anruf einfach laufen"
       },
@@ -3853,7 +3865,7 @@
     "mineShepherd": {
       "text": "Eine alte Frau in einem Hardsuit treibt eine Herde von Minen vor sich her. Sie stößt jede einzelne mit einem Bootshaken an, nennt sie bei dem Namen, den ihre Großmutter ihr gegeben hat, und sorgt dafür, dass die Herde nicht in die Fahrspur driftet. Sie hat bemerkt, dass du dich in der Fahrspur befindest.",
       "opt": {
-        "hireHer": "Bezahl sie dafür, dass sie dich hindurchlotst",
+        "hireHer": "Bezahl sie dafür, dass sie dich hindurchlotst (25)",
         "learnNames": "Lerne die Namen und geh es langsam an",
         "cullFlock": "Die Herde wegen der Gehäuse ausdünnen",
         "waitOut": "Motoren abstellen und die Herde vorbeiziehen lassen"
@@ -3896,9 +3908,9 @@
     "inheritedLedger": {
       "text": "Ein gepflegtes kleines Boot an einem Clan-Liegeplatz, zu einem Drittel seines Wertes angeboten. Der Verkäufer ist sehr interessiert und wirft immer wieder einen Blick auf die Spur. Der Haken sitzt fest am Steuermannssitz: das Schiffsbuch. In den Drift-Feldern gehört das Schiffsbuch zum Rumpf, und dieses hier hat Schulden bei drei Clans.",
       "opt": {
-        "honourLedger": "Kauf es und begleich die Rechnung",
-        "burnLedger": "Kauf den Rumpf, verbrenn das Buch",
-        "readLedger": "Lies das Schiffsbuch, bevor du kaufst",
+        "honourLedger": "Kauf es und begleich die Rechnung (50)",
+        "burnLedger": "Kauf den Rumpf, verbrenn das Buch (25)",
+        "readLedger": "Lies das Schiffsbuch, bevor du kaufst (15)",
         "tipClans": "Sagt den Clans, wer verkauft"
       },
       "out": {
@@ -3923,7 +3935,7 @@
         "echoName": "Nenne ihm Echos Namen",
         "fleetName": "Gib ihm einen Namen aus der Blackbox",
         "falseName": "Gib ihm eine falsche",
-        "offerScrap": "Schrott trotzdem anbieten"
+        "offerScrap": "Schrott trotzdem anbieten (30)"
       },
       "out": {
         "ownName": "Er schreibt ihn mit Kreide, die nicht abgeht, an die Konvoitafel. Die Route, die er dir zurückgibt, reicht für drei Reihen.",
@@ -3946,7 +3958,7 @@
         "l3": "Ich werde dir nicht vorschreiben, was du tun sollst, Kapitän. Ich werde einfach ganz still sein, bis du es tust."
       },
       "opt": {
-        "buyMind": "Den Geist von der Anlage freikaufen",
+        "buyMind": "Den Geist von der Anlage freikaufen (45)",
         "echoTalks": "Lass Echo mit ihm sprechen",
         "pullCore": "Zieh den Kern selbst heraus",
         "letItRest": "Lass es in Ruhe auf sich beruhen",
@@ -4012,8 +4024,8 @@
         "l3": "Das habe ich gehört. Bei dieser Tiefe höre ich alles doppelt."
       },
       "opt": {
-        "buyNow": "Bei dieser Mara kaufen",
-        "waitForSale": "Auf den Räumungsverkauf warten",
+        "buyNow": "Bei dieser Mara kaufen (40)",
+        "waitForSale": "Auf den Räumungsverkauf warten (20)",
         "playBoth": "Spiele eine Mara gegen die andere aus",
         "warnHer": "Zeig ihr das Zeichen",
         "robLater": "Den späteren Stand ausrauben"
@@ -4039,7 +4051,7 @@
       },
       "opt": {
         "joinRing": "Lass den Ring durch dich hindurchfließen",
-        "buyPacket": "Kauf das Päckchen, das sie bewachen",
+        "buyPacket": "Kauf das Päckchen, das sie bewachen (30)",
         "askLane": "Bitte sie um eine freie Spur",
         "netRing": "Den Ring mit dem Netz fangen und die Drohnen verkaufen"
       },
@@ -4104,7 +4116,7 @@
       },
       "opt": {
         "foldSignals": "Die beiden Signale zu einem zusammenführen",
-        "payUpkeep": "Die Kosten für die Instandhaltung der Boje übernehmen",
+        "payUpkeep": "Die Kosten für die Instandhaltung der Boje übernehmen (35)",
         "recordEcho": "Den Echo-Kanal aufzeichnen",
         "cutBuoy": "Schneide die Boje los und verkaufe sie"
       },
@@ -4147,7 +4159,7 @@
       "text": "Ein Vermessungstrupp hat drei Bojen am Rand des Schwarzen Lochs verankert und vermisst es mit einer Geduld, die sehr nach Angst aussieht. Die Leiterin winkt dich längsseits. „Jeder, der hier durchkommt, fliegt entweder hinein oder außen herum. Wir wüssten gern, was von beidem, und warum.“",
       "opt": {
         "lendSensors": "Ihnen Sensorzeit leihen",
-        "buyTables": "Eine Kopie ihrer Vermessung kaufen",
+        "buyTables": "Eine Kopie ihrer Vermessung kaufen (30)",
         "doctorReading": "Ihnen frisierte Messwerte verkaufen",
         "shareLog": "Ihnen das Logbuch von morgen zeigen",
         "warnThemOff": "Ihnen raten, die Anker zu lichten"
@@ -4169,7 +4181,7 @@
       "text": "Der Vermessungstrupp vom Rand des Schwarzen Lochs hat dich wiedergefunden. Alle drei Bojen sind herausgekommen, und die Leiterin ebenfalls, mit einer Kopie ihrer Messungen und einer Meinung über dich.",
       "opt": {
         "claimShare": "Deinen Anteil an der Vermessung fordern",
-        "settleUp": "Ersetzen, was deine Messwerte sie gekostet haben",
+        "settleUp": "Ersetzen, was deine Messwerte sie gekostet haben (40)",
         "tradeCharts": "Karten tauschen, sonst nichts",
         "askHorizon": "Fragen, was der Horizont ihnen gezeigt hat"
       },
@@ -4214,7 +4226,7 @@
         "sweepCores": "Die glatten Kerne einsammeln",
         "studyBite": "Das Bissmuster untersuchen",
         "baitIt": "Anködern, was hier frisst",
-        "leaveOffering": "Eine Opfergabe im Kreis lassen",
+        "leaveOffering": "Eine Opfergabe im Kreis lassen (25)",
         "checkTheLog": "Im Logbuch von morgen nachsehen"
       },
       "out": {
@@ -4258,7 +4270,7 @@
       "opt": {
         "pullFromFire": "Würfel aus dem Feuer ziehen",
         "feedPyre": "Ihm deinen schwächsten Würfel geben",
-        "buyAsh": "Einen Sack Asche kaufen",
+        "buyAsh": "Einen Sack Asche kaufen (35)",
         "dousePyre": "Das Feuer löschen",
         "leaveIt": "Weiterbrennen lassen"
       },
@@ -4282,7 +4294,7 @@
         "l2": "Ich kann uns etwa neunzig Sekunden in seinem Kielwasser halten, bevor es uns bemerkt, Kapitän. Danach wird daraus ein Gespräch."
       },
       "opt": {
-        "buyHerName": "Die Nummer bei seiner Ersten Stimme kaufen",
+        "buyHerName": "Die Nummer bei seiner Ersten Stimme kaufen (50)",
         "pullHerOut": "Reinfliegen und sie holen",
         "oneMessage": "Sie eine Nachricht senden lassen",
         "turnAway": "Den Scanner abschalten"
@@ -4354,7 +4366,7 @@
         "reciteLine": "Die nächste Zeile aufsagen",
         "sisterRecites": "Vier-Eins-Zwei antworten lassen",
         "bluffIt": "Eine Zeile erfinden",
-        "payToll": "Den Schweigezoll zahlen",
+        "payToll": "Den Schweigezoll zahlen (40)",
         "forceGate": "Das Tor aufbrechen"
       },
       "out": {
@@ -4419,9 +4431,9 @@
         "l2": "Die Stempel sind echt, Kapitän. Ich habe es geprüft. Woher sie die hat, weiß ich nicht, und dabei würde ich es gern belassen."
       },
       "opt": {
-        "buyIndulgence": "Einen Ablass kaufen",
-        "friendPrice": "Freundschaftspreis erbitten",
-        "settleOld": "Klären, was zwischen euch steht",
+        "buyIndulgence": "Einen Ablass kaufen (45)",
+        "friendPrice": "Freundschaftspreis erbitten (15)",
+        "settleOld": "Klären, was zwischen euch steht (30)",
         "reportHer": "Sie beim Chor anzeigen"
       },
       "out": {
@@ -4438,7 +4450,7 @@
     "blessedLane": {
       "text": "Eine Ordnerin der Prozession funkt dich an einer Gabelung an. Eine Bahn ist gesegnet, die andere verflucht, und gegen eine Gebühr trägt sie deine Registrierung in die ein, die du willst.",
       "opt": {
-        "payBlessing": "Für die gesegnete Bahn bezahlen",
+        "payBlessing": "Für die gesegnete Bahn bezahlen (40)",
         "takeCursed": "Um die verfluchte Bahn bitten",
         "writeItYourself": "Den Eintrag selbst schreiben"
       },
@@ -4505,7 +4517,7 @@
         "holdEdge": "Ihn bitten, an der Grenze ein Licht brennen zu lassen",
         "takeGunners": "Seine zwei besten Kanoniere an Bord nehmen",
         "collectLane": "Fragen, was die Kolonne dir hinterlassen hat",
-        "squarePinch": "Die Kosten der Engstelle erstatten"
+        "squarePinch": "Die Kosten der Engstelle erstatten (50)"
       },
       "out": {
         "sendHome": "Er widerspricht genau eine Minute lang, dann dreht er Richtung Rand ab und lässt seine Ersatzpanzerung an deiner Andockklammer zurück.",
@@ -4527,9 +4539,9 @@
         "l2": "Dein Schiff hat Meinungen. Das kostet Aufpreis."
       },
       "opt": {
-        "payIt": "Eigenes Kopfgeld zahlen",
+        "payIt": "Eigenes Kopfgeld zahlen (60)",
         "settleIt": "Es auf die alte Art regeln",
-        "hireHer": "Sie für den letzten Flug anheuern",
+        "hireHer": "Sie für den letzten Flug anheuern (30)",
         "counterBounty": "Kopfgeld auf den Kern aussetzen"
       },
       "out": {
@@ -4622,7 +4634,7 @@
         "l2": "Sie hat bessere Daten über dieses Loch als ich. Das kränkt mich persönlich."
       },
       "opt": {
-        "buyLog": "Eine Kopie ihres Logbuchs kaufen",
+        "buyLog": "Eine Kopie ihres Logbuchs kaufen (40)",
         "throwProbe": "Eine Sonde mit deiner Registrierung hineinwerfen",
         "fishShards": "Ihr helfen, Kernsplitter vom Rand zu fischen",
         "warnHer": "Ihr raten, zu verschwinden, solange sie kann"
@@ -4642,7 +4654,7 @@
       "text": "Der Stand auf deiner Karte ist eine Stunde vor deiner Ankunft kollabiert. Wo er stand, tobt ein Kampf, der noch immer andauert, und die Händlerin steckt mittendrin — eingeschlossen in ihrem eigenen Frachtcontainer, von wo sie auf einem offenen Band jedem ein Gebot macht, der sie herausholt.",
       "opt": {
         "cutHerOut": "Sie herausschneiden",
-        "tradeThroughHatch": "Durch die Luke handeln, mitten im Kampf",
+        "tradeThroughHatch": "Durch die Luke handeln, mitten im Kampf (30)",
         "leaveHer": "Sie sich selbst überlassen"
       },
       "out": {
@@ -4688,7 +4700,7 @@
         "l3": "Also. Zahl, lauf oder erzähl mir etwas, das ich nicht weiß."
       },
       "opt": {
-        "buyOut": "Eigenes Kopfgeld ablösen (50 Schrott)",
+        "buyOut": "Eigenes Kopfgeld ablösen (50)",
         "countersign": "Es auf den Aussteller gegenzeichnen",
         "callFavor": "Den geschuldeten Gefallen einfordern",
         "outrun": "Fliehen, bevor ihre Triebwerke warm sind"
@@ -5224,7 +5236,7 @@
         "commission": "Das Meisterwerk in Auftrag geben (45)",
         "steadyCore": "Den Rohkern halten, während sie schleift",
         "quickCut": "Heute einen Schliff kaufen (30)",
-        "callTheTow": "An das Abschleppen erinnern"
+        "callTheTow": "An das Abschleppen erinnern (20)"
       },
       "out": {
         "commission": "Sie schreibt deine Registrierung mit Kreide auf die Werkbank, über alle anderen. „Zwei Sektoren. Stirb nicht.“",
@@ -6369,7 +6381,7 @@
     },
     "15": {
       "name": "Singularität",
-      "desc": "Jeder Boss erhält ein weiteres Teil. Die Flut erreicht ihren Höchststand eine Stufe tiefer, und kein Durchflug durch ein Schwarzes Loch ist mehr stabil."
+      "desc": "Jeder Boss erhält ein weiteres Teil. Die Flut erreicht ihren Höchststand noch eine Stufe höher, und kein Durchflug durch ein Schwarzes Loch ist mehr stabil."
     }
   },
   "prologue": {
@@ -7295,16 +7307,16 @@
     "yusuf12": "Yusuf: „Ruh dich hier so lange aus, wie du möchtest. Der Rand läuft dir nicht weg.“",
     "yusuf13": "Yusuf: „Billige Reparaturen kosten doppelt so viel. Das wirst du irgendwann noch lernen.“",
     "yusuf14": "Yusuf: „Na los dann. Ich will diesen Rumpf nicht noch einmal sehen.“",
-    "keeper1": "Der Wächter: „Ihr seid das dritte Schiff in diesem Zyklus. Die anderen beiden haben nicht angehalten.“",
-    "keeper2": "Der Wächter: „Ich kümmere mich um die Beleuchtung. Irgendjemand muss ja sagen, wo die Grenzen liegen.“",
-    "keeper3": "Der Wächter: „Die Flotte ist hier singend vorbeigefahren. Das steht im Logbuch.“",
-    "keeper4": "Der Wächter: „Leuchtfeuer weisen nicht den Weg. Sie sind Zeugen.“",
-    "keeper5": "Der Wächter: „Ich zähle die Jahre nicht mehr. Ich zähle die Male, die ich die Zigarette wieder anzünde.“",
-    "keeper6": "Der Wächter: „Antworte den Leuchtfeuern, und der Sektor antwortet zurück. Irgendwann.“",
-    "keeper7": "Der Wächter: „Nimm den Messwert. Nimm nicht die Lampe.“",
-    "keeper8": "Der Wächter: „Alles, was der Rand verschlingt, hat ein Leuchtfeuer zuerst gesehen.“",
-    "keeper9": "Der Wächter: „Ich gehörte mal zur Besatzung. Das Schiff ist technisch gesehen immer noch da draußen.“",
-    "keeper10": "Der Wächter: „Wenn du zum Kern gelangst, sag ihm, dass jemand das Licht angelassen hat.“",
+    "keeper1": "„Ihr seid das dritte Schiff in diesem Zyklus. Die anderen beiden haben nicht angehalten.“",
+    "keeper2": "„Ich kümmere mich um die Beleuchtung. Irgendjemand muss ja sagen, wo die Grenzen liegen.“",
+    "keeper3": "„Die Flotte ist hier singend vorbeigefahren. Das steht im Logbuch.“",
+    "keeper4": "„Leuchtfeuer weisen nicht den Weg. Sie sind Zeugen.“",
+    "keeper5": "„Ich zähle die Jahre nicht mehr. Ich zähle die Male, die ich die Zigarette wieder anzünde.“",
+    "keeper6": "„Antworte den Leuchtfeuern, und der Sektor antwortet zurück. Irgendwann.“",
+    "keeper7": "„Nimm den Messwert. Nimm nicht die Lampe.“",
+    "keeper8": "„Alles, was der Rand verschlingt, hat ein Leuchtfeuer zuerst gesehen.“",
+    "keeper9": "„Ich gehörte mal zur Besatzung. Das Schiff ist technisch gesehen immer noch da draußen.“",
+    "keeper10": "„Wenn du zum Kern gelangst, sag ihm, dass jemand das Licht angelassen hat.“",
     "mara17": "„Alles auf dieser Seite der Theke ist mit einem Preis ausgezeichnet. Alles auf meiner Seite ist nicht zum Verkauf bestimmt.“",
     "mara18": "„Erzähl mir nicht, was es kann. Erzähl mir, was es mit dem letzten Schiff angerichtet hat, auf dem es zum Einsatz kam.“",
     "mFriend1": "„Du schon wieder. Gut. Ich hasse es, Fremden zweimal zu erklären, was ich auf Lager habe.“",
@@ -7789,6 +7801,86 @@
       "name": "Veto",
       "desc": "Einmal pro Spielrunde: ein Schicksalswurf oder ein Ereignisausgang, der den Rumpf auf null brächte, lässt ihn bei {{n}}.",
       "short": "Veto · 1/Lauf"
+    }
+  },
+  "shipPerks": {
+    "shipTurret": {
+      "name": "Geschützkapseln",
+      "desc": "Ein Waffenwürfel, der seine höchste Seite zeigt, zählt 1 höher."
+    },
+    "shipPlates": {
+      "name": "Panzerplatten",
+      "desc": "Der erste Treffer einer Elite, eines Minibosses oder eines Bosses in jedem Kampf trifft 30 % schwächer."
+    },
+    "shipAfterburner": {
+      "name": "Nachbrennerdüse",
+      "desc": "+6 Evasion, und jeder Kampf beginnt mit 2 Hülle weniger."
+    },
+    "shipBay": {
+      "name": "Zusatzschacht",
+      "desc": "+1 Modulschacht."
+    },
+    "shipTargeting": {
+      "name": "Zielfeld",
+      "desc": "Die Sensoren erhalten sofort ein Mk."
+    },
+    "shipCapacitor": {
+      "name": "Schildkondensator",
+      "desc": "Ab dem zweiten Zug beginnt jeder Zug mit 1 Schild."
+    },
+    "shipCoil": {
+      "name": "Reaktorspule",
+      "desc": "+1 Ladungsgrenze."
+    },
+    "shipMagnet": {
+      "name": "Schrottmagnet",
+      "desc": "Jeder Kampf beginnt mit +2 Schrott."
+    },
+    "shipBallast": {
+      "name": "Ballast",
+      "desc": "+1 maximale Hülle."
+    },
+    "shipOverdrive": {
+      "name": "Overdrive",
+      "desc": "Wiederwürfe erfassen 2 Würfel mehr."
+    },
+    "shipHardpoint": {
+      "name": "Waffenlafette",
+      "desc": "Waffenslots nehmen Würfel eine Größe größer an."
+    },
+    "shipCargoWeb": {
+      "name": "Frachtnetz",
+      "desc": "+1 Reserve."
+    },
+    "shipLattice": {
+      "name": "Kältegitter",
+      "desc": "15 % deines Schilds überstehen den Zug des Gegners."
+    },
+    "shipPrism": {
+      "name": "Prismenlinse",
+      "desc": "+1 auf die Resonanz der führenden Schule."
+    },
+    "shipDrones": {
+      "name": "Reparaturdrohnen",
+      "desc": "Heilt nach jedem Kampf 1 Hülle."
+    },
+    "shipBlackBox": {
+      "name": "Blackbox",
+      "desc": "Einmal pro Lauf lässt dich ein tödlicher Treffer in einem Boss- oder Miniboss-Kampf mit 1 Hülle zurück."
+    }
+  },
+  "shipMastery": {
+    "hull": {
+      "name": "Meisterschaft: verstärkte Hülle",
+      "desc": "Zusätzliche Hülle durch die Meisterschaft dieses Schiffs."
+    },
+    "reserve": {
+      "name": "Meisterschaft: Reservegestell",
+      "desc": "Zusätzliche Reserve durch die Meisterschaft dieses Schiffs."
+    },
+    "firstHit": {
+      "name": "Meisterschaft: versteifter Rahmen",
+      "desc": "Der erste Treffer einer Elite, eines Minibosses oder eines Bosses in jedem Kampf trifft schwächer."
     }
   }
 }

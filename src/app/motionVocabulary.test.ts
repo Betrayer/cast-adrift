@@ -18,6 +18,7 @@ const TRANSITIONS = readSource("app", "transitions.css");
 const ROUTER = readSource("app", "Router.module.css");
 const REWARDS = readSource("screens", "Rewards", "Rewards.module.css");
 const DIE_REWARD = readSource("screens", "Rewards", "DieReward.tsx");
+const CHART = readSource("screens", "Chart", "ChartScreen.module.css");
 const ROOT = bodyOf(TRANSITIONS, ":root");
 
 const ms = (value: string | null): number => {
@@ -126,5 +127,11 @@ describe("motion vocabulary — TS and CSS agree", () => {
     );
     expect(reduced).toHaveLength(1);
     expect(reduced[0]?.selector).toContain("[data-ca-motion='reduced']");
+  });
+});
+
+describe("motion that only plays under reduced motion", () => {
+  it("lets the chart node flash run the reduced twin, because it is drawn only when motion is reduced", () => {
+    expect(valueOf(bodyOf(CHART, ".flash"), "animation")).toContain("var(--ca-motion-reduced)");
   });
 });

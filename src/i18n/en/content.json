@@ -395,32 +395,44 @@
     "wanderer": {
       "name": "Wanderer",
       "passiveName": "Salvage Rig",
-      "passiveDesc": "Every battle opens with +2 scrap."
+      "passiveDesc": "Every battle opens with +2 scrap.",
+      "passiveIIName": "Salvage Rig II",
+      "passiveIIDesc": "Every battle opens with +3 scrap."
     },
     "ram": {
       "name": "Ram",
       "passiveName": "Overload",
-      "passiveDesc": "A weapon slot accepts a die above its cap; each such placement costs 2 hull."
+      "passiveDesc": "A weapon slot accepts a die above its cap; each such placement costs 2 hull.",
+      "passiveIIName": "Overload II",
+      "passiveIIDesc": "A weapon slot accepts a die above its cap; each such placement costs 1 hull."
     },
     "ark": {
       "name": "Ark",
       "passiveName": "Bulwark",
-      "passiveDesc": "A quarter of the standing shield carries into the next turn."
+      "passiveDesc": "A quarter of the standing shield carries into the next turn.",
+      "passiveIIName": "Bulwark II",
+      "passiveIIDesc": "Two fifths of the standing shield carry into the next turn."
     },
     "corsair": {
       "name": "Hound",
       "passiveName": "Afterburner",
-      "passiveDesc": "Manoeuvre runs hot: glancing 7.5% and dodge 4.5% per value instead of 3.5% and 1.5%, +8 evasion, and a ceiling of 55/40 instead of 25/10. Every glancing hit or dodge grants Weapons +1 next turn, up to +2 a turn."
+      "passiveDesc": "Manoeuvre runs hot: glancing 7.5% and dodge 4.5% per value instead of 3.5% and 1.5%, +8 evasion, and a ceiling of 38/22 instead of 25/10. Every glancing hit or dodge grants Weapons +1 next turn, up to +2 a turn.",
+      "passiveIIName": "Afterburner II",
+      "passiveIIDesc": "Manoeuvre runs hot as with Afterburner, and every glancing hit or dodge grants Weapons +1 next turn, up to +3 a turn."
     },
     "foundry": {
       "name": "Forge",
       "passiveName": "Anneal",
-      "passiveDesc": "Once per battle, two tray dice of equal value fuse into one die a tier larger, carrying both values."
+      "passiveDesc": "Once per battle, two tray dice of equal value fuse into one die a tier larger, carrying both values.",
+      "passiveIIName": "Anneal II",
+      "passiveIIDesc": "Once per battle, two tray dice of equal value fuse into one die two tiers larger, carrying both values."
     },
     "prism": {
       "name": "Prism",
       "passiveName": "Refractor",
-      "passiveDesc": "Prismatic dice count twice in the resonance census. Once per battle, one die turns prismatic for this turn."
+      "passiveDesc": "Prismatic dice count twice in the resonance census. Once per battle, one die turns prismatic for this turn.",
+      "passiveIIName": "Refractor II",
+      "passiveIIDesc": "Prismatic dice count three times in the resonance census. Once per battle, one die turns prismatic for this turn."
     },
     "ram-proto": {
       "name": "Ram Prototype"
@@ -1774,9 +1786,9 @@
     "clanToll": {
       "text": "A clan skiff cuts across the lane and holds station. «Toll's thirty. The lane's ours this cycle.»",
       "opt": {
-        "pay": "Pay the toll",
+        "pay": "Pay the toll (30)",
         "run": "Run the lane",
-        "haggle": "Haggle the toll down"
+        "haggle": "Haggle the toll down (30)"
       },
       "out": {
         "pay": "They wave you through and mark your hull as paid. The lane opens two rows deeper.",
@@ -1804,7 +1816,7 @@
     "yusufDebt": {
       "text": "Yusuf's voice, flat and tired: «You owe my lane a hull. Sixty, or we settle the other way.»",
       "opt": {
-        "settle": "Settle in scrap",
+        "settle": "Settle in scrap (60)",
         "refuse": "Refuse him",
         "workItOff": "Work the debt off on his lane"
       },
@@ -1844,7 +1856,7 @@
     "hunterTrail": {
       "text": "A narrow-band hail, unencrypted. The Huntress reads your registry back to you, digit by digit.",
       "opt": {
-        "buyOff": "Buy her off",
+        "buyOff": "Buy her off (50)",
         "ambushHer": "Turn and meet her"
       },
       "out": {
@@ -1882,7 +1894,7 @@
     "beaconRelay": {
       "text": "A relay mast, half its array sheared off. It still tries to speak on the hour.",
       "opt": {
-        "repairIt": "Repair the array",
+        "repairIt": "Repair the array (25)",
         "stripIt": "Strip the array",
         "useKey": "Use the Keeper's key"
       },
@@ -1952,7 +1964,7 @@
       "text": "Three clan hulls, no hail. They've been waiting on this row since the lane.",
       "opt": {
         "standGround": "Stand your ground",
-        "payLate": "Pay late, with interest",
+        "payLate": "Pay late, with interest (55)",
         "runForFold": "Run for the nearest fold"
       },
       "out": {
@@ -2000,7 +2012,7 @@
     "hunterRespect": {
       "text": "The Huntress hails you openly this time. «You cost me a wing. Say what you want.»",
       "opt": {
-        "hireHer": "Hire her",
+        "hireHer": "Hire her (40)",
         "warnHer": "Warn her off the Core"
       },
       "out": {
@@ -2041,7 +2053,7 @@
     "warpedShipyard": {
       "text": "A yard that finished building itself after the crew left. The tools still run.",
       "opt": {
-        "refit": "Pay for a refit",
+        "refit": "Pay for a refit (35)",
         "swapPart": "Let it swap a part",
         "letItFinish": "Let it finish its own design"
       },
@@ -2096,7 +2108,7 @@
     "heretics": {
       "text": "A handful of hulls with the hymn scraped off their plating. They heard you refused too.",
       "opt": {
-        "armThem": "Arm them",
+        "armThem": "Arm them (45)",
         "reportThem": "Report them",
         "escortThem": "Escort them past the picket"
       },
@@ -2160,7 +2172,7 @@
     "choirTithe": {
       "text": "A tithe station. The Choir accepts scrap, hull, or nothing — and prices all three honestly.",
       "opt": {
-        "tithe": "Tithe in scrap",
+        "tithe": "Tithe in scrap (50)",
         "bleed": "Tithe in hull",
         "declineTithe": "Decline"
       },
@@ -2190,7 +2202,7 @@
       "opt": {
         "shelter": "Shelter her",
         "handOver": "Hand her over",
-        "giveFuel": "Give her fuel and a heading"
+        "giveFuel": "Give her fuel and a heading (20)"
       },
       "out": {
         "shelter": "She earns her passage inside an hour, and reads Choir routing like a map.",
@@ -2295,7 +2307,7 @@
     "brokenLighthouse": {
       "text": "A lighthouse nobody built, dark for the first time in forty years.",
       "opt": {
-        "relight": "Relight it",
+        "relight": "Relight it (60)",
         "harvestLens": "Take the lens",
         "reactorLight": "Light it off your own reactor"
       },
@@ -2338,7 +2350,7 @@
     "lastMarket": {
       "text": "Mara has set up on a dead hull at the edge of the Core. «Last stock in the sector, captain.»",
       "opt": {
-        "buyOut": "Buy her out",
+        "buyOut": "Buy her out (90)",
         "sellShip": "Sell her your plating",
         "walkPast": "Walk past",
         "haul": "Take the crate under her counter"
@@ -2364,7 +2376,7 @@
     "maraCollector": {
       "text": "Not Mara — her collector. He has the page with your name and no interest in conversation.",
       "opt": {
-        "settleDebt": "Settle up",
+        "settleDebt": "Settle up (45)",
         "outrun": "Outrun him",
         "callFavour": "Call in the favour she owes"
       },
@@ -2439,7 +2451,7 @@
     "coldEngine": {
       "text": "A drive assembly, cold for decades, still bolted into half a hull.",
       "opt": {
-        "warmIt": "Warm it up",
+        "warmIt": "Warm it up (20)",
         "gutIt": "Gut it",
         "coax": "Coax it over on small dice"
       },
@@ -2493,8 +2505,8 @@
     "driftAuction": {
       "text": "Mara's auction, run off a barge ramp. Two lots, one crowd, no receipts.",
       "opt": {
-        "bidHigh": "Bid high",
-        "bidLow": "Bid low",
+        "bidHigh": "Bid high (70)",
+        "bidLow": "Bid low (25)",
         "heckle": "Heckle the bidding"
       },
       "out": {
@@ -2533,7 +2545,7 @@
     "maraUsurer": {
       "text": "Where Mara's counter should be there is a lien notice and a hull the size of a chapel. The Usurer runs her debts now — she sold the book to cover what you cost her. «Principal, interest, and the inconvenience,» it says.",
       "opt": {
-        "payInFull": "Pay it in full",
+        "payInFull": "Pay it in full (90)",
         "fightIt": "Refuse and hold station",
         "runTheLane": "Run the lane"
       },
@@ -2600,7 +2612,7 @@
     "keeperThread": {
       "text": "The Keeper's relay finds you between beacons. «You have been doing my work. I do not know whether to thank you or bill you. Come to that — what do you want out of this?»",
       "opt": {
-        "repayHim": "Square what you owe him",
+        "repayHim": "Square what you owe him (40)",
         "askMore": "Ask him for more",
         "handTheLog": "Hand him your beacon log"
       },
@@ -2630,7 +2642,7 @@
     "tugStrike": {
       "text": "Eleven tugs holding station across the lane, engines cold, transponders reading the same three words: NOT UNTIL PAID.",
       "opt": {
-        "payThem": "Pay the strike fund",
+        "payThem": "Pay the strike fund (40)",
         "crossPicket": "Cross the line",
         "haulForThem": "Haul one load for them"
       },
@@ -2657,7 +2669,7 @@
     "driftSchool": {
       "text": "Somebody has been running a school out of a gutted freighter. Nine children, one very tired adult, and a curriculum that is mostly about not dying in a drift field.",
       "opt": {
-        "donate": "Leave them supplies",
+        "donate": "Leave them supplies (25)",
         "teachThem": "Teach one lesson",
         "takeTheFreighter": "Take the freighter's core"
       },
@@ -2698,7 +2710,7 @@
     "manifestAuction": {
       "text": "An open-channel auction for a cargo manifest nobody has seen. Three bidders, and one of them is bidding in fleet script that stopped being money forty years ago.",
       "opt": {
-        "bidHigh": "Outbid them all",
+        "bidHigh": "Outbid them all (55)",
         "backScript": "Back the fleet bidder",
         "jamAuction": "Jam the auction",
         "haul": "Take the unsold lot on consignment"
@@ -2742,7 +2754,7 @@
       "text": "Two haulers have strung a tether across a gap and are betting on who can cross it faster without cutting it. They have space for a third.",
       "opt": {
         "race": "Take the third slot",
-        "bet": "Bet on the older hauler",
+        "bet": "Bet on the older hauler (20)",
         "cutTether": "Cut the tether and go"
       },
       "out": {
@@ -2756,7 +2768,7 @@
     "yusufApprentice": {
       "text": "Yusuf's apprentice hails you privately. «He will not ask, so I am asking. There is a part he needs and a yard that will not sell to him.»",
       "opt": {
-        "buyIt": "Buy it under your registry",
+        "buyIt": "Buy it under your registry (45)",
         "stealIt": "Take it off the yard",
         "tellHim": "Tell Yusuf his apprentice asked"
       },
@@ -2770,7 +2782,7 @@
     "iceLighter": {
       "text": "An ice lighter, still under thrust, still empty. Its autopilot has been running the same delivery loop since before the Cut and has never once been told to stop.",
       "opt": {
-        "loadIt": "Load it and let it run",
+        "loadIt": "Load it and let it run (20)",
         "boardIt": "Board and strip it",
         "stopIt": "Give it the stop order"
       },
@@ -2947,7 +2959,7 @@
     "riftPilotage": {
       "text": "A pilot's guild board, half-burned, still listing rates for lanes that fold differently every year. Somebody has kept it updated by hand.",
       "opt": {
-        "hirePilot": "Hire a pilot",
+        "hirePilot": "Hire a pilot (35)",
         "readBoard": "Just read the board",
         "takeBoard": "Take the board"
       },
@@ -2976,7 +2988,7 @@
       "opt": {
         "sendBack": "Order them back",
         "useThem": "Put them to work",
-        "armThem": "Arm them and hold the lane"
+        "armThem": "Arm them and hold the lane (50)"
       },
       "out": {
         "sendBack": "They argue for four minutes and then go. Somebody leaves a spare pump on your dock on the way out.",
@@ -2989,7 +3001,7 @@
       "text": "The buyer has taken orders. He is wearing Choir grey now and he still has your registry written on the back of his hand.",
       "opt": {
         "dealAnyway": "Deal with him anyway",
-        "buyBackName": "Buy your registry back",
+        "buyBackName": "Buy your registry back (60)",
         "readOrders": "Read his orders"
       },
       "out": {
@@ -3085,7 +3097,7 @@
       "text": "Somebody is counting the Procession, hull by hull, and has been for eleven years. They are four hundred short and will not say of what.",
       "opt": {
         "helpCount": "Help with the count",
-        "buyCount": "Buy the tally",
+        "buyCount": "Buy the tally (45)",
         "tellTruth": "Tell them where the four hundred went"
       },
       "out": {
@@ -3098,7 +3110,7 @@
       "text": "An acolyte is ferrying pilgrims across a dead zone in a hull that will not survive the round trip, and knows it.",
       "opt": {
         "takeThemOver": "Ferry them yourself",
-        "buyHull": "Buy his hull off him",
+        "buyHull": "Buy his hull off him (40)",
         "letItGo": "Let him make the crossing"
       },
       "out": {
@@ -3126,7 +3138,7 @@
       "opt": {
         "thankThem": "Thank them and go in",
         "sendThemOff": "Order them off the line",
-        "armThemAgain": "Give them everything you can spare"
+        "armThemAgain": "Give them everything you can spare (60)"
       },
       "out": {
         "thankThem": "They will hold as long as they can hold. Everyone involved understands what that means.",
@@ -3206,7 +3218,7 @@
       "opt": {
         "takeThemHome": "Take them out",
         "singWithThem": "Sing it with them",
-        "giveThemEngines": "Give them engines"
+        "giveThemEngines": "Give them engines (70)"
       },
       "out": {
         "takeThemHome": "Nine of them fit if you cut the hold in half. You cut the hold in half.",
@@ -3243,9 +3255,9 @@
     "lastYard": {
       "text": "A yard has set up in the Core's shadow, run by people who came out here to work and could not think of a reason to leave.",
       "opt": {
-        "refitHere": "Refit here",
+        "refitHere": "Refit here (50)",
         "warnThem": "Tell them to leave",
-        "hireCrew": "Hire a crew off them"
+        "hireCrew": "Hire a crew off them (35)"
       },
       "out": {
         "refitHere": "They work fast and they work well and nobody asks what you are going in there to do.",
@@ -3257,9 +3269,9 @@
     "thresholdMarket": {
       "text": "Somebody is running a stall at the threshold itself. Not Mara — but the prices are hers, and so is the handwriting on the board.",
       "opt": {
-        "buyEverything": "Buy the whole stall",
+        "buyEverything": "Buy the whole stall (85)",
         "askWhose": "Ask whose handwriting",
-        "leaveStock": "Leave your own stock"
+        "leaveStock": "Leave your own stock (30)"
       },
       "out": {
         "buyEverything": "It is not much of a stall. What is on it is the last inventory anyone will take out here.",
@@ -3315,9 +3327,9 @@
     "debtorsHull": {
       "text": "A hull with three liens on it and one very tired owner, who has heard that you settle up.",
       "opt": {
-        "clearOne": "Clear one lien",
-        "buyTheHull": "Buy the hull outright",
-        "buyTheDebt": "Buy the debt instead",
+        "clearOne": "Clear one lien (35)",
+        "buyTheHull": "Buy the hull outright (60)",
+        "buyTheDebt": "Buy the debt instead (25)",
         "walkOn": "Leave the liens where they lie"
       },
       "out": {
@@ -3347,7 +3359,7 @@
       "opt": {
         "readIt": "Read the petition",
         "takeThem": "Take them aboard",
-        "sendThemOn": "Send them somewhere safer"
+        "sendThemOn": "Send them somewhere safer (30)"
       },
       "out": {
         "readIt": "They want to come with you. All four of them. The document runs to two pages of reasons.",
@@ -3360,7 +3372,7 @@
       "opt": {
         "letItSing": "Let it transmit",
         "scrubName": "Scrub your registry out",
-        "boostIt": "Boost the transmitter"
+        "boostIt": "Boost the transmitter (30)"
       },
       "out": {
         "letItSing": "Every hull in the sector now knows where the lane is safe and who made it that way.",
@@ -3372,7 +3384,7 @@
       "text": "The tide is running early here and it is running through a wreck field, which makes the whole area read as one enormous unstable die.",
       "opt": {
         "rideSmall": "Ride it on small dice",
-        "waitItOut": "Wait it out",
+        "waitItOut": "Wait it out (20)",
         "pushThrough": "Push straight through"
       },
       "out": {
@@ -3401,7 +3413,7 @@
       "opt": {
         "nameThem": "Give the body a name",
         "joinWake": "Stay for the wake",
-        "takeTheHull": "Buy the hull off them"
+        "takeTheHull": "Buy the hull off them (40)"
       },
       "out": {
         "nameThem": "You take a registry off the hull's plate and read it out. Nine people accept it instantly and gratefully.",
@@ -3449,7 +3461,7 @@
     },
     "foldedYard": {
       "text": "Mara's stall is here. It should not be — you left her nineteen jumps and one act behind. She is restocking, badly, from crates that keep arriving before she orders them.",
-      "trade": "Buy the hull work (60 scrap)",
+      "trade": "Buy the hull work (60)",
       "tradeOut": "She welds a plate she says she bought from you last week. The plate is good. You pay and do not argue the calendar.",
       "ask": "Ask her how she got here",
       "askOut": "«Same way as you. Somebody asked me to stay and I said yes.» She patches you for free and marks your ledger open at every yard past this one.",
@@ -3789,10 +3801,10 @@
       },
       "opt": {
         "swapRail": "Put your worst core on the swap rail",
-        "buyChart": "Buy a lane chart",
+        "buyChart": "Buy a lane chart (30)",
         "tellStory": "Sell the story of your last fight",
         "liftCrate": "Lift a crate while the stalls are busy",
-        "standRound": "Stand the market a round"
+        "standRound": "Stand the market a round (20)"
       },
       "out": {
         "swapRail": "The rail takes your worst core and hands back a stranger's, plus ten for the difference in mass.",
@@ -3811,7 +3823,7 @@
       "text": "A clan tug matches your drift and offers the oldest contract in the Fields: if your engines die out here, they tow you home. In return, when they call, you come. Nobody has ever written the terms down. Nobody has ever needed to.",
       "opt": {
         "pledge": "Make the promise",
-        "payDeposit": "Pay for the tow instead",
+        "payDeposit": "Pay for the tow instead (35)",
         "inspectTug": "Look their tug over first",
         "stripTug": "Take their cable and run"
       },
@@ -3835,7 +3847,7 @@
       },
       "opt": {
         "comeWhenCalled": "Come when called",
-        "sendScrap": "Send scrap instead of yourself",
+        "sendScrap": "Send scrap instead of yourself (40)",
         "passToYusuf": "Pass the call to Yusuf's convoy",
         "letItGo": "Let the call go"
       },
@@ -3853,7 +3865,7 @@
     "mineShepherd": {
       "text": "An old woman in a hardsuit is herding mines. She nudges each one along with a boathook, calls it by the name her grandmother gave it, and keeps the flock drifting clear of the lane. She has noticed that you are in the lane.",
       "opt": {
-        "hireHer": "Pay her to walk you through",
+        "hireHer": "Pay her to walk you through (25)",
         "learnNames": "Learn the names and go slow",
         "cullFlock": "Cull the flock for casing",
         "waitOut": "Cut engines and let the flock pass"
@@ -3896,9 +3908,9 @@
     "inheritedLedger": {
       "text": "A clean little cutter at a clan mooring, priced at a third of what it's worth. The seller is keen and keeps glancing at the lane. The catch is bolted to the pilot's seat: the ship's ledger. In the Fields the ledger comes with the hull, and this one owes three clans.",
       "opt": {
-        "honourLedger": "Buy it and pay out the ledger",
-        "burnLedger": "Buy the hull, burn the book",
-        "readLedger": "Read the ledger before you buy",
+        "honourLedger": "Buy it and pay out the ledger (50)",
+        "burnLedger": "Buy the hull, burn the book (25)",
+        "readLedger": "Read the ledger before you buy (15)",
         "tipClans": "Tell the clans who's selling"
       },
       "out": {
@@ -3923,7 +3935,7 @@
         "echoName": "Give him Echo's name",
         "fleetName": "Give him a name from the blackbox",
         "falseName": "Give him a false one",
-        "offerScrap": "Offer scrap anyway"
+        "offerScrap": "Offer scrap anyway (30)"
       },
       "out": {
         "ownName": "He writes it on the convoy board in chalk that doesn't come off. The route he gives you back is good for three rows.",
@@ -3946,7 +3958,7 @@
         "l3": "I'm not going to tell you what to do, captain. I'm just going to be very quiet until you do it."
       },
       "opt": {
-        "buyMind": "Buy the mind off the rig",
+        "buyMind": "Buy the mind off the rig (45)",
         "echoTalks": "Let Echo talk to it",
         "pullCore": "Pull its core for yourself",
         "letItRest": "Let it go quietly",
@@ -4012,8 +4024,8 @@
         "l3": "I heard that. This deep, I hear everything twice."
       },
       "opt": {
-        "buyNow": "Buy from this Mara",
-        "waitForSale": "Wait for the closing-down sale",
+        "buyNow": "Buy from this Mara (40)",
+        "waitForSale": "Wait for the closing-down sale (20)",
         "playBoth": "Play one Mara against the other",
         "warnHer": "Show her the sign",
         "robLater": "Rob the later stall"
@@ -4039,7 +4051,7 @@
       },
       "opt": {
         "joinRing": "Let the ring route through you",
-        "buyPacket": "Buy the packet they're guarding",
+        "buyPacket": "Buy the packet they're guarding (30)",
         "askLane": "Ask them for a clean lane",
         "netRing": "Net the ring and sell the drones"
       },
@@ -4104,7 +4116,7 @@
       },
       "opt": {
         "foldSignals": "Fold the two signals into one",
-        "payUpkeep": "Pay for the buoy's upkeep",
+        "payUpkeep": "Pay for the buoy's upkeep (35)",
         "recordEcho": "Record the echo channel",
         "cutBuoy": "Cut the buoy loose and sell it"
       },
@@ -4147,7 +4159,7 @@
       "text": "A survey crew has anchored three buoys along the lip of the black hole and is measuring it with a patience that looks a lot like fear. Their chief waves you alongside. «Everyone who comes through here goes in or goes around. We'd like to know which, and why.»",
       "opt": {
         "lendSensors": "Lend them your sensor time",
-        "buyTables": "Buy a copy of their survey",
+        "buyTables": "Buy a copy of their survey (30)",
         "doctorReading": "Sell them a doctored reading",
         "shareLog": "Show them tomorrow's log",
         "warnThemOff": "Tell them to pull their anchors"
@@ -4169,7 +4181,7 @@
       "text": "The survey crew from the black hole's lip has found you again. All three buoys made it out, and so did the chief, with a copy of what they measured and an opinion about you.",
       "opt": {
         "claimShare": "Claim your share of the survey",
-        "settleUp": "Pay back what your reading cost them",
+        "settleUp": "Pay back what your reading cost them (40)",
         "tradeCharts": "Trade charts and nothing else",
         "askHorizon": "Ask what the horizon showed them"
       },
@@ -4214,7 +4226,7 @@
         "sweepCores": "Sweep up the smooth cores",
         "studyBite": "Study the bite pattern",
         "baitIt": "Bait whatever feeds here",
-        "leaveOffering": "Leave an offering in the circle",
+        "leaveOffering": "Leave an offering in the circle (25)",
         "checkTheLog": "Check tomorrow's log"
       },
       "out": {
@@ -4258,7 +4270,7 @@
       "opt": {
         "pullFromFire": "Pull dice out of the fire",
         "feedPyre": "Give it your weakest die",
-        "buyAsh": "Buy a sack of the ash",
+        "buyAsh": "Buy a sack of the ash (35)",
         "dousePyre": "Douse the pyre",
         "leaveIt": "Leave it burning"
       },
@@ -4282,7 +4294,7 @@
         "l2": "I can hold us in its wake for about ninety seconds before it notices, captain. After that it becomes a conversation."
       },
       "opt": {
-        "buyHerName": "Buy the number from its First Voice",
+        "buyHerName": "Buy the number from its First Voice (50)",
         "pullHerOut": "Go in and get her",
         "oneMessage": "Let her send one message",
         "turnAway": "Switch the scope off"
@@ -4354,7 +4366,7 @@
         "reciteLine": "Recite the next line",
         "sisterRecites": "Let Four-one-two answer",
         "bluffIt": "Make a line up",
-        "payToll": "Pay the silence toll",
+        "payToll": "Pay the silence toll (40)",
         "forceGate": "Force the gate"
       },
       "out": {
@@ -4419,9 +4431,9 @@
         "l2": "The stamps are real, captain. I checked. I do not know how she got them, and I would prefer to keep it that way."
       },
       "opt": {
-        "buyIndulgence": "Buy an indulgence",
-        "friendPrice": "Ask for the friend price",
-        "settleOld": "Settle what's between you",
+        "buyIndulgence": "Buy an indulgence (45)",
+        "friendPrice": "Ask for the friend price (15)",
+        "settleOld": "Settle what's between you (30)",
         "reportHer": "Report her to the Choir"
       },
       "out": {
@@ -4438,7 +4450,7 @@
     "blessedLane": {
       "text": "A Procession usher hails you at a fork. One lane is blessed and one is cursed, and for a fee she will write your registry onto whichever you like.",
       "opt": {
-        "payBlessing": "Pay to be written on the blessed lane",
+        "payBlessing": "Pay to be written on the blessed lane (40)",
         "takeCursed": "Ask for the cursed lane",
         "writeItYourself": "Write the entry yourself"
       },
@@ -4505,7 +4517,7 @@
         "holdEdge": "Ask him to keep a light on at the edge",
         "takeGunners": "Take his two best gunners aboard",
         "collectLane": "Ask what the procession left you",
-        "squarePinch": "Pay back what the pinch cost them"
+        "squarePinch": "Pay back what the pinch cost them (50)"
       },
       "out": {
         "sendHome": "He argues for exactly one minute, then turns for the Rim and leaves his spare plating on your clamp.",
@@ -4527,9 +4539,9 @@
         "l2": "Your ship has opinions. That is a surcharge."
       },
       "opt": {
-        "payIt": "Pay your own bounty",
+        "payIt": "Pay your own bounty (60)",
         "settleIt": "Settle it the old way",
-        "hireHer": "Hire her for the last run",
+        "hireHer": "Hire her for the last run (30)",
         "counterBounty": "Post a bounty on the Core instead"
       },
       "out": {
@@ -4622,7 +4634,7 @@
         "l2": "She has better data on that hole than I do. I find that personally upsetting."
       },
       "opt": {
-        "buyLog": "Buy a copy of her log",
+        "buyLog": "Buy a copy of her log (40)",
         "throwProbe": "Throw a probe in with your registry on it",
         "fishShards": "Help her fish core-shards off the rim",
         "warnHer": "Tell her to get clear while she can"
@@ -4642,7 +4654,7 @@
       "text": "The stall on your chart collapsed an hour before you arrived. Where it stood there is a fight, still going, and the trader is inside it — sealed in her own cargo container, bidding on an open band for anyone who will get her out.",
       "opt": {
         "cutHerOut": "Cut her out",
-        "tradeThroughHatch": "Trade through the hatch, mid-fight",
+        "tradeThroughHatch": "Trade through the hatch, mid-fight (30)",
         "leaveHer": "Leave her to it"
       },
       "out": {
@@ -4688,7 +4700,7 @@
         "l3": "So. Pay it, run, or tell me something I don't know."
       },
       "opt": {
-        "buyOut": "Buy out your own bounty (50 scrap)",
+        "buyOut": "Buy out your own bounty (50)",
         "countersign": "Countersign it onto whoever posted it",
         "callFavor": "Call in the favour she owes you",
         "outrun": "Run before her engines warm"
@@ -5224,7 +5236,7 @@
         "commission": "Commission the masterwork (45)",
         "steadyCore": "Steady the raw core while she cuts",
         "quickCut": "Buy a cut today (30)",
-        "callTheTow": "Remind her who towed her"
+        "callTheTow": "Remind her who towed her (20)"
       },
       "out": {
         "commission": "She chalks your registry on the bench, above everyone else's. «Two sectors. Don't die.»",
@@ -6369,7 +6381,7 @@
     },
     "15": {
       "name": "Singularity",
-      "desc": "Every boss gains one more part. The tide caps one level lower, and no ride through a black hole is stable any more."
+      "desc": "Every boss gains one more part. The tide caps one level higher still, and no ride through a black hole is stable any more."
     }
   },
   "prologue": {
@@ -7295,16 +7307,16 @@
     "yusuf12": "Yusuf: «Rest here as long as you like. The Rim isn't going anywhere.»",
     "yusuf13": "Yusuf: «Cheap repairs cost twice. You'll learn that once.»",
     "yusuf14": "Yusuf: «Go on then. Don't make me see this hull again.»",
-    "keeper1": "The Keeper: «You're the third ship this cycle. The other two didn't stop.»",
-    "keeper2": "The Keeper: «I keep the lights. Somebody has to say where the edges are.»",
-    "keeper3": "The Keeper: «The fleet passed here singing. That's in the log.»",
-    "keeper4": "The Keeper: «Beacons don't guide. They witness.»",
-    "keeper5": "The Keeper: «I've stopped counting years. I count relights.»",
-    "keeper6": "The Keeper: «Answer the beacons and the sector answers back. Eventually.»",
-    "keeper7": "The Keeper: «Take the reading. Don't take the lamp.»",
-    "keeper8": "The Keeper: «Everything the Rim swallows, a beacon saw first.»",
-    "keeper9": "The Keeper: «I was crew once. The ship is still out there, technically.»",
-    "keeper10": "The Keeper: «If you get to the Core, tell it somebody kept the lights on.»",
+    "keeper1": "«You're the third ship this cycle. The other two didn't stop.»",
+    "keeper2": "«I keep the lights. Somebody has to say where the edges are.»",
+    "keeper3": "«The fleet passed here singing. That's in the log.»",
+    "keeper4": "«Beacons don't guide. They witness.»",
+    "keeper5": "«I've stopped counting years. I count relights.»",
+    "keeper6": "«Answer the beacons and the sector answers back. Eventually.»",
+    "keeper7": "«Take the reading. Don't take the lamp.»",
+    "keeper8": "«Everything the Rim swallows, a beacon saw first.»",
+    "keeper9": "«I was crew once. The ship is still out there, technically.»",
+    "keeper10": "«If you get to the Core, tell it somebody kept the lights on.»",
     "mara17": "«Everything on this side of the counter is priced. Everything on my side is not for sale.»",
     "mara18": "«Do not tell me what it does. Tell me what it did to the last hull that ran it.»",
     "mFriend1": "«You again. Good. I hate explaining my stock twice to strangers.»",
@@ -7789,6 +7801,86 @@
       "name": "Veto",
       "desc": "Once per run: a Fate roll or an event outcome that would take the hull to zero leaves it at {{n}}.",
       "short": "Veto · 1/run"
+    }
+  },
+  "shipPerks": {
+    "shipTurret": {
+      "name": "Turret pods",
+      "desc": "A weapon die showing its top face counts 1 higher."
+    },
+    "shipPlates": {
+      "name": "Armour plates",
+      "desc": "The first hit from an elite, mini-boss or boss in each battle lands 30% lighter."
+    },
+    "shipAfterburner": {
+      "name": "Afterburner nozzle",
+      "desc": "+6 evasion, and every battle opens 2 hull down."
+    },
+    "shipBay": {
+      "name": "Extra bay",
+      "desc": "+1 module slot."
+    },
+    "shipTargeting": {
+      "name": "Targeting array",
+      "desc": "Sensors gain one Mk at once."
+    },
+    "shipCapacitor": {
+      "name": "Shield capacitor",
+      "desc": "From the second turn on, every turn opens with 1 shield."
+    },
+    "shipCoil": {
+      "name": "Reactor coil",
+      "desc": "+1 charge cap."
+    },
+    "shipMagnet": {
+      "name": "Scrap magnet",
+      "desc": "Every battle opens with +2 scrap."
+    },
+    "shipBallast": {
+      "name": "Ballast",
+      "desc": "+1 hull max."
+    },
+    "shipOverdrive": {
+      "name": "Overdrive",
+      "desc": "Rerolls reach 2 more dice."
+    },
+    "shipHardpoint": {
+      "name": "Hardpoint",
+      "desc": "Weapon slots take dice one size larger."
+    },
+    "shipCargoWeb": {
+      "name": "Cargo web",
+      "desc": "+1 reserve."
+    },
+    "shipLattice": {
+      "name": "Cold lattice",
+      "desc": "15% of your shield survives the enemy turn."
+    },
+    "shipPrism": {
+      "name": "Prism lens",
+      "desc": "+1 to the leading school's resonance."
+    },
+    "shipDrones": {
+      "name": "Repair drones",
+      "desc": "Heal 1 hull after every battle."
+    },
+    "shipBlackBox": {
+      "name": "Black box",
+      "desc": "Once per run, a lethal hit in a boss or mini-boss fight leaves you at 1 hull."
+    }
+  },
+  "shipMastery": {
+    "hull": {
+      "name": "Mastery: reinforced hull",
+      "desc": "Extra hull from this ship's mastery."
+    },
+    "reserve": {
+      "name": "Mastery: reserve rack",
+      "desc": "Extra reserve from this ship's mastery."
+    },
+    "firstHit": {
+      "name": "Mastery: braced frame",
+      "desc": "The first hit from an elite, mini-boss or boss in each battle lands lighter."
     }
   }
 }

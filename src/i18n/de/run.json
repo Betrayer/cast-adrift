@@ -87,7 +87,8 @@
     "beaconCounter": "Bake {{n}} von „{{max}}“",
     "reqCargo": "braucht freien Laderaum und eine Station voraus",
     "cargoTerms": "{{drawback}} · Ablieferung zahlt {{n}}",
-    "checkNoDice": "Kein Würfel in deinem Deck passt zu dieser Probe — sie kann nur misslingen."
+    "checkNoDice": "Kein Würfel in deinem Deck passt zu dieser Probe — sie kann nur misslingen.",
+    "shipRankGain": "Schiffsrang: +{{n}} auf dem Weg zur nächsten Umrüstung."
   },
   "anomaly": {
     "title": "Anomalie",
@@ -209,7 +210,9 @@
     "prologueBody": "Spiele die ersten Takte noch einmal ab. Nichts hat begonnen, nichts ist verloren.",
     "prologueReplay": "Wiederholung",
     "badgeLegend": "Würfelabzeichen",
-    "forge": "Schmiede"
+    "forge": "Schmiede",
+    "fusion": "Verschmelzungen",
+    "fusionHint": "Schmiede zwei Würfel „{{die}}“ auf einer Werft, um zu sehen, was daraus wird"
   },
   "rewards": {
     "dieTitle": "Geborgener Würfel",
@@ -292,7 +295,8 @@
     "holesBypassed": "Übersprungene Löcher",
     "causeSingularity": "Singularität",
     "cause": "Todesursache",
-    "route": "Route: Sektor {{n}} von {{max}}"
+    "route": "Route: Sektor {{n}} von {{max}}",
+    "shipRank": "Erreichter Schiffsrang: {{rank}}/{{max}}"
   },
   "prologue": {
     "title": "Prolog",
@@ -722,7 +726,9 @@
       "chartMore": "…und {{n}} weitere auf der Sternenkarte",
       "pinOff": "offline",
       "grantConditional": "nur solange seine eigene Bedingung gilt"
-    }
+    },
+    "shipRank": "Rang {{rank}}/{{max}}",
+    "mastery": "Meisterschaft {{rank}}"
   },
   "replace": {
     "title": "Ersetzen",
@@ -798,5 +804,18 @@
       "shieldEcho": "Echo-Kern: Schildecho ist offen.",
       "veto": "Echo-Kern: Veto ist offen."
     }
+  },
+  "shipRank": {
+    "title": "Schiffsrang {{rank}} von {{max}}",
+    "body": "Die Crew hat sich eine Umrüstung verdient. Wähle eine aus.",
+    "reroll": "Neu ziehen, kostenlos (Meisterschaft V)"
+  },
+  "recap": {
+    "share": "Teilen",
+    "title": "Mein Lauf in Cast Adrift",
+    "ascension": "Aufstieg A{{n}}",
+    "topDie": "Stärkster Würfel: {{die}}, d{{tier}}",
+    "failed": "Das Bild konnte nicht erstellt werden",
+    "topDieName": "Stärkster Würfel: {{die}}"
   }
 }

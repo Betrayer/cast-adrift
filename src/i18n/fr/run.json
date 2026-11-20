@@ -87,7 +87,8 @@
     "beaconCounter": "Balise {{n}} de {{max}}",
     "reqCargo": "nécessite une soute libre et une station devant",
     "cargoTerms": "{{drawback}} · la livraison rapporte {{n}}",
-    "checkNoDice": "Aucun dé de ton deck ne convient à ce test — il ne peut qu'échouer."
+    "checkNoDice": "Aucun dé de ton deck ne convient à ce test — il ne peut qu'échouer.",
+    "shipRankGain": "Rang du vaisseau : +{{n}} vers la prochaine refonte."
   },
   "anomaly": {
     "title": "Anomalie",
@@ -209,7 +210,9 @@
     "prologueBody": "Réécoute les premières mesures. Rien n'a commencé, rien n'est perdu.",
     "prologueReplay": "Rediffusion",
     "badgeLegend": "Badges des dés",
-    "forge": "Forge"
+    "forge": "Forge",
+    "fusion": "Fusions",
+    "fusionHint": "Forgez deux dés « {{die}} » dans un chantier naval pour voir ce qu’ils deviennent"
   },
   "rewards": {
     "dieTitle": "Dé récupéré",
@@ -292,7 +295,8 @@
     "holesBypassed": "Trous contournés",
     "causeSingularity": "Singularité",
     "cause": "Cause de la mort",
-    "route": "Route : secteur {{n}} sur {{max}}"
+    "route": "Route : secteur {{n}} sur {{max}}",
+    "shipRank": "Rang du vaisseau atteint : {{rank}}/{{max}}"
   },
   "prologue": {
     "title": "Prologue",
@@ -722,7 +726,9 @@
       "chartMore": "…et {{n}} autres sur la Carte stellaire",
       "pinOff": "hors service",
       "grantConditional": "seulement tant que sa propre condition tient"
-    }
+    },
+    "shipRank": "Rang {{rank}}/{{max}}",
+    "mastery": "Maîtrise {{rank}}"
   },
   "replace": {
     "title": "Remplacer",
@@ -798,5 +804,18 @@
       "shieldEcho": "Cœur d’Écho : Écho du bouclier est ouvert.",
       "veto": "Cœur d’Écho : Veto est ouvert."
     }
+  },
+  "shipRank": {
+    "title": "Rang du vaisseau {{rank}} sur {{max}}",
+    "body": "L'équipage a mérité une refonte. Choisissez-en une.",
+    "reroll": "Nouveau tirage, gratuit (maîtrise V)"
+  },
+  "recap": {
+    "share": "Partager",
+    "title": "Ma partie de Cast Adrift",
+    "ascension": "Ascension A{{n}}",
+    "topDie": "Meilleur dé : {{die}}, d{{tier}}",
+    "failed": "Impossible de générer l’image",
+    "topDieName": "Meilleur dé : {{die}}"
   }
 }

@@ -1,4 +1,5 @@
 import { PERK_BY_ID } from "@/data/perks";
+import { ordinaryPerks } from "@/data/perks/ship";
 import { ptsForDie, sellValue } from "@/game/economy/prices";
 import { grantDie, grantModule } from "@/game/run/inventory";
 import { logConsequence } from "@/game/run/journal";
@@ -26,7 +27,7 @@ export const draftContext = (
   run: RunState,
   floor?: DraftContext["floor"],
 ): DraftContext => ({
-  owned: run.perks,
+  owned: ordinaryPerks(run.perks),
   banished: run.banishedPerks,
   sector: run.sector,
   deckDefIds: run.deck.map((d) => d.defId),

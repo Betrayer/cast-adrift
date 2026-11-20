@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fireMotionFlag, riseStyle, RISE_STEPS, scrollIntoFocus } from '@/app/motion';
+import { fireMotionFlag, reducedFade, REDUCED_MS, riseStyle, RISE_STEPS, scrollIntoFocus } from '@/app/motion';
 
 describe('riseStyle', () => {
   it('maps an index onto the stagger variable', () => {
@@ -15,6 +15,14 @@ describe('riseStyle', () => {
 
   it('never goes negative', () => {
     expect(riseStyle(-3)).toEqual({ '--ca-rise-index': '0' });
+  });
+});
+
+describe('reducedFade', () => {
+  it('holds a reduced fade to the reduced twin and leaves full motion alone', () => {
+    expect(reducedFade(260, true)).toBe(REDUCED_MS);
+    expect(reducedFade(120, true)).toBe(120);
+    expect(reducedFade(420, false)).toBe(420);
   });
 });
 

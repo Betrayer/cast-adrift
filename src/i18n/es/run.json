@@ -87,7 +87,8 @@
     "beaconCounter": "Baliza {{n}} de {{max}}",
     "reqCargo": "necesita bodega libre y una estación por delante",
     "cargoTerms": "{{drawback}} · la entrega paga {{n}}",
-    "checkNoDice": "Ningún dado de tu mazo sirve para esta prueba: solo puede fallar."
+    "checkNoDice": "Ningún dado de tu mazo sirve para esta prueba: solo puede fallar.",
+    "shipRankGain": "Rango de nave: +{{n}} hacia el próximo reacondicionamiento."
   },
   "anomaly": {
     "title": "Anomalía",
@@ -209,7 +210,9 @@
     "prologueBody": "Vuelve a reproducir los primeros compases. No se ha iniciado nada, no se ha perdido nada.",
     "prologueReplay": "Repetición",
     "badgeLegend": "Distintivos de dados",
-    "forge": "Forja"
+    "forge": "Forja",
+    "fusion": "Fusiones",
+    "fusionHint": "Forja dos dados «{{die}}» en un astillero para ver en qué se convierten"
   },
   "rewards": {
     "dieTitle": "Dado recuperado",
@@ -292,7 +295,8 @@
     "holesBypassed": "Agujeros omitidos",
     "causeSingularity": "Singularidad",
     "cause": "Causa de la muerte",
-    "route": "Ruta: sector {{n}} de {{max}}"
+    "route": "Ruta: sector {{n}} de {{max}}",
+    "shipRank": "Rango de nave alcanzado: {{rank}}/{{max}}"
   },
   "prologue": {
     "title": "Prólogo",
@@ -722,7 +726,9 @@
       "chartMore": "…y {{n}} más en la Carta Estelar",
       "pinOff": "inactivo",
       "grantConditional": "solo mientras se cumpla su propia condición"
-    }
+    },
+    "shipRank": "Rango {{rank}}/{{max}}",
+    "mastery": "Maestría {{rank}}"
   },
   "replace": {
     "title": "Sustituir",
@@ -798,5 +804,18 @@
       "shieldEcho": "Núcleo Eco: Eco del escudo está abierto.",
       "veto": "Núcleo Eco: Veto está abierto."
     }
+  },
+  "shipRank": {
+    "title": "Rango de nave {{rank}} de {{max}}",
+    "body": "La tripulación se ha ganado un reacondicionamiento. Elige uno.",
+    "reroll": "Nuevas opciones, gratis (maestría V)"
+  },
+  "recap": {
+    "share": "Compartir",
+    "title": "Mi partida en Cast Adrift",
+    "ascension": "Ascensión A{{n}}",
+    "topDie": "Mejor dado: {{die}}, d{{tier}}",
+    "failed": "No se pudo generar la tarjeta",
+    "topDieName": "Mejor dado: {{die}}"
   }
 }

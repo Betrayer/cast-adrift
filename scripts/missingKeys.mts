@@ -26,6 +26,7 @@ import {
   SYSTEMS_CHECK,
 } from "../src/data/narrative/prologue";
 import { ALL_PERKS } from "../src/data/perks";
+import { MASTERY_PERKS, SHIP_PERKS } from "../src/data/perks/ship";
 import { PUZZLES } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
 import { SHIPS } from "../src/data/ships";
@@ -122,6 +123,12 @@ for (const s of SHIPS) {
   add(s.name);
   add(s.passiveName);
   add(s.passiveDesc);
+  add(s.passiveIIName);
+  add(s.passiveIIDesc);
+}
+for (const p of [...SHIP_PERKS, ...MASTERY_PERKS]) {
+  add(p.name);
+  add(p.desc);
 }
 for (const n of CHART_NODES) {
   add(n.name);

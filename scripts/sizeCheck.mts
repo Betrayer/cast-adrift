@@ -17,7 +17,8 @@ const AUDIO_BUDGET = 400 * 1024;
 const LANDING_BUDGET = 60 * 1024;
 
 const DIST = join(process.cwd(), "dist");
-const APP_DIST = existsSync(join(DIST, "play")) ? join(DIST, "play") : DIST;
+const SPLIT = existsSync(join(DIST, "play", "index.html"));
+const APP_DIST = SPLIT ? join(DIST, "play") : DIST;
 const MANIFEST = join(DIST, ".vite", "manifest.json");
 
 interface ManifestEntry {
@@ -41,6 +42,7 @@ const shippedAudio = audioBytes(".webm");
 const fallbackAudio = audioBytes(".wav");
 
 const landingBytes = (): number => {
+  if (!SPLIT) return 0;
   const page = join(DIST, "index.html");
   if (!existsSync(page)) return 0;
   let total = statSync(page).size;
@@ -64,6 +66,28 @@ const e2eLeaks = (): string[] => {
   }
   return hits;
 };
+
+const VOICE_MARKER = "speechSynthesis";
+
+const voiceScripts = (dir: string): { files: number; hits: string[] } => {
+  const files = filesUnder(join(dir, "assets"), (file) => file.endsWith(".js"));
+  const hits = files.filter((path) => readFileSync(path, "utf8").includes(VOICE_MARKER)).map((path) => basename(path));
+  return { files: files.length, hits };
+};
+
+if (process.argv.includes("--novoice")) {
+  const { files, hits } = voiceScripts(join(process.cwd(), "dist-novoice"));
+  if (files === 0) {
+    console.error("size-check: no build at dist-novoice: run npm run build:novoice first");
+    process.exit(1);
+  }
+  if (hits.length > 0) {
+    for (const hit of hits) console.error(`size-check: the novoice build carries ${VOICE_MARKER} in ${hit}`);
+    process.exit(1);
+  }
+  console.log(`size-check: the novoice build carries no ${VOICE_MARKER} (${String(files)} scripts)`);
+  process.exit(0);
+}
 
 if (!existsSync(MANIFEST)) {
   console.error(
@@ -147,9 +171,13 @@ if (report) {
 
 const leaks = e2eLeaks();
 if (leaks.length === 0) console.log("  e2e hooks   absent from the bundle");
+const voiced = voiceScripts(DIST);
+if (voiced.hits.length > 0) console.log(`  voice       ${voiced.hits.join(", ")}`);
 
 const failures: string[] = [];
 for (const leak of leaks) failures.push(`e2e hook shipped to production: ${leak}`);
+if (voiced.hits.length === 0)
+  failures.push(`no script in the build carries ${VOICE_MARKER}: the voice is missing, so the novoice check proves nothing`);
 if (mainGz > MAIN_BUDGET)
   failures.push(`main chunk ${kb(mainGz)} exceeds ${kb(MAIN_BUDGET)}`);
 if (initialGz > INITIAL_BUDGET)
@@ -158,8 +186,10 @@ if (shippedAudio === 0)
   failures.push("no encoded audio found in public/audio — see docs/audio-credits.md");
 if (shippedAudio > AUDIO_BUDGET)
   failures.push(`audio ${kb(shippedAudio)} exceeds ${kb(AUDIO_BUDGET)}`);
-if (landing === 0)
-  failures.push("no landing at dist/index.html — run the build first");
+if (!SPLIT)
+  failures.push("no dist/play/index.html: the site split did not run, so dist/index.html is the app and not the landing; run npm run build");
+else if (landing === 0)
+  failures.push("no landing at dist/index.html: run npm run build");
 if (landing > LANDING_BUDGET)
   failures.push(
     `landing ${kb(landing)} exceeds ${kb(LANDING_BUDGET)} — it is one request plus six ship svgs`,

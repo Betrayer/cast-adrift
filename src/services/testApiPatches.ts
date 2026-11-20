@@ -2,9 +2,12 @@ import { ALL_COACH_MARK_IDS, HINT_IDS } from "@/game/tutorial";
 import { totalXpForLevel } from "@/game/xp";
 import {
   chooseBattleLayout,
+  chooseBridgeFrame,
   chooseChartLayout,
   chooseRollStyle,
 } from "@/services/prefs";
+import type { ShipId } from "@/data/ships";
+import { gainShipRankXp } from "@/game/run/shipRanks";
 import type { MetaPatch, RunPatch } from "@/services/testApiTypes";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
@@ -22,6 +25,9 @@ export const applyMeta = (patch: MetaPatch): void => {
   if (patch.selectedShip !== undefined) {
     meta.buyShip(patch.selectedShip, 0);
     meta.selectShip(patch.selectedShip);
+  }
+  for (const [id, xp] of Object.entries(patch.shipMasteryXp ?? {})) {
+    meta.addShipMasteryXp(id as ShipId, xp);
   }
   if (patch.shards !== undefined) {
     const delta = patch.shards - useMetaStore.getState().shards;
@@ -88,6 +94,7 @@ export const applyRun = (patch: RunPatch): void => {
     }));
   }
   for (const defId of patch.usedMinibosses ?? []) run.markMinibossUsed(defId);
+  if (patch.shipRankXp !== undefined) gainShipRankXp(patch.shipRankXp);
   if (patch.echo !== undefined) {
     useRunStore.setState({ echo: patch.echo, echoUsed: false });
   }
@@ -110,7 +117,10 @@ export const applySettings = (patch: Partial<SettingsValues>): void => {
   if (patch.fontScale !== undefined) settings.setFontScale(patch.fontScale);
   if (patch.battleSpeed !== undefined) settings.setBattleSpeed(patch.battleSpeed);
   if (patch.skipTally !== undefined) settings.setSkipTally(patch.skipTally);
+  if (patch.voice !== undefined) settings.setVoice(patch.voice);
+  if (patch.haptics !== undefined) settings.setHaptics(patch.haptics);
   if (patch.battleLayout !== undefined) chooseBattleLayout(patch.battleLayout);
+  if (patch.bridgeFrame !== undefined) chooseBridgeFrame(patch.bridgeFrame);
   if (patch.chartLayout !== undefined) chooseChartLayout(patch.chartLayout);
   if (patch.rollStyle !== undefined) chooseRollStyle(patch.rollStyle);
 };

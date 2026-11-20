@@ -3,9 +3,11 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
-import type { CodexEntry } from "@/data/codex";
+import { FUSION_BASE_BY_CODEX_ID, type CodexEntry } from "@/data/codex";
+import { DIE_BY_ID } from "@/data/dice";
 import { memoryUnlockHint } from "@/game/narrative/memoryArc";
 import { useMetaStore } from "@/stores/metaStore";
+import { FusionPreview } from "./FusionPreview";
 
 export const CodexEntryRow = ({
   entry,
@@ -19,9 +21,16 @@ export const CodexEntryRow = ({
   const read = useMetaStore((s) => s.codexRead.includes(entry.id));
   const markRead = useMetaStore((s) => s.markCodexRead);
   const [open, setOpen] = useState(false);
+  const fusionBase = entry.group === "fusion" ? FUSION_BASE_BY_CODEX_ID.get(entry.id) : undefined;
 
   if (!unlocked) {
-    const hint = entry.group === "memory" ? memoryUnlockHint(entry.id) : null;
+    const baseName = fusionBase === undefined ? undefined : DIE_BY_ID.get(fusionBase)?.name;
+    const hint =
+      entry.group === "memory"
+        ? memoryUnlockHint(entry.id)
+        : baseName === undefined
+          ? null
+          : { key: "run:codex.fusionHint", values: { die: t(baseName) } };
     return (
       <Paper
         bg={tokens.surface1}
@@ -36,7 +45,12 @@ export const CodexEntryRow = ({
           {t("run:codex.locked")}
         </Text>
         {hint === null ? null : (
-          <Text size="xs" c={tokens.faint} data-memory-hint={entry.id}>
+          <Text
+            size="xs"
+            c={tokens.faint}
+            data-memory-hint={entry.group === "memory" ? entry.id : undefined}
+            data-fusion-hint={entry.group === "fusion" ? entry.id : undefined}
+          >
             {t(hint.key, hint.values)}
           </Text>
         )}
@@ -82,9 +96,13 @@ export const CodexEntryRow = ({
               {t(entry.signature)}
             </Text>
           )}
-          <Text size="sm" c={tokens.dim}>
-            {t(entry.body)}
-          </Text>
+          {fusionBase === undefined ? (
+            <Text size="sm" c={tokens.dim}>
+              {t(entry.body)}
+            </Text>
+          ) : (
+            <FusionPreview base={fusionBase} result={entry.id.slice("fusion-".length)} />
+          )}
         </Stack>
       ) : null}
     </Paper>

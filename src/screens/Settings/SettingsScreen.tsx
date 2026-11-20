@@ -15,6 +15,7 @@ import { tokens } from '@/app/theme';
 import { AVAILABLE_LOCALES } from '@/i18n';
 import { playSfx } from '@/services/audio';
 import { flashVignette } from '@/services/vignette';
+import { useAppStore } from '@/stores/appStore';
 import { useMetaStore } from '@/stores/metaStore';
 import { useSettingsStore } from '@/stores/settingsStore';
 import type { Locale } from '@/types';
@@ -27,6 +28,7 @@ import { SegmentSetting } from './SegmentSetting';
 import { FramePicker } from './FramePicker';
 import { SkinPicker } from './SkinPicker';
 import { ThemePicker } from './ThemePicker';
+import { VoiceSetting } from './VoiceSetting';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
@@ -46,6 +48,7 @@ const LOCALE_OPTIONS = AVAILABLE_LOCALES.map((value) => ({
 export const SettingsScreen = () => {
   const { t } = useTranslation(['common', 'settings']);
   const settings = useSettingsStore();
+  const isTelegram = useAppStore((s) => s.isTelegram);
   const resetTutorial = useMetaStore((s) => s.resetTutorial);
 
   return (
@@ -188,6 +191,8 @@ export const SettingsScreen = () => {
         ]}
       />
 
+      {import.meta.env.VITE_VOICE === '1' ? <VoiceSetting /> : null}
+
       <div data-rise data-settings-section="screenShake" style={riseStyle(3)}>
         <Switch
           label={t('settings:screenShake')}
@@ -197,6 +202,19 @@ export const SettingsScreen = () => {
           }}
         />
       </div>
+
+      {isTelegram ? (
+        <div data-rise data-settings-section="haptics" style={riseStyle(3)}>
+          <Switch
+            label={t('settings:haptics')}
+            data-testid="settings-haptics"
+            checked={settings.haptics}
+            onChange={(event) => {
+              settings.setHaptics(event.currentTarget.checked);
+            }}
+          />
+        </div>
+      ) : null}
 
       <SegmentSetting
         section="vignette"

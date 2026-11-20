@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { ALL_EVENTS } from "../src/data/events";
 import { optionRequirements } from "../src/game/events/engine";
@@ -72,5 +73,32 @@ describe("event purchases are gated at their price", () => {
       ),
     );
     expect(found).toEqual(expected);
+  });
+});
+
+describe("prices on event cards", () => {
+  const LOCALES = ["en", "uk", "ru", "de", "es", "fr", "pl"];
+
+  const labelIn = (dict: unknown, key: string): string => {
+    let node: unknown = dict;
+    for (const part of key.replace(/^content:/, "").split(".")) {
+      node = node !== null && typeof node === "object" ? (node as Record<string, unknown>)[part] : undefined;
+    }
+    return typeof node === "string" ? node : "";
+  };
+
+  it("prints every scrap requirement's price in the option's label, in every locale", () => {
+    const missing: string[] = [];
+    for (const locale of LOCALES) {
+      const dict: unknown = JSON.parse(readFileSync(`src/i18n/${locale}/content.json`, "utf8"));
+      for (const event of ALL_EVENTS) {
+        for (const option of event.options) {
+          const scrap = optionRequirements(option.requires).find((req) => req.req === "scrap");
+          if (scrap === undefined || scrap.req !== "scrap") continue;
+          if (!labelIn(dict, option.label).endsWith(`(${String(scrap.n)})`)) missing.push(`${locale} ${event.id}.${option.id}`);
+        }
+      }
+    }
+    expect(missing).toEqual([]);
   });
 });

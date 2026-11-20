@@ -116,7 +116,7 @@ export const ASCENSIONS: readonly AscensionDef[] = [
     level: 15,
     name: "content:ascension.15.name",
     desc: "content:ascension.15.desc",
-    mods: { bossExtraPart: true, tideCapDelta: -1, gentleRidesUnmake: true },
+    mods: { bossExtraPart: true, tideCapDelta: 1, gentleRidesUnmake: true },
   },
 ];
 

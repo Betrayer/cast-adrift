@@ -84,7 +84,7 @@ import {
 } from "@/stores/runStore";
 import type { SettingsValues } from "@/stores/settingsStore";
 import { useSummaryStore, type RunResult } from "@/stores/summaryStore";
-import { battleAnchors, dieAtClient, type BattleAnchors } from "@/pixi/battle/anchors";
+import { battleAnchors, dieAtClient, readHalos, type BattleAnchors } from "@/pixi/battle/anchors";
 import { capturedTarget, draggedDie } from "@/pixi/battle/dragState";
 import { readFrames, readPerf, type PerfSnapshot } from "@/pixi/perf";
 import { faceOf } from "@/dice3d/faceLog";
@@ -180,6 +180,7 @@ export interface TestApi {
   chartLayout: (id: ChartLayoutId) => void;
   chartBackdrop: () => ChartBackdropStats;
   dieFace: (uid: string) => number | null;
+  halos: () => { uid: string; school: string; tint: string }[];
   rollStyle: (id: RollStyle) => void;
   forge: (a: string, b: string, signature: string) => boolean;
   forecast: () => TurnForecast | null;
@@ -332,6 +333,9 @@ export const createTestApi = (): TestApi => ({
           ? {}
           : { officers: [...patch.officers] }),
         ...(patch.echo === undefined ? {} : { echo: patch.echo }),
+        ...(patch.reinforcements === undefined
+          ? {}
+          : { reinforcements: [...patch.reinforcements] }),
       },
       deck,
       createStreams(patch.seed ?? DEFAULT_SEED),
@@ -353,6 +357,12 @@ export const createTestApi = (): TestApi => ({
   chartLayout: chooseChartLayout,
   chartBackdrop: () => readChartBackdrop(),
   dieFace: faceOf,
+  halos: () =>
+    readHalos().map((halo) => ({
+      uid: halo.uid,
+      school: halo.school,
+      tint: `#${halo.tint.toString(16).padStart(6, "0")}`,
+    })),
   rollStyle: chooseRollStyle,
   forge: (a, b, signature) => {
     const deck = useRunStore.getState().deck;

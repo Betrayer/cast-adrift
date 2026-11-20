@@ -81,3 +81,61 @@ describe("motionBudgetErrors", () => {
     expect(motionBudgetErrors(P, ".a { width: 10px; transition: opacity 1s, box-shadow 1s; }\n")).toEqual([]);
   });
 });
+
+describe("the reduced-motion duration budget", () => {
+  const R = ":root[data-ca-motion='reduced']";
+
+  it("passes none, a zero, the reduced token and anything at or under 160 ms", () => {
+    const css = `${R} .a { animation: none; }
+${R} .b { transition: opacity 0ms !important; }
+${R} .c { animation: fade var(--ca-motion-reduced) var(--ca-ease-out) 200ms backwards; }
+${R} .d { transition-duration: 120ms, 160ms; }
+${R} .e { transition-duration: 0ms !important; }
+`;
+    expect(motionBudgetErrors(P, css)).toEqual([]);
+  });
+
+  it("fails a reduced rule that runs longer than the twin, in ms, in seconds or by a longer token", () => {
+    const css = `${R} .a { animation: flash 240ms ease-in-out; }
+${R} .b { transition: opacity 0.3s; }
+${R} .c { animation: rise var(--ca-motion-m) linear; }
+${R} .d { transition: opacity 120ms, transform 400ms; }
+`;
+    const errors = motionBudgetErrors(P, css);
+    expect(errors).toHaveLength(4);
+    expect(errors[0]).toContain("runs 240 ms under reduced motion");
+    expect(errors[1]).toContain("runs 300 ms");
+    expect(errors[2]).toContain("runs 260 ms");
+    expect(errors[3]).toContain("runs 400 ms");
+  });
+
+  it("reads past an easing variable and fails a calc or an unknown variable where a duration should be", () => {
+    expect(motionBudgetErrors(P, `${R} .a { animation: spin var(--ca-ease-out) infinite; }
+`)).toEqual([]);
+    expect(motionBudgetErrors(P, `${R} .a { animation: x var(--foo) linear; }
+`)[0]).toContain("cannot read");
+    expect(motionBudgetErrors(P, `${R} .a { transition: opacity calc(var(--a) * 2) ease; }
+`)[0]).toContain("cannot read");
+  });
+
+  it("names a reduced duration it cannot read instead of letting it pass", () => {
+    expect(motionBudgetErrors(P, `${R} .a { animation: x var(--ca-motion-huge) linear; }\n`)[0]).toContain("cannot read");
+  });
+
+  it("reads a variable with a fallback the way the shorthand and the longhand both spell it", () => {
+    expect(motionBudgetErrors(P, `${R} .a { animation: fade var(--ca-flourish-ms, 620ms) linear; }\n`)[0]).toContain("cannot read");
+    expect(motionBudgetErrors(P, `${R} .a { animation-duration: var(--ca-flourish-ms, 620ms); }\n`)[0]).toContain("cannot read");
+    expect(motionBudgetErrors(P, `${R} .a { animation: fade var(--ca-motion-reduced, 400ms) linear; }\n`)).toEqual([]);
+    expect(motionBudgetErrors(P, `${R} .a { animation: spin var(--ca-ease-out, ease) infinite; }\n`)).toEqual([]);
+  });
+
+  it("fails a min, a max or a clamp where a duration should be", () => {
+    for (const time of ["min(var(--a), 400ms)", "max(var(--ca-motion-l), 400ms)", "clamp(100ms, var(--a), 900ms)"]) {
+      expect(motionBudgetErrors(P, `${R} .a { transition: opacity ${time} ease; }\n`)[0]).toContain("cannot read");
+    }
+  });
+
+  it("leaves full-motion rules alone, however long they run", () => {
+    expect(motionBudgetErrors(P, ".a { animation: drift 2400ms linear infinite; }\n")).toEqual([]);
+  });
+});

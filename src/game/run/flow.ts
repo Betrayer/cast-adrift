@@ -1,5 +1,7 @@
 import { ascensionMods, ascensionScrapBonusPct } from "@/data/ascension";
 import { dossierId } from "@/data/codex";
+import { masteryPerkIds } from "@/data/perks/ship";
+import { masteryRankOf } from "@/data/shipMastery";
 import { contractDef } from "@/data/contracts";
 import { DIE_BY_ID } from "@/data/dice";
 import { STARTER_DECK } from "@/data/decks";
@@ -59,6 +61,8 @@ import {
 import { pushRunCloud } from "@/game/run/cloud";
 import { grantDie } from "@/game/run/inventory";
 import { pickBoss } from "@/game/run/encounter";
+import { noteShipEvent } from "@/game/run/shipProgress";
+import { firstMkDiscount } from "@/game/run/shipRules";
 import {
   applyEdgeMotifs,
   applyHoleToll,
@@ -344,7 +348,12 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
   if (deckIds !== savedDeck && setup.deckPreset === undefined) {
     useMetaStore.getState().setDeck(deckIds);
   }
-  const chartMods = computeRunMods([], chartPicks);
+  const masteryRank =
+    setup.chartDisabled === true
+      ? 0
+      : masteryRankOf(meta.shipMastery[shipId]?.xp ?? 0);
+  const masteryPerks = masteryPerkIds(shipId, masteryRank);
+  const chartMods = computeRunMods(masteryPerks, chartPicks);
   const ascension = Math.max(0, options.ascension ?? 0);
   const hullPct = ascensionMods(ascension).hullPct + chartMods.hullMaxPct;
   const hullMax = Math.max(
@@ -370,6 +379,9 @@ export const startRunMode = (options: StartRunOptions = {}): void => {
     hullMax,
     scrap: STARTING_SCRAP,
     shipId,
+    masteryRank,
+    perks: masteryPerks,
+    shipyardDiscount: firstMkDiscount(shipId, masteryRank),
     chartPicks,
     echo,
     tide: Math.max(0, setup.tideStart ?? 0),
@@ -692,6 +704,7 @@ export const rideWormhole = (
 };
 
 const afterBossVictory = (): void => {
+  noteShipEvent("sectorCleared");
   const run = useRunStore.getState();
   const meta = useMetaStore.getState();
   const bossId = pickBoss(run.sector, run.seed);
@@ -743,6 +756,9 @@ const finalizeNode = (
           ? { bosses: 1 }
           : {};
   run.bumpStats({ nodesCleared: 1, kills: result.kills ?? 0, ...typeDelta });
+  if (node.type === "elite" || node.type === "miniboss" || node.type === "boss") {
+    noteShipEvent(node.type);
+  }
   useMetaStore.getState().bumpLifetime({
     kills: result.kills ?? 0,
     ...(node.type === "elite" ? { elites: 1 } : {}),
@@ -808,6 +824,7 @@ const leaveSector = (node: MapNode): void => {
     afterBossVictory();
     return;
   }
+  noteShipEvent("sectorCleared");
   advanceSector();
 };
 
@@ -902,6 +919,7 @@ const settleWonBattle = (
   const enemyDefIds = b.enemies.map((e) => e.defId);
   const tally = takeBattleTally();
   const survivedLethal = b.survivedLethal;
+  const blackBoxSpent = b.blackBoxSpent;
   endBattleStore();
   run.noteBattleTally(tally);
   noteBattleLifetime(
@@ -910,6 +928,7 @@ const settleWonBattle = (
   );
   run.noteDriftUsage(b.blackUsed, b.blueUsed);
   if (survivedLethal) run.setFlag("survivedLethal");
+  if (blackBoxSpent) useRunStore.setState({ blackBoxSpent: true });
   if (stolen > 0) run.spendScrap(Math.min(stolen, run.scrap));
   announceVictory(enemyDefIds, battleHull);
   const mods = computeRunMods(

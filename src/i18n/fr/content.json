@@ -395,32 +395,44 @@
     "wanderer": {
       "name": "Vagabond",
       "passiveName": "Gréement de récupération",
-      "passiveDesc": "Chaque combat débute avec +2 ferraille."
+      "passiveDesc": "Chaque combat débute avec +2 ferraille.",
+      "passiveIIName": "Gréement de récupération II",
+      "passiveIIDesc": "Chaque combat débute avec +3 ferraille."
     },
     "ram": {
       "name": "Bélier",
       "passiveName": "Surcharge",
-      "passiveDesc": "Un emplacement d’arme accepte un dé au-dessus de son plafond ; chaque placement de ce type coûte 2 coque."
+      "passiveDesc": "Un emplacement d’arme accepte un dé au-dessus de son plafond ; chaque placement de ce type coûte 2 coque.",
+      "passiveIIName": "Surcharge II",
+      "passiveIIDesc": "Un emplacement d'arme accepte un dé au-dessus de son plafond ; chaque placement de ce type coûte 1 coque."
     },
     "ark": {
       "name": "Arche",
       "passiveName": "Bastion",
-      "passiveDesc": "Un quart du bouclier restant passe au tour suivant."
+      "passiveDesc": "Un quart du bouclier restant passe au tour suivant.",
+      "passiveIIName": "Bastion II",
+      "passiveIIDesc": "Deux cinquièmes du bouclier restant passent au tour suivant."
     },
     "corsair": {
       "name": "Chien de chasse",
       "passiveName": "Postcombustion",
-      "passiveDesc": "La manœuvre « Runs Hot » : effleurement 7,5 % et esquive 4,5 % par valeur au lieu de 3,5 % et 1,5 %, +8 d'évasion et un plafond de 55/40 au lieu de 25/10. Chaque coup effleuré ou esquive confère +1 aux armes au tour suivant, jusqu'à +2 par tour."
+      "passiveDesc": "La manœuvre « Runs Hot » : effleurement 7,5 % et esquive 4,5 % par valeur au lieu de 3,5 % et 1,5 %, +8 d'évasion et un plafond de 38/22 au lieu de 25/10. Chaque coup effleuré ou esquive confère +1 aux armes au tour suivant, jusqu'à +2 par tour.",
+      "passiveIIName": "Postcombustion II",
+      "passiveIIDesc": "La manœuvre s'emballe comme avec Postcombustion, et chaque coup effleuré ou esquive confère +1 aux armes au tour suivant, jusqu'à +3 par tour."
     },
     "foundry": {
       "name": "Forge",
       "passiveName": "Recuit",
-      "passiveDesc": "Une fois par combat, deux dés de plateau de même valeur fusionnent pour former un dé d'un niveau supérieur, qui prend en compte les deux valeurs."
+      "passiveDesc": "Une fois par combat, deux dés de plateau de même valeur fusionnent pour former un dé d'un niveau supérieur, qui prend en compte les deux valeurs.",
+      "passiveIIName": "Recuit II",
+      "passiveIIDesc": "Une fois par combat, deux dés de plateau de même valeur fusionnent pour former un dé supérieur de deux niveaux, qui conserve les deux valeurs."
     },
     "prism": {
       "name": "Prisme",
       "passiveName": "Réfracteur",
-      "passiveDesc": "Les dés prismatiques comptent double dans le décompte de résonance. Une fois par combat, un dé devient prismatique pour ce tour."
+      "passiveDesc": "Les dés prismatiques comptent double dans le décompte de résonance. Une fois par combat, un dé devient prismatique pour ce tour.",
+      "passiveIIName": "Réfracteur II",
+      "passiveIIDesc": "Les dés prismatiques comptent triple dans le décompte de résonance. Une fois par combat, un dé devient prismatique pour ce tour."
     },
     "ram-proto": {
       "name": "Prototype Bélier"
@@ -1774,9 +1786,9 @@
     "clanToll": {
       "text": "Une barque du clan traverse le couloir et se met en position. « Le péage est de trente. Le couloir est à nous pour ce cycle. »",
       "opt": {
-        "pay": "Payer le péage",
+        "pay": "Payer le péage (30)",
         "run": "Parcourir la piste",
-        "haggle": "Marchander le péage"
+        "haggle": "Marchander le péage (30)"
       },
       "out": {
         "pay": "Ils vous font signe de passer et indiquent sur votre coque que vous avez payé. La file s'allonge de deux rangées.",
@@ -1804,7 +1816,7 @@
     "yusufDebt": {
       "text": "La voix de Yusuf, monocorde et fatiguée : « Tu dois une coque à ma bande. Soixante, ou on règle ça autrement. »",
       "opt": {
-        "settle": "Se régler en ferraille",
+        "settle": "Se régler en ferraille (60)",
         "refuse": "Refuse-le",
         "workItOff": "Éponger la dette sur sa voie"
       },
@@ -1844,7 +1856,7 @@
     "hunterTrail": {
       "text": "Un message à bande étroite, non crypté. La Chasseuse te lit ton registre à haute voix, chiffre par chiffre.",
       "opt": {
-        "buyOff": "L'amadouer",
+        "buyOff": "L'amadouer (50)",
         "ambushHer": "Tourne-toi et va à sa rencontre"
       },
       "out": {
@@ -1882,7 +1894,7 @@
     "beaconRelay": {
       "text": "Un mât de relais, dont la moitié de l'antenne a été arrachée. Il tente toujours d'émettre toutes les heures.",
       "opt": {
-        "repairIt": "Réparer le tableau",
+        "repairIt": "Réparer le tableau (25)",
         "stripIt": "Extraire les éléments du tableau",
         "useKey": "Utilisez la clé du Gardien"
       },
@@ -1952,7 +1964,7 @@
       "text": "Trois vaisseaux du clan, pas de contact. Ils attendent sur cette rangée depuis la voie.",
       "opt": {
         "standGround": "Ne cède pas d'un pouce",
-        "payLate": "Payer en retard, avec des intérêts",
+        "payLate": "Payer en retard, avec des intérêts (55)",
         "runForFold": "Filer vers le pli le plus proche"
       },
       "out": {
@@ -2000,7 +2012,7 @@
     "hunterRespect": {
       "text": "Cette fois-ci, la Chasseuse te interpelle sans détour. « Tu m'as coûté une aile. Dis ce que tu veux. »",
       "opt": {
-        "hireHer": "Embauchez-la",
+        "hireHer": "Embauchez-la (40)",
         "warnHer": "Dissuade-la de s'approcher du Noyau"
       },
       "out": {
@@ -2041,7 +2053,7 @@
     "warpedShipyard": {
       "text": "Un chantier qui s'est achevé tout seul après le départ de l'équipe. Les outils fonctionnent toujours.",
       "opt": {
-        "refit": "Payer pour une remise en état",
+        "refit": "Payer pour une remise en état (35)",
         "swapPart": "Qu'il remplace une pièce",
         "letItFinish": "Le laisser achever son propre plan"
       },
@@ -2096,7 +2108,7 @@
     "heretics": {
       "text": "Une poignée de coques dont l'hymne avait été effacé du revêtement. Ils ont entendu dire que tu avais refusé toi aussi.",
       "opt": {
-        "armThem": "Armez-les",
+        "armThem": "Armez-les (45)",
         "reportThem": "Signalez-les",
         "escortThem": "Les escorter au-delà du barrage"
       },
@@ -2160,7 +2172,7 @@
     "choirTithe": {
       "text": "Un point de collecte. Le « Chœur » accepte la ferraille, les coques ou rien du tout — et évalue ces trois types de matériaux en toute honnêteté.",
       "opt": {
-        "tithe": "Dîme en ferraille",
+        "tithe": "Dîme en ferraille (50)",
         "bleed": "La dîme à Hull",
         "declineTithe": "Baisse"
       },
@@ -2190,7 +2202,7 @@
       "opt": {
         "shelter": "L'accueillir",
         "handOver": "Remets-la-moi",
-        "giveFuel": "Lui donner du carburant et un cap"
+        "giveFuel": "Lui donner du carburant et un cap (20)"
       },
       "out": {
         "shelter": "En moins d'une heure, elle a trouvé son chemin et lit les itinéraires de Choir comme une carte.",
@@ -2295,7 +2307,7 @@
     "brokenLighthouse": {
       "text": "Un phare que personne n'a construit, plongé dans l'obscurité pour la première fois depuis quarante ans.",
       "opt": {
-        "relight": "Rallume-le",
+        "relight": "Rallume-le (60)",
         "harvestLens": "Prends l'objectif",
         "reactorLight": "L'allumer sur ton propre réacteur"
       },
@@ -2338,7 +2350,7 @@
     "lastMarket": {
       "text": "Mara s'est installée sur une coque abandonnée aux confins du Noyau. « C'est le dernier stock du secteur, capitaine. »",
       "opt": {
-        "buyOut": "Racheter ses parts",
+        "buyOut": "Racheter ses parts (90)",
         "sellShip": "Vends-lui ta plaque",
         "walkPast": "Passer devant",
         "haul": "Prendre la caisse sous son comptoir"
@@ -2364,7 +2376,7 @@
     "maraCollector": {
       "text": "Ce n'est pas Mara, mais son collectionneur. Il a la page où figure ton nom et n'a aucune envie de discuter.",
       "opt": {
-        "settleDebt": "Régler ses comptes",
+        "settleDebt": "Régler ses comptes (45)",
         "outrun": "Le devancer",
         "callFavour": "Demande-lui de te rendre la faveur qu'elle te doit"
       },
@@ -2439,7 +2451,7 @@
     "coldEngine": {
       "text": "Un groupe motopropulseur, à l'abandon depuis des décennies, toujours boulonné à la moitié d'une coque.",
       "opt": {
-        "warmIt": "Fais-le chauffer",
+        "warmIt": "Fais-le chauffer (20)",
         "gutIt": "Éviscérer",
         "coax": "Le relancer en douceur avec de petits dés"
       },
@@ -2493,8 +2505,8 @@
     "driftAuction": {
       "text": "La vente aux enchères de Mara, organisée depuis la rampe d'accès d'une péniche. Deux lots, une foule, pas de reçus.",
       "opt": {
-        "bidHigh": "Enchérissez haut",
-        "bidLow": "Enchérissez à un prix bas",
+        "bidHigh": "Enchérissez haut (70)",
+        "bidLow": "Enchérissez à un prix bas (25)",
         "heckle": "Chahuter les enchères"
       },
       "out": {
@@ -2533,7 +2545,7 @@
     "maraUsurer": {
       "text": "À la place du comptoir de Mara, on trouve un avis de saisie et une coque aussi grande qu’une chapelle. C’est désormais l’Usurier qui gère ses dettes — elle a vendu le livre pour couvrir ce que tu lui as coûté. « Capital, intérêts et désagréments », peut-on y lire.",
       "opt": {
-        "payInFull": "Réglez la totalité du montant",
+        "payInFull": "Réglez la totalité du montant (90)",
         "fightIt": "Refuser et rester en position",
         "runTheLane": "Parcourir la piste"
       },
@@ -2600,7 +2612,7 @@
     "keeperThread": {
       "text": "Le relais du Gardien vous localise entre deux balises. « Vous avez fait mon travail. Je ne sais pas si je dois vous remercier ou vous facturer. D’ailleurs, qu’est-ce que vous cherchez à obtenir avec tout ça ? »",
       "opt": {
-        "repayHim": "Régle ce que tu lui dois",
+        "repayHim": "Régle ce que tu lui dois (40)",
         "askMore": "Demande-lui d'en dire plus",
         "handTheLog": "Donne-lui ton journal de balise"
       },
@@ -2630,7 +2642,7 @@
     "tugStrike": {
       "text": "Onze remorqueurs maintenaient leur position en travers de la voie, moteurs à l'arrêt, leurs transpondeurs affichant tous les trois les mêmes mots : « PAS AVANT PAIEMENT ».",
       "opt": {
-        "payThem": "Verser une contribution au fonds de grève",
+        "payThem": "Verser une contribution au fonds de grève (40)",
         "crossPicket": "Franchir la ligne",
         "haulForThem": "Faites-leur un petit service"
       },
@@ -2657,7 +2669,7 @@
     "driftSchool": {
       "text": "Quelqu'un a monté une école dans un cargo désaffecté. Neuf enfants, un adulte très fatigué, et un programme scolaire qui consiste surtout à apprendre à ne pas mourir dans un champ de dérive.",
       "opt": {
-        "donate": "Laissez-leur des provisions",
+        "donate": "Laissez-leur des provisions (25)",
         "teachThem": "Donner un cours",
         "takeTheFreighter": "S'emparer du cœur du cargo"
       },
@@ -2698,7 +2710,7 @@
     "manifestAuction": {
       "text": "Une vente aux enchères publique pour un manifeste de fret que personne n'a vu. Trois enchérisseurs, dont l'un enchérit avec des « fleet script » qui n'ont plus cours depuis quarante ans.",
       "opt": {
-        "bidHigh": "Surenchéris sur eux tous",
+        "bidHigh": "Surenchéris sur eux tous (55)",
         "backScript": "Soutenir le soumissionnaire de la flotte",
         "jamAuction": "Bloquer la vente aux enchères",
         "haul": "Prendre le lot invendu en consignation"
@@ -2742,7 +2754,7 @@
       "text": "Deux transporteurs ont tendu une corde au-dessus d'un fossé et parient pour savoir lequel des deux parviendra à la traverser le plus rapidement sans la couper. Il reste de la place pour un troisième.",
       "opt": {
         "race": "Prends la troisième place",
-        "bet": "Misez sur le camion plus ancien",
+        "bet": "Misez sur le camion plus ancien (20)",
         "cutTether": "Coupe la laisse et pars !"
       },
       "out": {
@@ -2756,7 +2768,7 @@
     "yusufApprentice": {
       "text": "L'apprenti de Yusuf te contacte en privé. « Il ne te le demandera pas, alors c'est moi qui te le demande. Il a besoin d'une pièce, mais le magasin refuse de la lui vendre. »",
       "opt": {
-        "buyIt": "Achetez-le via votre liste de naissance",
+        "buyIt": "Achetez-le via votre liste de naissance (45)",
         "stealIt": "Enlève ça de la cour",
         "tellHim": "Dis à Yusuf que son apprenti a demandé"
       },
@@ -2770,7 +2782,7 @@
     "iceLighter": {
       "text": "Un brise-glace, toujours en marche, toujours vide. Son pilote automatique effectue la même boucle de livraison depuis avant la « Coupure » et n'a jamais reçu l'ordre de s'arrêter.",
       "opt": {
-        "loadIt": "Chargez-le et laissez-le tourner",
+        "loadIt": "Chargez-le et laissez-le tourner (20)",
         "boardIt": "Le découper en planches et en lanières",
         "stopIt": "Donne-lui l'ordre d'arrêt"
       },
@@ -2947,7 +2959,7 @@
     "riftPilotage": {
       "text": "Le tableau d'affichage d'une association de pilotes, à moitié brûlé, indique toujours les tarifs des lignes qui varient chaque année. Quelqu'un l'a mis à jour à la main.",
       "opt": {
-        "hirePilot": "Engager un pilote",
+        "hirePilot": "Engager un pilote (35)",
         "readBoard": "Il suffit de lire le forum",
         "takeBoard": "Prends le plateau"
       },
@@ -2976,7 +2988,7 @@
       "opt": {
         "sendBack": "Demandez-leur de revenir",
         "useThem": "Mettez-les au travail",
-        "armThem": "Armez-les et tenez la voie"
+        "armThem": "Armez-les et tenez la voie (50)"
       },
       "out": {
         "sendBack": "Ils se disputent pendant quatre minutes, puis s'en vont. En partant, quelqu'un laisse une pompe de rechange sur votre ponton.",
@@ -2989,7 +3001,7 @@
       "text": "L'acheteur a pris les commandes. Il porte désormais le gris « Choir » et a toujours ta liste de mariage écrite au dos de la main.",
       "opt": {
         "dealAnyway": "Fais-lui face quand même",
-        "buyBackName": "Rachetez votre registre",
+        "buyBackName": "Rachetez votre registre (60)",
         "readOrders": "Lisez ses ordres"
       },
       "out": {
@@ -3085,7 +3097,7 @@
       "text": "Quelqu'un compte les navires de la Procession, un par un, et ce depuis onze ans. Il en manque quatre cents, mais on ne sait pas lesquels.",
       "opt": {
         "helpCount": "Aide pour le décompte",
-        "buyCount": "Acheter le compteur",
+        "buyCount": "Acheter le compteur (45)",
         "tellTruth": "Dis-leur où sont passés les quatre cents"
       },
       "out": {
@@ -3098,7 +3110,7 @@
       "text": "Un acolyte fait traverser à des pèlerins une zone morte à bord d'une coque qui ne tiendra pas le coup pendant l'aller-retour, et il en est conscient.",
       "opt": {
         "takeThemOver": "Transportez-les vous-même",
-        "buyHull": "Lui acheter sa coque",
+        "buyHull": "Lui acheter sa coque (40)",
         "letItGo": "Qu'il traverse donc !"
       },
       "out": {
@@ -3126,7 +3138,7 @@
       "opt": {
         "thankThem": "Remerciez-les et entrez",
         "sendThemOff": "Retirez-les de la chaîne de production",
-        "armThemAgain": "Donnez-leur tout ce dont vous pouvez vous passer"
+        "armThemAgain": "Donnez-leur tout ce dont vous pouvez vous passer (60)"
       },
       "out": {
         "thankThem": "Ils tiendront le coup aussi longtemps qu'ils le pourront. Toutes les personnes concernées savent ce que cela signifie.",
@@ -3206,7 +3218,7 @@
       "opt": {
         "takeThemHome": "Enlève-les",
         "singWithThem": "Chantez avec eux",
-        "giveThemEngines": "Donnez-leur des moteurs"
+        "giveThemEngines": "Donnez-leur des moteurs (70)"
       },
       "out": {
         "takeThemHome": "On peut en mettre neuf si on coupe la fente en deux. On coupe la fente en deux.",
@@ -3243,9 +3255,9 @@
     "lastYard": {
       "text": "Un chantier s'est installé à l'ombre du Core, tenu par des gens qui sont venus ici pour travailler et qui n'ont trouvé aucune raison de repartir.",
       "opt": {
-        "refitHere": "Réaménager ici",
+        "refitHere": "Réaménager ici (50)",
         "warnThem": "Dis-leur de partir",
-        "hireCrew": "Recrutez une équipe par leur intermédiaire"
+        "hireCrew": "Recrutez une équipe par leur intermédiaire (35)"
       },
       "out": {
         "refitHere": "Ils travaillent vite et bien, et personne ne vous demande ce que vous allez faire là-dedans.",
@@ -3257,9 +3269,9 @@
     "thresholdMarket": {
       "text": "Quelqu'un tient un stand juste au seuil. Ce n'est pas Mara, mais les prix sont les siens, tout comme l'écriture sur le panneau.",
       "opt": {
-        "buyEverything": "Acheter tout le stand",
+        "buyEverything": "Acheter tout le stand (85)",
         "askWhose": "Demande à qui appartient cette écriture",
-        "leaveStock": "Laissez votre propre stock"
+        "leaveStock": "Laissez votre propre stock (30)"
       },
       "out": {
         "buyEverything": "Ce n'est pas vraiment un étal. Ce qu'il y a dessus, c'est le dernier stock que quelqu'un viendra chercher ici.",
@@ -3315,9 +3327,9 @@
     "debtorsHull": {
       "text": "Une coque grevée de trois privilèges et un propriétaire à bout de souffle, qui a entendu dire que vous régliez vos dettes.",
       "opt": {
-        "clearOne": "Levée d'un privilège",
-        "buyTheHull": "Acheter la coque en pleine propriété",
-        "buyTheDebt": "Achetez plutôt la dette",
+        "clearOne": "Levée d'un privilège (35)",
+        "buyTheHull": "Acheter la coque en pleine propriété (60)",
+        "buyTheDebt": "Achetez plutôt la dette (25)",
         "walkOn": "Laisser les privilèges où ils sont"
       },
       "out": {
@@ -3347,7 +3359,7 @@
       "opt": {
         "readIt": "Lire la pétition",
         "takeThem": "Faites-les monter à bord",
-        "sendThemOn": "Envoyez-les dans un endroit plus sûr"
+        "sendThemOn": "Envoyez-les dans un endroit plus sûr (30)"
       },
       "out": {
         "readIt": "Ils veulent venir avec toi. Tous les quatre. Le document compte deux pages de justifications.",
@@ -3360,7 +3372,7 @@
       "opt": {
         "letItSing": "Qu'il transmette",
         "scrubName": "Nettoyez votre registre",
-        "boostIt": "Améliorer la puissance de l'émetteur"
+        "boostIt": "Améliorer la puissance de l'émetteur (30)"
       },
       "out": {
         "letItSing": "Tous les vaisseaux du secteur savent désormais où la voie est sûre et qui l'a rendue ainsi.",
@@ -3372,7 +3384,7 @@
       "text": "Ici, la marée monte tôt et traverse une zone parsemée d'épaves, ce qui donne à l'ensemble l'aspect d'un immense dé instable.",
       "opt": {
         "rideSmall": "Joue-le sur des petits dés",
-        "waitItOut": "Attends que ça passe",
+        "waitItOut": "Attends que ça passe (20)",
         "pushThrough": "Allez droit au but"
       },
       "out": {
@@ -3401,7 +3413,7 @@
       "opt": {
         "nameThem": "Donnez un nom au corps",
         "joinWake": "Restez pour la veillée funèbre",
-        "takeTheHull": "Achetez-leur la coque"
+        "takeTheHull": "Achetez-leur la coque (40)"
       },
       "out": {
         "nameThem": "Tu prends une fiche d'enregistrement sur la plaque de la coque et tu en lis le contenu à haute voix. Neuf personnes l'acceptent immédiatement et avec gratitude.",
@@ -3449,7 +3461,7 @@
     },
     "foldedYard": {
       "text": "Le stand de Mara est là. Il ne devrait pas être là : tu l'as laissée loin derrière, avec dix-neuf sauts et un numéro de retard. Elle est en train de réapprovisionner son stock, tant bien que mal, à partir de caisses qui ne cessent d'arriver avant même qu'elle ne les ait commandées.",
-      "trade": "Acheter les pièces de coque (60 ferraille)",
+      "trade": "Acheter les pièces de coque (60)",
       "tradeOut": "Elle soude une plaque qu'elle dit t'avoir achetée la semaine dernière. La plaque est en bon état. Tu paies sans discuter de la date.",
       "ask": "Demande-lui comment elle est arrivée ici",
       "askOut": "« Comme toi. Quelqu’un m’a demandé de rester et j’ai dit oui. » Elle te répare gratuitement et note dans ton compte que chaque yard parcouru au-delà de celui-ci est à ton actif.",
@@ -3789,10 +3801,10 @@
       },
       "opt": {
         "swapRail": "Mettre ton pire noyau sur le rail d'échange",
-        "buyChart": "Acheter une carte du couloir",
+        "buyChart": "Acheter une carte du couloir (30)",
         "tellStory": "Vendre le récit de ton dernier combat",
         "liftCrate": "Chaparder une caisse pendant que les étals sont occupés",
-        "standRound": "Payer une tournée à tout le marché"
+        "standRound": "Payer une tournée à tout le marché (20)"
       },
       "out": {
         "swapRail": "Le rail prend ton pire noyau et te rend celui d'un inconnu, plus dix pour la différence de masse.",
@@ -3811,7 +3823,7 @@
       "text": "Un remorqueur du clan s'aligne sur ta dérive et te propose le plus vieux contrat des Champs : si tes moteurs meurent ici, ils te remorquent jusque chez toi. En échange, quand ils appellent, tu viens. Personne n'a jamais mis les termes par écrit. Personne n'en a jamais eu besoin.",
       "opt": {
         "pledge": "Faire la promesse",
-        "payDeposit": "Payer le remorquage à la place",
+        "payDeposit": "Payer le remorquage à la place (35)",
         "inspectTug": "Inspecter d'abord leur remorqueur",
         "stripTug": "Prendre leur câble et filer"
       },
@@ -3835,7 +3847,7 @@
       },
       "opt": {
         "comeWhenCalled": "Venir quand on appelle",
-        "sendScrap": "Envoyer de la ferraille à ta place",
+        "sendScrap": "Envoyer de la ferraille à ta place (40)",
         "passToYusuf": "Transmettre l'appel au convoi de Yusuf",
         "letItGo": "Laisser l'appel sans réponse"
       },
@@ -3853,7 +3865,7 @@
     "mineShepherd": {
       "text": "Une vieille femme en scaphandre rigide garde un troupeau de mines. Elle pousse chacune d'elles avec une gaffe, l'appelle par le nom que lui a donné sa grand-mère, et fait dériver le troupeau à l'écart du couloir. Elle a remarqué que tu es dans le couloir.",
       "opt": {
-        "hireHer": "La payer pour te guider",
+        "hireHer": "La payer pour te guider (25)",
         "learnNames": "Apprendre les noms et avancer lentement",
         "cullFlock": "Éclaircir le troupeau pour les boîtiers",
         "waitOut": "Couper les moteurs et laisser passer le troupeau"
@@ -3896,9 +3908,9 @@
     "inheritedLedger": {
       "text": "Un petit cotre impeccable à un mouillage du clan, affiché au tiers de sa valeur. Le vendeur est pressé et ne cesse de jeter des coups d'œil vers le couloir. Le piège est boulonné au siège du pilote : le livre de comptes du vaisseau. Dans les Champs, le livre va avec la coque, et celui-ci doit de l'argent à trois clans.",
       "opt": {
-        "honourLedger": "L'acheter et solder le livre de comptes",
-        "burnLedger": "Acheter la coque, brûler le livre",
-        "readLedger": "Lire le livre avant d'acheter",
+        "honourLedger": "L'acheter et solder le livre de comptes (50)",
+        "burnLedger": "Acheter la coque, brûler le livre (25)",
+        "readLedger": "Lire le livre avant d'acheter (15)",
         "tipClans": "Dire aux clans qui vend"
       },
       "out": {
@@ -3923,7 +3935,7 @@
         "echoName": "Lui donner le nom d'Echo",
         "fleetName": "Lui donner un nom de la boîte noire",
         "falseName": "Lui en donner un faux",
-        "offerScrap": "Proposer quand même de la ferraille"
+        "offerScrap": "Proposer quand même de la ferraille (30)"
       },
       "out": {
         "ownName": "Il l'écrit sur le tableau du convoi, avec une craie qui ne s'efface pas. La route qu'il te donne en retour vaut pour trois rangées.",
@@ -3946,7 +3958,7 @@
         "l3": "Je ne vais pas te dire quoi faire, capitaine. Je vais juste rester très silencieuse jusqu'à ce que tu le fasses."
       },
       "opt": {
-        "buyMind": "Racheter l'esprit de l'installation",
+        "buyMind": "Racheter l'esprit de l'installation (45)",
         "echoTalks": "Laisser Echo lui parler",
         "pullCore": "Prendre son noyau pour toi",
         "letItRest": "Le laisser partir en paix",
@@ -4012,8 +4024,8 @@
         "l3": "Je t'ai entendue. À cette profondeur, j'entends tout deux fois."
       },
       "opt": {
-        "buyNow": "Acheter à cette Mara-ci",
-        "waitForSale": "Attendre la liquidation",
+        "buyNow": "Acheter à cette Mara-ci (40)",
+        "waitForSale": "Attendre la liquidation (20)",
         "playBoth": "Monter une Mara contre l'autre",
         "warnHer": "Lui montrer la pancarte",
         "robLater": "Dévaliser le second étal"
@@ -4039,7 +4051,7 @@
       },
       "opt": {
         "joinRing": "Laisser l'anneau transiter par toi",
-        "buyPacket": "Acheter le paquet qu'ils gardent",
+        "buyPacket": "Acheter le paquet qu'ils gardent (30)",
         "askLane": "Leur demander une voie dégagée",
         "netRing": "Prendre l'anneau au filet, vendre les drones"
       },
@@ -4104,7 +4116,7 @@
       },
       "opt": {
         "foldSignals": "Replier les deux signaux en un seul",
-        "payUpkeep": "Payer l'entretien de la bouée",
+        "payUpkeep": "Payer l'entretien de la bouée (35)",
         "recordEcho": "Enregistrer le canal de l'écho",
         "cutBuoy": "Détacher la bouée et la vendre"
       },
@@ -4147,7 +4159,7 @@
       "text": "Une équipe de relevé a ancré trois bouées le long de la lisière du trou noir et le mesure avec une patience qui ressemble beaucoup à de la peur. Leur cheffe te fait signe de venir bord à bord. « Tous ceux qui passent par ici entrent dedans ou le contournent. On aimerait savoir lequel des deux, et pourquoi. »",
       "opt": {
         "lendSensors": "Leur prêter du temps de capteurs",
-        "buyTables": "Acheter une copie de leur relevé",
+        "buyTables": "Acheter une copie de leur relevé (30)",
         "doctorReading": "Leur vendre une mesure truquée",
         "shareLog": "Leur montrer le journal de demain",
         "warnThemOff": "Leur dire de relever leurs ancres"
@@ -4169,7 +4181,7 @@
       "text": "L'équipe de relevé de la lisière du trou noir t'a retrouvé. Les trois bouées s'en sont sorties, et la cheffe aussi, avec une copie de leurs mesures et une opinion sur toi.",
       "opt": {
         "claimShare": "Réclamer ta part du relevé",
-        "settleUp": "Rembourser ce que ta mesure leur a coûté",
+        "settleUp": "Rembourser ce que ta mesure leur a coûté (40)",
         "tradeCharts": "Échanger des cartes, rien de plus",
         "askHorizon": "Demander ce que l'horizon leur a montré"
       },
@@ -4214,7 +4226,7 @@
         "sweepCores": "Ramasser les noyaux lisses",
         "studyBite": "Étudier la trace de morsure",
         "baitIt": "Appâter ce qui se nourrit ici",
-        "leaveOffering": "Laisser une offrande dans le cercle",
+        "leaveOffering": "Laisser une offrande dans le cercle (25)",
         "checkTheLog": "Consulter le journal de demain"
       },
       "out": {
@@ -4258,7 +4270,7 @@
       "opt": {
         "pullFromFire": "Tirer des dés du feu",
         "feedPyre": "Lui donner ton dé le plus faible",
-        "buyAsh": "Acheter un sac de cendres",
+        "buyAsh": "Acheter un sac de cendres (35)",
         "dousePyre": "Éteindre le bûcher",
         "leaveIt": "Le laisser brûler"
       },
@@ -4282,7 +4294,7 @@
         "l2": "Je peux nous maintenir dans son sillage environ quatre-vingt-dix secondes avant qu'il nous remarque, capitaine. Après ça, ça devient une conversation."
       },
       "opt": {
-        "buyHerName": "Acheter le numéro à sa Première Voix",
+        "buyHerName": "Acheter le numéro à sa Première Voix (50)",
         "pullHerOut": "Aller la chercher",
         "oneMessage": "La laisser envoyer un seul message",
         "turnAway": "Éteindre l'écran radar"
@@ -4354,7 +4366,7 @@
         "reciteLine": "Réciter le vers suivant",
         "sisterRecites": "Laisser Quatre-un-deux répondre",
         "bluffIt": "Inventer un vers",
-        "payToll": "Payer le péage du silence",
+        "payToll": "Payer le péage du silence (40)",
         "forceGate": "Forcer le portail"
       },
       "out": {
@@ -4419,9 +4431,9 @@
         "l2": "Les tampons sont authentiques, capitaine. J'ai vérifié. J'ignore comment elle se les est procurés, et je préférerais que ça reste ainsi."
       },
       "opt": {
-        "buyIndulgence": "Acheter une indulgence",
-        "friendPrice": "Demander le prix d'ami",
-        "settleOld": "Régler ce qui reste entre vous",
+        "buyIndulgence": "Acheter une indulgence (45)",
+        "friendPrice": "Demander le prix d'ami (15)",
+        "settleOld": "Régler ce qui reste entre vous (30)",
         "reportHer": "La dénoncer au Chœur"
       },
       "out": {
@@ -4438,7 +4450,7 @@
     "blessedLane": {
       "text": "Une ordonnatrice de la Procession te hèle à une bifurcation. Une voie est bénie, l'autre maudite, et moyennant finance elle inscrira ton registre sur celle de ton choix.",
       "opt": {
-        "payBlessing": "Payer l'inscription sur la voie bénie",
+        "payBlessing": "Payer l'inscription sur la voie bénie (40)",
         "takeCursed": "Demander la voie maudite",
         "writeItYourself": "Rédiger l'inscription soi-même"
       },
@@ -4505,7 +4517,7 @@
         "holdEdge": "Lui demander de garder une lumière allumée au bord",
         "takeGunners": "Prendre à bord ses deux meilleurs canonniers",
         "collectLane": "Demander ce que le cortège t'a laissé",
-        "squarePinch": "Rembourser ce que le goulet leur a coûté"
+        "squarePinch": "Rembourser ce que le goulet leur a coûté (50)"
       },
       "out": {
         "sendHome": "Il discute exactement une minute, puis met le cap sur le Rim et laisse son blindage de rechange sur ta pince d'amarrage.",
@@ -4527,9 +4539,9 @@
         "l2": "Ton vaisseau a des opinions. Ça, c'est un supplément."
       },
       "opt": {
-        "payIt": "Payer ta propre prime",
+        "payIt": "Payer ta propre prime (60)",
         "settleIt": "Régler ça à l'ancienne",
-        "hireHer": "L'engager pour le dernier trajet",
+        "hireHer": "L'engager pour le dernier trajet (30)",
         "counterBounty": "Mettre plutôt une prime sur le Noyau"
       },
       "out": {
@@ -4622,7 +4634,7 @@
         "l2": "Elle a de meilleures données que moi sur ce trou. Cela me contrarie, personnellement."
       },
       "opt": {
-        "buyLog": "Acheter une copie de son journal",
+        "buyLog": "Acheter une copie de son journal (40)",
         "throwProbe": "Y jeter une sonde portant ton registre",
         "fishShards": "L'aider à pêcher des éclats de noyau sur le rebord",
         "warnHer": "Lui dire de partir tant qu'elle le peut"
@@ -4642,7 +4654,7 @@
       "text": "L'échoppe indiquée sur votre carte s'est effondrée une heure avant votre arrivée. À sa place, un combat fait encore rage, et la marchande est en plein dedans — enfermée dans son propre conteneur, elle lance des offres sur une fréquence ouverte à quiconque la sortira de là.",
       "opt": {
         "cutHerOut": "La désincarcérer",
-        "tradeThroughHatch": "Commercer par l'écoutille, en plein combat",
+        "tradeThroughHatch": "Commercer par l'écoutille, en plein combat (30)",
         "leaveHer": "La laisser se débrouiller"
       },
       "out": {
@@ -4688,7 +4700,7 @@
         "l3": "Bon. Tu paies, tu fuis, ou tu m'apprends quelque chose que j'ignore."
       },
       "opt": {
-        "buyOut": "Racheter votre propre prime (50 ferraille)",
+        "buyOut": "Racheter votre propre prime (50)",
         "countersign": "La contresigner au nom de celui qui l'a publiée",
         "callFavor": "Réclamer la faveur qu'elle vous doit",
         "outrun": "Filer avant que ses moteurs chauffent"
@@ -5224,7 +5236,7 @@
         "commission": "Commander le chef-d'œuvre (45)",
         "steadyCore": "Tenir le noyau brut pendant qu'elle taille",
         "quickCut": "Acheter une taille aujourd'hui (30)",
-        "callTheTow": "Lui rappeler qui l'a remorquée"
+        "callTheTow": "Lui rappeler qui l'a remorquée (20)"
       },
       "out": {
         "commission": "Elle inscrit ton registre à la craie sur l'établi, au-dessus de tous les autres. « Deux secteurs. Ne meurs pas. »",
@@ -6369,7 +6381,7 @@
     },
     "15": {
       "name": "Singularité",
-      "desc": "Chaque boss gagne une pièce de plus. La marée culmine un niveau plus bas, et plus aucune traversée d'un trou noir n'est stable."
+      "desc": "Chaque boss gagne une pièce de plus. La marée culmine un niveau plus haut encore, et plus aucune traversée d'un trou noir n'est stable."
     }
   },
   "prologue": {
@@ -7295,16 +7307,16 @@
     "yusuf12": "Yusuf : « Repose-toi ici aussi longtemps que tu veux. Le Rim ne va pas s'envoler. »",
     "yusuf13": "Yusuf : « Les réparations bon marché finissent par coûter deux fois plus cher. Tu t'en rendras compte un jour. »",
     "yusuf14": "Yusuf : « Allez, vas-y. Ne me fais pas revoir cette coque. »",
-    "keeper1": "Le Gardien : « C'est le troisième vaisseau de ce cycle. Les deux autres ne se sont pas arrêtés. »",
-    "keeper2": "Le Gardien : « Je m'occupe de l'éclairage. Il faut bien que quelqu'un indique où se trouvent les limites. »",
-    "keeper3": "Le Gardien : « La flotte est passée par ici en chantant. C'est noté dans le journal de bord. »",
-    "keeper4": "Le Gardien : « Les balises ne guident pas. Elles sont témoins. »",
-    "keeper5": "Le Gardien : « J'ai arrêté de compter les années. Je compte les rallumages. »",
-    "keeper6": "Le Gardien : « Répondez aux balises, et le secteur vous répondra. Tôt ou tard. »",
-    "keeper7": "Le Gardien : « Prends le relevé. Ne prends pas la lampe. »",
-    "keeper8": "Le Gardien : « Tout ce que le Rim avale, une balise l’a vu en premier. »",
-    "keeper9": "Le Gardien : « J'ai fait partie de l'équipage autrefois. Techniquement, le vaisseau est toujours là-bas. »",
-    "keeper10": "Le Gardien : « Si tu arrives jusqu’au Cœur, dis-lui que quelqu’un a veillé à ce que les lumières restent allumées. »",
+    "keeper1": "« C'est le troisième vaisseau de ce cycle. Les deux autres ne se sont pas arrêtés. »",
+    "keeper2": "« Je m'occupe de l'éclairage. Il faut bien que quelqu'un indique où se trouvent les limites. »",
+    "keeper3": "« La flotte est passée par ici en chantant. C'est noté dans le journal de bord. »",
+    "keeper4": "« Les balises ne guident pas. Elles sont témoins. »",
+    "keeper5": "« J'ai arrêté de compter les années. Je compte les rallumages. »",
+    "keeper6": "« Répondez aux balises, et le secteur vous répondra. Tôt ou tard. »",
+    "keeper7": "« Prends le relevé. Ne prends pas la lampe. »",
+    "keeper8": "« Tout ce que le Rim avale, une balise l’a vu en premier. »",
+    "keeper9": "« J'ai fait partie de l'équipage autrefois. Techniquement, le vaisseau est toujours là-bas. »",
+    "keeper10": "« Si tu arrives jusqu’au Cœur, dis-lui que quelqu’un a veillé à ce que les lumières restent allumées. »",
     "mara17": "« Tout ce qui se trouve de ce côté du comptoir a un prix. Tout ce qui se trouve de mon côté n'est pas à vendre. »",
     "mara18": "« Ne me dis pas ce que ça fait. Dis-moi ce que ça a fait à la dernière coque qui l'a utilisé. »",
     "mFriend1": "« Encore toi. Tant mieux. Je déteste devoir expliquer deux fois mon stock à des inconnus. »",
@@ -7789,6 +7801,86 @@
       "name": "Veto",
       "desc": "Une fois par session : un lancer du destin ou une issue d'événement qui réduirait la coque à zéro la laisse à {{n}}.",
       "short": "Veto · 1/session"
+    }
+  },
+  "shipPerks": {
+    "shipTurret": {
+      "name": "Nacelles de tourelle",
+      "desc": "Un dé d'arme affichant sa face maximale compte 1 de plus."
+    },
+    "shipPlates": {
+      "name": "Plaques de blindage",
+      "desc": "Le premier coup d'une élite, d'un mini-boss ou d'un boss dans chaque combat est 30 % plus faible."
+    },
+    "shipAfterburner": {
+      "name": "Tuyère de postcombustion",
+      "desc": "+6 d'évasion, et chaque combat débute avec 2 coque en moins."
+    },
+    "shipBay": {
+      "name": "Baie supplémentaire",
+      "desc": "+1 baie de modules."
+    },
+    "shipTargeting": {
+      "name": "Système de visée",
+      "desc": "Les capteurs gagnent un Mk immédiatement."
+    },
+    "shipCapacitor": {
+      "name": "Condensateur de bouclier",
+      "desc": "À partir du deuxième tour, chaque tour débute avec 1 de bouclier."
+    },
+    "shipCoil": {
+      "name": "Bobine de réacteur",
+      "desc": "+1 au plafond de charge."
+    },
+    "shipMagnet": {
+      "name": "Aimant à ferraille",
+      "desc": "Chaque combat débute avec +2 ferraille."
+    },
+    "shipBallast": {
+      "name": "Lest",
+      "desc": "+1 coque max."
+    },
+    "shipOverdrive": {
+      "name": "Surrégime",
+      "desc": "Les relances couvrent 2 dés de plus."
+    },
+    "shipHardpoint": {
+      "name": "Point d'emport",
+      "desc": "Les emplacements d'arme acceptent des dés d'une taille supérieure."
+    },
+    "shipCargoWeb": {
+      "name": "Filet de cargaison",
+      "desc": "+1 réserve."
+    },
+    "shipLattice": {
+      "name": "Réseau froid",
+      "desc": "15 % du bouclier survit au tour ennemi."
+    },
+    "shipPrism": {
+      "name": "Lentille prismatique",
+      "desc": "+1 à la résonance de l'école dominante."
+    },
+    "shipDrones": {
+      "name": "Drones de réparation",
+      "desc": "Soigne 1 de coque après chaque combat."
+    },
+    "shipBlackBox": {
+      "name": "Boîte noire",
+      "desc": "Une fois par partie, un coup mortel lors d'un combat de boss ou de mini-boss laisse la coque à 1."
+    }
+  },
+  "shipMastery": {
+    "hull": {
+      "name": "Maîtrise : coque renforcée",
+      "desc": "Coque supplémentaire grâce à la maîtrise de ce vaisseau."
+    },
+    "reserve": {
+      "name": "Maîtrise : râtelier de réserve",
+      "desc": "Réserve supplémentaire grâce à la maîtrise de ce vaisseau."
+    },
+    "firstHit": {
+      "name": "Maîtrise : châssis étayé",
+      "desc": "Le premier coup d'une élite, d'un mini-boss ou d'un boss dans chaque combat est plus faible."
     }
   }
 }

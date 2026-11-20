@@ -8,7 +8,7 @@ import {
   fireModeVars,
   type FireModeId,
 } from "@/data/fireModes";
-import { SHIP_BY_ID, type ShipId } from "@/data/ships";
+import { SHIP_BY_ID, shipPassiveText, type ShipId } from "@/data/ships";
 import {
   affinitySchoolForSlot,
   ENGINE_SLOTS,
@@ -17,6 +17,7 @@ import {
 } from "@/data/slots";
 import {
   overCapAllowed,
+  passiveTierFor,
   shipProfile,
   type PassiveHandlerId,
 } from "@/game/battle/passives";
@@ -509,12 +510,12 @@ const fitRoute = (
 };
 
 const slotSheetFit = (
-  run: Pick<SlotSheetRun, "deck" | "shipId">,
+  run: Pick<SlotSheetRun, "deck" | "shipId" | "masteryRank">,
   slotId: SlotId,
   cap: DieTier,
   sources: readonly SlotSource[],
 ): SlotSheetFit => {
-  const rule = overCapAllowed(run.shipId, slotId);
+  const rule = overCapAllowed(run.shipId, slotId, passiveTierFor(run.masteryRank));
   const grants = fitGrants(sources);
   const tally = new Map<string, SlotFitRow>();
   for (const entry of run.deck) {
@@ -550,18 +551,15 @@ const slotPlacementRules = (
 const slotPassiveNote = (
   shipId: ShipId,
   slotId: SlotId,
+  tier: 1 | 2,
 ): SlotPassiveNote | null => {
   const ship = SHIP_BY_ID.get(shipId);
   const passive = ship?.passive;
-  if (
-    passive === undefined ||
-    ship?.passiveName === undefined ||
-    ship.passiveDesc === undefined
-  ) {
-    return null;
-  }
+  if (passive === undefined || ship === undefined) return null;
+  const text = shipPassiveText(ship, tier);
+  if (text.name === undefined || text.desc === undefined) return null;
   if (!PASSIVE_TOUCHES[passive.kind](shipId, slotId)) return null;
-  return { passive: passive.kind, name: ship.passiveName, desc: ship.passiveDesc };
+  return { passive: passive.kind, name: text.name, desc: text.desc };
 };
 
 const nextMkRow = (
@@ -639,7 +637,7 @@ export const slotSheetModel = (
     shrunk: cap < baseCap,
     disabled,
     affinity,
-    passiveNote: slotPassiveNote(run.shipId, slotId),
+    passiveNote: slotPassiveNote(run.shipId, slotId, passiveTierFor(run.masteryRank)),
     what: systemWhatKey(slotId),
     facts: factsForSlot(slotId, factInput).map((fact) => ({
       id: fact.id,
