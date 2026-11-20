@@ -1,4 +1,6 @@
 import {
+  bandBridges,
+  bandOf,
   nodeById,
   type MapGraph,
   type MapNode,
@@ -13,10 +15,14 @@ export interface ReachStep {
 
 const adjacency = (map: MapGraph): ReadonlyMap<NodeId, NodeId[]> => {
   const out = new Map<NodeId, NodeId[]>();
-  for (const [from, to] of map.edges) {
+  const link = (from: NodeId, to: NodeId): void => {
     const list = out.get(from);
     if (list === undefined) out.set(from, [to]);
-    else list.push(to);
+    else if (!list.includes(to)) list.push(to);
+  };
+  for (const [from, to] of map.edges) link(from, to);
+  for (const [rim, far] of bandBridges(map.nodes, bandOf(map)?.rows ?? null)) {
+    link(rim, far);
   }
   return out;
 };
@@ -27,7 +33,8 @@ export const forwardReach = (
   visited: readonly NodeId[] = [],
 ): ReadonlyMap<NodeId, number> => {
   const byId = nodeById(map);
-  if (byId.get(from) === undefined) return new Map();
+  const origin = byId.get(from);
+  if (origin === undefined) return new Map();
   const cleared = new Set(visited);
   const links = adjacency(map);
   const depth = new Map<NodeId, number>([[from, 0]]);
@@ -35,12 +42,12 @@ export const forwardReach = (
   for (let head = 0; head < queue.length; head += 1) {
     const id = queue[head];
     if (id === undefined) continue;
-    const rows = depth.get(id) ?? 0;
     for (const next of links.get(id) ?? []) {
       if (depth.has(next)) continue;
       if (cleared.has(next)) continue;
-      if (byId.get(next)?.hole === true) continue;
-      depth.set(next, rows + 1);
+      const node = byId.get(next);
+      if (node === undefined || node.hole === true) continue;
+      depth.set(next, node.row - origin.row);
       queue.push(next);
     }
   }

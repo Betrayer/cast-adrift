@@ -1,5 +1,6 @@
 import {
   useCallback,
+  useContext,
   useId,
   useLayoutEffect,
   useRef,
@@ -8,6 +9,7 @@ import {
 } from 'react';
 import { createPortal } from 'react-dom';
 import { cx } from '@/app/cx';
+import { ParkedContext } from '@/app/parked';
 import {
   popoverMaxHeight,
   popoverPlacement,
@@ -54,6 +56,9 @@ export const TapPopover = ({
   role = 'tooltip',
 }: TapPopoverProps) => {
   const [open, setOpen] = useState(false);
+  const parked = useContext(ParkedContext);
+  if (parked && open) setOpen(false);
+  const shown = open && !parked;
   const anchorRef = useRef<HTMLSpanElement | null>(null);
   const bubbleRef = useRef<HTMLSpanElement | null>(null);
   const bubbleId = useId();
@@ -67,11 +72,11 @@ export const TapPopover = ({
     swallowNextClick(at);
   }, []);
 
-  useEscapeKey(open, close);
-  useOutsidePointer(open, anchorRef, close, bubbleRef);
+  useEscapeKey(shown, close);
+  useOutsidePointer(shown, anchorRef, close, bubbleRef);
 
   useLayoutEffect(() => {
-    if (!open) return;
+    if (!shown) return;
     const bubble = bubbleRef.current;
     const anchor = anchorRef.current;
     if (bubble === null || anchor === null) return;
@@ -99,7 +104,7 @@ export const TapPopover = ({
       window.removeEventListener('resize', place);
       window.removeEventListener('scroll', place, true);
     };
-  }, [open, align]);
+  }, [shown, align]);
 
   return (
     <span ref={anchorRef} className={cx(styles.anchor, className)}>
@@ -107,8 +112,8 @@ export const TapPopover = ({
         type="button"
         className={styles.trigger}
         aria-label={label}
-        aria-expanded={open}
-        aria-controls={open ? bubbleId : undefined}
+        aria-expanded={shown}
+        aria-controls={shown ? bubbleId : undefined}
         aria-haspopup={role === 'menu' ? 'menu' : undefined}
         data-testid={testId}
         onClick={() => {
@@ -118,7 +123,7 @@ export const TapPopover = ({
       >
         {children}
       </button>
-      {open
+      {shown
         ? createPortal(
             <span
               ref={bubbleRef}

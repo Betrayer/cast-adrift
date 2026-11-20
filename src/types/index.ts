@@ -40,6 +40,10 @@ export type BattleSpeed = 'normal' | 'fast';
 
 export type BattleLayoutId = 'console' | 'orbit' | 'tablet';
 
+export type ChartLayoutId = 'spiral' | 'rings' | 'constellations' | 'nebulae';
+
+export type RollStyle = 'flip' | 'reel' | 'blur';
+
 export type EchoVerbosity = 'normal' | 'less' | 'off';
 
 export type VignetteIntensity = 'off' | 'subtle' | 'full';

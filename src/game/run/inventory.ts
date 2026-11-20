@@ -2,7 +2,8 @@ import { MODULE_BY_ID } from "@/data/modules";
 import { OFFICER_BY_ID } from "@/data/officers";
 import { takeCargo } from "@/game/run/cargo";
 import {
-  DECK_CAP,
+  HAND_CAP,
+  instanceSellValue,
   moduleSellValue,
   ptsForDie,
   sellValue,
@@ -26,7 +27,7 @@ export const swapValue = (swap: PendingSwap): number => {
 
 export const grantDie = (defId: string): GrantOutcome => {
   const run = useRunStore.getState();
-  if (run.deck.length < DECK_CAP) {
+  if (run.deck.length < HAND_CAP) {
     run.addDie(defId);
     return "added";
   }
@@ -79,12 +80,22 @@ export const sellModule = (moduleId: string): boolean => {
   return true;
 };
 
+export const sellDie = (uid: string): boolean => {
+  const run = useRunStore.getState();
+  if (run.deck.length <= 1) return false;
+  const die = run.deck.find((d) => d.uid === uid);
+  if (die === undefined) return false;
+  run.removeDie(uid);
+  run.addScrap(instanceSellValue(die));
+  return true;
+};
+
 export const replaceDie = (uid: string, defId: string): boolean => {
   const run = useRunStore.getState();
   const outgoing = run.deck.find((die) => die.uid === uid);
   if (outgoing === undefined) return false;
   run.removeDie(uid);
-  run.addScrap(sellValue(ptsForDie(outgoing.defId)));
+  run.addScrap(instanceSellValue(outgoing));
   useRunStore.getState().addDie(defId);
   return true;
 };
@@ -141,3 +152,8 @@ export const resolveSwapSell = (): void => {
   if (value > 0) run.addScrap(value);
   useRunStore.getState().shiftSwap();
 };
+
+export const ownedCount = (
+  hand: readonly { defId: string }[],
+  defId: string,
+): number => hand.filter((die) => die.defId === defId).length;

@@ -10,6 +10,32 @@ export const easeOutBack: Ease = (t) => {
   return 1 + c3 * (t - 1) ** 3 + c1 * (t - 1) ** 2;
 };
 
+export const easeOutCubic: Ease = (t) => 1 - (1 - t) ** 3;
+
+export const SPRING_DAMPING = 0.55;
+
+export const SPRING_OMEGA = 12;
+
+const springRaw = (t: number): number => {
+  const zeta = SPRING_DAMPING;
+  const omega = SPRING_OMEGA;
+  const damped = omega * Math.sqrt(1 - zeta * zeta);
+  const decay = Math.exp(-zeta * omega * t);
+  return (
+    1 -
+    decay *
+      (Math.cos(damped * t) + ((zeta * omega) / damped) * Math.sin(damped * t))
+  );
+};
+
+const SPRING_END = springRaw(1);
+
+export const spring: Ease = (t) => {
+  if (t <= 0) return 0;
+  if (t >= 1) return 1;
+  return springRaw(t) - (SPRING_END - 1) * t;
+};
+
 export type TweenProps<T> = {
   [K in keyof T & string as T[K] extends number ? K : never]?: number;
 };
@@ -26,6 +52,18 @@ export interface TweenClock {
 export interface TweenOptions {
   delay?: number;
   group?: string;
+  onUpdate?: (progress: number) => void;
+  onDrop?: () => void;
+}
+
+export interface StaggerOptions extends TweenOptions {
+  onComplete?: () => void;
+}
+
+export interface CountOptions extends TweenOptions {
+  ease?: Ease;
+  reduced?: boolean;
+  onComplete?: () => void;
 }
 
 export interface SequenceStep {
@@ -58,6 +96,8 @@ interface ActiveTween {
   started: boolean;
   ease: Ease;
   onComplete?: () => void;
+  onUpdate?: (progress: number) => void;
+  onDrop?: () => void;
 }
 
 interface ActiveTimer {
@@ -124,10 +164,26 @@ export class Tweens {
   private readonly active = new Set<ActiveTween>();
   private readonly timers = new Set<ActiveTimer>();
   private readonly groupScales = new Map<string, number>();
+  private attached = false;
 
   constructor(clock: TweenClock) {
     this.clock = clock;
+  }
+
+  get busy(): boolean {
+    return this.active.size > 0 || this.timers.size > 0;
+  }
+
+  private attach(): void {
+    if (this.attached) return;
+    this.attached = true;
     this.clock.add(this.update);
+  }
+
+  private detachWhenIdle(): void {
+    if (!this.attached || this.busy) return;
+    this.attached = false;
+    this.clock.remove(this.update);
   }
 
   setGroupScale(group: string, scale: number): void {
@@ -177,11 +233,90 @@ export class Tweens {
       started: false,
       ease,
       onComplete,
+      onUpdate: options.onUpdate,
+      onDrop: options.onDrop,
     };
     this.active.add(tween);
+    this.attach();
     return () => {
       this.active.delete(tween);
     };
+  }
+
+  stagger<T extends object>(
+    targets: readonly T[],
+    props: TweenProps<T> | ((index: number) => TweenProps<T>),
+    ms: number,
+    ease: Ease = easeOutQuad,
+    gap = 0,
+    options: StaggerOptions = {},
+  ): () => void {
+    const base = Math.max(0, options.delay ?? 0);
+    let remaining = targets.length;
+    const finish = (): void => {
+      remaining -= 1;
+      if (remaining === 0) options.onComplete?.();
+    };
+    const cancels = targets.map((target, index) =>
+      this.to(
+        target,
+        typeof props === "function" ? props(index) : props,
+        ms,
+        ease,
+        finish,
+        {
+          group: options.group,
+          onUpdate: options.onUpdate,
+          onDrop: finish,
+          delay: base + index * Math.max(0, gap),
+        },
+      ),
+    );
+    if (targets.length === 0) options.onComplete?.();
+    return () => {
+      for (const cancel of cancels) cancel();
+    };
+  }
+
+  count(
+    from: number,
+    to: number,
+    ms: number,
+    write: (value: number) => void,
+    options: CountOptions = {},
+  ): () => void {
+    const end = Math.round(to);
+    if (options.reduced === true || ms <= 0 || from === to) {
+      write(end);
+      options.onComplete?.();
+      return () => undefined;
+    }
+    const probe = { value: from };
+    let shown = Math.round(from);
+    write(shown);
+    return this.to(
+      probe,
+      { value: to },
+      ms,
+      options.ease ?? easeOutCubic,
+      () => {
+        if (shown !== end) write(end);
+        shown = end;
+        options.onComplete?.();
+      },
+      {
+        delay: options.delay,
+        group: options.group,
+        onUpdate: (progress) => {
+          const next = progress >= 1 ? end : Math.round(probe.value);
+          if (next !== shown) {
+            shown = next;
+            write(next);
+          }
+          options.onUpdate?.(progress);
+        },
+      },
+    );
   }
 
   after(ms: number, run: () => void, options: TweenOptions = {}): () => void {
@@ -191,6 +326,7 @@ export class Tweens {
       run,
     };
     this.timers.add(timer);
+    this.attach();
     return () => {
       this.timers.delete(timer);
     };
@@ -234,6 +370,7 @@ export class Tweens {
       if (!this.active.has(tween)) continue;
       if (targetIsDestroyed(tween.target)) {
         this.active.delete(tween);
+        tween.onDrop?.();
         continue;
       }
       const scale = this.scaleFor(tween.group);
@@ -253,19 +390,42 @@ export class Tweens {
       for (const key of Object.keys(tween.to)) {
         const from = tween.from[key] ?? 0;
         const to = tween.to[key] ?? 0;
-        tween.target[key] = from + (to - from) * k;
+        tween.target[key] = t >= 1 ? to : from + (to - from) * k;
       }
+      tween.onUpdate?.(t);
+      if (!this.active.has(tween)) continue;
       if (t >= 1) {
         this.active.delete(tween);
         tween.onComplete?.();
       }
     }
+    this.detachWhenIdle();
   };
 
   destroy(): void {
-    this.clock.remove(this.update);
+    if (this.attached) this.clock.remove(this.update);
+    this.attached = false;
     this.active.clear();
     this.timers.clear();
     this.groupScales.clear();
   }
 }
+
+export interface RafTweens {
+  clock: ReturnType<typeof rafClock>;
+  tweens: Tweens;
+  destroy: () => void;
+}
+
+export const rafTweens = (): RafTweens => {
+  const clock = rafClock();
+  const tweens = new Tweens(clock);
+  return {
+    clock,
+    tweens,
+    destroy: () => {
+      tweens.destroy();
+      clock.destroy();
+    },
+  };
+};

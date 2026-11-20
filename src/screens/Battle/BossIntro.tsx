@@ -5,6 +5,7 @@ import { AppSheet } from '@/components/AppModal';
 import { WarpStreaks } from '@/components/WarpStreaks';
 import { tokens } from '@/app/theme';
 import { ENEMY_BY_ID } from '@/data/enemies';
+import { partDefOf } from '@/game/battle/damage';
 import { playSfx } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { useBattleStore } from '@/stores/battleStore';
@@ -96,7 +97,7 @@ export const BossIntro = () => {
             </Text>
             <div className={styles.pips}>
               {subsystems.map((sub, index) => {
-                const subDef = def.subsystems?.find((s) => s.id === sub.key);
+                const subDef = partDefOf(def, sub);
                 return (
                   <span
                     key={sub.id}

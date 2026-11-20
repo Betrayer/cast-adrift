@@ -76,7 +76,8 @@
     "echoTotal": "echoes your last turn (max {{n}})",
     "foldOrder": "folds the order",
     "devourDie": "eats your best spare die",
-    "idle": "Holds"
+    "idle": "Holds",
+    "hidden": "Intent hidden"
   },
   "slot": {
     "weaponA": "Weapon A",
@@ -142,6 +143,7 @@
   "targetBody": "Target the hull",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "incoming raw {{raw}} → ~{{expected}} · shield {{shield}} · hull {{hull}}",
+  "mitigationHidden": "worst case raw {{raw}} → ~{{expected}} · shield {{shield}} · hull {{hull}}",
   "mitigationNone": "No damage from this enemy this turn",
   "forecast": "you deal {{out}} · you take ~{{inc}} (shield holds {{shield}})",
   "forecastClear": "{{out}} damage clears the field",
@@ -199,7 +201,8 @@
     "active": "Has an active",
     "engraved": "Engraved",
     "growth": "Grows on a max face",
-    "faces": "Non-standard faces"
+    "faces": "Non-standard faces",
+    "forged": "Forged"
   },
   "layoutHint": "Prefer another battle layout? Settings → Battle interface.",
   "radial": {
@@ -244,7 +247,9 @@
       "faces": "Non-standard faces — {{list}}",
       "growth": "Growth — +{{per}} on a max face, up to +{{cap}}",
       "growthField": "Growth — +{{n}} carried from the field",
-      "prismatic": "Prism — counts as any school and inherits the slot affinity"
+      "prismatic": "Prism — counts as any school and inherits the slot affinity",
+      "legendary": "Legendary — an aura in the colour of its school",
+      "forged": "Forged ×{{n}} — d{{from}} → d{{to}}"
     },
     "active": {
       "flip": "once a battle, flip to the opposite face",
@@ -344,18 +349,69 @@
   "interferenceWhy": "Skipped anomalies stack up: every stack adds another tide level for the rest of the run. Clear an anomaly to drop them all.",
   "interferenceTitle": "Interference",
   "axisWhy": "Black dice pull toward Resonance, blue toward Stability. Events and drift move it too.",
-  "chargeWhy": "Spend charge on actions: −1 nudge costs {{n}}, +1 nudge costs {{n}}, a bought reroll costs 5, a surge costs 10.",
+  "chargeWhy": "Spend charge on actions: a nudge of one face up or down costs {{n}}, a bought reroll costs {{reroll}}, a surge costs {{surge}}.",
   "chargeTitle": "Charge",
   "mkWhy": "Mk raises the slot cap and the affinity bonus of its school.",
   "resEarned": "Earned",
   "manoeuvreTitle": "Manoeuvre",
-  "manoeuvreWhy": "A die in Engines sets one evasion roll per incoming hit: glancing {{glancing}}% × value (max {{glancingCap}}%), dodge {{dodge}}% × value (max {{dodgeCap}}%). A glancing hit takes half, rounded up, a dodge takes nothing, anything else lands in full. From value {{intercept}} the turn's first successful evasion — glancing or dodge — is an intercept: Weapons +1 next turn. Value is the die after affinity and bonuses.",
-  "manoeuvreBrief": "One evasion roll per hit: glancing {{glancing}}% × value (cap {{glancingCap}}%), dodge {{dodge}}% × value (cap {{dodgeCap}}%). A glance halves it, a dodge negates it. From {{intercept}} the first evasion pays Weapons +1.",
+  "manoeuvreWhy": "A die in Engines sets one evasion roll per incoming hit: glancing {{glancing}}% × value (max {{glancingCap}}%), dodge {{dodge}}% × value (max {{dodgeCap}}%). A glancing hit takes half, rounded up, a dodge takes nothing, anything else lands in full. From value {{intercept}} the turn's first successful evasion — glancing or dodge — is an intercept: Weapons +{{interceptBonus}} next turn. Value is the die after affinity and bonuses.",
+  "manoeuvreBrief": "One evasion roll per hit: glancing {{glancing}}% × value (cap {{glancingCap}}%), dodge {{dodge}}% × value (cap {{dodgeCap}}%). A glance halves it, a dodge negates it. From {{intercept}} the first evasion pays Weapons +{{interceptBonus}}.",
   "targetingTitle": "Targeting",
-  "targetingWhy": "A die in Sensors makes the target Vulnerable +D for the turn: D is half the die value rounded up, capped at {{cap}}, and every hit this turn deals that much more. On the die’s max face the hit also pierces the shield. Sensors Mk also reveals one more map row per level above Mk1.",
+  "targetingWhy": "A die in Sensors makes the target Vulnerable +D for the turn: D is half the die value rounded up, capped at {{cap}}, and every hit this turn deals that much more. On the die’s max face the hit also pierces the shield.",
   "targetingBrief": "Sensors mark the target: Vulnerable +D for the turn, D is half the die value rounded up, cap {{cap}}. Every hit this turn deals that much more; the die's max face also pierces the shield.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systems",
+  "system": {
+    "weaponA": {
+      "what": "Your main gun: the die's value becomes damage on the chosen target. It fires right after Sensors, ahead of every other weapon."
+    },
+    "weaponB": {
+      "what": "Your second gun, built like Weapon A: the die's value becomes damage. It fires right after Weapon A, at whatever that shot left standing."
+    },
+    "spinal": {
+      "what": "A keel-length cannon that takes the biggest dice on the ship. A low roll wedges it; a clean shot drives the whole value into the target.",
+      "jam": "The spinal mount wedges on a value of {{jamOn}} or less, bonuses included: it fires nothing this turn and its next shot gets +{{carry}}, which keeps stacking while it keeps wedging. Above that it hits for the value plus bonuses, with the target's Vulnerable added and ×{{crit}} on a critical hit. It has no fire modes.",
+      "mk": "Mk never lifts the spinal mount's cap — it takes up to d{{cap}} at every level — but it does raise red's affinity bonus here."
+    },
+    "weapons": {
+      "damage": "Damage is the die's value plus its bonuses, shaped by the armed fire mode. Each hit adds the target's Vulnerable, a critical hit multiplies the total by ×{{crit}}, rounded down, and the enemy's shield soaks damage before its hull.",
+      "affinity": "Red dice add +{{mk1}} to their value here at Mk1, +{{mk2}} at Mk2 and +{{mk3}} at Mk3. A prismatic die counts as red in this slot."
+    },
+    "shields": {
+      "what": "Your shield generator: the die's value becomes shield for this turn. Enemy hits spend it before they reach the hull.",
+      "gain": "A die in Shields adds its value, plus bonuses, to your shield. Every shield slot feeds the same shield.",
+      "keep": "Shield lasts through the enemy's turn only: whatever is left when that turn ends is lost, unless something keeps a share of it or blue resonance has laid a lasting layer.",
+      "affinity": "Blue dice add +{{mk1}} here at Mk1, +{{mk2}} at Mk2 and +{{mk3}} at Mk3. A prismatic die counts as blue in this slot."
+    },
+    "shieldsB": {
+      "what": "A second shield generator. It stacks on the first: both pour into the same shield."
+    },
+    "engines": {
+      "what": "Your drive: the die's value sets the chance to glance or dodge each enemy hit this turn. A high value can also intercept.",
+      "affinity": "Green dice add +{{mk1}} here at Mk1, +{{mk2}} at Mk2 and +{{mk3}} at Mk3. A prismatic die counts as green in this slot.",
+      "flat": "This ship and build shift dodge by {{n}}% and glancing by half of that, before the caps."
+    },
+    "enginesB": {
+      "what": "A second drive. Its value adds to the first engine's, and the sum sets one evasion for the turn."
+    },
+    "sensors": {
+      "what": "Your targeting array: it marks the target Vulnerable before any weapon fires, so every hit this turn lands the mark on top.",
+      "fog": "Sensors also light the map: you see {{base}} rows ahead at Mk1 and {{perMk}} more for every Mk above it.",
+      "affinity": "Grey dice add +{{mk1}} here at Mk1, +{{mk2}} at Mk2 and +{{mk3}} at Mk3. A prismatic die counts as grey in this slot."
+    },
+    "reactor": {
+      "what": "Your power plant: the die's value becomes charge. Charge pays for nudges, rerolls, surges and some officer actions.",
+      "store": "A die in the Reactor stores its value as charge, after any multiplier and rounded down. Charge stops at the cap ({{cap}}); a store that overflows it wastes the rest and costs {{overflow}} hull.",
+      "affinity": "Black dice store ×{{mult}} charge here at every Mk. A prismatic die counts as black in this slot.",
+      "mk": "Mk raises the reactor's cap; black's ×{{mult}} charge stays the same at every level."
+    },
+    "repairBay": {
+      "what": "An on-board workshop: the die patches your hull. It works last in your turn, after every other system.",
+      "repair": "A die in the Repair Bay mends hull equal to its value ÷ {{divisor}}, rounded up, never past your maximum.",
+      "mk": "Mk raises the repair bay's cap. No school has an affinity here, so the cap is all it adds."
+    },
+    "fit": "A die fits when its size is at or under the slot's cap. A bigger die goes in only through a rule that lifts the cap — a ship passive, a perk, a module or a chart node — and most of them charge hull for it."
+  },
   "journal": {
     "title": "Battle log",
     "empty": "Nothing has resolved yet.",
@@ -413,5 +469,20 @@
     "fork": "{{cond}} — {{then}}. Otherwise — {{else}}.",
     "fixed": "{{intent}}.",
     "open": "Drawn from its pattern — it is not fixed."
-  }
+  },
+  "bag": {
+    "chip": "Bag {{bag}} · Discard {{discard}}",
+    "chipShort": "{{bag}}·{{discard}}",
+    "label": "Hand: {{bag}} in the bag, {{discard}} discarded",
+    "title": "Hand — {{n}} dice",
+    "hint": "Seven dice come to the table each turn, drawn from the bag. Placed and unused dice go to the discard; when the bag runs dry the discard is shuffled back in.",
+    "empty": "Empty",
+    "group": {
+      "table": "On the table · {{n}}",
+      "reserve": "Reserve · {{n}}",
+      "bag": "In the bag · {{n}}",
+      "discard": "Discard · {{n}}"
+    }
+  },
+  "fogTitle": "Sensor range"
 }

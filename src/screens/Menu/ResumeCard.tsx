@@ -7,6 +7,7 @@ import { SHIP_BY_ID } from '@/data/ships';
 import { abandonRun } from '@/game/run/flow';
 import { relativeWhen, resumeLocalRun, type LocalResume } from '@/game/run/resume';
 import { dropCloudRun } from '@/game/run/cloud';
+import styles from './MenuScreen.module.css';
 
 const SHIP_GLYPH: Record<string, string> = {
   wanderer: 'M2 12 L14 6 L22 12 L14 18 Z',
@@ -27,7 +28,14 @@ export const ResumeCard = ({ resume }: { resume: LocalResume }) => {
       : t(`menu:resumeWhen.${when.unit}`, { n: when.n });
 
   return (
-    <Paper bg={tokens.surface1} p="sm" radius="md" withBorder>
+    <Paper
+      bg={tokens.surface1}
+      p="sm"
+      radius="md"
+      withBorder
+      className={styles.resumeCard}
+      data-resume-card
+    >
       <Stack gap="xs">
         <Group gap="sm" wrap="nowrap" align="center">
           <svg width={26} height={26} viewBox="0 0 24 24" aria-hidden>

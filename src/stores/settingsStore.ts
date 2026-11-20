@@ -1,17 +1,27 @@
+import { useSyncExternalStore } from 'react';
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import {
   DEFAULT_BATTLE_LAYOUT,
   isBattleLayoutId,
 } from '@/data/battleLayouts';
+import {
+  DEFAULT_BRIDGE_FRAME,
+  isBridgeFrameChoice,
+  type BridgeFrameChoice,
+} from '@/data/bridgeFrames';
+import { DEFAULT_CHART_LAYOUT, isChartLayoutId } from '@/data/chartLayouts';
+import { DEFAULT_ROLL_STYLE, isRollStyle } from '@/data/rollStyles';
 import { DEFAULT_THEME_ID, isThemeId, type ThemeId } from '@/data/themes';
 import type {
   BattleLayoutId,
   BattleSpeed,
+  ChartLayoutId,
   EchoVerbosity,
   FontScale,
   Locale,
   ReducedMotionSetting,
+  RollStyle,
   VignetteIntensity,
 } from '@/types';
 import { pickShape, shapeKeys } from '@/stores/shape';
@@ -28,7 +38,12 @@ export interface SettingsValues {
   fontScale: FontScale;
   battleSpeed: BattleSpeed;
   battleLayout: BattleLayoutId;
+  chartLayout: ChartLayoutId;
+  rollStyle: RollStyle;
+  bridgeFrame: BridgeFrameChoice;
   skipTally: boolean;
+  voice: boolean;
+  haptics: boolean;
 }
 
 export interface SettingsState extends SettingsValues {
@@ -43,10 +58,15 @@ export interface SettingsState extends SettingsValues {
   setFontScale: (fontScale: FontScale) => void;
   setBattleSpeed: (battleSpeed: BattleSpeed) => void;
   setBattleLayout: (battleLayout: BattleLayoutId) => void;
+  setChartLayout: (chartLayout: ChartLayoutId) => void;
+  setRollStyle: (rollStyle: RollStyle) => void;
+  setBridgeFrame: (bridgeFrame: BridgeFrameChoice) => void;
   setSkipTally: (skipTally: boolean) => void;
+  setVoice: (voice: boolean) => void;
+  setHaptics: (haptics: boolean) => void;
 }
 
-export const SETTINGS_VERSION = 5;
+export const SETTINGS_VERSION = 9;
 
 const DEFAULTS: SettingsValues = {
   locale: 'en',
@@ -60,7 +80,12 @@ const DEFAULTS: SettingsValues = {
   fontScale: 'm',
   battleSpeed: 'normal',
   battleLayout: DEFAULT_BATTLE_LAYOUT,
+  chartLayout: DEFAULT_CHART_LAYOUT,
+  rollStyle: DEFAULT_ROLL_STYLE,
+  bridgeFrame: DEFAULT_BRIDGE_FRAME,
   skipTally: false,
+  voice: false,
+  haptics: true,
 };
 
 const SETTINGS_KEYS = shapeKeys(DEFAULTS);
@@ -90,7 +115,16 @@ export const migrateSettings = (
     battleLayout: isBattleLayoutId(prev.battleLayout)
       ? prev.battleLayout
       : DEFAULTS.battleLayout,
+    chartLayout: isChartLayoutId(prev.chartLayout)
+      ? prev.chartLayout
+      : DEFAULTS.chartLayout,
+    rollStyle: isRollStyle(prev.rollStyle) ? prev.rollStyle : DEFAULTS.rollStyle,
+    bridgeFrame: isBridgeFrameChoice(prev.bridgeFrame)
+      ? prev.bridgeFrame
+      : DEFAULTS.bridgeFrame,
     skipTally: prev.skipTally === true,
+    voice: prev.voice === true,
+    haptics: prev.haptics !== false,
     vignette: isVignette(prev.vignette) ? prev.vignette : DEFAULTS.vignette,
   };
 };
@@ -110,7 +144,12 @@ export const useSettingsStore = create<SettingsState>()(
       setFontScale: (fontScale) => set({ fontScale }),
       setBattleSpeed: (battleSpeed) => set({ battleSpeed }),
       setBattleLayout: (battleLayout) => set({ battleLayout }),
+      setChartLayout: (chartLayout) => set({ chartLayout }),
+      setRollStyle: (rollStyle) => set({ rollStyle }),
+      setBridgeFrame: (bridgeFrame) => set({ bridgeFrame }),
       setSkipTally: (skipTally) => set({ skipTally }),
+      setVoice: (voice) => set({ voice }),
+      setHaptics: (haptics) => set({ haptics }),
     }),
     {
       name: 'ca.settings',
@@ -121,14 +160,34 @@ export const useSettingsStore = create<SettingsState>()(
   ),
 );
 
+const REDUCED_MOTION_QUERY = '(prefers-reduced-motion: reduce)';
+
 export const resolveReducedMotion = (setting: ReducedMotionSetting): boolean => {
   if (setting === 'on') return true;
   if (setting === 'off') return false;
   return (
     typeof window !== 'undefined' &&
-    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    window.matchMedia(REDUCED_MOTION_QUERY).matches
   );
 };
 
+export const reducedMotionSnapshot = (): boolean =>
+  resolveReducedMotion(useSettingsStore.getState().reducedMotion);
+
+export const subscribeReducedMotion = (listener: () => void): (() => void) => {
+  const unsubscribeSettings = useSettingsStore.subscribe(listener);
+  if (typeof window === 'undefined') return unsubscribeSettings;
+  const query = window.matchMedia(REDUCED_MOTION_QUERY);
+  query.addEventListener('change', listener);
+  return () => {
+    unsubscribeSettings();
+    query.removeEventListener('change', listener);
+  };
+};
+
 export const useReducedMotion = (): boolean =>
-  resolveReducedMotion(useSettingsStore((s) => s.reducedMotion));
+  useSyncExternalStore(
+    subscribeReducedMotion,
+    reducedMotionSnapshot,
+    reducedMotionSnapshot,
+  );

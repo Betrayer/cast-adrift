@@ -14,7 +14,7 @@
     transparent 70%
   );
   opacity: 0.4;
-  animation: mkSweep 620ms ease-out both;
+  animation: mkSweep 620ms var(--ca-ease-out) both;
 }
 
 @keyframes mkSweep {
@@ -26,17 +26,41 @@
   }
 }
 
+.mkRing {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  box-shadow:
+    inset 0 0 0 2px var(--ca-flourish-color, var(--ca-accent)),
+    inset 0 0 14px var(--ca-flourish-color, var(--ca-accent));
+  animation: mkRing var(--ca-flourish-ms, var(--ca-motion-xl)) var(--ca-ease-out)
+    backwards;
+}
+
+@keyframes mkRing {
+  0% {
+    opacity: 0.95;
+    box-shadow:
+      inset 0 0 0 3px var(--ca-flourish-color, var(--ca-accent)),
+      inset 0 0 22px var(--ca-flourish-color, var(--ca-accent));
+  }
+  100% {
+    opacity: 0;
+    box-shadow:
+      inset 0 0 0 1px var(--ca-flourish-color, var(--ca-accent)),
+      inset 0 0 4px var(--ca-flourish-color, var(--ca-accent));
+  }
+}
+
 :root[data-ca-motion='reduced'] .sweep {
   animation: none;
   opacity: 0;
 }
 
-.fusePair {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
-  width: 220px;
+:root[data-ca-motion='reduced'] .mkRing {
+  animation: none;
 }
 
 .fuseArrow {
@@ -44,4 +68,87 @@
   font-size: 14px;
   line-height: 14px;
   color: var(--ca-faint);
+}
+
+.forgeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+  gap: 6px;
+}
+
+.forgeTile {
+  appearance: none;
+  font: inherit;
+  text-align: left;
+  padding: 0;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: none;
+  cursor: pointer;
+}
+
+.forgeTile:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.forgeTile[data-eligible='1'] {
+  border-color: var(--ca-line);
+}
+
+.forgeTile[data-chosen='1'] {
+  border-color: var(--ca-accent);
+}
+
+.forgeTile[data-forging='1'] {
+  position: relative;
+  z-index: var(--z-raise);
+  opacity: 0;
+  transform: translate3d(var(--ca-forge-dx, 0px), var(--ca-forge-dy, 0px), 0)
+    scale(0.9);
+  animation: forgeMerge var(--ca-motion-l) var(--ca-ease-out) backwards;
+}
+
+@keyframes forgeMerge {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    box-shadow: 0 0 0 0 transparent;
+    filter: brightness(1);
+  }
+  60% {
+    opacity: 1;
+    box-shadow:
+      0 0 0 2px var(--ca-accent),
+      0 0 22px 6px var(--ca-accent);
+    filter: brightness(1.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--ca-forge-dx, 0px), var(--ca-forge-dy, 0px), 0)
+      scale(0.9);
+    box-shadow: 0 0 0 0 transparent;
+    filter: brightness(1.4);
+  }
+}
+
+.confirmSweep[data-sweep-host]::after {
+  --ca-sweep-color: var(--mantine-color-white);
+}
+
+.forgeOption {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--ca-line);
+  border-radius: 10px;
+  background: var(--ca-surface1);
+}
+
+.forgePreview {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
 }

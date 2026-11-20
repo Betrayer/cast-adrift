@@ -1,16 +1,26 @@
 :root {
-  --ca-enter-ms: 180ms;
+  --ca-motion-xs: 120ms;
+  --ca-motion-s: 180ms;
+  --ca-motion-m: 260ms;
+  --ca-motion-l: 420ms;
+  --ca-motion-xl: 620ms;
+  --ca-motion-reduced: 160ms;
+  --ca-stagger-list: 45ms;
+  --ca-stagger-card: 70ms;
+  --ca-ease-out: cubic-bezier(0.33, 1, 0.68, 1);
+  --ca-ease-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ca-enter-ms: var(--ca-motion-s);
   --ca-enter-shift: 24px;
-  --ca-stagger-ms: 45ms;
+  --ca-stagger-ms: var(--ca-stagger-list);
   --ca-press-ms: 110ms;
 }
 
 [data-nav-dir='forward'] [data-screen-inner] {
-  animation: caEnterForward var(--ca-enter-ms) ease-out backwards;
+  animation: caEnterForward var(--ca-enter-ms) var(--ca-ease-out) backwards;
 }
 
 [data-nav-dir='back'] [data-screen-inner] {
-  animation: caEnterBack var(--ca-enter-ms) ease-out backwards;
+  animation: caEnterBack var(--ca-enter-ms) var(--ca-ease-out) backwards;
 }
 
 @keyframes caEnterForward {
@@ -36,7 +46,7 @@
 }
 
 [data-rise] {
-  animation: caRise 260ms ease-out backwards;
+  animation: caRise var(--ca-motion-m) var(--ca-ease-out) backwards;
   animation-delay: calc(var(--ca-stagger-ms) * var(--ca-rise-index, 0));
 }
 
@@ -50,13 +60,19 @@
   }
 }
 
-[data-press] {
+[data-press],
+.mantine-Button-root,
+.mantine-ActionIcon-root,
+.mantine-UnstyledButton-root {
   transition:
-    transform var(--ca-press-ms) ease-out,
-    filter var(--ca-press-ms) ease-out;
+    transform var(--ca-press-ms) var(--ca-ease-out),
+    filter var(--ca-press-ms) var(--ca-ease-out);
 }
 
-[data-press]:active {
+[data-press]:active,
+.mantine-Button-root:not(:disabled):not([data-disabled]):active,
+.mantine-ActionIcon-root:not(:disabled):not([data-disabled]):active,
+.mantine-UnstyledButton-root:not(:disabled):not([data-disabled]):active {
   transform: scale(0.97);
   filter: brightness(1.12);
 }
@@ -74,7 +90,7 @@
   background: linear-gradient(
     100deg,
     transparent 20%,
-    var(--ca-accent) 50%,
+    var(--ca-sweep-color, var(--ca-accent)) 50%,
     transparent 80%
   );
   opacity: 0;
@@ -82,7 +98,7 @@
 }
 
 [data-sweep-host][data-sweep='1']::after {
-  animation: caSweep 520ms ease-out backwards;
+  animation: caSweep 520ms var(--ca-ease-out) backwards;
 }
 
 @keyframes caSweep {
@@ -93,6 +109,40 @@
   100% {
     opacity: 0;
     transform: translate3d(120%, 0, 0);
+  }
+}
+
+[data-armed='1']::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  background: linear-gradient(
+      100deg,
+      transparent 35%,
+      color-mix(in srgb, var(--ca-accent) 40%, transparent) 50%,
+      transparent 65%
+    )
+    100% 0 / 300% 100% no-repeat;
+  box-shadow:
+    0 0 0 1.5px var(--ca-accent),
+    0 0 14px color-mix(in srgb, var(--ca-accent) 55%, transparent);
+  animation: slot-arm var(--ca-motion-m) var(--ca-ease-out) backwards;
+}
+
+@keyframes slot-arm {
+  0% {
+    opacity: 1;
+    background-position: 100% 0;
+  }
+  70% {
+    opacity: 0.85;
+  }
+  100% {
+    opacity: 0;
+    background-position: 0 0;
   }
 }
 
@@ -110,7 +160,7 @@
   pointer-events: none;
   border: 2px solid var(--ca-flourish-color, transparent);
   opacity: 0;
-  animation: caFlourishRing var(--ca-flourish-ms, 620ms) ease-out backwards;
+  animation: caFlourishRing var(--ca-flourish-ms, 620ms) var(--ca-ease-out) backwards;
 }
 
 @keyframes caFlourishIn {
@@ -156,15 +206,44 @@
 :root[data-ca-motion='reduced'] [data-entry-flourish],
 :root[data-ca-motion='reduced'] [data-entry-flourish]::after,
 :root[data-ca-motion='reduced'] [data-sweep-host]::after,
+:root[data-ca-motion='reduced'] [data-armed='1']::after,
 :root[data-ca-motion='reduced'] [data-pop='1'] {
   animation: none;
 }
 
-:root[data-ca-motion='reduced'] [data-press] {
+:root[data-ca-motion='reduced'] [data-press],
+:root[data-ca-motion='reduced'] .mantine-Button-root,
+:root[data-ca-motion='reduced'] .mantine-ActionIcon-root,
+:root[data-ca-motion='reduced'] .mantine-UnstyledButton-root {
   transition: none;
 }
 
-:root[data-ca-motion='reduced'] [data-press]:active {
+:root[data-ca-motion='reduced'] [data-press]:active,
+:root[data-ca-motion='reduced'] .mantine-Button-root:active,
+:root[data-ca-motion='reduced'] .mantine-ActionIcon-root:active,
+:root[data-ca-motion='reduced'] .mantine-UnstyledButton-root:active {
   transform: none;
   filter: none;
+}
+
+:root[data-ca-motion='reduced'] .mantine-Loader-root,
+:root[data-ca-motion='reduced'] .mantine-Loader-root::after,
+:root[data-ca-motion='reduced'] .mantine-Loader-root * {
+  animation: none;
+}
+
+:root[data-ca-motion='reduced'] .mantine-SegmentedControl-root {
+  --sc-transition-duration: 0ms;
+}
+
+:root[data-ca-motion='reduced'] .mantine-Switch-thumb,
+:root[data-ca-motion='reduced'] .mantine-Switch-trackLabel {
+  transition-duration: 0ms !important;
+}
+
+:root[data-ca-motion='reduced'] .mantine-Modal-content,
+:root[data-ca-motion='reduced'] .mantine-Modal-overlay,
+:root[data-ca-motion='reduced'] .mantine-Popover-dropdown,
+:root[data-ca-motion='reduced'] .mantine-Tooltip-tooltip {
+  transition-duration: 0ms !important;
 }

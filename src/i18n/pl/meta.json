@@ -7,7 +7,8 @@
     "yellow": "Żółty",
     "black": "Czarny",
     "grey": "Szary",
-    "prismatic": "Pryzmatyczny"
+    "prismatic": "Pryzmatyczny",
+    "nexus": "Węzeł"
   },
   "chart": {
     "title": "Mapa gwiazd",
@@ -53,21 +54,14 @@
     "keySingleCast": "Jednorazowy odlew",
     "redSpotter": "Obserwator",
     "redFirestorm": "Burza ognia",
-    "redSpine": "Kręgosłup",
     "blueBarrier": "Bariera",
     "blueJammer": "Urządzenie zakłócające",
-    "blueTideBreak": "Tidebreak",
     "greenCanopy": "Zadaszenie",
-    "greenPerennial": "Wieloletnia",
     "yellowTally": "Tally",
-    "yellowBounty": "Nagroda",
     "blackVent": "Wentylacja",
-    "blackWell": "No cóż",
     "greyToolkit": "Zestaw narzędzi",
-    "greyLedger": "Księga rachunkowa",
     "prismLattice": "Siatka",
     "prismFacet": "Aspekt",
-    "prismWell": "Studnia Prism",
     "hubEngineering": "Zatoka Inżynierów",
     "keyStormChaser": "Łowca burz",
     "keyIronDoctrine": "Żelazna doktryna",
@@ -82,36 +76,55 @@
     "respecConfirmTitle": "Czy chcesz usunąć ten węzeł?",
     "respecConfirmBody": "„{{name}}” wraca do puli, a {{points}} punkt(ów) zostaje przywróconych. Koszt: {{cost}}◈.",
     "respecConfirmYes": "Zwrot pieniędzy",
-    "redPowderRoom": "Toaleta dla kobiet",
-    "redRangeCard": "Karta zasięgu",
-    "redHairTrigger": "Bardzo czuły spust",
-    "redCoreBreach": "Naruszenie rdzenia",
-    "blueStormAnchor": "Kotwica burzowa",
-    "blueSpillway": "Przepust",
-    "blueLongLens": "Obiektyw o długim ogniskowej",
-    "blueKeelPlate": "Płyta kilowa",
-    "greenGraftBench": "Ławka Graft",
-    "greenSapline": "Sapline",
-    "greenLoam": "Gleba gliniasta",
-    "greenHollow": "The Hollow",
-    "yellowTollhouse": "Tollhouse",
-    "yellowFinderFee": "Prowizja za pośrednictwo",
-    "yellowShortWeight": "Niedowaga",
-    "yellowMintMark": "Znak mennicy",
-    "blackAshBed": "Warstwa popiołu",
-    "blackDeadMansSwitch": "Przełącznik „Dead Man's Switch”",
-    "blackTithe": "Dziesięcina",
-    "blackSlagHeap": "Hałda żużla",
-    "greyShimStack": "Stos podkładek",
-    "greyPatternBook": "Zbiór wzorów",
-    "greyBallastTrim": "Regulacja balastu",
-    "greyTallyStick": "Kij do liczenia",
     "cost": "Koszt {{n}}",
     "repriced": "Ceny węzłów się zmieniły: twój wybór kosztuje teraz {{spent}} z {{total}} punktów. Nic nie zostało zabrane — jeden pełny reset jest darmowy.",
     "freeRespec": "Darmowy reset",
     "freeRespecTitle": "Wyczyścić całą mapę?",
     "freeRespecBody": "Wszystkie przydzielone węzły ({{n}}) wracają do puli, a punkty są zwracane w całości. Ten reset jest darmowy.",
-    "freeRespecYes": "Wyczyść"
+    "freeRespecYes": "Wyczyść",
+    "redCorona": "Korona",
+    "redCinderFrost": "Popielny szron",
+    "blueTidalWall": "Ściana przypływu",
+    "bluePermafrost": "Wieczna zmarzlina",
+    "greenHoarfrost": "Kwiat szronu",
+    "greenGoldenGrove": "Złoty gaj",
+    "yellowHarvest": "Żniwa",
+    "yellowLoadedDice": "Fałszowane kości",
+    "blackGamblersVoid": "Pustka gracza",
+    "blackNullForge": "Zerowa kuźnia",
+    "greyBallast": "Balast",
+    "greyFacetGrinder": "Szlifierka faset",
+    "prismRefraction": "Załamanie",
+    "prismSolarWind": "Wiatr słoneczny",
+    "nexusSteamLance": "Parowa lanca",
+    "nexusFrostbloom": "Szronokwiat",
+    "nexusGoldenCanopy": "Złoty baldachim",
+    "nexusHouseEdge": "Przewaga kasyna",
+    "nexusNullAnvil": "Zerowe kowadło",
+    "nexusFacetEngine": "Maszyna fasetowa",
+    "nexusNova": "Nowa",
+    "resetAll": "Wyczyść wszystko",
+    "resetTitle": "Wyczyścić całą mapę?",
+    "resetBody": "{{n}} węzłów wróci jako punkty. Rdzeń zostaje. Kosztuje to {{price}} odłamków.",
+    "resetBodyFree": "{{n}} węzłów wróci jako punkty. Rdzeń zostaje. To skasowanie jest darmowe.",
+    "resetYes": "Wyczyść za {{price}}",
+    "requiresPoints": "Wymaga {{n}} punktów w szkole {{school}}",
+    "requiresMet": "{{n}} w szkole {{school}} — spełnione",
+    "scaledBy": "Rośnie wraz ze szkołą {{school}}: {{steps}} z 5 stopni ({{points}} punktów)",
+    "layout": "Widok mapy",
+    "search": "Szukaj węzłów",
+    "searchClear": "Wyczyść wyszukiwanie",
+    "available": "Dostępne teraz",
+    "filterKind": "Typ",
+    "filterTags": "Tagi",
+    "kind": {
+      "small": "Mały",
+      "gate": "Brama",
+      "notable": "Znaczący",
+      "confluence": "Rozdroże",
+      "nexus": "Węzeł",
+      "keystone": "Kamień węgielny"
+    }
   },
   "chartFx": {
     "hubBudget": "+1 budżet na hangar",
@@ -137,87 +150,117 @@
       "freeShopRerolls": "{{n}} bezpłatne ponowne losowanie licznika",
       "xpMultPct": "{{n}} % XP",
       "tideEffectDelta": "{{n}} pod wpływem przypływu",
-      "moduleSlotDelta": "{{n}} wnęka na moduły"
+      "moduleSlotDelta": "{{n}} wnęka na moduły",
+      "shieldKeepPct": "{{n}}% osłony przetrwa turę wroga",
+      "resonanceCountDelta": "{{n}} do rezonansu wiodącej szkoły",
+      "firstHitReducePct": "Pierwsze trafienie elity, minibossa lub bossa: {{n}}% słabsze"
     },
     "fx": {
-      "weaponsMaxFace": "Broń +1 przy rzucie kostką o maksymalnej wartości",
-      "redFirstTurn": "Czerwona kostka +1 w turze 1",
-      "shieldsHigh": "+1 do tarczy, gdy wynik rzutu kostką tarczy wynosi 6+",
-      "shieldsFlat": "+1 tarcza za każdy wynik testu „Tarcze”",
-      "minFaceScrap": "+2 do wyniku przy rzucie kostką z minimalną wartością",
+      "weaponsMaxFace": "Broń +{{n}} przy rzucie kostką o maksymalnej wartości",
+      "redFirstTurn": "Czerwona kostka +{{n}} w turze 1",
+      "shieldsHigh": "+{{n}} do tarczy, gdy wynik rzutu kostką tarczy wynosi 6+",
+      "shieldsFlat": "+{{n}} tarcza za każdy wynik testu „Tarcze”",
+      "minFaceScrap": "+{{n}} do wyniku przy rzucie kostką z minimalną wartością",
       "weaponsLowHull": "Broń +1, gdy wytrzymałość kadłuba spadnie poniżej 50%",
       "sensorsBonus": "Czujniki +1",
       "redSalvo": "Broń +3 w pierwszej turze",
       "blueGlacier": "+2 do tarczy za każdy test odporności tarcz",
       "blackEdge": "Wszystkie rzuty kostką +2, gdy kadłub jest w stanie krytycznym",
-      "allDice1": "Wszystkie kości +1",
-      "weaponsBurn": "Maksymalna wartość parametru „Face” w broni zwiększa efekt „Burn” o 1",
-      "enginesBonus": "+1 w kategorii silników",
-      "reactorBonus": "+1 w reaktorze",
+      "weaponsBurn": "Maksymalna wartość parametru „Face” w broni zwiększa efekt „Burn” o {{n}}",
+      "enginesBonus": "+{{n}} w kategorii silników",
+      "reactorBonus": "+{{n}} w reaktorze",
       "greenHeal": "Maksymalna liczba oczek na zielonej kostce leczy 1",
       "repeatCharge": "Powtarzająca się wartość oznacza 1 ładunek",
-      "maxFaceScrap": "Każda maksymalna twarz daje 2 złom",
+      "maxFaceScrap": "Każda maksymalna twarz daje {{n}} złom",
       "minFaceCharge": "Każdy minimalny element twarzy przechowuje 1 ładunek",
       "firstTurnAll": "+1 do każdej kości w pierwszej turze",
       "redFirestorm": "Maksymalna wartość parametru „Face” w broni zwiększa efekt „Burn” o 3",
-      "redSpine": "+4 przy mocowaniu kręgosłupowym",
+      "redSpine": "+{{n}} przy mocowaniu kręgosłupowym",
       "greenCanopy": "+3 w kategorii silników",
-      "blackWell": "W reaktorze pozostały jeszcze 2 ładunki",
-      "shopArrival": "+6 złomu po przybyciu na targ",
-      "tideWard": "Naprawiaj 1 kadłub przy każdym skoku, gdy poziom fali wynosi 2+",
+      "blackWell": "W reaktorze pozostały jeszcze {{n}} ładunki",
+      "shopArrival": "+{{n}} złomu po przybyciu na targ",
+      "tideWard": "Naprawiaj {{n}} kadłub przy każdym skoku, gdy poziom fali wynosi 2+",
       "detourScout": "+12 złomu przy wjeździe na objazd",
-      "redFinisher": "+2 do obrażeń zadawanych bronią w przypadku celu, którego wytrzymałość kadłuba spadła poniżej 30%.",
-      "redSwarmFire": "+1 do ataku, gdy na polu bitwy pozostają co najmniej dwaj przeciwnicy.",
-      "redBurnBite": "Trafienie bronią w płonący cel zadaje 2 dodatkowe punkty obrażeń.",
+      "redFinisher": "+{{n}} do obrażeń zadawanych bronią w przypadku celu, którego wytrzymałość kadłuba spadła poniżej 30%.",
+      "redSwarmFire": "+{{n}} do ataku, gdy na polu bitwy pozostają co najmniej dwaj przeciwnicy.",
+      "redBurnBite": "Trafienie bronią w płonący cel zadaje {{n}} dodatkowe punkty obrażeń.",
       "redRepeatCrit": "Kostka broni, która w przypadku trafienia krytycznego powtarza ostatnią wartość.",
-      "redSalvoTally": "Począwszy od trzeciej kości broni w danej bitwie, +1 do broni.",
-      "redOpener": "Pierwsza kostka broni w tej turze otrzymuje +2.",
-      "redRiskCharge": "Gdy poziom pancerza spadnie poniżej 40%, na koniec każdej tury pozostaje 1 ładunek.",
-      "redPowderRoom": "Każde trafienie w płonący cel powoduje dodanie kolejnego efektu zapalenia.",
+      "redSalvoTally": "Począwszy od trzeciej kości broni w danej bitwie, +{{n}} do broni.",
+      "redOpener": "Pierwsza kostka broni w tej turze otrzymuje +{{n}}.",
+      "redRiskCharge": "Gdy poziom pancerza spadnie poniżej 40%, na koniec każdej tury pozostaje {{n}} ładunek.",
+      "redPowderRoom": "Każde trafienie w płonący cel dodaje Płomień {{n}}.",
       "redHairTrigger": "Pierwsza kostka broni w tej turze daje trafienie krytyczne.",
-      "redCoreBreach": "+3 do każdego rzutu przeciwko celowi, którego kadłub ma mniej niż 25% wytrzymałości.",
+      "redCoreBreach": "+{{n}} do każdego rzutu przeciwko celowi, którego kadłub ma mniej niż 25% wytrzymałości.",
       "blueOvershield": "Przy 6 punktach osłony kostka osłony dodaje jeszcze 2 punkty.",
-      "blueStillness": "Niebieska kostka w tarczach otrzymuje +1.",
+      "blueStillness": "Niebieska kostka w tarczach otrzymuje +{{n}}.",
       "blueDeepGuard": "Utrzymaj 4 punktów osłony przez całą turę przeciwnika, aby wyleczyć 1 punkt zdrowia.",
       "blueJamOnLow": "Wynik poniżej 4 jest odczytywany jako 5.",
       "blueWatch": "Niebieską kostkę leżącą najniższą stroną do góry rzuca się ponownie jeden raz.",
       "blueBreakwater": "Zaczynaj każdą bitwę z 3 punktami tarczy.",
       "blueSpillway": "Wynik rzutu kostką na tarczę wynoszący 8 lub więcej zwiększa wartość tarczy o 3.",
-      "blueLongLens": "+2 czujniki.",
+      "blueLongLens": "+{{n}} czujniki.",
       "greenGrowOnEngines": "Współczynnik powiększenia silników typu „max-face” wzrasta do wartości +2.",
       "greenTendril": "Wynik 6 lub więcej na zielonej kostce powoduje wzrost o maksymalnie +3.",
       "greenMend": "Jeśli na koniec tury stan kadłuba wynosi powyżej 30%, odzyskujesz 1 punkt zdrowia.",
-      "greenRootHold": "+2 w silnikach umieszczonych poniżej połowy kadłuba.",
+      "greenRootHold": "+{{n}} w silnikach umieszczonych poniżej połowy kadłuba.",
       "greenSpore": "Wygrana bitwa przywraca 2 punkty zdrowia.",
       "greenQuietBerth": "Po przybyciu do stoczni odzyskujesz 2 punkty zdrowia.",
       "greenSapline": "Zakończ turę z 4 punktami tarczy, aby wyleczyć 2 punkty zdrowia.",
       "greenLoam": "Współczynnik powiększenia silników typu „max-face” wzrasta do wartości +3.",
-      "yellowTollBooth": "Za dotarcie do miejsca spotkania otrzymuje się 8 złomu.",
-      "yellowKickback": "Żółta kostka zapewnia 2 złomów podczas rozliczania.",
-      "yellowLuckyOpen": "Pierwsza kostka w tej turze, jeśli wypadnie na niej najwyższa wartość, daje 6 złomu.",
-      "yellowGleaner": "Żółta kostka, gdy wylosowana zostanie jej najniższa strona, daje 4 złom.",
-      "yellowWager": "Kostka na dowolnej z skrajnych ścianek daje 3 złom.",
-      "yellowTollhouse": "Za przybycie do lady otrzymuje się 14 złomu.",
-      "yellowMintMark": "Za matrycę reaktora otrzymuje się 4 sztuki złomu.",
-      "blackBleedCharge": "+1 do czarnych kości przy uszkodzeniu kadłuba poniżej 60%.",
+      "yellowTollBooth": "Za dotarcie do miejsca spotkania otrzymuje się {{n}} złomu.",
+      "yellowKickback": "Żółta kostka zapewnia {{n}} złomów podczas rozliczania.",
+      "yellowLuckyOpen": "Pierwsza kostka w tej turze, jeśli wypadnie na niej najwyższa wartość, daje {{n}} złomu.",
+      "yellowGleaner": "Żółta kostka, gdy wylosowana zostanie jej najniższa strona, daje {{n}} złom.",
+      "yellowWager": "Kostka na dowolnej z skrajnych ścianek daje {{n}} złom.",
+      "yellowTollhouse": "Za przybycie do lady otrzymuje się {{n}} złomu.",
+      "yellowMintMark": "Za matrycę reaktora otrzymuje się {{n}} sztuki złomu.",
+      "blackBleedCharge": "+{{n}} do czarnych kości przy uszkodzeniu kadłuba poniżej 60%.",
       "blackOvercap": "Czarne kości mogą przekroczyć limit miejsca na 2 punkty wytrzymałości kadłuba.",
-      "blackPactTithe": "W każdej bitwie zaczynasz z 2 punktami ładunku i -2 punktami wytrzymałości kadłuba.",
-      "blackLastLight": "+2 do każdego rzutu, gdy stan kadłuba spadnie poniżej 25%.",
-      "blackReactorTally": "Począwszy od drugiego reaktora, zakończ turę z 1 ładunkiem.",
-      "blackSpite": "Poniżej połowy pancerza tura przeciwnika kończy się 1 ładunkiem.",
-      "blackNightWatch": "Czarna kostka z najwyższą wartością zapewnia 1 ładunek.",
-      "blackAshBed": "Kość leżąca najniższą ścianką do góry daje 2 punkty ładunku.",
-      "blackDeadMansSwitch": "Gdy poziom zdrowia kadłuba spadnie poniżej 25%, na koniec każdej tury masz 3 punkty ładunku.",
-      "blackSlagHeap": "+3 w reaktorze przy 4 ładunkach.",
-      "greyScan": "Jedno dodatkowe pchnięcie przy każdym rzucie.",
-      "greyEvenKeel": "+1 za szare kości.",
-      "greyCounterweight": "Kość, która nie jest szara, otrzymuje +1, jeśli wylosowana zostanie jej najniższa ścianka.",
-      "greyToolbelt": "Jedno dodatkowe wykorzystanie ponownego rzutu na bitwę.",
-      "greySpare": "Jedno dodatkowe miejsce na rezerwę na każdą bitwę.",
-      "greyMirror": "Szara kostka, która powtarza ostatnią wartość, zwiększa liczbę ponownych rzutów o 1.",
-      "greyLedgerKeep": "Wejście do punktu obsługi kosztuje 10 złomu.",
-      "greyPatternBook": "Kość, na której pojawi się ostatnia wartość, daje możliwość ponownego rzutu.",
-      "greyTallyStick": "Od momentu, gdy przestaną działać drugie czujniki, +2 do każdego rzutu."
+      "blackPactTithe": "W każdej bitwie zaczynasz z {{n}} punktami ładunku i -{{m}} punktami wytrzymałości kadłuba.",
+      "blackLastLight": "+{{n}} do każdego rzutu, gdy stan kadłuba spadnie poniżej 25%.",
+      "blackReactorTally": "Począwszy od drugiego reaktora, zakończ turę z {{n}} ładunkiem.",
+      "blackSpite": "Poniżej połowy pancerza tura przeciwnika kończy się {{n}} ładunkiem.",
+      "blackNightWatch": "Czarna kostka z najwyższą wartością zapewnia {{n}} ładunek.",
+      "blackAshBed": "Kość leżąca najniższą ścianką do góry daje {{n}} punkty ładunku.",
+      "blackDeadMansSwitch": "Gdy poziom zdrowia kadłuba spadnie poniżej 25%, na koniec każdej tury masz {{n}} punkty ładunku.",
+      "blackSlagHeap": "+{{n}} w reaktorze przy 4 ładunkach.",
+      "greyScan": "Pchnięcia na rzut: +{{n}}.",
+      "greyEvenKeel": "+{{n}} za szare kości.",
+      "greyCounterweight": "Kość, która nie jest szara, otrzymuje +{{n}}, jeśli wylosowana zostanie jej najniższa ścianka.",
+      "greyToolbelt": "Ponowne rzuty na bitwę: +{{n}}.",
+      "greySpare": "+{{n}} do rezerwy na każdą bitwę.",
+      "greyMirror": "Szara kostka, która powtarza ostatnią wartość, zwiększa liczbę ponownych rzutów o {{n}}.",
+      "greyLedgerKeep": "Wejście do punktu obsługi kosztuje {{n}} złomu.",
+      "greyPatternBook": "Kość, na której pojawi się ostatnia wartość, dodaje {{n}} do przerzutów.",
+      "greyTallyStick": "Od drugiej kości w czujnikach +{{n}} do każdej kości.",
+      "prismWildEdge": "Pryzmatyczna kostka otrzymuje +{{n}} w dowolnym miejscu.",
+      "prismCarry": "Rozpatrzona pryzmatyczna kostka daje następnej pryzmatycznej kostce +2.",
+      "prismDichroic": "Pryzmatyczna kostka przyjmuje kolor miejsca: +{{n}} tarczy w tarczach i {{m}} punkty zapalenia w broni.",
+      "prismOvercap": "Pryzmatyczne kostki mogą przekroczyć limit miejsca za 1 punkt kadłuba.",
+      "prismKindling": "Dwie pryzmatyczne w spisie: każda bitwa zaczyna się z {{n}} ładunkami.",
+      "prismDeepWell": "Cztery pryzmatyczne w spisie: każda tura kończy się {{n}} ładunkiem i leczy {{m}}.",
+      "prismOpenHand": "Pierwsza kostka tury, niezależnie od koloru, otrzymuje +{{n}}.",
+      "prismDividend": "Dwie pryzmatyczne w spisie: wygrana bitwa daje {{n}} złomu i leczy {{m}}.",
+      "redCinderFrost": "Broń +1, dopóki tarcza się trzyma · za każde 5 punktów w Niebieskim",
+      "blueTidalWall": "+1 tarczy przy każdym rozliczeniu broni · za każde 5 punktów w Czerwonym",
+      "greenHoarfrost": "Leczy 1 na końcu tury, dopóki tarcza się trzyma · za każde 5 punktów w Niebieskim",
+      "greenGoldenGrove": "Pierwsze trzy zielone najwyższe ścianki w bitwie dają 1 złom · za każde 5 punktów w Żółtym",
+      "yellowLoadedDice": "Czarna kość na najniższej ściance otrzymuje +1 · za każde 5 punktów w Czarnym",
+      "blackGamblersVoid": "Pierwsze dwie czarne najwyższe ścianki w bitwie naprawiają 1 kadłub · za każde 5 punktów w Żółtym",
+      "blackNullForge": "Szara kość w reaktorze daje 1 ładunek · za każde 5 punktów w Szarym",
+      "greyFacetGrinder": "Od trzeciej szarej kości w bitwie szare kości otrzymują +1 · za każde 5 punktów w Pryzmatycznym",
+      "prismSolarWind": "Pierwsza kostka broni w turze otrzymuje +1 · za każde 5 punktów w Czerwonym",
+      "stormSurge": "Broń +1 za każdy stopień przypływu, maksymalnie +3.",
+      "coldLogicMaxDie": "Na początku bitwy najniższa kość zostaje ustawiona na maksymalnej ściance.",
+      "greySingleCast": "Szare kości +1; pozostałe kości +1, dopóki na pokładzie są co najmniej trzy szare kości.",
+      "prismCascade": "Gdy na pokładzie są trzy kości pryzmatyczne, każda kość pasuje do każdego miejsca bez kosztu kadłuba.",
+      "nexusSteamLance": "Od drugiej kostki tarcz w bitwie: +2 do broni.",
+      "nexusFrostbloom": "Zakończ turę z 3 · 7 · 12 punktami osłony, aby wyleczyć 1 · 2 · 3.",
+      "nexusGoldenCanopy": "Każda z pierwszych pięciu zielonych kostek w bitwie leczy 1 i daje 3 złomu.",
+      "nexusHouseEdge": "Darmowe pchnięcia na rzut: +{{n}} · czarne kości mogą przekroczyć limit miejsca za 2 punkty kadłuba.",
+      "nexusNullAnvil": "Szare kości mogą przekroczyć limit miejsca za darmo.",
+      "nexusFacetEngine": "Co trzecia postawiona szara kostka staje się pryzmatyczna.",
+      "nexusNova": "Przy dwóch pryzmatycznych w spisie trafienie broni rani każdego innego wroga za 4."
     },
     "trait": {
       "obsidianPact": "Czarne kości wypadają tylko z minimalną lub maksymalną wartością",
@@ -225,7 +268,12 @@
       "coldLogic": "Pchnięcia są darmowe · krytyczne trafienia wyłączone",
       "overflowShield": "Nadwyżka ładunku powyżej limitu zamienia się w osłonę.",
       "fateTwice": "Kostkę Losu można zagrać dwa razy w trakcie każdej bitwy.",
-      "prismDouble": "Kostki pryzmatyczne liczą się podwójnie przy obliczaniu rezonansu."
+      "prismDouble": "Kostki pryzmatyczne liczą się podwójnie przy obliczaniu rezonansu.",
+      "overflowCharge": "Kość umieszczona ponad limitem miejsca daje 1 punkt ładunku.",
+      "houseEdge": "Czarna kostka z maksymalną wartością przekracza limit bez kosztu kadłuba.",
+      "greyIsBlack": "Szare kości liczą się jako czarne.",
+      "facetEngine": "Co trzecia szara kostka wystawiona w bitwie staje się pryzmatyczna.",
+      "novaSplash": "Przy dwóch pryzmatycznych kostkach na stole pierwszy strzał w turze zadaje 4 obrażenia każdemu innemu wrogowi."
     },
     "budgetDelta": "{{n}} punkt hangarowy",
     "slotTier": "{{slot}}: {{n}} die-size step"
@@ -236,15 +284,14 @@
     "shipArk": "Odsłonięta Arka",
     "engraving": "Grawerunek stacja otwarta",
     "dailyPreview": "Jutrzejsze wydanie „Daily” jest już dostępne",
-    "respecPrestige": "Bezpłatna zmiana specjalizacji + skórka prestiżowa",
+    "respecPrestige": "Reset mapy za pół ceny + skórka prestiżowa",
     "diceWave": "Kości Fusion na półce",
     "contractWave": "Otwarcie fali kontraktowej",
-    "chartPoints": "Dwa punkty w ramach akcji „Mapa gwiazd”"
+    "chartPoints": "Bonus: +{{n}} pkt Mapy gwiazd"
   },
   "levelup": {
     "level": "Poziom kapitana {{level}}",
-    "point": "+1 punkt w rankingu „Mapa gwiazd”",
-    "points": "+{{n}} Mapa gwiazd punktów",
+    "points": "+{{n}} pkt Mapy gwiazd",
     "continue": "Kontynuuj"
   },
   "summary": {
@@ -276,7 +323,7 @@
     "save": "Zapisz talię",
     "saved": "Zapisano",
     "invalidOver": "Przekroczenie budżetu",
-    "invalidCap": "Maksymalnie 9 kości",
+    "invalidCap": "Maksymalnie {{n}} kości",
     "invalidMin": "Co najmniej 3 kostki",
     "invalidFate": "Maksymalnie 1 kość losu",
     "valid": "Gotowe",
@@ -285,7 +332,18 @@
     "shipEquipped": "Wyposażony",
     "shipBuy": "Kup · {{price}}◈",
     "shipLocked": "Odblokowuje: {{route}}",
-    "filterAll": "Wszystkie"
+    "filterAll": "Wszystkie",
+    "mastery": {
+      "rank": "Mistrzostwo {{rank}}",
+      "next": "{{xp}} / {{next}} XP do rangi {{rank}}",
+      "max": "Mistrzostwo ukończone",
+      "title": "Bonusy mistrzostwa",
+      "hull": "+{{n}} kadłuba",
+      "reserve": "+{{n}} rezerwy",
+      "mk": "Pierwsze ulepszenie Mk -{{n}}%",
+      "hit": "Pierwsze trafienie elity, minibossa lub bossa w walce -{{n}}%",
+      "passive": "Pasywka II: {{name}}"
+    }
   },
   "collection": {
     "title": "Kolekcja",
@@ -335,7 +393,9 @@
     "guardBody": "Dostępne jest jedno miejsce na przebieg. Uruchomienie tego trybu powoduje usunięcie bieżącego przebiegu zarówno lokalnie, jak i w chmurze.",
     "guardYes": "Usuń i uruchom",
     "dailyPreview": "Jutro ({{date}})",
-    "dailyPreviewLocked": "Jutrzejsze mutatory na poziomie{{n}}"
+    "dailyPreviewLocked": "Jutrzejsze mutatory na poziomie{{n}}",
+    "driftAscension": "Wniebowstąpienie dla tego dryfu",
+    "driftScoreMult": "Wynik ×{{mult}}"
   },
   "contracts": {
     "title": "Umowy",
@@ -383,7 +443,8 @@
     "submitSent": "Przedłożone zarządowi",
     "submitFailed": "Przesłanie nie powiodło się — wynik został zapisany lokalnie",
     "submitOffline": "Tryb offline — wynik jest zapisywany lokalnie",
-    "toBoard": "Otwórz tablicę"
+    "toBoard": "Otwórz tablicę",
+    "ascension": "Wniebowstąpienie A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Tabele wyników",
@@ -468,7 +529,8 @@
     "ascendant": "Ascendent",
     "chartwright": "Chartwright",
     "archivist": "Archiwista",
-    "answer": "Odpowiedź"
+    "answer": "Odpowiedź",
+    "singularity": "Osobliwość"
   },
   "unlock": {
     "opened": "Odblokowane",
@@ -507,13 +569,16 @@
     "featureShipArk": "Arka",
     "featureEngraving": "Grawerunek stacja",
     "featureDailyPreview": "Codzienny przegląd",
-    "featureFreeRespec": "Bezpłatna zmiana specjalizacji Keystone",
-    "sectorSix": "Sektor 6 „Poza rdzeniem”",
+    "sectorSix": "Sektor 6 „Poza Rdzeniem”",
     "diceS6": "Cztery kości przyczynowości",
     "skinThreshold": "Okładka albumu „Threshold”",
     "featureShipCorsair": "„Hound” jest już w sprzedaży",
     "featureShipFoundry": "Obiekt „The Forge” jest na sprzedaż",
-    "featureShipPrism": "Urządzenie Prism jest już dostępne w sprzedaży"
+    "featureShipPrism": "Urządzenie Prism jest już dostępne w sprzedaży",
+    "skinSingularity": "Skórka kości: Osobliwość",
+    "contractsA12": "Umowa: Głęboka próżnia",
+    "frameObsidian": "Ramka mostka: Obsydian",
+    "prestigeThemeTwo": "Temat: Horyzont zdarzeń"
   },
   "skin": {
     "title": "Skórki",
@@ -547,6 +612,10 @@
     "threshold": {
       "name": "Próg",
       "desc": "Okrągły, nieoświetlony, otoczony obramowaniem w kolorze jasnoszarym. Nosił go ten jedyny kapitan, który nigdy się nie poddawał."
+    },
+    "singularity": {
+      "name": "Osobliwość",
+      "desc": "Czarne szkło, biała obwódka, światło zakrzywiające się wokół znaku."
     }
   },
   "ach": {
@@ -564,7 +633,7 @@
     },
     "quickWork": {
       "name": "Szybka praca",
-      "desc": "Ukończ kampanię w maksymalnie 11 skokach."
+      "desc": "Ukończ kampanię w 85 skokach lub mniej."
     },
     "frugal": {
       "name": "Oszczędny",
@@ -731,8 +800,8 @@
       "desc": "Doprowadź historię Strażnika do ostatniej strony."
     },
     "allChains": {
-      "name": "Cztery nici",
-      "desc": "Ukończ wszystkie cztery historie załogi."
+      "name": "Każdy wątek",
+      "desc": "Zakończ historię każdej postaci z obsady."
     },
     "wandererClear": {
       "name": "Droga Wędrowca",
@@ -765,6 +834,34 @@
     "prismClear": {
       "name": "Załamane",
       "desc": "Ukończ kampanię, pilotując „Prism”."
+    },
+    "masterWanderer": {
+      "name": "Mistrz: Wędrowiec",
+      "desc": "Osiągnij mistrzostwo V na statku Wędrowiec."
+    },
+    "masterRam": {
+      "name": "Mistrz: Taran",
+      "desc": "Osiągnij mistrzostwo V na statku Taran."
+    },
+    "masterArk": {
+      "name": "Mistrz: Arka",
+      "desc": "Osiągnij mistrzostwo V na statku Arka."
+    },
+    "masterCorsair": {
+      "name": "Mistrz: Pies myśliwski",
+      "desc": "Osiągnij mistrzostwo V na statku Pies myśliwski."
+    },
+    "masterFoundry": {
+      "name": "Mistrz: Kuźnia",
+      "desc": "Osiągnij mistrzostwo V na statku Kuźnia."
+    },
+    "masterPrism": {
+      "name": "Mistrz: Pryzmat",
+      "desc": "Osiągnij mistrzostwo V na statku Pryzmat."
+    },
+    "admiral": {
+      "name": "Admirał",
+      "desc": "Osiągnij mistrzostwo V na trzech statkach."
     }
   },
   "chartTag": {
@@ -808,7 +905,13 @@
       "skinVoidglass": "okładka „Voidglass”",
       "skinEmberglass": "skórka „Emberglass”",
       "prestigeTheme": "motyw „Ascendant”",
-      "badge": "odznaka Ascendant"
+      "badge": "odznaka Ascendant",
+      "scrapBonus": "+5% złomu z walk za każdy poziom powyżej A10",
+      "skinSingularity": "skórka kości „Osobliwość”",
+      "contractA12": "umowa „Głęboka próżnia”",
+      "frameObsidian": "ramka mostka „Obsydian”",
+      "prestigeThemeTwo": "motyw „Horyzont zdarzeń”",
+      "badgeSingularity": "odznaka „Osobliwość”"
     }
   },
   "voucher": {
@@ -819,5 +922,17 @@
     "shards": "Weź {{n}} ◈",
     "bank": "W banku: {{n}} / {{max}}",
     "full": "Bank kuponów jest pełny ({{max}}). Weź odłamki."
+  },
+  "frame": {
+    "title": "Ramka mostka",
+    "hint": "Tylko kosmetycznie. Ramka nigdy nie zmienia statku.",
+    "hull": {
+      "name": "Własna ramka kadłuba",
+      "desc": "Każdy kadłub nosi ramkę, z którą go zbudowano."
+    },
+    "obsidian": {
+      "name": "Obsydian",
+      "desc": "Czarne szkło wulkaniczne obrzeżone zimną białą linią."
+    }
   }
 }

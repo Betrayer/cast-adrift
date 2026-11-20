@@ -19,6 +19,7 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "scrap", n: 22 },
               { k: "officer", id: "scrapper" },
+              { k: "shipRank", n: 1 },
             ],
           },
         ],
@@ -148,6 +149,26 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "readGlyphs",
+        label: "content:events.cursedCargo.opt.readGlyphs",
+        check: { dice: 2, pick: "sum", target: 8 },
+        onPass: [
+          {
+            text: "content:events.cursedCargo.out.readGlyphsPass",
+            effects: [{ k: "loot", rarity: "uncommon" }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.cursedCargo.out.readGlyphsFail",
+            effects: [
+              { k: "hull", n: -3 },
+              { k: "flag", key: "hunterMark" },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -163,12 +184,11 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.bountyAmbush.out.fight",
-            effects: [],
+            effects: [{ k: "flag", key: "hunterEngaged" }],
             consequence: "content:consequence.hunterMark",
             follow: {
               enemyIds: ["bountyHuntress"],
               loot: { rarity: "rare" },
-              setFlags: [["hunterEngaged", true]],
               clearFlags: ["hunterMark"],
             },
           },
@@ -402,6 +422,23 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "defuse",
+        label: "content:events.mineFieldGap.opt.defuse",
+        check: { dice: 2, pick: "lowest", target: 3, tierAtMost: 4 },
+        onPass: [
+          {
+            text: "content:events.mineFieldGap.out.defusePass",
+            effects: [{ k: "scrap", n: 25 }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.mineFieldGap.out.defuseFail",
+            effects: [{ k: "hull", n: -6 }],
+          },
+        ],
+      },
     ],
   },
   {
@@ -433,6 +470,26 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             text: "content:events.choirBroadcast.out.jam",
             effects: [
               { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "trace",
+        label: "content:events.choirBroadcast.opt.trace",
+        check: { dice: 3, pick: "sum", target: 11 },
+        onPass: [
+          {
+            text: "content:events.choirBroadcast.out.tracePass",
+            effects: [{ k: "nodeMod", mod: "revealRows", n: 2 }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.choirBroadcast.out.traceFail",
+            effects: [
+              { k: "axis", n: -1 },
               { k: "tide", n: 1 },
             ],
           },
@@ -506,6 +563,28 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "rig",
+        label: "content:events.scrapAuction.opt.rig",
+        check: { dice: 1, pick: "highest", target: 5 },
+        onPass: [
+          {
+            text: "content:events.scrapAuction.out.rigPass",
+            consequence: "content:consequence.auctionRun",
+            effects: [
+              { k: "loot", rarity: "uncommon" },
+              { k: "axis", n: -1 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.scrapAuction.out.rigFail",
+            consequence: "content:consequence.auctionRun",
+            effects: [{ k: "hull", n: -5 }],
+          },
+        ],
+      },
     ],
   },
   {
@@ -539,6 +618,30 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             effects: [
               { k: "scrap", n: 20 },
               { k: "axis", n: -1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "dropOff",
+        label: "content:events.stowaway.opt.dropOff",
+        outcomes: [
+          {
+            text: "content:events.stowaway.out.dropOff",
+            weight: 2,
+            consequence: "content:consequence.stowawayCalled",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "hull", n: 4 },
+            ],
+          },
+          {
+            text: "content:events.stowaway.out.dropOffTools",
+            weight: 1,
+            consequence: "content:consequence.stowawayCalled",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "scrap", n: -10 },
             ],
           },
         ],
@@ -580,6 +683,28 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "report",
+        label: "content:events.oldBeaconEcho.opt.report",
+        outcomes: [
+          {
+            text: "content:events.oldBeaconEcho.out.report",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "scrap", n: 10 },
+            ],
+          },
+          {
+            text: "content:events.oldBeaconEcho.out.reportLoud",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -612,6 +737,26 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "lure",
+        label: "content:events.leechNest.opt.lure",
+        check: { dice: 2, pick: "sum", target: 8 },
+        onPass: [
+          {
+            text: "content:events.leechNest.out.lurePass",
+            effects: [{ k: "scrap", n: 30 }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.leechNest.out.lureFail",
+            effects: [],
+            follow: {
+              enemyIds: ["leechSkiff"],
+            },
+          },
+        ],
+      },
     ],
   },
   {
@@ -639,6 +784,31 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             text: "content:events.driftMerchant.out.decline",
             consequence: "content:consequence.merchantSwap",
             effects: [{ k: "scrap", n: 6 }],
+          },
+        ],
+      },
+      {
+        id: "buyOne",
+        label: "content:events.driftMerchant.opt.buyOne",
+        requires: { req: "scrap", n: 20 },
+        outcomes: [
+          {
+            text: "content:events.driftMerchant.out.buyOne",
+            weight: 3,
+            consequence: "content:consequence.merchantSwap",
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+          },
+          {
+            text: "content:events.driftMerchant.out.buyOneRare",
+            weight: 1,
+            consequence: "content:consequence.merchantSwap",
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "loot", rarity: "rare" },
+            ],
           },
         ],
       },
@@ -675,6 +845,28 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "skim",
+        label: "content:events.radiationPocket.opt.skim",
+        check: { dice: 2, pick: "highest", target: 5 },
+        onPass: [
+          {
+            text: "content:events.radiationPocket.out.skimPass",
+            consequence: "content:consequence.pocketCrossed",
+            effects: [
+              { k: "tide", n: -1 },
+              { k: "scrap", n: 8 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.radiationPocket.out.skimFail",
+            consequence: "content:consequence.pocketCrossed",
+            effects: [{ k: "hull", n: -5 }],
+          },
+        ],
+      },
     ],
   },
   {
@@ -691,7 +883,10 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         onPass: [
           {
             text: "content:events.wardenCache.out.crackPass",
-            effects: [{ k: "nodeMod", mod: "shipyardDiscount", n: 30 }],
+            effects: [
+              { k: "nodeMod", mod: "shipyardDiscount", n: 30 },
+              { k: "flag", key: "cacheCracked" },
+            ],
           },
         ],
         onFail: [
@@ -710,7 +905,10 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.wardenCache.out.leave",
-            effects: [{ k: "axis", n: 1 }],
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "flag", key: "cacheLeft" },
+            ],
           },
         ],
       },
@@ -732,12 +930,11 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
         outcomes: [
           {
             text: "content:events.alertedPatrol.out.engage",
-            effects: [],
+            effects: [{ k: "flag", key: "patrolCleared" }],
             consequence: "content:consequence.alerted",
             follow: {
               enemyIds: ["raiderAlpha", "scavDrone"],
               loot: { rarity: "rare" },
-              setFlags: [["patrolCleared", true]],
             },
           },
         ],
@@ -803,6 +1000,29 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "hack",
+        label: "content:events.gamblersWreck.opt.hack",
+        check: { dice: 3, pick: "sum", target: 12 },
+        onPass: [
+          {
+            text: "content:events.gamblersWreck.out.hackPass",
+            effects: [
+              { k: "scrap", n: 35 },
+              { k: "axis", n: -1 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.gamblersWreck.out.hackFail",
+            effects: [
+              { k: "hull", n: -4 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
     ],
   },
   {
@@ -833,6 +1053,22 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           {
             text: "content:events.frozenCrew.out.leave",
             effects: [{ k: "axis", n: 1 }],
+          },
+        ],
+      },
+      {
+        id: "wakePilot",
+        label: "content:events.frozenCrew.opt.wakePilot",
+        outcomes: [
+          {
+            text: "content:events.frozenCrew.out.wakePilot",
+            weight: 2,
+            effects: [{ k: "nodeMod", mod: "revealRows", n: 2 }],
+          },
+          {
+            text: "content:events.frozenCrew.out.wakePilotBad",
+            weight: 1,
+            effects: [{ k: "scrap", n: -8 }],
           },
         ],
       },
@@ -901,6 +1137,30 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
               { k: "axis", n: -2 },
               { k: "loot", die: "black-d6" },
               { k: "hull", n: -2 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "vent",
+        label: "content:events.probCoreLeak.opt.vent",
+        outcomes: [
+          {
+            text: "content:events.probCoreLeak.out.vent",
+            weight: 3,
+            consequence: "content:consequence.leakHandled",
+            effects: [
+              { k: "hull", n: -2 },
+              { k: "scrap", n: 8 },
+            ],
+          },
+          {
+            text: "content:events.probCoreLeak.out.ventSpill",
+            weight: 1,
+            consequence: "content:consequence.leakHandled",
+            effects: [
+              { k: "hull", n: -2 },
+              { k: "tide", n: 1 },
             ],
           },
         ],
@@ -1055,6 +1315,25 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
           },
         ],
       },
+      {
+        id: "bet",
+        label: "content:events.driftRace.opt.bet",
+        requires: { req: "scrap", n: 15 },
+        outcomes: [
+          {
+            text: "content:events.driftRace.out.bet",
+            weight: 2,
+            consequence: "content:consequence.runnersRaced",
+            effects: [{ k: "scrap", n: -15 }],
+          },
+          {
+            text: "content:events.driftRace.out.betWon",
+            weight: 1,
+            consequence: "content:consequence.runnersRaced",
+            effects: [{ k: "scrap", n: 35 }],
+          },
+        ],
+      },
     ],
   },
   {
@@ -1086,6 +1365,28 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
               { k: "hull", n: -2 },
               { k: "scrap", n: 8 },
             ],
+          },
+        ],
+      },
+      {
+        id: "hail",
+        label: "content:events.sensorGhost.opt.hail",
+        outcomes: [
+          {
+            text: "content:events.sensorGhost.out.hail",
+            weight: 2,
+            consequence: "content:consequence.ghostResolved",
+            effects: [{ k: "scrap", n: 15 }],
+          },
+          {
+            text: "content:events.sensorGhost.out.hailTrap",
+            weight: 1,
+            consequence: "content:consequence.ghostResolved",
+            effects: [],
+            follow: {
+              enemyIds: ["jammerCorvette"],
+              loot: { rarity: "uncommon" },
+            },
           },
         ],
       },
@@ -1231,6 +1532,1042 @@ export const SECTOR1_EVENTS: readonly EventDef[] = [
             text: "content:events.rimNoticeboard.out.haul",
             effects: [{ k: "cargo", id: "leadBallast" }],
             consequence: "content:consequence.cargoTaken",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "wardenInspector",
+    weight: 9,
+    speaker: "warden",
+    requires: S1,
+    text: "content:events.wardenInspector.text",
+    dialogue: [
+      { who: "warden", line: "content:events.wardenInspector.dia.l1" },
+      { who: "echo", line: "content:events.wardenInspector.dia.l2" },
+    ],
+    options: [
+      {
+        id: "declare",
+        label: "content:events.wardenInspector.opt.declare",
+        outcomes: [
+          {
+            text: "content:events.wardenInspector.out.declare",
+            weight: 2,
+            effects: [
+              { k: "swapLowestDie" },
+              { k: "flag", key: "inspectionStamped" },
+            ],
+          },
+          {
+            text: "content:events.wardenInspector.out.declareFined",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -10 },
+              { k: "flag", key: "inspectionStamped" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "hide",
+        label: "content:events.wardenInspector.opt.hide",
+        check: { dice: 2, pick: "sum", target: 8 },
+        onPass: [
+          {
+            text: "content:events.wardenInspector.out.hidePass",
+            effects: [
+              { k: "tide", n: -1 },
+              { k: "flag", key: "inspectionStamped" },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.wardenInspector.out.hideFail",
+            effects: [
+              { k: "hull", n: -3 },
+              { k: "flag", key: "alerted" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "burnOff",
+        label: "content:events.wardenInspector.opt.burnOff",
+        outcomes: [
+          {
+            text: "content:events.wardenInspector.out.burnOff",
+            weight: 2,
+            effects: [
+              { k: "hull", n: -3 },
+              { k: "scrap", n: 20 },
+            ],
+          },
+          {
+            text: "content:events.wardenInspector.out.burnOffSignal",
+            weight: 1,
+            effects: [
+              { k: "hull", n: -3 },
+              { k: "scrap", n: 20 },
+              { k: "flag", key: "alerted" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "rewire",
+        label: "content:events.wardenInspector.opt.rewire",
+        check: { dice: 1, pick: "highest", target: 4 },
+        onPass: [
+          {
+            text: "content:events.wardenInspector.out.rewirePass",
+            effects: [{ k: "nodeMod", mod: "revealRows", n: 2 }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.wardenInspector.out.rewireFail",
+            effects: [{ k: "hull", n: -4 }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "wardenPicket",
+    weight: 14,
+    speaker: "warden",
+    requires: { sector: [1], flags: { all: ["inspectionStamped"] } },
+    text: "content:events.wardenPicket.text",
+    dialogue: [
+      { who: "warden", line: "content:events.wardenPicket.dia.l1" },
+      { who: "echo", line: "content:events.wardenPicket.dia.l2" },
+    ],
+    options: [
+      {
+        id: "submit",
+        label: "content:events.wardenPicket.opt.submit",
+        outcomes: [
+          {
+            text: "content:events.wardenPicket.out.submit",
+            weight: 3,
+            effects: [
+              { k: "flag", key: "patrolCleared" },
+              { k: "hull", n: 4 },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+          },
+          {
+            text: "content:events.wardenPicket.out.submitFined",
+            weight: 1,
+            effects: [
+              { k: "flag", key: "patrolCleared" },
+              { k: "scrap", n: -15 },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+          },
+        ],
+      },
+      {
+        id: "fee",
+        label: "content:events.wardenPicket.opt.fee",
+        requires: { req: "scrap", n: 20 },
+        outcomes: [
+          {
+            text: "content:events.wardenPicket.out.fee",
+            weight: 3,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "flag", key: "patrolCleared" },
+              { k: "tide", n: -1 },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+          },
+          {
+            text: "content:events.wardenPicket.out.feeLogged",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "flag", key: "patrolCleared" },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+          },
+        ],
+      },
+      {
+        id: "forge",
+        label: "content:events.wardenPicket.opt.forge",
+        check: { dice: 2, pick: "sum", target: 8 },
+        onPass: [
+          {
+            text: "content:events.wardenPicket.out.forgePass",
+            effects: [
+              { k: "flag", key: "patrolCleared" },
+              { k: "loot", rarity: "uncommon" },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.wardenPicket.out.forgeFail",
+            effects: [
+              { k: "hull", n: -5 },
+              { k: "flag", key: "alerted" },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+          },
+        ],
+      },
+      {
+        id: "seize",
+        label: "content:events.wardenPicket.opt.seize",
+        outcomes: [
+          {
+            text: "content:events.wardenPicket.out.seize",
+            weight: 3,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "flag", key: "patrolCleared" },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+            follow: {
+              enemyIds: ["shieldWarden", "scavDrone"],
+              scrap: 20,
+              loot: { rarity: "uncommon" },
+            },
+          },
+          {
+            text: "content:events.wardenPicket.out.seizeYield",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "scrap", n: 30 },
+              { k: "flag", key: "patrolCleared" },
+            ],
+            consequence: "content:consequence.inspectionStamped",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "twelfthHull",
+    weight: 7,
+    requires: S1,
+    text: "content:events.twelfthHull.text",
+    dialogue: [
+      { who: "echo", line: "content:events.twelfthHull.dia.l1" },
+      { who: "echo", line: "content:events.twelfthHull.dia.l2" },
+      { who: "narration", line: "content:events.twelfthHull.dia.l3" },
+    ],
+    options: [
+      {
+        id: "board",
+        label: "content:events.twelfthHull.opt.board",
+        check: { dice: 2, pick: "sum", target: 7 },
+        onPass: [
+          {
+            text: "content:events.twelfthHull.out.boardPass",
+            effects: [
+              { k: "loot", rarity: "uncommon" },
+              { k: "flag", key: "twelfthBoarded" },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.twelfthHull.out.boardFail",
+            effects: [
+              { k: "hull", n: -5 },
+              { k: "flag", key: "twelfthBoarded" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "hail",
+        label: "content:events.twelfthHull.opt.hail",
+        outcomes: [
+          {
+            text: "content:events.twelfthHull.out.hail",
+            weight: 2,
+            effects: [
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+              { k: "flag", key: "twelfthHailed" },
+            ],
+          },
+          {
+            text: "content:events.twelfthHull.out.hailSelf",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "flag", key: "twelfthHailed" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "strip",
+        label: "content:events.twelfthHull.opt.strip",
+        outcomes: [
+          {
+            text: "content:events.twelfthHull.out.strip",
+            weight: 3,
+            effects: [{ k: "scrap", n: 30 }],
+          },
+          {
+            text: "content:events.twelfthHull.out.stripBit",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 30 },
+              { k: "hull", n: -4 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "mark",
+        label: "content:events.twelfthHull.opt.mark",
+        outcomes: [
+          {
+            text: "content:events.twelfthHull.out.mark",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "flag", key: "twelfthTagged" },
+            ],
+          },
+          {
+            text: "content:events.twelfthHull.out.markLit",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+              { k: "flag", key: "twelfthTagged" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "scuttle",
+        label: "content:events.twelfthHull.opt.scuttle",
+        outcomes: [
+          {
+            text: "content:events.twelfthHull.out.scuttle",
+            weight: 2,
+            effects: [
+              { k: "tide", n: -1 },
+              { k: "axis", n: -1 },
+            ],
+          },
+          {
+            text: "content:events.twelfthHull.out.scuttleTwin",
+            weight: 1,
+            effects: [
+              { k: "tide", n: 1 },
+              { k: "axis", n: -1 },
+            ],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "twelfthWake",
+    weight: 14,
+    requires: {
+      sector: [1],
+      flags: { any: ["twelfthBoarded", "twelfthHailed", "twelfthTagged"] },
+    },
+    text: "content:events.twelfthWake.text",
+    dialogue: [
+      { who: "echo", line: "content:events.twelfthWake.dia.l1" },
+      { who: "echo", line: "content:events.twelfthWake.dia.l2" },
+    ],
+    options: [
+      {
+        id: "escort",
+        label: "content:events.twelfthWake.opt.escort",
+        outcomes: [
+          {
+            text: "content:events.twelfthWake.out.escort",
+            weight: 2,
+            effects: [{ k: "battleMod", mod: "startCharge", n: 2, battles: 2 }],
+            consequence: "content:consequence.twelfthHull",
+          },
+          {
+            text: "content:events.twelfthWake.out.escortBrief",
+            weight: 1,
+            effects: [
+              { k: "battleMod", mod: "startCharge", n: 2, battles: 1 },
+              { k: "axis", n: -1 },
+            ],
+            consequence: "content:consequence.twelfthHull",
+          },
+        ],
+      },
+      {
+        id: "answer",
+        label: "content:events.twelfthWake.opt.answer",
+        requires: { req: "flag", key: "twelfthHailed" },
+        outcomes: [
+          {
+            text: "content:events.twelfthWake.out.answer",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "sectorReveal", n: 1 },
+            ],
+            consequence: "content:consequence.twelfthHull",
+          },
+          {
+            text: "content:events.twelfthWake.out.answerGift",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+            consequence: "content:consequence.twelfthHull",
+          },
+        ],
+      },
+      {
+        id: "shake",
+        label: "content:events.twelfthWake.opt.shake",
+        check: { dice: 3, pick: "sum", target: 11 },
+        onPass: [
+          {
+            text: "content:events.twelfthWake.out.shakePass",
+            effects: [{ k: "tide", n: -1 }],
+            consequence: "content:consequence.twelfthHull",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.twelfthWake.out.shakeFail",
+            effects: [{ k: "hull", n: -5 }],
+            consequence: "content:consequence.twelfthHull",
+          },
+        ],
+      },
+      {
+        id: "fire",
+        label: "content:events.twelfthWake.opt.fire",
+        outcomes: [
+          {
+            text: "content:events.twelfthWake.out.fire",
+            weight: 2,
+            effects: [],
+            consequence: "content:consequence.twelfthHull",
+            follow: {
+              enemyIds: ["anchorHulk"],
+              loot: { rarity: "uncommon" },
+            },
+          },
+          {
+            text: "content:events.twelfthWake.out.fireBreak",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 25 },
+              { k: "axis", n: -1 },
+            ],
+            consequence: "content:consequence.twelfthHull",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "salvageClaim",
+    weight: 8,
+    requires: S1,
+    text: "content:events.salvageClaim.text",
+    options: [
+      {
+        id: "cutFirst",
+        label: "content:events.salvageClaim.opt.cutFirst",
+        check: { dice: 2, pick: "highest", target: 5 },
+        onPass: [
+          {
+            text: "content:events.salvageClaim.out.cutPass",
+            effects: [
+              { k: "scrap", n: 30 },
+              { k: "flag", key: "claimJumped" },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.salvageClaim.out.cutFail",
+            effects: [{ k: "hull", n: -4 }],
+          },
+        ],
+      },
+      {
+        id: "split",
+        label: "content:events.salvageClaim.opt.split",
+        outcomes: [
+          {
+            text: "content:events.salvageClaim.out.split",
+            weight: 3,
+            effects: [
+              { k: "scrap", n: 15 },
+              { k: "axis", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.salvageClaim.out.splitShort",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 5 },
+              { k: "axis", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "buyOut",
+        label: "content:events.salvageClaim.opt.buyOut",
+        requires: { req: "scrap", n: 20 },
+        outcomes: [
+          {
+            text: "content:events.salvageClaim.out.buyOut",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+          },
+          {
+            text: "content:events.salvageClaim.out.buyOutPlate",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "hullMax", n: 2 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "maraName",
+        label: "content:events.salvageClaim.opt.maraName",
+        requires: { req: "flag", key: "maraFriend" },
+        outcomes: [
+          {
+            text: "content:events.salvageClaim.out.maraName",
+            weight: 2,
+            effects: [{ k: "scrap", n: 25 }],
+          },
+          {
+            text: "content:events.salvageClaim.out.maraNameCore",
+            weight: 1,
+            effects: [{ k: "loot", rarity: "uncommon" }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "claimFeud",
+    weight: 14,
+    requires: { sector: [1], flags: { all: ["claimJumped"] } },
+    text: "content:events.claimFeud.text",
+    dialogue: [
+      { who: "narration", line: "content:events.claimFeud.dia.l1" },
+      { who: "echo", line: "content:events.claimFeud.dia.l2" },
+    ],
+    options: [
+      {
+        id: "fight",
+        label: "content:events.claimFeud.opt.fight",
+        outcomes: [
+          {
+            text: "content:events.claimFeud.out.fight",
+            weight: 3,
+            effects: [],
+            consequence: "content:consequence.claimJumped",
+            follow: {
+              enemyIds: ["raider", "scavDrone"],
+              scrap: 30,
+            },
+          },
+          {
+            text: "content:events.claimFeud.out.fightFold",
+            weight: 1,
+            effects: [{ k: "scrap", n: 20 }],
+            consequence: "content:consequence.claimJumped",
+          },
+        ],
+      },
+      {
+        id: "payShare",
+        label: "content:events.claimFeud.opt.payShare",
+        requires: { req: "scrap", n: 25 },
+        outcomes: [
+          {
+            text: "content:events.claimFeud.out.payShare",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -25 },
+              { k: "axis", n: 1 },
+            ],
+            consequence: "content:consequence.claimJumped",
+          },
+          {
+            text: "content:events.claimFeud.out.payShareTip",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -25 },
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+            ],
+            consequence: "content:consequence.claimJumped",
+          },
+        ],
+      },
+      {
+        id: "outrun",
+        label: "content:events.claimFeud.opt.outrun",
+        check: { dice: 3, pick: "sum", target: 12 },
+        onPass: [
+          {
+            text: "content:events.claimFeud.out.outrunPass",
+            effects: [{ k: "tide", n: -1 }],
+            consequence: "content:consequence.claimJumped",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.claimFeud.out.outrunFail",
+            effects: [{ k: "hull", n: -6 }],
+            consequence: "content:consequence.claimJumped",
+          },
+        ],
+      },
+      {
+        id: "pageTwo",
+        label: "content:events.claimFeud.opt.pageTwo",
+        check: { dice: 1, pick: "highest", target: 5 },
+        onPass: [
+          {
+            text: "content:events.claimFeud.out.pageTwoPass",
+            effects: [{ k: "scrap", n: 15 }],
+            consequence: "content:consequence.claimJumped",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.claimFeud.out.pageTwoFail",
+            effects: [{ k: "hull", n: -4 }],
+            consequence: "content:consequence.claimJumped",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "choirCountdown",
+    weight: 8,
+    speaker: "choirPreacher",
+    requires: S1,
+    text: "content:events.choirCountdown.text",
+    dialogue: [
+      { who: "choirPreacher", line: "content:events.choirCountdown.dia.l1" },
+      { who: "echo", line: "content:events.choirCountdown.dia.l2" },
+    ],
+    options: [
+      {
+        id: "countAlong",
+        label: "content:events.choirCountdown.opt.countAlong",
+        outcomes: [
+          {
+            text: "content:events.choirCountdown.out.countAlong",
+            weight: 2,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "battleMod", mod: "startCharge", n: 2, battles: 2 },
+              { k: "flag", key: "countJoined" },
+            ],
+          },
+          {
+            text: "content:events.choirCountdown.out.countAlongCalm",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "hull", n: 3 },
+              { k: "flag", key: "countJoined" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "retune",
+        label: "content:events.choirCountdown.opt.retune",
+        check: { dice: 2, pick: "highest", target: 5 },
+        onPass: [
+          {
+            text: "content:events.choirCountdown.out.retunePass",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.choirCountdown.out.retuneFail",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "hull", n: -3 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "cutLoose",
+        label: "content:events.choirCountdown.opt.cutLoose",
+        outcomes: [
+          {
+            text: "content:events.choirCountdown.out.cutLoose",
+            weight: 3,
+            effects: [
+              { k: "scrap", n: 20 },
+              { k: "axis", n: 1 },
+            ],
+          },
+          {
+            text: "content:events.choirCountdown.out.cutLooseHeard",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: 20 },
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "giveNumber",
+        label: "content:events.choirCountdown.opt.giveNumber",
+        requires: { req: "flag", key: "heardChoir" },
+        outcomes: [
+          {
+            text: "content:events.choirCountdown.out.giveNumber",
+            weight: 2,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "loot", rarity: "uncommon" },
+              { k: "flag", key: "countJoined" },
+            ],
+          },
+          {
+            text: "content:events.choirCountdown.out.giveNumberBlack",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "loot", die: "black-d6" },
+              { k: "flag", key: "countJoined" },
+            ],
+          },
+        ],
+      },
+      {
+        id: "record",
+        label: "content:events.choirCountdown.opt.record",
+        check: { dice: 1, pick: "lowest", target: 3 },
+        onPass: [
+          {
+            text: "content:events.choirCountdown.out.recordPass",
+            effects: [{ k: "nodeMod", mod: "sectorReveal", n: 1 }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.choirCountdown.out.recordFail",
+            effects: [{ k: "tide", n: 1 }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "countCollector",
+    weight: 13,
+    speaker: "choirPreacher",
+    requires: { sector: [1], flags: { all: ["countJoined"] } },
+    text: "content:events.countCollector.text",
+    dialogue: [
+      { who: "choirPreacher", line: "content:events.countCollector.dia.l1" },
+      { who: "echo", line: "content:events.countCollector.dia.l2" },
+    ],
+    options: [
+      {
+        id: "takeNumber",
+        label: "content:events.countCollector.opt.takeNumber",
+        outcomes: [
+          {
+            text: "content:events.countCollector.out.takeNumber",
+            weight: 2,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "loot", die: "black-d6" },
+            ],
+            consequence: "content:consequence.countJoined",
+          },
+          {
+            text: "content:events.countCollector.out.takeNumberCharge",
+            weight: 1,
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "battleMod", mod: "startCharge", n: 3, battles: 2 },
+            ],
+            consequence: "content:consequence.countJoined",
+          },
+        ],
+      },
+      {
+        id: "refuse",
+        label: "content:events.countCollector.opt.refuse",
+        outcomes: [
+          {
+            text: "content:events.countCollector.out.refuse",
+            weight: 2,
+            effects: [{ k: "axis", n: 1 }],
+            consequence: "content:consequence.countJoined",
+            follow: {
+              enemyIds: ["choirZealot", "choirZealot"],
+              loot: { rarity: "uncommon" },
+            },
+          },
+          {
+            text: "content:events.countCollector.out.refuseMarked",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "tide", n: 1 },
+            ],
+            consequence: "content:consequence.countJoined",
+          },
+        ],
+      },
+      {
+        id: "paintZero",
+        label: "content:events.countCollector.opt.paintZero",
+        check: { dice: 1, pick: "highest", target: 5 },
+        onPass: [
+          {
+            text: "content:events.countCollector.out.paintPass",
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "scrap", n: 15 },
+            ],
+            consequence: "content:consequence.countJoined",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.countCollector.out.paintFail",
+            effects: [
+              { k: "axis", n: -1 },
+              { k: "hull", n: -3 },
+            ],
+            consequence: "content:consequence.countJoined",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "coreSplinter",
+    weight: 7,
+    requires: S1,
+    text: "content:events.coreSplinter.text",
+    dialogue: [
+      { who: "echo", line: "content:events.coreSplinter.dia.l1" },
+      { who: "echo", line: "content:events.coreSplinter.dia.l2" },
+    ],
+    options: [
+      {
+        id: "pry",
+        label: "content:events.coreSplinter.opt.pry",
+        check: { dice: 2, pick: "sum", target: 7 },
+        onPass: [
+          {
+            text: "content:events.coreSplinter.out.pryPass",
+            effects: [{ k: "shards", n: 10 }],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.coreSplinter.out.pryFail",
+            effects: [{ k: "hull", n: -4 }],
+          },
+        ],
+      },
+      {
+        id: "feed",
+        label: "content:events.coreSplinter.opt.feed",
+        outcomes: [
+          {
+            text: "content:events.coreSplinter.out.feed",
+            weight: 2,
+            effects: [{ k: "battleMod", mod: "startCharge", n: 2, battles: 3 }],
+          },
+          {
+            text: "content:events.coreSplinter.out.feedChoke",
+            weight: 1,
+            effects: [
+              { k: "battleMod", mod: "startCharge", n: 2, battles: 1 },
+              { k: "hull", n: -3 },
+            ],
+          },
+        ],
+      },
+      {
+        id: "graft",
+        label: "content:events.coreSplinter.opt.graft",
+        check: { dice: 1, pick: "highest", target: 3, school: "green" },
+        onPass: [
+          {
+            text: "content:events.coreSplinter.out.graftPass",
+            effects: [
+              { k: "hullMax", n: 2 },
+              { k: "hull", n: 2 },
+            ],
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.coreSplinter.out.graftFail",
+            effects: [{ k: "hull", n: -3 }],
+          },
+        ],
+      },
+      {
+        id: "sell",
+        label: "content:events.coreSplinter.opt.sell",
+        outcomes: [
+          {
+            text: "content:events.coreSplinter.out.sell",
+            weight: 3,
+            effects: [{ k: "scrap", n: 20 }],
+          },
+          {
+            text: "content:events.coreSplinter.out.sellHigh",
+            weight: 1,
+            effects: [{ k: "scrap", n: 35 }],
+          },
+        ],
+      },
+    ],
+  },
+  {
+    id: "yusufTariff",
+    weight: 14,
+    speaker: "yusuf",
+    requires: { sector: [1], flags: { all: ["yusufGrudge"] } },
+    text: "content:events.yusufTariff.text",
+    dialogue: [
+      { who: "yusuf", line: "content:events.yusufTariff.dia.l1" },
+      { who: "echo", line: "content:events.yusufTariff.dia.l2" },
+    ],
+    options: [
+      {
+        id: "pay",
+        label: "content:events.yusufTariff.opt.pay",
+        requires: { req: "scrap", n: 20 },
+        outcomes: [
+          {
+            text: "content:events.yusufTariff.out.pay",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "axis", n: 1 },
+            ],
+            consequence: "content:consequence.yusufGrudge",
+          },
+          {
+            text: "content:events.yusufTariff.out.payTip",
+            weight: 1,
+            effects: [
+              { k: "scrap", n: -20 },
+              { k: "nodeMod", mod: "revealRows", n: 2 },
+            ],
+            consequence: "content:consequence.yusufGrudge",
+          },
+        ],
+      },
+      {
+        id: "holdLane",
+        label: "content:events.yusufTariff.opt.holdLane",
+        check: { dice: 3, pick: "highest", target: 6 },
+        onPass: [
+          {
+            text: "content:events.yusufTariff.out.holdPass",
+            effects: [{ k: "scrap", n: 15 }],
+            consequence: "content:consequence.yusufGrudge",
+          },
+        ],
+        onFail: [
+          {
+            text: "content:events.yusufTariff.out.holdFail",
+            effects: [
+              { k: "hull", n: -4 },
+              { k: "battleMod", mod: "enemyPlus", n: 1, battles: 1 },
+            ],
+            consequence: "content:consequence.yusufGrudge",
+          },
+        ],
+      },
+      {
+        id: "apologize",
+        label: "content:events.yusufTariff.opt.apologize",
+        outcomes: [
+          {
+            text: "content:events.yusufTariff.out.apologize",
+            weight: 2,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "hull", n: 3 },
+            ],
+            consequence: "content:consequence.yusufGrudge",
+          },
+          {
+            text: "content:events.yusufTariff.out.apologizeCore",
+            weight: 1,
+            effects: [
+              { k: "axis", n: 1 },
+              { k: "loot", rarity: "uncommon" },
+            ],
+            consequence: "content:consequence.yusufGrudge",
+          },
+        ],
+      },
+      {
+        id: "taxAgain",
+        label: "content:events.yusufTariff.opt.taxAgain",
+        outcomes: [
+          {
+            text: "content:events.yusufTariff.out.taxAgain",
+            weight: 2,
+            effects: [
+              { k: "scrap", n: 25 },
+              { k: "axis", n: -1 },
+            ],
+            consequence: "content:consequence.yusufGrudge",
+          },
+          {
+            text: "content:events.yusufTariff.out.taxAgainFight",
+            weight: 1,
+            effects: [{ k: "axis", n: -1 }],
+            consequence: "content:consequence.yusufGrudge",
+            follow: {
+              enemyIds: ["jammerCorvette", "scavDrone"],
+              scrap: 20,
+            },
           },
         ],
       },

@@ -1,6 +1,6 @@
 .badge {
   position: absolute;
-  z-index: 1;
+  z-index: var(--z-raise);
   display: inline-flex;
   line-height: 0;
 }

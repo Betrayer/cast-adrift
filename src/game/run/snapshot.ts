@@ -12,11 +12,13 @@ import {
 } from "@/stores/runStore";
 import { emitBark, resetBarkMemory } from "@/game/narrative/barks";
 import { restoreActionLog } from "@/game/run/actionLog";
+import { LEGACY_ENTRANCE } from "@/game/run/rewardEntrance";
 import { useAppStore } from "@/stores/appStore";
 import { useNarrativeStore } from "@/stores/narrativeStore";
 import type { JournalEntry } from "@/game/run/journal";
 import type { HoleSpot, MapGraph } from "@/game/map/types";
-import type { ScreenId } from "@/types";
+import { saveRunSnapshot } from "@/services/save";
+import type { RunSnapshot, ScreenId } from "@/types";
 
 const TRANSIENT_SCREENS: readonly ScreenId[] = [
   "bridge",
@@ -31,10 +33,10 @@ const resumeScreen = (screen: ScreenId, battleLive: boolean): ScreenId => {
   return useRunStore.getState().pendingRewards === null ? "map" : "rewards";
 };
 
-export const RUN_SNAPSHOT_V = 16;
+export const RUN_SNAPSHOT_V = 17;
 
 export const RUN_SNAPSHOT_ACCEPTED: readonly number[] = [
-  10, 11, 12, 13, 14, 15, 16,
+  10, 11, 12, 13, 14, 15, 16, 17,
 ];
 
 export interface RunSnapshotV1 {
@@ -62,6 +64,12 @@ const pickRunValues = (s: RunState): RunValues => ({
   hullMax: s.hullMax,
   scrap: s.scrap,
   shipId: s.shipId,
+  masteryRank: s.masteryRank,
+  shipRankXp: s.shipRankXp,
+  pendingRankUps: s.pendingRankUps,
+  pendingShipDraft: [...s.pendingShipDraft],
+  shipDraftRerollUsed: s.shipDraftRerollUsed,
+  blackBoxSpent: s.blackBoxSpent,
   deck: s.deck.map((d) => ({ ...d })),
   perks: [...s.perks],
   modules: [...s.modules],
@@ -123,6 +131,7 @@ const pickRunValues = (s: RunState): RunValues => ({
   lastWormhole: s.lastWormhole === null ? null : { ...s.lastWormhole },
   pendingDeepScan: s.pendingDeepScan,
   lastTally: s.lastTally === null ? null : { ...s.lastTally },
+  lastEntrance: s.lastEntrance,
   lastBattleLog: s.lastBattleLog.map((entry) => ({ ...entry })),
   pendingRewards:
     s.pendingRewards === null
@@ -150,6 +159,9 @@ const pickRunValues = (s: RunState): RunValues => ({
             : {}),
           ...(s.pendingRewards.draftFloor !== undefined
             ? { draftFloor: s.pendingRewards.draftFloor }
+            : {}),
+          ...(s.pendingRewards.entrance !== undefined
+            ? { entrance: s.pendingRewards.entrance }
             : {}),
         },
   shop:
@@ -186,6 +198,14 @@ export const captureRunSnapshot = (): RunSnapshotV1 => {
   };
 };
 
+export const autosaveRun = (): void => {
+  try {
+    saveRunSnapshot(captureRunSnapshot() as unknown as RunSnapshot);
+  } catch (error) {
+    console.error("flow: autosave failed", error);
+  }
+};
+
 const battleBlobIsCurrent = (snap: RunSnapshotV1): boolean =>
   snap.battle === null || snap.v === RUN_SNAPSHOT_V;
 
@@ -204,6 +224,13 @@ const isRunSnapshot = (data: unknown): data is RunSnapshotV1 => {
     Array.isArray(snap.journal)
   );
 };
+
+const withLegacyEntrance = (
+  rewards: RunValues["pendingRewards"],
+): RunValues["pendingRewards"] =>
+  rewards === null || rewards.entrance !== undefined
+    ? rewards
+    : { ...rewards, entrance: LEGACY_ENTRANCE };
 
 const withSynthesisedSpots = (map: MapGraph): MapGraph => {
   const declared: unknown = (map as { spots?: unknown }).spots;
@@ -226,10 +253,11 @@ const withSynthesisedSpots = (map: MapGraph): MapGraph => {
 export const restoreRunSnapshot = (data: unknown): boolean => {
   if (!isRunSnapshot(data)) return false;
   const restored = { ...createInitialRunValues(), ...data.run };
-  const values =
-    restored.map === null
-      ? restored
-      : { ...restored, map: withSynthesisedSpots(restored.map) };
+  const values = {
+    ...restored,
+    map: restored.map === null ? null : withSynthesisedSpots(restored.map),
+    pendingRewards: withLegacyEntrance(restored.pendingRewards),
+  };
   useRunStore.getState().hydrate(values);
   useNarrativeStore.getState().reset();
   useNarrativeStore.getState().setJournal(data.journal);

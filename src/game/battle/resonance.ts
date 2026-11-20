@@ -1,28 +1,10 @@
+import { REAL_SCHOOL_ORDER, SCHOOL_ORDER } from "@/data/schools";
 import type {
   ResonanceCensus,
   ResonanceThreshold,
   RolledDie,
 } from "@/types/battle";
 import type { School } from "@/types/content";
-
-export const SCHOOL_ORDER: readonly School[] = [
-  "red",
-  "blue",
-  "green",
-  "yellow",
-  "black",
-  "grey",
-  "prismatic",
-];
-
-const REAL_SCHOOLS: readonly School[] = [
-  "red",
-  "blue",
-  "green",
-  "yellow",
-  "black",
-  "grey",
-];
 
 export const RESONANCE_THRESHOLDS: readonly ResonanceThreshold[] = [2, 4, 6];
 
@@ -39,18 +21,19 @@ const zeroCounts = (): Record<School, number> => ({
 export const computeCensus = (
   dice: readonly Pick<RolledDie, "school">[],
   prismaticMult = 1,
+  leadBonus = 0,
 ): ResonanceCensus => {
   const counts = zeroCounts();
   for (const die of dice) counts[die.school] += 1;
   counts.prismatic *= prismaticMult;
 
   const prismatic = counts.prismatic;
-  if (prismatic > 0) {
-    let best: School = REAL_SCHOOLS[0] ?? "red";
-    for (const school of REAL_SCHOOLS) {
+  if (prismatic > 0 || leadBonus > 0) {
+    let best: School = REAL_SCHOOL_ORDER[0] ?? "red";
+    for (const school of REAL_SCHOOL_ORDER) {
       if (counts[school] > counts[best]) best = school;
     }
-    counts[best] += prismatic;
+    counts[best] += prismatic + leadBonus;
   }
 
   return { counts };
@@ -70,3 +53,32 @@ export const activeThresholds = (
 
 export const nextThreshold = (count: number): ResonanceThreshold | null =>
   RESONANCE_THRESHOLDS.find((n) => count < n) ?? null;
+
+export interface ResonanceBoardRow {
+  school: School;
+  deck: number;
+  prism: boolean;
+  placed: number;
+  tray: number;
+  reserved: number;
+}
+
+export const resonanceBoardRows = (
+  dice: readonly Pick<RolledDie, "school" | "state">[],
+  census: ResonanceCensus,
+): ResonanceBoardRow[] => {
+  const rows = SCHOOL_ORDER.map((school) => {
+    const owned = dice.filter((d) => d.school === school);
+    return {
+      school,
+      deck: census.counts[school],
+      prism: census.counts[school] > owned.length,
+      placed: owned.filter((d) => d.state === "placed").length,
+      tray: owned.filter((d) => d.state === "tray").length,
+      reserved: owned.filter((d) => d.state === "reserved").length,
+    };
+  });
+  return rows.filter(
+    (row) => row.deck > 0 || row.placed + row.tray + row.reserved > 0,
+  );
+};

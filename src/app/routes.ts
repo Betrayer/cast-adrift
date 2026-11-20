@@ -6,7 +6,7 @@ export type BackMode = 'stack' | 'locked' | 'guarded' | `fixed:${ScreenId}`;
 
 export type EnterMode = 'slide' | 'bespoke';
 
-export type FeedAnchor = 'top' | 'bottom' | 'none';
+export type FeedAnchor = 'top' | 'band' | 'none';
 
 export type NavDirection = 'forward' | 'back';
 
@@ -17,7 +17,7 @@ export interface RouteDef {
   swipeLock?: true;
   keepAlive?: true;
   enter?: 'bespoke';
-  feedAnchor?: 'bottom' | 'none';
+  feedAnchor?: 'band' | 'none';
 }
 
 export const ROUTES: Record<ScreenId, RouteDef> = {
@@ -66,7 +66,7 @@ export const ROUTES: Record<ScreenId, RouteDef> = {
     backMode: 'locked',
     swipeLock: true,
     enter: 'bespoke',
-    feedAnchor: 'bottom',
+    feedAnchor: 'band',
   },
   event: { group: 'node', backMode: 'guarded' },
   puzzle: {

@@ -57,7 +57,9 @@ const bootAuth = async (session: TmaSession): Promise<void> => {
   let uid: string | null = null;
   if (session.isTelegram && session.initDataRaw !== null) {
     if (shouldHandOver(previous)) await beginIdentityHandover();
-    uid = await signInWithTelegram(session.initDataRaw);
+    const attempt = await signInWithTelegram(session.initDataRaw);
+    uid = attempt.uid;
+    useAppStore.getState().setTgAuthFailure(attempt.reason);
   }
   uid ??= await ensureAnonAuth();
   if (uid === null) useAppStore.getState().setAuthError('network');

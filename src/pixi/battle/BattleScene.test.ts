@@ -7,7 +7,7 @@ import {
   FxPool,
   PART_BURST,
   type BurstAccent,
-} from "@/pixi/battle/BattleScene";
+} from "@/pixi/battle/fx";
 import { easeOutQuad, Tweens, type TweenClock } from "@/pixi/tween";
 
 const FULL_TURN = Math.PI * 2;

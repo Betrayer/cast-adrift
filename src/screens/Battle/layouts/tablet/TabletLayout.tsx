@@ -1,6 +1,8 @@
 import { isSlotBlocked, isSlotShrunk } from '@/game/battle/setup';
 import { goalSlotsNow } from '@/game/battle/view';
 import { useRegion } from '@/screens/Battle/board/measure';
+import { CommsBand } from '@/components/CommsBand';
+import { BoardColumn, type BoardComposition } from '@/screens/Battle/layouts/BoardColumn';
 import { ReserveButton } from '@/screens/Battle/board/SlotDock';
 import { SlotModeBadge } from '@/screens/Battle/board/SlotModeBadge';
 import {
@@ -10,12 +12,10 @@ import {
 } from '@/screens/Battle/board/useDock';
 import { Console } from '@/screens/Battle/console/Console';
 import { BattleJournal } from '@/screens/Battle/journal/BattleJournal';
-import {
-  EndTurnButton,
-  ResonanceChips,
-  RunActions,
-  TopBands,
-} from '@/screens/Battle/shell/BattleShell';
+import { TopBands } from '@/screens/Battle/shell/BattleShell';
+import { EndTurnButton } from '@/screens/Battle/shell/EndTurnButton';
+import { ResonanceChips } from '@/screens/Battle/shell/ResonanceChips';
+import { RunActions } from '@/screens/Battle/shell/RunActions';
 import {
   WideCentre,
   WideStage,
@@ -72,18 +72,18 @@ export const Conveyor = () => {
   );
 };
 
-export const TabletBody = () => {
+export const TabletBody = ({ composition }: { composition: BoardComposition }) => {
   const enemyRef = useRegion('enemies');
   const trayRef = useRegion('tray');
   return (
-    <div className={boardStyles.column} data-layout="tablet">
+    <BoardColumn layout="tablet" composition={composition}>
       <div ref={enemyRef} className={styles.enemyBand} data-band="enemies" />
       <ForecastStrip />
       <div className={styles.grid}>
         <Conveyor />
         <div ref={trayRef} className={styles.trayBand} data-band="tray" />
       </div>
-    </div>
+    </BoardColumn>
   );
 };
 
@@ -135,6 +135,7 @@ export const TabletWide = () => {
           <div className={wideStyles.railActions}>
             <RunActions />
           </div>
+          <CommsBand placement="gutter" />
           <BattleJournal />
         </>
       }

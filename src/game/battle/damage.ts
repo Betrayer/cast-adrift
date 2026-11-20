@@ -1,5 +1,6 @@
-import { A6_ELITE_SUBSYSTEM } from "@/data/ascension";
+import { A15_BOSS_PART, A6_ELITE_SUBSYSTEM } from "@/data/ascension";
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { aliveOnBoard } from "@/game/battle/seats";
 import { applyStatus, markMagnitude } from "@/game/battle/statuses";
 import type {
   BattleSnapshot,
@@ -13,6 +14,8 @@ import type {
   SubsystemDef,
 } from "@/types/content";
 
+export const CRIT_MULT = 1.5;
+
 export const aliveEnemies = (snapshot: BattleSnapshot): EnemyState[] =>
   snapshot.enemies.filter((e) => e.hp > 0);
 
@@ -24,7 +27,11 @@ export const partDefOf = (
   part: SubsystemState,
 ): SubsystemDef | undefined =>
   (def.subsystems ?? []).find((s) => s.id === part.key) ??
-  (part.key === A6_ELITE_SUBSYSTEM.id ? A6_ELITE_SUBSYSTEM : undefined);
+  (part.key === A6_ELITE_SUBSYSTEM.id
+    ? A6_ELITE_SUBSYSTEM
+    : part.key === A15_BOSS_PART.id
+      ? A15_BOSS_PART
+      : undefined);
 
 export const aliveCoreParts = (enemy: EnemyState): number =>
   aliveSubsystems(enemy).length;
@@ -185,7 +192,7 @@ export const reaimOffLockedCore = (next: BattleSnapshot): void => {
   if (next.targetId === null) return;
   const owner = next.targetId.split(":")[0] ?? next.targetId;
   const alive = next.enemies.find((e) => e.id === owner)?.hp ?? 0;
-  if (alive <= 0) next.targetId = aliveEnemies(next)[0]?.id ?? null;
+  if (alive <= 0) next.targetId = aliveOnBoard(next.enemies)[0]?.id ?? null;
   if (next.targetId === null) return;
   const body = next.enemies.find((e) => e.id === next.targetId);
   if (body === undefined) return;
@@ -195,7 +202,7 @@ export const reaimOffLockedCore = (next: BattleSnapshot): void => {
     return;
   }
   if (!isBodyImmune(next, body)) return;
-  const reachable = aliveEnemies(next).find((e) => !isBodyImmune(next, e));
+  const reachable = aliveOnBoard(next.enemies).find((e) => !isBodyImmune(next, e));
   if (reachable !== undefined) next.targetId = reachable.id;
 };
 
@@ -211,7 +218,7 @@ const retargetAfterKill = (
     next.targetId = survivor?.id ?? parent.id;
     return;
   }
-  next.targetId = aliveEnemies(next)[0]?.id ?? null;
+  next.targetId = aliveOnBoard(next.enemies)[0]?.id ?? null;
   reaimOffLockedCore(next);
 };
 
@@ -233,7 +240,7 @@ export const resolveWeaponTarget = (
     const enemy = next.enemies.find((e) => e.id === next.targetId && e.hp > 0);
     if (enemy !== undefined) return { enemy };
   }
-  const fallback = aliveEnemies(next)[0];
+  const fallback = aliveOnBoard(next.enemies)[0];
   if (fallback === undefined) return undefined;
   next.targetId = fallback.id;
   return { enemy: fallback };
@@ -241,7 +248,7 @@ export const resolveWeaponTarget = (
 
 export const scatterTargets = (next: BattleSnapshot): EnemyState[] => {
   const chosen = resolveWeaponTarget(next);
-  const alive = aliveEnemies(next);
+  const alive = aliveOnBoard(next.enemies);
   if (chosen === undefined) return alive;
   const headId = chosen.enemy.id;
   return [
@@ -271,7 +278,7 @@ export const applyWeaponDamage = (
   }
   if (target.subsystem !== undefined) {
     if (lockedOutByAlternating(target.enemy, target.subsystem)) return 0;
-    if (crit) damage = Math.floor(damage * 1.5);
+    if (crit) damage = Math.floor(damage * CRIT_MULT);
     if (def?.alternating === true) target.enemy.lastHitKey = target.subsystem.key;
     const partAlive = target.subsystem.hp > 0;
     target.subsystem.hp = Math.max(0, target.subsystem.hp - damage);
@@ -287,7 +294,7 @@ export const applyWeaponDamage = (
   if (marked) {
     damage += def?.markVulnerable === true ? vulnerable * 2 : vulnerable;
   }
-  if (crit) damage = Math.floor(damage * 1.5);
+  if (crit) damage = Math.floor(damage * CRIT_MULT);
   const gate = target.enemy.gate ?? 0;
   if (gate > 0 && !marked) {
     if (damage < gate) return 0;

@@ -1,4 +1,4 @@
-import { Button, Divider, Group, Paper, Progress, Stack, Text } from "@mantine/core";
+import { Button, Divider, Paper, Stack, Text } from "@mantine/core";
 import { useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
@@ -7,6 +7,10 @@ import {
   achievementProgress,
   achievementTitle,
 } from "@/game/meta/achievements";
+import {
+  AchievementTallyBar,
+  AchievementTallyHead,
+} from "@/screens/Achievements/AchievementTally";
 import { useAchievementCtx } from "@/screens/Achievements/useAchievementCtx";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
@@ -38,24 +42,9 @@ export const AchievementSummary = () => {
   return (
     <Paper bg={tokens.surface1} p="md" radius="md" withBorder>
       <Stack gap="xs">
-        <Group justify="space-between">
-          <Text fw={600} c={tokens.text}>
-            {t("meta:profile.achievements")}
-          </Text>
-          <Text size="xs" c={tokens.amber} data-achievement-count>
-            {t("meta:profile.achCount", {
-              n: earned.size,
-              total: ACHIEVEMENTS.length,
-            })}
-          </Text>
-        </Group>
+        <AchievementTallyHead earned={earned.size} />
         <Divider color={tokens.line} />
-        <Progress
-          value={(earned.size / ACHIEVEMENTS.length) * 100}
-          color="accent"
-          size="xs"
-          aria-label={t("meta:profile.achievements")}
-        />
+        <AchievementTallyBar earned={earned.size} />
         <Text size="xs" c={tokens.faint} data-achievement-closest>
           {closest === null
             ? t("meta:profile.achNoneClose")

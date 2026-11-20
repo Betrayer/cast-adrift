@@ -1,5 +1,6 @@
 import { Box } from '@mantine/core';
 import { lazy, Suspense, type ReactElement } from 'react';
+import { ParkedContext } from '@/app/parked';
 import { tokens } from '@/app/theme';
 import { CollectionScreen } from '@/screens/Collection/CollectionScreen';
 import { ContractsScreen } from '@/screens/Contracts/ContractsScreen';
@@ -121,7 +122,35 @@ export const forgetParkedScreens = (): void => {
 };
 
 const Fallback = () => (
-  <Box mih="var(--ca-vh)" bg={tokens.bg} data-screen-loading />
+  <Box
+    mih="var(--ca-vh)"
+    bg={tokens.bg}
+    className={styles.loading}
+    data-screen-loading
+  >
+    <svg
+      className={styles.loadingDie}
+      width={28}
+      height={28}
+      viewBox="0 0 24 24"
+      aria-hidden
+      data-loading-die
+    >
+      <rect
+        x={3}
+        y={3}
+        width={18}
+        height={18}
+        rx={4}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth={1.6}
+      />
+      <circle cx={8.5} cy={8.5} r={1.6} fill="currentColor" />
+      <circle cx={12} cy={12} r={1.6} fill="currentColor" />
+      <circle cx={15.5} cy={15.5} r={1.6} fill="currentColor" />
+    </svg>
+  </Box>
 );
 
 export const Router = () => {
@@ -152,11 +181,15 @@ export const Router = () => {
             data-screen={id}
             data-nav-dir={enterDir}
           >
-            <Suspense fallback={<Fallback />}>{SCREENS[id]()}</Suspense>
+            <ParkedContext value={false}>
+              <Suspense fallback={<Fallback />}>{SCREENS[id]()}</Suspense>
+            </ParkedContext>
           </div>
         ) : (
           <div key={id} className={styles.parked} data-parked-screen={id}>
-            <Suspense fallback={null}>{SCREENS[id]()}</Suspense>
+            <ParkedContext value={true}>
+              <Suspense fallback={null}>{SCREENS[id]()}</Suspense>
+            </ParkedContext>
           </div>
         ),
       )}

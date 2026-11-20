@@ -20,6 +20,7 @@
 }
 
 .svg {
+  position: relative;
   width: 100%;
   height: 100%;
   display: block;
@@ -27,6 +28,10 @@
 
 .node {
   cursor: pointer;
+}
+
+.link {
+  pointer-events: none;
 }
 
 .hit {
@@ -56,8 +61,13 @@
   bottom: 12px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   z-index: var(--z-hud);
+}
+
+.zoomControls > * {
+  width: 44px;
+  height: 44px;
 }
 
 .detail {
@@ -78,6 +88,10 @@
   max-height: 40%;
   overflow-y: auto;
   z-index: var(--z-hud);
+}
+
+:root[data-ca-compact='1'] .filterBar {
+  max-height: calc(100% - 16px);
 }
 
 .pulse {
@@ -127,4 +141,125 @@
     border-left: 1px solid var(--ca-line);
     border-radius: 0;
   }
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  pointer-events: none;
+}
+
+.decor {
+  animation: decorIn 420ms var(--ca-ease-out) both;
+}
+
+@keyframes decorIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.clusterLabel {
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  font-weight: 600;
+  pointer-events: none;
+  user-select: none;
+}
+
+.twinkle {
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
+
+.dashflow {
+  animation: dashflow 1.6s linear infinite;
+}
+
+@keyframes dashflow {
+  to {
+    stroke-dashoffset: -20;
+  }
+}
+
+.beam {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  animation: beamSpin 14s linear infinite;
+}
+
+@keyframes beamSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.beamFlash {
+  animation: beamFlash 700ms var(--ca-ease-out) 1;
+}
+
+@keyframes beamFlash {
+  0% {
+    opacity: 1;
+    filter: brightness(2.4);
+  }
+  100% {
+    opacity: 1;
+    filter: brightness(1);
+  }
+}
+
+.travel {
+  stroke: #ffffff;
+  stroke-width: 2.6;
+  stroke-linecap: round;
+  stroke-dasharray: 40 2000;
+  stroke-dashoffset: 40;
+  pointer-events: none;
+  animation: travel 2.8s linear 1 forwards;
+}
+
+@keyframes travel {
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: -1000;
+  }
+}
+
+.flash {
+  animation: nodeFlash var(--ca-motion-reduced) var(--ca-ease-out) 1;
+}
+
+@keyframes nodeFlash {
+  from {
+    opacity: 0.4;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+:root[data-ca-motion='reduced'] .decor,
+:root[data-ca-motion='reduced'] .twinkle,
+:root[data-ca-motion='reduced'] .dashflow,
+:root[data-ca-motion='reduced'] .beam,
+:root[data-ca-motion='reduced'] .beamFlash {
+  animation: none;
 }

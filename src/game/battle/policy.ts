@@ -38,6 +38,8 @@ import {
   vulnerableFor,
 } from "@/game/battle/resolver";
 import type { EvasionTuning } from "@/game/battle/passives";
+import { hiddenIntentIds, shownIntent } from "@/game/battle/intentVisibility";
+import { rerollFace } from "@/game/battle/rollFloors";
 import { canPlaceDie, isSlotBlocked } from "@/game/battle/setup";
 import { sourceMods, sourceTrait } from "@/game/run/runMods";
 import type { RngStream } from "@/services/rng";
@@ -74,8 +76,11 @@ const trayDice = (snapshot: BattleSnapshot): RolledDie[] =>
 export const expectedSum = (dice: readonly RolledDie[]): number =>
   dice.reduce((sum, d) => sum + (d.tier + 1) / 2, 0);
 
-const actingIntents = (enemy: EnemyState): Intent[] => [
-  enemy.nextIntent,
+const actingIntents = (
+  snapshot: BattleSnapshot,
+  enemy: EnemyState,
+): Intent[] => [
+  shownIntent(snapshot, enemy, hiddenIntentIds(snapshot)),
   ...livingPartIntents(enemy),
 ];
 
@@ -96,7 +101,7 @@ export const incomingEstimate = (snapshot: BattleSnapshot): number => {
     const damageMultPct =
       mutatorDmgPct + (authored ? 0 : Math.max(0, snapshot.sectorDmgPct));
     let charged = enemy.statuses.charge !== undefined;
-    for (const intent of actingIntents(enemy)) {
+    for (const intent of actingIntents(snapshot, enemy)) {
       const threat = intentMagnitude(snapshot, intent);
       if (threat === null) continue;
       const mult = charged ? 2 : 1;
@@ -120,7 +125,8 @@ const enemiesIntending = (
   kind: Intent["t"],
 ): EnemyState[] =>
   snapshot.enemies.filter(
-    (e) => e.hp > 0 && actingIntents(e).some((intent) => intent.t === kind),
+    (e) =>
+      e.hp > 0 && actingIntents(snapshot, e).some((intent) => intent.t === kind),
   );
 
 export const shieldsWasted = (snapshot: BattleSnapshot): boolean =>
@@ -147,13 +153,12 @@ export const rerollValue = (
   die: RolledDie,
   snapshot: BattleSnapshot,
   rng: RngStream,
-): number => {
-  const rolled = rng.int(1, die.tier) + (die.growth ?? 0);
-  return die.school === "blue" &&
-    resonanceGrantActive(snapshot.resonance.counts, "blueRollFloor")
-    ? Math.max(rolled, 2)
-    : rolled;
-};
+): number =>
+  rerollFace(
+    die,
+    rng,
+    resonanceGrantActive(snapshot.resonance.counts, "blueRollFloor"),
+  );
 
 const freeWeaponSlots = (
   snapshot: BattleSnapshot,

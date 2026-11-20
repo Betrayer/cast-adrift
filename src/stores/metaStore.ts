@@ -1,146 +1,59 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { resolveAchievementId } from '@/data/achievements';
-import { isBattleLayoutId } from '@/data/battleLayouts';
-import { CHART_NODE_BY_ID } from '@/data/chart';
-import { DEFAULT_DIE_SKIN, isDieSkinId } from '@/data/cosmetics';
-import { STARTER_DECK } from '@/data/decks';
+import { isDieSkinId } from '@/data/cosmetics';
 import { DIE_BY_ID } from '@/data/dice';
 import {
   echoNodeDef,
   echoUnlocked,
-  isEchoNodeId,
   type EchoNodeId,
 } from '@/data/echo';
 import { memoryFragmentCount } from '@/data/narrative/memories';
 import { FIRST_FIND_SHARDS } from '@/data/metaShop';
 import { socketsForDie } from '@/data/engravings';
-import { isThemeId, type ThemeId } from '@/data/themes';
-import { SHIP_BY_ID, type ShipId } from '@/data/ships';
-import type { BattleLayoutId } from '@/types';
-import { isOverBudget, picksConnected } from '@/game/chart/engine';
+import { masteryTableOf } from '@/data/shipMastery';
+import type { ShipId } from '@/data/ships';
+import { CORE_NODE_ID } from '@/game/chart/cost';
+import { chartResetCost } from '@/game/chart/engine';
 import { levelFromTotalXp } from '@/game/xp';
 import { scopedPersistStorage } from '@/stores/scopedStorage';
-import { pickShape, shapeKeys } from '@/stores/shape';
+import {
+  createInitialMetaValues,
+  META_PERSIST_KEY,
+  META_VERSION,
+  metaValues,
+  SEEN_FRAGMENT_MEMORY,
+  SEEN_PUZZLE_MEMORY,
+  VOUCHER_CAP,
+  type AccountPrefs,
+  type EncounterRecord,
+  type EncounterResult,
+  type MetaStats,
+  type MetaValues,
+  type RunEncounter,
+  type VoucherKind,
+} from '@/stores/metaValues';
+import { migrateMeta } from '@/stores/metaMigrate';
 
-export interface CollectionEntry {
-  defId: string;
-  count: number;
-}
-
-export interface MetaStats {
-  runs: number;
-  wins: number;
-  shardsEarned: number;
-  prologueDone: boolean;
-  systemsCheckDone: boolean;
-  campaignClears: number;
-  kills: number;
-  scrapEarned: number;
-  deepestDrift: number;
-  driftRuns: number;
-  dailyRuns: number;
-  contractRuns: number;
-  elites: number;
-  t5Solved: number;
-  beacons: number;
-  deepClears: number;
-  noDeathStreak: number;
-  bestNoDeathStreak: number;
-  wormholeRides: number;
-  holesBypassed: number;
-  disintegrations: number;
-  eventsResolved: number;
-  checksWon: number;
-  fusions: number;
-  engravingsFitted: number;
-  mk3Built: number;
-  resonance6: number;
-  flawlessBosses: number;
-  clearsWanderer: number;
-  clearsRam: number;
-  clearsArk: number;
-  clearsCorsair: number;
-  clearsFoundry: number;
-  clearsPrism: number;
-}
-
-export interface EncounterRecord {
-  sector: number;
-  node: string;
-}
-
-export interface RunEncounter extends EncounterRecord {
-  defId: string;
-}
-
-export interface EncounterResult {
-  firstFinds: string[];
-  shards: number;
-}
-
-export type DailyPlayState = "started" | "done";
-
-export interface DailyRecord {
-  state: DailyPlayState;
-  score: number;
-  rank: number | null;
-}
-
-export interface BestScores {
-  drift: number;
-  driftWeek: string | null;
-  driftWeekly: number;
-  dailyRank: number | null;
-  dailyDate: string | null;
-}
-
-export interface AccountPrefs {
-  battleLayout?: BattleLayoutId;
-  theme?: ThemeId;
-}
-
-export type VoucherKind = "perkDraft";
-
-export type VoucherBank = Record<VoucherKind, number>;
-
-export interface MetaValues {
-  shards: number;
-  vouchers: VoucherBank;
-  voucherOffers: string[];
-  xp: number;
-  level: number;
-  chartPicks: string[];
-  chartFreeRespecs: number;
-  collection: CollectionEntry[];
-  ships: ShipId[];
-  selectedShip: ShipId;
-  selectedEcho: EchoNodeId | null;
-  hangar: { deck: string[] };
-  themes: string[];
-  tutorialSeen: string[];
-  engravings: Record<string, string[]>;
-  badges: string[];
-  codex: string[];
-  codexRead: string[];
-  seenPuzzles: string[];
-  seenFragments: string[];
-  contracts: Record<string, number>;
-  dailyPlayed: Record<string, DailyRecord>;
-  best: BestScores;
-  ascension: { campaign: number };
-  flagsArchive: string[];
-  bossFirstKills: string[];
-  endings: string[];
-  achievements: string[];
-  achievementsSeen: string[];
-  encountered: Record<string, EncounterRecord>;
-  unlocksGranted: string[];
-  unlocksSeen: string[];
-  dieSkin: string;
-  prefs: AccountPrefs;
-  stats: MetaStats;
-}
+export {
+  ACCOUNT_PREF_KEYS,
+  createInitialMetaStats,
+  createInitialMetaValues,
+  META_PERSIST_KEY,
+  META_VERSION,
+  metaValues,
+  SINGULARITY_BADGE,
+  SMOTRITEL_BADGE,
+  VOUCHER_CAP,
+} from '@/stores/metaValues';
+export type {
+  AccountPrefKey,
+  AccountPrefs,
+  CollectionEntry,
+  MetaStats,
+  MetaValues,
+  VoucherKind,
+} from '@/stores/metaValues';
+export { migrateMeta } from '@/stores/metaMigrate';
 
 export interface RunAward {
   fromLevel: number;
@@ -160,11 +73,13 @@ export interface MetaState extends MetaValues {
   deallocatePick: (id: string) => void;
   grantChartRespec: () => void;
   fullRespec: () => boolean;
+  resetChart: () => boolean;
   addToCollection: (defId: string, n?: number) => void;
   buyDie: (defId: string, price: number) => boolean;
   setDeck: (deck: readonly string[]) => void;
   selectShip: (id: ShipId) => void;
   buyShip: (id: ShipId, price: number) => boolean;
+  addShipMasteryXp: (id: ShipId, xp: number) => void;
   unlockTheme: (id: string) => void;
   markTutorialSeen: (id: string) => void;
   resetTutorial: () => void;
@@ -197,60 +112,6 @@ export interface MetaState extends MetaValues {
   recordStreak: (win: boolean) => void;
 }
 
-export const META_VERSION = 18;
-
-export const SEEN_PUZZLE_MEMORY = 40;
-export const SEEN_FRAGMENT_MEMORY = 60;
-
-export const SMOTRITEL_BADGE = 'keeper';
-
-const STARTER_SPARE = 'yellow-d6';
-
-const buildStarterCollection = (): CollectionEntry[] => {
-  const counts = new Map<string, number>();
-  for (const id of [...STARTER_DECK, STARTER_SPARE]) {
-    counts.set(id, (counts.get(id) ?? 0) + 1);
-  }
-  return [...counts].map(([defId, count]) => ({ defId, count }));
-};
-
-export const createInitialMetaStats = (): MetaStats => ({
-  runs: 0,
-  wins: 0,
-  shardsEarned: 0,
-  prologueDone: false,
-  systemsCheckDone: false,
-  campaignClears: 0,
-  kills: 0,
-  scrapEarned: 0,
-  deepestDrift: 0,
-  driftRuns: 0,
-  dailyRuns: 0,
-  contractRuns: 0,
-  elites: 0,
-  t5Solved: 0,
-  beacons: 0,
-  deepClears: 0,
-  noDeathStreak: 0,
-  bestNoDeathStreak: 0,
-  wormholeRides: 0,
-  holesBypassed: 0,
-  disintegrations: 0,
-  eventsResolved: 0,
-  checksWon: 0,
-  fusions: 0,
-  engravingsFitted: 0,
-  mk3Built: 0,
-  resonance6: 0,
-  flawlessBosses: 0,
-  clearsWanderer: 0,
-  clearsRam: 0,
-  clearsArk: 0,
-  clearsCorsair: 0,
-  clearsFoundry: 0,
-  clearsPrism: 0,
-});
-
 const LIFETIME_KEYS = [
   "runs",
   "wins",
@@ -281,287 +142,9 @@ const LIFETIME_KEYS = [
   "clearsCorsair",
   "clearsFoundry",
   "clearsPrism",
+  "dragDrops",
+  "dragCancels",
 ] as const;
-
-export const META_PERSIST_KEY = 'meta';
-
-export const VOUCHER_CAP = 3;
-
-export const createInitialVouchers = (): VoucherBank => ({ perkDraft: 0 });
-
-export const createInitialMetaValues = (): MetaValues => ({
-  shards: 0,
-  vouchers: createInitialVouchers(),
-  voucherOffers: [],
-  xp: 0,
-  level: 1,
-  chartPicks: [],
-  chartFreeRespecs: 0,
-  collection: buildStarterCollection(),
-  ships: ['wanderer'],
-  selectedShip: 'wanderer',
-  selectedEcho: null,
-  hangar: { deck: [...STARTER_DECK] },
-  themes: ['deepSpace'],
-  tutorialSeen: [],
-  engravings: {},
-  badges: [],
-  codex: [],
-  codexRead: [],
-  seenPuzzles: [],
-  seenFragments: [],
-  contracts: {},
-  dailyPlayed: {},
-  best: {
-    drift: 0,
-    driftWeek: null,
-    driftWeekly: 0,
-    dailyRank: null,
-    dailyDate: null,
-  },
-  ascension: { campaign: 0 },
-  flagsArchive: [],
-  bossFirstKills: [],
-  endings: [],
-  achievements: [],
-  achievementsSeen: [],
-  encountered: {},
-  unlocksGranted: [],
-  unlocksSeen: [],
-  dieSkin: DEFAULT_DIE_SKIN,
-  prefs: {},
-  stats: createInitialMetaStats(),
-});
-
-const META_KEYS = shapeKeys(createInitialMetaValues());
-
-export const metaValues = (s: MetaValues): MetaValues =>
-  pickShape(META_KEYS, s);
-
-const coerceEncountered = (value: unknown): Record<string, EncounterRecord> => {
-  if (typeof value !== "object" || value === null) return {};
-  const out: Record<string, EncounterRecord> = {};
-  for (const [defId, raw] of Object.entries(value as Record<string, unknown>)) {
-    if (typeof raw !== "object" || raw === null) continue;
-    const rec = raw as Partial<EncounterRecord>;
-    out[defId] = {
-      sector: typeof rec.sector === "number" ? rec.sector : 1,
-      node: typeof rec.node === "string" ? rec.node : "battle",
-    };
-  }
-  return out;
-};
-
-const coerceStrings = (value: unknown, base: string[]): string[] =>
-  Array.isArray(value)
-    ? value.filter((id): id is string => typeof id === "string")
-    : base;
-
-const coerceCollection = (value: unknown): CollectionEntry[] => {
-  if (!Array.isArray(value)) return buildStarterCollection();
-  const out: CollectionEntry[] = [];
-  for (const entry of value) {
-    if (
-      typeof entry === 'object' &&
-      entry !== null &&
-      typeof (entry as CollectionEntry).defId === 'string' &&
-      typeof (entry as CollectionEntry).count === 'number'
-    ) {
-      out.push({
-        defId: (entry as CollectionEntry).defId,
-        count: (entry as CollectionEntry).count,
-      });
-    }
-  }
-  return out.length > 0 ? out : buildStarterCollection();
-};
-
-const coerceDailyPlayed = (value: unknown): Record<string, DailyRecord> => {
-  if (typeof value !== 'object' || value === null) return {};
-  const out: Record<string, DailyRecord> = {};
-  for (const [date, raw] of Object.entries(value as Record<string, unknown>)) {
-    if (typeof raw !== 'object' || raw === null) continue;
-    const rec = raw as Partial<DailyRecord>;
-    out[date] = {
-      state: rec.state === 'done' ? 'done' : 'started',
-      score: typeof rec.score === 'number' ? rec.score : 0,
-      rank: typeof rec.rank === 'number' ? rec.rank : null,
-    };
-  }
-  return out;
-};
-
-const coerceEngravings = (value: unknown): Record<string, string[]> => {
-  if (typeof value !== 'object' || value === null) return {};
-  const out: Record<string, string[]> = {};
-  for (const [defId, raw] of Object.entries(value as Record<string, unknown>)) {
-    if (!Array.isArray(raw)) continue;
-    const ids = raw.filter((id): id is string => typeof id === 'string');
-    if (ids.length > 0) out[defId] = ids;
-  }
-  return out;
-};
-
-export const coercePrefs = (value: unknown): AccountPrefs => {
-  if (typeof value !== 'object' || value === null) return {};
-  const prev = value as Partial<Record<keyof AccountPrefs, unknown>>;
-  return {
-    ...(isBattleLayoutId(prev.battleLayout)
-      ? { battleLayout: prev.battleLayout }
-      : {}),
-    ...(isThemeId(prev.theme) ? { theme: prev.theme } : {}),
-  };
-};
-
-const coerceBest = (value: unknown, base: BestScores): BestScores => {
-  if (typeof value !== 'object' || value === null) return base;
-  const prev = value as Partial<BestScores>;
-  return {
-    drift: typeof prev.drift === 'number' ? prev.drift : base.drift,
-    driftWeek:
-      typeof prev.driftWeek === 'string' ? prev.driftWeek : base.driftWeek,
-    driftWeekly:
-      typeof prev.driftWeekly === 'number'
-        ? prev.driftWeekly
-        : base.driftWeekly,
-    dailyRank:
-      typeof prev.dailyRank === 'number' ? prev.dailyRank : base.dailyRank,
-    dailyDate:
-      typeof prev.dailyDate === 'string' ? prev.dailyDate : base.dailyDate,
-  };
-};
-
-const migrateAchievementIds = (ids: readonly string[]): string[] => [
-  ...new Set(ids.map(resolveAchievementId)),
-];
-
-const coerceVouchers = (value: unknown): VoucherBank => {
-  const base = createInitialVouchers();
-  if (typeof value !== "object" || value === null) return base;
-  const prev = value as Partial<Record<VoucherKind, unknown>>;
-  return {
-    perkDraft:
-      typeof prev.perkDraft === "number"
-        ? Math.max(0, Math.min(VOUCHER_CAP, Math.trunc(prev.perkDraft)))
-        : base.perkDraft,
-  };
-};
-
-const coerceShips = (value: unknown, base: readonly ShipId[]): ShipId[] =>
-  Array.isArray(value)
-    ? [
-        ...new Set(
-          [...base, ...value].filter((id): id is ShipId =>
-            SHIP_BY_ID.has(id as ShipId),
-          ),
-        ),
-      ]
-    : [...base];
-
-export const migrateMeta = (
-  persisted: unknown,
-  fromVersion: number,
-): MetaValues => {
-  if (import.meta.env.DEV) {
-    console.info(
-      `metaStore: migrating v${String(fromVersion)} -> v${String(META_VERSION)}`,
-    );
-  }
-  const prev = (persisted ?? {}) as Partial<MetaValues>;
-  const base = createInitialMetaValues();
-  const ships = coerceShips(prev.ships, base.ships);
-  const level =
-    typeof prev.xp === 'number'
-      ? levelFromTotalXp(prev.xp)
-      : typeof prev.level === 'number'
-        ? prev.level
-        : base.level;
-  const picks = Array.isArray(prev.chartPicks)
-    ? prev.chartPicks.filter((id) => CHART_NODE_BY_ID.has(id))
-    : base.chartPicks;
-  const selectedShip =
-    typeof prev.selectedShip === 'string' &&
-    ships.includes(prev.selectedShip as ShipId)
-      ? (prev.selectedShip as ShipId)
-      : base.selectedShip;
-  return {
-    ...base,
-    shards: typeof prev.shards === 'number' ? prev.shards : base.shards,
-    vouchers: coerceVouchers(prev.vouchers),
-    voucherOffers: migrateAchievementIds(
-      coerceStrings(prev.voucherOffers, base.voucherOffers),
-    ),
-    xp: typeof prev.xp === 'number' ? prev.xp : base.xp,
-    level,
-    chartPicks: picks,
-    chartFreeRespecs:
-      typeof prev.chartFreeRespecs === 'number' && prev.chartFreeRespecs > 0
-        ? prev.chartFreeRespecs
-        : isOverBudget(level, picks) || !picksConnected(picks)
-          ? 1
-          : base.chartFreeRespecs,
-    collection: coerceCollection(prev.collection),
-    ships,
-    selectedShip,
-    selectedEcho: isEchoNodeId(prev.selectedEcho)
-      ? prev.selectedEcho
-      : base.selectedEcho,
-    hangar:
-      typeof prev.hangar === 'object' &&
-      prev.hangar !== null &&
-      Array.isArray((prev.hangar as { deck?: unknown }).deck)
-        ? { deck: [...(prev.hangar as { deck: string[] }).deck] }
-        : base.hangar,
-    themes: Array.isArray(prev.themes) ? prev.themes : base.themes,
-    tutorialSeen: Array.isArray(prev.tutorialSeen)
-      ? prev.tutorialSeen.filter((id): id is string => typeof id === 'string')
-      : base.tutorialSeen,
-    engravings: coerceEngravings(prev.engravings),
-    badges: Array.isArray(prev.badges) ? prev.badges : base.badges,
-    codex: Array.isArray(prev.codex) ? prev.codex : base.codex,
-    codexRead: Array.isArray(prev.codexRead) ? prev.codexRead : base.codexRead,
-    seenFragments: Array.isArray(prev.seenFragments)
-      ? prev.seenFragments.slice(-SEEN_FRAGMENT_MEMORY)
-      : base.seenFragments,
-    seenPuzzles: Array.isArray(prev.seenPuzzles)
-      ? prev.seenPuzzles.slice(-SEEN_PUZZLE_MEMORY)
-      : base.seenPuzzles,
-    contracts:
-      typeof prev.contracts === 'object' && prev.contracts !== null
-        ? (prev.contracts as Record<string, number>)
-        : base.contracts,
-    dailyPlayed: coerceDailyPlayed(prev.dailyPlayed),
-    best: coerceBest(prev.best, base.best),
-    ascension:
-      typeof prev.ascension === 'object' &&
-      prev.ascension !== null &&
-      typeof (prev.ascension as { campaign?: unknown }).campaign === 'number'
-        ? { campaign: (prev.ascension as { campaign: number }).campaign }
-        : base.ascension,
-    flagsArchive: Array.isArray(prev.flagsArchive)
-      ? prev.flagsArchive
-      : base.flagsArchive,
-    bossFirstKills: Array.isArray(prev.bossFirstKills)
-      ? prev.bossFirstKills
-      : base.bossFirstKills,
-    endings: Array.isArray(prev.endings) ? prev.endings : base.endings,
-    achievements: migrateAchievementIds(
-      coerceStrings(prev.achievements, base.achievements),
-    ),
-    achievementsSeen: migrateAchievementIds(
-      coerceStrings(prev.achievementsSeen, base.achievementsSeen),
-    ),
-    encountered: coerceEncountered(prev.encountered),
-    unlocksGranted: coerceStrings(prev.unlocksGranted, base.unlocksGranted),
-    unlocksSeen: coerceStrings(prev.unlocksSeen, base.unlocksSeen),
-    dieSkin: isDieSkinId(prev.dieSkin) ? prev.dieSkin : base.dieSkin,
-    prefs: coercePrefs(prev.prefs),
-    stats:
-      typeof prev.stats === 'object' && prev.stats !== null
-        ? { ...base.stats, ...(prev.stats as Partial<MetaStats>) }
-        : base.stats,
-  };
-};
 
 export const useMetaStore = create<MetaState>()(
   persist(
@@ -665,9 +248,18 @@ export const useMetaStore = create<MetaState>()(
       fullRespec: () => {
         if (get().chartFreeRespecs <= 0) return false;
         set((s) => ({
-          chartPicks: [],
+          chartPicks: [CORE_NODE_ID],
           chartFreeRespecs: s.chartFreeRespecs - 1,
         }));
+        return true;
+      },
+
+      resetChart: () => {
+        const s = get();
+        if (s.chartFreeRespecs > 0) return s.fullRespec();
+        const price = chartResetCost(s.level, s.chartPicks);
+        if (!s.spendShards(price)) return false;
+        set({ chartPicks: [CORE_NODE_ID] });
         return true;
       },
 
@@ -710,6 +302,16 @@ export const useMetaStore = create<MetaState>()(
         if (def === undefined) return;
         if (!echoUnlocked(def, memoryFragmentCount(get().codex))) return;
         set({ selectedEcho: def.id });
+      },
+
+      addShipMasteryXp: (id, xp) => {
+        if (masteryTableOf(id) === undefined || xp <= 0) return;
+        set((s) => ({
+          shipMastery: {
+            ...s.shipMastery,
+            [id]: { xp: (s.shipMastery[id]?.xp ?? 0) + xp },
+          },
+        }));
       },
 
       buyShip: (id, price) => {

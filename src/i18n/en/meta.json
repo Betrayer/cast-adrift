@@ -7,7 +7,8 @@
     "yellow": "Yellow",
     "black": "Black",
     "grey": "Grey",
-    "prismatic": "Prismatic"
+    "prismatic": "Prismatic",
+    "nexus": "Nexus"
   },
   "chart": {
     "title": "Star Chart",
@@ -53,21 +54,14 @@
     "keySingleCast": "Single Cast",
     "redSpotter": "Spotter",
     "redFirestorm": "Firestorm",
-    "redSpine": "Spine",
     "blueBarrier": "Barrier",
     "blueJammer": "Jammer",
-    "blueTideBreak": "Tidebreak",
     "greenCanopy": "Canopy",
-    "greenPerennial": "Perennial",
     "yellowTally": "Tally",
-    "yellowBounty": "Bounty",
     "blackVent": "Vent",
-    "blackWell": "Well",
     "greyToolkit": "Toolkit",
-    "greyLedger": "Ledger",
     "prismLattice": "Lattice",
     "prismFacet": "Facet",
-    "prismWell": "Prism Well",
     "hubEngineering": "Engineering Bay",
     "keyStormChaser": "Storm Chaser",
     "keyIronDoctrine": "Iron Doctrine",
@@ -82,36 +76,55 @@
     "respecConfirmTitle": "Refund this node?",
     "respecConfirmBody": "«{{name}}» goes back into the pool and {{points}} point(s) return. Cost: {{cost}}◈.",
     "respecConfirmYes": "Refund",
-    "redPowderRoom": "Powder Room",
-    "redRangeCard": "Range Card",
-    "redHairTrigger": "Hair Trigger",
-    "redCoreBreach": "Core Breach",
-    "blueStormAnchor": "Storm Anchor",
-    "blueSpillway": "Spillway",
-    "blueLongLens": "Long Lens",
-    "blueKeelPlate": "Keel Plate",
-    "greenGraftBench": "Graft Bench",
-    "greenSapline": "Sapline",
-    "greenLoam": "Loam",
-    "greenHollow": "The Hollow",
-    "yellowTollhouse": "Tollhouse",
-    "yellowFinderFee": "Finder's Fee",
-    "yellowShortWeight": "Short Weight",
-    "yellowMintMark": "Mint Mark",
-    "blackAshBed": "Ash Bed",
-    "blackDeadMansSwitch": "Dead Man's Switch",
-    "blackTithe": "The Tithe",
-    "blackSlagHeap": "Slag Heap",
-    "greyShimStack": "Shim Stack",
-    "greyPatternBook": "Pattern Book",
-    "greyBallastTrim": "Ballast Trim",
-    "greyTallyStick": "Tally Stick",
     "cost": "Cost {{n}}",
     "repriced": "Node prices changed: your picks now cost {{spent}} of {{total}} points. Nothing was taken back — one full respec is free.",
     "freeRespec": "Free respec",
     "freeRespecTitle": "Clear the whole chart?",
     "freeRespecBody": "All {{n}} allocated nodes go back into the pool and every point returns. This reset is free.",
-    "freeRespecYes": "Clear"
+    "freeRespecYes": "Clear",
+    "redCorona": "Corona",
+    "redCinderFrost": "Cinder Frost",
+    "blueTidalWall": "Tidal Wall",
+    "bluePermafrost": "Permafrost",
+    "greenHoarfrost": "Hoarfrost Bloom",
+    "greenGoldenGrove": "Golden Grove",
+    "yellowHarvest": "Harvest",
+    "yellowLoadedDice": "Loaded Dice",
+    "blackGamblersVoid": "Gambler's Void",
+    "blackNullForge": "Null Forge",
+    "greyBallast": "Ballast",
+    "greyFacetGrinder": "Facet Grinder",
+    "prismRefraction": "Refraction",
+    "prismSolarWind": "Solar Wind",
+    "nexusSteamLance": "Steam Lance",
+    "nexusFrostbloom": "Frostbloom",
+    "nexusGoldenCanopy": "Golden Canopy",
+    "nexusHouseEdge": "House Edge",
+    "nexusNullAnvil": "Null Anvil",
+    "nexusFacetEngine": "Facet Engine",
+    "nexusNova": "Nova",
+    "resetAll": "Clear all",
+    "resetTitle": "Clear the whole chart?",
+    "resetBody": "{{n}} nodes come back as points. The core stays allocated. It costs {{price}} shards.",
+    "resetBodyFree": "{{n}} nodes come back as points. The core stays allocated. This one is free.",
+    "resetYes": "Clear for {{price}}",
+    "requiresPoints": "Needs {{n}} points in {{school}}",
+    "requiresMet": "{{n}} in {{school}} — met",
+    "scaledBy": "Scales with {{school}}: {{steps}} of 5 steps ({{points}} points invested)",
+    "layout": "Chart view",
+    "search": "Search nodes",
+    "searchClear": "Clear the search",
+    "available": "Available now",
+    "filterKind": "Kind",
+    "filterTags": "Tags",
+    "kind": {
+      "small": "Small",
+      "gate": "Gate",
+      "notable": "Notable",
+      "confluence": "Confluence",
+      "nexus": "Nexus",
+      "keystone": "Keystone"
+    }
   },
   "chartFx": {
     "hubBudget": "+1 hangar budget",
@@ -137,87 +150,117 @@
       "freeShopRerolls": "{{n}} free counter reroll",
       "xpMultPct": "{{n}}% XP",
       "tideEffectDelta": "{{n}} to the tide's bite",
-      "moduleSlotDelta": "{{n}} module bay"
+      "moduleSlotDelta": "{{n}} module bay",
+      "shieldKeepPct": "{{n}}% of the shield survives the enemy turn",
+      "resonanceCountDelta": "{{n}} to the leading school's resonance",
+      "firstHitReducePct": "First hit from an elite, mini-boss or boss: {{n}}% lighter"
     },
     "fx": {
-      "weaponsMaxFace": "Weapons +1 on a max-face die",
-      "redFirstTurn": "Red dice +1 on turn 1",
-      "shieldsHigh": "+1 shield when the shield die is 6+",
-      "shieldsFlat": "+1 shield per Shields resolve",
-      "minFaceScrap": "+2 scrap on a min-face die",
+      "weaponsMaxFace": "Weapons +{{n}} on a max-face die",
+      "redFirstTurn": "Red dice +{{n}} on turn 1",
+      "shieldsHigh": "+{{n}} shield when the shield die is 6+",
+      "shieldsFlat": "+{{n}} shield per Shields resolve",
+      "minFaceScrap": "+{{n}} scrap on a min-face die",
       "weaponsLowHull": "Weapons +1 while hull is under 50%",
       "sensorsBonus": "Sensors +1",
       "redSalvo": "Weapons +3 on turn 1",
       "blueGlacier": "+2 shield per Shields resolve",
       "blackEdge": "All dice +2 while hull is critical",
-      "allDice1": "All dice +1",
-      "weaponsBurn": "Max face in weapons adds Burn 1",
-      "enginesBonus": "+1 in engines",
-      "reactorBonus": "+1 in the reactor",
+      "weaponsBurn": "Max face in weapons adds Burn {{n}}",
+      "enginesBonus": "+{{n}} in engines",
+      "reactorBonus": "+{{n}} in the reactor",
       "greenHeal": "Max face on a green die heals 1",
       "repeatCharge": "A repeated value stores 1 charge",
-      "maxFaceScrap": "Any max face pays 2 scrap",
+      "maxFaceScrap": "Any max face pays {{n}} scrap",
       "minFaceCharge": "Any min face stores 1 charge",
       "firstTurnAll": "+1 to every die on the first turn",
       "redFirestorm": "Max face in weapons adds Burn 3",
-      "redSpine": "+4 in the Spinal Mount",
+      "redSpine": "+{{n}} in the Spinal Mount",
       "greenCanopy": "+3 in engines",
-      "blackWell": "The reactor stores 2 more charge",
-      "shopArrival": "+6 scrap on arriving at a market",
-      "tideWard": "Repair 1 hull on every jump while tide is 2+",
+      "blackWell": "The reactor stores {{n}} more charge",
+      "shopArrival": "+{{n}} scrap on arriving at a market",
+      "tideWard": "Repair {{n}} hull on every jump while tide is 2+",
       "detourScout": "+12 scrap on entering a detour",
-      "redFinisher": "+2 in weapons against a target under 30% hull.",
-      "redSwarmFire": "+1 in weapons while two or more enemies stand.",
-      "redBurnBite": "A weapon hit on a burning target deals 2 more.",
+      "redFinisher": "+{{n}} in weapons against a target under 30% hull.",
+      "redSwarmFire": "+{{n}} in weapons while two or more enemies stand.",
+      "redBurnBite": "A weapon hit on a burning target deals {{n}} more.",
       "redRepeatCrit": "A weapon die that repeats the last value crits.",
-      "redSalvoTally": "From the third weapon die of a battle on, +1 in weapons.",
-      "redOpener": "The turn's first weapon die gets +2.",
-      "redRiskCharge": "Below 40% hull, end each turn with 1 charge.",
-      "redPowderRoom": "Any hit on a burning target adds another burn.",
+      "redSalvoTally": "From the third weapon die of a battle on, +{{n}} in weapons.",
+      "redOpener": "The turn's first weapon die gets +{{n}}.",
+      "redRiskCharge": "Below 40% hull, end each turn with {{n}} charge.",
+      "redPowderRoom": "Any hit on a burning target adds Burn {{n}}.",
       "redHairTrigger": "The turn's first weapon die crits.",
-      "redCoreBreach": "+3 on any die against a target under 25% hull.",
+      "redCoreBreach": "+{{n}} on any die against a target under 25% hull.",
       "blueOvershield": "With 6 shield up, a shields die adds 2 more.",
-      "blueStillness": "A blue die in shields gets +1.",
+      "blueStillness": "A blue die in shields gets +{{n}}.",
       "blueDeepGuard": "Hold 4 shield through the enemy turn to heal 1.",
       "blueJamOnLow": "A sensors die below 4 is read as 5.",
       "blueWatch": "A blue die on its lowest face is rerolled once.",
       "blueBreakwater": "Start every battle with 3 shield.",
       "blueSpillway": "A shields die of 8 or more adds 3 shield.",
-      "blueLongLens": "+2 in sensors.",
+      "blueLongLens": "+{{n}} in sensors.",
       "greenGrowOnEngines": "A max-face engines die grows, up to +2.",
       "greenTendril": "A green die of 6 or more grows, up to +3.",
       "greenMend": "End a turn above 30% hull to heal 1.",
-      "greenRootHold": "+2 in engines below half hull.",
+      "greenRootHold": "+{{n}} in engines below half hull.",
       "greenSpore": "A won battle heals 2.",
       "greenQuietBerth": "Arriving at a shipyard heals 2.",
       "greenSapline": "End a turn with 4 shield to heal 2.",
       "greenLoam": "A max-face engines die grows, up to +3.",
-      "yellowTollBooth": "Arriving at an encounter pays 8 scrap.",
-      "yellowKickback": "A yellow die pays 2 scrap when it resolves.",
-      "yellowLuckyOpen": "The turn's first die, on its max face, pays 6 scrap.",
-      "yellowGleaner": "A yellow die on its lowest face pays 4 scrap.",
-      "yellowWager": "A die on either extreme face pays 3 scrap.",
-      "yellowTollhouse": "Arriving at a counter pays 14 scrap.",
-      "yellowMintMark": "A reactor die pays 4 scrap.",
-      "blackBleedCharge": "+1 on black dice below 60% hull.",
+      "yellowTollBooth": "Arriving at an encounter pays {{n}} scrap.",
+      "yellowKickback": "A yellow die pays {{n}} scrap when it resolves.",
+      "yellowLuckyOpen": "The turn's first die, on its max face, pays {{n}} scrap.",
+      "yellowGleaner": "A yellow die on its lowest face pays {{n}} scrap.",
+      "yellowWager": "A die on either extreme face pays {{n}} scrap.",
+      "yellowTollhouse": "Arriving at a counter pays {{n}} scrap.",
+      "yellowMintMark": "A reactor die pays {{n}} scrap.",
+      "blackBleedCharge": "+{{n}} on black dice below 60% hull.",
       "blackOvercap": "Black dice may exceed a slot cap for 2 hull.",
-      "blackPactTithe": "Start every battle with 2 charge and −2 hull.",
-      "blackLastLight": "+2 on every die below 25% hull.",
-      "blackReactorTally": "From the second reactor die on, end the turn with 1 charge.",
-      "blackSpite": "Below half hull, the enemy turn ends with 1 charge.",
-      "blackNightWatch": "A black die on its max face gives 1 charge.",
-      "blackAshBed": "A die on its lowest face gives 2 charge.",
-      "blackDeadMansSwitch": "Below 25% hull, end each turn with 3 charge.",
-      "blackSlagHeap": "+3 in reactor while holding 4 charge.",
-      "greyScan": "One extra nudge every roll.",
-      "greyEvenKeel": "+1 on grey dice.",
-      "greyCounterweight": "A non-grey die on its lowest face gets +1.",
-      "greyToolbelt": "One extra reroll use per battle.",
-      "greySpare": "One extra reserve slot per battle.",
-      "greyMirror": "A grey die repeating the last value widens the reroll by 1.",
-      "greyLedgerKeep": "Walking into a counter pays 10 scrap.",
-      "greyPatternBook": "A die repeating the last value grants a reroll use.",
-      "greyTallyStick": "From the second sensors die on, +2 on every die."
+      "blackPactTithe": "Start every battle with {{n}} charge and −{{m}} hull.",
+      "blackLastLight": "+{{n}} on every die below 25% hull.",
+      "blackReactorTally": "From the second reactor die on, end the turn with {{n}} charge.",
+      "blackSpite": "Below half hull, the enemy turn ends with {{n}} charge.",
+      "blackNightWatch": "A black die on its max face gives {{n}} charge.",
+      "blackAshBed": "A die on its lowest face gives {{n}} charge.",
+      "blackDeadMansSwitch": "Below 25% hull, end each turn with {{n}} charge.",
+      "blackSlagHeap": "+{{n}} in reactor while holding 4 charge.",
+      "greyScan": "Nudges per roll: +{{n}}.",
+      "greyEvenKeel": "+{{n}} on grey dice.",
+      "greyCounterweight": "A non-grey die on its lowest face gets +{{n}}.",
+      "greyToolbelt": "Reroll uses per battle: +{{n}}.",
+      "greySpare": "+{{n}} reserve slot per battle.",
+      "greyMirror": "A grey die repeating the last value widens the reroll by {{n}}.",
+      "greyLedgerKeep": "Walking into a counter pays {{n}} scrap.",
+      "greyPatternBook": "A die repeating the last value adds {{n}} to your rerolls.",
+      "greyTallyStick": "From the second sensors die on, +{{n}} on every die.",
+      "prismWildEdge": "A prismatic die gets +{{n}} in any slot.",
+      "prismCarry": "A prismatic die that resolves gives the next prismatic die +2.",
+      "prismDichroic": "A prismatic die takes the slot's colour: +{{n}} shield in shields, Burn {{m}} in weapons.",
+      "prismOvercap": "Prismatic dice may exceed a slot cap for 1 hull.",
+      "prismKindling": "Two prismatic in the census: every battle starts with {{n}} charge.",
+      "prismDeepWell": "Four prismatic in the census: each turn ends with {{n}} charge and heals {{m}}.",
+      "prismOpenHand": "The turn's first die, whatever its colour, gets +{{n}}.",
+      "prismDividend": "Two prismatic in the census: a won battle pays {{n}} scrap and heals {{m}}.",
+      "redCinderFrost": "Weapons +1 while any shield holds · per 5 points in Blue",
+      "blueTidalWall": "+1 shield each time a weapon resolves · per 5 points in Red",
+      "greenHoarfrost": "Heal 1 at turn end while any shield holds · per 5 points in Blue",
+      "greenGoldenGrove": "The first three green max faces of a battle pay 1 scrap · per 5 points in Yellow",
+      "yellowLoadedDice": "A black die on its lowest face gets +1 · per 5 points in Black",
+      "blackGamblersVoid": "The first two black max faces of a battle repair 1 hull · per 5 points in Yellow",
+      "blackNullForge": "A grey die in the reactor stores 1 charge · per 5 points in Grey",
+      "greyFacetGrinder": "From the third grey die of a battle on, grey dice get +1 · per 5 points in Prismatic",
+      "prismSolarWind": "The turn's first weapon die gets +1 · per 5 points in Red",
+      "stormSurge": "Weapons +1 for every step the tide has risen, up to +3.",
+      "coldLogicMaxDie": "At the start of a battle the lowest die is set to its max face.",
+      "greySingleCast": "Grey dice +1; every other die +1 while three or more grey dice are aboard.",
+      "prismCascade": "With three prismatic dice aboard, any die fits any slot at no hull cost.",
+      "nexusSteamLance": "From the second shields die of a battle on, +2 in weapons.",
+      "nexusFrostbloom": "End a turn with 3 · 7 · 12 shield to heal 1 · 2 · 3.",
+      "nexusGoldenCanopy": "Each of the first five green dice a battle heals 1 and pays 3 scrap.",
+      "nexusHouseEdge": "Free nudges per roll: +{{n}} · black dice may exceed a slot cap for 2 hull.",
+      "nexusNullAnvil": "Grey dice may exceed a slot cap for free.",
+      "nexusFacetEngine": "Every third grey die you place turns prismatic.",
+      "nexusNova": "With two prismatic in the census, a weapon hit splashes 4 onto every other enemy."
     },
     "trait": {
       "obsidianPact": "Black dice roll only their min or max",
@@ -225,7 +268,12 @@
       "coldLogic": "Nudges are free · crits disabled",
       "overflowShield": "Charge spent over the cap becomes shield.",
       "fateTwice": "The Fate die may be played twice per battle.",
-      "prismDouble": "Prismatic dice count twice for resonance."
+      "prismDouble": "Prismatic dice count twice for resonance.",
+      "overflowCharge": "A die placed over a slot cap stores 1 charge.",
+      "houseEdge": "A black die on its max face pays no hull to exceed a cap.",
+      "greyIsBlack": "Grey dice count as black.",
+      "facetEngine": "Every third grey die placed in a battle turns prismatic.",
+      "novaSplash": "With two prismatic dice on the table, the turn's first weapon shot deals 4 to every other enemy."
     },
     "budgetDelta": "{{n}} hangar point",
     "slotTier": "{{slot}}: {{n}} die-size step"
@@ -236,14 +284,13 @@
     "shipArk": "Ark unlocked",
     "engraving": "Engraving station open",
     "dailyPreview": "Tomorrow's Daily is visible",
-    "respecPrestige": "Free respec + prestige skin",
+    "respecPrestige": "Half-price chart reset + prestige skin",
     "diceWave": "Fusion dice on the shelf",
     "contractWave": "Contract wave open",
-    "chartPoints": "Two Star Chart points"
+    "chartPoints": "Bonus: +{{n}} Star Chart points"
   },
   "levelup": {
     "level": "Captain Level {{level}}",
-    "point": "+1 Star Chart point",
     "points": "+{{n}} Star Chart points",
     "continue": "Continue"
   },
@@ -276,7 +323,7 @@
     "save": "Save deck",
     "saved": "Saved",
     "invalidOver": "Over budget",
-    "invalidCap": "Max 9 dice",
+    "invalidCap": "Max {{n}} dice",
     "invalidMin": "At least 3 dice",
     "invalidFate": "Max 1 Fate die",
     "valid": "Ready",
@@ -285,7 +332,18 @@
     "shipEquipped": "Equipped",
     "shipBuy": "Buy · {{price}}◈",
     "shipLocked": "Unlocks: {{route}}",
-    "filterAll": "All"
+    "filterAll": "All",
+    "mastery": {
+      "rank": "Mastery {{rank}}",
+      "next": "{{xp}} / {{next}} XP to rank {{rank}}",
+      "max": "Mastery complete",
+      "title": "Mastery bonuses",
+      "hull": "+{{n}} hull",
+      "reserve": "+{{n}} reserve",
+      "mk": "First Mk upgrade -{{n}}%",
+      "hit": "First hit from an elite, mini-boss or boss each battle -{{n}}%",
+      "passive": "Passive II: {{name}}"
+    }
   },
   "collection": {
     "title": "Collection",
@@ -335,7 +393,9 @@
     "guardBody": "There is one run slot. Starting this mode erases the current run, locally and in the cloud.",
     "guardYes": "Erase and launch",
     "dailyPreview": "Tomorrow ({{date}})",
-    "dailyPreviewLocked": "Tomorrow's mutators at level {{n}}"
+    "dailyPreviewLocked": "Tomorrow's mutators at level {{n}}",
+    "driftAscension": "Ascension for this drift",
+    "driftScoreMult": "Score ×{{mult}}"
   },
   "contracts": {
     "title": "Contracts",
@@ -383,7 +443,8 @@
     "submitSent": "Submitted to the board",
     "submitFailed": "Submission failed — the score is saved locally",
     "submitOffline": "Offline — the score is saved locally",
-    "toBoard": "Open the board"
+    "toBoard": "Open the board",
+    "ascension": "Ascension A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Leaderboards",
@@ -468,7 +529,8 @@
     "ascendant": "Ascendant",
     "chartwright": "Chartwright",
     "archivist": "Archivist",
-    "answer": "The Answer"
+    "answer": "The Answer",
+    "singularity": "Singularity"
   },
   "unlock": {
     "opened": "Unlocked",
@@ -507,13 +569,16 @@
     "featureShipArk": "The Ark",
     "featureEngraving": "Engraving station",
     "featureDailyPreview": "Daily preview",
-    "featureFreeRespec": "Free keystone respec",
     "sectorSix": "Sector 6 «Beyond the Core»",
     "diceS6": "Four causality dice",
     "skinThreshold": "Die skin «Threshold»",
     "featureShipCorsair": "The Hound is on the market",
     "featureShipFoundry": "The Forge is on the market",
-    "featureShipPrism": "The Prism is on the market"
+    "featureShipPrism": "The Prism is on the market",
+    "skinSingularity": "Die skin: Singularity",
+    "contractsA12": "Contract: Deep Vacuum",
+    "frameObsidian": "Bridge frame: Obsidian",
+    "prestigeThemeTwo": "Theme: Event Horizon"
   },
   "skin": {
     "title": "Die skins",
@@ -547,6 +612,10 @@
     "threshold": {
       "name": "Threshold",
       "desc": "Round, unlit, edged in fleet grey. Worn by the one captain who never leaned."
+    },
+    "singularity": {
+      "name": "Singularity",
+      "desc": "Black glass, a white rim, a light that bends round the glyph."
     }
   },
   "ach": {
@@ -564,7 +633,7 @@
     },
     "quickWork": {
       "name": "Quick Work",
-      "desc": "Clear a campaign in 11 jumps or fewer."
+      "desc": "Clear a campaign in 85 jumps or fewer."
     },
     "frugal": {
       "name": "Frugal",
@@ -731,8 +800,8 @@
       "desc": "See the Keeper's story through to its last page."
     },
     "allChains": {
-      "name": "Four Threads",
-      "desc": "Finish all four cast stories."
+      "name": "Every Thread",
+      "desc": "Finish every cast story."
     },
     "wandererClear": {
       "name": "Wanderer's Road",
@@ -765,6 +834,34 @@
     "prismClear": {
       "name": "Refracted",
       "desc": "Clear a campaign flying the Prism."
+    },
+    "masterWanderer": {
+      "name": "Master of the Wanderer",
+      "desc": "Reach mastery V on the Wanderer."
+    },
+    "masterRam": {
+      "name": "Master of the Ram",
+      "desc": "Reach mastery V on the Ram."
+    },
+    "masterArk": {
+      "name": "Master of the Ark",
+      "desc": "Reach mastery V on the Ark."
+    },
+    "masterCorsair": {
+      "name": "Master of the Hound",
+      "desc": "Reach mastery V on the Hound."
+    },
+    "masterFoundry": {
+      "name": "Master of the Forge",
+      "desc": "Reach mastery V on the Forge."
+    },
+    "masterPrism": {
+      "name": "Master of the Prism",
+      "desc": "Reach mastery V on the Prism."
+    },
+    "admiral": {
+      "name": "Admiral",
+      "desc": "Reach mastery V on three ships."
     }
   },
   "chartTag": {
@@ -808,7 +905,13 @@
       "skinVoidglass": "die skin «Voidglass»",
       "skinEmberglass": "die skin «Emberglass»",
       "prestigeTheme": "theme «Ascendant»",
-      "badge": "the Ascendant badge"
+      "badge": "the Ascendant badge",
+      "scrapBonus": "+5% scrap from fights for every level above A10",
+      "skinSingularity": "die skin «Singularity»",
+      "contractA12": "contract «Deep Vacuum»",
+      "frameObsidian": "bridge frame «Obsidian»",
+      "prestigeThemeTwo": "theme «Event Horizon»",
+      "badgeSingularity": "the Singularity badge"
     }
   },
   "voucher": {
@@ -819,5 +922,17 @@
     "shards": "Take {{n}} ◈",
     "bank": "Banked: {{n}} / {{max}}",
     "full": "Your voucher bank is full ({{max}}). Take the shards."
+  },
+  "frame": {
+    "title": "Bridge frame",
+    "hint": "Cosmetic only. A frame never changes a ship.",
+    "hull": {
+      "name": "The hull's own",
+      "desc": "Each hull wears the frame it was built with."
+    },
+    "obsidian": {
+      "name": "Obsidian",
+      "desc": "Black volcanic glass, edged in a cold white line."
+    }
   }
 }

@@ -1,4 +1,8 @@
 import { CHART_NODE_BY_ID } from "@/data/chart";
+import type { ChartNodeDef } from "@/data/chart";
+import { mapEffectMagnitudes, mapModValues } from "@/data/chart/scale";
+import { confluenceSteps } from "@/game/chart/engine";
+import type { EffectDef } from "@/game/effects/types";
 import { MODULE_BY_ID } from "@/data/modules";
 import { OFFICER_BY_ID } from "@/data/officers";
 import {
@@ -14,8 +18,35 @@ import {
   sumMods,
 } from "@/game/run/perkMods";
 
+const scaledMods = (
+  picks: readonly string[],
+  node: ChartNodeDef,
+): Partial<PerkMods> | undefined => {
+  if (node.mods === undefined) return undefined;
+  if (node.scaledBy === undefined) return node.mods;
+  const steps = confluenceSteps(picks, node);
+  return mapModValues(node.mods, (value) => value * steps);
+};
+
 export const computeChartMods = (picks: readonly string[]): PerkMods =>
-  sumMods(picks, (id) => CHART_NODE_BY_ID.get(id)?.mods);
+  sumMods(picks, (id) => {
+    const node = CHART_NODE_BY_ID.get(id);
+    return node === undefined ? undefined : scaledMods(picks, node);
+  });
+
+export const chartEffectsOf = (
+  picks: readonly string[],
+  id: string,
+): readonly EffectDef[] => {
+  const node = CHART_NODE_BY_ID.get(id);
+  if (node?.effects === undefined) return [];
+  if (node.scaledBy === undefined) return node.effects;
+  const steps = confluenceSteps(picks, node);
+  if (steps <= 0) return [];
+  return node.effects.map((effect) =>
+    mapEffectMagnitudes(effect, (n) => n * steps),
+  );
+};
 
 export const computeModuleMods = (modules: readonly string[]): PerkMods =>
   sumMods(modules, (id) => MODULE_BY_ID.get(id)?.mods);

@@ -19,12 +19,20 @@
 .headChips {
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 10px;
   min-width: 0;
 }
 
+.headChips > * {
+  min-height: 34px;
+}
+
 .tideChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
   padding: 4px 10px;
   border-radius: 12px;
   border: 1px solid var(--ca-danger);
@@ -36,6 +44,9 @@
 }
 
 .modChip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
   padding: 4px 10px;
   border-radius: 12px;
   border: 1px solid var(--ca-line);
@@ -52,7 +63,7 @@
 }
 
 .tidePulse {
-  animation: tideRipple 700ms ease-out;
+  animation: tideRipple 700ms var(--ca-ease-out);
 }
 
 @keyframes tideRipple {
@@ -151,8 +162,33 @@
   cursor: pointer;
 }
 
+.nodeHit {
+  fill: transparent;
+  stroke: none;
+}
+
 .nodeStagger {
-  animation: nodeIn 260ms ease-out both;
+  animation: nodeIn var(--ca-motion-m) var(--ca-ease-out) backwards;
+  animation-delay: calc(var(--ca-stagger-list) * var(--ca-node-row, 0));
+}
+
+.pathHighlight {
+  pointer-events: none;
+  stroke-dashoffset: 0;
+  animation: pathDraw var(--ca-motion-m) var(--ca-ease-out) backwards;
+}
+
+@keyframes pathDraw {
+  from {
+    stroke-dashoffset: var(--ca-path-len, 100);
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.jumpSweep[data-sweep-host]::after {
+  --ca-sweep-color: var(--mantine-color-white);
 }
 
 @keyframes cargoPulse {
@@ -175,7 +211,6 @@
     transform: translateY(6px);
   }
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }
@@ -197,7 +232,7 @@
 }
 
 .fog {
-  transition: opacity 300ms ease-out;
+  transition: opacity 300ms var(--ca-ease-out);
 }
 
 .marker {
@@ -248,7 +283,7 @@
 .arrival {
   transform-box: fill-box;
   transform-origin: center;
-  animation: arrivalTick var(--ca-map-arrival-ms, 120ms) ease-out both;
+  animation: arrivalTick var(--ca-map-arrival-ms, 120ms) var(--ca-ease-out) both;
 }
 
 @keyframes arrivalTick {
@@ -265,7 +300,8 @@
 .warpSuck {
   transform-box: fill-box;
   transform-origin: center;
-  animation: warpSuck 420ms cubic-bezier(0.5, 0, 0.9, 0.4) both;
+  animation: warpSuck var(--ca-warp-suck-ms, 420ms)
+    cubic-bezier(0.5, 0, 0.9, 0.4) both;
 }
 
 @keyframes warpSuck {
@@ -276,6 +312,25 @@
     opacity: 0;
     scale: 0.08;
     rotate: 540deg;
+  }
+}
+
+.warpStretch {
+  transform-box: view-box;
+  transform-origin: 0 0;
+  animation: warpStretch var(--ca-warp-suck-ms, 420ms)
+    cubic-bezier(0.5, 0, 0.9, 0.4) forwards;
+}
+
+@keyframes warpStretch {
+  0% {
+    transform: translateX(0) scale(1, 1);
+  }
+  40% {
+    transform: translateX(calc(var(--ca-warp-reach, 0px) * 0.22)) scale(2.8, 0.6);
+  }
+  100% {
+    transform: translateX(var(--ca-warp-reach, 0px)) scale(3.6, 0.28);
   }
 }
 
@@ -314,7 +369,9 @@
 :root[data-ca-motion='reduced'] .arrival,
 :root[data-ca-motion='reduced'] .tidePulse,
 :root[data-ca-motion='reduced'] .nodeStagger,
+:root[data-ca-motion='reduced'] .pathHighlight,
 :root[data-ca-motion='reduced'] .warpSuck,
+:root[data-ca-motion='reduced'] .warpStretch,
 :root[data-ca-motion='reduced'] .warpLand,
 :root[data-ca-motion='reduced'] .pulse {
   animation: none;

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { riseStyle } from '@/app/motion';
 import { ENEMY_BY_ID } from '@/data/enemies';
 import { logTurns } from '@/game/battle/log';
 import type { BattleLogEntry } from '@/types/battle';
@@ -24,8 +25,13 @@ export const BattleLogList = ({ log }: { log: readonly BattleLogEntry[] }) => {
 
   return (
     <ol className={styles.turns}>
-      {turns.map((group) => (
-        <li key={group.turn} className={styles.turn}>
+      {turns.map((group, index) => (
+        <li
+          key={group.turn}
+          className={styles.turn}
+          data-rise
+          style={riseStyle(index)}
+        >
           <span className={styles.turnHead}>
             {t('battle:journal.turn', { n: group.turn })}
           </span>

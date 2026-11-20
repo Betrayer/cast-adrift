@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { useTranslation } from 'react-i18next';
+import { clamp } from '@/app/math';
+import { safeBounds } from '@/app/safeArea';
 import { consoleActions, type ConsoleActionId } from '@/game/battle/view';
 import {
   boardRegion,
@@ -40,15 +42,6 @@ const arcMounted = (): boolean => boardRegion('ship') !== undefined;
 
 const noArc = (): boolean => false;
 
-const safeInset = (name: string): number => {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
-  const parsed = Number.parseFloat(raw);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
-const clamp = (value: number, min: number, max: number): number =>
-  Math.min(Math.max(value, min), max);
-
 export const RadialMenu = () => {
   const { t } = useTranslation(['battle']);
   const board = useBattleStore();
@@ -62,19 +55,15 @@ export const RadialMenu = () => {
   if (anchor === null || !onArc || board.phase !== 'placement') return null;
   const actions = consoleActions(board);
   const radius = (anchor.size / 2 + BUTTON / 2 + GAP) * DIAGONAL;
-  const minX = safeInset('--ca-safe-left') + EDGE + BUTTON / 2;
-  const maxX = window.innerWidth - safeInset('--ca-safe-right') - EDGE - BUTTON / 2;
-  const minY = safeInset('--ca-safe-top') + EDGE + BUTTON / 2;
-  const maxY =
-    window.innerHeight - safeInset('--ca-safe-bottom') - EDGE - BUTTON / 2;
+  const bounds = safeBounds(EDGE + BUTTON / 2);
 
   return (
     <div className={styles.radial} data-radial>
       {SPOKES.map((spoke) => {
         const action = actions[spoke.id];
         const rad = (spoke.angle * Math.PI) / 180;
-        const x = clamp(anchor.x + radius * Math.cos(rad), minX, maxX);
-        const y = clamp(anchor.y - radius * Math.sin(rad), minY, maxY);
+        const x = clamp(anchor.x + radius * Math.cos(rad), bounds.left, bounds.right);
+        const y = clamp(anchor.y - radius * Math.sin(rad), bounds.top, bounds.bottom);
         const label =
           spoke.id === 'reroll'
             ? rerollLabel(t, board)

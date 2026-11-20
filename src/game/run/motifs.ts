@@ -1,7 +1,7 @@
-import { sectorDef, type SectorMotif } from "@/data/sectors";
+import { ascensionMods } from "@/data/ascension";
+import { sectorMotif } from "@/data/sectors";
 import { applyEventEffects } from "@/game/events/apply";
 import { edgeMarkFor, type MapGraph, type MapNode, type NodeId } from "@/game/map/types";
-import { bypassIsLateral } from "@/game/map/wormhole";
 import { createStream, deriveSeed } from "@/services/rng";
 import { logConsequence } from "@/game/run/journal";
 import { useRunStore } from "@/stores/runStore";
@@ -15,14 +15,6 @@ export const MOTIF_CONSEQUENCE: Readonly<Record<string, LocKey>> = {
   cursed: "run:motif.cursed",
   bypass: "run:motif.bypass",
 };
-
-const motifOf = <K extends SectorMotif["m"]>(
-  sector: number,
-  kind: K,
-): Extract<SectorMotif, { m: K }> | undefined =>
-  sectorDef(sector).shape.motifs.find(
-    (motif): motif is Extract<SectorMotif, { m: K }> => motif.m === kind,
-  );
 
 export const survivable = (
   effects: readonly EventEffect[],
@@ -56,57 +48,58 @@ export const applyEdgeMotifs = (
   sector: number,
 ): void => {
   if (edgeMarkFor(map, from, to) !== "mine") return;
-  const motif = motifOf(sector, "mineEdges");
+  const motif = sectorMotif(sector, "mineEdges");
   if (motif === undefined) return;
   fire(motif.toll, "mine", `mine:${from}:${to}`);
 };
 
-export const holeTollFor = (sector: number, hull: number): number => {
-  const motif = motifOf(sector, "blackHoles");
-  if (motif === undefined) return 0;
-  const toll = motif.toll.reduce(
-    (sum, effect) => (effect.k === "hull" && effect.n < 0 ? sum - effect.n : sum),
-    0,
-  );
-  return hull <= toll ? 0 : toll;
+export const bypassPctFor = (sector: number, ascension = 0): number => {
+  const base = sectorMotif(sector, "blackHoles")?.bypassPct ?? 0;
+  return base > 0
+    ? Math.round((base + ascensionMods(ascension).bypassPctDelta) * 100) / 100
+    : 0;
 };
 
-export const disintegrationPctFor = (sector: number): number =>
-  motifOf(sector, "blackHoles")?.disintegrationPct ?? 0;
+export const holeTollFor = (
+  sector: number,
+  hullMax: number,
+  ascension = 0,
+): number => {
+  const pct = bypassPctFor(sector, ascension);
+  return pct <= 0 ? 0 : Math.ceil(Math.max(0, hullMax) * pct);
+};
 
-export const holeTollWaived = (
-  map: MapGraph | null,
-  from: NodeId,
-  hole: NodeId,
-  visited: readonly NodeId[],
-): boolean => map !== null && !bypassIsLateral(map, from, hole, visited);
+export const bypassLethal = (hull: number, toll: number): boolean =>
+  toll > 0 && hull <= toll;
+
+export const disintegrationPctFor = (sector: number, ascension = 0): number => {
+  const base = sectorMotif(sector, "blackHoles")?.disintegrationPct ?? 0;
+  return base > 0 ? base + ascensionMods(ascension).disintegrationPctDelta : 0;
+};
+
+export const ridesStayGentle = (ascension: number): boolean =>
+  !ascensionMods(ascension).gentleRidesUnmake;
 
 export const applyHoleToll = (
   sector: number,
   from: NodeId,
   hole: NodeId,
-): number => {
+): number | null => {
   const run = useRunStore.getState();
-  if (holeTollWaived(run.map, from, hole, run.visited)) {
-    logConsequence("run:motif.holeDrift");
-    return 0;
-  }
-  const cost = holeTollFor(sector, run.hull);
-  if (cost <= 0) {
-    logConsequence("run:motif.holeScorch");
-    return 0;
-  }
+  const cost = holeTollFor(sector, run.hullMax, run.ascension);
+  if (bypassLethal(run.hull, cost)) return null;
+  if (cost <= 0) return 0;
   fire([{ k: "hull", n: -cost }], "bypass", `bypass:${from}:${hole}`);
   return cost;
 };
 
 export const applyNodeMotifs = (node: MapNode, sector: number): void => {
   if (node.cache === true) {
-    const motif = motifOf(sector, "cache");
+    const motif = sectorMotif(sector, "cache");
     if (motif !== undefined) fire(motif.gain, "cache", `cache:${node.id}`);
   }
   if (node.blessing !== undefined) {
-    const motif = motifOf(sector, "procession");
+    const motif = sectorMotif(sector, "procession");
     if (motif !== undefined) {
       fire(
         node.blessing === "blessed" ? motif.blessed : motif.cursed,

@@ -1,5 +1,6 @@
 import { Paper, Stack, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
+import { riseStyle } from "@/app/motion";
 import { tokens } from "@/app/theme";
 import { CABIN_CAP, officerLabelVars } from "@/data/officers";
 import { useRunStore } from "@/stores/runStore";
@@ -27,13 +28,15 @@ export const CabinsSection = () => {
             max: CABIN_CAP,
           })}
         </Text>
-        {rows.map((row) => {
+        {rows.map((row, index) => {
           if (row.kind === "empty") {
             return (
               <div
                 key={`cabin-${String(row.index)}`}
                 className={styles.cabinEmpty}
                 data-bridge-cabin-empty={row.index}
+                data-rise
+                style={riseStyle(index)}
               >
                 <Text size="xs" c={tokens.faint}>
                   {t("run:bridge.cabinEmpty")}
@@ -47,6 +50,8 @@ export const CabinsSection = () => {
               key={def.id}
               className={styles.cabin}
               data-bridge-cabin={def.id}
+              data-rise
+              style={riseStyle(index)}
             >
               <Text size="sm" fw={600} c={tokens.text}>
                 {t(def.name)}

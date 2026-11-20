@@ -3,20 +3,20 @@ import { beaconsResolved } from "@/data/events/beacons";
 import { chainViews, type ChainView } from "@/data/narrative/chains";
 import type { EventOutcomeInfo } from "@/game/effects";
 import { dieForRarity } from "@/game/economy/rewards";
+import { gainShipRankXp } from "@/game/run/shipRanks";
 import { settleAchievements } from "@/game/meta/achievements";
 import { noteEventResolved } from "@/game/meta/counters";
-import { ptsForDie } from "@/game/economy/prices";
+import { ptsForInstance } from "@/game/economy/prices";
 import { grantCargo, grantDie, grantOfficer } from "@/game/run/inventory";
 import { applyAxisDelta, logConsequence, logJournal } from "@/game/run/journal";
 import { emitRunHook } from "@/game/run/runEffects";
+import { tideCapFor } from "@/game/run/tide";
 import { playSfx } from "@/services/audio";
 import type { RngStream } from "@/services/rng";
 import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore } from "@/stores/runStore";
+import { useRunStore, withHullMaxDelta } from "@/stores/runStore";
 import type { EventEffect, ForcedBattle, Outcome } from "@/types/events";
-
-export const TIDE_CAP = 3;
 
 export interface ApplyResult {
   follow: ForcedBattle | null;
@@ -47,7 +47,7 @@ const applyLoot = (
 const applySwapLowest = (stream: RngStream): void => {
   const run = useRunStore.getState();
   if (run.deck.length === 0) return;
-  const withPts = run.deck.map((d) => ({ uid: d.uid, pts: ptsForDie(d.defId) }));
+  const withPts = run.deck.map((d) => ({ uid: d.uid, pts: ptsForInstance(d) }));
   const lowest = withPts.reduce((a, b) => (b.pts < a.pts ? b : a));
   const samePts = LOOT_DICE.filter((d) => d.pts === lowest.pts);
   const pool = samePts.length > 0 ? samePts : LOOT_DICE;
@@ -66,20 +66,18 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
       if (effect.n >= 0) run.healHull(effect.n);
       else run.setHull(run.hull + effect.n);
       return;
-    case "hullMax": {
-      const nextMax = Math.max(1, run.hullMax + effect.n);
-      useRunStore.setState({
-        hullMax: nextMax,
-        hull: Math.min(
-          nextMax,
-          effect.n > 0 ? run.hull + effect.n : run.hull,
-        ),
-      });
+    case "hullMax":
+      useRunStore.setState(withHullMaxDelta(run, effect.n));
       return;
-    }
     case "tide":
       useRunStore.setState({
-        tide: Math.max(0, Math.min(TIDE_CAP, run.tide + effect.n)),
+        tide: Math.max(
+          0,
+          Math.min(
+            Math.max(run.tide, tideCapFor(run.ascension, run.mode, run.sector)),
+            run.tide + effect.n,
+          ),
+        ),
       });
       return;
     case "axis":
@@ -106,6 +104,12 @@ const applyEffect = (effect: EventEffect, stream: RngStream): void => {
         value: effect.n ?? (effect.mod === "startCharge" ? 2 : 1),
         battlesLeft: effect.battles ?? 1,
       });
+      return;
+    case "shards":
+      useMetaStore.getState().addShards(Math.max(0, effect.n));
+      return;
+    case "shipRank":
+      gainShipRankXp(effect.n);
       return;
     case "nodeMod":
       if (effect.mod === "revealRows") run.addBonusReveal(effect.n ?? 2);

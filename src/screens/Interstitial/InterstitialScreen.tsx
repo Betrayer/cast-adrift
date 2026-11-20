@@ -63,7 +63,13 @@ export const InterstitialScreen = () => {
         <Text className={styles.kicker} style={{ color: def.accent }}>
           {t('run:interstitial.sector', { n: sector })}
         </Text>
-        <Title order={1} c={tokens.text} ta="center">
+        <Title
+          order={1}
+          c={tokens.text}
+          ta="center"
+          className={styles.sectorName}
+          data-sector-name={sector}
+        >
           {t(def.name)}
         </Title>
       </Stack>

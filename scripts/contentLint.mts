@@ -1,4 +1,4 @@
-import { existsSync, readdirSync, readFileSync, statSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
 import {
@@ -18,6 +18,7 @@ import {
 import { BADGES, BADGE_BY_ID, DIE_SKINS } from "../src/data/cosmetics";
 import { MILESTONES, milestoneLabel } from "../src/data/milestones";
 import { THEMES } from "../src/data/themes";
+import { BRIDGE_FRAMES } from "../src/data/bridgeFrames";
 import {
   OPEN_CONTRACTS,
   OPEN_DICE,
@@ -69,7 +70,7 @@ import {
 import { CODEX, CODEX_BY_ID } from "../src/data/codex";
 import { STARTER_DECK } from "../src/data/decks";
 import { ALL_DICE, BASIC_DICE, DIE_BY_ID } from "../src/data/dice";
-import { resolveFaces } from "../src/game/puzzles/evaluate";
+import { resolveFaces } from "../src/game/dice/tier";
 import { createStream } from "../src/services/rng";
 import {
   ENCOUNTER_GROUPS,
@@ -159,8 +160,17 @@ type ContentNode = string | { [key: string]: ContentNode };
 
 const errors: string[] = [];
 
-import { RUNTIME_FLAGS } from "../src/data/flags";
-import { deadFlags, unwritableFlags } from "../src/game/narrative/flagGraph";
+import {
+  contractFeasibilityErrors,
+  eliteStarReach,
+  corpusStats,
+  eventCorpusErrors,
+} from "./eventCorpus";
+import { unallowedMotionFindings } from "./motionAudit";
+import { motionBudgetErrors } from "./motionBudget";
+import { filesUnder } from "./files";
+import { deadFlags, unwritableFlags, writtenFlags } from "../src/game/narrative/flagGraph";
+import { allOutcomes, optionRequirements } from "../src/game/events/engine";
 import { BLACK_BOX_EPITAPHS } from "../src/data/narrative/blackBox";
 import { DEATH_LINES } from "../src/data/narrative/deathLines";
 import { EPILOGUE_ENTRIES } from "../src/data/narrative/epilogue";
@@ -654,12 +664,17 @@ checkUniqueIds(
   CHART_NODES.map((n) => n.id),
 );
 
-const CHART_MINORS = 24;
-const CHART_NOTABLES = 32;
+const CHART_CONFLUENCE = 14;
+const CHART_NEXUS = 7;
+const CHART_NOTABLES = 25;
 const CHART_KEYSTONES = 8;
 const CHART_DISTINCT_SMALLS = 100;
-const minorCount = CHART_NODES.filter((n) => n.kind === "minor").length;
-expectCount("chart", minorCount, CHART_MINORS, "minor notables");
+const confluenceCount = CHART_NODES.filter(
+  (n) => n.kind === "confluence",
+).length;
+expectCount("chart", confluenceCount, CHART_CONFLUENCE, "confluence notables");
+const nexusCount = CHART_NODES.filter((n) => n.kind === "nexus").length;
+expectCount("chart", nexusCount, CHART_NEXUS, "nexus ultimates");
 const notableCount = CHART_NODES.filter((n) => n.kind === "notable").length;
 expectCount("chart", notableCount, CHART_NOTABLES, "notables");
 const keystoneCount = CHART_NODES.filter((n) => n.kind === "keystone").length;
@@ -682,6 +697,22 @@ if (distinctSmalls < CHART_DISTINCT_SMALLS)
   errors.push(
     `chart: expected at least ${String(CHART_DISTINCT_SMALLS)} distinct small payloads, found ${String(distinctSmalls)}`,
   );
+
+const branchesSeen = new Map<string, Map<string, string>>();
+for (const small of chartSmalls) {
+  if (small.constellation === "hub") continue;
+  const branch =
+    branchesSeen.get(small.constellation) ?? new Map<string, string>();
+  const key = chartPayloadKey(small);
+  const twin = branch.get(key);
+  if (twin !== undefined) {
+    errors.push(
+      `chart: "${small.id}" repeats the payload of "${twin}" inside the same branch`,
+    );
+  }
+  branch.set(key, small.id);
+  branchesSeen.set(small.constellation, branch);
+}
 
 for (const node of CHART_NODES) {
   for (const other of CHART_ADJACENCY.get(node.id) ?? []) {
@@ -909,6 +940,11 @@ for (const event of ALL_EVENTS) {
     checkLocKey(`events.${event.id}`, `content:speaker.${event.speaker}`);
   if (event.codex !== undefined && !CODEX_BY_ID.has(event.codex))
     errors.push(`events: "${event.id}" references unknown codex "${event.codex}"`);
+  for (const line of event.dialogue ?? []) {
+    checkLocKey(`events.${event.id}.dialogue`, line.line);
+    if (line.who !== "echo" && line.who !== "narration")
+      checkLocKey(`events.${event.id}.dialogue`, `content:speaker.${line.who}`);
+  }
   if (event.requires?.flags !== undefined) callbackCount += 1;
   if (event.options.length === 0)
     errors.push(`events: "${event.id}" has no options`);
@@ -920,19 +956,20 @@ for (const event of ALL_EVENTS) {
   }
 }
 
-const EVENT_TOTAL = 177;
-const CALLBACK_TARGET = 55;
+const EVENT_TOTAL = 262;
+const CALLBACK_TARGET = 115;
 const THREE_OPTION_PCT = 35;
-const WEIGHTED_TARGET = 25;
+const WEIGHTED_TARGET = 132;
 const SECTOR_TARGET: Readonly<Record<string, number>> = {
-  S1: 31,
-  S2: 22,
-  S3: 22,
-  S4: 20,
-  S5: 20,
-  S6: 12,
-  common: 35,
+  S1: 37,
+  S2: 30,
+  S3: 30,
+  S4: 28,
+  S5: 28,
+  S6: 23,
+  common: 45,
   beacon: 7,
+  chain: 34,
 };
 
 if (ALL_EVENTS.length < EVENT_TOTAL)
@@ -986,18 +1023,31 @@ if (weightedEvents < WEIGHTED_TARGET)
     `events: ${String(weightedEvents)} carry a weighted fork, target ${String(WEIGHTED_TARGET)}`,
   );
 
+errors.push(...eventCorpusErrors(ALL_EVENTS, CHAIN_EVENT_IDS));
+const eliteReach = eliteStarReach();
+errors.push(...contractFeasibilityErrors(eliteReach));
+const corpus = corpusStats(ALL_EVENTS, CHAIN_EVENT_IDS);
+
+const motionAudit = unallowedMotionFindings(process.cwd());
+for (const finding of motionAudit.open)
+  errors.push(
+    `motion: ${finding.file}:${String(finding.line)} <${finding.tag}> ${finding.kind === "list" ? "renders a list without data-rise" : "is clickable without data-press"} (scripts/motionAudit.allow.json lists the justified exceptions)`,
+  );
+for (const key of motionAudit.stale)
+  errors.push(`motion: allowlist entry no longer matches any finding — ${key}`);
+
 const vending = ALL_EVENTS.filter((event) => {
   if (event.requires?.flags !== undefined) return false;
   if (event.codex !== undefined) return false;
   return !event.options.some((option) => {
     if (option.check !== undefined) return true;
-    if (option.requires?.req === "flag" || option.requires?.req === "axis")
+    if (
+      optionRequirements(option.requires).some(
+        (req) => req.req === "flag" || req.req === "axis",
+      )
+    )
       return true;
-    return [
-      ...(option.outcomes ?? []),
-      ...(option.onPass ?? []),
-      ...(option.onFail ?? []),
-    ].some(
+    return allOutcomes(option).some(
       (outcome) =>
         outcome.consequence !== undefined ||
         outcome.follow !== undefined ||
@@ -1009,22 +1059,22 @@ const vending = ALL_EVENTS.filter((event) => {
 for (const event of vending)
   errors.push(`events: "${event.id}" is a vending machine — it leaves no trace`);
 
-const settableFlags = new Set<string>();
 for (const event of ALL_EVENTS) {
   for (const option of event.options) {
-    for (const outcome of [
-      ...(option.outcomes ?? []),
-      ...(option.onPass ?? []),
-      ...(option.onFail ?? []),
-    ]) {
-      for (const eff of outcome.effects) {
-        if (eff.k === "flag") settableFlags.add(eff.key);
-      }
-      for (const [key] of outcome.follow?.setFlags ?? []) settableFlags.add(key);
-    }
+    const label = stringAt(content, option.label.replace("content:", "")) ?? "";
+    const price = /\((\d+)(?: scrap)?\)$/.exec(label)?.[1];
+    if (price === undefined) continue;
+    const held = optionRequirements(option.requires).some(
+      (req) => req.req === "scrap" && req.n === Number(price),
+    );
+    if (!held)
+      errors.push(
+        `events: "${event.id}.${option.id}" prints a price of ${price} its requirements do not hold the player to`,
+      );
   }
 }
-for (const key of RUNTIME_FLAGS) settableFlags.add(key);
+
+const settableFlags = new Set(writtenFlags().keys());
 for (const event of ALL_EVENTS) {
   for (const key of event.requires?.flags?.all ?? []) {
     if (!settableFlags.has(key))
@@ -1080,7 +1130,7 @@ for (const id of MEMORY_CODEX_IDS) {
     errors.push(`memories: "${id}" has no Codex entry`);
 }
 
-const CHAIN_TARGET = 4;
+const CHAIN_TARGET = 8;
 const CHAIN_MIN_STEPS = 3;
 const eventById = new Map(ALL_EVENTS.map((e) => [e.id, e]));
 expectCount("chains", CHAINS.length, CHAIN_TARGET, "NPC chains");
@@ -1316,16 +1366,55 @@ for (const quotaKey of barkByQuota.keys()) {
     errors.push(`barks: trigger "${quotaKey}" ships lines with no quota row`);
 }
 
-const emitterSources: string[] = [];
-const walkSources = (dir: string): void => {
-  for (const entry of readdirSync(dir)) {
-    const child = join(dir, entry);
-    if (statSync(child).isDirectory()) walkSources(child);
-    else if (/\.tsx?$/.test(child) && !/\.test\.tsx?$/.test(child))
-      emitterSources.push(child);
+const emitterSources = filesUnder(join("src"), (path) => /\.tsx?$/.test(path) && !/\.test\.tsx?$/.test(path));
+
+const DEF_TIER_READ = /(?:DIE_BY_ID\.get\([^)]*\)\??|\bdef\??)\.tier\b/;
+const DEF_TIER_READERS: ReadonlySet<string> = new Set([
+  "src/components/DieCard.tsx",
+  "src/game/battle/battleHarness.ts",
+  "src/game/dice/card.ts",
+  "src/game/dice/tier.ts",
+  "src/game/effects/context.ts",
+  "src/game/meta/achievements.ts",
+  "src/game/meta/deck.ts",
+  "src/game/puzzles/difficulty.ts",
+  "src/game/puzzles/evaluate.ts",
+  "src/game/puzzles/roll.ts",
+  "src/screens/Collection/CollectionScreen.tsx",
+  "src/screens/Hangar/dieLabel.ts",
+  "src/screens/Puzzle/PuzzleDie.tsx",
+  "src/screens/Puzzle/PuzzleScreen.tsx",
+  "src/services/testApi.ts",
+  "src/stores/battleStore.ts",
+]);
+for (const file of emitterSources) {
+  const path = file.replace(/\\/g, "/");
+  if (DEF_TIER_READERS.has(path)) continue;
+  if (DEF_TIER_READ.test(readFileSync(file, "utf8")))
+    errors.push(
+      `dice: ${path} reads a die definition's tier; a hand die's size is dieTier(die) — use it, or list the file in DEF_TIER_READERS if it only ever sees definitions`,
+    );
+}
+
+const DOM_DIE_ROLL: readonly { name: string; pattern: RegExp }[] = [
+  { name: "rollCheckDice", pattern: /\brollCheckDice\(/ },
+  { name: "rollBaseValue", pattern: /\brollBaseValue\(/ },
+  { name: "DieChip", pattern: /\b(?:const|function|class)\s+DieChip\b/ },
+];
+for (const file of emitterSources) {
+  const path = file.replace(/\\/g, "/");
+  if (!path.startsWith("src/screens/") && !path.startsWith("src/components/")) continue;
+  const text = readFileSync(file, "utf8");
+  for (const roller of DOM_DIE_ROLL) {
+    if (!roller.pattern.test(text)) continue;
+    errors.push(
+      `dice: ${path} rolls or draws a die itself (${roller.name}); a screen shows a roll through DiceRollOverlay and takes the value from game code`,
+    );
   }
-};
-walkSources(join("src"));
+}
+
+const cssSources = filesUnder(join("src"), (path) => path.endsWith(".css"));
+for (const file of cssSources) errors.push(...motionBudgetErrors(file.replace(/\\/g, "/"), readFileSync(file, "utf8")));
 
 const CALL = "emitBark(";
 const argumentTextAt = (text: string, start: number): string => {
@@ -1530,7 +1619,7 @@ const dossierCount = CODEX.filter((e) => e.group === "dossier").length;
 expectCount("codex", dossierCount, DOSSIER_TOTAL, "dossiers");
 
 const MUTATOR_COUNT = 12;
-const CONTRACT_COUNT = 20;
+const CONTRACT_COUNT = 21;
 const MUTATOR_MOD_KEYS = new Set(Object.keys(ZERO_MUTATOR_MODS));
 
 checkUniqueIds(
@@ -1724,7 +1813,7 @@ for (const def of CONTRACTS) {
   }
 }
 
-const ACHIEVEMENT_COUNT = 96;
+const ACHIEVEMENT_COUNT = 103;
 const ACHIEVEMENT_GATES = 8;
 const ACHIEVEMENT_FLAG_READERS = 6;
 const ACHIEVEMENT_FAMILY_TARGET = 20;
@@ -1931,7 +2020,8 @@ for (const def of UNLOCKS) {
   if (def.cosmetic !== undefined) {
     const known =
       DIE_SKINS.some((skin) => skin.cosmetic === def.cosmetic) ||
-      THEMES.some((theme) => theme.unlock === def.cosmetic);
+      THEMES.some((theme) => theme.unlock === def.cosmetic) ||
+      BRIDGE_FRAMES.some((frame) => frame.cosmetic === def.cosmetic);
     if (!known)
       errors.push(`unlocks: "${def.id}" grants unknown cosmetic "${def.cosmetic}"`);
   }
@@ -2308,7 +2398,7 @@ const REVISION_3_TOTALS: readonly TotalsRow[] = [
   { label: "perks", have: ALL_PERKS.length, target: 180 },
   { label: "modules", have: ALL_MODULES.length, target: 60 },
   { label: "engravings", have: ENGRAVINGS.length, target: 50 },
-  { label: "events", have: ALL_EVENTS.length, target: 170 },
+  { label: "events", have: ALL_EVENTS.length, target: EVENT_TOTAL },
   { label: "callbacks", have: callbackCount, target: CALLBACK_TARGET },
   { label: "puzzles", have: PUZZLES.length, target: 60 },
   { label: "chart", have: CHART_NODES.length, target: 240 },
@@ -2403,6 +2493,20 @@ for (const row of REVISION_3_TOTALS) {
     `  ${row.label.padEnd(13)} ${String(row.have).padStart(4)}/${String(row.target).padEnd(4)} ${mark}`,
   );
 }
+
+console.log("lint:content: event corpus");
+console.log(
+  `  ${String(corpus.events)} events · ${String(corpus.options)} options (${(corpus.options / Math.max(1, corpus.events)).toFixed(2)} per event) · ${String(corpus.outcomes)} outcomes · ${String(corpus.singleOutcomeOptions)} single-outcome options · ${String(corpus.dialogueEvents)} with dialogue`,
+);
+console.log(
+  `  pools ${corpus.pools.map((pool) => `S${String(pool.sector)} ${String(pool.pool)}/${String(pool.need)}`).join(" · ")}`,
+);
+console.log(
+  `  motion audit: ${String(motionAudit.open.length)} open · ${String(motionAudit.allowed)} allowlisted`,
+);
+console.log(
+  `  elite stars: ${eliteReach.map((reach) => `${reach.contract} ${String(reach.n)} on ${String(reach.reached)}/${String(reach.seeds)}`).join(" · ")}`,
+);
 
 console.log("lint:content: bark census");
 console.log(

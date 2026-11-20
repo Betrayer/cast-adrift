@@ -1,11 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { TapPopover } from '@/components/TapPopover';
 import { isSlotBlocked, isSlotShrunk } from '@/game/battle/setup';
-import {
-  evasionTuningFor,
-  INTERCEPT_VALUE,
-  VULNERABLE_CAP,
-} from '@/game/battle/resolver';
+import { factVars, systemFact } from '@/game/battle/systemFacts';
 import { goalSlotsNow, type SlotProjection } from '@/game/battle/view';
 import type { BattleState } from '@/stores/battleStore';
 import type { ShipId } from '@/data/ships';
@@ -22,15 +18,9 @@ export const FORMULA_SLOTS: Partial<Record<SlotId, 'manoeuvre' | 'targeting'>> =
   sensors: 'targeting',
 };
 
-export const manoeuvreVars = (shipId: ShipId | undefined) => {
-  const tuning = evasionTuningFor(shipId);
-  return {
-    dodge: tuning.dodgePerValue,
-    glancing: tuning.glancingPerValue,
-    dodgeCap: tuning.dodgeCap,
-    glancingCap: tuning.glancingCap,
-    intercept: INTERCEPT_VALUE,
-  };
+const formulaBrief = (kind: 'manoeuvre' | 'targeting'): string => {
+  const fact = systemFact(kind);
+  return fact.brief ?? fact.text;
 };
 
 export const SlotFormula = ({
@@ -53,9 +43,7 @@ export const SlotFormula = ({
         <>
           <b>{t(`battle:${kind}Title`)}</b>
           <br />
-          {kind === 'manoeuvre'
-            ? t('battle:manoeuvreBrief', manoeuvreVars(shipId))
-            : t('battle:targetingBrief', { cap: VULNERABLE_CAP })}
+          {t(formulaBrief(kind), factVars(kind, { shipId }))}
         </>
       }
     >

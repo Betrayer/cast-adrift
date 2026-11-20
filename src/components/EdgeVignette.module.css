@@ -43,7 +43,7 @@
 
 .rim[data-on='1'] {
   opacity: calc(var(--vg-rim-alpha, 0.18) * var(--vg-scale, 1));
-  transition: opacity 320ms ease-out;
+  transition: opacity 320ms var(--ca-ease-out);
 }
 
 .rim[data-vignette-rim='lowHull'][data-on='1'] {
@@ -101,7 +101,7 @@
 }
 
 .flash[data-vignette-flash] {
-  animation: vgFlash var(--vg-ms, 400ms) var(--vg-ease, ease-out) both;
+  animation: vgFlash var(--vg-ms, 400ms) var(--vg-ease, var(--ca-ease-out)) both;
 }
 
 .flash[data-vignette-flash='shieldBreak'] {

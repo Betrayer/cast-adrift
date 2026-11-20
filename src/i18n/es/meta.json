@@ -7,7 +7,8 @@
     "yellow": "Amarillo",
     "black": "Negro",
     "grey": "Gris",
-    "prismatic": "Prismático"
+    "prismatic": "Prismático",
+    "nexus": "Nexo"
   },
   "chart": {
     "title": "Carta estelar",
@@ -53,21 +54,14 @@
     "keySingleCast": "Reparto único",
     "redSpotter": "Observador",
     "redFirestorm": "Tormenta de fuego",
-    "redSpine": "Columna vertebral",
     "blueBarrier": "Barrera",
     "blueJammer": "Inhibidor",
-    "blueTideBreak": "Tidebreak",
     "greenCanopy": "Dosel",
-    "greenPerennial": "Planta perenne",
     "yellowTally": "Recuento",
-    "yellowBounty": "Recompensa",
     "blackVent": "Ventilación",
-    "blackWell": "Bueno",
     "greyToolkit": "Conjunto de herramientas",
-    "greyLedger": "Libro mayor",
     "prismLattice": "Lattice",
     "prismFacet": "Faceta",
-    "prismWell": "Pozo Prism",
     "hubEngineering": "Bahía de la Ingeniería",
     "keyStormChaser": "Cazador de tormentas",
     "keyIronDoctrine": "La doctrina de hierro",
@@ -82,36 +76,55 @@
     "respecConfirmTitle": "¿Quieres devolver este nodo?",
     "respecConfirmBody": "«{{name}}» vuelve al pozo y se recuperan {{points}} punto(s). Coste: {{cost}}◈.",
     "respecConfirmYes": "Reembolso",
-    "redPowderRoom": "Aseo de invitados",
-    "redRangeCard": "Ficha de alcance",
-    "redHairTrigger": "Gatillo sensible",
-    "redCoreBreach": "Brecha en el núcleo",
-    "blueStormAnchor": "Ancla para tormentas",
-    "blueSpillway": "Aliviadero",
-    "blueLongLens": "Objetivo de gran alcance",
-    "blueKeelPlate": "Placa de quilla",
-    "greenGraftBench": "Banco de injertos",
-    "greenSapline": "Sapline",
-    "greenLoam": "Tierra franca",
-    "greenHollow": "El Hueco",
-    "yellowTollhouse": "Tollhouse",
-    "yellowFinderFee": "Comisión de intermediación",
-    "yellowShortWeight": "Peso inferior al normal",
-    "yellowMintMark": "Marca de ceca",
-    "blackAshBed": "Cama de ceniza",
-    "blackDeadMansSwitch": "El interruptor de emergencia",
-    "blackTithe": "El diezmo",
-    "blackSlagHeap": "Montón de escoria",
-    "greyShimStack": "Pila de cuñas",
-    "greyPatternBook": "Libro de patrones",
-    "greyBallastTrim": "Ajuste del lastre",
-    "greyTallyStick": "Palo de conteo",
     "cost": "Coste {{n}}",
     "repriced": "Los precios de los nodos han cambiado: tu selección cuesta ahora {{spent}} de {{total}} puntos. No se ha quitado nada: una reasignación completa es gratis.",
     "freeRespec": "Reasignación gratis",
     "freeRespecTitle": "¿Vaciar toda la carta?",
     "freeRespecBody": "Los {{n}} nodos asignados vuelven al pozo y se recuperan todos los puntos. Este reinicio es gratuito.",
-    "freeRespecYes": "Vaciar"
+    "freeRespecYes": "Vaciar",
+    "redCorona": "Corona",
+    "redCinderFrost": "Escarcha de ceniza",
+    "blueTidalWall": "Muro de marea",
+    "bluePermafrost": "Permafrost",
+    "greenHoarfrost": "Flor de escarcha",
+    "greenGoldenGrove": "Arboleda dorada",
+    "yellowHarvest": "Cosecha",
+    "yellowLoadedDice": "Dados cargados",
+    "blackGamblersVoid": "Vacío del jugador",
+    "blackNullForge": "Forja nula",
+    "greyBallast": "Lastre",
+    "greyFacetGrinder": "Tallador de facetas",
+    "prismRefraction": "Refracción",
+    "prismSolarWind": "Viento solar",
+    "nexusSteamLance": "Lanza de vapor",
+    "nexusFrostbloom": "Flor de escarcha",
+    "nexusGoldenCanopy": "Dosel dorado",
+    "nexusHouseEdge": "Ventaja de la casa",
+    "nexusNullAnvil": "Yunque nulo",
+    "nexusFacetEngine": "Motor de facetas",
+    "nexusNova": "Nova",
+    "resetAll": "Borrar todo",
+    "resetTitle": "¿Borrar todo el mapa?",
+    "resetBody": "{{n}} nodos vuelven como puntos. El núcleo se queda. Cuesta {{price}} fragmentos.",
+    "resetBodyFree": "{{n}} nodos vuelven como puntos. El núcleo se queda. Este es gratis.",
+    "resetYes": "Borrar por {{price}}",
+    "requiresPoints": "Requiere {{n}} puntos en {{school}}",
+    "requiresMet": "{{n}} en {{school}} — cumplido",
+    "scaledBy": "Escala con {{school}}: {{steps}} de 5 pasos ({{points}} puntos invertidos)",
+    "layout": "Vista de la carta",
+    "search": "Buscar nodos",
+    "searchClear": "Borrar la búsqueda",
+    "available": "Disponibles ahora",
+    "filterKind": "Tipo",
+    "filterTags": "Etiquetas",
+    "kind": {
+      "small": "Pequeño",
+      "gate": "Puerta",
+      "notable": "Notable",
+      "confluence": "Confluencia",
+      "nexus": "Nexo",
+      "keystone": "Piedra angular"
+    }
   },
   "chartFx": {
     "hubBudget": "+1 presupuesto para hangares",
@@ -137,87 +150,117 @@
       "freeShopRerolls": "{{n}} repetición gratuita del contador",
       "xpMultPct": "{{n}} % de XP",
       "tideEffectDelta": "{{n}} ante la fuerza de la marea",
-      "moduleSlotDelta": "{{n}} compartimento para módulos"
+      "moduleSlotDelta": "{{n}} compartimento para módulos",
+      "shieldKeepPct": "{{n}} % del escudo sobrevive al turno enemigo",
+      "resonanceCountDelta": "{{n}} a la resonancia de la escuela dominante",
+      "firstHitReducePct": "Primer impacto de élite, minijefe o jefe: {{n}} % más débil"
     },
     "fx": {
-      "weaponsMaxFace": "Armas +1 al tirar un dado de cara máxima",
-      "redFirstTurn": "Dado rojo +1 en el turno 1",
-      "shieldsHigh": "+1 escudo cuando el resultado de la tirada de escudo sea 6+",
-      "shieldsFlat": "+1 escudo por cada resolución de «Escudos»",
-      "minFaceScrap": "+2 a la tirada de un dado de cara mínima",
+      "weaponsMaxFace": "Armas +{{n}} al tirar un dado de cara máxima",
+      "redFirstTurn": "Dado rojo +{{n}} en el turno 1",
+      "shieldsHigh": "+{{n}} escudo cuando el resultado de la tirada de escudo sea 6+",
+      "shieldsFlat": "+{{n}} escudo por cada resolución de «Escudos»",
+      "minFaceScrap": "+{{n}} a la tirada de un dado de cara mínima",
       "weaponsLowHull": "Las armas obtienen un +1 mientras el casco esté por debajo del 50 %",
       "sensorsBonus": "Sensores +1",
       "redSalvo": "Armas +3 en el turno 1",
       "blueGlacier": "+2 de escudo por cada resolución de «Escudos»",
       "blackEdge": "Todos los dados +2 mientras el casco esté en estado crítico",
-      "allDice1": "Todos los dados +1",
-      "weaponsBurn": "El valor máximo de «face» en las armas añade «Burn 1»",
-      "enginesBonus": "+1 en motores",
-      "reactorBonus": "+1 en el reactor",
+      "weaponsBurn": "El valor máximo de «face» en las armas añade «Burn {{n}}»",
+      "enginesBonus": "+{{n}} en motores",
+      "reactorBonus": "+{{n}} en el reactor",
       "greenHeal": "La cara «Max» de un dado verde cura 1",
       "repeatCharge": "Un valor repetido almacena 1 carga",
-      "maxFaceScrap": "Cualquier cara máxima da 2 chatarra",
+      "maxFaceScrap": "Cualquier cara máxima da {{n}} chatarra",
       "minFaceCharge": "Cualquier cara «min» almacena 1 carga",
       "firstTurnAll": "+1 a cada dado en el primer turno",
       "redFirestorm": "El valor máximo de «face» en las armas añade «Burn 3»",
-      "redSpine": "+4 en la montura espinal",
+      "redSpine": "+{{n}} en la montura espinal",
       "greenCanopy": "+3 en motores",
-      "blackWell": "El reactor tiene capacidad para 2 cargas más.",
-      "shopArrival": "+6 de chatarra al llegar a un mercado",
-      "tideWard": "Repara 1 punto de casco en cada salto mientras la marea sea 2+",
+      "blackWell": "El reactor tiene capacidad para {{n}} cargas más.",
+      "shopArrival": "+{{n}} de chatarra al llegar a un mercado",
+      "tideWard": "Repara {{n}} punto de casco en cada salto mientras la marea sea 2+",
       "detourScout": "+12 de chatarra al entrar en un desvío",
-      "redFinisher": "+2 al daño de las armas contra un objetivo con menos del 30 % de casco.",
-      "redSwarmFire": "+1 en armas mientras haya dos o más enemigos en pie.",
-      "redBurnBite": "Un impacto de arma contra un objetivo en llamas inflige 2 puntos de daño adicionales.",
+      "redFinisher": "+{{n}} al daño de las armas contra un objetivo con menos del 30 % de casco.",
+      "redSwarmFire": "+{{n}} en armas mientras haya dos o más enemigos en pie.",
+      "redBurnBite": "Un impacto de arma contra un objetivo en llamas inflige {{n}} puntos de daño adicionales.",
       "redRepeatCrit": "Un dado de arma que repite el último valor en los golpes críticos.",
-      "redSalvoTally": "A partir del tercer dado de arma de una batalla, +1 en armas.",
-      "redOpener": "El primer dado de arma del turno obtiene +2.",
-      "redRiskCharge": "Por debajo del 40 % de la vida del casco, termina cada turno con 1 carga.",
-      "redPowderRoom": "Cada impacto en un objetivo en llamas le inflige otra quemadura.",
+      "redSalvoTally": "A partir del tercer dado de arma de una batalla, +{{n}} en armas.",
+      "redOpener": "El primer dado de arma del turno obtiene +{{n}}.",
+      "redRiskCharge": "Por debajo del 40 % de la vida del casco, termina cada turno con {{n}} carga.",
+      "redPowderRoom": "Cada impacto en un objetivo en llamas le inflige Quemadura {{n}}.",
       "redHairTrigger": "El primer dado de arma del turno resulta un crítico.",
-      "redCoreBreach": "+3 en cualquier tirada contra un objetivo con menos del 25 % de casco.",
+      "redCoreBreach": "+{{n}} en cualquier tirada contra un objetivo con menos del 25 % de casco.",
       "blueOvershield": "Con 6 de escudo, una tirada de escudo suma 2 más.",
-      "blueStillness": "Un dado azul en los escudos obtiene +1.",
+      "blueStillness": "Un dado azul en los escudos obtiene +{{n}}.",
       "blueDeepGuard": "Mantén 4 de escudo durante el turno del enemigo para curarte 1.",
       "blueJamOnLow": "Si la tirada de un sensor es inferior a 4, se considera un 5.",
       "blueWatch": "Un dado azul que haya caído con la cara de menor valor se vuelve a lanzar una vez.",
       "blueBreakwater": "Empieza cada batalla con 3 de escudo.",
       "blueSpillway": "Una tirada de 8 o más en la tirada de escudos añade 3 puntos de escudo.",
-      "blueLongLens": "+2 en sensores.",
+      "blueLongLens": "+{{n}} en sensores.",
       "greenGrowOnEngines": "El número de caras máximas de un motor aumenta hasta +2.",
       "greenTendril": "Si se obtiene un 6 o más con un dado verde, la tirada aumenta hasta +3.",
       "greenMend": "Si terminas un turno con más del 30 % de vida del casco, recuperas 1 punto de vida.",
-      "greenRootHold": "+2 en los motores situados por debajo de la mitad del casco.",
+      "greenRootHold": "+{{n}} en los motores situados por debajo de la mitad del casco.",
       "greenSpore": "Una batalla ganada cura 2.",
       "greenQuietBerth": "Al llegar a un astillero, recuperas 2 puntos de vida.",
       "greenSapline": "Si terminas un turno con 4 de escudo, te curas 2.",
       "greenLoam": "El número de caras máximas de un motor aumenta hasta +3.",
-      "yellowTollBooth": "Al llegar a un encuentro se obtienen 8 chatarra.",
-      "yellowKickback": "Un dado amarillo da 2 chatarra cuando se resuelve.",
-      "yellowLuckyOpen": "El primer dado del turno, si sale su cara de mayor valor, da 6 chatarra.",
-      "yellowGleaner": "Un dado amarillo que caiga con la cara de menor valor da 4 chatarra.",
-      "yellowWager": "Si sale un dado en cualquiera de las dos caras extremas, se ganan 3 chatarra.",
-      "yellowTollhouse": "Al llegar a un mostrador, se obtienen 14 chatarra.",
-      "yellowMintMark": "Un troquel de reactor da 4 de chatarra.",
-      "blackBleedCharge": "+1 en los dados negros cuando el casco está por debajo del 60 %.",
+      "yellowTollBooth": "Al llegar a un encuentro se obtienen {{n}} chatarra.",
+      "yellowKickback": "Un dado amarillo da {{n}} chatarra cuando se resuelve.",
+      "yellowLuckyOpen": "El primer dado del turno, si sale su cara de mayor valor, da {{n}} chatarra.",
+      "yellowGleaner": "Un dado amarillo que caiga con la cara de menor valor da {{n}} chatarra.",
+      "yellowWager": "Si sale un dado en cualquiera de las dos caras extremas, se ganan {{n}} chatarra.",
+      "yellowTollhouse": "Al llegar a un mostrador, se obtienen {{n}} chatarra.",
+      "yellowMintMark": "Un troquel de reactor da {{n}} de chatarra.",
+      "blackBleedCharge": "+{{n}} en los dados negros cuando el casco está por debajo del 60 %.",
       "blackOvercap": "Los dados negros pueden superar el límite de una ranura para 2 de casco.",
-      "blackPactTithe": "Empieza cada batalla con 2 de carga y −2 de casco.",
-      "blackLastLight": "+2 en cada tirada cuando el casco esté por debajo del 25 %.",
-      "blackReactorTally": "A partir del momento en que el segundo reactor se apague, termina el turno con 1 carga.",
-      "blackSpite": "Por debajo de la mitad de los puntos de vida, el turno del enemigo termina con 1 carga.",
-      "blackNightWatch": "Un dado negro que salga en su cara de máximo valor otorga 1 carga.",
-      "blackAshBed": "Un dado en su cara de menor valor otorga 2 de carga.",
-      "blackDeadMansSwitch": "Si la vida del casco es inferior al 25 %, termina cada turno con 3 de carga.",
-      "blackSlagHeap": "+3 en el reactor mientras se mantienen 4 cargas.",
-      "greyScan": "Un empujoncito extra en cada tirada.",
-      "greyEvenKeel": "+1 para los dados grises.",
-      "greyCounterweight": "Un dado que no sea gris y esté en su cara más baja obtiene +1.",
-      "greyToolbelt": "Un uso adicional de la repetición de tirada por combate.",
-      "greySpare": "Una plaza de reserva adicional por batalla.",
-      "greyMirror": "Un dado gris que repite el último valor aumenta la repetición de la tirada en 1.",
-      "greyLedgerKeep": "Al acercarse a un mostrador se pagan 10 chatarra.",
-      "greyPatternBook": "Si un dado repite el último valor, se obtiene una tirada adicional.",
-      "greyTallyStick": "A partir del segundo dado de sensores, +2 en cada tirada."
+      "blackPactTithe": "Empieza cada batalla con {{n}} de carga y −{{m}} de casco.",
+      "blackLastLight": "+{{n}} en cada tirada cuando el casco esté por debajo del 25 %.",
+      "blackReactorTally": "A partir del momento en que el segundo reactor se apague, termina el turno con {{n}} carga.",
+      "blackSpite": "Por debajo de la mitad de los puntos de vida, el turno del enemigo termina con {{n}} carga.",
+      "blackNightWatch": "Un dado negro que salga en su cara de máximo valor otorga {{n}} carga.",
+      "blackAshBed": "Un dado en su cara de menor valor otorga {{n}} de carga.",
+      "blackDeadMansSwitch": "Si la vida del casco es inferior al 25 %, termina cada turno con {{n}} de carga.",
+      "blackSlagHeap": "+{{n}} en el reactor mientras se mantienen 4 cargas.",
+      "greyScan": "Empujoncitos por tirada: +{{n}}.",
+      "greyEvenKeel": "+{{n}} para los dados grises.",
+      "greyCounterweight": "Un dado que no sea gris y esté en su cara más baja obtiene +{{n}}.",
+      "greyToolbelt": "Usos de repetición de tirada por combate: +{{n}}.",
+      "greySpare": "+{{n}} plaza de reserva por batalla.",
+      "greyMirror": "Un dado gris que repite el último valor aumenta la repetición de la tirada en {{n}}.",
+      "greyLedgerKeep": "Al acercarse a un mostrador se pagan {{n}} chatarra.",
+      "greyPatternBook": "Si un dado repite el último valor, suma {{n}} a tus repeticiones de tirada.",
+      "greyTallyStick": "A partir del segundo dado de sensores, +{{n}} en cada tirada.",
+      "prismWildEdge": "Un dado prismático recibe +{{n}} en cualquier ranura.",
+      "prismCarry": "Un dado prismático que se resuelve otorga +2 al siguiente dado prismático.",
+      "prismDichroic": "Un dado prismático toma el color de la ranura: +{{n}} de escudo en escudos y {{m}} de quemadura en armas.",
+      "prismOvercap": "Los dados prismáticos pueden superar el límite de una ranura por 1 de casco.",
+      "prismKindling": "Dos prismáticos en el censo: cada batalla empieza con {{n}} de carga.",
+      "prismDeepWell": "Cuatro prismáticos en el censo: cada turno termina con {{n}} de carga y cura {{m}}.",
+      "prismOpenHand": "El primer dado del turno, sea cual sea su color, recibe +{{n}}.",
+      "prismDividend": "Dos prismáticos en el censo: una batalla ganada paga {{n}} de chatarra y cura {{m}}.",
+      "redCinderFrost": "Armas +1 mientras haya escudo · por cada 5 puntos en Azul",
+      "blueTidalWall": "+1 de escudo cada vez que se resuelve un arma · por cada 5 puntos en Rojo",
+      "greenHoarfrost": "Cura 1 al final del turno mientras haya escudo · por cada 5 puntos en Azul",
+      "greenGoldenGrove": "Las tres primeras caras máximas verdes de una batalla dan 1 chatarra · por cada 5 puntos en Amarillo",
+      "yellowLoadedDice": "Un dado negro en su cara de menor valor obtiene +1 · por cada 5 puntos en Negro",
+      "blackGamblersVoid": "Las dos primeras caras máximas negras de una batalla reparan 1 de casco · por cada 5 puntos en Amarillo",
+      "blackNullForge": "Un dado gris en el reactor otorga 1 de carga · por cada 5 puntos en Gris",
+      "greyFacetGrinder": "A partir del tercer dado gris de una batalla, los dados grises obtienen +1 · por cada 5 puntos en Prismático",
+      "prismSolarWind": "El primer dado de arma del turno obtiene +1 · por cada 5 puntos en Rojo",
+      "stormSurge": "Armas +1 por cada nivel que haya subido la marea, hasta +3.",
+      "coldLogicMaxDie": "Al inicio de la batalla, el dado más bajo se coloca en su cara máxima.",
+      "greySingleCast": "Dados grises +1; el resto de dados +1 mientras haya tres o más dados grises a bordo.",
+      "prismCascade": "Con tres dados prismáticos a bordo, cualquier dado encaja en cualquier ranura sin coste de casco.",
+      "nexusSteamLance": "A partir del segundo dado de escudos de una batalla, +2 en armas.",
+      "nexusFrostbloom": "Termina un turno con 3 · 7 · 12 de escudo para curarte 1 · 2 · 3.",
+      "nexusGoldenCanopy": "Cada uno de los cinco primeros dados verdes de una batalla cura 1 y da 3 chatarra.",
+      "nexusHouseEdge": "Empujoncitos gratis por tirada: +{{n}} · los dados negros pueden superar el límite de una ranura por 2 de casco.",
+      "nexusNullAnvil": "Los dados grises pueden superar el límite de una ranura sin coste.",
+      "nexusFacetEngine": "Cada tercer dado gris que colocas se vuelve prismático.",
+      "nexusNova": "Con dos prismáticos en el censo, un impacto de arma salpica 4 a cada otro enemigo."
     },
     "trait": {
       "obsidianPact": "Los dados negros solo dan el mínimo o el máximo.",
@@ -225,7 +268,12 @@
       "coldLogic": "Los empujones son gratis · los golpes críticos están desactivados",
       "overflowShield": "La carga que supere el límite máximo se convierte en escudo.",
       "fateTwice": "La ficha de «Destino» se puede jugar dos veces por batalla.",
-      "prismDouble": "Los dados prismáticos cuentan doble para la resonancia."
+      "prismDouble": "Los dados prismáticos cuentan doble para la resonancia.",
+      "overflowCharge": "Un dado colocado por encima del límite de la ranura almacena 1 de carga.",
+      "houseEdge": "Un dado negro en su cara máxima supera el límite sin coste de casco.",
+      "greyIsBlack": "Los dados grises cuentan como negros.",
+      "facetEngine": "Cada tercer dado gris colocado en una batalla se vuelve prismático.",
+      "novaSplash": "Con dos dados prismáticos en la mesa, el primer disparo del turno inflige 4 a todos los demás enemigos."
     },
     "budgetDelta": "{{n}} punto de hangar",
     "slotTier": "{{slot}}: {{n}} cambio de tamaño de troquel"
@@ -236,15 +284,14 @@
     "shipArk": "Arca desbloqueada",
     "engraving": "Grabado estación abierta",
     "dailyPreview": "Ya se puede ver el «Daily» de mañana",
-    "respecPrestige": "Reasignación de puntos gratuita + skin de prestigio",
+    "respecPrestige": "Reinicio de la carta a mitad de precio + piel de prestigio",
     "diceWave": "Dados Fusion en la estantería",
     "contractWave": "Apertura de la ola de contratos",
-    "chartPoints": "Dos puntos de «Carta estelar»"
+    "chartPoints": "Bonificación: +{{n}} puntos de Carta estelar"
   },
   "levelup": {
     "level": "Nivel de capitán {{level}}",
-    "point": "+1 punto de «Carta estelar»",
-    "points": "+{{n}} Carta estelar puntos",
+    "points": "+{{n}} puntos de Carta estelar",
     "continue": "Continuar"
   },
   "summary": {
@@ -276,7 +323,7 @@
     "save": "Guardar baraja",
     "saved": "Guardado",
     "invalidOver": "Por encima del presupuesto",
-    "invalidCap": "Máximo 9 dados",
+    "invalidCap": "Máximo {{n}} dados",
     "invalidMin": "Al menos 3 dados",
     "invalidFate": "Máximo 1 dado de destino",
     "valid": "Listo",
@@ -285,7 +332,18 @@
     "shipEquipped": "Equipado",
     "shipBuy": "Comprar · {{price}}◈",
     "shipLocked": "Desbloqueos: {{route}}",
-    "filterAll": "Todos"
+    "filterAll": "Todos",
+    "mastery": {
+      "rank": "Maestría {{rank}}",
+      "next": "{{xp}} / {{next}} XP hasta el rango {{rank}}",
+      "max": "Maestría completa",
+      "title": "Bonos de maestría",
+      "hull": "+{{n}} de casco",
+      "reserve": "+{{n}} de reserva",
+      "mk": "Primera mejora Mk -{{n}} %",
+      "hit": "Primer impacto de élite, minijefe o jefe por combate -{{n}} %",
+      "passive": "Pasiva II: {{name}}"
+    }
   },
   "collection": {
     "title": "Colección",
@@ -335,7 +393,9 @@
     "guardBody": "Hay una ranura de partida. Al iniciar este modo, se borra la partida actual, tanto localmente como en la nube.",
     "guardYes": "Borrar e iniciar",
     "dailyPreview": "Mañana ({{date}})",
-    "dailyPreviewLocked": "Los mutadores de mañana en el nivel{{n}}"
+    "dailyPreviewLocked": "Los mutadores de mañana en el nivel{{n}}",
+    "driftAscension": "Ascensión para esta deriva",
+    "driftScoreMult": "Puntuación ×{{mult}}"
   },
   "contracts": {
     "title": "Contratos",
@@ -383,7 +443,8 @@
     "submitSent": "Presentado a la junta directiva",
     "submitFailed": "Error al enviar: la puntuación se guarda localmente",
     "submitOffline": "Sin conexión: la partida se guarda localmente",
-    "toBoard": "Abre el tablero"
+    "toBoard": "Abre el tablero",
+    "ascension": "Ascensión A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Clasificaciones",
@@ -468,7 +529,8 @@
     "ascendant": "Ascendente",
     "chartwright": "Chartwright",
     "archivist": "Archivero",
-    "answer": "La respuesta"
+    "answer": "La respuesta",
+    "singularity": "Singularidad"
   },
   "unlock": {
     "opened": "Desbloqueado",
@@ -494,7 +556,7 @@
     "contractsL5": "Tres contratos: «Storm», «Bare Armor» y «Blind Jump»",
     "contractsL12": "Tres contratos: Ram, Single Cast y Dead Reckoning",
     "contractsL20": "Tres contratos: Ark, Keeper, Iron Marea",
-    "contractsL28": "Tres contratos: Choir, Prismwork, Ghost Lane",
+    "contractsL28": "Tres contratos: La sombra del Coro, Prismwork, El carril fantasma",
     "contractsA5": "Contrato: El diezmo del vacío",
     "contractsAchGauntlet": "Contrato: «The Gauntlet»",
     "skinAshen": "La piel de Die: Cenicienta",
@@ -507,13 +569,16 @@
     "featureShipArk": "El Arca",
     "featureEngraving": "Grabado estación",
     "featureDailyPreview": "Resumen diario",
-    "featureFreeRespec": "Reasignación gratuita de puntos de habilidad de Keystone",
-    "sectorSix": "Sector 6 «Más allá del núcleo»",
+    "sectorSix": "Sector 6 «Más allá del Núcleo»",
     "diceS6": "Cuatro dados de causalidad",
     "skinThreshold": "La piel de «Threshold»",
     "featureShipCorsair": "El Sabueso está a la venta",
     "featureShipFoundry": "The Forge está a la venta",
-    "featureShipPrism": "El Prism ya está a la venta"
+    "featureShipPrism": "El Prism ya está a la venta",
+    "skinSingularity": "Piel de dado: Singularidad",
+    "contractsA12": "Contrato: Vacío profundo",
+    "frameObsidian": "Marco del puente: Obsidiana",
+    "prestigeThemeTwo": "Tema: Horizonte de sucesos"
   },
   "skin": {
     "title": "Las pieles",
@@ -547,6 +612,10 @@
     "threshold": {
       "name": "Umbral",
       "desc": "Redonda, apagada, con un borde de color gris claro. La llevaba el único capitán que nunca se inclinó."
+    },
+    "singularity": {
+      "name": "Singularidad",
+      "desc": "Vidrio negro, un borde blanco, una luz que se curva en torno al glifo."
     }
   },
   "ach": {
@@ -564,7 +633,7 @@
     },
     "quickWork": {
       "name": "Trabajo rápido",
-      "desc": "Supera una campaña en 11 saltos o menos."
+      "desc": "Supera una campaña en 85 saltos o menos."
     },
     "frugal": {
       "name": "Ahorrativo",
@@ -731,8 +800,8 @@
       "desc": "Lleva la historia del Guardián hasta su última página."
     },
     "allChains": {
-      "name": "Cuatro hilos",
-      "desc": "Termina las cuatro historias del reparto."
+      "name": "Todos los hilos",
+      "desc": "Completa todas las historias del reparto."
     },
     "wandererClear": {
       "name": "El camino del Errante",
@@ -765,6 +834,34 @@
     "prismClear": {
       "name": "Refractado",
       "desc": "Supera una campaña pilotando el Prism."
+    },
+    "masterWanderer": {
+      "name": "Maestro: Errante",
+      "desc": "Alcanza la maestría V con la nave Errante."
+    },
+    "masterRam": {
+      "name": "Maestro: Ariete",
+      "desc": "Alcanza la maestría V con la nave Ariete."
+    },
+    "masterArk": {
+      "name": "Maestro: Arca",
+      "desc": "Alcanza la maestría V con la nave Arca."
+    },
+    "masterCorsair": {
+      "name": "Maestro: Sabueso",
+      "desc": "Alcanza la maestría V con la nave Sabueso."
+    },
+    "masterFoundry": {
+      "name": "Maestro: Forja",
+      "desc": "Alcanza la maestría V con la nave Forja."
+    },
+    "masterPrism": {
+      "name": "Maestro: Prisma",
+      "desc": "Alcanza la maestría V con la nave Prisma."
+    },
+    "admiral": {
+      "name": "Almirante",
+      "desc": "Alcanza la maestría V con tres naves."
     }
   },
   "chartTag": {
@@ -808,7 +905,13 @@
       "skinVoidglass": "la piel «Voidglass»",
       "skinEmberglass": "la piel «Emberglass»",
       "prestigeTheme": "tema «Ascendente»",
-      "badge": "la insignia «Ascendant»"
+      "badge": "la insignia «Ascendant»",
+      "scrapBonus": "+5 % de chatarra de los combates por cada nivel por encima de A10",
+      "skinSingularity": "la piel de dado «Singularidad»",
+      "contractA12": "contrato «Vacío profundo»",
+      "frameObsidian": "marco del puente «Obsidiana»",
+      "prestigeThemeTwo": "tema «Horizonte de sucesos»",
+      "badgeSingularity": "la insignia «Singularidad»"
     }
   },
   "voucher": {
@@ -819,5 +922,17 @@
     "shards": "Tomar {{n}} ◈",
     "bank": "En reserva: {{n}} / {{max}}",
     "full": "Tu reserva de vales está llena ({{max}}). Llévate los fragmentos."
+  },
+  "frame": {
+    "title": "Marco del puente",
+    "hint": "Solo estético. Un marco nunca cambia una nave.",
+    "hull": {
+      "name": "Marco propio del casco",
+      "desc": "Cada casco lleva el marco con el que fue construido."
+    },
+    "obsidian": {
+      "name": "Obsidiana",
+      "desc": "Vidrio volcánico negro, ribeteado por una fría línea blanca."
+    }
   }
 }

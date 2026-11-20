@@ -1,13 +1,23 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { applyTheme } from "@/app/theme";
+import { TYPEWRITER_CAP_MS, typewriterMs } from "@/components/Typewriter";
+import { ALL_EVENTS } from "@/data/events";
+import { schools } from "@/data/schools";
+import { speakerTone } from "@/data/speakers";
+import { DEFAULT_THEME_ID } from "@/data/themes";
 import { applyOutcome } from "@/game/events/apply";
 import { createStream } from "@/services/rng";
 import { createInitialRunValues, useRunStore } from "@/stores/runStore";
 import type { ForcedBattle, Outcome } from "@/types/events";
+import { checkDismissGuard } from "./CheckModal";
 import {
-  checkDismissGuard,
-  eventExit,
-  resolveEventForNode,
-} from "./EventScreen";
+  DIALOGUE_GAP_MS,
+  DIALOGUE_LEAD_MS,
+  dialogueLineDelays,
+  dialogueTone,
+  dialogueTypesIn,
+} from "./EventDialogue";
+import { eventExit, resolveEventForNode } from "./resolveEvent";
 
 const NODE = "s2:r3:l2";
 
@@ -59,6 +69,73 @@ describe("checkDismissGuard", () => {
     expect(guard.closeOnClickOutside).toBe(false);
     guard.onClose();
     expect(cancel).not.toHaveBeenCalled();
+  });
+});
+
+describe("event dialogue", () => {
+  const scripted = ALL_EVENTS.filter(
+    (event) => event.dialogue !== undefined && event.dialogue.length > 0,
+  );
+
+  it("is authored on the corpus the screen renders", () => {
+    expect(scripted.length).toBeGreaterThan(0);
+  });
+
+  it("chains the lines, each one starting after the last has typed", () => {
+    const texts = ["short", "a much longer second line of dialogue", "x".repeat(400)];
+    const delays = dialogueLineDelays(texts);
+    expect(delays[0]).toBe(DIALOGUE_LEAD_MS);
+    expect(delays[1]).toBe(DIALOGUE_LEAD_MS + typewriterMs("short") + DIALOGUE_GAP_MS);
+    expect(delays[2]).toBe(
+      (delays[1] ?? 0) + typewriterMs(texts[1] ?? "") + DIALOGUE_GAP_MS,
+    );
+  });
+
+  it("caps every line so four long lines stay a short scene", () => {
+    const texts = Array.from({ length: 4 }, () => "y".repeat(500));
+    const delays = dialogueLineDelays(texts);
+    const end = (delays[3] ?? 0) + typewriterMs(texts[3] ?? "");
+    expect(typewriterMs(texts[0] ?? "")).toBe(TYPEWRITER_CAP_MS);
+    expect(end).toBe(DIALOGUE_LEAD_MS + 4 * TYPEWRITER_CAP_MS + 3 * DIALOGUE_GAP_MS);
+  });
+
+  it("types in on the first visit only", () => {
+    expect(dialogueTypesIn(null)).toBe(true);
+    expect(
+      dialogueTypesIn({ eventId: "wardenInspector", outcomeText: null, follow: null }),
+    ).toBe(false);
+    expect(
+      dialogueTypesIn({
+        eventId: "wardenInspector",
+        outcomeText: "content:events.wardenInspector.out.declare",
+        follow: null,
+      }),
+    ).toBe(false);
+  });
+
+  it("gives every authored voice a tone", () => {
+    for (const event of scripted) {
+      for (const line of event.dialogue ?? []) {
+        expect(dialogueTone(line.who), `${event.id}:${line.who}`).toMatch(/\S/);
+        if (line.who !== "echo" && line.who !== "narration") {
+          expect(dialogueTone(line.who)).toBe(speakerTone(line.who));
+        }
+      }
+    }
+  });
+});
+
+describe("speaker ink", () => {
+  afterEach(() => {
+    applyTheme(DEFAULT_THEME_ID);
+  });
+
+  it("follows a theme chosen after the speaker table loaded", () => {
+    const before = dialogueTone("mara");
+    applyTheme("terminal");
+    expect(dialogueTone("mara")).not.toBe(before);
+    expect(dialogueTone("mara")).toBe(schools.yellow.text);
+    expect(speakerTone("ines")).toBe(schools.black.stroke);
   });
 });
 

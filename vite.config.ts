@@ -20,6 +20,12 @@ const VENDOR_CHUNKS: Record<string, readonly string[]> = {
 };
 
 const E2E_MODES: readonly string[] = ['e2e', 'e2e-emu'];
+const NOVOICE_MODE = 'novoice';
+
+const outDirFor = (mode: string): string => {
+  if (E2E_MODES.includes(mode)) return 'dist-e2e';
+  return mode === NOVOICE_MODE ? 'dist-novoice' : 'dist';
+};
 
 export default defineConfig(({ mode }) => ({
   plugins: [react()],
@@ -31,6 +37,7 @@ export default defineConfig(({ mode }) => ({
     'import.meta.env.VITE_FB_EMULATOR': JSON.stringify(
       mode === 'e2e-emu' ? '1' : '0',
     ),
+    'import.meta.env.VITE_VOICE': JSON.stringify(mode === NOVOICE_MODE ? '0' : '1'),
   },
   resolve: {
     alias: {
@@ -38,7 +45,7 @@ export default defineConfig(({ mode }) => ({
     },
   },
   build: {
-    outDir: E2E_MODES.includes(mode) ? 'dist-e2e' : 'dist',
+    outDir: outDirFor(mode),
     manifest: true,
     rollupOptions: {
       output: {

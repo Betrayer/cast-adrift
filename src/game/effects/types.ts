@@ -131,7 +131,7 @@ export type Cond =
   | { c: "battleOutcome"; is: BattleOutcome }
   | { c: "nodeIs"; is: NodeKind };
 
-export type EffectTarget = "target" | "self";
+export type EffectTarget = "target" | "self" | "others";
 
 export type DieSelector =
   | { s: "subject" }
@@ -161,7 +161,8 @@ export type Action =
   | { a: "scrap"; n: number; perTag?: ContentTag }
   | { a: "hull"; n: number; perTag?: ContentTag }
   | { a: "modDieValue"; n: number; sel?: DieSelector }
-  | { a: "setDieValue"; n: number; sel?: DieSelector }
+  | { a: "setDieValue"; n?: number; max?: boolean; sel?: DieSelector }
+  | { a: "setDieSchool"; school: School; sel?: DieSelector }
   | { a: "rerollDie"; sel?: DieSelector }
   | { a: "addStatus"; s: StatusKey; n: number; target?: EffectTarget }
   | { a: "primeSchool"; school: School; n?: number; max?: boolean }
@@ -185,6 +186,7 @@ const ACTION_NAME_SET: Record<Action["a"], true> = {
   hull: true,
   modDieValue: true,
   setDieValue: true,
+  setDieSchool: true,
   rerollDie: true,
   addStatus: true,
   primeSchool: true,

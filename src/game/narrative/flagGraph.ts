@@ -10,6 +10,7 @@ import { ENDINGS } from "@/data/narrative/endings";
 import { KEEPER_LINES } from "@/data/narrative/keeperLines";
 import { EPILOGUE_ENTRIES } from "@/data/narrative/epilogue";
 import { SHOP_FLAG_RULES } from "@/game/economy/shop";
+import { allOutcomes, optionRequirements } from "@/game/events/engine";
 
 export interface FlagUse {
   key: string;
@@ -26,12 +27,7 @@ export const writtenFlags = (): Map<string, string[]> => {
   const out = new Map<string, string[]>();
   for (const event of ALL_EVENTS) {
     for (const option of event.options) {
-      const outcomes = [
-        ...(option.outcomes ?? []),
-        ...(option.onPass ?? []),
-        ...(option.onFail ?? []),
-      ];
-      for (const outcome of outcomes) {
+      for (const outcome of allOutcomes(option)) {
         for (const effect of outcome.effects) {
           if (effect.k === "flag") add(out, effect.key, `${event.id}.${option.id}`);
         }
@@ -57,8 +53,8 @@ export const readFlags = (): Map<string, string[]> => {
       add(out, key, `event:${event.id}`);
     }
     for (const option of event.options) {
-      if (option.requires?.req === "flag") {
-        add(out, option.requires.key, `event:${event.id}.${option.id}`);
+      for (const req of optionRequirements(option.requires)) {
+        if (req.req === "flag") add(out, req.key, `event:${event.id}.${option.id}`);
       }
     }
   }

@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { CARGO_IDS, cargoDef } from "@/data/cargo";
 import { ALL_EVENTS } from "@/data/events";
-import { optionMet, type OptionContext } from "@/game/events/engine";
+import { allOutcomes, optionMet, type OptionContext } from "@/game/events/engine";
 import { generateSectorMap } from "@/game/map/generator";
 import { isStationNode } from "@/game/map/reach";
 import { nodeById, type MapGraph, type MapNode } from "@/game/map/types";
@@ -90,11 +90,7 @@ describe("the cargo offer table", () => {
         (option) => option.id !== offer.option.id,
       );
       for (const option of declines) {
-        const outcomes = [
-          ...(option.outcomes ?? []),
-          ...(option.onPass ?? []),
-          ...(option.onFail ?? []),
-        ];
+        const outcomes = allOutcomes(option);
         expect(outcomes.length, `${offer.event.id}.${option.id}`).toBeGreaterThan(
           0,
         );

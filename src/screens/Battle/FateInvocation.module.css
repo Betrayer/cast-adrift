@@ -2,9 +2,9 @@
   position: absolute;
   inset: 0;
   z-index: var(--z-overlay);
-  pointer-events: none;
   background: var(--ca-bg-a86);
-  animation: dim 600ms ease-out forwards;
+  animation: dim 220ms var(--ca-ease-out) both;
+  cursor: pointer;
 }
 
 .orbit {
@@ -13,7 +13,8 @@
   top: 42%;
   width: 0;
   height: 0;
-  animation: spin 600ms linear;
+  pointer-events: none;
+  animation: spin 900ms var(--ca-ease-out) forwards;
 }
 
 .glyph {
@@ -24,36 +25,58 @@
   transform: translate(-50%, -50%);
 }
 
-.still {
+.stage {
   position: absolute;
-  inset: 0;
-  z-index: var(--z-overlay);
-  pointer-events: none;
-  background: var(--ca-bg-a86);
-  opacity: 0.5;
+  left: 50%;
+  top: 42%;
+  width: min(320px, calc(100% - 32px));
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: center;
+}
+
+.result {
+  margin: 0;
+  max-width: 100%;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  color: var(--ca-text);
+  animation: dim 180ms var(--ca-ease-out) both;
+}
+
+.overlay[data-fate-band='catastrophe'] .result,
+.overlay[data-fate-band='setback'] .result {
+  color: var(--ca-danger);
+}
+
+.overlay[data-fate-band='boon'] .result,
+.overlay[data-fate-band='miracle'] .result {
+  color: var(--ca-amber);
 }
 
 @keyframes dim {
-  0% {
+  from {
     opacity: 0;
   }
-  35% {
+  to {
     opacity: 1;
-  }
-  100% {
-    opacity: 0;
   }
 }
 
 @keyframes spin {
   from {
     transform: rotate(0deg);
+    opacity: 1;
   }
   to {
     transform: rotate(340deg);
+    opacity: 0;
   }
 }
 
-:root[data-ca-motion='reduced'] .overlay, :root[data-ca-motion='reduced'] .orbit {
+:root[data-ca-motion='reduced'] .overlay,
+:root[data-ca-motion='reduced'] .result {
   animation: none;
 }

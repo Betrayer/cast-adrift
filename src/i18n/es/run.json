@@ -37,7 +37,7 @@
       "beacon": "Baliza",
       "boss": "Jefe",
       "inverted": "invertido",
-      "hole": "Agujero negro: la mancha se tragó esta celda"
+      "hole": "Agujero negro: este nodo está devorado, fuera de juego"
     },
     "previewNode": "{{type}} · riesgo: {{risk}}",
     "previewPocket": "Desvío: mejor botín, combate más duro",
@@ -48,8 +48,8 @@
     },
     "hull": "Casco {{cur}}/{{max}}",
     "scrap": "Chatarra {{n}}",
-    "previewHole": "El borde responde por toda la mancha: rodéala o cruza el agujero de gusano",
-    "spotLabel": "Agujero negro: toda la mancha es una sola decisión",
+    "previewHole": "La franja corta todos los carriles: rodéala por casco o cruza con la travesía",
+    "spotLabel": "Agujero negro: una franja que cruza todos los carriles; el borde decide cómo pasas",
     "conditions": "Condiciones ×{{n}}",
     "cargo": "Carga ▸{{n}}",
     "cargoMany": "Carga ×{{n}}",
@@ -75,7 +75,7 @@
     "checkHint": "comprueba · {{n}} %",
     "pass": "Éxito — {{total}}",
     "fail": "Error — {{total}}",
-    "roll": "Lanzamiento",
+    "roll": "Tirar",
     "reqAxisMin": "Requiere Axis {{n}} o una versión superior",
     "reqAxisMax": "Requiere la versión {{n}} o inferior de Axis.",
     "checkLowest": "Nada por encima de {{n}}",
@@ -86,7 +86,9 @@
     "beaconTitle": "Baliza",
     "beaconCounter": "Baliza {{n}} de {{max}}",
     "reqCargo": "necesita bodega libre y una estación por delante",
-    "cargoTerms": "{{drawback}} · la entrega paga {{n}}"
+    "cargoTerms": "{{drawback}} · la entrega paga {{n}}",
+    "checkNoDice": "Ningún dado de tu mazo sirve para esta prueba: solo puede fallar.",
+    "shipRankGain": "Rango de nave: +{{n}} hacia el próximo reacondicionamiento."
   },
   "anomaly": {
     "title": "Anomalía",
@@ -207,13 +209,17 @@
     "prologueTitle": "La primera travesía",
     "prologueBody": "Vuelve a reproducir los primeros compases. No se ha iniciado nada, no se ha perdido nada.",
     "prologueReplay": "Repetición",
-    "badgeLegend": "Distintivos de dados"
+    "badgeLegend": "Distintivos de dados",
+    "forge": "Forja",
+    "fusion": "Fusiones",
+    "fusionHint": "Forja dos dados «{{die}}» en un astillero para ver en qué se convierten"
   },
   "rewards": {
-    "dieTitle": "Matriz recuperada",
-    "keep": "Dejar en la baraja",
+    "dieTitle": "Dado recuperado",
+    "keep": "Quedármelo en la mano",
     "sell": "Vender (+{{n}})",
-    "replace": "Sustituir un troquel"
+    "replace": "Sustituir un dado",
+    "owned": "Ya en la mano ×{{n}}"
   },
   "perk": {
     "title": "Elige una mejora",
@@ -229,7 +235,7 @@
     "reroll": "Reposición ({{n}})",
     "leave": "Salir",
     "scrap": "Chatarra: {{n}}",
-    "deck": "Cubierta {{n}} /9",
+    "deck": "Mano {{n}}/{{max}}",
     "sellTitle": "Vender un dado",
     "empty": "Agotado",
     "modulesTitle": "Módulos {{used}} / {{max}}",
@@ -239,10 +245,8 @@
   "shipyard": {
     "title": "Astillero",
     "mk": "Mk {{mk}} — {{cost}}",
-    "mkMax": "Mk3 · al máximo",
+    "mkMax": "Mk{{mk}} · al máximo",
     "systems": "Sistemas",
-    "fusionTitle": "Fusión",
-    "fusionHint": "Dos dados idénticos → +1 nivel",
     "repair": "Reparación",
     "repairHint": "2 piezas de chatarra por casco",
     "leave": "Salir",
@@ -250,12 +254,23 @@
     "hull": "Casco {{cur}}/{{max}}",
     "voucher": "Cupón Mk × {{n}}: un nivel gratuito",
     "voucherUse": "Gratis",
-    "fuse": "Fusionar — {{n}}",
     "baysTitle": "Compartimentos para módulos {{used}} / {{max}}",
     "baysEmpty": "No hay módulos instalados.",
     "demount": "Desmontaje + {{n}}",
-    "buyBay": "Compra un box — {{n}}",
-    "bayDone": "No habrá más bahías en esta ruta."
+    "buyBay": "Comprar compartimento — {{n}}",
+    "bayDone": "No habrá más compartimentos en esta partida.",
+    "forgeTitle": "Forja",
+    "forgeHint": "Dos dados de la misma escuela se vuelven uno: la firma conserva nombre y efectos y sube un tamaño; el otro se funde en ella.",
+    "forgeOpen": "Abrir la forja",
+    "forgeNone": "No hay dos dados de una escuela",
+    "forgeStepOne": "Elige el primer dado.",
+    "forgeStepTwo": "Elige un compañero de la misma escuela.",
+    "forgeStepThree": "Elige qué forja la forja.",
+    "forgeColour": "Reforzar {{name}}",
+    "forgeRecipe": "Forja: {{name}}",
+    "forgeConfirm": "Forjar — {{n}}",
+    "forgeRevealed": "Forjado: {{name}}, ahora un d{{tier}}.",
+    "forgeDone": "Hecho"
   },
   "summary": {
     "victory": "Sector despejado",
@@ -279,7 +294,9 @@
     "wormholeRides": "Atracciones de agujeros de gusano",
     "holesBypassed": "Agujeros omitidos",
     "causeSingularity": "Singularidad",
-    "cause": "Causa de la muerte"
+    "cause": "Causa de la muerte",
+    "route": "Ruta: sector {{n}} de {{max}}",
+    "shipRank": "Rango de nave alcanzado: {{rank}}/{{max}}"
   },
   "prologue": {
     "title": "Prólogo",
@@ -288,15 +305,15 @@
     "leave": "Volver al menú"
   },
   "interstitial": {
-    "sector": "Sector{{n}}",
+    "sector": "Sector {{n}}",
     "enter": "Entrar en el sector"
   },
   "finale": {
-    "title": "El «Core Heart» está abierto",
+    "title": "El Corazón del Núcleo está abierto",
     "intro": "Todo lo que has decidido aquí fuera es ahora una puerta. Solo se abrirán aquellas que te hayas ganado.",
-    "thin": "Echoe: «Lo has dejado un poco flojo, capitán. Dos puertas, y en ambas se han encogido de hombros».",
+    "thin": "Echo: «Lo has dejado un poco flojo, capitán. Dos puertas, y en ambas se han encogido de hombros».",
     "axis": "Resonancia ↔ Eje de estabilidad: {{n}}",
-    "deepTitle": "Más allá del núcleo",
+    "deepTitle": "Más allá del Núcleo",
     "deepIntro": "No queda nada más que superar. Sea lo que sea lo que hayas conservado tras el sexto acto, aquí es donde se agota.",
     "thresholdTag": "¿O no lo termines?",
     "thresholdCross": "Cruza el umbral",
@@ -319,7 +336,7 @@
     "deck": "Baraja: Dados «{{n}}»",
     "ascension": "Ascensión",
     "ascensionLocked": "Supera la campaña una vez para desbloquear la ascensión.",
-    "aLevel": "Un e{{n}}",
+    "aLevel": "A{{n}}",
     "tideCap": "Máximos de las mareas de interferencia en {{n}}",
     "launch": "Inicio",
     "ascensionCost": "Te cuesta",
@@ -328,7 +345,9 @@
     "changeShip": "Cambiar de nave",
     "voucher": "Vale: ventaja inicial",
     "voucherCount": "{{n}} en reserva",
-    "voucherHint": "Gasta un vale para elegir una ventaja antes del primer salto."
+    "voucherHint": "Gasta un vale para elegir una ventaja antes del primer salto.",
+    "aLocked": "Supera A{{prev}} para desbloquear A{{n}}.",
+    "aAllOpen": "Todos los niveles están desbloqueados."
   },
   "package": {
     "title": "Paquete «Gate»",
@@ -403,11 +422,9 @@
     "riftSplit": "La división de la grieta: las ramas solo se unen en la puerta",
     "inversion": "Remada invertida: los sistemas se resuelven de último a primero",
     "storm": "Tormenta de probabilidad: se vuelve a lanzar un dado colocado en su posición durante la resolución",
-    "blackHoles": "Agujero negro: una mancha se traga varias celdas; su borde ofrece un agujero de gusano",
+    "blackHoles": "Agujero negro: una franja que cruza todos los carriles; en su borde, rodea por casco o cruza con la travesía",
     "wormhole": "El borde del agujero de gusano: una decisión nos espera en el límite",
-    "bypass": "Rozó el borde: la marea rozó el casco",
-    "holeScorch": "Casco demasiado delgado para pagar el peaje: la llanta te dejó pasar",
-    "holeDrift": "La llanta no cobró nada: ese carril ya estaba abierto para ti"
+    "bypass": "Rozó el borde: la marea rozó el casco"
   },
   "tag": {
     "red": "Rojo",
@@ -476,7 +493,7 @@
     "title": "Diario de carreras",
     "open": "Diario",
     "empty": "Aún no hay nada escrito. El sector no te ha pedido nada.",
-    "sector": "Sector{{n}}",
+    "sector": "Sector {{n}}",
     "beacon": "Baliza resuelto — {{n}} de {{max}}",
     "memory": "Echo Recordé algo — fragmento {{n}}",
     "axisTitle": "Eje",
@@ -579,21 +596,23 @@
   },
   "hole": {
     "title": "Agujero negro",
-    "body": "La mancha se llevó estas celdas. Su borde te dejará rodearla o te lanzará adonde él decida.",
-    "gentle": "Agujero de gusano estable",
-    "gentleWhy": "Los dos primeros tramos de un recorrido son cortos y siempre se adentran más en el terreno.",
+    "body": "La singularidad ha partido el sector de lado a lado. Paga al borde para rodearla, o deja que el lanzamiento te lleve al otro lado.",
+    "gentle": "Agujero de gusano estable {{n}}/{{max}}",
+    "gentleWhy": "Las dos primeras travesías de una partida aterrizan justo tras el borde opuesto, en tu carril. La cuenta es para toda la partida: pagar el rodeo guarda una travesía estable para más tarde.",
     "bypass": "Dar una vuelta",
-    "bypassCost": "Derivación: casco «{{n}}»",
-    "bypassFree": "Exención: gratuita — el buque no puede pagar",
-    "bypassDrift": "Derivación: gratuita — un carril que ya tenías",
+    "bypassCost": "Rodeo: −{{n}} de casco ({{pct}} % del máximo)",
+    "bypassLethal": "Rodeo: −{{n}} de casco — el casco no lo aguantará",
     "bypassNone": "No hay rodeo: todos los carriles tras la llanta ya quedaron atrás",
     "ride": "¡A por ello!",
-    "rideCost": "Recorrido: un trayecto de {{min}} –{{max}}, dirección desconocida",
-    "rideGentle": "Ride: una variación de «{{min}}» – «{{max}}», pero más profunda",
+    "rideChaotic": "Travesía: caótica — aterriza {{min}}–{{max}} filas tras el borde opuesto, hasta {{lanes}} carriles de desvío",
+    "rideGentle": "Travesía: estable — aterriza justo tras el borde opuesto, en tu carril",
     "landed": "Lanzado {{rows}} filas {{way}}",
     "softLand": "Posarse con suavidad",
-    "softLandWhy": "Una vez por partida: sin tirada — el nodo libre más cercano por delante",
-    "softLandSpent": "La carga del Eco ya se gastó en esta partida"
+    "softLandWhy": "Una vez por partida: sin tirada ni riesgo — aterriza justo tras el borde opuesto, en tu carril",
+    "softLandSpent": "La carga del Eco ya se gastó en esta partida",
+    "gentleUnstable": "Lanzamiento corto {{n}}/{{max}}",
+    "gentleUnstableWhy": "Las dos primeras travesías de una partida siguen aterrizando justo tras el borde opuesto, en tu carril. En A15 ninguna es estable.",
+    "rideGentleUnstable": "Travesía: un lanzamiento corto justo tras el borde opuesto, en tu carril. En A15 no es estable"
   },
   "bridge": {
     "title": "Puente",
@@ -609,7 +628,7 @@
     "bays": "Bays {{used}} / {{max}}",
     "bayEmpty": "bahía vacía",
     "bayOffer": "+1 dique seco — Desguace de «{{n}}» en el astillero",
-    "deckCount": "Deck {{n}} / {{max}}",
+    "deckCount": "Mano {{n}}/{{max}}",
     "sellDiceHint": "En la tienda se venden dados.",
     "sellModule": "Vender + {{n}}",
     "crewTitle": "Cabinas de oficiales {{used}}/{{max}}",
@@ -633,13 +652,89 @@
     "dropBody": "{{name}} sale por la esclusa. El lastre termina ahora y los {{n}} de chatarra de la entrega se pierden.",
     "dropBodyAxis": "{{name}} sale por la esclusa. El eje se queda donde lo movió y los {{n}} de chatarra de la entrega se pierden.",
     "dropNo": "Seguir transportando",
-    "dropYes": "Expulsar"
+    "dropYes": "Expulsar",
+    "sheet": {
+      "open": "Abrir {{name}}",
+      "close": "Cerrar",
+      "cap": "admite hasta d{{cap}}",
+      "capShrunk": "admite hasta d{{cap}} — reducido desde d{{base}}",
+      "mk": "Mk{{mk}}",
+      "affinity": "{{school}} +{{n}} aquí",
+      "affinityMult": "{{school}} ×{{n}} aquí",
+      "affinityNone": "Ninguna escuela tiene afinidad aquí",
+      "disabled": "Desconectado en esta partida",
+      "passive": "Pasiva de la nave · {{name}}",
+      "what": "Qué es",
+      "how": "Cómo funciona",
+      "dice": "Cómo lo cambian los dados",
+      "modes": "Modos de fuego",
+      "sources": "Módulos y ventajas",
+      "improve": "Cómo mejorarlo",
+      "placement": "Reglas de colocación",
+      "table": "Tabla de valores",
+      "pinned": "Cifras para el turno {{turn}}, con el casco completo, un enemigo por encima de la mitad de su casco, el reactor vacío y sin escudo activo; se omiten los efectos ligados a otros momentos.",
+      "colFace": "Tirada",
+      "colPlain": "Otra escuela",
+      "colSchool": "Dado {{school}}",
+      "intercept": "intercepción",
+      "fitTitle": "Dados en tu mano",
+      "fitRow": "d{{tier}} × {{n}}",
+      "fitCap": "cabe",
+      "fitOverCap": "sobre el límite por {{n}} de casco",
+      "fitGrant": "sobre el límite por una concesión",
+      "fitNone": "demasiado grande",
+      "fitEmpty": "Tu mano está vacía.",
+      "modeBase": "de serie",
+      "modeMk": "desde Mk{{mk}}",
+      "modeModule": "por un módulo",
+      "modeAvailable": "disponible",
+      "modeLocked": "bloqueado",
+      "modesNote": "Cada combate empieza en modo Directo; cámbialo durante el combate.",
+      "sourcesEmpty": "Nada de lo que llevas afecta aún a este sistema.",
+      "sourceInactive": "aún no activo",
+      "kind": {
+        "module": "Módulo",
+        "perk": "Ventaja",
+        "chart": "Carta estelar",
+        "officer": "Oficial",
+        "cargo": "Carga",
+        "mutator": "Modificador",
+        "resonance": "Resonancia",
+        "die": "Dado"
+      },
+      "reason": {
+        "slot": "actúa en esta ranura",
+        "slotMk": "requiere Mk{{n}} aquí",
+        "exceedCap": "deja pasar dados sobre el límite",
+        "fireMode": "añade un modo de fuego",
+        "mod": "cambia sus cifras",
+        "mutatorMod": "cambia sus cifras",
+        "trait": "cambia sus reglas",
+        "tierDelta": "cambia el límite",
+        "grant": "concesión de resonancia",
+        "officerActive": "acción de oficial"
+      },
+      "nextMk": "Siguiente: Mk{{mk}}",
+      "nextMkCost": "{{n}} de chatarra en un astillero",
+      "nextMkCap": "límite d{{cap}}",
+      "nextMkUnlocks": "También activa:",
+      "maxMk": "Mk máximo alcanzado",
+      "chartAdvice": "Nodos de la Carta estelar para este sistema",
+      "chartAdviceEmpty": "Ningún nodo de la carta sin reclamar afecta a este sistema.",
+      "chartReachable": "a tu alcance",
+      "colValue": "Efecto",
+      "chartMore": "…y {{n}} más en la Carta Estelar",
+      "pinOff": "inactivo",
+      "grantConditional": "solo mientras se cumpla su propia condición"
+    },
+    "shipRank": "Rango {{rank}}/{{max}}",
+    "mastery": "Maestría {{rank}}"
   },
   "replace": {
     "title": "Sustituir",
     "titleDie": "Nueva matriz",
     "titleModule": "Nuevo módulo",
-    "fullDeck": "Baraja completa {{used}} / {{max}} — ¿qué pasa?",
+    "fullDeck": "Mano llena {{used}}/{{max}}: ¿cuál sale?",
     "fullBay": "Bay está a rebosar {{used}} / {{max}} — ¿qué pasa?",
     "toScrap": "→ eliminar{{n}}",
     "sellNew": "Vender el nuevo (+ {{n}})",
@@ -657,7 +752,10 @@
       "system": "SISTEMA"
     },
     "dismiss": "Descartar",
-    "open": "Abrir en el diario"
+    "open": "Abrir en el diario",
+    "idle": "Comunicaciones en silencio",
+    "waitingMark": "+{{count}}",
+    "waiting": "En espera: {{count}}"
   },
   "weather": {
     "title": "Condiciones del sector"
@@ -706,5 +804,18 @@
       "shieldEcho": "Núcleo Eco: Eco del escudo está abierto.",
       "veto": "Núcleo Eco: Veto está abierto."
     }
+  },
+  "shipRank": {
+    "title": "Rango de nave {{rank}} de {{max}}",
+    "body": "La tripulación se ha ganado un reacondicionamiento. Elige uno.",
+    "reroll": "Nuevas opciones, gratis (maestría V)"
+  },
+  "recap": {
+    "share": "Compartir",
+    "title": "Mi partida en Cast Adrift",
+    "ascension": "Ascensión A{{n}}",
+    "topDie": "Mejor dado: {{die}}, d{{tier}}",
+    "failed": "No se pudo generar la tarjeta",
+    "topDieName": "Mejor dado: {{die}}"
   }
 }

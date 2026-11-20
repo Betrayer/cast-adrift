@@ -1,3 +1,4 @@
+import type { HandDie } from "@/game/dice/tier";
 import { create } from "zustand";
 import { CARGO_BY_ID } from "@/data/cargo";
 import { echoVetoHull, type EchoNodeId } from "@/data/echo";
@@ -14,6 +15,12 @@ import { bayPurchasable, moduleSlots } from "@/game/run/bays";
 import { shipCargoHold } from "@/game/run/hold";
 import { interferenceStacksForStreak } from "@/game/run/interference";
 import { computeModuleMods, computeRunMods } from "@/game/run/runMods";
+import { mkTopFor } from "@/game/economy/prices";
+import {
+  entranceKey,
+  pickEntrance,
+  type RewardEntrance,
+} from "@/game/run/rewardEntrance";
 import type { ShopState } from "@/game/economy/shop";
 import type { MapGraph, NodeId } from "@/game/map/types";
 import type { WormholeThrow } from "@/game/map/wormhole";
@@ -27,10 +34,8 @@ export type MkLevels = Partial<Record<SlotId, MkLevel>>;
 
 export type RunMode = "campaign" | "drift" | "daily" | "contract";
 
-export interface DieInstance {
+export interface DieInstance extends HandDie {
   uid: string;
-  defId: string;
-  growthBonus?: number;
 }
 
 export type PendingSwap =
@@ -155,6 +160,7 @@ export interface PendingRewards {
   packageScrap?: number;
   draftNodeId?: NodeId;
   draftFloor?: "common" | "uncommon" | "rare";
+  entrance?: RewardEntrance;
 }
 
 export interface PuzzleRunState {
@@ -185,6 +191,12 @@ export interface RunValues {
   hullMax: number;
   scrap: number;
   shipId: ShipId;
+  masteryRank: number;
+  shipRankXp: number;
+  pendingRankUps: number;
+  pendingShipDraft: string[];
+  shipDraftRerollUsed: boolean;
+  blackBoxSpent: boolean;
   deck: DieInstance[];
   perks: string[];
   modules: string[];
@@ -229,6 +241,7 @@ export interface RunValues {
   pendingDeepScan: boolean;
   pendingRewards: PendingRewards | null;
   lastTally: BattleTally | null;
+  lastEntrance: RewardEntrance | null;
   lastBattleLog: BattleLogEntry[];
   shop: ShopState | null;
   deckSeq: number;
@@ -352,6 +365,12 @@ export const MAX_SHIPYARD_DISCOUNT = 60;
 
 export const createInitialRunValues = (): RunValues => ({
   active: false,
+  masteryRank: 0,
+  shipRankXp: 0,
+  pendingRankUps: 0,
+  pendingShipDraft: [],
+  shipDraftRerollUsed: false,
+  blackBoxSpent: false,
   seed: 0,
   mode: "campaign",
   mutators: [],
@@ -411,6 +430,7 @@ export const createInitialRunValues = (): RunValues => ({
   pendingDeepScan: false,
   pendingRewards: null,
   lastTally: null,
+  lastEntrance: null,
   lastBattleLog: [],
   shop: null,
   deckSeq: 0,
@@ -443,7 +463,7 @@ export const runBayPurchasable = (s: RunValues): boolean =>
     s.baysPurchased,
   );
 
-const withHullMaxDelta = (
+export const withHullMaxDelta = (
   s: Pick<RunValues, "hull" | "hullMax">,
   delta: number,
 ): Pick<RunValues, "hull" | "hullMax"> => {
@@ -859,6 +879,16 @@ export const useRunStore = create<RunState>()((set, get) => ({
   },
 
   setPendingRewards: (rewards) => {
+    if (rewards !== null && rewards.entrance === undefined) {
+      const s = get();
+      const entrance = pickEntrance(
+        s.seed,
+        entranceKey(s.sectorIndex, rewards.draftNodeId ?? String(s.visited.length)),
+        s.lastEntrance,
+      );
+      set({ pendingRewards: { ...rewards, entrance }, lastEntrance: entrance });
+      return;
+    }
     set({ pendingRewards: rewards });
   },
 
@@ -869,7 +899,8 @@ export const useRunStore = create<RunState>()((set, get) => ({
   bumpMk: (slotId) => {
     set((s) => {
       const current = s.mkLevels[slotId] ?? 1;
-      const next: MkLevel = current >= 3 ? 3 : ((current + 1) as MkLevel);
+      const top = mkTopFor(slotId, s.ascension);
+      const next: MkLevel = current >= top ? current : ((current + 1) as MkLevel);
       return { mkLevels: { ...s.mkLevels, [slotId]: next } };
     });
   },

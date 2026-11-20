@@ -1,3 +1,4 @@
+import { MAX_ASCENSION } from "@/data/ascension";
 import { plausibility, MAX_BOARD_SCORE } from "@/game/run/plausibility";
 
 export type BoardKind = "daily" | "driftAlltime" | "driftWeekly";
@@ -23,6 +24,7 @@ export interface BoardEntry {
   kills: number;
   scrap: number;
   updatedAt: number;
+  ascension?: number;
   hash?: number;
   state?: DailyState;
   flagged?: boolean;
@@ -92,7 +94,11 @@ export const entryValid = (entry: BoardEntry): boolean =>
   Number.isInteger(entry.scrap) &&
   entry.scrap >= 0 &&
   typeof entry.ship === "string" &&
-  entry.ship.length > 0;
+  entry.ship.length > 0 &&
+  (entry.ascension === undefined ||
+    (Number.isInteger(entry.ascension) &&
+      entry.ascension >= 0 &&
+      entry.ascension <= MAX_ASCENSION));
 
 export const entryHidden = (entry: BoardEntry, board: string): boolean => {
   if (entry.superseded === true) return true;
@@ -103,6 +109,7 @@ export const entryHidden = (entry: BoardEntry, board: string): boolean => {
     depth: entry.depth,
     kills: entry.kills,
     scrap: entry.scrap,
+    ascension: entry.ascension,
     hash: entry.hash,
     requiresHash: boardKind(board) === "daily",
   }).ok;
@@ -142,6 +149,8 @@ const entryDoc = (entry: BoardEntry, updatedAt: number): Record<string, unknown>
     scrap: entry.scrap,
     updatedAt,
   };
+  if (entry.ascension !== undefined && entry.ascension > 0)
+    doc.ascension = entry.ascension;
   if (entry.hash !== undefined) doc.hash = entry.hash;
   if (entry.state !== undefined) doc.state = entry.state;
   if (entry.flagged === true) doc.flagged = true;
@@ -158,6 +167,7 @@ const parseEntry = (uid: string, data: Record<string, unknown>): BoardEntry => (
   kills: typeof data.kills === "number" ? data.kills : 0,
   scrap: typeof data.scrap === "number" ? data.scrap : 0,
   updatedAt: typeof data.updatedAt === "number" ? data.updatedAt : 0,
+  ...(typeof data.ascension === "number" ? { ascension: data.ascension } : {}),
   ...(typeof data.hash === "number" ? { hash: data.hash } : {}),
   ...(data.state === "started" || data.state === "done"
     ? { state: data.state }
@@ -176,7 +186,7 @@ export const submit = async (
   }
   try {
     const { db } = await import("@/services/firebase");
-    const { doc, getDoc, setDoc } = await import("firebase/firestore");
+    const { deleteField, doc, getDoc, setDoc } = await import("firebase/firestore");
     const ref = doc(db(), "leaderboards", board, "entries", entry.uid);
     if (onlyIfHigher(board)) {
       const existing = await getDoc(ref);
@@ -185,7 +195,12 @@ export const submit = async (
         : null;
       if (prev !== null && prev.score >= entry.score) return false;
     }
-    await setDoc(ref, entryDoc(entry, Date.now()), { merge: true });
+    const body = entryDoc(entry, Date.now());
+    await setDoc(
+      ref,
+      "ascension" in body ? body : { ...body, ascension: deleteField() },
+      { merge: true },
+    );
     return true;
   } catch (error) {
     console.warn("leaderboards: submit failed", error);

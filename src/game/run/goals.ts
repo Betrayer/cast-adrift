@@ -1,3 +1,4 @@
+import { CONTRACTS } from "@/data/contracts";
 import { BEACON_TOTAL, beaconsResolved } from "@/data/events/beacons";
 import { NO_BATTLE_TURNS, type RunStats } from "@/stores/runStore";
 import type { FlagValue } from "@/types/events";
@@ -145,6 +146,11 @@ export const countStars = (mask: number): number => {
   }
   return n;
 };
+
+export const contractStarTotal = (
+  contracts: Readonly<Record<string, number>>,
+): number =>
+  CONTRACTS.reduce((sum, def) => sum + countStars(contracts[def.id] ?? 0), 0);
 
 export const newStars = (previous: number, earned: number): number =>
   countStars(earned & ~previous);

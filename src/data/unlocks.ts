@@ -10,7 +10,6 @@ export type FeatureId =
   | "shipPrism"
   | "engravingStation"
   | "dailyPreview"
-  | "freeRespec"
   | "sectorSix";
 
 export interface UnlockSource {
@@ -219,6 +218,26 @@ export const UNLOCKS: readonly UnlockDef[] = [
     source: { ascension: 10 },
     cosmetic: "ascendant",
   }),
+  unlock("skinSingularity", {
+    kind: "cosmetic",
+    source: { ascension: 11 },
+    cosmetic: "singularitySkin",
+  }),
+  unlock("contractsA12", {
+    kind: "contractWave",
+    source: { ascension: 12 },
+    contracts: ["deepVacuum"],
+  }),
+  unlock("frameObsidian", {
+    kind: "cosmetic",
+    source: { ascension: 13 },
+    cosmetic: "obsidianFrame",
+  }),
+  unlock("prestigeThemeTwo", {
+    kind: "cosmetic",
+    source: { ascension: 15 },
+    cosmetic: "eventHorizon",
+  }),
   unlock("skinPrestige50", {
     kind: "cosmetic",
     source: { level: 50 },
@@ -263,11 +282,6 @@ export const UNLOCKS: readonly UnlockDef[] = [
     kind: "feature",
     source: { level: 40 },
     feature: "dailyPreview",
-  }),
-  unlock("featureFreeRespec", {
-    kind: "feature",
-    source: { level: 50 },
-    feature: "freeRespec",
   }),
   {
     id: "s6-threshold",

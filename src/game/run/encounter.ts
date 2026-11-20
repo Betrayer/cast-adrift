@@ -35,6 +35,9 @@ export const TEMPLATES: readonly (readonly [EncounterTemplate, number])[] = [
   [["support", "harrier"], 1],
   [["bruiser", "swarm"], 2],
   [["anchor", "support"], 2],
+  [["bruiser", "support", "harrier"], 5],
+  [["bruiser", "harrier", "swarm"], 5],
+  [["anchor", "support", "harrier"], 5],
   [["swarm", "swarm", "swarm"], 1],
 ];
 

@@ -13,13 +13,16 @@ import {
   scopedKey,
 } from "@/services/profile";
 import {
+  ACCOUNT_PREF_KEYS,
   META_PERSIST_KEY,
   META_VERSION,
   metaValues,
   migrateMeta,
   useMetaStore,
+  type AccountPrefKey,
+  type AccountPrefs,
 } from "@/stores/metaStore";
-import { useSettingsStore } from "@/stores/settingsStore";
+import { useSettingsStore, type SettingsValues } from "@/stores/settingsStore";
 
 const DEBOUNCE = 3000;
 const PUSH_TIMEOUT = 5000;
@@ -56,13 +59,19 @@ export const metaDocSnapshot = (): MetaDoc => {
   };
 };
 
+const adoptPref = <K extends AccountPrefKey>(
+  key: K,
+  value: AccountPrefs[K],
+): void => {
+  if (value === undefined) return;
+  const patch: Partial<Pick<SettingsValues, AccountPrefKey>> = {};
+  patch[key] = value;
+  useSettingsStore.setState(patch);
+};
+
 const adoptPrefs = (): void => {
   const { prefs } = useMetaStore.getState();
-  const settings = useSettingsStore.getState();
-  if (prefs.battleLayout !== undefined) {
-    settings.setBattleLayout(prefs.battleLayout);
-  }
-  if (prefs.theme !== undefined) settings.setTheme(prefs.theme);
+  for (const key of ACCOUNT_PREF_KEYS) adoptPref(key, prefs[key]);
 };
 
 export const applyMetaDoc = (doc: MetaDoc): boolean => {

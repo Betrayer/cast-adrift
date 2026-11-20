@@ -23,6 +23,7 @@ import {
 } from '@/pixi/battle/anchors';
 import { draggedDie, subscribeDrag } from '@/pixi/battle/dragState';
 import { playSfx } from '@/services/audio';
+import { haptic } from '@/services/tma';
 import { battleSnapshot, useBattleStore } from '@/stores/battleStore';
 import type { BattleState } from '@/stores/battleStore';
 import type { RolledDie, SlotId } from '@/types/battle';
@@ -69,6 +70,7 @@ export const onSlotTap = (slotId: SlotId): void => {
   const after = useBattleStore.getState();
   const bounced = (after.lastBlock?.seq ?? 0) > seq;
   playSfx(bounced ? 'invalid' : 'place');
+  if (!bounced) haptic('place');
 };
 
 export const onReserveTap = (): void => {
@@ -85,6 +87,7 @@ export const onReserveTap = (): void => {
   }
   live.reserveDie(live.selectedDieUid);
   playSfx('place');
+  haptic('place');
 };
 
 export interface DockModel {

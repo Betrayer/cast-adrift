@@ -13,6 +13,7 @@ import {
 } from "@/data/officers";
 import { ZERO_PERK_MODS } from "@/data/perks/types";
 import { VULNERABLE_CAP, vulnerableFor } from "@/game/battle/resolver";
+import { allOutcomes } from "@/game/events/engine";
 import enContent from "@/i18n/en/content.json";
 import type { EventEffect, Outcome } from "@/types/events";
 
@@ -20,11 +21,7 @@ const outcomesOf = (eventId: string, optionId: string): readonly Outcome[] => {
   const event = ALL_EVENTS.find((def) => def.id === eventId);
   const option = event?.options.find((opt) => opt.id === optionId);
   if (option === undefined) return [];
-  return [
-    ...(option.outcomes ?? []),
-    ...(option.onPass ?? []),
-    ...(option.onFail ?? []),
-  ];
+  return allOutcomes(option);
 };
 
 const officerGrants = (effects: readonly EventEffect[]): readonly string[] =>
@@ -97,11 +94,7 @@ describe("the officer roster", () => {
     const wired: string[] = [];
     for (const event of ALL_EVENTS) {
       for (const option of event.options) {
-        for (const outcome of [
-          ...(option.outcomes ?? []),
-          ...(option.onPass ?? []),
-          ...(option.onFail ?? []),
-        ]) {
+        for (const outcome of allOutcomes(option)) {
           for (const id of officerGrants(outcome.effects)) {
             expect(OFFICER_BY_ID.get(id)).toBeDefined();
             wired.push(`${event.id}.${option.id}:${id}`);

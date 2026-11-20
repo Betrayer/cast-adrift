@@ -1,11 +1,7 @@
+import { devDebug } from "@/app/debug";
 import { tokens } from "@/app/theme";
 import { axisLabel } from "@/game/run/axis";
 import { useRunStore } from "@/stores/runStore";
-
-const isDebug = (): boolean =>
-  import.meta.env.DEV &&
-  typeof window !== "undefined" &&
-  new URLSearchParams(window.location.search).get("debug") === "1";
 
 export const DevOverlay = () => {
   const active = useRunStore((s) => s.active);
@@ -13,7 +9,7 @@ export const DevOverlay = () => {
   const flags = useRunStore((s) => s.flags);
   const seen = useRunStore((s) => s.seenEvents);
 
-  if (!isDebug() || !active) return null;
+  if (!devDebug() || !active) return null;
 
   const ratio = (axis + 10) / 20;
 

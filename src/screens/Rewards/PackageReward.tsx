@@ -1,22 +1,22 @@
+import { OwnedLine } from "@/components/OwnedLine";
 import { Button, Group, Stack, Text } from "@mantine/core";
 import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
+import { STAGGER_MS } from "@/app/motion";
 import { tokens } from "@/app/theme";
 import { LOOT_SFX } from "@/data/audio";
 import { DieCard } from "@/components/DieCard";
 import { DIE_BY_ID } from "@/data/dice";
 import { MODULE_BY_ID } from "@/data/modules";
 import { schools } from "@/data/schools";
-import { DECK_CAP } from "@/game/economy/prices";
+import { HAND_CAP } from "@/game/economy/prices";
 import { resolveDieChoice, resolveModuleChoice } from "@/game/run/flow";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import { useMetaStore } from "@/stores/metaStore";
-import { useReducedMotion } from "@/stores/settingsStore";
 import { runModuleSlots, useRunStore } from "@/stores/runStore";
+import { entranceCardStyle, useEntranceRow } from "./entrance";
 import styles from "./Rewards.module.css";
-
-const CARD_FLIP_MS = 140;
 
 const RARITY_ORDER = ["common", "uncommon", "rare", "legendary"] as const;
 
@@ -36,8 +36,10 @@ export const PackageReward = ({
   const runModules = useRunStore((s) => s.modules);
   const cap = useRunStore(runModuleSlots);
   const packageScrap = useRunStore((s) => s.pendingRewards?.packageScrap ?? 0);
-  const reduced = useReducedMotion();
-  const deckFull = deckSize >= DECK_CAP;
+  const { entrance, row } = useEntranceRow(
+    [...choices, ...moduleChoices].join("|"),
+  );
+  const deckFull = deckSize >= HAND_CAP;
   const bayFull = runModules.length >= cap;
 
   const best = choices.reduce<(typeof RARITY_ORDER)[number]>((top, dieId) => {
@@ -56,7 +58,7 @@ export const PackageReward = ({
     const timers = Array.from({ length: cardCount }, (_, index) =>
       window.setTimeout(() => {
         playSfx("unlockCard", { rate: 1 + index * 0.04 });
-      }, index * CARD_FLIP_MS),
+      }, index * STAGGER_MS.card),
     );
     return () => {
       for (const id of timers) window.clearTimeout(id);
@@ -80,37 +82,42 @@ export const PackageReward = ({
           </Text>
         ) : null}
       </Stack>
-      <Group gap="md" justify="center">
+      <Group ref={row} gap="md" justify="center" data-entrance={entrance}>
         {choices.map((dieId, index) => {
           const def = DIE_BY_ID.get(dieId);
           if (def === undefined) return null;
           const colors = schools[def.school];
+          const footer = (
+            <>
+              <OwnedLine defId={dieId} />
+              <Button
+                size="sm"
+                fullWidth
+                data-testid={`reward-package-die-${String(index)}`}
+                onClick={() => {
+                  playSfx(deckFull ? "buy" : "optionTick", { rate: 1.12 });
+                  resolveDieChoice(dieId);
+                }}
+              >
+                {deckFull ? t("run:package.replace") : t("run:package.take")}
+              </Button>
+            </>
+          );
           return (
             <div
               key={`${dieId}-${String(index)}`}
-              className={`${styles.card ?? ""} ${styles.cardDie ?? ""} ${reduced ? "" : styles.reveal ?? ""}`}
+              className={`${styles.card ?? ""} ${styles.cardDie ?? ""} ${styles.entryCard ?? ""}`}
+              data-entrance-card={index}
               style={{
                 borderColor: colors.stroke,
-                animationDelay: reduced ? undefined : `${String(index * 140)}ms`,
+                ...entranceCardStyle(index, cardCount),
               }}
             >
               <DieCard
                 defId={dieId}
                 plain
                 engravings={engravings}
-                footer={
-                  <Button
-                    size="sm"
-                    fullWidth
-                    data-testid={`reward-package-die-${String(index)}`}
-                    onClick={() => {
-                      playSfx(deckFull ? "buy" : "optionTick", { rate: 1.12 });
-                      resolveDieChoice(dieId);
-                    }}
-                  >
-                    {deckFull ? t("run:package.replace") : t("run:package.take")}
-                  </Button>
-                }
+                footer={footer}
               />
             </div>
           );
@@ -121,12 +128,11 @@ export const PackageReward = ({
           return (
             <div
               key={moduleId}
-              className={`${styles.card ?? ""} ${reduced ? "" : styles.reveal ?? ""}`}
+              className={`${styles.card ?? ""} ${styles.entryCard ?? ""}`}
+              data-entrance-card={choices.length + index}
               style={{
                 borderColor: tokens.accent,
-                animationDelay: reduced
-                  ? undefined
-                  : `${String((choices.length + index) * 140)}ms`,
+                ...entranceCardStyle(choices.length + index, cardCount),
               }}
             >
               <Text className={styles.dieName} c={tokens.text}>

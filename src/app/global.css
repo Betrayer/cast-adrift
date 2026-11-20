@@ -1,3 +1,27 @@
+@property --ca-safe-top {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --ca-safe-bottom {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --ca-safe-left {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
+@property --ca-safe-right {
+  syntax: '<length>';
+  inherits: true;
+  initial-value: 0px;
+}
+
 :root {
   --ca-tg-top: calc(
     var(--tg-viewport-safe-area-inset-top, 0px) +
@@ -28,4 +52,36 @@ html,
 body,
 #root {
   overscroll-behavior: none;
+}
+
+.mantine-Button-root,
+.mantine-ActionIcon-root,
+.mantine-Badge-root {
+  flex-shrink: 0;
+}
+
+.mantine-Modal-root {
+  --ca-modal-top: max(var(--modal-y-offset, 5dvh), calc(var(--ca-safe-top) + 8px));
+  --ca-modal-bottom: max(var(--modal-y-offset, 5dvh), calc(var(--ca-safe-bottom) + 8px));
+  --modal-content-max-height: calc(100dvh - var(--ca-modal-top) - var(--ca-modal-bottom));
+}
+
+.mantine-Modal-inner {
+  padding-top: var(--ca-modal-top);
+  padding-bottom: var(--ca-modal-bottom);
+}
+
+[data-tap-slop] {
+  position: relative;
+  overflow: visible;
+}
+
+[data-tap-slop]::after {
+  content: '';
+  position: absolute;
+  left: -2px;
+  right: -2px;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
 }

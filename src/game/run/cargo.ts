@@ -139,19 +139,6 @@ export const heldCargoDefs = (held: readonly RunCargo[]): readonly CargoDef[] =>
     return def === undefined ? [] : [def];
   });
 
-export const cargoSlotTier = (
-  held: readonly RunCargo[],
-): Partial<Record<SlotId, number>> => {
-  const out: Partial<Record<SlotId, number>> = {};
-  for (const def of heldCargoDefs(held)) {
-    for (const [slot, delta] of Object.entries(cargoSlotTierDelta(def))) {
-      const key = slot as SlotId;
-      out[key] = (out[key] ?? 0) + delta;
-    }
-  }
-  return out;
-};
-
 export const cargoChargeCap = (held: readonly RunCargo[]): number =>
   heldCargoDefs(held).reduce((sum, def) => sum + cargoChargeCapDelta(def), 0);
 

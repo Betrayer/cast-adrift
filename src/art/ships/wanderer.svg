@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 -66 330 302" role="presentation">
+<g data-part="hull"><path class="m-hull" d="M30 64 L62 50 L205 52 L284 85 L205 118 L62 120 L30 106 Z"/><path class="m-line" d="M62 50 L62 120"/><path class="m-line" d="M205 52 L205 118"/><circle class="m-glass" cx="238" cy="85" r="7"/></g>
+<g data-part="mastery-I"><path class="m-panel" d="M150 51.4 L170 21.4 L196 21.4 L184 51.4 Z"/><path class="m-panel" d="M150 118.6 L170 148.6 L196 148.6 L184 118.6 Z"/></g>
+<g data-part="mastery-II"><rect class="m-panel" x="132" y="72" width="62" height="26" rx="5"/><path class="m-accent" d="M142 80 L184 80 M142 90 L184 90"/></g>
+<g data-part="mastery-III"><path class="m-stripe" d="M86 53.3 L86 116.7"/><path class="m-stripe" d="M100 53.5 L100 116.5"/><path class="m-stripe" d="M114 53.7 L114 116.3"/></g>
+<g data-part="mastery-IV"><path class="m-plate" d="M178 51.6 L214 55.8 L250 70.8 L250 61.8 L214 46.8 L178 42.6 Z"/><path class="m-plate" d="M178 118.4 L214 114.2 L250 99.2 L250 108.2 L214 123.2 L178 127.4 Z"/></g>
+<g data-part="mastery-V"><path class="m-flame m-warm-fill" d="M30 76 L-6 85 L30 94 Z"/><path class="m-warm" d="M60 85 L150 85"/><circle class="m-warm" cx="238" cy="85" r="11"/></g>
+<g data-part="perk-shipTurret"><circle class="m-gun" cx="226" cy="53.8" r="11"/><path class="m-accent-thick" d="M226 53.8 L248 44.8"/><circle class="m-gun" cx="226" cy="116.2" r="11"/><path class="m-accent-thick" d="M226 116.2 L248 125.2"/></g>
+<g data-part="perk-shipPlates"><path class="m-plate" d="M48 56.1 L84 50.3 L120 50.8 L120 60.8 L84 60.3 L48 66.1 Z"/><path class="m-plate" d="M48 113.9 L84 119.7 L120 119.2 L120 109.2 L84 109.7 L48 103.9 Z"/></g>
+<g data-part="perk-shipAfterburner"><path class="m-flame m-accent-thick" d="M30 74 L-22 74 M30 96 L-22 96"/></g>
+<g data-part="perk-shipBay"><rect class="m-panel" x="66" y="74" width="34" height="22" rx="3"/><path class="m-accent" d="M83 74 L83 96"/></g>
+<g data-part="perk-shipTargeting"><path class="m-line" d="M250 70.8 L250 54.8"/><path class="m-accent-thick" d="M238 54.8 a14 14 0 0 1 24 0"/></g>
+<g data-part="perk-shipCapacitor"><circle class="m-ring" cx="170" cy="85" r="24"/></g>
+<g data-part="perk-shipCoil"><path class="m-accent-thick" d="M112 57.7 L118 67.7 L124 57.7 L130 67.7 L136 57.7 L142 67.7 L148 57.7"/></g>
+<g data-part="perk-shipMagnet"><path class="m-line" d="M132 51 L132 37"/><path class="m-accent-thick" d="M121 37 v-10 a11 11 0 0 1 22 0 v10"/></g>
+<g data-part="perk-shipBallast"><path class="m-panel" d="M108 118.8 L124 142.8 L176 142.8 L192 118.8 Z"/></g>
+<g data-part="perk-shipOverdrive"><rect class="m-gun" x="12" y="57" width="24" height="12" rx="2"/><rect class="m-gun" x="12" y="101" width="24" height="12" rx="2"/></g>
+<g data-part="perk-shipHardpoint"><rect class="m-gun" x="200" y="38.9" width="30" height="11" rx="2"/><rect class="m-gun" x="200" y="120.1" width="30" height="11" rx="2"/></g>
+<g data-part="perk-shipCargoWeb"><path class="m-line" d="M60 93.6 l40 20 M60 113.6 l40 -20 M80 93.6 l0 20 M100 93.6 l0 20"/></g>
+<g data-part="perk-shipLattice"><path class="m-line" d="M196 62 l14 -8 l14 8 l0 16 l-14 8 l-14 -8 Z M210 54 l0 32"/></g>
+<g data-part="perk-shipPrism"><path class="m-glass" d="M270 85 L256 72 L242 85 L256 98 Z"/></g>
+<g data-part="perk-shipDrones"><circle class="m-gun" cx="52" cy="38.4" r="11"/><circle class="m-glass" cx="52" cy="38.4" r="3"/><circle class="m-gun" cx="52" cy="131.6" r="11"/><circle class="m-glass" cx="52" cy="131.6" r="3"/></g>
+<g data-part="perk-shipBlackBox"><rect class="m-panel" x="184" y="77" width="26" height="16" rx="2"/><circle class="m-warm-fill" cx="197" cy="85" r="3"/></g>
+<circle data-pin="shields" cx="52" cy="-18" r="0"/>
+<circle data-pin="sensors" cx="135" cy="-18" r="0"/>
+<circle data-pin="weaponA" cx="218" cy="-18" r="0"/>
+<circle data-pin="engines" cx="52" cy="190" r="0"/>
+<circle data-pin="reactor" cx="135" cy="190" r="0"/>
+<circle data-pin="weaponB" cx="218" cy="190" r="0"/>
+</svg>

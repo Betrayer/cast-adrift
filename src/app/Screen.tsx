@@ -18,6 +18,7 @@ interface ScreenProps {
   scroll?: boolean;
   passThrough?: boolean;
   className?: string;
+  shellClassName?: string;
   bodyClassName?: string;
   innerClassName?: string;
   bodyRef?: RefObject<HTMLDivElement | null>;
@@ -45,6 +46,7 @@ export const Screen = ({
   scroll = true,
   passThrough = false,
   className,
+  shellClassName,
   bodyClassName,
   innerClassName,
   bodyRef,
@@ -90,7 +92,7 @@ export const Screen = ({
   );
 
   return (
-    <div className={styles.screen} data-screen-shell>
+    <div className={cx(styles.screen, shellClassName)} data-screen-shell>
       {background === undefined ? null : (
         <div className={styles.background}>{background}</div>
       )}

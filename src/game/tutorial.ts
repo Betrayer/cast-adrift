@@ -1,6 +1,7 @@
 import { allowedSlotsNow, consoleShape, reserveCapacity } from "@/game/battle/view";
 import { NUDGE_COST } from "@/game/battle/resolver";
-import { activeThresholds, SCHOOL_ORDER } from "@/game/battle/resonance";
+import { activeThresholds } from "@/game/battle/resonance";
+import { SCHOOL_ORDER } from "@/data/schools";
 import {
   battleAnchors,
   boardRegion,
@@ -17,6 +18,26 @@ export interface CoachRect {
   w: number;
   h: number;
 }
+
+export const COACH_RING_EDGE = 2;
+
+export const clampCoachRect = (
+  rect: CoachRect,
+  width: number,
+  height: number,
+  edge = COACH_RING_EDGE,
+): CoachRect => {
+  const left = Math.max(edge, rect.x);
+  const top = Math.max(edge, rect.y);
+  const right = Math.min(width - edge, rect.x + rect.w);
+  const bottom = Math.min(height - edge, rect.y + rect.h);
+  return {
+    x: left,
+    y: top,
+    w: Math.max(0, right - left),
+    h: Math.max(0, bottom - top),
+  };
+};
 
 export interface CoachMarkDef {
   id: string;

@@ -1,10 +1,10 @@
 {
-  "turn": "Turn {{n}}",
+  "turn": "Zug {{n}}",
   "hull": "Hülle {{hp}}/{{max}}",
-  "shield": "Schild-{{n}}",
+  "shield": "Schild {{n}}",
   "scrap": "Schrott {{n}}",
-  "charge": "Ansprech{{n}} / {{max}}",
-  "interference": "Interferenz × {{n}}",
+  "charge": "Ladung {{n}}/{{max}}",
+  "interference": "Interferenz ×{{n}}",
   "endTurn": "Ende der Runde",
   "burnHint": "Würfel, die außerhalb der Felder liegen, verglühen am Ende des Zuges",
   "victory": "Sieg",
@@ -76,12 +76,13 @@
     "echoTotal": "gibt deinen letzten Zug wieder (maximal {{n}})",
     "foldOrder": "bearbeitet die Bestellung",
     "devourDie": "verschlingt deinen besten Ersatzwürfel",
-    "idle": "Hält"
+    "idle": "Hält",
+    "hidden": "Absicht verborgen"
   },
   "slot": {
     "weaponA": "Waffe A",
     "weaponB": "Waffe B",
-    "spinal": "Halterung für die Wirbelsäule",
+    "spinal": "Spinallafette",
     "shields": "Schilde",
     "shieldsB": "Schilde II",
     "engines": "Motoren",
@@ -109,7 +110,7 @@
     "minibossAlt": "Mini-Boss · neue Signatur"
   },
   "fate": "Schicksal würfeln",
-  "fateResult": "Fate {{roll}} — {{text}}",
+  "fateResult": "Schicksal {{roll}} — {{text}}",
   "swap": "Tauschen",
   "swapPick": "Wähle einen Würfel aus…",
   "bank": "Bankfront",
@@ -142,6 +143,7 @@
   "targetBody": "Rumpf anvisieren",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "eingehend roh {{raw}} → ~{{expected}} · Schild {{shield}} · Rumpf {{hull}}",
+  "mitigationHidden": "schlimmstenfalls roh {{raw}} → ~{{expected}} · Schild {{shield}} · Rumpf {{hull}}",
   "mitigationNone": "Dieser Gegner verursacht in dieser Runde keinen Schaden",
   "forecast": "du machst {{out}} · du nimmst ~{{inc}} (Schild hält {{shield}})",
   "forecastClear": "{{out}} Schaden räumt das Feld",
@@ -199,7 +201,8 @@
     "active": "Hat eine Aktion",
     "engraved": "Graviert",
     "growth": "Wächst bei Höchstseite",
-    "faces": "Ungewöhnliche Seiten"
+    "faces": "Ungewöhnliche Seiten",
+    "forged": "Geschmiedet"
   },
   "layoutHint": "Lieber ein anderes Kampf-Layout? Einstellungen → Kampfoberfläche.",
   "radial": {
@@ -244,7 +247,9 @@
       "faces": "Ungewöhnliche Seiten — {{list}}",
       "growth": "Wachstum — +{{per}} bei einer Höchstseite, bis +{{cap}}",
       "growthField": "Wachstum — +{{n}} im Feld angesammelt",
-      "prismatic": "Prisma — zählt als jede Schule und erbt die Affinität des Slots"
+      "prismatic": "Prisma — zählt als jede Schule und erbt die Affinität des Slots",
+      "legendary": "Legendär — eine Aura in der Farbe ihrer Schule",
+      "forged": "Geschmiedet ×{{n}} — W{{from}} → W{{to}}"
     },
     "active": {
       "flip": "einmal pro Kampf auf die gegenüberliegende Seite drehen",
@@ -344,18 +349,69 @@
   "interferenceWhy": "Ausgelassene Anomalien stapeln sich: Jeder Stapel gibt für den Rest des Laufs eine weitere Flutstufe. Eine Anomalie zu lösen räumt alle ab.",
   "interferenceTitle": "Störung",
   "axisWhy": "Schwarze Würfel ziehen zur Resonanz, blaue zur Stabilität. Ereignisse und Drift bewegen die Achse ebenfalls.",
-  "chargeWhy": "Ladung zahlt Aktionen: −1 kostet {{n}}, +1 kostet {{n}}, ein gekaufter Neuwurf 5, ein Schub 10.",
+  "chargeWhy": "Gib Ladung für Aktionen aus: Ein Anstoß um eine Seite nach oben oder unten kostet {{n}}, ein gekaufter Wiederwurf kostet {{reroll}}, ein Schub kostet {{surge}}.",
   "chargeTitle": "Ladung",
   "mkWhy": "Mk hebt die Slot-Obergrenze und den Affinitätsbonus seiner Schule.",
   "resEarned": "Erreicht",
   "manoeuvreTitle": "Manöver",
-  "manoeuvreWhy": "Ein Würfel in den Triebwerken setzt einen Ausweichwurf pro eingehendem Treffer: Streifschuss {{glancing}}% × Wert (max. {{glancingCap}}%), Ausweichen {{dodge}}% × Wert (max. {{dodgeCap}}%). Ein Streifschuss nimmt die Hälfte, aufgerundet, Ausweichen nimmt nichts, alles andere trifft voll. Ab Wert {{intercept}} ist das erste gelungene Ausweichen der Runde — Streifschuss oder Ausweichen — ein Abfangen: Waffen +1 in der nächsten Runde. Der Wert ist der Würfel nach Affinität und Boni.",
-  "manoeuvreBrief": "Ein Wurf pro Treffer: Streifschuss {{glancing}}% × Wert (max {{glancingCap}}%), Ausweichen {{dodge}}% × Wert (max {{dodgeCap}}%). Streifen nimmt die Hälfte, Ausweichen nichts. Ab {{intercept}}: erste Evasion, Waffen +1.",
+  "manoeuvreWhy": "Ein Würfel in den Motoren bestimmt einen Ausweichwurf pro eingehendem Treffer: Streifen {{glancing}}% × Wert (max. {{glancingCap}}%), Ausweichen {{dodge}}% × Wert (max. {{dodgeCap}}%). Ein Streiftreffer richtet die Hälfte an (aufgerundet), ein Ausweichen nichts, alles andere trifft voll. Ab Wert {{intercept}} ist das erste erfolgreiche Ausweichen des Zuges – Streifen oder Ausweichen – ein Abfangen: Waffen +{{interceptBonus}} im nächsten Zug. Der Wert ist der Würfel nach Affinität und Boni.",
+  "manoeuvreBrief": "Ein Ausweichwurf pro Treffer: Streifen {{glancing}}% × Wert (max. {{glancingCap}}%), Ausweichen {{dodge}}% × Wert (max. {{dodgeCap}}%). Streifen halbiert den Treffer, Ausweichen hebt ihn auf. Ab {{intercept}} bringt das erste Ausweichen Waffen +{{interceptBonus}}.",
   "targetingTitle": "Zielerfassung",
-  "targetingWhy": "Ein Würfel in den Sensoren macht das Ziel für die Runde Verwundbar +D: D ist der halbe Würfelwert aufgerundet, höchstens {{cap}}, und jeder Treffer dieser Runde macht so viel mehr. Auf der Höchstseite durchschlägt der Treffer zusätzlich den Schild. Sensor-Mk deckt außerdem pro Stufe über Mk1 eine weitere Kartenzeile auf.",
+  "targetingWhy": "Ein Würfelwurf bei „Sensoren“ macht das Ziel für diesen Zug „Verwundbar +D“: D entspricht der Hälfte des Würfelwerts, aufgerundet, jedoch höchstens {{cap}}, und jeder Treffer in diesem Zug verursacht um diesen Wert mehr Schaden. Bei der höchsten Augenzahl des Würfels durchdringt der Treffer zudem den Schild.",
   "targetingBrief": "Sensoren markieren das Ziel: Verwundbar +D für die Runde, D ist der halbe Würfelwert aufgerundet, max {{cap}}. Jeder Treffer macht so viel mehr; die Höchstseite durchschlägt den Schild.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Systeme",
+  "system": {
+    "weaponA": {
+      "what": "Deine Hauptwaffe: Der Würfelwert wird als Schaden auf das ausgewählte Ziel angerechnet. Sie feuert direkt nach den Sensoren und noch vor allen anderen Waffen."
+    },
+    "weaponB": {
+      "what": "Deine zweite Waffe, die wie Waffe A aufgebaut ist: Der Würfelwert entspricht dem Schaden. Sie feuert direkt nach Waffe A auf das Ziel, das nach diesem Schuss noch steht."
+    },
+    "spinal": {
+      "what": "Eine kiellange Kanone, die die größten Würfel des Schiffs aufnimmt. Ein niedriger Wurf verklemmt sie; ein sauberer Schuss treibt den ganzen Wert ins Ziel.",
+      "jam": "Die Spinallafette verklemmt bei einem Wert von {{jamOn}} oder weniger, Boni eingerechnet: Sie feuert in diesem Zug nichts, und ihr nächster Schuss erhält +{{carry}}, was sich weiter aufaddiert, solange sie klemmt. Darüber trifft sie mit dem Wert plus Boni, zuzüglich des Verwundbar-Werts des Ziels und ×{{crit}} bei einem kritischen Treffer. Sie hat keine Feuermodi.",
+      "mk": "Mk hebt die Obergrenze der Spinallafette nie an – sie nimmt auf jeder Stufe bis zu d{{cap}} –, erhöht hier aber den Affinitätsbonus von Rot."
+    },
+    "weapons": {
+      "damage": "Der Schaden ist der Würfelwert plus seine Boni, geformt vom aktiven Feuermodus. Jeder Treffer addiert den Verwundbar-Wert des Ziels, ein kritischer Treffer multipliziert die Summe mit ×{{crit}} (abgerundet), und der Schild des Gegners fängt Schaden ab, bevor er den Rumpf erreicht.",
+      "affinity": "Rote Würfel erhalten hier bei Mk1 einen Bonus von +{{mk1}}, bei Mk2 von +{{mk2}} und bei Mk3 von +{{mk3}}. Ein prismatischer Würfel gilt in diesem Feld als roter Würfel."
+    },
+    "shields": {
+      "what": "Dein Schildgenerator: Der Würfelwert wird für diesen Zug zum Schild. Treffer des Gegners verbrauchen diesen Wert, bevor sie den Rumpf erreichen.",
+      "gain": "Ein Würfel in den Schilden fügt deinem Schild seinen Wert plus Boni hinzu. Jeder Schild-Slot speist denselben Schild.",
+      "keep": "Der Schild hält nur bis zum Ende des gegnerischen Zuges: Was dann übrig ist, geht verloren, es sei denn, etwas bewahrt einen Teil davon oder die blaue Resonanz hat eine dauerhafte Schicht gelegt.",
+      "affinity": "Blaue Würfel gewähren hier bei Mk1 +{{mk1}}, bei Mk2 +{{mk2}} und bei Mk3 +{{mk3}}. Ein prismatischer Würfel zählt in diesem Slot als blauer Würfel."
+    },
+    "shieldsB": {
+      "what": "Ein zweiter Schildgenerator. Er wird zum ersten hinzugefügt: Beide speisen denselben Schild."
+    },
+    "engines": {
+      "what": "Dein Antrieb: Der Würfelwert bestimmt die Chance, jeden gegnerischen Treffer in diesem Zug zu streifen oder ihm auszuweichen. Ein hoher Wert kann außerdem abfangen.",
+      "affinity": "Grüne Würfel addieren hier bei Mk1 +{{mk1}}, bei Mk2 +{{mk2}} und bei Mk3 +{{mk3}}. Ein prismatischer Würfel zählt in diesem Feld als grüner Würfel.",
+      "flat": "Dieses Schiff und dieser Build verschieben Ausweichen um {{n}} % und Streifen um die Hälfte davon, vor den Obergrenzen."
+    },
+    "enginesB": {
+      "what": "Ein zweiter Antrieb. Sein Wert addiert sich zu dem des ersten Antriebs, und die Summe bestimmt eine Ausweichaktion für diesen Zug."
+    },
+    "sensors": {
+      "what": "Dein Zielfeld: Es markiert das Ziel als „Verwundbar“, noch bevor eine Waffe abgefeuert wird, sodass jeder Treffer in diesem Zug die Markierung darüber hinterlässt.",
+      "fog": "Auch Sensoren leuchten die Karte auf: Bei Mk1 siehst du {{base}} Reihen vor dir und {{perMk}} weitere für jede Mk-Stufe darüber.",
+      "affinity": "Graue Würfel addieren hier bei Mk1 +{{mk1}}, bei Mk2 +{{mk2}} und bei Mk3 +{{mk3}}. Ein prismatischer Würfel zählt in diesem Feld als grauer Würfel."
+    },
+    "reactor": {
+      "what": "Dein Kraftwerk: Der Würfelwert wird zu Ladung. Ladung bezahlt Anstöße, Wiederwürfe, Schübe und einige Offiziersaktionen.",
+      "store": "Ein Würfel im Reaktor speichert seinen Wert als Ladung, wobei etwaige Multiplikatoren bereits berücksichtigt und der Wert abgerundet wurde. Ladung stoppt bei der Obergrenze ({{cap}}); bei einem Speichervorgang, der diese Grenze überschreitet, geht der Rest verloren und es entstehen {{overflow}} Rumpfschaden.",
+      "affinity": "Schwarze Würfel speichern hier auf jeder Mk-Stufe ×{{mult}} Ladung. Ein prismatischer Würfel zählt in diesem Slot als schwarz.",
+      "mk": "Mk erhöht die Obergrenze des Reaktors; die „×{{mult}}“-Ladung von Schwarz bleibt auf jeder Stufe gleich."
+    },
+    "repairBay": {
+      "what": "Ein Workshop an Bord: Der Würfel repariert deinen Rumpf. Er kommt in deinem Zug als Letztes zum Einsatz, nach allen anderen Systemen.",
+      "repair": "Ein Würfelwurf in der Reparaturbucht repariert den Rumpf um einen Wert, der seinem Wert geteilt durch {{divisor}} entspricht, aufgerundet, jedoch niemals über dein Maximum hinaus.",
+      "mk": "Mk erhöht die Obergrenze der Reparaturhalle. Da hier keine Schule eine Bindung hat, ist die Obergrenze der einzige Vorteil, den dies mit sich bringt."
+    },
+    "fit": "Ein Würfel passt, wenn seine Größe höchstens der Obergrenze des Slots entspricht. Ein größerer Würfel passt nur über eine Regel, die die Obergrenze anhebt – eine Schiffspassive, ein Perk, ein Modul oder ein Knoten der Sternenkarte –, und die meisten davon kosten dafür Rumpf."
+  },
   "journal": {
     "title": "Kampfprotokoll",
     "empty": "Es hat sich noch nichts geklärt.",
@@ -413,5 +469,20 @@
     "fork": "{{cond}} — {{then}}. Sonst — {{else}}.",
     "fixed": "{{intent}}.",
     "open": "Wird aus dem Muster gezogen — nicht festgelegt."
-  }
+  },
+  "bag": {
+    "chip": "Beutel {{bag}} · Ablage {{discard}}",
+    "chipShort": "{{bag}}·{{discard}}",
+    "label": "Hand: {{bag}} im Beutel, {{discard}} abgelegt",
+    "title": "Hand — {{n}} Würfel",
+    "hint": "Jeden Zug kommen sieben Würfel aus dem Beutel auf den Tisch. Gesetzte und ungenutzte Würfel gehen auf die Ablage; ist der Beutel leer, wird die Ablage zurückgemischt.",
+    "empty": "Leer",
+    "group": {
+      "table": "Auf dem Tisch · {{n}}",
+      "reserve": "Reserve · {{n}}",
+      "bag": "Im Beutel · {{n}}",
+      "discard": "Ablage · {{n}}"
+    }
+  },
+  "fogTitle": "Sensorreichweite"
 }

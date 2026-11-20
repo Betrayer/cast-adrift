@@ -1,7 +1,6 @@
 .stage {
   position: relative;
-  width: min(100%, 260px);
-  aspect-ratio: 1;
+  width: min(100%, 300px);
   margin: 0 auto;
   border-radius: 14px;
   background:
@@ -15,29 +14,131 @@
   overflow: visible;
 }
 
-.svg {
-  position: absolute;
-  inset: 8%;
-  width: 84%;
-  height: 84%;
+.stage[data-ship-silhouette-size='summary'] {
+  width: min(100%, 160px);
 }
 
-.hull {
+.stage[data-ship-silhouette-size='card'] {
+  width: min(100%, 120px);
+}
+
+.model {
+  position: absolute;
+  inset: 0;
+}
+
+.model :global(svg) {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.model :global([data-part]:not([data-on])) {
+  display: none;
+}
+
+.model :global(.m-hull),
+.model :global(.m-line),
+.model :global(.m-accent),
+.model :global(.m-panel),
+.model :global(.m-plate),
+.model :global(.m-gun) {
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+}
+
+.model :global(.m-hull) {
   fill: color-mix(in srgb, var(--bridge-accent) 22%, var(--ca-surface2));
   stroke: var(--bridge-accent);
   stroke-width: 1.5;
-  stroke-linejoin: round;
 }
 
-.fin {
-  fill: color-mix(in srgb, var(--bridge-wash) 70%, transparent);
-  stroke: color-mix(in srgb, var(--bridge-accent) 60%, var(--ca-line));
+.model :global(.m-line) {
+  fill: none;
+  stroke: color-mix(in srgb, var(--bridge-accent) 45%, var(--ca-line));
   stroke-width: 1;
-  stroke-linejoin: round;
 }
 
-.cockpit {
+.model :global(.m-accent) {
+  fill: none;
+  stroke: var(--bridge-accent);
+  stroke-width: 1.4;
+}
+
+.model :global(.m-accent-thick) {
+  fill: none;
+  stroke: var(--bridge-accent);
+  stroke-width: 3;
+  stroke-linecap: round;
+}
+
+.model :global(.m-panel) {
+  fill: color-mix(in srgb, var(--bridge-accent) 22%, var(--ca-surface1));
+  stroke: var(--bridge-accent);
+  stroke-width: 1.2;
+}
+
+.model :global(.m-plate) {
+  fill: color-mix(in srgb, var(--bridge-accent) 40%, var(--ca-surface2));
+  stroke: var(--bridge-accent);
+  stroke-width: 1;
+}
+
+.model :global(.m-gun) {
+  fill: var(--ca-surface2);
+  stroke: var(--bridge-accent);
+  stroke-width: 1.5;
+}
+
+.model :global(.m-stripe) {
+  fill: none;
+  stroke: var(--ca-amber);
+  stroke-width: 4;
+}
+
+.model :global(.m-glass) {
   fill: var(--bridge-text);
+}
+
+.model :global(.m-ring) {
+  fill: none;
+  stroke: var(--bridge-text);
+  stroke-width: 2.5;
+  stroke-dasharray: 5 4;
+}
+
+.model :global(.m-warm) {
+  fill: none;
+  stroke: var(--ca-amber);
+  stroke-width: 2;
+}
+
+.model :global(.m-warm-fill) {
+  fill: var(--ca-amber);
+}
+
+@keyframes shipPartInstalled {
+  0% {
+    opacity: 0;
+    filter: drop-shadow(0 0 0 var(--bridge-text));
+  }
+  45% {
+    opacity: 1;
+    filter: drop-shadow(0 0 7px var(--bridge-text));
+  }
+  100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 0 transparent);
+  }
+}
+
+.model :global([data-fresh]) {
+  animation: shipPartInstalled var(--ca-motion-xl) var(--ca-ease-out) backwards;
+}
+
+:root[data-ca-motion='reduced'] .model :global([data-fresh]) {
+  animation: none;
 }
 
 .stage[data-bridge-frame='hard'] {
@@ -80,4 +181,19 @@
 .stage[data-bridge-frame='raw'] {
   border-style: dashed;
   border-radius: 4px;
+}
+
+.stage[data-bridge-frame='obsidian'] {
+  border-radius: 6px;
+  border-color: color-mix(in srgb, var(--ca-text) 70%, transparent);
+  background:
+    radial-gradient(
+      circle at 50% 42%,
+      color-mix(in srgb, var(--bridge-wash) 40%, transparent) 0%,
+      transparent 62%
+    ),
+    linear-gradient(160deg, color-mix(in srgb, var(--ca-bg) 55%, black), var(--ca-surface1) 55%, color-mix(in srgb, var(--ca-bg) 55%, black));
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--ca-text) 30%, transparent),
+    inset 0 0 18px color-mix(in srgb, black 70%, transparent);
 }

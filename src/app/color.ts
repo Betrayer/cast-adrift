@@ -1,3 +1,5 @@
+import { clamp01 } from "@/app/math";
+
 export interface Rgb {
   r: number;
   g: number;
@@ -9,8 +11,6 @@ export interface Hsl {
   s: number;
   l: number;
 }
-
-const clamp01 = (v: number): number => Math.max(0, Math.min(1, v));
 
 const hex2 = (v: number): string =>
   Math.round(clamp01(v) * 255)

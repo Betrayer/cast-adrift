@@ -32,6 +32,16 @@
   background: none;
 }
 
+.plain > [data-aura] {
+  inset: -6px -8px;
+  border-radius: 12px;
+}
+
+.card[data-die-card-size='mini'] > [data-aura] {
+  inset: -5px;
+  border-radius: 13px;
+}
+
 .dense {
   min-height: 0;
   gap: 0;
@@ -266,10 +276,10 @@
   }
 }
 
-:root[data-ca-compact='1'] .card[data-die-card-size='mini'] {
+:root[data-ca-compact='1'] [data-screen='battle'] .card[data-die-card-size='mini'] {
   min-height: 34px;
 }
 
-:root[data-ca-compact='1'] .card[data-die-card-size='mini'] .desc {
+:root[data-ca-compact='1'] [data-screen='battle'] .card[data-die-card-size='mini'] .desc {
   display: none;
 }

@@ -75,3 +75,46 @@
   font-size: 13px;
   line-height: 1;
 }
+
+.fresh {
+  position: relative;
+  animation: freshPop var(--ca-motion-l) var(--ca-ease-back) var(--ca-motion-l)
+    backwards;
+}
+
+.fresh::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: inherit;
+  border: 2px solid var(--ca-amber);
+  pointer-events: none;
+  opacity: 0;
+  animation: freshRing var(--ca-motion-xl) var(--ca-ease-out) var(--ca-motion-l)
+    backwards;
+}
+
+@keyframes freshPop {
+  40% {
+    transform: scale(1.04);
+  }
+}
+
+@keyframes freshRing {
+  0% {
+    opacity: 0;
+    transform: scale(1);
+  }
+  12% {
+    opacity: 0.9;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.07);
+  }
+}
+
+:root[data-ca-motion='reduced'] .fresh,
+:root[data-ca-motion='reduced'] .fresh::after {
+  animation: none;
+}

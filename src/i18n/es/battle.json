@@ -1,10 +1,10 @@
 {
-  "turn": "Turn {{n}}",
+  "turn": "Turno {{n}}",
   "hull": "Casco {{hp}}/{{max}}",
   "shield": "Escudo {{n}}",
   "scrap": "Chatarra {{n}}",
-  "charge": "Contacto: {{n}} / {{max}}",
-  "interference": "Interferencia × {{n}}",
+  "charge": "Carga {{n}}/{{max}}",
+  "interference": "Interferencia ×{{n}}",
   "endTurn": "Fin de turno",
   "burnHint": "Los dados que quedan fuera de las ranuras se queman al final del turno",
   "victory": "Victoria",
@@ -76,7 +76,8 @@
     "echoTotal": "repite tu último turno (máx. {{n}})",
     "foldOrder": "pliega el pedido",
     "devourDie": "te quita tu mejor dado de reserva",
-    "idle": "Aguanta"
+    "idle": "Aguanta",
+    "hidden": "Intención oculta"
   },
   "slot": {
     "weaponA": "Arma A",
@@ -109,7 +110,7 @@
     "minibossAlt": "Minijefazo · firma nueva"
   },
   "fate": "Tirada de destino",
-  "fateResult": "Fate {{roll}} — {{text}}",
+  "fateResult": "Destino {{roll}} — {{text}}",
   "swap": "Intercambio",
   "swapPick": "Elige un dado…",
   "bank": "Cara del banco",
@@ -142,6 +143,7 @@
   "targetBody": "Apuntar al casco",
   "targetSub": "{{name}} {{hp}}/{{max}}",
   "mitigation": "entrante bruto {{raw}} → ~{{expected}} · escudo {{shield}} · casco {{hull}}",
+  "mitigationHidden": "en el peor caso bruto {{raw}} → ~{{expected}} · escudo {{shield}} · casco {{hull}}",
   "mitigationNone": "Este enemigo no hace daño en este turno",
   "forecast": "harás {{out}} · recibirás ~{{inc}} (el escudo aguanta {{shield}})",
   "forecastClear": "{{out}} de daño despeja el campo",
@@ -199,7 +201,8 @@
     "active": "Tiene una activa",
     "engraved": "Grabado",
     "growth": "Crece en la cara máxima",
-    "faces": "Caras no estándar"
+    "faces": "Caras no estándar",
+    "forged": "Forjado"
   },
   "layoutHint": "¿Prefieres otra interfaz de combate? Ajustes → Interfaz de combate.",
   "radial": {
@@ -244,7 +247,9 @@
       "faces": "Caras no estándar — {{list}}",
       "growth": "Crecimiento — +{{per}} en cara máxima, hasta +{{cap}}",
       "growthField": "Crecimiento — +{{n}} acumulado en el campo",
-      "prismatic": "Prisma — cuenta como cualquier escuela y hereda la afinidad de la ranura"
+      "prismatic": "Prisma — cuenta como cualquier escuela y hereda la afinidad de la ranura",
+      "legendary": "Legendario — un aura del color de su escuela",
+      "forged": "Forjado ×{{n}} — d{{from}} → d{{to}}"
     },
     "active": {
       "flip": "una vez por combate, gira a la cara opuesta",
@@ -344,18 +349,69 @@
   "interferenceWhy": "Las anomalías omitidas se acumulan: cada acumulación añade otro nivel de marea el resto de la partida. Resolver una anomalía las borra todas.",
   "interferenceTitle": "Interferencia",
   "axisWhy": "Los dados negros tiran hacia Resonancia, los azules hacia Estabilidad. Los eventos y la deriva también mueven el eje.",
-  "chargeWhy": "La carga paga acciones: −1 cuesta {{n}}, +1 cuesta {{n}}, una retirada comprada 5, una sobrecarga 10.",
+  "chargeWhy": "Gasta la carga en acciones: un empujón de una cara arriba o abajo cuesta {{n}}, una repetición de tirada comprada cuesta {{reroll}} y una sobrecarga, {{surge}}.",
   "chargeTitle": "Carga",
   "mkWhy": "Mk sube el límite de la ranura y el bono de afinidad de su escuela.",
   "resEarned": "Logrado",
   "manoeuvreTitle": "Maniobra",
-  "manoeuvreWhy": "Un dado en Motores fija una tirada de evasión por cada golpe entrante: roce {{glancing}}% × valor (máx. {{glancingCap}}%), esquiva {{dodge}}% × valor (máx. {{dodgeCap}}%). El roce recibe la mitad, redondeada hacia arriba, la esquiva no recibe nada, lo demás entra entero. Desde valor {{intercept}} la primera evasión lograda del turno — roce o esquiva — es una intercepción: Armas +1 el turno siguiente. El valor es el dado tras afinidad y bonos.",
-  "manoeuvreBrief": "Una tirada por golpe: roce {{glancing}}% × valor (máx {{glancingCap}}%), esquiva {{dodge}}% × valor (máx {{dodgeCap}}%). El roce recibe la mitad, la esquiva nada. Desde {{intercept}} la primera evasión da Armas +1.",
+  "manoeuvreWhy": "Un dado en Motores fija una tirada de evasión por cada golpe entrante: roce {{glancing}}% × valor (máx. {{glancingCap}}%), esquiva {{dodge}}% × valor (máx. {{dodgeCap}}%). Un roce recibe la mitad, redondeando hacia arriba; una esquiva no recibe nada, y todo lo demás entra completo. A partir del valor {{intercept}}, la primera evasión con éxito del turno —roce o esquiva— es una intercepción: Armas +{{interceptBonus}} el turno siguiente. El valor es el del dado tras la afinidad y los bonos.",
+  "manoeuvreBrief": "Una tirada de evasión por golpe: roce {{glancing}}% × valor (tope {{glancingCap}}%), esquiva {{dodge}}% × valor (tope {{dodgeCap}}%). El roce lo reduce a la mitad; la esquiva lo anula. Desde {{intercept}}, la primera evasión da Armas +{{interceptBonus}}.",
   "targetingTitle": "Designación",
-  "targetingWhy": "Un dado en Sensores deja al objetivo Vulnerable +D durante el turno: D es la mitad del valor del dado redondeada hacia arriba, con tope de {{cap}}, y cada golpe de este turno hace esa cantidad de más. En la cara máxima del dado el golpe además perfora el escudo. El Mk de Sensores además revela una fila más del mapa por cada nivel sobre Mk1.",
+  "targetingWhy": "Un dado en Sensores deja al objetivo Vulnerable +D durante el turno: D es la mitad del valor del dado redondeada hacia arriba, con un máximo de {{cap}}, y cada golpe de este turno inflige eso de más. Con la cara máxima del dado, el golpe además atraviesa el escudo.",
   "targetingBrief": "Los sensores marcan al objetivo: Vulnerable +D por el turno, D es la mitad del valor del dado hacia arriba, máx {{cap}}. Cada golpe hace eso de más; la cara máxima atraviesa el escudo.",
   "resEarnedLine": "{{n}} · {{desc}}",
   "systemsTitle": "Sistemas",
+  "system": {
+    "weaponA": {
+      "what": "Tu arma principal: el valor del dado se convierte en daño contra el objetivo elegido. Dispara justo después de Sensores, antes que cualquier otra arma."
+    },
+    "weaponB": {
+      "what": "Tu segunda arma, construida como el Arma A: el valor del dado se convierte en daño. Dispara justo después del Arma A, contra lo que haya dejado en pie ese disparo."
+    },
+    "spinal": {
+      "what": "Un cañón a lo largo de toda la quilla que admite los dados más grandes de la nave. Una tirada baja lo atasca; un disparo limpio clava todo el valor en el objetivo.",
+      "jam": "El montaje espinal se atasca con un valor de {{jamOn}} o menos, bonos incluidos: no dispara en este turno y su siguiente disparo recibe +{{carry}}, que se sigue acumulando mientras siga atascándose. Por encima de eso golpea por el valor más los bonos, sumando la vulnerabilidad del objetivo y ×{{crit}} con un golpe crítico. No tiene modos de fuego.",
+      "mk": "Mk nunca sube el límite del montaje espinal —admite hasta d{{cap}} en cualquier nivel—, pero sí aumenta aquí el bono de afinidad del rojo."
+    },
+    "weapons": {
+      "damage": "El daño es el valor del dado más sus bonos, moldeado por el modo de fuego activo. Cada golpe suma la vulnerabilidad del objetivo, un golpe crítico multiplica el total por ×{{crit}}, redondeando hacia abajo, y el escudo enemigo absorbe el daño antes que su casco.",
+      "affinity": "Aquí los dados rojos suman +{{mk1}} a su valor en Mk1, +{{mk2}} en Mk2 y +{{mk3}} en Mk3. Un dado prismático cuenta como rojo en esta ranura."
+    },
+    "shields": {
+      "what": "Tu generador de escudo: el valor del dado se convierte en escudo para este turno. Los golpes enemigos lo gastan antes de llegar al casco.",
+      "gain": "Un dado en Escudos suma su valor, más los bonos, a tu escudo. Todas las ranuras de escudo alimentan el mismo escudo.",
+      "keep": "El escudo solo dura hasta el final del turno enemigo: lo que quede cuando ese turno termine se pierde, a menos que algo conserve una parte o la resonancia azul haya dejado una capa duradera.",
+      "affinity": "Aquí los dados azules suman +{{mk1}} en Mk1, +{{mk2}} en Mk2 y +{{mk3}} en Mk3. Un dado prismático cuenta como azul en esta ranura."
+    },
+    "shieldsB": {
+      "what": "Un segundo generador de escudo. Se acumula con el primero: ambos vierten en el mismo escudo."
+    },
+    "engines": {
+      "what": "Tu propulsor: el valor del dado fija la probabilidad de roce o esquiva ante cada golpe enemigo en este turno. Un valor alto también puede interceptar.",
+      "affinity": "Aquí los dados verdes suman +{{mk1}} en Mk1, +{{mk2}} en Mk2 y +{{mk3}} en Mk3. Un dado prismático cuenta como verde en esta ranura.",
+      "flat": "Esta nave y esta configuración desplazan la esquiva en {{n}} % y el roce en la mitad, antes de los topes."
+    },
+    "enginesB": {
+      "what": "Un segundo propulsor. Su valor se suma al del primer motor, y la suma fija una única evasión para el turno."
+    },
+    "sensors": {
+      "what": "Tu sistema de puntería: marca al objetivo como Vulnerable antes de que dispare ninguna arma, así que cada golpe de este turno lleva la marca encima.",
+      "fog": "Los sensores también iluminan el mapa: ves {{base}} filas por delante en Mk1 y {{perMk}} más por cada Mk por encima.",
+      "affinity": "Aquí los dados grises suman +{{mk1}} en Mk1, +{{mk2}} en Mk2 y +{{mk3}} en Mk3. Un dado prismático cuenta como gris en esta ranura."
+    },
+    "reactor": {
+      "what": "Tu planta de energía: el valor del dado se convierte en carga. La carga paga empujones, repeticiones de tirada, sobrecargas y algunas acciones de oficiales.",
+      "store": "Un dado en el Reactor almacena su valor como carga, tras cualquier multiplicador y redondeando hacia abajo. La carga se detiene en el límite ({{cap}}); un almacenamiento que lo desborde desperdicia el resto y cuesta {{overflow}} de casco.",
+      "affinity": "Aquí los dados negros almacenan ×{{mult}} de carga en cualquier Mk. Un dado prismático cuenta como negro en esta ranura.",
+      "mk": "Mk sube el límite del reactor; el ×{{mult}} de carga del negro no cambia en ningún nivel."
+    },
+    "repairBay": {
+      "what": "Un taller a bordo: el dado remienda tu casco. Actúa el último en tu turno, después de todos los demás sistemas.",
+      "repair": "Un dado en el Taller de reparaciones repara casco igual a su valor ÷ {{divisor}}, redondeando hacia arriba, sin superar nunca tu máximo.",
+      "mk": "Mk sube el límite del taller de reparaciones. Aquí ninguna escuela tiene afinidad, así que el límite es lo único que aporta."
+    },
+    "fit": "Un dado cabe cuando su tamaño es igual o inferior al límite de la ranura. Un dado mayor solo entra mediante una regla que levante el límite —una pasiva de la nave, una ventaja, un módulo o un nodo de la Carta estelar— y la mayoría te cobra casco por ello."
+  },
   "journal": {
     "title": "Registro de batalla",
     "empty": "Todavía no se ha resuelto nada.",
@@ -413,5 +469,20 @@
     "fork": "{{cond}} — {{then}}. Si no — {{else}}.",
     "fixed": "{{intent}}.",
     "open": "Se extrae de su patrón — no está fijado."
-  }
+  },
+  "bag": {
+    "chip": "Bolsa {{bag}} · Descarte {{discard}}",
+    "chipShort": "{{bag}}·{{discard}}",
+    "label": "Mano: {{bag}} en la bolsa, {{discard}} descartados",
+    "title": "Mano — {{n}} dados",
+    "hint": "Cada turno salen a la mesa siete dados de la bolsa. Los colocados y los sin usar van al descarte; cuando la bolsa se vacía, el descarte se baraja de vuelta.",
+    "empty": "Vacío",
+    "group": {
+      "table": "En la mesa · {{n}}",
+      "reserve": "Reserva · {{n}}",
+      "bag": "En la bolsa · {{n}}",
+      "discard": "Descarte · {{n}}"
+    }
+  },
+  "fogTitle": "Alcance de sensores"
 }

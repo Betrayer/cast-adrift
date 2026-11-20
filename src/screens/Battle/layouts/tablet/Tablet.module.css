@@ -2,7 +2,6 @@
 .trayBand {
   pointer-events: none;
   min-width: 0;
-  touch-action: none;
 }
 
 .enemyBand {
@@ -55,16 +54,17 @@
 
 .grid {
   flex: 1 1 auto;
-  min-height: 0;
+  min-height: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  align-items: stretch;
   gap: 6px;
   padding: 0 12px;
 }
 
 .conveyor {
   pointer-events: auto;
-  flex: 0 0 auto;
+  flex: 1.35 1 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -73,7 +73,7 @@
 
 .trayBand {
   flex: 1 1 0;
-  width: 100%;
+  width: auto;
   min-height: 72px;
 }
 
@@ -107,8 +107,8 @@
   --wash: var(--ca-surface2);
   --tone: var(--ca-dim);
   transition:
-    box-shadow 140ms ease,
-    border-color 140ms ease;
+    box-shadow 140ms var(--ca-ease-out),
+    border-color 140ms var(--ca-ease-out);
 }
 
 .chip {
@@ -232,7 +232,7 @@
 
 .row[data-pulse='1'],
 .reserve[data-pulse='1'] {
-  animation: row-pulse 320ms ease-out;
+  animation: row-pulse 320ms var(--ca-ease-out);
 }
 
 .rowBlocked {
@@ -250,6 +250,7 @@
 }
 
 .reserve {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -319,21 +320,16 @@
     min-height: 30px;
     padding: 2px 6px;
   }
+
+  .out {
+    min-width: 42px;
+    font-size: 11px;
+  }
 }
 
 @media (min-width: 480px) {
-  .grid {
-    flex-direction: row;
-    align-items: stretch;
-  }
-
   .conveyor {
     flex: 1.25 1 0;
-  }
-
-  .trayBand {
-    flex: 1 1 0;
-    width: auto;
   }
 }
 
@@ -359,8 +355,8 @@
 }
 
 :root[data-ca-compact='1'] .enemyBand {
-  min-height: 74px;
-  height: 19%;
+  min-height: 60px;
+  height: 18%;
 }
 
 :root[data-ca-compact='1'] .stripBreak {
@@ -369,22 +365,14 @@
 
 :root[data-ca-compact='1'] .strip {
   min-height: 22px;
-  padding: 2px 8px;
-}
-
-:root[data-ca-compact='1'] .grid {
-  flex-direction: row;
-  align-items: stretch;
+  padding: 1px 8px;
 }
 
 :root[data-ca-compact='1'] .conveyor {
-  flex: 1.35 1 0;
-  gap: 3px;
+  gap: 2px;
 }
 
 :root[data-ca-compact='1'] .trayBand {
-  flex: 1 1 0;
-  width: auto;
   min-height: 64px;
 }
 
@@ -409,8 +397,8 @@
 }
 
 :root[data-ca-compact='1'] .well {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 :root[data-ca-compact='1'] .out {
@@ -419,7 +407,7 @@
 }
 
 :root[data-ca-compact='1'] .reserve {
-  min-height: 28px;
+  min-height: 26px;
   padding: 2px 6px;
 }
 
@@ -433,7 +421,6 @@
   pointer-events: none;
   width: 100%;
   min-width: 0;
-  touch-action: none;
 }
 
 .wideEnemyBand {
@@ -444,4 +431,52 @@
 .wideTrayBand {
   flex: 1 1 0;
   min-height: 120px;
+}
+
+:root[data-ca-tight='1'] .enemyBand {
+  min-height: 40px;
+  height: 14%;
+}
+
+:root[data-ca-tight='1'] .strip {
+  min-height: 16px;
+  padding: 0 8px;
+}
+
+:root[data-ca-tight='1'] .reserve {
+  min-height: 24px;
+  padding: 1px 6px;
+}
+
+:root[data-ca-tight='1'] .row {
+  padding: 1px 6px;
+  gap: 3px;
+  overflow: hidden;
+}
+
+:root[data-ca-tight='1'] .well {
+  width: 14px;
+  height: 14px;
+}
+
+:root[data-ca-tight='1'] .conveyor {
+  gap: 2px;
+  min-height: 0;
+}
+
+:root[data-ca-tight='1'] .grid {
+  min-height: 0;
+}
+
+:root[data-ca-tight='1'] .trayBand {
+  min-height: 0;
+}
+
+:root[data-ca-tight='1'] .cap {
+  display: none;
+}
+
+:root[data-ca-tight='1'] .chip {
+  width: 18px;
+  height: 18px;
 }

@@ -1,4 +1,4 @@
-import { readdirSync, readFileSync, statSync } from "node:fs";
+import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import {
@@ -7,6 +7,7 @@ import {
   fixedBackTarget,
   navAttrFor,
 } from "@/app/routes";
+import { SRC, sourceFiles } from "@/app/sourceFiles";
 import type { ScreenId } from "@/types";
 
 const NAMESPACES = ["battle", "common", "content", "menu", "meta", "run", "settings"] as const;
@@ -27,19 +28,6 @@ const hasKey = (key: string): boolean => {
     node = (node as Record<string, unknown>)[segment];
   }
   return typeof node === "string";
-};
-
-const screenFiles = (): string[] => {
-  const out: string[] = [];
-  const walk = (dir: string): void => {
-    for (const entry of readdirSync(dir)) {
-      const path = join(dir, entry);
-      if (statSync(path).isDirectory()) walk(path);
-      else if (path.endsWith(".tsx")) out.push(path);
-    }
-  };
-  walk(join("src", "screens"));
-  return out;
 };
 
 const ids = Object.keys(ROUTES) as ScreenId[];
@@ -72,7 +60,7 @@ describe("route metadata", () => {
 
 describe("header ownership", () => {
   it("leaves the back label to AppHeader alone", () => {
-    const offenders = screenFiles().filter((file) =>
+    const offenders = sourceFiles(".tsx", join(SRC, "screens")).filter((file) =>
       readFileSync(file, "utf8").includes("common:back"),
     );
     expect(offenders).toEqual([]);

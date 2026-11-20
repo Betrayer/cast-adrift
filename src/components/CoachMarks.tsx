@@ -2,9 +2,11 @@ import { Button } from '@mantine/core';
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useViewport } from '@/app/breakpoints';
-import { coachCardPlacement, type Bounds } from '@/components/coachPlacement';
+import { safeBounds } from '@/app/safeArea';
+import { coachCardPlacement } from '@/components/coachPlacement';
 import {
   ALL_COACH_MARK_IDS,
+  clampCoachRect,
   nextCoachMark,
   type CoachMarkDef,
   type CoachRect,
@@ -17,19 +19,6 @@ import styles from './CoachMarks.module.css';
 const POLL_MS = 400;
 const CARD_W = 300;
 const EDGE = 12;
-
-const inset = (name: string): number => {
-  const raw = getComputedStyle(document.documentElement).getPropertyValue(name);
-  const parsed = Number.parseFloat(raw);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
-const safeBounds = (): Bounds => ({
-  top: inset('--ca-safe-top') + EDGE,
-  left: inset('--ca-safe-left') + EDGE,
-  right: window.innerWidth - inset('--ca-safe-right') - EDGE,
-  bottom: window.innerHeight - inset('--ca-safe-bottom') - EDGE,
-});
 
 export interface CoachTarget {
   mark: CoachMarkDef;
@@ -67,7 +56,7 @@ const MarkView = ({ mark, rect, onNext, onSkipAll }: MarkViewProps) => {
       const { left, top } = coachCardPlacement(
         rect,
         { w: card.offsetWidth, h: card.offsetHeight },
-        safeBounds(),
+        safeBounds(EDGE),
       );
       card.style.left = `${String(left)}px`;
       card.style.top = `${String(top)}px`;
@@ -151,7 +140,11 @@ const CoachMarkHost = ({ screen }: { screen: ScreenId }) => {
   useEffect(() => {
     const evaluate = (): void => {
       const mark = nextCoachMark(screen, useMetaStore.getState().tutorialSeen);
-      const rect = mark?.anchor() ?? null;
+      const anchored = mark?.anchor() ?? null;
+      const rect =
+        anchored === null
+          ? null
+          : clampCoachRect(anchored, window.innerWidth, window.innerHeight);
       if (mark === null || rect === null) {
         setActive((prev) => (prev === null ? prev : null));
         return;

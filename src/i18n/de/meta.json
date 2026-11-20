@@ -7,7 +7,8 @@
     "yellow": "Gelb",
     "black": "Schwarz",
     "grey": "Grau",
-    "prismatic": "Prismatisch"
+    "prismatic": "Prismatisch",
+    "nexus": "Nexus"
   },
   "chart": {
     "title": "Sternenkarte",
@@ -53,21 +54,14 @@
     "keySingleCast": "Einzelguss",
     "redSpotter": "Beobachter",
     "redFirestorm": "Feuersturm",
-    "redSpine": "Wirbelsäule",
     "blueBarrier": "Barriere",
     "blueJammer": "Störsender",
-    "blueTideBreak": "Tidebreak",
     "greenCanopy": "Vordach",
-    "greenPerennial": "Mehrjährig",
     "yellowTally": "Zählung",
-    "yellowBounty": "Kopfgeld",
     "blackVent": "Entlüftung",
-    "blackWell": "Na ja",
     "greyToolkit": "Toolkit",
-    "greyLedger": "Hauptbuch",
     "prismLattice": "Gitter",
     "prismFacet": "Facette",
-    "prismWell": "Prism-Brunnen",
     "hubEngineering": "Technikbereich",
     "keyStormChaser": "Sturmjäger",
     "keyIronDoctrine": "Eiserne Doktrin",
@@ -82,36 +76,55 @@
     "respecConfirmTitle": "Diesen Knoten zurückerstatten?",
     "respecConfirmBody": "„{{name}}“ wird wieder in den Pool zurückgelegt, und {{points}} Punkt(e) werden zurückgegeben. Kosten: {{cost}}◈.",
     "respecConfirmYes": "Rückerstattung",
-    "redPowderRoom": "Gäste-WC",
-    "redRangeCard": "Schusskarte",
-    "redHairTrigger": "Haarauslöser",
-    "redCoreBreach": "Kernbruch",
-    "blueStormAnchor": "Sturmanker",
-    "blueSpillway": "Überlauf",
-    "blueLongLens": "Teleobjektiv",
-    "blueKeelPlate": "Kielplatte",
-    "greenGraftBench": "Graft-Bank",
-    "greenSapline": "Sapline",
-    "greenLoam": "Lehm",
-    "greenHollow": "Die Senke",
-    "yellowTollhouse": "Mautstelle",
-    "yellowFinderFee": "Vermittlungsgebühr",
-    "yellowShortWeight": "Untergewicht",
-    "yellowMintMark": "Prägezeichen",
-    "blackAshBed": "Aschebett",
-    "blackDeadMansSwitch": "Notschalter",
-    "blackTithe": "Der Zehnte",
-    "blackSlagHeap": "Schlackenhalde",
-    "greyShimStack": "Unterlegscheibenstapel",
-    "greyPatternBook": "Musterbuch",
-    "greyBallastTrim": "Ballasttrimmung",
-    "greyTallyStick": "Zählstab",
     "cost": "Kosten {{n}}",
     "repriced": "Die Knotenpreise haben sich geändert: deine Auswahl kostet jetzt {{spent}} von {{total}} Punkten. Nichts wurde weggenommen — ein vollständiger Respec ist kostenlos.",
     "freeRespec": "Kostenloser Respec",
     "freeRespecTitle": "Die gesamte Karte leeren?",
     "freeRespecBody": "Alle zugewiesenen Knoten ({{n}}) gehen in den Pool zurück und jeder Punkt wird erstattet. Dieses Zurücksetzen ist kostenlos.",
-    "freeRespecYes": "Leeren"
+    "freeRespecYes": "Leeren",
+    "redCorona": "Korona",
+    "redCinderFrost": "Aschenfrost",
+    "blueTidalWall": "Flutwand",
+    "bluePermafrost": "Permafrost",
+    "greenHoarfrost": "Reifblüte",
+    "greenGoldenGrove": "Goldener Hain",
+    "yellowHarvest": "Ernte",
+    "yellowLoadedDice": "Gezinkte Würfel",
+    "blackGamblersVoid": "Leere des Spielers",
+    "blackNullForge": "Nullschmiede",
+    "greyBallast": "Ballast",
+    "greyFacetGrinder": "Facettenschleifer",
+    "prismRefraction": "Brechung",
+    "prismSolarWind": "Sonnenwind",
+    "nexusSteamLance": "Dampflanze",
+    "nexusFrostbloom": "Frostblüte",
+    "nexusGoldenCanopy": "Goldenes Blätterdach",
+    "nexusHouseEdge": "Hausvorteil",
+    "nexusNullAnvil": "Nullamboss",
+    "nexusFacetEngine": "Facettenmaschine",
+    "nexusNova": "Nova",
+    "resetAll": "Alles löschen",
+    "resetTitle": "Die ganze Karte löschen?",
+    "resetBody": "{{n}} Knoten kehren als Punkte zurück. Der Kern bleibt. Es kostet {{price}} Splitter.",
+    "resetBodyFree": "{{n}} Knoten kehren als Punkte zurück. Der Kern bleibt. Dieser ist kostenlos.",
+    "resetYes": "Für {{price}} löschen",
+    "requiresPoints": "Benötigt {{n}} Punkte in {{school}}",
+    "requiresMet": "{{n}} in {{school}} — erfüllt",
+    "scaledBy": "Skaliert mit {{school}}: {{steps}} von 5 Stufen ({{points}} Punkte investiert)",
+    "layout": "Kartenansicht",
+    "search": "Knoten suchen",
+    "searchClear": "Suche löschen",
+    "available": "Jetzt verfügbar",
+    "filterKind": "Typ",
+    "filterTags": "Tags",
+    "kind": {
+      "small": "Klein",
+      "gate": "Tor",
+      "notable": "Bedeutend",
+      "confluence": "Zusammenfluss",
+      "nexus": "Nexus",
+      "keystone": "Schlussstein"
+    }
   },
   "chartFx": {
     "hubBudget": "+1 Hangar-Budget",
@@ -137,87 +150,117 @@
       "freeShopRerolls": "{{n}} Kostenloser Neuzufall des Zählers",
       "xpMultPct": "{{n}} % XP",
       "tideEffectDelta": "{{n}} dem Biss der Flut",
-      "moduleSlotDelta": "{{n}} Modulschacht"
+      "moduleSlotDelta": "{{n}} Modulschacht",
+      "shieldKeepPct": "{{n}} % des Schilds überstehen den Zug des Gegners",
+      "resonanceCountDelta": "{{n}} auf die Resonanz der führenden Schule",
+      "firstHitReducePct": "Erster Treffer einer Elite, eines Minibosses oder eines Bosses: {{n}} % schwächer"
     },
     "fx": {
-      "weaponsMaxFace": "Waffen +1 bei einem Würfel mit maximaler Augenzahl",
-      "redFirstTurn": "Roter Würfel +1 in Runde 1",
-      "shieldsHigh": "+1 Schild, wenn der Schild-Wurf 6+ ergibt",
-      "shieldsFlat": "+1 Schild pro „Schilde“-Entscheidung",
-      "minFaceScrap": "+2 Schrott bei einem Würfelwurf mit der Mindestaugenzahl",
+      "weaponsMaxFace": "Waffen +{{n}} bei einem Würfel mit maximaler Augenzahl",
+      "redFirstTurn": "Roter Würfel +{{n}} in Runde 1",
+      "shieldsHigh": "+{{n}} Schild, wenn der Schild-Wurf 6+ ergibt",
+      "shieldsFlat": "+{{n}} Schild pro „Schilde“-Entscheidung",
+      "minFaceScrap": "+{{n}} Schrott bei einem Würfelwurf mit der Mindestaugenzahl",
       "weaponsLowHull": "Waffen +1, solange der Rumpf weniger als 50 % hat",
       "sensorsBonus": "Sensoren +1",
       "redSalvo": "Waffen +3 in Runde 1",
       "blueGlacier": "+2 Schilde pro „Schilde“-Entscheidung",
       "blackEdge": "Alle Würfel +2, solange der Rumpf kritisch beschädigt ist",
-      "allDice1": "Alle Würfel +1",
-      "weaponsBurn": "Maximaler Wert für „Waffen“ erhöht „Verbrennung“ um 1",
-      "enginesBonus": "+1 bei den Motoren",
-      "reactorBonus": "+1 im Reaktor",
+      "weaponsBurn": "Maximaler Wert für „Waffen“ erhöht „Verbrennung“ um {{n}}",
+      "enginesBonus": "+{{n}} bei den Motoren",
+      "reactorBonus": "+{{n}} im Reaktor",
       "greenHeal": "Bei einer grünen Augenzahl heilt Max 1",
       "repeatCharge": "Ein wiederholter Wert speichert 1 Ladung",
-      "maxFaceScrap": "Jede „Max Face“-Kombination bringt 2 Schrott.",
+      "maxFaceScrap": "Jede „Max Face“-Kombination bringt {{n}} Schrott.",
       "minFaceCharge": "Jedes „min face“-Lager speichert 1 Ladung",
       "firstTurnAll": "+1 auf jeden Würfel in der ersten Runde",
       "redFirestorm": "Maximaler Wert für „Waffen“ erhöht „Verbrennung“ um 3",
-      "redSpine": "+4 bei der Wirbelsäulenmontage",
+      "redSpine": "+{{n}} bei der Wirbelsäulenmontage",
       "greenCanopy": "+3 bei den Motoren",
-      "blackWell": "Der Reaktor speichert noch 2 Ladungen",
-      "shopArrival": "+6 Schrott bei Ankunft auf einem Markt",
-      "tideWard": "Repariere bei jedem Sprung 1 Rumpf, solange die Flut 2+ beträgt",
+      "blackWell": "Der Reaktor speichert noch {{n}} Ladungen",
+      "shopArrival": "+{{n}} Schrott bei Ankunft auf einem Markt",
+      "tideWard": "Repariere bei jedem Sprung {{n}} Rumpf, solange die Flut 2+ beträgt",
       "detourScout": "+12 Schrott beim Einfahren in eine Umleitung",
-      "redFinisher": "+2 auf den Waffenschaden gegen ein Ziel mit weniger als 30 % Rumpf.",
-      "redSwarmFire": "+1 auf die Waffen, solange zwei oder mehr Gegner noch im Kampf sind.",
-      "redBurnBite": "Ein Treffer mit einer Waffe auf ein brennendes Ziel verursacht 2 zusätzliche Schadenspunkte.",
+      "redFinisher": "+{{n}} auf den Waffenschaden gegen ein Ziel mit weniger als 30 % Rumpf.",
+      "redSwarmFire": "+{{n}} auf die Waffen, solange zwei oder mehr Gegner noch im Kampf sind.",
+      "redBurnBite": "Ein Treffer mit einer Waffe auf ein brennendes Ziel verursacht {{n}} zusätzliche Schadenspunkte.",
       "redRepeatCrit": "Ein Waffenwürfel, bei dem der letzte Wert bei einem kritischen Treffer wiederholt wird.",
-      "redSalvoTally": "Ab dem dritten Waffenwürfel einer Schlacht gibt es +1 auf die Waffenwerte.",
-      "redOpener": "Der erste Waffenwürfel der Runde erhält einen Bonus von +2.",
-      "redRiskCharge": "Wenn die Rumpfstärke unter 40 % liegt, beende jeden Zug mit 1 Ladung.",
-      "redPowderRoom": "Jeder Treffer auf ein brennendes Ziel verursacht einen weiteren Brandschaden.",
+      "redSalvoTally": "Ab dem dritten Waffenwürfel einer Schlacht gibt es +{{n}} auf die Waffenwerte.",
+      "redOpener": "Der erste Waffenwürfel der Runde erhält einen Bonus von +{{n}}.",
+      "redRiskCharge": "Wenn die Rumpfstärke unter 40 % liegt, beende jeden Zug mit {{n}} Ladung.",
+      "redPowderRoom": "Jeder Treffer auf ein brennendes Ziel fügt Brand {{n}} hinzu.",
       "redHairTrigger": "Der erste Waffenwürfel dieser Runde ergibt einen kritischen Treffer.",
-      "redCoreBreach": "+3 auf jeden Würfelwurf gegen ein Ziel mit weniger als 25 % Rumpf.",
+      "redCoreBreach": "+{{n}} auf jeden Würfelwurf gegen ein Ziel mit weniger als 25 % Rumpf.",
       "blueOvershield": "Bei 6 Schilden addiert ein Schild-Würfel 2 weitere hinzu.",
-      "blueStillness": "Ein blauer Würfel in Schilden erhält +1.",
+      "blueStillness": "Ein blauer Würfel in Schilden erhält +{{n}}.",
       "blueDeepGuard": "Halte 4 Schild während des gegnerischen Zuges, um 1 zu heilen.",
       "blueJamOnLow": "Ein Sensorwert unter 4 wird als 5 gewertet.",
       "blueWatch": "Ein blauer Würfel, der auf seiner niedrigsten Seite liegt, wird einmal erneut gewürfelt.",
       "blueBreakwater": "Beginne jeden Kampf mit 3 Schildpunkten.",
       "blueSpillway": "Bei einem Würfelwurf von 8 oder mehr auf die Schild-Fläche werden 3 Schilde hinzugefügt.",
-      "blueLongLens": "+2 bei den Sensoren.",
+      "blueLongLens": "+{{n}} bei den Sensoren.",
       "greenGrowOnEngines": "Eine „Max-Face“-Maschine wächst um bis zu +2.",
       "greenTendril": "Ein grüner Würfel mit einer Augenzahl von 6 oder mehr erhöht den Wert um bis zu +3.",
       "greenMend": "Beende einen Zug mit mehr als 30 % Rumpf, um 1 Lebenspunkt zu regenerieren.",
-      "greenRootHold": "+2 bei Motoren unterhalb der Rumpfhalbhöhe.",
+      "greenRootHold": "+{{n}} bei Motoren unterhalb der Rumpfhalbhöhe.",
       "greenSpore": "Ein gewonnener Kampf heilt 2.",
       "greenQuietBerth": "Bei der Ankunft in einer Werft werden 2 Lebenspunkte wiederhergestellt.",
       "greenSapline": "Beende einen Zug mit 4 Schildpunkten, um 2 zu heilen.",
       "greenLoam": "Eine „Max-Face“-Maschine wächst um bis zu +3.",
-      "yellowTollBooth": "Das Erreichen einer Begegnung bringt 8 Schrott ein.",
-      "yellowKickback": "Ein gelber Würfel bringt bei seiner Auswertung 2 Schrott ein.",
-      "yellowLuckyOpen": "Der erste Würfel des Zuges bringt bei seiner Höchstzahl 6 Schrott.",
-      "yellowGleaner": "Ein gelber Würfel bringt auf seiner niedrigsten Seite 4 Schrott.",
-      "yellowWager": "Ein Würfel auf einer der beiden äußeren Seiten bringt 3 Schrott.",
-      "yellowTollhouse": "Wenn man an einem Schalter ankommt, erhält man 14 Schrott.",
-      "yellowMintMark": "Ein Reaktor-Chip bringt 4 Schrott ein.",
-      "blackBleedCharge": "+1 bei schwarzen Würfeln unter 60 % Rumpf.",
+      "yellowTollBooth": "Das Erreichen einer Begegnung bringt {{n}} Schrott ein.",
+      "yellowKickback": "Ein gelber Würfel bringt bei seiner Auswertung {{n}} Schrott ein.",
+      "yellowLuckyOpen": "Der erste Würfel des Zuges bringt bei seiner Höchstzahl {{n}} Schrott.",
+      "yellowGleaner": "Ein gelber Würfel bringt auf seiner niedrigsten Seite {{n}} Schrott.",
+      "yellowWager": "Ein Würfel auf einer der beiden äußeren Seiten bringt {{n}} Schrott.",
+      "yellowTollhouse": "Wenn man an einem Schalter ankommt, erhält man {{n}} Schrott.",
+      "yellowMintMark": "Ein Reaktor-Chip bringt {{n}} Schrott ein.",
+      "blackBleedCharge": "+{{n}} bei schwarzen Würfeln unter 60 % Rumpf.",
       "blackOvercap": "Schwarze Würfel können die Slot-Obergrenze für 2 Rumpfplätze überschreiten.",
-      "blackPactTithe": "Beginne jeden Kampf mit 2 Ladepunkten und −2 Rumpf.",
-      "blackLastLight": "+2 bei jedem Würfelwurf, wenn der Rumpfschaden unter 25 % liegt.",
-      "blackReactorTally": "Ab dem zweiten Reaktor, der ausfällt, beende den Zug mit 1 Ladung.",
-      "blackSpite": "Bei weniger als der Hälfte der Rüstung endet der Zug des Gegners mit 1 Angriff.",
-      "blackNightWatch": "Ein schwarzer Würfel, der auf seiner Höchstseite liegt, ergibt 1 Ladung.",
-      "blackAshBed": "Ein Würfel auf seiner niedrigsten Seite ergibt 2 Ladung.",
-      "blackDeadMansSwitch": "Wenn die Rumpf-HP unter 25 % liegen, beende jeden Zug mit 3 Ladungen.",
-      "blackSlagHeap": "+3 im Reaktor bei 4 Ladungen.",
-      "greyScan": "Bei jedem Würfelwurf gibt es einen zusätzlichen Schub.",
-      "greyEvenKeel": "+1 für graue Würfel.",
-      "greyCounterweight": "Ein nicht grauer Würfel erhält auf seiner niedrigsten Seite +1.",
-      "greyToolbelt": "Ein zusätzlicher Wiederholungswurf pro Kampf.",
-      "greySpare": "Ein zusätzlicher Reserveplatz pro Gefecht.",
-      "greyMirror": "Ein grauer Würfel, der den letzten Wert wiederholt, erhöht die Anzahl der Wiederholungswürfe um 1.",
-      "greyLedgerKeep": "Wenn man gegen einen Tresen läuft, erhält man 10 Schrott.",
-      "greyPatternBook": "Ein Würfel, der den letzten Wert wiederholt, gewährt einen Wiederholungswurf.",
-      "greyTallyStick": "Sobald der zweite Sensor ausfällt, gibt es bei jedem Würfelwurf +2."
+      "blackPactTithe": "Beginne jeden Kampf mit {{n}} Ladepunkten und −{{m}} Rumpf.",
+      "blackLastLight": "+{{n}} bei jedem Würfelwurf, wenn der Rumpfschaden unter 25 % liegt.",
+      "blackReactorTally": "Ab dem zweiten Reaktor, der ausfällt, beende den Zug mit {{n}} Ladung.",
+      "blackSpite": "Bei weniger als der Hälfte der Rüstung endet der Zug des Gegners mit {{n}} Angriff.",
+      "blackNightWatch": "Ein schwarzer Würfel, der auf seiner Höchstseite liegt, ergibt {{n}} Ladung.",
+      "blackAshBed": "Ein Würfel auf seiner niedrigsten Seite ergibt {{n}} Ladung.",
+      "blackDeadMansSwitch": "Wenn die Rumpf-HP unter 25 % liegen, beende jeden Zug mit {{n}} Ladungen.",
+      "blackSlagHeap": "+{{n}} im Reaktor bei 4 Ladungen.",
+      "greyScan": "Anstöße pro Wurf: +{{n}}.",
+      "greyEvenKeel": "+{{n}} für graue Würfel.",
+      "greyCounterweight": "Ein nicht grauer Würfel erhält auf seiner niedrigsten Seite +{{n}}.",
+      "greyToolbelt": "Wiederholungswürfe pro Kampf: +{{n}}.",
+      "greySpare": "+{{n}} Reserveplatz pro Gefecht.",
+      "greyMirror": "Ein grauer Würfel, der den letzten Wert wiederholt, erhöht die Anzahl der Wiederholungswürfe um {{n}}.",
+      "greyLedgerKeep": "Wenn man gegen einen Tresen läuft, erhält man {{n}} Schrott.",
+      "greyPatternBook": "Ein Würfel, der den letzten Wert wiederholt, erhöht deine Wiederholungswürfe um {{n}}.",
+      "greyTallyStick": "Ab dem zweiten Sensorwürfel +{{n}} auf jeden Würfel.",
+      "prismWildEdge": "Ein prismatischer Würfel erhält +{{n}} in jedem Slot.",
+      "prismCarry": "Ein aufgelöster prismatischer Würfel gibt dem nächsten prismatischen Würfel +2.",
+      "prismDichroic": "Ein prismatischer Würfel nimmt die Farbe des Slots an: +{{n}} Schild in den Schilden, Verbrennung {{m}} in den Waffen.",
+      "prismOvercap": "Prismatische Würfel können die Slot-Obergrenze für 1 Rumpf überschreiten.",
+      "prismKindling": "Zwei prismatische in der Zählung: Jeder Kampf beginnt mit {{n}} Ladung.",
+      "prismDeepWell": "Vier prismatische in der Zählung: Jede Runde endet mit {{n}} Ladung und heilt {{m}}.",
+      "prismOpenHand": "Der erste Würfel der Runde erhält +{{n}}, egal welche Farbe.",
+      "prismDividend": "Zwei prismatische in der Zählung: Ein gewonnener Kampf bringt {{n}} Schrott und heilt {{m}}.",
+      "redCinderFrost": "Waffen +1, solange ein Schild hält · je 5 Punkte in Blau",
+      "blueTidalWall": "+1 Schild bei jeder Waffenauswertung · je 5 Punkte in Rot",
+      "greenHoarfrost": "Heilt 1 am Zugende, solange ein Schild hält · je 5 Punkte in Blau",
+      "greenGoldenGrove": "Die ersten drei grünen Höchstseiten einer Schlacht bringen 1 Schrott · je 5 Punkte in Gelb",
+      "yellowLoadedDice": "Ein schwarzer Würfel auf seiner niedrigsten Seite erhält +1 · je 5 Punkte in Schwarz",
+      "blackGamblersVoid": "Die ersten zwei schwarzen Höchstseiten einer Schlacht reparieren 1 Hülle · je 5 Punkte in Gelb",
+      "blackNullForge": "Ein grauer Würfel im Reaktor gibt 1 Ladung · je 5 Punkte in Grau",
+      "greyFacetGrinder": "Ab dem dritten grauen Würfel einer Schlacht erhalten graue Würfel +1 · je 5 Punkte in Prismatisch",
+      "prismSolarWind": "Der erste Waffenwürfel der Runde erhält +1 · je 5 Punkte in Rot",
+      "stormSurge": "Waffen +1 für jede Stufe, um die die Flut gestiegen ist, bis zu +3.",
+      "coldLogicMaxDie": "Zu Beginn eines Kampfes wird der niedrigste Würfel auf seine höchste Seite gesetzt.",
+      "greySingleCast": "Graue Würfel +1; jeder andere Würfel +1, solange drei oder mehr graue Würfel an Bord sind.",
+      "prismCascade": "Mit drei prismatischen Würfeln an Bord passt jeder Würfel ohne Rumpfkosten in jeden Slot.",
+      "nexusSteamLance": "Ab dem zweiten Schild-Würfel eines Kampfes: +2 auf die Waffen.",
+      "nexusFrostbloom": "Beende einen Zug mit 3 · 7 · 12 Schild, um 1 · 2 · 3 zu heilen.",
+      "nexusGoldenCanopy": "Jeder der ersten fünf grünen Würfel eines Kampfes heilt 1 und bringt 3 Schrott.",
+      "nexusHouseEdge": "Kostenlose Anstöße pro Wurf: +{{n}} · schwarze Würfel können die Slot-Obergrenze für 2 Rumpf überschreiten.",
+      "nexusNullAnvil": "Graue Würfel können die Slot-Obergrenze kostenlos überschreiten.",
+      "nexusFacetEngine": "Jeder dritte gesetzte graue Würfel wird prismatisch.",
+      "nexusNova": "Mit zwei prismatischen in der Zählung trifft ein Waffentreffer jeden anderen Gegner für 4."
     },
     "trait": {
       "obsidianPact": "Schwarze Würfel zeigen nur ihren Mindest- oder Höchstwert an.",
@@ -225,7 +268,12 @@
       "coldLogic": "Anstöße sind kostenlos · Kritische Treffer deaktiviert",
       "overflowShield": "Die über die Obergrenze hinaus ausgegebenen Ladungen werden zu einem Schutzschild.",
       "fateTwice": "Der Schicksalswürfel kann zweimal pro Kampf eingesetzt werden.",
-      "prismDouble": "Prismatische Würfel zählen bei der Resonanz doppelt."
+      "prismDouble": "Prismatische Würfel zählen bei der Resonanz doppelt.",
+      "overflowCharge": "Ein Würfel über der Slot-Obergrenze speichert 1 Ladung.",
+      "houseEdge": "Ein schwarzer Würfel auf seiner Höchstzahl überschreitet die Obergrenze ohne Rumpfkosten.",
+      "greyIsBlack": "Graue Würfel zählen als schwarze.",
+      "facetEngine": "Jeder dritte in einem Kampf platzierte graue Würfel wird prismatisch.",
+      "novaSplash": "Mit zwei prismatischen Würfeln auf dem Tisch fügt der erste Waffenschuss des Zuges jedem anderen Gegner 4 Schaden zu."
     },
     "budgetDelta": "{{n}} Hangar-Punkt",
     "slotTier": "{{slot}}: {{n}} die-size step"
@@ -236,14 +284,13 @@
     "shipArk": "Die Arche wurde freigeschaltet",
     "engraving": "Gravur Bahnhof geöffnet",
     "dailyPreview": "Die morgige Tagesausgabe ist einsehbar",
-    "respecPrestige": "Kostenlose Umverteilung der Attribute + Prestige-Skin",
+    "respecPrestige": "Karte zum halben Preis zurücksetzen + Prestige-Skin",
     "diceWave": "Fusion-Würfel im Regal",
     "contractWave": "Vertragswelle eröffnet",
-    "chartPoints": "Zwei Punkte für „Sternenkarte“"
+    "chartPoints": "Bonus: +{{n}} Punkte für die Sternenkarte"
   },
   "levelup": {
     "level": "Kapitänsstufe {{level}}",
-    "point": "+1 Punkt für „Sternenkarte“",
     "points": "+{{n}} Sternenkarte Punkte",
     "continue": "Weiter"
   },
@@ -276,7 +323,7 @@
     "save": "Deck speichern",
     "saved": "Gespeichert",
     "invalidOver": "Über dem Budget",
-    "invalidCap": "Maximal 9 Würfel",
+    "invalidCap": "Maximal {{n}} Würfel",
     "invalidMin": "Mindestens 3 Würfel",
     "invalidFate": "Maximal 1 Schicksalswürfel",
     "valid": "Bereit",
@@ -285,7 +332,18 @@
     "shipEquipped": "Ausgestattet",
     "shipBuy": "Kaufen · {{price}}◈",
     "shipLocked": "Freischaltungen: {{route}}",
-    "filterAll": "Alle"
+    "filterAll": "Alle",
+    "mastery": {
+      "rank": "Meisterschaft {{rank}}",
+      "next": "{{xp}} / {{next}} XP bis Rang {{rank}}",
+      "max": "Meisterschaft abgeschlossen",
+      "title": "Meisterschaftsboni",
+      "hull": "+{{n}} Hülle",
+      "reserve": "+{{n}} Reserve",
+      "mk": "Erster Mk-Ausbau -{{n}} %",
+      "hit": "Erster Treffer einer Elite, eines Minibosses oder eines Bosses je Kampf -{{n}} %",
+      "passive": "Passive II: {{name}}"
+    }
   },
   "collection": {
     "title": "Sammlung",
@@ -335,7 +393,9 @@
     "guardBody": "Es gibt einen Lauf-Slot. Beim Starten dieses Modus wird der aktuelle Lauf sowohl lokal als auch in der Cloud gelöscht.",
     "guardYes": "Löschen und starten",
     "dailyPreview": "Morgen ({{date}})",
-    "dailyPreviewLocked": "Die Mutatoren von morgen auf Level {{n}}"
+    "dailyPreviewLocked": "Die Mutatoren von morgen auf Level {{n}}",
+    "driftAscension": "Aufstieg für diese Drift",
+    "driftScoreMult": "Ergebnis ×{{mult}}"
   },
   "contracts": {
     "title": "Verträge",
@@ -383,7 +443,8 @@
     "submitSent": "Dem Vorstand vorgelegt",
     "submitFailed": "Die Übermittlung ist fehlgeschlagen – die Punktzahl wird lokal gespeichert",
     "submitOffline": "Offline – die Partitur wird lokal gespeichert",
-    "toBoard": "Das Spielbrett öffnen"
+    "toBoard": "Das Spielbrett öffnen",
+    "ascension": "Aufstieg A{{n}} ×{{mult}}"
   },
   "board": {
     "title": "Ranglisten",
@@ -468,7 +529,8 @@
     "ascendant": "Aszendent",
     "chartwright": "Chartwright",
     "archivist": "Archivar",
-    "answer": "Die Antwort"
+    "answer": "Die Antwort",
+    "singularity": "Singularität"
   },
   "unlock": {
     "opened": "Freigeschaltet",
@@ -507,13 +569,16 @@
     "featureShipArk": "Die Arche",
     "featureEngraving": "Gravur Bahnhof",
     "featureDailyPreview": "Tägliche Vorschau",
-    "featureFreeRespec": "Kostenlose Keystone-Neuzuweisung",
     "sectorSix": "Sektor 6 „Jenseits des Kerns“",
     "diceS6": "Vier Kausalitätswürfel",
     "skinThreshold": "Die Skin „Threshold“",
     "featureShipCorsair": "Der Hound ist auf dem Markt",
     "featureShipFoundry": "„The Forge“ ist auf dem Markt",
-    "featureShipPrism": "Das Prism ist auf dem Markt"
+    "featureShipPrism": "Das Prism ist auf dem Markt",
+    "skinSingularity": "Würfel-Skin: Singularität",
+    "contractsA12": "Vertrag: Tiefes Vakuum",
+    "frameObsidian": "Brückenrahmen: Obsidian",
+    "prestigeThemeTwo": "Thema: Ereignishorizont"
   },
   "skin": {
     "title": "Die Skins",
@@ -547,6 +612,10 @@
     "threshold": {
       "name": "Schwellenwert",
       "desc": "Rund, unbeleuchtet, mit einem Rand in Flottengrau. Getragen von dem einen Kapitän, der sich nie zurücklehnte."
+    },
+    "singularity": {
+      "name": "Singularität",
+      "desc": "Schwarzes Glas, ein weißer Rand, ein Licht, das sich um die Glyphe krümmt."
     }
   },
   "ach": {
@@ -564,7 +633,7 @@
     },
     "quickWork": {
       "name": "Schnelle Arbeit",
-      "desc": "Schließe eine Kampagne in höchstens 11 Sprüngen ab."
+      "desc": "Schließe eine Kampagne in höchstens 85 Sprüngen ab."
     },
     "frugal": {
       "name": "Sparsam",
@@ -731,8 +800,8 @@
       "desc": "Führe die Geschichte des Wächters bis zur letzten Seite."
     },
     "allChains": {
-      "name": "Vier Fäden",
-      "desc": "Beende alle vier Geschichten der Besatzung."
+      "name": "Jeder Faden",
+      "desc": "Bringe die Geschichte jeder Figur zu Ende."
     },
     "wandererClear": {
       "name": "Weg des Wanderers",
@@ -765,6 +834,34 @@
     "prismClear": {
       "name": "Gebrochen",
       "desc": "Schließe eine Kampagne mit der „Prism“ ab."
+    },
+    "masterWanderer": {
+      "name": "Meister: Wanderer",
+      "desc": "Erreiche Meisterschaft V mit dem Schiff Wanderer."
+    },
+    "masterRam": {
+      "name": "Meister: Ramme",
+      "desc": "Erreiche Meisterschaft V mit dem Schiff Ramme."
+    },
+    "masterArk": {
+      "name": "Meister: Arche",
+      "desc": "Erreiche Meisterschaft V mit dem Schiff Arche."
+    },
+    "masterCorsair": {
+      "name": "Meister: Hund",
+      "desc": "Erreiche Meisterschaft V mit dem Schiff Hund."
+    },
+    "masterFoundry": {
+      "name": "Meister: Schmiede",
+      "desc": "Erreiche Meisterschaft V mit dem Schiff Schmiede."
+    },
+    "masterPrism": {
+      "name": "Meister: Prisma",
+      "desc": "Erreiche Meisterschaft V mit dem Schiff Prisma."
+    },
+    "admiral": {
+      "name": "Admiral",
+      "desc": "Erreiche Meisterschaft V mit drei Schiffen."
     }
   },
   "chartTag": {
@@ -808,7 +905,13 @@
       "skinVoidglass": "die Haut „Voidglass“",
       "skinEmberglass": "Die Haut „Emberglass“",
       "prestigeTheme": "Thema „Ascendant“",
-      "badge": "das „Ascendant“-Abzeichen"
+      "badge": "das „Ascendant“-Abzeichen",
+      "scrapBonus": "+5 % Schrott aus Kämpfen für jedes Level über A10",
+      "skinSingularity": "Würfel-Skin „Singularität“",
+      "contractA12": "Vertrag „Tiefes Vakuum“",
+      "frameObsidian": "Brückenrahmen „Obsidian“",
+      "prestigeThemeTwo": "Thema „Ereignishorizont“",
+      "badgeSingularity": "das „Singularität“-Abzeichen"
     }
   },
   "voucher": {
@@ -819,5 +922,17 @@
     "shards": "{{n}} ◈ nehmen",
     "bank": "Im Depot: {{n}} / {{max}}",
     "full": "Dein Gutscheindepot ist voll ({{max}}). Nimm die Splitter."
+  },
+  "frame": {
+    "title": "Brückenrahmen",
+    "hint": "Nur kosmetisch. Ein Rahmen verändert niemals ein Schiff.",
+    "hull": {
+      "name": "Eigener Rahmen des Rumpfs",
+      "desc": "Jeder Rumpf trägt den Rahmen, mit dem er gebaut wurde."
+    },
+    "obsidian": {
+      "name": "Obsidian",
+      "desc": "Schwarzes Vulkanglas, gesäumt von einer kalten weißen Linie."
+    }
   }
 }

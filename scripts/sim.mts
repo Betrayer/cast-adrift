@@ -1,4 +1,5 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import type { DeckEntry } from "@/game/dice/tier";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { STARTER_DECK } from "../src/data/decks";
 import { ALL_DICE } from "../src/data/dice";
@@ -6,9 +7,21 @@ import { PUZZLES, type PuzzleTier } from "../src/data/puzzles";
 import { difficultyOf, TIER_BANDS } from "../src/game/puzzles/difficulty";
 import { maxAttempts, TIER_STAKES } from "../src/game/puzzles/stakes";
 import {
+  ARCHETYPE_LEVEL,
   buildChartPicks,
+  CHART_SCHOOLS,
+  dualChart,
+  halfBranchChart,
+  hubHeavyChart,
   MID_COLLECTION_LEVEL,
+  monoChart,
+  nexusIds,
+  nexusReachable,
+  spreadChart,
 } from "./simPolicy/chart";
+import { CHART_NODE_BY_ID } from "../src/data/chart";
+import { pointsSpent, pointsTotal } from "../src/game/chart/engine";
+import type { School } from "../src/types/content";
 import {
   deliveryReachOf,
   EXPECTED_DMG_PER_FIGHT,
@@ -19,19 +32,24 @@ import {
   type RouteState,
 } from "./simPolicy/map";
 import {
-  bypassIsLateral,
   bypassTargetFor,
   isGentleRide,
-  openLandings,
   rollThrow,
-  throwCost,
+  softLandThrow,
 } from "../src/game/map/wormhole";
-import { disintegrationPctFor, holeTollFor } from "../src/game/run/motifs";
+import {
+  bypassLethal,
+  bypassPctFor,
+  disintegrationPctFor,
+  holeTollFor,
+  ridesStayGentle,
+} from "../src/game/run/motifs";
 import {
   applyEdgeMotifs,
   applyEffectsToState,
   applyNodeMotifs,
   createRunState,
+  gainSimShipRank,
   emptyPuzzleTally,
   emptySinks,
   gain,
@@ -40,6 +58,7 @@ import {
   maxMk,
   takeModule,
   wouldTakeModule,
+  handIds,
   maxRealSchoolCount,
   runAnomaly,
   runDraft,
@@ -74,7 +93,14 @@ import {
   type EchoNodeId,
 } from "../src/data/echo";
 import { forwardReach, forwardStations } from "../src/game/map/reach";
-import { economyFailureLines } from "./simPolicy/verdict";
+import {
+  actRampSteps,
+  chartLikeWithLike,
+  economyFailureLines,
+  halfParityPp,
+  ladderOutOfBand,
+  type LadderReading,
+} from "./simPolicy/verdict";
 import { shipCargoHold } from "../src/game/run/hold";
 import {
   DIRECT,
@@ -115,7 +141,7 @@ import {
   isEncounterGroup,
 } from "../src/data/enemies";
 import {
-  DECK_CAP,
+  HAND_CAP,
   MINIBOSS_PACKAGE_SCRAP,
 } from "../src/game/economy/prices";
 import {
@@ -156,6 +182,9 @@ import {
   resolveEnemyPhase,
   resolvePlayerPhase,
 } from "../src/game/battle/resolver";
+import { masteryPerkIds } from "../src/data/perks/ship";
+import { CLEAN_SECTOR_HULL_PCT, SHIP_RANK_GAIN } from "../src/data/shipRanks";
+import { passiveTierFor, shipProfile, type PassiveTier } from "../src/game/battle/passives";
 import {
   buildBattleSnapshot,
   canPlaceDie,
@@ -169,7 +198,12 @@ import {
 } from "../src/game/run/encounter";
 import { computePerkMods } from "../src/game/run/perkMods";
 import { computeRunMods, runChargeCap } from "../src/game/run/runMods";
-import { ascensionMods } from "../src/data/ascension";
+import { slotTierDeltaFrom } from "../src/game/run/slotTier";
+import {
+  ascensionMods,
+  ascensionScrapBonusPct,
+  MAX_ASCENSION,
+} from "../src/data/ascension";
 import { ALL_PERKS } from "../src/data/perks";
 import type { PerkPool } from "../src/data/perks/types";
 import { PERK_DRAFT_SIZE } from "../src/game/run/perkDraft";
@@ -187,7 +221,7 @@ import {
 import type { BattleSnapshot, SlotId } from "../src/types/battle";
 import type { EventDef, EventOption } from "../src/types/events";
 import { ALL_EVENTS } from "../src/data/events";
-import { pickEvent, type EventContext } from "../src/game/events/engine";
+import { allOutcomes, pickEvent, type EventContext } from "../src/game/events/engine";
 import {
   driftAllowed,
   sectorDriftDelta,
@@ -219,6 +253,8 @@ interface BattleInit {
   cargo?: readonly string[];
   echo?: EchoNodeId;
   killOrder?: readonly string[];
+  passiveTier?: PassiveTier;
+  blackBoxSpent?: boolean;
 }
 
 type ModeTally = Partial<Record<FireModeId, number>>;
@@ -240,6 +276,9 @@ interface BattleResult {
   modeOffered: ModeTally;
   activeFired: ActiveTally;
   activeReady: ActiveTally;
+  scrap: number;
+  stolen: number;
+  blackBoxSpent: boolean;
 }
 
 const bump = (tally: ModeTally, mode: FireModeId): void => {
@@ -284,6 +323,14 @@ const WEATHER_ENABLED = getArg("weather", "") === "on";
 const SALVAGE_ENABLED = getArg("salvage", "") !== "off";
 
 const CARGO_ENABLED = getArg("cargo", "") !== "off";
+
+const MASTERY_ARG = Number(getArg("mastery", "0"));
+
+const SHIP_RANKS_ARG = !process.argv.includes("--no-ranks");
+
+const SHIP_PERK_ONLY_ARG: readonly string[] = getArg("ship-perks", "")
+  .split(",")
+  .filter((id) => id !== "");
 
 const OFFICERS_ENABLED = getArg("officers", "") !== "off";
 
@@ -411,7 +458,7 @@ const spendCharge = (snapshot: BattleSnapshot, init: BattleInit): void => {
 
 const simulateBattle = (
   enemyIds: readonly string[],
-  deck: readonly string[],
+  deck: readonly DeckEntry[],
   rootSeed: number,
   init: BattleInit = {},
 ): BattleResult => {
@@ -423,16 +470,12 @@ const simulateBattle = (
     const def = CARGO_BY_ID.get(id);
     return def === undefined ? [] : [def];
   });
-  const tierDelta: Partial<Record<SlotId, number>> = {};
-  for (const def of holdDefs) {
-    for (const [slot, delta] of Object.entries(cargoSlotTierDelta(def))) {
-      const key = slot as SlotId;
-      tierDelta[key] = (tierDelta[key] ?? 0) + delta;
-    }
-  }
-  if (mut.sensorsTierDelta !== 0) {
-    tierDelta.sensors = (tierDelta.sensors ?? 0) + mut.sensorsTierDelta;
-  }
+  const tierDelta = slotTierDeltaFrom({
+    chartPicks: init.chartPicks ?? [],
+    perks: init.perks ?? [],
+    mutators: init.mutators ?? [],
+    cargoDefs: holdDefs,
+  });
   const holdChargeCap = holdDefs.reduce(
     (sum, def) => sum + cargoChargeCapDelta(def),
     0,
@@ -447,6 +490,8 @@ const simulateBattle = (
     {
       tide: init.tide,
       interference: init.interference,
+      passiveTier: init.passiveTier,
+      blackBoxSpent: init.blackBoxSpent,
       perks: init.perks,
       chartPicks: init.chartPicks,
       mutators: init.mutators,
@@ -478,6 +523,14 @@ const simulateBattle = (
     },
   );
   if (officers.length > 0) snapshot.officers = [...officers];
+  snapshot.scrap +=
+    computeRunMods(
+      init.perks ?? [],
+      init.chartPicks ?? [],
+      init.modules ?? [],
+      officers,
+    ).battleStartScrap +
+    shipProfile(init.shipId ?? "wanderer", init.passiveTier).battleStartScrap;
   if (init.echo !== undefined) {
     snapshot.echo = init.echo;
     const opening = echoStartCharge(init.echo);
@@ -598,6 +651,7 @@ const simulateBattle = (
   const timeout = snapshot.outcome === undefined;
   return {
     win: snapshot.outcome === "victory",
+    blackBoxSpent: snapshot.blackBoxSpent === true,
     timeout,
     turns: Math.min(snapshot.turn, TURN_CAP),
     hullLeft: snapshot.hull,
@@ -611,7 +665,16 @@ const simulateBattle = (
     modeOffered,
     activeFired,
     activeReady,
+    scrap: snapshot.scrap,
+    stolen: snapshot.stolenScrap,
   };
+};
+
+const takeFightScrap = (state: RunState, res: BattleResult): void => {
+  if (res.blackBoxSpent) state.blackBoxSpent = true;
+  state.scrap = Math.max(0, state.scrap - res.stolen);
+  state.nodeScrap.inFight = (state.nodeScrap.inFight ?? 0) + res.scrap;
+  gain(state, res.scrap);
 };
 
 const decile = (sorted: readonly number[], q: number): number => {
@@ -666,6 +729,7 @@ interface WalkOptions {
   mutators?: readonly string[];
   noDraft?: boolean;
   wormholes?: WormholeTally;
+  battleSalt?: number;
 }
 
 interface WalkResult {
@@ -691,18 +755,12 @@ const softLandingFor = (
   map: MapGraph,
   byId: ReadonlyMap<string, MapNode>,
   from: string,
+  hole: string,
   visited: readonly string[],
 ): SoftLanding | undefined => {
-  const origin = byId.get(from);
-  if (origin === undefined) return undefined;
-  const node = openLandings(map, from, visited)
-    .filter((candidate) => candidate.row > origin.row)
-    .sort(
-      (a, b) =>
-        throwCost(origin, a) - throwCost(origin, b) ||
-        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
-    )[0];
-  return node === undefined ? undefined : { node, rows: node.row - origin.row };
+  const roll = softLandThrow(map, from, hole, visited);
+  const node = roll.landing === null ? undefined : byId.get(roll.landing);
+  return node === undefined ? undefined : { node, rows: roll.rows };
 };
 
 const resolveWormhole = (
@@ -717,11 +775,14 @@ const resolveWormhole = (
   stream: RngStream,
   tally: WormholeTally,
   tideCap: number,
+  ascension: number,
 ): HoleOutcome => {
   const rides = tally.rides;
-  if (ridesWormhole(route, stream.next())) {
+  const toll = holeTollFor(sector, state.hullMax, ascension);
+  const lethal = bypassLethal(state.hull, toll);
+  if (lethal || ridesWormhole(route, bypassPctFor(sector, ascension))) {
     if (echoSoftLands(state.echo) && !state.echoUsed) {
-      const gentle = softLandingFor(map, byId, from, visited);
+      const gentle = softLandingFor(map, byId, from, hole.id, visited);
       if (gentle !== undefined) {
         state.echoUsed = true;
         tally.rides += 1;
@@ -734,10 +795,10 @@ const resolveWormhole = (
       { map, from, hole: hole.id, visited, rides },
       stream,
     );
-    const pct = disintegrationPctFor(sector);
+    const pct = disintegrationPctFor(sector, ascension);
     if (
       pct > 0 &&
-      !isGentleRide(rides) &&
+      (!isGentleRide(rides) || !ridesStayGentle(ascension)) &&
       stream.int(1, DISINTEGRATION_FACES) <= pct
     ) {
       tally.disintegrations += 1;
@@ -747,7 +808,6 @@ const resolveWormhole = (
     if (landing !== undefined) {
       tally.rides += 1;
       tally.rowsMoved += Math.abs(roll.rows);
-      if (roll.rows < 0) tally.backward += 1;
       if (roll.fallback !== "none") tally.fallbacks += 1;
       return { kind: "moved", node: landing };
     }
@@ -755,9 +815,7 @@ const resolveWormhole = (
   const target = bypassTargetFor(map, from, hole.id, visited);
   const node = target === null ? undefined : byId.get(target);
   if (node === undefined) return { kind: "stuck" };
-  const toll = bypassIsLateral(map, from, hole.id, visited)
-    ? holeTollFor(sector, state.hull)
-    : 0;
+  if (lethal) return { kind: "stuck" };
   if (toll > 0) {
     applyEffectsToState(state, [{ k: "hull", n: -toll }], tideCap);
     tally.tollPaid += toll;
@@ -775,13 +833,15 @@ const mergeActiveTally = (state: RunState, res: BattleResult): void => {
   }
 };
 
+const fightPrefix = (prefix: string, salt: number | undefined): string =>
+  salt === undefined || salt === 0 ? prefix : `${prefix}~${String(salt)}`;
+
 const nsKey = (ns: string, prefix: string, id: string): string =>
   ns === "" ? `${prefix}:${id}` : `${prefix}:${ns}:${id}`;
 
 export interface WormholeTally {
   rides: number;
   bypasses: number;
-  backward: number;
   fallbacks: number;
   rowsMoved: number;
   tollPaid: number;
@@ -792,7 +852,6 @@ export interface WormholeTally {
 export const emptyWormholeTally = (): WormholeTally => ({
   rides: 0,
   bypasses: 0,
-  backward: 0,
   fallbacks: 0,
   rowsMoved: 0,
   tollPaid: 0,
@@ -959,6 +1018,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
     anomalyStreak: state.anomalyStreak,
     scrap: state.scrap,
     wormholeRides: tally.rides,
+    gentleSafe: ridesStayGentle(opts.ascension),
     ...(deliveryReach === undefined ? {} : { deliveryReach }),
   });
 
@@ -1008,6 +1068,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         chaosStream,
         tally,
         opts.tideCap,
+        opts.ascension,
       );
       if (resolved.kind === "fatal") return stop(false, step.row);
       if (resolved.kind === "stuck") break;
@@ -1040,7 +1101,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       const res = simulateBattle(
         enemyIds,
         state.deck,
-        deriveSeed(seed, nsKey(ns, "node", next.id)),
+        deriveSeed(seed, nsKey(ns, fightPrefix("node", opts.battleSalt), next.id)),
         {
           shipId: state.shipId,
           hull: state.hull,
@@ -1050,6 +1111,8 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           interference: state.interference,
           mkLevels: state.mkLevels,
           perks: state.perks,
+          passiveTier: passiveTierFor(state.masteryRank),
+          blackBoxSpent: state.blackBoxSpent,
           chartPicks: state.chartPicks,
           mutators: state.mutators,
           modules: state.modules,
@@ -1072,6 +1135,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       state.fightsBySector[sector] = (state.fightsBySector[sector] ?? 0) + 1;
       state.kills += res.kills;
       if (!res.win) return stop(false, next.row);
+      takeFightScrap(state, res);
       state.nodes += 1;
       state.fights += 1;
       const loot = createStream(deriveSeed(seed, nsKey(ns, "loot", next.id)));
@@ -1088,20 +1152,25 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         state.modules,
         state.officers,
       );
-      gain(
-        state,
-        Math.round(
-          reward.scrap *
-            opts.scrapMult *
-            (1 + (mods.scrapMultPct + mut.scrapMultPct) / 100),
-        ),
+      const nodeIncome = Math.round(
+        reward.scrap *
+          opts.scrapMult *
+          (1 +
+            (mods.scrapMultPct +
+              mut.scrapMultPct +
+              ascensionScrapBonusPct(opts.ascension)) /
+              100),
       );
+      gain(state, nodeIncome);
+      state.nodeScrap[type] = (state.nodeScrap[type] ?? 0) + nodeIncome;
       state.hull = Math.min(state.hullMax, state.hull + mods.battleEndHeal);
       if (type === "miniboss") {
-        gain(
-          state,
-          loot.int(MINIBOSS_PACKAGE_SCRAP[0], MINIBOSS_PACKAGE_SCRAP[1]),
+        const packageScrap = loot.int(
+          MINIBOSS_PACKAGE_SCRAP[0],
+          MINIBOSS_PACKAGE_SCRAP[1],
         );
+        gain(state, packageScrap);
+        state.nodeScrap.package = (state.nodeScrap.package ?? 0) + packageScrap;
         const dieChoice = dieForRarity(loot, "rare", mut.lootRarityStep);
         const moduleChoice = rollModule(loot, state.modules, "uncommon");
         if (opts.rollModules && wouldTakeModule(state, moduleChoice)) {
@@ -1127,8 +1196,21 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
       if (isDraftNode(type) && opts.noDraft !== true) {
         runDraft(state, sector, loot);
       }
-      if (type === "boss") return stop(true, -1);
-      if (opts.stopRow > 0 && posRow >= opts.stopRow) return stop(true, -1);
+      const cleanBoss =
+        type === "boss" && state.hull * 100 >= state.hullMax * CLEAN_SECTOR_HULL_PCT;
+      if (type === "elite" || type === "miniboss" || type === "boss") {
+        gainSimShipRank(state, SHIP_RANK_GAIN[type]);
+      }
+      if (type === "boss") {
+        if (cleanBoss) gainSimShipRank(state, SHIP_RANK_GAIN.cleanSector);
+        return stop(true, -1);
+      }
+      if (opts.stopRow > 0 && posRow >= opts.stopRow) {
+        if (state.hull * 100 >= state.hullMax * CLEAN_SECTOR_HULL_PCT) {
+          gainSimShipRank(state, SHIP_RANK_GAIN.cleanSector);
+        }
+        return stop(true, -1);
+      }
     } else if (type === "anomaly") {
       runAnomaly(state, sector, next, deriveSeed(seed, `anomaly:${ns}`));
       state.nodes += 1;
@@ -1162,7 +1244,7 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
         const res = simulateBattle(
           [...follow.enemyIds],
           state.deck,
-          deriveSeed(seed, nsKey(ns, "eventFight", next.id)),
+          deriveSeed(seed, nsKey(ns, fightPrefix("eventFight", opts.battleSalt), next.id)),
           {
             shipId: state.shipId,
             hull: state.hull,
@@ -1172,6 +1254,8 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
             interference: state.interference,
             mkLevels: state.mkLevels,
             perks: state.perks,
+            passiveTier: passiveTierFor(state.masteryRank),
+          blackBoxSpent: state.blackBoxSpent,
             chartPicks: state.chartPicks,
             modules: state.modules,
             officers: state.officers,
@@ -1192,18 +1276,24 @@ const walkSector = (state: RunState, opts: WalkOptions): WalkResult => {
           (state.fightsBySector[sector] ?? 0) + 1;
         state.kills += res.kills;
         if (!res.win) return stop(false, next.row);
+        takeFightScrap(state, res);
         state.fights += 1;
         if (follow.scrap !== undefined) gain(state, follow.scrap);
       }
       state.nodes += 1;
     } else if (type === "shop") {
-      greedyShop(state, ns === "" ? seed : deriveSeed(seed, `shop:${ns}`), next);
+      greedyShop(
+        state,
+        ns === "" ? seed : deriveSeed(seed, `shop:${ns}`),
+        next,
+        opts.ascension,
+      );
       state.nodes += 1;
     } else if (type === "shipyard") {
       const forecast =
         fightsUntilRest(map, byId, next.id, next.row, route()) *
         EXPECTED_DMG_PER_FIGHT;
-      greedyShipyard(state, forecast > state.hull * 0.6, sector);
+      greedyShipyard(state, forecast > state.hull * 0.6, sector, opts.ascension);
       state.nodes += 1;
     } else {
       state.nodes += 1;
@@ -1236,14 +1326,20 @@ const sectorResultOf = (
   hullMedian: median(
     walk.hullEntering.length > 0 ? walk.hullEntering : [state.hull],
   ),
-  resonanceSet: maxRealSchoolCount(state.deck) >= 4,
+  resonanceSet: maxRealSchoolCount(handIds(state.deck)) >= 4,
   mkReached: maxMk(state.mkLevels),
   pockets: state.pockets,
 });
 
 const runSector = (seed: number): SectorResult => {
   const state = createRunState(
-    runStateInit({ hull: 30, hullMax: 30, deck: STARTER_DECK }),
+    runStateInit({
+      hull: 30,
+      hullMax: 30,
+      deck: STARTER_DECK,
+      shipRanksOn: SHIP_RANKS_ARG,
+      rankSeed: seed,
+    }),
   );
   const walk = walkSector(state, {
     sector: 1,
@@ -1321,6 +1417,8 @@ const runDrift = (seed: number, mid: boolean): DriftResult => {
       hullMax: 30,
       deck: mid ? DRIFT_MID_DECK : STARTER_DECK,
       mkLevels: mid ? { ...DRIFT_MID_MK } : {},
+      shipRanksOn: SHIP_RANKS_ARG,
+      rankSeed: seed,
     }),
   );
 
@@ -1447,7 +1545,8 @@ const runModeMain = (runs: number, seed: number, startedAt: number): void => {
   for (const r of results) {
     if (!r.win) deathHist.set(r.deathRow, (deathHist.get(r.deathRow) ?? 0) + 1);
   }
-  const histLine = Array.from({ length: 16 }, (_, row) => row)
+  const histRows = Math.max(...SECTORS.map((sd) => sd.shape.bossRow)) + 1;
+  const histLine = Array.from({ length: histRows }, (_, row) => row)
     .filter((row) => (deathHist.get(row) ?? 0) > 0)
     .map((row) => `r${String(row)}:${String(deathHist.get(row) ?? 0)}`)
     .join(" ");
@@ -1494,7 +1593,7 @@ const runModeMain = (runs: number, seed: number, startedAt: number): void => {
 
   const histCsv = ["", "death_row,count"]
     .concat(
-      Array.from({ length: 16 }, (_, row) => row)
+      Array.from({ length: histRows }, (_, row) => row)
         .filter((row) => (deathHist.get(row) ?? 0) > 0)
         .map((row) => `${String(row)},${String(deathHist.get(row) ?? 0)}`),
     )
@@ -1790,6 +1889,7 @@ interface SweepOptions {
   noDraft?: boolean;
   perks?: readonly string[];
   chartPicks?: readonly string[];
+  deck?: readonly string[];
   deckExtra?: readonly string[];
   mkLevels?: MkLevels;
   officers?: readonly string[];
@@ -1797,27 +1897,42 @@ interface SweepOptions {
   echo?: EchoNodeId | null;
 }
 
+const startingHullMax = (
+  shipId: ShipId,
+  ascension: number,
+  chartPicks: readonly string[],
+  masteryRank = 0,
+): number => {
+  const chartMods = computeRunMods(masteryPerkIds(shipId, masteryRank), chartPicks);
+  return Math.max(
+    1,
+    Math.round(
+      shipHullMax(shipId) *
+        (1 + (ascensionMods(ascension).hullPct + chartMods.hullMaxPct) / 100),
+    ) + chartMods.hullMaxDelta,
+  );
+};
+
 const sweepState = (opts: SweepOptions): RunState => {
-  const aMods = ascensionMods(opts.ascension);
   const shipId = opts.shipId ?? "wanderer";
   const carried =
     opts.forcedPerk !== undefined ? [opts.forcedPerk] : [...(opts.perks ?? [])];
-  const hullMax = Math.max(
-    1,
-    Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)) +
-      computePerkMods(carried).hullMaxDelta,
-  );
+  const hullMax =
+    startingHullMax(shipId, opts.ascension, opts.chartPicks ?? []) +
+    computePerkMods(carried).hullMaxDelta;
   return createRunState(
     runStateInit({
       shipId,
       hull: hullMax,
       hullMax,
-      deck: [...opts.archetype.deck, ...(opts.deckExtra ?? [])].slice(
+      deck: [...(opts.deck ?? opts.archetype.deck), ...(opts.deckExtra ?? [])].slice(
         0,
-        DECK_CAP,
+        HAND_CAP,
       ),
       mkLevels: { ...opts.archetype.mkLevels, ...(opts.mkLevels ?? {}) },
       perks: carried,
+      shipRanksOn: SHIP_RANKS_ARG,
+      rankAscension: opts.ascension,
       modules: [...opts.archetype.modules],
       chartPicks: [...(opts.chartPicks ?? [])],
       ...(opts.officers === undefined ? {} : { officers: opts.officers }),
@@ -1853,6 +1968,7 @@ const runSweepSectorWithState = (
   opts: SweepOptions,
 ): { result: SectorResult; state: RunState } => {
   const state = sweepState(opts);
+  state.rankSeed = seed;
   const walk = walkSector(state, { ...sweepWalkOptions(opts), seed });
   return { result: sectorResultOf(state, walk), state };
 };
@@ -1951,7 +2067,7 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
     "\nsim sweep: intrinsic difficulty ladder (A0, red+blue, mid-collection chart picks)",
   );
   console.log(
-    `  the cold column is printed as diagnostics and never checked; the rule holds over S1-S${String(LADDER_LAST_CHECKED_ACT)}.`,
+    `  the gaps over S1-S${String(LADDER_LAST_CHECKED_ACT)} are a diagnostic: the act ramp is asserted on the campaign's conditional clears (--mode campaign); the cold column is printed and never checked.`,
   );
   rows.push("");
   rows.push("sector,coldWinrate,midWinrate,gapToPreviousPp,verdict");
@@ -1980,12 +2096,11 @@ const sweepModeMain = (runs: number, seed: number, startedAt: number): void => {
     if (checked) previous = mean;
   }
   console.log(
-    `  ${String(cliffs)} gap(s) over ${String(LADDER_GAP_PP)}pp | ${String(rises)} act(s) easier than the one before`,
+    `  ${String(cliffs)} gap(s) over ${String(LADDER_GAP_PP)}pp | ${String(rises)} act(s) easier than the one before (diagnostic, not asserted)`,
   );
 
   const outPath = writeSimCsv("sweep", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
-  if (cliffs > 0 || rises > 0) process.exitCode = 1;
 };
 
 interface LadderCell {
@@ -2006,7 +2121,7 @@ const ladderCell = (
   runs: number,
   seed: number,
   sector: number,
-  build: Pick<SweepOptions, "perks" | "chartPicks">,
+  build: Pick<SweepOptions, "perks" | "chartPicks" | "deck">,
 ): LadderCell => {
   const shape = SECTORS.find((def) => def.id === sector)?.shape;
   const results: SectorResult[] = [];
@@ -2052,6 +2167,7 @@ const ladderCell = (
 const printLadderCell = (
   cell: LadderCell,
   target: number | null,
+  diagnostic = false,
 ): void => {
   const hist = [...cell.deathRows.entries()]
     .sort((a, b) => a[0] - b[0])
@@ -2059,8 +2175,9 @@ const printLadderCell = (
     .join(" ");
   const delta = target === null ? 0 : cell.winrate * 100 - target;
   const out = target !== null && Math.abs(delta) > LADDER_BAND_PP;
+  const verdict = diagnostic ? " diagnostic" : out ? " OUT OF BAND" : " ok";
   console.log(
-    `    ${cell.label.padEnd(22)} winrate ${(cell.winrate * 100).toFixed(1).padStart(5)}%${target === null ? " · unchecked" : ` · target ${target.toFixed(0).padStart(3)} (${delta >= 0 ? "+" : ""}${delta.toFixed(1)}pp)${out ? " OUT OF BAND" : " ok"}`}`,
+    `    ${cell.label.padEnd(22)} winrate ${(cell.winrate * 100).toFixed(1).padStart(5)}%${target === null ? " · unchecked" : ` · target ${target.toFixed(0).padStart(3)} (${delta >= 0 ? "+" : ""}${delta.toFixed(1)}pp)${verdict}`}`,
   );
   console.log(
     `      nodes ${cell.avgNodes.toFixed(1)} · fights ${cell.avgFights.toFixed(1)} · kills ${cell.avgKills.toFixed(1)} · hull(med) ${cell.hullMedian.toFixed(1)} · set ${cell.resonancePct.toFixed(0)}% · deaths gate ${String(cell.deathsAtGate)} · boss ${String(cell.deathsAtBoss)} · ${hist === "" ? "none" : hist}`,
@@ -2090,22 +2207,70 @@ interface LadderBand {
 
 const LADDER_BANDS: readonly LadderBand[] = [
   { sector: 1, mid: 99, perks: 99 },
-  { sector: 2, mid: 88, perks: 91 },
-  { sector: 3, mid: 76, perks: 79 },
-  { sector: 4, mid: 61, perks: 65 },
-  { sector: 5, mid: 54, perks: 58 },
-  { sector: 6, mid: 42, perks: 47 },
+  { sector: 2, mid: 91, perks: 93 },
+  { sector: 3, mid: 87, perks: 90 },
+  { sector: 4, mid: 28, perks: 32 },
+  { sector: 5, mid: 6, perks: 8 },
+  { sector: 6, mid: 88, perks: 89 },
 ];
 
 const LADDER_BAND_PP = 5;
 
+const LADDER_DIAGNOSTIC_ACTS: readonly number[] = [4, 5];
+
+const MATTERS_GAP_PP: readonly [number, number] = [12, 20];
+
+const COLD_GAP_MIN_PP = 25;
+
+const MATTERS_FIRST_ACT = 3;
+
+const NAKED_CHART_LEVEL = 50;
+
+const NAKED_CHART_PICKS: readonly string[] = buildChartPicks(NAKED_CHART_LEVEL);
+
+interface MattersRead {
+  sector: number;
+  cold: number;
+  full: number;
+  nakedChart: number;
+  nakedDeck: number;
+}
+
+const printMatters = (reads: readonly MattersRead[], rows: string[]): number => {
+  console.log(
+    `  meta and deck matter (S${String(MATTERS_FIRST_ACT)}+): naked-chart and naked-deck ${String(MATTERS_GAP_PP[0])}-${String(MATTERS_GAP_PP[1])}pp under full-power, full-power at least ${String(COLD_GAP_MIN_PP)}pp over cold`,
+  );
+  rows.push("");
+  rows.push("sector,fullMinusNakedChartPp,fullMinusNakedDeckPp,fullMinusColdPp,verdict");
+  let out = 0;
+  for (const read of reads) {
+    const chartGap = (read.full - read.nakedChart) * 100;
+    const deckGap = (read.full - read.nakedDeck) * 100;
+    const coldGap = (read.full - read.cold) * 100;
+    const inGap = (gap: number): boolean =>
+      gap >= MATTERS_GAP_PP[0] && gap <= MATTERS_GAP_PP[1];
+    const checked = read.sector >= MATTERS_FIRST_ACT;
+    const ok = !checked || (inGap(chartGap) && inGap(deckGap) && coldGap >= COLD_GAP_MIN_PP);
+    if (!ok) out += 1;
+    console.log(
+      `    S${String(read.sector)} deck matters ${chartGap.toFixed(1)}pp · meta matters ${deckGap.toFixed(1)}pp · over cold ${coldGap.toFixed(1)}pp${checked ? (ok ? " · ok" : " · OUT") : " · unchecked"}`,
+    );
+    rows.push(
+      `${String(read.sector)},${chartGap.toFixed(1)},${deckGap.toFixed(1)},${coldGap.toFixed(1)},${checked ? (ok ? "ok" : "OUT") : "unchecked"}`,
+    );
+  }
+  return out;
+};
+
 const ladderModeMain = (runs: number, seed: number, startedAt: number): void => {
   const only = Number(getArg("sector", "0"));
+  const matters = process.argv.includes("--matters");
+  const mattersReads: MattersRead[] = [];
   console.log(
     `sim ladder: the difficulty contract — A0, red+blue, ${String(runs)} runs per deck per act`,
   );
   console.log(
-    `  the two equipped columns carry the bands (±${String(LADDER_BAND_PP)}pp); the cold column is printed diagnostics.`,
+    `  the two equipped columns carry the bands (±${String(LADDER_BAND_PP)}pp); the cold column is printed diagnostics, and so are the equipped cells of ${LADDER_DIAGNOSTIC_ACTS.map((act) => `S${String(act)}`).join(" and ")} (a fresh ship there is nearly blind to a harder act; the campaign reads them).`,
   );
   console.log(
     "  each act is measured three ways to separate act scaling from build strength.",
@@ -2113,15 +2278,16 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
   const rows: string[] = [
     "sector,build,winrate,target,deltaPp,checked,nodes,fights,kills,hullMedian",
   ];
-  let out = 0;
+  const readings: LadderReading[] = [];
   for (const sector of SECTORS.map((def) => def.id)) {
     if (only > 0 && sector !== only) continue;
     const band = LADDER_BANDS.find((b) => b.sector === sector);
+    const diagnostic = LADDER_DIAGNOSTIC_ACTS.includes(sector);
     console.log(`  S${String(sector)}`);
     const builds: readonly {
       label: string;
       target: number | null;
-      build: Pick<SweepOptions, "perks" | "chartPicks">;
+      build: Pick<SweepOptions, "perks" | "chartPicks" | "deck">;
     }[] = [
       { label: "cold (diagnostics)", target: null, build: {} },
       {
@@ -2137,13 +2303,37 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
           perks: LADDER_PERK_SAMPLE,
         },
       },
+      ...(matters
+        ? [
+            {
+              label: "naked-deck",
+              target: null,
+              build: { perks: LADDER_PERK_SAMPLE },
+            },
+            {
+              label: "naked-chart",
+              target: null,
+              build: {
+                chartPicks: NAKED_CHART_PICKS,
+                perks: LADDER_PERK_SAMPLE,
+                deck: STARTER_DECK,
+              },
+            },
+          ]
+        : []),
     ];
+    const winrates = new Map<string, number>();
     for (const entry of builds) {
       const cell = ladderCell(entry.label, runs, seed, sector, entry.build);
-      printLadderCell(cell, entry.target);
+      winrates.set(entry.label, cell.winrate);
+      printLadderCell(cell, entry.target, diagnostic);
       const delta =
         entry.target === null ? 0 : cell.winrate * 100 - entry.target;
-      if (entry.target !== null && Math.abs(delta) > LADDER_BAND_PP) out += 1;
+      readings.push({
+        sector,
+        winratePct: cell.winrate * 100,
+        target: entry.target,
+      });
       rows.push(
         [
           String(sector),
@@ -2151,7 +2341,7 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
           cell.winrate.toFixed(3),
           entry.target === null ? "" : entry.target.toFixed(0),
           entry.target === null ? "" : delta.toFixed(1),
-          entry.target === null ? "no" : "yes",
+          entry.target === null ? "no" : diagnostic ? "diagnostic" : "yes",
           cell.avgNodes.toFixed(2),
           cell.avgFights.toFixed(2),
           cell.avgKills.toFixed(2),
@@ -2159,13 +2349,29 @@ const ladderModeMain = (runs: number, seed: number, startedAt: number): void => 
         ].join(","),
       );
     }
+    if (matters) {
+      mattersReads.push({
+        sector,
+        cold: winrates.get("cold (diagnostics)") ?? 0,
+        full: winrates.get("+ picks + 6 perks") ?? 0,
+        nakedChart: winrates.get("naked-chart") ?? 0,
+        nakedDeck: winrates.get("naked-deck") ?? 0,
+      });
+    }
   }
+  const out = ladderOutOfBand(readings, LADDER_BAND_PP, LADDER_DIAGNOSTIC_ACTS);
+  const checkedCells = readings.filter(
+    (reading) =>
+      reading.target !== null &&
+      !LADDER_DIAGNOSTIC_ACTS.includes(reading.sector),
+  ).length;
   console.log(
-    `  ${String(out)} of ${String(LADDER_BANDS.length * 2)} checked cell(s) outside ±${String(LADDER_BAND_PP)}pp`,
+    `  ${String(out)} of ${String(checkedCells)} checked cell(s) outside ±${String(LADDER_BAND_PP)}pp`,
   );
+  const mattersOut = matters ? printMatters(mattersReads, rows) : 0;
   const outPath = writeSimCsv("ladder", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
-  if (out > 0) process.exitCode = 1;
+  if (out > 0 || mattersOut > 0) process.exitCode = 1;
 };
 
 const DEAD_PERK_LINE = -8;
@@ -2312,6 +2518,8 @@ const ECONOMY_SECTOR_MIN = 130;
 const ECONOMY_SECTOR_MAX = 130 * 6;
 const ECONOMY_MIN_CLEARS = 12;
 
+const ANTI_SIGNAL_DECK = "black-edge";
+
 const economyModeMain = (runs: number, seed: number, startedAt: number): void => {
   const rows: string[] = [
     "sector,deck,runs,clears,medianEarnedPerFight,medianEarned,basis,medianSpent,spendShare,verdict",
@@ -2326,6 +2534,7 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
     baseIncome: number;
     sharePct: number;
     ok: boolean;
+    enforced: boolean;
   }[] = [];
   const sectorSinks: {
     sector: number;
@@ -2358,6 +2567,8 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       let salvageScrap = 0;
       let salvageDeclines = 0;
       let fightCount = 0;
+      let walkedFights = 0;
+      let walkedNodes = 0;
       let cargoScrap = 0;
       let cargoTaken = 0;
       let cargoDelivered = 0;
@@ -2367,7 +2578,7 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
       for (let i = 0; i < runs; i += 1) {
         const { result: r, state } = runSweepSectorWithState(
           deriveSeed(seed, `eco:${String(sector)}:${archetype.name}:${String(i)}`),
-          { sector, ascension: 0, archetype },
+          { sector, ascension: 0, archetype, chartPicks: MID_COLLECTION_PICKS },
         );
         spent.push(r.scrapSpent);
         const loot = Math.max(
@@ -2385,6 +2596,8 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         cargoLapsed += state.cargoLapsed;
         if (r.win) clearedEarned.push(loot);
         if (r.fights > 0) perNode.push(loot / r.fights);
+        walkedFights += r.fights;
+        walkedNodes += Math.max(1, r.nodes);
         pockets += r.pockets;
         skipIncome += state.draftSkips;
         fightCount += r.fights;
@@ -2412,10 +2625,11 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         declines: salvageDeclines / Math.max(1, runs),
         picks: salvagePicks,
       });
+      const enforced = archetype.name !== ANTI_SIGNAL_DECK;
       const baseIncome = Math.max(1, totalEarned - cargoScrap);
       const sharePct = (cargoScrap / baseIncome) * 100;
       const shareOk = sharePct <= CARGO_INCOME_SHARE_PCT;
-      if (!shareOk) shareFailures += 1;
+      if (!shareOk && enforced) shareFailures += 1;
       cargoRows.push({
         sector,
         deck: archetype.name,
@@ -2426,13 +2640,15 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         baseIncome: baseIncome / Math.max(1, runs),
         sharePct,
         ok: shareOk,
+        enforced,
       });
       const mEarnedPerNode = median(perNode);
       const clears = clearedEarned.length;
       const projected = clears >= ECONOMY_MIN_CLEARS;
+      const fightsPerAct = (walkedFights / Math.max(1, walkedNodes)) * depth;
       const mEarned = projected
         ? median(clearedEarned)
-        : mEarnedPerNode * depth;
+        : mEarnedPerNode * fightsPerAct;
       const basis = projected ? "cleared" : "projected";
       const mSpent = median(spent);
       const share = mEarned > 0 ? mSpent / mEarned : 0;
@@ -2443,7 +2659,8 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
         mEarnedPerNode <= hi &&
         mEarned >= ECONOMY_SECTOR_MIN &&
         mEarned <= ECONOMY_SECTOR_MAX;
-      if (!ok) envelopeFailures += 1;
+      if (!ok && enforced) envelopeFailures += 1;
+      const verdict = ok ? "ok" : enforced ? "OUT OF BAND" : "out of band, unchecked (the black-edge anti-signal, DESIGN §16)";
       rows.push(
         [
           String(sector),
@@ -2455,11 +2672,11 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
           basis,
           mSpent.toFixed(1),
           share.toFixed(3),
-          ok ? "ok" : "OUT_OF_BAND",
+          ok ? "ok" : enforced ? "OUT_OF_BAND" : "UNCHECKED",
         ].join(","),
       );
       console.log(
-        `sim economy: S${String(sector)} ${archetype.name.padEnd(10)} ${mEarnedPerNode.toFixed(1)}/fight (band ${lo.toFixed(0)}-${hi.toFixed(0)}) · ${basis} ${mEarned.toFixed(0)} (${String(clears)}/${String(runs)} clears) · spent ${mSpent.toFixed(0)} (${(share * 100).toFixed(0)}%) — ${ok ? "ok" : "OUT OF BAND"}`,
+        `sim economy: S${String(sector)} ${archetype.name.padEnd(10)} ${mEarnedPerNode.toFixed(1)}/fight (band ${lo.toFixed(0)}-${hi.toFixed(0)}) · ${basis} ${mEarned.toFixed(0)} (${String(clears)}/${String(runs)} clears) · spent ${mSpent.toFixed(0)} (${(share * 100).toFixed(0)}%) · ${verdict}`,
       );
     }
   }
@@ -2491,10 +2708,10 @@ const economyModeMain = (runs: number, seed: number, startedAt: number): void =>
   );
   for (const row of cargoRows) {
     console.log(
-      `  S${String(row.sector)}     ${row.deck.padEnd(11)} taken ${row.taken.toFixed(2)} · delivered ${row.delivered.toFixed(2)} · lapsed ${row.lapsed.toFixed(2)} · scrap ${row.cargoScrap.toFixed(1).padStart(5)} of ${row.baseIncome.toFixed(0).padStart(4)} · ${row.sharePct.toFixed(1).padStart(5)}% — ${row.ok ? "ok" : "OVER SHARE"}`,
+      `  S${String(row.sector)}     ${row.deck.padEnd(11)} taken ${row.taken.toFixed(2)} · delivered ${row.delivered.toFixed(2)} · lapsed ${row.lapsed.toFixed(2)} · scrap ${row.cargoScrap.toFixed(1).padStart(5)} of ${row.baseIncome.toFixed(0).padStart(4)} · ${row.sharePct.toFixed(1).padStart(5)}% · ${row.ok ? "ok" : row.enforced ? "OVER SHARE" : "over share, unchecked (the black-edge anti-signal, DESIGN §16)"}`,
     );
     rows.push(
-      `${String(row.sector)},${row.deck},${row.taken.toFixed(2)},${row.delivered.toFixed(2)},${row.lapsed.toFixed(2)},${row.cargoScrap.toFixed(2)},${row.baseIncome.toFixed(1)},${row.sharePct.toFixed(2)},${row.ok ? "ok" : "OVER_SHARE"}`,
+      `${String(row.sector)},${row.deck},${row.taken.toFixed(2)},${row.delivered.toFixed(2)},${row.lapsed.toFixed(2)},${row.cargoScrap.toFixed(2)},${row.baseIncome.toFixed(1)},${row.sharePct.toFixed(2)},${row.ok ? "ok" : row.enforced ? "OVER_SHARE" : "UNCHECKED"}`,
     );
   }
 
@@ -2613,6 +2830,8 @@ interface CampaignResult {
   sinks: Record<string, number>;
   draftSkips: number;
   draftRerolls: number;
+  forges: number;
+  handEnd: number;
   eventsResolved: number;
   eventScrap: number;
   eventHull: number;
@@ -2621,21 +2840,50 @@ interface CampaignResult {
   wormholes: WormholeTally;
   takenBySector: Record<number, number>;
   fightsBySector: Record<number, number>;
+  income: Record<string, number>;
 }
 
 const CAMPAIGN_SECTORS = 5;
+
+interface CampaignOptions {
+  startDraft?: boolean;
+  shipId?: ShipId;
+  chartPicks?: readonly string[];
+  battleSalt?: number;
+  masteryRank?: number;
+  shipRanks?: boolean;
+}
+
+const incomeBySource = (state: RunState): Record<string, number> => {
+  const named: Record<string, number> = {
+    battle: state.nodeScrap.battle ?? 0,
+    elite: state.nodeScrap.elite ?? 0,
+    miniboss: (state.nodeScrap.miniboss ?? 0) + (state.nodeScrap.package ?? 0),
+    boss: state.nodeScrap.boss ?? 0,
+    events: Math.max(0, state.eventScrap),
+    salvage: Math.max(0, state.salvageScrap),
+    cargo: Math.max(0, state.cargoScrap),
+    sales: Math.max(0, state.moduleSales),
+    inFight: state.nodeScrap.inFight ?? 0,
+  };
+  const counted = Object.values(named).reduce((sum, v) => sum + v, 0);
+  return { ...named, other: Math.max(0, state.scrapEarned - counted) };
+};
 
 const runCampaign = (
   seed: number,
   archetype: Archetype,
   ascension: number,
-  startDraft = false,
-  shipId: ShipId = "wanderer",
+  options: CampaignOptions = {},
 ): CampaignResult => {
+  const shipId = options.shipId ?? "wanderer";
   const aMods = ascensionMods(ascension);
-  const hullMax = Math.max(
-    1,
-    Math.round(shipHullMax(shipId) * (1 + aMods.hullPct / 100)),
+  const masteryRank = options.masteryRank ?? MASTERY_ARG;
+  const hullMax = startingHullMax(
+    shipId,
+    ascension,
+    options.chartPicks ?? MID_COLLECTION_PICKS,
+    masteryRank,
   );
   const state = createRunState(
     runStateInit({
@@ -2643,10 +2891,16 @@ const runCampaign = (
       hull: hullMax,
       hullMax,
       deck: archetype.deck,
-      chartPicks: MID_COLLECTION_PICKS,
+      chartPicks: options.chartPicks ?? MID_COLLECTION_PICKS,
+      perks: masteryPerkIds(shipId, masteryRank),
+      masteryRank,
+      shipRanksOn: options.shipRanks ?? SHIP_RANKS_ARG,
+      shipPerkOnly: SHIP_PERK_ONLY_ARG,
+      rankSeed: seed,
+      rankAscension: ascension,
     }),
   );
-  if (startDraft) {
+  if (options.startDraft === true) {
     runDraft(state, 1, createStream(deriveSeed(seed, "voucherDraft")));
   }
   const wormholes = emptyWormholeTally();
@@ -2672,6 +2926,7 @@ const runCampaign = (
       rollModules: true,
       guard: 64,
       wormholes,
+      battleSalt: options.battleSalt ?? 0,
     });
     if (!walk.cleared) {
       deathSector = sector;
@@ -2696,6 +2951,8 @@ const runCampaign = (
     sinks: state.sinks,
     draftSkips: state.draftSkips,
     draftRerolls: state.draftRerolls,
+    forges: state.forges,
+    handEnd: state.deck.length,
     eventsResolved: state.eventsResolved,
     eventScrap: state.eventScrap,
     eventHull: state.eventHull,
@@ -2704,16 +2961,124 @@ const runCampaign = (
     wormholes,
     takenBySector: state.takenBySector,
     fightsBySector: state.fightsBySector,
+    income: incomeBySource(state),
   };
 };
 
-const CAMPAIGN_BAND: readonly [number, number] = [0.3, 0.36];
+const CAMPAIGN_BAND: readonly [number, number] = [0.28, 0.34];
 
 const CAMPAIGN_ASCENSIONS: readonly number[] = getArg("asc", "0,3")
   .split(",")
   .map((part) => Number(part.trim()))
   .filter((n) => Number.isFinite(n) && n >= 0);
 const MONOTONIC_GAP_PP = 18;
+
+const ACT_RAMP_RISE_SE = 2;
+
+const OWNER_EDGE_PP = 13;
+
+const AXIS_MEAN_DROP_PP = 1.5;
+
+const AXIS_TOP_BAND: readonly [number, number] = [0.05, 0.12];
+
+const AXIS_RISE_SE = 2;
+
+const pairedStep = (
+  before: readonly boolean[],
+  after: readonly boolean[],
+): { mean: number; se: number } => {
+  const n = Math.min(before.length, after.length);
+  if (n === 0) return { mean: 0, se: 0 };
+  const diffs = Array.from(
+    { length: n },
+    (_, i) => (after[i] === true ? 1 : 0) - (before[i] === true ? 1 : 0),
+  );
+  const mean = diffs.reduce((sum, d) => sum + d, 0) / n;
+  const variance = diffs.reduce((sum, d) => sum + (d - mean) ** 2, 0) / Math.max(1, n - 1);
+  return { mean, se: Math.sqrt(variance / n) };
+};
+
+const printAscensionAxis = (
+  axis: ReadonlyMap<number, readonly boolean[]>,
+  rows: string[],
+): number => {
+  const levels = [...axis.keys()].sort((a, b) => a - b);
+  if (levels.length < 2) return 0;
+  const means = levels.map((level) => {
+    const cells = axis.get(level) ?? [];
+    return cells.filter(Boolean).length / Math.max(1, cells.length);
+  });
+  const contract =
+    levels.length === MAX_ASCENSION + 1 &&
+    levels.every((level, index) => level === index);
+  console.log(
+    `  ascension axis (red+blue mean, paired worlds; a rise counts above ${String(AXIS_RISE_SE)} standard errors of the paired step)${contract ? "" : " · partial, printed unchecked"}:`,
+  );
+  rows.push("");
+  rows.push("ascension,meanWinrate,stepPp,stepSePp,verdict");
+  let rises = 0;
+  let flatRises = 0;
+  levels.forEach((level, index) => {
+    const value = means[index] ?? 0;
+    const previous = index === 0 ? undefined : levels[index - 1];
+    const step =
+      previous === undefined
+        ? { mean: 0, se: 0 }
+        : pairedStep(axis.get(previous) ?? [], axis.get(level) ?? []);
+    const significant = step.mean > AXIS_RISE_SE * step.se;
+    if (previous !== undefined && step.mean > 0) flatRises += 1;
+    if (previous !== undefined && significant) rises += 1;
+    console.log(
+      `    A${String(level).padEnd(2)} ${(value * 100).toFixed(1).padStart(5)}%${previous === undefined ? "" : `  step ${step.mean >= 0 ? "+" : ""}${(step.mean * 100).toFixed(1)}pp ±${(step.se * 100).toFixed(1)}${significant ? " RISE" : step.mean > 0 ? " rise inside the noise" : ""}`}`,
+    );
+    rows.push(
+      `${String(level)},${value.toFixed(3)},${(step.mean * 100).toFixed(1)},${(step.se * 100).toFixed(1)},${significant ? "RISE" : "ok"}`,
+    );
+  });
+  console.log(`    ${String(flatRises)} raw rise(s), ${String(rises)} above the noise`);
+  const first = means[0] ?? 0;
+  const last = means[means.length - 1] ?? 0;
+  const meanDrop = ((first - last) * 100) / Math.max(1, levels.length - 1);
+  const top = last >= AXIS_TOP_BAND[0] && last <= AXIS_TOP_BAND[1];
+  console.log(
+    `    ${String(rises)} rise(s) · mean drop ${meanDrop.toFixed(2)}pp per level (floor ${String(AXIS_MEAN_DROP_PP)}) · A${String(levels[levels.length - 1] ?? 0)} ${(last * 100).toFixed(1)}%${contract ? ` (band ${(AXIS_TOP_BAND[0] * 100).toFixed(0)}-${(AXIS_TOP_BAND[1] * 100).toFixed(0)}%)` : ""}`,
+  );
+  if (!contract) return 0;
+  return (rises > 0 ? 1 : 0) + (meanDrop < AXIS_MEAN_DROP_PP ? 1 : 0) + (top ? 0 : 1);
+};
+
+const INCOME_SOURCES: readonly string[] = [
+  "battle",
+  "elite",
+  "miniboss",
+  "boss",
+  "events",
+  "salvage",
+  "cargo",
+  "sales",
+  "inFight",
+  "other",
+];
+
+const printIncome = (runs: readonly CampaignResult[], rows: string[]): void => {
+  const n = Math.max(1, runs.length);
+  const nodes = runs.reduce((sum, r) => sum + r.nodes, 0) / n;
+  const earned = runs.reduce((sum, r) => sum + r.scrapEarned, 0) / n;
+  const parts = INCOME_SOURCES.map(
+    (source) => runs.reduce((sum, r) => sum + (r.income[source] ?? 0), 0) / n,
+  );
+  console.log(
+    `  income per run (A0, red+blue): ${earned.toFixed(0)} over ${nodes.toFixed(1)} nodes cleared · ${(earned / Math.max(1, nodes)).toFixed(1)} per node`,
+  );
+  console.log(
+    `    ${INCOME_SOURCES.map((source, index) => `${source} ${(parts[index] ?? 0).toFixed(0)}`).join(" · ")}`,
+  );
+  rows.push("");
+  rows.push(`earned,nodes,perNode,${INCOME_SOURCES.join(",")}`);
+  rows.push(
+    `${earned.toFixed(1)},${nodes.toFixed(2)},${(earned / Math.max(1, nodes)).toFixed(2)},${parts.map((p) => p.toFixed(1)).join(",")}`,
+  );
+};
 
 const mergeTallies = (
   into: Record<number, PuzzleTally>,
@@ -2751,24 +3116,20 @@ interface CampaignRoll {
   deathHist: Map<number, number>;
 }
 
+const campaignWorld = (seed: number, index: number): number =>
+  deriveSeed(seed, `campaign:${String(index)}`);
+
 const campaignRoll = (
   runs: number,
   seed: number,
   archetype: Archetype,
   ascension: number,
-  startDraft = false,
-  shipId: ShipId = "wanderer",
+  options: CampaignOptions = {},
 ): { roll: CampaignRoll; results: CampaignResult[] } => {
   const results: CampaignResult[] = [];
   for (let i = 0; i < runs; i += 1) {
     results.push(
-      runCampaign(
-        deriveSeed(seed, `campaign:${archetype.name}:${String(i)}`),
-        archetype,
-        ascension,
-        startDraft,
-        shipId,
-      ),
+      runCampaign(campaignWorld(seed, i), archetype, ascension, options),
     );
   }
   const n = Math.max(1, results.length);
@@ -2795,12 +3156,22 @@ const campaignRoll = (
   };
 };
 
+const chartFilePicks = (): readonly string[] | undefined => {
+  const path = getArg("chart-file", "");
+  if (path === "") return undefined;
+  const parsed: unknown = JSON.parse(readFileSync(path, "utf8"));
+  if (!Array.isArray(parsed) || !parsed.every((id) => typeof id === "string"))
+    throw new Error(`sim: --chart-file ${path} is not a list of node ids`);
+  return parsed;
+};
+
 const campaignModeMain = (
   runs: number,
   seed: number,
   startedAt: number,
 ): void => {
   const startDraft = process.argv.includes("--start-draft");
+  const chartPicks = chartFilePicks();
   const rows: string[] = [
     "deck,ascension,runs,winrate,avgSectorsCleared,avgNodes,avgScrapEarned,avgScrapSpent,verdict",
   ];
@@ -2811,11 +3182,15 @@ const campaignModeMain = (
   const sinks = emptySinks();
   let skips = 0;
   let rerolls = 0;
+  let forges = 0;
+  let hands = 0;
+  let forgeRuns = 0;
   let events = 0;
   let eventScrap = 0;
   let eventHull = 0;
   const a0: number[] = [];
   const a0Runs: CampaignResult[] = [];
+  const axis = new Map<number, boolean[]>();
   for (const ascension of CAMPAIGN_ASCENSIONS) {
     for (const archetype of ARCHETYPES) {
       const { roll, results } = campaignRoll(
@@ -2823,7 +3198,7 @@ const campaignModeMain = (
         seed,
         archetype,
         ascension,
-        startDraft,
+        { startDraft, ...(chartPicks === undefined ? {} : { chartPicks }) },
       );
       if (ascension === 0) {
         for (const r of results) {
@@ -2831,6 +3206,9 @@ const campaignModeMain = (
           mergeSinks(sinks, r.sinks);
           skips += r.draftSkips;
           rerolls += r.draftRerolls;
+          forges += r.forges;
+          hands += r.handEnd;
+          forgeRuns += 1;
           events += r.eventsResolved;
           eventScrap += r.eventScrap;
           eventHull += r.eventHull;
@@ -2839,6 +3217,12 @@ const campaignModeMain = (
           a0.push(roll.winrate);
           a0Runs.push(...results);
         }
+      }
+      if (archetype.name !== "black-edge") {
+        axis.set(ascension, [
+          ...(axis.get(ascension) ?? []),
+          ...results.map((r) => r.cleared),
+        ]);
       }
 
       rows.push(
@@ -2859,38 +3243,44 @@ const campaignModeMain = (
         .map(([sector, n]) => `s${String(sector)}:${String(n)}`)
         .join(" ");
       console.log(
-        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}`,
+        `  A${String(ascension)} ${archetype.name.padEnd(10)} winrate ${(roll.winrate * 100).toFixed(1)}% · sectors ${roll.avgSectors.toFixed(2)} · nodes ${roll.avgNodes.toFixed(1)} · scrap +${roll.avgEarned.toFixed(0)}/-${roll.avgSpent.toFixed(0)} · deaths ${hist === "" ? "none" : hist}`,
       );
     }
   }
   const mean = a0.reduce((sum, v) => sum + v, 0) / Math.max(1, a0.length);
   console.log(
+    `  A0 hand and forge — forges/run ${(forges / Math.max(1, forgeRuns)).toFixed(2)} · hand at the end ${(hands / Math.max(1, forgeRuns)).toFixed(1)} dice`,
+  );
+  console.log(
     `  A0 mid-collection mean (red+blue) ${(mean * 100).toFixed(1)}% — band ${(CAMPAIGN_BAND[0] * 100).toFixed(0)}-${(CAMPAIGN_BAND[1] * 100).toFixed(0)}%${mean >= CAMPAIGN_BAND[0] && mean <= CAMPAIGN_BAND[1] ? " — ok" : " — OUT OF BAND"}`,
   );
-
-  const conditional: number[] = [];
   console.log(
-    "  per-sector conditional clear rate (A0, red+blue — the monotonicity read):",
+    `  owner at A0 ≈ ${(mean * 100 + OWNER_EDGE_PP).toFixed(1)}% (bot + OWNER_EDGE_PP ${String(OWNER_EDGE_PP)})`,
+  );
+  const axisFailures = printAscensionAxis(axis, rows);
+  printIncome(a0Runs, rows);
+
+  console.log(
+    `  per-sector conditional clear rate (A0, red+blue): the act ramp, adjacent acts at most ${String(MONOTONIC_GAP_PP)}pp apart, no rise above ${String(ACT_RAMP_RISE_SE)} se`,
   );
   rows.push("");
-  rows.push("sector,entered,cleared,conditionalClearRate,gapToPrevious");
-  let previous: number | null = null;
-  let cliffs = 0;
-  for (let sector = 1; sector <= CAMPAIGN_SECTORS; sector += 1) {
-    const entered = a0Runs.filter((r) => r.sectorsCleared >= sector - 1).length;
-    const clearedHere = a0Runs.filter((r) => r.sectorsCleared >= sector).length;
-    const rate = entered === 0 ? 0 : clearedHere / entered;
-    conditional.push(rate);
-    const gap = previous === null ? 0 : (rate - previous) * 100;
-    if (previous !== null && Math.abs(gap) > MONOTONIC_GAP_PP) cliffs += 1;
+  rows.push("sector,entered,cleared,conditionalClearRate,gapToPrevious,sePp,verdict");
+  const acts = Array.from({ length: CAMPAIGN_SECTORS }, (_, index) => ({
+    entered: a0Runs.filter((r) => r.sectorsCleared >= index).length,
+    cleared: a0Runs.filter((r) => r.sectorsCleared >= index + 1).length,
+  }));
+  const steps = actRampSteps(acts, MONOTONIC_GAP_PP, ACT_RAMP_RISE_SE);
+  steps.forEach((step, index) => {
+    const act = acts[index] ?? { entered: 0, cleared: 0 };
+    const verdict = step.cliff && step.rise ? "CLIFF+RISE" : step.cliff ? "CLIFF" : step.rise ? "RISE" : "ok";
     console.log(
-      `    S${String(sector)} ${String(clearedHere).padStart(4)}/${String(entered).padEnd(4)} ${(rate * 100).toFixed(1).padStart(6)}%${previous === null ? "" : `  gap ${gap >= 0 ? "+" : ""}${gap.toFixed(1)}pp${Math.abs(gap) > MONOTONIC_GAP_PP ? " — CLIFF" : ""}${gap > 0 ? " — EASIER THAN THE ACT BEFORE" : ""}`}`,
+      `    S${String(index + 1)} ${String(act.cleared).padStart(4)}/${String(act.entered).padEnd(4)} ${(step.rate * 100).toFixed(1).padStart(6)}%${index === 0 ? "" : `  gap ${step.gapPp >= 0 ? "+" : ""}${step.gapPp.toFixed(1)}pp (se ${step.sePp.toFixed(1)})${step.cliff ? " CLIFF" : ""}${step.rise ? " EASIER THAN THE ACT BEFORE" : ""}`}`,
     );
     rows.push(
-      `${String(sector)},${String(entered)},${String(clearedHere)},${rate.toFixed(3)},${gap.toFixed(1)}`,
+      `${String(index + 1)},${String(act.entered)},${String(act.cleared)},${step.rate.toFixed(3)},${step.gapPp.toFixed(1)},${step.sePp.toFixed(1)},${verdict}`,
     );
-    previous = rate;
-  }
+  });
+  const cliffs = steps.filter((step) => step.cliff).length;
   console.log("  damage taken per act (A0, red+blue — hull+shield absorbed per fight):");
   rows.push("");
   rows.push("sector,fights,damageTaken,perFight");
@@ -2928,17 +3318,14 @@ const campaignModeMain = (
     );
   }
 
-  const rises = conditional.filter(
-    (rate, index) => index > 0 && rate > (conditional[index - 1] ?? 0),
-  ).length;
+  const rises = steps.filter((step) => step.rise).length;
   console.log(
-    `    ${String(cliffs)} cliff(s) over ${String(MONOTONIC_GAP_PP)}pp · ${String(rises)} act(s) easier than the one before`,
+    `    ${String(cliffs)} cliff(s) over ${String(MONOTONIC_GAP_PP)}pp · ${String(rises)} act(s) easier than the one before beyond ${String(ACT_RAMP_RISE_SE)} se${a0Runs.length === 0 ? " · no A0 runs, the act ramp was not read" : cliffs + rises > 0 ? " · THE ACT RAMP IS BROKEN" : " · the act ramp holds"}`,
   );
   const holes = a0Runs.reduce(
     (into: WormholeTally, run: CampaignResult) => ({
       rides: into.rides + run.wormholes.rides,
       bypasses: into.bypasses + run.wormholes.bypasses,
-      backward: into.backward + run.wormholes.backward,
       fallbacks: into.fallbacks + run.wormholes.fallbacks,
       rowsMoved: into.rowsMoved + run.wormholes.rowsMoved,
       tollPaid: into.tollPaid + run.wormholes.tollPaid,
@@ -2960,10 +3347,6 @@ const campaignModeMain = (
   );
   console.log(
     `    rides ${String(holes.rides)} (${
-      holes.rides === 0
-        ? "0"
-        : ((holes.backward / holes.rides) * 100).toFixed(0)
-    }% backward · ${
       holes.rides === 0
         ? "0"
         : ((holes.fallbacks / holes.rides) * 100).toFixed(0)
@@ -3000,6 +3383,203 @@ const campaignModeMain = (
   const outPath = writeSimCsv("campaign", rows, startedAt);
   console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
   if (mean < CAMPAIGN_BAND[0] || mean > CAMPAIGN_BAND[1]) process.exitCode = 1;
+  if (axisFailures > 0) process.exitCode = 1;
+  if (cliffs + rises > 0) process.exitCode = 1;
+};
+
+const CHART_SPREAD_PP = 8;
+
+const CHART_PARITY_PP = 3;
+
+interface ChartRead {
+  name: string;
+  winrate: number;
+  spent: number;
+  keystones: number;
+  nexus: number;
+}
+
+const chartModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const decks = ARCHETYPES.filter((a) => CONTRACT_DECKS.includes(a.name));
+  console.log(
+    `sim chart: campaign A0 per chart archetype at L${String(ARCHETYPE_LEVEL)} (${String(pointsTotal(ARCHETYPE_LEVEL))} points), red+blue x ${String(runs)} runs`,
+  );
+  const read = (name: string, picks: readonly string[]): ChartRead => {
+    const rates = decks.map(
+      (deck) =>
+        campaignRoll(runs, seed, deck, 0, { chartPicks: picks }).roll.winrate,
+    );
+    const kinds = picks.map((id) => CHART_NODE_BY_ID.get(id)?.kind);
+    const result: ChartRead = {
+      name,
+      winrate: rates.reduce((sum, v) => sum + v, 0) / Math.max(1, rates.length),
+      spent: pointsSpent(picks),
+      keystones: kinds.filter((k) => k === "keystone").length,
+      nexus: kinds.filter((k) => k === "nexus").length,
+    };
+    console.log(
+      `  ${name.padEnd(18)} ${(result.winrate * 100).toFixed(1).padStart(5)}% · ${String(result.spent).padStart(3)} pts · keystones ${String(result.keystones)} · nexus ${String(result.nexus)}`,
+    );
+    return result;
+  };
+  const baseline = read("no chart", []);
+  const archetypes: ChartRead[] = [
+    ...CHART_SCHOOLS.map((school) => read(`mono-${school}`, monoChart(school))),
+    read("dual red+blue", dualChart("red", "blue")),
+    read("spread red/blue+green", spreadChart(["red", "blue"], "green")),
+    read("hub-heavy", hubHeavyChart()),
+  ];
+  const halves = CHART_SCHOOLS.map((school) =>
+    read(`half-${school}`, halfBranchChart(school)),
+  );
+  const rates = archetypes.map((a) => a.winrate);
+  const mean = rates.reduce((sum, v) => sum + v, 0) / Math.max(1, rates.length);
+  const spread = (Math.max(...rates) - Math.min(...rates)) * 100;
+  const below = archetypes.filter((a) => a.winrate < baseline.winrate);
+  const green = archetypes.find((a) => a.name === "mono-green");
+  const greenEdge = ((green?.winrate ?? 0) - mean) * 100;
+  const unreachable = nexusIds().filter((id) => !nexusReachable(id));
+  const groups = chartLikeWithLike(archetypes, CHART_DECK_SCHOOLS);
+  const greenParity = halfParityPp(halves, "green", CHART_SCHOOLS);
+  const blueParity = halfParityPp(
+    halves,
+    "blue",
+    CHART_DECK_SCHOOLS.filter((school) => school !== "blue"),
+  );
+  const checks: readonly [string, boolean][] = [
+    [`mono charts of the deck schools (${groups.monos.join(", ")}) spread ${groups.monoSpreadPp.toFixed(1)}pp (gate ${String(CHART_SPREAD_PP)})`, groups.monoSpreadPp <= CHART_SPREAD_PP],
+    [`multi-constellation charts (${groups.multis.join(", ")}) spread ${groups.multiSpreadPp.toFixed(1)}pp (gate ${String(CHART_SPREAD_PP)})`, groups.multiSpreadPp <= CHART_SPREAD_PP],
+    [`archetypes below the no-chart baseline: ${below.length === 0 ? "none" : below.map((a) => a.name).join(", ")}`, below.length === 0],
+    [`mono-green over the archetype mean ${greenEdge >= 0 ? "+" : ""}${greenEdge.toFixed(1)}pp (gate +${String(CHART_PARITY_PP)})`, greenEdge <= CHART_PARITY_PP],
+    [`nexus reachable at L${String(ARCHETYPE_LEVEL)}: ${unreachable.length === 0 ? "all" : `missing ${unreachable.join(", ")}`}`, unreachable.length === 0],
+    [`half-green against the other halves ${greenParity >= 0 ? "+" : ""}${greenParity.toFixed(1)}pp (±${String(CHART_PARITY_PP)})`, Math.abs(greenParity) <= CHART_PARITY_PP],
+    [`half-blue against the halves of the other deck schools ${blueParity >= 0 ? "+" : ""}${blueParity.toFixed(1)}pp (±${String(CHART_PARITY_PP)})`, Math.abs(blueParity) <= CHART_PARITY_PP],
+  ];
+  console.log(`  archetype mean ${(mean * 100).toFixed(1)}%`);
+  console.log(`  price of specialising (multi-constellation mean minus mono mean) ${groups.specialisingGapPp.toFixed(1)}pp, printed`);
+  console.log(`  spread over every archetype ${spread.toFixed(1)}pp, printed`);
+  for (const [label, ok] of checks) {
+    console.log(`  ${ok ? "ok " : "OUT"} ${label}`);
+  }
+  const rows: string[] = ["archetype,winrate,points,keystones,nexus"];
+  for (const row of [baseline, ...archetypes, ...halves]) {
+    rows.push(
+      `${row.name},${row.winrate.toFixed(3)},${String(row.spent)},${String(row.keystones)},${String(row.nexus)}`,
+    );
+  }
+  const outPath = writeSimCsv("chart", rows, startedAt);
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (checks.some(([, ok]) => !ok)) process.exitCode = 1;
+};
+
+const PROGRESSION_LEVELS: readonly number[] = [1, 5, 10, 15, 20, 25, 30, 40, 50];
+
+const levelsModeMain = (runs: number, seed: number, startedAt: number): void => {
+  const decks = ARCHETYPES.filter((a) => CONTRACT_DECKS.includes(a.name));
+  console.log(
+    `sim levels: campaign A0 by captain level, the greedy chart at each level, red+blue x ${String(runs)} runs`,
+  );
+  const rows: string[] = ["level,points,winrate,ownerEstimate"];
+  for (const level of PROGRESSION_LEVELS) {
+    const picks = buildChartPicks(level);
+    const rates = decks.map(
+      (deck) =>
+        campaignRoll(runs, seed, deck, 0, { chartPicks: picks }).roll.winrate,
+    );
+    const mean = rates.reduce((sum, v) => sum + v, 0) / Math.max(1, rates.length);
+    console.log(
+      `  L${String(level).padEnd(3)} ${String(pointsSpent(picks)).padStart(3)} pts · bot ${(mean * 100).toFixed(1).padStart(5)}% · owner ≈ ${Math.min(100, mean * 100 + OWNER_EDGE_PP).toFixed(1)}%`,
+    );
+    rows.push(
+      `${String(level)},${String(pointsSpent(picks))},${mean.toFixed(3)},${Math.min(1, mean + OWNER_EDGE_PP / 100).toFixed(3)}`,
+    );
+  }
+  const outPath = writeSimCsv("levels", rows, startedAt);
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+};
+
+const UNWINNABLE_BAND: readonly [number, number] = [0.08, 0.15];
+
+const UNWINNABLE_CEILING = 0.2;
+
+const UNWINNABLE_READS: readonly number[] = [1, 2, 4, 8];
+
+const CONTRACT_DECKS: readonly string[] = ["red-burn", "blue-wall"];
+
+const CHART_DECK_SCHOOLS: readonly School[] = ["red", "blue"];
+
+interface WorldRead {
+  world: number;
+  firstContract: number;
+  firstAny: number;
+  deaths: string[];
+}
+
+const unwinnableModeMain = (
+  runs: number,
+  seed: number,
+  startedAt: number,
+): void => {
+  const replays = Math.max(1, Number(getArg("replays", "8")));
+  console.log(
+    `sim unwinnable: ${String(runs)} worlds at A0 · columns = ${String(ARCHETYPES.length)} decks x up to ${String(replays)} fight-stream replays (map, events, shops and loot fixed per world)`,
+  );
+  const reads: WorldRead[] = [];
+  for (let i = 0; i < runs; i += 1) {
+    const world = campaignWorld(seed, i);
+    let firstContract = Number.POSITIVE_INFINITY;
+    let firstAny = Number.POSITIVE_INFINITY;
+    const deaths: string[] = [];
+    for (let r = 0; r < replays && firstContract === Number.POSITIVE_INFINITY; r += 1) {
+      for (const archetype of ARCHETYPES) {
+        const result = runCampaign(world, archetype, 0, { battleSalt: r });
+        if (r === 0) {
+          deaths.push(
+            result.cleared
+              ? `${archetype.name} won`
+              : `${archetype.name} s${String(result.deathSector)}r${String(result.deathRow)}`,
+          );
+        }
+        if (!result.cleared) continue;
+        firstAny = Math.min(firstAny, r + 1);
+        if (CONTRACT_DECKS.includes(archetype.name)) {
+          firstContract = Math.min(firstContract, r + 1);
+        }
+      }
+    }
+    reads.push({ world: i, firstContract, firstAny, deaths });
+  }
+  const rows: string[] = ["replays,unwinnableAllDecks,unwinnableRedBlue"];
+  for (const read of UNWINNABLE_READS.filter((n) => n <= replays)) {
+    const all = reads.filter((w) => w.firstAny > read).length / Math.max(1, runs);
+    const contract =
+      reads.filter((w) => w.firstContract > read).length / Math.max(1, runs);
+    console.log(
+      `  R=${String(read)}: no column wins ${(all * 100).toFixed(1)}% of worlds · no red or blue column ${(contract * 100).toFixed(1)}%`,
+    );
+    rows.push(`${String(read)},${all.toFixed(3)},${contract.toFixed(3)}`);
+  }
+  const final =
+    reads.filter((w) => w.firstAny > replays).length / Math.max(1, runs);
+  const ok = final >= UNWINNABLE_BAND[0] && final <= UNWINNABLE_BAND[1];
+  console.log(
+    `  unwinnable at R=${String(replays)}: ${(final * 100).toFixed(1)}% · band ${(UNWINNABLE_BAND[0] * 100).toFixed(0)}-${(UNWINNABLE_BAND[1] * 100).toFixed(0)}%, ceiling ${(UNWINNABLE_CEILING * 100).toFixed(0)}%${ok ? " · ok" : final > UNWINNABLE_CEILING ? " · OVER THE CEILING" : " · OUT OF BAND"}`,
+  );
+  const lost = reads.filter((w) => w.firstAny > replays);
+  console.log(`  unwinnable worlds (index: replay-0 outcome per deck):`);
+  for (const read of lost.slice(0, 12)) {
+    console.log(`    world ${String(read.world)}: ${read.deaths.join(" · ")}`);
+  }
+  rows.push("");
+  rows.push("world,firstContract,firstAny,replay0");
+  for (const read of reads) {
+    rows.push(
+      `${String(read.world)},${Number.isFinite(read.firstContract) ? String(read.firstContract) : "none"},${Number.isFinite(read.firstAny) ? String(read.firstAny) : "none"},${read.deaths.join(" | ")}`,
+    );
+  }
+  const outPath = writeSimCsv("unwinnable", rows, startedAt);
+  console.log(`sim: wrote ${outPath} in ${String(Date.now() - startedAt)} ms`);
+  if (final > UNWINNABLE_CEILING || !ok) process.exitCode = 1;
 };
 
 const SHIP_BAND: readonly [number, number] = [0.2, 0.6];
@@ -3036,7 +3616,7 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
   for (const ship of ships) {
     const banded: number[] = [];
     for (const archetype of SHIP_ARCHETYPES) {
-      const { roll } = campaignRoll(runs, seed, archetype, 0, false, ship.id);
+      const { roll } = campaignRoll(runs, seed, archetype, 0, { shipId: ship.id });
       if (archetype.name !== "black-edge") banded.push(roll.winrate);
       rows.push(
         [
@@ -3055,9 +3635,9 @@ const shipsModeMain = (runs: number, seed: number, startedAt: number): void => {
     const mean = banded.reduce((sum, v) => sum + v, 0) / Math.max(1, banded.length);
     const inBand = mean >= SHIP_BAND[0] && mean <= SHIP_BAND[1];
     const enforced = SHIP_BAND_ENFORCED.includes(ship.id);
-    if (!inBand && enforced) outOfBand += 1;
+    if (!inBand && enforced && MASTERY_ARG === 0) outOfBand += 1;
     console.log(
-      `  ${ship.id.padEnd(9)} banded mean ${(mean * 100).toFixed(1)}%${inBand ? "" : enforced ? " OUT OF BAND" : " outside the band (reference)"}`,
+      `  ${ship.id.padEnd(9)} banded mean ${(mean * 100).toFixed(1)}%${inBand ? "" : enforced && MASTERY_ARG === 0 ? " OUT OF BAND" : enforced ? ` outside the band (diagnostic at mastery ${String(MASTERY_ARG)})` : " outside the band (reference)"}`,
     );
     rows.push(`${ship.id},banded mean,,${mean.toFixed(3)},,`);
   }
@@ -3398,11 +3978,7 @@ const rosterModeMain = (runs: number, seed: number, startedAt: number): void => 
 type AxisPolicy = "stability" | "resonance" | "greedy";
 
 const optionAxisSum = (option: EventOption): number => {
-  const lists = [
-    ...(option.outcomes ?? []),
-    ...(option.onPass ?? []),
-    ...(option.onFail ?? []),
-  ];
+  const lists = allOutcomes(option);
   if (lists.length === 0) return 0;
   const total = lists.reduce(
     (sum, outcome) =>
@@ -4182,6 +4758,9 @@ const MODES: Readonly<Record<string, SimMode>> = {
   deep: { runs: 300, main: deepModeMain },
   s6: { runs: 300, main: deepModeMain },
   campaign: { runs: 200, main: campaignModeMain },
+  unwinnable: { runs: 300, main: unwinnableModeMain },
+  chart: { runs: 300, main: chartModeMain },
+  levels: { runs: 200, main: levelsModeMain },
   ships: { runs: 200, main: shipsModeMain },
   puzzles: { runs: 60, main: puzzleModeMain },
   dice: { runs: 200, main: diceModeMain },

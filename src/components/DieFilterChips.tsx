@@ -1,4 +1,5 @@
 import { useTranslation } from "react-i18next";
+import { riseStyle } from "@/app/motion";
 import {
   DIE_BADGE_GLYPH,
   DIE_FILTERS,
@@ -28,19 +29,27 @@ export const DieFilterChips = ({
         className={styles.chip}
         data-on={value === "all" ? "1" : "0"}
         data-die-filter="all"
+        data-rise
+        data-press
+        data-tap-slop
+        style={riseStyle(0)}
         onClick={() => {
           onChange("all");
         }}
       >
         {t("meta:hangar.filterAll")}
       </button>
-      {DIE_FILTERS.map((feature) => (
+      {DIE_FILTERS.map((feature, index) => (
         <button
           key={feature}
           type="button"
           className={styles.chip}
           data-on={value === feature ? "1" : "0"}
           data-die-filter={feature}
+          data-rise
+          data-press
+          data-tap-slop
+          style={riseStyle(index + 1)}
           onClick={() => {
             onChange(value === feature ? "all" : feature);
           }}

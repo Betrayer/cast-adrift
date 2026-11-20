@@ -1,6 +1,7 @@
 import { Button, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { AppSheet } from "@/components/AppModal";
+import { riseStyle } from "@/app/motion";
 import { rarityColor } from "@/app/rarity";
 import { schools } from "@/data/schools";
 import { tokens } from "@/app/theme";
@@ -10,46 +11,53 @@ import { ENGRAVING_BY_ID } from "@/data/engravings";
 import { MODULE_BY_ID } from "@/data/modules";
 import { moduleTags } from "@/data/modules/types";
 import { PERK_BY_ID } from "@/data/perks";
+import { draftedPerks } from "@/data/perks/ship";
+import { perkTags } from "@/data/perks/types";
 import { RESONANCE_BONUSES } from "@/data/resonance";
-import { MECHANIC_TAGS, SYSTEM_TAGS, type ContentTag } from "@/data/tags";
-import { computeCensus } from "@/game/battle/resonance";
-import { VULNERABLE_CAP } from "@/game/battle/resolver";
-import { manoeuvreVars } from "@/screens/Battle/board/SlotGrid";
-import { loadoutCensus } from "@/game/effects/census";
+import { nextThreshold } from "@/game/battle/resonance";
+import {
+  factVars,
+  systemFact,
+  type FactInput,
+  type FactVars,
+  type SystemFactId,
+} from "@/game/battle/systemFacts";
+import { nudgeChargePrice } from "@/game/battle/view/actions";
+import {
+  activeCensusTags,
+  deckResonance,
+  loadoutCensus,
+} from "@/game/effects/census";
+import { fogRowsFor } from "@/game/map/fog";
+import { useAppStore } from "@/stores/appStore";
+import { useBattleStore } from "@/stores/battleStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore } from "@/stores/runStore";
-import type { ShipId } from "@/data/ships";
 import type { School } from "@/types/content";
 import styles from "./BuildSheet.module.css";
 
 interface SystemNote {
-  id: string;
+  id: SystemFactId;
   title: string;
   body: string;
-  vars?: Record<string, number>;
+  vars: FactVars;
 }
 
-const systemNotes = (shipId: ShipId): readonly SystemNote[] => [
-  {
-    id: "manoeuvre",
-    title: "battle:manoeuvreTitle",
-    body: "battle:manoeuvreWhy",
-    vars: manoeuvreVars(shipId),
-  },
-  {
-    id: "targeting",
-    title: "battle:targetingTitle",
-    body: "battle:targetingWhy",
-    vars: { cap: VULNERABLE_CAP },
-  },
-  { id: "charge", title: "battle:chargeTitle", body: "battle:chargeWhy" },
-  { id: "mk", title: "battle:slot.mkTitle", body: "battle:mkWhy" },
+const SYSTEM_NOTE_TITLES: readonly (readonly [SystemFactId, string])[] = [
+  ["manoeuvre", "battle:manoeuvreTitle"],
+  ["targeting", "battle:targetingTitle"],
+  ["charge", "battle:chargeTitle"],
+  ["mk", "battle:slot.mkTitle"],
+  ["fog", "battle:fogTitle"],
 ];
 
-const RESONANCE_TIERS: readonly number[] = [2, 4, 6];
-
-const nextThreshold = (count: number): number | undefined =>
-  RESONANCE_TIERS.find((tier) => count < tier);
+const systemNotes = (input: FactInput): readonly SystemNote[] =>
+  SYSTEM_NOTE_TITLES.map(([id, title]) => ({
+    id,
+    title,
+    body: systemFact(id).text,
+    vars: factVars(id, input),
+  }));
 
 const tierDesc = (school: School, threshold: number): string | undefined =>
   RESONANCE_BONUSES.find(
@@ -59,24 +67,36 @@ const tierDesc = (school: School, threshold: number): string | undefined =>
 export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
   const { t } = useTranslation(["run", "content", "battle"]);
   const deck = useRunStore((s) => s.deck);
-  const perks = useRunStore((s) => s.perks);
+  const allPerks = useRunStore((s) => s.perks);
+  const perks = draftedPerks(allPerks);
+  const masteryRank = useRunStore((s) => s.masteryRank);
   const modules = useRunStore((s) => s.modules);
   const shipId = useRunStore((s) => s.shipId);
+  const chartPicks = useRunStore((s) => s.chartPicks);
+  const officers = useRunStore((s) => s.officers);
+  const mutators = useRunStore((s) => s.mutators);
+  const echo = useRunStore((s) => s.echo);
   const banished = useRunStore((s) => s.banishedPerks);
+  const nudgeCost = nudgeChargePrice({ perks, chartPicks, modules, officers, mutators });
+  const fogRows = fogRowsFor({
+    sensorsMk: 1,
+    deepScan: false,
+    bonusReveal: 0,
+    sectorReveal: 0,
+    echo,
+    mutators,
+  });
   const engravings = useMetaStore((s) => s.engravings);
+  const inBattle = useAppStore((s) => s.screen) === "battle";
+  const battleResonance = useBattleStore((s) => s.resonance);
 
   const deckDefIds = deck.map((d) => d.defId);
   const census = loadoutCensus({ deckDefIds, perks, modules, engravings });
-  const resonance = computeCensus(
-    deckDefIds
-      .map((defId) => DIE_BY_ID.get(defId))
-      .filter((def) => def !== undefined)
-      .map((def) => ({ school: def.school })),
-  );
+  const resonance = inBattle
+    ? battleResonance
+    : deckResonance(deck, { shipId, masteryRank, perks: allPerks, chartPicks, modules });
 
-  const activeTags: ContentTag[] = [...SYSTEM_TAGS, ...MECHANIC_TAGS].filter(
-    (tag) => (census[tag] ?? 0) > 0,
-  );
+  const activeTags = activeCensusTags(census);
 
   const engraved = [...new Set(deckDefIds)]
     .map((defId) => ({ defId, ids: engravings[defId] ?? [] }))
@@ -102,13 +122,18 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
           <Text size="xs" c={tokens.faint} className={styles.sectionTitle}>
             {t("run:build.resonance")}
           </Text>
-          {(Object.keys(schools) as School[]).map((school) => {
+          {(Object.keys(schools) as School[]).map((school, index) => {
             const count = resonance.counts[school];
             if (count === 0) return null;
             const next = nextThreshold(count);
-            const desc = next === undefined ? undefined : tierDesc(school, next);
+            const desc = next === null ? undefined : tierDesc(school, next);
             return (
-              <div key={school} className={styles.row}>
+              <div
+                key={school}
+                className={styles.row}
+                data-rise
+                style={riseStyle(index)}
+              >
                 <span
                   className={styles.schoolDot}
                   style={{ background: schools[school].stroke }}
@@ -120,7 +145,7 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
                   {String(count)}
                 </Text>
                 <Text size="xs" c={tokens.faint} className={styles.hint}>
-                  {next === undefined
+                  {next === null
                     ? t("run:build.resonanceMax")
                     : desc === undefined
                       ? t("run:build.resonanceNext", { n: next - count })
@@ -138,8 +163,14 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
           <Text size="xs" c={tokens.faint} className={styles.sectionTitle}>
             {t("battle:systemsTitle")}
           </Text>
-          {systemNotes(shipId).map((note) => (
-            <div key={note.id} className={styles.entry} data-system-note={note.id}>
+          {systemNotes({ shipId, nudgeCost, fogRows }).map((note, index) => (
+            <div
+              key={note.id}
+              className={styles.entry}
+              data-system-note={note.id}
+              data-rise
+              style={riseStyle(index)}
+            >
               <Text size="sm" fw={600} c={tokens.text}>
                 {t(note.title)}
               </Text>
@@ -172,7 +203,7 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
               {t("run:build.empty")}
             </Text>
           ) : (
-            perks.map((id) => {
+            perks.map((id, index) => {
               const def = PERK_BY_ID.get(id);
               if (def === undefined) return null;
               return (
@@ -180,7 +211,11 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
                   key={id}
                   className={styles.entry}
                   data-build-perk={id}
-                  style={{ borderLeftColor: rarityColor(def.rarity) }}
+                  data-rise
+                  style={{
+                    borderLeftColor: rarityColor(def.rarity),
+                    ...riseStyle(index),
+                  }}
                 >
                   <Text size="sm" fw={600} c={tokens.text}>
                     {t(def.name)}
@@ -188,9 +223,7 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
                   <Text size="xs" c={tokens.dim}>
                     {t(def.desc)}
                   </Text>
-                  <TagChips
-                    tags={[...new Set([...(def.synergy ?? []), ...(def.tags ?? [])])]}
-                  />
+                  <TagChips tags={perkTags(def)} />
                 </div>
               );
             })
@@ -206,14 +239,18 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
               {t("run:build.empty")}
             </Text>
           ) : (
-            modules.map((id) => {
+            modules.map((id, index) => {
               const def = MODULE_BY_ID.get(id);
               if (def === undefined) return null;
               return (
                 <div
                   key={id}
                   className={styles.entry}
-                  style={{ borderLeftColor: rarityColor(def.rarity) }}
+                  data-rise
+                  style={{
+                    borderLeftColor: rarityColor(def.rarity),
+                    ...riseStyle(index),
+                  }}
                 >
                   <Text size="sm" fw={600} c={tokens.text}>
                     {t(def.name)}
@@ -237,10 +274,15 @@ export const BuildSheet = ({ onClose }: { onClose: () => void }) => {
               {t("run:build.empty")}
             </Text>
           ) : (
-            engraved.map((entry) => {
+            engraved.map((entry, index) => {
               const dieDef = DIE_BY_ID.get(entry.defId);
               return (
-                <div key={entry.defId} className={styles.entry}>
+                <div
+                  key={entry.defId}
+                  className={styles.entry}
+                  data-rise
+                  style={riseStyle(index)}
+                >
                   <Text size="sm" fw={600} c={tokens.text}>
                     {dieDef === undefined ? entry.defId : t(dieDef.name)}
                   </Text>

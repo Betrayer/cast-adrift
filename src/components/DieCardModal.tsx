@@ -11,6 +11,7 @@ interface DieCardModalProps {
   defId: string;
   onClose: () => void;
   growthBonus?: number;
+  fusion?: number;
   engravings?: EngravingMap;
   engravingIds?: readonly string[];
   tagCounts?: Partial<Record<ContentTag, number>>;
@@ -21,6 +22,7 @@ export const DieCardModal = ({
   defId,
   onClose,
   growthBonus,
+  fusion,
   engravings,
   engravingIds,
   tagCounts,
@@ -39,6 +41,7 @@ export const DieCardModal = ({
         defId={defId}
         size="full"
         growthBonus={growthBonus}
+        fusion={fusion}
         engravings={engravings}
         engravingIds={engravingIds}
         tagCounts={tagCounts}

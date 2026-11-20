@@ -1,14 +1,14 @@
 import { Button, Text } from '@mantine/core';
 import { useCallback, useEffect, useState, type CSSProperties } from 'react';
 import { useTranslation } from 'react-i18next';
-import { rarityColor } from '@/app/rarity';
+import { dieFrameColor } from '@/app/rarity';
+import { LegendaryAura } from '@/components/LegendaryAura';
 import { useEscapeKey } from '@/components/dismiss';
 import { tokens } from '@/app/theme';
 import { DieCard } from '@/components/DieCard';
 import { ParticleRain } from '@/components/ParticleRain';
 import { DIE_BY_ID } from '@/data/dice';
-import { LOOT_SFX } from '@/data/audio';
-import { duckMusic, playSfx } from '@/services/audio';
+import { playLootCue } from '@/services/audio';
 import { haptic } from '@/services/tma';
 import { useReducedMotion } from '@/stores/settingsStore';
 import { useLootStore } from '@/stores/lootStore';
@@ -40,10 +40,7 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
   useEffect(() => {
     haptic('reveal');
     const def = DIE_BY_ID.get(dieId);
-    if (def !== undefined) {
-      playSfx(LOOT_SFX[def.rarity]);
-      duckMusic(def.rarity === 'legendary' ? 2000 : 1200);
-    }
+    if (def !== undefined) playLootCue(def.rarity);
     if (reduced) return;
     const id = window.setTimeout(() => {
       setRevealed(true);
@@ -66,7 +63,8 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
   const def = DIE_BY_ID.get(dieId);
   if (def === undefined) return null;
 
-  const frameColor = rarityColor(def.rarity);
+  const frameColor = dieFrameColor(def);
+  const legendary = def.rarity === 'legendary';
 
 
   return (
@@ -105,10 +103,13 @@ const LootCard = ({ dieId, reduced, onClose }: LootCardProps) => {
           </div>
           <div
             className={`${styles.face ?? ''} ${styles.front ?? ''} ${revealed ? styles.frontGlow ?? '' : ''
-              }`}
+              } ${legendary ? styles.frontLegendary ?? '' : ''}`}
             style={{ borderColor: frameColor, color: frameColor }}
+            data-rarity={def.rarity}
+            data-school={def.school}
           >
-            <DieCard defId={dieId} plain className={styles.dieBody} />
+            {legendary ? <LegendaryAura defId={dieId} school={def.school} /> : null}
+            <DieCard defId={dieId} plain aura={false} className={styles.dieBody} />
           </div>
           {revealed && !reduced ? (
             <div className={styles.burst}>

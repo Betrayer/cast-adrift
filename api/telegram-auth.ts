@@ -6,6 +6,22 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 
 const MAX_AGE_SECONDS = 86400;
 
+const ENV_NAMES = [
+  "CA_TG_BOT_TOKEN",
+  "FIREBASE_PROJECT_ID",
+  "FIREBASE_CLIENT_EMAIL",
+  "FIREBASE_PRIVATE_KEY",
+] as const;
+
+export const missingEnvNames = (
+  env: Record<string, string | undefined>,
+): string[] => ENV_NAMES.filter((name) => !env[name]?.trim());
+
+const isProbe = (query: VercelRequest["query"]): boolean => {
+  const value = query["probe"];
+  return value === "1" || (Array.isArray(value) && value.includes("1"));
+};
+
 const readInitData = (body: unknown): string | null => {
   if (typeof body !== "object" || body === null) return null;
   const value = (body as { initData?: unknown }).initData;
@@ -67,6 +83,11 @@ export default async function handler(
   req: VercelRequest,
   res: VercelResponse,
 ): Promise<void> {
+  if (req.method === "GET" && isProbe(req.query)) {
+    const missing = missingEnvNames(process.env);
+    res.status(200).json({ ok: missing.length === 0, missing });
+    return;
+  }
   if (req.method !== "POST") {
     res.status(405).json({ error: "method-not-allowed" });
     return;

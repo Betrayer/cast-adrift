@@ -1,9 +1,9 @@
 .beat {
-  animation: beatIn 420ms ease-out both;
+  animation: beatIn 420ms var(--ca-ease-out) backwards;
 }
 
 .tallyLine {
-  animation: slideIn 340ms ease-out both;
+  animation: slideIn 340ms var(--ca-ease-out) backwards;
 }
 
 @keyframes beatIn {
@@ -127,7 +127,7 @@
 }
 
 .epitaph {
-  animation: beatIn 620ms ease-out both;
+  animation: beatIn 620ms var(--ca-ease-out) backwards;
 }
 
 :root[data-ca-motion='reduced'] .horizonCore,

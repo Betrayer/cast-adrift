@@ -24,6 +24,11 @@ import { connectFirestoreEmulator, getFirestore } from "firebase/firestore";
 import type { Auth, AuthCredential, User } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 import { authErrorCode, type AuthErrorCode } from "@/services/authErrors";
+import {
+  readServerError,
+  tgFailureFor,
+  type TgAuthResult,
+} from "@/services/tgAuth";
 import { providersOf, type AccountInfo } from "@/services/uid";
 
 const EMULATOR_HOST = "127.0.0.1";
@@ -117,7 +122,7 @@ export const ensureAnonAuth = async (): Promise<string | null> => {
 
 export const signInWithTelegram = async (
   initDataRaw: string,
-): Promise<string | null> => {
+): Promise<TgAuthResult> => {
   try {
     const response = await fetch("/api/telegram-auth", {
       method: "POST",
@@ -125,22 +130,24 @@ export const signInWithTelegram = async (
       body: JSON.stringify({ initData: initDataRaw }),
     });
     if (!response.ok) {
+      const body: unknown = await response.json().catch(() => null);
+      const reason = tgFailureFor(response.status, readServerError(body));
       console.warn(
-        `firebase: telegram auth rejected (${String(response.status)})`,
+        `firebase: telegram auth rejected (${String(response.status)} ${reason})`,
       );
-      return null;
+      return { uid: null, reason };
     }
     const body: unknown = await response.json();
     const token =
       typeof body === "object" && body !== null
         ? (body as { token?: unknown }).token
         : null;
-    if (typeof token !== "string") return null;
+    if (typeof token !== "string") return { uid: null, reason: "network" };
     const credential = await signInWithCustomToken(ensureAuth(), token);
-    return credential.user.uid;
+    return { uid: credential.user.uid, reason: null };
   } catch (error) {
     console.warn("firebase: telegram sign-in failed", error);
-    return null;
+    return { uid: null, reason: "network" };
   }
 };
 

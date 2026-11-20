@@ -1,20 +1,26 @@
 import { describe, expect, it } from "vitest";
-import { SECTORS } from "@/data/sectors";
+import { SECTORS, sectorDef } from "@/data/sectors";
 import { generateSectorMap } from "@/game/map/generator";
 import {
   edgeKey,
   nodeById,
+  type EdgeMark,
   type HoleSpot,
   type MapGraph,
   type MapNode,
   type NodeId,
+  type WormholeEdge,
 } from "@/game/map/types";
 import { createStreams } from "@/services/rng";
-import { mapGeometry } from "./mapGeometry";
+import { mapGeometry, SIDE_MARGIN } from "./mapGeometry";
 import {
   adjacentBypassOffer,
+  bandHorizons,
   bypassCopyKey,
+  bypassCopyVars,
   bypassOfferFor,
+  bypassState,
+  bypassTollMark,
   isDrawableEdge,
   sharesSpot,
   spotEllipse,
@@ -139,177 +145,301 @@ describe("edges inside a spot", () => {
 });
 
 const RIM_SPOT = "spot:rim";
+const RIM_LANES = 3;
+const RIM_ROW = 1;
+const RIM_BAND: readonly [number, number] = [2, 3];
+const RIM_BOSS = 5;
+
+const inRimBand = (row: number): boolean =>
+  row >= RIM_BAND[0] && row <= RIM_BAND[1];
 
 const rimNodes: MapNode[] = [
   node(0, 1, { type: "start" }),
-  node(1, 0),
-  node(1, 1),
-  node(2, 0),
-  node(2, 1, { hole: true, spot: RIM_SPOT }),
-  node(2, 2),
-  node(3, 1, { hole: true, spot: RIM_SPOT }),
-  node(3, 0),
-  node(3, 2),
-  node(4, 1, { type: "boss" }),
+  ...Array.from({ length: (RIM_BOSS - 1) * RIM_LANES }, (_, i) => {
+    const row = Math.floor(i / RIM_LANES) + 1;
+    const lane = i % RIM_LANES;
+    return node(row, lane, inRimBand(row) ? { hole: true, spot: RIM_SPOT } : {});
+  }),
+  node(RIM_BOSS, 1, { type: "boss" }),
 ];
 
-const rimEdges: [NodeId, NodeId][] = [
-  ["r0l1", "r1l0"],
-  ["r0l1", "r1l1"],
-  ["r1l0", "r2l0"],
-  ["r1l1", "r2l0"],
-  ["r1l1", "r2l1"],
-  ["r2l0", "r3l0"],
-  ["r2l1", "r3l1"],
-  ["r2l2", "r3l2"],
-  ["r3l0", "r4l1"],
-  ["r3l1", "r4l1"],
-  ["r3l2", "r4l1"],
-];
+const rimEdges: [NodeId, NodeId][] = rimNodes.flatMap((from) =>
+  rimNodes
+    .filter(
+      (to) =>
+        to.row === from.row + 1 &&
+        (from.type === "start" ||
+          to.type === "boss" ||
+          Math.abs(to.lane - from.lane) <= 1),
+    )
+    .map((to): [NodeId, NodeId] => [from.id, to.id]),
+);
 
 const rimSpot: HoleSpot = {
   id: RIM_SPOT,
-  nodes: ["r2l1", "r3l1"],
-  rows: [2, 3],
-  lanes: [1, 1],
+  nodes: rimNodes.filter((n) => n.hole === true).map((n) => n.id),
+  rows: RIM_BAND,
+  lanes: [0, RIM_LANES - 1],
 };
 
-const rimMap = (overrides: Partial<MapGraph> = {}): MapGraph => ({
-  nodes: rimNodes,
-  edges: rimEdges,
-  shape: { bossRow: 4, gateRow: 1, lanes: 3 },
-  edgeMarks: { [edgeKey("r1l1", "r2l1")]: "wormhole" },
-  wormholes: {
-    [edgeKey("r1l1", "r2l1")]: { from: "r1l1", hole: "r2l1", bypass: "r2l2" },
-  },
-  spots: [rimSpot],
-  bossReach: rimNodes.filter((n) => n.hole !== true).map((n) => n.id),
-  ...overrides,
-});
+const farRimOf = (lane: number): NodeId =>
+  `r${String(RIM_BAND[1] + 1)}l${String(lane)}`;
+
+const rimRecords = (): Record<string, WormholeEdge> => {
+  const byId = new Map(rimNodes.map((n) => [n.id, n]));
+  const out: Record<string, WormholeEdge> = {};
+  for (const [from, to] of rimEdges) {
+    const source = byId.get(from);
+    if (source === undefined || source.row !== RIM_ROW) continue;
+    if (byId.get(to)?.hole !== true) continue;
+    out[edgeKey(from, to)] = { from, hole: to, bypass: farRimOf(source.lane) };
+  }
+  return out;
+};
+
+const rimMap = (overrides: Partial<MapGraph> = {}): MapGraph => {
+  const wormholes = rimRecords();
+  return {
+    nodes: rimNodes,
+    edges: rimEdges,
+    shape: { bossRow: RIM_BOSS, gateRow: 0, lanes: RIM_LANES },
+    edgeMarks: Object.fromEntries(
+      Object.keys(wormholes).map((key): [string, EdgeMark] => [key, "wormhole"]),
+    ),
+    wormholes,
+    spots: [rimSpot],
+    bossReach: rimNodes.filter((n) => n.hole !== true).map((n) => n.id),
+    ...overrides,
+  };
+};
+
+const FAR_RIM: readonly NodeId[] = [farRimOf(0), farRimOf(1), farRimOf(2)];
 
 describe("the spot as one click target", () => {
-  it("routes to the entry node the player actually stands on", () => {
-    expect(spotEntryFor(rimMap(), "r1l1", rimSpot, [])).toBe("r2l1");
+  it("routes to the entry straight ahead of the ship", () => {
+    for (let lane = 0; lane < RIM_LANES; lane += 1) {
+      expect(spotEntryFor(rimMap(), `r1l${String(lane)}`, rimSpot, [])).toBe(
+        `r2l${String(lane)}`,
+      );
+    }
   });
 
   it("offers nothing from a node with no wormhole edge into the spot", () => {
-    expect(spotEntryFor(rimMap(), "r1l0", rimSpot, [])).toBeNull();
+    expect(spotEntryFor(rimMap(), "r0l1", rimSpot, [])).toBeNull();
+    expect(spotEntryFor(rimMap(), "r4l1", rimSpot, [])).toBeNull();
   });
 
-  it("prefers the entry whose bypass is a lateral slip", () => {
-    const twoWay = rimMap({
-      edges: [...rimEdges, ["r1l1", "r3l1"]],
-      edgeMarks: {
-        [edgeKey("r1l1", "r2l1")]: "wormhole",
-        [edgeKey("r1l1", "r3l1")]: "wormhole",
-      },
-      wormholes: {
-        [edgeKey("r1l1", "r2l1")]: {
-          from: "r1l1",
-          hole: "r2l1",
-          bypass: "r2l0",
-        },
-        [edgeKey("r1l1", "r3l1")]: {
-          from: "r1l1",
-          hole: "r3l1",
-          bypass: "r3l2",
-        },
-      },
-    });
-    expect(spotEntryFor(twoWay, "r1l1", rimSpot, [])).toBe("r3l1");
+  it("picks the entry nearest the ship's lane, the lower id on a tie", () => {
+    expect(spotEntryFor(rimMap(), "r1l1", rimSpot, ["r2l1"])).toBe("r2l0");
+    expect(spotEntryFor(rimMap(), "r1l1", rimSpot, ["r2l1", "r2l0"])).toBe(
+      "r2l2",
+    );
+    expect(spotEntryFor(rimMap(), "r1l0", rimSpot, ["r2l0"])).toBe("r2l1");
+    expect(spotEntryFor(rimMap(), "r1l0", rimSpot, ["r2l0", "r2l1"])).toBeNull();
   });
 });
 
-const walkable = rimMap({
-  wormholes: {
-    [edgeKey("r1l1", "r2l1")]: { from: "r1l1", hole: "r2l1", bypass: "r2l0" },
-  },
-});
+const bypassPctOf = (sector: number): number => {
+  const motif = sectorDef(sector).shape.motifs.find((m) => m.m === "blackHoles");
+  return motif?.m === "blackHoles" ? motif.bypassPct : 0;
+};
+
+const HOLE_SECTORS: readonly number[] = [2, 3, 4, 5, 6];
 
 describe("the bypass offer the card and the preview both read", () => {
-  it("charges the sector toll when the bypass buys a lateral slip", () => {
-    const offer = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, 20);
-    expect(offer.offered).toBe(true);
-    expect(offer.waived).toBe(false);
-    expect(offer.toll).toBe(2);
-    expect(bypassCopyKey(offer)).toBe("run:hole.bypassCost");
+  it("charges the ceiling of the sector's share of max hull", () => {
+    for (const sector of HOLE_SECTORS) {
+      const pct = bypassPctOf(sector);
+      expect(pct, `S${String(sector)}`).toBeGreaterThan(0);
+      for (const hullMax of [7, 10, 23, 30, 41, 60]) {
+        const offer = bypassOfferFor(
+          rimMap(),
+          "r1l1",
+          "r2l1",
+          [],
+          sector,
+          hullMax,
+          hullMax,
+        );
+        const label = `S${String(sector)} max ${String(hullMax)}`;
+        expect(offer.offered, label).toBe(true);
+        expect(offer.toll, label).toBe(Math.ceil(hullMax * pct));
+        expect(offer.pct, label).toBe(Math.round(pct * 100));
+        expect(offer.lethal, label).toBe(false);
+        expect(bypassCopyKey(offer), label).toBe("run:hole.bypassCost");
+      }
+    }
   });
 
-  it("waives the toll when the bypass only walks an edge already offered", () => {
-    const offer = bypassOfferFor(walkable, "r1l1", "r2l1", [], 4, 20);
-    expect(offer.offered).toBe(true);
-    expect(offer.waived).toBe(true);
-    expect(offer.toll).toBe(0);
-    expect(bypassCopyKey(offer)).toBe("run:hole.bypassDrift");
+  it("prices the toll off max hull, not the hull the ship has left", () => {
+    const full = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 6, 30, 30);
+    const worn = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 6, 12, 30);
+    expect(worn.toll).toBe(full.toll);
+    expect(worn.lethal).toBe(false);
+    const bare = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 6, 12);
+    expect(bare.toll).toBe(Math.ceil(12 * bypassPctOf(6)));
   });
 
-  it("says free rather than waived when the hull cannot pay", () => {
-    const offer = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, 2);
-    expect(offer.waived).toBe(false);
-    expect(offer.toll).toBe(0);
-    expect(bypassCopyKey(offer)).toBe("run:hole.bypassFree");
+  it("turns lethal once the hull is at or under the toll", () => {
+    for (const sector of HOLE_SECTORS) {
+      const toll = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], sector, 30, 30)
+        .toll;
+      for (const hull of [1, toll - 1, toll]) {
+        const offer = bypassOfferFor(
+          rimMap(),
+          "r1l1",
+          "r2l1",
+          [],
+          sector,
+          hull,
+          30,
+        );
+        const label = `S${String(sector)} hull ${String(hull)}`;
+        expect(offer.offered, label).toBe(true);
+        expect(offer.lethal, label).toBe(true);
+        expect(offer.toll, label).toBe(toll);
+        expect(bypassCopyKey(offer), label).toBe("run:hole.bypassLethal");
+      }
+      const safe = bypassOfferFor(
+        rimMap(),
+        "r1l1",
+        "r2l1",
+        [],
+        sector,
+        toll + 1,
+        30,
+      );
+      expect(safe.lethal, `S${String(sector)}`).toBe(false);
+      expect(bypassCopyKey(safe)).toBe("run:hole.bypassCost");
+    }
   });
 
-  it("disables the control when every legal target is already behind", () => {
+  it("disables the control when every far-rim node is already behind", () => {
+    const offer = bypassOfferFor(rimMap(), "r1l1", "r2l1", FAR_RIM, 4, 1, 30);
+    expect(offer.offered).toBe(false);
+    expect(offer.lethal).toBe(false);
+    expect(bypassCopyKey(offer)).toBe("run:hole.bypassNone");
+  });
+
+  it("still offers the bypass while one far-rim node is open", () => {
     const offer = bypassOfferFor(
       rimMap(),
       "r1l1",
       "r2l1",
-      ["r2l0", "r2l2"],
+      FAR_RIM.filter((id) => id !== farRimOf(2)),
       4,
-      20,
+      30,
     );
-    expect(offer.offered).toBe(false);
-    expect(bypassCopyKey(offer)).toBe("run:hole.bypassNone");
+    expect(offer.offered).toBe(true);
+    expect(bypassCopyKey(offer)).toBe("run:hole.bypassCost");
   });
 
   it("disables the control on an edge that is not a wormhole at all", () => {
-    const offer = bypassOfferFor(rimMap(), "r1l1", "r2l0", [], 4, 20);
+    const offer = bypassOfferFor(rimMap(), "r0l1", "r1l1", [], 4, 30);
     expect(offer.offered).toBe(false);
     expect(bypassCopyKey(offer)).toBe("run:hole.bypassNone");
   });
+
+  it("charges nothing where the sector declares no hole", () => {
+    const offer = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 1, 1, 30);
+    expect(offer.toll).toBe(0);
+    expect(offer.pct).toBe(0);
+    expect(offer.lethal).toBe(false);
+  });
+
+  it("gives the card and the preview one verdict, one toll mark and one set of copy values", () => {
+    const none = bypassOfferFor(rimMap(), "r1l1", "r2l1", FAR_RIM, 4, 1, 30);
+    expect(bypassState(none)).toBe("none");
+    expect(bypassTollMark(none)).toBe("-1");
+    const cost = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, 30, 30);
+    expect(bypassState(cost)).toBe("cost");
+    expect(bypassTollMark(cost)).toBe(String(cost.toll));
+    expect(bypassCopyVars(cost)).toEqual({ n: cost.toll, pct: cost.pct });
+    const lethal = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, cost.toll, 30);
+    expect(bypassState(lethal)).toBe("lethal");
+    expect(bypassTollMark(lethal)).toBe(String(cost.toll));
+  });
 });
 
-const rimHole = node(2, 1, { hole: true, spot: RIM_SPOT });
+const rimHole = node(RIM_BAND[0], 1, { hole: true, spot: RIM_SPOT });
 
 describe("the verdict the preview card is allowed to state", () => {
   it("reads the offer for a hole on an edge out of the node the ship stands on", () => {
-    const offer = adjacentBypassOffer(rimMap(), "r1l1", rimHole, [], 4, 20);
+    const offer = adjacentBypassOffer(rimMap(), "r1l1", rimHole, [], 4, 30);
     expect(offer).not.toBeNull();
     if (offer === null) return;
     expect(offer.offered).toBe(true);
     expect(bypassCopyKey(offer)).toBe("run:hole.bypassCost");
   });
 
+  it("carries the lethal verdict to the preview", () => {
+    const toll = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, 30).toll;
+    const offer = adjacentBypassOffer(rimMap(), "r1l1", rimHole, [], 4, toll, 30);
+    expect(offer?.lethal).toBe(true);
+    expect(offer === null ? null : bypassCopyKey(offer)).toBe(
+      "run:hole.bypassLethal",
+    );
+  });
+
   it("refuses one for a hole the ghost row shows but the ship cannot act on", () => {
-    expect(adjacentBypassOffer(rimMap(), "r0l1", rimHole, [], 4, 20)).toBeNull();
+    expect(adjacentBypassOffer(rimMap(), "r0l1", rimHole, [], 4, 30)).toBeNull();
   });
 
   it("keeps the ghost preview from asserting the opposite of one jump later", () => {
-    const far = bypassOfferFor(rimMap(), "r0l1", "r2l1", [], 4, 20);
-    const near = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, 20);
+    const far = bypassOfferFor(rimMap(), "r0l1", "r2l1", [], 4, 30);
+    const near = bypassOfferFor(rimMap(), "r1l1", "r2l1", [], 4, 30);
     expect(bypassCopyKey(far)).toBe("run:hole.bypassNone");
     expect(bypassCopyKey(near)).toBe("run:hole.bypassCost");
-    expect(adjacentBypassOffer(rimMap(), "r0l1", rimHole, [], 4, 20)).toBeNull();
+    expect(adjacentBypassOffer(rimMap(), "r0l1", rimHole, [], 4, 30)).toBeNull();
   });
 
-  it("has no verdict for a node the rim never swallowed", () => {
-    expect(adjacentBypassOffer(rimMap(), "r1l1", node(2, 0), [], 4, 20)).toBeNull();
+  it("has no verdict for a node the band never swallowed", () => {
+    expect(
+      adjacentBypassOffer(rimMap(), "r0l1", node(1, 0), [], 4, 30),
+    ).toBeNull();
   });
 });
 
 const SWEEP_SEEDS = 48;
 
-const subsetsOf = <T,>(items: readonly T[]): T[][] => {
-  const out: T[][] = [];
-  for (let mask = 1; mask < 1 << items.length; mask += 1) {
-    out.push(items.filter((_, i) => (mask & (1 << i)) !== 0));
+const litUnderFog = (members: readonly MapNode[]): MapNode[][] => {
+  const rows = [...new Set(members.map((n) => n.row))].sort((a, b) => a - b);
+  const lanes = [...new Set(members.map((n) => n.lane))].sort((a, b) => a - b);
+  const out: MapNode[][] = [];
+  for (const row of rows) {
+    const below = members.filter((n) => n.row < row);
+    for (const lane of lanes) {
+      out.push([
+        ...below,
+        ...members.filter((n) => n.row === row && n.lane <= lane),
+      ]);
+      out.push(members.filter((n) => n.row === row && n.lane >= lane));
+    }
   }
   return out;
 };
 
 describe("the disc the stage has to hold", () => {
-  it("stays inside the viewBox for every spot the generator draws, under any fog", () => {
+  it("clamps a full-width band inside the viewBox", () => {
+    const shape = { bossRow: 20, gateRow: 10, lanes: 4 };
+    const wide = mapGeometry(shape);
+    const band: MapNode[] = [];
+    for (const row of [12, 13, 14]) {
+      for (let lane = 0; lane < shape.lanes; lane += 1) {
+        band.push(swallowed(row, lane));
+      }
+    }
+    const ellipse = spotEllipse(wide, band);
+    expect(ellipse).not.toBeNull();
+    if (ellipse === null) return;
+    expect(ellipse.cx - ellipse.rx).toBeGreaterThanOrEqual(0);
+    expect(ellipse.cx + ellipse.rx).toBeLessThanOrEqual(wide.viewW);
+    expect(ellipse.rx).toBeGreaterThanOrEqual(
+      (wide.laneX(shape.lanes - 1) - wide.laneX(0)) / 2,
+    );
+  });
+
+  it("stays inside the viewBox for every band the generator draws, under any fog line", () => {
     let checked = 0;
     for (const sector of SECTORS) {
       for (let seed = 1; seed <= SWEEP_SEEDS; seed += 1) {
@@ -321,7 +451,8 @@ describe("the disc the stage has to hold", () => {
           const members = spot.nodes
             .map((id) => byId.get(id))
             .filter((node): node is MapNode => node !== undefined);
-          for (const lit of subsetsOf(members)) {
+          for (const lit of [members, ...litUnderFog(members)]) {
+            if (lit.length === 0) continue;
             const ellipse = spotEllipse(geo, lit);
             expect(ellipse).not.toBeNull();
             if (ellipse === null) continue;
@@ -342,5 +473,60 @@ describe("the disc the stage has to hold", () => {
       }
     }
     expect(checked).toBeGreaterThan(0);
+  });
+});
+
+describe("the band's horizon lines", () => {
+  const shape = { bossRow: 20, gateRow: 10, lanes: 4 };
+  const wide = mapGeometry(shape);
+  const band: HoleSpot = {
+    id: "spot:band",
+    nodes: [],
+    rows: [12, 14],
+    lanes: [0, shape.lanes - 1],
+  };
+
+  it("draws the near rim between the rim row and the band's first row", () => {
+    const [near] = bandHorizons(wide, band, shape.lanes, band.rows[0]);
+    expect(near?.side).toBe("near");
+    expect(near?.y).toBe((wide.rowY(band.rows[0]) + wide.rowY(band.rows[0] - 1)) / 2);
+  });
+
+  it("adds the far rim once the fog has lifted off the band's last row", () => {
+    expect(bandHorizons(wide, band, shape.lanes, band.rows[1] - 1)).toHaveLength(1);
+    const lines = bandHorizons(wide, band, shape.lanes, band.rows[1]);
+    expect(lines.map((line) => line.side)).toEqual(["near", "far"]);
+    const far = lines[1];
+    expect(far?.y).toBe((wide.rowY(band.rows[1]) + wide.rowY(band.rows[1] + 1)) / 2);
+    expect(far?.y ?? 0).toBeLessThan(lines[0]?.y ?? 0);
+    expect(bandHorizons(wide, band, shape.lanes, shape.bossRow)).toEqual(lines);
+  });
+
+  it("spans every lane and stays inside the viewBox", () => {
+    for (const line of bandHorizons(wide, band, shape.lanes, shape.bossRow)) {
+      expect(line.x1).toBe(wide.laneX(0) - SIDE_MARGIN / 2);
+      expect(line.x2).toBe(wide.laneX(shape.lanes - 1) + SIDE_MARGIN / 2);
+      expect(line.x1).toBeGreaterThanOrEqual(0);
+      expect(line.x2).toBeLessThanOrEqual(wide.viewW);
+    }
+  });
+
+  it("draws nothing for a spot that does not span the map", () => {
+    const blob: HoleSpot = { ...band, lanes: [1, 2] };
+    expect(bandHorizons(wide, blob, shape.lanes, shape.bossRow)).toEqual([]);
+    expect(bandHorizons(wide, band, shape.lanes + 1, shape.bossRow)).toEqual([]);
+  });
+
+  it("draws both rims for every band the generator carves", () => {
+    for (const sector of SECTORS) {
+      for (let seed = 1; seed <= 12; seed += 1) {
+        const map = generateSectorMap(createStreams(seed).map, sector.id);
+        const geo = mapGeometry(map.shape);
+        for (const spot of map.spots) {
+          const lines = bandHorizons(geo, spot, map.shape.lanes, map.shape.bossRow);
+          expect(lines, `s${String(sector.id)} seed ${String(seed)}`).toHaveLength(2);
+        }
+      }
+    }
   });
 });

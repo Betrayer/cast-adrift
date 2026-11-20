@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { CABIN_CAP, OFFICER_BY_ID } from "@/data/officers";
 import { applyOutcome } from "@/game/events/apply";
+import { allOutcomes } from "@/game/events/engine";
 import { must, optionById } from "@/game/events/eventFixtures";
 import { abandonRun, endRun, startRun } from "@/game/run/flow";
 import {
@@ -23,11 +24,7 @@ import type { Outcome } from "@/types/events";
 const rescueOutcome = (officerId: string): Outcome => {
   const def = must(OFFICER_BY_ID.get(officerId), `officer ${officerId}`);
   const option = optionById(def.event, def.option);
-  const outcomes = [
-    ...(option.outcomes ?? []),
-    ...(option.onPass ?? []),
-    ...(option.onFail ?? []),
-  ];
+  const outcomes = allOutcomes(option);
   return must(
     outcomes.find((out) =>
       out.effects.some((eff) => eff.k === "officer" && eff.id === officerId),
@@ -176,8 +173,8 @@ describe("the crew snapshot", () => {
   });
 
   it("bumps to v16 and still accepts every version the build has written", () => {
-    expect(RUN_SNAPSHOT_V).toBe(16);
-    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16]);
+    expect(RUN_SNAPSHOT_V).toBe(17);
+    expect(RUN_SNAPSHOT_ACCEPTED).toEqual([10, 11, 12, 13, 14, 15, 16, 17]);
   });
 
   it("round-trips the aboard roster", () => {

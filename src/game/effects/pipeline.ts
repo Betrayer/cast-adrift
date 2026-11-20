@@ -3,6 +3,7 @@ import { engravingEffects, type EngravingMap } from "@/data/engravings";
 import { buildAffinitySource } from "@/game/effects/affinity";
 import type { EffectCtx } from "@/game/effects/ctx";
 import { applyDefs } from "@/game/effects/evaluate";
+import { isOnTable } from "@/game/battle/table";
 import {
   buildChartSource,
   buildModuleSource,
@@ -31,6 +32,8 @@ export interface RunLoadout {
 }
 
 const subjectHooks: ReadonlySet<Hook> = new Set(SUBJECT_HOOKS);
+
+const loadoutHooks: ReadonlySet<Hook> = new Set<Hook>(["battleStart", "battleEnd"]);
 
 const injected: EffectSource[] = [];
 
@@ -107,6 +110,7 @@ export const emit = (
     }
     const die = ctx.findDie?.(source.dieUid);
     if (die === undefined) continue;
+    if (!isOnTable(die) && !loadoutHooks.has(hook)) continue;
     if (subjectHooks.has(hook) && subject?.uid !== die.uid) continue;
     source.run(hook, ctx, die);
   }

@@ -4,95 +4,42 @@ import {
   Group,
   Paper,
   Progress,
-  SimpleGrid,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
 import { riseStyle } from "@/app/motion";
-import { rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
+import { rafTweens, UI_GROUP } from "@/pixi/tween";
 import { playSfx } from "@/services/audio";
 import { tokens } from "@/app/theme";
 import { achievementTitleById } from "@/game/meta/achievements";
 import { ShipCard } from "@/components/ShipCard";
+import { ShipSilhouette } from "@/components/ShipSilhouette";
+import { SHIP_RANK_MAX, shipRankOf } from "@/data/shipRanks";
 import { BattleTallyPanel } from "@/screens/Rewards/BattleTallyPanel";
 import { DIE_BY_ID } from "@/data/dice";
 import { PERK_BY_ID } from "@/data/perks";
-import { progressWithinLevel, ZERO_SHARD_BREAKDOWN } from "@/game/xp";
+import { draftedPerks } from "@/data/perks/ship";
+import { progressWithinLevel } from "@/game/xp";
 import { abandonRun } from "@/game/run/flow";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
-import { useRunStore, type RunStats } from "@/stores/runStore";
+import { useRunStore } from "@/stores/runStore";
 import { useReducedMotion } from "@/stores/settingsStore";
 import { useSummaryStore } from "@/stores/summaryStore";
+import { CountLine, CountSlot } from "./CountLine";
+import { COUNT_MARK } from "./countSequence";
 import { LevelUpCeremony } from "./LevelUpCeremony";
+import { RecapShareButton } from "./RecapShareButton";
+import { SectorLadder, summaryRoute } from "./SectorLadder";
+import { ShardBreakdownList } from "./ShardBreakdownList";
+import { SummaryDetail } from "./SummaryDetail";
+import { useSummaryCounts } from "./useSummaryCounts";
 
 const FIND_STAGGER_MS = 180;
-
-const CAUSE_ROW_ID = "cause";
-
-const DETAIL_ROWS: readonly {
-  id: string;
-  label: string;
-  read: (stats: RunStats) => number;
-}[] = [
-  { id: "elites", label: "run:summary.elites", read: (s) => s.elites },
-  {
-    id: "minibosses",
-    label: "run:summary.minibosses",
-    read: (s) => s.minibosses,
-  },
-  { id: "bosses", label: "run:summary.bosses", read: (s) => s.bosses },
-  {
-    id: "scrapSpent",
-    label: "run:summary.scrapSpent",
-    read: (s) => s.scrapSpent,
-  },
-  {
-    id: "hullPctMin",
-    label: "run:summary.hullPctMin",
-    read: (s) => s.hullPctMin,
-  },
-  {
-    id: "dicePlaced",
-    label: "run:summary.dicePlaced",
-    read: (s) => s.dicePlaced,
-  },
-  {
-    id: "wormholeRides",
-    label: "run:summary.wormholeRides",
-    read: (s) => s.wormholeRides,
-  },
-  {
-    id: "holesBypassed",
-    label: "run:summary.holesBypassed",
-    read: (s) => s.holesBypassed,
-  },
-];
-
-const useCountUp = (target: number, reduced: boolean): number => {
-  const [value, setValue] = useState(reduced ? target : 0);
-  useEffect(() => {
-    if (reduced) return;
-    let frame = 0;
-    let start = 0;
-    const duration = 650;
-    const tick = (ts: number): void => {
-      if (start === 0) start = ts;
-      const p = Math.min(1, (ts - start) / duration);
-      setValue(Math.round(target * p));
-      if (p < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => {
-      cancelAnimationFrame(frame);
-    };
-  }, [target, reduced]);
-  return value;
-};
 
 export const SummaryScreen = () => {
   const { t } = useTranslation(["run", "meta"]);
@@ -101,37 +48,51 @@ export const SummaryScreen = () => {
   const mkLevels = useRunStore((s) => s.mkLevels);
   const tally = useRunStore((s) => s.lastTally);
   const perks = useRunStore((s) => s.perks);
+  const masteryRank = useRunStore((s) => s.masteryRank);
+  const shipRankXp = useRunStore((s) => s.shipRankXp);
+  const sectorIndex = useRunStore((s) => s.sectorIndex);
+  const crossedThreshold = useRunStore((s) => s.crossedThreshold);
+  const mode = useRunStore((s) => s.mode);
+  const contractId = useRunStore((s) => s.contractId);
   const result = useSummaryStore((s) => s.result);
   const level = useMetaStore((s) => s.level);
   const xp = useMetaStore((s) => s.xp);
   const reduced = useReducedMotion();
+  const modelRef = useRef<HTMLDivElement | null>(null);
 
   const win = result?.win ?? false;
-  const xpShown = useCountUp(result?.xpGain ?? 0, reduced);
-  const shardsShown = useCountUp(result?.shardGain ?? 0, reduced);
+  const route = summaryRoute(
+    { sectorIndex, crossedThreshold, mode, contractId },
+    win,
+  );
   const leveled =
     result !== null && result.toLevel > result.fromLevel;
   const [ceremonyDone, setCeremonyDone] = useState(!leveled);
-  const [barsDone, setBarsDone] = useState(reduced);
   const [detailed, setDetailed] = useState(false);
 
-  useEffect(() => {
-    if (reduced) return;
-    const id = setTimeout(() => {
-      setBarsDone(true);
-    }, 750);
-    return () => {
-      clearTimeout(id);
-    };
-  }, [reduced]);
+  const xpTarget = result?.xpGain ?? 0;
+  const shardsTarget = result?.shardGain ?? 0;
+  const nodesTarget = stats.nodesCleared;
+  const killsTarget = stats.kills;
+  const scrapTarget = stats.scrapEarned;
+
+  const { slots, countsDone } = useSummaryCounts(
+    {
+      xp: xpTarget,
+      shards: shardsTarget,
+      nodes: nodesTarget,
+      kills: killsTarget,
+      scrap: scrapTarget,
+    },
+    reduced,
+  );
 
   const firstFinds = useMemo(() => result?.firstFinds ?? [], [result]);
   const findShards = result?.findShards ?? 0;
 
   useEffect(() => {
     if (firstFinds.length === 0) return;
-    const clock = rafClock();
-    const tweens = new Tweens(clock);
+    const { tweens, destroy } = rafTweens();
     tweens.channel(UI_GROUP).sequence(
       firstFinds.map((_, index) => ({
         ms: FIND_STAGGER_MS,
@@ -141,19 +102,18 @@ export const SummaryScreen = () => {
       })),
       );
     return () => {
-      tweens.destroy();
-      clock.destroy();
+      destroy();
     };
   }, [firstFinds]);
 
   const progress = progressWithinLevel(xp);
-  const perkNames = perks
+  const perkNames = draftedPerks(perks)
     .map((id) => PERK_BY_ID.get(id)?.name)
     .filter((name): name is string => name !== undefined);
 
 
   const ceremony =
-    leveled && barsDone && !ceremonyDone && result !== null ? (
+    leveled && countsDone && !ceremonyDone && result !== null ? (
       <LevelUpCeremony
         fromLevel={result.fromLevel}
         toLevel={result.toLevel}
@@ -166,38 +126,66 @@ export const SummaryScreen = () => {
       />
     ) : null;
 
-  const shards = result?.shards ?? ZERO_SHARD_BREAKDOWN;
-  const breakdown: readonly [string, number][] = [
-    ["meta:summary.fromSectors", shards.sectors],
-    ["meta:summary.fromBeacons", shards.beacons],
-    ["meta:summary.fromEnding", shards.firstEnding],
-    ["meta:summary.fromHull", shards.hullClear],
-    ["meta:summary.fromStreak", shards.streak],
-    ["meta:summary.fromDeep", shards.deepClear],
-    ["meta:summary.fromAscension", shards.ascension],
-    ["meta:summary.fromFinds", result?.findShards ?? 0],
-    ["meta:summary.fromAchievements", result?.achievementShards ?? 0],
-  ];
-  const earned = breakdown.filter(([, value]) => value !== 0);
-
   return (
     <Screen
       centered
       overlay={ceremony}
     >
-      <Paper bg={tokens.surface1} p="xl" radius="md" withBorder w="100%">
+      <Paper
+        bg={tokens.surface1}
+        p="xl"
+        radius="md"
+        withBorder
+        w="100%"
+        data-summary-sequence={countsDone ? "done" : "running"}
+      >
         <Stack gap="sm">
           <Title order={2} c={win ? tokens.text : tokens.danger} ta="center">
             {t(win ? "run:summary.victory" : "run:summary.defeat")}
           </Title>
-          <ShipCard shipId={shipId} size="compact" mkLevels={mkLevels} />
+          <div ref={modelRef}>
+            <ShipSilhouette
+              shipId={shipId}
+              masteryRank={masteryRank}
+              perks={perks}
+              size="summary"
+            />
+          </div>
+          <Text size="sm" c={tokens.dim} ta="center" data-testid="summary-ship-rank">
+            {t("run:summary.shipRank", {
+              rank: shipRankOf(shipRankXp),
+              max: SHIP_RANK_MAX,
+            })}
+          </Text>
+          <ShipCard shipId={shipId} size="compact" mkLevels={mkLevels} masteryRank={masteryRank} />
+          <SectorLadder
+            route={route}
+            label={t("run:summary.route", { n: route.to, max: route.total })}
+          />
           <Divider color={tokens.line} />
           <Text c={tokens.dim}>
-            {t("run:summary.nodes", { n: stats.nodesCleared })}
+            <CountLine
+              text={t("run:summary.nodes", { n: COUNT_MARK })}
+              id="nodes"
+              target={nodesTarget}
+              slot={slots.nodes}
+            />
           </Text>
-          <Text c={tokens.dim}>{t("run:summary.kills", { n: stats.kills })}</Text>
           <Text c={tokens.dim}>
-            {t("run:summary.earned", { n: stats.scrapEarned })}
+            <CountLine
+              text={t("run:summary.kills", { n: COUNT_MARK })}
+              id="kills"
+              target={killsTarget}
+              slot={slots.kills}
+            />
+          </Text>
+          <Text c={tokens.dim}>
+            <CountLine
+              text={t("run:summary.earned", { n: COUNT_MARK })}
+              id="scrap"
+              target={scrapTarget}
+              slot={slots.scrap}
+            />
           </Text>
           <Button
             size="compact-xs"
@@ -211,30 +199,7 @@ export const SummaryScreen = () => {
             {t(detailed ? "run:summary.less" : "run:summary.more")}
           </Button>
           {detailed ? (
-            <SimpleGrid cols={2} spacing={4} data-summary-detail>
-              {DETAIL_ROWS.map((row) => (
-                <Group key={row.id} justify="space-between" data-summary-row={row.id}>
-                  <Text size="xs" c={tokens.faint}>
-                    {t(row.label)}
-                  </Text>
-                  <Text size="xs" c={tokens.dim} data-summary-value={row.id}>
-                    {row.id === "hullPctMin"
-                      ? t("run:summary.pct", { n: Math.round(row.read(stats)) })
-                      : row.read(stats)}
-                  </Text>
-                </Group>
-              ))}
-              {result?.cause === "singularity" ? (
-                <Group justify="space-between" data-summary-row={CAUSE_ROW_ID}>
-                  <Text size="xs" c={tokens.faint}>
-                    {t("run:summary.cause")}
-                  </Text>
-                  <Text size="xs" c={tokens.danger} data-summary-value={CAUSE_ROW_ID}>
-                    {t("run:summary.causeSingularity")}
-                  </Text>
-                </Group>
-              ) : null}
-            </SimpleGrid>
+            <SummaryDetail stats={stats} cause={result?.cause ?? null} />
           ) : null}
           {detailed && tally !== null ? (
             <BattleTallyPanel tally={tally} />
@@ -252,23 +217,12 @@ export const SummaryScreen = () => {
               {t("meta:summary.shards")}
             </Text>
             <Text c={tokens.amber} fw={700}>
-              +{shardsShown} ◈
+              +
+              <CountSlot id="shards" target={shardsTarget} slot={slots.shards} />
+              {" ◈"}
             </Text>
           </Group>
-          {earned.length === 0 ? null : (
-            <Stack gap={2} data-shard-breakdown>
-              {earned.map(([label, value]) => (
-                <Group key={label} justify="space-between">
-                  <Text size="xs" c={tokens.faint}>
-                    {t(label)}
-                  </Text>
-                  <Text size="xs" c={tokens.dim}>
-                    +{value}
-                  </Text>
-                </Group>
-              ))}
-            </Stack>
-          )}
+          <ShardBreakdownList result={result} />
           {firstFinds.length === 0 ? null : (
             <Text
               size="xs"
@@ -299,7 +253,8 @@ export const SummaryScreen = () => {
               {t("meta:summary.xp")}
             </Text>
             <Text c={tokens.accent} fw={700}>
-              +{xpShown}
+              +
+              <CountSlot id="xp" target={xpTarget} slot={slots.xp} />
             </Text>
           </Group>
           <Text size="xs" c={tokens.faint}>
@@ -317,6 +272,7 @@ export const SummaryScreen = () => {
               ? t("run:summary.perksNone")
               : perkNames.map((name) => t(name)).join(" · ")}
           </Text>
+          <Group grow gap="xs" align="flex-start" wrap="nowrap">
           <Button
             size="compact-sm"
             variant="default"
@@ -327,6 +283,8 @@ export const SummaryScreen = () => {
           >
             {t("run:build.open")}
           </Button>
+          <RecapShareButton modelRef={modelRef} win={win} sector={route.to} sectorMax={route.total} />
+          </Group>
           <Button
             size="md"
             fullWidth

@@ -1,0 +1,67 @@
+.band {
+  --comms-line: 15px;
+  --comms-pad: 4px;
+  --comms-gap: 4px;
+  --comms-inset: 4px;
+  --comms-cap: 3;
+  --comms-lead: calc(2 * var(--comms-line) + 2 * var(--comms-pad) + 2px);
+  --comms-row: calc(var(--comms-line) + 2 * var(--comms-pad) + 2px);
+  position: relative;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 0 12px var(--comms-inset);
+  overflow: clip;
+  pointer-events: none;
+}
+
+.board {
+  flex: 0 1
+    calc(
+      var(--comms-lead) + (var(--comms-cap) - 1) * (var(--comms-row) + var(--comms-gap)) +
+        var(--comms-inset)
+    );
+  min-height: calc(var(--comms-row) + var(--comms-inset));
+}
+
+.gutter {
+  flex: 0 0 auto;
+  height: calc(var(--comms-lead) + 2 * (var(--comms-row) + var(--comms-gap)) + var(--comms-inset));
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.lane {
+  display: flex;
+  flex-direction: column;
+  gap: var(--comms-gap);
+  height: 100%;
+  min-height: 0;
+}
+
+.idle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: 100%;
+  min-height: var(--comms-row);
+  border: 1px dashed var(--ca-line);
+  border-radius: 10px;
+  color: var(--ca-faint);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+:root[data-ca-compact='1'] .band {
+  --comms-line: 13px;
+  --comms-pad: 3px;
+  --comms-gap: 3px;
+  --comms-inset: 3px;
+  --comms-cap: 2;
+}
+
+:root[data-ca-tight='1'] .band {
+  --comms-cap: 1;
+}

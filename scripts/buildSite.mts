@@ -54,6 +54,13 @@ if (!existsSync(join(DIST, "index.html"))) {
   process.exit(1);
 }
 
+if (!existsSync(LANDING)) {
+  console.error(
+    "build-site: landing/ is missing — see docs/horizon/phase-h1-plan.md",
+  );
+  process.exit(1);
+}
+
 rmSync(PLAY, { recursive: true, force: true });
 mkdirSync(PLAY, { recursive: true });
 renameSync(join(DIST, "index.html"), join(PLAY, "index.html"));

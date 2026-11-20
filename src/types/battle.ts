@@ -9,6 +9,7 @@ import type {
 import type { EchoNodeId } from "@/data/echo";
 import type { FireModeId } from "@/data/fireModes";
 import type { ShipId } from "@/data/ships";
+import type { PassiveTier } from "@/game/battle/passives";
 import type { Statuses } from "@/game/battle/statuses";
 import type {
   ExceedCapGrant,
@@ -18,7 +19,14 @@ import type {
 
 export type { SlotId };
 
-export type DieState = "tray" | "placed" | "reserved" | "locked" | "burned";
+export type DieState =
+  | "tray"
+  | "placed"
+  | "reserved"
+  | "locked"
+  | "burned"
+  | "bag"
+  | "discard";
 
 export interface RolledDie {
   uid: string;
@@ -37,6 +45,9 @@ export interface RolledDie {
   bankedValue?: number;
   pinned?: boolean;
   reschooled?: boolean;
+  seat?: number;
+  fusion?: number;
+  faces?: readonly number[];
 }
 
 export interface SlotState {
@@ -74,6 +85,7 @@ export interface EnemyState {
   ward?: School;
   lastHitKey?: string;
   coreOpenUntilTurn?: number;
+  seat?: number;
 }
 
 export type ResonanceThreshold = 2 | 4 | 6;
@@ -149,6 +161,9 @@ export interface BattleSnapshot {
   sacrificePool: number;
   bloodReactorUsed: boolean;
   passiveUsed?: boolean;
+  passiveTier?: PassiveTier;
+  firstHitSpent?: boolean;
+  blackBoxSpent?: boolean;
   burnDoubleUsed: boolean;
   blockedSlots: BlockedSlot[];
   shrunkSlots: BlockedSlot[];
@@ -163,6 +178,7 @@ export interface BattleSnapshot {
   pendingSwap: number;
   pendingStorm: number;
   pendingAdds?: string[];
+  reinforcements?: string[];
   partsDowned?: string[];
   ascension: number;
   sectorHpPct: number;

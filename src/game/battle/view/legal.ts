@@ -5,6 +5,7 @@ import {
   isSlotBlocked,
 } from "@/game/battle/setup";
 import { dieHasGrant } from "@/data/engravings";
+import { FATE_DIE_ID } from "@/data/fate";
 import { DIRECT, fireModeAllowed, type FireModeId } from "@/data/fireModes";
 import { sourceMods } from "@/game/run/runMods";
 import type { BattleBoard } from "@/game/battle/view/types";
@@ -70,6 +71,10 @@ export const goalDiceNow = (
 export const checkEndTurnBlocked = (
   board: CheckBoard & Pick<BattleBoard, "slots">,
 ): boolean => pendingCheckMoves(board).length > 0;
+
+export const isTableSpent = (board: Pick<BattleBoard, "phase" | "dice">): boolean =>
+  board.phase === "placement" &&
+  !board.dice.some((die) => die.state === "tray" && die.defId !== FATE_DIE_ID);
 
 export const boardSlotIds = (board: Pick<BattleBoard, "slots">): SlotId[] =>
   Object.keys(board.slots) as SlotId[];

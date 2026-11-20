@@ -3,8 +3,10 @@ import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { tokens } from "@/app/theme";
 import { ParticleRain } from "@/components/ParticleRain";
+import type { MilestoneCard } from "@/data/milestones";
+import { levelUpPoints } from "@/game/chart/engine";
 import { emitBark } from "@/game/narrative/barks";
-import { rafClock, Tweens, UI_GROUP } from "@/pixi/tween";
+import { rafTweens, UI_GROUP } from "@/pixi/tween";
 import { duckMusic, playSfx } from "@/services/audio";
 import { haptic } from "@/services/tma";
 import styles from "./LevelUpCeremony.module.css";
@@ -15,7 +17,7 @@ const CARD_STAGGER_MS = 240;
 interface Props {
   fromLevel: number;
   toLevel: number;
-  milestones: readonly string[];
+  milestones: readonly MilestoneCard[];
   unlocks: readonly string[];
   reduced: boolean;
   onContinue: () => void;
@@ -30,15 +32,14 @@ export const LevelUpCeremony = ({
   onContinue,
 }: Props) => {
   const { t } = useTranslation(["meta"]);
-  const points = toLevel - fromLevel;
+  const points = levelUpPoints(fromLevel, toLevel);
 
   useEffect(() => {
     emitBark("levelUp");
     playSfx("levelUp");
     duckMusic(2200);
     haptic("levelUp");
-    const clock = rafClock();
-    const tweens = new Tweens(clock);
+    const { tweens, destroy } = rafTweens();
     const cards = [...milestones, ...unlocks];
     tweens.channel(UI_GROUP).sequence([
       { delay: CARD_DELAY_MS },
@@ -50,8 +51,7 @@ export const LevelUpCeremony = ({
       })),
     ]);
     return () => {
-      tweens.destroy();
-      clock.destroy();
+      destroy();
     };
   }, [milestones, unlocks]);
 
@@ -90,11 +90,9 @@ export const LevelUpCeremony = ({
         {t("meta:levelup.level", { level: toLevel })}
       </Title>
       <Badge size="lg" color="accent" variant="light" className={cls("chip")}>
-        {points > 1
-          ? t("meta:levelup.points", { n: points })
-          : t("meta:levelup.point")}
+        {t("meta:levelup.points", { n: points })}
       </Badge>
-      {milestones.map((label, i) => (
+      {milestones.map((card, i) => (
         <Paper
           key={i}
           bg={tokens.surface1}
@@ -108,7 +106,7 @@ export const LevelUpCeremony = ({
           data-milestone-card
         >
           <Text ta="center" c={tokens.amber} fw={600}>
-            {t(label)}
+            {t(card.key, card.values)}
           </Text>
         </Paper>
       ))}

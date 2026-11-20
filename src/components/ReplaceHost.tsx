@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { ReplaceCard } from "@/components/ReplaceCard";
 import { CABIN_CAP } from "@/data/officers";
-import { DECK_CAP } from "@/game/economy/prices";
+import { HAND_CAP } from "@/game/economy/prices";
 import { autosaveRun } from "@/game/run/flow";
 import {
   resolveSwapReplace,
@@ -41,7 +41,7 @@ export const ReplaceHost = () => {
         ? modules.length
         : officers.length;
   const max =
-    swap.kind === "die" ? DECK_CAP : swap.kind === "module" ? cap : CABIN_CAP;
+    swap.kind === "die" ? HAND_CAP : swap.kind === "module" ? cap : CABIN_CAP;
 
   return (
     <ReplaceCard

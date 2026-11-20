@@ -1,0 +1,19 @@
+.pips {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 3px;
+}
+
+.pip {
+  width: 7px;
+  height: 7px;
+  transform: rotate(45deg);
+  border: 1px solid var(--ca-faint);
+  background: transparent;
+}
+
+.pip[data-on='1'] {
+  border-color: var(--ca-amber);
+  background: var(--ca-amber);
+}

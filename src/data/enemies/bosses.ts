@@ -4,7 +4,7 @@ import type { BossDef } from "@/types/content";
 export const BOSSES: readonly BossDef[] = [
   bossDef({
     id: "quarantineWarden",
-    hp: 42,
+    hp: 41,
     shell: true,
     coreLockAt: 1,
     claims: [
@@ -131,7 +131,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "auctionCorvette",
-    hp: 93,
+    hp: 89,
     shell: true,
     coreLockAt: 1,
     stealOnHit: 5,
@@ -340,7 +340,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "coreHeart",
-    hp: 73,
+    hp: 71,
     shell: true,
     coreLockAt: 1,
     claims: [
@@ -439,7 +439,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "theHush",
-    hp: 30,
+    hp: 29,
     shell: true,
     coreLockAt: 1,
     jamReleasesBlocks: true,
@@ -493,7 +493,7 @@ export const BOSSES: readonly BossDef[] = [
   }),
   bossDef({
     id: "echoFleet",
-    hp: 86,
+    hp: 80,
     shell: true,
     coreLockAt: 1,
     claims: [

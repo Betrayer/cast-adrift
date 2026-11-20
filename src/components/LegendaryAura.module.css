@@ -1,0 +1,398 @@
+@property --aura-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.host {
+  position: relative;
+  isolation: isolate;
+}
+
+.host::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: var(--z-recede);
+  border-radius: inherit;
+  background: inherit;
+}
+
+.aura {
+  --aura: var(--ca-school-yellow-stroke);
+  --aura-glow: color-mix(in srgb, var(--aura) 58%, transparent);
+  position: absolute;
+  inset: -8px;
+  z-index: var(--z-recede-deep);
+  overflow: hidden;
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+.aura[data-aura='red'] {
+  --aura: var(--ca-school-red-stroke);
+}
+
+.aura[data-aura='blue'] {
+  --aura: var(--ca-school-blue-stroke);
+}
+
+.aura[data-aura='green'] {
+  --aura: var(--ca-school-green-stroke);
+}
+
+.aura[data-aura='grey'] {
+  --aura: var(--ca-school-grey-stroke);
+}
+
+.aura[data-aura='black'] {
+  --aura: var(--ca-school-black-stroke);
+}
+
+.aura[data-aura='prismatic'] {
+  --aura: var(--ca-school-prismatic-stroke);
+}
+
+.glow,
+.accent {
+  position: absolute;
+  inset: 5px;
+  border-radius: 13px;
+}
+
+.glow {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--aura) 70%, transparent),
+    0 0 12px 2px var(--aura-glow);
+}
+
+.accent {
+  opacity: 0;
+}
+
+.particle {
+  position: absolute;
+  left: var(--px);
+  top: var(--py);
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: var(--aura);
+  opacity: 0;
+  animation-duration: var(--pd);
+  animation-delay: var(--pdl);
+  animation-iteration-count: infinite;
+}
+
+.particle[data-kind='rise'] {
+  top: auto;
+  bottom: 2px;
+  animation-name: auraRise;
+  animation-timing-function: linear;
+}
+
+.particle[data-kind='orbit'] {
+  animation-name: auraOrbit;
+  animation-timing-function: linear;
+}
+
+.particle[data-kind='sparkle'] {
+  width: 2px;
+  height: 2px;
+  box-shadow: 0 0 4px var(--aura);
+  animation-name: auraSparkle;
+  animation-timing-function: ease-in-out;
+}
+
+.particle[data-kind='suck'] {
+  left: 50%;
+  top: 50%;
+  animation-name: auraSuck;
+  animation-timing-function: ease-in;
+}
+
+.aura[data-aura='yellow'] .glow {
+  animation: auraPulse 2.2s ease-in-out infinite;
+}
+
+.aura[data-aura='yellow'] .accent {
+  inset: 0;
+  border-radius: 18px;
+  opacity: 0.8;
+  background: repeating-conic-gradient(
+    from var(--aura-angle),
+    transparent 0deg 12deg,
+    color-mix(in srgb, var(--aura) 45%, transparent) 12deg 16deg,
+    transparent 16deg 30deg
+  );
+  animation: auraTurn 16s linear infinite;
+}
+
+.aura[data-aura='blue'] .glow {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--aura) 90%, #ffffff),
+    0 0 10px var(--aura),
+    0 0 20px var(--aura-glow);
+  animation: auraNeon 1.8s ease-in-out infinite;
+}
+
+.aura[data-aura='blue'] .accent,
+.aura[data-aura='prismatic'] .accent,
+.aura[data-aura='black'] .accent {
+  inset: 3px;
+  border-radius: 15px;
+  padding: 2px;
+  opacity: 1;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.aura[data-aura='blue'] .accent {
+  background: conic-gradient(
+    from var(--aura-angle),
+    transparent 0 70%,
+    color-mix(in srgb, var(--aura) 40%, #ffffff) 88%,
+    transparent 100%
+  );
+  animation: auraTurn 2.4s linear infinite;
+}
+
+.aura[data-aura='prismatic'] .glow {
+  box-shadow:
+    0 0 0 1px #ffffff,
+    0 0 14px 2px color-mix(in srgb, #ff7d7d 60%, transparent);
+  animation: auraHue 5s linear infinite;
+}
+
+.aura[data-aura='prismatic'] .accent {
+  background: conic-gradient(
+    from var(--aura-angle),
+    #ff5c5c,
+    #ffc75c,
+    #7dff7d,
+    #5cd8ff,
+    #8f7dff,
+    #ff7dee,
+    #ff5c5c
+  );
+  animation: auraTurn 5s linear infinite;
+}
+
+.aura[data-aura='prismatic'] .particle {
+  background: #ffffff;
+}
+
+.aura[data-aura='red'] .glow {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--aura) 70%, transparent),
+    0 0 14px 3px color-mix(in srgb, #ff6e3c 60%, transparent);
+  animation: auraFlicker 1.1s steps(6) infinite;
+}
+
+.aura[data-aura='red'] .particle {
+  background: #ffb27a;
+}
+
+.aura[data-aura='green'] .glow {
+  animation: auraBreathe 3.4s ease-in-out infinite;
+}
+
+.aura[data-aura='green'] .accent {
+  border: 1.5px solid color-mix(in srgb, var(--aura) 80%, #ffffff);
+  animation: auraRipple 2.6s var(--ca-ease-out) infinite;
+}
+
+.aura[data-aura='grey'] .glow {
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, #dce4f0 60%, transparent),
+    0 0 12px 2px color-mix(in srgb, #dce4f0 30%, transparent);
+}
+
+.aura[data-aura='grey'] .accent {
+  inset: 0;
+  opacity: 1;
+  background: linear-gradient(
+    100deg,
+    transparent 40%,
+    rgba(255, 255, 255, 0.55) 50%,
+    transparent 60%
+  );
+  background-size: 260% 100%;
+  animation: auraSweep 2.8s ease-in-out infinite;
+}
+
+.aura[data-aura='black'] .glow {
+  box-shadow:
+    inset 0 0 12px rgba(0, 0, 0, 0.9),
+    0 0 0 1px color-mix(in srgb, var(--aura) 70%, transparent),
+    0 0 14px 2px var(--aura-glow);
+  animation: auraBreathe 4s ease-in-out infinite;
+}
+
+.aura[data-aura='black'] .accent {
+  background: repeating-conic-gradient(
+    from var(--aura-angle),
+    color-mix(in srgb, var(--aura) 80%, #ffffff) 0deg 7deg,
+    transparent 7deg 16deg
+  );
+  animation: auraTurn 9s linear infinite reverse;
+}
+
+.aura[data-aura-motion='still'] .glow,
+.aura[data-aura-motion='still'] .accent {
+  animation: none;
+}
+
+.aura[data-aura-motion='still'] .particle {
+  display: none;
+}
+
+:root[data-ca-motion='reduced'] .glow,
+:root[data-ca-motion='reduced'] .accent {
+  animation: none;
+}
+
+:root[data-ca-motion='reduced'] .particle {
+  display: none;
+}
+
+@keyframes auraTurn {
+  to {
+    --aura-angle: 360deg;
+  }
+}
+
+@keyframes auraPulse {
+  0%,
+  100% {
+    opacity: 0.75;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes auraNeon {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.35);
+  }
+}
+
+@keyframes auraHue {
+  to {
+    filter: hue-rotate(360deg);
+  }
+}
+
+@keyframes auraFlicker {
+  0% {
+    opacity: 0.55;
+  }
+  20% {
+    opacity: 0.9;
+  }
+  40% {
+    opacity: 0.65;
+  }
+  60% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes auraBreathe {
+  0%,
+  100% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes auraRipple {
+  0% {
+    transform: scale(0.96);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(1.12);
+    opacity: 0;
+  }
+}
+
+@keyframes auraSweep {
+  0% {
+    background-position: 130% 0;
+  }
+  45%,
+  100% {
+    background-position: -130% 0;
+  }
+}
+
+@keyframes auraRise {
+  0% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--pdx), -40px) scale(0.3);
+    opacity: 0;
+  }
+}
+
+@keyframes auraOrbit {
+  0% {
+    transform: rotate(var(--pa)) translateX(6px) scale(1);
+    opacity: 0;
+  }
+  20%,
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(calc(var(--pa) + 180deg)) translateX(6px) scale(0.4);
+    opacity: 0;
+  }
+}
+
+@keyframes auraSparkle {
+  0%,
+  100% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 1;
+  }
+}
+
+@keyframes auraSuck {
+  0% {
+    transform: rotate(var(--pa)) translateX(60px) scale(1);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: rotate(calc(var(--pa) + 140deg)) translateX(8px) scale(0.2);
+    opacity: 0;
+  }
+}

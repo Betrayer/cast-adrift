@@ -2,6 +2,7 @@ import { Button, Text } from "@mantine/core";
 import { useTranslation } from "react-i18next";
 import { AppModal } from "@/components/AppModal";
 import { DieCard } from "@/components/DieCard";
+import { riseStyle } from "@/app/motion";
 import { rarityColor } from "@/app/rarity";
 import { tokens } from "@/app/theme";
 import { DIE_BY_ID } from "@/data/dice";
@@ -9,7 +10,7 @@ import { MODULE_BY_ID } from "@/data/modules";
 import { moduleTags } from "@/data/modules/types";
 import { OFFICER_BY_ID } from "@/data/officers";
 import { schools } from "@/data/schools";
-import { moduleSellValue, ptsForDie, sellValue } from "@/game/economy/prices";
+import { instanceSellValue, moduleSellValue } from "@/game/economy/prices";
 import { TagChips } from "@/components/TagChips";
 import { useMetaStore } from "@/stores/metaStore";
 import { useRunStore, type PendingSwap } from "@/stores/runStore";
@@ -55,7 +56,7 @@ export const useReplaceCandidates = (
           name: t(def.name),
           detail: t(`battle:school.${def.school}`),
           note: t("run:replace.toScrap", {
-            n: sellValue(ptsForDie(die.defId)),
+            n: instanceSellValue(die),
           }),
           accent: schools[def.school].stroke,
         },
@@ -178,12 +179,14 @@ export const ReplaceCard = ({
       </Text>
 
       <div className={styles.list}>
-        {candidates.map((candidate) => (
+        {candidates.map((candidate, index) => (
           <button
             key={candidate.key}
             type="button"
             className={styles.row}
-            style={{ borderLeftColor: candidate.accent }}
+            style={{ borderLeftColor: candidate.accent, ...riseStyle(index) }}
+            data-rise
+            data-press
             data-testid={`replace-pick-${candidate.key}`}
             onClick={() => {
               onPick(candidate.key);

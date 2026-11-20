@@ -25,7 +25,7 @@ import {
   startRunMode,
 } from "@/game/run/flow";
 import { isSectorExitRow } from "@/game/run/modes";
-import { START_NODE_ID } from "@/game/map/generator";
+import { bossNodeIdFor, START_NODE_ID } from "@/game/map/generator";
 import { outgoingEdges } from "@/game/map/types";
 import { captureRunSnapshot, restoreRunSnapshot } from "@/game/run/snapshot";
 import { createStream, deriveSeed } from "@/services/rng";
@@ -299,7 +299,10 @@ describe("the reveal row is scoped to the act", () => {
   });
 });
 
-const DRIFT_SEED = 1;
+const DRIFT_SEED =
+  Array.from({ length: 64 }, (_, i) => i + 1).find((seed) =>
+    rollSalvageOffer(seed, bossNodeIdFor(1)).includes("recon"),
+  ) ?? 1;
 
 describe("a face that cannot pay is never offered", () => {
   beforeEach(() => {

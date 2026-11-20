@@ -1,6 +1,6 @@
 import { tokens } from "@/app/theme";
 import { schools } from "@/data/schools";
-import type { Rarity } from "@/types/content";
+import type { DieItemDef, Rarity } from "@/types/content";
 
 export const rarityColor = (rarity: Rarity): string => {
   switch (rarity) {
@@ -14,3 +14,6 @@ export const rarityColor = (rarity: Rarity): string => {
       return tokens.amber;
   }
 };
+
+export const dieFrameColor = (def: Pick<DieItemDef, "rarity" | "school">): string =>
+  def.rarity === "legendary" ? schools[def.school].stroke : rarityColor(def.rarity);

@@ -1,69 +1,92 @@
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { schools } from "@/data/schools";
-import { shipGlyphFor, type GlyphPoint } from "@/data/shipGlyphs";
-import { SHIP_BY_ID, type BridgePin, type ShipId } from "@/data/ships";
+import { SHIP_BY_ID, type ShipId } from "@/data/ships";
+import { useBridgeFrame } from "@/services/prefs";
+import {
+  BARE_VIEW,
+  litShipModel,
+  modelAspect,
+  modelPartNames,
+  PINNED_VIEW,
+  useShipModel,
+} from "./shipModel";
 import styles from "./ShipSilhouette.module.css";
 
-const VIEW = 1.6;
+export type ShipSilhouetteSize = "hero" | "summary" | "card";
 
-const SVG_INSET_PCT = 8;
-
-const SVG_SPAN_PCT = 100 - SVG_INSET_PCT * 2;
-
-const points = (poly: readonly GlyphPoint[]): string =>
-  poly.map(([x, y]) => `${String(x)},${String(y)}`).join(" ");
-
-export const pinStyle = (point: BridgePin): Record<string, string> => ({
-  left: `${String(50 + (point[0] / VIEW) * SVG_SPAN_PCT)}%`,
-  top: `${String(50 + (point[1] / VIEW) * SVG_SPAN_PCT)}%`,
-});
+const NO_PERKS: readonly string[] = [];
 
 interface ShipSilhouetteProps {
   shipId: ShipId;
+  masteryRank?: number;
+  perks?: readonly string[];
+  size?: ShipSilhouetteSize;
+  pinned?: boolean;
   children?: ReactNode;
 }
 
-export const ShipSilhouette = ({ shipId, children }: ShipSilhouetteProps) => {
+interface SeenParts {
+  key: string;
+  shipId: ShipId;
+  names: readonly string[];
+  fresh: readonly string[];
+}
+
+export const ShipSilhouette = ({
+  shipId,
+  masteryRank = 0,
+  perks = NO_PERKS,
+  size = "hero",
+  pinned = false,
+  children,
+}: ShipSilhouetteProps) => {
   const def = SHIP_BY_ID.get(shipId);
+  const frame = useBridgeFrame();
+  const svg = useShipModel(shipId);
+  const names = modelPartNames(masteryRank, perks);
+  const key = `${shipId}|${names.join(",")}`;
+  const [seen, setSeen] = useState<SeenParts>({ key, shipId, names, fresh: [] });
+  if (seen.key !== key) {
+    setSeen({
+      key,
+      shipId,
+      names,
+      fresh:
+        seen.shipId === shipId
+          ? names.filter((name) => !seen.names.includes(name))
+          : [],
+    });
+  }
   if (def === undefined) return null;
-  const glyph = shipGlyphFor(shipId);
   const colors = schools[def.bridgeTheme.tint];
+  const fresh = seen.key === key ? seen.fresh : [];
+  const view = pinned ? PINNED_VIEW : BARE_VIEW;
   return (
     <div
       className={styles.stage}
       data-ship-silhouette={shipId}
-      data-bridge-frame={def.bridgeTheme.frame}
+      data-ship-silhouette-size={size}
+      data-model-view={pinned ? "pinned" : "bare"}
+      data-model-ready={svg === null ? undefined : "1"}
+      data-bridge-frame={frame === "hull" ? def.bridgeTheme.frame : frame}
       style={{
         ["--bridge-accent" as string]: colors.stroke,
         ["--bridge-wash" as string]: colors.fill,
         ["--bridge-text" as string]: colors.text,
+        aspectRatio: modelAspect(view),
       }}
     >
-      <svg
-        className={styles.svg}
-        viewBox={`${String(-VIEW / 2)} ${String(-VIEW / 2)} ${String(VIEW)} ${String(VIEW)}`}
-        role="presentation"
-      >
-        <polygon
-          className={styles.hull}
-          points={points(glyph.hull)}
-          vectorEffect="non-scaling-stroke"
+      {svg === null ? null : (
+        <div
+          className={styles.model}
+          onAnimationEnd={() => {
+            if (fresh.length > 0) setSeen((prev) => ({ ...prev, fresh: [] }));
+          }}
+          dangerouslySetInnerHTML={{
+            __html: litShipModel(svg, new Set(names), new Set(fresh), view),
+          }}
         />
-        {glyph.fins.map((fin, index) => (
-          <polygon
-            key={index}
-            className={styles.fin}
-            points={points(fin)}
-            vectorEffect="non-scaling-stroke"
-          />
-        ))}
-        <circle
-          className={styles.cockpit}
-          cx={glyph.cockpit.x}
-          cy={glyph.cockpit.y}
-          r={glyph.cockpit.r}
-        />
-      </svg>
+      )}
       {children}
     </div>
   );

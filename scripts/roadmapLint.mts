@@ -1,6 +1,7 @@
 import { existsSync, readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
+import { horizonErrors, horizonPhaseRows } from "./roadmapHorizon";
 
 const DIR = join(process.cwd(), "docs", "archive", "rework");
 const ROADMAP = join(DIR, "ROADMAP.md");
@@ -131,6 +132,17 @@ for (const row of rows) {
   );
 }
 
+const HORIZON = join(process.cwd(), "docs", "horizon");
+const HORIZON_ROADMAP = join(HORIZON, "ROADMAP.md");
+const horizonRows = existsSync(HORIZON_ROADMAP) ? horizonPhaseRows(readFileSync(HORIZON_ROADMAP, "utf8")) : [];
+if (existsSync(HORIZON_ROADMAP) && horizonRows.length === 0) errors.push("docs/horizon/ROADMAP.md: the phase table parsed as empty");
+errors.push(
+  ...horizonErrors(horizonRows, (file) => {
+    const path = join(HORIZON, file);
+    return existsSync(path) ? readFileSync(path, "utf8") : null;
+  }),
+);
+
 if (errors.length > 0) {
   for (const error of errors) console.error(`lint:roadmap: ${error}`);
   process.exit(1);
@@ -138,3 +150,6 @@ if (errors.length > 0) {
 
 console.log("lint:roadmap: every Revision-3 content target is owned by a phase DoD");
 for (const line of report) console.log(line);
+console.log(
+  `lint:roadmap: ${String(horizonRows.length)} horizon phases, ${String(horizonRows.filter((row) => row.done).length)} marked done, each with every DoD line ticked`,
+);

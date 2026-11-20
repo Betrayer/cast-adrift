@@ -43,6 +43,7 @@ export interface ResolveScope {
   chargeMult: number;
   crit: boolean;
   repeat: boolean;
+  hitEnemyId?: string;
 }
 
 interface PrimedSchool {
@@ -55,15 +56,20 @@ export interface GrowthRequest {
   per: number;
 }
 
+const instanceFaces = (die: RolledDie): readonly number[] | undefined => {
+  const faces = die.faces ?? DIE_BY_ID.get(die.defId)?.faces;
+  return faces !== undefined && faces.length > 0 ? faces : undefined;
+};
+
 export const dieFaceMax = (die: RolledDie): number => {
-  const def = DIE_BY_ID.get(die.defId);
-  const base = def?.faces !== undefined ? Math.max(...def.faces) : die.tier;
+  const faces = instanceFaces(die);
+  const base = faces !== undefined ? Math.max(...faces) : die.tier;
   return base + (die.growth ?? 0);
 };
 
 export const dieFaceMin = (die: RolledDie): number => {
-  const def = DIE_BY_ID.get(die.defId);
-  const base = def?.faces !== undefined ? Math.min(...def.faces) : 1;
+  const faces = instanceFaces(die);
+  const base = faces !== undefined ? Math.min(...faces) : 1;
   return base + (die.growth ?? 0);
 };
 
@@ -198,13 +204,21 @@ export class BattleCtx implements EffectCtx {
     return this.census[tag] ?? 0;
   }
 
+  schoolCountsAs(school: School, is: School): boolean {
+    return (
+      school === "grey" &&
+      is === "black" &&
+      sourceTrait(this.snapshot, "greyIsBlack")
+    );
+  }
+
   rng(): RngStream {
     this.effectStream ??= createStream(fnv1a(snapshotRngKey(this.snapshot)));
     return this.effectStream;
   }
 
   rerollDie(die: RolledDie): void {
-    const value = rollBaseValue(die.defId, die.tier, this.rng());
+    const value = rollBaseValue(die.defId, die.tier, this.rng(), die.faces);
     this.setDieValue(die, value + (die.growth ?? 0));
   }
 
@@ -282,10 +296,26 @@ export class BattleCtx implements EffectCtx {
   }
 
   dmg(n: number, target: EffectTarget = "target"): void {
-    if (target !== "target") return;
+    if (target === "self") return;
+    if (target === "others") {
+      const excluded =
+        this.scope?.hitEnemyId ?? resolveWeaponTarget(this.snapshot)?.enemy.id;
+      if (excluded === undefined) return;
+      for (const enemy of this.snapshot.enemies) {
+        if (enemy.id === excluded || enemy.hp <= 0) continue;
+        applyWeaponDamage(this.snapshot, { enemy }, n);
+      }
+      return;
+    }
     const weaponTarget = resolveWeaponTarget(this.snapshot);
     if (weaponTarget === undefined) return;
     applyWeaponDamage(this.snapshot, weaponTarget, n);
+  }
+
+  setDieSchool(die: RolledDie, school: School): void {
+    const live = this.snapshot.dice.find((d) => d.uid === die.uid);
+    if (live === undefined) return;
+    live.school = school;
   }
 
   shield(n: number): void {

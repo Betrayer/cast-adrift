@@ -14,6 +14,7 @@ import type {
   FlagQuery,
   FlagValue,
   OptionRequirement,
+  OptionRequires,
   Outcome,
 } from "@/types/events";
 
@@ -108,11 +109,14 @@ export const selectOutcome = (
   return stream.weighted(outcomes.map((o) => [o, outcomeWeight(o)] as const));
 };
 
-export const optionMet = (
-  req: OptionRequirement | undefined,
-  ctx: OptionContext,
-): boolean => {
-  if (req === undefined) return true;
+export const optionRequirements = (
+  requires: OptionRequires | undefined,
+): readonly OptionRequirement[] => {
+  if (requires === undefined) return [];
+  return "req" in requires ? [requires] : requires;
+};
+
+const requirementMet = (req: OptionRequirement, ctx: OptionContext): boolean => {
   switch (req.req) {
     case "scrap":
       return ctx.scrap >= req.n;
@@ -144,13 +148,32 @@ export const optionMet = (
   }
 };
 
+export const unmetRequirement = (
+  requires: OptionRequires | undefined,
+  ctx: OptionContext,
+): OptionRequirement | null =>
+  optionRequirements(requires).find((req) => !requirementMet(req, ctx)) ?? null;
+
+export const optionMet = (
+  requires: OptionRequires | undefined,
+  ctx: OptionContext,
+): boolean => unmetRequirement(requires, ctx) === null;
+
+export const allOutcomes = (option: EventOption): readonly Outcome[] => [
+  ...(option.outcomes ?? []),
+  ...(option.onPass ?? []),
+  ...(option.onFail ?? []),
+];
+
+export const outcomeShipRank = (event: EventDef, text: string): number =>
+  event.options
+    .flatMap((option) => allOutcomes(option))
+    .filter((outcome) => outcome.text === text)
+    .flatMap((outcome) => outcome.effects)
+    .reduce((sum, effect) => (effect.k === "shipRank" ? sum + effect.n : sum), 0);
+
 export const optionAxisRange = (option: EventOption): AxisRange | null => {
-  const lists = [
-    ...(option.outcomes ?? []),
-    ...(option.onPass ?? []),
-    ...(option.onFail ?? []),
-  ];
-  const deltas = lists.map((outcome) =>
+  const deltas = allOutcomes(option).map((outcome) =>
     outcome.effects.reduce(
       (sum, effect) => (effect.k === "axis" ? sum + effect.n : sum),
       0,

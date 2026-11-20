@@ -1,6 +1,7 @@
 import { Howl } from "howler";
 import {
   HOT_SFX,
+  LOOT_SFX,
   musicSources,
   sfxSources,
   SFX_GAIN,
@@ -12,6 +13,7 @@ import {
   type SfxId,
 } from "@/data/audio";
 import { useSettingsStore } from "@/stores/settingsStore";
+import type { Rarity } from "@/types/content";
 
 const howls = new Map<string, Howl>();
 const beds = new Map<MusicId, Howl>();
@@ -261,6 +263,11 @@ export const duckMusic = (ms = 1600): void => {
     duckDepth = Math.max(0, duckDepth - 1);
     if (duckDepth === 0) retune(500);
   }, ms);
+};
+
+export const playLootCue = (rarity: Rarity): void => {
+  playSfx(LOOT_SFX[rarity]);
+  duckMusic(rarity === "legendary" ? 2000 : 1200);
 };
 
 export const musicDuckDepth = (): number => duckDepth;

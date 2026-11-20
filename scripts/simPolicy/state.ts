@@ -1,3 +1,11 @@
+import { handDie, type DeckEntry, type HandDie } from "@/game/dice/tier";
+import {
+  canBeSignature,
+  forgeCost,
+  forgedDie,
+  growthRefund,
+  isForgeable,
+} from "@/game/dice/forge";
 import {
   CARGO_BY_ID,
   cargoHullPerNode,
@@ -17,6 +25,16 @@ import {
 } from "../../src/game/effects/census";
 import { bayPurchasable, moduleSlots } from "../../src/game/run/bays";
 import { PERK_BY_ID } from "../../src/data/perks";
+import { isShipPerk, ordinaryPerks, SHIP_PERK_MK } from "../../src/data/perks/ship";
+import { shipRankOf } from "../../src/data/shipRanks";
+import {
+  firstMkDiscount,
+  rollShipDraft,
+  shipDraftRerollAllowed,
+  shipDraftSize,
+  shipPerkAvailable,
+  type ShipDraftContext,
+} from "../../src/game/run/shipRules";
 import {
   drawSalvageOffer,
   SALVAGE_BY_ID,
@@ -25,13 +43,18 @@ import {
 import { sectorDef } from "../../src/data/sectors";
 import {
   bayPrice,
-  DECK_CAP,
+  HAND_CAP,
+  instanceSellValue,
+  mkTopFor,
   mkUpgradeCost,
   moduleSellValue,
   ptsForDie,
+  ptsForInstance,
   sellValue,
+  TABLE_SIZE,
 } from "../../src/game/economy/prices";
 import { generateShopModules, generateShopStock } from "../../src/game/economy/shop";
+import { shopPricePct } from "../../src/game/run/shopPrice";
 import { interferenceStacksForStreak } from "../../src/game/run/interference";
 import { computePerkMods } from "../../src/game/run/perkMods";
 import { computeModuleMods, computeRunMods } from "../../src/game/run/runMods";
@@ -65,9 +88,9 @@ import {
   selectOutcome,
 } from "../../src/game/events/engine";
 import {
-  checkOdds,
-  checkPassed,
-  checkTotal,
+  checkRollOutcome,
+  deckCheckOdds,
+  deckRefFor,
   rollCheckDice,
   topDiceForCheck,
   type DeckRef,
@@ -98,9 +121,18 @@ export interface RunState {
   scrap: number;
   scrapEarned: number;
   scrapSpent: number;
-  deck: string[];
+  deck: HandDie[];
+  forges: number;
   mkLevels: MkLevels;
   perks: string[];
+  masteryRank: number;
+  shipRanksOn: boolean;
+  shipPerkOnly: readonly string[];
+  blackBoxSpent: boolean;
+  shipRankXp: number;
+  rankSeed: number;
+  rankAscension: number;
+  firstMkDiscount: number;
   modules: string[];
   banished: string[];
   chartPicks: string[];
@@ -147,6 +179,7 @@ export interface RunState {
   cargoLapsed: number;
   activeFired: Record<string, number>;
   activeReady: Record<string, number>;
+  nodeScrap: Record<string, number>;
 }
 
 export const emptyPuzzleTally = (): Record<number, PuzzleTally> => ({
@@ -166,15 +199,21 @@ export const emptySinks = (): Record<string, number> => ({
   puzzleStakes: 0,
   draftReroll: 0,
   events: 0,
+  forge: 0,
 });
 
 export interface RunStateInit {
   shipId?: ShipId;
   hull: number;
   hullMax: number;
-  deck: readonly string[];
+  deck: readonly DeckEntry[];
   mkLevels?: MkLevels;
   perks?: readonly string[];
+  masteryRank?: number;
+  shipRanksOn?: boolean;
+  shipPerkOnly?: readonly string[];
+  rankSeed?: number;
+  rankAscension?: number;
   modules?: readonly string[];
   chartPicks?: readonly string[];
   mutators?: readonly string[];
@@ -190,9 +229,18 @@ export const createRunState = (init: RunStateInit): RunState => ({
   scrap: 0,
   scrapEarned: 0,
   scrapSpent: 0,
-  deck: [...init.deck],
+  deck: init.deck.map((entry) => ({ ...handDie(entry) })),
+  forges: 0,
   mkLevels: { ...(init.mkLevels ?? {}) },
   perks: [...(init.perks ?? [])],
+  masteryRank: init.masteryRank ?? 0,
+  shipRanksOn: init.shipRanksOn ?? false,
+  shipPerkOnly: init.shipPerkOnly ?? [],
+  blackBoxSpent: false,
+  shipRankXp: 0,
+  rankSeed: init.rankSeed ?? 0,
+  rankAscension: init.rankAscension ?? 0,
+  firstMkDiscount: firstMkDiscount(init.shipId ?? "wanderer", init.masteryRank ?? 0),
   modules: [...(init.modules ?? [])],
   banished: [],
   chartPicks: [...(init.chartPicks ?? [])],
@@ -239,6 +287,7 @@ export const createRunState = (init: RunStateInit): RunState => ({
   cargoLapsed: 0,
   activeFired: {},
   activeReady: {},
+  nodeScrap: {},
 });
 
 export const spend = (state: RunState, cost: number, sink: string): boolean => {
@@ -311,15 +360,26 @@ export const maxRealSchoolCount = (deck: readonly string[]): number => {
 export const maxMk = (mkLevels: MkLevels): number =>
   Math.max(1, ...Object.values(mkLevels).map((mk) => mk ?? 1));
 
-const worstDieIndex = (deck: readonly string[], target: string): number => {
+export const handIds = (deck: readonly HandDie[]): string[] =>
+  deck.map((die) => die.defId);
+
+const ON_SCHOOL_WORTH = 4;
+
+export const dieWorth = (die: HandDie, target: string): number => {
+  const school = schoolOf(die.defId);
+  return (
+    ptsForInstance(die) +
+    (school === target || school === "prismatic" ? ON_SCHOOL_WORTH : 0)
+  );
+};
+
+const worstDieIndex = (deck: readonly HandDie[], target: string): number => {
   let index = -1;
   let worst = Number.POSITIVE_INFINITY;
   for (let i = 0; i < deck.length; i += 1) {
-    const defId = deck[i];
-    if (defId === undefined) continue;
-    const school = schoolOf(defId);
-    const offSchool = school !== target && school !== "prismatic" ? 0 : 4;
-    const score = ptsForDie(defId) + offSchool;
+    const die = deck[i];
+    if (die === undefined) continue;
+    const score = dieWorth(die, target);
     if (score < worst) {
       worst = score;
       index = i;
@@ -328,24 +388,101 @@ const worstDieIndex = (deck: readonly string[], target: string): number => {
   return index;
 };
 
-export const takeDie = (state: RunState, defId: string): void => {
-  if (state.deck.length < DECK_CAP) {
-    state.deck.push(defId);
-    return;
+const meanWorth = (deck: readonly HandDie[], target: string): number =>
+  deck.length === 0
+    ? 0
+    : deck.reduce((sum, die) => sum + dieWorth(die, target), 0) / deck.length;
+
+export type DieVerdict = { kind: "add" } | { kind: "swap"; index: number } | { kind: "decline" };
+
+export const dieVerdict = (state: RunState, defId: string): DieVerdict => {
+  const target = deckTargetSchool(handIds(state.deck));
+  const worth = dieWorth({ defId }, target);
+  if (state.deck.length < TABLE_SIZE) return { kind: "add" };
+  if (state.deck.length < HAND_CAP) {
+    return worth >= meanWorth(state.deck, target) ? { kind: "add" } : { kind: "decline" };
   }
-  const target = deckTargetSchool(state.deck);
   const index = worstDieIndex(state.deck, target);
   const incumbent = index < 0 ? undefined : state.deck[index];
-  if (
-    index >= 0 &&
-    incumbent !== undefined &&
-    ptsForDie(defId) > ptsForDie(incumbent)
-  ) {
-    state.deck[index] = defId;
-    gain(state, sellValue(ptsForDie(incumbent)));
+  return incumbent !== undefined && worth > dieWorth(incumbent, target)
+    ? { kind: "swap", index }
+    : { kind: "decline" };
+};
+
+export const takeDie = (state: RunState, defId: string): void => {
+  const verdict = dieVerdict(state, defId);
+  if (verdict.kind === "add") {
+    state.deck.push({ defId });
     return;
   }
+  if (verdict.kind === "swap") {
+    const incumbent = state.deck[verdict.index];
+    if (incumbent !== undefined) {
+      state.deck[verdict.index] = { defId };
+      gain(state, instanceSellValue(incumbent));
+      return;
+    }
+  }
   gain(state, sellValue(ptsForDie(defId)));
+};
+
+export const FORGES_PER_VISIT = 2;
+
+const forgeCandidate = (
+  state: RunState,
+): { signature: number; consumed: number; cost: number } | null => {
+  const target = deckTargetSchool(handIds(state.deck));
+  let best: { signature: number; consumed: number; cost: number; weight: number } | null = null;
+  const bySchool = new Map<string, { die: HandDie; index: number }[]>();
+  state.deck.forEach((die, index) => {
+    if (!isForgeable(die)) return;
+    const school = schoolOf(die.defId);
+    if (school === undefined) return;
+    bySchool.set(school, [...(bySchool.get(school) ?? []), { die, index }]);
+  });
+  for (const entries of bySchool.values()) {
+    if (entries.length < 2) continue;
+    const [low, high] = [...entries].sort((a, b) => dieWorth(a.die, target) - dieWorth(b.die, target));
+    if (low === undefined || high === undefined) continue;
+    const pair = canBeSignature(high.die)
+      ? { signature: high, consumed: low }
+      : canBeSignature(low.die)
+        ? { signature: low, consumed: high }
+        : null;
+    if (pair === null) continue;
+    const weight = dieWorth(low.die, target) + dieWorth(high.die, target);
+    if (best === null || weight < best.weight) {
+      best = {
+        signature: pair.signature.index,
+        consumed: pair.consumed.index,
+        cost: forgeCost(pair.signature.die),
+        weight,
+      };
+    }
+  }
+  return best === null
+    ? null
+    : { signature: best.signature, consumed: best.consumed, cost: best.cost };
+};
+
+export const forgeOnce = (state: RunState): boolean => {
+  if (state.deck.length <= TABLE_SIZE) return false;
+  const pick = forgeCandidate(state);
+  if (pick === null || !spend(state, pick.cost, "forge")) return false;
+  const signature = state.deck[pick.signature];
+  const consumed = state.deck[pick.consumed];
+  if (signature === undefined || consumed === undefined) return false;
+  state.deck[pick.signature] = forgedDie({ uid: "", ...signature }, consumed);
+  state.deck.splice(pick.consumed, 1);
+  gain(state, growthRefund(consumed));
+  state.forges += 1;
+  return true;
+};
+
+export const forgeWeakest = (state: RunState): number => {
+  let made = 0;
+  while (made < FORGES_PER_VISIT && forgeOnce(state)) made += 1;
+  return made;
 };
 
 const MODULE_RARITY_VALUE: Record<string, number> = {
@@ -389,7 +526,7 @@ const MODULE_FIRE_MODE_VALUE = 1.2;
 
 export const buildCensus = (state: RunState): TagCensus =>
   loadoutCensus({
-    deckDefIds: state.deck,
+    deckDefIds: handIds(state.deck),
     perks: state.perks,
     modules: [],
   });
@@ -483,8 +620,16 @@ export const greedyShop = (
   state: RunState,
   seed: number,
   node: MapNode,
+  ascension: number,
 ): void => {
-  const discount = computeRunMods(state.perks, state.chartPicks, state.modules).shopDiscountPct;
+  const discount = shopPricePct({
+    perks: state.perks,
+    chartPicks: state.chartPicks,
+    modules: state.modules,
+    flags: state.flags,
+    ascension,
+    contractId: null,
+  });
   for (const item of generateShopModules(seed, node.id, 0, discount)) {
     if (state.scrap < item.price) continue;
     if (!wouldTakeModule(state, item.moduleId)) continue;
@@ -492,7 +637,7 @@ export const greedyShop = (
     takeModule(state, item.moduleId);
   }
   const items = generateShopStock(seed, node.id, 0, discount);
-  const target = deckTargetSchool(state.deck);
+  const target = deckTargetSchool(handIds(state.deck));
   const rank = (defId: string): number => {
     const school = schoolOf(defId);
     if (school === target || school === "prismatic") return 0;
@@ -505,16 +650,7 @@ export const greedyShop = (
   });
   for (const item of sorted) {
     if (state.scrap < item.price) continue;
-    if (state.deck.length >= DECK_CAP) {
-      const worst = worstDieIndex(state.deck, target);
-      const incumbent = worst < 0 ? undefined : state.deck[worst];
-      if (
-        incumbent === undefined ||
-        ptsForDie(item.defId) <= ptsForDie(incumbent)
-      ) {
-        continue;
-      }
-    }
+    if (dieVerdict(state, item.defId).kind === "decline") continue;
     if (!spend(state, item.price, "dice")) continue;
     takeDie(state, item.defId);
   }
@@ -546,22 +682,23 @@ export const repairToFull = (state: RunState): void => {
   }
 };
 
-export const buyUpgrades = (state: RunState): void => {
+export const buyUpgrades = (state: RunState, ascension = 0): void => {
   const slots = upgradeSlotsFor(state.shipId);
   for (const slotId of slots) {
     while (state.vouchers > 0) {
       const mk = state.mkLevels[slotId] ?? 1;
-      if (mk >= 3) break;
+      if (mk >= mkTopFor(slotId, ascension)) break;
       state.vouchers -= 1;
       state.mkLevels = { ...state.mkLevels, [slotId]: (mk + 1) as 2 | 3 };
     }
   }
   for (const slotId of slots) {
     let mk = state.mkLevels[slotId] ?? 1;
-    while (mk < 3) {
+    while (mk < mkTopFor(slotId, ascension)) {
       const target = (mk + 1) as 2 | 3;
-      const cost = mkUpgradeCost(target);
+      const cost = Math.max(1, mkUpgradeCost(target) - state.firstMkDiscount);
       if (state.scrap < cost || !spend(state, cost, "mk")) break;
+      state.firstMkDiscount = 0;
       mk = target;
       state.mkLevels = { ...state.mkLevels, [slotId]: mk };
     }
@@ -588,15 +725,17 @@ export const greedyShipyard = (
   state: RunState,
   repairFirst: boolean,
   sector: number,
+  ascension = 0,
 ): void => {
   if (repairFirst) {
     repairToFull(state);
-    buyUpgrades(state);
+    buyUpgrades(state, ascension);
   } else {
-    buyUpgrades(state);
+    buyUpgrades(state, ascension);
     repairToFull(state);
   }
   repairToFull(state);
+  forgeWeakest(state);
   buyBay(state, sector);
 };
 
@@ -637,11 +776,13 @@ export const applyEffectsToState = (
           : dieForRarity(loot, effect.rarity));
       takeDie(state, defId);
     } else if (effect.k === "swapLowestDie") {
-      state.deck.sort((a, b) => ptsForDie(a) - ptsForDie(b));
+      state.deck.sort((a, b) => ptsForInstance(a) - ptsForInstance(b));
     } else if (effect.k === "officer") {
       grantSimOfficer(state, effect.id);
     } else if (effect.k === "cargo") {
       state.pendingCargo = effect.id;
+    } else if (effect.k === "shipRank") {
+      gainSimShipRank(state, effect.n);
     }
   }
 };
@@ -744,20 +885,93 @@ export const draftContext = (
   state: RunState,
   sector: number,
 ): DraftContext => ({
-  owned: state.perks,
+  owned: ordinaryPerks(state.perks),
   banished: state.banished,
   sector,
-  deckDefIds: state.deck,
+  deckDefIds: handIds(state.deck),
   modules: state.modules,
   shipId: "wanderer",
   draftsSinceRare: state.draftsSinceRare,
 });
 
 const loadoutOf = (state: RunState): DraftLoadout => ({
-  deckDefIds: state.deck,
+  deckDefIds: handIds(state.deck),
   perks: state.perks,
   modules: state.modules,
 });
+
+const SHIP_PERK_PRIORITY: readonly string[] = [
+  "shipBay",
+  "shipHardpoint",
+  "shipCapacitor",
+  "shipDrones",
+  "shipPrism",
+  "shipBallast",
+  "shipTurret",
+  "shipPlates",
+  "shipBlackBox",
+  "shipLattice",
+  "shipMagnet",
+  "shipCoil",
+  "shipCargoWeb",
+  "shipOverdrive",
+  "shipTargeting",
+  "shipAfterburner",
+];
+
+const SIM_REDRAW_FROM = 6;
+
+const bestShipPerk = (cards: readonly string[]): string | undefined =>
+  [...cards].sort(
+    (a, b) => SHIP_PERK_PRIORITY.indexOf(a) - SHIP_PERK_PRIORITY.indexOf(b),
+  )[0];
+
+const simDraftContext = (state: RunState): ShipDraftContext => ({
+  shipId: state.shipId,
+  mkLevels: state.mkLevels,
+  ascension: state.rankAscension,
+  disabledSlots: [],
+});
+
+const simShipDraft = (state: RunState, rank: number): string[] => {
+  const ctx = simDraftContext(state);
+  if (state.shipPerkOnly.length > 0) {
+    return state.shipPerkOnly.filter(
+      (id) => isShipPerk(id) && !state.perks.includes(id) && shipPerkAvailable(ctx, id),
+    );
+  }
+  const size = shipDraftSize(state.masteryRank);
+  const cards = rollShipDraft(ctx, state.perks, size, deriveSeed(state.rankSeed, `shipDraft:${String(rank)}:0`));
+  const best = bestShipPerk(cards);
+  const weak = best === undefined || SHIP_PERK_PRIORITY.indexOf(best) >= SIM_REDRAW_FROM;
+  if (!weak || !shipDraftRerollAllowed(state.masteryRank)) return cards;
+  const redrawn = rollShipDraft(
+    ctx,
+    [...state.perks, ...cards],
+    size,
+    deriveSeed(state.rankSeed, `shipDraft:${String(rank)}:1`),
+  );
+  return redrawn.length > 0 ? redrawn : cards;
+};
+
+export const gainSimShipRank = (state: RunState, n: number): void => {
+  if (!state.shipRanksOn || n <= 0) return;
+  const before = shipRankOf(state.shipRankXp);
+  state.shipRankXp += n;
+  const after = shipRankOf(state.shipRankXp);
+  for (let rank = before + 1; rank <= after; rank += 1) {
+    const pick = bestShipPerk(simShipDraft(state, rank));
+    if (pick === undefined) continue;
+    takePerk(state, pick);
+    const slot = SHIP_PERK_MK[pick];
+    if (slot !== undefined) {
+      const mk = state.mkLevels[slot] ?? 1;
+      if (mk < mkTopFor(slot, state.rankAscension)) {
+        state.mkLevels = { ...state.mkLevels, [slot]: (mk + 1) as 2 | 3 };
+      }
+    }
+  }
+};
 
 const takePerk = (state: RunState, perkId: string): void => {
   state.perks.push(perkId);
@@ -832,12 +1046,9 @@ export const runDraft = (
 const EVENT_HULL_VALUE = 6;
 
 const deckRefs = (state: RunState): DeckRef[] =>
-  state.deck.flatMap((defId) => {
-    const def = DIE_BY_ID.get(defId);
-    return def === undefined
-      ? []
-      : [{ defId, tier: def.tier, school: def.school }];
-  });
+  state.deck.flatMap((die) =>
+    DIE_BY_ID.has(die.defId) ? [deckRefFor(die)] : [],
+  );
 
 const hullValue = (state: RunState): number =>
   EVENT_HULL_VALUE * (state.hullMax / Math.max(1, state.hull));
@@ -924,15 +1135,8 @@ const optionValue = (
     : odds * outcomesValue(state, option.onPass ?? [], sector) +
       (1 - odds) * outcomesValue(state, option.onFail ?? [], sector);
 
-const checkOddsFor = (state: RunState, option: EventOption): number => {
-  if (option.check === undefined) return 1;
-  const dice = topDiceForCheck(
-    deckRefs(state),
-    option.check.dice,
-    option.check,
-  );
-  return checkOdds(dice, option.check.pick, option.check.target);
-};
+const checkOddsFor = (state: RunState, option: EventOption): number =>
+  option.check === undefined ? 1 : deckCheckOdds(deckRefs(state), option.check);
 
 export const runEvent = (
   state: RunState,
@@ -988,11 +1192,7 @@ export const runEvent = (
   if (best.check !== undefined) {
     const dice = topDiceForCheck(deckRefs(state), best.check.dice, best.check);
     const values = rollCheckDice(dice, createStream(deriveSeed(seed, "check")));
-    passed = checkPassed(
-      checkTotal(values, best.check.pick),
-      best.check.pick,
-      best.check.target,
-    );
+    passed = checkRollOutcome(values, best.check).success;
   }
   const outcome = selectOutcome(
     optionOutcomes(best, passed),

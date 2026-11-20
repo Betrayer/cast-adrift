@@ -8,6 +8,7 @@ import {
 import {
   FEED_CAP,
   FEED_CONSEQUENCE_MS,
+  FEED_MIN_RETURN_MS,
   FEED_MS,
   JOURNAL_CAP,
   JOURNAL_CHATTER_CAP,
@@ -52,6 +53,72 @@ describe("the comms feed", () => {
     expect(feed().map((m) => m.key)).toEqual(["b"]);
   });
 
+  it("starts every row with no time on screen", () => {
+    const store = useNarrativeStore.getState();
+    store.pushFeed({ source: "bark", key: "a" });
+    store.pushFeed({ source: "consequence", key: "b" });
+    expect(feed().map((m) => m.shownMs)).toEqual([0, 0]);
+  });
+
+  it("adds each stretch on screen to the row's time shown", () => {
+    const store = useNarrativeStore.getState();
+    const id = store.pushFeed({ source: "bark", key: "a" });
+    store.creditFeed(id, 3000);
+    expect(feed()[0]?.shownMs).toBe(3000);
+    store.creditFeed(id, 3000);
+    expect(feed()[0]?.shownMs).toBe(6000);
+    expect(feed()[0]?.ttlMs).toBe(FEED_MS);
+  });
+
+  it("credits only the row it names", () => {
+    const store = useNarrativeStore.getState();
+    const first = store.pushFeed({ source: "bark", key: "a" });
+    store.pushFeed({ source: "bark", key: "b" });
+    store.creditFeed(first, 2500);
+    expect(feed().map((m) => [m.key, m.shownMs])).toEqual([
+      ["b", 0],
+      ["a", 2500],
+    ]);
+  });
+
+  it("drops a row that would come back with less than a second left", () => {
+    const store = useNarrativeStore.getState();
+    const bark = store.pushFeed({ source: "bark", key: "a" });
+    store.pushFeed({ source: "bark", key: "b" });
+    store.creditFeed(bark, 7200);
+    expect(FEED_MS - 7200).toBeLessThan(FEED_MIN_RETURN_MS);
+    expect(feed().map((m) => m.key)).toEqual(["b"]);
+  });
+
+  it("keeps a row that still has exactly a second left", () => {
+    const store = useNarrativeStore.getState();
+    const bark = store.pushFeed({ source: "bark", key: "a" });
+    store.creditFeed(bark, FEED_MS - FEED_MIN_RETURN_MS);
+    expect(feed()[0]?.shownMs).toBe(FEED_MS - FEED_MIN_RETURN_MS);
+  });
+
+  it("gives a consequence its longer lifetime when it comes back", () => {
+    const store = useNarrativeStore.getState();
+    const id = store.pushFeed({ source: "consequence", key: "a" });
+    store.creditFeed(id, 7200);
+    expect(feed()[0]?.shownMs).toBe(7200);
+  });
+
+  it("leaves the state untouched for an unknown row or no time on screen", () => {
+    const store = useNarrativeStore.getState();
+    const id = store.pushFeed({ source: "bark", key: "a" });
+    const before = useNarrativeStore.getState();
+    store.creditFeed(id + 99, 3000);
+    expect(useNarrativeStore.getState()).toBe(before);
+    store.creditFeed(id, 0);
+    expect(useNarrativeStore.getState()).toBe(before);
+    store.creditFeed(id, -500);
+    expect(useNarrativeStore.getState()).toBe(before);
+    store.creditFeed(id, Number.NaN);
+    expect(useNarrativeStore.getState()).toBe(before);
+    expect(feed()[0]?.shownMs).toBe(0);
+  });
+
   it("never reissues a row id, so a survivor can never look newer than one already seen", () => {
     const store = useNarrativeStore.getState();
     const seen: number[] = [];
@@ -68,6 +135,11 @@ describe("the comms feed", () => {
     expect(feed()[0]?.id).toBeLessThan(second);
 
     note(store.pushFeed({ source: "consequence", key: "c" }));
+    const credited = store.pushFeed({ source: "bark", key: "g" });
+    note(credited);
+    store.creditFeed(credited, FEED_MS);
+    expect(feed().some((m) => m.id === credited)).toBe(false);
+    note(store.pushFeed({ source: "bark", key: "h" }));
     store.clearFeed();
     note(store.pushFeed({ source: "achievement", key: "d" }));
 

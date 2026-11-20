@@ -10,14 +10,15 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Screen } from "@/app/Screen";
-import { riseStyle } from "@/app/motion";
+import { riseStyle, scrollIntoFocus } from "@/app/motion";
+import { useUnlockContext } from "@/app/useUnlockContext";
 import { AppHeader } from "@/components/AppHeader";
 import { tokens } from "@/app/theme";
-import { CONTRACTS } from "@/data/contracts";
+import { maxSelectableAscension } from "@/data/ascension";
+import { CONTRACT_STAR_MAX } from "@/data/contracts";
 import { DAILY_PREVIEW_LEVEL } from "@/data/milestones";
 import { MUTATOR_BY_ID } from "@/data/mutators";
 import { hasFeature } from "@/data/unlocks";
-import { unlockContextOf } from "@/game/meta/unlockState";
 import { claimDailyAttempt } from "@/game/run/boards";
 import {
   hasActiveRun,
@@ -25,11 +26,14 @@ import {
   startDriftRun,
 } from "@/game/run/flow";
 import {
+  ascensionScoreMult,
+  DAY_MS,
   dailyMutators,
   msUntilUtcReset,
   utcDateKey,
 } from "@/game/run/modes";
-import { countStars } from "@/game/run/goals";
+import { contractStarTotal } from "@/game/run/goals";
+import { now } from "@/services/clock";
 import { useAppStore } from "@/stores/appStore";
 import { useMetaStore } from "@/stores/metaStore";
 import { ActiveRunGuard } from "@/screens/Modes/ActiveRunGuard";
@@ -38,8 +42,6 @@ const countdownLabel = (ms: number): { h: number; m: number } => ({
   h: Math.floor(ms / 3_600_000),
   m: Math.floor((ms % 3_600_000) / 60_000),
 });
-
-const DAY_MS = 86_400_000;
 
 export const ModesScreen = () => {
   const { t } = useTranslation(["meta", "common", "content", "run"]);
@@ -50,38 +52,26 @@ export const ModesScreen = () => {
   const best = useMetaStore((s) => s.best);
   const contracts = useMetaStore((s) => s.contracts);
   const dailyPlayed = useMetaStore((s) => s.dailyPlayed);
-  const level = useMetaStore((s) => s.level);
-  const achievements = useMetaStore((s) => s.achievements);
-  const ascension = useMetaStore((s) => s.ascension);
-  const unlocksGranted = useMetaStore((s) => s.unlocksGranted);
-  const clears = useMetaStore((s) => s.stats.campaignClears);
-  const previewUnlocked = hasFeature(
-    unlockContextOf({
-      level,
-      achievements,
-      ascension,
-      unlocksGranted,
-      stats: { campaignClears: clears },
-    }),
-    "dailyPreview",
+  const driftMax = maxSelectableAscension(
+    useMetaStore((s) => s.ascension.campaign),
   );
-  const [now] = useState(() => Date.now());
+  const [driftAscension, setDriftAscension] = useState(0);
+  const unlockCtx = useUnlockContext();
+  const previewUnlocked = hasFeature(unlockCtx, "dailyPreview");
+  const [openedAt] = useState(now);
   const [pending, setPending] = useState<(() => void) | null>(null);
 
-  const date = utcDateKey(now);
+  const date = utcDateKey(openedAt);
   const mutators = dailyMutators(date);
-  const tomorrow = utcDateKey(now + DAY_MS);
+  const tomorrow = utcDateKey(openedAt + DAY_MS);
   const tomorrowMutators = dailyMutators(tomorrow);
   const dailyRecord = dailyPlayed[date];
-  const reset = countdownLabel(msUntilUtcReset(now));
-  const starTotal = CONTRACTS.reduce(
-    (sum, def) => sum + countStars(contracts[def.id] ?? 0),
-    0,
-  );
+  const reset = countdownLabel(msUntilUtcReset(openedAt));
+  const starTotal = contractStarTotal(contracts);
 
   useEffect(() => {
     if (focus === undefined) return;
-    focusRef.current?.scrollIntoView({ block: "center", behavior: "smooth" });
+    scrollIntoFocus(focusRef.current);
   }, [focus]);
 
   const guarded = useCallback((action: () => void) => {
@@ -158,12 +148,39 @@ export const ModesScreen = () => {
             <Text size="xs" c={tokens.dim}>
               {t("meta:modes.driftDesc")}
             </Text>
+            {driftMax > 0 ? (
+              <Stack gap={4} data-testid="drift-ascension">
+                <Text size="xs" c={tokens.faint}>
+                  {t("meta:modes.driftAscension")}
+                </Text>
+                <Group gap={4}>
+                  {Array.from({ length: driftMax + 1 }, (_, level) => (
+                    <Button
+                      key={level}
+                      size="compact-xs"
+                      variant={level === driftAscension ? "filled" : "default"}
+                      data-drift-ascension={level}
+                      onClick={() => {
+                        setDriftAscension(level);
+                      }}
+                    >
+                      {t("run:setup.aLevel", { n: level })}
+                    </Button>
+                  ))}
+                </Group>
+                <Text size="xs" c={tokens.amber}>
+                  {t("meta:modes.driftScoreMult", {
+                    mult: ascensionScoreMult(driftAscension).toFixed(2),
+                  })}
+                </Text>
+              </Stack>
+            ) : null}
             <Group grow>
               <Button
                 color="accent"
                 onClick={() => {
                   guarded(() => {
-                    startDriftRun();
+                    startDriftRun(undefined, driftAscension);
                   });
                 }}
               >
@@ -289,7 +306,7 @@ export const ModesScreen = () => {
               <Text size="xs" c={tokens.amber}>
                 {t("meta:modes.contractStars", {
                   n: starTotal,
-                  max: CONTRACTS.length * 3,
+                  max: CONTRACT_STAR_MAX,
                 })}
               </Text>
             </Group>

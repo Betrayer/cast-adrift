@@ -5,23 +5,27 @@ import {
   migrateMeta,
   useMetaStore,
 } from "@/stores/metaStore";
+import { CORE_NODE_ID } from "@/game/chart/cost";
 import { pointsSpent, pointsTotal } from "@/game/chart/engine";
 import { totalXpForLevel } from "@/game/xp";
 
 const V14_KEYSTONE_LINE: readonly string[] = [
   "red-gate",
-  "red-min1",
+  "red-s1",
   "red-not1",
-  "red-min2",
+  "red-s4",
   "red-not2",
-  "red-min3",
+  "red-s9",
   "red-not3",
-  "red-min4",
-  "red-not4",
-  "red-s19",
-  "red-s22",
-  "red-s23",
+  "red-s14",
+  "red-s17",
+  "red-s20",
   "red-key1",
+];
+
+const withCore = (picks: readonly string[]): string[] => [
+  CORE_NODE_ID,
+  ...picks,
 ];
 
 const STATS_WITHOUT_DISINTEGRATIONS = 16;
@@ -71,20 +75,26 @@ describe("metaStore migration", () => {
       14,
     );
     expect(values.level).toBe(13);
-    expect(values.chartPicks).toEqual([...V14_KEYSTONE_LINE]);
-    expect(pointsSpent(values.chartPicks)).toBe(39);
-    expect(pointsTotal(values.level)).toBe(13);
+    expect(values.chartPicks).toEqual(withCore(V14_KEYSTONE_LINE));
+    expect(pointsSpent(values.chartPicks)).toBe(31);
+    expect(pointsTotal(values.level)).toBe(28);
     expect(values.chartFreeRespecs).toBe(1);
   });
 
-  it("leaves a v14 allocation that still fits alone", () => {
-    const picks = ["red-gate", "red-s1", "red-s3"];
+  it("leaves a hub allocation that still walks from the core", () => {
+    const picks = [CORE_NODE_ID, "hub-i1", "hub-i2"];
     const values = migrateMeta(
       { xp: totalXpForLevel(13), chartPicks: picks },
-      14,
+      19,
     );
-    expect(pointsSpent(values.chartPicks)).toBe(4);
+    expect(pointsSpent(values.chartPicks)).toBe(2);
     expect(values.chartFreeRespecs).toBe(0);
+  });
+
+  it("seeds the core into a profile that never had one", () => {
+    const values = migrateMeta({ xp: totalXpForLevel(3), chartPicks: [] }, 14);
+    expect(values.chartPicks).toEqual([CORE_NODE_ID]);
+    expect(pointsSpent(values.chartPicks)).toBe(0);
   });
 
   it("banks a respec when a v15 allocation lost its door to the hub", () => {
@@ -95,7 +105,7 @@ describe("metaStore migration", () => {
       },
       15,
     );
-    expect(values.chartPicks).toEqual(["hub-i7", "hub-o9"]);
+    expect(values.chartPicks).toEqual(withCore(["hub-i7", "hub-o9"]));
     expect(pointsSpent(values.chartPicks)).toBeLessThan(pointsTotal(40));
     expect(values.chartFreeRespecs).toBe(1);
   });
@@ -140,7 +150,7 @@ describe("free full respec", () => {
       chartFreeRespecs: 1,
     });
     expect(useMetaStore.getState().fullRespec()).toBe(true);
-    expect(useMetaStore.getState().chartPicks).toEqual([]);
+    expect(useMetaStore.getState().chartPicks).toEqual([CORE_NODE_ID]);
     expect(useMetaStore.getState().chartFreeRespecs).toBe(0);
     expect(useMetaStore.getState().fullRespec()).toBe(false);
   });
@@ -179,5 +189,31 @@ describe("metaStore accumulation", () => {
     expect(useMetaStore.getState().ships).toContain("ram");
     expect(useMetaStore.getState().selectedShip).toBe("ram");
     expect(useMetaStore.getState().buyShip("ark", 1500)).toBe(false);
+  });
+});
+
+describe("ship mastery persistence", () => {
+  it("starts every ship at no mastery", () => {
+    expect(migrateMeta({}, 1).shipMastery).toEqual({});
+  });
+
+  it("keeps known ships with positive xp, floored, and drops the rest", () => {
+    const values = migrateMeta(
+      {
+        shipMastery: {
+          wanderer: { xp: 61.7 },
+          ram: { xp: -5 },
+          ark: { xp: "lots" },
+          ghost: { xp: 400 },
+          prism: null,
+        },
+      },
+      META_VERSION,
+    );
+    expect(values.shipMastery).toEqual({ wanderer: { xp: 61 } });
+  });
+
+  it("drops a mastery record that is not an object", () => {
+    expect(migrateMeta({ shipMastery: 12 }, META_VERSION).shipMastery).toEqual({});
   });
 });

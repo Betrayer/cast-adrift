@@ -1,8 +1,7 @@
 import {
-  areConnected,
-  edgeKey,
+  nearestInLane,
   nodeById,
-  outgoingEdges,
+  spotOf,
   wormholeFor,
   type MapGraph,
   type MapNode,
@@ -11,11 +10,10 @@ import {
 
 export type ThrowDirection = "forward" | "backward";
 
-export type ThrowFallback = "none" | "direction" | "nearest" | "stalled";
+export type ThrowFallback = "none" | "nearest" | "stalled";
 
 export interface ThrowSource {
   int: (min: number, max: number) => number;
-  pick: <T>(arr: readonly T[]) => T;
 }
 
 export interface ThrowRequest {
@@ -30,35 +28,42 @@ export interface WormholeThrow {
   from: NodeId;
   hole: NodeId;
   landing: NodeId | null;
-  budget: number;
+  extra: number;
+  laneShift: number;
   direction: ThrowDirection;
-  cost: number;
   rows: number;
   gentle: boolean;
   fallback: ThrowFallback;
 }
- 
+
 export const GENTLE_RIDES = 2;
-export const MAX_BUDGET = 5;
-export const GENTLE_BUDGET = 2;
-export const ROW_STEP_COST = 1;
-export const LANE_STEP_COST = 0.5;
+
+export const EXTRA_ROWS_FACES = 6;
+
+export const LANE_SHIFT_FACES = 9;
+
+const EXTRA_ROWS_BY_FACE: readonly number[] = [0, 0, 0, 1, 1, 2];
+
+const LANE_SHIFT_BY_FACE: readonly number[] = [0, 0, 0, -1, -1, 1, 1, -2, 2];
+
+export const MAX_EXTRA_ROWS = Math.max(...EXTRA_ROWS_BY_FACE);
+
+export const MAX_LANE_SHIFT = Math.max(
+  ...LANE_SHIFT_BY_FACE.map((shift) => Math.abs(shift)),
+);
+
+export const extraRowsFor = (face: number): number =>
+  EXTRA_ROWS_BY_FACE[face - 1] ?? 0;
+
+export const laneShiftFor = (face: number): number =>
+  LANE_SHIFT_BY_FACE[face - 1] ?? 0;
 
 export const isGentleRide = (rides: number): boolean => rides < GENTLE_RIDES;
 
-export const budgetCapFor = (rides: number): number =>
-  isGentleRide(rides) ? GENTLE_BUDGET : MAX_BUDGET;
-
-export const throwCost = (from: MapNode, to: MapNode): number =>
-  Math.abs(to.row - from.row) * ROW_STEP_COST +
-  Math.abs(to.lane - from.lane) * LANE_STEP_COST;
-
-const byCostThenId = (
-  origin: MapNode,
-): ((a: MapNode, b: MapNode) => number) =>
-  (a, b) =>
-    throwCost(origin, a) - throwCost(origin, b) ||
-    (a.id < b.id ? -1 : a.id > b.id ? 1 : 0);
+export const farRimRowFor = (map: MapGraph, hole: NodeId): number | null => {
+  const spot = spotOf(map, hole);
+  return spot === undefined ? null : spot.rows[1] + 1;
+};
 
 export const openLandings = (
   map: MapGraph,
@@ -71,59 +76,80 @@ export const openLandings = (
     (node) =>
       node.id !== from &&
       node.hole !== true &&
+      node.pocket !== true &&
       node.row !== map.shape.bossRow &&
       !cleared.has(node.id) &&
       reach.has(node.id),
   );
 };
 
-export const landingCandidates = (
-  map: MapGraph,
-  from: NodeId,
-  visited: readonly NodeId[],
-  budget: number,
-  direction: ThrowDirection,
-): MapNode[] => {
+const landingFrom = (
+  open: readonly MapNode[],
+  row: number,
+  lane: number,
+): MapNode | undefined =>
+  nearestInLane(
+    open.filter((node) => node.row === row),
+    lane,
+  );
+
+export const rollThrow = (
+  request: ThrowRequest,
+  source: ThrowSource,
+): WormholeThrow => {
+  const { map, from, hole, visited, rides } = request;
+  const gentle = isGentleRide(rides);
+  const extra = gentle ? 0 : extraRowsFor(source.int(1, EXTRA_ROWS_FACES));
+  const laneShift = gentle
+    ? 0
+    : laneShiftFor(source.int(1, LANE_SHIFT_FACES));
   const origin = nodeById(map).get(from);
-  if (origin === undefined) return [];
-  return openLandings(map, from, visited).filter((node) => {
-    const delta = node.row - origin.row;
-    if (direction === "forward" ? delta <= 0 : delta >= 0) return false;
-    return throwCost(origin, node) <= budget;
+  const base = farRimRowFor(map, hole);
+
+  const settle = (
+    landing: MapNode | undefined,
+    fallback: ThrowFallback,
+  ): WormholeThrow => ({
+    from,
+    hole,
+    landing: landing?.id ?? null,
+    extra,
+    laneShift,
+    direction: "forward",
+    rows:
+      landing === undefined || origin === undefined
+        ? 0
+        : landing.row - origin.row,
+    gentle,
+    fallback: landing === undefined ? "stalled" : fallback,
   });
+
+  if (origin === undefined || base === null) return settle(undefined, "stalled");
+  const open = openLandings(map, from, visited);
+  const target = base + extra;
+  const lane = origin.lane + laneShift;
+  const aimed = landingFrom(open, target, lane);
+  if (aimed !== undefined) return settle(aimed, "none");
+  for (let row = target - 1; row >= base; row -= 1) {
+    const nearer = landingFrom(open, row, lane);
+    if (nearer !== undefined) return settle(nearer, "nearest");
+  }
+  for (let row = target + 1; row < map.shape.bossRow; row += 1) {
+    const further = landingFrom(open, row, lane);
+    if (further !== undefined) return settle(further, "nearest");
+  }
+  return settle(undefined, "stalled");
 };
 
-const flip = (direction: ThrowDirection): ThrowDirection =>
-  direction === "forward" ? "backward" : "forward";
+const STILL_SOURCE: ThrowSource = { int: (min) => min };
 
-export const lateralBypassCandidates = (
+export const softLandThrow = (
   map: MapGraph,
   from: NodeId,
   hole: NodeId,
   visited: readonly NodeId[],
-): MapNode[] => {
-  const byId = nodeById(map);
-  const origin = byId.get(from);
-  const swallowed = byId.get(hole);
-  if (origin === undefined || swallowed === undefined) return [];
-  const cleared = new Set(visited);
-  const reached = new Set(outgoingEdges(map, from));
-  return map.nodes
-    .filter(
-      (node) =>
-        node.row === swallowed.row &&
-        node.id !== from &&
-        node.hole !== true &&
-        node.pocket !== true &&
-        !cleared.has(node.id) &&
-        !reached.has(node.id),
-    )
-    .sort(
-      (a, b) =>
-        Math.abs(a.lane - origin.lane) - Math.abs(b.lane - origin.lane) ||
-        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
-    );
-};
+): WormholeThrow =>
+  rollThrow({ map, from, hole, visited, rides: 0 }, STILL_SOURCE);
 
 export const bypassTargetFor = (
   map: MapGraph,
@@ -137,16 +163,13 @@ export const bypassTargetFor = (
     !cleared.has(id) && byId.get(id)?.hole !== true;
   const declared = wormholeFor(map, from, hole)?.bypass;
   if (declared !== undefined && legal(declared)) return declared;
-  const slip = lateralBypassCandidates(map, from, hole, visited)[0];
-  if (slip !== undefined) return slip.id;
-  const spare = outgoingEdges(map, from)
-    .filter((id) => id !== hole && legal(id))
-    .sort((a, b) => {
-      const marked = (id: NodeId): number =>
-        map.edgeMarks[edgeKey(from, id)] === undefined ? 0 : 1;
-      return marked(a) - marked(b) || (a < b ? -1 : a > b ? 1 : 0);
-    });
-  return spare[0] ?? null;
+  const origin = byId.get(from);
+  const base = farRimRowFor(map, hole);
+  if (origin === undefined || base === null) return null;
+  const rim = map.nodes.filter(
+    (node) => node.row === base && node.pocket !== true && legal(node.id),
+  );
+  return nearestInLane(rim, origin.lane)?.id ?? null;
 };
 
 export const canBypass = (
@@ -157,72 +180,3 @@ export const canBypass = (
 ): boolean =>
   wormholeFor(map, from, hole) !== undefined &&
   bypassTargetFor(map, from, hole, visited) !== null;
-
-export const bypassIsLateral = (
-  map: MapGraph,
-  from: NodeId,
-  hole: NodeId,
-  visited: readonly NodeId[],
-): boolean => {
-  const target = bypassTargetFor(map, from, hole, visited);
-  return target !== null && !areConnected(map, from, target);
-};
-
-export const rollThrow = (
-  request: ThrowRequest,
-  source: ThrowSource,
-): WormholeThrow => {
-  const { map, from, hole, visited, rides } = request;
-  const gentle = isGentleRide(rides);
-  const budget = source.int(1, budgetCapFor(rides));
-  const direction: ThrowDirection = gentle
-    ? "forward"
-    : source.int(0, 1) === 0
-      ? "forward"
-      : "backward";
-  const origin = nodeById(map).get(from);
-
-  const settle = (
-    landing: MapNode | undefined,
-    fallback: ThrowFallback,
-  ): WormholeThrow => ({
-    from,
-    hole,
-    landing: landing?.id ?? null,
-    budget,
-    direction,
-    cost:
-      landing === undefined || origin === undefined
-        ? 0
-        : throwCost(origin, landing),
-    rows:
-      landing === undefined || origin === undefined
-        ? 0
-        : landing.row - origin.row,
-    gentle,
-    fallback: landing === undefined ? "stalled" : fallback,
-  });
-
-  if (origin === undefined) return settle(undefined, "stalled");
-
-  const aimed = landingCandidates(map, from, visited, budget, direction);
-  if (aimed.length > 0) return settle(source.pick(aimed), "none");
-
-  const turned = landingCandidates(
-    map,
-    from,
-    visited,
-    budget,
-    flip(direction),
-  );
-  if (turned.length > 0) return settle(source.pick(turned), "direction");
-
-  const open = openLandings(map, from, visited);
-  const ahead = open
-    .filter((node) => node.row > origin.row)
-    .sort(byCostThenId(origin));
-  if (ahead.length > 0) return settle(ahead[0], "nearest");
-
-  const anywhere = [...open].sort(byCostThenId(origin));
-  return settle(anywhere[0], "nearest");
-};

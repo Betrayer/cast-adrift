@@ -1,3 +1,5 @@
+import { CHAINS } from "@/data/narrative/chains";
+import type { ShipId } from "@/data/ships";
 import type { MetaStats } from "@/stores/metaStore";
 import type { RunStats } from "@/stores/runStore";
 import type { LocKey } from "@/types/content";
@@ -38,6 +40,8 @@ export type AchievementCond =
   | { c: "streak"; n: number }
   | { c: "chainDone"; id: string }
   | { c: "chainsDone"; n: number }
+  | { c: "shipMastered"; ship: ShipId }
+  | { c: "shipsMastered"; n: number }
   | { c: "flags"; keys: readonly string[]; mode: "all" | "any" };
 
 export type VoucherKind = "perkDraft";
@@ -363,6 +367,21 @@ export const ACHIEVEMENT_FAMILIES: readonly AchievementFamilyDef[] = [
   }),
 ];
 
+const SHIP_MASTER_SHARDS = 120;
+
+const ADMIRAL_SHIPS = 3;
+
+const ADMIRAL_SHARDS = 300;
+
+const SHIP_MASTER_ACHIEVEMENTS: readonly { id: string; ship: ShipId }[] = [
+  { id: "masterWanderer", ship: "wanderer" },
+  { id: "masterRam", ship: "ram" },
+  { id: "masterArk", ship: "ark" },
+  { id: "masterCorsair", ship: "corsair" },
+  { id: "masterFoundry", ship: "foundry" },
+  { id: "masterPrism", ship: "prism" },
+];
+
 export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
   single("sectorFive", {
     group: "combat",
@@ -381,7 +400,7 @@ export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
   }),
   single("quickWork", {
     group: "combat",
-    cond: { c: "runStatAtMost", stat: "jumps", n: 11 },
+    cond: { c: "runStatAtMost", stat: "jumps", n: 85 },
     reward: { shards: 60 },
   }),
   single("beyondTheCore", {
@@ -421,7 +440,7 @@ export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
   }),
   single("allChains", {
     group: "story",
-    cond: { c: "chainsDone", n: 4 },
+    cond: { c: "chainsDone", n: CHAINS.length },
     reward: { shards: 200 },
   }),
   single("maraSquared", {
@@ -523,6 +542,18 @@ export const SINGLE_ACHIEVEMENTS: readonly AchievementDef[] = [
     cond: { c: "runDeckSchools", n: 6 },
     reward: { shards: 90 },
   }),
+  ...SHIP_MASTER_ACHIEVEMENTS.map(({ id, ship }) =>
+    single(id, {
+      group: "modes",
+      cond: { c: "shipMastered", ship },
+      reward: { shards: SHIP_MASTER_SHARDS },
+    }),
+  ),
+  single("admiral", {
+    group: "modes",
+    cond: { c: "shipsMastered", n: ADMIRAL_SHIPS },
+    reward: { shards: ADMIRAL_SHARDS },
+  }),
 ];
 
 export const ACHIEVEMENT_GROUPS: readonly AchievementGroup[] = [
@@ -567,9 +598,6 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = ACHIEVEMENT_ROWS.flatMap(
 export const ACHIEVEMENT_BY_ID: ReadonlyMap<string, AchievementDef> = new Map(
   ACHIEVEMENTS.map((def) => [def.id, def]),
 );
-
-export const familyTiers = (familyId: string): readonly AchievementDef[] =>
-  ACHIEVEMENTS.filter((def) => def.family === familyId);
 
 export const ACHIEVEMENT_ALIASES: Readonly<Record<string, string>> = {
   firstBlood: "bounty-3",

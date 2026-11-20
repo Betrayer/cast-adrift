@@ -44,6 +44,16 @@
   animation: spotTwinkle 3.2s ease-in-out infinite;
 }
 
+.horizon {
+  animation: spotHorizon 2.4s linear infinite;
+}
+
+@keyframes spotHorizon {
+  to {
+    stroke-dashoffset: -16;
+  }
+}
+
 @keyframes spotSpin {
   to {
     transform: rotate(360deg);
@@ -82,6 +92,7 @@
 :root[data-ca-motion='reduced'] .far,
 :root[data-ca-motion='reduced'] .near,
 :root[data-ca-motion='reduced'] .core,
-:root[data-ca-motion='reduced'] .mote {
+:root[data-ca-motion='reduced'] .mote,
+:root[data-ca-motion='reduced'] .horizon {
   animation: none;
 }

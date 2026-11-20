@@ -8,17 +8,13 @@ import {
   Text,
 } from "@mantine/core";
 import { useState } from "react";
+import { devDebug } from "@/app/debug";
 import { tokens } from "@/app/theme";
 import { ALL_EVENTS } from "@/data/events";
 import { PUZZLES } from "@/data/puzzles";
-import { TIDE_CAP } from "@/game/events/apply";
+import { BASE_TIDE_CAP } from "@/game/run/tide";
 import { useAppStore } from "@/stores/appStore";
 import { useRunStore } from "@/stores/runStore";
-
-const isDebug = (): boolean =>
-  import.meta.env.DEV &&
-  typeof window !== "undefined" &&
-  new URLSearchParams(window.location.search).get("debug") === "1";
 
 const FLAGS: readonly string[] = [
   "courierFreed",
@@ -58,7 +54,7 @@ export const DevPanel = () => {
     puzzleOptions[0]?.value ?? null,
   );
 
-  if (!isDebug() || !active || screen === "battle") return null;
+  if (!devDebug() || !active || screen === "battle") return null;
 
   const go = useAppStore.getState().go;
 
@@ -70,7 +66,7 @@ export const DevPanel = () => {
 
   const bumpTide = (n: number): void => {
     const s = useRunStore.getState();
-    useRunStore.setState({ tide: Math.max(0, Math.min(TIDE_CAP, s.tide + n)) });
+    useRunStore.setState({ tide: Math.max(0, Math.min(BASE_TIDE_CAP, s.tide + n)) });
   };
 
   return (

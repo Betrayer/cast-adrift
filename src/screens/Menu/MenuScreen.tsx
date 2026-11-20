@@ -9,11 +9,13 @@ import {
   Title,
   UnstyledButton,
 } from '@mantine/core';
-import { useReducedMotion } from '@mantine/hooks';
-import { lazy, Suspense, useCallback, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { devDebug } from '@/app/debug';
 import { Screen } from '@/app/Screen';
+import { riseStyle } from '@/app/motion';
 import { tokens } from '@/app/theme';
+import { unseenAchievementIds } from '@/game/meta/achievements';
 import { unreadMemoryIds } from '@/game/narrative/memoryArc';
 import { progressWithinLevel } from '@/game/xp';
 import { useMetaStore } from '@/stores/metaStore';
@@ -24,7 +26,7 @@ import { ResumeCard } from '@/screens/Menu/ResumeCard';
 import { haptic } from '@/services/tma';
 import { APP_VERSION } from '@/services/version';
 import { useAppStore } from '@/stores/appStore';
-import { useSettingsStore } from '@/stores/settingsStore';
+import { useReducedMotion } from '@/stores/settingsStore';
 import type { ScreenId } from '@/types';
 import styles from './MenuScreen.module.css';
 
@@ -58,10 +60,13 @@ const DEV_ENTRIES: readonly MenuEntry[] = [
   { key: 'testBattle', screen: 'battle' },
 ];
 
-const devMenu = (): boolean =>
-  import.meta.env.DEV &&
-  typeof window !== 'undefined' &&
-  new URLSearchParams(window.location.search).get('debug') === '1';
+let titleSettled = false;
+
+const titleSettlePending = (): boolean => !titleSettled;
+
+const markTitleSettled = (): void => {
+  titleSettled = true;
+};
 
 export const MenuScreen = () => {
   const { t } = useTranslation(['common', 'menu', 'meta']);
@@ -76,21 +81,22 @@ export const MenuScreen = () => {
   const badges = useMetaStore((s) => s.badges);
   const achievements = useMetaStore((s) => s.achievements);
   const achievementsSeen = useMetaStore((s) => s.achievementsSeen);
-  const unseenAchievements = achievements.filter(
-    (id) => !achievementsSeen.includes(id),
+  const unseenAchievements = unseenAchievementIds(
+    achievements,
+    achievementsSeen,
   ).length;
   const topBadge = menuBadgeId(badges);
   const unreadMemories = unreadMemoryIds(codex, codexRead).length;
   const [localResume] = useState(readLocalResume);
   const [entries] = useState<readonly MenuEntry[]>(() =>
-    devMenu() ? [...ENTRIES, ...DEV_ENTRIES] : ENTRIES,
+    devDebug() ? [...ENTRIES, ...DEV_ENTRIES] : ENTRIES,
   );
-  const reducedMotionSetting = useSettingsStore((s) => s.reducedMotion);
-  const osReducedMotion = useReducedMotion(false);
-  const reducedMotion =
-    reducedMotionSetting === 'auto'
-      ? osReducedMotion
-      : reducedMotionSetting === 'on';
+  const reducedMotion = useReducedMotion();
+  const [settleTitle] = useState(titleSettlePending);
+
+  useEffect(() => {
+    markTitleSettled();
+  }, []);
 
   const onSelect = useCallback(
     (entry: MenuEntry) => () => {
@@ -140,7 +146,12 @@ export const MenuScreen = () => {
     >
       <div className={styles.hero}>
         <div className={styles.title}>
-          <Title order={1} c={tokens.text}>
+          <Title
+            order={1}
+            c={tokens.text}
+            className={styles.titleText}
+            data-menu-title={settleTitle ? 'settle' : 'still'}
+          >
             {t('common:appName')}
           </Title>
           <Text c={tokens.dim} size="sm">
@@ -182,12 +193,14 @@ export const MenuScreen = () => {
           ) : localResume !== null ? (
             <ResumeCard resume={localResume} />
           ) : null}
-          {entries.map((entry) => (
+          {entries.map((entry, index) => (
             <Button
               key={entry.key}
               size="md"
               variant="filled"
               data-testid={`menu-${entry.key}`}
+              data-rise
+              style={riseStyle(index)}
               onClick={onSelect(entry)}
               rightSection={
                 entry.key === 'codex' && unreadMemories > 0 ? (

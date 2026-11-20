@@ -1,6 +1,7 @@
-import { mkdirSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import process from "node:process";
+import { filesUnder } from "./files";
 import { BARKS } from "../src/data/barks";
 import { ASCENSIONS } from "../src/data/ascension";
 import { CHART_NODES } from "../src/data/chart";
@@ -25,11 +26,13 @@ import {
   SYSTEMS_CHECK,
 } from "../src/data/narrative/prologue";
 import { ALL_PERKS } from "../src/data/perks";
+import { MASTERY_PERKS, SHIP_PERKS } from "../src/data/perks/ship";
 import { PUZZLES } from "../src/data/puzzles";
 import { RESONANCE_BONUSES } from "../src/data/resonance";
 import { SHIPS } from "../src/data/ships";
 import enContent from "../src/i18n/en/content.json" with { type: "json" };
 import enMeta from "../src/i18n/en/meta.json" with { type: "json" };
+import { allOutcomes } from "../src/game/events/engine";
 import type { EventOption, Outcome } from "../src/types/events";
 
 type Node = string | { [key: string]: Node };
@@ -120,6 +123,12 @@ for (const s of SHIPS) {
   add(s.name);
   add(s.passiveName);
   add(s.passiveDesc);
+  add(s.passiveIIName);
+  add(s.passiveIIDesc);
+}
+for (const p of [...SHIP_PERKS, ...MASTERY_PERKS]) {
+  add(p.name);
+  add(p.desc);
 }
 for (const n of CHART_NODES) {
   add(n.name);
@@ -133,16 +142,17 @@ const outcomeKeys = (o: Outcome): void => {
 };
 const optionKeys = (o: EventOption): void => {
   add(o.label);
-  for (const out of [
-    ...(o.outcomes ?? []),
-    ...(o.onPass ?? []),
-    ...(o.onFail ?? []),
-  ])
-    outcomeKeys(out);
+  for (const out of allOutcomes(o)) outcomeKeys(out);
 };
 for (const e of ALL_EVENTS) {
   add(e.text);
   if (e.speaker !== undefined) add(`content:speaker.${e.speaker}`);
+  for (const line of e.dialogue ?? []) {
+    add(line.line);
+    if (line.who !== "echo" && line.who !== "narration") {
+      add(`content:speaker.${line.who}`);
+    }
+  }
   for (const o of e.options) optionKeys(o);
 }
 
@@ -184,15 +194,7 @@ for (const ns of NAMESPACES) {
   for (const k of keys) authored.add(`${ns}:${k}`);
 }
 
-const sourceFiles: string[] = [];
-const walk = (dir: string): void => {
-  for (const entry of readdirSync(dir)) {
-    const p = join(dir, entry);
-    if (statSync(p).isDirectory()) walk(p);
-    else if (/\.(ts|tsx)$/.test(p)) sourceFiles.push(p);
-  }
-};
-walk("src");
+const sourceFiles = filesUnder("src", (path) => /\.(ts|tsx)$/.test(path));
 
 const referenced = new Set<string>();
 const prefixes = new Set<string>();

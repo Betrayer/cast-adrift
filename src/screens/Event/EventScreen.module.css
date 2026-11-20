@@ -40,3 +40,43 @@
 .pip[data-current='true'] {
   box-shadow: 0 0 8px 1px var(--ca-beacon-glow);
 }
+
+.dialogue {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.dialogueLine {
+  min-width: 0;
+  max-width: 38rem;
+  padding-left: 10px;
+  border-left: 2px solid var(--ca-voice, transparent);
+  overflow-wrap: anywhere;
+}
+
+.dialogueLine[data-who='narration'] {
+  padding-left: 0;
+  border-left: 0;
+}
+
+.who {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 2px;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ca-voice);
+}
+
+.glyph {
+  font-size: 15px;
+  line-height: 1;
+}
+
+.dialogueText {
+  line-height: 1.45;
+}

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-30 19 330 132" width="180" height="72" role="presentation">
+<style>
+.flame{animation:flare .6s steps(2,jump-none) infinite alternate;transform-origin:30px 85px}
+@keyframes flare{from{transform:scaleX(1);opacity:.8}to{transform:scaleX(1.3);opacity:.45}}
+@media (prefers-reduced-motion: reduce){.flame{animation:none}}
+</style>
+<g><path fill="#1f2a4a" stroke="#4A90E2" stroke-width="2.4" stroke-linejoin="round" d="M30 64 L62 50 L205 52 L284 85 L205 118 L62 120 L30 106 Z"/><path fill="none" stroke="#4A90E2" stroke-width="1.4" opacity=".45" d="M62 50 L62 120"/><path fill="none" stroke="#4A90E2" stroke-width="1.4" opacity=".45" d="M205 52 L205 118"/><circle fill="#8FD0FF" cx="238" cy="85" r="7"/></g>
+<path class="flame" d="M30 85 L-20 85" stroke="#4A90E2" stroke-width="7" stroke-linecap="round" opacity=".8"/>
+</svg>

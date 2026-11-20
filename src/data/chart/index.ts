@@ -1,5 +1,6 @@
 import { CHART_NODES, HUB_BUDGET_NODE_ID } from "@/data/chart/nodes";
 import type { ChartNodeDef } from "@/data/chart/types";
+import type { School } from "@/types/content";
 
 export type { ChartNodeDef, ChartNodeKind, Constellation } from "@/data/chart/types";
 export { CHART_NODES, HUB_BUDGET_NODE_ID };
@@ -8,25 +9,24 @@ export const CHART_NODE_BY_ID: ReadonlyMap<string, ChartNodeDef> = new Map(
   CHART_NODES.map((n) => [n.id, n]),
 );
 
-const CHART_PAD = 40;
+const buildEdges = (): [ChartNodeDef, ChartNodeDef][] => {
+  const seen = new Set<string>();
+  const edges: [ChartNodeDef, ChartNodeDef][] = [];
+  for (const node of CHART_NODES) {
+    for (const link of node.links) {
+      const other = CHART_NODE_BY_ID.get(link);
+      if (other === undefined) continue;
+      const key = [node.id, link].sort().join("|");
+      if (seen.has(key)) continue;
+      seen.add(key);
+      edges.push([node, other]);
+    }
+  }
+  return edges;
+};
 
-export const CHART_BOUNDS = ((): {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-} => {
-  const xs = CHART_NODES.map((n) => n.pos.x);
-  const ys = CHART_NODES.map((n) => n.pos.y);
-  const minX = Math.min(...xs) - CHART_PAD;
-  const minY = Math.min(...ys) - CHART_PAD;
-  return {
-    x: minX,
-    y: minY,
-    w: Math.max(...xs) + CHART_PAD - minX,
-    h: Math.max(...ys) + CHART_PAD - minY,
-  };
-})();
+export const CHART_EDGES: readonly (readonly [ChartNodeDef, ChartNodeDef])[] =
+  buildEdges();
 
 const buildAdjacency = (): Map<string, string[]> => {
   const adj = new Map<string, string[]>();
@@ -53,3 +53,15 @@ export const chartNeighbors = (id: string): readonly string[] =>
 
 export const isEntryNode = (id: string): boolean =>
   CHART_NODE_BY_ID.get(id)?.entry === true;
+
+export const chartSpine = (school: School): string[] => {
+  const ids: string[] = [];
+  let cursor: string | undefined = `${school}-key1`;
+  while (cursor !== undefined) {
+    ids.unshift(cursor);
+    const node: ChartNodeDef | undefined = CHART_NODE_BY_ID.get(cursor);
+    if (node === undefined || node.kind === "gate") break;
+    cursor = node.links[0];
+  }
+  return ids;
+};

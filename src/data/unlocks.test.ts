@@ -104,9 +104,9 @@ describe("unlock resolver", () => {
   it("treats a grant as a fifth source", () => {
     const granted = ctx({ granted: ["diceL46"] });
     expect(unlockedDice(granted).has("lancehead")).toBe(true);
-    expect(hasFeature(ctx({ granted: ["featureFreeRespec"] }), "freeRespec")).toBe(
-      true,
-    );
+    expect(
+      hasFeature(ctx({ granted: ["featureDailyPreview"] }), "dailyPreview"),
+    ).toBe(true);
   });
 
   it("opens a single die from a unique-drop grant", () => {
@@ -122,8 +122,14 @@ describe("unlock resolver", () => {
     expect(hasFeature(ctx({ level: 30 }), "engravingStation")).toBe(true);
     expect(hasFeature(ctx({ level: 39 }), "dailyPreview")).toBe(false);
     expect(hasFeature(ctx({ level: 40 }), "dailyPreview")).toBe(true);
-    expect(hasFeature(ctx({ level: 49 }), "freeRespec")).toBe(false);
-    expect(hasFeature(ctx({ level: 50 }), "freeRespec")).toBe(true);
+  });
+
+  it("opens only the prestige skin at L50, since the half-price reset is a rule of level", () => {
+    const before = resolveUnlocks(ctx({ level: 49 }));
+    const fresh = [...resolveUnlocks(ctx({ level: 50 }))].filter(
+      (id) => !before.has(id),
+    );
+    expect(fresh).toEqual(["skinPrestige50"]);
   });
 });
 

@@ -101,6 +101,25 @@ export const FIRE_MODE_BY_ID: ReadonlyMap<FireModeId, FireModeDef> = new Map(
 export const fireModeDef = (id: FireModeId): FireModeDef =>
   FIRE_MODE_BY_ID.get(id) ?? DIRECT;
 
+export const fireModeVars = (def: FireModeDef): Record<string, number> => {
+  switch (def.id) {
+    case "scatter":
+      return { fragmentBonus: def.fragmentBonus, minEnemies: def.minEnemies };
+    case "doublet":
+      return { hits: def.hits };
+    case "shaped":
+      return { offFacePenalty: def.offFacePenalty };
+    case "incendiary":
+      return { damagePenalty: def.damagePenalty, burn: def.burn };
+    case "linked":
+      return { perDie: def.perDie, cap: def.cap };
+    case "shunt":
+      return { damagePenalty: def.damagePenalty, charge: def.charge };
+    default:
+      return {};
+  }
+};
+
 export const FIRE_MODE_SLOTS: readonly SlotId[] = ["weaponA", "weaponB"];
 
 export const SCATTER_MK: MkLevel = 3;

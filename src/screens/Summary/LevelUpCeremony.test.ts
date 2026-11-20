@@ -1,42 +1,10 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { bodyOf, selectorsDeclaring, valueOf } from "@/app/cssRules";
+import { readSource } from "@/app/sourceFiles";
 
-const CEREMONY_CSS = readFileSync(
-  join(process.cwd(), "src", "screens", "Summary", "LevelUpCeremony.module.css"),
-  "utf8",
-);
+const CEREMONY_CSS = readSource("screens", "Summary", "LevelUpCeremony.module.css");
 
-const SCREEN_CSS = readFileSync(
-  join(process.cwd(), "src", "app", "Screen.module.css"),
-  "utf8",
-);
-
-const RULE = /([^{}]+)\{([^{}]*)\}/g;
-
-interface Rule {
-  selector: string;
-  body: string;
-}
-
-const rulesOf = (css: string): Rule[] =>
-  [...css.matchAll(RULE)].map((match) => ({
-    selector: (match[1] ?? "").trim().replace(/\s+/g, " "),
-    body: match[2] ?? "",
-  }));
-
-const bodyOf = (css: string, selector: string): string =>
-  rulesOf(css).find((rule) => rule.selector === selector)?.body ?? "";
-
-const valueOf = (body: string, property: string): string | null => {
-  const match = new RegExp(`(?:^|;)\\s*${property}\\s*:\\s*([^;]+)`).exec(body);
-  return match === null ? null : (match[1] ?? "").trim();
-};
-
-const selectorsDeclaring = (css: string, declaration: RegExp): string[] =>
-  rulesOf(css)
-    .filter((rule) => declaration.test(rule.body))
-    .map((rule) => rule.selector);
+const SCREEN_CSS = readSource("app", "Screen.module.css");
 
 const UNREACHABLE_BLOCK_ALIGNMENTS = [
   "center",

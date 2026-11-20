@@ -16,8 +16,10 @@ export interface RunCounts {
   contractStars: number;
 }
 
+export const ASCENSION_XP_PCT = 12;
+
 export const ascensionMult = (ascension: number): number =>
-  1 + 0.1 * Math.max(0, ascension);
+  1 + (ASCENSION_XP_PCT / 100) * Math.max(0, ascension);
 
 export const xpToNext = (level: number): number => 25 + 6 * level;
 
@@ -75,7 +77,7 @@ export const campaignShards = (sectorsCleared: number): number =>
     0,
   );
 
-export const ASCENSION_SHARD_PCT = 8;
+export const ASCENSION_SHARD_PCT = 10;
 export const BEACON_SHARDS = 8;
 export const FIRST_ENDING_SHARDS = 25;
 export const HALF_HULL_CLEAR_SHARDS = 15;

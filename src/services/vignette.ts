@@ -40,6 +40,9 @@ const listeners = new Set<Listener>();
 
 const LOW_HULL_RATIO = 0.3;
 
+export const isLowHull = (hull: number, hullMax: number): boolean =>
+  hullMax > 0 && hull > 0 && hull / hullMax < LOW_HULL_RATIO;
+
 let seq = 0;
 let lastFlash: VignetteFlash | null = null;
 let rims: VignetteRims = { shield: false, lowHull: false };
@@ -79,8 +82,7 @@ export const setVignetteRim = (kind: VignetteRimKind, on: boolean): void => {
 };
 
 export const syncHullRim = (hull: number, hullMax: number): void => {
-  const low = hullMax > 0 && hull > 0 && hull / hullMax < LOW_HULL_RATIO;
-  setVignetteRim("lowHull", low);
+  setVignetteRim("lowHull", isLowHull(hull, hullMax));
 };
 
 export const clearVignette = (): void => {

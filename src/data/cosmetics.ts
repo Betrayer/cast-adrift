@@ -58,6 +58,11 @@ export const DIE_SKINS: readonly DieSkinDef[] = [
     edge: "#B9C6D6",
     cosmetic: "thresholdSkin",
   }),
+  skinDef("singularity", {
+    style: { radius: 0.46, strokeW: 1.5, noise: 0, gradient: 0.62 },
+    edge: "#F2F6FF",
+    cosmetic: "singularitySkin",
+  }),
 ];
 
 export const DIE_SKIN_BY_ID: ReadonlyMap<string, DieSkinDef> = new Map(
@@ -97,6 +102,7 @@ export const BADGES: readonly BadgeDef[] = [
   badge("chartwright", { glyph: "✦", kind: "static" }),
   badge("archivist", { glyph: "❖", kind: "static" }),
   badge("answer", { glyph: "◉", kind: "animated" }),
+  badge("singularity", { glyph: "⊚", kind: "animated" }),
 ];
 
 export const BADGE_BY_ID: ReadonlyMap<string, BadgeDef> = new Map(

@@ -1,4 +1,4 @@
-import { DIRECT, type FireModeDef, type FireModeId } from '@/data/fireModes';
+import { DIRECT, type FireModeId } from '@/data/fireModes';
 import {
   boardSlotIds,
   modeBlockFor,
@@ -23,25 +23,6 @@ export interface SlotModeModel {
 export type SlotModeModels = Partial<Record<SlotId, SlotModeModel>>;
 
 type ModeBoard = Pick<BattleBoard, 'slots' | 'enemies'>;
-
-export const fireModeVars = (def: FireModeDef): Record<string, number> => {
-  switch (def.id) {
-    case 'scatter':
-      return { fragmentBonus: def.fragmentBonus, minEnemies: def.minEnemies };
-    case 'doublet':
-      return { hits: def.hits };
-    case 'shaped':
-      return { offFacePenalty: def.offFacePenalty };
-    case 'incendiary':
-      return { damagePenalty: def.damagePenalty, burn: def.burn };
-    case 'linked':
-      return { perDie: def.perDie, cap: def.cap };
-    case 'shunt':
-      return { damagePenalty: def.damagePenalty, charge: def.charge };
-    default:
-      return {};
-  }
-};
 
 export const slotModeModel = (
   board: ModeBoard,

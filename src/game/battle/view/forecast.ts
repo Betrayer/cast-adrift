@@ -1,4 +1,5 @@
 import { ENEMY_BY_ID } from "@/data/enemies";
+import { isAuthoredEnemy } from "@/game/battle/enemyPhase";
 import { computeMutatorMods } from "@/data/mutators";
 import {
   applyChargeAuras,
@@ -6,6 +7,7 @@ import {
   intentHits,
   resolvePlayerPhase,
 } from "@/game/battle/resolver";
+import { hiddenIntentIds, shownIntent } from "@/game/battle/intentVisibility";
 import { everyTurnFor } from "@/game/battle/setup";
 import { livingPartIntents } from "@/game/battle/target";
 import { applyStatus } from "@/game/battle/statuses";
@@ -41,6 +43,7 @@ export const expectedHit = (
 };
 
 export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
+  const hidden = hiddenIntentIds(snapshot);
   const { next, beats } = resolvePlayerPhase(snapshot);
   const outgoing = beats
     .filter((b) => b.kind === "damage")
@@ -78,13 +81,16 @@ export const enemyForecast = (snapshot: BattleSnapshot): TurnForecast => {
     if (def === undefined) continue;
     for (const intent of [
       ...everyTurnFor(def, enemy.phase),
-      enemy.nextIntent,
+      shownIntent(next, enemy, hidden),
       ...livingPartIntents(enemy),
     ]) {
       const raws = intentHits(next, enemy, intent);
       if (raws.length > 0) {
         delete enemy.statuses.charge;
         delete enemy.statuses.jam;
+      }
+      if (raws.some((raw) => raw > 0) && isAuthoredEnemy(enemy.defId)) {
+        next.firstHitSpent = true;
       }
       for (const raw of raws) {
         rawTotal += raw;
@@ -127,7 +133,10 @@ export const mitigationOf = (
   if (chargeAuraActive(snapshot)) applyStatus(actor.statuses, "charge");
   let raw = 0;
   let expected = 0;
-  for (const intent of [enemy.nextIntent, ...livingPartIntents(enemy)]) {
+  for (const intent of [
+    shownIntent(snapshot, enemy, hiddenIntentIds(snapshot)),
+    ...livingPartIntents(enemy),
+  ]) {
     const hits = intentHits(snapshot, actor, intent);
     if (hits.length > 0) {
       delete actor.statuses.charge;

@@ -30,10 +30,11 @@ export const atLeast = (width: number, bp: Breakpoint): boolean =>
   width >= BREAKPOINTS[bp];
 
 export const HEIGHTS = {
+  tight: 600,
   compact: 780,
 } as const;
 
-export const HEIGHT_ORDER: readonly (keyof typeof HEIGHTS)[] = ['compact'];
+export const HEIGHT_ORDER: readonly (keyof typeof HEIGHTS)[] = ['tight', 'compact'];
 
 export const ROTATE_GATE_MAX_HEIGHT = 520;
 

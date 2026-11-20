@@ -4,22 +4,44 @@ import type { EffectDef } from "@/game/effects/types";
 import type { SlotId } from "@/types/battle";
 import type { LocKey, School } from "@/types/content";
 
-export type Constellation = School | "hub";
+const TIER_BANDS: readonly number[] = [3, 6, 9, 11];
+
+export const smallTier = (depth: number): number => {
+  for (let tier = 0; tier < TIER_BANDS.length; tier += 1) {
+    if (depth <= (TIER_BANDS[tier] ?? 0)) return tier + 1;
+  }
+  return TIER_BANDS.length;
+};
+
+export type Constellation = School | "hub" | "nexus";
 
 export type ChartNodeKind =
   | "small"
   | "gate"
-  | "minor"
   | "notable"
+  | "confluence"
+  | "nexus"
   | "keystone";
+
+export interface ChartRequirement {
+  pointsIn: Partial<Record<School, number>>;
+}
+
+export interface ChartScaling {
+  school: School;
+  per: number;
+  max: number;
+}
 
 export interface ChartNodeDef {
   id: string;
   constellation: Constellation;
   kind: ChartNodeKind;
-  pos: { x: number; y: number };
   links: string[];
+  depth: number;
   entry?: boolean;
+  requires?: ChartRequirement;
+  scaledBy?: ChartScaling;
   effects?: readonly EffectDef[];
   mods?: Partial<PerkMods>;
   traits?: readonly PerkTrait[];

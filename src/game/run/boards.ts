@@ -47,13 +47,14 @@ const captureSubmission = (): {
 } => {
   const run = useRunStore.getState();
   const meta = useMetaStore.getState();
-  const score = runScore(run.stats);
+  const score = runScore(run.stats, run.ascension);
   const daily = run.mode === "daily";
   const check = plausibility({
     score,
     depth: run.stats.depth,
     kills: run.stats.kills,
     scrap: run.stats.scrapEarned,
+    ascension: run.ascension,
     hash: run.stats.actionHash,
     requiresHash: daily,
   });
@@ -72,6 +73,7 @@ const captureSubmission = (): {
       kills: run.stats.kills,
       scrap: run.stats.scrapEarned,
       updatedAt: Date.now(),
+      ...(run.ascension > 0 ? { ascension: run.ascension } : {}),
       hash: run.stats.actionHash,
       ...(daily ? { state: "done" as const } : {}),
       ...(check.ok ? {} : { flagged: true as const }),

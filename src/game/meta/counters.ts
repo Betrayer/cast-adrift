@@ -14,6 +14,11 @@ export const noteEventResolved = (): void => {
   bump({ eventsResolved: 1 });
 };
 
+export const noteDragTally = (drops: number, cancels: number): void => {
+  if (drops + cancels === 0) return;
+  useMetaStore.getState().bumpLifetime({ dragDrops: drops, dragCancels: cancels });
+};
+
 export const noteFusion = (): void => {
   bump({ fusions: 1 });
 };

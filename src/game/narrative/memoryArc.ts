@@ -2,7 +2,7 @@ import { beaconsResolved } from "@/data/events/beacons";
 import {
   earnedMemoryOrders,
   finalMemoryCodexId,
-  memoryAt,
+  numberedMemoryAt,
   memoryFragmentCount,
   FINAL_MEMORY_IDS,
   MEMORY_CODEX_IDS,
@@ -29,10 +29,11 @@ export const syncMemoryArc = (): number[] => {
   const run = useRunStore.getState();
   const fresh: number[] = [];
   for (const order of earned) {
-    if (!run.unlockMemory(order)) continue;
-    const memory = memoryAt(order);
+    const memory = numberedMemoryAt(order);
     if (memory === undefined) continue;
-    useMetaStore.getState().unlockCodex(memory.codexId);
+    const firstEver = useMetaStore.getState().unlockCodex(memory.codexId);
+    run.unlockMemory(order);
+    if (!firstEver) continue;
     useNarrativeStore.getState().pushMemory(order);
     logJournal({ k: "memory", order });
     fresh.push(order);
@@ -47,8 +48,11 @@ export const echoArcComplete = (): boolean =>
   memoryFragmentCount(useMetaStore.getState().codex) === MEMORY_TOTAL;
 
 export const sealFinalMemory = (endingId: string): void => {
+  const held = useMetaStore.getState().codex;
+  const firstEver = !FINAL_MEMORY_IDS.some((id) => held.includes(id));
   useRunStore.getState().unlockMemory(MEMORY_TOTAL);
   useMetaStore.getState().unlockCodex(finalMemoryCodexId(endingId));
+  if (!firstEver) return;
   logJournal({ k: "memory", order: MEMORY_TOTAL });
 };
 

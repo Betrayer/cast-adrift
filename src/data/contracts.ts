@@ -90,7 +90,7 @@ export const CONTRACTS: readonly ContractDef[] = [
     goals: [
       { g: "win" },
       { g: "burnKillElite" },
-      { g: "jumpsAtMost", n: 12 },
+      { g: "fastBattleTurnsAtMost", n: 3 },
     ],
   }),
   contract("iceWall", {
@@ -182,14 +182,14 @@ export const CONTRACTS: readonly ContractDef[] = [
     goals: [
       { g: "win" },
       { g: "dicePlacedAtMost", n: 20 },
-      { g: "jumpsAtMost", n: 14 },
+      { g: "noRerolls" },
     ],
   }),
   contract("deadReckoning", {
     setup: { chartDisabled: true, mutators: ["fog"] },
     goals: [
       { g: "win" },
-      { g: "jumpsAtMost", n: 13 },
+      { g: "hullNeverBelowPct", n: 40 },
       { g: "noShipyardVisits" },
     ],
   }),
@@ -214,7 +214,7 @@ export const CONTRACTS: readonly ContractDef[] = [
     goals: [
       { g: "win" },
       { g: "elitesAtMost", n: 1 },
-      { g: "jumpsAtMost", n: 12 },
+      { g: "hullNeverBelowPct", n: 35 },
     ],
   }),
   contract("voidTithe", {
@@ -225,6 +225,14 @@ export const CONTRACTS: readonly ContractDef[] = [
       { g: "scrapAtLeast", n: 120 },
     ],
   }),
+  contract("deepVacuum", {
+    setup: { sector: 4, mutators: ["risingTide"] },
+    goals: [
+      { g: "win" },
+      { g: "hullNeverBelowPct", n: 30 },
+      { g: "scrapAtLeast", n: 100 },
+    ],
+  }),
   contract("gauntlet", {
     setup: {
       forcedTraits: ["obsidianPact"],
@@ -233,11 +241,13 @@ export const CONTRACTS: readonly ContractDef[] = [
     },
     goals: [
       { g: "win" },
-      { g: "elitesAtLeast", n: 4 },
+      { g: "elitesAtLeast", n: 2 },
       { g: "hullPctAtLeast", n: 25 },
     ],
   }),
 ];
+
+export const CONTRACT_STAR_MAX = CONTRACTS.length * CONTRACT_STAR_COUNT;
 
 export const CONTRACT_BY_ID: ReadonlyMap<string, ContractDef> = new Map(
   CONTRACTS.map((def) => [def.id, def]),

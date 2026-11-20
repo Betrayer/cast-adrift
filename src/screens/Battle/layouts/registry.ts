@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import type { BoardComposition } from '@/screens/Battle/layouts/BoardColumn';
 import {
   ConsoleBody,
   ConsoleFooter,
@@ -17,7 +18,7 @@ import {
 import type { BattleLayoutId } from '@/types';
 
 export interface BattleLayoutView {
-  Body: ComponentType;
+  Body: ComponentType<{ composition: BoardComposition }>;
   Footer: ComponentType;
   Wide: ComponentType;
 }

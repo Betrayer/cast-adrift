@@ -35,7 +35,8 @@
     "owned": "Unlocked",
     "unlock": "Unlock",
     "price": "{{n}} shards",
-    "ascendant": "Ascendant"
+    "ascendant": "Ascendant",
+    "eventHorizon": "Event Horizon"
   },
   "diagnostics": {
     "version": "Build {{version}}",
@@ -61,6 +62,16 @@
     "signOutConfirm": "Sign out anyway",
     "telegramHint": "Attach an email to this Telegram profile and the same account opens on the web.",
     "telegramGoogleHint": "Google needs a real browser window. The button opens Cast Adrift outside Telegram.",
+    "tg": {
+      "signedIn": "Telegram: {{name}}",
+      "unnamed": "signed in",
+      "guest": "Guest — Telegram sign-in is unavailable: {{reason}}",
+      "reason": {
+        "missingConfig": "the server is not configured",
+        "badSignature": "Telegram did not confirm this session",
+        "network": "the server did not answer"
+      }
+    },
     "provider": {
       "google": "Google",
       "password": "Email",
@@ -130,5 +141,49 @@
       "desc": "Every number in one column, the whole turn priced before you end it."
     }
   },
-  "skipTally": "Skip the battle tally"
+  "chartLayout": {
+    "title": "Star chart",
+    "hint": "Four ways to draw the same chart. Nodes, links and prices never change.",
+    "open": "Open the chart",
+    "spiral": {
+      "name": "Spiral",
+      "desc": "Seven arms curling out of the core. The default."
+    },
+    "rings": {
+      "name": "Orbits",
+      "desc": "Every ring is a price tier: how far out a node sits is what it costs."
+    },
+    "constellations": {
+      "name": "Constellations",
+      "desc": "Each school a figure of stars, drawn once and kept."
+    },
+    "nebulae": {
+      "name": "Nebulae",
+      "desc": "Each school a cloud that thickens with every point you put in."
+    }
+  },
+  "rollStyle": {
+    "title": "Dice roll",
+    "hint": "How a die that decides something is shown rolling. Tap a card to roll it again.",
+    "flip": {
+      "name": "Tumble",
+      "desc": "A real die spins and lands on its face. The default."
+    },
+    "reel": {
+      "name": "Reel",
+      "desc": "The face flicks through numbers and slows to a stop."
+    },
+    "blur": {
+      "name": "Blur",
+      "desc": "The numbers blur past and snap into focus."
+    }
+  },
+  "skipTally": "Skip the battle tally",
+  "voice": "Ship computer voice",
+  "voiceTest": "Test",
+  "voiceSample": "Captain, Echo here. Comms are clear.",
+  "voiceUnavailable": "Not available on this device",
+  "voiceNoLanguage": "This device has no voice for this language",
+  "voiceMuted": "Sound effects are muted",
+  "haptics": "Vibration"
 }

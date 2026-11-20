@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { CONTRACTS, CONTRACT_STAR_COUNT } from "@/data/contracts";
+import {
+  CONTRACTS,
+  CONTRACT_STAR_COUNT,
+  CONTRACT_STAR_MAX,
+} from "@/data/contracts";
 import { BEACON_FLAGS } from "@/data/events/beacons";
 import {
+  contractStarTotal,
   countStars,
   goalMet,
   goalStarsMask,
@@ -221,8 +226,8 @@ describe("star masks", () => {
 });
 
 describe("contract catalogue", () => {
-  it("ships twenty contracts, each with three distinct goals", () => {
-    expect(CONTRACTS).toHaveLength(20);
+  it("ships twenty-one contracts, each with three distinct goals", () => {
+    expect(CONTRACTS).toHaveLength(21);
     for (const def of CONTRACTS) {
       expect(def.goals).toHaveLength(CONTRACT_STAR_COUNT);
       expect(new Set(def.goals.map((g) => g.g)).size).toBe(CONTRACT_STAR_COUNT);
@@ -240,5 +245,23 @@ describe("contract catalogue", () => {
       const mask = goalStarsMask(def.goals, ctx({ win: false, hull: 0 }));
       expect(mask).toBe(0);
     }
+  });
+});
+
+describe("contract star total", () => {
+  it("is zero for a profile that holds no stars", () => {
+    expect(contractStarTotal({})).toBe(0);
+  });
+
+  it("counts stars of catalogued contracts only", () => {
+    const first = CONTRACTS[0]?.id ?? "";
+    const second = CONTRACTS[1]?.id ?? "";
+    expect(
+      contractStarTotal({ [first]: 0b111, [second]: 0b001, stale: 0b111 }),
+    ).toBe(4);
+  });
+
+  it("caps at three stars for every contract", () => {
+    expect(CONTRACT_STAR_MAX).toBe(CONTRACTS.length * CONTRACT_STAR_COUNT);
   });
 });

@@ -1,6 +1,7 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAtLeast } from '@/app/breakpoints';
+import { debugRequested } from '@/app/debug';
 import { Screen } from '@/app/Screen';
 import { LootReveal } from '@/screens/Battle/LootReveal';
 import { useLootStore } from '@/stores/lootStore';
@@ -19,6 +20,7 @@ import { now } from '@/services/clock';
 import { haptic } from '@/services/tma';
 import { useBattleLayoutId } from '@/services/prefs';
 import { createStreams } from '@/services/rng';
+import { isLowHull } from '@/services/vignette';
 import { useReducedMotion } from '@/stores/settingsStore';
 import { useAppStore } from '@/stores/appStore';
 import { useBattleStore } from '@/stores/battleStore';
@@ -28,11 +30,20 @@ import { FateInvocation } from '@/screens/Battle/FateInvocation';
 import { DebugPanel } from '@/screens/Battle/DebugPanel';
 import { EnemyDetail } from '@/screens/Battle/console/EnemyDetail';
 import { LAYOUT_VIEWS } from '@/screens/Battle/layouts/registry';
+import { useSlotArm } from '@/screens/Battle/board/slotArm';
 import { EndOverlay, TopBands } from '@/screens/Battle/shell/BattleShell';
+import { endHoldMs } from '@/screens/Battle/shell/endHold';
 import bossStyles from './BossIntro.module.css';
 import styles from './BattleScreen.module.css';
+import { noteDragTally } from '@/game/meta/counters';
+import { takeDragTally } from '@/pixi/battle/dragState';
 
-const BOSS_HIT_STOP_MS = 300;
+const DragDiagnostics = lazy(() =>
+  import('@/screens/Battle/DragDiagnostics').then((m) => ({
+    default: m.DragDiagnostics,
+  })),
+);
+
 const BATTLE_WARP_MS = 400;
 
 const startTestBattleIfIdle = (): void => {
@@ -65,17 +76,21 @@ export const BattleScreen = () => {
   const reduced = useReducedMotion();
   const bossFall =
     bossFight && phase === 'ended' && outcome === 'victory' && !reduced;
+  const holdOutcome =
+    runActive && phase === 'ended' && !reduced ? outcome : undefined;
   const droppedRef = useRef(false);
   const resolvedRef = useRef(false);
   const lowHullRef = useRef(false);
   const [warping, setWarping] = useState(true);
+
+  useSlotArm();
 
   useEffect(() => {
     if (!runActive || hullMax <= 0) {
       lowHullRef.current = false;
       return;
     }
-    const low = hull > 0 && hull / hullMax < 0.3;
+    const low = isLowHull(hull, hullMax);
     if (low && !lowHullRef.current) emitBark('lowHull');
     lowHullRef.current = low;
   }, [hull, hullMax, runActive]);
@@ -90,6 +105,8 @@ export const BattleScreen = () => {
     focusEnemy(null);
     return () => {
       focusEnemy(null);
+      const tally = takeDragTally();
+      noteDragTally(tally.drops, tally.cancels);
     };
   }, []);
 
@@ -131,16 +148,22 @@ export const BattleScreen = () => {
     if (!runActive) return;
     if (phase !== 'ended' || resolvedRef.current) return;
     resolvedRef.current = true;
-    if (!bossFall) {
+    if (bossFall) haptic('bossIntro');
+    const hold = endHoldMs(outcome, reduced);
+    if (hold === 0) {
       resolveActiveBattle();
       return;
     }
-    haptic('bossIntro');
-    const id = window.setTimeout(resolveActiveBattle, BOSS_HIT_STOP_MS);
+    let fired = false;
+    const id = window.setTimeout(() => {
+      fired = true;
+      resolveActiveBattle();
+    }, hold);
     return () => {
       window.clearTimeout(id);
+      if (!fired) resolvedRef.current = false;
     };
-  }, [phase, runActive, bossFall]);
+  }, [phase, runActive, bossFall, outcome, reduced]);
 
   const mountScene = useMemo(
     () => (app: Application) =>
@@ -153,9 +176,8 @@ export const BattleScreen = () => {
     [t],
   );
 
-  const debugEnabled =
-    import.meta.env.DEV &&
-    new URLSearchParams(window.location.search).get('debug') === '1';
+  const requested = debugRequested();
+  const debugEnabled = import.meta.env.DEV && requested;
 
   const view = LAYOUT_VIEWS[layoutId];
 
@@ -165,6 +187,7 @@ export const BattleScreen = () => {
       pad={false}
       scroll={false}
       passThrough
+      shellClassName={styles.noPan}
       bodyClassName={styles.board}
       innerClassName={styles.inner}
       header={wide ? undefined : <TopBands />}
@@ -183,16 +206,32 @@ export const BattleScreen = () => {
           <LootReveal />
           <FateInvocation />
           {bossFall ? <div className={bossStyles.bossFall} /> : null}
+          {holdOutcome === 'defeat' ? (
+            <div
+              className={styles.defeatClose}
+              data-end-hold="defeat"
+              data-defeat-close
+              aria-hidden
+            />
+          ) : null}
+          {holdOutcome === 'victory' ? (
+            <div className={styles.endHold} data-end-hold="victory" aria-hidden />
+          ) : null}
           <BossIntro />
           {phase === 'ended' && !runActive ? <EndOverlay /> : null}
           {debugEnabled ? <DebugPanel /> : null}
+          {requested ? (
+            <Suspense fallback={null}>
+              <DragDiagnostics />
+            </Suspense>
+          ) : null}
         </>
       }
     >
       {wide ? (
         <view.Wide key={`wide-${layoutId}`} />
       ) : (
-        <view.Body key={layoutId} />
+        <view.Body key={layoutId} composition="phone" />
       )}
     </Screen>
   );

@@ -1,0 +1,61 @@
+.ladder {
+  display: block;
+  overflow: visible;
+}
+
+.track {
+  fill: none;
+  stroke: var(--ca-line);
+  stroke-width: 2;
+}
+
+.stroke {
+  fill: none;
+  stroke: var(--ca-accent);
+  stroke-width: 2;
+  stroke-linecap: butt;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 0;
+  animation: routeDraw var(--ca-motion-xl) var(--ca-ease-out) backwards;
+}
+
+.pip {
+  fill: var(--ca-bg);
+  stroke: var(--ca-line);
+  stroke-width: 1.5;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.pip[data-route-state='cleared'] {
+  fill: var(--ca-pip-color);
+  stroke: var(--ca-pip-color);
+  animation: pipLight var(--ca-motion-s) var(--ca-ease-back) backwards;
+  animation-delay: var(--ca-pip-delay, 0ms);
+}
+
+.pip[data-route-state='ended'] {
+  fill: var(--ca-bg);
+  stroke: var(--ca-danger);
+  stroke-width: 2;
+  animation: pipLight var(--ca-motion-s) var(--ca-ease-back) backwards;
+  animation-delay: var(--ca-pip-delay, 0ms);
+}
+
+@keyframes routeDraw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes pipLight {
+  from {
+    opacity: 0.3;
+    transform: scale(0.6);
+  }
+}
+
+:root[data-ca-motion='reduced'] .stroke,
+:root[data-ca-motion='reduced'] .pip {
+  animation: none;
+}

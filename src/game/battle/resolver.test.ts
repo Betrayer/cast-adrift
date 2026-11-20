@@ -8,7 +8,6 @@ import {
   advanceTurn,
   applyNodeStorm,
   applyPendingTwists,
-  CHARGE_CAP,
   DODGE_PCT_CAP,
   evasionFor,
   evasionTuningFor,
@@ -26,7 +25,13 @@ import {
   drawIntent,
   spawnEnemy,
 } from "@/game/battle/setup";
-import { harnessEnemy, harnessSnap } from "@/game/battle/battleHarness";
+import {
+  harnessDie,
+  harnessEnemy,
+  harnessSnap,
+  place,
+} from "@/game/battle/battleHarness";
+import { BASE_CHARGE_CAP } from "@/game/run/perkMods";
 import {
   createStream,
   createStreamFromState,
@@ -227,7 +232,7 @@ describe("evasion carriers", () => {
     })),
   ];
 
-  it("has exactly the carriers the U2 sweep re-tuned", () => {
+  it("has exactly the carriers the U2 sweep re-tuned, plus H3's ramp", () => {
     expect(CARRIERS.map((c) => `${c.id}=${String(c.delta)}`)).toEqual([
       "perk:mirrorLattice=2",
       "perk:rhizome=4",
@@ -236,10 +241,12 @@ describe("evasion carriers", () => {
       "module:ballastModule=-2",
       "module:hardpointClamp=2",
       "module:bulkheadRing=-2",
-      "chart:green-s6=2",
+      "chart:green-s2=2",
       "chart:green-not2=2",
-      "chart:green-s11=2",
-      "chart:green-s21=2",
+      "chart:green-s12=5",
+      "chart:green-s22=6",
+      "chart:prismatic-s6=3",
+      "chart:prismatic-s22=6",
     ]);
   });
 
@@ -266,6 +273,7 @@ describe("evasion carriers", () => {
   });
 
   it("keeps every ship tuning inside the Hound's ceiling", () => {
+    const hound = evasionTuningFor("corsair");
     for (const ship of PLAYABLE_SHIPS) {
       const tuning = evasionTuningFor(ship.id);
       for (let value = 0; value <= 24; value += 1) {
@@ -275,8 +283,8 @@ describe("evasion carriers", () => {
           tuning.glancingCap,
         );
       }
-      expect(tuning.dodgeCap, ship.id).toBeLessThanOrEqual(40);
-      expect(tuning.glancingCap, ship.id).toBeLessThanOrEqual(55);
+      expect(tuning.dodgeCap, ship.id).toBeLessThanOrEqual(hound.dodgeCap);
+      expect(tuning.glancingCap, ship.id).toBeLessThanOrEqual(hound.glancingCap);
       expect(evasionFor(20, 0, tuning).glancingPct, ship.id).toBeGreaterThan(
         evasionFor(20, 0, tuning).dodgePct,
       );
@@ -573,7 +581,7 @@ describe("reactor economy", () => {
     const { next } = resolvePlayerPhase(
       withPlacements({ reactor: 4 }, { charge: 6 }),
     );
-    expect(next.charge).toBe(CHARGE_CAP);
+    expect(next.charge).toBe(BASE_CHARGE_CAP);
     expect(next.hull).toBe(30);
   });
 
@@ -581,7 +589,7 @@ describe("reactor economy", () => {
     const { next, beats } = resolvePlayerPhase(
       withPlacements({ reactor: 6 }, { charge: 8 }),
     );
-    expect(next.charge).toBe(CHARGE_CAP);
+    expect(next.charge).toBe(BASE_CHARGE_CAP);
     expect(next.hull).toBe(28);
     expect(beats[0]?.overflowHull).toBe(2);
   });
@@ -635,6 +643,43 @@ describe("weapons and targeting", () => {
     );
     expect(next.enemies[1]?.hp).toBe(5);
     expect(beats[0]?.targetId).toBe("enemy-1");
+  });
+});
+
+describe("the Nova splash", () => {
+  const hpAfterNova = (
+    hps: readonly number[],
+    chartPicks: readonly string[] = ["nexus-prismatic-red"],
+  ): number[] => {
+    const board = harnessSnap(
+      [
+        harnessDie("gun", "red-d6", 6),
+        harnessDie("f1", "facet", 4),
+        harnessDie("f2", "facet", 4),
+      ],
+      {
+        enemies: hps.map((hp, index) =>
+          harnessEnemy({ id: `enemy-${String(index)}`, hp, hpMax: 40 }),
+        ),
+        targetId: "enemy-0",
+        chartPicks: [...chartPicks],
+      },
+    );
+    place(board, "gun", "weaponA");
+    return resolvePlayerPhase(board).next.enemies.map((e) => e.hp);
+  };
+
+  it("splashes the survivor when the first hit kills its target", () => {
+    expect(hpAfterNova([4, 32])).toEqual([0, 28]);
+  });
+
+  it("splashes every survivor of a three-enemy fight after a kill", () => {
+    expect(hpAfterNova([4, 32, 32])).toEqual([0, 28, 28]);
+  });
+
+  it("keeps the struck enemy out of its own splash", () => {
+    const [struck] = hpAfterNova([40, 32], []);
+    expect(hpAfterNova([40, 32])).toEqual([struck, 28]);
   });
 });
 

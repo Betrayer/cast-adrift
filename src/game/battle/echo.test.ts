@@ -12,9 +12,9 @@ import {
   createStreamFromState,
   createStreams,
 } from "@/services/rng";
+import { echoAction } from "@/game/battle/view";
 import {
   createInitialBattleValues,
-  echoActiveDead,
   echoActiveSpent,
   useBattleStore,
 } from "@/stores/battleStore";
@@ -121,7 +121,7 @@ describe("Second Look — the reroll the baseline cannot buy", () => {
     useBattleStore.setState((s) => ({
       dice: s.dice.map((d) => ({ ...d, state: "placed" as const })),
     }));
-    expect(echoActiveDead(useBattleStore.getState())).toBe(true);
+    expect(echoAction(useBattleStore.getState()).block).toBe("notAllowed");
     useBattleStore.getState().useEchoActive();
     expect(useBattleStore.getState().spentGrants).toEqual([]);
   });

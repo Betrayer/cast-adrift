@@ -104,6 +104,8 @@ export const dieForRarity = (
   rarityStep = 0,
 ): string => rng.pick(poolForRarity(bumpRarity(rarity, rarityStep)));
 
+export const BATTLE_SCRAP: readonly [number, number] = [7, 11];
+
 export const POCKET_SCRAP_MULT = 1.5;
 export const POCKET_RARITY_STEP = 1;
 
@@ -125,7 +127,7 @@ export const computeNodeReward = (
   switch (type) {
     case "battle":
       return {
-        scrap: scrap(rng.int(12, 20)),
+        scrap: scrap(rng.int(BATTLE_SCRAP[0], BATTLE_SCRAP[1])),
         dieDrop:
           rng.next() < BATTLE_DROP_CHANCE
             ? rollDrop(rng, DROP_WEIGHTS.battle, step)
